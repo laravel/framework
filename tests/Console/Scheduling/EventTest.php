@@ -6,6 +6,7 @@ use Illuminate\Console\Scheduling\Event;
 use Illuminate\Console\Scheduling\EventMutex;
 use Illuminate\Support\Str;
 use Mockery as m;
+use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 use PHPUnit\Framework\TestCase;
 
 class EventTest extends TestCase
@@ -17,9 +18,7 @@ class EventTest extends TestCase
         parent::tearDown();
     }
 
-    /**
-     * @requires OS Linux|Darwin
-     */
+    #[RequiresOperatingSystem('Linux|Darwin')]
     public function testBuildCommandUsingUnix()
     {
         $event = new Event(m::mock(EventMutex::class), 'php -i');
@@ -27,9 +26,7 @@ class EventTest extends TestCase
         $this->assertSame("php -i > '/dev/null' 2>&1", $event->buildCommand());
     }
 
-    /**
-     * @requires OS Windows
-     */
+    #[RequiresOperatingSystem('Windows')]
     public function testBuildCommandUsingWindows()
     {
         $event = new Event(m::mock(EventMutex::class), 'php -i');
@@ -37,9 +34,7 @@ class EventTest extends TestCase
         $this->assertSame('php -i > "NUL" 2>&1', $event->buildCommand());
     }
 
-    /**
-     * @requires OS Linux|Darwin
-     */
+    #[RequiresOperatingSystem('Linux|Darwin')]
     public function testBuildCommandInBackgroundUsingUnix()
     {
         $event = new Event(m::mock(EventMutex::class), 'php -i');
@@ -50,9 +45,7 @@ class EventTest extends TestCase
         $this->assertSame("(php -i > '/dev/null' 2>&1 ; '".PHP_BINARY."' 'artisan' schedule:finish {$scheduleId} \"$?\") > '/dev/null' 2>&1 &", $event->buildCommand());
     }
 
-    /**
-     * @requires OS Windows
-     */
+    #[RequiresOperatingSystem('Windows')]
     public function testBuildCommandInBackgroundUsingWindows()
     {
         $event = new Event(m::mock(EventMutex::class), 'php -i');

@@ -173,6 +173,8 @@ class AboutCommand extends Command
             'Debug Mode' => static::format(config('app.debug'), console: $formatEnabledStatus),
             'URL' => Str::of(config('app.url'))->replace(['http://', 'https://'], ''),
             'Maintenance Mode' => static::format($this->laravel->isDownForMaintenance(), console: $formatEnabledStatus),
+            'Timezone' => config('app.timezone'),
+            'Locale' => config('app.locale'),
         ]);
 
         static::addToSection('Cache', fn () => [
@@ -232,7 +234,7 @@ class AboutCommand extends Command
      * @param  string|null  $value
      * @return void
      */
-    public static function add(string $section, $data, string $value = null)
+    public static function add(string $section, $data, ?string $value = null)
     {
         static::$customDataResolvers[] = fn () => static::addToSection($section, $data, $value);
     }
@@ -245,7 +247,7 @@ class AboutCommand extends Command
      * @param  string|null  $value
      * @return void
      */
-    protected static function addToSection(string $section, $data, string $value = null)
+    protected static function addToSection(string $section, $data, ?string $value = null)
     {
         if (is_array($data)) {
             foreach ($data as $key => $value) {
@@ -279,7 +281,7 @@ class AboutCommand extends Command
      * @param  (\Closure(mixed):(mixed))|null  $json
      * @return \Closure(bool):mixed
      */
-    public static function format($value, Closure $console = null, Closure $json = null)
+    public static function format($value, ?Closure $console = null, ?Closure $json = null)
     {
         return function ($isJson) use ($value, $console, $json) {
             if ($isJson === true && $json instanceof Closure) {

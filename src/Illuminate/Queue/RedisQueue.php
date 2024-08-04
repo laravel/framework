@@ -255,7 +255,6 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      *
      * @param  string  $from
      * @param  string  $to
-     * @param  int  $limit
      * @return array
      */
     public function migrateExpiredJobs($from, $to)

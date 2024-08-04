@@ -3,10 +3,14 @@
 namespace Illuminate\Notifications;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\HasCollection;
 use Illuminate\Database\Eloquent\Model;
 
 class DatabaseNotification extends Model
 {
+    /** @use HasCollection<DatabaseNotificationCollection> */
+    use HasCollection;
+
     /**
      * The "type" of the primary key ID.
      *
@@ -46,9 +50,14 @@ class DatabaseNotification extends Model
     ];
 
     /**
+     * The type of collection that should be used for the model.
+     */
+    protected static string $collectionClass = DatabaseNotificationCollection::class;
+
+    /**
      * Get the notifiable entity that the notification belongs to.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphTo
+     * @return \Illuminate\Database\Eloquent\Relations\MorphTo<\Illuminate\Database\Eloquent\Model, $this>
      */
     public function notifiable()
     {
@@ -102,8 +111,8 @@ class DatabaseNotification extends Model
     /**
      * Scope a query to only include read notifications.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @param  \Illuminate\Database\Eloquent\Builder<static>  $query
+     * @return \Illuminate\Database\Eloquent\Builder<static>
      */
     public function scopeRead(Builder $query)
     {
@@ -113,22 +122,11 @@ class DatabaseNotification extends Model
     /**
      * Scope a query to only include unread notifications.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @param  \Illuminate\Database\Eloquent\Builder<static>  $query
+     * @return \Illuminate\Database\Eloquent\Builder<static>
      */
     public function scopeUnread(Builder $query)
     {
         return $query->whereNull('read_at');
-    }
-
-    /**
-     * Create a new database notification collection instance.
-     *
-     * @param  array  $models
-     * @return \Illuminate\Notifications\DatabaseNotificationCollection
-     */
-    public function newCollection(array $models = [])
-    {
-        return new DatabaseNotificationCollection($models);
     }
 }

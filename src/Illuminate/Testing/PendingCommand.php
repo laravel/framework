@@ -8,6 +8,8 @@ use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Traits\Conditionable;
+use Illuminate\Support\Traits\Macroable;
 use Mockery;
 use Mockery\Exception\NoMatchingExpectationException;
 use PHPUnit\Framework\TestCase as PHPUnitTestCase;
@@ -18,6 +20,9 @@ use Symfony\Component\Console\Output\BufferedOutput;
 
 class PendingCommand
 {
+    use Conditionable;
+    use Macroable;
+
     /**
      * The test being run.
      *
@@ -132,11 +137,17 @@ class PendingCommand
     /**
      * Specify output that should be printed when the command runs.
      *
-     * @param  string  $output
+     * @param  string|null  $output
      * @return $this
      */
-    public function expectsOutput($output)
+    public function expectsOutput($output = null)
     {
+        if ($output === null) {
+            $this->test->expectsOutput = true;
+
+            return $this;
+        }
+
         $this->test->expectedOutput[] = $output;
 
         return $this;
@@ -145,11 +156,17 @@ class PendingCommand
     /**
      * Specify output that should never be printed when the command runs.
      *
-     * @param  string  $output
+     * @param  string|null  $output
      * @return $this
      */
-    public function doesntExpectOutput($output)
+    public function doesntExpectOutput($output = null)
     {
+        if ($output === null) {
+            $this->test->expectsOutput = false;
+
+            return $this;
+        }
+
         $this->test->unexpectedOutput[$output] = false;
 
         return $this;
@@ -409,6 +426,18 @@ class PendingCommand
         $mock = Mockery::mock(BufferedOutput::class.'[doWrite]')
                 ->shouldAllowMockingProtectedMethods()
                 ->shouldIgnoreMissing();
+
+        if ($this->test->expectsOutput === false) {
+            $mock->shouldReceive('doWrite')->never();
+
+            return $mock;
+        }
+
+        if ($this->test->expectsOutput === true
+            && count($this->test->expectedOutput) === 0
+            && count($this->test->expectedOutputSubstrings) === 0) {
+            $mock->shouldReceive('doWrite')->atLeast()->once();
+        }
 
         foreach ($this->test->expectedOutput as $i => $output) {
             $mock->shouldReceive('doWrite')

@@ -15,7 +15,9 @@ use Illuminate\Queue\Middleware\RateLimitedWithRedis;
 use Illuminate\Support\Str;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 
+#[RequiresPhpExtension('redis')]
 class RateLimitedWithRedisTest extends TestCase
 {
     use InteractsWithRedis;

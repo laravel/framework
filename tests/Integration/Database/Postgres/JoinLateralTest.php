@@ -6,11 +6,11 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use PHPUnit\Framework\Attributes\RequiresOperatingSystemFamily;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 
-/**
- * @requires extension pdo_pgsql
- * @requires OS Linux|Darwin
- */
+#[RequiresPhpExtension('pdo_pgsql')]
+#[RequiresOperatingSystemFamily('Linux|Darwin')]
 class JoinLateralTest extends PostgresTestCase
 {
     protected function afterRefreshingDatabase()

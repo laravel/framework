@@ -16,14 +16,14 @@ class Argon2IdHasher extends ArgonHasher
      *
      * @throws \RuntimeException
      */
-    public function check($value, $hashedValue, array $options = [])
+    public function check(#[\SensitiveParameter] $value, $hashedValue, array $options = [])
     {
-        if ($this->verifyAlgorithm && ! $this->isUsingCorrectAlgorithm($hashedValue)) {
-            throw new RuntimeException('This password does not use the Argon2id algorithm.');
-        }
-
         if (is_null($hashedValue) || strlen($hashedValue) === 0) {
             return false;
+        }
+
+        if ($this->verifyAlgorithm && ! $this->isUsingCorrectAlgorithm($hashedValue)) {
+            throw new RuntimeException('This password does not use the Argon2id algorithm.');
         }
 
         return password_verify($value, $hashedValue);

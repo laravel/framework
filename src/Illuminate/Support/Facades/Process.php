@@ -38,7 +38,7 @@ use Illuminate\Process\Factory;
  * @method static \Illuminate\Contracts\Process\ProcessResult pipe(callable|array $callback, callable|null $output = null)
  * @method static \Illuminate\Process\ProcessPoolResults concurrently(callable $callback, callable|null $output = null)
  * @method static \Illuminate\Process\PendingProcess newPendingProcess()
- * @method static void macro(string $name, object|callable $macro)
+ * @method static void macro(string $name, object|callable $macro, object|callable $macro = null)
  * @method static void mixin(object $mixin, bool $replace = true)
  * @method static bool hasMacro(string $name)
  * @method static void flushMacros()
@@ -65,7 +65,7 @@ class Process extends Facade
      * @param  \Closure|array|null  $callback
      * @return \Illuminate\Process\Factory
      */
-    public static function fake(Closure|array $callback = null)
+    public static function fake(Closure|array|null $callback = null)
     {
         return tap(static::getFacadeRoot(), function ($fake) use ($callback) {
             static::swap($fake->fake($callback));

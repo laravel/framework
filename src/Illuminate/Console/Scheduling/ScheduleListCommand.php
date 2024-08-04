@@ -104,13 +104,12 @@ class ScheduleListCommand extends Command
     /**
      * List the given even in the console.
      *
-     * @param  \Illuminate\Console\Scheduling\Event
+     * @param  \Illuminate\Console\Scheduling\Event  $event
      * @param  int  $terminalWidth
      * @param  array  $expressionSpacing
      * @param  int  $repeatExpressionSpacing
-     * @param  array  $repeatExpressionSpacing
      * @param  \DateTimeZone  $timezone
-     * @return \Illuminate\Support\DateTimeZone
+     * @return array
      */
     private function listEvent($event, $terminalWidth, $expressionSpacing, $repeatExpressionSpacing, $timezone)
     {

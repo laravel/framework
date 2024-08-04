@@ -74,8 +74,8 @@ class DatabaseTransactionsManagerTest extends TestCase
         $executedAdminTransactions = $manager->commit('admin', 2, 1);
 
         $this->assertCount(1, $manager->getPendingTransactions()); // One pending "admin" transaction left...
-        $this->assertCount(2, $executedTransactions); // Two committed tranasctions on "default"
-        $this->assertCount(0, $executedAdminTransactions); // Zero executed committed tranasctions on "default"
+        $this->assertCount(2, $executedTransactions); // Two committed transactions on "default"
+        $this->assertCount(0, $executedAdminTransactions); // Zero executed committed transactions on "default"
 
         // Level 2 "admin" callback has been staged...
         $this->assertSame('admin', $manager->getCommittedTransactions()[0]->connection);

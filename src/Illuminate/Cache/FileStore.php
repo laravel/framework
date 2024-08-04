@@ -60,7 +60,7 @@ class FileStore implements Store, LockProvider
     /**
      * Retrieve an item from the cache by key.
      *
-     * @param  string|array  $key
+     * @param  string  $key
      * @return mixed
      */
     public function get($key)
@@ -378,6 +378,19 @@ class FileStore implements Store, LockProvider
     public function getDirectory()
     {
         return $this->directory;
+    }
+
+    /**
+     * Set the working directory of the cache.
+     *
+     * @param  string  $directory
+     * @return $this
+     */
+    public function setDirectory($directory)
+    {
+        $this->directory = $directory;
+
+        return $this;
     }
 
     /**

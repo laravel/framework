@@ -74,6 +74,15 @@ if (! function_exists('data_get')) {
                 return in_array('*', $key) ? Arr::collapse($result) : $result;
             }
 
+            $segment = match ($segment) {
+                '\*' => '*',
+                '\{first}' => '{first}',
+                '{first}' => array_key_first(is_array($target) ? $target : collect($target)->all()),
+                '\{last}' => '{last}',
+                '{last}' => array_key_last(is_array($target) ? $target : collect($target)->all()),
+                default => $segment,
+            };
+
             if (Arr::accessible($target) && Arr::exists($target, $segment)) {
                 $target = $target[$segment];
             } elseif (is_object($target) && isset($target->{$segment})) {
@@ -215,9 +224,12 @@ if (! function_exists('value')) {
     /**
      * Return the default value of the given value.
      *
-     * @param  mixed  $value
-     * @param  mixed  ...$args
-     * @return mixed
+     * @template TValue
+     * @template TArgs
+     *
+     * @param  TValue|\Closure(TArgs): TValue  $value
+     * @param  TArgs  ...$args
+     * @return TValue
      */
     function value($value, ...$args)
     {

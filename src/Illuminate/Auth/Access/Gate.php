@@ -100,7 +100,7 @@ class Gate implements GateContract
         array $policies = [],
         array $beforeCallbacks = [],
         array $afterCallbacks = [],
-        callable $guessPolicyNamesUsingCallback = null)
+        ?callable $guessPolicyNamesUsingCallback = null)
     {
         $this->policies = $policies;
         $this->container = $container;
@@ -224,7 +224,7 @@ class Gate implements GateContract
      * @param  array|null  $abilities
      * @return $this
      */
-    public function resource($name, $class, array $abilities = null)
+    public function resource($name, $class, ?array $abilities = null)
     {
         $abilities = $abilities ?: [
             'viewAny' => 'viewAny',
@@ -575,7 +575,7 @@ class Gate implements GateContract
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
      * @param  string  $ability
      * @param  array  $arguments
-     * @param  bool  $result
+     * @param  bool|null  $result
      * @return bool|null
      */
     protected function callAfterCallbacks($user, $ability, array $arguments, $result)

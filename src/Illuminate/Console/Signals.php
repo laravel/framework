@@ -142,7 +142,7 @@ class Signals
     /**
      * Set the availability resolver.
      *
-     * @param  callable(): bool
+     * @param  (callable(): bool)  $resolver
      * @return void
      */
     public static function resolveAvailabilityUsing($resolver)

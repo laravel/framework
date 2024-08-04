@@ -4,12 +4,20 @@ namespace Illuminate\Foundation\Console;
 
 use Closure;
 use Illuminate\Console\Command;
+use Illuminate\Console\ManuallyFailedException;
+use Illuminate\Support\Facades\Schedule;
+use Illuminate\Support\Traits\ForwardsCalls;
 use ReflectionFunction;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * @mixin \Illuminate\Console\Scheduling\Event
+ */
 class ClosureCommand extends Command
 {
+    use ForwardsCalls;
+
     /**
      * The command callback.
      *
@@ -39,7 +47,7 @@ class ClosureCommand extends Command
      * @param  \Symfony\Component\Console\Output\OutputInterface  $output
      * @return int
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $inputs = array_merge($input->getArguments(), $input->getOptions());
 
@@ -51,9 +59,15 @@ class ClosureCommand extends Command
             }
         }
 
-        return (int) $this->laravel->call(
-            $this->callback->bindTo($this, $this), $parameters
-        );
+        try {
+            return (int) $this->laravel->call(
+                $this->callback->bindTo($this, $this), $parameters
+            );
+        } catch (ManuallyFailedException $e) {
+            $this->components->error($e->getMessage());
+
+            return static::FAILURE;
+        }
     }
 
     /**
@@ -78,5 +92,30 @@ class ClosureCommand extends Command
         $this->setDescription($description);
 
         return $this;
+    }
+
+    /**
+     * Create a new scheduled event for the command.
+     *
+     * @param  array  $parameters
+     * @return \Illuminate\Console\Scheduling\Event
+     */
+    public function schedule($parameters = [])
+    {
+        return Schedule::command($this->name, $parameters);
+    }
+
+    /**
+     * Dynamically proxy calls to a new scheduled event.
+     *
+     * @param  string  $method
+     * @param  array  $parameters
+     * @return mixed
+     *
+     * @throws \BadMethodCallException
+     */
+    public function __call($method, $parameters)
+    {
+        return $this->forwardCallTo($this->schedule(), $method, $parameters);
     }
 }

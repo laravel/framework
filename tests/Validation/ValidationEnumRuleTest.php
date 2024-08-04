@@ -3,12 +3,16 @@
 namespace Illuminate\Tests\Validation;
 
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Database\Eloquent\Casts\ArrayObject;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator;
 use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\ValidationServiceProvider;
 use Illuminate\Validation\Validator;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 include_once 'Enums.php';
@@ -97,12 +101,10 @@ class ValidationEnumRuleTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
-    /**
-     * @dataProvider conditionalCasesDataProvider
-     */
+    #[DataProvider('conditionalCasesDataProvider')]
     public function testValidationPassesWhenOnlyCasesProvided(
         IntegerStatus|int $enum,
-        array|IntegerStatus $only,
+        array|Arrayable|IntegerStatus $only,
         bool $expected
     ) {
         $v = new Validator(
@@ -118,12 +120,10 @@ class ValidationEnumRuleTest extends TestCase
         $this->assertSame($expected, $v->passes());
     }
 
-    /**
-     * @dataProvider conditionalCasesDataProvider
-     */
+    #[DataProvider('conditionalCasesDataProvider')]
     public function testValidationPassesWhenExceptCasesProvided(
         int|IntegerStatus $enum,
-        array|IntegerStatus $except,
+        array|Arrayable|IntegerStatus $except,
         bool $expected
     ) {
         $v = new Validator(
@@ -254,6 +254,8 @@ class ValidationEnumRuleTest extends TestCase
         return [
             [IntegerStatus::done, IntegerStatus::done, true],
             [IntegerStatus::done, [IntegerStatus::done, IntegerStatus::pending], true],
+            [IntegerStatus::done, new ArrayObject([IntegerStatus::done, IntegerStatus::pending]), true],
+            [IntegerStatus::done, new Collection([IntegerStatus::done, IntegerStatus::pending]), true],
             [IntegerStatus::pending->value, [IntegerStatus::done, IntegerStatus::pending], true],
             [IntegerStatus::done->value, IntegerStatus::pending, false],
         ];

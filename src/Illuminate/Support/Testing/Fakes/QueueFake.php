@@ -301,7 +301,9 @@ class QueueFake extends QueueManager implements Fake, Queue
      */
     public function assertNothingPushed()
     {
-        PHPUnit::assertEmpty($this->jobs, 'Jobs were pushed unexpectedly.');
+        $pushedJobs = implode("\n- ", array_keys($this->jobs));
+
+        PHPUnit::assertEmpty($this->jobs, "The following jobs were pushed unexpectedly:\n\n- $pushedJobs\n");
     }
 
     /**

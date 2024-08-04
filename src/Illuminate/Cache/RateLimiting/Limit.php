@@ -12,18 +12,18 @@ class Limit
     public $key;
 
     /**
-     * The maximum number of attempts allowed within the given number of minutes.
+     * The maximum number of attempts allowed within the given number of seconds.
      *
      * @var int
      */
     public $maxAttempts;
 
     /**
-     * The number of minutes until the rate limit is reset.
+     * The number of seconds until the rate limit is reset.
      *
      * @var int
      */
-    public $decayMinutes;
+    public $decaySeconds;
 
     /**
      * The response generator callback.
@@ -37,25 +37,38 @@ class Limit
      *
      * @param  mixed  $key
      * @param  int  $maxAttempts
-     * @param  int  $decayMinutes
+     * @param  int  $decaySeconds
      * @return void
      */
-    public function __construct($key = '', int $maxAttempts = 60, int $decayMinutes = 1)
+    public function __construct($key = '', int $maxAttempts = 60, int $decaySeconds = 60)
     {
         $this->key = $key;
         $this->maxAttempts = $maxAttempts;
-        $this->decayMinutes = $decayMinutes;
+        $this->decaySeconds = $decaySeconds;
     }
 
     /**
      * Create a new rate limit.
      *
      * @param  int  $maxAttempts
+     * @param  int  $decaySeconds
      * @return static
      */
-    public static function perMinute($maxAttempts)
+    public static function perSecond($maxAttempts, $decaySeconds = 1)
     {
-        return new static('', $maxAttempts);
+        return new static('', $maxAttempts, $decaySeconds);
+    }
+
+    /**
+     * Create a new rate limit.
+     *
+     * @param  int  $maxAttempts
+     * @param  int  $decayMinutes
+     * @return static
+     */
+    public static function perMinute($maxAttempts, $decayMinutes = 1)
+    {
+        return new static('', $maxAttempts, 60 * $decayMinutes);
     }
 
     /**
@@ -67,7 +80,7 @@ class Limit
      */
     public static function perMinutes($decayMinutes, $maxAttempts)
     {
-        return new static('', $maxAttempts, $decayMinutes);
+        return new static('', $maxAttempts, 60 * $decayMinutes);
     }
 
     /**
@@ -79,7 +92,7 @@ class Limit
      */
     public static function perHour($maxAttempts, $decayHours = 1)
     {
-        return new static('', $maxAttempts, 60 * $decayHours);
+        return new static('', $maxAttempts, 60 * 60 * $decayHours);
     }
 
     /**
@@ -91,7 +104,7 @@ class Limit
      */
     public static function perDay($maxAttempts, $decayDays = 1)
     {
-        return new static('', $maxAttempts, 60 * 24 * $decayDays);
+        return new static('', $maxAttempts, 60 * 60 * 24 * $decayDays);
     }
 
     /**

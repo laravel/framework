@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Queue;
 use Exception;
 use Illuminate\Bus\Dispatcher;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Queue\CallQueuedHandler;
@@ -14,7 +15,10 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
+use RuntimeException;
 
+#[RequiresPhpExtension('redis')]
 class ThrottlesExceptionsWithRedisTest extends TestCase
 {
     use InteractsWithRedis;
@@ -116,6 +120,36 @@ class ThrottlesExceptionsWithRedisTest extends TestCase
 
         $this->assertTrue($class::$handled);
     }
+
+    public function testReportingExceptions()
+    {
+        $this->spy(ExceptionHandler::class)
+            ->shouldReceive('report')
+            ->twice()
+            ->with(m::type(RuntimeException::class));
+
+        $job = new class
+        {
+            public function release()
+            {
+                return $this;
+            }
+        };
+        $next = function () {
+            throw new RuntimeException('Whoops!');
+        };
+
+        $middleware = new ThrottlesExceptionsWithRedis();
+
+        $middleware->report();
+        $middleware->handle($job, $next);
+
+        $middleware->report(fn () => true);
+        $middleware->handle($job, $next);
+
+        $middleware->report(fn () => false);
+        $middleware->handle($job, $next);
+    }
 }
 
 class CircuitBreakerWithRedisTestJob
@@ -140,7 +174,7 @@ class CircuitBreakerWithRedisTestJob
 
     public function middleware()
     {
-        return [(new ThrottlesExceptionsWithRedis(2, 10))->by($this->key)];
+        return [(new ThrottlesExceptionsWithRedis(2, 10 * 60))->by($this->key)];
     }
 }
 
@@ -164,6 +198,6 @@ class CircuitBreakerWithRedisSuccessfulJob
 
     public function middleware()
     {
-        return [(new ThrottlesExceptionsWithRedis(2, 10))->by($this->key)];
+        return [(new ThrottlesExceptionsWithRedis(2, 10 * 60))->by($this->key)];
     }
 }

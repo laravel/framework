@@ -89,7 +89,7 @@ class Envelope
      *
      * @named-arguments-supported
      */
-    public function __construct(Address|string $from = null, $to = [], $cc = [], $bcc = [], $replyTo = [], string $subject = null, array $tags = [], array $metadata = [], Closure|array $using = [])
+    public function __construct(Address|string|null $from = null, $to = [], $cc = [], $bcc = [], $replyTo = [], ?string $subject = null, array $tags = [], array $metadata = [], Closure|array $using = [])
     {
         $this->from = is_string($from) ? new Address($from) : $from;
         $this->to = $this->normalizeAddresses($to);
@@ -266,7 +266,7 @@ class Envelope
      * @param  string|null  $name
      * @return bool
      */
-    public function isFrom(string $address, string $name = null)
+    public function isFrom(string $address, ?string $name = null)
     {
         if (is_null($name)) {
             return $this->from->address === $address;
@@ -283,7 +283,7 @@ class Envelope
      * @param  string|null  $name
      * @return bool
      */
-    public function hasTo(string $address, string $name = null)
+    public function hasTo(string $address, ?string $name = null)
     {
         return $this->hasRecipient($this->to, $address, $name);
     }
@@ -295,7 +295,7 @@ class Envelope
      * @param  string|null  $name
      * @return bool
      */
-    public function hasCc(string $address, string $name = null)
+    public function hasCc(string $address, ?string $name = null)
     {
         return $this->hasRecipient($this->cc, $address, $name);
     }
@@ -307,7 +307,7 @@ class Envelope
      * @param  string|null  $name
      * @return bool
      */
-    public function hasBcc(string $address, string $name = null)
+    public function hasBcc(string $address, ?string $name = null)
     {
         return $this->hasRecipient($this->bcc, $address, $name);
     }
@@ -319,7 +319,7 @@ class Envelope
      * @param  string|null  $name
      * @return bool
      */
-    public function hasReplyTo(string $address, string $name = null)
+    public function hasReplyTo(string $address, ?string $name = null)
     {
         return $this->hasRecipient($this->replyTo, $address, $name);
     }

@@ -77,4 +77,15 @@ class AsEnumCollection implements Castable
             }
         };
     }
+
+    /**
+     * Specify the Enum for the cast.
+     *
+     * @param  class-string  $class
+     * @return string
+     */
+    public static function of($class)
+    {
+        return static::class.':'.$class;
+    }
 }

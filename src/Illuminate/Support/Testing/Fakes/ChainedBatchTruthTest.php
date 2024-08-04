@@ -27,7 +27,7 @@ class ChainedBatchTruthTest
     /**
      * Invoke the truth test with the given pending batch.
      *
-     * @param  \Illuminate\Bus\PendingBatch
+     * @param  \Illuminate\Bus\PendingBatch  $pendingBatch
      * @return bool
      */
     public function __invoke($pendingBatch)

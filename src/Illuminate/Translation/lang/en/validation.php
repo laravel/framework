@@ -34,6 +34,7 @@ return [
     'boolean' => 'The :attribute field must be true or false.',
     'can' => 'The :attribute field contains an unauthorized value.',
     'confirmed' => 'The :attribute field confirmation does not match.',
+    'contains' => 'The :attribute field is missing a required value.',
     'current_password' => 'The password is incorrect.',
     'date' => 'The :attribute field must be a valid date.',
     'date_equals' => 'The :attribute field must be a date equal to :date.',
@@ -76,6 +77,7 @@ return [
     'ipv4' => 'The :attribute field must be a valid IPv4 address.',
     'ipv6' => 'The :attribute field must be a valid IPv6 address.',
     'json' => 'The :attribute field must be a valid JSON string.',
+    'list' => 'The :attribute field must be a list.',
     'lowercase' => 'The :attribute field must be lowercase.',
     'lt' => [
         'array' => 'The :attribute field must have less than :value items.',
@@ -136,6 +138,7 @@ return [
     'required_array_keys' => 'The :attribute field must contain entries for: :values.',
     'required_if' => 'The :attribute field is required when :other is :value.',
     'required_if_accepted' => 'The :attribute field is required when :other is accepted.',
+    'required_if_declined' => 'The :attribute field is required when :other is declined.',
     'required_unless' => 'The :attribute field is required unless :other is in :values.',
     'required_with' => 'The :attribute field is required when :values is present.',
     'required_with_all' => 'The :attribute field is required when :values are present.',

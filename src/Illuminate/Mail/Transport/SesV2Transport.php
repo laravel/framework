@@ -4,13 +4,14 @@ namespace Illuminate\Mail\Transport;
 
 use Aws\Exception\AwsException;
 use Aws\SesV2\SesV2Client;
+use Stringable;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractTransport;
 use Symfony\Component\Mime\Message;
 
-class SesV2Transport extends AbstractTransport
+class SesV2Transport extends AbstractTransport implements Stringable
 {
     /**
      * The Amazon SES V2 instance.
@@ -49,6 +50,10 @@ class SesV2Transport extends AbstractTransport
         $options = $this->options;
 
         if ($message->getOriginalMessage() instanceof Message) {
+            if ($listManagementOptions = $this->listManagementOptions($message)) {
+                $options['ListManagementOptions'] = $listManagementOptions;
+            }
+
             foreach ($message->getOriginalMessage()->getHeaders()->all() as $header) {
                 if ($header instanceof MetadataHeader) {
                     $options['EmailTags'][] = ['Name' => $header->getKey(), 'Value' => $header->getValue()];
@@ -90,6 +95,21 @@ class SesV2Transport extends AbstractTransport
 
         $message->getOriginalMessage()->getHeaders()->addHeader('X-Message-ID', $messageId);
         $message->getOriginalMessage()->getHeaders()->addHeader('X-SES-Message-ID', $messageId);
+    }
+
+    /**
+     * Extract the SES list managenent options, if applicable.
+     *
+     * @param  \Illuminate\Mail\SentMessage  $message
+     * @return array|null
+     */
+    protected function listManagementOptions(SentMessage $message)
+    {
+        if ($header = $message->getOriginalMessage()->getHeaders()->get('X-SES-LIST-MANAGEMENT-OPTIONS')) {
+            if (preg_match("/^(contactListName=)*(?<ContactListName>[^;]+)(;\s?topicName=(?<TopicName>.+))?$/ix", $header->getBodyAsString(), $listManagementOptions)) {
+                return array_filter($listManagementOptions, fn ($e) => in_array($e, ['ContactListName', 'TopicName']), ARRAY_FILTER_USE_KEY);
+            }
+        }
     }
 
     /**

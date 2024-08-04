@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Cache;
 use Illuminate\Cache\RedisStore;
 use Illuminate\Cache\Repository;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class RedisCacheIntegrationTest extends TestCase
@@ -24,10 +25,9 @@ class RedisCacheIntegrationTest extends TestCase
     }
 
     /**
-     * @dataProvider redisDriverProvider
-     *
      * @param  string  $driver
      */
+    #[DataProvider('redisDriverProvider')]
     public function testRedisCacheAddTwice($driver)
     {
         $store = new RedisStore($this->redis[$driver]);
@@ -40,10 +40,9 @@ class RedisCacheIntegrationTest extends TestCase
     /**
      * Breaking change.
      *
-     * @dataProvider redisDriverProvider
-     *
      * @param  string  $driver
      */
+    #[DataProvider('redisDriverProvider')]
     public function testRedisCacheAddFalse($driver)
     {
         $store = new RedisStore($this->redis[$driver]);
@@ -56,10 +55,9 @@ class RedisCacheIntegrationTest extends TestCase
     /**
      * Breaking change.
      *
-     * @dataProvider redisDriverProvider
-     *
      * @param  string  $driver
      */
+    #[DataProvider('redisDriverProvider')]
     public function testRedisCacheAddNull($driver)
     {
         $store = new RedisStore($this->redis[$driver]);

@@ -9,6 +9,7 @@ use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Throwable;
 
 class Command extends SymfonyCommand
 {
@@ -166,6 +167,7 @@ class Command extends SymfonyCommand
      * @param  \Symfony\Component\Console\Output\OutputInterface  $output
      * @return int
      */
+    #[\Override]
     public function run(InputInterface $input, OutputInterface $output): int
     {
         $this->output = $output instanceof OutputStyle ? $output : $this->laravel->make(
@@ -190,9 +192,9 @@ class Command extends SymfonyCommand
      *
      * @param  \Symfony\Component\Console\Input\InputInterface  $input
      * @param  \Symfony\Component\Console\Output\OutputInterface  $output
-     * @return int
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    #[\Override]
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if ($this instanceof Isolatable && $this->option('isolated') !== false &&
             ! $this->commandIsolationMutex()->create($this)) {
@@ -209,6 +211,10 @@ class Command extends SymfonyCommand
 
         try {
             return (int) $this->laravel->call([$this, $method]);
+        } catch (ManuallyFailedException $e) {
+            $this->components->error($e->getMessage());
+
+            return static::FAILURE;
         } finally {
             if ($this instanceof Isolatable && $this->option('isolated') !== false) {
                 $this->commandIsolationMutex()->forget($this);
@@ -256,10 +262,32 @@ class Command extends SymfonyCommand
     }
 
     /**
+     * Fail the command manually.
+     *
+     * @param  \Throwable|string|null  $exception
+     * @return void
+     *
+     * @throws \Illuminate\Console\ManuallyFailedException|\Throwable
+     */
+    public function fail(Throwable|string|null $exception = null)
+    {
+        if (is_null($exception)) {
+            $exception = 'Command failed manually.';
+        }
+
+        if (is_string($exception)) {
+            $exception = new ManuallyFailedException($exception);
+        }
+
+        throw $exception;
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @return bool
      */
+    #[\Override]
     public function isHidden(): bool
     {
         return $this->hidden;
@@ -268,6 +296,7 @@ class Command extends SymfonyCommand
     /**
      * {@inheritdoc}
      */
+    #[\Override]
     public function setHidden(bool $hidden = true): static
     {
         parent::setHidden($this->hidden = $hidden);

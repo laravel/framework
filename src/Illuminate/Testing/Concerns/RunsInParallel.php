@@ -3,8 +3,10 @@
 namespace Illuminate\Testing\Concerns;
 
 use Illuminate\Contracts\Console\Kernel;
+use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\ParallelTesting;
 use Illuminate\Testing\ParallelConsoleOutput;
+use PHPUnit\TextUI\Configuration\PhpHandler;
 use RuntimeException;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -101,15 +103,11 @@ trait RunsInParallel
      */
     public function execute(): int
     {
-        $phpHandlerClass = class_exists(\PHPUnit\TextUI\Configuration\PhpHandler::class)
-            ? \PHPUnit\TextUI\Configuration\PhpHandler::class
-            : \PHPUnit\TextUI\XmlConfiguration\PhpHandler::class;
-
         $configuration = $this->options instanceof \ParaTest\Options
             ? $this->options->configuration
             : $this->options->configuration();
 
-        (new $phpHandlerClass)->handle($configuration->php());
+        (new PhpHandler())->handle($configuration->php());
 
         $this->forEachProcess(function () {
             ParallelTesting::callSetUpProcessCallbacks();
@@ -123,9 +121,7 @@ trait RunsInParallel
             });
         }
 
-        return $potentialExitCode === null
-            ? $this->getExitCode()
-            : $potentialExitCode;
+        return $potentialExitCode ?? $this->getExitCode();
     }
 
     /**
@@ -176,8 +172,7 @@ trait RunsInParallel
                 };
 
                 return $applicationCreator->createApplication();
-            } elseif (file_exists($path = getcwd().'/bootstrap/app.php') ||
-                      file_exists($path = getcwd().'/.laravel/app.php')) {
+            } elseif (file_exists($path = (Application::inferBasePath().'/bootstrap/app.php'))) {
                 $app = require $path;
 
                 $app->make(Kernel::class)->bootstrap();

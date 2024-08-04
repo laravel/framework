@@ -30,11 +30,11 @@ class ThrottlesExceptions
     protected $maxAttempts;
 
     /**
-     * The number of minutes until the maximum attempts are reset.
+     * The number of seconds until the maximum attempts are reset.
      *
      * @var int
      */
-    protected $decayMinutes;
+    protected $decaySeconds;
 
     /**
      * The number of minutes to wait before retrying the job after an exception.
@@ -42,6 +42,13 @@ class ThrottlesExceptions
      * @var int
      */
     protected $retryAfterMinutes = 0;
+
+    /**
+     * The callback that determines if the exception should be reported.
+     *
+     * @var callable
+     */
+    protected $reportCallback;
 
     /**
      * The callback that determines if rate limiting should apply.
@@ -68,13 +75,13 @@ class ThrottlesExceptions
      * Create a new middleware instance.
      *
      * @param  int  $maxAttempts
-     * @param  int  $decayMinutes
+     * @param  int  $decaySeconds
      * @return void
      */
-    public function __construct($maxAttempts = 10, $decayMinutes = 10)
+    public function __construct($maxAttempts = 10, $decaySeconds = 600)
     {
         $this->maxAttempts = $maxAttempts;
-        $this->decayMinutes = $decayMinutes;
+        $this->decaySeconds = $decaySeconds;
     }
 
     /**
@@ -101,7 +108,11 @@ class ThrottlesExceptions
                 throw $throwable;
             }
 
-            $this->limiter->hit($jobKey, $this->decayMinutes * 60);
+            if ($this->reportCallback && call_user_func($this->reportCallback, $throwable)) {
+                report($throwable);
+            }
+
+            $this->limiter->hit($jobKey, $this->decaySeconds);
 
             return $job->release($this->retryAfterMinutes * 60);
         }
@@ -184,6 +195,19 @@ class ThrottlesExceptions
     public function byJob()
     {
         $this->byJob = true;
+
+        return $this;
+    }
+
+    /**
+     * Report exceptions and optionally specify a callback that determines if the exception should be reported.
+     *
+     * @param  callable|null  $callback
+     * @return $this
+     */
+    public function report(?callable $callback = null)
+    {
+        $this->reportCallback = $callback ?? fn () => true;
 
         return $this;
     }

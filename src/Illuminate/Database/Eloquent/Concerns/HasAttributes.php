@@ -40,6 +40,7 @@ use ReflectionClass;
 use ReflectionMethod;
 use ReflectionNamedType;
 use RuntimeException;
+use ValueError;
 
 trait HasAttributes
 {
@@ -183,6 +184,18 @@ trait HasAttributes
     public static $encrypter;
 
     /**
+     * Initialize the trait.
+     *
+     * @return void
+     */
+    protected function initializeHasAttributes()
+    {
+        $this->casts = $this->ensureCastsAreStringValues(
+            array_merge($this->casts, $this->casts()),
+        );
+    }
+
+    /**
      * Convert the model's attributes to an array.
      *
      * @return array
@@ -310,7 +323,7 @@ trait HasAttributes
             }
 
             if ($this->isEnumCastable($key) && (! ($attributes[$key] ?? null) instanceof Arrayable)) {
-                $attributes[$key] = isset($attributes[$key]) ? $this->getStorableEnumValue($attributes[$key]) : null;
+                $attributes[$key] = isset($attributes[$key]) ? $this->getStorableEnumValue($this->getCasts()[$key], $attributes[$key]) : null;
             }
 
             if ($attributes[$key] instanceof Arrayable) {
@@ -381,8 +394,8 @@ trait HasAttributes
             // If the relation value has been set, we will set it on this attributes
             // list for returning. If it was not arrayable or null, we'll not set
             // the value on the array because it is some type of invalid value.
-            if (isset($relation) || is_null($value)) {
-                $attributes[$key] = $relation;
+            if (array_key_exists('relation', get_defined_vars())) { // check if $relation is in scope (could be null)
+                $attributes[$key] = $relation ?? null;
             }
 
             unset($relation);
@@ -421,6 +434,25 @@ trait HasAttributes
     }
 
     /**
+     * Determine whether an attribute exists on the model.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function hasAttribute($key)
+    {
+        if (! $key) {
+            return false;
+        }
+
+        return array_key_exists($key, $this->attributes) ||
+            array_key_exists($key, $this->casts) ||
+            $this->hasGetMutator($key) ||
+            $this->hasAttributeMutator($key) ||
+            $this->isClassCastable($key);
+    }
+
+    /**
      * Get an attribute from the model.
      *
      * @param  string  $key
@@ -435,11 +467,7 @@ trait HasAttributes
         // If the attribute exists in the attribute array or has a "get" mutator we will
         // get the attribute's value. Otherwise, we will proceed as if the developers
         // are asking for a relationship's value. This covers both types of values.
-        if (array_key_exists($key, $this->attributes) ||
-            array_key_exists($key, $this->casts) ||
-            $this->hasGetMutator($key) ||
-            $this->hasAttributeMutator($key) ||
-            $this->isClassCastable($key)) {
+        if ($this->hasAttribute($key)) {
             return $this->getAttributeValue($key);
         }
 
@@ -719,9 +747,37 @@ trait HasAttributes
      */
     public function mergeCasts($casts)
     {
+        $casts = $this->ensureCastsAreStringValues($casts);
+
         $this->casts = array_merge($this->casts, $casts);
 
         return $this;
+    }
+
+    /**
+     * Ensure that the given casts are strings.
+     *
+     * @param  array  $casts
+     * @return array
+     */
+    protected function ensureCastsAreStringValues($casts)
+    {
+        foreach ($casts as $attribute => $cast) {
+            $casts[$attribute] = match (true) {
+                is_array($cast) => value(function () use ($cast) {
+                    if (count($cast) === 1) {
+                        return $cast[0];
+                    }
+
+                    [$cast, $arguments] = [array_shift($cast), $cast];
+
+                    return $cast.':'.implode(',', $arguments);
+                }),
+                default => $cast,
+            };
+        }
+
+        return $casts;
     }
 
     /**
@@ -1152,7 +1208,7 @@ trait HasAttributes
      * Set the value of an enum castable attribute.
      *
      * @param  string  $key
-     * @param  \UnitEnum|string|int  $value
+     * @param  \UnitEnum|string|int|null  $value
      * @return void
      */
     protected function setEnumCastableAttribute($key, $value)
@@ -1162,10 +1218,10 @@ trait HasAttributes
         if (! isset($value)) {
             $this->attributes[$key] = null;
         } elseif (is_object($value)) {
-            $this->attributes[$key] = $this->getStorableEnumValue($value);
+            $this->attributes[$key] = $this->getStorableEnumValue($enumClass, $value);
         } else {
             $this->attributes[$key] = $this->getStorableEnumValue(
-                $this->getEnumCaseFromValue($enumClass, $value)
+                $enumClass, $this->getEnumCaseFromValue($enumClass, $value)
             );
         }
     }
@@ -1187,11 +1243,16 @@ trait HasAttributes
     /**
      * Get the storable value from the given enum.
      *
+     * @param  string  $expectedEnum
      * @param  \UnitEnum|\BackedEnum  $value
      * @return string|int
      */
-    protected function getStorableEnumValue($value)
+    protected function getStorableEnumValue($expectedEnum, $value)
     {
+        if (! $value instanceof $expectedEnum) {
+            throw new ValueError(sprintf('Value [%s] is not of the expected enum type [%s].', var_export($value, true), $expectedEnum));
+        }
+
         return $value instanceof BackedEnum
                 ? $value->value
                 : $value->name;
@@ -1265,7 +1326,7 @@ trait HasAttributes
     /**
      * Decode the given JSON back into an array or object.
      *
-     * @param  string  $value
+     * @param  string|null  $value
      * @param  bool  $asObject
      * @return mixed
      */
@@ -1282,7 +1343,7 @@ trait HasAttributes
      */
     public function fromEncryptedString($value)
     {
-        return (static::$encrypter ?? Crypt::getFacadeRoot())->decrypt($value, false);
+        return static::currentEncrypter()->decrypt($value, false);
     }
 
     /**
@@ -1292,9 +1353,9 @@ trait HasAttributes
      * @param  mixed  $value
      * @return string
      */
-    protected function castAttributeAsEncryptedString($key, $value)
+    protected function castAttributeAsEncryptedString($key, #[\SensitiveParameter] $value)
     {
-        return (static::$encrypter ?? Crypt::getFacadeRoot())->encrypt($value, false);
+        return static::currentEncrypter()->encrypt($value, false);
     }
 
     /**
@@ -1309,13 +1370,23 @@ trait HasAttributes
     }
 
     /**
+     * Get the current encrypter being used by the model.
+     *
+     * @return \Illuminate\Contracts\Encryption\Encrypter
+     */
+    protected static function currentEncrypter()
+    {
+        return static::$encrypter ?? Crypt::getFacadeRoot();
+    }
+
+    /**
      * Cast the given attribute to a hashed string.
      *
      * @param  string  $key
      * @param  mixed  $value
      * @return string
      */
-    protected function castAttributeAsHashedString($key, $value)
+    protected function castAttributeAsHashedString($key, #[\SensitiveParameter] $value)
     {
         if ($value === null) {
             return null;
@@ -1325,6 +1396,7 @@ trait HasAttributes
             return Hash::make($value);
         }
 
+        /** @phpstan-ignore-next-line */
         if (! Hash::verifyConfiguration($value)) {
             throw new RuntimeException("Could not verify the hashed value's configuration.");
         }
@@ -1403,7 +1475,7 @@ trait HasAttributes
         // and format a Carbon object from this timestamp. This allows flexibility
         // when defining your date fields as they might be UNIX timestamps here.
         if (is_numeric($value)) {
-            return Date::createFromTimestamp($value);
+            return Date::createFromTimestamp($value, date_default_timezone_get());
         }
 
         // If the value is in simply year, month, day format, we will instantiate the
@@ -1528,7 +1600,7 @@ trait HasAttributes
     }
 
     /**
-     * Get the casts array.
+     * Get the attributes that should be cast.
      *
      * @return array
      */
@@ -1539,6 +1611,16 @@ trait HasAttributes
         }
 
         return $this->casts;
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array
+     */
+    protected function casts()
+    {
+        return [];
     }
 
     /**
@@ -2089,6 +2171,8 @@ trait HasAttributes
             }
 
             return abs($this->castAttribute($key, $attribute) - $this->castAttribute($key, $original)) < PHP_FLOAT_EPSILON * 4;
+        } elseif ($this->isEncryptedCastable($key) && ! empty(static::currentEncrypter()->getPreviousKeys())) {
+            return false;
         } elseif ($this->hasCast($key, static::$primitiveCastTypes)) {
             return $this->castAttribute($key, $attribute) ===
                 $this->castAttribute($key, $original);
@@ -2097,7 +2181,11 @@ trait HasAttributes
         } elseif ($this->isClassCastable($key) && Str::startsWith($this->getCasts()[$key], [AsEnumArrayObject::class, AsEnumCollection::class])) {
             return $this->fromJson($attribute) === $this->fromJson($original);
         } elseif ($this->isClassCastable($key) && $original !== null && Str::startsWith($this->getCasts()[$key], [AsEncryptedArrayObject::class, AsEncryptedCollection::class])) {
-            return $this->fromEncryptedString($attribute) === $this->fromEncryptedString($original);
+            if (empty(static::currentEncrypter()->getPreviousKeys())) {
+                return $this->fromEncryptedString($attribute) === $this->fromEncryptedString($original);
+            }
+
+            return false;
         }
 
         return is_numeric($attribute) && is_numeric($original)

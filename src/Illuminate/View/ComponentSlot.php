@@ -4,8 +4,9 @@ namespace Illuminate\View;
 
 use Illuminate\Contracts\Support\Htmlable;
 use InvalidArgumentException;
+use Stringable;
 
-class ComponentSlot implements Htmlable
+class ComponentSlot implements Htmlable, Stringable
 {
     /**
      * The slot attribute bag.

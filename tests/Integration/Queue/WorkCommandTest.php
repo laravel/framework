@@ -10,6 +10,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Queue;
 use Orchestra\Testbench\Attributes\WithMigration;
 
+#[WithMigration]
 #[WithMigration('queue')]
 class WorkCommandTest extends QueueTestCase
 {

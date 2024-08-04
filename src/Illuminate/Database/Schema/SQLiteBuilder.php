@@ -53,30 +53,18 @@ class SQLiteBuilder extends Builder
     }
 
     /**
-     * Get all of the table names for the database.
+     * Get the columns for a given table.
      *
-     * @deprecated Will be removed in a future Laravel version.
-     *
+     * @param  string  $table
      * @return array
      */
-    public function getAllTables()
+    public function getColumns($table)
     {
-        return $this->connection->select(
-            $this->grammar->compileGetAllTables()
-        );
-    }
+        $table = $this->connection->getTablePrefix().$table;
 
-    /**
-     * Get all of the view names for the database.
-     *
-     * @deprecated Will be removed in a future Laravel version.
-     *
-     * @return array
-     */
-    public function getAllViews()
-    {
-        return $this->connection->select(
-            $this->grammar->compileGetAllViews()
+        return $this->connection->getPostProcessor()->processColumns(
+            $this->connection->selectFromWriteConnection($this->grammar->compileColumns($table)),
+            $this->connection->scalar($this->grammar->compileSqlCreateStatement($table))
         );
     }
 
@@ -114,6 +102,45 @@ class SQLiteBuilder extends Builder
         $this->connection->select($this->grammar->compileDisableWriteableSchema());
 
         $this->connection->select($this->grammar->compileRebuild());
+    }
+
+    /**
+     * Set the busy timeout.
+     *
+     * @param  int  $milliseconds
+     * @return bool
+     */
+    public function setBusyTimeout($milliseconds)
+    {
+        return $this->connection->statement(
+            $this->grammar->compileSetBusyTimeout($milliseconds)
+        );
+    }
+
+    /**
+     * Set the journal mode.
+     *
+     * @param  string  $mode
+     * @return bool
+     */
+    public function setJournalMode($mode)
+    {
+        return $this->connection->statement(
+            $this->grammar->compileSetJournalMode($mode)
+        );
+    }
+
+    /**
+     * Set the synchronous mode.
+     *
+     * @param  int  $mode
+     * @return bool
+     */
+    public function setSynchronous($mode)
+    {
+        return $this->connection->statement(
+            $this->grammar->compileSetSynchronous($mode)
+        );
     }
 
     /**

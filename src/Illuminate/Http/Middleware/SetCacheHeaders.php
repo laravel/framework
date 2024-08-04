@@ -23,7 +23,14 @@ class SetCacheHeaders
         }
 
         return collect($options)
-            ->map(fn ($value, $key) => is_int($key) ? $value : "{$key}={$value}")
+            ->map(function ($value, $key) {
+                if (is_bool($value)) {
+                    return $value ? $key : null;
+                }
+
+                return is_int($key) ? $value : "{$key}={$value}";
+            })
+            ->filter()
             ->map(fn ($value) => Str::finish($value, ';'))
             ->pipe(fn ($options) => rtrim(static::class.':'.$options->implode(''), ';'));
     }
@@ -50,13 +57,17 @@ class SetCacheHeaders
             $options = $this->parseOptions($options);
         }
 
+        if (! $response->isSuccessful()) {
+            return $response;
+        }
+
         if (isset($options['etag']) && $options['etag'] === true) {
             $options['etag'] = $response->getEtag() ?? md5($response->getContent());
         }
 
         if (isset($options['last_modified'])) {
             if (is_numeric($options['last_modified'])) {
-                $options['last_modified'] = Carbon::createFromTimestamp($options['last_modified']);
+                $options['last_modified'] = Carbon::createFromTimestamp($options['last_modified'], date_default_timezone_get());
             } else {
                 $options['last_modified'] = Carbon::parse($options['last_modified']);
             }

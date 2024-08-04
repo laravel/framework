@@ -12,8 +12,10 @@ use Illuminate\Database\Events\ModelPruningStarting;
 use Illuminate\Database\Events\ModelsPruned;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Finder\Finder;
 
+#[AsCommand(name: 'model:prune')]
 class PruneCommand extends Command
 {
     /**

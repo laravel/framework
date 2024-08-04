@@ -3,17 +3,25 @@
 namespace Illuminate\Database;
 
 use Exception;
-use Illuminate\Database\PDO\MySqlDriver;
 use Illuminate\Database\Query\Grammars\MySqlGrammar as QueryGrammar;
 use Illuminate\Database\Query\Processors\MySqlProcessor;
 use Illuminate\Database\Schema\Grammars\MySqlGrammar as SchemaGrammar;
 use Illuminate\Database\Schema\MySqlBuilder;
 use Illuminate\Database\Schema\MySqlSchemaState;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Str;
 use PDO;
 
 class MySqlConnection extends Connection
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function getDriverTitle()
+    {
+        return $this->isMaria() ? 'MariaDB' : 'MySQL';
+    }
+
     /**
      * Escape a binary value for safe SQL embedding.
      *
@@ -46,6 +54,18 @@ class MySqlConnection extends Connection
     public function isMaria()
     {
         return str_contains($this->getPdo()->getAttribute(PDO::ATTR_SERVER_VERSION), 'MariaDB');
+    }
+
+    /**
+     * Get the server version for the connection.
+     *
+     * @return string
+     */
+    public function getServerVersion(): string
+    {
+        return str_contains($version = parent::getServerVersion(), 'MariaDB')
+            ? Str::between($version, '5.5.5-', '-MariaDB')
+            : $version;
     }
 
     /**
@@ -93,7 +113,7 @@ class MySqlConnection extends Connection
      * @param  callable|null  $processFactory
      * @return \Illuminate\Database\Schema\MySqlSchemaState
      */
-    public function getSchemaState(Filesystem $files = null, callable $processFactory = null)
+    public function getSchemaState(?Filesystem $files = null, ?callable $processFactory = null)
     {
         return new MySqlSchemaState($this, $files, $processFactory);
     }
@@ -106,15 +126,5 @@ class MySqlConnection extends Connection
     protected function getDefaultPostProcessor()
     {
         return new MySqlProcessor;
-    }
-
-    /**
-     * Get the Doctrine DBAL driver.
-     *
-     * @return \Illuminate\Database\PDO\MySqlDriver
-     */
-    protected function getDoctrineDriver()
-    {
-        return new MySqlDriver;
     }
 }

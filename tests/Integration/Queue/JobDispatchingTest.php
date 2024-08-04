@@ -10,6 +10,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Orchestra\Testbench\Attributes\WithMigration;
 
+#[WithMigration]
 #[WithMigration('queue')]
 class JobDispatchingTest extends QueueTestCase
 {
@@ -139,7 +140,7 @@ class JobDispatchingTest extends QueueTestCase
      */
     private function getJobLock($job, $value = null)
     {
-        return $this->app->get(Repository::class)->lock('laravel_unique_job:'.$job.$value, 10)->get();
+        return $this->app->get(Repository::class)->lock('laravel_unique_job:'.$job.':'.$value, 10)->get();
     }
 }
 

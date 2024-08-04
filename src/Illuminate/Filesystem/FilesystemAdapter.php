@@ -237,7 +237,7 @@ class FilesystemAdapter implements CloudFilesystemContract
     }
 
     /**
-     * Get the full path for the file at the given "short" path.
+     * Get the full path to the file that exists at the given relative path.
      *
      * @param  string  $path
      * @return string

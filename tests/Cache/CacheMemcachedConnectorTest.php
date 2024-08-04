@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Cache;
 use Illuminate\Cache\MemcachedConnector;
 use Memcached;
 use Mockery as m;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
@@ -48,9 +49,7 @@ class CacheMemcachedConnectorTest extends TestCase
         $this->assertSame($result, $memcached);
     }
 
-    /**
-     * @requires extension memcached
-     */
+    #[RequiresPhpExtension('memcached')]
     public function testServersAreAddedCorrectlyWithValidOptions()
     {
         $validOptions = [
@@ -71,9 +70,7 @@ class CacheMemcachedConnectorTest extends TestCase
         $this->assertSame($result, $memcached);
     }
 
-    /**
-     * @requires extension memcached
-     */
+    #[RequiresPhpExtension('memcached')]
     public function testServersAreAddedCorrectlyWithSaslCredentials()
     {
         $saslCredentials = ['foo', 'bar'];

@@ -3,10 +3,10 @@
 namespace Illuminate\Tests\Integration\Foundation;
 
 use Exception;
-use Illuminate\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
+use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\TestCase;
 
 class FoundationHelpersTest extends TestCase
@@ -66,10 +66,9 @@ class FoundationHelpersTest extends TestCase
         unlink($manifest);
     }
 
+    #[WithConfig('app.debug', false)]
     public function testMixSilentlyFailsWhenAssetIsMissingFromManifestWhenNotInDebugMode()
     {
-        $this->app['config']->set('app.debug', false);
-
         $manifest = $this->makeManifest();
 
         $path = mix('missing.js');
@@ -79,12 +78,11 @@ class FoundationHelpersTest extends TestCase
         unlink($manifest);
     }
 
+    #[WithConfig('app.debug', true)]
     public function testMixThrowsExceptionWhenAssetIsMissingFromManifestWhenInDebugMode()
     {
         $this->expectException(Exception::class);
         $this->expectExceptionMessage('Unable to locate Mix file: /missing.js.');
-
-        $this->app['config']->set('app.debug', true);
 
         $manifest = $this->makeManifest();
 
@@ -97,11 +95,11 @@ class FoundationHelpersTest extends TestCase
         }
     }
 
+    #[WithConfig('app.debug', true)]
     public function testMixOnlyThrowsAndReportsOneExceptionWhenAssetIsMissingFromManifestWhenInDebugMode()
     {
         $handler = new FakeHandler;
         $this->app->instance(ExceptionHandler::class, $handler);
-        $this->app['config']->set('app.debug', true);
 
         $manifest = $this->makeManifest();
 
@@ -118,20 +116,15 @@ class FoundationHelpersTest extends TestCase
 
     public function testFakeReturnsSameInstance()
     {
-        app()->instance('config', new ConfigRepository([]));
-
         $this->assertSame(fake(), fake());
         $this->assertSame(fake(), fake('en_US'));
         $this->assertSame(fake('en_AU'), fake('en_AU'));
         $this->assertNotSame(fake('en_US'), fake('en_AU'));
-
-        app()->flush();
     }
 
     public function testFakeUsesLocale()
     {
         mt_srand(12345, MT_RAND_PHP);
-        app()->instance('config', new ConfigRepository([]));
 
         // Should fallback to en_US
         $this->assertSame('Arkansas', fake()->state());
@@ -144,7 +137,7 @@ class FoundationHelpersTest extends TestCase
             'Guadeloupe', 'Martinique', 'Guyane', 'La Réunion', 'Mayotte',
         ]);
 
-        app()->instance('config', new ConfigRepository(['app' => ['faker_locale' => 'en_AU']]));
+        config(['app.faker_locale' => 'en_AU']);
         mt_srand(4, MT_RAND_PHP);
 
         // Should fallback to en_US

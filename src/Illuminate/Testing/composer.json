@@ -14,12 +14,12 @@
         }
     ],
     "require": {
-        "php": "^8.1",
+        "php": "^8.2",
         "ext-mbstring": "*",
-        "illuminate/collections": "^10.0",
-        "illuminate/contracts": "^10.0",
-        "illuminate/macroable": "^10.0",
-        "illuminate/support": "^10.0"
+        "illuminate/collections": "^11.0",
+        "illuminate/contracts": "^11.0",
+        "illuminate/macroable": "^11.0",
+        "illuminate/support": "^11.0"
     },
     "autoload": {
         "psr-4": {
@@ -28,16 +28,16 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "10.x-dev"
+            "dev-master": "11.x-dev"
         }
     },
     "suggest": {
-        "brianium/paratest": "Required to run tests in parallel (^6.0).",
-        "illuminate/console": "Required to assert console commands (^10.0).",
-        "illuminate/database": "Required to assert databases (^10.0).",
-        "illuminate/http": "Required to assert responses (^10.0).",
-        "mockery/mockery": "Required to use mocking (^1.5.1).",
-        "phpunit/phpunit": "Required to use assertions and run tests (^9.5.8|^10.0.7)."
+        "brianium/paratest": "Required to run tests in parallel (^7.0|^8.0).",
+        "illuminate/console": "Required to assert console commands (^11.0).",
+        "illuminate/database": "Required to assert databases (^11.0).",
+        "illuminate/http": "Required to assert responses (^11.0).",
+        "mockery/mockery": "Required to use mocking (^1.6).",
+        "phpunit/phpunit": "Required to use assertions and run tests (^10.5|^11.0)."
     },
     "config": {
         "sort-packages": true

@@ -33,7 +33,7 @@ class Attempting
      * @param  bool  $remember
      * @return void
      */
-    public function __construct($guard, $credentials, $remember)
+    public function __construct($guard, #[\SensitiveParameter] $credentials, $remember)
     {
         $this->guard = $guard;
         $this->remember = $remember;

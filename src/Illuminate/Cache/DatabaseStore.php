@@ -9,12 +9,13 @@ use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\PostgresConnection;
 use Illuminate\Database\QueryException;
 use Illuminate\Database\SqlServerConnection;
+use Illuminate\Support\Arr;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Str;
 
 class DatabaseStore implements LockProvider, Store
 {
-    use InteractsWithTime, RetrievesMultipleKeys;
+    use InteractsWithTime;
 
     /**
      * The database connection instance.
@@ -93,34 +94,61 @@ class DatabaseStore implements LockProvider, Store
     /**
      * Retrieve an item from the cache by key.
      *
-     * @param  string|array  $key
+     * @param  string  $key
      * @return mixed
      */
     public function get($key)
     {
-        $prefixed = $this->prefix.$key;
+        return $this->many([$key])[$key];
+    }
 
-        $cache = $this->table()->where('key', '=', $prefixed)->first();
-
-        // If we have a cache record we will check the expiration time against current
-        // time on the system and see if the record has expired. If it has, we will
-        // remove the records from the database table so it isn't returned again.
-        if (is_null($cache)) {
-            return;
+    /**
+     * Retrieve multiple items from the cache by key.
+     *
+     * Items not found in the cache will have a null value.
+     *
+     * @return array
+     */
+    public function many(array $keys)
+    {
+        if (count($keys) === 0) {
+            return [];
         }
 
-        $cache = is_array($cache) ? (object) $cache : $cache;
+        $results = array_fill_keys($keys, null);
+
+        // First we will retrieve all of the items from the cache using their keys and
+        // the prefix value. Then we will need to iterate through each of the items
+        // and convert them to an object when they are currently in array format.
+        $values = $this->table()
+            ->whereIn('key', array_map(function ($key) {
+                return $this->prefix.$key;
+            }, $keys))
+            ->get()
+            ->map(function ($value) {
+                return is_array($value) ? (object) $value : $value;
+            });
+
+        $currentTime = $this->currentTime();
 
         // If this cache expiration date is past the current time, we will remove this
         // item from the cache. Then we will return a null value since the cache is
         // expired. We will use "Carbon" to make this comparison with the column.
-        if ($this->currentTime() >= $cache->expiration) {
-            $this->forgetIfExpired($key);
+        [$values, $expired] = $values->partition(function ($cache) use ($currentTime) {
+            return $cache->expiration > $currentTime;
+        });
 
-            return;
+        if ($expired->isNotEmpty()) {
+            $this->forgetManyIfExpired($expired->pluck('key')->all(), prefixed: true);
         }
 
-        return $this->unserialize($cache->value);
+        return Arr::map($results, function ($value, $key) use ($values) {
+            if ($cache = $values->firstWhere('key', $this->prefix.$key)) {
+                return $this->unserialize($cache->value);
+            }
+
+            return $value;
+        });
     }
 
     /**
@@ -133,11 +161,30 @@ class DatabaseStore implements LockProvider, Store
      */
     public function put($key, $value, $seconds)
     {
-        $key = $this->prefix.$key;
-        $value = $this->serialize($value);
+        return $this->putMany([$key => $value], $seconds);
+    }
+
+    /**
+     * Store multiple items in the cache for a given number of seconds.
+     *
+     * @param  int  $seconds
+     * @return bool
+     */
+    public function putMany(array $values, $seconds)
+    {
+        $serializedValues = [];
+
         $expiration = $this->getTime() + $seconds;
 
-        return $this->table()->upsert(compact('key', 'value', 'expiration'), 'key') > 0;
+        foreach ($values as $key => $value) {
+            $serializedValues[] = [
+                'key' => $this->prefix.$key,
+                'value' => $this->serialize($value),
+                'expiration' => $expiration,
+            ];
+        }
+
+        return $this->table()->upsert($serializedValues, 'key') > 0;
     }
 
     /**
@@ -175,8 +222,8 @@ class DatabaseStore implements LockProvider, Store
      * Increment the value of an item in the cache.
      *
      * @param  string  $key
-     * @param  mixed  $value
-     * @return int|bool
+     * @param  int  $value
+     * @return int|false
      */
     public function increment($key, $value = 1)
     {
@@ -189,8 +236,8 @@ class DatabaseStore implements LockProvider, Store
      * Decrement the value of an item in the cache.
      *
      * @param  string  $key
-     * @param  mixed  $value
-     * @return int|bool
+     * @param  int  $value
+     * @return int|false
      */
     public function decrement($key, $value = 1)
     {
@@ -203,9 +250,9 @@ class DatabaseStore implements LockProvider, Store
      * Increment or decrement an item in the cache.
      *
      * @param  string  $key
-     * @param  mixed  $value
+     * @param  int|float  $value
      * @param  \Closure  $callback
-     * @return int|bool
+     * @return int|false
      */
     protected function incrementOrDecrement($key, $value, Closure $callback)
     {
@@ -309,9 +356,7 @@ class DatabaseStore implements LockProvider, Store
      */
     public function forget($key)
     {
-        $this->table()->where('key', '=', $this->prefix.$key)->delete();
-
-        return true;
+        return $this->forgetMany([$key]);
     }
 
     /**
@@ -322,8 +367,37 @@ class DatabaseStore implements LockProvider, Store
      */
     public function forgetIfExpired($key)
     {
+        return $this->forgetManyIfExpired([$key]);
+    }
+
+    /**
+     * Remove all items from the cache.
+     *
+     * @param  array  $keys
+     * @return bool
+     */
+    protected function forgetMany(array $keys)
+    {
+        $this->table()->whereIn('key', array_map(function ($key) {
+            return $this->prefix.$key;
+        }, $keys))->delete();
+
+        return true;
+    }
+
+    /**
+     * Remove all expired items from the given set from the cache.
+     *
+     * @param  array  $keys
+     * @param  bool  $prefixed
+     * @return bool
+     */
+    protected function forgetManyIfExpired(array $keys, bool $prefixed = false)
+    {
         $this->table()
-            ->where('key', '=', $this->prefix.$key)
+            ->whereIn('key', $prefixed ? $keys : array_map(function ($key) {
+                return $this->prefix.$key;
+            }, $keys))
             ->where('expiration', '<=', $this->getTime())
             ->delete();
 
@@ -383,6 +457,17 @@ class DatabaseStore implements LockProvider, Store
     public function getPrefix()
     {
         return $this->prefix;
+    }
+
+    /**
+     * Set the cache key prefix.
+     *
+     * @param  string  $prefix
+     * @return void
+     */
+    public function setPrefix($prefix)
+    {
+        $this->prefix = $prefix;
     }
 
     /**

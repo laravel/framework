@@ -2,30 +2,23 @@
 
 namespace Illuminate\Testing\Fluent\Concerns;
 
+use Illuminate\Support\Traits\Dumpable;
+
 trait Debugging
 {
+    use Dumpable;
+
     /**
      * Dumps the given props.
      *
      * @param  string|null  $prop
      * @return $this
      */
-    public function dump(string $prop = null): self
+    public function dump(?string $prop = null): self
     {
         dump($this->prop($prop));
 
         return $this;
-    }
-
-    /**
-     * Dumps the given props and exits.
-     *
-     * @param  string|null  $prop
-     * @return never
-     */
-    public function dd(string $prop = null): void
-    {
-        dd($this->prop($prop));
     }
 
     /**
@@ -34,5 +27,5 @@ trait Debugging
      * @param  string|null  $key
      * @return mixed
      */
-    abstract protected function prop(string $key = null);
+    abstract protected function prop(?string $key = null);
 }

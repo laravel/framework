@@ -390,8 +390,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function storeVerbatimBlocks($value)
     {
-        return preg_replace_callback('/(?<!@)@verbatim(.*?)@endverbatim/s', function ($matches) {
-            return $this->storeRawBlock($matches[1]);
+        return preg_replace_callback('/(?<!@)@verbatim(\s*)(.*?)@endverbatim/s', function ($matches) {
+            return $matches[1].$this->storeRawBlock($matches[2]);
         }, $value);
     }
 
@@ -808,7 +808,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      * @param  string|null  $prefix
      * @return void
      */
-    public function anonymousComponentPath(string $path, string $prefix = null)
+    public function anonymousComponentPath(string $path, ?string $prefix = null)
     {
         $prefixHash = md5($prefix ?: $path);
 
@@ -830,7 +830,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      * @param  string|null  $prefix
      * @return void
      */
-    public function anonymousComponentNamespace(string $directory, string $prefix = null)
+    public function anonymousComponentNamespace(string $directory, ?string $prefix = null)
     {
         $prefix ??= $directory;
 

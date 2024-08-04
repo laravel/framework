@@ -14,11 +14,11 @@
         }
     ],
     "require": {
-        "php": "^8.1",
-        "illuminate/collections": "^10.0",
-        "illuminate/contracts": "^10.0",
-        "illuminate/macroable": "^10.0",
-        "illuminate/support": "^10.0"
+        "php": "^8.2",
+        "illuminate/collections": "^11.0",
+        "illuminate/contracts": "^11.0",
+        "illuminate/macroable": "^11.0",
+        "illuminate/support": "^11.0"
     },
     "provide": {
         "psr/simple-cache-implementation": "1.0|2.0|3.0"
@@ -30,17 +30,17 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "10.x-dev"
+            "dev-master": "11.x-dev"
         }
     },
     "suggest": {
         "ext-apcu": "Required to use the APC cache driver.",
         "ext-filter": "Required to use the DynamoDb cache driver.",
         "ext-memcached": "Required to use the memcache cache driver.",
-        "illuminate/database": "Required to use the database cache driver (^10.0).",
-        "illuminate/filesystem": "Required to use the file cache driver (^10.0).",
-        "illuminate/redis": "Required to use the redis cache driver (^10.0).",
-        "symfony/cache": "Required to use PSR-6 cache bridge (^6.2)."
+        "illuminate/database": "Required to use the database cache driver (^11.0).",
+        "illuminate/filesystem": "Required to use the file cache driver (^11.0).",
+        "illuminate/redis": "Required to use the redis cache driver (^11.0).",
+        "symfony/cache": "Required to use PSR-6 cache bridge (^7.0)."
     },
     "config": {
         "sort-packages": true

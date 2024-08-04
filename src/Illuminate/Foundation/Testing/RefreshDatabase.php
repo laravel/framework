@@ -18,9 +18,11 @@ trait RefreshDatabase
     {
         $this->beforeRefreshingDatabase();
 
-        $this->usingInMemoryDatabase()
-                        ? $this->refreshInMemoryDatabase()
-                        : $this->refreshTestDatabase();
+        if ($this->usingInMemoryDatabase()) {
+            $this->restoreInMemoryDatabase();
+        }
+
+        $this->refreshTestDatabase();
 
         $this->afterRefreshingDatabase();
     }
@@ -38,28 +40,19 @@ trait RefreshDatabase
     }
 
     /**
-     * Refresh the in-memory database.
+     * Restore the in-memory database between tests.
      *
      * @return void
      */
-    protected function refreshInMemoryDatabase()
+    protected function restoreInMemoryDatabase()
     {
-        $this->artisan('migrate', $this->migrateUsing());
+        $database = $this->app->make('db');
 
-        $this->app[Kernel::class]->setArtisan(null);
-    }
-
-    /**
-     * The parameters that should be used when running "migrate".
-     *
-     * @return array
-     */
-    protected function migrateUsing()
-    {
-        return [
-            '--seed' => $this->shouldSeed(),
-            '--seeder' => $this->seeder(),
-        ];
+        foreach ($this->connectionsToTransact() as $name) {
+            if (isset(RefreshDatabaseState::$inMemoryConnections[$name])) {
+                $database->connection($name)->setPdo(RefreshDatabaseState::$inMemoryConnections[$name]);
+            }
+        }
     }
 
     /**
@@ -93,7 +86,13 @@ trait RefreshDatabase
 
         foreach ($this->connectionsToTransact() as $name) {
             $connection = $database->connection($name);
+
             $connection->setTransactionManager($transactionsManager);
+
+            if ($this->usingInMemoryDatabase()) {
+                RefreshDatabaseState::$inMemoryConnections[$name] ??= $connection->getPdo();
+            }
+
             $dispatcher = $connection->getEventDispatcher();
 
             $connection->unsetEventDispatcher();

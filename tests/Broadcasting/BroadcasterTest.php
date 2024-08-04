@@ -8,7 +8,9 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Routing\BindingRegistrar;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Illuminate\Routing\RouteBinding;
 use Mockery as m;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
@@ -81,6 +83,23 @@ class BroadcasterTest extends TestCase
     {
         $parameters = $this->broadcaster->extractAuthParameters('asd.{model}.{nonModel}', 'asd.1.something', DummyBroadcastingChannel::class);
         $this->assertEquals(['model.1.instance', 'something'], $parameters);
+    }
+
+    public function testModelRouteBinding()
+    {
+        $container = new Container;
+        Container::setInstance($container);
+        $binder = m::mock(BindingRegistrar::class);
+        $callback = RouteBinding::forModel($container, BroadcasterTestEloquentModelStub::class);
+
+        $binder->shouldReceive('getBindingCallback')->times(2)->with('model')->andReturn($callback);
+        $container->instance(BindingRegistrar::class, $binder);
+        $callback = function ($user, $model) {
+            //
+        };
+        $parameters = $this->broadcaster->extractAuthParameters('something.{model}', 'something.1', $callback);
+        $this->assertEquals(['model.1.instance'], $parameters);
+        Container::setInstance(new Container);
     }
 
     public function testUnknownChannelAuthHandlerTypeThrowsException()
@@ -314,9 +333,7 @@ class BroadcasterTest extends TestCase
         $this->assertNull($this->broadcaster->resolveAuthenticatedUser(new Request(['socket_id' => '1234.1234'])));
     }
 
-    /**
-     * @dataProvider channelNameMatchPatternProvider
-     */
+    #[DataProvider('channelNameMatchPatternProvider')]
     public function testChannelNameMatchPattern($channel, $pattern, $shouldMatch)
     {
         $this->assertEquals($shouldMatch, $this->broadcaster->channelNameMatchesPattern($channel, $pattern));

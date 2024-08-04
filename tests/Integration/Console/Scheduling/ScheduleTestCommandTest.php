@@ -77,13 +77,6 @@ class ScheduleTestCommandTest extends TestCase
             )
             ->expectsOutputToContain('Running [callback]');
     }
-
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-
-        Carbon::setTestNow(null);
-    }
 }
 
 class BarCommandStub extends Command

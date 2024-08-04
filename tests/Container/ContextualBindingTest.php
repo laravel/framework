@@ -40,6 +40,21 @@ class ContextualBindingTest extends TestCase
 
         $this->assertInstanceOf(ContainerContextImplementationStub::class, $one->impl);
         $this->assertInstanceOf(ContainerContextImplementationStubTwo::class, $two->impl);
+
+        /*
+         * Test nesting to make the same 'abstract' in different context
+         */
+        $container = new Container;
+
+        $container->bind(IContainerContextContractStub::class, ContainerContextImplementationStub::class);
+
+        $container->when(ContainerTestContextInjectOne::class)->needs(IContainerContextContractStub::class)->give(function ($container) {
+            return $container->make(IContainerContextContractStub::class);
+        });
+
+        $one = $container->make(ContainerTestContextInjectOne::class);
+
+        $this->assertInstanceOf(ContainerContextImplementationStub::class, $one->impl);
     }
 
     public function testContextualBindingWorksForExistingInstancedBindings()
@@ -497,11 +512,9 @@ class ContextualBindingTest extends TestCase
         $valueResolvedUsingArraySyntax = $container->call([$object, 'method']);
         $this->assertInstanceOf(ContainerContextImplementationStub::class, $valueResolvedUsingArraySyntax);
 
-        if (PHP_VERSION_ID >= 80200) {
-            // first class callable syntax...
-            $valueResolvedUsingFirstClassSyntax = $container->call($object->method(...));
-            $this->assertInstanceOf(ContainerContextImplementationStub::class, $valueResolvedUsingFirstClassSyntax);
-        }
+        // first class callable syntax...
+        $valueResolvedUsingFirstClassSyntax = $container->call($object->method(...));
+        $this->assertInstanceOf(ContainerContextImplementationStub::class, $valueResolvedUsingFirstClassSyntax);
     }
 }
 
@@ -581,7 +594,7 @@ class ContainerTestContextWithOptionalInnerDependency
 {
     public $inner;
 
-    public function __construct(ContainerTestContextInjectOne $inner = null)
+    public function __construct(?ContainerTestContextInjectOne $inner = null)
     {
         $this->inner = $inner;
     }

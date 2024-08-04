@@ -6,12 +6,15 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class DatabaseSqliteConnectionTest extends DatabaseTestCase
 {
-    protected function getEnvironmentSetUp($app)
+    protected function defineEnvironment($app)
     {
-        if (getenv('DB_CONNECTION') !== 'testing') {
+        parent::defineEnvironment($app);
+
+        if ($this->driver !== 'sqlite') {
             $this->markTestSkipped('Test requires a Sqlite connection.');
         }
 
@@ -38,9 +41,7 @@ class DatabaseSqliteConnectionTest extends DatabaseTestCase
         Schema::drop('json_table');
     }
 
-    /**
-     * @dataProvider jsonContainsKeyDataProvider
-     */
+    #[DataProvider('jsonContainsKeyDataProvider')]
     public function testWhereJsonContainsKey($count, $column)
     {
         DB::table('json_table')->insert([

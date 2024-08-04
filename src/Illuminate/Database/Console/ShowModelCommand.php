@@ -3,9 +3,6 @@
 namespace Illuminate\Database\Console;
 
 use BackedEnum;
-use Doctrine\DBAL\Schema\Column;
-use Doctrine\DBAL\Schema\Index;
-use Doctrine\DBAL\Types\DecimalType;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -13,6 +10,7 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use ReflectionClass;
 use ReflectionMethod;
+use ReflectionNamedType;
 use SplFileObject;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -70,10 +68,6 @@ class ShowModelCommand extends DatabaseInspectionCommand
      */
     public function handle()
     {
-        if (! $this->ensureDependenciesExist()) {
-            return 1;
-        }
-
         $class = $this->qualifyModel($this->argument('model'));
 
         try {
@@ -81,7 +75,9 @@ class ShowModelCommand extends DatabaseInspectionCommand
 
             $class = get_class($model);
         } catch (BindingResolutionException $e) {
-            return $this->components->error($e->getMessage());
+            $this->components->error($e->getMessage());
+
+            return 1;
         }
 
         if ($this->option('database')) {
@@ -95,8 +91,11 @@ class ShowModelCommand extends DatabaseInspectionCommand
             $this->getPolicy($model),
             $this->getAttributes($model),
             $this->getRelations($model),
+            $this->getEvents($model),
             $this->getObservers($model),
         );
+
+        return 0;
     }
 
     /**
@@ -121,25 +120,23 @@ class ShowModelCommand extends DatabaseInspectionCommand
     protected function getAttributes($model)
     {
         $connection = $model->getConnection();
-        $schema = $connection->getDoctrineSchemaManager();
-        $this->registerTypeMappings($connection->getDoctrineConnection()->getDatabasePlatform());
-        $table = $model->getConnection()->getTablePrefix().$model->getTable();
-        $columns = $schema->listTableColumns($table);
-        $indexes = $schema->listTableIndexes($table);
+        $schema = $connection->getSchemaBuilder();
+        $table = $model->getTable();
+        $columns = $schema->getColumns($table);
+        $indexes = $schema->getIndexes($table);
 
         return collect($columns)
-            ->values()
-            ->map(fn (Column $column) => [
-                'name' => $column->getName(),
-                'type' => $this->getColumnType($column),
-                'increments' => $column->getAutoincrement(),
-                'nullable' => ! $column->getNotnull(),
+            ->map(fn ($column) => [
+                'name' => $column['name'],
+                'type' => $column['type'],
+                'increments' => $column['auto_increment'],
+                'nullable' => $column['nullable'],
                 'default' => $this->getColumnDefault($column, $model),
-                'unique' => $this->columnIsUnique($column->getName(), $indexes),
-                'fillable' => $model->isFillable($column->getName()),
-                'hidden' => $this->attributeIsHidden($column->getName(), $model),
+                'unique' => $this->columnIsUnique($column['name'], $indexes),
+                'fillable' => $model->isFillable($column['name']),
+                'hidden' => $this->attributeIsHidden($column['name'], $model),
                 'appended' => null,
-                'cast' => $this->getCastType($column->getName(), $model),
+                'cast' => $this->getCastType($column['name'], $model),
             ])
             ->merge($this->getVirtualAttributes($model, $columns));
     }
@@ -148,7 +145,7 @@ class ShowModelCommand extends DatabaseInspectionCommand
      * Get the virtual (non-column) attributes for the given model.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @param  \Doctrine\DBAL\Schema\Column[]  $columns
+     * @param  array  $columns
      * @return \Illuminate\Support\Collection
      */
     protected function getVirtualAttributes($model, $columns)
@@ -170,7 +167,7 @@ class ShowModelCommand extends DatabaseInspectionCommand
                     return [];
                 }
             })
-            ->reject(fn ($cast, $name) => collect($columns)->has($name))
+            ->reject(fn ($cast, $name) => collect($columns)->contains('name', $name))
             ->map(fn ($cast, $name) => [
                 'name' => $name,
                 'type' => null,
@@ -200,8 +197,14 @@ class ShowModelCommand extends DatabaseInspectionCommand
                 fn (ReflectionMethod $method) => $method->isStatic()
                     || $method->isAbstract()
                     || $method->getDeclaringClass()->getName() === Model::class
+                    || $method->getNumberOfParameters() > 0
             )
             ->filter(function (ReflectionMethod $method) {
+                if ($method->getReturnType() instanceof ReflectionNamedType
+                    && is_subclass_of($method->getReturnType()->getName(), Relation::class)) {
+                    return true;
+                }
+
                 $file = new SplFileObject($method->getFileName());
                 $file->seek($method->getStartLine() - 1);
                 $code = '';
@@ -228,6 +231,21 @@ class ShowModelCommand extends DatabaseInspectionCommand
             })
             ->filter()
             ->values();
+    }
+
+    /**
+     * Get the Events that the model dispatches.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @return \Illuminate\Support\Collection
+     */
+    protected function getEvents($model)
+    {
+        return collect($model->dispatchesEvents())
+            ->map(fn (string $class, string $event) => [
+                'event' => $event,
+                'class' => $class,
+            ])->values();
     }
 
     /**
@@ -273,14 +291,15 @@ class ShowModelCommand extends DatabaseInspectionCommand
      * @param  string  $policy
      * @param  \Illuminate\Support\Collection  $attributes
      * @param  \Illuminate\Support\Collection  $relations
+     * @param  \Illuminate\Support\Collection  $events
      * @param  \Illuminate\Support\Collection  $observers
      * @return void
      */
-    protected function display($class, $database, $table, $policy, $attributes, $relations, $observers)
+    protected function display($class, $database, $table, $policy, $attributes, $relations, $events, $observers)
     {
         $this->option('json')
-            ? $this->displayJson($class, $database, $table, $policy, $attributes, $relations, $observers)
-            : $this->displayCli($class, $database, $table, $policy, $attributes, $relations, $observers);
+            ? $this->displayJson($class, $database, $table, $policy, $attributes, $relations, $events, $observers)
+            : $this->displayCli($class, $database, $table, $policy, $attributes, $relations, $events, $observers);
     }
 
     /**
@@ -292,10 +311,11 @@ class ShowModelCommand extends DatabaseInspectionCommand
      * @param  string  $policy
      * @param  \Illuminate\Support\Collection  $attributes
      * @param  \Illuminate\Support\Collection  $relations
+     * @param  \Illuminate\Support\Collection  $events
      * @param  \Illuminate\Support\Collection  $observers
      * @return void
      */
-    protected function displayJson($class, $database, $table, $policy, $attributes, $relations, $observers)
+    protected function displayJson($class, $database, $table, $policy, $attributes, $relations, $events, $observers)
     {
         $this->output->writeln(
             collect([
@@ -305,6 +325,7 @@ class ShowModelCommand extends DatabaseInspectionCommand
                 'policy' => $policy,
                 'attributes' => $attributes,
                 'relations' => $relations,
+                'events' => $events,
                 'observers' => $observers,
             ])->toJson()
         );
@@ -319,10 +340,11 @@ class ShowModelCommand extends DatabaseInspectionCommand
      * @param  string  $policy
      * @param  \Illuminate\Support\Collection  $attributes
      * @param  \Illuminate\Support\Collection  $relations
+     * @param  \Illuminate\Support\Collection  $events
      * @param  \Illuminate\Support\Collection  $observers
      * @return void
      */
-    protected function displayCli($class, $database, $table, $policy, $attributes, $relations, $observers)
+    protected function displayCli($class, $database, $table, $policy, $attributes, $relations, $events, $observers)
     {
         $this->newLine();
 
@@ -379,6 +401,19 @@ class ShowModelCommand extends DatabaseInspectionCommand
 
         $this->newLine();
 
+        $this->components->twoColumnDetail('<fg=green;options=bold>Events</>');
+
+        if ($events->count()) {
+            foreach ($events as $event) {
+                $this->components->twoColumnDetail(
+                    sprintf('%s', $event['event']),
+                    sprintf('%s', $event['class']),
+                );
+            }
+        }
+
+        $this->newLine();
+
         $this->components->twoColumnDetail('<fg=green;options=bold>Observers</>');
 
         if ($observers->count()) {
@@ -429,44 +464,20 @@ class ShowModelCommand extends DatabaseInspectionCommand
     }
 
     /**
-     * Get the type of the given column.
-     *
-     * @param  \Doctrine\DBAL\Schema\Column  $column
-     * @return string
-     */
-    protected function getColumnType($column)
-    {
-        $name = $column->getType()->getName();
-
-        $unsigned = $column->getUnsigned() ? ' unsigned' : '';
-
-        $details = match (get_class($column->getType())) {
-            DecimalType::class => $column->getPrecision().','.$column->getScale(),
-            default => $column->getLength(),
-        };
-
-        if ($details) {
-            return sprintf('%s(%s)%s', $name, $details, $unsigned);
-        }
-
-        return sprintf('%s%s', $name, $unsigned);
-    }
-
-    /**
      * Get the default value for the given column.
      *
-     * @param  \Doctrine\DBAL\Schema\Column  $column
+     * @param  array  $column
      * @param  \Illuminate\Database\Eloquent\Model  $model
      * @return mixed|null
      */
     protected function getColumnDefault($column, $model)
     {
-        $attributeDefault = $model->getAttributes()[$column->getName()] ?? null;
+        $attributeDefault = $model->getAttributes()[$column['name']] ?? null;
 
         return match (true) {
             $attributeDefault instanceof BackedEnum => $attributeDefault->value,
             $attributeDefault instanceof UnitEnum => $attributeDefault->name,
-            default => $attributeDefault ?? $column->getDefault(),
+            default => $attributeDefault ?? $column['default'],
         };
     }
 
@@ -494,14 +505,14 @@ class ShowModelCommand extends DatabaseInspectionCommand
      * Determine if the given attribute is unique.
      *
      * @param  string  $column
-     * @param  \Doctrine\DBAL\Schema\Index[]  $indexes
+     * @param  array  $indexes
      * @return bool
      */
     protected function columnIsUnique($column, $indexes)
     {
-        return collect($indexes)
-            ->filter(fn (Index $index) => count($index->getColumns()) === 1 && $index->getColumns()[0] === $column)
-            ->contains(fn (Index $index) => $index->isUnique());
+        return collect($indexes)->contains(
+            fn ($index) => count($index['columns']) === 1 && $index['columns'][0] === $column && $index['unique']
+        );
     }
 
     /**

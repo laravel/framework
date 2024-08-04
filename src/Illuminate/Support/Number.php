@@ -233,6 +233,42 @@ class Number
     }
 
     /**
+     * Split the given number into pairs of min/max values.
+     *
+     * @param  int|float  $to
+     * @param  int|float  $by
+     * @param  int|float  $offset
+     * @return array
+     */
+    public static function pairs(int|float $to, int|float $by, int|float $offset = 1)
+    {
+        $output = [];
+
+        for ($lower = 0; $lower < $to; $lower += $by) {
+            $upper = $lower + $by;
+
+            if ($upper > $to) {
+                $upper = $to;
+            }
+
+            $output[] = [$lower + $offset, $upper];
+        }
+
+        return $output;
+    }
+
+    /**
+     * Remove any trailing zero digits after the decimal point of the given number.
+     *
+     * @param  int|float  $number
+     * @return int|float
+     */
+    public static function trim(int|float $number)
+    {
+        return json_decode(json_encode($number));
+    }
+
+    /**
      * Execute the given callback using the given locale.
      *
      * @param  string  $locale

@@ -69,7 +69,7 @@ class RateLimited
                 return (object) [
                     'key' => md5($this->limiterName.$limit->key),
                     'maxAttempts' => $limit->maxAttempts,
-                    'decayMinutes' => $limit->decayMinutes,
+                    'decaySeconds' => $limit->decaySeconds,
                 ];
             })->all()
         );
@@ -92,7 +92,7 @@ class RateLimited
                         : false;
             }
 
-            $this->limiter->hit($limit->key, $limit->decayMinutes * 60);
+            $this->limiter->hit($limit->key, $limit->decaySeconds);
         }
 
         return $next($job);

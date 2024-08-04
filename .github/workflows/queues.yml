@@ -9,7 +9,7 @@ on:
 
 jobs:
   sync:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     strategy:
       fail-fast: true
@@ -23,13 +23,13 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.1
+          php-version: 8.2
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, :php-psr
           tools: composer:v2
           coverage: none
 
       - name: Set Framework version
-        run: composer config version "10.x-dev"
+        run: composer config version "11.x-dev"
 
       - name: Install dependencies
         uses: nick-fields/retry@v3
@@ -44,7 +44,7 @@ jobs:
           QUEUE_CONNECTION: sync
 
   database:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     strategy:
       fail-fast: true
@@ -58,13 +58,13 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.1
+          php-version: 8.2
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, :php-psr
           tools: composer:v2
           coverage: none
 
       - name: Set Framework version
-        run: composer config version "10.x-dev"
+        run: composer config version "11.x-dev"
 
       - name: Install dependencies
         uses: nick-fields/retry@v3
@@ -80,7 +80,7 @@ jobs:
           QUEUE_CONNECTION: database
 
   redis:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     services:
       redis:
@@ -101,13 +101,13 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.1
+          php-version: 8.2
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, :php-psr
           tools: composer:v2
           coverage: none
 
       - name: Set Framework version
-        run: composer config version "10.x-dev"
+        run: composer config version "11.x-dev"
 
       - name: Install dependencies
         uses: nick-fields/retry@v3
@@ -122,17 +122,17 @@ jobs:
           QUEUE_CONNECTION: redis
 
   beanstalkd:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     name: Beanstalkd Driver
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - name: Download & Extract beanstalkd
         run: curl -L https://github.com/beanstalkd/beanstalkd/archive/refs/tags/v1.13.tar.gz | tar xz
-      
+
       - name: Make beanstalkd
         run: make
         working-directory: beanstalkd-1.13
@@ -140,13 +140,13 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.1
+          php-version: 8.2
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, :php-psr
           tools: composer:v2
           coverage: none
 
       - name: Set Framework version
-        run: composer config version "10.x-dev"
+        run: composer config version "11.x-dev"
 
       - name: Install dependencies
         uses: nick-fields/retry@v3

@@ -40,6 +40,14 @@ interface ProcessResult
     public function output();
 
     /**
+     * Determine if the output contains the given string.
+     *
+     * @param  string  $output
+     * @return bool
+     */
+    public function seeInOutput(string $output);
+
+    /**
      * Get the error output of the process.
      *
      * @return string
@@ -47,12 +55,20 @@ interface ProcessResult
     public function errorOutput();
 
     /**
+     * Determine if the error output contains the given string.
+     *
+     * @param  string  $output
+     * @return bool
+     */
+    public function seeInErrorOutput(string $output);
+
+    /**
      * Throw an exception if the process failed.
      *
      * @param  callable|null  $callback
      * @return $this
      */
-    public function throw(callable $callback = null);
+    public function throw(?callable $callback = null);
 
     /**
      * Throw an exception if the process failed and the given condition is true.
@@ -61,5 +77,5 @@ interface ProcessResult
      * @param  callable|null  $callback
      * @return $this
      */
-    public function throwIf(bool $condition, callable $callback = null);
+    public function throwIf(bool $condition, ?callable $callback = null);
 }

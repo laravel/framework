@@ -12,6 +12,7 @@ use Illuminate\Support\Stringable;
 use Illuminate\Tests\Database\Fixtures\Models\Money\Price;
 use InvalidArgumentException;
 use Mockery as m;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Exception\SessionNotFoundException;
@@ -80,9 +81,7 @@ class HttpRequestTest extends TestCase
         $this->assertSame('foo bar', $request->decodedPath());
     }
 
-    /**
-     * @dataProvider segmentProvider
-     */
+    #[DataProvider('segmentProvider')]
     public function testSegmentMethod($path, $segment, $expected)
     {
         $request = Request::create($path);
@@ -99,9 +98,7 @@ class HttpRequestTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider segmentsProvider
-     */
+    #[DataProvider('segmentsProvider')]
     public function testSegmentsMethod($path, $expected)
     {
         $request = Request::create($path);
@@ -765,13 +762,16 @@ class HttpRequestTest extends TestCase
         $request = Request::create('/', 'GET', [
             'valid_enum_value' => 'test',
             'invalid_enum_value' => 'invalid',
+            'empty_value_request' => '',
         ]);
 
-        $this->assertNull($request->enum('doesnt_exists', TestEnum::class));
+        $this->assertNull($request->enum('doesnt_exists', TestEnumBacked::class));
 
-        $this->assertEquals(TestEnum::test, $request->enum('valid_enum_value', TestEnum::class));
+        $this->assertEquals(TestEnumBacked::test, $request->enum('valid_enum_value', TestEnumBacked::class));
 
-        $this->assertNull($request->enum('invalid_enum_value', TestEnum::class));
+        $this->assertNull($request->enum('invalid_enum_value', TestEnumBacked::class));
+        $this->assertNull($request->enum('empty_value_request', TestEnumBacked::class));
+        $this->assertNull($request->enum('valid_enum_value', TestEnum::class));
     }
 
     public function testArrayAccess()
@@ -1077,9 +1077,7 @@ class HttpRequestTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider getPrefersCases
-     */
+    #[DataProvider('getPrefersCases')]
     public function testPrefersMethod($accept, $prefers, $expected)
     {
         $this->assertSame(
@@ -1607,5 +1605,15 @@ class HttpRequestTest extends TestCase
         $value = $request->get('framework');
 
         $this->assertSame(['name' => 'Laravel'], $request->get('framework'));
+    }
+
+    public function testItDoesNotGenerateJsonErrorsForEmptyContent()
+    {
+        // clear any existing errors
+        json_encode(null);
+
+        Request::create('', 'GET')->json();
+
+        $this->assertTrue(json_last_error() === JSON_ERROR_NONE);
     }
 }

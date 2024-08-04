@@ -5,6 +5,7 @@ namespace Illuminate\Bus;
 use Closure;
 use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Support\Arr;
+use PHPUnit\Framework\Assert as PHPUnit;
 use RuntimeException;
 
 trait Queueable
@@ -22,27 +23,6 @@ trait Queueable
      * @var string|null
      */
     public $queue;
-
-    /**
-     * The name of the connection the chain should be sent to.
-     *
-     * @var string|null
-     */
-    public $chainConnection;
-
-    /**
-     * The name of the queue the chain should be sent to.
-     *
-     * @var string|null
-     */
-    public $chainQueue;
-
-    /**
-     * The callbacks to be executed on chain failure.
-     *
-     * @var array|null
-     */
-    public $chainCatchCallbacks;
 
     /**
      * The number of seconds before the job should be made available.
@@ -71,6 +51,27 @@ trait Queueable
      * @var array
      */
     public $chained = [];
+
+    /**
+     * The name of the connection the chain should be sent to.
+     *
+     * @var string|null
+     */
+    public $chainConnection;
+
+    /**
+     * The name of the queue the chain should be sent to.
+     *
+     * @var string|null
+     */
+    public $chainQueue;
+
+    /**
+     * The callbacks to be executed on chain failure.
+     *
+     * @var array|null
+     */
+    public $chainCatchCallbacks;
 
     /**
      * Set the desired connection for the job.
@@ -135,6 +136,18 @@ trait Queueable
     public function delay($delay)
     {
         $this->delay = $delay;
+
+        return $this;
+    }
+
+    /**
+     * Set the delay for the job to zero seconds.
+     *
+     * @return $this
+     */
+    public function withoutDelay()
+    {
+        $this->delay = 0;
 
         return $this;
     }
@@ -272,5 +285,40 @@ trait Queueable
         collect($this->chainCatchCallbacks)->each(function ($callback) use ($e) {
             $callback($e);
         });
+    }
+
+    /**
+     * Assert that the job has the given chain of jobs attached to it.
+     *
+     * @param  array  $expectedChain
+     * @return void
+     */
+    public function assertHasChain($expectedChain)
+    {
+        PHPUnit::assertTrue(
+            collect($expectedChain)->isNotEmpty(),
+            'The expected chain can not be empty.'
+        );
+
+        if (collect($expectedChain)->contains(fn ($job) => is_object($job))) {
+            $expectedChain = collect($expectedChain)->map(fn ($job) => serialize($job))->all();
+        } else {
+            $chain = collect($this->chained)->map(fn ($job) => get_class(unserialize($job)))->all();
+        }
+
+        PHPUnit::assertTrue(
+            $expectedChain === ($chain ?? $this->chained),
+            'The job does not have the expected chain.'
+        );
+    }
+
+    /**
+     * Assert that the job has no remaining chained jobs.
+     *
+     * @return void
+     */
+    public function assertDoesntHaveChain()
+    {
+        PHPUnit::assertEmpty($this->chained, 'The job has chained jobs.');
     }
 }

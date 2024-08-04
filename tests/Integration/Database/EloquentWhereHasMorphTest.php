@@ -153,7 +153,7 @@ class EloquentWhereHasMorphTest extends DatabaseTestCase
         });
 
         Schema::table('comments', function (Blueprint $table) {
-            $table->string('commentable_id')->change();
+            $table->string('commentable_id')->nullable()->change();
         });
 
         Post::where('id', 1)->update(['slug' => 'foo']);

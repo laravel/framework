@@ -12,6 +12,8 @@ use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Stringable;
 
+include_once 'Enums.php';
+
 class RouteRegistrarTest extends TestCase
 {
     /**
@@ -939,6 +941,19 @@ class RouteRegistrarTest extends TestCase
         /** @var \Illuminate\Routing\Route $route */
         foreach ($this->router->getRoutes() as $route) {
             $this->assertEquals($wheres, $route->wheres);
+        }
+    }
+
+    public function testWhereInEnumRegistration()
+    {
+        $this->router->get('/posts/{category}')->whereIn('category', CategoryBackedEnum::cases());
+
+        $invalidRequest = Request::create('/posts/invalid-value', 'GET');
+        $this->assertFalse($this->getRoute()->matches($invalidRequest));
+
+        foreach (CategoryBackedEnum::cases() as $case) {
+            $request = Request::create('/posts/'.$case->value, 'GET');
+            $this->assertTrue($this->getRoute()->matches($request));
         }
     }
 

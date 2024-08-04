@@ -11,11 +11,12 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Env;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Str;
+use Orchestra\Testbench\Attributes\RequiresEnv;
 use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 
-/**
- * @requires OS Linux|Darwin
- */
+#[RequiresOperatingSystem('Linux|Darwin')]
+#[RequiresEnv('DYNAMODB_ENDPOINT')]
 class DynamoBatchTest extends TestCase
 {
     public function setUp(): void
@@ -34,14 +35,10 @@ class DynamoBatchTest extends TestCase
 
     protected function defineEnvironment($app)
     {
-        if (is_null($endpoint = Env::get('DYNAMODB_ENDPOINT'))) {
-            $this->markTestSkipped('Require `dynamodb` to be configured');
-        }
-
         $app['config']->set('queue.batching', [
             'driver' => 'dynamodb',
             'region' => 'us-west-2',
-            'endpoint' => $endpoint,
+            'endpoint' => Env::get('DYNAMODB_ENDPOINT'),
             'key' => 'key',
             'secret' => 'secret',
         ]);

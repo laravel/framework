@@ -144,6 +144,19 @@ class RateLimiter
     }
 
     /**
+     * Decrement the counter for a given key for a given decay time by a given amount.
+     *
+     * @param  string  $key
+     * @param  int  $decaySeconds
+     * @param  int  $amount
+     * @return int
+     */
+    public function decrement($key, $decaySeconds = 60, $amount = 1)
+    {
+        return $this->increment($key, $decaySeconds, $amount * -1);
+    }
+
+    /**
      * Get the number of attempts for the given key.
      *
      * @param  string  $key

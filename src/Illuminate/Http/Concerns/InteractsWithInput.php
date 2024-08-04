@@ -5,13 +5,15 @@ namespace Illuminate\Http\Concerns;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Traits\Dumpable;
 use SplFileInfo;
 use stdClass;
 use Symfony\Component\HttpFoundation\InputBag;
-use Symfony\Component\VarDumper\VarDumper;
 
 trait InteractsWithInput
 {
+    use Dumpable;
+
     /**
      * Retrieve a server variable from the request.
      *
@@ -120,7 +122,7 @@ trait InteractsWithInput
      * @param  callable|null  $default
      * @return $this|mixed
      */
-    public function whenHas($key, callable $callback, callable $default = null)
+    public function whenHas($key, callable $callback, ?callable $default = null)
     {
         if ($this->has($key)) {
             return $callback(data_get($this->all(), $key)) ?: $this;
@@ -198,7 +200,7 @@ trait InteractsWithInput
      * @param  callable|null  $default
      * @return $this|mixed
      */
-    public function whenFilled($key, callable $callback, callable $default = null)
+    public function whenFilled($key, callable $callback, ?callable $default = null)
     {
         if ($this->filled($key)) {
             return $callback(data_get($this->all(), $key)) ?: $this;
@@ -232,7 +234,7 @@ trait InteractsWithInput
      * @param  callable|null  $default
      * @return $this|mixed
      */
-    public function whenMissing($key, callable $callback, callable $default = null)
+    public function whenMissing($key, callable $callback, ?callable $default = null)
     {
         if ($this->missing($key)) {
             return $callback(data_get($this->all(), $key)) ?: $this;
@@ -607,19 +609,6 @@ trait InteractsWithInput
     }
 
     /**
-     * Dump the request items and end the script.
-     *
-     * @param  mixed  ...$keys
-     * @return never
-     */
-    public function dd(...$keys)
-    {
-        $this->dump(...$keys);
-
-        exit(1);
-    }
-
-    /**
      * Dump the items.
      *
      * @param  mixed  $keys
@@ -629,7 +618,7 @@ trait InteractsWithInput
     {
         $keys = is_array($keys) ? $keys : func_get_args();
 
-        VarDumper::dump(count($keys) > 0 ? $this->only($keys) : $this->all());
+        dump(count($keys) > 0 ? $this->only($keys) : $this->all());
 
         return $this;
     }

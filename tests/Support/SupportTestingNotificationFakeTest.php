@@ -116,7 +116,7 @@ class SupportTestingNotificationFakeTest extends TestCase
             $this->fake->assertNothingSent();
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertStringContainsString('Notifications were sent unexpectedly.', $e->getMessage());
+            $this->assertStringContainsString("The following notifications were sent unexpectedly:\n\n- ".get_class(new NotificationStub), $e->getMessage());
         }
     }
 

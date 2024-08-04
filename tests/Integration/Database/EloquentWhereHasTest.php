@@ -9,6 +9,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class EloquentWhereHasTest extends DatabaseTestCase
 {
@@ -49,9 +50,8 @@ class EloquentWhereHasTest extends DatabaseTestCase
 
     /**
      * Check that the 'whereRelation' callback function works.
-     *
-     * @dataProvider dataProviderWhereRelationCallback
      */
+    #[DataProvider('dataProviderWhereRelationCallback')]
     public function testWhereRelationCallback($callbackEloquent, $callbackQuery)
     {
         $userWhereRelation = User::whereRelation('posts', $callbackEloquent);
@@ -69,9 +69,8 @@ class EloquentWhereHasTest extends DatabaseTestCase
 
     /**
      * Check that the 'orWhereRelation' callback function works.
-     *
-     * @dataProvider dataProviderWhereRelationCallback
      */
+    #[DataProvider('dataProviderWhereRelationCallback')]
     public function testOrWhereRelationCallback($callbackEloquent, $callbackQuery)
     {
         $userOrWhereRelation = User::orWhereRelation('posts', $callbackEloquent);

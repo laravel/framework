@@ -2,9 +2,10 @@
 
 namespace Illuminate\Foundation;
 
-use Exception;
-
-class ViteManifestNotFoundException extends Exception
+/**
+ * @deprecated use ViteException
+ */
+class ViteManifestNotFoundException extends ViteException
 {
     //
 }

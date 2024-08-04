@@ -14,14 +14,15 @@ class CacheHit extends CacheEvent
     /**
      * Create a new event instance.
      *
+     * @param  string|null  $storeName
      * @param  string  $key
      * @param  mixed  $value
      * @param  array  $tags
      * @return void
      */
-    public function __construct($key, $value, array $tags = [])
+    public function __construct($storeName, $key, $value, array $tags = [])
     {
-        parent::__construct($key, $tags);
+        parent::__construct($storeName, $key, $tags);
 
         $this->value = $value;
     }

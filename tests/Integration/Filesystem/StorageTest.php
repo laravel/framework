@@ -8,7 +8,7 @@ use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 use Symfony\Component\Process\Process;
 
-#[RequiresOperatingSystem('Linux|DAR')]
+#[RequiresOperatingSystem('Linux|Darwin')]
 class StorageTest extends TestCase
 {
     protected $stubFile;

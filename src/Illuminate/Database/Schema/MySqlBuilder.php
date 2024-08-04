@@ -59,34 +59,6 @@ class MySqlBuilder extends Builder
     }
 
     /**
-     * Get all of the table names for the database.
-     *
-     * @deprecated Will be removed in a future Laravel version.
-     *
-     * @return array
-     */
-    public function getAllTables()
-    {
-        return $this->connection->select(
-            $this->grammar->compileGetAllTables()
-        );
-    }
-
-    /**
-     * Get all of the view names for the database.
-     *
-     * @deprecated Will be removed in a future Laravel version.
-     *
-     * @return array
-     */
-    public function getAllViews()
-    {
-        return $this->connection->select(
-            $this->grammar->compileGetAllViews()
-        );
-    }
-
-    /**
      * Get the columns for a given table.
      *
      * @param  string  $table

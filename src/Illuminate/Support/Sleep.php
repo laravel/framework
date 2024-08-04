@@ -92,7 +92,7 @@ class Sleep
     public static function until($timestamp)
     {
         if (is_numeric($timestamp)) {
-            $timestamp = Carbon::createFromTimestamp($timestamp);
+            $timestamp = Carbon::createFromTimestamp($timestamp, date_default_timezone_get());
         }
 
         return new static(Carbon::now()->diff($timestamp));
@@ -415,7 +415,7 @@ class Sleep
         }
 
         foreach (static::$sequence as $duration) {
-            PHPUnit::assertSame(0, $duration->totalMicroseconds, vsprintf('Unexpected sleep duration of [%s] found.', [
+            PHPUnit::assertSame(0, (int) $duration->totalMicroseconds, vsprintf('Unexpected sleep duration of [%s] found.', [
                 $duration->cascade()->forHumans([
                     'options' => 0,
                     'minimumUnit' => 'microsecond',

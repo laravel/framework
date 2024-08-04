@@ -10,9 +10,11 @@ use Orchestra\Testbench\TestCase;
 
 class EloquentModelConnectionsTest extends TestCase
 {
-    protected function getEnvironmentSetUp($app)
+    protected function defineEnvironment($app)
     {
-        if (getenv('DB_CONNECTION') !== 'testing') {
+        $connection = $app['config']->get('database.default');
+
+        if ($app['config']->get("database.connections.$connection.driver") !== 'sqlite') {
             $this->markTestSkipped('Test requires a Sqlite connection.');
         }
 

@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Console\Scheduling\ScheduleListCommand;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\ProcessUtils;
 use Orchestra\Testbench\TestCase;
 
@@ -127,6 +128,30 @@ class ScheduleListCommandTest extends TestCase
             ->expectsOutput('  * * * * * 15s  php artisan inspire ........... Next Due: 15 seconds from now')
             ->expectsOutput('  * * * * * 20s  php artisan inspire ........... Next Due: 20 seconds from now')
             ->expectsOutput('  * * * * * 30s  php artisan inspire ........... Next Due: 30 seconds from now');
+    }
+
+    public function testClosureCommandsMayBeScheduled()
+    {
+        $closure = function () {
+        };
+
+        Artisan::command('one', $closure)->weekly()->everySecond();
+        Artisan::command('two', $closure)->everyTwoSeconds();
+        Artisan::command('three', $closure)->everyFiveSeconds();
+        Artisan::command('four', $closure)->everyTenSeconds();
+        Artisan::command('five', $closure)->everyFifteenSeconds();
+        Artisan::command('six', $closure)->everyTwentySeconds()->hourly();
+        Artisan::command('six', $closure)->everyThreeHours()->everySecond();
+
+        $this->artisan(ScheduleListCommand::class)
+            ->assertSuccessful()
+            ->expectsOutput('  * 0   * * 0 1s   php artisan one ............... Next Due: 1 second from now')
+            ->expectsOutput('  * *   * * * 2s   php artisan two .............. Next Due: 2 seconds from now')
+            ->expectsOutput('  * *   * * * 5s   php artisan three ............ Next Due: 5 seconds from now')
+            ->expectsOutput('  * *   * * * 10s  php artisan four ............ Next Due: 10 seconds from now')
+            ->expectsOutput('  * *   * * * 15s  php artisan five ............ Next Due: 15 seconds from now')
+            ->expectsOutput('  0 *   * * * 20s  php artisan six ............. Next Due: 20 seconds from now')
+            ->expectsOutput('  * */3 * * * 1s   php artisan six ............... Next Due: 1 second from now');
     }
 
     protected function tearDown(): void

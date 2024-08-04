@@ -105,7 +105,7 @@ class ShouldDispatchAfterCommitEventTest extends TestCase
         $this->assertTrue(AnotherShouldDispatchAfterCommitTestEvent::$ran);
     }
 
-    public function testItOnlyDispatchesNestedTransactionsEventsAfterTheRootTransactionIsCommitedDifferentOrder()
+    public function testItOnlyDispatchesNestedTransactionsEventsAfterTheRootTransactionIsCommittedDifferentOrder()
     {
         Event::listen(ShouldDispatchAfterCommitTestEvent::class, ShouldDispatchAfterCommitListener::class);
         Event::listen(AnotherShouldDispatchAfterCommitTestEvent::class, AnotherShouldDispatchAfterCommitListener::class);

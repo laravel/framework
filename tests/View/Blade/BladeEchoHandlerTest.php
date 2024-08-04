@@ -5,6 +5,7 @@ namespace Illuminate\Tests\View\Blade;
 use Exception;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\Str;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class BladeEchoHandlerTest extends AbstractBladeTestCase
 {
@@ -49,9 +50,7 @@ class BladeEchoHandlerTest extends AbstractBladeTestCase
         );
     }
 
-    /**
-     * @dataProvider handlerLogicDataProvider
-     */
+    #[DataProvider('handlerLogicDataProvider')]
     public function testHandlerLogicWorksCorrectly($blade)
     {
         $this->expectException(Exception::class);
@@ -61,9 +60,7 @@ class BladeEchoHandlerTest extends AbstractBladeTestCase
             throw new Exception('The fluent object has been successfully handled!');
         });
 
-        app()->singleton('blade.compiler', function () {
-            return $this->compiler;
-        });
+        app()->instance('blade.compiler', $this->compiler);
 
         $exampleObject = new Fluent();
 
@@ -80,16 +77,12 @@ class BladeEchoHandlerTest extends AbstractBladeTestCase
         ];
     }
 
-    /**
-     * @dataProvider handlerWorksWithIterableDataProvider
-     */
+    #[DataProvider('handlerWorksWithIterableDataProvider')]
     public function testHandlerWorksWithIterables($blade, $closure, $expectedOutput)
     {
         $this->compiler->stringable('iterable', $closure);
 
-        app()->singleton('blade.compiler', function () {
-            return $this->compiler;
-        });
+        app()->instance('blade.compiler', $this->compiler);
 
         ob_start();
         eval(Str::of($this->compiler->compileString($blade))->remove(['<?php', '?>']));
@@ -108,14 +101,10 @@ class BladeEchoHandlerTest extends AbstractBladeTestCase
         ];
     }
 
-    /**
-     * @dataProvider nonStringableDataProvider
-     */
+    #[DataProvider('nonStringableDataProvider')]
     public function testHandlerWorksWithNonStringables($blade, $expectedOutput)
     {
-        app()->singleton('blade.compiler', function () {
-            return $this->compiler;
-        });
+        app()->instance('blade.compiler', $this->compiler);
 
         ob_start();
         eval(Str::of($this->compiler->compileString($blade))->remove(['<?php', '?>']));

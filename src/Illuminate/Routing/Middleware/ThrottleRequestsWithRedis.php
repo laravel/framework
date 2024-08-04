@@ -57,7 +57,7 @@ class ThrottleRequestsWithRedis extends ThrottleRequests
     protected function handleRequest($request, Closure $next, array $limits)
     {
         foreach ($limits as $limit) {
-            if ($this->tooManyAttempts($limit->key, $limit->maxAttempts, $limit->decayMinutes)) {
+            if ($this->tooManyAttempts($limit->key, $limit->maxAttempts, $limit->decaySeconds)) {
                 throw $this->buildException($request, $limit->key, $limit->maxAttempts, $limit->responseCallback);
             }
         }
@@ -80,13 +80,13 @@ class ThrottleRequestsWithRedis extends ThrottleRequests
      *
      * @param  string  $key
      * @param  int  $maxAttempts
-     * @param  int  $decayMinutes
+     * @param  int  $decaySeconds
      * @return mixed
      */
-    protected function tooManyAttempts($key, $maxAttempts, $decayMinutes)
+    protected function tooManyAttempts($key, $maxAttempts, $decaySeconds)
     {
         $limiter = new DurationLimiter(
-            $this->getRedisConnection(), $key, $maxAttempts, $decayMinutes * 60
+            $this->getRedisConnection(), $key, $maxAttempts, $decaySeconds
         );
 
         return tap(! $limiter->acquire(), function () use ($key, $limiter) {

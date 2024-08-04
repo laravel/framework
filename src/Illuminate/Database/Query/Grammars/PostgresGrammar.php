@@ -69,6 +69,22 @@ class PostgresGrammar extends Grammar
     }
 
     /**
+     * Compile a "where like" clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereLike(Builder $query, $where)
+    {
+        $where['operator'] = $where['not'] ? 'not ' : '';
+
+        $where['operator'] .= $where['caseSensitive'] ? 'like' : 'ilike';
+
+        return $this->whereBasic($query, $where);
+    }
+
+    /**
      * Compile a "where date" clause.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
@@ -631,6 +647,16 @@ class PostgresGrammar extends Grammar
     public function compileTruncate(Builder $query)
     {
         return ['truncate '.$this->wrapTable($query->from).' restart identity cascade' => []];
+    }
+
+    /**
+     * Compile a query to get the number of open connections for a database.
+     *
+     * @return string
+     */
+    public function compileThreadCount()
+    {
+        return 'select count(*) as "Value" from pg_stat_activity';
     }
 
     /**

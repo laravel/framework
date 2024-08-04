@@ -62,6 +62,7 @@ class MailSesTransportTest extends TestCase
         $message->bcc('you@example.com');
         $message->replyTo(new Address('taylor@example.com', 'Taylor Otwell'));
         $message->getHeaders()->add(new MetadataHeader('FooTag', 'TagValue'));
+        $message->getHeaders()->addTextHeader('X-Ses-List-Management-Options', 'contactListName=TestList;topicName=TestTopic');
 
         $client = m::mock(SesClient::class);
         $sesResult = m::mock();
@@ -73,6 +74,7 @@ class MailSesTransportTest extends TestCase
             ->with(m::on(function ($arg) {
                 return $arg['Source'] === 'myself@example.com' &&
                     $arg['Destinations'] === ['me@example.com', 'you@example.com'] &&
+                    $arg['ListManagementOptions'] === ['ContactListName' => 'TestList', 'TopicName' => 'TestTopic'] &&
                     $arg['Tags'] === [['Name' => 'FooTag', 'Value' => 'TagValue']] &&
                     strpos($arg['RawMessage']['Data'], 'Reply-To: Taylor Otwell <taylor@example.com>') !== false;
             }))

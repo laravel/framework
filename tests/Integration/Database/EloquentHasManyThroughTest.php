@@ -366,6 +366,21 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
         // $jane should not be updated, because it belongs to a different user altogether.
         $this->assertSame('jane-slug', $jane->fresh()->slug);
     }
+
+    public function testCanReplicateModelLoadedThroughHasManyThrough()
+    {
+        $team = Team::create();
+        $user = User::create(['team_id' => $team->id, 'name' => 'John']);
+        Article::create(['user_id' => $user->id, 'title' => 'John\'s new has-many-through-article']);
+
+        $article = $team->articles()->first();
+
+        $this->assertInstanceOf(Article::class, $article);
+
+        $newArticle = $article->replicate();
+        $newArticle->title .= ' v2';
+        $newArticle->save();
+    }
 }
 
 class User extends Model

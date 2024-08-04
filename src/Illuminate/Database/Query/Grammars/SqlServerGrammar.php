@@ -314,6 +314,22 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
+     * Compile a row number clause.
+     *
+     * @param  string  $partition
+     * @param  string  $orders
+     * @return string
+     */
+    protected function compileRowNumber($partition, $orders)
+    {
+        if (empty($orders)) {
+            $orders = 'order by (select 0)';
+        }
+
+        return parent::compileRowNumber($partition, $orders);
+    }
+
+    /**
      * Compile the "offset" portions of the query.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
@@ -479,6 +495,16 @@ class SqlServerGrammar extends Grammar
     public function compileSavepointRollBack($name)
     {
         return 'ROLLBACK TRANSACTION '.$name;
+    }
+
+    /**
+     * Compile a query to get the number of open connections for a database.
+     *
+     * @return string
+     */
+    public function compileThreadCount()
+    {
+        return 'select count(*) Value from sys.dm_exec_sessions where status = N\'running\'';
     }
 
     /**

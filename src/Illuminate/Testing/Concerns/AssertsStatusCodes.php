@@ -212,7 +212,7 @@ trait AssertsStatusCodes
     }
 
     /**
-     * Assert that the response has a 422 "Unprocessable Entity" status code.
+     * Assert that the response has a 422 "Unprocessable Content" status code.
      *
      * @return $this
      */

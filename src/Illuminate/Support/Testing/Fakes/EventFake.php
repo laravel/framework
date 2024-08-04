@@ -192,9 +192,18 @@ class EventFake implements Dispatcher, Fake
     {
         $count = count(Arr::flatten($this->events));
 
+        $eventNames = collect($this->events)
+            ->map(fn ($events, $eventName) => sprintf(
+                '%s dispatched %s %s',
+                $eventName,
+                count($events),
+                Str::plural('time', count($events)),
+            ))
+            ->join("\n- ");
+
         PHPUnit::assertSame(
             0, $count,
-            "{$count} unexpected events were dispatched."
+            "{$count} unexpected events were dispatched:\n\n- $eventNames\n"
         );
     }
 
@@ -402,6 +411,16 @@ class EventFake implements Dispatcher, Fake
     public function until($event, $payload = [])
     {
         return $this->dispatch($event, $payload, true);
+    }
+
+    /**
+     * Get the events that have been dispatched.
+     *
+     * @return array
+     */
+    public function dispatchedEvents()
+    {
+        return $this->events;
     }
 
     /**

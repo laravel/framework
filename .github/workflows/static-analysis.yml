@@ -9,7 +9,7 @@ on:
 
 jobs:
   types:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     strategy:
       fail-fast: true
@@ -25,12 +25,12 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.1
+          php-version: 8.2
           tools: composer:v2
           coverage: none
 
       - name: Set Framework version
-        run: composer config version "10.x-dev"
+        run: composer config version "11.x-dev"
 
       - name: Install dependencies
         uses: nick-fields/retry@v3

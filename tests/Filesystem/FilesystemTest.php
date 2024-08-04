@@ -7,6 +7,10 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Testing\Assert;
 use Mockery as m;
+use PHPUnit\Framework\Attributes\AfterClass;
+use PHPUnit\Framework\Attributes\BeforeClass;
+use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use SplFileInfo;
 
@@ -14,18 +18,14 @@ class FilesystemTest extends TestCase
 {
     private static $tempDir;
 
-    /**
-     * @beforeClass
-     */
+    #[BeforeClass]
     public static function setUpTempDir()
     {
         self::$tempDir = sys_get_temp_dir().'/tmp';
         mkdir(self::$tempDir);
     }
 
-    /**
-     * @afterClass
-     */
+    #[AfterClass]
     public static function tearDownTempDir()
     {
         $files = new Filesystem;
@@ -59,21 +59,28 @@ class FilesystemTest extends TestCase
     {
         $path = self::$tempDir.'/file.txt';
 
-        $contents = LazyCollection::times(3)
-            ->map(function ($number) {
-                return "line-{$number}";
-            })
-            ->join("\n");
-
+        $contents = ' '.PHP_EOL.' spaces around '.PHP_EOL.PHP_EOL.'Line 2'.PHP_EOL.'1 trailing empty line ->'.PHP_EOL.PHP_EOL;
         file_put_contents($path, $contents);
 
         $files = new Filesystem;
         $this->assertInstanceOf(LazyCollection::class, $files->lines($path));
 
         $this->assertSame(
-            ['line-1', 'line-2', 'line-3'],
+            [' ', ' spaces around ', '', 'Line 2', '1 trailing empty line ->', '', ''],
             $files->lines($path)->all()
         );
+
+        // an empty file:
+        ftruncate(fopen($path, 'w'), 0);
+        $this->assertSame([''], $files->lines($path)->all());
+    }
+
+    public function testLinesThrowsExceptionNonexisitingFile()
+    {
+        $this->expectException(FileNotFoundException::class);
+        $this->expectExceptionMessage('File does not exist at path '.__DIR__.'/unknown-file.txt.');
+
+        (new Filesystem)->lines(__DIR__.'/unknown-file.txt');
     }
 
     public function testReplaceCreatesFile()
@@ -97,9 +104,7 @@ class FilesystemTest extends TestCase
         $this->assertStringEqualsFile($tempFile, 'Hello Taylor');
     }
 
-    /**
-     * @requires OS Linux|Darwin
-     */
+    #[RequiresOperatingSystem('Linux|Darwin')]
     public function testReplaceWhenUnixSymlinkExists()
     {
         $tempFile = self::$tempDir.'/file.txt';
@@ -326,9 +331,9 @@ class FilesystemTest extends TestCase
     public function testGetThrowsExceptionNonexisitingFile()
     {
         $this->expectException(FileNotFoundException::class);
+        $this->expectExceptionMessage('File does not exist at path '.self::$tempDir.'/unknown-file.txt.');
 
-        $files = new Filesystem;
-        $files->get(self::$tempDir.'/unknown-file.txt');
+        (new Filesystem)->get(self::$tempDir.'/unknown-file.txt');
     }
 
     public function testGetRequireReturnsProperly()
@@ -341,9 +346,9 @@ class FilesystemTest extends TestCase
     public function testGetRequireThrowsExceptionNonExistingFile()
     {
         $this->expectException(FileNotFoundException::class);
+        $this->expectExceptionMessage('File does not exist at path '.self::$tempDir.'/unknown-file.txt.');
 
-        $files = new Filesystem;
-        $files->getRequire(self::$tempDir.'/file.php');
+        (new Filesystem)->getRequire(self::$tempDir.'/unknown-file.txt');
     }
 
     public function testJsonReturnsDecodedJsonData()
@@ -428,9 +433,7 @@ class FilesystemTest extends TestCase
         $this->assertEquals($size, $files->size(self::$tempDir.'/foo.txt'));
     }
 
-    /**
-     * @requires extension fileinfo
-     */
+    #[RequiresPhpExtension('fileinfo')]
     public function testMimeTypeOutputsMimeType()
     {
         file_put_contents(self::$tempDir.'/foo.txt', 'foo');
@@ -527,10 +530,8 @@ class FilesystemTest extends TestCase
         $this->assertFileExists(self::$tempDir.'/created');
     }
 
-    /**
-     * @requires extension pcntl
-     * @requires OS Linux|Darwin
-     */
+    #[RequiresOperatingSystem('Linux|Darwin')]
+    #[RequiresPhpExtension('pcntl')]
     public function testSharedGet()
     {
         $content = str_repeat('123456', 1000000);
@@ -568,6 +569,14 @@ class FilesystemTest extends TestCase
         $filesystem->requireOnce(self::$tempDir.'/scripts/foo.php');
         $this->assertTrue(function_exists('random_function_xyz'));
         $this->assertFalse(function_exists('random_function_xyz_changed'));
+    }
+
+    public function testRequireOnceThrowsExceptionNonexisitingFile()
+    {
+        $this->expectException(FileNotFoundException::class);
+        $this->expectExceptionMessage('File does not exist at path '.__DIR__.'/unknown-file.txt.');
+
+        (new Filesystem)->requireOnce(__DIR__.'/unknown-file.txt');
     }
 
     public function testCopyCopiesFileProperly()

@@ -49,13 +49,6 @@ class Builder
     public static $defaultMorphKeyType = 'int';
 
     /**
-     * Indicates whether Doctrine DBAL usage will be prevented if possible when dropping, renaming, and modifying columns.
-     *
-     * @var bool
-     */
-    public static $alwaysUsesNativeSchemaOperationsIfPossible = false;
-
-    /**
      * Create a new database Schema manager.
      *
      * @param  \Illuminate\Database\Connection  $connection
@@ -116,17 +109,6 @@ class Builder
     }
 
     /**
-     * Attempt to use native schema operations for dropping, renaming, and modifying columns, even if Doctrine DBAL is installed.
-     *
-     * @param  bool  $value
-     * @return void
-     */
-    public static function useNativeSchemaOperationsIfPossible(bool $value = true)
-    {
-        static::$alwaysUsesNativeSchemaOperationsIfPossible = $value;
-    }
-
-    /**
      * Create a database in the schema.
      *
      * @param  string  $name
@@ -162,6 +144,7 @@ class Builder
     {
         $table = $this->connection->getTablePrefix().$table;
 
+        /** @phpstan-ignore arguments.count (SQLite accepts a withSize argument) */
         foreach ($this->getTables(false) as $value) {
             if (strtolower($table) === strtolower($value['name'])) {
                 return true;
@@ -232,20 +215,6 @@ class Builder
     public function getTypes()
     {
         throw new LogicException('This database driver does not support user-defined types.');
-    }
-
-    /**
-     * Get all of the table names for the database.
-     *
-     * @deprecated Will be removed in a future Laravel version.
-     *
-     * @return array
-     *
-     * @throws \LogicException
-     */
-    public function getAllTables()
-    {
-        throw new LogicException('This database driver does not support getting all tables.');
     }
 
     /**
@@ -322,16 +291,10 @@ class Builder
      */
     public function getColumnType($table, $column, $fullDefinition = false)
     {
-        if (! $this->connection->usingNativeSchemaOperations()) {
-            $table = $this->connection->getTablePrefix().$table;
-
-            return $this->connection->getDoctrineColumn($table, $column)->getType()->getName();
-        }
-
         $columns = $this->getColumns($table);
 
         foreach ($columns as $value) {
-            if (strtolower($value['name']) === $column) {
+            if (strtolower($value['name']) === strtolower($column)) {
                 return $fullDefinition ? $value['type'] : $value['type_name'];
             }
         }
@@ -609,7 +572,7 @@ class Builder
      * @param  \Closure|null  $callback
      * @return \Illuminate\Database\Schema\Blueprint
      */
-    protected function createBlueprint($table, Closure $callback = null)
+    protected function createBlueprint($table, ?Closure $callback = null)
     {
         $prefix = $this->connection->getConfig('prefix_indexes')
                     ? $this->connection->getConfig('prefix')

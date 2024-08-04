@@ -9,6 +9,7 @@ use Illuminate\Contracts\Mail\Factory as FactoryContract;
 use Illuminate\Log\LogManager;
 use Illuminate\Mail\Transport\ArrayTransport;
 use Illuminate\Mail\Transport\LogTransport;
+use Illuminate\Mail\Transport\ResendTransport;
 use Illuminate\Mail\Transport\SesTransport;
 use Illuminate\Mail\Transport\SesV2Transport;
 use Illuminate\Support\Arr;
@@ -16,6 +17,7 @@ use Illuminate\Support\ConfigurationUrlParser;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
+use Resend;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\Mailer\Bridge\Mailgun\Transport\MailgunTransportFactory;
 use Symfony\Component\Mailer\Bridge\Postmark\Transport\PostmarkTransportFactory;
@@ -290,6 +292,19 @@ class MailManager implements FactoryContract
         }
 
         return Arr::except($config, ['token']);
+    }
+
+    /**
+     * Create an instance of the Resend Transport driver.
+     *
+     * @param  array  $config
+     * @return \Illuminate\Mail\Transport\ResendTransprot
+     */
+    protected function createResendTransport(array $config)
+    {
+        return new ResendTransport(
+            Resend::client($config['key'] ?? $this->app['config']->get('services.resend.key')),
+        );
     }
 
     /**

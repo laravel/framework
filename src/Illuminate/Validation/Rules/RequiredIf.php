@@ -3,8 +3,9 @@
 namespace Illuminate\Validation\Rules;
 
 use InvalidArgumentException;
+use Stringable;
 
-class RequiredIf
+class RequiredIf implements Stringable
 {
     /**
      * The condition that validates the attribute.

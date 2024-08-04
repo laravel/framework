@@ -52,14 +52,17 @@ class DatabasePostgresBuilderTest extends TestCase
         $connection->shouldReceive('getConfig')->with('search_path')->andReturn(null);
         $connection->shouldReceive('getConfig')->with('schema')->andReturn(null);
         $grammar = m::mock(PostgresGrammar::class);
+        $processor = m::mock(PostgresProcessor::class);
         $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
-        $grammar->shouldReceive('compileTableExists')->andReturn("select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = 'BASE TABLE'");
-        $connection->shouldReceive('selectFromWriteConnection')->with("select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = 'BASE TABLE'", ['laravel', 'public', 'foo'])->andReturn(['countable_result']);
+        $connection->shouldReceive('getPostProcessor')->andReturn($processor);
+        $grammar->shouldReceive('compileTables')->andReturn('sql');
+        $connection->shouldReceive('selectFromWriteConnection')->with('sql')->andReturn([['schema' => 'public', 'name' => 'foo']]);
         $connection->shouldReceive('getTablePrefix');
-        $connection->shouldReceive('getConfig')->with('database')->andReturn('laravel');
         $builder = $this->getBuilder($connection);
+        $processor->shouldReceive('processTables')->andReturn([['schema' => 'public', 'name' => 'foo']]);
 
-        $builder->hasTable('foo');
+        $this->assertTrue($builder->hasTable('foo'));
+        $this->assertTrue($builder->hasTable('public.foo'));
     }
 
     public function testHasTableWhenSchemaUnqualifiedAndSearchPathFilled()
@@ -67,14 +70,17 @@ class DatabasePostgresBuilderTest extends TestCase
         $connection = $this->getConnection();
         $connection->shouldReceive('getConfig')->with('search_path')->andReturn('myapp,public');
         $grammar = m::mock(PostgresGrammar::class);
+        $processor = m::mock(PostgresProcessor::class);
         $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
-        $grammar->shouldReceive('compileTableExists')->andReturn("select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = 'BASE TABLE'");
-        $connection->shouldReceive('selectFromWriteConnection')->with("select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = 'BASE TABLE'", ['laravel', 'myapp', 'foo'])->andReturn(['countable_result']);
+        $connection->shouldReceive('getPostProcessor')->andReturn($processor);
+        $grammar->shouldReceive('compileTables')->andReturn('sql');
+        $connection->shouldReceive('selectFromWriteConnection')->with('sql')->andReturn([['schema' => 'myapp', 'name' => 'foo']]);
         $connection->shouldReceive('getTablePrefix');
-        $connection->shouldReceive('getConfig')->with('database')->andReturn('laravel');
         $builder = $this->getBuilder($connection);
+        $processor->shouldReceive('processTables')->andReturn([['schema' => 'myapp', 'name' => 'foo']]);
 
-        $builder->hasTable('foo');
+        $this->assertTrue($builder->hasTable('foo'));
+        $this->assertTrue($builder->hasTable('myapp.foo'));
     }
 
     public function testHasTableWhenSchemaUnqualifiedAndSearchPathFallbackFilled()
@@ -83,14 +89,17 @@ class DatabasePostgresBuilderTest extends TestCase
         $connection->shouldReceive('getConfig')->with('search_path')->andReturn(null);
         $connection->shouldReceive('getConfig')->with('schema')->andReturn(['myapp', 'public']);
         $grammar = m::mock(PostgresGrammar::class);
+        $processor = m::mock(PostgresProcessor::class);
         $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
-        $grammar->shouldReceive('compileTableExists')->andReturn("select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = 'BASE TABLE'");
-        $connection->shouldReceive('selectFromWriteConnection')->with("select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = 'BASE TABLE'", ['laravel', 'myapp', 'foo'])->andReturn(['countable_result']);
+        $connection->shouldReceive('getPostProcessor')->andReturn($processor);
+        $grammar->shouldReceive('compileTables')->andReturn('sql');
+        $connection->shouldReceive('selectFromWriteConnection')->with('sql')->andReturn([['schema' => 'myapp', 'name' => 'foo']]);
         $connection->shouldReceive('getTablePrefix');
-        $connection->shouldReceive('getConfig')->with('database')->andReturn('laravel');
         $builder = $this->getBuilder($connection);
+        $processor->shouldReceive('processTables')->andReturn([['schema' => 'myapp', 'name' => 'foo']]);
 
-        $builder->hasTable('foo');
+        $this->assertTrue($builder->hasTable('foo'));
+        $this->assertTrue($builder->hasTable('myapp.foo'));
     }
 
     public function testHasTableWhenSchemaUnqualifiedAndSearchPathIsUserVariable()
@@ -99,14 +108,17 @@ class DatabasePostgresBuilderTest extends TestCase
         $connection->shouldReceive('getConfig')->with('username')->andReturn('foouser');
         $connection->shouldReceive('getConfig')->with('search_path')->andReturn('$user');
         $grammar = m::mock(PostgresGrammar::class);
+        $processor = m::mock(PostgresProcessor::class);
         $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
-        $grammar->shouldReceive('compileTableExists')->andReturn("select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = 'BASE TABLE'");
-        $connection->shouldReceive('selectFromWriteConnection')->with("select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = 'BASE TABLE'", ['laravel', 'foouser', 'foo'])->andReturn(['countable_result']);
+        $connection->shouldReceive('getPostProcessor')->andReturn($processor);
+        $grammar->shouldReceive('compileTables')->andReturn('sql');
+        $connection->shouldReceive('selectFromWriteConnection')->with('sql')->andReturn([['schema' => 'foouser', 'name' => 'foo']]);
         $connection->shouldReceive('getTablePrefix');
-        $connection->shouldReceive('getConfig')->with('database')->andReturn('laravel');
         $builder = $this->getBuilder($connection);
+        $processor->shouldReceive('processTables')->andReturn([['schema' => 'foouser', 'name' => 'foo']]);
 
-        $builder->hasTable('foo');
+        $this->assertTrue($builder->hasTable('foo'));
+        $this->assertTrue($builder->hasTable('foouser.foo'));
     }
 
     public function testHasTableWhenSchemaQualifiedAndSearchPathMismatches()
@@ -114,26 +126,25 @@ class DatabasePostgresBuilderTest extends TestCase
         $connection = $this->getConnection();
         $connection->shouldReceive('getConfig')->with('search_path')->andReturn('public');
         $grammar = m::mock(PostgresGrammar::class);
+        $processor = m::mock(PostgresProcessor::class);
         $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
-        $grammar->shouldReceive('compileTableExists')->andReturn("select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = 'BASE TABLE'");
-        $connection->shouldReceive('selectFromWriteConnection')->with("select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = 'BASE TABLE'", ['laravel', 'myapp', 'foo'])->andReturn(['countable_result']);
+        $connection->shouldReceive('getPostProcessor')->andReturn($processor);
+        $grammar->shouldReceive('compileTables')->andReturn('sql');
+        $connection->shouldReceive('selectFromWriteConnection')->with('sql')->andReturn([['schema' => 'myapp', 'name' => 'foo']]);
         $connection->shouldReceive('getTablePrefix');
-        $connection->shouldReceive('getConfig')->with('database')->andReturn('laravel');
         $builder = $this->getBuilder($connection);
+        $processor->shouldReceive('processTables')->andReturn([['schema' => 'myapp', 'name' => 'foo']]);
 
-        $builder->hasTable('myapp.foo');
+        $this->assertTrue($builder->hasTable('myapp.foo'));
     }
 
     public function testHasTableWhenDatabaseAndSchemaQualifiedAndSearchPathMismatches()
     {
+        $this->expectException(\InvalidArgumentException::class);
+
         $connection = $this->getConnection();
-        $connection->shouldReceive('getConfig')->with('search_path')->andReturn('public');
         $grammar = m::mock(PostgresGrammar::class);
         $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
-        $grammar->shouldReceive('compileTableExists')->andReturn("select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = 'BASE TABLE'");
-        $connection->shouldReceive('selectFromWriteConnection')->with("select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = 'BASE TABLE'", ['mydatabase', 'myapp', 'foo'])->andReturn(['countable_result']);
-        $connection->shouldReceive('getTablePrefix');
-        $connection->shouldReceive('getConfig')->with('database')->andReturn('laravel');
         $builder = $this->getBuilder($connection);
 
         $builder->hasTable('mydatabase.myapp.foo');
@@ -146,10 +157,9 @@ class DatabasePostgresBuilderTest extends TestCase
         $connection->shouldReceive('getConfig')->with('schema')->andReturn(null);
         $grammar = m::mock(PostgresGrammar::class);
         $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
-        $grammar->shouldReceive('compileColumns')->with('laravel', 'public', 'foo')->andReturn('sql');
-        $connection->shouldReceive('selectFromWriteConnection')->with('sql')->andReturn(['countable_result']);
+        $grammar->shouldReceive('compileColumns')->with('public', 'foo')->andReturn('sql');
+        $connection->shouldReceive('selectFromWriteConnection')->with('sql')->andReturn([['name' => 'some_column']]);
         $connection->shouldReceive('getTablePrefix');
-        $connection->shouldReceive('getConfig')->with('database')->andReturn('laravel');
         $processor = m::mock(PostgresProcessor::class);
         $connection->shouldReceive('getPostProcessor')->andReturn($processor);
         $processor->shouldReceive('processColumns')->andReturn([['name' => 'some_column']]);
@@ -164,10 +174,9 @@ class DatabasePostgresBuilderTest extends TestCase
         $connection->shouldReceive('getConfig')->with('search_path')->andReturn('myapp,public');
         $grammar = m::mock(PostgresGrammar::class);
         $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
-        $grammar->shouldReceive('compileColumns')->with('laravel', 'myapp', 'foo')->andReturn('sql');
-        $connection->shouldReceive('selectFromWriteConnection')->with('sql')->andReturn(['countable_result']);
+        $grammar->shouldReceive('compileColumns')->with('myapp', 'foo')->andReturn('sql');
+        $connection->shouldReceive('selectFromWriteConnection')->with('sql')->andReturn([['name' => 'some_column']]);
         $connection->shouldReceive('getTablePrefix');
-        $connection->shouldReceive('getConfig')->with('database')->andReturn('laravel');
         $processor = m::mock(PostgresProcessor::class);
         $connection->shouldReceive('getPostProcessor')->andReturn($processor);
         $processor->shouldReceive('processColumns')->andReturn([['name' => 'some_column']]);
@@ -183,10 +192,9 @@ class DatabasePostgresBuilderTest extends TestCase
         $connection->shouldReceive('getConfig')->with('search_path')->andReturn('$user');
         $grammar = m::mock(PostgresGrammar::class);
         $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
-        $grammar->shouldReceive('compileColumns')->with('laravel', 'foouser', 'foo')->andReturn('sql');
-        $connection->shouldReceive('selectFromWriteConnection')->with('sql')->andReturn(['countable_result']);
+        $grammar->shouldReceive('compileColumns')->with('foouser', 'foo')->andReturn('sql');
+        $connection->shouldReceive('selectFromWriteConnection')->with('sql')->andReturn([['name' => 'some_column']]);
         $connection->shouldReceive('getTablePrefix');
-        $connection->shouldReceive('getConfig')->with('database')->andReturn('laravel');
         $processor = m::mock(PostgresProcessor::class);
         $connection->shouldReceive('getPostProcessor')->andReturn($processor);
         $processor->shouldReceive('processColumns')->andReturn([['name' => 'some_column']]);
@@ -201,10 +209,9 @@ class DatabasePostgresBuilderTest extends TestCase
         $connection->shouldReceive('getConfig')->with('search_path')->andReturn('public');
         $grammar = m::mock(PostgresGrammar::class);
         $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
-        $grammar->shouldReceive('compileColumns')->with('laravel', 'myapp', 'foo')->andReturn('sql');
-        $connection->shouldReceive('selectFromWriteConnection')->with('sql')->andReturn(['countable_result']);
+        $grammar->shouldReceive('compileColumns')->with('myapp', 'foo')->andReturn('sql');
+        $connection->shouldReceive('selectFromWriteConnection')->with('sql')->andReturn([['name' => 'some_column']]);
         $connection->shouldReceive('getTablePrefix');
-        $connection->shouldReceive('getConfig')->with('database')->andReturn('laravel');
         $processor = m::mock(PostgresProcessor::class);
         $connection->shouldReceive('getPostProcessor')->andReturn($processor);
         $processor->shouldReceive('processColumns')->andReturn([['name' => 'some_column']]);
@@ -215,17 +222,12 @@ class DatabasePostgresBuilderTest extends TestCase
 
     public function testGetColumnWhenDatabaseAndSchemaQualifiedAndSearchPathMismatches()
     {
+        $this->expectException(\InvalidArgumentException::class);
+
         $connection = $this->getConnection();
         $connection->shouldReceive('getConfig')->with('search_path')->andReturn('public');
         $grammar = m::mock(PostgresGrammar::class);
         $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
-        $grammar->shouldReceive('compileColumns')->with('mydatabase', 'myapp', 'foo')->andReturn('sql');
-        $connection->shouldReceive('selectFromWriteConnection')->with('sql')->andReturn(['countable_result']);
-        $connection->shouldReceive('getTablePrefix');
-        $connection->shouldReceive('getConfig')->with('database')->andReturn('laravel');
-        $processor = m::mock(PostgresProcessor::class);
-        $connection->shouldReceive('getPostProcessor')->andReturn($processor);
-        $processor->shouldReceive('processColumns')->andReturn([['name' => 'some_column']]);
         $builder = $this->getBuilder($connection);
 
         $builder->getColumnListing('mydatabase.myapp.foo');

@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Testing;
 
 use Illuminate\Container\Container;
 use Illuminate\Testing\ParallelTesting;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class ParallelTestingTest extends TestCase
@@ -17,9 +18,7 @@ class ParallelTestingTest extends TestCase
         $_SERVER['LARAVEL_PARALLEL_TESTING'] = 1;
     }
 
-    /**
-     * @dataProvider callbacks
-     */
+    #[DataProvider('callbacks')]
     public function testCallbacks($callback)
     {
         $parallelTesting = new ParallelTesting(Container::getInstance());

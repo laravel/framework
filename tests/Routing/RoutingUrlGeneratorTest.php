@@ -10,6 +10,7 @@ use Illuminate\Routing\Route;
 use Illuminate\Routing\RouteCollection;
 use Illuminate\Routing\UrlGenerator;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
@@ -39,6 +40,24 @@ class RoutingUrlGeneratorTest extends TestCase
         );
 
         $this->assertSame('https://www.foo.com/foo/bar', $url->to('foo/bar'));
+    }
+
+    public function testQueryGeneration()
+    {
+        $url = new UrlGenerator(
+            new RouteCollection,
+            Request::create('http://www.foo.com/')
+        );
+
+        $this->assertSame('http://www.foo.com/foo/bar', $url->query('foo/bar'));
+        $this->assertSame('http://www.foo.com/foo/bar?0=foo', $url->query('foo/bar', ['foo']));
+        $this->assertSame('http://www.foo.com/foo/bar?baz=boom', $url->query('foo/bar', ['baz' => 'boom']));
+        $this->assertSame('http://www.foo.com/foo/bar?baz=zee&zal=bee', $url->query('foo/bar?baz=boom&zal=bee', ['baz' => 'zee']));
+        $this->assertSame('http://www.foo.com/foo/bar?zal=bee', $url->query('foo/bar?baz=boom&zal=bee', ['baz' => null]));
+        $this->assertSame('http://www.foo.com/foo/bar?baz=boom', $url->query('foo/bar?baz=boom', ['nonexist' => null]));
+        $this->assertSame('http://www.foo.com/foo/bar', $url->query('foo/bar?baz=boom', ['baz' => null]));
+        $this->assertSame('https://www.foo.com/foo/bar/baz?foo=bar&zal=bee', $url->query('foo/bar?foo=bar', ['zal' => 'bee'], ['baz'], true));
+        $this->assertSame('http://www.foo.com/foo/bar?baz[0]=boom&baz[1]=bam&baz[2]=bim', urldecode($url->query('foo/bar', ['baz' => ['boom', 'bam', 'bim']])));
     }
 
     public function testAssetGeneration()
@@ -587,9 +606,7 @@ class RoutingUrlGeneratorTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider providerRouteParameters
-     */
+    #[DataProvider('providerRouteParameters')]
     public function testUrlGenerationForControllersRequiresPassingOfRequiredParameters($parameters)
     {
         $this->expectException(UrlGenerationException::class);
@@ -641,9 +658,7 @@ class RoutingUrlGeneratorTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provideParametersAndExpectedMeaningfulExceptionMessages
-     */
+    #[DataProvider('provideParametersAndExpectedMeaningfulExceptionMessages')]
     public function testUrlGenerationThrowsExceptionForMissingParametersWithMeaningfulMessage($parameters, $expectedMeaningfulExceptionMessage)
     {
         $this->expectException(UrlGenerationException::class);
@@ -872,6 +887,22 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertSame('http://www.foo.com/foo/fruits', $url->route('foo.bar', CategoryBackedEnum::Fruits));
     }
 
+    public function testRouteGenerationWithNestedBackedEnums()
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            Request::create('http://www.foo.com/')
+        );
+
+        $namedRoute = new Route(['GET'], '/foo', ['as' => 'foo']);
+        $routes->add($namedRoute);
+
+        $this->assertSame(
+            'http://www.foo.com/foo?filter%5B0%5D=people&filter%5B1%5D=fruits',
+            $url->route('foo', ['filter' => [CategoryBackedEnum::People, CategoryBackedEnum::Fruits]]),
+        );
+    }
+
     public function testSignedUrlWithKeyResolver()
     {
         $url = new UrlGenerator(
@@ -879,7 +910,7 @@ class RoutingUrlGeneratorTest extends TestCase
             $request = Request::create('http://www.foo.com/')
         );
         $url->setKeyResolver(function () {
-            return 'secret';
+            return 'first-secret';
         });
 
         $route = new Route(['GET'], 'foo', ['as' => 'foo', function () {
@@ -887,24 +918,32 @@ class RoutingUrlGeneratorTest extends TestCase
         }]);
         $routes->add($route);
 
-        $request = Request::create($url->signedRoute('foo'));
+        $firstRequest = Request::create($url->signedRoute('foo'));
 
-        $this->assertTrue($url->hasValidSignature($request));
+        $this->assertTrue($url->hasValidSignature($firstRequest));
 
         $request = Request::create($url->signedRoute('foo').'?tampered=true');
 
         $this->assertFalse($url->hasValidSignature($request));
 
         $url2 = $url->withKeyResolver(function () {
-            return 'other-secret';
+            return 'second-secret';
         });
 
-        $this->assertFalse($url2->hasValidSignature($request));
+        $this->assertFalse($url2->hasValidSignature($firstRequest));
 
-        $request = Request::create($url2->signedRoute('foo'));
+        $secondRequest = Request::create($url2->signedRoute('foo'));
 
-        $this->assertTrue($url2->hasValidSignature($request));
-        $this->assertFalse($url->hasValidSignature($request));
+        $this->assertTrue($url2->hasValidSignature($secondRequest));
+        $this->assertFalse($url->hasValidSignature($secondRequest));
+
+        // Key resolver also supports multiple keys, for app key rotation via the config "app.previous_keys"
+        $url3 = $url->withKeyResolver(function () {
+            return ['first-secret', 'second-secret'];
+        });
+
+        $this->assertTrue($url3->hasValidSignature($firstRequest));
+        $this->assertTrue($url3->hasValidSignature($secondRequest));
     }
 
     public function testMissingNamedRouteResolution()

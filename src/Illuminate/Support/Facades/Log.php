@@ -25,6 +25,7 @@ namespace Illuminate\Support\Facades;
  * @method static void info(string|\Stringable $message, array $context = [])
  * @method static void debug(string|\Stringable $message, array $context = [])
  * @method static void log(mixed $level, string|\Stringable $message, array $context = [])
+ * @method static \Illuminate\Log\LogManager setApplication(\Illuminate\Contracts\Foundation\Application $app)
  * @method static void write(string $level, \Illuminate\Contracts\Support\Arrayable|\Illuminate\Contracts\Support\Jsonable|\Illuminate\Support\Stringable|array|string $message, array $context = [])
  * @method static \Illuminate\Log\Logger withContext(array $context = [])
  * @method static void listen(\Closure $callback)

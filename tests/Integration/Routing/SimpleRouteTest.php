@@ -16,5 +16,11 @@ class SimpleRouteTest extends TestCase
         $response = $this->get('/');
 
         $this->assertSame('Hello World', $response->content());
+
+        $response = $this->get('/?foo=bar');
+
+        $this->assertSame('Hello World', $response->content());
+
+        $this->assertSame('bar', $response->baseRequest->query('foo'));
     }
 }

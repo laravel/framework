@@ -6,12 +6,11 @@ use Illuminate\Foundation\Auth\User;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Support\Facades\Route;
 use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class RouteRedirectTest extends TestCase
 {
-    /**
-     * @dataProvider  routeRedirectDataSets
-     */
+    #[DataProvider('routeRedirectDataSets')]
     public function testRouteRedirect($redirectFrom, $redirectTo, $requestUri, $redirectUri)
     {
         $this->withoutExceptionHandling();

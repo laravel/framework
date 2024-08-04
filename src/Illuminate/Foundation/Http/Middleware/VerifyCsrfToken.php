@@ -9,13 +9,16 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Cookie\CookieValuePrefix;
 use Illuminate\Cookie\Middleware\EncryptCookies;
+use Illuminate\Foundation\Http\Middleware\Concerns\ExcludesPaths;
 use Illuminate\Session\TokenMismatchException;
+use Illuminate\Support\Arr;
 use Illuminate\Support\InteractsWithTime;
 use Symfony\Component\HttpFoundation\Cookie;
 
 class VerifyCsrfToken
 {
-    use InteractsWithTime;
+    use InteractsWithTime,
+        ExcludesPaths;
 
     /**
      * The application instance.
@@ -32,11 +35,18 @@ class VerifyCsrfToken
     protected $encrypter;
 
     /**
-     * The URIs that should be excluded from CSRF verification.
+     * The URIs that should be excluded.
      *
      * @var array<int, string>
      */
     protected $except = [];
+
+    /**
+     * The globally ignored URIs that should be excluded from CSRF verification.
+     *
+     * @var array
+     */
+    protected static $neverVerify = [];
 
     /**
      * Indicates whether the XSRF-TOKEN cookie should be set on the response.
@@ -107,24 +117,13 @@ class VerifyCsrfToken
     }
 
     /**
-     * Determine if the request has a URI that should pass through CSRF verification.
+     * Get the URIs that should be excluded.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return bool
+     * @return array
      */
-    protected function inExceptArray($request)
+    public function getExcludedPaths()
     {
-        foreach ($this->except as $except) {
-            if ($except !== '/') {
-                $except = trim($except, '/');
-            }
-
-            if ($request->fullUrlIs($except) || $request->is($except)) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_merge($this->except, static::$neverVerify);
     }
 
     /**
@@ -217,6 +216,19 @@ class VerifyCsrfToken
     }
 
     /**
+     * Indicate that the given URIs should be excluded from CSRF verification.
+     *
+     * @param  array|string  $uris
+     * @return void
+     */
+    public static function except($uris)
+    {
+        static::$neverVerify = array_values(array_unique(
+            array_merge(static::$neverVerify, Arr::wrap($uris))
+        ));
+    }
+
+    /**
      * Determine if the cookie contents should be serialized.
      *
      * @return bool
@@ -224,5 +236,15 @@ class VerifyCsrfToken
     public static function serialized()
     {
         return EncryptCookies::serialized('XSRF-TOKEN');
+    }
+
+    /**
+     * Flush the state of the middleware.
+     *
+     * @return void
+     */
+    public static function flushState()
+    {
+        static::$neverVerify = [];
     }
 }
