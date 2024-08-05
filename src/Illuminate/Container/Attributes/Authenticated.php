@@ -7,7 +7,7 @@ use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Container\ContextualAttribute;
 
 #[Attribute(Attribute::TARGET_PARAMETER)]
-class Guard implements ContextualAttribute
+class Authenticated implements ContextualAttribute
 {
     /**
      * Create a new class instance.
@@ -17,14 +17,14 @@ class Guard implements ContextualAttribute
     }
 
     /**
-     * Resolve the auth guard.
+     * Resolve the currently authenticated user.
      *
      * @param  self  $attribute
      * @param  \Illuminate\Contracts\Container\Container  $container
-     * @return \Illuminate\Contracts\Auth\Guard|\Illuminate\Contracts\Auth\StatefulGuard
+     * @return \Illuminate\Contracts\Auth\Authenticatable|null
      */
     public static function resolve(self $attribute, Container $container)
     {
-        return $container->make('auth')->guard($attribute->guard);
+        return $container->make('auth')->guard($attribute->guard)->user();
     }
 }

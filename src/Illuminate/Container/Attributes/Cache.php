@@ -12,12 +12,12 @@ class Cache implements ContextualAttribute
     /**
      * Create a new class instance.
      */
-    public function __construct(public ?string $driver = null)
+    public function __construct(public ?string $store = null)
     {
     }
 
     /**
-     * Resolve the cache driver.
+     * Resolve the cache store.
      *
      * @param  self  $attribute
      * @param  \Illuminate\Contracts\Container\Container  $container
@@ -25,6 +25,6 @@ class Cache implements ContextualAttribute
      */
     public static function resolve(self $attribute, Container $container)
     {
-        return $container->make('cache')->driver($attribute->driver);
+        return $container->make('cache')->store($attribute->store);
     }
 }

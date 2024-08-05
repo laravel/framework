@@ -7,11 +7,12 @@ use Illuminate\Auth\AuthManager;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Cache\Repository as CacheRepository;
 use Illuminate\Config\Repository;
-use Illuminate\Container\Attributes\Authed;
+use Illuminate\Container\Attributes\Auth;
+use Illuminate\Container\Attributes\Authenticated;
 use Illuminate\Container\Attributes\Cache;
 use Illuminate\Container\Attributes\Config;
+use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Container\Attributes\Database;
-use Illuminate\Container\Attributes\Guard;
 use Illuminate\Container\Attributes\Log;
 use Illuminate\Container\Attributes\Storage;
 use Illuminate\Container\Container;
@@ -129,8 +130,8 @@ class ContextualAttributeBindingTest extends TestCase
         $container = new Container;
         $container->singleton('cache', function () {
             $manager = m::mock(CacheManager::class);
-            $manager->shouldReceive('driver')->with('foo')->andReturn(m::mock(CacheRepository::class));
-            $manager->shouldReceive('driver')->with('bar')->andReturn(m::mock(CacheRepository::class));
+            $manager->shouldReceive('store')->with('foo')->andReturn(m::mock(CacheRepository::class));
+            $manager->shouldReceive('store')->with('bar')->andReturn(m::mock(CacheRepository::class));
 
             return $manager;
         });
@@ -166,9 +167,9 @@ class ContextualAttributeBindingTest extends TestCase
         $container->make(DatabaseTest::class);
     }
 
-    public function testGuardAttribute()
+    public function testAuthAttribute()
     {
-        $container = new Container;
+        $container = new Container;#
         $container->singleton('auth', function () {
             $manager = m::mock(AuthManager::class);
             $manager->shouldReceive('guard')->with('foo')->andReturn(m::mock(GuardContract::class));
@@ -185,8 +186,8 @@ class ContextualAttributeBindingTest extends TestCase
         $container = new Container;
         $container->singleton('log', function () {
             $manager = m::mock(LogManager::class);
-            $manager->shouldReceive('driver')->with('foo')->andReturn(m::mock(LoggerInterface::class));
-            $manager->shouldReceive('driver')->with('bar')->andReturn(m::mock(LoggerInterface::class));
+            $manager->shouldReceive('channel')->with('foo')->andReturn(m::mock(LoggerInterface::class));
+            $manager->shouldReceive('channel')->with('bar')->andReturn(m::mock(LoggerInterface::class));
 
             return $manager;
         });
@@ -314,7 +315,7 @@ final class ContainerTestHasConfigValueWithResolvePropertyAndAfterCallback
 
 final class AuthedTest
 {
-    public function __construct(#[Authed('foo')] AuthenticatableContract $foo, #[Authed('bar')] AuthenticatableContract $bar)
+    public function __construct(#[Authenticated('foo')] AuthenticatableContract $foo, #[CurrentUser('bar')] AuthenticatableContract $bar)
     {
     }
 }
@@ -342,7 +343,7 @@ final class DatabaseTest
 
 final class GuardTest
 {
-    public function __construct(#[Guard('foo')] GuardContract $foo, #[Guard('bar')] GuardContract $bar)
+    public function __construct(#[Auth('foo')] GuardContract $foo, #[Auth('bar')] GuardContract $bar)
     {
     }
 }

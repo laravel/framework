@@ -12,12 +12,12 @@ class Log implements ContextualAttribute
     /**
      * Create a new class instance.
      */
-    public function __construct(public ?string $driver = null)
+    public function __construct(public ?string $channel = null)
     {
     }
 
     /**
-     * Resolve the log driver.
+     * Resolve the log channel.
      *
      * @param  self  $attribute
      * @param  \Illuminate\Contracts\Container\Container  $container
@@ -25,6 +25,6 @@ class Log implements ContextualAttribute
      */
     public static function resolve(self $attribute, Container $container)
     {
-        return $container->make('log')->driver($attribute->driver);
+        return $container->make('log')->channel($attribute->channel);
     }
 }
