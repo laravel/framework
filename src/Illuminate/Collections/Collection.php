@@ -1902,4 +1902,26 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     {
         unset($this->items[$key]);
     }
+
+    /**
+     * Fill null values in specified fields of a collection.
+     *
+     * @param  mixed  $value  Default value to fill in the fields
+     * @param  string  ...$fields  Field names to be filled with the default value
+     * @return static
+     */
+    public function fillNull($value = 0, ...$fields)
+    {
+        return $this->map(function ($item) use ($fields, $value) {
+            $fieldsToFill = empty($fields) ? array_keys($item) : $fields;
+
+            foreach ($fieldsToFill as $field) {
+                if (array_key_exists($field, $item) && $item[$field] === null) {
+                    $item[$field] = $value;
+                }
+            }
+
+            return $item;
+        });
+    }
 }

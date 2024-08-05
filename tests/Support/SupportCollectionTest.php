@@ -5522,6 +5522,37 @@ class SupportCollectionTest extends TestCase
         $this->assertSame(0.0, $collection->percentage(fn ($value) => $value['foo'] === 'test'));
     }
 
+    public function testFillNullCollection()
+    {
+        $collection = new Collection([
+            ['name' => 'Item 1', 'value' => null],
+            ['name' => 'Item 2', 'value' => 10, 'meta' => null],
+            ['name' => 'Item 4', 'value' => 25],
+            ['name' => null, 'value' => null],
+        ]);
+
+        $this->assertEquals([
+            ['name' => 'Item 1', 'value' => 0],
+            ['name' => 'Item 2', 'value' => 10, 'meta' => 0],
+            ['name' => 'Item 4', 'value' => 25],
+            ['name' => 0, 'value' => 0],
+        ], $collection->fillNull()->toArray());
+
+        $this->assertEquals([
+            ['name' => 'Item 1', 'value' => 'Default'],
+            ['name' => 'Item 2', 'value' => 10, 'meta' => 'Default'],
+            ['name' => 'Item 4', 'value' => 25],
+            ['name' => 'Default', 'value' => 'Default'],
+        ], $collection->fillNull('Default')->toArray());
+
+        $this->assertEquals([
+            ['name' => 'Item 1', 'value' => 0],
+            ['name' => 'Item 2', 'value' => 10, 'meta' => 0],
+            ['name' => 'Item 4', 'value' => 25],
+            ['name' => null, 'value' => 0],
+        ], $collection->fillNull(0, 'value', 'meta')->toArray());
+    }
+
     #[DataProvider('collectionClassProvider')]
     public function testHighOrderPercentage($collection)
     {
