@@ -2339,6 +2339,8 @@ class Builder implements BuilderContract
     /**
      * Add a "where not" clause to the query for multiple columns where none of the conditions should be true.
      *
+     * @deprecated Will be removed in a future Laravel version. Use whereNotAny instead.
+     *
      * @param  \Illuminate\Contracts\Database\Query\Expression[]|string[]  $columns
      * @param  mixed  $operator
      * @param  mixed  $value
@@ -2347,11 +2349,13 @@ class Builder implements BuilderContract
      */
     public function whereNone($columns, $operator = null, $value = null, $boolean = 'and')
     {
-        return $this->whereAny($columns, $operator, $value, $boolean.' not');
+        return $this->whereNotAny($columns, $operator, $value, $boolean);
     }
 
     /**
      * Add an "or where not" clause to the query for multiple columns where none of the conditions should be true.
+     *
+     * @deprecated Will be removed in a future Laravel version. Use orWhereNotAny instead.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression[]|string[]  $columns
      * @param  mixed  $operator
@@ -2360,7 +2364,7 @@ class Builder implements BuilderContract
      */
     public function orWhereNone($columns, $operator = null, $value = null)
     {
-        return $this->whereNone($columns, $operator, $value, 'or');
+        return $this->orWhereNotAny($columns, $operator, $value);
     }
 
     /**
