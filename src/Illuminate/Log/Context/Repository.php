@@ -333,7 +333,7 @@ class Repository
         }
 
         if ($value instanceof Closure) {
-            return $value($this->data[$key]);
+            return collect($this->data[$key])->contains($value);
         }
 
         return in_array($value, $this->data[$key], $strict);
@@ -360,7 +360,7 @@ class Repository
         }
 
         if ($value instanceof Closure) {
-            return $value($this->data[$key]);
+            return collect($this->hidden[$key])->contains($value);
         }
 
         return in_array($value, $this->hidden[$key], $strict);
