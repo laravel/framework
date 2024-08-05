@@ -1390,7 +1390,6 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertSame('select * from "users" where "first_name" like ? or ("last_name" = ? or "email" = ?)', $builder->toSql());
         $this->assertEquals(['%Taylor%', '%Otwell%', '%Otwell%'], $builder->getBindings());
 
-
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->where('first_name', 'like', '%Taylor%')->orWhereAny(['email_verified_at', 'deleted_at'], null);
         $this->assertSame('select * from "users" where "first_name" like ? or ("email_verified_at" is null or "deleted_at" is null)', $builder->toSql());
