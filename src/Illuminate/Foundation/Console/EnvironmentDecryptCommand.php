@@ -63,9 +63,7 @@ class EnvironmentDecryptCommand extends Command
         $key = $this->option('key') ?: Env::get('LARAVEL_ENV_ENCRYPTION_KEY');
 
         if (! $key) {
-            $this->components->error('A decryption key is required.');
-
-            return Command::FAILURE;
+            $this->fail('A decryption key is required.');
         }
 
         $cipher = $this->option('cipher') ?: 'AES-256-CBC';
@@ -79,21 +77,15 @@ class EnvironmentDecryptCommand extends Command
         $outputFile = $this->outputFilePath();
 
         if (Str::endsWith($outputFile, '.encrypted')) {
-            $this->components->error('Invalid filename.');
-
-            return Command::FAILURE;
+            $this->fail('Invalid filename.');
         }
 
         if (! $this->files->exists($encryptedFile)) {
-            $this->components->error('Encrypted environment file not found.');
-
-            return Command::FAILURE;
+            $this->fail('Encrypted environment file not found.');
         }
 
         if ($this->files->exists($outputFile) && ! $this->option('force')) {
-            $this->components->error('Environment file already exists.');
-
-            return Command::FAILURE;
+            $this->fail('Environment file already exists.');
         }
 
         try {
@@ -104,9 +96,7 @@ class EnvironmentDecryptCommand extends Command
                 $encrypter->decrypt($this->files->get($encryptedFile))
             );
         } catch (Exception $e) {
-            $this->components->error($e->getMessage());
-
-            return Command::FAILURE;
+            $this->fail($e->getMessage());
         }
 
         $this->components->info('Environment successfully decrypted.');
