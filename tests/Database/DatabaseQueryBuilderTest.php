@@ -1325,6 +1325,11 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->select('*')->from('users')->whereAll(['last_name', 'email'], 'not like', '%Otwell%');
         $this->assertSame('select * from "users" where ("last_name" not like ? and "email" not like ?)', $builder->toSql());
         $this->assertEquals(['%Otwell%', '%Otwell%'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereAll(['email_verified_at', 'deleted_at'], null);
+        $this->assertSame('select * from "users" where ("email_verified_at" is null and "deleted_at" is null)', $builder->toSql());
+        $this->assertEquals([], $builder->getBindings());
     }
 
     public function testOrWhereAll()
@@ -1343,6 +1348,11 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->select('*')->from('users')->where('first_name', 'like', '%Taylor%')->orWhereAll(['last_name', 'email'], '%Otwell%');
         $this->assertSame('select * from "users" where "first_name" like ? or ("last_name" = ? and "email" = ?)', $builder->toSql());
         $this->assertEquals(['%Taylor%', '%Otwell%', '%Otwell%'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereAll(['email_verified_at', 'deleted_at'], null);
+        $this->assertSame('select * from "users" where ("email_verified_at" is null and "deleted_at" is null)', $builder->toSql());
+        $this->assertEquals([], $builder->getBindings());
     }
 
     public function testWhereAny()
@@ -1356,6 +1366,11 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->select('*')->from('users')->whereAny(['last_name', 'email'], '%Otwell%');
         $this->assertSame('select * from "users" where ("last_name" = ? or "email" = ?)', $builder->toSql());
         $this->assertEquals(['%Otwell%', '%Otwell%'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereAny(['email_verified_at', 'deleted_at'], null);
+        $this->assertSame('select * from "users" where ("email_verified_at" is null or "deleted_at" is null)', $builder->toSql());
+        $this->assertEquals([], $builder->getBindings());
     }
 
     public function testOrWhereAny()
@@ -1374,6 +1389,12 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->select('*')->from('users')->where('first_name', 'like', '%Taylor%')->orWhereAny(['last_name', 'email'], '%Otwell%');
         $this->assertSame('select * from "users" where "first_name" like ? or ("last_name" = ? or "email" = ?)', $builder->toSql());
         $this->assertEquals(['%Taylor%', '%Otwell%', '%Otwell%'], $builder->getBindings());
+
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('first_name', 'like', '%Taylor%')->orWhereAny(['email_verified_at', 'deleted_at'], null);
+        $this->assertSame('select * from "users" where "first_name" like ? or ("email_verified_at" is null or "deleted_at" is null)', $builder->toSql());
+        $this->assertEquals(['%Taylor%'], $builder->getBindings());
     }
 
     public function testWhereNotAny()
