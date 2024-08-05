@@ -10,7 +10,7 @@ class JobDispatchedException extends RuntimeException
     /**
      * Create a new exception instance.
      *
-     * @param  \Illuminate\Contracts\Process\ProcessResult  $result
+     * @param  \Illuminate\Contracts\Queue\ShouldBeUnique  $job
      * @return void
      */
     public function __construct(public ShouldBeUnique $job)
@@ -19,9 +19,10 @@ class JobDispatchedException extends RuntimeException
     }
 
     /**
-     * Generate the lock key for the given job.
+     * Generate the identifier for the given job.
      *
      * @param  mixed  $job
+     * @return string
      */
     protected function getIdentifier($job): string
     {
@@ -29,6 +30,6 @@ class JobDispatchedException extends RuntimeException
                     ? $job->uniqueId()
                     : ($job->uniqueId ?? '');
 
-        return empty($uniqueId) ? get_class($job) : get_class($job) . "({$uniqueId})";
+        return empty($uniqueId) ? get_class($job) : get_class($job) . " ({$uniqueId})";
     }
 }
