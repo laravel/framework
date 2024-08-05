@@ -202,16 +202,20 @@ class PendingDispatch
      * Handle the object's destruction.
      *
      * @return void
+     * 
+     * @throws \Illuminate\Foundation\Bus\Exceptions\JobDispatchedException
      */
     public function __destruct()
     {
         if (! $this->shouldDispatch()) {
+            if (! $this->throwCallback) {
+                return;
+            }
+
             throw tap(new Exceptions\JobDispatchedException($this->job), function ($exception) {
-                if ($this->throwCallback && is_callable($this->throwCallback)) {
-                    $this->throwCallback($this, $exception);
-                }
+                $callback = $this->throwCallback;
+                $callback($this, $exception);
             });
-            return;
         } elseif ($this->afterResponse) {
             app(Dispatcher::class)->dispatchAfterResponse($this->job);
         } else {
