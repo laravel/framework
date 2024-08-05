@@ -221,7 +221,7 @@ trait FormatsMessages
         // list doesn't have it we'll just consider it a string by elimination.
         return match (true) {
             $this->hasRule($attribute, $this->numericRules) => 'numeric',
-            $this->hasRule($attribute, ['Array']) => 'array',
+            $this->hasRule($attribute, ['Array', 'List']) => 'array',
             $this->getValue($attribute) instanceof UploadedFile,
             $this->getValue($attribute) instanceof File => 'file',
             default => 'string',
