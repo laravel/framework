@@ -2244,7 +2244,7 @@ class Builder implements BuilderContract
      * @param  string  $boolean
      * @return $this
      */
-    public function whereAll($columns, $operator = null, $value = null, $boolean = 'and')
+    public function whereAll($columns, $operator, $value = null, $boolean = 'and')
     {
         [$value, $operator] = $this->prepareValueAndOperator(
             $value, $operator, func_num_args() === 2
@@ -2267,7 +2267,7 @@ class Builder implements BuilderContract
      * @param  mixed  $value
      * @return $this
      */
-    public function orWhereAll($columns, $operator = null, $value = null)
+    public function orWhereAll($columns, $operator, $value = null)
     {
         return $this->whereAll($columns, $operator, $value, 'or');
     }
@@ -2281,7 +2281,7 @@ class Builder implements BuilderContract
      * @param  string  $boolean
      * @return $this
      */
-    public function whereAny($columns, $operator = null, $value = null, $boolean = 'and')
+    public function whereAny($columns, $operator, $value = null, $boolean = 'and')
     {
         [$value, $operator] = $this->prepareValueAndOperator(
             $value, $operator, func_num_args() === 2
@@ -2304,7 +2304,7 @@ class Builder implements BuilderContract
      * @param  mixed  $value
      * @return $this
      */
-    public function orWhereAny($columns, $operator = null, $value = null)
+    public function orWhereAny($columns, $operator, $value = null)
     {
         return $this->whereAny($columns, $operator, $value, 'or');
     }
@@ -2318,7 +2318,7 @@ class Builder implements BuilderContract
      * @param  string  $boolean
      * @return $this
      */
-    public function whereNone($columns, $operator = null, $value = null, $boolean = 'and')
+    public function whereNone($columns, $operator, $value = null, $boolean = 'and')
     {
         return $this->whereAny($columns, $operator, $value, $boolean.' not');
     }
@@ -2331,7 +2331,7 @@ class Builder implements BuilderContract
      * @param  mixed  $value
      * @return $this
      */
-    public function orWhereNone($columns, $operator = null, $value = null)
+    public function orWhereNone($columns, $operator, $value = null)
     {
         return $this->whereNone($columns, $operator, $value, 'or');
     }
