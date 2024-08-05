@@ -2310,6 +2310,33 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add a "where not" clause to the query for multiple columns with "or" conditions between them.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression[]|string[]  $columns
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereNotAny($columns, $operator = null, $value = null, $boolean = 'and')
+    {
+        return $this->whereAny($columns, $operator, $value, $boolean.' not');
+    }
+
+    /**
+     * Add an "or where not" clause to the query for multiple columns with "or" conditions between them.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression[]|string[]  $columns
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function orWhereNotAny($columns, $operator = null, $value = null)
+    {
+        return $this->whereNotAny($columns, $operator, $value, 'or');
+    }
+
+    /**
      * Add a "where not" clause to the query for multiple columns where none of the conditions should be true.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression[]|string[]  $columns
