@@ -2,9 +2,9 @@
 
 namespace Illuminate\Foundation;
 
-use RuntimeException;
+use Exception;
 
-class MixFileNotFoundException extends RuntimeException
+class MixFileNotFoundException extends Exception
 {
     //
 }
