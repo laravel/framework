@@ -95,6 +95,14 @@ if (!function_exists('data_get')) {
         return $target;
     }
 }
+/**
+ * Get an item from an array or object using "dot" notation.
+ *
+ * @param  mixed  $target
+ * @param  string|array|int|null  $key
+ * @param  mixed  $default
+ * @return mixed
+ */
 function data_fetch(mixed $target, string|array|int|null $key, mixed $default = null, bool $trim = false): mixed
 {
     if (is_null($key)) {
