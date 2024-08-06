@@ -563,17 +563,6 @@ class ValidatedInput implements ValidatedData
     }
 
     /**
-     * Determine if the validated inputs contains a given input item key.
-     *
-     * @param  string|array  $key
-     * @return bool
-     */
-    public function exists($key)
-    {
-        return $this->has($key);
-    }
-
-    /**
      * Determine if the validated inputs contains any of the given inputs.
      *
      * @param  string|array  $keys
