@@ -7,11 +7,13 @@ use Illuminate\Contracts\Console\Kernel as ConsoleKernel;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Foundation\ExceptionRenderer;
 use Illuminate\Contracts\Foundation\MaintenanceMode as MaintenanceModeContract;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Grammar;
 use Illuminate\Foundation\Console\CliDumper;
+use Illuminate\Foundation\Exceptions\Renderer\LaravelRenderer;
 use Illuminate\Foundation\Exceptions\Renderer\Listener;
 use Illuminate\Foundation\Exceptions\Renderer\Mappers\BladeMapper;
 use Illuminate\Foundation\Exceptions\Renderer\Renderer;
@@ -135,8 +137,6 @@ class FoundationServiceProvider extends AggregateServiceProvider
      * Register the "validate" macro on the request.
      *
      * @return void
-     *
-     * @throws \Illuminate\Validation\ValidationException
      */
     public function registerRequestValidation()
     {
@@ -238,6 +238,10 @@ class FoundationServiceProvider extends AggregateServiceProvider
         });
 
         $this->app->singleton(Listener::class);
+
+        $this->app->singleton(ExceptionRenderer::class, function ($app) {
+            return new LaravelRenderer($app[Renderer::class], $app['request']);
+        });
     }
 
     /**

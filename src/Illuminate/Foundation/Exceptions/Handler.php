@@ -837,12 +837,8 @@ class Handler implements ExceptionHandlerContract
     protected function renderExceptionContent(Throwable $e)
     {
         try {
-            if (config('app.debug')) {
-                if (app()->has(ExceptionRenderer::class)) {
-                    return $this->renderExceptionWithCustomRenderer($e);
-                } elseif ($this->container->bound(Renderer::class)) {
-                    return $this->container->make(Renderer::class)->render(request(), $e);
-                }
+            if (config('app.debug') && app()->has(ExceptionRenderer::class)) {
+                return $this->renderExceptionWithCustomRenderer($e);
             }
 
             return $this->renderExceptionWithSymfony($e, config('app.debug'));
