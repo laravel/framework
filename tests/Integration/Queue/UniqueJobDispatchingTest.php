@@ -20,6 +20,7 @@ class UniqueJobDispatchingTest extends QueueTestCase
 
         $app['config']->set('cache.default', 'database');
     }
+
     public function testSubsequentUniqueJobDispatchAreIgnored()
     {
         $this->markTestSkippedWhenUsingSyncQueueDriver();

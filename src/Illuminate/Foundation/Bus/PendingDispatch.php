@@ -202,7 +202,7 @@ class PendingDispatch
      * Handle the object's destruction.
      *
      * @return void
-     * 
+     *
      * @throws \Illuminate\Foundation\Bus\Exceptions\JobDispatchedException
      */
     public function __destruct()

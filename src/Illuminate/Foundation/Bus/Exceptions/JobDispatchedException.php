@@ -30,6 +30,6 @@ class JobDispatchedException extends RuntimeException
                     ? $job->uniqueId()
                     : ($job->uniqueId ?? '');
 
-        return empty($uniqueId) ? get_class($job) : get_class($job) . " ({$uniqueId})";
+        return empty($uniqueId) ? get_class($job) : get_class($job)." ({$uniqueId})";
     }
 }
