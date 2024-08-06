@@ -50,11 +50,6 @@ class MySqlConnection extends Connection
         });
     }
 
-    public function getLastInsertId()
-    {
-        return $this->lastInsertId;
-    }
-
     /**
      * Escape a binary value for safe SQL embedding.
      *
@@ -77,6 +72,16 @@ class MySqlConnection extends Connection
     protected function isUniqueConstraintError(Exception $exception)
     {
         return boolval(preg_match('#Integrity constraint violation: 1062#i', $exception->getMessage()));
+    }
+
+    /**
+     * Get the connection's last insert ID.
+     *
+     * @return string|int|null
+     */
+    public function getLastInsertId()
+    {
+        return $this->lastInsertId;
     }
 
     /**
