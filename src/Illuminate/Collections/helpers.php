@@ -95,7 +95,37 @@ if (! function_exists('data_get')) {
         return $target;
     }
 }
+/**
+ * Get an item from an array or object using "dot" notation.
+ *
+ * @param  mixed  $target
+ * @param  string|array|int|null  $key
+ * @param  mixed  $default
+ * @return mixed
+ */
+function data_fetch(mixed $target, string|array|int|null $key, mixed $default = null, bool $trim = false): mixed
+{
+    if (is_null($key)) {
+        return $default;
+    }
 
+    $key = is_array($key) ? $key : [$key];
+    $segment = array_shift($key);
+
+    if (Arr::accessible($target) && Arr::exists($target, $segment)) {
+        $target = $target[$segment];
+    } elseif (is_object($target) && isset($target->{$segment})) {
+        $target = $target->{$segment};
+    } else {
+        return $default;
+    }
+
+    if ($key) {
+        return data_fetch($target, $key, $default); // recursive call
+    } else {
+        return ($trim) ? trim($target) : $target;
+    }
+}
 if (! function_exists('data_set')) {
     /**
      * Set an item on an array or object using dot notation.
