@@ -375,6 +375,32 @@ class MySqlGrammar extends Grammar
     }
 
     /**
+     * Compile an upsert statement using a subquery into SQL.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $values
+     * @param  array  $uniqueBy
+     * @param  array  $update
+     * @return string
+     */
+    public function compileUpsertUsing(Builder $query, array $columns, string $sql, array $uniqueBy, array $update)
+    {
+        $sql = $this->compileInsertUsing($query, $columns, $sql);
+
+        $sql .= ' on duplicate key update ';
+
+        $columns = collect($update)->map(function ($value, $key) {
+            if (! is_numeric($key)) {
+                return $this->wrap($key).' = '.$this->parameter($value);
+            }
+
+            return $this->wrap($value).' = values('.$this->wrap($value).')';
+        })->implode(', ');
+
+        return $sql.$columns;
+    }
+
+    /**
      * Compile a "lateral join" clause.
      *
      * @param  \Illuminate\Database\Query\JoinLateralClause  $join
