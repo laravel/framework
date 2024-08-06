@@ -1,6 +1,21 @@
 # Release Notes for 10.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v10.48.15...10.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v10.48.18...10.x)
+
+## [v10.48.18](https://github.com/laravel/framework/compare/v10.48.17...v10.48.18) - 2024-07-30
+
+* [10.x] backport #52188 by [@calebdw](https://github.com/calebdw) in https://github.com/laravel/framework/pull/52293
+* [10.x] Fix runPaginationCountQuery not working properly for union queries by [@chinleung](https://github.com/chinleung) in https://github.com/laravel/framework/pull/52314
+
+## [v10.48.17](https://github.com/laravel/framework/compare/v10.48.16...v10.48.17) - 2024-07-23
+
+* [10.x] Fix PHP_CLI_SERVER_WORKERS warning by suppressing it by [@pelomedusa](https://github.com/pelomedusa) in https://github.com/laravel/framework/pull/52094
+* [10.x]  Backport #51615  by [@GrahamCampbell](https://github.com/GrahamCampbell) in https://github.com/laravel/framework/pull/52215
+
+## [v10.48.16](https://github.com/laravel/framework/compare/v10.48.15...v10.48.16) - 2024-07-09
+
+* [10.x] Fix Http::retry so that throw is respected for call signature Http::retry([1,2], throw: false) by [@paulyoungnb](https://github.com/paulyoungnb) in https://github.com/laravel/framework/pull/52002
+* [10.x] Set application_name and character set as PostgreSQL DSN string by [@sunaoka](https://github.com/sunaoka) in https://github.com/laravel/framework/pull/51985
 
 ## [v10.48.15](https://github.com/laravel/framework/compare/v10.48.14...v10.48.15) - 2024-07-02
 
