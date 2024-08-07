@@ -10,6 +10,7 @@ use function Laravel\Prompts\confirm;
 use function Laravel\Prompts\multiselect;
 use function Laravel\Prompts\password;
 use function Laravel\Prompts\select;
+use function Laravel\Prompts\suggest;
 use function Laravel\Prompts\text;
 use function Laravel\Prompts\textarea;
 
@@ -57,6 +58,28 @@ class PromptsAssertionTest extends TestCase
             ->artisan('test:textarea')
             ->expectsQuestion('What is your name?', 'Jane')
             ->expectsOutput('Jane');
+    }
+
+    public function testAssertionForSuggestPrompt()
+    {
+        $this->app[Kernel::class]->registerCommand(
+            new class extends Command
+            {
+                protected $signature = 'test:suggest';
+
+                public function handle()
+                {
+                    $name = suggest('What is your name?', ['John', 'Jane']);
+
+                    $this->line($name);
+                }
+            }
+        );
+
+        $this
+            ->artisan('test:suggest')
+            ->expectsChoice('What is your name?', 'Joe', ['John', 'Jane'])
+            ->expectsOutput('Joe');
     }
 
     public function testAssertionForPasswordPrompt()
