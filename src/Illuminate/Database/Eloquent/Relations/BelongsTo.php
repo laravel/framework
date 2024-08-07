@@ -177,6 +177,18 @@ class BelongsTo extends Relation
     }
 
     /**
+     * Touch all of the related models for the relationship.
+     *
+     * @return void
+     */
+    public function touch()
+    {
+        if (! is_null($this->getParentKey())) {
+            parent::touch();
+        }
+    }
+
+    /**
      * Associate the model instance to the given parent.
      *
      * @param  TRelatedModel|int|string|null  $model
