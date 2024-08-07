@@ -8,6 +8,9 @@ use Illuminate\Support\Traits\Macroable;
 use LogicException;
 use Stringable;
 
+/**
+ * @mixin \Psr\Http\Message\ResponseInterface
+ */
 class Response implements ArrayAccess, Stringable
 {
     use Concerns\DeterminesStatusCode, Macroable {
