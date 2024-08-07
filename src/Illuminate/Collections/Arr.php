@@ -321,6 +321,28 @@ class Arr
     }
 
     /**
+     * Format the key names of an associative array.
+     *
+     * @param  array  $array
+     * @param  callable  $formatter
+     * @param  int  $depth
+     * @return array
+     */
+    public static function formatKeysWith(array $array, callable $formatter, int $depth = PHP_INT_MAX): array
+    {
+        $result = [];
+        foreach ($array as $key => $value) {
+            $newKey = $formatter($key);
+            if (is_array($value) && $depth > 1) {
+                $value = self::formatKeysWith($value, $formatter, $depth - 1);
+            }
+            $result[$newKey] = $value;
+        }
+
+        return $result;
+    }
+
+    /**
      * Get an item from an array using "dot" notation.
      *
      * @param  \ArrayAccess|array  $array

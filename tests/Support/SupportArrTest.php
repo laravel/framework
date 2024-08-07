@@ -6,6 +6,7 @@ use ArrayObject;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use stdClass;
@@ -420,6 +421,39 @@ class SupportArrTest extends TestCase
 
         $array = [['#foo', ['#bar', ['#baz']]], '#zap'];
         $this->assertEquals(['#foo', '#bar', ['#baz'], '#zap'], Arr::flatten($array, 2));
+    }
+
+    public function testFormatKeysWith()
+    {
+        $inputArray = [
+            'snake_case' => true,
+            'camelCase' => true,
+            'sub_array' => [
+                'snake_case' => true,
+                'camelCase' => true,
+            ],
+        ];
+
+        $uppercaseArray = [
+            'SNAKE_CASE' => true,
+            'CAMELCASE' => true,
+            'SUB_ARRAY' => [
+                'SNAKE_CASE' => true,
+                'CAMELCASE' => true,
+            ],
+        ];
+
+        $camelCaseDepthOneArray = [
+            'snakeCase' => true,
+            'camelCase' => true,
+            'subArray' => [
+                'snake_case' => true,
+                'camelCase' => true,
+            ],
+        ];
+
+        $this->assertEquals(Arr::formatKeysWith($inputArray, [Str::class, 'upper']), $uppercaseArray);
+        $this->assertEquals(Arr::formatKeysWith($inputArray, [Str::class, 'camel'], 1), $camelCaseDepthOneArray);
     }
 
     public function testGet()
