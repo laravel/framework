@@ -3,6 +3,7 @@
 namespace Illuminate\Http\Client;
 
 use ArrayAccess;
+use GuzzleHttp\Psr7\StreamWrapper;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\Macroable;
 use LogicException;
@@ -102,6 +103,18 @@ class Response implements ArrayAccess, Stringable
     public function collect($key = null)
     {
         return Collection::make($this->json($key));
+    }
+
+    /**
+     * Get the body of the response as a PHP resource.
+     *
+     * @return resource
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function resource()
+    {
+        return StreamWrapper::getResource($this->response->getBody());
     }
 
     /**

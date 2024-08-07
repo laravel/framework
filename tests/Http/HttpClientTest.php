@@ -327,6 +327,18 @@ class HttpClientTest extends TestCase
         $this->assertSame('bar', $response->object()->result->foo);
     }
 
+    public function testResponseCanBeReturnedAsResource()
+    {
+        $this->factory->fake([
+            '*' => ['result' => ['foo' => 'bar']],
+        ]);
+
+        $response = $this->factory->get('http://foo.com/api');
+
+        $this->assertIsResource($response->resource());
+        $this->assertSame('{"result":{"foo":"bar"}}', stream_get_contents($response->resource()));
+    }
+
     public function testResponseCanBeReturnedAsCollection()
     {
         $this->factory->fake([
