@@ -398,7 +398,7 @@ class PendingCommand
                 ->ordered()
                 ->with(Mockery::on(function ($argument) use ($question) {
                     if (isset($this->test->expectedChoices[$question[0]])) {
-                        $this->test->expectedChoices[$question[0]]['actual'] = $argument instanceof ChoiceQuestion
+                        $this->test->expectedChoices[$question[0]]['actual'] = $argument instanceof ChoiceQuestion && ! array_is_list($this->test->expectedChoices[$question[0]]['expected'])
                             ? $argument->getChoices()
                             : $argument->getAutocompleterValues();
                     }
