@@ -3920,9 +3920,9 @@ class Builder implements BuilderContract
      */
     public function upsertUsing(array $columns, $query, $uniqueBy, $update = null)
     {
-        if(is_null($update)) {
+        if (is_null($update)) {
             $update = $columns;
-        } else if (! is_array($update)) {
+        } elseif (! is_array($update)) {
             $update = [$update];
         }
 
