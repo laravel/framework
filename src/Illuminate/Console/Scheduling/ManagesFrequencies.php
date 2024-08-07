@@ -3,6 +3,7 @@
 namespace Illuminate\Console\Scheduling;
 
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 use InvalidArgumentException;
 
 trait ManagesFrequencies
@@ -29,7 +30,25 @@ trait ManagesFrequencies
      */
     public function between($startTime, $endTime)
     {
-        return $this->when($this->inTimeInterval($startTime, $endTime));
+        $startHour = Str::before($startTime, ':');
+        $endHour = Str::before($endTime, ':');
+        $startMinute = Str::after($startTime, ':');
+        $endMinute = Str::after($endTime, ':');
+
+        $result = $this->when($this->inTimeInterval($startTime, $endTime));
+
+        if ($startHour === $endHour) {
+            $result->spliceIntoPosition(2, $startHour);
+        } else {
+            $result->spliceIntoPosition(2, $startHour.'-'.$endHour);
+        }
+
+        if ($startMinute !== $endMinute) {
+            $endMinute = $endMinute === '00' ? '59' : $endMinute;
+            $result->prefixIntoPosition(1, $startMinute.'-'.$endMinute);
+        }
+
+        return $result;
     }
 
     /**
@@ -661,6 +680,22 @@ trait ManagesFrequencies
         $segments = preg_split("/\s+/", $this->expression);
 
         $segments[$position - 1] = $value;
+
+        return $this->cron(implode(' ', $segments));
+    }
+
+    /**
+     * Prefixes the given value into the given position of the expression.
+     *
+     * @param  int  $position
+     * @param  string  $value
+     * @return $this
+     */
+    protected function prefixIntoPosition($position, $value)
+    {
+        $segments = preg_split("/\s+/", $this->expression);
+
+        $segments[$position - 1] = Str::replace('*', '', $value.$segments[$position - 1]);
 
         return $this->cron(implode(' ', $segments));
     }
