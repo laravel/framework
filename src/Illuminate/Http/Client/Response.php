@@ -106,11 +106,11 @@ class Response implements ArrayAccess, Stringable
     }
 
     /**
-     * Get the body of the response as a php resource.
+     * Get the body of the response as a PHP resource.
      *
      * @return resource
      *
-     * @throws \InvalidArgumentException if stream is not readable or writable
+     * @throws \InvalidArgumentException
      */
     public function resource()
     {
