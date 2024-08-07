@@ -28,8 +28,8 @@ class EloquentUpdateTest extends DatabaseTestCase
 
         Schema::create('test_model3', function (Blueprint $table) {
             $table->increments('id');
-            $table->unsignedInteger('wallet_1');
-            $table->unsignedInteger('wallet_2');
+            $table->integer('wallet_1');
+            $table->integer('wallet_2');
             $table->softDeletes();
             $table->timestamps();
         });
