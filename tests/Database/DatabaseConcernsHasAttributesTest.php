@@ -21,6 +21,14 @@ class DatabaseConcernsHasAttributesTest extends TestCase
         $attributes = $instance->getMutatedAttributes();
         $this->assertEquals(['some_attribute'], $attributes);
     }
+
+    public function testCastingEmptyStringToArrayDoesNotError()
+    {
+        $instance = new HasAttributesWithArrayCast();
+        $this->assertEquals(['foo' => null], $instance->attributesToArray());
+
+        $this->assertTrue(json_last_error() === JSON_ERROR_NONE);
+    }
 }
 
 class HasAttributesWithoutConstructor
@@ -38,5 +46,25 @@ class HasAttributesWithConstructorArguments extends HasAttributesWithoutConstruc
 {
     public function __construct($someValue)
     {
+    }
+}
+
+class HasAttributesWithArrayCast
+{
+    use HasAttributes;
+
+    public function getArrayableAttributes(): array
+    {
+        return ['foo' => ''];
+    }
+
+    public function getCasts(): array
+    {
+        return ['foo' => 'array'];
+    }
+
+    public function usesTimestamps(): bool
+    {
+        return false;
     }
 }
