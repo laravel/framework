@@ -112,7 +112,7 @@ class PromptsAssertionTest extends TestCase
             ->expectsOutput('Your name is John.');
     }
 
-    public function testAssertionForSelectPrompt()
+    public function testAssertionForSelectPromptWithAList()
     {
         $this->app[Kernel::class]->registerCommand(
             new class extends Command
@@ -135,6 +135,31 @@ class PromptsAssertionTest extends TestCase
             ->artisan('test:select')
             ->expectsChoice('What is your name?', 'Jane', ['John', 'Jane'])
             ->expectsOutput('Your name is Jane.');
+    }
+
+    public function testAssertionForSelectPromptWithAnAssociativeArray()
+    {
+        $this->app[Kernel::class]->registerCommand(
+            new class extends Command
+            {
+                protected $signature = 'test:select';
+
+                public function handle()
+                {
+                    $name = select(
+                        label: 'What is your name?',
+                        options: ['john' => 'John', 'jane' => 'Jane']
+                    );
+
+                    $this->line("Your name is $name.");
+                }
+            }
+        );
+
+        $this
+            ->artisan('test:select')
+            ->expectsChoice('What is your name?', 'jane', ['john' => 'John', 'jane' => 'Jane'])
+            ->expectsOutput('Your name is jane.');
     }
 
     public function testAssertionForRequiredMultiselectPrompt()
