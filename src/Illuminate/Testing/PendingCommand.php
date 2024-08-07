@@ -17,6 +17,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
+use Symfony\Component\Console\Question\ChoiceQuestion;
 
 class PendingCommand
 {
@@ -397,7 +398,9 @@ class PendingCommand
                 ->ordered()
                 ->with(Mockery::on(function ($argument) use ($question) {
                     if (isset($this->test->expectedChoices[$question[0]])) {
-                        $this->test->expectedChoices[$question[0]]['actual'] = $argument->getChoices();
+                        $this->test->expectedChoices[$question[0]]['actual'] = $argument instanceof ChoiceQuestion
+                            ? $argument->getChoices()
+                            : $argument->getAutocompleterValues();
                     }
 
                     return $argument->getQuestion() == $question[0];
