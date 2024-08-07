@@ -1183,6 +1183,22 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Increment the given column's values by the given amounts.
+     *
+     * @param  array<string, float|int|numeric-string>  $columns
+     * @param  array<string, mixed>  $extra
+     * @return int
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function incrementEach($columns, array $extra = [])
+    {
+        return $this->toBase()->incrementEach(
+            $columns, $this->addUpdatedAtColumn($extra)
+        );
+    }
+
+    /**
      * Decrement a column's value by a given amount.
      *
      * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
@@ -1194,6 +1210,22 @@ class Builder implements BuilderContract
     {
         return $this->toBase()->decrement(
             $column, $amount, $this->addUpdatedAtColumn($extra)
+        );
+    }
+
+    /**
+     * Decrement the given column's values by the given amounts.
+     *
+     * @param  array<string, float|int|numeric-string>  $columns
+     * @param  array<string, mixed>  $extra
+     * @return int
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function decrementEach($columns, array $extra = [])
+    {
+        return $this->toBase()->decrementEach(
+            $columns, $this->addUpdatedAtColumn($extra)
         );
     }
 

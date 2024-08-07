@@ -28,7 +28,8 @@ class EloquentUpdateTest extends DatabaseTestCase
 
         Schema::create('test_model3', function (Blueprint $table) {
             $table->increments('id');
-            $table->unsignedInteger('counter');
+            $table->unsignedInteger('wallet_1');
+            $table->unsignedInteger('wallet_2');
             $table->softDeletes();
             $table->timestamps();
         });
@@ -105,36 +106,68 @@ class EloquentUpdateTest extends DatabaseTestCase
     public function testIncrement()
     {
         TestUpdateModel3::create([
-            'counter' => 0,
+            'wallet_1' => 0,
+            'wallet_2' => 0,
         ]);
 
         TestUpdateModel3::create([
-            'counter' => 0,
+            'wallet_1' => 0,
+            'wallet_2' => 0,
         ])->delete();
 
-        TestUpdateModel3::increment('counter');
+        TestUpdateModel3::increment('wallet_1');
+        TestUpdateModel3::incrementEach([
+            'wallet_1' => 10,
+            'wallet_2' => -20
+        ]);
 
         $models = TestUpdateModel3::withoutGlobalScopes()->orderBy('id')->get();
-        $this->assertEquals(1, $models[0]->counter);
-        $this->assertEquals(0, $models[1]->counter);
+        $this->assertEquals(1 + 10, $models[0]->wallet_1);
+        $this->assertEquals(-20, $models[0]->wallet_2);
+        $this->assertEquals(0, $models[1]->wallet_1);
+        $this->assertEquals(0, $models[1]->wallet_2);
+
+        $record = TestUpdateModel3::create([
+            'wallet_1' => 50,
+            'wallet_2' => 70,
+        ]);
+        $record->incrementEach([
+            'wallet_1' => 20,
+            'wallet_2' => -40,
+        ]);
+
+        $models = TestUpdateModel3::withoutGlobalScopes()->orderBy('id')->get();
+        $this->assertEquals(1 + 10, $models[0]->wallet_1);
+        $this->assertEquals(-20, $models[0]->wallet_2);
+        $this->assertEquals(0, $models[1]->wallet_1);
+        $this->assertEquals(0, $models[1]->wallet_2);
+        $this->assertEquals(50 + 20, $models[2]->wallet_1);
+        $this->assertEquals(70 - 40, $models[2]->wallet_2);
     }
 
     public function testIncrementOrDecrementIgnoresGlobalScopes()
     {
         /** @var TestUpdateModel3 $deletedModel */
         $deletedModel = tap(TestUpdateModel3::create([
-            'counter' => 0,
+            'wallet_1' => 0,
+            'wallet_2' => 0,
         ]), fn ($model) => $model->delete());
 
-        $deletedModel->increment('counter');
+        $deletedModel->increment('wallet_1');
+        $deletedModel->incrementEach(['wallet_1' => 1, 'wallet_2' => 1]);
 
-        $this->assertEquals(1, $deletedModel->counter);
+        $this->assertEquals(1 + 1, $deletedModel->wallet_1);
+        $this->assertEquals(1, $deletedModel->wallet_2);
 
         $deletedModel->fresh();
-        $this->assertEquals(1, $deletedModel->counter);
+        $this->assertEquals(1 + 1, $deletedModel->wallet_1);
+        $this->assertEquals(1, $deletedModel->wallet_2);
 
-        $deletedModel->decrement('counter');
-        $this->assertEquals(0, $deletedModel->fresh()->counter);
+        $deletedModel->decrement('wallet_1');
+        $deletedModel->decrementEach(['wallet_1' => 1, 'wallet_2' => 1]);
+
+        $this->assertEquals(0, $deletedModel->fresh()->wallet_1);
+        $this->assertEquals(0, $deletedModel->fresh()->wallet_2);
     }
 }
 
@@ -158,6 +191,6 @@ class TestUpdateModel3 extends Model
     use SoftDeletes;
 
     public $table = 'test_model3';
-    protected $fillable = ['counter'];
+    protected $fillable = ['wallet_1', 'wallet_2'];
     protected $casts = ['deleted_at' => 'datetime'];
 }
