@@ -56,4 +56,42 @@ class JobMakeCommandTest extends TestCase
         $this->assertFilenameExists('app/Jobs/FooCreated.php');
         $this->assertFilenameExists('tests/Feature/Jobs/FooCreatedTest.php');
     }
+
+    public function testItCanGenerateJobFileWithNotInitialInput()
+    {
+        $this->artisan('make:job')
+            ->expectsQuestion('What should the job be named?', 'FooCreated')
+            ->expectsQuestion('Do you want the job to be synchronous?', false)
+            ->assertExitCode(0);
+
+        $this->assertFileContains([
+            'namespace App\Jobs;',
+            'use Illuminate\Contracts\Queue\ShouldQueue;',
+            'use Illuminate\Foundation\Bus\Dispatchable;',
+            'use Illuminate\Foundation\Queue\Queueable;',
+            'use Illuminate\Queue\InteractsWithQueue;',
+            'use Illuminate\Queue\SerializesModels;',
+            'class FooCreated implements ShouldQueue',
+            'use Queueable;',
+        ], 'app/Jobs/FooCreated.php');
+
+        $this->assertFilenameExists('app/Jobs/FooCreated.php');
+    }
+
+    public function testItCanGenerateJobFileWithsynchronousWithNotInitialInput()
+    {
+        $this->artisan('make:job')
+            ->expectsQuestion('What should the job be named?', 'FooCreated')
+            ->expectsQuestion('Do you want the job to be synchronous?', true)
+            ->assertExitCode(0);
+
+        $this->assertFileContains([
+            'namespace App\Jobs;',
+            'use Illuminate\Foundation\Bus\Dispatchable;',
+            'class FooCreated',
+            'use Dispatchable;',
+        ], 'app/Jobs/FooCreated.php');
+
+        $this->assertFilenameExists('app/Jobs/FooCreated.php');
+    }
 }
