@@ -118,7 +118,7 @@ class EloquentUpdateTest extends DatabaseTestCase
         TestUpdateModel3::increment('wallet_1');
         TestUpdateModel3::incrementEach([
             'wallet_1' => 10,
-            'wallet_2' => -20
+            'wallet_2' => -20,
         ]);
 
         $models = TestUpdateModel3::withoutGlobalScopes()->orderBy('id')->get();

@@ -1027,7 +1027,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Run the incrementEach or decrementEach method on the model.
      *
-     * @param array<string, float|int|numeric-string> $columns
+     * @param  array<string, float|int|numeric-string>  $columns
      * @param  array  $extra
      * @param  string  $method
      * @return int
