@@ -90,6 +90,24 @@ class HttpResponseTest extends TestCase
         $this->assertSame('bar', $cookies[0]->getValue());
     }
 
+    public function testResponseCookiesInheritRequestSecureState()
+    {
+        $cookie = Cookie::create('foo', 'bar');
+
+        $response = new Response('foo');
+        $response->headers->setCookie($cookie);
+
+        $request = Request::create('/', 'GET');
+        $response->prepare($request);
+
+        $this->assertFalse($cookie->isSecure());
+
+        $request = Request::create('https://localhost/', 'GET');
+        $response->prepare($request);
+
+        $this->assertTrue($cookie->isSecure());
+    }
+
     public function testGetOriginalContent()
     {
         $arr = ['foo' => 'bar'];
