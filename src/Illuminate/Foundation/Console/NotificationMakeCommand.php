@@ -11,7 +11,6 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 use function Laravel\Prompts\confirm;
-use function Laravel\Prompts\text;
 
 #[AsCommand(name: 'make:notification')]
 class NotificationMakeCommand extends GeneratorCommand
