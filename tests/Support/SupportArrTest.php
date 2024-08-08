@@ -6,6 +6,7 @@ use ArrayObject;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use stdClass;
@@ -788,19 +789,52 @@ class SupportArrTest extends TestCase
 
     public function testMapWithKeys()
     {
-        $data = [
+        $depthOneData = [
             ['name' => 'Blastoise', 'type' => 'Water', 'idx' => 9],
             ['name' => 'Charmander', 'type' => 'Fire', 'idx' => 4],
             ['name' => 'Dragonair', 'type' => 'Dragon', 'idx' => 148],
         ];
+        $depthTwoData = [
+            'Pikachu' => [
+                'Type' => 'Electric',
+                'Level' => 25,
+                'Moves' => ['Thunder Shock', 'Quick Attack', 'Iron Tail', 'Electro Ball'],
+            ],
+            'Charmander' => [
+                'Type' => 'Fire',
+                'Level' => 15,
+                'Moves' => ['Ember', 'Scratch', 'Growl', 'Smokescreen'],
+            ],
+        ];
 
-        $data = Arr::mapWithKeys($data, function ($pokemon) {
+        $expectedDepthOneData = ['Blastoise' => 'Water', 'Charmander' => 'Fire', 'Dragonair' => 'Dragon'];
+        $expectedDepthTwoData = [
+            'PIKACHU' => [
+                'TYPE' => 'Electric',
+                'LEVEL' => 25,
+                'MOVES' => ['Thunder Shock', 'Quick Attack', 'Iron Tail', 'Electro Ball'],
+            ],
+            'CHARMANDER' => [
+                'TYPE' => 'Fire',
+                'LEVEL' => 15,
+                'MOVES' => ['Ember', 'Scratch', 'Growl', 'Smokescreen'],
+            ],
+        ];
+
+        $depthOneResult = Arr::mapWithKeys($depthOneData, function ($pokemon) {
             return [$pokemon['name'] => $pokemon['type']];
         });
+        $depthTwoResult = Arr::mapWithKeys($depthTwoData, function ($value, $key) {
+            return [Str::upper($key) => $value];
+        }, 2);
 
         $this->assertEquals(
-            ['Blastoise' => 'Water', 'Charmander' => 'Fire', 'Dragonair' => 'Dragon'],
-            $data
+            $expectedDepthOneData,
+            $depthOneResult
+        );
+        $this->assertEquals(
+            $expectedDepthTwoData,
+            $depthTwoResult
         );
     }
 

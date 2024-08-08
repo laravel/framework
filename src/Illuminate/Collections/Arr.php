@@ -622,9 +622,10 @@ class Arr
      *
      * @param  array<TKey, TValue>  $array
      * @param  callable(TValue, TKey): array<TMapWithKeysKey, TMapWithKeysValue>  $callback
+     * @param  int  $depth
      * @return array
      */
-    public static function mapWithKeys(array $array, callable $callback)
+    public static function mapWithKeys(array $array, callable $callback, $depth = 1)
     {
         $result = [];
 
@@ -632,6 +633,9 @@ class Arr
             $assoc = $callback($value, $key);
 
             foreach ($assoc as $mapKey => $mapValue) {
+                if (is_array($mapValue) && $depth > 1) {
+                    $mapValue = self::mapWithKeys($mapValue, $callback, $depth - 1);
+                }
                 $result[$mapKey] = $mapValue;
             }
         }
