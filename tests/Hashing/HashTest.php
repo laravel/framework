@@ -12,8 +12,8 @@ class HashTest extends TestCase
         $email = 'taylor@laravel.com';
         $timeStamp = Carbon::now();
 
-        $firstHash = sha1($email . $timeStamp);
-        $secondHash= sha1($email . $timeStamp);
+        $firstHash = sha1($email.$timeStamp);
+        $secondHash = sha1($email.$timeStamp);
 
         $this->assertTrue(hash_equals($firstHash, $secondHash));
     }
