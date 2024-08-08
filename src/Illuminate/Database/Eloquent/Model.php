@@ -49,7 +49,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * The table associated with the model.
      *
-     * @var string
+     * @var string|null
      */
     protected $table;
 
