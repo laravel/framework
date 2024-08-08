@@ -19,7 +19,7 @@ class EmailVerificationRequest extends FormRequest
             return false;
         }
 
-        if (! hash_equals(sha1($this->user()->getEmailForVerification()), (string) $this->route('hash'))) {
+        if (! hash_equals(sha1($this->user()->getEmailForVerification() . $this->user()->created_at), (string) $this->route('hash'))) {
             return false;
         }
 
