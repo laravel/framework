@@ -123,7 +123,7 @@ trait HasAttributes
     /**
      * The storage format of the model's date columns.
      *
-     * @var string
+     * @var string|null
      */
     protected $dateFormat;
 
