@@ -45,7 +45,7 @@ class MakesHttpRequestsTest extends TestCase
     {
         $this->withHeaders([
             'name' => 'Milwad',
-            'foo' => 'bar'
+            'foo' => 'bar',
         ])->from('previous/url');
 
         $this->assertEquals('Milwad', $this->defaultHeaders['name']);
