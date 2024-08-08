@@ -30,6 +30,17 @@ class MakesHttpRequestsTest extends TestCase
         $this->assertSame('http://localhost/previous/url', $this->app['session']->previousUrl());
     }
 
+    public function testFromRemoveHeader()
+    {
+        $this->withHeader('name', 'Milwad')->from('previous/url');
+
+        $this->assertEquals('Milwad', $this->defaultHeaders['name']);
+
+        $this->withoutHeader('name')->from('previous/url');
+
+        $this->assertArrayNotHasKey('name', $this->defaultHeaders);
+    }
+
     public function testWithTokenSetsAuthorizationHeader()
     {
         $this->withToken('foobar');
