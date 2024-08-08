@@ -10,6 +10,7 @@ use function Laravel\Prompts\confirm;
 use function Laravel\Prompts\multiselect;
 use function Laravel\Prompts\password;
 use function Laravel\Prompts\select;
+use function Laravel\Prompts\suggest;
 use function Laravel\Prompts\text;
 use function Laravel\Prompts\textarea;
 
@@ -57,6 +58,28 @@ class PromptsAssertionTest extends TestCase
             ->artisan('test:textarea')
             ->expectsQuestion('What is your name?', 'Jane')
             ->expectsOutput('Jane');
+    }
+
+    public function testAssertionForSuggestPrompt()
+    {
+        $this->app[Kernel::class]->registerCommand(
+            new class extends Command
+            {
+                protected $signature = 'test:suggest';
+
+                public function handle()
+                {
+                    $name = suggest('What is your name?', ['John', 'Jane']);
+
+                    $this->line($name);
+                }
+            }
+        );
+
+        $this
+            ->artisan('test:suggest')
+            ->expectsChoice('What is your name?', 'Joe', ['John', 'Jane'])
+            ->expectsOutput('Joe');
     }
 
     public function testAssertionForPasswordPrompt()
@@ -112,7 +135,7 @@ class PromptsAssertionTest extends TestCase
             ->expectsOutput('Your name is John.');
     }
 
-    public function testAssertionForSelectPrompt()
+    public function testAssertionForSelectPromptWithAList()
     {
         $this->app[Kernel::class]->registerCommand(
             new class extends Command
@@ -135,6 +158,56 @@ class PromptsAssertionTest extends TestCase
             ->artisan('test:select')
             ->expectsChoice('What is your name?', 'Jane', ['John', 'Jane'])
             ->expectsOutput('Your name is Jane.');
+    }
+
+    public function testAssertionForSelectPromptWithAnAssociativeArray()
+    {
+        $this->app[Kernel::class]->registerCommand(
+            new class extends Command
+            {
+                protected $signature = 'test:select';
+
+                public function handle()
+                {
+                    $name = select(
+                        label: 'What is your name?',
+                        options: ['john' => 'John', 'jane' => 'Jane']
+                    );
+
+                    $this->line("Your name is $name.");
+                }
+            }
+        );
+
+        $this
+            ->artisan('test:select')
+            ->expectsChoice('What is your name?', 'jane', ['john' => 'John', 'jane' => 'Jane'])
+            ->expectsOutput('Your name is jane.');
+    }
+
+    public function testAlternativeAssertionForSelectPromptWithAnAssociativeArray()
+    {
+        $this->app[Kernel::class]->registerCommand(
+            new class extends Command
+            {
+                protected $signature = 'test:select';
+
+                public function handle()
+                {
+                    $name = select(
+                        label: 'What is your name?',
+                        options: ['john' => 'John', 'jane' => 'Jane']
+                    );
+
+                    $this->line("Your name is $name.");
+                }
+            }
+        );
+
+        $this
+            ->artisan('test:select')
+            ->expectsChoice('What is your name?', 'jane', ['john', 'jane', 'John', 'Jane'])
+            ->expectsOutput('Your name is jane.');
     }
 
     public function testAssertionForRequiredMultiselectPrompt()

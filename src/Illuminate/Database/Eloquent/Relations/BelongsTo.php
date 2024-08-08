@@ -219,6 +219,18 @@ class BelongsTo extends Relation
         return $this->dissociate();
     }
 
+    /**
+     * Touch all of the related models for the relationship.
+     *
+     * @return void
+     */
+    public function touch()
+    {
+        if (! is_null($this->getParentKey())) {
+            parent::touch();
+        }
+    }
+
     /** @inheritDoc */
     public function getRelationExistenceQuery(Builder $query, Builder $parentQuery, $columns = ['*'])
     {
