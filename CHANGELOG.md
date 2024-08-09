@@ -1,6 +1,10 @@
 # Release Notes for 10.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v10.48.19...10.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v10.48.20...10.x)
+
+## [v10.48.20](https://github.com/laravel/framework/compare/v10.48.19...v10.48.20) - 2024-08-09
+
+* [10.x] fix: prevent casting empty string to array from triggering json error by [@calebdw](https://github.com/calebdw) in https://github.com/laravel/framework/pull/52415
 
 ## [v10.48.19](https://github.com/laravel/framework/compare/v10.48.18...v10.48.19) - 2024-08-06
 
