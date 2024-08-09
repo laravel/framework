@@ -10,6 +10,7 @@ use Illuminate\Database\PostgresConnection;
 use Illuminate\Database\QueryException;
 use Illuminate\Database\SqlServerConnection;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Str;
 
@@ -216,6 +217,35 @@ class DatabaseStore implements LockProvider, Store
         }
 
         return false;
+    }
+
+    /**
+     * Get the cache key's expiration time.
+     *
+     * @param  string  $key
+     * @param  bool  $format
+     * @return string|int|null
+     */
+    public function remaining($key, $format = true)
+    {
+        $prefixed = $this->prefix.$key;
+
+        $cache = $this->table()->where('key', '=', $prefixed)->first();
+
+        // If we have a cache record we will check the expiration time against current
+        // time on the system and see if the record has expired. If it has, we will
+        // remove the records from the database table so it isn't returned again.
+        if (is_null($cache)) {
+            return null;
+        }
+
+        $cache = is_array($cache) ? (object) $cache : $cache;
+
+        if ($format) {
+            return Carbon::createFromTimestamp($cache->expiration)->diffForHumans();
+        }
+
+        return (int) $cache->expiration;
     }
 
     /**
