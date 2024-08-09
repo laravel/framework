@@ -1332,6 +1332,8 @@ class Grammar extends BaseGrammar
      * @param  \Illuminate\Database\Query\Builder  $query
      * @param  array  $columns
      * @param  string  $sql
+     * @param  array  $uniqueBy
+     * @param  array  $update
      * @return string
      */
     public function compileUpsertUsing(Builder $query, array $columns, string $sql, array $uniqueBy, array $update)

@@ -983,6 +983,11 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertSame('foo', $builder->insertUsing(['bar'], 'baz'));
 
         $builder = $this->getBuilder();
+        $builder->getQuery()->shouldReceive('upsertUsing')->once()->with(['bar'], 'baz', 'foobar')->andReturn('foo');
+
+        $this->assertSame('foo', $builder->upsertUsing(['bar'], 'baz', 'foobar'));
+
+        $builder = $this->getBuilder();
         $builder->getQuery()->shouldReceive('raw')->once()->with('bar')->andReturn('foo');
 
         $this->assertSame('foo', $builder->raw('bar'));

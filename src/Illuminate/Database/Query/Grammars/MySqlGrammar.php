@@ -378,7 +378,8 @@ class MySqlGrammar extends Grammar
      * Compile an upsert statement using a subquery into SQL.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  array  $values
+     * @param  array  $columns
+     * @param  string  $sql
      * @param  array  $uniqueBy
      * @param  array  $update
      * @return string

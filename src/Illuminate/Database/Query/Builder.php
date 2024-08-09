@@ -3916,14 +3916,18 @@ class Builder implements BuilderContract
      *
      * @param  array  $columns
      * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|string  $query
+     * @param  array|string  $uniqueBy
+     * @param  array|null  $update
      * @return int
      */
     public function upsertUsing(array $columns, $query, $uniqueBy, $update = null)
     {
+        if ($update === []) {
+            return $this->insertUsing($columns, $query);
+        }
+
         if (is_null($update)) {
             $update = $columns;
-        } elseif (! is_array($update)) {
-            $update = [$update];
         }
 
         $this->applyBeforeQueryCallbacks();
