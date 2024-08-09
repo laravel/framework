@@ -51,6 +51,13 @@ class FulltextTest extends MySqlTestCase
         $this->assertSame('MySQL vs. YourSQL', $articles[1]->title);
     }
 
+    public function testWhereFulltextWithNonUtf8Input()
+    {
+        $articles = DB::table('articles')->whereFulltext(['title', 'body'], '😊😊')->get();
+
+        $this->assertCount(0, $articles);
+    }
+
     /** @link https://dev.mysql.com/doc/refman/8.0/en/fulltext-boolean.html */
     public function testWhereFulltextWithBooleanMode()
     {
