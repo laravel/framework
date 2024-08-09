@@ -666,9 +666,26 @@ class HttpClientTest extends TestCase
         $this->factory->assertSent(function (Request $request) {
             return $request->url() === 'http://foo.com/file' &&
                    Str::startsWith($request->header('Content-Type')[0], 'multipart') &&
-                   $request[0]['name'] === 'foo' &&
-                   $request->hasFile('foo', 'data', 'file.txt');
+                   $request[0]['name'] === 'foo';
         });
+    }
+
+    public function testHasFileCorrectlyIdentifiesFiles()
+    {
+        $this->factory->fake();
+
+        $tmpFilePath = tempnam(sys_get_temp_dir(), 'test');
+        file_put_contents($tmpFilePath, 'file data');
+        $fileResource = fopen($tmpFilePath, 'r');
+
+        $this->factory->attach('foo', $fileResource, 'file.txt')->post('http://foo.com/file', ['bar' => 'baz']);
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->hasFile('foo') && ! $request->hasFile('bar');
+        });
+
+        fclose($fileResource);
+        unlink($tmpFilePath);
     }
 
     public function testCanSendMultipartDataWithSimplifiedParameters()
