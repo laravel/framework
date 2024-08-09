@@ -248,11 +248,34 @@ class Sleep
     }
 
     /**
+     * Specify a callback that should be executed after sleeping.
+     *
+     * @param  callable  $then
+     * @return mixed
+     */
+    public function then(callable $then)
+    {
+        $this->goodnight();
+
+        return $then();
+    }
+
+    /**
      * Handle the object's destruction.
      *
      * @return void
      */
     public function __destruct()
+    {
+        $this->goodnight();
+    }
+
+    /**
+     * Handle the object's destruction.
+     *
+     * @return void
+     */
+    protected function goodnight()
     {
         if (! $this->shouldSleep) {
             return;
