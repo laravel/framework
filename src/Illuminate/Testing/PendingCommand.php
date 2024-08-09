@@ -136,6 +136,22 @@ class PendingCommand
     }
 
     /**
+     * Specify an expected search question with an expected search string, followed by an expected choice question with expected answers.
+     *
+     * @param  string  $question
+     * @param  string|array  $answer
+     * @param  string  $search
+     * @param  array  $answers
+     * @return $this
+     */
+    public function expectsSearch($question, $answer, $search, $answers)
+    {
+        return $this
+            ->expectsQuestion($question, $search)
+            ->expectsChoice($question, $answer, $answers);
+    }
+
+    /**
      * Specify output that should be printed when the command runs.
      *
      * @param  string|null  $output
