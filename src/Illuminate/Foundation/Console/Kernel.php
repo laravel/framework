@@ -7,6 +7,7 @@ use Closure;
 use DateTimeInterface;
 use Illuminate\Console\Application as Artisan;
 use Illuminate\Console\Command;
+use Illuminate\Console\Events\CommandErrored;
 use Illuminate\Console\Events\CommandFinished;
 use Illuminate\Console\Events\CommandStarting;
 use Illuminate\Console\Scheduling\Schedule;
@@ -24,6 +25,7 @@ use ReflectionClass;
 use SplFileInfo;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
+use Symfony\Component\Console\Event\ConsoleErrorEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Finder\Finder;
@@ -169,6 +171,12 @@ class Kernel implements KernelContract
             $this->symfonyDispatcher->addListener(ConsoleEvents::TERMINATE, function (ConsoleTerminateEvent $event) {
                 $this->events->dispatch(
                     new CommandFinished($event->getCommand()->getName(), $event->getInput(), $event->getOutput(), $event->getExitCode())
+                );
+            });
+
+            $this->symfonyDispatcher->addListener(ConsoleEvents::ERROR, function (ConsoleErrorEvent $event) {
+                $this->events->dispatch(
+                    new CommandErrored($event->getCommand()->getName(), $event->getInput(), $event->getOutput(), $event->getError())
                 );
             });
         }

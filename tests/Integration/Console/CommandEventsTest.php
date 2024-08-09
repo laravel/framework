@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Console;
 
+use Illuminate\Console\Events\CommandErrored;
 use Illuminate\Console\Events\CommandFinished;
 use Illuminate\Console\Events\CommandStarting;
 use Illuminate\Contracts\Console\Kernel as ConsoleKernel;
@@ -94,6 +95,25 @@ class CommandEventsTest extends TestCase
         }];
     }
 
+    public function testCommandErroredEvent()
+    {
+        $this->app[ConsoleKernel::class]->registerCommand(new CommandErroredEventTestCommand);
+        $this->app[Dispatcher::class]->listen(function (CommandErrored $event) {
+            array_map(fn ($e) => $this->files->append($this->logfile, $e.PHP_EOL), [
+                'CommandErrored',
+                $event->error->getMessage()
+            ]);
+        });
+
+        $this->expectException(\Error::class);
+        $this->expectExceptionMessage('Command errored test');
+        $this->artisan('command-errored-event-test-command');
+
+        $this->assertLogged(
+            'CommandErrored', 'Command errored test',
+        );
+    }
+
     public function testCommandEventsReceiveParsedInputFromBackground()
     {
         $laravel = Testbench::create(
@@ -156,5 +176,15 @@ class CommandEventsTestCommand extends \Illuminate\Console\Command
     public function handle()
     {
         // ...
+    }
+}
+
+class CommandErroredEventTestCommand extends \Illuminate\Console\Command
+{
+    protected $signature = 'command-errored-event-test-command';
+
+    public function handle()
+    {
+        throw new \Error('Command errored test');
     }
 }
