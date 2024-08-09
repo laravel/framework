@@ -27,11 +27,11 @@ class ServeFile
             $this->hasValidSignature($request),
             $this->isProduction ? 404 : 403
         );
-
         try {
             abort_unless(Storage::disk($this->disk)->exists($path), 404);
 
             $headers = [
+                'Cache-Control' => "no-store, no-cache, must-revalidate, max-age=0",
                 'Content-Security-Policy' => "default-src 'none'; style-src 'unsafe-inline'; sandbox",
             ];
 
