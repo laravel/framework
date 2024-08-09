@@ -3,6 +3,7 @@
 namespace Illuminate\Concurrency;
 
 use Closure;
+use Illuminate\Foundation\Defer\DeferredCallback;
 use Illuminate\Support\Arr;
 use Spatie\Fork\Fork;
 
@@ -17,10 +18,10 @@ class ForkDriver
     }
 
     /**
-     * Start the given tasks in the background.
+     * Start the given tasks in the background after the current task has finished.
      */
-    public function background(Closure|array $tasks): void
+    public function defer(Closure|array $tasks): DeferredCallback
     {
-        $this->run($tasks);
+        return defer(fn () => $this->run($tasks));
     }
 }

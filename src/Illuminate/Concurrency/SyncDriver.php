@@ -3,6 +3,7 @@
 namespace Illuminate\Concurrency;
 
 use Closure;
+use Illuminate\Foundation\Defer\DeferredCallback;
 use Illuminate\Support\Arr;
 
 class SyncDriver
@@ -18,10 +19,10 @@ class SyncDriver
     }
 
     /**
-     * Start the given tasks in the background.
+     * Start the given tasks in the background after the current task has finished.
      */
-    public function background(Closure|array $tasks): void
+    public function defer(Closure|array $tasks): DeferredCallback
     {
-        collect(Arr::wrap($tasks))->each(fn ($task) => $task());
+        return defer(fn () => collect(Arr::wrap($tasks))->each(fn ($task) => $task()));
     }
 }

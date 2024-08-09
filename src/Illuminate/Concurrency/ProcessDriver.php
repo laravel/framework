@@ -3,6 +3,7 @@
 namespace Illuminate\Concurrency;
 
 use Closure;
+use Illuminate\Foundation\Defer\DeferredCallback;
 use Illuminate\Process\Factory as ProcessFactory;
 use Illuminate\Process\Pool;
 use Illuminate\Support\Arr;
@@ -45,14 +46,16 @@ class ProcessDriver
     }
 
     /**
-     * Start the given tasks in the background.
+     * Start the given tasks in the background after the current task has finished.
      */
-    public function background(Closure|array $tasks): void
+    public function defer(Closure|array $tasks): DeferredCallback
     {
-        foreach (Arr::wrap($tasks) as $task) {
-            $this->processFactory->path(base_path())->env([
-                'LARAVEL_INVOKABLE_CLOSURE' => serialize(new SerializableClosure($task)),
-            ])->run('php artisan invoke-serialized-closure 2>&1 &');
-        }
+        return defer(function () use ($tasks) {
+            foreach (Arr::wrap($tasks) as $task) {
+                $this->processFactory->path(base_path())->env([
+                    'LARAVEL_INVOKABLE_CLOSURE' => serialize(new SerializableClosure($task)),
+                ])->run('php artisan invoke-serialized-closure 2>&1 &');
+            }
+        });
     }
 }
