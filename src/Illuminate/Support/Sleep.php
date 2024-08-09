@@ -62,6 +62,13 @@ class Sleep
     protected $shouldSleep = true;
 
     /**
+     * Indicates if the instance already slept via `then()`.
+     *
+     * @var bool
+     */
+    protected $alreadySlept = false;
+
+    /**
      * Create a new class instance.
      *
      * @param  int|float|\DateInterval  $duration
@@ -257,6 +264,8 @@ class Sleep
     {
         $this->goodnight();
 
+        $this->alreadySlept = true;
+
         return $then();
     }
 
@@ -277,7 +286,7 @@ class Sleep
      */
     protected function goodnight()
     {
-        if (! $this->shouldSleep) {
+        if ($this->alreadySlept || ! $this->shouldSleep) {
             return;
         }
 
