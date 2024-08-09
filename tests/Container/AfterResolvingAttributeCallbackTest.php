@@ -57,6 +57,21 @@ class AfterResolvingAttributeCallbackTest extends TestCase
         $this->assertInstanceOf(ContainerTestHasSelfConfiguringAttributeAndConstructor::class, $instance);
         $this->assertEquals('the-right-value', $instance->value);
     }
+
+    public function testCallbackIsCalledOnAppCall()
+    {
+        $container = new Container();
+
+        $container->afterResolvingAttribute(ContainerTestOnTenant::class, function (ContainerTestOnTenant $attribute, HasTenantImpl $hasTenantImpl, Container $container) {
+            $hasTenantImpl->onTenant($attribute->tenant);
+        });
+
+        $tenant = $container->call(function (#[ContainerTestOnTenant(Tenant::TenantA)] HasTenantImpl $property) {
+            return $property->tenant;
+        });
+
+        $this->assertEquals(Tenant::TenantA, $tenant);
+    }
 }
 
 #[Attribute(Attribute::TARGET_PARAMETER)]

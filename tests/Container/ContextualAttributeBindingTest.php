@@ -208,6 +208,33 @@ class ContextualAttributeBindingTest extends TestCase
 
         $container->make(StorageTest::class);
     }
+
+    public function testInjectionWithAttributeOnAppCall()
+    {
+        $container = new Container;
+
+        $person = $container->call(function (ContainerTestHasConfigValueWithResolvePropertyAndAfterCallback $hasAttribute) {
+            return $hasAttribute->person;
+        });
+
+        $this->assertEquals('Taylor', $person->name);
+    }
+
+    public function testAttributeOnAppCall()
+    {
+        $container = new Container;
+        $container->singleton('config', fn () => new Repository([
+            'app' => [
+                'timezone' => 'Europe/Paris',
+            ],
+        ]));
+
+        $value = $container->call(function (#[Config('app.timezone')] string $value) {
+            return $value;
+        });
+
+        $this->assertEquals('Europe/Paris', $value);
+    }
 }
 
 #[Attribute(Attribute::TARGET_PARAMETER)]
