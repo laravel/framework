@@ -118,6 +118,7 @@ class Builder implements BuilderContract
         'insertorignore',
         'insertusing',
         'insertorignoreusing',
+        'upsertusing',
         'max',
         'min',
         'raw',
