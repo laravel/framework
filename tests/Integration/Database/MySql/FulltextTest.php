@@ -53,7 +53,7 @@ class FulltextTest extends MySqlTestCase
 
     public function testWhereFulltextWithNonUtf8Input()
     {
-        $articles = DB::table('articles')->whereFulltext(['title', 'body'], '😊😊')->get();
+        $articles = DB::table('articles')->whereFulltext(['title', 'body'], '+😊*', ['mode' => 'boolean'])->get();
 
         $this->assertCount(0, $articles);
     }
