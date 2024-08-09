@@ -663,7 +663,7 @@ class Dispatcher implements DispatcherContract
         return tap($job, function ($job) use ($listener) {
             $data = array_values($job->data);
 
-            if ($listener instanceof ShouldQueueAfterCommit) {
+            if ($listener instanceof ShouldQueueAfterCommit || $listener instanceof ShouldHandleEventsAfterCommit) {
                 $job->afterCommit = true;
             } else {
                 $job->afterCommit = property_exists($listener, 'afterCommit') ? $listener->afterCommit : null;
