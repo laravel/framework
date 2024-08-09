@@ -19,12 +19,19 @@ class MorphMany extends MorphOneOrMany
      */
     public function one()
     {
-        return MorphOne::noConstraints(fn () => new MorphOne(
-            $this->getQuery(),
-            $this->getParent(),
-            $this->morphType,
-            $this->foreignKey,
-            $this->localKey
+        return MorphOne::noConstraints(fn () => tap(
+            new MorphOne(
+                $this->getQuery(),
+                $this->getParent(),
+                $this->morphType,
+                $this->foreignKey,
+                $this->localKey
+            ),
+            function ($morphOne) {
+                if ($inverse = $this->getInverseRelationship()) {
+                    $morphOne->inverse($inverse);
+                }
+            }
         ));
     }
 
