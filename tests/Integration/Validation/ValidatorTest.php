@@ -87,6 +87,22 @@ class ValidatorTest extends DatabaseTestCase
         $this->assertSame('name at line 1 must be a string!', $validator->getMessageBag()->all()[0]);
     }
 
+    public function testCustomValidationIsAppendedToMessages()
+    {
+        $validator = $this->getValidator(
+            ['foo' => true],
+            ['foo' => function (string $attribute, mixed $value, \Closure $fail) {
+                    $fail("{$attribute} must be false");
+                }
+            ]
+        );
+
+        $this->assertFalse($validator->passes());
+        $this->assertEquals($validator->errors()->messages(), [
+            'foo' => ['foo must be false']
+        ]);
+    }
+
     protected function getValidator(array $data, array $rules)
     {
         $translator = new Translator(new ArrayLoader, 'en');
