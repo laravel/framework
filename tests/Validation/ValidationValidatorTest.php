@@ -994,7 +994,7 @@ class ValidationValidatorTest extends TestCase
         $validator = new Validator($trans,
             ['foo' => true],
             ['foo' => function (string $attribute, mixed $value, \Closure $fail) {
-                $fail(":attribute must be false");
+                $fail(':attribute must be false');
             },
             ], ['foo' => ['required' => 'Foo is required']]);
 
