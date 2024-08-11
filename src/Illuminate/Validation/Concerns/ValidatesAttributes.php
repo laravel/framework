@@ -2370,7 +2370,7 @@ trait ValidatesAttributes
         return $value === $other;
     }
 
-     /**
+    /**
      * Validate that the size of two attributes match.
      *
      * @param  string  $attribute
