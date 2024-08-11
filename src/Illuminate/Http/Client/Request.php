@@ -150,7 +150,7 @@ class Request implements ArrayAccess
             return $file['name'] != $name ||
                 ($value && $file['contents'] != $value) ||
                 ($filename && $file['filename'] != $filename) ||
-                ! is_resource($file['contents']) && json_encode($file['contents']) !== false;
+                (! is_resource($file['contents']) && json_encode($file['contents']) !== false);
         })->count() > 0;
     }
 
