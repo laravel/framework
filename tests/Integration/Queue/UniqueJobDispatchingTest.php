@@ -2,24 +2,32 @@
 
 namespace Illuminate\Tests\Integration\Queue;
 
-use Illuminate\Contracts\Queue\ShouldBeUnique;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Exceptions\JobDispatchedException;
-use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Queue;
+use Orchestra\Testbench\Attributes\WithMigration;
 
+#[WithMigration]
+#[WithMigration('cache')]
+#[WithMigration('queue')]
 class UniqueJobDispatchingTest extends QueueTestCase
 {
+    protected function defineEnvironment($app)
+    {
+        parent::defineEnvironment($app);
+
+        $app['config']->set('cache.default', 'database');
+    }
+
     public function testSubsequentUniqueJobDispatchAreIgnored()
     {
         $this->markTestSkippedWhenUsingSyncQueueDriver();
 
         Queue::fake();
 
-        ThrowableUniqueJob::dispatch();
-        ThrowableUniqueJob::dispatch();
+        Fixtures\UniqueJob::dispatch();
+        Fixtures\UniqueJob::dispatch();
 
-        Queue::assertPushed(ThrowableUniqueJob::class);
+        Queue::assertPushed(Fixtures\UniqueJob::class);
     }
 
     public function testSubsequentUniqueJobDispatchCanThrow()
@@ -29,10 +37,10 @@ class UniqueJobDispatchingTest extends QueueTestCase
         Queue::fake();
         $this->expectException(JobDispatchedException::class);
 
-        ThrowableUniqueJob::dispatch()->throw();
-        ThrowableUniqueJob::dispatch()->throw();
+        Fixtures\UniqueJob::dispatch()->throw();
+        Fixtures\UniqueJob::dispatch()->throw();
 
-        Queue::assertPushed(ThrowableUniqueJob::class);
+        Queue::assertPushed(Fixtures\UniqueJob::class);
     }
 
     public function testSubsequentUniqueJobDispatchCanThrowWithCallback()
@@ -43,15 +51,10 @@ class UniqueJobDispatchingTest extends QueueTestCase
         $this->expectException(JobDispatchedException::class);
         $value = 0;
 
-        ThrowableUniqueJob::dispatch()->throw(fn () => $value = 1);
-        ThrowableUniqueJob::dispatch()->throw(fn () => $value = 2);
+        Fixtures\UniqueJob::dispatch()->throw(fn () => $value = 1);
+        Fixtures\UniqueJob::dispatch()->throw(fn () => $value = 2);
 
-        Queue::assertPushed(ThrowableUniqueJob::class);
+        Queue::assertPushed(Fixtures\UniqueJob::class);
         $this->assertEquals(2, $value);
     }
-}
-
-class ThrowableUniqueJob implements ShouldQueue, ShouldBeUnique
-{
-    use Queueable;
 }
