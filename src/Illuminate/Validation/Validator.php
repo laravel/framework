@@ -875,10 +875,12 @@ class Validator implements ValidatorContract
 
             $messages = $messages ? (array) $messages : [$ruleClass];
 
-            if ($rule instanceof ClosureValidationRule) {
-                $this->messages->add($attribute, head($rule->message()));
-            } else {
-                $this->messages->add($attribute, $rule->message());
+            foreach ($messages as $key => $message) {
+                $key = is_string($key) ? $key : $attribute;
+
+                $this->messages->add($key, $this->makeReplacements(
+                    $message, $key, $ruleClass, []
+                ));
             }
         }
     }
