@@ -2129,6 +2129,37 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
+    public function testValidateSameSize()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => 'bar', 'baz' => 'boom'], ['foo' => 'same_size:baz']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'bar'], ['foo' => 'same_size:baz']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'bar', 'baz' => 'bar'], ['foo' => 'same_size:baz']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '1e2', 'baz' => '100'], ['foo' => 'same_size:baz']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => null, 'baz' => null], ['foo' => 'same_size:baz']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 1, 'baz' => 2], ['foo' => 'same_size:baz']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 1, 'baz' => 2], ['foo' => 'same_size:baz', 'baz' => 'numeric']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => [1], 'baz' => [2]], ['foo' => 'same_size:baz']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => [1], 'baz' => [2, 3]], ['foo' => 'same_size:baz']);
+        $this->assertFalse($v->passes());
+    }
+
     public function testValidateDifferent()
     {
         $trans = $this->getIlluminateArrayTranslator();

@@ -2370,6 +2370,23 @@ trait ValidatesAttributes
         return $value === $other;
     }
 
+     /**
+     * Validate that the size of two attributes match.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|string>  $parameters
+     * @return bool
+     */
+    public function validateSameSize($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(1, $parameters, 'same_size');
+
+        $other = Arr::get($this->data, $parameters[0]);
+
+        return BigNumber::of($this->getSize($attribute, $value))->isEqualTo($this->getSize($parameters[0], $other));
+    }
+
     /**
      * Validate the size of an attribute.
      *

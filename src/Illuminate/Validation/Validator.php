@@ -272,6 +272,7 @@ class Validator implements ValidatorContract
         'MissingWith',
         'MissingWithAll',
         'Same',
+        'SameSize',
         'Unique',
     ];
 

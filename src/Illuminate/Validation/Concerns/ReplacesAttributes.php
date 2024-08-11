@@ -716,6 +716,20 @@ trait ReplacesAttributes
     }
 
     /**
+     * Replace all place-holders for the same size rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array<int,string>  $parameters
+     * @return string
+     */
+    protected function replaceSameSize($message, $attribute, $rule, $parameters)
+    {
+        return str_replace(':other', $this->getDisplayableAttribute($parameters[0]), $message);
+    }
+
+    /**
      * Replace all place-holders for the before rule.
      *
      * @param  string  $message
