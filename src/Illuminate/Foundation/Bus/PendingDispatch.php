@@ -208,7 +208,7 @@ class PendingDispatch
     public function __destruct()
     {
         if (! $this->shouldDispatch()) {
-            if (is_null($this->throwCallback)) {
+            if (! is_callable($this->throwCallback)) {
                 return;
             }
 
