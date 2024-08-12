@@ -33,6 +33,13 @@ class Response implements ArrayAccess, Stringable
     protected $decoded;
 
     /**
+     * Determine the output verbosity state.
+     *
+     * @var bool
+     */
+    protected $withVerboseException = false;
+
+    /**
      * The request cookies.
      *
      * @var \GuzzleHttp\Cookie\CookieJar
@@ -286,7 +293,7 @@ class Response implements ArrayAccess, Stringable
     public function toException()
     {
         if ($this->failed()) {
-            return new RequestException($this);
+            return new RequestException($this, $this->withVerboseException);
         }
     }
 
@@ -310,6 +317,18 @@ class Response implements ArrayAccess, Stringable
         }
 
         return $this;
+    }
+
+    /**
+     * Enable verbose exception messages.
+     *
+     * @return $this
+     */
+    public function withVerboseException()
+    {
+        return tap($this, function () {
+            $this->withVerboseException = true;
+        });
     }
 
     /**
@@ -453,7 +472,7 @@ class Response implements ArrayAccess, Stringable
     public function __call($method, $parameters)
     {
         return static::hasMacro($method)
-                    ? $this->macroCall($method, $parameters)
-                    : $this->response->{$method}(...$parameters);
+            ? $this->macroCall($method, $parameters)
+            : $this->response->{$method}(...$parameters);
     }
 }

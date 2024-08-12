@@ -1162,6 +1162,22 @@ class HttpClientTest extends TestCase
         $this->assertInstanceOf(RequestException::class, $resp->toException());
     }
 
+    public function testExceptionMessageOnFailure()
+    {
+        $this->expectException(RequestException::class);
+        $this->expectExceptionMessage('{"error":{"code":403,"message":"The Request can not be completed because quota limit was exceeded. Please, check our support team to increase your limit');
+
+        $error = [
+            'error' => [
+                'code' => 403,
+                'message' => 'The Request can not be completed because quota limit was exceeded. Please, check our support team to increase your limit',
+            ],
+        ];
+        $response = new Psr7Response(403, [], json_encode($error));
+
+        throw new RequestException(new Response($response), true);
+    }
+
     public function testRequestExceptionSummary()
     {
         $this->expectException(RequestException::class);

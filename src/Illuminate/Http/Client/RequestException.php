@@ -14,16 +14,26 @@ class RequestException extends HttpClientException
     public $response;
 
     /**
+     * Determine if the exception message should be verbose.
+     *
+     * @var bool
+     */
+    protected bool $isVerbose = false;
+
+    /**
      * Create a new exception instance.
      *
      * @param  \Illuminate\Http\Client\Response  $response
+     * @param  bool  $isVerbose
      * @return void
      */
-    public function __construct(Response $response)
+    public function __construct(Response $response, $isVerbose = false)
     {
-        parent::__construct($this->prepareMessage($response), $response->status());
-
         $this->response = $response;
+
+        $this->isVerbose = $isVerbose;
+
+        parent::__construct($this->prepareMessage($response), $response->status());
     }
 
     /**
@@ -36,8 +46,12 @@ class RequestException extends HttpClientException
     {
         $message = "HTTP request returned status code {$response->status()}";
 
-        $summary = Message::bodySummary($response->toPsrResponse());
+        if (! $this->isVerbose) {
+            $psrResponse = Message::bodySummary($response->toPsrResponse());
+        } else {
+            $psrResponse = $response->toPsrResponse()->getBody()->getContents();
+        }
 
-        return is_null($summary) ? $message : $message .= ":\n{$summary}\n";
+        return is_null($psrResponse) ? $message : $message .= ":\n{$psrResponse}\n";
     }
 }
