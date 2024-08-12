@@ -193,7 +193,7 @@ class PendingDispatch
      */
     public function throw(?callable $callback = null)
     {
-        $this->throwCallback = $callback ?: fn () => null;
+        $this->throwCallback = $callback;
 
         return $this;
     }
@@ -208,7 +208,7 @@ class PendingDispatch
     public function __destruct()
     {
         if (! $this->shouldDispatch()) {
-            if (! $this->throwCallback) {
+            if (is_null($this->throwCallback)) {
                 return;
             }
 

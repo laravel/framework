@@ -30,6 +30,19 @@ class UniqueJobDispatchingTest extends QueueTestCase
         Queue::assertPushed(Fixtures\UniqueJob::class);
     }
 
+    public function testSubsequentUniqueJobDispatchCanThrow()
+    {
+        $this->markTestSkippedWhenUsingSyncQueueDriver();
+
+        Queue::fake();
+        $this->expectException(JobDispatchedException::class);
+
+        Fixtures\UniqueJob::dispatch()->throw();
+        Fixtures\UniqueJob::dispatch()->throw();
+
+        Queue::assertPushed(Fixtures\UniqueJob::class);
+    }
+
     public function testSubsequentUniqueJobDispatchCanThrowWithCallback()
     {
         $this->markTestSkippedWhenUsingSyncQueueDriver();
