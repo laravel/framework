@@ -1,0 +1,74 @@
+<?php
+
+namespace Illuminate\Database\Eloquent\Concerns;
+
+use Illuminate\Support\Arr;
+use Illuminate\Support\Onceable;
+
+trait PreventsCircularRecursion
+{
+    /**
+     * The cache of objects processed to prevent infinite recursion.
+     *
+     * @var \WeakMap<static, array<string, mixed>>
+     */
+    protected static $recursionCache;
+
+    /**
+     * Get the current recursion cache being used by the model.
+     *
+     * @return \WeakMap
+     */
+    protected static function getRecursionCache()
+    {
+        return static::$recursionCache ??= new \WeakMap();
+    }
+
+    /**
+     * Get the current stack of methods being called recursively.
+     *
+     * @param  object  $object
+     * @return array
+     */
+    protected static function getRecursiveCallStack($object): array
+    {
+        return static::getRecursionCache()->offsetExists($object)
+            ? static::getRecursionCache()->offsetGet($object)
+            : [];
+    }
+
+    /**
+     * Prevent a method from being called multiple times on the same object within the same call stack.
+     *
+     * @param  callable  $callback
+     * @param  mixed  $default
+     * @return mixed
+     */
+    protected function once($callback, $default = null)
+    {
+        $trace = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 2);
+
+        $onceable = Onceable::tryFromTrace($trace, $callback);
+
+        $object = $onceable->object ?? $this;
+        $stack = static::getRecursiveCallStack($object);
+
+        if (isset($stack[$onceable->hash])) {
+            return $stack[$onceable->hash];
+        }
+
+        try {
+            // Set the default first to prevent recursion
+            $stack[$onceable->hash] = $default;
+            static::getRecursionCache()->offsetSet($object, $stack);
+
+            return call_user_func($onceable->callable);
+        } finally {
+            if ($stack = Arr::except($this->getRecursiveCallStack($object), $onceable->hash)) {
+                static::getRecursionCache()->offsetSet($object, $stack);
+            } elseif (static::getRecursionCache()->offsetExists($object)) {
+                static::getRecursionCache()->offsetUnset($object);
+            }
+        }
+    }
+}
