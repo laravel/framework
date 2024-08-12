@@ -1173,6 +1173,16 @@ class SupportHelpersTest extends TestCase
         $this->assertSame('some-value', Env::getOrFail('required-exists'));
     }
 
+    public function testEnvOrFail()
+    {
+        $_SERVER['foo'] = 'bar';
+        $this->assertSame('bar', envOrFail('foo'));
+        $this->assertSame('bar', Env::getOrFail('foo'));
+        $this->expectException(RuntimeException::class);
+        envOrFail('baz');
+        Env::getOrFail('baz');
+    }
+
     public function testLiteral(): void
     {
         $this->assertEquals(1, literal(1));
