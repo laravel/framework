@@ -150,6 +150,20 @@ if (! function_exists('env')) {
     }
 }
 
+if (! function_exists('envOrFail')) {
+    /**
+     * Gets the value of an environment variable
+     * or fails if it does not exist
+     *
+     * @param  string  $key
+     * @return mixed
+     */
+    function envOrFail($key)
+    {
+        return Env::getOrFail($key);
+    }
+}
+
 if (! function_exists('filled')) {
     /**
      * Determine if a value is "filled".
