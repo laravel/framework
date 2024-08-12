@@ -505,12 +505,12 @@ trait QueriesRelationships
                 $model = array_search($model, $morphMap, true);
             }
 
-            return $this->whereNot($relation->qualifyColumn($relation->getMorphType()), '<=>', $model, $boolean);
+            return $this->whereNot($relation->qualifyColumn($relation->getMorphType()), $model, $boolean);
         }
 
         return $this->whereNot(function ($query) use ($relation, $model) {
-            $query->where($relation->qualifyColumn($relation->getMorphType()), '<=>', $model->getMorphClass())
-                ->where($relation->qualifyColumn($relation->getForeignKeyName()), '<=>', $model->getKey());
+            $query->where($relation->qualifyColumn($relation->getMorphType()), $model->getMorphClass())
+                ->where($relation->qualifyColumn($relation->getForeignKeyName()), $model->getKey());
         }, null, null, $boolean);
     }
 
