@@ -153,7 +153,7 @@ if (! function_exists('env')) {
 if (! function_exists('envOrFail')) {
     /**
      * Gets the value of an environment variable
-     * or fails if it does not exist
+     * or fails if it does not exist.
      *
      * @param  string  $key
      * @return mixed
