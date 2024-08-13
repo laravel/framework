@@ -1337,10 +1337,13 @@ class SupportArrTest extends TestCase
     {
         $string = 'a';
         $array = ['a'];
+        $assocArray = ['a' => 'b'];
         $object = new stdClass;
         $object->value = 'a';
         $this->assertEquals(['a'], Arr::wrap($string));
         $this->assertEquals($array, Arr::wrap($array));
+        $this->assertEquals($assocArray, Arr::wrap($assocArray));
+        $this->assertEquals([$assocArray], Arr::wrap($assocArray, true));
         $this->assertEquals([$object], Arr::wrap($object));
         $this->assertEquals([], Arr::wrap(null));
         $this->assertEquals([null], Arr::wrap([null]));

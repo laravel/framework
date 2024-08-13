@@ -941,14 +941,19 @@ class Arr
      * If the given value is not an array and not null, wrap it in one.
      *
      * @param  mixed  $value
+     * @param  bool  $wrapIfAssoc
      * @return array
      */
-    public static function wrap($value)
+    public static function wrap($value, $wrapIfAssoc = false)
     {
         if (is_null($value)) {
             return [];
         }
 
-        return is_array($value) ? $value : [$value];
+        if (is_array($value)) {
+            return array_is_list($value) ? $value : ($wrapIfAssoc ? [$value] : $value);
+        }
+
+        return [$value];
     }
 }
