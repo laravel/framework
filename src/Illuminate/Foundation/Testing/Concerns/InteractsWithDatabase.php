@@ -24,7 +24,7 @@ trait InteractsWithDatabase
      * @param  string|null  $connection
      * @return $this
      */
-    protected function assertDatabaseHas($table, array $data, $connection = null)
+    protected function assertDatabaseHas($table, array $data = [], $connection = null)
     {
         if ($table instanceof Model) {
             $data = [
@@ -48,7 +48,7 @@ trait InteractsWithDatabase
      * @param  string|null  $connection
      * @return $this
      */
-    protected function assertDatabaseMissing($table, array $data, $connection = null)
+    protected function assertDatabaseMissing($table, array $data = [], $connection = null)
     {
         if ($table instanceof Model) {
             $data = [
@@ -171,11 +171,7 @@ trait InteractsWithDatabase
      */
     protected function assertModelExists($model)
     {
-        return $this->assertDatabaseHas(
-            $model->getTable(),
-            [$model->getKeyName() => $model->getKey()],
-            $model->getConnectionName()
-        );
+        return $this->assertDatabaseHas($model);
     }
 
     /**
@@ -186,11 +182,7 @@ trait InteractsWithDatabase
      */
     protected function assertModelMissing($model)
     {
-        return $this->assertDatabaseMissing(
-            $model->getTable(),
-            [$model->getKeyName() => $model->getKey()],
-            $model->getConnectionName()
-        );
+        return $this->assertDatabaseMissing($model);
     }
 
     /**
