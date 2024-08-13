@@ -130,6 +130,26 @@ class ScheduleListCommandTest extends TestCase
             ->expectsOutput('  * * * * * 30s  php artisan inspire ........... Next Due: 30 seconds from now');
     }
 
+    public function testDisplayScheduleCurrentEnvironment()
+    {
+        $this->schedule->command('inspire')->environments(['testing'])->weekly();
+        $this->schedule->command('inspire')->environments(['staging'])->weekly();
+        $this->artisan(ScheduleListCommand::class)
+            ->assertSuccessful()
+            ->expectsOutput('  0 0 * * 0  php artisan inspire ................... Next Due: 1 week from now');
+    }
+
+    public function testDisplayScheduleAllEnvironments()
+    {
+        $this->schedule->command('inspire')->environments(['testing'])->weekly();
+        $this->schedule->command('inspire')->environments(['staging'])->weekly();
+
+        $this->artisan(ScheduleListCommand::class, ['--all' => true])
+            ->assertSuccessful()
+            ->expectsOutput('  0 0 * * 0  php artisan inspire ................... Next Due: 1 week from now')
+            ->expectsOutput('  0 0 * * 0  php artisan inspire ................... Next Due: 1 week from now');
+    }
+
     public function testClosureCommandsMayBeScheduled()
     {
         $closure = function () {

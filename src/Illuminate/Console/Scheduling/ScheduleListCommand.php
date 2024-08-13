@@ -8,6 +8,7 @@ use DateTimeZone;
 use Illuminate\Console\Application;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\App;
 use ReflectionClass;
 use ReflectionFunction;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -24,6 +25,7 @@ class ScheduleListCommand extends Command
     protected $signature = 'schedule:list
         {--timezone= : The timezone that times should be displayed in}
         {--next : Sort the listed tasks by their next due date}
+        {--all : Show all the listed tasks}
     ';
 
     /**
@@ -51,6 +53,10 @@ class ScheduleListCommand extends Command
     public function handle(Schedule $schedule)
     {
         $events = collect($schedule->events());
+
+        if (! $this->option('all')) {
+            $events = $events->filter(fn(Event $event) => $event->runsInEnvironment(App::environment()));
+        }
 
         if ($events->isEmpty()) {
             $this->components->info('No scheduled tasks have been defined.');
