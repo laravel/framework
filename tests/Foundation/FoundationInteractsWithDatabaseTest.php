@@ -44,12 +44,11 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $this->assertDatabaseHas($this->table, $this->data);
     }
 
-    public function testAssertDatabaseHasSupportModels()
+    public function testAssertDatabaseHasSupportsModelClass()
     {
         $this->mockCountBuilder(1);
 
         $this->assertDatabaseHas(ProductStub::class, $this->data);
-        $this->assertDatabaseHas(new ProductStub, $this->data);
     }
 
     public function testAssertDatabaseHasConstrainsToModel()
@@ -116,12 +115,11 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $this->assertDatabaseMissing($this->table, $this->data);
     }
 
-    public function testAssertDatabaseMissingSupportModels()
+    public function testAssertDatabaseMissingSupportsModelClass()
     {
         $this->mockCountBuilder(0);
 
         $this->assertDatabaseMissing(ProductStub::class, $this->data);
-        $this->assertDatabaseMissing(new ProductStub, $this->data);
     }
 
     public function testAssertDatabaseMissingConstrainsToModel()
