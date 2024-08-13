@@ -3,7 +3,6 @@
 namespace Illuminate\Http\Client;
 
 use ArrayAccess;
-use Closure;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\Macroable;
 use LogicException;
@@ -278,12 +277,12 @@ class Response implements ArrayAccess, Stringable
     /**
      * Throw an exception if a server or client error occurred.
      *
-     * @param  \Closure|null  $callback
+     * @param  callable|null  $callback
      * @return $this
      *
      * @throws \Illuminate\Http\Client\RequestException
      */
-    public function throw(?Closure $callback = null)
+    public function throw(?callable $callback = null)
     {
         if ($this->failed()) {
             throw tap($this->toException(), function ($exception) use ($callback) {
