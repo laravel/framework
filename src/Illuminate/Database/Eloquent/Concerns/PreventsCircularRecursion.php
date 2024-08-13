@@ -44,7 +44,7 @@ trait PreventsCircularRecursion
      * @param  mixed  $default
      * @return mixed
      */
-    protected function once($callback, $default = null)
+    protected function withoutRecursion($callback, $default = null)
     {
         $trace = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 2);
 
@@ -53,13 +53,12 @@ trait PreventsCircularRecursion
         $object = $onceable->object ?? $this;
         $stack = static::getRecursiveCallStack($object);
 
-        if (isset($stack[$onceable->hash])) {
+        if (array_key_exists($onceable->hash, $stack)) {
             return $stack[$onceable->hash];
         }
 
         try {
-            // Set the default first to prevent recursion
-            $stack[$onceable->hash] = $default;
+            $stack[$onceable->hash] = is_callable($default) ? call_user_func($default) : $default;
             static::getRecursionCache()->offsetSet($object, $stack);
 
             return call_user_func($onceable->callable);

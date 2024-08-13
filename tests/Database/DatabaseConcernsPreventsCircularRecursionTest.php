@@ -137,7 +137,7 @@ class PreventsCircularRecursionWithRecursiveMethod
 
     public function callStack(): int
     {
-        return $this->once(
+        return $this->withoutRecursion(
             function () {
                 static::$globalStack++;
                 $this->instanceStack++;
@@ -150,7 +150,7 @@ class PreventsCircularRecursionWithRecursiveMethod
 
     public function callOtherStack(): int
     {
-        return $this->once(
+        return $this->withoutRecursion(
             function () {
                 $this->other->callStack();
 
