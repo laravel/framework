@@ -56,6 +56,7 @@ class ResourceRegistrar
     protected static $verbs = [
         'create' => 'create',
         'edit' => 'edit',
+        'restore' => 'restore',
     ];
 
     /**
@@ -152,6 +153,10 @@ class ResourceRegistrar
             $defaults = array_merge($defaults, ['create', 'store', 'destroy']);
         } elseif (isset($options['destroyable'])) {
             $defaults = array_merge($defaults, ['destroy']);
+        }
+
+        if (isset($options['restorable'])) {
+            $defaults = array_merge($defaults, ['restore']);
         }
 
         $collection = new RouteCollection;
@@ -509,6 +514,25 @@ class ResourceRegistrar
         $action = $this->getResourceAction($name, $controller, 'destroy', $options);
 
         return $this->router->delete($uri, $action);
+    }
+
+    /**
+     * Add the restore method for a singleton route.
+     *
+     * @param  string  $name
+     * @param  string  $controller
+     * @param  array  $options
+     * @return \Illuminate\Routing\Route
+     */
+    protected function addSingletonRestore($name, $controller, $options)
+    {
+        $name = $this->getShallowName($name, $options);
+
+        $uri = $this->getResourceUri($name).'/'.static::$verbs['restore'];
+
+        $action = $this->getResourceAction($name, $controller, 'restore', $options);
+
+        return $this->router->post($uri, $action);
     }
 
     /**

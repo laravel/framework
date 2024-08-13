@@ -25,4 +25,9 @@ class SingletonTestController extends Controller
     {
         return 'singleton destroy';
     }
+
+    public function restore()
+    {
+        return 'singleton restore';
+    }
 }

@@ -112,6 +112,18 @@ class PendingSingletonResourceRegistration
     }
 
     /**
+     * Indicate that the resource should have a restoration route.
+     *
+     * @return $this
+     */
+    public function restorable()
+    {
+        $this->options['restorable'] = true;
+
+        return $this;
+    }
+
+    /**
      * Set the route names for controller actions.
      *
      * @param  array|string  $names

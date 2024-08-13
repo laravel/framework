@@ -217,6 +217,75 @@ class RouteSingletonTest extends TestCase
         $this->assertEquals(405, $response->getStatusCode());
     }
 
+    public function testRestorableSingleton()
+    {
+        Route::singleton('avatar', SingletonTestController::class)->restorable();
+
+        $this->assertSame('http://localhost/avatar/restore', route('avatar.restore'));
+
+        $this->get('/avatar')->assertOk()->assertSee('singleton show');
+        $this->get('/avatar/edit')->assertOk()->assertSee('singleton edit');
+        $this->put('/avatar')->assertOk()->assertSee('singleton update');
+        $this->delete('/avatar')->assertMethodNotAllowed();
+        $this->post('/avatar/restore')->assertOk()->assertSee('singleton restore');
+    }
+
+    public function testRestorableWithDestroyableSingleton()
+    {
+        Route::singleton('avatar', SingletonTestController::class)->destroyable()->restorable();
+
+        $this->assertSame('http://localhost/avatar/restore', route('avatar.restore'));
+
+        $this->get('/avatar')->assertOk()->assertSee('singleton show');
+        $this->get('/avatar/edit')->assertOk()->assertSee('singleton edit');
+        $this->put('/avatar')->assertOk()->assertSee('singleton update');
+        $this->delete('/avatar')->assertOk()->assertSee('singleton destroy');
+        $this->post('/avatar/restore')->assertOk()->assertSee('singleton restore');
+    }
+
+    public function testRestorableExceptSingleton()
+    {
+        Route::singleton('avatar', SingletonTestController::class)->restorable()->except(['restore']);
+
+        $this->get('/avatar')->assertOk()->assertSee('singleton show');
+        $this->get('/avatar/edit')->assertOk()->assertSee('singleton edit');
+        $this->put('/avatar')->assertOk()->assertSee('singleton update');
+        $this->post('/avatar/restore')->assertNotFound();
+    }
+
+    public function testRestorableOnlySingleton()
+    {
+        Route::singleton('avatar', SingletonTestController::class)->restorable()->only(['restore']);
+
+        $this->get('/avatar')->assertNotFound();
+        $this->get('/avatar/edit')->assertNotFound();
+        $this->put('/avatar')->assertNotFound();
+        $this->post('/avatar/restore')->assertOk()->assertSee('singleton restore');
+    }
+
+    public function testRestorableDestroyableExceptOnly()
+    {
+        Route::singleton('avatar', SingletonTestController::class)->destroyable()->restorable()->only(['show'])->except(['restore']);
+
+        $this->get('/avatar')->assertOk()->assertSee('singleton show');
+        $this->get('/avatar/edit')->assertNotFound();
+        $this->put('/avatar')->assertMethodNotAllowed();
+        $this->post('/avatar/restore')->assertNotFound();
+    }
+
+    public function testRestorableWithCustomVerb()
+    {
+        Route::resourceVerbs(['restore' => 'recover']);
+        Route::singleton('avatar', SingletonTestController::class)->restorable();
+
+        $this->assertSame('http://localhost/avatar/recover', route('avatar.restore'));
+
+        $this->get('/avatar')->assertOk()->assertSee('singleton show');
+        $this->get('/avatar/edit')->assertOk()->assertSee('singleton edit');
+        $this->put('/avatar')->assertOk()->assertSee('singleton update');
+        $this->post('/avatar/recover')->assertOk()->assertSee('singleton restore');
+    }
+
     public function testApiSingleton()
     {
         Route::apiSingleton('avatar', SingletonTestController::class);
