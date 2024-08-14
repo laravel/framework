@@ -5,6 +5,7 @@ namespace Illuminate\Bus;
 use Closure;
 use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use PHPUnit\Framework\Assert as PHPUnit;
 use RuntimeException;
 
@@ -212,7 +213,9 @@ trait Queueable
      */
     public function prependToChain($job)
     {
-        $this->chained = Arr::prepend($this->chained, $this->serializeJob($job));
+        $jobs = ChainedBatch::prepareNestedBatches(collect([$job]));
+
+        $this->chained = Arr::prepend($this->chained, $this->serializeJob($jobs->first()));
 
         return $this;
     }
@@ -225,7 +228,8 @@ trait Queueable
      */
     public function appendToChain($job)
     {
-        $this->chained = array_merge($this->chained, [$this->serializeJob($job)]);
+        $jobs = ChainedBatch::prepareNestedBatches(collect([$job]));
+        $this->chained = array_merge($this->chained, [$this->serializeJob($jobs->first())]);
 
         return $this;
     }
