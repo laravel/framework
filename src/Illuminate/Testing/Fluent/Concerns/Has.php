@@ -41,7 +41,7 @@ trait Has
     }
 
     /**
-     * Asserts that the value is between 2 specified values
+     * Asserts that the value is between 2 specified values.
      *
      * @param  int|string  $lowestValue
      * @param  int|string  $highestValue
