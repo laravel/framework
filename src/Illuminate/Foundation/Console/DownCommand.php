@@ -9,7 +9,13 @@ use Illuminate\Foundation\Events\MaintenanceModeEnabled;
 use Illuminate\Foundation\Exceptions\RegisterErrorViewPaths;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 use Throwable;
+
+use function Laravel\Prompts\select;
+use function Laravel\Prompts\confirm;
+use function Laravel\Prompts\text;
 
 #[AsCommand(name: 'down')]
 class DownCommand extends Command
@@ -46,6 +52,9 @@ class DownCommand extends Command
                 $this->components->info('Application is already down.');
 
                 return 0;
+            }
+            if (!$this->didReceiveOptions($this->input)) {
+                $this->afterPromptingForMissingArguments($this->input, $this->output);
             }
 
             $downFilePayload = $this->getDownFilePayload();
@@ -158,5 +167,30 @@ class DownCommand extends Command
             $this->option('with-secret') => Str::random(),
             default => null,
         };
+    }
+
+
+    /**
+     * Interact further with the user if they were prompted for missing arguments.
+     *
+     * @param  \Symfony\Component\Console\Input\InputInterface  $input
+     * @param  \Symfony\Component\Console\Output\OutputInterface  $output
+     * @return void
+     */
+    protected function afterPromptingForMissingArguments(InputInterface $input, OutputInterface $output)
+    {
+        if (confirm('Would you like to set up a secret?', true)) {
+            $type = select('Select secret type:', [
+                'random' => 'Random Secret',
+                'custom' => 'Custom Secret',
+            ]);
+            if ($type === 'random') {
+                $secret = Str::random();
+            } else {
+                $secret = text('Enter secret:', 'E.g. secret');
+            }
+            $this->input->setOption('secret', $secret);
+            $this->input->setOption('with-secret', false);
+        }
     }
 }
