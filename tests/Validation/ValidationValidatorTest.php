@@ -5018,9 +5018,11 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['x' => $uploadedFile], ['x' => 'dimensions:ratio=1']);
         $this->assertFalse($v->passes());
 
+        // evaluates to (64 / 65) > (1 / 1.0) which is true/fails
         $v = new Validator($trans, ['x' => $uploadedFile], ['x' => 'dimensions:min_ratio=1']);
-        $this->assertFalse($v->passes());
+        $this->assertFalse($v->fails());
 
+        // evaluates to (64 / 65) < (1 / 1.0) which is false/passes
         $v = new Validator($trans, ['x' => $uploadedFile], ['x' => 'dimensions:max_ratio=1']);
         $this->assertFalse($v->passes());
 
