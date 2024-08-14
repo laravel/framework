@@ -285,6 +285,63 @@ class AssertTest extends TestCase
         });
     }
 
+    public function testAssertBetween()
+    {
+        $assert = AssertableJson::fromArray([
+            'foo',
+            'bar',
+            'baz',
+        ]);
+
+        $assert->between(1, 3);
+    }
+    
+    public function testAssertBetweenFails()
+    {
+        $assert = AssertableJson::fromArray([
+            'foo',
+            'bar',
+            'baz',
+        ]);
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Root level size is not less than or equal to [2].');
+
+        $assert->between(1, 2);
+    }
+    
+    public function testAssertBetweenLowestValueFails()
+    {
+        $assert = AssertableJson::fromArray([
+            'foo',
+            'bar',
+            'baz',
+        ]);
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Root level size is not greater than or equal to [4].');
+
+        $assert->between(4, 3);
+    }
+    
+    public function testAssertBetweenFailsScoped()
+    {
+        $assert = AssertableJson::fromArray([
+            'bar' => [
+                'baz' => 'example',
+                'prop' => 'value',
+                'foo' => 'value',
+            ],
+        ]);
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Property [bar] size is not less than or equal to [2].');
+
+        $assert->has('bar', function (AssertableJson $bar) {
+            $bar->between(1, 2);
+        });
+    }
+    
     public function testAssertMissing()
     {
         $assert = AssertableJson::fromArray([
