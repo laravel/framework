@@ -241,6 +241,18 @@ class PendingResourceRegistration
     }
 
     /**
+     * Indicate that the resource should have a restoration route.
+     *
+     * @return $this
+     */
+    public function restorable()
+    {
+        $this->options['restorable'] = true;
+
+        return $this;
+    }
+
+    /**
      * Register the resource route.
      *
      * @return \Illuminate\Routing\RouteCollection
