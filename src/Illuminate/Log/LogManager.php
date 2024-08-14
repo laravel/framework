@@ -231,6 +231,10 @@ class LogManager implements LoggerInterface
             throw new InvalidArgumentException("Log [{$name}] is not defined.");
         }
 
+        if (! isset($config['driver'])) {
+            $config['driver'] = 'single';
+        }
+
         if (isset($this->customCreators[$config['driver']])) {
             return $this->callCustomCreator($config);
         }
