@@ -41,6 +41,37 @@ trait Has
     }
 
     /**
+     * Asserts that the value is between 2 specified values
+     *
+     * @param  int|string  $lowestValue
+     * @param  int|string  $highestValue
+     * @return $this
+     */
+    public function between(int|string $lowestValue, int|string $highestValue): self
+    {
+        $path = $this->dotPath();
+        $prop = $this->prop();
+
+        PHPUnit::assertGreaterThanOrEqual(
+            $lowestValue,
+            count($prop),
+            $path
+                ? sprintf('Property [%s] size is not greater than or equal to [%s].', $path, $lowestValue)
+                : sprintf('Root level size is not greater than or equal to [%s].', $lowestValue)
+        );
+
+        PHPUnit::assertLessThanOrEqual(
+            $highestValue,
+            count($prop),
+            $path
+                ? sprintf('Property [%s] size is not less than or equal to [%s].', $path, $highestValue)
+                : sprintf('Root level size is not less than or equal to [%s].', $highestValue)
+        );
+
+        return $this;
+    }
+
+    /**
      * Ensure that the given prop exists.
      *
      * @param  string|int  $key
