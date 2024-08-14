@@ -5,7 +5,6 @@ namespace Illuminate\Bus;
 use Closure;
 use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
 use PHPUnit\Framework\Assert as PHPUnit;
 use RuntimeException;
 
