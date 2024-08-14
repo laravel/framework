@@ -295,7 +295,7 @@ class AssertTest extends TestCase
 
         $assert->between(1, 3);
     }
-    
+
     public function testAssertBetweenFails()
     {
         $assert = AssertableJson::fromArray([
@@ -309,7 +309,7 @@ class AssertTest extends TestCase
 
         $assert->between(1, 2);
     }
-    
+
     public function testAssertBetweenLowestValueFails()
     {
         $assert = AssertableJson::fromArray([
@@ -323,7 +323,7 @@ class AssertTest extends TestCase
 
         $assert->between(4, 3);
     }
-    
+
     public function testAssertBetweenFailsScoped()
     {
         $assert = AssertableJson::fromArray([
@@ -341,7 +341,7 @@ class AssertTest extends TestCase
             $bar->between(1, 2);
         });
     }
-    
+
     public function testAssertMissing()
     {
         $assert = AssertableJson::fromArray([
