@@ -63,6 +63,34 @@ class FoundationApplicationTest extends TestCase
         $this->assertNotSame($instance, $app->make(AbstractClass::class));
     }
 
+    public function testScopedBindingsAreCreatedWhenServiceProviderIsRegistered()
+    {
+        $app = new Application;
+        $app->register($provider = new class($app) extends ServiceProvider
+        {
+            public $scopedBindings = [
+                NonContractBackedClass::class,
+                AbstractClass::class => ConcreteClass::class,
+            ];
+        });
+
+        $this->assertArrayHasKey(get_class($provider), $app->getLoadedProviders());
+
+        $instance = $app->make(AbstractClass::class);
+
+        $this->assertInstanceOf(ConcreteClass::class, $instance);
+        $this->assertSame($instance, $app->make(AbstractClass::class));
+        $app->forgetScopedInstances();
+        $this->assertNotSame($instance, $app->make(AbstractClass::class));
+
+        $instance = $app->make(NonContractBackedClass::class);
+
+        $this->assertInstanceOf(NonContractBackedClass::class, $instance);
+        $this->assertSame($instance, $app->make(NonContractBackedClass::class));
+        $app->forgetScopedInstances();
+        $this->assertNotSame($instance, $app->make(AbstractClass::class));
+    }
+
     public function testSingletonsAreCreatedWhenServiceProviderIsRegistered()
     {
         $app = new Application;
