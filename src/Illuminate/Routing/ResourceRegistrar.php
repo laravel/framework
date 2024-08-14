@@ -423,7 +423,7 @@ class ResourceRegistrar
 
         $action = $this->getResourceAction($name, $controller, 'restore', $options);
 
-        return $this->router->post($uri, $action);
+        return $this->router->post($uri, $action)->withTrashed();
     }
 
     /**
@@ -556,7 +556,7 @@ class ResourceRegistrar
 
         $action = $this->getResourceAction($name, $controller, 'restore', $options);
 
-        return $this->router->post($uri, $action);
+        return $this->router->post($uri, $action)->withTrashed();
     }
 
     /**
