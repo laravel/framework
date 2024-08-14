@@ -88,7 +88,7 @@ class FoundationApplicationTest extends TestCase
         $this->assertInstanceOf(NonContractBackedClass::class, $instance);
         $this->assertSame($instance, $app->make(NonContractBackedClass::class));
         $app->forgetScopedInstances();
-        $this->assertNotSame($instance, $app->make(AbstractClass::class));
+        $this->assertNotSame($instance, $app->make(NonContractBackedClass::class));
     }
 
     public function testSingletonsAreCreatedWhenServiceProviderIsRegistered()
