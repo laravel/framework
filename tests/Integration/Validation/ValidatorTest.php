@@ -46,7 +46,7 @@ class ValidatorTest extends DatabaseTestCase
         $this->assertTrue($validator->passes());
 
         $validator = $this->getValidator(['first_name' => 'Taylor'], ['first_name' => 'unique:'.User::class.',no_column']);
-        $this->assertThrows(fn() => $validator->passes(), \InvalidArgumentException::class);
+        $this->assertThrows(fn () => $validator->passes(), \InvalidArgumentException::class);
     }
 
     public function testUniqueWithCustomModelKey()

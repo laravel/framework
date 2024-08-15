@@ -971,7 +971,7 @@ trait ValidatesAttributes
 
         if (!in_array($column, $columns)) {
             $errorMsg = sprintf(
-                "The [%s] column doesnt exists in [%s] the table. Available columns: %s",
+                'The [%s] column doesnt exists in [%s] the table. Available columns: %s',
                 $column,
                 $table,
                 implode(',', $columns)
