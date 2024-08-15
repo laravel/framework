@@ -204,11 +204,11 @@ class TableCommand extends DatabaseInspectionCommand
 
         $this->newLine();
 
-        $this->components->twoColumnDetail('<fg=green;options=bold>'.($table['schema'] ? $table['schema'].'.'.$table['name'] : $table['name']).'</>', $table['comment']);
+        $this->components->twoColumnDetail('<fg=green;options=bold>'.($table['schema'] ? $table['schema'].'.'.$table['name'] : $table['name']).'</>', $table['comment'] ? '<fg=gray>'.$table['comment'].'</>' : null);
         $this->components->twoColumnDetail('Columns', $table['columns']);
 
-        if ($size = $table['size']) {
-            $this->components->twoColumnDetail('Size', Number::fileSize($size, 2));
+        if (! is_null($table['size'])) {
+            $this->components->twoColumnDetail('Size', Number::fileSize($table['size'], 2));
         }
 
         if ($table['engine']) {
