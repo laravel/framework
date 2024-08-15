@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Exceptions\MathException;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\Unique;
@@ -958,6 +959,21 @@ trait ValidatesAttributes
         // be verified as unique. If this parameter isn't specified we will just
         // assume that this column to be verified shares the attribute's name.
         $column = $this->getQueryColumn($parameters, $attribute);
+
+        $model = new class extends Model {};
+        $model->setTable($table);
+
+        // Get columns of $table
+        $availableColumns = Schema::getColumnListing($table);
+        $availableQualifyColumns = $model->qualifyColumns($availableColumns);
+
+        $columns = array_merge($availableColumns, $availableQualifyColumns);
+
+        if (!in_array($column, $columns)) {
+            $columnsList = implode(',', $columns);
+            $errorMsg = sprintf("The [%s] column doesnt exists in [%s] the table. Available columns: {$columnsList}", $column, $table);
+            throw new InvalidArgumentException($errorMsg);
+        }
 
         $id = null;
 
