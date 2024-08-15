@@ -26,6 +26,13 @@ trait InteractsWithDatabase
      */
     protected function assertDatabaseHas($table, array $data, $connection = null)
     {
+        if ($table instanceof Model) {
+            $data = [
+                $table->getKeyName() => $table->getKey(),
+                ...$data,
+            ];
+        }
+
         $this->assertThat(
             $this->getTable($table), new HasInDatabase($this->getConnection($connection, $table), $data)
         );
@@ -43,6 +50,13 @@ trait InteractsWithDatabase
      */
     protected function assertDatabaseMissing($table, array $data, $connection = null)
     {
+        if ($table instanceof Model) {
+            $data = [
+                $table->getKeyName() => $table->getKey(),
+                ...$data,
+            ];
+        }
+
         $constraint = new ReverseConstraint(
             new HasInDatabase($this->getConnection($connection, $table), $data)
         );
