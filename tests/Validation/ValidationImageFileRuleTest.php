@@ -61,13 +61,13 @@ class ValidationImageFileRuleTest extends TestCase
     public function testDimentionWithTheMinRatioMethod()
     {
         $this->fails(
-            File::image()->dimensions(Rule::dimensions()->minRatio(1/2)),
+            File::image()->dimensions(Rule::dimensions()->minRatio(1 / 2)),
             UploadedFile::fake()->image('foo.png', 100, 100),
             ['validation.dimensions'],
         );
 
         $this->passes(
-            File::image()->dimensions(Rule::dimensions()->minRatio(1/2)),
+            File::image()->dimensions(Rule::dimensions()->minRatio(1 / 2)),
             UploadedFile::fake()->image('foo.png', 100, 200),
         );
     }
@@ -75,13 +75,13 @@ class ValidationImageFileRuleTest extends TestCase
     public function testDimentionWithTheMaxRatioMethod()
     {
         $this->fails(
-            File::image()->dimensions(Rule::dimensions()->maxRatio(1/2)),
+            File::image()->dimensions(Rule::dimensions()->maxRatio(1 / 2)),
             UploadedFile::fake()->image('foo.png', 100, 300),
             ['validation.dimensions'],
         );
 
         $this->passes(
-            File::image()->dimensions(Rule::dimensions()->maxRatio(1/2)),
+            File::image()->dimensions(Rule::dimensions()->maxRatio(1 / 2)),
             UploadedFile::fake()->image('foo.png', 100, 100),
         );
     }
@@ -89,13 +89,13 @@ class ValidationImageFileRuleTest extends TestCase
     public function testDimentionWithTheRatioRangeMethod()
     {
         $this->fails(
-            File::image()->dimensions(Rule::dimensions()->ratioRange(1/2, 1/3)),
+            File::image()->dimensions(Rule::dimensions()->ratioRange(1 / 2, 1 / 3)),
             UploadedFile::fake()->image('foo.png', 100, 100),
             ['validation.dimensions'],
         );
 
         $this->passes(
-            File::image()->dimensions(Rule::dimensions()->ratioRange(1/2, 1/3)),
+            File::image()->dimensions(Rule::dimensions()->ratioRange(1 / 2, 1 / 3)),
             UploadedFile::fake()->image('foo.png', 100, 200),
         );
     }

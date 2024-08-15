@@ -740,7 +740,7 @@ trait ValidatesAttributes
 
         $parameters = $this->parseNamedParameters($parameters);
 
-        return !(
+        return ! (
             $this->failsBasicDimensionChecks($parameters, $width, $height) ||
             $this->failsRatioCheck($parameters, $width, $height) ||
             $this->failsMinRatioCheck($parameters, $width, $height) ||
@@ -799,7 +799,7 @@ trait ValidatesAttributes
      */
     private function failsMinRatioCheck($parameters, $width, $height)
     {
-        if (!isset($parameters['min_ratio'])) {
+        if (! isset($parameters['min_ratio'])) {
             return false;
         }
 
@@ -813,14 +813,14 @@ trait ValidatesAttributes
     /**
      * Determine if the given parameters fail a dimension max ratio check.
      *
-     * @param array<string,string> $parameters
-     * @param int $width
-     * @param int $height
+     * @param  array<string,string>  $parameters
+     * @param  int  $width
+     * @param  int  $height
      * @return bool
      */
     private function failsMaxRatioCheck($parameters, $width, $height)
     {
-        if (!isset($parameters['max_ratio'])) {
+        if (! isset($parameters['max_ratio'])) {
             return false;
         }
 

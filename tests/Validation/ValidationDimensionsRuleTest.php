@@ -40,12 +40,12 @@ class ValidationDimensionsRuleTest extends TestCase
         $this->assertSame('dimensions:height=100', (string) $rule);
 
         $rule = Rule::dimensions()
-            ->minRatio(1/2)
-            ->maxRatio(1/3);
+            ->minRatio(1 / 2)
+            ->maxRatio(1 / 3);
         $this->assertSame('dimensions:min_ratio=0.5,max_ratio=0.33333333333333', (string) $rule);
 
         $rule = Rule::dimensions()
-            ->ratioRange(min: 1/2, max: 1/3);
+            ->ratioRange(min: 1 / 2, max: 1 / 3);
         $this->assertSame('dimensions:min_ratio=0.5,max_ratio=0.33333333333333', (string) $rule);
     }
 }
