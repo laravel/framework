@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Exceptions\MathException;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Stringable;
 use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator;
@@ -4031,6 +4032,10 @@ class ValidationValidatorTest extends TestCase
 
     public function testValidateUnique()
     {
+        Schema::shouldReceive('getColumnListing')
+            ->with('users')
+            ->andReturn(['email', 'email_addr']);
+
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['email' => 'foo'], ['email' => 'Unique:users']);
         $mock = m::mock(DatabasePresenceVerifierInterface::class);
@@ -4079,6 +4084,10 @@ class ValidationValidatorTest extends TestCase
 
     public function testValidateUniqueAndExistsSendsCorrectFieldNameToDBWithArrays()
     {
+        Schema::shouldReceive('getColumnListing')
+            ->with('users')
+            ->andReturn(['email']);
+
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, [['email' => 'foo', 'type' => 'bar']], [
             '*.email' => 'unique:users', '*.type' => 'exists:user_types',
