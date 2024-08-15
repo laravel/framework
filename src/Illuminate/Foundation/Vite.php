@@ -188,7 +188,7 @@ class Vite implements Htmlable
      * @param  array  $config
      * @return $this
      */
-    public function usePrefetchStrategy($strategy, $config)
+    public function usePrefetchStrategy($strategy, $config = [])
     {
         $this->prefetchStrategy = $strategy;
 
@@ -449,74 +449,74 @@ class Vite implements Htmlable
             ->pipe(fn ($assets) => with(Js::from($assets), fn ($assets) => match ($this->prefetchStrategy) {
                 'waterfall' => new HtmlString($base.<<<HTML
 
-                        <script>
-                             window.addEventListener('load', () => window.setTimeout(() => {
-                                const linkTemplate = document.createElement('link')
-                                linkTemplate.rel = 'prefetch'
+                    <script>
+                         window.addEventListener('load', () => window.setTimeout(() => {
+                            const linkTemplate = document.createElement('link')
+                            linkTemplate.rel = 'prefetch'
 
-                                const makeLink = (asset) => {
-                                    const link = linkTemplate.cloneNode()
+                            const makeLink = (asset) => {
+                                const link = linkTemplate.cloneNode()
 
-                                    Object.keys(asset).forEach((attribute) => {
-                                        link.setAttribute(attribute, asset[attribute])
-                                    })
-
-                                    return link
-                                }
-
-                                const loadNext = (assets, count) => window.setTimeout(() => {
-                                    if (count > assets.length) {
-                                        count = assets.length
-
-                                        if (count === 0) {
-                                            return
-                                        }
-                                    }
-
-                                    const fragment = new DocumentFragment
-
-                                    while (count > 0) {
-                                        const link = makeLink(assets.shift())
-                                        fragment.append(link)
-                                        count--
-
-                                        if (assets.length) {
-                                            link.onload = () => loadNext(assets, 1)
-                                            link.error = () => loadNext(assets, 1)
-                                        }
-                                    }
-
-                                    document.head.append(fragment)
+                                Object.keys(asset).forEach((attribute) => {
+                                    link.setAttribute(attribute, asset[attribute])
                                 })
 
-                                loadNext({$assets}, {$this->prefetchChunks})
-                            }))
-                        </script>
-                        HTML),
-                    'aggressive' => new HtmlString($base.<<<HTML
+                                return link
+                            }
 
-                        <script>
-                             window.addEventListener('load', () => window.setTimeout(() => {
-                                const linkTemplate = document.createElement('link')
-                                linkTemplate.rel = 'prefetch'
+                            const loadNext = (assets, count) => window.setTimeout(() => {
+                                if (count > assets.length) {
+                                    count = assets.length
 
-                                const makeLink = (asset) => {
-                                    const link = linkTemplate.cloneNode()
-
-                                    Object.keys(asset).forEach((attribute) => {
-                                        link.setAttribute(attribute, asset[attribute])
-                                    })
-
-                                    return link
+                                    if (count === 0) {
+                                        return
+                                    }
                                 }
 
                                 const fragment = new DocumentFragment
-                                {$assets}.forEach((asset) => fragment.append(makeLink(asset)))
+
+                                while (count > 0) {
+                                    const link = makeLink(assets.shift())
+                                    fragment.append(link)
+                                    count--
+
+                                    if (assets.length) {
+                                        link.onload = () => loadNext(assets, 1)
+                                        link.error = () => loadNext(assets, 1)
+                                    }
+                                }
+
                                 document.head.append(fragment)
-                             }))
-                        </script>
-                        HTML),
-                    }));
+                            })
+
+                            loadNext({$assets}, {$this->prefetchChunks})
+                        }))
+                    </script>
+                    HTML),
+                'aggressive' => new HtmlString($base.<<<HTML
+
+                    <script>
+                         window.addEventListener('load', () => window.setTimeout(() => {
+                            const linkTemplate = document.createElement('link')
+                            linkTemplate.rel = 'prefetch'
+
+                            const makeLink = (asset) => {
+                                const link = linkTemplate.cloneNode()
+
+                                Object.keys(asset).forEach((attribute) => {
+                                    link.setAttribute(attribute, asset[attribute])
+                                })
+
+                                return link
+                            }
+
+                            const fragment = new DocumentFragment
+                            {$assets}.forEach((asset) => fragment.append(makeLink(asset)))
+                            document.head.append(fragment)
+                         }))
+                    </script>
+                    HTML),
+            }));
     }
 
     /**
