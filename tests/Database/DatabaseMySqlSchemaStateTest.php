@@ -6,10 +6,10 @@ use Exception;
 use Generator;
 use Illuminate\Database\MySqlConnection;
 use Illuminate\Database\Schema\MySqlSchemaState;
-use Symfony\Component\Process\Process;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
+use Symfony\Component\Process\Process;
 
 class DatabaseMySqlSchemaStateTest extends TestCase
 {
