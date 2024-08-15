@@ -79,7 +79,9 @@ class ShowCommand extends DatabaseInspectionCommand
             'table' => $table['name'],
             'schema' => $table['schema'],
             'size' => $table['size'],
-            'rows' => $this->option('counts') ? $connection->table($table['name'])->count() : null,
+            'rows' => $this->option('counts')
+                ? $connection->table($table['schema'] ? $table['schema'].'.'.$table['name'] : $table['name'])->count()
+                : null,
             'engine' => $table['engine'],
             'collation' => $table['collation'],
             'comment' => $table['comment'],
@@ -100,7 +102,8 @@ class ShowCommand extends DatabaseInspectionCommand
             ->map(fn ($view) => [
                 'view' => $view['name'],
                 'schema' => $view['schema'],
-                'rows' => $connection->table($view->getName())->count(),
+                'rows' => $connection->table($view['schema'] ? $view['schema'].'.'.$view['name'] : $view['name'])->count(),
+
             ]);
     }
 
