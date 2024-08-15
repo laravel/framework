@@ -56,9 +56,7 @@ class TableCommand extends DatabaseInspectionCommand
             return 1;
         }
 
-        $tableName = $table['schema']
-            ? $table['schema'].'.'.$this->withoutTablePrefix($connection, $table['name'])
-            : $this->withoutTablePrefix($connection, $table['name']);
+        $tableName = ($table['schema'] ? $table['schema'].'.' : '').$this->withoutTablePrefix($connection, $table['name']);
 
         $columns = $this->columns($schema, $tableName);
         $indexes = $this->indexes($schema, $tableName);
@@ -70,6 +68,9 @@ class TableCommand extends DatabaseInspectionCommand
                 'name' => $table['name'],
                 'columns' => count($columns),
                 'size' => $table['size'],
+                'comment' => $table['comment'],
+                'collation' => $table['collation'],
+                'engine' => $table['engine'],
             ],
             'columns' => $columns,
             'indexes' => $indexes,
@@ -108,6 +109,7 @@ class TableCommand extends DatabaseInspectionCommand
     {
         return collect([
             $column['type_name'],
+            $column['generation'] ? $column['generation']['type'] : null,
             $column['auto_increment'] ? 'autoincrement' : null,
             $column['nullable'] ? 'nullable' : null,
             $column['collation'],
@@ -202,11 +204,19 @@ class TableCommand extends DatabaseInspectionCommand
 
         $this->newLine();
 
-        $this->components->twoColumnDetail('<fg=green;options=bold>'.($table['schema'] ? $table['schema'].'.'.$table['name'] : $table['name']).'</>');
+        $this->components->twoColumnDetail('<fg=green;options=bold>'.($table['schema'] ? $table['schema'].'.'.$table['name'] : $table['name']).'</>', $table['comment']);
         $this->components->twoColumnDetail('Columns', $table['columns']);
 
         if ($size = $table['size']) {
             $this->components->twoColumnDetail('Size', Number::fileSize($size, 2));
+        }
+
+        if ($table['engine']) {
+            $this->components->twoColumnDetail('Engine', $table['engine']);
+        }
+
+        if ($table['collation']) {
+            $this->components->twoColumnDetail('Collation', $table['collation']);
         }
 
         $this->newLine();

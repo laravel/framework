@@ -103,7 +103,6 @@ class ShowCommand extends DatabaseInspectionCommand
                 'view' => $view['name'],
                 'schema' => $view['schema'],
                 'rows' => $connection->table($view['schema'] ? $view['schema'].'.'.$view['name'] : $view['name'])->count(),
-
             ]);
     }
 
