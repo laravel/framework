@@ -230,6 +230,7 @@ trait Queueable
     public function appendToChain($job)
     {
         $jobs = ChainedBatch::prepareNestedBatches(collect([$job]));
+
         $this->chained = array_merge($this->chained, [$this->serializeJob($jobs->first())]);
 
         return $this;
