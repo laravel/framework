@@ -969,7 +969,7 @@ trait ValidatesAttributes
 
         $columns = array_merge($availableColumns, $availableQualifyColumns);
 
-        if (!in_array($column, $columns)) {
+        if (! in_array($column, $columns)) {
             $errorMsg = sprintf(
                 'The [%s] column doesnt exists in [%s] the table. Available columns: %s',
                 $column,
