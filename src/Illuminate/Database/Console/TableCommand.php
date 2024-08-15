@@ -39,14 +39,16 @@ class TableCommand extends DatabaseInspectionCommand
     {
         $connection = $connections->connection($this->input->getOption('database'));
         $schema = $connection->getSchemaBuilder();
-        $tables = $schema->getTables();
+        $tables = collect($schema->getTables())
+            ->keyBy(fn ($table) => $table['schema'] ? $table['schema'].'.'.$table['name'] : $table['name'])
+            ->all();
 
         $tableName = $this->argument('table') ?: select(
             'Which table would you like to inspect?',
-            array_column($tables, 'name')
+            array_keys($tables)
         );
 
-        $table = Arr::first($tables, fn ($table) => $table['name'] === $tableName);
+        $table = $tables[$tableName] ?? Arr::first($tables, fn ($table) => $table['name'] === $tableName);
 
         if (! $table) {
             $this->components->warn("Table [{$tableName}] doesn't exist.");
@@ -54,7 +56,9 @@ class TableCommand extends DatabaseInspectionCommand
             return 1;
         }
 
-        $tableName = $this->withoutTablePrefix($connection, $table['name']);
+        $tableName = $table['schema']
+            ? $table['schema'].'.'.$this->withoutTablePrefix($connection, $table['name'])
+            : $this->withoutTablePrefix($connection, $table['name']);
 
         $columns = $this->columns($schema, $tableName);
         $indexes = $this->indexes($schema, $tableName);
@@ -62,6 +66,7 @@ class TableCommand extends DatabaseInspectionCommand
 
         $data = [
             'table' => [
+                'schema' => $table['schema'],
                 'name' => $table['name'],
                 'columns' => count($columns),
                 'size' => $table['size'],
@@ -197,7 +202,7 @@ class TableCommand extends DatabaseInspectionCommand
 
         $this->newLine();
 
-        $this->components->twoColumnDetail('<fg=green;options=bold>'.$table['name'].'</>');
+        $this->components->twoColumnDetail('<fg=green;options=bold>'.($table['schema'] ? $table['schema'].'.'.$table['name'] : $table['name']).'</>');
         $this->components->twoColumnDetail('Columns', $table['columns']);
 
         if ($size = $table['size']) {
