@@ -109,7 +109,7 @@ class Vite implements Htmlable
      *
      * @var int
      */
-    protected $prefetchChunks = 3;
+    protected $prefetchConcurrently = 3;
 
     /**
      * Get the preloaded assets.
@@ -193,7 +193,7 @@ class Vite implements Htmlable
         $this->prefetchStrategy = $strategy;
 
         if ($strategy === 'waterfall') {
-            $this->prefetchChunks = $config['chunks'] ?? $this->prefetchChunks;
+            $this->prefetchConcurrently = $config['concurrently'] ?? $this->prefetchConcurrently;
         }
 
         return $this;
@@ -489,7 +489,7 @@ class Vite implements Htmlable
                                 document.head.append(fragment)
                             })
 
-                            loadNext({$assets}, {$this->prefetchChunks})
+                            loadNext({$assets}, {$this->prefetchConcurrently})
                         }))
                     </script>
                     HTML),
