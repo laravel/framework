@@ -151,7 +151,7 @@ class MySqlSchemaState extends SchemaState
     protected function executeDumpProcess(Process $process, $output, array $variables, int $depth = 0)
     {
         if ($depth > 30) {
-            throw new Exception('Dump execution exceeded maximum depth of '.$maxDepth.'.');
+            throw new Exception('Dump execution exceeded maximum depth of 30.');
         }
 
         try {
