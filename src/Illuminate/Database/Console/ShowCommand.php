@@ -80,7 +80,7 @@ class ShowCommand extends DatabaseInspectionCommand
             'schema' => $table['schema'],
             'size' => $table['size'],
             'rows' => $this->option('counts')
-                ? $connection->table($table['schema'] ? $table['schema'].'.'.$table['name'] : $table['name'])->count()
+                ? ($connection->table($table['schema'] ? $table['schema'].'.'.$table['name'] : $table['name'])->count())
                 : null,
             'engine' => $table['engine'],
             'collation' => $table['collation'],
