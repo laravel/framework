@@ -290,7 +290,7 @@ class Vite implements Htmlable
     public function useWaterfallPrefetching(?int $concurrency = null)
     {
         return $this->usePrefetchStrategy('waterfall', [
-            'concurrency' => $concurrency ?? $this->prefetchConcurrently
+            'concurrency' => $concurrency ?? $this->prefetchConcurrently,
         ]);
     }
 
