@@ -494,7 +494,8 @@ class RoutingRouteTest extends TestCase
         $router = new Router(new Dispatcher, $container);
         $container->instance(Registrar::class, $router);
 
-        $container->bind(RoutingTestUserModel::class, function () {});
+        $container->bind(RoutingTestUserModel::class, function () {
+        });
         $container->bind(CallableDispatcherContract::class, fn ($app) => new CallableDispatcher($app));
 
         $router->get('foo/{team}/{post}', [
@@ -2403,7 +2404,9 @@ class RouteTestResourceControllerWithModelParameter extends Controller
 
 class RouteTestNestedResourceControllerWithMissingUser extends Controller
 {
-    public function show(RoutingTestTeamWithoutUserModel $team, RoutingTestUserModel $user) {}
+    public function show(RoutingTestTeamWithoutUserModel $team, RoutingTestUserModel $user)
+    {
+    }
 }
 
 class RouteTestClosureMiddlewareController extends Controller
