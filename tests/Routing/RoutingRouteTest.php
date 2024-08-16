@@ -494,8 +494,7 @@ class RoutingRouteTest extends TestCase
         $router = new Router(new Dispatcher, $container);
         $container->instance(Registrar::class, $router);
 
-        $container->bind(RoutingTestUserModel::class, function () {
-        });
+        $container->bind(RoutingTestUserModel::class, function () {});
         $container->bind(CallableDispatcherContract::class, fn ($app) => new CallableDispatcher($app));
 
         $router->get('foo/{team}/{post}', [
@@ -1452,6 +1451,13 @@ class RoutingRouteTest extends TestCase
         $this->assertCount(5, $routes);
 
         $router = $this->getRouter();
+        $router->resource('foo', 'FooController')->restorable();
+        $routes = $router->getRoutes();
+
+        $this->assertCount(8, $routes);
+        $this->assertSame('foo/{foo}/restore', $routes->getByName('foo.restore')->uri());
+
+        $router = $this->getRouter();
         $router->resource('foo-bars', 'FooController', ['only' => ['show']]);
         $routes = $router->getRoutes();
         $routes = $routes->getRoutes();
@@ -1476,13 +1482,15 @@ class RoutingRouteTest extends TestCase
         ResourceRegistrar::verbs([
             'create' => 'ajouter',
             'edit' => 'modifier',
+            'restore' => 'restaurer',
         ]);
         $router = $this->getRouter();
-        $router->resource('foo', 'FooController');
+        $router->resource('foo', 'FooController')->restorable();
         $routes = $router->getRoutes();
 
         $this->assertSame('foo/ajouter', $routes->getByName('foo.create')->uri());
         $this->assertSame('foo/{foo}/modifier', $routes->getByName('foo.edit')->uri());
+        $this->assertSame('foo/{foo}/restaurer', $routes->getByName('foo.restore')->uri());
     }
 
     public function testResourceRoutingParameters()
@@ -2323,9 +2331,7 @@ class RouteTestResourceControllerWithModelParameter extends Controller
 
 class RouteTestNestedResourceControllerWithMissingUser extends Controller
 {
-    public function show(RoutingTestTeamWithoutUserModel $team, RoutingTestUserModel $user)
-    {
-    }
+    public function show(RoutingTestTeamWithoutUserModel $team, RoutingTestUserModel $user) {}
 }
 
 class RouteTestClosureMiddlewareController extends Controller
