@@ -43,30 +43,30 @@ trait Has
     /**
      * Assert that the prop size is between a given minimum and maximum.
      *
-     * @param  int|string  $lowestValue
-     * @param  int|string  $highestValue
+     * @param  int|string  $min
+     * @param  int|string  $max
      * @return $this
      */
-    public function countBetween(int|string $lowestValue, int|string $highestValue): self
+    public function countBetween(int|string $min, int|string $max): self
     {
         $path = $this->dotPath();
 
         $prop = $this->prop();
 
         PHPUnit::assertGreaterThanOrEqual(
-            $lowestValue,
+            $min,
             count($prop),
             $path
-                ? sprintf('Property [%s] size is not greater than or equal to [%s].', $path, $lowestValue)
-                : sprintf('Root level size is not greater than or equal to [%s].', $lowestValue)
+                ? sprintf('Property [%s] size is not greater than or equal to [%s].', $path, $min)
+                : sprintf('Root level size is not greater than or equal to [%s].', $min)
         );
 
         PHPUnit::assertLessThanOrEqual(
-            $highestValue,
+            $max,
             count($prop),
             $path
-                ? sprintf('Property [%s] size is not less than or equal to [%s].', $path, $highestValue)
-                : sprintf('Root level size is not less than or equal to [%s].', $highestValue)
+                ? sprintf('Property [%s] size is not less than or equal to [%s].', $path, $max)
+                : sprintf('Root level size is not less than or equal to [%s].', $max)
         );
 
         return $this;
