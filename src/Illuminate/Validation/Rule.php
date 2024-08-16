@@ -110,7 +110,7 @@ class Rule
     }
 
     /**
-     * Get an exists constraint builder instance.
+     * Get an ModelExists constraint builder instance.
      *
      * @param  Builder<TModel>|TModel|class-string<TModel>  $model
      * @return \Illuminate\Validation\Rules\ModelExists<Builder<TModel>>

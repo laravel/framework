@@ -28,6 +28,8 @@ class ModelExists implements ValidationRule
     }
 
     /**
+     * Create a new rule instance with the given Builder, Model, or class name.
+     *
      * @template TModel of Model
      *
      * @param  Builder<TModel>|TModel|class-string<TModel>  $model
