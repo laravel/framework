@@ -436,6 +436,7 @@ class Vite implements Htmlable
                             $manifest,
                         ),
                         'rel' => 'prefetch',
+                        'fetchpriority' => 'low',
                         'href' => $url,
                     ])->reject(
                         fn ($value) => in_array($value, [null, false], true)
@@ -451,11 +452,8 @@ class Vite implements Htmlable
 
                     <script>
                          window.addEventListener('load', () => window.setTimeout(() => {
-                            const linkTemplate = document.createElement('link')
-                            linkTemplate.rel = 'prefetch'
-
                             const makeLink = (asset) => {
-                                const link = linkTemplate.cloneNode()
+                                const link = document.createElement('link')
 
                                 Object.keys(asset).forEach((attribute) => {
                                     link.setAttribute(attribute, asset[attribute])
@@ -497,11 +495,8 @@ class Vite implements Htmlable
 
                     <script>
                          window.addEventListener('load', () => window.setTimeout(() => {
-                            const linkTemplate = document.createElement('link')
-                            linkTemplate.rel = 'prefetch'
-
                             const makeLink = (asset) => {
-                                const link = linkTemplate.cloneNode()
+                                const link = document.createElement('link')
 
                                 Object.keys(asset).forEach((attribute) => {
                                     link.setAttribute(attribute, asset[attribute])
