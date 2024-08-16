@@ -75,6 +75,21 @@ class ValidationModelExistsRuleTest extends TestCase
         $this->assertSame('The selected id is invalid.', $v->errors()->first('id'));
     }
 
+    public function testPassesWhenRecordExistsWithScope()
+    {
+        $rule = Rule::modelExists(UserModel::class)->typeFoo();
+
+        UserModel::create(['id' => 1, 'type' => 'foo']);
+        UserModel::create(['id' => 2, 'type' => 'bar']);
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['id' => 1], ['id' => $rule]);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['id' => 2], ['id' => $rule]);
+        $this->assertFalse($v->passes());
+    }
+
     public function testPassesWhenRecordExistsWithColumn()
     {
         $rule = Rule::modelExists(UserModel::class, 'type');
@@ -153,4 +168,9 @@ class UserModel extends Eloquent
     protected $guarded = [];
 
     public $timestamps = false;
+
+    public function scopeTypeFoo($query)
+    {
+        $query->where('type', 'foo');
+    }
 }
