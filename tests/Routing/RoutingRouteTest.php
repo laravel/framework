@@ -1488,12 +1488,12 @@ class RoutingRouteTest extends TestCase
         $this->assertSame('foo-bars/{foo_bar}', $routes[0]->uri());
         $this->assertSame('prefix.foo-bars.show', $routes[0]->getName());
 
+        $router = $this->getRouter();
         ResourceRegistrar::verbs([
             'create' => 'ajouter',
             'edit' => 'modifier',
             'restore' => 'restaurer',
         ]);
-        $router = $this->getRouter();
         $router->resource('foo', 'FooController')->restorable();
         $routes = $router->getRoutes();
 
@@ -2303,6 +2303,8 @@ class RoutingRouteTest extends TestCase
 
     protected function getRouter($container = null)
     {
+        ResourceRegistrar::resetVerbs();
+
         $container ??= new Container;
 
         $router = new Router($container->make(Dispatcher::class), $container);

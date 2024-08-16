@@ -49,15 +49,22 @@ class ResourceRegistrar
     protected static $singularParameters = true;
 
     /**
-     * The verbs used in the resource URIs.
+     * The default verbs used in the resource URIs.
      *
      * @var array
      */
-    protected static $verbs = [
+    protected static $defaultVerbs = [
         'create' => 'create',
         'edit' => 'edit',
         'restore' => 'restore',
     ];
+
+    /**
+     * The verbs used in the resource URIs.
+     *
+     * @var array|null
+     */
+    protected static $verbs = null;
 
     /**
      * Create a new resource registrar instance.
@@ -297,7 +304,7 @@ class ResourceRegistrar
      */
     protected function addResourceCreate($name, $base, $controller, $options)
     {
-        $uri = $this->getResourceUri($name).'/'.static::$verbs['create'];
+        $uri = $this->getResourceUri($name).'/'.static::verb('create');
 
         unset($options['missing']);
 
@@ -359,7 +366,7 @@ class ResourceRegistrar
     {
         $name = $this->getShallowName($name, $options);
 
-        $uri = $this->getResourceUri($name).'/{'.$base.'}/'.static::$verbs['edit'];
+        $uri = $this->getResourceUri($name).'/{'.$base.'}/'.static::verb('edit');
 
         $action = $this->getResourceAction($name, $controller, 'edit', $options);
 
@@ -419,7 +426,7 @@ class ResourceRegistrar
     {
         $name = $this->getShallowName($name, $options);
 
-        $uri = $this->getResourceUri($name).'/{'.$base.'}/'.static::$verbs['restore'];
+        $uri = $this->getResourceUri($name).'/{'.$base.'}/'.static::verb('restore');
 
         $action = $this->getResourceAction($name, $controller, 'restore', $options);
 
@@ -436,7 +443,7 @@ class ResourceRegistrar
      */
     protected function addSingletonCreate($name, $controller, $options)
     {
-        $uri = $this->getResourceUri($name).'/'.static::$verbs['create'];
+        $uri = $this->getResourceUri($name).'/'.static::verb('create');
 
         unset($options['missing']);
 
@@ -495,7 +502,7 @@ class ResourceRegistrar
     {
         $name = $this->getShallowName($name, $options);
 
-        $uri = $this->getResourceUri($name).'/'.static::$verbs['edit'];
+        $uri = $this->getResourceUri($name).'/'.static::verb('edit');
 
         $action = $this->getResourceAction($name, $controller, 'edit', $options);
 
@@ -552,7 +559,7 @@ class ResourceRegistrar
     {
         $name = $this->getShallowName($name, $options);
 
-        $uri = $this->getResourceUri($name).'/'.static::$verbs['restore'];
+        $uri = $this->getResourceUri($name).'/'.static::verb('restore');
 
         $action = $this->getResourceAction($name, $controller, 'restore', $options);
 
@@ -754,9 +761,25 @@ class ResourceRegistrar
     public static function verbs(array $verbs = [])
     {
         if (empty($verbs)) {
-            return static::$verbs;
+            return static::$verbs ?? static::$defaultVerbs;
         }
 
-        static::$verbs = array_merge(static::$verbs, $verbs);
+        static::$verbs = array_merge(static::$defaultVerbs, static::$verbs ?? [], $verbs);
+    }
+
+    /**
+     * Resets verbs to use the default verbs.
+     */
+    public static function resetVerbs(): void
+    {
+        static::$verbs = null;
+    }
+
+    /**
+     * Get the verb to be used in the resource URIs.
+     */
+    protected static function verb(string $verb): string
+    {
+        return static::verbs()[$verb];
     }
 }
