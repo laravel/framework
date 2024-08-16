@@ -790,7 +790,7 @@ trait ValidatesAttributes
     }
 
     /**
-     * Determine if the given parameters fail a dimension min ratio check.
+     * Determine if the given parameters fail a dimension minimum ratio check.
      *
      * @param  array<string,string>  $parameters
      * @param  int  $width
@@ -811,7 +811,7 @@ trait ValidatesAttributes
     }
 
     /**
-     * Determine if the given parameters fail a dimension max ratio check.
+     * Determine if the given parameters fail a dimension maximum ratio check.
      *
      * @param  array<string,string>  $parameters
      * @param  int  $width

@@ -151,7 +151,7 @@ class Dimensions implements Stringable
      * @param  float  $max
      * @return $this
      */
-    public function ratioRange($min, $max)
+    public function ratioBetween($min, $max)
     {
         $this->constraints['min_ratio'] = $min;
         $this->constraints['max_ratio'] = $max;

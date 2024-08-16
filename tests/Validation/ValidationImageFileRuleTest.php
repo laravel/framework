@@ -89,13 +89,13 @@ class ValidationImageFileRuleTest extends TestCase
     public function testDimentionWithTheRatioRangeMethod()
     {
         $this->fails(
-            File::image()->dimensions(Rule::dimensions()->ratioRange(1 / 2, 1 / 3)),
+            File::image()->dimensions(Rule::dimensions()->ratioBetween(1 / 2, 1 / 3)),
             UploadedFile::fake()->image('foo.png', 100, 100),
             ['validation.dimensions'],
         );
 
         $this->passes(
-            File::image()->dimensions(Rule::dimensions()->ratioRange(1 / 2, 1 / 3)),
+            File::image()->dimensions(Rule::dimensions()->ratioBetween(1 / 2, 1 / 3)),
             UploadedFile::fake()->image('foo.png', 100, 200),
         );
     }
