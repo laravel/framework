@@ -41,15 +41,16 @@ trait Has
     }
 
     /**
-     * Asserts that the value is between 2 specified values.
+     * Assert that the prop size is between a given minimum and maximum.
      *
      * @param  int|string  $lowestValue
      * @param  int|string  $highestValue
      * @return $this
      */
-    public function between(int|string $lowestValue, int|string $highestValue): self
+    public function countBetween(int|string $lowestValue, int|string $highestValue): self
     {
         $path = $this->dotPath();
+
         $prop = $this->prop();
 
         PHPUnit::assertGreaterThanOrEqual(

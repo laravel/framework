@@ -293,7 +293,7 @@ class AssertTest extends TestCase
             'baz',
         ]);
 
-        $assert->between(1, 3);
+        $assert->countBetween(1, 3);
     }
 
     public function testAssertBetweenFails()
@@ -307,7 +307,7 @@ class AssertTest extends TestCase
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Root level size is not less than or equal to [2].');
 
-        $assert->between(1, 2);
+        $assert->countBetween(1, 2);
     }
 
     public function testAssertBetweenLowestValueFails()
@@ -321,7 +321,7 @@ class AssertTest extends TestCase
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Root level size is not greater than or equal to [4].');
 
-        $assert->between(4, 3);
+        $assert->countBetween(4, 3);
     }
 
     public function testAssertBetweenFailsScoped()
@@ -338,7 +338,7 @@ class AssertTest extends TestCase
         $this->expectExceptionMessage('Property [bar] size is not less than or equal to [2].');
 
         $assert->has('bar', function (AssertableJson $bar) {
-            $bar->between(1, 2);
+            $bar->countBetween(1, 2);
         });
     }
 
