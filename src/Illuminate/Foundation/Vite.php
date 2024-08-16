@@ -182,24 +182,6 @@ class Vite implements Htmlable
     }
 
     /**
-     * Set the prefetching strategy.
-     *
-     * @param  'waterfall'|'aggressive'|null  $strategy
-     * @param  array  $config
-     * @return $this
-     */
-    public function usePrefetchStrategy($strategy, $config = [])
-    {
-        $this->prefetchStrategy = $strategy;
-
-        if ($strategy === 'waterfall') {
-            $this->prefetchConcurrently = $config['concurrently'] ?? $this->prefetchConcurrently;
-        }
-
-        return $this;
-    }
-
-    /**
      * Resolve asset paths using the provided resolver.
      *
      * @param  callable|null  $resolver
@@ -295,6 +277,24 @@ class Vite implements Htmlable
         }
 
         $this->preloadTagAttributesResolvers[] = $attributes;
+
+        return $this;
+    }
+
+    /**
+     * Set the prefetching strategy.
+     *
+     * @param  'waterfall'|'aggressive'|null  $strategy
+     * @param  array  $config
+     * @return $this
+     */
+    public function usePrefetchStrategy($strategy, $config = [])
+    {
+        $this->prefetchStrategy = $strategy;
+
+        if ($strategy === 'waterfall') {
+            $this->prefetchConcurrently = $config['concurrently'] ?? $this->prefetchConcurrently;
+        }
 
         return $this;
     }
