@@ -1106,6 +1106,14 @@ class RoutingRouteTest extends TestCase
         $this->assertSame('TAYLOR', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
     }
 
+    public function testRestorableResourceRouteAllowsTrashed()
+    {
+        $router = $this->getRouter();
+        $router->resource('foo', RouteTestResourceControllerWithModelParameter::class, ['middleware' => SubstituteBindings::class])->restorable()->only(['restore']);
+
+        $this->assertTrue($router->getRoutes()->getByName('foo.restore')->allowsTrashedBindings());
+    }
+
     public function testGroupMerging()
     {
         $old = ['prefix' => 'foo/bar/'];
