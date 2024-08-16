@@ -1411,7 +1411,7 @@ class FoundationViteTest extends TestCase
         $this->makeViteManifest($manifest, $buildDir);
         app()->usePublicPath(__DIR__);
 
-        $html = (string) ViteFacade::withEntryPoints(['resources/js/app.js'])->useBuildDirectory($buildDir)->usePrefetchStrategy('waterfall', ['concurrently' => 10])->toHtml();
+        $html = (string) ViteFacade::withEntryPoints(['resources/js/app.js'])->useBuildDirectory($buildDir)->useWaterfallPrefetching(concurrency: 10)->toHtml();
 
         $expectedAssets = Js::from([
             ['rel' => 'prefetch', 'href' => "https://example.com/{$buildDir}/assets/ConfirmPassword-CDwcgU8E.js", 'fetchpriority' => 'low'],
@@ -1447,7 +1447,7 @@ class FoundationViteTest extends TestCase
         $this->makeViteManifest($manifest, $buildDir);
         app()->usePublicPath(__DIR__);
 
-        $html = (string) ViteFacade::withEntryPoints(['resources/js/app.js'])->useBuildDirectory($buildDir)->usePrefetchStrategy('aggressive')->toHtml();
+        $html = (string) ViteFacade::withEntryPoints(['resources/js/app.js'])->useBuildDirectory($buildDir)->useAggressivePrefetching()->toHtml();
 
         $expectedAssets = Js::from([
             ['rel' => 'prefetch', 'href' => "https://example.com/{$buildDir}/assets/ConfirmPassword-CDwcgU8E.js", 'fetchpriority' => 'low'],
