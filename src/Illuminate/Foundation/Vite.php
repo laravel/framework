@@ -5,6 +5,7 @@ namespace Illuminate\Foundation;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
+use Illuminate\Support\Js;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 
@@ -95,6 +96,20 @@ class Vite implements Htmlable
      * @var array
      */
     protected static $manifests = [];
+
+    /**
+     * The prefetching strategy to use.
+     *
+     * @var null|'waterfall'|'aggressive'
+     */
+    protected $prefetchStrategy = null;
+
+    /**
+     * The number of assets to load concurrently when using the "waterfall" strategy.
+     *
+     * @var int
+     */
+    protected $prefetchConcurrently = 3;
 
     /**
      * Get the preloaded assets.
@@ -267,6 +282,47 @@ class Vite implements Htmlable
     }
 
     /**
+     * Use the "waterfall" prefetching strategy.
+     *
+     * @param  int|null  $concurrency
+     * @return $this
+     */
+    public function useWaterfallPrefetching(?int $concurrency = null)
+    {
+        return $this->usePrefetchStrategy('waterfall', [
+            'concurrency' => $concurrency ?? $this->prefetchConcurrently
+        ]);
+    }
+
+    /**
+     * Use the "aggressive" prefetching strategy.
+     *
+     * @return $this
+     */
+    public function useAggressivePrefetching()
+    {
+        return $this->usePrefetchStrategy('aggressive');
+    }
+
+    /**
+     * Set the prefetching strategy.
+     *
+     * @param  'waterfall'|'aggressive'|null  $strategy
+     * @param  array  $config
+     * @return $this
+     */
+    public function usePrefetchStrategy($strategy, $config = [])
+    {
+        $this->prefetchStrategy = $strategy;
+
+        if ($strategy === 'waterfall') {
+            $this->prefetchConcurrently = $config['concurrency'] ?? $this->prefetchConcurrently;
+        }
+
+        return $this;
+    }
+
+    /**
      * Generate Vite tags for an entrypoint.
      *
      * @param  string|string[]  $entrypoints
@@ -363,7 +419,122 @@ class Vite implements Htmlable
             ->sortByDesc(fn ($args) => $this->isCssPath($args[1]))
             ->map(fn ($args) => $this->makePreloadTagForChunk(...$args));
 
-        return new HtmlString($preloads->join('').$stylesheets->join('').$scripts->join(''));
+        $base = $preloads->join('').$stylesheets->join('').$scripts->join('');
+
+        if ($this->prefetchStrategy === null || $this->isRunningHot()) {
+            return new HtmlString($base);
+        }
+
+        $discoveredImports = [];
+
+        return collect($entrypoints)
+            ->flatMap(fn ($entrypoint) => collect($manifest[$entrypoint]['dynamicImports'] ?? [])
+                ->map(fn ($import) => $manifest[$import])
+                ->filter(fn ($chunk) => str_ends_with($chunk['file'], '.js') || str_ends_with($chunk['file'], '.css'))
+                ->flatMap($f = function ($chunk) use (&$f, $manifest, &$discoveredImports) {
+                    return collect([...$chunk['imports'] ?? [], ...$chunk['dynamicImports'] ?? []])
+                        ->reject(function ($import) use (&$discoveredImports) {
+                            if (isset($discoveredImports[$import])) {
+                                return true;
+                            }
+
+                            return ! $discoveredImports[$import] = true;
+                        })
+                        ->reduce(
+                            fn ($chunks, $import) => $chunks->merge(
+                                $f($manifest[$import])
+                            ), collect([$chunk]))
+                        ->merge(collect($chunk['css'] ?? [])->map(
+                            fn ($css) => collect($manifest)->first(fn ($chunk) => $chunk['file'] === $css) ?? [
+                                'file' => $css,
+                            ],
+                        ));
+                })
+                ->map(function ($chunk) use ($buildDirectory, $manifest) {
+                    return collect([
+                        ...$this->resolvePreloadTagAttributes(
+                            $chunk['src'] ?? null,
+                            $url = $this->assetPath("{$buildDirectory}/{$chunk['file']}"),
+                            $chunk,
+                            $manifest,
+                        ),
+                        'rel' => 'prefetch',
+                        'fetchpriority' => 'low',
+                        'href' => $url,
+                    ])->reject(
+                        fn ($value) => in_array($value, [null, false], true)
+                    )->mapWithKeys(fn ($value, $key) => [
+                        $key = (is_int($key) ? $value : $key) => $value === true ? $key : $value,
+                    ])->all();
+                })
+                ->reject(fn ($attributes) => isset($this->preloadedAssets[$attributes['href']])))
+            ->unique('href')
+            ->values()
+            ->pipe(fn ($assets) => with(Js::from($assets), fn ($assets) => match ($this->prefetchStrategy) {
+                'waterfall' => new HtmlString($base.<<<HTML
+
+                    <script>
+                         window.addEventListener('load', () => window.setTimeout(() => {
+                            const makeLink = (asset) => {
+                                const link = document.createElement('link')
+
+                                Object.keys(asset).forEach((attribute) => {
+                                    link.setAttribute(attribute, asset[attribute])
+                                })
+
+                                return link
+                            }
+
+                            const loadNext = (assets, count) => window.setTimeout(() => {
+                                if (count > assets.length) {
+                                    count = assets.length
+
+                                    if (count === 0) {
+                                        return
+                                    }
+                                }
+
+                                const fragment = new DocumentFragment
+
+                                while (count > 0) {
+                                    const link = makeLink(assets.shift())
+                                    fragment.append(link)
+                                    count--
+
+                                    if (assets.length) {
+                                        link.onload = () => loadNext(assets, 1)
+                                        link.error = () => loadNext(assets, 1)
+                                    }
+                                }
+
+                                document.head.append(fragment)
+                            })
+
+                            loadNext({$assets}, {$this->prefetchConcurrently})
+                        }))
+                    </script>
+                    HTML),
+                'aggressive' => new HtmlString($base.<<<HTML
+
+                    <script>
+                         window.addEventListener('load', () => window.setTimeout(() => {
+                            const makeLink = (asset) => {
+                                const link = document.createElement('link')
+
+                                Object.keys(asset).forEach((attribute) => {
+                                    link.setAttribute(attribute, asset[attribute])
+                                })
+
+                                return link
+                            }
+
+                            const fragment = new DocumentFragment
+                            {$assets}.forEach((asset) => fragment.append(makeLink(asset)))
+                            document.head.append(fragment)
+                         }))
+                    </script>
+                    HTML),
+            }));
     }
 
     /**
