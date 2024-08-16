@@ -230,6 +230,13 @@ class RouteSingletonTest extends TestCase
         $this->post('/avatar/restore')->assertOk()->assertSee('singleton restore');
     }
 
+    public function testRestorableSingletonAllowsTrashed()
+    {
+        Route::singleton('avatar', SingletonTestController::class)->restorable();
+
+        $this->assertTrue(Route::getRoutes()->getByName('avatar.restore')->allowsTrashedBindings());
+    }
+
     public function testRestorableWithDestroyableSingleton()
     {
         Route::singleton('avatar', SingletonTestController::class)->destroyable()->restorable();
