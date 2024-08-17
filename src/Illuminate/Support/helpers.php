@@ -87,6 +87,28 @@ if (! function_exists('class_basename')) {
     }
 }
 
+if (! function_exists('required')) {
+    /**
+     * Return the required value or the default value.
+     *
+     * @template TValue
+     * @template TArgs
+     *
+     * @param  TValue|\Closure(TArgs): TValue  $callback
+     * @param  TValue  $require
+     * @param  mixed  $default
+     * @return TValue
+     */
+    function required($callback, $require, $default)
+    {
+        if ($callback($require) === $require) {
+            return $require;
+        }
+
+        return value($default);
+    }
+}
+
 if (! function_exists('class_uses_recursive')) {
     /**
      * Returns all traits used by a class, its parent classes and trait of their traits.
