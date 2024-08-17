@@ -89,7 +89,7 @@ if (! function_exists('class_basename')) {
 
 if (! function_exists('required')) {
     /**
-     * Return the required value or the fallback value.
+     * Returns a non-null value of the given closure or the fallback value.
      *
      * @template TValue
      * @template TArgs
