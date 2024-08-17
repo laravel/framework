@@ -1125,7 +1125,7 @@ class RoutingRouteTest extends TestCase
             'middleware' => SubstituteBindings::class,
             'uses' => function (#[Config('app.timezone')] string $value) {
                 return $value;
-            }
+            },
         ]);
 
         $this->assertSame('Europe/Paris', $router->dispatch(Request::create('foo', 'GET'))->getContent());
@@ -1146,7 +1146,7 @@ class RoutingRouteTest extends TestCase
             'middleware' => SubstituteBindings::class,
             'uses' => function (#[RoutingTestOnTenant(RoutingTestTenant::TenantA)] RoutingTestHasTenantImpl $property) {
                 return $property->tenant->name;
-            }
+            },
         ]);
 
         $this->assertSame('TenantA', $router->dispatch(Request::create('foo', 'GET'))->getContent());
@@ -2684,7 +2684,6 @@ class ExampleMiddleware implements ExampleMiddlewareContract
         return $next($request);
     }
 }
-
 
 #[Attribute(Attribute::TARGET_PARAMETER)]
 final class RoutingTestOnTenant
