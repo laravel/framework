@@ -89,23 +89,24 @@ if (! function_exists('class_basename')) {
 
 if (! function_exists('required')) {
     /**
-     * Return the required value or the default value.
+     * Return the required value or the fallback value.
      *
      * @template TValue
      * @template TArgs
      *
      * @param  TValue|\Closure(TArgs): TValue  $callback
-     * @param  TValue  $require
-     * @param  mixed  $default
+     * @param  mixed  $fallback
      * @return TValue
      */
-    function required($callback, $require, $default)
+    function required($callback, $fallback = null)
     {
-        if ($callback($require) === $require) {
-            return $require;
+        $result = $callback();
+
+        if (! is_null($result)) {
+            return $result;
         }
 
-        return value($default);
+        return value($fallback);
     }
 }
 

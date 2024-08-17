@@ -1207,6 +1207,19 @@ class SupportHelpersTest extends TestCase
             preg_replace_array($pattern, $replacements, $subject)
         );
     }
+
+    public function testRequired()
+    {
+        // Nullables
+        $this->assertEquals(10, required(fn () => null,10));
+        $this->assertEquals(true, required(fn () => null,true));
+        $this->assertEquals(false, required(fn () => null,false));
+
+        // Non-nullables
+        $this->assertEquals(10, required(fn () => 10,5));
+        $this->assertEquals(true, required(fn () => true,false));
+        $this->assertEquals(false, required(fn () => false,true));
+    }
 }
 
 trait SupportTestTraitOne
