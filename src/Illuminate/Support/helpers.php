@@ -98,7 +98,7 @@ if (! function_exists('required')) {
      * @param  mixed  $fallback
      * @return TValue
      */
-    function required($callback, $fallback = null)
+    function required($callback, $fallback)
     {
         $result = $callback();
 
