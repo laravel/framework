@@ -1208,17 +1208,17 @@ class SupportHelpersTest extends TestCase
         );
     }
 
-    public function testRequired()
+    public function testRequires()
     {
         // Nullables
-        $this->assertEquals(10, required(fn () => null, 10));
-        $this->assertEquals(true, required(fn () => null, true));
-        $this->assertEquals(false, required(fn () => null, false));
+        $this->assertEquals(10, requires(fn () => null, 10));
+        $this->assertEquals(true, requires(fn () => null, true));
+        $this->assertEquals(false, requires(fn () => null, false));
 
         // Non-nullables
-        $this->assertEquals(10, required(fn () => 10, 5));
-        $this->assertEquals(true, required(fn () => true, false));
-        $this->assertEquals(false, required(fn () => false, true));
+        $this->assertEquals(10, requires(fn () => 10, 5));
+        $this->assertEquals(true, requires(fn () => true, false));
+        $this->assertEquals(false, requires(fn () => false, true));
     }
 }
 

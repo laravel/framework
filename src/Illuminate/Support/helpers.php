@@ -87,7 +87,7 @@ if (! function_exists('class_basename')) {
     }
 }
 
-if (! function_exists('required')) {
+if (! function_exists('requires')) {
     /**
      * Returns a non-null value of the given closure or the fallback value.
      *
@@ -98,7 +98,7 @@ if (! function_exists('required')) {
      * @param  mixed  $fallback
      * @return TValue
      */
-    function required($callback, $fallback)
+    function requires($callback, $fallback)
     {
         $result = $callback();
 
