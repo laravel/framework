@@ -198,16 +198,16 @@ class Migrator
      */
     protected function runUp($file, $batch, $pretend)
     {
+        if ($pretend) {
+            return $this->pretendToRun($file, 'up', $batch);
+        }
+
         // First we will resolve a "real" instance of the migration class from this
         // migration file name. Once we have the instances we can run the actual
         // command such as "up" or "down", or we can just simulate the action.
         $migration = $this->resolvePath($file);
 
         $name = $this->getMigrationName($file);
-
-        if ($pretend) {
-            return $this->pretendToRun($migration, 'up');
-        }
 
         $this->write(Task::class, $name, fn () => $this->runMigration($migration, 'up'));
 
@@ -361,16 +361,16 @@ class Migrator
      */
     protected function runDown($file, $migration, $pretend)
     {
+        if ($pretend) {
+            return $this->pretendToRun($file, 'down');
+        }
+
         // First we will get the file name of the migration so we can resolve out an
         // instance of the migration. Once we get an instance we can either run a
         // pretend execution of the migration or we can run the real migration.
         $instance = $this->resolvePath($file);
 
         $name = $this->getMigrationName($file);
-
-        if ($pretend) {
-            return $this->pretendToRun($instance, 'down');
-        }
 
         $this->write(Task::class, $name, fn () => $this->runMigration($instance, 'down'));
 
@@ -412,25 +412,22 @@ class Migrator
     /**
      * Pretend to run the migrations.
      *
-     * @param  object  $migration
+     * @param  string $file
      * @param  string  $method
+     * @param  int|null $batch
      * @return void
      */
-    protected function pretendToRun($migration, $method)
+    protected function pretendToRun($file, $method, $batch = null)
     {
-        $name = get_class($migration);
+        $migration = $this->resolvePath($file);
 
-        $reflectionClass = new ReflectionClass($migration);
-
-        if ($reflectionClass->isAnonymous()) {
-            $name = $this->getMigrationName($reflectionClass->getFileName());
-        }
+        $name = $this->getMigrationName($file);
 
         $this->write(TwoColumnDetail::class, $name);
 
         $this->write(
             BulletList::class,
-            collect($this->getQueries($migration, $method))->map(fn ($query) => $query['query'])
+            collect($this->getQueries($migration, $name, $method, $batch))->map(fn ($query) => $query['query'])
         );
     }
 
@@ -438,10 +435,12 @@ class Migrator
      * Get all of the queries that would be run for a migration.
      *
      * @param  object  $migration
+     * @param  string  $name
      * @param  string  $method
+     * @param int|null $batch
      * @return array
      */
-    protected function getQueries($migration, $method)
+    protected function getQueries($migration, $name, $method, $batch)
     {
         // Now that we have the connections we can resolve it and pretend to run the
         // queries against the database returning the array of raw SQL statements
@@ -450,9 +449,15 @@ class Migrator
             $migration->getConnection()
         );
 
-        return $db->pretend(function () use ($db, $migration, $method) {
+        return $db->pretend(function () use ($db, $migration, $name, $method, $batch) {
             if (method_exists($migration, $method)) {
                 $this->runMethod($db, $migration, $method);
+            }
+
+            if ($method === 'up') {
+                $this->repository->log($name, $batch);
+            } else {
+                $this->repository->delete($migration);
             }
         });
     }

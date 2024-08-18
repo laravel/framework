@@ -85,15 +85,22 @@ class MigratorTest extends TestCase
         $this->expectBulletList([
             'create table "people" ("id" integer primary key autoincrement not null, "name" varchar not null, "email" varchar not null, "password" varchar not null, "remember_token" varchar, "created_at" datetime, "updated_at" datetime)',
             'create unique index "people_email_unique" on "people" ("email")',
+            'insert into "migrations" ("migration", "batch") values (\'2014_10_12_000000_create_people_table\', 1)',
         ]);
 
         $this->expectTwoColumnDetail('ModifyPeopleTable');
-        $this->expectBulletList(['alter table "people" add column "first_name" varchar']);
+        $this->expectBulletList([
+            'alter table "people" add column "first_name" varchar',
+            'insert into "migrations" ("migration", "batch") values (\'2015_10_04_000000_modify_people_table\', 1)',
+        ]);
 
         $this->expectTwoColumnDetail('2016_10_04_000000_modify_people_table');
-        $this->expectBulletList(['alter table "people" add column "last_name" varchar']);
+        $this->expectBulletList([
+            'alter table "people" add column "last_name" varchar',
+            'insert into "migrations" ("migration", "batch") values (\'2016_10_04_000000_modify_people_table\', 1)',
+        ]);
 
-        $this->output->shouldReceive('writeln')->once();
+        $this->output->shouldReceive('writeln')->times(3);
 
         $this->subject->run([__DIR__.'/fixtures'], ['pretend' => true]);
 
@@ -253,7 +260,7 @@ class MigratorTest extends TestCase
 
     protected function expectBulletList($elements): void
     {
-        $this->output->shouldReceive('writeln')->once()->with(m::on(function ($argument) use ($elements) {
+        $this->output->shouldReceive('writeln')->with(m::on(function ($argument) use ($elements) {
             foreach ($elements as $element) {
                 if (! str($argument)->contains("⇂ $element")) {
                     return false;
