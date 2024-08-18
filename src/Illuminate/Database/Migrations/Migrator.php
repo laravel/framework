@@ -412,9 +412,9 @@ class Migrator
     /**
      * Pretend to run the migrations.
      *
-     * @param  string $file
+     * @param  string  $file
      * @param  string  $method
-     * @param  int|null $batch
+     * @param  int|null  $batch
      * @return void
      */
     protected function pretendToRun($file, $method, $batch = null)
@@ -437,7 +437,7 @@ class Migrator
      * @param  object  $migration
      * @param  string  $name
      * @param  string  $method
-     * @param int|null $batch
+     * @param  int|null  $batch
      * @return array
      */
     protected function getQueries($migration, $name, $method, $batch)
