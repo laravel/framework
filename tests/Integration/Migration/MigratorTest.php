@@ -198,7 +198,7 @@ class MigratorTest extends TestCase
             'insert into "blogs" ("id", "name") values (2, \'John Doe Blog\')',
         ]);
 
-        $this->output->shouldReceive('writeln')->once();
+        $this->output->shouldReceive('writeln')->twice();
 
         $this->subject->run([__DIR__.'/pretending/2023_10_17_000000_dynamic_content_is_shown.php'], ['pretend' => true]);
 
@@ -229,7 +229,7 @@ class MigratorTest extends TestCase
             'select * from "people"',
         ]);
 
-        $this->output->shouldReceive('writeln')->once();
+        $this->output->shouldReceive('writeln')->twice();
 
         $this->subject->run([__DIR__.'/pretending/2023_10_17_000000_dynamic_content_not_shown.php'], ['pretend' => true]);
 
@@ -240,7 +240,7 @@ class MigratorTest extends TestCase
 
     protected function expectInfo($message): void
     {
-        $this->output->shouldReceive('writeln')->once()->with(m::on(
+        $this->output->shouldReceive('writeln')->with(m::on(
             fn ($argument) => str($argument)->contains($message),
         ), m::any());
     }
