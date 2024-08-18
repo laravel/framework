@@ -5,7 +5,7 @@ namespace Illuminate\Support;
 /**
  * @template TKey of array-key
  *
- * @template-covariant TValue of mixed
+ * @template-covariant TValue
  *
  * @mixin \Illuminate\Support\Enumerable<TKey, TValue>
  * @mixin TValue
