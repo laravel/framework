@@ -1078,6 +1078,17 @@ class SupportStringableTest extends TestCase
         $this->assertSame('     ❤MultiByte☆', (string) $this->stringable('❤MultiByte☆')->padLeft(16));
     }
 
+    public function testPath()
+    {
+        $path = sprintf('x%sy%sz', DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR);
+
+        $this->assertSame("$path", (string) $this->stringable(' x/  y/z/ ')->path());
+        $this->assertSame("$path", (string) $this->stringable('///x/y/z//')->path());
+        $this->assertSame("$path", (string) $this->stringable(' | " ?:x/\>>**y/\<<z//')->path());
+        $this->assertSame("$path", (string) $this->stringable('x////y///z')->path());
+        $this->assertSame("$path", (string) $this->stringable('x\\\\y\\z')->path());
+    }
+
     public function testPadRight()
     {
         $this->assertSame('Alien-----', (string) $this->stringable('Alien')->padRight(10, '-'));

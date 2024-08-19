@@ -925,6 +925,36 @@ class Str
     }
 
     /**
+     * Convert to a universal file path
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public static function path(string $value)
+    {
+        $value = trim($value);
+
+        // If path separator is hardcoded make it platform independent
+        $value =  preg_replace('/(^[\/\\\\]+)|([\/\\\\]+$)|[\/\\\\]+/', DIRECTORY_SEPARATOR, $value);
+
+        // Remove the leading/trailing separators
+        $value = trim($value, DIRECTORY_SEPARATOR);
+
+        // Remove special characters (:,*,?,",<,>,|) that aren't allowed in some os
+        $value = preg_replace('/[:\*\?\"\<\>\|]/', '', $value);
+
+        // Trim paths
+        $value = implode(
+            DIRECTORY_SEPARATOR,
+            collect(explode(DIRECTORY_SEPARATOR, $value))
+                ->transform(fn ($value) => trim($value))
+                ->toArray()
+        );
+
+        return $value;
+    }
+
+    /**
      * Get the plural form of an English word.
      *
      * @param  string  $value

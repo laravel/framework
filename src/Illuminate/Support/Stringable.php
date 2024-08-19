@@ -601,6 +601,17 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Convert to a universal file path
+     *
+     * @param  string  $value
+     * @return static
+     */
+    public function path()
+    {
+        return new static(Str::path($this->value));
+    }
+
+    /**
      * Call the given callback and return a new string.
      *
      * @param  callable  $callback

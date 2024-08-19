@@ -1150,6 +1150,17 @@ class SupportStrTest extends TestCase
         $this->assertSame('❤MultiByte☆❤☆❤☆❤', Str::padRight('❤MultiByte☆', 16, '❤☆'));
     }
 
+    public function testPath()
+    {
+        $path = sprintf('x%sy%sz', DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR);
+
+        $this->assertSame("$path", Str::path(' x/  y/z/ '));
+        $this->assertSame("$path", Str::path('///x/y/z//'));
+        $this->assertSame("$path", Str::path(' | " ?:x/\>>**y/\<<z//'));
+        $this->assertSame("$path", Str::path('x////y///z'));
+        $this->assertSame("$path", Str::path('x\\\\y\\z'));
+    }
+
     public function testSwapKeywords(): void
     {
         $this->assertSame(
