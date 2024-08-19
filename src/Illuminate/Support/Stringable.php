@@ -602,6 +602,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
 
     /**
      * Convert to a universal file path.
+     *
      * @param  string  $replace  Special characters are replaced with this param default empty
      * @return static
      */
