@@ -925,7 +925,7 @@ class Str
     }
 
     /**
-     * Convert to a universal file path
+     * Convert to a universal file path.
      *
      * @param  string  $value
      * @param  string  $replace  Special characters are replaced with this param default empty
