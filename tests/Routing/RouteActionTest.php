@@ -4,7 +4,6 @@ namespace Illuminate\Tests\Routing;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Events\Dispatcher;
-use Illuminate\Routing\Route;
 use Illuminate\Routing\RouteAction;
 use Illuminate\Routing\Router;
 use Laravel\SerializableClosure\SerializableClosure;
@@ -35,19 +34,21 @@ class RouteActionTest extends TestCase
 
         $route = $router->get('/', ['FooController', 'index']);
 
-        $this->assertSame($route->getActionName(), 'FooController@index');
+        $this->assertSame('FooController@index', $route->getActionName());
 
-        $route = $router->get('/', function() {});
+        $route = $router->get('/', function () {
+        });
 
-        $this->assertSame($route->getActionName(), 'Closure');
+        $this->assertSame('Closure', $route->getActionName());
 
         $route = $router->get('/')->uses(['FooController', 'index']);
 
-        $this->assertSame($route->getActionName(), 'FooController@index');
+        $this->assertSame('FooController@index', $route->getActionName());
 
-        $route = $router->get('/')->uses(function() {});
+        $route = $router->get('/')->uses(function () {
+        });
 
-        $this->assertSame($route->getActionName(), 'Closure');
+        $this->assertSame('Closure', $route->getActionName());
     }
 }
 

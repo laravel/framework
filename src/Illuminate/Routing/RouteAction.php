@@ -47,7 +47,7 @@ class RouteAction
             $action['uses'] = static::makeInvokable($action['uses']);
         }
 
-        if (isset($action['controller']) && !is_string($action['controller'])) {
+        if (isset($action['controller']) && ! is_string($action['controller'])) {
             $action['controller'] = null;
         }
 
