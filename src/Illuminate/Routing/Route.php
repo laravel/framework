@@ -921,7 +921,7 @@ class Route
 
         return $this->setAction(array_merge($this->action, $this->parseAction([
             'uses' => $action,
-            'controller' => is_string($action) ? $action : null,
+            'controller' => $action,
         ])));
     }
 
