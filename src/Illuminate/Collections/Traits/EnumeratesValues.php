@@ -24,35 +24,35 @@ use WeakMap;
  *
  * @template-covariant TValue
  *
- * @property-read HigherOrderCollectionProxy $average
- * @property-read HigherOrderCollectionProxy $avg
- * @property-read HigherOrderCollectionProxy $contains
- * @property-read HigherOrderCollectionProxy $doesntContain
- * @property-read HigherOrderCollectionProxy $each
- * @property-read HigherOrderCollectionProxy $every
- * @property-read HigherOrderCollectionProxy $filter
- * @property-read HigherOrderCollectionProxy $first
- * @property-read HigherOrderCollectionProxy $flatMap
- * @property-read HigherOrderCollectionProxy $groupBy
- * @property-read HigherOrderCollectionProxy $keyBy
- * @property-read HigherOrderCollectionProxy $map
- * @property-read HigherOrderCollectionProxy $max
- * @property-read HigherOrderCollectionProxy $min
- * @property-read HigherOrderCollectionProxy $partition
- * @property-read HigherOrderCollectionProxy $percentage
- * @property-read HigherOrderCollectionProxy $reject
- * @property-read HigherOrderCollectionProxy $skipUntil
- * @property-read HigherOrderCollectionProxy $skipWhile
- * @property-read HigherOrderCollectionProxy $some
- * @property-read HigherOrderCollectionProxy $sortBy
- * @property-read HigherOrderCollectionProxy $sortByDesc
- * @property-read HigherOrderCollectionProxy $sum
- * @property-read HigherOrderCollectionProxy $takeUntil
- * @property-read HigherOrderCollectionProxy $takeWhile
- * @property-read HigherOrderCollectionProxy $unique
- * @property-read HigherOrderCollectionProxy $unless
- * @property-read HigherOrderCollectionProxy $until
- * @property-read HigherOrderCollectionProxy $when
+ * @property-read HigherOrderCollectionProxy<TKey, TValue> $average
+ * @property-read HigherOrderCollectionProxy<TKey, TValue> $avg
+ * @property-read HigherOrderCollectionProxy<TKey, TValue> $contains
+ * @property-read HigherOrderCollectionProxy<TKey, TValue> $doesntContain
+ * @property-read HigherOrderCollectionProxy<TKey, TValue> $each
+ * @property-read HigherOrderCollectionProxy<TKey, TValue> $every
+ * @property-read HigherOrderCollectionProxy<TKey, TValue> $filter
+ * @property-read HigherOrderCollectionProxy<TKey, TValue> $first
+ * @property-read HigherOrderCollectionProxy<TKey, TValue> $flatMap
+ * @property-read HigherOrderCollectionProxy<TKey, TValue> $groupBy
+ * @property-read HigherOrderCollectionProxy<TKey, TValue> $keyBy
+ * @property-read HigherOrderCollectionProxy<TKey, TValue> $map
+ * @property-read HigherOrderCollectionProxy<TKey, TValue> $max
+ * @property-read HigherOrderCollectionProxy<TKey, TValue> $min
+ * @property-read HigherOrderCollectionProxy<TKey, TValue> $partition
+ * @property-read HigherOrderCollectionProxy<TKey, TValue> $percentage
+ * @property-read HigherOrderCollectionProxy<TKey, TValue> $reject
+ * @property-read HigherOrderCollectionProxy<TKey, TValue> $skipUntil
+ * @property-read HigherOrderCollectionProxy<TKey, TValue> $skipWhile
+ * @property-read HigherOrderCollectionProxy<TKey, TValue> $some
+ * @property-read HigherOrderCollectionProxy<TKey, TValue> $sortBy
+ * @property-read HigherOrderCollectionProxy<TKey, TValue> $sortByDesc
+ * @property-read HigherOrderCollectionProxy<TKey, TValue> $sum
+ * @property-read HigherOrderCollectionProxy<TKey, TValue> $takeUntil
+ * @property-read HigherOrderCollectionProxy<TKey, TValue> $takeWhile
+ * @property-read HigherOrderCollectionProxy<TKey, TValue> $unique
+ * @property-read HigherOrderCollectionProxy<TKey, TValue> $unless
+ * @property-read HigherOrderCollectionProxy<TKey, TValue> $until
+ * @property-read HigherOrderCollectionProxy<TKey, TValue> $when
  */
 trait EnumeratesValues
 {
