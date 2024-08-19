@@ -29,7 +29,7 @@ class RouteActionTest extends TestCase
         $this->assertFalse(RouteAction::containsSerializedClosure($action));
     }
 
-    public function test_action_name_is_a_string_or_null()
+    public function test_action_name_is_a_string()
     {
         $router = new Router(new Dispatcher());
 
