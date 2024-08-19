@@ -928,9 +928,10 @@ class Str
      * Convert to a universal file path
      *
      * @param  string  $value
+     * @param  string  $replace Special characters are replaced with this param default empty
      * @return string
      */
-    public static function path(string $value)
+    public static function path(string $value, string $replace = '')
     {
         $value = trim($value);
 
@@ -941,7 +942,7 @@ class Str
         $value = trim($value, DIRECTORY_SEPARATOR);
 
         // Remove special characters (:,*,?,",<,>,|) that aren't allowed in some os
-        $value = preg_replace('/[:\*\?\"\<\>\|]/', '', $value);
+        $value = preg_replace('/[:\*\?\"\<\>\|]/', $replace, $value);
 
         // Trim paths
         $value = implode(

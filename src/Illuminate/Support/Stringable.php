@@ -602,13 +602,12 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
 
     /**
      * Convert to a universal file path
-     *
-     * @param  string  $value
+     * @param  string  $replace  Special characters are replaced with this param default empty
      * @return static
      */
-    public function path()
+    public function path($replace = '')
     {
-        return new static(Str::path($this->value));
+        return new static(Str::path($this->value, $replace));
     }
 
     /**

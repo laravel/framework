@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Support;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
+use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
 use League\CommonMark\Environment\EnvironmentBuilderInterface;
 use League\CommonMark\Extension\ExtensionInterface;
@@ -1080,13 +1081,17 @@ class SupportStringableTest extends TestCase
 
     public function testPath()
     {
-        $path = sprintf('x%sy%sz', DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR);
+        $ds = DIRECTORY_SEPARATOR;
+        $path = sprintf('x%sy%sz', $ds, $ds);
 
         $this->assertSame("$path", (string) $this->stringable(' x/  y/z/ ')->path());
         $this->assertSame("$path", (string) $this->stringable('///x/y/z//')->path());
         $this->assertSame("$path", (string) $this->stringable(' | " ?:x/\>>**y/\<<z//')->path());
         $this->assertSame("$path", (string) $this->stringable('x////y///z')->path());
         $this->assertSame("$path", (string) $this->stringable('x\\\\y\\z')->path());
+
+        $this->assertSame("users{$ds}davejohn", (string) $this->stringable('users/dave:john')->path());
+        $this->assertSame("users{$ds}dave_john", (string) $this->stringable('users/dave_john')->path('_'));
     }
 
     public function testPadRight()

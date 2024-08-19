@@ -1152,13 +1152,17 @@ class SupportStrTest extends TestCase
 
     public function testPath()
     {
-        $path = sprintf('x%sy%sz', DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR);
+        $ds = DIRECTORY_SEPARATOR;
+        $path = sprintf('x%sy%sz', $ds, $ds);
 
         $this->assertSame("$path", Str::path(' x/  y/z/ '));
         $this->assertSame("$path", Str::path('///x/y/z//'));
         $this->assertSame("$path", Str::path(' | " ?:x/\>>**y/\<<z//'));
         $this->assertSame("$path", Str::path('x////y///z'));
         $this->assertSame("$path", Str::path('x\\\\y\\z'));
+
+        $this->assertSame("users{$ds}davejohn", Str::path('users/dave:john'));
+        $this->assertSame("users{$ds}dave_john", Str::path('users/dave_john', '_'));
     }
 
     public function testSwapKeywords(): void
