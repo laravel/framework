@@ -858,7 +858,6 @@ foreach ($collection as $int => $user) {
     assertType('User', $user);
 }
 
-
 class LazyAnimal
 {
 }
