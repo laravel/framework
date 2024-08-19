@@ -647,6 +647,15 @@ class ContainerTest extends TestCase
         $container->get('Taylor');
     }
 
+    public function testUnknownEntryThrowsExceptionWithExpectedMessage()
+    {
+        $this->expectException(EntryNotFoundException::class);
+        $this->expectExceptionMessage("No container bind defined for: Taylor.");
+
+        $container = new Container;
+        $container->get('Taylor');
+    }
+
     public function testBoundEntriesThrowsContainerExceptionWhenNotResolvable()
     {
         $this->expectException(ContainerExceptionInterface::class);
