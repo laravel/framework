@@ -12,6 +12,7 @@ class EntryNotFoundException extends Exception implements NotFoundExceptionInter
      *
      * @param  string  $id
      * @param  int  $code
+     * @param  \Throwable|null  $previous
      * @return void
      */
     public function __construct($id, $code, $previous)
