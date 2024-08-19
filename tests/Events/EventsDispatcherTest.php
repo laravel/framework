@@ -583,6 +583,21 @@ class EventsDispatcherTest extends TestCase
 
         unset($_SERVER['__event.test']);
     }
+
+    public function testDispatchWithObjectAndClassWithArguments()
+    {
+        unset($_SERVER['__event.test']);
+        $d = new Dispatcher;
+        $d->listen(TestEvent1::class, [TestListener4::class, 'handle']);
+
+        $test = 'hello';
+
+        $d->dispatch(new TestEvent1($test));
+        $this->assertSame($test, $_SERVER['__event.test']);
+
+        $d->dispatch(TestEvent1::class, [$test]);
+        $this->assertSame($test, $_SERVER['__event.test']);
+    }
 }
 
 class TestListenerLean
@@ -724,5 +739,21 @@ class TestListener3
     public function handle()
     {
         $_SERVER['__event.test'][] = 'handle-3';
+    }
+}
+
+class TestEvent1
+{
+    public function __construct(
+        public string $test
+    ) {
+    }
+}
+
+class TestListener4
+{
+    public function handle(TestEvent1 $exampleEvent)
+    {
+        $_SERVER['__event.test'] = $exampleEvent->test;
     }
 }

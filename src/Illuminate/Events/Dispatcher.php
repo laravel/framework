@@ -316,6 +316,8 @@ class Dispatcher implements DispatcherContract
     {
         if (is_object($event)) {
             [$payload, $event] = [[$event], get_class($event)];
+        } elseif (class_exists($event)) {
+            [$payload, $event] = [[new $event(...$payload)], $event];
         }
 
         return [$event, Arr::wrap($payload)];
