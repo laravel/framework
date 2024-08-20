@@ -168,7 +168,7 @@ class Number
     public static function forHumans(int|float $number, int $precision = 0, ?int $maxPrecision = null, bool $abbreviate = false)
     {
         return static::summarize($number, $precision, $maxPrecision, $abbreviate ? [
-            3 => 'K',
+            3 => 'k',
             6 => 'M',
             9 => 'B',
             12 => 'T',
@@ -195,7 +195,7 @@ class Number
     {
         if (empty($units)) {
             $units = [
-                3 => 'K',
+                3 => 'k',
                 6 => 'M',
                 9 => 'B',
                 12 => 'T',
