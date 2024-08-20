@@ -583,9 +583,9 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
-     * @param $column
-     * @param array $priority
-     * @param $direction
+     * @param  $column
+     * @param  array $priority
+     * @param  $direction
      * @return string
      */
     public function orderByPriority($column, array $priority, $direction = 'asc')
@@ -596,7 +596,7 @@ class SqlServerGrammar extends Grammar
             $cases[] = "WHEN {$column} = ? THEN {$index}";
         }
 
-        $caseStatement = "CASE " . implode(' ', $cases) . " ELSE " . count($priority) . " END";
+        $caseStatement = 'CASE '.implode(' ', $cases).' ELSE '.count($priority).' END';
 
         return "{$caseStatement} {$direction}";
     }

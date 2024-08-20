@@ -2638,7 +2638,7 @@ class Builder implements BuilderContract
 
         $grammar = $this->getGrammar();
 
-        if (!method_exists($grammar, 'orderByPriority')) {
+        if (! method_exists($grammar, 'orderByPriority')) {
             throw new RuntimeException('The "orderByPriority" function is not supported by this database.');
         }
 
