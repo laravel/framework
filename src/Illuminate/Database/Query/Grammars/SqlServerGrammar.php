@@ -584,7 +584,7 @@ class SqlServerGrammar extends Grammar
 
     /**
      * @param  $column
-     * @param  array $priority
+     * @param  array  $priority
      * @param  $direction
      * @return string
      */

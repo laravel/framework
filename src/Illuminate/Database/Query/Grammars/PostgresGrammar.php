@@ -777,7 +777,7 @@ class PostgresGrammar extends Grammar
      * Apply custom ordering to a query based on a priority array.
      *
      * @param  $column
-     * @param  array $priority
+     * @param  array  $priority
      * @param  $direction
      * @return string
      */
