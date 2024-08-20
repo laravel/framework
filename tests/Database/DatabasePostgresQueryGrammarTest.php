@@ -28,4 +28,11 @@ class DatabasePostgresQueryGrammarTest extends TestCase
 
         $this->assertSame('select * from "users" where \'{}\' ? \'Hello\\\'\\\'World?\' AND "email" = \'foo\'', $query);
     }
+
+    public function testOrderByPriority()
+    {
+        $grammar = new PostgresGrammar;
+        $queryString = $grammar->orderByPriority('name', ['john', 'doe']);
+        $this->assertSame('CASE WHEN name = ? THEN 0 WHEN name = ? THEN 1 ELSE 2 END asc', $queryString);
+    }
 }

@@ -456,4 +456,25 @@ class SQLiteGrammar extends Grammar
 
         return 'json_extract('.$field.$path.')';
     }
+
+    /**
+     * Apply custom ordering to a query based on a priority array.
+     *
+     * @param $column
+     * @param array $priority
+     * @param $direction
+     * @return string
+     */
+    public function orderByPriority($column, array $priority, $direction = 'asc')
+    {
+        $cases = [];
+
+        foreach ($priority as $index => $value) {
+            $cases[] = "WHEN {$column} = ? THEN {$index}";
+        }
+
+        $caseStatement = "CASE " . implode(' ', $cases) . " ELSE " . count($priority) . " END";
+
+        return "{$caseStatement} {$direction}";
+    }
 }
