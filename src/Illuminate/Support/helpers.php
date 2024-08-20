@@ -475,7 +475,7 @@ if (! function_exists('transform')) {
             return $default($value);
         }
 
-        return value($default);
+        return $default;
     }
 }
 
