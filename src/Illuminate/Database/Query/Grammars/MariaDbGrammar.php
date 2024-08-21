@@ -53,19 +53,4 @@ class MariaDbGrammar extends MySqlGrammar
     {
         return false;
     }
-
-    /**
-     * Apply custom ordering to a query based on a priority array.
-     *
-     * @param  $column
-     * @param  array  $priority
-     * @param  $direction
-     * @return string
-     */
-    public function orderByPriority($column, array $priority, $direction = 'asc')
-    {
-        $placeholders = implode(',', array_fill(0, count($priority), '?'));
-
-        return "FIELD($column, $placeholders) $direction";
-    }
 }

@@ -528,15 +528,17 @@ class MySqlGrammar extends Grammar
     /**
      * Apply custom ordering to a query based on a priority array.
      *
-     * @param  $column
+     * @param  string  $column
      * @param  array  $priority
-     * @param  $direction
+     * @param  string  $direction
      * @return string
      */
-    public function orderByPriority($column, array $priority, $direction = 'asc')
+    public function orderByPriority(string $column, array $priority, string $direction = 'asc')
     {
+        $column = $this->wrap($column);
+
         $placeholders = implode(',', array_fill(0, count($priority), '?'));
 
-        return "FIELD($column, $placeholders) $direction";
+        return 'field('.$column.', '.$placeholders.') '.$direction;
     }
 }

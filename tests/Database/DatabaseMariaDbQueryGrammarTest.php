@@ -33,6 +33,6 @@ class DatabaseMariaDbQueryGrammarTest extends TestCase
     {
         $grammar = new MariaDbGrammar;
         $queryString = $grammar->orderByPriority('name', ['john', 'doe']);
-        $this->assertSame('FIELD(name, ?,?) asc', $queryString);
+        $this->assertSame('field(`name`, ?,?) asc', $queryString);
     }
 }

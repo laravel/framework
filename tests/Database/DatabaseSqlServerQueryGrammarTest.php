@@ -33,6 +33,6 @@ class DatabaseSqlServerQueryGrammarTest extends TestCase
     {
         $grammar = new SqlServerGrammar;
         $queryString = $grammar->orderByPriority('name', ['john', 'doe']);
-        $this->assertSame('CASE WHEN name = ? THEN 0 WHEN name = ? THEN 1 ELSE 2 END asc', $queryString);
+        $this->assertSame('case when [name] = ? then 0 when [name] = ? then 1 else 2 end asc', $queryString);
     }
 }

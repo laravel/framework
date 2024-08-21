@@ -460,20 +460,22 @@ class SQLiteGrammar extends Grammar
     /**
      * Apply custom ordering to a query based on a priority array.
      *
-     * @param  $column
+     * @param  string  $column
      * @param  array  $priority
-     * @param  $direction
+     * @param  string  $direction
      * @return string
      */
-    public function orderByPriority($column, array $priority, $direction = 'asc')
+    public function orderByPriority(string $column, array $priority,string $direction = 'asc')
     {
+        $column = $this->wrap($column);
+
         $cases = [];
 
         foreach ($priority as $index => $value) {
-            $cases[] = "WHEN {$column} = ? THEN {$index}";
+            $cases[] = "when {$column} = ? then {$index}";
         }
 
-        $caseStatement = 'CASE '.implode(' ', $cases).' ELSE '.count($priority).' END';
+        $caseStatement = 'case '.implode(' ', $cases).' else '.count($priority).' end';
 
         return "{$caseStatement} {$direction}";
     }

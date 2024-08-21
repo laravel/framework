@@ -33,6 +33,6 @@ class DatabaseMySqlQueryGrammarTest extends TestCase
     {
         $grammar = new MySqlGrammar;
         $queryString = $grammar->orderByPriority('name', ['john', 'doe']);
-        $this->assertSame('FIELD(name, ?,?) asc', $queryString);
+        $this->assertSame('field(`name`, ?,?) asc', $queryString);
     }
 }
