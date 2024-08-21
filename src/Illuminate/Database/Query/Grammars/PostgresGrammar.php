@@ -781,7 +781,7 @@ class PostgresGrammar extends Grammar
      * @param  string  $direction
      * @return string
      */
-    public function orderByPriority(string $column, array $priority,string $direction = 'asc')
+    public function orderByPriority(string $column, array $priority, string $direction = 'asc')
     {
         $column = $this->wrap($column);
 
