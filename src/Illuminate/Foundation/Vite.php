@@ -282,9 +282,21 @@ class Vite implements Htmlable
     }
 
     /**
-     * Use the "waterfall" prefetching strategy.
+     * Eagerly prefetch assets.
      *
      * @param  int|null  $concurrency
+     * @return $this
+     */
+    public function prefetch($concurrency = null)
+    {
+        return $concurrency === null
+            ? $this->usePrefetchStrategy('aggressive')
+            : $this->usePrefetchStrategy('waterfall', ['concurrency' => $concurrency]);
+    }
+
+    /**
+     * Use the "waterfall" prefetching strategy.
+     *
      * @return $this
      */
     public function useWaterfallPrefetching(?int $concurrency = null)
