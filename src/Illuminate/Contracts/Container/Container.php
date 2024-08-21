@@ -216,4 +216,23 @@ interface Container extends ContainerInterface
      * @return void
      */
     public function afterResolving($abstract, ?Closure $callback = null);
+
+    /**
+     * Refresh an instance on the given target and method.
+     *
+     * @param  string  $abstract
+     * @param  mixed  $target
+     * @param  string  $method
+     * @return mixed
+     */
+    public function refresh($abstract, $target, $method);
+
+    /**
+     * Bind a new callback to an abstract's rebind event.
+     *
+     * @param  string  $abstract
+     * @param  \Closure  $callback
+     * @return mixed
+     */
+    public function rebinding($abstract, Closure $callback);
 }
