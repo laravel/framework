@@ -929,33 +929,105 @@ class Builder implements BuilderContract
 
     /**
      * Get a collection with the values of a given column.
+     * Support specifying additional columns useful for mutations.
      *
      * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
      * @param  string|null  $key
+     * @param  string|array|null  $additional_columns
      * @return \Illuminate\Support\Collection<array-key, mixed>
      */
-    public function pluck($column, $key = null)
+    public function pluck($column, $key = null, $additional_columns = null)
     {
-        $results = $this->toBase()->pluck($column, $key);
+        $builder = $this->applyScopes();
 
-        $column = $column instanceof Expression ? $column->getValue($this->getGrammar()) : $column;
+        $columns = array_filter(array_merge([$column], [$key], (array) $additional_columns));
 
-        $column = Str::after($column, "{$this->model->getTable()}.");
+        $results = $builder->getModels($columns);
 
-        // If the model has a mutator for the requested column, we will spin through
-        // the results and mutate the values so that the mutated version of these
-        // columns are returned as you would expect from these Eloquent models.
-        if (! $this->model->hasGetMutator($column) &&
-            ! $this->model->hasCast($column) &&
-            ! in_array($column, $this->model->getDates())) {
-            return $results;
+        if (empty($results)) {
+            return collect();
         }
 
+        $column = $this->stripTableForPluck($column);
+
+        $key = $this->stripTableForPluck($key);
+
         return $this->applyAfterQueryCallbacks(
-            $results->map(function ($value) use ($column) {
-                return $this->model->newFromBuilder([$column => $value])->{$column};
-            })
+            is_array($results[0])
+                    ? $this->pluckFromArrayColumn($results, $column, $key)
+                    : $this->pluckFromObjectColumn($results, $column, $key)
         );
+    }
+
+    /**
+     * Strip off the table name or alias from a column identifier.
+     *
+     * @param  string  $column
+     * @return string|null
+     */
+    protected function stripTableForPluck($column)
+    {
+        if (is_null($column)) {
+            return $column;
+        }
+
+        $columnString = $column instanceof Expression
+            ? $column->getValue($this->getGrammar())
+            : $column;
+
+        $separator = str_contains(strtolower($columnString), ' as ') ? ' as ' : '\.';
+
+        return last(preg_split('~'.$separator.'~i', $columnString));
+    }
+
+    /**
+     * Retrieve column values from rows represented as objects.
+     *
+     * @param  array  $queryResult
+     * @param  string  $column
+     * @param  string  $key
+     * @return \Illuminate\Support\Collection
+     */
+    protected function pluckFromObjectColumn($queryResult, $column, $key)
+    {
+        $results = [];
+
+        if (is_null($key)) {
+            foreach ($queryResult as $row) {
+                $results[] = $row->$column;
+            }
+        } else {
+            foreach ($queryResult as $row) {
+                $results[$row->$key] = $row->$column;
+            }
+        }
+
+        return collect($results);
+    }
+
+    /**
+     * Retrieve column values from rows represented as arrays.
+     *
+     * @param  array  $queryResult
+     * @param  string  $column
+     * @param  string  $key
+     * @return \Illuminate\Support\Collection
+     */
+    protected function pluckFromArrayColumn($queryResult, $column, $key)
+    {
+        $results = [];
+
+        if (is_null($key)) {
+            foreach ($queryResult as $row) {
+                $results[] = $row[$column];
+            }
+        } else {
+            foreach ($queryResult as $row) {
+                $results[$row[$key]] = $row[$column];
+            }
+        }
+
+        return collect($results);
     }
 
     /**
