@@ -77,7 +77,7 @@ class Util
     /**
      * Get a contextual attribute from a dependency.
      *
-     * @param  ReflectionParameter  $dependency
+     * @param  \ReflectionParameter  $dependency
      * @return \ReflectionAttribute|null
      */
     public static function getContextualAttributeFromDependency($dependency)
