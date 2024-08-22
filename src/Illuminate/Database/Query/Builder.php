@@ -2238,7 +2238,7 @@ class Builder implements BuilderContract
     /**
      * Add a "where" clause to the query for multiple columns with "and" conditions between them.
      *
-     * @param  \Illuminate\Contracts\Database\Query\Expression[]|string[]  $columns
+     * @param  \Illuminate\Contracts\Database\Query\Expression[]|string[]|\Closure[]  $columns
      * @param  mixed  $operator
      * @param  mixed  $value
      * @param  string  $boolean
@@ -2262,7 +2262,7 @@ class Builder implements BuilderContract
     /**
      * Add an "or where" clause to the query for multiple columns with "and" conditions between them.
      *
-     * @param  \Illuminate\Contracts\Database\Query\Expression[]|string[]  $columns
+     * @param  \Illuminate\Contracts\Database\Query\Expression[]|string[]|\Closure[]  $columns
      * @param  mixed  $operator
      * @param  mixed  $value
      * @return $this
