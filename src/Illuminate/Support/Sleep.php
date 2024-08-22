@@ -3,6 +3,7 @@
 namespace Illuminate\Support;
 
 use Carbon\CarbonInterval;
+use Closure;
 use DateInterval;
 use Illuminate\Support\Traits\Macroable;
 use PHPUnit\Framework\Assert as PHPUnit;
@@ -32,6 +33,13 @@ class Sleep
      * @var \Carbon\CarbonInterval
      */
     public $duration;
+
+    /**
+     * The callback that determines if sleeping should continue.
+     *
+     * @var \Closure
+     */
+    public $while;
 
     /**
      * The pending duration to sleep.
@@ -255,6 +263,19 @@ class Sleep
     }
 
     /**
+     * Sleep while a given callback returns "true".
+     *
+     * @param  \Closure  $callback
+     * @return $this
+     */
+    public function while(Closure $callback)
+    {
+        $this->while = $callback;
+
+        return $this;
+    }
+
+    /**
      * Specify a callback that should be executed after sleeping.
      *
      * @param  callable  $then
@@ -312,16 +333,24 @@ class Sleep
 
         $seconds = (int) $remaining->totalSeconds;
 
-        if ($seconds > 0) {
-            sleep($seconds);
+        $while = $this->while ?: function () {
+            static $return = [true, false];
 
-            $remaining = $remaining->subSeconds($seconds);
-        }
+            return array_shift($return);
+        };
 
-        $microseconds = (int) $remaining->totalMicroseconds;
+        while ($while()) {
+            if ($seconds > 0) {
+                sleep($seconds);
 
-        if ($microseconds > 0) {
-            usleep($microseconds);
+                $remaining = $remaining->subSeconds($seconds);
+            }
+
+            $microseconds = (int) $remaining->totalMicroseconds;
+
+            if ($microseconds > 0) {
+                usleep($microseconds);
+            }
         }
     }
 
