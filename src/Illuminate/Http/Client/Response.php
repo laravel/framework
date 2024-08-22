@@ -3,6 +3,7 @@
 namespace Illuminate\Http\Client;
 
 use ArrayAccess;
+use Closure;
 use GuzzleHttp\Psr7\StreamWrapper;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\Macroable;
@@ -106,6 +107,22 @@ class Response implements ArrayAccess, Stringable
     public function collect($key = null)
     {
         return Collection::make($this->json($key));
+    }
+
+    /**
+     * Get the JSON decoded body of the response as a class instance.
+     *
+     * @param  \Closure|string  $instance
+     * @param  string|null  $key
+     * @return \Closure|mixed
+     */
+    public function toInstance(Closure|string $instance, $key = null)
+    {
+        if (is_callable($instance)) {
+            return $instance($this->json($key));
+        }
+
+        return new $instance($this->json($key));
     }
 
     /**

@@ -354,6 +354,27 @@ class HttpClientTest extends TestCase
         $this->assertEquals(collect(), $response->collect('missing_key'));
     }
 
+    public function testResponseCanBeReturnedAsClassInstance()
+    {
+        $this->factory->fake([
+            '*' => ['result' => ['foo' => 'bar']],
+        ]);
+
+        $response = $this->factory->get('http://foo.com/api');
+
+        $this->assertInstanceOf(Collection::class, $response->toInstance(Collection::class));
+        $this->assertEquals(collect(['result' => ['foo' => 'bar']]), $response->toInstance(Collection::class));
+        $this->assertEquals(collect(['foo' => 'bar']), $response->toInstance(Collection::class, 'result'));
+        $this->assertEquals(collect(['bar']), $response->toInstance(Collection::class, 'result.foo'));
+        $this->assertEquals(collect(), $response->toInstance(Collection::class, 'missing_key'));
+
+        $this->assertInstanceOf(Collection::class, $response->toInstance(fn ($data) => Collection::make($data)));
+        $this->assertEquals(collect(['result' => ['foo' => 'bar']]), $response->toInstance(fn ($data) => Collection::make($data)));
+        $this->assertEquals(collect(['foo' => 'bar']), $response->toInstance(fn ($data) => Collection::make($data), 'result'));
+        $this->assertEquals(collect(['bar']), $response->toInstance(fn ($data) => Collection::make($data), 'result.foo'));
+        $this->assertEquals(collect(), $response->toInstance(fn ($data) => Collection::make($data), 'missing_key'));
+    }
+
     public function testSendRequestBodyAsJsonByDefault()
     {
         $body = '{"test":"phpunit"}';
