@@ -9,25 +9,33 @@ use Illuminate\Support\Str;
 
 trait SupportsInverseRelations
 {
+    /**
+     * The name of the inverse relationship.
+     *
+     * @var string|null
+     */
     protected string|null $inverseRelationship = null;
 
     /**
-     * Gets the name of the inverse relationship.
+     * Instruct Eloquent to link the related models back to the parent after the relationship query has run.
      *
-     * @return string|null
-     */
-    public function getInverseRelationship()
-    {
-        return $this->inverseRelationship;
-    }
-
-    /**
-     * Links the related models back to the parent after the query has run.
+     * Alias of "chaperone".
      *
      * @param  string|null  $relation
      * @return $this
      */
     public function inverse(?string $relation = null)
+    {
+        return $this->chaperone($relation);
+    }
+
+    /**
+     * Instruct Eloquent to link the related models back to the parent after the relationship query has run.
+     *
+     * @param  string|null  $relation
+     * @return $this
+     */
+    public function chaperone(?string $relation = null)
     {
         $relation ??= $this->guessInverseRelation();
 
@@ -49,19 +57,20 @@ trait SupportsInverseRelations
     }
 
     /**
-     * Removes the inverse relationship for this query.
+     * Guess the name of the inverse relationship.
      *
-     * @return $this
+     * @return string|null
      */
-    public function withoutInverse()
+    protected function guessInverseRelation(): string|null
     {
-        $this->inverseRelationship = null;
-
-        return $this;
+        return Arr::first(
+            $this->getPossibleInverseRelations(),
+            fn ($relation) => $relation && $this->getModel()->isRelation($relation)
+        );
     }
 
     /**
-     * Gets possible inverse relations for the parent model.
+     * Get the possible inverse relations for the parent model.
      *
      * @return array<non-empty-string>
      */
@@ -77,20 +86,7 @@ trait SupportsInverseRelations
     }
 
     /**
-     * Guesses the name of the inverse relationship.
-     *
-     * @return string|null
-     */
-    protected function guessInverseRelation(): string|null
-    {
-        return Arr::first(
-            $this->getPossibleInverseRelations(),
-            fn ($relation) => $relation && $this->getModel()->isRelation($relation)
-        );
-    }
-
-    /**
-     * Sets the inverse relation on all models in a collection.
+     * Set the inverse relation on all models in a collection.
      *
      * @param  \Illuminate\Database\Eloquent\Collection  $models
      * @param  \Illuminate\Database\Eloquent\Model|null  $parent
@@ -108,7 +104,7 @@ trait SupportsInverseRelations
     }
 
     /**
-     * Sets the inverse relation on a model.
+     * Set the inverse relation on a model.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $model
      * @param  \Illuminate\Database\Eloquent\Model|null  $parent
@@ -123,5 +119,39 @@ trait SupportsInverseRelations
         }
 
         return $model;
+    }
+
+    /**
+     * Get the name of the inverse relationship.
+     *
+     * @return string|null
+     */
+    public function getInverseRelationship()
+    {
+        return $this->inverseRelationship;
+    }
+
+    /**
+     * Remove the chaperone / inverse relationship for this query.
+     *
+     * Alias of "withoutChaperone".
+     *
+     * @return $this
+     */
+    public function withoutInverse()
+    {
+        return $this->withoutChaperone();
+    }
+
+    /**
+     * Remove the chaperone / inverse relationship for this query.
+     *
+     * @return $this
+     */
+    public function withoutChaperone()
+    {
+        $this->inverseRelationship = null;
+
+        return $this;
     }
 }

@@ -156,7 +156,7 @@ abstract class HasOneOrMany extends Relation
                 $related = $this->getRelationValue($dictionary, $key, $type);
                 $model->setRelation($relation, $related);
 
-                // Apply the inverse relation if we have one
+                // Apply the inverse relation if we have one...
                 $type === 'one'
                     ? $this->applyInverseRelationToModel($related, $model)
                     : $this->applyInverseRelationToCollection($related, $model);
@@ -423,6 +423,7 @@ abstract class HasOneOrMany extends Relation
     protected function setForeignAttributesForCreate(Model $model)
     {
         $model->setAttribute($this->getForeignKeyName(), $this->getParentKey());
+
         $this->applyInverseRelationToModel($model);
     }
 

@@ -143,7 +143,7 @@ abstract class MorphOneOrMany extends HasOneOrMany
     }
 
     /**
-     * Gets possible inverse relations for the parent model.
+     * Get the possible inverse relations for the parent model.
      *
      * @return array<non-empty-string>
      */
