@@ -30,6 +30,58 @@ class DatabaseConcernsPreventsCircularRecursionTest extends TestCase
         $this->assertEquals(2, $instance->instanceStack);
     }
 
+    public function testRecursiveDefaultCallbackIsCalledOnlyOnRecursion()
+    {
+        $instance = new PreventsCircularRecursionWithRecursiveMethod();
+
+        $this->assertEquals(0, PreventsCircularRecursionWithRecursiveMethod::$globalStack);
+        $this->assertEquals(0, $instance->instanceStack);
+        $this->assertEquals(0, $instance->defaultStack);
+
+        $this->assertEquals(['instance' => 1, 'default' => 0], $instance->callCallableDefaultStack());
+        $this->assertEquals(1, PreventsCircularRecursionWithRecursiveMethod::$globalStack);
+        $this->assertEquals(1, $instance->instanceStack);
+        $this->assertEquals(1, $instance->defaultStack);
+
+        $this->assertEquals(['instance' => 2, 'default' => 1], $instance->callCallableDefaultStack());
+        $this->assertEquals(2, PreventsCircularRecursionWithRecursiveMethod::$globalStack);
+        $this->assertEquals(2, $instance->instanceStack);
+        $this->assertEquals(2, $instance->defaultStack);
+    }
+
+    public function testRecursiveDefaultCallbackIsCalledOnlyOncePerCallStack()
+    {
+        $instance = new PreventsCircularRecursionWithRecursiveMethod();
+
+        $this->assertEquals(0, PreventsCircularRecursionWithRecursiveMethod::$globalStack);
+        $this->assertEquals(0, $instance->instanceStack);
+        $this->assertEquals(0, $instance->defaultStack);
+
+        $this->assertEquals(
+            [
+                ['instance' => 1, 'default' => 0],
+                ['instance' => 1, 'default' => 0],
+                ['instance' => 1, 'default' => 0],
+            ],
+            $instance->callCallableDefaultStackRepeatedly(),
+        );
+        $this->assertEquals(1, PreventsCircularRecursionWithRecursiveMethod::$globalStack);
+        $this->assertEquals(1, $instance->instanceStack);
+        $this->assertEquals(1, $instance->defaultStack);
+
+        $this->assertEquals(
+            [
+                ['instance' => 2, 'default' => 1],
+                ['instance' => 2, 'default' => 1],
+                ['instance' => 2, 'default' => 1],
+            ],
+            $instance->callCallableDefaultStackRepeatedly(),
+        );
+        $this->assertEquals(2, PreventsCircularRecursionWithRecursiveMethod::$globalStack);
+        $this->assertEquals(2, $instance->instanceStack);
+        $this->assertEquals(2, $instance->defaultStack);
+    }
+
     public function testRecursiveCallsAreLimitedToIndividualInstances()
     {
         $instance = new PreventsCircularRecursionWithRecursiveMethod();
@@ -134,6 +186,7 @@ class PreventsCircularRecursionWithRecursiveMethod
 
     public static int $globalStack = 0;
     public int $instanceStack = 0;
+    public int $defaultStack = 0;
 
     public function callStack(): int
     {
@@ -144,7 +197,43 @@ class PreventsCircularRecursionWithRecursiveMethod
 
                 return $this->callStack();
             },
-            $this->instanceStack
+            $this->instanceStack,
+        );
+    }
+
+    public function callCallableDefaultStack(): array
+    {
+        return $this->withoutRecursion(
+            function () {
+                static::$globalStack++;
+                $this->instanceStack++;
+
+                return $this->callCallableDefaultStack();
+            },
+            fn () => [
+                'instance' => $this->instanceStack,
+                'default' => $this->defaultStack++,
+            ],
+        );
+    }
+
+    public function callCallableDefaultStackRepeatedly(): array
+    {
+        return $this->withoutRecursion(
+            function () {
+                static::$globalStack++;
+                $this->instanceStack++;
+
+                return [
+                    $this->callCallableDefaultStackRepeatedly(),
+                    $this->callCallableDefaultStackRepeatedly(),
+                    $this->callCallableDefaultStackRepeatedly(),
+                ];
+            },
+            fn () => [
+                'instance' => $this->instanceStack,
+                'default' => $this->defaultStack++,
+            ],
         );
     }
 
@@ -156,7 +245,7 @@ class PreventsCircularRecursionWithRecursiveMethod
 
                 return $this->other->callOtherStack();
             },
-            $this->instanceStack
+            $this->instanceStack,
         );
     }
 }
