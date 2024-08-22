@@ -4,6 +4,7 @@ namespace Illuminate\Database\Eloquent\Concerns;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Onceable;
+use WeakMap;
 
 trait PreventsCircularRecursion
 {
@@ -15,13 +16,39 @@ trait PreventsCircularRecursion
     protected static $recursionCache;
 
     /**
-     * Get the current recursion cache being used by the model.
+     * Prevent a method from being called multiple times on the same object within the same call stack.
      *
-     * @return \WeakMap
+     * @param  callable  $callback
+     * @param  mixed  $default
+     * @return mixed
      */
-    protected static function getRecursionCache()
+    protected function withoutRecursion($callback, $default = null)
     {
-        return static::$recursionCache ??= new \WeakMap();
+        $trace = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 2);
+
+        $onceable = Onceable::tryFromTrace($trace, $callback);
+
+        $object = $onceable->object ?? $this;
+
+        $stack = static::getRecursiveCallStack($object);
+
+        if (array_key_exists($onceable->hash, $stack)) {
+            return $stack[$onceable->hash];
+        }
+
+        try {
+            $stack[$onceable->hash] = is_callable($default) ? call_user_func($default) : $default;
+
+            static::getRecursionCache()->offsetSet($object, $stack);
+
+            return call_user_func($onceable->callable);
+        } finally {
+            if ($stack = Arr::except($this->getRecursiveCallStack($object), $onceable->hash)) {
+                static::getRecursionCache()->offsetSet($object, $stack);
+            } elseif (static::getRecursionCache()->offsetExists($object)) {
+                static::getRecursionCache()->offsetUnset($object);
+            }
+        }
     }
 
     /**
@@ -38,36 +65,12 @@ trait PreventsCircularRecursion
     }
 
     /**
-     * Prevent a method from being called multiple times on the same object within the same call stack.
+     * Get the current recursion cache being used by the model.
      *
-     * @param  callable  $callback
-     * @param  mixed  $default
-     * @return mixed
+     * @return \WeakMap
      */
-    protected function withoutRecursion($callback, $default = null)
+    protected static function getRecursionCache()
     {
-        $trace = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 2);
-
-        $onceable = Onceable::tryFromTrace($trace, $callback);
-
-        $object = $onceable->object ?? $this;
-        $stack = static::getRecursiveCallStack($object);
-
-        if (array_key_exists($onceable->hash, $stack)) {
-            return $stack[$onceable->hash];
-        }
-
-        try {
-            $stack[$onceable->hash] = is_callable($default) ? call_user_func($default) : $default;
-            static::getRecursionCache()->offsetSet($object, $stack);
-
-            return call_user_func($onceable->callable);
-        } finally {
-            if ($stack = Arr::except($this->getRecursiveCallStack($object), $onceable->hash)) {
-                static::getRecursionCache()->offsetSet($object, $stack);
-            } elseif (static::getRecursionCache()->offsetExists($object)) {
-                static::getRecursionCache()->offsetUnset($object);
-            }
-        }
+        return static::$recursionCache ??= new WeakMap();
     }
 }
