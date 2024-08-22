@@ -18,10 +18,10 @@ use InvalidArgumentException;
  * @method \Illuminate\Routing\Route put(string $uri, \Closure|array|string|null $action = null)
  * @method \Illuminate\Routing\RouteRegistrar as(string $value)
  * @method \Illuminate\Routing\RouteRegistrar controller(string $controller)
- * @method \Illuminate\Routing\RouteRegistrar domain(string $value)
+ * @method \Illuminate\Routing\RouteRegistrar domain(string|\BackedEnum $value)
  * @method \Illuminate\Routing\RouteRegistrar middleware(array|string|null $middleware)
  * @method \Illuminate\Routing\RouteRegistrar missing(\Closure $missing)
- * @method \Illuminate\Routing\RouteRegistrar name(string $value)
+ * @method \Illuminate\Routing\RouteRegistrar name(string|\BackedEnum $value)
  * @method \Illuminate\Routing\RouteRegistrar namespace(string|null $value)
  * @method \Illuminate\Routing\RouteRegistrar prefix(string $prefix)
  * @method \Illuminate\Routing\RouteRegistrar scopeBindings()
@@ -124,6 +124,10 @@ class RouteRegistrar
             $value = array_merge(
                 (array) ($this->attributes[$attributeKey] ?? []), Arr::wrap($value)
             );
+        }
+
+        if ($value instanceof \BackedEnum && ! is_string($value = $value->value)) {
+            throw new \InvalidArgumentException("Attribute [{$key}] expects a string backed enum.");
         }
 
         $this->attributes[$attributeKey] = $value;
