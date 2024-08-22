@@ -11,7 +11,7 @@ trait PreventsCircularRecursion
     /**
      * The cache of objects processed to prevent infinite recursion.
      *
-     * @var \WeakMap<static, array<string, mixed>>
+     * @var WeakMap<static, array<string, mixed>>
      */
     protected static $recursionCache;
 
@@ -28,31 +28,40 @@ trait PreventsCircularRecursion
 
         $onceable = Onceable::tryFromTrace($trace, $callback);
 
-        $object = $onceable->object ?? $this;
-
-        $stack = static::getRecursiveCallStack($object);
+        $stack = static::getRecursiveCallStack($this);
 
         if (array_key_exists($onceable->hash, $stack)) {
-            return $stack[$onceable->hash];
+            return is_callable($stack[$onceable->hash])
+                ? static::setRecursiveCallValue($this, $onceable->hash, call_user_func($stack[$onceable->hash]))
+                : $stack[$onceable->hash];
         }
 
         try {
-            $stack[$onceable->hash] = is_callable($default) ? call_user_func($default) : $default;
-
-            static::getRecursionCache()->offsetSet($object, $stack);
+            static::setRecursiveCallValue($this, $onceable->hash, $default);
 
             return call_user_func($onceable->callable);
         } finally {
-            if ($stack = Arr::except($this->getRecursiveCallStack($object), $onceable->hash)) {
-                static::getRecursionCache()->offsetSet($object, $stack);
-            } elseif (static::getRecursionCache()->offsetExists($object)) {
-                static::getRecursionCache()->offsetUnset($object);
-            }
+            static::clearRecursiveCallValue($this, $onceable->hash);
         }
     }
 
     /**
-     * Get the current stack of methods being called recursively.
+     * Remove an entry from the recursion cache for an object.
+     *
+     * @param  object  $object
+     * @param  string  $hash
+     */
+    protected static function clearRecursiveCallValue($object, string $hash)
+    {
+        if ($stack = Arr::except(static::getRecursiveCallStack($object), $hash)) {
+            static::getRecursionCache()->offsetSet($object, $stack);
+        } elseif (static::getRecursionCache()->offsetExists($object)) {
+            static::getRecursionCache()->offsetUnset($object);
+        }
+    }
+
+    /**
+     * Get the stack of methods being called recursively for the current object.
      *
      * @param  object  $object
      * @return array
@@ -67,10 +76,28 @@ trait PreventsCircularRecursion
     /**
      * Get the current recursion cache being used by the model.
      *
-     * @return \WeakMap
+     * @return WeakMap
      */
     protected static function getRecursionCache()
     {
         return static::$recursionCache ??= new WeakMap();
+    }
+
+    /**
+     * Set a value in the recursion cache for the given object and method.
+     *
+     * @param  object  $object
+     * @param  string  $hash
+     * @param  mixed  $value
+     * @return mixed
+     */
+    protected static function setRecursiveCallValue($object, string $hash, $value)
+    {
+        static::getRecursionCache()->offsetSet(
+            $object,
+            tap(static::getRecursiveCallStack($object), fn (&$stack) => $stack[$hash] = $value),
+        );
+
+        return static::getRecursiveCallStack($object)[$hash];
     }
 }
