@@ -192,6 +192,12 @@ class ValidationFileRuleTest extends TestCase
             File::image(),
             UploadedFile::fake()->image('foo.png'),
         );
+
+        $this->passes(
+            File::image(),
+            UploadedFile::fake()->image('foo.avif'),
+            ['validation.image']
+        );
     }
 
     public function testSize()
