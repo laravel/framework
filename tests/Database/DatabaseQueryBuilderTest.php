@@ -1328,8 +1328,8 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->whereAll([
-            fn(Builder $query) => $query->where('last_name', 'like', '%Otwell%'),
-            fn(Builder $query) => $query->where('email', 'like', '%Otwell%'),
+            fn (Builder $query) => $query->where('last_name', 'like', '%Otwell%'),
+            fn (Builder $query) => $query->where('email', 'like', '%Otwell%'),
         ]);
         $this->assertSame('select * from "users" where (("last_name" like ?) and ("email" like ?))', $builder->toSql());
         $this->assertEquals(['%Otwell%', '%Otwell%'], $builder->getBindings());
@@ -1354,8 +1354,8 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->where('first_name', 'like', '%Taylor%')->orWhereAll([
-            fn(Builder $query) => $query->where('last_name', 'like', '%Otwell%'),
-            fn(Builder $query) => $query->where('email', 'like', '%Otwell%'),
+            fn (Builder $query) => $query->where('last_name', 'like', '%Otwell%'),
+            fn (Builder $query) => $query->where('email', 'like', '%Otwell%'),
         ]);
         $this->assertSame('select * from "users" where "first_name" like ? or (("last_name" like ?) and ("email" like ?))', $builder->toSql());
         $this->assertEquals(['%Taylor%', '%Otwell%', '%Otwell%'], $builder->getBindings());
@@ -1375,8 +1375,8 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->whereAny([
-            fn(Builder $query) => $query->where('last_name', 'like', '%Otwell%'),
-            fn(Builder $query) => $query->where('email', 'like', '%Otwell%'),
+            fn (Builder $query) => $query->where('last_name', 'like', '%Otwell%'),
+            fn (Builder $query) => $query->where('email', 'like', '%Otwell%'),
         ]);
         $this->assertSame('select * from "users" where (("last_name" like ?) or ("email" like ?))', $builder->toSql());
         $this->assertEquals(['%Otwell%', '%Otwell%'], $builder->getBindings());
@@ -1401,8 +1401,8 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->where('first_name', 'like', '%Taylor%')->orWhereAny([
-            fn(Builder $query) => $query->where('last_name', 'like', '%Otwell%'),
-            fn(Builder $query) => $query->where('email', 'like', '%Otwell%'),
+            fn (Builder $query) => $query->where('last_name', 'like', '%Otwell%'),
+            fn (Builder $query) => $query->where('email', 'like', '%Otwell%'),
         ]);
         $this->assertSame('select * from "users" where "first_name" like ? or (("last_name" like ?) or ("email" like ?))', $builder->toSql());
         $this->assertEquals(['%Taylor%', '%Otwell%', '%Otwell%'], $builder->getBindings());
@@ -1427,8 +1427,8 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->whereNone([
-            fn(Builder $query) => $query->where('last_name', 'like', '%Otwell%'),
-            fn(Builder $query) => $query->where('email', 'like', '%Otwell%'),
+            fn (Builder $query) => $query->where('last_name', 'like', '%Otwell%'),
+            fn (Builder $query) => $query->where('email', 'like', '%Otwell%'),
         ]);
         $this->assertSame('select * from "users" where not (("last_name" like ?) or ("email" like ?))', $builder->toSql());
         $this->assertEquals(['%Otwell%', '%Otwell%'], $builder->getBindings());
@@ -1453,8 +1453,8 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->where('first_name', 'like', '%Taylor%')->orWhereNone([
-            fn(Builder $query) => $query->where('last_name', 'like', '%Otwell%'),
-            fn(Builder $query) => $query->where('email', 'like', '%Otwell%'),
+            fn (Builder $query) => $query->where('last_name', 'like', '%Otwell%'),
+            fn (Builder $query) => $query->where('email', 'like', '%Otwell%'),
         ]);
         $this->assertSame('select * from "users" where "first_name" like ? or not (("last_name" like ?) or ("email" like ?))', $builder->toSql());
         $this->assertEquals(['%Taylor%', '%Otwell%', '%Otwell%'], $builder->getBindings());
