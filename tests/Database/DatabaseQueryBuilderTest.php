@@ -1356,6 +1356,14 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->select('*')->from('users')->whereAny(['last_name', 'email'], '%Otwell%');
         $this->assertSame('select * from "users" where ("last_name" = ? or "email" = ?)', $builder->toSql());
         $this->assertEquals(['%Otwell%', '%Otwell%'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereAny([
+            fn(Builder $query) => $query->where('last_name', 'like', '%Otwell%'),
+            fn(Builder $query) => $query->where('email', 'like', '%Otwell%'),
+        ]);
+        $this->assertSame('select * from "users" where (("last_name" like ?) or ("email" like ?))', $builder->toSql());
+        $this->assertEquals(['%Otwell%', '%Otwell%'], $builder->getBindings());
     }
 
     public function testOrWhereAny()
