@@ -1305,7 +1305,7 @@ class FoundationViteTest extends TestCase
         $this->makeViteManifest($manifest, $buildDir);
         app()->usePublicPath(__DIR__);
 
-        $html = (string) ViteFacade::withEntryPoints(['resources/js/app.js'])->useBuildDirectory($buildDir)->usePrefetchStrategy('waterfall')->toHtml();
+        $html = (string) ViteFacade::withEntryPoints(['resources/js/app.js'])->useBuildDirectory($buildDir)->prefetch(concurrency: 3)->toHtml();
 
         $expectedAssets = Js::from([
             ['rel' => 'prefetch', 'href' => "https://example.com/{$buildDir}/assets/ConfirmPassword-CDwcgU8E.js", 'fetchpriority' => 'low'],
@@ -1381,7 +1381,7 @@ class FoundationViteTest extends TestCase
         $this->makeViteManifest($manifest, $buildDir);
         app()->usePublicPath(__DIR__);
 
-        $html = (string) ViteFacade::withEntryPoints(['resources/js/app.js', 'resources/js/Pages/Auth/Login.vue'])->useBuildDirectory($buildDir)->usePrefetchStrategy('waterfall')->toHtml();
+        $html = (string) ViteFacade::withEntryPoints(['resources/js/app.js', 'resources/js/Pages/Auth/Login.vue'])->useBuildDirectory($buildDir)->prefetch(concurrency: 3)->toHtml();
 
         $expectedAssets = Js::from([
             ['rel' => 'prefetch', 'href' => "https://example.com/{$buildDir}/assets/ConfirmPassword-CDwcgU8E.js", 'fetchpriority' => 'low'],
@@ -1411,7 +1411,7 @@ class FoundationViteTest extends TestCase
         $this->makeViteManifest($manifest, $buildDir);
         app()->usePublicPath(__DIR__);
 
-        $html = (string) ViteFacade::withEntryPoints(['resources/js/app.js'])->useBuildDirectory($buildDir)->useWaterfallPrefetching(concurrency: 10)->toHtml();
+        $html = (string) ViteFacade::withEntryPoints(['resources/js/app.js'])->useBuildDirectory($buildDir)->prefetch(concurrency: 10)->toHtml();
 
         $expectedAssets = Js::from([
             ['rel' => 'prefetch', 'href' => "https://example.com/{$buildDir}/assets/ConfirmPassword-CDwcgU8E.js", 'fetchpriority' => 'low'],
@@ -1447,7 +1447,7 @@ class FoundationViteTest extends TestCase
         $this->makeViteManifest($manifest, $buildDir);
         app()->usePublicPath(__DIR__);
 
-        $html = (string) ViteFacade::withEntryPoints(['resources/js/app.js'])->useBuildDirectory($buildDir)->useAggressivePrefetching()->toHtml();
+        $html = (string) ViteFacade::withEntryPoints(['resources/js/app.js'])->useBuildDirectory($buildDir)->prefetch()->toHtml();
 
         $expectedAssets = Js::from([
             ['rel' => 'prefetch', 'href' => "https://example.com/{$buildDir}/assets/ConfirmPassword-CDwcgU8E.js", 'fetchpriority' => 'low'],
@@ -1501,7 +1501,7 @@ class FoundationViteTest extends TestCase
         $this->makeViteManifest($manifest, $buildDir);
         app()->usePublicPath(__DIR__);
 
-        $html = (string) tap(ViteFacade::withEntryPoints(['resources/js/app.js'])->useBuildDirectory($buildDir)->usePrefetchStrategy('waterfall'))->useCspNonce('abc123')->toHtml();
+        $html = (string) tap(ViteFacade::withEntryPoints(['resources/js/app.js'])->useBuildDirectory($buildDir)->prefetch(concurrency: 3))->useCspNonce('abc123')->toHtml();
 
         $expectedAssets = Js::from([
             ['rel' => 'prefetch', 'href' => "https://example.com/{$buildDir}/assets/ConfirmPassword-CDwcgU8E.js", 'nonce' => 'abc123', 'fetchpriority' => 'low'],
@@ -1537,7 +1537,7 @@ class FoundationViteTest extends TestCase
         $this->makeViteManifest($manifest, $buildDir);
         app()->usePublicPath(__DIR__);
 
-        $html = (string) tap(ViteFacade::withEntryPoints(['resources/js/app.js']))->useBuildDirectory($buildDir)->usePrefetchStrategy('waterfall')->usePreloadTagAttributes([
+        $html = (string) tap(ViteFacade::withEntryPoints(['resources/js/app.js']))->useBuildDirectory($buildDir)->prefetch(concurrency: 3)->usePreloadTagAttributes([
             'key' => 'value',
             'key-only',
             'true-value' => true,
@@ -1580,7 +1580,7 @@ class FoundationViteTest extends TestCase
         $this->makeViteManifest($manifest, $buildDir);
         app()->usePublicPath(__DIR__);
 
-        $html = (string) ViteFacade::withEntryPoints(['resources/js/admin.js'])->useBuildDirectory($buildDir)->usePrefetchStrategy('waterfall')->toHtml();
+        $html = (string) ViteFacade::withEntryPoints(['resources/js/admin.js'])->useBuildDirectory($buildDir)->prefetch(concurrency: 3)->toHtml();
 
         $expectedAssets = Js::from([
             ['rel' => 'prefetch', 'href' => "https://example.com/{$buildDir}/assets/ConfirmPassword-CDwcgU8E.js", 'fetchpriority' => 'low'],
