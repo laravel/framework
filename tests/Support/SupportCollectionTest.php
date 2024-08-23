@@ -2213,19 +2213,19 @@ class SupportCollectionTest extends TestCase
     {
         $itemFoo = new \stdClass();
         $itemFoo->first = 'f';
-        $itemFoo->second = 's';
+        $itemFoo->second = null;
         $itemBar = new \stdClass();
         $itemBar->first = 'f';
-        $itemBar->second = null;
+        $itemBar->second = 's';
 
         $data = new $collection([$itemFoo, $itemBar]);
-        $data->sortBy([
-            ['first', 'asc'],
-            ['second', 'asc'],
+        $data = $data->sortBy([
+            ['first', 'desc'],
+            ['second', 'desc'],
         ], SORT_NATURAL);
 
-        $this->assertEquals($itemFoo, $data->first());
-        $this->assertEquals($itemBar, $data->get(2));
+        $this->assertEquals($itemBar, $data->first());
+        $this->assertEquals($itemFoo, $data->skip(1)->first());
     }
 
     /**
