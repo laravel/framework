@@ -208,10 +208,10 @@ class SupportHelpersTest extends TestCase
         ]);
 
         $this->assertEquals(['taylor', 'abigail', 'dayle'], data_get($array, '*.name'));
-        $this->assertEquals(['taylorotwell@gmail.com', null, null], data_get($array, '*.email', 'irrelevant'));
+        $this->assertEquals(['taylorotwell@gmail.com', 'default', 'default'], data_get($array, '*.email', 'default'));
 
         $this->assertEquals(['taylor', 'abigail', 'dayle'], data_get($arrayIterable, '*.name'));
-        $this->assertEquals(['taylorotwell@gmail.com', null, null], data_get($arrayIterable, '*.email', 'irrelevant'));
+        $this->assertEquals(['taylorotwell@gmail.com', 'default', 'default'], data_get($arrayIterable, '*.email', 'default'));
 
         $array = [
             'users' => [
@@ -223,7 +223,7 @@ class SupportHelpersTest extends TestCase
         ];
 
         $this->assertEquals(['taylor', 'abigail', 'dayle'], data_get($array, 'users.*.first'));
-        $this->assertEquals(['taylorotwell@gmail.com', null, null], data_get($array, 'users.*.email', 'irrelevant'));
+        $this->assertEquals(['taylorotwell@gmail.com', 'default', 'default'], data_get($array, 'users.*.email', 'default'));
         $this->assertSame('not found', data_get($array, 'posts.*.date', 'not found'));
         $this->assertNull(data_get($array, 'posts.*.date'));
     }
