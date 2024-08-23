@@ -4,6 +4,7 @@ namespace Illuminate\Http;
 
 use Illuminate\Contracts\Support\MessageProvider;
 use Illuminate\Session\Store as SessionStore;
+use Illuminate\Support\Arr;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
@@ -180,6 +181,56 @@ class RedirectResponse extends BaseRedirectResponse
     public function withoutFragment()
     {
         return $this->setTargetUrl(Str::before($this->getTargetUrl(), '#'));
+    }
+
+    /**
+     * Add query string values to the URL.
+     *
+     * @return $this
+     */
+    public function withQuery(array $query)
+    {
+        $url = $this->getTargetUrl();
+
+        $qs = parse_url($url, PHP_URL_QUERY);
+
+        parse_str($qs, $current);
+
+        $query = Arr::query(array_replace_recursive($current, $query));
+
+        $url = match (true) {
+            empty($query) => $url,
+            empty($qs) => $url.'?'.$query,
+            default => str_replace('?'.$qs, '?'.$query, $url)
+        };
+
+        return $this->setTargetUrl($url);
+    }
+
+    /**
+     * Remove the given query string value from the response URL.
+     *
+     * @return $this
+     */
+    public function withoutQuery(array|string $keys = null)
+    {
+        $url = $this->getTargetUrl();
+
+        $qs = parse_url($url, PHP_URL_QUERY);
+
+        $current = [];
+
+        if (! is_null($keys)) {
+            parse_str($qs, $current);
+
+            Arr::forget($current, $keys);
+        }
+
+        $query = empty($current) ? '' : '?'.Arr::query($current);
+
+        $url = str_replace('?'.$qs, $query, $url);
+
+        return $this->setTargetUrl($url);
     }
 
     /**

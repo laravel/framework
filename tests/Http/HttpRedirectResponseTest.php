@@ -54,6 +54,23 @@ class HttpRedirectResponseTest extends TestCase
 
     public function testFragmentIdentifierOnRedirect()
     {
+        $response = new RedirectResponse('foo.bar?category=laravel');
+
+        $response->withQuery(['v' => '11', 'meta' => ['package' => 'routing']]);
+        $this->assertSame(
+            'category=laravel&v=11&meta[package]=routing',
+            urldecode(parse_url($response->getTargetUrl(), PHP_URL_QUERY))
+        );
+
+        $response->withoutQuery('meta.package');
+        $this->assertSame('category=laravel&v=11', parse_url($response->getTargetUrl(), PHP_URL_QUERY));
+
+        $response->withoutQuery();
+        $this->assertNull(parse_url($response->getTargetUrl(), PHP_URL_QUERY));
+    }
+
+    public function testQueryOnRedirect()
+    {
         $response = new RedirectResponse('foo.bar');
 
         $response->withFragment('foo');
