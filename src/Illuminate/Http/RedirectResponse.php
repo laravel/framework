@@ -200,7 +200,7 @@ class RedirectResponse extends BaseRedirectResponse
 
         $url = match (true) {
             empty($query) => $url,
-            empty($qs) => $url.'?'.$query,
+            is_null($qs) => $url.'?'.$query,
             default => str_replace('?'.$qs, '?'.$query, $url)
         };
 
