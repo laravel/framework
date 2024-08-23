@@ -194,9 +194,9 @@ class RedirectResponse extends BaseRedirectResponse
 
         $qs = parse_url($url, PHP_URL_QUERY);
 
-        parse_str($qs, $current);
+        parse_str((string) $qs, $current);
 
-        $query = Arr::query(array_replace_recursive($current, $query));
+        $query = Arr::query(array_replace_recursive((array) $current, $query));
 
         $url = match (true) {
             empty($query) => $url,
