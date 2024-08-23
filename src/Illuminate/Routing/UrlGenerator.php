@@ -347,7 +347,7 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * Create a signed route URL for a named route.
      *
-     * @param  string|\BackedEnum  $name
+     * @param  \BackedEnum|string  $name
      * @param  mixed  $parameters
      * @param  \DateTimeInterface|\DateInterval|int|null  $expiration
      * @param  bool  $absolute
@@ -402,7 +402,7 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * Create a temporary signed route URL for a named route.
      *
-     * @param  string|\BackedEnum  $name
+     * @param  \BackedEnum|string  $name
      * @param  \DateTimeInterface|\DateInterval|int  $expiration
      * @param  array  $parameters
      * @param  bool  $absolute
@@ -491,7 +491,7 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * Get the URL to a named route.
      *
-     * @param  string|\BackedEnum  $name
+     * @param  \BackedEnum|string  $name
      * @param  mixed  $parameters
      * @param  bool  $absolute
      * @return string
@@ -500,8 +500,8 @@ class UrlGenerator implements UrlGeneratorContract
      */
     public function route($name, $parameters = [], $absolute = true)
     {
-        if ($name instanceof \BackedEnum && ! is_string($name = $name->value)) {
-            throw new \InvalidArgumentException('Attribute [name] expects a string backed enum.');
+        if ($name instanceof BackedEnum && ! is_string($name = $name->value)) {
+            throw new InvalidArgumentException('Attribute [name] expects a string backed enum.');
         }
 
         if (! is_null($route = $this->routes->getByName($name))) {
