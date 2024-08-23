@@ -1652,6 +1652,30 @@ class FoundationViteTest extends TestCase
         $this->cleanViteManifest($buildDir);
     }
 
+    public function testSupportCspNonceInPrefetchScript()
+    {
+        $manifest = json_decode(file_get_contents(__DIR__.'/fixtures/prefetching-manifest.json'));
+        $buildDir = Str::random();
+        $this->makeViteManifest($manifest, $buildDir);
+        app()->usePublicPath(__DIR__);
+
+        $html = (string) tap(ViteFacade::withEntryPoints(['resources/js/app.js']))
+            ->useCspNonce('abc123')
+            ->useBuildDirectory($buildDir)
+            ->prefetch()
+            ->toHtml();
+        $this->assertStringContainsString('<script nonce="abc123">', $html);
+
+        $html = (string) tap(ViteFacade::withEntryPoints(['resources/js/app.js']))
+            ->useCspNonce('abc123')
+            ->useBuildDirectory($buildDir)
+            ->prefetch(concurrency: 3)
+            ->toHtml();
+        $this->assertStringContainsString('<script nonce="abc123">', $html);
+
+        $this->cleanViteManifest($buildDir);
+    }
+
     protected function cleanViteManifest($path = 'build')
     {
         if (file_exists(public_path("{$path}/manifest.json"))) {

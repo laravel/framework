@@ -485,7 +485,7 @@ class Vite implements Htmlable
             ->pipe(fn ($assets) => with(Js::from($assets), fn ($assets) => match ($this->prefetchStrategy) {
                 'waterfall' => new HtmlString($base.<<<HTML
 
-                    <script>
+                    <script{$this->nonceAttribute()}>
                          window.addEventListener('load', () => window.setTimeout(() => {
                             const makeLink = (asset) => {
                                 const link = document.createElement('link')
@@ -528,7 +528,7 @@ class Vite implements Htmlable
                     HTML),
                 'aggressive' => new HtmlString($base.<<<HTML
 
-                    <script>
+                    <script{$this->nonceAttribute()}>
                          window.addEventListener('load', () => window.setTimeout(() => {
                             const makeLink = (asset) => {
                                 const link = document.createElement('link')
@@ -964,6 +964,20 @@ class Vite implements Htmlable
         }
 
         return $manifest[$file];
+    }
+
+    /**
+     * Get the nonce attribute for the prefetch script tags.
+     *
+     * @return \Illuminate\Support\HtmlString
+     */
+    protected function nonceAttribute()
+    {
+        if ($this->cspNonce() === null) {
+            return new HtmlString('');
+        }
+
+        return new HtmlString(' nonce="'.$this->cspNonce().'"');
     }
 
     /**
