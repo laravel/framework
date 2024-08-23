@@ -967,7 +967,7 @@ class Vite implements Htmlable
     }
 
     /**
-     * The none attribute for the prefetch script tags.
+     * Get the nonce attribute for the prefetch script tags.
      *
      * @return HtmlString
      */
