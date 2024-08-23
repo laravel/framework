@@ -54,6 +54,20 @@ class HttpRedirectResponseTest extends TestCase
 
     public function testFragmentIdentifierOnRedirect()
     {
+        $response = new RedirectResponse('foo.bar');
+
+        $response->withFragment('foo');
+        $this->assertSame('foo', parse_url($response->getTargetUrl(), PHP_URL_FRAGMENT));
+
+        $response->withFragment('#bar');
+        $this->assertSame('bar', parse_url($response->getTargetUrl(), PHP_URL_FRAGMENT));
+
+        $response->withoutFragment();
+        $this->assertNull(parse_url($response->getTargetUrl(), PHP_URL_FRAGMENT));
+    }
+
+    public function testQueryOnRedirect()
+    {
         $response = new RedirectResponse('foo.bar?category=laravel');
 
         $response->withQuery(['v' => '11', 'meta' => ['package' => 'routing']]);
@@ -67,20 +81,6 @@ class HttpRedirectResponseTest extends TestCase
 
         $response->withoutQuery();
         $this->assertNull(parse_url($response->getTargetUrl(), PHP_URL_QUERY));
-    }
-
-    public function testQueryOnRedirect()
-    {
-        $response = new RedirectResponse('foo.bar');
-
-        $response->withFragment('foo');
-        $this->assertSame('foo', parse_url($response->getTargetUrl(), PHP_URL_FRAGMENT));
-
-        $response->withFragment('#bar');
-        $this->assertSame('bar', parse_url($response->getTargetUrl(), PHP_URL_FRAGMENT));
-
-        $response->withoutFragment();
-        $this->assertNull(parse_url($response->getTargetUrl(), PHP_URL_FRAGMENT));
     }
 
     public function testInputOnRedirect()
