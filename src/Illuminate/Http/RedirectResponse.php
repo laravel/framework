@@ -216,12 +216,14 @@ class RedirectResponse extends BaseRedirectResponse
     {
         $url = $this->getTargetUrl();
 
-        $qs = parse_url($url, PHP_URL_QUERY);
+        $qs = (string) parse_url($url, PHP_URL_QUERY);
 
         $current = [];
 
         if (! is_null($keys)) {
             parse_str($qs, $current);
+
+            $current = (array) $current;
 
             Arr::forget($current, $keys);
         }
