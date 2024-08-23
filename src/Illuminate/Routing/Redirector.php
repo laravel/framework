@@ -143,7 +143,7 @@ class Redirector
     /**
      * Create a new redirect response to a named route.
      *
-     * @param  string  $route
+     * @param  \BackedEnum|string  $route
      * @param  mixed  $parameters
      * @param  int  $status
      * @param  array  $headers
@@ -157,7 +157,7 @@ class Redirector
     /**
      * Create a new redirect response to a signed named route.
      *
-     * @param  string  $route
+     * @param  \BackedEnum|string  $route
      * @param  mixed  $parameters
      * @param  \DateTimeInterface|\DateInterval|int|null  $expiration
      * @param  int  $status
@@ -172,7 +172,7 @@ class Redirector
     /**
      * Create a new redirect response to a signed named route.
      *
-     * @param  string  $route
+     * @param  \BackedEnum|string  $route
      * @param  \DateTimeInterface|\DateInterval|int|null  $expiration
      * @param  mixed  $parameters
      * @param  int  $status
