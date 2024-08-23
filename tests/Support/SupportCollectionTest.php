@@ -2003,6 +2003,32 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testNaturalSortByManyWithNull($collection)
+    {
+        $itemFoo = new \stdClass();
+        $itemFoo->first = 'f';
+        $itemFoo->second = null;
+        $itemBar = new \stdClass();
+        $itemBar->first = 'f';
+        $itemBar->second = 's';
+
+        $data = new $collection([$itemFoo, $itemBar]);
+        $data = $data->sortBy([
+            ['first', 'desc'],
+            ['second', 'desc'],
+        ], SORT_NATURAL);
+
+        $this->assertEquals($itemBar, $data->first());
+        $this->assertEquals($itemFoo, $data->skip(1)->first());
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testSortKeys($collection)
     {
         $data = new $collection(['b' => 'dayle', 'a' => 'taylor']);
