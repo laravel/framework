@@ -193,7 +193,7 @@ jobs:
           DB_PASSWORD: password
 
   mssql:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     services:
       sqlsrv:
@@ -240,7 +240,7 @@ jobs:
           DB_PASSWORD: Forge123
 
   sqlite:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
 
     strategy:
       fail-fast: true
