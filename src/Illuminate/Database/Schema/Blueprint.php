@@ -1297,7 +1297,7 @@ class Blueprint
      * @param  string  $column
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function epochSoftDeletes($column = 'deleted_at',)
+    public function epochSoftDeletes($column = 'deleted_at')
     {
         return $this->integer(column: $column, unsigned: true)->default(0);
     }

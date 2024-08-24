@@ -3,8 +3,8 @@
 namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Eloquent\Casts\EpochCast;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\EpochSoftDeletes;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
 
