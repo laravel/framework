@@ -1292,6 +1292,17 @@ class Blueprint
     }
 
     /**
+     * Add a "deleted at" epoch timestamp for the table.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Database\Schema\ColumnDefinition
+     */
+    public function epochSoftDeletes($column = 'deleted_at',)
+    {
+        return $this->integer(column: $column, unsigned: true)->default(0);
+    }
+
+    /**
      * Add a "deleted at" timestampTz for the table.
      *
      * @param  string  $column
