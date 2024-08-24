@@ -281,6 +281,42 @@ class Grammar extends BaseGrammar
     }
 
     /**
+     * Compile a raw "where in" clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereRawIn(Builder $query, $where)
+    {
+        if (! empty($where['values'])) {
+            $sql = $where['sql'] instanceof Expression ? $where['sql']->getValue($this) : $where['sql'];
+
+            return $sql.' in ('.$this->parameterize($where['values']).')';
+        }
+
+        return '0 = 1';
+    }
+
+    /**
+     * Compile a raw "where not in" clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereRawNotIn(Builder $query, $where)
+    {
+        if (! empty($where['values'])) {
+            $sql = $where['sql'] instanceof Expression ? $where['sql']->getValue($this) : $where['sql'];
+
+            return $sql.' not in ('.$this->parameterize($where['values']).')';
+        }
+
+        return '1 = 1';
+    }
+
+    /**
      * Compile a basic where clause.
      *
      * @param  \Illuminate\Database\Query\Builder  $query

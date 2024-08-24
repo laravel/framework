@@ -1222,6 +1222,87 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([], $builder->getBindings());
     }
 
+    public function testWhereRawIn()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereRawIn('concat_ws(" ", first_name , NULLIF(last_name , ""))', [
+            'John Doe',
+            'Alice',
+        ]);
+        $this->assertSame('select * from "users" where concat_ws(" ", first_name , NULLIF(last_name , "")) in (?, ?)', $builder->toSql());
+        $this->assertEquals([0 => 'John Doe', 1 => 'Alice'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereRawIn('concat_ws(" ", first_name , NULLIF(last_name , ""))', collect(['John Doe', 'Alice']));
+        $this->assertSame('select * from "users" where concat_ws(" ", first_name , NULLIF(last_name , "")) in (?, ?)', $builder->toSql());
+        $this->assertEquals([0 => 'John Doe', 1 => 'Alice'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereRawIn('concat_ws(?, first_name , NULLIF(last_name , ""))', ['John Doe', 'Alice'], [' ']);
+        $this->assertSame('select * from "users" where concat_ws(?, first_name , NULLIF(last_name , "")) in (?, ?)', $builder->toSql());
+        $this->assertEquals([0 => ' ', 1 => 'John Doe', 2 => 'Alice'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereRawIn(
+            'concat_ws(?, first_name , NULLIF(last_name , ""))',
+            $this->getBuilder()->select('first_name')->from('customers'),
+            [' ']);
+        $this->assertSame('select * from "users" where concat_ws(?, first_name , NULLIF(last_name , "")) in (select "first_name" from "customers")', $builder->toSql());
+        $this->assertEquals([0 => ' '], $builder->getBindings());
+    }
+
+    public function testOrWhereRawIn()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereRawIn('concat_ws(" ", first_name , NULLIF(last_name , ""))', [
+            'John Doe',
+            'Alice',
+        ]);
+        $this->assertSame('select * from "users" where "id" = ? or concat_ws(" ", first_name , NULLIF(last_name , "")) in (?, ?)', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 'John Doe', 2 => 'Alice'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereRawIn(
+            'concat_ws(?, first_name , NULLIF(last_name , ""))',
+            ['John Doe', 'Alice'],
+            [' ']
+        );
+        $this->assertSame('select * from "users" where "id" = ? or concat_ws(?, first_name , NULLIF(last_name , "")) in (?, ?)', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => ' ', 2 => 'John Doe', 3 => 'Alice'], $builder->getBindings());
+    }
+
+    public function testWhereRawNotIn()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereRawNotIn('concat_ws(" ", first_name , NULLIF(last_name , ""))', ['John Doe', 'Alice']);
+        $this->assertSame('select * from "users" where concat_ws(" ", first_name , NULLIF(last_name , "")) not in (?, ?)', $builder->toSql());
+        $this->assertEquals([0 => 'John Doe', 1 => 'Alice'], $builder->getBindings());
+    }
+
+    public function testOrWhereRawNotIn()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereRawNotIn('concat_ws(" ", first_name , NULLIF(last_name , ""))', ['John Doe', 'Alice']);
+        $this->assertSame('select * from "users" where "id" = ? or concat_ws(" ", first_name , NULLIF(last_name , "")) not in (?, ?)', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 'John Doe', 2 => 'Alice'], $builder->getBindings());
+    }
+
+    public function testEmptyWhereRawIn()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereRawIn('concat_ws(" ", first_name , NULLIF(last_name , ""))', []);
+        $this->assertSame('select * from "users" where 0 = 1', $builder->toSql());
+        $this->assertEquals([], $builder->getBindings());
+    }
+
+    public function testEmptyWhereRawNotIn()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereRawNotIn('concat_ws(" ", first_name , NULLIF(last_name , ""))', []);
+        $this->assertSame('select * from "users" where 1 = 1', $builder->toSql());
+        $this->assertEquals([], $builder->getBindings());
+    }
+
     public function testBasicWhereColumn()
     {
         $builder = $this->getBuilder();

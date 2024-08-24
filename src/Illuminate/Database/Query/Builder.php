@@ -1334,6 +1334,79 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add a raw "where in" clause to the query.
+     *
+     * @param  string  $sql
+     * @param  mixed  $values
+     * @param  string  $boolean
+     * @param  bool  $not
+     * @return $this
+     */
+    public function whereRawIn($sql, $values, $bindings = [], $boolean = 'and', $not = false)
+    {
+        $type = $not ? 'RawNotIn' : 'RawIn';
+
+        if ($this->isQueryable($values)) {
+            [$query, $subBindings] = $this->createSub($values);
+
+            $values = [new Expression($query)];
+
+            $this->addBinding($subBindings, 'where');
+        }
+
+        if ($values instanceof Arrayable) {
+            $values = $values->toArray();
+        }
+
+        if (count($values) !== count(Arr::flatten($values, 1))) {
+            throw new \InvalidArgumentException('Nested arrays may not be passed to whereRawIn method.');
+        }
+
+        $this->wheres[] = compact('type', 'sql', 'values', 'boolean');
+
+        $this->addBinding((array) $bindings, 'where');
+        $this->addBinding($this->cleanBindings($values), 'where');
+
+        return $this;
+    }
+
+    /**
+     * Add a raw "where not in" clause to the query.
+     *
+     * @param  string  $sql
+     * @param  mixed  $values
+     * @return $this
+     */
+    public function whereRawNotIn($sql, $values, $bindings = [])
+    {
+        return $this->whereRawIn($sql, $values, $bindings, 'and', true);
+    }
+
+    /**
+     * Add a raw "or where in" clause to the query.
+     *
+     * @param  string  $sql
+     * @param  mixed  $values
+     * @return $this
+     */
+    public function orWhereRawIn($sql, $values, $bindings = [])
+    {
+        return $this->whereRawIn($sql, $values, $bindings, 'or');
+    }
+
+    /**
+     * Add a raw "or where not in" clause to the query.
+     *
+     * @param  string  $sql
+     * @param  mixed  $values
+     * @return $this
+     */
+    public function orWhereRawNotIn($sql, $values, $bindings = [])
+    {
+        return $this->whereRawIn($sql, $values, $bindings, 'or', true);
+    }
+
+    /**
      * Add a "where null" clause to the query.
      *
      * @param  string|array|\Illuminate\Contracts\Database\Query\Expression  $columns
