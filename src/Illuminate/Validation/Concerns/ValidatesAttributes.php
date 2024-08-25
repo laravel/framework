@@ -2659,7 +2659,7 @@ trait ValidatesAttributes
     {
         $stringValue = (string) $value;
 
-        if (! is_numeric($value) || ! Str::contains($stringValue, 'e', ignoreCase: true)) {
+        if (! is_numeric($value) || ! Str::contains($stringValue, 'e', caseSensitive: false)) {
             return $value;
         }
 
