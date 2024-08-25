@@ -283,12 +283,12 @@ class Str
      *
      * @param  string  $haystack
      * @param  string|iterable<string>  $needles
-     * @param  bool  $ignoreCase
+     * @param  bool  $caseSensitive
      * @return bool
      */
-    public static function contains($haystack, $needles, $ignoreCase = false)
+    public static function contains($haystack, $needles, $caseSensitive = true)
     {
-        if ($ignoreCase) {
+        if (!$caseSensitive) {
             $haystack = mb_strtolower($haystack);
         }
 
@@ -297,7 +297,7 @@ class Str
         }
 
         foreach ($needles as $needle) {
-            if ($ignoreCase) {
+            if (!$caseSensitive) {
                 $needle = mb_strtolower($needle);
             }
 
@@ -314,13 +314,13 @@ class Str
      *
      * @param  string  $haystack
      * @param  iterable<string>  $needles
-     * @param  bool  $ignoreCase
+     * @param  bool  $caseSensitive
      * @return bool
      */
-    public static function containsAll($haystack, $needles, $ignoreCase = false)
+    public static function containsAll($haystack, $needles, $caseSensitive = true)
     {
         foreach ($needles as $needle) {
-            if (! static::contains($haystack, $needle, $ignoreCase)) {
+            if (! static::contains($haystack, $needle, $caseSensitive)) {
                 return false;
             }
         }

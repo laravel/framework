@@ -1259,8 +1259,8 @@ class SupportStrTest extends TestCase
         return [
             ['Taylor', 'ylo', true, true],
             ['Taylor', 'ylo', true, false],
-            ['Taylor', 'taylor', true, true],
-            ['Taylor', 'taylor', false, false],
+            ['Taylor', 'taylor', false, true],
+            ['Taylor', 'taylor', true, false],
             ['Taylor', ['ylo'], true, true],
             ['Taylor', ['ylo'], true, false],
             ['Taylor', ['xxx', 'ylo'], true, true],
@@ -1276,10 +1276,10 @@ class SupportStrTest extends TestCase
     public static function strContainsAllProvider()
     {
         return [
-            ['Taylor Otwell', ['taylor', 'otwell'], false, false],
-            ['Taylor Otwell', ['taylor', 'otwell'], true, true],
-            ['Taylor Otwell', ['taylor'], false, false],
-            ['Taylor Otwell', ['taylor'], true, true],
+            ['Taylor Otwell', ['taylor', 'otwell'], true, false],
+            ['Taylor Otwell', ['taylor', 'otwell'], false, true],
+            ['Taylor Otwell', ['taylor'], true, false],
+            ['Taylor Otwell', ['taylor'], false, true],
             ['Taylor Otwell', ['taylor', 'xxx'], false, false],
             ['Taylor Otwell', ['taylor', 'xxx'], false, true],
         ];
