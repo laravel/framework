@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Foundation\Bootstrap;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables;
 use Mockery as m;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class LoadEnvironmentVariablesTest extends TestCase
@@ -16,18 +17,18 @@ class LoadEnvironmentVariablesTest extends TestCase
         m::close();
     }
 
-    protected function getAppMock($file)
+    protected function getAppMock($file, $n = 1)
     {
-        $app = m::mock(Application::class);
+        $app = m::mock(Application::class)->makePartial();
 
         $app->shouldReceive('configurationIsCached')
-            ->once()->with()->andReturn(false);
+            ->times($n)->with()->andReturn(false);
         $app->shouldReceive('runningInConsole')
-            ->once()->with()->andReturn(false);
+            ->times($n)->with()->andReturn(false);
         $app->shouldReceive('environmentPath')
-            ->once()->with()->andReturn(__DIR__.'/../fixtures');
-        $app->shouldReceive('environmentFile')
-            ->once()->with()->andReturn($file);
+            ->atLeast($n)->with()->andReturn(__DIR__.'/../fixtures');
+
+        $app->loadEnvironmentFrom($file);
 
         return $app;
     }
@@ -49,5 +50,43 @@ class LoadEnvironmentVariablesTest extends TestCase
         $this->expectOutputString('');
 
         (new LoadEnvironmentVariables)->bootstrap($this->getAppMock('BAD_FILE'));
+    }
+
+    #[DataProvider('appEnvProvider')]
+    public function testIdempotence(?string $appEnv, string $expected): void
+    {
+        if (isset($appEnv)) {
+            $_ENV['APP_ENV'] = $appEnv;
+        }
+
+        $app = $this->getAppMock('.env.idempotence', 2);
+
+        (new LoadEnvironmentVariables)->bootstrap($app);
+
+        $this->assertSame($expected, env('FOO'));
+        $this->assertSame($expected, getenv('FOO'));
+        $this->assertSame($expected, $_ENV['FOO']);
+        $this->assertSame($expected, $_SERVER['FOO']);
+
+        (new LoadEnvironmentVariables)->bootstrap($app);
+
+        $this->assertSame($expected, env('FOO'));
+        $this->assertSame($expected, getenv('FOO'));
+        $this->assertSame($expected, $_ENV['FOO']);
+        $this->assertSame($expected, $_SERVER['FOO']);
+
+        $reflection = new \ReflectionClass(LoadEnvironmentVariables::class);
+        $reflection->setStaticPropertyValue('externallyProvidedAppEnv', null);
+
+        unset($_ENV['APP_ENV'], $_SERVER['APP_ENV']);
+        putenv('APP_ENV');
+    }
+
+    public static function appEnvProvider(): array
+    {
+        return [
+            'Use default .env file.' => ['appEnv' => null, 'expected' => 'BAR'],
+            'APP_ENV has been externally provided.' => ['appEnv' => 'baz', 'expected' => 'BAZ'],
+        ];
     }
 }
