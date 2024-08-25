@@ -131,6 +131,7 @@
             "src/Illuminate/Events/functions.php",
             "src/Illuminate/Filesystem/functions.php",
             "src/Illuminate/Foundation/helpers.php",
+            "src/Illuminate/Log/functions.php",
             "src/Illuminate/Support/helpers.php"
         ],
         "psr-4": {
