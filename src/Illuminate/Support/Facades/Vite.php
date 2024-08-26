@@ -16,7 +16,7 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Foundation\Vite useScriptTagAttributes(callable|array $attributes)
  * @method static \Illuminate\Foundation\Vite useStyleTagAttributes(callable|array $attributes)
  * @method static \Illuminate\Foundation\Vite usePreloadTagAttributes(callable|array|false $attributes)
- * @method static \Illuminate\Foundation\Vite prefetch(int|null $concurrency = null)
+ * @method static \Illuminate\Foundation\Vite prefetch(int|null $concurrency = null, string $event = 'load')
  * @method static \Illuminate\Foundation\Vite useWaterfallPrefetching(int|null $concurrency = null)
  * @method static \Illuminate\Foundation\Vite useAggressivePrefetching()
  * @method static \Illuminate\Foundation\Vite usePrefetchStrategy(string|null $strategy, array $config = [])
