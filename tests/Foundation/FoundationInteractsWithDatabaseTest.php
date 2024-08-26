@@ -377,6 +377,14 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $this->assertEquals($this->table, $this->getTable(ProductStub::class));
         $this->assertEquals($this->table, $this->getTable(new ProductStub));
         $this->assertEquals($this->table, $this->getTable($this->table));
+        $this->assertEquals('all_products', $this->getTable((new ProductStub)->setTable('all_products')));
+    }
+
+    public function testGetTableConnectionNameFromModel()
+    {
+        $this->assertSame(null, $this->getTableConnection(ProductStub::class));
+        $this->assertSame(null, $this->getTableConnection(new ProductStub));
+        $this->assertSame('mysql', $this->getTableConnection((new ProductStub)->setConnection('mysql')));
     }
 
     public function testGetTableCustomizedDeletedAtColumnName()
