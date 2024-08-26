@@ -112,6 +112,13 @@ class Vite implements Htmlable
     protected $prefetchConcurrently = 3;
 
     /**
+     * The name of the event that should trigger prefetching. The event must be dispatched on the `window`.
+     *
+     * @var string
+     */
+    protected $prefetchEvent = 'load';
+
+    /**
      * Get the preloaded assets.
      *
      * @return array
@@ -285,10 +292,13 @@ class Vite implements Htmlable
      * Eagerly prefetch assets.
      *
      * @param  int|null  $concurrency
+     * @param  string  $event
      * @return $this
      */
-    public function prefetch($concurrency = null)
+    public function prefetch($concurrency = null, $event = 'load')
     {
+        $this->prefetchEvent = $event;
+
         return $concurrency === null
             ? $this->usePrefetchStrategy('aggressive')
             : $this->usePrefetchStrategy('waterfall', ['concurrency' => $concurrency]);
@@ -486,7 +496,7 @@ class Vite implements Htmlable
                 'waterfall' => new HtmlString($base.<<<HTML
 
                     <script{$this->nonceAttribute()}>
-                         window.addEventListener('load', () => window.setTimeout(() => {
+                         window.addEventListener('{$this->prefetchEvent}', () => window.setTimeout(() => {
                             const makeLink = (asset) => {
                                 const link = document.createElement('link')
 
@@ -529,7 +539,7 @@ class Vite implements Htmlable
                 'aggressive' => new HtmlString($base.<<<HTML
 
                     <script{$this->nonceAttribute()}>
-                         window.addEventListener('load', () => window.setTimeout(() => {
+                         window.addEventListener('{$this->prefetchEvent}', () => window.setTimeout(() => {
                             const makeLink = (asset) => {
                                 const link = document.createElement('link')
 

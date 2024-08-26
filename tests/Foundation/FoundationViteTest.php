@@ -1676,6 +1676,23 @@ class FoundationViteTest extends TestCase
         $this->cleanViteManifest($buildDir);
     }
 
+    public function testItCanConfigureThePrefetchTriggerEvent()
+    {
+        $manifest = json_decode(file_get_contents(__DIR__.'/fixtures/prefetching-manifest.json'));
+        $buildDir = Str::random();
+        $this->makeViteManifest($manifest, $buildDir);
+        app()->usePublicPath(__DIR__);
+
+        $html = (string) tap(ViteFacade::withEntryPoints(['resources/js/app.js']))
+            ->useBuildDirectory($buildDir)
+            ->prefetch(event: 'vite:prefetch')
+            ->toHtml();
+        $this->assertStringNotContainsString("window.addEventListener('load', ", $html);
+        $this->assertStringContainsString("window.addEventListener('vite:prefetch', ", $html);
+
+        $this->cleanViteManifest($buildDir);
+    }
+
     protected function cleanViteManifest($path = 'build')
     {
         if (file_exists(public_path("{$path}/manifest.json"))) {
