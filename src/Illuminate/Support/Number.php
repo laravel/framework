@@ -269,6 +269,28 @@ class Number
     }
 
     /**
+     * Ensure the given number is negative.
+     *
+     * @param  int|float  $number
+     * @return int|float
+     */
+    public static function makeNegative(int|float $number)
+    {
+        return $number < 0 ? $number : -$number;
+    }
+
+    /**
+     * Ensure the given number is positive.
+     *
+     * @param  int|float  $number
+     * @return int|float
+     */
+    public static function makePositive(int|float $number)
+    {
+        return $number > 0 ? $number : abs($number);
+    }
+
+    /**
      * Execute the given callback using the given locale.
      *
      * @param  string  $locale

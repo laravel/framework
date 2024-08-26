@@ -304,4 +304,24 @@ class SupportNumberTest extends TestCase
         $this->assertSame(12.3456789, Number::trim(12.3456789));
         $this->assertSame(12.3456789, Number::trim(12.34567890000));
     }
+
+    public function testMakeNegative()
+    {
+        $this->assertSame(-12, Number::makeNegative(12));
+        $this->assertSame(-12, Number::makeNegative(-12));
+        $this->assertSame(0, Number::makeNegative(0));
+        $this->assertSame(-0, Number::makeNegative(-0));
+        $this->assertSame(-12.34, Number::makeNegative(-12.34));
+        $this->assertSame(-12.34, Number::makeNegative(-12.34));
+    }
+
+    public function testMakePositive()
+    {
+        $this->assertSame(12, Number::makePositive(-12));
+        $this->assertSame(12, Number::makePositive(12));
+        $this->assertSame(0, Number::makePositive(0));
+        $this->assertSame(0, Number::makePositive(-0));
+        $this->assertSame(12.34, Number::makePositive(-12.34));
+        $this->assertSame(12.34, Number::makePositive(12.34));
+    }
 }
