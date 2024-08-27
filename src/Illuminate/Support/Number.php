@@ -269,6 +269,23 @@ class Number
     }
 
     /**
+     * Check if the given number is between given min and max number.
+     *
+     * @param  int|float  $value
+     * @param  int|float  $min
+     * @param  int|float  $max
+     * @param  bool  $inclusive
+     * @return bool
+     */
+    public static function isBetween(int|float $value, int|float $min, int|float $max, bool $inclusive = true)
+    {
+        return match ($inclusive) {
+            true => $value >= $min && $value <= $max,
+            false => $value > $min && $value < $max,
+        };
+    }
+
+    /**
      * Execute the given callback using the given locale.
      *
      * @param  string  $locale

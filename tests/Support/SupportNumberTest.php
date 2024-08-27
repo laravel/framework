@@ -304,4 +304,23 @@ class SupportNumberTest extends TestCase
         $this->assertSame(12.3456789, Number::trim(12.3456789));
         $this->assertSame(12.3456789, Number::trim(12.34567890000));
     }
+
+    public function testBetween()
+    {
+        $this->assertTrue(Number::isBetween(5, 1, 10));
+        $this->assertTrue(Number::isBetween(1, 1, 10));
+        $this->assertTrue(Number::isBetween(10, 1, 10));
+        $this->assertFalse(Number::isBetween(0, 1, 10));
+        $this->assertFalse(Number::isBetween(11, 1, 10));
+        $this->assertTrue(Number::isBetween(7.5, 1.2, 7.5));
+        $this->assertTrue(Number::isBetween(7.5, 7.5, 10.5));
+        $this->assertTrue(Number::isBetween(5, 1, 10, false));
+        $this->assertFalse(Number::isBetween(1, 1, 10, false));
+        $this->assertFalse(Number::isBetween(10, 1, 10, false));
+        $this->assertFalse(Number::isBetween(0, 1, 10, false));
+        $this->assertFalse(Number::isBetween(11, 1, 10, false));
+        $this->assertFalse(Number::isBetween(7.5, 1.2, 7.5, false));
+        $this->assertFalse(Number::isBetween(7.5, 7.5, 10.5, false));
+        $this->assertTrue(Number::isBetween(7.4, 1.2, 7.5, false));
+    }
 }
