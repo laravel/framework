@@ -29,6 +29,12 @@ class SupportStringableTest extends TestCase
         );
     }
 
+    public function testItAddsACustomCharacterEveryXTimes()
+    {
+        $this->assertSame('12 34 56 78 90', (string) $this->stringable('1234567890')->addCharAtInterval(' ', 2));
+        $this->assertSame('123-456-789', (string) $this->stringable('123456789')->addCharAtInterval('-', 3));
+    }
+
     public function testIsAscii()
     {
         $this->assertTrue($this->stringable('A')->isAscii());

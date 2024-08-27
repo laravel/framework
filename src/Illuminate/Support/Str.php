@@ -111,6 +111,19 @@ class Str
     }
 
     /**
+     * Return the given string with a custom character every X character.
+     *
+     * @param  string  $subject
+     * @param  string  $char
+     * @param  int  $length
+     * @return string
+     */
+    public static function addCharAtInterval($subject, $char, $length = 1)
+    {
+        return implode($char, str_split($subject, $length));
+    }
+
+    /**
      * Transliterate a UTF-8 value to ASCII.
      *
      * @param  string  $value
