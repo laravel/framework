@@ -31,7 +31,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      */
     public function __construct($value = '')
     {
-        $this->value = (string) $value;
+        $this->value = (string)$value;
     }
 
     /**
@@ -46,7 +46,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
-     * Return the given string with a custom character every X character
+     * Return the given string with a custom character every X character.
      *
      * @param $char
      * @param $length
@@ -335,7 +335,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
 
         $segments = preg_split($pattern, $this->value, $limit, $flags);
 
-        return ! empty($segments) ? collect($segments) : collect();
+        return !empty($segments) ? collect($segments) : collect();
     }
 
     /**
@@ -427,7 +427,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      */
     public function isNotEmpty()
     {
-        return ! $this->isEmpty();
+        return !$this->isEmpty();
     }
 
     /**
@@ -1156,7 +1156,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      */
     public function whenNotExactly($value, $callback, $default = null)
     {
-        return $this->when(! $this->exactly($value), $callback, $default);
+        return $this->when(!$this->exactly($value), $callback, $default);
     }
 
     /**
@@ -1481,6 +1481,6 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      */
     public function __toString()
     {
-        return (string) $this->value;
+        return (string)$this->value;
     }
 }
