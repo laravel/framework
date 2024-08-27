@@ -12,6 +12,12 @@ use ValueError;
 
 class SupportStrTest extends TestCase
 {
+    public function testItAddsACustomCharacterEveryXTimes(): void
+    {
+        $this->assertSame('12 34 56 78 90', Str::addCharAtInterval('1234567890', ' ', 2));
+        $this->assertSame('123-456-789', Str::addCharAtInterval('123456789', '-', 3));
+    }
+
     public function testStringCanBeLimitedByWords(): void
     {
         $this->assertSame('Taylor...', Str::words('Taylor Otwell', 1));

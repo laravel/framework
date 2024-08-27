@@ -46,6 +46,18 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Return the given string with a custom character every X character
+     *
+     * @param $char
+     * @param $length
+     * @return static
+     */
+    public function addCharAtInterval($char, $length = 1)
+    {
+        return new static(Str::addCharAtInterval($this->value, $char, $length));
+    }
+
+    /**
      * Return the remainder of a string after the last occurrence of a given value.
      *
      * @param  string  $search
