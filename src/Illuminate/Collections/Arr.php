@@ -951,4 +951,35 @@ class Arr
 
         return is_array($value) ? $value : [$value];
     }
+
+    public static function toFilled(array $arr, $value, int $start = 0, int $end = null): array
+    {
+        $arrLength = count($arr);
+
+        // Adjust the start position for negative values
+        if ($start < 0) {
+            $start = max(0, $arrLength + $start);
+        } else {
+            $start = min($start, $arrLength);
+        }
+
+        // If end is not provided, set it to the length of the array
+        if (is_null($end)) {
+            $end = $arrLength;
+        } elseif ($end < 0) {
+            $end = max(0, $arrLength + $end);
+        } else {
+            $end = min($end, $arrLength);
+        }
+
+        // Create a copy of the array to avoid modifying the original
+        $result = $arr;
+
+        // Fill the array with the provided value from start to end positions
+        for ($i = $start; $i < $end; $i++) {
+            $result[$i] = $value;
+        }
+
+        return $result;
+    }
 }

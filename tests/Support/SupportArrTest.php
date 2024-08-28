@@ -1502,4 +1502,58 @@ class SupportArrTest extends TestCase
             ],
         ], Arr::select($array, 'name'));
     }
+
+    public function testToFilledWithDefaultStartAndEnd()
+    {
+        $array = [1, 2, 3, 4, 5];
+        $result = Arr::toFilled($array, '*');
+
+        $this->assertEquals(['*', '*', '*', '*', '*'], $result);
+        $this->assertEquals([1, 2, 3, 4, 5], $array);
+    }
+
+    public function testToFilledWithStartIndex()
+    {
+        $array = [1, 2, 3, 4, 5];
+        $result = Arr::toFilled($array, '*', 2);
+
+        $this->assertEquals([1, 2, '*', '*', '*'], $result);
+        $this->assertEquals([1, 2, 3, 4, 5], $array);
+    }
+
+    public function testToFilledWithStartAndEndIndices()
+    {
+        $array = [1, 2, 3, 4, 5];
+        $result = Arr::toFilled($array, '*', 1, 4);
+
+        $this->assertEquals([1, '*', '*', '*', 5], $result);
+        $this->assertEquals([1, 2, 3, 4, 5], $array);
+    }
+
+    public function testToFilledWithNegativeIndices()
+    {
+        $array = [1, 2, 3, 4, 5];
+        $result = Arr::toFilled($array, '*', -4, -1);
+
+        $this->assertEquals([1, '*', '*', '*', 5], $result);
+        $this->assertEquals([1, 2, 3, 4, 5], $array);
+    }
+
+    public function testToFilledWithStartGreaterThanEnd()
+    {
+        $array = [1, 2, 3, 4, 5];
+        $result = Arr::toFilled($array, '*', 3, 2);
+
+        $this->assertEquals([1, 2, 3, 4, 5], $result); // No change, start is greater than end
+        $this->assertEquals([1, 2, 3, 4, 5], $array);
+    }
+
+    public function testToFilledWithEmptyArray()
+    {
+        $array = [];
+        $result = Arr::toFilled($array, '*');
+
+        $this->assertEquals([], $result); // No change, array is empty
+        $this->assertEquals([], $array);
+    }
 }
