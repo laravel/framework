@@ -2124,6 +2124,12 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['password' => '1e2', 'password_confirmation' => '100'], ['password' => 'Confirmed']);
         $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['password' => 'foo', 'passwordConfirmation' => 'foo'], ['password' => 'Confirmed:passwordConfirmation']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['password' => 'foo', 'passwordConfirmation' => 'bar'], ['password' => 'Confirmed:passwordConfirmation']);
+        $this->assertFalse($v->passes());
     }
 
     public function testValidateSame()
