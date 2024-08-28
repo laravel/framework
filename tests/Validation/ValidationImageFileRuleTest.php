@@ -86,7 +86,7 @@ class ValidationImageFileRuleTest extends TestCase
         );
     }
 
-    public function testDimentionWithTheRatioRangeMethod()
+    public function testDimentionWithTheRatioBetweenMethod()
     {
         $this->fails(
             File::image()->dimensions(Rule::dimensions()->ratioBetween(1 / 2, 1 / 3)),
