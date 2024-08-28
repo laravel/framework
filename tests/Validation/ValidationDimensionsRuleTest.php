@@ -74,5 +74,4 @@ class ValidationDimensionsRuleTest extends TestCase
             $validator->errors()->first('image')
         );
     }
-
 }
