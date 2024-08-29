@@ -1503,55 +1503,55 @@ class SupportArrTest extends TestCase
         ], Arr::select($array, 'name'));
     }
 
-    public function testToFilledWithDefaultStartAndEnd()
+    public function testFillWithDefaultStartAndEnd()
     {
         $array = [1, 2, 3, 4, 5];
-        $result = Arr::toFilled($array, '*');
+        $result = Arr::fill($array, '*');
 
         $this->assertEquals(['*', '*', '*', '*', '*'], $result);
         $this->assertEquals([1, 2, 3, 4, 5], $array);
     }
 
-    public function testToFilledWithStartIndex()
+    public function testFillWithStartIndex()
     {
         $array = [1, 2, 3, 4, 5];
-        $result = Arr::toFilled($array, '*', 2);
+        $result = Arr::fill($array, '*', 2);
 
         $this->assertEquals([1, 2, '*', '*', '*'], $result);
         $this->assertEquals([1, 2, 3, 4, 5], $array);
     }
 
-    public function testToFilledWithStartAndEndIndices()
+    public function testFillWithStartAndEndIndices()
     {
         $array = [1, 2, 3, 4, 5];
-        $result = Arr::toFilled($array, '*', 1, 4);
+        $result = Arr::fill($array, '*', 1, 4);
 
         $this->assertEquals([1, '*', '*', '*', 5], $result);
         $this->assertEquals([1, 2, 3, 4, 5], $array);
     }
 
-    public function testToFilledWithNegativeIndices()
+    public function testFillWithNegativeIndices()
     {
         $array = [1, 2, 3, 4, 5];
-        $result = Arr::toFilled($array, '*', -4, -1);
+        $result = Arr::fill($array, '*', -4, -1);
 
         $this->assertEquals([1, '*', '*', '*', 5], $result);
         $this->assertEquals([1, 2, 3, 4, 5], $array);
     }
 
-    public function testToFilledWithStartGreaterThanEnd()
+    public function testFillWithStartGreaterThanEnd()
     {
         $array = [1, 2, 3, 4, 5];
-        $result = Arr::toFilled($array, '*', 3, 2);
+        $result = Arr::fill($array, '*', 3, 2);
 
         $this->assertEquals([1, 2, 3, 4, 5], $result); // No change, start is greater than end
         $this->assertEquals([1, 2, 3, 4, 5], $array);
     }
 
-    public function testToFilledWithEmptyArray()
+    public function testFillWithEmptyArray()
     {
         $array = [];
-        $result = Arr::toFilled($array, '*');
+        $result = Arr::fill($array, '*');
 
         $this->assertEquals([], $result); // No change, array is empty
         $this->assertEquals([], $array);
