@@ -408,7 +408,7 @@ trait CompilesConditionals
     }
 
     /**
-     * Compile a readonly block into valid PHP.
+     * Compile a hidden block into valid PHP.
      *
      * @param  string  $condition
      * @return string
