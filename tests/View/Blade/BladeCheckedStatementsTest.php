@@ -43,4 +43,12 @@ class BladeCheckedStatementsTest extends AbstractBladeTestCase
 
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
+
+    public function testHiddenStatementsAreCompiled()
+    {
+        $string = '<input @hidden(name(foo(bar)))/>';
+        $expected = "<input <?php if(name(foo(bar))): echo 'hidden'; endif; ?>/>";
+
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
 }
