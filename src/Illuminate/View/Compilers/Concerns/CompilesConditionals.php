@@ -406,4 +406,15 @@ trait CompilesConditionals
     {
         return '<?php $__env->stopPush(); endif; ?>';
     }
+
+    /**
+     * Compile a readonly block into valid PHP.
+     *
+     * @param  string  $condition
+     * @return string
+     */
+    protected function compileHidden($condition)
+    {
+        return "<?php if{$condition}: echo 'hidden'; endif; ?>";
+    }
 }
