@@ -1556,4 +1556,18 @@ class SupportArrTest extends TestCase
         $this->assertEquals([], $result); // No change, array is empty
         $this->assertEquals([], $array);
     }
+
+    public function testFillShouldNotApplyChanges()
+    {
+        $array = [1, 2, 3, 4, 5];
+
+        $this->assertEquals([1, 2, 3, 4, 5], Arr::fill($array, '*', 1, 1));
+    }
+
+    public function testFillShouldApplyChanges()
+    {
+        $array = [1, 2, 3, 4, 5];
+
+        $this->assertEquals([1, '*', 3, 4, 5], Arr::fill($array, '*', 1, 2));
+    }
 }
