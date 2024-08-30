@@ -33,6 +33,6 @@ class DatabaseMySqlQueryGrammarTest extends TestCase
     {
         $grammar = new MySqlGrammar;
         $queryString = $grammar->orderByPriority('name', ['john', 'doe']);
-        $this->assertSame('case when "name" = ? then 0 when "name" = ? then 1 else 2 end asc', $queryString);
+        $this->assertSame('case when `name` = ? then 0 when "name" = ? then 1 else 2 end asc', $queryString);
     }
 }
