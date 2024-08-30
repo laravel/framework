@@ -10,7 +10,7 @@ trait DetectsLostConnections
     /**
      * Determine if the given exception was caused by a lost connection.
      *
-     * @param  \Throwable  $e
+     * @param \Throwable $e
      * @return bool
      */
     protected function causedByLostConnection(Throwable $e)
@@ -76,6 +76,9 @@ trait DetectsLostConnections
             'No such file or directory',
             'server is shutting down',
             'failed to connect to',
+            'Channel connection is closed',
+            'Connection lost',
+            'Broken pipe',
         ]);
     }
 }
