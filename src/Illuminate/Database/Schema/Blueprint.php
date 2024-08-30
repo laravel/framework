@@ -1241,6 +1241,19 @@ class Blueprint
     }
 
     /**
+     * Add native creation and update timestamps to the table.
+     *
+     * @param  int|null  $precision
+     * @return void
+     */
+    public function nativeTimestamps($precision = 0)
+    {
+        $this->timestamp('created_at', $precision)->useCurrent();
+
+        $this->timestamp('updated_at', $precision)->useCurrent()->useCurrentOnUpdate();
+    }
+
+    /**
      * Add nullable creation and update timestamps to the table.
      *
      * Alias for self::timestamps().
