@@ -44,6 +44,7 @@ namespace Illuminate\Support\Facades;
  * @method static void stringable(string|callable $class, callable|null $handler = null)
  * @method static string compileEchos(string $value)
  * @method static string applyEchoHandler(string $value)
+ * @method static string compileLog(string $expression)
  *
  * @see \Illuminate\View\Compilers\BladeCompiler
  */
