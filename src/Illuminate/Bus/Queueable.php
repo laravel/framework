@@ -7,6 +7,7 @@ use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Support\Arr;
 use PHPUnit\Framework\Assert as PHPUnit;
 use RuntimeException;
+use StringBackedEnum;
 
 trait Queueable
 {
@@ -76,12 +77,14 @@ trait Queueable
     /**
      * Set the desired connection for the job.
      *
-     * @param  string|null  $connection
+     * @param  string|StringBackedEnum|null  $connection
      * @return $this
      */
     public function onConnection($connection)
     {
-        $this->connection = $connection;
+        $this->connection = $connection instanceof StringBackedEnum
+            ? $connection->value
+            : $connection;
 
         return $this;
     }
@@ -89,12 +92,14 @@ trait Queueable
     /**
      * Set the desired queue for the job.
      *
-     * @param  string|null  $queue
+     * @param  string|StringBackedEnum|null  $queue
      * @return $this
      */
     public function onQueue($queue)
     {
-        $this->queue = $queue;
+        $this->queue = $queue instanceof StringBackedEnum
+            ? $queue->value
+            : $queue;
 
         return $this;
     }
@@ -102,13 +107,17 @@ trait Queueable
     /**
      * Set the desired connection for the chain.
      *
-     * @param  string|null  $connection
+     * @param  string|StringBackedEnum|null  $connection
      * @return $this
      */
     public function allOnConnection($connection)
     {
-        $this->chainConnection = $connection;
-        $this->connection = $connection;
+        $resolvedConnection = $connection instanceof StringBackedEnum
+            ? $connection->value
+            : $connection;
+
+        $this->chainConnection = $resolvedConnection;
+        $this->connection = $resolvedConnection;
 
         return $this;
     }
@@ -116,13 +125,17 @@ trait Queueable
     /**
      * Set the desired queue for the chain.
      *
-     * @param  string|null  $queue
+     * @param  string|StringBackedEnum|null  $queue
      * @return $this
      */
     public function allOnQueue($queue)
     {
-        $this->chainQueue = $queue;
-        $this->queue = $queue;
+        $resolvedQueue = $queue instanceof StringBackedEnum
+            ? $queue->value
+            : $queue;
+
+        $this->chainQueue = $resolvedQueue;
+        $this->queue = $resolvedQueue;
 
         return $this;
     }
