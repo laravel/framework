@@ -537,8 +537,14 @@ class MySqlGrammar extends Grammar
     {
         $column = $this->wrap($column);
 
-        $placeholders = implode(',', array_fill(0, count($priority), '?'));
+        $cases = [];
 
-        return 'field('.$column.', '.$placeholders.') '.$direction;
+        foreach ($priority as $index => $value) {
+            $cases[] = "when {$column} = ? then {$index}";
+        }
+
+        $caseStatement = 'case '.implode(' ', $cases).' else '.count($priority).' end';
+
+        return "{$caseStatement} {$direction}";
     }
 }
