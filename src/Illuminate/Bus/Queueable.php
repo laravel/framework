@@ -2,12 +2,12 @@
 
 namespace Illuminate\Bus;
 
+use BackedEnum;
 use Closure;
 use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Support\Arr;
 use PHPUnit\Framework\Assert as PHPUnit;
 use RuntimeException;
-use StringBackedEnum;
 
 trait Queueable
 {
@@ -77,12 +77,12 @@ trait Queueable
     /**
      * Set the desired connection for the job.
      *
-     * @param  string|StringBackedEnum|null  $connection
+     * @param  string|BackedEnum|null  $connection
      * @return $this
      */
     public function onConnection($connection)
     {
-        $this->connection = $connection instanceof StringBackedEnum
+        $this->connection = $connection instanceof BackedEnum
             ? $connection->value
             : $connection;
 
@@ -92,12 +92,12 @@ trait Queueable
     /**
      * Set the desired queue for the job.
      *
-     * @param  string|StringBackedEnum|null  $queue
+     * @param  string|BackedEnum|null  $queue
      * @return $this
      */
     public function onQueue($queue)
     {
-        $this->queue = $queue instanceof StringBackedEnum
+        $this->queue = $queue instanceof BackedEnum
             ? $queue->value
             : $queue;
 
@@ -107,12 +107,12 @@ trait Queueable
     /**
      * Set the desired connection for the chain.
      *
-     * @param  string|StringBackedEnum|null  $connection
+     * @param  string|BackedEnum|null  $connection
      * @return $this
      */
     public function allOnConnection($connection)
     {
-        $resolvedConnection = $connection instanceof StringBackedEnum
+        $resolvedConnection = $connection instanceof BackedEnum
             ? $connection->value
             : $connection;
 
@@ -125,12 +125,12 @@ trait Queueable
     /**
      * Set the desired queue for the chain.
      *
-     * @param  string|StringBackedEnum|null  $queue
+     * @param  string|BackedEnum|null  $queue
      * @return $this
      */
     public function allOnQueue($queue)
     {
-        $resolvedQueue = $queue instanceof StringBackedEnum
+        $resolvedQueue = $queue instanceof BackedEnum
             ? $queue->value
             : $queue;
 
