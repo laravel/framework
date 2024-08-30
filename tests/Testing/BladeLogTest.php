@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Testing;
 
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\View\Blade\AbstractBladeTestCase;
 
-class BladeLogTest extends TestCase
+class BladeLogTest extends AbstractBladeTestCase
 {
     public function testLogAreCompiled()
     {
