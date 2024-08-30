@@ -802,6 +802,21 @@ class SupportStringableTest extends TestCase
         $this->assertFalse($this->stringable('test')->is([]));
     }
 
+    public function testIsExactly()
+    {
+        $this->assertTrue($this->stringable('taylor')->isExactly('taylor'));
+        $this->assertTrue($this->stringable('taylor')->isExactly('TAYLOR', false));
+        $this->assertFalse($this->stringable('taylor')->isExactly('tayl'));
+        $this->assertFalse($this->stringable('taylor')->isExactly('otwell'));
+    }
+
+    public function testIsExactlyAny()
+    {
+        $this->assertTrue($this->stringable('taylor')->isExactlyAny(['taylor', 'otwell']));
+        $this->assertTrue($this->stringable('taylor')->isExactlyAny(['TAYLOR', 'otwell'], false));
+        $this->assertFalse($this->stringable('taylor')->isExactlyAny(['tayl', 'otwell']));
+    }
+
     public function testIsWithMultilineStrings()
     {
         $this->assertFalse($this->stringable("/\n")->is('/'));

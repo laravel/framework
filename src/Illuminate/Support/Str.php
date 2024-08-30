@@ -488,6 +488,41 @@ class Str
     }
 
     /**
+     * Determine if a given string exactly matches a string.
+     *
+     * @param  string  $subject
+     * @param  string|iterable<string>  $needles
+     * @param  bool  $caseSensitive
+     * @return bool
+     */
+    public static function isExactly($subject, $needles, $caseSensitive = true)
+    {
+        return static::isExactlyAny($subject, $needles, $caseSensitive);
+    }
+
+    /**
+     * Determine if a given string exactly matches a string from a list.
+     *
+     * @param  string  $subject
+     * @param  string|iterable<string>  $needles
+     * @param  bool  $caseSensitive
+     * @return bool
+     */
+    public static function isExactlyAny($subject, $needles, $caseSensitive = true)
+    {
+        if (! is_iterable($needles)) {
+            $needles = (array) $needles;
+        }
+
+        if (! $caseSensitive) {
+            $subject = mb_strtolower($subject);
+            $needles = array_map('mb_strtolower', $needles);
+        }
+
+        return in_array($subject, $needles);
+    }
+
+    /**
      * Determine if a given string is 7 bit ASCII.
      *
      * @param  string  $value

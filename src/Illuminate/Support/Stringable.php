@@ -338,6 +338,30 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Determine if a given string exactly matches a string.
+     *
+     * @param  string|iterable<string>  $needles
+     * @param  bool  $caseSensitive
+     * @return bool
+     */
+    public function isExactly($needles, $caseSensitive = true)
+    {
+        return Str::isExactly($this->value, $needles, $caseSensitive);
+    }
+
+    /**
+     * Determine if a given string exactly matches a string from a list.
+     *
+     * @param  string|iterable<string>  $needles
+     * @param  bool  $caseSensitive
+     * @return bool
+     */
+    public function isExactlyAny($needles, $caseSensitive = true)
+    {
+        return Str::isExactlyAny($this->value, $needles, $caseSensitive);
+    }
+
+    /**
      * Determine if a given string is 7 bit ASCII.
      *
      * @return bool

@@ -564,6 +564,21 @@ class SupportStrTest extends TestCase
         PATTERN, $multilineValue));
     }
 
+    public function testIsExactly()
+    {
+        $this->assertTrue(Str::isExactly('taylor', 'taylor'));
+        $this->assertTrue(Str::isExactly('taylor', 'TAYLOR', false));
+        $this->assertFalse(Str::isExactly('taylor', 'tayl'));
+        $this->assertFalse(Str::isExactly('taylor', 'otwell'));
+    }
+
+    public function testIsExactlyAny()
+    {
+        $this->assertTrue(Str::isExactlyAny('taylor', ['taylor', 'otwell']));
+        $this->assertTrue(Str::isExactlyAny('taylor', ['TAYLOR', 'otwell'], false));
+        $this->assertFalse(Str::isExactlyAny('taylor', ['tayl', 'otwell']));
+    }
+
     public function testIsUrl()
     {
         $this->assertTrue(Str::isUrl('https://laravel.com'));
