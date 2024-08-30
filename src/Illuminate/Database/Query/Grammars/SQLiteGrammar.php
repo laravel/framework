@@ -213,6 +213,19 @@ class SQLiteGrammar extends Grammar
     }
 
     /**
+     * Compile an insert ignore statement using a subquery into SQL.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $columns
+     * @param  string  $sql
+     * @return string
+     */
+    public function compileInsertOrIgnoreUsing(Builder $query, array $columns, string $sql)
+    {
+        return Str::replaceFirst('insert', 'insert or ignore', $this->compileInsertUsing($query, $columns, $sql));
+    }
+
+    /**
      * Compile the columns for an update statement.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
@@ -374,7 +387,7 @@ class SQLiteGrammar extends Grammar
     public function compileTruncate(Builder $query)
     {
         return [
-            'delete from sqlite_sequence where name = ?' => [$query->from],
+            'delete from sqlite_sequence where name = ?' => [$this->getTablePrefix().$query->from],
             'delete from '.$this->wrapTable($query->from) => [],
         ];
     }

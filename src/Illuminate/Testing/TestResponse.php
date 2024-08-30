@@ -26,6 +26,7 @@ use LogicException;
 use PHPUnit\Framework\ExpectationFailedException;
 use ReflectionProperty;
 use Symfony\Component\HttpFoundation\Cookie;
+use Symfony\Component\HttpFoundation\StreamedJsonResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
@@ -309,7 +310,7 @@ class TestResponse implements ArrayAccess
     public function assertLocation($uri)
     {
         PHPUnit::assertEquals(
-            app('url')->to($uri), app('url')->to($this->headers->get('Location'))
+            app('url')->to($uri), app('url')->to($this->headers->get('Location', ''))
         );
 
         return $this;
@@ -323,7 +324,7 @@ class TestResponse implements ArrayAccess
      */
     public function assertDownload($filename = null)
     {
-        $contentDisposition = explode(';', $this->headers->get('content-disposition'));
+        $contentDisposition = explode(';', $this->headers->get('content-disposition', ''));
 
         if (trim($contentDisposition[0]) !== 'attachment') {
             PHPUnit::fail(
@@ -529,6 +530,17 @@ class TestResponse implements ArrayAccess
         PHPUnit::assertSame($value, $this->streamedContent());
 
         return $this;
+    }
+
+    /**
+     * Assert that the given array matches the streamed JSON response content.
+     *
+     * @param  array  $value
+     * @return $this
+     */
+    public function assertStreamedJsonContent($value)
+    {
+        return $this->assertStreamedContent(json_encode($value, JSON_THROW_ON_ERROR));
     }
 
     /**
@@ -1564,7 +1576,8 @@ class TestResponse implements ArrayAccess
             return $this->streamedContent;
         }
 
-        if (! $this->baseResponse instanceof StreamedResponse) {
+        if (! $this->baseResponse instanceof StreamedResponse
+            && ! $this->baseResponse instanceof StreamedJsonResponse) {
             PHPUnit::fail('The response is not a streamed response.');
         }
 
@@ -1638,7 +1651,7 @@ class TestResponse implements ArrayAccess
      */
     protected function appendExceptionToException($exceptionToAppend, $exception)
     {
-        $exceptionMessage = $exceptionToAppend->getMessage();
+        $exceptionMessage = is_string($exceptionToAppend) ? $exceptionToAppend : $exceptionToAppend->getMessage();
 
         $exceptionToAppend = (string) $exceptionToAppend;
 

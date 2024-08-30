@@ -70,4 +70,17 @@ class TranslatorTest extends TestCase
 
         $this->app['translator']->handleMissingKeysUsing(null);
     }
+
+    public function testItReturnsCorrectLocaleForMissingKeys()
+    {
+        $this->app['translator']->handleMissingKeysUsing(function ($key, $replacements, $locale) {
+            $_SERVER['__missing_translation_key_locale'] = $locale;
+        });
+
+        $this->app['translator']->get('some missing key', [], 'ht');
+
+        $this->assertSame('ht', $_SERVER['__missing_translation_key_locale']);
+
+        $this->app['translator']->handleMissingKeysUsing(null);
+    }
 }

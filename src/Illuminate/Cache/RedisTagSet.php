@@ -11,13 +11,13 @@ class RedisTagSet extends TagSet
      * Add a reference entry to the tag set's underlying sorted set.
      *
      * @param  string  $key
-     * @param  int  $ttl
+     * @param  int|null  $ttl
      * @param  string  $updateWhen
      * @return void
      */
-    public function addEntry(string $key, int $ttl = 0, $updateWhen = null)
+    public function addEntry(string $key, int $ttl = null, $updateWhen = null)
     {
-        $ttl = $ttl > 0 ? Carbon::now()->addSeconds($ttl)->getTimestamp() : -1;
+        $ttl = is_null($ttl) ? -1 : Carbon::now()->addSeconds($ttl)->getTimestamp();
 
         foreach ($this->tagIds() as $tagKey) {
             if ($updateWhen) {

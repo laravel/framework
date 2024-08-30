@@ -9,6 +9,7 @@ use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Contracts\Queue\ShouldBeEncrypted;
 use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
 use Illuminate\Queue\Events\JobQueued;
+use Illuminate\Queue\Events\JobQueueing;
 use Illuminate\Support\Arr;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Str;
@@ -327,12 +328,16 @@ abstract class Queue
             $this->container->bound('db.transactions')) {
             return $this->container->make('db.transactions')->addCallback(
                 function () use ($payload, $queue, $delay, $callback, $job) {
+                    $this->raiseJobQueueingEvent($job, $payload);
+
                     return tap($callback($payload, $queue, $delay), function ($jobId) use ($job, $payload) {
                         $this->raiseJobQueuedEvent($jobId, $job, $payload);
                     });
                 }
             );
         }
+
+        $this->raiseJobQueueingEvent($job, $payload);
 
         return tap($callback($payload, $queue, $delay), function ($jobId) use ($job, $payload) {
             $this->raiseJobQueuedEvent($jobId, $job, $payload);
@@ -360,6 +365,20 @@ abstract class Queue
         }
 
         return false;
+    }
+
+    /**
+     * Raise the job queueing event.
+     *
+     * @param  \Closure|string|object  $job
+     * @param  string  $payload
+     * @return void
+     */
+    protected function raiseJobQueueingEvent($job, $payload)
+    {
+        if ($this->container->bound('events')) {
+            $this->container['events']->dispatch(new JobQueueing($this->connectionName, $job, $payload));
+        }
     }
 
     /**

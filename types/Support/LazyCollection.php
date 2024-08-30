@@ -547,6 +547,7 @@ assertType('Illuminate\Support\LazyCollection<int<0, 1>, Illuminate\Support\Lazy
 
 assertType('Illuminate\Support\LazyCollection<int, int>', $collection->make([1])->concat([2]));
 assertType('Illuminate\Support\LazyCollection<int, string>', $collection->make(['string'])->concat(['string']));
+assertType('Illuminate\Support\LazyCollection<int, int|string>', $collection->make([1])->concat(['string']));
 
 assertType('Illuminate\Support\LazyCollection<int, int>|int', $collection->make([1])->random(2));
 assertType('Illuminate\Support\LazyCollection<int, string>|string', $collection->make(['string'])->random());

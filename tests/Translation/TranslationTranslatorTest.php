@@ -123,7 +123,7 @@ class TranslationTranslatorTest extends TestCase
         $this->assertSame('breeze bar', $t->get('foo.bar', ['foo' => 'bar']));
     }
 
-    public function testChoiceMethodProperlyLoadsAndRetrievesItem()
+    public function testChoiceMethodProperlyLoadsAndRetrievesItemForAnInt()
     {
         $t = $this->getMockBuilder(Translator::class)->onlyMethods(['get'])->setConstructorArgs([$this->getLoader(), 'en'])->getMock();
         $t->expects($this->once())->method('get')->with($this->equalTo('foo'), $this->equalTo(['replace']), $this->equalTo('en'))->willReturn('line');
@@ -131,6 +131,16 @@ class TranslationTranslatorTest extends TestCase
         $selector->shouldReceive('choose')->once()->with('line', 10, 'en')->andReturn('choiced');
 
         $t->choice('foo', 10, ['replace']);
+    }
+
+    public function testChoiceMethodProperlyLoadsAndRetrievesItemForAFloat()
+    {
+        $t = $this->getMockBuilder(Translator::class)->onlyMethods(['get'])->setConstructorArgs([$this->getLoader(), 'en'])->getMock();
+        $t->expects($this->once())->method('get')->with($this->equalTo('foo'), $this->equalTo(['replace']), $this->equalTo('en'))->willReturn('line');
+        $t->setSelector($selector = m::mock(MessageSelector::class));
+        $selector->shouldReceive('choose')->once()->with('line', 1.2, 'en')->andReturn('choiced');
+
+        $t->choice('foo', 1.2, ['replace']);
     }
 
     public function testChoiceMethodProperlyCountsCollectionsAndLoadsAndRetrievesItem()

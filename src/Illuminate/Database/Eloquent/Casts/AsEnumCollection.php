@@ -30,7 +30,7 @@ class AsEnumCollection implements Castable
 
             public function get($model, $key, $value, $attributes)
             {
-                if (! isset($attributes[$key]) || is_null($attributes[$key])) {
+                if (! isset($attributes[$key])) {
                     return;
                 }
 

@@ -41,22 +41,15 @@ trait ManagesTransactions
                 continue;
             }
 
+            $levelBeingCommitted = $this->transactions;
+
             try {
                 if ($this->transactions == 1) {
                     $this->fireConnectionEvent('committing');
                     $this->getPdo()->commit();
                 }
 
-                [$levelBeingCommitted, $this->transactions] = [
-                    $this->transactions,
-                    max(0, $this->transactions - 1),
-                ];
-
-                $this->transactionsManager?->commit(
-                    $this->getName(),
-                    $levelBeingCommitted,
-                    $this->transactions
-                );
+                $this->transactions = max(0, $this->transactions - 1);
             } catch (Throwable $e) {
                 $this->handleCommitTransactionException(
                     $e, $currentAttempt, $attempts
@@ -64,6 +57,12 @@ trait ManagesTransactions
 
                 continue;
             }
+
+            $this->transactionsManager?->commit(
+                $this->getName(),
+                $levelBeingCommitted,
+                $this->transactions
+            );
 
             $this->fireConnectionEvent('committed');
 
@@ -119,6 +118,10 @@ trait ManagesTransactions
      */
     public function beginTransaction()
     {
+        foreach ($this->beforeStartingTransaction as $callback) {
+            $callback($this);
+        }
+
         $this->createTransaction();
 
         $this->transactions++;

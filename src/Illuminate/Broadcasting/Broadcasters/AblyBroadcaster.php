@@ -232,4 +232,15 @@ class AblyBroadcaster extends Broadcaster
     {
         return $this->ably;
     }
+
+    /**
+     * Set the underlying Ably SDK instance.
+     *
+     * @param  \Ably\AblyRest  $ably
+     * @return void
+     */
+    public function setAbly($ably)
+    {
+        $this->ably = $ably;
+    }
 }

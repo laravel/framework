@@ -95,6 +95,21 @@ class EloquentMorphEagerLoadingTest extends DatabaseTestCase
         $this->assertTrue($action[1]->relationLoaded('target'));
         $this->assertInstanceOf(User::class, $action[1]->getRelation('target'));
     }
+
+    public function testMorphWithTrashedRelationLazyLoading()
+    {
+        $deletedUser = User::forceCreate(['deleted_at' => now()]);
+
+        $action = new Action;
+        $action->target()->associate($deletedUser)->save();
+
+        // model is already set via associate and not retrieved from the database
+        $this->assertInstanceOf(User::class, $action->target);
+
+        $action->unsetRelation('target');
+
+        $this->assertInstanceOf(User::class, $action->target);
+    }
 }
 
 class Action extends Model

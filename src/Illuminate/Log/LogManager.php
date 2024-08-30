@@ -630,7 +630,7 @@ class LogManager implements LoggerInterface
     /**
      * System is unusable.
      *
-     * @param  string  $message
+     * @param  string|\Stringable  $message
      * @param  array  $context
      * @return void
      */
@@ -645,7 +645,7 @@ class LogManager implements LoggerInterface
      * Example: Entire website down, database unavailable, etc. This should
      * trigger the SMS alerts and wake you up.
      *
-     * @param  string  $message
+     * @param  string|\Stringable  $message
      * @param  array  $context
      * @return void
      */
@@ -659,7 +659,7 @@ class LogManager implements LoggerInterface
      *
      * Example: Application component unavailable, unexpected exception.
      *
-     * @param  string  $message
+     * @param  string|\Stringable  $message
      * @param  array  $context
      * @return void
      */
@@ -672,7 +672,7 @@ class LogManager implements LoggerInterface
      * Runtime errors that do not require immediate action but should typically
      * be logged and monitored.
      *
-     * @param  string  $message
+     * @param  string|\Stringable  $message
      * @param  array  $context
      * @return void
      */
@@ -687,7 +687,7 @@ class LogManager implements LoggerInterface
      * Example: Use of deprecated APIs, poor use of an API, undesirable things
      * that are not necessarily wrong.
      *
-     * @param  string  $message
+     * @param  string|\Stringable  $message
      * @param  array  $context
      * @return void
      */
@@ -699,7 +699,7 @@ class LogManager implements LoggerInterface
     /**
      * Normal but significant events.
      *
-     * @param  string  $message
+     * @param  string|\Stringable  $message
      * @param  array  $context
      * @return void
      */
@@ -713,7 +713,7 @@ class LogManager implements LoggerInterface
      *
      * Example: User logs in, SQL logs.
      *
-     * @param  string  $message
+     * @param  string|\Stringable  $message
      * @param  array  $context
      * @return void
      */
@@ -725,7 +725,7 @@ class LogManager implements LoggerInterface
     /**
      * Detailed debug information.
      *
-     * @param  string  $message
+     * @param  string|\Stringable  $message
      * @param  array  $context
      * @return void
      */
@@ -738,7 +738,7 @@ class LogManager implements LoggerInterface
      * Logs with an arbitrary level.
      *
      * @param  mixed  $level
-     * @param  string  $message
+     * @param  string|\Stringable  $message
      * @param  array  $context
      * @return void
      */

@@ -24,7 +24,7 @@
         "ext-session": "*",
         "ext-tokenizer": "*",
         "composer-runtime-api": "^2.2",
-        "brick/math": "^0.9.3|^0.10.2|^0.11",
+        "brick/math": "^0.9.3|^0.10.2|^0.11|^0.12",
         "doctrine/inflector": "^2.0.5",
         "dragonmantank/cron-expression": "^3.3.2",
         "egulias/email-validator": "^3.2.1|^4.0",
@@ -105,7 +105,7 @@
         "league/flysystem-sftp-v3": "^3.0",
         "mockery/mockery": "^1.5.1",
         "nyholm/psr7": "^1.2",
-        "orchestra/testbench-core": "^8.18",
+        "orchestra/testbench-core": "^8.23.4",
         "pda/pheanstalk": "^4.0",
         "phpstan/phpstan": "^1.4.7",
         "phpunit/phpunit": "^10.0.7",
@@ -121,7 +121,9 @@
     "conflict": {
         "carbonphp/carbon-doctrine-types": ">=3.0",
         "doctrine/dbal": ">=4.0",
-        "tightenco/collect": "<5.5.33"
+        "mockery/mockery": "1.6.8",
+        "tightenco/collect": "<5.5.33",
+        "phpunit/phpunit": ">=11.0.0"
     },
     "autoload": {
         "files": [

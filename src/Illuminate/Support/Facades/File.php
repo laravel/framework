@@ -21,7 +21,7 @@ namespace Illuminate\Support\Facades;
  * @method static bool delete(string|array $paths)
  * @method static bool move(string $path, string $target)
  * @method static bool copy(string $path, string $target)
- * @method static void link(string $target, string $link)
+ * @method static bool|null link(string $target, string $link)
  * @method static void relativeLink(string $target, string $link)
  * @method static string name(string $path)
  * @method static string basename(string $path)

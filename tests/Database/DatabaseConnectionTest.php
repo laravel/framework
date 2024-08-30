@@ -484,6 +484,18 @@ class DatabaseConnectionTest extends TestCase
         $connection->select('foo bar', ['baz']);
     }
 
+    public function testBeforeStartingTransactionHooksCanBeRegistered()
+    {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('The callback was fired');
+
+        $connection = $this->getMockConnection();
+        $connection->beforeStartingTransaction(function () {
+            throw new Exception('The callback was fired');
+        });
+        $connection->beginTransaction();
+    }
+
     public function testPretendOnlyLogsQueries()
     {
         $connection = $this->getMockConnection();

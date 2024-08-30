@@ -9,6 +9,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Queue\DatabaseQueue;
 use Illuminate\Queue\Events\JobQueued;
+use Illuminate\Queue\Events\JobQueueing;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
@@ -247,21 +248,28 @@ class QueueDatabaseQueueIntegrationTest extends TestCase
         $this->assertNull($popped_job);
     }
 
-    public function testJobPayloadIsAvailableOnEvent()
+    public function testJobPayloadIsAvailableOnEvents()
     {
-        $event = null;
+        $jobQueueingEvent = null;
+        $jobQueuedEvent = null;
         Str::createUuidsUsingSequence([
             'expected-job-uuid',
         ]);
-        $this->container['events']->listen(function (JobQueued $e) use (&$event) {
-            $event = $e;
+        $this->container['events']->listen(function (JobQueueing $e) use (&$jobQueueingEvent) {
+            $jobQueueingEvent = $e;
+        });
+        $this->container['events']->listen(function (JobQueued $e) use (&$jobQueuedEvent) {
+            $jobQueuedEvent = $e;
         });
 
         $this->queue->push('MyJob', [
             'laravel' => 'Framework',
         ]);
 
-        $this->assertIsArray($event->payload());
-        $this->assertSame('expected-job-uuid', $event->payload()['uuid']);
+        $this->assertIsArray($jobQueueingEvent->payload());
+        $this->assertSame('expected-job-uuid', $jobQueueingEvent->payload()['uuid']);
+
+        $this->assertIsArray($jobQueuedEvent->payload());
+        $this->assertSame('expected-job-uuid', $jobQueuedEvent->payload()['uuid']);
     }
 }

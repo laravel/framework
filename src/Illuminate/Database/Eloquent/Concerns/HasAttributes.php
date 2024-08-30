@@ -1271,7 +1271,11 @@ trait HasAttributes
      */
     public function fromJson($value, $asObject = false)
     {
-        return Json::decode($value ?? '', ! $asObject);
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        return Json::decode($value, ! $asObject);
     }
 
     /**
@@ -2101,7 +2105,7 @@ trait HasAttributes
         }
 
         return is_numeric($attribute) && is_numeric($original)
-            && BigDecimal::of($attribute)->isEqualTo($original);
+            && strcmp((string) $attribute, (string) $original) === 0;
     }
 
     /**

@@ -954,10 +954,48 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     }
 
     /**
+     * Select specific values from the items within the collection.
+     *
+     * @param  \Illuminate\Support\Enumerable<array-key, TKey>|array<array-key, TKey>|string  $keys
+     * @return static
+     */
+    public function select($keys)
+    {
+        if ($keys instanceof Enumerable) {
+            $keys = $keys->all();
+        } elseif (! is_null($keys)) {
+            $keys = is_array($keys) ? $keys : func_get_args();
+        }
+
+        return new static(function () use ($keys) {
+            if (is_null($keys)) {
+                yield from $this;
+            } else {
+                foreach ($this as $item) {
+                    $result = [];
+
+                    foreach ($keys as $key) {
+                        if (Arr::accessible($item) && Arr::exists($item, $key)) {
+                            $result[$key] = $item[$key];
+                        } elseif (is_object($item) && isset($item->{$key})) {
+                            $result[$key] = $item->{$key};
+                        }
+                    }
+
+                    yield $result;
+                }
+            }
+        });
+    }
+
+    /**
      * Push all of the given items onto the collection.
      *
-     * @param  iterable<array-key, TValue>  $source
-     * @return static
+     * @template TConcatKey of array-key
+     * @template TConcatValue
+     *
+     * @param  iterable<TConcatKey, TConcatValue>  $source
+     * @return static<TKey|TConcatKey, TValue|TConcatValue>
      */
     public function concat($source)
     {
@@ -1740,6 +1778,8 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
      */
     protected function now()
     {
-        return Carbon::now()->timestamp;
+        return class_exists(Carbon::class)
+            ? Carbon::now()->timestamp
+            : time();
     }
 }

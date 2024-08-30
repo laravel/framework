@@ -73,7 +73,7 @@ class MailSesV2TransportTest extends TestCase
             ->with(m::on(function ($arg) {
                 return $arg['Source'] === 'myself@example.com' &&
                     $arg['Destination']['ToAddresses'] === ['me@example.com', 'you@example.com'] &&
-                    $arg['Tags'] === [['Name' => 'FooTag', 'Value' => 'TagValue']] &&
+                    $arg['EmailTags'] === [['Name' => 'FooTag', 'Value' => 'TagValue']] &&
                     strpos($arg['Content']['Raw']['Data'], 'Reply-To: Taylor Otwell <taylor@example.com>') !== false;
             }))
             ->andReturn($sesResult);
@@ -111,7 +111,7 @@ class MailSesV2TransportTest extends TestCase
                             'region' => 'eu-west-1',
                             'options' => [
                                 'ConfigurationSetName' => 'Laravel',
-                                'Tags' => [
+                                'EmailTags' => [
                                     ['Name' => 'Laravel', 'Value' => 'Framework'],
                                 ],
                             ],
@@ -144,7 +144,7 @@ class MailSesV2TransportTest extends TestCase
 
         $this->assertSame([
             'ConfigurationSetName' => 'Laravel',
-            'Tags' => [
+            'EmailTags' => [
                 ['Name' => 'Laravel', 'Value' => 'Framework'],
             ],
         ], $transport->getOptions());

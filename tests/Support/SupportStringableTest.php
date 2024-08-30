@@ -1177,6 +1177,13 @@ class SupportStringableTest extends TestCase
         $this->assertEquals('"value"', $this->stringable('value')->wrap('"'));
     }
 
+    public function testUnwrap()
+    {
+        $this->assertEquals('value', $this->stringable('"value"')->unwrap('"'));
+        $this->assertEquals('bar', $this->stringable('foo-bar-baz')->unwrap('foo-', '-baz'));
+        $this->assertEquals('some: "json"', $this->stringable('{some: "json"}')->unwrap('{', '}'));
+    }
+
     public function testToHtmlString()
     {
         $this->assertEquals(
@@ -1294,5 +1301,19 @@ class SupportStringableTest extends TestCase
         $this->assertSame('t', $str[4]);
         $this->assertTrue(isset($str[2]));
         $this->assertFalse(isset($str[10]));
+    }
+
+    public function testToBase64()
+    {
+        $this->assertSame(base64_encode('foo'), (string) $this->stringable('foo')->toBase64());
+        $this->assertSame(base64_encode('foobar'), (string) $this->stringable('foobar')->toBase64());
+        $this->assertSame(base64_encode('foobarbaz'), (string) $this->stringable('foobarbaz')->toBase64());
+    }
+
+    public function testFromBase64()
+    {
+        $this->assertSame('foo', (string) $this->stringable(base64_encode('foo'))->fromBase64());
+        $this->assertSame('foobar', (string) $this->stringable(base64_encode('foobar'))->fromBase64(true));
+        $this->assertSame('foobarbaz', (string) $this->stringable(base64_encode('foobarbaz'))->fromBase64());
     }
 }

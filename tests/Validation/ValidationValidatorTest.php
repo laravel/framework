@@ -293,6 +293,28 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame('validation.boolean', $v->messages()->get('b')[0]);
     }
 
+    public function testArrayNullableWithUnvalidatedArrayKeys()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $v = new Validator($trans, [
+            'x' => null,
+        ], [
+            'x' => 'array|nullable',
+            'x.key' => 'string',
+        ]);
+        $this->assertTrue($v->passes());
+        $this->assertArrayHasKey('x', $v->validated());
+
+        $v = new Validator($trans, [
+            'x' => null,
+        ], [
+            'x' => 'array',
+            'x.key' => 'string',
+        ]);
+        $this->assertFalse($v->passes());
+    }
+
     public function testNullableMakesNoDifferenceIfImplicitRuleExists()
     {
         $trans = $this->getIlluminateArrayTranslator();

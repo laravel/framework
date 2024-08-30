@@ -1,307 +1,311 @@
 <?php
 
-namespace Illuminate\Tests\Support;
+namespace Illuminate\Support;
 
-use Illuminate\Support\Number;
-use PHPUnit\Framework\Attributes\RequiresPhpExtension;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Support\Traits\Macroable;
+use NumberFormatter;
+use RuntimeException;
 
-class SupportNumberTest extends TestCase
+class Number
 {
-    #[RequiresPhpExtension('intl')]
-    public function testFormat()
+    use Macroable;
+
+    /**
+     * The current default locale.
+     *
+     * @var string
+     */
+    protected static $locale = 'en';
+
+    /**
+     * Format the given number according to the current locale.
+     *
+     * @param  int|float  $number
+     * @param  int|null  $precision
+     * @param  int|null  $maxPrecision
+     * @param  string|null  $locale
+     * @return string|false
+     */
+    public static function format(int|float $number, ?int $precision = null, ?int $maxPrecision = null, ?string $locale = null)
     {
-        $this->assertSame('0', Number::format(0));
-        $this->assertSame('0', Number::format(0.0));
-        $this->assertSame('0', Number::format(0.00));
-        $this->assertSame('1', Number::format(1));
-        $this->assertSame('10', Number::format(10));
-        $this->assertSame('25', Number::format(25));
-        $this->assertSame('100', Number::format(100));
-        $this->assertSame('100,000', Number::format(100000));
-        $this->assertSame('100,000.00', Number::format(100000, precision: 2));
-        $this->assertSame('100,000.12', Number::format(100000.123, precision: 2));
-        $this->assertSame('100,000.123', Number::format(100000.1234, maxPrecision: 3));
-        $this->assertSame('100,000.124', Number::format(100000.1236, maxPrecision: 3));
-        $this->assertSame('123,456,789', Number::format(123456789));
+        static::ensureIntlExtensionIsInstalled();
 
-        $this->assertSame('-1', Number::format(-1));
-        $this->assertSame('-10', Number::format(-10));
-        $this->assertSame('-25', Number::format(-25));
+        $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::DECIMAL);
 
-        $this->assertSame('0.2', Number::format(0.2));
-        $this->assertSame('0.20', Number::format(0.2, precision: 2));
-        $this->assertSame('0.123', Number::format(0.1234, maxPrecision: 3));
-        $this->assertSame('1.23', Number::format(1.23));
-        $this->assertSame('-1.23', Number::format(-1.23));
-        $this->assertSame('123.456', Number::format(123.456));
+        if (! is_null($maxPrecision)) {
+            $formatter->setAttribute(NumberFormatter::MAX_FRACTION_DIGITS, $maxPrecision);
+        } elseif (! is_null($precision)) {
+            $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, $precision);
+        }
 
-        $this->assertSame('∞', Number::format(INF));
-        $this->assertSame('NaN', Number::format(NAN));
+        return $formatter->format($number);
     }
 
-    #[RequiresPhpExtension('intl')]
-    public function testFormatWithDifferentLocale()
+    /**
+     * Spell out the given number in the given locale.
+     *
+     * @param  int|float  $number
+     * @param  string|null  $locale
+     * @param  int|null  $after
+     * @param  int|null  $until
+     * @return string
+     */
+    public static function spell(int|float $number, ?string $locale = null, ?int $after = null, ?int $until = null)
     {
-        $this->assertSame('123,456,789', Number::format(123456789, locale: 'en'));
-        $this->assertSame('123.456.789', Number::format(123456789, locale: 'de'));
-        $this->assertSame('123 456 789', Number::format(123456789, locale: 'fr'));
-        $this->assertSame('123 456 789', Number::format(123456789, locale: 'ru'));
-        $this->assertSame('123 456 789', Number::format(123456789, locale: 'sv'));
+        static::ensureIntlExtensionIsInstalled();
+
+        if (! is_null($after) && $number <= $after) {
+            return static::format($number, locale: $locale);
+        }
+
+        if (! is_null($until) && $number >= $until) {
+            return static::format($number, locale: $locale);
+        }
+
+        $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::SPELLOUT);
+
+        return $formatter->format($number);
     }
 
-    #[RequiresPhpExtension('intl')]
-    public function testFormatWithAppLocale()
+    /**
+     * Convert the given number to ordinal form.
+     *
+     * @param  int|float  $number
+     * @param  string|null  $locale
+     * @return string
+     */
+    public static function ordinal(int|float $number, ?string $locale = null)
     {
-        $this->assertSame('123,456,789', Number::format(123456789));
+        static::ensureIntlExtensionIsInstalled();
 
-        Number::useLocale('de');
+        $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::ORDINAL);
 
-        $this->assertSame('123.456.789', Number::format(123456789));
-
-        Number::useLocale('en');
+        return $formatter->format($number);
     }
 
-    public function testSpellout()
+    /**
+     * Convert the given number to its percentage equivalent.
+     *
+     * @param  int|float  $number
+     * @param  int  $precision
+     * @param  int|null  $maxPrecision
+     * @param  string|null  $locale
+     * @return string|false
+     */
+    public static function percentage(int|float $number, int $precision = 0, ?int $maxPrecision = null, ?string $locale = null)
     {
-        $this->assertSame('ten', Number::spell(10));
-        $this->assertSame('one point two', Number::spell(1.2));
+        static::ensureIntlExtensionIsInstalled();
+
+        $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::PERCENT);
+
+        if (! is_null($maxPrecision)) {
+            $formatter->setAttribute(NumberFormatter::MAX_FRACTION_DIGITS, $maxPrecision);
+        } else {
+            $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, $precision);
+        }
+
+        return $formatter->format($number / 100);
     }
 
-    #[RequiresPhpExtension('intl')]
-    public function testSpelloutWithLocale()
+    /**
+     * Convert the given number to its currency equivalent.
+     *
+     * @param  int|float  $number
+     * @param  string  $in
+     * @param  string|null  $locale
+     * @return string|false
+     */
+    public static function currency(int|float $number, string $in = 'USD', ?string $locale = null)
     {
-        $this->assertSame('trois', Number::spell(3, 'fr'));
+        static::ensureIntlExtensionIsInstalled();
+
+        $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::CURRENCY);
+
+        return $formatter->formatCurrency($number, $in);
     }
 
-    #[RequiresPhpExtension('intl')]
-    public function testSpelloutWithThreshold()
+    /**
+     * Convert the given number to its file size equivalent.
+     *
+     * @param  int|float  $bytes
+     * @param  int  $precision
+     * @param  int|null  $maxPrecision
+     * @return string
+     */
+    public static function fileSize(int|float $bytes, int $precision = 0, ?int $maxPrecision = null)
     {
-        $this->assertSame('9', Number::spell(9, after: 10));
-        $this->assertSame('10', Number::spell(10, after: 10));
-        $this->assertSame('eleven', Number::spell(11, after: 10));
+        $units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
 
-        $this->assertSame('nine', Number::spell(9, until: 10));
-        $this->assertSame('10', Number::spell(10, until: 10));
-        $this->assertSame('11', Number::spell(11, until: 10));
+        for ($i = 0; ($bytes / 1024) > 0.9 && ($i < count($units) - 1); $i++) {
+            $bytes /= 1024;
+        }
 
-        $this->assertSame('ten thousand', Number::spell(10000, until: 50000));
-        $this->assertSame('100,000', Number::spell(100000, until: 50000));
+        return sprintf('%s %s', static::format($bytes, $precision, $maxPrecision), $units[$i]);
     }
 
-    public function testOrdinal()
+    /**
+     * Convert the number to its human-readable equivalent.
+     *
+     * @param  int|float  $number
+     * @param  int  $precision
+     * @param  int|null  $maxPrecision
+     * @return bool|string
+     */
+    public static function abbreviate(int|float $number, int $precision = 0, ?int $maxPrecision = null)
     {
-        $this->assertSame('1st', Number::ordinal(1));
-        $this->assertSame('2nd', Number::ordinal(2));
-        $this->assertSame('3rd', Number::ordinal(3));
+        return static::forHumans($number, $precision, $maxPrecision, abbreviate: true);
     }
 
-    #[RequiresPhpExtension('intl')]
-    public function testToPercent()
+    /**
+     * Convert the number to its human-readable equivalent.
+     *
+     * @param  int|float  $number
+     * @param  int  $precision
+     * @param  int|null  $maxPrecision
+     * @param  bool  $abbreviate
+     * @return bool|string
+     */
+    public static function forHumans(int|float $number, int $precision = 0, ?int $maxPrecision = null, bool $abbreviate = false)
     {
-        $this->assertSame('0%', Number::percentage(0, precision: 0));
-        $this->assertSame('0%', Number::percentage(0));
-        $this->assertSame('1%', Number::percentage(1));
-        $this->assertSame('10.00%', Number::percentage(10, precision: 2));
-        $this->assertSame('100%', Number::percentage(100));
-        $this->assertSame('100.00%', Number::percentage(100, precision: 2));
-        $this->assertSame('100.123%', Number::percentage(100.1234, maxPrecision: 3));
-
-        $this->assertSame('300%', Number::percentage(300));
-        $this->assertSame('1,000%', Number::percentage(1000));
-
-        $this->assertSame('2%', Number::percentage(1.75));
-        $this->assertSame('1.75%', Number::percentage(1.75, precision: 2));
-        $this->assertSame('1.750%', Number::percentage(1.75, precision: 3));
-        $this->assertSame('0%', Number::percentage(0.12345));
-        $this->assertSame('0.00%', Number::percentage(0, precision: 2));
-        $this->assertSame('0.12%', Number::percentage(0.12345, precision: 2));
-        $this->assertSame('0.1235%', Number::percentage(0.12345, precision: 4));
+        return static::summarize($number, $precision, $maxPrecision, $abbreviate ? [
+            3 => 'K',
+            6 => 'M',
+            9 => 'B',
+            12 => 'T',
+            15 => 'Q',
+        ] : [
+            3 => ' thousand',
+            6 => ' million',
+            9 => ' billion',
+            12 => ' trillion',
+            15 => ' quadrillion',
+        ]);
     }
 
-    #[RequiresPhpExtension('intl')]
-    public function testToCurrency()
+    /**
+     * Convert the number to its human-readable equivalent.
+     *
+     * @param  int|float  $number
+     * @param  int  $precision
+     * @param  int|null  $maxPrecision
+     * @param  array  $units
+     * @return string|false
+     */
+    protected static function summarize(int|float $number, int $precision = 0, ?int $maxPrecision = null, array $units = [])
     {
-        $this->assertSame('$0.00', Number::currency(0));
-        $this->assertSame('$1.00', Number::currency(1));
-        $this->assertSame('$10.00', Number::currency(10));
+        if (empty($units)) {
+            $units = [
+                3 => 'K',
+                6 => 'M',
+                9 => 'B',
+                12 => 'T',
+                15 => 'Q',
+            ];
+        }
 
-        $this->assertSame('€0.00', Number::currency(0, 'EUR'));
-        $this->assertSame('€1.00', Number::currency(1, 'EUR'));
-        $this->assertSame('€10.00', Number::currency(10, 'EUR'));
+        switch (true) {
+            case floatval($number) === 0.0:
+                return $precision > 0 ? static::format(0, $precision, $maxPrecision) : '0';
+            case $number < 0:
+                return sprintf('-%s', static::summarize(abs($number), $precision, $maxPrecision, $units));
+            case $number >= 1e15:
+                return sprintf('%s'.end($units), static::summarize($number / 1e15, $precision, $maxPrecision, $units));
+        }
 
-        $this->assertSame('-$5.00', Number::currency(-5));
-        $this->assertSame('$5.00', Number::currency(5.00));
-        $this->assertSame('$5.32', Number::currency(5.325));
+        $numberExponent = floor(log10($number));
+        $displayExponent = $numberExponent - ($numberExponent % 3);
+        $number /= pow(10, $displayExponent);
+
+        return trim(sprintf('%s%s', static::format($number, $precision, $maxPrecision), $units[$displayExponent] ?? ''));
     }
 
-    #[RequiresPhpExtension('intl')]
-    public function testToCurrencyWithDifferentLocale()
+    /**
+     * Clamp the given number between the given minimum and maximum.
+     *
+     * @param  int|float  $number
+     * @param  int|float  $min
+     * @param  int|float  $max
+     * @return int|float
+     */
+    public static function clamp(int|float $number, int|float $min, int|float $max)
     {
-        $this->assertSame('1,00 €', Number::currency(1, 'EUR', 'de'));
-        $this->assertSame('1,00 $', Number::currency(1, 'USD', 'de'));
-        $this->assertSame('1,00 £', Number::currency(1, 'GBP', 'de'));
-
-        $this->assertSame('123.456.789,12 $', Number::currency(123456789.12345, 'USD', 'de'));
-        $this->assertSame('123.456.789,12 €', Number::currency(123456789.12345, 'EUR', 'de'));
-        $this->assertSame('1 234,56 $US', Number::currency(1234.56, 'USD', 'fr'));
+        return min(max($number, $min), $max);
     }
 
-    public function testBytesToHuman()
+    /**
+     * Split the given number into pairs of min/max values.
+     *
+     * @param  int|float  $to
+     * @param  int|float  $by
+     * @param  int|float  $offset
+     * @return array
+     */
+    public static function pairs(int|float $to, int|float $by, int|float $offset = 1)
     {
-        $this->assertSame('0 B', Number::fileSize(0));
-        $this->assertSame('0.00 B', Number::fileSize(0, precision: 2));
-        $this->assertSame('1 B', Number::fileSize(1));
-        $this->assertSame('1 KB', Number::fileSize(1024));
-        $this->assertSame('2 KB', Number::fileSize(2048));
-        $this->assertSame('2.00 KB', Number::fileSize(2048, precision: 2));
-        $this->assertSame('1.23 KB', Number::fileSize(1264, precision: 2));
-        $this->assertSame('1.234 KB', Number::fileSize(1264.12345, maxPrecision: 3));
-        $this->assertSame('1.234 KB', Number::fileSize(1264, 3));
-        $this->assertSame('5 GB', Number::fileSize(1024 * 1024 * 1024 * 5));
-        $this->assertSame('10 TB', Number::fileSize((1024 ** 4) * 10));
-        $this->assertSame('10 PB', Number::fileSize((1024 ** 5) * 10));
-        $this->assertSame('1 ZB', Number::fileSize(1024 ** 7));
-        $this->assertSame('1 YB', Number::fileSize(1024 ** 8));
-        $this->assertSame('1,024 YB', Number::fileSize(1024 ** 9));
+        $output = [];
+
+        for ($lower = 0; $lower < $to; $lower += $by) {
+            $upper = $lower + $by;
+
+            if ($upper > $to) {
+                $upper = $to;
+            }
+
+            $output[] = [$lower + $offset, $upper];
+        }
+
+        return $output;
     }
 
-    public function testClamp()
+    /**
+     * Remove any trailing zero digits after the decimal point of the given number.
+     *
+     * @param  int|float  $number
+     * @return int|float
+     */
+    public static function trim(int|float $number)
     {
-        $this->assertSame(2, Number::clamp(1, 2, 3));
-        $this->assertSame(3, Number::clamp(5, 2, 3));
-        $this->assertSame(5, Number::clamp(5, 1, 10));
-        $this->assertSame(4.5, Number::clamp(4.5, 1, 10));
-        $this->assertSame(1, Number::clamp(-10, 1, 5));
+        return json_decode(json_encode($number));
     }
 
-    public function testToHuman()
+    /**
+     * Execute the given callback using the given locale.
+     *
+     * @param  string  $locale
+     * @param  callable  $callback
+     * @return mixed
+     */
+    public static function withLocale(string $locale, callable $callback)
     {
-        $this->assertSame('1', Number::forHumans(1));
-        $this->assertSame('1.00', Number::forHumans(1, precision: 2));
-        $this->assertSame('10', Number::forHumans(10));
-        $this->assertSame('100', Number::forHumans(100));
-        $this->assertSame('1 thousand', Number::forHumans(1000));
-        $this->assertSame('1.00 thousand', Number::forHumans(1000, precision: 2));
-        $this->assertSame('1 thousand', Number::forHumans(1000, maxPrecision: 2));
-        $this->assertSame('1 thousand', Number::forHumans(1230));
-        $this->assertSame('1.2 thousand', Number::forHumans(1230, maxPrecision: 1));
-        $this->assertSame('1 million', Number::forHumans(1000000));
-        $this->assertSame('1 billion', Number::forHumans(1000000000));
-        $this->assertSame('1 trillion', Number::forHumans(1000000000000));
-        $this->assertSame('1 quadrillion', Number::forHumans(1000000000000000));
-        $this->assertSame('1 thousand quadrillion', Number::forHumans(1000000000000000000));
+        $previousLocale = static::$locale;
 
-        $this->assertSame('123', Number::forHumans(123));
-        $this->assertSame('1 thousand', Number::forHumans(1234));
-        $this->assertSame('1.23 thousand', Number::forHumans(1234, precision: 2));
-        $this->assertSame('12 thousand', Number::forHumans(12345));
-        $this->assertSame('1 million', Number::forHumans(1234567));
-        $this->assertSame('1 billion', Number::forHumans(1234567890));
-        $this->assertSame('1 trillion', Number::forHumans(1234567890123));
-        $this->assertSame('1.23 trillion', Number::forHumans(1234567890123, precision: 2));
-        $this->assertSame('1 quadrillion', Number::forHumans(1234567890123456));
-        $this->assertSame('1.23 thousand quadrillion', Number::forHumans(1234567890123456789, precision: 2));
-        $this->assertSame('490 thousand', Number::forHumans(489939));
-        $this->assertSame('489.9390 thousand', Number::forHumans(489939, precision: 4));
-        $this->assertSame('500.00000 million', Number::forHumans(500000000, precision: 5));
+        static::useLocale($locale);
 
-        $this->assertSame('1 million quadrillion', Number::forHumans(1000000000000000000000));
-        $this->assertSame('1 billion quadrillion', Number::forHumans(1000000000000000000000000));
-        $this->assertSame('1 trillion quadrillion', Number::forHumans(1000000000000000000000000000));
-        $this->assertSame('1 quadrillion quadrillion', Number::forHumans(1000000000000000000000000000000));
-        $this->assertSame('1 thousand quadrillion quadrillion', Number::forHumans(1000000000000000000000000000000000));
-
-        $this->assertSame('0', Number::forHumans(0));
-        $this->assertSame('0', Number::forHumans(0.0));
-        $this->assertSame('0.00', Number::forHumans(0, 2));
-        $this->assertSame('0.00', Number::forHumans(0.0, 2));
-        $this->assertSame('-1', Number::forHumans(-1));
-        $this->assertSame('-1.00', Number::forHumans(-1, precision: 2));
-        $this->assertSame('-10', Number::forHumans(-10));
-        $this->assertSame('-100', Number::forHumans(-100));
-        $this->assertSame('-1 thousand', Number::forHumans(-1000));
-        $this->assertSame('-1.23 thousand', Number::forHumans(-1234, precision: 2));
-        $this->assertSame('-1.2 thousand', Number::forHumans(-1234, maxPrecision: 1));
-        $this->assertSame('-1 million', Number::forHumans(-1000000));
-        $this->assertSame('-1 billion', Number::forHumans(-1000000000));
-        $this->assertSame('-1 trillion', Number::forHumans(-1000000000000));
-        $this->assertSame('-1.1 trillion', Number::forHumans(-1100000000000, maxPrecision: 1));
-        $this->assertSame('-1 quadrillion', Number::forHumans(-1000000000000000));
-        $this->assertSame('-1 thousand quadrillion', Number::forHumans(-1000000000000000000));
+        return tap($callback(), fn () => static::useLocale($previousLocale));
     }
 
-    public function testSummarize()
+    /**
+     * Set the default locale.
+     *
+     * @param  string  $locale
+     * @return void
+     */
+    public static function useLocale(string $locale)
     {
-        $this->assertSame('1', Number::abbreviate(1));
-        $this->assertSame('1.00', Number::abbreviate(1, precision: 2));
-        $this->assertSame('10', Number::abbreviate(10));
-        $this->assertSame('100', Number::abbreviate(100));
-        $this->assertSame('1K', Number::abbreviate(1000));
-        $this->assertSame('1.00K', Number::abbreviate(1000, precision: 2));
-        $this->assertSame('1K', Number::abbreviate(1000, maxPrecision: 2));
-        $this->assertSame('1K', Number::abbreviate(1230));
-        $this->assertSame('1.2K', Number::abbreviate(1230, maxPrecision: 1));
-        $this->assertSame('1M', Number::abbreviate(1000000));
-        $this->assertSame('1B', Number::abbreviate(1000000000));
-        $this->assertSame('1T', Number::abbreviate(1000000000000));
-        $this->assertSame('1Q', Number::abbreviate(1000000000000000));
-        $this->assertSame('1KQ', Number::abbreviate(1000000000000000000));
-
-        $this->assertSame('123', Number::abbreviate(123));
-        $this->assertSame('1K', Number::abbreviate(1234));
-        $this->assertSame('1.23K', Number::abbreviate(1234, precision: 2));
-        $this->assertSame('12K', Number::abbreviate(12345));
-        $this->assertSame('1M', Number::abbreviate(1234567));
-        $this->assertSame('1B', Number::abbreviate(1234567890));
-        $this->assertSame('1T', Number::abbreviate(1234567890123));
-        $this->assertSame('1.23T', Number::abbreviate(1234567890123, precision: 2));
-        $this->assertSame('1Q', Number::abbreviate(1234567890123456));
-        $this->assertSame('1.23KQ', Number::abbreviate(1234567890123456789, precision: 2));
-        $this->assertSame('490K', Number::abbreviate(489939));
-        $this->assertSame('489.9390K', Number::abbreviate(489939, precision: 4));
-        $this->assertSame('500.00000M', Number::abbreviate(500000000, precision: 5));
-
-        $this->assertSame('1MQ', Number::abbreviate(1000000000000000000000));
-        $this->assertSame('1BQ', Number::abbreviate(1000000000000000000000000));
-        $this->assertSame('1TQ', Number::abbreviate(1000000000000000000000000000));
-        $this->assertSame('1QQ', Number::abbreviate(1000000000000000000000000000000));
-        $this->assertSame('1KQQ', Number::abbreviate(1000000000000000000000000000000000));
-
-        $this->assertSame('0', Number::abbreviate(0));
-        $this->assertSame('0', Number::abbreviate(0.0));
-        $this->assertSame('0.00', Number::abbreviate(0, 2));
-        $this->assertSame('0.00', Number::abbreviate(0.0, 2));
-        $this->assertSame('-1', Number::abbreviate(-1));
-        $this->assertSame('-1.00', Number::abbreviate(-1, precision: 2));
-        $this->assertSame('-10', Number::abbreviate(-10));
-        $this->assertSame('-100', Number::abbreviate(-100));
-        $this->assertSame('-1K', Number::abbreviate(-1000));
-        $this->assertSame('-1.23K', Number::abbreviate(-1234, precision: 2));
-        $this->assertSame('-1.2K', Number::abbreviate(-1234, maxPrecision: 1));
-        $this->assertSame('-1M', Number::abbreviate(-1000000));
-        $this->assertSame('-1B', Number::abbreviate(-1000000000));
-        $this->assertSame('-1T', Number::abbreviate(-1000000000000));
-        $this->assertSame('-1.1T', Number::abbreviate(-1100000000000, maxPrecision: 1));
-        $this->assertSame('-1Q', Number::abbreviate(-1000000000000000));
-        $this->assertSame('-1KQ', Number::abbreviate(-1000000000000000000));
+        static::$locale = $locale;
     }
 
-    public function testPairs()
+    /**
+     * Ensure the "intl" PHP extension is installed.
+     *
+     * @return void
+     */
+    protected static function ensureIntlExtensionIsInstalled()
     {
-        $this->assertSame([[1, 10], [11, 20], [21, 25]], Number::pairs(25, 10));
-        $this->assertSame([[0, 10], [10, 20], [20, 25]], Number::pairs(25, 10, 0));
-        $this->assertSame([[0, 2.5], [2.5, 5.0], [5.0, 7.5], [7.5, 10.0]], Number::pairs(10, 2.5, 0));
-    }
+        if (! extension_loaded('intl')) {
+            $method = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]['function'];
 
-    public function testTrim()
-    {
-        $this->assertSame(12, Number::trim(12));
-        $this->assertSame(120, Number::trim(120));
-        $this->assertSame(12, Number::trim(12.0));
-        $this->assertSame(12.3, Number::trim(12.3));
-        $this->assertSame(12.3, Number::trim(12.30));
-        $this->assertSame(12.3456789, Number::trim(12.3456789));
-        $this->assertSame(12.3456789, Number::trim(12.34567890000));
+            throw new RuntimeException('The "intl" PHP extension is required to use the ['.$method.'] method.');
+        }
     }
 }

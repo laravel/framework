@@ -83,7 +83,8 @@ class DatabaseTransactionsManager
         // shouldn't be any pending transactions, but going to clear them here anyways just
         // in case. This method could be refactored to receive a level in the future too.
         $this->pendingTransactions = $this->pendingTransactions->reject(
-            fn ($transaction) => $transaction->connection === $connection
+            fn ($transaction) => $transaction->connection === $connection &&
+                $transaction->level >= $levelBeingCommitted
         )->values();
 
         [$forThisConnection, $forOtherConnections] = $this->committedTransactions->partition(

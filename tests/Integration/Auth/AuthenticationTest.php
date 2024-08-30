@@ -13,6 +13,7 @@ use Illuminate\Auth\Events\Validated;
 use Illuminate\Auth\SessionGuard;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Events\Dispatcher;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
@@ -20,27 +21,42 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Testing\Fakes\EventFake;
 use Illuminate\Tests\Integration\Auth\Fixtures\AuthenticationTestUser;
 use InvalidArgumentException;
+use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\TestCase;
 
+#[WithMigration]
 class AuthenticationTest extends TestCase
 {
-    protected function getEnvironmentSetUp($app)
-    {
-        $app['config']->set('auth.providers.users.model', AuthenticationTestUser::class);
+    use RefreshDatabase;
 
-        $app['config']->set('hashing', ['driver' => 'bcrypt']);
+    protected function defineEnvironment($app)
+    {
+        $app['config']->set([
+            'auth.providers.users.model' => AuthenticationTestUser::class,
+            'hashing.driver' => 'bcrypt',
+        ]);
     }
 
-    protected function setUp(): void
+    protected function defineRoutes($router)
     {
-        parent::setUp();
+        $router->get('basic', function () {
+            return $this->app['auth']->guard()->basic()
+                ?: $this->app['auth']->user()->toJson();
+        });
 
-        Schema::create('users', function (Blueprint $table) {
-            $table->increments('id');
-            $table->string('email');
-            $table->string('username');
-            $table->string('password');
-            $table->string('remember_token')->default(null)->nullable();
+        $router->get('basicWithCondition', function () {
+            return $this->app['auth']->guard()->basic('email', ['is_active' => true])
+                ?: $this->app['auth']->user()->toJson();
+        });
+    }
+
+    protected function afterRefreshingDatabase()
+    {
+        Schema::table('users', function (Blueprint $table) {
+            $table->renameColumn('name', 'username');
+        });
+
+        Schema::table('users', function (Blueprint $table) {
             $table->tinyInteger('is_active')->default(0);
         });
 
@@ -50,16 +66,6 @@ class AuthenticationTest extends TestCase
             'password' => bcrypt('password'),
             'is_active' => true,
         ]);
-
-        $this->app->make('router')->get('basic', function () {
-            return $this->app['auth']->guard()->basic()
-                ?: $this->app['auth']->user()->toJson();
-        });
-
-        $this->app->make('router')->get('basicWithCondition', function () {
-            return $this->app['auth']->guard()->basic('email', ['is_active' => true])
-                ?: $this->app['auth']->user()->toJson();
-        });
     }
 
     public function testBasicAuthProtectsRoute()

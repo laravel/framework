@@ -17,15 +17,24 @@ trait LazilyRefreshDatabase
     {
         $database = $this->app->make('db');
 
-        $database->beforeExecuting(function () {
+        $callback = function () {
             if (RefreshDatabaseState::$lazilyRefreshed) {
                 return;
             }
 
             RefreshDatabaseState::$lazilyRefreshed = true;
 
+            $shouldMockOutput = $this->mockConsoleOutput;
+
+            $this->mockConsoleOutput = false;
+
             $this->baseRefreshDatabase();
-        });
+
+            $this->mockConsoleOutput = $shouldMockOutput;
+        };
+
+        $database->beforeStartingTransaction($callback);
+        $database->beforeExecuting($callback);
 
         $this->beforeApplicationDestroyed(function () {
             RefreshDatabaseState::$lazilyRefreshed = false;

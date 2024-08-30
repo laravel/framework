@@ -61,6 +61,32 @@ class DatabaseEloquentLocalScopesTest extends TestCase
         $this->assertSame('select * from "table" where "active" = ? and "type" = ?', $query->toSql());
         $this->assertEquals([true, 'foo'], $query->getBindings());
     }
+
+    public function testLocalScopeNestingDoesntDoubleFirstWhereClauseNegation()
+    {
+        $model = new EloquentLocalScopesTestModel;
+        $query = $model
+            ->newQuery()
+            ->whereNot('firstWhere', true)
+            ->orWhere('secondWhere', true)
+            ->active();
+
+        $this->assertSame('select * from "table" where (not "firstWhere" = ? or "secondWhere" = ?) and "active" = ?', $query->toSql());
+        $this->assertEquals([true, true, true], $query->getBindings());
+    }
+
+    public function testLocalScopeNestingGroupsOrNotWhereClause()
+    {
+        $model = new EloquentLocalScopesTestModel;
+        $query = $model
+            ->newQuery()
+            ->where('firstWhere', true)
+            ->orWhereNot('secondWhere', true)
+            ->active();
+
+        $this->assertSame('select * from "table" where ("firstWhere" = ? or not "secondWhere" = ?) and "active" = ?', $query->toSql());
+        $this->assertEquals([true, true, true], $query->getBindings());
+    }
 }
 
 class EloquentLocalScopesTestModel extends Model

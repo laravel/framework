@@ -3,6 +3,8 @@
 namespace Illuminate\Tests\Support;
 
 use Exception;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Notifications\AnonymousNotifiable;
@@ -221,6 +223,16 @@ class SupportTestingNotificationFakeTest extends TestCase
 
         $this->fake->assertNotSentTo($user, NotificationWithFalsyShouldSendStub::class);
     }
+
+    public function testAssertItCanSerializeAndRestoreNotifications()
+    {
+        $this->fake->serializeAndRestore();
+        $this->fake->send($this->user, new NotificationWithSerialization('hello'));
+
+        $this->fake->assertSentTo($this->user, NotificationWithSerialization::class, function ($notification) {
+            return $notification->value === 'hello-serialized-unserialized';
+        });
+    }
 }
 
 class NotificationStub extends Notification
@@ -254,5 +266,24 @@ class LocalizedUserStub extends User implements HasLocalePreference
     public function preferredLocale()
     {
         return 'au';
+    }
+}
+
+class NotificationWithSerialization extends NotificationStub implements ShouldQueue
+{
+    use Queueable;
+
+    public function __construct(public $value)
+    {
+    }
+
+    public function __serialize(): array
+    {
+        return ['value' => $this->value.'-serialized'];
+    }
+
+    public function __unserialize(array $data): void
+    {
+        $this->value = $data['value'].'-unserialized';
     }
 }
