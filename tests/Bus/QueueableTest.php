@@ -43,7 +43,7 @@ class QueueableTest extends TestCase
     public static function queuesDataProvider(): array
     {
         return [
-            'uses string' => ['high', 'high',],
+            'uses string' => ['high', 'high'],
             'uses BackedEnum #1' => [QueueEnum::DEFAULT, 'default'],
             'uses BackedEnum #2' => [QueueEnum::HIGH, 'high'],
             'uses null' => [null, null],
@@ -74,16 +74,19 @@ class QueueableTest extends TestCase
     }
 }
 
-class FakeJob {
+class FakeJob
+{
     use Queueable;
 }
 
-enum ConnectionEnum: string {
+enum ConnectionEnum: string
+{
     case SQS = 'sqs';
     case REDIS = 'redis';
 }
 
-enum QueueEnum: string {
+enum QueueEnum: string
+{
     case HIGH = 'high';
     case DEFAULT = 'default';
 }
