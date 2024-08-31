@@ -2478,6 +2478,13 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertSame('select * from "orders" where exists (select * from "products" where "products"."id" = "orders"."id")', $builder->toSql());
     }
 
+    public function testRelationNotExists()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('orders')->relationNotExists('products', 'product_id');
+        $this->assertSame('select * from "orders" where not exists (select * from "products" where "products"."id" = "orders"."product_id")', $builder->toSql());
+    }
+
     public function testBasicJoins()
     {
         $builder = $this->getBuilder();

@@ -1890,6 +1890,23 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Check a table doesn't have relation with another table.
+     *
+     * @param  string  $relation
+     * @param  string  $foreignKeyColumn
+     * @return $this
+     */
+    public function relationNotExists($relation, $foreignKeyColumn)
+    {
+        $relationKey = $relation.'.id';
+        $foreignKey = new Expression(sprintf('"%s"."%s"', $this->from, $foreignKeyColumn));
+
+        return $this->from($this->from)->whereNotExists(function ($q) use ($foreignKey, $relationKey, $relation) {
+            $q->select('*')->from($relation)->where($relationKey, '=', $foreignKey);
+        });
+    }
+
+    /**
      * Adds a where condition using row values.
      *
      * @param  array  $columns
