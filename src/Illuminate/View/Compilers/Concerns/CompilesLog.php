@@ -7,10 +7,10 @@ trait CompilesLog
     /**
      * Compile the extends statements into valid PHP.
      *
-     * @param string $expression
+     * @param  string  $expression
      * @return string
      */
-    public function compileLog(string $expression)
+    public function compileLog($expression)
     {
         $expression = $this->stripParentheses($expression);
         $parts = array_map('trim', explode(',', $expression));
