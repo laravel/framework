@@ -51,6 +51,8 @@ assertType('array<string, mixed>', request(['foo', 'bar']));
 
 assertType('Illuminate\Contracts\Routing\ResponseFactory', response());
 assertType('Illuminate\Http\Response', response('foo'));
+assertType('Illuminate\Http\Response', response(status: 111));
+assertType('Illuminate\Http\Response', response(headers: ['foo' => 'bar']));
 
 assertType('Illuminate\Session\SessionManager', session());
 assertType('mixed', session('foo'));
@@ -60,10 +62,14 @@ assertType('Illuminate\Contracts\Translation\Translator', trans());
 assertType('array|string', trans('foo'));
 
 assertType('Illuminate\Contracts\Validation\Factory', validator());
-assertType('Illuminate\Contracts\Validation\Validator', validator([]));
+assertType('Illuminate\Contracts\Validation\Validator', validator(rules: ['foo']));
+assertType('Illuminate\Contracts\Validation\Validator', validator(messages: ['bar']));
+assertType('Illuminate\Contracts\Validation\Validator', validator(attributes: ['foo', 'bar']));
 
 assertType('Illuminate\Contracts\View\Factory', view());
 assertType('Illuminate\Contracts\View\View', view('foo'));
+assertType('Illuminate\Contracts\View\View', view(data: ['foo']));
+assertType('Illuminate\Contracts\View\View', view(mergeData: ['bar']));
 
 assertType('Illuminate\Contracts\Routing\UrlGenerator', url());
 assertType('string', url('foo'));

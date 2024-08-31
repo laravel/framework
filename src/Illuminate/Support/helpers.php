@@ -338,7 +338,7 @@ if (! function_exists('str')) {
      * Get a new stringable object from the given string.
      *
      * @param  string|null  $string
-     * @return ($string not given ? object : \Illuminate\Support\Stringable)
+     * @return ($string is null ? object : \Illuminate\Support\Stringable)
      */
     function str($string = null)
     {
