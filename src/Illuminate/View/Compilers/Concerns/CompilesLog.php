@@ -10,7 +10,7 @@ trait CompilesLog
      * @param  string  $expression
      * @return string
      */
-    public function compileLog($expression)
+    protected function compileLog($expression)
     {
         $expression = $this->stripParentheses($expression);
         $parts = array_map('trim', explode(',', $expression));
