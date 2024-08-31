@@ -810,7 +810,7 @@ if (! function_exists('response')) {
      * @param  \Illuminate\Contracts\View\View|string|array|null  $content
      * @param  int  $status
      * @param  array  $headers
-     * @return ($content is null ? \Illuminate\Contracts\Routing\ResponseFactory : \Illuminate\Http\Response)
+     * @return (when called without any args ? \Illuminate\Contracts\Routing\ResponseFactory : \Illuminate\Http\Response)
      */
     function response($content = null, $status = 200, array $headers = [])
     {
@@ -1013,7 +1013,7 @@ if (! function_exists('validator')) {
      * @param  array  $rules
      * @param  array  $messages
      * @param  array  $attributes
-     * @return ($data is null ? \Illuminate\Contracts\Validation\Factory : \Illuminate\Contracts\Validation\Validator)
+     * @return (when called without any args ? \Illuminate\Contracts\Validation\Factory : \Illuminate\Contracts\Validation\Validator)
      */
     function validator(?array $data = null, array $rules = [], array $messages = [], array $attributes = [])
     {
@@ -1034,7 +1034,7 @@ if (! function_exists('view')) {
      * @param  string|null  $view
      * @param  \Illuminate\Contracts\Support\Arrayable|array  $data
      * @param  array  $mergeData
-     * @return ($view is null ? \Illuminate\Contracts\View\Factory : \Illuminate\Contracts\View\View)
+     * @return (when called without any args ? \Illuminate\Contracts\View\Factory : \Illuminate\Contracts\View\View)
      */
     function view($view = null, $data = [], $mergeData = [])
     {
