@@ -19,7 +19,7 @@ trait CompilesLog
         $method = isset($parts[1]) ? trim($parts[1], "'\"") : 'info';
         $resolvedClass = app()->make('log');
 
-        if (!method_exists($resolvedClass, $method)) {
+        if (! method_exists($resolvedClass, $method)) {
             $method = 'info';
         }
 
