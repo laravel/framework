@@ -113,7 +113,6 @@ class Builder implements BuilderContract
         'getgrammar',
         'getrawbindings',
         'implode',
-        'insert',
         'insertgetid',
         'insertorignore',
         'insertusing',
@@ -1138,9 +1137,30 @@ class Builder implements BuilderContract
         }
 
         return $this->toBase()->upsert(
-            $this->addTimestampsToUpsertValues($this->addUniqueIdsToUpsertValues($values)),
+            $this->addTimestampsToValues($this->addUniqueIdsToValues($values)),
             $uniqueBy,
             $this->addUpdatedAtToUpsertColumns($update)
+        );
+    }
+
+    /**
+     * Insert new records.
+     *
+     * @param array $values
+     * @return bool
+     */
+    public function insert(array $values)
+    {
+        if (empty($values)) {
+            return true;
+        }
+
+        if (! is_array(reset($values))) {
+            $values = [$values];
+        }
+
+        return $this->toBase()->insert(
+            $this->addTimestampsToValues($this->addUniqueIdsToValues($values))
         );
     }
 
@@ -1245,7 +1265,7 @@ class Builder implements BuilderContract
      * @param  array  $values
      * @return array
      */
-    protected function addUniqueIdsToUpsertValues(array $values)
+    protected function addUniqueIdsToValues(array $values)
     {
         if (! $this->model->usesUniqueIds()) {
             return $values;
@@ -1268,7 +1288,7 @@ class Builder implements BuilderContract
      * @param  array  $values
      * @return array
      */
-    protected function addTimestampsToUpsertValues(array $values)
+    protected function addTimestampsToValues(array $values)
     {
         if (! $this->model->usesTimestamps()) {
             return $values;
