@@ -5,6 +5,9 @@ namespace Illuminate\Encryption;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Laravel\SerializableClosure\SerializableClosure;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Encryption\MissingAppKeyException;
+use InvalidArgumentException;
 
 class EncryptionServiceProvider extends ServiceProvider
 {
@@ -29,11 +32,16 @@ class EncryptionServiceProvider extends ServiceProvider
         $this->app->singleton('encrypter', function ($app) {
             $config = $app->make('config')->get('app');
 
-            return (new Encrypter($this->parseKey($config), $config['cipher']))
-                ->previousKeys(array_map(
-                    fn ($key) => $this->parseKey(['key' => $key]),
-                    $config['previous_keys'] ?? []
-                ));
+            try {
+                return (new Encrypter($this->parseKey($config), $config['cipher']))
+                    ->previousKeys(array_map(
+                        fn($key) => $this->parseKey(['key' => $key]),
+                        $config['previous_keys'] ?? []
+                    ));
+            } catch (InvalidArgumentException $e) {
+                Log::critical('Failed to create encrypter: ' . $e->getMessage());
+                throw $e; // Lança a exceção após o log
+            }
         });
     }
 
@@ -46,11 +54,16 @@ class EncryptionServiceProvider extends ServiceProvider
     {
         $config = $this->app->make('config')->get('app');
 
-        if (! class_exists(SerializableClosure::class) || empty($config['key'])) {
+        if (!class_exists(SerializableClosure::class) || empty($config['key'])) {
             return;
         }
 
-        SerializableClosure::setSecretKey($this->parseKey($config));
+        try {
+            SerializableClosure::setSecretKey($this->parseKey($config));
+        } catch (InvalidArgumentException $e) {
+            Log::critical('Failed to set SerializableClosure secret key: ' . $e->getMessage());
+            throw $e; 
+        }
     }
 
     /**
@@ -58,11 +71,20 @@ class EncryptionServiceProvider extends ServiceProvider
      *
      * @param  array  $config
      * @return string
+     *
+     * @throws \InvalidArgumentException
      */
     protected function parseKey(array $config)
     {
-        if (Str::startsWith($key = $this->key($config), $prefix = 'base64:')) {
-            $key = base64_decode(Str::after($key, $prefix));
+        $key = $this->key($config);
+
+        if (Str::startsWith($key, $prefix = 'base64:')) {
+            $decodedKey = base64_decode(Str::after($key, $prefix), true);
+            if ($decodedKey === false) {
+                Log::error('Base64 decoding failed for key: ' . $key);
+                throw new InvalidArgumentException('Invalid base64 encoding for the encryption key.');
+            }
+            return $decodedKey;
         }
 
         return $key;
@@ -80,7 +102,8 @@ class EncryptionServiceProvider extends ServiceProvider
     {
         return tap($config['key'], function ($key) {
             if (empty($key)) {
-                throw new MissingAppKeyException;
+                Log::critical('Application key is missing.');
+                throw new MissingAppKeyException('The application key is required.');
             }
         });
     }
