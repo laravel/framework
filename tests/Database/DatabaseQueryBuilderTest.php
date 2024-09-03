@@ -1792,7 +1792,7 @@ class DatabaseQueryBuilderTest extends TestCase
             m::mock(Processor::class),
         ]);
         $builder->select('*')->from('users')->orderByPriority('name', ['john', 'doe']);
-        $this->assertSame('select * from `users` order by field(`name`, ?,?) asc', $builder->toSql());
+        $this->assertSame('select * from `users` order by case when `name` = ? then 0 when `name` = ? then 1 else 2 end asc', $builder->toSql());
 
         $builder = m::mock(Builder::class.'[where,exists,insert]', [
             m::mock(ConnectionInterface::class),
@@ -1800,7 +1800,7 @@ class DatabaseQueryBuilderTest extends TestCase
             m::mock(Processor::class),
         ]);
         $builder->select('*')->from('users')->orderByPriority('name', ['john', 'doe']);
-        $this->assertSame('select * from `users` order by field(`name`, ?,?) asc', $builder->toSql());
+        $this->assertSame('select * from `users` order by case when `name` = ? then 0 when `name` = ? then 1 else 2 end asc', $builder->toSql());
 
         $builder = m::mock(Builder::class.'[where,exists,insert]', [
             m::mock(ConnectionInterface::class),
