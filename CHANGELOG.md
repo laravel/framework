@@ -1,6 +1,33 @@
 # Release Notes for 11.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v11.21.0...11.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v11.22.0...11.x)
+
+## [v11.22.0](https://github.com/laravel/framework/compare/v11.21.0...v11.22.0) - 2024-09-03
+
+* [11.x] Fix FoundationServiceProvider docblock by [@seriquynh](https://github.com/seriquynh) in https://github.com/laravel/framework/pull/52542
+* [11.x] Fix ReflectionParameter [@param](https://github.com/param) type on Util::getContextualAttributeFromDependency() by [@samsonasik](https://github.com/samsonasik) in https://github.com/laravel/framework/pull/52541
+* [11.x] More specific parameter type in CastsInboundAttributes by [@lorenzolosa](https://github.com/lorenzolosa) in https://github.com/laravel/framework/pull/52536
+* [11.x] Unify prefetch API by [@timacdonald](https://github.com/timacdonald) in https://github.com/laravel/framework/pull/52550
+* [11.x] Add PDO subclass support for PHP 8.4 by [@ju5t](https://github.com/ju5t) in https://github.com/laravel/framework/pull/52538
+* [11.x] Handle circular references in model serialization by [@samlev](https://github.com/samlev) in https://github.com/laravel/framework/pull/52461
+* [11.x] Eloquent inverse relations by [@samlev](https://github.com/samlev) in https://github.com/laravel/framework/pull/51582
+* [11.x] Feature/whereany closures by [@liamduckett](https://github.com/liamduckett) in https://github.com/laravel/framework/pull/52555
+* [11.x] Update remaining workflows to run on latest possible ubuntu version by [@Jubeki](https://github.com/Jubeki) in https://github.com/laravel/framework/pull/52566
+* Correct comments to better represent the updated method functionality by [@dropweb](https://github.com/dropweb) in https://github.com/laravel/framework/pull/52564
+* [11.x] Support CSP nonce by [@timacdonald](https://github.com/timacdonald) in https://github.com/laravel/framework/pull/52558
+* [11.x] Allow enums to be passed to routes by [@NickSdot](https://github.com/NickSdot) in https://github.com/laravel/framework/pull/52561
+* [11.x] SORT_NATURAL on Collection no longer throws warning for nulls by [@Chaplinski](https://github.com/Chaplinski) in https://github.com/laravel/framework/pull/52557
+* [11.x] Allow prefetch to start on custom event by [@timacdonald](https://github.com/timacdonald) in https://github.com/laravel/framework/pull/52574
+* [11.x] Fix regression in database assertions with custom model connections by [@devfrey](https://github.com/devfrey) in https://github.com/laravel/framework/pull/52581
+* [11] Update DetectsLostConnections.php by [@webartisan10](https://github.com/webartisan10) in https://github.com/laravel/framework/pull/52614
+* Fix docblock for `Model::getEventDispatcher()` by [@inmula](https://github.com/inmula) in https://github.com/laravel/framework/pull/52602
+* [11.x] Restore Request::HEADER_X_FORWARDED_PREFIX in TrustProxies by [@taka-oyama](https://github.com/taka-oyama) in https://github.com/laravel/framework/pull/52598
+* [11.x] Accepts BackedEnum for onQueue, onConnection, allOnQueue, and allOnConnection methods in the Queueable trait by [@sethsandaru](https://github.com/sethsandaru) in https://github.com/laravel/framework/pull/52604
+* [11.x] Use the same parameter type for 'throwUnless' as used for 'throwIf' by [@pataar](https://github.com/pataar) in https://github.com/laravel/framework/pull/52626
+* [11.x] Pass iterable keys to `withProgressBar` in InteractsWithIO by [@robinmoisson](https://github.com/robinmoisson) in https://github.com/laravel/framework/pull/52623
+* [11.x] Fix docblock for Filesystem::hash() by [@sunaoka](https://github.com/sunaoka) in https://github.com/laravel/framework/pull/52630
+* Fix Apostrophe Handling in SeeInOrder.php and Enhance Test Coverage by [@nomitoor](https://github.com/nomitoor) in https://github.com/laravel/framework/pull/52627
+* [11.x] SQLite Error: "General error: 1 no such table" after adding a foreign key when using a table prefix. by [@incrize](https://github.com/incrize) in https://github.com/laravel/framework/pull/52578
 
 ## [v11.21.0](https://github.com/laravel/framework/compare/v11.20.0...v11.21.0) - 2024-08-20
 
