@@ -167,6 +167,10 @@ class PostgresSchemaBuilderTest extends PostgresTestCase
 
     public function testDropPartitionedTables()
     {
+        if (version_compare($this->getConnection()->getServerVersion(), '11.0', '<')) {
+            $this->markTestSkipped('Test requires a PostgreSQL connection >= 11.0');
+        }
+
         DB::statement('create table groups (id bigserial, tenant_id bigint, name varchar, primary key (id, tenant_id)) partition by hash (tenant_id)');
         DB::statement('create table groups_1 partition of groups for values with (modulus 2, remainder 0)');
         DB::statement('create table groups_2 partition of groups for values with (modulus 2, remainder 1)');

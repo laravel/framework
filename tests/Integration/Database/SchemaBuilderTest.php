@@ -669,6 +669,10 @@ class SchemaBuilderTest extends DatabaseTestCase
 
     public function testGettingGeneratedColumns()
     {
+        if ($this->driver === 'pgsql' && version_compare($this->getConnection()->getServerVersion(), '12.0', '<')) {
+            $this->markTestSkipped('Test requires a PostgreSQL connection >= 12.0');
+        }
+
         Schema::create('test', function (Blueprint $table) {
             $table->integer('price');
 
