@@ -114,7 +114,8 @@
         "resend/resend-php": "^0.10.0",
         "symfony/cache": "^7.0",
         "symfony/http-client": "^7.0",
-        "symfony/psr-http-message-bridge": "^7.0"
+        "symfony/psr-http-message-bridge": "^7.0",
+        "nette/schema": "dev-master as v1.3.0"
     },
     "conflict": {
         "mockery/mockery": "1.6.8",
