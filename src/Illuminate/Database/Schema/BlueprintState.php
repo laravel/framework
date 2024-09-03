@@ -105,7 +105,7 @@ class BlueprintState
 
         $this->foreignKeys = collect($schema->getForeignKeys($table))->map(fn ($foreignKey) => new ForeignKeyDefinition([
             'columns' => $foreignKey['columns'],
-            'on' => $foreignKey['foreign_table'],
+            'on' => $this->withoutTablePrefix($foreignKey['foreign_table']),
             'references' => $foreignKey['foreign_columns'],
             'onUpdate' => $foreignKey['on_update'],
             'onDelete' => $foreignKey['on_delete'],
@@ -250,5 +250,20 @@ class BlueprintState
 
                 break;
         }
+    }
+
+    /**
+     * Remove the table prefix from a table name, if it exists.
+     *
+     * @param  string  $table
+     * @return string
+     */
+    protected function withoutTablePrefix(string $table)
+    {
+        $prefix = $this->connection->getTablePrefix();
+
+        return str_starts_with($table, $prefix)
+            ? substr($table, strlen($prefix))
+            : $table;
     }
 }
