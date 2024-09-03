@@ -52,6 +52,10 @@ class FulltextTest extends PostgresTestCase
 
     public function testWhereFulltextWithWebsearch()
     {
+        if (version_compare($this->getConnection()->getServerVersion(), '11.0', '<')) {
+            $this->markTestSkipped('Test requires a PostgreSQL connection >= 11.0');
+        }
+
         $articles = DB::table('articles')->whereFulltext(['title', 'body'], '+PostgreSQL -YourSQL', ['mode' => 'websearch'])->get();
 
         $this->assertCount(5, $articles);
