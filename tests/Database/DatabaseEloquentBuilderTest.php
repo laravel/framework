@@ -958,11 +958,6 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertInstanceOf(Builder::class, $builder->foobar());
 
         $builder = $this->getBuilder();
-        $builder->getQuery()->shouldReceive('insert')->once()->with(['bar'])->andReturn('foo');
-
-        $this->assertSame('foo', $builder->insert(['bar']));
-
-        $builder = $this->getBuilder();
         $builder->getQuery()->shouldReceive('insertOrIgnore')->once()->with(['bar'])->andReturn('foo');
 
         $this->assertSame('foo', $builder->insertOrIgnore(['bar']));
@@ -2255,6 +2250,26 @@ class DatabaseEloquentBuilderTest extends TestCase
         $result = $builder->upsert([['email' => 'foo', 'name' => 'bar'], ['name' => 'bar2', 'email' => 'foo2']], ['email']);
 
         $this->assertEquals(2, $result);
+    }
+
+    public function testInsert()
+    {
+        $now = Carbon::now();
+        $query = m::mock(BaseBuilder::class);
+        $query->shouldReceive('from')->with('foo_table');
+        $builder = new Builder($query);
+        $model = new EloquentBuilderTestStubStringPrimaryKey;
+        $builder->setModel($model);
+
+        $query->shouldReceive('insert')->once()
+            ->with([
+                ['email' => 'foo', 'name' => 'bar', 'updated_at' => $now, 'created_at' => $now],
+                ['name' => 'bar2', 'email' => 'foo2', 'updated_at' => $now, 'created_at' => $now],
+            ])->andReturn(true);
+
+        $result = $builder->insert([['email' => 'foo', 'name' => 'bar'], ['name' => 'bar2', 'email' => 'foo2']]);
+
+        $this->assertTrue($result);
     }
 
     public function testTouch()
