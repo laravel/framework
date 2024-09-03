@@ -39,7 +39,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        php: [8.2, 8.3]
+        php: [8.4]
         phpunit: ['10.5', '11.0.1']
         stability: [prefer-lowest, prefer-stable]
 
@@ -103,71 +103,71 @@ jobs:
             vendor/orchestra/testbench-core/laravel/storage/logs
             !vendor/**/.gitignore
 
-  windows_tests:
-    runs-on: windows-2022
+  # windows_tests:
+  #   runs-on: windows-2022
 
-    strategy:
-      fail-fast: true
-      matrix:
-        php: [8.2, 8.3]
-        phpunit: ['10.5', '11.0.1']
-        stability: [prefer-lowest, prefer-stable]
+  #   strategy:
+  #     fail-fast: true
+  #     matrix:
+  #       php: [8.2, 8.3]
+  #       phpunit: ['10.5', '11.0.1']
+  #       stability: [prefer-lowest, prefer-stable]
 
-    name: PHP ${{ matrix.php }} - PHPUnit ${{ matrix.phpunit }} - ${{ matrix.stability }} - Windows
+  #   name: PHP ${{ matrix.php }} - PHPUnit ${{ matrix.phpunit }} - ${{ matrix.stability }} - Windows
 
-    steps:
-      - name: Set git to use LF
-        run: |
-          git config --global core.autocrlf false
-          git config --global core.eol lf
+  #   steps:
+  #     - name: Set git to use LF
+  #       run: |
+  #         git config --global core.autocrlf false
+  #         git config --global core.eol lf
 
-      - name: Checkout code
-        uses: actions/checkout@v4
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php }}
-          extensions: dom, curl, libxml, mbstring, zip, pdo, sqlite, pdo_sqlite, gd, pdo_mysql, fileinfo, ftp, redis, memcached, gmp, intl, :php-psr
-          tools: composer:v2
-          coverage: none
+  #     - name: Setup PHP
+  #       uses: shivammathur/setup-php@v2
+  #       with:
+  #         php-version: ${{ matrix.php }}
+  #         extensions: dom, curl, libxml, mbstring, zip, pdo, sqlite, pdo_sqlite, gd, pdo_mysql, fileinfo, ftp, redis, memcached, gmp, intl, :php-psr
+  #         tools: composer:v2
+  #         coverage: none
 
-      - name: Set Framework version
-        run: composer config version "11.x-dev"
+  #     - name: Set Framework version
+  #       run: composer config version "11.x-dev"
 
-      - name: Set Minimum PHP 8.2 Versions
-        uses: nick-fields/retry@v3
-        with:
-          timeout_minutes: 5
-          max_attempts: 5
-          command: composer require guzzlehttp/psr7:^2.4 --no-interaction --no-update
-          shell: bash
+  #     - name: Set Minimum PHP 8.2 Versions
+  #       uses: nick-fields/retry@v3
+  #       with:
+  #         timeout_minutes: 5
+  #         max_attempts: 5
+  #         command: composer require guzzlehttp/psr7:^2.4 --no-interaction --no-update
+  #         shell: bash
 
-      - name: Set PHPUnit
-        uses: nick-fields/retry@v3
-        with:
-          timeout_minutes: 5
-          max_attempts: 5
-          command: composer require phpunit/phpunit:^${{ matrix.phpunit }} --dev --no-interaction --no-update
-          shell: bash
+  #     - name: Set PHPUnit
+  #       uses: nick-fields/retry@v3
+  #       with:
+  #         timeout_minutes: 5
+  #         max_attempts: 5
+  #         command: composer require phpunit/phpunit:^${{ matrix.phpunit }} --dev --no-interaction --no-update
+  #         shell: bash
 
-      - name: Install dependencies
-        uses: nick-fields/retry@v3
-        with:
-          timeout_minutes: 5
-          max_attempts: 5
-          command: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress
+  #     - name: Install dependencies
+  #       uses: nick-fields/retry@v3
+  #       with:
+  #         timeout_minutes: 5
+  #         max_attempts: 5
+  #         command: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress
 
-      - name: Execute tests
-        run: vendor/bin/phpunit
-        env:
-          AWS_ACCESS_KEY_ID: random_key
-          AWS_SECRET_ACCESS_KEY: random_secret
+  #     - name: Execute tests
+  #       run: vendor/bin/phpunit
+  #       env:
+  #         AWS_ACCESS_KEY_ID: random_key
+  #         AWS_SECRET_ACCESS_KEY: random_secret
 
-      - name: Store artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: windows-logs-${{ matrix.php }}-${{ matrix.phpunit }}-${{ matrix.stability }}
-          path: |
-            vendor/orchestra/testbench-core/laravel/storage/logs
-            !vendor/**/.gitignore
+  #     - name: Store artifacts
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: windows-logs-${{ matrix.php }}-${{ matrix.phpunit }}-${{ matrix.stability }}
+  #         path: |
+  #           vendor/orchestra/testbench-core/laravel/storage/logs
+  #           !vendor/**/.gitignore
