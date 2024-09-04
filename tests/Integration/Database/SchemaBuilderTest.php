@@ -343,31 +343,24 @@ class SchemaBuilderTest extends DatabaseTestCase
             $this->markTestSkipped('Test requires a PostgreSQL connection.');
         }
 
-        dump(count(Schema::getTypes()));
         DB::statement('create type pseudo_foo');
-        dump(count(Schema::getTypes()));
         DB::statement('create type comp_foo as (f1 int, f2 text)');
-        dump(count(Schema::getTypes()));
         DB::statement("create type enum_foo as enum ('new', 'open', 'closed')");
-        dump(count(Schema::getTypes()));
         DB::statement('create type range_foo as range (subtype = float8)');
-        dump(count(Schema::getTypes()));
         DB::statement('create domain domain_foo as text');
-        dump(count(Schema::getTypes()));
         DB::statement('create type base_foo');
-        dump(count(Schema::getTypes()));
         DB::statement("create function foo_in(cstring) returns base_foo language internal immutable strict parallel safe as 'int2in'");
-        dump(count(Schema::getTypes()));
         DB::statement("create function foo_out(base_foo) returns cstring language internal immutable strict parallel safe as 'int2out'");
-        dump(count(Schema::getTypes()));
         DB::statement('create type base_foo (input = foo_in, output = foo_out)');
-        dump(count(Schema::getTypes()));
 
         $types = Schema::getTypes();
 
-        dump($types);
+        if (version_compare($this->getConnection()->getServerVersion(), '14.0', '<')) {
+            $this->assertCount(10, $types);
+        } else {
+            $this->assertCount(13, $types);
+        }
 
-        $this->assertCount(13, $types);
         $this->assertTrue(collect($types)->contains(fn ($type) => $type['name'] === 'pseudo_foo' && $type['type'] === 'pseudo' && ! $type['implicit']));
         $this->assertTrue(collect($types)->contains(fn ($type) => $type['name'] === 'comp_foo' && $type['type'] === 'composite' && ! $type['implicit']));
         $this->assertTrue(collect($types)->contains(fn ($type) => $type['name'] === 'enum_foo' && $type['type'] === 'enum' && ! $type['implicit']));
