@@ -76,7 +76,7 @@ jobs:
         with:
           timeout_minutes: 5
           max_attempts: 5
-          command: composer require guzzlehttp/promises:^2.0.3 mockery/mockery:^1.6.10 symfony/http-foundation:^7.1.3 symfony/translation:^7.1.3 symfony/console:^7.1.3 sebastian/cli-parser:^3.0.1 nesbot/carbon:^3.2.4 sebastian/exporter:^6.0.1 --no-interaction --no-update
+          command: composer require guzzlehttp/promises:^2.0.3 mockery/mockery:^1.6.10 symfony/http-foundation:^7.1.3 symfony/translation:^7.1.3 symfony/console:^7.1.3 sebastian/cli-parser:^3.0.1 nesbot/carbon:^3.4.0 sebastian/exporter:^6.0.1 --no-interaction --no-update
 
       - name: Set PHPUnit
         uses: nick-fields/retry@v3
