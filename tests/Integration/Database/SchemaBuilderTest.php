@@ -343,15 +343,25 @@ class SchemaBuilderTest extends DatabaseTestCase
             $this->markTestSkipped('Test requires a PostgreSQL connection.');
         }
 
+        dump(count(Schema::getTypes()));
         DB::statement('create type pseudo_foo');
+        dump(count(Schema::getTypes()));
         DB::statement('create type comp_foo as (f1 int, f2 text)');
+        dump(count(Schema::getTypes()));
         DB::statement("create type enum_foo as enum ('new', 'open', 'closed')");
+        dump(count(Schema::getTypes()));
         DB::statement('create type range_foo as range (subtype = float8)');
+        dump(count(Schema::getTypes()));
         DB::statement('create domain domain_foo as text');
+        dump(count(Schema::getTypes()));
         DB::statement('create type base_foo');
+        dump(count(Schema::getTypes()));
         DB::statement("create function foo_in(cstring) returns base_foo language internal immutable strict parallel safe as 'int2in'");
+        dump(count(Schema::getTypes()));
         DB::statement("create function foo_out(base_foo) returns cstring language internal immutable strict parallel safe as 'int2out'");
+        dump(count(Schema::getTypes()));
         DB::statement('create type base_foo (input = foo_in, output = foo_out)');
+        dump(count(Schema::getTypes()));
 
         $types = Schema::getTypes();
 
