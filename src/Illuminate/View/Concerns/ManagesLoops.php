@@ -2,6 +2,7 @@
 
 namespace Illuminate\View\Concerns;
 
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\LazyCollection;
 
@@ -28,6 +29,12 @@ trait ManagesLoops
 
         $parent = Arr::last($this->loopsStack);
 
+        $pageIteration = 1;
+
+        if ($data instanceof LengthAwarePaginator) {
+            $pageIteration = ($data->currentPage() - 1) * $data->perPage();
+        }
+
         $this->loopsStack[] = [
             'iteration' => 0,
             'index' => 0,
@@ -39,6 +46,7 @@ trait ManagesLoops
             'even' => true,
             'depth' => count($this->loopsStack) + 1,
             'parent' => $parent ? (object) $parent : null,
+            'pageIteration' => $pageIteration,
         ];
     }
 
@@ -59,6 +67,7 @@ trait ManagesLoops
             'even' => ! $loop['even'],
             'remaining' => isset($loop['count']) ? $loop['remaining'] - 1 : null,
             'last' => isset($loop['count']) ? $loop['iteration'] == $loop['count'] - 1 : null,
+            'pageIteration' => $loop['pageIteration'] + 1,
         ]);
     }
 
