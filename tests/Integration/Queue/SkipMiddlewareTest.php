@@ -2,15 +2,15 @@
 
 namespace Illuminate\Tests\Integration\Queue;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Queue\Middleware\Skip;
 use Illuminate\Bus\Dispatcher;
+use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Queue\CallQueuedHandler;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\Middleware\Skip;
+use Laravel\SerializableClosure\SerializableClosure;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
-use Laravel\SerializableClosure\SerializableClosure;
 
 class SkipMiddlewareTest extends TestCase
 {

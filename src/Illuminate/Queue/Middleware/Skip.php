@@ -13,7 +13,7 @@ class Skip
     /**
      * Apply the middleware if the given condition is truthy.
      *
-     * @param bool|Closure(): bool $condition
+     * @param  bool|Closure(): bool  $condition
      */
     public static function if(bool|Closure $condition): self
     {
@@ -25,7 +25,7 @@ class Skip
     /**
      * Apply the middleware unless the given condition is truthy.
      *
-     * @param bool|Closure(): bool $condition
+     * @param  bool|Closure(): bool  $condition
      */
     public static function unless(bool|Closure $condition): self
     {
