@@ -508,33 +508,34 @@ if (! function_exists('with')) {
         return is_null($callback) ? $value : $callback($value);
     }
 
-if (! function_exists('resolve_form_request')) {
+    if (! function_exists('resolve_form_request')) {
 
-    /**
-     * Get resolved form request instance which already validated.
-     *
-     * @param  string  $request
-     * @param  array $data
-     * @param  Illuminate\Foundation\Auth\User|null $user
-     * @return Illuminate\Foundation\Http\FormRequest
-     */
-    function resolve_form_request(string $request, array $data = [], User|null $user = null)
-    {
+        /**
+         * Get resolved form request instance which already validated.
+         *
+         * @param  string  $request
+         * @param  array $data
+         * @param  Illuminate\Foundation\Auth\User|null $user
+         * @return Illuminate\Foundation\Http\FormRequest
+         */
+        function resolve_form_request(string $request, array $data = [], User|null $user = null)
+        {
 
-        $req = new $request();
+            $req = new $request();
 
-        $req->merge($data);
+            $req->merge($data);
 
-        if (filled($user)) {
-            $req->setUserResolver(fn() => $user);
+            if (filled($user)) {
+                $req->setUserResolver(fn() => $user);
+            }
+
+            $container = app();
+            $req
+                ->setContainer($container)
+                ->setRedirector($container->make('redirect'))
+                ->validateResolved();
+
+            return $req;
         }
-
-        $container = app();
-        $req
-            ->setContainer($container)
-            ->setRedirector($container->make('redirect'))
-            ->validateResolved();
-
-        return $req;
     }
 }
