@@ -3558,6 +3558,21 @@ class DatabaseQueryBuilderTest extends TestCase
         );
 
         $this->assertEquals(1, $result);
+
+        $builder = $this->getSQLiteBuilder();
+        $builder->getConnection()->shouldReceive('getDatabaseName');
+        $builder->getConnection()
+            ->shouldReceive('affectingStatement')->once()->with('insert into "table1" ("foo") select "bar" from "table2" where "foreign_id" = ? on conflict ("id") do update set "foo" = "excluded"."foo"', [5])->andReturn(1);
+
+        $result = $builder->from('table1')->upsertUsing(
+            ['foo'],
+            function (Builder $query) {
+                $query->select(['bar'])->from('table2')->where('foreign_id', '=', 5);
+            },
+            'id'
+        );
+
+        $this->assertEquals(1, $result);
     }
 
     public function testUpsertUsingWithEmptyColumns()
