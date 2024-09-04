@@ -13,6 +13,8 @@ use Illuminate\Support\Sleep;
 use Illuminate\Support\Stringable;
 use Illuminate\Tests\Support\Fixtures\IntBackedEnum;
 use Illuminate\Tests\Support\Fixtures\StringBackedEnum;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\ValidationException;
 use IteratorAggregate;
 use LogicException;
 use Mockery as m;
@@ -1207,6 +1209,47 @@ class SupportHelpersTest extends TestCase
             preg_replace_array($pattern, $replacements, $subject)
         );
     }
+
+
+    public function testResolveFormRequest()
+    {
+        $this->assertThrows(
+            fn() => resolve_form_request(
+                request: SupportTestFormRequest::class
+            ),
+            ValidationException::class,
+            'The name field is required'
+        );
+
+        $resolved = resolve_form_request(
+            request: SupportTestFormRequest::class,
+            data: [
+                'name'  => 'foobar',
+                'email' => 'foobar@gmail.com'
+            ]
+        );
+
+        $this->assertTrue($resolved instanceof SupportTestFormRequest);
+        $this->assertTrue($resolved->safe()->name == 'foobar');
+        $this->assertTrue($resolved->safe()->email == 'foobar@gmail.com');
+
+        // (new User)->forceCreate([
+        //     'name'      => 'Sajad',
+        //     'email'     => 'sajad@example.org',
+        //     'password'  => 'password',
+        // ]);
+
+        // $resolved = resolve_form_request(
+        //     request: SupportTestFormRequest::class,
+        //     data: [
+        //         'name'  => 'foobar',
+        //         'email' => 'foobar@gmail.com'
+        //     ],
+        //     user: (new User)->first()
+        // );
+
+        // $this->assertTrue($resolved->user()->name == 'Sajad');
+    }
 }
 
 trait SupportTestTraitOne
@@ -1300,5 +1343,27 @@ class SupportTestCountable implements Countable
     public function count(): int
     {
         return 0;
+    }
+}
+
+class SupportTestFormRequest extends FormRequest
+{
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    public function rules(): array
+    {
+        return [
+            'name'  => [
+                'required',
+                'max:255'
+            ],
+            'email' => [
+                'required',
+                'email'
+            ]
+        ];
     }
 }
