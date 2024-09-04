@@ -55,7 +55,7 @@
         "symfony/uid": "^7.1",
         "symfony/var-dumper": "^7.1",
         "tijsverkoyen/css-to-inline-styles": "^2.2.5",
-        "vlucas/phpdotenv": "^5.4.1",
+        "vlucas/phpdotenv": "^5.6.1",
         "voku/portable-ascii": "^2.0"
     },
     "replace": {
