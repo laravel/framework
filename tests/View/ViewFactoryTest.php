@@ -927,6 +927,7 @@ class ViewFactoryTest extends TestCase
             'even' => true,
             'depth' => 1,
             'parent' => null,
+            'pageIteration' => 1,
         ];
 
         $this->assertEquals([$expectedLoop], $factory->getLoopStack());
@@ -944,6 +945,7 @@ class ViewFactoryTest extends TestCase
             'even' => true,
             'depth' => 2,
             'parent' => (object) $expectedLoop,
+            'pageIteration' => 1,
         ];
         $this->assertEquals([$expectedLoop, $secondExpectedLoop], $factory->getLoopStack());
 
@@ -990,6 +992,7 @@ class ViewFactoryTest extends TestCase
             'even' => true,
             'depth' => 1,
             'parent' => null,
+            'pageIteration' => 1,
         ];
 
         $this->assertEquals([$expectedLoop], $factory->getLoopStack());
@@ -1014,6 +1017,7 @@ class ViewFactoryTest extends TestCase
             'even' => true,
             'depth' => 1,
             'parent' => null,
+            'pageIteration' => 1,
         ];
 
         $this->assertEquals([$expectedLoop], $factory->getLoopStack());
