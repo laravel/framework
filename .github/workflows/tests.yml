@@ -71,6 +71,13 @@ jobs:
           max_attempts: 5
           command: composer require guzzlehttp/psr7:^2.4 --no-interaction --no-update
 
+      - name: Set minimum PHP 8.4 versions
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: composer require guzzlehttp/promises:^2.0.3 mocker/mocker:^1.6.10 symfony/http-foundation:^7.1.3 sebastian/cli-parser:^3.0.1 nesbot/carbon:^3.2.0 --no-interaction --no-update
+
       - name: Set PHPUnit
         uses: nick-fields/retry@v3
         with:
