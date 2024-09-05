@@ -8933,6 +8933,15 @@ class ValidationValidatorTest extends TestCase
         $validator->excludeUnvalidatedArrayKeys = true;
         $this->assertTrue($validator->passes());
         $this->assertSame(['users' => [1, 2, 3]], $validator->validated());
+
+        $validator = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['users' => [['name' => 'Mohamed', 'location' => 'cairo']]],
+            ['users' => 'list', 'users.*.name' => 'string']
+        );
+        $validator->excludeUnvalidatedArrayKeys = true;
+        $this->assertTrue($validator->passes());
+        $this->assertSame(['users' => [['name' => 'Mohamed']]], $validator->validated());
     }
 
     public function testExcludeUnless()
