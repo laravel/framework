@@ -252,8 +252,10 @@ trait ValidatesAttributes
             return $this->checkDateTimeOrder($format, $value, $parameters[0], $operator);
         }
 
-        if (is_null($date = $this->getDateTimestamp($parameters[0]))) {
+        if ($this->hasValue($parameters[0])) {
             $date = $this->getDateTimestamp($this->getValue($parameters[0]));
+        } else {
+            $date = $this->getDateTimestamp($parameters[0]);
         }
 
         return $this->compare($this->getDateTimestamp($value), $date, $operator);
@@ -298,13 +300,13 @@ trait ValidatesAttributes
     {
         $firstDate = $this->getDateTimeWithOptionalFormat($format, $first);
 
-        if (! $secondDate = $this->getDateTimeWithOptionalFormat($format, $second)) {
+        if ($this->hasValue($second)) {
             if (is_null($second = $this->getValue($second))) {
                 return true;
             }
-
-            $secondDate = $this->getDateTimeWithOptionalFormat($format, $second);
         }
+
+        $secondDate = $this->getDateTimeWithOptionalFormat($format, $second);
 
         return ($firstDate && $secondDate) && $this->compare($firstDate, $secondDate, $operator);
     }

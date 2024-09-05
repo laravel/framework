@@ -1118,6 +1118,17 @@ class Validator implements ValidatorContract
     }
 
     /**
+     * Does the attribute exist.
+     *
+     * @param  string  $attribute
+     * @return bool
+     */
+    public function hasValue($attribute)
+    {
+        return Arr::has($this->data, $attribute);
+    }
+
+    /**
      * Get the value of a given attribute.
      *
      * @param  string  $attribute
