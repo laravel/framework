@@ -1047,3 +1047,23 @@ if (! function_exists('view')) {
         return $factory->make($view, $data, $mergeData);
     }
 }
+
+if (! function_exists('when')) {
+    /**
+     * Output a value if the given condition is true
+     *
+     * @param  bool  $condition
+     * @param  string $output,
+     * @param  bool  $escape
+     * @return void
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     */
+    function when($condition, $output, $escape = false)
+    {
+        if ($condition) {
+            echo $escape ? e($output) : $output;
+        }
+    }
+}
