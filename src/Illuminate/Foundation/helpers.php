@@ -1050,10 +1050,10 @@ if (! function_exists('view')) {
 
 if (! function_exists('when')) {
     /**
-     * Output a value if the given condition is true
+     * Output a value if the given condition is true.
      *
      * @param  bool  $condition
-     * @param  string $output,
+     * @param  string  $output,
      * @param  bool  $escape
      * @return void
      *

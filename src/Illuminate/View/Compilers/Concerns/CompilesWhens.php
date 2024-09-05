@@ -9,12 +9,13 @@ trait CompilesWhens
      *
      * @param  string  $expression
      * @param  string  $output
-     * @param  boolean  $escape
+     * @param  bool  $escape
      * @return string
      */
     protected function compileWhen($expression)
     {
         $expression = $expression == '()' ? "(false,'',false)" : $expression;
+
         return "<?php when{$expression}; ?>";
     }
 }
