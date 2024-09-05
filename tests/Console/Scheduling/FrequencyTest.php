@@ -37,7 +37,7 @@ class FrequencyTest extends TestCase
         $this->assertSame('*/5 * * * *', $this->event->everyFiveMinutes()->getExpression());
         $this->assertSame('*/10 * * * *', $this->event->everyTenMinutes()->getExpression());
         $this->assertSame('*/15 * * * *', $this->event->everyFifteenMinutes()->getExpression());
-        $this->assertSame('0,30 * * * *', $this->event->everyThirtyMinutes()->getExpression());
+        $this->assertSame('*/30 * * * *', $this->event->everyThirtyMinutes()->getExpression());
     }
 
     public function testDaily()
