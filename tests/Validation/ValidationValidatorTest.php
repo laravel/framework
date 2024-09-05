@@ -4953,6 +4953,14 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['x' => $uploadedFile], ['x' => 'dimensions:ratio=1']);
         $this->assertTrue($v->fails());
 
+        // for min_ratio
+        $v = new Validator($trans, ['x' => $uploadedFile], ['x' => 'dimensions:min_ratio=1/2']);
+        $this->assertTrue($v->fails());
+
+        // for max_ratio
+        $v = new Validator($trans, ['x' => $uploadedFile], ['x' => 'dimensions:max_ratio=2/5']);
+        $this->assertTrue($v->passes());
+
         // Knowing that demo image2.png has width = 4 and height = 2
         $uploadedFile = new UploadedFile(__DIR__.'/fixtures/image2.png', '', null, null, true);
         $trans = $this->getIlluminateArrayTranslator();
@@ -5008,6 +5016,14 @@ class ValidationValidatorTest extends TestCase
 
         // Ensure validation doesn't erroneously fail when ratio doesn't matches
         $v = new Validator($trans, ['x' => $uploadedFile], ['x' => 'dimensions:ratio=1']);
+        $this->assertFalse($v->passes());
+
+        // evaluates to (64 / 65) > (1 / 1.0) which is true/fails
+        $v = new Validator($trans, ['x' => $uploadedFile], ['x' => 'dimensions:min_ratio=1']);
+        $this->assertFalse($v->fails());
+
+        // evaluates to (64 / 65) < (1 / 1.0) which is false/passes
+        $v = new Validator($trans, ['x' => $uploadedFile], ['x' => 'dimensions:max_ratio=1']);
         $this->assertFalse($v->passes());
 
         // Knowing that demo image5.png has width = 1366 and height = 768
