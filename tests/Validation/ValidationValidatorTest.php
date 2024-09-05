@@ -6002,6 +6002,18 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['x' => '0001-01-01T00:00'], ['x' => 'after:1970-01-01']);
         $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['f' => '2012-01-15', 'b' => '2012-01-14'], ['f' => 'before_or_equal:b']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['f' => '2036-01-18', 'b' => '2036-01-19'], ['f' => 'after_or_equal:b']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['f' => '2036-01-18', 'b' => '2036-01-19'], ['f' => 'after:b']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['f' => '2012-01-15', 'b' => '2012-01-14'], ['f' => 'before:b']);
+        $this->assertTrue($v->fails());
     }
 
     public function testBeforeAndAfterWithFormat()
@@ -6114,6 +6126,18 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->fails());
 
         $v = new Validator($trans, ['x' => '1970-01-02', '2018-05-12' => '1970-01-01'], ['x' => 'date_format:Y-m-d|after:2018-05-12']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['f' => '2012-01-15', 'b' => '2012-01-14'], ['f' => 'date_format:Y-m-d|before_or_equal:b']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['f' => '2036-01-18', 'b' => '2036-01-19'], ['f' => 'date_format:Y-m-d|after_or_equal:b']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['f' => '2036-01-18', 'b' => '2036-01-19'], ['f' => 'date_format:Y-m-d|after:b']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['f' => '2012-01-15', 'b' => '2012-01-14'], ['f' => 'date_format:Y-m-d|before:b']);
         $this->assertTrue($v->fails());
     }
 
