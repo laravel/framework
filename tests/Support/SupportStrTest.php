@@ -862,9 +862,9 @@ class SupportStrTest extends TestCase
 
         $this->assertSame("\xE9", Str::trim(" \xE9 "));
 
-        $phpDefaultChars = [' ', "\n", "\r", "\t", "\v", "\0"];
+        $trimDefaultChars = [' ', "\n", "\r", "\t", "\v", "\0"];
 
-        foreach ($phpDefaultChars as $char) {
+        foreach ($trimDefaultChars as $char) {
             $this->assertSame('', Str::trim(" {$char} "));
             $this->assertSame(trim(" {$char} "), Str::trim(" {$char} "));
 
@@ -892,9 +892,9 @@ class SupportStrTest extends TestCase
         );
         $this->assertSame("\xE9 ", Str::ltrim(" \xE9 "));
 
-        $phpDefaultChars = [' ', "\n", "\r", "\t", "\v", "\0"];
+        $ltrimDefaultChars = [' ', "\n", "\r", "\t", "\v", "\0"];
 
-        foreach ($phpDefaultChars as $char) {
+        foreach ($ltrimDefaultChars as $char) {
             $this->assertSame('', Str::ltrim(" {$char} "));
             $this->assertSame(ltrim(" {$char} "), Str::ltrim(" {$char} "));
 
@@ -923,9 +923,9 @@ class SupportStrTest extends TestCase
 
         $this->assertSame(" \xE9", Str::rtrim(" \xE9 "));
 
-        $phpDefaultChars = [' ', "\n", "\r", "\t", "\v", "\0"];
+        $rtrimDefaultChars = [' ', "\n", "\r", "\t", "\v", "\0"];
 
-        foreach ($phpDefaultChars as $char) {
+        foreach ($rtrimDefaultChars as $char) {
             $this->assertSame('', Str::rtrim(" {$char} "));
             $this->assertSame(rtrim(" {$char} "), Str::rtrim(" {$char} "));
 
