@@ -216,7 +216,6 @@ class ValidationDimensionsRuleTest extends TestCase
 
     public function testRatioBetween()
     {
-        $rule = new Dimensions(['min_width' => 100, 'min_height' => 100]);
         $rule = (new Dimensions)->ratioBetween(1 / 2, 2 / 5);
 
         $this->passes(
@@ -232,6 +231,24 @@ class ValidationDimensionsRuleTest extends TestCase
             message: 'validation.ratio_between'
         );
     }
+
+    public function testLegacyStringFormatIsSupported()
+    {
+        $rule = 'dimensions:min_width=100,max_width=200,min_height=100,max_height=200,ratio=1/1,min_ratio=1/1,max_ratio=2/5';
+
+        $this->passes(
+            $rule,
+            width: 150,
+            height: 150
+        );
+
+        $this->fails(
+            $rule,
+            width: 190,
+            height: 210,
+            message: 'validation.dimensions'
+        );
+     }
 
     public function fails($rule, $width, $height, $message)
     {
