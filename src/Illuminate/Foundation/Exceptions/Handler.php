@@ -1046,19 +1046,9 @@ class Handler implements ExceptionHandlerContract
     }
 
     /**
-     * Create a new logger instance.
-     *
-     * @return \Psr\Log\LoggerInterface
-     */
-    protected function newLogger()
-    {
-        return $this->container->make(LoggerInterface::class);
-    }
-
-    /**
      * Map the exception to a log level.
      *
-     * @param  Throwable  $e
+     * @param  \Throwable  $e
      * @return \Psr\Log\LogLevel::*
      */
     protected function mapLogLevel(Throwable $e)
@@ -1066,5 +1056,15 @@ class Handler implements ExceptionHandlerContract
         return Arr::first(
             $this->levels, fn ($level, $type) => $e instanceof $type, LogLevel::ERROR
         );
+    }
+
+    /**
+     * Create a new logger instance.
+     *
+     * @return \Psr\Log\LoggerInterface
+     */
+    protected function newLogger()
+    {
+        return $this->container->make(LoggerInterface::class);
     }
 }
