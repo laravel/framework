@@ -68,6 +68,8 @@ return [
         'numeric' => 'The :attribute field must be greater than or equal to :value.',
         'string' => 'The :attribute field must be greater than or equal to :value characters.',
     ],
+    'height' => 'The :attribute field must be :height pixels.',
+    'height_between' => 'The :attribute field must be between :min_height and :max_height pixels in height.',
     'hex_color' => 'The :attribute field must be a valid hexadecimal color.',
     'image' => 'The :attribute field must be an image.',
     'in' => 'The selected :attribute is invalid.',
@@ -99,6 +101,9 @@ return [
         'string' => 'The :attribute field must not be greater than :max characters.',
     ],
     'max_digits' => 'The :attribute field must not have more than :max digits.',
+    'max_height' => 'The :attribute field must not be greater than :max_height pixels.',
+    'max_ratio' => 'The :attribute field must have maximum aspect ratio of :max_ratio.',
+    'max_width' => 'The :attribute field must not be greater than :max_width pixels.',
     'mimes' => 'The :attribute field must be a file of type: :values.',
     'mimetypes' => 'The :attribute field must be a file of type: :values.',
     'min' => [
@@ -108,6 +113,9 @@ return [
         'string' => 'The :attribute field must be at least :min characters.',
     ],
     'min_digits' => 'The :attribute field must have at least :min digits.',
+    'min_height' => 'The :attribute field must be at least :min_height pixels.',
+    'min_ratio' => 'The :attribute field must have minimum aspect ratio of :min_ratio.',
+    'min_width' => 'The :attribute field must be at least :min_width pixels.',
     'missing' => 'The :attribute field must be missing.',
     'missing_if' => 'The :attribute field must be missing when :other is :value.',
     'missing_unless' => 'The :attribute field must be missing unless :other is :value.',
@@ -133,6 +141,8 @@ return [
     'prohibited_if' => 'The :attribute field is prohibited when :other is :value.',
     'prohibited_unless' => 'The :attribute field is prohibited unless :other is in :values.',
     'prohibits' => 'The :attribute field prohibits :other from being present.',
+    'ratio' => 'The :attribute field must have a :ratio aspect ratio.',
+    'ratio_between' => 'The :attribute field must have an aspect ratio between :min_ratio and :max_ratio.',
     'regex' => 'The :attribute field format is invalid.',
     'required' => 'The :attribute field is required.',
     'required_array_keys' => 'The :attribute field must contain entries for: :values.',
@@ -160,7 +170,8 @@ return [
     'url' => 'The :attribute field must be a valid URL.',
     'ulid' => 'The :attribute field must be a valid ULID.',
     'uuid' => 'The :attribute field must be a valid UUID.',
-
+    'width' => 'The :attribute field must be :width pixels.',
+    'width_between' => 'The :attribute field must be between :min_width and :max_width pixels in width.',
     /*
     |--------------------------------------------------------------------------
     | Custom Validation Language Lines
