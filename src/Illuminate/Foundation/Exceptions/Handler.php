@@ -1058,7 +1058,7 @@ class Handler implements ExceptionHandlerContract
     /**
      * Map the exception to a log level.
      *
-     * @param Throwable $e
+     * @param  Throwable  $e
      * @return \Psr\Log\LogLevel::*
      */
     protected function mapLogLevel(Throwable $e)
