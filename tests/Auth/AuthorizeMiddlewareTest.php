@@ -352,6 +352,7 @@ class AuthorizeMiddlewareTest extends TestCase
     }
 }
 
-enum AbilitiesEnum: string {
+enum AbilitiesEnum: string
+{
     case VIEW_DASHBOARD = 'view-dashboard';
 }
