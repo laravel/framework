@@ -70,4 +70,27 @@ trait Conditionable
 
         return $this;
     }
+
+    /**
+     * Apply the callback which key matches the given "value".
+     * 
+     * @template TMatchParameter
+     * @template TMatchReturnType
+     * 
+     * @param  (\Closure($this): TMatchParameter)|TMatchParameter  $value
+     * @param  array<TMatchParameter, callable($this): TMatchReturnType>  $conditions
+     * @return $this|TMatchReturnType
+     */
+    public function match($value, array $conditions)
+    {
+        $value = $value instanceof Closure ? $value($this) : $value;
+
+        foreach ($conditions as $key => $callback) {
+            if ($key === $value) {
+                return $callback($this) ?? $this;
+            }
+        }
+
+        return $this;
+    }
 }
