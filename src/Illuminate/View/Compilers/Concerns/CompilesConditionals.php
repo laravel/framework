@@ -337,7 +337,7 @@ trait CompilesConditionals
      */
     protected function compileWhen($expression)
     {
-        return "<?php when{$expression}; ?>";
+        return "<?php echo when{$expression}; ?>";
     }
 
     /**

@@ -1063,7 +1063,7 @@ if (! function_exists('when')) {
     function when($condition, $output, $escape = false)
     {
         if ($condition) {
-            echo $escape ? e($output) : $output;
+            return $escape ? e($output) : $output;
         }
     }
 }
