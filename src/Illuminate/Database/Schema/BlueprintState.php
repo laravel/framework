@@ -6,6 +6,7 @@ use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Grammars\Grammar;
 use Illuminate\Support\Fluent;
+use Illuminate\Support\Str;
 
 class BlueprintState
 {
@@ -80,7 +81,7 @@ class BlueprintState
             'type' => $column['type_name'],
             'full_type_definition' => $column['type'],
             'nullable' => $column['nullable'],
-            'default' => is_null($column['default']) ? null : new Expression($column['default']),
+            'default' => is_null($column['default']) ? null : new Expression(Str::wrap($column['default'], '(', ')')),
             'autoIncrement' => $column['auto_increment'],
             'collation' => $column['collation'],
             'comment' => $column['comment'],
@@ -105,7 +106,7 @@ class BlueprintState
 
         $this->foreignKeys = collect($schema->getForeignKeys($table))->map(fn ($foreignKey) => new ForeignKeyDefinition([
             'columns' => $foreignKey['columns'],
-            'on' => $this->withoutTablePrefix($foreignKey['foreign_table']),
+            'on' => new Expression($foreignKey['foreign_table']),
             'references' => $foreignKey['foreign_columns'],
             'onUpdate' => $foreignKey['on_update'],
             'onDelete' => $foreignKey['on_delete'],
@@ -250,20 +251,5 @@ class BlueprintState
 
                 break;
         }
-    }
-
-    /**
-     * Remove the table prefix from a table name, if it exists.
-     *
-     * @param  string  $table
-     * @return string
-     */
-    protected function withoutTablePrefix(string $table)
-    {
-        $prefix = $this->connection->getTablePrefix();
-
-        return str_starts_with($table, $prefix)
-            ? substr($table, strlen($prefix))
-            : $table;
     }
 }
