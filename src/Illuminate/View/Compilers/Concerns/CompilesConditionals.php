@@ -328,6 +328,19 @@ trait CompilesConditionals
     }
 
     /**
+     * Compile the 'when' statement into valid PHP.
+     *
+     * @param  string  $expression
+     * @param  string  $output
+     * @param  bool  $escape
+     * @return string
+     */
+    protected function compileWhen($expression)
+    {
+        return "<?php when{$expression}; ?>";
+    }
+
+    /**
      * Compile a disabled block into valid PHP.
      *
      * @param  string  $condition

@@ -11,10 +11,17 @@ class BladeWhenTest extends AbstractBladeTestCase
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
-    public function testWhenStatementsAreCompiledEmpty()
+    public function testWhenStatementCompiledEmpty()
     {
         $string = '<span @when()></span>';
-        $expected = "<span <?php when(false,'',false); ?>></span>";
+        $expected = "<span <?php when(); ?>></span>";
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
+
+    public function testWhenStatementsArePassedTwoArgumentsItDefaultsToEscaped()
+    {
+        $string = "<span @when(true, 'hello')></span>";
+        $expected = "<span <?php when(true, 'hello'); ?>></span>";
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 }

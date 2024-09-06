@@ -16,7 +16,6 @@ class BladeCompiler extends Compiler implements CompilerInterface
 {
     use Concerns\CompilesAuthorizations,
         Concerns\CompilesClasses,
-        Concerns\CompilesWhens,
         Concerns\CompilesComments,
         Concerns\CompilesComponents,
         Concerns\CompilesConditionals,
