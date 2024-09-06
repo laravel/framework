@@ -73,10 +73,10 @@ trait Conditionable
 
     /**
      * Apply the callback which key matches the given "value".
-     * 
+     *
      * @template TMatchParameter
      * @template TMatchReturnType
-     * 
+     *
      * @param  (\Closure($this): TMatchParameter)|TMatchParameter  $value
      * @param  array<TMatchParameter, callable($this): TMatchReturnType>  $conditions
      * @return $this|TMatchReturnType
