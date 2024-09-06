@@ -1057,7 +1057,7 @@ if (! function_exists('when')) {
      * @param  bool  $escape
      * @return void
      */
-    function when($condition, $output, $escape = false)
+    function when($condition, $output, $escape = true)
     {
         if ($condition) {
             return $escape ? e($output) : $output;
