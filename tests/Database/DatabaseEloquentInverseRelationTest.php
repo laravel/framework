@@ -272,6 +272,27 @@ class DatabaseEloquentInverseRelationTest extends TestCase
         $this->assertSame('test', $relation->getInverseRelationship());
     }
 
+    public function testOnlyHydratesInverseRelationOnModels()
+    {
+        $relation = m::mock(HasInverseRelationStub::class)->shouldAllowMockingProtectedMethods()->makePartial();
+        $relation->shouldReceive('getParent')->andReturn(new HasInverseRelationParentStub);
+        $relation->shouldReceive('applyInverseRelationToModel')->times(6);
+        $relation->exposeApplyInverseRelationToCollection([
+            new HasInverseRelationRelatedStub(),
+            12345,
+            new HasInverseRelationRelatedStub(),
+            new HasInverseRelationRelatedStub(),
+            Model::class,
+            new HasInverseRelationRelatedStub(),
+            true,
+            [],
+            new HasInverseRelationRelatedStub(),
+            'foo',
+            new class() {},
+            new HasInverseRelationRelatedStub(),
+        ]);
+    }
+
     public static function guessedParentRelationsDataProvider()
     {
         yield ['hasInverseRelationParentStub'];
@@ -360,5 +381,10 @@ class HasInverseRelationStub extends Relation
     public function exposeGuessInverseRelation(): string|null
     {
         return $this->guessInverseRelation();
+    }
+
+    public function exposeApplyInverseRelationToCollection($models, ?Model $parent = null)
+    {
+        return $this->applyInverseRelationToCollection($models, $parent);
     }
 }
