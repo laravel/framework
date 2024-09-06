@@ -348,7 +348,6 @@ class AuthAccessGateTest extends TestCase
         $this->assertTrue($gate->allows(AbilitiesEnum::VIEW_DASHBOARD));
     }
 
-
     public function testBackedEnumInDenies()
     {
         $gate = $this->getBasicGate();
@@ -1142,7 +1141,6 @@ class AuthAccessGateTest extends TestCase
         $this->assertTrue($gate->check(['edit', AbilitiesEnum::UPDATE], new AccessGateTestDummy));
     }
 
-
     /**
      * @param  array  $abilitiesToSet
      * @param  array|string  $abilitiesToCheck
@@ -1544,7 +1542,8 @@ class AccessGateTestPolicyThrowingAuthorizationException
     }
 }
 
-enum AbilitiesEnum: string {
+enum AbilitiesEnum: string
+{
     case VIEW_DASHBOARD = 'view-dashboard';
     case UPDATE = 'update';
 }
