@@ -21,7 +21,7 @@ class ValidationImageFileRuleTest extends TestCase
         $this->fails(
             File::image()->dimensions(Rule::dimensions()->width(100)->height(100)),
             UploadedFile::fake()->image('foo.png', 101, 101),
-            ['validation.dimensions'],
+            ['validation.width', 'validation.height'],
         );
 
         $this->passes(
@@ -35,7 +35,7 @@ class ValidationImageFileRuleTest extends TestCase
         $this->fails(
             File::image()->dimensions(Rule::dimensions()->width(100)->height(100)),
             new UploadedFileWithCustomImageSizeMethod(stream_get_meta_data($tmpFile = tmpfile())['uri'], 'foo.png'),
-            ['validation.dimensions'],
+            ['validation.width', 'validation.height'],
         );
 
         $this->passes(
