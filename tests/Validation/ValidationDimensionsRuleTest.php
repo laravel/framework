@@ -2,15 +2,236 @@
 
 namespace Illuminate\Tests\Validation;
 
-use Illuminate\Validation\Rule;
+use Illuminate\Container\Container;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Facade;
+use Illuminate\Translation\ArrayLoader;
+use Illuminate\Translation\Translator;
 use Illuminate\Validation\Rules\Dimensions;
+use Illuminate\Validation\ValidationServiceProvider;
+use Illuminate\Validation\Validator;
 use PHPUnit\Framework\TestCase;
 
 class ValidationDimensionsRuleTest extends TestCase
 {
-    public function testItCorrectlyFormatsAStringVersionOfTheRule()
+
+    public function testWidth()
+    {
+        $rule = (new Dimensions)->width(100);
+
+        $this->passes(
+            $rule,
+            width: 100,
+            height: 100,
+        );
+
+        $this->fails(
+            $rule,
+            width: 99,
+            height: 100,
+            message: 'validation.width'
+        );
+    }
+
+    public function testMinWidth()
+    {
+        $rule = (new Dimensions)->minWidth(100);
+
+        $this->passes(
+            $rule,
+            width: 100,
+            height: 100,
+        );
+
+        $this->fails(
+            $rule,
+            width: 99,
+            height: 100,
+            message: 'validation.min_width'
+        );
+    }
+
+    public function testMaxWidth()
+    {
+        $rule = (new Dimensions)->maxWidth(100);
+
+        $this->passes(
+            $rule,
+            width: 100,
+            height: 100,
+        );
+
+        $this->fails(
+            $rule,
+            width: 101,
+            height: 100,
+            message: 'validation.max_width'
+        );
+    }
+
+    public function testWidthBetween()
+    {
+        $rule = (new Dimensions)->widthBetween(100, 200);
+
+        $this->passes(
+            $rule,
+            width: 100,
+            height: 100,
+        );
+
+        $this->fails(
+            $rule,
+            width: 99,
+            height: 100,
+            message: 'validation.width_between'
+        );
+    }
+
+    public function testHeight()
+    {
+        $rule = (new Dimensions)->height(100);
+
+        $this->passes(
+            $rule,
+            width: 100,
+            height: 100,
+        );
+
+        $this->fails(
+            $rule,
+            width: 100,
+            height: 99,
+            message: 'validation.height'
+        );
+    }
+
+    public function testMinHeight()
+    {
+        $rule = (new Dimensions)->minHeight(100);
+
+        $this->passes(
+            $rule,
+            width: 100,
+            height: 100,
+        );
+
+        $this->fails(
+            $rule,
+            width: 100,
+            height: 99,
+            message: 'validation.min_height'
+        );
+    }
+
+
+    public function testMaxHeight()
+    {
+        $rule = (new Dimensions)->maxHeight(100);
+
+        $this->passes(
+            $rule,
+            width: 100,
+            height: 100,
+        );
+
+        $this->fails(
+            $rule,
+            width: 100,
+            height: 101,
+            message: 'validation.max_height'
+        );
+    }
+
+    public function testHeightBetween()
+    {
+        $rule = (new Dimensions)->heightBetween(100, 200);
+
+        $this->passes(
+            $rule,
+            width: 100,
+            height: 100,
+        );
+
+        $this->fails(
+            $rule,
+            width: 100,
+            height: 99,
+            message: 'validation.height_between'
+        );
+    }
+
+    public function testRatio()
+    {
+        $rule = (new Dimensions)->ratio(1 / 2);
+
+        $this->passes(
+            $rule,
+            width:100,
+            height:200,
+        );
+
+        $this->fails(
+            $rule,
+            width:100,
+            height:220,
+            message: 'validation.ratio'
+        );
+    }
+
+    public function testMinRatio()
+    {
+        $rule = (new Dimensions)->minRatio(1 / 2);
+
+        $this->passes(
+            $rule,
+            width:100,
+            height:200
+        );
+
+        $this->fails($rule,
+            width: 100,
+            height: 100,
+            message: 'validation.min_ratio'
+        );
+    }
+
+    public function testMaxRatio()
+    {
+        $rule = (new Dimensions)->maxRatio(1 / 1);
+
+        $this->passes(
+            $rule,
+            width: 100,
+            height: 100
+        );
+
+        $this->fails(
+            $rule,
+            width: 100,
+            height: 200,
+            message: 'validation.max_ratio'
+        );
+    }
+
+    public function testRatioBetween()
     {
         $rule = new Dimensions(['min_width' => 100, 'min_height' => 100]);
+        $rule = (new Dimensions)->ratioBetween(1 / 2, 2 / 5);
+
+        $this->passes(
+            $rule,
+            width: 100,
+            height: 200
+        );
+
+        $this->fails(
+            $rule,
+            width: 100,
+            height: 100,
+            message: 'validation.ratio_between'
+        );
+    }
 
         $this->assertSame('dimensions:min_width=100,min_height=100', (string) $rule);
 
@@ -24,19 +245,67 @@ class ValidationDimensionsRuleTest extends TestCase
 
         $rule = new Dimensions(['ratio' => '2/3']);
 
-        $this->assertSame('dimensions:ratio=2/3', (string) $rule);
+    public function fails($rule, $width, $height, $message)
+    {
+        $this->assertValidationRules(
+            $rule,
+            UploadedFile::fake()->image('image.jpg', $width, $height),
+            false,
+            [$message]
+        );
+    }
 
-        $rule = Rule::dimensions()->minWidth(300)->minHeight(400);
+    public function passes($rule, $width, $height)
+    {
+        $this->assertValidationRules(
+            $rule,
+            UploadedFile::fake()->image('image.jpg', $width, $height),
+            true,
+            []
+        );
+    }
 
-        $this->assertSame('dimensions:min_width=300,min_height=400', (string) $rule);
+    protected function assertValidationRules($rule, $values, $result, $messages)
+    {
+        $values = Arr::wrap($values);
 
-        $rule = Rule::dimensions()
-            ->when(true, function ($rule) {
-                $rule->height('100');
-            })
-            ->unless(true, function ($rule) {
-                $rule->width('200');
-            });
-        $this->assertSame('dimensions:height=100', (string) $rule);
+        foreach ($values as $value) {
+            $v = new Validator(
+                resolve('translator'),
+                ['my_file' => $value],
+                ['my_file' => is_object($rule) ? clone $rule : $rule]
+            );
+
+            $this->assertSame($result, $v->passes());
+
+            $this->assertSame(
+                $result ? [] : ['my_file' => $messages],
+                $v->messages()->toArray()
+            );
+        }
+    }
+
+    protected function setUp(): void
+    {
+        $container = Container::getInstance();
+
+        $container->bind('translator', function () {
+            return new Translator(
+                new ArrayLoader, 'en'
+            );
+        });
+
+        Facade::setFacadeApplication($container);
+
+        (new ValidationServiceProvider($container))->register();
+    }
+
+    protected function tearDown(): void
+    {
+        Container::setInstance(null);
+
+        Facade::clearResolvedInstances();
+
+        Facade::setFacadeApplication(null);
     }
 }
