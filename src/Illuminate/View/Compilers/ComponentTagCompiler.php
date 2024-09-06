@@ -299,6 +299,10 @@ class ComponentTagCompiler
             return $class;
         }
 
+         if (class_exists($class = $class.'\\'.Str::afterLast($class, '\\'))) {
+             return $class;
+         }
+
         if (! is_null($guess = $this->guessAnonymousComponentUsingNamespaces($viewFactory, $component)) ||
             ! is_null($guess = $this->guessAnonymousComponentUsingPaths($viewFactory, $component))) {
             return $guess;
