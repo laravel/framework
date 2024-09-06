@@ -110,4 +110,31 @@ class DatabaseSchemaBuilderTest extends TestCase
             $fk['columns'] === ['moderator_id'])
         );
     }
+
+    public function testAlterTableAddForeignKeyWithExpressionDefault()
+    {
+        Schema::create('items', function (Blueprint $table) {
+            $table->id();
+            $table->json('flags')->default(new Expression('(JSON_ARRAY())'));
+        });
+
+        Schema::table('items', function (Blueprint $table) {
+            $table->foreignId('item_id')->nullable()->constrained('items');
+        });
+
+        $this->assertTrue(collect(Schema::getForeignKeys('items'))->contains(fn ($fk) =>
+            $fk['foreign_table'] === 'items' &&
+            $fk['foreign_columns'] === ['id'] &&
+            $fk['columns'] === ['item_id'])
+        );
+
+        $columns = Schema::getColumns('items');
+
+        $this->assertTrue(collect($columns)->contains(fn ($column) =>
+            $column['name'] === 'flags' &&
+            $column['default'] === 'JSON_ARRAY()'
+        ));
+
+        $this->assertTrue(collect($columns)->contains(fn ($column) => $column['name'] === 'item_id' && $column['nullable']));
+    }
 }

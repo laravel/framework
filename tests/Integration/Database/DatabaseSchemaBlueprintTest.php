@@ -321,7 +321,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $queries = $blueprint->toSql(DB::connection(), new SQLiteGrammar);
 
         $expected = [
-            'create table "__temp__products" ("changed_col" text not null, "timestamp_col" datetime not null default CURRENT_TIMESTAMP, "integer_col" integer not null default \'123\', "string_col" varchar not null default \'value\')',
+            'create table "__temp__products" ("changed_col" text not null, "timestamp_col" datetime not null default (CURRENT_TIMESTAMP), "integer_col" integer not null default (\'123\'), "string_col" varchar not null default (\'value\'))',
             'insert into "__temp__products" ("changed_col", "timestamp_col", "integer_col", "string_col") select "changed_col", "timestamp_col", "integer_col", "string_col" from "products"',
             'drop table "products"',
             'alter table "__temp__products" rename to "products"',

@@ -6,6 +6,7 @@ use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Grammars\Grammar;
 use Illuminate\Support\Fluent;
+use Illuminate\Support\Str;
 
 class BlueprintState
 {
@@ -80,7 +81,7 @@ class BlueprintState
             'type' => $column['type_name'],
             'full_type_definition' => $column['type'],
             'nullable' => $column['nullable'],
-            'default' => is_null($column['default']) ? null : new Expression($column['default']),
+            'default' => is_null($column['default']) ? null : new Expression(Str::wrap($column['default'], '(', ')')),
             'autoIncrement' => $column['auto_increment'],
             'collation' => $column['collation'],
             'comment' => $column['comment'],
