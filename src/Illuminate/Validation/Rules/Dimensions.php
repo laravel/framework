@@ -101,13 +101,6 @@ class Dimensions implements Rule, DataAwareRule, ValidatorAwareRule
     protected $validator;
 
     /**
-     * The callback that will generate the "default" version of the dimensions rule.
-     *
-     * @var string|array|callable|null
-     */
-    public static $defaultCallback;
-
-    /**
      * Create a new dimensions rule instance.
      *
      * @param  array  $constraints
@@ -336,41 +329,6 @@ class Dimensions implements Rule, DataAwareRule, ValidatorAwareRule
         }
 
         return array_filter($rules);
-    }
-
-    /**
-     * Set the default callback to be used for determining the dimensions rule.
-     *
-     * If no arguments are passed, the default dimension rule configuration will be returned.
-     *
-     * @param  static|callable|null  $callback
-     * @return static|null
-     */
-    public static function defaults($callback = null)
-    {
-        if ($callback === null) {
-            return static::default();
-        }
-
-        if (! is_callable($callback) && ! $callback instanceof static) {
-            throw new InvalidArgumentException('The given callback should be callable or an instance of '.static::class);
-        }
-
-        static::$defaultCallback = $callback;
-    }
-
-    /**
-     * Get the default configuration of the dimensions rule.
-     *
-     * @return static
-     */
-    public static function default()
-    {
-        $file = is_callable(static::$defaultCallback)
-            ? call_user_func(static::$defaultCallback)
-            : static::$defaultCallback;
-
-        return $file instanceof Rule ? $file : new self();
     }
 
     /**
