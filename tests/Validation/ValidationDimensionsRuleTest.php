@@ -250,13 +250,27 @@ class ValidationDimensionsRuleTest extends TestCase
         );
      }
 
-        $this->assertSame('dimensions:width=200,height=100', (string) $rule);
+    public function testMacroable()
+    {
+        Dimensions::macro('thumbnail', function () {
+            return $this->width(100)->height(100);
+        });
 
-        $rule = Rule::dimensions()->maxWidth(1000)->maxHeight(500)->ratio(3 / 2);
+        $rule = (new Dimensions)->thumbnail();
 
-        $this->assertSame('dimensions:max_width=1000,max_height=500,ratio=1.5', (string) $rule);
+        $this->passes(
+            $rule,
+            width: 100,
+            height: 100,
+        );
 
-        $rule = new Dimensions(['ratio' => '2/3']);
+        $this->fails(
+            $rule,
+            width: 99,
+            height: 100,
+            message: 'validation.width'
+        );
+    }
 
     public function fails($rule, $width, $height, $message)
     {
