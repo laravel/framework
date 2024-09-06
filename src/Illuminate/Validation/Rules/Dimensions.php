@@ -6,7 +6,6 @@ use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Contracts\Validation\ValidatorAwareRule;
 use Illuminate\Support\Traits\Conditionable;
-use Stringable;
 use Illuminate\Support\Traits\Macroable;
 
 class Dimensions implements Rule, DataAwareRule, ValidatorAwareRule
@@ -112,7 +111,14 @@ class Dimensions implements Rule, DataAwareRule, ValidatorAwareRule
      */
     public function __construct(array $constraints = [])
     {
-        $this->constraints = $constraints;
+        foreach ($constraints as $constraint) {
+            [$key, $value] = explode('=', $constraint);
+            $key = Str::camel($key);
+
+            if (method_exists($this, $key)) {
+            	$this->{$key}($value);
+            }
+        }
     }
 
     /**
