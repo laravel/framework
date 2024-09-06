@@ -122,6 +122,23 @@ class AuthorizeMiddlewareTest extends TestCase
         $this->assertSame('success', $response->content());
     }
 
+    public function testSimpleAbilityWithBackedEnumParameter()
+    {
+        $this->gate()->define('view-dashboard', function ($user) {
+            return true;
+        });
+
+        $this->router->middleware(Authorize::using(AbilitiesEnum::VIEW_DASHBOARD))->get('dashboard', [
+            'uses' => function () {
+                return 'success';
+            },
+        ]);
+
+        $response = $this->router->dispatch(Request::create('dashboard', 'GET'));
+
+        $this->assertSame('success', $response->content());
+    }
+
     public function testSimpleAbilityWithNullParameter()
     {
         $this->gate()->define('view-dashboard', function ($user, $param = null) {
@@ -333,4 +350,8 @@ class AuthorizeMiddlewareTest extends TestCase
     {
         return $this->container->make(GateContract::class);
     }
+}
+
+enum AbilitiesEnum: string {
+    case VIEW_DASHBOARD = 'view-dashboard';
 }
