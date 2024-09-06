@@ -250,6 +250,28 @@ class ValidationDimensionsRuleTest extends TestCase
         );
      }
 
+    public function testMacroable()
+    {
+        Dimensions::macro('thumbnail', function () {
+            return $this->width(100)->height(100);
+        });
+
+        $rule = (new Dimensions)->thumbnail();
+
+        $this->passes(
+            $rule,
+            width: 100,
+            height: 100,
+        );
+
+        $this->fails(
+            $rule,
+            width: 99,
+            height: 100,
+            message: 'validation.width'
+        );
+    }
+
     public function fails($rule, $width, $height, $message)
     {
         $this->assertValidationRules(
