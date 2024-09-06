@@ -129,7 +129,7 @@ class Dimensions implements Rule, DataAwareRule, ValidatorAwareRule
      */
     public function width($value)
     {
-        $this->constraints['width'] = $value;
+        $this->width = $value;
 
         return $this;
     }
@@ -142,7 +142,7 @@ class Dimensions implements Rule, DataAwareRule, ValidatorAwareRule
      */
     public function height($value)
     {
-        $this->constraints['height'] = $value;
+        $this->height = $value;
 
         return $this;
     }
@@ -155,7 +155,7 @@ class Dimensions implements Rule, DataAwareRule, ValidatorAwareRule
      */
     public function minWidth($value)
     {
-        $this->constraints['min_width'] = $value;
+        $this->minWidth = $value;
 
         return $this;
     }
@@ -168,7 +168,7 @@ class Dimensions implements Rule, DataAwareRule, ValidatorAwareRule
      */
     public function minHeight($value)
     {
-        $this->constraints['min_height'] = $value;
+        $this->minHeight = $value;
 
         return $this;
     }
@@ -181,7 +181,7 @@ class Dimensions implements Rule, DataAwareRule, ValidatorAwareRule
      */
     public function maxWidth($value)
     {
-        $this->constraints['max_width'] = $value;
+        $this->maxWidth =$value;
 
         return $this;
     }
@@ -194,7 +194,37 @@ class Dimensions implements Rule, DataAwareRule, ValidatorAwareRule
      */
     public function maxHeight($value)
     {
-        $this->constraints['max_height'] = $value;
+        $this->maxHeight = $value;
+
+        return $this;
+    }
+
+    /**
+     * Set the width between constraint.
+     *
+     * @param   int  $min
+     * @param   int  $max
+     * @return  $this
+     */
+    public function widthBetween($min, $max)
+    {
+        $this->minWidth = $min;
+        $this->maxWidth = $max;
+
+        return $this;
+    }
+
+    /**
+     * Set the height between constraint.
+     *
+     * @param  int  $min
+     * @param  int  $max
+     * @return  $this
+     */
+    public function heightBetween($min, $max)
+    {
+        $this->minHeight = $min;
+        $this->maxHeight = $max;
 
         return $this;
     }
@@ -207,39 +237,39 @@ class Dimensions implements Rule, DataAwareRule, ValidatorAwareRule
      */
     public function ratio($value)
     {
-        $this->constraints['ratio'] = $value;
+        $this->ratio = $value;
 
         return $this;
     }
 
     /**
-     * Set the minimum aspect ratio.
+     * Set the minimum aspect ratio constraint.
      *
      * @param  float  $value
      * @return $this
      */
     public function minRatio($value)
     {
-        $this->constraints['min_ratio'] = $value;
+        $this->minRatio = $value;
 
         return $this;
     }
 
     /**
-     * Set the maximum aspect ratio.
+     * Set the maximum aspect ratio constraint.
      *
      * @param  float  $value
      * @return $this
      */
     public function maxRatio($value)
     {
-        $this->constraints['max_ratio'] = $value;
+        $this->maxRatio = $value;
 
         return $this;
     }
 
     /**
-     * Set the aspect ratio range.
+     * Set the aspect ratio range constraint.
      *
      * @param  float  $min
      * @param  float  $max
@@ -247,14 +277,14 @@ class Dimensions implements Rule, DataAwareRule, ValidatorAwareRule
      */
     public function ratioBetween($min, $max)
     {
-        $this->constraints['min_ratio'] = $min;
-        $this->constraints['max_ratio'] = $max;
+        $this->minRatio = $min;
+        $this->maxRatio = $max;
 
         return $this;
     }
 
     /**
-     * Convert the rule to a validation string.
+     * Build the array of underlying validation rules based on the current state.
      *
      * @return string
      */
