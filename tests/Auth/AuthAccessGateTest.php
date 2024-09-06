@@ -12,6 +12,8 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
+include_once 'Enums.php';
+
 class AuthAccessGateTest extends TestCase
 {
     public function testBasicClosuresCanBeDefined()
@@ -1540,10 +1542,4 @@ class AccessGateTestPolicyThrowingAuthorizationException
     {
         throw new AuthorizationException('Not allowed.', 'some_code');
     }
-}
-
-enum AbilitiesEnum: string
-{
-    case VIEW_DASHBOARD = 'view-dashboard';
-    case UPDATE = 'update';
 }
