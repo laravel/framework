@@ -1056,7 +1056,6 @@ if (! function_exists('when')) {
      * @param  string  $output,
      * @param  bool  $escape
      * @return void
-     *
      */
     function when($condition, $output, $escape = false)
     {
