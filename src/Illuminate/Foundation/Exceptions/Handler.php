@@ -633,12 +633,12 @@ class Handler implements ExceptionHandlerContract
             $e instanceof BackedEnumCaseNotFoundException => new NotFoundHttpException($e->getMessage(), $e),
             $e instanceof ModelNotFoundException => new NotFoundHttpException($e->getMessage(), $e),
             $e instanceof AuthorizationException && $e->hasStatus() => new HttpException(
-                $e->status(), $e->response()?->message() ?: (Response::$statusTexts[$e->status()] ?? 'Whoops, looks like something went wrong.'), $e
+                $e->status(), $e->response()?->message() ?: (Response::$statusTexts[$e->status()] ?? __('Whoops, looks like something went wrong.')), $e
             ),
             $e instanceof AuthorizationException && ! $e->hasStatus() => new AccessDeniedHttpException($e->getMessage(), $e),
             $e instanceof TokenMismatchException => new HttpException(419, $e->getMessage(), $e),
-            $e instanceof RequestExceptionInterface => new BadRequestHttpException('Bad request.', $e),
-            $e instanceof RecordsNotFoundException => new NotFoundHttpException('Not found.', $e),
+            $e instanceof RequestExceptionInterface => new BadRequestHttpException(__('Bad request.'), $e),
+            $e instanceof RecordsNotFoundException => new NotFoundHttpException(__('Not found.'), $e),
             default => $e,
         };
     }
@@ -989,7 +989,7 @@ class Handler implements ExceptionHandlerContract
             'line' => $e->getLine(),
             'trace' => collect($e->getTrace())->map(fn ($trace) => Arr::except($trace, ['args']))->all(),
         ] : [
-            'message' => $this->isHttpException($e) ? $e->getMessage() : 'Server Error',
+            'message' => $this->isHttpException($e) ? $e->getMessage() : __('Server Error'),
         ];
     }
 
