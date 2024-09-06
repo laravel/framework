@@ -2,6 +2,7 @@
 
 namespace Illuminate\Auth\Access;
 
+use BackedEnum;
 use Closure;
 use Exception;
 use Illuminate\Auth\Access\Events\GateEvaluated;
@@ -191,7 +192,7 @@ class Gate implements GateContract
     /**
      * Define a new ability.
      *
-     * @param  string  $ability
+     * @param  \BackedEnum|string  $ability
      * @param  callable|array|string  $callback
      * @return $this
      *
@@ -199,6 +200,8 @@ class Gate implements GateContract
      */
     public function define($ability, $callback)
     {
+        $ability = $ability instanceof BackedEnum ? $ability->value : $ability;
+
         if (is_array($callback) && isset($callback[0]) && is_string($callback[0])) {
             $callback = $callback[0].'@'.$callback[1];
         }
