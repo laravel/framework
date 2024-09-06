@@ -19,6 +19,8 @@ use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
+include_once 'Enums.php';
+
 class AuthorizeMiddlewareTest extends TestCase
 {
     protected $container;
@@ -350,9 +352,4 @@ class AuthorizeMiddlewareTest extends TestCase
     {
         return $this->container->make(GateContract::class);
     }
-}
-
-enum AbilitiesEnum: string
-{
-    case VIEW_DASHBOARD = 'view-dashboard';
 }
