@@ -326,6 +326,40 @@ class AuthAccessGateTest extends TestCase
         $this->assertTrue($gate->denies('deny'));
     }
 
+    public function testCanDefineGatesUsingBackedEnum()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->define(AbilitiesEnum::VIEW_DASHBOARD, function ($user) {
+            return true;
+        });
+
+        $this->assertTrue($gate->allows('view-dashboard'));
+    }
+
+    public function testBackedEnumInAllows()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->define(AbilitiesEnum::VIEW_DASHBOARD, function ($user) {
+            return true;
+        });
+
+        $this->assertTrue($gate->allows(AbilitiesEnum::VIEW_DASHBOARD));
+    }
+
+
+    public function testBackedEnumInDenies()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->define(AbilitiesEnum::VIEW_DASHBOARD, function ($user) {
+            return false;
+        });
+
+        $this->assertTrue($gate->denies(AbilitiesEnum::VIEW_DASHBOARD));
+    }
+
     public function testArrayAbilitiesInAllows()
     {
         $gate = $this->getBasicGate();
@@ -336,12 +370,15 @@ class AuthAccessGateTest extends TestCase
         $gate->define('allow_2', function ($user) {
             return true;
         });
+        $gate->define(AbilitiesEnum::VIEW_DASHBOARD, function ($user) {
+            return true;
+        });
         $gate->define('deny', function ($user) {
             return false;
         });
 
         $this->assertTrue($gate->allows(['allow_1']));
-        $this->assertTrue($gate->allows(['allow_1', 'allow_2']));
+        $this->assertTrue($gate->allows(['allow_1', 'allow_2', AbilitiesEnum::VIEW_DASHBOARD]));
         $this->assertFalse($gate->allows(['allow_1', 'allow_2', 'deny']));
         $this->assertFalse($gate->allows(['deny', 'allow_1', 'allow_2']));
     }
@@ -356,12 +393,15 @@ class AuthAccessGateTest extends TestCase
         $gate->define('deny_2', function ($user) {
             return false;
         });
+        $gate->define(AbilitiesEnum::VIEW_DASHBOARD, function ($user) {
+            return false;
+        });
         $gate->define('allow', function ($user) {
             return true;
         });
 
         $this->assertTrue($gate->denies(['deny_1']));
-        $this->assertTrue($gate->denies(['deny_1', 'deny_2']));
+        $this->assertTrue($gate->denies(['deny_1', 'deny_2', AbilitiesEnum::VIEW_DASHBOARD]));
         $this->assertTrue($gate->denies(['deny_1', 'allow']));
         $this->assertTrue($gate->denies(['allow', 'deny_1']));
         $this->assertFalse($gate->denies(['allow']));
@@ -1075,6 +1115,34 @@ class AuthAccessGateTest extends TestCase
         $this->assertFalse($gate->check(['edit', 'update'], new AccessGateTestDummy));
     }
 
+    public function testAnyAbilitiesCheckUsingBackedEnum()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicyWithAllPermissions::class);
+
+        $this->assertTrue($gate->any(['edit', AbilitiesEnum::UPDATE], new AccessGateTestDummy));
+    }
+
+    public function testNoneAbilitiesCheckUsingBackedEnum()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicyWithNoPermissions::class);
+
+        $this->assertTrue($gate->none(['edit', AbilitiesEnum::UPDATE], new AccessGateTestDummy));
+    }
+
+    public function testAbilitiesCheckUsingBackedEnum()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicyWithAllPermissions::class);
+
+        $this->assertTrue($gate->check(['edit', AbilitiesEnum::UPDATE], new AccessGateTestDummy));
+    }
+
+
     /**
      * @param  array  $abilitiesToSet
      * @param  array|string  $abilitiesToCheck
@@ -1474,4 +1542,9 @@ class AccessGateTestPolicyThrowingAuthorizationException
     {
         throw new AuthorizationException('Not allowed.', 'some_code');
     }
+}
+
+enum AbilitiesEnum: string {
+    case VIEW_DASHBOARD = 'view-dashboard';
+    case UPDATE = 'update';
 }
