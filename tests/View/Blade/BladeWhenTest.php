@@ -14,7 +14,7 @@ class BladeWhenTest extends AbstractBladeTestCase
     public function testWhenStatementCompiledEmpty()
     {
         $string = '<span @when()></span>';
-        $expected = "<span <?php when(); ?>></span>";
+        $expected = '<span <?php when(); ?>></span>';
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
