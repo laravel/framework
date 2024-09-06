@@ -811,6 +811,175 @@ trait ReplacesAttributes
         return $message;
     }
 
+
+    /**
+     * Replace placeholder for the width constraint on the dimensions rule
+     *
+     * @param  string $message
+     * @param  string $attribute
+     * @param  string $rule
+     * @param  array<int, string>$parameters
+     * @return string
+     */
+    protected function replaceWidth($message, $attribute, $rule, $parameters)
+    {
+        return str_replace(':width', $parameters[0], $message);
+    }
+
+    /**
+     * Replace placeholder for the minimum width constraint on the dimensions rule
+     *
+     * @param  string $message
+     * @param  string $attribute
+     * @param  string $rule
+     * @param  array<int, string>$parameters
+     * @return string
+     */
+    protected function replaceMinWidth($message, $attribute, $rule, $parameters)
+    {
+        return str_replace(':min_width', $parameters[0], $message);
+    }
+
+    /**
+     * Replace placeholder for the maximum width constraint on the dimensions rule
+     *
+     * @param  string $message
+     * @param  string $attribute
+     * @param  string $rule
+     * @param  array<int, string>$parameters
+     * @return string
+     */
+    protected function replaceMaxWidth($message, $attribute, $rule, $parameters)
+    {
+        return str_replace(':max_width', $parameters[0], $message);
+    }
+
+    /**
+     * Replace placeholders for the width between constraint on the dimensions rule
+     *
+     * @param  string $message
+     * @param  string $attribute
+     * @param  string $rule
+     * @param  array<int, string>$parameters
+     * @return string
+     */
+    protected function replaceWidthBetween($message, $attribute, $rule, $parameters)
+    {
+        return str_replace([':min_width', ':max_width'], $parameters, $message);
+    }
+
+    /**
+     * Replace placeholder for the height constraint on the dimensions rule
+     *
+     * @param  string $message
+     * @param  string $attribute
+     * @param  string $rule
+     * @param  array<int, string>$parameters
+     * @return string
+     */
+    protected function replaceHeight($message, $attribute, $rule, $parameters)
+    {
+        return str_replace(':height', $parameters[0], $message);
+    }
+
+    /**
+     * Replace placeholder for the width between constraint on the dimensions rule
+     *
+     * @param  string $message
+     * @param  string $attribute
+     * @param  string $rule
+     * @param  array<int, string>$parameters
+     * @return string
+     */
+    protected function replaceMinHeight($message, $attribute, $rule, $parameters)
+    {
+        return str_replace(':min_height', $parameters[0], $message);
+    }
+
+    /**
+     * Replace placeholder for the maximum height constraint on the dimensions rule
+     *
+     * @param  string $message
+     * @param  string $attribute
+     * @param  string $rule
+     * @param  array<int, string>$parameters
+     * @return string
+     */
+    protected function replaceMaxHeight($message, $attribute, $rule, $parameters)
+    {
+        return str_replace(':max_height', $parameters[0], $message);
+    }
+
+    /**
+     * Replace placeholders for the height between constraint on the dimensions rule
+     *
+     * @param  string $message
+     * @param  string $attribute
+     * @param  string $rule
+     * @param  array<int, string>$parameters
+     * @return string
+     */
+    protected function replaceHeightBetween($message, $attribute, $rule, $parameters)
+    {
+        return str_replace([':min_height', ':max_height'], $parameters, $message);
+    }
+
+    /**
+     * Replace placeholder for the ratio constraint on the dimensions rule
+     *
+     * @param  string $message
+     * @param  string $attribute
+     * @param  string $rule
+     * @param  array<int, string>$parameters
+     * @return string
+     */
+    protected function replaceRatio($message, $attribute, $rule, $parameters)
+    {
+        return str_replace(':ratio', $parameters[0], $message);
+    }
+
+    /**
+     * Replace placeholder for the minimum ratio constraint on the dimensions rule
+     *
+     * @param  string $message
+     * @param  string $attribute
+     * @param  string $rule
+     * @param  array<int, string>$parameters
+     * @return string
+     */
+    protected function replaceMinRatio($message, $attribute, $rule, $parameters)
+    {
+        return str_replace(':min_ratio', $parameters[0], $message);
+    }
+
+    /**
+     * Replace placeholder for the maximum ratio constraint on the dimensions rule
+     *
+     * @param  string $message
+     * @param  string $attribute
+     * @param  string $rule
+     * @param  array<int, string>$parameters
+     * @return string
+     */
+    protected function replaceMaxRatio($message, $attribute, $rule, $parameters)
+    {
+        return str_replace(':max_ratio', $parameters[0], $message);
+    }
+
+    /**
+     * Replace placeholders for the ratio between constraint on the dimensions rule
+     *
+     * @param  string $message
+     * @param  string $attribute
+     * @param  string $rule
+     * @param  array<int, string>$parameters
+     * @return string
+     */
+    protected function replaceRatioBetween($message, $attribute, $rule, $parameters)
+    {
+        return str_replace([':min_ratio', ':max_ratio'], $parameters, $message);
+    }
+
     /**
      * Replace all place-holders for the ends_with rule.
      *
