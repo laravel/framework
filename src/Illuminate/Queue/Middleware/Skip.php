@@ -15,11 +15,9 @@ class Skip
      *
      * @param  bool|Closure(): bool  $condition
      */
-    public static function if(bool|Closure $condition): self
+    public static function when(Closure|bool $condition): self
     {
-        $condition = $condition instanceof Closure ? $condition() : $condition;
-
-        return new self($condition);
+        return new self(value($condition));
     }
 
     /**
@@ -27,13 +25,14 @@ class Skip
      *
      * @param  bool|Closure(): bool  $condition
      */
-    public static function unless(bool|Closure $condition): self
+    public static function unless(Closure|bool $condition): self
     {
-        $condition = $condition instanceof Closure ? $condition() : $condition;
-
-        return new self(! $condition);
+        return new self(! value($condition));
     }
 
+    /**
+     * Handle the job.
+     */
     public function handle(mixed $job, callable $next): mixed
     {
         if ($this->skip) {

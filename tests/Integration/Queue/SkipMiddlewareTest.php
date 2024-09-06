@@ -127,6 +127,6 @@ class SkipTestJob
             return [Skip::unless($skip)];
         }
 
-        return [Skip::if($skip)];
+        return [Skip::when($skip)];
     }
 }
