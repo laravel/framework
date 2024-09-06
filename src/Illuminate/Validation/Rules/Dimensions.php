@@ -2,19 +2,107 @@
 
 namespace Illuminate\Validation\Rules;
 
+use Illuminate\Contracts\Validation\DataAwareRule;
+use Illuminate\Contracts\Validation\Rule;
+use Illuminate\Contracts\Validation\ValidatorAwareRule;
 use Illuminate\Support\Traits\Conditionable;
 use Stringable;
+use Illuminate\Support\Traits\Macroable;
 
-class Dimensions implements Stringable
+class Dimensions implements Rule, DataAwareRule, ValidatorAwareRule
 {
-    use Conditionable;
+    use Conditionable, Macroable;
 
     /**
-     * The constraints for the dimensions rule.
+     * The width constraint in pixels.
+     *
+     * @var null|int
+     */
+    protected $width = null;
+
+    /**
+     * The minimum size in pixels that the image can be.
+     *
+     * @var null|int
+     */
+    protected $minWidth = null;
+
+    /**
+     * The maximum size in pixels that the image can be.
+     *
+     * @var null|int
+     */
+    protected $maxWidth = null;
+
+    /**
+     * The height constraint in pixels.
+     *
+     * @var null|int
+     */
+    protected $height = null;
+
+    /**
+     * The minimum size in pixels that the image can be.
+     *
+     * @var null|int
+     */
+    protected $minHeight = null;
+
+    /**
+     * The maximum size in pixels that the image can be.
+     *
+     * @var null|int
+     */
+    protected $maxHeight = null;
+
+    /**
+     * The ratio constraint.
+     *
+     * @var null|float
+     */
+    protected $ratio = null;
+
+    /**
+     * The minimum aspect ratio constraint.
+     *
+     * @var null|float
+     */
+    protected $minRatio = null;
+
+    /**
+     * The maximum aspect ratio constraint.
+     *
+     * @var null|float
+     */
+    protected $maxRatio = null;
+
+    /**
+     * The error message after validation, if any.
      *
      * @var array
      */
-    protected $constraints = [];
+    protected $messages = [];
+
+    /**
+     * The data under validation.
+     *
+     * @var array
+     */
+    protected $data;
+
+    /**
+     * The validator performing the validation.
+     *
+     * @var \Illuminate\Validation\Validator
+     */
+    protected $validator;
+
+    /**
+     * The callback that will generate the "default" version of the dimensions rule.
+     *
+     * @var string|array|callable|null
+     */
+    public static $defaultCallback;
 
     /**
      * Create a new dimensions rule instance.
