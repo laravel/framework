@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
+use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -76,5 +77,37 @@ class DatabaseSchemaBuilderTest extends TestCase
         $indexes = array_column($connection->getSchemaBuilder()->getIndexes('table1'), 'name');
 
         $this->assertContains('example_table1_name_index', $indexes);
+    }
+
+    public function testAlterTableAddForeignKeyWithPrefix()
+    {
+        $schema = Schema::connection('sqlite-with-prefix');
+
+        $schema->create('table1', function (Blueprint $table) {
+            $table->id();
+        });
+
+        $schema->create('table2', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('author_id')->constrained('table1');
+        });
+
+        $schema->table('table2', function (Blueprint $table) {
+            $table->foreignId('moderator_id')->constrained('table1');
+        });
+
+        $foreignKeys = collect($schema->getForeignKeys('table2'));
+
+        $this->assertTrue($foreignKeys->contains(fn ($fk) =>
+            $fk['foreign_table'] === 'example_table1' &&
+            $fk['foreign_columns'] === ['id'] &&
+            $fk['columns'] === ['author_id'])
+        );
+
+        $this->assertTrue($foreignKeys->contains(fn ($fk) =>
+            $fk['foreign_table'] === 'example_table1' &&
+            $fk['foreign_columns'] === ['id'] &&
+            $fk['columns'] === ['moderator_id'])
+        );
     }
 }
