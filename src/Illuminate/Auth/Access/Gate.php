@@ -323,7 +323,7 @@ class Gate implements GateContract
     /**
      * Determine if all of the given abilities should be granted for the current user.
      *
-     * @param  iterable|string  $ability
+     * @param  iterable|\BackedEnum|string  $ability
      * @param  array|mixed  $arguments
      * @return bool
      */
@@ -335,7 +335,7 @@ class Gate implements GateContract
     /**
      * Determine if any of the given abilities should be denied for the current user.
      *
-     * @param  iterable|string  $ability
+     * @param  iterable|\BackedEnum|string  $ability
      * @param  array|mixed  $arguments
      * @return bool
      */
@@ -347,7 +347,7 @@ class Gate implements GateContract
     /**
      * Determine if all of the given abilities should be granted for the current user.
      *
-     * @param  iterable|string  $abilities
+     * @param  iterable|\BackedEnum|string  $abilities
      * @param  array|mixed  $arguments
      * @return bool
      */
@@ -361,7 +361,7 @@ class Gate implements GateContract
     /**
      * Determine if any one of the given abilities should be granted for the current user.
      *
-     * @param  iterable|string  $abilities
+     * @param  iterable|\BackedEnum|string  $abilities
      * @param  array|mixed  $arguments
      * @return bool
      */
@@ -373,7 +373,7 @@ class Gate implements GateContract
     /**
      * Determine if all of the given abilities should be denied for the current user.
      *
-     * @param  iterable|string  $abilities
+     * @param  iterable|\BackedEnum|string  $abilities
      * @param  array|mixed  $arguments
      * @return bool
      */
@@ -385,7 +385,7 @@ class Gate implements GateContract
     /**
      * Determine if the given ability should be granted for the current user.
      *
-     * @param  string  $ability
+     * @param  \BackedEnum|string  $ability
      * @param  array|mixed  $arguments
      * @return \Illuminate\Auth\Access\Response
      *
@@ -399,12 +399,14 @@ class Gate implements GateContract
     /**
      * Inspect the user for the given ability.
      *
-     * @param  string  $ability
+     * @param  \BackedEnum|string  $ability
      * @param  array|mixed  $arguments
      * @return \Illuminate\Auth\Access\Response
      */
     public function inspect($ability, $arguments = [])
     {
+        $ability = $ability instanceof BackedEnum ? $ability->value : $ability;
+
         try {
             $result = $this->raw($ability, $arguments);
 
