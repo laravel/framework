@@ -711,11 +711,239 @@ trait ValidatesAttributes
     }
 
     /**
-     * Validate the dimensions of an image matches the given values.
+     * Validate the pixel width of an image is equal to a given size.
      *
      * @param  string  $attribute
      * @param  mixed  $value
      * @param  array<int, int|string>  $parameters
+     * @return bool
+     */
+    public function validateWidth($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(1, $parameters, 'width');
+
+        return $this->validateDimensions(
+            $attribute,
+            $value,
+            ['width' => (int)$parameters[0]]
+        );
+    }
+
+    /**
+     * Validate the pixel width of an image is greater than a given size.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<string, int|string>  $parameters
+     * @return bool
+     */
+    public function validateMinWidth($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(1, $parameters, 'min_width');
+
+        return $this->validateDimensions(
+            $attribute,
+            $value,
+            ['min_width' => (int)$parameters[0]]
+        );
+    }
+
+    /**
+     * Validate the pixel width of an image is less than a given size.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|string>  $parameters
+     * @return bool
+     */
+    public function validateMaxWidth($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(1, $parameters, 'max_width');
+
+        return $this->validateDimensions(
+            $attribute,
+            $value,
+            ['max_width' => (int)$parameters[0]]
+        );
+    }
+
+    /**
+     * Validate the pixel width of an image is between two values.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|string>  $parameters
+     * @return bool
+     */
+    public function validateWidthBetween($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(2, $parameters, 'width_between');
+
+        return $this->validateDimensions(
+            $attribute,
+            $value,
+            ['min_width' => (int)$parameters[0], 'max_width' => (int)$parameters[1]]
+        );
+    }
+
+    /**
+     * Validate the pixel height of an image is a given size.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|string>  $parameters
+     * @return bool
+     */
+    public function validateHeight($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(1, $parameters, 'height');
+
+        return $this->validateDimensions(
+            $attribute,
+            $value,
+            ['height' => intval($parameters[0])]
+        );
+    }
+
+    /**
+     * Validate the pixel height of an image is greater than a given size.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|string>  $parameters
+     * @return bool
+     */
+    public function validateMinHeight($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(1, $parameters, 'min_height');
+
+        return $this->validateDimensions(
+            $attribute,
+            $value,
+            ['min_height' => (int)$parameters[0]]
+        );
+    }
+
+    /**
+     * Validate the pixel height of an image is less than a given size.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|string>  $parameters
+     * @return bool
+     */
+    public function validateMaxHeight($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(1, $parameters, 'max_height');
+
+        return $this->validateDimensions(
+            $attribute,
+            $value,
+            ['max_height' => (int)$parameters[0]]
+        );
+    }
+
+    /**
+     * Validate the pixel height of an image is between a given size.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|string>  $parameters
+     * @return bool
+     */
+    public function validateHeightBetween($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(2, $parameters, 'height_between');
+
+        return $this->validateDimensions(
+            $attribute,
+            $value,
+            ['min_height' => (int)$parameters[0], 'max_height' => (int)$parameters[1]]
+        );
+    }
+
+    /**
+     * Validate the ratio of an image is equal to a given value.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|float|string>  $parameters
+     * @return bool
+     */
+    public function validateRatio($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(1, $parameters, 'ratio');
+
+        return $this->validateDimensions(
+            $attribute,
+            $value,
+            ['ratio' => (float)$parameters[0]]
+        );
+    }
+
+    /**
+     * Validate the ratio of an image is greater than a given value.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<string, int|float|string>  $parameters
+     * @return bool
+     */
+    public function validateMinRatio($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(1, $parameters, 'min_ratio');
+
+        return $this->validateDimensions(
+            $attribute,
+            $value,
+            ['min_ratio' => (float)$parameters[0]]
+        );
+    }
+
+    /**
+     * Validate the ratio of an image is less than a given value.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|float|string>  $parameters
+     * @return bool
+     */
+    public function validateMaxRatio($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(1, $parameters, 'max_ratio');
+
+        return $this->validateDimensions(
+            $attribute,
+            $value,
+            ['max_ratio' => (float)$parameters[0]]
+        );
+    }
+
+    /**
+     * Validate the ratio of an image is between two values.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|float|string>  $parameters
+     * @return bool
+     */
+    public function validateRatioBetween($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(2, $parameters, 'ratio_between');
+
+        return $this->validateDimensions(
+            $attribute,
+            $value,
+            ['min_ratio' => (float)$parameters[0], 'max_ratio' => (float)$parameters[1]]
+        );
+    }
+
+    /**
+     * Validate the dimensions of an image matches the given values.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|float|string>  $parameters
      * @return bool
      */
     public function validateDimensions($attribute, $value, $parameters)
@@ -736,43 +964,86 @@ trait ValidatesAttributes
             return false;
         }
 
-        $this->requireParameterCount(1, $parameters, 'dimensions');
-
         [$width, $height] = $dimensions;
 
-        $parameters = $this->parseNamedParameters($parameters);
+        // This is to correctly parse string representations for dimensions
+        // like so "dimensions:min_width=100,min_height=200"
+        if (! Arr::isAssoc($parameters)) {
+            $this->requireParameterCount(1, $parameters, 'dimensions');
+            $parameters = $this->parseStringParameters($parameters);
+        }
 
         return ! (
-            $this->failsBasicDimensionChecks($parameters, $width, $height) ||
-            $this->failsRatioCheck($parameters, $width, $height) ||
-            $this->failsMinRatioCheck($parameters, $width, $height) ||
-            $this->failsMaxRatioCheck($parameters, $width, $height)
+            $this->failsBasicDimensionChecks($parameters, $width, $height)
+            || $this->failsRatioCheck($parameters, $width, $height)
+            || $this->failsMinRatioCheck($parameters, $width, $height)
+            || $this->failsMaxRatioCheck($parameters, $width, $height)
         );
+    }
+
+    /**
+     * Parse the string value parameters for the Dimensions rule.
+     *
+     * @param  array<int, string>  $parameters
+     * @return array<string, int|float>
+     */
+    protected function parseStringParameters($parameters)
+    {
+        return array_reduce($parameters, function ($carry, $parameter) {
+            if (str_contains($parameter, '=')) {
+                [$key, $value] = explode('=', $parameter, 2);
+                $value = str_contains($key, 'ratio')
+                    ? $this->parseRatio($value)
+                    : (int)$value;
+
+                return Arr::add($carry, $key, $value);
+            }
+
+            return $carry;
+        }, []);
+    }
+
+    /**
+    * Parse the ratio values to floats
+    *
+    * @param  string  $ratio
+    * @return float
+    */
+    private function parseRatio($ratio)
+    {
+        if (str_contains($ratio, '/')) {
+            [$numerator, $denominator] = array_replace(
+                [1, 1], array_filter(sscanf($ratio, '%f/%d'))
+            );
+            return (float)($numerator / $denominator);
+        }
+
+        return (float)$ratio;
     }
 
     /**
      * Test if the given width and height fail any conditions.
      *
-     * @param  array<string,string>  $parameters
+     * @param  array<string, int>  $parameters
      * @param  int  $width
      * @param  int  $height
      * @return bool
      */
     protected function failsBasicDimensionChecks($parameters, $width, $height)
     {
-        return (isset($parameters['width']) && $parameters['width'] != $width) ||
-               (isset($parameters['min_width']) && $parameters['min_width'] > $width) ||
-               (isset($parameters['max_width']) && $parameters['max_width'] < $width) ||
-               (isset($parameters['height']) && $parameters['height'] != $height) ||
-               (isset($parameters['min_height']) && $parameters['min_height'] > $height) ||
-               (isset($parameters['max_height']) && $parameters['max_height'] < $height);
+        return (isset($parameters['width']) && $parameters['width'] !== $width) ||
+            (isset($parameters['min_width']) && $parameters['min_width'] > $width) ||
+            (isset($parameters['max_width']) && $parameters['max_width'] < $width) ||
+            (isset($parameters['height']) && $parameters['height'] !== $height) ||
+            (isset($parameters['min_height']) && $parameters['min_height'] > $height) ||
+            (isset($parameters['max_height']) && $parameters['max_height'] < $height);
     }
 
     /**
      * Determine if the given parameters fail a dimension ratio check.
      *
-     * @param  array<string,string>  $parameters
-     * @param  int  $width
+     * @param  array<string, float>  $parameters
+     * @param  int   $width
      * @param  int  $height
      * @return bool
      */
@@ -782,55 +1053,43 @@ trait ValidatesAttributes
             return false;
         }
 
-        [$numerator, $denominator] = array_replace(
-            [1, 1], array_filter(sscanf($parameters['ratio'], '%f/%d'))
-        );
-
         $precision = 1 / (max(($width + $height) / 2, $height) + 1);
 
-        return abs($numerator / $denominator - $width / $height) > $precision;
+        return abs($parameters['ratio'] - $width / $height) > $precision;
     }
 
     /**
      * Determine if the given parameters fail a dimension minimum ratio check.
      *
-     * @param  array<string,string>  $parameters
+     * @param  array<string, float>  $parameters
      * @param  int  $width
      * @param  int  $height
      * @return bool
      */
     private function failsMinRatioCheck($parameters, $width, $height)
     {
-        if (! isset($parameters['min_ratio'])) {
+        if (!isset($parameters['min_ratio'])) {
             return false;
         }
 
-        [$minNumerator, $minDenominator] = array_replace(
-            [1, 1], array_filter(sscanf($parameters['min_ratio'], '%f/%d'))
-        );
-
-        return ($width / $height) > ($minNumerator / $minDenominator);
+        return ($width / $height) > $parameters['min_ratio'];
     }
 
     /**
      * Determine if the given parameters fail a dimension maximum ratio check.
      *
-     * @param  array<string,string>  $parameters
+     * @param  array<string, float>  $parameters
      * @param  int  $width
      * @param  int  $height
      * @return bool
      */
     private function failsMaxRatioCheck($parameters, $width, $height)
     {
-        if (! isset($parameters['max_ratio'])) {
+        if (!isset($parameters['max_ratio'])) {
             return false;
         }
 
-        [$maxNumerator, $maxDenominator] = array_replace(
-            [1, 1], array_filter(sscanf($parameters['max_ratio'], '%f/%d'))
-        );
-
-        return ($width / $height) < ($maxNumerator / $maxDenominator);
+        return ($width / $height) < $parameters['max_ratio'];
     }
 
     /**
