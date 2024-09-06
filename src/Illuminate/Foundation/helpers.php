@@ -1057,8 +1057,6 @@ if (! function_exists('when')) {
      * @param  bool  $escape
      * @return void
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     function when($condition, $output, $escape = false)
     {
