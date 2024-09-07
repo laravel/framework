@@ -38,6 +38,13 @@ class Dimensions implements Rule, DataAwareRule, ValidatorAwareRule
     protected $maxWidth = null;
 
     /**
+     * The width between constraint.
+     *
+     * @var null|array
+     */
+    protected $widthBetween = null;
+
+    /**
      * The height constraint in pixels.
      *
      * @var null|int
@@ -59,6 +66,13 @@ class Dimensions implements Rule, DataAwareRule, ValidatorAwareRule
     protected $maxHeight = null;
 
     /**
+     * The height between constraint.
+     *
+     * @var null|array
+     */
+    protected $heightBetween = null;
+
+    /**
      * The ratio constraint.
      *
      * @var null|float
@@ -78,6 +92,13 @@ class Dimensions implements Rule, DataAwareRule, ValidatorAwareRule
      * @var null|float
      */
     protected $maxRatio = null;
+
+    /**
+     * The aspect ratio range constraint.
+     *
+     * @var null|array
+     */
+    protected $ratioBetween = null;
 
     /**
      * The error message after validation, if any.
@@ -187,8 +208,7 @@ class Dimensions implements Rule, DataAwareRule, ValidatorAwareRule
      */
     public function widthBetween($min, $max)
     {
-        $this->minWidth = $min;
-        $this->maxWidth = $max;
+        $this->widthBetween = [$min, $max];
 
         return $this;
     }
@@ -202,8 +222,7 @@ class Dimensions implements Rule, DataAwareRule, ValidatorAwareRule
      */
     public function heightBetween($min, $max)
     {
-        $this->minHeight = $min;
-        $this->maxHeight = $max;
+        $this->heightBetween = [$min, $max];
 
         return $this;
     }
@@ -256,8 +275,7 @@ class Dimensions implements Rule, DataAwareRule, ValidatorAwareRule
      */
     public function ratioBetween($min, $max)
     {
-        $this->minRatio = $min;
-        $this->maxRatio = $max;
+        $this->ratioBetween = [$min, $max];
 
         return $this;
     }
@@ -271,44 +289,29 @@ class Dimensions implements Rule, DataAwareRule, ValidatorAwareRule
     {
         $rules = [];
 
-        if ($this->width) {
-            $rules[] = "width:{$this->width}";
-        }
+        $rules[] = match (true) {
+            $this->width !== null => "width:{$this->width}",
+            $this->minWidth !== null => "min_width:{$this->minWidth}",
+            $this->maxWidth !== null => "max_width:{$this->maxWidth}",
+            $this->widthBetween !== null => "width_between:{$this->widthBetween[0]},{$this->widthBetween[1]}",
+            default => null,
+        };
 
-        if ($this->minWidth || $this->maxWidth) {
-            $rules[] = match (true) {
-                is_null($this->maxWidth) => "min_width:{$this->minWidth}",
-                is_null($this->minWidth) => "max_width:{$this->maxWidth}",
-                $this->minWidth !== $this->maxWidth => "width_between:{$this->minWidth},{$this->maxWidth}",
-                default => null,
-            };
-        }
+        $rules[] = match (true) {
+            $this->height !== null => "height:{$this->height}",
+            $this->minHeight !== null => "min_height:{$this->minHeight}",
+            $this->maxHeight !== null => "max_height:{$this->maxHeight}",
+            $this->heightBetween !== null => "height_between:{$this->heightBetween[0]},{$this->heightBetween[1]}",
+            default => null,
+        };
 
-        if ($this->height) {
-            $rules[] = "height:{$this->height}";
-        }
-
-        if ($this->minHeight || $this->maxHeight) {
-            $rules[] = match (true) {
-                is_null($this->maxHeight) => "min_height:{$this->minHeight}",
-                is_null($this->minHeight) => "max_height:{$this->maxHeight}",
-                $this->minHeight !== $this->maxHeight => "height_between:{$this->minHeight},{$this->maxHeight}",
-                default => null,
-            };
-        }
-
-        if ($this->ratio) {
-            $rules[] = "ratio:{$this->ratio}";
-        }
-
-        if ($this->minRatio || $this->maxRatio) {
-            $rules[] = match (true) {
-                is_null($this->maxRatio) => "min_ratio:{$this->minRatio}",
-                is_null($this->minRatio) => "max_ratio:{$this->maxRatio}",
-                $this->minRatio !== $this->maxRatio => "ratio_between:{$this->minRatio},{$this->maxRatio}",
-                default => null,
-            };
-        }
+        $rules[] = match (true) {
+            $this->ratio !== null => "ratio:{$this->ratio}",
+            $this->minRatio !== null => "min_ratio:{$this->minRatio}",
+            $this->maxRatio !== null => "max_ratio:{$this->maxRatio}",
+            $this->ratioBetween !== null  => "ratio_between:{$this->ratioBetween[0]},{$this->ratioBetween[1]}",
+            default => null,
+        };
 
         return array_filter($rules);
     }
