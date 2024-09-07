@@ -113,10 +113,12 @@ class AttachableTest extends TestCase
 
     public function testFromUrlMethod()
     {
-        $mailable = new class extends Mailable {
+        $mailable = new class extends Mailable
+        {
             public function build()
             {
-                $this->attach(new class implements Attachable {
+                $this->attach(new class implements Attachable
+                {
                     public function toMailAttachment()
                     {
                         return Attachment::fromUrl('https://example.com/file.pdf')
