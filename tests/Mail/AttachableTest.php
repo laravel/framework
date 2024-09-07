@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Mail;
 use Illuminate\Contracts\Mail\Attachable;
 use Illuminate\Mail\Attachment;
 use Illuminate\Mail\Mailable;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 class AttachableTest extends TestCase
@@ -108,5 +109,40 @@ class AttachableTest extends TestCase
             'text/css',
             99,
         ], $notification->dataArgs);
+    }
+
+    public function testFromUrlMethod()
+    {
+        $mailable = new class extends Mailable {
+            public function build()
+            {
+                $this->attach(new class implements Attachable {
+                    public function toMailAttachment()
+                    {
+                        return Attachment::fromUrl('https://example.com/file.pdf')
+                            ->as('example.pdf')
+                            ->withMime('application/pdf');
+                    }
+                });
+            }
+        };
+
+        $mailable->build();
+
+        $this->assertSame([
+            'file' => 'https://example.com/file.pdf',
+            'options' => [
+                'as' => 'example.pdf',
+                'mime' => 'application/pdf',
+            ],
+        ], $mailable->attachments[0]);
+    }
+
+    public function testFromUrlMethodWithInvalidUrl()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid URL provided.');
+
+        Attachment::fromUrl('/path/to/file');
     }
 }

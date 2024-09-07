@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Filesystem\Factory as FilesystemFactory;
 use Illuminate\Support\Traits\Macroable;
+use InvalidArgumentException;
 use RuntimeException;
 
 class Attachment
@@ -53,6 +54,23 @@ class Attachment
     public static function fromPath($path)
     {
         return new static(fn ($attachment, $pathStrategy) => $pathStrategy($path, $attachment));
+    }
+
+    /**
+     * Create a mail attachment from a URL.
+     *
+     * @param  string  $url
+     * @return static
+     *
+     * @throws InvalidArgumentException
+     */
+    public static function fromUrl($url)
+    {
+        if (filter_var($url, FILTER_VALIDATE_URL) === false) {
+            throw new InvalidArgumentException('Invalid URL provided.');
+        }
+
+        return static::fromPath($url);
     }
 
     /**
