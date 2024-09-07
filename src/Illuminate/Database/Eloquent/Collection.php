@@ -51,6 +51,37 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
+     * Find a model in the collection by key or throw an exception.
+     *
+     * @param  mixed  $key
+     * @return TModel
+     *
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     */
+    public function findOrFail($key)
+    {
+        $result = $this->find($key);
+
+        if (is_array($key) && count($result) === count(array_unique($key))) {
+            return $result;
+        } elseif (! is_array($key) && ! is_null($result)) {
+            return $result;
+        }
+
+        $exception = new ModelNotFoundException;
+
+        if (! $model = head($this->items)) {
+            throw $exception;
+        }
+
+        $ids = is_array($key) ? array_diff($key, $result->modelKeys()) : $key;
+
+        $exception->setModel(get_class($model), $ids);
+
+        throw $exception;
+    }
+
+    /**
      * Load a set of relationships onto the collection.
      *
      * @param  array<array-key, (callable(\Illuminate\Database\Eloquent\Builder<TModel>): mixed)|string>|string  $relations
