@@ -974,9 +974,11 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             return $this->newQueryWithoutRelationships()->{$method}($column, $amount, $extra);
         }
 
-        $this->{$column} = $this->isClassDeviable($column)
+        $value = $this->isClassDeviable($column)
             ? $this->deviateClassCastableAttribute($method, $column, $amount)
-            : $this->{$column} + ($method === 'increment' ? $amount : $amount * -1);
+            : $this->getRawOriginal($column) + ($method === 'increment' ? $amount : $amount * -1);
+
+        $this->setAttribute($column, $value);
 
         $this->forceFill($extra);
 
