@@ -412,16 +412,15 @@ class Repository implements ArrayAccess, CacheContract
      * @param  string  $key
      * @param  \Closure|\DateTimeInterface|\DateInterval|int|null  $ttl
      * @param  \Closure(): TCacheValue  $callback
+     * @param  bool  $fresh
      * @return TCacheValue
      */
-    public function remember($key, $ttl, Closure $callback)
+    public function remember($key, $ttl, Closure $callback, bool $fresh = false)
     {
-        $value = $this->get($key);
-
         // If the item exists in the cache we will just return this immediately and if
         // not we will execute the given Closure and cache the result of that for a
         // given number of seconds so it's available for all subsequent requests.
-        if (! is_null($value)) {
+        if (! $fresh && ! is_null($value = $this->get($key))) {
             return $value;
         }
 
