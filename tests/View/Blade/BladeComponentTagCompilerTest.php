@@ -115,6 +115,24 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 '@endComponentClass##END-COMPONENT-CLASS##</div>', trim($result));
     }
 
+    public function testNestedDefaultComponentParsing()
+    {
+        $container = new Container;
+        $container->instance(Application::class, $app = m::mock(Application::class));
+        $container->instance(Factory::class, $factory = m::mock(Factory::class));
+        $app->shouldReceive('getNamespace')->once()->andReturn('App\\');
+        Container::setInstance($container);
+
+        $result = $this->compiler()->compileTags('<div><x-card /></div>');
+
+        $this->assertSame("<div>##BEGIN-COMPONENT-CLASS##@component('App\View\Components\Card\Card', 'card', [])
+<?php if (isset(\$attributes) && \$attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php \$attributes = \$attributes->except(\App\View\Components\Card\Card::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php \$component->withAttributes([]); ?>\n".
+            "@endComponentClass##END-COMPONENT-CLASS##</div>", trim($result));
+    }
+
     public function testBasicComponentWithEmptyAttributesParsing()
     {
         $this->mockViewFactory();
@@ -853,5 +871,17 @@ class TestContainerComponent extends Component
     public function render()
     {
         return 'container';
+    }
+}
+
+namespace App\View\Components\Card;
+
+use Illuminate\View\Component;
+
+class Card extends Component
+{
+    public function render()
+    {
+        return 'card';
     }
 }
