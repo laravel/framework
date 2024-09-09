@@ -14,7 +14,7 @@
         }
     ],
     "require": {
-        "php": "^8.0.2",
+        "php": "^8.2",
         "illuminate/process": "^11.0",
         "laravel/serializable-closure": "^1.2.2"
     },

@@ -14,6 +14,7 @@ class ForkDriver
      */
     public function run(Closure|array $tasks): array
     {
+        /** @phpstan-ignore class.notFound */
         return Fork::new()->run(...Arr::wrap($tasks));
     }
 
