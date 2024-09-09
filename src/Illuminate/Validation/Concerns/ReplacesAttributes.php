@@ -812,12 +812,12 @@ trait ReplacesAttributes
     }
 
     /**
-     * Replace placeholder for the width constraint on the dimensions rule
+     * Replace placeholder for the width constraint on the dimensions rule.
      *
      * @param  string  $message
      * @param  string  $attribute
      * @param  string  $rule
-     * @param  array<int, string> $parameters
+     * @param  array<int, string>  $parameters
      * @return string
      */
     protected function replaceWidth($message, $attribute, $rule, $parameters)
@@ -826,7 +826,7 @@ trait ReplacesAttributes
     }
 
     /**
-     * Replace placeholder for the minimum width constraint on the dimensions rule
+     * Replace placeholder for the width constraint on the dimensions rule.
      *
      * @param  string  $message
      * @param  string  $attribute
@@ -840,12 +840,12 @@ trait ReplacesAttributes
     }
 
     /**
-     * Replace placeholder for the maximum width constraint on the dimensions rule
+     * Replace placeholder for the maximum width constraint on the dimensions rule.
      *
      * @param  string  $message
      * @param  string  $attribute
      * @param  string  $rule
-     * @param  array<int, string>   $parameters
+     * @param  array<int, string>  $parameters
      * @return string
      */
     protected function replaceMaxWidth($message, $attribute, $rule, $parameters)
@@ -854,7 +854,7 @@ trait ReplacesAttributes
     }
 
     /**
-     * Replace placeholders for the width between constraint on the dimensions rule
+     * Replace placeholders for the width between constraint on the dimensions rule.
      *
      * @param  string  $message
      * @param  string  $attribute
@@ -868,7 +868,7 @@ trait ReplacesAttributes
     }
 
     /**
-     * Replace placeholder for the height constraint on the dimensions rule
+     * Replace placeholder for the height constraint on the dimensions rule.
      *
      * @param  string  $message
      * @param  string  $attribute
@@ -882,7 +882,7 @@ trait ReplacesAttributes
     }
 
     /**
-     * Replace placeholder for the width between constraint on the dimensions rule
+     * Replace placeholder for the min height constraint on the dimensions rule.
      *
      * @param  string  $message
      * @param  string  $attribute
@@ -896,12 +896,12 @@ trait ReplacesAttributes
     }
 
     /**
-     * Replace placeholder for the maximum height constraint on the dimensions rule
+     * Replace placeholder for the maximum height constraint on the dimensions rule.
      *
      * @param  string  $message
      * @param  string  $attribute
      * @param  string  $rule
-     * @param  array<int, string> $parameters
+     * @param  array<int, string>  $parameters
      * @return string
      */
     protected function replaceMaxHeight($message, $attribute, $rule, $parameters)
@@ -910,12 +910,12 @@ trait ReplacesAttributes
     }
 
     /**
-     * Replace placeholders for the height between constraint on the dimensions rule
+     * Replace placeholders for the height between constraint on the dimensions rule.
      *
-     * @param  string $message
-     * @param  string $attribute
-     * @param  string $rule
-     * @param  array<int, string>$parameters
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array<int, string>  $parameters
      * @return string
      */
     protected function replaceHeightBetween($message, $attribute, $rule, $parameters)
@@ -924,21 +924,21 @@ trait ReplacesAttributes
     }
 
     /**
-     * Replace placeholder for the ratio constraint on the dimensions rule
+     * Replace placeholder for the ratio constraint on the dimensions rule.
      *
      * @param  string  $message
      * @param  string  $attribute
      * @param  string  $rule
-     * @param  array<int, string> $parameters
+     * @param  array<int, string>  $parameters
      * @return string
      */
     protected function replaceRatio($message, $attribute, $rule, $parameters)
-    {;
+    {
         return str_replace(':value', round($parameters[0], 3), $message);
     }
 
     /**
-     * Replace placeholder for the minimum ratio constraint on the dimensions rule
+     * Replace placeholder for the minimum ratio constraint on the dimensions rule.
      *
      * @param  string  $message
      * @param  string  $attribute
@@ -952,7 +952,7 @@ trait ReplacesAttributes
     }
 
     /**
-     * Replace placeholder for the maximum ratio constraint on the dimensions rule
+     * Replace placeholder for the maximum ratio constraint on the dimensions rule.
      *
      * @param  string  $message
      * @param  string  $attribute
@@ -966,7 +966,7 @@ trait ReplacesAttributes
     }
 
     /**
-     * Replace placeholders for the ratio between constraint on the dimensions rule
+     * Replace placeholders for the ratio between constraint on the dimensions rule.
      *
      * @param  string  $message
      * @param  string  $attribute
