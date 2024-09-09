@@ -2,11 +2,20 @@
 
 namespace Illuminate\Tests\Integration\Console;
 
-use Illuminate\Support\Facades\Concurrency;
-use Illuminate\Support\Facades\Route;
 use Orchestra\Testbench\Attributes\UsesVendor;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
+
+#[UsesVendor]
+#[RequiresOperatingSystem('Linux|DAR')]
+class ConcurrencyTest extends TestCase
+{
+    protected function setUp(): void
+    {
+        $this->defineStashRoutes(<<<PHP
+<?php
+use Illuminate\Support\Facades\Concurrency;
+use Illuminate\Support\Facades\Route;
 
 Route::any('/concurrency', function () {
     return Concurrency::run([
