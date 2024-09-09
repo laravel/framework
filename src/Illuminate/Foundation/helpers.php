@@ -1052,15 +1052,15 @@ if (! function_exists('when')) {
     /**
      * Output a value if the given condition is true.
      *
-     * @param  bool  $condition
-     * @param  string  $output,
-     * @param  bool  $escape
-     * @return void
+     * @param bool $condition
+     * @param string $output ,
+     * @return string|null
      */
-    function when($condition, $output, $escape = true)
+    function when(bool $condition, $output): ?string
     {
         if ($condition) {
-            return $escape ? e($output) : $output;
+            return $output;
         }
+        return null;
     }
 }

@@ -100,6 +100,14 @@ class SupportHelpersTest extends TestCase
         $this->assertSame('..', class_basename('\Foo\Bar\Baz\\..\\'));
     }
 
+    public function testWhen()
+    {
+        $this->assertEquals('Hello', when(true, 'Hello'));
+        $this->assertEquals(null, when(false, 'Hello'));
+        $this->assertEquals('There', when(1==1, 'There'));
+        $this->assertEquals(null, when(1==2, 'There'));
+    }
+
     public function testFilled()
     {
         $this->assertFalse(filled(null));
