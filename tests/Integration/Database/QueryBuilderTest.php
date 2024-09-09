@@ -9,6 +9,9 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Testing\Assert as PHPUnit;
+use Orchestra\Testbench\Attributes\DefineEnvironment;
+use PDOException;
 
 class QueryBuilderTest extends DatabaseTestCase
 {
@@ -305,10 +308,50 @@ class QueryBuilderTest extends DatabaseTestCase
         $this->assertSame(1, DB::table('posts')->whereDate('created_at', new Carbon('2018-01-02'))->count());
     }
 
+    #[DefineEnvironment('defineEnvironmentWouldThrowsPDOException')]
+    public function testWhereDateWithInvalidOperator()
+    {
+        $sql = DB::table('posts')->whereDate('created_at', '? OR 1=1', '2018-01-02');
+
+        PHPUnit::assertArraySubset([
+            [
+                'column' => 'created_at',
+                'type' => 'Date',
+                'value' => '? OR 1=1',
+                'boolean' => 'and',
+            ],
+        ], $sql->wheres);
+
+        $this->assertSame(0, $sql->count());
+    }
+
     public function testOrWhereDate()
     {
         $this->assertSame(2, DB::table('posts')->where('id', 1)->orWhereDate('created_at', '2018-01-02')->count());
         $this->assertSame(2, DB::table('posts')->where('id', 1)->orWhereDate('created_at', new Carbon('2018-01-02'))->count());
+    }
+
+    #[DefineEnvironment('defineEnvironmentWouldThrowsPDOException')]
+    public function testOrWhereDateWithInvalidOperator()
+    {
+        $sql = DB::table('posts')->where('id', 1)->orWhereDate('created_at', '? OR 1=1', '2018-01-02');
+
+        PHPUnit::assertArraySubset([
+            [
+                'column' => 'id',
+                'type' => 'Basic',
+                'value' => 1,
+                'boolean' => 'and',
+            ],
+            [
+                'column' => 'created_at',
+                'type' => 'Date',
+                'value' => '? OR 1=1',
+                'boolean' => 'or',
+            ],
+        ], $sql->wheres);
+
+        $this->assertSame(1, $sql->count());
     }
 
     public function testWhereDay()
@@ -318,11 +361,49 @@ class QueryBuilderTest extends DatabaseTestCase
         $this->assertSame(1, DB::table('posts')->whereDay('created_at', new Carbon('2018-01-02'))->count());
     }
 
+    public function testWhereDayWithInvalidOperator()
+    {
+        $sql = DB::table('posts')->whereDay('created_at', '? OR 1=1', '02');
+
+        PHPUnit::assertArraySubset([
+            [
+                'column' => 'created_at',
+                'type' => 'Day',
+                'value' => '00',
+                'boolean' => 'and',
+            ],
+        ], $sql->wheres);
+
+        $this->assertSame(0, $sql->count());
+    }
+
     public function testOrWhereDay()
     {
         $this->assertSame(2, DB::table('posts')->where('id', 1)->orWhereDay('created_at', '02')->count());
         $this->assertSame(2, DB::table('posts')->where('id', 1)->orWhereDay('created_at', 2)->count());
         $this->assertSame(2, DB::table('posts')->where('id', 1)->orWhereDay('created_at', new Carbon('2018-01-02'))->count());
+    }
+
+    public function testOrWhereDayWithInvalidOperator()
+    {
+        $sql = DB::table('posts')->where('id', 1)->orWhereDay('created_at', '? OR 1=1', '02');
+
+        PHPUnit::assertArraySubset([
+            [
+                'column' => 'id',
+                'type' => 'Basic',
+                'value' => 1,
+                'boolean' => 'and',
+            ],
+            [
+                'column' => 'created_at',
+                'type' => 'Day',
+                'value' => '00',
+                'boolean' => 'or',
+            ],
+        ], $sql->wheres);
+
+        $this->assertSame(1, $sql->count());
     }
 
     public function testWhereMonth()
@@ -332,11 +413,49 @@ class QueryBuilderTest extends DatabaseTestCase
         $this->assertSame(1, DB::table('posts')->whereMonth('created_at', new Carbon('2018-01-02'))->count());
     }
 
+    public function testWhereMonthWithInvalidOperator()
+    {
+        $sql = DB::table('posts')->whereMonth('created_at', '? OR 1=1', '01');
+
+        PHPUnit::assertArraySubset([
+            [
+                'column' => 'created_at',
+                'type' => 'Month',
+                'value' => '00',
+                'boolean' => 'and',
+            ],
+        ], $sql->wheres);
+
+        $this->assertSame(0, $sql->count());
+    }
+
     public function testOrWhereMonth()
     {
         $this->assertSame(2, DB::table('posts')->where('id', 1)->orWhereMonth('created_at', '01')->count());
         $this->assertSame(2, DB::table('posts')->where('id', 1)->orWhereMonth('created_at', 1)->count());
         $this->assertSame(2, DB::table('posts')->where('id', 1)->orWhereMonth('created_at', new Carbon('2018-01-02'))->count());
+    }
+
+    public function testOrWhereMonthWithInvalidOperator()
+    {
+        $sql = DB::table('posts')->where('id', 1)->orWhereMonth('created_at', '? OR 1=1', '01');
+
+        PHPUnit::assertArraySubset([
+            [
+                'column' => 'id',
+                'type' => 'Basic',
+                'value' => 1,
+                'boolean' => 'and',
+            ],
+            [
+                'column' => 'created_at',
+                'type' => 'Month',
+                'value' => '00',
+                'boolean' => 'or',
+            ],
+        ], $sql->wheres);
+
+        $this->assertSame(1, $sql->count());
     }
 
     public function testWhereYear()
@@ -346,11 +465,51 @@ class QueryBuilderTest extends DatabaseTestCase
         $this->assertSame(1, DB::table('posts')->whereYear('created_at', new Carbon('2018-01-02'))->count());
     }
 
+    #[DefineEnvironment('defineEnvironmentWouldThrowsPDOException')]
+    public function testWhereYearWithInvalidOperator()
+    {
+        $sql = DB::table('posts')->whereYear('created_at', '? OR 1=1', '2018');
+
+        PHPUnit::assertArraySubset([
+            [
+                'column' => 'created_at',
+                'type' => 'Year',
+                'value' => '? OR 1=1',
+                'boolean' => 'and',
+            ],
+        ], $sql->wheres);
+
+        $this->assertSame(0, $sql->count());
+    }
+
     public function testOrWhereYear()
     {
         $this->assertSame(2, DB::table('posts')->where('id', 1)->orWhereYear('created_at', '2018')->count());
         $this->assertSame(2, DB::table('posts')->where('id', 1)->orWhereYear('created_at', 2018)->count());
         $this->assertSame(2, DB::table('posts')->where('id', 1)->orWhereYear('created_at', new Carbon('2018-01-02'))->count());
+    }
+
+    #[DefineEnvironment('defineEnvironmentWouldThrowsPDOException')]
+    public function testOrWhereYearWithInvalidOperator()
+    {
+        $sql = DB::table('posts')->where('id', 1)->orWhereYear('created_at', '? OR 1=1', '2018');
+
+        PHPUnit::assertArraySubset([
+            [
+                'column' => 'id',
+                'type' => 'Basic',
+                'value' => 1,
+                'boolean' => 'and',
+            ],
+            [
+                'column' => 'created_at',
+                'type' => 'Year',
+                'value' => '? OR 1=1',
+                'boolean' => 'or',
+            ],
+        ], $sql->wheres);
+
+        $this->assertSame(1, $sql->count());
     }
 
     public function testWhereTime()
@@ -359,10 +518,50 @@ class QueryBuilderTest extends DatabaseTestCase
         $this->assertSame(1, DB::table('posts')->whereTime('created_at', new Carbon('2018-01-02 03:04:05'))->count());
     }
 
+    #[DefineEnvironment('defineEnvironmentWouldThrowsPDOException')]
+    public function testWhereTimeWithInvalidOperator()
+    {
+        $sql = DB::table('posts')->whereTime('created_at', '? OR 1=1', '03:04:05');
+
+        PHPUnit::assertArraySubset([
+            [
+                'column' => 'created_at',
+                'type' => 'Time',
+                'value' => '? OR 1=1',
+                'boolean' => 'and',
+            ],
+        ], $sql->wheres);
+
+        $this->assertSame(0, $sql->count());
+    }
+
     public function testOrWhereTime()
     {
         $this->assertSame(2, DB::table('posts')->where('id', 1)->orWhereTime('created_at', '03:04:05')->count());
         $this->assertSame(2, DB::table('posts')->where('id', 1)->orWhereTime('created_at', new Carbon('2018-01-02 03:04:05'))->count());
+    }
+
+    #[DefineEnvironment('defineEnvironmentWouldThrowsPDOException')]
+    public function testOrWhereTimeWithInvalidOperator()
+    {
+        $sql = DB::table('posts')->where('id', 1)->orWhereTime('created_at', '? OR 1=1', '03:04:05');
+
+        PHPUnit::assertArraySubset([
+            [
+                'column' => 'id',
+                'type' => 'Basic',
+                'value' => 1,
+                'boolean' => 'and',
+            ],
+            [
+                'column' => 'created_at',
+                'type' => 'Time',
+                'value' => '? OR 1=1',
+                'boolean' => 'or',
+            ],
+        ], $sql->wheres);
+
+        $this->assertSame(1, $sql->count());
     }
 
     public function testWhereNested()
@@ -435,5 +634,14 @@ class QueryBuilderTest extends DatabaseTestCase
         $this->assertSame([
             'Lorem Ipsum.' => 'Bar Post',
         ], DB::table('posts')->pluck('title', 'content')->toArray());
+    }
+
+    protected function defineEnvironmentWouldThrowsPDOException($app)
+    {
+        $this->afterApplicationCreated(function () {
+            if (in_array($this->driver, ['pgsql', 'sqlsrv'])) {
+                $this->expectException(PDOException::class);
+            }
+        });
     }
 }

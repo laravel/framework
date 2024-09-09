@@ -4,14 +4,17 @@ namespace Illuminate\Database\DBAL;
 
 use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Doctrine\DBAL\Platforms\MariaDb1010Platform;
 use Doctrine\DBAL\Platforms\MariaDb1027Platform;
 use Doctrine\DBAL\Platforms\MariaDb1052Platform;
 use Doctrine\DBAL\Platforms\MariaDb1060Platform;
 use Doctrine\DBAL\Platforms\MariaDBPlatform;
 use Doctrine\DBAL\Platforms\MySQL57Platform;
 use Doctrine\DBAL\Platforms\MySQL80Platform;
+use Doctrine\DBAL\Platforms\MySQL84Platform;
 use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Platforms\PostgreSQL100Platform;
+use Doctrine\DBAL\Platforms\PostgreSQL120Platform;
 use Doctrine\DBAL\Platforms\PostgreSQL94Platform;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Platforms\SqlitePlatform;
@@ -33,13 +36,16 @@ class TimestampType extends Type implements PhpDateTimeMappingType
             MySQLPlatform::class,
             MySQL57Platform::class,
             MySQL80Platform::class,
+            MySQL84Platform::class,
             MariaDBPlatform::class,
             MariaDb1027Platform::class,
             MariaDb1052Platform::class,
-            MariaDb1060Platform::class => $this->getMySqlPlatformSQLDeclaration($column),
+            MariaDb1060Platform::class,
+            MariaDb1010Platform::class => $this->getMySqlPlatformSQLDeclaration($column),
             PostgreSQLPlatform::class,
             PostgreSQL94Platform::class,
-            PostgreSQL100Platform::class => $this->getPostgresPlatformSQLDeclaration($column),
+            PostgreSQL100Platform::class,
+            PostgreSQL120Platform::class => $this->getPostgresPlatformSQLDeclaration($column),
             SQLServerPlatform::class,
             SQLServer2012Platform::class => $this->getSqlServerPlatformSQLDeclaration($column),
             SqlitePlatform::class => 'DATETIME',
