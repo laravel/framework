@@ -801,7 +801,7 @@ trait ValidatesAttributes
         return $this->validateDimensions(
             $attribute,
             $value,
-            ['height' => intval($parameters[0])]
+            ['height' => (int)$parameters[0]]
         );
     }
 
