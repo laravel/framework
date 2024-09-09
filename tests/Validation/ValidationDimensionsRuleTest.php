@@ -18,7 +18,7 @@ class ValidationDimensionsRuleTest extends TestCase
 
     public function testWidth()
     {
-        $rule = (new Dimensions)->width(100);
+        $rule = Dimensions::defaults()->width(100);
 
         $this->passes(
             $rule,
@@ -36,7 +36,7 @@ class ValidationDimensionsRuleTest extends TestCase
 
     public function testMinWidth()
     {
-        $rule = (new Dimensions)->minWidth(100);
+        $rule = Dimensions::defaults()->minWidth(100);
 
         $this->passes(
             $rule,
@@ -54,7 +54,7 @@ class ValidationDimensionsRuleTest extends TestCase
 
     public function testMaxWidth()
     {
-        $rule = (new Dimensions)->maxWidth(100);
+        $rule = Dimensions::defaults()->maxWidth(100);
 
         $this->passes(
             $rule,
@@ -72,7 +72,7 @@ class ValidationDimensionsRuleTest extends TestCase
 
     public function testWidthBetween()
     {
-        $rule = (new Dimensions)->widthBetween(100, 200);
+        $rule = Dimensions::defaults()->widthBetween(100, 200);
 
         $this->passes(
             $rule,
@@ -90,7 +90,7 @@ class ValidationDimensionsRuleTest extends TestCase
 
     public function testHeight()
     {
-        $rule = (new Dimensions)->height(100);
+        $rule = Dimensions::defaults()->height(100);
 
         $this->passes(
             $rule,
@@ -108,7 +108,7 @@ class ValidationDimensionsRuleTest extends TestCase
 
     public function testMinHeight()
     {
-        $rule = (new Dimensions)->minHeight(100);
+        $rule = Dimensions::defaults()->minHeight(100);
 
         $this->passes(
             $rule,
@@ -127,7 +127,7 @@ class ValidationDimensionsRuleTest extends TestCase
 
     public function testMaxHeight()
     {
-        $rule = (new Dimensions)->maxHeight(100);
+        $rule = Dimensions::defaults()->maxHeight(100);
 
         $this->passes(
             $rule,
@@ -145,7 +145,7 @@ class ValidationDimensionsRuleTest extends TestCase
 
     public function testHeightBetween()
     {
-        $rule = (new Dimensions)->heightBetween(100, 200);
+        $rule = Dimensions::defaults()->heightBetween(100, 200);
 
         $this->passes(
             $rule,
@@ -163,7 +163,7 @@ class ValidationDimensionsRuleTest extends TestCase
 
     public function testRatio()
     {
-        $rule = (new Dimensions)->ratio(1 / 2);
+        $rule = Dimensions::defaults()->ratio(1 / 2);
 
         $this->passes(
             $rule,
@@ -174,14 +174,14 @@ class ValidationDimensionsRuleTest extends TestCase
         $this->fails(
             $rule,
             width:100,
-            height:220,
+            height:100,
             message: 'validation.ratio'
         );
     }
 
     public function testMinRatio()
     {
-        $rule = (new Dimensions)->minRatio(1 / 2);
+        $rule = Dimensions::defaults()->minRatio(1 / 2);
 
         $this->passes(
             $rule,
@@ -198,7 +198,7 @@ class ValidationDimensionsRuleTest extends TestCase
 
     public function testMaxRatio()
     {
-        $rule = (new Dimensions)->maxRatio(1 / 1);
+        $rule = Dimensions::defaults()->maxRatio(1 / 1);
 
         $this->passes(
             $rule,
@@ -216,7 +216,7 @@ class ValidationDimensionsRuleTest extends TestCase
 
     public function testRatioBetween()
     {
-        $rule = (new Dimensions)->ratioBetween(1 / 2, 2 / 5);
+        $rule = Dimensions::defaults()->ratioBetween(1 / 2, 2 / 5);
 
         $this->passes(
             $rule,
@@ -250,13 +250,33 @@ class ValidationDimensionsRuleTest extends TestCase
         );
      }
 
+     public function testCustomRulesAdded()
+     {
+         $this->passes(
+             Dimensions::defaults()
+                 ->width(100)->height(100)
+                 ->rules(['mimes:jpg']),
+             width: 100,
+             height: 100
+         );
+
+         $this->fails(
+             Dimensions::defaults()
+                 ->width(100)->height(100)
+                 ->rules(['mimes:png']),
+             width: 100,
+             height: 100,
+             message: 'validation.mimes'
+         );
+     }
+
     public function testMacroable()
     {
         Dimensions::macro('thumbnail', function () {
             return $this->width(100)->height(100);
         });
 
-        $rule = (new Dimensions)->thumbnail();
+        $rule = Dimensions::defaults()->thumbnail();
 
         $this->passes(
             $rule,
