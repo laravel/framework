@@ -4,12 +4,14 @@ namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\MultipleRecordsFoundException;
+use Illuminate\Database\QueryException;
 use Illuminate\Database\RecordsNotFoundException;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Testing\Assert as PHPUnit;
+use Orchestra\Testbench\Attributes\DefineEnvironment;
 
 class QueryBuilderTest extends DatabaseTestCase
 {
@@ -306,6 +308,8 @@ class QueryBuilderTest extends DatabaseTestCase
         $this->assertSame(1, DB::table('posts')->whereDate('created_at', new Carbon('2018-01-02'))->count());
     }
 
+    #[DefineEnvironment('definePostgresEnvironmentWouldThrowsException')]
+    #[DefineEnvironment('defineSqlServerEnvironmentWouldThrowsException')]
     public function testWhereDateWithInvalidOperator()
     {
         $sql = DB::table('posts')->whereDate('created_at', '? OR 1=1', '2018-01-02');
@@ -328,6 +332,8 @@ class QueryBuilderTest extends DatabaseTestCase
         $this->assertSame(2, DB::table('posts')->where('id', 1)->orWhereDate('created_at', new Carbon('2018-01-02'))->count());
     }
 
+    #[DefineEnvironment('definePostgresEnvironmentWouldThrowsException')]
+    #[DefineEnvironment('defineSqlServerEnvironmentWouldThrowsException')]
     public function testOrWhereDateWithInvalidOperator()
     {
         $sql = DB::table('posts')->where('id', 1)->orWhereDate('created_at', '? OR 1=1', '2018-01-02');
@@ -357,6 +363,8 @@ class QueryBuilderTest extends DatabaseTestCase
         $this->assertSame(1, DB::table('posts')->whereDay('created_at', new Carbon('2018-01-02'))->count());
     }
 
+    #[DefineEnvironment('definePostgresEnvironmentWouldThrowsException')]
+    #[DefineEnvironment('defineSqlServerEnvironmentWouldThrowsException')]
     public function testWhereDayWithInvalidOperator()
     {
         $sql = DB::table('posts')->whereDay('created_at', '? OR 1=1', '02');
@@ -380,6 +388,8 @@ class QueryBuilderTest extends DatabaseTestCase
         $this->assertSame(2, DB::table('posts')->where('id', 1)->orWhereDay('created_at', new Carbon('2018-01-02'))->count());
     }
 
+    #[DefineEnvironment('definePostgresEnvironmentWouldThrowsException')]
+    #[DefineEnvironment('defineSqlServerEnvironmentWouldThrowsException')]
     public function testOrWhereDayWithInvalidOperator()
     {
         $sql = DB::table('posts')->where('id', 1)->orWhereDay('created_at', '? OR 1=1', '02');
@@ -409,6 +419,8 @@ class QueryBuilderTest extends DatabaseTestCase
         $this->assertSame(1, DB::table('posts')->whereMonth('created_at', new Carbon('2018-01-02'))->count());
     }
 
+    #[DefineEnvironment('definePostgresEnvironmentWouldThrowsException')]
+    #[DefineEnvironment('defineSqlServerEnvironmentWouldThrowsException')]
     public function testWhereMonthWithInvalidOperator()
     {
         $sql = DB::table('posts')->whereMonth('created_at', '? OR 1=1', '01');
@@ -432,6 +444,8 @@ class QueryBuilderTest extends DatabaseTestCase
         $this->assertSame(2, DB::table('posts')->where('id', 1)->orWhereMonth('created_at', new Carbon('2018-01-02'))->count());
     }
 
+    #[DefineEnvironment('definePostgresEnvironmentWouldThrowsException')]
+    #[DefineEnvironment('defineSqlServerEnvironmentWouldThrowsException')]
     public function testOrWhereMonthWithInvalidOperator()
     {
         $sql = DB::table('posts')->where('id', 1)->orWhereMonth('created_at', '? OR 1=1', '01');
@@ -461,6 +475,8 @@ class QueryBuilderTest extends DatabaseTestCase
         $this->assertSame(1, DB::table('posts')->whereYear('created_at', new Carbon('2018-01-02'))->count());
     }
 
+    #[DefineEnvironment('definePostgresEnvironmentWouldThrowsException')]
+    #[DefineEnvironment('defineSqlServerEnvironmentWouldThrowsException')]
     public function testWhereYearWithInvalidOperator()
     {
         $sql = DB::table('posts')->whereYear('created_at', '? OR 1=1', '2018');
@@ -484,6 +500,8 @@ class QueryBuilderTest extends DatabaseTestCase
         $this->assertSame(2, DB::table('posts')->where('id', 1)->orWhereYear('created_at', new Carbon('2018-01-02'))->count());
     }
 
+    #[DefineEnvironment('definePostgresEnvironmentWouldThrowsException')]
+    #[DefineEnvironment('defineSqlServerEnvironmentWouldThrowsException')]
     public function testOrWhereYearWithInvalidOperator()
     {
         $sql = DB::table('posts')->where('id', 1)->orWhereYear('created_at', '? OR 1=1', '2018');
@@ -512,6 +530,8 @@ class QueryBuilderTest extends DatabaseTestCase
         $this->assertSame(1, DB::table('posts')->whereTime('created_at', new Carbon('2018-01-02 03:04:05'))->count());
     }
 
+    #[DefineEnvironment('definePostgresEnvironmentWouldThrowsException')]
+    #[DefineEnvironment('defineSqlServerEnvironmentWouldThrowsException')]
     public function testWhereTimeWithInvalidOperator()
     {
         $sql = DB::table('posts')->whereTime('created_at', '? OR 1=1', '03:04:05');
@@ -534,6 +554,8 @@ class QueryBuilderTest extends DatabaseTestCase
         $this->assertSame(2, DB::table('posts')->where('id', 1)->orWhereTime('created_at', new Carbon('2018-01-02 03:04:05'))->count());
     }
 
+    #[DefineEnvironment('definePostgresEnvironmentWouldThrowsException')]
+    #[DefineEnvironment('defineSqlServerEnvironmentWouldThrowsException')]
     public function testOrWhereTimeWithInvalidOperator()
     {
         $sql = DB::table('posts')->where('id', 1)->orWhereTime('created_at', '? OR 1=1', '03:04:05');
@@ -626,5 +648,19 @@ class QueryBuilderTest extends DatabaseTestCase
         $this->assertSame([
             'Lorem Ipsum.' => 'Bar Post',
         ], DB::table('posts')->pluck('title', 'content')->toArray());
+    }
+
+    protected function definePostgresEnvironmentWouldThrowsException($app)
+    {
+        if ($this->driver === 'pgsql') {
+            $this->expectException(QueryException::class);
+        }
+    }
+
+    protected function defineSqlServerEnvironmentWouldThrowsException($app)
+    {
+        if ($this->driver === 'sqlsrv') {
+            $this->expectException(QueryException::class);
+        }
     }
 }
