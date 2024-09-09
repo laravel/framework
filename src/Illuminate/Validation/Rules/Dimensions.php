@@ -122,6 +122,20 @@ class Dimensions implements Rule, DataAwareRule, ValidatorAwareRule
     protected $validator;
 
     /**
+     * The callback that will generate the "default" version of the dimensions rule.
+     *
+     * @var string|array|callable|null
+     */
+    public static $defaultCallback;
+
+    /**
+     * Additional validation rules that should be merged into the default rules during validation.
+     *
+     * @var array
+     */
+    protected $customRules = [];
+
+    /**
      * Set the "width" constraint.
      *
      * @param  int  $value
@@ -288,32 +302,67 @@ class Dimensions implements Rule, DataAwareRule, ValidatorAwareRule
     protected function buildValidationRules()
     {
         $rules = [];
+        $conditions = ['width', 'height', 'ratio'];
 
-        $rules[] = match (true) {
-            $this->width !== null => "width:{$this->width}",
-            $this->minWidth !== null => "min_width:{$this->minWidth}",
-            $this->maxWidth !== null => "max_width:{$this->maxWidth}",
-            $this->widthBetween !== null => "width_between:{$this->widthBetween[0]},{$this->widthBetween[1]}",
-            default => null,
-        };
+        foreach (get_object_vars($this) as $property => $value) {
+            if ($value !== null && Str::contains($property, $conditions, true) ) {
+                if (is_array($value)) {
+                    $value = implode(',', $value);
+                }
+                $rule = Str::snake($property);
+                $rules[] = "{$rule}:{$value}";
+            }
+        }
 
-        $rules[] = match (true) {
-            $this->height !== null => "height:{$this->height}",
-            $this->minHeight !== null => "min_height:{$this->minHeight}",
-            $this->maxHeight !== null => "max_height:{$this->maxHeight}",
-            $this->heightBetween !== null => "height_between:{$this->heightBetween[0]},{$this->heightBetween[1]}",
-            default => null,
-        };
+        return array_merge(array_filter($rules), $this->customRules);
+    }
 
-        $rules[] = match (true) {
-            $this->ratio !== null => "ratio:{$this->ratio}",
-            $this->minRatio !== null => "min_ratio:{$this->minRatio}",
-            $this->maxRatio !== null => "max_ratio:{$this->maxRatio}",
-            $this->ratioBetween !== null  => "ratio_between:{$this->ratioBetween[0]},{$this->ratioBetween[1]}",
-            default => null,
-        };
+    /**
+     * Set the default callback to be used for determining default rules.
+     *
+     * If no arguments are passed, the default dimensions rule configuration will be returned.
+     *
+     * @param  static|callable|null  $callback
+     * @return static|null
+     */
+    public static function defaults($callback = null)
+    {
+        if (is_null($callback)) {
+            return static::default();
+        }
 
-        return array_filter($rules);
+        if (! is_callable($callback) && ! $callback instanceof static) {
+            throw new InvalidArgumentException('The given callback should be callable or an instance of '.static::class);
+        }
+
+        static::$defaultCallback = $callback;
+    }
+
+    /**
+     * Get the default configuration of the dimensions rule.
+     *
+     * @return static
+     */
+    public static function default()
+    {
+        $dimensions = is_callable(static::$defaultCallback)
+            ? call_user_func(static::$defaultCallback)
+            : static::$defaultCallback;
+
+        return $dimensions instanceof Rule ? $dimensions : new self();
+    }
+
+    /**
+     * Specify additional validation rules that should be merged with the default rules during validation.
+     *
+     * @param  string|array  $rules
+     * @return $this
+     */
+    public function rules($rules)
+    {
+        $this->customRules = array_merge($this->customRules, Arr::wrap($rules));
+
+        return $this;
     }
 
     /**
