@@ -363,8 +363,6 @@ class QueryBuilderTest extends DatabaseTestCase
         $this->assertSame(1, DB::table('posts')->whereDay('created_at', new Carbon('2018-01-02'))->count());
     }
 
-    #[DefineEnvironment('definePostgresEnvironmentWouldThrowsException')]
-    #[DefineEnvironment('defineSqlServerEnvironmentWouldThrowsException')]
     public function testWhereDayWithInvalidOperator()
     {
         $sql = DB::table('posts')->whereDay('created_at', '? OR 1=1', '02');
@@ -388,8 +386,6 @@ class QueryBuilderTest extends DatabaseTestCase
         $this->assertSame(2, DB::table('posts')->where('id', 1)->orWhereDay('created_at', new Carbon('2018-01-02'))->count());
     }
 
-    #[DefineEnvironment('definePostgresEnvironmentWouldThrowsException')]
-    #[DefineEnvironment('defineSqlServerEnvironmentWouldThrowsException')]
     public function testOrWhereDayWithInvalidOperator()
     {
         $sql = DB::table('posts')->where('id', 1)->orWhereDay('created_at', '? OR 1=1', '02');
@@ -419,8 +415,6 @@ class QueryBuilderTest extends DatabaseTestCase
         $this->assertSame(1, DB::table('posts')->whereMonth('created_at', new Carbon('2018-01-02'))->count());
     }
 
-    #[DefineEnvironment('definePostgresEnvironmentWouldThrowsException')]
-    #[DefineEnvironment('defineSqlServerEnvironmentWouldThrowsException')]
     public function testWhereMonthWithInvalidOperator()
     {
         $sql = DB::table('posts')->whereMonth('created_at', '? OR 1=1', '01');
@@ -444,8 +438,6 @@ class QueryBuilderTest extends DatabaseTestCase
         $this->assertSame(2, DB::table('posts')->where('id', 1)->orWhereMonth('created_at', new Carbon('2018-01-02'))->count());
     }
 
-    #[DefineEnvironment('definePostgresEnvironmentWouldThrowsException')]
-    #[DefineEnvironment('defineSqlServerEnvironmentWouldThrowsException')]
     public function testOrWhereMonthWithInvalidOperator()
     {
         $sql = DB::table('posts')->where('id', 1)->orWhereMonth('created_at', '? OR 1=1', '01');
