@@ -167,14 +167,14 @@ class ValidationDimensionsRuleTest extends TestCase
 
         $this->passes(
             $rule,
-            width:100,
-            height:200,
+            width: 100,
+            height: 200,
         );
 
         $this->fails(
             $rule,
-            width:100,
-            height:100,
+            width: 100,
+            height: 100,
             message: 'validation.ratio'
         );
     }
@@ -185,8 +185,8 @@ class ValidationDimensionsRuleTest extends TestCase
 
         $this->passes(
             $rule,
-            width:100,
-            height:200
+            width: 100,
+            height: 200
         );
 
         $this->fails($rule,
@@ -248,27 +248,27 @@ class ValidationDimensionsRuleTest extends TestCase
             height: 210,
             message: 'validation.dimensions'
         );
-     }
+    }
 
-     public function testCustomRulesAdded()
-     {
-         $this->passes(
-             Dimensions::defaults()
-                 ->width(100)->height(100)
-                 ->rules(['mimes:jpg']),
-             width: 100,
-             height: 100
-         );
+    public function testCustomRulesAdded()
+    {
+        $this->passes(
+            Dimensions::defaults()
+                ->width(100)->height(100)
+                ->rules(['mimes:jpg']),
+            width: 100,
+            height: 100
+        );
 
-         $this->fails(
-             Dimensions::defaults()
-                 ->width(100)->height(100)
-                 ->rules(['mimes:png']),
-             width: 100,
-             height: 100,
-             message: 'validation.mimes'
-         );
-     }
+        $this->fails(
+            Dimensions::defaults()
+                ->width(100)->height(100)
+                ->rules(['mimes:png']),
+            width: 100,
+            height: 100,
+            message: 'validation.mimes'
+        );
+    }
 
     public function testMacroable()
     {
