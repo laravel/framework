@@ -18,6 +18,7 @@ use Illuminate\Contracts\Foundation\ExceptionRenderer;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\MultipleRecordsFoundException;
+use Illuminate\Database\RecordNotFoundException;
 use Illuminate\Database\RecordsNotFoundException;
 use Illuminate\Foundation\Exceptions\Renderer\Renderer;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -35,8 +36,8 @@ use Illuminate\Support\Traits\ReflectsClosures;
 use Illuminate\Support\ViewErrorBag;
 use Illuminate\Validation\ValidationException;
 use InvalidArgumentException;
-use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Application as ConsoleApplication;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
 use Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer;
@@ -145,6 +146,7 @@ class Handler implements ExceptionHandlerContract
         HttpResponseException::class,
         ModelNotFoundException::class,
         MultipleRecordsFoundException::class,
+        RecordNotFoundException::class,
         RecordsNotFoundException::class,
         RequestExceptionInterface::class,
         TokenMismatchException::class,
@@ -636,6 +638,7 @@ class Handler implements ExceptionHandlerContract
             $e instanceof AuthorizationException && ! $e->hasStatus() => new AccessDeniedHttpException($e->getMessage(), $e),
             $e instanceof TokenMismatchException => new HttpException(419, $e->getMessage(), $e),
             $e instanceof RequestExceptionInterface => new BadRequestHttpException('Bad request.', $e),
+            $e instanceof RecordNotFoundException => new NotFoundHttpException('Not found.', $e),
             $e instanceof RecordsNotFoundException => new NotFoundHttpException('Not found.', $e),
             default => $e,
         };
