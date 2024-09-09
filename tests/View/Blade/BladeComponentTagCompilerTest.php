@@ -130,7 +130,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 <?php \$attributes = \$attributes->except(\App\View\Components\Card\Card::ignoredParameterNames()); ?>
 <?php endif; ?>
 <?php \$component->withAttributes([]); ?>\n".
-            "@endComponentClass##END-COMPONENT-CLASS##</div>", trim($result));
+            '@endComponentClass##END-COMPONENT-CLASS##</div>', trim($result));
     }
 
     public function testBasicComponentWithEmptyAttributesParsing()
