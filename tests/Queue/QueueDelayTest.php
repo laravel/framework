@@ -30,6 +30,17 @@ class QueueDelayTest extends TestCase
 
         $this->assertEquals(0, $job->delay);
     }
+
+    public function test_pending_dispatch_without_delay()
+    {
+        Queue::fake();
+
+        $job = new TestJob;
+
+        dispatch($job)->withoutDelay();
+
+        $this->assertEquals(0, $job->delay);
+    }
 }
 
 class TestJob implements ShouldQueue
