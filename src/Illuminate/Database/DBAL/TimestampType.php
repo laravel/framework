@@ -14,6 +14,7 @@ use Doctrine\DBAL\Platforms\MySQL80Platform;
 use Doctrine\DBAL\Platforms\MySQL84Platform;
 use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Platforms\PostgreSQL100Platform;
+use Doctrine\DBAL\Platforms\PostgreSQL120Platform;
 use Doctrine\DBAL\Platforms\PostgreSQL94Platform;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Platforms\SqlitePlatform;
@@ -43,7 +44,8 @@ class TimestampType extends Type implements PhpDateTimeMappingType
             MariaDb1010Platform::class => $this->getMySqlPlatformSQLDeclaration($column),
             PostgreSQLPlatform::class,
             PostgreSQL94Platform::class,
-            PostgreSQL100Platform::class => $this->getPostgresPlatformSQLDeclaration($column),
+            PostgreSQL100Platform::class,
+            PostgreSQL120Platform::class => $this->getPostgresPlatformSQLDeclaration($column),
             SQLServerPlatform::class,
             SQLServer2012Platform::class => $this->getSqlServerPlatformSQLDeclaration($column),
             SqlitePlatform::class => 'DATETIME',
