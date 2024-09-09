@@ -4,7 +4,6 @@ namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\MultipleRecordsFoundException;
-use Illuminate\Database\QueryException;
 use Illuminate\Database\RecordsNotFoundException;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
@@ -12,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Testing\Assert as PHPUnit;
 use Orchestra\Testbench\Attributes\DefineEnvironment;
+use PDOException;
 
 class QueryBuilderTest extends DatabaseTestCase
 {
@@ -654,7 +654,7 @@ class QueryBuilderTest extends DatabaseTestCase
     {
         $this->afterApplicationCreated(function () {
             if ($this->driver === 'pgsql') {
-                // $this->expectException(QueryException::class);
+                $this->expectException(PDOException::class);
             }
         });
     }
@@ -663,7 +663,7 @@ class QueryBuilderTest extends DatabaseTestCase
     {
         $this->afterApplicationCreated(function () {
             if ($this->driver === 'sqlsrv') {
-                // $this->expectException(QueryException::class);
+                $this->expectException(PDOException::class);
             }
         });
     }
