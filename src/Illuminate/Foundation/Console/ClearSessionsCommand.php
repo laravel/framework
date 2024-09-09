@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Redis;
 
-class ClearSessionCommand extends Command
+class ClearSessionsCommand extends Command
 {
     protected $signature = 'sessions:clear';
     protected $description = 'Clear all user sessions based on the session driver';
@@ -60,7 +60,6 @@ class ClearSessionCommand extends Command
 
     protected function clearRedisSessions()
     {
-        // Assuming Redis is used for session storage
         Redis::connection()->flushdb();
         $this->info('All Redis-based user sessions have been cleared.');
     }
