@@ -15,7 +15,6 @@ use PHPUnit\Framework\TestCase;
 
 class ValidationDimensionsRuleTest extends TestCase
 {
-
     public function testWidth()
     {
         $rule = Dimensions::defaults()->width(100);
@@ -123,7 +122,6 @@ class ValidationDimensionsRuleTest extends TestCase
             message: 'validation.min_height'
         );
     }
-
 
     public function testMaxHeight()
     {

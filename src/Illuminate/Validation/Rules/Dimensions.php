@@ -195,7 +195,7 @@ class Dimensions implements Rule, DataAwareRule, ValidatorAwareRule
      */
     public function maxWidth($value)
     {
-        $this->maxWidth =$value;
+        $this->maxWidth = $value;
 
         return $this;
     }
