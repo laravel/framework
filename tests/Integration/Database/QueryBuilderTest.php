@@ -308,8 +308,7 @@ class QueryBuilderTest extends DatabaseTestCase
         $this->assertSame(1, DB::table('posts')->whereDate('created_at', new Carbon('2018-01-02'))->count());
     }
 
-    #[DefineEnvironment('definePostgresEnvironmentWouldThrowsException')]
-    #[DefineEnvironment('defineSqlServerEnvironmentWouldThrowsException')]
+    #[DefineEnvironment('defineEnvironmentWouldThrowsPDOException')]
     public function testWhereDateWithInvalidOperator()
     {
         $sql = DB::table('posts')->whereDate('created_at', '? OR 1=1', '2018-01-02');
@@ -332,8 +331,7 @@ class QueryBuilderTest extends DatabaseTestCase
         $this->assertSame(2, DB::table('posts')->where('id', 1)->orWhereDate('created_at', new Carbon('2018-01-02'))->count());
     }
 
-    #[DefineEnvironment('definePostgresEnvironmentWouldThrowsException')]
-    #[DefineEnvironment('defineSqlServerEnvironmentWouldThrowsException')]
+    #[DefineEnvironment('defineEnvironmentWouldThrowsPDOException')]
     public function testOrWhereDateWithInvalidOperator()
     {
         $sql = DB::table('posts')->where('id', 1)->orWhereDate('created_at', '? OR 1=1', '2018-01-02');
@@ -467,8 +465,7 @@ class QueryBuilderTest extends DatabaseTestCase
         $this->assertSame(1, DB::table('posts')->whereYear('created_at', new Carbon('2018-01-02'))->count());
     }
 
-    #[DefineEnvironment('definePostgresEnvironmentWouldThrowsException')]
-    #[DefineEnvironment('defineSqlServerEnvironmentWouldThrowsException')]
+    #[DefineEnvironment('defineEnvironmentWouldThrowsPDOException')]
     public function testWhereYearWithInvalidOperator()
     {
         $sql = DB::table('posts')->whereYear('created_at', '? OR 1=1', '2018');
@@ -492,8 +489,7 @@ class QueryBuilderTest extends DatabaseTestCase
         $this->assertSame(2, DB::table('posts')->where('id', 1)->orWhereYear('created_at', new Carbon('2018-01-02'))->count());
     }
 
-    #[DefineEnvironment('definePostgresEnvironmentWouldThrowsException')]
-    #[DefineEnvironment('defineSqlServerEnvironmentWouldThrowsException')]
+    #[DefineEnvironment('defineEnvironmentWouldThrowsPDOException')]
     public function testOrWhereYearWithInvalidOperator()
     {
         $sql = DB::table('posts')->where('id', 1)->orWhereYear('created_at', '? OR 1=1', '2018');
@@ -522,8 +518,7 @@ class QueryBuilderTest extends DatabaseTestCase
         $this->assertSame(1, DB::table('posts')->whereTime('created_at', new Carbon('2018-01-02 03:04:05'))->count());
     }
 
-    #[DefineEnvironment('definePostgresEnvironmentWouldThrowsException')]
-    #[DefineEnvironment('defineSqlServerEnvironmentWouldThrowsException')]
+    #[DefineEnvironment('defineEnvironmentWouldThrowsPDOException')]
     public function testWhereTimeWithInvalidOperator()
     {
         $sql = DB::table('posts')->whereTime('created_at', '? OR 1=1', '03:04:05');
@@ -546,8 +541,7 @@ class QueryBuilderTest extends DatabaseTestCase
         $this->assertSame(2, DB::table('posts')->where('id', 1)->orWhereTime('created_at', new Carbon('2018-01-02 03:04:05'))->count());
     }
 
-    #[DefineEnvironment('definePostgresEnvironmentWouldThrowsException')]
-    #[DefineEnvironment('defineSqlServerEnvironmentWouldThrowsException')]
+    #[DefineEnvironment('defineEnvironmentWouldThrowsPDOException')]
     public function testOrWhereTimeWithInvalidOperator()
     {
         $sql = DB::table('posts')->where('id', 1)->orWhereTime('created_at', '? OR 1=1', '03:04:05');
@@ -642,19 +636,10 @@ class QueryBuilderTest extends DatabaseTestCase
         ], DB::table('posts')->pluck('title', 'content')->toArray());
     }
 
-    protected function definePostgresEnvironmentWouldThrowsException($app)
+    protected function defineEnvironmentWouldThrowsPDOException($app)
     {
         $this->afterApplicationCreated(function () {
-            if ($this->driver === 'pgsql') {
-                $this->expectException(PDOException::class);
-            }
-        });
-    }
-
-    protected function defineSqlServerEnvironmentWouldThrowsException($app)
-    {
-        $this->afterApplicationCreated(function () {
-            if ($this->driver === 'sqlsrv') {
+            if (in_array($this->driver, ['pgsql', 'sqlsrv'])) {
                 $this->expectException(PDOException::class);
             }
         });
