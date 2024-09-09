@@ -1052,8 +1052,8 @@ if (! function_exists('when')) {
     /**
      * Output a value if the given condition is true.
      *
-     * @param bool $condition
-     * @param string $output ,
+     * @param  bool  $condition
+     * @param  string  $output  ,
      * @return string|null
      */
     function when(bool $condition, $output): ?string
@@ -1061,6 +1061,7 @@ if (! function_exists('when')) {
         if ($condition) {
             return $output;
         }
+
         return null;
     }
 }

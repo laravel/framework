@@ -104,8 +104,8 @@ class SupportHelpersTest extends TestCase
     {
         $this->assertEquals('Hello', when(true, 'Hello'));
         $this->assertEquals(null, when(false, 'Hello'));
-        $this->assertEquals('There', when(1==1, 'There'));
-        $this->assertEquals(null, when(1==2, 'There'));
+        $this->assertEquals('There', when(1 == 1, 'There'));
+        $this->assertEquals(null, when(1 == 2, 'There'));
     }
 
     public function testFilled()
