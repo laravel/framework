@@ -725,7 +725,7 @@ trait ValidatesAttributes
         return $this->validateDimensions(
             $attribute,
             $value,
-            ['width' => (int)$parameters[0]]
+            ['width' => (int) $parameters[0]]
         );
     }
 
@@ -744,7 +744,7 @@ trait ValidatesAttributes
         return $this->validateDimensions(
             $attribute,
             $value,
-            ['min_width' => (int)$parameters[0]]
+            ['min_width' => (int) $parameters[0]]
         );
     }
 
@@ -763,7 +763,7 @@ trait ValidatesAttributes
         return $this->validateDimensions(
             $attribute,
             $value,
-            ['max_width' => (int)$parameters[0]]
+            ['max_width' => (int) $parameters[0]]
         );
     }
 
@@ -782,7 +782,7 @@ trait ValidatesAttributes
         return $this->validateDimensions(
             $attribute,
             $value,
-            ['min_width' => (int)$parameters[0], 'max_width' => (int)$parameters[1]]
+            ['min_width' => (int) $parameters[0], 'max_width' => (int) $parameters[1]]
         );
     }
 
@@ -801,7 +801,7 @@ trait ValidatesAttributes
         return $this->validateDimensions(
             $attribute,
             $value,
-            ['height' => (int)$parameters[0]]
+            ['height' => (int) $parameters[0]]
         );
     }
 
@@ -820,7 +820,7 @@ trait ValidatesAttributes
         return $this->validateDimensions(
             $attribute,
             $value,
-            ['min_height' => (int)$parameters[0]]
+            ['min_height' => (int) $parameters[0]]
         );
     }
 
@@ -839,7 +839,7 @@ trait ValidatesAttributes
         return $this->validateDimensions(
             $attribute,
             $value,
-            ['max_height' => (int)$parameters[0]]
+            ['max_height' => (int) $parameters[0]]
         );
     }
 
@@ -858,7 +858,7 @@ trait ValidatesAttributes
         return $this->validateDimensions(
             $attribute,
             $value,
-            ['min_height' => (int)$parameters[0], 'max_height' => (int)$parameters[1]]
+            ['min_height' => (int) $parameters[0], 'max_height' => (int) $parameters[1]]
         );
     }
 
@@ -877,7 +877,7 @@ trait ValidatesAttributes
         return $this->validateDimensions(
             $attribute,
             $value,
-            ['ratio' => (float)$parameters[0]]
+            ['ratio' => (float) $parameters[0]]
         );
     }
 
@@ -896,7 +896,7 @@ trait ValidatesAttributes
         return $this->validateDimensions(
             $attribute,
             $value,
-            ['min_ratio' => (float)$parameters[0]]
+            ['min_ratio' => (float) $parameters[0]]
         );
     }
 
@@ -915,7 +915,7 @@ trait ValidatesAttributes
         return $this->validateDimensions(
             $attribute,
             $value,
-            ['max_ratio' => (float)$parameters[0]]
+            ['max_ratio' => (float) $parameters[0]]
         );
     }
 
@@ -934,7 +934,7 @@ trait ValidatesAttributes
         return $this->validateDimensions(
             $attribute,
             $value,
-            ['min_ratio' => (float)$parameters[0], 'max_ratio' => (float)$parameters[1]]
+            ['min_ratio' => (float) $parameters[0], 'max_ratio' => (float) $parameters[1]]
         );
     }
 
@@ -994,7 +994,7 @@ trait ValidatesAttributes
                 [$key, $value] = explode('=', $parameter, 2);
                 $value = str_contains($key, 'ratio')
                     ? $this->parseRatio($value)
-                    : (int)$value;
+                    : (int) $value;
 
                 return Arr::add($carry, $key, $value);
             }
@@ -1004,7 +1004,7 @@ trait ValidatesAttributes
     }
 
     /**
-    * Parse the ratio values to floats
+    * Parse the ratio values to floats.
     *
     * @param  string  $ratio
     * @return float
@@ -1015,10 +1015,10 @@ trait ValidatesAttributes
             [$numerator, $denominator] = array_replace(
                 [1, 1], array_filter(sscanf($ratio, '%f/%d'))
             );
-            return (float)($numerator / $denominator);
+            return (float)  ($numerator / $denominator);
         }
 
-        return (float)$ratio;
+        return (float) $ratio;
     }
 
     /**
@@ -1043,7 +1043,7 @@ trait ValidatesAttributes
      * Determine if the given parameters fail a dimension ratio check.
      *
      * @param  array<string, float>  $parameters
-     * @param  int   $width
+     * @param  int  $width
      * @param  int  $height
      * @return bool
      */
@@ -1068,7 +1068,7 @@ trait ValidatesAttributes
      */
     private function failsMinRatioCheck($parameters, $width, $height)
     {
-        if (!isset($parameters['min_ratio'])) {
+        if (! isset($parameters['min_ratio'])) {
             return false;
         }
 
@@ -1085,7 +1085,7 @@ trait ValidatesAttributes
      */
     private function failsMaxRatioCheck($parameters, $width, $height)
     {
-        if (!isset($parameters['max_ratio'])) {
+        if (! isset($parameters['max_ratio'])) {
             return false;
         }
 
