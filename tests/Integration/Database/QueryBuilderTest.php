@@ -652,15 +652,19 @@ class QueryBuilderTest extends DatabaseTestCase
 
     protected function definePostgresEnvironmentWouldThrowsException($app)
     {
-        if ($this->driver === 'pgsql') {
-            $this->expectException(QueryException::class);
-        }
+        $this->afterApplicationCreated(function () {
+            if ($this->driver === 'pgsql') {
+                $this->expectException(QueryException::class);
+            }
+        });
     }
 
     protected function defineSqlServerEnvironmentWouldThrowsException($app)
     {
-        if ($this->driver === 'sqlsrv') {
-            $this->expectException(QueryException::class);
-        }
+        $this->afterApplicationCreated(function () {
+            if ($this->driver === 'sqlsrv') {
+                $this->expectException(QueryException::class);
+            }
+        });
     }
 }
