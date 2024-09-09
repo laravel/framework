@@ -1156,6 +1156,28 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals([2, 3], $model->relationMany->pluck('id')->all());
     }
 
+    public function testPushCircularRelations()
+    {
+        $parent = new EloquentModelWithRecursiveRelationshipsStub(['id' => 1, 'parent_id' => null]);
+        $lastId = $parent->id;
+        $parent->setRelation('self', $parent);
+
+        $children = new Collection();
+        for ($count = 0; $count < 2; $count++) {
+            $child = new EloquentModelWithRecursiveRelationshipsStub(['id' => ++$lastId, 'parent_id' => $parent->id]);
+            $child->setRelation('parent', $parent);
+            $child->setRelation('self', $child);
+            $children->push($child);
+        }
+        $parent->setRelation('children', $children);
+
+        try {
+            $this->assertTrue($parent->push());
+        } catch (\RuntimeException $e) {
+            $this->fail($e->getMessage());
+        }
+    }
+
     public function testNewQueryReturnsEloquentQueryBuilder()
     {
         $conn = m::mock(Connection::class);
@@ -1229,6 +1251,79 @@ class DatabaseEloquentModelTest extends TestCase
         $model->setAppends(['appendable']);
         $array = $model->toArray();
         $this->assertSame('appended', $array['appendable']);
+    }
+
+    public function testToArrayWithCircularRelations()
+    {
+        $parent = new EloquentModelWithRecursiveRelationshipsStub(['id' => 1, 'parent_id' => null]);
+        $lastId = $parent->id;
+        $parent->setRelation('self', $parent);
+
+        $children = new Collection();
+        for ($count = 0; $count < 2; $count++) {
+            $child = new EloquentModelWithRecursiveRelationshipsStub(['id' => ++$lastId, 'parent_id' => $parent->id]);
+            $child->setRelation('parent', $parent);
+            $child->setRelation('self', $child);
+            $children->push($child);
+        }
+        $parent->setRelation('children', $children);
+
+        try {
+            $this->assertSame(
+                [
+                    'id' => 1,
+                    'parent_id' => null,
+                    'self' => ['id' => 1, 'parent_id' => null],
+                    'children' => [
+                        [
+                            'id' => 2,
+                            'parent_id' => 1,
+                            'parent' => ['id' => 1, 'parent_id' => null],
+                            'self' => ['id' => 2, 'parent_id' => 1],
+                        ],
+                        [
+                            'id' => 3,
+                            'parent_id' => 1,
+                            'parent' => ['id' => 1, 'parent_id' => null],
+                            'self' => ['id' => 3, 'parent_id' => 1],
+                        ],
+                    ],
+                ],
+                $parent->toArray()
+            );
+        } catch (\RuntimeException $e) {
+            $this->fail($e->getMessage());
+        }
+    }
+
+    public function testGetQueueableRelationsWithCircularRelations()
+    {
+        $parent = new EloquentModelWithRecursiveRelationshipsStub(['id' => 1, 'parent_id' => null]);
+        $lastId = $parent->id;
+        $parent->setRelation('self', $parent);
+
+        $children = new Collection();
+        for ($count = 0; $count < 2; $count++) {
+            $child = new EloquentModelWithRecursiveRelationshipsStub(['id' => ++$lastId, 'parent_id' => $parent->id]);
+            $child->setRelation('parent', $parent);
+            $child->setRelation('self', $child);
+            $children->push($child);
+        }
+        $parent->setRelation('children', $children);
+
+        try {
+            $this->assertSame(
+                [
+                    'self',
+                    'children',
+                    'children.parent',
+                    'children.self',
+                ],
+                $parent->getQueueableRelations()
+            );
+        } catch (\RuntimeException $e) {
+            $this->fail($e->getMessage());
+        }
     }
 
     public function testVisibleCreatesArrayWhitelist()
@@ -3681,5 +3776,97 @@ class Address implements Castable
                 ];
             }
         };
+    }
+}
+
+class EloquentModelWithRecursiveRelationshipsStub extends Model
+{
+    public $fillable = ['id', 'parent_id'];
+
+    protected static \WeakMap $recursionDetectionCache;
+
+    public function getQueueableRelations()
+    {
+        try {
+            $this->stepIn();
+
+            return parent::getQueueableRelations();
+        } finally {
+            $this->stepOut();
+        }
+    }
+
+    public function push()
+    {
+        try {
+            $this->stepIn();
+
+            return parent::push();
+        } finally {
+            $this->stepOut();
+        }
+    }
+
+    public function save(array $options = [])
+    {
+        return true;
+    }
+
+    public function relationsToArray()
+    {
+        try {
+            $this->stepIn();
+
+            return parent::relationsToArray();
+        } finally {
+            $this->stepOut();
+        }
+    }
+
+    public function parent(): BelongsTo
+    {
+        return $this->belongsTo(static::class, 'parent_id');
+    }
+
+    public function children(): HasMany
+    {
+        return $this->hasMany(static::class, 'parent_id');
+    }
+
+    public function self(): BelongsTo
+    {
+        return $this->belongsTo(static::class, 'id');
+    }
+
+    protected static function getRecursionDetectionCache()
+    {
+        return static::$recursionDetectionCache ??= new \WeakMap;
+    }
+
+    protected function getRecursionDepth(): int
+    {
+        $cache = static::getRecursionDetectionCache();
+
+        return $cache->offsetExists($this) ? $cache->offsetGet($this) : 0;
+    }
+
+    protected function stepIn(): void
+    {
+        $depth = $this->getRecursionDepth();
+
+        if ($depth > 1) {
+            throw new \RuntimeException('Recursion detected');
+        }
+        static::getRecursionDetectionCache()->offsetSet($this, $depth + 1);
+    }
+
+    protected function stepOut(): void
+    {
+        $cache = static::getRecursionDetectionCache();
+        if ($depth = $this->getRecursionDepth()) {
+            $cache->offsetSet($this, $depth - 1);
+        } else {
+            $cache->offsetUnset($this);
+        }
     }
 }

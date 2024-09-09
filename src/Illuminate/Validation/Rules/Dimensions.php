@@ -143,7 +143,7 @@ class Dimensions implements Rule, DataAwareRule, ValidatorAwareRule
      */
     public function width($value)
     {
-        $this->width = $value;
+        $this->constraints['width'] = $value;
 
         return $this;
     }

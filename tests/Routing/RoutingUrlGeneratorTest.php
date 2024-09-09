@@ -273,6 +273,12 @@ class RoutingUrlGeneratorTest extends TestCase
         }]);
         $routes->add($route);
 
+        /*
+         * With backed enum name and domain
+         */
+        $route = (new Route(['GET'], 'backed-enum', ['as' => 'prefixed.']))->name(RouteNameEnum::UserIndex)->domain(RouteDomainEnum::DashboardDomain);
+        $routes->add($route);
+
         $this->assertSame('/', $url->route('plain', [], false));
         $this->assertSame('/?foo=bar', $url->route('plain', ['foo' => 'bar'], false));
         $this->assertSame('http://www.foo.com/foo/bar', $url->route('foo'));
@@ -305,6 +311,7 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertSame('/foo/bar?foo=bar#derp', $url->route('fragment', ['foo' => 'bar'], false));
         $this->assertSame('/foo/bar?baz=%C3%A5%CE%B1%D1%84#derp', $url->route('fragment', ['baz' => 'åαф'], false));
         $this->assertSame('http://en.example.com/foo', $url->route('defaults'));
+        $this->assertSame('http://dashboard.myapp.com/backed-enum', $url->route('prefixed.users.index'));
     }
 
     public function testFluentRouteNameDefinitions()
