@@ -84,7 +84,6 @@ class RepositoryTest extends TestCase
         $this->assertSame(3, $cache->get('foo'));
         $this->assertSame(946684832, $cache->get('foo:created'));
 
-
         // Now lets see what happens when another request, job, or command is
         // also trying to refresh the same key at the same time. Will push past
         // the "fresh" TTL and register a deferred callback.

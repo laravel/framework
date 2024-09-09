@@ -2,7 +2,6 @@
 
 namespace Illuminate\Concurrency;
 
-use Illuminate\Concurrency\ConcurrencyManager;
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Support\ServiceProvider;
 

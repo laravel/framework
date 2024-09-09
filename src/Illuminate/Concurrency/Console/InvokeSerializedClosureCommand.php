@@ -46,7 +46,7 @@ class InvokeSerializedClosureCommand extends Command
                     ! is_null($this->argument('code')) => unserialize($this->argument('code')),
                     isset($_SERVER['LARAVEL_INVOKABLE_CLOSURE']) => unserialize($_SERVER['LARAVEL_INVOKABLE_CLOSURE']),
                     default => fn () => null,
-                }))
+                })),
             ]));
         } catch (Throwable $e) {
             report($e);
