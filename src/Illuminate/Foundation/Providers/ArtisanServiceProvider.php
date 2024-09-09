@@ -85,6 +85,7 @@ use Illuminate\Foundation\Console\VendorPublishCommand;
 use Illuminate\Foundation\Console\ViewCacheCommand;
 use Illuminate\Foundation\Console\ViewClearCommand;
 use Illuminate\Foundation\Console\ViewMakeCommand;
+use Illuminate\Foundation\Console\ClearSessionCommand;
 use Illuminate\Notifications\Console\NotificationTableCommand;
 use Illuminate\Queue\Console\BatchesTableCommand;
 use Illuminate\Queue\Console\ClearCommand as QueueClearCommand;
@@ -141,6 +142,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'PackageDiscover' => PackageDiscoverCommand::class,
         'PruneStaleTagsCommand' => PruneStaleTagsCommand::class,
         'QueueClear' => QueueClearCommand::class,
+        'SessionClear' => ClearSessionCommand::class,
         'QueueFailed' => ListFailedQueueCommand::class,
         'QueueFlush' => FlushFailedQueueCommand::class,
         'QueueForget' => ForgetFailedQueueCommand::class,
