@@ -2,17 +2,15 @@
 
 namespace Illuminate\Tests\Integration\Console;
 
-use Orchestra\Testbench\Attributes\UsesVendor;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 
-#[UsesVendor]
 #[RequiresOperatingSystem('Linux|DAR')]
 class ConcurrencyTest extends TestCase
 {
     protected function setUp(): void
     {
-        $this->defineStashRoutes(<<<PHP
+        $this->defineCacheRoutes(<<<PHP
 <?php
 use Illuminate\Support\Facades\Concurrency;
 use Illuminate\Support\Facades\Route;
