@@ -1002,18 +1002,18 @@ trait ValidatesAttributes
     }
 
     /**
-    * Parse the ratio values to floats.
-    *
-    * @param  string  $ratio
-    * @return float
-    */
+     * Parse the ratio values to floats.
+     *
+     * @param  string  $ratio
+     * @return float
+     */
     private function parseRatio($ratio)
     {
         if (str_contains($ratio, '/')) {
             [$numerator, $denominator] = array_replace(
                 [1, 1], array_filter(sscanf($ratio, '%f/%d'))
             );
-            return (float)  ($numerator / $denominator);
+            return (float) ($numerator / $denominator);
         }
 
         return (float) $ratio;
