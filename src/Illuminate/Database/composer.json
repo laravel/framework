@@ -36,7 +36,7 @@
     },
     "conflict": {
         "carbonphp/carbon-doctrine-types": ">=3.0",
-        "doctrine/dbal": ">=4.0"
+        "doctrine/dbal": ">=3.9"
     },
     "suggest": {
         "ext-filter": "Required to use the Postgres database driver.",
