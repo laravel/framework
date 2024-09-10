@@ -53,4 +53,12 @@ bar
 <?php endswitch; ?>';
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
+
+    public function testMatchStatementsAreCompiled()
+    {
+        $string = '@match(true, [0 => "false", 1 => "true"])';
+        $expected = '<?php echo match(true) { 0 => "false", 1 => "true" }; ?>';
+
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
 }
