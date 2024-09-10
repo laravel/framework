@@ -292,7 +292,7 @@ trait CompilesConditionals
     {
         $parts = explode(',', $this->stripParentheses($expression), 2);
         $parts[1] = substr($parts[1], 2);
-        $parts[1] = substr_replace($parts[1], "", -1);
+        $parts[1] = substr_replace($parts[1], '', -1);
 
         return "<?php echo match({$parts[0]}) { {$parts[1]} }; ?>";
     }
