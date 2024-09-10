@@ -61,4 +61,12 @@ bar
 
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
+
+    public function testMatchStatementsAreCompiledWithDefaultValue()
+    {
+        $string = '@match(2, [0 => "false", 1 => "true", default => "not bool"])';
+        $expected = '<?php echo match(2) { 0 => "false", 1 => "true", default => "not bool" }; ?>';
+
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
 }
