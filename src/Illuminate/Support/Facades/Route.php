@@ -65,7 +65,7 @@ namespace Illuminate\Support\Facades;
  * @method static bool is(mixed ...$patterns)
  * @method static bool currentRouteNamed(mixed ...$patterns)
  * @method static string|null currentRouteAction()
- * @method static bool uses(array ...$patterns)
+ * @method static bool uses(array|string ...$patterns)
  * @method static bool currentRouteUses(string $action)
  * @method static void singularResourceParameters(bool $singular = true)
  * @method static void resourceParameters(array $parameters = [])
