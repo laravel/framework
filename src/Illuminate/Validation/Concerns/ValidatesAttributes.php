@@ -493,7 +493,7 @@ trait ValidatesAttributes
      *
      * @param  string  $attribute
      * @param  mixed  $value
-     * @param  array{0: string} $parameters
+     * @param  array{0: string}  $parameters
      * @return bool
      */
     public function validateConfirmed($attribute, $value, $parameters)
