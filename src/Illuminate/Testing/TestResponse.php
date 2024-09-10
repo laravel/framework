@@ -236,7 +236,7 @@ class TestResponse implements ArrayAccess
      *
      * @param  string|null  $name
      * @param  mixed  $parameters
-     * @param boolean $absolute
+     * @param  bool  $absolute
      * @return $this
      */
     public function assertRedirectToSignedRoute($name = null, $parameters = [], $absolute = true)
