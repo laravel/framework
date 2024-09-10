@@ -236,9 +236,10 @@ class TestResponse implements ArrayAccess
      *
      * @param  string|null  $name
      * @param  mixed  $parameters
+     * @param  bool  $absolute
      * @return $this
      */
-    public function assertRedirectToSignedRoute($name = null, $parameters = [])
+    public function assertRedirectToSignedRoute($name = null, $parameters = [], $absolute = true)
     {
         if (! is_null($name)) {
             $uri = route($name, $parameters);
@@ -252,7 +253,7 @@ class TestResponse implements ArrayAccess
         $request = Request::create($this->headers->get('Location'));
 
         PHPUnit::withResponse($this)->assertTrue(
-            $request->hasValidSignature(), 'The response is not a redirect to a signed route.'
+            $request->hasValidSignature($absolute), 'The response is not a redirect to a signed route.'
         );
 
         if (! is_null($name)) {
