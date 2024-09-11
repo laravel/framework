@@ -2,7 +2,6 @@
 
 namespace Illuminate\Foundation\Console;
 
-use Illuminate\Console\Application;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Process;
