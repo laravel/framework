@@ -1015,6 +1015,7 @@ trait ValidatesAttributes
             [$numerator, $denominator] = array_replace(
                 [1, 1], array_filter(sscanf($ratio, '%f/%d'))
             );
+
             return (float) ($numerator / $denominator);
         }
 
