@@ -109,9 +109,9 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals(null, when(1 == 2, 'There'));
         $this->assertEquals(null, when('1', fn () => null));
         $this->assertEquals(null, when(0, fn () => null));
-        $this->assertEquals('True', when([1,2,3,4], 'True')); // Array
+        $this->assertEquals('True', when([1, 2, 3, 4], 'True')); // Array
         $this->assertEquals(null, when([], 'True')); // Empty Array = Falsy
-        $this->assertEquals('True', when(new StdClass, fn() => 'True')); // Object
+        $this->assertEquals('True', when(new StdClass, fn () => 'True')); // Object
     }
 
     public function testFilled()
