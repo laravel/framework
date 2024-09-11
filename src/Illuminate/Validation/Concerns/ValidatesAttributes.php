@@ -498,7 +498,7 @@ trait ValidatesAttributes
      */
     public function validateConfirmed($attribute, $value, $parameters)
     {
-        return $this->validateSame($attribute, $value, [$parameters[0] ?: $attribute.'_confirmation']);
+        return $this->validateSame($attribute, $value, [$parameters[0] ?? $attribute.'_confirmation']);
     }
 
     /**
