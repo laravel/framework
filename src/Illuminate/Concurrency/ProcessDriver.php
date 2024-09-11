@@ -28,7 +28,7 @@ class ProcessDriver
             foreach (Arr::wrap($tasks) as $task) {
                 $pool->path(base_path())->env([
                     'LARAVEL_INVOKABLE_CLOSURE' => serialize(new SerializableClosure($task)),
-                ])->command('php artisan invoke-serialized-closure');
+                ])->command(PHP_BINARY.' artisan invoke-serialized-closure');
             }
         })->start()->wait();
 
