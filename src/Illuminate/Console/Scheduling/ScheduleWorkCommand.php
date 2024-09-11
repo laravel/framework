@@ -2,6 +2,7 @@
 
 namespace Illuminate\Console\Scheduling;
 
+use Illuminate\Console\Application;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\ProcessUtils;
@@ -42,7 +43,7 @@ class ScheduleWorkCommand extends Command
 
         $command = implode(' ', array_map(fn ($arg) => ProcessUtils::escapeArgument($arg), [
             PHP_BINARY,
-            defined('ARTISAN_BINARY') ? ARTISAN_BINARY : 'artisan',
+            Application::artisanBinary(),
             'schedule:run',
         ]));
 

@@ -2,11 +2,11 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Illuminate\Console\Application;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Process;
 use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Process\PhpExecutableFinder;
 
 #[AsCommand(name: 'install:api')]
 class ApiInstallCommand extends Command
@@ -65,8 +65,8 @@ class ApiInstallCommand extends Command
 
         if ($this->option('passport')) {
             Process::run(array_filter([
-                (new PhpExecutableFinder())->find(false) ?: 'php',
-                defined('ARTISAN_BINARY') ? ARTISAN_BINARY : 'artisan',
+                Application::phpBinary(),
+                Application::artisanBinary(),
                 'passport:install',
                 $this->confirm('Would you like to use UUIDs for all client IDs?') ? '--uuids' : null,
             ]));
@@ -130,8 +130,8 @@ class ApiInstallCommand extends Command
 
         if (! $migrationPublished) {
             Process::run([
-                (new PhpExecutableFinder())->find(false) ?: 'php',
-                defined('ARTISAN_BINARY') ? ARTISAN_BINARY : 'artisan',
+                Application::phpBinary(),
+                Application::artisanBinary(),
                 'vendor:publish',
                 '--provider',
                 'Laravel\\Sanctum\\SanctumServiceProvider',

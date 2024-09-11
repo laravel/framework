@@ -61,7 +61,7 @@ class Listener
      */
     protected function phpBinary()
     {
-        return (new PhpExecutableFinder)->find(false);
+        return (new PhpExecutableFinder)->find(false) ?: 'php';
     }
 
     /**

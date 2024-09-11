@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Console;
 
 use Composer\InstalledVersions;
+use Illuminate\Console\Application;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Process;
@@ -154,11 +155,9 @@ class BroadcastingInstallCommand extends Command
             'laravel/reverb:^1.0',
         ]);
 
-        $php = (new PhpExecutableFinder())->find(false) ?: 'php';
-
         Process::run([
-            $php,
-            defined('ARTISAN_BINARY') ? ARTISAN_BINARY : 'artisan',
+            Application::phpBinary(),
+            Application::artisanBinary(),
             'reverb:install',
         ]);
 
