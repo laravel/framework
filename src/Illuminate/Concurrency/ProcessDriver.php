@@ -25,7 +25,7 @@ class ProcessDriver
      */
     public function run(Closure|array $tasks): array
     {
-        $php = (new PhpExecutableFinder)->find();
+        $php = (new PhpExecutableFinder)->find(false);
 
         $results = $this->processFactory->pool(function (Pool $pool) use ($tasks, $php) {
             foreach (Arr::wrap($tasks) as $task) {
