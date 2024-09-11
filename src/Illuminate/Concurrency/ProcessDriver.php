@@ -3,12 +3,12 @@
 namespace Illuminate\Concurrency;
 
 use Closure;
+use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Defer\DeferredCallback;
 use Illuminate\Process\Factory as ProcessFactory;
 use Illuminate\Process\Pool;
 use Illuminate\Support\Arr;
 use Laravel\SerializableClosure\SerializableClosure;
-use Symfony\Component\Process\PhpExecutableFinder;
 
 class ProcessDriver
 {
@@ -25,8 +25,8 @@ class ProcessDriver
      */
     public function run(Closure|array $tasks): array
     {
-        $php = $this->phpBinary();
-        $artisan = $this->artisanBinary();
+        $php = Application::phpBinary();
+        $artisan = Application::artisanBinary();
 
         $results = $this->processFactory->pool(function (Pool $pool) use ($tasks, $php, $artisan) {
             foreach (Arr::wrap($tasks) as $task) {
@@ -58,8 +58,8 @@ class ProcessDriver
      */
     public function defer(Closure|array $tasks): DeferredCallback
     {
-        $php = $this->phpBinary();
-        $artisan = $this->artisanBinary();
+        $php = Application::phpBinary();
+        $artisan = Application::artisanBinary();
 
         return defer(function () use ($tasks, $php, $artisan) {
             foreach (Arr::wrap($tasks) as $task) {
@@ -72,21 +72,5 @@ class ProcessDriver
                 ]);
             }
         });
-    }
-
-    /**
-     * Get the PHP binary.
-     */
-    protected function phpBinary(): string
-    {
-        return (new PhpExecutableFinder)->find(false) ?: 'php';
-    }
-
-    /**
-     * Get the Artisan binary.
-     */
-    protected function artisanBinary(): string
-    {
-        return defined('ARTISAN_BINARY') ? ARTISAN_BINARY : 'artisan';
     }
 }
