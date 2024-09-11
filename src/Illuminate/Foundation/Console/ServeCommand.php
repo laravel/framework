@@ -2,13 +2,13 @@
 
 namespace Illuminate\Foundation\Console;
 
-use Illuminate\Console\Application;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Env;
 use Illuminate\Support\InteractsWithTime;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
 
 use function Termwind\terminal;
@@ -178,7 +178,7 @@ class ServeCommand extends Command
             : __DIR__.'/../resources/server.php';
 
         return [
-            Application::phpBinary(),
+            (new PhpExecutableFinder)->find(false) ?: 'php',
             '-S',
             $this->host().':'.$this->port(),
             $server,

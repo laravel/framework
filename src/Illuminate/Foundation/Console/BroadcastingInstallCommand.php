@@ -3,11 +3,11 @@
 namespace Illuminate\Foundation\Console;
 
 use Composer\InstalledVersions;
-use Illuminate\Console\Application;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Process;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Process\PhpExecutableFinder;
 
 use function Laravel\Prompts\confirm;
 
@@ -155,8 +155,8 @@ class BroadcastingInstallCommand extends Command
         ]);
 
         Process::run([
-            Application::phpBinary(),
-            Application::artisanBinary(),
+            (new PhpExecutableFinder())->find(false) ?: 'php',
+            defined('ARTISAN_BINARY') ? ARTISAN_BINARY : 'artisan',
             'reverb:install',
         ]);
 

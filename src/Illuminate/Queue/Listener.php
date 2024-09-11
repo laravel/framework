@@ -3,7 +3,6 @@
 namespace Illuminate\Queue;
 
 use Closure;
-use Illuminate\Console\Application;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
 
@@ -58,8 +57,6 @@ class Listener
     /**
      * Get the PHP binary.
      *
-     * @deprecated Use \Illuminate\Console\Application::phpBinary()
-     *
      * @return string
      */
     protected function phpBinary()
@@ -69,8 +66,6 @@ class Listener
 
     /**
      * Get the Artisan binary.
-     *
-     * @deprecated Use \Illuminate\Console\Application::artisanBinary()
      *
      * @return string
      */
@@ -155,8 +150,8 @@ class Listener
     protected function createCommand($connection, $queue, ListenerOptions $options)
     {
         return array_filter([
-            Application::phpBinary(),
-            Application::artisanBinary(),
+            $this->phpBinary(),
+            $this->artisanBinary(),
             'queue:work',
             $connection,
             '--once',

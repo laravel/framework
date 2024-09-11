@@ -41,11 +41,7 @@ class ScheduleWorkCommand extends Command
 
         [$lastExecutionStartedAt, $executions] = [Carbon::now()->subMinutes(10), []];
 
-        $command = implode(' ', array_map(fn ($arg) => ProcessUtils::escapeArgument($arg), [
-            PHP_BINARY,
-            Application::artisanBinary(),
-            'schedule:run',
-        ]));
+        $command = Application::formatCommandString('schedule:run');
 
         if ($this->option('run-output-file')) {
             $command .= ' >> '.ProcessUtils::escapeArgument($this->option('run-output-file')).' 2>&1';

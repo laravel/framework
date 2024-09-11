@@ -2,7 +2,6 @@
 
 namespace Illuminate\Foundation\Console;
 
-use Illuminate\Console\Application;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
 
@@ -18,7 +17,7 @@ trait InteractsWithComposerPackages
     protected function requireComposerPackages(string $composer, array $packages)
     {
         if ($composer !== 'global') {
-            $command = [Application::phpBinary(), $composer, 'require'];
+            $command = [$this->phpBinary(), $composer, 'require'];
         }
 
         $command = array_merge(
@@ -35,8 +34,6 @@ trait InteractsWithComposerPackages
 
     /**
      * Get the path to the appropriate PHP binary.
-     *
-     * @deprecated Use \Illuminate\Console\Application::phpBinary()
      *
      * @return string
      */

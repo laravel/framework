@@ -3,7 +3,7 @@
 namespace Illuminate\Concurrency;
 
 use Closure;
-use Illuminate\Foundation\Application;
+use Illuminate\Console\Application;
 use Illuminate\Foundation\Defer\DeferredCallback;
 use Illuminate\Process\Factory as ProcessFactory;
 use Illuminate\Process\Pool;
@@ -25,18 +25,13 @@ class ProcessDriver
      */
     public function run(Closure|array $tasks): array
     {
-        $php = Application::phpBinary();
-        $artisan = Application::artisanBinary();
+        $command = Application::formatCommandString('invoke-serialized-closure');
 
-        $results = $this->processFactory->pool(function (Pool $pool) use ($tasks, $php, $artisan) {
+        $results = $this->processFactory->pool(function (Pool $pool) use ($tasks, $command) {
             foreach (Arr::wrap($tasks) as $task) {
                 $pool->path(base_path())->env([
                     'LARAVEL_INVOKABLE_CLOSURE' => serialize(new SerializableClosure($task)),
-                ])->command([
-                    $php,
-                    $artisan,
-                    'invoke-serialized-closure',
-                ]);
+                ])->command($command);
             }
         })->start()->wait();
 
@@ -58,18 +53,13 @@ class ProcessDriver
      */
     public function defer(Closure|array $tasks): DeferredCallback
     {
-        $php = Application::phpBinary();
-        $artisan = Application::artisanBinary();
+        $command = Application::formatCommandString('invoke-serialized-closure 2>&1 &');
 
-        return defer(function () use ($tasks, $php, $artisan) {
+        return defer(function () use ($tasks, $command) {
             foreach (Arr::wrap($tasks) as $task) {
                 $this->processFactory->path(base_path())->env([
                     'LARAVEL_INVOKABLE_CLOSURE' => serialize(new SerializableClosure($task)),
-                ])->run([
-                    $php,
-                    $artisan,
-                    'invoke-serialized-closure 2>&1 &',
-                ]);
+                ])->run($command);
             }
         });
     }

@@ -3,7 +3,6 @@
 namespace Illuminate\Support;
 
 use Closure;
-use Illuminate\Console\Application;
 use Illuminate\Filesystem\Filesystem;
 use RuntimeException;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -172,9 +171,9 @@ class Composer
     public function findComposer($composerBinary = null)
     {
         if (! is_null($composerBinary) && $this->files->exists($composerBinary)) {
-            return [Application::phpBinary(), $composerBinary];
+            return [$this->phpBinary(), $composerBinary];
         } elseif ($this->files->exists($this->workingPath.'/composer.phar')) {
-            return [Application::phpBinary(), 'composer.phar'];
+            return [$this->phpBinary(), 'composer.phar'];
         }
 
         return ['composer'];
@@ -200,8 +199,6 @@ class Composer
 
     /**
      * Get the PHP binary.
-     *
-     * @deprecated Use \Illuminate\Console\Application::phpBinary()
      *
      * @return string
      */
