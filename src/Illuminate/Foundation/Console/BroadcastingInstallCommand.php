@@ -8,7 +8,6 @@ use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Process;
 use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Process\PhpExecutableFinder;
 
 use function Laravel\Prompts\confirm;
 
