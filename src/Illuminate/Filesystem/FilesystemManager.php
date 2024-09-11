@@ -170,7 +170,7 @@ class FilesystemManager implements FactoryContract
      * @param  string  $name
      * @return \Illuminate\Contracts\Filesystem\Filesystem
      */
-    public function createLocalDriver(array $config, string $name)
+    public function createLocalDriver(array $config, string $name = 'local')
     {
         $visibility = PortableVisibilityConverter::fromArray(
             $config['permissions'] ?? [],
