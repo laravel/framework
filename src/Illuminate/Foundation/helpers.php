@@ -1052,8 +1052,8 @@ if (! function_exists('when')) {
     /**
      * Output a value if the given condition is true.
      *
-     * @param  mixed  $condition  a 'truthy' or 'falsy' value
-     * @param  mixed|Closure  $output  returned when the condition is 'truthy'
+     * @param  mixed  $condition
+     * @param  \Closure|mixed  $output
      * @return mixed
      */
     function when($condition, $output)
