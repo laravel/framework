@@ -2,10 +2,22 @@
 
 namespace Illuminate\Filesystem;
 
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
 class FilesystemServiceProvider extends ServiceProvider
 {
+    /**
+     * Bootstrap the filesystem.
+     *
+     * @return void
+     */
+    public function boot()
+    {
+        $this->serveFiles();
+    }
+
     /**
      * Register the service provider.
      *
@@ -14,7 +26,6 @@ class FilesystemServiceProvider extends ServiceProvider
     public function register()
     {
         $this->registerNativeFilesystem();
-
         $this->registerFlysystem();
     }
 
@@ -58,6 +69,49 @@ class FilesystemServiceProvider extends ServiceProvider
         $this->app->singleton('filesystem', function ($app) {
             return new FilesystemManager($app);
         });
+    }
+
+    /**
+     * Register protected file serving.
+     *
+     * @return void
+     */
+    protected function serveFiles()
+    {
+        if ($this->app->routesAreCached()) {
+            return;
+        }
+
+        foreach ($this->app['config']['filesystems.disks'] ?? [] as $disk => $config) {
+            if (! $this->shouldServeFiles($config)) {
+                continue;
+            }
+
+            $this->app->booted(function () use ($disk, $config) {
+                $uri = isset($config['url'])
+                    ? rtrim(parse_url($config['url'])['path'], '/')
+                    : '/storage';
+
+                Route::get($uri.'/{path}', function (Request $request, string $path) use ($disk, $config) {
+                    return (new ServeFile(
+                        $disk,
+                        $config,
+                        $this->app->isProduction()
+                    ))($request, $path);
+                })->where('path', '.*')->name('storage.'.$disk);
+            });
+        }
+    }
+
+    /**
+     * Determine if the disk is serveable.
+     *
+     * @param  array  $config
+     * @return bool
+     */
+    protected function shouldServeFiles(array $config)
+    {
+        return $config['driver'] === 'local' && ($config['serve'] ?? false);
     }
 
     /**
