@@ -56,6 +56,17 @@ class Attachment
     }
 
     /**
+     * Create a mail attachment from a URL.
+     *
+     * @param  string  $url
+     * @return static
+     */
+    public static function fromUrl($url)
+    {
+        return static::fromPath($url);
+    }
+
+    /**
      * Create a mail attachment from in-memory data.
      *
      * @param  \Closure  $data
