@@ -25,11 +25,11 @@ class SleepTest extends TestCase
 
     public function testItSleepsForSeconds()
     {
-            $start = microtime(true);
-            Sleep::for(1)->seconds();
-            $end = microtime(true);
+        $start = microtime(true);
+        Sleep::for(1)->seconds();
+        $end = microtime(true);
 
-            $this->assertEqualsWithDelta(1, $end - $start, 0.03);
+        $this->assertEqualsWithDelta(1, $end - $start, 0.03);
     }
 
     public function testCallbacksMayBeExecutedUsingThen()
@@ -44,6 +44,7 @@ class SleepTest extends TestCase
         $result = Sleep::for(10)->milliseconds()->while(function () {
             static $results = [true, true, false];
             $_SERVER['__sleep.while']++;
+
             return array_shift($results);
         })->then(fn () => 100);
 

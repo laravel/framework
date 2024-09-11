@@ -505,7 +505,7 @@ class Repository implements ArrayAccess, CacheContract
                 "illuminate:cache:refresh:lock:{$key}",
                 $lock['seconds'] ?? 0,
                 $lock['owner'] ?? null,
-            )->get(function () use ($key, $callback, $created, $ttl, $lock) {
+            )->get(function () use ($key, $callback, $created, $ttl) {
                 if ($created !== $this->get("{$key}:created")) {
                     return;
                 }
