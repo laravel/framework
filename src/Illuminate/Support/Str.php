@@ -1991,4 +1991,23 @@ class Str
         static::$camelCache = [];
         static::$studlyCache = [];
     }
+
+    /**
+     * Implode an array of strings with commas and a custom conjunction before the last item.
+     *
+     * @param  array<string>  $items
+     * @param  string  $conjunction
+     * @return string
+     */
+    public static function implodeWithConjunction(array $items, string $conjunction = 'and'): string
+    {
+        $items = array_filter($items);
+
+        if (count($items) > 1) {
+            $last = array_pop($items);
+            return implode(', ', $items) . ' ' . $conjunction . ' ' . $last;
+        }
+
+        return $items[0] ?? '';
+    }
 }

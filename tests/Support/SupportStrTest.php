@@ -1612,6 +1612,50 @@ class SupportStrTest extends TestCase
             $this->assertSame($expected, Str::chopEnd($subject, $needle));
         }
     }
+
+    public function testImplodeWithConjunction()
+    {
+        $testCases = [
+            [
+                'items' => ['apple', 'banana', 'cherry'],
+                'conjunction' => 'and',
+                'expected' => 'apple, banana and cherry',
+            ],
+            [
+                'items' => ['apple', 'banana', 'cherry'],
+                'conjunction' => 'or',
+                'expected' => 'apple, banana or cherry',
+            ],
+            [
+                'items' => ['apple', 'banana'],
+                'conjunction' => 'and',
+                'expected' => 'apple and banana',
+            ],
+            [
+                'items' => ['apple', 'banana'],
+                'conjunction' => 'or',
+                'expected' => 'apple or banana',
+            ],
+            [
+                'items' => ['apple'],
+                'conjunction' => 'and',
+                'expected' => 'apple',
+            ],
+            [
+                'items' => [],
+                'conjunction' => 'and',
+                'expected' => '',
+            ],
+            [
+                'items' => ['apple', '', 'banana', ''],
+                'conjunction' => 'and',
+                'expected' => 'apple and banana',
+            ],
+        ];
+        foreach($testCases as $testCase) {
+            $this->assertSame($testCase['expected'], Str::implodeWithConjunction($testCase['items'], $testCase['conjunction']));
+        }
+    }
 }
 
 class StringableObjectStub
