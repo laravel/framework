@@ -8,6 +8,7 @@ use Illuminate\Process\Factory as ProcessFactory;
 use Illuminate\Process\Pool;
 use Illuminate\Support\Arr;
 use Laravel\SerializableClosure\SerializableClosure;
+use Symfony\Component\Process\PhpExecutableFinder;
 
 class ProcessDriver
 {
@@ -24,11 +25,13 @@ class ProcessDriver
      */
     public function run(Closure|array $tasks): array
     {
-        $results = $this->processFactory->pool(function (Pool $pool) use ($tasks) {
+        $php = (new PhpExecutableFinder)->find();
+
+        $results = $this->processFactory->pool(function (Pool $pool) use ($tasks, $php) {
             foreach (Arr::wrap($tasks) as $task) {
                 $pool->path(base_path())->env([
                     'LARAVEL_INVOKABLE_CLOSURE' => serialize(new SerializableClosure($task)),
-                ])->command(PHP_BINARY.' artisan invoke-serialized-closure');
+                ])->command($php.' artisan invoke-serialized-closure');
             }
         })->start()->wait();
 
