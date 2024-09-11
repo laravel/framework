@@ -1047,21 +1047,3 @@ if (! function_exists('view')) {
         return $factory->make($view, $data, $mergeData);
     }
 }
-
-if (! function_exists('when')) {
-    /**
-     * Output a value if the given condition is true.
-     *
-     * @param  mixed  $condition
-     * @param  \Closure|mixed  $output
-     * @return mixed
-     */
-    function when($condition, $output)
-    {
-        if ($condition) {
-            return value($output);
-        }
-
-        return null;
-    }
-}
