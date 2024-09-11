@@ -93,9 +93,7 @@ class LoadConfiguration
      */
     protected function loadConfigurationFile(RepositoryContract $repository, $name, $path, array $base)
     {
-        $config = (function () use ($path) {
-            return require $path;
-        })();
+        $config = (fn () => require $path)();
 
         if (isset($base[$name])) {
             $config = array_merge($base[$name], $config);
