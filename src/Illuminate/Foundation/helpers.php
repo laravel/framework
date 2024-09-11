@@ -1052,16 +1052,15 @@ if (! function_exists('when')) {
     /**
      * Output a value if the given condition is true.
      *
-     * @param  bool  $condition
-     * @param  string  $output  ,
-     * @return string|null
+     * @param mixed $condition a 'truthy' or 'falsy' value
+     * @param  mixed|Closure  $output returned when the condition is 'truthy'
+     * @return mixed
      */
-    function when(bool $condition, $output): ?string
+    function when($condition, $output): mixed
     {
         if ($condition) {
-            return $output;
+            return value($output);
         }
-
         return null;
     }
 }
