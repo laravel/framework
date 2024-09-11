@@ -1056,7 +1056,7 @@ if (! function_exists('when')) {
      * @param  mixed|Closure  $output returned when the condition is 'truthy'
      * @return mixed
      */
-    function when($condition, $output): mixed
+    function when($condition, $output)
     {
         if ($condition) {
             return value($output);
