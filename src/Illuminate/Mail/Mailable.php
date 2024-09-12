@@ -1682,7 +1682,9 @@ class Mailable implements MailableContract, Renderable
 
         foreach (['to', 'cc', 'bcc', 'replyTo'] as $type) {
             foreach ($envelope->{$type} as $address) {
-                $this->{$type}($address->address, $address->name);
+                if ($address instanceof Mailables\Address) {
+                    $this->{$type}($address->address, $address->name);
+                }
             }
         }
 
