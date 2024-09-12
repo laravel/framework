@@ -296,14 +296,14 @@ class Number
     }
 
     /**
-     * Returns a random number, using mt_rand() function, using the given length
+     * Returns a random number, using mt_rand() function, using the given length.
      *
-     * @param int $length
+     * @param  int  $length
      * @return int
      */
     public static function random(int $length = 16): int
     {
-        $min = (int) ('1'.str_repeat('0', ($length - 1))); // eq. 100000
+        $min = (int) ('1'.str_repeat('0', $length - 1)); // eq. 100000
         $max = (int) str_repeat('9', $length); // eq. 999999
 
         return mt_rand($min, $max);
