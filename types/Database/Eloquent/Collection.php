@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Database\Eloquent\Relations\MorphTo;
+
 use function PHPStan\Testing\assertType;
 
 $collection = User::all();
@@ -11,9 +13,13 @@ assertType('Illuminate\Database\Eloquent\Collection<int, User>|string|User', $co
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->load('string'));
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->load(['string']));
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->load(['string' => function ($query) {
-    // assertType('Illuminate\Database\Eloquent\Relations\Relation<*,*,*>', $query);
+    //assertType('Illuminate\Database\Eloquent\Relations\Relation<*,*,*>', $query);
 }]));
 
+assertType('array{string: Closure(Illuminate\Database\Eloquent\Relations\MorphTo): void}', ['string' => function (MorphTo $query): void {
+}]);
+assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->load(['string' => function (MorphTo $query): void {
+}]));
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadAggregate('string', 'string'));
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadAggregate(['string'], 'string'));
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadAggregate(['string'], 'string', 'string'));
