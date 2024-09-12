@@ -173,4 +173,13 @@ class CacheTest extends TestCase
 
         $this->assertSame($time, $response->getLastModified()->getTimestamp());
     }
+
+    public function testItDoesNotSetEtagHeadersForBinaryContent()
+    {
+        $response = (new Cache)->handle(new Request, function () {
+            return new BinaryFileResponse(__DIR__.'/../fixtures/test.txt');
+        }, 'etag');
+
+        $this->assertNull($response->getEtag());
+    }
 }

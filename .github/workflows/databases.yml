@@ -144,7 +144,7 @@ jobs:
         env:
           DB_CONNECTION: mariadb
 
-  pgsql:
+  pgsql_14:
     runs-on: ubuntu-24.04
 
     services:
@@ -192,7 +192,55 @@ jobs:
           DB_USERNAME: forge
           DB_PASSWORD: password
 
-  mssql:
+  pgsql_10:
+    runs-on: ubuntu-24.04
+
+    services:
+      postgresql:
+        image: postgres:10
+        env:
+          POSTGRES_DB: laravel
+          POSTGRES_USER: forge
+          POSTGRES_PASSWORD: password
+        ports:
+          - 5432:5432
+        options: --health-cmd=pg_isready --health-interval=10s --health-timeout=5s --health-retries=3
+
+    strategy:
+      fail-fast: true
+
+    name: PostgreSQL 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.2
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_pgsql, :php-psr
+          tools: composer:v2
+          coverage: none
+
+      - name: Set Framework version
+        run: composer config version "11.x-dev"
+
+      - name: Install dependencies
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: composer update --prefer-stable --prefer-dist --no-interaction --no-progress
+
+      - name: Execute tests
+        run: vendor/bin/phpunit tests/Integration/Database
+        env:
+          DB_CONNECTION: pgsql
+          DB_USERNAME: forge
+          DB_PASSWORD: password
+
+  mssql_2019:
     runs-on: ubuntu-22.04
 
     services:
@@ -208,6 +256,53 @@ jobs:
       fail-fast: true
 
     name: SQL Server 2019
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.2
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, sqlsrv, pdo, pdo_sqlsrv, odbc, pdo_odbc, :php-psr
+          tools: composer:v2
+          coverage: none
+
+      - name: Set Framework version
+        run: composer config version "11.x-dev"
+
+      - name: Install dependencies
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: composer update --prefer-stable --prefer-dist --no-interaction --no-progress
+
+      - name: Execute tests
+        run: vendor/bin/phpunit tests/Integration/Database
+        env:
+          DB_CONNECTION: sqlsrv
+          DB_DATABASE: master
+          DB_USERNAME: SA
+          DB_PASSWORD: Forge123
+
+  mssql_2017:
+    runs-on: ubuntu-22.04
+
+    services:
+      sqlsrv:
+        image: mcr.microsoft.com/mssql/server:2017-latest
+        env:
+          ACCEPT_EULA: Y
+          SA_PASSWORD: Forge123
+        ports:
+          - 1433:1433
+
+    strategy:
+      fail-fast: true
+
+    name: SQL Server 2017
 
     steps:
       - name: Checkout code

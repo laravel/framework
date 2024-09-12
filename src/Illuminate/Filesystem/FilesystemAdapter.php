@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Contracts\Filesystem\Cloud as CloudFilesystemContract;
 use Illuminate\Contracts\Filesystem\Filesystem as FilesystemContract;
 use Illuminate\Http\File;
+use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -72,6 +73,13 @@ class FilesystemAdapter implements CloudFilesystemContract
      * @var \League\Flysystem\PathPrefixer
      */
     protected $prefixer;
+
+    /**
+     * The file server callback.
+     *
+     * @var \Closure|null
+     */
+    protected $serveCallback;
 
     /**
      * The temporary URL builder callback.
@@ -316,8 +324,25 @@ class FilesystemAdapter implements CloudFilesystemContract
     /**
      * Create a streamed download response for a given file.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @param  string  $path
      * @param  string|null  $name
+     * @param  array  $headers
+     * @return \Symfony\Component\HttpFoundation\StreamedResponse
+     */
+    public function serve(Request $request, $path, $name = null, array $headers = [])
+    {
+        return isset($this->serveCallback)
+            ? call_user_func($this->serveCallback, $request, $path, $headers)
+            : $this->response($path, $name, $headers);
+    }
+
+    /**
+     * Create a streamed download response for a given file.
+     *
+     * @param  string  $path
+     * @param  string|null  $name
+     * @param  array  $headers
      * @return \Symfony\Component\HttpFoundation\StreamedResponse
      */
     public function download($path, $name = null, array $headers = [])
@@ -946,6 +971,17 @@ class FilesystemAdapter implements CloudFilesystemContract
             FilesystemContract::VISIBILITY_PRIVATE => Visibility::PRIVATE,
             default => throw new InvalidArgumentException("Unknown visibility: {$visibility}."),
         };
+    }
+
+    /**
+     * Define a custom callback that generates file download responses.
+     *
+     * @param  \Closure  $callback
+     * @return void
+     */
+    public function serveUsing(Closure $callback)
+    {
+        $this->serveCallback = $callback;
     }
 
     /**

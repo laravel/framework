@@ -204,7 +204,7 @@ class Composer
      */
     protected function phpBinary()
     {
-        return (string) (new PhpExecutableFinder)->find(false);
+        return (new PhpExecutableFinder)->find(false) ?: 'php';
     }
 
     /**

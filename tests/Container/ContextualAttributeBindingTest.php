@@ -15,7 +15,9 @@ use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Container\Attributes\Database;
 use Illuminate\Container\Attributes\Log;
 use Illuminate\Container\Attributes\Storage;
+use Illuminate\Container\Attributes\Tag;
 use Illuminate\Container\Container;
+use Illuminate\Container\RewindableGenerator;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\Guard as GuardContract;
 use Illuminate\Contracts\Container\ContextualAttribute;
@@ -234,6 +236,20 @@ class ContextualAttributeBindingTest extends TestCase
         });
 
         $this->assertEquals('Europe/Paris', $value);
+    }
+
+    public function testTagAttribute()
+    {
+        $container = new Container;
+        $container->bind('one', fn (): int => 1);
+        $container->bind('two', fn (): int => 2);
+        $container->tag(['one', 'two'], 'numbers');
+
+        $value = $container->call(function (#[Tag('numbers')] RewindableGenerator $integers) {
+            return $integers;
+        });
+
+        $this->assertEquals([1, 2], iterator_to_array($value));
     }
 }
 

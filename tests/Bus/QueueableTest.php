@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Bus;
 
 use Illuminate\Bus\Queueable;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class QueueableTest extends TestCase
@@ -17,9 +18,7 @@ class QueueableTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider connectionDataProvider
-     */
+    #[DataProvider('connectionDataProvider')]
     public function testOnConnection(mixed $connection, ?string $expected): void
     {
         $job = new FakeJob();
@@ -28,9 +27,7 @@ class QueueableTest extends TestCase
         $this->assertSame($job->connection, $expected);
     }
 
-    /**
-     * @dataProvider connectionDataProvider
-     */
+    #[DataProvider('connectionDataProvider')]
     public function testAllOnConnection(mixed $connection, ?string $expected): void
     {
         $job = new FakeJob();
@@ -50,9 +47,7 @@ class QueueableTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider queuesDataProvider
-     */
+    #[DataProvider('queuesDataProvider')]
     public function testOnQueue(mixed $queue, ?string $expected): void
     {
         $job = new FakeJob();
@@ -61,9 +56,7 @@ class QueueableTest extends TestCase
         $this->assertSame($job->queue, $expected);
     }
 
-    /**
-     * @dataProvider queuesDataProvider
-     */
+    #[DataProvider('queuesDataProvider')]
     public function testAllOnQueue(mixed $queue, ?string $expected): void
     {
         $job = new FakeJob();

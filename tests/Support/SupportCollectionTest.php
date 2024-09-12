@@ -2003,9 +2003,6 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
-    /**
-     * @dataProvider collectionClassProvider
-     */
     public function testNaturalSortByManyWithNull($collection)
     {
         $itemFoo = new \stdClass();
@@ -2026,9 +2023,6 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
-    /**
-     * @dataProvider collectionClassProvider
-     */
     public function testSortKeys($collection)
     {
         $data = new $collection(['b' => 'dayle', 'a' => 'taylor']);

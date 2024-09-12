@@ -64,6 +64,7 @@
         "illuminate/bus": "self.version",
         "illuminate/cache": "self.version",
         "illuminate/collections": "self.version",
+        "illuminate/concurrency": "self.version",
         "illuminate/conditionable": "self.version",
         "illuminate/config": "self.version",
         "illuminate/console": "self.version",
@@ -106,7 +107,7 @@
         "league/flysystem-sftp-v3": "^3.0",
         "mockery/mockery": "^1.6",
         "nyholm/psr7": "^1.2",
-        "orchestra/testbench-core": "^9.1.5",
+        "orchestra/testbench-core": "^9.4.0",
         "pda/pheanstalk": "^5.0",
         "phpstan/phpstan": "^1.11.5",
         "phpunit/phpunit": "^10.5|^11.0",
@@ -131,6 +132,7 @@
             "src/Illuminate/Events/functions.php",
             "src/Illuminate/Filesystem/functions.php",
             "src/Illuminate/Foundation/helpers.php",
+            "src/Illuminate/Log/functions.php",
             "src/Illuminate/Support/helpers.php"
         ],
         "psr-4": {

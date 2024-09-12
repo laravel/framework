@@ -472,6 +472,61 @@ class Repository implements ArrayAccess, CacheContract
     }
 
     /**
+     * Retrieve an item from the cache by key, refreshing it in the background if it is stale.
+     *
+     * @template TCacheValue
+     *
+     * @param  string  $key
+     * @param  array{ 0: int, 1: int }  $ttl
+     * @param  (callable(): TCacheValue)  $callback
+     * @param  array{ seconds?: int, owner?: string }|null  $lock
+     * @return TCacheValue
+     */
+    public function flexible($key, $ttl, $callback, $lock = null)
+    {
+        [
+            $key => $value,
+            "{$key}:created" => $created,
+        ] = $this->many([$key, "{$key}:created"]);
+
+        if ($created === null) {
+            return tap(value($callback), fn ($value) => $this->putMany([
+                $key => $value,
+                "{$key}:created" => Carbon::now()->getTimestamp(),
+            ], $ttl[1]));
+        }
+
+        if (($created + $this->getSeconds($ttl[0])) > Carbon::now()->getTimestamp()) {
+            return $value;
+        }
+
+        $refresh = function () use ($key, $ttl, $callback, $lock, $created) {
+            $this->store->lock(
+                "illuminate:cache:refresh:lock:{$key}",
+                $lock['seconds'] ?? 0,
+                $lock['owner'] ?? null,
+            )->get(function () use ($key, $callback, $created, $ttl) {
+                if ($created !== $this->get("{$key}:created")) {
+                    return;
+                }
+
+                $this->putMany([
+                    $key => value($callback),
+                    "{$key}:created" => Carbon::now()->getTimestamp(),
+                ], $ttl[1]);
+            });
+        };
+
+        if (function_exists('defer')) {
+            defer($refresh, "illuminate:cache:refresh:{$key}");
+        } else {
+            $refresh();
+        }
+
+        return $value;
+    }
+
+    /**
      * Remove an item from the cache.
      *
      * @param  string  $key
