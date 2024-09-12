@@ -103,15 +103,23 @@ class SupportHelpersTest extends TestCase
     public function testWhen()
     {
         $this->assertEquals('Hello', when(true, 'Hello'));
-        $this->assertEquals(null, when(false, 'Hello'));
+        $this->assertNull(when(false, 'Hello'));
         $this->assertEquals('There', when(1 === 1, 'There')); // strict types
         $this->assertEquals('There', when(1 == '1', 'There')); // loose types
-        $this->assertEquals(null, when(1 == 2, 'There'));
-        $this->assertEquals(null, when('1', fn () => null));
-        $this->assertEquals(null, when(0, fn () => null));
+        $this->assertNull(when(1 == 2, 'There'));
+        $this->assertNull(when('1', fn () => null));
+        $this->assertNull(when(0, fn () => null));
         $this->assertEquals('True', when([1, 2, 3, 4], 'True')); // Array
-        $this->assertEquals(null, when([], 'True')); // Empty Array = Falsy
+        $this->assertNull(when([], 'True')); // Empty Array = Falsy
         $this->assertEquals('True', when(new StdClass, fn () => 'True')); // Object
+        $this->assertEquals('World', when(false, 'Hello', 'World'));
+        $this->assertEquals('World', when(1 === 0, 'Hello', 'World')); // strict types
+        $this->assertEquals('World', when(1 == '0', 'Hello', 'World')); // loose types
+        $this->assertNull(when('', fn () => 'There', fn () => null));
+        $this->assertNull(when(0, fn () => 'There', fn () => null));
+        $this->assertEquals('False', when([], 'True', 'False'));  // Empty Array = Falsy
+        $this->assertTrue(when(true, fn ($value) => $value, fn ($value) => ! $value)); // lazy evaluation
+        $this->assertTrue(when(false, fn ($value) => $value, fn ($value) => ! $value)); // lazy evaluation
     }
 
     public function testFilled()
