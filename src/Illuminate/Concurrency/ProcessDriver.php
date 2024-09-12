@@ -3,6 +3,7 @@
 namespace Illuminate\Concurrency;
 
 use Closure;
+use Illuminate\Contracts\Concurrency\Driver;
 use Illuminate\Foundation\Defer\DeferredCallback;
 use Illuminate\Process\Factory as ProcessFactory;
 use Illuminate\Process\Pool;
@@ -10,7 +11,7 @@ use Illuminate\Support\Arr;
 use Laravel\SerializableClosure\SerializableClosure;
 use Symfony\Component\Process\PhpExecutableFinder;
 
-class ProcessDriver
+class ProcessDriver implements Driver
 {
     /**
      * Create a new process based concurrency driver.

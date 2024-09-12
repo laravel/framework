@@ -3,6 +3,7 @@
 namespace Illuminate\Contracts\Concurrency;
 
 use Closure;
+use Illuminate\Foundation\Defer\DeferredCallback;
 
 interface Driver
 {
@@ -12,7 +13,7 @@ interface Driver
     public function run(Closure|array $tasks): array;
 
     /**
-     * Start the given tasks in the background.
+     * Defer the execution of the given tasks.
      */
-    public function background(Closure|array $tasks): void;
+    public function defer(Closure|array $tasks): DeferredCallback;
 }

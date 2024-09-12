@@ -3,10 +3,11 @@
 namespace Illuminate\Concurrency;
 
 use Closure;
+use Illuminate\Contracts\Concurrency\Driver;
 use Illuminate\Foundation\Defer\DeferredCallback;
 use Illuminate\Support\Arr;
 
-class SyncDriver
+class SyncDriver implements Driver
 {
     /**
      * Run the given tasks concurrently and return an array containing the results.
