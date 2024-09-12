@@ -2,6 +2,7 @@
 
 namespace Illuminate\Filesystem;
 
+use Illuminate\Contracts\Foundation\CachesRoutes;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
@@ -78,7 +79,7 @@ class FilesystemServiceProvider extends ServiceProvider
      */
     protected function serveFiles()
     {
-        if ($this->app->routesAreCached()) {
+        if ($this->app instanceof CachesRoutes && $this->app->routesAreCached()) {
             return;
         }
 
