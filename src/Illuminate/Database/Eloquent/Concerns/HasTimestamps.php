@@ -199,7 +199,11 @@ trait HasTimestamps
         try {
             return $callback();
         } finally {
-            static::$ignoreTimestampsOn = array_values(array_diff(static::$ignoreTimestampsOn, $models));
+            foreach ($models as $model) {
+                if (($key = array_search($model, static::$ignoreTimestampsOn, true)) !== false) {
+                    unset(static::$ignoreTimestampsOn[$key]);
+                }
+            }
         }
     }
 
