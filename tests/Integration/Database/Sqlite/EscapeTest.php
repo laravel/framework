@@ -2,28 +2,10 @@
 
 namespace Illuminate\Tests\Integration\Database\Sqlite;
 
-use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 use RuntimeException;
 
-class EscapeTest extends DatabaseTestCase
+class EscapeTest extends SqliteTestCase
 {
-    protected function defineEnvironment($app)
-    {
-        parent::defineEnvironment($app);
-
-        if ($this->driver !== 'sqlite') {
-            $this->markTestSkipped('Test requires a Sqlite connection.');
-        }
-
-        $app['config']->set('database.default', 'conn1');
-
-        $app['config']->set('database.connections.conn1', [
-            'driver' => 'sqlite',
-            'database' => ':memory:',
-            'prefix' => '',
-        ]);
-    }
-
     public function testEscapeInt()
     {
         $this->assertSame('42', $this->app['db']->escape(42));

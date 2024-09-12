@@ -5,28 +5,10 @@ namespace Illuminate\Tests\Integration\Database\Sqlite;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-class DatabaseSqliteConnectionTest extends DatabaseTestCase
+class DatabaseSqliteConnectionTest extends SqliteTestCase
 {
-    protected function defineEnvironment($app)
-    {
-        parent::defineEnvironment($app);
-
-        if ($this->driver !== 'sqlite') {
-            $this->markTestSkipped('Test requires a Sqlite connection.');
-        }
-
-        $app['config']->set('database.default', 'conn1');
-
-        $app['config']->set('database.connections.conn1', [
-            'driver' => 'sqlite',
-            'database' => ':memory:',
-            'prefix' => '',
-        ]);
-    }
-
     protected function afterRefreshingDatabase()
     {
         if (! Schema::hasTable('json_table')) {

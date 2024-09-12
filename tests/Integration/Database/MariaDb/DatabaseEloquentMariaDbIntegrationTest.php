@@ -6,9 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\Integration\Database\Traits\EloquentBulkInsertTest;
+use Illuminate\Tests\Integration\Database\Traits\CreatesUniqueUsersUUIDTable;
 
 class DatabaseEloquentMariaDbIntegrationTest extends MariaDbTestCase
 {
+    use EloquentBulkInsertTest;
+    use CreatesUniqueUsersUUIDTable;
+
     protected function afterRefreshingDatabase()
     {
         if (! Schema::hasTable('database_eloquent_mariadb_integration_users')) {
@@ -19,11 +24,14 @@ class DatabaseEloquentMariaDbIntegrationTest extends MariaDbTestCase
                 $table->timestamps();
             });
         }
+
+        $this->createUniqueUsersUUIDTable();
     }
 
     protected function destroyDatabaseMigrations()
     {
         Schema::drop('database_eloquent_mariadb_integration_users');
+        $this->dropUniqueUsersUUIDTable();
     }
 
     public function testCreateOrFirst()
