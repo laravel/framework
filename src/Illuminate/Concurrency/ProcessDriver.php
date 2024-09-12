@@ -3,12 +3,12 @@
 namespace Illuminate\Concurrency;
 
 use Closure;
-use Illuminate\Console\Application;
 use Illuminate\Foundation\Defer\DeferredCallback;
 use Illuminate\Process\Factory as ProcessFactory;
 use Illuminate\Process\Pool;
 use Illuminate\Support\Arr;
 use Laravel\SerializableClosure\SerializableClosure;
+use Symfony\Component\Process\PhpExecutableFinder;
 
 class ProcessDriver
 {
@@ -25,13 +25,18 @@ class ProcessDriver
      */
     public function run(Closure|array $tasks): array
     {
-        $command = Application::formatCommandString('invoke-serialized-closure');
+        $php = $this->phpBinary();
+        $artisan = $this->artisanBinary();
 
-        $results = $this->processFactory->pool(function (Pool $pool) use ($tasks, $command) {
+        $results = $this->processFactory->pool(function (Pool $pool) use ($tasks, $php, $artisan) {
             foreach (Arr::wrap($tasks) as $task) {
                 $pool->path(base_path())->env([
                     'LARAVEL_INVOKABLE_CLOSURE' => serialize(new SerializableClosure($task)),
-                ])->command($command);
+                ])->command([
+                    $php,
+                    $artisan,
+                    'invoke-serialized-closure',
+                ]);
             }
         })->start()->wait();
 
@@ -53,14 +58,35 @@ class ProcessDriver
      */
     public function defer(Closure|array $tasks): DeferredCallback
     {
-        $command = Application::formatCommandString('invoke-serialized-closure 2>&1 &');
+        $php = $this->phpBinary();
+        $artisan = $this->artisanBinary();
 
-        return defer(function () use ($tasks, $command) {
+        return defer(function () use ($tasks, $php, $artisan) {
             foreach (Arr::wrap($tasks) as $task) {
                 $this->processFactory->path(base_path())->env([
                     'LARAVEL_INVOKABLE_CLOSURE' => serialize(new SerializableClosure($task)),
-                ])->run($command);
+                ])->run([
+                    $php,
+                    $artisan,
+                    'invoke-serialized-closure 2>&1 &',
+                ]);
             }
         });
+    }
+
+    /**
+     * Get the PHP binary.
+     */
+    protected function phpBinary(): string
+    {
+        return (new PhpExecutableFinder)->find(false) ?: 'php';
+    }
+
+    /**
+     * Get the Artisan binary.
+     */
+    protected function artisanBinary(): string
+    {
+        return defined('ARTISAN_BINARY') ? ARTISAN_BINARY : 'artisan';
     }
 }
