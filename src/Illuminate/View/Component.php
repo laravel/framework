@@ -5,12 +5,13 @@ namespace Illuminate\View;
 use Closure;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Contracts\View\View as ViewContract;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionProperty;
 
-abstract class Component
+abstract class Component implements Responsable
 {
     /**
      * The properties / methods that should not be exposed to the component.
@@ -161,6 +162,16 @@ abstract class Component
             return $resolver($view($data));
         }
         : $resolver($view);
+    }
+
+    /**
+     * Get the view and data that represent the component.
+     *
+     * @return \Illuminate\Contracts\View\View|\Illuminate\Contracts\Support\Htmlable|\Closure|string
+     */
+    public function toResponse($request)
+    {
+        return $this->resolveView()->with($this->data());
     }
 
     /**

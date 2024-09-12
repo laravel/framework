@@ -368,6 +368,15 @@ class ComponentTest extends TestCase
         $this->assertTrue((bool) $anotherSlot->hasActualContent());
         $this->assertTrue((bool) $moreComplexSlot->hasActualContent());
     }
+
+    public function testComponentIsRenderedFromResponse()
+    {
+        $component = new TestHtmlableReturningViewComponent('title');
+
+        $response = $component->toResponse(new Request());
+
+        $this->assertSame('<p>Hello title</p>', $response->getContent());
+    }
 }
 
 class TestInlineViewComponent extends Component
