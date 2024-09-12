@@ -1537,7 +1537,7 @@ class Builder implements BuilderContract
     /**
      * Set the relationships that should be eager loaded.
      *
-     * @param  array<array-key, array|(\Closure(\Illuminate\Database\Eloquent\Relations\Relation<*,*,*>): mixed)|string>|string  $relations
+     * @param  array<array-key, array|(\Closure(\Illuminate\Database\Eloquent\Relations\Relation<*,*,*>): mixed)|string>|string|class-string<Model>  $relations
      * @param  (\Closure(\Illuminate\Database\Eloquent\Relations\Relation<*,*,*>): mixed)|string|null  $callback
      * @return $this
      */
@@ -1675,6 +1675,27 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Attempt to guess the relationship name.
+     *
+     * @param  string  $name
+     * @return string
+     */
+    protected function guessRelationship(string $name): string
+    {
+        if (\str_contains($name, '\\') && class_exists($name)) {
+            $guess = Str::camel(Str::plural(class_basename($name)));
+        } else {
+            $guess = Str::camel(Str::plural($name));
+        }
+
+        return match (true) {
+            method_exists($this->model, $guess) => $guess,
+            method_exists($this->model, $singular = Str::singular($guess)) => $singular,
+            default => $name
+        };
+    }
+
+    /**
      * Combine an array of constraints into a single constraint.
      *
      * @param  array  $constraints
@@ -1701,7 +1722,7 @@ class Builder implements BuilderContract
     {
         return str_contains($name, ':')
             ? $this->createSelectWithConstraint($name)
-            : [$name, static function () {
+            : [$this->guessRelationship($name), static function () {
                 //
             }];
     }
@@ -1714,7 +1735,7 @@ class Builder implements BuilderContract
      */
     protected function createSelectWithConstraint($name)
     {
-        return [explode(':', $name)[0], static function ($query) use ($name) {
+        return [$this->guessRelationship(explode(':', $name)[0]), static function ($query) use ($name) {
             $query->select(array_map(static function ($column) use ($query) {
                 if (str_contains($column, '.')) {
                     return $column;
