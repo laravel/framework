@@ -239,7 +239,7 @@ if (! function_exists('value')) {
 
 if (! function_exists('when')) {
     /**
-     * Output a value if the given condition is true.
+     * Return a value if the given condition is true.
      *
      * @param  mixed  $condition
      * @param  \Closure|mixed  $value
