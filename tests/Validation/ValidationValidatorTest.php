@@ -1,5 +1,4 @@
 <?php
-declare(strict_types=1);
 
 namespace Illuminate\Tests\Validation;
 
@@ -3149,7 +3148,13 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['foo' => '1'], ['foo' => 'Decimal:0,1']);
         $this->assertTrue($v->passes());
 
+        $v = new Validator($trans, ['foo' => 1], ['foo' => 'Decimal:0,1']);
+        $this->assertTrue($v->passes());
+
         $v = new Validator($trans, ['foo' => '1.2'], ['foo' => 'Decimal:0,1']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 1.2], ['foo' => 'Decimal:0,1']);
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['foo' => '-1.2'], ['foo' => 'Decimal:0,1']);
