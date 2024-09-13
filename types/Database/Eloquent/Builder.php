@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\HasBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use User;
@@ -25,14 +26,23 @@ function test(
     assertType('Illuminate\Database\Eloquent\Builder<User>', $query->whereNot('status', 'active'));
     assertType('Illuminate\Database\Eloquent\Builder<User>', $query->with('relation'));
     assertType('Illuminate\Database\Eloquent\Builder<User>', $query->with(['relation' => ['foo' => fn ($q) => $q]]));
-    assertType('Illuminate\Database\Eloquent\Builder<User>', $query->with(['relation' => function ($query) {
-        // assertType('Illuminate\Database\Eloquent\Relations\Relation<*,*,*>', $query);
+    assertType('Illuminate\Database\Eloquent\Builder<User>', $query->with(['relation' => function (HasMany $query): void {
+        assertType('Illuminate\Database\Eloquent\Relations\HasMany', $query);
+    }]));
+    assertType('Illuminate\Database\Eloquent\Builder<User>', $query->with(['relation' => function (HasOne $query): void {
+        assertType('Illuminate\Database\Eloquent\Relations\HasOne', $query);
+    }]));
+    assertType('Illuminate\Database\Eloquent\Builder<User>', $query->with(['relation' => function (MorphTo $query): void {
+        assertType('Illuminate\Database\Eloquent\Relations\MorphTo', $query);
     }]));
     assertType('Illuminate\Database\Eloquent\Builder<User>', $query->without('relation'));
     assertType('Illuminate\Database\Eloquent\Builder<User>', $query->withOnly(['relation']));
     assertType('Illuminate\Database\Eloquent\Builder<User>', $query->withOnly(['relation' => ['foo' => fn ($q) => $q]]));
-    assertType('Illuminate\Database\Eloquent\Builder<User>', $query->withOnly(['relation' => function ($query) {
-        // assertType('Illuminate\Database\Eloquent\Relations\Relation<*,*,*>', $query);
+    assertType('Illuminate\Database\Eloquent\Builder<User>', $query->withOnly(['relation' => function (MorphTo $query) {
+        assertType('Illuminate\Database\Eloquent\Relations\MorphTo', $query);
+    }]));
+    assertType('Illuminate\Database\Eloquent\Builder<User>', $query->withOnly(['relation' => function (HasOne $query): void {
+        assertType('Illuminate\Database\Eloquent\Relations\HasOne', $query);
     }]));
     assertType('array<int, User>', $query->getModels());
     assertType('array<int, User>', $query->eagerLoadRelations([]));

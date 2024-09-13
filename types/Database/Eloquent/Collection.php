@@ -1,5 +1,10 @@
 <?php
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
+
 use function PHPStan\Testing\assertType;
 
 $collection = User::all();
@@ -11,77 +16,77 @@ assertType('Illuminate\Database\Eloquent\Collection<int, User>|string|User', $co
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->load('string'));
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->load(['string']));
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->load(['string' => ['foo' => fn ($q) => $q]]));
-assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->load(['string' => function ($query) {
-    // assertType('Illuminate\Database\Eloquent\Relations\Relation<*,*,*>', $query);
+assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->load(['string' => function (BelongsTo $query) {
+    assertType('Illuminate\Database\Eloquent\Relations\BelongsTo', $query);
 }]));
 
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadAggregate('string', 'string'));
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadAggregate(['string'], 'string'));
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadAggregate(['string' => ['foo' => fn ($q) => $q]], 'string'));
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadAggregate(['string'], 'string', 'string'));
-assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadAggregate(['string' => function ($query) {
-    // assertType('Illuminate\Database\Eloquent\Relations\Relation<*,*,*>', $query);
+assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadAggregate(['string' => function (BelongsTo $query) {
+    assertType('Illuminate\Database\Eloquent\Relations\BelongsTo', $query);
 }], 'string', 'string'));
 
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadCount('string'));
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadCount(['string']));
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadCount(['string' => ['foo' => fn ($q) => $q]]));
-assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadCount(['string' => function ($query) {
-    // assertType('Illuminate\Database\Eloquent\Relations\Relation<*,*,*>', $query);
+assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadCount(['string' => function (HasOne $query) {
+    assertType('Illuminate\Database\Eloquent\Relations\HasOne', $query);
 }]));
 
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadMax('string', 'string'));
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadMax(['string'], 'string'));
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadMax(['string' => ['foo' => fn ($q) => $q]], 'string'));
-assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadMax(['string' => function ($query) {
-    // assertType('Illuminate\Database\Eloquent\Relations\Relation<*,*,*>', $query);
+assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadMax(['string' => function (HasMany $query) {
+    assertType('Illuminate\Database\Eloquent\Relations\HasMany', $query);
 }], 'string'));
 
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadMin('string', 'string'));
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadMin(['string'], 'string'));
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadMin(['string' => ['foo' => fn ($q) => $q]], 'string'));
-assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadMin(['string' => function ($query) {
-    // assertType('Illuminate\Database\Eloquent\Relations\Relation<*,*,*>', $query);
+assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadMin(['string' => function (HasOne $query) {
+    assertType('Illuminate\Database\Eloquent\Relations\HasOne', $query);
 }], 'string'));
 
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadSum('string', 'string'));
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadSum(['string'], 'string'));
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadSum(['string' => ['foo' => fn ($q) => $q]], 'string'));
-assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadSum(['string' => function ($query) {
-    // assertType('Illuminate\Database\Eloquent\Relations\Relation<*,*,*>', $query);
+assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadSum(['string' => function (HasMany $query) {
+    assertType('Illuminate\Database\Eloquent\Relations\HasMany', $query);
 }], 'string'));
 
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadAvg('string', 'string'));
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadAvg(['string'], 'string'));
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadAvg(['string' => ['foo' => fn ($q) => $q]], 'string'));
-assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadAvg(['string' => function ($query) {
-    // assertType('Illuminate\Database\Eloquent\Relations\Relation<*,*,*>', $query);
+assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadAvg(['string' => function (BelongsTo $query) {
+    assertType('Illuminate\Database\Eloquent\Relations\BelongsTo', $query);
 }], 'string'));
 
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadExists('string'));
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadExists(['string']));
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadExists(['string' => ['foo' => fn ($q) => $q]]));
-assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadExists(['string' => function ($query) {
-    // assertType('Illuminate\Database\Eloquent\Relations\Relation<*,*,*>', $query);
+assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadExists(['string' => function (MorphTo $query) {
+    assertType('Illuminate\Database\Eloquent\Relations\MorphTo', $query);
 }]));
 
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadMissing('string'));
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadMissing(['string']));
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadMissing(['string' => ['foo' => fn ($q) => $q]]));
-assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadMissing(['string' => function ($query) {
-    // assertType('Illuminate\Database\Eloquent\Relations\Relation<*,*,*>', $query);
+assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadMissing(['string' => function (HasOne $query) {
+    assertType('Illuminate\Database\Eloquent\Relations\HasOne', $query);
 }]));
 
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadMorph('string', ['string']));
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadMorph('string', ['string' => ['foo' => fn ($q) => $q]]));
-assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadMorph('string', ['string' => function ($query) {
-    // assertType('Illuminate\Database\Eloquent\Relations\Relation<*,*,*>', $query);
+assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadMorph('string', ['string' => function (HasMany $query) {
+    assertType('Illuminate\Database\Eloquent\Relations\HasMany', $query);
 }]));
 
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadMorphCount('string', ['string']));
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadMorphCount('string', ['string' => ['foo' => fn ($q) => $q]]));
-assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadMorphCount('string', ['string' => function ($query) {
-    // assertType('Illuminate\Database\Eloquent\Relations\Relation<*,*,*>', $query);
+assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadMorphCount('string', ['string' => function (HasOne $query) {
+    assertType('Illuminate\Database\Eloquent\Relations\HasOne', $query);
 }]));
 
 assertType('bool', $collection->contains(function ($user) {
