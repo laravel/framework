@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Integration\Database\Sqlite;
 
-use Illuminate\Tests\Integration\Database\Traits\EloquentBulkInsertTestTrait;
 use Illuminate\Tests\Integration\Database\Traits\CreatesUniqueUsersUUIDTable;
+use Illuminate\Tests\Integration\Database\Traits\EloquentBulkInsertTestTrait;
 
 class DatabaseEloquentSqliteIntegrationTest extends SqliteTestCase
 {

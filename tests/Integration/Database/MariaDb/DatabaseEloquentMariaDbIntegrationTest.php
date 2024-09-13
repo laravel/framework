@@ -6,8 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Tests\Integration\Database\Traits\EloquentBulkInsertTestTrait;
 use Illuminate\Tests\Integration\Database\Traits\CreatesUniqueUsersUUIDTable;
+use Illuminate\Tests\Integration\Database\Traits\EloquentBulkInsertTestTrait;
 
 class DatabaseEloquentMariaDbIntegrationTest extends MariaDbTestCase
 {

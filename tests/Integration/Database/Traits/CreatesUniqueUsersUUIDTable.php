@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Integration\Database\Traits;
 
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 trait CreatesUniqueUsersUUIDTable
 {

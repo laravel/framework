@@ -1146,7 +1146,7 @@ class Builder implements BuilderContract
     /**
      * Insert new records.
      *
-     * @param array $values
+     * @param  array  $values
      * @return bool
      */
     public function insert(array $values)

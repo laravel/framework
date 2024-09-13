@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Integration\Database\Traits;
 
-use Illuminate\Support\Carbon;
 use Illuminate\Database\UniqueConstraintViolationException;
+use Illuminate\Support\Carbon;
 use Illuminate\Tests\Integration\Database\Model\DatabaseEloquentIntegrationUniqueUserUUID;
 
 trait EloquentBulkInsertTestTrait
