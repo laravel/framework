@@ -6,12 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Tests\Integration\Database\Traits\EloquentBulkInsertTest;
+use Illuminate\Tests\Integration\Database\Traits\EloquentBulkInsertTestTrait;
 use Illuminate\Tests\Integration\Database\Traits\CreatesUniqueUsersUUIDTable;
 
 class DatabaseEloquentMariaDbIntegrationTest extends MariaDbTestCase
 {
-    use EloquentBulkInsertTest;
+    use EloquentBulkInsertTestTrait;
     use CreatesUniqueUsersUUIDTable;
 
     protected function afterRefreshingDatabase()

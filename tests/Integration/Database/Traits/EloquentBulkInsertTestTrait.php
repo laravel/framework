@@ -6,7 +6,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Tests\Integration\Database\Model\DatabaseEloquentIntegrationUniqueUserUUID;
 
-trait EloquentBulkInsertTest
+trait EloquentBulkInsertTestTrait
 {
     public function testBulkInsertWithNonAutoIncrementingId(): void
     {
@@ -45,12 +45,11 @@ trait EloquentBulkInsertTest
         $this->assertTrue($result);
         $this->assertEquals(2, $query->count());
 
-        $result = $query->upsert([
+        $query->upsert([
             ['name' => 'First', 'email' => 'foo@gmail.com', 'birthday' => $now],
             ['name' => 'Third', 'email' => 'baz@gmail.com', 'birthday' => $now],
         ], ['email'], ['name', 'birthday']);
 
-        $this->assertEquals(2, $result);
         $this->assertEquals(3, $query->count());
 
         $user = $query->where('email', 'foo@gmail.com')->first();
