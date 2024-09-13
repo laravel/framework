@@ -4,7 +4,9 @@ namespace Illuminate\Support;
 
 use ArgumentCountError;
 use ArrayAccess;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\View\ComponentAttributeBag;
 use InvalidArgumentException;
 use Random\Randomizer;
 
@@ -889,6 +891,26 @@ class Arr
         }
 
         return implode(' ', $classes);
+    }
+
+    /**
+     * Conditionally compile attributes from an array into an HTML attribute string.
+     *
+     * @param  array  $array
+     * @return string
+     */
+    public static function toHtmlAttributes($array)
+    {
+       return Collection::make($array)->map(function ($value, $key) {
+        if ($key) {
+            return $value ? sprintf('%s', $key) : null;
+        } elseif ($value instanceof ComponentAttributeBag) {
+            return collect($value->getAttributes())->map(fn ($value, $key) => sprintf('%s="%s"', $key, $value));
+        } else {
+            return sprintf("%s", $value);
+        }
+       })
+           ->implode(" ");
     }
 
     /**

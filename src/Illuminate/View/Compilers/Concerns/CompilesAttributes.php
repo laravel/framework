@@ -13,6 +13,6 @@ trait CompilesAttributes
     protected function compileAttributes($expression)
     {
         $expression = is_null($expression) ? '([])' : $expression;
-        return "<?php echo \Illuminate\Support\Collection::make{$expression}->map(function (\$value, \$key) { if (\$key && \$value) { return \$value ? \$key : null; } else { return \$value; } })->filter()->implode(' '); ?>";
+        return "<?php echo \Illuminate\Support\Arr::toHtmlAttributes{$expression}; ?>";
     }
 }

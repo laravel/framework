@@ -112,8 +112,9 @@ class ComponentTagCompiler
                         \s+
                         (?:
                             (?:
-                                @(?:attributes)(\( (?: (?>[^()]+) | (?-1) )* \))
+                                @(?:withAttributes)(\( (?: (?>[^()]+) | (?-1) )* \))
                             )
+                            |
                             (?:
                                 @(?:class)(\( (?: (?>[^()]+) | (?-1) )* \))
                             )
@@ -155,7 +156,6 @@ class ComponentTagCompiler
             $this->boundAttributes = [];
 
             $attributes = $this->getAttributesFromAttributeString($matches['attributes']);
-
             return $this->componentString($matches[1], $attributes);
         }, $value);
     }
@@ -179,6 +179,10 @@ class ComponentTagCompiler
                     (?:
                         \s+
                         (?:
+                            (?:
+                                @(?:attributes)(\( (?: (?>[^()]+) | (?-1) )* \))
+                            )
+                            |
                             (?:
                                 @(?:class)(\( (?: (?>[^()]+) | (?-1) )* \))
                             )
@@ -515,6 +519,10 @@ class ComponentTagCompiler
                         \s+
                         (?:
                             (?:
+                                @(?:attributes)(\( (?: (?>[^()]+) | (?-1) )* \))
+                            )
+                            |
+                            (?:
                                 @(?:class)(\( (?: (?>[^()]+) | (?-1) )* \))
                             )
                             |
@@ -584,8 +592,9 @@ class ComponentTagCompiler
      */
     protected function getAttributesFromAttributeString(string $attributeString)
     {
-        $attributeString = $this->parseShortAttributeSyntax($attributeString);
         $attributeString = $this->parseAttributeBag($attributeString);
+        $attributeString = $this->parseShortAttributeSyntax($attributeString);
+        $attributeString = $this->parseComponentTagAttributesStatements($attributeString);
         $attributeString = $this->parseComponentTagClassStatements($attributeString);
         $attributeString = $this->parseComponentTagStyleStatements($attributeString);
         $attributeString = $this->parseBindAttributes($attributeString);
@@ -635,7 +644,8 @@ class ComponentTagCompiler
             }
 
             return [$attribute => $value];
-        })->toArray();
+        })
+            ->toArray();
     }
 
     /**
@@ -683,6 +693,26 @@ class ComponentTagCompiler
                     $match[2] = str_replace('"', "'", $match[2]);
 
                     return ":class=\"\Illuminate\Support\Arr::toCssClasses{$match[2]}\"";
+                }
+
+                return $match[0];
+            }, $attributeString
+        );
+    }
+
+    /**
+     * Parse @attributes statements in a given attribute string into their fully-qualified syntax.
+     *
+     * @param  string  $attributeString
+     * @return string
+     */
+    protected function parseComponentTagAttributesStatements(string $attributeString)
+    {
+        return preg_replace_callback(
+            '/@(attributes)(\( ( (?>[^()]+) | (?2) )* \))/x', function ($match) {
+                if ($match[1] === 'attributes') {
+                    $match[2] = str_replace('"', "'", $match[2]);
+                    return \Illuminate\Support\Arr::toHtmlAttributes($match[2]);
                 }
 
                 return $match[0];
