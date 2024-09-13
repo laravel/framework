@@ -19,6 +19,9 @@ use ReflectionClass;
  */
 class ComponentTagCompiler
 {
+
+    use Concerns\CompilesAttributes;
+
     /**
      * The Blade compiler instance.
      *
@@ -112,7 +115,7 @@ class ComponentTagCompiler
                         \s+
                         (?:
                             (?:
-                                @(?:withAttributes)(\( (?: (?>[^()]+) | (?-1) )* \))
+                                @(?:attributes)(\( (?: (?>[^()]+) | (?-1) )* \))
                             )
                             |
                             (?:
@@ -154,7 +157,6 @@ class ComponentTagCompiler
 
         return preg_replace_callback($pattern, function (array $matches) {
             $this->boundAttributes = [];
-
             $attributes = $this->getAttributesFromAttributeString($matches['attributes']);
             return $this->componentString($matches[1], $attributes);
         }, $value);
@@ -592,9 +594,9 @@ class ComponentTagCompiler
      */
     protected function getAttributesFromAttributeString(string $attributeString)
     {
+        $attributeString = $this->parseComponentTagAttributesStatements($attributeString);
         $attributeString = $this->parseAttributeBag($attributeString);
         $attributeString = $this->parseShortAttributeSyntax($attributeString);
-        $attributeString = $this->parseComponentTagAttributesStatements($attributeString);
         $attributeString = $this->parseComponentTagClassStatements($attributeString);
         $attributeString = $this->parseComponentTagStyleStatements($attributeString);
         $attributeString = $this->parseBindAttributes($attributeString);
@@ -619,7 +621,8 @@ class ComponentTagCompiler
             return [];
         }
 
-        return collect($matches)->mapWithKeys(function ($match) {
+        return collect($matches)
+            ->mapWithKeys(function ($match) {
             $attribute = $match['attribute'];
             $value = $match['value'] ?? null;
 
@@ -691,7 +694,6 @@ class ComponentTagCompiler
             '/@(class)(\( ( (?>[^()]+) | (?2) )* \))/x', function ($match) {
                 if ($match[1] === 'class') {
                     $match[2] = str_replace('"', "'", $match[2]);
-
                     return ":class=\"\Illuminate\Support\Arr::toCssClasses{$match[2]}\"";
                 }
 
@@ -711,8 +713,34 @@ class ComponentTagCompiler
         return preg_replace_callback(
             '/@(attributes)(\( ( (?>[^()]+) | (?2) )* \))/x', function ($match) {
                 if ($match[1] === 'attributes') {
-                    $match[2] = str_replace('"', "'", $match[2]);
-                    return \Illuminate\Support\Arr::toHtmlAttributes($match[2]);
+//                    $match[2] = str_replace('"', "'", $match[2]);
+
+                    // Using regex to extract keys and values
+                    $matches = [];
+                    preg_match_all(
+                         "/'([^']+)' =>\s*(true|false|'.*?')/",
+                        $match[2],
+                        $matches);
+
+                    $parsedArray = [];
+                    // Iterate through the matches to handle boolean and string values correctly
+                    foreach ($matches[1] as $index => $key) {
+                        $value = $matches[2][$index];
+
+                        // Check if the value is actual boolean true or false
+                        if ($value === 'true') {
+                            $parsedArray[$key] = true;
+                        } elseif ($value === 'false') {
+                            $parsedArray[$key] = false;
+                        } else {
+                            // If it's a string (e.g., 'value'), remove the surrounding quotes
+                            $parsedArray[$key] = trim($value, "'");
+                        }
+                    }
+
+                    // Combine keys and values into an associative array
+                    $parsedArray = array_combine($matches[1], $matches[2]);
+                    return \Illuminate\Support\Arr::toHtmlAttributes($parsedArray);
                 }
 
                 return $match[0];

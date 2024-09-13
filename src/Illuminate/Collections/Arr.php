@@ -905,7 +905,7 @@ class Arr
         if ($key) {
             return $value ? sprintf('%s', $key) : null;
         } elseif ($value instanceof ComponentAttributeBag) {
-            return collect($value->getAttributes())->map(fn ($value, $key) => sprintf('%s="%s"', $key, $value));
+            return collect($value->getAttributes())->map(fn ($value, $key) => sprintf('%s="%s"', $key, $value))->join(' ');
         } else {
             return sprintf("%s", $value);
         }
