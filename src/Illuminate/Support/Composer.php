@@ -4,9 +4,10 @@ namespace Illuminate\Support;
 
 use Closure;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Process\PhpExecutableFinder;
 use RuntimeException;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Process\PhpExecutableFinder;
+use Symfony\Component\Process\PhpExecutableFinder as SymfonyPhpExecutableFinder;
 use Symfony\Component\Process\Process;
 
 class Composer
@@ -204,7 +205,11 @@ class Composer
      */
     protected function phpBinary()
     {
-        return (new PhpExecutableFinder)->find(false) ?: 'php';
+        $class = class_exists(PhpExecutableFinder::class)
+            ? PhpExecutableFinder::class
+            : SymfonyPhpExecutableFinder::class;
+
+        return (new $class)->find(false) ?: 'php';
     }
 
     /**
