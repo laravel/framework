@@ -963,7 +963,6 @@ class Arr
      */
     public static function scale($array, $min_range = 0, $max_range = 1,$precision=14)
     {
-
         if (empty($array)) {
             return [];
         }
@@ -998,11 +997,17 @@ class Arr
         }
 
         return self::map($array, function ($item, $key) use ($keys, $min_range, $max_range,$precision) {
-            if (!in_array($key, $keys) || !is_array($item) || is_object($item)) {
+            if ((!in_array($key, $keys)&&!isset($keys[$key])) || !is_array($item) || is_object($item)) {
                 return $item;
             }
-            return self::scale($item, $min_range, $max_range,$precision);
 
+            if(isset($keys[$key]))
+            {
+                return self::scale($item, $keys[$key][0]??$min_range, $keys[$key][1]??$max_range,$keys[$key][2]??$precision);
+            }
+            else {
+                return self::scale($item, $min_range, $max_range, $precision);
+            }
         });
     }
 
@@ -1037,7 +1042,7 @@ class Arr
                 continue;
 
             if (is_array($value) && !empty($value)) {
-                $result = self::scale($values, $value[0] ?? 0, $value[1] ?? 1,$value[2]??14);
+                $result = self::scale($values, $value[0] ?? $min_range, $value[1] ?? $max_range,$value[2]??$precision);
             } else {
                 $result = self::scale($values, $min_range, $max_range,$precision);
             }
