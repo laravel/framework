@@ -903,13 +903,16 @@ class Arr
     {
        return Collection::make($array)->map(function ($value, $key) {
         if ($key) {
-            return $value ? sprintf('%s', $key) : null;
+            $value = value($value);
+            return is_null($value) || $value === false ? null : sprintf('%s="%s"', $key, $value);
         } elseif ($value instanceof ComponentAttributeBag) {
-            return collect($value->getAttributes())->map(fn ($value, $key) => sprintf('%s="%s"', $key, $value))->join(' ');
+            return self::toHtmlAttributes($value->getAttributes());
         } else {
             return sprintf("%s", $value);
         }
        })
+           ->filter()
+           ->values()
            ->implode(" ");
     }
 
