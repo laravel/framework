@@ -1970,6 +1970,6 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
             return new static($this->items);
         }
 
-        return new static(Arr::scaleByMany($this->items,$keys, $min, $max,$precision=14));
+        return new static(Arr::scaleByMany($this->items,$keys, $min, $max,$precision));
     }
 }
