@@ -7,6 +7,7 @@ use Illuminate\Console\Events\ArtisanStarting;
 use Illuminate\Contracts\Console\Application as ApplicationContract;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Process\PhpExecutableFinder;
 use Illuminate\Support\ProcessUtils;
 use Symfony\Component\Console\Application as SymfonyApplication;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
@@ -16,7 +17,7 @@ use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\BufferedOutput;
-use Symfony\Component\Process\PhpExecutableFinder;
+use Symfony\Component\Process\PhpExecutableFinder as SymfonyPhpExecutableFinder;
 
 class Application extends SymfonyApplication implements ApplicationContract
 {
@@ -84,7 +85,11 @@ class Application extends SymfonyApplication implements ApplicationContract
      */
     public static function phpBinary()
     {
-        return ProcessUtils::escapeArgument((new PhpExecutableFinder)->find(false) ?: 'php');
+        $class = class_exists(PhpExecutableFinder::class)
+            ? PhpExecutableFinder::class
+            : SymfonyPhpExecutableFinder::class;
+
+        return ProcessUtils::escapeArgument((new $class)->find(false) ?: 'php');
     }
 
     /**
