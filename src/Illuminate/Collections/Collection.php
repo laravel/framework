@@ -1902,4 +1902,74 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     {
         unset($this->items[$key]);
     }
+
+    /**
+     * Scale collection items between tow number
+     *
+     * @param  int  $min
+     * @param  int  $max
+     * @param int $precision
+     * @return $this
+     */
+    public function scale($min=0,$max=1,$precision=14)
+    {
+        return new static(Arr::scale($this->items, $min, $max,$precision));
+    }
+
+    /**
+     * Scale By index of Collection items between tow number
+     *
+     * @param \Illuminate\Support\Enumerable<array-key, TKey>|array<array-key, TKey>|string|null $keys
+     * @param  int  $min
+     * @param  int  $max
+     * @param int $precision
+     * @return $this
+     */
+    public function scaleBy($keys,$min=0,$max=1,$precision=14)
+    {
+        if (is_null($keys)) {
+            return new static($this->items);
+        }
+
+        if ($keys instanceof Enumerable) {
+            $keys = $keys->all();
+        }
+
+        $keys = Arr::wrap($keys);
+
+        if(empty($keys)) {
+            return new static($this->items);
+        }
+
+        return new static(Arr::scaleBy($this->items,$keys, $min, $max,$precision));
+    }
+
+    /**
+     * Scale By index of Collection items element between tow number
+     *
+     * @param \Illuminate\Support\Enumerable<array-key, TKey>|string|array<array-key, TKey>|null $keys
+     * @param  int  $min
+     * @param  int  $max
+     * @param  int  $precision
+     * @return $this
+     */
+    public function scaleByMany($keys, $min=0, $max=1, $precision=14)
+    {
+
+        if (is_null($keys)) {
+            return new static($this->items);
+        }
+
+        if ($keys instanceof Enumerable) {
+            $keys = $keys->all();
+        }
+
+        $keys = Arr::wrap($keys);
+
+        if(empty($keys)) {
+            return new static($this->items);
+        }
+
+        return new static(Arr::scaleByMany($this->items,$keys, $min, $max,$precision=14));
+    }
 }

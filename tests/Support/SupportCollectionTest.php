@@ -5563,6 +5563,103 @@ class SupportCollectionTest extends TestCase
         $this->assertNull($collection->percentage(fn ($value) => $value === 1));
     }
 
+    #[DataProvider('collectionClassProvider')]
+    public function testScaleReturnsEmptyArrayForEmptyCollection($collection)
+    {
+        $collection = new $collection();
+
+        $this->assertEquals([],$collection->scale()->all());
+    }
+    #[DataProvider('collectionClassProvider')]
+    public function testScale($collection)
+    {
+        $collection = new $collection([0,2,4,6,8,10]);
+
+        $this->assertEquals([0,0.2,0.4,0.6,0.8,1], $collection->scale()->all());
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testScaleWithParams($collection)
+    {
+        $collection = new $collection([0,2,4,6,8,10]);
+
+        $this->assertEquals([-2,-1.2,-0.4,0.4,1.2,2],$collection->scale(-2,2,1)->all());
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testScaleWithFloatOutput($collection)
+    {
+        $collection = new $collection([0.0003,0,1]);
+
+        $this->assertEquals([0.13,0.1,100],$collection->scale(0.1,100,2)->all());
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testScaleBy($collection)
+    {
+        $collection = new $collection(['Taylor'=>[0,1,2,3,4],"Hossein"=>[5,6,7,8,9]]);
+
+        $this->assertEquals(['Taylor'=>[0,0.25,0.5,0.75,1],"Hossein"=>[5,6,7,8,9]],$collection->scaleBy('Taylor',precision:2)->all());
+        $this->assertEquals(['Taylor'=>[0,0.25,0.5,0.75,1],"Hossein"=>[5,6,7,8,9]],$collection->scaleBy(['Taylor'],precision:2)->all());
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testScaleByReturnsEmptyArrayForEmptyCollection($collection)
+    {
+        $collection = new $collection();
+
+        $this->assertEquals([],$collection->scaleBy('Taylor')->all());
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testScaleByReturnsItemsWithoutChangesOnKeyIsEmptyOrNotFound($collection)
+    {
+        $collection = new $collection(['Taylor'=>[0,1,2,3,4]]);
+
+        $this->assertEquals(['Taylor'=>[0,1,2,3,4]],$collection->scaleBy([])->all());
+        $this->assertEquals(['Taylor'=>[0,1,2,3,4]],$collection->scaleBy('Hossein')->all());
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testScaleByMany($collection)
+    {
+        $firstModel = new StdClass();
+        $firstModel->name="Taylor";
+        $firstModel->score=100;
+
+        $firstExceptModel = $firstModel;
+        $firstExceptModel->score=1000;
+
+        $secondModel = new StdClass();
+        $secondModel->name="Hossein";
+        $secondModel->score=65;
+
+        $secondExceptModel = $secondModel;
+        $secondExceptModel->score=0;
+
+        $collection = new $collection([$firstModel,$secondModel]);
+
+        $this->assertEquals([$firstExceptModel,$secondExceptModel],$collection->scaleByMany('score',0,1000)->toArray());
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testScaleByManyReturnsItemsWithoutChangesOnKeyIsEmptyOrNotFound($collection)
+    {
+        $firstModel = new StdClass();
+        $firstModel->name="Taylor";
+        $firstModel->score=100;
+
+        $secondModel = new StdClass();
+        $secondModel->name="Hossein";
+        $secondModel->score=65;
+
+        $collection = new $collection([$firstModel,$secondModel]);
+
+        $this->assertEquals([$firstModel,$secondModel],$collection->scaleByMany('price',0,100)->toArray());
+    }
+
+
+
     /**
      * Provides each collection class, respectively.
      *

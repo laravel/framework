@@ -1787,6 +1787,49 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     }
 
     /**
+     * Scale collection items between tow number
+     *
+     * @param  int  $min
+     * @param  int  $max
+     * @param int $precision
+     * @return static
+     */
+    public function scale($min=0,$max=1,$precision=14)
+    {
+        return $this->passthru('scale', [$min,$max,$precision]);
+    }
+
+    /**
+     * Scale By index of Collection items between tow number
+     *
+     * @param \Illuminate\Support\Enumerable<array-key, TKey>|array<array-key, TKey>|string|null $keys
+     * @param  int  $min
+     * @param  int  $max
+     * @param int $precision
+     * @return static
+     */
+    public function scaleBy($keys,$min=0,$max=1,$precision=14)
+    {
+        return $this->passthru('scaleBy', [$keys,$min,$max,$precision]);
+    }
+
+    /**
+     * Scale By index of Collection items element between tow number
+     *
+     * @param \Illuminate\Support\Enumerable<array-key, TKey>|string|array<array-key, TKey>|null $keys
+     * @param  int  $min
+     * @param  int  $max
+     * @param  int  $precision
+     * @return static
+     */
+    public function scaleByMany($keys,$min=0,$max=1,$precision=14)
+    {
+        return $this->passthru('scaleByMany', [$keys,$min,$max,$precision]);
+    }
+
+
+
+    /**
      * Get the values iterator.
      *
      * @return \Traversable<TKey, TValue>

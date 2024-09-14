@@ -22,12 +22,12 @@ class SupportArrTest extends TestCase
         $this->assertFalse(Arr::accessible(null));
         $this->assertFalse(Arr::accessible('abc'));
         $this->assertFalse(Arr::accessible(new stdClass));
-        $this->assertFalse(Arr::accessible((object) ['a' => 1, 'b' => 2]));
+        $this->assertFalse(Arr::accessible((object)['a' => 1, 'b' => 2]));
         $this->assertFalse(Arr::accessible(123));
         $this->assertFalse(Arr::accessible(12.34));
         $this->assertFalse(Arr::accessible(true));
         $this->assertFalse(Arr::accessible(new \DateTime));
-        $this->assertFalse(Arr::accessible(static fn () => null));
+        $this->assertFalse(Arr::accessible(static fn() => null));
     }
 
     public function testAdd()
@@ -263,8 +263,8 @@ class SupportArrTest extends TestCase
         $array = array_values(Arr::whereNotNull(['a', null, 'b', null, 'c']));
         $this->assertEquals(['a', 'b', 'c'], $array);
 
-        $array = array_values(Arr::whereNotNull([null, 1, 'string', 0.0, false, [], new stdClass(), fn () => null]));
-        $this->assertEquals([1, 'string', 0.0, false, [], new stdClass(), fn () => null], $array);
+        $array = array_values(Arr::whereNotNull([null, 1, 'string', 0.0, false, [], new stdClass(), fn() => null]));
+        $this->assertEquals([1, 'string', 0.0, false, [], new stdClass(), fn() => null], $array);
     }
 
     public function testFirst()
@@ -722,7 +722,7 @@ class SupportArrTest extends TestCase
 
     public function testArrayPluckWithArrayAndObjectValues()
     {
-        $array = [(object) ['name' => 'taylor', 'email' => 'foo'], ['name' => 'dayle', 'email' => 'bar']];
+        $array = [(object)['name' => 'taylor', 'email' => 'foo'], ['name' => 'dayle', 'email' => 'bar']];
         $this->assertEquals(['taylor', 'dayle'], Arr::pluck($array, 'name'));
         $this->assertEquals(['taylor' => 'foo', 'dayle' => 'bar'], Arr::pluck($array, 'email', 'name'));
     }
@@ -763,7 +763,7 @@ class SupportArrTest extends TestCase
     {
         $data = ['first' => 'taylor', 'last' => 'otwell'];
         $mapped = Arr::map($data, function ($value, $key) {
-            return $key.'-'.strrev($value);
+            return $key . '-' . strrev($value);
         });
         $this->assertEquals(['first' => 'first-rolyat', 'last' => 'last-llewto'], $mapped);
         $this->assertEquals(['first' => 'taylor', 'last' => 'otwell'], $data);
@@ -772,7 +772,7 @@ class SupportArrTest extends TestCase
     public function testMapWithEmptyArray()
     {
         $mapped = Arr::map([], static function ($value, $key) {
-            return $key.'-'.$value;
+            return $key . '-' . $value;
         });
         $this->assertEquals([], $mapped);
     }
@@ -781,7 +781,7 @@ class SupportArrTest extends TestCase
     {
         $data = ['first' => 'taylor', 'last' => null];
         $mapped = Arr::map($data, static function ($value, $key) {
-            return $key.'-'.$value;
+            return $key . '-' . $value;
         });
         $this->assertEquals(['first' => 'first-taylor', 'last' => 'last-'], $mapped);
     }
@@ -1361,10 +1361,10 @@ class SupportArrTest extends TestCase
     public function testSortByMany()
     {
         $unsorted = [
-            ['name' => 'John', 'age' => 8,  'meta' => ['key' => 3]],
+            ['name' => 'John', 'age' => 8, 'meta' => ['key' => 3]],
             ['name' => 'John', 'age' => 10, 'meta' => ['key' => 5]],
             ['name' => 'Dave', 'age' => 10, 'meta' => ['key' => 3]],
-            ['name' => 'John', 'age' => 8,  'meta' => ['key' => 2]],
+            ['name' => 'John', 'age' => 8, 'meta' => ['key' => 2]],
         ];
 
         // sort using keys
@@ -1375,8 +1375,8 @@ class SupportArrTest extends TestCase
         ]));
         $this->assertEquals([
             ['name' => 'Dave', 'age' => 10, 'meta' => ['key' => 3]],
-            ['name' => 'John', 'age' => 8,  'meta' => ['key' => 2]],
-            ['name' => 'John', 'age' => 8,  'meta' => ['key' => 3]],
+            ['name' => 'John', 'age' => 8, 'meta' => ['key' => 2]],
+            ['name' => 'John', 'age' => 8, 'meta' => ['key' => 3]],
             ['name' => 'John', 'age' => 10, 'meta' => ['key' => 5]],
         ], $sorted);
 
@@ -1389,8 +1389,8 @@ class SupportArrTest extends TestCase
         $this->assertEquals([
             ['name' => 'Dave', 'age' => 10, 'meta' => ['key' => 3]],
             ['name' => 'John', 'age' => 10, 'meta' => ['key' => 5]],
-            ['name' => 'John', 'age' => 8,  'meta' => ['key' => 2]],
-            ['name' => 'John', 'age' => 8,  'meta' => ['key' => 3]],
+            ['name' => 'John', 'age' => 8, 'meta' => ['key' => 2]],
+            ['name' => 'John', 'age' => 8, 'meta' => ['key' => 3]],
         ], $sortedWithOrder);
 
         // sort using callable
@@ -1406,8 +1406,8 @@ class SupportArrTest extends TestCase
         $this->assertEquals([
             ['name' => 'Dave', 'age' => 10, 'meta' => ['key' => 3]],
             ['name' => 'John', 'age' => 10, 'meta' => ['key' => 5]],
-            ['name' => 'John', 'age' => 8,  'meta' => ['key' => 2]],
-            ['name' => 'John', 'age' => 8,  'meta' => ['key' => 3]],
+            ['name' => 'John', 'age' => 8, 'meta' => ['key' => 2]],
+            ['name' => 'John', 'age' => 8, 'meta' => ['key' => 3]],
         ], $sortedWithCallable);
     }
 
@@ -1501,5 +1501,128 @@ class SupportArrTest extends TestCase
                 'name' => 'Abigail',
             ],
         ], Arr::select($array, 'name'));
+    }
+
+    public function testScale()
+    {
+        $array = [-2, -1, 0, 2];
+        $this->assertEquals([0, 0.25, 0.5, 1], Arr::scale($array,precision: 2));
+        $this->assertEquals([1, 1.75, 2.5, 4], Arr::scale($array, 1, 4,2));
+        $this->assertEquals([4, 3.25, 2.5, 1], Arr::scale($array, 4, 1,2));
+        $this->assertEquals([1, 0.75, 0.5, 0], Arr::scale($array, 1, 0,2));
+        $this->assertEquals([0, 0.25, 0.5, 1], Arr::scale($array, 0, 1,2));
+        $this->assertEquals([0, -0.25, -0.5, -1], Arr::scale($array, 0, -1,2));
+        $this->assertEquals([-1, -0.75, -0.5, 0], Arr::scale($array, -1, 0,2));
+        $this->assertEquals([-2, -1, 0, 2], Arr::scale($array, -2, 2,2));
+        $this->assertEquals([2, 1, 0, -2], Arr::scale($array, 2, -2,2));
+        $this->assertEquals([0, 0, 0, 0], Arr::scale($array, 0, 0,2));
+    }
+
+    public function testScaleBy()
+    {
+        return true;
+        $array = ['numbers' => [-2, -1, 0, 2], 'classes' => [1, 2, 3, 4]];
+        $this->assertEquals(['numbers' => [0, 0.25, 0.5, 1], 'classes' => [1, 2, 3, 4]], Arr::scaleBy($array, 'numbers',precision: 2));
+        $this->assertEquals(['numbers' => [1, 1.75, 2.5, 4], 'classes' => [1, 2, 3, 4]], Arr::scaleBy($array, 'numbers', 1, 4,2));
+        $this->assertEquals(['numbers' => [4, 3.25, 2.5, 1], 'classes' => [1, 2, 3, 4]], Arr::scaleBy($array, 'numbers', 4, 1,2));
+        $this->assertEquals(['numbers' => [1, 0.75, 0.5, 0], 'classes' => [1, 2, 3, 4]], Arr::scaleBy($array, 'numbers', 1, 0,2));
+        $this->assertEquals(['numbers' => [0, 0.25, 0.5, 1], 'classes' => [1, 2, 3, 4]], Arr::scaleBy($array, 'numbers', 0, 1,2));
+        $this->assertEquals(['numbers' => [0, -0.25, -0.5, -1], 'classes' => [1, 2, 3, 4]], Arr::scaleBy($array, 'numbers', 0, -1,2));
+        $this->assertEquals(['numbers' => [-1, -0.75, -0.5, 0], 'classes' => [1, 2, 3, 4]], Arr::scaleBy($array, 'numbers', -1, 0,2));
+        $this->assertEquals(['numbers' => [-2, -1, 0, 2], 'classes' => [1, 2, 3, 4]], Arr::scaleBy($array, 'numbers', -2, 2,2));
+        $this->assertEquals(['numbers' => [2, 1, 0, -2], 'classes' => [1, 2, 3, 4]], Arr::scaleBy($array, 'numbers', 2, -2,2));
+        $this->assertEquals(['numbers' => [0, 0, 0, 0], 'classes' => [1, 2, 3, 4]], Arr::scaleBy($array, 'numbers', 0, 0,2));
+    }
+
+    public function testScaleByMany()
+    {
+        return true;
+        $array = [
+            ['balance' => 30, 'age' => 10, 'class' => 1],
+            ['balance' => 120, 'age' => 40, 'class' => 2],
+            ['balance' => -60, 'age' => 25, 'class' => 3],
+            ['balance' => 75, 'age'=> 25, 'class' => 4]
+        ];
+        $this->assertEquals([
+            ['balance' => 0.5, 'age' => 10, 'class' => 1],
+            ['balance' => 1, 'age' => 40, 'class' => 2],
+            ['balance' => 0, 'age' => 25, 'class' => 3],
+            ['balance' => 0.75, 'age' => 25, 'class' => 4]
+        ], Arr::scaleByMany($array, 'balance',precision: 2));
+        $this->assertEquals([
+            ['balance' => 50, 'age' => 10, 'class' => 1],
+            ['balance' => 100, 'age' => 40, 'class' => 2],
+            ['balance' => 0, 'age' => 25, 'class' => 3],
+            ['balance' => 75, 'age' => 25, 'class' => 4]
+        ], Arr::scaleByMany($array, ['balance' => [0, 100]]));
+        $this->assertEquals([
+            ['balance' => 50, 'age' => 10, 'class' => 1],
+            ['balance' => 100, 'age' => 40, 'class' => 2],
+            ['balance' => 0, 'age' => 25, 'class' => 3],
+            ['balance' => 75, 'age' => 25, 'class' => 4]
+        ], Arr::scaleByMany($array, 'balance', 0, 100));
+        $this->assertEquals([
+            ['balance' => 30, 'age' => 0, 'class' => 1],
+            ['balance' => 120, 'age' => 100, 'class' => 2],
+            ['balance' => -60, 'age' => 50, 'class' => 3],
+            ['balance' => 75, 'age'=> 50, 'class' => 4]
+        ], Arr::scaleByMany($array, ['age'],0,100));
+        $this->assertEquals([
+            ['balance' => 50, 'age' => 0, 'class' => 1],
+            ['balance' => 100, 'age' => 100, 'class' => 2],
+            ['balance' => 0, 'age' => 50, 'class' => 3],
+            ['balance' => 75, 'age'=> 50, 'class' => 4]
+        ], Arr::scaleByMany($array, ['age','balance'],0,100));
+        $this->assertEquals([
+            ['balance' => 50, 'age' => -100, 'class' => 1],
+            ['balance' => 100, 'age' => 100, 'class' => 2],
+            ['balance' => 0, 'age' => 0, 'class' => 3],
+            ['balance' => 75, 'age'=> 0, 'class' => 4]
+        ], Arr::scaleByMany($array, ['age','balance'=>[0,100]],-100,100));
+    }
+    public function testScaleByManyAsObject()
+    {
+        $array = fn()=> [
+            (object)['balance' => 30, 'age' => 10, 'class' => 1],
+            (object)['balance' => 120, 'age' => 40, 'class' => 2],
+            (object)['balance' => -60, 'age' => 25, 'class' => 3],
+            (object)['balance' => 75, 'age'=> 25, 'class' => 4]
+        ];
+        $this->assertEquals([
+            (object)['balance' => 0.5, 'age' => 10, 'class' => 1],
+            (object)['balance' => 1, 'age' => 40, 'class' => 2],
+            (object)['balance' => 0, 'age' => 25, 'class' => 3],
+            (object)['balance' => 0.75, 'age' => 25, 'class' => 4]
+        ], Arr::scaleByMany($array(), 'balance',precision: 2));
+        $this->assertEquals([
+            (object)['balance' => 50, 'age' => 10, 'class' => 1],
+            (object)['balance' => 100, 'age' => 40, 'class' => 2],
+            (object)['balance' => 0, 'age' => 25, 'class' => 3],
+            (object)['balance' => 75, 'age' => 25, 'class' => 4]
+        ], Arr::scaleByMany($array(), ['balance' => [0, 100]]));
+        $this->assertEquals([
+            (object)['balance' => 50, 'age' => 10, 'class' => 1],
+            (object)['balance' => 100, 'age' => 40, 'class' => 2],
+            (object)['balance' => 0, 'age' => 25, 'class' => 3],
+            (object)['balance' => 75, 'age' => 25, 'class' => 4]
+        ], Arr::scaleByMany($array(), 'balance', 0, 100));
+       $this->assertEquals([
+           (object)['balance' => 30, 'age' => 0, 'class' => 1],
+           (object)['balance' => 120, 'age' => 100, 'class' => 2],
+           (object)['balance' => -60, 'age' => 50, 'class' => 3],
+           (object)['balance' => 75, 'age'=> 50, 'class' => 4]
+       ], Arr::scaleByMany($array(), ['age'],0,100));
+        $this->assertEquals([
+            (object)['balance' => 50, 'age' => 0, 'class' => 1],
+            (object)['balance' => 100, 'age' => 100, 'class' => 2],
+            (object)['balance' => 0, 'age' => 50, 'class' => 3],
+            (object)['balance' => 75, 'age'=> 50, 'class' => 4]
+        ], Arr::scaleByMany($array(), ['age','balance'],0,100));
+        $this->assertEquals([
+            (object)['balance' => 50, 'age' => -100, 'class' => 1],
+            (object)['balance' => 100, 'age' => 100, 'class' => 2],
+            (object)['balance' => 0, 'age' => 0, 'class' => 3],
+            (object)['balance' => 75, 'age'=> 0, 'class' => 4]
+        ], Arr::scaleByMany($array(), ['age','balance'=>[0,100]],-100,100));
     }
 }
