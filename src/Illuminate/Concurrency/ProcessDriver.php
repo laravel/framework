@@ -6,8 +6,8 @@ use Closure;
 use Illuminate\Contracts\Concurrency\Driver;
 use Illuminate\Foundation\Defer\DeferredCallback;
 use Illuminate\Process\Factory as ProcessFactory;
-use Illuminate\Process\Pool;
 use Illuminate\Process\PhpExecutableFinder;
+use Illuminate\Process\Pool;
 use Illuminate\Support\Arr;
 use Laravel\SerializableClosure\SerializableClosure;
 
