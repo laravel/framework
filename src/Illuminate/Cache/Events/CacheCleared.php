@@ -10,8 +10,8 @@ class CacheCleared extends CacheEvent
      * @param  string|null  $storeName
      * @param  string  $key
      */
-    public function __construct($storeName,$key = '*')
+    public function __construct($storeName, $key = '*')
     {
-        parent::__construct($storeName,$key);
+        parent::__construct($storeName, $key);
     }
 }
