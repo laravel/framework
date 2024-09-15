@@ -3,6 +3,8 @@
 namespace Illuminate\Cache\Console;
 
 use Illuminate\Cache\CacheManager;
+use Illuminate\Cache\Events\CacheCleared;
+use Illuminate\Cache\Events\CacheClearing;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -62,8 +64,17 @@ class ClearCommand extends Command
      */
     public function handle()
     {
+        /*
+         * Keep both events for backwards compatibility?
+         * Remove old event only with Laravel 12?
+         * Don't add new event = inconsistent?
+         * */
         $this->laravel['events']->dispatch(
             'cache:clearing', [$this->argument('store'), $this->tags()]
+        );
+
+        $this->laravel['events']->dispatch(
+            CacheClearing::class, [$this->argument('store'), $this->tags()]
         );
 
         $successful = $this->cache()->flush();
@@ -76,6 +87,10 @@ class ClearCommand extends Command
 
         $this->laravel['events']->dispatch(
             'cache:cleared', [$this->argument('store'), $this->tags()]
+        );
+
+        $this->laravel['events']->dispatch(
+            CacheCleared::class, [$this->argument('store'), $this->tags()]
         );
 
         $this->components->info('Application cache cleared successfully.');

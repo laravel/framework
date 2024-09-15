@@ -6,6 +6,8 @@ use ArrayAccess;
 use BadMethodCallException;
 use Closure;
 use DateTimeInterface;
+use Illuminate\Cache\Events\CacheCleared;
+use Illuminate\Cache\Events\CacheClearing;
 use Illuminate\Cache\Events\CacheHit;
 use Illuminate\Cache\Events\CacheMissed;
 use Illuminate\Cache\Events\ForgettingKey;
@@ -580,7 +582,10 @@ class Repository implements ArrayAccess, CacheContract
      */
     public function clear(): bool
     {
-        return $this->store->flush();
+        $this->event(new CacheClearing($this->getName()));
+        $flush =  $this->store->flush();
+        $this->event(new CacheCleared($this->getName()));
+        return $flush;
     }
 
     /**
