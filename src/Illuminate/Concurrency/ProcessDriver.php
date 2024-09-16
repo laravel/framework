@@ -3,14 +3,13 @@
 namespace Illuminate\Concurrency;
 
 use Closure;
+use Illuminate\Console\Application;
 use Illuminate\Contracts\Concurrency\Driver;
 use Illuminate\Foundation\Defer\DeferredCallback;
 use Illuminate\Process\Factory as ProcessFactory;
 use Illuminate\Process\Pool;
 use Illuminate\Support\Arr;
-use Illuminate\Support\ProcessUtils;
 use Laravel\SerializableClosure\SerializableClosure;
-use Symfony\Component\Process\PhpExecutableFinder;
 
 class ProcessDriver implements Driver
 {
@@ -27,7 +26,7 @@ class ProcessDriver implements Driver
      */
     public function run(Closure|array $tasks): array
     {
-        $command = $this->buildCommand();
+        $command = Application::formatCommandString('invoke-serialized-closure');
 
         $results = $this->processFactory->pool(function (Pool $pool) use ($tasks, $command) {
             foreach (Arr::wrap($tasks) as $task) {
@@ -55,7 +54,7 @@ class ProcessDriver implements Driver
      */
     public function defer(Closure|array $tasks): DeferredCallback
     {
-        $command = $this->buildCommand();
+        $command = Application::formatCommandString('invoke-serialized-closure');
 
         return defer(function () use ($tasks, $command) {
             foreach (Arr::wrap($tasks) as $task) {
@@ -64,31 +63,5 @@ class ProcessDriver implements Driver
                 ])->run($command.' 2>&1 &');
             }
         });
-    }
-
-    /**
-     * Get the PHP binary.
-     */
-    protected function phpBinary(): string
-    {
-        return ProcessUtils::escapeArgument((new PhpExecutableFinder)->find(false) ?: 'php');
-    }
-
-    /**
-     * Get the Artisan binary.
-     */
-    protected function artisanBinary(): string
-    {
-        return ProcessUtils::escapeArgument(defined('ARTISAN_BINARY') ? ARTISAN_BINARY : 'artisan');
-    }
-
-    /**
-     * Build the command string.
-     *
-     * @return string
-     */
-    protected function buildCommand(): string
-    {
-        return sprintf('%s %s invoke-serialized-closure', $this->phpBinary(), $this->artisanBinary());
     }
 }
