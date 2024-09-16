@@ -1284,7 +1284,7 @@ class Blueprint
      *
      * @param  string  $column
      * @param  int|null  $precision
-     * @param bool $index
+     * @param bool  $index
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function softDeletes($column = 'deleted_at', $precision = 0, $index = true)
@@ -1297,7 +1297,7 @@ class Blueprint
      *
      * @param  string  $column
      * @param  int|null  $precision
-     * @param bool $index
+     * @param bool  $index
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function softDeletesTz($column = 'deleted_at', $precision = 0, $index = true)
@@ -1310,7 +1310,7 @@ class Blueprint
      *
      * @param  string  $column
      * @param  int|null  $precision
-     * @param bool $index
+     * @param bool  $index
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function softDeletesDatetime($column = 'deleted_at', $precision = 0, $index = true)
