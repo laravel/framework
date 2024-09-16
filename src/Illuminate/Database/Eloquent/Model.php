@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Str;
@@ -931,6 +932,17 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     public function loadMorphAvg($relation, $relations, $column)
     {
         return $this->loadMorphAggregate($relation, $relations, $column, 'avg');
+    }
+
+    /**
+     * Get the actual class name for a given morph class.
+     *
+     * @param  string  $class
+     * @return string
+     */
+    public static function getMorphAlias()
+    {
+        return Relation::getMorphAlias(static::class);
     }
 
     /**

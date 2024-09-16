@@ -479,6 +479,23 @@ class DatabaseEloquentMorphTest extends TestCase
         $this->assertFalse($relation->is($model));
     }
 
+    public function testGetMorphAlias()
+    {
+        // Clear any existing morph maps
+        Relation::morphMap([], false);
+
+        // Define a morph map
+        Relation::morphMap([
+            'test_get_morph_alias' => EloquentMorphResetModelStub::class,
+        ]);
+
+        // Assert that getMorphAlias returns the correct alias
+        $this->assertSame('test_get_morph_alias', EloquentMorphResetModelStub::getMorphAlias());
+
+        // Clean up after test
+        Relation::morphMap([], false);
+    }
+
     protected function getOneRelation()
     {
         $queryBuilder = m::mock(QueryBuilder::class);
