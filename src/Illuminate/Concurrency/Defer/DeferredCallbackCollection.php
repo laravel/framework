@@ -115,7 +115,7 @@ class DeferredCallbackCollection implements ArrayAccess, Countable
     }
 
     /**
-     * Set teh callback with the given key.
+     * Set the callback with the given key.
      *
      * @param  mixed  $offset
      * @param  mixed  $value
