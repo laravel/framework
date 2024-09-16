@@ -11,6 +11,8 @@ use Illuminate\Support\Defer\DeferredCallback;
 use Laravel\SerializableClosure\SerializableClosure;
 use Symfony\Component\Process\PhpExecutableFinder;
 
+use function Illuminate\Support\defer;
+
 class ProcessDriver implements Driver
 {
     /**
