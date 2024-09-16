@@ -2720,4 +2720,49 @@ trait ValidatesAttributes
 
         return $value;
     }
+
+    /**
+     * Validate that the given value is a valid longitude.
+     *
+     * Longitude values must be numeric and between -180 and 180 degrees,
+     * as defined by geographic coordinate standards.
+     *
+     * @param  string  $attribute  The name of the attribute being validated.
+     * @param  mixed   $value      The value of the attribute being validated.
+     * @return bool    Returns true if the value is a valid longitude, false otherwise.
+     */
+    protected function validateLongitude($attribute, $value)
+    {
+        return is_numeric($value) && $value >= -180 && $value <= 180;
+    }
+
+    /**
+     * Validate that the given value is a valid latitude.
+     *
+     * Latitude values must be numeric and between -90 and 90 degrees,
+     * as defined by geographic coordinate standards.
+     *
+     * @param  string  $attribute  The name of the attribute being validated.
+     * @param  mixed   $value      The value of the attribute being validated.
+     * @return bool    Returns true if the value is a valid latitude, false otherwise.
+     */
+    protected function validateLatitude($attribute, $value)
+    {
+        return is_numeric($value) && $value >= -90 && $value <= 90;
+    }
+
+    /**
+     * Validate that the given value is a valid camera angle.
+     *
+     * Camera angles are typically measured in degrees, ranging from 0 to 360 degrees.
+     * This validation ensures that the value is within this range.
+     *
+     * @param  string  $attribute  The name of the attribute being validated.
+     * @param  mixed   $value      The value of the attribute being validated.
+     * @return bool    Returns true if the value is a valid camera angle, false otherwise.
+     */
+    protected function validateCameraAngle($attribute, $value)
+    {
+        return is_numeric($value) && $value >= 0 && $value <= 360;
+    }
 }

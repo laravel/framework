@@ -160,6 +160,9 @@ return [
     'url' => 'The :attribute field must be a valid URL.',
     'ulid' => 'The :attribute field must be a valid ULID.',
     'uuid' => 'The :attribute field must be a valid UUID.',
+    'longitude' => 'The :attribute must be a valid longitude value between -180 and 180.',
+    'latitude' => 'The :attribute must be a valid latitude value between -90 and 90.',
+    'camera_angle' => 'The :attribute must be a valid camera angle between 0 and 360 degrees.',
 
     /*
     |--------------------------------------------------------------------------
