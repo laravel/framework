@@ -203,7 +203,7 @@ class Composer
      */
     protected function phpBinary()
     {
-       return php_binary();
+        return php_binary();
     }
 
     /**

@@ -7,7 +7,6 @@ use Illuminate\Console\Events\ArtisanStarting;
 use Illuminate\Contracts\Console\Application as ApplicationContract;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Process\PhpExecutableFinder;
 use Illuminate\Support\ProcessUtils;
 use Symfony\Component\Console\Application as SymfonyApplication;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
@@ -17,7 +16,6 @@ use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\BufferedOutput;
-use Symfony\Component\Process\PhpExecutableFinder as SymfonyPhpExecutableFinder;
 
 use function Illuminate\Support\php_binary;
 

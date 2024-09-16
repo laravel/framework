@@ -2,7 +2,6 @@
 
 namespace Illuminate\Foundation\Console;
 
-use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
 
 use function Illuminate\Support\php_binary;
