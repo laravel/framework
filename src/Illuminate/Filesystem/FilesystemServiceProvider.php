@@ -88,16 +88,18 @@ class FilesystemServiceProvider extends ServiceProvider
                 continue;
             }
 
-            $this->app->booted(function () use ($disk, $config) {
+            $this->app->booted(function ($app) use ($disk, $config) {
                 $uri = isset($config['url'])
                     ? rtrim(parse_url($config['url'])['path'], '/')
                     : '/storage';
 
-                Route::get($uri.'/{path}', function (Request $request, string $path) use ($disk, $config) {
+                $isProduction = $app->isProduction();
+
+                Route::get($uri.'/{path}', function (Request $request, string $path) use ($disk, $config, $isProduction) {
                     return (new ServeFile(
                         $disk,
                         $config,
-                        $this->app->isProduction()
+                        $isProduction
                     ))($request, $path);
                 })->where('path', '.*')->name('storage.'.$disk);
             });

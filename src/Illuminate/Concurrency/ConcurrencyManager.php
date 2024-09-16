@@ -97,7 +97,7 @@ class ConcurrencyManager extends MultipleInstanceManager
     public function getInstanceConfig($name)
     {
         return $this->app['config']->get(
-            'concurrency.drivers.'.$name, ['driver' => $name],
+            'concurrency.driver.'.$name, ['driver' => $name],
         );
     }
 }

@@ -1,6 +1,11 @@
 # Release Notes for 11.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v11.23.4...11.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v11.23.5...11.x)
+
+## [v11.23.5](https://github.com/laravel/framework/compare/v11.23.4...v11.23.5) - 2024-09-13
+
+* allow recursive Model::withoutTimestamps calls by [@m1guelpf](https://github.com/m1guelpf) in https://github.com/laravel/framework/pull/52768
+* [11.x] Fixes out of memory issue running `route:cache` with ServeFile by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/52781
 
 ## [v11.23.4](https://github.com/laravel/framework/compare/v11.23.2...v11.23.4) - 2024-09-12
 
