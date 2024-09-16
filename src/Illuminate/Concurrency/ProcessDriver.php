@@ -59,20 +59,7 @@ class ProcessDriver implements Driver
      */
     public function defer(Closure|array $tasks): DeferredCallback
     {
-        $php = $this->phpBinary();
-        $artisan = $this->artisanBinary();
-
-        return defer(function () use ($tasks, $php, $artisan) {
-            foreach (Arr::wrap($tasks) as $task) {
-                $this->processFactory->path(base_path())->env([
-                    'LARAVEL_INVOKABLE_CLOSURE' => serialize(new SerializableClosure($task)),
-                ])->run([
-                    $php,
-                    $artisan,
-                    'invoke-serialized-closure 2>&1 &',
-                ]);
-            }
-        });
+        return defer(fn () => $this->run($tasks));
     }
 
     /**
