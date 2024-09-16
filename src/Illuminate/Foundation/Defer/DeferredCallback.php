@@ -7,6 +7,35 @@ use Illuminate\Support\Str;
 class DeferredCallback
 {
     /**
+     * Define whether the defer callback has been cancelled.
+     *
+     * @var bool
+     */
+    protected bool $cancelled = false;
+
+    /**
+     * Cancels a deferred callback.
+     *
+     * @return $this
+     */
+    public function cancel(): self
+    {
+        $this->cancelled = true;
+
+        return $this;
+    }
+
+    /**
+     * Indicate whether the deferred callback has been cancelled or not.
+     *
+     * @return bool
+     */
+    public function isCancelled(): bool
+    {
+        return $this->cancelled;
+    }
+
+    /**
      * Create a new deferred callback instance.
      *
      * @param  callable  $callback
@@ -50,6 +79,8 @@ class DeferredCallback
      */
     public function __invoke(): void
     {
-        call_user_func($this->callback);
+        if (! $this->cancelled) {
+            call_user_func($this->callback);
+        }
     }
 }

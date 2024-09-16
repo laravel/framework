@@ -26,6 +26,22 @@ class DeferredCallbackCollection implements ArrayAccess, Countable
     }
 
     /**
+     * Cancels an existing deferred function by its name
+     *
+     * @param string $name
+     * @return void
+     */
+    public function cancel(string $name): void
+    {
+        foreach ($this->callbacks as $callback) {
+            if ($callback->name === $name) {
+                $callback->cancel();
+                break;
+            }
+        }
+    }
+
+    /**
      * Invoke the deferred callbacks.
      *
      * @return void
@@ -48,7 +64,7 @@ class DeferredCallbackCollection implements ArrayAccess, Countable
         $this->forgetDuplicates();
 
         foreach ($this->callbacks as $index => $callback) {
-            if ($when($callback)) {
+            if (! $callback->isCancelled() && $when($callback)) {
                 rescue($callback);
             }
 
