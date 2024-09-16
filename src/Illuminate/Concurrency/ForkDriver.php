@@ -3,9 +3,9 @@
 namespace Illuminate\Concurrency;
 
 use Closure;
-use Illuminate\Concurrency\Defer\DeferredCallback;
 use Illuminate\Contracts\Concurrency\Driver;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Defer\DeferredCallback;
 use Spatie\Fork\Fork;
 
 class ForkDriver implements Driver

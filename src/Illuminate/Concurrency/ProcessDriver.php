@@ -3,11 +3,11 @@
 namespace Illuminate\Concurrency;
 
 use Closure;
-use Illuminate\Concurrency\Defer\DeferredCallback;
 use Illuminate\Contracts\Concurrency\Driver;
 use Illuminate\Process\Factory as ProcessFactory;
 use Illuminate\Process\Pool;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Defer\DeferredCallback;
 use Laravel\SerializableClosure\SerializableClosure;
 use Symfony\Component\Process\PhpExecutableFinder;
 

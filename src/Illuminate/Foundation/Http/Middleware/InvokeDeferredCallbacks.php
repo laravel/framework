@@ -3,9 +3,9 @@
 namespace Illuminate\Foundation\Http\Middleware;
 
 use Closure;
-use Illuminate\Concurrency\Defer\DeferredCallbackCollection;
 use Illuminate\Container\Container;
 use Illuminate\Http\Request;
+use Illuminate\Support\Defer\DeferredCallbackCollection;
 use Symfony\Component\HttpFoundation\Response;
 
 class InvokeDeferredCallbacks

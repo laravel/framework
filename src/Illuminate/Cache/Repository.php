@@ -24,7 +24,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Traits\Macroable;
 
-use function Illuminate\Concurrency\defer;
+use function Illuminate\Support\defer;
 
 /**
  * @mixin \Illuminate\Contracts\Cache\Store

@@ -1,9 +1,9 @@
 <?php
 
-namespace Illuminate\Concurrency;
+namespace Illuminate\Support;
 
-use Illuminate\Concurrency\Defer\DeferredCallback;
-use Illuminate\Concurrency\Defer\DeferredCallbackCollection;
+use Illuminate\Support\Defer\DeferredCallback;
+use Illuminate\Support\Defer\DeferredCallbackCollection;
 
 /**
  * Defer execution of the given callback.
@@ -11,7 +11,7 @@ use Illuminate\Concurrency\Defer\DeferredCallbackCollection;
  * @param  callable|null  $callback
  * @param  string|null  $name
  * @param  bool  $always
- * @return \Illuminate\Concurrency\Defer\DeferredCallback
+ * @return \Illuminate\Support\Defer\DeferredCallback
  */
 function defer(?callable $callback = null, ?string $name = null, bool $always = false)
 {

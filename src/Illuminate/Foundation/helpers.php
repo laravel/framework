@@ -410,7 +410,7 @@ if (! function_exists('defer')) {
      */
     function defer(?callable $callback = null, ?string $name = null, bool $always = false)
     {
-        return \Illuminate\Concurrency\defer($callback, $name, $always);
+        return \Illuminate\Support\defer($callback, $name, $always);
     }
 }
 

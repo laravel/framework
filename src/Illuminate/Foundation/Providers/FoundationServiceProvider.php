@@ -2,7 +2,6 @@
 
 namespace Illuminate\Foundation\Providers;
 
-use Illuminate\Concurrency\Defer\DeferredCallbackCollection;
 use Illuminate\Console\Events\CommandFinished;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Console\Kernel as ConsoleKernel;
@@ -26,6 +25,7 @@ use Illuminate\Http\Request;
 use Illuminate\Log\Events\MessageLogged;
 use Illuminate\Queue\Events\JobAttempted;
 use Illuminate\Support\AggregateServiceProvider;
+use Illuminate\Support\Defer\DeferredCallbackCollection;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Testing\LoggedExceptionCollection;
 use Illuminate\Testing\ParallelTestingServiceProvider;
