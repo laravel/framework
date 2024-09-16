@@ -158,9 +158,7 @@ trait ManagesEvents
     protected function addEventListener($name, $callback)
     {
         if (str_contains($name, '*')) {
-            $callback = function ($name, array $data) use ($callback) {
-                return $callback($data[0]);
-            };
+            $callback = fn($name, array $data) => $callback($data[0]);
         }
 
         $this->events->listen($name, $callback);
