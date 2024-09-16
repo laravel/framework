@@ -24,6 +24,7 @@ class ScheduleListCommand extends Command
     protected $signature = 'schedule:list
         {--timezone= : The timezone that times should be displayed in}
         {--next : Sort the listed tasks by their next due date}
+        {--all : Disregard environment constraints}
     ';
 
     /**
@@ -65,6 +66,8 @@ class ScheduleListCommand extends Command
         $repeatExpressionSpacing = $this->getRepeatExpressionSpacing($events);
 
         $timezone = new DateTimeZone($this->option('timezone') ?? config('app.timezone'));
+
+        $events = $this->filterEvents($events);
 
         $events = $this->sortEvents($events, $timezone);
 
@@ -181,6 +184,21 @@ class ScheduleListCommand extends Command
     private function getRepeatExpression($event)
     {
         return $event->isRepeatable() ? "{$event->repeatSeconds}s " : '';
+    }
+
+    /**
+     * Filter the events based on the environment constraint.
+     *
+     * @param  \Illuminate\Support\Collection  $events
+     * @return \Illuminate\Support\Collection
+     */
+    private function filterEvents(\Illuminate\Support\Collection $events)
+    {
+        $environment = $this->laravel->environment();
+
+        return $this->option('all')
+                    ? $events
+                    : $events->filter(fn ($event) => $event->runsInEnvironment($environment));
     }
 
     /**
