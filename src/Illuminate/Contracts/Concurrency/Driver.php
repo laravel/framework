@@ -3,7 +3,7 @@
 namespace Illuminate\Contracts\Concurrency;
 
 use Closure;
-use Illuminate\Foundation\Defer\DeferredCallback;
+use Illuminate\Concurrency\Defer\DeferredCallback;
 
 interface Driver
 {

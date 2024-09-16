@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Providers;
 
+use Illuminate\Concurrency\Defer\DeferredCallbackCollection;
 use Illuminate\Console\Events\CommandFinished;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Console\Kernel as ConsoleKernel;
@@ -13,7 +14,6 @@ use Illuminate\Contracts\View\Factory;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Grammar;
 use Illuminate\Foundation\Console\CliDumper;
-use Illuminate\Foundation\Defer\DeferredCallbackCollection;
 use Illuminate\Foundation\Exceptions\Renderer\Listener;
 use Illuminate\Foundation\Exceptions\Renderer\Mappers\BladeMapper;
 use Illuminate\Foundation\Exceptions\Renderer\Renderer;

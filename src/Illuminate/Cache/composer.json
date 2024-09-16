@@ -16,6 +16,7 @@
     "require": {
         "php": "^8.2",
         "illuminate/collections": "^11.0",
+        "illuminate/concurrency": "^11.0",
         "illuminate/contracts": "^11.0",
         "illuminate/macroable": "^11.0",
         "illuminate/support": "^11.0"

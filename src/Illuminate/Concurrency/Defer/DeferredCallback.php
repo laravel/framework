@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Foundation\Defer;
+namespace Illuminate\Concurrency\Defer;
 
 use Illuminate\Support\Str;
 

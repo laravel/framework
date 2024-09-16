@@ -3,8 +3,8 @@
 namespace Illuminate\Foundation\Http\Middleware;
 
 use Closure;
+use Illuminate\Concurrency\Defer\DeferredCallbackCollection;
 use Illuminate\Container\Container;
-use Illuminate\Foundation\Defer\DeferredCallbackCollection;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 

@@ -3,8 +3,8 @@
 namespace Illuminate\Concurrency;
 
 use Closure;
+use Illuminate\Concurrency\Defer\DeferredCallback;
 use Illuminate\Contracts\Concurrency\Driver;
-use Illuminate\Foundation\Defer\DeferredCallback;
 use Illuminate\Process\Factory as ProcessFactory;
 use Illuminate\Process\Pool;
 use Illuminate\Support\Arr;
