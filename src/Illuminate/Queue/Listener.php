@@ -6,6 +6,8 @@ use Closure;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
 
+use function Illuminate\Support\php_binary;
+
 class Listener
 {
     /**
@@ -61,7 +63,7 @@ class Listener
      */
     protected function phpBinary()
     {
-        return (new PhpExecutableFinder)->find(false) ?: 'php';
+        return php_binary();
     }
 
     /**

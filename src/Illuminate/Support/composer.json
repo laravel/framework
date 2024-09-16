@@ -37,6 +37,7 @@
             "Illuminate\\Support\\": ""
         },
         "files": [
+            "functions.php",
             "helpers.php"
         ]
     },

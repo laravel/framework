@@ -11,6 +11,8 @@ use Illuminate\Process\Pool;
 use Illuminate\Support\Arr;
 use Laravel\SerializableClosure\SerializableClosure;
 
+use function Illuminate\Support\php_binary;
+
 class ProcessDriver implements Driver
 {
     /**
@@ -80,7 +82,7 @@ class ProcessDriver implements Driver
      */
     protected function phpBinary(): string
     {
-        return (new PhpExecutableFinder)->find(false) ?: 'php';
+        return php_binary();
     }
 
     /**

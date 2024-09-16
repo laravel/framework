@@ -19,6 +19,8 @@ use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Process\PhpExecutableFinder as SymfonyPhpExecutableFinder;
 
+use function Illuminate\Support\php_binary;
+
 class Application extends SymfonyApplication implements ApplicationContract
 {
     /**
@@ -85,11 +87,7 @@ class Application extends SymfonyApplication implements ApplicationContract
      */
     public static function phpBinary()
     {
-        $class = class_exists(PhpExecutableFinder::class)
-            ? PhpExecutableFinder::class
-            : SymfonyPhpExecutableFinder::class;
-
-        return ProcessUtils::escapeArgument((new $class)->find(false) ?: 'php');
+        return ProcessUtils::escapeArgument(php_binary());
     }
 
     /**

@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Process;
+namespace Illuminate\Support\Process;
 
 use Symfony\Component\Process\PhpExecutableFinder as SymfonyPhpExecutableFinder;
 

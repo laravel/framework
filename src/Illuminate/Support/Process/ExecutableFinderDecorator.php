@@ -1,10 +1,8 @@
 <?php
 
-namespace Illuminate\Process;
+namespace Illuminate\Support\Process;
 
 use Symfony\Component\Process\ExecutableFinder;
-
-use function Illuminate\Filesystem\join_paths;
 
 class ExecutableFinderDecorator
 {
@@ -58,7 +56,7 @@ class ExecutableFinderDecorator
     public function find(string $name, ?string $default = null, array $extraDirs = []): ?string
     {
         if ($herdPath = getenv('HERD_HOME')) {
-            $extraDirs[] = join_paths($herdPath, 'bin');
+            $extraDirs[] = implode(DIRECTORY_SEPARATOR, [$herdPath, 'bin']);
         }
 
         return $this->decorator->find($name, $default, $extraDirs);
