@@ -5,7 +5,6 @@ namespace Illuminate\Foundation\Defer;
 use ArrayAccess;
 use Closure;
 use Countable;
-use Illuminate\Support\Collection;
 
 class DeferredCallbackCollection implements ArrayAccess, Countable
 {
@@ -39,7 +38,7 @@ class DeferredCallbackCollection implements ArrayAccess, Countable
     /**
      * Invoke the deferred callbacks if the given truth test evaluates to true.
      *
-     * @param  \Closure  $when
+     * @param  \Closure|null  $when
      * @return void
      */
     public function invokeWhen(?Closure $when = null): void
@@ -115,7 +114,7 @@ class DeferredCallbackCollection implements ArrayAccess, Countable
     }
 
     /**
-     * Set teh callback with the given key.
+     * Set the callback with the given key.
      *
      * @param  mixed  $offset
      * @param  mixed  $value
