@@ -514,22 +514,23 @@ assertType('string|User', $collection->value('string', fn () => 'string'));
 
 assertType('Illuminate\Support\Collection<string, int>', $collection::make(['string'])->flip());
 
-assertType('Illuminate\Support\Collection<(int|string), Illuminate\Support\Collection<(int|string), User>>', $collection->groupBy('name'));
-assertType('Illuminate\Support\Collection<(int|string), Illuminate\Support\Collection<(int|string), User>>', $collection->groupBy('name', true));
-assertType('Illuminate\Support\Collection<(int|string), Illuminate\Support\Collection<(int|string), User>>', $collection->groupBy(function ($user, $int) {
-    // assertType('User', $user);
-    // assertType('int', $int);
+assertType('Illuminate\Support\Collection<(int|string), Illuminate\Support\Collection<int, User>>', $collection->groupBy('name'));
+assertType('Illuminate\Support\Collection<(int|string), Illuminate\Support\Collection<int, User>>', $collection->groupBy('name', true));
+assertType('Illuminate\Support\Collection<string, Illuminate\Support\Collection<int, User>>', $collection->groupBy(function ($user, $int) {
+    assertType('User', $user);
+    assertType('int', $int);
 
     return 'foo';
 }));
-assertType('Illuminate\Support\Collection<(int|string), Illuminate\Support\Collection<(int|string), User>>', $collection->groupBy(function ($user) {
+
+assertType('Illuminate\Support\Collection<string, Illuminate\Support\Collection<string, User>>', $collection->keyBy(fn () => '')->groupBy(function ($user) {
     return 'foo';
-}));
+}, preserveKeys: true));
 
 assertType('Illuminate\Support\Collection<(int|string), User>', $collection->keyBy('name'));
-assertType('Illuminate\Support\Collection<(int|string), User>', $collection->keyBy(function ($user, $int) {
-    // assertType('User', $user);
-    // assertType('int', $int);
+assertType('Illuminate\Support\Collection<string, User>', $collection->keyBy(function ($user, $int) {
+    assertType('User', $user);
+    assertType('int', $int);
 
     return 'foo';
 }));
