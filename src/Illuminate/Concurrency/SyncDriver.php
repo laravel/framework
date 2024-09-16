@@ -3,8 +3,8 @@
 namespace Illuminate\Concurrency;
 
 use Closure;
+use Illuminate\Concurrency\Defer\DeferredCallback;
 use Illuminate\Contracts\Concurrency\Driver;
-use Illuminate\Foundation\Defer\DeferredCallback;
 use Illuminate\Support\Arr;
 
 class SyncDriver implements Driver
