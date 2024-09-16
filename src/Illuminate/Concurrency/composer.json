@@ -20,7 +20,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Illuminate\\Support\\": ""
+            "Illuminate\\Concurrency\\": ""
         }
     },
     "extra": {
