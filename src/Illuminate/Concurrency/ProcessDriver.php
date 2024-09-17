@@ -5,11 +5,13 @@ namespace Illuminate\Concurrency;
 use Closure;
 use Illuminate\Console\Application;
 use Illuminate\Contracts\Concurrency\Driver;
-use Illuminate\Foundation\Defer\DeferredCallback;
 use Illuminate\Process\Factory as ProcessFactory;
 use Illuminate\Process\Pool;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Defer\DeferredCallback;
 use Laravel\SerializableClosure\SerializableClosure;
+
+use function Illuminate\Support\defer;
 
 class ProcessDriver implements Driver
 {

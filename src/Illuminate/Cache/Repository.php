@@ -24,6 +24,8 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Traits\Macroable;
 
+use function Illuminate\Support\defer;
+
 /**
  * @mixin \Illuminate\Contracts\Cache\Store
  */
@@ -517,11 +519,7 @@ class Repository implements ArrayAccess, CacheContract
             });
         };
 
-        if (function_exists('defer')) {
-            defer($refresh, "illuminate:cache:refresh:{$key}");
-        } else {
-            $refresh();
-        }
+        defer($refresh, "illuminate:cache:refresh:{$key}");
 
         return $value;
     }

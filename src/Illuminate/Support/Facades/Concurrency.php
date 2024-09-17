@@ -18,7 +18,7 @@ use Illuminate\Concurrency\ConcurrencyManager;
  * @method static \Illuminate\Concurrency\ConcurrencyManager extend(string $name, \Closure $callback)
  * @method static \Illuminate\Concurrency\ConcurrencyManager setApplication(\Illuminate\Contracts\Foundation\Application $app)
  * @method static array run(\Closure|array $tasks)
- * @method static \Illuminate\Foundation\Defer\DeferredCallback defer(\Closure|array $tasks)
+ * @method static \Illuminate\Support\Defer\DeferredCallback defer(\Closure|array $tasks)
  *
  * @see \Illuminate\Concurrency\ConcurrencyManager
  */

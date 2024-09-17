@@ -14,8 +14,6 @@ use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Illuminate\Contracts\View\Factory as ViewFactory;
 use Illuminate\Foundation\Bus\PendingClosureDispatch;
 use Illuminate\Foundation\Bus\PendingDispatch;
-use Illuminate\Foundation\Defer\DeferredCallback;
-use Illuminate\Foundation\Defer\DeferredCallbackCollection;
 use Illuminate\Foundation\Mix;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Log\Context\Repository as ContextRepository;
@@ -412,14 +410,7 @@ if (! function_exists('defer')) {
      */
     function defer(?callable $callback = null, ?string $name = null, bool $always = false)
     {
-        if ($callback === null) {
-            return app(DeferredCallbackCollection::class);
-        }
-
-        return tap(
-            new DeferredCallback($callback, $name, $always),
-            fn ($deferred) => app(DeferredCallbackCollection::class)[] = $deferred
-        );
+        return \Illuminate\Support\defer($callback, $name, $always);
     }
 }
 
