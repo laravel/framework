@@ -93,7 +93,7 @@ class Worker
 
     /**
      * Indicates whether we pulled a job from any queue in the last read cycle.
-     * 
+     *
      * @var bool
      */
     protected bool $lastJobCycleHadJob = false;
