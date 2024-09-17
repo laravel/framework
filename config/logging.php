@@ -63,6 +63,7 @@ return [
             'path' => storage_path('logs/laravel.log'),
             'level' => env('LOG_LEVEL', 'debug'),
             'replace_placeholders' => true,
+            'tap' => array_filter(explode(',', env('LOG_TAPS', ''))),
         ],
 
         'daily' => [
@@ -71,6 +72,7 @@ return [
             'level' => env('LOG_LEVEL', 'debug'),
             'days' => env('LOG_DAILY_DAYS', 14),
             'replace_placeholders' => true,
+            'tap' => array_filter(explode(',', env('LOG_TAPS', ''))),
         ],
 
         'slack' => [
@@ -80,6 +82,7 @@ return [
             'emoji' => env('LOG_SLACK_EMOJI', ':boom:'),
             'level' => env('LOG_LEVEL', 'critical'),
             'replace_placeholders' => true,
+            'tap' => array_filter(explode(',', env('LOG_TAPS', ''))),
         ],
 
         'papertrail' => [
@@ -110,12 +113,14 @@ return [
             'level' => env('LOG_LEVEL', 'debug'),
             'facility' => env('LOG_SYSLOG_FACILITY', LOG_USER),
             'replace_placeholders' => true,
+            'tap' => array_filter(explode(',', env('LOG_TAPS', ''))),
         ],
 
         'errorlog' => [
             'driver' => 'errorlog',
             'level' => env('LOG_LEVEL', 'debug'),
             'replace_placeholders' => true,
+            'tap' => array_filter(explode(',', env('LOG_TAPS', ''))),
         ],
 
         'null' => [
