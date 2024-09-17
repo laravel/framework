@@ -92,7 +92,7 @@ class Worker
     public $paused = false;
 
     /**
-     * Indicates whether we pulled a job from any queue in the last read cycle
+     * Indicates whether we pulled a job from any queue in the last read cycle.
      * 
      * @var bool
      */
@@ -367,7 +367,7 @@ class Worker
                 );
             }
 
-            foreach (explode(',', $queue) as $index=>$queue) {
+            foreach (explode(',', $queue) as $index => $queue) {
                 $block = ! $this->lastJobCycleHadJob && $index == 0;
 
                 if (! is_null($job = $popJobCallback($queue, $block))) {
@@ -380,7 +380,6 @@ class Worker
             }
 
             $this->lastJobCycleHadJob = false;
-
         } catch (Throwable $e) {
             $this->exceptions->report($e);
 
