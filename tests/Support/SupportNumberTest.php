@@ -306,12 +306,26 @@ class SupportNumberTest extends TestCase
     }
     public function testRomanConversion()
     {
-        $this->assertEquals('I', Number::roman(1));
-        $this->assertEquals('IV', Number::roman(4));
-        $this->assertEquals('XLII', Number::roman(42));
-        $this->assertEquals('XCIX', Number::roman(99));
-        $this->assertEquals('MCMXCIV', Number::roman(1994));
-        $this->assertEquals('MMMCMXC', Number::roman(3990));
+        $this->assertSame('I', Number::roman(1));
+        $this->assertSame('IV', Number::roman(4));
+        $this->assertSame('XLII', Number::roman(42));
+        $this->assertSame('XCIX', Number::roman(99));
+        $this->assertSame('MCMXCIV', Number::roman(1994));
+        $this->assertSame('MMMCMXC', Number::roman(3990));
+
+        try {
+            Number::roman(12.34); // Passing a float instead of an integer
+        } catch (\Exception $e) {
+            $this->assertInstanceOf(\InvalidArgumentException::class, $e);
+            $this->assertEquals('The number must be an integer between 1 and 3999.', $e->getMessage());
+        }
+
+        try {
+            Number::roman(6754); // Passing a out of range value
+        } catch (\Exception $e) {
+            $this->assertInstanceOf(\InvalidArgumentException::class, $e);
+            $this->assertEquals('Roman numerals are only defined for integers between 1 and 3999.', $e->getMessage());
+        }
     }
 
 }
