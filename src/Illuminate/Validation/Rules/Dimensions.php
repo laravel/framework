@@ -136,6 +136,21 @@ class Dimensions implements Rule, DataAwareRule, ValidatorAwareRule
     protected $customRules = [];
 
     /**
+     * Create a new dimensions rule instance.
+     *
+     * @param  array  $constraints
+     * @return void
+     */
+    public function __construct(array $constraints = [])
+    {
+        foreach ($constraints as $key => $value) {
+            if (method_exists($this, $key)) {
+            	$this->{$key}($value);
+            }
+        }
+    }
+
+    /**
      * Set the "width" constraint.
      *
      * @param  int  $value
@@ -143,7 +158,7 @@ class Dimensions implements Rule, DataAwareRule, ValidatorAwareRule
      */
     public function width($value)
     {
-        $this->constraints['width'] = $value;
+        $this->width = $value;
 
         return $this;
     }

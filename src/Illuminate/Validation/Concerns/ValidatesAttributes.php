@@ -972,10 +972,10 @@ trait ValidatesAttributes
         }
 
         return ! (
-            $this->failsBasicDimensionChecks($parameters, $width, $height)
-            || $this->failsRatioCheck($parameters, $width, $height)
-            || $this->failsMinRatioCheck($parameters, $width, $height)
-            || $this->failsMaxRatioCheck($parameters, $width, $height)
+            $this->failsBasicDimensionChecks($parameters, $width, $height) ||
+            $this->failsRatioCheck($parameters, $width, $height) ||
+            $this->failsMinRatioCheck($parameters, $width, $height) ||
+            $this->failsMaxRatioCheck($parameters, $width, $height)
         );
     }
 
