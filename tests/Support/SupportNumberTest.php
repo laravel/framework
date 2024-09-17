@@ -304,4 +304,14 @@ class SupportNumberTest extends TestCase
         $this->assertSame(12.3456789, Number::trim(12.3456789));
         $this->assertSame(12.3456789, Number::trim(12.34567890000));
     }
+    public function testRomanConversion()
+    {
+        $this->assertEquals('I', Number::roman(1));
+        $this->assertEquals('IV', Number::roman(4));
+        $this->assertEquals('XLII', Number::roman(42));
+        $this->assertEquals('XCIX', Number::roman(99));
+        $this->assertEquals('MCMXCIV', Number::roman(1994));
+        $this->assertEquals('MMMCMXC', Number::roman(3990));
+    }
+
 }

@@ -308,4 +308,54 @@ class Number
             throw new RuntimeException('The "intl" PHP extension is required to use the ['.$method.'] method.');
         }
     }
+
+    /**
+     * Convert the given number to its Roman numeral equivalent.
+     *
+     * @param  int  $number
+     * @return string
+     */
+    public static function roman(int $number): string
+    {
+        if ($number < 1 || $number > 3999) {
+            throw new \InvalidArgumentException('Roman numerals are only defined for integers between 1 and 3999.');
+        }
+
+        return static::toRoman($number);
+    }
+
+    /**
+     * Convert the given number to a Roman numeral.
+     *
+     * @param  int  $number
+     * @return string
+     */
+    protected static function toRoman(int $number): string
+    {
+        $map = [
+            1000 => 'M',
+            900 => 'CM',
+            500 => 'D',
+            400 => 'CD',
+            100 => 'C',
+            90 => 'XC',
+            50 => 'L',
+            40 => 'XL',
+            10 => 'X',
+            9 => 'IX',
+            5 => 'V',
+            4 => 'IV',
+            1 => 'I',
+        ];
+
+        $roman = '';
+
+        foreach ($map as $value => $numeral) {
+            $matches = intdiv($number, $value);
+            $roman .= str_repeat($numeral, $matches);
+            $number %= $value;
+        }
+
+        return $roman;
+    }
 }
