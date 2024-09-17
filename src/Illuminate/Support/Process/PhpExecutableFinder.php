@@ -7,17 +7,15 @@ use Symfony\Component\Process\PhpExecutableFinder as SymfonyPhpExecutableFinder;
 class PhpExecutableFinder extends SymfonyPhpExecutableFinder
 {
     /**
-     * The Symfony's Executable Finder Decorator implementation.
-     *
-     * @var Symfony\Component\Process\PhpExecutableFinder
+     * Finds The PHP executable.
      */
-    private ExecutableFinderDecorator $executableFinder;
-
-    /**
-     * Construct a new PHP Executable Finder.
-     */
-    public function __construct()
+    #[\Override]
+    public function find(bool $includeArgs = true): string|false
     {
-        $this->executableFinder = new ExecutableFinderDecorator();
+        if ($herdPath = getenv('HERD_HOME')) {
+            return (new ExecutableFinder)->find('php', false, [implode(DIRECTORY_SEPARATOR, [$herdPath, 'bin'])]);
+        }
+
+        return parent::find($includeArgs);
     }
 }
