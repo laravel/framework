@@ -307,7 +307,7 @@ trait EnumeratesValues
     /**
      * Get an item from the collection by key or throw an exception if it does not exist.
      *
-     * @param  TKey $key
+     * @param  TKey  $key
      * @return TValue
      *
      * @throws \Illuminate\Support\ItemNotFoundException
