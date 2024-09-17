@@ -5318,6 +5318,16 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testGetOrFail($collection)
+    {
+        $data = new $collection(['name' => 'taylor', 'framework' => 'laravel']);
+        $this->assertEquals('taylor', $data->getOrFail('name'));
+
+        $this->expectException(ItemNotFoundException::class);
+        $data->getOrFail('age');
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testWhereNull($collection)
     {
         $data = new $collection([

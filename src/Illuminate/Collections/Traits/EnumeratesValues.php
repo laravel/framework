@@ -12,8 +12,10 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
 use Illuminate\Support\HigherOrderCollectionProxy;
+use Illuminate\Support\ItemNotFoundException;
 use InvalidArgumentException;
 use JsonSerializable;
+use stdClass;
 use Traversable;
 use UnexpectedValueException;
 use UnitEnum;
@@ -300,6 +302,27 @@ trait EnumeratesValues
         }
 
         return $this->every($this->operatorForWhere(...func_get_args()));
+    }
+
+    /**
+     * Get an item from the collection by key or throw an exception if it does not exist.
+     *
+     * @param TKey $key
+     * @return TValue
+     *
+     * @throws \Illuminate\Support\ItemNotFoundException
+     */
+    public function getOrFail($key)
+    {
+        $placeholder = new stdClass();
+
+        $item = $this->get($key, $placeholder);
+
+        if ($item === $placeholder) {
+            throw new ItemNotFoundException;
+        }
+
+        return $item;
     }
 
     /**
