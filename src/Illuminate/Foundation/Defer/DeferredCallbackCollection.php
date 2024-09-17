@@ -28,8 +28,8 @@ class DeferredCallbackCollection implements ArrayAccess, Countable
     /**
      * Cancels an existing deferred function by its name.
      *
-     * @param   string  $name
-     * @return  void
+     * @param  string  $name
+     * @return void
      */
     public function cancel(string $name): void
     {
