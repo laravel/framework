@@ -145,7 +145,7 @@ class Dimensions implements Rule, DataAwareRule, ValidatorAwareRule
     {
         foreach ($constraints as $key => $value) {
             if (method_exists($this, $key)) {
-            	$this->{$key}($value);
+                $this->{$key}($value);
             }
         }
     }
