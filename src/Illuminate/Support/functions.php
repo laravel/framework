@@ -2,7 +2,6 @@
 
 namespace Illuminate\Support;
 
-use Symfony\Component\Process\ExecutableFinder;
 use Illuminate\Support\Process\PhpExecutableFinder;
 
 /**
