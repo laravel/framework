@@ -26,6 +26,16 @@ class DeferredCallbackCollection implements ArrayAccess, Countable
     }
 
     /**
+     * Get all the deferred callbacks registered.
+     *
+     * @return array
+     */
+    public function all(): array
+    {
+        return $this->callbacks;
+    }
+
+    /**
      * Cancels an existing deferred function by its name.
      *
      * @param  string  $name
