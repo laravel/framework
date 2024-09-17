@@ -304,6 +304,7 @@ class SupportNumberTest extends TestCase
         $this->assertSame(12.3456789, Number::trim(12.3456789));
         $this->assertSame(12.3456789, Number::trim(12.34567890000));
     }
+
     public function testRomanConversion()
     {
         $this->assertSame('I', Number::roman(1));
@@ -327,5 +328,4 @@ class SupportNumberTest extends TestCase
             $this->assertEquals('Roman numerals are only defined for integers between 1 and 3999.', $e->getMessage());
         }
     }
-
 }

@@ -318,7 +318,7 @@ class Number
     public static function roman(int $number): string
     {
         // Check if the input is a valid integer
-        if (!is_int($number)) {
+        if (! is_int($number)) {
             throw new \InvalidArgumentException('The number must be an integer between 1 and 3999.');
         }
 
