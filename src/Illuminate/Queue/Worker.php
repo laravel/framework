@@ -92,6 +92,13 @@ class Worker
     public $paused = false;
 
     /**
+     * Indicates whether we pulled a job from any queue in the last read cycle
+     * 
+     * @var bool
+     */
+    protected bool $lastJobCycleHadJob = false;
+
+    /**
      * The callbacks used to pop jobs from queues.
      *
      * @var callable[]
@@ -346,8 +353,8 @@ class Worker
      */
     protected function getNextJob($connection, $queue)
     {
-        $popJobCallback = function ($queue) use ($connection) {
-            return $connection->pop($queue);
+        $popJobCallback = function ($queue, $block) use ($connection) {
+            return $connection->pop($queue, $block);
         };
 
         $this->raiseBeforeJobPopEvent($connection->getConnectionName());
@@ -360,13 +367,20 @@ class Worker
                 );
             }
 
-            foreach (explode(',', $queue) as $queue) {
-                if (! is_null($job = $popJobCallback($queue))) {
+            foreach (explode(',', $queue) as $index=>$queue) {
+                $block = ! $this->lastJobCycleHadJob && $index == 0;
+
+                if (! is_null($job = $popJobCallback($queue, $block))) {
                     $this->raiseAfterJobPopEvent($connection->getConnectionName(), $job);
+
+                    $this->lastJobCycleHadJob = true;
 
                     return $job;
                 }
             }
+
+            $this->lastJobCycleHadJob = false;
+            
         } catch (Throwable $e) {
             $this->exceptions->report($e);
 
