@@ -24,7 +24,6 @@ class FindCommand extends Command
      */
     protected $description = 'Find an Artisan command.';
 
-
     /**
      * Execute the console command.
      *
