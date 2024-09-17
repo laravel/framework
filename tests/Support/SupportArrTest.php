@@ -1242,11 +1242,13 @@ class SupportArrTest extends TestCase
             new ComponentAttributeBag([
                 'taylor' => false,
                 'joe' => '',
+                'aaron' => 0,
                 'james' => null,
                 'tim' => 'macdonald',
                 'christoph' => fn () => "rumpel",
             ]),
             'audrey' => '',
+            'alex' => 0,
             'leyton' => false,
             'till' => null,
             'josie' => 'cold',
@@ -1255,11 +1257,13 @@ class SupportArrTest extends TestCase
 
         $this->assertStringContainsString( 'audrey=""', $resultString);
         $this->assertStringContainsString( 'hedwood="melanie"', $resultString);
+        $this->assertStringContainsString( 'alex="0"', $resultString);
         $this->assertStringNotContainsString( 'leyton', $resultString);
         $this->assertStringNotContainsString( 'till', $resultString);
 
         $this->assertStringContainsString( 'joe=""', $resultString);
         $this->assertStringContainsString( 'christoph="rumpel"', $resultString);
+        $this->assertStringContainsString( 'aaron="0"', $resultString);
         $this->assertStringContainsString( 'tim="macdonald"', $resultString);
         $this->assertStringNotContainsString( 'taylor', $resultString);
         $this->assertStringNotContainsString( 'james', $resultString);

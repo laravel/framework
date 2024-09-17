@@ -558,6 +558,8 @@ class ComponentTagCompiler
         /x";
 
         $value = preg_replace_callback($pattern, function ($matches) {
+
+
             $name = $this->stripQuotes($matches['inlineName'] ?: $matches['name'] ?: $matches['boundName']);
 
             if (Str::contains($name, '-') && ! empty($matches['inlineName'])) {
@@ -570,6 +572,7 @@ class ComponentTagCompiler
             }
 
             $this->boundAttributes = [];
+
 
             $attributes = $this->getAttributesFromAttributeString($matches['attributes']);
 
@@ -712,40 +715,48 @@ class ComponentTagCompiler
     {
         return preg_replace_callback(
             '/@(attributes)(\( ( (?>[^()]+) | (?2) )* \))/x', function ($match) {
+
+
                 if ($match[1] === 'attributes') {
-//                    $match[2] = str_replace('"', "'", $match[2]);
-
-                    // Using regex to extract keys and values
-                    $matches = [];
-                    preg_match_all(
-                         "/'([^']+)' =>\s*(true|false|'.*?')/",
-                        $match[2],
-                        $matches);
-
-                    $parsedArray = [];
-                    // Iterate through the matches to handle boolean and string values correctly
-                    foreach ($matches[1] as $index => $key) {
-                        $value = $matches[2][$index];
-
-                        // Check if the value is actual boolean true or false
-                        if ($value === 'true') {
-                            $parsedArray[$key] = true;
-                        } elseif ($value === 'false') {
-                            $parsedArray[$key] = false;
-                        } else {
-                            // If it's a string (e.g., 'value'), remove the surrounding quotes
-                            $parsedArray[$key] = trim($value, "'");
-                        }
-                    }
-
-                    // Combine keys and values into an associative array
-                    $parsedArray = array_combine($matches[1], $matches[2]);
-                    return \Illuminate\Support\Arr::toHtmlAttributes($parsedArray);
+                    return \Illuminate\Support\Arr::toHtmlAttributes(
+                        $this->reformatAttributeExpressionStringToArray($match[2])
+                    );
                 }
 
                 return $match[0];
             }, $attributeString
         );
+    }
+
+    /**
+     * Take an attribute string in expression format (surrounded by ([]))
+     * and reformat it into a compiled HTML attribute string.
+     *
+     * @param string $expression
+     * @return array
+     */
+    public function reformatAttributeExpressionStringToArray(string $expression)
+    {
+        preg_match_all(
+            '/[\'"](?<key>[^\'"]+)[\'"]\s*=>\s*(?:(?<bool>true|false)|(?<int>\d+)|[\'"](?<string>[^\'"]*)[\'"])/x',
+            trim($expression, '()[]'),
+            $matches,
+            PREG_SET_ORDER
+        );
+        return \Illuminate\Support\Collection::make($matches)
+            ->mapWithKeys(function ($match) {
+                $key = $match['key'];
+                if (isset($match['bool']) && $match['bool'] !== '') {
+                    $value = $match['bool'] === 'true';
+                } elseif (isset($match['int']) && $match['int'] !== '') {
+                    $value = intval($match['int']);
+                } elseif (isset($match['string'])) {
+                    $value = $match['string'];
+                } else {
+                    $value = null;
+                }
+                return [$key => $value];
+            })->toArray();
     }
 
     /**
