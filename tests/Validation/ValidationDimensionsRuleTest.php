@@ -8,6 +8,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Dimensions;
 use Illuminate\Validation\ValidationServiceProvider;
 use Illuminate\Validation\Validator;
@@ -245,6 +246,30 @@ class ValidationDimensionsRuleTest extends TestCase
             width: 190,
             height: 210,
             message: 'validation.dimensions'
+        );
+    }
+
+    public function testLegacyConstraintsPassedIntoConstructorViaRuleSupported()
+    {
+        $rule = Rule::dimensions([
+            'min_width' => 100,
+            'max_width' => 200,
+            'min_height' => 100,
+            'max_height' => 200,
+            'ratio' => 1 / 1,
+        ]);
+
+        $this->passes(
+            $rule,
+            width: 150,
+            height: 150
+        );
+
+        $this->fails(
+            $rule,
+            width: 190,
+            height: 210,
+            message: 'validation.ratio'
         );
     }
 
