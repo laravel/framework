@@ -353,7 +353,7 @@ class Worker
      */
     protected function getNextJob($connection, $queue)
     {
-        $popJobCallback = function ($queue, $block) use ($connection) {
+        $popJobCallback = function ($queue, $block = true) use ($connection) {
             return $connection->pop($queue, $block);
         };
 
@@ -380,7 +380,7 @@ class Worker
             }
 
             $this->lastJobCycleHadJob = false;
-            
+
         } catch (Throwable $e) {
             $this->exceptions->report($e);
 
