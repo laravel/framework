@@ -9,6 +9,8 @@ use Illuminate\Support\HigherOrderTapProxy;
 use Illuminate\Support\Once;
 use Illuminate\Support\Onceable;
 use Illuminate\Support\Optional;
+use Illuminate\Support\Recursable;
+use Illuminate\Support\Recurser;
 use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
 
@@ -505,5 +507,30 @@ if (! function_exists('with')) {
     function with($value, ?callable $callback = null)
     {
         return is_null($callback) ? $value : $callback($value);
+    }
+}
+
+if (! function_exists('without_recursion')) {
+    /**
+     * Executes a callback and returns a secondary value for recursive calls.
+     *
+     * @template  TReturnType
+     * @template  TRecursionCallable of callable(): TReturnType
+     * @template  TRecursionType of TReturnType|TRecursionCallable
+     *
+     * @param  callable(): TReturnType  $callback
+     * @param  TRecursionType  $onRecursion
+     * @param  string|null  $as
+     * @param  object|null  $for
+     * @return TReturnType
+     */
+    function without_recursion(callable $callback, mixed $onRecursion, ?string $as = null, ?object $for = null): mixed
+    {
+        return Recurser::instance()
+            ->withoutRecursion(
+            $as
+                ? Recursable::fromSignature($as, $callback, $onRecursion, $for)
+                : Recursable::fromTrace(debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 2), $callback, $onRecursion, $for)
+            );
     }
 }
