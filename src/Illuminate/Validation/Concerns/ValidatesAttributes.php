@@ -640,7 +640,11 @@ trait ValidatesAttributes
             return false;
         }
 
-        $decimals = strlen(end($matches));
+        if (!isset($matches[1])) {
+            return false;
+        }
+
+        $decimals = strlen($matches[1]);
 
         if (! isset($parameters[1])) {
             return $decimals == $parameters[0];
