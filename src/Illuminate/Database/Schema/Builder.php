@@ -5,6 +5,7 @@ namespace Illuminate\Database\Schema;
 use Closure;
 use Illuminate\Container\Container;
 use Illuminate\Database\Connection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use LogicException;
@@ -577,6 +578,10 @@ class Builder
         $prefix = $this->connection->getConfig('prefix_indexes')
                     ? $this->connection->getConfig('prefix')
                     : '';
+
+        if (class_exists($table) && $table instanceof Model) {
+            $table = (new $table)->getTable();
+        }
 
         if (isset($this->resolver)) {
             return call_user_func($this->resolver, $table, $callback, $prefix);
