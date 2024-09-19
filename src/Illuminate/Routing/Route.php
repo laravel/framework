@@ -1056,7 +1056,8 @@ class Route
      * @param  mixed  $description
      * @return $this
      */
-    public function description($description) {
+    public function description($description)
+    {
         $this->description = $description;
 
         return $this;
