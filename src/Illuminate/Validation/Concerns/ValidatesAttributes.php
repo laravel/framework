@@ -640,7 +640,7 @@ trait ValidatesAttributes
             return false;
         }
 
-        if (!isset($matches[1])) {
+        if (! isset($matches[1])) {
             return false;
         }
 
