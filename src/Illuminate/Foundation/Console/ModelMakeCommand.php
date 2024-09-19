@@ -218,8 +218,8 @@ class ModelMakeCommand extends GeneratorCommand
         $replace = [];
 
         if ($this->option('factory')) {
-            $replace["{{ factoryDocBlock }}" ] = $this->buildFactoryReplacements();
-        }else{
+            $replace['{{ factoryDocBlock }}'] = $this->buildFactoryReplacements();
+        } else {
             $replace["\n    {{ factoryDocBlock }}"] = '';
         }
 
