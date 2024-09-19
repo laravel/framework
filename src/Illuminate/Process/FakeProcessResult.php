@@ -4,6 +4,7 @@ namespace Illuminate\Process;
 
 use Illuminate\Contracts\Process\ProcessResult as ProcessResultContract;
 use Illuminate\Process\Exceptions\ProcessFailedException;
+use Illuminate\Support\Str;
 
 class FakeProcessResult implements ProcessResultContract
 {
@@ -133,6 +134,14 @@ class FakeProcessResult implements ProcessResultContract
     public function output()
     {
         return $this->output;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function stringable()
+    {
+        return Str::of($this->output());
     }
 
     /**

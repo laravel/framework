@@ -4,6 +4,7 @@ namespace Illuminate\Process;
 
 use Illuminate\Contracts\Process\ProcessResult as ProcessResultContract;
 use Illuminate\Process\Exceptions\ProcessFailedException;
+use Illuminate\Support\Str;
 use Symfony\Component\Process\Process;
 
 class ProcessResult implements ProcessResultContract
@@ -74,6 +75,14 @@ class ProcessResult implements ProcessResultContract
     public function output()
     {
         return $this->process->getOutput();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function stringable()
+    {
+        return Str::of($this->output());
     }
 
     /**

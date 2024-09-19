@@ -40,6 +40,13 @@ interface ProcessResult
     public function output();
 
     /**
+     * Get the standard output of the process as Stringable.
+     *
+     * @return \Illuminate\Support\Stringable
+     */
+    public function stringable();
+
+    /**
      * Determine if the output contains the given string.
      *
      * @param  string  $output

@@ -6,6 +6,7 @@ use Illuminate\Contracts\Process\ProcessResult;
 use Illuminate\Process\Exceptions\ProcessFailedException;
 use Illuminate\Process\Exceptions\ProcessTimedOutException;
 use Illuminate\Process\Factory;
+use Illuminate\Support\Stringable;
 use OutOfBoundsException;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 use PHPUnit\Framework\TestCase;
@@ -104,6 +105,15 @@ class ProcessTest extends TestCase
 
         $this->assertTrue(str_contains($pool['first']->output(), 'ProcessTest.php'));
         $this->assertTrue(str_contains($pool['second']->output(), 'ProcessTest.php'));
+    }
+
+    public function testOutputStringable()
+    {
+        $factory = new Factory;
+        $result = $factory->path(__DIR__)->run($this->ls());
+
+        $this->assertInstanceOf(Stringable::class, $result->stringable());
+        $this->assertEquals($result->output(), $result->stringable()->value());
     }
 
     public function testOutputCanBeRetrievedViaStartCallback()
