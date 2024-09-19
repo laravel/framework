@@ -49,6 +49,13 @@ class Route
     public $action;
 
     /**
+     * The route description.
+     *
+     * @var mixed
+     */
+    public $description;
+
+    /**
      * Indicates whether the route is a fallback route.
      *
      * @var bool
@@ -1029,6 +1036,28 @@ class Route
     public function missing($missing)
     {
         $this->action['missing'] = $missing;
+
+        return $this;
+    }
+
+    /**
+     * Get the description of the route instance.
+     *
+     * @return mixed
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
+     * Add or change the route description.
+     *
+     * @param  mixed  $description
+     * @return $this
+     */
+    public function description($description) {
+        $this->description = $description;
 
         return $this;
     }

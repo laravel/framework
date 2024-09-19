@@ -1338,6 +1338,14 @@ class RouteRegistrarTest extends TestCase
         $this->assertTrue($this->router->getRoutes()->hasNamedRoute('user.edit'));
     }
 
+    public function testCanRegisterWithDescription()
+    {
+        $desc = 'User route';
+        $this->router->get('user')->description($desc);
+
+        $this->assertSame($desc, $this->getRoute()->getDescription());
+    }
+
     /**
      * Get the last route registered with the router.
      *
