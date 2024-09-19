@@ -1084,7 +1084,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function push()
     {
-        return $this->withoutRecursion(function () {
+        return without_recursion(function () {
             if (! $this->save()) {
                 return false;
             }
@@ -1660,7 +1660,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function toArray()
     {
-        return $this->withoutRecursion(
+        return without_recursion(
             fn () => array_merge($this->attributesToArray(), $this->relationsToArray()),
             fn () => $this->attributesToArray(),
         );
@@ -2010,7 +2010,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function getQueueableRelations()
     {
-        return $this->withoutRecursion(function () {
+        return without_recursion(function () {
             $relations = [];
 
             foreach ($this->getRelations() as $key => $relation) {

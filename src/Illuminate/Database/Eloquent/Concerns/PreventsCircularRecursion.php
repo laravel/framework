@@ -21,6 +21,8 @@ trait PreventsCircularRecursion
      * @param  callable  $callback
      * @param  mixed  $default
      * @return mixed
+     *
+     * @deprecated Replaced by `without_recursion()` helper
      */
     protected function withoutRecursion($callback, $default = null)
     {
