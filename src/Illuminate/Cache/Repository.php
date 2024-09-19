@@ -534,9 +534,10 @@ class Repository implements ArrayAccess, CacheContract
     {
         $this->event(new ForgettingKey($this->getName(), $key));
 
-        if ($this->store->get("{$this->itemKey($key)}:created") !== null) {
-            return $this->forget("{$this->itemKey($key)}:created");
-        }
+        $itemKey = "{$this->itemKey($key)}:created";
+        defer(function () use ($itemKey) {
+            $this->store->forget($itemKey);
+        }, name: "illuminate:cache:forget:flexible:{$key}");
 
         return tap($this->store->forget($this->itemKey($key)), function ($result) use ($key) {
             if ($result) {
