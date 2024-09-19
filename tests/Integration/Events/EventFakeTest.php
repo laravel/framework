@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Events;
 
 use Closure;
 use Exception;
+use Illuminate\Console\Events\CommandFinished;
 use Illuminate\Contracts\Events\ShouldDispatchAfterCommit;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
@@ -177,6 +178,17 @@ class EventFakeTest extends TestCase
         Event::assertListening('eloquent.saving: '.Post::class, PostObserver::class.'@saving');
         Event::assertListening('eloquent.saving: '.Post::class, [PostObserver::class, 'saving']);
         Event::assertListening('event', InvokableEventSubscriber::class);
+    }
+
+    public function testAssertNotListening()
+    {
+        Event::fake();
+
+        if(app()->isProduction()) {
+            Event::listen(CommandFinished::class, 'logCommandListener');
+        }
+
+        Event::assertNotListening(CommandFinished::class, 'logCommandListener');
     }
 
     public function testMissingMethodsAreForwarded()

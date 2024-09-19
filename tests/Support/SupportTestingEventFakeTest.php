@@ -61,6 +61,107 @@ class SupportTestingEventFakeTest extends TestCase
         $fake->assertListening(EventStub::class, ListenerStub::class);
     }
 
+    public function testAssertNotListening()
+    {
+        // Case 1: Listener is NOT attached, should pass
+        $listener = ListenerStub::class;
+
+        $dispatcher = m::mock(Dispatcher::class);
+        $dispatcher->shouldReceive('getListeners')->andReturn([]);
+
+        $fake = new EventFake($dispatcher);
+
+        $fake->assertNotListening(EventStub::class, ListenerStub::class);
+
+        // Case 2: Listener is attached, should fail
+        $dispatcher = m::mock(Dispatcher::class);
+        $dispatcher->shouldReceive('getListeners')->andReturn([function ($event, $payload) use ($listener) {
+            return $listener(...array_values($payload));
+        }]);
+
+        $fake = new EventFake($dispatcher);
+
+        $this->expectException(ExpectationFailedException::class);
+        $fake->assertNotListening(EventStub::class, ListenerStub::class);
+    }
+
+    public function testAssertNotListeningWithStringCallback()
+    {
+        // Case 3: Listener attached as a string with method, should fail
+        $listener = ListenerStub::class . '@handle';
+
+        $dispatcher = m::mock(Dispatcher::class);
+        $dispatcher->shouldReceive('getListeners')->andReturn([function ($event, $payload) use ($listener) {
+            return $listener(...array_values($payload));
+        }]);
+
+        $fake = new EventFake($dispatcher);
+
+        $this->expectException(ExpectationFailedException::class);
+        $fake->assertNotListening(EventStub::class, $listener);
+    }
+
+    public function testAssertNotListeningWithDifferentListeners()
+    {
+        // Case 4: Different listener should pass
+        $actualListener = AnotherListenerStub::class;
+
+        $dispatcher = m::mock(Dispatcher::class);
+        $dispatcher->shouldReceive('getListeners')->andReturn([function ($event, $payload) use ($actualListener) {
+            return $actualListener(...array_values($payload));
+        }]);
+
+        $fake = new EventFake($dispatcher);
+
+        $fake->assertNotListening(EventStub::class, ListenerStub::class);
+    }
+
+    public function testAssertNotListeningWithClosureListener()
+    {
+        // Case 5: Closure listener, should pass
+        $listener = function () {
+            // Closure listener logic
+        };
+
+        $dispatcher = m::mock(Dispatcher::class);
+        $dispatcher->shouldReceive('getListeners')->andReturn([$listener]);
+
+        $fake = new EventFake($dispatcher);
+
+        $fake->assertNotListening(EventStub::class, ListenerStub::class);
+    }
+
+    public function testAssertNotListeningWithClosureListenerAsClosureClass()
+    {
+        // Case 6: Closure listener, expecting Closure::class, should pass
+        $listener = function () {
+            // Closure logic
+        };
+
+        $dispatcher = m::mock(Dispatcher::class);
+        $dispatcher->shouldReceive('getListeners')->andReturn([$listener]);
+
+        $fake = new EventFake($dispatcher);
+
+        $fake->assertNotListening(EventStub::class, Closure::class);
+    }
+
+    public function testAssertNotListeningWithMatchingParsedCallback()
+    {
+        // Case 7: Listener with parsed callback, should fail
+        $listener = ListenerStub::class . '@handle';
+
+        $dispatcher = m::mock(Dispatcher::class);
+        $dispatcher->shouldReceive('getListeners')->andReturn([function ($event, $payload) use ($listener) {
+            return $listener(...array_values($payload));
+        }]);
+
+        $fake = new EventFake($dispatcher);
+
+        $this->expectException(ExpectationFailedException::class);
+        $fake->assertNotListening(EventStub::class, ListenerStub::class . '@handle');
+    }
+
     public function testAssertDispatchedWithCallbackInt()
     {
         $this->fake->dispatch(EventStub::class);
@@ -162,6 +263,11 @@ class EventStub
 }
 
 class ListenerStub
+{
+    //
+}
+
+class AnotherListenerStub
 {
     //
 }
