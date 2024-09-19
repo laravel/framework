@@ -76,17 +76,18 @@ class EventFake implements Dispatcher, Fake
     }
 
     /**
-     * Assert if an event has a listener attached to it.
+     * Assert if an event has or does not have a listener attached to it.
      *
      * @param  string  $expectedEvent
      * @param  string|array  $expectedListener
+     * @param  bool  $shouldListen
      * @return void
      */
-    public function assertListening($expectedEvent, $expectedListener)
+    protected function checkListener($expectedEvent, $expectedListener, $shouldListen = true)
     {
         foreach ($this->dispatcher->getListeners($expectedEvent) as $listenerClosure) {
             $actualListener = (new ReflectionFunction($listenerClosure))
-                        ->getStaticVariables()['listener'];
+                ->getStaticVariables()['listener'];
 
             $normalizedListener = $expectedListener;
 
@@ -107,21 +108,44 @@ class EventFake implements Dispatcher, Fake
 
             if ($actualListener === $normalizedListener ||
                 ($actualListener instanceof Closure &&
-                $normalizedListener === Closure::class)) {
-                PHPUnit::assertTrue(true);
+                    $normalizedListener === Closure::class)) {
+                PHPUnit::assertTrue($shouldListen);
 
                 return;
             }
         }
 
-        PHPUnit::assertTrue(
-            false,
-            sprintf(
-                'Event [%s] does not have the [%s] listener attached to it',
-                $expectedEvent,
-                print_r($expectedListener, true)
-            )
-        );
+        // Final assertion based on $shouldListen
+        PHPUnit::assertFalse($shouldListen, sprintf(
+            'Event [%s] %s have the [%s] listener attached to it',
+            $expectedEvent,
+            $shouldListen ? 'does not' : 'does',
+            print_r($expectedListener, true)
+        ));
+    }
+
+    /**
+     * Assert if an event has a listener attached to it.
+     *
+     * @param  string  $expectedEvent
+     * @param  string|array  $expectedListener
+     * @return void
+     */
+    public function assertListening($expectedEvent, $expectedListener)
+    {
+        $this->checkListener($expectedEvent, $expectedListener);
+    }
+
+    /**
+     * Assert if an event does not have a listener attached to it.
+     *
+     * @param  string  $expectedEvent
+     * @param  string|array  $expectedListener
+     * @return void
+     */
+    public function assertNotListening($expectedEvent, $expectedListener)
+    {
+        $this->checkListener($expectedEvent, $expectedListener, false);
     }
 
     /**
