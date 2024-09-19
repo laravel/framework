@@ -283,10 +283,7 @@ class ThrottleRequests
      * @param  \Symfony\Component\HttpFoundation\Response|null  $response
      * @return array
      */
-    protected function getHeaders($maxAttempts,
-        $remainingAttempts,
-        $retryAfter = null,
-        ?Response $response = null)
+    protected function getHeaders($maxAttempts, $remainingAttempts, $retryAfter = null, ?Response $response = null)
     {
         if ($response &&
             ! is_null($response->headers->get('X-RateLimit-Remaining')) &&
