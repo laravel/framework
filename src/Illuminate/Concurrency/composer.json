@@ -15,7 +15,10 @@
     ],
     "require": {
         "php": "^8.2",
+        "illuminate/console": "^11.0",
+        "illuminate/contracts": "^11.0",
         "illuminate/process": "^11.0",
+        "illuminate/support": "^11.0",
         "laravel/serializable-closure": "^1.2.2"
     },
     "autoload": {
