@@ -206,6 +206,46 @@ class ModelMakeCommand extends GeneratorCommand
     }
 
     /**
+     * Build the class with the given name.
+     *
+     * @param  string  $name
+     * @return string
+     *
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     */
+    protected function buildClass($name)
+    {
+        $replace = [];
+
+        if ($this->option('factory')) {
+            $replace["{{ factoryDocBlock }}" ] = $this->buildFactoryReplacements();
+        }else{
+            $replace["\n    {{ factoryDocBlock }}"] = '';
+        }
+
+        $class = str_replace(
+            array_keys($replace), array_values($replace), parent::buildClass($name)
+        );
+
+        return $class;
+    }
+
+    /**
+     * Build the replacements for a factory doc block.
+     *
+     * @return string
+     */
+    protected function buildFactoryReplacements()
+    {
+        $factory = Str::studly($this->argument('name')).'Factory';
+        $factoryNameSpace = '\\Database\\Factories\\'.$factory;
+
+        return <<<EOT
+        /** @use HasFactory<$factoryNameSpace> */
+        EOT;
+    }
+
+    /**
      * Get the console command options.
      *
      * @return array
