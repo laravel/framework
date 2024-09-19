@@ -96,6 +96,8 @@ class ModelMakeCommandTest extends TestCase
             'namespace App\Models;',
             'use Illuminate\Database\Eloquent\Model;',
             'class Foo extends Model',
+            '/** @use HasFactory<\Database\Factories\FooFactory> */',
+            'use HasFactory;',
         ], 'app/Models/Foo.php');
 
         $this->assertFilenameNotExists('app/Http/Controllers/FooController.php');
