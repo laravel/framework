@@ -88,7 +88,7 @@ class SupportTestingEventFakeTest extends TestCase
     public function testAssertNotListeningWithStringCallback()
     {
         // Case 3: Listener attached as a string with method, should fail
-        $listener = ListenerStub::class . '@handle';
+        $listener = ListenerStub::class.'@handle';
 
         $dispatcher = m::mock(Dispatcher::class);
         $dispatcher->shouldReceive('getListeners')->andReturn([function ($event, $payload) use ($listener) {
@@ -149,7 +149,7 @@ class SupportTestingEventFakeTest extends TestCase
     public function testAssertNotListeningWithMatchingParsedCallback()
     {
         // Case 7: Listener with parsed callback, should fail
-        $listener = ListenerStub::class . '@handle';
+        $listener = ListenerStub::class.'@handle';
 
         $dispatcher = m::mock(Dispatcher::class);
         $dispatcher->shouldReceive('getListeners')->andReturn([function ($event, $payload) use ($listener) {
@@ -159,7 +159,7 @@ class SupportTestingEventFakeTest extends TestCase
         $fake = new EventFake($dispatcher);
 
         $this->expectException(ExpectationFailedException::class);
-        $fake->assertNotListening(EventStub::class, ListenerStub::class . '@handle');
+        $fake->assertNotListening(EventStub::class, ListenerStub::class.'@handle');
     }
 
     public function testAssertDispatchedWithCallbackInt()

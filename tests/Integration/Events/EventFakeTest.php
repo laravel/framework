@@ -184,7 +184,7 @@ class EventFakeTest extends TestCase
     {
         Event::fake();
 
-        if(app()->isProduction()) {
+        if (app()->isProduction()) {
             Event::listen(CommandFinished::class, 'logCommandListener');
         }
 
