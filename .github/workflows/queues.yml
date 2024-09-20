@@ -1,14 +1,11 @@
 name: queues
 
-on:
-  push:
-    branches:
-      - master
-      - '*.x'
-      - '!php84'
-  pull_request:
-    branches-ignore:
-      - 'php84'
+# on:
+#   push:
+#     branches:
+#       - master
+#       - '*.x'
+#   pull_request:
 
 jobs:
   sync:
