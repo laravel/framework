@@ -12,8 +12,8 @@ class SupportRecursableTest extends TestCase
 {
     public function testForSetsObjectIfBlank()
     {
-        $one = (object)[];
-        $two = (object)[];
+        $one = (object) [];
+        $two = (object) [];
 
         $recursableOne = new Recursable(fn () => 'foo', 'bar', null);
         $recursableTwo = new Recursable(fn () => 'foo', 'bar', $one);
@@ -133,7 +133,8 @@ class SupportRecursableTest extends TestCase
     }
 
     #[DataProvider('backtraceProvider')]
-    public function testObjectFromTrace(array $trace, array $target, string $signature) {
+    public function testObjectFromTrace(array $trace, array $target, string $signature)
+    {
         $this->assertSame($target['object'], RecursableStub::expose_objectFromTrace($trace));
     }
 
@@ -214,7 +215,7 @@ class SupportRecursableTest extends TestCase
     public static function backtraceProvider(): array
     {
         $empty = ['file' => '', 'class' => '', 'function' => '', 'line' => 0, 'object' => null];
-        $object = (object)[];
+        $object = (object) [];
 
         return [
             'no frames' => [[], $empty, ':0'],

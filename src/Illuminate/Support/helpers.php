@@ -528,9 +528,9 @@ if (! function_exists('without_recursion')) {
     {
         return Recurser::instance()
             ->withoutRecursion(
-            $as
-                ? Recursable::fromSignature($as, $callback, $onRecursion, $for)
-                : Recursable::fromTrace(debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 2), $callback, $onRecursion, $for)
+                $as
+                    ? Recursable::fromSignature($as, $callback, $onRecursion, $for)
+                    : Recursable::fromTrace(debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 2), $callback, $onRecursion, $for)
             );
     }
 }

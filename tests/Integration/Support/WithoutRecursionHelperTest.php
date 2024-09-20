@@ -125,7 +125,8 @@ class WithoutRecursionHelperTest extends TestCase
         $this->assertSame(['upline' => 1, 'upline_callback' => 1], $tail->pullCallCount());
     }
 
-    public function testRecursionCallbacksAreCalledOnRecursiveInstances() {
+    public function testRecursionCallbacksAreCalledOnRecursiveInstances()
+    {
         $head = DoublyLinkedRecursiveList::make(children: 2);
         $body = $head->getNext();
         $tail = $body->getNext();

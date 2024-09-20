@@ -152,6 +152,13 @@ class DatabaseEloquentIntegrationTest extends TestCase
                 $table->morphs('taggable');
                 $table->string('taxonomy')->nullable();
             });
+
+            $this->schema($connection)->create('categories', function ($table) {
+                $table->increments('id');
+                $table->string('name');
+                $table->integer('parent_id')->nullable();
+                $table->timestamps();
+            });
         }
 
         $this->schema($connection)->create('non_incrementing_users', function ($table) {
@@ -2182,6 +2189,61 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertSame('primary', $pivot->taxonomy);
     }
 
+    public function testTouchingChaperonedChildModelUpdatesParentTimestamps()
+    {
+        $before = Carbon::now();
+
+        $one = EloquentTouchingCategory::create(['id' => 1, 'name' => 'One']);
+        $two = $one->children()->create(['id' => 2, 'name' => 'Two']);
+
+        $this->assertTrue($before->isSameDay($one->updated_at));
+        $this->assertTrue($before->isSameDay($two->updated_at));
+
+        Carbon::setTestNow($future = $before->copy()->addDays(3));
+
+        $two->touch();
+
+        $this->assertTrue($future->isSameDay($two->fresh()->updated_at), 'It is not touching model own timestamps.');
+        $this->assertTrue($future->isSameDay($one->fresh()->updated_at), 'It is not touching chaperoned models related timestamps.');
+    }
+
+    public function testTouchingBiDirectionalChaperonedModelUpdatesAllRelatedTimestamps()
+    {
+        $before = Carbon::now();
+
+        EloquentTouchingCategory::insert([
+            ['id' => 1, 'name' => 'One', 'parent_id' => null, 'created_at' => $before, 'updated_at' => $before],
+            ['id' => 2, 'name' => 'Two', 'parent_id' => 1, 'created_at' => $before, 'updated_at' => $before],
+            ['id' => 3, 'name' => 'Three', 'parent_id' => 1, 'created_at' => $before, 'updated_at' => $before],
+            ['id' => 4, 'name' => 'Four', 'parent_id' => 2, 'created_at' => $before, 'updated_at' => $before],
+        ]);
+
+        $one = EloquentTouchingCategory::find(1);
+        [$two, $three] = $one->children;
+        [$four] = $two->children;
+
+        $this->assertTrue($before->isSameDay($one->updated_at));
+        $this->assertTrue($before->isSameDay($two->updated_at));
+        $this->assertTrue($before->isSameDay($three->updated_at));
+        $this->assertTrue($before->isSameDay($four->updated_at));
+
+        Carbon::setTestNow($future = $before->copy()->addDays(3));
+
+        // Touch a random model and check that all of the others have been updated
+        $models = tap([$one, $two, $three, $four], shuffle(...));
+        $target = array_shift($models);
+        $target->touch();
+
+        $this->assertTrue($future->isSameDay($target->fresh()->updated_at), 'It is not touching model own timestamps.');
+
+        while ($next = array_shift($models)) {
+            $this->assertTrue(
+                $future->isSameDay($next->fresh()->updated_at),
+                'It is not touching related models timestamps.'
+            );
+        }
+    }
+
     /**
      * Helpers...
      */
@@ -2484,5 +2546,26 @@ class EloquentTouchingComment extends Eloquent
     public function post()
     {
         return $this->belongsTo(EloquentTouchingPost::class, 'post_id');
+    }
+}
+
+class EloquentTouchingCategory extends Eloquent
+{
+    protected $table = 'categories';
+    protected $guarded = [];
+
+    protected $touches = [
+        'parent',
+        'children',
+    ];
+
+    public function parent()
+    {
+        return $this->belongsTo(EloquentTouchingCategory::class, 'parent_id');
+    }
+
+    public function children()
+    {
+        return $this->hasMany(EloquentTouchingCategory::class, 'parent_id')->chaperone();
     }
 }
