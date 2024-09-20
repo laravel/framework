@@ -22,6 +22,7 @@ use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\HtmlString;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\VarDumper\VarDumper;
 
 if (! function_exists('abort')) {
     /**
@@ -411,6 +412,32 @@ if (! function_exists('defer')) {
     function defer(?callable $callback = null, ?string $name = null, bool $always = false)
     {
         return \Illuminate\Support\defer($callback, $name, $always);
+    }
+}
+
+if(! function_exists('dd_if')) {
+    /**
+     * Dump the passed variables if the condition is true and terminate the script.
+     *
+     * @param bool $condition
+     * @param mixed ...$vars
+     * @return mixed|null
+     */
+    function dd_if(bool $condition, ...$vars)
+    {
+        if (!$condition) {
+            return null;
+        }
+
+        if (array_key_exists(0, $vars) && 1 === count($vars)) {
+            VarDumper::dump($vars[0]);
+        } else {
+            foreach ($vars as $k => $v) {
+                VarDumper::dump($v, is_int($k) ? 1 + $k : $k);
+            }
+        }
+
+        exit(1);
     }
 }
 
