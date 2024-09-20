@@ -20,6 +20,7 @@ use Illuminate\Database\Query\JoinClause;
 use Illuminate\Database\Query\Processors\MySqlProcessor;
 use Illuminate\Database\Query\Processors\PostgresProcessor;
 use Illuminate\Database\Query\Processors\Processor;
+use Illuminate\Database\RecordNotFoundException;
 use Illuminate\Pagination\AbstractPaginator as Paginator;
 use Illuminate\Pagination\Cursor;
 use Illuminate\Pagination\CursorPaginator;
@@ -2990,6 +2991,30 @@ class DatabaseQueryBuilderTest extends TestCase
         });
         $results = $builder->from('users')->where('id', '=', 1)->first();
         $this->assertEquals(['foo' => 'bar'], $results);
+    }
+
+    public function testFirstOrFailMethodReturnsFirstResult()
+    {
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('select')->once()->with('select * from "users" where "id" = ? limit 1', [1], true)->andReturn([['foo' => 'bar']]);
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, [['foo' => 'bar']])->andReturnUsing(function ($query, $results) {
+            return $results;
+        });
+        $results = $builder->from('users')->where('id', '=', 1)->firstOrFail();
+        $this->assertEquals(['foo' => 'bar'], $results);
+    }
+
+    public function testFirstOrFailMethodThrowsRecordNotFoundException()
+    {
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('select')->once()->with('select * from "users" where "id" = ? limit 1', [1], true)->andReturn([]);
+
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, [])->andReturn([]);
+
+        $this->expectException(RecordNotFoundException::class);
+        $this->expectExceptionMessage('No record found for the given query.');
+
+        $builder->from('users')->where('id', '=', 1)->firstOrFail();
     }
 
     public function testPluckMethodGetsCollectionOfColumnValues()

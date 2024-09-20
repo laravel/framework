@@ -399,6 +399,21 @@ if (! function_exists('decrypt')) {
     }
 }
 
+if (! function_exists('defer')) {
+    /**
+     * Defer execution of the given callback.
+     *
+     * @param  callable|null  $callback
+     * @param  string|null  $name
+     * @param  bool  $always
+     * @return \Illuminate\Foundation\Defer\DeferredCallback
+     */
+    function defer(?callable $callback = null, ?string $name = null, bool $always = false)
+    {
+        return \Illuminate\Support\defer($callback, $name, $always);
+    }
+}
+
 if (! function_exists('dispatch')) {
     /**
      * Dispatch a job to its appropriate handler.

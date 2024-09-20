@@ -51,9 +51,40 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
+     * Find a model in the collection by key or throw an exception.
+     *
+     * @param  mixed  $key
+     * @return TModel
+     *
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     */
+    public function findOrFail($key)
+    {
+        $result = $this->find($key);
+
+        if (is_array($key) && count($result) === count(array_unique($key))) {
+            return $result;
+        } elseif (! is_array($key) && ! is_null($result)) {
+            return $result;
+        }
+
+        $exception = new ModelNotFoundException;
+
+        if (! $model = head($this->items)) {
+            throw $exception;
+        }
+
+        $ids = is_array($key) ? array_diff($key, $result->modelKeys()) : $key;
+
+        $exception->setModel(get_class($model), $ids);
+
+        throw $exception;
+    }
+
+    /**
      * Load a set of relationships onto the collection.
      *
-     * @param  array<array-key, (callable(\Illuminate\Database\Eloquent\Builder<TModel>): mixed)|string>|string  $relations
+     * @param  array<array-key, array|(callable(\Illuminate\Database\Eloquent\Relations\Relation<*, *, *>): mixed)|string>|string  $relations
      * @return $this
      */
     public function load($relations)
@@ -74,7 +105,7 @@ class Collection extends BaseCollection implements QueueableCollection
     /**
      * Load a set of aggregations over relationship's column onto the collection.
      *
-     * @param  array<array-key, (callable(\Illuminate\Database\Eloquent\Builder<TModel>): mixed)|string>|string  $relations
+     * @param  array<array-key, array|(callable(\Illuminate\Database\Eloquent\Relations\Relation<*, *, *>): mixed)|string>|string  $relations
      * @param  string  $column
      * @param  string|null  $function
      * @return $this
@@ -111,7 +142,7 @@ class Collection extends BaseCollection implements QueueableCollection
     /**
      * Load a set of relationship counts onto the collection.
      *
-     * @param  array<array-key, (callable(\Illuminate\Database\Eloquent\Builder<TModel>): mixed)|string>|string  $relations
+     * @param  array<array-key, array|(callable(\Illuminate\Database\Eloquent\Relations\Relation<*, *, *>): mixed)|string>|string  $relations
      * @return $this
      */
     public function loadCount($relations)
@@ -122,7 +153,7 @@ class Collection extends BaseCollection implements QueueableCollection
     /**
      * Load a set of relationship's max column values onto the collection.
      *
-     * @param  array<array-key, (callable(\Illuminate\Database\Eloquent\Builder<TModel>): mixed)|string>|string  $relations
+     * @param  array<array-key, array|(callable(\Illuminate\Database\Eloquent\Relations\Relation<*, *, *>): mixed)|string>|string  $relations
      * @param  string  $column
      * @return $this
      */
@@ -134,7 +165,7 @@ class Collection extends BaseCollection implements QueueableCollection
     /**
      * Load a set of relationship's min column values onto the collection.
      *
-     * @param  array<array-key, (callable(\Illuminate\Database\Eloquent\Builder<TModel>): mixed)|string>|string  $relations
+     * @param  array<array-key, array|(callable(\Illuminate\Database\Eloquent\Relations\Relation<*, *, *>): mixed)|string>|string  $relations
      * @param  string  $column
      * @return $this
      */
@@ -146,7 +177,7 @@ class Collection extends BaseCollection implements QueueableCollection
     /**
      * Load a set of relationship's column summations onto the collection.
      *
-     * @param  array<array-key, (callable(\Illuminate\Database\Eloquent\Builder<TModel>): mixed)|string>|string  $relations
+     * @param  array<array-key, array|(callable(\Illuminate\Database\Eloquent\Relations\Relation<*, *, *>): mixed)|string>|string  $relations
      * @param  string  $column
      * @return $this
      */
@@ -158,7 +189,7 @@ class Collection extends BaseCollection implements QueueableCollection
     /**
      * Load a set of relationship's average column values onto the collection.
      *
-     * @param  array<array-key, (callable(\Illuminate\Database\Eloquent\Builder<TModel>): mixed)|string>|string  $relations
+     * @param  array<array-key, array|(callable(\Illuminate\Database\Eloquent\Relations\Relation<*, *, *>): mixed)|string>|string  $relations
      * @param  string  $column
      * @return $this
      */
@@ -170,7 +201,7 @@ class Collection extends BaseCollection implements QueueableCollection
     /**
      * Load a set of related existences onto the collection.
      *
-     * @param  array<array-key, (callable(\Illuminate\Database\Eloquent\Builder<TModel>): mixed)|string>|string  $relations
+     * @param  array<array-key, array|(callable(\Illuminate\Database\Eloquent\Relations\Relation<*, *, *>): mixed)|string>|string  $relations
      * @return $this
      */
     public function loadExists($relations)
@@ -181,7 +212,7 @@ class Collection extends BaseCollection implements QueueableCollection
     /**
      * Load a set of relationships onto the collection if they are not already eager loaded.
      *
-     * @param  array<array-key, (callable(\Illuminate\Database\Eloquent\Builder<TModel>): mixed)|string>|string  $relations
+     * @param  array<array-key, array|(callable(\Illuminate\Database\Eloquent\Relations\Relation<*, *, *>): mixed)|string>|string  $relations
      * @return $this
      */
     public function loadMissing($relations)
@@ -253,7 +284,7 @@ class Collection extends BaseCollection implements QueueableCollection
      * Load a set of relationships onto the mixed relationship collection.
      *
      * @param  string  $relation
-     * @param  array<array-key, (callable(\Illuminate\Database\Eloquent\Builder<TModel>): mixed)|string>  $relations
+     * @param  array<array-key, array|(callable(\Illuminate\Database\Eloquent\Relations\Relation<*, *, *>): mixed)|string>  $relations
      * @return $this
      */
     public function loadMorph($relation, $relations)
@@ -270,7 +301,7 @@ class Collection extends BaseCollection implements QueueableCollection
      * Load a set of relationship counts onto the mixed relationship collection.
      *
      * @param  string  $relation
-     * @param  array<array-key, (callable(\Illuminate\Database\Eloquent\Builder<TModel>): mixed)|string>  $relations
+     * @param  array<array-key, array|(callable(\Illuminate\Database\Eloquent\Relations\Relation<*, *, *>): mixed)|string>  $relations
      * @return $this
      */
     public function loadMorphCount($relation, $relations)
