@@ -1,6 +1,6 @@
 name: static analysis
 
-# on:
+on:
 #   push:
 #     branches:
 #       - master

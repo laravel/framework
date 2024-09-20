@@ -1,6 +1,6 @@
 name: databases
 
-# on:
+on:
 #   push:
 #     branches:
 #       - master

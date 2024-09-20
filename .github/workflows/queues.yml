@@ -1,6 +1,6 @@
 name: queues
 
-# on:
+on:
 #   push:
 #     branches:
 #       - master
