@@ -294,12 +294,12 @@ jobs:
           DB_PASSWORD: Forge123
 
   mssql_2017:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-20.04
     timeout-minutes: 5
 
     services:
       sqlsrv:
-        image: mcr.microsoft.com/mssql/server:2017-CU14-ubuntu
+        image: mcr.microsoft.com/mssql/server:2017-latest
         env:
           ACCEPT_EULA: Y
           SA_PASSWORD: Forge123
