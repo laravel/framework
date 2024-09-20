@@ -19,7 +19,6 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Env;
 use Illuminate\Support\InteractsWithTime;
-use Illuminate\Support\Str;
 use ReflectionClass;
 use SplFileInfo;
 use Symfony\Component\Console\ConsoleEvents;
@@ -385,7 +384,7 @@ class Kernel implements KernelContract
     protected function commandClassFromFile(SplFileInfo $file): string
     {
         return implode(
-            "\\",
+            '\\',
             array_map(
                 'ucfirst',
                 explode(DIRECTORY_SEPARATOR, substr($file->getRealPath(), strlen($this->app->basePath()) + 1, -4)),
