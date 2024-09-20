@@ -364,10 +364,8 @@ class Kernel implements KernelContract
             array_unique(array_merge($this->loadedPaths, $paths))
         );
 
-        $namespace = $this->app->getNamespace();
-
         foreach (Finder::create()->in($paths)->files() as $file) {
-            $command = $this->commandClassFromFile($file, $namespace);
+            $command = $this->commandClassFromFile($file);
 
             if (is_subclass_of($command, Command::class) &&
                 ! (new ReflectionClass($command))->isAbstract()) {
@@ -382,15 +380,16 @@ class Kernel implements KernelContract
      * Extract the command class name from the given file path.
      *
      * @param  \SplFileInfo  $file
-     * @param  string  $namespace
      * @return string
      */
-    protected function commandClassFromFile(SplFileInfo $file, string $namespace): string
+    protected function commandClassFromFile(SplFileInfo $file): string
     {
-        return $namespace.str_replace(
-            ['/', '.php'],
-            ['\\', ''],
-            Str::after($file->getRealPath(), realpath(app_path()).DIRECTORY_SEPARATOR)
+        return implode(
+            "\\",
+            array_map(
+                'ucfirst',
+                explode(DIRECTORY_SEPARATOR, substr($file->getRealPath(), strlen($this->app->basePath()) + 1, -4)),
+            ),
         );
     }
 
