@@ -137,7 +137,9 @@ class FakeProcessResult implements ProcessResultContract
     }
 
     /**
-     * {@inheritdoc}
+     * Get the standard output of the process as Stringable.
+     *
+     * @return \Illuminate\Support\Stringable
      */
     public function stringable()
     {
