@@ -109,4 +109,33 @@ class AttachableTest extends TestCase
             99,
         ], $notification->dataArgs);
     }
+
+    public function testFromUrlMethod()
+    {
+        $mailable = new class extends Mailable
+        {
+            public function build()
+            {
+                $this->attach(new class implements Attachable
+                {
+                    public function toMailAttachment()
+                    {
+                        return Attachment::fromUrl('https://example.com/file.pdf')
+                            ->as('example.pdf')
+                            ->withMime('application/pdf');
+                    }
+                });
+            }
+        };
+
+        $mailable->build();
+
+        $this->assertSame([
+            'file' => 'https://example.com/file.pdf',
+            'options' => [
+                'as' => 'example.pdf',
+                'mime' => 'application/pdf',
+            ],
+        ], $mailable->attachments[0]);
+    }
 }

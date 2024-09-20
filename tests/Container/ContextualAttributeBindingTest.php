@@ -15,7 +15,9 @@ use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Container\Attributes\Database;
 use Illuminate\Container\Attributes\Log;
 use Illuminate\Container\Attributes\Storage;
+use Illuminate\Container\Attributes\Tag;
 use Illuminate\Container\Container;
+use Illuminate\Container\RewindableGenerator;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\Guard as GuardContract;
 use Illuminate\Contracts\Container\ContextualAttribute;
@@ -226,6 +228,7 @@ class ContextualAttributeBindingTest extends TestCase
         $container->singleton('config', fn () => new Repository([
             'app' => [
                 'timezone' => 'Europe/Paris',
+                'locale' => null,
             ],
         ]));
 
@@ -234,6 +237,49 @@ class ContextualAttributeBindingTest extends TestCase
         });
 
         $this->assertEquals('Europe/Paris', $value);
+
+        $value = $container->call(function (#[Config('app.locale')] ?string $value) {
+            return $value;
+        });
+
+        $this->assertNull($value);
+    }
+
+    public function testNestedAttributeOnAppCall()
+    {
+        $container = new Container;
+        $container->singleton('config', fn () => new Repository([
+            'app' => [
+                'timezone' => 'Europe/Paris',
+                'locale' => null,
+            ],
+        ]));
+
+        $value = $container->call(function (TimezoneObject $object) {
+            return $object;
+        });
+
+        $this->assertEquals('Europe/Paris', $value->timezone);
+
+        $value = $container->call(function (LocaleObject $object) {
+            return $object;
+        });
+
+        $this->assertNull($value->locale);
+    }
+
+    public function testTagAttribute()
+    {
+        $container = new Container;
+        $container->bind('one', fn (): int => 1);
+        $container->bind('two', fn (): int => 2);
+        $container->tag(['one', 'two'], 'numbers');
+
+        $value = $container->call(function (#[Tag('numbers')] RewindableGenerator $integers) {
+            return $integers;
+        });
+
+        $this->assertEquals([1, 2], iterator_to_array($value));
     }
 }
 
@@ -386,5 +432,23 @@ final class StorageTest
 {
     public function __construct(#[Storage('foo')] Filesystem $foo, #[Storage('bar')] Filesystem $bar)
     {
+    }
+}
+
+final class TimezoneObject
+{
+    public function __construct(
+        #[Config('app.timezone')] public readonly ?string $timezone
+    ) {
+        //
+    }
+}
+
+final class LocaleObject
+{
+    public function __construct(
+        #[Config('app.locale')] public readonly ?string $locale
+    ) {
+        //
     }
 }

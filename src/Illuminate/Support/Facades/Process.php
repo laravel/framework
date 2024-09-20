@@ -38,7 +38,7 @@ use Illuminate\Process\Factory;
  * @method static \Illuminate\Contracts\Process\ProcessResult pipe(callable|array $callback, callable|null $output = null)
  * @method static \Illuminate\Process\ProcessPoolResults concurrently(callable $callback, callable|null $output = null)
  * @method static \Illuminate\Process\PendingProcess newPendingProcess()
- * @method static void macro(string $name, object|callable $macro, object|callable $macro = null)
+ * @method static void macro(string $name, object|callable $macro)
  * @method static void mixin(object $mixin, bool $replace = true)
  * @method static bool hasMacro(string $name)
  * @method static void flushMacros()

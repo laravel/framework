@@ -23,7 +23,7 @@ use Illuminate\Database\Console\WipeCommand;
  * @method static array getConnections()
  * @method static void setReconnector(callable $reconnector)
  * @method static \Illuminate\Database\DatabaseManager setApplication(\Illuminate\Contracts\Foundation\Application $app)
- * @method static void macro(string $name, object|callable $macro, object|callable $macro = null)
+ * @method static void macro(string $name, object|callable $macro)
  * @method static void mixin(object $mixin, bool $replace = true)
  * @method static bool hasMacro(string $name)
  * @method static void flushMacros()

@@ -19,6 +19,8 @@ use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
+include_once 'Enums.php';
+
 class AuthorizeMiddlewareTest extends TestCase
 {
     protected $container;
@@ -112,6 +114,23 @@ class AuthorizeMiddlewareTest extends TestCase
 
         $this->router->get('dashboard', [
             'middleware' => Authorize::class.':view-dashboard,"some string"',
+            'uses' => function () {
+                return 'success';
+            },
+        ]);
+
+        $response = $this->router->dispatch(Request::create('dashboard', 'GET'));
+
+        $this->assertSame('success', $response->content());
+    }
+
+    public function testSimpleAbilityWithBackedEnumParameter()
+    {
+        $this->gate()->define('view-dashboard', function ($user) {
+            return true;
+        });
+
+        $this->router->middleware(Authorize::using(AbilitiesEnum::VIEW_DASHBOARD))->get('dashboard', [
             'uses' => function () {
                 return 'success';
             },
