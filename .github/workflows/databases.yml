@@ -1,10 +1,10 @@
 name: databases
 
 on:
-#   push:
-#     branches:
-#       - master
-#       - '*.x'
+  push:
+    branches:
+      - master
+      - '*.x'
 #   pull_request:
 
 jobs:
