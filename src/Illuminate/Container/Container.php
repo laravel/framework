@@ -1083,12 +1083,14 @@ class Container implements ArrayAccess, ContainerContract
 
         if ($parameter->isDefaultValueAvailable()) {
             return $parameter->getDefaultValue();
-        } elseif ($parameter->allowsNull()) {
-            return null;
         }
 
         if ($parameter->isVariadic()) {
             return [];
+        }
+
+        if ($parameter->hasType() && $parameter->allowsNull()) {
+            return null;
         }
 
         $this->unresolvablePrimitive($parameter);
