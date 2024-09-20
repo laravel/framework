@@ -228,6 +228,7 @@ class ContextualAttributeBindingTest extends TestCase
         $container->singleton('config', fn () => new Repository([
             'app' => [
                 'timezone' => 'Europe/Paris',
+                'locale' => null,
             ],
         ]));
 
@@ -236,6 +237,35 @@ class ContextualAttributeBindingTest extends TestCase
         });
 
         $this->assertEquals('Europe/Paris', $value);
+
+        $value = $container->call(function (#[Config('app.locale')] ?string $value) {
+            return $value;
+        });
+
+        $this->assertNull($value);
+    }
+
+    public function testNestedAttributeOnAppCall()
+    {
+        $container = new Container;
+        $container->singleton('config', fn () => new Repository([
+            'app' => [
+                'timezone' => 'Europe/Paris',
+                'locale' => null,
+            ],
+        ]));
+
+        $value = $container->call(function (TimezoneObject $object) {
+            return $object;
+        });
+
+        $this->assertEquals('Europe/Paris', $value->timezone);
+
+        $value = $container->call(function (LocaleObject $object) {
+            return $object;
+        });
+
+        $this->assertNull($value->locale);
     }
 
     public function testTagAttribute()
@@ -402,5 +432,23 @@ final class StorageTest
 {
     public function __construct(#[Storage('foo')] Filesystem $foo, #[Storage('bar')] Filesystem $bar)
     {
+    }
+}
+
+final class TimezoneObject
+{
+    public function __construct(
+        #[Config('app.timezone')] public readonly ?string $timezone
+    ) {
+        //
+    }
+}
+
+final class LocaleObject
+{
+    public function __construct(
+        #[Config('app.locale')] public readonly ?string $locale
+    ) {
+        //
     }
 }
