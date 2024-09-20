@@ -3573,6 +3573,20 @@ class DatabaseQueryBuilderTest extends TestCase
         );
 
         $this->assertEquals(1, $result);
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->getConnection()
+            ->shouldReceive('affectingStatement')->once()->with('merge [table1] using (select [bar] from [table2] where [foreign_id] = ?) [laravel_source] ([foo]) on [laravel_source].[id] = [table1].[id] when matched then update set [foo] = [laravel_source].[foo] when not matched then insert ([foo]) values ([foo]);', [5])->andReturn(1);
+
+        $result = $builder->from('table1')->upsertUsing(
+            ['foo'],
+            function (Builder $query) {
+                $query->select(['bar'])->from('table2')->where('foreign_id', '=', 5);
+            },
+            'id'
+        );
+
+        $this->assertEquals(1, $result);
     }
 
     public function testUpsertUsingWithEmptyColumns()
@@ -3595,6 +3609,38 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getPostgresBuilder();
         $builder->getConnection()
             ->shouldReceive('affectingStatement')->once()->with('insert into "table1" select * from "table2" where "foreign_id" = ? on conflict ("id") do update set "foo" = "excluded"."foo"', [5])->andReturn(1);
+
+        $result = $builder->from('table1')->upsertUsing(
+            [],
+            function (Builder $query) {
+                $query->from('table2')->where('foreign_id', '=', 5);
+            },
+            'id',
+            ['foo']
+        );
+
+        $this->assertEquals(1, $result);
+
+        $builder = $this->getSQLiteBuilder();
+        $builder->getConnection()->shouldReceive('getDatabaseName');
+        $builder->getConnection()
+            ->shouldReceive('affectingStatement')->once()->with('insert into "table1" select * from "table2" where "foreign_id" = ? on conflict ("id") do update set "foo" = "excluded"."foo"', [5])->andReturn(1);
+
+        $result = $builder->from('table1')->upsertUsing(
+            [],
+            function (Builder $query) {
+                $query->from('table2')->where('foreign_id', '=', 5);
+            },
+            'id',
+            ['foo']
+        );
+
+        $this->assertEquals(1, $result);
+
+        // will error as SQL Server requires columns in this case but confirm the builder constructs right string
+        $builder = $this->getSqlServerBuilder();
+        $builder->getConnection()
+            ->shouldReceive('affectingStatement')->once()->with('merge [table1] using (select * from [table2] where [foreign_id] = ?) [laravel_source] () on [laravel_source].[id] = [table1].[id] when matched then update set [foo] = [laravel_source].[foo] when not matched then insert () values ();', [5])->andReturn(1);
 
         $result = $builder->from('table1')->upsertUsing(
             [],

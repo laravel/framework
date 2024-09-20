@@ -446,6 +446,45 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
+     * Compile an upsert statement using a subquery into SQL.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $columns
+     * @param  string  $sql
+     * @param  array  $uniqueBy
+     * @param  array  $update
+     * @return string
+     */
+    public function compileUpsertUsing(Builder $query, array $columns, string $sql, array $uniqueBy, array $update)
+    {
+        $columns = $this->columnize($columns);
+
+        $upsertSql = 'merge '.$this->wrapTable($query->from).' ';
+
+        $upsertSql .= 'using ('.$sql.') '.$this->wrapTable('laravel_source').' ('.$columns.') ';
+
+        $on = collect($uniqueBy)->map(function ($column) use ($query) {
+            return $this->wrap('laravel_source.'.$column).' = '.$this->wrap($query->from.'.'.$column);
+        })->implode(' and ');
+
+        $upsertSql .= 'on '.$on.' ';
+
+        if ($update) {
+            $update = collect($update)->map(function ($value, $key) {
+                return is_numeric($key)
+                    ? $this->wrap($value).' = '.$this->wrap('laravel_source.'.$value)
+                    : $this->wrap($key).' = '.$this->parameter($value);
+            })->implode(', ');
+
+            $upsertSql .= 'when matched then update set '.$update.' ';
+        }
+
+        $upsertSql .= 'when not matched then insert ('.$columns.') values ('.$columns.');';
+
+        return $upsertSql;
+    }
+
+    /**
      * Prepare the bindings for an update statement.
      *
      * @param  array  $bindings
