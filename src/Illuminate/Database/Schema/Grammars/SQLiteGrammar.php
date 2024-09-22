@@ -5,6 +5,7 @@ namespace Illuminate\Database\Schema\Grammars;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Schema\Builder;
 use Illuminate\Database\Schema\IndexDefinition;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Fluent;
@@ -41,6 +42,18 @@ class SQLiteGrammar extends Grammar
         }
 
         return $alterCommands;
+    }
+
+    /**
+     * Compile the column definition.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Database\Schema\ColumnDefinition  $column
+     * @return string
+     */
+    protected function getColumn(Blueprint $blueprint, $column)
+    {
+        return $this->addConstraints(parent::addModifiers($sql, $blueprint, $column), $blueprint, $column);
     }
 
     /**
@@ -178,6 +191,22 @@ class SQLiteGrammar extends Grammar
             // are building, since SQLite needs foreign keys on the tables creation.
             return $sql.$this->getForeignKey($foreign);
         }, '');
+    }
+
+    /**
+     * Add relevant constraints for column creation.
+     *
+     * @param  string  $sql
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string|null
+     */
+    protected function addConstraints(string $sql, Blueprint $blueprint, Fluent $command): ?string
+    {
+        if (method_exists($this, $method = "constrain{$command->type}")) {
+            $sql .= $this->{$method}($blueprint, $command);
+        }
+        return $sql;
     }
 
     /**
@@ -1047,6 +1076,17 @@ class SQLiteGrammar extends Grammar
     }
 
     /**
+     * Create the column definition for a vector type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    protected function typeVector(Fluent $column)
+    {
+        return "blob";
+    }
+
+    /**
      * Get the SQL for a generated virtual column modifier.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
@@ -1151,6 +1191,19 @@ class SQLiteGrammar extends Grammar
         if (! is_null($column->collation)) {
             return " collate '{$column->collation}'";
         }
+    }
+
+    /**
+     * Get the SQL for constraining a blob column to be used as a vector.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    protected function constrainVector(Blueprint $blueprint, Fluent $column)
+    {
+        $size = ($column->dimension ?? Builder::$defaultVectorDimension) * 4;
+        return " check(length({$column->name}) = {$size})";
     }
 
     /**

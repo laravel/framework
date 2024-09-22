@@ -5,6 +5,7 @@ namespace Illuminate\Database\Schema\Grammars;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Schema\Builder;
 use Illuminate\Support\Fluent;
 use LogicException;
 
@@ -1051,6 +1052,18 @@ class PostgresGrammar extends Grammar
         }
 
         return 'geography';
+    }
+
+    /**
+     * Create the column definition for a vector type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    protected function typeVector(Fluent $column)
+    {
+        $dimension = $column->dimension ? $column->dimension : Builder::$defaultVectorDimension;
+        return "vector($dimension)";
     }
 
     /**

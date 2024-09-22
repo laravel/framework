@@ -896,6 +896,16 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertSame('create table "products" ("price" integer not null, "discounted_virtual" integer as ("price" - 5), "discounted_stored" integer as ("price" - 5) stored)', $statements[0]);
     }
 
+    public function testAddingVector()
+    {
+        $blueprint = new Blueprint('embeddings');
+        $blueprint->vector('embedding');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table "embeddings" add column "embedding" blob not null check(length(embedding) = 1536)', $statements[0]);
+    }
+
     public function testGrammarsAreMacroable()
     {
         // compileReplace macro.

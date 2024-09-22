@@ -5,6 +5,7 @@ namespace Illuminate\Database\Schema\Grammars;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Schema\Builder;
 use Illuminate\Database\Schema\ColumnDefinition;
 use Illuminate\Support\Fluent;
 use RuntimeException;
@@ -1101,6 +1102,18 @@ class MySqlGrammar extends Grammar
     protected function typeComputed(Fluent $column)
     {
         throw new RuntimeException('This database driver requires a type, see the virtualAs / storedAs modifiers.');
+    }
+
+    /**
+     * Create the column definition for a vector type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    protected function typeVector(Fluent $column)
+    {
+        $dimension = $column->dimension ? $column->dimension : Builder::$defaultVectorDimension;
+        return "vector($dimension)";
     }
 
     /**
