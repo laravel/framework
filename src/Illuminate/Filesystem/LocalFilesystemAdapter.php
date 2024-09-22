@@ -3,7 +3,6 @@
 namespace Illuminate\Filesystem;
 
 use Closure;
-use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Traits\Conditionable;
 use RuntimeException;
 
