@@ -114,9 +114,9 @@ class Arr
 
         foreach ($array as $key => $value) {
             if (is_array($value) && ! empty($value)) {
-                $results = array_merge($results, static::dot($value, $prepend.$key.'.'));
+                $results = array_merge($results, static::dot($value, $prepend . $key . '.'));
             } else {
-                $results[$prepend.$key] = $value;
+                $results[$prepend . $key] = $value;
             }
         }
 
@@ -473,7 +473,7 @@ class Arr
 
         $finalItem = array_pop($array);
 
-        return implode($glue, $array).$finalGlue.$finalItem;
+        return implode($glue, $array) . $finalGlue . $finalItem;
     }
 
     /**
@@ -497,7 +497,7 @@ class Arr
      */
     public static function prependKeysWith($array, $prependWith)
     {
-        return static::mapWithKeys($array, fn ($item, $key) => [$prependWith.$key => $item]);
+        return static::mapWithKeys($array, fn($item, $key) => [$prependWith . $key => $item]);
     }
 
     /**
@@ -845,12 +845,12 @@ class Arr
 
         if (! array_is_list($array)) {
             $descending
-                    ? krsort($array, $options)
-                    : ksort($array, $options);
+                ? krsort($array, $options)
+                : ksort($array, $options);
         } else {
             $descending
-                    ? rsort($array, $options)
-                    : sort($array, $options);
+                ? rsort($array, $options)
+                : sort($array, $options);
         }
 
         return $array;
@@ -934,7 +934,7 @@ class Arr
      */
     public static function whereNotNull($array)
     {
-        return static::where($array, fn ($value) => ! is_null($value));
+        return static::where($array, fn($value) => ! is_null($value));
     }
 
     /**
@@ -950,5 +950,26 @@ class Arr
         }
 
         return is_array($value) ? $value : [$value];
+    }
+
+    /**
+     * Split an array into smaller chunks of a specified size.
+     *
+     * @param  array  $array
+     * @param  int  $size
+     * @return array
+     */
+    public static function chunk($array, $size)
+    {
+        if ($size <= 0) {
+            return [];
+        }
+
+        $chunks = [];
+        foreach (array_chunk($array, $size, true) as $chunk) {
+            $chunks[] = $chunk;
+        }
+
+        return $chunks;
     }
 }
