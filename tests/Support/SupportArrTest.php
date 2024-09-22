@@ -27,7 +27,7 @@ class SupportArrTest extends TestCase
         $this->assertFalse(Arr::accessible(12.34));
         $this->assertFalse(Arr::accessible(true));
         $this->assertFalse(Arr::accessible(new \DateTime));
-        $this->assertFalse(Arr::accessible(static fn () => null));
+        $this->assertFalse(Arr::accessible(static fn() => null));
     }
 
     public function testAdd()
@@ -88,10 +88,18 @@ class SupportArrTest extends TestCase
         // 3D matrix
         $this->assertSame(
             [
-                [1, 'a', 'I'], [1, 'a', 'II'], [1, 'a', 'III'],
-                [1, 'b', 'I'], [1, 'b', 'II'], [1, 'b', 'III'],
-                [2, 'a', 'I'], [2, 'a', 'II'], [2, 'a', 'III'],
-                [2, 'b', 'I'], [2, 'b', 'II'], [2, 'b', 'III'],
+                [1, 'a', 'I'],
+                [1, 'a', 'II'],
+                [1, 'a', 'III'],
+                [1, 'b', 'I'],
+                [1, 'b', 'II'],
+                [1, 'b', 'III'],
+                [2, 'a', 'I'],
+                [2, 'a', 'II'],
+                [2, 'a', 'III'],
+                [2, 'b', 'I'],
+                [2, 'b', 'II'],
+                [2, 'b', 'III'],
             ],
             Arr::crossJoin([1, 2], ['a', 'b'], ['I', 'II', 'III'])
         );
@@ -263,8 +271,8 @@ class SupportArrTest extends TestCase
         $array = array_values(Arr::whereNotNull(['a', null, 'b', null, 'c']));
         $this->assertEquals(['a', 'b', 'c'], $array);
 
-        $array = array_values(Arr::whereNotNull([null, 1, 'string', 0.0, false, [], new stdClass(), fn () => null]));
-        $this->assertEquals([1, 'string', 0.0, false, [], new stdClass(), fn () => null], $array);
+        $array = array_values(Arr::whereNotNull([null, 1, 'string', 0.0, false, [], new stdClass(), fn() => null]));
+        $this->assertEquals([1, 'string', 0.0, false, [], new stdClass(), fn() => null], $array);
     }
 
     public function testFirst()
@@ -640,7 +648,8 @@ class SupportArrTest extends TestCase
             'post-1' => [
                 'comments' => [
                     'tags' => [
-                        '#foo', '#bar',
+                        '#foo',
+                        '#bar',
                     ],
                 ],
             ],
@@ -656,7 +665,8 @@ class SupportArrTest extends TestCase
         $this->assertEquals([
             0 => [
                 'tags' => [
-                    '#foo', '#bar',
+                    '#foo',
+                    '#bar',
                 ],
             ],
             1 => [
@@ -763,7 +773,7 @@ class SupportArrTest extends TestCase
     {
         $data = ['first' => 'taylor', 'last' => 'otwell'];
         $mapped = Arr::map($data, function ($value, $key) {
-            return $key.'-'.strrev($value);
+            return $key . '-' . strrev($value);
         });
         $this->assertEquals(['first' => 'first-rolyat', 'last' => 'last-llewto'], $mapped);
         $this->assertEquals(['first' => 'taylor', 'last' => 'otwell'], $data);
@@ -772,7 +782,7 @@ class SupportArrTest extends TestCase
     public function testMapWithEmptyArray()
     {
         $mapped = Arr::map([], static function ($value, $key) {
-            return $key.'-'.$value;
+            return $key . '-' . $value;
         });
         $this->assertEquals([], $mapped);
     }
@@ -781,7 +791,7 @@ class SupportArrTest extends TestCase
     {
         $data = ['first' => 'taylor', 'last' => null];
         $mapped = Arr::map($data, static function ($value, $key) {
-            return $key.'-'.$value;
+            return $key . '-' . $value;
         });
         $this->assertEquals(['first' => 'first-taylor', 'last' => 'last-'], $mapped);
     }
@@ -1501,5 +1511,16 @@ class SupportArrTest extends TestCase
                 'name' => 'Abigail',
             ],
         ], Arr::select($array, 'name'));
+    }
+
+    public function testArrayCanBeChunked()
+    {
+        $array = ['a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5];
+        $result = Arr::chunk($array, 2);
+
+        $this->assertCount(3, $result);
+        $this->assertEquals(['a' => 1, 'b' => 2], $result[0]);
+        $this->assertEquals(['c' => 3, 'd' => 4], $result[1]);
+        $this->assertEquals(['e' => 5], $result[2]);
     }
 }
