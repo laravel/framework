@@ -806,7 +806,6 @@ trait HasRelationships
                     }
                 }
             },
-            null,
         );
     }
 
