@@ -39,6 +39,8 @@ class ConcurrencyManager extends MultipleInstanceManager
      *
      * @param  array  $config
      * @return \Illuminate\Concurrency\ForkDriver
+     *
+     * @throws \RuntimeException
      */
     public function createForkDriver(array $config)
     {

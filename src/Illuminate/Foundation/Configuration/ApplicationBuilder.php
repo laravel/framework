@@ -282,7 +282,11 @@ class ApplicationBuilder
      */
     public function withCommands(array $commands = [])
     {
-        if (empty($commands)) {
+        if (empty($commands) && is_file($this->app->basePath('routes/console.php'))) {
+            $commands = [$this->app->basePath('routes/console.php')];
+        }
+
+        if (empty($commands) && is_dir($this->app->path('Console/Commands'))) {
             $commands = [$this->app->path('Console/Commands')];
         }
 
