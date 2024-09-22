@@ -524,7 +524,7 @@ if (! function_exists('without_recursion')) {
      * @param  object|null  $for
      * @return TReturnType
      */
-    function without_recursion(callable $callback, mixed $onRecursion, ?string $as = null, ?object $for = null): mixed
+    function without_recursion(callable $callback, mixed $onRecursion = null, ?string $as = null, ?object $for = null): mixed
     {
         return Recurser::instance()
             ->withoutRecursion(
