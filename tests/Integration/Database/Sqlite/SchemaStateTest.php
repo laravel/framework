@@ -3,12 +3,14 @@
 namespace Illuminate\Tests\Integration\Database\Sqlite;
 
 use Illuminate\Support\Facades\DB;
+use Orchestra\Testbench\Attributes\RequiresDatabase;
 use Orchestra\Testbench\Concerns\InteractsWithPublishedFiles;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 
 use function Orchestra\Testbench\remote;
 
+#[RequiresDatabase('sqlite', default: true)]
 class SchemaStateTest extends TestCase
 {
     use InteractsWithPublishedFiles;

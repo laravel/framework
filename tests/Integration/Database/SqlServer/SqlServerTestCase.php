@@ -4,12 +4,8 @@ namespace Illuminate\Tests\Integration\Database\SqlServer;
 
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
+#[RequiresDatabase('sqlsrv', default: true)]
 abstract class SqlServerTestCase extends DatabaseTestCase
 {
-    protected function defineDatabaseMigrations()
-    {
-        if ($this->driver !== 'sqlsrv') {
-            $this->markTestSkipped('Test requires a SQL Server connection.');
-        }
-    }
+    //
 }
