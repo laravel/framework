@@ -177,7 +177,7 @@ class RepositoryTest extends TestCase
         $this->assertSame(2, $count);
     }
 
-    public function testDatabaseImplicitlyClearsTtlKeys()
+    public function testItImplicitlyClearsTtlKeysFromDatabaseCache()
     {
         $this->freezeTime();
         $cache = Cache::driver('database');
@@ -203,6 +203,36 @@ class RepositoryTest extends TestCase
 
         $this->assertEmpty($cache->getConnection()->table('cache')->get());
         $this->assertTrue($cache->missing('count'));
+        $this->assertTrue($cache->missing('count:created'));
+    }
+
+    public function testItImplicitlyClearsTtlKeysFromFileDriver()
+    {
+        $this->freezeTime();
+        $cache = Cache::driver('file');
+
+        $cache->flexible('count', [5, 10], fn () => 1);
+
+        $this->assertTrue($cache->has('count'));
+        $this->assertTrue($cache->has('count:created'));
+
+        $cache->forget('count');
+
+        $this->assertFalse($cache->getFilesystem()->exists($cache->path('count')));
+        $this->assertFalse($cache->getFilesystem()->exists($cache->path('count:created')));
+        $this->assertTrue($cache->missing('count'));
+        $this->assertTrue($cache->missing('count:created'));
+
+        $cache->flexible('count', [5, 10], fn () => 1);
+
+        $this->assertTrue($cache->has('count'));
+        $this->assertTrue($cache->has('count:created'));
+
+        $this->travel(20)->seconds();
+
+        $this->assertTrue($cache->missing('count'));
+        $this->assertFalse($cache->getFilesystem()->exists($cache->path('count')));
+        $this->assertFalse($cache->getFilesystem()->exists($cache->path('count:created')));
         $this->assertTrue($cache->missing('count:created'));
     }
 }
