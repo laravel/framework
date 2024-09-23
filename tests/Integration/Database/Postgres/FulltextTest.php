@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Database\Postgres;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Orchestra\Testbench\Attributes\RequiresDatabase;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 
@@ -50,12 +51,9 @@ class FulltextTest extends PostgresTestCase
         $this->assertSame('PostgreSQL vs. YourSQL', $articles[1]->title);
     }
 
+    #[RequiresDatabase('pgsql', '>=11.0')]
     public function testWhereFulltextWithWebsearch()
     {
-        if (version_compare($this->getConnection()->getServerVersion(), '11.0', '<')) {
-            $this->markTestSkipped('Test requires a PostgreSQL connection >= 11.0');
-        }
-
         $articles = DB::table('articles')->whereFulltext(['title', 'body'], '+PostgreSQL -YourSQL', ['mode' => 'websearch'])->get();
 
         $this->assertCount(5, $articles);
