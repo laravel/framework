@@ -6,7 +6,6 @@ use Closure;
 use Illuminate\Container\Container;
 use Illuminate\Http\Request;
 use Illuminate\Support\Defer\DeferredCallbackCollection;
-use Illuminate\Support\Facades\Session;
 use Symfony\Component\HttpFoundation\Response;
 
 class InvokeDeferredCallbacks
