@@ -2,12 +2,17 @@
 
 namespace Illuminate\Tests\Integration\Cache;
 
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
+use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\TestCase;
 
+#[WithMigration('cache')]
 class RepositoryTest extends TestCase
 {
+    use LazilyRefreshDatabase;
+
     public function testStaleWhileRevalidate(): void
     {
         Carbon::setTestNow('2000-01-01 00:00:00');
@@ -170,5 +175,34 @@ class RepositoryTest extends TestCase
         });
         $this->assertSame(2, $value);
         $this->assertSame(2, $count);
+    }
+
+    public function testDatabaseImplicitlyClearsTtlKeys()
+    {
+        $this->freezeTime();
+        $cache = Cache::driver('database');
+
+        $cache->flexible('count', [5, 10], fn () => 1);
+
+        $this->assertTrue($cache->has('count'));
+        $this->assertTrue($cache->has('count:created'));
+
+        $cache->forget('count');
+
+        $this->assertEmpty($cache->getConnection()->table('cache')->get());
+        $this->assertTrue($cache->missing('count'));
+        $this->assertTrue($cache->missing('count:created'));
+
+        $cache->flexible('count', [5, 10], fn () => 1);
+
+        $this->assertTrue($cache->has('count'));
+        $this->assertTrue($cache->has('count:created'));
+
+        $this->travel(20)->seconds();
+        $cache->forgetIfExpired('count');
+
+        $this->assertEmpty($cache->getConnection()->table('cache')->get());
+        $this->assertTrue($cache->missing('count'));
+        $this->assertTrue($cache->missing('count:created'));
     }
 }
