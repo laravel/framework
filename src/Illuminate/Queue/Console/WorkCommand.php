@@ -270,14 +270,14 @@ class WorkCommand extends Command
     {
         $log = array_filter([
             'timestamp' => $this->now()->format('Y-m-d\TH:i:s.uP'),
-            'level' => $status === 'starting' ||  $status === 'success'? 'info' : 'warning',
+            'level' => $status === 'starting' || $status === 'success' ? 'info' : 'warning',
             'job' => $job->resolveName(),
             'id' => $job->getJobId(),
             'uuid' => $job->uuid(),
             'connection' => $job->getConnectionName(),
             'queue' => $job->getQueue(),
             'status' => $status,
-            'result' => match(true) {
+            'result' => match (true) {
                 $job->isDeleted() => 'deleted',
                 $job->isReleased() => 'released',
                 $job->hasFailed() => 'failed',
