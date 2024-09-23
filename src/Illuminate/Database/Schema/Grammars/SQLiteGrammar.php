@@ -47,7 +47,6 @@ class SQLiteGrammar extends Grammar
     /**
      * Compile the column definition.
      *
-     * @param  string  $blueprint
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Database\Schema\ColumnDefinition  $column
      * @return string
