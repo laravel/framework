@@ -33,15 +33,6 @@ class SchemaStateTest extends TestCase
         parent::tearDown();
     }
 
-    protected function defineEnvironment($app)
-    {
-        $connection = $app['config']->get('database.default');
-
-        if ($app['config']->get("database.connections.$connection.driver") !== 'sqlite') {
-            $this->markTestSkipped('Test requires a Sqlite connection.');
-        }
-    }
-
     #[RequiresOperatingSystem('Linux|Darwin')]
     public function testSchemaDumpOnSqlite()
     {
