@@ -9,6 +9,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Queue\Attributes\WithoutRelations;
 use Illuminate\Queue\SerializesModels;
 use LogicException;
+use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\TestCase;
 use Schema;
 
@@ -61,6 +62,7 @@ class ModelSerializationTest extends TestCase
         });
     }
 
+    #[WithConfig('database.default', 'testing')]
     public function testItSerializeUserOnDefaultConnection()
     {
         $user = ModelSerializationTestUser::create([
