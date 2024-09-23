@@ -5,7 +5,7 @@ on:
     branches:
       - master
       - '*.x'
-  pull_request:
+  # pull_request:
 
 jobs:
   mysql_57:
