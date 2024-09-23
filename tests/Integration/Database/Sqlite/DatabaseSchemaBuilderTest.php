@@ -15,7 +15,6 @@ class DatabaseSchemaBuilderTest extends TestCase
     protected function defineEnvironment($app)
     {
         $app['config']->set([
-            'database.default' => 'testing',
             'database.connections.sqlite-with-prefix' => [
                 'driver' => 'sqlite',
                 'database' => ':memory:',
