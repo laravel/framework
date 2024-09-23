@@ -10,6 +10,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Queue\Attributes\WithoutRelations;
 use Illuminate\Queue\SerializesModels;
 use LogicException;
+use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\TestCase;
 use Schema;
 
@@ -313,6 +314,7 @@ class ModelSerializationTest extends TestCase
         $this->assertSame('taylor@laravel.com', $unSerialized->users[1]->email);
     }
 
+    #[WithConfig('database.default', 'testing')]
     public function test_model_serialization_structure()
     {
         $user = ModelSerializationTestUser::create([
@@ -326,6 +328,7 @@ class ModelSerializationTest extends TestCase
         );
     }
 
+    #[WithConfig('database.default', 'testing')]
     public function test_it_respects_without_relations_attribute()
     {
         $user = User::create([
@@ -339,6 +342,7 @@ class ModelSerializationTest extends TestCase
         );
     }
 
+    #[WithConfig('database.default', 'testing')]
     public function test_it_respects_without_relations_attribute_applied_to_class()
     {
         $user = User::create([
