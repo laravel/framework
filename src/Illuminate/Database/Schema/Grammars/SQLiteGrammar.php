@@ -208,6 +208,7 @@ class SQLiteGrammar extends Grammar
         if (method_exists($this, $method = "constrain{$command->type}")) {
             $sql .= $this->{$method}($blueprint, $command);
         }
+
         return $sql;
     }
 
