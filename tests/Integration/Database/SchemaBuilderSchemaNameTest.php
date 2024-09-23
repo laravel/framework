@@ -5,16 +5,14 @@ namespace Illuminate\Tests\Integration\Database;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Orchestra\Testbench\Attributes\RequiresDatabase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
+#[RequiresDatabase(['pgsql', 'sqlsrv'])]
 class SchemaBuilderSchemaNameTest extends DatabaseTestCase
 {
     protected function defineDatabaseMigrations()
     {
-        if (! in_array($this->driver, ['pgsql', 'sqlsrv'])) {
-            $this->markTestSkipped('Test requires a PostgreSQL or SQL Server connection.');
-        }
-
         if ($this->driver === 'pgsql') {
             DB::connection('without-prefix')->statement('create schema if not exists my_schema');
             DB::connection('with-prefix')->statement('create schema if not exists my_schema');
