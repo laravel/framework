@@ -15,7 +15,6 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\InteractsWithTime;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Terminal;
-
 use Throwable;
 
 use function Termwind\terminal;
@@ -293,7 +292,7 @@ class WorkCommand extends Command
         if ($status === 'starting') {
             $this->latestStartedAt = microtime(true);
         } else {
-            $log['ms'] = round((microtime(true) - $this->latestStartedAt) * 1000, 3);
+            $log['duration'] = round((microtime(true) - $this->latestStartedAt), 6);
         }
 
         $this->output->writeln(json_encode($log));
