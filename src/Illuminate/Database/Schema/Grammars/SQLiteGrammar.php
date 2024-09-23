@@ -47,12 +47,14 @@ class SQLiteGrammar extends Grammar
     /**
      * Compile the column definition.
      *
+     * @param  string  $blueprint
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Database\Schema\ColumnDefinition  $column
      * @return string
      */
     protected function getColumn(Blueprint $blueprint, $column)
     {
+        $sql = $this->wrap($column).' '.$this->getType($column);
         return $this->addConstraints(parent::addModifiers($sql, $blueprint, $column), $blueprint, $column);
     }
 
