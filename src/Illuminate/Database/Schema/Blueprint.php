@@ -1454,6 +1454,7 @@ class Blueprint
 
     /**
      * Create a new vector column on the table.
+     *
      * @param  string  $column
      * @param  int|null  $dimension
      * @return ColumnDefinition
@@ -1461,6 +1462,7 @@ class Blueprint
     public function vector($column, $dimension = null)
     {
         $dimension = $dimension ?: Builder::$defaultVectorDimension;
+
         return $this->addColumn('vector', $column, compact('dimension'));
     }
 

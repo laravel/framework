@@ -1063,6 +1063,7 @@ class PostgresGrammar extends Grammar
     protected function typeVector(Fluent $column)
     {
         $dimension = $column->dimension ? $column->dimension : Builder::$defaultVectorDimension;
+
         return "vector($dimension)";
     }
 

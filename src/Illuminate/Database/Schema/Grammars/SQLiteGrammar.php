@@ -54,6 +54,7 @@ class SQLiteGrammar extends Grammar
     protected function getColumn(Blueprint $blueprint, $column)
     {
         $sql = $this->wrap($column).' '.$this->getType($column);
+
         return $this->addConstraints(parent::addModifiers($sql, $blueprint, $column), $blueprint, $column);
     }
 
@@ -1084,7 +1085,7 @@ class SQLiteGrammar extends Grammar
      */
     protected function typeVector(Fluent $column)
     {
-        return "blob";
+        return 'blob';
     }
 
     /**
@@ -1204,6 +1205,7 @@ class SQLiteGrammar extends Grammar
     protected function constrainVector(Blueprint $blueprint, Fluent $column)
     {
         $size = ($column->dimension ?? Builder::$defaultVectorDimension) * 4;
+
         return " check(length({$column->name}) = {$size})";
     }
 
