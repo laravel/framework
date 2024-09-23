@@ -491,10 +491,7 @@ class Repository implements ArrayAccess, CacheContract
             "{$key}:created" => $created,
         ] = $this->many([$key, "{$key}:created"]);
 
-        if (
-            $created === null ||
-            ($value === null && $this->missing($key))
-        ) {
+        if (in_array(null, [$value, $created], true)) {
             return tap(value($callback), fn ($value) => $this->putMany([
                 $key => $value,
                 "{$key}:created" => Carbon::now()->getTimestamp(),
