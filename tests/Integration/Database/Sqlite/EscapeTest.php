@@ -6,7 +6,7 @@ use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 use Orchestra\Testbench\Attributes\RequiresDatabase;
 use RuntimeException;
 
-#[RequiresDatabase('sqlite', default: true)]
+#[RequiresDatabase('sqlite')]
 class EscapeTest extends DatabaseTestCase
 {
     protected function defineEnvironment($app)

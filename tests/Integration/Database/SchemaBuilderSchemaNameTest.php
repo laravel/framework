@@ -370,12 +370,9 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
     }
 
     #[DataProvider('connectionProvider')]
+    #[RequiresDatabase('pgsql')]
     public function testComment($connection)
     {
-        if ($this->driver !== 'pgsql') {
-            $this->markTestSkipped('Test requires a PostgreSQL connection.');
-        }
-
         $schema = Schema::connection($connection);
 
         $schema->create('my_schema.table', function (Blueprint $table) {
@@ -405,12 +402,9 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
     }
 
     #[DataProvider('connectionProvider')]
+    #[RequiresDatabase('pgsql')]
     public function testAutoIncrementStartingValue($connection)
     {
-        if ($this->driver !== 'pgsql') {
-            $this->markTestSkipped('Test requires a PostgreSQL connection.');
-        }
-
         $this->expectNotToPerformAssertions();
 
         $schema = Schema::connection($connection);
@@ -424,12 +418,9 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
     }
 
     #[DataProvider('connectionProvider')]
+    #[RequiresDatabase('sqlsrv')]
     public function testHasTable($connection)
     {
-        if ($this->driver !== 'sqlsrv') {
-            $this->markTestSkipped('Test requires a SQL Server connection.');
-        }
-
         $db = DB::connection($connection);
         $schema = $db->getSchemaBuilder();
 

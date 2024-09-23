@@ -9,7 +9,7 @@ use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 use Orchestra\Testbench\Attributes\RequiresDatabase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-#[RequiresDatabase('sqlite', default: true)]
+#[RequiresDatabase('sqlite')]
 class DatabaseSqliteConnectionTest extends DatabaseTestCase
 {
     protected function defineEnvironment($app)

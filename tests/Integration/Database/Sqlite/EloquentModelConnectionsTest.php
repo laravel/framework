@@ -9,7 +9,7 @@ use Illuminate\Support\Str;
 use Orchestra\Testbench\Attributes\RequiresDatabase;
 use Orchestra\Testbench\TestCase;
 
-#[RequiresDatabase('sqlite', default: true)]
+#[RequiresDatabase('sqlite')]
 class EloquentModelConnectionsTest extends TestCase
 {
     protected function defineEnvironment($app)

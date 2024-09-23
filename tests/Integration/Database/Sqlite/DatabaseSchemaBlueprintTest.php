@@ -13,7 +13,7 @@ use Orchestra\Testbench\Attributes\RequiresDatabase;
 use Orchestra\Testbench\TestCase;
 use RuntimeException;
 
-#[RequiresDatabase('sqlite', default: true)]
+#[RequiresDatabase('sqlite')]
 class DatabaseSchemaBlueprintTest extends TestCase
 {
     protected function setUp(): void

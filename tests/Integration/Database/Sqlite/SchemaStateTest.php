@@ -10,7 +10,7 @@ use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 
 use function Orchestra\Testbench\remote;
 
-#[RequiresDatabase('sqlite', default: true)]
+#[RequiresDatabase('sqlite')]
 class SchemaStateTest extends TestCase
 {
     use InteractsWithPublishedFiles;

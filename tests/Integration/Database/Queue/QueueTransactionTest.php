@@ -24,7 +24,7 @@ class QueueTransactionTest extends DatabaseTestCase
 
         $config = $app['config'];
 
-        if ($config->get('database.default') === 'testing') {
+        if ($this->usesSqliteInMemoryDatabaseConnection()) {
             $this->markTestSkipped('Test does not support using :memory: database connection');
         }
 

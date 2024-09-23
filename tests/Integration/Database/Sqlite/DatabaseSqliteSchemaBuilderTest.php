@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 use Orchestra\Testbench\Attributes\RequiresDatabase;
 
-#[RequiresDatabase('sqlite', default: true)]
+#[RequiresDatabase('sqlite')]
 class DatabaseSqliteSchemaBuilderTest extends DatabaseTestCase
 {
     protected function defineEnvironment($app)
