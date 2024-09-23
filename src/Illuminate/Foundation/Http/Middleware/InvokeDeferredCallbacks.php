@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Container\Container;
 use Illuminate\Http\Request;
 use Illuminate\Support\Defer\DeferredCallbackCollection;
+use Illuminate\Support\Facades\Session;
 use Symfony\Component\HttpFoundation\Response;
 
 class InvokeDeferredCallbacks
@@ -31,8 +32,10 @@ class InvokeDeferredCallbacks
      */
     public function terminate(Request $request, Response $response)
     {
+        $hasErrors = session()?->has('errors') ?? false;
         Container::getInstance()
             ->make(DeferredCallbackCollection::class)
-            ->invokeWhen(fn ($callback) => $response->getStatusCode() < 400 || $callback->always);
+            ->invokeWhen(fn($callback) => ($response->getStatusCode() < 400 || $callback->always)
+                && (!$hasErrors) || $callback->evenWithErrors);
     }
 }

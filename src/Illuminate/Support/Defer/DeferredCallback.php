@@ -12,8 +12,12 @@ class DeferredCallback
      * @param  callable  $callback
      * @return void
      */
-    public function __construct(public $callback, public ?string $name = null, public bool $always = false)
-    {
+    public function __construct(
+        public $callback,
+        public ?string $name = null,
+        public bool $always = false,
+        public bool $evenWithErrors = true,
+    ) {
         $this->name = $name ?? (string) Str::uuid();
     }
 
@@ -39,6 +43,19 @@ class DeferredCallback
     public function always(bool $always = true): self
     {
         $this->always = $always;
+
+        return $this;
+    }
+
+    /**
+     * Indicate that the deferred callback should run even on unsuccessful requests validations.
+     *
+     * @param  bool  $evenWithErrors
+     * @return $this
+     */
+    public function evenWithErrors(bool $evenWithErrors = true): self
+    {
+        $this->evenWithErrors = $evenWithErrors;
 
         return $this;
     }

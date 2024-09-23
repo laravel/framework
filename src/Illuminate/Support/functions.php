@@ -14,14 +14,14 @@ use Illuminate\Support\Process\PhpExecutableFinder;
  * @param  bool  $always
  * @return \Illuminate\Support\Defer\DeferredCallback
  */
-function defer(?callable $callback = null, ?string $name = null, bool $always = false)
+function defer(?callable $callback = null, ?string $name = null, bool $always = false, $evenWithErrors = true)
 {
     if ($callback === null) {
         return app(DeferredCallbackCollection::class);
     }
 
     return tap(
-        new DeferredCallback($callback, $name, $always),
+        new DeferredCallback($callback, $name, $always, $evenWithErrors),
         fn ($deferred) => app(DeferredCallbackCollection::class)[] = $deferred
     );
 }
