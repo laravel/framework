@@ -111,7 +111,7 @@
         "pda/pheanstalk": "^5.0",
         "phpstan/phpstan": "^1.11.5",
         "phpunit/phpunit": "^10.5.12|^11.3.2",
-        "predis/predis": "^2.2.0",
+        "predis/predis": "v2.x-dev",
         "resend/resend-php": "^0.10.0",
         "symfony/cache": "^7.1.4",
         "symfony/http-client": "^7.1.4",
