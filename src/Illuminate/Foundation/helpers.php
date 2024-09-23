@@ -408,9 +408,9 @@ if (! function_exists('defer')) {
      * @param  bool  $always
      * @return \Illuminate\Foundation\Defer\DeferredCallback
      */
-    function defer(?callable $callback = null, ?string $name = null, bool $always = false)
+    function defer(?callable $callback = null, ?string $name = null, bool $always = false, $evenWithErrors = true)
     {
-        return \Illuminate\Support\defer($callback, $name, $always);
+        return \Illuminate\Support\defer($callback, $name, $always, $evenWithErrors);
     }
 }
 
