@@ -291,7 +291,7 @@ class WorkCommand extends Command
         if ($status === 'starting') {
             $this->latestStartedAt = microtime(true);
         } else {
-            $log['duration'] = round((microtime(true) - $this->latestStartedAt), 6);
+            $log['duration'] = round(microtime(true) - $this->latestStartedAt, 6);
         }
 
         $this->output->writeln(json_encode($log));
