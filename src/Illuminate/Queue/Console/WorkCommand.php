@@ -115,18 +115,16 @@ class WorkCommand extends Command
         // connection being run for the queue operation currently being executed.
         $queue = $this->getQueue($connection);
 
-        if (Terminal::hasSttyAvailable()) {
-            if ($this->option('json')) {
-                $this->output->writeln(json_encode([
-                    'connection' => $connection,
-                    'queues' => explode(',', $queue),
-                    'status' => 'starting',
-                ]));
-            } else {
-                $this->components->info(
-                    sprintf('Processing jobs from the [%s] %s.', $queue, str('queue')->plural(explode(',', $queue)))
-                );
-            }
+        if ($this->option('json')) {
+            $this->output->writeln(json_encode([
+                'connection' => $connection,
+                'queues' => explode(',', $queue),
+                'status' => 'starting',
+            ]));
+        } elseif (Terminal::hasSttyAvailable()) {
+            $this->components->info(
+                sprintf('Processing jobs from the [%s] %s.', $queue, str('queue')->plural(explode(',', $queue)))
+            );
         }
 
         return $this->runWorker(
