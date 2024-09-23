@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Queue\Attributes\WithoutRelations;
 use Illuminate\Queue\SerializesModels;
 use LogicException;
@@ -14,6 +15,8 @@ use Schema;
 
 class ModelSerializationTest extends TestCase
 {
+    use RefreshDatabase;
+
     protected function getEnvironmentSetUp($app)
     {
         $app['config']->set('database.connections.custom', [
