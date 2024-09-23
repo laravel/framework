@@ -16,6 +16,8 @@ use Illuminate\Support\InteractsWithTime;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Terminal;
 
+use Throwable;
+
 use function Termwind\terminal;
 
 #[AsCommand(name: 'queue:work')]
@@ -35,6 +37,7 @@ class WorkCommand extends Command
                             {--daemon : Run the worker in daemon mode (Deprecated)}
                             {--once : Only process the next job on the queue}
                             {--stop-when-empty : Stop when the queue is empty}
+                            {--json : Output the queue worker information as JSON}
                             {--delay=0 : The number of seconds to delay failed jobs (Deprecated)}
                             {--backoff=0 : The number of seconds to wait before retrying a job that encountered an uncaught exception}
                             {--max-jobs=0 : The number of jobs to process before stopping}
@@ -114,9 +117,17 @@ class WorkCommand extends Command
         $queue = $this->getQueue($connection);
 
         if (Terminal::hasSttyAvailable()) {
-            $this->components->info(
-                sprintf('Processing jobs from the [%s] %s.', $queue, str('queue')->plural(explode(',', $queue)))
-            );
+            if ($this->option('json')) {
+                $this->output->writeln(json_encode([
+                    'connection' => $connection,
+                    'queues' => explode(',', $queue),
+                    'status' => 'starting',
+                ]));
+            } else {
+                $this->components->info(
+                    sprintf('Processing jobs from the [%s] %s.', $queue, str('queue')->plural(explode(',', $queue)))
+                );
+            }
         }
 
         return $this->runWorker(
@@ -183,10 +194,25 @@ class WorkCommand extends Command
         });
 
         $this->laravel['events']->listen(JobFailed::class, function ($event) {
-            $this->writeOutput($event->job, 'failed');
+            $this->writeOutput($event->job, 'failed', $event->exception);
 
             $this->logFailedJob($event);
         });
+    }
+
+    /**
+     * Write the status output for the queue worker for JSON or TTY.
+     *
+     * @param  Job  $job
+     * @param  string  $status
+     * @param  Throwable|null  $exception
+     * @return void
+     */
+    protected function writeOutput(Job $job, $status, Throwable $exception = null)
+    {
+        $this->option('json')
+            ? $this->writeOutputAsJson($job, $status, $exception)
+            : $this->writeOutputForCli($job, $status);
     }
 
     /**
@@ -196,7 +222,7 @@ class WorkCommand extends Command
      * @param  string  $status
      * @return void
      */
-    protected function writeOutput(Job $job, $status)
+    protected function writeOutputForCli(Job $job, $status)
     {
         $this->output->write(sprintf(
             '  <fg=gray>%s</> %s%s',
@@ -233,6 +259,44 @@ class WorkCommand extends Command
             'released_after_exception' => ' <fg=yellow;options=bold>FAIL</>',
             default => ' <fg=red;options=bold>FAIL</>',
         });
+    }
+
+    /**
+     * Write the status output for the queue worker in JSON format.
+     *
+     * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @param  string  $status
+     * @param  Throwable|null  $exception
+     * @return void
+     */
+    protected function writeOutputAsJson(Job $job, $status, Throwable $exception = null)
+    {
+        $log = array_filter([
+            'timestamp' => $this->now()->format('Y-m-d\TH:i:s.uP'),
+            'job' => $job->resolveName(),
+            'id' => $job->getJobId(),
+            'uuid' => $job->uuid(),
+            'connection' => $job->getConnectionName(),
+            'queue' => $job->getQueue(),
+            'status' => $status,
+            'result' => match(true) {
+                $job->isDeleted() => 'deleted',
+                $job->isReleased() => 'released',
+                $job->hasFailed() => 'failed',
+                default => '',
+            },
+            'attempts' => $job->attempts(),
+            'exception' => $exception ? $exception::class : '',
+            'message' => $exception?->getMessage(),
+        ]);
+
+        if ($status === 'starting') {
+            $this->latestStartedAt = microtime(true);
+        } else {
+            $log['ms'] = round((microtime(true) - $this->latestStartedAt) * 1000, 3);
+        }
+
+        $this->output->writeln(json_encode($log));
     }
 
     /**
