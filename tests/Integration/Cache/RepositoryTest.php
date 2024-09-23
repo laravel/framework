@@ -146,4 +146,29 @@ class RepositoryTest extends TestCase
         $this->assertSame(99, $cache->get('foo'));
         $this->assertSame(946684863, $cache->get('foo:created'));
     }
+
+    public function testItHandlesStrayTtlKeyAfterMainKeyIsForgotten()
+    {
+        $cache = Cache::driver('array');
+        $count = 0;
+
+        $value = $cache->flexible('count', [5, 10], function () use (&$count) {
+            $count = 1;
+
+            return $count;
+        });
+
+        $this->assertSame(1, $value);
+        $this->assertSame(1, $count);
+
+        $cache->forget('count');
+
+        $value = $cache->flexible('count', [5, 10], function () use (&$count) {
+            $count = 2;
+
+            return $count;
+        });
+        $this->assertSame(2, $value);
+        $this->assertSame(2, $count);
+    }
 }
