@@ -7,6 +7,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Orchestra\Testbench\Attributes\RequiresDatabase;
 
 class SchemaBuilderTest extends DatabaseTestCase
 {
@@ -672,12 +673,9 @@ class SchemaBuilderTest extends DatabaseTestCase
         ));
     }
 
+    #[RequiresDatabase('pgsql', '>=12.0')]
     public function testGettingGeneratedColumns()
     {
-        if ($this->driver === 'pgsql' && version_compare($this->getConnection()->getServerVersion(), '12.0', '<')) {
-            $this->markTestSkipped('Test requires a PostgreSQL connection >= 12.0');
-        }
-
         Schema::create('test', function (Blueprint $table) {
             $table->integer('price');
 
