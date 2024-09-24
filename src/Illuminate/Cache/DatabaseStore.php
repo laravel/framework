@@ -398,7 +398,7 @@ class DatabaseStore implements LockProvider, Store
         $this->table()
             ->whereIn('key', collect($keys)->flatMap(fn ($key) => $prefixed ? [
                 $key,
-                "illuminate:cache:flexible:created:{$key}",
+                $this->prefix.'illuminate:cache:flexible:created:'.Str::chopStart($key, $this->prefix),
             ] : [
                 "{$this->prefix}{$key}",
                 "{$this->prefix}illuminate:cache:flexible:created:{$key}",
