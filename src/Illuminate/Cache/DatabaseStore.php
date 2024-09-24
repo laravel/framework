@@ -381,7 +381,7 @@ class DatabaseStore implements LockProvider, Store
         $this->table()->whereIn('key', collect($keys)->flatMap(fn ($key) => [
             $this->prefix.$key,
             "{$this->prefix}illuminate:cache:flexible:created:{$key}",
-        ]))->delete();
+        ])->all())->delete();
 
         return true;
     }
@@ -402,7 +402,7 @@ class DatabaseStore implements LockProvider, Store
             ] : [
                 "{$this->prefix}{$key}",
                 "{$this->prefix}illuminate:cache:flexible:created:{$key}",
-            ]))
+            ])->all())
             ->where('expiration', '<=', $this->getTime())
             ->delete();
 
