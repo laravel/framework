@@ -2,7 +2,6 @@
 
 namespace Illuminate\Support;
 
-use Closure;
 use Illuminate\Support\Defer\DeferredCallback;
 use Illuminate\Support\Defer\DeferredCallbackCollection;
 use Illuminate\Support\Process\PhpExecutableFinder;
