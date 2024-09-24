@@ -519,7 +519,7 @@ class Repository implements ArrayAccess, CacheContract
             });
         };
 
-        defer($refresh, "illuminate:cache:refresh:{$key}");
+        defer($refresh, "illuminate:cache:flexible:{$key}");
 
         return $value;
     }
