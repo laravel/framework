@@ -470,7 +470,7 @@ class Kernel implements KernelContract
 
                     if ($after && $middlewareIndex > $index) {
                         $index = $middlewareIndex + 1;
-                    } else if ($after === false && $middlewareIndex < $index) {
+                    } elseif ($after === false && $middlewareIndex < $index) {
                         $index = $middlewareIndex;
                     }
                 }
@@ -478,7 +478,7 @@ class Kernel implements KernelContract
 
             if ($index === 0 && $after === false) {
                 array_unshift($this->middlewarePriority, $middleware);
-            } else if (($after && $index === 0) || $index === count($this->middlewarePriority)) {
+            } elseif (($after && $index === 0) || $index === count($this->middlewarePriority)) {
                 $this->middlewarePriority[] = $middleware;
             } else {
                 array_splice($this->middlewarePriority, $index, 0, $middleware);
