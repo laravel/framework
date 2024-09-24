@@ -36,7 +36,6 @@ class WorkCommand extends Command
                             {--daemon : Run the worker in daemon mode (Deprecated)}
                             {--once : Only process the next job on the queue}
                             {--stop-when-empty : Stop when the queue is empty}
-                            {--json : Output the queue worker information as JSON}
                             {--delay=0 : The number of seconds to delay failed jobs (Deprecated)}
                             {--backoff=0 : The number of seconds to wait before retrying a job that encountered an uncaught exception}
                             {--max-jobs=0 : The number of jobs to process before stopping}
@@ -46,7 +45,8 @@ class WorkCommand extends Command
                             {--sleep=3 : Number of seconds to sleep when no job is available}
                             {--rest=0 : Number of seconds to rest between jobs}
                             {--timeout=60 : The number of seconds a child process can run}
-                            {--tries=1 : Number of times to attempt a job before logging it failed}';
+                            {--tries=1 : Number of times to attempt a job before logging it failed}
+                            {--json : Output the queue worker information as JSON}';
 
     /**
      * The console command description.
@@ -115,13 +115,7 @@ class WorkCommand extends Command
         // connection being run for the queue operation currently being executed.
         $queue = $this->getQueue($connection);
 
-        if ($this->option('json')) {
-            $this->output->writeln(json_encode([
-                'connection' => $connection,
-                'queues' => explode(',', $queue),
-                'status' => 'starting',
-            ]));
-        } elseif (Terminal::hasSttyAvailable()) {
+        if (! $this->option('json') && Terminal::hasSttyAvailable()) {
             $this->components->info(
                 sprintf('Processing jobs from the [%s] %s.', $queue, str('queue')->plural(explode(',', $queue)))
             );
@@ -269,13 +263,12 @@ class WorkCommand extends Command
     protected function writeOutputAsJson(Job $job, $status, Throwable $exception = null)
     {
         $log = array_filter([
-            'timestamp' => $this->now()->format('Y-m-d\TH:i:s.uP'),
             'level' => $status === 'starting' || $status === 'success' ? 'info' : 'warning',
-            'job' => $job->resolveName(),
             'id' => $job->getJobId(),
             'uuid' => $job->uuid(),
             'connection' => $job->getConnectionName(),
             'queue' => $job->getQueue(),
+            'job' => $job->resolveName(),
             'status' => $status,
             'result' => match (true) {
                 $job->isDeleted() => 'deleted',
@@ -286,6 +279,7 @@ class WorkCommand extends Command
             'attempts' => $job->attempts(),
             'exception' => $exception ? $exception::class : '',
             'message' => $exception?->getMessage(),
+            'timestamp' => $this->now()->format('Y-m-d\TH:i:s.uP'),
         ]);
 
         if ($status === 'starting') {
