@@ -33,7 +33,6 @@ class InvokeDeferredCallbacks
     {
         Container::getInstance()
             ->make(DeferredCallbackCollection::class)
-            ->invokeWhen(fn ($callback) => $callback->shouldCall($request, $response) &&
-                $response->getStatusCode() < 400 || $callback->always);
+            ->invokeWhen(fn ($callback) => $callback->shouldCall($request, $response) && ($response->getStatusCode() < 400 || $callback->always));
     }
 }
