@@ -117,7 +117,13 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     {
         $locale = $locale ?: $this->locale;
 
+        $handleMissingTranslationKeys = $this->handleMissingTranslationKeys;
+
+        $this->handleMissingTranslationKeys = false;
+
         $line = $this->get($key, [], $locale, $fallback);
+
+        $this->handleMissingTranslationKeys = $handleMissingTranslationKeys;
 
         // For JSON translations, the loaded files will contain the correct line.
         // Otherwise, we must assume we are handling typical translation file

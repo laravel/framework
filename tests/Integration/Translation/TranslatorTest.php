@@ -41,6 +41,19 @@ class TranslatorTest extends TestCase
         $this->assertTrue($this->app['translator']->hasForLocale('30 Days'));
     }
 
+    public function testItCanCheckKeyExistsWithoutTriggeringHandleMissingKeys()
+    {
+        $this->app['translator']->handleMissingKeysUsing(function ($key) {
+            $_SERVER['__missing_translation_key'] = $key;
+        });
+
+        $this->assertFalse($this->app['translator']->has('Foo Bar'));
+        $this->assertFalse(isset($_SERVER['__missing_translation_key']));
+
+        $this->assertFalse($this->app['translator']->hasForLocale('Foo Bar', 'nl'));
+        $this->assertFalse(isset($_SERVER['__missing_translation_key']));
+    }
+
     public function testItCanHandleMissingKeysUsingCallback()
     {
         $this->app['translator']->handleMissingKeysUsing(function ($key) {
