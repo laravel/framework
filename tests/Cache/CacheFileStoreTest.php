@@ -285,14 +285,15 @@ class CacheFileStoreTest extends TestCase
 
     public function testRemoveDeletesFile()
     {
-        $files = $this->mockFilesystem();
-        $hash = sha1('foobar');
-        $cache_dir = substr($hash, 0, 2).'/'.substr($hash, 2, 2);
+        $files = new Filesystem;
         $store = new FileStore($files, __DIR__);
         $store->put('foobar', 'Hello Baby', 10);
-        $files->expects($this->once())->method('exists')->with($this->equalTo(__DIR__.'/'.$cache_dir.'/'.$hash))->willReturn(true);
-        $files->expects($this->once())->method('delete')->with($this->equalTo(__DIR__.'/'.$cache_dir.'/'.$hash));
+
+        $this->assertFileExists($store->path('foobar'));
+
         $store->forget('foobar');
+
+        $this->assertFileDoesNotExist($store->path('foobar'));
     }
 
     public function testFlushCleansDirectory()

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithDictionary;
+use Illuminate\Database\Eloquent\Relations\Concerns\SupportsInverseRelations;
 use Illuminate\Database\UniqueConstraintViolationException;
 
 /**
@@ -17,7 +18,7 @@ use Illuminate\Database\UniqueConstraintViolationException;
  */
 abstract class HasOneOrMany extends Relation
 {
-    use InteractsWithDictionary;
+    use InteractsWithDictionary, SupportsInverseRelations;
 
     /**
      * The foreign key of the parent model.
@@ -60,6 +61,7 @@ abstract class HasOneOrMany extends Relation
     {
         return tap($this->related->newInstance($attributes), function ($instance) {
             $this->setForeignAttributesForCreate($instance);
+            $this->applyInverseRelationToModel($instance);
         });
     }
 
@@ -153,9 +155,13 @@ abstract class HasOneOrMany extends Relation
         // matching very convenient and easy work. Then we'll just return them.
         foreach ($models as $model) {
             if (isset($dictionary[$key = $this->getDictionaryKey($model->getAttribute($this->localKey))])) {
-                $model->setRelation(
-                    $relation, $this->getRelationValue($dictionary, $key, $type)
-                );
+                $related = $this->getRelationValue($dictionary, $key, $type);
+                $model->setRelation($relation, $related);
+
+                // Apply the inverse relation if we have one...
+                $type === 'one'
+                    ? $this->applyInverseRelationToModel($related, $model)
+                    : $this->applyInverseRelationToCollection($related, $model);
             }
         }
 
@@ -277,6 +283,27 @@ abstract class HasOneOrMany extends Relation
     }
 
     /**
+     * Insert new records or update the existing ones.
+     *
+     * @param  array  $values
+     * @param  array|string  $uniqueBy
+     * @param  array|null  $update
+     * @return int
+     */
+    public function upsert(array $values, $uniqueBy, $update = null)
+    {
+        if (! empty($values) && ! is_array(reset($values))) {
+            $values = [$values];
+        }
+
+        foreach ($values as $key => $value) {
+            $values[$key][$this->getForeignKeyName()] = $this->getParentKey();
+        }
+
+        return $this->getQuery()->upsert($values, $uniqueBy, $update);
+    }
+
+    /**
      * Attach a model instance to the parent model.
      *
      * @param  TRelatedModel  $model
@@ -342,6 +369,8 @@ abstract class HasOneOrMany extends Relation
             $this->setForeignAttributesForCreate($instance);
 
             $instance->save();
+
+            $this->applyInverseRelationToModel($instance);
         });
     }
 
@@ -366,7 +395,7 @@ abstract class HasOneOrMany extends Relation
     {
         $attributes[$this->getForeignKeyName()] = $this->getParentKey();
 
-        return $this->related->forceCreate($attributes);
+        return $this->applyInverseRelationToModel($this->related->forceCreate($attributes));
     }
 
     /**
@@ -417,6 +446,8 @@ abstract class HasOneOrMany extends Relation
     protected function setForeignAttributesForCreate(Model $model)
     {
         $model->setAttribute($this->getForeignKeyName(), $this->getParentKey());
+
+        $this->applyInverseRelationToModel($model);
     }
 
     /** @inheritDoc */

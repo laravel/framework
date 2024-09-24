@@ -6,6 +6,7 @@ use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
+use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\Attributes\WithMigration;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Symfony\Component\Process\Exception\ProcessSignaledException;
@@ -15,21 +16,18 @@ use function Orchestra\Testbench\remote;
 
 #[RequiresPhpExtension('pcntl')]
 #[WithMigration('laravel', 'queue')]
+#[WithConfig('queue.default', 'database')]
 class BatchableTransactionTest extends DatabaseTestCase
 {
     use DatabaseMigrations;
 
-    protected function defineEnvironment($app)
+    protected function setUp(): void
     {
-        parent::defineEnvironment($app);
+        parent::setUp();
 
-        $config = $app['config'];
-
-        if ($config->get('database.default') === 'testing') {
+        if ($this->usesSqliteInMemoryDatabaseConnection()) {
             $this->markTestSkipped('Test does not support using :memory: database connection');
         }
-
-        $config->set(['queue.default' => 'database']);
     }
 
     public function testItCanHandleTimeoutJob()

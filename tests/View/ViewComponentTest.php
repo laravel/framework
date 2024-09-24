@@ -49,8 +49,6 @@ class ViewComponentTest extends TestCase
 
         $reflectionMethod = new ReflectionMethod($component, 'ignoredMethods');
 
-        $reflectionMethod->setAccessible(true);
-
         $ignoredMethods = $reflectionMethod->invoke($component);
 
         foreach ($ignoredMethods as $method) {

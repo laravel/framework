@@ -14,6 +14,7 @@ use Illuminate\Contracts\Console\Kernel as KernelContract;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Foundation\Events\Terminating;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Env;
@@ -212,6 +213,8 @@ class Kernel implements KernelContract
      */
     public function terminate($input, $status)
     {
+        $this->events->dispatch(new Terminating);
+
         $this->app->terminate();
 
         if ($this->commandStartedAt === null) {

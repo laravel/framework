@@ -26,4 +26,15 @@ class LoadConfigurationTest extends TestCase
 
         $this->assertNull($app['config']['app.name']);
     }
+
+    public function testLoadsConfigurationInIsolation()
+    {
+        $app = new Application(__DIR__.'/../fixtures');
+        $app->useConfigPath(__DIR__.'/../fixtures/config');
+
+        (new LoadConfiguration())->bootstrap($app);
+
+        $this->assertNull($app['config']['bar.foo']);
+        $this->assertSame('bar', $app['config']['custom.foo']);
+    }
 }

@@ -3,13 +3,10 @@
 namespace Illuminate\Tests\Integration\Database\MariaDb;
 
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
+use Orchestra\Testbench\Attributes\RequiresDatabase;
 
+#[RequiresDatabase('mariadb')]
 abstract class MariaDbTestCase extends DatabaseTestCase
 {
-    protected function defineDatabaseMigrations()
-    {
-        if ($this->driver !== 'mariadb') {
-            $this->markTestSkipped('Test requires a MariaDB connection.');
-        }
-    }
+    //
 }

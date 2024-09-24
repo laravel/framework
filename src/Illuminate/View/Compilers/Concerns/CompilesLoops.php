@@ -16,7 +16,7 @@ trait CompilesLoops
     /**
      * Compile the for-else statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param  string|null  $expression
      * @return string
      *
      * @throws \Illuminate\Contracts\View\ViewCompilationException
@@ -93,7 +93,7 @@ trait CompilesLoops
     /**
      * Compile the for-each statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param  string|null  $expression
      * @return string
      *
      * @throws \Illuminate\Contracts\View\ViewCompilationException

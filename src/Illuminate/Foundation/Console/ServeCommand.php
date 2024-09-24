@@ -178,7 +178,7 @@ class ServeCommand extends Command
             : __DIR__.'/../resources/server.php';
 
         return [
-            (new PhpExecutableFinder)->find(false),
+            (new PhpExecutableFinder)->find(false) ?: 'php',
             '-S',
             $this->host().':'.$this->port(),
             $server,

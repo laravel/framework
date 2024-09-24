@@ -3,13 +3,40 @@
 namespace Illuminate\Tests\Container;
 
 use Attribute;
+use Illuminate\Auth\AuthManager;
+use Illuminate\Cache\CacheManager;
+use Illuminate\Cache\Repository as CacheRepository;
 use Illuminate\Config\Repository;
+use Illuminate\Container\Attributes\Auth;
+use Illuminate\Container\Attributes\Authenticated;
+use Illuminate\Container\Attributes\Cache;
+use Illuminate\Container\Attributes\Config;
+use Illuminate\Container\Attributes\CurrentUser;
+use Illuminate\Container\Attributes\Database;
+use Illuminate\Container\Attributes\Log;
+use Illuminate\Container\Attributes\Storage;
+use Illuminate\Container\Attributes\Tag;
 use Illuminate\Container\Container;
+use Illuminate\Container\RewindableGenerator;
+use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
+use Illuminate\Contracts\Auth\Guard as GuardContract;
 use Illuminate\Contracts\Container\ContextualAttribute;
+use Illuminate\Contracts\Filesystem\Filesystem;
+use Illuminate\Database\Connection;
+use Illuminate\Database\DatabaseManager;
+use Illuminate\Filesystem\FilesystemManager;
+use Illuminate\Log\LogManager;
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 
 class ContextualAttributeBindingTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        m::close();
+    }
+
     public function testDependencyCanBeResolvedFromAttributeBinding()
     {
         $container = new Container;
@@ -74,6 +101,185 @@ class ContextualAttributeBindingTest extends TestCase
         $class = $container->make(ContainerTestHasConfigValueWithResolvePropertyAndAfterCallback::class);
 
         $this->assertEquals('Developer', $class->person->role);
+    }
+
+    public function testAuthedAttribute()
+    {
+        $container = new Container;
+        $container->singleton('auth', function () {
+            $manager = m::mock(AuthManager::class);
+            $manager->shouldReceive('guard')->with('foo')->andReturnUsing(function () {
+                $guard = m::mock(GuardContract::class);
+                $guard->shouldReceive('user')->andReturn(m:mock(AuthenticatableContract::class));
+
+                return $guard;
+            });
+            $manager->shouldReceive('guard')->with('bar')->andReturnUsing(function () {
+                $guard = m::mock(GuardContract::class);
+                $guard->shouldReceive('user')->andReturn(m:mock(AuthenticatableContract::class));
+
+                return $guard;
+            });
+
+            return $manager;
+        });
+
+        $container->make(AuthedTest::class);
+    }
+
+    public function testCacheAttribute()
+    {
+        $container = new Container;
+        $container->singleton('cache', function () {
+            $manager = m::mock(CacheManager::class);
+            $manager->shouldReceive('store')->with('foo')->andReturn(m::mock(CacheRepository::class));
+            $manager->shouldReceive('store')->with('bar')->andReturn(m::mock(CacheRepository::class));
+
+            return $manager;
+        });
+
+        $container->make(CacheTest::class);
+    }
+
+    public function testConfigAttribute()
+    {
+        $container = new Container;
+        $container->singleton('config', function () {
+            $repository = m::mock(Repository::class);
+            $repository->shouldReceive('get')->with('foo', null)->andReturn('foo');
+            $repository->shouldReceive('get')->with('bar', null)->andReturn('bar');
+
+            return $repository;
+        });
+
+        $container->make(ConfigTest::class);
+    }
+
+    public function testDatabaseAttribute()
+    {
+        $container = new Container;
+        $container->singleton('db', function () {
+            $manager = m::mock(DatabaseManager::class);
+            $manager->shouldReceive('connection')->with('foo')->andReturn(m::mock(Connection::class));
+            $manager->shouldReceive('connection')->with('bar')->andReturn(m::mock(Connection::class));
+
+            return $manager;
+        });
+
+        $container->make(DatabaseTest::class);
+    }
+
+    public function testAuthAttribute()
+    {
+        $container = new Container; //
+        $container->singleton('auth', function () {
+            $manager = m::mock(AuthManager::class);
+            $manager->shouldReceive('guard')->with('foo')->andReturn(m::mock(GuardContract::class));
+            $manager->shouldReceive('guard')->with('bar')->andReturn(m::mock(GuardContract::class));
+
+            return $manager;
+        });
+
+        $container->make(GuardTest::class);
+    }
+
+    public function testLogAttribute()
+    {
+        $container = new Container;
+        $container->singleton('log', function () {
+            $manager = m::mock(LogManager::class);
+            $manager->shouldReceive('channel')->with('foo')->andReturn(m::mock(LoggerInterface::class));
+            $manager->shouldReceive('channel')->with('bar')->andReturn(m::mock(LoggerInterface::class));
+
+            return $manager;
+        });
+
+        $container->make(LogTest::class);
+    }
+
+    public function testStorageAttribute()
+    {
+        $container = new Container;
+        $container->singleton('filesystem', function () {
+            $manager = m::mock(FilesystemManager::class);
+            $manager->shouldReceive('disk')->with('foo')->andReturn(m::mock(Filesystem::class));
+            $manager->shouldReceive('disk')->with('bar')->andReturn(m::mock(Filesystem::class));
+
+            return $manager;
+        });
+
+        $container->make(StorageTest::class);
+    }
+
+    public function testInjectionWithAttributeOnAppCall()
+    {
+        $container = new Container;
+
+        $person = $container->call(function (ContainerTestHasConfigValueWithResolvePropertyAndAfterCallback $hasAttribute) {
+            return $hasAttribute->person;
+        });
+
+        $this->assertEquals('Taylor', $person->name);
+    }
+
+    public function testAttributeOnAppCall()
+    {
+        $container = new Container;
+        $container->singleton('config', fn () => new Repository([
+            'app' => [
+                'timezone' => 'Europe/Paris',
+                'locale' => null,
+            ],
+        ]));
+
+        $value = $container->call(function (#[Config('app.timezone')] string $value) {
+            return $value;
+        });
+
+        $this->assertEquals('Europe/Paris', $value);
+
+        $value = $container->call(function (#[Config('app.locale')] ?string $value) {
+            return $value;
+        });
+
+        $this->assertNull($value);
+    }
+
+    public function testNestedAttributeOnAppCall()
+    {
+        $container = new Container;
+        $container->singleton('config', fn () => new Repository([
+            'app' => [
+                'timezone' => 'Europe/Paris',
+                'locale' => null,
+            ],
+        ]));
+
+        $value = $container->call(function (TimezoneObject $object) {
+            return $object;
+        });
+
+        $this->assertEquals('Europe/Paris', $value->timezone);
+
+        $value = $container->call(function (LocaleObject $object) {
+            return $object;
+        });
+
+        $this->assertNull($value->locale);
+    }
+
+    public function testTagAttribute()
+    {
+        $container = new Container;
+        $container->bind('one', fn (): int => 1);
+        $container->bind('two', fn (): int => 2);
+        $container->tag(['one', 'two'], 'numbers');
+
+        $value = $container->call(function (#[Tag('numbers')] RewindableGenerator $integers) {
+            return $integers;
+        });
+
+        $this->assertEquals([1, 2], iterator_to_array($value));
     }
 }
 
@@ -177,5 +383,72 @@ final class ContainerTestHasConfigValueWithResolvePropertyAndAfterCallback
         #[ContainerTestConfigValueWithResolveAndAfter]
         public object $person
     ) {
+    }
+}
+
+final class AuthedTest
+{
+    public function __construct(#[Authenticated('foo')] AuthenticatableContract $foo, #[CurrentUser('bar')] AuthenticatableContract $bar)
+    {
+    }
+}
+
+final class CacheTest
+{
+    public function __construct(#[Cache('foo')] CacheRepository $foo, #[Cache('bar')] CacheRepository $bar)
+    {
+    }
+}
+
+final class ConfigTest
+{
+    public function __construct(#[Config('foo')] string $foo, #[Config('bar')] string $bar)
+    {
+    }
+}
+
+final class DatabaseTest
+{
+    public function __construct(#[Database('foo')] Connection $foo, #[Database('bar')] Connection $bar)
+    {
+    }
+}
+
+final class GuardTest
+{
+    public function __construct(#[Auth('foo')] GuardContract $foo, #[Auth('bar')] GuardContract $bar)
+    {
+    }
+}
+
+final class LogTest
+{
+    public function __construct(#[Log('foo')] LoggerInterface $foo, #[Log('bar')] LoggerInterface $bar)
+    {
+    }
+}
+
+final class StorageTest
+{
+    public function __construct(#[Storage('foo')] Filesystem $foo, #[Storage('bar')] Filesystem $bar)
+    {
+    }
+}
+
+final class TimezoneObject
+{
+    public function __construct(
+        #[Config('app.timezone')] public readonly ?string $timezone
+    ) {
+        //
+    }
+}
+
+final class LocaleObject
+{
+    public function __construct(
+        #[Config('app.locale')] public readonly ?string $locale
+    ) {
+        //
     }
 }

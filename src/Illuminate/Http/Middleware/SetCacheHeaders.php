@@ -62,7 +62,7 @@ class SetCacheHeaders
         }
 
         if (isset($options['etag']) && $options['etag'] === true) {
-            $options['etag'] = $response->getEtag() ?? hash('xxh128', $response->getContent());
+            $options['etag'] = $response->getEtag() ?? ($response->getContent() ? hash('xxh128', $response->getContent()) : null);
         }
 
         if (isset($options['last_modified'])) {

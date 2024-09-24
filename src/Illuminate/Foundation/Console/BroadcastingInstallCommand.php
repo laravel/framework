@@ -154,10 +154,8 @@ class BroadcastingInstallCommand extends Command
             'laravel/reverb:^1.0',
         ]);
 
-        $php = (new PhpExecutableFinder())->find(false) ?: 'php';
-
         Process::run([
-            $php,
+            (new PhpExecutableFinder())->find(false) ?: 'php',
             defined('ARTISAN_BINARY') ? ARTISAN_BINARY : 'artisan',
             'reverb:install',
         ]);

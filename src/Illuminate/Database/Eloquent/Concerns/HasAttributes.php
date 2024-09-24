@@ -123,7 +123,7 @@ trait HasAttributes
     /**
      * The storage format of the model's date columns.
      *
-     * @var string
+     * @var string|null
      */
     protected $dateFormat;
 
@@ -394,8 +394,8 @@ trait HasAttributes
             // If the relation value has been set, we will set it on this attributes
             // list for returning. If it was not arrayable or null, we'll not set
             // the value on the array because it is some type of invalid value.
-            if (isset($relation) || is_null($value)) {
-                $attributes[$key] = $relation;
+            if (array_key_exists('relation', get_defined_vars())) { // check if $relation is in scope (could be null)
+                $attributes[$key] = $relation ?? null;
             }
 
             unset($relation);
@@ -1208,7 +1208,7 @@ trait HasAttributes
      * Set the value of an enum castable attribute.
      *
      * @param  string  $key
-     * @param  \UnitEnum|string|int  $value
+     * @param  \UnitEnum|string|int|null  $value
      * @return void
      */
     protected function setEnumCastableAttribute($key, $value)
@@ -1326,13 +1326,17 @@ trait HasAttributes
     /**
      * Decode the given JSON back into an array or object.
      *
-     * @param  string  $value
+     * @param  string|null  $value
      * @param  bool  $asObject
      * @return mixed
      */
     public function fromJson($value, $asObject = false)
     {
-        return Json::decode($value ?? '', ! $asObject);
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        return Json::decode($value, ! $asObject);
     }
 
     /**
@@ -1396,6 +1400,7 @@ trait HasAttributes
             return Hash::make($value);
         }
 
+        /** @phpstan-ignore staticMethod.notFound */
         if (! Hash::verifyConfiguration($value)) {
             throw new RuntimeException("Could not verify the hashed value's configuration.");
         }

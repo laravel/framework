@@ -27,6 +27,7 @@ class ContextServiceProvider extends ServiceProvider
     public function boot()
     {
         Queue::createPayloadUsing(function ($connection, $queue, $payload) {
+            /** @phpstan-ignore staticMethod.notFound */
             $context = Context::dehydrate();
 
             return $context === null ? $payload : [
@@ -36,6 +37,7 @@ class ContextServiceProvider extends ServiceProvider
         });
 
         $this->app['events']->listen(function (JobProcessing $event) {
+            /** @phpstan-ignore staticMethod.notFound */
             Context::hydrate($event->job->payload()['illuminate:log:context'] ?? null);
         });
     }

@@ -678,7 +678,7 @@ abstract class Factory
     /**
      * Add a new "after creating" callback to the model definition.
      *
-     * @param  \Closure(TModel): mixed  $callback
+     * @param  \Closure(TModel, \Illuminate\Database\Eloquent\Model|null): mixed  $callback
      * @return static
      */
     public function afterCreating(Closure $callback)

@@ -479,6 +479,16 @@ class MySqlGrammar extends Grammar
     }
 
     /**
+     * Compile a query to get the number of open connections for a database.
+     *
+     * @return string
+     */
+    public function compileThreadCount()
+    {
+        return 'select variable_value as `Value` from performance_schema.session_status where variable_name = \'threads_connected\'';
+    }
+
+    /**
      * Wrap a single string in keyword identifiers.
      *
      * @param  string  $value

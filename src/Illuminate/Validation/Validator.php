@@ -593,7 +593,7 @@ class Validator implements ValidatorContract
             $value = data_get($this->getData(), $key, $missingValue);
 
             if ($this->excludeUnvalidatedArrayKeys &&
-                in_array('array', $rules) &&
+                (in_array('array', $rules) || in_array('list', $rules)) &&
                 $value !== null &&
                 ! empty(preg_grep('/^'.preg_quote($key, '/').'\.+/', array_keys($this->getRules())))) {
                 continue;

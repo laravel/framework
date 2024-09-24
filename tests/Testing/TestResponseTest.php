@@ -376,6 +376,28 @@ class TestResponseTest extends TestCase
         $response->assertSee(['bar & baz', 'baz & qux']);
     }
 
+    public function testAssertSeeHtml()
+    {
+        $response = $this->makeMockResponse([
+            'render' => '<ul><li>foo</li><li>bar</li><li>baz</li><li>foo</li></ul>',
+        ]);
+
+        $response->assertSeeHtml('<li>foo</li>');
+        $response->assertSeeHtml(['<li>baz</li>', '<li>bar</li>']);
+    }
+
+    public function testAssertSeeHtmlCanFail()
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $response = $this->makeMockResponse([
+            'render' => '<ul><li>foo</li><li>bar</li><li>baz</li><li>foo</li></ul>',
+        ]);
+
+        $response->assertSeeHtml('<li>item</li>');
+        $response->assertSeeHtml(['<li>not</li>', '<li>found</li>']);
+    }
+
     public function testAssertSeeInOrder()
     {
         $response = $this->makeMockResponse([
@@ -407,6 +429,39 @@ class TestResponseTest extends TestCase
         ]);
 
         $response->assertSeeInOrder(['foo', 'qux', 'bar', 'baz']);
+    }
+
+    public function testAssertSeeHtmlInOrder()
+    {
+        $response = $this->makeMockResponse([
+            'render' => '<ul><li>foo</li><li>bar</li><li>baz</li><li>foo</li></ul>',
+        ]);
+
+        $response->assertSeeHtmlInOrder(['<li>foo</li>', '<li>bar</li>', '<li>baz</li>']);
+
+        $response->assertSeeHtmlInOrder(['<li>foo</li>', '<li>bar</li>', '<li>baz</li>', '<li>foo</li>']);
+    }
+
+    public function testAssertSeeHtmlInOrderCanFail()
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $response = $this->makeMockResponse([
+            'render' => '<ul><li>foo</li><li>bar</li><li>baz</li><li>foo</li></ul>',
+        ]);
+
+        $response->assertSeeHtmlInOrder(['<li>baz</li>', '<li>bar</li>', '<li>foo</li>']);
+    }
+
+    public function testAssertSeeHtmlInOrderCanFail2()
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $response = $this->makeMockResponse([
+            'render' => '<ul><li>foo</li><li>bar</li><li>baz</li><li>foo</li></ul>',
+        ]);
+
+        $response->assertSeeHtmlInOrder(['<li>foo</li>', '<li>qux</li>', '<li>bar</li>', '<li>baz</li>']);
     }
 
     public function testAssertSeeText()
@@ -537,6 +592,28 @@ class TestResponseTest extends TestCase
 
         $response->assertDontSee('laravel & php');
         $response->assertDontSee(['php & friends', 'laravel & php']);
+    }
+
+    public function testAssertDontSeeHtml()
+    {
+        $response = $this->makeMockResponse([
+            'render' => '<ul><li>foo</li><li>bar</li><li>baz</li><li>foo</li></ul>',
+        ]);
+
+        $response->assertDontSeeHtml('<li>laravel</li>');
+        $response->assertDontSeeHtml(['<li>php</li>', '<li>friends</li>']);
+    }
+
+    public function testAssertDontSeeHtmlCanFail()
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $response = $this->makeMockResponse([
+            'render' => '<ul><li>foo</li><li>bar</li><li>baz</li><li>foo</li></ul>',
+        ]);
+
+        $response->assertDontSeeHtml('<li>foo</li>');
+        $response->assertDontSeeHtml(['<li>baz</li>', '<li>bar</li>']);
     }
 
     public function testAssertDontSeeText()
@@ -1383,6 +1460,88 @@ class TestResponseTest extends TestCase
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
 
         $response->assertJsonStructure(['*' => ['foo', 'bar', 'foobar']]);
+    }
+
+    public function testAssertExactJsonStructure()
+    {
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
+
+        // Without structure
+        $response->assertExactJsonStructure();
+
+        // At root
+        try {
+            $response->assertExactJsonStructure(['foo']);
+            $failed = false;
+        } catch (AssertionFailedError $e) {
+            $failed = true;
+        }
+
+        $this->assertTrue($failed);
+
+        $response->assertExactJsonStructure(['foo', 'foobar', 0, 'bars', 'baz', 'barfoo', 'numeric_keys']);
+
+        // Nested
+        try {
+            $response->assertExactJsonStructure(['foobar' => ['foobar_foo'], 'foo', 0, 'bars', 'baz', 'barfoo', 'numeric_keys']);
+            $failed = false;
+        } catch (AssertionFailedError $e) {
+            $failed = true;
+        }
+
+        $this->assertTrue($failed);
+
+        $response->assertExactJsonStructure(['foobar' => ['foobar_foo', 'foobar_bar'], 'foo', 0, 'bars', 'baz', 'barfoo', 'numeric_keys']);
+
+        // Wildcard (repeating structure)
+        try {
+            $response->assertExactJsonStructure(['bars' => ['*' => ['bar']], 'foo', 'foobar', 0, 'baz', 'barfoo', 'numeric_keys']);
+            $failed = false;
+        } catch (AssertionFailedError $e) {
+            $failed = true;
+        }
+
+        $this->assertTrue($failed);
+
+        $response->assertExactJsonStructure(['bars' => ['*' => ['bar', 'foo']], 'foo', 'foobar', 0, 'baz', 'barfoo', 'numeric_keys']);
+
+        // Wildcard (numeric keys)
+        try {
+            $response->assertExactJsonStructure(['numeric_keys' => ['*' => ['bar']], 'foo', 'foobar', 0, 'bars', 'baz', 'barfoo']);
+            $failed = false;
+        } catch (AssertionFailedError $e) {
+            $failed = true;
+        }
+
+        $this->assertTrue($failed);
+
+        $response->assertExactJsonStructure(['numeric_keys' => ['*' => ['bar', 'foo']], 'foo', 'foobar', 0, 'bars', 'baz', 'barfoo']);
+
+        // Nested after wildcard
+        try {
+            $response->assertExactJsonStructure(['baz' => ['*' => ['foo', 'bar' => ['foo']]], 'foo', 'foobar', 0, 'bars', 'barfoo', 'numeric_keys']);
+            $failed = false;
+        } catch (AssertionFailedError $e) {
+            $failed = true;
+        }
+
+        $this->assertTrue($failed);
+
+        $response->assertExactJsonStructure(['baz' => ['*' => ['foo', 'bar' => ['foo', 'bar']]], 'foo', 'foobar', 0, 'bars', 'barfoo', 'numeric_keys']);
+
+        // Wildcard (repeating structure) at root
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
+
+        try {
+            $response->assertExactJsonStructure(['*' => ['foo', 'bar']]);
+            $failed = false;
+        } catch (AssertionFailedError $e) {
+            $failed = true;
+        }
+
+        $this->assertTrue($failed);
+
+        $response->assertExactJsonStructure(['*' => ['foo', 'bar', 'foobar']]);
     }
 
     public function testAssertJsonCount()

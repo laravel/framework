@@ -1430,6 +1430,16 @@ class Grammar extends BaseGrammar
     }
 
     /**
+     * Compile a query to get the number of open connections for a database.
+     *
+     * @return string|null
+     */
+    public function compileThreadCount()
+    {
+        return null;
+    }
+
+    /**
      * Determine if the grammar supports savepoints.
      *
      * @return bool

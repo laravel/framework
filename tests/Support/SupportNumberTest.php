@@ -302,4 +302,15 @@ class SupportNumberTest extends TestCase
         $this->assertSame([[0.5, 3.0], [3.0, 5.5], [5.5, 8.0], [8.0, 10]], Number::pairs(10, 2.5, 0.5, 0));
         $this->assertSame([[0.5, 2.5], [3.0, 5.0], [5.5, 7.5], [8.0, 10.0]], Number::pairs(10, 2.5, 0.5, 0.5));
     }
+
+    public function testTrim()
+    {
+        $this->assertSame(12, Number::trim(12));
+        $this->assertSame(120, Number::trim(120));
+        $this->assertSame(12, Number::trim(12.0));
+        $this->assertSame(12.3, Number::trim(12.3));
+        $this->assertSame(12.3, Number::trim(12.30));
+        $this->assertSame(12.3456789, Number::trim(12.3456789));
+        $this->assertSame(12.3456789, Number::trim(12.34567890000));
+    }
 }
