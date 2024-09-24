@@ -414,6 +414,21 @@ if (! function_exists('defer')) {
     }
 }
 
+if (! function_exists('defer_if')) {
+    /**
+     * Defer execution of the given callback if conditional is valid.
+     *
+     * @param  callable|null  $callback
+     * @param  string|null  $name
+     * @param  bool  $always
+     * @return \Illuminate\Foundation\Defer\DeferredCallback
+     */
+    function defer_if(bool|callable $conditional = true, ?callable $callback = null, ?string $name = null, bool $always = false)
+    {
+        return \Illuminate\Support\defer($callback, $name, $always, $conditional);
+    }
+}
+
 if (! function_exists('dispatch')) {
     /**
      * Dispatch a job to its appropriate handler.

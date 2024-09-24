@@ -2,7 +2,10 @@
 
 namespace Illuminate\Support\Defer;
 
+use Closure;
+use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Symfony\Component\HttpFoundation\Response;
 
 class DeferredCallback
 {
@@ -12,9 +15,26 @@ class DeferredCallback
      * @param  callable  $callback
      * @return void
      */
-    public function __construct(public $callback, public ?string $name = null, public bool $always = false)
-    {
+    public function __construct(
+        public $callback,
+        public ?string $name = null,
+        public bool $always = false,
+        public mixed $conditional = true,
+    ) {
         $this->name = $name ?? (string) Str::uuid();
+    }
+
+    /**
+     * Specify an if condition to run or not the callback.
+     *
+     * @param  bool|Closure  $conditional
+     * @return $this
+     */
+    public function if(bool|Closure $conditional): self
+    {
+        $this->conditional = $conditional;
+
+        return $this;
     }
 
     /**
@@ -28,6 +48,20 @@ class DeferredCallback
         $this->name = $name;
 
         return $this;
+    }
+
+    /**
+     * Specify an if condition to run or not the callback.
+     *
+     * @param  \Illuminate\Http\Request|null  $request
+     * @param  \Symfony\Component\HttpFoundation\Response|null  $response
+     * @return bool
+     */
+    public function shouldCall(Request $request = null, Response $response = null): bool
+    {
+        return is_callable($this->conditional)
+            ? call_user_func($this->conditional, $request, $response)
+            : boolval($this->conditional);
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Support;
 
+use Closure;
 use Illuminate\Support\Defer\DeferredCallback;
 use Illuminate\Support\Defer\DeferredCallbackCollection;
 use Illuminate\Support\Process\PhpExecutableFinder;
@@ -14,14 +15,14 @@ use Illuminate\Support\Process\PhpExecutableFinder;
  * @param  bool  $always
  * @return \Illuminate\Support\Defer\DeferredCallback
  */
-function defer(?callable $callback = null, ?string $name = null, bool $always = false)
+function defer(?callable $callback = null, ?string $name = null, bool $always = false, bool|callable $conditional = true)
 {
     if ($callback === null) {
         return app(DeferredCallbackCollection::class);
     }
 
     return tap(
-        new DeferredCallback($callback, $name, $always),
+        new DeferredCallback($callback, $name, $always, $conditional),
         fn ($deferred) => app(DeferredCallbackCollection::class)[] = $deferred
     );
 }
