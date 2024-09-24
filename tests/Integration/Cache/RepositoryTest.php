@@ -105,7 +105,7 @@ class RepositoryTest extends TestCase
         // our own lock. This means that the value should not be refreshed by
         // deferred callback.
         /** @var Lock */
-        $lock = $cache->lock('illuminate:cache:refresh:lock:foo');
+        $lock = $cache->lock('illuminate:cache:flexible:lock:foo');
 
         $this->assertTrue($lock->acquire());
         defer()->first()();
