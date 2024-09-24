@@ -456,7 +456,7 @@ class Kernel implements KernelContract
      * @param  bool $after
      * @return $this
      */
-    public function addToMiddlewarePriorityRelative($middleware, $existing, $after = true)
+    protected function addToMiddlewarePriorityRelative($middleware, $existing, $after = true)
     {
         if (! in_array($middleware, $this->middlewarePriority)) {
             $index = $after ? 0 : count($this->middlewarePriority);
