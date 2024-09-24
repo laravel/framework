@@ -2,7 +2,6 @@
 
 namespace Illuminate\Support\Defer;
 
-use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response;
@@ -27,10 +26,10 @@ class DeferredCallback
     /**
      * Specify an if condition to run or not the callback.
      *
-     * @param  bool|Closure  $conditional
+     * @param  bool|callable  $conditional
      * @return $this
      */
-    public function if(bool|Closure $conditional): self
+    public function if(bool|callable $conditional): self
     {
         $this->conditional = $conditional;
 
