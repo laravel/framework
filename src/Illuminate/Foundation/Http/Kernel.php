@@ -452,8 +452,8 @@ class Kernel implements KernelContract
      * Add the given middleware to the middleware priority list relative to other middleware.
      *
      * @param  string  $middleware
-     * @param  string|array   $existing
-     * @param  bool $after
+     * @param  string|array  $existing
+     * @param  bool  $after
      * @return $this
      */
     protected function addToMiddlewarePriorityRelative($middleware, $existing, $after = true)
@@ -491,7 +491,7 @@ class Kernel implements KernelContract
      * Add the given middleware to the middleware priority list after other middleware.
      *
      * @param  string  $middleware
-     * @param  string|array   $existing
+     * @param  string|array  $existing
      * @return $this
      */
     public function addToMiddlewarePriorityAfter($middleware, $existing)
@@ -503,7 +503,7 @@ class Kernel implements KernelContract
      * Add the given middleware to the middleware priority list before other middleware.
      *
      * @param  string  $middleware
-     * @param  string|array   $existing
+     * @param  string|array  $existing
      * @return $this
      */
     public function addToMiddlewarePriorityBefore($middleware, $existing)
