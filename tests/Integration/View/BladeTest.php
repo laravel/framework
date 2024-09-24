@@ -43,11 +43,13 @@ class BladeTest extends TestCase
             $this->assertNotFalse($iniSet, 'Could not set config for open_basedir.');
         }
 
-        $longString = str_repeat('x', PHP_MAXPATHLEN);
+        for ($i = PHP_MAXPATHLEN - 200; $i <= PHP_MAXPATHLEN + 1; $i++) {
+            $longString = str_repeat('x', $i);
 
-        $result = Blade::render($longString);
+            $result = Blade::render($longString);
 
-        $this->assertSame($longString, $result);
+            $this->assertSame($longString, $result);
+        }
     }
 
     public function test_rendering_blade_component_instance()

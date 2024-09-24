@@ -309,6 +309,24 @@ class Grammar extends BaseGrammar
     }
 
     /**
+     * Compile a "where like" clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereLike(Builder $query, $where)
+    {
+        if ($where['caseSensitive']) {
+            throw new RuntimeException('This database engine does not support case sensitive like operations.');
+        }
+
+        $where['operator'] = $where['not'] ? 'not like' : 'like';
+
+        return $this->whereBasic($query, $where);
+    }
+
+    /**
      * Compile a "where in" clause.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
@@ -641,6 +659,37 @@ class Grammar extends BaseGrammar
     protected function compileJsonContains($column, $value)
     {
         throw new RuntimeException('This database engine does not support JSON contains operations.');
+    }
+
+    /**
+     * Compile a "where JSON overlaps" clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereJsonOverlaps(Builder $query, $where)
+    {
+        $not = $where['not'] ? 'not ' : '';
+
+        return $not.$this->compileJsonOverlaps(
+            $where['column'],
+            $this->parameter($where['value'])
+        );
+    }
+
+    /**
+     * Compile a "JSON overlaps" statement into SQL.
+     *
+     * @param  string  $column
+     * @param  string  $value
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    protected function compileJsonOverlaps($column, $value)
+    {
+        throw new RuntimeException('This database engine does not support JSON overlaps operations.');
     }
 
     /**
@@ -1378,6 +1427,16 @@ class Grammar extends BaseGrammar
     protected function compileLock(Builder $query, $value)
     {
         return is_string($value) ? $value : '';
+    }
+
+    /**
+     * Compile a query to get the number of open connections for a database.
+     *
+     * @return string|null
+     */
+    public function compileThreadCount()
+    {
+        return null;
     }
 
     /**

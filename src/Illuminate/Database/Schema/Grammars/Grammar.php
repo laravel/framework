@@ -187,15 +187,27 @@ abstract class Grammar extends BaseGrammar
         $columns = [];
 
         foreach ($blueprint->getAddedColumns() as $column) {
-            // Each of the column types has their own compiler functions, which are tasked
-            // with turning the column definition into its SQL format for this platform
-            // used by the connection. The column's modifiers are compiled and added.
-            $sql = $this->wrap($column).' '.$this->getType($column);
-
-            $columns[] = $this->addModifiers($sql, $blueprint, $column);
+            $columns[] = $this->getColumn($blueprint, $column);
         }
 
         return $columns;
+    }
+
+    /**
+     * Compile the column definition.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Database\Schema\ColumnDefinition  $column
+     * @return string
+     */
+    protected function getColumn(Blueprint $blueprint, $column)
+    {
+        // Each of the column types has their own compiler functions, which are tasked
+        // with turning the column definition into its SQL format for this platform
+        // used by the connection. The column's modifiers are compiled and added.
+        $sql = $this->wrap($column).' '.$this->getType($column);
+
+        return $this->addModifiers($sql, $blueprint, $column);
     }
 
     /**
@@ -320,13 +332,12 @@ abstract class Grammar extends BaseGrammar
      * Wrap a value in keyword identifiers.
      *
      * @param  \Illuminate\Support\Fluent|\Illuminate\Contracts\Database\Query\Expression|string  $value
-     * @param  bool  $prefixAlias
      * @return string
      */
-    public function wrap($value, $prefixAlias = false)
+    public function wrap($value)
     {
         return parent::wrap(
-            $value instanceof Fluent ? $value->name : $value, $prefixAlias
+            $value instanceof Fluent ? $value->name : $value,
         );
     }
 

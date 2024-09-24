@@ -21,6 +21,8 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Log\Context\Repository addHiddenIf(string $key, mixed $value)
  * @method static \Illuminate\Log\Context\Repository push(string $key, mixed ...$values)
  * @method static \Illuminate\Log\Context\Repository pushHidden(string $key, mixed ...$values)
+ * @method static bool stackContains(string $key, mixed $value, bool $strict = false)
+ * @method static bool hiddenStackContains(string $key, mixed $value, bool $strict = false)
  * @method static bool isEmpty()
  * @method static \Illuminate\Log\Context\Repository dehydrating(callable $callback)
  * @method static \Illuminate\Log\Context\Repository hydrated(callable $callback)

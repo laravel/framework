@@ -98,7 +98,7 @@ class Store implements Session
      */
     protected function loadSession()
     {
-        $this->attributes = array_merge($this->attributes, $this->readFromHandler());
+        $this->attributes = array_replace($this->attributes, $this->readFromHandler());
 
         $this->marshalErrorBag();
     }
@@ -641,6 +641,16 @@ class Store implements Session
     public function setName($name)
     {
         $this->name = $name;
+    }
+
+    /**
+     * Get the current session ID.
+     *
+     * @return string
+     */
+    public function id()
+    {
+        return $this->getId();
     }
 
     /**

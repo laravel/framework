@@ -1,4 +1,6 @@
 parameters:
-  paths:
-    - types
-  level: max
+    level: max
+    paths:
+        - types
+    ignoreErrors:
+        - identifier: argument.templateType

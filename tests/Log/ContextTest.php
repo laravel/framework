@@ -136,7 +136,6 @@ class ContextTest extends TestCase
             'data' => [
                 'string' => 's:6:"string";',
                 'bool' => 'b:0;',
-                'bool' => 'b:0;',
                 'int' => 'i:5;',
                 'float' => 'd:5.5;',
                 'null' => 'N;',
@@ -204,6 +203,49 @@ class ContextTest extends TestCase
         $this->assertTrue(Context::has('foo'));
         $this->assertTrue(Context::has('null'));
         $this->assertFalse(Context::has('unset'));
+    }
+
+    public function test_it_can_check_if_value_is_in_context_stack()
+    {
+        Context::push('foo', 'bar', 'lorem');
+
+        $this->assertTrue(Context::stackContains('foo', 'bar'));
+        $this->assertTrue(Context::stackContains('foo', 'lorem'));
+        $this->assertFalse(Context::stackContains('foo', 'doesNotExist'));
+    }
+
+    public function test_it_can_check_if_value_is_in_context_stack_with_closures()
+    {
+        Context::push('foo', 'bar', ['lorem'], 123);
+        Context::pushHidden('baz');
+
+        $this->assertTrue(Context::stackContains('foo', fn ($value) => $value === 'bar'));
+        $this->assertFalse(Context::stackContains('foo', fn ($value) => $value === 'baz'));
+    }
+
+    public function test_it_can_check_if_value_is_in_hidden_context_stack()
+    {
+        Context::pushHidden('foo', 'bar', 'lorem');
+
+        $this->assertTrue(Context::hiddenStackContains('foo', 'bar'));
+        $this->assertTrue(Context::hiddenStackContains('foo', 'lorem'));
+        $this->assertFalse(Context::hiddenStackContains('foo', 'doesNotExist'));
+    }
+
+    public function test_it_can_check_if_value_is_in_hidden_context_stack_with_closures()
+    {
+        Context::pushHidden('foo', 'baz');
+        Context::push('foo', 'bar', ['lorem'], 123);
+
+        $this->assertTrue(Context::hiddenStackContains('foo', fn ($value) => $value === 'baz'));
+        $this->assertFalse(Context::hiddenStackContains('foo', fn ($value) => $value === 'bar'));
+    }
+
+    public function test_it_cannot_check_if_hidden_value_is_in_non_hidden_context_stack()
+    {
+        Context::pushHidden('foo', 'bar', 'lorem');
+
+        $this->assertFalse(Context::stackContains('foo', 'bar'));
     }
 
     public function test_it_can_get_all_values()

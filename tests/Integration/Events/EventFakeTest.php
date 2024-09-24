@@ -233,7 +233,7 @@ class EventFakeTest extends TestCase
             Event::assertNothingDispatched();
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertStringContainsString('2 unexpected events were dispatched.', $e->getMessage());
+            $this->assertStringContainsString("2 unexpected events were dispatched:\n\n- Illuminate\Tests\Integration\Events\ShouldDispatchAfterCommitEvent dispatched 2 times", $e->getMessage());
         }
     }
 }

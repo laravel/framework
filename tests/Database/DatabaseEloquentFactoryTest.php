@@ -129,14 +129,30 @@ class DatabaseEloquentFactoryTest extends TestCase
         $users = FactoryTestUserFactory::new()->createMany(2);
         $this->assertInstanceOf(Collection::class, $users);
         $this->assertCount(2, $users);
+        $this->assertInstanceOf(FactoryTestUser::class, $users->first());
 
         $users = FactoryTestUserFactory::times(2)->createMany();
         $this->assertInstanceOf(Collection::class, $users);
         $this->assertCount(2, $users);
+        $this->assertInstanceOf(FactoryTestUser::class, $users->first());
+
+        $users = FactoryTestUserFactory::times(2)->createMany();
+        $this->assertInstanceOf(Collection::class, $users);
+        $this->assertCount(2, $users);
+        $this->assertInstanceOf(FactoryTestUser::class, $users->first());
+
+        $users = FactoryTestUserFactory::times(3)->createMany([
+            ['name' => 'Taylor Otwell'],
+            ['name' => 'Jeffrey Way'],
+        ]);
+        $this->assertInstanceOf(Collection::class, $users);
+        $this->assertCount(2, $users);
+        $this->assertInstanceOf(FactoryTestUser::class, $users->first());
 
         $users = FactoryTestUserFactory::new()->createMany();
         $this->assertInstanceOf(Collection::class, $users);
         $this->assertCount(1, $users);
+        $this->assertInstanceOf(FactoryTestUser::class, $users->first());
 
         $users = FactoryTestUserFactory::times(10)->create();
         $this->assertCount(10, $users);

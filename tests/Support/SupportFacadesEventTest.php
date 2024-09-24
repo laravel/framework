@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Support;
 
 use Illuminate\Cache\CacheManager;
 use Illuminate\Cache\Events\CacheMissed;
+use Illuminate\Cache\Events\RetrievingKey;
 use Illuminate\Config\Repository as ConfigRepository;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
@@ -75,13 +76,14 @@ class SupportFacadesEventTest extends TestCase
     {
         $arrayRepository = Cache::store('array');
 
-        $this->events->shouldReceive('dispatch')->once();
+        $this->events->shouldReceive('dispatch')->times(2);
         $arrayRepository->get('foo');
 
         Event::fake();
 
         $arrayRepository->get('bar');
 
+        Event::assertDispatched(RetrievingKey::class);
         Event::assertDispatched(CacheMissed::class);
     }
 

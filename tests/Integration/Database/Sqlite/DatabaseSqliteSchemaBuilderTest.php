@@ -9,9 +9,11 @@ use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class DatabaseSqliteSchemaBuilderTest extends DatabaseTestCase
 {
-    protected function getEnvironmentSetUp($app)
+    protected function defineEnvironment($app)
     {
-        if (getenv('DB_CONNECTION') !== 'testing') {
+        parent::defineEnvironment($app);
+
+        if ($this->driver !== 'sqlite') {
             $this->markTestSkipped('Test requires a Sqlite connection.');
         }
 

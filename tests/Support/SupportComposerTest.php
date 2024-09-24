@@ -24,9 +24,7 @@ class SupportComposerTest extends TestCase
 
     public function testDumpAutoloadRunsTheCorrectCommandWhenCustomComposerPharIsPresent()
     {
-        $escape = '\\' === DIRECTORY_SEPARATOR ? '"' : '\'';
-
-        $expectedProcessArguments = [$escape.PHP_BINARY.$escape,  'composer.phar', 'dump-autoload'];
+        $expectedProcessArguments = [PHP_BINARY,  'composer.phar', 'dump-autoload'];
         $customComposerPhar = true;
 
         $composer = $this->mockComposer($expectedProcessArguments, $customComposerPhar);

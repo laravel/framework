@@ -3,6 +3,7 @@
 namespace Illuminate\Log\Context;
 
 use __PHP_Incomplete_Class;
+use Closure;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Log\Context\Events\ContextDehydrating as Dehydrating;
@@ -193,7 +194,7 @@ class Repository
      * @param  mixed  $value
      * @return $this
      */
-    public function addHidden($key, $value = null)
+    public function addHidden($key, #[\SensitiveParameter] $value = null)
     {
         $this->hidden = array_merge(
             $this->hidden,
@@ -256,7 +257,7 @@ class Repository
      * @param  mixed  $value
      * @return $this
      */
-    public function addHiddenIf($key, $value)
+    public function addHiddenIf($key, #[\SensitiveParameter] $value)
     {
         if (! $this->hasHidden($key)) {
             $this->addHidden($key, $value);
@@ -309,6 +310,60 @@ class Repository
         ];
 
         return $this;
+    }
+
+    /**
+     * Determine if the given value is in the given stack.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @param  bool  $strict
+     * @return bool
+     *
+     * @throws \RuntimeException
+     */
+    public function stackContains(string $key, mixed $value, bool $strict = false): bool
+    {
+        if (! $this->isStackable($key)) {
+            throw new RuntimeException("Given key [{$key}] is not a stack.");
+        }
+
+        if (! array_key_exists($key, $this->data)) {
+            return false;
+        }
+
+        if ($value instanceof Closure) {
+            return collect($this->data[$key])->contains($value);
+        }
+
+        return in_array($value, $this->data[$key], $strict);
+    }
+
+    /**
+     * Determine if the given value is in the given hidden stack.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @param  bool  $strict
+     * @return bool
+     *
+     * @throws \RuntimeException
+     */
+    public function hiddenStackContains(string $key, mixed $value, bool $strict = false): bool
+    {
+        if (! $this->isHiddenStackable($key)) {
+            throw new RuntimeException("Given key [{$key}] is not a stack.");
+        }
+
+        if (! array_key_exists($key, $this->hidden)) {
+            return false;
+        }
+
+        if ($value instanceof Closure) {
+            return collect($this->hidden[$key])->contains($value);
+        }
+
+        return in_array($value, $this->hidden[$key], $strict);
     }
 
     /**

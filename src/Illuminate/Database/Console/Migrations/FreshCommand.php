@@ -4,6 +4,7 @@ namespace Illuminate\Database\Console\Migrations;
 
 use Illuminate\Console\Command;
 use Illuminate\Console\ConfirmableTrait;
+use Illuminate\Console\Prohibitable;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Events\DatabaseRefreshed;
 use Illuminate\Database\Migrations\Migrator;
@@ -13,7 +14,7 @@ use Symfony\Component\Console\Input\InputOption;
 #[AsCommand(name: 'migrate:fresh')]
 class FreshCommand extends Command
 {
-    use ConfirmableTrait;
+    use ConfirmableTrait, Prohibitable;
 
     /**
      * The console command name.
@@ -56,26 +57,25 @@ class FreshCommand extends Command
      */
     public function handle()
     {
-        if (! $this->confirmToProceed()) {
-            return 1;
+        if ($this->isProhibited() ||
+            ! $this->confirmToProceed()) {
+            return Command::FAILURE;
         }
 
         $database = $this->input->getOption('database');
 
-        if (! is_null($database)) {
-            $this->migrator->setConnection($database);
-        }
+        $this->migrator->usingConnection($database, function () use ($database) {
+            if ($this->migrator->repositoryExists()) {
+                $this->newLine();
 
-        if ($this->migrator->repositoryExists()) {
-            $this->newLine();
-
-            $this->components->task('Dropping all tables', fn () => $this->callSilent('db:wipe', array_filter([
-                '--database' => $database,
-                '--drop-views' => $this->option('drop-views'),
-                '--drop-types' => $this->option('drop-types'),
-                '--force' => true,
-            ])) == 0);
-        }
+                $this->components->task('Dropping all tables', fn () => $this->callSilent('db:wipe', array_filter([
+                    '--database' => $database,
+                    '--drop-views' => $this->option('drop-views'),
+                    '--drop-types' => $this->option('drop-types'),
+                    '--force' => true,
+                ])) == 0);
+            }
+        });
 
         $this->newLine();
 

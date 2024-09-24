@@ -28,6 +28,13 @@ class ApplicationBuilder
     protected array $pendingProviders = [];
 
     /**
+     * Any additional routing callbacks that should be invoked while registering routes.
+     *
+     * @var array
+     */
+    protected array $additionalRoutingCallbacks = [];
+
+    /**
      * The Folio / page middleware that have been defined by the user.
      *
      * @var array
@@ -131,8 +138,8 @@ class ApplicationBuilder
      * Register the routing services for the application.
      *
      * @param  \Closure|null  $using
-     * @param  string|null  $web
-     * @param  string|null  $api
+     * @param  array|string|null  $web
+     * @param  array|string|null  $api
      * @param  string|null  $commands
      * @param  string|null  $channels
      * @param  string|null  $pages
@@ -141,8 +148,8 @@ class ApplicationBuilder
      * @return $this
      */
     public function withRouting(?Closure $using = null,
-        ?string $web = null,
-        ?string $api = null,
+        array|string|null $web = null,
+        array|string|null $api = null,
         ?string $commands = null,
         ?string $channels = null,
         ?string $pages = null,
@@ -150,7 +157,7 @@ class ApplicationBuilder
         string $apiPrefix = 'api',
         ?callable $then = null)
     {
-        if (is_null($using) && (is_string($web) || is_string($api) || is_string($pages) || is_string($health)) || is_callable($then)) {
+        if (is_null($using) && (is_string($web) || is_array($web) || is_string($api) || is_array($api) || is_string($pages) || is_string($health)) || is_callable($then)) {
             $using = $this->buildRoutingCallback($web, $api, $pages, $health, $apiPrefix, $then);
         }
 
@@ -174,36 +181,56 @@ class ApplicationBuilder
     /**
      * Create the routing callback for the application.
      *
-     * @param  string|null  $web
-     * @param  string|null  $api
+     * @param  array|string|null  $web
+     * @param  array|string|null  $api
      * @param  string|null  $pages
      * @param  string|null  $health
      * @param  string  $apiPrefix
      * @param  callable|null  $then
      * @return \Closure
      */
-    protected function buildRoutingCallback(?string $web,
-        ?string $api,
+    protected function buildRoutingCallback(array|string|null $web,
+        array|string|null $api,
         ?string $pages,
         ?string $health,
         string $apiPrefix,
         ?callable $then)
     {
         return function () use ($web, $api, $pages, $health, $apiPrefix, $then) {
-            if (is_string($api) && realpath($api) !== false) {
-                Route::middleware('api')->prefix($apiPrefix)->group($api);
+            if (is_string($api) || is_array($api)) {
+                if (is_array($api)) {
+                    foreach ($api as $apiRoute) {
+                        if (realpath($apiRoute) !== false) {
+                            Route::middleware('api')->prefix($apiPrefix)->group($apiRoute);
+                        }
+                    }
+                } else {
+                    Route::middleware('api')->prefix($apiPrefix)->group($api);
+                }
             }
 
             if (is_string($health)) {
-                Route::middleware('web')->get($health, function () {
+                Route::get($health, function () {
                     Event::dispatch(new DiagnosingHealth);
 
                     return View::file(__DIR__.'/../resources/health-up.blade.php');
                 });
             }
 
-            if (is_string($web) && realpath($web) !== false) {
-                Route::middleware('web')->group($web);
+            if (is_string($web) || is_array($web)) {
+                if (is_array($web)) {
+                    foreach ($web as $webRoute) {
+                        if (realpath($webRoute) !== false) {
+                            Route::middleware('web')->group($webRoute);
+                        }
+                    }
+                } else {
+                    Route::middleware('web')->group($web);
+                }
+            }
+
+            foreach ($this->additionalRoutingCallbacks as $callback) {
+                $callback();
             }
 
             if (is_string($pages) &&
@@ -255,7 +282,11 @@ class ApplicationBuilder
      */
     public function withCommands(array $commands = [])
     {
-        if (empty($commands)) {
+        if (empty($commands) && is_file($this->app->basePath('routes/console.php'))) {
+            $commands = [$this->app->basePath('routes/console.php')];
+        }
+
+        if (empty($commands) && is_dir($this->app->path('Console/Commands'))) {
             $commands = [$this->app->path('Console/Commands')];
         }
 
@@ -284,6 +315,8 @@ class ApplicationBuilder
         $this->app->afterResolving(ConsoleKernel::class, function ($kernel) use ($paths) {
             $this->app->booted(fn () => $kernel->addCommandRoutePaths($paths));
         });
+
+        return $this;
     }
 
     /**

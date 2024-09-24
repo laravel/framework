@@ -11,6 +11,7 @@ class Ask extends Component
      *
      * @param  string  $question
      * @param  string  $default
+     * @param  bool  $multiline
      * @return mixed
      */
     public function render($question, $default = null, $multiline = false)

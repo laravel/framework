@@ -191,7 +191,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     public function choice($key, $number, array $replace = [], $locale = null)
     {
         $line = $this->get(
-            $key, $replace, $locale = $this->localeForChoice($locale)
+            $key, $replace, $locale = $this->localeForChoice($key, $locale)
         );
 
         // If the given "number" is actually an array or countable we will simply count the
@@ -211,12 +211,15 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     /**
      * Get the proper locale for a choice operation.
      *
+     * @param  string  $key
      * @param  string|null  $locale
      * @return string
      */
-    protected function localeForChoice($locale)
+    protected function localeForChoice($key, $locale)
     {
-        return $locale ?: $this->locale ?: $this->fallback;
+        $locale = $locale ?: $this->locale;
+
+        return $this->hasForLocale($key, $locale) ? $locale : $this->fallback;
     }
 
     /**
@@ -262,12 +265,22 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
         $shouldReplace = [];
 
         foreach ($replace as $key => $value) {
+            if ($value instanceof Closure) {
+                $line = preg_replace_callback(
+                    '/<'.$key.'>(.*?)<\/'.$key.'>/',
+                    fn ($args) => $value($args[1]),
+                    $line
+                );
+
+                continue;
+            }
+
             if (is_object($value) && isset($this->stringableHandlers[get_class($value)])) {
                 $value = call_user_func($this->stringableHandlers[get_class($value)], $value);
             }
 
-            $shouldReplace[':'.Str::ucfirst($key ?? '')] = Str::ucfirst($value ?? '');
-            $shouldReplace[':'.Str::upper($key ?? '')] = Str::upper($value ?? '');
+            $shouldReplace[':'.Str::ucfirst($key)] = Str::ucfirst($value ?? '');
+            $shouldReplace[':'.Str::upper($key)] = Str::upper($value ?? '');
             $shouldReplace[':'.$key] = $value;
         }
 

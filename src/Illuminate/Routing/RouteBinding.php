@@ -4,6 +4,7 @@ namespace Illuminate\Routing;
 
 use Closure;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 
 class RouteBinding
@@ -57,7 +58,7 @@ class RouteBinding
      */
     public static function forModel($container, $class, $callback = null)
     {
-        return function ($value) use ($container, $class, $callback) {
+        return function ($value, $route = null) use ($container, $class, $callback) {
             if (is_null($value)) {
                 return;
             }
@@ -67,7 +68,11 @@ class RouteBinding
             // throw a not found exception otherwise we will return the instance.
             $instance = $container->make($class);
 
-            if ($model = $instance->resolveRouteBinding($value)) {
+            $routeBindingMethod = $route?->allowsTrashedBindings() && in_array(SoftDeletes::class, class_uses_recursive($instance))
+                        ? 'resolveSoftDeletableRouteBinding'
+                        : 'resolveRouteBinding';
+
+            if ($model = $instance->{$routeBindingMethod}($value)) {
                 return $model;
             }
 

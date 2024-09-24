@@ -3,13 +3,18 @@
 namespace Illuminate\Tests\Foundation;
 
 use Exception;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Cache\Repository as CacheRepository;
 use Illuminate\Contracts\Config\Repository;
+use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Mix;
+use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use stdClass;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class FoundationHelpersTest extends TestCase
 {
@@ -21,17 +26,17 @@ class FoundationHelpersTest extends TestCase
     public function testCache()
     {
         $app = new Application;
-        $app['cache'] = $cache = m::mock(stdClass::class);
+        $app['cache'] = $cache = m::mock(CacheRepository::class);
 
         // 1. cache()
-        $this->assertInstanceOf(stdClass::class, cache());
+        $this->assertInstanceOf(CacheRepository::class, cache());
 
         // 2. cache(['foo' => 'bar'], 1);
         $cache->shouldReceive('put')->once()->with('foo', 'bar', 1);
         cache(['foo' => 'bar'], 1);
 
         // 3. cache('foo');
-        $cache->shouldReceive('get')->once()->with('foo')->andReturn('bar');
+        $cache->shouldReceive('get')->once()->with('foo', null)->andReturn('bar');
         $this->assertSame('bar', cache('foo'));
 
         // 4. cache('foo', null);
@@ -239,5 +244,55 @@ class FoundationHelpersTest extends TestCase
         });
 
         $this->assertSame('expected', mix('asset.png'));
+    }
+
+    public function testAbortReceivesCodeAsSymfonyResponseInstance()
+    {
+        try {
+            abort($code = new SymfonyResponse());
+
+            $this->fail(
+                sprintf('abort function must throw %s when receiving code as Symfony Response instance.', HttpResponseException::class)
+            );
+        } catch (HttpResponseException $ex) {
+            $this->assertSame($code, $ex->getResponse());
+        }
+    }
+
+    public function testAbortReceivesCodeAsResponableImplementation()
+    {
+        app()->instance('request', $request = Request::create('/'));
+
+        try {
+            abort($code = new class implements Responsable
+            {
+                public $request;
+
+                public function toResponse($request)
+                {
+                    $this->request = $request;
+
+                    return new SymfonyResponse();
+                }
+            });
+
+            $this->fail(
+                sprintf('abort function must throw %s when receiving code as Responable implementation.', HttpResponseException::class)
+            );
+        } catch (HttpResponseException $ex) {
+            $this->assertSame($request, $code->request);
+        }
+    }
+
+    public function testAbortReceivesCodeAsInteger()
+    {
+        $app = m::mock(Application::class);
+        $app->shouldReceive('abort')
+            ->with($code = 400, $message = 'Bad request', $headers = ['X-FOO' => 'BAR'])
+            ->once();
+
+        Container::setInstance($app);
+
+        abort($code, $message, $headers);
     }
 }

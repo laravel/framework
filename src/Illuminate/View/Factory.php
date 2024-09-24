@@ -91,6 +91,20 @@ class Factory implements FactoryContract
     protected $renderedOnce = [];
 
     /**
+     * The cached array of engines for paths.
+     *
+     * @var array
+     */
+    protected $pathEngineCache = [];
+
+    /**
+     * The cache of normalized names for views.
+     *
+     * @var array
+     */
+    protected $normalizedNameCache = [];
+
+    /**
      * Create a new view factory instance.
      *
      * @param  \Illuminate\View\Engines\EngineResolver  $engines
@@ -247,7 +261,7 @@ class Factory implements FactoryContract
      */
     protected function normalizeName($name)
     {
-        return ViewName::normalize($name);
+        return $this->normalizedNameCache[$name] ??= ViewName::normalize($name);
     }
 
     /**
@@ -301,13 +315,17 @@ class Factory implements FactoryContract
      */
     public function getEngineFromPath($path)
     {
+        if (isset($this->pathEngineCache[$path])) {
+            return $this->engines->resolve($this->pathEngineCache[$path]);
+        }
+
         if (! $extension = $this->getExtension($path)) {
             throw new InvalidArgumentException("Unrecognized extension in file: {$path}.");
         }
 
-        $engine = $this->extensions[$extension];
-
-        return $this->engines->resolve($engine);
+        return $this->engines->resolve(
+            $this->pathEngineCache[$path] = $this->extensions[$extension]
+        );
     }
 
     /**
@@ -407,6 +425,17 @@ class Factory implements FactoryContract
     }
 
     /**
+     * Prepend a location to the array of view locations.
+     *
+     * @param  string  $location
+     * @return void
+     */
+    public function prependLocation($location)
+    {
+        $this->finder->prependLocation($location);
+    }
+
+    /**
      * Add a new namespace to the loader.
      *
      * @param  string  $namespace
@@ -467,6 +496,8 @@ class Factory implements FactoryContract
         unset($this->extensions[$extension]);
 
         $this->extensions = array_merge([$extension => $engine], $this->extensions);
+
+        $this->pathEngineCache = [];
     }
 
     /**

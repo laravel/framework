@@ -125,8 +125,9 @@ class TranslationTranslatorTest extends TestCase
 
     public function testChoiceMethodProperlyLoadsAndRetrievesItemForAnInt()
     {
-        $t = $this->getMockBuilder(Translator::class)->onlyMethods(['get'])->setConstructorArgs([$this->getLoader(), 'en'])->getMock();
+        $t = $this->getMockBuilder(Translator::class)->onlyMethods(['get', 'localeForChoice'])->setConstructorArgs([$this->getLoader(), 'en'])->getMock();
         $t->expects($this->once())->method('get')->with($this->equalTo('foo'), $this->equalTo(['replace']), $this->equalTo('en'))->willReturn('line');
+        $t->expects($this->once())->method('localeForChoice')->with($this->equalTo('foo'), $this->equalTo(null))->willReturn('en');
         $t->setSelector($selector = m::mock(MessageSelector::class));
         $selector->shouldReceive('choose')->once()->with('line', 10, 'en')->andReturn('choiced');
 
@@ -135,8 +136,9 @@ class TranslationTranslatorTest extends TestCase
 
     public function testChoiceMethodProperlyLoadsAndRetrievesItemForAFloat()
     {
-        $t = $this->getMockBuilder(Translator::class)->onlyMethods(['get'])->setConstructorArgs([$this->getLoader(), 'en'])->getMock();
+        $t = $this->getMockBuilder(Translator::class)->onlyMethods(['get', 'localeForChoice'])->setConstructorArgs([$this->getLoader(), 'en'])->getMock();
         $t->expects($this->once())->method('get')->with($this->equalTo('foo'), $this->equalTo(['replace']), $this->equalTo('en'))->willReturn('line');
+        $t->expects($this->once())->method('localeForChoice')->with($this->equalTo('foo'), $this->equalTo(null))->willReturn('en');
         $t->setSelector($selector = m::mock(MessageSelector::class));
         $selector->shouldReceive('choose')->once()->with('line', 1.2, 'en')->andReturn('choiced');
 
@@ -145,8 +147,9 @@ class TranslationTranslatorTest extends TestCase
 
     public function testChoiceMethodProperlyCountsCollectionsAndLoadsAndRetrievesItem()
     {
-        $t = $this->getMockBuilder(Translator::class)->onlyMethods(['get'])->setConstructorArgs([$this->getLoader(), 'en'])->getMock();
+        $t = $this->getMockBuilder(Translator::class)->onlyMethods(['get', 'localeForChoice'])->setConstructorArgs([$this->getLoader(), 'en'])->getMock();
         $t->expects($this->exactly(2))->method('get')->with($this->equalTo('foo'), $this->equalTo(['replace']), $this->equalTo('en'))->willReturn('line');
+        $t->expects($this->exactly(2))->method('localeForChoice')->with($this->equalTo('foo'), $this->equalTo(null))->willReturn('en');
         $t->setSelector($selector = m::mock(MessageSelector::class));
         $selector->shouldReceive('choose')->twice()->with('line', 3, 'en')->andReturn('choiced');
 
@@ -155,6 +158,18 @@ class TranslationTranslatorTest extends TestCase
 
         $values = new Collection(['foo', 'bar', 'baz']);
         $t->choice('foo', $values, ['replace']);
+    }
+
+    public function testChoiceMethodProperlySelectsLocaleForChoose()
+    {
+        $t = $this->getMockBuilder(Translator::class)->onlyMethods(['get', 'hasForLocale'])->setConstructorArgs([$this->getLoader(), 'cs'])->getMock();
+        $t->setFallback('en');
+        $t->expects($this->once())->method('get')->with($this->equalTo('foo'), $this->equalTo(['replace']), $this->equalTo('en'))->willReturn('line');
+        $t->expects($this->once())->method('hasForLocale')->with($this->equalTo('foo'), $this->equalTo('cs'))->willReturn(false);
+        $t->setSelector($selector = m::mock(MessageSelector::class));
+        $selector->shouldReceive('choose')->once()->with('line', 10, 'en')->andReturn('choiced');
+
+        $t->choice('foo', 10, ['replace']);
     }
 
     public function testGetJson()
@@ -254,6 +269,42 @@ class TranslationTranslatorTest extends TestCase
         $this->assertSame(
             'the date is 1st Jan 1970',
             $t->get('test', ['date' => $date])
+        );
+    }
+
+    public function testTagReplacements()
+    {
+        $t = new Translator($this->getLoader(), 'en');
+
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->once()->with('en', 'We have some nice <docs-link>documentation</docs-link>', '*')->andReturn([]);
+
+        $this->assertSame(
+            'We have some nice <a href="https://laravel.com/docs">documentation</a>',
+            $t->get(
+                'We have some nice <docs-link>documentation</docs-link>',
+                [
+                    'docs-link' => fn ($children) => "<a href=\"https://laravel.com/docs\">$children</a>",
+                ]
+            )
+        );
+    }
+
+    public function testTagReplacementsHandleMultipleOfSameTag()
+    {
+        $t = new Translator($this->getLoader(), 'en');
+
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '<bold-this>bold</bold-this> something else <bold-this>also bold</bold-this>', '*')->andReturn([]);
+
+        $this->assertSame(
+            '<b>bold</b> something else <b>also bold</b>',
+            $t->get(
+                '<bold-this>bold</bold-this> something else <bold-this>also bold</bold-this>',
+                [
+                    'bold-this' => fn ($children) => "<b>$children</b>",
+                ]
+            )
         );
     }
 

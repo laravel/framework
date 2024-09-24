@@ -14,8 +14,18 @@ enum CategoryBackedEnum: string
     case Fruits = 'fruits';
 }
 
-enum CategoryIntBackedEnum: int
+enum RouteNameEnum: string
 {
-    case People = 1;
-    case Fruits = 2;
+    case UserIndex = 'users.index';
+}
+
+enum RouteDomainEnum: string
+{
+    case DashboardDomain = 'dashboard.myapp.com';
+}
+
+enum IntegerEnum: int
+{
+    case One = 1;
+    case Two = 2;
 }

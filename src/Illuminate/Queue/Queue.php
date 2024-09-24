@@ -317,7 +317,7 @@ abstract class Queue
      *
      * @param  \Closure|string|object  $job
      * @param  string  $payload
-     * @param  string  $queue
+     * @param  string|null  $queue
      * @param  \DateTimeInterface|\DateInterval|int|null  $delay
      * @param  callable  $callback
      * @return mixed
@@ -360,11 +360,7 @@ abstract class Queue
             return $job->afterCommit;
         }
 
-        if (isset($this->dispatchAfterCommit)) {
-            return $this->dispatchAfterCommit;
-        }
-
-        return false;
+        return $this->dispatchAfterCommit ?? false;
     }
 
     /**
@@ -388,7 +384,7 @@ abstract class Queue
     /**
      * Raise the job queued event.
      *
-     * @param  string  $queue
+     * @param  string|null  $queue
      * @param  string|int|null  $jobId
      * @param  \Closure|string|object  $job
      * @param  string  $payload

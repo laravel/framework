@@ -13,6 +13,7 @@ use Pheanstalk\Contract\PheanstalkPublisherInterface;
 use Pheanstalk\Contract\PheanstalkSubscriberInterface;
 use Pheanstalk\Pheanstalk;
 use Pheanstalk\Values\Job;
+use Pheanstalk\Values\TubeList;
 use Pheanstalk\Values\TubeName;
 use PHPUnit\Framework\TestCase;
 
@@ -80,9 +81,12 @@ class QueueBeanstalkdQueueTest extends TestCase
     public function testPopProperlyPopsJobOffOfBeanstalkd()
     {
         $this->setQueue('default', 60);
+        $tube = new TubeName('default');
 
         $pheanstalk = $this->queue->getPheanstalk();
-        $pheanstalk->shouldReceive('watch')->once()->with(m::type(TubeName::class));
+        $pheanstalk->shouldReceive('watch')->once()->with(m::type(TubeName::class))
+            ->shouldReceive('listTubesWatched')->once()->andReturn(new TubeList($tube));
+
         $jobId = m::mock(JobIdInterface::class);
         $jobId->shouldReceive('getId')->once();
         $job = new Job($jobId, '');
@@ -96,9 +100,12 @@ class QueueBeanstalkdQueueTest extends TestCase
     public function testBlockingPopProperlyPopsJobOffOfBeanstalkd()
     {
         $this->setQueue('default', 60, 60);
+        $tube = new TubeName('default');
 
         $pheanstalk = $this->queue->getPheanstalk();
-        $pheanstalk->shouldReceive('watch')->once()->with(m::type(TubeName::class));
+        $pheanstalk->shouldReceive('watch')->once()->with(m::type(TubeName::class))
+            ->shouldReceive('listTubesWatched')->once()->andReturn(new TubeList($tube));
+
         $jobId = m::mock(JobIdInterface::class);
         $jobId->shouldReceive('getId')->once();
         $job = new Job($jobId, '');

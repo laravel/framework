@@ -36,7 +36,7 @@ class OptimizeClearCommand extends Command
             'compiled' => fn () => $this->callSilent('clear-compiled') == 0,
             'config' => fn () => $this->callSilent('config:clear') == 0,
             'events' => fn () => $this->callSilent('event:clear') == 0,
-            'route' => fn () => $this->callSilent('route:clear') == 0,
+            'routes' => fn () => $this->callSilent('route:clear') == 0,
             'views' => fn () => $this->callSilent('view:clear') == 0,
         ])->each(fn ($task, $description) => $this->components->task($description, $task));
 

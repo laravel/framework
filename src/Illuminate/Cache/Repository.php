@@ -8,14 +8,23 @@ use Closure;
 use DateTimeInterface;
 use Illuminate\Cache\Events\CacheHit;
 use Illuminate\Cache\Events\CacheMissed;
+use Illuminate\Cache\Events\ForgettingKey;
+use Illuminate\Cache\Events\KeyForgetFailed;
 use Illuminate\Cache\Events\KeyForgotten;
+use Illuminate\Cache\Events\KeyWriteFailed;
 use Illuminate\Cache\Events\KeyWritten;
+use Illuminate\Cache\Events\RetrievingKey;
+use Illuminate\Cache\Events\RetrievingManyKeys;
+use Illuminate\Cache\Events\WritingKey;
+use Illuminate\Cache\Events\WritingManyKeys;
 use Illuminate\Contracts\Cache\Repository as CacheContract;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Traits\Macroable;
+
+use function Illuminate\Support\defer;
 
 /**
  * @mixin \Illuminate\Contracts\Cache\Store
@@ -36,7 +45,7 @@ class Repository implements ArrayAccess, CacheContract
     /**
      * The event dispatcher implementation.
      *
-     * @var \Illuminate\Contracts\Events\Dispatcher
+     * @var \Illuminate\Contracts\Events\Dispatcher|null
      */
     protected $events;
 
@@ -104,6 +113,8 @@ class Repository implements ArrayAccess, CacheContract
             return $this->many($key);
         }
 
+        $this->event(new RetrievingKey($this->getName(), $key));
+
         $value = $this->store->get($this->itemKey($key));
 
         // If we could not find the cache value, we will fire the missed event and get
@@ -130,6 +141,8 @@ class Repository implements ArrayAccess, CacheContract
      */
     public function many(array $keys)
     {
+        $this->event(new RetrievingManyKeys($this->getName(), $keys));
+
         $values = $this->store->many(collect($keys)->map(function ($value, $key) {
             return is_string($key) ? $key : $value;
         })->values()->all());
@@ -222,10 +235,14 @@ class Repository implements ArrayAccess, CacheContract
             return $this->forget($key);
         }
 
+        $this->event(new WritingKey($this->getName(), $key, $value, $seconds));
+
         $result = $this->store->put($this->itemKey($key), $value, $seconds);
 
         if ($result) {
             $this->event(new KeyWritten($this->getName(), $key, $value, $seconds));
+        } else {
+            $this->event(new KeyWriteFailed($this->getName(), $key, $value, $seconds));
         }
 
         return $result;
@@ -260,11 +277,15 @@ class Repository implements ArrayAccess, CacheContract
             return $this->deleteMultiple(array_keys($values));
         }
 
+        $this->event(new WritingManyKeys($this->getName(), array_keys($values), array_values($values), $seconds));
+
         $result = $this->store->putMany($values, $seconds);
 
-        if ($result) {
-            foreach ($values as $key => $value) {
+        foreach ($values as $key => $value) {
+            if ($result) {
                 $this->event(new KeyWritten($this->getName(), $key, $value, $seconds));
+            } else {
+                $this->event(new KeyWriteFailed($this->getName(), $key, $value, $seconds));
             }
         }
 
@@ -372,10 +393,14 @@ class Repository implements ArrayAccess, CacheContract
      */
     public function forever($key, $value)
     {
+        $this->event(new WritingKey($this->getName(), $key, $value));
+
         $result = $this->store->forever($this->itemKey($key), $value);
 
         if ($result) {
             $this->event(new KeyWritten($this->getName(), $key, $value));
+        } else {
+            $this->event(new KeyWriteFailed($this->getName(), $key, $value));
         }
 
         return $result;
@@ -449,6 +474,57 @@ class Repository implements ArrayAccess, CacheContract
     }
 
     /**
+     * Retrieve an item from the cache by key, refreshing it in the background if it is stale.
+     *
+     * @template TCacheValue
+     *
+     * @param  string  $key
+     * @param  array{ 0: int, 1: int }  $ttl
+     * @param  (callable(): TCacheValue)  $callback
+     * @param  array{ seconds?: int, owner?: string }|null  $lock
+     * @return TCacheValue
+     */
+    public function flexible($key, $ttl, $callback, $lock = null)
+    {
+        [
+            $key => $value,
+            "{$key}:created" => $created,
+        ] = $this->many([$key, "{$key}:created"]);
+
+        if ($created === null) {
+            return tap(value($callback), fn ($value) => $this->putMany([
+                $key => $value,
+                "{$key}:created" => Carbon::now()->getTimestamp(),
+            ], $ttl[1]));
+        }
+
+        if (($created + $this->getSeconds($ttl[0])) > Carbon::now()->getTimestamp()) {
+            return $value;
+        }
+
+        $refresh = function () use ($key, $ttl, $callback, $lock, $created) {
+            $this->store->lock(
+                "illuminate:cache:refresh:lock:{$key}",
+                $lock['seconds'] ?? 0,
+                $lock['owner'] ?? null,
+            )->get(function () use ($key, $callback, $created, $ttl) {
+                if ($created !== $this->get("{$key}:created")) {
+                    return;
+                }
+
+                $this->putMany([
+                    $key => value($callback),
+                    "{$key}:created" => Carbon::now()->getTimestamp(),
+                ], $ttl[1]);
+            });
+        };
+
+        defer($refresh, "illuminate:cache:refresh:{$key}");
+
+        return $value;
+    }
+
+    /**
      * Remove an item from the cache.
      *
      * @param  string  $key
@@ -456,9 +532,13 @@ class Repository implements ArrayAccess, CacheContract
      */
     public function forget($key)
     {
+        $this->event(new ForgettingKey($this->getName(), $key));
+
         return tap($this->store->forget($this->itemKey($key)), function ($result) use ($key) {
             if ($result) {
                 $this->event(new KeyForgotten($this->getName(), $key));
+            } else {
+                $this->event(new KeyForgetFailed($this->getName(), $key));
             }
         });
     }
@@ -634,7 +714,7 @@ class Repository implements ArrayAccess, CacheContract
     /**
      * Get the event dispatcher instance.
      *
-     * @return \Illuminate\Contracts\Events\Dispatcher
+     * @return \Illuminate\Contracts\Events\Dispatcher|null
      */
     public function getEventDispatcher()
     {

@@ -31,6 +31,7 @@ namespace Illuminate\Support\Facades;
  * @method static mixed remember(string $key, \Closure|\DateTimeInterface|\DateInterval|int|null $ttl, \Closure $callback)
  * @method static mixed sear(string $key, \Closure $callback)
  * @method static mixed rememberForever(string $key, \Closure $callback)
+ * @method static mixed flexible(string $key, array $ttl, callable $callback, array|null $lock = null)
  * @method static bool forget(string $key)
  * @method static bool delete(string $key)
  * @method static bool deleteMultiple(iterable $keys)
@@ -41,7 +42,7 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Cache\Repository setDefaultCacheTime(int|null $seconds)
  * @method static \Illuminate\Contracts\Cache\Store getStore()
  * @method static \Illuminate\Cache\Repository setStore(\Illuminate\Contracts\Cache\Store $store)
- * @method static \Illuminate\Contracts\Events\Dispatcher getEventDispatcher()
+ * @method static \Illuminate\Contracts\Events\Dispatcher|null getEventDispatcher()
  * @method static void setEventDispatcher(\Illuminate\Contracts\Events\Dispatcher $events)
  * @method static void macro(string $name, object|callable $macro)
  * @method static void mixin(object $mixin, bool $replace = true)
@@ -54,8 +55,7 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Contracts\Cache\Lock restoreLock(string $name, string $owner)
  *
  * @see \Illuminate\Cache\CacheManager
- *
- * @mixin \Illuminate\Cache\Repository
+ * @see \Illuminate\Cache\Repository
  */
 class Cache extends Facade
 {

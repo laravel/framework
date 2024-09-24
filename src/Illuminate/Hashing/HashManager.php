@@ -58,7 +58,7 @@ class HashManager extends Manager implements Hasher
      * @param  array  $options
      * @return string
      */
-    public function make($value, array $options = [])
+    public function make(#[\SensitiveParameter] $value, array $options = [])
     {
         return $this->driver()->make($value, $options);
     }
@@ -71,7 +71,7 @@ class HashManager extends Manager implements Hasher
      * @param  array  $options
      * @return bool
      */
-    public function check($value, $hashedValue, array $options = [])
+    public function check(#[\SensitiveParameter] $value, $hashedValue, array $options = [])
     {
         return $this->driver()->check($value, $hashedValue, $options);
     }
@@ -94,9 +94,9 @@ class HashManager extends Manager implements Hasher
      * @param  string  $value
      * @return bool
      */
-    public function isHashed($value)
+    public function isHashed(#[\SensitiveParameter] $value)
     {
-        return password_get_info($value)['algo'] !== null;
+        return $this->driver()->info($value)['algo'] !== null;
     }
 
     /**
@@ -107,5 +107,18 @@ class HashManager extends Manager implements Hasher
     public function getDefaultDriver()
     {
         return $this->config->get('hashing.driver', 'bcrypt');
+    }
+
+    /**
+     * Verifies that the configuration is less than or equal to what is configured.
+     *
+     * @param  array  $value
+     * @return bool
+     *
+     * @internal
+     */
+    public function verifyConfiguration($value)
+    {
+        return $this->driver()->verifyConfiguration($value);
     }
 }

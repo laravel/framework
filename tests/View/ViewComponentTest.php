@@ -49,8 +49,6 @@ class ViewComponentTest extends TestCase
 
         $reflectionMethod = new ReflectionMethod($component, 'ignoredMethods');
 
-        $reflectionMethod->setAccessible(true);
-
         $ignoredMethods = $reflectionMethod->invoke($component);
 
         foreach ($ignoredMethods as $method) {
@@ -58,13 +56,18 @@ class ViewComponentTest extends TestCase
         }
     }
 
-    public function testAttributeParentInheritance()
+    public function testAttributeParentInheritance(): void
     {
         $component = new TestViewComponent;
+        $attributes = new ComponentAttributeBag(['class' => 'bar', 'type' => 'button']);
 
-        $component->withAttributes(['class' => 'foo', 'attributes' => new ComponentAttributeBag(['class' => 'bar', 'type' => 'button'])]);
+        $component->withAttributes(['class' => 'foo', 'attributes' => $attributes]);
 
         $this->assertSame('class="foo bar" type="button"', (string) $component->attributes);
+
+        // Test overriding parent class attributes
+        $component->withAttributes(['class' => 'override', 'type' => 'submit']);
+        $this->assertSame('class="override" type="submit"', (string) $component->attributes);
     }
 
     public function testPublicMethodsWithNoArgsAreConvertedToStringableCallablesInvokedAndNotCached()

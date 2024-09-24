@@ -23,7 +23,14 @@ class SetCacheHeaders
         }
 
         return collect($options)
-            ->map(fn ($value, $key) => is_int($key) ? $value : "{$key}={$value}")
+            ->map(function ($value, $key) {
+                if (is_bool($value)) {
+                    return $value ? $key : null;
+                }
+
+                return is_int($key) ? $value : "{$key}={$value}";
+            })
+            ->filter()
             ->map(fn ($value) => Str::finish($value, ';'))
             ->pipe(fn ($options) => rtrim(static::class.':'.$options->implode(''), ';'));
     }
@@ -55,7 +62,7 @@ class SetCacheHeaders
         }
 
         if (isset($options['etag']) && $options['etag'] === true) {
-            $options['etag'] = $response->getEtag() ?? md5($response->getContent());
+            $options['etag'] = $response->getEtag() ?? ($response->getContent() ? md5($response->getContent()) : null);
         }
 
         if (isset($options['last_modified'])) {

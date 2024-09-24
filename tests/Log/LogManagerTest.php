@@ -19,6 +19,8 @@ use Monolog\Processor\MemoryUsageProcessor;
 use Monolog\Processor\PsrLogMessageProcessor;
 use Monolog\Processor\UidProcessor;
 use Orchestra\Testbench\TestCase;
+use Psr\Log\LoggerInterface;
+use Psr\Log\LoggerTrait;
 use ReflectionProperty;
 use RuntimeException;
 
@@ -709,6 +711,28 @@ class LogManagerTest extends TestCase
             '[%datetime%] %channel%.%level_name%: %message% %context% %extra%',
             rtrim($format->getValue($formatter)));
     }
+
+    public function testDriverUsersPsrLoggerManagerReturnsLogger()
+    {
+        // Given
+        $config = $this->app['config'];
+        $config->set('logging.channels.spy', [
+            'driver' => 'spy',
+        ]);
+
+        $manager = new LogManager($this->app);
+
+        $loggerSpy = new LoggerSpy();
+        $manager->extend('spy', fn () => $loggerSpy);
+
+        // When
+        $logger = $manager->channel('spy');
+        $logger->alert('some alert');
+
+        // Then
+        $this->assertCount(1, $loggerSpy->logs);
+        $this->assertEquals('some alert', $loggerSpy->logs[0]['message']);
+    }
 }
 
 class CustomizeFormatter
@@ -720,5 +744,21 @@ class CustomizeFormatter
                 '[%datetime%] %channel%.%level_name%: %message% %context% %extra%'
             ));
         }
+    }
+}
+
+class LoggerSpy implements LoggerInterface
+{
+    use LoggerTrait;
+
+    public array $logs = [];
+
+    public function log($level, \Stringable|string $message, array $context = []): void
+    {
+        $this->logs[] = [
+            'level' => $level,
+            'message' => $message,
+            'context' => $context,
+        ];
     }
 }

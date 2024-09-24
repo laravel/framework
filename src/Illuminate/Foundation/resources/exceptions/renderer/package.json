@@ -1,0 +1,18 @@
+{
+    "private": true,
+    "entry": "show.blade.php",
+    "scripts": {
+        "build": "vite build",
+        "watch": "vite build --watch"
+    },
+    "dependencies": {
+        "alpinejs": "^3.13.10",
+        "autoprefixer": "^10.4.19",
+        "highlight.js": "^11.9.0",
+        "postcss": "^8.4.38",
+        "tailwindcss": "^3.4.3",
+        "tippy.js": "^6.3.7",
+        "vite": "^5.2.14",
+        "vite-require": "^0.2.3"
+    }
+}

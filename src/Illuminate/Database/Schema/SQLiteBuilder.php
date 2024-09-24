@@ -105,6 +105,45 @@ class SQLiteBuilder extends Builder
     }
 
     /**
+     * Set the busy timeout.
+     *
+     * @param  int  $milliseconds
+     * @return bool
+     */
+    public function setBusyTimeout($milliseconds)
+    {
+        return $this->connection->statement(
+            $this->grammar->compileSetBusyTimeout($milliseconds)
+        );
+    }
+
+    /**
+     * Set the journal mode.
+     *
+     * @param  string  $mode
+     * @return bool
+     */
+    public function setJournalMode($mode)
+    {
+        return $this->connection->statement(
+            $this->grammar->compileSetJournalMode($mode)
+        );
+    }
+
+    /**
+     * Set the synchronous mode.
+     *
+     * @param  int  $mode
+     * @return bool
+     */
+    public function setSynchronous($mode)
+    {
+        return $this->connection->statement(
+            $this->grammar->compileSetSynchronous($mode)
+        );
+    }
+
+    /**
      * Empty the database file.
      *
      * @return void

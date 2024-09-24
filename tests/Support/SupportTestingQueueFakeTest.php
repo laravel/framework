@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Support;
 use BadMethodCallException;
 use Illuminate\Bus\Queueable;
 use Illuminate\Foundation\Application;
+use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Support\Testing\Fakes\QueueFake;
 use Mockery as m;
@@ -194,11 +195,17 @@ class SupportTestingQueueFakeTest extends TestCase
 
         $this->fake->push($this->job);
 
+        $this->fake->push(function () {
+            //
+        });
+
         try {
             $this->fake->assertNothingPushed();
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertStringContainsString('Jobs were pushed unexpectedly.', $e->getMessage());
+            $this->assertStringContainsString('The following jobs were pushed unexpectedly', $e->getMessage());
+            $this->assertStringContainsString(get_class($this->job), $e->getMessage());
+            $this->assertStringContainsString(CallQueuedClosure::class, $e->getMessage());
         }
     }
 

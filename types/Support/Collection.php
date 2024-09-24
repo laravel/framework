@@ -487,6 +487,20 @@ assertType('string|User', $collection->first(function ($user) {
 assertType('string|User', $collection->first(null, function () {
     return 'string';
 }));
+if ($collection->isNotEmpty()) {
+    assertType('User', $collection->first());
+    assertType('string|User', $collection->first(null, 'foo'));
+} else {
+    assertType('null', $collection->first());
+    assertType('string|User', $collection->first(null, 'foo'));
+}
+if ($collection->isEmpty()) {
+    assertType('null', $collection->first());
+    assertType('string|User', $collection->first(null, 'foo'));
+} else {
+    assertType('User', $collection->first());
+    assertType('string|User', $collection->first(null, 'foo'));
+}
 
 assertType('Illuminate\Support\Collection<int, mixed>', $collection->flatten());
 assertType('Illuminate\Support\Collection<int, mixed>', $collection::make(['string' => 'string'])->flatten(4));
@@ -500,22 +514,23 @@ assertType('string|User', $collection->value('string', fn () => 'string'));
 
 assertType('Illuminate\Support\Collection<string, int>', $collection::make(['string'])->flip());
 
-assertType('Illuminate\Support\Collection<(int|string), Illuminate\Support\Collection<(int|string), User>>', $collection->groupBy('name'));
-assertType('Illuminate\Support\Collection<(int|string), Illuminate\Support\Collection<(int|string), User>>', $collection->groupBy('name', true));
-assertType('Illuminate\Support\Collection<(int|string), Illuminate\Support\Collection<(int|string), User>>', $collection->groupBy(function ($user, $int) {
-    // assertType('User', $user);
-    // assertType('int', $int);
+assertType('Illuminate\Support\Collection<(int|string), Illuminate\Support\Collection<int, User>>', $collection->groupBy('name'));
+assertType('Illuminate\Support\Collection<(int|string), Illuminate\Support\Collection<int, User>>', $collection->groupBy('name', true));
+assertType('Illuminate\Support\Collection<string, Illuminate\Support\Collection<int, User>>', $collection->groupBy(function ($user, $int) {
+    assertType('User', $user);
+    assertType('int', $int);
 
     return 'foo';
 }));
-assertType('Illuminate\Support\Collection<(int|string), Illuminate\Support\Collection<(int|string), User>>', $collection->groupBy(function ($user) {
+
+assertType('Illuminate\Support\Collection<string, Illuminate\Support\Collection<string, User>>', $collection->keyBy(fn () => '')->groupBy(function ($user) {
     return 'foo';
-}));
+}, preserveKeys: true));
 
 assertType('Illuminate\Support\Collection<(int|string), User>', $collection->keyBy('name'));
-assertType('Illuminate\Support\Collection<(int|string), User>', $collection->keyBy(function ($user, $int) {
-    // assertType('User', $user);
-    // assertType('int', $int);
+assertType('Illuminate\Support\Collection<string, User>', $collection->keyBy(function ($user, $int) {
+    assertType('User', $user);
+    assertType('int', $int);
 
     return 'foo';
 }));
@@ -1098,3 +1113,34 @@ class Zoo
 $zoo = new Zoo();
 
 assertType('Illuminate\Support\Collection<int, Animal>', $zoo->getWithoutZebras());
+
+$coll = $zoo->getWithoutZebras();
+assertType('Illuminate\Support\HigherOrderCollectionProxy<int, Animal>', $coll->average);
+assertType('Illuminate\Support\HigherOrderCollectionProxy<int, Animal>', $coll->avg);
+assertType('Illuminate\Support\HigherOrderCollectionProxy<int, Animal>', $coll->contains);
+assertType('Illuminate\Support\HigherOrderCollectionProxy<int, Animal>', $coll->doesntContain);
+assertType('Illuminate\Support\HigherOrderCollectionProxy<int, Animal>', $coll->each);
+assertType('Illuminate\Support\HigherOrderCollectionProxy<int, Animal>', $coll->every);
+assertType('Illuminate\Support\HigherOrderCollectionProxy<int, Animal>', $coll->filter);
+assertType('Illuminate\Support\HigherOrderCollectionProxy<int, Animal>', $coll->first);
+assertType('Illuminate\Support\HigherOrderCollectionProxy<int, Animal>', $coll->flatMap);
+assertType('Illuminate\Support\HigherOrderCollectionProxy<int, Animal>', $coll->groupBy);
+assertType('Illuminate\Support\HigherOrderCollectionProxy<int, Animal>', $coll->keyBy);
+assertType('Illuminate\Support\HigherOrderCollectionProxy<int, Animal>', $coll->map);
+assertType('Illuminate\Support\HigherOrderCollectionProxy<int, Animal>', $coll->max);
+assertType('Illuminate\Support\HigherOrderCollectionProxy<int, Animal>', $coll->min);
+assertType('Illuminate\Support\HigherOrderCollectionProxy<int, Animal>', $coll->partition);
+assertType('Illuminate\Support\HigherOrderCollectionProxy<int, Animal>', $coll->percentage);
+assertType('Illuminate\Support\HigherOrderCollectionProxy<int, Animal>', $coll->reject);
+assertType('Illuminate\Support\HigherOrderCollectionProxy<int, Animal>', $coll->skipUntil);
+assertType('Illuminate\Support\HigherOrderCollectionProxy<int, Animal>', $coll->skipWhile);
+assertType('Illuminate\Support\HigherOrderCollectionProxy<int, Animal>', $coll->some);
+assertType('Illuminate\Support\HigherOrderCollectionProxy<int, Animal>', $coll->sortBy);
+assertType('Illuminate\Support\HigherOrderCollectionProxy<int, Animal>', $coll->sortByDesc);
+assertType('Illuminate\Support\HigherOrderCollectionProxy<int, Animal>', $coll->sum);
+assertType('Illuminate\Support\HigherOrderCollectionProxy<int, Animal>', $coll->takeUntil);
+assertType('Illuminate\Support\HigherOrderCollectionProxy<int, Animal>', $coll->takeWhile);
+assertType('Illuminate\Support\HigherOrderCollectionProxy<int, Animal>', $coll->unique);
+assertType('Illuminate\Support\HigherOrderCollectionProxy<int, Animal>', $coll->unless);
+assertType('Illuminate\Support\HigherOrderCollectionProxy<int, Animal>', $coll->until);
+assertType('Illuminate\Support\HigherOrderCollectionProxy<int, Animal>', $coll->when);

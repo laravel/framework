@@ -115,7 +115,14 @@ class BroadcastingInstallCommand extends Command
      */
     protected function enableBroadcastServiceProvider()
     {
-        $config = ($filesystem = new Filesystem)->get(app()->configPath('app.php'));
+        $filesystem = new Filesystem;
+
+        if (! $filesystem->exists(app()->configPath('app.php')) ||
+            ! $filesystem->exists('app/Providers/BroadcastServiceProvider.php')) {
+            return;
+        }
+
+        $config = $filesystem->get(app()->configPath('app.php'));
 
         if (str_contains($config, '// App\Providers\BroadcastServiceProvider::class')) {
             $filesystem->replaceInFile(
@@ -144,13 +151,11 @@ class BroadcastingInstallCommand extends Command
         }
 
         $this->requireComposerPackages($this->option('composer'), [
-            'laravel/reverb:@beta',
+            'laravel/reverb:^1.0',
         ]);
 
-        $php = (new PhpExecutableFinder())->find(false) ?: 'php';
-
         Process::run([
-            $php,
+            (new PhpExecutableFinder())->find(false) ?: 'php',
             defined('ARTISAN_BINARY') ? ARTISAN_BINARY : 'artisan',
             'reverb:install',
         ]);

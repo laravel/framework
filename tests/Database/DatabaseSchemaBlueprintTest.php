@@ -120,6 +120,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $this->assertEquals(['alter table "users" add column "created" timestamp(0) without time zone not null default CURRENT_TIMESTAMP'], $blueprint->toSql($connection, new PostgresGrammar));
 
         $blueprint = clone $base;
+        $connection->shouldReceive('getServerVersion')->andReturn('3.35');
         $this->assertEquals(['alter table "users" add column "created" datetime not null default CURRENT_TIMESTAMP'], $blueprint->toSql($connection, new SQLiteGrammar));
 
         $blueprint = clone $base;
@@ -141,6 +142,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $this->assertEquals(['alter table "users" add column "created" timestamp(0) without time zone not null default CURRENT_TIMESTAMP'], $blueprint->toSql($connection, new PostgresGrammar));
 
         $blueprint = clone $base;
+        $connection->shouldReceive('getServerVersion')->andReturn('3.35');
         $this->assertEquals(['alter table "users" add column "created" datetime not null default CURRENT_TIMESTAMP'], $blueprint->toSql($connection, new SQLiteGrammar));
 
         $blueprint = clone $base;
@@ -197,8 +199,8 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $connection->shouldReceive('isMaria')->andReturn(false);
         $connection->shouldReceive('getServerVersion')->andReturn('5.7');
         $connection->shouldReceive('getSchemaBuilder->getColumns')->andReturn([
-            ['name' => 'name', 'type' => 'varchar(255)', 'type_name' => 'varchar', 'nullable' => true, 'collation' => 'utf8mb4_unicode_ci', 'default' => 'foo', 'comment' => null, 'auto_increment' => false],
-            ['name' => 'id', 'type' => 'bigint unsigned', 'type_name' => 'bigint', 'nullable' => false, 'collation' => null, 'default' => null, 'comment' => 'lorem ipsum', 'auto_increment' => true],
+            ['name' => 'name', 'type' => 'varchar(255)', 'type_name' => 'varchar', 'nullable' => true, 'collation' => 'utf8mb4_unicode_ci', 'default' => 'foo', 'comment' => null, 'auto_increment' => false, 'generation' => null],
+            ['name' => 'id', 'type' => 'bigint unsigned', 'type_name' => 'bigint', 'nullable' => false, 'collation' => null, 'default' => null, 'comment' => 'lorem ipsum', 'auto_increment' => true, 'generation' => null],
             ['name' => 'generated', 'type' => 'int', 'type_name' => 'int', 'nullable' => false, 'collation' => null, 'default' => null, 'comment' => null, 'auto_increment' => false, 'generation' => ['type' => 'stored', 'expression' => 'expression']],
         ]);
 
@@ -215,21 +217,24 @@ class DatabaseSchemaBlueprintTest extends TestCase
             $table->renameColumn('name', 'title');
             $table->renameColumn('id', 'key');
             $table->renameColumn('generated', 'new_generated');
+            $table->renameColumn('foo', 'bar');
         });
 
         $connection = m::mock(Connection::class);
         $connection->shouldReceive('isMaria')->andReturn(true);
         $connection->shouldReceive('getServerVersion')->andReturn('10.1.35');
         $connection->shouldReceive('getSchemaBuilder->getColumns')->andReturn([
-            ['name' => 'name', 'type' => 'varchar(255)', 'type_name' => 'varchar', 'nullable' => true, 'collation' => 'utf8mb4_unicode_ci', 'default' => 'foo', 'comment' => null, 'auto_increment' => false],
-            ['name' => 'id', 'type' => 'bigint unsigned', 'type_name' => 'bigint', 'nullable' => false, 'collation' => null, 'default' => null, 'comment' => 'lorem ipsum', 'auto_increment' => true],
+            ['name' => 'name', 'type' => 'varchar(255)', 'type_name' => 'varchar', 'nullable' => true, 'collation' => 'utf8mb4_unicode_ci', 'default' => 'foo', 'comment' => null, 'auto_increment' => false, 'generation' => null],
+            ['name' => 'id', 'type' => 'bigint unsigned', 'type_name' => 'bigint', 'nullable' => false, 'collation' => null, 'default' => null, 'comment' => 'lorem ipsum', 'auto_increment' => true, 'generation' => null],
             ['name' => 'generated', 'type' => 'int', 'type_name' => 'int', 'nullable' => false, 'collation' => null, 'default' => null, 'comment' => null, 'auto_increment' => false, 'generation' => ['type' => 'stored', 'expression' => 'expression']],
+            ['name' => 'foo', 'type' => 'int', 'type_name' => 'int', 'nullable' => true, 'collation' => null, 'default' => 'NULL', 'comment' => null, 'auto_increment' => false, 'generation' => null],
         ]);
 
         $this->assertEquals([
             "alter table `users` change `name` `title` varchar(255) collate 'utf8mb4_unicode_ci' null default 'foo'",
             "alter table `users` change `id` `key` bigint unsigned not null auto_increment comment 'lorem ipsum'",
             'alter table `users` change `generated` `new_generated` int as (expression) stored not null',
+            'alter table `users` change `foo` `bar` int null default NULL',
         ], $blueprint->toSql($connection, new MariaDbGrammar));
     }
 
@@ -248,6 +253,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $this->assertEquals(['alter table "users" drop column "foo"'], $blueprint->toSql($connection, new PostgresGrammar));
 
         $blueprint = clone $base;
+        $connection->shouldReceive('getServerVersion')->andReturn('3.35');
         $this->assertEquals(['alter table "users" drop column "foo"'], $blueprint->toSql($connection, new SQLiteGrammar));
 
         $blueprint = clone $base;
@@ -284,7 +290,8 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $blueprint = clone $base;
 
         $this->assertEquals([
-            'alter table `comments` add `commentable_type` varchar(255) not null, add `commentable_id` bigint unsigned not null',
+            'alter table `comments` add `commentable_type` varchar(255) not null',
+            'alter table `comments` add `commentable_id` bigint unsigned not null',
             'alter table `comments` add index `comments_commentable_type_commentable_id_index`(`commentable_type`, `commentable_id`)',
         ], $blueprint->toSql($connection, new MySqlGrammar));
     }
@@ -300,7 +307,8 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $blueprint = clone $base;
 
         $this->assertEquals([
-            'alter table `comments` add `commentable_type` varchar(255) null, add `commentable_id` bigint unsigned null',
+            'alter table `comments` add `commentable_type` varchar(255) null',
+            'alter table `comments` add `commentable_id` bigint unsigned null',
             'alter table `comments` add index `comments_commentable_type_commentable_id_index`(`commentable_type`, `commentable_id`)',
         ], $blueprint->toSql($connection, new MySqlGrammar));
     }
@@ -318,7 +326,8 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $blueprint = clone $base;
 
         $this->assertEquals([
-            'alter table `comments` add `commentable_type` varchar(255) not null, add `commentable_id` char(36) not null',
+            'alter table `comments` add `commentable_type` varchar(255) not null',
+            'alter table `comments` add `commentable_id` char(36) not null',
             'alter table `comments` add index `comments_commentable_type_commentable_id_index`(`commentable_type`, `commentable_id`)',
         ], $blueprint->toSql($connection, new MySqlGrammar));
     }
@@ -336,7 +345,8 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $blueprint = clone $base;
 
         $this->assertEquals([
-            'alter table `comments` add `commentable_type` varchar(255) null, add `commentable_id` char(36) null',
+            'alter table `comments` add `commentable_type` varchar(255) null',
+            'alter table `comments` add `commentable_id` char(36) null',
             'alter table `comments` add index `comments_commentable_type_commentable_id_index`(`commentable_type`, `commentable_id`)',
         ], $blueprint->toSql($connection, new MySqlGrammar));
     }
@@ -354,7 +364,8 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $blueprint = clone $base;
 
         $this->assertEquals([
-            'alter table `comments` add `commentable_type` varchar(255) not null, add `commentable_id` char(26) not null',
+            'alter table `comments` add `commentable_type` varchar(255) not null',
+            'alter table `comments` add `commentable_id` char(26) not null',
             'alter table `comments` add index `comments_commentable_type_commentable_id_index`(`commentable_type`, `commentable_id`)',
         ], $blueprint->toSql($connection, new MySqlGrammar));
     }
@@ -372,7 +383,8 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $blueprint = clone $base;
 
         $this->assertEquals([
-            'alter table `comments` add `commentable_type` varchar(255) null, add `commentable_id` char(26) null',
+            'alter table `comments` add `commentable_type` varchar(255) null',
+            'alter table `comments` add `commentable_id` char(26) null',
             'alter table `comments` add index `comments_commentable_type_commentable_id_index`(`commentable_type`, `commentable_id`)',
         ], $blueprint->toSql($connection, new MySqlGrammar));
     }
@@ -512,6 +524,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
         ], $blueprint->toSql($connection, new MySqlGrammar));
 
         $blueprint = clone $base;
+        $connection->shouldReceive('getServerVersion')->andReturn('3.35');
         $this->assertEquals([
             'alter table "posts" add column "note" text not null',
         ], $blueprint->toSql($connection, new SQLiteGrammar));
@@ -541,6 +554,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
         ], $blueprint->toSql($connection, new MySqlGrammar));
 
         $blueprint = clone $base;
+        $connection->shouldReceive('getServerVersion')->andReturn('3.35');
         $this->assertEquals([
             'alter table "posts" add column "note" text',
         ], $blueprint->toSql($connection, new SQLiteGrammar));

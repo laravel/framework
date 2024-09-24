@@ -6,6 +6,7 @@ use Illuminate\Container\Container;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\MultipleRecordsFoundException;
 use Illuminate\Database\Query\Expression;
+use Illuminate\Database\RecordNotFoundException;
 use Illuminate\Database\RecordsNotFoundException;
 use Illuminate\Pagination\Cursor;
 use Illuminate\Pagination\CursorPaginator;
@@ -18,6 +19,12 @@ use Illuminate\Support\Traits\Conditionable;
 use InvalidArgumentException;
 use RuntimeException;
 
+/**
+ * @template TValue
+ *
+ * @mixin \Illuminate\Database\Eloquent\Builder
+ * @mixin \Illuminate\Database\Query\Builder
+ */
 trait BuildsQueries
 {
     use Conditionable;
@@ -26,7 +33,7 @@ trait BuildsQueries
      * Chunk the results of the query.
      *
      * @param  int  $count
-     * @param  callable  $callback
+     * @param  callable(\Illuminate\Support\Collection<int, TValue>, int): mixed  $callback
      * @return bool
      */
     public function chunk($count, callable $callback)
@@ -65,9 +72,11 @@ trait BuildsQueries
     /**
      * Run a map over each item while chunking.
      *
-     * @param  callable  $callback
+     * @template TReturn
+     *
+     * @param  callable(TValue): TReturn  $callback
      * @param  int  $count
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Support\Collection<int, TReturn>
      */
     public function chunkMap(callable $callback, $count = 1000)
     {
@@ -85,7 +94,7 @@ trait BuildsQueries
     /**
      * Execute a callback over each item while chunking.
      *
-     * @param  callable  $callback
+     * @param  callable(TValue, int): mixed  $callback
      * @param  int  $count
      * @return bool
      *
@@ -106,7 +115,7 @@ trait BuildsQueries
      * Chunk the results of a query by comparing IDs.
      *
      * @param  int  $count
-     * @param  callable  $callback
+     * @param  callable(\Illuminate\Support\Collection<int, TValue>, int): mixed  $callback
      * @param  string|null  $column
      * @param  string|null  $alias
      * @return bool
@@ -120,7 +129,7 @@ trait BuildsQueries
      * Chunk the results of a query by comparing IDs in descending order.
      *
      * @param  int  $count
-     * @param  callable  $callback
+     * @param  callable(\Illuminate\Support\Collection<int, TValue>, int): mixed  $callback
      * @param  string|null  $column
      * @param  string|null  $alias
      * @return bool
@@ -134,7 +143,7 @@ trait BuildsQueries
      * Chunk the results of a query by comparing IDs in a given order.
      *
      * @param  int  $count
-     * @param  callable  $callback
+     * @param  callable(\Illuminate\Support\Collection<int, TValue>, int): mixed  $callback
      * @param  string|null  $column
      * @param  string|null  $alias
      * @param  bool  $descending
@@ -194,7 +203,7 @@ trait BuildsQueries
     /**
      * Execute a callback over each item while chunking by ID.
      *
-     * @param  callable  $callback
+     * @param  callable(TValue, int): mixed  $callback
      * @param  int  $count
      * @param  string|null  $column
      * @param  string|null  $alias
@@ -328,7 +337,7 @@ trait BuildsQueries
      * Execute the query and get the first result.
      *
      * @param  array|string  $columns
-     * @return \Illuminate\Database\Eloquent\Model|object|static|null
+     * @return TValue|null
      */
     public function first($columns = ['*'])
     {
@@ -336,10 +345,28 @@ trait BuildsQueries
     }
 
     /**
+     * Execute the query and get the first result or throw an exception.
+     *
+     * @param  array|string  $columns
+     * @param  string|null  $message
+     * @return TValue
+     *
+     * @throws \Illuminate\Database\RecordNotFoundException
+     */
+    public function firstOrFail($columns = ['*'], $message = null)
+    {
+        if (! is_null($result = $this->first($columns))) {
+            return $result;
+        }
+
+        throw new RecordNotFoundException($message ?: 'No record found for the given query.');
+    }
+
+    /**
      * Execute the query and get the first result if it's the sole matching record.
      *
      * @param  array|string  $columns
-     * @return \Illuminate\Database\Eloquent\Model|object|static|null
+     * @return TValue
      *
      * @throws \Illuminate\Database\RecordsNotFoundException
      * @throws \Illuminate\Database\MultipleRecordsFoundException
@@ -381,11 +408,14 @@ trait BuildsQueries
         $orders = $this->ensureOrderForCursorPagination(! is_null($cursor) && $cursor->pointsToPreviousItems());
 
         if (! is_null($cursor)) {
-            $addCursorConditions = function (self $builder, $previousColumn, $i) use (&$addCursorConditions, $cursor, $orders) {
-                $unionBuilders = isset($builder->unions) ? collect($builder->unions)->pluck('query') : collect();
+            // Reset the union bindings so we can add the cursor where in the correct position...
+            $this->setBindings([], 'union');
+
+            $addCursorConditions = function (self $builder, $previousColumn, $originalColumn, $i) use (&$addCursorConditions, $cursor, $orders) {
+                $unionBuilders = $builder->getUnionBuilders();
 
                 if (! is_null($previousColumn)) {
-                    $originalColumn = $this->getOriginalColumnNameForCursorPagination($this, $previousColumn);
+                    $originalColumn ??= $this->getOriginalColumnNameForCursorPagination($this, $previousColumn);
 
                     $builder->where(
                         Str::contains($originalColumn, ['(', ')']) ? new Expression($originalColumn) : $originalColumn,
@@ -395,7 +425,7 @@ trait BuildsQueries
 
                     $unionBuilders->each(function ($unionBuilder) use ($previousColumn, $cursor) {
                         $unionBuilder->where(
-                            $this->getOriginalColumnNameForCursorPagination($this, $previousColumn),
+                            $this->getOriginalColumnNameForCursorPagination($unionBuilder, $previousColumn),
                             '=',
                             $cursor->parameter($previousColumn)
                         );
@@ -404,44 +434,48 @@ trait BuildsQueries
                     });
                 }
 
-                $builder->where(function (self $builder) use ($addCursorConditions, $cursor, $orders, $i, $unionBuilders) {
+                $builder->where(function (self $secondBuilder) use ($addCursorConditions, $cursor, $orders, $i, $unionBuilders) {
                     ['column' => $column, 'direction' => $direction] = $orders[$i];
 
                     $originalColumn = $this->getOriginalColumnNameForCursorPagination($this, $column);
 
-                    $builder->where(
+                    $secondBuilder->where(
                         Str::contains($originalColumn, ['(', ')']) ? new Expression($originalColumn) : $originalColumn,
                         $direction === 'asc' ? '>' : '<',
                         $cursor->parameter($column)
                     );
 
                     if ($i < $orders->count() - 1) {
-                        $builder->orWhere(function (self $builder) use ($addCursorConditions, $column, $i) {
-                            $addCursorConditions($builder, $column, $i + 1);
+                        $secondBuilder->orWhere(function (self $thirdBuilder) use ($addCursorConditions, $column, $originalColumn, $i) {
+                            $addCursorConditions($thirdBuilder, $column, $originalColumn, $i + 1);
                         });
                     }
 
                     $unionBuilders->each(function ($unionBuilder) use ($column, $direction, $cursor, $i, $orders, $addCursorConditions) {
-                        $unionBuilder->where(function ($unionBuilder) use ($column, $direction, $cursor, $i, $orders, $addCursorConditions) {
+                        $unionWheres = $unionBuilder->getRawBindings()['where'];
+
+                        $originalColumn = $this->getOriginalColumnNameForCursorPagination($unionBuilder, $column);
+                        $unionBuilder->where(function ($unionBuilder) use ($column, $direction, $cursor, $i, $orders, $addCursorConditions, $originalColumn, $unionWheres) {
                             $unionBuilder->where(
-                                $this->getOriginalColumnNameForCursorPagination($this, $column),
+                                $originalColumn,
                                 $direction === 'asc' ? '>' : '<',
                                 $cursor->parameter($column)
                             );
 
                             if ($i < $orders->count() - 1) {
-                                $unionBuilder->orWhere(function (self $builder) use ($addCursorConditions, $column, $i) {
-                                    $addCursorConditions($builder, $column, $i + 1);
+                                $unionBuilder->orWhere(function (self $fourthBuilder) use ($addCursorConditions, $column, $originalColumn, $i) {
+                                    $addCursorConditions($fourthBuilder, $column, $originalColumn, $i + 1);
                                 });
                             }
 
+                            $this->addBinding($unionWheres, 'union');
                             $this->addBinding($unionBuilder->getRawBindings()['where'], 'union');
                         });
                     });
                 });
             };
 
-            $addCursorConditions($this, null, 0);
+            $addCursorConditions($this, null, null, 0);
         }
 
         $this->limit($perPage + 1);
@@ -456,7 +490,7 @@ trait BuildsQueries
     /**
      * Get the original column name of the given column, without any aliasing.
      *
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
+     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>  $builder
      * @param  string  $parameter
      * @return string
      */
@@ -533,7 +567,7 @@ trait BuildsQueries
     /**
      * Pass the query to a given callback.
      *
-     * @param  callable  $callback
+     * @param  callable($this): mixed  $callback
      * @return $this
      */
     public function tap($callback)
