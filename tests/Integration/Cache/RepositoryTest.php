@@ -2,12 +2,17 @@
 
 namespace Illuminate\Tests\Integration\Cache;
 
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
+use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\TestCase;
 
+#[WithMigration('cache')]
 class RepositoryTest extends TestCase
 {
+    use LazilyRefreshDatabase;
+
     public function testStaleWhileRevalidate(): void
     {
         Carbon::setTestNow('2000-01-01 00:00:00');
@@ -22,7 +27,7 @@ class RepositoryTest extends TestCase
         $this->assertSame(1, $value);
         $this->assertCount(0, defer());
         $this->assertSame(1, $cache->get('foo'));
-        $this->assertSame(946684800, $cache->get('foo:created'));
+        $this->assertSame(946684800, $cache->get('illuminate:cache:flexible:created:foo'));
 
         // Cache is fresh. The value should be retrieved from the cache and used...
         $value = $cache->flexible('foo', [10, 20], function () use (&$count) {
@@ -31,7 +36,7 @@ class RepositoryTest extends TestCase
         $this->assertSame(1, $value);
         $this->assertCount(0, defer());
         $this->assertSame(1, $cache->get('foo'));
-        $this->assertSame(946684800, $cache->get('foo:created'));
+        $this->assertSame(946684800, $cache->get('illuminate:cache:flexible:created:foo'));
 
         Carbon::setTestNow(now()->addSeconds(11));
 
@@ -43,7 +48,7 @@ class RepositoryTest extends TestCase
         $this->assertSame(1, $value);
         $this->assertCount(1, defer());
         $this->assertSame(1, $cache->get('foo'));
-        $this->assertSame(946684800, $cache->get('foo:created'));
+        $this->assertSame(946684800, $cache->get('illuminate:cache:flexible:created:foo'));
 
         // We will hit it again within the same request. This should not queue
         // up an additional deferred callback as only one can be registered at
@@ -54,14 +59,14 @@ class RepositoryTest extends TestCase
         $this->assertSame(1, $value);
         $this->assertCount(1, defer());
         $this->assertSame(1, $cache->get('foo'));
-        $this->assertSame(946684800, $cache->get('foo:created'));
+        $this->assertSame(946684800, $cache->get('illuminate:cache:flexible:created:foo'));
 
         // We will now simulate the end of the request lifecycle by executing the
         // deferred callback. This should refresh the cache.
         defer()->invoke();
         $this->assertCount(0, defer());
         $this->assertSame(2, $cache->get('foo')); // this has been updated!
-        $this->assertSame(946684811, $cache->get('foo:created')); // this has been updated!
+        $this->assertSame(946684811, $cache->get('illuminate:cache:flexible:created:foo')); // this has been updated!
 
         // Now the cache is fresh again...
         $value = $cache->flexible('foo', [10, 20], function () use (&$count) {
@@ -70,7 +75,7 @@ class RepositoryTest extends TestCase
         $this->assertSame(2, $value);
         $this->assertCount(0, defer());
         $this->assertSame(2, $cache->get('foo'));
-        $this->assertSame(946684811, $cache->get('foo:created'));
+        $this->assertSame(946684811, $cache->get('illuminate:cache:flexible:created:foo'));
 
         // Let's now progress time beyond the stale TTL...
         Carbon::setTestNow(now()->addSeconds(21));
@@ -82,7 +87,7 @@ class RepositoryTest extends TestCase
         $this->assertSame(3, $value);
         $this->assertCount(0, defer());
         $this->assertSame(3, $cache->get('foo'));
-        $this->assertSame(946684832, $cache->get('foo:created'));
+        $this->assertSame(946684832, $cache->get('illuminate:cache:flexible:created:foo'));
 
         // Now lets see what happens when another request, job, or command is
         // also trying to refresh the same key at the same time. Will push past
@@ -94,20 +99,20 @@ class RepositoryTest extends TestCase
         $this->assertSame(3, $value);
         $this->assertCount(1, defer());
         $this->assertSame(3, $cache->get('foo'));
-        $this->assertSame(946684832, $cache->get('foo:created'));
+        $this->assertSame(946684832, $cache->get('illuminate:cache:flexible:created:foo'));
 
         // Now we will execute the deferred callback but we will first aquire
         // our own lock. This means that the value should not be refreshed by
         // deferred callback.
         /** @var Lock */
-        $lock = $cache->lock('illuminate:cache:refresh:lock:foo');
+        $lock = $cache->lock('illuminate:cache:flexible:lock:foo');
 
         $this->assertTrue($lock->acquire());
         defer()->first()();
         $this->assertSame(3, $value);
         $this->assertCount(1, defer());
         $this->assertSame(3, $cache->get('foo'));
-        $this->assertSame(946684832, $cache->get('foo:created'));
+        $this->assertSame(946684832, $cache->get('illuminate:cache:flexible:created:foo'));
         $this->assertTrue($lock->release());
 
         // Now we have cleared the lock we will, one last time, confirm that
@@ -115,7 +120,7 @@ class RepositoryTest extends TestCase
         defer()->invoke();
         $this->assertCount(0, defer());
         $this->assertSame(4, $cache->get('foo'));
-        $this->assertSame(946684843, $cache->get('foo:created'));
+        $this->assertSame(946684843, $cache->get('illuminate:cache:flexible:created:foo'));
 
         // The last thing is to check that we don't refresh the cache in the
         // deferred callback if another thread has already done the work for us.
@@ -127,13 +132,13 @@ class RepositoryTest extends TestCase
         $this->assertSame(4, $value);
         $this->assertCount(1, defer());
         $this->assertSame(4, $cache->get('foo'));
-        $this->assertSame(946684843, $cache->get('foo:created'));
+        $this->assertSame(946684843, $cache->get('illuminate:cache:flexible:created:foo'));
 
         // There is now a deferred callback ready to refresh the cache. We will
         // simulate another thread updating the value.
         $cache->putMany([
             'foo' => 99,
-            'foo:created' => 946684863,
+            'illuminate:cache:flexible:created:foo' => 946684863,
         ]);
 
         // then we will run the refresh callback
@@ -144,6 +149,90 @@ class RepositoryTest extends TestCase
         $this->assertSame(99, $value);
         $this->assertCount(0, defer());
         $this->assertSame(99, $cache->get('foo'));
-        $this->assertSame(946684863, $cache->get('foo:created'));
+        $this->assertSame(946684863, $cache->get('illuminate:cache:flexible:created:foo'));
+    }
+
+    public function testItHandlesStrayTtlKeyAfterMainKeyIsForgotten()
+    {
+        $cache = Cache::driver('array');
+        $count = 0;
+
+        $value = $cache->flexible('count', [5, 10], function () use (&$count) {
+            $count = 1;
+
+            return $count;
+        });
+
+        $this->assertSame(1, $value);
+        $this->assertSame(1, $count);
+
+        $cache->forget('count');
+
+        $value = $cache->flexible('count', [5, 10], function () use (&$count) {
+            $count = 2;
+
+            return $count;
+        });
+        $this->assertSame(2, $value);
+        $this->assertSame(2, $count);
+    }
+
+    public function testItImplicitlyClearsTtlKeysFromDatabaseCache()
+    {
+        $this->freezeTime();
+        $cache = Cache::driver('database');
+
+        $cache->flexible('count', [5, 10], fn () => 1);
+
+        $this->assertTrue($cache->has('count'));
+        $this->assertTrue($cache->has('illuminate:cache:flexible:created:count'));
+
+        $cache->forget('count');
+
+        $this->assertEmpty($cache->getConnection()->table('cache')->get());
+        $this->assertTrue($cache->missing('count'));
+        $this->assertTrue($cache->missing('illuminate:cache:flexible:created:count'));
+
+        $cache->flexible('count', [5, 10], fn () => 1);
+
+        $this->assertTrue($cache->has('count'));
+        $this->assertTrue($cache->has('illuminate:cache:flexible:created:count'));
+
+        $this->travel(20)->seconds();
+        $cache->forgetIfExpired('count');
+
+        $this->assertEmpty($cache->getConnection()->table('cache')->get());
+        $this->assertTrue($cache->missing('count'));
+        $this->assertTrue($cache->missing('illuminate:cache:flexible:created:count'));
+    }
+
+    public function testItImplicitlyClearsTtlKeysFromFileDriver()
+    {
+        $this->freezeTime();
+        $cache = Cache::driver('file');
+
+        $cache->flexible('count', [5, 10], fn () => 1);
+
+        $this->assertTrue($cache->has('count'));
+        $this->assertTrue($cache->has('illuminate:cache:flexible:created:count'));
+
+        $cache->forget('count');
+
+        $this->assertFalse($cache->getFilesystem()->exists($cache->path('count')));
+        $this->assertFalse($cache->getFilesystem()->exists($cache->path('illuminate:cache:flexible:created:count')));
+        $this->assertTrue($cache->missing('count'));
+        $this->assertTrue($cache->missing('illuminate:cache:flexible:created:count'));
+
+        $cache->flexible('count', [5, 10], fn () => 1);
+
+        $this->assertTrue($cache->has('count'));
+        $this->assertTrue($cache->has('illuminate:cache:flexible:created:count'));
+
+        $this->travel(20)->seconds();
+
+        $this->assertTrue($cache->missing('count'));
+        $this->assertFalse($cache->getFilesystem()->exists($cache->path('count')));
+        $this->assertFalse($cache->getFilesystem()->exists($cache->path('illuminate:cache:flexible:created:count')));
+        $this->assertTrue($cache->missing('illuminate:cache:flexible:created:count'));
     }
 }

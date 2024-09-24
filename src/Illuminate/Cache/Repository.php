@@ -488,13 +488,13 @@ class Repository implements ArrayAccess, CacheContract
     {
         [
             $key => $value,
-            "{$key}:created" => $created,
-        ] = $this->many([$key, "{$key}:created"]);
+            "illuminate:cache:flexible:created:{$key}" => $created,
+        ] = $this->many([$key, "illuminate:cache:flexible:created:{$key}"]);
 
-        if ($created === null) {
+        if (in_array(null, [$value, $created], true)) {
             return tap(value($callback), fn ($value) => $this->putMany([
                 $key => $value,
-                "{$key}:created" => Carbon::now()->getTimestamp(),
+                "illuminate:cache:flexible:created:{$key}" => Carbon::now()->getTimestamp(),
             ], $ttl[1]));
         }
 
@@ -504,22 +504,22 @@ class Repository implements ArrayAccess, CacheContract
 
         $refresh = function () use ($key, $ttl, $callback, $lock, $created) {
             $this->store->lock(
-                "illuminate:cache:refresh:lock:{$key}",
+                "illuminate:cache:flexible:lock:{$key}",
                 $lock['seconds'] ?? 0,
                 $lock['owner'] ?? null,
             )->get(function () use ($key, $callback, $created, $ttl) {
-                if ($created !== $this->get("{$key}:created")) {
+                if ($created !== $this->get("illuminate:cache:flexible:created:{$key}")) {
                     return;
                 }
 
                 $this->putMany([
                     $key => value($callback),
-                    "{$key}:created" => Carbon::now()->getTimestamp(),
+                    "illuminate:cache:flexible:created:{$key}" => Carbon::now()->getTimestamp(),
                 ], $ttl[1]);
             });
         };
 
-        defer($refresh, "illuminate:cache:refresh:{$key}");
+        defer($refresh, "illuminate:cache:flexible:{$key}");
 
         return $value;
     }
