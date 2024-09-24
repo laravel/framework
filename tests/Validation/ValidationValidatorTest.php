@@ -3112,6 +3112,10 @@ class ValidationValidatorTest extends TestCase
     public function testValidateDecimal()
     {
         $trans = $this->getIlluminateArrayTranslator();
+
+        $v = new Validator($trans, ['foo' => 0.000004], ['foo' => 'Decimal:6']);
+        $this->assertTrue($v->passes());
+
         $v = new Validator($trans, ['foo' => 'asdad'], ['foo' => 'Decimal:2,3']);
         $this->assertFalse($v->passes());
 
