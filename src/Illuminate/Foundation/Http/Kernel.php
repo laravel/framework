@@ -449,6 +449,69 @@ class Kernel implements KernelContract
     }
 
     /**
+     * Add the given middleware to the middleware priority list relative to other middleware.
+     *
+     * @param  string  $middleware
+     * @param  string|array   $existing
+     * @param  bool $after
+     * @return $this
+     */
+    public function addToMiddlewarePriorityRelative($middleware, $existing, $after = true)
+    {
+        if (! in_array($middleware, $this->middlewarePriority)) {
+            $index = $after ? 0 : count($this->middlewarePriority);
+
+            foreach ((array) $existing as $existingMiddleware) {
+                if (in_array($existingMiddleware, $this->middlewarePriority)) {
+                    $middlewareIndex = array_search($existingMiddleware, $this->middlewarePriority);
+
+                    if ($after && $middlewareIndex > $index) {
+                        $index = $middlewareIndex + 1;
+                    } else if ($after === false && $middlewareIndex < $index) {
+                        $index = $middlewareIndex;
+                    }
+                }
+            }
+
+            if ($index === 0 && $after === false) {
+                array_unshift($this->middlewarePriority, $middleware);
+            } else if (($after && $index === 0) || $index === count($this->middlewarePriority)) {
+                $this->middlewarePriority[] = $middleware;
+            } else {
+                array_splice($this->middlewarePriority, $index, 0, $middleware);
+            }
+        }
+
+        $this->syncMiddlewareToRouter();
+
+        return $this;
+    }
+
+    /**
+     * Add the given middleware to the middleware priority list after other middleware.
+     *
+     * @param  string  $middleware
+     * @param  string|array   $existing
+     * @return $this
+     */
+    public function addToMiddlewarePriorityAfter($middleware, $existing)
+    {
+        return $this->addToMiddlewarePriorityRelative($middleware, $existing);
+    }
+
+    /**
+     * Add the given middleware to the middleware priority list before other middleware.
+     *
+     * @param  string  $middleware
+     * @param  string|array   $existing
+     * @return $this
+     */
+    public function addToMiddlewarePriorityBefore($middleware, $existing)
+    {
+        return $this->addToMiddlewarePriorityRelative($middleware, $existing, false);
+    }
+
+    /**
      * Sync the current state of the middleware to the router.
      *
      * @return void
