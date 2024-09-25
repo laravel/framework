@@ -56,7 +56,7 @@ class EloquentPreventStrayQueriesTest extends DatabaseTestCase
         $this->expectException(\BadMethodCallException::class);
         $this->expectExceptionMessage('Call to undefined method');
 
-        $model->foo(function ($model) {
+        $model->nonExistingMethod(function ($model) {
             //
         });
     }
