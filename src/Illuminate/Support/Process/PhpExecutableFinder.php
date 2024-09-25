@@ -2,8 +2,8 @@
 
 namespace Illuminate\Support\Process;
 
-use Symfony\Component\Process\PhpExecutableFinder as SymfonyPhpExecutableFinder;
 use Symfony\Component\Process\ExecutableFinder;
+use Symfony\Component\Process\PhpExecutableFinder as SymfonyPhpExecutableFinder;
 
 class PhpExecutableFinder extends SymfonyPhpExecutableFinder
 {
