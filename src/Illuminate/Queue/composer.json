@@ -13,6 +13,12 @@
             "email": "taylor@laravel.com"
         }
     ],
+    "repositories": {
+        "laravel/serializable-closure": {
+            "type": "vcs",
+            "url": "https://github.com/Jubeki/serializable-closure"
+        }
+    },
     "require": {
         "php": "^8.2",
         "illuminate/collections": "^11.0",
