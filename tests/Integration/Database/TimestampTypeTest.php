@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Orchestra\Testbench\Attributes\RequiresDatabase;
 
 class TimestampTypeTest extends DatabaseTestCase
 {
@@ -49,12 +50,9 @@ class TimestampTypeTest extends DatabaseTestCase
         );
     }
 
+    #[RequiresDatabase(['mysql', 'mariadb'])]
     public function testChangeStringColumnToTimestampColumn()
     {
-        if (! in_array($this->driver, ['mysql', 'mariadb'])) {
-            $this->markTestSkipped('Test requires a MySQL or a MariaDB connection.');
-        }
-
         Schema::create('test', function (Blueprint $table) {
             $table->string('string_to_timestamp');
         });

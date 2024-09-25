@@ -247,6 +247,7 @@ jobs:
 
   mssql_2019:
     runs-on: ubuntu-22.04
+    timeout-minutes: 5
 
     services:
       sqlsrv:
@@ -292,52 +293,53 @@ jobs:
           DB_USERNAME: SA
           DB_PASSWORD: Forge123
 
-  # mssql_2017:
-  #   runs-on: ubuntu-22.04
+  mssql_2017:
+    runs-on: ubuntu-20.04
+    timeout-minutes: 5
 
-  #   services:
-  #     sqlsrv:
-  #       image: mcr.microsoft.com/mssql/server:2017-latest
-  #       env:
-  #         ACCEPT_EULA: Y
-  #         SA_PASSWORD: Forge123
-  #       ports:
-  #         - 1433:1433
+    services:
+      sqlsrv:
+        image: mcr.microsoft.com/mssql/server:2017-latest
+        env:
+          ACCEPT_EULA: Y
+          SA_PASSWORD: Forge123
+        ports:
+          - 1433:1433
 
-  #   strategy:
-  #     fail-fast: true
+    strategy:
+      fail-fast: true
 
-  #   name: SQL Server 2017
+    name: SQL Server 2017
 
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-  #     - name: Setup PHP
-  #       uses: shivammathur/setup-php@v2
-  #       with:
-  #         php-version: 8.2
-  #         extensions: dom, curl, libxml, mbstring, zip, pcntl, sqlsrv, pdo, pdo_sqlsrv, odbc, pdo_odbc, :php-psr
-  #         tools: composer:v2
-  #         coverage: none
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.2
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, sqlsrv, pdo, pdo_sqlsrv, odbc, pdo_odbc, :php-psr
+          tools: composer:v2
+          coverage: none
 
-  #     - name: Set Framework version
-  #       run: composer config version "11.x-dev"
+      - name: Set Framework version
+        run: composer config version "11.x-dev"
 
-  #     - name: Install dependencies
-  #       uses: nick-fields/retry@v3
-  #       with:
-  #         timeout_minutes: 5
-  #         max_attempts: 5
-  #         command: composer update --prefer-stable --prefer-dist --no-interaction --no-progress
+      - name: Install dependencies
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: composer update --prefer-stable --prefer-dist --no-interaction --no-progress
 
-  #     - name: Execute tests
-  #       run: vendor/bin/phpunit tests/Integration/Database
-  #       env:
-  #         DB_CONNECTION: sqlsrv
-  #         DB_DATABASE: master
-  #         DB_USERNAME: SA
-  #         DB_PASSWORD: Forge123
+      - name: Execute tests
+        run: vendor/bin/phpunit tests/Integration/Database
+        env:
+          DB_CONNECTION: sqlsrv
+          DB_DATABASE: master
+          DB_USERNAME: SA
+          DB_PASSWORD: Forge123
 
   sqlite:
     runs-on: ubuntu-24.04

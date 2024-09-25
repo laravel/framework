@@ -1,19 +1,20 @@
 <?php
 
-namespace Illuminate\Tests\Integration\Database;
+namespace Illuminate\Tests\Integration\Database\Sqlite;
 
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Orchestra\Testbench\Attributes\RequiresDatabase;
 use Orchestra\Testbench\TestCase;
 
+#[RequiresDatabase('sqlite')]
 class DatabaseSchemaBuilderTest extends TestCase
 {
     protected function defineEnvironment($app)
     {
         $app['config']->set([
-            'database.default' => 'testing',
             'database.connections.sqlite-with-prefix' => [
                 'driver' => 'sqlite',
                 'database' => ':memory:',

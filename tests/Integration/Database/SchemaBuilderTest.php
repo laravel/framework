@@ -7,6 +7,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Orchestra\Testbench\Attributes\RequiresDatabase;
 
 class SchemaBuilderTest extends DatabaseTestCase
 {
@@ -43,12 +44,9 @@ class SchemaBuilderTest extends DatabaseTestCase
         DB::statement('create view foo (id) as select 1');
     }
 
+    #[RequiresDatabase('sqlite')]
     public function testChangeToTinyInteger()
     {
-        if ($this->driver !== 'sqlite') {
-            $this->markTestSkipped('Test requires a SQLite connection.');
-        }
-
         Schema::create('test', function (Blueprint $table) {
             $table->string('test_column');
         });
@@ -62,12 +60,9 @@ class SchemaBuilderTest extends DatabaseTestCase
         $this->assertSame('integer', Schema::getColumnType('test', 'test_column'));
     }
 
+    #[RequiresDatabase(['mysql', 'mariadb'])]
     public function testChangeToTextColumn()
     {
-        if (! in_array($this->driver, ['mysql', 'mariadb'])) {
-            $this->markTestSkipped('Test requires a MySQL or a MariaDB connection.');
-        }
-
         Schema::create('test', function (Blueprint $table) {
             $table->integer('test_column');
         });
@@ -87,12 +82,9 @@ class SchemaBuilderTest extends DatabaseTestCase
         }
     }
 
+    #[RequiresDatabase(['mysql', 'mariadb'])]
     public function testChangeTextColumnToTextColumn()
     {
-        if (! in_array($this->driver, ['mysql', 'mariadb'])) {
-            $this->markTestSkipped('Test requires a MySQL or a MariaDB connection.');
-        }
-
         Schema::create('test', static function (Blueprint $table) {
             $table->text('test_column');
         });
@@ -112,12 +104,9 @@ class SchemaBuilderTest extends DatabaseTestCase
         }
     }
 
+    #[RequiresDatabase(['mysql', 'mariadb'])]
     public function testModifyNullableColumn()
     {
-        if (! in_array($this->driver, ['mysql', 'mariadb'])) {
-            $this->markTestSkipped('Test requires a MySQL or a MariaDB connection.');
-        }
-
         Schema::create('test', static function (Blueprint $table) {
             $table->string('not_null_column_to_not_null');
             $table->string('not_null_column_to_nullable');
@@ -195,12 +184,9 @@ class SchemaBuilderTest extends DatabaseTestCase
         $this->assertEquals(collect(Schema::getColumns('test'))->firstWhere('name', 'new_bar')['default'], $defaultBar);
     }
 
+    #[RequiresDatabase('sqlite')]
     public function testModifyColumnWithZeroDefaultOnSqlite()
     {
-        if ($this->driver !== 'sqlite') {
-            $this->markTestSkipped('Test requires a SQLite connection.');
-        }
-
         Schema::create('test', static function (Blueprint $table) {
             $table->integer('column_default_zero')->default(new Expression('0'));
             $table->integer('column_to_change');
@@ -337,12 +323,9 @@ class SchemaBuilderTest extends DatabaseTestCase
         $this->assertEmpty(array_diff(['foo', 'bar', 'baz'], array_column($views, 'name')));
     }
 
+    #[RequiresDatabase('pgsql')]
     public function testGetAndDropTypes()
     {
-        if ($this->driver !== 'pgsql') {
-            $this->markTestSkipped('Test requires a PostgreSQL connection.');
-        }
-
         DB::statement('create type pseudo_foo');
         DB::statement('create type comp_foo as (f1 int, f2 text)');
         DB::statement("create type enum_foo as enum ('new', 'open', 'closed')");
@@ -474,12 +457,9 @@ class SchemaBuilderTest extends DatabaseTestCase
         ));
     }
 
+    #[RequiresDatabase(['mysql', 'mariadb', 'pgsql'])]
     public function testGetFullTextIndexes()
     {
-        if (! in_array($this->driver, ['mysql', 'mariadb', 'pgsql'])) {
-            $this->markTestSkipped('Test requires a MySQL, a MariaDB, or a PostgreSQL connection.');
-        }
-
         Schema::create('articles', function (Blueprint $table) {
             $table->id();
             $table->string('title', 200);
@@ -591,12 +571,9 @@ class SchemaBuilderTest extends DatabaseTestCase
         ));
     }
 
+    #[RequiresDatabase('mariadb')]
     public function testSystemVersionedTables()
     {
-        if ($this->driver !== 'mariadb') {
-            $this->markTestSkipped('Test requires a MariaDB connection.');
-        }
-
         DB::statement('create table `test` (`foo` int) WITH system versioning;');
 
         $this->assertTrue(Schema::hasTable('test'));
@@ -608,12 +585,9 @@ class SchemaBuilderTest extends DatabaseTestCase
         DB::statement('create table `test` (`foo` int) WITH system versioning;');
     }
 
+    #[RequiresDatabase('sqlite')]
     public function testAddingStoredColumnOnSqlite()
     {
-        if ($this->driver !== 'sqlite') {
-            $this->markTestSkipped('Test requires a SQLite connection.');
-        }
-
         Schema::create('test', function (Blueprint $table) {
             $table->integer('price');
         });
@@ -626,12 +600,9 @@ class SchemaBuilderTest extends DatabaseTestCase
         $this->assertTrue(Schema::hasColumns('test', ['virtual_column', 'stored_column']));
     }
 
+    #[RequiresDatabase('sqlite')]
     public function testModifyingStoredColumnOnSqlite()
     {
-        if ($this->driver !== 'sqlite') {
-            $this->markTestSkipped('Test requires a SQLite connection.');
-        }
-
         Schema::create('test', function (Blueprint $table) {
             $table->integer('price');
             $table->integer('virtual_price')->virtualAs('price - 2');
@@ -672,12 +643,9 @@ class SchemaBuilderTest extends DatabaseTestCase
         ));
     }
 
+    #[RequiresDatabase('pgsql', '>=12.0')]
     public function testGettingGeneratedColumns()
     {
-        if ($this->driver === 'pgsql' && version_compare($this->getConnection()->getServerVersion(), '12.0', '<')) {
-            $this->markTestSkipped('Test requires a PostgreSQL connection >= 12.0');
-        }
-
         Schema::create('test', function (Blueprint $table) {
             $table->integer('price');
 
@@ -722,12 +690,9 @@ class SchemaBuilderTest extends DatabaseTestCase
         ));
     }
 
+    #[RequiresDatabase('sqlite')]
     public function testAddForeignKeysOnSqlite()
     {
-        if ($this->driver !== 'sqlite') {
-            $this->markTestSkipped('Test requires a SQLite connection.');
-        }
-
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name');
@@ -752,12 +717,9 @@ class SchemaBuilderTest extends DatabaseTestCase
         $this->assertTrue(Schema::hasIndex('posts', ['title'], 'unique'));
     }
 
+    #[RequiresDatabase('sqlite')]
     public function testDropForeignKeysOnSqlite()
     {
-        if ($this->driver !== 'sqlite') {
-            $this->markTestSkipped('Test requires a SQLite connection.');
-        }
-
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name');
@@ -794,12 +756,9 @@ class SchemaBuilderTest extends DatabaseTestCase
         $this->assertFalse(Schema::hasIndex('posts', ['user_id']));
     }
 
+    #[RequiresDatabase('sqlite')]
     public function testAddAndDropPrimaryOnSqlite()
     {
-        if ($this->driver !== 'sqlite') {
-            $this->markTestSkipped('Test requires a SQLite connection.');
-        }
-
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name');
@@ -840,12 +799,9 @@ class SchemaBuilderTest extends DatabaseTestCase
         $this->assertTrue(Schema::hasIndex('posts', ['user_name'], 'unique'));
     }
 
+    #[RequiresDatabase('sqlite')]
     public function testSetJournalModeOnSqlite()
     {
-        if ($this->driver !== 'sqlite') {
-            $this->markTestSkipped('Test requires a SQLite connection.');
-        }
-
         file_put_contents(DB::connection('sqlite')->getConfig('database'), '');
 
         $this->assertSame('delete', DB::connection('sqlite')->select('PRAGMA journal_mode')[0]->journal_mode);
