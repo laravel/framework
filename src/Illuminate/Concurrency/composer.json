@@ -25,7 +25,7 @@
         "illuminate/contracts": "^11.0",
         "illuminate/process": "^11.0",
         "illuminate/support": "^11.0",
-        "laravel/serializable-closure": "dev-php84 as 1.999"
+        "laravel/serializable-closure": "dev-php84.x as 1.999"
     },
     "autoload": {
         "psr-4": {

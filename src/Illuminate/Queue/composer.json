@@ -29,7 +29,7 @@
         "illuminate/filesystem": "^11.0",
         "illuminate/pipeline": "^11.0",
         "illuminate/support": "^11.0",
-        "laravel/serializable-closure": "dev-php84 as 1.999",
+        "laravel/serializable-closure": "dev-php84.x as 1.999",
         "ramsey/uuid": "^4.7",
         "symfony/process": "^7.1.3"
     },

@@ -38,7 +38,7 @@
         "guzzlehttp/guzzle": "^7.8.2",
         "guzzlehttp/uri-template": "^1.0",
         "laravel/prompts": "^0.1.18|^0.2.0",
-        "laravel/serializable-closure": "dev-php84 as 1.999",
+        "laravel/serializable-closure": "dev-php84.x as 1.999",
         "league/commonmark": "^2.2.1",
         "league/flysystem": "^3.25.1",
         "monolog/monolog": "^3.0",
