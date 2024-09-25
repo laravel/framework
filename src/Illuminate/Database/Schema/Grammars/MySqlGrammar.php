@@ -1104,6 +1104,17 @@ class MySqlGrammar extends Grammar
     }
 
     /**
+     * Create the column definition for a vector type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    protected function typeVector(Fluent $column)
+    {
+        return "vector($column->dimensions)";
+    }
+
+    /**
      * Get the SQL for a generated virtual column modifier.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
