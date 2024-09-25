@@ -1047,17 +1047,6 @@ class SQLiteGrammar extends Grammar
     }
 
     /**
-     * Create the column definition for a vector type.
-     *
-     * @param  \Illuminate\Support\Fluent  $column
-     * @return string
-     */
-    protected function typeVector(Fluent $column)
-    {
-        throw new RuntimeException('This database driver does not support vector columns.');
-    }
-
-    /**
      * Get the SQL for a generated virtual column modifier.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
