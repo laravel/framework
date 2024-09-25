@@ -52,6 +52,20 @@ abstract class ServiceProvider
     public static $publishGroups = [];
 
     /**
+     * Commands that should be run during the optimize command.
+     *
+     * @var array<string, string>
+     */
+    public static array $optimizingCommands = [];
+
+    /**
+     * Commands that should be run during the optimize:clear command.
+     *
+     * @var array<string, string>
+     */
+    public static array $optimizeClearingCommands = [];
+
+    /**
      * The migration paths available for publishing.
      *
      * @var array
@@ -536,5 +550,16 @@ return [
         file_put_contents($path, $content.PHP_EOL);
 
         return true;
+    }
+
+    protected function registerOptimizeCommands(string $key, string $optimize = null, string $optimizeClear = null): void
+    {
+        if ($optimize) {
+            static::$optimizingCommands[$key] = $optimize;
+        }
+
+        if ($optimizeClear) {
+            static::$optimizeClearingCommands[$key] = $optimizeClear;
+        }
     }
 }
