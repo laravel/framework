@@ -5,7 +5,6 @@ namespace Illuminate\Tests\Integration\Database;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\StrayQueryException;
-use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
 
 class EloquentPreventStrayQueriesTest extends DatabaseTestCase
