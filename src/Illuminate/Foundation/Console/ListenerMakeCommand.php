@@ -2,15 +2,15 @@
 
 namespace Illuminate\Foundation\Console;
 
+use function Laravel\Prompts\suggest;
 use Illuminate\Console\Concerns\CreatesMatchingTest;
 use Illuminate\Console\GeneratorCommand;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
 
-use function Laravel\Prompts\suggest;
+use Symfony\Component\Console\Output\OutputInterface;
 
 #[AsCommand(name: 'make:listener')]
 class ListenerMakeCommand extends GeneratorCommand
@@ -104,7 +104,7 @@ class ListenerMakeCommand extends GeneratorCommand
      */
     protected function alreadyExists($rawName)
     {
-        return class_exists($rawName);
+        return class_exists($this->qualifyClass($rawName));
     }
 
     /**
