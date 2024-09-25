@@ -31,7 +31,7 @@ class VendorPublishCommand extends Command
     /**
      * The provider to publish.
      *
-     * @var string
+     * @var string|null
      */
     protected $provider = null;
 
