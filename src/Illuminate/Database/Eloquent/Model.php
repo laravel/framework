@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Database\StrayQueryException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Str;
@@ -172,6 +173,13 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * @var bool
      */
     protected static $modelsShouldPreventLazyLoading = false;
+
+    /**
+     * Indicates whether models should allow forwarding to a new query.
+     *
+     * @var bool
+     */
+    protected static $modelsShouldPreventStrayQueries = false;
 
     /**
      * The callback that is responsible for handling lazy loading violations.
@@ -451,6 +459,17 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     public static function handleLazyLoadingViolationUsing(?callable $callback)
     {
         static::$lazyLoadingViolationCallback = $callback;
+    }
+
+    /**
+     * Prevent model relationships from being lazy loaded.
+     *
+     * @param  bool  $value
+     * @return void
+     */
+    public static function preventStrayQueries($value = true)
+    {
+        static::$modelsShouldPreventStrayQueries = $value;
     }
 
     /**
@@ -2209,6 +2228,16 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
+     * Determine if stray queries are being prevented.
+     *
+     * @return bool
+     */
+    public static function preventsStrayQueries()
+    {
+        return static::$modelsShouldPreventStrayQueries;
+    }
+
+    /**
      * Determine if discarding guarded attribute fills is disabled.
      *
      * @return bool
@@ -2364,7 +2393,11 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             return $this->through($relationMethod);
         }
 
-        return $this->forwardCallTo($this->newQuery(), $method, $parameters);
+        return tap($this->forwardCallTo($this->newQuery(), $method, $parameters), function () {
+            if ($this->exists && Model::preventsStrayQueries()) {
+                throw new StrayQueryException($this);
+            }
+        });
     }
 
     /**
