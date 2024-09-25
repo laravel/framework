@@ -90,17 +90,13 @@ class TrustProxies
      */
     protected function setTrustedProxyIpAddressesToSpecificIps(Request $request, array $trustedIps)
     {
-        $trustedIps = array_reduce($trustedIps, function ($ips, $trustedIp) use ($request) {
-            if ('REMOTE_ADDR' !== $trustedIp) {
-                $ips[] = $trustedIp;
-            } elseif ($request->server->get($trustedIp)) {
-                $ips[] = $request->server->get($trustedIp);
-            }
+        $request->setTrustedProxies(array_reduce($trustedIps, function ($ips, $trustedIp) use ($request) {
+            $ips[] = $trustedIp === 'REMOTE_ADDR'
+                ? $request->server->get('REMOTE_ADDR')
+                : $trustedIp;
 
             return $ips;
-        }, []);
-
-        $request->setTrustedProxies($trustedIps, $this->getTrustedHeaderNames());
+        }, []), $this->getTrustedHeaderNames());
     }
 
     /**
