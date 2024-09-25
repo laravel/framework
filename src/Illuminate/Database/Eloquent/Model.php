@@ -175,7 +175,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     protected static $modelsShouldPreventLazyLoading = false;
 
     /**
-     * Indicates whether models should allow forwarding to a new query.
+     * Indicates if calls to be forwarded to new queries on an existing model should be prevented.
      *
      * @var bool
      */
@@ -462,7 +462,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
-     * Prevent model relationships from being lazy loaded.
+     * Prevent calls to be forwarded to new queries on an existing model.
      *
      * @param  bool  $value
      * @return void
