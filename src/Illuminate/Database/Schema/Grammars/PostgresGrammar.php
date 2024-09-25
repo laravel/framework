@@ -5,7 +5,6 @@ namespace Illuminate\Database\Schema\Grammars;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Database\Schema\Builder;
 use Illuminate\Support\Fluent;
 use LogicException;
 
@@ -1062,9 +1061,7 @@ class PostgresGrammar extends Grammar
      */
     protected function typeVector(Fluent $column)
     {
-        $dimension = $column->dimension ? $column->dimension : Builder::$defaultVectorDimension;
-
-        return "vector($dimension)";
+        return "vector($column->dimensions)";
     }
 
     /**

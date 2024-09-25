@@ -42,13 +42,6 @@ class Builder
     public static $defaultStringLength = 255;
 
     /**
-     * The default vector dimensions for migrations.
-     *
-     * @var int|null
-     */
-    public static $defaultVectorDimension = 384;
-
-    /**
      * The default relationship morph key type.
      *
      * @var string

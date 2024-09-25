@@ -1456,14 +1456,12 @@ class Blueprint
      * Create a new vector column on the table.
      *
      * @param  string  $column
-     * @param  int|null  $dimension
-     * @return ColumnDefinition
+     * @param  int  $dimensions
+     * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function vector($column, $dimension = null)
+    public function vector($column, $dimensions)
     {
-        $dimension = $dimension ?: Builder::$defaultVectorDimension;
-
-        return $this->addColumn('vector', $column, compact('dimension'));
+        return $this->addColumn('vector', $column, compact('dimensions'));
     }
 
     /**

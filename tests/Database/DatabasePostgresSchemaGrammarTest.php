@@ -45,7 +45,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
     public function testAddingVector()
     {
         $blueprint = new Blueprint('embeddings');
-        $blueprint->vector('embedding');
+        $blueprint->vector('embedding', 384);
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
