@@ -20,6 +20,13 @@ class EloquentPreventStrayQueriesTest extends DatabaseTestCase
         Model::preventStrayQueries();
     }
 
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        Model::preventStrayQueries(false);
+    }
+
     protected function afterRefreshingDatabase()
     {
         Schema::create('stray_queries_test_model', function (Blueprint $table) {
