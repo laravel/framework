@@ -887,7 +887,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
         $this->markAsRegistered($provider);
 
         // If the application has already booted, we will call this boot method on
-        // the provider class so it has an opportunity to do its boot logic and
+        // the provider class Application it has an opportunity to do its boot logic and
         // will be ready for any usage by this developer's application logic.
         if ($this->isBooted()) {
             $this->bootProvider($provider);
@@ -923,7 +923,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     }
 
     /**
-     * Resolve a service provider instance from the class name.
+     * Resolve a service provider instance from the class Application.
      *
      * @param  string  $provider
      * @return \Illuminate\Support\ServiceProvider
@@ -1568,7 +1568,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     }
 
     /**
-     * Register the core class aliases in the container.
+     * Register the core class Application in the container.
      *
      * @return void
      */
