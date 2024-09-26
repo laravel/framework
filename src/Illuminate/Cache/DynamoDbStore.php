@@ -439,6 +439,15 @@ class DynamoDbStore implements LockProvider, Store
             'TableName' => $this->table,
             'Key' => [
                 $this->keyAttribute => [
+                    'S' => "{$this->prefix}illuminate:cache:flexible:created:{$key}",
+                ],
+            ],
+        ]);
+
+        $this->dynamo->deleteItem([
+            'TableName' => $this->table,
+            'Key' => [
+                $this->keyAttribute => [
                     'S' => $this->prefix.$key,
                 ],
             ],

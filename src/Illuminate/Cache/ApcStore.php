@@ -101,6 +101,8 @@ class ApcStore extends TaggableStore
      */
     public function forget($key)
     {
+        $this->apc->delete("{$this->prefix}illuminate:cache:flexible:created:{$key}");
+
         return $this->apc->delete($this->prefix.$key);
     }
 

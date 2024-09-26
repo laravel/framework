@@ -235,6 +235,8 @@ class RedisStore extends TaggableStore implements LockProvider
      */
     public function forget($key)
     {
+        $this->connection()->del("{$this->prefix}illuminate:cache:flexible:created:{$key}");
+
         return (bool) $this->connection()->del($this->prefix.$key);
     }
 
