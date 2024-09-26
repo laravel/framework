@@ -10,6 +10,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Bus\PendingChain;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Queue;
@@ -792,7 +793,7 @@ class JobChainPayloadTest implements ShouldQueue
 
     public function handle()
     {
-        $this->chainPayload(array_merge($this->chainPayload, [$this->addChainPayload]));
+        $this->chainPayload(array_merge(Arr::wrap($this->chainPayload), Arr::wrap($this->addChainPayload)));
 
         static::$chainPayloads[] = $this->chainPayload;
     }

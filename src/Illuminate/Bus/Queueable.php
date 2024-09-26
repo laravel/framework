@@ -74,12 +74,12 @@ trait Queueable
      */
     public $chainCatchCallbacks;
 
-    /*
+    /**
      * The payload of the chain.
      *
-     * @var array
+     * @var mixed
      */
-    public $chainPayload = [];
+    public $chainPayload;
 
     /**
      * Set the desired connection for the job.
@@ -317,12 +317,12 @@ trait Queueable
     /**
      *  Set the chain payload.
      *
-     * @param  array  $payload
+     * @param  mixed  $chainPayload
      * @return $this
      */
-    public function chainPayload($payload)
+    public function chainPayload($chainPayload)
     {
-        $this->chainPayload = $payload;
+        $this->chainPayload = $chainPayload;
 
         return $this;
     }
