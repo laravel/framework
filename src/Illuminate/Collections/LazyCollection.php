@@ -622,7 +622,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     /**
      * Concatenate values of a given key as a string.
      *
-     * @param  callable|string  $value
+     * @param  (callable(TValue, TKey): mixed)|string  $value
      * @param  string|null  $glue
      * @return string
      */
