@@ -522,7 +522,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      *
      * @param  (callable(TValue, TKey): TGroupKey)|array|string  $groupBy
      * @param  bool  $preserveKeys
-     * @return static<TGroupKey, static<($preserveKeys is true ? TKey : int), TValue>>
+     * @return static<($groupBy is string ? array-key : ($groupBy is array ? array-key : TGroupKey)), static<($preserveKeys is true ? TKey : int), TValue>>
      */
     public function groupBy($groupBy, $preserveKeys = false);
 
@@ -532,7 +532,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * @template TNewKey of array-key
      *
      * @param  (callable(TValue, TKey): TNewKey)|array|string  $keyBy
-     * @return static<TNewKey, TValue>
+     * @return static<($keyBy is string ? array-key : ($keyBy is array ? array-key : TNewKey)), TValue>
      */
     public function keyBy($keyBy);
 
