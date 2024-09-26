@@ -74,6 +74,13 @@ trait Queueable
      */
     public $chainCatchCallbacks;
 
+    /*
+     * The payload of the chain.
+     *
+     * @var array
+     */
+    public $chainPayload = [];
+
     /**
      * Set the desired connection for the job.
      *
@@ -289,6 +296,7 @@ trait Queueable
                 $next->chainConnection = $this->chainConnection;
                 $next->chainQueue = $this->chainQueue;
                 $next->chainCatchCallbacks = $this->chainCatchCallbacks;
+                $next->chainPayload = $this->chainPayload;
             }));
         }
     }
@@ -304,6 +312,19 @@ trait Queueable
         collect($this->chainCatchCallbacks)->each(function ($callback) use ($e) {
             $callback($e);
         });
+    }
+
+    /**
+     *  Set the chain payload.
+     *
+     * @param  array  $payload
+     * @return $this
+     */
+    public function chainPayload($payload)
+    {
+        $this->chainPayload = $payload;
+
+        return $this;
     }
 
     /**

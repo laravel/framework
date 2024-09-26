@@ -544,6 +544,19 @@ class JobChainingTest extends QueueTestCase
         $this->assertFalse(JobChainingTestFirstJob::$ran);
         $this->assertFalse(JobChainingTestSecondJob::$ran);
     }
+
+    public function testChainPayloadIsProperlyPassedThrough()
+    {
+        Bus::dispatchChain([
+            new JobChainPayloadTest('foo'),
+            new JobChainPayloadTest('bar'),
+        ]);
+
+        $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
+
+        $this->assertSame(JobChainPayloadTest::$chainPayloads[0], ['foo']);
+        $this->assertSame(JobChainPayloadTest::$chainPayloads[1], ['foo', 'bar']);
+    }
 }
 
 class JobChainingTestFirstJob implements ShouldQueue
@@ -763,5 +776,24 @@ class JobRunRecorder
     {
         self::$results = [];
         self::$failures = [];
+    }
+}
+
+class JobChainPayloadTest implements ShouldQueue
+{
+    use Dispatchable, Queueable;
+
+    public static $chainPayloads = [];
+
+    public function __construct(
+        public $addChainPayload
+    ) {
+    }
+
+    public function handle()
+    {
+        $this->chainPayload(array_merge($this->chainPayload, [$this->addChainPayload]));
+
+        static::$chainPayloads[] = $this->chainPayload;
     }
 }
