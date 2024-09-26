@@ -5,6 +5,7 @@ namespace Illuminate\Validation\Concerns;
 use Brick\Math\BigDecimal;
 use Brick\Math\BigNumber;
 use Brick\Math\Exception\MathException as BrickMathException;
+use Brick\Math\Exception\NumberFormatException;
 use DateTime;
 use DateTimeInterface;
 use DateTimeZone;
@@ -634,9 +635,15 @@ trait ValidatesAttributes
             return false;
         }
 
+        try {
+            $value_str = sprintf('%s', BigDecimal::of($value)->stripTrailingZeros());
+        } catch (NumberFormatException) {
+            return false;
+        }
+
         $matches = [];
 
-        if (preg_match('/^[+-]?\d*\.?(\d*)$/', $value, $matches) !== 1) {
+        if (preg_match('/^[+-]?\d*\.?(\d*)$/', $value_str, $matches) !== 1) {
             return false;
         }
 

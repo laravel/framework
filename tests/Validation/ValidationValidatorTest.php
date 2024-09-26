@@ -3266,7 +3266,7 @@ class ValidationValidatorTest extends TestCase
             'decimal' => 'Decimal:0,3',
             'scientific' => 'Decimal:0,3',
         ]);
-        $this->assertSame(['scientific'], $v->errors()->keys());
+        $this->assertSame([], $v->errors()->keys());
 
         $v = new Validator($trans, ['foo' => '+'], ['foo' => 'Decimal:0,2']);
         $this->assertTrue($v->fails());
