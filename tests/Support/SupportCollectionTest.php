@@ -3843,6 +3843,151 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testBeforeWhereReturnsItemBeforeTheGivenItemAndMeetsGivenCallback($collection)
+    {
+        $c = new $collection([1, 2, 3, 4, 2, 5, 'name' => 'taylor', 6, 'framework' => 'laravel', 7]);
+
+        $this->assertEquals(1, $c->beforeWhere(2, function($value) {
+            return $value > 0;
+        }));
+        $this->assertEquals(2, $c->beforeWhere(3, function($value) {
+            return $value < 3;
+        }));
+        $this->assertEquals(2, $c->beforeWhere(3, function($value) {
+            return $value === 2;
+        }));
+        $this->assertEquals(1, $c->beforeWhere(3, function($value) {
+            return $value > 0 && $value < 2;
+        }));
+        $this->assertEquals('taylor', $c->beforeWhere(6, function($value) {
+            return is_string($value);
+        }));
+        $this->assertEquals('taylor', $c->beforeWhere('laravel', function($value) {
+            return is_string($value);
+        }));
+        $this->assertEquals('taylor', $c->beforeWhere(7, function($value) {
+            return is_string($value) && strlen($value) < 7;
+        }));
+        $this->assertEquals(2, $c->beforeWhere(
+            function($value) {
+                return $value > 2 && $value < 5;
+            },
+            function($value) {
+                return $value > 0;
+            }
+        ));
+        $this->assertEquals(2, $c->beforeWhere(
+            function($value) {
+                return is_string($value);
+            },
+            function($value) {
+                return $value < 3;
+            }
+        ));
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testBeforeWhereInStrictMode($collection)
+    {
+        $c = new $collection([false, 0, 1, [], '']);
+
+        $this->assertNull($c->beforeWhere('false', function($value) {
+            return $value > 1;
+        }, true));
+        $this->assertNull($c->beforeWhere('1', function($value) {
+            return $value === 0;
+        }, true));
+        $this->assertEquals(false, $c->beforeWhere(0, function($value) {
+            return !$value;
+        }, true));
+        $this->assertEquals(0, $c->beforeWhere(1, function($value) {
+            return $value === 0;
+        }, true));
+        $this->assertEquals(1, $c->beforeWhere([], function($value) {
+            return $value > 0;
+        }, true));
+        $this->assertEquals([], $c->beforeWhere('', function($value) {
+            return is_array($value);
+        }, true));
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testBeforeWhereReturnsNullWhenItemIsNotFound($collection)
+    {
+        $c = new $collection([1, 2, 3, 4, 5, 'foo' => 'bar', 6]);
+
+        $this->assertNull($c->beforeWhere('foo', function($value) {
+            return $value > 6;
+        }));
+        $this->assertNull($c->beforeWhere(5, function($value) {
+            return $value < 0;
+        }));
+        $this->assertNull($c->beforeWhere(4, function($value) {
+            return $value === 0;
+        }));
+        $this->assertNull($c->beforeWhere('foo', function($value) {
+            return is_string($value);
+        }));
+        $this->assertNull($c->beforeWhere(6, function($value) {
+            return is_string($value) && strlen($value) > 3;
+        }));
+        $this->assertNull($c->beforeWhere(
+            function($value) {
+                return is_numeric($value) && $value > 6;
+            },
+            function($value) {
+                return $value < 3;
+            }
+        ));
+        $this->assertNull($c->beforeWhere(
+            function($value) {
+                return is_string($value) && strlen($value) > 3;
+            },
+            function($value) {
+                return $value < 3;
+            }
+        ));
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testBeforeWhereReturnsNullWhenItemOnTheFirstitem($collection)
+    {
+        $c = new $collection([1, 2, 3, 4, 5, 'foo' => 'bar']);
+
+        $this->assertNull($c->beforeWhere(1, function($value) {
+            return $value > 0;
+        }));
+        $this->assertNull($c->beforeWhere(1, function($value) {
+            return is_string($value);
+        }));
+        $this->assertNull($c->beforeWhere(
+            function($value) {
+                return $value > 0;
+            },
+            function($value) {
+                return $value < 3;
+            }
+        ));
+
+        $c = new $collection(['foo' => 'bar', 1, 2, 3, 4, 5]);
+
+        $this->assertNull($c->beforeWhere('bar', function($value) {
+            return $value > 0;
+        }));
+        $this->assertNull($c->beforeWhere('bar', function($value) {
+            return is_string($value);
+        }));
+        $this->assertNull($c->beforeWhere(
+            function($value) {
+                return is_string($value);
+            },
+            function($value) {
+                return $value < 3;
+            }
+        ));
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testAfterReturnsItemAfterTheGivenItem($collection)
     {
         $c = new $collection([1, 2, 3, 4, 2, 5, 'name' => 'taylor', 'framework' => 'laravel']);
@@ -3903,6 +4048,140 @@ class SupportCollectionTest extends TestCase
         $c = new $collection(['foo' => 'bar', 1, 2, 3, 4, 5]);
         $this->assertNull($c->after(5));
     }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testAfterWhereReturnsItemAfterTheGivenItemAndMeetsGivenCallback($collection)
+    {
+        $c = new $collection([1, 2, 3, 4, 2, 5, 'name' => 'taylor', 'framework' => 'laravel']);
+
+        $this->assertEquals(2, $c->afterWhere(1, function($value) {
+            return $value > 1;
+        }));
+        $this->assertEquals(3, $c->afterWhere(2, function($value) {
+            return $value < 4;
+        }));
+        $this->assertEquals(3, $c->afterWhere(1, function($value) {
+            return $value === 3;
+        }));
+        $this->assertEquals(3, $c->afterWhere(1, function($value) {
+            return $value > 2;
+        }));
+        $this->assertEquals('taylor', $c->afterWhere(1, function($value) {
+            return is_string($value);
+        }));
+        $this->assertEquals('taylor', $c->afterWhere(1, function($value) {
+            return $value === 'taylor';
+        }));
+        $this->assertEquals('laravel', $c->afterWhere('taylor', function($value) {
+            return is_string($value);
+        }));
+        $this->assertEquals('laravel', $c->afterWhere(1, function($value) {
+            return is_string($value) && strlen($value) > 6;
+        }));
+        $this->assertEquals(3, $c->afterWhere(
+            function($value) {
+                return $value > 1;
+            },
+            function($value) {
+                return $value > 1;
+            }
+        ));
+        $this->assertEquals('laravel', $c->afterWhere(
+            function($value) {
+                return is_string($value) && strlen($value) === 6;
+            },
+            function($value) {
+                return is_string($value);
+            }
+        ));
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testAfterWhereInStrictMode($collection)
+    {
+        $c = new $collection([false, 0, 1, [], '']);
+
+        $this->assertNull($c->afterWhere('false', function($value) {
+            return $value === 0;
+        }, true));
+        $this->assertNull($c->afterWhere('1', function($value) {
+            return is_array($value);
+        }, true));
+        $this->assertNull($c->afterWhere('', function($value) {
+            return $value > 0;
+        }, true));
+        $this->assertEquals(0, $c->afterWhere(false, function($value) {
+            return is_numeric($value);
+        } ,true));
+        $this->assertEquals([], $c->afterWhere(1, function($value) {
+            return is_array($value);
+        } ,true));
+        $this->assertEquals('', $c->afterWhere([], function($value) {
+            return is_string($value);
+        } ,true));
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testAfterWhereReturnsNullWhenItemIsNotFound($collection)
+    {
+        $c = new $collection([1, 2, 3, 4, 5, 'foo' => 'bar']);
+
+        $this->assertNull($c->afterWhere(6, function($value) {
+            return $value > 0;
+        }));
+        $this->assertNull($c->afterWhere(1, function($value) {
+            return is_numeric($value) && $value > 5;
+        }));
+        $this->assertNull($c->afterWhere('foo', function($value) {
+            return $value > 0;
+        }));
+        $this->assertNull($c->afterWhere(1, function($value) {
+            return is_string($value) && strlen($value) > 3;
+        }));
+        $this->assertNull($c->afterWhere(
+            function($value) {
+                return $value > 5;
+            },
+            function($value) {
+                return is_string($value);
+            }
+        ));
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testAfterWhereReturnsNullWhenItemOnTheLastItem($collection)
+    {
+        $c = new $collection([1, 2, 3, 4, 5, 'foo' => 'bar']);
+
+        $this->assertNull($c->afterWhere('bar', function($value) {
+            return $value > 0;
+        }));
+        $this->assertNull($c->afterWhere(
+            function($value) {
+                return is_string($value);
+            },
+            function($value) {
+                return is_string($value);
+            }
+        ));
+        $this->assertNull($c->afterWhere('bar', function($value) {
+            return $value > 0;
+        }));
+
+        $c = new $collection(['foo' => 'bar', 1, 2, 3, 4, 5]);
+        $this->assertNull($c->afterWhere(5, function($value) {
+            return is_string($value);
+        }));
+        $this->assertNull($c->afterWhere(
+            function($value) {
+                return $value === 5;
+            },
+            function($value) {
+                return is_string($value);
+            }
+        ));
+    }
+
 
     #[DataProvider('collectionClassProvider')]
     public function testKeys($collection)

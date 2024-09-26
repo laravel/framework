@@ -1145,6 +1145,36 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     }
 
     /**
+     * Get the item before the given item and meets the provided callback.
+     *
+     * @param  TValue|(callable(TValue,TKey): bool)  $value
+     * @param  (callable(TValue,TKey): bool)  $callable
+     * @param  bool  $strict
+     * @return TValue|null
+     */
+    public function beforeWhere($value, callable $callback, $strict = false)
+    {
+        $previous = null;
+
+        /** @var (callable(TValue,TKey): bool) $predicate */
+        $predicate = $this->useAsCallable($value)
+            ? $value
+            : function ($item) use ($value, $strict) {
+                return $strict ? $item === $value : $item == $value;
+            };
+
+        foreach ($this as $key => $item) {
+            if ($predicate($item, $key)) {
+                return $previous;
+            }
+
+            $previous = $callback($item) ? $item : $previous;
+        }
+
+        return null;
+    }
+
+    /**
      * Get the item after the given item.
      *
      * @param  TValue|(callable(TValue,TKey): bool)  $value
@@ -1168,6 +1198,38 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
             }
 
             if ($predicate($item, $key)) {
+                $found = true;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Get the item after the given item and meets the provided callback.
+     *
+     * @param  TValue|(callable(TValue,TKey): bool)  $value
+     * @param  (callable(TValue,TKey): bool)  $callable
+     * @param  bool  $strict
+     * @return TValue|null
+     */
+    public function afterWhere($value, callable $callback, $strict = false)
+    {
+        $found = false;
+
+        /** @var (callable(TValue,TKey): bool) $predicate */
+        $predicate = $this->useAsCallable($value)
+            ? $value
+            : function ($item) use ($value, $strict) {
+                return $strict ? $item === $value : $item == $value;
+            };
+
+        foreach ($this as $key => $item) {
+            if ($found && $callback($item)) {
+                return $item;
+            }
+
+            if (! $found && $predicate($item, $key)) {
                 $found = true;
             }
         }

@@ -1186,6 +1186,31 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Get the item before the given item and meets the provided callback.
+     *
+     * @param  TValue|(callable(TValue,TKey): bool)  $value
+     * @param  (callable(TValue,TKey): bool)  $callable
+     * @param  bool  $strict
+     * @return TValue|null
+     */
+    public function beforeWhere($value, callable $callback, $strict = false)
+    {
+        $key = $this->search($value, $strict);
+
+        if ($key === false) {
+            return null;
+        }
+
+        $position = $this->keys()->search($key);
+
+        if ($position === 0) {
+            return null;
+        }
+
+        return $this->slice(0, $position)->reverse()->first($callback);
+    }
+
+    /**
      * Get the item after the given item.
      *
      * @param  TValue|(callable(TValue,TKey): bool)  $value
@@ -1207,6 +1232,31 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
         }
 
         return $this->get($keys->get($position + 1));
+    }
+
+    /**
+     * Get the item after the given item and meets the provided callback.
+     *
+     * @param  TValue|(callable(TValue,TKey): bool)  $value
+     * @param  (callable(TValue,TKey): bool)  $callable
+     * @param  bool  $strict
+     * @return TValue|null
+     */
+    public function afterWhere($value, callable $callback, $strict = false)
+    {
+        $key = $this->search($value, $strict);
+
+        if ($key === false) {
+            return null;
+        }
+
+        $position = ($keys = $this->keys())->search($key);
+
+        if ($position === $keys->count() - 1) {
+            return null;
+        }
+
+        return $this->slice($position + 1)->first($callback);
     }
 
     /**
