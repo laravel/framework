@@ -903,6 +903,16 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public function before($value, $strict = false);
 
     /**
+     * Get the item before the given item and meets the provided callback.
+     *
+     * @param  TValue|(callable(TValue,TKey): bool)  $value
+     * @param  (callable(TValue,TKey): bool)  $callable
+     * @param  bool  $strict
+     * @return TValue|null
+     */
+    public function beforeWhere($value, callable $callback, $strict = false);
+
+    /**
      * Get the item after the given item.
      *
      * @param  TValue|(callable(TValue,TKey): bool)  $value
@@ -910,6 +920,16 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * @return TValue|null
      */
     public function after($value, $strict = false);
+
+    /**
+     * Get the item after the given item and meets the provided callback.
+     *
+     * @param  TValue|(callable(TValue,TKey): bool)  $value
+     * @param  (callable(TValue,TKey): bool)  $callable
+     * @param  bool  $strict
+     * @return TValue|null
+     */
+    public function afterWhere($value, callable $callback, $strict = false);
 
     /**
      * Shuffle the items in the collection.
