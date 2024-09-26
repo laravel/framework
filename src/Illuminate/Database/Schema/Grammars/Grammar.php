@@ -239,6 +239,8 @@ abstract class Grammar extends BaseGrammar
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
+     *
+     * @throws \RuntimeException
      */
     protected function typeVector(Fluent $column)
     {
