@@ -1148,7 +1148,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
      * Get the item before the given item passing the given truth test.
      *
      * @param  TValue|(callable(TValue,TKey): bool)  $value
-     * @param  (callable(TValue,TKey): bool)  $callable
+     * @param  (callable(TValue,TKey): bool)  $callback
      * @param  bool  $strict
      * @return TValue|null
      */
@@ -1209,7 +1209,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
      * Get the item after the given item passing the given truth test.
      *
      * @param  TValue|(callable(TValue,TKey): bool)  $value
-     * @param  (callable(TValue,TKey): bool)  $callable
+     * @param  (callable(TValue,TKey): bool)  $callback
      * @param  bool  $strict
      * @return TValue|null
      */
