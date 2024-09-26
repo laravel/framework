@@ -13,8 +13,8 @@ services:
   mysql:
     image: mysql/mysql-server:5.7
     environment:
-      MYSQL_ALLOW_EMPTY_PASSWORD: 1
-      MYSQL_ROOT_PASSWORD: ""
+      MYSQL_ALLOW_EMPTY_PASSWORD: 0 
+      MYSQL_ROOT_PASSWORD: ""  # Set a secure root password.
       MYSQL_DATABASE: "forge"
       MYSQL_ROOT_HOST: "%"
     ports:
@@ -23,7 +23,7 @@ services:
   # postgres:
   #   image: postgres:15
   #   environment:
-  #     POSTGRES_PASSWORD: "secret"
+  #     POSTGRES_PASSWORD: "ChangeThisToSomethingDifferent!"
   #     POSTGRES_DB: "forge"
   #   ports:
   #     - "5432:5432"
@@ -31,8 +31,8 @@ services:
   # mariadb:
   #   image: mariadb:11
   #   environment:
-  #     MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: "yes"
-  #     MARIADB_ROOT_PASSWORD: ""
+  #     MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: "no" 
+  #     MARIADB_ROOT_PASSWORD: "ChangeThisToSomethingDifferent!"  # Set a secure root password.
   #     MARIADB_DATABASE: "forge"
   #     MARIADB_ROOT_HOST: "%"
   #   ports:
