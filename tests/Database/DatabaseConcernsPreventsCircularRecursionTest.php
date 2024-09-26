@@ -180,8 +180,8 @@ class DatabaseConcernsPreventsCircularRecursionTest extends TestCase
 
         // Model toArray method implementation
         $toArray = $mock->withoutRecursion(
-            fn() => array_merge($mock->attributesToArray(), $mock->relationsToArray()),
-            fn() => $mock->attributesToArray(),
+            fn () => array_merge($mock->attributesToArray(), $mock->relationsToArray()),
+            fn () => $mock->attributesToArray(),
         );
         $this->assertEquals([], $toArray);
     }
