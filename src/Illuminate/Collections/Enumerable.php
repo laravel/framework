@@ -903,7 +903,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public function before($value, $strict = false);
 
     /**
-     * Get the item before the given item and meets the provided callback.
+     * Get the item before the given item passing the given truth test.
      *
      * @param  TValue|(callable(TValue,TKey): bool)  $value
      * @param  (callable(TValue,TKey): bool)  $callable
@@ -922,7 +922,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public function after($value, $strict = false);
 
     /**
-     * Get the item after the given item and meets the provided callback.
+     * Get the item after the given item passing the given truth test.
      *
      * @param  TValue|(callable(TValue,TKey): bool)  $value
      * @param  (callable(TValue,TKey): bool)  $callable
