@@ -67,6 +67,10 @@ class BcryptHasher extends AbstractHasher implements HasherContract
      */
     public function check(#[\SensitiveParameter] $value, $hashedValue, array $options = [])
     {
+        if (is_null($hashedValue) || strlen($hashedValue) === 0) {
+            return false;
+        }
+
         if ($this->verifyAlgorithm && ! $this->isUsingCorrectAlgorithm($hashedValue)) {
             throw new RuntimeException('This password does not use the Bcrypt algorithm.');
         }

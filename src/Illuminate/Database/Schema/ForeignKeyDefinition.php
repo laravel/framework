@@ -35,6 +35,16 @@ class ForeignKeyDefinition extends Fluent
     }
 
     /**
+     * Indicate that updates should set the foreign key value to null.
+     *
+     * @return $this
+     */
+    public function nullOnUpdate()
+    {
+        return $this->onUpdate('set null');
+    }
+
+    /**
      * Indicate that updates should have "no action".
      *
      * @return $this

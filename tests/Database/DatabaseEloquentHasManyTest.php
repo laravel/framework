@@ -257,7 +257,21 @@ class DatabaseEloquentHasManyTest extends TestCase
     {
         $relation = $this->getRelation();
 
-        $relation->getQuery()->shouldReceive('upsert')->with(
+        $relation->getQuery()->shouldReceive('upsert')->once()->with(
+            [
+                ['email' => 'foo3', 'name' => 'bar', $relation->getForeignKeyName() => $relation->getParentKey()],
+            ],
+            ['email'],
+            ['name']
+        );
+
+        $relation->upsert(
+            ['email' => 'foo3', 'name' => 'bar'],
+            ['email'],
+            ['name']
+        );
+
+        $relation->getQuery()->shouldReceive('upsert')->once()->with(
             [
                 ['email' => 'foo3', 'name' => 'bar', $relation->getForeignKeyName() => $relation->getParentKey()],
                 ['name' => 'bar2', 'email' => 'foo2', $relation->getForeignKeyName() => $relation->getParentKey()],

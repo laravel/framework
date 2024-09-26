@@ -2,11 +2,14 @@
 
 namespace Illuminate\Tests\Routing;
 
+use Attribute;
 use Closure;
 use DateTime;
 use Exception;
 use Illuminate\Auth\Middleware\Authenticate;
 use Illuminate\Auth\Middleware\Authorize;
+use Illuminate\Config\Repository;
+use Illuminate\Container\Attributes\Config;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Routing\Registrar;
 use Illuminate\Contracts\Support\Responsable;
@@ -1105,6 +1108,48 @@ class RoutingRouteTest extends TestCase
         }]);
         $router->model('bar', RouteModelInterface::class);
         $this->assertSame('TAYLOR', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
+    }
+
+    public function testRouteDependenciesCanBeResolvedThroughAttributes()
+    {
+        $container = new Container;
+        $container->singleton('config', fn () => new Repository([
+            'app' => [
+                'timezone' => 'Europe/Paris',
+            ],
+        ]));
+        $router = new Router(new Dispatcher, $container);
+        $container->instance(Registrar::class, $router);
+        $container->bind(CallableDispatcherContract::class, fn ($app) => new CallableDispatcher($app));
+        $router->get('foo', [
+            'middleware' => SubstituteBindings::class,
+            'uses' => function (#[Config('app.timezone')] string $value) {
+                return $value;
+            },
+        ]);
+
+        $this->assertSame('Europe/Paris', $router->dispatch(Request::create('foo', 'GET'))->getContent());
+    }
+
+    public function testAfterResolvingAttributeCallbackIsCalledOnRouteDependenciesResolution()
+    {
+        $container = new Container();
+        $router = new Router(new Dispatcher, $container);
+        $container->instance(Registrar::class, $router);
+        $container->bind(CallableDispatcherContract::class, fn ($app) => new CallableDispatcher($app));
+
+        $container->afterResolvingAttribute(RoutingTestOnTenant::class, function (RoutingTestOnTenant $attribute, RoutingTestHasTenantImpl $hasTenantImpl, Container $container) {
+            $hasTenantImpl->onTenant($attribute->tenant);
+        });
+
+        $router->get('foo', [
+            'middleware' => SubstituteBindings::class,
+            'uses' => function (#[RoutingTestOnTenant(RoutingTestTenant::TenantA)] RoutingTestHasTenantImpl $property) {
+                return $property->tenant->name;
+            },
+        ]);
+
+        $this->assertSame('TenantA', $router->dispatch(Request::create('foo', 'GET'))->getContent());
     }
 
     public function testGroupMerging()
@@ -2637,5 +2682,30 @@ class ExampleMiddleware implements ExampleMiddlewareContract
     public function handle($request, Closure $next)
     {
         return $next($request);
+    }
+}
+
+#[Attribute(Attribute::TARGET_PARAMETER)]
+final class RoutingTestOnTenant
+{
+    public function __construct(
+        public readonly RoutingTestTenant $tenant
+    ) {
+    }
+}
+
+enum RoutingTestTenant
+{
+    case TenantA;
+    case TenantB;
+}
+
+final class RoutingTestHasTenantImpl
+{
+    public ?RoutingTestTenant $tenant = null;
+
+    public function onTenant(RoutingTestTenant $tenant): void
+    {
+        $this->tenant = $tenant;
     }
 }

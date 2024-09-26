@@ -145,23 +145,28 @@ class MySqlSchemaState extends SchemaState
      * @param  \Symfony\Component\Process\Process  $process
      * @param  callable  $output
      * @param  array  $variables
+     * @param  int  $depth
      * @return \Symfony\Component\Process\Process
      */
-    protected function executeDumpProcess(Process $process, $output, array $variables)
+    protected function executeDumpProcess(Process $process, $output, array $variables, int $depth = 0)
     {
+        if ($depth > 30) {
+            throw new Exception('Dump execution exceeded maximum depth of 30.');
+        }
+
         try {
             $process->setTimeout(null)->mustRun($output, $variables);
         } catch (Exception $e) {
             if (Str::contains($e->getMessage(), ['column-statistics', 'column_statistics'])) {
                 return $this->executeDumpProcess(Process::fromShellCommandLine(
                     str_replace(' --column-statistics=0', '', $process->getCommandLine())
-                ), $output, $variables);
+                ), $output, $variables, $depth + 1);
             }
 
             if (str_contains($e->getMessage(), 'set-gtid-purged')) {
                 return $this->executeDumpProcess(Process::fromShellCommandLine(
                     str_replace(' --set-gtid-purged=OFF', '', $process->getCommandLine())
-                ), $output, $variables);
+                ), $output, $variables, $depth + 1);
             }
 
             throw $e;

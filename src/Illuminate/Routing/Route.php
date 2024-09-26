@@ -2,6 +2,7 @@
 
 namespace Illuminate\Routing;
 
+use BackedEnum;
 use Closure;
 use Illuminate\Container\Container;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -17,6 +18,7 @@ use Illuminate\Routing\Matching\UriValidator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
+use InvalidArgumentException;
 use Laravel\SerializableClosure\SerializableClosure;
 use LogicException;
 use Symfony\Component\Routing\Route as SymfonyRoute;
@@ -752,13 +754,19 @@ class Route
     /**
      * Get or set the domain for the route.
      *
-     * @param  string|null  $domain
+     * @param  \BackedEnum|string|null  $domain
      * @return $this|string|null
+     *
+     * @throws \InvalidArgumentException
      */
     public function domain($domain = null)
     {
         if (is_null($domain)) {
             return $this->getDomain();
+        }
+
+        if ($domain instanceof BackedEnum && ! is_string($domain = $domain->value)) {
+            throw new InvalidArgumentException('Enum must be string backed.');
         }
 
         $parsed = RouteUri::parse($domain);
@@ -796,7 +804,7 @@ class Route
     /**
      * Add a prefix to the route URI.
      *
-     * @param  string  $prefix
+     * @param  string|null  $prefix
      * @return $this
      */
     public function prefix($prefix)
@@ -874,11 +882,17 @@ class Route
     /**
      * Add or change the route name.
      *
-     * @param  string  $name
+     * @param  \BackedEnum|string  $name
      * @return $this
+     *
+     * @throws \InvalidArgumentException
      */
     public function name($name)
     {
+        if ($name instanceof BackedEnum && ! is_string($name = $name->value)) {
+            throw new InvalidArgumentException('Enum must be string backed.');
+        }
+
         $this->action['as'] = isset($this->action['as']) ? $this->action['as'].$name : $name;
 
         return $this;
@@ -1067,12 +1081,14 @@ class Route
     /**
      * Specify that the "Authorize" / "can" middleware should be applied to the route with the given options.
      *
-     * @param  string  $ability
+     * @param  \BackedEnum|string  $ability
      * @param  array|string  $models
      * @return $this
      */
     public function can($ability, $models = [])
     {
+        $ability = $ability instanceof BackedEnum ? $ability->value : $ability;
+
         return empty($models)
                     ? $this->middleware(['can:'.$ability])
                     : $this->middleware(['can:'.$ability.','.implode(',', Arr::wrap($models))]);

@@ -276,6 +276,10 @@ trait ConditionallyLoadsAttributes
             return;
         }
 
+        if ($value === null) {
+            $value = value(...);
+        }
+
         return value($value, $loadedValue);
     }
 
@@ -307,6 +311,10 @@ trait ConditionallyLoadsAttributes
             return;
         }
 
+        if ($value === null) {
+            $value = value(...);
+        }
+
         return value($value, $this->resource->{$attribute});
     }
 
@@ -333,6 +341,41 @@ trait ConditionallyLoadsAttributes
         }
 
         if (func_num_args() === 3) {
+            return $this->resource->{$attribute};
+        }
+
+        if ($this->resource->{$attribute} === null) {
+            return;
+        }
+
+        if ($value === null) {
+            $value = value(...);
+        }
+
+        return value($value, $this->resource->{$attribute});
+    }
+
+    /**
+     * Retrieve a relationship existence check if it exists.
+     *
+     * @param  string  $relationship
+     * @param  mixed  $value
+     * @param  mixed  $default
+     * @return \Illuminate\Http\Resources\MissingValue|mixed
+     */
+    public function whenExistsLoaded($relationship, $value = null, $default = null)
+    {
+        if (func_num_args() < 3) {
+            $default = new MissingValue;
+        }
+
+        $attribute = (string) Str::of($relationship)->snake()->finish('_exists');
+
+        if (! array_key_exists($attribute, $this->resource->getAttributes())) {
+            return value($default);
+        }
+
+        if (func_num_args() === 1) {
             return $this->resource->{$attribute};
         }
 

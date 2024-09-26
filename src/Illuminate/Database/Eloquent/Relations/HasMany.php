@@ -19,11 +19,18 @@ class HasMany extends HasOneOrMany
      */
     public function one()
     {
-        return HasOne::noConstraints(fn () => new HasOne(
-            $this->getQuery(),
-            $this->parent,
-            $this->foreignKey,
-            $this->localKey
+        return HasOne::noConstraints(fn () => tap(
+            new HasOne(
+                $this->getQuery(),
+                $this->parent,
+                $this->foreignKey,
+                $this->localKey
+            ),
+            function ($hasOne) {
+                if ($inverse = $this->getInverseRelationship()) {
+                    $hasOne->inverse($inverse);
+                }
+            }
         ));
     }
 

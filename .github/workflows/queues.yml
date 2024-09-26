@@ -73,10 +73,13 @@ jobs:
           max_attempts: 5
           command: composer update --prefer-stable --prefer-dist --no-interaction --no-progress
 
+      - name: Setup SQLite Database
+        run: php vendor/bin/testbench package:create-sqlite-db
+
       - name: Execute tests
         run: vendor/bin/phpunit tests/Integration/Queue
         env:
-          DB_CONNECTION: testing
+          DB_CONNECTION: sqlite
           QUEUE_CONNECTION: database
 
   redis:

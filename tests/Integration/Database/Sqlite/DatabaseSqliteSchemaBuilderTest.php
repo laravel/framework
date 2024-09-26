@@ -6,16 +6,14 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
+use Orchestra\Testbench\Attributes\RequiresDatabase;
 
+#[RequiresDatabase('sqlite')]
 class DatabaseSqliteSchemaBuilderTest extends DatabaseTestCase
 {
     protected function defineEnvironment($app)
     {
         parent::defineEnvironment($app);
-
-        if ($this->driver !== 'sqlite') {
-            $this->markTestSkipped('Test requires a Sqlite connection.');
-        }
 
         $app['config']->set('database.default', 'conn1');
 

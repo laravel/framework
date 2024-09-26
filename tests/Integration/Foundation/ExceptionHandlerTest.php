@@ -5,6 +5,8 @@ namespace Illuminate\Tests\Integration\Foundation;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Contracts\Debug\ShouldntReport;
+use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Route;
 use Orchestra\Testbench\TestCase;
@@ -40,6 +42,31 @@ class ExceptionHandlerTest extends TestCase
             ->assertExactJson([
                 'message' => 'expected message',
             ]);
+    }
+
+    public function testItDoesntReportExceptionsWithShouldntReportInterface()
+    {
+        Config::set('app.debug', true);
+        $reported = [];
+        $this->app[ExceptionHandler::class]->reportable(function (Throwable $e) use (&$reported) {
+            $reported[] = $e;
+        });
+
+        $exception = new class extends \Exception implements ShouldntReport, Responsable
+        {
+            public function toResponse($request)
+            {
+                return response('shouldnt report', 500);
+            }
+        };
+
+        Route::get('test-route', fn () => throw $exception);
+
+        $this->getJson('test-route')
+            ->assertStatus(500)
+            ->assertSee('shouldnt report');
+
+        $this->assertEquals([], $reported);
     }
 
     public function testItRendersAuthorizationExceptionsWithCustomStatusCode()

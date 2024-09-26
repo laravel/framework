@@ -2,6 +2,7 @@
 
 namespace Illuminate\Console\Scheduling;
 
+use Illuminate\Console\Application;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\ProcessUtils;
@@ -40,11 +41,7 @@ class ScheduleWorkCommand extends Command
 
         [$lastExecutionStartedAt, $executions] = [Carbon::now()->subMinutes(10), []];
 
-        $command = implode(' ', array_map(fn ($arg) => ProcessUtils::escapeArgument($arg), [
-            PHP_BINARY,
-            defined('ARTISAN_BINARY') ? ARTISAN_BINARY : 'artisan',
-            'schedule:run',
-        ]));
+        $command = Application::formatCommandString('schedule:run');
 
         if ($this->option('run-output-file')) {
             $command .= ' >> '.ProcessUtils::escapeArgument($this->option('run-output-file')).' 2>&1';

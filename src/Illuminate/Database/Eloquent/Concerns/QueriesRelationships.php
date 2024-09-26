@@ -466,7 +466,7 @@ trait QueriesRelationships
         }
 
         if (is_null($model)) {
-            return $this->whereNull($relation->getMorphType(), $boolean);
+            return $this->whereNull($relation->qualifyColumn($relation->getMorphType()), $boolean);
         }
 
         if (is_string($model)) {
@@ -476,12 +476,12 @@ trait QueriesRelationships
                 $model = array_search($model, $morphMap, true);
             }
 
-            return $this->where($relation->getMorphType(), $model, null, $boolean);
+            return $this->where($relation->qualifyColumn($relation->getMorphType()), $model, null, $boolean);
         }
 
         return $this->where(function ($query) use ($relation, $model) {
-            $query->where($relation->getMorphType(), $model->getMorphClass())
-                ->where($relation->getForeignKeyName(), $model->getKey());
+            $query->where($relation->qualifyColumn($relation->getMorphType()), $model->getMorphClass())
+                ->where($relation->qualifyColumn($relation->getForeignKeyName()), $model->getKey());
         }, null, null, $boolean);
     }
 
@@ -505,12 +505,12 @@ trait QueriesRelationships
                 $model = array_search($model, $morphMap, true);
             }
 
-            return $this->whereNot($relation->getMorphType(), '<=>', $model, $boolean);
+            return $this->whereNot($relation->qualifyColumn($relation->getMorphType()), '<=>', $model, $boolean);
         }
 
         return $this->whereNot(function ($query) use ($relation, $model) {
-            $query->where($relation->getMorphType(), '<=>', $model->getMorphClass())
-                ->where($relation->getForeignKeyName(), '<=>', $model->getKey());
+            $query->where($relation->qualifyColumn($relation->getMorphType()), '<=>', $model->getMorphClass())
+                ->where($relation->qualifyColumn($relation->getForeignKeyName()), '<=>', $model->getKey());
         }, null, null, $boolean);
     }
 

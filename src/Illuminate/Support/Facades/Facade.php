@@ -190,7 +190,7 @@ abstract class Facade
      *
      * @return bool
      */
-    protected static function isFake()
+    public static function isFake()
     {
         $name = static::getFacadeAccessor();
 
@@ -278,6 +278,7 @@ abstract class Facade
             'Broadcast' => Broadcast::class,
             'Bus' => Bus::class,
             'Cache' => Cache::class,
+            'Concurrency' => Concurrency::class,
             'Config' => Config::class,
             'Context' => Context::class,
             'Cookie' => Cookie::class,

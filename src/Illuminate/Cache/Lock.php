@@ -112,14 +112,18 @@ abstract class Lock implements LockContract
      */
     public function block($seconds, $callback = null)
     {
-        $starting = $this->currentTime();
+        $starting = ((int) now()->format('Uu')) / 1000;
+
+        $milliseconds = $seconds * 1000;
 
         while (! $this->acquire()) {
-            Sleep::usleep($this->sleepMilliseconds * 1000);
+            $now = ((int) now()->format('Uu')) / 1000;
 
-            if ($this->currentTime() - $seconds >= $starting) {
+            if (($now + $this->sleepMilliseconds - $milliseconds) >= $starting) {
                 throw new LockTimeoutException;
             }
+
+            Sleep::usleep($this->sleepMilliseconds * 1000);
         }
 
         if (is_callable($callback)) {

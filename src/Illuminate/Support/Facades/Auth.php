@@ -59,7 +59,7 @@ use RuntimeException;
  * @method static \Illuminate\Auth\SessionGuard forgetUser()
  * @method static \Illuminate\Contracts\Auth\UserProvider getProvider()
  * @method static void setProvider(\Illuminate\Contracts\Auth\UserProvider $provider)
- * @method static void macro(string $name, object|callable $macro, object|callable $macro = null)
+ * @method static void macro(string $name, object|callable $macro)
  * @method static void mixin(object $mixin, bool $replace = true)
  * @method static bool hasMacro(string $name)
  * @method static void flushMacros()

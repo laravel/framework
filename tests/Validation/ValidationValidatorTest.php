@@ -988,6 +988,22 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame('name should be of length 9', $v->messages()->first('name'));
     }
 
+    public function testCustomValidationIsAppendedToMessages()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $validator = new Validator($trans,
+            ['foo' => true],
+            ['foo' => function (string $attribute, mixed $value, \Closure $fail) {
+                $fail(':attribute must be false');
+            },
+            ], ['foo' => ['required' => 'Foo is required']]);
+
+        $this->assertFalse($validator->passes());
+        $this->assertEquals($validator->errors()->messages(), [
+            'foo' => ['foo must be false'],
+        ]);
+    }
+
     public function testInlineValidationMessagesAreRespectedWithAsterisks()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -2107,6 +2123,12 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['password' => '1e2', 'password_confirmation' => '100'], ['password' => 'Confirmed']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['password' => 'foo', 'passwordConfirmation' => 'foo'], ['password' => 'Confirmed:passwordConfirmation']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['password' => 'foo', 'passwordConfirmation' => 'bar'], ['password' => 'Confirmed:passwordConfirmation']);
         $this->assertFalse($v->passes());
     }
 
@@ -4937,6 +4959,14 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['x' => $uploadedFile], ['x' => 'dimensions:ratio=1']);
         $this->assertTrue($v->fails());
 
+        // for min_ratio
+        $v = new Validator($trans, ['x' => $uploadedFile], ['x' => 'dimensions:min_ratio=1/2']);
+        $this->assertTrue($v->fails());
+
+        // for max_ratio
+        $v = new Validator($trans, ['x' => $uploadedFile], ['x' => 'dimensions:max_ratio=2/5']);
+        $this->assertTrue($v->passes());
+
         // Knowing that demo image2.png has width = 4 and height = 2
         $uploadedFile = new UploadedFile(__DIR__.'/fixtures/image2.png', '', null, null, true);
         $trans = $this->getIlluminateArrayTranslator();
@@ -4992,6 +5022,14 @@ class ValidationValidatorTest extends TestCase
 
         // Ensure validation doesn't erroneously fail when ratio doesn't matches
         $v = new Validator($trans, ['x' => $uploadedFile], ['x' => 'dimensions:ratio=1']);
+        $this->assertFalse($v->passes());
+
+        // evaluates to (64 / 65) > (1 / 1.0) which is true/fails
+        $v = new Validator($trans, ['x' => $uploadedFile], ['x' => 'dimensions:min_ratio=1']);
+        $this->assertFalse($v->fails());
+
+        // evaluates to (64 / 65) < (1 / 1.0) which is false/passes
+        $v = new Validator($trans, ['x' => $uploadedFile], ['x' => 'dimensions:max_ratio=1']);
         $this->assertFalse($v->passes());
 
         // Knowing that demo image5.png has width = 1366 and height = 768
@@ -8917,6 +8955,15 @@ class ValidationValidatorTest extends TestCase
         $validator->excludeUnvalidatedArrayKeys = true;
         $this->assertTrue($validator->passes());
         $this->assertSame(['users' => [1, 2, 3]], $validator->validated());
+
+        $validator = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['users' => [['name' => 'Mohamed', 'location' => 'cairo']]],
+            ['users' => 'list', 'users.*.name' => 'string']
+        );
+        $validator->excludeUnvalidatedArrayKeys = true;
+        $this->assertTrue($validator->passes());
+        $this->assertSame(['users' => [['name' => 'Mohamed']]], $validator->validated());
     }
 
     public function testExcludeUnless()

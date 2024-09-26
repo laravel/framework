@@ -400,6 +400,21 @@ if (! function_exists('decrypt')) {
     }
 }
 
+if (! function_exists('defer')) {
+    /**
+     * Defer execution of the given callback.
+     *
+     * @param  callable|null  $callback
+     * @param  string|null  $name
+     * @param  bool  $always
+     * @return \Illuminate\Support\Defer\DeferredCallback
+     */
+    function defer(?callable $callback = null, ?string $name = null, bool $always = false)
+    {
+        return \Illuminate\Support\defer($callback, $name, $always);
+    }
+}
+
 if (! function_exists('dispatch')) {
     /**
      * Dispatch a job to its appropriate handler.
@@ -829,7 +844,7 @@ if (! function_exists('route')) {
     /**
      * Generate the URL to a named route.
      *
-     * @param  string  $name
+     * @param  \BackedEnum|string  $name
      * @param  mixed  $parameters
      * @param  bool  $absolute
      * @return string
@@ -908,7 +923,7 @@ if (! function_exists('to_route')) {
     /**
      * Create a new redirect response to a named route.
      *
-     * @param  string  $route
+     * @param  \BackedEnum|string  $route
      * @param  mixed  $parameters
      * @param  int  $status
      * @param  array  $headers
