@@ -10,6 +10,7 @@ use Illuminate\Support\Traits\Conditionable;
 class Exceptions
 {
     use Conditionable;
+
     /**
      * Create a new exception handling configuration instance.
      *
