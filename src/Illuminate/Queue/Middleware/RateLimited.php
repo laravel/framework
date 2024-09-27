@@ -35,7 +35,7 @@ class RateLimited
     /**
      * Create a new middleware instance.
      *
-     * @param  BackedEnum|UnitEnum|string  $limiterName
+     * @param  \BackedEnum|\UnitEnum|string  $limiterName
      * @return void
      */
     public function __construct($limiterName)
