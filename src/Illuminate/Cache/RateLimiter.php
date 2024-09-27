@@ -256,9 +256,9 @@ class RateLimiter
     }
 
     /**
-     * Resolve the rate limiter name
+     * Resolve the rate limiter name.
      *
-     * @param  \BackedEnum|\UnitEnum|string $name
+     * @param  \BackedEnum|\UnitEnum|string  $name
      * @return string
      */
     private function resolveLimiterName($name): string
