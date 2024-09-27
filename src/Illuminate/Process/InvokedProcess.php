@@ -53,9 +53,8 @@ class InvokedProcess implements InvokedProcessContract
     /**
      * Stop the process if it is still running.
      *
-     * @param float $timeout
-     * @param int|null $signal
-     *
+     * @param  float  $timeout
+     * @param  int|null  $signal
      * @return int|null
      */
     public function stop(float $timeout = 10, ?int $signal = null)

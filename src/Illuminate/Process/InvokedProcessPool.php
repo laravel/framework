@@ -36,11 +36,10 @@ class InvokedProcessPool implements Countable
     }
 
     /**
-     * Stop all processes that are still running
+     * Stop all processes that are still running.
      *
-     * @param float $timeout
-     * @param int|null  $signal
-     *
+     * @param  float  $timeout
+     * @param  int|null  $signal
      * @return \Illuminate\Support\Collection
      */
     public function stop(float $timeout = 10, ?int $signal = null)
