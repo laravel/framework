@@ -636,25 +636,18 @@ trait ValidatesAttributes
         }
 
         try {
-            $value_str = sprintf('%s', BigDecimal::of($value)->stripTrailingZeros());
-        } catch (NumberFormatException) {
+            $big_decimal =BigDecimal::of($value)->stripTrailingZeros();
+        } catch (Exception) {
             return false;
         }
 
-        $matches = [];
-
-        if (preg_match('/^[+-]?\d*\.?(\d*)$/', $value_str, $matches) !== 1) {
-            return false;
-        }
-
-        $decimals = strlen(end($matches));
-
+        $decimals = $big_decimal->getScale();
         if (! isset($parameters[1])) {
             return $decimals == $parameters[0];
         }
 
         return $decimals >= $parameters[0] &&
-               $decimals <= $parameters[1];
+            $decimals <= $parameters[1];
     }
 
     /**
