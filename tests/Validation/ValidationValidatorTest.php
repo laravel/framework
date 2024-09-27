@@ -3248,6 +3248,9 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['foo' => '1.88888888888888888888'], ['foo' => 'Decimal:20|Max:1.88888888888888888888']);
         $this->assertTrue($v->passes());
 
+        $v = new Validator($trans, ['foo' => '10.9e-10000000000'], ['foo' => 'Decimal:6']);
+        $this->assertFalse($v->passes());
+
         $v = new Validator($trans, [
             // these are the same number
             'decimal' => '0.555',

@@ -5,7 +5,6 @@ namespace Illuminate\Validation\Concerns;
 use Brick\Math\BigDecimal;
 use Brick\Math\BigNumber;
 use Brick\Math\Exception\MathException as BrickMathException;
-use Brick\Math\Exception\NumberFormatException;
 use DateTime;
 use DateTimeInterface;
 use DateTimeZone;
@@ -636,7 +635,7 @@ trait ValidatesAttributes
         }
 
         try {
-            $big_decimal =BigDecimal::of($value)->stripTrailingZeros();
+            $big_decimal = BigDecimal::of($value)->stripTrailingZeros();
         } catch (Exception) {
             return false;
         }
