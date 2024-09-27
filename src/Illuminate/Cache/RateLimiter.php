@@ -40,7 +40,7 @@ class RateLimiter
     /**
      * Register a named limiter configuration.
      *
-     * @param  BackedEnum|UnitEnum|string  $name
+     * @param  \BackedEnum|\UnitEnum|string  $name
      * @param  \Closure  $callback
      * @return $this
      */
@@ -56,7 +56,7 @@ class RateLimiter
     /**
      * Get the given named rate limiter.
      *
-     * @param  BackedEnum|UnitEnum|string  $name
+     * @param  \BackedEnum|\UnitEnum|string  $name
      * @return \Closure|null
      */
     public function limiter($name)
@@ -258,7 +258,7 @@ class RateLimiter
     /**
      * Resolve the rate limiter name
      *
-     * @param BackedEnum|UnitEnum|string $name
+     * @param  \BackedEnum|\UnitEnum|string $name
      * @return string
      */
     private function resolveLimiterName($name): string
