@@ -59,7 +59,7 @@ class BcryptHasher extends AbstractHasher implements HasherContract
      * Check the given plain value against a hash.
      *
      * @param  string  $value
-     * @param  string  $hashedValue
+     * @param  string|null  $hashedValue
      * @param  array  $options
      * @return bool
      *
