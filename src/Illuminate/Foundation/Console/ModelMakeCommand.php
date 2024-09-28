@@ -56,6 +56,7 @@ class ModelMakeCommand extends GeneratorCommand
             $this->input->setOption('controller', true);
             $this->input->setOption('policy', true);
             $this->input->setOption('resource', true);
+            $this->input->setOption('requests', true);
         }
 
         if ($this->option('factory')) {
@@ -76,6 +77,10 @@ class ModelMakeCommand extends GeneratorCommand
 
         if ($this->option('policy')) {
             $this->createPolicy();
+        }
+
+        if ($this->option('requests')) {
+            $this->createRequest();
         }
     }
 
@@ -142,7 +147,6 @@ class ModelMakeCommand extends GeneratorCommand
             'name' => "{$controller}Controller",
             '--model' => $this->option('resource') || $this->option('api') ? $modelName : null,
             '--api' => $this->option('api'),
-            '--requests' => $this->option('requests') || $this->option('all'),
             '--test' => $this->option('test'),
             '--pest' => $this->option('pest'),
         ]));
@@ -160,6 +164,28 @@ class ModelMakeCommand extends GeneratorCommand
         $this->call('make:policy', [
             'name' => "{$policy}Policy",
             '--model' => $this->qualifyClass($this->getNameInput()),
+        ]);
+    }
+
+    /**
+     * Create request files for the model.
+     *
+     * @return void
+     */
+    protected function createRequest()
+    {
+        $request = Str::studly(class_basename($this->argument('name')));
+
+        $storeRequestClass = "Store{$request}Request";
+
+        $this->call('make:request', [
+            'name' => $storeRequestClass,
+        ]);
+
+        $updateRequestClass = "Update{$request}Request";
+
+        $this->call('make:request', [
+            'name' => $updateRequestClass,
         ]);
     }
 

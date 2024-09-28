@@ -179,4 +179,37 @@ class ModelMakeCommandTest extends TestCase
         $this->assertFilenameNotExists('database/seeders/FooSeeder.php');
         $this->assertFilenameExists('tests/Feature/Models/FooTest.php');
     }
+
+    public function testItCanGenerateModelFileWithRequestOption()
+    {
+        $this->artisan('make:model', ['name' => 'Foo', '--requests' => true])
+            ->assertExitCode(0);
+
+        $this->assertFileContains([
+            'namespace App\Models;',
+            'use Illuminate\Database\Eloquent\Model;',
+            'class Foo extends Model',
+        ], 'app/Models/Foo.php');
+
+        $this->assertFilenameExists('app/Http/Requests/StoreFooRequest.php');
+
+        $this->assertFilenameExists('app/Http/Requests/UpdateFooRequest.php');
+
+        $this->assertFileContains([
+            'namespace App\Http\Requests;',
+            'use Illuminate\Foundation\Http\FormRequest;',
+            'class StoreFooRequest extends FormRequest',
+        ], 'app/Http/Requests/StoreFooRequest.php');
+
+        $this->assertFileContains([
+            'namespace App\Http\Requests;',
+            'use Illuminate\Foundation\Http\FormRequest;',
+            'class UpdateFooRequest extends FormRequest',
+        ], 'app/Http/Requests/UpdateFooRequest.php');
+
+        $this->assertFilenameNotExists('app/Http/Controllers/FooController.php');
+        $this->assertFilenameNotExists('database/factories/FooFactory.php');
+        $this->assertFilenameNotExists('database/seeders/FooSeeder.php');
+        $this->assertFilenameNotExists('tests/Feature/Models/FooTest.php');
+    }
 }
