@@ -563,6 +563,56 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add a Model join clause to the query.
+     *
+     * @param \Illuminate\Database\Eloquent\Model|string $table
+     * @param \Closure|\Illuminate\Contracts\Database\Query\Expression|string $first
+     * @param string|null $operator
+     * @param \Illuminate\Contracts\Database\Query\Expression|string|null $second
+     * @param string $type
+     * @param bool $where
+     * @return $this
+     */
+    public function joinModel($model, $first, $operator = null, $second = null, $type = 'inner', $where = false)
+    {
+        // If the model is a string, resolve it
+        if (is_string($model) && class_exists($model)) {
+            $model = app($model);
+        }
+
+        // If the model is not a model class
+        if (!($model instanceof Model)) {
+            throw new InvalidArgumentException(
+                'The model must be an instance of Illuminate\Database\Eloquent\Model or a string representing the model class.'
+            );
+        }
+
+        $table = $model->getTable();
+
+        // Create a new query for the related model
+        $relatedQuery = $model->newQuery();
+
+        // Apply global scopes
+        foreach ($model->getGlobalScopes() as $identifier => $scope) {
+            $scope->apply($relatedQuery, $model);
+        }
+
+
+        // Get the base conditions from the related query
+        $wheres = $relatedQuery->getQuery()->wheres;
+        $bindings = $relatedQuery->getQuery()->getBindings();
+
+        // Perform the actual join
+        $join = $where ? 'joinWhere' : 'join';
+        $this->$join($table, $first, $operator, $second, $type);
+
+        // Apply the conditions from the related query to the main query
+        $this->mergeWheres($wheres, $bindings);
+
+        return $this;
+    }
+
+    /**
      * Add a "join where" clause to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $table
