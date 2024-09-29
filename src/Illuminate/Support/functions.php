@@ -6,7 +6,7 @@ use Illuminate\Support\Defer\DeferredCallback;
 use Illuminate\Support\Defer\DeferredCallbackCollection;
 use Illuminate\Support\Process\PhpExecutableFinder;
 
-if (! function_exists('defer')) {
+if (! function_exists('Illuminate\Support\defer')) {
     /**
      * Defer execution of the given callback.
      *
@@ -28,7 +28,7 @@ if (! function_exists('defer')) {
     }
 }
 
-if (! function_exists('php_binary')) {
+if (! function_exists('Illuminate\Support\php_binary')) {
     /**
      * Determine the PHP Binary.
      *
