@@ -721,6 +721,23 @@ class SupportStringableTest extends TestCase
         $this->assertFalse($this->stringable('taylor otwell')->containsAll(['taylor', 'xxx']));
     }
 
+    public function testMissing()
+    {
+        $this->assertFalse($this->stringable('Hello World')->missing('world', true));
+        $this->assertTrue($this->stringable('Hello World')->missing('world', false));
+        $this->assertFalse($this->stringable('Hello World')->missing(['xxx', 'world'], true));
+        $this->assertFalse($this->stringable('Hello World')->missing(['xxx', 'World'], false));
+        $this->assertFalse($this->stringable('Hello World')->missing(collect(['xxx', 'world']), true));
+        $this->assertFalse($this->stringable('Hello World')->missing(collect(['xxx', 'World']), false));
+        $this->assertTrue($this->stringable('Hello World')->missing('xxx', true));
+        $this->assertTrue($this->stringable('Hello World')->missing(['xxx'], true));
+        $this->assertFalse($this->stringable('Hello World')->missing('',  true));
+        $this->assertFalse($this->stringable('Hello World')->missing('',  false));
+        $this->assertFalse($this->stringable('Hello World')->missing(['world', ''],  false));
+        $this->assertFalse($this->stringable('Hello World')->missing(['world', ''], true));
+        $this->assertFalse($this->stringable('')->missing('', false));
+    }
+
     public function testParseCallback()
     {
         $this->assertEquals(['Class', 'method'], $this->stringable('Class@method')->parseCallback('foo'));

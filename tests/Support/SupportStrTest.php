@@ -377,6 +377,12 @@ class SupportStrTest extends TestCase
         $this->assertEquals($expected, Str::containsAll($haystack, $needles, $ignoreCase));
     }
 
+    #[DataProvider('strMissingProvider')]
+    public function testMissing($haystack, $needles, $expected, $ignoreCase = false)
+    {
+        $this->assertEquals($expected, Str::missing($haystack, $needles, $ignoreCase));
+    }
+
     public function testConvertCase()
     {
         // Upper Case Conversion
@@ -1282,6 +1288,25 @@ class SupportStrTest extends TestCase
             ['Taylor Otwell', ['taylor'], true, true],
             ['Taylor Otwell', ['taylor', 'xxx'], false, false],
             ['Taylor Otwell', ['taylor', 'xxx'], false, true],
+        ];
+    }
+    public static function strMissingProvider()
+    {
+        return [
+            ['Hello World', 'world', false, true],
+            ['Hello World', 'world', true, false],
+            ['Hello World', ['xxx', 'world'], false, true],
+            ['Hello World', ['xxx', 'World'], false, false],
+            ['Hello World', collect(['xxx', 'world']), false, true],
+            ['Hello World', collect(['xxx', 'World']), false, false],
+            ['Hello World', 'xxx', true, true],
+            ['Hello World', ['xxx'], true, true],
+            ['Hello World', '', false, true],
+            ['Hello World', '', false, false],
+            ['Hello World', ['world', ''], false, false],
+            ['Hello World', ['world', ''], false, true],
+            ['', '',  false, false],
+            ['', '',  false],
         ];
     }
 

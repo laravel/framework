@@ -1991,4 +1991,34 @@ class Str
         static::$camelCache = [];
         static::$studlyCache = [];
     }
+
+    /**
+     * Determine if a given string is missing a given substring.
+     *
+     * @param  string  $haystack
+     * @param  string|iterable<string>  $needles
+     * @return bool
+     */
+    public static function missing($haystack, $needles, $ignoreCase = false)
+    {
+        if ($ignoreCase) {
+            $haystack = mb_strtolower($haystack);
+        }
+
+        if (! is_iterable($needles)) {
+            $needles = (array) $needles;
+        }
+
+        foreach ($needles as $needle) {
+            if($ignoreCase) {
+                $needle = mb_strtolower($needle);
+            }
+
+            if($needle === '' || str_contains($haystack, $needle)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }
