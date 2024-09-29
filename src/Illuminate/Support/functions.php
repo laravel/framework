@@ -28,7 +28,7 @@ if (! function_exists('defer')) {
     }
 }
 
-if (! function_exists('defer')) {
+if (! function_exists('php_binary')) {
     /**
      * Determine the PHP Binary.
      *
