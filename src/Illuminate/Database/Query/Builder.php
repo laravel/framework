@@ -563,15 +563,33 @@ class Builder implements BuilderContract
     }
 
     /**
-     * Add a Model join clause to the query.
+     * Join a model's table to the query while respecting its global scopes and constraints.
      *
-     * @param  \Illuminate\Database\Eloquent\Model|string  $table
-     * @param  \Closure|\Illuminate\Contracts\Database\Query\Expression|string  $first
-     * @param  string|null  $operator
-     * @param  \Illuminate\Contracts\Database\Query\Expression|string|null  $second
-     * @param  string  $type
-     * @param  bool  $where
+     * This method enhances the standard join functionality by allowing you to join
+     * Eloquent model tables dynamically, automatically applying the model's global scopes
+     * and other query constraints. It's particularly useful for complex queries that need
+     * to maintain model-specific conditions, such as soft deletes.
+     *
+     * Key features:
+     * - Supports joining by model instance or class name string
+     * - Automatically applies all global scopes defined on the model (e.g., SoftDeletes)
+     * - Preserves model-specific query constraints
+     * - Supports all join types ('inner', 'left', 'right', etc.)
+     * - Option for 'joinWhere' functionality
+     *
+     * @param  \Illuminate\Database\Eloquent\Model|string  $model  The model instance or class name to join
+     * @param  string  $first  The first column for the join condition
+     * @param  string|null  $operator  The operator for the join condition (optional)
+     * @param  string|null  $second  The second column for the join condition (optional)
+     * @param  string  $type  The type of join ('inner', 'left', 'right', etc.)
+     * @param  bool  $where  Whether to use 'joinWhere' instead of 'join'
      * @return $this
+     *
+     * @throws \InvalidArgumentException If the provided model is invalid
+     *
+     * @example
+     * // Join the 'users' table, respecting the User model's global scopes
+     * $query->joinModel(User::class, 'posts.user_id', '=', 'users.id');
      */
     public function joinModel($model, $first, $operator = null, $second = null, $type = 'inner', $where = false)
     {
