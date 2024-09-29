@@ -4,7 +4,7 @@ namespace Illuminate\Support;
 
 use Illuminate\Support\Traits\Macroable;
 
-class Casing
+class StrGrammar
 {
     use Macroable;
 
