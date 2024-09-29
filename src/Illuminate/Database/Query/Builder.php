@@ -571,7 +571,7 @@ class Builder implements BuilderContract
      * @param  \Illuminate\Contracts\Database\Query\Expression|string|null $second
      * @param  string $type
      * @param  bool $where
-     * @return  $this
+     * @return $this
      */
     public function joinModel($model, $first, $operator = null, $second = null, $type = 'inner', $where = false)
     {
