@@ -565,13 +565,13 @@ class Builder implements BuilderContract
     /**
      * Add a Model join clause to the query.
      *
-     * @param \Illuminate\Database\Eloquent\Model|string $table
-     * @param \Closure|\Illuminate\Contracts\Database\Query\Expression|string $first
-     * @param string|null $operator
-     * @param \Illuminate\Contracts\Database\Query\Expression|string|null $second
-     * @param string $type
-     * @param bool $where
-     * @return $this
+     * @param  \Illuminate\Database\Eloquent\Model|string $table
+     * @param  \Closure|\Illuminate\Contracts\Database\Query\Expression|string $first
+     * @param  string|null $operator
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string|null $second
+     * @param  string $type
+     * @param  bool $where
+     * @return  $this
      */
     public function joinModel($model, $first, $operator = null, $second = null, $type = 'inner', $where = false)
     {
@@ -581,7 +581,7 @@ class Builder implements BuilderContract
         }
 
         // If the model is not a model class
-        if (!($model instanceof Model)) {
+        if (! ($model instanceof Model)) {
             throw new InvalidArgumentException(
                 'The model must be an instance of Illuminate\Database\Eloquent\Model or a string representing the model class.'
             );
