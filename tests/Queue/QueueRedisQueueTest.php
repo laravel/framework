@@ -9,7 +9,6 @@ use Illuminate\Queue\Queue;
 use Illuminate\Queue\RedisQueue;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Generator;
-use Illuminate\Support\Str;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -45,7 +44,7 @@ class QueueRedisQueueTest extends TestCase
     {
         $uuid = Generator::uuid();
 
-        Str::createUuidsUsing(function () use ($uuid) {
+        Generator::createUuidsUsing(function () use ($uuid) {
             return $uuid;
         });
 
@@ -72,7 +71,7 @@ class QueueRedisQueueTest extends TestCase
     {
         $uuid = Generator::uuid();
 
-        Str::createUuidsUsing(function () use ($uuid) {
+        Generator::createUuidsUsing(function () use ($uuid) {
             return $uuid;
         });
 
@@ -103,7 +102,7 @@ class QueueRedisQueueTest extends TestCase
     {
         $uuid = Generator::uuid();
 
-        Str::createUuidsUsing(function () use ($uuid) {
+        Generator::createUuidsUsing(function () use ($uuid) {
             return $uuid;
         });
 
@@ -130,7 +129,7 @@ class QueueRedisQueueTest extends TestCase
     {
         $uuid = Generator::uuid();
 
-        Str::createUuidsUsing(function () use ($uuid) {
+        Generator::createUuidsUsing(function () use ($uuid) {
             return $uuid;
         });
 

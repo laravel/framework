@@ -2,7 +2,7 @@
 
 namespace Illuminate\Tests\View\Blade;
 
-use Illuminate\Support\Str;
+use Illuminate\Support\Generator;
 
 class BladePushTest extends AbstractBladeTestCase
 {
@@ -44,7 +44,7 @@ test
 
     public function testPushOnceIsCompiledWhenIdIsMissing()
     {
-        Str::createUuidsUsing(fn () => 'e60e8f77-9ac3-4f71-9f8e-a044ef481d7f');
+        Generator::createUuidsUsing(fn () => 'e60e8f77-9ac3-4f71-9f8e-a044ef481d7f');
 
         $string = '@pushOnce(\'foo\')
 test

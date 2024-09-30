@@ -9,7 +9,6 @@ use Exception;
 use Illuminate\Queue\Failed\DynamoDbFailedJobProvider;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Generator;
-use Illuminate\Support\Str;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -24,7 +23,7 @@ class DynamoDbFailedJobProviderTest extends TestCase
     {
         $uuid = Generator::orderedUuid();
 
-        Str::createUuidsUsing(function () use ($uuid) {
+        Generator::createUuidsUsing(function () use ($uuid) {
             return $uuid;
         });
 

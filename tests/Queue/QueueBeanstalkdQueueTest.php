@@ -6,7 +6,6 @@ use Illuminate\Container\Container;
 use Illuminate\Queue\BeanstalkdQueue;
 use Illuminate\Queue\Jobs\BeanstalkdJob;
 use Illuminate\Support\Generator;
-use Illuminate\Support\Str;
 use Mockery as m;
 use Pheanstalk\Contract\JobIdInterface;
 use Pheanstalk\Contract\PheanstalkManagerInterface;
@@ -39,7 +38,7 @@ class QueueBeanstalkdQueueTest extends TestCase
     {
         $uuid = Generator::uuid();
 
-        Str::createUuidsUsing(function () use ($uuid) {
+        Generator::createUuidsUsing(function () use ($uuid) {
             return $uuid;
         });
 

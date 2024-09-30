@@ -7,7 +7,6 @@ use Illuminate\Database\Connection;
 use Illuminate\Queue\DatabaseQueue;
 use Illuminate\Queue\Queue;
 use Illuminate\Support\Generator;
-use Illuminate\Support\Str;
 use Mockery as m;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -24,7 +23,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
     #[DataProvider('pushJobsDataProvider')]
     public function testPushProperlyPushesJobOntoDatabase($uuid, $job, $displayNameStartsWith, $jobStartsWith)
     {
-        Str::createUuidsUsing(function () use ($uuid) {
+        Generator::createUuidsUsing(function () use ($uuid) {
             return $uuid;
         });
 
@@ -66,7 +65,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
     {
         $uuid = Generator::uuid();
 
-        Str::createUuidsUsing(function () use ($uuid) {
+        Generator::createUuidsUsing(function () use ($uuid) {
             return $uuid;
         });
 
@@ -127,7 +126,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
     {
         $uuid = Generator::uuid();
 
-        Str::createUuidsUsing(function () use ($uuid) {
+        Generator::createUuidsUsing(function () use ($uuid) {
             return $uuid;
         });
 
