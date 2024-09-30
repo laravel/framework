@@ -3036,6 +3036,17 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Get the first result in random order.
+     *
+     * @param  array|string  $columns
+     * @return object|null
+     */
+    public function firstRandom($columns = ['*'])
+    {
+        return $this->inRandomOrder()->first($columns);
+    }
+
+    /**
      * Execute a query for a single record by ID or call a callback.
      *
      * @template TValue

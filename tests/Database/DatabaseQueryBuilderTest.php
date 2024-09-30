@@ -2993,6 +2993,27 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], $results);
     }
 
+    public function testFirstRandomMySql()
+    {
+        $builder = $this->getBuilder();
+        $builder->from('users')->firstRandom();
+        $this->assertSame('select * from "users" order by RANDOM() limit 1', $builder->toSql());
+    }
+
+    public function testFirstRandomPostgres()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->from('users')->firstRandom();
+        $this->assertSame('select * from "users" order by RANDOM() limit 1', $builder->toSql());
+    }
+
+    public function testFirstRandomSqlServer()
+    {
+        $builder = $this->getSqlServerBuilder();
+        $builder->from('users')->firstRandom();
+        $this->assertSame('select * from [users] order by NEWID() limit 1', $builder->toSql());
+    }
+
     public function testFirstOrFailMethodReturnsFirstResult()
     {
         $builder = $this->getBuilder();
