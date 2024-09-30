@@ -11,6 +11,7 @@ use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
 use Illuminate\Queue\Events\JobQueued;
 use Illuminate\Queue\Events\JobQueueing;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Generator;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Str;
 
@@ -140,7 +141,7 @@ abstract class Queue
     protected function createObjectPayload($job, $queue)
     {
         $payload = $this->withCreatePayloadHooks($queue, [
-            'uuid' => (string) Str::uuid(),
+            'uuid' => (string) Generator::uuid(),
             'displayName' => $this->getDisplayName($job),
             'job' => 'Illuminate\Queue\CallQueuedHandler@call',
             'maxTries' => $this->getJobTries($job) ?? null,
@@ -267,7 +268,7 @@ abstract class Queue
     protected function createStringPayload($job, $queue, $data)
     {
         return $this->withCreatePayloadHooks($queue, [
-            'uuid' => (string) Str::uuid(),
+            'uuid' => (string) Generator::uuid(),
             'displayName' => is_string($job) ? explode('@', $job)[0] : null,
             'job' => $job,
             'maxTries' => null,

@@ -8,6 +8,7 @@ use DateTimeInterface;
 use Illuminate\Database\Connection;
 use Illuminate\Database\PostgresConnection;
 use Illuminate\Database\Query\Expression;
+use Illuminate\Support\Generator;
 use Illuminate\Support\Str;
 use Throwable;
 
@@ -94,7 +95,7 @@ class DatabaseBatchRepository implements PrunableBatchRepository
      */
     public function store(PendingBatch $batch)
     {
-        $id = (string) Str::orderedUuid();
+        $id = (string) Generator::orderedUuid();
 
         $this->connection->table($this->table)->insert([
             'id' => $id,

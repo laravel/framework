@@ -10,6 +10,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Env;
 use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Generator;
 use Illuminate\Support\Str;
 use Orchestra\Testbench\Attributes\RequiresEnv;
 use Orchestra\Testbench\TestCase;
@@ -73,7 +74,7 @@ class DynamoBatchTest extends TestCase
     {
         /** @var DynamoBatchRepository */
         $repo = app(DynamoBatchRepository::class);
-        $retrieved = $repo->find(Str::orderedUuid());
+        $retrieved = $repo->find(Generator::orderedUuid());
         $this->assertNull($retrieved);
     }
 
@@ -96,7 +97,7 @@ class DynamoBatchTest extends TestCase
     {
         /** @var DynamoBatchRepository */
         $repo = app(DynamoBatchRepository::class);
-        $repo->delete(Str::orderedUuid());
+        $repo->delete(Generator::orderedUuid());
         // Ensure we didn't throw an exception
         $this->assertTrue(true);
     }
@@ -139,7 +140,7 @@ class DynamoBatchTest extends TestCase
         $this->assertCount(6, $repo->get(100, $batches[6]->id));
         $this->assertCount(0, $repo->get(100, $batches[0]->id));
         $this->assertCount(9, $repo->get(100, $batches[9]->id));
-        $this->assertCount(10, $repo->get(100, Str::orderedUuid()));
+        $this->assertCount(10, $repo->get(100, Generator::orderedUuid()));
     }
 }
 

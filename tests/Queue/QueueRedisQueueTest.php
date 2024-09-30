@@ -8,6 +8,7 @@ use Illuminate\Queue\LuaScripts;
 use Illuminate\Queue\Queue;
 use Illuminate\Queue\RedisQueue;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Generator;
 use Illuminate\Support\Str;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -21,9 +22,9 @@ class QueueRedisQueueTest extends TestCase
 
     public function testPushProperlyPushesJobOntoRedis()
     {
-        $uuid = Str::uuid();
+        $uuid = Generator::uuid();
 
-        Str::createUuidsUsing(function () use ($uuid) {
+        Generator::createUuidsUsing(function () use ($uuid) {
             return $uuid;
         });
 
@@ -37,12 +38,12 @@ class QueueRedisQueueTest extends TestCase
         $this->assertSame('foo', $id);
         $container->shouldHaveReceived('bound')->with('events')->twice();
 
-        Str::createUuidsNormally();
+        Generator::createUuidsNormally();
     }
 
     public function testPushProperlyPushesJobOntoRedisWithCustomPayloadHook()
     {
-        $uuid = Str::uuid();
+        $uuid = Generator::uuid();
 
         Str::createUuidsUsing(function () use ($uuid) {
             return $uuid;
@@ -64,12 +65,12 @@ class QueueRedisQueueTest extends TestCase
 
         Queue::createPayloadUsing(null);
 
-        Str::createUuidsNormally();
+        Generator::createUuidsNormally();
     }
 
     public function testPushProperlyPushesJobOntoRedisWithTwoCustomPayloadHook()
     {
-        $uuid = Str::uuid();
+        $uuid = Generator::uuid();
 
         Str::createUuidsUsing(function () use ($uuid) {
             return $uuid;
@@ -95,12 +96,12 @@ class QueueRedisQueueTest extends TestCase
 
         Queue::createPayloadUsing(null);
 
-        Str::createUuidsNormally();
+        Generator::createUuidsNormally();
     }
 
     public function testDelayedPushProperlyPushesJobOntoRedis()
     {
-        $uuid = Str::uuid();
+        $uuid = Generator::uuid();
 
         Str::createUuidsUsing(function () use ($uuid) {
             return $uuid;
@@ -122,12 +123,12 @@ class QueueRedisQueueTest extends TestCase
         $this->assertSame('foo', $id);
         $container->shouldHaveReceived('bound')->with('events')->twice();
 
-        Str::createUuidsNormally();
+        Generator::createUuidsNormally();
     }
 
     public function testDelayedPushWithDateTimeProperlyPushesJobOntoRedis()
     {
-        $uuid = Str::uuid();
+        $uuid = Generator::uuid();
 
         Str::createUuidsUsing(function () use ($uuid) {
             return $uuid;
@@ -149,6 +150,6 @@ class QueueRedisQueueTest extends TestCase
         $queue->later($date, 'foo', ['data']);
         $container->shouldHaveReceived('bound')->with('events')->twice();
 
-        Str::createUuidsNormally();
+        Generator::createUuidsNormally();
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Eloquent\Concerns;
 
+use Illuminate\Support\Generator;
 use Illuminate\Support\Str;
 
 trait HasVersion4Uuids
@@ -15,6 +16,6 @@ trait HasVersion4Uuids
      */
     public function newUniqueId()
     {
-        return (string) Str::orderedUuid();
+        return (string) Generator::orderedUuid();
     }
 }

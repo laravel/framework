@@ -6,6 +6,7 @@ use Illuminate\Container\Container;
 use Illuminate\Database\Connection;
 use Illuminate\Queue\DatabaseQueue;
 use Illuminate\Queue\Queue;
+use Illuminate\Support\Generator;
 use Illuminate\Support\Str;
 use Mockery as m;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -47,12 +48,12 @@ class QueueDatabaseQueueUnitTest extends TestCase
 
         $container->shouldHaveReceived('bound')->with('events')->twice();
 
-        Str::createUuidsNormally();
+        Generator::createUuidsNormally();
     }
 
     public static function pushJobsDataProvider()
     {
-        $uuid = Str::uuid()->toString();
+        $uuid = Generator::uuid()->toString();
 
         return [
             [$uuid, new MyTestJob, 'MyTestJob', 'CallQueuedHandler'],
@@ -63,7 +64,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
 
     public function testDelayedPushProperlyPushesJobOntoDatabase()
     {
-        $uuid = Str::uuid();
+        $uuid = Generator::uuid();
 
         Str::createUuidsUsing(function () use ($uuid) {
             return $uuid;
@@ -88,7 +89,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
 
         $container->shouldHaveReceived('bound')->with('events')->twice();
 
-        Str::createUuidsNormally();
+        Generator::createUuidsNormally();
     }
 
     public function testFailureToCreatePayloadFromObject()
@@ -124,7 +125,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
 
     public function testBulkBatchPushesOntoDatabase()
     {
-        $uuid = Str::uuid();
+        $uuid = Generator::uuid();
 
         Str::createUuidsUsing(function () use ($uuid) {
             return $uuid;
@@ -155,7 +156,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
 
         $queue->bulk(['foo', 'bar'], ['data'], 'queue');
 
-        Str::createUuidsNormally();
+        Generator::createUuidsNormally();
     }
 
     public function testBuildDatabaseRecordWithPayloadAtTheEnd()

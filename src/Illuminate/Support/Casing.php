@@ -114,9 +114,9 @@ class Casing
 
         $parts = count($parts) > 1
             ? array_map([static::class, 'title'], $parts)
-            : array_map([static::class, 'title'], static::ucsplit(implode('_', $parts)));
+            : array_map([static::class, 'title'], Str::ucsplit(implode('_', $parts)));
 
-        $collapsed = static::replace(['-', '_', ' '], '_', implode('_', $parts));
+        $collapsed = Str::replace(['-', '_', ' '], '_', implode('_', $parts));
 
         return implode(' ', array_filter(explode('_', $collapsed)));
     }
@@ -129,7 +129,7 @@ class Casing
      */
     public static function lcfirst($string)
     {
-        return static::lower(static::substr($string, 0, 1)).static::substr($string, 1);
+        return static::lower(Str::substr($string, 0, 1)).Str::substr($string, 1);
     }
 
     /**
@@ -140,7 +140,7 @@ class Casing
      */
     public static function ucfirst($string)
     {
-        return static::upper(static::substr($string, 0, 1)).static::substr($string, 1);
+        return static::upper(Str::substr($string, 0, 1)).Str::substr($string, 1);
     }
 
     /**
@@ -181,7 +181,7 @@ class Casing
             return static::$studlyCache[$key];
         }
 
-        $words = explode(' ', static::replace(['-', '_'], ' ', $value));
+        $words = explode(' ', Str::replace(['-', '_'], ' ', $value));
 
         $studlyWords = array_map(fn ($word) => static::ucfirst($word), $words);
 

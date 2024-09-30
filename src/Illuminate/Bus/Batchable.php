@@ -3,6 +3,7 @@
 namespace Illuminate\Bus;
 
 use Carbon\CarbonImmutable;
+use Generator;
 use Illuminate\Container\Container;
 use Illuminate\Support\Str;
 use Illuminate\Support\Testing\Fakes\BatchFake;
@@ -91,7 +92,7 @@ trait Batchable
                                   ?CarbonImmutable $finishedAt = null)
     {
         $this->fakeBatch = new BatchFake(
-            empty($id) ? (string) Str::uuid() : $id,
+            empty($id) ? (string) Generator::uuid() : $id,
             $name,
             $totalJobs,
             $pendingJobs,

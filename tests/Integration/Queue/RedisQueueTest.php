@@ -9,6 +9,7 @@ use Illuminate\Queue\Events\JobQueued;
 use Illuminate\Queue\Events\JobQueueing;
 use Illuminate\Queue\Jobs\RedisJob;
 use Illuminate\Queue\RedisQueue;
+use Illuminate\Support\Generator;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Str;
 use Mockery as m;
@@ -266,7 +267,7 @@ class RedisQueueTest extends TestCase
         $this->assertEquals(0, $this->redis[$driver]->connection()->zcard('queues:default:delayed'));
         $this->assertEquals(2, $this->redis[$driver]->connection()->zcard('queues:default:reserved'));
 
-        Str::createUuidsNormally();
+        Generator::createUuidsNormally();
     }
 
     /**

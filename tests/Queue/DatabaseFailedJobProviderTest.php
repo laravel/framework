@@ -7,6 +7,7 @@ use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Queue\Failed\DatabaseFailedJobProvider;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Generator;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -60,7 +61,7 @@ class DatabaseFailedJobProviderTest extends TestCase
             $table->timestamp('failed_at')->useCurrent();
         });
 
-        $uuid = Str::uuid();
+        $uuid = Generator::uuid();
 
         $exception = new Exception(mb_convert_encoding('ÐÑÙ0E\xE2\x�98\xA0World��7B¹!þÿ', 'ISO-8859-1', 'UTF-8'));
         $provider = new DatabaseFailedJobProvider($db->getDatabaseManager(), 'default', 'failed_jobs');
@@ -92,11 +93,11 @@ class DatabaseFailedJobProviderTest extends TestCase
 
         $this->assertSame(0, $provider->count());
 
-        $provider->log('database', 'default', json_encode(['uuid' => (string) Str::uuid()]), new RuntimeException());
+        $provider->log('database', 'default', json_encode(['uuid' => (string) Generator::uuid()]), new RuntimeException());
         $this->assertSame(1, $provider->count());
 
-        $provider->log('database', 'default', json_encode(['uuid' => (string) Str::uuid()]), new RuntimeException());
-        $provider->log('another-connection', 'another-queue', json_encode(['uuid' => (string) Str::uuid()]), new RuntimeException());
+        $provider->log('database', 'default', json_encode(['uuid' => (string) Generator::uuid()]), new RuntimeException());
+        $provider->log('another-connection', 'another-queue', json_encode(['uuid' => (string) Generator::uuid()]), new RuntimeException());
         $this->assertSame(3, $provider->count());
     }
 
@@ -117,12 +118,12 @@ class DatabaseFailedJobProviderTest extends TestCase
         });
         $provider = new DatabaseFailedJobProvider($db->getDatabaseManager(), 'default', 'failed_jobs');
 
-        $provider->log('connection-1', 'default', json_encode(['uuid' => (string) Str::uuid()]), new RuntimeException());
-        $provider->log('connection-2', 'default', json_encode(['uuid' => (string) Str::uuid()]), new RuntimeException());
+        $provider->log('connection-1', 'default', json_encode(['uuid' => (string) Generator::uuid()]), new RuntimeException());
+        $provider->log('connection-2', 'default', json_encode(['uuid' => (string) Generator::uuid()]), new RuntimeException());
         $this->assertSame(1, $provider->count('connection-1'));
         $this->assertSame(1, $provider->count('connection-2'));
 
-        $provider->log('connection-1', 'default', json_encode(['uuid' => (string) Str::uuid()]), new RuntimeException());
+        $provider->log('connection-1', 'default', json_encode(['uuid' => (string) Generator::uuid()]), new RuntimeException());
         $this->assertSame(2, $provider->count('connection-1'));
         $this->assertSame(1, $provider->count('connection-2'));
     }
@@ -144,12 +145,12 @@ class DatabaseFailedJobProviderTest extends TestCase
         });
         $provider = new DatabaseFailedJobProvider($db->getDatabaseManager(), 'default', 'failed_jobs');
 
-        $provider->log('database', 'queue-1', json_encode(['uuid' => (string) Str::uuid()]), new RuntimeException());
-        $provider->log('database', 'queue-2', json_encode(['uuid' => (string) Str::uuid()]), new RuntimeException());
+        $provider->log('database', 'queue-1', json_encode(['uuid' => (string) Generator::uuid()]), new RuntimeException());
+        $provider->log('database', 'queue-2', json_encode(['uuid' => (string) Generator::uuid()]), new RuntimeException());
         $this->assertSame(1, $provider->count(queue: 'queue-1'));
         $this->assertSame(1, $provider->count(queue: 'queue-2'));
 
-        $provider->log('database', 'queue-1', json_encode(['uuid' => (string) Str::uuid()]), new RuntimeException());
+        $provider->log('database', 'queue-1', json_encode(['uuid' => (string) Generator::uuid()]), new RuntimeException());
         $this->assertSame(2, $provider->count(queue: 'queue-1'));
         $this->assertSame(1, $provider->count(queue: 'queue-2'));
     }
@@ -171,12 +172,12 @@ class DatabaseFailedJobProviderTest extends TestCase
         });
         $provider = new DatabaseFailedJobProvider($db->getDatabaseManager(), 'default', 'failed_jobs');
 
-        $provider->log('connection-1', 'queue-99', json_encode(['uuid' => (string) Str::uuid()]), new RuntimeException());
-        $provider->log('connection-1', 'queue-99', json_encode(['uuid' => (string) Str::uuid()]), new RuntimeException());
-        $provider->log('connection-2', 'queue-99', json_encode(['uuid' => (string) Str::uuid()]), new RuntimeException());
-        $provider->log('connection-1', 'queue-1', json_encode(['uuid' => (string) Str::uuid()]), new RuntimeException());
-        $provider->log('connection-2', 'queue-1', json_encode(['uuid' => (string) Str::uuid()]), new RuntimeException());
-        $provider->log('connection-2', 'queue-1', json_encode(['uuid' => (string) Str::uuid()]), new RuntimeException());
+        $provider->log('connection-1', 'queue-99', json_encode(['uuid' => (string) Generator::uuid()]), new RuntimeException());
+        $provider->log('connection-1', 'queue-99', json_encode(['uuid' => (string) Generator::uuid()]), new RuntimeException());
+        $provider->log('connection-2', 'queue-99', json_encode(['uuid' => (string) Generator::uuid()]), new RuntimeException());
+        $provider->log('connection-1', 'queue-1', json_encode(['uuid' => (string) Generator::uuid()]), new RuntimeException());
+        $provider->log('connection-2', 'queue-1', json_encode(['uuid' => (string) Generator::uuid()]), new RuntimeException());
+        $provider->log('connection-2', 'queue-1', json_encode(['uuid' => (string) Generator::uuid()]), new RuntimeException());
         $this->assertSame(2, $provider->count('connection-1', 'queue-99'));
         $this->assertSame(1, $provider->count('connection-2', 'queue-99'));
         $this->assertSame(1, $provider->count('connection-1', 'queue-1'));

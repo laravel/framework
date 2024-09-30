@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Events\NotificationSending;
 use Illuminate\Notifications\Events\NotificationSent;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Generator;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Localizable;
 
@@ -99,7 +100,7 @@ class NotificationSender
             }
 
             $this->withLocale($this->preferredLocale($notifiable, $notification), function () use ($viaChannels, $notifiable, $original) {
-                $notificationId = Str::uuid()->toString();
+                $notificationId = Generator::uuid()->toString();
 
                 foreach ((array) $viaChannels as $channel) {
                     if (! ($notifiable instanceof AnonymousNotifiable && $channel === 'database')) {
@@ -186,7 +187,7 @@ class NotificationSender
         $original = clone $notification;
 
         foreach ($notifiables as $notifiable) {
-            $notificationId = Str::uuid()->toString();
+            $notificationId = Generator::uuid()->toString();
 
             foreach ((array) $original->via($notifiable) as $channel) {
                 $notification = clone $original;

@@ -11,6 +11,7 @@ use Illuminate\Queue\DatabaseQueue;
 use Illuminate\Queue\Events\JobQueued;
 use Illuminate\Queue\Events\JobQueueing;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Generator;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
 
@@ -252,7 +253,7 @@ class QueueDatabaseQueueIntegrationTest extends TestCase
     {
         $jobQueueingEvent = null;
         $jobQueuedEvent = null;
-        Str::createUuidsUsingSequence([
+        Generator::createUuidsUsingSequence([
             'expected-job-uuid',
         ]);
         $this->container['events']->listen(function (JobQueueing $e) use (&$jobQueueingEvent) {

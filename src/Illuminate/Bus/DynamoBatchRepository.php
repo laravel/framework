@@ -6,6 +6,7 @@ use Aws\DynamoDb\DynamoDbClient;
 use Aws\DynamoDb\Marshaler;
 use Carbon\CarbonImmutable;
 use Closure;
+use Illuminate\Support\Generator;
 use Illuminate\Support\Str;
 
 class DynamoBatchRepository implements BatchRepository
@@ -162,7 +163,7 @@ class DynamoBatchRepository implements BatchRepository
      */
     public function store(PendingBatch $batch)
     {
-        $id = (string) Str::orderedUuid();
+        $id = (string) Generator::orderedUuid();
 
         $batch = [
             'id' => $id,

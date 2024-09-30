@@ -7,6 +7,7 @@ use Closure;
 use Illuminate\Bus\BatchRepository;
 use Illuminate\Bus\PendingBatch;
 use Illuminate\Bus\UpdatedBatchJobCounts;
+use Illuminate\Support\Generator;
 use Illuminate\Support\Str;
 
 class BatchRepositoryFake implements BatchRepository
@@ -49,7 +50,7 @@ class BatchRepositoryFake implements BatchRepository
      */
     public function store(PendingBatch $batch)
     {
-        $id = (string) Str::orderedUuid();
+        $id = (string) Generator::orderedUuid();
 
         $this->batches[$id] = new BatchFake(
             $id,

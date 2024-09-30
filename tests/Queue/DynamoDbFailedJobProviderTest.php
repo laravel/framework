@@ -8,6 +8,7 @@ use DateTimeInterface;
 use Exception;
 use Illuminate\Queue\Failed\DynamoDbFailedJobProvider;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Generator;
 use Illuminate\Support\Str;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -21,7 +22,7 @@ class DynamoDbFailedJobProviderTest extends TestCase
 
     public function testCanProperlyLogFailedJob()
     {
-        $uuid = Str::orderedUuid();
+        $uuid = Generator::orderedUuid();
 
         Str::createUuidsUsing(function () use ($uuid) {
             return $uuid;
@@ -51,7 +52,7 @@ class DynamoDbFailedJobProviderTest extends TestCase
 
         $provider->log('connection', 'queue', json_encode(['uuid' => (string) $uuid]), $exception);
 
-        Str::createUuidsNormally();
+        Generator::createUuidsNormally();
     }
 
     public function testCanRetrieveAllFailedJobs()

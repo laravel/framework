@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Validation;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Generator;
 use Illuminate\Support\Str;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 use Illuminate\Translation\ArrayLoader;
@@ -24,8 +25,8 @@ class ValidatorTest extends DatabaseTestCase
             $table->string('first_name');
         });
 
-        User::create(['uuid' => (string) Str::uuid(), 'first_name' => 'John']);
-        User::create(['uuid' => (string) Str::uuid(), 'first_name' => 'Jim']);
+        User::create(['uuid' => (string) Generator::uuid(), 'first_name' => 'John']);
+        User::create(['uuid' => (string) Generator::uuid(), 'first_name' => 'Jim']);
     }
 
     public function testExists()

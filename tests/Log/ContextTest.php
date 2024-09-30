@@ -12,6 +12,7 @@ use Illuminate\Log\Context\Repository;
 use Illuminate\Support\Facades\Context;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Generator;
 use Illuminate\Support\Str;
 use Orchestra\Testbench\TestCase;
 use RuntimeException;
@@ -293,9 +294,9 @@ class ContextTest extends TestCase
     {
         $path = storage_path('logs/laravel.log');
         file_put_contents($path, '');
-        Str::createUuidsUsingSequence(['expected-trace-id']);
+        Generator::createUuidsUsingSequence(['expected-trace-id']);
 
-        Context::add('trace_id', Str::uuid());
+        Context::add('trace_id', Generator::uuid());
         Context::add('foo.bar', 123);
         Context::push('bar.baz', 456);
         Context::push('bar.baz', 789);
@@ -309,14 +310,14 @@ class ContextTest extends TestCase
         $this->assertSame('testing.INFO: My name is Tim {"name":"Tim","framework":"Laravel"} {"trace_id":"expected-trace-id","foo.bar":123,"bar.baz":[456,789]}', trim($log));
 
         file_put_contents($path, '');
-        Str::createUuidsNormally();
+        Generator::createUuidsNormally();
     }
 
     public function test_it_doesnt_override_log_instance_context()
     {
         $path = storage_path('logs/laravel.log');
         file_put_contents($path, '');
-        Str::createUuidsUsingSequence(['expected-trace-id']);
+        Generator::createUuidsUsingSequence(['expected-trace-id']);
 
         Context::add('name', 'James');
 
@@ -328,14 +329,14 @@ class ContextTest extends TestCase
         $this->assertSame('testing.INFO: My name is Tim {"name":"Tim"} {"name":"James"}', trim($log));
 
         file_put_contents($path, '');
-        Str::createUuidsNormally();
+        Generator::createUuidsNormally();
     }
 
     public function test_it_doesnt_allow_context_to_be_used_as_parameters()
     {
         $path = storage_path('logs/laravel.log');
         file_put_contents($path, '');
-        Str::createUuidsUsingSequence(['expected-trace-id']);
+        Generator::createUuidsUsingSequence(['expected-trace-id']);
 
         Context::add('name', 'James');
 
@@ -345,14 +346,14 @@ class ContextTest extends TestCase
         $this->assertSame('testing.INFO: My name is {name}  {"name":"James"}', trim($log));
 
         file_put_contents($path, '');
-        Str::createUuidsNormally();
+        Generator::createUuidsNormally();
     }
 
     public function test_does_not_add_hidden_context_to_logging()
     {
         $path = storage_path('logs/laravel.log');
         file_put_contents($path, '');
-        Str::createUuidsUsingSequence(['expected-trace-id']);
+        Generator::createUuidsUsingSequence(['expected-trace-id']);
 
         Context::addHidden('hidden_data', 'hidden_data');
 
@@ -365,7 +366,7 @@ class ContextTest extends TestCase
         $this->assertStringNotContainsString('hidden_data', trim($log));
 
         file_put_contents($path, '');
-        Str::createUuidsNormally();
+        Generator::createUuidsNormally();
     }
 
     public function test_it_can_add_hidden()
@@ -413,9 +414,9 @@ class ContextTest extends TestCase
     {
         $path = storage_path('logs/laravel.log');
         file_put_contents($path, '');
-        Str::createUuidsUsingSequence(['expected-trace-id']);
+        Generator::createUuidsUsingSequence(['expected-trace-id']);
 
-        Context::add('trace_id', Str::uuid());
+        Context::add('trace_id', Generator::uuid());
         Context::add('foo.bar', 123);
         Context::push('bar.baz', 456);
         Context::push('bar.baz', 789);
@@ -426,7 +427,7 @@ class ContextTest extends TestCase
         $this->assertStringEndsWith(' {"trace_id":"expected-trace-id","foo.bar":123,"bar.baz":[456,789]}', trim($log));
 
         file_put_contents($path, '');
-        Str::createUuidsNormally();
+        Generator::createUuidsNormally();
     }
 }
 

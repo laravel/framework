@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Eloquent\Concerns;
 
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Generator;
 use Illuminate\Support\Str;
 
 trait HasUlids
@@ -34,7 +35,7 @@ trait HasUlids
      */
     public function newUniqueId()
     {
-        return strtolower((string) Str::ulid());
+        return strtolower((string) Generator::ulid());
     }
 
     /**

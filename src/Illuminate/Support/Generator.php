@@ -218,15 +218,15 @@ class Generator
      */
     public static function freezeUuids(?Closure $callback = null)
     {
-        $uuid = Str::uuid();
+        $uuid = self::uuid();
 
-        Str::createUuidsUsing(fn () => $uuid);
+        self::createUuidsUsing(fn () => $uuid);
 
         if ($callback !== null) {
             try {
                 $callback($uuid);
             } finally {
-                Str::createUuidsNormally();
+                self::createUuidsNormally();
             }
         }
 
@@ -325,15 +325,15 @@ class Generator
      */
     public static function freezeUlids(?Closure $callback = null)
     {
-        $ulid = Str::ulid();
+        $ulid = self::ulid();
 
-        Str::createUlidsUsing(fn () => $ulid);
+        self::createUlidsUsing(fn () => $ulid);
 
         if ($callback !== null) {
             try {
                 $callback($ulid);
             } finally {
-                Str::createUlidsNormally();
+                self::createUlidsNormally();
             }
         }
 

@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Queue;
 
 use Exception;
 use Illuminate\Queue\Failed\FileFailedJobProvider;
+use Illuminate\Support\Generator;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
 
@@ -86,7 +87,7 @@ class FileFailedJobProviderTest extends TestCase
 
     public function testNullIsReturnedIfJobNotFound()
     {
-        $uuid = Str::uuid();
+        $uuid = Generator::uuid();
 
         $failedJob = $this->provider->find($uuid);
 
@@ -192,7 +193,7 @@ class FileFailedJobProviderTest extends TestCase
 
     public function logFailedJob($connection = 'connection', $queue = 'queue')
     {
-        $uuid = Str::uuid();
+        $uuid = Generator::uuid();
 
         $exception = new Exception("Something went wrong at job [{$uuid}].");
 

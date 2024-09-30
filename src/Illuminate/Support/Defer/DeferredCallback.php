@@ -2,6 +2,7 @@
 
 namespace Illuminate\Support\Defer;
 
+use Illuminate\Support\Generator;
 use Illuminate\Support\Str;
 
 class DeferredCallback
@@ -14,7 +15,7 @@ class DeferredCallback
      */
     public function __construct(public $callback, public ?string $name = null, public bool $always = false)
     {
-        $this->name = $name ?? (string) Str::uuid();
+        $this->name = $name ?? (string) Generator::uuid();
     }
 
     /**

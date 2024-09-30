@@ -14,6 +14,7 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Generator;
 use Illuminate\Support\Str;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
@@ -60,7 +61,7 @@ class SendingMailNotificationsTest extends TestCase
     public function testMailIsSent()
     {
         $notification = new TestMailNotification;
-        $notification->id = Str::uuid()->toString();
+        $notification->id = Generator::uuid()->toString();
 
         $user = NotifiableUser::forceCreate([
             'email' => 'taylor@laravel.com',
@@ -98,7 +99,7 @@ class SendingMailNotificationsTest extends TestCase
     public function testMailIsSentWithCustomTheme()
     {
         $notification = new TestMailNotificationWithCustomTheme;
-        $notification->id = Str::uuid()->toString();
+        $notification->id = Generator::uuid()->toString();
 
         $user = NotifiableUser::forceCreate([
             'email' => 'taylor@laravel.com',
@@ -171,7 +172,7 @@ class SendingMailNotificationsTest extends TestCase
     public function testMailIsSentToNamedAddress()
     {
         $notification = new TestMailNotification;
-        $notification->id = Str::uuid()->toString();
+        $notification->id = Generator::uuid()->toString();
 
         $user = NotifiableUserWithNamedAddress::forceCreate([
             'email' => 'taylor@laravel.com',
@@ -210,7 +211,7 @@ class SendingMailNotificationsTest extends TestCase
     public function testMailIsSentWithSubject()
     {
         $notification = new TestMailNotificationWithSubject;
-        $notification->id = Str::uuid()->toString();
+        $notification->id = Generator::uuid()->toString();
 
         $user = NotifiableUser::forceCreate([
             'email' => 'taylor@laravel.com',
@@ -238,7 +239,7 @@ class SendingMailNotificationsTest extends TestCase
     public function testMailIsSentToMultipleAddresses()
     {
         $notification = new TestMailNotificationWithSubject;
-        $notification->id = Str::uuid()->toString();
+        $notification->id = Generator::uuid()->toString();
 
         $user = NotifiableUserWithMultipleAddresses::forceCreate([
             'email' => 'taylor@laravel.com',
@@ -277,7 +278,7 @@ class SendingMailNotificationsTest extends TestCase
     public function testMailIsSentUsingMailMessageWithHtmlAndPlain()
     {
         $notification = new TestMailNotificationWithHtmlAndPlain;
-        $notification->id = Str::uuid()->toString();
+        $notification->id = Generator::uuid()->toString();
 
         $user = NotifiableUser::forceCreate([
             'email' => 'taylor@laravel.com',
@@ -309,7 +310,7 @@ class SendingMailNotificationsTest extends TestCase
     public function testMailIsSentUsingMailMessageWithHtmlOnly()
     {
         $notification = new TestMailNotificationWithHtmlOnly;
-        $notification->id = Str::uuid()->toString();
+        $notification->id = Generator::uuid()->toString();
 
         $user = NotifiableUser::forceCreate([
             'email' => 'taylor@laravel.com',
@@ -341,7 +342,7 @@ class SendingMailNotificationsTest extends TestCase
     public function testMailIsSentUsingMailMessageWithPlainOnly()
     {
         $notification = new TestMailNotificationWithPlainOnly;
-        $notification->id = Str::uuid()->toString();
+        $notification->id = Generator::uuid()->toString();
 
         $user = NotifiableUser::forceCreate([
             'email' => 'taylor@laravel.com',

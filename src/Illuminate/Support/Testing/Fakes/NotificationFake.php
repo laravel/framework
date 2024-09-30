@@ -10,6 +10,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Generator;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\ReflectsClosures;
@@ -310,7 +311,7 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
 
         foreach ($notifiables as $notifiable) {
             if (! $notification->id) {
-                $notification->id = Str::uuid()->toString();
+                $notification->id = Generator::uuid()->toString();
             }
 
             $notifiableChannels = $channels ?: $notification->via($notifiable);

@@ -40,7 +40,7 @@ class Replacer
         $result = array_shift($segments);
 
         foreach ($segments as $segment) {
-            $result .= self::toStringOr(array_shift($replace) ?? $search, $search).$segment;
+            $result .= Str::toStringOr(array_shift($replace) ?? $search, $search).$segment;
         }
 
         return $result;
@@ -115,7 +115,7 @@ class Replacer
             return $subject;
         }
 
-        if (static::startsWith($subject, $search)) {
+        if (Str::startsWith($subject, $search)) {
             return static::replaceFirst($search, $replace, $subject);
         }
 
@@ -163,7 +163,7 @@ class Replacer
             return $subject;
         }
 
-        if (static::endsWith($subject, $search)) {
+        if (Str::endsWith($subject, $search)) {
             return static::replaceLast($search, $replace, $subject);
         }
 

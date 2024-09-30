@@ -2,6 +2,7 @@
 
 namespace Illuminate\Queue\Jobs;
 
+use Illuminate\Support\Generator;
 use Illuminate\Support\Str;
 
 class FakeJob extends Job
@@ -34,7 +35,7 @@ class FakeJob extends Job
      */
     public function getJobId()
     {
-        return once(fn () => (string) Str::uuid());
+        return once(fn () => (string) Generator::uuid());
     }
 
     /**

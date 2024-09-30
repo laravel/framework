@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Queue;
 use Illuminate\Container\Container;
 use Illuminate\Queue\BeanstalkdQueue;
 use Illuminate\Queue\Jobs\BeanstalkdJob;
+use Illuminate\Support\Generator;
 use Illuminate\Support\Str;
 use Mockery as m;
 use Pheanstalk\Contract\JobIdInterface;
@@ -36,7 +37,7 @@ class QueueBeanstalkdQueueTest extends TestCase
 
     public function testPushProperlyPushesJobOntoBeanstalkd()
     {
-        $uuid = Str::uuid();
+        $uuid = Generator::uuid();
 
         Str::createUuidsUsing(function () use ($uuid) {
             return $uuid;
@@ -53,14 +54,14 @@ class QueueBeanstalkdQueueTest extends TestCase
 
         $this->container->shouldHaveReceived('bound')->with('events')->times(4);
 
-        Str::createUuidsNormally();
+        Generator::createUuidsNormally();
     }
 
     public function testDelayedPushProperlyPushesJobOntoBeanstalkd()
     {
-        $uuid = Str::uuid();
+        $uuid = Generator::uuid();
 
-        Str::createUuidsUsing(function () use ($uuid) {
+        Generator::createUuidsUsing(function () use ($uuid) {
             return $uuid;
         });
 
@@ -75,7 +76,7 @@ class QueueBeanstalkdQueueTest extends TestCase
 
         $this->container->shouldHaveReceived('bound')->with('events')->times(4);
 
-        Str::createUuidsNormally();
+        Generator::createUuidsNormally();
     }
 
     public function testPopProperlyPopsJobOffOfBeanstalkd()
