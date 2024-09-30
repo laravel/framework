@@ -34,7 +34,8 @@ class Number
 
         if (! is_null($maxPrecision)) {
             $formatter->setAttribute(NumberFormatter::MAX_FRACTION_DIGITS, $maxPrecision);
-        } elseif (! is_null($precision)) {
+        }
+        if (! is_null($precision)) {
             $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, $precision);
         }
 
