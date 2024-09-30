@@ -4,6 +4,7 @@ namespace Illuminate\Support;
 
 use Closure;
 use Illuminate\Support\Traits\Macroable;
+use Throwable;
 use Traversable;
 
 class Replacer
@@ -204,5 +205,21 @@ class Replacer
         }
 
         return substr_replace($string, $replace, $offset, $length);
+    }
+
+    /**
+     * Convert the given value to a string or return the given fallback on failure.
+     *
+     * @param  mixed  $value
+     * @param  string  $fallback
+     * @return string
+     */
+    private static function toStringOr($value, $fallback)
+    {
+        try {
+            return (string) $value;
+        } catch (Throwable $e) {
+            return $fallback;
+        }
     }
 }

@@ -3,8 +3,8 @@
 namespace Illuminate\Bus;
 
 use Carbon\CarbonImmutable;
-use Generator;
 use Illuminate\Container\Container;
+use Illuminate\Support\Generator;
 use Illuminate\Support\Testing\Fakes\BatchFake;
 
 trait Batchable

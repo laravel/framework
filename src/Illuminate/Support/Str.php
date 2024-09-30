@@ -10,7 +10,6 @@ use League\CommonMark\Extension\InlinesOnly\InlinesOnlyExtension;
 use League\CommonMark\GithubFlavoredMarkdownConverter;
 use League\CommonMark\MarkdownConverter;
 use Symfony\Component\Uid\Ulid;
-use Throwable;
 use voku\helper\ASCII;
 
 class Str
@@ -668,22 +667,6 @@ class Str
     public static function repeat(string $string, int $times)
     {
         return str_repeat($string, $times);
-    }
-
-    /**
-     * Convert the given value to a string or return the given fallback on failure.
-     *
-     * @param  mixed  $value
-     * @param  string  $fallback
-     * @return string
-     */
-    private static function toStringOr($value, $fallback)
-    {
-        try {
-            return (string) $value;
-        } catch (Throwable $e) {
-            return $fallback;
-        }
     }
 
     /**

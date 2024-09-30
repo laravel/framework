@@ -115,7 +115,7 @@ class Casing
             ? array_map([static::class, 'title'], $parts)
             : array_map([static::class, 'title'], Str::ucsplit(implode('_', $parts)));
 
-        $collapsed = Str::replace(['-', '_', ' '], '_', implode('_', $parts));
+        $collapsed = Replacer::replace(['-', '_', ' '], '_', implode('_', $parts));
 
         return implode(' ', array_filter(explode('_', $collapsed)));
     }
@@ -180,7 +180,7 @@ class Casing
             return static::$studlyCache[$key];
         }
 
-        $words = explode(' ', Str::replace(['-', '_'], ' ', $value));
+        $words = explode(' ', Replacer::replace(['-', '_'], ' ', $value));
 
         $studlyWords = array_map(fn ($word) => static::ucfirst($word), $words);
 
