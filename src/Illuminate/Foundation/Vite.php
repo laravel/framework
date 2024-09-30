@@ -7,7 +7,6 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Generator;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Js;
-use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 
 class Vite implements Htmlable

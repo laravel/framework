@@ -8,7 +8,6 @@ use ReflectionClass;
 
 class SupportCasingTest extends TestCase
 {
-
     public function testConvertCase()
     {
         // Upper Case Conversion
