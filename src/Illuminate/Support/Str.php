@@ -464,6 +464,7 @@ class Str
 
         return preg_replace("/(.*)\s.*/", '$1', $trimmed).$end;
     }
+
     /**
      * Limit the number of words in a string.
      *

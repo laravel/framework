@@ -53,7 +53,6 @@ class Casing
         return mb_strtolower($value, 'UTF-8');
     }
 
-
     /**
      * Convert a value to camel case.
      *

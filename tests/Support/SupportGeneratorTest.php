@@ -10,7 +10,6 @@ use Ramsey\Uuid\UuidInterface;
 
 class SupportGeneratorTest extends TestCase
 {
-
     public function testRandom()
     {
         $this->assertEquals(16, strlen(Generator::random()));
