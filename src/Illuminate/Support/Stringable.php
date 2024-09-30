@@ -459,7 +459,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      */
     public function lower()
     {
-        return new static(Str::lower($this->value));
+        return new static(Casing::lower($this->value));
     }
 
     /**

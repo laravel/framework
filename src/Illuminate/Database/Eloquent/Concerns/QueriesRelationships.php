@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Query\Expression;
+use Illuminate\Support\Casing;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 
@@ -627,7 +628,7 @@ trait QueriesRelationships
 
             unset($alias);
 
-            if (count($segments) === 3 && Str::lower($segments[1]) === 'as') {
+            if (count($segments) === 3 && Casing::lower($segments[1]) === 'as') {
                 [$name, $alias] = [$segments[0], $segments[2]];
             }
 

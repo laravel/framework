@@ -7,6 +7,7 @@ use Illuminate\Console\Command;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Http\Client\Factory as Http;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Casing;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Env;
 use Illuminate\Support\Str;
@@ -235,15 +236,15 @@ class DocsCommand extends Command
             label: 'Which page would you like to open?',
             options: fn ($value) => $this->pages()
                 ->mapWithKeys(fn ($option) => [
-                    Str::lower($option['title']) => $option['title'],
+                    Casing::lower($option['title']) => $option['title'],
                 ])
-                ->filter(fn ($title) => str_contains(Str::lower($title), Str::lower($value)))
+                ->filter(fn ($title) => str_contains(Casing::lower($title), Casing::lower($value)))
                 ->all(),
             placeholder: 'E.g. Collections'
         );
 
         return $this->pages()->filter(
-            fn ($page) => $page['title'] === $choice || Str::lower($page['title']) === $choice
+            fn ($page) => $page['title'] === $choice || Casing::lower($page['title']) === $choice
         )->keys()->first() ?: $this->guessPage($choice);
     }
 

@@ -18,6 +18,7 @@ use Exception;
 use Illuminate\Container\Container;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Casing;
 use Illuminate\Support\Exceptions\MathException;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Str;
@@ -1353,7 +1354,7 @@ trait ValidatesAttributes
      */
     public function validateLowercase($attribute, $value, $parameters)
     {
-        return Str::lower($value) === $value;
+        return Casing::lower($value) === $value;
     }
 
     /**
@@ -1366,7 +1367,7 @@ trait ValidatesAttributes
      */
     public function validateUppercase($attribute, $value, $parameters)
     {
-        return Str::upper($value) === $value;
+        return Casing::upper($value) === $value;
     }
 
     /**
@@ -2290,7 +2291,7 @@ trait ValidatesAttributes
     protected function convertValuesToNull($values)
     {
         return array_map(function ($value) {
-            return Str::lower($value) === 'null' ? null : $value;
+            return Casing::lower($value) === 'null' ? null : $value;
         }, $values);
     }
 

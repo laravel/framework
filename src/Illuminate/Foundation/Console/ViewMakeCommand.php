@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Console;
 use Illuminate\Console\Concerns\CreatesMatchingTest;
 use Illuminate\Console\GeneratorCommand;
 use Illuminate\Foundation\Inspiring;
+use Illuminate\Support\Casing;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -181,7 +182,7 @@ class ViewMakeCommand extends GeneratorCommand
      */
     protected function testClassFullyQualifiedName()
     {
-        $name = Str::of(Str::lower($this->getNameInput()))->replace('.'.$this->option('extension'), '');
+        $name = Str::of(Casing::lower($this->getNameInput()))->replace('.'.$this->option('extension'), '');
 
         $namespacedName = Str::of(
             Str::of($name)
