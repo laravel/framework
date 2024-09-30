@@ -317,6 +317,17 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Get the first result in random order.
+     *
+     * @param  array|string  $columns
+     * @return TModel|null
+     */
+    public function firstRandom($columns = ['*'])
+    {
+        return $this->inRandomOrder()->first($columns);
+    }
+
+    /**
      * Add a basic where clause to the query, and return the first result.
      *
      * @param  (\Closure(static): mixed)|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
