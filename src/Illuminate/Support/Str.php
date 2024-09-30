@@ -787,7 +787,7 @@ class Str
         $title = str_replace(array_keys($dictionary), array_values($dictionary), $title);
 
         // Remove all characters that are not the separator, letters, numbers, or whitespace
-        $title = preg_replace('![^'.preg_quote($separator).'\pL\pN\s]+!u', '', static::lower($title));
+        $title = preg_replace('![^'.preg_quote($separator).'\pL\pN\s]+!u', '', Casing::lower($title));
 
         // Replace all separator characters and whitespace by a single separator
         $title = preg_replace('!['.preg_quote($separator).'\s]+!u', $separator, $title);
