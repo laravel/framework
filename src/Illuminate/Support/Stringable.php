@@ -196,7 +196,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      */
     public function camel()
     {
-        return new static(Str::camel($this->value));
+        return new static(Casing::camel($this->value));
     }
 
     /**
@@ -232,7 +232,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      */
     public function convertCase(int $mode = MB_CASE_FOLD, ?string $encoding = 'UTF-8')
     {
-        return new static(Str::convertCase($this->value, $mode, $encoding));
+        return new static(Casing::convertCase($this->value, $mode, $encoding));
     }
 
     /**
@@ -345,7 +345,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      */
     public function is($pattern)
     {
-        return Str::is($pattern, $this->value);
+        return PatternMatcher::is($pattern, $this->value);
     }
 
     /**
@@ -355,7 +355,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      */
     public function isAscii()
     {
-        return Str::isAscii($this->value);
+        return PatternMatcher::isAscii($this->value);
     }
 
     /**
@@ -375,7 +375,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      */
     public function isUrl()
     {
-        return Str::isUrl($this->value);
+        return PatternMatcher::isUrl($this->value);
     }
 
     /**
@@ -385,7 +385,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      */
     public function isUuid()
     {
-        return Str::isUuid($this->value);
+        return PatternMatcher::isUuid($this->value);
     }
 
     /**
@@ -425,7 +425,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      */
     public function kebab()
     {
-        return new static(Str::kebab($this->value));
+        return new static(Casing::kebab($this->value));
     }
 
     /**
@@ -507,7 +507,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      */
     public function match($pattern)
     {
-        return new static(Str::match($pattern, $this->value));
+        return new static(PatternMatcher::match($pattern, $this->value));
     }
 
     /**
@@ -518,7 +518,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      */
     public function isMatch($pattern)
     {
-        return Str::isMatch($pattern, $this->value);
+        return PatternMatcher::isMatch($pattern, $this->value);
     }
 
     /**
@@ -529,7 +529,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      */
     public function matchAll($pattern)
     {
-        return Str::matchAll($pattern, $this->value);
+        return PatternMatcher::matchAll($pattern, $this->value);
     }
 
     /**
@@ -550,7 +550,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      */
     public function numbers()
     {
-        return new static(Str::numbers($this->value));
+        return new static(Replacer::numbers($this->value));
     }
 
     /**
@@ -619,7 +619,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      */
     public function plural($count = 2)
     {
-        return new static(Str::plural($this->value, $count));
+        return new static(StrGrammar::plural($this->value, $count));
     }
 
     /**
@@ -630,7 +630,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      */
     public function pluralStudly($count = 2)
     {
-        return new static(Str::pluralStudly($this->value, $count));
+        return new static(StrGrammar::pluralStudly($this->value, $count));
     }
 
     /**
@@ -666,7 +666,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      */
     public function remove($search, $caseSensitive = true)
     {
-        return new static(Str::remove($search, $this->value, $caseSensitive));
+        return new static(Sanitizer::remove($search, $this->value, $caseSensitive));
     }
 
     /**
@@ -700,7 +700,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      */
     public function replace($search, $replace, $caseSensitive = true)
     {
-        return new static(Str::replace($search, $replace, $this->value, $caseSensitive));
+        return new static(Replacer::replace($search, $replace, $this->value, $caseSensitive));
     }
 
     /**
@@ -712,7 +712,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      */
     public function replaceArray($search, $replace)
     {
-        return new static(Str::replaceArray($search, $replace, $this->value));
+        return new static(Replacer::replaceArray($search, $replace, $this->value));
     }
 
     /**
@@ -724,7 +724,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      */
     public function replaceFirst($search, $replace)
     {
-        return new static(Str::replaceFirst($search, $replace, $this->value));
+        return new static(Replacer::replaceFirst($search, $replace, $this->value));
     }
 
     /**
@@ -736,7 +736,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      */
     public function replaceStart($search, $replace)
     {
-        return new static(Str::replaceStart($search, $replace, $this->value));
+        return new static(Replacer::replaceStart($search, $replace, $this->value));
     }
 
     /**
@@ -748,7 +748,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      */
     public function replaceLast($search, $replace)
     {
-        return new static(Str::replaceLast($search, $replace, $this->value));
+        return new static(Replacer::replaceLast($search, $replace, $this->value));
     }
 
     /**
@@ -760,7 +760,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      */
     public function replaceEnd($search, $replace)
     {
-        return new static(Str::replaceEnd($search, $replace, $this->value));
+        return new static(Replacer::replaceEnd($search, $replace, $this->value));
     }
 
     /**
@@ -798,7 +798,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      */
     public function squish()
     {
-        return new static(Str::squish($this->value));
+        return new static(Sanitizer::squish($this->value));
     }
 
     /**
@@ -830,7 +830,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      */
     public function upper()
     {
-        return new static(Str::upper($this->value));
+        return new static(Casing::upper($this->value));
     }
 
     /**
@@ -840,7 +840,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      */
     public function title()
     {
-        return new static(Str::title($this->value));
+        return new static(Casing::title($this->value));
     }
 
     /**
@@ -850,7 +850,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      */
     public function headline()
     {
-        return new static(Str::headline($this->value));
+        return new static(Casing::headline($this->value));
     }
 
     /**
@@ -882,7 +882,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      */
     public function singular()
     {
-        return new static(Str::singular($this->value));
+        return new static(StrGrammar::singular($this->value));
     }
 
     /**
@@ -906,7 +906,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      */
     public function snake($delimiter = '_')
     {
-        return new static(Str::snake($this->value, $delimiter));
+        return new static(Casing::snake($this->value, $delimiter));
     }
 
     /**
@@ -927,7 +927,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      */
     public function studly()
     {
-        return new static(Str::studly($this->value));
+        return new static(Casing::studly($this->value));
     }
 
     /**
@@ -966,7 +966,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      */
     public function substrReplace($replace, $offset = 0, $length = null)
     {
-        return new static(Str::substrReplace($this->value, $replace, $offset, $length));
+        return new static(Replacer::substrReplace($this->value, $replace, $offset, $length));
     }
 
     /**
@@ -1003,7 +1003,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      */
     public function trim($characters = null)
     {
-        return new static(Str::trim(...array_merge([$this->value], func_get_args())));
+        return new static(Sanitizer::trim(...array_merge([$this->value], func_get_args())));
     }
 
     /**
@@ -1014,7 +1014,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      */
     public function ltrim($characters = null)
     {
-        return new static(Str::ltrim(...array_merge([$this->value], func_get_args())));
+        return new static(Sanitizer::ltrim(...array_merge([$this->value], func_get_args())));
     }
 
     /**
@@ -1025,7 +1025,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      */
     public function rtrim($characters = null)
     {
-        return new static(Str::rtrim(...array_merge([$this->value], func_get_args())));
+        return new static(Sanitizer::rtrim(...array_merge([$this->value], func_get_args())));
     }
 
     /**
@@ -1035,7 +1035,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      */
     public function lcfirst()
     {
-        return new static(Str::lcfirst($this->value));
+        return new static(Casing::lcfirst($this->value));
     }
 
     /**
@@ -1045,7 +1045,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      */
     public function ucfirst()
     {
-        return new static(Str::ucfirst($this->value));
+        return new static(Casing::ucfirst($this->value));
     }
 
     /**
