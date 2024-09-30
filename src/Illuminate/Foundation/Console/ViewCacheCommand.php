@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Illuminate\Console\Attributes\AsOptimize;
 use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -10,6 +11,7 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 
 #[AsCommand(name: 'view:cache')]
+#[AsOptimize(name: 'views')]
 class ViewCacheCommand extends Command
 {
     /**

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Illuminate\Console\Attributes\AsOptimize;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Console\Kernel as ConsoleKernelContract;
 use Illuminate\Filesystem\Filesystem;
@@ -9,6 +10,7 @@ use Illuminate\Routing\RouteCollection;
 use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'route:cache')]
+#[AsOptimize(name: 'routes')]
 class RouteCacheCommand extends Command
 {
     /**

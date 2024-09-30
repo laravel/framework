@@ -2,11 +2,13 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Illuminate\Console\Attributes\AsOptimize;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'event:clear')]
+#[AsOptimize(name: 'events', clear: true)]
 class EventClearCommand extends Command
 {
     /**

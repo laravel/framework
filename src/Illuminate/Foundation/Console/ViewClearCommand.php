@@ -2,12 +2,14 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Illuminate\Console\Attributes\AsOptimize;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use RuntimeException;
 use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'view:clear')]
+#[AsOptimize(name: 'views', clear: true)]
 class ViewClearCommand extends Command
 {
     /**

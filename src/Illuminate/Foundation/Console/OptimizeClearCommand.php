@@ -2,7 +2,9 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Illuminate\Console\Attributes\AsOptimize;
 use Illuminate\Console\Command;
+use ReflectionAttribute;
 use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'optimize:clear')]
@@ -31,14 +33,15 @@ class OptimizeClearCommand extends Command
     {
         $this->components->info('Clearing cached bootstrap files.');
 
-        collect([
-            'cache' => fn () => $this->callSilent('cache:clear') == 0,
-            'compiled' => fn () => $this->callSilent('clear-compiled') == 0,
-            'config' => fn () => $this->callSilent('config:clear') == 0,
-            'events' => fn () => $this->callSilent('event:clear') == 0,
-            'routes' => fn () => $this->callSilent('route:clear') == 0,
-            'views' => fn () => $this->callSilent('view:clear') == 0,
-        ])->each(fn ($task, $description) => $this->components->task($description, $task));
+        $commands = collect($this->getApplication()->all())
+            ->mapWithKeys(fn($command, $name) => [$name => collect((new \ReflectionClass($command))->getAttributes(AsOptimize::class))->first()])
+            ->filter(fn(?ReflectionAttribute $attribute) => $attribute !== null)
+            ->filter(fn(ReflectionAttribute $attribute) => ($attribute->getArguments()['clear']) === true)
+            ->mapWithKeys(fn(ReflectionAttribute $attribute, $command) => [
+                $attribute->getArguments()['name'] => fn() => $this->callSilent($command) == 0
+            ]);
+
+        $commands->each(fn($task, $description) => $this->components->task($description, $task));
 
         $this->newLine();
     }

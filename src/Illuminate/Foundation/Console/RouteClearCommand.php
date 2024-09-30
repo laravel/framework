@@ -2,11 +2,13 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Illuminate\Console\Attributes\AsOptimize;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'route:clear')]
+#[AsOptimize(name: 'routes', clear: true)]
 class RouteClearCommand extends Command
 {
     /**

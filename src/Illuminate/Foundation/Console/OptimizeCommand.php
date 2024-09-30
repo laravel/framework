@@ -2,7 +2,9 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Illuminate\Console\Attributes\AsOptimize;
 use Illuminate\Console\Command;
+use ReflectionAttribute;
 use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'optimize')]
@@ -31,12 +33,15 @@ class OptimizeCommand extends Command
     {
         $this->components->info('Caching framework bootstrap, configuration, and metadata.');
 
-        collect([
-            'config' => fn () => $this->callSilent('config:cache') == 0,
-            'events' => fn () => $this->callSilent('event:cache') == 0,
-            'routes' => fn () => $this->callSilent('route:cache') == 0,
-            'views' => fn () => $this->callSilent('view:cache') == 0,
-        ])->each(fn ($task, $description) => $this->components->task($description, $task));
+        $commands = collect($this->getApplication()->all())
+            ->mapWithKeys(fn($command, $name) => [$name => collect((new \ReflectionClass($command))->getAttributes(AsOptimize::class))->first()])
+            ->filter(fn(?ReflectionAttribute $attribute) => $attribute !== null)
+            ->filter(fn(ReflectionAttribute $attribute) => ($attribute->getArguments()['clear']) === false)
+            ->mapWithKeys(fn(ReflectionAttribute $attribute, $command) => [
+                $attribute->getArguments()['name'] => fn() => $this->callSilent($command) == 0
+            ]);
+
+        $commands->each(fn($task, $description) => $this->components->task($description, $task));
 
         $this->newLine();
     }

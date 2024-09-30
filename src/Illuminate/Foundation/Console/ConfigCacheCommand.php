@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Illuminate\Console\Attributes\AsOptimize;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Console\Kernel as ConsoleKernelContract;
 use Illuminate\Filesystem\Filesystem;
@@ -10,6 +11,7 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Throwable;
 
 #[AsCommand(name: 'config:cache')]
+#[AsOptimize(name: 'config')]
 class ConfigCacheCommand extends Command
 {
     /**
