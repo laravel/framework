@@ -2,56 +2,56 @@
 
 namespace Illuminate\Tests\Support;
 
-use Illuminate\Support\Str;
+use Illuminate\Support\StrGrammar;
 use PHPUnit\Framework\TestCase;
 
 class SupportPluralizerTest extends TestCase
 {
     public function testBasicSingular()
     {
-        $this->assertSame('child', Str::singular('children'));
+        $this->assertSame('child', StrGrammar::singular('children'));
     }
 
     public function testBasicPlural()
     {
-        $this->assertSame('children', Str::plural('child'));
-        $this->assertSame('cod', Str::plural('cod'));
-        $this->assertSame('The words', Str::plural('The word'));
-        $this->assertSame('Bouquetés', Str::plural('Bouqueté'));
+        $this->assertSame('children', StrGrammar::plural('child'));
+        $this->assertSame('cod', StrGrammar::plural('cod'));
+        $this->assertSame('The words', StrGrammar::plural('The word'));
+        $this->assertSame('Bouquetés', StrGrammar::plural('Bouqueté'));
     }
 
     public function testCaseSensitiveSingularUsage()
     {
-        $this->assertSame('Child', Str::singular('Children'));
-        $this->assertSame('CHILD', Str::singular('CHILDREN'));
-        $this->assertSame('Test', Str::singular('Tests'));
+        $this->assertSame('Child', StrGrammar::singular('Children'));
+        $this->assertSame('CHILD', StrGrammar::singular('CHILDREN'));
+        $this->assertSame('Test', StrGrammar::singular('Tests'));
     }
 
     public function testCaseSensitiveSingularPlural()
     {
-        $this->assertSame('Children', Str::plural('Child'));
-        $this->assertSame('CHILDREN', Str::plural('CHILD'));
-        $this->assertSame('Tests', Str::plural('Test'));
-        $this->assertSame('children', Str::plural('cHiLd'));
+        $this->assertSame('Children', StrGrammar::plural('Child'));
+        $this->assertSame('CHILDREN', StrGrammar::plural('CHILD'));
+        $this->assertSame('Tests', StrGrammar::plural('Test'));
+        $this->assertSame('children', StrGrammar::plural('cHiLd'));
     }
 
     public function testIfEndOfWordPlural()
     {
-        $this->assertSame('VortexFields', Str::plural('VortexField'));
-        $this->assertSame('MatrixFields', Str::plural('MatrixField'));
-        $this->assertSame('IndexFields', Str::plural('IndexField'));
-        $this->assertSame('VertexFields', Str::plural('VertexField'));
+        $this->assertSame('VortexFields', StrGrammar::plural('VortexField'));
+        $this->assertSame('MatrixFields', StrGrammar::plural('MatrixField'));
+        $this->assertSame('IndexFields', StrGrammar::plural('IndexField'));
+        $this->assertSame('VertexFields', StrGrammar::plural('VertexField'));
 
-        // This is expected behavior, use "Str::pluralStudly" instead.
-        $this->assertSame('RealHumen', Str::plural('RealHuman'));
+        // This is expected behavior, use "StrGrammar::pluralStudly" instead.
+        $this->assertSame('RealHumen', StrGrammar::plural('RealHuman'));
     }
 
     public function testPluralWithNegativeCount()
     {
-        $this->assertSame('test', Str::plural('test', 1));
-        $this->assertSame('tests', Str::plural('test', 2));
-        $this->assertSame('test', Str::plural('test', -1));
-        $this->assertSame('tests', Str::plural('test', -2));
+        $this->assertSame('test', StrGrammar::plural('test', 1));
+        $this->assertSame('tests', StrGrammar::plural('test', 2));
+        $this->assertSame('test', StrGrammar::plural('test', -1));
+        $this->assertSame('tests', StrGrammar::plural('test', -2));
     }
 
     public function testPluralStudly()
@@ -72,31 +72,31 @@ class SupportPluralizerTest extends TestCase
 
     public function testPluralNotAppliedForStringEndingWithNonAlphanumericCharacter()
     {
-        $this->assertSame('Alien.', Str::plural('Alien.'));
-        $this->assertSame('Alien!', Str::plural('Alien!'));
-        $this->assertSame('Alien ', Str::plural('Alien '));
-        $this->assertSame('50%', Str::plural('50%'));
+        $this->assertSame('Alien.', StrGrammar::plural('Alien.'));
+        $this->assertSame('Alien!', StrGrammar::plural('Alien!'));
+        $this->assertSame('Alien ', StrGrammar::plural('Alien '));
+        $this->assertSame('50%', StrGrammar::plural('50%'));
     }
 
     public function testPluralAppliedForStringEndingWithNumericCharacter()
     {
-        $this->assertSame('User1s', Str::plural('User1'));
-        $this->assertSame('User2s', Str::plural('User2'));
-        $this->assertSame('User3s', Str::plural('User3'));
+        $this->assertSame('User1s', StrGrammar::plural('User1'));
+        $this->assertSame('User2s', StrGrammar::plural('User2'));
+        $this->assertSame('User3s', StrGrammar::plural('User3'));
     }
 
     public function testPluralSupportsArrays()
     {
-        $this->assertSame('users', Str::plural('user', []));
-        $this->assertSame('user', Str::plural('user', ['one']));
-        $this->assertSame('users', Str::plural('user', ['one', 'two']));
+        $this->assertSame('users', StrGrammar::plural('user', []));
+        $this->assertSame('user', StrGrammar::plural('user', ['one']));
+        $this->assertSame('users', StrGrammar::plural('user', ['one', 'two']));
     }
 
     public function testPluralSupportsCollections()
     {
-        $this->assertSame('users', Str::plural('user', collect()));
-        $this->assertSame('user', Str::plural('user', collect(['one'])));
-        $this->assertSame('users', Str::plural('user', collect(['one', 'two'])));
+        $this->assertSame('users', StrGrammar::plural('user', collect()));
+        $this->assertSame('user', StrGrammar::plural('user', collect(['one'])));
+        $this->assertSame('users', StrGrammar::plural('user', collect(['one', 'two'])));
     }
 
     public function testPluralStudlySupportsArrays()
@@ -115,6 +115,6 @@ class SupportPluralizerTest extends TestCase
 
     private function assertPluralStudly($expected, $value, $count = 2)
     {
-        $this->assertSame($expected, Str::pluralStudly($value, $count));
+        $this->assertSame($expected, StrGrammar::pluralStudly($value, $count));
     }
 }
