@@ -9,7 +9,6 @@ use Illuminate\Contracts\Cache\Store;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Replacer;
-use Illuminate\Support\Str;
 use RuntimeException;
 
 class DynamoDbStore implements LockProvider, Store

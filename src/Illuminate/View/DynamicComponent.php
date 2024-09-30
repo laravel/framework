@@ -4,7 +4,6 @@ namespace Illuminate\View;
 
 use Illuminate\Container\Container;
 use Illuminate\Support\Casing;
-use Illuminate\Support\Str;
 use Illuminate\View\Compilers\ComponentTagCompiler;
 
 class DynamicComponent extends Component

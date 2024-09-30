@@ -38,7 +38,6 @@ use Illuminate\Routing\RouteGroup;
 use Illuminate\Routing\Router;
 use Illuminate\Routing\UrlGenerator;
 use Illuminate\Support\Generator;
-use Illuminate\Support\Str;
 use LogicException;
 use PHPUnit\Framework\TestCase;
 use stdClass;

@@ -5,7 +5,6 @@ namespace Illuminate\Foundation\Events;
 use Illuminate\Support\PatternMatcher;
 use Illuminate\Support\Reflector;
 use Illuminate\Support\Replacer;
-use Illuminate\Support\Str;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;

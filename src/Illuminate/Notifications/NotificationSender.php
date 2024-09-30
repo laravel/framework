@@ -10,7 +10,6 @@ use Illuminate\Notifications\Events\NotificationSending;
 use Illuminate\Notifications\Events\NotificationSent;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Generator;
-use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Localizable;
 
 class NotificationSender

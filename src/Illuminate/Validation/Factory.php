@@ -7,7 +7,6 @@ use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Contracts\Validation\Factory as FactoryContract;
 use Illuminate\Support\Casing;
-use Illuminate\Support\Str;
 
 class Factory implements FactoryContract
 {

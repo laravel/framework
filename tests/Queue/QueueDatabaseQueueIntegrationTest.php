@@ -12,7 +12,6 @@ use Illuminate\Queue\Events\JobQueued;
 use Illuminate\Queue\Events\JobQueueing;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Generator;
-use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
 
 class QueueDatabaseQueueIntegrationTest extends TestCase

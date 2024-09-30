@@ -17,7 +17,6 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Casing;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
 use ReflectionClass;
 use Symfony\Component\Console\Output\OutputInterface;
 

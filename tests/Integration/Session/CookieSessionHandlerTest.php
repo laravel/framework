@@ -4,7 +4,6 @@ namespace Illuminate\Tests\Integration\Session;
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Generator;
-use Illuminate\Support\Str;
 use Orchestra\Testbench\TestCase;
 
 class CookieSessionHandlerTest extends TestCase

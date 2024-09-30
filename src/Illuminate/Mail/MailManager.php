@@ -15,7 +15,6 @@ use Illuminate\Mail\Transport\SesV2Transport;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Casing;
 use Illuminate\Support\ConfigurationUrlParser;
-use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Resend;

@@ -7,7 +7,6 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Generator;
-use Illuminate\Support\Str;
 
 class EloquentModelTest extends DatabaseTestCase
 {

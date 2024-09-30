@@ -4,7 +4,6 @@ namespace Illuminate\Mail;
 
 use Illuminate\Contracts\Mail\Attachable;
 use Illuminate\Support\Generator;
-use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;

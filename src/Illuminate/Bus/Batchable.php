@@ -5,7 +5,6 @@ namespace Illuminate\Bus;
 use Carbon\CarbonImmutable;
 use Generator;
 use Illuminate\Container\Container;
-use Illuminate\Support\Str;
 use Illuminate\Support\Testing\Fakes\BatchFake;
 
 trait Batchable

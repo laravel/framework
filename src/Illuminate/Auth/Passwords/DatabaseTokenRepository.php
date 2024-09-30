@@ -7,7 +7,6 @@ use Illuminate\Contracts\Hashing\Hasher as HasherContract;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Generator;
-use Illuminate\Support\Str;
 
 class DatabaseTokenRepository implements TokenRepositoryInterface
 {

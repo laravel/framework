@@ -4,7 +4,6 @@ namespace Illuminate\Notifications;
 
 use Illuminate\Contracts\Notifications\Dispatcher;
 use Illuminate\Support\Casing;
-use Illuminate\Support\Str;
 
 trait RoutesNotifications
 {

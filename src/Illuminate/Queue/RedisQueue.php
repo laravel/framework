@@ -7,7 +7,6 @@ use Illuminate\Contracts\Queue\Queue as QueueContract;
 use Illuminate\Contracts\Redis\Factory as Redis;
 use Illuminate\Queue\Jobs\RedisJob;
 use Illuminate\Support\Generator;
-use Illuminate\Support\Str;
 
 class RedisQueue extends Queue implements QueueContract, ClearableQueue
 {

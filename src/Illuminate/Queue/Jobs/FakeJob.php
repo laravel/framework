@@ -3,7 +3,6 @@
 namespace Illuminate\Queue\Jobs;
 
 use Illuminate\Support\Generator;
-use Illuminate\Support\Str;
 
 class FakeJob extends Job
 {

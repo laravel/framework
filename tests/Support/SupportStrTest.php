@@ -2,13 +2,10 @@
 
 namespace Illuminate\Tests\Support;
 
-use Exception;
 use Illuminate\Support\PatternMatcher;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Ramsey\Uuid\UuidInterface;
-use ReflectionClass;
 use ValueError;
 
 class SupportStrTest extends TestCase

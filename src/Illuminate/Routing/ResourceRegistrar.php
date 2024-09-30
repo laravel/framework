@@ -2,7 +2,6 @@
 
 namespace Illuminate\Routing;
 
-use Illuminate\Support\Str;
 use Illuminate\Support\StrGrammar;
 
 class ResourceRegistrar

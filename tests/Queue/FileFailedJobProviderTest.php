@@ -5,7 +5,6 @@ namespace Illuminate\Tests\Queue;
 use Exception;
 use Illuminate\Queue\Failed\FileFailedJobProvider;
 use Illuminate\Support\Generator;
-use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
 
 class FileFailedJobProviderTest extends TestCase

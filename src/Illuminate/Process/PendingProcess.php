@@ -5,7 +5,6 @@ namespace Illuminate\Process;
 use Closure;
 use Illuminate\Process\Exceptions\ProcessTimedOutException;
 use Illuminate\Support\PatternMatcher;
-use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Conditionable;
 use LogicException;
 use RuntimeException;

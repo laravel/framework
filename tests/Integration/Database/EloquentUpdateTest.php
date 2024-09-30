@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Generator;
-use Illuminate\Support\Str;
 
 class EloquentUpdateTest extends DatabaseTestCase
 {

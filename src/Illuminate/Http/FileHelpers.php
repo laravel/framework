@@ -3,7 +3,6 @@
 namespace Illuminate\Http;
 
 use Illuminate\Support\Generator;
-use Illuminate\Support\Str;
 
 trait FileHelpers
 {

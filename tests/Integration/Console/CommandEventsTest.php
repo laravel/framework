@@ -10,7 +10,6 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Testing\WithConsoleEvents;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Generator;
-use Illuminate\Support\Str;
 use Orchestra\Testbench\Foundation\Application as Testbench;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;

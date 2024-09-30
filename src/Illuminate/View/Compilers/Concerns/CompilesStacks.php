@@ -3,7 +3,6 @@
 namespace Illuminate\View\Compilers\Concerns;
 
 use Illuminate\Support\Generator;
-use Illuminate\Support\Str;
 
 trait CompilesStacks
 {

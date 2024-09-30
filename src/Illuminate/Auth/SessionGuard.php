@@ -20,7 +20,6 @@ use Illuminate\Contracts\Session\Session;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Generator;
-use Illuminate\Support\Str;
 use Illuminate\Support\Timebox;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;

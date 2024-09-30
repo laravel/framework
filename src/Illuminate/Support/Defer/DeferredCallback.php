@@ -3,7 +3,6 @@
 namespace Illuminate\Support\Defer;
 
 use Illuminate\Support\Generator;
-use Illuminate\Support\Str;
 
 class DeferredCallback
 {

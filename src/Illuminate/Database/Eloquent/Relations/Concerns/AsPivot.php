@@ -4,7 +4,6 @@ namespace Illuminate\Database\Eloquent\Relations\Concerns;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Casing;
-use Illuminate\Support\Str;
 use Illuminate\Support\StrGrammar;
 
 trait AsPivot

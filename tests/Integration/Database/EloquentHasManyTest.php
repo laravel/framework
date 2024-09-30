@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Generator;
-use Illuminate\Support\Str;
 
 class EloquentHasManyTest extends DatabaseTestCase
 {

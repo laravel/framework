@@ -14,7 +14,6 @@ use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithPivotTable;
 use Illuminate\Database\Query\Grammars\MySqlGrammar;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Casing;
-use Illuminate\Support\Str;
 use Illuminate\Support\StrGrammar;
 use InvalidArgumentException;
 

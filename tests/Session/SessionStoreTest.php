@@ -7,7 +7,6 @@ use Illuminate\Session\CookieSessionHandler;
 use Illuminate\Session\Store;
 use Illuminate\Support\Generator;
 use Illuminate\Support\MessageBag;
-use Illuminate\Support\Str;
 use Illuminate\Support\ViewErrorBag;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;

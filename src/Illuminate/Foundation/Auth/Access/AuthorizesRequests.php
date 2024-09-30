@@ -4,7 +4,6 @@ namespace Illuminate\Foundation\Auth\Access;
 
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Support\Casing;
-use Illuminate\Support\Str;
 
 trait AuthorizesRequests
 {

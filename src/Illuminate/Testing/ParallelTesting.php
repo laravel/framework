@@ -3,7 +3,6 @@
 namespace Illuminate\Testing;
 
 use Illuminate\Contracts\Container\Container;
-use Illuminate\Support\Str;
 
 class ParallelTesting
 {

@@ -13,7 +13,6 @@ use Illuminate\Queue\Events\JobQueueing;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Generator;
 use Illuminate\Support\InteractsWithTime;
-use Illuminate\Support\Str;
 
 abstract class Queue
 {

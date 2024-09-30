@@ -5,7 +5,6 @@ namespace Illuminate\Database\Query\Grammars;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\JoinLateralClause;
 use Illuminate\Support\Replacer;
-use Illuminate\Support\Str;
 
 class MySqlGrammar extends Grammar
 {

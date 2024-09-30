@@ -5,7 +5,6 @@ namespace Illuminate\Queue\Console;
 use Illuminate\Console\Command;
 use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Contracts\Queue\ClearableQueue;
-use Illuminate\Support\Str;
 use Illuminate\Support\StrGrammar;
 use ReflectionClass;
 use Symfony\Component\Console\Attribute\AsCommand;

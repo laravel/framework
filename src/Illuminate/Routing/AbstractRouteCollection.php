@@ -7,7 +7,6 @@ use Countable;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Generator;
-use Illuminate\Support\Str;
 use IteratorAggregate;
 use LogicException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;

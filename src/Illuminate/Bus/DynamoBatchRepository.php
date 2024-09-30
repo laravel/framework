@@ -7,7 +7,6 @@ use Aws\DynamoDb\Marshaler;
 use Carbon\CarbonImmutable;
 use Closure;
 use Illuminate\Support\Generator;
-use Illuminate\Support\Str;
 
 class DynamoBatchRepository implements BatchRepository
 {

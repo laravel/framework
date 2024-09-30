@@ -5,7 +5,6 @@ namespace Illuminate\Log;
 use Closure;
 use Illuminate\Log\Context\Repository as ContextRepository;
 use Illuminate\Support\Casing;
-use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\ErrorLogHandler;

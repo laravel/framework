@@ -5,7 +5,6 @@ namespace Illuminate\Tests\Integration\Auth\Middleware;
 use Illuminate\Auth\Middleware\RedirectIfAuthenticated;
 use Illuminate\Contracts\Routing\Registrar;
 use Illuminate\Support\Generator;
-use Illuminate\Support\Str;
 use Illuminate\Tests\Integration\Auth\Fixtures\AuthenticationTestUser;
 use Orchestra\Testbench\Factories\UserFactory;
 use Orchestra\Testbench\TestCase;

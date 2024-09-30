@@ -5,7 +5,6 @@ namespace Illuminate\Redis\Limiters;
 use Illuminate\Contracts\Redis\LimiterTimeoutException;
 use Illuminate\Support\Generator;
 use Illuminate\Support\Sleep;
-use Illuminate\Support\Str;
 use Throwable;
 
 class ConcurrencyLimiter

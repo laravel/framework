@@ -11,7 +11,6 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Env;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Generator;
-use Illuminate\Support\Str;
 use Orchestra\Testbench\Attributes\RequiresEnv;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;

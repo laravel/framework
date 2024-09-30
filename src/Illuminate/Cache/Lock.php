@@ -7,7 +7,6 @@ use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Support\Generator;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Sleep;
-use Illuminate\Support\Str;
 
 abstract class Lock implements LockContract
 {

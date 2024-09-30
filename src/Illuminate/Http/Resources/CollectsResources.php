@@ -7,7 +7,6 @@ use Illuminate\Pagination\AbstractCursorPaginator;
 use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Replacer;
-use Illuminate\Support\Str;
 use LogicException;
 use ReflectionClass;
 use Traversable;

@@ -22,7 +22,6 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Casing;
-use Illuminate\Support\Str;
 use Illuminate\Support\StrGrammar;
 
 trait HasRelationships

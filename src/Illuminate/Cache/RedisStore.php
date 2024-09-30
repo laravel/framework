@@ -8,7 +8,6 @@ use Illuminate\Redis\Connections\PhpRedisConnection;
 use Illuminate\Redis\Connections\PredisConnection;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\PatternMatcher;
-use Illuminate\Support\Str;
 
 class RedisStore extends TaggableStore implements LockProvider
 {

@@ -5,7 +5,6 @@ namespace Illuminate\Foundation\Http\Middleware;
 use Closure;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Sanitizer;
-use Illuminate\Support\Str;
 
 class TrimStrings extends TransformsRequest
 {

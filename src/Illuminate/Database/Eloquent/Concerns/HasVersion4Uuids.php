@@ -3,7 +3,6 @@
 namespace Illuminate\Database\Eloquent\Concerns;
 
 use Illuminate\Support\Generator;
-use Illuminate\Support\Str;
 
 trait HasVersion4Uuids
 {

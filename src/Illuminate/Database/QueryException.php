@@ -3,7 +3,6 @@
 namespace Illuminate\Database;
 
 use Illuminate\Support\Replacer;
-use Illuminate\Support\Str;
 use PDOException;
 use Throwable;
 

@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Routing\Exceptions\BackedEnumCaseNotFoundException;
 use Illuminate\Support\Casing;
 use Illuminate\Support\Reflector;
-use Illuminate\Support\Str;
 
 class ImplicitRouteBinding
 {

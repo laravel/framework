@@ -4,7 +4,6 @@ namespace Illuminate\Tests\Integration\Foundation\Support\Providers;
 
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Generator;
-use Illuminate\Support\Str;
 use Orchestra\Testbench\TestCase;
 
 class RouteServiceProviderHealthTest extends TestCase

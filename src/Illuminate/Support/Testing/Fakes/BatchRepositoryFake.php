@@ -8,7 +8,6 @@ use Illuminate\Bus\BatchRepository;
 use Illuminate\Bus\PendingBatch;
 use Illuminate\Bus\UpdatedBatchJobCounts;
 use Illuminate\Support\Generator;
-use Illuminate\Support\Str;
 
 class BatchRepositoryFake implements BatchRepository
 {
