@@ -94,7 +94,7 @@ class EloquentUserProvider implements UserProvider
     {
         $user->setRememberToken($token);
 
-        $user->withoutTimestamps(function() use ($user, $token) {
+        $user->withoutTimestamps(function () use ($user, $token) {
             $user->update([$user->getRememberTokenName() => $token]);
         });
     }
