@@ -41,7 +41,7 @@ class Replacer
         $result = array_shift($segments);
 
         foreach ($segments as $segment) {
-            $result .= Str::toStringOr(array_shift($replace) ?? $search, $search).$segment;
+            $result .= static::toStringOr(array_shift($replace) ?? $search, $search).$segment;
         }
 
         return $result;
