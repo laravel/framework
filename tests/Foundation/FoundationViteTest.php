@@ -6,6 +6,7 @@ use Illuminate\Foundation\Vite;
 use Illuminate\Foundation\ViteException;
 use Illuminate\Foundation\ViteManifestNotFoundException;
 use Illuminate\Support\Facades\Vite as ViteFacade;
+use Illuminate\Support\Generator;
 use Illuminate\Support\Js;
 use Illuminate\Support\Str;
 use Orchestra\Testbench\TestCase;
@@ -104,7 +105,7 @@ class FoundationViteTest extends TestCase
 
     public function testItCanGenerateCspNonceWithHotFile()
     {
-        Str::createRandomStringsUsing(fn ($length) => "random-string-with-length:{$length}");
+        Generator::createRandomStringsUsing(fn ($length) => "random-string-with-length:{$length}");
         $this->makeViteHotFile();
 
         $nonce = ViteFacade::useCspNonce();
@@ -119,12 +120,12 @@ class FoundationViteTest extends TestCase
             $result->toHtml()
         );
 
-        Str::createRandomStringsNormally();
+        Generator::createRandomStringsNormally();
     }
 
     public function testItCanGenerateCspNonceWithManifest()
     {
-        Str::createRandomStringsUsing(fn ($length) => "random-string-with-length:{$length}");
+        Generator::createRandomStringsUsing(fn ($length) => "random-string-with-length:{$length}");
         $this->makeViteManifest();
 
         $nonce = ViteFacade::useCspNonce();
@@ -138,7 +139,7 @@ class FoundationViteTest extends TestCase
             $result->toHtml()
         );
 
-        Str::createRandomStringsNormally();
+        Generator::createRandomStringsNormally();
     }
 
     public function testItCanSpecifyCspNonceWithHotFile()
@@ -195,7 +196,7 @@ class FoundationViteTest extends TestCase
 
     public function testItCanInjectIntegrityWhenPresentInManifest()
     {
-        $buildDir = Str::random();
+        $buildDir = Generator::random();
         $this->makeViteManifest([
             'resources/js/app.js' => [
                 'src' => 'resources/js/app.js',
@@ -222,7 +223,7 @@ class FoundationViteTest extends TestCase
 
     public function testItCanInjectIntegrityWhenPresentInManifestForCss()
     {
-        $buildDir = Str::random();
+        $buildDir = Generator::random();
         $this->makeViteManifest([
             'resources/js/app.js' => [
                 'src' => 'resources/js/app.js',
@@ -258,7 +259,7 @@ class FoundationViteTest extends TestCase
 
     public function testItCanInjectIntegrityWhenPresentInManifestForImportedCss()
     {
-        $buildDir = Str::random();
+        $buildDir = Generator::random();
         $this->makeViteManifest([
             'resources/js/app.js' => [
                 'src' => 'resources/js/app.js',
@@ -294,7 +295,7 @@ class FoundationViteTest extends TestCase
 
     public function testItCanSpecifyIntegrityKey()
     {
-        $buildDir = Str::random();
+        $buildDir = Generator::random();
         $this->makeViteManifest([
             'resources/js/app.js' => [
                 'src' => 'resources/js/app.js',
@@ -676,7 +677,7 @@ class FoundationViteTest extends TestCase
                 'src' => 'resources/images/profile.png',
                 'file' => 'assets/profile.versioned.png',
             ],
-        ], $buildDir = Str::random());
+        ], $buildDir = Generator::random());
         $vite = app(Vite::class)->useBuildDirectory($buildDir);
         $this->app['config']->set('app.asset_url', 'https://cdn.app.com');
 
@@ -703,7 +704,7 @@ class FoundationViteTest extends TestCase
                 'src' => 'resources/images/profile.png',
                 'file' => 'assets/profile.versioned.png',
             ],
-        ], $buildDir = Str::random());
+        ], $buildDir = Generator::random());
         Vite::macro('image', function ($asset, $buildDir = null) {
             return $this->asset("resources/images/{$asset}", $buildDir);
         });
@@ -718,7 +719,7 @@ class FoundationViteTest extends TestCase
     public function testItGeneratesPreloadDirectivesForJsAndCssImports()
     {
         $manifest = json_decode(file_get_contents(__DIR__.'/fixtures/jetstream-manifest.json'));
-        $buildDir = Str::random();
+        $buildDir = Generator::random();
         $this->makeViteManifest($manifest, $buildDir);
 
         $result = app(Vite::class)(['resources/js/Pages/Auth/Login.vue'], $buildDir);
@@ -776,7 +777,7 @@ class FoundationViteTest extends TestCase
 
     public function testItCanSpecifyAttributesForPreloadedAssets()
     {
-        $buildDir = Str::random();
+        $buildDir = Generator::random();
         $this->makeViteManifest([
             'resources/js/app.js' => [
                 'src' => 'resources/js/app.js',
@@ -906,7 +907,7 @@ class FoundationViteTest extends TestCase
 
     public function testItCanSuppressPreloadTagGeneration()
     {
-        $buildDir = Str::random();
+        $buildDir = Generator::random();
         $this->makeViteManifest([
             'resources/js/app.js' => [
                 'src' => 'resources/js/app.js',
@@ -1057,7 +1058,7 @@ class FoundationViteTest extends TestCase
 
     public function testPreloadAssetsGetAssetNonce()
     {
-        $buildDir = Str::random();
+        $buildDir = Generator::random();
         $this->makeViteManifest([
             'resources/js/app.js' => [
                 'src' => 'resources/js/app.js',
@@ -1099,7 +1100,7 @@ class FoundationViteTest extends TestCase
 
     public function testCrossoriginAttributeIsInheritedByPreloadTags()
     {
-        $buildDir = Str::random();
+        $buildDir = Generator::random();
         $this->makeViteManifest([
             'resources/js/app.js' => [
                 'src' => 'resources/js/app.js',
@@ -1146,7 +1147,7 @@ class FoundationViteTest extends TestCase
 
     public function testItCanConfigureTheManifestFilename()
     {
-        $buildDir = Str::random();
+        $buildDir = Generator::random();
         app()->usePublicPath(__DIR__);
         if (! file_exists(public_path($buildDir))) {
             mkdir(public_path($buildDir));
@@ -1174,7 +1175,7 @@ class FoundationViteTest extends TestCase
 
     public function testItOnlyOutputsUniquePreloadTags()
     {
-        $buildDir = Str::random();
+        $buildDir = Generator::random();
         $this->makeViteManifest([
             'resources/js/app.css' => [
                 'file' => 'assets/app-versioned.css',
@@ -1301,7 +1302,7 @@ class FoundationViteTest extends TestCase
     public function testItCanPrefetchEntrypoint()
     {
         $manifest = json_decode(file_get_contents(__DIR__.'/fixtures/prefetching-manifest.json'));
-        $buildDir = Str::random();
+        $buildDir = Generator::random();
         $this->makeViteManifest($manifest, $buildDir);
         app()->usePublicPath(__DIR__);
 
@@ -1377,7 +1378,7 @@ class FoundationViteTest extends TestCase
     public function testItHandlesSpecifyingPageWithAppJs()
     {
         $manifest = json_decode(file_get_contents(__DIR__.'/fixtures/prefetching-manifest.json'));
-        $buildDir = Str::random();
+        $buildDir = Generator::random();
         $this->makeViteManifest($manifest, $buildDir);
         app()->usePublicPath(__DIR__);
 
@@ -1407,7 +1408,7 @@ class FoundationViteTest extends TestCase
     public function testItCanSpecifyWaterfallChunks()
     {
         $manifest = json_decode(file_get_contents(__DIR__.'/fixtures/prefetching-manifest.json'));
-        $buildDir = Str::random();
+        $buildDir = Generator::random();
         $this->makeViteManifest($manifest, $buildDir);
         app()->usePublicPath(__DIR__);
 
@@ -1443,7 +1444,7 @@ class FoundationViteTest extends TestCase
     public function testItCanPrefetchAggressively()
     {
         $manifest = json_decode(file_get_contents(__DIR__.'/fixtures/prefetching-manifest.json'));
-        $buildDir = Str::random();
+        $buildDir = Generator::random();
         $this->makeViteManifest($manifest, $buildDir);
         app()->usePublicPath(__DIR__);
 
@@ -1497,7 +1498,7 @@ class FoundationViteTest extends TestCase
     public function testAddsAttributesToPrefetchTags()
     {
         $manifest = json_decode(file_get_contents(__DIR__.'/fixtures/prefetching-manifest.json'));
-        $buildDir = Str::random();
+        $buildDir = Generator::random();
         $this->makeViteManifest($manifest, $buildDir);
         app()->usePublicPath(__DIR__);
 
@@ -1533,7 +1534,7 @@ class FoundationViteTest extends TestCase
     public function testItNormalisesAttributes()
     {
         $manifest = json_decode(file_get_contents(__DIR__.'/fixtures/prefetching-manifest.json'));
-        $buildDir = Str::random();
+        $buildDir = Generator::random();
         $this->makeViteManifest($manifest, $buildDir);
         app()->usePublicPath(__DIR__);
 
@@ -1576,7 +1577,7 @@ class FoundationViteTest extends TestCase
     public function testItPrefetchesCss()
     {
         $manifest = json_decode(file_get_contents(__DIR__.'/fixtures/prefetching-manifest.json'));
-        $buildDir = Str::random();
+        $buildDir = Generator::random();
         $this->makeViteManifest($manifest, $buildDir);
         app()->usePublicPath(__DIR__);
 
@@ -1655,7 +1656,7 @@ class FoundationViteTest extends TestCase
     public function testSupportCspNonceInPrefetchScript()
     {
         $manifest = json_decode(file_get_contents(__DIR__.'/fixtures/prefetching-manifest.json'));
-        $buildDir = Str::random();
+        $buildDir = Generator::random();
         $this->makeViteManifest($manifest, $buildDir);
         app()->usePublicPath(__DIR__);
 
@@ -1679,7 +1680,7 @@ class FoundationViteTest extends TestCase
     public function testItCanConfigureThePrefetchTriggerEvent()
     {
         $manifest = json_decode(file_get_contents(__DIR__.'/fixtures/prefetching-manifest.json'));
-        $buildDir = Str::random();
+        $buildDir = Generator::random();
         $this->makeViteManifest($manifest, $buildDir);
         app()->usePublicPath(__DIR__);
 

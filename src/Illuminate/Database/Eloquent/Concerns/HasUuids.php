@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Eloquent\Concerns;
 
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\PatternMatcher;
 use Illuminate\Support\Str;
 
 trait HasUuids
@@ -49,11 +50,11 @@ trait HasUuids
      */
     public function resolveRouteBindingQuery($query, $value, $field = null)
     {
-        if ($field && in_array($field, $this->uniqueIds()) && ! Str::isUuid($value)) {
+        if ($field && in_array($field, $this->uniqueIds()) && ! PatternMatcher::isUuid($value)) {
             throw (new ModelNotFoundException)->setModel(get_class($this), $value);
         }
 
-        if (! $field && in_array($this->getRouteKeyName(), $this->uniqueIds()) && ! Str::isUuid($value)) {
+        if (! $field && in_array($this->getRouteKeyName(), $this->uniqueIds()) && ! PatternMatcher::isUuid($value)) {
             throw (new ModelNotFoundException)->setModel(get_class($this), $value);
         }
 

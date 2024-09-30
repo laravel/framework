@@ -3,6 +3,7 @@
 namespace Illuminate\View\Concerns;
 
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Generator;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 
@@ -192,7 +193,7 @@ trait ManagesLayouts
     protected static function parentPlaceholderSalt()
     {
         if (! static::$parentPlaceholderSalt) {
-            return static::$parentPlaceholderSalt = Str::random(40);
+            return static::$parentPlaceholderSalt = Generator::random(40);
         }
 
         return static::$parentPlaceholderSalt;

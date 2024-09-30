@@ -8,6 +8,7 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Events\ShouldDispatchAfterCommit;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\Support\StrGrammar;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\ReflectsClosures;
 use PHPUnit\Framework\Assert as PHPUnit;
@@ -197,7 +198,7 @@ class EventFake implements Dispatcher, Fake
                 '%s dispatched %s %s',
                 $eventName,
                 count($events),
-                Str::plural('time', count($events)),
+                StrGrammar::plural('time', count($events)),
             ))
             ->join("\n- ");
 

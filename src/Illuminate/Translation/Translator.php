@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Contracts\Translation\Loader;
 use Illuminate\Contracts\Translation\Translator as TranslatorContract;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Casing;
 use Illuminate\Support\NamespacedItemResolver;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
@@ -288,8 +289,8 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
                 $value = call_user_func($this->stringableHandlers[get_class($value)], $value);
             }
 
-            $shouldReplace[':'.Str::ucfirst($key)] = Str::ucfirst($value ?? '');
-            $shouldReplace[':'.Str::upper($key)] = Str::upper($value ?? '');
+            $shouldReplace[':'.Casing::ucfirst($key)] = Casing::ucfirst($value ?? '');
+            $shouldReplace[':'.Casing::upper($key)] = Casing::upper($value ?? '');
             $shouldReplace[':'.$key] = $value;
         }
 

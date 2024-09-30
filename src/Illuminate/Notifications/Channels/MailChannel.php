@@ -10,7 +10,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Markdown;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
+use Illuminate\Support\Casing;
 use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\Header\TagHeader;
 
@@ -175,8 +175,8 @@ class MailChannel
     {
         $this->addressMessage($mailMessage, $notifiable, $notification, $message);
 
-        $mailMessage->subject($message->subject ?: Str::title(
-            Str::snake(class_basename($notification), ' ')
+        $mailMessage->subject($message->subject ?: Casing::title(
+            Casing::snake(class_basename($notification), ' ')
         ));
 
         $this->addAttachments($mailMessage, $message);

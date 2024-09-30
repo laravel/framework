@@ -15,6 +15,7 @@ use Illuminate\Contracts\Queue\ShouldBeEncrypted;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
 use Illuminate\Support\Arr;
+use Illuminate\Support\PatternMatcher;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\ReflectsClosures;
@@ -145,7 +146,7 @@ class Dispatcher implements DispatcherContract
     public function hasWildcardListeners($eventName)
     {
         foreach ($this->wildcards as $key => $listeners) {
-            if (Str::is($key, $eventName)) {
+            if (PatternMatcher::is($key, $eventName)) {
                 return true;
             }
         }
@@ -386,7 +387,7 @@ class Dispatcher implements DispatcherContract
         $wildcards = [];
 
         foreach ($this->wildcards as $key => $listeners) {
-            if (Str::is($key, $eventName)) {
+            if (PatternMatcher::is($key, $eventName)) {
                 foreach ($listeners as $listener) {
                     $wildcards[] = $this->makeListener($listener, true);
                 }
@@ -699,7 +700,7 @@ class Dispatcher implements DispatcherContract
         }
 
         foreach ($this->wildcardsCache as $key => $listeners) {
-            if (Str::is($event, $key)) {
+            if (PatternMatcher::is($event, $key)) {
                 unset($this->wildcardsCache[$key]);
             }
         }

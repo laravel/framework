@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Concerns\CreatesMatchingTest;
 use Illuminate\Console\GeneratorCommand;
+use Illuminate\Support\Casing;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -145,7 +146,7 @@ class NotificationMakeCommand extends GeneratorCommand
 
         if ($wantsMarkdownView) {
             $defaultMarkdownView = collect(explode('/', str_replace('\\', '/', $this->argument('name'))))
-                ->map(fn ($path) => Str::kebab($path))
+                ->map(fn ($path) => Casing::kebab($path))
                 ->prepend('mail')
                 ->implode('.');
 

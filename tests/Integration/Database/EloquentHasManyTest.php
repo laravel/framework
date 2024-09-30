@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Generator;
 use Illuminate\Support\Str;
 
 class EloquentHasManyTest extends DatabaseTestCase
@@ -65,7 +66,7 @@ class EloquentHasManyTest extends DatabaseTestCase
     {
         $user = EloquentHasManyTestUser::create();
 
-        $post1 = $user->posts()->create(['title' => Str::random()]);
+        $post1 = $user->posts()->create(['title' => Generator::random()]);
         $post2 = $user->posts()->firstOrCreate(['title' => $post1->title]);
 
         $this->assertTrue($post1->is($post2));
@@ -76,7 +77,7 @@ class EloquentHasManyTest extends DatabaseTestCase
     {
         $user = EloquentHasManyTestUser::create();
 
-        $post1 = $user->posts()->create(['title' => Str::random()]);
+        $post1 = $user->posts()->create(['title' => Generator::random()]);
 
         DB::transaction(function () use ($user, $post1) {
             $post2 = $user->posts()->firstOrCreate(['title' => $post1->title]);
@@ -91,7 +92,7 @@ class EloquentHasManyTest extends DatabaseTestCase
     {
         $user = EloquentHasManyTestUser::create();
 
-        $post1 = $user->posts()->createOrFirst(['title' => Str::random()]);
+        $post1 = $user->posts()->createOrFirst(['title' => Generator::random()]);
         $post2 = $user->posts()->createOrFirst(['title' => $post1->title]);
 
         $this->assertTrue($post1->is($post2));
@@ -102,7 +103,7 @@ class EloquentHasManyTest extends DatabaseTestCase
     {
         $user = EloquentHasManyTestUser::create();
 
-        $post1 = $user->posts()->create(['title' => Str::random()]);
+        $post1 = $user->posts()->create(['title' => Generator::random()]);
 
         DB::transaction(function () use ($user, $post1) {
             $post2 = $user->posts()->createOrFirst(['title' => $post1->title]);

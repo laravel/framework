@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Database\EloquentTouchParentWithGlobalSco
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Generator;
 use Illuminate\Support\Str;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
@@ -28,11 +29,11 @@ class EloquentTouchParentWithGlobalScopeTest extends DatabaseTestCase
 
     public function testBasicCreateAndRetrieve()
     {
-        $post = Post::create(['title' => Str::random(), 'updated_at' => '2016-10-10 10:10:10']);
+        $post = Post::create(['title' => Generator::random(), 'updated_at' => '2016-10-10 10:10:10']);
 
         $this->assertSame('2016-10-10', $post->fresh()->updated_at->toDateString());
 
-        $post->comments()->create(['title' => Str::random()]);
+        $post->comments()->create(['title' => Generator::random()]);
 
         $this->assertNotSame('2016-10-10', $post->fresh()->updated_at->toDateString());
     }

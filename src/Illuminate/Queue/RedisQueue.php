@@ -6,6 +6,7 @@ use Illuminate\Contracts\Queue\ClearableQueue;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
 use Illuminate\Contracts\Redis\Factory as Redis;
 use Illuminate\Queue\Jobs\RedisJob;
+use Illuminate\Support\Generator;
 use Illuminate\Support\Str;
 
 class RedisQueue extends Queue implements QueueContract, ClearableQueue
@@ -345,7 +346,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      */
     protected function getRandomId()
     {
-        return Str::random(32);
+        return Generator::random(32);
     }
 
     /**

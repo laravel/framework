@@ -100,7 +100,7 @@ abstract class Manager
             return $this->callCustomCreator($driver);
         }
 
-        $method = 'create'.Str::studly($driver).'Driver';
+        $method = 'create'.Casing::studly($driver).'Driver';
 
         if (method_exists($this, $method)) {
             return $this->$method();

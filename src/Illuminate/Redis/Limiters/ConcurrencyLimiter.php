@@ -3,6 +3,7 @@
 namespace Illuminate\Redis\Limiters;
 
 use Illuminate\Contracts\Redis\LimiterTimeoutException;
+use Illuminate\Support\Generator;
 use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
 use Throwable;
@@ -69,7 +70,7 @@ class ConcurrencyLimiter
     {
         $starting = time();
 
-        $id = Str::random(20);
+        $id = Generator::random(20);
 
         while (! $slot = $this->acquire($id)) {
             if (time() - $timeout >= $starting) {

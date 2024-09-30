@@ -7,6 +7,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Generator;
 use Illuminate\Support\Str;
 use Illuminate\Tests\Integration\Auth\Fixtures\AuthenticationTestUser;
 use Orchestra\Testbench\Attributes\WithMigration;
@@ -28,7 +29,7 @@ class ForgotPasswordWithoutDefaultRoutesTest extends TestCase
 
     protected function defineEnvironment($app)
     {
-        $app['config']->set('app.key', Str::random(32));
+        $app['config']->set('app.key', Generator::random(32));
         $app['config']->set('auth.providers.users.model', AuthenticationTestUser::class);
     }
 

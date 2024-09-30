@@ -4,6 +4,7 @@ namespace Illuminate\Database\Migrations;
 
 use Closure;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Casing;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 
@@ -159,7 +160,7 @@ class MigrationCreator
      */
     protected function getClassName($name)
     {
-        return Str::studly($name);
+        return Casing::studly($name);
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace Illuminate\View;
 
 use Illuminate\Container\Container;
+use Illuminate\Support\Casing;
 use Illuminate\Support\Str;
 use Illuminate\View\Compilers\ComponentTagCompiler;
 
@@ -48,7 +49,7 @@ class DynamicComponent extends Component
     public function render()
     {
         $template = <<<'EOF'
-<?php extract(collect($attributes->getAttributes())->mapWithKeys(function ($value, $key) { return [Illuminate\Support\Str::camel(str_replace([':', '.'], ' ', $key)) => $value]; })->all(), EXTR_SKIP); ?>
+<?php extract(collect($attributes->getAttributes())->mapWithKeys(function ($value, $key) { return [Illuminate\Support\Casing::camel(str_replace([':', '.'], ' ', $key)) => $value]; })->all(), EXTR_SKIP); ?>
 {{ props }}
 <x-{{ component }} {{ bindings }} {{ attributes }}>
 {{ slots }}
@@ -94,7 +95,7 @@ EOF;
         }
 
         return '@props('.'[\''.implode('\',\'', collect($bindings)->map(function ($dataKey) {
-            return Str::camel($dataKey);
+            return Casing::camel($dataKey);
         })->all()).'\']'.')';
     }
 
@@ -107,7 +108,7 @@ EOF;
     protected function compileBindings(array $bindings)
     {
         return collect($bindings)->map(function ($key) {
-            return ':'.$key.'="$'.Str::camel(str_replace([':', '.'], ' ', $key)).'"';
+            return ':'.$key.'="$'.Casing::camel(str_replace([':', '.'], ' ', $key)).'"';
         })->implode(' ');
     }
 

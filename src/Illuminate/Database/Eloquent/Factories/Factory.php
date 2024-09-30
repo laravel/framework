@@ -10,9 +10,12 @@ use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Casing;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
+use Illuminate\Support\Replacer;
 use Illuminate\Support\Str;
+use Illuminate\Support\StrGrammar;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\Macroable;
@@ -587,9 +590,9 @@ abstract class Factory
      */
     protected function guessRelationship(string $related)
     {
-        $guess = Str::camel(Str::plural(class_basename($related)));
+        $guess = Casing::camel(StrGrammar::plural(class_basename($related)));
 
-        return method_exists($this->modelName(), $guess) ? $guess : Str::singular($guess);
+        return method_exists($this->modelName(), $guess) ? $guess : StrGrammar::singular($guess);
     }
 
     /**
@@ -606,7 +609,7 @@ abstract class Factory
             'has' => $this->has->concat([new BelongsToManyRelationship(
                 $factory,
                 $pivot,
-                $relationship ?? Str::camel(Str::plural(class_basename(
+                $relationship ?? Casing::camel(StrGrammar::plural(class_basename(
                     $factory instanceof Factory
                         ? $factory->modelName()
                         : Collection::wrap($factory)->first()
@@ -626,7 +629,7 @@ abstract class Factory
     {
         return $this->newInstance(['for' => $this->for->concat([new BelongsToRelationship(
             $factory,
-            $relationship ?? Str::camel(class_basename(
+            $relationship ?? Casing::camel(class_basename(
                 $factory instanceof Factory ? $factory->modelName() : $factory
             ))
         )])]);
@@ -780,11 +783,11 @@ abstract class Factory
     public function modelName()
     {
         $resolver = static::$modelNameResolver ?? function (self $factory) {
-            $namespacedFactoryBasename = Str::replaceLast(
-                'Factory', '', Str::replaceFirst(static::$namespace, '', get_class($factory))
+            $namespacedFactoryBasename = Replacer::replaceLast(
+                'Factory', '', Replacer::replaceFirst(static::$namespace, '', get_class($factory))
             );
 
-            $factoryBasename = Str::replaceLast('Factory', '', class_basename($factory));
+            $factoryBasename = Replacer::replaceLast('Factory', '', class_basename($factory));
 
             $appNamespace = static::appNamespace();
 
@@ -916,7 +919,7 @@ abstract class Factory
             static::throwBadMethodCallException($method);
         }
 
-        $relationship = Str::camel(Str::substr($method, 3));
+        $relationship = Casing::camel(Str::substr($method, 3));
 
         $relatedModel = get_class($this->newModel()->{$relationship}()->getRelated());
 

@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\GeneratorCommand;
+use Illuminate\Support\Casing;
 use Illuminate\Support\Str;
 use LogicException;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -121,7 +122,7 @@ class PolicyMakeCommand extends GeneratorCommand
 
         $dummyUser = class_basename($this->userProviderModel());
 
-        $dummyModel = Str::camel($model) === 'user' ? 'model' : $model;
+        $dummyModel = Casing::camel($model) === 'user' ? 'model' : $model;
 
         $replace = [
             'NamespacedDummyModel' => $namespacedModel,
@@ -130,13 +131,13 @@ class PolicyMakeCommand extends GeneratorCommand
             'DummyModel' => $model,
             '{{ model }}' => $model,
             '{{model}}' => $model,
-            'dummyModel' => Str::camel($dummyModel),
-            '{{ modelVariable }}' => Str::camel($dummyModel),
-            '{{modelVariable}}' => Str::camel($dummyModel),
+            'dummyModel' => Casing::camel($dummyModel),
+            '{{ modelVariable }}' => Casing::camel($dummyModel),
+            '{{modelVariable}}' => Casing::camel($dummyModel),
             'DummyUser' => $dummyUser,
             '{{ user }}' => $dummyUser,
             '{{user}}' => $dummyUser,
-            '$user' => '$'.Str::camel($dummyUser),
+            '$user' => '$'.Casing::camel($dummyUser),
         ];
 
         $stub = str_replace(

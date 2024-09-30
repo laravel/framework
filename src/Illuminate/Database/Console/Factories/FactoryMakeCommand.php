@@ -3,6 +3,8 @@
 namespace Illuminate\Database\Console\Factories;
 
 use Illuminate\Console\GeneratorCommand;
+use Illuminate\Support\Casing;
+use Illuminate\Support\Replacer;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputOption;
@@ -62,7 +64,7 @@ class FactoryMakeCommand extends GeneratorCommand
      */
     protected function buildClass($name)
     {
-        $factory = class_basename(Str::ucfirst(str_replace('Factory', '', $name)));
+        $factory = class_basename(Casing::ucfirst(str_replace('Factory', '', $name)));
 
         $namespaceModel = $this->option('model')
                         ? $this->qualifyModel($this->option('model'))
@@ -71,7 +73,7 @@ class FactoryMakeCommand extends GeneratorCommand
         $model = class_basename($namespaceModel);
 
         $namespace = $this->getNamespace(
-            Str::replaceFirst($this->rootNamespace(), 'Database\\Factories\\', $this->qualifyClass($this->getNameInput()))
+            Replacer::replaceFirst($this->rootNamespace(), 'Database\\Factories\\', $this->qualifyClass($this->getNameInput()))
         );
 
         $replace = [

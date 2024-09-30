@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Console;
 use Illuminate\Console\Concerns\CreatesMatchingTest;
 use Illuminate\Console\GeneratorCommand;
 use Illuminate\Foundation\Inspiring;
+use Illuminate\Support\Casing;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -111,7 +112,7 @@ class MailMakeCommand extends GeneratorCommand
     {
         $class = str_replace(
             '{{ subject }}',
-            Str::headline(str_replace($this->getNamespace($name).'\\', '', $name)),
+            Casing::headline(str_replace($this->getNamespace($name).'\\', '', $name)),
             parent::buildClass($name)
         );
 
@@ -135,7 +136,7 @@ class MailMakeCommand extends GeneratorCommand
             $name = str_replace('\\', '/', $this->argument('name'));
 
             $view = 'mail.'.collect(explode('/', $name))
-                ->map(fn ($part) => Str::kebab($part))
+                ->map(fn ($part) => Casing::kebab($part))
                 ->implode('.');
         }
 

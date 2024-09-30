@@ -2,6 +2,7 @@
 
 namespace Illuminate\Broadcasting\Broadcasters;
 
+use Illuminate\Support\Replacer;
 use Illuminate\Support\Str;
 
 trait UsePusherChannelConventions
@@ -27,7 +28,7 @@ trait UsePusherChannelConventions
     {
         foreach (['private-encrypted-', 'private-', 'presence-'] as $prefix) {
             if (Str::startsWith($channel, $prefix)) {
-                return Str::replaceFirst($prefix, '', $channel);
+                return Replacer::replaceFirst($prefix, '', $channel);
             }
         }
 

@@ -6,6 +6,7 @@ use ArrayAccess;
 use ArrayIterator;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Casing;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Conditionable;
@@ -405,7 +406,7 @@ class ComponentAttributeBag implements ArrayAccess, IteratorAggregate, JsonSeria
             $key = is_numeric($key) ? $default : $key;
 
             $props[] = $key;
-            $props[] = Str::kebab($key);
+            $props[] = Casing::kebab($key);
         }
 
         return $props;

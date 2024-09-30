@@ -6,6 +6,8 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Casing;
+use Illuminate\Support\Replacer;
 use Illuminate\Support\Str;
 use Illuminate\View\AnonymousComponent;
 use Illuminate\View\DynamicComponent;
@@ -237,7 +239,7 @@ class ComponentTagCompiler
         [$data, $attributes] = $this->partitionDataAndAttributes($class, $attributes);
 
         $data = $data->mapWithKeys(function ($value, $key) {
-            return [Str::camel($key) => $value];
+            return [Casing::camel($key) => $value];
         });
 
         // If the component doesn't exist as a class, we'll assume it's a class-less
@@ -426,7 +428,7 @@ class ComponentTagCompiler
     public function formatClassName(string $component)
     {
         $componentPieces = array_map(function ($componentPiece) {
-            return ucfirst(Str::camel($componentPiece));
+            return ucfirst(Casing::camel($componentPiece));
         }, explode('.', $component));
 
         return implode('\\', $componentPieces);
@@ -448,7 +450,7 @@ class ComponentTagCompiler
         $delimiter = ViewFinderInterface::HINT_PATH_DELIMITER;
 
         if (str_contains($name, $delimiter)) {
-            return Str::replaceFirst($delimiter, $delimiter.$prefix, $name);
+            return Replacer::replaceFirst($delimiter, $delimiter.$prefix, $name);
         }
 
         return $prefix.$name;
@@ -477,7 +479,7 @@ class ComponentTagCompiler
                     : [];
 
         return collect($attributes)->partition(function ($value, $key) use ($parameterNames) {
-            return in_array(Str::camel($key), $parameterNames);
+            return in_array(Casing::camel($key), $parameterNames);
         })->all();
     }
 
@@ -548,7 +550,7 @@ class ComponentTagCompiler
             $name = $this->stripQuotes($matches['inlineName'] ?: $matches['name'] ?: $matches['boundName']);
 
             if (Str::contains($name, '-') && ! empty($matches['inlineName'])) {
-                $name = Str::camel($name);
+                $name = Casing::camel($name);
             }
 
             // If the name was given as a simple string, we will wrap it in quotes as if it was bound for convenience...

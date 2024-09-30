@@ -6,6 +6,7 @@ use Aws\DynamoDb\DynamoDbClient;
 use Aws\Exception\AwsException;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Generator;
 use Illuminate\Support\Str;
 use Orchestra\Testbench\Attributes\RequiresEnv;
 use Orchestra\Testbench\TestCase;
@@ -34,7 +35,7 @@ class DynamoDbStoreTest extends TestCase
 
     public function testItemsCanBeAtomicallyAdded()
     {
-        $key = Str::random(6);
+        $key = Generator::random(6);
 
         $this->assertTrue(Cache::driver('dynamodb')->add($key, 'Taylor', 10));
         $this->assertFalse(Cache::driver('dynamodb')->add($key, 'Taylor', 10));

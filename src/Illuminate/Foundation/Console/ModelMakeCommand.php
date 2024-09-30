@@ -4,7 +4,9 @@ namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Concerns\CreatesMatchingTest;
 use Illuminate\Console\GeneratorCommand;
+use Illuminate\Support\Casing;
 use Illuminate\Support\Str;
+use Illuminate\Support\StrGrammar;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -86,7 +88,7 @@ class ModelMakeCommand extends GeneratorCommand
      */
     protected function createFactory()
     {
-        $factory = Str::studly($this->argument('name'));
+        $factory = Casing::studly($this->argument('name'));
 
         $this->call('make:factory', [
             'name' => "{$factory}Factory",
@@ -101,10 +103,10 @@ class ModelMakeCommand extends GeneratorCommand
      */
     protected function createMigration()
     {
-        $table = Str::snake(Str::pluralStudly(class_basename($this->argument('name'))));
+        $table = Casing::snake(StrGrammar::pluralStudly(class_basename($this->argument('name'))));
 
         if ($this->option('pivot')) {
-            $table = Str::singular($table);
+            $table = StrGrammar::singular($table);
         }
 
         $this->call('make:migration', [
@@ -120,7 +122,7 @@ class ModelMakeCommand extends GeneratorCommand
      */
     protected function createSeeder()
     {
-        $seeder = Str::studly(class_basename($this->argument('name')));
+        $seeder = Casing::studly(class_basename($this->argument('name')));
 
         $this->call('make:seeder', [
             'name' => "{$seeder}Seeder",
@@ -134,7 +136,7 @@ class ModelMakeCommand extends GeneratorCommand
      */
     protected function createController()
     {
-        $controller = Str::studly(class_basename($this->argument('name')));
+        $controller = Casing::studly(class_basename($this->argument('name')));
 
         $modelName = $this->qualifyClass($this->getNameInput());
 
@@ -155,7 +157,7 @@ class ModelMakeCommand extends GeneratorCommand
      */
     protected function createPolicy()
     {
-        $policy = Str::studly(class_basename($this->argument('name')));
+        $policy = Casing::studly(class_basename($this->argument('name')));
 
         $this->call('make:policy', [
             'name' => "{$policy}Policy",

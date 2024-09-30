@@ -21,6 +21,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Casing;
 use Illuminate\Support\Exceptions\MathException;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\PatternMatcher;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\Unique;
@@ -159,7 +160,7 @@ trait ValidatesAttributes
      */
     public function validateAscii($attribute, $value)
     {
-        return Str::isAscii($value);
+        return PatternMatcher::isAscii($value);
     }
 
     /**
@@ -1434,7 +1435,7 @@ trait ValidatesAttributes
         $attributeData = ValidationData::extractDataFromPath($explicitPath, $this->data);
 
         $otherValues = Arr::where(Arr::dot($attributeData), function ($value, $key) use ($parameters) {
-            return Str::is($parameters[0], $key);
+            return PatternMatcher::is($parameters[0], $key);
         });
 
         return in_array($value, $otherValues);
@@ -2516,8 +2517,8 @@ trait ValidatesAttributes
     public function validateTimezone($attribute, $value, $parameters = [])
     {
         return in_array($value, timezone_identifiers_list(
-            constant(DateTimeZone::class.'::'.Str::upper($parameters[0] ?? 'ALL')),
-            isset($parameters[1]) ? Str::upper($parameters[1]) : null,
+            constant(DateTimeZone::class.'::'.Casing::upper($parameters[0] ?? 'ALL')),
+            isset($parameters[1]) ? Casing::upper($parameters[1]) : null,
         ), true);
     }
 
@@ -2531,7 +2532,7 @@ trait ValidatesAttributes
      */
     public function validateUrl($attribute, $value, $parameters = [])
     {
-        return Str::isUrl($value, $parameters);
+        return PatternMatcher::isUrl($value, $parameters);
     }
 
     /**
@@ -2555,7 +2556,7 @@ trait ValidatesAttributes
      */
     public function validateUuid($attribute, $value)
     {
-        return Str::isUuid($value);
+        return PatternMatcher::isUuid($value);
     }
 
     /**

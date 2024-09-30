@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Generator;
 use Illuminate\Support\Str;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
@@ -48,7 +49,7 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
 
     public function testBasicCreateAndRetrieve()
     {
-        $user = User::create(['name' => Str::random()]);
+        $user = User::create(['name' => Generator::random()]);
 
         $team1 = Team::create(['owner_id' => $user->id]);
         $team2 = Team::create(['owner_id' => $user->id]);
@@ -56,7 +57,7 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
         $mate1 = User::create(['name' => 'John', 'team_id' => $team1->id]);
         $mate2 = User::create(['name' => 'Jack', 'team_id' => $team2->id, 'slug' => null]);
 
-        User::create(['name' => Str::random()]);
+        User::create(['name' => Generator::random()]);
 
         $this->assertEquals([$mate1->id, $mate2->id], $user->teamMates->pluck('id')->toArray());
         $this->assertEquals([$mate1->id, $mate2->id], $user->teamMatesWithPendingRelation->pluck('id')->toArray());
@@ -90,11 +91,11 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
 
     public function testGlobalScopeColumns()
     {
-        $user = User::create(['name' => Str::random()]);
+        $user = User::create(['name' => Generator::random()]);
 
         $team1 = Team::create(['owner_id' => $user->id]);
 
-        User::create(['name' => Str::random(), 'team_id' => $team1->id]);
+        User::create(['name' => Generator::random(), 'team_id' => $team1->id]);
 
         $teamMates = $user->teamMatesWithGlobalScope;
         $this->assertEquals(['id' => 2, 'laravel_through_key' => 1], $teamMates[0]->getAttributes());
@@ -105,11 +106,11 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
 
     public function testHasSelf()
     {
-        $user = User::create(['name' => Str::random()]);
+        $user = User::create(['name' => Generator::random()]);
 
         $team = Team::create(['owner_id' => $user->id]);
 
-        User::create(['name' => Str::random(), 'team_id' => $team->id]);
+        User::create(['name' => Generator::random(), 'team_id' => $team->id]);
 
         $users = User::has('teamMates')->get();
         $this->assertCount(1, $users);
@@ -120,11 +121,11 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
 
     public function testHasSelfCustomOwnerKey()
     {
-        $user = User::create(['slug' => Str::random(), 'name' => Str::random()]);
+        $user = User::create(['slug' => Generator::random(), 'name' => Generator::random()]);
 
         $team = Team::create(['owner_slug' => $user->slug]);
 
-        User::create(['name' => Str::random(), 'team_id' => $team->id]);
+        User::create(['name' => Generator::random(), 'team_id' => $team->id]);
 
         $users = User::has('teamMatesBySlug')->get();
         $this->assertCount(1, $users);

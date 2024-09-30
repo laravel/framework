@@ -8,6 +8,7 @@ use Illuminate\Session\NullSessionHandler;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Generator;
 use Illuminate\Support\Str;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
@@ -51,7 +52,7 @@ class CookieTest extends TestCase
 
         $handler->shouldReceive('render')->andReturn(new Response);
 
-        $app['config']->set('app.key', Str::random(32));
+        $app['config']->set('app.key', Generator::random(32));
         $app['config']->set('session.driver', 'fake-null');
 
         Session::extend('fake-null', function () {

@@ -12,9 +12,9 @@ use Illuminate\Contracts\Queue\Factory as Queue;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Contracts\Translation\HasLocalePreference;
+use Illuminate\Support\Casing;
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
-use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\Localizable;
@@ -448,7 +448,7 @@ class Mailable implements MailableContract, Renderable
         if ($this->subject) {
             $message->subject($this->subject);
         } else {
-            $message->subject(Str::title(Str::snake(class_basename($this), ' ')));
+            $message->subject(Casing::title(Casing::snake(class_basename($this), ' ')));
         }
 
         return $this;
@@ -1813,7 +1813,7 @@ class Mailable implements MailableContract, Renderable
         }
 
         if (str_starts_with($method, 'with')) {
-            return $this->with(Str::camel(substr($method, 4)), $parameters[0]);
+            return $this->with(Casing::camel(substr($method, 4)), $parameters[0]);
         }
 
         static::throwBadMethodCallException($method);

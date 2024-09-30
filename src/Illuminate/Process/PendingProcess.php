@@ -4,6 +4,7 @@ namespace Illuminate\Process;
 
 use Closure;
 use Illuminate\Process\Exceptions\ProcessTimedOutException;
+use Illuminate\Support\PatternMatcher;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Conditionable;
 use LogicException;
@@ -350,7 +351,7 @@ class PendingProcess
     protected function fakeFor(string $command)
     {
         return collect($this->fakeHandlers)
-                ->first(fn ($handler, $pattern) => Str::is($pattern, $command));
+                ->first(fn ($handler, $pattern) => PatternMatcher::is($pattern, $command));
     }
 
     /**

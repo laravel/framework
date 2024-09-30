@@ -7,6 +7,7 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Contracts\View\Factory as ViewFactory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Casing;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ReflectsClosures;
 use Illuminate\View\Component;
@@ -761,9 +762,9 @@ class BladeCompiler extends Compiler implements CompilerInterface
         if (is_null($alias)) {
             $alias = str_contains($class, '\\View\\Components\\')
                             ? collect(explode('\\', Str::after($class, '\\View\\Components\\')))->map(function ($segment) {
-                                return Str::kebab($segment);
+                                return Casing::kebab($segment);
                             })->implode(':')
-                            : Str::kebab(class_basename($class));
+                            : Casing::kebab(class_basename($class));
         }
 
         if (! empty($prefix)) {

@@ -8,6 +8,7 @@ use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\InteractsWithTime;
+use Illuminate\Support\Replacer;
 use Illuminate\Support\Str;
 use RuntimeException;
 
@@ -167,7 +168,7 @@ class DynamoDbStore implements LockProvider, Store
                 );
             }
 
-            return [Str::replaceFirst($this->prefix, '', $response[$this->keyAttribute]['S']) => $value];
+            return [Replacer::replaceFirst($this->prefix, '', $response[$this->keyAttribute]['S']) => $value];
         })->all());
     }
 

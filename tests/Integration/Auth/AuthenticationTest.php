@@ -17,6 +17,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Generator;
 use Illuminate\Support\Str;
 use Illuminate\Support\Testing\Fakes\EventFake;
 use Illuminate\Tests\Integration\Auth\Fixtures\AuthenticationTestUser;
@@ -276,7 +277,7 @@ class AuthenticationTest extends TestCase
             'username' => 'username2',
             'email' => 'email2',
             'password' => bcrypt('password'),
-            'remember_token' => $token = Str::random(),
+            'remember_token' => $token = Generator::random(),
             'is_active' => false,
         ]);
 

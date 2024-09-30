@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Foundation\Support\Providers;
 
 use Illuminate\Foundation\Application;
+use Illuminate\Support\Generator;
 use Illuminate\Support\Str;
 use Orchestra\Testbench\TestCase;
 
@@ -24,7 +25,7 @@ class RouteServiceProviderHealthTest extends TestCase
 
     protected function defineEnvironment($app)
     {
-        $app['config']->set('app.key', Str::random(32));
+        $app['config']->set('app.key', Generator::random(32));
     }
 
     public function test_it_can_load_health_page()

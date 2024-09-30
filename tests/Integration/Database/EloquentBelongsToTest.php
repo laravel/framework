@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Database\EloquentBelongsToTest;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Generator;
 use Illuminate\Support\Str;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
@@ -19,7 +20,7 @@ class EloquentBelongsToTest extends DatabaseTestCase
             $table->string('parent_slug')->nullable();
         });
 
-        $user = User::create(['slug' => Str::random()]);
+        $user = User::create(['slug' => Generator::random()]);
         User::create(['parent_id' => $user->id, 'parent_slug' => $user->slug]);
     }
 

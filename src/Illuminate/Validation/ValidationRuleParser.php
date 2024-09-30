@@ -7,6 +7,7 @@ use Illuminate\Contracts\Validation\InvokableRule;
 use Illuminate\Contracts\Validation\Rule as RuleContract;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Casing;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\Unique;
@@ -248,7 +249,7 @@ class ValidationRuleParser
      */
     protected static function parseArrayRule(array $rule)
     {
-        return [Str::studly(trim(Arr::get($rule, 0, ''))), array_slice($rule, 1)];
+        return [Casing::studly(trim(Arr::get($rule, 0, ''))), array_slice($rule, 1)];
     }
 
     /**
@@ -270,7 +271,7 @@ class ValidationRuleParser
             $parameters = static::parseParameters($rule, $parameter);
         }
 
-        return [Str::studly(trim($rule)), $parameters];
+        return [Casing::studly(trim($rule)), $parameters];
     }
 
     /**

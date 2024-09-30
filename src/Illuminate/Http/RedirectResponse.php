@@ -4,6 +4,7 @@ namespace Illuminate\Http;
 
 use Illuminate\Contracts\Support\MessageProvider;
 use Illuminate\Session\Store as SessionStore;
+use Illuminate\Support\Casing;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
@@ -250,7 +251,7 @@ class RedirectResponse extends BaseRedirectResponse
         }
 
         if (str_starts_with($method, 'with')) {
-            return $this->with(Str::snake(substr($method, 4)), $parameters[0]);
+            return $this->with(Casing::snake(substr($method, 4)), $parameters[0]);
         }
 
         static::throwBadMethodCallException($method);

@@ -2,7 +2,9 @@
 
 namespace Illuminate\Foundation\Events;
 
+use Illuminate\Support\PatternMatcher;
 use Illuminate\Support\Reflector;
+use Illuminate\Support\Replacer;
 use Illuminate\Support\Str;
 use ReflectionClass;
 use ReflectionException;
@@ -72,7 +74,7 @@ class DiscoverEvents
             }
 
             foreach ($listener->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
-                if ((! Str::is('handle*', $method->name) && ! Str::is('__invoke', $method->name)) ||
+                if ((! PatternMatcher::is('handle*', $method->name) && ! PatternMatcher::is('__invoke', $method->name)) ||
                     ! isset($method->getParameters()[0])) {
                     continue;
                 }
@@ -98,12 +100,12 @@ class DiscoverEvents
             return call_user_func(static::$guessClassNamesUsingCallback, $file, $basePath);
         }
 
-        $class = trim(Str::replaceFirst($basePath, '', $file->getRealPath()), DIRECTORY_SEPARATOR);
+        $class = trim(Replacer::replaceFirst($basePath, '', $file->getRealPath()), DIRECTORY_SEPARATOR);
 
         return str_replace(
             [DIRECTORY_SEPARATOR, ucfirst(basename(app()->path())).'\\'],
             ['\\', app()->getNamespace()],
-            ucfirst(Str::replaceLast('.php', '', $class))
+            ucfirst(Replacer::replaceLast('.php', '', $class))
         );
     }
 

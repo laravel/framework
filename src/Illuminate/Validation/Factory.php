@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Contracts\Validation\Factory as FactoryContract;
+use Illuminate\Support\Casing;
 use Illuminate\Support\Str;
 
 class Factory implements FactoryContract
@@ -198,7 +199,7 @@ class Factory implements FactoryContract
         $this->extensions[$rule] = $extension;
 
         if ($message) {
-            $this->fallbackMessages[Str::snake($rule)] = $message;
+            $this->fallbackMessages[Casing::snake($rule)] = $message;
         }
     }
 
@@ -215,7 +216,7 @@ class Factory implements FactoryContract
         $this->implicitExtensions[$rule] = $extension;
 
         if ($message) {
-            $this->fallbackMessages[Str::snake($rule)] = $message;
+            $this->fallbackMessages[Casing::snake($rule)] = $message;
         }
     }
 
@@ -232,7 +233,7 @@ class Factory implements FactoryContract
         $this->dependentExtensions[$rule] = $extension;
 
         if ($message) {
-            $this->fallbackMessages[Str::snake($rule)] = $message;
+            $this->fallbackMessages[Casing::snake($rule)] = $message;
         }
     }
 

@@ -6,6 +6,7 @@ use ArrayIterator;
 use Countable;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Generator;
 use Illuminate\Support\Str;
 use IteratorAggregate;
 use LogicException;
@@ -259,7 +260,7 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
      */
     protected function generateRouteName()
     {
-        return 'generated::'.Str::random();
+        return 'generated::'.Generator::random();
     }
 
     /**

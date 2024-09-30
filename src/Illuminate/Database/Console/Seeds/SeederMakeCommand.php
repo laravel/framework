@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Console\Seeds;
 
 use Illuminate\Console\GeneratorCommand;
+use Illuminate\Support\Replacer;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Attribute\AsCommand;
 
@@ -71,7 +72,7 @@ class SeederMakeCommand extends GeneratorCommand
      */
     protected function getPath($name)
     {
-        $name = str_replace('\\', '/', Str::replaceFirst($this->rootNamespace(), '', $name));
+        $name = str_replace('\\', '/', Replacer::replaceFirst($this->rootNamespace(), '', $name));
 
         if (is_dir($this->laravel->databasePath().'/seeds')) {
             return $this->laravel->databasePath().'/seeds/'.$name.'.php';

@@ -3,7 +3,9 @@
 namespace Illuminate\Database\Eloquent\Relations\Concerns;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Casing;
 use Illuminate\Support\Str;
+use Illuminate\Support\StrGrammar;
 
 trait AsPivot
 {
@@ -161,7 +163,7 @@ trait AsPivot
     {
         if (! isset($this->table)) {
             $this->setTable(str_replace(
-                '\\', '', Str::snake(Str::singular(class_basename($this)))
+                '\\', '', Casing::snake(StrGrammar::singular(class_basename($this)))
             ));
         }
 

@@ -12,6 +12,7 @@ use Illuminate\Queue\CallQueuedHandler;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Middleware\ThrottlesExceptionsWithRedis;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Generator;
 use Illuminate\Support\Str;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
@@ -41,21 +42,21 @@ class ThrottlesExceptionsWithRedisTest extends TestCase
 
     public function testCircuitIsOpenedForJobErrors()
     {
-        $this->assertJobWasReleasedImmediately(CircuitBreakerWithRedisTestJob::class, $key = Str::random());
+        $this->assertJobWasReleasedImmediately(CircuitBreakerWithRedisTestJob::class, $key = Generator::random());
         $this->assertJobWasReleasedImmediately(CircuitBreakerWithRedisTestJob::class, $key);
         $this->assertJobWasReleasedWithDelay(CircuitBreakerWithRedisTestJob::class, $key);
     }
 
     public function testCircuitStaysClosedForSuccessfulJobs()
     {
-        $this->assertJobRanSuccessfully(CircuitBreakerWithRedisSuccessfulJob::class, $key = Str::random());
+        $this->assertJobRanSuccessfully(CircuitBreakerWithRedisSuccessfulJob::class, $key = Generator::random());
         $this->assertJobRanSuccessfully(CircuitBreakerWithRedisSuccessfulJob::class, $key);
         $this->assertJobRanSuccessfully(CircuitBreakerWithRedisSuccessfulJob::class, $key);
     }
 
     public function testCircuitResetsAfterSuccess()
     {
-        $this->assertJobWasReleasedImmediately(CircuitBreakerWithRedisTestJob::class, $key = Str::random());
+        $this->assertJobWasReleasedImmediately(CircuitBreakerWithRedisTestJob::class, $key = Generator::random());
         $this->assertJobRanSuccessfully(CircuitBreakerWithRedisSuccessfulJob::class, $key);
         $this->assertJobWasReleasedImmediately(CircuitBreakerWithRedisTestJob::class, $key);
         $this->assertJobWasReleasedImmediately(CircuitBreakerWithRedisTestJob::class, $key);

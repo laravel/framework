@@ -13,7 +13,9 @@ use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithDictionary;
 use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithPivotTable;
 use Illuminate\Database\Query\Grammars\MySqlGrammar;
 use Illuminate\Database\UniqueConstraintViolationException;
+use Illuminate\Support\Casing;
 use Illuminate\Support\Str;
+use Illuminate\Support\StrGrammar;
 use InvalidArgumentException;
 
 /**
@@ -1227,7 +1229,7 @@ class BelongsToMany extends Relation
      */
     protected function guessInverseRelation()
     {
-        return Str::camel(Str::pluralStudly(class_basename($this->getParent())));
+        return Casing::camel(StrGrammar::pluralStudly(class_basename($this->getParent())));
     }
 
     /**

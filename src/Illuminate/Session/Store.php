@@ -5,8 +5,8 @@ namespace Illuminate\Session;
 use Closure;
 use Illuminate\Contracts\Session\Session;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Generator;
 use Illuminate\Support\MessageBag;
-use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\ViewErrorBag;
 use SessionHandlerInterface;
@@ -692,7 +692,7 @@ class Store implements Session
      */
     protected function generateSessionId()
     {
-        return Str::random(40);
+        return Generator::random(40);
     }
 
     /**
@@ -725,7 +725,7 @@ class Store implements Session
      */
     public function regenerateToken()
     {
-        $this->put('_token', Str::random(40));
+        $this->put('_token', Generator::random(40));
     }
 
     /**

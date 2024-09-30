@@ -5,6 +5,7 @@ namespace Illuminate\Database\Query\Grammars;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\JoinLateralClause;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Replacer;
 use Illuminate\Support\Str;
 
 class SqlServerGrammar extends Grammar
@@ -280,7 +281,7 @@ class SqlServerGrammar extends Grammar
         $sql = parent::compileDeleteWithoutJoins($query, $table, $where);
 
         return ! is_null($query->limit) && $query->limit > 0 && $query->offset <= 0
-                        ? Str::replaceFirst('delete', 'delete top ('.$query->limit.')', $sql)
+                        ? Replacer::replaceFirst('delete', 'delete top ('.$query->limit.')', $sql)
                         : $sql;
     }
 

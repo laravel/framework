@@ -9,6 +9,7 @@ use Illuminate\Http\File;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Replacer;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
@@ -734,7 +735,7 @@ class FilesystemAdapter implements CloudFilesystemContract
         // the default disk to generate the path instead of the "public" disk like they
         // are really supposed to use. We will remove the public from this path here.
         if (str_contains($path, '/storage/public/')) {
-            return Str::replaceFirst('/public/', '/', $path);
+            return Replacer::replaceFirst('/public/', '/', $path);
         }
 
         return $path;

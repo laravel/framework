@@ -5,6 +5,7 @@ namespace Illuminate\Database\Eloquent\Relations\Concerns;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\RelationNotFoundException;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Casing;
 use Illuminate\Support\Str;
 
 trait SupportsInverseRelations
@@ -77,9 +78,9 @@ trait SupportsInverseRelations
     protected function getPossibleInverseRelations(): array
     {
         return array_filter(array_unique([
-            Str::camel(Str::beforeLast($this->getForeignKeyName(), $this->getParent()->getKeyName())),
-            Str::camel(Str::beforeLast($this->getParent()->getForeignKey(), $this->getParent()->getKeyName())),
-            Str::camel(class_basename($this->getParent())),
+            Casing::camel(Str::beforeLast($this->getForeignKeyName(), $this->getParent()->getKeyName())),
+            Casing::camel(Str::beforeLast($this->getParent()->getForeignKey(), $this->getParent()->getKeyName())),
+            Casing::camel(class_basename($this->getParent())),
             'owner',
             get_class($this->getParent()) === get_class($this->getModel()) ? 'parent' : null,
         ]));

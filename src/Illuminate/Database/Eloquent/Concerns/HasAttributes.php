@@ -28,6 +28,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\LazyLoadingViolationException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Casing;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Exceptions\MathException;
 use Illuminate\Support\Facades\Crypt;
@@ -388,7 +389,7 @@ trait HasAttributes
             // key so that the relation attribute is snake cased in this returned
             // array to the developers, making this consistent with attributes.
             if (static::$snakeAttributes) {
-                $key = Str::snake($key);
+                $key = Casing::snake($key);
             }
 
             // If the relation value has been set, we will set it on this attributes
@@ -629,7 +630,7 @@ trait HasAttributes
      */
     public function hasGetMutator($key)
     {
-        return method_exists($this, 'get'.Str::studly($key).'Attribute');
+        return method_exists($this, 'get'.Casing::studly($key).'Attribute');
     }
 
     /**
@@ -644,7 +645,7 @@ trait HasAttributes
             return static::$attributeMutatorCache[get_class($this)][$key];
         }
 
-        if (! method_exists($this, $method = Str::camel($key))) {
+        if (! method_exists($this, $method = Casing::camel($key))) {
             return static::$attributeMutatorCache[get_class($this)][$key] = false;
         }
 
@@ -671,7 +672,7 @@ trait HasAttributes
             return static::$getAttributeMutatorCache[get_class($this)][$key] = false;
         }
 
-        return static::$getAttributeMutatorCache[get_class($this)][$key] = is_callable($this->{Str::camel($key)}()->get);
+        return static::$getAttributeMutatorCache[get_class($this)][$key] = is_callable($this->{Casing::camel($key)}()->get);
     }
 
     /**
@@ -683,7 +684,7 @@ trait HasAttributes
      */
     protected function mutateAttribute($key, $value)
     {
-        return $this->{'get'.Str::studly($key).'Attribute'}($value);
+        return $this->{'get'.Casing::studly($key).'Attribute'}($value);
     }
 
     /**
@@ -699,7 +700,7 @@ trait HasAttributes
             return $this->attributeCastCache[$key];
         }
 
-        $attribute = $this->{Str::camel($key)}();
+        $attribute = $this->{Casing::camel($key)}();
 
         $value = call_user_func($attribute->get ?: function ($value) {
             return $value;
@@ -1067,7 +1068,7 @@ trait HasAttributes
      */
     public function hasSetMutator($key)
     {
-        return method_exists($this, 'set'.Str::studly($key).'Attribute');
+        return method_exists($this, 'set'.Casing::studly($key).'Attribute');
     }
 
     /**
@@ -1084,7 +1085,7 @@ trait HasAttributes
             return static::$setAttributeMutatorCache[$class][$key];
         }
 
-        if (! method_exists($this, $method = Str::camel($key))) {
+        if (! method_exists($this, $method = Casing::camel($key))) {
             return static::$setAttributeMutatorCache[$class][$key] = false;
         }
 
@@ -1105,7 +1106,7 @@ trait HasAttributes
      */
     protected function setMutatedAttributeValue($key, $value)
     {
-        return $this->{'set'.Str::studly($key).'Attribute'}($value);
+        return $this->{'set'.Casing::studly($key).'Attribute'}($value);
     }
 
     /**
@@ -1117,7 +1118,7 @@ trait HasAttributes
      */
     protected function setAttributeMarkedMutatedAttributeValue($key, $value)
     {
-        $attribute = $this->{Str::camel($key)}();
+        $attribute = $this->{Casing::camel($key)}();
 
         $callback = $attribute->set ?: function ($value) use ($key) {
             $this->attributes[$key] = $value;
@@ -1838,7 +1839,7 @@ trait HasAttributes
     protected function mergeAttributesFromAttributeCasts()
     {
         foreach ($this->attributeCastCache as $key => $value) {
-            $attribute = $this->{Str::camel($key)}();
+            $attribute = $this->{Casing::camel($key)}();
 
             if ($attribute->get && ! $attribute->set) {
                 continue;
@@ -2317,13 +2318,13 @@ trait HasAttributes
         static::$getAttributeMutatorCache[$class] =
             collect($attributeMutatorMethods = static::getAttributeMarkedMutatorMethods($classOrInstance))
                     ->mapWithKeys(function ($match) {
-                        return [lcfirst(static::$snakeAttributes ? Str::snake($match) : $match) => true];
+                        return [lcfirst(static::$snakeAttributes ? Casing::snake($match) : $match) => true];
                     })->all();
 
         static::$mutatorCache[$class] = collect(static::getMutatorMethods($class))
                 ->merge($attributeMutatorMethods)
                 ->map(function ($match) {
-                    return lcfirst(static::$snakeAttributes ? Str::snake($match) : $match);
+                    return lcfirst(static::$snakeAttributes ? Casing::snake($match) : $match);
                 })->all();
     }
 

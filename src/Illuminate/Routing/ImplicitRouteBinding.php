@@ -6,6 +6,7 @@ use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Routing\Exceptions\BackedEnumCaseNotFoundException;
+use Illuminate\Support\Casing;
 use Illuminate\Support\Reflector;
 use Illuminate\Support\Str;
 
@@ -117,7 +118,7 @@ class ImplicitRouteBinding
             return $name;
         }
 
-        if (array_key_exists($snakedName = Str::snake($name), $parameters)) {
+        if (array_key_exists($snakedName = Casing::snake($name), $parameters)) {
             return $snakedName;
         }
     }

@@ -8,6 +8,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Generator;
 use Illuminate\Support\Str;
 
 class DatabaseEloquentModelAttributeCastingTest extends DatabaseTestCase
@@ -425,7 +426,7 @@ class TestEloquentModelWithAttributeCast extends Model
     {
         return new Attribute(
             function () {
-                return Str::random(10);
+                return Generator::random(10);
             }
         );
     }
@@ -433,7 +434,7 @@ class TestEloquentModelWithAttributeCast extends Model
     public function virtualStringCached(): Attribute
     {
         return Attribute::get(function () {
-            return Str::random(10);
+            return Generator::random(10);
         })->shouldCache();
     }
 
@@ -466,7 +467,7 @@ class TestEloquentModelWithAttributeCast extends Model
     {
         return new Attribute(
             function () {
-                return new AttributeCastAddress(Str::random(10), Str::random(10));
+                return new AttributeCastAddress(Generator::random(10), Generator::random(10));
             }
         );
     }
@@ -484,7 +485,7 @@ class TestEloquentModelWithAttributeCast extends Model
     {
         return (new Attribute(
             function () {
-                return new AttributeCastAddress(Str::random(10), Str::random(10));
+                return new AttributeCastAddress(Generator::random(10), Generator::random(10));
             }
         ))->withoutObjectCaching();
     }
@@ -501,7 +502,7 @@ class TestEloquentModelWithAttributeCast extends Model
     public function virtualObjectWithoutCaching(): Attribute
     {
         return Attribute::get(function () {
-            return new AttributeCastAddress(Str::random(10), Str::random(10));
+            return new AttributeCastAddress(Generator::random(10), Generator::random(10));
         })->withoutObjectCaching();
     }
 

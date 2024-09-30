@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Generator;
 use Illuminate\Support\Str;
 
 class EloquentModelTest extends DatabaseTestCase
@@ -42,7 +43,7 @@ class EloquentModelTest extends DatabaseTestCase
     public function testAttributeChanges()
     {
         $user = TestModel2::create([
-            'name' => Str::random(), 'title' => Str::random(),
+            'name' => Generator::random(), 'title' => Generator::random(),
         ]);
 
         $this->assertEmpty($user->getDirty());
@@ -50,7 +51,7 @@ class EloquentModelTest extends DatabaseTestCase
         $this->assertFalse($user->isDirty());
         $this->assertFalse($user->wasChanged());
 
-        $user->name = $name = Str::random();
+        $user->name = $name = Generator::random();
 
         $this->assertEquals(['name' => $name], $user->getDirty());
         $this->assertEmpty($user->getChanges());
@@ -68,7 +69,7 @@ class EloquentModelTest extends DatabaseTestCase
     public function testDiscardChanges()
     {
         $user = TestModel2::create([
-            'name' => $originalName = Str::random(), 'title' => Str::random(),
+            'name' => $originalName = Generator::random(), 'title' => Generator::random(),
         ]);
 
         $this->assertEmpty($user->getDirty());
@@ -76,7 +77,7 @@ class EloquentModelTest extends DatabaseTestCase
         $this->assertFalse($user->isDirty());
         $this->assertFalse($user->wasChanged());
 
-        $user->name = $overrideName = Str::random();
+        $user->name = $overrideName = Generator::random();
 
         $this->assertEquals(['name' => $overrideName], $user->getDirty());
         $this->assertEmpty($user->getChanges());

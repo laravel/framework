@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Auth\Middleware;
 
 use Illuminate\Auth\Middleware\RedirectIfAuthenticated;
 use Illuminate\Contracts\Routing\Registrar;
+use Illuminate\Support\Generator;
 use Illuminate\Support\Str;
 use Illuminate\Tests\Integration\Auth\Fixtures\AuthenticationTestUser;
 use Orchestra\Testbench\Factories\UserFactory;
@@ -38,7 +39,7 @@ class RedirectIfAuthenticatedTest extends TestCase
 
     protected function defineEnvironment($app)
     {
-        $app['config']->set('app.key', Str::random(32));
+        $app['config']->set('app.key', Generator::random(32));
         $app['config']->set('auth.providers.users.model', AuthenticationTestUser::class);
     }
 

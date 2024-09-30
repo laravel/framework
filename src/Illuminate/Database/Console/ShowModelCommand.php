@@ -6,6 +6,7 @@ use BackedEnum;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Support\Casing;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use ReflectionClass;
@@ -160,9 +161,9 @@ class ShowModelCommand extends DatabaseInspectionCommand
             )
             ->mapWithKeys(function (ReflectionMethod $method) use ($model) {
                 if (preg_match('/^get(.+)Attribute$/', $method->getName(), $matches) === 1) {
-                    return [Str::snake($matches[1]) => 'accessor'];
+                    return [Casing::snake($matches[1]) => 'accessor'];
                 } elseif ($model->hasAttributeMutator($method->getName())) {
-                    return [Str::snake($method->getName()) => 'attribute'];
+                    return [Casing::snake($method->getName()) => 'attribute'];
                 } else {
                     return [];
                 }

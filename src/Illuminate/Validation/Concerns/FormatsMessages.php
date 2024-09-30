@@ -4,6 +4,8 @@ namespace Illuminate\Validation\Concerns;
 
 use Closure;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Casing;
+use Illuminate\Support\PatternMatcher;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -34,7 +36,7 @@ trait FormatsMessages
             return $inlineMessage;
         }
 
-        $lowerRule = Str::snake($rule);
+        $lowerRule = Casing::snake($rule);
 
         $customKey = "validation.custom.{$attribute}.{$lowerRule}";
 
@@ -81,7 +83,7 @@ trait FormatsMessages
      */
     protected function getInlineMessage($attribute, $rule)
     {
-        $inlineEntry = $this->getFromLocalArray($attribute, Str::snake($rule));
+        $inlineEntry = $this->getFromLocalArray($attribute, Casing::snake($rule));
 
         return is_array($inlineEntry) && in_array($rule, $this->sizeRules)
                     ? $inlineEntry[$this->getAttributeType($attribute)]
@@ -123,7 +125,7 @@ trait FormatsMessages
                     continue;
                 }
 
-                if (Str::is($sourceKey, $key)) {
+                if (PatternMatcher::is($sourceKey, $key)) {
                     $message = $source[$sourceKey];
 
                     if ($sourceKey === $attribute && is_array($message)) {
@@ -179,7 +181,7 @@ trait FormatsMessages
     protected function getWildcardCustomMessages($messages, $search, $default)
     {
         foreach ($messages as $key => $message) {
-            if ($search === $key || (Str::contains($key, ['*']) && Str::is($key, $search))) {
+            if ($search === $key || (Str::contains($key, ['*']) && PatternMatcher::is($key, $search))) {
                 return $message;
             }
         }
@@ -196,7 +198,7 @@ trait FormatsMessages
      */
     protected function getSizeMessage($attribute, $rule)
     {
-        $lowerRule = Str::snake($rule);
+        $lowerRule = Casing::snake($rule);
 
         // There are three different types of size validations. The attribute may be
         // either a number, file, or string so we will check a few things to know
@@ -247,8 +249,8 @@ trait FormatsMessages
         $message = $this->replaceIndexPlaceholder($message, $attribute);
         $message = $this->replacePositionPlaceholder($message, $attribute);
 
-        if (isset($this->replacers[Str::snake($rule)])) {
-            return $this->callReplacer($message, $attribute, Str::snake($rule), $parameters, $this);
+        if (isset($this->replacers[Casing::snake($rule)])) {
+            return $this->callReplacer($message, $attribute, Casing::snake($rule), $parameters, $this);
         } elseif (method_exists($this, $replacer = "replace{$rule}")) {
             return $this->$replacer($message, $attribute, $rule, $parameters);
         }
@@ -294,7 +296,7 @@ trait FormatsMessages
                             : $attribute;
         }
 
-        return str_replace('_', ' ', Str::snake($attribute));
+        return str_replace('_', ' ', Casing::snake($attribute));
     }
 
     /**
@@ -349,7 +351,7 @@ trait FormatsMessages
     {
         return str_replace(
             [':attribute', ':ATTRIBUTE', ':Attribute'],
-            [$value, Str::upper($value), Str::ucfirst($value)],
+            [$value, Casing::upper($value), Casing::ucfirst($value)],
             $message
         );
     }

@@ -19,6 +19,7 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Session\Session;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Generator;
 use Illuminate\Support\Str;
 use Illuminate\Support\Timebox;
 use Illuminate\Support\Traits\Macroable;
@@ -671,7 +672,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      */
     protected function cycleRememberToken(AuthenticatableContract $user)
     {
-        $user->setRememberToken($token = Str::random(60));
+        $user->setRememberToken($token = Generator::random(60));
 
         $this->provider->updateRememberToken($user, $token);
     }

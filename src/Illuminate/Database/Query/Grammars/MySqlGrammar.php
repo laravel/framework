@@ -4,6 +4,7 @@ namespace Illuminate\Database\Query\Grammars;
 
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\JoinLateralClause;
+use Illuminate\Support\Replacer;
 use Illuminate\Support\Str;
 
 class MySqlGrammar extends Grammar
@@ -196,7 +197,7 @@ class MySqlGrammar extends Grammar
      */
     public function compileInsertOrIgnore(Builder $query, array $values)
     {
-        return Str::replaceFirst('insert', 'insert ignore', $this->compileInsert($query, $values));
+        return Replacer::replaceFirst('insert', 'insert ignore', $this->compileInsert($query, $values));
     }
 
     /**
@@ -209,7 +210,7 @@ class MySqlGrammar extends Grammar
      */
     public function compileInsertOrIgnoreUsing(Builder $query, array $columns, string $sql)
     {
-        return Str::replaceFirst('insert', 'insert ignore', $this->compileInsertUsing($query, $columns, $sql));
+        return Replacer::replaceFirst('insert', 'insert ignore', $this->compileInsertUsing($query, $columns, $sql));
     }
 
     /**

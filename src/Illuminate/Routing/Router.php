@@ -21,6 +21,7 @@ use Illuminate\Routing\Events\RouteMatched;
 use Illuminate\Routing\Events\Routing;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\PatternMatcher;
 use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
 use Illuminate\Support\Traits\Macroable;
@@ -1350,7 +1351,7 @@ class Router implements BindingRegistrar, RegistrarContract
     public function uses(...$patterns)
     {
         foreach ($patterns as $pattern) {
-            if (Str::is($pattern, $this->currentRouteAction())) {
+            if (PatternMatcher::is($pattern, $this->currentRouteAction())) {
                 return true;
             }
         }

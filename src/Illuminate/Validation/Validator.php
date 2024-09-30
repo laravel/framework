@@ -11,8 +11,11 @@ use Illuminate\Contracts\Validation\Rule as RuleContract;
 use Illuminate\Contracts\Validation\Validator as ValidatorContract;
 use Illuminate\Contracts\Validation\ValidatorAwareRule;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Casing;
 use Illuminate\Support\Fluent;
+use Illuminate\Support\Generator;
 use Illuminate\Support\MessageBag;
+use Illuminate\Support\Replacer;
 use Illuminate\Support\Str;
 use Illuminate\Support\ValidatedInput;
 use InvalidArgumentException;
@@ -337,7 +340,7 @@ class Validator implements ValidatorContract
     public function __construct(Translator $translator, array $data, array $rules,
                                 array $messages = [], array $attributes = [])
     {
-        $this->dotPlaceholder = Str::random();
+        $this->dotPlaceholder = Generator::random();
 
         $this->initialRules = $rules;
         $this->translator = $translator;
@@ -1252,7 +1255,7 @@ class Validator implements ValidatorContract
         $lastSegmentOfAttribute = strrchr($attribute, '.');
 
         $attribute = $lastSegmentOfAttribute && $removeLastSegmentOfAttribute
-                    ? Str::replaceLast($lastSegmentOfAttribute, '', $attribute)
+                    ? Replacer::replaceLast($lastSegmentOfAttribute, '', $attribute)
                     : $attribute;
 
         return is_array($data = data_get($this->data, $attribute))
@@ -1301,7 +1304,7 @@ class Validator implements ValidatorContract
         $this->addExtensions($extensions);
 
         foreach ($extensions as $rule => $extension) {
-            $this->implicitRules[] = Str::studly($rule);
+            $this->implicitRules[] = Casing::studly($rule);
         }
     }
 
@@ -1316,7 +1319,7 @@ class Validator implements ValidatorContract
         $this->addExtensions($extensions);
 
         foreach ($extensions as $rule => $extension) {
-            $this->dependentRules[] = Str::studly($rule);
+            $this->dependentRules[] = Casing::studly($rule);
         }
     }
 
@@ -1329,7 +1332,7 @@ class Validator implements ValidatorContract
      */
     public function addExtension($rule, $extension)
     {
-        $this->extensions[Str::snake($rule)] = $extension;
+        $this->extensions[Casing::snake($rule)] = $extension;
     }
 
     /**
@@ -1343,7 +1346,7 @@ class Validator implements ValidatorContract
     {
         $this->addExtension($rule, $extension);
 
-        $this->implicitRules[] = Str::studly($rule);
+        $this->implicitRules[] = Casing::studly($rule);
     }
 
     /**
@@ -1357,7 +1360,7 @@ class Validator implements ValidatorContract
     {
         $this->addExtension($rule, $extension);
 
-        $this->dependentRules[] = Str::studly($rule);
+        $this->dependentRules[] = Casing::studly($rule);
     }
 
     /**
@@ -1386,7 +1389,7 @@ class Validator implements ValidatorContract
      */
     public function addReplacer($rule, $replacer)
     {
-        $this->replacers[Str::snake($rule)] = $replacer;
+        $this->replacers[Casing::snake($rule)] = $replacer;
     }
 
     /**
@@ -1629,7 +1632,7 @@ class Validator implements ValidatorContract
      */
     public function __call($method, $parameters)
     {
-        $rule = Str::snake(substr($method, 8));
+        $rule = Casing::snake(substr($method, 8));
 
         if (isset($this->extensions[$rule])) {
             return $this->callExtension($rule, $parameters);

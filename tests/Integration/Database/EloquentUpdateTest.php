@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Generator;
 use Illuminate\Support\Str;
 
 class EloquentUpdateTest extends DatabaseTestCase
@@ -37,7 +38,7 @@ class EloquentUpdateTest extends DatabaseTestCase
     public function testBasicUpdate()
     {
         TestUpdateModel1::create([
-            'name' => Str::random(),
+            'name' => Generator::random(),
             'title' => 'Ms.',
         ]);
 
@@ -70,7 +71,7 @@ class EloquentUpdateTest extends DatabaseTestCase
         ]);
 
         TestUpdateModel2::create([
-            'name' => Str::random(),
+            'name' => Generator::random(),
         ]);
 
         TestUpdateModel2::join('test_model1', function ($join) {
@@ -86,12 +87,12 @@ class EloquentUpdateTest extends DatabaseTestCase
     public function testSoftDeleteWithJoins()
     {
         TestUpdateModel1::create([
-            'name' => Str::random(),
+            'name' => Generator::random(),
             'title' => 'Mr.',
         ]);
 
         TestUpdateModel2::create([
-            'name' => Str::random(),
+            'name' => Generator::random(),
         ]);
 
         TestUpdateModel2::join('test_model1', function ($join) {

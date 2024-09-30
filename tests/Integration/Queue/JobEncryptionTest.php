@@ -11,6 +11,7 @@ use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Generator;
 use Illuminate\Support\Str;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 use Orchestra\Testbench\Attributes\WithMigration;
@@ -25,7 +26,7 @@ class JobEncryptionTest extends DatabaseTestCase
     {
         parent::getEnvironmentSetUp($app);
 
-        $app['config']->set('app.key', Str::random(32));
+        $app['config']->set('app.key', Generator::random(32));
         $app['config']->set('queue.default', 'database');
     }
 

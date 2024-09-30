@@ -4,6 +4,7 @@ namespace Illuminate\Database\Query\Grammars;
 
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Replacer;
 use Illuminate\Support\Str;
 
 class SQLiteGrammar extends Grammar
@@ -261,7 +262,7 @@ class SQLiteGrammar extends Grammar
      */
     public function compileInsertOrIgnore(Builder $query, array $values)
     {
-        return Str::replaceFirst('insert', 'insert or ignore', $this->compileInsert($query, $values));
+        return Replacer::replaceFirst('insert', 'insert or ignore', $this->compileInsert($query, $values));
     }
 
     /**
@@ -274,7 +275,7 @@ class SQLiteGrammar extends Grammar
      */
     public function compileInsertOrIgnoreUsing(Builder $query, array $columns, string $sql)
     {
-        return Str::replaceFirst('insert', 'insert or ignore', $this->compileInsertUsing($query, $columns, $sql));
+        return Replacer::replaceFirst('insert', 'insert or ignore', $this->compileInsertUsing($query, $columns, $sql));
     }
 
     /**

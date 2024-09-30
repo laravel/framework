@@ -13,6 +13,7 @@ use Illuminate\Mail\Transport\ResendTransport;
 use Illuminate\Mail\Transport\SesTransport;
 use Illuminate\Mail\Transport\SesV2Transport;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Casing;
 use Illuminate\Support\ConfigurationUrlParser;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
@@ -161,7 +162,7 @@ class MailManager implements FactoryContract
         }
 
         if (trim($transport ?? '') === '' ||
-            ! method_exists($this, $method = 'create'.ucfirst(Str::camel($transport)).'Transport')) {
+            ! method_exists($this, $method = 'create'.ucfirst(Casing::camel($transport)).'Transport')) {
             throw new InvalidArgumentException("Unsupported mail transport [{$transport}].");
         }
 
@@ -476,7 +477,7 @@ class MailManager implements FactoryContract
         $address = Arr::get($config, $type, $this->app['config']['mail.'.$type]);
 
         if (is_array($address) && isset($address['address'])) {
-            $mailer->{'always'.Str::studly($type)}($address['address'], $address['name']);
+            $mailer->{'always'.Casing::studly($type)}($address['address'], $address['name']);
         }
     }
 

@@ -7,6 +7,7 @@ use Closure;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Session\SymfonySessionDecorator;
 use Illuminate\Support\Arr;
+use Illuminate\Support\PatternMatcher;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use RuntimeException;
@@ -212,7 +213,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     {
         $path = $this->decodedPath();
 
-        return collect($patterns)->contains(fn ($pattern) => Str::is($pattern, $path));
+        return collect($patterns)->contains(fn ($pattern) => PatternMatcher::is($pattern, $path));
     }
 
     /**
@@ -236,7 +237,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     {
         $url = $this->fullUrl();
 
-        return collect($patterns)->contains(fn ($pattern) => Str::is($pattern, $url));
+        return collect($patterns)->contains(fn ($pattern) => PatternMatcher::is($pattern, $url));
     }
 
     /**

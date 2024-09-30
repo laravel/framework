@@ -3,6 +3,7 @@
 namespace Illuminate\Routing;
 
 use Illuminate\Support\Str;
+use Illuminate\Support\StrGrammar;
 
 class ResourceRegistrar
 {
@@ -594,7 +595,7 @@ class ResourceRegistrar
         } elseif (isset(static::$parameterMap[$value])) {
             $value = static::$parameterMap[$value];
         } elseif ($this->parameters === 'singular' || static::$singularParameters) {
-            $value = Str::singular($value);
+            $value = StrGrammar::singular($value);
         }
 
         return str_replace('-', '_', $value);

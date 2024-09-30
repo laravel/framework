@@ -6,6 +6,7 @@ use Ably\AblyRest;
 use Ably\Exceptions\AblyException;
 use Ably\Models\Message as AblyMessage;
 use Illuminate\Broadcasting\BroadcastException;
+use Illuminate\Support\Replacer;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
@@ -175,8 +176,8 @@ class AblyBroadcaster extends Broadcaster
     {
         if ($this->isGuardedChannel($channel)) {
             return str_starts_with($channel, 'private-')
-                        ? Str::replaceFirst('private-', '', $channel)
-                        : Str::replaceFirst('presence-', '', $channel);
+                        ? Replacer::replaceFirst('private-', '', $channel)
+                        : Replacer::replaceFirst('presence-', '', $channel);
         }
 
         return $channel;
@@ -195,8 +196,8 @@ class AblyBroadcaster extends Broadcaster
 
             if (Str::startsWith($channel, ['private-', 'presence-'])) {
                 return str_starts_with($channel, 'private-')
-                    ? Str::replaceFirst('private-', 'private:', $channel)
-                    : Str::replaceFirst('presence-', 'presence:', $channel);
+                    ? Replacer::replaceFirst('private-', 'private:', $channel)
+                    : Replacer::replaceFirst('presence-', 'presence:', $channel);
             }
 
             return 'public:'.$channel;

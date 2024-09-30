@@ -12,6 +12,7 @@ use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Queue\CallQueuedHandler;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Middleware\RateLimitedWithRedis;
+use Illuminate\Support\Generator;
 use Illuminate\Support\Str;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
@@ -194,7 +195,7 @@ class RedisRateLimitedTestJob
 
     public function __construct()
     {
-        $this->key = Str::random(10);
+        $this->key = Generator::random(10);
     }
 
     public function handle()

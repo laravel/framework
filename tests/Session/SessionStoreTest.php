@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Session;
 use Illuminate\Cookie\CookieJar;
 use Illuminate\Session\CookieSessionHandler;
 use Illuminate\Session\Store;
+use Illuminate\Support\Generator;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
 use Illuminate\Support\ViewErrorBag;
@@ -127,7 +128,7 @@ class SessionStoreTest extends TestCase
     {
         $session = $this->getSession();
         $session->getHandler()->shouldReceive('read')->once()->andReturn(serialize([
-            '_token' => Str::random(40),
+            '_token' => Generator::random(40),
             'foo' => 'bar',
             'baz' => 'boom',
             '_flash' => [
@@ -158,7 +159,7 @@ class SessionStoreTest extends TestCase
     {
         $session = $this->getSession();
         $session->getHandler()->shouldReceive('read')->once()->andReturn(serialize([
-            '_token' => Str::random(40),
+            '_token' => Generator::random(40),
             'foo' => 'bar',
             'baz' => 'boom',
             '_flash' => [
@@ -190,7 +191,7 @@ class SessionStoreTest extends TestCase
     {
         $session = $this->getSession();
         $oldId = $session->getId();
-        $token = Str::random(40);
+        $token = Generator::random(40);
         $session->getHandler()->shouldReceive('read')->once()->with($oldId)->andReturn(serialize([
             '_token' => $token,
             'foo' => 'bar',

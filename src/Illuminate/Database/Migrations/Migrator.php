@@ -15,6 +15,7 @@ use Illuminate\Database\Events\MigrationStarted;
 use Illuminate\Database\Events\NoPendingMigrations;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Casing;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use ReflectionClass;
@@ -524,7 +525,7 @@ class Migrator
      */
     protected function getMigrationClass(string $migrationName): string
     {
-        return Str::studly(implode('_', array_slice(explode('_', $migrationName), 4)));
+        return Casing::studly(implode('_', array_slice(explode('_', $migrationName), 4)));
     }
 
     /**

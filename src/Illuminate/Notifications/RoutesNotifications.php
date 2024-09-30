@@ -3,6 +3,7 @@
 namespace Illuminate\Notifications;
 
 use Illuminate\Contracts\Notifications\Dispatcher;
+use Illuminate\Support\Casing;
 use Illuminate\Support\Str;
 
 trait RoutesNotifications
@@ -39,7 +40,7 @@ trait RoutesNotifications
      */
     public function routeNotificationFor($driver, $notification = null)
     {
-        if (method_exists($this, $method = 'routeNotificationFor'.Str::studly($driver))) {
+        if (method_exists($this, $method = 'routeNotificationFor'.Casing::studly($driver))) {
             return $this->{$method}($notification);
         }
 

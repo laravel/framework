@@ -22,6 +22,7 @@ use Illuminate\Routing\RoutingServiceProvider;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Env;
+use Illuminate\Support\PatternMatcher;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
@@ -725,7 +726,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
         if (count($environments) > 0) {
             $patterns = is_array($environments[0]) ? $environments[0] : $environments;
 
-            return Str::is($patterns, $this['env']);
+            return PatternMatcher::is($patterns, $this['env']);
         }
 
         return $this['env'];

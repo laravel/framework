@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Http\Middleware;
 
 use Closure;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Sanitizer;
 use Illuminate\Support\Str;
 
 class TrimStrings extends TransformsRequest
@@ -66,7 +67,7 @@ class TrimStrings extends TransformsRequest
             return $value;
         }
 
-        return Str::trim($value);
+        return Sanitizer::trim($value);
     }
 
     /**

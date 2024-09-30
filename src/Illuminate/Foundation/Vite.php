@@ -4,6 +4,7 @@ namespace Illuminate\Foundation;
 
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Generator;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Js;
 use Illuminate\Support\Str;
@@ -146,7 +147,7 @@ class Vite implements Htmlable
      */
     public function useCspNonce($nonce = null)
     {
-        return $this->nonce = $nonce ?? Str::random(40);
+        return $this->nonce = $nonce ?? Generator::random(40);
     }
 
     /**

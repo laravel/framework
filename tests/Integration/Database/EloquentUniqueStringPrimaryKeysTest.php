@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\PatternMatcher;
 use Illuminate\Support\Str;
 
 class EloquentUniqueStringPrimaryKeysTest extends DatabaseTestCase
@@ -51,9 +52,9 @@ class EloquentUniqueStringPrimaryKeysTest extends DatabaseTestCase
     {
         $user = ModelWithUuidPrimaryKey::create();
 
-        $this->assertTrue(Str::isUuid($user->id));
-        $this->assertTrue(Str::isUuid($user->foo));
-        $this->assertTrue(Str::isUuid($user->bar));
+        $this->assertTrue(PatternMatcher::isUuid($user->id));
+        $this->assertTrue(PatternMatcher::isUuid($user->foo));
+        $this->assertTrue(PatternMatcher::isUuid($user->bar));
     }
 
     public function testModelWithUlidPrimaryKeyCanBeCreated()
@@ -70,15 +71,15 @@ class EloquentUniqueStringPrimaryKeysTest extends DatabaseTestCase
         $user = ModelWithoutUuidPrimaryKey::create();
 
         $this->assertTrue(is_int($user->id));
-        $this->assertTrue(Str::isUuid($user->foo));
-        $this->assertTrue(Str::isUuid($user->bar));
+        $this->assertTrue(PatternMatcher::isUuid($user->foo));
+        $this->assertTrue(PatternMatcher::isUuid($user->bar));
     }
 
     public function testModelWithCustomUuidPrimaryKeyNameCanBeCreated()
     {
         $user = ModelWithCustomUuidPrimaryKeyName::create();
 
-        $this->assertTrue(Str::isUuid($user->uuid));
+        $this->assertTrue(PatternMatcher::isUuid($user->uuid));
     }
 
     public function testModelWithUuidPrimaryKeyCanBeCreatedQuietly()
@@ -87,9 +88,9 @@ class EloquentUniqueStringPrimaryKeysTest extends DatabaseTestCase
 
         $user->saveQuietly();
 
-        $this->assertTrue(Str::isUuid($user->id));
-        $this->assertTrue(Str::isUuid($user->foo));
-        $this->assertTrue(Str::isUuid($user->bar));
+        $this->assertTrue(PatternMatcher::isUuid($user->id));
+        $this->assertTrue(PatternMatcher::isUuid($user->foo));
+        $this->assertTrue(PatternMatcher::isUuid($user->bar));
     }
 
     public function testModelWithUlidPrimaryKeyCanBeCreatedQuietly()
@@ -110,8 +111,8 @@ class EloquentUniqueStringPrimaryKeysTest extends DatabaseTestCase
         $user->saveQuietly();
 
         $this->assertTrue(is_int($user->id));
-        $this->assertTrue(Str::isUuid($user->foo));
-        $this->assertTrue(Str::isUuid($user->bar));
+        $this->assertTrue(PatternMatcher::isUuid($user->foo));
+        $this->assertTrue(PatternMatcher::isUuid($user->bar));
     }
 
     public function testModelWithCustomUuidPrimaryKeyNameCanBeCreatedQuietly()
@@ -120,7 +121,7 @@ class EloquentUniqueStringPrimaryKeysTest extends DatabaseTestCase
 
         $user->saveQuietly();
 
-        $this->assertTrue(Str::isUuid($user->uuid));
+        $this->assertTrue(PatternMatcher::isUuid($user->uuid));
     }
 
     public function testUpsertWithUuidPrimaryKey()

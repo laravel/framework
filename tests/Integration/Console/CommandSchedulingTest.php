@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Generator;
 use Illuminate\Support\Str;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -45,7 +46,7 @@ class CommandSchedulingTest extends TestCase
 
         $this->fs = new Filesystem;
 
-        $this->id = Str::random();
+        $this->id = Generator::random();
         $this->logfile = storage_path("logs/command_scheduling_test_{$this->id}.log");
 
         $this->writeArtisanScript();

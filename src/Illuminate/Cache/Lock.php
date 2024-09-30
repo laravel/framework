@@ -4,6 +4,7 @@ namespace Illuminate\Cache;
 
 use Illuminate\Contracts\Cache\Lock as LockContract;
 use Illuminate\Contracts\Cache\LockTimeoutException;
+use Illuminate\Support\Generator;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
@@ -51,7 +52,7 @@ abstract class Lock implements LockContract
     public function __construct($name, $seconds, $owner = null)
     {
         if (is_null($owner)) {
-            $owner = Str::random();
+            $owner = Generator::random();
         }
 
         $this->name = $name;

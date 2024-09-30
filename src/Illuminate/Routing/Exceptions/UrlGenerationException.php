@@ -4,7 +4,7 @@ namespace Illuminate\Routing\Exceptions;
 
 use Exception;
 use Illuminate\Routing\Route;
-use Illuminate\Support\Str;
+use Illuminate\Support\StrGrammar;
 
 class UrlGenerationException extends Exception
 {
@@ -17,7 +17,7 @@ class UrlGenerationException extends Exception
      */
     public static function forMissingParameters(Route $route, array $parameters = [])
     {
-        $parameterLabel = Str::plural('parameter', count($parameters));
+        $parameterLabel = StrGrammar::plural('parameter', count($parameters));
 
         $message = sprintf(
             'Missing required %s for [Route: %s] [URI: %s]',

@@ -6,6 +6,7 @@ use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Generator;
 use Illuminate\Support\Str;
 
 class DatabaseTokenRepository implements TokenRepositoryInterface
@@ -211,7 +212,7 @@ class DatabaseTokenRepository implements TokenRepositoryInterface
      */
     public function createNewToken()
     {
-        return hash_hmac('sha256', Str::random(40), $this->hashKey);
+        return hash_hmac('sha256', Generator::random(40), $this->hashKey);
     }
 
     /**

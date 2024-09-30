@@ -2,6 +2,7 @@
 
 namespace Illuminate\Http;
 
+use Illuminate\Support\Generator;
 use Illuminate\Support\Str;
 
 trait FileHelpers
@@ -45,7 +46,7 @@ trait FileHelpers
             $path = rtrim($path, '/').'/';
         }
 
-        $hash = $this->hashName ?: $this->hashName = Str::random(40);
+        $hash = $this->hashName ?: $this->hashName = Generator::random(40);
 
         if ($extension = $this->guessExtension()) {
             $extension = '.'.$extension;

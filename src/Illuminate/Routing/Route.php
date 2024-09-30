@@ -16,6 +16,7 @@ use Illuminate\Routing\Matching\MethodValidator;
 use Illuminate\Routing\Matching\SchemeValidator;
 use Illuminate\Routing\Matching\UriValidator;
 use Illuminate\Support\Arr;
+use Illuminate\Support\PatternMatcher;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
@@ -911,7 +912,7 @@ class Route
         }
 
         foreach ($patterns as $pattern) {
-            if (Str::is($pattern, $routeName)) {
+            if (PatternMatcher::is($pattern, $routeName)) {
                 return true;
             }
         }

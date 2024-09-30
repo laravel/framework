@@ -6,6 +6,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Pagination\AbstractCursorPaginator;
 use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Replacer;
 use Illuminate\Support\Str;
 use LogicException;
 use ReflectionClass;
@@ -52,8 +53,8 @@ trait CollectsResources
         if ($this->collects) {
             $collects = $this->collects;
         } elseif (str_ends_with(class_basename($this), 'Collection') &&
-            (class_exists($class = Str::replaceLast('Collection', '', get_class($this))) ||
-             class_exists($class = Str::replaceLast('Collection', 'Resource', get_class($this))))) {
+            (class_exists($class = Replacer::replaceLast('Collection', '', get_class($this))) ||
+             class_exists($class = Replacer::replaceLast('Collection', 'Resource', get_class($this))))) {
             $collects = $class;
         }
 

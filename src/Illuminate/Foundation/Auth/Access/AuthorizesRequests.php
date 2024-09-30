@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Auth\Access;
 
 use Illuminate\Contracts\Auth\Access\Gate;
+use Illuminate\Support\Casing;
 use Illuminate\Support\Str;
 
 trait AuthorizesRequests
@@ -86,7 +87,7 @@ trait AuthorizesRequests
 
         $parameter = is_array($parameter) ? implode(',', $parameter) : $parameter;
 
-        $parameter = $parameter ?: Str::snake(class_basename($model));
+        $parameter = $parameter ?: Casing::snake(class_basename($model));
 
         $middleware = [];
 

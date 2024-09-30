@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Database\MySql;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Generator;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystemFamily;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
@@ -41,14 +42,14 @@ class JoinLateralTest extends MySqlTestCase
         $this->checkMySqlVersion();
 
         DB::table('users')->insert([
-            ['name' => Str::random()],
-            ['name' => Str::random()],
+            ['name' => Generator::random()],
+            ['name' => Generator::random()],
         ]);
 
         DB::table('posts')->insert([
-            ['title' => Str::random(), 'rating' => 1, 'user_id' => 1],
-            ['title' => Str::random(), 'rating' => 3, 'user_id' => 1],
-            ['title' => Str::random(), 'rating' => 7, 'user_id' => 1],
+            ['title' => Generator::random(), 'rating' => 1, 'user_id' => 1],
+            ['title' => Generator::random(), 'rating' => 3, 'user_id' => 1],
+            ['title' => Generator::random(), 'rating' => 7, 'user_id' => 1],
         ]);
     }
 

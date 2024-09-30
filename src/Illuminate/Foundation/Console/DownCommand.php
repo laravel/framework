@@ -7,6 +7,7 @@ use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Foundation\Events\MaintenanceModeEnabled;
 use Illuminate\Foundation\Exceptions\RegisterErrorViewPaths;
+use Illuminate\Support\Generator;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Throwable;
@@ -155,7 +156,7 @@ class DownCommand extends Command
     {
         return match (true) {
             ! is_null($this->option('secret')) => $this->option('secret'),
-            $this->option('with-secret') => Str::random(),
+            $this->option('with-secret') => Generator::random(),
             default => null,
         };
     }

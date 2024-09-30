@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Database\Sqlite;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Generator;
 use Illuminate\Support\Str;
 use Orchestra\Testbench\Attributes\RequiresDatabase;
 use Orchestra\Testbench\TestCase;
@@ -56,14 +57,14 @@ class EloquentModelConnectionsTest extends TestCase
 
     public function testChildObeysParentConnection()
     {
-        $parent1 = ParentModel::create(['name' => Str::random()]);
+        $parent1 = ParentModel::create(['name' => Generator::random()]);
         $parent1->children()->create(['name' => 'childOnConn1']);
         $parents1 = ParentModel::with('children')->get();
         $this->assertSame('childOnConn1', ChildModel::on('conn1')->first()->name);
         $this->assertSame('childOnConn1', $parent1->children()->first()->name);
         $this->assertSame('childOnConn1', $parents1[0]->children[0]->name);
 
-        $parent2 = ParentModel::on('conn2')->create(['name' => Str::random()]);
+        $parent2 = ParentModel::on('conn2')->create(['name' => Generator::random()]);
         $parent2->children()->create(['name' => 'childOnConn2']);
         $parents2 = ParentModel::on('conn2')->with('children')->get();
         $this->assertSame('childOnConn2', ChildModel::on('conn2')->first()->name);
@@ -73,7 +74,7 @@ class EloquentModelConnectionsTest extends TestCase
 
     public function testChildUsesItsOwnConnectionIfSet()
     {
-        $parent1 = ParentModel::create(['name' => Str::random()]);
+        $parent1 = ParentModel::create(['name' => Generator::random()]);
         $parent1->childrenDefaultConn2()->create(['name' => 'childAlwaysOnConn2']);
         $parents1 = ParentModel::with('childrenDefaultConn2')->get();
         $this->assertSame('childAlwaysOnConn2', ChildModelDefaultConn2::first()->name);
@@ -84,7 +85,7 @@ class EloquentModelConnectionsTest extends TestCase
 
     public function testChildUsesItsOwnConnectionIfSetEvenIfParentExplicitConnection()
     {
-        $parent1 = ParentModel::on('conn1')->create(['name' => Str::random()]);
+        $parent1 = ParentModel::on('conn1')->create(['name' => Generator::random()]);
         $parent1->childrenDefaultConn2()->create(['name' => 'childAlwaysOnConn2']);
         $parents1 = ParentModel::on('conn1')->with('childrenDefaultConn2')->get();
         $this->assertSame('childAlwaysOnConn2', ChildModelDefaultConn2::first()->name);

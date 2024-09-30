@@ -3,6 +3,7 @@
 namespace Illuminate\Mail;
 
 use Illuminate\Contracts\Mail\Attachable;
+use Illuminate\Support\Generator;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Symfony\Component\Mime\Address;
@@ -344,7 +345,7 @@ class Message
         if ($file instanceof Attachment) {
             return $file->attachWith(
                 function ($path) use ($file) {
-                    $cid = $file->as ?? Str::random();
+                    $cid = $file->as ?? Generator::random();
 
                     $this->message->addPart(
                         (new DataPart(new File($path), $cid, $file->mime))->asInline()
@@ -362,7 +363,7 @@ class Message
             );
         }
 
-        $cid = Str::random(10);
+        $cid = Generator::random(10);
 
         $this->message->addPart(
             (new DataPart(new File($file), $cid))->asInline()
