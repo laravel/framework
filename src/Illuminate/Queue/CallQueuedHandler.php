@@ -70,7 +70,7 @@ class CallQueuedHandler
 
         $this->dispatchThroughMiddleware($job, $command);
 
-        if (! $job->isReleased() && ! $command instanceof ShouldBeUniqueUntilProcessing) {
+        if (! $job->isReleased() && ! $command instanceof ShouldBeUniqueUntilProcessing && ! $command instanceof ShouldBeUnique) {
             $this->ensureUniqueJobLockIsReleased($command);
         }
 
@@ -202,9 +202,7 @@ class CallQueuedHandler
      */
     protected function ensureUniqueJobLockIsReleased($command)
     {
-        if ($command instanceof ShouldBeUnique) {
-            (new UniqueLock($this->container->make(Cache::class)))->release($command);
-        }
+        (new UniqueLock($this->container->make(Cache::class)))->release($command);
     }
 
     /**
