@@ -890,8 +890,9 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->expectException(RelationNotFoundException::class);
 
         $builder = $this->getBuilder();
-        $builder->setModel($this->getMockModel());
-
+        $model = $this->getMockModel();
+        $model->shouldReceive('isRelation')->andReturn(false);
+        $builder->setModel($model);
         $builder->getRelation('invalid');
     }
 
@@ -2414,7 +2415,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $model->shouldReceive('getKeyName')->andReturn('foo');
         $model->shouldReceive('getTable')->andReturn('foo_table');
         $model->shouldReceive('getQualifiedKeyName')->andReturn('foo_table.foo');
-        $model->shouldReceive('newInstance')->andReturn(clone $model);
+        $model->shouldReceive('newInstance')->andReturnSelf();
 
         return $model;
     }

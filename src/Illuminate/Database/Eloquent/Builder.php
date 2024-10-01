@@ -822,7 +822,7 @@ class Builder implements BuilderContract
         $relation = Relation::noConstraints(function () use ($name) {
             $instance = $this->getModel()->newInstance();
 
-            if (!method_exists($instance, $name)) {
+            if (!$instance->isRelation($name)) {
                 throw RelationNotFoundException::make($this->getModel(), $name);
             }
 
