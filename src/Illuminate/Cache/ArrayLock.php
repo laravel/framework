@@ -44,7 +44,7 @@ class ArrayLock extends Lock
 
         $this->store->locks[$this->name] = [
             'owner' => $this->owner,
-            'expiresAt' => Carbon::now()->addSeconds($this->seconds > 0 ? $this->seconds : 86400),
+            'expiresAt' => $this->seconds === 0 ? null : Carbon::now()->addSeconds($this->seconds),
         ];
 
         return true;
