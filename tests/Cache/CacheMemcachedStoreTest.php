@@ -61,6 +61,7 @@ class CacheMemcachedStoreTest extends TestCase
         Carbon::setTestNow($now = Carbon::now());
         $memcache = $this->getMockBuilder(Memcached::class)->onlyMethods(['set'])->getMock();
         $memcache->expects($this->once())->method('set')->with($this->equalTo('foo'), $this->equalTo('bar'), $this->equalTo($now->timestamp + 60))->willReturn(true);
+        $memcache->expects($this->once())->method('set')->with($this->equalTo('foo_ttl'), $this->equalTo(0), $this->equalTo(0))->willReturn(true);
         $store = new MemcachedStore($memcache);
         $result = $store->put('foo', 'bar', 60);
         $this->assertTrue($result);
@@ -89,6 +90,7 @@ class CacheMemcachedStoreTest extends TestCase
     {
         $memcache = $this->getMockBuilder(Memcached::class)->onlyMethods(['set'])->getMock();
         $memcache->expects($this->once())->method('set')->with($this->equalTo('foo'), $this->equalTo('bar'), $this->equalTo(0))->willReturn(true);
+        $memcache->expects($this->once())->method('set')->with($this->equalTo('foo_ttl'), $this->equalTo(0), $this->equalTo(0))->willReturn(true);
         $store = new MemcachedStore($memcache);
         $result = $store->forever('foo', 'bar');
         $this->assertTrue($result);
