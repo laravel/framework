@@ -87,7 +87,7 @@ class SqlServerGrammar extends Grammar
     {
         return sprintf(
             'select (case when object_id(%s, \'U\') is null then 0 else 1 end) as [exists]',
-            $this->quoteString($this->wrap($schema ? $schema.'.'.$table : $table))
+            $this->quoteString($schema ? $schema.'.'.$table : $table)
         );
     }
 
