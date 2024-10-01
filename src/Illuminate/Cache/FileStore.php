@@ -87,13 +87,8 @@ class FileStore implements Store, LockProvider
             $path, $expiration.serialize($value), true
         );
 
-        $ttl_result = $this->files->put(
-            $path . "_ttl", $expiration.serialize($expiration), true
-        );
-
-        if ($result !== false && $result > 0 && $ttl_result !== false && $ttl_result > 0) {
+        if ($result !== false && $result > 0) {
             $this->ensurePermissionsAreCorrect($path);
-            $this->ensurePermissionsAreCorrect($path . "_ttl");
 
             return true;
         }
@@ -187,7 +182,7 @@ class FileStore implements Store, LockProvider
         $path = $this->path($key);
 
         try {
-            if (is_null($contents = $this->files->get($path . "_ttl", true))) {
+            if (is_null($contents = $this->files->get($path, true))) {
                 return null;
             }
 
