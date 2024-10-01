@@ -45,14 +45,9 @@ class SqlServerBuilder extends Builder
         $schema ??= $this->getDefaultSchema();
         $table = $this->connection->getTablePrefix().$table;
 
-        foreach ($this->getTables() as $value) {
-            if (strtolower($table) === strtolower($value['name'])
-                && strtolower($schema) === strtolower($value['schema'])) {
-                return true;
-            }
-        }
-
-        return false;
+        return (bool) $this->connection->scalar(
+            $this->grammar->compileTableExists($schema, $table)
+        );
     }
 
     /**
