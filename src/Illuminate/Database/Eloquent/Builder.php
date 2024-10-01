@@ -820,11 +820,13 @@ class Builder implements BuilderContract
         // not have to remove these where clauses manually which gets really hacky
         // and error prone. We don't want constraints because we add eager ones.
         $relation = Relation::noConstraints(function () use ($name) {
-            try {
-                return $this->getModel()->newInstance()->$name();
-            } catch (BadMethodCallException) {
+            $instance = $this->getModel()->newInstance();
+
+            if (!method_exists($instance, $name)) {
                 throw RelationNotFoundException::make($this->getModel(), $name);
             }
+
+            return $instance->$name();
         });
 
         $nested = $this->relationsNestedUnder($name);
