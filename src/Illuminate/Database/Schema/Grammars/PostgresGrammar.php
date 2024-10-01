@@ -79,7 +79,7 @@ class PostgresGrammar extends Grammar
     {
         return sprintf(
             'select exists (select 1 from pg_class c, pg_namespace n where '
-            ."n.nspname = %s and c.relname = %s and c.relkind in ('r', 'p') and n.oid = c.relnamespace) as 'exists'",
+            ."n.nspname = %s and c.relname = %s and c.relkind in ('r', 'p') and n.oid = c.relnamespace)",
             $this->quoteString($schema),
             $this->quoteString($table)
         );

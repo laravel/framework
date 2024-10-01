@@ -42,7 +42,6 @@ class SqlServerBuilder extends Builder
     {
         [$schema, $table] = $this->parseSchemaAndTable($table);
 
-        $schema ??= $this->getDefaultSchema();
         $table = $this->connection->getTablePrefix().$table;
 
         return (bool) $this->connection->scalar(
