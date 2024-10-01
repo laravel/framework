@@ -229,7 +229,7 @@ class ModelMakeCommand extends GeneratorCommand
     }
 
     /**
-     * Build the replacements for a factory doc block.
+     * Build the replacements for a factory DocBlock.
      *
      * @return string
      */
