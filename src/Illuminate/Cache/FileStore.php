@@ -81,12 +81,19 @@ class FileStore implements Store, LockProvider
     {
         $this->ensureCacheDirectoryExists($path = $this->path($key));
 
+        $expiration = $this->expiration($seconds);
+
         $result = $this->files->put(
-            $path, $this->expiration($seconds).serialize($value), true
+            $path, $expiration.serialize($value), true
         );
 
-        if ($result !== false && $result > 0) {
+        $ttl_result = $this->files->put(
+            $path . "_ttl", $expiration.serialize($expiration), true
+        );
+
+        if ($result !== false && $result > 0 && $ttl_result !== false && $ttl_result > 0) {
             $this->ensurePermissionsAreCorrect($path);
+            $this->ensurePermissionsAreCorrect($path . "_ttl");
 
             return true;
         }
@@ -180,7 +187,7 @@ class FileStore implements Store, LockProvider
         $path = $this->path($key);
 
         try {
-            if (is_null($contents = $this->files->get($path, true))) {
+            if (is_null($contents = $this->files->get($path . "_ttl", true))) {
                 return null;
             }
 
@@ -190,7 +197,7 @@ class FileStore implements Store, LockProvider
                 return Carbon::createFromTimestamp($expire)->diffForHumans();
             }
 
-            return (int) $expire;
+            return (int) $contents;
         } catch (Exception $e) {
             // Do nothing...
         }
