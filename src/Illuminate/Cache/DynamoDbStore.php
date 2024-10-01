@@ -128,7 +128,7 @@ class DynamoDbStore implements LockProvider, Store
      */
     public function remaining($key, $format = true)
     {
-        $remaining = $this->get($key."_ttl");
+        $remaining = $this->get($key.'_ttl');
 
         if ($remaining === null) {
             return null;
@@ -239,7 +239,7 @@ class DynamoDbStore implements LockProvider, Store
             'TableName' => $this->table,
             'Item' => [
                 $this->keyAttribute => [
-                    'S' => $this->prefix.$key."_ttl",
+                    'S' => $this->prefix.$key.'_ttl',
                 ],
                 $this->valueAttribute => [
                     $this->type($value) => $this->serialize($expiration),
@@ -487,7 +487,7 @@ class DynamoDbStore implements LockProvider, Store
             'TableName' => $this->table,
             'Key' => [
                 $this->keyAttribute => [
-                    'S' => $this->prefix.$key."_ttl",
+                    'S' => $this->prefix.$key.'_ttl',
                 ],
             ],
         ]);
