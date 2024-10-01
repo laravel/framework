@@ -34,14 +34,14 @@ class OptimizeCommand extends Command
         $this->components->info('Caching framework bootstrap, configuration, and metadata.');
 
         $commands = collect($this->getApplication()->all())
-            ->mapWithKeys(fn($command, $name) => [$name => collect((new \ReflectionClass($command))->getAttributes(AsOptimize::class))->first()])
-            ->filter(fn(?ReflectionAttribute $attribute) => $attribute !== null)
-            ->filter(fn(ReflectionAttribute $attribute) => ($attribute->getArguments()['clear']) === false)
-            ->mapWithKeys(fn(ReflectionAttribute $attribute, $command) => [
-                $attribute->getArguments()['name'] => fn() => $this->callSilent($command) == 0
+            ->mapWithKeys(fn ($command, $name) => [$name => collect((new \ReflectionClass($command))->getAttributes(AsOptimize::class))->first()])
+            ->filter(fn (?ReflectionAttribute $attribute) => $attribute !== null)
+            ->filter(fn (ReflectionAttribute $attribute) => $attribute->getArguments()['clear'] === false)
+            ->mapWithKeys(fn (ReflectionAttribute $attribute, $command) => [
+                $attribute->getArguments()['name'] => fn () => $this->callSilent($command) == 0,
             ]);
 
-        $commands->each(fn($task, $description) => $this->components->task($description, $task));
+        $commands->each(fn ($task, $description) => $this->components->task($description, $task));
 
         $this->newLine();
     }
