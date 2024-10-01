@@ -86,6 +86,34 @@ class ArrayStore extends TaggableStore implements LockProvider
     }
 
     /**
+     * Get the time remaining on the key's expiration as a UNIX timestamp or readable string.
+     *
+     * @param  string  $key
+     * @param  bool  $format
+     * @return string|int|null
+     */
+    public function remaining($key, $format = true)
+    {
+        if (! isset($this->storage[$key])) {
+            return;
+        }
+
+        $item = $this->storage[$key];
+
+        $expiresAt = $item['expiresAt'] ?? 0;
+
+        if ($expiresAt === 0) {
+            return null;
+        }
+
+        if ($format) {
+            return Carbon::createFromTimestamp($expiresAt)->diffForHumans();
+        }
+
+        return (int) $expiresAt;
+    }
+
+    /**
      * Increment the value of an item in the cache.
      *
      * @param  string  $key

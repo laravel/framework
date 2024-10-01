@@ -220,7 +220,7 @@ class DatabaseStore implements LockProvider, Store
     }
 
     /**
-     * Get the cache key's expiration time.
+     * Get the time remaining on the key's expiration as a UNIX timestamp or readable string.
      *
      * @param  string  $key
      * @param  bool  $format
