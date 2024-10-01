@@ -223,11 +223,9 @@ class ModelMakeCommand extends GeneratorCommand
             $replace["\n    {{ factoryDocBlock }}"] = '';
         }
 
-        $class = str_replace(
+        return str_replace(
             array_keys($replace), array_values($replace), parent::buildClass($name)
         );
-
-        return $class;
     }
 
     /**
@@ -237,11 +235,10 @@ class ModelMakeCommand extends GeneratorCommand
      */
     protected function buildFactoryReplacements()
     {
-        $factory = Str::studly($this->argument('name')).'Factory';
-        $factoryNameSpace = '\\Database\\Factories\\'.$factory;
+        $factoryNamespace = '\\Database\\Factories\\'.Str::studly($this->argument('name')).'Factory';
 
         return <<<EOT
-        /** @use HasFactory<$factoryNameSpace> */
+        /** @use HasFactory<$factoryNamespace> */
         EOT;
     }
 
