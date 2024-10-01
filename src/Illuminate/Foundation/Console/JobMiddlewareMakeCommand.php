@@ -1,13 +1,14 @@
 <?php
 
-namespace Illuminate\Routing\Console;
+namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Concerns\CreatesMatchingTest;
 use Illuminate\Console\GeneratorCommand;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Input\InputOption;
 
-#[AsCommand(name: 'make:middleware')]
-class MiddlewareMakeCommand extends GeneratorCommand
+#[AsCommand(name: 'make:job-middleware')]
+class JobMiddlewareMakeCommand extends GeneratorCommand
 {
     use CreatesMatchingTest;
 
@@ -16,14 +17,14 @@ class MiddlewareMakeCommand extends GeneratorCommand
      *
      * @var string
      */
-    protected $name = 'make:middleware';
+    protected $name = 'make:job-middleware';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Create a new HTTP middleware class';
+    protected $description = 'Create a new job middleware class';
 
     /**
      * The type of class being generated.
@@ -39,7 +40,7 @@ class MiddlewareMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        return $this->resolveStubPath('/stubs/middleware.stub');
+        return $this->resolveStubPath('/stubs/job.middleware.stub');
     }
 
     /**
@@ -51,8 +52,8 @@ class MiddlewareMakeCommand extends GeneratorCommand
     protected function resolveStubPath($stub)
     {
         return file_exists($customPath = $this->laravel->basePath(trim($stub, '/')))
-            ? $customPath
-            : __DIR__.$stub;
+                        ? $customPath
+                        : __DIR__.$stub;
     }
 
     /**
@@ -63,6 +64,18 @@ class MiddlewareMakeCommand extends GeneratorCommand
      */
     protected function getDefaultNamespace($rootNamespace)
     {
-        return $rootNamespace.'\Http\Middleware';
+        return $rootNamespace.'\Jobs\Middleware';
+    }
+
+    /**
+     * Get the console command options.
+     *
+     * @return array
+     */
+    protected function getOptions()
+    {
+        return [
+            ['force', 'f', InputOption::VALUE_NONE, 'Create the class even if the job middleware already exists'],
+        ];
     }
 }
