@@ -856,6 +856,19 @@ class Gate implements GateContract
     }
 
     /**
+     * Set the callback to be used to resolve users.
+     *
+     * @param  \Closure  $userResolver
+     * @return $this
+     */
+    public function resolveUsersUsing(Closure $userResolver)
+    {
+        $this->userResolver = $userResolver;
+
+        return $this;
+    }
+
+    /**
      * Get all of the defined abilities.
      *
      * @return array
