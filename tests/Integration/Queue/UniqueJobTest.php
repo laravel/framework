@@ -47,14 +47,14 @@ class UniqueJobTest extends QueueTestCase
         );
     }
 
-    public function testLockIsReleasedForSuccessfulJobs()
+    public function testLockIsNotReleasedForSuccessfulJobs()
     {
         UniqueTestJob::$handled = false;
         dispatch($job = new UniqueTestJob);
         $this->runQueueWorkerCommand(['--once' => true]);
 
         $this->assertTrue($job::$handled);
-        $this->assertTrue($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
+        $this->assertFalse($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
     }
 
     public function testLockIsReleasedForFailedJobs()

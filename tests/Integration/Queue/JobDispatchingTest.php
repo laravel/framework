@@ -98,7 +98,7 @@ class JobDispatchingTest extends QueueTestCase
         $this->assertTrue(Job::$ran);
     }
 
-    public function testUniqueJobLockIsReleasedForJobDispatchedAfterResponse()
+    public function testUniqueJobLockIsNotReleasedForJobDispatchedAfterResponse()
     {
         // get initial terminatingCallbacks
         $terminatingCallbacksReflectionProperty = (new \ReflectionObject($this->app))->getProperty('terminatingCallbacks');
@@ -117,10 +117,10 @@ class JobDispatchingTest extends QueueTestCase
         UniqueJob::$ran = false;
         UniqueJob::dispatch('test')->afterResponse();
         $this->app->terminate();
-        $this->assertTrue(UniqueJob::$ran);
+        $this->assertFalse(UniqueJob::$ran);
 
         // acquire job lock and confirm that job is not dispatched after response
-        $this->assertTrue(
+        $this->assertFalse(
             $this->getJobLock(UniqueJob::class, 'test')
         );
         $terminatingCallbacksReflectionProperty->setValue($this->app, $startTerminatingCallbacks);
