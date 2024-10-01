@@ -70,10 +70,6 @@ class CallQueuedHandler
 
         $this->dispatchThroughMiddleware($job, $command);
 
-        if (! $job->isReleased() && ! $command instanceof ShouldBeUniqueUntilProcessing && ! $command instanceof ShouldBeUnique) {
-            $this->ensureUniqueJobLockIsReleased($command);
-        }
-
         if (! $job->hasFailed() && ! $job->isReleased()) {
             $this->ensureNextJobInChainIsDispatched($command);
             $this->ensureSuccessfulBatchJobIsRecorded($command);
@@ -246,7 +242,7 @@ class CallQueuedHandler
     {
         $command = $this->getCommand($data);
 
-        if (! $command instanceof ShouldBeUniqueUntilProcessing) {
+        if ($command instanceof ShouldBeUnique) {
             $this->ensureUniqueJobLockIsReleased($command);
         }
 
