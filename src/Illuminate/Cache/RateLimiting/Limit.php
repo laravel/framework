@@ -120,6 +120,18 @@ class Limit
     }
 
     /**
+     * Create a new rate limit using months as decay time.
+     *
+     * @param  int  $maxAttempts
+     * @param  int  $decayMonths
+     * @return static
+     */
+    public static function perMonth($maxAttempts, $decayMonths = 1, $daysInMonth = 28)
+    {
+        return new static('', $maxAttempts, 60 * 60 * 24 * 7 * $daysInMonth * $decayMonths);
+    }
+
+    /**
      * Create a new unlimited rate limit.
      *
      * @return static
