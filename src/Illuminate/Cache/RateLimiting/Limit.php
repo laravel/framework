@@ -128,7 +128,7 @@ class Limit
      */
     public static function perMonth($maxAttempts, $decayMonths = 1, $daysInMonth = 28)
     {
-        return new static('', $maxAttempts, 60 * 60 * 24 * 7 * $daysInMonth * $decayMonths);
+        return new static('', $maxAttempts, 60 * 60 * 24 * $daysInMonth * $decayMonths);
     }
 
     /**
