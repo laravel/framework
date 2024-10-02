@@ -423,7 +423,7 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
         $name = str_replace('/', '\\', $name);
 
         $nameParts = collect(explode('\\', $name))->map(function ($part) {
-            return Str::contains($part, '-') ? Str::studly($part) : Str::ucfirst($part);
+            return Str::contains($part, '-') ? Str::studly($part) : $part;
         });
 
         return $nameParts->implode('\\');
