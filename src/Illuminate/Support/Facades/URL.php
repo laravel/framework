@@ -23,7 +23,7 @@ namespace Illuminate\Support\Facades;
  * @method static string route(\BackedEnum|string $name, mixed $parameters = [], bool $absolute = true)
  * @method static string toRoute(\Illuminate\Routing\Route $route, mixed $parameters, bool $absolute)
  * @method static string action(string|array $action, mixed $parameters = [], bool $absolute = true)
- * @method static array formatParameters(mixed|array $parameters)
+ * @method static array formatParameters(mixed $parameters)
  * @method static string formatRoot(string $scheme, string|null $root = null)
  * @method static string format(string $root, string $path, \Illuminate\Routing\Route|null $route = null)
  * @method static bool isValidUrl(string $path)
