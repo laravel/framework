@@ -386,7 +386,8 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
      */
     protected function replaceClass($stub, $name)
     {
-        $class = str_replace($this->getNamespace($name).'\\', '', $name);
+
+        $class = Str::studly(Str::afterLast(str_replace('-', ' ', $name), '\\'));
 
         return str_replace(['DummyClass', '{{ class }}', '{{class}}'], $class, $stub);
     }
@@ -418,12 +419,14 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
     protected function getNameInput()
     {
         $name = trim($this->argument('name'));
+        $name = Str::before($name, '.php');
+        $name = str_replace('/', '\\', $name);
 
-        if (Str::endsWith($name, '.php')) {
-            return Str::substr($name, 0, -4);
-        }
+        $nameParts = collect(explode('\\', $name))->map(function ($part) {
+            return Str::contains($part, '-') ? Str::studly($part) : Str::ucfirst($part);
+        });
 
-        return $name;
+        return $nameParts->implode('\\');
     }
 
     /**
