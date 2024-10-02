@@ -108,6 +108,18 @@ class Limit
     }
 
     /**
+     * Create a new rate limit using days as decay time.
+     *
+     * @param  int  $maxAttempts
+     * @param  int  $decayWeeks
+     * @return static
+     */
+    public static function perWeek($maxAttempts, $decayWeeks = 1)
+    {
+        return new static('', $maxAttempts, 60 * 60 * 24 * 7 * $decayWeeks);
+    }
+
+    /**
      * Create a new unlimited rate limit.
      *
      * @return static
