@@ -108,7 +108,7 @@ class Limit
     }
 
     /**
-     * Create a new rate limit using days as decay time.
+     * Create a new rate limit using weeks as decay time.
      *
      * @param  int  $maxAttempts
      * @param  int  $decayWeeks
