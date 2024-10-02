@@ -283,13 +283,7 @@ class ApplicationBuilder
     public function withCommands(array $commands = [])
     {
         if (empty($commands)) {
-            if (is_file($this->app->basePath('routes/console.php'))) {
-                $commands = [$this->app->basePath('routes/console.php')];
-            }
-
-            if (is_dir($this->app->path('Console/Commands'))) {
-                $commands = [...$commands, $this->app->path('Console/Commands')];
-            }
+            $commands = [$this->app->path('Console/Commands')];
         }
 
         $this->app->afterResolving(ConsoleKernel::class, function ($kernel) use ($commands) {

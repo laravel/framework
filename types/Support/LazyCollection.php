@@ -416,6 +416,13 @@ assertType('Illuminate\Support\LazyCollection<string, User>', $collection->keyBy
 assertType('bool', $collection->has(0));
 assertType('bool', $collection->has([0, 1]));
 
+assertType('string', $collection->implode(function ($user, $index) {
+    assertType('User', $user);
+    assertType('int', $index);
+
+    return 'string';
+}));
+
 assertType('Illuminate\Support\LazyCollection<int, User>', $collection->intersect([new User]));
 
 assertType('Illuminate\Support\LazyCollection<int, User>', $collection->intersectByKeys([new User]));

@@ -608,7 +608,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Concatenate values of a given key as a string.
      *
-     * @param  callable|string|null  $value
+     * @param  (callable(TValue, TKey): mixed)|string|null  $value
      * @param  string|null  $glue
      * @return string
      */

@@ -149,7 +149,7 @@ class Builder implements BuilderContract
     /**
      * The maximum number of records to return.
      *
-     * @var int
+     * @var int|null
      */
     public $limit;
 
@@ -177,14 +177,14 @@ class Builder implements BuilderContract
     /**
      * The maximum number of union records to return.
      *
-     * @var int
+     * @var int|null
      */
     public $unionLimit;
 
     /**
      * The number of union records to skip.
      *
-     * @var int
+     * @var int|null
      */
     public $unionOffset;
 
