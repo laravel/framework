@@ -237,14 +237,14 @@ if (! function_exists('cache')) {
      *
      * @throws \InvalidArgumentException
      */
-    function cache($key = null, $default = null, $ttl = false)
+    function cache($key = null, $default = null)
     {
         if (is_null($key)) {
             return app('cache');
         }
 
         if (is_string($key)) {
-            return app('cache')->get($key, $default, $ttl);
+            return app('cache')->get($key, $default);
         }
 
         if (! is_array($key)) {
