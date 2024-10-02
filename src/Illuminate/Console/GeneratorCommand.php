@@ -419,15 +419,16 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
     protected function getNameInput()
     {
         $name = trim($this->argument('name'));
-        $name = Str::before($name, '.php');
+        if (Str::endsWith($name, '.php')) {
+            $name = Str::substr($name, 0, -4);
+        }
         $name = str_replace('/', '\\', $name);
-
         $nameParts = collect(explode('\\', $name))->map(function ($part) {
             return Str::contains($part, '-') ? Str::studly($part) : $part;
         });
-
         return $nameParts->implode('\\');
     }
+
 
     /**
      * Get the root namespace for the class.
