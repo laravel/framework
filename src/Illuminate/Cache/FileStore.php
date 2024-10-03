@@ -247,9 +247,11 @@ class FileStore implements Store, LockProvider
      */
     public function forget($key)
     {
-        if ($this->files->exists($file = $this->path($key))) {
-            $this->files->delete($this->path("illuminate:cache:flexible:created:{$key}"));
+        if ($this->files->exists($file = $this->path("illuminate:cache:flexible:created:{$key}"))) {
+            $this->files->delete($file);
+        }
 
+        if ($this->files->exists($file = $this->path($key))) {
             return $this->files->delete($file);
         }
 
