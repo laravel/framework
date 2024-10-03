@@ -88,8 +88,8 @@ class CacheMemcachedStoreTest extends TestCase
     public function testStoreItemForeverProperlyCallsMemcached()
     {
         $memcache = $this->getMockBuilder(Memcached::class)->onlyMethods(['set'])->getMock();
-        $memcache->expects($this->once())->method('set')->with($this->equalTo('foo'), $this->equalTo('bar'), $this->equalTo(0))->willReturn(true);
-        $memcache->expects($this->once())->method('set')->with($this->equalTo('foo_ttl'), $this->equalTo(0), $this->equalTo(0))->willReturn(true);
+        $memcache->expects($this->at(0))->method('set')->with($this->equalTo('foo'), $this->equalTo('bar'), $this->equalTo(0))->willReturn(true);
+        $memcache->expects($this->at(1))->method('set')->with($this->equalTo('foo_ttl'), $this->equalTo(0), $this->equalTo(0))->willReturn(true);
         $store = new MemcachedStore($memcache);
         $result = $store->forever('foo', 'bar');
         $this->assertTrue($result);
