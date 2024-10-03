@@ -1620,7 +1620,7 @@ trait HasAttributes
     /**
      * Get the attributes that should be cast.
      *
-     * @return array
+     * @return array<string, string>
      */
     protected function casts()
     {
