@@ -110,7 +110,7 @@
         "orchestra/testbench-core": "^9.4.0",
         "pda/pheanstalk": "^5.0.6",
         "phpstan/phpstan": "^1.11.5",
-        "phpunit/phpunit": "^10.5.12|^11.3.2",
+        "phpunit/phpunit": "^10.5.35|^11.3.6",
         "predis/predis": "v2.x-dev",
         "resend/resend-php": "^0.10.0",
         "symfony/cache": "^7.1.4",
