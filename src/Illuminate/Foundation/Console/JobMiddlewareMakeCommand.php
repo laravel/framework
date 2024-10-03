@@ -27,7 +27,7 @@ class JobMiddlewareMakeCommand extends GeneratorCommand
     protected $description = 'Create a new job middleware class';
 
     /**
-     * The type of class being generated.
+     * The type of class JobMiddlewareMakeCommand generated.
      *
      * @var string
      */
@@ -75,7 +75,7 @@ class JobMiddlewareMakeCommand extends GeneratorCommand
     protected function getOptions()
     {
         return [
-            ['force', 'f', InputOption::VALUE_NONE, 'Create the class even if the job middleware already exists'],
+            ['force', 'f', InputOption::VALUE_NONE, 'Create the class JobMiddlewareMakeCommand if the job middleware already exists'],
         ];
     }
 }
