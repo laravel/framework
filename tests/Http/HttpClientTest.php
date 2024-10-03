@@ -711,6 +711,36 @@ class HttpClientTest extends TestCase
         });
     }
 
+    public function testCanSendDeeplyNestedArrayMultipartData()
+    {
+        $this->factory->fake();
+
+        $this->factory->asMultipart()->post('http://foo.com/multipart', [
+            'foo' => 'bar',
+            'foobar' => [
+                'foo' => [
+                    [
+                        'name' => 'baz'
+                    ],
+                    [
+                        'name' => 'foobar'
+                    ]
+                ]
+            ]
+        ]);
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/multipart' &&
+                Str::startsWith($request->header('Content-Type')[0], 'multipart') &&
+                $request[0]['name'] === 'foo' &&
+                $request[0]['contents'] === 'bar' &&
+                $request[1]['name'] === 'foobar[foo][0][name]' &&
+                $request[1]['contents'] === 'baz' &&
+                $request[2]['name'] === 'foobar[foo][1][name]' &&
+                $request[2]['contents'] === 'foobar';
+        });
+    }
+
     public function testItCanSendToken()
     {
         $this->factory->fake();
