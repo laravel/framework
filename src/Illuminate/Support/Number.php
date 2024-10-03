@@ -128,7 +128,7 @@ class Number
 
         $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::CURRENCY);
 
-        return $formatter->formatCurrency($number, empty($in) ? static::$currency : $in);
+        return $formatter->formatCurrency($number, ! empty($in) ? $in : static::$currency);
     }
 
     /**
