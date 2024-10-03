@@ -102,7 +102,7 @@ class Repository implements ArrayAccess, CacheContract
      * Retrieve an item from the cache by key.
      *
      * @param  array|string  $key
-     * @param  (\Closure(): mixed)  $default
+     * @param  mixed  $default
      * @return mixed
      */
     public function get($key, $default = null): mixed
@@ -197,7 +197,7 @@ class Repository implements ArrayAccess, CacheContract
      * Retrieve an item from the cache and delete it.
      *
      * @param  array|string  $key
-     * @param  (\Closure(): mixed)  $default
+     * @param  mixed  $default
      * @return mixed
      */
     public function pull($key, $default = null)
