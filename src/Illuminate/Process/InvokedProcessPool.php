@@ -36,6 +36,18 @@ class InvokedProcessPool implements Countable
     }
 
     /**
+     * Stop all processes that are still running.
+     *
+     * @param  float  $timeout
+     * @param  int|null  $signal
+     * @return \Illuminate\Support\Collection
+     */
+    public function stop(float $timeout = 10, ?int $signal = null)
+    {
+        return $this->running()->each->stop($timeout, $signal);
+    }
+
+    /**
      * Get the processes in the pool that are still currently running.
      *
      * @return \Illuminate\Support\Collection

@@ -235,6 +235,19 @@ abstract class Grammar extends BaseGrammar
     }
 
     /**
+     * Create the column definition for a vector type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    protected function typeVector(Fluent $column)
+    {
+        throw new RuntimeException('This database driver does not support the vector type.');
+    }
+
+    /**
      * Add the column modifiers to the definition.
      *
      * @param  string  $sql

@@ -3,8 +3,8 @@
 namespace Illuminate\Support\Facades;
 
 /**
- * @method static \Illuminate\Cache\RateLimiter for(string $name, \Closure $callback)
- * @method static \Closure|null limiter(string $name)
+ * @method static \Illuminate\Cache\RateLimiter for(\BackedEnum|\UnitEnum|string $name, \Closure $callback)
+ * @method static \Closure|null limiter(\BackedEnum|\UnitEnum|string $name)
  * @method static mixed attempt(string $key, int $maxAttempts, \Closure $callback, int $decaySeconds = 60)
  * @method static bool tooManyAttempts(string $key, int $maxAttempts)
  * @method static int hit(string $key, int $decaySeconds = 60)
