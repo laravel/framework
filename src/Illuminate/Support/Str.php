@@ -1813,7 +1813,15 @@ class Str
      */
     public static function createUuidsUsing(?callable $factory = null)
     {
-        static::$uuidFactory = $factory;
+        static::$uuidFactory = function () use ($factory) {
+            $uuid = $factory();
+
+            if (is_string($uuid)) {
+                $uuid = (new UuidFactory)->fromString($uuid);
+            }
+
+            return $uuid;
+        };
     }
 
     /**

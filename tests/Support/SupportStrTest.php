@@ -1397,6 +1397,21 @@ class SupportStrTest extends TestCase
         }
     }
 
+    public function testItCanControlUuidGenerationWithStrings()
+    {
+        Str::createUuidsUsing(fn () => '6201c046-a8d7-47e5-8ac7-cd0cbdb3b9f4');
+        $uuid = Str::uuid();
+        $this->assertInstanceOf(UuidInterface::class, $uuid);
+        $this->assertSame('6201c046-a8d7-47e5-8ac7-cd0cbdb3b9f4', (string) $uuid);
+        Str::createUuidsNormally();
+
+        Str::createUuidsUsingSequence(['6201c046-a8d7-47e5-8ac7-cd0cbdb3b9f4']);
+        $uuid = Str::uuid();
+        $this->assertInstanceOf(UuidInterface::class, $uuid);
+        $this->assertSame('6201c046-a8d7-47e5-8ac7-cd0cbdb3b9f4', (string) $uuid);
+        Str::createUuidsNormally();
+    }
+
     public function testItCanSpecifyASequenceOfUuidsToUtilise()
     {
         Str::createUuidsUsingSequence([
