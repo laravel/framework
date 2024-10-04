@@ -15,6 +15,7 @@ use Illuminate\Support\ItemNotFoundException;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\MultipleItemsFoundException;
 use Illuminate\Support\Str;
+use Illuminate\Support\Stringable;
 use InvalidArgumentException;
 use IteratorAggregate;
 use JsonSerializable;
@@ -1751,6 +1752,15 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testJoinOf($collection)
+    {
+        $data = new $collection(['taylor', 'dayle']);
+        $this->assertInstanceOf(Stringable::class, $data->joinOf(','));
+        $this->assertSame('taylor,dayle', (string) $data->joinOf(','));
+        $this->assertSame('TAYLOR,DAYLE', (string) $data->joinOf(',')->upper());
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testCrossJoin($collection)
     {
         // Cross join with an array
@@ -2305,6 +2315,15 @@ class SupportCollectionTest extends TestCase
         $data = new $collection([['name' => 'taylor', 'email' => 'foo'], ['name' => 'dayle', 'email' => 'bar']]);
         $this->assertSame('taylor-foodayle-bar', $data->implode(fn ($user) => $user['name'].'-'.$user['email']));
         $this->assertSame('taylor-foo,dayle-bar', $data->implode(fn ($user) => $user['name'].'-'.$user['email'], ','));
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testImplodeOf($collection)
+    {
+        $data = new $collection(['taylor', 'dayle']);
+        $this->assertInstanceOf(Stringable::class, $data->implodeOf(','));
+        $this->assertSame('taylor,dayle', (string) $data->implodeOf(','));
+        $this->assertSame('TAYLOR,DAYLE', (string) $data->implodeOf(',')->upper());
     }
 
     #[DataProvider('collectionClassProvider')]
