@@ -76,7 +76,7 @@ jobs:
         with:
           timeout_minutes: 5
           max_attempts: 5
-          command: composer require "nesbot/carbon:^3.4" "guzzlehttp/promises:^2.0.3" "symfony/contracts:^3.4.2" "symfony/translation:^7.0.3" "mtdowling/jmespath.php:^2.8.0" --no-interaction --no-update
+          command: composer require "nesbot/carbon:^3.4" "guzzlehttp/promises:^2.0.3" "symfony/contracts:^3.4.2" "symfony/translation:^7.0.3" "mtdowling/jmespath.php:^2.8.0" "league/mime-type-detection:^1.16.0" --no-interaction --no-update
 
       - name: Install dependencies
         uses: nick-fields/retry@v3
