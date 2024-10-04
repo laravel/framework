@@ -280,9 +280,7 @@ trait ValidatesAttributes
      */
     protected function getDateTimestamp($value)
     {
-        $date = is_null($value) ? null : $this->getDateTime($value);
-
-        return $date ? $date->getTimestamp() : null;
+        return $this->getDateTime($value)?->getTimestamp();
     }
 
     /**
