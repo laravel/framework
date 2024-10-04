@@ -46,6 +46,9 @@ class RouteCollection extends AbstractRouteCollection
     {
         $this->addToCollections($route);
 
+        // Sort routes by model binding BEFORE adding lookups
+        $this->sortRoutesByModelBinding();
+
         $this->addLookups($route);
 
         return $route;
@@ -265,5 +268,38 @@ class RouteCollection extends AbstractRouteCollection
         return (new CompiledRouteCollection($compiled, $attributes))
             ->setRouter($router)
             ->setContainer($container);
+    }
+
+    /**
+     * Sort routes by whether they have model binding.
+     *
+     * @return void
+     */
+    protected function sortRoutesByModelBinding(): void
+    {
+        if (count($this->allRoutes) == 1) return;
+
+        usort($this->allRoutes, function ($routeA, $routeB) {
+            // Fetch parameter names or bindings for both routes
+            $bindingsA = $this->extractRouteParameters($routeA);
+            $bindingsB = $this->extractRouteParameters($routeB);
+
+
+            return count($bindingsA) <=> count($bindingsB);
+        });
+    }
+
+    /**
+     * Helper method to extract route parameters or bindings from the route URI.
+     *
+     * @param \Illuminate\Routing\Route $route
+     * @return array
+     */
+    protected function extractRouteParameters($route): array
+    {
+        // Extract parameter placeholders from the URI (e.g., {id}, {slug})
+        preg_match_all('/\{[^\}]+\}/', $route->uri(), $matches);
+
+        return $matches[0] ?? [];
     }
 }

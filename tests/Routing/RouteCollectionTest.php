@@ -325,4 +325,56 @@ class RouteCollectionTest extends TestCase
 
         $this->assertInstanceOf("\Symfony\Component\Routing\RouteCollection", $this->routeCollection->toSymfonyRouteCollection());
     }
+
+    public function testRoutesAreSortedByModelBinding()
+    {
+        $collection = new RouteCollection();
+
+        // Create a route with model binding (has parameters)
+        $routeWithBinding = new Route(['GET'], 'user/{id}', function () {});
+
+        // Create a route without model binding (no parameters)
+        $routeWithoutBinding = new Route(['GET'], 'home', function () {});
+
+        // Add the routes to the collection
+        $collection->add($routeWithBinding);
+        $collection->add($routeWithoutBinding);
+
+        // Get the sorted routes from the collection
+        $sortedRoutes = $collection->getRoutes();
+
+        // Assert that the route without model binding comes first
+        $this->assertEquals('home', $sortedRoutes[0]->uri());
+        $this->assertEquals('user/{id}', $sortedRoutes[1]->uri());
+    }
+
+    /**
+     * Test that the route order is maintained with multiple routes.
+     */
+    public function testMultipleRoutesSortedCorrectly()
+    {
+        $collection = new RouteCollection();
+
+        // Create multiple routes with and without model binding
+        $routeWithBinding1 = new Route(['GET'], 'user/{id}', function () {});
+        $routeWithBinding2 = new Route(['POST'], 'product/{productId}', function () {});
+        $routeWithoutBinding1 = new Route(['GET'], 'about', function () {});
+        $routeWithoutBinding2 = new Route(['GET'], 'contact', function () {});
+
+        // Add the routes to the collection
+        $collection->add($routeWithBinding1);
+        $collection->add($routeWithoutBinding1);
+        $collection->add($routeWithBinding2);
+        $collection->add($routeWithoutBinding2);
+
+        // Get the sorted routes from the collection
+        $sortedRoutes = $collection->getRoutes();
+
+        // Assert that the routes without model bindings come first
+        $this->assertEquals('about', $sortedRoutes[0]->uri());
+        $this->assertEquals('contact', $sortedRoutes[1]->uri());
+        $this->assertEquals('user/{id}', $sortedRoutes[2]->uri());
+        $this->assertEquals('product/{productId}', $sortedRoutes[3]->uri());
+    }
+
 }
