@@ -409,6 +409,47 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertSame('alter table "users" add column "foo" bigserial not null primary key', $statements[0]);
+
+        $blueprint = new Blueprint('users');
+        $blueprint->id('foo', 'integer');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table "users" add column "foo" serial not null primary key', $statements[0]);
+
+        $blueprint = new Blueprint('users');
+        $blueprint->id('id', 'tinyInteger');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table "users" add column "id" smallserial not null primary key', $statements[0]);
+
+        $blueprint = new Blueprint('users');
+        $blueprint->id('id', 'smallInteger');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table "users" add column "id" smallserial not null primary key', $statements[0]);
+
+        $blueprint = new Blueprint('users');
+        $blueprint->id('id', 'mediumInteger');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table "users" add column "id" serial not null primary key', $statements[0]);
+
+        $blueprint = new Blueprint('users');
+        $blueprint->id('id', 'bigInteger');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table "users" add column "id" bigserial not null primary key', $statements[0]);
+
+        $this->expectException(\InvalidArgumentException::class);
+
+        $blueprint = new Blueprint('users');
+        $blueprint->id('id', 'invalid type');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
     }
 
     public function testAddingForeignID()
@@ -444,6 +485,44 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertSame([
             'alter table "users" add column "company_id" bigint not null',
             'alter table "users" add constraint "my_index" foreign key ("company_id") references "companies" ("id")',
+        ], $statements);
+    }
+
+    public function testAddingForeignIdSpecifyingColumnType()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->foreignId('company_id', 'integer');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertSame([
+            'alter table "users" add column "company_id" integer not null',
+        ], $statements);
+
+        $blueprint = new Blueprint('users');
+        $blueprint->foreignId('company_id', 'tinyInteger');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertSame([
+            'alter table "users" add column "company_id" smallint not null',
+        ], $statements);
+
+        $blueprint = new Blueprint('users');
+        $blueprint->foreignId('company_id', 'smallInteger');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertSame([
+            'alter table "users" add column "company_id" smallint not null',
+        ], $statements);
+
+        $blueprint = new Blueprint('users');
+        $blueprint->foreignId('company_id', 'mediumInteger');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertSame([
+            'alter table "users" add column "company_id" integer not null',
+        ], $statements);
+
+        $blueprint = new Blueprint('users');
+        $blueprint->foreignId('company_id', 'bigInteger');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertSame([
+            'alter table "users" add column "company_id" bigint not null',
         ], $statements);
     }
 

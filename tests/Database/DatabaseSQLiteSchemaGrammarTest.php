@@ -300,6 +300,47 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertSame('alter table "users" add column "foo" integer primary key autoincrement not null', $statements[0]);
+
+        $blueprint = new Blueprint('users');
+        $blueprint->id('foo', 'integer');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table "users" add column "foo" integer primary key autoincrement not null', $statements[0]);
+
+        $blueprint = new Blueprint('users');
+        $blueprint->id('id', 'tinyInteger');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table "users" add column "id" integer primary key autoincrement not null', $statements[0]);
+
+        $blueprint = new Blueprint('users');
+        $blueprint->id('id', 'smallInteger');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table "users" add column "id" integer primary key autoincrement not null', $statements[0]);
+
+        $blueprint = new Blueprint('users');
+        $blueprint->id('id', 'mediumInteger');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table "users" add column "id" integer primary key autoincrement not null', $statements[0]);
+
+        $blueprint = new Blueprint('users');
+        $blueprint->id('id', 'bigInteger');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table "users" add column "id" integer primary key autoincrement not null', $statements[0]);
+
+        $this->expectException(\InvalidArgumentException::class);
+
+        $blueprint = new Blueprint('users');
+        $blueprint->id('id', 'invalid type');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
     }
 
     public function testAddingForeignID()
@@ -368,6 +409,44 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
             'insert into "__temp__users" ("company_id") select "company_id" from "users"',
             'drop table "users"',
             'alter table "__temp__users" rename to "users"',
+        ], $statements);
+    }
+
+    public function testAddingForeignIdSpecifyingColumnType()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->foreignId('company_id', 'integer');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertSame([
+            'alter table "users" add column "company_id" integer not null',
+        ], $statements);
+
+        $blueprint = new Blueprint('users');
+        $blueprint->foreignId('company_id', 'tinyInteger');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertSame([
+            'alter table "users" add column "company_id" integer not null',
+        ], $statements);
+
+        $blueprint = new Blueprint('users');
+        $blueprint->foreignId('company_id', 'smallInteger');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertSame([
+            'alter table "users" add column "company_id" integer not null',
+        ], $statements);
+
+        $blueprint = new Blueprint('users');
+        $blueprint->foreignId('company_id', 'mediumInteger');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertSame([
+            'alter table "users" add column "company_id" integer not null',
+        ], $statements);
+
+        $blueprint = new Blueprint('users');
+        $blueprint->foreignId('company_id', 'bigInteger');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertSame([
+            'alter table "users" add column "company_id" integer not null',
         ], $statements);
     }
 

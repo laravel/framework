@@ -737,11 +737,19 @@ class Blueprint
      * Create a new auto-incrementing big integer (8-byte) column on the table.
      *
      * @param  string  $column
+     * @param  string  $type
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function id($column = 'id')
+    public function id($column = 'id', $type = 'bigInteger')
     {
-        return $this->bigIncrements($column);
+        return match ($type) {
+            'integer' => $this->increments($column),
+            'tinyInteger' => $this->tinyIncrements($column),
+            'smallInteger' => $this->smallIncrements($column),
+            'mediumInteger' => $this->mediumIncrements($column),
+            'bigInteger' => $this->bigIncrements($column),
+            default => throw new \InvalidArgumentException("Invalid type: {$type}"),
+        };
     }
 
     /**
@@ -1011,12 +1019,13 @@ class Blueprint
      * Create a new unsigned big integer (8-byte) column on the table.
      *
      * @param  string  $column
+     * @param  string  $type
      * @return \Illuminate\Database\Schema\ForeignIdColumnDefinition
      */
-    public function foreignId($column)
+    public function foreignId($column, $type = 'bigInteger')
     {
         return $this->addColumnDefinition(new ForeignIdColumnDefinition($this, [
-            'type' => 'bigInteger',
+            'type' => $type,
             'name' => $column,
             'autoIncrement' => false,
             'unsigned' => true,
