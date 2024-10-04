@@ -1005,9 +1005,29 @@ class PendingRequest
      */
     protected function parseMultipartBodyFormat(array $data)
     {
-        return collect($data)->map(function ($value, $key) {
-            return is_array($value) ? $value : ['name' => $key, 'contents' => $value];
-        })->values()->all();
+        // We separate already extended fields and simple fields
+        // A field is marked as extended if it's already an array containing both name and contents keys
+        [$extendedFields, $simpleFields] = collect($data)->partition(function ($value) {
+            return is_array($value) && array_key_exists('name', $value) && array_key_exists('contents', $value);
+        });
+
+        // Then we extend the simple fields
+        if ($simpleFields->isNotEmpty()) {
+            $simpleFieldsAsQuery = explode('&', http_build_query($simpleFields->toArray()));
+
+            $extendedFields = $extendedFields->merge(
+                array_map(function ($field) {
+                    list($name, $field) = explode('=', $field);
+
+                    return [
+                        'name' => urldecode($name),
+                        'contents' => urldecode($field)
+                    ];
+                }, $simpleFieldsAsQuery)
+            );
+        }
+
+        return $extendedFields->values()->all();
     }
 
     /**
