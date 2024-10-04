@@ -741,6 +741,35 @@ class HttpClientTest extends TestCase
         });
     }
 
+    public function testFilesCanBeAttachedWithMultipartExtraData()
+    {
+        $this->factory->fake();
+
+        $this->factory
+            ->attach('foo', 'data', 'file.txt')
+            ->post('http://foo.com/file', [
+                'foo' => 'bar',
+                'foobar' => [
+                    'foo' => [
+                        [
+                            'name' => 'baz',
+                        ],
+                    ],
+                ],
+            ]);
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/file' &&
+                Str::startsWith($request->header('Content-Type')[0], 'multipart') &&
+                $request[0]['name'] === 'foo' &&
+                $request->hasFile('foo', 'data', 'file.txt') &&
+                $request[0]['name'] === 'foo' &&
+                $request[0]['contents'] === 'bar' &&
+                $request[1]['name'] === 'foobar[foo][0][name]' &&
+                $request[1]['contents'] === 'baz';
+        });
+    }
+
     public function testItCanSendToken()
     {
         $this->factory->fake();
