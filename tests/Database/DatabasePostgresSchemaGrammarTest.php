@@ -42,6 +42,16 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         ], $statements);
     }
 
+    public function testAddingVector()
+    {
+        $blueprint = new Blueprint('embeddings');
+        $blueprint->vector('embedding', 384);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table "embeddings" add column "embedding" vector(384) not null', $statements[0]);
+    }
+
     public function testCreateTableWithAutoIncrementStartingValue()
     {
         $blueprint = new Blueprint('users');

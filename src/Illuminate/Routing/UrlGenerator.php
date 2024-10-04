@@ -586,7 +586,7 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * Format the array of URL parameters.
      *
-     * @param  mixed|array  $parameters
+     * @param  mixed  $parameters
      * @return array
      */
     public function formatParameters($parameters)

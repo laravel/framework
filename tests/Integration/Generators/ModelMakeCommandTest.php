@@ -25,6 +25,11 @@ class ModelMakeCommandTest extends TestCase
             'class Foo extends Model',
         ], 'app/Models/Foo.php');
 
+        $this->assertFileDoesNotContains([
+            '{{ factoryDocBlock }}',
+            '/** @use HasFactory<\Database\Factories\FooFactory> */',
+        ], 'app/Models/Foo.php');
+
         $this->assertFilenameNotExists('app/Http/Controllers/FooController.php');
         $this->assertFilenameNotExists('database/factories/FooFactory.php');
         $this->assertFilenameNotExists('database/seeders/FooSeeder.php');
@@ -96,6 +101,8 @@ class ModelMakeCommandTest extends TestCase
             'namespace App\Models;',
             'use Illuminate\Database\Eloquent\Model;',
             'class Foo extends Model',
+            '/** @use HasFactory<\Database\Factories\FooFactory> */',
+            'use HasFactory;',
         ], 'app/Models/Foo.php');
 
         $this->assertFilenameNotExists('app/Http/Controllers/FooController.php');

@@ -1634,8 +1634,10 @@ class Connection implements ConnectionInterface
     /**
      * Set the table prefix and return the grammar.
      *
-     * @param  \Illuminate\Database\Grammar  $grammar
-     * @return \Illuminate\Database\Grammar
+     * @template TGrammar of \Illuminate\Database\Grammar
+     *
+     * @param  TGrammar  $grammar
+     * @return TGrammar
      */
     public function withTablePrefix(Grammar $grammar)
     {
@@ -1670,7 +1672,7 @@ class Connection implements ConnectionInterface
      * Get the connection resolver for the given driver.
      *
      * @param  string  $driver
-     * @return mixed
+     * @return \Closure|null
      */
     public static function getResolver($driver)
     {

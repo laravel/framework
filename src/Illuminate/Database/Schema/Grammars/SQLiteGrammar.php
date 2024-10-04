@@ -69,6 +69,20 @@ class SQLiteGrammar extends Grammar
     }
 
     /**
+     * Compile the query to determine if the given table exists.
+     *
+     * @param  string  $table
+     * @return string
+     */
+    public function compileTableExists($table)
+    {
+        return sprintf(
+            'select exists (select 1 from sqlite_master where name = %s and type = \'table\') as "exists"',
+            $this->quoteString(str_replace('.', '__', $table))
+        );
+    }
+
+    /**
      * Compile the query to determine the tables.
      *
      * @param  bool  $withSize
