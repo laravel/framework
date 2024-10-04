@@ -78,19 +78,12 @@ jobs:
           max_attempts: 5
           command: composer require "nesbot/carbon:^3.4" "guzzlehttp/promises:^2.0.3" "symfony/contracts:^3.4.2" "symfony/translation:^7.0.3" "mtdowling/jmespath.php:^2.8.0" --no-interaction --no-update
 
-      - name: Set PHPUnit
-        uses: nick-fields/retry@v3
-        with:
-          timeout_minutes: 5
-          max_attempts: 5
-          command: composer require phpunit/phpunit:^${{ matrix.phpunit }} --dev --no-interaction --no-update
-
       - name: Install dependencies
         uses: nick-fields/retry@v3
         with:
           timeout_minutes: 5
           max_attempts: 5
-          command: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress
+          command: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress --with=phpunit/phpunit:^${{ matrix.phpunit }}
 
       - name: Installed dependencies
         run: composer show -D
