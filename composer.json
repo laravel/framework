@@ -35,6 +35,7 @@
         "laravel/serializable-closure": "^1.3",
         "league/commonmark": "^2.2.1",
         "league/flysystem": "^3.25.1",
+        "league/flysystem-local": "^3.25.1",
         "monolog/monolog": "^3.0",
         "nesbot/carbon": "^2.72.2|^3.4",
         "nunomaduro/termwind": "^2.0",
