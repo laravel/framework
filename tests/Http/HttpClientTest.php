@@ -720,13 +720,13 @@ class HttpClientTest extends TestCase
             'foobar' => [
                 'foo' => [
                     [
-                        'name' => 'baz'
+                        'name' => 'baz',
                     ],
                     [
-                        'name' => 'foobar'
-                    ]
-                ]
-            ]
+                        'name' => 'foobar',
+                    ],
+                ],
+            ],
         ]);
 
         $this->factory->assertSent(function (Request $request) {

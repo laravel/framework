@@ -1017,11 +1017,11 @@ class PendingRequest
 
             $extendedFields = $extendedFields->merge(
                 array_map(function ($field) {
-                    list($name, $field) = explode('=', $field);
+                    [$name, $field] = explode('=', $field);
 
                     return [
                         'name' => urldecode($name),
-                        'contents' => urldecode($field)
+                        'contents' => urldecode($field),
                     ];
                 }, $simpleFieldsAsQuery)
             );
