@@ -576,11 +576,22 @@ trait QueriesRelationships
             throw RelationNotFoundException::make($this->model, $relationshipName, BelongsTo::class);
         }
 
-        $this->whereIn(
-            $relationship->getQualifiedForeignKeyName(),
-            $relatedCollection->pluck($relationship->getOwnerKeyName())->toArray(),
-            $boolean,
-        );
+        if ($relationship instanceof MorphTo) {
+            $this->where(fn ($query) => (
+                $relatedCollection->each(fn ($model) => (
+                    $query->orWhere(fn ($innerQuery) => (
+                        $innerQuery->where($relationship->getQualifiedMorphTypeColumn(), \get_class($model))
+                            ->where($relationship->getQualifiedForeignKeyName(), $model->getKey())
+                    ))
+                ))
+            ));
+        } else {
+            $this->whereIn(
+                $relationship->getQualifiedForeignKeyName(),
+                $relatedCollection->pluck($relationship->getOwnerKeyName())->toArray(),
+                $boolean,
+            );
+        }
 
         return $this;
     }

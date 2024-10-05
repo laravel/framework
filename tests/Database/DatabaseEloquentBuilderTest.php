@@ -1251,6 +1251,38 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals($result, $builder);
     }
 
+    public function testPolymorphicWhereBelongsTo()
+    {
+        $related = new EloquentBuilderTestPolymorphicWhereBelongsToStub([
+            'id' => 1,
+            'parent_id' => 1,
+            'parent_type' => EloquentBuilderTestWhereBelongsToStub::class,
+        ]);
+
+        $parent = new EloquentBuilderTestWhereBelongsToStub([
+            'id' => 1,
+            'parent_id' => 1,
+        ]);
+
+        $this->mockConnectionForModel($related, 'SQLite');
+
+        $query = $related->newQuery()->whereBelongsTo($parent, 'parent');
+        $this->assertSame('select * from "foo_table" where (("foo_table"."parent_type" = ? and "foo_table"."parent_id" = ?))', $query->toSql());
+        $this->assertEquals([EloquentBuilderTestWhereBelongsToStub::class, 1], $query->getBindings());
+
+        $parents = new Collection([new EloquentBuilderTestWhereBelongsToStub([
+            'id' => 2,
+            'parent_id' => 1,
+        ]), new EloquentBuilderTestWhereBelongsToStub([
+            'id' => 3,
+            'parent_id' => 1,
+        ])]);
+    
+        $query = $related->newQuery()->whereBelongsTo($parents, 'parent');
+        $this->assertSame('select * from "foo_table" where (("foo_table"."parent_type" = ? and "foo_table"."parent_id" = ?) or ("foo_table"."parent_type" = ? and "foo_table"."parent_id" = ?))', $query->toSql());
+        $this->assertEquals([EloquentBuilderTestWhereBelongsToStub::class, 2, EloquentBuilderTestWhereBelongsToStub::class, 3], $query->getBindings());
+    }
+
     public function testDeleteOverride()
     {
         $builder = $this->getBuilder();
@@ -2626,5 +2658,21 @@ class EloquentBuilderTestWhereBelongsToStub extends Model
     public function parent()
     {
         return $this->belongsTo(self::class, 'parent_id', 'id', 'parent');
+    }
+}
+
+class EloquentBuilderTestPolymorphicWhereBelongsToStub extends Model
+{
+    protected $fillable = [
+        'id',
+        'parent_type',
+        'parent_id',
+    ];
+
+    protected $table = 'foo_table';
+
+    public function parent()
+    {
+        return $this->morphTo(__FUNCTION__, 'parent_type', 'parent_id');
     }
 }

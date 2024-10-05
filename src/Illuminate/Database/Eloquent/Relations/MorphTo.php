@@ -406,6 +406,16 @@ class MorphTo extends BelongsTo
     }
 
     /**
+     * Get the fully qualified morph type column of the relationship.
+     *
+     * @return string
+     */
+    public function getQualifiedMorphTypeColumn()
+    {
+        return $this->child->qualifyColumn($this->morphType);
+    }
+
+    /**
      * Handle dynamic method calls to the relationship.
      *
      * @param  string  $method
