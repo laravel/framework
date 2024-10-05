@@ -117,4 +117,10 @@ class SupportPluralizerTest extends TestCase
     {
         $this->assertSame($expected, Str::pluralStudly($value, $count));
     }
+
+    public function testIsPlural()
+    {
+        $this->assertTrue(Str::isPlural('children'));
+        $this->assertFalse(Str::isPlural('child'));
+    }
 }

@@ -124,4 +124,15 @@ class Pluralizer
 
         static::$inflector = null;
     }
+
+    /**
+     * Determine if the given word is in its plural form.
+     *
+     * @param  string  $value
+     * @return bool
+     */
+    public static function isPlural($value)
+    {
+        return static::singular($value) !== $value;
+    }
 }
