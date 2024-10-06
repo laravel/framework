@@ -730,14 +730,19 @@ class Str
      *
      * @param  string  $string
      * @param  array  $options
+     * @param  array  $extensions
      * @return string
      */
-    public static function inlineMarkdown($string, array $options = [])
+    public static function inlineMarkdown($string, array $options = [], array $extensions = [])
     {
         $environment = new Environment($options);
 
         $environment->addExtension(new GithubFlavoredMarkdownExtension());
         $environment->addExtension(new InlinesOnlyExtension());
+
+        foreach ($extensions as $extension) {
+            $environment->addExtension($extension);
+        }
 
         $converter = new MarkdownConverter($environment);
 
