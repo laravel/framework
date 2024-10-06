@@ -578,13 +578,13 @@ trait QueriesRelationships
 
         if ($relationship instanceof MorphTo) {
             $this->where(fn ($query) => (
-                $relatedCollection->each(fn ($model) => (
-                    $query->orWhere(fn ($innerQuery) => (
+                $relatedCollection->each(fn ($model) =>
+                    $query->orWhere(fn ($innerQuery) =>
                         $innerQuery->where($relationship->getQualifiedMorphTypeColumn(), \get_class($model))
                             ->where($relationship->getQualifiedForeignKeyName(), $model->getKey())
-                    ))
-                ))
-            ));
+                    )
+                )
+            ), boolean: $boolean);
         } else {
             $this->whereIn(
                 $relationship->getQualifiedForeignKeyName(),

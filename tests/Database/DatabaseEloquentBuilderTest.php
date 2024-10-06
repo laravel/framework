@@ -1253,11 +1253,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     public function testPolymorphicWhereBelongsTo()
     {
-        $related = new EloquentBuilderTestPolymorphicWhereBelongsToStub([
-            'id' => 1,
-            'parent_id' => 1,
-            'parent_type' => EloquentBuilderTestWhereBelongsToStub::class,
-        ]);
+        $related = new EloquentBuilderTestPolymorphicWhereBelongsToStub;
 
         $parent = new EloquentBuilderTestPolymorphicParentWhereBelongsToStub([
             'id' => 1,
@@ -1269,6 +1265,10 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertSame('select * from "foo_table" where (("foo_table"."parent_type" = ? and "foo_table"."parent_id" = ?))', $query->toSql());
         $this->assertEquals([EloquentBuilderTestPolymorphicParentWhereBelongsToStub::class, 1], $query->getBindings());
 
+        $query = $related->newQuery()->where('foo', '=', 'bar')->orWhereBelongsTo($parent, 'parent');
+        $this->assertSame('select * from "foo_table" where "foo" = ? or (("foo_table"."parent_type" = ? and "foo_table"."parent_id" = ?))', $query->toSql());
+        $this->assertEquals(['bar', EloquentBuilderTestPolymorphicParentWhereBelongsToStub::class, 1], $query->getBindings());
+
         $parents = new Collection([new EloquentBuilderTestPolymorphicParentWhereBelongsToStub([
             'id' => 2,
         ]), new EloquentBuilderTestPolymorphicParentWhereBelongsToStub([
@@ -1279,15 +1279,27 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertSame('select * from "foo_table" where (("foo_table"."parent_type" = ? and "foo_table"."parent_id" = ?) or ("foo_table"."parent_type" = ? and "foo_table"."parent_id" = ?))', $query->toSql());
         $this->assertEquals([EloquentBuilderTestPolymorphicParentWhereBelongsToStub::class, 2, EloquentBuilderTestPolymorphicParentWhereBelongsToStub::class, 3], $query->getBindings());
 
-        $parents = new Collection([new EloquentBuilderTestPolymorphicParentWhereBelongsToStub([
+        $query = $related->newQuery()->where('foo', '=', 'bar')->orWhereBelongsTo($parents, 'parent');
+        $this->assertSame('select * from "foo_table" where "foo" = ? or (("foo_table"."parent_type" = ? and "foo_table"."parent_id" = ?) or ("foo_table"."parent_type" = ? and "foo_table"."parent_id" = ?))', $query->toSql());
+        $this->assertEquals(['bar', EloquentBuilderTestPolymorphicParentWhereBelongsToStub::class, 2, EloquentBuilderTestPolymorphicParentWhereBelongsToStub::class, 3], $query->getBindings());
+
+        $parents2 = new Collection([new EloquentBuilderTestPolymorphicParentWhereBelongsToStub([
             'id' => 4,
         ]), new EloquentBuilderTestWhereBelongsToStub([
             'id' => 1,
         ])]);
     
-        $query = $related->newQuery()->whereBelongsTo($parents, 'parent');
+        $query = $related->newQuery()->whereBelongsTo($parents2, 'parent');
         $this->assertSame('select * from "foo_table" where (("foo_table"."parent_type" = ? and "foo_table"."parent_id" = ?) or ("foo_table"."parent_type" = ? and "foo_table"."parent_id" = ?))', $query->toSql());
         $this->assertEquals([EloquentBuilderTestPolymorphicParentWhereBelongsToStub::class, 4, EloquentBuilderTestWhereBelongsToStub::class, 1], $query->getBindings());
+        
+        $query = $related->newQuery()->where('foo', '=', 'bar')->orWhereBelongsTo($parents2, 'parent');
+        $this->assertSame('select * from "foo_table" where "foo" = ? or (("foo_table"."parent_type" = ? and "foo_table"."parent_id" = ?) or ("foo_table"."parent_type" = ? and "foo_table"."parent_id" = ?))', $query->toSql());
+        $this->assertEquals(['bar', EloquentBuilderTestPolymorphicParentWhereBelongsToStub::class, 4, EloquentBuilderTestWhereBelongsToStub::class, 1], $query->getBindings());
+
+        $query = $related->newQuery()->whereBelongsTo($parents, 'parent')->orWhereBelongsTo($parents2, 'parent');
+        $this->assertSame('select * from "foo_table" where (("foo_table"."parent_type" = ? and "foo_table"."parent_id" = ?) or ("foo_table"."parent_type" = ? and "foo_table"."parent_id" = ?)) or (("foo_table"."parent_type" = ? and "foo_table"."parent_id" = ?) or ("foo_table"."parent_type" = ? and "foo_table"."parent_id" = ?))', $query->toSql());
+        $this->assertEquals([EloquentBuilderTestPolymorphicParentWhereBelongsToStub::class, 2, EloquentBuilderTestPolymorphicParentWhereBelongsToStub::class, 3, EloquentBuilderTestPolymorphicParentWhereBelongsToStub::class, 4, EloquentBuilderTestWhereBelongsToStub::class, 1], $query->getBindings());
     }
 
     public function testDeleteOverride()
