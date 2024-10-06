@@ -117,7 +117,7 @@
         "symfony/cache": "^7.0.3",
         "symfony/http-client": "^7.0.3",
         "symfony/psr-http-message-bridge": "^7.0.3",
-        "nette/schema": "dev-master as v1.3.0"
+        "nette/schema": "^1.3.1"
     },
     "conflict": {
         "mockery/mockery": "1.6.8",
