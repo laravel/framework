@@ -329,6 +329,19 @@ class Str
     }
 
     /**
+     * Determine if a given string doesn't contain a given substring.
+     *
+     * @param  string  $haystack
+     * @param  string|iterable<string>  $needles
+     * @param  bool  $ignoreCase
+     * @return bool
+     */
+    public static function doesntContain($haystack, $needles, $ignoreCase = false)
+    {
+        return ! static::contains($haystack, $needles, $ignoreCase);
+    }
+
+    /**
      * Convert the case of a string.
      *
      * @param  string  $string
