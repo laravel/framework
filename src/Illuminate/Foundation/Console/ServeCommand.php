@@ -163,6 +163,10 @@ class ServeCommand extends Command
 
         $process->start($this->handleProcessOutput());
 
+        if ($this->option('open')) {
+            $this->openBrowser("http://{$this->host()}:{$this->port()}");
+        }
+
         return $process;
     }
 
@@ -393,6 +397,24 @@ class ServeCommand extends Command
             ['port', null, InputOption::VALUE_OPTIONAL, 'The port to serve the application on', Env::get('SERVER_PORT')],
             ['tries', null, InputOption::VALUE_OPTIONAL, 'The max number of ports to attempt to serve from', 10],
             ['no-reload', null, InputOption::VALUE_NONE, 'Do not reload the development server on .env file changes'],
+            ['open', 'o', InputOption::VALUE_NONE, 'Automatically open the application in your browser'],
         ];
+    }
+
+    /**
+     * Open the given URL in the browser.
+     *
+     * @param  string  $url
+     * @return void
+     */
+    protected function openBrowser($url)
+    {
+        if (PHP_OS_FAMILY === 'Darwin') {
+            exec('open '.$url);
+        } elseif (PHP_OS_FAMILY === 'Windows') {
+            exec('start '.$url);
+        } else {
+            exec('xdg-open '.$url);
+        }
     }
 }
