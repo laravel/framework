@@ -151,7 +151,7 @@ class ModelMakeCommand extends GeneratorCommand
     }
 
     /**
-     * Create form requests for the model.
+     * Create the form requests for the model.
      *
      * @return void
      */
