@@ -30,7 +30,7 @@ class CountInDatabase extends Constraint
     protected $actualCount;
 
     /**
-     * Whether to swap the assertion to check that the count does not equal the expected count
+     * Whether to swap the assertion to check that the count does not equal the expected count.
      *
      * @var bool
      */
@@ -63,7 +63,7 @@ class CountInDatabase extends Constraint
         $this->actualCount = $this->database->table($table)->count();
 
         if ($this->not) {
-           return $this->actualCount !== $this->expectedCount;
+            return $this->actualCount !== $this->expectedCount;
         }
 
         return $this->actualCount === $this->expectedCount;
@@ -87,7 +87,7 @@ class CountInDatabase extends Constraint
 
             return sprintf(
                 "table [%s] is empty. Entries found: %s.\n",
-                $table,  $this->actualCount
+                $table, $this->actualCount
             );
         }
 
