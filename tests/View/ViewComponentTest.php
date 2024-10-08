@@ -4,6 +4,7 @@ namespace Illuminate\Tests\View;
 
 use Illuminate\View\Component;
 use Illuminate\View\ComponentAttributeBag;
+use Illuminate\View\ComponentSlot;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
 
@@ -68,6 +69,22 @@ class ViewComponentTest extends TestCase
         // Test overriding parent class attributes
         $component->withAttributes(['class' => 'override', 'type' => 'submit']);
         $this->assertSame('class="override" type="submit"', (string) $component->attributes);
+    }
+
+    public function testSlotAttributeParentInheritance(): void
+    {
+        $attributes = new ComponentAttributeBag(['class' => 'bar', 'type' => 'button']);
+
+        $slot = new ComponentSlot('test', [
+            'class' => 'foo',
+            'attributes' => $attributes,
+        ]);
+
+        $this->assertSame('class="foo bar" type="button"', (string) $slot->attributes);
+
+        // Test overriding parent class attributes
+        $slot->withAttributes(['class' => 'override', 'type' => 'submit']);
+        $this->assertSame('class="override" type="submit"', (string) $slot->attributes);
     }
 
     public function testPublicMethodsWithNoArgsAreConvertedToStringableCallablesInvokedAndNotCached()

@@ -9,9 +9,13 @@ class MailMailableDataTest extends TestCase
 {
     public function testMailableDataIsNotLost()
     {
-        $testData = ['first_name' => 'James'];
-
         $mailable = new MailableStub;
+
+        $testData = [
+            'first_name' => 'James',
+            '__laravel_mailable' => get_class($mailable),
+        ];
+
         $mailable->build(function ($m) use ($testData) {
             $m->view('view', $testData);
         });
