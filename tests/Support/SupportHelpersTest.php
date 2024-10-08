@@ -843,7 +843,6 @@ class SupportHelpersTest extends TestCase
     {
         $data = ['activated' => false];
         $timestamp = timestamp_if_true($data, 'activated');
-        
         $this->assertNull($timestamp);
     }
 
@@ -851,7 +850,6 @@ class SupportHelpersTest extends TestCase
     {
         $data = [];
         $timestamp = timestamp_if_true($data, 'activated');
-        
         $this->assertNull($timestamp);
     }
 
@@ -859,7 +857,6 @@ class SupportHelpersTest extends TestCase
     {
         $data = ['activated' => 1]; // Truthy but not strictly boolean
         $timestamp = timestamp_if_true($data, 'activated');
-        
         $this->assertInstanceOf(Carbon::class, $timestamp);
     }
 

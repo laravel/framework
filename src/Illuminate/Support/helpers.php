@@ -439,7 +439,7 @@ if (! function_exists('timestamp_if_true')) {
      * Return the current timestamp if the given array item value is set and truthy.
      *
      * @param  array  $data
-     * @param  string $key
+     * @param  string  $key
      * @return \Illuminate\Support\Carbon|null
      */
     function timestamp_if_true(array $data, string $key): ?Carbon
