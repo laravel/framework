@@ -346,8 +346,8 @@ class Worker
      */
     protected function getNextJob($connection, $queue)
     {
-        $popJobCallback = function ($queue, $index = 0) use ($connection) {
-            return $connection->pop($queue, $index);
+        $popJobCallback = function ($queue) use ($connection) {
+            return $connection->pop($queue);
         };
 
         $this->raiseBeforeJobPopEvent($connection->getConnectionName());
@@ -360,8 +360,8 @@ class Worker
                 );
             }
 
-            foreach (explode(',', $queue) as $index => $queue) {
-                if (! is_null($job = $popJobCallback($queue, $index))) {
+            foreach (explode(',', $queue) as $queue) {
+                if (! is_null($job = $popJobCallback($queue))) {
                     $this->raiseAfterJobPopEvent($connection->getConnectionName(), $job);
 
                     return $job;
