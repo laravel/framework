@@ -55,10 +55,10 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
     protected $migrationBatchSize = -1;
 
     /**
-     * Indicates if a secondary queue had a job available between checks of the primary queue
-     * 
-     * Only applicable when monitoring multiple named queues with a single instance
-     * 
+     * Indicates if a secondary queue had a job available between checks of the primary queue.
+     *
+     * Only applicable when monitoring multiple named queues with a single instance.
+     *
      * @var bool
      */
     protected $secondaryQueueHadJob = false;
@@ -238,12 +238,12 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
 
         [$job, $reserved] = $this->retrieveNextJob($prefixed, $block);
 
-        if($index == 0) {
+        if ($index == 0) {
             $this->secondaryQueueHadJob = false;
         }
 
         if ($reserved) {
-            if($index > 0) {
+            if ($index > 0) {
                 $this->secondaryQueueHadJob = true;
             }
 
