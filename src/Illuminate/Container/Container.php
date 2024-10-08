@@ -1352,7 +1352,7 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Fire all of the after resolving attribute callbacks.
      *
-     * @param  \ReflectionAttribute[]  $abstract
+     * @param  \ReflectionAttribute[]  $attributes
      * @param  mixed  $object
      * @return void
      */
