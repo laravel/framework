@@ -4,6 +4,7 @@ namespace Illuminate\Support\Facades;
 
 /**
  * @method static void defaultStringLength(int $length)
+ * @method static void defaultTimePrecision(int|null $precision)
  * @method static void defaultMorphKeyType(string $type)
  * @method static void morphUsingUuids()
  * @method static void morphUsingUlids()
