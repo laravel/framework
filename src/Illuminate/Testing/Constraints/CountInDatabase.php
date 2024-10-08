@@ -30,17 +30,26 @@ class CountInDatabase extends Constraint
     protected $actualCount;
 
     /**
+     * Whether to swap the assertion to check that the count does not equal the expected count
+     *
+     * @var bool
+     */
+    protected $not;
+
+    /**
      * Create a new constraint instance.
      *
      * @param  \Illuminate\Database\Connection  $database
      * @param  int  $expectedCount
      * @return void
      */
-    public function __construct(Connection $database, int $expectedCount)
+    public function __construct(Connection $database, int $expectedCount, bool $not = false)
     {
         $this->expectedCount = $expectedCount;
 
         $this->database = $database;
+
+        $this->not = $not;
     }
 
     /**
@@ -53,6 +62,10 @@ class CountInDatabase extends Constraint
     {
         $this->actualCount = $this->database->table($table)->count();
 
+        if ($this->not) {
+           return $this->actualCount !== $this->expectedCount;
+        }
+
         return $this->actualCount === $this->expectedCount;
     }
 
@@ -64,6 +77,20 @@ class CountInDatabase extends Constraint
      */
     public function failureDescription($table): string
     {
+        if ($this->expectedCount === 0) {
+            if ($this->not) {
+                return sprintf(
+                    "table [%s] is not empty.\n",
+                    $table
+                );
+            }
+
+            return sprintf(
+                "table [%s] is empty. Entries found: %s.\n",
+                $table,  $this->actualCount
+            );
+        }
+
         return sprintf(
             "table [%s] matches expected entries count of %s. Entries found: %s.\n",
             $table, $this->expectedCount, $this->actualCount

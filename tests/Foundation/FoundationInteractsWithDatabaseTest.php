@@ -171,6 +171,34 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $this->assertDatabaseEmpty(new ProductStub);
     }
 
+    public function testAssertDatabaseEmptyWrong()
+    {
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('Failed asserting that table [products] is empty. Entries found: 1.');
+        $this->mockCountBuilder(1);
+
+        $this->assertDatabaseEmpty(ProductStub::class);
+        $this->assertDatabaseEmpty(new ProductStub);
+    }
+
+    public function testAssertDatabaseNotEmpty()
+    {
+        $this->mockCountBuilder(1);
+
+        $this->assertDatabaseNotEmpty(ProductStub::class);
+        $this->assertDatabaseNotEmpty(new ProductStub);
+    }
+
+    public function testAssertDatabaseNotEmptyWrong()
+    {
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('Failed asserting that table [products] is not empty.');
+        $this->mockCountBuilder(0);
+
+        $this->assertDatabaseNotEmpty(ProductStub::class);
+        $this->assertDatabaseNotEmpty(new ProductStub);
+    }
+
     public function testAssertTableEntriesCountWrong()
     {
         $this->expectException(ExpectationFailedException::class);
