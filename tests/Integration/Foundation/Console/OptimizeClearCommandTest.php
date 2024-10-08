@@ -17,7 +17,7 @@ class OptimizeClearCommandTest extends TestCase
     {
         $this->artisan('optimize:clear')
             ->assertSuccessful()
-            ->expectsOutputToContain('my package');
+            ->expectsOutputToContain('ServiceProviderWithOptimizeClear');
     }
 }
 
@@ -29,9 +29,8 @@ class ServiceProviderWithOptimizeClear extends ServiceProvider
             new ClosureCommand('my_package:clear', fn () => 0),
         ]);
 
-        $this->registerOptimizeCommands(
-            key: 'my package',
-            optimizeClear: 'my_package:clear',
+        $this->optimizes(
+            clear: 'my_package:clear',
         );
     }
 }

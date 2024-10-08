@@ -39,14 +39,19 @@ class OptimizeCommand extends Command
         $this->newLine();
     }
 
-    protected function getOptimizeTasks(): array
+    /**
+     * Get the commands that should be run to optimize the framework.
+     *
+     * @return array
+     */
+    protected function getOptimizeTasks()
     {
         return [
             'config' => 'config:cache',
             'events' => 'event:cache',
             'routes' => 'route:cache',
             'views' => 'view:cache',
-            ...ServiceProvider::$optimizingCommands,
+            ...ServiceProvider::$optimizeCommands,
         ];
     }
 }

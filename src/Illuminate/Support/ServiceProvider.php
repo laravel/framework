@@ -8,6 +8,7 @@ use Illuminate\Contracts\Foundation\CachesConfiguration;
 use Illuminate\Contracts\Foundation\CachesRoutes;
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Database\Eloquent\Factory as ModelFactory;
+use Illuminate\Support\Str;
 use Illuminate\View\Compilers\BladeCompiler;
 
 /**
@@ -52,25 +53,25 @@ abstract class ServiceProvider
     public static $publishGroups = [];
 
     /**
-     * Commands that should be run during the optimize command.
-     *
-     * @var array<string, string>
-     */
-    public static array $optimizingCommands = [];
-
-    /**
-     * Commands that should be run during the optimize:clear command.
-     *
-     * @var array<string, string>
-     */
-    public static array $optimizeClearingCommands = [];
-
-    /**
      * The migration paths available for publishing.
      *
      * @var array
      */
     protected static $publishableMigrationPaths = [];
+
+    /**
+     * Commands that should be run during the "optimize" command.
+     *
+     * @var array<string, string>
+     */
+    public static array $optimizeCommands = [];
+
+    /**
+     * Commands that should be run during the "optimize:clear" command.
+     *
+     * @var array<string, string>
+     */
+    public static array $optimizeClearCommands = [];
 
     /**
      * Create a new service provider instance.
@@ -475,6 +476,36 @@ abstract class ServiceProvider
     }
 
     /**
+     * Register commands that should run on "optimize" or "optimize:clear".
+     *
+     * @param  string  $optimize
+     * @param  string  $clear
+     * @param  string|null  $key
+     * @return void
+     */
+    protected function optimizes(string $optimize = null, string $clear = null, ?string $key = null)
+    {
+        $key ??= (string) Str::of(get_class($this))
+            ->classBasename()
+            ->before('ServiceProvider')
+            ->kebab()
+            ->lower()
+            ->trim();
+
+        if (empty($key)) {
+            $key = class_basename(get_class($this));
+        }
+
+        if ($optimize) {
+            static::$optimizeCommands[$key] = $optimize;
+        }
+
+        if ($clear) {
+            static::$optimizeClearCommands[$key] = $clear;
+        }
+    }
+
+    /**
      * Get the services provided by the provider.
      *
      * @return array
@@ -550,16 +581,5 @@ return [
         file_put_contents($path, $content.PHP_EOL);
 
         return true;
-    }
-
-    protected function registerOptimizeCommands(string $key, string $optimize = null, string $optimizeClear = null): void
-    {
-        if ($optimize) {
-            static::$optimizingCommands[$key] = $optimize;
-        }
-
-        if ($optimizeClear) {
-            static::$optimizeClearingCommands[$key] = $optimizeClear;
-        }
     }
 }

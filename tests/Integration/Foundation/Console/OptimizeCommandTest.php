@@ -29,9 +29,9 @@ class ServiceProviderWithOptimize extends ServiceProvider
             new ClosureCommand('my_package:cache', fn () => 0),
         ]);
 
-        $this->registerOptimizeCommands(
-            key: 'my package',
+        $this->optimizes(
             optimize: 'my_package:cache',
+            key: 'my package',
         );
     }
 }

@@ -39,7 +39,12 @@ class OptimizeClearCommand extends Command
         $this->newLine();
     }
 
-    public function getOptimizeClearTasks(): array
+    /**
+     * Get the commands that should be run to clear the "optimization" files.
+     *
+     * @return array
+     */
+    public function getOptimizeClearTasks()
     {
         return [
             'cache' => 'cache:clear',
@@ -48,7 +53,7 @@ class OptimizeClearCommand extends Command
             'events' => 'event:clear',
             'routes' => 'route:clear',
             'views' => 'view:clear',
-            ...ServiceProvider::$optimizeClearingCommands,
+            ...ServiceProvider::$optimizeClearCommands,
         ];
     }
 }
