@@ -452,6 +452,30 @@ class Kernel implements KernelContract
     }
 
     /**
+     * Add the given middleware to the middleware priority list before other middleware.
+     *
+     * @param  array|string  $before
+     * @param  string  $middleware
+     * @return $this
+     */
+    public function addToMiddlewarePriorityBefore($before, $middleware)
+    {
+        return $this->addToMiddlewarePriorityRelative($before, $middleware, after: false);
+    }
+
+    /**
+     * Add the given middleware to the middleware priority list after other middleware.
+     *
+     * @param  array|string  $after
+     * @param  string  $middleware
+     * @return $this
+     */
+    public function addToMiddlewarePriorityAfter($after, $middleware)
+    {
+        return $this->addToMiddlewarePriorityRelative($after, $middleware);
+    }
+
+    /**
      * Add the given middleware to the middleware priority list relative to other middleware.
      *
      * @param  string  $middleware
@@ -459,7 +483,7 @@ class Kernel implements KernelContract
      * @param  bool  $after
      * @return $this
      */
-    protected function addToMiddlewarePriorityRelative($middleware, $existing, $after = true)
+    protected function addToMiddlewarePriorityRelative($existing, $middleware, $after = true)
     {
         if (! in_array($middleware, $this->middlewarePriority)) {
             $index = $after ? 0 : count($this->middlewarePriority);
@@ -488,30 +512,6 @@ class Kernel implements KernelContract
         $this->syncMiddlewareToRouter();
 
         return $this;
-    }
-
-    /**
-     * Add the given middleware to the middleware priority list after other middleware.
-     *
-     * @param  string  $middleware
-     * @param  string|array  $existing
-     * @return $this
-     */
-    public function addToMiddlewarePriorityAfter($middleware, $existing)
-    {
-        return $this->addToMiddlewarePriorityRelative($middleware, $existing);
-    }
-
-    /**
-     * Add the given middleware to the middleware priority list before other middleware.
-     *
-     * @param  string  $middleware
-     * @param  string|array  $existing
-     * @return $this
-     */
-    public function addToMiddlewarePriorityBefore($middleware, $existing)
-    {
-        return $this->addToMiddlewarePriorityRelative($middleware, $existing, false);
     }
 
     /**

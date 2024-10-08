@@ -51,11 +51,11 @@ class KernelTest extends TestCase
         $kernel = new Kernel($this->getApplication(), $this->getRouter());
 
         $kernel->addToMiddlewarePriorityAfter(
-            \Illuminate\Routing\Middleware\ValidateSignature::class,
             [
                 \Illuminate\Cookie\Middleware\EncryptCookies::class,
                 \Illuminate\Contracts\Auth\Middleware\AuthenticatesRequests::class,
-            ]
+            ],
+            \Illuminate\Routing\Middleware\ValidateSignature::class,
         );
 
         $this->assertEquals([
@@ -79,11 +79,11 @@ class KernelTest extends TestCase
         $kernel = new Kernel($this->getApplication(), $this->getRouter());
 
         $kernel->addToMiddlewarePriorityBefore(
-            \Illuminate\Routing\Middleware\ValidateSignature::class,
             [
                 \Illuminate\Cookie\Middleware\EncryptCookies::class,
                 \Illuminate\Contracts\Auth\Middleware\AuthenticatesRequests::class,
-            ]
+            ],
+            \Illuminate\Routing\Middleware\ValidateSignature::class,
         );
 
         $this->assertEquals([
