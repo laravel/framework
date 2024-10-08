@@ -2,6 +2,7 @@
 
 namespace Illuminate\Bus;
 
+use BackedEnum;
 use Closure;
 use Illuminate\Bus\Events\BatchDispatched;
 use Illuminate\Contracts\Container\Container;
@@ -261,12 +262,14 @@ class PendingBatch
     /**
      * Specify the queue that the batched jobs should run on.
      *
-     * @param  string  $queue
+     * @param  \BackedEnum|string|null  $queue
      * @return $this
      */
-    public function onQueue(string $queue)
+    public function onQueue($queue)
     {
-        $this->options['queue'] = $queue;
+        $this->options['queue'] = $queue instanceof BackedEnum
+            ? $queue->value
+            : $queue;
 
         return $this;
     }
