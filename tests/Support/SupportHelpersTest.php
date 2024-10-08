@@ -7,6 +7,7 @@ use ArrayIterator;
 use Countable;
 use Error;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Env;
 use Illuminate\Support\Optional;
 use Illuminate\Support\Sleep;
@@ -822,6 +823,44 @@ class SupportHelpersTest extends TestCase
         $this->expectExceptionMessage('Test Message');
 
         throw_if(true, RuntimeException::class, 'Test Message');
+    }
+
+    public function testReturnsCurrentTimestampWhenTrue()
+    {
+        $now = Carbon::now();
+        Carbon::setTestNow($now);
+
+        $data = ['activated' => true];
+        $timestamp = timestamp_if_true($data, 'activated');
+
+        $this->assertInstanceOf(Carbon::class, $timestamp);
+        $this->assertTrue($timestamp->equalTo($now), 'Returned timestamp should match the frozen time');
+
+        Carbon::setTestNow();
+    }
+
+    public function testReturnsNullWhenFalse()
+    {
+        $data = ['activated' => false];
+        $timestamp = timestamp_if_true($data, 'activated');
+        
+        $this->assertNull($timestamp);
+    }
+
+    public function testReturnsNullWhenKeyIsNotSet()
+    {
+        $data = [];
+        $timestamp = timestamp_if_true($data, 'activated');
+        
+        $this->assertNull($timestamp);
+    }
+
+    public function testReturnsNullWhenKeyIsTruthyButNotBoolean()
+    {
+        $data = ['activated' => 1]; // Truthy but not strictly boolean
+        $timestamp = timestamp_if_true($data, 'activated');
+        
+        $this->assertInstanceOf(Carbon::class, $timestamp);
     }
 
     public function testOptional()

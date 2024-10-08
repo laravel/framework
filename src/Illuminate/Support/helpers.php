@@ -3,6 +3,7 @@
 use Illuminate\Contracts\Support\DeferringDisplayableValue;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Env;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\HigherOrderTapProxy;
@@ -430,6 +431,22 @@ if (! function_exists('throw_unless')) {
         throw_if(! $condition, $exception, ...$parameters);
 
         return $condition;
+    }
+}
+
+if (! function_exists('timestamp_if_true')) {
+    /**
+     * Return the current timestamp if the given array item value is set and truthy.
+     *
+     * @param  array  $data
+     * @param  string $key
+     * @return \Illuminate\Support\Carbon|null
+     */
+    function timestamp_if_true(array $data, string $key): ?Carbon
+    {
+        return filter_var(Arr::get($data, $key), FILTER_VALIDATE_BOOLEAN)
+            ? now()
+            : null;
     }
 }
 
