@@ -21,31 +21,31 @@ class AsEnumArrayObject implements Castable
     {
         return new class($arguments) implements CastsAttributes
         {
-            protected $arguments;
+            protected string $enumClass;
+            protected bool $forceArray;
 
             public function __construct(array $arguments)
             {
-                $this->arguments = $arguments;
+                $this->enumClass = $arguments[0];
+                $this->forceArray = $arguments[1] ?? false;
             }
 
             public function get($model, $key, $value, $attributes)
             {
                 if (! isset($attributes[$key])) {
-                    return;
+                    return $this->forceArray ? new ArrayObject: null;
                 }
 
                 $data = Json::decode($attributes[$key]);
 
                 if (! is_array($data)) {
-                    return;
+                    return $this->forceArray ? new ArrayObject: null;
                 }
 
-                $enumClass = $this->arguments[0];
-
-                return new ArrayObject((new Collection($data))->map(function ($value) use ($enumClass) {
-                    return is_subclass_of($enumClass, BackedEnum::class)
-                        ? $enumClass::from($value)
-                        : constant($enumClass.'::'.$value);
+                return new ArrayObject((new Collection($data))->map(function ($value) {
+                    return is_subclass_of($this->enumClass, BackedEnum::class)
+                        ? $this->enumClass::from($value)
+                        : constant($this->enumClass.'::'.$value);
                 })->toArray());
             }
 
@@ -86,10 +86,15 @@ class AsEnumArrayObject implements Castable
      * Specify the Enum for the cast.
      *
      * @param  class-string  $class
+     * @param  bool  $force
      * @return string
      */
-    public static function of($class)
+    public static function of(string $class, bool $force = false): string
     {
+        if ($force) {
+            return static::class.':'.$class.',force';
+        }
+
         return static::class.':'.$class;
     }
 }

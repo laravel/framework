@@ -2,10 +2,12 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
+use Illuminate\Database\Eloquent\Casts\ArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsEnumArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsEnumCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use ValueError;
@@ -24,6 +26,8 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
             $table->integer('integer_status')->nullable();
             $table->json('integer_status_collection')->nullable();
             $table->json('integer_status_array')->nullable();
+            $table->json('integer_status_collection_forced')->nullable();
+            $table->json('integer_status_array_forced')->nullable();
             $table->string('arrayable_status')->nullable();
         });
 
@@ -66,6 +70,8 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
             'integer_status_collection' => null,
             'integer_status_array' => null,
             'arrayable_status' => null,
+            'integer_status_collection_forced' => null,
+            'integer_status_array_forced' => null,
         ]);
 
         $model = EloquentModelEnumCastingTestModel::first();
@@ -77,6 +83,8 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
         $this->assertEquals(null, $model->integer_status_collection);
         $this->assertEquals(null, $model->integer_status_array);
         $this->assertEquals(null, $model->arrayable_status);
+        $this->assertInstanceOf(Collection::class, $model->integer_status_collection_forced);
+        $this->assertInstanceOf(ArrayObject::class, $model->integer_status_array_forced);
     }
 
     public function testEnumsAreCastableToArray()
@@ -116,6 +124,8 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
             'integer_status_collection' => null,
             'integer_status_array' => null,
             'arrayable_status' => null,
+            'integer_status_collection_forced' => null,
+            'integer_status_array_forced' => null,
         ]);
 
         $this->assertEquals([
@@ -126,6 +136,8 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
             'integer_status_collection' => null,
             'integer_status_array' => null,
             'arrayable_status' => null,
+            'integer_status_collection_forced' => [],
+            'integer_status_array_forced' => [],
         ], $model->toArray());
     }
 
@@ -139,6 +151,8 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
             'integer_status_collection' => [IntegerStatus::pending, IntegerStatus::done],
             'integer_status_array' => [IntegerStatus::pending, IntegerStatus::done],
             'arrayable_status' => ArrayableStatus::pending,
+            'integer_status_collection_forced' => null,
+            'integer_status_array_forced' => null,
         ]);
 
         $model->save();
@@ -152,6 +166,8 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
             'integer_status_collection' => json_encode([1, 2]),
             'integer_status_array' => json_encode([1, 2]),
             'arrayable_status' => 'pending',
+            'integer_status_collection_forced' => '',
+            'integer_status_array_forced' => '',
         ], collect(DB::table('enum_casts')->where('id', $model->id)->first())->map(function ($value) {
             return str_replace(', ', ',', $value);
         })->all());
@@ -167,6 +183,8 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
             'integer_status_collection' => [1, 2],
             'integer_status_array' => [1, 2],
             'arrayable_status' => 'pending',
+            'integer_status_collection_forced' => null,
+            'integer_status_array_forced' => null,
         ]);
 
         $model->save();
@@ -180,6 +198,8 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
             'integer_status_collection' => json_encode([1, 2]),
             'integer_status_array' => json_encode([1, 2]),
             'arrayable_status' => 'pending',
+            'integer_status_collection_forced' => '',
+            'integer_status_array_forced' => '',
         ], collect(DB::table('enum_casts')->where('id', $model->id)->first())->map(function ($value) {
             return str_replace(', ', ',', $value);
         })->all());
@@ -195,6 +215,8 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
             'integer_status_collection' => null,
             'integer_status_array' => null,
             'arrayable_status' => null,
+            'integer_status_collection_forced' => null,
+            'integer_status_array_forced' => null,
         ]);
 
         $model->save();
@@ -208,6 +230,8 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
             'integer_status_collection' => null,
             'integer_status_array' => null,
             'arrayable_status' => null,
+            'integer_status_collection_forced' => null,
+            'integer_status_array_forced' => null,
         ], DB::table('enum_casts')->where('id', $model->id)->first());
     }
 
@@ -331,15 +355,20 @@ class EloquentModelEnumCastingTestModel extends Model
     protected $guarded = [];
     protected $table = 'enum_casts';
 
-    public $casts = [
-        'string_status' => StringStatus::class,
-        'string_status_collection' => AsEnumCollection::class.':'.StringStatus::class,
-        'string_status_array' => AsEnumArrayObject::class.':'.StringStatus::class,
-        'integer_status' => IntegerStatus::class,
-        'integer_status_collection' => AsEnumCollection::class.':'.IntegerStatus::class,
-        'integer_status_array' => AsEnumArrayObject::class.':'.IntegerStatus::class,
-        'arrayable_status' => ArrayableStatus::class,
-    ];
+    protected function casts()
+    {
+        return [
+            'string_status' => StringStatus::class,
+            'string_status_collection' => AsEnumCollection::class.':'.StringStatus::class,
+            'string_status_array' => AsEnumArrayObject::class.':'.StringStatus::class,
+            'integer_status' => IntegerStatus::class,
+            'integer_status_collection' => AsEnumCollection::class.':'.IntegerStatus::class,
+            'integer_status_array' => AsEnumArrayObject::class.':'.IntegerStatus::class,
+            'arrayable_status' => ArrayableStatus::class,
+            'integer_status_collection_forced' => AsEnumCollection::of(IntegerStatus::class, true),
+            'integer_status_array_forced' => AsEnumArrayObject::of(IntegerStatus::class, true),
+        ];
+    }
 }
 
 class EloquentModelEnumCastingUniqueTestModel extends Model
