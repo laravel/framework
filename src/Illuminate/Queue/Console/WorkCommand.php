@@ -115,7 +115,7 @@ class WorkCommand extends Command
         // connection being run for the queue operation currently being executed.
         $queue = $this->getQueue($connection);
 
-        if (! $this->hasOption('json') && Terminal::hasSttyAvailable()) {
+        if (! $this->outputUsingJson() && Terminal::hasSttyAvailable()) {
             $this->components->info(
                 sprintf('Processing jobs from the [%s] %s.', $queue, str('queue')->plural(explode(',', $queue)))
             );
@@ -201,7 +201,7 @@ class WorkCommand extends Command
      */
     protected function writeOutput(Job $job, $status, Throwable $exception = null)
     {
-        $this->hasOption('json')
+        $this->outputUsingJson()
             ? $this->writeOutputAsJson($job, $status, $exception)
             : $this->writeOutputForCli($job, $status);
     }
@@ -345,5 +345,19 @@ class WorkCommand extends Command
     protected function downForMaintenance()
     {
         return $this->option('force') ? false : $this->laravel->isDownForMaintenance();
+    }
+
+    /**
+     * Determine if the worker should output using JSON.
+     *
+     * @return bool
+     */
+    protected function outputUsingJson()
+    {
+        if (! $this->hasOption('json')) {
+            return false;
+        }
+
+        return $this->option('json');
     }
 }
