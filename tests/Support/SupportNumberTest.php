@@ -91,7 +91,7 @@ class SupportNumberTest extends TestCase
 
     public function testDivide()
     {
-        $this->assertSame('0', Number::divide(0));
+        $this->assertSame('0', Number::divide(0, 0));
         $this->assertSame('0.5', Number::divide(1, 2));
         $this->assertSame('0.25', Number::divide(0.5, 2));
         $this->assertSame('0', Number::divide(0, 2));

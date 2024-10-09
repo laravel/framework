@@ -151,7 +151,7 @@ class Number
     }
 
     /**
-     * Divide a number
+     * Divide a number.
      *
      * @param  int|float  $numerator
      * @param  int  $denominator
