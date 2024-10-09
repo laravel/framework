@@ -151,6 +151,17 @@ class Number
     }
 
     /**
+     * Divide a number
+     *
+     * @param  int|float  $number
+     * @param  int  $precision
+     */
+    public static function divide(int|float $numerator, int $denominator)
+    {
+        return $denominator == 0 ? 0 : ($numerator / $denominator);
+    }
+
+    /**
      * Convert the number to its human-readable equivalent.
      *
      * @param  int|float  $number
