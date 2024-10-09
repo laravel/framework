@@ -1685,7 +1685,7 @@ class Str
      */
     public static function interpolate(
         string $string,
-        array $map = [],
+        array $map,
         string $pattern = '/{{\s*(\w+)\s*}}/',
         bool $preserve = true
     ) {
