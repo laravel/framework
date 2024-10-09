@@ -89,6 +89,15 @@ class SupportNumberTest extends TestCase
         $this->assertSame('100,000', Number::spell(100000, until: 50000));
     }
 
+    public function testDivide()
+    {
+        $this->assertSame('0', Number::divide(0));
+        $this->assertSame('0.5', Number::divide(1, 2));
+        $this->assertSame('0.25', Number::divide(0.5, 2));
+        $this->assertSame('0', Number::divide(0, 2));
+        $this->assertSame('0', Number::divide(2, 0));
+    }
+
     public function testOrdinal()
     {
         $this->assertSame('1st', Number::ordinal(1));
