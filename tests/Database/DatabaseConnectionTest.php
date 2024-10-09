@@ -5,7 +5,6 @@ namespace Illuminate\Tests\Database;
 use DateTime;
 use ErrorException;
 use Exception;
-use http\Exception\BadMethodCallException;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Events\QueryExecuted;

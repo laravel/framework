@@ -588,7 +588,7 @@ class Builder
         }
 
         if (self::$defaultBlueprintClass !== Blueprint::class
-            && !is_subclass_of(self::$defaultBlueprintClass, Blueprint::class)
+            && ! is_subclass_of(self::$defaultBlueprintClass, Blueprint::class)
         ) {
             throw new RuntimeException(sprintf(
                 'DefaultBlueprintClass must extend or be %s class. Got: %s',
@@ -601,7 +601,7 @@ class Builder
     }
 
     /**
-     * @param class-string $class
+     * @param  class-string  $class
      */
     public static function setDefaultBlueprintClass(string $class): void
     {
