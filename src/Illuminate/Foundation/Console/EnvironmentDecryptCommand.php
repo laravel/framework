@@ -63,6 +63,10 @@ class EnvironmentDecryptCommand extends Command
         $key = $this->option('key') ?: Env::get('LARAVEL_ENV_ENCRYPTION_KEY');
 
         if (! $key) {
+            $key = $this->ask('Decryption key');
+        }
+
+        if (! $key) {
             $this->fail('A decryption key is required.');
         }
 
