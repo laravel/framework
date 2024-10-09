@@ -1688,7 +1688,7 @@ class Str
         string $string,
         array $map = [],
         string $pattern = '/{{\s*(\w+)\s*}}/',
-        bool $preserve = false
+        bool $preserve = true
     )
     {
         $interpolated = preg_replace_callback(
