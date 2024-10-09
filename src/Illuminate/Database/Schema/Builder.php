@@ -14,6 +14,11 @@ class Builder
     use Macroable;
 
     /**
+     * @var class-string The default Blueprint class
+     */
+    private static string $defaultBlueprintClass = Blueprint::class;
+
+    /**
      * The database connection instance.
      *
      * @var \Illuminate\Database\Connection
@@ -581,7 +586,15 @@ class Builder
             return call_user_func($this->resolver, $table, $callback, $prefix);
         }
 
-        return Container::getInstance()->make(Blueprint::class, compact('table', 'callback', 'prefix'));
+        return Container::getInstance()->make(self::$defaultBlueprintClass, compact('table', 'callback', 'prefix'));
+    }
+
+    /**
+     * @param class-string $class
+     */
+    public static function overrideDefaultBlueprintClass(string $class): void
+    {
+        self::$defaultBlueprintClass = $class;
     }
 
     /**
