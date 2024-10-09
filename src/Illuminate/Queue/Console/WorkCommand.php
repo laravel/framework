@@ -358,7 +358,6 @@ class WorkCommand extends Command
             return false;
         }
 
-
         return $this->option('json');
     }
 }
