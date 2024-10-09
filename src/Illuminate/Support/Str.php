@@ -1678,19 +1678,17 @@ class Str
     /**
      * Interpolate placeholders in a string with mapped values.
      *
-     * @param string $string
-     * @param array $map
-     * @param string $pattern
-     * @param bool $perserve
-     * @return string
+     * @param  string  $string
+     * @param  array  $map
+     * @param  string  $pattern
+     * @param  bool  $perserve
      */
     public static function interpolate(
         string $string,
         array $map = [],
         string $pattern = '/{{\s*(\w+)\s*}}/',
         bool $preserve = true
-    )
-    {
+    ) {
         $interpolated = preg_replace_callback(
             $pattern,
             function (array $matches) use ($map, $preserve) {
