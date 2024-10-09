@@ -2,6 +2,7 @@
 
 namespace Illuminate\Cache;
 
+use Illuminate\Redis\Connections\PhpRedisConnection;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\LazyCollection;
 
@@ -35,12 +36,19 @@ class RedisTagSet extends TagSet
      */
     public function entries()
     {
-        return LazyCollection::make(function () {
+        $connection = $this->store->connection();
+
+        $defaultCursorValue = match (true) {
+            $connection instanceof PhpRedisConnection => null,
+            default => '0',
+        };
+
+        return LazyCollection::make(function () use ($connection, $defaultCursorValue) {
             foreach ($this->tagIds() as $tagKey) {
                 $cursor = $defaultCursorValue = '0';
 
                 do {
-                    [$cursor, $entries] = $this->store->connection()->zscan(
+                    [$cursor, $entries] = $connection->zscan(
                         $this->store->getPrefix().$tagKey,
                         $cursor,
                         ['match' => '*', 'count' => 1000]
