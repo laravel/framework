@@ -97,9 +97,9 @@ class SupportNumberTest extends TestCase
         $this->assertSame(0, Number::divide(0, 2));
         $this->assertSame(0, Number::divide(2, 0));
 
-        $this->assertSame(0, Number::divide(0, 0.5));
-        $this->assertSame(4, Number::divide(1, 0.25));
-        $this->assertSame(1, Number::divide(0.5, 0.5));
+        $this->assertSame(0.0, Number::divide(0, 0.5));
+        $this->assertSame(4.0, Number::divide(1, 0.25));
+        $this->assertSame(1.0, Number::divide(0.5, 0.5));
     }
 
     public function testOrdinal()
