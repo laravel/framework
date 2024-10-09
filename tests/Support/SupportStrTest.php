@@ -1227,7 +1227,7 @@ class SupportStrTest extends TestCase
         // Using a different placeholder pattern
         $this->assertSame(
             'Hello Mr. Miyagi!',
-            Str::interpolate('Hello {{ $name }}!', ['name' => 'Mr. Miyagi'], '/{{\s*\$(\w+)\s*}}/')
+            Str::interpolate('Hello {{ @name }}!', ['name' => 'Mr. Miyagi'], '/{{\s*\@(\w+)\s*}}/')
         );
     }
 
