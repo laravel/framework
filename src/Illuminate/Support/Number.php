@@ -154,7 +154,7 @@ class Number
      * Divide a number.
      *
      * @param  int|float  $numerator
-     * @param  int  $denominator
+     * @param  int|float  $denominator
      */
     public static function divide(int|float $numerator, int|float $denominator)
     {
