@@ -1676,6 +1676,37 @@ class Str
     }
 
     /**
+     * Interpolate placeholders in a string with mapped values.
+     *
+     * @param string $string
+     * @param array $map
+     * @param string $pattern
+     * @param bool $perserve
+     * @return string
+     */
+    public static function interpolate(
+        string $string,
+        array $map = [],
+        string $pattern = '/{{\s*(\w+)\s*}}/',
+        bool $preserve = false
+    )
+    {
+        $interpolated = preg_replace_callback(
+            $pattern,
+            function (array $matches) use ($map, $preserve) {
+                [$value, $key] = $matches;
+
+                return array_key_exists($key, $map)
+                    ? $map[$key]
+                    : ($preserve ? $value : '');
+            },
+            $string
+        );
+
+        return $interpolated ?? '';
+    }
+
+    /**
      * Take the first or last {$limit} characters of a string.
      *
      * @param  string  $string

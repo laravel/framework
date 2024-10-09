@@ -1205,6 +1205,32 @@ class SupportStrTest extends TestCase
         );
     }
 
+    public function testInterpolate(): void
+    {
+        $this->assertSame(
+            "Hi John Doe!",
+            Str::interpolate("{{greetings}} {{  name  }}!", ['greetings' => 'Hi', 'name' => 'John Doe'])
+        );
+
+        // Preserve:false will remove placeholders not in the map
+        $this->assertSame(
+            " John Doe!",
+            Str::interpolate("{{greetings  }} {{  name}}!", ['name' => 'John Doe'], preserve:false)
+        );
+
+        // Preserve:true will keep placeholders not in the map
+        $this->assertSame(
+            "{{greetings}} John Doe!",
+            Str::interpolate("{{greetings}} {{name}}!", ['name' => 'John Doe'], preserve:true)
+        );
+
+        // Using a different placeholder pattern
+        $this->assertSame(
+            'Hello Mr. Miyagi!',
+            Str::interpolate('Hello {{ $name }}!', ['name' => 'Mr. Miyagi'], '/{{\s*\$(\w+)\s*}}/')
+        );
+    }
+
     public function testWordCount()
     {
         $this->assertEquals(2, Str::wordCount('Hello, world!'));
