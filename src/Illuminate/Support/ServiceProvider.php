@@ -477,12 +477,12 @@ abstract class ServiceProvider
     /**
      * Register commands that should run on "optimize" or "optimize:clear".
      *
-     * @param  string  $optimize
-     * @param  string  $clear
+     * @param  string|null  $optimize
+     * @param  string|null  $clear
      * @param  string|null  $key
      * @return void
      */
-    protected function optimizes(string $optimize = null, string $clear = null, ?string $key = null)
+    protected function optimizes(?string $optimize = null, ?string $clear = null, ?string $key = null)
     {
         $key ??= (string) Str::of(get_class($this))
             ->classBasename()
