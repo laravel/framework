@@ -77,6 +77,21 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
+     * Compile the query to determine if the given table exists.
+     *
+     * @param  string|null  $schema
+     * @param  string  $table
+     * @return string
+     */
+    public function compileTableExists($schema, $table)
+    {
+        return sprintf(
+            'select (case when object_id(%s, \'U\') is null then 0 else 1 end) as [exists]',
+            $this->quoteString($schema ? $schema.'.'.$table : $table)
+        );
+    }
+
+    /**
      * Compile the query to determine the tables.
      *
      * @return string

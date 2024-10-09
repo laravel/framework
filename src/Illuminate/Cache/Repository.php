@@ -101,11 +101,9 @@ class Repository implements ArrayAccess, CacheContract
     /**
      * Retrieve an item from the cache by key.
      *
-     * @template TCacheValue
-     *
      * @param  array|string  $key
-     * @param  TCacheValue|(\Closure(): TCacheValue)  $default
-     * @return (TCacheValue is null ? mixed : TCacheValue)
+     * @param  mixed  $default
+     * @return mixed
      */
     public function get($key, $default = null): mixed
     {
@@ -198,11 +196,9 @@ class Repository implements ArrayAccess, CacheContract
     /**
      * Retrieve an item from the cache and delete it.
      *
-     * @template TCacheValue
-     *
      * @param  array|string  $key
-     * @param  TCacheValue|(\Closure(): TCacheValue)  $default
-     * @return (TCacheValue is null ? mixed : TCacheValue)
+     * @param  mixed  $default
+     * @return mixed
      */
     public function pull($key, $default = null)
     {

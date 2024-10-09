@@ -77,6 +77,23 @@ class MySqlGrammar extends Grammar
     }
 
     /**
+     * Compile the query to determine if the given table exists.
+     *
+     * @param  string  $database
+     * @param  string  $table
+     * @return string
+     */
+    public function compileTableExists($database, $table)
+    {
+        return sprintf(
+            'select exists (select 1 from information_schema.tables where '
+            ."table_schema = %s and table_name = %s and table_type in ('BASE TABLE', 'SYSTEM VERSIONED')) as `exists`",
+            $this->quoteString($database),
+            $this->quoteString($table)
+        );
+    }
+
+    /**
      * Compile the query to determine the tables.
      *
      * @param  string  $database

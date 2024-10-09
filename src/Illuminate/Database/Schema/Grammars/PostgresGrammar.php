@@ -69,6 +69,23 @@ class PostgresGrammar extends Grammar
     }
 
     /**
+     * Compile the query to determine if the given table exists.
+     *
+     * @param  string  $schema
+     * @param  string  $table
+     * @return string
+     */
+    public function compileTableExists($schema, $table)
+    {
+        return sprintf(
+            'select exists (select 1 from pg_class c, pg_namespace n where '
+            ."n.nspname = %s and c.relname = %s and c.relkind in ('r', 'p') and n.oid = c.relnamespace)",
+            $this->quoteString($schema),
+            $this->quoteString($table)
+        );
+    }
+
+    /**
      * Compile the query to determine the tables.
      *
      * @return string

@@ -128,7 +128,7 @@ namespace Illuminate\Support\Facades;
  * @method static void resolving(\Closure|string $abstract, \Closure|null $callback = null)
  * @method static void afterResolving(\Closure|string $abstract, \Closure|null $callback = null)
  * @method static void afterResolvingAttribute(string $attribute, \Closure $callback)
- * @method static void fireAfterResolvingAttributeCallbacks(array $attributes, mixed $object)
+ * @method static void fireAfterResolvingAttributeCallbacks(\ReflectionAttribute[] $attributes, mixed $object)
  * @method static array getBindings()
  * @method static string getAlias(string $abstract)
  * @method static void forgetExtenders(string $abstract)
