@@ -1190,6 +1190,19 @@ class SupportStringableTest extends TestCase
     {
         $this->assertEquals("<em>hello world</em>\n", $this->stringable('*hello world*')->inlineMarkdown());
         $this->assertEquals("<a href=\"https://laravel.com\"><strong>Laravel</strong></a>\n", $this->stringable('[**Laravel**](https://laravel.com)')->inlineMarkdown());
+
+        $extension = new class implements ExtensionInterface
+        {
+            public bool $configured = false;
+
+            public function register(EnvironmentBuilderInterface $environment): void
+            {
+                $this->configured = true;
+            }
+        };
+
+        $this->stringable('# hello world')->inlineMarkdown([], [$extension]);
+        $this->assertTrue($extension->configured);
     }
 
     public function testMask()

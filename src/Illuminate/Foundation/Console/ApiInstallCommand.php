@@ -6,7 +6,8 @@ use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Process;
 use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Process\PhpExecutableFinder;
+
+use function Illuminate\Support\php_binary;
 
 #[AsCommand(name: 'install:api')]
 class ApiInstallCommand extends Command
@@ -65,7 +66,7 @@ class ApiInstallCommand extends Command
 
         if ($this->option('passport')) {
             Process::run(array_filter([
-                (new PhpExecutableFinder())->find(false) ?: 'php',
+                php_binary(),
                 defined('ARTISAN_BINARY') ? ARTISAN_BINARY : 'artisan',
                 'passport:install',
                 $this->confirm('Would you like to use UUIDs for all client IDs?') ? '--uuids' : null,
@@ -130,7 +131,7 @@ class ApiInstallCommand extends Command
 
         if (! $migrationPublished) {
             Process::run([
-                (new PhpExecutableFinder())->find(false) ?: 'php',
+                php_binary(),
                 defined('ARTISAN_BINARY') ? ARTISAN_BINARY : 'artisan',
                 'vendor:publish',
                 '--provider',

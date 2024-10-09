@@ -72,6 +72,8 @@ class ModelMakeCommand extends GeneratorCommand
 
         if ($this->option('controller') || $this->option('resource') || $this->option('api')) {
             $this->createController();
+        } elseif ($this->option('requests')) {
+            $this->createFormRequests();
         }
 
         if ($this->option('policy')) {
@@ -146,6 +148,24 @@ class ModelMakeCommand extends GeneratorCommand
             '--test' => $this->option('test'),
             '--pest' => $this->option('pest'),
         ]));
+    }
+
+    /**
+     * Create the form requests for the model.
+     *
+     * @return void
+     */
+    protected function createFormRequests()
+    {
+        $request = Str::studly(class_basename($this->argument('name')));
+
+        $this->call('make:request', [
+            'name' => "Store{$request}Request",
+        ]);
+
+        $this->call('make:request', [
+            'name' => "Update{$request}Request",
+        ]);
     }
 
     /**

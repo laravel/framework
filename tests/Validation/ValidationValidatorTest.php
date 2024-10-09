@@ -1696,6 +1696,14 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->fails());
         $this->assertCount(1, $v->messages());
         $this->assertSame('The baz field is required when foo is empty.', $v->messages()->first('baz'));
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator(
+            $trans,
+            ['foo' => 'bar', 'customfield' => ['1' => 'taylor']],
+            ['customfield' => ['nullable', 'array'], 'foo' => 'required_if:customfield.1,taylor']
+        );
+        $this->assertTrue($v->passes());
     }
 
     public function testRequiredIfArrayToStringConversationErrorException()
