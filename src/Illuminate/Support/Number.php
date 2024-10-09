@@ -156,7 +156,7 @@ class Number
      * @param  int|float  $numerator
      * @param  int  $denominator
      */
-    public static function divide(int|float $numerator, int $denominator)
+    public static function divide(int|float $numerator, int|float $denominator)
     {
         return $denominator == 0 ? 0 : ($numerator / $denominator);
     }
