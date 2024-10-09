@@ -1,6 +1,11 @@
 # Release Notes for 11.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v11.27.1...11.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v11.27.2...11.x)
+
+## [v11.27.2](https://github.com/laravel/framework/compare/v11.27.1...v11.27.2) - 2024-10-09
+
+* [11.x] Fixes regression with `queue:work` Command by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/53076
+* [11.x] Fixes parameter declaration for `ServiceProvider::optimizes()` by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/53074
 
 ## [v11.27.1](https://github.com/laravel/framework/compare/v11.27.0...v11.27.1) - 2024-10-08
 
