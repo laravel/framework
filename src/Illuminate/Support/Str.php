@@ -1997,6 +1997,17 @@ class Str
 
         return $ulid;
     }
+    
+    /**
+     * Determine if two words are homophones using Soundex and Metaphone.
+     *
+     * @param string $word1
+     * @param string $word2
+     * @return bool
+     */
+    public static function comparePhonetics($word1, $word2) {
+        return (soundex($word1) === soundex($word2)) && (metaphone($word1) === metaphone($word2));
+    }
 
     /**
      * Remove all strings from the casing caches.
