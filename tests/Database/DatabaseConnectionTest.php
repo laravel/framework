@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Database;
 use DateTime;
 use ErrorException;
 use Exception;
+use http\Exception\BadMethodCallException;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Events\QueryExecuted;
@@ -542,6 +543,9 @@ class DatabaseConnectionTest extends TestCase
             $table->timestamps();
         });
         $this->assertTrue(OverriddenSchemaBlueprint::$invokedSpy);
+
+        // Enable back the original-default Blueprint
+        Builder::setDefaultBlueprintClass(Blueprint::class);
     }
 
     public function testGetRawQueryLog()
