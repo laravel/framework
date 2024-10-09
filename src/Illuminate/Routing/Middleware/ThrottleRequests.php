@@ -194,9 +194,9 @@ class ThrottleRequests
 
         // If we still don't have a numeric value, there was no matching rate limiter...
         if (! is_numeric($maxAttempts)) {
-            is_null($request->user())
-                ? throw MissingRateLimiterException::forLimiter($maxAttempts)
-                : throw MissingRateLimiterException::forLimiterAndUser($maxAttempts, get_class($request->user()));
+            throw is_null($request->user())
+                ? MissingRateLimiterException::forLimiter($maxAttempts)
+                : MissingRateLimiterException::forLimiterAndUser($maxAttempts, get_class($request->user()));
         }
 
         return (int) $maxAttempts;
