@@ -153,8 +153,8 @@ class Number
     /**
      * Divide a number
      *
-     * @param  int|float  $number
-     * @param  int  $precision
+     * @param  int|float  $numerator
+     * @param  int  $denominator
      */
     public static function divide(int|float $numerator, int $denominator)
     {
