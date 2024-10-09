@@ -45,7 +45,7 @@ class RedisTagSet extends TagSet
 
         return LazyCollection::make(function () use ($connection, $defaultCursorValue) {
             foreach ($this->tagIds() as $tagKey) {
-                $cursor = $defaultCursorValue = '0';
+                $cursor = $defaultCursorValue;
 
                 do {
                     [$cursor, $entries] = $connection->zscan(
