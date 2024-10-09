@@ -17,7 +17,9 @@ use Illuminate\Database\Query\Builder as BaseBuilder;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Database\QueryException;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Builder;
+use Illuminate\Tests\Database\Fixtures\Models\OverriddenSchemaBlueprint;
 use Mockery as m;
 use PDO;
 use PDOException;
@@ -512,6 +514,34 @@ class DatabaseConnectionTest extends TestCase
         $schema = $connection->getSchemaBuilder();
         $this->assertInstanceOf(Builder::class, $schema);
         $this->assertSame($connection, $schema->getConnection());
+    }
+
+    public function testDefaultSchemaBuilderMustBeValidBlueprint(): void
+    {
+        Builder::setDefaultBlueprintClass('invalid-class-name');
+        $connection = $this->getMockConnection();
+        $schema = $connection->getSchemaBuilder();
+
+        $this->expectExceptionMessage('DefaultBlueprintClass must extend or be Illuminate\Database\Schema\Blueprint class. Got: invalid-class-name');
+
+        $schema->table('table', function (Blueprint $table) {
+            $table->timestamps();
+        });
+    }
+
+    public function testDefaultSchemaBuilderCanBeOverridden(): void
+    {
+        Builder::setDefaultBlueprintClass(OverriddenSchemaBlueprint::class);
+        $connection = $this->getMockConnection();
+        $grammar = $this->createStub(\Illuminate\Database\Schema\Grammars\Grammar::class);
+        $connection->setSchemaGrammar($grammar);
+        $schema = $connection->getSchemaBuilder();
+
+        $this->assertFalse(OverriddenSchemaBlueprint::$invokedSpy);
+        $schema->table('table', function (OverriddenSchemaBlueprint $table) {
+            $table->timestamps();
+        });
+        $this->assertTrue(OverriddenSchemaBlueprint::$invokedSpy);
     }
 
     public function testGetRawQueryLog()

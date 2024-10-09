@@ -8,13 +8,14 @@ use Illuminate\Database\Connection;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use LogicException;
+use RuntimeException;
 
 class Builder
 {
     use Macroable;
 
     /**
-     * @var class-string The default Blueprint class
+     * @var class-string The default Blueprint in use.
      */
     private static string $defaultBlueprintClass = Blueprint::class;
 
@@ -586,13 +587,23 @@ class Builder
             return call_user_func($this->resolver, $table, $callback, $prefix);
         }
 
+        if (self::$defaultBlueprintClass !== Blueprint::class
+            && !is_subclass_of(self::$defaultBlueprintClass, Blueprint::class)
+        ) {
+            throw new RuntimeException(sprintf(
+                'DefaultBlueprintClass must extend or be %s class. Got: %s',
+                Blueprint::class,
+                self::$defaultBlueprintClass,
+            ));
+        }
+
         return Container::getInstance()->make(self::$defaultBlueprintClass, compact('table', 'callback', 'prefix'));
     }
 
     /**
      * @param class-string $class
      */
-    public static function overrideDefaultBlueprintClass(string $class): void
+    public static function setDefaultBlueprintClass(string $class): void
     {
         self::$defaultBlueprintClass = $class;
     }
