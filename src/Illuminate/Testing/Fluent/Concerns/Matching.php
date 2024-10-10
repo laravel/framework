@@ -66,7 +66,9 @@ trait Matching
             return $this;
         }
 
-        $this->ensureSorted(mutate($expected));
+        $expected = mutate($expected);
+
+        $this->ensureSorted($expected);
         $this->ensureSorted($actual);
 
         PHPUnit::assertNotSame(
