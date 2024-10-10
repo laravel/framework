@@ -249,7 +249,6 @@ class ModelMakeCommand extends GeneratorCommand
      */
     protected function buildFactoryReplacements()
     {
-
         $replacements = [];
 
         if ($this->option('factory')) {
