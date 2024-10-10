@@ -27,7 +27,8 @@ use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use LogicException;
 use RuntimeException;
-use UnitEnum;
+
+use function Illuminate\Support\mutate;
 
 class Builder implements BuilderContract
 {
@@ -4207,11 +4208,7 @@ class Builder implements BuilderContract
      */
     public function castBinding($value)
     {
-        if ($value instanceof UnitEnum) {
-            return $value instanceof BackedEnum ? $value->value : $value->name;
-        }
-
-        return $value;
+        return mutate($value);
     }
 
     /**
