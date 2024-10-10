@@ -70,7 +70,7 @@ class EnvironmentEncryptCommand extends Command
                 label: 'What encryption key would you like to use?',
                 options: [
                     'generate' => 'Generate a new encryption key',
-                    'ask' => 'Provide your own encryption key'
+                    'ask' => 'Provide your own encryption key',
                 ],
                 default: 'generate'
             );
