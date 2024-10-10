@@ -69,8 +69,8 @@ class EnvironmentEncryptCommand extends Command
             $ask = select(
                 label: 'What encryption key would you like to use?',
                 options: [
-                    'generate' => 'Generate a new encryption key',
-                    'ask' => 'Provide your own encryption key',
+                    'generate' => 'Generate a random encryption key',
+                    'ask' => 'Provide an encryption key',
                 ],
                 default: 'generate'
             );
