@@ -4,7 +4,7 @@ namespace Illuminate\Routing;
 
 use Illuminate\Support\Arr;
 
-use function Illuminate\Support\mutate;
+use function Illuminate\Support\enum_value;
 
 trait CreatesRegularExpressionRouteConstraints
 {
@@ -75,7 +75,7 @@ trait CreatesRegularExpressionRouteConstraints
         return $this->assignExpressionToParameters(
             $parameters,
             collect($values)
-                ->map(fn ($value) => mutate($value))
+                ->map(fn ($value) => enum_value($value))
                 ->implode('|')
         );
     }
