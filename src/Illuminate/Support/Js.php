@@ -2,6 +2,7 @@
 
 namespace Illuminate\Support;
 
+use BackedEnum;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Contracts\Support\Jsonable;
@@ -70,6 +71,10 @@ class Js implements Htmlable, Stringable
             return $data->toHtml();
         }
 
+        if ($data instanceof BackedEnum) {
+            $data = $data->value;
+        }
+
         $json = static::encode($data, $flags, $depth);
 
         if (is_string($data)) {
@@ -99,7 +104,7 @@ class Js implements Htmlable, Stringable
             $data = $data->toArray();
         }
 
-        return json_encode(mutate($data), $flags | static::REQUIRED_FLAGS, $depth);
+        return json_encode($data, $flags | static::REQUIRED_FLAGS, $depth);
     }
 
     /**
