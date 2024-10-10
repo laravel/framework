@@ -243,6 +243,68 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $this->assertTrue($user->exists);
     }
 
+    public function testForceDestroyFullyDeletesRecord()
+    {
+        $this->createUsers();
+        $deleted = SoftDeletesTestUser::forceDestroy(2);
+
+        $this->assertSame(1, $deleted);
+
+        $users = SoftDeletesTestUser::withTrashed()->get();
+
+        $this->assertCount(1, $users);
+        $this->assertEquals(1, $users->first()->id);
+        $this->assertNull(SoftDeletesTestUser::find(2));
+    }
+
+    public function testForceDestroyDeletesAlreadyDeletedRecord()
+    {
+        $this->createUsers();
+        $deleted = SoftDeletesTestUser::forceDestroy(1);
+
+        $this->assertSame(1, $deleted);
+
+        $users = SoftDeletesTestUser::withTrashed()->get();
+
+        $this->assertCount(1, $users);
+        $this->assertEquals(2, $users->first()->id);
+        $this->assertNull(SoftDeletesTestUser::find(1));
+    }
+
+    public function testForceDestroyDeletesMultipleRecords()
+    {
+        $this->createUsers();
+        $deleted = SoftDeletesTestUser::forceDestroy([1, 2]);
+
+        $this->assertSame(2, $deleted);
+
+        $this->assertTrue(SoftDeletesTestUser::withTrashed()->get()->isEmpty());
+    }
+
+    public function testForceDestroyDeletesRecordsFromCollection()
+    {
+        $this->createUsers();
+        $deleted = SoftDeletesTestUser::forceDestroy(collect([1, 2]));
+
+        $this->assertSame(2, $deleted);
+
+        $this->assertTrue(SoftDeletesTestUser::withTrashed()->get()->isEmpty());
+    }
+
+    public function testForceDestroyDeletesRecordsFromEloquentCollection()
+    {
+        $this->createUsers();
+        $deleted = SoftDeletesTestUser::forceDestroy(SoftDeletesTestUser::all());
+
+        $this->assertSame(1, $deleted);
+
+        $users = SoftDeletesTestUser::withTrashed()->get();
+
+        $this->assertCount(1, $users);
+        $this->assertEquals(1, $users->first()->id);
+        $this->assertNull(SoftDeletesTestUser::find(2));
+    }
+
     public function testRestoreRestoresRecords()
     {
         $this->createUsers();

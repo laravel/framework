@@ -37,7 +37,7 @@ class CacheDatabaseStoreTest extends TestCase
         $getQuery->shouldReceive('get')->once()->andReturn(collect([(object) ['key' => 'prefixfoo', 'expiration' => 1]]));
 
         $deleteQuery = m::mock(stdClass::class);
-        $deleteQuery->shouldReceive('whereIn')->once()->with('key', ['prefixfoo'])->andReturn($deleteQuery);
+        $deleteQuery->shouldReceive('whereIn')->once()->with('key', ['prefixfoo', 'prefixilluminate:cache:flexible:created:foo'])->andReturn($deleteQuery);
         $deleteQuery->shouldReceive('where')->once()->with('expiration', '<=', m::any())->andReturn($deleteQuery);
         $deleteQuery->shouldReceive('delete')->once()->andReturnNull();
 
@@ -105,7 +105,7 @@ class CacheDatabaseStoreTest extends TestCase
         $store = $this->getStore();
         $table = m::mock(stdClass::class);
         $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
-        $table->shouldReceive('whereIn')->once()->with('key', ['prefixfoo'])->andReturn($table);
+        $table->shouldReceive('whereIn')->once()->with('key', ['prefixfoo', 'prefixilluminate:cache:flexible:created:foo'])->andReturn($table);
         $table->shouldReceive('delete')->once();
 
         $store->forget('foo');

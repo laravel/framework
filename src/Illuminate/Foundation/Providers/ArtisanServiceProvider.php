@@ -7,6 +7,7 @@ use Illuminate\Cache\Console\CacheTableCommand;
 use Illuminate\Cache\Console\ClearCommand as CacheClearCommand;
 use Illuminate\Cache\Console\ForgetCommand as CacheForgetCommand;
 use Illuminate\Cache\Console\PruneStaleTagsCommand;
+use Illuminate\Concurrency\Console\InvokeSerializedClosureCommand;
 use Illuminate\Console\Scheduling\ScheduleClearCacheCommand;
 use Illuminate\Console\Scheduling\ScheduleFinishCommand;
 use Illuminate\Console\Scheduling\ScheduleInterruptCommand;
@@ -55,6 +56,7 @@ use Illuminate\Foundation\Console\EventMakeCommand;
 use Illuminate\Foundation\Console\ExceptionMakeCommand;
 use Illuminate\Foundation\Console\InterfaceMakeCommand;
 use Illuminate\Foundation\Console\JobMakeCommand;
+use Illuminate\Foundation\Console\JobMiddlewareMakeCommand;
 use Illuminate\Foundation\Console\KeyGenerateCommand;
 use Illuminate\Foundation\Console\LangPublishCommand;
 use Illuminate\Foundation\Console\ListenerMakeCommand;
@@ -135,6 +137,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'EventCache' => EventCacheCommand::class,
         'EventClear' => EventClearCommand::class,
         'EventList' => EventListCommand::class,
+        'InvokeSerializedClosure' => InvokeSerializedClosureCommand::class,
         'KeyGenerate' => KeyGenerateCommand::class,
         'Optimize' => OptimizeCommand::class,
         'OptimizeClear' => OptimizeClearCommand::class,
@@ -197,6 +200,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'FactoryMake' => FactoryMakeCommand::class,
         'InterfaceMake' => InterfaceMakeCommand::class,
         'JobMake' => JobMakeCommand::class,
+        'JobMiddlewareMake' => JobMiddlewareMakeCommand::class,
         'LangPublish' => LangPublishCommand::class,
         'ListenerMake' => ListenerMakeCommand::class,
         'MailMake' => MailMakeCommand::class,
@@ -501,6 +505,18 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     {
         $this->app->singleton(JobMakeCommand::class, function ($app) {
             return new JobMakeCommand($app['files']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerJobMiddlewareMakeCommand()
+    {
+        $this->app->singleton(JobMiddlewareMakeCommand::class, function ($app) {
+            return new JobMiddlewareMakeCommand($app['files']);
         });
     }
 

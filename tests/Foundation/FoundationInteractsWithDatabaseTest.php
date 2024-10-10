@@ -44,12 +44,25 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $this->assertDatabaseHas($this->table, $this->data);
     }
 
-    public function testAssertDatabaseHasSupportModels()
+    public function testAssertDatabaseHasSupportsModelClass()
     {
         $this->mockCountBuilder(1);
 
         $this->assertDatabaseHas(ProductStub::class, $this->data);
-        $this->assertDatabaseHas(new ProductStub, $this->data);
+    }
+
+    public function testAssertDatabaseHasConstrainsToModel()
+    {
+        $data = $this->data;
+
+        $this->data = [
+            'id' => 1,
+            ...$this->data,
+        ];
+
+        $this->mockCountBuilder(1);
+
+        $this->assertDatabaseHas(new ProductStub(['id' => 1]), $data);
     }
 
     public function testSeeInDatabaseDoesNotFindResults()
@@ -102,12 +115,25 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $this->assertDatabaseMissing($this->table, $this->data);
     }
 
-    public function testAssertDatabaseMissingSupportModels()
+    public function testAssertDatabaseMissingSupportsModelClass()
     {
         $this->mockCountBuilder(0);
 
         $this->assertDatabaseMissing(ProductStub::class, $this->data);
-        $this->assertDatabaseMissing(new ProductStub, $this->data);
+    }
+
+    public function testAssertDatabaseMissingConstrainsToModel()
+    {
+        $data = $this->data;
+
+        $this->data = [
+            'id' => 1,
+            ...$this->data,
+        ];
+
+        $this->mockCountBuilder(0);
+
+        $this->assertDatabaseMissing(new ProductStub(['id' => 1]), $data);
     }
 
     public function testDontSeeInDatabaseFindsResults()
@@ -351,6 +377,14 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $this->assertEquals($this->table, $this->getTable(ProductStub::class));
         $this->assertEquals($this->table, $this->getTable(new ProductStub));
         $this->assertEquals($this->table, $this->getTable($this->table));
+        $this->assertEquals('all_products', $this->getTable((new ProductStub)->setTable('all_products')));
+    }
+
+    public function testGetTableConnectionNameFromModel()
+    {
+        $this->assertSame(null, $this->getTableConnection(ProductStub::class));
+        $this->assertSame(null, $this->getTableConnection(new ProductStub));
+        $this->assertSame('mysql', $this->getTableConnection((new ProductStub)->setConnection('mysql')));
     }
 
     public function testGetTableCustomizedDeletedAtColumnName()

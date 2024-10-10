@@ -234,7 +234,7 @@ trait ManagesFrequencies
      */
     public function everyThirtyMinutes()
     {
-        return $this->spliceIntoPosition(1, '0,30');
+        return $this->spliceIntoPosition(1, '*/30');
     }
 
     /**

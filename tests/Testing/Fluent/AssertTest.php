@@ -285,6 +285,63 @@ class AssertTest extends TestCase
         });
     }
 
+    public function testAssertBetween()
+    {
+        $assert = AssertableJson::fromArray([
+            'foo',
+            'bar',
+            'baz',
+        ]);
+
+        $assert->countBetween(1, 3);
+    }
+
+    public function testAssertBetweenFails()
+    {
+        $assert = AssertableJson::fromArray([
+            'foo',
+            'bar',
+            'baz',
+        ]);
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Root level size is not less than or equal to [2].');
+
+        $assert->countBetween(1, 2);
+    }
+
+    public function testAssertBetweenLowestValueFails()
+    {
+        $assert = AssertableJson::fromArray([
+            'foo',
+            'bar',
+            'baz',
+        ]);
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Root level size is not greater than or equal to [4].');
+
+        $assert->countBetween(4, 3);
+    }
+
+    public function testAssertBetweenFailsScoped()
+    {
+        $assert = AssertableJson::fromArray([
+            'bar' => [
+                'baz' => 'example',
+                'prop' => 'value',
+                'foo' => 'value',
+            ],
+        ]);
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Property [bar] size is not less than or equal to [2].');
+
+        $assert->has('bar', function (AssertableJson $bar) {
+            $bar->countBetween(1, 2);
+        });
+    }
+
     public function testAssertMissing()
     {
         $assert = AssertableJson::fromArray([
@@ -496,6 +553,33 @@ class AssertTest extends TestCase
             ]);
     }
 
+    public function testAssertWhereUsingBackedEnum()
+    {
+        $assert = AssertableJson::fromArray([
+            'bar' => BackedEnum::test->value,
+        ]);
+
+        $assert->where('bar', BackedEnum::test);
+
+        $assert = AssertableJson::fromArray([
+            'bar' => BackedEnum::test_empty->value,
+        ]);
+
+        $assert->where('bar', BackedEnum::test_empty);
+    }
+
+    public function testAssertWhereFailsUsingBackedEnum()
+    {
+        $assert = AssertableJson::fromArray([
+            'bar' => BackedEnum::test->value,
+        ]);
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Property [bar] does not match the expected value.');
+
+        $assert->where('bar', BackedEnum::test_empty);
+    }
+
     public function testAssertWhereContainsFailsWithEmptyValue()
     {
         $assert = AssertableJson::fromArray([]);
@@ -690,6 +774,33 @@ class AssertTest extends TestCase
         $assert->whereContains('foo', null);
     }
 
+    public function testAssertWhereContainsUsingBackedEnum()
+    {
+        $assert = AssertableJson::fromArray([
+            'bar' => [BackedEnum::test->value],
+        ]);
+
+        $assert->whereContains('bar', BackedEnum::test);
+
+        $assert = AssertableJson::fromArray([
+            'bar' => [BackedEnum::test_empty->value],
+        ]);
+
+        $assert->whereContains('bar', BackedEnum::test_empty);
+    }
+
+    public function testAssertWhereContainsFailsUsingBackedEnum()
+    {
+        $assert = AssertableJson::fromArray([
+            'bar' => [BackedEnum::test_empty->value],
+        ]);
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Property [bar] does not contain [test].');
+
+        $assert->whereContains('bar', BackedEnum::test);
+    }
+
     public function testAssertNestedWhereMatchesValue()
     {
         $assert = AssertableJson::fromArray([
@@ -713,6 +824,31 @@ class AssertTest extends TestCase
         $this->expectExceptionMessage('Property [example.nested] does not match the expected value.');
 
         $assert->where('example.nested', 'another-value');
+    }
+
+    public function testAssertNestedWhereUsingBackedEnum()
+    {
+        $assert = AssertableJson::fromArray([
+            'example' => [
+                'nested' => BackedEnum::test->value,
+            ],
+        ]);
+
+        $assert->where('example.nested', BackedEnum::test);
+    }
+
+    public function testAssertNestedWhereFailsUsingBackedEnum()
+    {
+        $assert = AssertableJson::fromArray([
+            'example' => [
+                'nested' => BackedEnum::test_empty->value,
+            ],
+        ]);
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Property [example.nested] does not match the expected value.');
+
+        $assert->where('example.nested', BackedEnum::test);
     }
 
     public function testAssertWhereDoesNotMatchValue()
@@ -771,6 +907,27 @@ class AssertTest extends TestCase
         $assert->whereNot('bar', function ($value) {
             return $value === 'baz';
         });
+    }
+
+    public function testAssertWhereNotUsingBackedEnum()
+    {
+        $assert = AssertableJson::fromArray([
+            'bar' => BackedEnum::test->value,
+        ]);
+
+        $assert->whereNot('bar', BackedEnum::test_empty);
+    }
+
+    public function testAssertWhereNotFailsUsingBackedEnum()
+    {
+        $assert = AssertableJson::fromArray([
+            'bar' => BackedEnum::test->value,
+        ]);
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Property [bar] contains a value that should be missing: [bar, test]');
+
+        $assert->whereNot('bar', BackedEnum::test);
     }
 
     public function testScope()

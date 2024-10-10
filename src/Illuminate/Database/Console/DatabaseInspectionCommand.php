@@ -3,7 +3,6 @@
 namespace Illuminate\Database\Console;
 
 use Illuminate\Console\Command;
-use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Support\Arr;
 

@@ -6,7 +6,8 @@ use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Process;
 use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Process\PhpExecutableFinder;
+
+use function Illuminate\Support\php_binary;
 
 #[AsCommand(name: 'install:api')]
 class ApiInstallCommand extends Command
@@ -34,7 +35,7 @@ class ApiInstallCommand extends Command
     /**
      * Execute the console command.
      *
-     * @return int
+     * @return void
      */
     public function handle()
     {
@@ -65,7 +66,7 @@ class ApiInstallCommand extends Command
 
         if ($this->option('passport')) {
             Process::run([
-                (new PhpExecutableFinder())->find(false) ?: 'php',
+                php_binary(),
                 defined('ARTISAN_BINARY') ? ARTISAN_BINARY : 'artisan',
                 'passport:install',
             ]);
@@ -107,8 +108,6 @@ class ApiInstallCommand extends Command
             );
         } else {
             $this->components->warn('Unable to automatically add API route definition to bootstrap file. API route file should be registered manually.');
-
-            return;
         }
     }
 
@@ -129,7 +128,7 @@ class ApiInstallCommand extends Command
 
         if (! $migrationPublished) {
             Process::run([
-                (new PhpExecutableFinder())->find(false) ?: 'php',
+                php_binary(),
                 defined('ARTISAN_BINARY') ? ARTISAN_BINARY : 'artisan',
                 'vendor:publish',
                 '--provider',

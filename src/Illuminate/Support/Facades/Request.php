@@ -172,7 +172,7 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Http\UploadedFile|\Illuminate\Http\UploadedFile[]|array|null file(string|null $key = null, mixed $default = null)
  * @method static \Illuminate\Http\Request dump(mixed $keys = [])
  * @method static never dd(mixed ...$args)
- * @method static void macro(string $name, object|callable $macro, object|callable $macro = null)
+ * @method static void macro(string $name, object|callable $macro)
  * @method static void mixin(object $mixin, bool $replace = true)
  * @method static bool hasMacro(string $name)
  * @method static void flushMacros()

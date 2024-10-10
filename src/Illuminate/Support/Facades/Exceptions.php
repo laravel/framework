@@ -14,7 +14,7 @@ use Illuminate\Support\Testing\Fakes\ExceptionHandlerFake;
  * @method static \Illuminate\Foundation\Exceptions\Handler dontReport(array|string $exceptions)
  * @method static \Illuminate\Foundation\Exceptions\Handler ignore(array|string $exceptions)
  * @method static \Illuminate\Foundation\Exceptions\Handler dontFlash(array|string $attributes)
- * @method static \Illuminate\Foundation\Exceptions\Handler level(string $type, void $level)
+ * @method static \Illuminate\Foundation\Exceptions\Handler level(string $type, string $level)
  * @method static void report(\Throwable $e)
  * @method static bool shouldReport(\Throwable $e)
  * @method static \Illuminate\Foundation\Exceptions\Handler throttleUsing(callable $throttleUsing)
@@ -25,16 +25,16 @@ use Illuminate\Support\Testing\Fakes\ExceptionHandlerFake;
  * @method static \Illuminate\Foundation\Exceptions\Handler shouldRenderJsonWhen(callable $callback)
  * @method static \Illuminate\Foundation\Exceptions\Handler dontReportDuplicates()
  * @method static \Illuminate\Contracts\Debug\ExceptionHandler handler()
- * @method static void assertNothingReported()
  * @method static void assertReported(\Closure|string $exception)
  * @method static void assertReportedCount(int $count)
  * @method static void assertNotReported(\Closure|string $exception)
+ * @method static void assertNothingReported()
  * @method static void renderForConsole(\Symfony\Component\Console\Output\OutputInterface $output, \Throwable $e)
+ * @method static \Illuminate\Support\Testing\Fakes\ExceptionHandlerFake throwOnReport()
  * @method static \Illuminate\Support\Testing\Fakes\ExceptionHandlerFake throwFirstReported()
  * @method static \Illuminate\Support\Testing\Fakes\ExceptionHandlerFake setHandler(\Illuminate\Contracts\Debug\ExceptionHandler $handler)
  *
  * @see \Illuminate\Foundation\Exceptions\Handler
- * @see \Illuminate\Contracts\Debug\ExceptionHandler
  * @see \Illuminate\Support\Testing\Fakes\ExceptionHandlerFake
  */
 class Exceptions extends Facade

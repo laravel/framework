@@ -1010,7 +1010,7 @@ class Container implements ArrayAccess, ContainerContract
 
             $result = null;
 
-            if (! is_null($attribute = $this->getContextualAttributeFromDependency($dependency))) {
+            if (! is_null($attribute = Util::getContextualAttributeFromDependency($dependency))) {
                 $result = $this->resolveFromAttribute($attribute);
             }
 
@@ -1068,17 +1068,6 @@ class Container implements ArrayAccess, ContainerContract
     }
 
     /**
-     * Get a contextual attribute from a dependency.
-     *
-     * @param  ReflectionParameter  $dependency
-     * @return \ReflectionAttribute|null
-     */
-    protected function getContextualAttributeFromDependency($dependency)
-    {
-        return $dependency->getAttributes(ContextualAttribute::class, ReflectionAttribute::IS_INSTANCEOF)[0] ?? null;
-    }
-
-    /**
      * Resolve a non-class hinted primitive dependency.
      *
      * @param  \ReflectionParameter  $parameter
@@ -1098,6 +1087,10 @@ class Container implements ArrayAccess, ContainerContract
 
         if ($parameter->isVariadic()) {
             return [];
+        }
+
+        if ($parameter->hasType() && $parameter->allowsNull()) {
+            return null;
         }
 
         $this->unresolvablePrimitive($parameter);
@@ -1164,7 +1157,7 @@ class Container implements ArrayAccess, ContainerContract
      * @param  \ReflectionAttribute  $attribute
      * @return mixed
      */
-    protected function resolveFromAttribute(ReflectionAttribute $attribute)
+    public function resolveFromAttribute(ReflectionAttribute $attribute)
     {
         $handler = $this->contextualAttributes[$attribute->getName()] ?? null;
 
@@ -1359,11 +1352,11 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Fire all of the after resolving attribute callbacks.
      *
-     * @param  \ReflectionAttribute[]  $abstract
+     * @param  \ReflectionAttribute[]  $attributes
      * @param  mixed  $object
      * @return void
      */
-    protected function fireAfterResolvingAttributeCallbacks(array $attributes, $object)
+    public function fireAfterResolvingAttributeCallbacks(array $attributes, $object)
     {
         foreach ($attributes as $attribute) {
             if (is_a($attribute->getName(), ContextualAttribute::class, true)) {
@@ -1530,11 +1523,7 @@ class Container implements ArrayAccess, ContainerContract
      */
     public static function getInstance()
     {
-        if (is_null(static::$instance)) {
-            static::$instance = new static;
-        }
-
-        return static::$instance;
+        return static::$instance ??= new static;
     }
 
     /**

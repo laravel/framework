@@ -219,6 +219,7 @@ img {
     padding: 0;
     text-align: center;
     width: 100%;
+    float: unset;
 }
 
 .button {

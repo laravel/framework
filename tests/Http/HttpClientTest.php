@@ -5,11 +5,13 @@ namespace Illuminate\Tests\Http;
 use Exception;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Promise\PromiseInterface;
+use GuzzleHttp\Promise\RejectedPromise;
 use GuzzleHttp\Psr7\Response as Psr7Response;
 use GuzzleHttp\Psr7\Utils;
 use GuzzleHttp\TransferStats;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\Events\RequestSending;
 use Illuminate\Http\Client\Events\ResponseReceived;
 use Illuminate\Http\Client\Factory;
@@ -323,6 +325,18 @@ class HttpClientTest extends TestCase
 
         $this->assertIsObject($response->object());
         $this->assertSame('bar', $response->object()->result->foo);
+    }
+
+    public function testResponseCanBeReturnedAsResource()
+    {
+        $this->factory->fake([
+            '*' => ['result' => ['foo' => 'bar']],
+        ]);
+
+        $response = $this->factory->get('http://foo.com/api');
+
+        $this->assertIsResource($response->resource());
+        $this->assertSame('{"result":{"foo":"bar"}}', stream_get_contents($response->resource()));
     }
 
     public function testResponseCanBeReturnedAsCollection()
@@ -2116,6 +2130,23 @@ class HttpClientTest extends TestCase
         $this->factory->assertSent(function (Request $request) {
             return $request->hasHeader('Foo') && $request->header('Foo') === ['Bar'];
         });
+    }
+
+    public function testHandleRequestExeptionWithNoResponseInPoolConsideredConnectionException()
+    {
+        $requestException = new \GuzzleHttp\Exception\RequestException('Error', new \GuzzleHttp\Psr7\Request('GET', '/'));
+        $this->factory->fake([
+            'noresponse.com' => new RejectedPromise($requestException),
+        ]);
+
+        $responses = $this->factory->pool(function (Pool $pool) {
+            return [
+                $pool->get('noresponse.com'),
+            ];
+        });
+
+        self::assertInstanceOf(ConnectionException::class, $responses[0]);
+        self::assertSame($requestException, $responses[0]->getPrevious());
     }
 
     public function testExceptionThrownInRetryCallbackIsReturnedWithoutRetryingInPool()

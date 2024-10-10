@@ -1453,6 +1453,18 @@ class Blueprint
     }
 
     /**
+     * Create a new vector column on the table.
+     *
+     * @param  string  $column
+     * @param  int  $dimensions
+     * @return \Illuminate\Database\Schema\ColumnDefinition
+     */
+    public function vector($column, $dimensions)
+    {
+        return $this->addColumn('vector', $column, compact('dimensions'));
+    }
+
+    /**
      * Add the proper columns for a polymorphic table.
      *
      * @param  string  $name

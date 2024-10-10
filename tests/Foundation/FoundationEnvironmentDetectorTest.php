@@ -46,4 +46,34 @@ class FoundationEnvironmentDetectorTest extends TestCase
         }, ['--env']);
         $this->assertSame('foobar', $result);
     }
+
+    public function testConsoleEnvironmentDetectionDoesNotUseArgumentThatStartsWithEnv()
+    {
+        $env = new EnvironmentDetector;
+
+        $result = $env->detect(function () {
+            return 'foobar';
+        }, ['--envelope=mail']);
+        $this->assertSame('foobar', $result);
+    }
+
+    public function testConsoleEnvironmentDetectionDoesNotUseArgumentThatStartsWithEnvSeparatedWithSpace()
+    {
+        $env = new EnvironmentDetector;
+
+        $result = $env->detect(function () {
+            return 'foobar';
+        }, ['--envelope', 'mail']);
+        $this->assertSame('foobar', $result);
+    }
+
+    public function testConsoleEnvironmentDetectionDoesNotUseArgumentThatStartsWithEnvWithNoValue()
+    {
+        $env = new EnvironmentDetector;
+
+        $result = $env->detect(function () {
+            return 'foobar';
+        }, ['--envelope']);
+        $this->assertSame('foobar', $result);
+    }
 }

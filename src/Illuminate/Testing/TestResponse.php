@@ -28,6 +28,8 @@ use Symfony\Component\HttpFoundation\StreamedJsonResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
+ * @template TResponse of \Symfony\Component\HttpFoundation\Response
+ *
  * @mixin \Illuminate\Http\Response
  */
 class TestResponse implements ArrayAccess
@@ -46,7 +48,7 @@ class TestResponse implements ArrayAccess
     /**
      * The response to delegate to.
      *
-     * @var \Illuminate\Http\Response
+     * @var TResponse
      */
     public $baseResponse;
 
@@ -67,7 +69,7 @@ class TestResponse implements ArrayAccess
     /**
      * Create a new test response instance.
      *
-     * @param  \Illuminate\Http\Response  $response
+     * @param  TResponse  $response
      * @param  \Illuminate\Http\Request|null  $request
      * @return void
      */
@@ -81,9 +83,11 @@ class TestResponse implements ArrayAccess
     /**
      * Create a new TestResponse from another response.
      *
-     * @param  \Illuminate\Http\Response  $response
+     * @template R of TResponse
+     *
+     * @param  R  $response
      * @param  \Illuminate\Http\Request|null  $request
-     * @return static
+     * @return static<R>
      */
     public static function fromBaseResponse($response, $request = null)
     {
@@ -236,9 +240,10 @@ class TestResponse implements ArrayAccess
      *
      * @param  string|null  $name
      * @param  mixed  $parameters
+     * @param  bool  $absolute
      * @return $this
      */
-    public function assertRedirectToSignedRoute($name = null, $parameters = [])
+    public function assertRedirectToSignedRoute($name = null, $parameters = [], $absolute = true)
     {
         if (! is_null($name)) {
             $uri = route($name, $parameters);
@@ -252,7 +257,7 @@ class TestResponse implements ArrayAccess
         $request = Request::create($this->headers->get('Location'));
 
         PHPUnit::withResponse($this)->assertTrue(
-            $request->hasValidSignature(), 'The response is not a redirect to a signed route.'
+            $request->hasValidSignature($absolute), 'The response is not a redirect to a signed route.'
         );
 
         if (! is_null($name)) {
@@ -1036,7 +1041,7 @@ class TestResponse implements ArrayAccess
     }
 
     /**
-     * Validate and return the decoded response JSON.
+     * Validate the decoded response JSON.
      *
      * @return \Illuminate\Testing\AssertableJsonString
      *
@@ -1060,7 +1065,7 @@ class TestResponse implements ArrayAccess
     }
 
     /**
-     * Validate and return the decoded response JSON.
+     * Return the decoded response JSON.
      *
      * @param  string|null  $key
      * @return mixed
