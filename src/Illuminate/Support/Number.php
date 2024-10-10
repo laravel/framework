@@ -330,6 +330,26 @@ class Number
     }
 
     /**
+     * Get the default locale.
+     *
+     * @return string
+     */
+    public static function defaultLocale()
+    {
+        return static::$locale;
+    }
+
+    /**
+     * Get the default currency.
+     *
+     * @return string
+     */
+    public static function defaultCurrency()
+    {
+        return static::$currency;
+    }
+
+    /**
      * Ensure the "intl" PHP extension is installed.
      *
      * @return void
