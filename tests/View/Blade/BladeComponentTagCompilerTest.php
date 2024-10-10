@@ -546,7 +546,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $container->instance(Factory::class, $factory = m::mock(Factory::class));
 
         $app->shouldReceive('getNamespace')->once()->andReturn('App\\');
-        $factory->shouldReceive('exists')->times(3)->andReturnUsing(function ($arg) {
+        $factory->shouldReceive('exists')->times(4)->andReturnUsing(function ($arg) {
             // In our test, we'll do as if the 'public.frontend.anonymous-component'
             // view exists and not the others.
             return $arg === 'public.frontend.anonymous-component';
@@ -580,7 +580,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $container->instance(Factory::class, $factory = m::mock(Factory::class));
 
         $app->shouldReceive('getNamespace')->once()->andReturn('App\\');
-        $factory->shouldReceive('exists')->times(4)->andReturnUsing(function (string $viewNameBeingCheckedForExistence) {
+        $factory->shouldReceive('exists')->times(5)->andReturnUsing(function (string $viewNameBeingCheckedForExistence) {
             // In our test, we'll do as if the 'public.frontend.anonymous-component'
             // view exists and not the others.
             return $viewNameBeingCheckedForExistence === 'admin.auth.components.anonymous-component.index';
@@ -707,7 +707,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $container->instance(Application::class, $app = m::mock(Application::class));
         $container->instance(Factory::class, $factory = m::mock(Factory::class));
         $app->shouldReceive('getNamespace')->once()->andReturn('App\\');
-        $factory->shouldReceive('exists')->twice()->andReturn(false);
+        $factory->shouldReceive('exists')->times(3)->andReturn(false);
         Container::setInstance($container);
 
         $this->expectException(InvalidArgumentException::class);
