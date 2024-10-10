@@ -25,7 +25,7 @@ class Number
     protected static $currency = 'USD';
 
     /**
-     * Returns the default locale specified
+     * Returns the default locale specified.
      *
      * @return string
      */
@@ -35,7 +35,7 @@ class Number
     }
 
     /**
-     * Returns the default currency specified
+     * Returns the default currency specified.
      *
      * @return string
      */
