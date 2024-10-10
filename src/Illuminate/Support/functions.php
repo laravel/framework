@@ -44,7 +44,6 @@ if (! function_exists('Illuminate\Support\mutate')) {
     {
         return transform($value, fn ($value) => match (true) {
             $value instanceof \JsonSerializable => $value->jsonSerialize(),
-            $value instanceof Arrayable => $value->toArray(),
 
             $value instanceof \BackedEnum => $value->value,
             $value instanceof \UnitEnum => $value->name,

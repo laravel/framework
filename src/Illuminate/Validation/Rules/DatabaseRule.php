@@ -3,8 +3,8 @@
 namespace Illuminate\Validation\Rules;
 
 use Closure;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
-
 use function Illuminate\Support\mutate;
 
 trait DatabaseRule
@@ -87,9 +87,7 @@ trait DatabaseRule
      */
     public function where($column, $value = null)
     {
-        $value = mutate($value);
-
-        if (is_array($value)) {
+        if ($value instanceof Arrayable || is_array($value)) {
             return $this->whereIn($column, $value);
         }
 
@@ -100,6 +98,8 @@ trait DatabaseRule
         if (is_null($value)) {
             return $this->whereNull($column);
         }
+
+        $value = mutate($value);
 
         $this->wheres[] = compact('column', 'value');
 
@@ -115,11 +115,11 @@ trait DatabaseRule
      */
     public function whereNot($column, $value)
     {
-        $value = mutate($value);
-
-        if (is_array($value)) {
+        if ($value instanceof Arrayable || is_array($value)) {
             return $this->whereNotIn($column, $value);
         }
+
+        $value = mutate($value);
 
         return $this->where($column, '!'.$value);
     }
