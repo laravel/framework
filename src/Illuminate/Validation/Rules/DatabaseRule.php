@@ -5,6 +5,7 @@ namespace Illuminate\Validation\Rules;
 use Closure;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
+
 use function Illuminate\Support\mutate;
 
 trait DatabaseRule
