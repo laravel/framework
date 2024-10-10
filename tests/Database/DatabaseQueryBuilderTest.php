@@ -946,7 +946,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $period = now()->startOfDay()->toPeriod(now()->addMonth()->startOfDay());
         $builder->select('*')->from('users')->whereDateBetween('created_at', $period);
         $this->assertSame('select * from "users" where date("created_at") between ? and ?', $builder->toSql());
-        $this->assertEquals([now()->startOfDay()->format('Y-m-d'), now()->addMonth()->startOfDay()->format('Y-m-d')], $builder->getBindings());
+        $this->assertEquals([$period->getStartDate()->format('Y-m-d'), $period->getEndDate()->format('Y-m-d')], $builder->getBindings());
 
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->whereDateBetween('created_at', collect([now(), now()]));
@@ -993,6 +993,47 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->select('*')->from('users')->whereTimeBetween('created_at', collect([now(), now()]));
         $this->assertSame('select * from "users" where time("created_at") between ? and ?', $builder->toSql());
         $this->assertEquals([0 => now()->format('H:i:s'), 1 => now()->format('H:i:s')], $builder->getBindings());
+    }
+
+    public function testWhereMonthBetween()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereMonthBetween('created_at', ['1', '10']);
+        $this->assertSame('select * from "users" where month("created_at") between ? and ?', $builder->toSql());
+        $this->assertEquals([0 => '01', 1 => '10'], $builder->getBindings());
+        
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereMonthBetween('created_at', [['1', '10', '12']]);
+        $this->assertSame('select * from "users" where month("created_at") between ? and ?', $builder->toSql());
+        $this->assertEquals([0 => '01', 1 => '10'], $builder->getBindings());
+        
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereMonthBetween('created_at', [['1'], ['10', '12']]);
+        $this->assertSame('select * from "users" where month("created_at") between ? and ?', $builder->toSql());
+        $this->assertEquals([0 => '01', 1 => '10'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereMonthBetween('created_at', [new Raw('5'), new Raw('12')]);
+        $this->assertSame('select * from "users" where month("created_at") between 5 and 12', $builder->toSql());
+        $this->assertEquals([], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $period = now()->startOfDay()->toPeriod(now()->addDay()->startOfDay());
+        $builder->select('*')->from('users')->whereMonthBetween('created_at', $period);
+        $this->assertSame('select * from "users" where month("created_at") between ? and ?', $builder->toSql());
+        $this->assertEquals([now()->startOfDay()->format('m'), now()->addDay()->startOfDay()->format('m')], $builder->getBindings());
+
+        // custom long carbon period date
+        $builder = $this->getBuilder();
+        $period = now()->startOfDay()->toPeriod(now()->addMonth()->startOfDay());
+        $builder->select('*')->from('users')->whereMonthBetween('created_at', $period);
+        $this->assertSame('select * from "users" where month("created_at") between ? and ?', $builder->toSql());
+        $this->assertEquals([now()->startOfDay()->format('m'), now()->addMonth()->startOfDay()->format('m')], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereMonthBetween('created_at', collect([now(), now()]));
+        $this->assertSame('select * from "users" where month("created_at") between ? and ?', $builder->toSql());
+        $this->assertEquals([0 => now()->format('m'), 1 => now()->format('m')], $builder->getBindings());
     }
 
     public function testOrWhereBetween()

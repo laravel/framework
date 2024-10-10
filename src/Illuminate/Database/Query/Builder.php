@@ -1565,6 +1565,8 @@ class Builder implements BuilderContract
             $values = [$values->getStartDate(), $values->getEndDate()];
         }
 
+        $values = array_slice(Arr::flatten($values), 0, 2);
+
         $values = collect($values)
             ->map(function ($value) {
                 if ($value instanceof DateTimeInterface) {
@@ -1623,6 +1625,8 @@ class Builder implements BuilderContract
         if ($values instanceof CarbonPeriod) {
             $values = [$values->getStartDate(), $values->getEndDate()];
         }
+
+        $values = array_slice(Arr::flatten($values), 0, 2);
 
         $values = collect($values)
             ->map(function ($value) {
@@ -1703,6 +1707,8 @@ class Builder implements BuilderContract
         if ($values instanceof CarbonPeriod) {
             $values = [$values->getStartDate(), $values->getEndDate()];
         }
+
+        $values = array_slice(Arr::flatten($values), 0, 2);
 
         $values = collect($values)
             ->map(function ($value) {
@@ -1788,6 +1794,8 @@ class Builder implements BuilderContract
             $values = [$values->getStartDate(), $values->getEndDate()];
         }
 
+        $values = array_slice(Arr::flatten($values), 0, 2);
+
         $values = collect($values)
             ->map(function ($value) {
                 if ($value instanceof DateTimeInterface) {
@@ -1868,6 +1876,8 @@ class Builder implements BuilderContract
             $values = [$values->getStartDate(), $values->getEndDate()];
         }
 
+        $values = array_slice(Arr::flatten($values), 0, 2);
+
         $values = collect($values)
             ->map(function ($value) {
                 if ($value instanceof DateTimeInterface) {
@@ -1935,7 +1945,7 @@ class Builder implements BuilderContract
 
         $this->wheres[] = compact('type', 'column', 'values', 'boolean', 'not');
 
-        $this->addBinding(array_slice($this->cleanBindings(Arr::flatten($values)), 0, 2), 'where');
+        $this->addBinding($this->cleanBindings($values), 'where');
 
         return $this;
     }
