@@ -1724,7 +1724,7 @@ class Builder implements BuilderContract
             })
             ->all();
 
-        return $this->addDateBasedWhereBetween('Time', $column, $values, $boolean, $not);
+        return $this->addDateBasedWhereBetween('Day', $column, $values, $boolean, $not);
     }
 
     /**
