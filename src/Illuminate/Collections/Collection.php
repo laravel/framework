@@ -11,8 +11,6 @@ use InvalidArgumentException;
 use stdClass;
 use Traversable;
 
-use function Illuminate\Support\mutate;
-
 /**
  * @template TKey of array-key
  *
