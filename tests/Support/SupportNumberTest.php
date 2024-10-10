@@ -8,6 +8,20 @@ use PHPUnit\Framework\TestCase;
 
 class SupportNumberTest extends TestCase
 {
+    public function testDefaultLocale()
+    {
+        Number::useLocale('de');
+
+        $this->assertSame('de', Number::defaultLocale());
+    }
+
+    public function testDefaultCurrency()
+    {
+        Number::useCurrency('USD');
+
+        $this->assertSame('USD', Number::defaultCurrency());
+    }
+
     #[RequiresPhpExtension('intl')]
     public function testFormat()
     {
