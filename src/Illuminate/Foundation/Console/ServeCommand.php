@@ -280,6 +280,11 @@ class ServeCommand extends Command
                         $this->serverRunningHasBeenDisplayed = true;
 
                         $this->components->info("Server running on [http://{$this->host()}:{$this->port()}].");
+
+                        if ($this->getNumOfWorkers() > 1) {
+                            $this->components->info("Using {$this->getNumOfWorkers()} worker processes.");
+                        }
+
                         $this->comment('  <fg=yellow;options=bold>Press Ctrl+C to stop the server</>');
 
                         $this->newLine();
@@ -348,6 +353,16 @@ class ServeCommand extends Command
     }
 
     /**
+     * Get number of workers
+     *
+     * @return int
+     */
+    protected function getNumOfWorkers()
+    {
+        return $this->option('workers') ?: env('PHP_CLI_SERVER_WORKERS', 1);
+    }
+
+    /**
      * Get the date from the given PHP server output.
      *
      * @param  string  $line
@@ -355,7 +370,7 @@ class ServeCommand extends Command
      */
     protected function getDateFromLine($line)
     {
-        $workers = $this->option('workers') ?: env('PHP_CLI_SERVER_WORKERS', 1);
+        $workers = $this->getNumOfWorkers();
 
         $regex = $workers > 1
             ? '/^\[\d+]\s\[([a-zA-Z0-9: ]+)\]/'
@@ -400,8 +415,8 @@ class ServeCommand extends Command
                     : [$key => false];
             })
             ->when(
-                $workers = $this->option('workers'),
-                fn ($envs) => $envs->offsetSet('PHP_CLI_SERVER_WORKERS', $workers)
+                $this->getNumOfWorkers() > 1,
+                fn ($envs) => $envs->offsetSet('PHP_CLI_SERVER_WORKERS', $this->getNumOfWorkers())
             )
             ->all();
     }
