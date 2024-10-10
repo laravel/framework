@@ -10,15 +10,11 @@ class SupportNumberTest extends TestCase
 {
     public function testDefaultLocale()
     {
-        Number::useLocale('de');
-
-        $this->assertSame('de', Number::defaultLocale());
+        $this->assertSame('en', Number::defaultLocale());
     }
 
     public function testDefaultCurrency()
     {
-        Number::useCurrency('USD');
-
         $this->assertSame('USD', Number::defaultCurrency());
     }
 
