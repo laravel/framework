@@ -22,24 +22,24 @@ class AsEnumArrayObject implements Castable
         return new class($arguments) implements CastsAttributes
         {
             protected string $enumClass;
-            protected bool $forceArray;
+            protected bool $forceInstance;
 
             public function __construct(array $arguments)
             {
                 $this->enumClass = $arguments[0];
-                $this->forceArray = $arguments[1] ?? false;
+                $this->forceInstance = $arguments[1] ?? false;
             }
 
             public function get($model, $key, $value, $attributes)
             {
                 if (! isset($attributes[$key])) {
-                    return $this->forceArray ? new ArrayObject: null;
+                    return $this->forceInstance ? new ArrayObject : null;
                 }
 
                 $data = Json::decode($attributes[$key]);
 
                 if (! is_array($data)) {
-                    return $this->forceArray ? new ArrayObject: null;
+                    return $this->forceInstance ? new ArrayObject : null;
                 }
 
                 return new ArrayObject((new Collection($data))->map(function ($value) {
