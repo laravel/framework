@@ -342,6 +342,7 @@ class ComponentTagCompiler
                 if (! is_null($guess = match (true) {
                     $viewFactory->exists($guess = $path['prefixHash'].$delimiter.$formattedComponent) => $guess,
                     $viewFactory->exists($guess = $path['prefixHash'].$delimiter.$formattedComponent.'.index') => $guess,
+                    $viewFactory->exists($guess = $path['prefixHash'].$delimiter.$formattedComponent.'.'.Str::afterLast($formattedComponent, '.')) => $guess,
                     default => null,
                 })) {
                     return $guess;
@@ -378,6 +379,10 @@ class ComponentTagCompiler
                 }
 
                 if ($viewFactory->exists($view = $this->guessViewName($componentName, $directory).'.index')) {
+                    return $view;
+                }
+
+                if ($viewFactory->exists($view = $this->guessViewName($componentName, $directory).'.'.Str::afterLast($componentName, '.'))) {
                     return $view;
                 }
             });
