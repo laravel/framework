@@ -519,6 +519,25 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 '@endComponentClass##END-COMPONENT-CLASS##', trim($result));
     }
 
+    public function testClasslessComponentsWithComponentView()
+    {
+        $container = new Container;
+        $container->instance(Application::class, $app = m::mock(Application::class));
+        $container->instance(Factory::class, $factory = m::mock(Factory::class));
+        $app->shouldReceive('getNamespace')->andReturn('App\\');
+        $factory->shouldReceive('exists')->andReturn(false, false, true);
+        Container::setInstance($container);
+
+        $result = $this->compiler()->compileTags('<x-anonymous-component :name="\'Taylor\'" :age="31" wire:model="foo" />');
+
+        $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\View\AnonymousComponent', 'anonymous-component', ['view' => 'components.anonymous-component.anonymous-component','data' => ['name' => 'Taylor','age' => 31,'wire:model' => 'foo']])
+<?php if (isset(\$attributes) && \$attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php \$attributes = \$attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php \$component->withAttributes(['name' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute('Taylor'),'age' => 31,'wire:model' => 'foo']); ?>\n".
+            '@endComponentClass##END-COMPONENT-CLASS##', trim($result));
+    }
+
     public function testPackagesClasslessComponents()
     {
         $container = new Container;
@@ -606,6 +625,40 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
             '@endComponentClass##END-COMPONENT-CLASS##', trim($result));
     }
 
+    public function testClasslessComponentsWithAnonymousComponentNamespaceWithComponentView()
+    {
+        $container = new Container;
+
+        $container->instance(Application::class, $app = m::mock(Application::class));
+        $container->instance(Factory::class, $factory = m::mock(Factory::class));
+
+        $app->shouldReceive('getNamespace')->once()->andReturn('App\\');
+        $factory->shouldReceive('exists')->times(6)->andReturnUsing(function (string $viewNameBeingCheckedForExistence) {
+            // In our test, we'll do as if the 'public.frontend.anonymous-component'
+            // view exists and not the others.
+            return $viewNameBeingCheckedForExistence === 'admin.auth.components.anonymous-component.anonymous-component';
+        });
+
+        Container::setInstance($container);
+
+        $blade = m::mock(BladeCompiler::class)->makePartial();
+
+        $blade->shouldReceive('getAnonymousComponentNamespaces')->once()->andReturn([
+            'admin.auth' => 'admin.auth.components',
+        ]);
+
+        $compiler = $this->compiler([], [], $blade);
+
+        $result = $compiler->compileTags('<x-admin.auth::anonymous-component :name="\'Taylor\'" :age="31" wire:model="foo" />');
+
+        $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\View\AnonymousComponent', 'admin.auth::anonymous-component', ['view' => 'admin.auth.components.anonymous-component.anonymous-component','data' => ['name' => 'Taylor','age' => 31,'wire:model' => 'foo']])
+<?php if (isset(\$attributes) && \$attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php \$attributes = \$attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php \$component->withAttributes(['name' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute('Taylor'),'age' => 31,'wire:model' => 'foo']); ?>\n".
+            '@endComponentClass##END-COMPONENT-CLASS##', trim($result));
+    }
+
     public function testClasslessComponentsWithAnonymousComponentPath()
     {
         $container = new Container;
@@ -632,6 +685,39 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $result = $compiler->compileTags('<x-panel />');
 
         $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\View\AnonymousComponent', 'panel', ['view' => '".md5('test-directory')."::panel.index','data' => []])
+<?php if (isset(\$attributes) && \$attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php \$attributes = \$attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php \$component->withAttributes([]); ?>\n".
+            '@endComponentClass##END-COMPONENT-CLASS##', trim($result));
+    }
+
+    public function testClasslessComponentsWithAnonymousComponentPathComponentName()
+    {
+        $container = new Container;
+
+        $container->instance(Application::class, $app = m::mock(Application::class));
+        $container->instance(Factory::class, $factory = m::mock(Factory::class));
+
+        $app->shouldReceive('getNamespace')->once()->andReturn('App\\');
+
+        $factory->shouldReceive('exists')->andReturnUsing(function ($arg) {
+            return $arg === md5('test-directory').'::panel.panel';
+        });
+
+        Container::setInstance($container);
+
+        $blade = m::mock(BladeCompiler::class)->makePartial();
+
+        $blade->shouldReceive('getAnonymousComponentPaths')->once()->andReturn([
+            ['path' => 'test-directory', 'prefix' => null, 'prefixHash' => md5('test-directory')],
+        ]);
+
+        $compiler = $this->compiler([], [], $blade);
+
+        $result = $compiler->compileTags('<x-panel />');
+
+        $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\View\AnonymousComponent', 'panel', ['view' => '".md5('test-directory')."::panel.panel','data' => []])
 <?php if (isset(\$attributes) && \$attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php \$attributes = \$attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
