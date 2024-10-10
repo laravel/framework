@@ -39,7 +39,7 @@ class RedisTagSet extends TagSet
         $connection = $this->store->connection();
 
         $defaultCursorValue = match (true) {
-            $connection instanceof PhpRedisConnection => null,
+            $connection instanceof PhpRedisConnection && version_compare(phpversion('redis'), '6.1.0', '>=') => null,
             default => '0',
         };
 

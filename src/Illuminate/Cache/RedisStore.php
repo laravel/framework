@@ -293,7 +293,7 @@ class RedisStore extends TaggableStore implements LockProvider
         };
 
         $defaultCursorValue = match (true) {
-            $connection instanceof PhpRedisConnection => null,
+            $connection instanceof PhpRedisConnection && version_compare(phpversion('redis'), '6.1.0', '>=') => null,
             default => '0',
         };
 
