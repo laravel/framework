@@ -200,5 +200,4 @@ class EnvironmentEncryptCommandTest extends TestCase
             ->expectsOutputToContain('.env.encrypted')
             ->assertExitCode(0);
     }
-
 }
