@@ -951,4 +951,38 @@ class Arr
 
         return is_array($value) ? $value : [$value];
     }
+
+    /**
+     * Extracts key-value pairs from the second array where keys and value types match those in the first array.
+     *
+     * @param array $sourceArray The array with the original keys and value types.
+     * @param array $targetArray The array from which to extract the matching key-value pairs.
+     * @param bool $ignoreSameValue Whether to ignore key-value pairs where the values in both arrays are identical. If true, key-value pairs with matching values in both arrays will be excluded from the result.
+     * @return array An array containing the key-value pairs from $targetArray that match the keys and value types in $sourceArray.
+     */
+    public static function extractMatchingKeys(array $sourceArray, array $targetArray, bool $ignoreSameValue = false): array
+    {
+        $result = [];
+        $flattenSourceArray = static::dot($sourceArray);
+
+        foreach ($flattenSourceArray as $key => $value) {
+            if (!static::has($targetArray, $key)) continue;
+
+            $valueInTargetArray = static::get($targetArray, $key);
+
+            if ($ignoreSameValue && $value == $valueInTargetArray) continue;
+
+            if (gettype($value) != gettype($valueInTargetArray)) continue;
+
+            if (is_array($valueInTargetArray)) {
+                if (!static::isAssoc($valueInTargetArray)) {
+                    static::set($result, $key, $valueInTargetArray);
+                }
+            } else {
+                static::set($result, $key, $valueInTargetArray);
+            }
+        }
+
+        return $result;
+    }
 }

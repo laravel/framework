@@ -1502,4 +1502,44 @@ class SupportArrTest extends TestCase
             ],
         ], Arr::select($array, 'name'));
     }
+
+    public function testExtractMatchingKeys()
+    {
+        $sourceArray = [
+            'name' => 'John',
+            'age' => 30,
+            'details' => [
+                'address' => '123 Street'
+            ]
+        ];
+
+        $targetArray = [
+            'name' => 'Jane',
+            'age' => 30,
+            'details' => [
+                'address' => '456 Avenue',
+                'phone' => '123-456'
+            ]
+        ];
+
+        $expectedWithIgnore = [
+            'name' => 'Jane',
+            'details' => [
+                'address' => '456 Avenue',
+            ]
+        ];
+
+        $expectedWithoutIgnore = [
+            'name' => 'Jane',
+            'age' => 30,
+            'details' => [
+                'address' => '456 Avenue',
+            ]
+        ];
+
+        $this->assertEquals($expectedWithIgnore, Arr::extractMatchingKeys($sourceArray, $targetArray, true));
+
+        $this->assertEquals($expectedWithoutIgnore, Arr::extractMatchingKeys($sourceArray, $targetArray));
+    }
+
 }
