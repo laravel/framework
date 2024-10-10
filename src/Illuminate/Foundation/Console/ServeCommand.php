@@ -145,13 +145,11 @@ class ServeCommand extends Command
      */
     protected function startProcess($hasEnvironment)
     {
-        $process = new Process($this->serverCommand(), public_path(), collect($_ENV)->mapWithKeys(function ($value, $key) use ($hasEnvironment) {
-            if ($this->option('no-reload') || ! $hasEnvironment) {
-                return [$key => $value];
-            }
-
-            return in_array($key, static::$passthroughVariables) ? [$key => $value] : [$key => false];
-        })->all());
+        $process = new Process(
+            command: $this->serverCommand(),
+            cwd: public_path(),
+            env: $this->resolveEnvs($hasEnvironment)
+        );
 
         $this->trap(fn () => [SIGTERM, SIGINT, SIGHUP, SIGUSR1, SIGUSR2, SIGQUIT], function ($signal) use ($process) {
             if ($process->isRunning()) {
@@ -357,7 +355,9 @@ class ServeCommand extends Command
      */
     protected function getDateFromLine($line)
     {
-        $regex = env('PHP_CLI_SERVER_WORKERS', 1) > 1
+        $workers = $this->option('workers') ?: env('PHP_CLI_SERVER_WORKERS', 1);
+
+        $regex = $workers > 1
             ? '/^\[\d+]\s\[([a-zA-Z0-9: ]+)\]/'
             : '/^\[([^\]]+)\]/';
 
@@ -382,6 +382,31 @@ class ServeCommand extends Command
     }
 
     /**
+     * Resolve the ENVs
+     *
+     * @param  bool  $hasEnvironment
+     * @return array
+     */
+    protected function resolveEnvs($hasEnvironment): array
+    {
+        return collect($_ENV)
+            ->mapWithKeys(function ($value, $key) use ($hasEnvironment) {
+                if ($this->option('no-reload') || ! $hasEnvironment) {
+                    return [$key => $value];
+                }
+
+                return in_array($key, static::$passthroughVariables)
+                    ? [$key => $value]
+                    : [$key => false];
+            })
+            ->when(
+                $workers = $this->option('workers'),
+                fn ($envs) => $envs->offsetSet('PHP_CLI_SERVER_WORKERS', $workers)
+            )
+            ->all();
+    }
+
+    /**
      * Get the console command options.
      *
      * @return array
@@ -393,6 +418,7 @@ class ServeCommand extends Command
             ['port', null, InputOption::VALUE_OPTIONAL, 'The port to serve the application on', Env::get('SERVER_PORT')],
             ['tries', null, InputOption::VALUE_OPTIONAL, 'The max number of ports to attempt to serve from', 10],
             ['no-reload', null, InputOption::VALUE_NONE, 'Do not reload the development server on .env file changes'],
+            ['workers', null, InputOption::VALUE_OPTIONAL, 'The max number of workers to serve the application', 1],
         ];
     }
 }
