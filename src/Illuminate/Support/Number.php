@@ -25,26 +25,6 @@ class Number
     protected static $currency = 'USD';
 
     /**
-     * Returns the default locale specified.
-     *
-     * @return string
-     */
-    public static function defaultLocale()
-    {
-        return static::$locale;
-    }
-
-    /**
-     * Returns the default currency specified.
-     *
-     * @return string
-     */
-    public static function defaultCurrency()
-    {
-        return static::$currency;
-    }
-
-    /**
      * Format the given number according to the current locale.
      *
      * @param  int|float  $number
@@ -347,6 +327,26 @@ class Number
     public static function useCurrency(string $currency)
     {
         static::$currency = $currency;
+    }
+
+    /**
+     * Get the default locale.
+     *
+     * @return string
+     */
+    public static function defaultLocale()
+    {
+        return static::$locale;
+    }
+
+    /**
+     * Get the default currency.
+     *
+     * @return string
+     */
+    public static function defaultCurrency()
+    {
+        return static::$currency;
     }
 
     /**
