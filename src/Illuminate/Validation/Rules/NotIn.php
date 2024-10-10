@@ -2,10 +2,10 @@
 
 namespace Illuminate\Validation\Rules;
 
-use BackedEnum;
 use Illuminate\Contracts\Support\Arrayable;
 use Stringable;
-use UnitEnum;
+
+use function Illuminate\Support\mutate;
 
 class NotIn implements Stringable
 {
@@ -46,11 +46,7 @@ class NotIn implements Stringable
     public function __toString()
     {
         $values = array_map(function ($value) {
-            $value = match (true) {
-                $value instanceof BackedEnum => $value->value,
-                $value instanceof UnitEnum => $value->name,
-                default => $value,
-            };
+            $value = mutate($value);
 
             return '"'.str_replace('"', '""', $value).'"';
         }, $this->values);
