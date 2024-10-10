@@ -28,7 +28,7 @@ trait Macroable
     public static function macro(...$args)
     {
         if (func_num_args() === 2 && is_string($args[0])) {
-            $args = [ $args[0] => $args[1] ];
+            $args = [$args[0] => $args[1]];
         }
 
         foreach ($args as $name => $macro) {
