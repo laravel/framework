@@ -284,4 +284,28 @@ class EnvironmentDecryptCommandTest extends TestCase
             ->expectsOutputToContain('Invalid filename.')
             ->assertExitCode(1);
     }
+
+    public function testItGeneratesTheEnvironmentFileWithInteractivelyUserProvidedKey()
+    {
+        $this->filesystem->shouldReceive('exists')
+            ->once()
+            ->andReturn(true)
+            ->shouldReceive('exists')
+            ->once()
+            ->andReturn(false)
+            ->shouldReceive('get')
+            ->once()
+            ->andReturn(
+                (new Encrypter($key = 'abcdefghijklmnop', 'aes-128-gcm'))
+                    ->encrypt('APP_NAME="Laravel Two"')
+            );
+
+        $this->artisan('env:decrypt', ['--cipher' => 'aes-128-gcm'])
+            ->expectsQuestion('What is the decryption key?', $key)
+            ->expectsOutputToContain('Environment successfully decrypted.')
+            ->assertExitCode(0);
+
+        $this->filesystem->shouldHaveReceived('put')
+            ->with(base_path('.env'), 'APP_NAME="Laravel Two"');
+    }
 }
