@@ -8,7 +8,7 @@ use Illuminate\Support\Arr;
 use PHPUnit\Framework\Assert as PHPUnit;
 use RuntimeException;
 
-use function Illuminate\Support\mutate;
+use function Illuminate\Support\enum_value;
 
 trait Queueable
 {
@@ -83,7 +83,7 @@ trait Queueable
      */
     public function onConnection($connection)
     {
-        $this->connection = mutate($connection);
+        $this->connection = enum_value($connection);
 
         return $this;
     }
@@ -96,7 +96,7 @@ trait Queueable
      */
     public function onQueue($queue)
     {
-        $this->queue = mutate($queue);
+        $this->queue = enum_value($queue);
 
         return $this;
     }
@@ -109,7 +109,7 @@ trait Queueable
      */
     public function allOnConnection($connection)
     {
-        $resolvedConnection = mutate($connection);
+        $resolvedConnection = enum_value($connection);
 
         $this->chainConnection = $resolvedConnection;
         $this->connection = $resolvedConnection;
@@ -125,7 +125,7 @@ trait Queueable
      */
     public function allOnQueue($queue)
     {
-        $resolvedQueue = mutate($queue);
+        $resolvedQueue = enum_value($queue);
 
         $this->chainQueue = $resolvedQueue;
         $this->queue = $resolvedQueue;

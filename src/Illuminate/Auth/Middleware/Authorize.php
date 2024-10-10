@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Database\Eloquent\Model;
 
-use function Illuminate\Support\mutate;
+use function Illuminate\Support\enum_value;
 
 class Authorize
 {
@@ -37,7 +37,7 @@ class Authorize
      */
     public static function using($ability, ...$models)
     {
-        return static::class.':'.implode(',', [mutate($ability), ...$models]);
+        return static::class.':'.implode(',', [enum_value($ability), ...$models]);
     }
 
     /**

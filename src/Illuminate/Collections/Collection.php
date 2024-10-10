@@ -514,7 +514,9 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
             foreach ($groupKeys as $groupKey) {
                 $groupKey = match (true) {
                     is_bool($groupKey) => (int) $groupKey,
-                    default => mutate($groupKey),
+                    $groupKey instanceof \BackedEnum => $groupKey->value,
+                    $groupKey instanceof \Stringable => (string) $groupKey,
+                    default => $groupKey,
                 };
 
                 if (! array_key_exists($groupKey, $results)) {
