@@ -3,6 +3,7 @@
 namespace Illuminate\Testing\Fluent\Concerns;
 
 use Closure;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
 use PHPUnit\Framework\Assert as PHPUnit;
 
@@ -32,7 +33,9 @@ trait Matching
             return $this;
         }
 
-        $expected = mutate($expected);
+        $expected = $expected instanceof Arrayable
+            ? $expected->toArray()
+            : mutate($expected);
 
         $this->ensureSorted($expected);
         $this->ensureSorted($actual);
@@ -68,7 +71,9 @@ trait Matching
             return $this;
         }
 
-        $expected = mutate($expected);
+        $expected = $expected instanceof Arrayable
+            ? $expected->toArray()
+            : mutate($expected);
 
         $this->ensureSorted($expected);
         $this->ensureSorted($actual);
