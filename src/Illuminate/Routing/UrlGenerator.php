@@ -15,8 +15,6 @@ use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
-use function Illuminate\Support\mutate;
-
 class UrlGenerator implements UrlGeneratorContract
 {
     use InteractsWithTime, Macroable;
@@ -537,7 +535,9 @@ class UrlGenerator implements UrlGeneratorContract
         })->all();
 
         array_walk_recursive($parameters, function (&$item) {
-            $item = mutate($item);
+            if ($item instanceof BackedEnum) {
+                $item = $item->value;
+            }
         });
 
         return $this->routeUrl()->to(
