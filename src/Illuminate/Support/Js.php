@@ -70,8 +70,6 @@ class Js implements Htmlable, Stringable
             return $data->toHtml();
         }
 
-        $data = mutate($data);
-
         $json = static::encode($data, $flags, $depth);
 
         if (is_string($data)) {
@@ -101,7 +99,7 @@ class Js implements Htmlable, Stringable
             $data = $data->toArray();
         }
 
-        return json_encode($data, $flags | static::REQUIRED_FLAGS, $depth);
+        return json_encode(mutate($data), $flags | static::REQUIRED_FLAGS, $depth);
     }
 
     /**
