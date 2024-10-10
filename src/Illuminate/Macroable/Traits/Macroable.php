@@ -19,16 +19,21 @@ trait Macroable
     /**
      * Register a custom macro.
      *
-     * @param  string  $name
-     * @param  object|callable  $macro
+     * @param  array{string, callable}|callable[]  $args
      *
      * @param-closure-this static  $macro
      *
      * @return void
      */
-    public static function macro($name, $macro)
+    public static function macro(...$args)
     {
-        static::$macros[$name] = $macro;
+        if (func_num_args() === 2 && is_string($args[0])) {
+            $args = [ $args[0] => $args[1] ];
+        }
+
+        foreach ($args as $name => $macro) {
+            static::$macros[$name] = $macro;
+        }
     }
 
     /**
