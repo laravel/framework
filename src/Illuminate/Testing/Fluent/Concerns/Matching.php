@@ -2,11 +2,11 @@
 
 namespace Illuminate\Testing\Fluent\Concerns;
 
-use BackedEnum;
 use Closure;
-use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
 use PHPUnit\Framework\Assert as PHPUnit;
+
+use function Illuminate\Support\mutate;
 
 trait Matching
 {
@@ -32,15 +32,7 @@ trait Matching
             return $this;
         }
 
-        if ($expected instanceof Arrayable) {
-            $expected = $expected->toArray();
-        }
-
-        if ($expected instanceof BackedEnum) {
-            $expected = $expected->value;
-        }
-
-        $this->ensureSorted($expected);
+        $this->ensureSorted(mutate($expected));
         $this->ensureSorted($actual);
 
         PHPUnit::assertSame(
@@ -74,15 +66,7 @@ trait Matching
             return $this;
         }
 
-        if ($expected instanceof Arrayable) {
-            $expected = $expected->toArray();
-        }
-
-        if ($expected instanceof BackedEnum) {
-            $expected = $expected->value;
-        }
-
-        $this->ensureSorted($expected);
+        $this->ensureSorted(mutate($expected));
         $this->ensureSorted($actual);
 
         PHPUnit::assertNotSame(
@@ -169,7 +153,7 @@ trait Matching
         );
 
         $missing = Collection::make($expected)
-            ->map(fn ($search) => $search instanceof BackedEnum ? $search->value : $search)
+            ->map(fn ($search) => mutate($search))
             ->reject(function ($search) use ($key, $actual) {
                 if ($actual->containsStrict($key, $search)) {
                     return true;

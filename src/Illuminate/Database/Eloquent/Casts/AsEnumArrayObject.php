@@ -2,10 +2,11 @@
 
 namespace Illuminate\Database\Eloquent\Casts;
 
-use BackedEnum;
 use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Support\Collection;
+
+use function Illuminate\Support\mutate;
 
 class AsEnumArrayObject implements Castable
 {
@@ -73,11 +74,7 @@ class AsEnumArrayObject implements Castable
 
             protected function getStorableEnumValue($enum)
             {
-                if (is_string($enum) || is_int($enum)) {
-                    return $enum;
-                }
-
-                return $enum instanceof BackedEnum ? $enum->value : $enum->name;
+                return mutate($enum);
             }
         };
     }

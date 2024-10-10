@@ -2,12 +2,13 @@
 
 namespace Illuminate\Bus;
 
-use BackedEnum;
 use Closure;
 use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Support\Arr;
 use PHPUnit\Framework\Assert as PHPUnit;
 use RuntimeException;
+
+use function Illuminate\Support\mutate;
 
 trait Queueable
 {
@@ -82,9 +83,7 @@ trait Queueable
      */
     public function onConnection($connection)
     {
-        $this->connection = $connection instanceof BackedEnum
-            ? $connection->value
-            : $connection;
+        $this->connection = mutate($connection);
 
         return $this;
     }
@@ -97,9 +96,7 @@ trait Queueable
      */
     public function onQueue($queue)
     {
-        $this->queue = $queue instanceof BackedEnum
-            ? $queue->value
-            : $queue;
+        $this->queue = mutate($queue);
 
         return $this;
     }
@@ -112,9 +109,7 @@ trait Queueable
      */
     public function allOnConnection($connection)
     {
-        $resolvedConnection = $connection instanceof BackedEnum
-            ? $connection->value
-            : $connection;
+        $resolvedConnection = mutate($connection);
 
         $this->chainConnection = $resolvedConnection;
         $this->connection = $resolvedConnection;
@@ -130,9 +125,7 @@ trait Queueable
      */
     public function allOnQueue($queue)
     {
-        $resolvedQueue = $queue instanceof BackedEnum
-            ? $queue->value
-            : $queue;
+        $resolvedQueue = mutate($queue);
 
         $this->chainQueue = $resolvedQueue;
         $this->queue = $resolvedQueue;
