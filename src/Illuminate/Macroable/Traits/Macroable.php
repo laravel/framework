@@ -19,7 +19,7 @@ trait Macroable
     /**
      * Register a custom macro.
      *
-     * @param  array{string, callable}|callable[]  $args
+     * @param  array{string, object|callable}|callable[]  $args
      *
      * @param-closure-this static  $macro
      *
