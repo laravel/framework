@@ -50,32 +50,6 @@ if (! function_exists('Illuminate\Support\enum_value')) {
     }
 }
 
-if (! function_exists('Illuminate\Support\mutate')) {
-    /**
-     * Mutate enumerations or scalar value.
-     *
-     * @template TValue
-     * @template TDefault
-     *
-     * @param  TValue  $value
-     * @param  TDefault|callable(TValue): TDefault  $default
-     * @return ($value is empty ? TDefault : mixed)
-     */
-    function mutate($value, $default = null)
-    {
-        return transform($value, fn ($value) => match (true) {
-            $value instanceof \JsonSerializable => $value->jsonSerialize(),
-
-            $value instanceof \BackedEnum => $value->value,
-            $value instanceof \UnitEnum => $value->name,
-
-            $value instanceof \Stringable => (string) $value,
-
-            default => $value,
-        }, $default);
-    }
-}
-
 if (! function_exists('Illuminate\Support\php_binary')) {
     /**
      * Determine the PHP Binary.
