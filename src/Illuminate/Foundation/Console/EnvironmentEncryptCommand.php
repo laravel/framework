@@ -9,6 +9,9 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Attribute\AsCommand;
 
+use function Laravel\Prompts\password;
+use function Laravel\Prompts\select;
+
 #[AsCommand(name: 'env:encrypt')]
 class EnvironmentEncryptCommand extends Command
 {
@@ -22,8 +25,7 @@ class EnvironmentEncryptCommand extends Command
                     {--cipher= : The encryption cipher}
                     {--env= : The environment to be encrypted}
                     {--prune : Delete the original environment file}
-                    {--force : Overwrite the existing encrypted environment file}
-                    {--interactive : Prompt the encryption key}';
+                    {--force : Overwrite the existing encrypted environment file}';
 
     /**
      * The console command description.
@@ -63,8 +65,19 @@ class EnvironmentEncryptCommand extends Command
 
         $key = $this->option('key');
 
-        if (! $key && $this->option('interactive')) {
-            $key = $this->ask('Encryption key');
+        if (! $key && $this->input->isInteractive()) {
+            $ask = select(
+                label: 'What encryption key would you like to use?',
+                options: [
+                    'generate' => 'Generate a new encryption key',
+                    'ask' => 'Provide your own encryption key'
+                ],
+                default: 'generate'
+            );
+
+            if ($ask == 'ask') {
+                $key = password('What is the encryption key?');
+            }
         }
 
         $keyPassed = $key !== null;

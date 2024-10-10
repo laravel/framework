@@ -10,6 +10,8 @@ use Illuminate\Support\Env;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Attribute\AsCommand;
 
+use function Laravel\Prompts\password;
+
 #[AsCommand(name: 'env:decrypt')]
 class EnvironmentDecryptCommand extends Command
 {
@@ -62,8 +64,8 @@ class EnvironmentDecryptCommand extends Command
     {
         $key = $this->option('key') ?: Env::get('LARAVEL_ENV_ENCRYPTION_KEY');
 
-        if (! $key) {
-            $key = $this->ask('Decryption key');
+        if (! $key && $this->input->isInteractive()) {
+            $key = password('What is the decryption key?');
         }
 
         if (! $key) {
