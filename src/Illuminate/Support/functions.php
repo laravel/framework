@@ -33,7 +33,7 @@ if (! function_exists('Illuminate\Support\enum_value')) {
      * Mutate enumerations or scalar value.
      *
      * @internal
-     * 
+     *
      * @template TValue
      * @template TDefault
      *
