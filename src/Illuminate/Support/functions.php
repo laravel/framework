@@ -41,6 +41,10 @@ if (! function_exists('Illuminate\Support\enum_value')) {
      */
     function enum_value($value, $default = null)
     {
+        if (is_string($value) && empty($value)) {
+            return $value;
+        }
+
         return transform($value, fn ($value) => match (true) {
             $value instanceof \BackedEnum => $value->value,
             $value instanceof \UnitEnum => $value->name,
