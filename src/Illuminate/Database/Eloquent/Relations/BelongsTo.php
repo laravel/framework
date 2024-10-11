@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\Concerns\ComparesRelatedModels;
 use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithDictionary;
 use Illuminate\Database\Eloquent\Relations\Concerns\SupportsDefaultModels;
 
-use function Illuminate\Support\scalar_value;
+use function Illuminate\Support\enum_value;
 
 /**
  * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
@@ -368,7 +368,7 @@ class BelongsTo extends Relation
     {
         $foreignKey = $model->{$this->foreignKey};
 
-        return scalar_value($foreignKey);
+        return enum_value($foreignKey);
     }
 
     /**

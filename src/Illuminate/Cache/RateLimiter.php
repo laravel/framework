@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Support\InteractsWithTime;
 
-use function Illuminate\Support\scalar_value;
+use function Illuminate\Support\enum_value;
 
 class RateLimiter
 {
@@ -263,6 +263,6 @@ class RateLimiter
      */
     private function resolveLimiterName($name): string
     {
-        return (string) scalar_value($name);
+        return (string) enum_value($name);
     }
 }

@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
 
-use function Illuminate\Support\scalar_value;
+use function Illuminate\Support\enum_value;
 
 trait DatabaseRule
 {
@@ -100,7 +100,7 @@ trait DatabaseRule
             return $this->whereNull($column);
         }
 
-        $value = scalar_value($value);
+        $value = enum_value($value);
 
         $this->wheres[] = compact('column', 'value');
 
@@ -120,7 +120,7 @@ trait DatabaseRule
             return $this->whereNotIn($column, $value);
         }
 
-        $value = scalar_value($value);
+        $value = enum_value($value);
 
         return $this->where($column, '!'.$value);
     }

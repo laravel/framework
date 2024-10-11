@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Support;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-use function Illuminate\Support\scalar_value;
+use function Illuminate\Support\enum_value;
 
 include_once 'Enums.php';
 
@@ -13,19 +13,19 @@ class SupportEnumValueFunctionTest extends TestCase
 {
     public function test_it_can_handle_enums_value()
     {
-        $this->assertSame('A', scalar_value(TestEnum::A));
+        $this->assertSame('A', enum_value(TestEnum::A));
 
-        $this->assertSame(1, scalar_value(TestBackedEnum::A));
-        $this->assertSame(2, scalar_value(TestBackedEnum::B));
+        $this->assertSame(1, enum_value(TestBackedEnum::A));
+        $this->assertSame(2, enum_value(TestBackedEnum::B));
 
-        $this->assertSame('A', scalar_value(TestStringBackedEnum::A));
-        $this->assertSame('B', scalar_value(TestStringBackedEnum::B));
+        $this->assertSame('A', enum_value(TestStringBackedEnum::A));
+        $this->assertSame('B', enum_value(TestStringBackedEnum::B));
     }
 
     #[DataProvider('scalarDataProvider')]
-    public function test_it_can_handle_scalar_value($given, $expected)
+    public function test_it_can_handle_enum_value($given, $expected)
     {
-        $this->assertSame($expected, scalar_value($given));
+        $this->assertSame($expected, enum_value($given));
     }
 
     public static function scalarDataProvider()

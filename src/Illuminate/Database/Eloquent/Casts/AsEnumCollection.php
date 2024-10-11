@@ -7,7 +7,7 @@ use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Support\Collection;
 
-use function Illuminate\Support\scalar_value;
+use function Illuminate\Support\enum_value;
 
 class AsEnumCollection implements Castable
 {
@@ -75,7 +75,7 @@ class AsEnumCollection implements Castable
                     return $enum;
                 }
 
-                return scalar_value($enum);
+                return enum_value($enum);
             }
         };
     }

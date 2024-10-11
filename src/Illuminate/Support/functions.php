@@ -28,9 +28,9 @@ if (! function_exists('Illuminate\Support\defer')) {
     }
 }
 
-if (! function_exists('Illuminate\Support\scalar_value')) {
+if (! function_exists('Illuminate\Support\enum_value')) {
     /**
-     * Mutate enumerations or scalar value.
+     * Return a scalar value for the given value that might be an enum.
      *
      * @internal
      *
@@ -41,7 +41,7 @@ if (! function_exists('Illuminate\Support\scalar_value')) {
      * @param  TDefault|callable(TValue): TDefault  $default
      * @return ($value is empty ? TDefault : mixed)
      */
-    function scalar_value($value, $default = null)
+    function enum_value($value, $default = null)
     {
         if (is_string($value) && empty($value)) {
             return $value;
