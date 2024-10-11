@@ -585,13 +585,17 @@ trait EnumeratesValues
     /**
      * Filter items by the given key value pair.
      *
-     * @param  callable|string  $key
+     * @param  callable|array|string  $key
      * @param  mixed  $operator
      * @param  mixed  $value
      * @return static
      */
     public function where($key, $operator = null, $value = null)
     {
+        if (Arr::accessible($key) && Arr::isAssoc($key)) {
+            return $this->whereAssocArray($key);
+        }
+
         return $this->filter($this->operatorForWhere(...func_get_args()));
     }
 
@@ -732,6 +736,23 @@ trait EnumeratesValues
 
             return $value instanceof $type;
         });
+    }
+
+    /**
+     * Filter items by the given associative array.
+     *
+     * @param  array  $array
+     * @return static
+     */
+    public function whereAssocArray($array)
+    {
+        $result = $this;
+
+        foreach ($array as $key => $value) {
+            $result = $result->where($key, '=', $value);
+        }
+
+        return $result;
     }
 
     /**
