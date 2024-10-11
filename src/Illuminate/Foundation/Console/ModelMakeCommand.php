@@ -264,6 +264,7 @@ class ModelMakeCommand extends GeneratorCommand
         } else {
             $replacements['{{ factoryCode }}'] = '//';
             $replacements["{{ factoryImport }}\n"] = '';
+            $replacements["{{ factoryImport }}\r\n"] = '';
         }
 
         return $replacements;
