@@ -169,7 +169,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
             $table->increments('id');
             $table->string('migration');
             $table->integer('batch');
-            $table->dateTime('executed_at');
+//            $table->dateTime('executed_at');
         });
     }
 
