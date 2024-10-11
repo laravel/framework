@@ -478,8 +478,8 @@ class Kernel implements KernelContract
     /**
      * Add the given middleware to the middleware priority list relative to other middleware.
      *
-     * @param  string  $middleware
      * @param  string|array  $existing
+     * @param  string  $middleware
      * @param  bool  $after
      * @return $this
      */
