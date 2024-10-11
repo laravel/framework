@@ -117,7 +117,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
      */
     public function log($file, $batch)
     {
-        $record = ['migration' => $file, 'batch' => $batch, 'executed_at' => now()];
+        $record = ['migration' => $file, 'batch' => $batch];
 
         $this->table()->insert($record);
     }
