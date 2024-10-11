@@ -26,7 +26,7 @@
         "composer-runtime-api": "^2.2",
         "brick/math": "^0.9.3|^0.10.2|^0.11|^0.12",
         "doctrine/inflector": "^2.0.5",
-        "dragonmantank/cron-expression": "^3.3.2",
+        "dragonmantank/cron-expression": "^3.4",
         "egulias/email-validator": "^3.2.1|^4.0",
         "fruitcake/php-cors": "^1.3",
         "guzzlehttp/guzzle": "^7.8.2",
