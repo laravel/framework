@@ -35,8 +35,8 @@ function test(User $user, Post $post, Comment $comment, Article $article): void
 
     assertType('Illuminate\Database\Eloquent\Collection<(int|string), User>', $user->newCollection([new User()]));
     assertType('Illuminate\Types\Model\Posts<(int|string), Illuminate\Types\Model\Post>', $post->newCollection(['foo' => new Post()]));
+    assertType('Illuminate\Types\Model\Articles<(int|string), Illuminate\Types\Model\Article>', $article->newCollection([new Article()]));
     assertType('Illuminate\Types\Model\Comments', $comment->newCollection([new Comment()]));
-    assertType('Illuminate\Types\Model\Articles', $article->newCollection([new Article()]));
 
     assertType('bool', $user->restore());
     assertType('User', $user->restoreOrCreate());
