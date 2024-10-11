@@ -54,14 +54,14 @@ class DatabaseMigrationRepositoryTest extends TestCase
 
     public function testLogMethodInsertsRecordIntoMigrationTable()
     {
-//        Carbon::setTestNow(now());
+        Carbon::setTestNow(now());
 
         $repo = $this->getRepository();
         $query = m::mock(stdClass::class);
         $connectionMock = m::mock(Connection::class);
         $repo->getConnectionResolver()->shouldReceive('connection')->with(null)->andReturn($connectionMock);
         $repo->getConnection()->shouldReceive('table')->once()->with('migrations')->andReturn($query);
-        $query->shouldReceive('insert')->once()->with(['migration' => 'bar', 'batch' => 1]);
+        $query->shouldReceive('insert')->once()->with(['migration' => 'bar', 'batch' => 1, 'created_at' => now()]);
         $query->shouldReceive('useWritePdo')->once()->andReturn($query);
 
         $repo->log('bar', 1);
