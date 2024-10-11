@@ -42,6 +42,8 @@ use ReflectionNamedType;
 use RuntimeException;
 use ValueError;
 
+use function Illuminate\Support\enum_value;
+
 trait HasAttributes
 {
     /**
@@ -1253,9 +1255,7 @@ trait HasAttributes
             throw new ValueError(sprintf('Value [%s] is not of the expected enum type [%s].', var_export($value, true), $expectedEnum));
         }
 
-        return $value instanceof BackedEnum
-                ? $value->value
-                : $value->name;
+        return enum_value($value);
     }
 
     /**
