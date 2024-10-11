@@ -31,8 +31,12 @@ trait HasCollection
     public function resolveCollectionAttribute()
     {
         $reflectionClass = new ReflectionClass(static::class);
-        $attribute = $reflectionClass->getAttributes(CollectedBy::class)[0];
+        $attributes = $reflectionClass->getAttributes(CollectedBy::class);
 
-        return $attribute ? $attribute->getArguments()[0] : null;
+        if (! isset($attributes[0]) || ! isset($attributes[0]->getArguments()[0])) {
+            return;
+        }
+
+        return $attributes[0]->getArguments()[0];
     }
 }
