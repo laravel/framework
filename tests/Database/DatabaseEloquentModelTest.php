@@ -15,6 +15,7 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
+use Illuminate\Database\Eloquent\Attributes\CollectedBy;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\ArrayObject;
@@ -3169,6 +3170,14 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertSame('123 Main Street', $model->address_line_one);
         $this->assertSame('Anytown', $model->address_line_two);
     }
+
+    public function testCollectedByAttribute()
+    {
+        $model = new EloquentModelWithCollectedByAttribute;
+        $collection = $model->newCollection([$model]);
+
+        $this->assertInstanceOf(CustomEloquentCollection::class, $collection);
+    }
 }
 
 class EloquentTestObserverStub
@@ -3928,3 +3937,10 @@ class EloquentModelWithMutators extends Model
         $this->attributes['address_line_two'] = $addressLineTwo;
     }
 }
+
+#[CollectedBy(CustomEloquentCollection::class)]
+class EloquentModelWithCollectedByAttribute extends Model
+{
+}
+
+class CustomEloquentCollection extends Collection {}

@@ -2,6 +2,9 @@
 
 namespace Illuminate\Database\Eloquent;
 
+use Illuminate\Database\Eloquent\Attributes\CollectedBy;
+use ReflectionClass;
+
 /**
  * @template TCollection of \Illuminate\Database\Eloquent\Collection
  */
@@ -15,6 +18,21 @@ trait HasCollection
      */
     public function newCollection(array $models = [])
     {
-        return new static::$collectionClass($models);
+        $collectionClass = $this->resolveCollectionAttribute() ?? static::$collectionClass;
+
+        return new $collectionClass($models);
+    }
+
+    /**
+     * Resolve the collection class name from the CollectedBy attribute.
+     *
+     * @return ?class-string<TCollection>
+     */
+    public function resolveCollectionAttribute()
+    {
+        $reflectionClass = new ReflectionClass(static::class);
+        $attribute = $reflectionClass->getAttributes(CollectedBy::class)[0];
+
+        return $attribute ? $attribute->getArguments()[0] : null;
     }
 }
