@@ -739,9 +739,9 @@ trait EnumeratesValues
     }
 
     /**
-     * Filter items by the given associative array
+     * Filter items by the given associative array.
      *
-     * @param  array $array
+     * @param  array  $array
      * @return static
      */
     public function whereAssocArray($array)
