@@ -54,7 +54,7 @@ class DatabaseMigrationRepositoryTest extends TestCase
 
     public function testLogMethodInsertsRecordIntoMigrationTable()
     {
-        Carbon::setTestNow(now());
+//        Carbon::setTestNow(now());
 
         $repo = $this->getRepository();
         $query = m::mock(stdClass::class);
