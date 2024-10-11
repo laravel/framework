@@ -919,12 +919,12 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->select('*')->from('users')->whereDateBetween('created_at', ['2024-10-01', '2024-10-10']);
         $this->assertSame('select * from "users" where date("created_at") between ? and ?', $builder->toSql());
         $this->assertEquals([0 => '2024-10-01', 1 => '2024-10-10'], $builder->getBindings());
-        
+
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->whereDateBetween('created_at', [['2024-10-01', '2024-10-10', '2024-10-03']]);
         $this->assertSame('select * from "users" where date("created_at") between ? and ?', $builder->toSql());
         $this->assertEquals([0 => '2024-10-01', 1 => '2024-10-10'], $builder->getBindings());
-        
+
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->whereDateBetween('created_at', [['2024-10-01'], ['2024-10-10', '2024-10-15']]);
         $this->assertSame('select * from "users" where date("created_at") between ? and ?', $builder->toSql());
@@ -960,12 +960,12 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->select('*')->from('users')->whereTimeBetween('created_at', ['20:00:00', '21:00:00']);
         $this->assertSame('select * from "users" where time("created_at") between ? and ?', $builder->toSql());
         $this->assertEquals([0 => '20:00:00', 1 => '21:00:00'], $builder->getBindings());
-        
+
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->whereTimeBetween('created_at', [['20:00:00', '21:00:00', '22:00:00']]);
         $this->assertSame('select * from "users" where time("created_at") between ? and ?', $builder->toSql());
         $this->assertEquals([0 => '20:00:00', 1 => '21:00:00'], $builder->getBindings());
-        
+
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->whereTimeBetween('created_at', [['20:00:00'], ['21:00:00', '22:00:00']]);
         $this->assertSame('select * from "users" where time("created_at") between ? and ?', $builder->toSql());
@@ -1001,12 +1001,12 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->select('*')->from('users')->whereMonthBetween('created_at', ['1', '10']);
         $this->assertSame('select * from "users" where month("created_at") between ? and ?', $builder->toSql());
         $this->assertEquals([0 => '01', 1 => '10'], $builder->getBindings());
-        
+
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->whereMonthBetween('created_at', [['1', '10', '12']]);
         $this->assertSame('select * from "users" where month("created_at") between ? and ?', $builder->toSql());
         $this->assertEquals([0 => '01', 1 => '10'], $builder->getBindings());
-        
+
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->whereMonthBetween('created_at', [['1'], ['10', '12']]);
         $this->assertSame('select * from "users" where month("created_at") between ? and ?', $builder->toSql());
@@ -1042,12 +1042,12 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->select('*')->from('users')->whereDayBetween('created_at', ['1', '10']);
         $this->assertSame('select * from "users" where day("created_at") between ? and ?', $builder->toSql());
         $this->assertEquals([0 => '01', 1 => '10'], $builder->getBindings());
-        
+
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->whereDayBetween('created_at', [['1', '10', '12']]);
         $this->assertSame('select * from "users" where day("created_at") between ? and ?', $builder->toSql());
         $this->assertEquals([0 => '01', 1 => '10'], $builder->getBindings());
-        
+
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->whereDayBetween('created_at', [['1'], ['10', '12']]);
         $this->assertSame('select * from "users" where day("created_at") between ? and ?', $builder->toSql());
@@ -1083,12 +1083,12 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->select('*')->from('users')->whereYearBetween('created_at', ['2022', '2024']);
         $this->assertSame('select * from "users" where year("created_at") between ? and ?', $builder->toSql());
         $this->assertEquals([0 => '2022', 1 => '2024'], $builder->getBindings());
-        
+
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->whereYearBetween('created_at', [['2022', '2024', '2025']]);
         $this->assertSame('select * from "users" where year("created_at") between ? and ?', $builder->toSql());
         $this->assertEquals([0 => '2022', 1 => '2024'], $builder->getBindings());
-        
+
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->whereYearBetween('created_at', [['2022'], ['2024', '2025']]);
         $this->assertSame('select * from "users" where year("created_at") between ? and ?', $builder->toSql());
