@@ -3939,6 +3939,10 @@ class EloquentModelWithMutators extends Model
 }
 
 #[CollectedBy(CustomEloquentCollection::class)]
-class EloquentModelWithCollectedByAttribute extends Model {}
+class EloquentModelWithCollectedByAttribute extends Model
+{
+}
 
-class CustomEloquentCollection extends Collection {}
+class CustomEloquentCollection extends Collection
+{
+}
