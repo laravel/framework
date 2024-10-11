@@ -42,7 +42,7 @@ use ReflectionNamedType;
 use RuntimeException;
 use ValueError;
 
-use function Illuminate\Support\enum_value;
+use function Illuminate\Support\scalar_value;
 
 trait HasAttributes
 {
@@ -1255,7 +1255,7 @@ trait HasAttributes
             throw new ValueError(sprintf('Value [%s] is not of the expected enum type [%s].', var_export($value, true), $expectedEnum));
         }
 
-        return enum_value($value);
+        return scalar_value($value);
     }
 
     /**

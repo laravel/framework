@@ -7,7 +7,7 @@ use Illuminate\Cache\RateLimiting\Unlimited;
 use Illuminate\Container\Container;
 use Illuminate\Support\Arr;
 
-use function Illuminate\Support\enum_value;
+use function Illuminate\Support\scalar_value;
 
 class RateLimited
 {
@@ -42,7 +42,7 @@ class RateLimited
     {
         $this->limiter = Container::getInstance()->make(RateLimiter::class);
 
-        $this->limiterName = (string) enum_value($limiterName);
+        $this->limiterName = (string) scalar_value($limiterName);
     }
 
     /**

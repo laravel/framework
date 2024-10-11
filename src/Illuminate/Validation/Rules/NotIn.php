@@ -5,7 +5,7 @@ namespace Illuminate\Validation\Rules;
 use Illuminate\Contracts\Support\Arrayable;
 use Stringable;
 
-use function Illuminate\Support\enum_value;
+use function Illuminate\Support\scalar_value;
 
 class NotIn implements Stringable
 {
@@ -46,7 +46,7 @@ class NotIn implements Stringable
     public function __toString()
     {
         $values = array_map(function ($value) {
-            $value = enum_value($value);
+            $value = scalar_value($value);
 
             return '"'.str_replace('"', '""', $value).'"';
         }, $this->values);

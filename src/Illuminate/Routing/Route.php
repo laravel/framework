@@ -23,7 +23,7 @@ use Laravel\SerializableClosure\SerializableClosure;
 use LogicException;
 use Symfony\Component\Routing\Route as SymfonyRoute;
 
-use function Illuminate\Support\enum_value;
+use function Illuminate\Support\scalar_value;
 
 class Route
 {
@@ -1089,7 +1089,7 @@ class Route
      */
     public function can($ability, $models = [])
     {
-        $ability = enum_value($ability);
+        $ability = scalar_value($ability);
 
         return empty($models)
                     ? $this->middleware(['can:'.$ability])

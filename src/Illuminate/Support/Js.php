@@ -70,7 +70,7 @@ class Js implements Htmlable, Stringable
             return $data->toHtml();
         }
 
-        $data = enum_value($data);
+        $data = scalar_value($data);
 
         $json = static::encode($data, $flags, $depth);
 

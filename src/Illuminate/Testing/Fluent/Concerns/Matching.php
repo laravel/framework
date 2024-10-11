@@ -7,7 +7,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
 use PHPUnit\Framework\Assert as PHPUnit;
 
-use function Illuminate\Support\enum_value;
+use function Illuminate\Support\scalar_value;
 
 trait Matching
 {
@@ -35,7 +35,7 @@ trait Matching
 
         $expected = $expected instanceof Arrayable
             ? $expected->toArray()
-            : enum_value($expected);
+            : scalar_value($expected);
 
         $this->ensureSorted($expected);
         $this->ensureSorted($actual);
@@ -73,7 +73,7 @@ trait Matching
 
         $expected = $expected instanceof Arrayable
             ? $expected->toArray()
-            : enum_value($expected);
+            : scalar_value($expected);
 
         $this->ensureSorted($expected);
         $this->ensureSorted($actual);
@@ -162,7 +162,7 @@ trait Matching
         );
 
         $missing = Collection::make($expected)
-            ->map(fn ($search) => enum_value($search))
+            ->map(fn ($search) => scalar_value($search))
             ->reject(function ($search) use ($key, $actual) {
                 if ($actual->containsStrict($key, $search)) {
                     return true;

@@ -5,7 +5,7 @@ namespace Illuminate\Validation\Rules;
 use Illuminate\Contracts\Support\Arrayable;
 use Stringable;
 
-use function Illuminate\Support\enum_value;
+use function Illuminate\Support\scalar_value;
 
 class ArrayRule implements Stringable
 {
@@ -43,7 +43,7 @@ class ArrayRule implements Stringable
         }
 
         $keys = array_map(
-            static fn ($key) => enum_value($key),
+            static fn ($key) => scalar_value($key),
             $this->keys,
         );
 

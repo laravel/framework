@@ -14,7 +14,7 @@ use SplFileObject;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use function Illuminate\Support\enum_value;
+use function Illuminate\Support\scalar_value;
 
 #[AsCommand(name: 'model:show')]
 class ShowModelCommand extends DatabaseInspectionCommand
@@ -474,7 +474,7 @@ class ShowModelCommand extends DatabaseInspectionCommand
     {
         $attributeDefault = $model->getAttributes()[$column['name']] ?? null;
 
-        return enum_value($attributeDefault, $column['default']);
+        return scalar_value($attributeDefault, $column['default']);
     }
 
     /**
