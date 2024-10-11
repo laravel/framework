@@ -263,7 +263,7 @@ class ModelMakeCommand extends GeneratorCommand
             $replacements['{{ factoryImport }}'] = 'use Illuminate\Database\Eloquent\Factories\HasFactory;';
         } else {
             $replacements['{{ factoryCode }}'] = '//';
-            $replacements['{{ factoryImport }}'.PHP_EOL] = '';
+            $replacements[PHP_EOL.'{{ factoryImport }}'] = '';
         }
 
         return $replacements;
