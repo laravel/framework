@@ -2,11 +2,11 @@
 
 namespace Illuminate\Cache;
 
-use BackedEnum;
 use Closure;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Support\InteractsWithTime;
-use UnitEnum;
+
+use function Illuminate\Support\enum_value;
 
 class RateLimiter
 {
@@ -263,10 +263,6 @@ class RateLimiter
      */
     private function resolveLimiterName($name): string
     {
-        return match (true) {
-            $name instanceof BackedEnum => $name->value,
-            $name instanceof UnitEnum => $name->name,
-            default => (string) $name,
-        };
+        return (string) enum_value($name);
     }
 }
