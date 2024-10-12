@@ -30,13 +30,15 @@ trait HasCollection
      */
     public function resolveCollectionAttribute()
     {
-        $reflectionClass = new ReflectionClass(static::class);
-        $attributes = $reflectionClass->getAttributes(CollectedBy::class);
+        return once(function () {
+            $reflectionClass = new ReflectionClass(static::class);
+            $attributes = $reflectionClass->getAttributes(CollectedBy::class);
 
-        if (! isset($attributes[0]) || ! isset($attributes[0]->getArguments()[0])) {
-            return;
-        }
+            if (! isset($attributes[0]) || ! isset($attributes[0]->getArguments()[0])) {
+                return;
+            }
 
-        return $attributes[0]->getArguments()[0];
+            return $attributes[0]->getArguments()[0];
+        });
     }
 }
