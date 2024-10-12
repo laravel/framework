@@ -1625,7 +1625,7 @@ class HttpRequestTest extends TestCase
 
         $value = $request->get('framework');
 
-        $this->assertSame(['name' => 'Laravel'], $value);
+        $this->assertSame(['name' => 'Laravel'], $request->get('framework'));
     }
 
     public function testItDoesNotGenerateJsonErrorsForEmptyContent()
