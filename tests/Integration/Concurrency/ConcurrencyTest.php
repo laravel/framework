@@ -1,7 +1,8 @@
 <?php
 
-namespace Illuminate\Tests\Integration\Console;
+namespace Illuminate\Tests\Integration\Concurrency;
 
+use Illuminate\Support\Facades\Concurrency;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 
