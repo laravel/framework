@@ -4,10 +4,12 @@ namespace Illuminate\Database\Eloquent\Relations;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithDictionary;
 use Illuminate\Database\Eloquent\Relations\Concerns\SupportsInverseRelations;
 use Illuminate\Database\UniqueConstraintViolationException;
+use RuntimeException;
 
 /**
  * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
@@ -196,6 +198,23 @@ abstract class HasOneOrMany extends Relation
         return $results->mapToDictionary(function ($result) use ($foreign) {
             return [$this->getDictionaryKey($result->{$foreign}) => $result];
         })->all();
+    }
+
+    /**
+     * @param $count
+     * @param array $state
+     * @return Factory<TRelatedModel>
+     * @throws RuntimeException
+     */
+    public function factory($count = null, array $state = []): Factory {
+
+        if (! method_exists($this->related, 'factory')) {
+            throw new RuntimeException('Related model does not support a factory');
+        }
+
+        return tap($this->related->factory($count, $state), function (Factory $factory) {
+            $factory->set($this->getForeignKeyName(), $this->getParentKey());
+        });
     }
 
     /**
