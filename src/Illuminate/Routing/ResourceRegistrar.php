@@ -617,6 +617,10 @@ class ResourceRegistrar
 
         if (isset($options['middleware'])) {
             $action['middleware'] = $options['middleware'];
+
+            if (isset($options['method_middleware'][$method])) {
+                $action['middleware'] = array_merge($action['middleware'], $options['method_middleware'][$method]);
+            }
         }
 
         if (isset($options['excluded_middleware'])) {
