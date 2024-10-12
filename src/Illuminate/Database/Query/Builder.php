@@ -29,6 +29,8 @@ use LogicException;
 use RuntimeException;
 use UnitEnum;
 
+use function Illuminate\Support\enum_value;
+
 class Builder implements BuilderContract
 {
     /** @use \Illuminate\Database\Concerns\BuildsQueries<object> */
@@ -4208,7 +4210,7 @@ class Builder implements BuilderContract
     public function castBinding($value)
     {
         if ($value instanceof UnitEnum) {
-            return $value instanceof BackedEnum ? $value->value : $value->name;
+            return enum_value($value);
         }
 
         return $value;
