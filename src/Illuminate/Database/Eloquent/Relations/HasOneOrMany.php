@@ -206,8 +206,8 @@ abstract class HasOneOrMany extends Relation
      * @return Factory<TRelatedModel>
      * @throws RuntimeException
      */
-    public function factory($count = null, array $state = []): Factory {
-
+    public function factory($count = null, array $state = [])
+    {
         if (! method_exists($this->related, 'factory')) {
             throw new RuntimeException('Related model does not support a factory');
         }
