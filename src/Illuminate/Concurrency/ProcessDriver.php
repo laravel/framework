@@ -31,14 +31,14 @@ class ProcessDriver implements Driver
         $command = Application::formatCommandString('invoke-serialized-closure');
 
         $results = $this->processFactory->pool(function (Pool $pool) use ($tasks, $command) {
-            foreach (Arr::wrap($tasks) as $task) {
-                $pool->path(base_path())->env([
+            foreach (Arr::wrap($tasks) as $key => $task) {
+                $pool->as($key)->path(base_path())->env([
                     'LARAVEL_INVOKABLE_CLOSURE' => serialize(new SerializableClosure($task)),
                 ])->command($command);
             }
         })->start()->wait();
 
-        return $results->collect()->map(function ($result) {
+        return $results->collect()->mapWithKeys(function ($result, $key) {
             $result = json_decode($result->output(), true);
 
             if (! $result['successful']) {
@@ -47,7 +47,7 @@ class ProcessDriver implements Driver
                 );
             }
 
-            return unserialize($result['result']);
+            return [$key => unserialize($result['result'])];
         })->all();
     }
 

@@ -37,4 +37,25 @@ PHP);
         $this->assertEquals(2, $first);
         $this->assertEquals(4, $second);
     }
+
+
+    public function testOutputIsMappedToArrayInput()
+    {
+        $input = [
+            'first' => fn() => 1 + 1,
+            'second' => fn() => 2 + 2,
+        ];
+
+        $processOutput = Concurrency::driver('process')->run($input);
+
+        $this->assertIsArray($processOutput);
+        $this->assertArrayHasKey('first', $processOutput);
+        $this->assertArrayHasKey('second', $processOutput);
+
+        $syncOutput = Concurrency::driver('sync')->run($input);
+
+        $this->assertIsArray($syncOutput);
+        $this->assertArrayHasKey('first', $syncOutput);
+        $this->assertArrayHasKey('second', $syncOutput);
+    }
 }
