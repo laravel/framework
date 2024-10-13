@@ -1011,15 +1011,17 @@ class Blueprint
      * Create a new unsigned big integer (8-byte) column on the table.
      *
      * @param  string  $column
+     * @param  string  $table
      * @return \Illuminate\Database\Schema\ForeignIdColumnDefinition
      */
-    public function foreignId($column)
+    public function foreignId($column, $table = null)
     {
         return $this->addColumnDefinition(new ForeignIdColumnDefinition($this, [
             'type' => 'bigInteger',
             'name' => $column,
             'autoIncrement' => false,
             'unsigned' => true,
+            'table' => $table,
         ]));
     }
 
@@ -1039,7 +1041,7 @@ class Blueprint
         $column = $column ?: $model->getForeignKey();
 
         if ($model->getKeyType() === 'int' && $model->getIncrementing()) {
-            return $this->foreignId($column);
+            return $this->foreignId($column, $model->getTable());
         }
 
         $modelTraits = class_uses_recursive($model);
@@ -1048,7 +1050,7 @@ class Blueprint
             return $this->foreignUlid($column);
         }
 
-        return $this->foreignUuid($column);
+        return $this->foreignUuid($column, $model->getTable());
     }
 
     /**
@@ -1356,11 +1358,12 @@ class Blueprint
      * @param  string  $column
      * @return \Illuminate\Database\Schema\ForeignIdColumnDefinition
      */
-    public function foreignUuid($column)
+    public function foreignUuid($column, $table = null)
     {
         return $this->addColumnDefinition(new ForeignIdColumnDefinition($this, [
             'type' => 'uuid',
             'name' => $column,
+            'table' => $table,
         ]));
     }
 
