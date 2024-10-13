@@ -26,7 +26,7 @@ trait HasCollection
     /**
      * Resolve the collection class name from the CollectedBy attribute.
      *
-     * @return ?class-string<TCollection>
+     * @return class-string<TCollection>|null
      */
     public function resolveCollectionAttribute()
     {
