@@ -5,6 +5,7 @@ namespace Illuminate\Database\Query\Grammars;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use RuntimeException;
 
 class SQLiteGrammar extends Grammar
 {
@@ -148,6 +149,34 @@ class SQLiteGrammar extends Grammar
         $value = $this->parameter($where['value']);
 
         return "strftime('{$type}', {$this->wrap($where['column'])}) {$where['operator']} cast({$value} as text)";
+    }
+
+    /**
+     * Compile a date based where between clause.
+     *
+     * @param  string  $type
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function dateBasedWhereBetween($type, Builder $query, $where)
+    {
+        $between = $where['not'] ? 'not between' : 'between';
+
+        $format = match($type) {
+            'date' => '%Y-%m-%d',
+            'year' => '%Y',
+            'month' => '%m',
+            'day' => '%d',
+            'time' => '%H:%M:%S',
+            default => throw new RuntimeException('This database engine does not support whereBetween operations using type: '.$type),
+        };
+
+        $min = $this->parameter(is_array($where['values']) ? reset($where['values']) : $where['values'][0]);
+
+        $max = $this->parameter(is_array($where['values']) ? end($where['values']) : $where['values'][1]);
+
+        return "strftime('{$format}', {$this->wrap($where['column'])}) $between cast({$min} as text) and cast({$max} as text)";
     }
 
     /**
