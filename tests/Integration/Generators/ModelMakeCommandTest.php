@@ -10,6 +10,7 @@ class ModelMakeCommandTest extends TestCase
         'app/Http/Controllers/FooController.php',
         'app/Http/Controllers/BarController.php',
         'database/factories/FooFactory.php',
+        'database/factories/Foo/BarFactory.php',
         'database/seeders/FooSeeder.php',
         'tests/Feature/Models/FooTest.php',
     ];
@@ -117,6 +118,30 @@ class ModelMakeCommandTest extends TestCase
         $this->assertFilenameNotExists('app/Http/Controllers/FooController.php');
         $this->assertFilenameExists('database/factories/FooFactory.php');
         $this->assertFilenameNotExists('database/seeders/FooSeeder.php');
+    }
+
+    public function testItCanGenerateModelFileWithFactoryOptionForDeepFolder()
+    {
+        $this->artisan('make:model', ['name' => 'Foo/Bar', '--factory' => true])
+            ->assertExitCode(0);
+
+        $this->assertFileContains([
+            'namespace App\Models\Foo;',
+            'use Illuminate\Database\Eloquent\Factories\HasFactory;',
+            'use Illuminate\Database\Eloquent\Model;',
+            'class Bar extends Model',
+            '/** @use HasFactory<\Database\Factories\Foo\BarFactory> */',
+            'use HasFactory;',
+        ], 'app/Models/Foo/Bar.php');
+
+        $this->assertFileNotContains([
+            '{{ factoryImport }}',
+            '{{ factory }}',
+        ], 'app/Models/Foo/Bar.php');
+
+        $this->assertFilenameNotExists('app/Http/Controllers/Foo/BarController.php');
+        $this->assertFilenameExists('database/factories/Foo/BarFactory.php');
+        $this->assertFilenameNotExists('database/seeders/Foo/BarSeeder.php');
     }
 
     public function testItCanGenerateModelFileWithMigrationOption()
