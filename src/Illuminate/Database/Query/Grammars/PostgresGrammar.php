@@ -146,7 +146,7 @@ class PostgresGrammar extends Grammar
         // if the type is year, month, or day, we should use the extract function for comparasion
         if (in_array($type, ['year', 'month', 'day'])) {
             return 'extract('.$type.' from '.$this->wrap($where['column']).') '.$between.' '.$min.' and '.$max;
-        } 
+        }
 
         // for date and time, we can use the column directly
         return $this->wrap($where['column']).'::'.$type.' '.$between.' '.$min.' and '.$max;

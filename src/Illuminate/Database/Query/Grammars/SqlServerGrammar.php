@@ -165,11 +165,11 @@ class SqlServerGrammar extends Grammar
 
         // if the type is date or time, we should use the casting for comparasion
         if (in_array($type, ['date', 'time'])) {
-            return 'cast('.$this->wrap($where['column']).' as '. $type .') '.$between.' '.$min.' and '.$max;
+            return 'cast('.$this->wrap($where['column']).' as '.$type.') '.$between.' '.$min.' and '.$max;
         }
 
         // for others, we can use the functions directly
-        return 'cast('.$this->wrap($where['column']).' as '.$type.') '.$between.' '.$min.' and '.$max;
+        return $type.'('.$this->wrap($where['column']).') '.$between.' '.$min.' and '.$max;
     }
 
     /**
