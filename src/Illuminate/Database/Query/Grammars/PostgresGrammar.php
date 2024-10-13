@@ -128,6 +128,31 @@ class PostgresGrammar extends Grammar
     }
 
     /**
+     * Compile a date based where clause.
+     *
+     * @param  string  $type
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function dateBasedWhereBetween($type, Builder $query, $where)
+    {
+        $between = $where['not'] ? 'not between' : 'between';
+
+        $min = $this->parameter(is_array($where['values']) ? reset($where['values']) : $where['values'][0]);
+
+        $max = $this->parameter(is_array($where['values']) ? end($where['values']) : $where['values'][1]);
+
+        // if the type is year, month, or day, we should use the extract function for comparasion
+        if (in_array($type, ['year', 'month', 'day'])) {
+            return 'extract('.$type.' from '.$this->wrap($where['column']).') '.$between.' '.$min.' and '.$max;
+        } 
+
+        // for date and time, we can use the column directly
+        return $this->wrap($where['column']).'::'. $type .' '.$between.' '.$min.' and '.$max;
+    }
+
+    /**
      * Compile a "where fulltext" clause.
      *
      * @param  \Illuminate\Database\Query\Builder  $query

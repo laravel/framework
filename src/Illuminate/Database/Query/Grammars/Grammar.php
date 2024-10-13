@@ -604,7 +604,7 @@ class Grammar extends BaseGrammar
         $min = $this->parameter(is_array($where['values']) ? reset($where['values']) : $where['values'][0]);
 
         $max = $this->parameter(is_array($where['values']) ? end($where['values']) : $where['values'][1]);
-        
+
         return $type.'('.$this->wrap($where['column']).') '.$between.' '.$min.' and '.$max;
     }
 

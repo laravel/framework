@@ -1552,7 +1552,7 @@ class Builder implements BuilderContract
 
     /**
      * Add a "where date between" statement to the query.
-     * 
+     *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
      * @param  iterable<\DateTimeInterface|string|null>  $values
      * @param  string  $boolean
@@ -1715,7 +1715,7 @@ class Builder implements BuilderContract
                 if ($value instanceof DateTimeInterface) {
                     return $value->format('d');
                 }
-    
+
                 if (! $value instanceof ExpressionContract) {
                     return sprintf('%02d', $value);
                 }
@@ -1801,7 +1801,7 @@ class Builder implements BuilderContract
                 if ($value instanceof DateTimeInterface) {
                     return $value->format('m');
                 }
-    
+
                 if (! $value instanceof ExpressionContract) {
                     return sprintf('%02d', $value);
                 }
@@ -1931,7 +1931,7 @@ class Builder implements BuilderContract
 
     /**
      * Add a date based  (year, month, day, time) where between statement to the query.
-     * 
+     *
      * @param  string  $type
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
      * @param  string  $operator
