@@ -55,7 +55,7 @@ abstract class Factory
      *
      * @var \Illuminate\Support\Collection
      */
-    protected $has;
+    public $has;
 
     /**
      * The child relationships that will be applied to the model.
@@ -330,7 +330,7 @@ abstract class Factory
      */
     protected function store(Collection $results)
     {
-        $results->each(function ($model) {
+        $results->each(function ($model, int $index) {
             if (! isset($this->connection)) {
                 $model->setConnection($model->newQueryWithoutScopes()->getConnection()->getName());
             }
@@ -343,7 +343,7 @@ abstract class Factory
                 }
             }
 
-            $this->createChildren($model);
+            $this->createChildren($model, $index);
         });
     }
 
@@ -353,10 +353,10 @@ abstract class Factory
      * @param  \Illuminate\Database\Eloquent\Model  $model
      * @return void
      */
-    protected function createChildren(Model $model)
+    protected function createChildren(Model $model, int $index)
     {
-        Model::unguarded(function () use ($model) {
-            $this->has->each(function ($has) use ($model) {
+        Model::unguarded(function () use ($model, $index) {
+            $this->has->concat($this->getSequenceHasRelations($index))->each(function ($has) use ($model) {
                 $has->recycle($this->recycle)->createFor($model);
             });
         });
@@ -448,6 +448,22 @@ abstract class Factory
         })->reduce(function ($carry, $state) use ($parent) {
             if ($state instanceof Closure) {
                 $state = $state->bindTo($this);
+            } elseif ($state instanceof Sequence) {
+                $sequence = $state($this::new());
+
+                if ($sequence instanceof Factory) {
+                    foreach ($sequence->getStates() as $s) {
+                        $carry = array_merge($carry, $s($carry, $parent));
+                    }
+
+                    if ($sequence->for->isNotEmpty()) {
+                        $carry = array_merge($carry, $sequence->parentResolvers());
+                    }
+
+                    return $carry;
+                }
+
+                return array_merge($carry, $sequence);
             }
 
             return array_merge($carry, $state($carry, $parent));
@@ -936,5 +952,34 @@ abstract class Factory
                 $relationship
             );
         }
+    }
+
+    /**
+     * Get the states of the factory.
+     *
+     * @return Collection
+     */
+    public function getStates()
+    {
+        return $this->states;
+    }
+
+    /**
+     * Get the sequence has relations for the given index.
+     *
+     * @param int $index
+     * @return Collection
+     */
+    public function getSequenceHasRelations(int $index)
+    {
+        $has = collect();
+
+        foreach ($this->getStates() as $state) {
+            if ($state instanceof Sequence) {
+                $has = $has->concat($state->has[$index % $state->count] ?? []);
+            }
+        }
+
+        return $has;
     }
 }

@@ -569,6 +569,37 @@ class DatabaseEloquentFactoryTest extends TestCase
         $assert($usersByMethod);
     }
 
+    public function test_sequence_can_access_factory()
+    {
+        [$userA, $userB] = FactoryTestUserFactory::new()
+            ->forEachSequence(
+                fn (Sequence $sequence, FactoryTestUserFactory $user) => $user->name('Jane'),
+                fn (Sequence $sequence, FactoryTestUserFactory $user) => $user->name('Thomas')->has(FactoryTestPostFactory::new(), 'posts'),
+            )
+            ->create();
+
+        $this->assertEquals('Jane', $userA->name);
+        $this->assertCount(0, $userA->posts);
+        $this->assertEquals('Thomas', $userB->name);
+        $this->assertCount(1, $userB->posts);
+    }
+
+    public function test_sequence_factory_for()
+    {
+        [$postA, $postB, $postC, $postD] = FactoryTestPostFactory::new()
+            ->sequence(
+                fn (Sequence $sequence, FactoryTestPostFactory $post) => $post->for(FactoryTestUserFactory::new()->name('John')),
+                fn (Sequence $sequence, FactoryTestPostFactory $post) => $post->for(FactoryTestUserFactory::new()->name('Jane')),
+            )
+            ->count(4)
+            ->create();
+
+        $this->assertEquals('John', $postA->user->name);
+        $this->assertEquals('Jane', $postB->user->name);
+        $this->assertEquals('John', $postC->user->name);
+        $this->assertEquals('Jane', $postD->user->name);
+    }
+
     public function test_resolve_nested_model_factories()
     {
         Factory::useNamespace('Factories\\');
@@ -852,6 +883,11 @@ class FactoryTestUserFactory extends Factory
             'options' => null,
         ];
     }
+
+    public function name(string $name): self
+    {
+        return $this->state(['name' => $name]);
+    }
 }
 
 class FactoryTestUser extends Eloquent
@@ -886,6 +922,11 @@ class FactoryTestPostFactory extends Factory
             'user_id' => FactoryTestUserFactory::new(),
             'title' => $this->faker->name(),
         ];
+    }
+
+    public function title(string $title): self
+    {
+        return $this->state(['title' => $title]);
     }
 }
 

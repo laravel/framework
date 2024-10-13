@@ -28,6 +28,13 @@ class Sequence implements Countable
     public $index = 0;
 
     /**
+     * The parent relationships that will be applied to the model.
+     *
+     * @var \Illuminate\Support\Collection
+     */
+    public $has;
+
+    /**
      * Create a new sequence instance.
      *
      * @param  mixed  ...$sequence
@@ -37,6 +44,7 @@ class Sequence implements Countable
     {
         $this->sequence = $sequence;
         $this->count = count($sequence);
+        $this->has = collect();
     }
 
     /**
@@ -52,11 +60,17 @@ class Sequence implements Countable
     /**
      * Get the next value in the sequence.
      *
+     * @param Factory $factory The factory that the sequence is invoked from
+     *
      * @return mixed
      */
-    public function __invoke()
+    public function __invoke($factory)
     {
-        return tap(value($this->sequence[$this->index % $this->count], $this), function () {
+        return tap(value($this->sequence[$this->index % $this->count], $this, $factory), function ($value) {
+            if ($value instanceof Factory) {
+                $this->has[$this->index] = $value->has;
+            }
+
             $this->index = $this->index + 1;
         });
     }
