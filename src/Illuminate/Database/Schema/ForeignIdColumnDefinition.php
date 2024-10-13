@@ -2,6 +2,8 @@
 
 namespace Illuminate\Database\Schema;
 
+use Illuminate\Support\Str;
+
 class ForeignIdColumnDefinition extends ColumnDefinition
 {
     /**
@@ -35,7 +37,11 @@ class ForeignIdColumnDefinition extends ColumnDefinition
      */
     public function constrained($table = null, $column = 'id', $indexName = null)
     {
-        return $this->references($column, $indexName)->on($table ?? $this->blueprint->getTable());
+        if(is_null($table) && is_null($this->table)) {
+            $table = $this->table;
+        }
+        
+        return $this->references($column, $indexName)->on($table ?? Str::of($this->name)->beforeLast('_'.$column)->plural());
     }
 
     /**
