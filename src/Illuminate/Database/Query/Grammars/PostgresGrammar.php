@@ -128,7 +128,7 @@ class PostgresGrammar extends Grammar
     }
 
     /**
-     * Compile a date based where clause.
+     * Compile a date based between where clause.
      *
      * @param  string  $type
      * @param  \Illuminate\Database\Query\Builder  $query

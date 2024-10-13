@@ -148,6 +148,31 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
+     * Compile a date based where between clause.
+     *
+     * @param  string  $type
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function dateBasedWhereBetween($type, Builder $query, $where)
+    {
+        $between = $where['not'] ? 'not between' : 'between';
+
+        $min = $this->parameter(is_array($where['values']) ? reset($where['values']) : $where['values'][0]);
+
+        $max = $this->parameter(is_array($where['values']) ? end($where['values']) : $where['values'][1]);
+
+        // if the type is date or time, we should use the casting for comparasion
+        if (in_array($type, ['date', 'time'])) {
+            return 'cast('.$this->wrap($where['column']).' as '. $type .') '.$between.' '.$min.' and '.$max;
+        }
+
+        // for others, we can use the functions directly
+        return $type.'('.$this->wrap($where['column']).') '.$between.' '.$min.' and '.$max;
+    }
+
+    /**
      * Compile a "where time" clause.
      *
      * @param  \Illuminate\Database\Query\Builder  $query

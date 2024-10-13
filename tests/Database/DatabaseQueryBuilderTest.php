@@ -628,6 +628,69 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => now()->format('d'), 1 => now()->addDays(62)->format('d')], $builder->getBindings());
     }
 
+    public function testWhereDateFunctionsBetweenSqlServer()
+    {
+        // test where date function
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->whereDateBetween('created_at', ['2024-11-11', '2024-11-12']);
+        $this->assertSame('select * from [users] where cast([created_at] as date) between ? and ?', $builder->toSql());
+        $this->assertEquals([0 => '2024-11-11', 1 => '2024-11-12'], $builder->getBindings());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->whereDateBetween('created_at', [now(), now()]);
+        $this->assertSame('select * from [users] where cast([created_at] as date) between ? and ?', $builder->toSql());
+        $this->assertEquals([0 => now()->format('Y-m-d'), 1 => now()->format('Y-m-d')], $builder->getBindings());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->whereDateBetween('created_at', [new Raw('NOW()'), new Raw('NOW()')]);
+        $this->assertSame('select * from [users] where cast([created_at] as date) between NOW() and NOW()', $builder->toSql());
+
+        // test where year function
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->whereYearBetween('created_at', ['2024', '2025']);
+        $this->assertSame('select * from [users] where year([created_at]) between ? and ?', $builder->toSql());
+        $this->assertEquals([0 => '2024', 1 => '2025'], $builder->getBindings());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->whereYearBetween('created_at', [now(), now()]);
+        $this->assertSame('select * from [users] where year([created_at]) between ? and ?', $builder->toSql());
+        $this->assertEquals([0 => now()->format('Y'), 1 => now()->format('Y')], $builder->getBindings());
+
+        // test where time function
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->whereTimeBetween('created_at', ['12:00:00', '15:00:00']);
+        $this->assertSame('select * from [users] where cast([created_at] as time) between ? and ?', $builder->toSql());
+        $this->assertEquals([0 => '12:00:00', 1 => '15:00:00'], $builder->getBindings());
+
+        $builder = $this->getSqlServerBuilder();
+        $timestamp = now();
+        $builder->select('*')->from('users')->whereTimeBetween('created_at', [$timestamp, $timestamp]);
+        $this->assertSame('select * from [users] where cast([created_at] as time) between ? and ?', $builder->toSql());
+        $this->assertEquals([0 => $timestamp->format('H:i:s'), 1 => $timestamp->format('H:i:s')], $builder->getBindings());
+
+        // test where month function
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->whereMonthBetween('created_at', [1, '12']);
+        $this->assertSame('select * from [users] where month([created_at]) between ? and ?', $builder->toSql());
+        $this->assertEquals([0 => '01', 1 => '12'], $builder->getBindings());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->whereMonthBetween('created_at', [now(), now()->addMonths(2)]);
+        $this->assertSame('select * from [users] where month([created_at]) between ? and ?', $builder->toSql());
+        $this->assertEquals([0 => now()->format('m'), 1 => now()->addMonths(2)->format('m')], $builder->getBindings());
+
+        // test where month function
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->whereDayBetween('created_at', [1, '30']);
+        $this->assertSame('select * from [users] where day([created_at]) between ? and ?', $builder->toSql());
+        $this->assertEquals([0 => '01', 1 => '30'], $builder->getBindings());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->whereDayBetween('created_at', [now(), now()->addDays(62)]);
+        $this->assertSame('select * from [users] where day([created_at]) between ? and ?', $builder->toSql());
+        $this->assertEquals([0 => now()->format('d'), 1 => now()->addDays(62)->format('d')], $builder->getBindings());
+    }
+
     public function testWhereDayMySql()
     {
         $builder = $this->getMySqlBuilder();
