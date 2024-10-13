@@ -149,7 +149,7 @@ class PostgresGrammar extends Grammar
         } 
 
         // for date and time, we can use the column directly
-        return $this->wrap($where['column']).'::'. $type .' '.$between.' '.$min.' and '.$max;
+        return $this->wrap($where['column']).'::'.$type.' '.$between.' '.$min.' and '.$max;
     }
 
     /**

@@ -163,7 +163,7 @@ class SQLiteGrammar extends Grammar
     {
         $between = $where['not'] ? 'not between' : 'between';
 
-        $format = match($type) {
+        $format = match ($type) {
             'date' => '%Y-%m-%d',
             'year' => '%Y',
             'month' => '%m',

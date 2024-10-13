@@ -169,7 +169,7 @@ class SqlServerGrammar extends Grammar
         }
 
         // for others, we can use the functions directly
-        return $type.'('.$this->wrap($where['column']).') '.$between.' '.$min.' and '.$max;
+        return 'cast('.$this->wrap($where['column']).' as '.$type.') '.$between.' '.$min.' and '.$max;
     }
 
     /**

@@ -2,7 +2,6 @@
 
 namespace Illuminate\Database;
 
-use Carbon\Carbon;
 use Illuminate\Contracts\Database\Query\Expression;
 use Illuminate\Support\Traits\Macroable;
 use RuntimeException;
