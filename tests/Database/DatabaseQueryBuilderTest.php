@@ -423,6 +423,85 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertSame('select * from `users` where date(`created_at`) = NOW()', $builder->toSql());
     }
 
+    public function testWhereDateFunctionsBetweenMySql()
+    {
+        // test where date function
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereDateBetween('created_at', ['2024-11-11', '2024-11-12']);
+        $this->assertSame('select * from `users` where date(`created_at`) between ? and ?', $builder->toSql());
+        $this->assertEquals([0 => '2024-11-11', 1 => '2024-11-12'], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereDateBetween('created_at', [now(), now()]);
+        $this->assertSame('select * from `users` where date(`created_at`) between ? and ?', $builder->toSql());
+        $this->assertEquals([0 => now()->format('Y-m-d'), 1 => now()->format('Y-m-d')], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereDateBetween('created_at', [new Raw('NOW()'), new Raw('NOW() + INTERVAL 1 DAY')]);
+        $this->assertSame('select * from `users` where date(`created_at`) between NOW() and NOW() + INTERVAL 1 DAY', $builder->toSql());
+
+        // test where year function
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereYearBetween('created_at', ['2024', '2025']);
+        $this->assertSame('select * from `users` where year(`created_at`) between ? and ?', $builder->toSql());
+        $this->assertEquals([0 => '2024', 1 => '2025'], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereYearBetween('created_at', [now(), now()]);
+        $this->assertSame('select * from `users` where year(`created_at`) between ? and ?', $builder->toSql());
+        $this->assertEquals([0 => now()->format('Y'), 1 => now()->format('Y')], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereYearBetween('created_at', [new Raw('YEAR(NOW())'), new Raw('YEAR(NOW() + INTERVAL 2 YEAR)')]);
+        $this->assertSame('select * from `users` where year(`created_at`) between YEAR(NOW()) and YEAR(NOW() + INTERVAL 2 YEAR)', $builder->toSql());
+
+        // test where time function
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereTimeBetween('created_at', ['12:00:00', '15:00:00']);
+        $this->assertSame('select * from `users` where time(`created_at`) between ? and ?', $builder->toSql());
+        $this->assertEquals([0 => '12:00:00', 1 => '15:00:00'], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilder();
+        $timestamp = now();
+        $builder->select('*')->from('users')->whereTimeBetween('created_at', [$timestamp, $timestamp]);
+        $this->assertSame('select * from `users` where time(`created_at`) between ? and ?', $builder->toSql());
+        $this->assertEquals([0 => $timestamp->format('H:i:s'), 1 => $timestamp->format('H:i:s')], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereTimeBetween('created_at', [new Raw('TIME(NOW())'), new Raw('TIME(NOW() + INTERVAL 2 HOUR)')]);
+        $this->assertSame('select * from `users` where time(`created_at`) between TIME(NOW()) and TIME(NOW() + INTERVAL 2 HOUR)', $builder->toSql());
+
+        // test where month function
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereMonthBetween('created_at', [1, '12']);
+        $this->assertSame('select * from `users` where month(`created_at`) between ? and ?', $builder->toSql());
+        $this->assertEquals([0 => '01', 1 => '12'], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereMonthBetween('created_at', [now(), now()->addMonths(2)]);
+        $this->assertSame('select * from `users` where month(`created_at`) between ? and ?', $builder->toSql());
+        $this->assertEquals([0 => now()->format('m'), 1 => now()->addMonths(2)->format('m')], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereMonthBetween('created_at', [new Raw('MONTH(NOW())'), new Raw('MONTH(NOW() + INTERVAL 2 MONTH)')]);
+        $this->assertSame('select * from `users` where month(`created_at`) between MONTH(NOW()) and MONTH(NOW() + INTERVAL 2 MONTH)', $builder->toSql());
+
+        // test where month function
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereDayBetween('created_at', [1, '30']);
+        $this->assertSame('select * from `users` where day(`created_at`) between ? and ?', $builder->toSql());
+        $this->assertEquals([0 => '01', 1 => '30'], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereDayBetween('created_at', [now(), now()->addDays(62)]);
+        $this->assertSame('select * from `users` where day(`created_at`) between ? and ?', $builder->toSql());
+        $this->assertEquals([0 => now()->format('d'), 1 => now()->addDays(62)->format('d')], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereDayBetween('created_at', [new Raw('DAY(NOW())'), new Raw('DAY(NOW() + INTERVAL 2 DAY)')]);
+        $this->assertSame('select * from `users` where day(`created_at`) between DAY(NOW()) and DAY(NOW() + INTERVAL 2 DAY)', $builder->toSql());
+    }
+
     public function testWhereDayMySql()
     {
         $builder = $this->getMySqlBuilder();
@@ -952,6 +1031,79 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->select('*')->from('users')->whereDateBetween('created_at', collect([now(), now()]));
         $this->assertSame('select * from "users" where date("created_at") between ? and ?', $builder->toSql());
         $this->assertEquals([0 => now()->format('Y-m-d'), 1 => now()->format('Y-m-d')], $builder->getBindings());
+    }
+
+    public function testWhereBetweenDateArguments()
+    {
+        // primitive types
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereDateBetween('created_at', ['2024-10-01', '2024-10-10']);
+        $this->assertEquals([0 => '2024-10-01', 1 => '2024-10-10'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereTimeBetween('created_at', ['20:00:00', '21:00:00']);
+        $this->assertEquals([0 => '20:00:00', 1 => '21:00:00'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereYearBetween('created_at', [2024, '2025']);
+        $this->assertEquals([0 => '2024', 1 => '2025'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereMonthBetween('created_at', ['1', 12]);
+        $this->assertEquals([0 => '01', 1 => '12'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereDayBetween('created_at', [1, '22']);
+        $this->assertEquals([0 => '01', 1 => '22'], $builder->getBindings());
+
+        // DateTimeInterface
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereDateBetween('created_at', [now(), now()->addDays(2)]);
+        $this->assertEquals([0 => now()->format('Y-m-d'), 1 => now()->addDays(2)->format('Y-m-d')], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $start = now();
+        $end = now()->addHours(3);
+        $builder->select('*')->from('users')->whereTimeBetween('created_at', [$start, $end->addHours(1)]);
+        $this->assertEquals([0 => $start->format('H:i:s'), 1 => $end->format('H:i:s')], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereYearBetween('created_at', [now(), now()->addYears(2)]);
+        $this->assertEquals([0 => now()->format('Y'), 1 => now()->addYears(2)->format('Y')], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereMonthBetween('created_at', [now(), now()->addMonths(3)]);
+        $this->assertEquals([0 => now()->format('m'), 1 => now()->addMonths(3)->format('m')], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereDayBetween('created_at', [now(), now()->addDays(3)]);
+        $this->assertEquals([0 => now()->format('d'), 1 => now()->addDays(3)->format('d')], $builder->getBindings());
+
+        // CarbonPeriod
+        $builder = $this->getBuilder();
+        $period = now()->toPeriod(now()->addDays(2));
+        $builder->select('*')->from('users')->whereDateBetween('created_at', $period);
+        $this->assertEquals([0 => $period->getStartDate()->format('Y-m-d'), 1 => $period->getEndDate()->format('Y-m-d')], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $period = now()->toPeriod(now()->addHours(2)->addSeconds(10));
+        $builder->select('*')->from('users')->whereTimeBetween('created_at', $period);
+        $this->assertEquals([0 => $period->getStartDate()->format('H:i:s'), 1 => $period->getEndDate()->format('H:i:s')], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $period = now()->toPeriod(now()->addYears(10));
+        $builder->select('*')->from('users')->whereYearBetween('created_at', $period);
+        $this->assertEquals([0 => $period->getStartDate()->format('Y'), 1 => $period->getEndDate()->format('Y')], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $period = now()->toPeriod(now()->addMonths(10));
+        $builder->select('*')->from('users')->whereMonthBetween('created_at', $period);
+        $this->assertEquals([0 => $period->getStartDate()->format('m'), 1 => $period->getEndDate()->format('m')], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $period = now()->toPeriod(now()->addDays(15));
+        $builder->select('*')->from('users')->whereDayBetween('created_at', $period);
+        $this->assertEquals([0 => $period->getStartDate()->format('d'), 1 => $period->getEndDate()->format('d')], $builder->getBindings());
     }
 
     public function testWhereTimeBetween()
