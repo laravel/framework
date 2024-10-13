@@ -2,8 +2,6 @@
 
 namespace Illuminate\Database\Schema;
 
-use Illuminate\Support\Str;
-
 class ForeignIdColumnDefinition extends ColumnDefinition
 {
     /**
