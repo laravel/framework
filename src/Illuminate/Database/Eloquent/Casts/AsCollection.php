@@ -12,37 +12,57 @@ class AsCollection implements Castable
     /**
      * Get the caster class to use when casting from / to this cast target.
      *
-     * @param  array  $arguments
-     * @return \Illuminate\Contracts\Database\Eloquent\CastsAttributes<\Illuminate\Support\Collection<array-key, mixed>, iterable>
+     * @template TCollection
+     *
+     * @param array{class-string<TCollection>,string} $arguments
+     * @return \Illuminate\Contracts\Database\Eloquent\CastsAttributes<TCollection<array-key, mixed>, iterable>
      */
     public static function castUsing(array $arguments)
     {
         return new class($arguments) implements CastsAttributes
         {
-            public function __construct(protected array $arguments)
+            /**
+             * @var class-string<TCollection>
+             */
+            protected string $collectionClass;
+            protected bool $forceInstance;
+
+            public function __construct(array $arguments)
             {
+                $this->collectionClass = $arguments[0] ?? Collection::class;
+                $this->forceInstance = ($arguments[1] ?? '') === 'force';
+
+                if (! is_a($this->collectionClass, Collection::class, true)) {
+                    throw new InvalidArgumentException('The provided class must extend ['.Collection::class.'].');
+                }
             }
 
             public function get($model, $key, $value, $attributes)
             {
                 if (! isset($attributes[$key])) {
-                    return;
+                    return $this->defaultValue();
                 }
 
                 $data = Json::decode($attributes[$key]);
 
-                $collectionClass = $this->arguments[0] ?? Collection::class;
-
-                if (! is_a($collectionClass, Collection::class, true)) {
-                    throw new InvalidArgumentException('The provided class must extend ['.Collection::class.'].');
+                if (! is_array($data)) {
+                    return $this->defaultValue();
                 }
 
-                return is_array($data) ? new $collectionClass($data) : null;
+                return new $this->collectionClass($data);
             }
 
             public function set($model, $key, $value, $attributes)
             {
                 return [$key => Json::encode($value)];
+            }
+
+            /**
+             * @return TCollection|null
+             */
+            protected function defaultValue(): ?Collection
+            {
+                return $this->forceInstance ? new $this->collectionClass : null;
             }
         };
     }
@@ -50,11 +70,27 @@ class AsCollection implements Castable
     /**
      * Specify the collection for the cast.
      *
-     * @param  class-string  $class
+     * @param  class-string<Collection>  $class
+     * @param  bool $force
      * @return string
      */
-    public static function using($class)
+    public static function using(string $class = Collection::class, bool $force = false): string
     {
+        if ($force) {
+            return static::class.':'.$class.',force';
+        }
+
         return static::class.':'.$class;
+    }
+
+    /**
+     * Always get a collection instance.
+     *
+     * @param  class-string<Collection>  $class
+     * @return string
+     */
+    public static function force(string $class = Collection::class): string
+    {
+        return static::class.':'.$class.',force';
     }
 }

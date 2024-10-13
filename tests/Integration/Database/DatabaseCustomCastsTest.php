@@ -2,14 +2,17 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
+use Illuminate\Database\Eloquent\Casts\ArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsCollection;
 use Illuminate\Database\Eloquent\Casts\AsStringable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use Illuminate\Support\Stringable;
 
 class DatabaseCustomCastsTest extends DatabaseTestCase
 {
@@ -28,9 +31,12 @@ class DatabaseCustomCastsTest extends DatabaseTestCase
         Schema::create('test_eloquent_model_with_custom_casts_nullables', function (Blueprint $table) {
             $table->increments('id');
             $table->text('array_object')->nullable();
+            $table->text('array_object_forced')->nullable();
             $table->json('array_object_json')->nullable();
             $table->text('collection')->nullable();
+            $table->text('collection_forced')->nullable();
             $table->string('stringable')->nullable();
+            $table->string('stringable_forced')->nullable();
             $table->timestamps();
         });
     }
@@ -110,18 +116,24 @@ class DatabaseCustomCastsTest extends DatabaseTestCase
         $model = new TestEloquentModelWithCustomCastsNullable();
 
         $model->array_object = null;
+        $model->array_object_forced = null;
         $model->array_object_json = null;
         $model->collection = collect();
+        $model->collection_forced = null;
         $model->stringable = null;
+        $model->stringable_forced = null;
 
         $model->save();
 
         $model = $model->fresh();
 
         $this->assertEmpty($model->array_object);
+        $this->assertInstanceOf(ArrayObject::class, $model->array_object_forced);
         $this->assertEmpty($model->array_object_json);
         $this->assertEmpty($model->collection);
+        $this->assertInstanceOf(Collection::class, $model->collection);
         $this->assertSame('', (string) $model->stringable);
+        $this->assertInstanceOf(Stringable::class, $model->stringable_forced);
 
         $model->array_object = ['name' => 'John'];
         $model->array_object['name'] = 'Taylor';
@@ -185,15 +197,16 @@ class TestEloquentModelWithCustomCastsNullable extends Model
      */
     protected $guarded = [];
 
-    /**
-     * The attributes that should be cast to native types.
-     *
-     * @var array
-     */
-    protected $casts = [
-        'array_object' => AsArrayObject::class,
-        'array_object_json' => AsArrayObject::class,
-        'collection' => AsCollection::class,
-        'stringable' => AsStringable::class,
-    ];
+    protected function casts()
+    {
+        return [
+            'array_object' => AsArrayObject::class,
+            'array_object_forced' => AsArrayObject::force(),
+            'array_object_json' => AsArrayObject::class,
+            'collection' => AsCollection::class,
+            'collection_forced' => AsCollection::force(),
+            'stringable' => AsStringable::class,
+            'stringable_forced' => AsStringable::force(),
+        ];
+    }
 }

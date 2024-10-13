@@ -16,15 +16,28 @@ class AsEncryptedArrayObject implements Castable
      */
     public static function castUsing(array $arguments)
     {
-        return new class implements CastsAttributes
+        return new class($arguments) implements CastsAttributes
         {
+            protected bool $forceInstance;
+
+            public function __construct(array $arguments)
+            {
+                $this->forceInstance = ($arguments[0] ?? '') === 'force';
+            }
+
             public function get($model, $key, $value, $attributes)
             {
-                if (isset($attributes[$key])) {
-                    return new ArrayObject(Json::decode(Crypt::decryptString($attributes[$key])));
+                if (! isset($attributes[$key])) {
+                    return $this->defaultValue();
                 }
 
-                return null;
+                $data = Json::decode(Crypt::decryptString($attributes[$key]));
+
+                if (! is_array($data)) {
+                    return $this->defaultValue();
+                }
+
+                return new ArrayObject($data);
             }
 
             public function set($model, $key, $value, $attributes)
@@ -40,6 +53,19 @@ class AsEncryptedArrayObject implements Castable
             {
                 return ! is_null($value) ? $value->getArrayCopy() : null;
             }
+
+            protected function defaultValue(): ?ArrayObject
+            {
+                return $this->forceInstance ? new ArrayObject : null;
+            }
         };
+    }
+
+    /**
+     * Always get a ArrayObject instance.
+     */
+    public static function force(): string
+    {
+        return static::class.':force';
     }
 }

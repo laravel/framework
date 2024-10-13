@@ -14,7 +14,7 @@ class AsEnumArrayObject implements Castable
      *
      * @template TEnum
      *
-     * @param  array{class-string<TEnum>}  $arguments
+     * @param  array{class-string<TEnum>,string}  $arguments
      * @return \Illuminate\Contracts\Database\Eloquent\CastsAttributes<\Illuminate\Database\Eloquent\Casts\ArrayObject<array-key, TEnum>, iterable<TEnum>>
      */
     public static function castUsing(array $arguments)
@@ -27,19 +27,19 @@ class AsEnumArrayObject implements Castable
             public function __construct(array $arguments)
             {
                 $this->enumClass = $arguments[0];
-                $this->forceInstance = $arguments[1] ?? false;
+                $this->forceInstance = ($arguments[1] ?? '') === 'force';
             }
 
             public function get($model, $key, $value, $attributes)
             {
                 if (! isset($attributes[$key])) {
-                    return $this->forceInstance ? new ArrayObject : null;
+                    return $this->defaultValue();
                 }
 
                 $data = Json::decode($attributes[$key]);
 
                 if (! is_array($data)) {
-                    return $this->forceInstance ? new ArrayObject : null;
+                    return $this->defaultValue();
                 }
 
                 return new ArrayObject((new Collection($data))->map(function ($value) {
@@ -79,13 +79,18 @@ class AsEnumArrayObject implements Castable
 
                 return $enum instanceof BackedEnum ? $enum->value : $enum->name;
             }
+
+            protected function defaultValue(): ?ArrayObject
+            {
+                return $this->forceInstance ? new ArrayObject : null;
+            }
         };
     }
 
     /**
      * Specify the Enum for the cast.
      *
-     * @param  class-string  $class
+     * @param  class-string<\UnitEnum>  $class
      * @param  bool  $force
      * @return string
      */
@@ -96,5 +101,16 @@ class AsEnumArrayObject implements Castable
         }
 
         return static::class.':'.$class;
+    }
+
+    /**
+     * Always get an ArrayObject instance.
+     *
+     * @param class-string<\UnitEnum> $class
+     * @return string
+     */
+    public static function force(string $class): string
+    {
+        return static::class.':'.$class.',force';
     }
 }

@@ -27,19 +27,19 @@ class AsEnumCollection implements Castable
             public function __construct(array $arguments)
             {
                 $this->enumClass = $arguments[0];
-                $this->forceInstance = $arguments[1] ?? false;
+                $this->forceInstance = ($arguments[1] ?? '') === 'force';
             }
 
             public function get($model, $key, $value, $attributes)
             {
                 if (! isset($attributes[$key])) {
-                    return $this->forceInstance ? new Collection : null;
+                    return $this->defaultValue();
                 }
 
                 $data = Json::decode($attributes[$key]);
 
                 if (! is_array($data)) {
-                    return $this->forceInstance ? new Collection : null;
+                    return $this->defaultValue();
                 }
 
                 return (new Collection($data))->map(function ($value) {
@@ -75,13 +75,18 @@ class AsEnumCollection implements Castable
 
                 return $enum instanceof BackedEnum ? $enum->value : $enum->name;
             }
+
+            protected function defaultValue(): ?Collection
+            {
+                return $this->forceInstance ? new Collection : null;
+            }
         };
     }
 
     /**
      * Specify the Enum for the cast.
      *
-     * @param  class-string  $class
+     * @param  class-string<\UnitEnum>  $class
      * @param  bool  $force
      * @return string
      */
@@ -92,5 +97,16 @@ class AsEnumCollection implements Castable
         }
 
         return static::class.':'.$class;
+    }
+
+    /**
+     * Always get a collection instance.
+     *
+     * @param class-string<\UnitEnum> $class
+     * @return string
+     */
+    public static function force(string $class): string
+    {
+        return static::class.':'.$class.',force';
     }
 }
