@@ -252,7 +252,9 @@ class ModelMakeCommand extends GeneratorCommand
         $replacements = [];
 
         if ($this->option('factory')) {
-            $factoryNamespace = '\\Database\\Factories\\'.Str::studly($this->argument('name')).'Factory';
+            $modelPath = str($this->argument('name'))->studly()->replace('/', '\\')->toString();
+
+            $factoryNamespace = '\\Database\\Factories\\'.$modelPath.'Factory';
 
             $factoryCode = <<<EOT
             /** @use HasFactory<$factoryNamespace> */
