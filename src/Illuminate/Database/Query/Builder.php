@@ -144,7 +144,7 @@ class Builder implements BuilderContract
     /**
      * The orderings for the query.
      *
-     * @var array
+     * @var array|null
      */
     public $orders;
 
@@ -193,7 +193,7 @@ class Builder implements BuilderContract
     /**
      * The orderings for the union query.
      *
-     * @var array
+     * @var array|null
      */
     public $unionOrders;
 
@@ -768,7 +768,7 @@ class Builder implements BuilderContract
      *
      * @param  \Illuminate\Database\Query\Builder  $parentQuery
      * @param  string  $type
-     * @param  string  $table
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $table
      * @return \Illuminate\Database\Query\JoinClause
      */
     protected function newJoinClause(self $parentQuery, $type, $table)
@@ -781,7 +781,7 @@ class Builder implements BuilderContract
      *
      * @param  \Illuminate\Database\Query\Builder  $parentQuery
      * @param  string  $type
-     * @param  string  $table
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $table
      * @return \Illuminate\Database\Query\JoinLateralClause
      */
     protected function newJoinLateralClause(self $parentQuery, $type, $table)
