@@ -40,7 +40,7 @@ class ForeignIdColumnDefinition extends ColumnDefinition
         if (is_null($table) && is_null($this->table)) {
             $table = $this->table;
         }
-        
+
         return $this->references($column, $indexName)->on($table ?? Str::of($this->name)->beforeLast('_'.$column)->plural());
     }
 
