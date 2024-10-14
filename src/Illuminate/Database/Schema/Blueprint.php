@@ -99,6 +99,7 @@ class Blueprint
     /**
      * Create a new schema blueprint.
      *
+     * @param  \Illuminate\Database\Connection  $connection
      * @param  string  $table
      * @param  \Closure|null  $callback
      * @param  string  $prefix
