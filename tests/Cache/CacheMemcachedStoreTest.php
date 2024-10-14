@@ -133,7 +133,7 @@ class CacheMemcachedStoreTest extends TestCase
         $invocations = [];
         $memcache->method('delete')->willReturnCallback(function ($key) use (&$invocations) {
             $invocations[] = func_get_args();
-            
+
             return true;
         });
         $store = new MemcachedStore($memcache);
