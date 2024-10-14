@@ -36,6 +36,13 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     public $source;
 
     /**
+     * Whether the all() method should preserve the keys passed from the source.
+     * 
+     * @var bool
+     */
+    public bool $preserveKeys = true;
+
+    /**
      * Create a new lazy collection instance.
      *
      * @param  \Illuminate\Contracts\Support\Arrayable<TKey, TValue>|iterable<TKey, TValue>|(Closure(): \Generator<TKey, TValue, mixed, void>)|self<TKey, TValue>|array<TKey, TValue>|null  $source
@@ -93,17 +100,37 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     }
 
     /**
+     * Make the all() method preserve or not preserve the keys passed from the source.
+     * @param bool $preserveKeys
+     * @return $this
+     */
+    public function preserveKeys(bool $preserveKeys = true): static
+    {
+        $this->preserveKeys = $preserveKeys;
+        return $this;
+    }
+
+    /**
+     * Make the all() method not preserve the keys passed from the source.
+     * @return $this
+     */
+    public function dontPreserveKeys(): static
+    {
+        return $this->preserveKeys(false);
+    }
+    
+    /**
      * Get all items in the enumerable.
      *
      * @return array<TKey, TValue>
      */
-    public function all()
+    public function all(bool)
     {
         if (is_array($this->source)) {
             return $this->source;
         }
 
-        return iterator_to_array($this->getIterator());
+        return iterator_to_array($this->getIterator(), $this->preserveKeys);
     }
 
     /**
