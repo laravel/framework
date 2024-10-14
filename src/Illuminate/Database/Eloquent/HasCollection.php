@@ -11,6 +11,11 @@ use ReflectionClass;
 trait HasCollection
 {
     /**
+     * @var array<class-string<static>, class-string<TCollection>>
+     */
+    protected static array $resolvedCollectionClasses = [];
+
+    /**
      * Create a new Eloquent Collection instance.
      *
      * @param  array<array-key, \Illuminate\Database\Eloquent\Model>  $models
@@ -18,9 +23,9 @@ trait HasCollection
      */
     public function newCollection(array $models = [])
     {
-        $collectionClass = $this->resolveCollectionAttribute() ?? static::$collectionClass;
+        static::$resolvedCollectionClasses[static::class] ??= $this->resolveCollectionAttribute() ?? static::$collectionClass;
 
-        return new $collectionClass($models);
+        return new static::$resolvedCollectionClasses[static::class]($models);
     }
 
     /**
@@ -30,15 +35,13 @@ trait HasCollection
      */
     public function resolveCollectionAttribute()
     {
-        return once(function () {
-            $reflectionClass = new ReflectionClass(static::class);
-            $attributes = $reflectionClass->getAttributes(CollectedBy::class);
+        $reflectionClass = new ReflectionClass(static::class);
+        $attributes = $reflectionClass->getAttributes(CollectedBy::class);
 
-            if (! isset($attributes[0]) || ! isset($attributes[0]->getArguments()[0])) {
-                return;
-            }
+        if (! isset($attributes[0]) || ! isset($attributes[0]->getArguments()[0])) {
+            return;
+        }
 
-            return $attributes[0]->getArguments()[0];
-        });
+        return $attributes[0]->getArguments()[0];
     }
 }
