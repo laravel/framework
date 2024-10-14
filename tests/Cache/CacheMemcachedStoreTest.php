@@ -63,6 +63,7 @@ class CacheMemcachedStoreTest extends TestCase
         $invocations = [];
         $memcache->method('set')->willReturnCallback(function ($key, $value, $expiry) use (&$invocations) {
             $invocations[] = func_get_args();
+
             return true;
         });
 
@@ -107,6 +108,7 @@ class CacheMemcachedStoreTest extends TestCase
         $invocations = [];
         $memcache->method('set')->willReturnCallback(function ($key, $value, $expiry) use (&$invocations) {
             $invocations[] = func_get_args();
+
             return true;
         });
         $store = new MemcachedStore($memcache);
@@ -131,6 +133,7 @@ class CacheMemcachedStoreTest extends TestCase
         $invocations = [];
         $memcache->method('delete')->willReturnCallback(function ($key) use (&$invocations) {
             $invocations[] = func_get_args();
+            
             return true;
         });
         $store = new MemcachedStore($memcache);
