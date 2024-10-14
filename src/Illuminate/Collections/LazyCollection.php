@@ -124,7 +124,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
      *
      * @return array<TKey, TValue>
      */
-    public function all(bool)
+    public function all()
     {
         if (is_array($this->source)) {
             return $this->source;
