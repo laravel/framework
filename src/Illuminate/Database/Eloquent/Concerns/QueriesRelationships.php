@@ -419,6 +419,18 @@ trait QueriesRelationships
     }
 
     /**
+     * Add a basic where clause to a relationship query on a specific key or keys.
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>|string  $relation
+     * @param  mixed  $id
+     * @return $this
+     */
+    public function whereRelationKey($relation, $id)
+    {
+        return $this->whereHas($relation, fn ($query) => $query->whereKey($id));
+    }
+
+    /**
      * Add a polymorphic relationship condition to the query with a where clause.
      *
      * @param  \Illuminate\Database\Eloquent\Relations\MorphTo<*, *>|string  $relation
