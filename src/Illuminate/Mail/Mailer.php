@@ -97,7 +97,7 @@ class Mailer implements MailerContract, MailQueueContract
      * @param  \Illuminate\Contracts\Events\Dispatcher|null  $events
      * @return void
      */
-    public function __construct(string $name, Factory $views, TransportInterface $transport, Dispatcher $events = null)
+    public function __construct(string $name, Factory $views, TransportInterface $transport, ?Dispatcher $events = null)
     {
         $this->name = $name;
         $this->views = $views;
@@ -303,21 +303,18 @@ class Mailer implements MailerContract, MailQueueContract
 
         $data['mailer'] = $this->name;
 
-        // First we need to parse the view, which could either be a string or an array
-        // containing both an HTML and plain text versions of the view which should
-        // be used when sending an e-mail. We will extract both of them out here.
+        // Once we have retrieved the view content for the e-mail we will set the body
+        // of this message using the HTML type, which will provide a simple wrapper
+        // to creating view based emails that are able to receive arrays of data.
         [$view, $plain, $raw] = $this->parseView($view);
 
         $data['message'] = $message = $this->createMessage();
 
-        // Once we have retrieved the view content for the e-mail we will set the body
-        // of this message using the HTML type, which will provide a simple wrapper
-        // to creating view based emails that are able to receive arrays of data.
+        $this->addContent($message, $view, $plain, $raw, $data);
+
         if (! is_null($callback)) {
             $callback($message);
         }
-
-        $this->addContent($message, $view, $plain, $raw, $data);
 
         // If a global "to" address has been set, we will set that address on the mail
         // message. This is primarily useful during local development in which each
@@ -355,6 +352,21 @@ class Mailer implements MailerContract, MailQueueContract
         return $mailable instanceof ShouldQueue
                         ? $mailable->mailer($this->name)->queue($this->queue)
                         : $mailable->mailer($this->name)->send($this);
+    }
+
+    /**
+     * Send a new message synchronously using a view.
+     *
+     * @param  \Illuminate\Contracts\Mail\Mailable|string|array  $mailable
+     * @param  array  $data
+     * @param  \Closure|string|null  $callback
+     * @return \Illuminate\Mail\SentMessage|null
+     */
+    public function sendNow($mailable, array $data = [], $callback = null)
+    {
+        return $mailable instanceof MailableContract
+            ? $mailable->mailer($this->name)->send($this)
+            : $this->send($mailable, $data, $callback);
     }
 
     /**
@@ -396,9 +408,9 @@ class Mailer implements MailerContract, MailQueueContract
      * Add the content to a given message.
      *
      * @param  \Illuminate\Mail\Message  $message
-     * @param  string  $view
-     * @param  string  $plain
-     * @param  string  $raw
+     * @param  string|null  $view
+     * @param  string|null  $plain
+     * @param  string|null  $raw
      * @param  array  $data
      * @return void
      */
@@ -450,7 +462,7 @@ class Mailer implements MailerContract, MailQueueContract
     }
 
     /**
-     * Queue a new e-mail message for sending.
+     * Queue a new mail message for sending.
      *
      * @param  \Illuminate\Contracts\Mail\Mailable|string|array  $view
      * @param  string|null  $queue
@@ -472,7 +484,7 @@ class Mailer implements MailerContract, MailQueueContract
     }
 
     /**
-     * Queue a new e-mail message for sending on the given queue.
+     * Queue a new mail message for sending on the given queue.
      *
      * @param  string  $queue
      * @param  \Illuminate\Contracts\Mail\Mailable  $view
@@ -484,7 +496,7 @@ class Mailer implements MailerContract, MailQueueContract
     }
 
     /**
-     * Queue a new e-mail message for sending on the given queue.
+     * Queue a new mail message for sending on the given queue.
      *
      * This method didn't match rest of framework's "onQueue" phrasing. Added "onQueue".
      *
@@ -498,7 +510,7 @@ class Mailer implements MailerContract, MailQueueContract
     }
 
     /**
-     * Queue a new e-mail message for sending after (n) seconds.
+     * Queue a new mail message for sending after (n) seconds.
      *
      * @param  \DateTimeInterface|\DateInterval|int  $delay
      * @param  \Illuminate\Contracts\Mail\Mailable  $view
@@ -519,7 +531,7 @@ class Mailer implements MailerContract, MailQueueContract
     }
 
     /**
-     * Queue a new e-mail message for sending after (n) seconds on the given queue.
+     * Queue a new mail message for sending after (n) seconds on the given queue.
      *
      * @param  string  $queue
      * @param  \DateTimeInterface|\DateInterval|int  $delay
@@ -603,11 +615,9 @@ class Mailer implements MailerContract, MailQueueContract
      */
     protected function dispatchSentEvent($message, $data = [])
     {
-        if ($this->events) {
-            $this->events->dispatch(
-                new MessageSent($message, $data)
-            );
-        }
+        $this->events?->dispatch(
+            new MessageSent($message, $data)
+        );
     }
 
     /**

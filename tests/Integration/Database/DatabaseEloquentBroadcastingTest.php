@@ -18,7 +18,7 @@ use Mockery as m;
 
 class DatabaseEloquentBroadcastingTest extends DatabaseTestCase
 {
-    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
+    protected function afterRefreshingDatabase()
     {
         Schema::create('test_eloquent_broadcasting_users', function (Blueprint $table) {
             $table->increments('id');

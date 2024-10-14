@@ -19,7 +19,7 @@ trait InteractsWithRedis
     /**
      * Redis manager instance.
      *
-     * @var \Illuminate\Redis\RedisManager[]
+     * @var array<string, \Illuminate\Redis\RedisManager>
      */
     private $redis;
 

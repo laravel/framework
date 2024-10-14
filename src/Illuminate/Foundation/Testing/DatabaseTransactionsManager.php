@@ -21,7 +21,7 @@ class DatabaseTransactionsManager extends BaseManager
             return $callback();
         }
 
-        $this->transactions->last()->addCallback($callback);
+        $this->pendingTransactions->last()->addCallback($callback);
     }
 
     /**
@@ -31,7 +31,7 @@ class DatabaseTransactionsManager extends BaseManager
      */
     public function callbackApplicableTransactions()
     {
-        return $this->transactions->skip(1)->values();
+        return $this->pendingTransactions->skip(1)->values();
     }
 
     /**

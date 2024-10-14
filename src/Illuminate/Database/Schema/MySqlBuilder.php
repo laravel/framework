@@ -40,9 +40,39 @@ class MySqlBuilder extends Builder
     {
         $table = $this->connection->getTablePrefix().$table;
 
-        return count($this->connection->selectFromWriteConnection(
-            $this->grammar->compileTableExists(), [$this->connection->getDatabaseName(), $table]
-        )) > 0;
+        $database = $this->connection->getDatabaseName();
+
+        return (bool) $this->connection->scalar(
+            $this->grammar->compileTableExists($database, $table)
+        );
+    }
+
+    /**
+     * Get the tables for the database.
+     *
+     * @return array
+     */
+    public function getTables()
+    {
+        return $this->connection->getPostProcessor()->processTables(
+            $this->connection->selectFromWriteConnection(
+                $this->grammar->compileTables($this->connection->getDatabaseName())
+            )
+        );
+    }
+
+    /**
+     * Get the views for the database.
+     *
+     * @return array
+     */
+    public function getViews()
+    {
+        return $this->connection->getPostProcessor()->processViews(
+            $this->connection->selectFromWriteConnection(
+                $this->grammar->compileViews($this->connection->getDatabaseName())
+            )
+        );
     }
 
     /**
@@ -63,19 +93,47 @@ class MySqlBuilder extends Builder
     }
 
     /**
+     * Get the indexes for a given table.
+     *
+     * @param  string  $table
+     * @return array
+     */
+    public function getIndexes($table)
+    {
+        $table = $this->connection->getTablePrefix().$table;
+
+        return $this->connection->getPostProcessor()->processIndexes(
+            $this->connection->selectFromWriteConnection(
+                $this->grammar->compileIndexes($this->connection->getDatabaseName(), $table)
+            )
+        );
+    }
+
+    /**
+     * Get the foreign keys for a given table.
+     *
+     * @param  string  $table
+     * @return array
+     */
+    public function getForeignKeys($table)
+    {
+        $table = $this->connection->getTablePrefix().$table;
+
+        return $this->connection->getPostProcessor()->processForeignKeys(
+            $this->connection->selectFromWriteConnection(
+                $this->grammar->compileForeignKeys($this->connection->getDatabaseName(), $table)
+            )
+        );
+    }
+
+    /**
      * Drop all tables from the database.
      *
      * @return void
      */
     public function dropAllTables()
     {
-        $tables = [];
-
-        foreach ($this->getAllTables() as $row) {
-            $row = (array) $row;
-
-            $tables[] = reset($row);
-        }
+        $tables = array_column($this->getTables(), 'name');
 
         if (empty($tables)) {
             return;
@@ -97,13 +155,7 @@ class MySqlBuilder extends Builder
      */
     public function dropAllViews()
     {
-        $views = [];
-
-        foreach ($this->getAllViews() as $row) {
-            $row = (array) $row;
-
-            $views[] = reset($row);
-        }
+        $views = array_column($this->getViews(), 'name');
 
         if (empty($views)) {
             return;
@@ -111,30 +163,6 @@ class MySqlBuilder extends Builder
 
         $this->connection->statement(
             $this->grammar->compileDropAllViews($views)
-        );
-    }
-
-    /**
-     * Get all of the table names for the database.
-     *
-     * @return array
-     */
-    public function getAllTables()
-    {
-        return $this->connection->select(
-            $this->grammar->compileGetAllTables()
-        );
-    }
-
-    /**
-     * Get all of the view names for the database.
-     *
-     * @return array
-     */
-    public function getAllViews()
-    {
-        return $this->connection->select(
-            $this->grammar->compileGetAllViews()
         );
     }
 }

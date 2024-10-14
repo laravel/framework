@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Mail;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Notifications\Events\NotificationSent;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notifiable;
@@ -14,13 +15,18 @@ use Orchestra\Testbench\TestCase;
 
 class SentMessageMailTest extends TestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
+    use LazilyRefreshDatabase;
 
+    protected function afterRefreshingDatabase()
+    {
         Schema::create('sent_message_users', function (Blueprint $table) {
             $table->increments('id');
         });
+    }
+
+    protected function beforeRefreshingDatabase()
+    {
+        Schema::dropIfExists('sent_message_users');
     }
 
     public function testDispatchesNotificationSent()

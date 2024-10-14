@@ -17,9 +17,21 @@ class ValidationInRuleTest extends TestCase
 
         $this->assertSame('in:"Laravel","Framework","PHP"', (string) $rule);
 
+        $rule = new In(collect(['Taylor', 'Michael', 'Tim']));
+
+        $this->assertSame('in:"Taylor","Michael","Tim"', (string) $rule);
+
         $rule = new In(['Life, the Universe and Everything', 'this is a "quote"']);
 
         $this->assertSame('in:"Life, the Universe and Everything","this is a ""quote"""', (string) $rule);
+
+        $rule = Rule::in(collect([1, 2, 3, 4]));
+
+        $this->assertSame('in:"1","2","3","4"', (string) $rule);
+
+        $rule = Rule::in(collect([1, 2, 3, 4]));
+
+        $this->assertSame('in:"1","2","3","4"', (string) $rule);
 
         $rule = new In(["a,b\nc,d"]);
 
@@ -38,6 +50,10 @@ class ValidationInRuleTest extends TestCase
         $this->assertSame('in:"1","2","3","4"', (string) $rule);
 
         $rule = Rule::in('1', '2', '3', '4');
+
+        $this->assertSame('in:"1","2","3","4"', (string) $rule);
+
+        $rule = new In('1', '2', '3', '4');
 
         $this->assertSame('in:"1","2","3","4"', (string) $rule);
 

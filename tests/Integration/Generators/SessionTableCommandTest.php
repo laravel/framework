@@ -2,11 +2,13 @@
 
 namespace Illuminate\Tests\Integration\Generators;
 
+use Illuminate\Session\Console\SessionTableCommand;
+
 class SessionTableCommandTest extends TestCase
 {
     public function testCreateMakesMigration()
     {
-        $this->artisan('session:table')->assertExitCode(0);
+        $this->artisan(SessionTableCommand::class)->assertExitCode(0);
 
         $this->assertMigrationFileContains([
             'use Illuminate\Database\Migrations\Migration;',

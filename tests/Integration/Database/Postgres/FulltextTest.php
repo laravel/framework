@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Database\Postgres;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Orchestra\Testbench\Attributes\RequiresDatabase;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 
@@ -12,7 +13,7 @@ use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 #[RequiresPhpExtension('pdo_pgsql')]
 class FulltextTest extends PostgresTestCase
 {
-    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
+    protected function afterRefreshingDatabase()
     {
         Schema::create('articles', function (Blueprint $table) {
             $table->id('id');
@@ -50,6 +51,7 @@ class FulltextTest extends PostgresTestCase
         $this->assertSame('PostgreSQL vs. YourSQL', $articles[1]->title);
     }
 
+    #[RequiresDatabase('pgsql', '>=11.0')]
     public function testWhereFulltextWithWebsearch()
     {
         $articles = DB::table('articles')->whereFulltext(['title', 'body'], '+PostgreSQL -YourSQL', ['mode' => 'websearch'])->get();

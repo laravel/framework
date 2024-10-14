@@ -30,7 +30,7 @@ class FileFailedJobProvider implements CountableFailedJobProvider, FailedJobProv
     protected $lockProviderResolver;
 
     /**
-     * Create a new database failed job provider.
+     * Create a new file failed job provider.
      *
      * @param  string  $path
      * @param  int  $limit
@@ -76,6 +76,20 @@ class FileFailedJobProvider implements CountableFailedJobProvider, FailedJobProv
 
             return $id;
         });
+    }
+
+    /**
+     * Get the IDs of all of the failed jobs.
+     *
+     * @param  string|null  $queue
+     * @return array
+     */
+    public function ids($queue = null)
+    {
+        return collect($this->all())
+            ->when(! is_null($queue), fn ($collect) => $collect->where('queue', $queue))
+            ->pluck('id')
+            ->all();
     }
 
     /**

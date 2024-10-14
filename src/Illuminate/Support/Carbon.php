@@ -16,7 +16,7 @@ class Carbon extends BaseCarbon
     /**
      * {@inheritdoc}
      */
-    public static function setTestNow($testNow = null)
+    public static function setTestNow(mixed $testNow = null): void
     {
         BaseCarbon::setTestNow($testNow);
         BaseCarbonImmutable::setTestNow($testNow);
@@ -24,14 +24,13 @@ class Carbon extends BaseCarbon
 
     /**
      * Create a Carbon instance from a given ordered UUID or ULID.
-     *
-     * @param  \Ramsey\Uuid\Uuid|\Symfony\Component\Uid\Ulid|string  $id
-     * @return \Illuminate\Support\Carbon
      */
-    public static function createFromId($id)
+    public static function createFromId(Uuid|Ulid|string $id): static
     {
-        return Ulid::isValid($id)
-            ? static::createFromInterface(Ulid::fromString($id)->getDateTime())
-            : static::createFromInterface(Uuid::fromString($id)->getDateTime());
+        if (is_string($id)) {
+            $id = Ulid::isValid($id) ? Ulid::fromString($id) : Uuid::fromString($id);
+        }
+
+        return static::createFromInterface($id->getDateTime());
     }
 }

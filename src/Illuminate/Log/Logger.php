@@ -43,7 +43,7 @@ class Logger implements LoggerInterface
      * @param  \Illuminate\Contracts\Events\Dispatcher|null  $dispatcher
      * @return void
      */
-    public function __construct(LoggerInterface $logger, Dispatcher $dispatcher = null)
+    public function __construct(LoggerInterface $logger, ?Dispatcher $dispatcher = null)
     {
         $this->logger = $logger;
         $this->dispatcher = $dispatcher;
@@ -244,9 +244,7 @@ class Logger implements LoggerInterface
         // If the event dispatcher is set, we will pass along the parameters to the
         // log listeners. These are useful for building profilers or other tools
         // that aggregate all of the log messages for a given "request" cycle.
-        if (isset($this->dispatcher)) {
-            $this->dispatcher->dispatch(new MessageLogged($level, $message, $context));
-        }
+        $this->dispatcher?->dispatch(new MessageLogged($level, $message, $context));
     }
 
     /**

@@ -12,7 +12,7 @@ use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentWhereHasMorphTest extends DatabaseTestCase
 {
-    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
+    protected function afterRefreshingDatabase()
     {
         Schema::create('posts', function (Blueprint $table) {
             $table->increments('id');
@@ -27,7 +27,7 @@ class EloquentWhereHasMorphTest extends DatabaseTestCase
 
         Schema::create('comments', function (Blueprint $table) {
             $table->increments('id');
-            $table->morphs('commentable');
+            $table->nullableMorphs('commentable');
             $table->softDeletes();
         });
 
@@ -41,6 +41,8 @@ class EloquentWhereHasMorphTest extends DatabaseTestCase
         $models[] = Video::create(['title' => 'foo']);
         $models[] = Video::create(['title' => 'bar']);
         $models[] = Video::create(['title' => 'baz']);
+        $models[] = null; // deleted
+        $models[] = null; // deleted
 
         foreach ($models as $model) {
             (new Comment)->commentable()->associate($model)->save();
@@ -103,6 +105,19 @@ class EloquentWhereHasMorphTest extends DatabaseTestCase
         }
     }
 
+    public function testWhereHasMorphWithWildcardAndOnlyNullMorphTypes()
+    {
+        Comment::whereNotNull('commentable_type')->forceDelete();
+
+        $comments = Comment::query()
+            ->whereHasMorph('commentable', '*', function (Builder $query) {
+                $query->where('title', 'foo');
+            })
+            ->orderBy('id')->get();
+
+        $this->assertEmpty($comments->pluck('id')->all());
+    }
+
     public function testWhereHasMorphWithRelationConstraint()
     {
         $comments = Comment::whereHasMorph('commentableWithConstraint', Video::class, function (Builder $query) {
@@ -138,7 +153,7 @@ class EloquentWhereHasMorphTest extends DatabaseTestCase
         });
 
         Schema::table('comments', function (Blueprint $table) {
-            $table->string('commentable_id')->change();
+            $table->string('commentable_id')->nullable()->change();
         });
 
         Post::where('id', 1)->update(['slug' => 'foo']);
@@ -190,6 +205,18 @@ class EloquentWhereHasMorphTest extends DatabaseTestCase
         $this->assertEquals([1, 4], $comments->pluck('id')->all());
     }
 
+    public function testOrWhereHasMorphWithWildcardAndOnlyNullMorphTypes()
+    {
+        Comment::whereNotNull('commentable_type')->forceDelete();
+
+        $comments = Comment::where('id', 7)
+            ->orWhereHasMorph('commentable', '*', function (Builder $query) {
+                $query->where('title', 'foo');
+            })->orderBy('id')->get();
+
+        $this->assertEquals([7], $comments->pluck('id')->all());
+    }
+
     public function testWhereDoesntHaveMorph()
     {
         $comments = Comment::whereDoesntHaveMorph('commentable', Post::class, function (Builder $query) {
@@ -197,6 +224,17 @@ class EloquentWhereHasMorphTest extends DatabaseTestCase
         })->orderBy('id')->get();
 
         $this->assertEquals([2, 3], $comments->pluck('id')->all());
+    }
+
+    public function testWhereDoesntHaveMorphWithWildcardAndOnlyNullMorphTypes()
+    {
+        Comment::whereNotNull('commentable_type')->forceDelete();
+
+        $comments = Comment::whereDoesntHaveMorph('commentable', [], function (Builder $query) {
+            $query->where('title', 'foo');
+        })->orderBy('id')->get();
+
+        $this->assertEquals([7, 8], $comments->pluck('id')->all());
     }
 
     public function testOrWhereDoesntHaveMorph()

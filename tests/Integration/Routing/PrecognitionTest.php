@@ -300,7 +300,7 @@ class PrecognitionTest extends TestCase
 
     public function testClientCanSpecifyInputsToValidateWhenUsingControllerValidate()
     {
-        Route::post('test-route', [PrecognitionTestController::class, 'methodWherePredicitionValidatesViaControllerValidate'])
+        Route::post('test-route', [PrecognitionTestController::class, 'methodWherePredictionValidatesViaControllerValidate'])
             ->middleware(PrecognitionInvokingController::class);
 
         $response = $this->postJson('test-route', [
@@ -327,7 +327,7 @@ class PrecognitionTest extends TestCase
 
     public function testClientCanSpecifyInputsToValidateWhenUsingControllerValidateWithBag()
     {
-        Route::post('test-route', [PrecognitionTestController::class, 'methodWherePredicitionValidatesViaControllerValidateWithBag'])
+        Route::post('test-route', [PrecognitionTestController::class, 'methodWherePredictionValidatesViaControllerValidateWithBag'])
             ->middleware(PrecognitionInvokingController::class);
 
         $response = $this->postJson('test-route', [
@@ -431,7 +431,7 @@ class PrecognitionTest extends TestCase
 
     public function testClientCanSpecifyInputsToValidateWhenUsingControllerValidateWithPassingArrayOfRules()
     {
-        Route::post('test-route', [PrecognitionTestController::class, 'methodWherePredicitionValidatesViaControllerValidateWith'])
+        Route::post('test-route', [PrecognitionTestController::class, 'methodWherePredictionValidatesViaControllerValidateWith'])
             ->middleware(PrecognitionInvokingController::class);
 
         $response = $this->postJson('test-route', [
@@ -1131,7 +1131,7 @@ class PrecognitionTestController
         fail();
     }
 
-    public function methodWherePredicitionValidatesViaControllerValidate(Request $request)
+    public function methodWherePredictionValidatesViaControllerValidate(Request $request)
     {
         precognitive(function () use ($request) {
             $this->validate($request, [
@@ -1147,7 +1147,7 @@ class PrecognitionTestController
         fail();
     }
 
-    public function methodWherePredicitionValidatesViaControllerValidateWithBag(Request $request)
+    public function methodWherePredictionValidatesViaControllerValidateWithBag(Request $request)
     {
         precognitive(function () use ($request) {
             $this->validateWithBag('custom-bag', $request, [
@@ -1163,7 +1163,7 @@ class PrecognitionTestController
         fail();
     }
 
-    public function methodWherePredicitionValidatesViaControllerValidateWith(Request $request)
+    public function methodWherePredictionValidatesViaControllerValidateWith(Request $request)
     {
         precognitive(function () use ($request) {
             $this->validateWith([

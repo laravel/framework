@@ -12,7 +12,7 @@ class EloquentCastTest extends MySqlTestCase
 {
     protected $driver = 'mysql';
 
-    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
+    protected function afterRefreshingDatabase()
     {
         Schema::create('users', function ($table) {
             $table->increments('id');

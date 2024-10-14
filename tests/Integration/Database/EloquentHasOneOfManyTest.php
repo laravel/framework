@@ -10,7 +10,7 @@ class EloquentHasOneOfManyTest extends DatabaseTestCase
 {
     public $retrievedLogins;
 
-    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
+    protected function afterRefreshingDatabase()
     {
         Schema::create('users', function ($table) {
             $table->id();

@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Schema;
 
 class DatabaseEloquentSqlServerIntegrationTest extends SqlServerTestCase
 {
-    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
+    protected function afterRefreshingDatabase()
     {
         if (! Schema::hasTable('database_eloquent_sql_server_integration_users')) {
             Schema::create('database_eloquent_sql_server_integration_users', function (Blueprint $table) {

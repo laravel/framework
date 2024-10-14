@@ -20,7 +20,26 @@ class CookieSessionHandlerTest extends TestCase
         $this->assertEquals(0, $sessionValueCookie->getExpiresTime());
     }
 
-    protected function getEnvironmentSetUp($app)
+    public function testCookieSessionInheritsRequestSecureState()
+    {
+        Route::get('/', fn () => '')->middleware('web');
+
+        $unsecureResponse = $this->get('/');
+        $unsecureSessionIdCookie = $unsecureResponse->getCookie('laravel_session');
+        $unsecureSessionValueCookie = $unsecureResponse->getCookie($unsecureSessionIdCookie->getValue());
+
+        $this->assertFalse($unsecureSessionIdCookie->isSecure());
+        $this->assertFalse($unsecureSessionValueCookie->isSecure());
+
+        $secureResponse = $this->get('https://localhost/');
+        $secureSessionIdCookie = $secureResponse->getCookie('laravel_session');
+        $secureSessionValueCookie = $secureResponse->getCookie($secureSessionIdCookie->getValue());
+
+        $this->assertTrue($secureSessionIdCookie->isSecure());
+        $this->assertTrue($secureSessionValueCookie->isSecure());
+    }
+
+    protected function defineEnvironment($app)
     {
         $app['config']->set('app.key', Str::random(32));
         $app['config']->set('session.driver', 'cookie');

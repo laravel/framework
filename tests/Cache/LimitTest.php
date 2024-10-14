@@ -18,8 +18,16 @@ class LimitTest extends TestCase
         $this->assertSame(1, $limit->decaySeconds);
         $this->assertSame(3, $limit->maxAttempts);
 
+        $limit = Limit::perSecond(3, 5);
+        $this->assertSame(5, $limit->decaySeconds);
+        $this->assertSame(3, $limit->maxAttempts);
+
         $limit = Limit::perMinute(3);
         $this->assertSame(60, $limit->decaySeconds);
+        $this->assertSame(3, $limit->maxAttempts);
+
+        $limit = Limit::perMinute(3, 4);
+        $this->assertSame(240, $limit->decaySeconds);
         $this->assertSame(3, $limit->maxAttempts);
 
         $limit = Limit::perMinutes(2, 3);
@@ -30,8 +38,16 @@ class LimitTest extends TestCase
         $this->assertSame(3600, $limit->decaySeconds);
         $this->assertSame(3, $limit->maxAttempts);
 
+        $limit = Limit::perHour(3, 2);
+        $this->assertSame(7200, $limit->decaySeconds);
+        $this->assertSame(3, $limit->maxAttempts);
+
         $limit = Limit::perDay(3);
         $this->assertSame(86400, $limit->decaySeconds);
+        $this->assertSame(3, $limit->maxAttempts);
+
+        $limit = Limit::perDay(3, 5);
+        $this->assertSame(432000, $limit->decaySeconds);
         $this->assertSame(3, $limit->maxAttempts);
 
         $limit = new GlobalLimit(3);

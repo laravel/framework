@@ -17,7 +17,8 @@ class BladeComponentsTest extends AbstractBladeTestCase
     public function testClassComponentsAreCompiled()
     {
         $this->assertSame('<?php if (isset($component)) { $__componentOriginal2dda3d2f2f9b76bd400bf03f0b84e87f = $component; } ?>
-<?php $component = Illuminate\Tests\View\Blade\ComponentStub::class::resolve(["foo" => "bar"] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php if (isset($attributes)) { $__attributesOriginal2dda3d2f2f9b76bd400bf03f0b84e87f = $attributes; } ?>
+<?php $component = Illuminate\Tests\View\Blade\ComponentStub::class::resolve(["foo" => "bar"] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName(\'test\'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>', $this->compiler->compileString('@component(\'Illuminate\Tests\View\Blade\ComponentStub::class\', \'test\', ["foo" => "bar"])'));
@@ -35,6 +36,10 @@ class BladeComponentsTest extends AbstractBladeTestCase
         $this->compiler->newComponentHash('foo');
 
         $this->assertSame('<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal79aef92e83454121ab6e5f64077e7d8a)): ?>
+<?php $attributes = $__attributesOriginal79aef92e83454121ab6e5f64077e7d8a; ?>
+<?php unset($__attributesOriginal79aef92e83454121ab6e5f64077e7d8a); ?>
 <?php endif; ?>
 <?php if (isset($__componentOriginal79aef92e83454121ab6e5f64077e7d8a)): ?>
 <?php $component = $__componentOriginal79aef92e83454121ab6e5f64077e7d8a; ?>

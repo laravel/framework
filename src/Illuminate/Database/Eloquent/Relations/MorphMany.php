@@ -3,31 +3,39 @@
 namespace Illuminate\Database\Eloquent\Relations;
 
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
+ * @template TDeclaringModel of \Illuminate\Database\Eloquent\Model
+ *
+ * @extends \Illuminate\Database\Eloquent\Relations\MorphOneOrMany<TRelatedModel, TDeclaringModel, \Illuminate\Database\Eloquent\Collection<int, TRelatedModel>>
+ */
 class MorphMany extends MorphOneOrMany
 {
     /**
      * Convert the relationship to a "morph one" relationship.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphOne
+     * @return \Illuminate\Database\Eloquent\Relations\MorphOne<TRelatedModel, TDeclaringModel>
      */
     public function one()
     {
-        return MorphOne::noConstraints(fn () => new MorphOne(
-            $this->getQuery(),
-            $this->getParent(),
-            $this->morphType,
-            $this->foreignKey,
-            $this->localKey
+        return MorphOne::noConstraints(fn () => tap(
+            new MorphOne(
+                $this->getQuery(),
+                $this->getParent(),
+                $this->morphType,
+                $this->foreignKey,
+                $this->localKey
+            ),
+            function ($morphOne) {
+                if ($inverse = $this->getInverseRelationship()) {
+                    $morphOne->inverse($inverse);
+                }
+            }
         ));
     }
 
-    /**
-     * Get the results of the relationship.
-     *
-     * @return mixed
-     */
+    /** @inheritDoc */
     public function getResults()
     {
         return ! is_null($this->getParentKey())
@@ -35,13 +43,7 @@ class MorphMany extends MorphOneOrMany
                 : $this->related->newCollection();
     }
 
-    /**
-     * Initialize the relation on a set of models.
-     *
-     * @param  array  $models
-     * @param  string  $relation
-     * @return array
-     */
+    /** @inheritDoc */
     public function initRelation(array $models, $relation)
     {
         foreach ($models as $model) {
@@ -51,40 +53,17 @@ class MorphMany extends MorphOneOrMany
         return $models;
     }
 
-    /**
-     * Match the eagerly loaded results to their parents.
-     *
-     * @param  array  $models
-     * @param  \Illuminate\Database\Eloquent\Collection  $results
-     * @param  string  $relation
-     * @return array
-     */
+    /** @inheritDoc */
     public function match(array $models, Collection $results, $relation)
     {
         return $this->matchMany($models, $results, $relation);
     }
 
-    /**
-     * Create a new instance of the related model. Allow mass-assignment.
-     *
-     * @param  array  $attributes
-     * @return \Illuminate\Database\Eloquent\Model
-     */
+    /** @inheritDoc */
     public function forceCreate(array $attributes = [])
     {
         $attributes[$this->getMorphType()] = $this->morphClass;
 
         return parent::forceCreate($attributes);
-    }
-
-    /**
-     * Create a new instance of the related model with mass assignment without raising model events.
-     *
-     * @param  array  $attributes
-     * @return \Illuminate\Database\Eloquent\Model
-     */
-    public function forceCreateQuietly(array $attributes = [])
-    {
-        return Model::withoutEvents(fn () => $this->forceCreate($attributes));
     }
 }

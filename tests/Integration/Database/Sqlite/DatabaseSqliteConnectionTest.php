@@ -6,15 +6,15 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
+use Orchestra\Testbench\Attributes\RequiresDatabase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
+#[RequiresDatabase('sqlite')]
 class DatabaseSqliteConnectionTest extends DatabaseTestCase
 {
-    protected function getEnvironmentSetUp($app)
+    protected function defineEnvironment($app)
     {
-        if (getenv('DB_CONNECTION') !== 'testing') {
-            $this->markTestSkipped('Test requires a Sqlite connection.');
-        }
+        parent::defineEnvironment($app);
 
         $app['config']->set('database.default', 'conn1');
 
@@ -25,7 +25,7 @@ class DatabaseSqliteConnectionTest extends DatabaseTestCase
         ]);
     }
 
-    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
+    protected function afterRefreshingDatabase()
     {
         if (! Schema::hasTable('json_table')) {
             Schema::create('json_table', function (Blueprint $table) {

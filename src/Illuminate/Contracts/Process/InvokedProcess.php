@@ -58,7 +58,7 @@ interface InvokedProcess
      * Wait for the process to finish.
      *
      * @param  callable|null  $output
-     * @return \Illuminate\Console\Process\ProcessResult
+     * @return \Illuminate\Process\ProcessResult
      */
-    public function wait(callable $output = null);
+    public function wait(?callable $output = null);
 }

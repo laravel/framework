@@ -4,21 +4,12 @@ namespace Illuminate\Tests\Integration\Cache;
 
 use Exception;
 use Illuminate\Support\Facades\Cache;
+use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\TestCase;
 
+#[WithConfig('cache.default', 'file')]
 class FileCacheLockTest extends TestCase
 {
-    /**
-     * Define environment setup.
-     *
-     * @param  \Illuminate\Foundation\Application  $app
-     * @return void
-     */
-    protected function getEnvironmentSetUp($app)
-    {
-        $app['config']->set('cache.default', 'file');
-    }
-
     public function testLocksCanBeAcquiredAndReleased()
     {
         Cache::lock('foo')->forceRelease();
@@ -94,5 +85,31 @@ class FileCacheLockTest extends TestCase
         $secondLock->release();
 
         $this->assertTrue(Cache::lock('foo')->get());
+    }
+
+    public function testOwnerStatusCanBeCheckedAfterRestoringLock()
+    {
+        Cache::lock('foo')->forceRelease();
+
+        $firstLock = Cache::lock('foo', 10);
+        $this->assertTrue($firstLock->get());
+        $owner = $firstLock->owner();
+
+        $secondLock = Cache::store('file')->restoreLock('foo', $owner);
+        $this->assertTrue($secondLock->isOwnedByCurrentProcess());
+    }
+
+    public function testOtherOwnerDoesNotOwnLockAfterRestore()
+    {
+        Cache::lock('foo')->forceRelease();
+
+        $firstLock = Cache::lock('foo', 10);
+        $this->assertTrue($firstLock->isOwnedBy(null));
+        $this->assertTrue($firstLock->get());
+        $this->assertTrue($firstLock->isOwnedBy($firstLock->owner()));
+
+        $secondLock = Cache::store('file')->restoreLock('foo', 'other_owner');
+        $this->assertTrue($secondLock->isOwnedBy($firstLock->owner()));
+        $this->assertFalse($secondLock->isOwnedByCurrentProcess());
     }
 }

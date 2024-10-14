@@ -15,6 +15,7 @@ class VerifyCsrfTokenExceptTest extends TestCase
     {
         parent::setUp();
 
+        VerifyCsrfTokenExceptStub::except(['/globally/ignored']);
         $this->stub = new VerifyCsrfTokenExceptStub(app(), new Encrypter(Encrypter::generateKey('AES-128-CBC')));
         $this->request = Request::create('http://example.com/foo/bar', 'POST');
     }
@@ -24,6 +25,12 @@ class VerifyCsrfTokenExceptTest extends TestCase
         $this->assertMatchingExcept(['/foo/bar']);
         $this->assertMatchingExcept(['foo/bar']);
         $this->assertNonMatchingExcept(['/bar/foo']);
+    }
+
+    public function testPathsCanBeGloballyIgnored()
+    {
+        $this->request = Request::create('http://example.com/globally/ignored', 'POST');
+        $this->assertMatchingExcept(['globally/ignored']);
     }
 
     public function testItCanExceptWildcardPaths()

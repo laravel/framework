@@ -37,7 +37,7 @@ class Fluent implements Arrayable, ArrayAccess, Jsonable, JsonSerializable
     }
 
     /**
-     * Get an attribute from the fluent instance.
+     * Get an attribute from the fluent instance using "dot" notation.
      *
      * @template TGetDefault
      *
@@ -47,11 +47,37 @@ class Fluent implements Arrayable, ArrayAccess, Jsonable, JsonSerializable
      */
     public function get($key, $default = null)
     {
+        return data_get($this->attributes, $key, $default);
+    }
+
+    /**
+     * Get an attribute from the fluent instance.
+     *
+     * @param  string  $key
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public function value($key, $default = null)
+    {
         if (array_key_exists($key, $this->attributes)) {
             return $this->attributes[$key];
         }
 
         return value($default);
+    }
+
+    /**
+     * Get the value of the given key as a new Fluent instance.
+     *
+     * @param  string  $key
+     * @param  mixed  $default
+     * @return static
+     */
+    public function scope($key, $default = null)
+    {
+        return new static(
+            (array) $this->get($key, $default)
+        );
     }
 
     /**
@@ -72,6 +98,17 @@ class Fluent implements Arrayable, ArrayAccess, Jsonable, JsonSerializable
     public function toArray()
     {
         return $this->attributes;
+    }
+
+    /**
+     * Convert the fluent instance to a Collection.
+     *
+     * @param  string|null  $key
+     * @return \Illuminate\Support\Collection
+     */
+    public function collect($key = null)
+    {
+        return new Collection($this->get($key));
     }
 
     /**
@@ -114,7 +151,7 @@ class Fluent implements Arrayable, ArrayAccess, Jsonable, JsonSerializable
      */
     public function offsetGet($offset): mixed
     {
-        return $this->get($offset);
+        return $this->value($offset);
     }
 
     /**
@@ -162,7 +199,7 @@ class Fluent implements Arrayable, ArrayAccess, Jsonable, JsonSerializable
      */
     public function __get($key)
     {
-        return $this->get($key);
+        return $this->value($key);
     }
 
     /**

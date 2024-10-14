@@ -1,0 +1,138 @@
+name: manual release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+
+    name: Release ${{ inputs.version }}
+
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      notes: ${{ steps.cleaned-notes.outputs.notes }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Remove optional "v" prefix
+        id: version
+        run: |
+          echo "version=${VERSION#v}" >> "$GITHUB_OUTPUT"
+        env:
+          VERSION: ${{ inputs.version }}
+
+      - name: Check if branch and version match
+        id: guard
+        run: |
+          MAJOR_VERSION="${NUMERIC_VERSION%%.*}"
+          BRANCH_MAJOR_VERSION="${BRANCH%%.*}"
+
+          if [ "$MAJOR_VERSION" != "$BRANCH_MAJOR_VERSION" ]; then
+            echo "Mismatched versions! Aborting."
+            VERSION_MISMATCH='true';
+          else
+            echo "Versions match! Proceeding."
+            VERSION_MISMATCH='false';
+          fi
+
+          echo "VERSION_MISMATCH=$(echo $VERSION_MISMATCH)" >> "$GITHUB_OUTPUT";
+        env:
+          BRANCH: ${{ github.ref_name }}
+          NUMERIC_VERSION: ${{ steps.version.outputs.version }}
+
+      - name: Fail if branch and release tag do not match
+        if: ${{ steps.guard.outputs.VERSION_MISMATCH == 'true' }}
+        uses: actions/github-script@v7
+        with:
+          script: |
+              core.setFailed('Workflow failed. Release version does not match with selected target branch. Did you select the correct branch?')
+
+      - name: Update Application.php version
+        run: sed -i "s/const VERSION = '.*';/const VERSION = '${{ steps.version.outputs.version }}';/g" src/Illuminate/Foundation/Application.php
+
+      - name: Commit version change
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Update version to v${{ steps.version.outputs.version }}"
+
+      - name: SSH into splitter server
+        uses: appleboy/ssh-action@master
+        with:
+          host: 104.248.56.26
+          username: forge
+          key: ${{ secrets.SSH_PRIVATE_KEY_SPLITTER }}
+          script: |
+            cd laravel-${{ github.ref_name }}
+            git pull origin ${{ github.ref_name }}
+            bash ./bin/release.sh v${{ steps.version.outputs.version }}
+          script_stop: true
+
+      - name: Generate release notes
+        id: generated-notes
+        uses: RedCrafter07/release-notes-action@main
+        with:
+          tag-name: v${{ steps.version.outputs.version }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref_name }}
+
+      - name: Cleanup release notes
+        id: cleaned-notes
+        run: |
+          START_FROM=$(echo -n "$RELEASE_NOTES" | awk "/What's Changed/{ print NR; exit }" -)
+          DROP_FROM_CONTRIBUTORS=$(echo -n "$RELEASE_NOTES" | awk "/New Contributors/{ print NR; exit }" -)
+          DROP_FROM_FULL_CHANGELOG=$(echo -n "$RELEASE_NOTES" | awk "/Full Changelog/{ print NR; exit }" -)
+
+          # Drop everything starting from "Full Changelog"
+          if [ ! -z "$DROP_FROM_FULL_CHANGELOG" ]; then
+              RELEASE_NOTES=$(echo -n "$RELEASE_NOTES" | sed "${DROP_FROM_FULL_CHANGELOG},$ d")
+          fi
+
+          # Drop everything starting from "New Contributors"
+          if [ ! -z "$DROP_FROM_CONTRIBUTORS" ]; then
+              RELEASE_NOTES=$(echo -n "$RELEASE_NOTES" | sed "${DROP_FROM_CONTRIBUTORS},$ d")
+          fi
+
+          # Drop the line "What's Changed"
+          if [ ! -z "$START_FROM" ]; then
+              RELEASE_NOTES=$(echo -n "$RELEASE_NOTES" | sed "${START_FROM}d")
+          fi
+
+          {
+            echo 'notes<<EOF'
+            echo "$RELEASE_NOTES"
+            echo EOF
+          } >> "$GITHUB_OUTPUT";
+        env:
+          RELEASE_NOTES: ${{ steps.generated-notes.outputs.release-notes }}
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          name: v${{ steps.version.outputs.version }}
+          body: ${{ steps.cleaned-notes.outputs.notes }}
+          target_commitish: ${{ github.ref_name }}
+          make_latest: "${{ github.ref_name == github.event.repository.default_branch }}"
+
+  update-changelog:
+    needs: release
+
+    name: Update changelog
+
+    uses: laravel/.github/.github/workflows/update-changelog.yml@main
+    with:
+      branch: ${{ github.ref_name }}
+      version: "v${{ needs.release.outputs.version }}"
+      notes: ${{ needs.release.outputs.notes }}

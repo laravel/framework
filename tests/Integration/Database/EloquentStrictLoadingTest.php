@@ -19,7 +19,7 @@ class EloquentStrictLoadingTest extends DatabaseTestCase
         Model::preventLazyLoading();
     }
 
-    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
+    protected function afterRefreshingDatabase()
     {
         Schema::create('test_model1', function (Blueprint $table) {
             $table->increments('id');

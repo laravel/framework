@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Database;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Query\Grammars\Grammar;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use stdClass;
@@ -30,8 +31,7 @@ class DatabaseEloquentBelongsToManyWithDefaultAttributesTest extends TestCase
         $query = m::mock(stdClass::class);
         $query->shouldReceive('from')->once()->with('club_user')->andReturn($query);
         $query->shouldReceive('insert')->once()->with([['club_id' => 1, 'user_id' => 1, 'is_admin' => 1]])->andReturn(true);
-        $relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock(stdClass::class));
-        $mockQueryBuilder->shouldReceive('newQuery')->once()->andReturn($query);
+        $relation->getQuery()->getQuery()->shouldReceive('newQuery')->once()->andReturn($query);
 
         $relation->attach(1);
     }
@@ -55,6 +55,9 @@ class DatabaseEloquentBelongsToManyWithDefaultAttributesTest extends TestCase
         $builder->shouldReceive('join')->once()->with('club_user', 'users.id', '=', 'club_user.user_id');
         $builder->shouldReceive('where')->once()->with('club_user.club_id', '=', 1);
         $builder->shouldReceive('where')->once()->with('club_user.is_admin', '=', 1, 'and');
+
+        $builder->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock(stdClass::class));
+        $mockQueryBuilder->shouldReceive('getGrammar')->andReturn(m::mock(Grammar::class, ['isExpression' => false]));
 
         return [$builder, $parent, 'club_user', 'club_id', 'user_id', 'id', 'id', null, false];
     }

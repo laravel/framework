@@ -10,7 +10,7 @@ use RuntimeException;
 
 class EloquentModelHashedCastingTest extends DatabaseTestCase
 {
-    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
+    protected function afterRefreshingDatabase()
     {
         Schema::create('hashed_casts', function (Blueprint $table) {
             $table->increments('id');

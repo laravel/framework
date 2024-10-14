@@ -80,6 +80,20 @@ class TrustProxiesTest extends TestCase
     }
 
     /**
+     * Test the next most typical usage of TrustedProxies:
+     * Trusted X-Forwarded-For header, REMOTE_ADDR for TrustedProxies.
+     */
+    public function test_trusted_proxy_sets_trusted_proxies_with_REMOTE_ADDR()
+    {
+        $trustedProxy = $this->createTrustedProxy($this->headerAll, 'REMOTE_ADDR');
+        $request = $this->createProxiedRequest();
+
+        $trustedProxy->handle($request, function ($request) {
+            $this->assertSame('173.174.200.38', $request->getClientIp(), 'Assert trusted proxy x-forwarded-for header used with REMOTE_ADDR proxy setting');
+        });
+    }
+
+    /**
      * Test the most typical usage of TrustProxies:
      * Trusted X-Forwarded-For header.
      */

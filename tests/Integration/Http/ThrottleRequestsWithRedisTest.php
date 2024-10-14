@@ -6,23 +6,14 @@ use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Routing\Middleware\ThrottleRequestsWithRedis;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Route;
+use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\TestCase;
 use Throwable;
 
+#[WithConfig('hashing.driver', 'bcrypt')]
 class ThrottleRequestsWithRedisTest extends TestCase
 {
     use InteractsWithRedis;
-
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-        Carbon::setTestNow(null);
-    }
-
-    public function getEnvironmentSetUp($app)
-    {
-        $app['config']->set('hashing', ['driver' => 'bcrypt']);
-    }
 
     public function testLockOpensImmediatelyAfterDecay()
     {

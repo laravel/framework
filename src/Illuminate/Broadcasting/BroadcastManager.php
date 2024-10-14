@@ -64,7 +64,7 @@ class BroadcastManager implements FactoryContract
      * @param  array|null  $attributes
      * @return void
      */
-    public function routes(array $attributes = null)
+    public function routes(?array $attributes = null)
     {
         if ($this->app instanceof CachesRoutes && $this->app->routesAreCached()) {
             return;
@@ -86,7 +86,7 @@ class BroadcastManager implements FactoryContract
      * @param  array|null  $attributes
      * @return void
      */
-    public function userRoutes(array $attributes = null)
+    public function userRoutes(?array $attributes = null)
     {
         if ($this->app instanceof CachesRoutes && $this->app->routesAreCached()) {
             return;
@@ -110,7 +110,7 @@ class BroadcastManager implements FactoryContract
      * @param  array|null  $attributes
      * @return void
      */
-    public function channelRoutes(array $attributes = null)
+    public function channelRoutes(?array $attributes = null)
     {
         $this->routes($attributes);
     }
@@ -130,6 +130,30 @@ class BroadcastManager implements FactoryContract
         $request = $request ?: $this->app['request'];
 
         return $request->header('X-Socket-ID');
+    }
+
+    /**
+     * Begin sending an anonymous broadcast to the given channels.
+     */
+    public function on(Channel|string|array $channels): AnonymousEvent
+    {
+        return new AnonymousEvent($channels);
+    }
+
+    /**
+     * Begin sending an anonymous broadcast to the given private channels.
+     */
+    public function private(string $channel): AnonymousEvent
+    {
+        return $this->on(new PrivateChannel($channel));
+    }
+
+    /**
+     * Begin sending an anonymous broadcast to the given presence channels.
+     */
+    public function presence(string $channel): AnonymousEvent
+    {
+        return $this->on(new PresenceChannel($channel));
     }
 
     /**
@@ -271,6 +295,17 @@ class BroadcastManager implements FactoryContract
     protected function callCustomCreator(array $config)
     {
         return $this->customCreators[$config['driver']]($this->app, $config);
+    }
+
+    /**
+     * Create an instance of the driver.
+     *
+     * @param  array  $config
+     * @return \Illuminate\Contracts\Broadcasting\Broadcaster
+     */
+    protected function createReverbDriver(array $config)
+    {
+        return $this->createPusherDriver($config);
     }
 
     /**

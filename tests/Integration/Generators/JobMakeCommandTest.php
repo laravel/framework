@@ -16,12 +16,10 @@ class JobMakeCommandTest extends TestCase
 
         $this->assertFileContains([
             'namespace App\Jobs;',
-            'use Illuminate\Bus\Queueable;',
             'use Illuminate\Contracts\Queue\ShouldQueue;',
-            'use Illuminate\Foundation\Bus\Dispatchable;',
-            'use Illuminate\Queue\InteractsWithQueue;',
-            'use Illuminate\Queue\SerializesModels;',
+            'use Illuminate\Foundation\Queue\Queueable;',
             'class FooCreated implements ShouldQueue',
+            'use Queueable;',
         ], 'app/Jobs/FooCreated.php');
 
         $this->assertFilenameNotExists('tests/Feature/Jobs/FooCreatedTest.php');
@@ -36,10 +34,12 @@ class JobMakeCommandTest extends TestCase
             'namespace App\Jobs;',
             'use Illuminate\Foundation\Bus\Dispatchable;',
             'class FooCreated',
+            'use Dispatchable;',
         ], 'app/Jobs/FooCreated.php');
 
         $this->assertFileNotContains([
             'use Illuminate\Contracts\Queue\ShouldQueue;',
+            'use Illuminate\Foundation\Queue\Queueable;',
             'use Illuminate\Queue\InteractsWithQueue;',
             'use Illuminate\Queue\SerializesModels;',
         ], 'app/Jobs/FooCreated.php');

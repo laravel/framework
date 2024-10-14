@@ -3,10 +3,13 @@
 namespace Illuminate\Testing;
 
 use Illuminate\Console\OutputStyle;
+use Illuminate\Console\PromptValidationException;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Traits\Conditionable;
+use Illuminate\Support\Traits\Macroable;
 use Mockery;
 use Mockery\Exception\NoMatchingExpectationException;
 use PHPUnit\Framework\TestCase as PHPUnitTestCase;
@@ -14,9 +17,13 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
+use Symfony\Component\Console\Question\ChoiceQuestion;
 
 class PendingCommand
 {
+    use Conditionable;
+    use Macroable;
+
     /**
      * The test being run.
      *
@@ -129,13 +136,35 @@ class PendingCommand
     }
 
     /**
-     * Specify output that should be printed when the command runs.
+     * Specify an expected search question with an expected search string, followed by an expected choice question with expected answers.
      *
-     * @param  string  $output
+     * @param  string  $question
+     * @param  string|array  $answer
+     * @param  string  $search
+     * @param  array  $answers
      * @return $this
      */
-    public function expectsOutput($output)
+    public function expectsSearch($question, $answer, $search, $answers)
     {
+        return $this
+            ->expectsQuestion($question, $search)
+            ->expectsChoice($question, $answer, $answers);
+    }
+
+    /**
+     * Specify output that should be printed when the command runs.
+     *
+     * @param  string|null  $output
+     * @return $this
+     */
+    public function expectsOutput($output = null)
+    {
+        if ($output === null) {
+            $this->test->expectsOutput = true;
+
+            return $this;
+        }
+
         $this->test->expectedOutput[] = $output;
 
         return $this;
@@ -144,11 +173,17 @@ class PendingCommand
     /**
      * Specify output that should never be printed when the command runs.
      *
-     * @param  string  $output
+     * @param  string|null  $output
      * @return $this
      */
-    public function doesntExpectOutput($output)
+    public function doesntExpectOutput($output = null)
     {
+        if ($output === null) {
+            $this->test->expectsOutput = false;
+
+            return $this;
+        }
+
         $this->test->unexpectedOutput[$output] = false;
 
         return $this;
@@ -300,6 +335,8 @@ class PendingCommand
             }
 
             throw $e;
+        } catch (PromptValidationException) {
+            $exitCode = Command::FAILURE;
         }
 
         if ($this->expectedExitCode !== null) {
@@ -377,7 +414,9 @@ class PendingCommand
                 ->ordered()
                 ->with(Mockery::on(function ($argument) use ($question) {
                     if (isset($this->test->expectedChoices[$question[0]])) {
-                        $this->test->expectedChoices[$question[0]]['actual'] = $argument->getAutocompleterValues();
+                        $this->test->expectedChoices[$question[0]]['actual'] = $argument instanceof ChoiceQuestion && ! array_is_list($this->test->expectedChoices[$question[0]]['expected'])
+                            ? $argument->getChoices()
+                            : $argument->getAutocompleterValues();
                     }
 
                     return $argument->getQuestion() == $question[0];
@@ -406,6 +445,18 @@ class PendingCommand
         $mock = Mockery::mock(BufferedOutput::class.'[doWrite]')
                 ->shouldAllowMockingProtectedMethods()
                 ->shouldIgnoreMissing();
+
+        if ($this->test->expectsOutput === false) {
+            $mock->shouldReceive('doWrite')->never();
+
+            return $mock;
+        }
+
+        if ($this->test->expectsOutput === true
+            && count($this->test->expectedOutput) === 0
+            && count($this->test->expectedOutputSubstrings) === 0) {
+            $mock->shouldReceive('doWrite')->atLeast()->once();
+        }
 
         foreach ($this->test->expectedOutput as $i => $output) {
             $mock->shouldReceive('doWrite')

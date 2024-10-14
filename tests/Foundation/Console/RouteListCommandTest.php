@@ -48,13 +48,16 @@ class RouteListCommandTest extends TestCase
 
         $kernel->prependToMiddlewarePriority('Middleware 5');
 
-        $laravel->singleton(Kernel::class, function () use ($kernel) {
-            return $kernel;
-        });
+        $laravel->instance(Kernel::class, $kernel);
 
         $router->get('/example', function () {
             return 'Hello World';
         })->middleware('exampleMiddleware');
+
+        $router->get('/sub-example', function () {
+            return 'Hello World';
+        })->domain('sub')
+        ->middleware('exampleMiddleware');
 
         $router->get('/example-group', function () {
             return 'Hello Group';
@@ -72,6 +75,26 @@ class RouteListCommandTest extends TestCase
         $output = $this->app->output();
 
         $this->assertStringNotContainsString('exampleMiddleware', $output);
+    }
+
+    public function testSortRouteListAsc()
+    {
+        $this->app->call('route:list', ['--json' => true, '--sort' => 'domain,uri']);
+        $output = $this->app->output();
+
+        $expectedOrder = '[{"domain":null,"method":"GET|HEAD","uri":"example","name":null,"action":"Closure","middleware":["exampleMiddleware"]},{"domain":null,"method":"GET|HEAD","uri":"example-group","name":null,"action":"Closure","middleware":["web","auth"]},{"domain":"sub","method":"GET|HEAD","uri":"sub-example","name":null,"action":"Closure","middleware":["exampleMiddleware"]}]';
+
+        $this->assertJsonStringEqualsJsonString($expectedOrder, $output);
+    }
+
+    public function testSortRouteListDesc()
+    {
+        $this->app->call('route:list', ['--json' => true, '--sort' => 'domain,uri', '--reverse' => true]);
+        $output = $this->app->output();
+
+        $expectedOrder = '[{"domain":"sub","method":"GET|HEAD","uri":"sub-example","name":null,"action":"Closure","middleware":["exampleMiddleware"]},{"domain":null,"method":"GET|HEAD","uri":"example-group","name":null,"action":"Closure","middleware":["web","auth"]},{"domain":null,"method":"GET|HEAD","uri":"example","name":null,"action":"Closure","middleware":["exampleMiddleware"]}]';
+
+        $this->assertJsonStringEqualsJsonString($expectedOrder, $output);
     }
 
     public function testMiddlewareGroupsAssignmentInCli()
@@ -143,7 +166,7 @@ class RouteListCommandTest extends TestCase
         $this->app->call('route:list', ['--json' => true, '-vv' => true]);
         $output = $this->app->output();
 
-        $expectedOrder = '[{"domain":null,"method":"GET|HEAD","uri":"example","name":null,"action":"Closure","middleware":["exampleMiddleware"]},{"domain":null,"method":"GET|HEAD","uri":"example-group","name":null,"action":"Closure","middleware":["Middleware 5","Middleware 1","Middleware 4","Middleware 2","Middleware 3"]}]';
+        $expectedOrder = '[{"domain":null,"method":"GET|HEAD","uri":"example","name":null,"action":"Closure","middleware":["exampleMiddleware"]},{"domain":null,"method":"GET|HEAD","uri":"example-group","name":null,"action":"Closure","middleware":["Middleware 5","Middleware 1","Middleware 4","Middleware 2","Middleware 3"]},{"domain":"sub","method":"GET|HEAD","uri":"sub-example","name":null,"action":"Closure","middleware":["exampleMiddleware"]}]';
 
         $this->assertJsonStringEqualsJsonString($expectedOrder, $output);
     }

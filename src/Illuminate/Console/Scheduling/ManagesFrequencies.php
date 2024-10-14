@@ -234,7 +234,7 @@ trait ManagesFrequencies
      */
     public function everyThirtyMinutes()
     {
-        return $this->spliceIntoPosition(1, '0,30');
+        return $this->spliceIntoPosition(1, '*/30');
     }
 
     /**
@@ -583,7 +583,7 @@ trait ManagesFrequencies
      * Schedule the event to run quarterly on a given day and time.
      *
      * @param  int  $dayOfQuarter
-     * @param  int  $time
+     * @param  string  $time
      * @return $this
      */
     public function quarterlyOn($dayOfQuarter = 1, $time = '0:0')

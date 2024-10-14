@@ -10,12 +10,24 @@ use RuntimeException;
 
 class EncrypterTest extends TestCase
 {
-    public function testEncryption()
+    public function testEncryption(): void
     {
         $e = new Encrypter(str_repeat('a', 16));
         $encrypted = $e->encrypt('foo');
         $this->assertNotSame('foo', $encrypted);
         $this->assertSame('foo', $e->decrypt($encrypted));
+
+        $encrypted = $e->encrypt('');
+        $this->assertSame('', $e->decrypt($encrypted));
+
+        $longString = str_repeat('a', 1000);
+        $encrypted = $e->encrypt($longString);
+        $this->assertSame($longString, $e->decrypt($encrypted));
+
+        $data = ['foo' => 'bar', 'baz' => 'qux'];
+        $encryptedArray = $e->encrypt($data);
+        $this->assertNotSame($data, $encryptedArray);
+        $this->assertSame($data, $e->decrypt($encryptedArray));
     }
 
     public function testRawStringEncryption()
@@ -24,6 +36,30 @@ class EncrypterTest extends TestCase
         $encrypted = $e->encryptString('foo');
         $this->assertNotSame('foo', $encrypted);
         $this->assertSame('foo', $e->decryptString($encrypted));
+    }
+
+    public function testRawStringEncryptionWithPreviousKeys()
+    {
+        $previous = new Encrypter(str_repeat('b', 16));
+        $previousValue = $previous->encryptString('foo');
+
+        $new = new Encrypter(str_repeat('a', 16));
+        $new->previousKeys([str_repeat('b', 16)]);
+
+        $decrypted = $new->decryptString($previousValue);
+        $this->assertSame('foo', $decrypted);
+    }
+
+    public function testItValidatesMacOnPerKeyBasis()
+    {
+        // Payload created with (key: str_repeat('b', 16)) but will
+        // "successfully" decrypt with (key: str_repeat('a', 16)), however it
+        // outputs a random binary string as it is not the correct key.
+        $encrypted = 'eyJpdiI6Ilg0dFM5TVRibEFqZW54c3lQdWJoVVE9PSIsInZhbHVlIjoiRGJpa2p2ZHI3eUs0dUtRakJneUhUUT09IiwibWFjIjoiMjBjZWYxODdhNThhOTk4MTk1NTc0YTE1MDgzODU1OWE0ZmQ4MDc5ZjMxYThkOGM1ZmM1MzlmYzBkYTBjMWI1ZiIsInRhZyI6IiJ9';
+
+        $new = new Encrypter(str_repeat('a', 16));
+        $new->previousKeys([str_repeat('b', 16)]);
+        $this->assertSame('foo', $new->decryptString($encrypted));
     }
 
     public function testEncryptionUsingBase64EncodedKey()

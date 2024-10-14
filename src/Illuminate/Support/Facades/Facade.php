@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Js;
+use Illuminate\Support\Number;
 use Illuminate\Support\Str;
 use Illuminate\Support\Testing\Fakes\Fake;
 use Mockery;
@@ -17,7 +18,7 @@ abstract class Facade
     /**
      * The application instance being facaded.
      *
-     * @var \Illuminate\Contracts\Foundation\Application
+     * @var \Illuminate\Contracts\Foundation\Application|null
      */
     protected static $app;
 
@@ -189,7 +190,7 @@ abstract class Facade
      *
      * @return bool
      */
-    protected static function isFake()
+    public static function isFake()
     {
         $name = static::getFacadeAccessor();
 
@@ -277,7 +278,9 @@ abstract class Facade
             'Broadcast' => Broadcast::class,
             'Bus' => Bus::class,
             'Cache' => Cache::class,
+            'Concurrency' => Concurrency::class,
             'Config' => Config::class,
+            'Context' => Context::class,
             'Cookie' => Cookie::class,
             'Crypt' => Crypt::class,
             'Date' => Date::class,
@@ -293,6 +296,7 @@ abstract class Facade
             'Log' => Log::class,
             'Mail' => Mail::class,
             'Notification' => Notification::class,
+            'Number' => Number::class,
             'Password' => Password::class,
             'Process' => Process::class,
             'Queue' => Queue::class,
@@ -301,6 +305,7 @@ abstract class Facade
             'Request' => Request::class,
             'Response' => Response::class,
             'Route' => Route::class,
+            'Schedule' => Schedule::class,
             'Schema' => Schema::class,
             'Session' => Session::class,
             'Storage' => Storage::class,
@@ -315,7 +320,7 @@ abstract class Facade
     /**
      * Get the application instance behind the facade.
      *
-     * @return \Illuminate\Contracts\Foundation\Application
+     * @return \Illuminate\Contracts\Foundation\Application|null
      */
     public static function getFacadeApplication()
     {
@@ -325,7 +330,7 @@ abstract class Facade
     /**
      * Set the application instance.
      *
-     * @param  \Illuminate\Contracts\Foundation\Application  $app
+     * @param  \Illuminate\Contracts\Foundation\Application|null  $app
      * @return void
      */
     public static function setFacadeApplication($app)

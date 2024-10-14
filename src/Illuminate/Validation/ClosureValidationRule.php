@@ -64,7 +64,7 @@ class ClosureValidationRule implements RuleContract, ValidatorAwareRule
             $this->failed = true;
 
             return $this->pendingPotentiallyTranslatedString($attribute, $message);
-        });
+        }, $this->validator);
 
         return ! $this->failed;
     }
@@ -72,7 +72,7 @@ class ClosureValidationRule implements RuleContract, ValidatorAwareRule
     /**
      * Get the validation error messages.
      *
-     * @return string
+     * @return array
      */
     public function message()
     {

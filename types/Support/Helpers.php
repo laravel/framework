@@ -2,58 +2,77 @@
 
 use function PHPStan\Testing\assertType;
 
+/** @var bool|float|int|string|null $value */
+if (filled($value)) {
+    assertType('bool|float|int|non-empty-string', $value);
+} else {
+    assertType('string|null', $value);
+}
+
+if (blank($value)) {
+    assertType('string|null', $value);
+} else {
+    assertType('bool|float|int|non-empty-string', $value);
+}
+
+assertType('User', object_get(new User(), null));
+assertType('User', object_get(new User(), ''));
+assertType('mixed', object_get(new User(), 'name'));
+
+assertType('int', once(fn () => 1));
+assertType('null', once(function () { /** @phpstan-ignore function.void (testing void) */
+}));
+
+assertType('Illuminate\Support\Optional', optional());
+assertType('null', optional(null, fn () => 1));
+assertType('int', optional('foo', function ($value) {
+    assertType('string', $value);
+
+    return 1;
+}));
+
+assertType('int', retry(5, fn () => 1));
+
+assertType('object', str());
+assertType('Illuminate\Support\Stringable', str('foo'));
+
+assertType('User', tap(new User(), function ($user) {
+    assertType('User', $user);
+}));
+assertType('Illuminate\Support\HigherOrderTapProxy', tap(new User()));
+
+function testThrowIf(float|int $foo): void
+{
+    assertType('never', throw_if(true, Exception::class));
+    assertType('bool', throw_if(false, Exception::class));
+    assertType('false', throw_if(empty($foo)));
+    throw_if(is_float($foo));
+    assertType('int', $foo);
+    throw_if($foo == false);
+    assertType('int<min, -1>|int<1, max>', $foo);
+}
+
+function testThrowUnless(float|int $foo): void
+{
+    assertType('bool', throw_unless(true, Exception::class));
+    assertType('never', throw_unless(false, Exception::class));
+    assertType('true', throw_unless(empty($foo)));
+    throw_unless(is_int($foo));
+    assertType('int', $foo);
+    throw_unless($foo == false);
+    assertType('0', $foo);
+}
+
+assertType('int', transform('filled', fn () => 1, true));
+assertType('int', transform(['filled'], fn () => 1));
+assertType('null', transform('', fn () => 1));
+assertType('bool', transform('', fn () => 1, true));
+assertType('bool', transform('', fn () => 1, fn () => true));
+
 assertType('User', with(new User()));
 assertType('bool', with(new User())->save());
-
-assertType('User', with(new User(), function (User $user) {
-    return $user;
-}));
-assertType('User', with(new User(), function (User $user): User {
-    return $user;
-}));
-
-assertType('User', with(new User(), function ($user) {
-    /** @var User $user */
-    return $user;
-}));
-assertType('User', with(new User(), function ($user): User {
-    /** @var User $user */
-    return $user;
-}));
-
 assertType('int', with(new User(), function ($user) {
     assertType('User', $user);
 
     return 10;
 }));
-assertType('int', with(new User(), function ($user): int {
-    assertType('User', $user);
-
-    return 10;
-}));
-
-assertType('mixed', with(new User(), function ($user) {
-    return $user;
-}));
-assertType('User', with(new User(), function ($user): User {
-    return $user;
-}));
-
-// falls back to default if provided
-assertType('int|null', transform(optional(), fn () => 1));
-// default as callable
-assertType('int|string', transform(optional(), fn () => 1, fn () => 'string'));
-
-// non empty values
-assertType('int', transform('filled', fn () => 1));
-assertType('int', transform(['filled'], fn () => 1));
-assertType('int', transform(new User(), fn () => 1));
-
-// "empty" values
-assertType('null', transform(null, fn () => 1));
-assertType('null', transform('', fn () => 1));
-assertType('null', transform([], fn () => 1));
-
-assertType('int|null', rescue(fn () => 123));
-assertType('int', rescue(fn () => 123, 345));
-assertType('int', rescue(fn () => 123, fn () => 345));

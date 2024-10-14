@@ -110,6 +110,29 @@ class SupportFluentTest extends TestCase
 
         $this->assertJsonStringEqualsJsonString(json_encode(['foo']), $results);
     }
+
+    public function testScope()
+    {
+        $fluent = new Fluent(['user' => ['name' => 'taylor']]);
+        $this->assertEquals(['taylor'], $fluent->scope('user.name')->toArray());
+        $this->assertEquals(['dayle'], $fluent->scope('user.age', 'dayle')->toArray());
+
+        $fluent = new Fluent(['products' => ['forge', 'vapour', 'spark']]);
+        $this->assertEquals(['forge', 'vapour', 'spark'], $fluent->scope('products')->toArray());
+        $this->assertEquals(['foo', 'bar'], $fluent->scope('missing', ['foo', 'bar'])->toArray());
+
+        $fluent = new Fluent(['authors' => ['taylor' => ['products' => ['forge', 'vapour', 'spark']]]]);
+        $this->assertEquals(['forge', 'vapour', 'spark'], $fluent->scope('authors.taylor.products')->toArray());
+    }
+
+    public function testToCollection()
+    {
+        $fluent = new Fluent(['forge', 'vapour', 'spark']);
+        $this->assertEquals(['forge', 'vapour', 'spark'], $fluent->collect()->all());
+
+        $fluent = new Fluent(['authors' => ['taylor' => ['products' => ['forge', 'vapour', 'spark']]]]);
+        $this->assertEquals(['forge', 'vapour', 'spark'], $fluent->collect('authors.taylor.products')->all());
+    }
 }
 
 class FluentArrayIteratorStub implements IteratorAggregate

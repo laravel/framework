@@ -11,7 +11,7 @@ use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentMorphEagerLoadingTest extends DatabaseTestCase
 {
-    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
+    protected function afterRefreshingDatabase()
     {
         Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
@@ -94,6 +94,21 @@ class EloquentMorphEagerLoadingTest extends DatabaseTestCase
         $this->assertInstanceOf(Video::class, $action[0]->getRelation('target'));
         $this->assertTrue($action[1]->relationLoaded('target'));
         $this->assertInstanceOf(User::class, $action[1]->getRelation('target'));
+    }
+
+    public function testMorphWithTrashedRelationLazyLoading()
+    {
+        $deletedUser = User::forceCreate(['deleted_at' => now()]);
+
+        $action = new Action;
+        $action->target()->associate($deletedUser)->save();
+
+        // model is already set via associate and not retrieved from the database
+        $this->assertInstanceOf(User::class, $action->target);
+
+        $action->unsetRelation('target');
+
+        $this->assertInstanceOf(User::class, $action->target);
     }
 }
 

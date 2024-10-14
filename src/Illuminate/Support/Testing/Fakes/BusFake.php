@@ -4,12 +4,14 @@ namespace Illuminate\Support\Testing\Fakes;
 
 use Closure;
 use Illuminate\Bus\BatchRepository;
+use Illuminate\Bus\ChainedBatch;
 use Illuminate\Bus\PendingBatch;
 use Illuminate\Contracts\Bus\QueueingDispatcher;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\ReflectsClosures;
 use PHPUnit\Framework\Assert as PHPUnit;
+use RuntimeException;
 
 class BusFake implements Fake, QueueingDispatcher
 {
@@ -86,7 +88,7 @@ class BusFake implements Fake, QueueingDispatcher
      * @param  \Illuminate\Bus\BatchRepository|null  $batchRepository
      * @return void
      */
-    public function __construct(QueueingDispatcher $dispatcher, $jobsToFake = [], BatchRepository $batchRepository = null)
+    public function __construct(QueueingDispatcher $dispatcher, $jobsToFake = [], ?BatchRepository $batchRepository = null)
     {
         $this->dispatcher = $dispatcher;
         $this->jobsToFake = Arr::wrap($jobsToFake);
@@ -184,7 +186,9 @@ class BusFake implements Fake, QueueingDispatcher
      */
     public function assertNothingDispatched()
     {
-        PHPUnit::assertEmpty($this->commands, 'Jobs were dispatched unexpectedly.');
+        $commandNames = implode("\n- ", array_keys($this->commands));
+
+        PHPUnit::assertEmpty($this->commands, "The following jobs were dispatched unexpectedly:\n\n- $commandNames\n");
     }
 
     /**
@@ -333,6 +337,12 @@ class BusFake implements Fake, QueueingDispatcher
 
         if ($command instanceof Closure) {
             [$command, $callback] = [$this->firstClosureParameterType($command), $command];
+        } elseif ($command instanceof ChainedBatchTruthTest) {
+            $instance = $command;
+
+            $command = ChainedBatch::class;
+
+            $callback = fn ($job) => $instance($job->toPendingBatch());
         } elseif (! is_string($command)) {
             $instance = $command;
 
@@ -348,9 +358,7 @@ class BusFake implements Fake, QueueingDispatcher
             "The expected [{$command}] job was not dispatched."
         );
 
-        $this->isChainOfObjects($expectedChain)
-            ? $this->assertDispatchedWithChainOfObjects($command, $expectedChain, $callback)
-            : $this->assertDispatchedWithChainOfClasses($command, $expectedChain, $callback);
+        $this->assertDispatchedWithChainOfObjects($command, $expectedChain, $callback);
     }
 
     /**
@@ -387,7 +395,7 @@ class BusFake implements Fake, QueueingDispatcher
             "The expected [{$command}] job was not dispatched."
         );
 
-        $this->assertDispatchedWithChainOfClasses($command, [], $callback);
+        $this->assertDispatchedWithChainOfObjects($command, [], $callback);
     }
 
     /**
@@ -400,48 +408,58 @@ class BusFake implements Fake, QueueingDispatcher
      */
     protected function assertDispatchedWithChainOfObjects($command, $expectedChain, $callback)
     {
-        $chain = collect($expectedChain)->map(fn ($job) => serialize($job))->all();
+        $chain = $expectedChain;
 
         PHPUnit::assertTrue(
-            $this->dispatched($command, $callback)->filter(
-                fn ($job) => $job->chained == $chain
-            )->isNotEmpty(),
+            $this->dispatched($command, $callback)->filter(function ($job) use ($chain) {
+                if (count($chain) !== count($job->chained)) {
+                    return false;
+                }
+
+                foreach ($job->chained as $index => $serializedChainedJob) {
+                    if ($chain[$index] instanceof ChainedBatchTruthTest) {
+                        $chainedBatch = unserialize($serializedChainedJob);
+
+                        if (! $chainedBatch instanceof ChainedBatch ||
+                            ! $chain[$index]($chainedBatch->toPendingBatch())) {
+                            return false;
+                        }
+                    } elseif ($chain[$index] instanceof Closure) {
+                        [$expectedType, $callback] = [$this->firstClosureParameterType($chain[$index]), $chain[$index]];
+
+                        $chainedJob = unserialize($serializedChainedJob);
+
+                        if (! $chainedJob instanceof $expectedType) {
+                            throw new RuntimeException('The chained job was expected to be of type '.$expectedType.', '.$chainedJob::class.' chained.');
+                        }
+
+                        if (! $callback($chainedJob)) {
+                            return false;
+                        }
+                    } elseif (is_string($chain[$index])) {
+                        if ($chain[$index] != get_class(unserialize($serializedChainedJob))) {
+                            return false;
+                        }
+                    } elseif (serialize($chain[$index]) != $serializedChainedJob) {
+                        return false;
+                    }
+                }
+
+                return true;
+            })->isNotEmpty(),
             'The expected chain was not dispatched.'
         );
     }
 
     /**
-     * Assert if a job was dispatched with chained jobs based on a truth-test callback.
+     * Create a new assertion about a chained batch.
      *
-     * @param  string  $command
-     * @param  array  $expectedChain
-     * @param  callable|null  $callback
-     * @return void
+     * @param  \Closure  $callback
+     * @return \Illuminate\Support\Testing\Fakes\ChainedBatchTruthTest
      */
-    protected function assertDispatchedWithChainOfClasses($command, $expectedChain, $callback)
+    public function chainedBatch(Closure $callback)
     {
-        $matching = $this->dispatched($command, $callback)->map->chained->map(function ($chain) {
-            return collect($chain)->map(
-                fn ($job) => get_class(unserialize($job))
-            );
-        })->filter(
-            fn ($chain) => $chain->all() === $expectedChain
-        );
-
-        PHPUnit::assertTrue(
-            $matching->isNotEmpty(), 'The expected chain was not dispatched.'
-        );
-    }
-
-    /**
-     * Determine if the given chain is entirely composed of objects.
-     *
-     * @param  array  $chain
-     * @return bool
-     */
-    protected function isChainOfObjects($chain)
-    {
-        return ! collect($chain)->contains(fn ($job) => ! is_object($job));
+        return new ChainedBatchTruthTest($callback);
     }
 
     /**
@@ -478,7 +496,12 @@ class BusFake implements Fake, QueueingDispatcher
      */
     public function assertNothingBatched()
     {
-        PHPUnit::assertEmpty($this->batches, 'Batched jobs were dispatched unexpectedly.');
+        $jobNames = collect($this->batches)
+            ->map(fn ($batch) => $batch->jobs->map(fn ($job) => get_class($job)))
+            ->flatten()
+            ->join("\n- ");
+
+        PHPUnit::assertEmpty($this->batches, "The following batched jobs were dispatched unexpectedly:\n\n- $jobNames\n");
     }
 
     /**
@@ -671,6 +694,7 @@ class BusFake implements Fake, QueueingDispatcher
     public function chain($jobs)
     {
         $jobs = Collection::wrap($jobs);
+        $jobs = ChainedBatch::prepareNestedBatches($jobs);
 
         return new PendingChainFake($this, $jobs->shift(), $jobs->toArray());
     }
@@ -842,5 +866,15 @@ class BusFake implements Fake, QueueingDispatcher
         $this->dispatcher->map($map);
 
         return $this;
+    }
+
+    /**
+     * Get the batches that have been dispatched.
+     *
+     * @return array
+     */
+    public function dispatchedBatches()
+    {
+        return $this->batches;
     }
 }

@@ -29,7 +29,7 @@ class DiscoverEvents
     public static function within($listenerPath, $basePath)
     {
         $listeners = collect(static::getListenerEvents(
-            (new Finder)->files()->in($listenerPath), $basePath
+            Finder::create()->files()->in($listenerPath), $basePath
         ));
 
         $discoveredEvents = [];
@@ -100,11 +100,11 @@ class DiscoverEvents
 
         $class = trim(Str::replaceFirst($basePath, '', $file->getRealPath()), DIRECTORY_SEPARATOR);
 
-        return str_replace(
+        return ucfirst(Str::camel(str_replace(
             [DIRECTORY_SEPARATOR, ucfirst(basename(app()->path())).'\\'],
             ['\\', app()->getNamespace()],
             ucfirst(Str::replaceLast('.php', '', $class))
-        );
+        )));
     }
 
     /**

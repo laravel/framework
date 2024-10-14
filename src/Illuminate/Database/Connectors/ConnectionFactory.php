@@ -4,6 +4,7 @@ namespace Illuminate\Database\Connectors;
 
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Database\Connection;
+use Illuminate\Database\MariaDbConnection;
 use Illuminate\Database\MySqlConnection;
 use Illuminate\Database\PostgresConnection;
 use Illuminate\Database\SQLiteConnection;
@@ -187,7 +188,9 @@ class ConnectionFactory
                 }
             }
 
-            throw $e;
+            if (isset($e)) {
+                throw $e;
+            }
         };
     }
 
@@ -241,6 +244,7 @@ class ConnectionFactory
 
         return match ($config['driver']) {
             'mysql' => new MySqlConnector,
+            'mariadb' => new MariaDbConnector,
             'pgsql' => new PostgresConnector,
             'sqlite' => new SQLiteConnector,
             'sqlsrv' => new SqlServerConnector,
@@ -268,6 +272,7 @@ class ConnectionFactory
 
         return match ($driver) {
             'mysql' => new MySqlConnection($connection, $database, $prefix, $config),
+            'mariadb' => new MariaDbConnection($connection, $database, $prefix, $config),
             'pgsql' => new PostgresConnection($connection, $database, $prefix, $config),
             'sqlite' => new SQLiteConnection($connection, $database, $prefix, $config),
             'sqlsrv' => new SqlServerConnection($connection, $database, $prefix, $config),

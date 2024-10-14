@@ -11,7 +11,7 @@ use Illuminate\Support\Str;
 
 class EloquentUniqueStringPrimaryKeysTest extends DatabaseTestCase
 {
-    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
+    protected function afterRefreshingDatabase()
     {
         Schema::create('users', function (Blueprint $table) {
             $table->uuid('id')->primary();

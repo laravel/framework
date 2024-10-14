@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Config;
 
 use Illuminate\Config\Repository;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 class RepositoryTest extends TestCase
@@ -25,6 +26,8 @@ class RepositoryTest extends TestCase
             'baz' => 'bat',
             'null' => null,
             'boolean' => true,
+            'integer' => 1,
+            'float' => 1.1,
             'associate' => [
                 'x' => 'xxx',
                 'y' => 'yyy',
@@ -53,6 +56,9 @@ class RepositoryTest extends TestCase
         $this->assertNull(
             $this->repository->get('a.b.c')
         );
+
+        $this->assertNull($this->repository->get('x.y.z'));
+        $this->assertNull($this->repository->get('.'));
     }
 
     public function testGetBooleanValue()
@@ -175,10 +181,13 @@ class RepositoryTest extends TestCase
     {
         $this->assertSame('aaa', $this->repository->get('array.0'));
         $this->assertSame('zzz', $this->repository->get('array.1'));
+
         $this->repository->prepend('array', 'xxx');
         $this->assertSame('xxx', $this->repository->get('array.0'));
         $this->assertSame('aaa', $this->repository->get('array.1'));
         $this->assertSame('zzz', $this->repository->get('array.2'));
+        $this->assertNull($this->repository->get('array.3'));
+        $this->assertCount(3, $this->repository->get('array'));
     }
 
     public function testPush()
@@ -189,6 +198,8 @@ class RepositoryTest extends TestCase
         $this->assertSame('aaa', $this->repository->get('array.0'));
         $this->assertSame('zzz', $this->repository->get('array.1'));
         $this->assertSame('xxx', $this->repository->get('array.2'));
+
+        $this->assertCount(3, $this->repository->get('array'));
     }
 
     public function testPrependWithNewKey()
@@ -210,8 +221,21 @@ class RepositoryTest extends TestCase
 
     public function testOffsetExists()
     {
+        $data = [
+            'foo' => 'bar',
+            'null_value' => null,
+            'empty_string' => '',
+            'numeric_value' => 123,
+        ];
+        $this->repository->set($data);
+
         $this->assertTrue(isset($this->repository['foo']));
         $this->assertFalse(isset($this->repository['not-exist']));
+        $this->assertTrue(isset($this->repository['null_value']));
+        $this->assertTrue(isset($this->repository['empty_string']));
+        $this->assertTrue(isset($this->repository['numeric_value']));
+        $this->assertFalse(isset($this->repository[-1]));
+        $this->assertFalse(isset($this->repository['non_numeric']));
     }
 
     public function testOffsetGet()
@@ -231,6 +255,18 @@ class RepositoryTest extends TestCase
         $this->repository['key'] = 'value';
 
         $this->assertSame('value', $this->repository['key']);
+
+        $this->repository['key'] = 'new_value';
+        $this->assertSame('new_value', $this->repository['key']);
+
+        $this->repository['new_key'] = null;
+        $this->assertNull($this->repository['new_key']);
+
+        $this->repository[''] = 'value';
+        $this->assertSame('value', $this->repository['']);
+
+        $this->repository[123] = '123';
+        $this->assertSame('123', $this->repository[123]);
     }
 
     public function testOffsetUnset()
@@ -251,5 +287,80 @@ class RepositoryTest extends TestCase
         });
 
         $this->assertSame('macroable', $this->repository->foo());
+    }
+
+    public function testItGetsAsString(): void
+    {
+        $this->assertSame(
+            'c', $this->repository->string('a.b')
+        );
+    }
+
+    public function testItThrowsAnExceptionWhenTryingToGetNonStringValueAsString(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('#^Configuration value for key \[a\] must be a string, (.*) given.#');
+
+        $this->repository->string('a');
+    }
+
+    public function testItGetsAsArray(): void
+    {
+        $this->assertSame(
+            $this->repository->array('array'), ['aaa', 'zzz']
+        );
+    }
+
+    public function testItThrowsAnExceptionWhenTryingToGetNonArrayValueAsArray(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('#Configuration value for key \[a.b\] must be an array, (.*) given.#');
+
+        $this->repository->array('a.b');
+    }
+
+    public function testItGetsAsBoolean(): void
+    {
+        $this->assertTrue(
+            $this->repository->boolean('boolean')
+        );
+    }
+
+    public function testItThrowsAnExceptionWhenTryingToGetNonBooleanValueAsBoolean(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('#Configuration value for key \[a.b\] must be a boolean, (.*) given.#');
+
+        $this->repository->boolean('a.b');
+    }
+
+    public function testItGetsAsInteger(): void
+    {
+        $this->assertSame(
+            $this->repository->integer('integer'), 1
+        );
+    }
+
+    public function testItThrowsAnExceptionWhenTryingToGetNonIntegerValueAsInteger(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('#Configuration value for key \[a.b\] must be an integer, (.*) given.#');
+
+        $this->repository->integer('a.b');
+    }
+
+    public function testItGetsAsFloat(): void
+    {
+        $this->assertSame(
+            $this->repository->float('float'), 1.1
+        );
+    }
+
+    public function testItThrowsAnExceptionWhenTryingToGetNonFloatValueAsFloat(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('#^Configuration value for key \[a.b\] must be a float, (.*) given.#');
+
+        $this->repository->float('a.b');
     }
 }

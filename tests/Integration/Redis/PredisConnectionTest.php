@@ -6,17 +6,14 @@ use Illuminate\Redis\Connections\PredisConnection;
 use Illuminate\Redis\Events\CommandExecuted;
 use Illuminate\Support\Facades\Event;
 use Mockery as m;
+use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\TestCase;
 use Predis\Client;
 use Predis\Command\Argument\Search\SearchArguments;
 
+#[WithConfig('database.redis.client', 'predis')]
 class PredisConnectionTest extends TestCase
 {
-    protected function defineEnvironment($app)
-    {
-        $app->get('config')->set('database.redis.client', 'predis');
-    }
-
     public function testPredisCanEmitEventWithArrayableArgumentObject()
     {
         if (! class_exists(SearchArguments::class)) {

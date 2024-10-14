@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Validation;
 
+use Illuminate\Tests\Validation\fixtures\Values;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\NotIn;
 use PHPUnit\Framework\TestCase;
@@ -16,6 +17,18 @@ class ValidationNotInRuleTest extends TestCase
 
         $this->assertSame('not_in:"Laravel","Framework","PHP"', (string) $rule);
 
+        $rule = new NotIn(collect(['Taylor', 'Michael', 'Tim']));
+
+        $this->assertSame('not_in:"Taylor","Michael","Tim"', (string) $rule);
+
+        $rule = Rule::notIn(collect([1, 2, 3, 4]));
+
+        $this->assertSame('not_in:"1","2","3","4"', (string) $rule);
+
+        $rule = Rule::notIn(collect([1, 2, 3, 4]));
+
+        $this->assertSame('not_in:"1","2","3","4"', (string) $rule);
+
         $rule = Rule::notIn([1, 2, 3, 4]);
 
         $this->assertSame('not_in:"1","2","3","4"', (string) $rule);
@@ -24,7 +37,19 @@ class ValidationNotInRuleTest extends TestCase
 
         $this->assertSame('not_in:"1","2","3","4"', (string) $rule);
 
+        $rule = Rule::notIn(new Values);
+
+        $this->assertSame('not_in:"1","2","3","4"', (string) $rule);
+
+        $rule = new NotIn(new Values);
+
+        $this->assertSame('not_in:"1","2","3","4"', (string) $rule);
+
         $rule = Rule::notIn('1', '2', '3', '4');
+
+        $this->assertSame('not_in:"1","2","3","4"', (string) $rule);
+
+        $rule = new NotIn('1', '2', '3', '4');
 
         $this->assertSame('not_in:"1","2","3","4"', (string) $rule);
 

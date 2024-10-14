@@ -10,13 +10,6 @@ use Orchestra\Testbench\TestCase;
 
 class CallbackEventTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-
-        m::close();
-    }
-
     public function testDefaultResultIsSuccess()
     {
         $success = null;

@@ -2,7 +2,6 @@
 
 namespace Illuminate\Foundation;
 
-use Exception;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 
@@ -15,7 +14,7 @@ class Mix
      * @param  string  $manifestDirectory
      * @return \Illuminate\Support\HtmlString|string
      *
-     * @throws \Exception
+     * @throws \Illuminate\Foundation\MixManifestNotFoundException|\Illuminate\Foundation\MixFileNotFoundException
      */
     public function __invoke($path, $manifestDirectory = '')
     {
@@ -49,7 +48,7 @@ class Mix
 
         if (! isset($manifests[$manifestPath])) {
             if (! is_file($manifestPath)) {
-                throw new Exception("Mix manifest not found at: {$manifestPath}");
+                throw new MixManifestNotFoundException("Mix manifest not found at: {$manifestPath}");
             }
 
             $manifests[$manifestPath] = json_decode(file_get_contents($manifestPath), true);
@@ -58,7 +57,7 @@ class Mix
         $manifest = $manifests[$manifestPath];
 
         if (! isset($manifest[$path])) {
-            $exception = new Exception("Unable to locate Mix file: {$path}.");
+            $exception = new MixFileNotFoundException("Unable to locate Mix file: {$path}.");
 
             if (! app('config')->get('app.debug')) {
                 report($exception);

@@ -17,7 +17,7 @@ class RoutingServiceProviderTest extends TestCase
 
         $response = $this->withoutExceptionHandling()->get('test-route?'.http_build_query([
             'sent' => 'sent-data',
-            'overridden' => 'overriden-sent-data',
+            'overridden' => 'overridden-sent-data',
         ]));
 
         $response->assertOk();
@@ -48,7 +48,7 @@ class RoutingServiceProviderTest extends TestCase
 
         $response = $this->getJson('test-route?'.http_build_query([
             'sent' => 'sent-data',
-            'overridden' => 'overriden-sent-data',
+            'overridden' => 'overridden-sent-data',
         ]), [
             'content-type' => 'application/json',
         ]);
@@ -57,7 +57,7 @@ class RoutingServiceProviderTest extends TestCase
         $response->assertExactJson([
             'json-data' => 'json-data',
             'merged' => 'replaced-merged-data',
-            'overridden' => 'overriden-merged-data',
+            'overridden' => 'overridden-merged-data',
             'request-data' => 'request-data',
         ]);
     }
@@ -70,14 +70,14 @@ class RoutingServiceProviderTest extends TestCase
 
         $response = $this->getJson('test-route?'.http_build_query([
             'sent' => 'sent-data',
-            'overridden' => 'overriden-sent-data',
+            'overridden' => 'overridden-sent-data',
         ]));
 
         $response->assertOk();
         $response->assertExactJson([
             'json-data' => 'json-data',
             'merged' => 'replaced-merged-data',
-            'overridden' => 'overriden-merged-data',
+            'overridden' => 'overridden-merged-data',
             'request-data' => 'request-data',
         ]);
     }
@@ -90,14 +90,14 @@ class RoutingServiceProviderTest extends TestCase
 
         $response = $this->post('test-route', [
             'sent' => 'sent-data',
-            'overridden' => 'overriden-sent-data',
+            'overridden' => 'overridden-sent-data',
         ]);
 
         $response->assertOk();
         $response->assertExactJson([
             'sent' => 'sent-data',
             'merged' => 'replaced-merged-data',
-            'overridden' => 'overriden-merged-data',
+            'overridden' => 'overridden-merged-data',
             'request-data' => 'request-data',
         ]);
     }
@@ -110,7 +110,7 @@ class RoutingServiceProviderTest extends TestCase
 
         $response = $this->postJson('test-route', [
             'sent' => 'sent-data',
-            'overridden' => 'overriden-sent-data',
+            'overridden' => 'overridden-sent-data',
         ]);
 
         $response->assertOk();
@@ -118,9 +118,21 @@ class RoutingServiceProviderTest extends TestCase
             'json-data' => 'json-data',
             'sent' => 'sent-data',
             'merged' => 'replaced-merged-data',
-            'overridden' => 'overriden-merged-data',
+            'overridden' => 'overridden-merged-data',
             'request-data' => 'request-data',
         ]);
+    }
+
+    public function testItHandlesGzippedBodyPayloadsWhenCreatingServerRequestInterfaceInstances()
+    {
+        Route::post('test-route', function (ServerRequestInterface $request) {
+            return gzdecode((string) $request->getBody());
+        });
+
+        $response = $this->call('POST', 'test-route', content: file_get_contents(__DIR__.'/Fixtures/laravel.txt.gz'));
+
+        $response->assertOk();
+        $response->assertContent("Laravel\n");
     }
 }
 
@@ -132,7 +144,7 @@ class MergeDataMiddleware
 
         $request->merge(['merged' => 'replaced-merged-data']);
 
-        $request->merge(['overridden' => 'overriden-merged-data']);
+        $request->merge(['overridden' => 'overridden-merged-data']);
 
         $request->request->set('request-data', 'request-data');
 

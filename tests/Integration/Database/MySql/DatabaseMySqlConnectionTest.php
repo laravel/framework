@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Database\MySql;
 
+use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -18,7 +19,7 @@ class DatabaseMySqlConnectionTest extends MySqlTestCase
     const JSON_COL = 'json_col';
     const FLOAT_VAL = 0.2;
 
-    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
+    protected function afterRefreshingDatabase()
     {
         if (! Schema::hasTable(self::TABLE)) {
             Schema::create(self::TABLE, function (Blueprint $table) {
@@ -143,5 +144,28 @@ class DatabaseMySqlConnectionTest extends MySqlTestCase
             'mixed keys' => [1, 'json_col->foo[1]->baz'],
             'null value' => [1, 'json_col->bar'],
         ];
+    }
+
+    public function testLastInsertIdIsPreserved()
+    {
+        if (! Schema::hasTable('auto_id_table')) {
+            Schema::create('auto_id_table', function (Blueprint $table) {
+                $table->id();
+            });
+        }
+
+        try {
+            static $callbackExecuted = false;
+            DB::listen(function (QueryExecuted $event) use (&$callbackExecuted) {
+                DB::getPdo()->query('SELECT 1');
+                $callbackExecuted = true;
+            });
+
+            $id = DB::table('auto_id_table')->insertGetId([]);
+            $this->assertTrue($callbackExecuted, 'The query listener was not executed.');
+            $this->assertEquals(1, $id);
+        } finally {
+            Schema::drop('auto_id_table');
+        }
     }
 }

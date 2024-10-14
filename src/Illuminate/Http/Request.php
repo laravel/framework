@@ -297,7 +297,8 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     public function prefetch()
     {
         return strcasecmp($this->server->get('HTTP_X_MOZ') ?? '', 'prefetch') === 0 ||
-               strcasecmp($this->headers->get('Purpose') ?? '', 'prefetch') === 0;
+               strcasecmp($this->headers->get('Purpose') ?? '', 'prefetch') === 0 ||
+               strcasecmp($this->headers->get('Sec-Purpose') ?? '', 'prefetch') === 0;
     }
 
     /**
@@ -348,9 +349,13 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function merge(array $input)
     {
-        $this->getInputSource()->add($input);
-
-        return $this;
+        return tap($this, function (Request $request) use ($input) {
+            $request->getInputSource()
+                    ->replace(collect($input)->reduce(
+                        fn ($requestInput, $value, $key) => data_set($requestInput, $key, $value),
+                        $this->getInputSource()->all()
+                    ));
+        });
     }
 
     /**
@@ -367,7 +372,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
-     * Replace the input for the current request.
+     * Replace the input values for the current request.
      *
      * @param  array  $input
      * @return $this
@@ -388,6 +393,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      * @param  mixed  $default
      * @return mixed
      */
+    #[\Override]
     public function get(string $key, mixed $default = null): mixed
     {
         return parent::get($key, $default);
@@ -403,7 +409,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     public function json($key = null, $default = null)
     {
         if (! isset($this->json)) {
-            $this->json = new InputBag((array) json_decode($this->getContent(), true));
+            $this->json = new InputBag((array) json_decode($this->getContent() ?: '[]', true));
         }
 
         if (is_null($key)) {
@@ -498,7 +504,8 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      *
      * @return static
      */
-    public function duplicate(array $query = null, array $request = null, array $attributes = null, array $cookies = null, array $files = null, array $server = null): static
+    #[\Override]
+    public function duplicate(?array $query = null, ?array $request = null, ?array $attributes = null, ?array $cookies = null, ?array $files = null, ?array $server = null): static
     {
         return parent::duplicate($query, $request, $attributes, $cookies, $this->filterFiles($files), $server);
     }
@@ -531,6 +538,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     /**
      * {@inheritdoc}
      */
+    #[\Override]
     public function hasSession(bool $skipIfUninitialized = false): bool
     {
         return $this->session instanceof SymfonySessionDecorator;
@@ -539,11 +547,12 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     /**
      * {@inheritdoc}
      */
+    #[\Override]
     public function getSession(): SessionInterface
     {
         return $this->hasSession()
-                    ? $this->session
-                    : throw new SessionNotFoundException;
+            ? $this->session
+            : throw new SessionNotFoundException;
     }
 
     /**

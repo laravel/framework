@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Integration\Auth;
 
 use Illuminate\Database\QueryException;
-use Illuminate\Foundation\Auth\User as FoundationUser;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Orchestra\Testbench\TestCase;
@@ -12,11 +11,10 @@ use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 #[RequiresPhpExtension('pdo_mysql')]
 class ApiAuthenticationWithEloquentTest extends TestCase
 {
-    protected function getEnvironmentSetUp($app)
+    protected function defineEnvironment($app)
     {
         // Auth configuration
         $app['config']->set('auth.defaults.guard', 'api');
-        $app['config']->set('auth.providers.users.model', User::class);
 
         $app['config']->set('auth.guards.api', [
             'driver' => 'token',
@@ -57,9 +55,4 @@ class ApiAuthenticationWithEloquentTest extends TestCase
             throw $e;
         }
     }
-}
-
-class User extends FoundationUser
-{
-    //
 }

@@ -24,6 +24,7 @@ class DefaultProviders
             \Illuminate\Bus\BusServiceProvider::class,
             \Illuminate\Cache\CacheServiceProvider::class,
             \Illuminate\Foundation\Providers\ConsoleSupportServiceProvider::class,
+            \Illuminate\Concurrency\ConcurrencyServiceProvider::class,
             \Illuminate\Cookie\CookieServiceProvider::class,
             \Illuminate\Database\DatabaseServiceProvider::class,
             \Illuminate\Encryption\EncryptionServiceProvider::class,
@@ -33,10 +34,10 @@ class DefaultProviders
             \Illuminate\Mail\MailServiceProvider::class,
             \Illuminate\Notifications\NotificationServiceProvider::class,
             \Illuminate\Pagination\PaginationServiceProvider::class,
+            \Illuminate\Auth\Passwords\PasswordResetServiceProvider::class,
             \Illuminate\Pipeline\PipelineServiceProvider::class,
             \Illuminate\Queue\QueueServiceProvider::class,
             \Illuminate\Redis\RedisServiceProvider::class,
-            \Illuminate\Auth\Passwords\PasswordResetServiceProvider::class,
             \Illuminate\Session\SessionServiceProvider::class,
             \Illuminate\Translation\TranslationServiceProvider::class,
             \Illuminate\Validation\ValidationServiceProvider::class,
@@ -60,7 +61,7 @@ class DefaultProviders
     /**
      * Replace the given providers with other providers.
      *
-     * @param  array  $items
+     * @param  array  $replacements
      * @return static
      */
     public function replace(array $replacements)
@@ -70,7 +71,7 @@ class DefaultProviders
         foreach ($replacements as $from => $to) {
             $key = $current->search($from);
 
-            $current = $key ? $current->replace([$key => $to]) : $current;
+            $current = is_int($key) ? $current->replace([$key => $to]) : $current;
         }
 
         return new static($current->values()->toArray());

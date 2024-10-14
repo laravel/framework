@@ -24,8 +24,15 @@ trait InteractsWithDatabase
      * @param  string|null  $connection
      * @return $this
      */
-    protected function assertDatabaseHas($table, array $data, $connection = null)
+    protected function assertDatabaseHas($table, array $data = [], $connection = null)
     {
+        if ($table instanceof Model) {
+            $data = [
+                $table->getKeyName() => $table->getKey(),
+                ...$data,
+            ];
+        }
+
         $this->assertThat(
             $this->getTable($table), new HasInDatabase($this->getConnection($connection, $table), $data)
         );
@@ -41,8 +48,15 @@ trait InteractsWithDatabase
      * @param  string|null  $connection
      * @return $this
      */
-    protected function assertDatabaseMissing($table, array $data, $connection = null)
+    protected function assertDatabaseMissing($table, array $data = [], $connection = null)
     {
+        if ($table instanceof Model) {
+            $data = [
+                $table->getKeyName() => $table->getKey(),
+                ...$data,
+            ];
+        }
+
         $constraint = new ReverseConstraint(
             new HasInDatabase($this->getConnection($connection, $table), $data)
         );
@@ -157,11 +171,7 @@ trait InteractsWithDatabase
      */
     protected function assertModelExists($model)
     {
-        return $this->assertDatabaseHas(
-            $model->getTable(),
-            [$model->getKeyName() => $model->getKey()],
-            $model->getConnectionName()
-        );
+        return $this->assertDatabaseHas($model);
     }
 
     /**
@@ -172,11 +182,7 @@ trait InteractsWithDatabase
      */
     protected function assertModelMissing($model)
     {
-        return $this->assertDatabaseMissing(
-            $model->getTable(),
-            [$model->getKeyName() => $model->getKey()],
-            $model->getConnectionName()
-        );
+        return $this->assertDatabaseMissing($model);
     }
 
     /**
@@ -199,8 +205,8 @@ trait InteractsWithDatabase
 
             $this->beforeApplicationDestroyed(function () use (&$actual, $expected, $connectionInstance) {
                 $this->assertSame(
-                    $actual,
                     $expected,
+                    $actual,
                     "Expected {$expected} database queries on the [{$connectionInstance->getName()}] connection. {$actual} occurred."
                 );
             });
@@ -266,6 +272,10 @@ trait InteractsWithDatabase
      */
     protected function getTable($table)
     {
+        if ($table instanceof Model) {
+            return $table->getTable();
+        }
+
         return $this->newModelFor($table)?->getTable() ?: $table;
     }
 
@@ -277,6 +287,10 @@ trait InteractsWithDatabase
      */
     protected function getTableConnection($table)
     {
+        if ($table instanceof Model) {
+            return $table->getConnectionName();
+        }
+
         return $this->newModelFor($table)?->getConnectionName();
     }
 

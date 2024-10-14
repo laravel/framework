@@ -285,7 +285,7 @@ class DynamoDbStore implements LockProvider, Store
                 ],
                 'ExpressionAttributeValues' => [
                     ':now' => [
-                        'N' => (string) Carbon::now()->getTimestamp(),
+                        'N' => (string) $this->currentTime(),
                     ],
                 ],
             ]);
@@ -305,7 +305,7 @@ class DynamoDbStore implements LockProvider, Store
      *
      * @param  string  $key
      * @param  mixed  $value
-     * @return int|bool
+     * @return int|false
      */
     public function increment($key, $value = 1)
     {
@@ -326,7 +326,7 @@ class DynamoDbStore implements LockProvider, Store
                 ],
                 'ExpressionAttributeValues' => [
                     ':now' => [
-                        'N' => (string) Carbon::now()->getTimestamp(),
+                        'N' => (string) $this->currentTime(),
                     ],
                     ':amount' => [
                         'N' => (string) $value,
@@ -350,7 +350,7 @@ class DynamoDbStore implements LockProvider, Store
      *
      * @param  string  $key
      * @param  mixed  $value
-     * @return int|bool
+     * @return int|false
      */
     public function decrement($key, $value = 1)
     {
@@ -371,7 +371,7 @@ class DynamoDbStore implements LockProvider, Store
                 ],
                 'ExpressionAttributeValues' => [
                     ':now' => [
-                        'N' => (string) Carbon::now()->getTimestamp(),
+                        'N' => (string) $this->currentTime(),
                     ],
                     ':amount' => [
                         'N' => (string) $value,
@@ -412,7 +412,7 @@ class DynamoDbStore implements LockProvider, Store
      */
     public function lock($name, $seconds = 0, $owner = null)
     {
-        return new DynamoDbLock($this, $this->prefix.$name, $seconds, $owner);
+        return new DynamoDbLock($this, $name, $seconds, $owner);
     }
 
     /**
@@ -469,7 +469,7 @@ class DynamoDbStore implements LockProvider, Store
     {
         return $seconds > 0
                     ? $this->availableAt($seconds)
-                    : Carbon::now()->getTimestamp();
+                    : $this->currentTime();
     }
 
     /**

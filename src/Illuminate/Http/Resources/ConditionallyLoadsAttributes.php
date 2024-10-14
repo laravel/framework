@@ -266,15 +266,21 @@ trait ConditionallyLoadsAttributes
             return value($default);
         }
 
+        $loadedValue = $this->resource->{$relationship};
+
         if (func_num_args() === 1) {
-            return $this->resource->{$relationship};
+            return $loadedValue;
         }
 
-        if ($this->resource->{$relationship} === null) {
+        if ($loadedValue === null) {
             return;
         }
 
-        return value($value);
+        if ($value === null) {
+            $value = value(...);
+        }
+
+        return value($value, $loadedValue);
     }
 
     /**
@@ -293,7 +299,7 @@ trait ConditionallyLoadsAttributes
 
         $attribute = (string) Str::of($relationship)->snake()->finish('_count');
 
-        if (! isset($this->resource->getAttributes()[$attribute])) {
+        if (! array_key_exists($attribute, $this->resource->getAttributes())) {
             return value($default);
         }
 
@@ -303,6 +309,10 @@ trait ConditionallyLoadsAttributes
 
         if ($this->resource->{$attribute} === null) {
             return;
+        }
+
+        if ($value === null) {
+            $value = value(...);
         }
 
         return value($value, $this->resource->{$attribute});
@@ -320,13 +330,52 @@ trait ConditionallyLoadsAttributes
      */
     public function whenAggregated($relationship, $column, $aggregate, $value = null, $default = null)
     {
+        if (func_num_args() < 5) {
+            $default = new MissingValue;
+        }
+
         $attribute = (string) Str::of($relationship)->snake()->append('_')->append($aggregate)->append('_')->finish($column);
 
-        if (! isset($this->resource->getAttributes()[$attribute])) {
+        if (! array_key_exists($attribute, $this->resource->getAttributes())) {
             return value($default);
         }
 
         if (func_num_args() === 3) {
+            return $this->resource->{$attribute};
+        }
+
+        if ($this->resource->{$attribute} === null) {
+            return;
+        }
+
+        if ($value === null) {
+            $value = value(...);
+        }
+
+        return value($value, $this->resource->{$attribute});
+    }
+
+    /**
+     * Retrieve a relationship existence check if it exists.
+     *
+     * @param  string  $relationship
+     * @param  mixed  $value
+     * @param  mixed  $default
+     * @return \Illuminate\Http\Resources\MissingValue|mixed
+     */
+    public function whenExistsLoaded($relationship, $value = null, $default = null)
+    {
+        if (func_num_args() < 3) {
+            $default = new MissingValue;
+        }
+
+        $attribute = (string) Str::of($relationship)->snake()->finish('_exists');
+
+        if (! array_key_exists($attribute, $this->resource->getAttributes())) {
+            return value($default);
+        }
+
+        if (func_num_args() === 1) {
             return $this->resource->{$attribute};
         }
 

@@ -6,6 +6,7 @@ use Illuminate\Bus\Dispatcher;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Queue\Attributes\DeleteWhenMissingModels;
 use Illuminate\Queue\CallQueuedHandler;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\InteractsWithQueue;
@@ -15,13 +16,6 @@ use Orchestra\Testbench\TestCase;
 
 class CallQueuedHandlerTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-
-        m::close();
-    }
-
     public function testJobCanBeDispatched()
     {
         CallQueuedHandlerTestJob::$handled = false;
@@ -124,6 +118,27 @@ class CallQueuedHandlerTest extends TestCase
 
         Event::assertNotDispatched(JobFailed::class);
     }
+
+    public function testJobIsDeletedIfHasDeleteAttribute()
+    {
+        Event::fake();
+
+        $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
+
+        $job = m::mock(Job::class);
+        $job->shouldReceive('getConnectionName')->andReturn('connection');
+        $job->shouldReceive('resolveName')->andReturn(CallQueuedHandlerAttributeExceptionThrower::class);
+        $job->shouldReceive('markAsFailed')->never();
+        $job->shouldReceive('isDeleted')->andReturn(false);
+        $job->shouldReceive('delete')->once();
+        $job->shouldReceive('failed')->never();
+
+        $instance->call($job, [
+            'command' => serialize(new CallQueuedHandlerAttributeExceptionThrower()),
+        ]);
+
+        Event::assertNotDispatched(JobFailed::class);
+    }
 }
 
 class CallQueuedHandlerTestJob
@@ -175,6 +190,20 @@ class CallQueuedHandlerExceptionThrower
 {
     public $deleteWhenMissingModels = true;
 
+    public function handle()
+    {
+        //
+    }
+
+    public function __wakeup()
+    {
+        throw new ModelNotFoundException('Foo');
+    }
+}
+
+#[DeleteWhenMissingModels]
+class CallQueuedHandlerAttributeExceptionThrower
+{
     public function handle()
     {
         //

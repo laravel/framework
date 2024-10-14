@@ -12,7 +12,7 @@ use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentHasManyThroughTest extends DatabaseTestCase
 {
-    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
+    protected function afterRefreshingDatabase()
     {
         Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
@@ -365,6 +365,21 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
         $this->assertSame('john-doe', $john->fresh()->slug);
         // $jane should not be updated, because it belongs to a different user altogether.
         $this->assertSame('jane-slug', $jane->fresh()->slug);
+    }
+
+    public function testCanReplicateModelLoadedThroughHasManyThrough()
+    {
+        $team = Team::create();
+        $user = User::create(['team_id' => $team->id, 'name' => 'John']);
+        Article::create(['user_id' => $user->id, 'title' => 'John\'s new has-many-through-article']);
+
+        $article = $team->articles()->first();
+
+        $this->assertInstanceOf(Article::class, $article);
+
+        $newArticle = $article->replicate();
+        $newArticle->title .= ' v2';
+        $newArticle->save();
     }
 }
 

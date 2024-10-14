@@ -134,7 +134,7 @@ class ConfigurationUrlParserTest extends TestCase
                 ],
             ],
             'query params from URL are used as extra params' => [
-                'url' => 'mysql://foo:bar@localhost/database?charset=UTF-8',
+                'mysql://foo:bar@localhost/database?charset=UTF-8',
                 [
                     'driver' => 'mysql',
                     'database' => 'database',
@@ -255,6 +255,30 @@ class ConfigurationUrlParserTest extends TestCase
                     'driver' => 'sqlite',
                     'database' => '/absolute/path/to/database.sqlite',
                     'foreign_key_constraints' => true,
+                ],
+            ],
+            'Sqlite with busy_timeout' => [
+                'sqlite:////absolute/path/to/database.sqlite?busy_timeout=5000',
+                [
+                    'driver' => 'sqlite',
+                    'database' => '/absolute/path/to/database.sqlite',
+                    'busy_timeout' => 5000,
+                ],
+            ],
+            'Sqlite with journal_mode' => [
+                'sqlite:////absolute/path/to/database.sqlite?journal_mode=WAL',
+                [
+                    'driver' => 'sqlite',
+                    'database' => '/absolute/path/to/database.sqlite',
+                    'journal_mode' => 'WAL',
+                ],
+            ],
+            'Sqlite with synchronous' => [
+                'sqlite:////absolute/path/to/database.sqlite?synchronous=NORMAL',
+                [
+                    'driver' => 'sqlite',
+                    'database' => '/absolute/path/to/database.sqlite',
+                    'synchronous' => 'NORMAL',
                 ],
             ],
 

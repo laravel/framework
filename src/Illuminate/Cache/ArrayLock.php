@@ -87,6 +87,10 @@ class ArrayLock extends Lock
      */
     protected function getCurrentOwner()
     {
+        if (! $this->exists()) {
+            return null;
+        }
+
         return $this->store->locks[$this->name]['owner'];
     }
 

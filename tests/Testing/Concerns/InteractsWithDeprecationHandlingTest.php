@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Testing\Concerns;
 
 use ErrorException;
+use Illuminate\Foundation\Bootstrap\HandleExceptions;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithDeprecationHandling;
 use PHPUnit\Framework\TestCase;
 
@@ -10,15 +11,13 @@ class InteractsWithDeprecationHandlingTest extends TestCase
 {
     use InteractsWithDeprecationHandling;
 
-    protected $original;
-
     protected $deprecationsFound = false;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->original = set_error_handler(function () {
+        set_error_handler(function () {
             $this->deprecationsFound = true;
         });
     }
@@ -44,10 +43,9 @@ class InteractsWithDeprecationHandlingTest extends TestCase
 
     protected function tearDown(): void
     {
-        set_error_handler($this->original);
-
-        $this->originalDeprecationHandler = null;
         $this->deprecationsFound = false;
+
+        HandleExceptions::flushHandlersState();
 
         parent::tearDown();
     }

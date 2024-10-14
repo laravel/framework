@@ -89,4 +89,11 @@ interface BatchRepository
      * @return mixed
      */
     public function transaction(Closure $callback);
+
+    /**
+     * Rollback the last database transaction for the connection.
+     *
+     * @return void
+     */
+    public function rollBack();
 }

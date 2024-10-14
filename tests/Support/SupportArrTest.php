@@ -12,7 +12,7 @@ use stdClass;
 
 class SupportArrTest extends TestCase
 {
-    public function testAccessible()
+    public function testAccessible(): void
     {
         $this->assertTrue(Arr::accessible([]));
         $this->assertTrue(Arr::accessible([1, 2]));
@@ -23,6 +23,11 @@ class SupportArrTest extends TestCase
         $this->assertFalse(Arr::accessible('abc'));
         $this->assertFalse(Arr::accessible(new stdClass));
         $this->assertFalse(Arr::accessible((object) ['a' => 1, 'b' => 2]));
+        $this->assertFalse(Arr::accessible(123));
+        $this->assertFalse(Arr::accessible(12.34));
+        $this->assertFalse(Arr::accessible(true));
+        $this->assertFalse(Arr::accessible(new \DateTime));
+        $this->assertFalse(Arr::accessible(static fn () => null));
     }
 
     public function testAdd()
@@ -38,11 +43,26 @@ class SupportArrTest extends TestCase
 
     public function testCollapse()
     {
+        // Normal case: a two-dimensional array with different elements
         $data = [['foo', 'bar'], ['baz']];
         $this->assertEquals(['foo', 'bar', 'baz'], Arr::collapse($data));
 
+        // Case including numeric and string elements
         $array = [[1], [2], [3], ['foo', 'bar'], collect(['baz', 'boom'])];
         $this->assertEquals([1, 2, 3, 'foo', 'bar', 'baz', 'boom'], Arr::collapse($array));
+
+        // Case with empty two-dimensional arrays
+        $emptyArray = [[], [], []];
+        $this->assertEquals([], Arr::collapse($emptyArray));
+
+        // Case with both empty arrays and arrays with elements
+        $mixedArray = [[], [1, 2], [], ['foo', 'bar']];
+        $this->assertEquals([1, 2, 'foo', 'bar'], Arr::collapse($mixedArray));
+
+        // Case including collections and arrays
+        $collection = collect(['baz', 'boom']);
+        $mixedArray = [[1], [2], [3], ['foo', 'bar'], $collection];
+        $this->assertEquals([1, 2, 3, 'foo', 'bar', 'baz', 'boom'], Arr::collapse($mixedArray));
     }
 
     public function testCrossJoin()
@@ -90,29 +110,89 @@ class SupportArrTest extends TestCase
         $this->assertSame([[]], Arr::crossJoin());
     }
 
-    public function testDivide()
+    public function testDivide(): void
     {
+        // Test dividing an empty array
+        [$keys, $values] = Arr::divide([]);
+        $this->assertEquals([], $keys);
+        $this->assertEquals([], $values);
+
+        // Test dividing an array with a single key-value pair
         [$keys, $values] = Arr::divide(['name' => 'Desk']);
         $this->assertEquals(['name'], $keys);
         $this->assertEquals(['Desk'], $values);
+
+        // Test dividing an array with multiple key-value pairs
+        [$keys, $values] = Arr::divide(['name' => 'Desk', 'price' => 100, 'available' => true]);
+        $this->assertEquals(['name', 'price', 'available'], $keys);
+        $this->assertEquals(['Desk', 100, true], $values);
+
+        // Test dividing an array with numeric keys
+        [$keys, $values] = Arr::divide([0 => 'first', 1 => 'second']);
+        $this->assertEquals([0, 1], $keys);
+        $this->assertEquals(['first', 'second'], $values);
+
+        // Test dividing an array with null key
+        [$keys, $values] = Arr::divide([null => 'Null', 1 => 'one']);
+        $this->assertEquals([null, 1], $keys);
+        $this->assertEquals(['Null', 'one'], $values);
+
+        // Test dividing an array where the keys are arrays
+        [$keys, $values] = Arr::divide([['one' => 1, 2 => 'second'], 1 => 'one']);
+        $this->assertEquals([0, 1], $keys);
+        $this->assertEquals([['one' => 1, 2 => 'second'], 'one'], $values);
+
+        // Test dividing an array where the values are arrays
+        [$keys, $values] = Arr::divide([null => ['one' => 1, 2 => 'second'], 1 => 'one']);
+        $this->assertEquals([null, 1], $keys);
+        $this->assertEquals([['one' => 1, 2 => 'second'], 'one'], $values);
     }
 
     public function testDot()
     {
         $array = Arr::dot(['foo' => ['bar' => 'baz']]);
-        $this->assertEquals(['foo.bar' => 'baz'], $array);
+        $this->assertSame(['foo.bar' => 'baz'], $array);
+
+        $array = Arr::dot([10 => 100]);
+        $this->assertSame([10 => 100], $array);
+
+        $array = Arr::dot(['foo' => [10 => 100]]);
+        $this->assertSame(['foo.10' => 100], $array);
 
         $array = Arr::dot([]);
-        $this->assertEquals([], $array);
+        $this->assertSame([], $array);
 
         $array = Arr::dot(['foo' => []]);
-        $this->assertEquals(['foo' => []], $array);
+        $this->assertSame(['foo' => []], $array);
 
         $array = Arr::dot(['foo' => ['bar' => []]]);
-        $this->assertEquals(['foo.bar' => []], $array);
+        $this->assertSame(['foo.bar' => []], $array);
 
         $array = Arr::dot(['name' => 'taylor', 'languages' => ['php' => true]]);
-        $this->assertEquals(['name' => 'taylor', 'languages.php' => true], $array);
+        $this->assertSame(['name' => 'taylor', 'languages.php' => true], $array);
+
+        $array = Arr::dot(['user' => ['name' => 'Taylor', 'age' => 25, 'languages' => ['PHP', 'C#']]]);
+        $this->assertSame([
+            'user.name' => 'Taylor',
+            'user.age' => 25,
+            'user.languages.0' => 'PHP',
+            'user.languages.1' => 'C#',
+        ], $array);
+
+        $array = Arr::dot(['foo', 'foo' => ['bar' => 'baz', 'baz' => ['a' => 'b']]]);
+        $this->assertSame([
+            'foo',
+            'foo.bar' => 'baz',
+            'foo.baz.a' => 'b',
+        ], $array);
+
+        $array = Arr::dot(['foo' => 'bar', 'empty_array' => [], 'user' => ['name' => 'Taylor'], 'key' => 'value']);
+        $this->assertSame([
+            'foo' => 'bar',
+            'empty_array' => [],
+            'user.name' => 'Taylor',
+            'key' => 'value',
+        ], $array);
     }
 
     public function testUndot()
@@ -169,10 +249,22 @@ class SupportArrTest extends TestCase
         $this->assertFalse(Arr::exists(new Collection(['a' => null]), 'b'));
     }
 
-    public function testWhereNotNull()
+    public function testWhereNotNull(): void
     {
         $array = array_values(Arr::whereNotNull([null, 0, false, '', null, []]));
         $this->assertEquals([0, false, '', []], $array);
+
+        $array = array_values(Arr::whereNotNull([1, 2, 3]));
+        $this->assertEquals([1, 2, 3], $array);
+
+        $array = array_values(Arr::whereNotNull([null, null, null]));
+        $this->assertEquals([], $array);
+
+        $array = array_values(Arr::whereNotNull(['a', null, 'b', null, 'c']));
+        $this->assertEquals(['a', 'b', 'c'], $array);
+
+        $array = array_values(Arr::whereNotNull([null, 1, 'string', 0.0, false, [], new stdClass(), fn () => null]));
+        $this->assertEquals([1, 'string', 0.0, false, [], new stdClass(), fn () => null], $array);
     }
 
     public function testFirst()
@@ -677,6 +769,23 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['first' => 'taylor', 'last' => 'otwell'], $data);
     }
 
+    public function testMapWithEmptyArray()
+    {
+        $mapped = Arr::map([], static function ($value, $key) {
+            return $key.'-'.$value;
+        });
+        $this->assertEquals([], $mapped);
+    }
+
+    public function testMapNullValues()
+    {
+        $data = ['first' => 'taylor', 'last' => null];
+        $mapped = Arr::map($data, static function ($value, $key) {
+            return $key.'-'.$value;
+        });
+        $this->assertEquals(['first' => 'first-taylor', 'last' => 'last-'], $mapped);
+    }
+
     public function testMapWithKeys()
     {
         $data = [
@@ -704,6 +813,21 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['first' => 'taylor', 'last' => 'otwell'], $data);
     }
 
+    public function testMapSpread()
+    {
+        $c = [[1, 'a'], [2, 'b']];
+
+        $result = Arr::mapSpread($c, function ($number, $character) {
+            return "{$number}-{$character}";
+        });
+        $this->assertEquals(['1-a', '2-b'], $result);
+
+        $result = Arr::mapSpread($c, function ($number, $character, $key) {
+            return "{$number}-{$character}-{$key}";
+        });
+        $this->assertEquals(['1-a-0', '2-b-1'], $result);
+    }
+
     public function testPrepend()
     {
         $array = Arr::prepend(['one', 'two', 'three', 'four'], 'zero');
@@ -714,6 +838,21 @@ class SupportArrTest extends TestCase
 
         $array = Arr::prepend(['one' => 1, 'two' => 2], 0, null);
         $this->assertEquals([null => 0, 'one' => 1, 'two' => 2], $array);
+
+        $array = Arr::prepend(['one', 'two'], null, '');
+        $this->assertEquals(['' => null, 'one', 'two'], $array);
+
+        $array = Arr::prepend([], 'zero');
+        $this->assertEquals(['zero'], $array);
+
+        $array = Arr::prepend([''], 'zero');
+        $this->assertEquals(['zero', ''], $array);
+
+        $array = Arr::prepend(['one', 'two'], ['zero']);
+        $this->assertEquals([['zero'], 'one', 'two'], $array);
+
+        $array = Arr::prepend(['one', 'two'], ['zero'], 'key');
+        $this->assertEquals(['key' => ['zero'], 'one', 'two'], $array);
     }
 
     public function testPull()
@@ -878,12 +1017,33 @@ class SupportArrTest extends TestCase
         $this->assertEquals([1 => 'hAz'], Arr::set($array, 1, 'hAz'));
     }
 
-    public function testShuffleWithSeed()
+    public function testShuffleProducesDifferentShuffles()
     {
-        $this->assertEquals(
-            Arr::shuffle(range(0, 100, 10), 1234),
-            Arr::shuffle(range(0, 100, 10), 1234)
+        $input = range('a', 'z');
+
+        $this->assertFalse(
+            Arr::shuffle($input) === Arr::shuffle($input) && Arr::shuffle($input) === Arr::shuffle($input),
+            "The shuffles produced the same output each time, which shouldn't happen."
         );
+    }
+
+    public function testShuffleActuallyShuffles()
+    {
+        $input = range('a', 'z');
+
+        $this->assertFalse(
+            Arr::shuffle($input) === $input && Arr::shuffle($input) === $input,
+            "The shuffles were unshuffled each time, which shouldn't happen."
+        );
+    }
+
+    public function testShuffleKeepsSameValues()
+    {
+        $input = range('a', 'z');
+        $shuffled = Arr::shuffle($input);
+        sort($shuffled);
+
+        $this->assertEquals($input, $shuffled);
     }
 
     public function testEmptyShuffle()
@@ -999,6 +1159,61 @@ class SupportArrTest extends TestCase
         ];
 
         $this->assertEquals($expect, Arr::sortRecursive($array));
+    }
+
+    public function testSortRecursiveDesc()
+    {
+        $array = [
+            'empty' => [],
+            'nested' => [
+                'level1' => [
+                    'level2' => [
+                        'level3' => [2, 3, 1],
+                    ],
+                    'values' => [4, 5, 6],
+                ],
+            ],
+            'mixed' => [
+                'a' => 1,
+                2 => 'b',
+                'c' => 3,
+                1 => 'd',
+            ],
+            'numbered_index' => [
+                1 => 'e',
+                3 => 'c',
+                4 => 'b',
+                5 => 'a',
+                2 => 'd',
+            ],
+        ];
+
+        $expect = [
+            'empty' => [],
+            'mixed' => [
+                'c' => 3,
+                'a' => 1,
+                2 => 'b',
+                1 => 'd',
+            ],
+            'nested' => [
+                'level1' => [
+                    'values' => [6, 5, 4],
+                    'level2' => [
+                        'level3' => [3, 2, 1],
+                    ],
+                ],
+            ],
+            'numbered_index' => [
+                5 => 'a',
+                4 => 'b',
+                3 => 'c',
+                2 => 'd',
+                1 => 'e',
+            ],
+        ];
+
+        $this->assertEquals($expect, Arr::sortRecursiveDesc($array));
     }
 
     public function testToCssClasses()
@@ -1230,5 +1445,61 @@ class SupportArrTest extends TestCase
                 'key' => 1,
             ],
         ], Arr::prependKeysWith($array, 'test.'));
+    }
+
+    public function testTake(): void
+    {
+        $array = [1, 2, 3, 4, 5, 6];
+
+        // Test with a positive limit, should return the first 'limit' elements.
+        $this->assertEquals([1, 2, 3], Arr::take($array, 3));
+
+        // Test with a negative limit, should return the last 'abs(limit)' elements.
+        $this->assertEquals([4, 5, 6], Arr::take($array, -3));
+
+        // Test with zero limit, should return an empty array.
+        $this->assertEquals([], Arr::take($array, 0));
+
+        // Test with a limit greater than the array size, should return the entire array.
+        $this->assertEquals([1, 2, 3, 4, 5, 6], Arr::take($array, 10));
+
+        // Test with a negative limit greater than the array size, should return the entire array.
+        $this->assertEquals([1, 2, 3, 4, 5, 6], Arr::take($array, -10));
+    }
+
+    public function testSelect()
+    {
+        $array = [
+            [
+                'name' => 'Taylor',
+                'role' => 'Developer',
+                'age' => 1,
+            ],
+            [
+                'name' => 'Abigail',
+                'role' => 'Infrastructure',
+                'age' => 2,
+            ],
+        ];
+
+        $this->assertEquals([
+            [
+                'name' => 'Taylor',
+                'age' => 1,
+            ],
+            [
+                'name' => 'Abigail',
+                'age' => 2,
+            ],
+        ], Arr::select($array, ['name', 'age']));
+
+        $this->assertEquals([
+            [
+                'name' => 'Taylor',
+            ],
+            [
+                'name' => 'Abigail',
+            ],
+        ], Arr::select($array, 'name'));
     }
 }

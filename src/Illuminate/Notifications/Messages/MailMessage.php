@@ -130,6 +130,21 @@ class MailMessage extends SimpleMessage implements Renderable
     }
 
     /**
+     * Set the plain text view for the mail message.
+     *
+     * @param  string  $textView
+     * @param  array  $data
+     * @return $this
+     */
+    public function text($textView, array $data = [])
+    {
+        return $this->view([
+            'html' => is_array($this->view) ? ($this->view['html'] ?? null) : $this->view,
+            'text' => $textView,
+        ], $data);
+    }
+
+    /**
      * Set the Markdown template for the notification.
      *
      * @param  string  $view

@@ -24,6 +24,13 @@ class EventGenerateCommand extends Command
     protected $description = 'Generate the missing events and listeners based on registration';
 
     /**
+     * Indicates whether the command should be shown in the Artisan command list.
+     *
+     * @var bool
+     */
+    protected $hidden = true;
+
+    /**
      * Execute the console command.
      *
      * @return void

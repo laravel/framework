@@ -2,10 +2,17 @@
 
 namespace Illuminate\Database\Eloquent;
 
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Support\Collection as BaseCollection;
+
 /**
- * @method static \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder withTrashed(bool $withTrashed = true)
- * @method static \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder onlyTrashed()
- * @method static \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder withoutTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static> withTrashed(bool $withTrashed = true)
+ * @method static \Illuminate\Database\Eloquent\Builder<static> onlyTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static> withoutTrashed()
+ * @method static static restoreOrCreate(array<string, mixed> $attributes = [], array<string, mixed> $values = [])
+ * @method static static createOrRestore(array<string, mixed> $attributes = [], array<string, mixed> $values = [])
+ *
+ * @mixin \Illuminate\Database\Eloquent\Model
  */
 trait SoftDeletes
 {
@@ -68,6 +75,44 @@ trait SoftDeletes
     public function forceDeleteQuietly()
     {
         return static::withoutEvents(fn () => $this->forceDelete());
+    }
+
+    /**
+     * Destroy the models for the given IDs.
+     *
+     * @param  \Illuminate\Support\Collection|array|int|string  $ids
+     * @return int
+     */
+    public static function forceDestroy($ids)
+    {
+        if ($ids instanceof EloquentCollection) {
+            $ids = $ids->modelKeys();
+        }
+
+        if ($ids instanceof BaseCollection) {
+            $ids = $ids->all();
+        }
+
+        $ids = is_array($ids) ? $ids : func_get_args();
+
+        if (count($ids) === 0) {
+            return 0;
+        }
+
+        // We will actually pull the models from the database table and call delete on
+        // each of them individually so that their events get fired properly with a
+        // correct set of attributes in case the developers wants to check these.
+        $key = ($instance = new static)->getKeyName();
+
+        $count = 0;
+
+        foreach ($instance->withTrashed()->whereIn($key, $ids)->get() as $model) {
+            if ($model->forceDelete()) {
+                $count++;
+            }
+        }
+
+        return $count;
     }
 
     /**
@@ -165,7 +210,7 @@ trait SoftDeletes
     /**
      * Register a "softDeleted" model event callback with the dispatcher.
      *
-     * @param  \Closure|string  $callback
+     * @param  \Illuminate\Events\QueuedClosure|\Closure|string  $callback
      * @return void
      */
     public static function softDeleted($callback)
@@ -176,7 +221,7 @@ trait SoftDeletes
     /**
      * Register a "restoring" model event callback with the dispatcher.
      *
-     * @param  \Closure|string  $callback
+     * @param  \Illuminate\Events\QueuedClosure|\Closure|string  $callback
      * @return void
      */
     public static function restoring($callback)
@@ -187,7 +232,7 @@ trait SoftDeletes
     /**
      * Register a "restored" model event callback with the dispatcher.
      *
-     * @param  \Closure|string  $callback
+     * @param  \Illuminate\Events\QueuedClosure|\Closure|string  $callback
      * @return void
      */
     public static function restored($callback)
@@ -198,7 +243,7 @@ trait SoftDeletes
     /**
      * Register a "forceDeleting" model event callback with the dispatcher.
      *
-     * @param  \Closure|string  $callback
+     * @param  \Illuminate\Events\QueuedClosure|\Closure|string  $callback
      * @return void
      */
     public static function forceDeleting($callback)
@@ -209,7 +254,7 @@ trait SoftDeletes
     /**
      * Register a "forceDeleted" model event callback with the dispatcher.
      *
-     * @param  \Closure|string  $callback
+     * @param  \Illuminate\Events\QueuedClosure|\Closure|string  $callback
      * @return void
      */
     public static function forceDeleted($callback)

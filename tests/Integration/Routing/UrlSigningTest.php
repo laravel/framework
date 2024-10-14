@@ -270,7 +270,7 @@ class UrlSigningTest extends TestCase
 
     public function testSignedMiddlewareIgnoringParameter()
     {
-        Route::get('/foo/{id}}', function (Request $request, $id) {
+        Route::get('/foo/{id}', function (Request $request, $id) {
         })->name('foo')->middleware('signed:relative');
 
         $this->assertIsString($url = URL::signedRoute('foo', ['id' => 1]).'&ignore=me');
@@ -295,6 +295,26 @@ class UrlSigningTest extends TestCase
 
         $response = $this->get('/foo/1');
         $response->assertStatus(403);
+    }
+
+    public function testSignedMiddlewareCanGloballyIgnoreParameters()
+    {
+        ValidateSignature::except(['globally_ignore']);
+
+        Route::get('/foo/{id}', function (Request $request, $id) {
+        })->name('foo')->middleware('signed:relative');
+
+        $this->assertIsString($url = URL::signedRoute('foo', ['id' => 1]).'&globally_ignore=me');
+        $request = Request::create($url);
+        $middleware = $this->createValidateSignatureMiddleware(['ignore']);
+
+        try {
+            $middleware->handle($request, function ($request) {
+                $this->assertTrue($request->hasValidSignatureWhileIgnoring(['globally_ignore']));
+            });
+        } catch (InvalidSignatureException $exception) {
+            $this->fail($exception->getMessage());
+        }
     }
 
     public function testSignedMiddlewareIgnoringParameterViaArgumentsWithoutRelative()
@@ -332,6 +352,32 @@ class UrlSigningTest extends TestCase
 
         $signature = (string) ValidateSignature::absolute(['foo', 'bar']);
         $this->assertSame('Illuminate\Routing\Middleware\ValidateSignature:foo,bar', $signature);
+    }
+
+    public function testUrlsSignedByPreviousAppKeysAreValidWhenAddedAsPreviousKeys()
+    {
+        Route::get('/foo/{id}', function (Request $request, $id) {
+            return $request->hasValidSignature() ? 'valid' : 'invalid';
+        })->name('foo');
+
+        config(['app.key' => 'oldest-key']);
+        $oldestURL = URL::signedRoute('foo', ['id' => 1]);
+
+        config(['app.key' => 'old-key']);
+        $oldURL = URL::signedRoute('foo', ['id' => 1]);
+
+        config(['app.key' => 'new-key']);
+        $newUrl = URL::signedRoute('foo', ['id' => 1]);
+
+        tap($this->get($oldestURL), fn ($response) => $this->assertSame('invalid', $response->original));
+        tap($this->get($oldURL), fn ($response) => $this->assertSame('invalid', $response->original));
+        tap($this->get($newUrl), fn ($response) => $this->assertSame('valid', $response->original));
+
+        config(['app.previous_keys' => ['old-key', 'oldest-key']]);
+
+        tap($this->get($oldestURL), fn ($response) => $this->assertSame('valid', $response->original));
+        tap($this->get($oldURL), fn ($response) => $this->assertSame('valid', $response->original));
+        tap($this->get($newUrl), fn ($response) => $this->assertSame('valid', $response->original));
     }
 
     protected function createValidateSignatureMiddleware(array $ignore)

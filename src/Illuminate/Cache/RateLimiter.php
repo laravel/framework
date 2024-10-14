@@ -2,9 +2,11 @@
 
 namespace Illuminate\Cache;
 
+use BackedEnum;
 use Closure;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Support\InteractsWithTime;
+use UnitEnum;
 
 class RateLimiter
 {
@@ -38,13 +40,15 @@ class RateLimiter
     /**
      * Register a named limiter configuration.
      *
-     * @param  string  $name
+     * @param  \BackedEnum|\UnitEnum|string  $name
      * @param  \Closure  $callback
      * @return $this
      */
-    public function for(string $name, Closure $callback)
+    public function for($name, Closure $callback)
     {
-        $this->limiters[$name] = $callback;
+        $resolvedName = $this->resolveLimiterName($name);
+
+        $this->limiters[$resolvedName] = $callback;
 
         return $this;
     }
@@ -52,12 +56,14 @@ class RateLimiter
     /**
      * Get the given named rate limiter.
      *
-     * @param  string  $name
+     * @param  \BackedEnum|\UnitEnum|string  $name
      * @return \Closure|null
      */
-    public function limiter(string $name)
+    public function limiter($name)
     {
-        return $this->limiters[$name] ?? null;
+        $resolvedName = $this->resolveLimiterName($name);
+
+        return $this->limiters[$resolvedName] ?? null;
     }
 
     /**
@@ -105,13 +111,26 @@ class RateLimiter
     }
 
     /**
-     * Increment the counter for a given key for a given decay time.
+     * Increment (by 1) the counter for a given key for a given decay time.
      *
      * @param  string  $key
      * @param  int  $decaySeconds
      * @return int
      */
     public function hit($key, $decaySeconds = 60)
+    {
+        return $this->increment($key, $decaySeconds);
+    }
+
+    /**
+     * Increment the counter for a given key for a given decay time by a given amount.
+     *
+     * @param  string  $key
+     * @param  int  $decaySeconds
+     * @param  int  $amount
+     * @return int
+     */
+    public function increment($key, $decaySeconds = 60, $amount = 1)
     {
         $key = $this->cleanRateLimiterKey($key);
 
@@ -121,13 +140,26 @@ class RateLimiter
 
         $added = $this->cache->add($key, 0, $decaySeconds);
 
-        $hits = (int) $this->cache->increment($key);
+        $hits = (int) $this->cache->increment($key, $amount);
 
         if (! $added && $hits == 1) {
             $this->cache->put($key, 1, $decaySeconds);
         }
 
         return $hits;
+    }
+
+    /**
+     * Decrement the counter for a given key for a given decay time by a given amount.
+     *
+     * @param  string  $key
+     * @param  int  $decaySeconds
+     * @param  int  $amount
+     * @return int
+     */
+    public function decrement($key, $decaySeconds = 60, $amount = 1)
+    {
+        return $this->increment($key, $decaySeconds, $amount * -1);
     }
 
     /**
@@ -221,5 +253,20 @@ class RateLimiter
     public function cleanRateLimiterKey($key)
     {
         return preg_replace('/&([a-z])[a-z]+;/i', '$1', htmlentities($key));
+    }
+
+    /**
+     * Resolve the rate limiter name.
+     *
+     * @param  \BackedEnum|\UnitEnum|string  $name
+     * @return string
+     */
+    private function resolveLimiterName($name): string
+    {
+        return match (true) {
+            $name instanceof BackedEnum => $name->value,
+            $name instanceof UnitEnum => $name->name,
+            default => (string) $name,
+        };
     }
 }

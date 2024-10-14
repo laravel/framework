@@ -2,9 +2,12 @@
 
 namespace Illuminate\Tests\Support;
 
+use Carbon\CarbonInterval as Duration;
+use Illuminate\Foundation\Testing\Wormhole;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\LazyCollection;
+use Illuminate\Support\Sleep;
 use InvalidArgumentException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -221,6 +224,58 @@ class SupportLazyCollectionTest extends TestCase
 
         $this->assertSame([1, 2, 3, 4, 5], $data);
         $this->assertSame([1, 2, 3, 4, 5], $tapped);
+    }
+
+    public function testThrottle()
+    {
+        Sleep::fake();
+
+        $data = LazyCollection::times(3)
+            ->throttle(2)
+            ->all();
+
+        Sleep::assertSlept(function (Duration $duration) {
+            $this->assertEqualsWithDelta(
+                2_000_000, $duration->totalMicroseconds, 1_000
+            );
+
+            return true;
+        }, times: 3);
+
+        $this->assertSame([1, 2, 3], $data);
+
+        Sleep::fake(false);
+    }
+
+    public function testThrottleAccountsForTimePassed()
+    {
+        Sleep::fake();
+        Carbon::setTestNow(now());
+
+        $data = LazyCollection::times(3)
+            ->throttle(3)
+            ->tapEach(function ($value, $index) {
+                if ($index == 1) {
+                    // Travel in time...
+                    (new Wormhole(1))->second();
+                }
+            })
+            ->all();
+
+        Sleep::assertSlept(function (Duration $duration, int $index) {
+            $expectation = $index == 1 ? 2_000_000 : 3_000_000;
+
+            $this->assertEqualsWithDelta(
+                $expectation, $duration->totalMicroseconds, 1_000
+            );
+
+            return true;
+        }, times: 3);
+
+        $this->assertSame([1, 2, 3], $data);
+
+        Sleep::fake(false);
+        Carbon::setTestNow();
     }
 
     public function testUniqueDoubleEnumeration()

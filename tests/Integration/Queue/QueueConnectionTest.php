@@ -23,7 +23,7 @@ class QueueConnectionTest extends TestCase
     {
         QueueConnectionTestJob::$ran = false;
 
-        m::close();
+        parent::tearDown();
     }
 
     public function testJobWontGetDispatchedInsideATransaction()

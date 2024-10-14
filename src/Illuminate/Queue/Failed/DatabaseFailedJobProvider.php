@@ -65,6 +65,21 @@ class DatabaseFailedJobProvider implements CountableFailedJobProvider, FailedJob
     }
 
     /**
+     * Get the IDs of all of the failed jobs.
+     *
+     * @param  string|null  $queue
+     * @return array
+     */
+    public function ids($queue = null)
+    {
+        return $this->getTable()
+            ->when(! is_null($queue), fn ($query) => $query->where('queue', $queue))
+            ->orderBy('id', 'desc')
+            ->pluck('id')
+            ->all();
+    }
+
+    /**
      * Get a list of all of the failed jobs.
      *
      * @return array

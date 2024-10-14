@@ -13,6 +13,17 @@ use Throwable;
 class SyncQueue extends Queue implements QueueContract
 {
     /**
+     * Create a new sync queue instance.
+     *
+     * @param  bool  $dispatchAfterCommit
+     * @return void
+     */
+    public function __construct($dispatchAfterCommit = false)
+    {
+        $this->dispatchAfterCommit = $dispatchAfterCommit;
+    }
+
+    /**
      * Get the size of the queue.
      *
      * @param  string|null  $queue
@@ -34,6 +45,28 @@ class SyncQueue extends Queue implements QueueContract
      * @throws \Throwable
      */
     public function push($job, $data = '', $queue = null)
+    {
+        if ($this->shouldDispatchAfterCommit($job) &&
+            $this->container->bound('db.transactions')) {
+            return $this->container->make('db.transactions')->addCallback(
+                fn () => $this->executeJob($job, $data, $queue)
+            );
+        }
+
+        return $this->executeJob($job, $data, $queue);
+    }
+
+    /**
+     * Execute a given job synchronously.
+     *
+     * @param  string  $job
+     * @param  mixed  $data
+     * @param  string|null  $queue
+     * @return int
+     *
+     * @throws \Throwable
+     */
+    protected function executeJob($job, $data = '', $queue = null)
     {
         $queueJob = $this->resolveJob($this->createPayload($job, $queue, $data), $queue);
 

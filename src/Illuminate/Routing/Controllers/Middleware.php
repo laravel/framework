@@ -8,35 +8,13 @@ use Illuminate\Support\Arr;
 class Middleware
 {
     /**
-     * The middleware that should be assigned.
-     *
-     * @var \Closure|string|array
-     */
-    public $middleware;
-
-    /**
-     * The controller methods the middleware should only apply to.
-     *
-     * @var array|null
-     */
-    public $only;
-
-    /**
-     * The controller methods the middleware should not apply to.
-     *
-     * @var array|null
-     */
-    public $except;
-
-    /**
      * Create a new controller middleware definition.
      *
      * @param  \Closure|string|array  $middleware
      * @return void
      */
-    public function __construct(Closure|string|array $middleware)
+    public function __construct(public Closure|string|array $middleware, public ?array $only = null, public ?array $except = null)
     {
-        $this->middleware = $middleware;
     }
 
     /**

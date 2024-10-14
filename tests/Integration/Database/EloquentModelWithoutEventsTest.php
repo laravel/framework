@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Schema;
 
 class EloquentModelWithoutEventsTest extends DatabaseTestCase
 {
-    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
+    protected function afterRefreshingDatabase()
     {
         Schema::create('auto_filled_models', function (Blueprint $table) {
             $table->increments('id');

@@ -30,9 +30,11 @@ class BladeCompiler extends Compiler implements CompilerInterface
         Concerns\CompilesLayouts,
         Concerns\CompilesLoops,
         Concerns\CompilesRawPhp,
+        Concerns\CompilesSessions,
         Concerns\CompilesStacks,
         Concerns\CompilesStyles,
         Concerns\CompilesTranslations,
+        Concerns\CompilesUseStatements,
         ReflectsClosures;
 
     /**
@@ -332,7 +334,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
 
         return tap($view->render(), function () use ($view, $deleteCachedView) {
             if ($deleteCachedView) {
-                unlink($view->getPath());
+                @unlink($view->getPath());
             }
         });
     }
@@ -388,8 +390,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function storeVerbatimBlocks($value)
     {
-        return preg_replace_callback('/(?<!@)@verbatim(.*?)@endverbatim/s', function ($matches) {
-            return $this->storeRawBlock($matches[1]);
+        return preg_replace_callback('/(?<!@)@verbatim(\s*)(.*?)@endverbatim/s', function ($matches) {
+            return $matches[1].$this->storeRawBlock($matches[2]);
         }, $value);
     }
 
@@ -806,9 +808,9 @@ class BladeCompiler extends Compiler implements CompilerInterface
      * @param  string|null  $prefix
      * @return void
      */
-    public function anonymousComponentPath(string $path, string $prefix = null)
+    public function anonymousComponentPath(string $path, ?string $prefix = null)
     {
-        $prefixHash = md5($prefix ?: $path);
+        $prefixHash = hash('xxh128', $prefix ?: $path);
 
         $this->anonymousComponentPaths[] = [
             'path' => $path,
@@ -828,7 +830,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      * @param  string|null  $prefix
      * @return void
      */
-    public function anonymousComponentNamespace(string $directory, string $prefix = null)
+    public function anonymousComponentNamespace(string $directory, ?string $prefix = null)
     {
         $prefix ??= $directory;
 

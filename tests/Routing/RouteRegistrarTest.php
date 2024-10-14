@@ -12,6 +12,8 @@ use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Stringable;
 
+include_once 'Enums.php';
+
 class RouteRegistrarTest extends TestCase
 {
     /**
@@ -498,9 +500,9 @@ class RouteRegistrarTest extends TestCase
     public function testRegisteringNonApprovedAttributesThrows()
     {
         $this->expectException(BadMethodCallException::class);
-        $this->expectExceptionMessage('Method Illuminate\Routing\RouteRegistrar::missing does not exist.');
+        $this->expectExceptionMessage('Method Illuminate\Routing\RouteRegistrar::unsupportedMethod does not exist.');
 
-        $this->router->domain('foo')->missing('bar')->group(function ($router) {
+        $this->router->domain('foo')->unsupportedMethod('bar')->group(function ($router) {
             //
         });
     }
@@ -942,6 +944,19 @@ class RouteRegistrarTest extends TestCase
         }
     }
 
+    public function testWhereInEnumRegistration()
+    {
+        $this->router->get('/posts/{category}')->whereIn('category', CategoryBackedEnum::cases());
+
+        $invalidRequest = Request::create('/posts/invalid-value', 'GET');
+        $this->assertFalse($this->getRoute()->matches($invalidRequest));
+
+        foreach (CategoryBackedEnum::cases() as $case) {
+            $request = Request::create('/posts/'.$case->value, 'GET');
+            $this->assertTrue($this->getRoute()->matches($request));
+        }
+    }
+
     public function testGroupWhereNumberRegistrationOnRouteRegistrar()
     {
         $wheres = ['foo' => '[0-9]+', 'bar' => '[0-9]+'];
@@ -1096,6 +1111,34 @@ class RouteRegistrarTest extends TestCase
 
         $this->seeResponse('all-users', Request::create('users', 'GET'));
         $this->assertSame('users.index', $this->getRoute()->getName());
+    }
+
+    public function testCanSetRouteNameUsingStringBackedEnum()
+    {
+        $this->router->name(RouteNameEnum::UserIndex)->get('users', fn () => 'all-users');
+
+        $this->assertSame('users.index', $this->getRoute()->getName());
+    }
+
+    public function testCannotSetRouteNameUsingIntegerBackedEnum()
+    {
+        $this->expectExceptionObject(new \InvalidArgumentException('Attribute [name] expects a string backed enum.'));
+
+        $this->router->name(IntegerEnum::One)->get('users', fn () => 'all-users');
+    }
+
+    public function testCanSetRouteDomainUsingStringBackedEnum()
+    {
+        $this->router->domain(RouteDomainEnum::DashboardDomain)->get('users', fn () => 'all-users');
+
+        $this->assertSame('dashboard.myapp.com', $this->getRoute()->getDomain());
+    }
+
+    public function testCannotSetRouteDomainUsingIntegerBackedEnum()
+    {
+        $this->expectExceptionObject(new \InvalidArgumentException('Attribute [domain] expects a string backed enum.'));
+
+        $this->router->domain(IntegerEnum::One)->get('users', fn () => 'all-users');
     }
 
     public function testPushMiddlewareToGroup()

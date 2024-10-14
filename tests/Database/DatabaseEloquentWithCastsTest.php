@@ -3,6 +3,8 @@
 namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Database\Eloquent\MissingAttributeException;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use PHPUnit\Framework\TestCase;
 
@@ -74,6 +76,21 @@ class DatabaseEloquentWithCastsTest extends TestCase
             ->createOrFirst(['time' => '07:30']);
 
         $this->assertSame($time1->id, $time2->id);
+    }
+
+    public function testThrowsExceptionIfCastableAttributeWasNotRetrievedAndPreventMissingAttributesIsEnabled()
+    {
+        Time::create(['time' => now()]);
+        $originalMode = Model::preventsAccessingMissingAttributes();
+        Model::preventAccessingMissingAttributes();
+
+        $this->expectException(MissingAttributeException::class);
+        try {
+            $time = Time::query()->select('id')->first();
+            $this->assertNull($time->time);
+        } finally {
+            Model::preventAccessingMissingAttributes($originalMode);
+        }
     }
 
     /**

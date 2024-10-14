@@ -180,7 +180,7 @@ class FoundationDocsCommandTest extends TestCase
         $this->artisan('docs');
     }
 
-    public function testItBubblesUpNonProcessInterruptExceptionsInAskStratgies()
+    public function testItBubblesUpNonProcessInterruptExceptionsInAskStrategies()
     {
         putenv('ARTISAN_DOCS_ASK_STRATEGY='.__DIR__.'/fixtures/process-failure-strategy.php');
 

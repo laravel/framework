@@ -4,7 +4,7 @@ namespace Illuminate\Queue\Jobs;
 
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Queue\Job as JobContract;
-use Pheanstalk\Job as PheanstalkJob;
+use Pheanstalk\Contract\JobIdInterface;
 use Pheanstalk\Pheanstalk;
 
 class BeanstalkdJob extends Job implements JobContract
@@ -12,7 +12,7 @@ class BeanstalkdJob extends Job implements JobContract
     /**
      * The Pheanstalk instance.
      *
-     * @var \Pheanstalk\Pheanstalk
+     * @var \Pheanstalk\Contract\PheanstalkManagerInterface&\Pheanstalk\Contract\PheanstalkPublisherInterface&\Pheanstalk\Contract\PheanstalkSubscriberInterface
      */
     protected $pheanstalk;
 
@@ -27,13 +27,13 @@ class BeanstalkdJob extends Job implements JobContract
      * Create a new job instance.
      *
      * @param  \Illuminate\Container\Container  $container
-     * @param  \Pheanstalk\Pheanstalk  $pheanstalk
-     * @param  \Pheanstalk\Job  $job
+     * @param  \Pheanstalk\Contract\PheanstalkManagerInterface&\Pheanstalk\Contract\PheanstalkPublisherInterface&\Pheanstalk\Contract\PheanstalkSubscriberInterface  $pheanstalk
+     * @param  \Pheanstalk\Contract\JobIdInterface  $job
      * @param  string  $connectionName
      * @param  string  $queue
      * @return void
      */
-    public function __construct(Container $container, Pheanstalk $pheanstalk, PheanstalkJob $job, $connectionName, $queue)
+    public function __construct(Container $container, $pheanstalk, JobIdInterface $job, $connectionName, $queue)
     {
         $this->job = $job;
         $this->queue = $queue;
@@ -116,7 +116,7 @@ class BeanstalkdJob extends Job implements JobContract
     /**
      * Get the underlying Pheanstalk instance.
      *
-     * @return \Pheanstalk\Pheanstalk
+     * @return \Pheanstalk\Contract\PheanstalkManagerInterface&\Pheanstalk\Contract\PheanstalkPublisherInterface&\Pheanstalk\Contract\PheanstalkSubscriberInterface
      */
     public function getPheanstalk()
     {
@@ -126,7 +126,7 @@ class BeanstalkdJob extends Job implements JobContract
     /**
      * Get the underlying Pheanstalk job.
      *
-     * @return \Pheanstalk\Job
+     * @return \Pheanstalk\Contract\JobIdInterface
      */
     public function getPheanstalkJob()
     {
