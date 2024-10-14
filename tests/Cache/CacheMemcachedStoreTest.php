@@ -128,9 +128,17 @@ class CacheMemcachedStoreTest extends TestCase
     public function testForgetMethodProperlyCallsMemcache()
     {
         $memcache = $this->getMockBuilder(Memcached::class)->onlyMethods(['delete'])->getMock();
-        $memcache->expects($this->once())->method('delete')->with($this->equalTo('foo'));
+        $invocations = [];
+        $memcache->method('delete')->willReturnCallback(function ($key) use (&$invocations) {
+            $invocations[] = func_get_args();
+            return true;
+        });
         $store = new MemcachedStore($memcache);
         $store->forget('foo');
+        $this->assertCount(2, $invocations);
+
+        $this->assertSame('foo', $invocations[0][0]);
+        $this->assertSame('foo_ttl', $invocations[1][0]);
     }
 
     public function testFlushesCached()

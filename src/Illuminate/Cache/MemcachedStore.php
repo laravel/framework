@@ -242,7 +242,10 @@ class MemcachedStore extends TaggableStore implements LockProvider
      */
     public function forget($key)
     {
-        return $this->memcached->delete($this->prefix.$key);
+        $delete_item = $this->memcached->delete($this->prefix.$key);
+        $delete_ttl = $this->memcached->delete($this->prefix.$key.'_ttl');
+
+        return $delete_item && $delete_ttl;
     }
 
     /**
