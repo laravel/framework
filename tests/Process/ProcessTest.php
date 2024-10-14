@@ -47,6 +47,31 @@ class ProcessTest extends TestCase
 
         $this->assertTrue(str_contains($results[0]->output(), 'ProcessTest.php'));
         $this->assertTrue(str_contains($results[1]->output(), 'ProcessTest.php'));
+
+        $this->assertTrue($results->successful());
+    }
+
+    public function testProcessPoolFailed()
+    {
+        $factory = new Factory;
+
+        $factory->fake([
+            'cat *' => $factory->result(exitCode: 1),
+        ]);
+
+        $pool = $factory->pool(function ($pool) {
+            return [
+                $pool->path(__DIR__)->command($this->ls()),
+                $pool->path(__DIR__)->command('cat test'),
+            ];
+        });
+
+        $results = $pool->start()->wait();
+
+        $this->assertTrue($results[0]->successful());
+        $this->assertTrue($results[1]->failed());
+
+        $this->assertTrue($results->failed());
     }
 
     public function testInvokedProcessPoolCount()

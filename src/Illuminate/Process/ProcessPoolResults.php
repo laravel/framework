@@ -79,4 +79,22 @@ class ProcessPoolResults implements ArrayAccess
     {
         unset($this->results[$offset]);
     }
+
+    /**
+     * Determine if the process was successful.
+     *
+     * @return bool
+     */
+    public function successful() {
+        return collect($this->results)->every(fn($poolResult) => $poolResult->successful());
+    }
+
+    /**
+     * Determine if the process failed.
+     *
+     * @return bool
+     */
+    public function failed() {
+        return !$this->successful();
+    }
 }
