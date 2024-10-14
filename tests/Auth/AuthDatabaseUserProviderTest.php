@@ -179,7 +179,7 @@ class AuthDatabaseUserProviderTest extends TestCase
     {
         $conn = m::mock(Connection::class);
         $hasher = m::mock(Hasher::class);
-        $hasher->shouldReceive('check')->once()->with('plain', 'hash')->never();
+        $hasher->shouldReceive('check')->never();
         $provider = new DatabaseUserProvider($conn, $hasher, 'foo');
         $user = m::mock(Authenticatable::class);
         $user->shouldReceive('getAuthPassword')->once()->andReturn(null);
