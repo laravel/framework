@@ -46,10 +46,9 @@ function testThrowIf(float|int $foo): void
     assertType('never', throw_if(true, Exception::class));
     assertType('bool', throw_if(false, Exception::class));
     assertType('false', throw_if(empty($foo)));
-    throw_if(is_float($foo));
-    assertType('int', $foo);
-    throw_if($foo == false);
-    assertType('int<min, -1>|int<1, max>', $foo);
+    assertType('null', throw_if(null, Exception::class));
+    assertType('string', throw_if('', Exception::class));
+    assertType('never', throw_if('foo', Exception::class));
 }
 
 function testThrowUnless(float|int $foo): void
@@ -58,9 +57,9 @@ function testThrowUnless(float|int $foo): void
     assertType('never', throw_unless(false, Exception::class));
     assertType('true', throw_unless(empty($foo)));
     throw_unless(is_int($foo));
-    assertType('int', $foo);
-    throw_unless($foo == false);
-    assertType('0', $foo);
+    assertType('never', throw_unless(null, Exception::class));
+    assertType('never', throw_unless('', Exception::class));
+    assertType('string', throw_unless('foo', Exception::class));
 }
 
 assertType('int', transform('filled', fn () => 1, true));
