@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Database;
 
 use BadMethodCallException;
-use Carbon\Month;
 use Closure;
 use DateTime;
 use Illuminate\Contracts\Database\Query\ConditionExpression;
@@ -1406,11 +1405,6 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => '01', 1 => '10'], $builder->getBindings());
 
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->whereMonthBetween('created_at', [Month::January, Month::October]);
-        $this->assertSame('select * from "users" where month("created_at") between ? and ?', $builder->toSql());
-        $this->assertEquals([0 => '01', 1 => '10'], $builder->getBindings());
-
-        $builder = $this->getBuilder();
         $builder->select('*')->from('users')->whereMonthBetween('created_at', [['1'], ['10', '12']]);
         $this->assertSame('select * from "users" where month("created_at") between ? and ?', $builder->toSql());
         $this->assertEquals([0 => '01', 1 => '10'], $builder->getBindings());
@@ -1437,6 +1431,18 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->select('*')->from('users')->whereMonthBetween('created_at', collect([now(), now()]));
         $this->assertSame('select * from "users" where month("created_at") between ? and ?', $builder->toSql());
         $this->assertEquals([0 => now()->format('m'), 1 => now()->format('m')], $builder->getBindings());
+    }
+
+    public function testWhereMonthBetweenAcceptsMonthEnum()
+    {
+        if (! class_exists(\Carbon\Month::class)) {
+            $this->markTestSkipped('Carbon 3.0 is not installed.');
+        }
+        
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereMonthBetween('created_at', [\Carbon\Month::January, \Carbon\Month::October]);
+        $this->assertSame('select * from "users" where month("created_at") between ? and ?', $builder->toSql());
+        $this->assertEquals([0 => '01', 1 => '10'], $builder->getBindings());
     }
 
     public function testWhereDayBetween()

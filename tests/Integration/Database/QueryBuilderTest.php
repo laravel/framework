@@ -334,7 +334,7 @@ class QueryBuilderTest extends DatabaseTestCase
         $this->assertSame(1, DB::table('posts')->whereMonthBetween('created_at', [1, 3])->count());
     }
 
-    public function testWhereMonthBetweenUsinCarbon()
+    public function testWhereMonthBetweenUsingCarbon()
     {
         if (! class_exists(\Carbon\Month::class)) {
             $this->markTestSkipped('Carbon 3.0 is not installed.');
