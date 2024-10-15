@@ -17,6 +17,7 @@ use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Illuminate\Database\Eloquent\Attributes\CollectedBy;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Attributes\QueriedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\ArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
@@ -3178,6 +3179,16 @@ class DatabaseEloquentModelTest extends TestCase
 
         $this->assertInstanceOf(CustomEloquentCollection::class, $collection);
     }
+
+    public function testQueriedByAttribute()
+    {
+        $baseBuilderMock = m::mock(BaseBuilder::class);
+
+        $model = new EloquentModelWithQueriedByAttribute;
+        $collection = $model->newEloquentBuilder($baseBuilderMock);
+
+        $this->assertInstanceOf(CustomEloquentBuilder::class, $collection);
+    }
 }
 
 class EloquentTestObserverStub
@@ -3944,5 +3955,14 @@ class EloquentModelWithCollectedByAttribute extends Model
 }
 
 class CustomEloquentCollection extends Collection
+{
+}
+
+#[QueriedBy(CustomEloquentBuilder::class)]
+class EloquentModelWithQueriedByAttribute extends Model
+{
+}
+
+class CustomEloquentBuilder extends Builder
 {
 }
