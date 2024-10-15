@@ -59,16 +59,16 @@ PHP);
         $this->assertArrayHasKey('second', $syncOutput);
 
         /** As of now, the spatie/fork package is not included by default.
-        $forkOutput = Concurrency::driver('fork')->run([
-            'first' => fn() => 1 + 1,
-            'second' => fn() => 2 + 2,
-        ]);
-
-        $this->assertIsArray($forkOutput);
-        $this->assertArrayHasKey('first', $forkOutput);
-        $this->assertArrayHasKey('second', $forkOutput);
-        $this->assertEquals(2, $forkOutput['first']);
-        $this->assertEquals(4, $forkOutput['second']);
-        */
+         * $forkOutput = Concurrency::driver('fork')->run([
+         * 'first' => fn() => 1 + 1,
+         * 'second' => fn() => 2 + 2,
+         * ]);.
+         *
+         * $this->assertIsArray($forkOutput);
+         * $this->assertArrayHasKey('first', $forkOutput);
+         * $this->assertArrayHasKey('second', $forkOutput);
+         * $this->assertEquals(2, $forkOutput['first']);
+         * $this->assertEquals(4, $forkOutput['second']);
+         */
     }
 }
