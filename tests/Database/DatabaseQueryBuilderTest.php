@@ -1438,7 +1438,7 @@ class DatabaseQueryBuilderTest extends TestCase
         if (! class_exists(\Carbon\Month::class)) {
             $this->markTestSkipped('Carbon 3.0 is not installed.');
         }
-        
+
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->whereMonthBetween('created_at', [\Carbon\Month::January, \Carbon\Month::October]);
         $this->assertSame('select * from "users" where month("created_at") between ? and ?', $builder->toSql());
