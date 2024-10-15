@@ -5516,6 +5516,13 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testEnsureAndForceFilter($collection)
+    {
+        $mixture = (new $collection([1, 2, 3, 'string', new stdClass()]))->ensure('int', true);
+        $this->assertSame([1, 2, 3], $mixture->all());
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testPercentageWithFlatCollection($collection)
     {
         $collection = new $collection([1, 1, 2, 2, 2, 3]);
