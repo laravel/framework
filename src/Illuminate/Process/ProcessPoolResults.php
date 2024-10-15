@@ -85,8 +85,9 @@ class ProcessPoolResults implements ArrayAccess
      *
      * @return bool
      */
-    public function successful() {
-        return collect($this->results)->every(fn($poolResult) => $poolResult->successful());
+    public function successful() 
+    {
+        return $this->collect($this->results)->every(fn($poolResult) => $poolResult->successful());
     }
 
     /**
@@ -94,7 +95,8 @@ class ProcessPoolResults implements ArrayAccess
      *
      * @return bool
      */
-    public function failed() {
-        return !$this->successful();
+    public function failed() 
+    {
+        return ! $this->successful();
     }
 }
