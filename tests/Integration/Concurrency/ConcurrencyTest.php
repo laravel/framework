@@ -38,12 +38,11 @@ PHP);
         $this->assertEquals(4, $second);
     }
 
-
     public function testOutputIsMappedToArrayInput()
     {
         $input = [
-            'first' => fn() => 1 + 1,
-            'second' => fn() => 2 + 2,
+            'first' => fn () => 1 + 1,
+            'second' => fn () => 2 + 2,
         ];
 
         $processOutput = Concurrency::driver('process')->run($input);
