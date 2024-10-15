@@ -1011,17 +1011,15 @@ class Blueprint
      * Create a new unsigned big integer (8-byte) column on the table.
      *
      * @param  string  $column
-     * @param  string|null  $table
      * @return \Illuminate\Database\Schema\ForeignIdColumnDefinition
      */
-    public function foreignId($column, $table = null)
+    public function foreignId($column)
     {
         return $this->addColumnDefinition(new ForeignIdColumnDefinition($this, [
             'type' => 'bigInteger',
             'name' => $column,
             'autoIncrement' => false,
             'unsigned' => true,
-            'table' => $table,
         ]));
     }
 
@@ -1041,16 +1039,16 @@ class Blueprint
         $column = $column ?: $model->getForeignKey();
 
         if ($model->getKeyType() === 'int' && $model->getIncrementing()) {
-            return $this->foreignId($column, $model->getTable());
+            return $this->foreignId($column)->table($model->getTable());
         }
 
         $modelTraits = class_uses_recursive($model);
 
         if (in_array(HasUlids::class, $modelTraits, true)) {
-            return $this->foreignUlid($column, 26, $model->getTable());
+            return $this->foreignUlid($column, 26)->table($model->getTable());
         }
 
-        return $this->foreignUuid($column, $model->getTable());
+        return $this->foreignUuid($column)->table($model->getTable());
     }
 
     /**
@@ -1356,15 +1354,13 @@ class Blueprint
      * Create a new UUID column on the table with a foreign key constraint.
      *
      * @param  string  $column
-     * @param  string|null  $table
      * @return \Illuminate\Database\Schema\ForeignIdColumnDefinition
      */
-    public function foreignUuid($column, $table = null)
+    public function foreignUuid($column)
     {
         return $this->addColumnDefinition(new ForeignIdColumnDefinition($this, [
             'type' => 'uuid',
             'name' => $column,
-            'table' => $table,
         ]));
     }
 
@@ -1385,16 +1381,14 @@ class Blueprint
      *
      * @param  string  $column
      * @param  int|null  $length
-     * @param  string|null  $table
      * @return \Illuminate\Database\Schema\ForeignIdColumnDefinition
      */
-    public function foreignUlid($column, $length = 26, $table = null)
+    public function foreignUlid($column, $length = 26)
     {
         return $this->addColumnDefinition(new ForeignIdColumnDefinition($this, [
             'type' => 'char',
             'name' => $column,
             'length' => $length,
-            'table' => $table,
         ]));
     }
 
