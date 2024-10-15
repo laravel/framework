@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
-use Carbon\Month;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\MultipleRecordsFoundException;
 use Illuminate\Database\RecordsNotFoundException;
@@ -333,7 +332,15 @@ class QueryBuilderTest extends DatabaseTestCase
         $this->assertSame(1, DB::table('posts')->whereMonthBetween('created_at', ['11', '12'])->count());
         $this->assertSame(2, DB::table('posts')->whereMonthBetween('created_at', [1, '12'])->count());
         $this->assertSame(1, DB::table('posts')->whereMonthBetween('created_at', [1, 3])->count());
-        $this->assertSame(1, DB::table('posts')->whereMonthBetween('created_at', [Month::January, Month::April])->count());
+    }
+
+    public function testWhereMonthBetweenUsinCarbon()
+    {
+        if(! class_exists(\Carbon\Month::class)) {
+            $this->markTestSkipped('Carbon 3.0 is not installed.');
+        }
+
+        $this->assertSame(1, DB::table('posts')->whereMonthBetween('created_at', [\Carbon\Month::January, \Carbon\Month::March])->count());
     }
 
     public function testWhereDayBetween()

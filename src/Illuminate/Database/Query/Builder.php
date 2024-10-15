@@ -1881,7 +1881,7 @@ class Builder implements BuilderContract
                     return $value->format('m');
                 }
 
-                if ($value instanceof Month) {
+                if (class_exists(Month::class) && $value instanceof Month) {
                     $value = $value->value;
                 }
 
