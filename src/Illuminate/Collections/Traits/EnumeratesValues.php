@@ -339,15 +339,25 @@ trait EnumeratesValues
      * @template TEnsureOfType
      *
      * @param  class-string<TEnsureOfType>|array<array-key, class-string<TEnsureOfType>>  $type
+     * @param bool  $forceFilterCollection
      * @return static<TKey, TEnsureOfType>
      *
      * @throws \UnexpectedValueException
      */
-    public function ensure($type)
+    public function ensure($type, bool $forceFilterCollection = false)
     {
         $allowedTypes = is_array($type) ? $type : [$type];
 
-        return $this->each(function ($item, $index) use ($allowedTypes) {
+        return $this->when($forceFilterCollection, function ($collection) use ($allowedTypes) {
+            return $collection->filter(function ($item) use ($allowedTypes) {
+                $itemType = get_debug_type($item);
+
+                if (in_array($itemType, $allowedTypes)) {
+                    return true;
+                }
+                return false;
+            });
+        })->each(function ($item) use ($allowedTypes) {
             $itemType = get_debug_type($item);
 
             foreach ($allowedTypes as $allowedType) {
@@ -357,7 +367,7 @@ trait EnumeratesValues
             }
 
             throw new UnexpectedValueException(
-                sprintf("Collection should only include [%s] items, but '%s' found at position %d.", implode(', ', $allowedTypes), $itemType, $index)
+                sprintf("Collection should only include [%s] items, but '%s' found.", implode(', ', $allowedTypes), $itemType)
             );
         });
     }
