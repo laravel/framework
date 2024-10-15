@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Database;
 
 use BadMethodCallException;
+use Carbon\Month;
 use Closure;
 use DateTime;
 use Illuminate\Contracts\Database\Query\ConditionExpression;
@@ -1401,6 +1402,11 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->whereMonthBetween('created_at', [['1', '10', '12']]);
+        $this->assertSame('select * from "users" where month("created_at") between ? and ?', $builder->toSql());
+        $this->assertEquals([0 => '01', 1 => '10'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereMonthBetween('created_at', [Month::January, Month::October]);
         $this->assertSame('select * from "users" where month("created_at") between ? and ?', $builder->toSql());
         $this->assertEquals([0 => '01', 1 => '10'], $builder->getBindings());
 

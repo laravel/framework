@@ -4,6 +4,7 @@ namespace Illuminate\Database\Query;
 
 use BackedEnum;
 use Carbon\CarbonPeriod;
+use Carbon\Month;
 use Closure;
 use DateTimeInterface;
 use Illuminate\Contracts\Database\Query\Builder as BuilderContract;
@@ -1878,6 +1879,10 @@ class Builder implements BuilderContract
             ->map(function ($value) {
                 if ($value instanceof DateTimeInterface) {
                     return $value->format('m');
+                }
+
+                if ($value instanceof Month) {
+                    $value = $value->value;
                 }
 
                 if (! $value instanceof ExpressionContract) {
