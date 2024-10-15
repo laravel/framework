@@ -26,6 +26,26 @@ class ProcessPoolResults implements ArrayAccess
     }
 
     /**
+     * Determine if all of the processes in the pool were successful.
+     *
+     * @return bool
+     */
+    public function successful()
+    {
+        return $this->collect()->every(fn ($p) => $p->successful());
+    }
+
+    /**
+     * Determine if any of the processes in the pool failed.
+     *
+     * @return bool
+     */
+    public function failed()
+    {
+        return ! $this->successful();
+    }
+
+    /**
      * Get the results as a collection.
      *
      * @return \Illuminate\Support\Collection
@@ -78,25 +98,5 @@ class ProcessPoolResults implements ArrayAccess
     public function offsetUnset($offset): void
     {
         unset($this->results[$offset]);
-    }
-
-    /**
-     * Determine if the process was successful.
-     *
-     * @return bool
-     */
-    public function successful() 
-    {
-        return $this->collect()->every(fn ($poolResult) => $poolResult->successful());
-    }
-
-    /**
-     * Determine if the process failed.
-     *
-     * @return bool
-     */
-    public function failed()
-    {
-        return ! $this->successful();
     }
 }
