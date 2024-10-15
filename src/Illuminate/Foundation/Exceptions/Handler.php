@@ -630,16 +630,16 @@ class Handler implements ExceptionHandlerContract
     protected function prepareException(Throwable $e)
     {
         return match (true) {
-            $e instanceof BackedEnumCaseNotFoundException => new NotFoundHttpException($e->getMessage(), $e),
-            $e instanceof ModelNotFoundException => new NotFoundHttpException($e->getMessage(), $e),
+            $e instanceof BackedEnumCaseNotFoundException => new NotFoundHttpException(__($e->getMessage()), $e),
+            $e instanceof ModelNotFoundException => new NotFoundHttpException(__($e->getMessage()), $e),
             $e instanceof AuthorizationException && $e->hasStatus() => new HttpException(
-                $e->status(), $e->response()?->message() ?: (Response::$statusTexts[$e->status()] ?? 'Whoops, looks like something went wrong.'), $e
+                $e->status(), __($e->response()?->message()) ?: (Response::$statusTexts[$e->status()] ?? __('Whoops, looks like something went wrong.')), $e
             ),
-            $e instanceof AuthorizationException && ! $e->hasStatus() => new AccessDeniedHttpException($e->getMessage(), $e),
-            $e instanceof TokenMismatchException => new HttpException(419, $e->getMessage(), $e),
-            $e instanceof RequestExceptionInterface => new BadRequestHttpException('Bad request.', $e),
-            $e instanceof RecordNotFoundException => new NotFoundHttpException('Not found.', $e),
-            $e instanceof RecordsNotFoundException => new NotFoundHttpException('Not found.', $e),
+            $e instanceof AuthorizationException && ! $e->hasStatus() => new AccessDeniedHttpException(__($e->getMessage()), $e),
+            $e instanceof TokenMismatchException => new HttpException(419, __($e->getMessage()), $e),
+            $e instanceof RequestExceptionInterface => new BadRequestHttpException(__('Bad request.'), $e),
+            $e instanceof RecordNotFoundException => new NotFoundHttpException(__('Not found.'), $e),
+            $e instanceof RecordsNotFoundException => new NotFoundHttpException(__('Not found.'), $e),
             default => $e,
         };
     }
@@ -806,7 +806,7 @@ class Handler implements ExceptionHandlerContract
         }
 
         if (! $this->isHttpException($e)) {
-            $e = new HttpException(500, $e->getMessage(), $e);
+            $e = new HttpException(500, __($e->getMessage()), $e);
         }
 
         return $this->toIlluminateResponse(
@@ -984,13 +984,13 @@ class Handler implements ExceptionHandlerContract
     protected function convertExceptionToArray(Throwable $e)
     {
         return config('app.debug') ? [
-            'message' => $e->getMessage(),
+            'message' => __($e->getMessage()),
             'exception' => get_class($e),
             'file' => $e->getFile(),
             'line' => $e->getLine(),
             'trace' => collect($e->getTrace())->map(fn ($trace) => Arr::except($trace, ['args']))->all(),
         ] : [
-            'message' => $this->isHttpException($e) ? $e->getMessage() : 'Server Error',
+            'message' => $this->isHttpException($e) ? __($e->getMessage()) : __('Server Error'),
         ];
     }
 
