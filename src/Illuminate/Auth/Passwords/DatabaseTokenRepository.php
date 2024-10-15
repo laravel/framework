@@ -6,6 +6,7 @@ use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 class DatabaseTokenRepository implements TokenRepositoryInterface
@@ -53,6 +54,13 @@ class DatabaseTokenRepository implements TokenRepositoryInterface
     protected $throttle;
 
     /**
+     * The provider for the password reset.
+     *
+     * @var string|null
+     */
+    protected $provider;
+
+    /**
      * Create a new token repository instance.
      *
      * @param  \Illuminate\Database\ConnectionInterface  $connection
@@ -61,11 +69,12 @@ class DatabaseTokenRepository implements TokenRepositoryInterface
      * @param  string  $hashKey
      * @param  int  $expires
      * @param  int  $throttle
+     * @param  string|null  $provider
      * @return void
      */
     public function __construct(ConnectionInterface $connection, HasherContract $hasher,
                                 $table, $hashKey, $expires = 60,
-                                $throttle = 60)
+                                $throttle = 60, $provider = null)
     {
         $this->table = $table;
         $this->hasher = $hasher;
@@ -73,6 +82,7 @@ class DatabaseTokenRepository implements TokenRepositoryInterface
         $this->expires = $expires * 60;
         $this->connection = $connection;
         $this->throttle = $throttle;
+        $this->provider = $provider;
     }
 
     /**
@@ -105,7 +115,10 @@ class DatabaseTokenRepository implements TokenRepositoryInterface
      */
     protected function deleteExisting(CanResetPasswordContract $user)
     {
-        return $this->getTable()->where('email', $user->getEmailForPasswordReset())->delete();
+        return $this->getTable()
+            ->where('email', $user->getEmailForPasswordReset())
+            ->when(is_string($this->provider), fn ($query) => $query->where('provider', $this->provider))
+            ->delete();
     }
 
     /**
@@ -117,7 +130,17 @@ class DatabaseTokenRepository implements TokenRepositoryInterface
      */
     protected function getPayload($email, #[\SensitiveParameter] $token)
     {
-        return ['email' => $email, 'token' => $this->hasher->make($token), 'created_at' => new Carbon];
+        $payload = [
+            'email' => $email,
+            'token' => $this->hasher->make($token),
+            'created_at' => new Carbon,
+        ];
+
+        if (is_string($this->provider)) {
+            $payload['provider'] = $this->provider;
+        }
+
+        return $payload;
     }
 
     /**
@@ -129,9 +152,10 @@ class DatabaseTokenRepository implements TokenRepositoryInterface
      */
     public function exists(CanResetPasswordContract $user, #[\SensitiveParameter] $token)
     {
-        $record = (array) $this->getTable()->where(
-            'email', $user->getEmailForPasswordReset()
-        )->first();
+        $record = (array) $this->getTable()
+            ->where('email', $user->getEmailForPasswordReset())
+            ->when(is_string($this->provider), fn ($query) => $query->where('provider', $this->provider))
+            ->first();
 
         return $record &&
                ! $this->tokenExpired($record['created_at']) &&
@@ -157,9 +181,10 @@ class DatabaseTokenRepository implements TokenRepositoryInterface
      */
     public function recentlyCreatedToken(CanResetPasswordContract $user)
     {
-        $record = (array) $this->getTable()->where(
-            'email', $user->getEmailForPasswordReset()
-        )->first();
+        $record = (array) $this->getTable()
+            ->where('email', $user->getEmailForPasswordReset())
+            ->when(is_string($this->provider), fn ($query) => $query->where('provider', $this->provider))
+            ->first();
 
         return $record && $this->tokenRecentlyCreated($record['created_at']);
     }
