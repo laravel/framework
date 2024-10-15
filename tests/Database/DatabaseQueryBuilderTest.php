@@ -1222,7 +1222,8 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => now()->format('Y-m-d'), 1 => now()->format('Y-m-d')], $builder->getBindings());
     }
 
-    public function testOrWhereDateFunctionsBetween() {
+    public function testOrWhereDateFunctionsBetween()
+    {
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->whereDateBetween('created_at', [now(), now()])
             ->orWhereDateBetween('updated_at', [now(), now()]);
@@ -1249,7 +1250,8 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertSame('select * from "users" where day("created_at") between ? and ? or day("updated_at") between ? and ?', $builder->toSql());
     }
 
-    public function testWhereDateFunctionsNotBetween() {
+    public function testWhereDateFunctionsNotBetween()
+    {
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->whereDateBetween('created_at', [now(), now()])
             ->whereDateNotBetween('updated_at', [now(), now()]);
