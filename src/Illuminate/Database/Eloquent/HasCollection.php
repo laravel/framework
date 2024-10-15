@@ -11,6 +11,8 @@ use ReflectionClass;
 trait HasCollection
 {
     /**
+     * The resolved collection class names by model.
+     *
      * @var array<class-string<static>, class-string<TCollection>>
      */
     protected static array $resolvedCollectionClasses = [];
@@ -23,7 +25,7 @@ trait HasCollection
      */
     public function newCollection(array $models = [])
     {
-        static::$resolvedCollectionClasses[static::class] ??= $this->resolveCollectionAttribute() ?? static::$collectionClass;
+        static::$resolvedCollectionClasses[static::class] ??= ($this->resolveCollectionFromAttribute() ?? static::$collectionClass);
 
         return new static::$resolvedCollectionClasses[static::class]($models);
     }
@@ -33,9 +35,10 @@ trait HasCollection
      *
      * @return class-string<TCollection>|null
      */
-    public function resolveCollectionAttribute()
+    public function resolveCollectionFromAttribute()
     {
         $reflectionClass = new ReflectionClass(static::class);
+
         $attributes = $reflectionClass->getAttributes(CollectedBy::class);
 
         if (! isset($attributes[0]) || ! isset($attributes[0]->getArguments()[0])) {
