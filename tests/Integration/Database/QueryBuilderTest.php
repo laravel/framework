@@ -308,6 +308,39 @@ class QueryBuilderTest extends DatabaseTestCase
         $this->assertSame(1, DB::table('posts')->whereDate('created_at', new Carbon('2018-01-02'))->count());
     }
 
+    public function testWhereDateBetween()
+    {
+        $this->assertSame(2, DB::table('posts')->whereDateBetween('created_at', ['2017-11-12', '2018-01-02'])->count());
+        $this->assertSame(1, DB::table('posts')->whereDateBetween('created_at', [new Carbon('2017-12-12'), new Carbon('2018-01-03')])->count());
+        $this->assertSame(2, DB::table('posts')->whereDateBetween('created_at', (new Carbon('2017-11-12'))->toPeriod(new Carbon('2018-03-02')))->count());
+    }
+
+    public function testWhereTimeBetween()
+    {
+        $this->assertSame(2, DB::table('posts')->whereTimeBetween('created_at', ['00:00:00', '15:00:00'])->count());
+        $this->assertSame(1, DB::table('posts')->whereTimeBetween('created_at', ['12:00:00', '14:00:00'])->count());
+    }
+
+    public function testWhereYearBetween()
+    {
+        $this->assertSame(1, DB::table('posts')->whereYearBetween('created_at', [2018, 2019])->count());
+        $this->assertSame(2, DB::table('posts')->whereYearBetween('created_at', (new Carbon('2017-01-01'))->toPeriod(new Carbon('2018-01-01')))->count());
+    }
+
+    public function testWhereMonthBetween()
+    {
+        $this->assertSame(1, DB::table('posts')->whereMonthBetween('created_at', ['11', '12'])->count());
+        $this->assertSame(2, DB::table('posts')->whereMonthBetween('created_at', [1, '12'])->count());
+        $this->assertSame(1, DB::table('posts')->whereMonthBetween('created_at', [1, 3])->count());
+    }
+
+    public function testWhereDayBetween()
+    {
+        $this->assertSame(2, DB::table('posts')->whereMonthBetween('created_at', [1, 31])->count());
+        $this->assertSame(1, DB::table('posts')->whereMonthBetween('created_at', [10, '31'])->count());
+        $this->assertSame(1, DB::table('posts')->whereMonthBetween('created_at', ['01', '10'])->count());
+    }
+
     #[DefineEnvironment('defineEnvironmentWouldThrowsPDOException')]
     public function testWhereDateWithInvalidOperator()
     {
