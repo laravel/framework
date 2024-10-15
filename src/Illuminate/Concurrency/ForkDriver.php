@@ -17,7 +17,6 @@ class ForkDriver implements Driver
      */
     public function run(Closure|array $tasks): array
     {
-        /** @phpstan-ignore class.notFound */
         $tasks = Arr::wrap($tasks);
         $keys = array_keys($tasks);
         $values = array_values($tasks);
