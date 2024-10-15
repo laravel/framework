@@ -984,13 +984,13 @@ class Handler implements ExceptionHandlerContract
     protected function convertExceptionToArray(Throwable $e)
     {
         return config('app.debug') ? [
-            'message' => $e->getMessage(),
+            'message' => __($e->getMessage()),
             'exception' => get_class($e),
             'file' => $e->getFile(),
             'line' => $e->getLine(),
             'trace' => collect($e->getTrace())->map(fn ($trace) => Arr::except($trace, ['args']))->all(),
         ] : [
-            'message' => $this->isHttpException($e) ? $e->getMessage() : 'Server Error',
+            'message' => $this->isHttpException($e) ? __($e->getMessage()) : __('Server Error'),
         ];
     }
 
