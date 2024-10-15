@@ -1249,6 +1249,33 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertSame('select * from "users" where day("created_at") between ? and ? or day("updated_at") between ? and ?', $builder->toSql());
     }
 
+    public function testWhereDateFunctionsNotBetween() {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereDateBetween('created_at', [now(), now()])
+            ->whereDateNotBetween('updated_at', [now(), now()]);
+        $this->assertSame('select * from "users" where date("created_at") between ? and ? or date("updated_at") not between ? and ?', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereTimeBetween('created_at', [now(), now()])
+            ->whereTimeNotBetween('updated_at', [now(), now()]);
+        $this->assertSame('select * from "users" where time("created_at") between ? and ? or time("updated_at") not between ? and ?', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereYearBetween('created_at', [now(), now()])
+            ->whereYearNotBetween('updated_at', [now(), now()]);
+        $this->assertSame('select * from "users" where year("created_at") between ? and ? or year("updated_at") not between ? and ?', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereMonthBetween('created_at', [now(), now()])
+            ->whereMonthNotBetween('updated_at', [now(), now()]);
+        $this->assertSame('select * from "users" where month("created_at") between ? and ? or month("updated_at") not between ? and ?', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereDayBetween('created_at', [now(), now()])
+            ->whereDayNotBetween('updated_at', [now(), now()]);
+        $this->assertSame('select * from "users" where day("created_at") between ? and ? or day("updated_at") not between ? and ?', $builder->toSql());
+    }
+
     public function testWhereBetweenDateArguments()
     {
         // primitive types

@@ -1594,6 +1594,19 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add a "where date not between" statement to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  iterable<\DateTimeInterface|string|null>  $values
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereDateNotBetween($column, iterable $values, $boolean = 'or')
+    {
+        return $this->whereDateBetween($column, $values, $boolean, true);
+    }
+
+    /**
      * Add a "where time" statement to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
@@ -1665,6 +1678,19 @@ class Builder implements BuilderContract
     public function orWhereTimeBetween($column, iterable $values, $not = false)
     {
         return $this->whereTimeBetween($column, $values, 'or', $not);
+    }
+
+    /**
+     * Add a "where time not between" statement to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  iterable<\DateTimeInterface|string|null>  $values
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereTimeNotBetween($column, iterable $values, $boolean = 'or')
+    {
+        return $this->whereTimeBetween($column, $values, $boolean, true);
     }
 
     /**
@@ -1767,6 +1793,19 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add a "where day not between" statement to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  iterable<\DateTimeInterface|string|int|null>  $values
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereDayNotBetween($column, iterable $values, $boolean = 'or')
+    {
+        return $this->whereDayBetween($column, $values, $boolean, true);
+    }
+
+    /**
      * Add an "or where day" statement to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
@@ -1866,6 +1905,19 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add a "where month not between" statement to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  iterable<\DateTimeInterface|string|int|null>  $values
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereMonthNotBetween($column, iterable $values, $boolean = 'or')
+    {
+        return $this->whereMonthBetween($column, $values, $boolean, true);
+    }
+
+    /**
      * Add an "or where month" statement to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
@@ -1954,6 +2006,19 @@ class Builder implements BuilderContract
     public function orWhereYearBetween($column, iterable $values, $not = false)
     {
         return $this->whereYearBetween($column, $values, 'or', $not);
+    }
+
+    /**
+     * Add a "where year not between" statement to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  iterable<\DateTimeInterface|string|int|null>  $values
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereYearNotBetween($column, iterable $values, $boolean = 'or')
+    {
+        return $this->whereYearBetween($column, $values, $boolean, true);
     }
 
     /**
