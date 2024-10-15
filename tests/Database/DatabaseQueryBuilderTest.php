@@ -1222,6 +1222,33 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => now()->format('Y-m-d'), 1 => now()->format('Y-m-d')], $builder->getBindings());
     }
 
+    public function testOrWhereDateFunctionsBetween() {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereDateBetween('created_at', [now(), now()])
+            ->orWhereDateBetween('updated_at', [now(), now()]);
+        $this->assertSame('select * from "users" where date("created_at") between ? and ? or date("updated_at") between ? and ?', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereTimeBetween('created_at', [now(), now()])
+            ->orWhereTimeBetween('updated_at', [now(), now()]);
+        $this->assertSame('select * from "users" where time("created_at") between ? and ? or time("updated_at") between ? and ?', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereYearBetween('created_at', [now(), now()])
+            ->orWhereYearBetween('updated_at', [now(), now()]);
+        $this->assertSame('select * from "users" where year("created_at") between ? and ? or year("updated_at") between ? and ?', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereMonthBetween('created_at', [now(), now()])
+            ->orWhereMonthBetween('updated_at', [now(), now()]);
+        $this->assertSame('select * from "users" where month("created_at") between ? and ? or month("updated_at") between ? and ?', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereDayBetween('created_at', [now(), now()])
+            ->orWhereDayBetween('updated_at', [now(), now()]);
+        $this->assertSame('select * from "users" where day("created_at") between ? and ? or day("updated_at") between ? and ?', $builder->toSql());
+    }
+
     public function testWhereBetweenDateArguments()
     {
         // primitive types
