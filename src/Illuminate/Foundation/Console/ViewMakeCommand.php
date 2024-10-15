@@ -75,11 +75,7 @@ class ViewMakeCommand extends GeneratorCommand
      */
     protected function getNameInput()
     {
-        $name = trim($this->argument('name'));
-
-        $name = str_replace(['\\', '.'], '/', $this->argument('name'));
-
-        return $name;
+        return str_replace(['\\', '.'], '/', $this->argument('name'));
     }
 
     /**
