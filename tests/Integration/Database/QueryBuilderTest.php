@@ -336,7 +336,7 @@ class QueryBuilderTest extends DatabaseTestCase
 
     public function testWhereMonthBetweenUsinCarbon()
     {
-        if(! class_exists(\Carbon\Month::class)) {
+        if (! class_exists(\Carbon\Month::class)) {
             $this->markTestSkipped('Carbon 3.0 is not installed.');
         }
 
