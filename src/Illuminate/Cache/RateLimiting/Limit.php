@@ -144,7 +144,7 @@ class Limit
     }
 
     /**
-     * Retrieve a fallback key for the limit.
+     * Get a potential fallback key for the limit.
      *
      * @return string
      */
