@@ -101,6 +101,19 @@ class PendingResourceRegistration
     }
 
     /**
+     * Set the route names for controller actions.
+     *
+     * @param  array|string  $paths
+     * @return \Illuminate\Routing\PendingResourceRegistration
+     */
+    public function paths($paths)
+    {
+        $this->options['paths'] = $paths;
+
+        return $this;
+    }
+
+    /**
      * Set the route name for a controller action.
      *
      * @param  string  $method
