@@ -324,7 +324,7 @@ trait CompilesConditionals
      */
     protected function compileBool($condition)
     {
-        return "<?php if{$condition}: echo 'true'; else: 'false'; endif; ?>";
+        return "<?php echo ($condition ? 'true' : 'false'); ?>";
     }
 
     /**
