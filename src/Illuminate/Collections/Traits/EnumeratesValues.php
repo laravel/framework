@@ -339,7 +339,7 @@ trait EnumeratesValues
      * @template TEnsureOfType
      *
      * @param  class-string<TEnsureOfType>|array<array-key, class-string<TEnsureOfType>>  $type
-     * @param bool  $forceFilterCollection
+     * @param  bool $forceFilterCollection
      * @return static<TKey, TEnsureOfType>
      *
      * @throws \UnexpectedValueException
@@ -355,6 +355,7 @@ trait EnumeratesValues
                 if (in_array($itemType, $allowedTypes)) {
                     return true;
                 }
+
                 return false;
             });
         })->each(function ($item, $index) use ($allowedTypes) {
