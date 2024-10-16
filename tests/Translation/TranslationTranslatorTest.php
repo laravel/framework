@@ -322,7 +322,8 @@ class TranslationTranslatorTest extends TestCase
         $this->assertSame('foo', $t->get('foo'));
     }
 
-    public function testTagReplacementsHandleZeroAsString(){
+    public function testTagReplacementsHandleZeroAsString()
+    {
         $t = new Translator($this->getLoader(), 'en');
         $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn(['foo' => '0']);
         $this->assertSame('0', $t->get('foo'));
