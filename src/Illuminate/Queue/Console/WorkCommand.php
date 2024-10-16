@@ -199,7 +199,7 @@ class WorkCommand extends Command
      * @param  Throwable|null  $exception
      * @return void
      */
-    protected function writeOutput(Job $job, $status, Throwable $exception = null)
+    protected function writeOutput(Job $job, $status, ?Throwable $exception = null)
     {
         $this->outputUsingJson()
             ? $this->writeOutputAsJson($job, $status, $exception)
@@ -260,7 +260,7 @@ class WorkCommand extends Command
      * @param  Throwable|null  $exception
      * @return void
      */
-    protected function writeOutputAsJson(Job $job, $status, Throwable $exception = null)
+    protected function writeOutputAsJson(Job $job, $status, ?Throwable $exception = null)
     {
         $log = array_filter([
             'level' => $status === 'starting' || $status === 'success' ? 'info' : 'warning',
