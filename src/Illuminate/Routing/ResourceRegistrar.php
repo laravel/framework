@@ -288,7 +288,7 @@ class ResourceRegistrar
      */
     protected function addResourceCreate($name, $base, $controller, $options)
     {
-        $uri = $this->getResourceUri($name).'/'.static::$verbs['create'];
+        $uri = $this->getResourceUri($name).'/'.($options['paths']['create'] ?? static::$verbs['create']);
 
         unset($options['missing']);
 
@@ -350,7 +350,7 @@ class ResourceRegistrar
     {
         $name = $this->getShallowName($name, $options);
 
-        $uri = $this->getResourceUri($name).'/{'.$base.'}/'.static::$verbs['edit'];
+        $uri = $this->getResourceUri($name).'/{'.$base.'}/'.($options['paths']['edit'] ?? static::$verbs['edit']);
 
         $action = $this->getResourceAction($name, $controller, 'edit', $options);
 
@@ -407,7 +407,7 @@ class ResourceRegistrar
      */
     protected function addSingletonCreate($name, $controller, $options)
     {
-        $uri = $this->getResourceUri($name).'/'.static::$verbs['create'];
+        $uri = $this->getResourceUri($name).'/'.($options['paths']['create'] ?? static::$verbs['create']);
 
         unset($options['missing']);
 
@@ -466,7 +466,7 @@ class ResourceRegistrar
     {
         $name = $this->getShallowName($name, $options);
 
-        $uri = $this->getResourceUri($name).'/'.static::$verbs['edit'];
+        $uri = $this->getResourceUri($name).'/'.($options['paths']['edit'] ?? static::$verbs['edit']);
 
         $action = $this->getResourceAction($name, $controller, 'edit', $options);
 
