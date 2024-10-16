@@ -382,7 +382,9 @@ class ComponentTagCompiler
                     return $view;
                 }
 
-                if ($viewFactory->exists($view = $this->guessViewName($componentName, $directory).'.'.Str::afterLast($componentName, '.'))) {
+                $lastViewSegment = Str::afterLast(Str::afterLast($componentName, '.'), ':');
+
+                if ($viewFactory->exists($view = $this->guessViewName($componentName, $directory).'.'.$lastViewSegment)) {
                     return $view;
                 }
             });
