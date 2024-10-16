@@ -306,7 +306,7 @@ trait CompilesConditionals
     }
 
     /**
-     * Compile a bool block into valid PHP.
+     * Compile a boolean value into a raw true / false value for embedding into HTML attributes or JavaScript.
      *
      * @param  bool  $condition
      * @return string
