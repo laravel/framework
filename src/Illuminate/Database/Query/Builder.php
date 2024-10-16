@@ -1072,7 +1072,6 @@ class Builder implements BuilderContract
         // and can add them each as a where clause. We will maintain the boolean we
         // received when the method was called and pass it into the nested where.
         if (is_array($first)) {
-            // here
             return $this->addArrayOfWheres($first, $boolean, 'whereColumn');
         }
 
