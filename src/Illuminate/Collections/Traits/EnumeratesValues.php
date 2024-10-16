@@ -357,7 +357,7 @@ trait EnumeratesValues
                 }
                 return false;
             });
-        })->each(function ($item) use ($allowedTypes) {
+        })->each(function ($item, $index) use ($allowedTypes) {
             $itemType = get_debug_type($item);
 
             foreach ($allowedTypes as $allowedType) {
