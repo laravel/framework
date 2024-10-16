@@ -383,7 +383,7 @@ class ComponentTagCompiler
                 }
 
                 $lastViewPart = Str::afterLast(Str::afterLast($componentName, '.'), ':');
-                
+
                 if ($viewFactory->exists($view = $this->guessViewName($componentName, $directory).'.'.$lastViewPart)) {
                     return $view;
                 }
