@@ -30,6 +30,14 @@ class SupportEnumValueFunctionTest extends TestCase
 
     public static function scalarDataProvider()
     {
+        yield [null, null];
+        yield [0, 0];
+        yield ['0', '0'];
+        yield [false, false];
+        yield [1, 1];
+        yield ['1', '1'];
+        yield [true, true];
+        yield [[], []];
         yield ['', ''];
         yield ['laravel', 'laravel'];
         yield [true, true];
