@@ -367,7 +367,7 @@ trait EnumeratesValues
             }
 
             throw new UnexpectedValueException(
-                sprintf("Collection should only include [%s] items, but '%s' found at position %d.", implode(', ', $allowedTypes), $itemType)
+                sprintf("Collection should only include [%s] items, but '%s' found at position %d.", implode(', ', $allowedTypes), $itemType, $index)
             );
         });
     }
