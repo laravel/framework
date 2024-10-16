@@ -1062,7 +1062,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
         $updated = $this->fill($attributes)->save($options);
 
-        return $updated ? $this->fresh() : false;
+        return $updated ? $this : false;
     }
 
     /**
