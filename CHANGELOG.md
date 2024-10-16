@@ -1,6 +1,13 @@
 # Release Notes for 11.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v11.28.0...11.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v11.28.1...11.x)
+
+## [v11.28.1](https://github.com/laravel/framework/compare/v11.28.0...v11.28.1) - 2024-10-16
+
+* [11.x] Fix trim getting discarded in `ViewMakeCommand` by [@GrahamCampbell](https://github.com/GrahamCampbell) in https://github.com/laravel/framework/pull/53174
+* [11.x] Discard `PHP_CLI_SERVER_WORKERS` on Windows environment by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/53178
+* [11.x] Improves PHP 8.4 compatibility by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/53182
+* [11.x] Fix handling empty values passed to `enum_value()` function instead of only empty string by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/53181
 
 ## [v11.28.0](https://github.com/laravel/framework/compare/v11.27.2...v11.28.0) - 2024-10-15
 
