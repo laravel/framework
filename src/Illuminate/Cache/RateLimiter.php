@@ -63,7 +63,33 @@ class RateLimiter
     {
         $resolvedName = $this->resolveLimiterName($name);
 
-        return $this->limiters[$resolvedName] ?? null;
+        $limiter = $this->limiters[$resolvedName] ?? null;
+
+        if (! is_callable($limiter)) {
+            return;
+        }
+
+        return function (...$args) use ($limiter) {
+            $result = $limiter(...$args);
+
+            if (! is_array($result)) {
+                return $result;
+            }
+
+            $duplicates = collect($result)->duplicates('key');
+
+            if ($duplicates->isEmpty()) {
+                return $result;
+            }
+
+            foreach ($result as $limit) {
+                if ($duplicates->contains($limit->key)) {
+                    $limit->key = $limit->fallbackKey();
+                }
+            }
+
+            return $result;
+        };
     }
 
     /**
