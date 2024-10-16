@@ -306,17 +306,6 @@ trait CompilesConditionals
     }
 
     /**
-     * Compile a selected block into valid PHP.
-     *
-     * @param  string  $condition
-     * @return string
-     */
-    protected function compileSelected($condition)
-    {
-        return "<?php if{$condition}: echo 'selected'; endif; ?>";
-    }
-
-    /**
      * Compile a bool block into valid PHP.
      *
      * @param  bool  $condition
@@ -369,6 +358,17 @@ trait CompilesConditionals
     protected function compileReadonly($condition)
     {
         return "<?php if{$condition}: echo 'readonly'; endif; ?>";
+    }
+
+    /**
+     * Compile a selected block into valid PHP.
+     *
+     * @param  string  $condition
+     * @return string
+     */
+    protected function compileSelected($condition)
+    {
+        return "<?php if{$condition}: echo 'selected'; endif; ?>";
     }
 
     /**
