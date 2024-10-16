@@ -1,6 +1,7 @@
 <?php
 
 namespace Illuminate\Tests\View\Blade;
+
 class BladeBoolTest extends AbstractBladeTestCase
 {
     public function testBool()
