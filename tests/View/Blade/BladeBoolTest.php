@@ -8,7 +8,6 @@ class BladeBoolTest extends AbstractBladeTestCase
 {
     public function testBool()
     {
-
         // For Javascript object{'isBool' : true}
         $string = "{'isBool' : @bool(true)}";
         $expected = "{'isBool' : <?php echo ((true) ? 'true' : 'false'); ?>}";
@@ -46,7 +45,6 @@ class BladeBoolTest extends AbstractBladeTestCase
         eval(substr($compiled, 6, -3));
         $this->assertEquals('false', ob_get_clean());
 
-
         $anotherSomeViewVarTruthy = new SomeClass();
         $compiled = $this->compiler->compileString('@bool($anotherSomeViewVarTruthy)');
 
@@ -54,17 +52,19 @@ class BladeBoolTest extends AbstractBladeTestCase
         eval(substr($compiled, 6, -3));
         $this->assertEquals('true', ob_get_clean());
 
-        $anotherSomeViewVarFalsey = NULL;
+        $anotherSomeViewVarFalsey = null;
         $compiled = $this->compiler->compileString('@bool($anotherSomeViewVarFalsey)');
 
         ob_start();
         eval(substr($compiled, 6, -3));
         $this->assertEquals('false', ob_get_clean());
-
     }
 }
 
 
-class SomeClass{
-    public function someMethod(){}
+class SomeClass
+{
+    public function someMethod()
+    {
+    }
 }
