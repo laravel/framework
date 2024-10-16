@@ -921,7 +921,7 @@ class Builder implements BuilderContract
      * @param  string  $method
      * @return $this
      */
-    protected function addArrayOfWheres($column, $boolean, $method = 'where')
+    protected function addArrayOfWheres($column, $boolean, $method = 'where', $outerBoolean = null)
     {
         return $this->whereNested(function ($query) use ($column, $method, $boolean) {
             foreach ($column as $key => $value) {
@@ -931,7 +931,7 @@ class Builder implements BuilderContract
                     $query->{$method}($key, '=', $value, $boolean);
                 }
             }
-        }, $boolean);
+        }, $outerBoolean ?? $boolean);
     }
 
     /**
@@ -1004,6 +1004,13 @@ class Builder implements BuilderContract
      */
     public function orWhere($column, $operator = null, $value = null)
     {
+        // If the column is an array, we will assume it is an array of key-value pairs
+        // and can add them each as a where clause. We will maintain the boolean we
+        // received when the method was called and pass it into the nested where.
+        if (is_array($column)) {
+            return $this->addArrayOfWheres($column, array_is_list($column) ? 'and' : 'or', outerBoolean: 'or');
+        }
+
         [$value, $operator] = $this->prepareValueAndOperator(
             $value, $operator, func_num_args() === 2
         );
@@ -1041,6 +1048,12 @@ class Builder implements BuilderContract
      */
     public function orWhereNot($column, $operator = null, $value = null)
     {
+        if (is_array($column)) {
+            return $this->whereNested(function ($query) use ($column, $operator, $value) {
+                $query->where($column, $operator, $value);
+            }, 'or not');
+        }
+
         return $this->whereNot($column, $operator, $value, 'or');
     }
 
@@ -1059,6 +1072,7 @@ class Builder implements BuilderContract
         // and can add them each as a where clause. We will maintain the boolean we
         // received when the method was called and pass it into the nested where.
         if (is_array($first)) {
+            // here
             return $this->addArrayOfWheres($first, $boolean, 'whereColumn');
         }
 
