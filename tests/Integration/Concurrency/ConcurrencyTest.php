@@ -1,7 +1,8 @@
 <?php
 
-namespace Illuminate\Tests\Integration\Console;
+namespace Illuminate\Tests\Integration\Concurrency;
 
+use Illuminate\Support\Facades\Concurrency;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 
@@ -35,5 +36,38 @@ PHP);
 
         $this->assertEquals(2, $first);
         $this->assertEquals(4, $second);
+    }
+
+    public function testOutputIsMappedToArrayInput()
+    {
+        $input = [
+            'first' => fn () => 1 + 1,
+            'second' => fn () => 2 + 2,
+        ];
+
+        $processOutput = Concurrency::driver('process')->run($input);
+
+        $this->assertIsArray($processOutput);
+        $this->assertArrayHasKey('first', $processOutput);
+        $this->assertArrayHasKey('second', $processOutput);
+
+        $syncOutput = Concurrency::driver('sync')->run($input);
+
+        $this->assertIsArray($syncOutput);
+        $this->assertArrayHasKey('first', $syncOutput);
+        $this->assertArrayHasKey('second', $syncOutput);
+
+        /** As of now, the spatie/fork package is not included by default.
+         * $forkOutput = Concurrency::driver('fork')->run([
+         * 'first' => fn() => 1 + 1,
+         * 'second' => fn() => 2 + 2,
+         * ]);.
+         *
+         * $this->assertIsArray($forkOutput);
+         * $this->assertArrayHasKey('first', $forkOutput);
+         * $this->assertArrayHasKey('second', $forkOutput);
+         * $this->assertEquals(2, $forkOutput['first']);
+         * $this->assertEquals(4, $forkOutput['second']);
+         */
     }
 }
