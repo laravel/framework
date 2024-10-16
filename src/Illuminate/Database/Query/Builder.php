@@ -4,6 +4,7 @@ namespace Illuminate\Database\Query;
 
 use BackedEnum;
 use Carbon\CarbonPeriod;
+use Carbon\Month;
 use Closure;
 use DateTimeInterface;
 use Illuminate\Contracts\Database\Query\Builder as BuilderContract;
@@ -1553,6 +1554,62 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add a "where date between" statement to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  iterable<\DateTimeInterface|string|null>  $values
+     * @param  string  $boolean
+     * @param  bool  $not
+     * @return $this
+     */
+    public function whereDateBetween($column, iterable $values, $boolean = 'and', $not = false)
+    {
+        if ($values instanceof CarbonPeriod) {
+            $values = [$values->getStartDate(), $values->getEndDate()];
+        }
+
+        $values = array_slice(Arr::flatten($values), 0, 2);
+
+        $values = collect($values)
+            ->map(function ($value) {
+                if ($value instanceof DateTimeInterface) {
+                    return $value->format('Y-m-d');
+                }
+
+                return $value;
+            })
+            ->all();
+
+        return $this->addDateBasedWhereBetween('Date', $column, $values, $boolean, $not);
+    }
+
+    /**
+     * Add a "or where date between" statement to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  iterable<\DateTimeInterface|string|null>  $values
+     * @param  bool  $not
+     * @return $this
+     */
+    public function orWhereDateBetween($column, iterable $values, $not = false)
+    {
+        return $this->whereDateBetween($column, $values, 'or', $not);
+    }
+
+    /**
+     * Add a "where date not between" statement to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  iterable<\DateTimeInterface|string|null>  $values
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereDateNotBetween($column, iterable $values, $boolean = 'or')
+    {
+        return $this->whereDateBetween($column, $values, $boolean, true);
+    }
+
+    /**
      * Add a "where time" statement to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
@@ -1581,6 +1638,62 @@ class Builder implements BuilderContract
         }
 
         return $this->addDateBasedWhere('Time', $column, $operator, $value, $boolean);
+    }
+
+    /**
+     * Add a "where time between" statement to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  iterable<\DateTimeInterface|string|null>  $values
+     * @param  string  $boolean
+     * @param  bool  $not
+     * @return $this
+     */
+    public function whereTimeBetween($column, iterable $values, $boolean = 'and', $not = false)
+    {
+        if ($values instanceof CarbonPeriod) {
+            $values = [$values->getStartDate(), $values->getEndDate()];
+        }
+
+        $values = array_slice(Arr::flatten($values), 0, 2);
+
+        $values = collect($values)
+            ->map(function ($value) {
+                if ($value instanceof DateTimeInterface) {
+                    return $value->format('H:i:s');
+                }
+
+                return $value;
+            })
+            ->all();
+
+        return $this->addDateBasedWhereBetween('Time', $column, $values, $boolean, $not);
+    }
+
+    /**
+     * Add a "or where time between" statement to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  iterable<\DateTimeInterface|string|null>  $values
+     * @param  bool  $not
+     * @return $this
+     */
+    public function orWhereTimeBetween($column, iterable $values, $not = false)
+    {
+        return $this->whereTimeBetween($column, $values, 'or', $not);
+    }
+
+    /**
+     * Add a "where time not between" statement to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  iterable<\DateTimeInterface|string|null>  $values
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereTimeNotBetween($column, iterable $values, $boolean = 'or')
+    {
+        return $this->whereTimeBetween($column, $values, $boolean, true);
     }
 
     /**
@@ -1636,6 +1749,66 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add a "where day between" statement to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  iterable<\DateTimeInterface|string|int|null>  $values
+     * @param  string  $boolean
+     * @param  bool  $not
+     * @return $this
+     */
+    public function whereDayBetween($column, iterable $values, $boolean = 'and', $not = false)
+    {
+        if ($values instanceof CarbonPeriod) {
+            $values = [$values->getStartDate(), $values->getEndDate()];
+        }
+
+        $values = array_slice(Arr::flatten($values), 0, 2);
+
+        $values = collect($values)
+            ->map(function ($value) {
+                if ($value instanceof DateTimeInterface) {
+                    return $value->format('d');
+                }
+
+                if (! $value instanceof ExpressionContract) {
+                    return sprintf('%02d', $value);
+                }
+
+                return $value;
+            })
+            ->all();
+
+        return $this->addDateBasedWhereBetween('Day', $column, $values, $boolean, $not);
+    }
+
+    /**
+     * Add a "or where day between" statement to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  iterable<\DateTimeInterface|string|int|null>  $values
+     * @param  bool  $not
+     * @return $this
+     */
+    public function orWhereDayBetween($column, iterable $values, $not = false)
+    {
+        return $this->whereDayBetween($column, $values, 'or', $not);
+    }
+
+    /**
+     * Add a "where day not between" statement to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  iterable<\DateTimeInterface|string|int|null>  $values
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereDayNotBetween($column, iterable $values, $boolean = 'or')
+    {
+        return $this->whereDayBetween($column, $values, $boolean, true);
+    }
+
+    /**
      * Add an "or where day" statement to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
@@ -1688,6 +1861,70 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add a "where month between" statement to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  iterable<\DateTimeInterface|string|int|null>  $values
+     * @param  string  $boolean
+     * @param  bool  $not
+     * @return $this
+     */
+    public function whereMonthBetween($column, iterable $values, $boolean = 'and', $not = false)
+    {
+        if ($values instanceof CarbonPeriod) {
+            $values = [$values->getStartDate(), $values->getEndDate()];
+        }
+
+        $values = array_slice(Arr::flatten($values), 0, 2);
+
+        $values = collect($values)
+            ->map(function ($value) {
+                if ($value instanceof DateTimeInterface) {
+                    return $value->format('m');
+                }
+
+                if (class_exists(Month::class) && $value instanceof Month) {
+                    $value = $value->value;
+                }
+
+                if (! $value instanceof ExpressionContract) {
+                    return sprintf('%02d', $value);
+                }
+
+                return $value;
+            })
+            ->all();
+
+        return $this->addDateBasedWhereBetween('Month', $column, $values, $boolean, $not);
+    }
+
+    /**
+     * Add a "or where month between" statement to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  iterable<\DateTimeInterface|string|int|null>  $values
+     * @param  bool  $not
+     * @return $this
+     */
+    public function orWhereMonthBetween($column, iterable $values, $not = false)
+    {
+        return $this->whereMonthBetween($column, $values, 'or', $not);
+    }
+
+    /**
+     * Add a "where month not between" statement to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  iterable<\DateTimeInterface|string|int|null>  $values
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereMonthNotBetween($column, iterable $values, $boolean = 'or')
+    {
+        return $this->whereMonthBetween($column, $values, $boolean, true);
+    }
+
+    /**
      * Add an "or where month" statement to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
@@ -1736,6 +1973,62 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add a "where year between" statement to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  iterable<\DateTimeInterface|string|int|null>  $values
+     * @param  string  $boolean
+     * @param  bool  $not
+     * @return $this
+     */
+    public function whereYearBetween($column, iterable $values, $boolean = 'and', $not = false)
+    {
+        if ($values instanceof CarbonPeriod) {
+            $values = [$values->getStartDate(), $values->getEndDate()];
+        }
+
+        $values = array_slice(Arr::flatten($values), 0, 2);
+
+        $values = collect($values)
+            ->map(function ($value) {
+                if ($value instanceof DateTimeInterface) {
+                    return $value->format('Y');
+                }
+
+                return $value;
+            })
+            ->all();
+
+        return $this->addDateBasedWhereBetween('Year', $column, $values, $boolean, $not);
+    }
+
+    /**
+     * Add a "or where year between" statement to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  iterable<\DateTimeInterface|string|int|null>  $values
+     * @param  bool  $not
+     * @return $this
+     */
+    public function orWhereYearBetween($column, iterable $values, $not = false)
+    {
+        return $this->whereYearBetween($column, $values, 'or', $not);
+    }
+
+    /**
+     * Add a "where year not between" statement to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  iterable<\DateTimeInterface|string|int|null>  $values
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereYearNotBetween($column, iterable $values, $boolean = 'or')
+    {
+        return $this->whereYearBetween($column, $values, $boolean, true);
+    }
+
+    /**
      * Add an "or where year" statement to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
@@ -1769,6 +2062,27 @@ class Builder implements BuilderContract
         if (! $value instanceof ExpressionContract) {
             $this->addBinding($value, 'where');
         }
+
+        return $this;
+    }
+
+    /**
+     * Add a date based  (year, month, day, time) where between statement to the query.
+     *
+     * @param  string  $type
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  string  $operator
+     * @param  mixed  $value
+     * @param  string  $boolean
+     * @return $this
+     */
+    protected function addDateBasedWhereBetween($type, $column, iterable $values, $boolean = 'and', $not = false)
+    {
+        $type = $type.'Between';
+
+        $this->wheres[] = compact('type', 'column', 'values', 'boolean', 'not');
+
+        $this->addBinding($this->cleanBindings($values), 'where');
 
         return $this;
     }
