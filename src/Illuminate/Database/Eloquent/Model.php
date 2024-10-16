@@ -1048,6 +1048,24 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
+     * Update the model in the database and return the updated model instance.
+     *
+     * @param  array  $attributes
+     * @param  array  $options
+     * @return bool
+     */
+    public function updateAndFetch(array $attributes = [], array $options = [])
+    {
+        if (! $this->exists) {
+            return false;
+        }
+
+        $updated = $this->fill($attributes)->save($options);
+
+        return $updated ? $this->fresh() : false;
+    }
+
+    /**
      * Increment a column's value by a given amount without raising any events.
      *
      * @param  string  $column

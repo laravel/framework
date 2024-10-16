@@ -126,6 +126,19 @@ class EloquentModelTest extends DatabaseTestCase
             'analyze' => true,
         ]);
     }
+
+    public function testUpdateReturnsUpdatedModel()
+    {
+        $user = TestModel2::create(['name' => 'John Doe', 'title' => 'hello']);
+
+        $updatedUser = $user->updateAndFetch(['title' => 'hello web']);
+
+        $this->assertInstanceOf(TestModel2::class, $updatedUser);
+
+        $this->assertEquals('hello web', $updatedUser->title);
+
+        $this->assertEquals('John Doe', $updatedUser->name);
+    }
 }
 
 class TestModel1 extends Model
