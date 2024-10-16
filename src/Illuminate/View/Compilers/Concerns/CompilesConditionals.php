@@ -317,6 +317,17 @@ trait CompilesConditionals
     }
 
     /**
+     * Compile a bool block into valid PHP.
+     *
+     * @param  bool  $condition
+     * @return string
+     */
+    protected function compileBool($condition)
+    {
+        return "<?php if{$condition}: echo 'true'; else: 'false'; endif; ?>";
+    }
+
+    /**
      * Compile a checked block into valid PHP.
      *
      * @param  string  $condition
