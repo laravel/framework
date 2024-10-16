@@ -1,9 +1,6 @@
 <?php
 
 namespace Illuminate\Tests\View\Blade;
-
-use Illuminate\Testing\TestView;
-
 class BladeBoolTest extends AbstractBladeTestCase
 {
     public function testBool()
@@ -60,7 +57,6 @@ class BladeBoolTest extends AbstractBladeTestCase
         $this->assertEquals('false', ob_get_clean());
     }
 }
-
 
 class SomeClass
 {
