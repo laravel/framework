@@ -1804,6 +1804,20 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(['whereRawBinding', 'groupByRawBinding', 'havingRawBinding'], $builder->getBindings());
     }
 
+    public function testGroupByAndAggregate()
+    {
+        $builder = $this->getBuilder();
+
+        $queryResults = [(object) ['aggregate' => 2, 'role' => 'admin', 'city' => 'NY'], (object) ['aggregate' => 5, 'role' => 'user', 'city' => 'LA']];
+        $builder->getConnection()
+            ->shouldReceive('select')->once()
+            ->with('select count(*) as aggregate , "role", "city" from "users" group by "role", "city"', [], true)
+            ->andReturn($queryResults);
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(fn ($builder, $results) => $results);
+        $results = $builder->select('role')->from('users')->groupBy('role', 'city')->aggregate('count');
+        $this->assertEquals($queryResults, $results->toArray());
+    }
+
     public function testOrderBys()
     {
         $builder = $this->getBuilder();

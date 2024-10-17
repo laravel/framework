@@ -3631,6 +3631,10 @@ class Builder implements BuilderContract
                         ->setAggregate($function, $columns)
                         ->get($columns);
 
+        if ($this->groups) {
+            return $results;
+        }
+
         if (! $results->isEmpty()) {
             return array_change_key_case((array) $results[0])['aggregate'];
         }
@@ -3680,6 +3684,8 @@ class Builder implements BuilderContract
             $this->orders = null;
 
             $this->bindings['order'] = [];
+        } else {
+            $this->columns = array_merge($this->groups, $columns);
         }
 
         return $this;
