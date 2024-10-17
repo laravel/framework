@@ -79,7 +79,7 @@ class Pipeline implements PipelineContract
     }
 
     /**
-     * Push additional pipes onto the pipeline.
+     * Push additional pipes into the pipeline.
      *
      * @param  array|mixed  $pipes
      * @return $this
