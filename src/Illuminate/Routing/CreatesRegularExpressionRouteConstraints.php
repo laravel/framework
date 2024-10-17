@@ -2,8 +2,9 @@
 
 namespace Illuminate\Routing;
 
-use BackedEnum;
 use Illuminate\Support\Arr;
+
+use function Illuminate\Support\enum_value;
 
 trait CreatesRegularExpressionRouteConstraints
 {
@@ -74,7 +75,7 @@ trait CreatesRegularExpressionRouteConstraints
         return $this->assignExpressionToParameters(
             $parameters,
             collect($values)
-                ->map(fn ($value) => $value instanceof BackedEnum ? $value->value : $value)
+                ->map(fn ($value) => enum_value($value))
                 ->implode('|')
         );
     }

@@ -2,13 +2,14 @@
 
 namespace Illuminate\Database\Eloquent\Relations;
 
-use BackedEnum;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Concerns\ComparesRelatedModels;
 use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithDictionary;
 use Illuminate\Database\Eloquent\Relations\Concerns\SupportsDefaultModels;
+
+use function Illuminate\Support\enum_value;
 
 /**
  * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
@@ -367,7 +368,7 @@ class BelongsTo extends Relation
     {
         $foreignKey = $model->{$this->foreignKey};
 
-        return $foreignKey instanceof BackedEnum ? $foreignKey->value : $foreignKey;
+        return enum_value($foreignKey);
     }
 
     /**

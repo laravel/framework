@@ -62,6 +62,7 @@ class DatabaseEloquentBelongsToManyWithCastedAttributesTest extends TestCase
         $builder = m::mock(Builder::class);
         $related = m::mock(Model::class);
         $related->shouldReceive('newCollection')->passthru();
+        $related->shouldReceive('resolveCollectionFromAttribute')->passthru();
         $builder->shouldReceive('getModel')->andReturn($related);
         $related->shouldReceive('qualifyColumn');
         $builder->shouldReceive('join', 'where');

@@ -18,6 +18,7 @@ class SupportJsTest extends TestCase
         $this->assertSame('true', (string) Js::from(true));
         $this->assertSame('1', (string) Js::from(1));
         $this->assertSame('1.1', (string) Js::from(1.1));
+        $this->assertSame('[]', (string) Js::from([]));
         $this->assertSame("'Hello world'", (string) Js::from('Hello world'));
         $this->assertEquals(
             "'\\u003Cdiv class=\\u0022foo\\u0022\\u003E\\u0027quoted html\\u0027\\u003C\\/div\\u003E'",

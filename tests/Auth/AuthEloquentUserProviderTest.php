@@ -152,6 +152,18 @@ class AuthEloquentUserProviderTest extends TestCase
         $this->assertFalse($result);
     }
 
+    public function testCredentialValidationFailsGracefullyWithNullPassword()
+    {
+        $hasher = m::mock(Hasher::class);
+        $hasher->shouldReceive('check')->never();
+        $provider = new EloquentUserProvider($hasher, 'foo');
+        $user = m::mock(Authenticatable::class);
+        $user->shouldReceive('getAuthPassword')->once()->andReturn(null);
+        $result = $provider->validateCredentials($user, ['password' => 'plain']);
+
+        $this->assertFalse($result);
+    }
+
     public function testRehashPasswordIfRequired()
     {
         $hasher = m::mock(Hasher::class);

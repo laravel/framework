@@ -158,7 +158,7 @@ class Arr
      * Determine if the given key exists in the provided array.
      *
      * @param  \ArrayAccess|array  $array
-     * @param  string|int  $key
+     * @param  string|int|float  $key
      * @return bool
      */
     public static function exists($array, $key)
