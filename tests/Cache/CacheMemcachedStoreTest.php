@@ -60,10 +60,27 @@ class CacheMemcachedStoreTest extends TestCase
     {
         Carbon::setTestNow($now = Carbon::now());
         $memcache = $this->getMockBuilder(Memcached::class)->onlyMethods(['set'])->getMock();
-        $memcache->expects($this->once())->method('set')->with($this->equalTo('foo'), $this->equalTo('bar'), $this->equalTo($now->timestamp + 60))->willReturn(true);
+        $invocations = [];
+        $memcache->method('set')->willReturnCallback(function ($key, $value, $expiry) use (&$invocations) {
+            $invocations[] = func_get_args();
+
+            return true;
+        });
+
         $store = new MemcachedStore($memcache);
         $result = $store->put('foo', 'bar', 60);
+
         $this->assertTrue($result);
+        $this->assertCount(2, $invocations);
+
+        $this->assertSame('foo', $invocations[0][0]);
+        $this->assertSame('bar', $invocations[0][1]);
+        $this->assertSame($now->timestamp + 60, $invocations[0][2]);
+
+        $this->assertSame('foo_ttl', $invocations[1][0]);
+        $this->assertSame($now->timestamp + 60, $invocations[1][1]);
+        $this->assertSame($now->timestamp + 60, $invocations[1][2]);
+
         Carbon::setTestNow(null);
     }
 
@@ -88,18 +105,43 @@ class CacheMemcachedStoreTest extends TestCase
     public function testStoreItemForeverProperlyCallsMemcached()
     {
         $memcache = $this->getMockBuilder(Memcached::class)->onlyMethods(['set'])->getMock();
-        $memcache->expects($this->once())->method('set')->with($this->equalTo('foo'), $this->equalTo('bar'), $this->equalTo(0))->willReturn(true);
+        $invocations = [];
+        $memcache->method('set')->willReturnCallback(function ($key, $value, $expiry) use (&$invocations) {
+            $invocations[] = func_get_args();
+
+            return true;
+        });
         $store = new MemcachedStore($memcache);
         $result = $store->forever('foo', 'bar');
         $this->assertTrue($result);
+        $this->assertCount(2, $invocations);
+
+        $this->assertSame('foo', $invocations[0][0]);
+        $this->assertSame('bar', $invocations[0][1]);
+        $this->assertSame(0, $invocations[0][2]);
+
+        $this->assertSame('foo_ttl', $invocations[1][0]);
+        $this->assertSame(0, $invocations[1][1]);
+        $this->assertSame(0, $invocations[1][2]);
+
+        Carbon::setTestNow(null);
     }
 
     public function testForgetMethodProperlyCallsMemcache()
     {
         $memcache = $this->getMockBuilder(Memcached::class)->onlyMethods(['delete'])->getMock();
-        $memcache->expects($this->once())->method('delete')->with($this->equalTo('foo'));
+        $invocations = [];
+        $memcache->method('delete')->willReturnCallback(function ($key) use (&$invocations) {
+            $invocations[] = func_get_args();
+
+            return true;
+        });
         $store = new MemcachedStore($memcache);
         $store->forget('foo');
+        $this->assertCount(2, $invocations);
+
+        $this->assertSame('foo', $invocations[0][0]);
+        $this->assertSame('foo_ttl', $invocations[1][0]);
     }
 
     public function testFlushesCached()

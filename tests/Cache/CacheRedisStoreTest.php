@@ -61,8 +61,9 @@ class CacheRedisStoreTest extends TestCase
     public function testSetMethodProperlyCallsRedis()
     {
         $redis = $this->getRedis();
-        $redis->getRedis()->shouldReceive('connection')->once()->with('default')->andReturn($redis->getRedis());
+        $redis->getRedis()->shouldReceive('connection')->twice()->with('default')->andReturn($redis->getRedis());
         $redis->getRedis()->shouldReceive('setex')->once()->with('prefix:foo', 60, serialize('foo'))->andReturn('OK');
+        $redis->getRedis()->shouldReceive('setex')->once()->with('prefix:foo_ttl', 60, time() + 60)->andReturn('OK');
         $result = $redis->put('foo', 'foo', 60);
         $this->assertTrue($result);
     }
@@ -90,8 +91,9 @@ class CacheRedisStoreTest extends TestCase
     public function testSetMethodProperlyCallsRedisForNumerics()
     {
         $redis = $this->getRedis();
-        $redis->getRedis()->shouldReceive('connection')->once()->with('default')->andReturn($redis->getRedis());
+        $redis->getRedis()->shouldReceive('connection')->twice()->with('default')->andReturn($redis->getRedis());
         $redis->getRedis()->shouldReceive('setex')->once()->with('prefix:foo', 60, 1);
+        $redis->getRedis()->shouldReceive('setex')->once()->with('prefix:foo_ttl', 60, time() + 60)->andReturn('OK');
         $result = $redis->put('foo', 1, 60);
         $this->assertFalse($result);
     }
