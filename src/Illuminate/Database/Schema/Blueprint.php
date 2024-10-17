@@ -1284,11 +1284,12 @@ class Blueprint
      *
      * @param  string  $column
      * @param  int|null  $precision
+     * @param bool  $index
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function softDeletes($column = 'deleted_at', $precision = 0)
+    public function softDeletes($column = 'deleted_at', $precision = 0, $index = true)
     {
-        return $this->timestamp($column, $precision)->nullable();
+        return $index ? $this->timestamp($column, $precision)->nullable()->index() : $this->timestamp($column, $precision)->nullable();
     }
 
     /**
@@ -1296,11 +1297,12 @@ class Blueprint
      *
      * @param  string  $column
      * @param  int|null  $precision
+     * @param bool  $index
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function softDeletesTz($column = 'deleted_at', $precision = 0)
+    public function softDeletesTz($column = 'deleted_at', $precision = 0, $index = true)
     {
-        return $this->timestampTz($column, $precision)->nullable();
+        return $index ? $this->timestampTz($column, $precision)->nullable()->index() : $this->timestampTz($column, $precision)->nullable();
     }
 
     /**
@@ -1308,11 +1310,12 @@ class Blueprint
      *
      * @param  string  $column
      * @param  int|null  $precision
+     * @param bool  $index
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function softDeletesDatetime($column = 'deleted_at', $precision = 0)
+    public function softDeletesDatetime($column = 'deleted_at', $precision = 0, $index = true)
     {
-        return $this->datetime($column, $precision)->nullable();
+        return $index ? $this->datetime($column, $precision)->nullable()->index() : $this->datetime($column, $precision)->nullable();
     }
 
     /**
