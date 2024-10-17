@@ -19,6 +19,9 @@ use ReflectionClass;
  */
 class ComponentTagCompiler
 {
+
+    use Concerns\CompilesAttributes;
+
     /**
      * The Blade compiler instance.
      *
@@ -112,6 +115,10 @@ class ComponentTagCompiler
                         \s+
                         (?:
                             (?:
+                                @(?:attributes)(\( (?: (?>[^()]+) | (?-1) )* \))
+                            )
+                            |
+                            (?:
                                 @(?:class)(\( (?: (?>[^()]+) | (?-1) )* \))
                             )
                             |
@@ -150,9 +157,7 @@ class ComponentTagCompiler
 
         return preg_replace_callback($pattern, function (array $matches) {
             $this->boundAttributes = [];
-
             $attributes = $this->getAttributesFromAttributeString($matches['attributes']);
-
             return $this->componentString($matches[1], $attributes);
         }, $value);
     }
@@ -176,6 +181,10 @@ class ComponentTagCompiler
                     (?:
                         \s+
                         (?:
+                            (?:
+                                @(?:attributes)(\( (?: (?>[^()]+) | (?-1) )* \))
+                            )
+                            |
                             (?:
                                 @(?:class)(\( (?: (?>[^()]+) | (?-1) )* \))
                             )
@@ -523,6 +532,10 @@ class ComponentTagCompiler
                         \s+
                         (?:
                             (?:
+                                @(?:attributes)(\( (?: (?>[^()]+) | (?-1) )* \))
+                            )
+                            |
+                            (?:
                                 @(?:class)(\( (?: (?>[^()]+) | (?-1) )* \))
                             )
                             |
@@ -556,6 +569,8 @@ class ComponentTagCompiler
         /x";
 
         $value = preg_replace_callback($pattern, function ($matches) {
+
+
             $name = $this->stripQuotes($matches['inlineName'] ?: $matches['name'] ?: $matches['boundName']);
 
             if (Str::contains($name, '-') && ! empty($matches['inlineName'])) {
@@ -568,6 +583,7 @@ class ComponentTagCompiler
             }
 
             $this->boundAttributes = [];
+
 
             $attributes = $this->getAttributesFromAttributeString($matches['attributes']);
 
@@ -592,8 +608,9 @@ class ComponentTagCompiler
      */
     protected function getAttributesFromAttributeString(string $attributeString)
     {
-        $attributeString = $this->parseShortAttributeSyntax($attributeString);
+        $attributeString = $this->parseComponentTagAttributesStatements($attributeString);
         $attributeString = $this->parseAttributeBag($attributeString);
+        $attributeString = $this->parseShortAttributeSyntax($attributeString);
         $attributeString = $this->parseComponentTagClassStatements($attributeString);
         $attributeString = $this->parseComponentTagStyleStatements($attributeString);
         $attributeString = $this->parseBindAttributes($attributeString);
@@ -618,7 +635,8 @@ class ComponentTagCompiler
             return [];
         }
 
-        return collect($matches)->mapWithKeys(function ($match) {
+        return collect($matches)
+            ->mapWithKeys(function ($match) {
             $attribute = $match['attribute'];
             $value = $match['value'] ?? null;
 
@@ -643,7 +661,8 @@ class ComponentTagCompiler
             }
 
             return [$attribute => $value];
-        })->toArray();
+        })
+            ->toArray();
     }
 
     /**
@@ -689,13 +708,66 @@ class ComponentTagCompiler
             '/@(class)(\( ( (?>[^()]+) | (?2) )* \))/x', function ($match) {
                 if ($match[1] === 'class') {
                     $match[2] = str_replace('"', "'", $match[2]);
-
                     return ":class=\"\Illuminate\Support\Arr::toCssClasses{$match[2]}\"";
                 }
 
                 return $match[0];
             }, $attributeString
         );
+    }
+
+    /**
+     * Parse @attributes statements in a given attribute string into their fully-qualified syntax.
+     *
+     * @param  string  $attributeString
+     * @return string
+     */
+    protected function parseComponentTagAttributesStatements(string $attributeString)
+    {
+        return preg_replace_callback(
+            '/@(attributes)(\( ( (?>[^()]+) | (?2) )* \))/x', function ($match) {
+
+
+                if ($match[1] === 'attributes') {
+                    return \Illuminate\Support\Arr::toHtmlAttributes(
+                        $this->reformatAttributeExpressionStringToArray($match[2])
+                    );
+                }
+
+                return $match[0];
+            }, $attributeString
+        );
+    }
+
+    /**
+     * Take an attribute string in expression format (surrounded by ([]))
+     * and reformat it into a compiled HTML attribute string.
+     *
+     * @param string $expression
+     * @return array
+     */
+    public function reformatAttributeExpressionStringToArray(string $expression)
+    {
+        preg_match_all(
+            '/[\'"](?<key>[^\'"]+)[\'"]\s*=>\s*(?:(?<bool>true|false)|(?<int>\d+)|[\'"](?<string>[^\'"]*)[\'"])/x',
+            trim($expression, '()[]'),
+            $matches,
+            PREG_SET_ORDER
+        );
+        return \Illuminate\Support\Collection::make($matches)
+            ->mapWithKeys(function ($match) {
+                $key = $match['key'];
+                if (isset($match['bool']) && $match['bool'] !== '') {
+                    $value = $match['bool'] === 'true';
+                } elseif (isset($match['int']) && $match['int'] !== '') {
+                    $value = intval($match['int']);
+                } elseif (isset($match['string'])) {
+                    $value = $match['string'];
+                } else {
+                    $value = null;
+                }
+                return [$key => $value];
+            })->toArray();
     }
 
     /**

@@ -6,6 +6,7 @@ use ArrayObject;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\View\ComponentAttributeBag;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use stdClass;
@@ -1233,6 +1234,39 @@ class SupportArrTest extends TestCase
         ]);
 
         $this->assertSame('font-bold mt-4 ml-2', $classes);
+    }
+
+    public function testToHtmlAttributes()
+    {
+        $resultString = Arr::toHtmlAttributes([
+            new ComponentAttributeBag([
+                'taylor' => false,
+                'joe' => '',
+                'aaron' => 0,
+                'james' => null,
+                'tim' => 'macdonald',
+                'christoph' => fn () => "rumpel",
+            ]),
+            'audrey' => '',
+            'alex' => 0,
+            'leyton' => false,
+            'till' => null,
+            'josie' => 'cold',
+            'hedwood' => fn () => 'melanie'
+        ]);
+
+        $this->assertStringContainsString( 'audrey=""', $resultString);
+        $this->assertStringContainsString( 'hedwood="melanie"', $resultString);
+        $this->assertStringContainsString( 'alex="0"', $resultString);
+        $this->assertStringNotContainsString( 'leyton', $resultString);
+        $this->assertStringNotContainsString( 'till', $resultString);
+
+        $this->assertStringContainsString( 'joe=""', $resultString);
+        $this->assertStringContainsString( 'christoph="rumpel"', $resultString);
+        $this->assertStringContainsString( 'aaron="0"', $resultString);
+        $this->assertStringContainsString( 'tim="macdonald"', $resultString);
+        $this->assertStringNotContainsString( 'taylor', $resultString);
+        $this->assertStringNotContainsString( 'james', $resultString);
     }
 
     public function testToCssStyles()
