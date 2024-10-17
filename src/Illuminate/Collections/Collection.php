@@ -207,6 +207,18 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Determine if any item is contained in the collection.
+     *
+     * @param  array|Collection
+     * @return bool
+     */
+    public function containsAny($values = [])
+    {
+        $values = new static($values);
+        return $this->intersect($values->unique())->isNotEmpty();
+    }
+
+    /**
      * Determine if an item is not contained in the collection.
      *
      * @param  mixed  $key
