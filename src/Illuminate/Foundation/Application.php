@@ -22,7 +22,6 @@ use Illuminate\Routing\RoutingServiceProvider;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Env;
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use RuntimeException;
@@ -830,17 +829,21 @@ class Application extends Container implements ApplicationContract, CachesConfig
     /**
      * Register all of the configured providers.
      *
+     * @param  \Illuminate\Foundation\ProviderRepository|null  $providerRepository
      * @return void
      */
-    public function registerConfiguredProviders()
+    public function registerConfiguredProviders($providerRepository = null)
     {
         $providers = Collection::make($this->make('config')->get('app.providers'))
                         ->partition(fn ($provider) => str_starts_with($provider, 'Illuminate\\'));
 
         $providers->splice(1, 0, [$this->make(PackageManifest::class)->providers()]);
 
-        (new ProviderRepository($this, new Filesystem, $this->getCachedServicesPath()))
-                    ->load($providers->collapse()->toArray());
+        if ($providerRepository == null) {
+            $providerRepository = new ProviderRepository($this, new Filesystem, $this->getCachedServicesPath());
+        }
+
+        $providerRepository->load($providers->collapse()->toArray());
 
         $this->fireAppCallbacks($this->registeredCallbacks);
     }
@@ -850,9 +853,10 @@ class Application extends Container implements ApplicationContract, CachesConfig
      *
      * @param  \Illuminate\Support\ServiceProvider|string  $provider
      * @param  bool  $force
+     * @param  bool  $boot
      * @return \Illuminate\Support\ServiceProvider
      */
-    public function register($provider, $force = false)
+    public function register($provider, $force = false, $boot = true)
     {
         if (($registered = $this->getProvider($provider)) && ! $force) {
             return $registered;
@@ -889,7 +893,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
         // If the application has already booted, we will call this boot method on
         // the provider class so it has an opportunity to do its boot logic and
         // will be ready for any usage by this developer's application logic.
-        if ($this->isBooted()) {
+        if ($this->isBooted() && $boot) {
             $this->bootProvider($provider);
         }
 
@@ -1111,7 +1115,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      * @param  \Illuminate\Support\ServiceProvider  $provider
      * @return void
      */
-    protected function bootProvider(ServiceProvider $provider)
+    public function bootProvider($provider)
     {
         $provider->callBootingCallbacks();
 
