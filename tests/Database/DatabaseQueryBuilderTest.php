@@ -1809,7 +1809,7 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $builder = $this->getBuilder();
 
-        $queryResults = [(object) ['aggregate' => 2, 'role' => 'admin', 'city' => 'NY'], (object) ['aggregate' => 5, 'role' => 'user', 'city' => 'LA']];
+        $queryResults = [['aggregate' => 2, 'role' => 'admin', 'city' => 'NY'], ['aggregate' => 5, 'role' => 'user', 'city' => 'LA']];
         $builder->getConnection()
             ->shouldReceive('select')->once()
             ->with('select "role", "city", count(*) as aggregate from "users" group by "role", "city"', [], true)
@@ -1823,7 +1823,7 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $builder = $this->getBuilder();
 
-        $queryResults = [(object) ['aggregate' => 2, 'role' => 'admin', 'city' => 'NY'], (object) ['aggregate' => 5, 'role' => 'user', 'city' => 'LA']];
+        $queryResults = [['aggregate' => 2, 'role' => 'admin'], ['aggregate' => 5, 'role' => 'user']];
         $builder->getConnection()
             ->shouldReceive('select')->once()
             ->with('select "role", count(*) as aggregate from ((select * from "users") union (select * from "members")) as "temp_table" group by "role"', [], true)
