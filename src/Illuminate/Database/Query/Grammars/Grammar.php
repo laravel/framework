@@ -1139,7 +1139,7 @@ class Grammar extends BaseGrammar
     protected function compileUnionAggregate(Builder $query)
     {
         $sql = $this->compileAggregate($query, $query->aggregate);
-        $group = $query->groups ? ' ' . $this->compileGroups($query, $query->groups) : '';
+        $group = $query->groups ? ' '.$this->compileGroups($query, $query->groups) : '';
 
         $query->aggregate = null;
         $query->groups = null;
