@@ -149,7 +149,8 @@ class Request implements ArrayAccess
         return collect($this->data)->reject(function ($file) use ($name, $value, $filename) {
             return $file['name'] != $name ||
                 ($value && $file['contents'] != $value) ||
-                ($filename && $file['filename'] != $filename);
+                ($filename && $file['filename'] != $filename) ||
+                (! is_resource($file['contents']) && json_encode($file['contents']) !== false);
         })->count() > 0;
     }
 
