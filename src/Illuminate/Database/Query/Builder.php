@@ -919,19 +919,20 @@ class Builder implements BuilderContract
      * @param  array  $column
      * @param  string  $boolean
      * @param  string  $method
+     * @param  string|null  $outerBoolean
      * @return $this
      */
-    protected function addArrayOfWheres($column, $boolean, $method = 'where')
+    protected function addArrayOfWheres($column, $boolean, $method = 'where', $outerBoolean = null)
     {
         return $this->whereNested(function ($query) use ($column, $method, $boolean) {
             foreach ($column as $key => $value) {
                 if (is_numeric($key) && is_array($value)) {
-                    $query->{$method}(...array_values($value));
+                    $query->{$method}(...array_values($value), boolean: $boolean);
                 } else {
                     $query->{$method}($key, '=', $value, $boolean);
                 }
             }
-        }, $boolean);
+        }, $outerBoolean ?? $boolean);
     }
 
     /**
@@ -1004,6 +1005,10 @@ class Builder implements BuilderContract
      */
     public function orWhere($column, $operator = null, $value = null)
     {
+        if (is_array($column)) {
+            return $this->addArrayOfWheres($column, array_is_list($column) ? 'and' : 'or', outerBoolean: 'or');
+        }
+
         [$value, $operator] = $this->prepareValueAndOperator(
             $value, $operator, func_num_args() === 2
         );
@@ -1041,6 +1046,12 @@ class Builder implements BuilderContract
      */
     public function orWhereNot($column, $operator = null, $value = null)
     {
+        if (is_array($column)) {
+            return $this->whereNested(function ($query) use ($column, $operator, $value) {
+                $query->where($column, $operator, $value, array_is_list($column) ? 'and' : 'or');
+            }, 'or not');
+        }
+
         return $this->whereNot($column, $operator, $value, 'or');
     }
 
@@ -1091,6 +1102,10 @@ class Builder implements BuilderContract
      */
     public function orWhereColumn($first, $operator = null, $second = null)
     {
+        if (is_array($first)) {
+            return $this->addArrayOfWheres($first, array_is_list($first) ? 'and' : 'or', 'whereColumn', outerBoolean: 'or');
+        }
+
         return $this->whereColumn($first, $operator, $second, 'or');
     }
 
