@@ -43,5 +43,6 @@ class SupportEnumValueFunctionTest extends TestCase
         yield [true, true];
         yield [1337, 1337];
         yield [1.0, 1.0];
+        yield [$collect = collect(), $collect];
     }
 }
