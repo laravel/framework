@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Database\Postgres;
 
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -15,32 +16,33 @@ class DatabasePostgresConnectionTest extends PostgresTestCase
 {
     protected function afterRefreshingDatabase()
     {
-        if (! Schema::hasTable('json_table')) {
-            Schema::create('json_table', function (Blueprint $table) {
+        if (! Schema::hasTable('pgsql_table')) {
+            Schema::create('pgsql_table', function (Blueprint $table) {
                 $table->json('json_col')->nullable();
+                $table->timestamptz('timestamptz', precision: 6)->nullable();
             });
         }
     }
 
     protected function destroyDatabaseMigrations()
     {
-        Schema::drop('json_table');
+        Schema::drop('pgsql_table');
     }
 
     #[DataProvider('jsonWhereNullDataProvider')]
     public function testJsonWhereNull($expected, $key, array $value = ['value' => 123])
     {
-        DB::table('json_table')->insert(['json_col' => json_encode($value)]);
+        DB::table('pgsql_table')->insert(['json_col' => json_encode($value)]);
 
-        $this->assertSame($expected, DB::table('json_table')->whereNull("json_col->$key")->exists());
+        $this->assertSame($expected, DB::table('pgsql_table')->whereNull("json_col->$key")->exists());
     }
 
     #[DataProvider('jsonWhereNullDataProvider')]
     public function testJsonWhereNotNull($expected, $key, array $value = ['value' => 123])
     {
-        DB::table('json_table')->insert(['json_col' => json_encode($value)]);
+        DB::table('pgsql_table')->insert(['json_col' => json_encode($value)]);
 
-        $this->assertSame(! $expected, DB::table('json_table')->whereNotNull("json_col->$key")->exists());
+        $this->assertSame(! $expected, DB::table('pgsql_table')->whereNotNull("json_col->$key")->exists());
     }
 
     public static function jsonWhereNullDataProvider()
@@ -71,18 +73,18 @@ class DatabasePostgresConnectionTest extends PostgresTestCase
 
     public function testJsonPathUpdate()
     {
-        DB::table('json_table')->insert([
+        DB::table('pgsql_table')->insert([
             ['json_col' => '{"foo":["bar"]}'],
             ['json_col' => '{"foo":["baz"]}'],
             ['json_col' => '{"foo":[["array"]]}'],
         ]);
 
-        $updatedCount = DB::table('json_table')->where('json_col->foo[0]', 'baz')->update([
+        $updatedCount = DB::table('pgsql_table')->where('json_col->foo[0]', 'baz')->update([
             'json_col->foo[0]' => 'updated',
         ]);
         $this->assertSame(1, $updatedCount);
 
-        $updatedCount = DB::table('json_table')->where('json_col->foo[0][0]', 'array')->update([
+        $updatedCount = DB::table('pgsql_table')->where('json_col->foo[0][0]', 'array')->update([
             'json_col->foo[0][0]' => 'updated',
         ]);
         $this->assertSame(1, $updatedCount);
@@ -91,7 +93,7 @@ class DatabasePostgresConnectionTest extends PostgresTestCase
     #[DataProvider('jsonContainsKeyDataProvider')]
     public function testWhereJsonContainsKey($count, $column)
     {
-        DB::table('json_table')->insert([
+        DB::table('pgsql_table')->insert([
             ['json_col' => '{"foo":{"bar":["baz"]}}'],
             ['json_col' => '{"foo":{"bar":false}}'],
             ['json_col' => '{"foo":{}}'],
@@ -99,7 +101,19 @@ class DatabasePostgresConnectionTest extends PostgresTestCase
             ['json_col' => '{"bar":null}'],
         ]);
 
-        $this->assertSame($count, DB::table('json_table')->whereJsonContainsKey($column)->count());
+        $this->assertSame($count, DB::table('pgsql_table')->whereJsonContainsKey($column)->count());
+    }
+
+    public function testDateTimeInterfacesAreNotTruncated()
+    {
+        $datetime = Carbon::parse('2021-01-01 12:34:56.123456', 'America/New_York');
+
+        DB::table('pgsql_table')->insert([['timestamptz' => $datetime]]);
+
+        $this->assertSame(
+            '2021-01-01 17:34:56.123456+00',
+            DB::table('pgsql_table')->pluck('timestamptz')->first(),
+        );
     }
 
     public static function jsonContainsKeyDataProvider()
