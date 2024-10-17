@@ -150,8 +150,12 @@ class CookieJar implements JarContract
             $this->queued[$cookie->getName()] = [];
         }
 
-        if (! isset($this->queued[$cookie->getDomain()])) {
-            $this->queued[$cookie->getDomain()] = [];
+        if (! isset($this->queued[$cookie->getName()][$cookie->getPath()])) {
+            $this->queued[$cookie->getName()][$cookie->getPath()] = [];
+        }
+
+        if (! isset($this->queued[$cookie->getName()][$cookie->getPath()][$cookie->getDomain()])) {
+            $this->queued[$cookie->getName()][$cookie->getPath()][$cookie->getDomain()] = [];
         }
 
         $this->queued[$cookie->getName()][$cookie->getPath()][$cookie->getDomain()] = $cookie;
@@ -175,17 +179,26 @@ class CookieJar implements JarContract
      *
      * @param  string  $name
      * @param  string|null  $path
+     * @param  string|null $domain
      * @return void
      */
-    public function unqueue($name, $path = null)
+    public function unqueue($name, $path = null, $domain = null)
     {
-        if ($path === null) {
+        if ($path === null && $domain === null) {
             unset($this->queued[$name]);
 
             return;
         }
 
-        unset($this->queued[$name][$path]);
+        if (empty($domain) && !empty($path)) {
+            unset($this->queued[$name][$path]);
+        }
+
+        if (empty($path) && !empty($domain)) {
+            unset($this->queued[$name][$domain]);
+        }
+
+        unset($this->queued[$name][$path][$domain]);
 
         if (empty($this->queued[$name])) {
             unset($this->queued[$name]);
