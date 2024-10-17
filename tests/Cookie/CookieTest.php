@@ -265,6 +265,108 @@ class CookieTest extends TestCase
         $this->assertEmpty($cookieJar->getQueuedCookies());
     }
 
+    public function testQueueHandlesDifferentDomains()
+    {
+        $cookieJar = $this->getCreator();
+        $cookieJar->queue('auth_cookie', 'value1', 60, '/path1', 'sub.example.com');
+        $cookieJar->queue('auth_cookie', 'value2', 60, '/path2', 'new.example.com');
+
+        // Get all queued cookies
+        $queuedCookies = $cookieJar->getQueuedCookies();
+
+        // Ensure we have two cookies queued
+        $this->assertCount(2, $queuedCookies);
+
+        // Check the first cookie
+        $this->assertSame('auth_cookie', $queuedCookies[0]->getName());
+        $this->assertSame('value1', $queuedCookies[0]->getValue());
+        $this->assertSame('/path1', $queuedCookies[0]->getPath());
+        $this->assertSame('sub.example.com', $queuedCookies[0]->getDomain());
+
+        // Check the second cookie
+        $this->assertSame('auth_cookie', $queuedCookies[1]->getName());
+        $this->assertSame('value2', $queuedCookies[1]->getValue());
+        $this->assertSame('/path2', $queuedCookies[1]->getPath());
+        $this->assertSame('.example.com', $queuedCookies[1]->getDomain());
+    }
+
+    public function testQueueCookiesWithSameNameAndPathButDifferentDomains()
+    {
+        $cookieJar = $this->getCreator();
+
+        // Queue two cookies with the same name and path, but different domains
+        $cookieJar->queue('auth_cookie', 'value1', 60, '/same-path', 'sub1.example.com');
+        $cookieJar->queue('auth_cookie', 'value2', 60, '/same-path', 'sub2.example.com');
+
+        // Get all queued cookies
+        $queuedCookies = $cookieJar->getQueuedCookies();
+
+        // Ensure both cookies are queued
+        $this->assertCount(2, $queuedCookies);
+
+        // Verify the domain-specific cookies are correctly queued
+        $this->assertSame('sub1.example.com', $queuedCookies[0]->getDomain());
+        $this->assertSame('sub2.example.com', $queuedCookies[1]->getDomain());
+    }
+
+    public function testQueueCookiesWithSameNameAndDifferentPaths()
+    {
+        $cookieJar = $this->getCreator();
+
+        // Queue two cookies with the same name, different paths
+        $cookieJar->queue('session_cookie', 'value1', 60, '/path1', 'example.com');
+        $cookieJar->queue('session_cookie', 'value2', 60, '/path2', 'example.com');
+
+        // Get all queued cookies
+        $queuedCookies = $cookieJar->getQueuedCookies();
+
+        // Ensure both cookies are queued
+        $this->assertCount(2, $queuedCookies);
+
+        // Verify the paths are correctly handled
+        $this->assertSame('/path1', $queuedCookies[0]->getPath());
+        $this->assertSame('/path2', $queuedCookies[1]->getPath());
+    }
+
+    public function testQueueCookiesWithSameNamePathAndDomainOverwrites()
+    {
+        $cookieJar = $this->getCreator();
+
+        // Queue two cookies with the same name, path, and domain
+        $cookieJar->queue('auth_cookie', 'initial_value', 60, '/same-path', 'example.com');
+        $cookieJar->queue('auth_cookie', 'new_value', 60, '/same-path', 'example.com');
+
+        // Get queued cookies
+        $queuedCookies = $cookieJar->getQueuedCookies();
+
+        // Only one cookie should be queued
+        $this->assertCount(1, $queuedCookies);
+
+        // Verify the cookie's value is the latest one
+        $this->assertSame('new_value', $queuedCookies[0]->getValue());
+    }
+
+
+    public function testQueueCookiesWithDifferentSecureAndHttpOnlyFlags()
+    {
+        $cookieJar = $this->getCreator();
+
+        // Queue cookies with different secure and httpOnly flags
+        $cookieJar->queue('auth_cookie', 'value1', 60, '/', 'example.com', true, false); // Secure, not HttpOnly
+        $cookieJar->queue('auth_cookie', 'value2', 60, '/', 'new.example.com', false, true); // Not Secure, HttpOnly
+
+        // Get queued cookies
+        $queuedCookies = $cookieJar->getQueuedCookies();
+
+        // Verify the secure and httpOnly flags
+        $this->assertTrue($queuedCookies[0]->isSecure());
+        $this->assertFalse($queuedCookies[0]->isHttpOnly());
+        $this->assertFalse($queuedCookies[1]->isSecure());
+        $this->assertTrue($queuedCookies[1]->isHttpOnly());
+    }
+
+
+
     public function getCreator()
     {
         return new CookieJar;

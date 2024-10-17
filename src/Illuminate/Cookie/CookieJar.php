@@ -150,7 +150,11 @@ class CookieJar implements JarContract
             $this->queued[$cookie->getName()] = [];
         }
 
-        $this->queued[$cookie->getName()][$cookie->getPath()] = $cookie;
+        if (! isset($this->queued[$cookie->getDomain()])) {
+            $this->queued[$cookie->getDomain()] = [];
+        }
+
+        $this->queued[$cookie->getName()][$cookie->getPath()][$cookie->getDomain()] = $cookie;
     }
 
     /**
