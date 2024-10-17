@@ -3684,8 +3684,6 @@ class Builder implements BuilderContract
             $this->orders = null;
 
             $this->bindings['order'] = [];
-        } else {
-            $this->columns = array_merge($this->groups, $columns);
         }
 
         return $this;

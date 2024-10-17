@@ -1811,10 +1811,26 @@ class DatabaseQueryBuilderTest extends TestCase
         $queryResults = [(object) ['aggregate' => 2, 'role' => 'admin', 'city' => 'NY'], (object) ['aggregate' => 5, 'role' => 'user', 'city' => 'LA']];
         $builder->getConnection()
             ->shouldReceive('select')->once()
-            ->with('select count(*) as aggregate , "role", "city" from "users" group by "role", "city"', [], true)
+            ->with('select "role", "city", count(*) as aggregate from "users" group by "role", "city"', [], true)
             ->andReturn($queryResults);
         $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(fn ($builder, $results) => $results);
-        $results = $builder->select('role')->from('users')->groupBy('role', 'city')->aggregate('count');
+        $results = $builder->from('users')->groupBy('role', 'city')->aggregate('count');
+        $this->assertEquals($queryResults, $results->toArray());
+    }
+
+    public function testGroupByUnionAndAggregate()
+    {
+        $builder = $this->getBuilder();
+
+        $queryResults = [(object) ['aggregate' => 2, 'role' => 'admin', 'city' => 'NY'], (object) ['aggregate' => 5, 'role' => 'user', 'city' => 'LA']];
+        $builder->getConnection()
+            ->shouldReceive('select')->once()
+            ->with('select "role", count(*) as aggregate from ((select * from "users") union (select * from "members")) as "temp_table" group by "role"', [], true)
+            ->andReturn($queryResults);
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(fn ($builder, $results) => $results);
+        $results = $builder->from('users')
+            ->union($this->getBuilder()->select('*')->from('members'))
+            ->groupBy('role')->aggregate('count');
         $this->assertEquals($queryResults, $results->toArray());
     }
 
