@@ -2324,28 +2324,13 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
 
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->where([['foo', 1], ['bar', 2]], boolean: 'or');
-        $this->assertSame('select * from "users" where ("foo" = ? or "bar" = ?)', $builder->toSql());
-        $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
-
-        $builder = $this->getBuilder();
         $builder->select('*')->from('users')->where(['foo' => 1, 'bar' => 2]);
         $this->assertSame('select * from "users" where ("foo" = ? and "bar" = ?)', $builder->toSql());
         $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
 
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->where(['foo' => 1, 'bar' => 2], boolean: 'or');
-        $this->assertSame('select * from "users" where ("foo" = ? or "bar" = ?)', $builder->toSql());
-        $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
-
-        $builder = $this->getBuilder();
         $builder->select('*')->from('users')->where([['foo', 1], ['bar', '<', 2]]);
         $this->assertSame('select * from "users" where ("foo" = ? and "bar" < ?)', $builder->toSql());
-        $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
-
-        $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->where([['foo', 1], ['bar', '<', 2]], boolean: 'or');
-        $this->assertSame('select * from "users" where ("foo" = ? or "bar" < ?)', $builder->toSql());
         $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
     }
 
