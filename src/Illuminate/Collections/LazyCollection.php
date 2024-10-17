@@ -556,6 +556,30 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     }
 
     /**
+     * Determine if the collection is associative.
+     *
+     * The collection is "associative" if it doesn't have sequential numerical keys beginning with zero.
+     *
+     * @return bool
+     */
+    public function isAssoc()
+    {
+        return Arr::isAssoc($this->all());
+    }
+
+    /**
+     * Determine if the collection is a list.
+     *
+     * The collection is a "list" if all keys are sequential integers starting from 0 with no gaps in between.
+     *
+     * @return bool
+     */
+    public function isList()
+    {
+        return Arr::isList($this->all());
+    }
+
+    /**
      * Key an associative array by a field or using a callback.
      *
      * @template TNewKey of array-key

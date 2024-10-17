@@ -3338,6 +3338,42 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testIsAssoc($collection)
+    {
+        $this->assertTrue((new $collection(['a' => 'a', 0 => 'b']))->isAssoc());
+        $this->assertTrue((new $collection([1 => 'a', 0 => 'b']))->isAssoc());
+        $this->assertTrue((new $collection([1 => 'a', 2 => 'b']))->isAssoc());
+        $this->assertTrue((new $collection([1 => 'foo', 'bar']))->isAssoc());
+        $this->assertTrue((new $collection([0 => 'foo', 'bar' => 'baz']))->isAssoc());
+        $this->assertTrue((new $collection([0 => 'foo', 2 => 'bar']))->isAssoc());
+        $this->assertTrue((new $collection(['foo' => 'bar', 'baz' => 'qux']))->isAssoc());
+
+        $this->assertFalse((new $collection([]))->isAssoc());
+        $this->assertFalse((new $collection([0 => 'a', 1 => 'b']))->isAssoc());
+        $this->assertFalse((new $collection(['a', 'b']))->isAssoc());
+        $this->assertFalse((new $collection([1, 2, 3]))->isAssoc());
+        $this->assertFalse((new $collection(['foo', 2, 3]))->isAssoc());
+        $this->assertFalse((new $collection([0 => 'foo', 'bar']))->isAssoc());
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testIsList($collection)
+    {
+        $this->assertTrue((new $collection([]))->isList());
+        $this->assertTrue((new $collection([1, 2, 3]))->isList());
+        $this->assertTrue((new $collection(['foo', 2, 3]))->isList());
+        $this->assertTrue((new $collection(['foo', 'bar']))->isList());
+        $this->assertTrue((new $collection([0 => 'foo', 'bar']))->isList());
+        $this->assertTrue((new $collection([0 => 'foo', 1 => 'bar']))->isList());
+
+        $this->assertFalse((new $collection([1 => 'foo', 'bar']))->isList());
+        $this->assertFalse((new $collection([1 => 'foo', 0 => 'bar']))->isList());
+        $this->assertFalse((new $collection([0 => 'foo', 'bar' => 'baz']))->isList());
+        $this->assertFalse((new $collection([0 => 'foo', 2 => 'bar']))->isList());
+        $this->assertFalse((new $collection(['foo' => 'bar', 'baz' => 'qux']))->isList());
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testKeyByAttribute($collection)
     {
         $data = new $collection([['rating' => 1, 'name' => '1'], ['rating' => 2, 'name' => '2'], ['rating' => 3, 'name' => '3']]);
