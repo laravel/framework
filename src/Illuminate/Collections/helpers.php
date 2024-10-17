@@ -185,7 +185,7 @@ if (! function_exists('data_forget')) {
         } elseif (is_object($target)) {
             if ($segments && isset($target->{$segment})) {
                 data_forget($target->{$segment}, $segments);
-            } elseif (isset($target->{$segment})) {
+            } elseif (property_exists($target, $segment)) {
                 unset($target->{$segment});
             }
         }
