@@ -919,6 +919,7 @@ class Builder implements BuilderContract
      * @param  array  $column
      * @param  string  $boolean
      * @param  string  $method
+     * @param  string|null  $outerBoolean
      * @return $this
      */
     protected function addArrayOfWheres($column, $boolean, $method = 'where', $outerBoolean = null)
