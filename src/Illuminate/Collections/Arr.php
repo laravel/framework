@@ -4,6 +4,7 @@ namespace Illuminate\Support;
 
 use ArgumentCountError;
 use ArrayAccess;
+use BackedEnum;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use Random\Randomizer;
@@ -27,7 +28,7 @@ class Arr
      * Add an element to an array using "dot" notation if it doesn't exist.
      *
      * @param  array  $array
-     * @param  string|int|float  $key
+     * @param  string|\BackedEnum|int|float  $key
      * @param  mixed  $value
      * @return array
      */
@@ -144,7 +145,7 @@ class Arr
      * Get all of the given array except for a specified array of keys.
      *
      * @param  array  $array
-     * @param  array|string|int|float  $keys
+     * @param  array|string|\BackedEnum|int|float  $keys
      * @return array
      */
     public static function except($array, $keys)
@@ -158,11 +159,13 @@ class Arr
      * Determine if the given key exists in the provided array.
      *
      * @param  \ArrayAccess|array  $array
-     * @param  string|int|float  $key
+     * @param  string|\BackedEnum|int|float  $key
      * @return bool
      */
     public static function exists($array, $key)
     {
+        $key = $key instanceof BackedEnum ? $key->value : $key;
+
         if ($array instanceof Enumerable) {
             return $array->has($key);
         }
@@ -280,12 +283,14 @@ class Arr
      * Remove one or many array items from a given array using "dot" notation.
      *
      * @param  array  $array
-     * @param  array|string|int|float  $keys
+     * @param  array|string|\BackedEnum|int|float  $keys
      * @return void
      */
     public static function forget(&$array, $keys)
     {
         $original = &$array;
+
+        $keys = $keys instanceof BackedEnum ? $keys->value : $keys;
 
         $keys = (array) $keys;
 
@@ -294,6 +299,8 @@ class Arr
         }
 
         foreach ($keys as $key) {
+            $key = $key instanceof BackedEnum ? $key->value : $key;
+
             // if the exact key exists in the top-level, remove it
             if (static::exists($array, $key)) {
                 unset($array[$key]);
@@ -324,7 +331,7 @@ class Arr
      * Get an item from an array using "dot" notation.
      *
      * @param  \ArrayAccess|array  $array
-     * @param  string|int|null  $key
+     * @param  string|\BackedEnum|int|null  $key
      * @param  mixed  $default
      * @return mixed
      */
@@ -337,6 +344,8 @@ class Arr
         if (is_null($key)) {
             return $array;
         }
+
+        $key = $key instanceof BackedEnum ? $key->value : $key;
 
         if (static::exists($array, $key)) {
             return $array[$key];
@@ -361,11 +370,13 @@ class Arr
      * Check if an item or items exist in an array using "dot" notation.
      *
      * @param  \ArrayAccess|array  $array
-     * @param  string|array  $keys
+     * @param  string|\BackedEnum|array  $keys
      * @return bool
      */
     public static function has($array, $keys)
     {
+        $keys = $keys instanceof BackedEnum ? $keys->value : $keys;
+
         $keys = (array) $keys;
 
         if (! $array || $keys === []) {
@@ -373,6 +384,8 @@ class Arr
         }
 
         foreach ($keys as $key) {
+            $key = $key instanceof BackedEnum ? $key->value : $key;
+
             $subKeyArray = $array;
 
             if (static::exists($array, $key)) {
@@ -395,7 +408,7 @@ class Arr
      * Determine if any of the keys exist in an array using "dot" notation.
      *
      * @param  \ArrayAccess|array  $array
-     * @param  string|array  $keys
+     * @param  string|\BackedEnum|array  $keys
      * @return bool
      */
     public static function hasAny($array, $keys)
@@ -403,6 +416,8 @@ class Arr
         if (is_null($keys)) {
             return false;
         }
+
+        $keys = $keys instanceof BackedEnum ? $keys->value : $keys;
 
         $keys = (array) $keys;
 
@@ -504,11 +519,13 @@ class Arr
      * Get a subset of the items from the given array.
      *
      * @param  array  $array
-     * @param  array|string  $keys
+     * @param  array|string|\BackedEnum  $keys
      * @return array
      */
     public static function only($array, $keys)
     {
+        $keys = $keys instanceof BackedEnum ? $keys->value : $keys;
+
         return array_intersect_key($array, array_flip((array) $keys));
     }
 
@@ -516,17 +533,21 @@ class Arr
      * Select an array of values from an array.
      *
      * @param  array  $array
-     * @param  array|string  $keys
+     * @param  array|string|\BackedEnum  $keys
      * @return array
      */
     public static function select($array, $keys)
     {
+        $keys = $keys instanceof BackedEnum ? $keys->value : $keys;
+
         $keys = static::wrap($keys);
 
         return static::map($array, function ($item) use ($keys) {
             $result = [];
 
             foreach ($keys as $key) {
+                $key = $key instanceof BackedEnum ? $key->value : $key;
+
                 if (Arr::accessible($item) && Arr::exists($item, $key)) {
                     $result[$key] = $item[$key];
                 } elseif (is_object($item) && isset($item->{$key})) {
@@ -543,7 +564,7 @@ class Arr
      *
      * @param  iterable  $array
      * @param  string|array|int|null  $value
-     * @param  string|array|null  $key
+     * @param  string|\BackedEnum|array|null  $key
      * @return array
      */
     public static function pluck($array, $value, $key = null)
@@ -553,6 +574,8 @@ class Arr
         [$value, $key] = static::explodePluckParameters($value, $key);
 
         foreach ($array as $item) {
+            $value = $value instanceof BackedEnum ? $value->value : $value;
+
             $itemValue = data_get($item, $value);
 
             // If the key is "null", we will just append the value to the array and keep
@@ -578,12 +601,14 @@ class Arr
      * Explode the "value" and "key" arguments passed to "pluck".
      *
      * @param  string|array  $value
-     * @param  string|array|null  $key
+     * @param  string|\BackedEnum|array|null  $key
      * @return array
      */
     protected static function explodePluckParameters($value, $key)
     {
         $value = is_string($value) ? explode('.', $value) : $value;
+
+        $key = $key instanceof BackedEnum ? $key->value : $key;
 
         $key = is_null($key) || is_array($key) ? $key : explode('.', $key);
 
@@ -681,7 +706,7 @@ class Arr
      * Get a value from the array, and remove it.
      *
      * @param  array  $array
-     * @param  string|int  $key
+     * @param  string|\BackedEnum|int  $key
      * @param  mixed  $default
      * @return mixed
      */
@@ -758,7 +783,7 @@ class Arr
      * If no key is given to the method, the entire array will be replaced.
      *
      * @param  array  $array
-     * @param  string|int|null  $key
+     * @param  string|\BackedEnum|int|null  $key
      * @param  mixed  $value
      * @return array
      */
@@ -767,6 +792,8 @@ class Arr
         if (is_null($key)) {
             return $array = $value;
         }
+
+        $key = $key instanceof BackedEnum ? $key->value : $key;
 
         $keys = explode('.', $key);
 

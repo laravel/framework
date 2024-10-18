@@ -6,6 +6,7 @@ use ArrayObject;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Tests\Support\Fixtures\StringBackedEnum;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use stdClass;
@@ -36,6 +37,7 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['name' => 'Desk', 'price' => 100], $array);
 
         $this->assertEquals(['surname' => 'Mövsümov'], Arr::add([], 'surname', 'Mövsümov'));
+        $this->assertEquals([StringBackedEnum::ARRAY_KEY->value => 'foo'], Arr::add([], StringBackedEnum::ARRAY_KEY, 'foo'));
         $this->assertEquals(['developer' => ['name' => 'Ferid']], Arr::add([], 'developer.name', 'Ferid'));
         $this->assertEquals([1 => 'hAz'], Arr::add([], 1, 'hAz'));
         $this->assertEquals([1 => [1 => 'hAz']], Arr::add([], 1.1, 'hAz'));
@@ -221,9 +223,12 @@ class SupportArrTest extends TestCase
 
     public function testExcept()
     {
-        $array = ['name' => 'taylor', 'age' => 26];
-        $this->assertEquals(['age' => 26], Arr::except($array, ['name']));
-        $this->assertEquals(['age' => 26], Arr::except($array, 'name'));
+        $array = ['name' => 'taylor', 'age' => 26, StringBackedEnum::ARRAY_KEY->value => 'foo'];
+        $this->assertEquals(['age' => 26, StringBackedEnum::ARRAY_KEY->value => 'foo'], Arr::except($array, ['name']));
+        $this->assertEquals(['age' => 26, StringBackedEnum::ARRAY_KEY->value => 'foo'], Arr::except($array, 'name'));
+
+        $this->assertEquals(['name' => 'taylor', 'age' => 26], Arr::except($array, [StringBackedEnum::ARRAY_KEY]));
+        $this->assertEquals(['name' => 'taylor', 'age' => 26], Arr::except($array, StringBackedEnum::ARRAY_KEY));
 
         $array = ['name' => 'taylor', 'framework' => ['language' => 'PHP', 'name' => 'Laravel']];
         $this->assertEquals(['name' => 'taylor'], Arr::except($array, 'framework'));
@@ -242,11 +247,13 @@ class SupportArrTest extends TestCase
         $this->assertTrue(Arr::exists(['a' => 1], 'a'));
         $this->assertTrue(Arr::exists(['a' => null], 'a'));
         $this->assertTrue(Arr::exists(new Collection(['a' => null]), 'a'));
+        $this->assertTrue(Arr::exists([StringBackedEnum::ARRAY_KEY->value => 'foo'], StringBackedEnum::ARRAY_KEY));
 
         $this->assertFalse(Arr::exists([1], 1));
         $this->assertFalse(Arr::exists([null], 1));
         $this->assertFalse(Arr::exists(['a' => 1], 0));
         $this->assertFalse(Arr::exists(new Collection(['a' => null]), 'b'));
+        $this->assertFalse(Arr::exists(['bar' => 'foo'], StringBackedEnum::ARRAY_KEY));
     }
 
     public function testWhereNotNull(): void
@@ -263,8 +270,8 @@ class SupportArrTest extends TestCase
         $array = array_values(Arr::whereNotNull(['a', null, 'b', null, 'c']));
         $this->assertEquals(['a', 'b', 'c'], $array);
 
-        $array = array_values(Arr::whereNotNull([null, 1, 'string', 0.0, false, [], new stdClass(), fn () => null]));
-        $this->assertEquals([1, 'string', 0.0, false, [], new stdClass(), fn () => null], $array);
+        $array = array_values(Arr::whereNotNull([null, 1, 'string', 0.0, false, [], new stdClass, fn () => null]));
+        $this->assertEquals([1, 'string', 0.0, false, [], new stdClass, fn () => null], $array);
     }
 
     public function testFirst()
@@ -427,6 +434,9 @@ class SupportArrTest extends TestCase
         $array = ['products.desk' => ['price' => 100]];
         $this->assertEquals(['price' => 100], Arr::get($array, 'products.desk'));
 
+        $array = ['products.desk' => ['price' => 100], StringBackedEnum::ARRAY_KEY->value => 'foo'];
+        $this->assertEquals('foo', Arr::get($array, StringBackedEnum::ARRAY_KEY));
+
         $array = ['products' => ['desk' => ['price' => 100]]];
         $value = Arr::get($array, 'products.desk');
         $this->assertEquals(['price' => 100], $value);
@@ -517,9 +527,10 @@ class SupportArrTest extends TestCase
         $this->assertFalse(Arr::has($array, 'products.foo'));
         $this->assertFalse(Arr::has($array, 'products.desk.foo'));
 
-        $array = ['foo' => null, 'bar' => ['baz' => null]];
+        $array = ['foo' => null, 'bar' => ['baz' => null], StringBackedEnum::ARRAY_KEY->value => 'something-else'];
         $this->assertTrue(Arr::has($array, 'foo'));
         $this->assertTrue(Arr::has($array, 'bar.baz'));
+        $this->assertTrue(Arr::has($array, StringBackedEnum::ARRAY_KEY));
 
         $array = new ArrayObject(['foo' => 10, 'bar' => new ArrayObject(['baz' => 10])]);
         $this->assertTrue(Arr::has($array, 'foo'));
@@ -571,18 +582,22 @@ class SupportArrTest extends TestCase
 
     public function testHasAnyMethod()
     {
-        $array = ['name' => 'Taylor', 'age' => '', 'city' => null];
+        $array = ['name' => 'Taylor', 'age' => '', 'city' => null, StringBackedEnum::ARRAY_KEY->value => 'foo'];
         $this->assertTrue(Arr::hasAny($array, 'name'));
         $this->assertTrue(Arr::hasAny($array, 'age'));
         $this->assertTrue(Arr::hasAny($array, 'city'));
         $this->assertFalse(Arr::hasAny($array, 'foo'));
         $this->assertTrue(Arr::hasAny($array, 'name', 'email'));
         $this->assertTrue(Arr::hasAny($array, ['name', 'email']));
+        $this->assertTrue(Arr::hasAny($array, StringBackedEnum::ARRAY_KEY));
+        $this->assertTrue(Arr::hasAny($array, [StringBackedEnum::ARRAY_KEY]));
 
         $array = ['name' => 'Taylor', 'email' => 'foo'];
         $this->assertTrue(Arr::hasAny($array, 'name', 'email'));
         $this->assertFalse(Arr::hasAny($array, 'surname', 'password'));
         $this->assertFalse(Arr::hasAny($array, ['surname', 'password']));
+        $this->assertFalse(Arr::hasAny($array, StringBackedEnum::ARRAY_KEY, StringBackedEnum::HELLO_WORLD));
+        $this->assertFalse(Arr::hasAny($array, [StringBackedEnum::ARRAY_KEY, StringBackedEnum::HELLO_WORLD]));
 
         $array = ['foo' => ['bar' => null, 'baz' => '']];
         $this->assertTrue(Arr::hasAny($array, 'foo.bar'));
@@ -628,7 +643,7 @@ class SupportArrTest extends TestCase
 
     public function testOnly()
     {
-        $array = ['name' => 'Desk', 'price' => 100, 'orders' => 10];
+        $array = ['name' => 'Desk', 'price' => 100, 'orders' => 10, StringBackedEnum::ARRAY_KEY->value => 'foo'];
         $array = Arr::only($array, ['name', 'price']);
         $this->assertEquals(['name' => 'Desk', 'price' => 100], $array);
         $this->assertEmpty(Arr::only($array, ['nonExistingKey']));
@@ -643,6 +658,7 @@ class SupportArrTest extends TestCase
                         '#foo', '#bar',
                     ],
                 ],
+                StringBackedEnum::ARRAY_KEY->value => 'foo',
             ],
             'post-2' => [
                 'comments' => [
@@ -650,6 +666,7 @@ class SupportArrTest extends TestCase
                         '#baz',
                     ],
                 ],
+                StringBackedEnum::ARRAY_KEY->value => 'bar',
             ],
         ];
 
@@ -669,6 +686,7 @@ class SupportArrTest extends TestCase
         $this->assertEquals([['#foo', '#bar'], ['#baz']], Arr::pluck($data, 'comments.tags'));
         $this->assertEquals([null, null], Arr::pluck($data, 'foo'));
         $this->assertEquals([null, null], Arr::pluck($data, 'foo.bar'));
+        $this->assertEquals(['foo', 'bar'], Arr::pluck($data, StringBackedEnum::ARRAY_KEY));
 
         $array = [
             ['developer' => ['name' => 'Taylor']],
@@ -862,6 +880,11 @@ class SupportArrTest extends TestCase
         $this->assertSame('Desk', $name);
         $this->assertSame(['price' => 100], $array);
 
+        $array = ['name' => 'Desk', StringBackedEnum::ARRAY_KEY->value => 'foo', 'price' => 100];
+        $name = Arr::pull($array, StringBackedEnum::ARRAY_KEY);
+        $this->assertSame('foo', $name);
+        $this->assertSame(['name' => 'Desk', 'price' => 100], $array);
+
         // Only works on first level keys
         $array = ['joe@example.com' => 'Joe', 'jane@localhost' => 'Jane'];
         $name = Arr::pull($array, 'joe@example.com');
@@ -980,6 +1003,8 @@ class SupportArrTest extends TestCase
         $array = ['products' => ['desk' => ['price' => 100]]];
         Arr::set($array, 'products.desk.price', 200);
         $this->assertEquals(['products' => ['desk' => ['price' => 200]]], $array);
+        Arr::set($array, StringBackedEnum::ARRAY_KEY, 'foo');
+        $this->assertEquals(['products' => ['desk' => ['price' => 200]], StringBackedEnum::ARRAY_KEY->value => 'foo'], $array);
 
         // No key is given
         $array = ['products' => ['desk' => ['price' => 100]]];
@@ -1286,6 +1311,10 @@ class SupportArrTest extends TestCase
         Arr::forget($array, []);
         $this->assertEquals(['products' => ['desk' => ['price' => 100]]], $array);
 
+        $array = ['products' => ['desk' => ['price' => 100]], StringBackedEnum::ARRAY_KEY->value => 'foo'];
+        Arr::forget($array, StringBackedEnum::ARRAY_KEY);
+        $this->assertEquals(['products' => ['desk' => ['price' => 100]]], $array);
+
         $array = ['products' => ['desk' => ['price' => 100]]];
         Arr::forget($array, 'products.desk');
         $this->assertEquals(['products' => []], $array);
@@ -1474,11 +1503,13 @@ class SupportArrTest extends TestCase
                 'name' => 'Taylor',
                 'role' => 'Developer',
                 'age' => 1,
+                StringBackedEnum::ARRAY_KEY->value => 'foo',
             ],
             [
                 'name' => 'Abigail',
                 'role' => 'Infrastructure',
                 'age' => 2,
+                StringBackedEnum::ARRAY_KEY->value => 'bar',
             ],
         ];
 
@@ -1501,5 +1532,16 @@ class SupportArrTest extends TestCase
                 'name' => 'Abigail',
             ],
         ], Arr::select($array, 'name'));
+
+        $this->assertEquals([
+            [
+                'role' => 'Developer',
+                StringBackedEnum::ARRAY_KEY->value => 'foo',
+            ],
+            [
+                'role' => 'Infrastructure',
+                StringBackedEnum::ARRAY_KEY->value => 'bar',
+            ],
+        ], Arr::select($array, ['role', StringBackedEnum::ARRAY_KEY]));
     }
 }
