@@ -106,7 +106,7 @@ class Connection implements ConnectionInterface
     /**
      * The event dispatcher instance.
      *
-     * @var \Illuminate\Contracts\Events\Dispatcher
+     * @var \Illuminate\Contracts\Events\Dispatcher|null
      */
     protected $events;
 
@@ -127,7 +127,7 @@ class Connection implements ConnectionInterface
     /**
      * The transaction manager instance.
      *
-     * @var \Illuminate\Database\DatabaseTransactionsManager
+     * @var \Illuminate\Database\DatabaseTransactionsManager|null
      */
     protected $transactionsManager;
 
