@@ -52,11 +52,6 @@ class DownCommand extends Command
 
             $this->laravel->maintenanceMode()->activate($downFilePayload);
 
-            file_put_contents(
-                storage_path('framework/maintenance.php'),
-                file_get_contents(__DIR__.'/stubs/maintenance-mode.stub')
-            );
-
             $this->laravel->get('events')->dispatch(new MaintenanceModeEnabled());
 
             $this->components->info('Application is now in maintenance mode.');
