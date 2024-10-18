@@ -8,6 +8,7 @@ use Illuminate\Session\Store;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
 use Illuminate\Support\ViewErrorBag;
+use Illuminate\Tests\Support\Fixtures\StringBackedEnum;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
@@ -24,12 +25,13 @@ class SessionStoreTest extends TestCase
     public function testSessionIsLoadedFromHandler()
     {
         $session = $this->getSession();
-        $session->getHandler()->shouldReceive('read')->once()->with($this->getSessionId())->andReturn(serialize(['foo' => 'bar', 'bagged' => ['name' => 'taylor'], '123' => 'bax']));
+        $session->getHandler()->shouldReceive('read')->once()->with($this->getSessionId())->andReturn(serialize(['foo' => 'bar', 'bagged' => ['name' => 'taylor'], '123' => 'bax', StringBackedEnum::ARRAY_KEY->value => 'enum']));
         $session->start();
 
         $this->assertSame('bar', $session->get('foo'));
         $this->assertSame('bax', $session->get('123'));
         $this->assertSame('baz', $session->get('bar', 'baz'));
+        $this->assertSame('enum', $session->get(StringBackedEnum::ARRAY_KEY));
         $this->assertTrue($session->has('foo'));
         $this->assertTrue($session->has('123'));
         $this->assertFalse($session->has('bar'));
@@ -230,12 +232,13 @@ class SessionStoreTest extends TestCase
     {
         $session = $this->getSession();
         $session->put('boom', 'baz');
-        $session->flashInput(['foo' => 'bar', 'bar' => 0, 'name' => null]);
+        $session->flashInput(['foo' => 'bar', 'bar' => 0, 'name' => null, StringBackedEnum::ARRAY_KEY->value => 'enum']);
 
         $this->assertTrue($session->hasOldInput('foo'));
         $this->assertSame('bar', $session->getOldInput('foo'));
         $this->assertEquals(0, $session->getOldInput('bar'));
         $this->assertFalse($session->hasOldInput('boom'));
+        $this->assertTrue($session->hasOldInput(StringBackedEnum::ARRAY_KEY));
 
         $session->ageFlashData();
 
@@ -243,6 +246,7 @@ class SessionStoreTest extends TestCase
         $this->assertSame('bar', $session->getOldInput('foo'));
         $this->assertEquals(0, $session->getOldInput('bar'));
         $this->assertFalse($session->hasOldInput('boom'));
+        $this->assertTrue($session->hasOldInput(StringBackedEnum::ARRAY_KEY));
 
         $this->assertSame('default', $session->getOldInput('input', 'default'));
         $this->assertNull($session->getOldInput('name', 'default'));
@@ -254,22 +258,26 @@ class SessionStoreTest extends TestCase
         $session->flash('foo', 'bar');
         $session->flash('bar', 0);
         $session->flash('baz');
+        $session->flash(StringBackedEnum::ARRAY_KEY, 'enum');
 
         $this->assertTrue($session->has('foo'));
         $this->assertSame('bar', $session->get('foo'));
         $this->assertEquals(0, $session->get('bar'));
         $this->assertTrue($session->get('baz'));
+        $this->assertEquals('enum', $session->get(StringBackedEnum::ARRAY_KEY));
 
         $session->ageFlashData();
 
         $this->assertTrue($session->has('foo'));
         $this->assertSame('bar', $session->get('foo'));
         $this->assertEquals(0, $session->get('bar'));
+        $this->assertEquals('enum', $session->get(StringBackedEnum::ARRAY_KEY));
 
         $session->ageFlashData();
 
         $this->assertFalse($session->has('foo'));
         $this->assertNull($session->get('foo'));
+        $this->assertNull($session->get(StringBackedEnum::ARRAY_KEY));
     }
 
     public function testDataFlashingNow()
@@ -277,15 +285,18 @@ class SessionStoreTest extends TestCase
         $session = $this->getSession();
         $session->now('foo', 'bar');
         $session->now('bar', 0);
+        $session->now(StringBackedEnum::ARRAY_KEY, 'enum');
 
         $this->assertTrue($session->has('foo'));
         $this->assertSame('bar', $session->get('foo'));
         $this->assertEquals(0, $session->get('bar'));
+        $this->assertEquals('enum', $session->get(StringBackedEnum::ARRAY_KEY));
 
         $session->ageFlashData();
 
         $this->assertFalse($session->has('foo'));
         $this->assertNull($session->get('foo'));
+        $this->assertNull($session->get(StringBackedEnum::ARRAY_KEY));
     }
 
     public function testDataMergeNewFlashes()
@@ -359,6 +370,11 @@ class SessionStoreTest extends TestCase
         $pulled = $session->remove('foo');
         $this->assertFalse($session->has('foo'));
         $this->assertSame('bar', $pulled);
+
+        $session->put(StringBackedEnum::ARRAY_KEY, 'enum');
+        $pulled = $session->remove(StringBackedEnum::ARRAY_KEY);
+        $this->assertFalse($session->has(StringBackedEnum::ARRAY_KEY));
+        $this->assertSame('enum', $pulled);
     }
 
     public function testClear()
@@ -390,6 +406,9 @@ class SessionStoreTest extends TestCase
 
         $session->increment('bar');
         $this->assertEquals(1, $session->get('bar'));
+
+        $session->increment(StringBackedEnum::ARRAY_KEY);
+        $this->assertEquals(1, $session->get(StringBackedEnum::ARRAY_KEY));
     }
 
     public function testDecrement()
@@ -407,6 +426,9 @@ class SessionStoreTest extends TestCase
 
         $session->decrement('bar');
         $this->assertEquals(-1, $session->get('bar'));
+
+        $session->decrement(StringBackedEnum::ARRAY_KEY);
+        $this->assertEquals(-1, $session->get(StringBackedEnum::ARRAY_KEY));
     }
 
     public function testHasOldInputWithoutKey()
@@ -417,6 +439,16 @@ class SessionStoreTest extends TestCase
 
         $session->flashInput(['foo' => 'bar']);
         $this->assertTrue($session->hasOldInput());
+    }
+
+    public function testHasOldInputWithKey()
+    {
+        $session = $this->getSession();
+        $session->flash(StringBackedEnum::ARRAY_KEY, 'enum');
+        $this->assertFalse($session->hasOldInput());
+
+        $session->flashInput([StringBackedEnum::ARRAY_KEY->value => 'bar']);
+        $this->assertTrue($session->hasOldInput(StringBackedEnum::ARRAY_KEY));
     }
 
     public function testHandlerNeedsRequest()
@@ -462,11 +494,18 @@ class SessionStoreTest extends TestCase
         $session->forget('foo');
         $this->assertFalse($session->has('foo'));
 
+        $session->put(StringBackedEnum::ARRAY_KEY, 'enum');
+        $this->assertTrue($session->has(StringBackedEnum::ARRAY_KEY));
+        $session->forget(StringBackedEnum::ARRAY_KEY);
+        $this->assertFalse($session->has(StringBackedEnum::ARRAY_KEY));
+
         $session->put('foo', 'bar');
         $session->put('bar', 'baz');
-        $session->forget(['foo', 'bar']);
+        $session->put(StringBackedEnum::ARRAY_KEY, 'enum');
+        $session->forget(['foo', 'bar', StringBackedEnum::ARRAY_KEY]);
         $this->assertFalse($session->has('foo'));
         $this->assertFalse($session->has('bar'));
+        $this->assertFalse($session->has(StringBackedEnum::ARRAY_KEY));
     }
 
     public function testSetPreviousUrl()
@@ -494,18 +533,25 @@ class SessionStoreTest extends TestCase
         $session = $this->getSession();
         $session->put('language', ['PHP' => ['Laravel']]);
         $session->push('language.PHP', 'Symfony');
+        $session->push(StringBackedEnum::ARRAY_KEY, 'enum');
 
         $this->assertEquals(['PHP' => ['Laravel', 'Symfony']], $session->get('language'));
+        $this->assertEquals(['enum'], $session->get(StringBackedEnum::ARRAY_KEY));
     }
 
     public function testKeyPull()
     {
         $session = $this->getSession();
         $session->put('name', 'Taylor');
+        $session->put(StringBackedEnum::ARRAY_KEY, 'enum');
 
         $this->assertSame('Taylor', $session->pull('name'));
         $this->assertSame('Taylor Otwell', $session->pull('name', 'Taylor Otwell'));
         $this->assertNull($session->pull('name'));
+
+        $this->assertSame('enum', $session->pull(StringBackedEnum::ARRAY_KEY));
+        $this->assertSame('fallback', $session->pull(StringBackedEnum::ARRAY_KEY, 'fallback'));
+        $this->assertNull($session->pull(StringBackedEnum::ARRAY_KEY));
     }
 
     public function testKeyHas()
@@ -513,14 +559,19 @@ class SessionStoreTest extends TestCase
         $session = $this->getSession();
         $session->put('first_name', 'Mehdi');
         $session->put('last_name', 'Rajabi');
+        $session->put(StringBackedEnum::ARRAY_KEY, 'enum');
 
         $this->assertTrue($session->has('first_name'));
         $this->assertTrue($session->has('last_name'));
         $this->assertTrue($session->has('first_name', 'last_name'));
         $this->assertTrue($session->has(['first_name', 'last_name']));
+        $this->assertTrue($session->has(StringBackedEnum::ARRAY_KEY));
+        $this->assertTrue($session->has('first_name', StringBackedEnum::ARRAY_KEY));
+        $this->assertTrue($session->has(['first_name', StringBackedEnum::ARRAY_KEY]));
 
         $this->assertFalse($session->has('first_name', 'foo'));
         $this->assertFalse($session->has('foo', 'bar'));
+        $this->assertFalse($session->has(StringBackedEnum::HELLO_WORLD));
     }
 
     public function testKeyHasAny()
@@ -528,15 +579,20 @@ class SessionStoreTest extends TestCase
         $session = $this->getSession();
         $session->put('first_name', 'Mahmoud');
         $session->put('last_name', 'Ramadan');
+        $session->put(StringBackedEnum::ARRAY_KEY, 'enum');
 
         $this->assertTrue($session->hasAny('first_name'));
         $this->assertTrue($session->hasAny('first_name', 'last_name'));
         $this->assertTrue($session->hasAny(['first_name', 'last_name']));
         $this->assertTrue($session->hasAny(['first_name', 'middle_name']));
+        $this->assertTrue($session->hasAny(StringBackedEnum::ARRAY_KEY));
+        $this->assertTrue($session->hasAny(StringBackedEnum::ARRAY_KEY, 'first_name'));
+        $this->assertTrue($session->hasAny([StringBackedEnum::ARRAY_KEY, 'first_name']));
 
         $this->assertFalse($session->hasAny('middle_name'));
         $this->assertFalse($session->hasAny('foo', 'bar'));
         $this->assertFalse($session->hasAny(['foo', 'bar']));
+        $this->assertFalse($session->hasAny(StringBackedEnum::HELLO_WORLD));
     }
 
     public function testKeyExists()
@@ -546,6 +602,7 @@ class SessionStoreTest extends TestCase
         $this->assertTrue($session->exists('foo'));
         $session->put('baz', null);
         $session->put('hulk', ['one' => true]);
+        $session->put(StringBackedEnum::ARRAY_KEY->value, 'enum');
         $this->assertFalse($session->has('baz'));
         $this->assertTrue($session->exists('baz'));
         $this->assertFalse($session->exists('bogus'));
@@ -553,6 +610,7 @@ class SessionStoreTest extends TestCase
         $this->assertFalse($session->exists(['foo', 'baz', 'bogus']));
         $this->assertTrue($session->exists(['hulk.one']));
         $this->assertFalse($session->exists(['hulk.two']));
+        $this->assertTrue($session->exists(StringBackedEnum::ARRAY_KEY));
     }
 
     public function testKeyMissing()
@@ -562,6 +620,7 @@ class SessionStoreTest extends TestCase
         $this->assertFalse($session->missing('foo'));
         $session->put('baz', null);
         $session->put('hulk', ['one' => true]);
+        $session->put(StringBackedEnum::ARRAY_KEY->value, 'enum');
         $this->assertFalse($session->has('baz'));
         $this->assertFalse($session->missing('baz'));
         $this->assertTrue($session->missing('bogus'));
@@ -569,6 +628,7 @@ class SessionStoreTest extends TestCase
         $this->assertTrue($session->missing(['foo', 'baz', 'bogus']));
         $this->assertFalse($session->missing(['hulk.one']));
         $this->assertTrue($session->missing(['hulk.two']));
+        $this->assertFalse($session->missing(StringBackedEnum::ARRAY_KEY));
     }
 
     public function testRememberMethodCallsPutAndReturnsDefault()
@@ -591,6 +651,17 @@ class SessionStoreTest extends TestCase
         });
         $this->assertSame('foo', $session->get('key'));
         $this->assertSame('foo', $result);
+    }
+
+    public function testRememberMethodReturnsPreviousValueUsingBackedEnum()
+    {
+        $session = $this->getSession();
+        $session->put(StringBackedEnum::ARRAY_KEY, 'enum');
+        $result = $session->remember(StringBackedEnum::ARRAY_KEY, function () {
+            return 'bar';
+        });
+        $this->assertSame('enum', $session->get(StringBackedEnum::ARRAY_KEY));
+        $this->assertSame('enum', $result);
     }
 
     public function testValidationErrorsCanBeSerializedAsJson()
