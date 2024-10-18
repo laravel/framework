@@ -1833,6 +1833,58 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([1, 1, 'news', 'opinion'], $builder->getBindings());
     }
 
+    public function testOrderByPriority()
+    {
+        $builder = m::mock(Builder::class.'[where,exists,insert]', [
+            m::mock(ConnectionInterface::class),
+            new MySqlGrammar,
+            m::mock(Processor::class),
+        ]);
+        $builder->select('*')->from('users')->orderByPriority('name', ['john', 'doe']);
+        $this->assertSame('select * from `users` order by case when `name` = ? then 0 when `name` = ? then 1 else 2 end asc', $builder->toSql());
+
+        $builder = m::mock(Builder::class.'[where,exists,insert]', [
+            m::mock(ConnectionInterface::class),
+            new MariaDbGrammar,
+            m::mock(Processor::class),
+        ]);
+        $builder->select('*')->from('users')->orderByPriority('name', ['john', 'doe']);
+        $this->assertSame('select * from `users` order by case when `name` = ? then 0 when `name` = ? then 1 else 2 end asc', $builder->toSql());
+
+        $builder = m::mock(Builder::class.'[where,exists,insert]', [
+            m::mock(ConnectionInterface::class),
+            new PostgresGrammar,
+            m::mock(Processor::class),
+        ]);
+        $builder->select('*')->from('users')->orderByPriority('name', ['john', 'doe']);
+        $this->assertSame('select * from "users" order by case when "name" = ? then 0 when "name" = ? then 1 else 2 end asc', $builder->toSql());
+
+        $builder = m::mock(Builder::class.'[where,exists,insert]', [
+            m::mock(ConnectionInterface::class),
+            new SqlServerGrammar,
+            m::mock(Processor::class),
+        ]);
+        $builder->select('*')->from('users')->orderByPriority('name', ['john', 'doe']);
+        $this->assertSame('select * from [users] order by case when [name] = ? then 0 when [name] = ? then 1 else 2 end asc', $builder->toSql());
+
+        $builder = m::mock(Builder::class.'[where,exists,insert]', [
+            m::mock(ConnectionInterface::class),
+            new SQLiteGrammar,
+            m::mock(Processor::class),
+        ]);
+        $builder->select('*')->from('users')->orderByPriority('name', ['john', 'doe']);
+        $this->assertSame('select * from "users" order by case when "name" = ? then 0 when "name" = ? then 1 else 2 end asc', $builder->toSql());
+    }
+
+    public function testOrderByPriorityThrowsRuntimeExceptionForUnsupportedDatabase()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('The "orderByPriority" function is not supported by this database.');
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->orderByPriority('name', ['john', 'doe']);
+    }
+
     public function testLatest()
     {
         $builder = $this->getBuilder();
@@ -1977,6 +2029,24 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->orderBy('age', 'asec');
+    }
+
+    public function testOrderByPriorityInvalidDirectionParam()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Order direction must be "asc" or "desc".');
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->orderByPriority('name', ['john', 'doe'], 'asec');
+    }
+
+    public function testOrderByPriorityInvalidEmptyPriorityParam()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Order priority array must not be empty.');
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->orderByPriority('name', []);
     }
 
     public function testHavings()

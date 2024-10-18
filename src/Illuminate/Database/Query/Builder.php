@@ -2659,6 +2659,39 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Apply custom ordering to a query based on a priority array.
+     *
+     * @param  string  $column
+     * @param  array  $priority
+     * @param  string  $direction
+     * @return $this
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function orderByPriority($column, array $priority, $direction = 'asc')
+    {
+        $direction = strtolower($direction);
+
+        if (! in_array($direction, ['asc', 'desc'], true)) {
+            throw new InvalidArgumentException('Order direction must be "asc" or "desc".');
+        }
+
+        if (count($priority) === 0) {
+            throw new InvalidArgumentException('Order priority array must not be empty.');
+        }
+
+        $grammar = $this->getGrammar();
+
+        if (! method_exists($grammar, 'orderByPriority')) {
+            throw new RuntimeException('The "orderByPriority" function is not supported by this database.');
+        }
+
+        $this->orderByRaw($grammar->orderByPriority($column, $priority, $direction), $priority);
+
+        return $this;
+    }
+
+    /**
      * Add a descending "order by" clause to the query.
      *
      * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|\Illuminate\Contracts\Database\Query\Expression|string  $column

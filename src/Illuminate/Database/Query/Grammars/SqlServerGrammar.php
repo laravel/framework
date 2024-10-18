@@ -581,4 +581,27 @@ class SqlServerGrammar extends Grammar
 
         return $table;
     }
+
+    /**
+     * Apply custom ordering to a query based on a priority array.
+     *
+     * @param  string  $column
+     * @param  array  $priority
+     * @param  string  $direction
+     * @return string
+     */
+    public function orderByPriority(string $column, array $priority, string $direction = 'asc')
+    {
+        $column = $this->wrap($column);
+
+        $cases = [];
+
+        foreach ($priority as $index => $value) {
+            $cases[] = "when {$column} = ? then {$index}";
+        }
+
+        $caseStatement = 'case '.implode(' ', $cases).' else '.count($priority).' end';
+
+        return "{$caseStatement} {$direction}";
+    }
 }
