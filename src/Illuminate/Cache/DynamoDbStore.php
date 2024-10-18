@@ -120,6 +120,28 @@ class DynamoDbStore implements LockProvider, Store
     }
 
     /**
+     * Get the time remaining on the key's expiration as a UNIX timestamp or readable string.
+     *
+     * @param  string  $key
+     * @param  bool  $format
+     * @return string|int|null
+     */
+    public function remaining($key, $format = true)
+    {
+        $remaining = $this->get($key.'_ttl');
+
+        if ($remaining === null) {
+            return null;
+        }
+
+        if ($format) {
+            return Carbon::createFromTimestamp($remaining)->diffForHumans();
+        }
+
+        return (int) $remaining;
+    }
+
+    /**
      * Retrieve multiple items from the cache by key.
      *
      * Items not found in the cache will have a null value.
@@ -196,6 +218,8 @@ class DynamoDbStore implements LockProvider, Store
      */
     public function put($key, $value, $seconds)
     {
+        $expiration = $this->toTimestamp($seconds);
+
         $this->dynamo->putItem([
             'TableName' => $this->table,
             'Item' => [
@@ -206,7 +230,22 @@ class DynamoDbStore implements LockProvider, Store
                     $this->type($value) => $this->serialize($value),
                 ],
                 $this->expirationAttribute => [
-                    'N' => (string) $this->toTimestamp($seconds),
+                    'N' => (string) $expiration,
+                ],
+            ],
+        ]);
+
+        $this->dynamo->putItem([
+            'TableName' => $this->table,
+            'Item' => [
+                $this->keyAttribute => [
+                    'S' => $this->prefix.$key.'_ttl',
+                ],
+                $this->valueAttribute => [
+                    $this->type($value) => $this->serialize($expiration),
+                ],
+                $this->expirationAttribute => [
+                    'N' => (string) $expiration,
                 ],
             ],
         ]);
@@ -440,6 +479,15 @@ class DynamoDbStore implements LockProvider, Store
             'Key' => [
                 $this->keyAttribute => [
                     'S' => $this->prefix.$key,
+                ],
+            ],
+        ]);
+
+        $this->dynamo->deleteItem([
+            'TableName' => $this->table,
+            'Key' => [
+                $this->keyAttribute => [
+                    'S' => $this->prefix.$key.'_ttl',
                 ],
             ],
         ]);

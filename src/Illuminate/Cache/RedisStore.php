@@ -6,6 +6,7 @@ use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Redis\Factory as Redis;
 use Illuminate\Redis\Connections\PhpRedisConnection;
 use Illuminate\Redis\Connections\PredisConnection;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Str;
 
@@ -104,9 +105,15 @@ class RedisStore extends TaggableStore implements LockProvider
      */
     public function put($key, $value, $seconds)
     {
-        return (bool) $this->connection()->setex(
+        $set_item = (bool) $this->connection()->setex(
             $this->prefix.$key, (int) max(1, $seconds), $this->serialize($value)
         );
+
+        $set_ttl = (bool) $this->connection()->setex(
+            $this->prefix.$key.'_ttl', (int) max(1, $seconds), time() + $seconds
+        );
+
+        return $set_item && $set_ttl;
     }
 
     /**
@@ -156,6 +163,28 @@ class RedisStore extends TaggableStore implements LockProvider
         return (bool) $this->connection()->eval(
             $lua, 1, $this->prefix.$key, $this->serialize($value), (int) max(1, $seconds)
         );
+    }
+
+    /**
+     * Get the time remaining on the key's expiration as a UNIX timestamp or readable string.
+     *
+     * @param  string  $key
+     * @param  bool  $format
+     * @return string|int|null
+     */
+    public function remaining($key, $format = true)
+    {
+        $remaining = $this->get($key.'_ttl');
+
+        if (! $remaining) {
+            return null;
+        }
+
+        if ($format) {
+            return Carbon::createFromTimestamp($remaining)->diffForHumans();
+        }
+
+        return (int) $remaining;
     }
 
     /**

@@ -74,6 +74,7 @@ class TagSet
     public function flushTag($name)
     {
         $this->store->forget($this->tagKey($name));
+        $this->store->forget($this->tagKey($name.'_ttl'));
     }
 
     /**
