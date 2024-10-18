@@ -128,7 +128,7 @@ class PostgresGrammar extends Grammar
         return 'extract('.$type.' from '.$this->wrap($where['column']).') '.$where['operator'].' '.$value;
     }
 
-po    /**
+    /**
      * Compile a "where DateDiff" clause.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
