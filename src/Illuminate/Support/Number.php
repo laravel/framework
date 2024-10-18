@@ -170,7 +170,7 @@ class Number
      * @param  int  $precision
      * @param  int|null  $maxPrecision
      * @param  bool  $abbreviate
-     * @return bool|string
+     * @return false|string
      */
     public static function forHumans(int|float $number, int $precision = 0, ?int $maxPrecision = null, bool $abbreviate = false)
     {
