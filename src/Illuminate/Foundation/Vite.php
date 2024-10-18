@@ -176,6 +176,20 @@ class Vite implements Htmlable
     }
 
     /**
+     * Merge additional Vite entry points with the current set.
+     *
+     * @param  array  $entryPoints
+     * @return $this
+     */
+    public function mergeEntryPoints($entryPoints)
+    {
+        return $this->withEntryPoints(array_unique([
+            ...$this->entryPoints,
+            ...$entryPoints,
+        ]));
+    }
+
+    /**
      * Set the filename for the manifest file.
      *
      * @param  string  $filename
