@@ -87,6 +87,26 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $this->assertSame("@slot('foo', null, ['class' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(\Illuminate\Support\Arr::toCssClasses(\$classes))]) \n".' @endslot', trim($result));
     }
 
+    public function testSlotsWithAttributesDirectiveCanBeCompiled()
+    {
+        $this->mockViewFactory();
+        $result = $this->compiler()->compileSlots('<x-slot name="foo" @attributes(["class" => "ml-4", "disabled" => false, "readonly" => 0])>"])>
+</x-slot>');
+dd(trim($result));
+        $this->assertSame("@slot('foo', null, ['class' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(\Illuminate\Support\Arr::toCssClasses(\$classes))]) \n".' @endslot', trim($result));
+    }
+
+    public function testReformatAttributeExpressionStringToArrayMethod()
+    {
+        $compiler = app(ComponentTagCompiler::class);
+        $result = $compiler->reformatAttributeExpressionStringToArray('(["contains(" => ")bracket", "[other" => "]bracket,", "string" => "string", "bool" => true, "falseBool" => false, "int" => 32, \'singlestring\' => \'single\'])');
+        $this->assertEquals('string', $result['string']);
+        $this->assertEquals('single', $result['singlestring']);
+        $this->assertTrue($result['bool']);
+        $this->assertFalse($result['falseBool']);
+        $this->assertEquals(32, $result['int']);
+    }
+
     public function testSlotsWithStyleDirectiveCanBeCompiled()
     {
         $this->mockViewFactory();
