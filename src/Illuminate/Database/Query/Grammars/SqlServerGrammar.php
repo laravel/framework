@@ -162,6 +162,20 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
+     * Compile a "where DateDiff" clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereDateDiff(Builder $query, $where)
+    {
+        $unit = strtolower($where['unit']);
+
+        return "DATEDIFF({$unit}, {$this->wrap($where['column2'])}, {$this->wrap($where['column1'])}) {$where['operator']} ?";
+    }
+
+    /**
      * Compile a "JSON contains" statement into SQL.
      *
      * @param  string  $column

@@ -19,7 +19,9 @@ use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
@@ -1771,6 +1773,65 @@ class Builder implements BuilderContract
         }
 
         return $this;
+    }
+
+    /**
+     * Add an "where DateDiff" statement to the query.
+     *
+     * @param \DateTimeInterface|string $column1
+     * @param \DateTimeInterface|string $column2
+     * @param string $operator
+     * @param string $value
+     * @param string $unit One of 'year', 'month', 'week', 'day', 'hour', 'minute', or 'day'
+     * @return $this
+     */
+    public function whereDateDiff($column1, $column2, $operator, $value, $unit = 'day', $boolean = 'and')
+    {
+        $type = 'DateDiff';
+
+        $column1 = $this->normalizeDateDiffArgument($column1);
+        $column2 = $this->normalizeDateDiffArgument($column2);
+
+        $this->wheres[] = compact('type', 'column1', 'column2', 'operator', 'value', 'boolean', 'unit');
+
+        $this->addBinding($value, 'where');
+        return $this;
+    }
+
+    /**
+     * Add an "or where DateDiff" statement to the query.
+     *
+     * @param \DateTimeInterface|string $column1
+     * @param \DateTimeInterface|string $column2
+     * @param string $operator
+     * @param string $value
+     * @param string $unit One of 'year', 'month', 'week', 'day', 'hour', 'minute', or 'day'
+     * @return $this
+     */
+    public function orWhereDateDiff($column1, $column2, $operator, $value, $unit = 'day')
+    {
+        return $this->whereDateDiff($column1, $column2, $operator, $value, $unit, 'or');
+    }
+
+    /**
+     * Normalize the argument for a DateDiff query.
+     *
+     * @param \DateTimeInterface|string $column
+     * @return \Illuminate\Database\Query\Expression|string
+     */
+    protected function normalizeDateDiffArgument($column)
+    {
+        if ($column instanceof DateTimeInterface) {
+            return new Expression("'".$column->toDateTimeString()."'");
+        }
+
+        if (is_string($column)) {
+            if (Validator::make(['date' => $column], ['date' => 'date'])->passes()) {
+                return new Expression("'".Carbon::parse($column)->toDateTimeString()."'");
+            }
+        }
+
+        return $column;
     }
 
     /**

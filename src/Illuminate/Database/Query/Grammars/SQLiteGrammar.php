@@ -5,6 +5,7 @@ namespace Illuminate\Database\Query\Grammars;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use InvalidArgumentException;
 
 class SQLiteGrammar extends Grammar
 {
@@ -148,6 +149,34 @@ class SQLiteGrammar extends Grammar
         $value = $this->parameter($where['value']);
 
         return "strftime('{$type}', {$this->wrap($where['column'])}) {$where['operator']} cast({$value} as text)";
+    }
+
+    /**
+     * Compile a "where DateDiff" clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereDateDiff(Builder $query, $where)
+    {
+        $column1 = $this->wrap($where['column1']);
+        $column2 = $this->wrap($where['column2']);
+        $unit = strtolower($where['unit']);
+
+        $sql = match ($unit) {
+            'year' => "(CAST(strftime('%Y', {$column1}) AS INTEGER) - CAST(strftime('%Y', {$column2}) AS INTEGER))",
+            'month' => "((CAST(strftime('%Y', {$column1}) AS INTEGER) - CAST(strftime('%Y', {$column2}) AS INTEGER)) * 12 +
+                        (CAST(strftime('%m', {$column1}) AS INTEGER) - CAST(strftime('%m', {$column2}) AS INTEGER)))",
+            'week' => "CAST((julianday({$column1}) - julianday({$column2})) / 7 AS INTEGER)",
+            'day' => "CAST(julianday({$column1}) - julianday({$column2}) AS INTEGER)",
+            'hour' => "CAST((julianday({$column1}) - julianday({$column2})) * 24 AS INTEGER)",
+            'minute' => "CAST((julianday({$column1}) - julianday({$column2})) * 1440 AS INTEGER)",
+            'second' => "CAST((julianday({$column1}) - julianday({$column2})) * 86400 AS INTEGER)",
+            default => throw new InvalidArgumentException("Unsupported date difference unit: {$unit}")
+        };
+
+        return $sql . ' ' . $where['operator'] . ' ?';
     }
 
     /**

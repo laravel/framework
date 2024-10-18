@@ -377,6 +377,25 @@ class QueryBuilderTest extends DatabaseTestCase
         $this->assertSame(0, $sql->count());
     }
 
+    public function testWhereDateDiff()
+    {
+        $this->assertSame(1, DB::table('posts')->whereId(1)->whereDateDiff('posts.created_at', '2017-11-12 13:14:15', '=', 0)->count());
+        $this->assertSame(1, DB::table('posts')->whereId(1)->whereDateDiff('created_at', '2017-11-12 13:14:15', '=', 0)->count());
+        $this->assertSame(1, DB::table('posts')->whereId(1)->whereDateDiff('Dec 31 2023', 'Dec 31 2023', '=', 0)->count());
+        $this->assertSame(1, DB::table('posts')->whereId(1)->whereDateDiff('2017-11-12 13:14:15', 'created_at', '=', 0)->count());
+        $this->assertSame(1, DB::table('posts')->whereId(1)->whereDateDiff('2017-11-12 13:14:15', '2017-11-12 13:14:15', '=', 0)->count());
+        $this->assertSame(1, DB::table('posts')->whereId(1)->whereDateDiff('Dec 01 2025', '2022-11-12 13:14:15', '=', 3, 'year')->count());
+    }
+
+
+    public function testOrWhereDateDiff()
+    {
+        $this->assertSame(1, DB::table('posts')->whereId(1)->orWhereDateDiff('created_at', '2017-11-12 13:14:15', '=', 0)->count());
+        $this->assertSame(1, DB::table('posts')->whereId(1)->orWhereDateDiff('2017-11-12 13:14:15', 'created_at', '=', 0)->count());
+        $this->assertSame(2, DB::table('posts')->whereId(1)->orWhereDateDiff('2017-11-12 13:14:15', '2017-11-12 13:14:15', '=', 0)->count());
+        $this->assertSame(2, DB::table('posts')->whereId(1)->orWhereDateDiff('Dec 01 2025', '2022-11-12 13:14:15', '=', 3, 'year')->count());
+    }
+
     public function testOrWhereDay()
     {
         $this->assertSame(2, DB::table('posts')->where('id', 1)->orWhereDay('created_at', '02')->count());

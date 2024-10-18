@@ -9,6 +9,7 @@ use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Database\Query\JoinLateralClause;
 use Illuminate\Support\Arr;
+use InvalidArgumentException;
 use RuntimeException;
 
 class Grammar extends BaseGrammar
@@ -539,6 +540,34 @@ class Grammar extends BaseGrammar
     protected function whereColumn(Builder $query, $where)
     {
         return $this->wrap($where['first']).' '.$where['operator'].' '.$this->wrap($where['second']);
+    }
+
+    /**
+     * Compile a "where DateDiff" clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereDateDiff(Builder $query, $where)
+    {
+
+        $column1 = $this->wrap($where['column1']);
+        $column2 = $this->wrap($where['column2']);
+        $unit = strtolower($where['unit']);
+
+        $sql = match ($unit) {
+            'year' => "TIMESTAMPDIFF(YEAR, {$column2}, {$column1})",
+            'month' => "TIMESTAMPDIFF(MONTH, {$column2}, {$column1})",
+            'week' => "FLOOR(DATEDIFF({$column1}, {$column2}) / 7)",
+            'day' => "DATEDIFF({$column1}, {$column2})",
+            'hour' => "TIMESTAMPDIFF(HOUR, {$column2}, {$column1})",
+            'minute' => "TIMESTAMPDIFF(MINUTE, {$column2}, {$column1})",
+            'second' => "TIMESTAMPDIFF(SECOND, {$column2}, {$column1})",
+            default => throw new InvalidArgumentException("Unsupported date difference unit: {$unit}")
+        };
+
+        return $sql . ' ' . $where['operator'] . ' ?';
     }
 
     /**

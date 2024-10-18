@@ -6,6 +6,7 @@ use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\JoinLateralClause;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use InvalidArgumentException;
 
 class PostgresGrammar extends Grammar
 {
@@ -125,6 +126,33 @@ class PostgresGrammar extends Grammar
         $value = $this->parameter($where['value']);
 
         return 'extract('.$type.' from '.$this->wrap($where['column']).') '.$where['operator'].' '.$value;
+    }
+
+po    /**
+     * Compile a "where DateDiff" clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereDateDiff(Builder $query, $where)
+    {
+        $column1 = $this->wrap($where['column1']);
+        $column2 = $this->wrap($where['column2']);
+        $unit = strtolower($where['unit']);
+
+        $sql = match ($unit) {
+            'year' => "DATE_PART('year', AGE({$column1}, {$column2}))",
+            'month' => "(DATE_PART('year', AGE({$column1}, {$column2})) * 12 + DATE_PART('month', AGE({$column1}, {$column2})))",
+            'week' => "FLOOR(DATE_PART('day', {$column1}::timestamp - {$column2}::timestamp) / 7)",
+            'day' => "DATE_PART('day', {$column1}::timestamp - {$column2}::timestamp)",
+            'hour' => "FLOOR(EXTRACT(EPOCH FROM ({$column1}::timestamp - {$column2}::timestamp)) / 3600)",
+            'minute' => "FLOOR(EXTRACT(EPOCH FROM ({$column1}::timestamp - {$column2}::timestamp)) / 60)",
+            'second' => "EXTRACT(EPOCH FROM ({$column1}::timestamp - {$column2}::timestamp))",
+            default => throw new InvalidArgumentException("Unsupported date difference unit: {$unit}")
+        };
+
+        return $sql . ' ' . $where['operator'] . ' ?';
     }
 
     /**
