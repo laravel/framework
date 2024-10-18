@@ -18,6 +18,11 @@ class FileBasedMaintenanceMode implements MaintenanceModeContract
             $this->path(),
             json_encode($payload, JSON_PRETTY_PRINT)
         );
+
+        file_put_contents(
+            storage_path('framework/maintenance.php'),
+            file_get_contents(__DIR__.'/stubs/maintenance-mode.stub')
+        );
     }
 
     /**
