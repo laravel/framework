@@ -4,15 +4,7 @@ namespace Illuminate\Database\Console\Migrations;
 
 class TableGuesser
 {
-    const CREATE_PATTERNS = [
-        '/^create_(\w+)_table$/',
-        '/^create_(\w+)$/',
-    ];
-
-    const CHANGE_PATTERNS = [
-        '/.+_(to|from|in)_(\w+)_table$/',
-        '/.+_(to|from|in)_(\w+)$/',
-    ];
+    const PATTERN = '/^(?<method>create)_(?<table>\w+?)(?:_table)?$|(?J)(?<method>add|drop|change).+_(?:to|from|in)_(?J)(?<table>\w+?)(?:_table)?$/'; 
 
     /**
      * Attempt to guess the table name and "creation" status of the given migration.
@@ -22,16 +14,8 @@ class TableGuesser
      */
     public static function guess($migration)
     {
-        foreach (self::CREATE_PATTERNS as $pattern) {
-            if (preg_match($pattern, $migration, $matches)) {
-                return [$matches[1], $create = true];
-            }
-        }
-
-        foreach (self::CHANGE_PATTERNS as $pattern) {
-            if (preg_match($pattern, $migration, $matches)) {
-                return [$matches[2], $create = false];
-            }
+        if (preg_match(self::PATTERN, $migration, $matches)) {
+            return [$matches['table'], $matches['method'] === 'create'];
         }
     }
 }
