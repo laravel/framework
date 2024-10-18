@@ -185,7 +185,7 @@ class Vite implements Htmlable
     {
         return $this->withEntryPoints(array_unique([
             ...$this->entryPoints,
-            ...$entryPoints
+            ...$entryPoints,
         ]));
     }
 
