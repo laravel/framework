@@ -268,6 +268,16 @@ class Factory
     }
 
     /**
+     * Determine if stray requests are being prevented.
+     *
+     * @return bool
+     */
+    public function preventingStrayRequests()
+    {
+        return $this->preventStrayRequests;
+    }
+
+    /**
      * Indicate that an exception should not be thrown if any request is not faked.
      *
      * @return $this
