@@ -461,7 +461,7 @@ class Sleep
      */
     public static function assertNeverSlept()
     {
-        return static::assertSleptTimes(0);
+        static::assertSleptTimes(0);
     }
 
     /**
