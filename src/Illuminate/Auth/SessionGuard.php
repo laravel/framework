@@ -211,6 +211,75 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     }
 
     /**
+     * Impersonate the given user.
+     *
+     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @return void
+     *
+     * @throws \Illuminate\Auth\AuthenticationException
+     */
+    public function impersonate(AuthenticatableContract $user)
+    {
+        if ($this->impersonating()) {
+            throw new AuthenticationException('Cannot impersonate while already impersonating.');
+        }
+
+        if (! $authenticated = $this->user()) {
+            throw new AuthenticationException('Cannot impersonate without a currently authenticated user.');
+        }
+
+        $this->session->put($this->getImpersonationName(), $authenticated->getAuthIdentifier());
+
+        $this->session->regenerate();
+
+        $this->login($user);
+    }
+
+    /**
+     * Stop impersonating a user and resume the original authentication state.
+     *
+     * @return void
+     */
+    public function unpersonate()
+    {
+        if (! $id = $this->session->pull($this->getImpersonationName())) {
+            return;
+        }
+
+        if ($user = $this->provider->retrieveById($id)) {
+            $this->login($user);
+
+            $this->session->regenerate();
+
+            return;
+        }
+
+        $this->logout();
+    }
+
+    /**
+     * Get the underlying impersonator user.
+     *
+     * @return \Illuminate\Contracts\Auth\Authenticatable|null
+     */
+    public function impersonator()
+    {
+        if ($id = $this->session->get($this->getImpersonationName())) {
+            return $this->provider->retrieveById($id);
+        }
+    }
+
+    /**
+     * Determine if the current user is impersonating another user.
+     *
+     * @return bool
+     */
+    public function impersonating()
+    {
+        return $this->session->has($this->getImpersonationName());
+    }
+
+    /**
      * Get the decrypted recaller cookie for the request.
      *
      * @return \Illuminate\Auth\Recaller|null
@@ -833,6 +902,16 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     public function getRecallerName()
     {
         return 'remember_'.$this->name.'_'.sha1(static::class);
+    }
+
+    /**
+     * Get a unique identifier for the impersonator session value.
+     *
+     * @return string
+     */
+    public function getImpersonationName()
+    {
+        return 'impersonator_'.$this->name.'_'.sha1(static::class);
     }
 
     /**

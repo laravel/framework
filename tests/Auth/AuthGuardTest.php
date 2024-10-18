@@ -651,6 +651,111 @@ class AuthGuardTest extends TestCase
         $this->assertNull($guard->getUser());
     }
 
+    public function testImpersonate()
+    {
+        $mock = $this->getGuard();
+
+        $impersonator = m::mock(Authenticatable::class);
+        $impersonator->shouldReceive('getAuthIdentifier')->once()->andReturn('foo');
+
+        $impersonated = m::mock(Authenticatable::class);
+        $impersonated->shouldReceive('getAuthIdentifier')->once()->andReturn('bar');
+
+        $mock->getSession()->shouldReceive('has')->with($mock->getImpersonationName())->once()->andReturn(false);
+        $mock->getSession()->shouldReceive('get')->with($mock->getName())->once()->andReturn('foo');
+        $mock->getProvider()->shouldReceive('retrieveById')->once()->with('foo')->andReturn($impersonator);
+        $mock->getSession()->shouldReceive('put')->with($mock->getImpersonationName(), 'foo')->once();
+        $mock->getSession()->shouldReceive('put')->with($mock->getName(), 'bar')->once();
+        $mock->getSession()->shouldReceive('regenerate')->once();
+        $mock->getSession()->shouldReceive('migrate')->once();
+
+        $mock->impersonate($impersonated);
+    }
+
+    public function testImpersonateThrowsWhenAlreadyImpersonating()
+    {
+        $this->expectException(AuthenticationException::class);
+        $this->expectExceptionMessage('Cannot impersonate while already impersonating.');
+
+        $mock = $this->getGuard();
+
+        $mock->getSession()->shouldReceive('has')->with($mock->getImpersonationName())->once()->andReturn(true);
+
+        $mock->impersonate(m::mock(Authenticatable::class));
+    }
+
+    public function testImpersonateThrowsWhenUserIsNotAuthenticated()
+    {
+        $this->expectException(AuthenticationException::class);
+        $this->expectExceptionMessage('Cannot impersonate without a currently authenticated user.');
+
+        $mock = $this->getGuard();
+
+        $mock->getSession()->shouldReceive('has')->with($mock->getImpersonationName())->once()->andReturn(false);
+        $mock->getSession()->shouldReceive('get')->with($mock->getName())->once()->andReturn(null);
+
+        $mock->impersonate(m::mock(Authenticatable::class));
+    }
+
+    public function testUnpersonate()
+    {
+        $mock = $this->getGuard();
+
+        $impersonator = m::mock(Authenticatable::class);
+        $impersonator->shouldReceive('getAuthIdentifier')->once()->andReturn('foo');
+
+        $mock->getSession()->shouldReceive('pull')->with($mock->getImpersonationName())->once()->andReturn('foo');
+        $mock->getProvider()->shouldReceive('retrieveById')->once()->with('foo')->andReturn($impersonator);
+        $mock->getSession()->shouldReceive('put')->with($mock->getName(), 'foo')->once();
+        $mock->getSession()->shouldReceive('regenerate')->once();
+        $mock->getSession()->shouldReceive('migrate')->once();
+
+        $mock->unpersonate();
+    }
+
+    public function testUnpersonateLogsOutWhenImpersonatorIsNotAuthenticated()
+    {
+        [$session, $provider, $request] = $this->getMocks();
+
+        $mock = $this->getMockBuilder(SessionGuard::class)->onlyMethods(['clearUserDataFromStorage'])->setConstructorArgs(['default', $provider, $session, $request])->getMock();
+        $mock->expects($this->once())->method('clearUserDataFromStorage');
+
+        $mock->setDispatcher($events = m::mock(Dispatcher::class));
+        $events->shouldReceive('dispatch')->once()->with(m::type(Authenticated::class));
+
+        $session->shouldReceive('pull')->with($mock->getImpersonationName())->once()->andReturn('foo');
+        $provider->shouldReceive('retrieveById')->once()->with('foo')->andReturn(null);
+
+        $user = m::mock(Authenticatable::class);
+        $user->shouldReceive('getRememberToken')->andReturn(null);
+        $mock->setUser($user);
+
+        $events->shouldReceive('dispatch')->once()->with(m::type(Logout::class));
+
+        $mock->unpersonate();
+    }
+
+    public function testImpersonator()
+    {
+        $mock = $this->getGuard();
+
+        $impersonator = m::mock(Authenticatable::class);
+
+        $mock->getSession()->shouldReceive('get')->with($mock->getImpersonationName())->once()->andReturn('foo');
+        $mock->getProvider()->shouldReceive('retrieveById')->once()->with('foo')->andReturn($impersonator);
+
+        $this->assertSame($impersonator, $mock->impersonator());
+    }
+
+    public function testImpersonating()
+    {
+        $mock = $this->getGuard();
+
+        $mock->getSession()->shouldReceive('has')->with($mock->getImpersonationName())->once()->andReturnTrue();
+
+        $this->assertTrue($mock->impersonating());
+    }
+
     protected function getGuard()
     {
         [$session, $provider, $request, $cookie, $timebox] = $this->getMocks();
