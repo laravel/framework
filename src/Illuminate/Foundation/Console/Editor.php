@@ -22,7 +22,7 @@ class Editor
      */
     public function __construct(
         #[Config('app.editor')] ?string $editor
-    ){
+    ) {
         $this->editor = $editor;
     }
 
@@ -34,7 +34,7 @@ class Editor
      */
     public function open(string $path)
     {
-        if(!$this->editor){
+        if (! $this->editor) {
             return;
         }
 
