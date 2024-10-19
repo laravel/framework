@@ -740,6 +740,16 @@ abstract class Factory
     }
 
     /**
+     * Get the database connection that is used to generate models.
+     *
+     * @return \Illuminate\Database\Connection
+     */
+    public function getConnection()
+    {
+        return $this->connection;
+    }
+
+    /**
      * Create a new instance of the factory builder with the given mutated properties.
      *
      * @param  array  $arguments
