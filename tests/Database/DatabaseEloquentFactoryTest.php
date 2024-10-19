@@ -820,6 +820,13 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertSame(2, FactoryTestUser::count());
     }
 
+    public function test_getter_for_connection_used_to_create_a_model()
+    {
+        $factory = FactoryTestUserFactory::new()->connection('custom-connection');
+
+        $this->assertSame('custom-connection', $factory->getConnection());
+    }
+
     /**
      * Get a database connection instance.
      *
