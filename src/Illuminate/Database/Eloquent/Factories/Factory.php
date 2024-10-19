@@ -742,7 +742,7 @@ abstract class Factory
     /**
      * Get the database connection that is used to generate models.
      *
-     * @return \Illuminate\Database\Connection
+     * @return string
      */
     public function getConnection()
     {
