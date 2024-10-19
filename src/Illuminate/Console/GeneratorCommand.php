@@ -3,6 +3,7 @@
 namespace Illuminate\Console;
 
 use Illuminate\Console\Concerns\CreatesMatchingTest;
+use Illuminate\Console\Events\FileGenerated;
 use Illuminate\Contracts\Console\PromptsForMissingInput;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Str;
@@ -191,6 +192,8 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
         }
 
         $this->components->info(sprintf('%s [%s] created successfully.', $info, $path));
+
+        $this->laravel['events']->dispatch(new FileGenerated($path));
     }
 
     /**

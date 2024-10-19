@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Console\Migrations;
 
+use Illuminate\Console\Events\FileGenerated;
 use Illuminate\Contracts\Console\PromptsForMissingInput;
 use Illuminate\Database\Migrations\MigrationCreator;
 use Illuminate\Support\Composer;
@@ -112,6 +113,8 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
         $file = $this->creator->create(
             $name, $this->getMigrationPath(), $table, $create
         );
+
+        $this->laravel['events']->dispatch(new FileGenerated($file));
 
         $this->components->info(sprintf('Migration [%s] created successfully.', $file));
     }
