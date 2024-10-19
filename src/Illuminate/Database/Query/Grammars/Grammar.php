@@ -407,6 +407,24 @@ class Grammar extends BaseGrammar
     }
 
     /**
+     * Compile a "where empty" clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereEmpty(Builder $query, $where)
+    {
+        $column = $this->wrap($where['column']);
+
+        if ($where['not']) {
+            return '('.$column.' is not null and '.$column." != '')";
+        }
+
+        return '('.$column.' is null or '.$column." = '')";
+    }
+
+    /**
      * Compile a "where not null" clause.
      *
      * @param  \Illuminate\Database\Query\Builder  $query

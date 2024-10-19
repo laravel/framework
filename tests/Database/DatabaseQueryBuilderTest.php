@@ -6516,6 +6516,35 @@ SQL;
 
         $this->assertSame('select * from "users" where "email" = \'foo\'', $builder->toRawSql());
     }
+    public function testWhereEmpty()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereEmpty('name');
+        $this->assertSame('select * from "users" where ("name" is null or "name" = \'\')', $builder->toSql());
+    }
+
+    public function testOrWhereEmpty()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereEmpty('name');
+        $this->assertSame('select * from "users" where "id" = ? or ("name" is null or "name" = \'\')', $builder->toSql());
+        $this->assertEquals([1], $builder->getBindings());
+    }
+
+    public function testWhereNotEmpty()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereNotEmpty('name');
+        $this->assertSame('select * from "users" where ("name" is not null and "name" != \'\')', $builder->toSql());
+    }
+
+    public function testOrWhereNotEmpty()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereNotEmpty('name');
+        $this->assertSame('select * from "users" where "id" = ? or ("name" is not null and "name" != \'\')', $builder->toSql());
+        $this->assertEquals([1], $builder->getBindings());
+    }
 
     protected function getConnection()
     {

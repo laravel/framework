@@ -1354,6 +1354,7 @@ class Builder implements BuilderContract
         return $this;
     }
 
+
     /**
      * Add an "or where null" clause to the query.
      *
@@ -1375,6 +1376,59 @@ class Builder implements BuilderContract
     public function whereNotNull($columns, $boolean = 'and')
     {
         return $this->whereNull($columns, $boolean, true);
+    }
+
+    /**
+     * Add a "where empty" clause to the query.
+     *
+     * @param  string|array  $columns
+     * @param  string  $boolean
+     * @param  bool  $not
+     * @return $this
+     */
+    public function whereEmpty($columns, $boolean = 'and', $not = false)
+    {
+        $type = 'Empty';
+
+        foreach (Arr::wrap($columns) as $column) {
+            $this->wheres[] = compact('type', 'column', 'boolean', 'not');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Add an "or where empty" clause to the query.
+     *
+     * @param  string|array  $columns
+     * @return $this
+     */
+    public function orWhereEmpty($columns)
+    {
+        return $this->whereEmpty($columns, 'or');
+    }
+
+    /**
+     * Add a "where not empty" clause to the query.
+     *
+     * @param  string|array  $columns
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereNotEmpty($columns, $boolean = 'and')
+    {
+        return $this->whereEmpty($columns, $boolean, true);
+    }
+
+    /**
+     * Add an "or where not empty" clause to the query.
+     *
+     * @param  string|array  $columns
+     * @return $this
+     */
+    public function orWhereNotEmpty($columns)
+    {
+        return $this->whereNotEmpty($columns, 'or');
     }
 
     /**
