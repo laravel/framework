@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Providers;
 
 use Illuminate\Console\Events\CommandFinished;
+use Illuminate\Console\Events\FileGenerated;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Console\Kernel as ConsoleKernel;
 use Illuminate\Contracts\Container\Container;
@@ -13,6 +14,7 @@ use Illuminate\Contracts\View\Factory;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Grammar;
 use Illuminate\Foundation\Console\CliDumper;
+use Illuminate\Foundation\Console\Editor;
 use Illuminate\Foundation\Exceptions\Renderer\Listener;
 use Illuminate\Foundation\Exceptions\Renderer\Mappers\BladeMapper;
 use Illuminate\Foundation\Exceptions\Renderer\Renderer;
@@ -93,6 +95,7 @@ class FoundationServiceProvider extends AggregateServiceProvider
         $this->registerExceptionTracking();
         $this->registerExceptionRenderer();
         $this->registerMaintenanceModeManager();
+        $this->registerFileGenerationHandler();
     }
 
     /**
@@ -275,5 +278,21 @@ class FoundationServiceProvider extends AggregateServiceProvider
             MaintenanceModeContract::class,
             fn () => $this->app->make(MaintenanceModeManager::class)->driver()
         );
+    }
+
+    /**
+     * Register an event listener to open generated files in developer editor.
+     *
+     * @return void
+     */
+    private function registerFileGenerationHandler()
+    {
+        if (! $this->app->runningInConsole()) {
+            return;
+        }
+
+        $this->app['events']->listen(function (FileGenerated $event) {
+            $this->app->make(Editor::class)->open($event->path);
+        });
     }
 }
