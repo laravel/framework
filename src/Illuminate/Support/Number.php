@@ -362,4 +362,36 @@ class Number
             throw new RuntimeException('The "intl" PHP extension is required to use the ['.$method.'] method.');
         }
     }
+    /**
+     * Convert a decimal number to a fraction.
+     *
+     * @param  float  $decimal
+     * @param  int  $precision
+     * @return string
+     */
+    public static function fraction(float $decimal, int $precision = 6)
+    {
+        // Handle edge case for whole numbers
+        if (intval($decimal) == $decimal) {
+            return strval(intval($decimal));
+        }
+
+        // Scale the decimal to an integer fraction with the specified precision
+        $denominator = pow(10, $precision);
+        $numerator = intval(round($decimal * $denominator));
+
+        // Calculate the greatest common divisor
+        $gcd = function($a, $b) use (&$gcd) {
+            return ($b == 0) ? $a : $gcd($b, $a % $b);
+        };
+
+        // Reduce the fraction by dividing by the GCD
+        $divisor = $gcd($numerator, $denominator);
+        $numerator /= $divisor;
+        $denominator /= $divisor;
+
+        // Return the fraction in the form of 'numerator/denominator'
+        return sprintf('%d/%d', $numerator, $denominator);
+    }
+
 }

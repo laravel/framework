@@ -314,4 +314,14 @@ class SupportNumberTest extends TestCase
         $this->assertSame(12.3456789, Number::trim(12.3456789));
         $this->assertSame(12.3456789, Number::trim(12.34567890000));
     }
+
+    public function testFraction()
+    {
+        $this->assertEquals('3/4', Number::fraction(0.75));
+        $this->assertEquals('333333/1000000', Number::fraction(0.333333, 6));
+        $this->assertEquals('1/2', Number::fraction(0.5));
+        $this->assertEquals('2', Number::fraction(2));
+        $this->assertEquals('7/10', Number::fraction(0.7, 2));
+    }
+
 }
