@@ -20,6 +20,32 @@ class NotificationMailMessageTest extends TestCase
         $this->assertSame('notifications::foo', $message->markdown);
     }
 
+    public function testMarkdown()
+    {
+        $message = new MailMessage;
+
+        $this->assertSame('notifications::email', $message->markdown);
+        $this->assertSame([], $message->viewData);
+
+        $message->markdown('notifications::foo', ['foo' => 'bar']);
+
+        $this->assertSame('notifications::foo', $message->markdown);
+        $this->assertSame(['foo' => 'bar'], $message->viewData);
+        $this->assertNull($message->view);
+    }
+
+    public function testMarkdownText()
+    {
+        $message = new MailMessage;
+
+        $this->assertNull($message->markdownText);
+
+        $message->markdownText('notifications::foo');
+
+        $this->assertSame('notifications::foo', $message->markdownText);
+        $this->assertSame([], $message->viewData);
+    }
+
     public function testHtmlAndPlainView()
     {
         $message = new MailMessage;
