@@ -36,6 +36,14 @@ class MailMessage extends SimpleMessage implements Renderable
     public $markdown = 'notifications::email';
 
     /**
+     * The Markdown template to render the plain text version.
+     * If not set, the `markdown` property will be used.
+     *
+     * @var string|null
+     */
+    public $markdownText = null;
+
+    /**
      * The current theme being used when generating emails.
      *
      * @var string|null
@@ -157,6 +165,19 @@ class MailMessage extends SimpleMessage implements Renderable
         $this->viewData = $data;
 
         $this->view = null;
+
+        return $this;
+    }
+
+    /**
+     * Set the Markdown template for the plain text version.
+     *
+     * @param  string  $textView
+     * @return $this
+     */
+    public function markdownText($textView)
+    {
+        $this->markdownText = $textView;
 
         return $this;
     }
