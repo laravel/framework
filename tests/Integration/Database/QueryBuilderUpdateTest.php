@@ -22,6 +22,10 @@ class QueryBuilderUpdateTest extends DatabaseTestCase
     #[DataProvider('jsonValuesDataProvider')]
     public function testBasicUpdateForJson($given, $expected)
     {
+        if ($this->driver !== 'sqlite') {
+            $this->markTestSkipped('Test requires a SQLite connection.');
+        }
+
         $db = DB::table('example')->insert([
             'name' => 'Taylor Otwell',
             'title' => 'Mr.',
@@ -38,7 +42,7 @@ class QueryBuilderUpdateTest extends DatabaseTestCase
 
     public static function jsonValuesDataProvider()
     {
-        yield [['Laravel', 'Founder'], ['Laravel', 'Founder']];
-        yield [collect(['Laravel', 'Founder']), ['Laravel', 'Founder']];
+        yield [['Laravel', 'Founder'], json_encode(['Laravel', 'Founder'])];
+        yield [collect(['Laravel', 'Founder']), json_encode(['Laravel', 'Founder'])];
     }
 }
