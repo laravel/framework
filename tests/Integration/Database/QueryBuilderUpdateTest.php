@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Database;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Orchestra\Testbench\Attributes\RequiresDatabase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 require_once 'Enums.php';
@@ -23,6 +24,7 @@ class QueryBuilderUpdateTest extends DatabaseTestCase
     }
 
     #[DataProvider('jsonValuesDataProvider')]
+    #[RequiresDatabase(['sqlite', 'mysql', 'mariadb'])]
     public function testBasicUpdateForJson($column, $given, $expected)
     {
         DB::table('example')->insert([
