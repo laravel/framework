@@ -21,7 +21,6 @@ class QueryBuilderUpdateTest extends DatabaseTestCase
     }
 
     #[DataProvider('jsonValuesDataProvider')]
-    #[RequiresDatabase('sqlite')]
     public function testBasicUpdateForJson($given, $expected)
     {
         DB::table('example')->insert([
