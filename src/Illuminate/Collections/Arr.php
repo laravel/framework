@@ -9,6 +9,8 @@ use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use Random\Randomizer;
 
+use function Illuminate\Support\enum_value;
+
 class Arr
 {
     use Macroable;
@@ -164,7 +166,7 @@ class Arr
      */
     public static function exists($array, $key)
     {
-        $key = $key instanceof BackedEnum ? $key->value : $key;
+        $key = enum_value($key);
 
         if ($array instanceof Enumerable) {
             return $array->has($key);
@@ -299,7 +301,7 @@ class Arr
         }
 
         foreach ($keys as $key) {
-            $key = $key instanceof BackedEnum ? $key->value : $key;
+            $key = enum_value($key);
 
             // if the exact key exists in the top-level, remove it
             if (static::exists($array, $key)) {
@@ -345,7 +347,7 @@ class Arr
             return $array;
         }
 
-        $key = $key instanceof BackedEnum ? $key->value : $key;
+        $key = enum_value($key);
 
         if (static::exists($array, $key)) {
             return $array[$key];
@@ -384,7 +386,7 @@ class Arr
         }
 
         foreach ($keys as $key) {
-            $key = $key instanceof BackedEnum ? $key->value : $key;
+            $key = enum_value($key);
 
             $subKeyArray = $array;
 
@@ -546,7 +548,7 @@ class Arr
             $result = [];
 
             foreach ($keys as $key) {
-                $key = $key instanceof BackedEnum ? $key->value : $key;
+                $key = enum_value($key);
 
                 if (Arr::accessible($item) && Arr::exists($item, $key)) {
                     $result[$key] = $item[$key];
@@ -608,7 +610,7 @@ class Arr
     {
         $value = is_string($value) ? explode('.', $value) : $value;
 
-        $key = $key instanceof BackedEnum ? $key->value : $key;
+        $key = enum_value($key);
 
         $key = is_null($key) || is_array($key) ? $key : explode('.', $key);
 
@@ -793,7 +795,7 @@ class Arr
             return $array = $value;
         }
 
-        $key = $key instanceof BackedEnum ? $key->value : $key;
+        $key = enum_value($key);
 
         $keys = explode('.', $key);
 
