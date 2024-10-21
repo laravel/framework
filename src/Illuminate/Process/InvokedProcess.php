@@ -132,7 +132,7 @@ class InvokedProcess implements InvokedProcessContract
     }
 
     /**
-     * Waits until the callback returns true.
+     * Wait until the given callback returns true.
      *
      * @param  callable|null  $output
      * @return \Illuminate\Process\ProcessResult
