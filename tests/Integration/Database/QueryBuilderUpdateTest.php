@@ -32,7 +32,7 @@ class QueryBuilderUpdateTest extends DatabaseTestCase
         $this->assertDatabaseHas('example', [
             'name' => 'Taylor Otwell',
             'title' => 'Mr.',
-            'payload' => $expected,
+            'payload' => $this->castAsJson($expected),
         ]);
     }
 
