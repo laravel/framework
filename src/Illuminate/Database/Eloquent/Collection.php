@@ -27,7 +27,7 @@ class Collection extends BaseCollection implements QueueableCollection
      *
      * @param  mixed  $key
      * @param  TFindDefault  $default
-     * @return static<TKey, TModel>|TModel|TFindDefault
+     * @return ($key is (\Illuminate\Contracts\Support\Arrayable<array-key, mixed>|array<mixed>) ? static : TModel|TFindDefault)
      */
     public function find($key, $default = null)
     {
@@ -470,7 +470,7 @@ class Collection extends BaseCollection implements QueueableCollection
      *
      * @param  (callable(TModel, TKey): mixed)|string|null  $key
      * @param  bool  $strict
-     * @return static<int, TModel>
+     * @return static
      */
     public function unique($key = null, $strict = false)
     {
@@ -485,7 +485,7 @@ class Collection extends BaseCollection implements QueueableCollection
      * Returns only the models from the collection with the specified keys.
      *
      * @param  array<array-key, mixed>|null  $keys
-     * @return static<int, TModel>
+     * @return static
      */
     public function only($keys)
     {
@@ -502,7 +502,7 @@ class Collection extends BaseCollection implements QueueableCollection
      * Returns all models in the collection except the models with specified keys.
      *
      * @param  array<array-key, mixed>|null  $keys
-     * @return static<int, TModel>
+     * @return static
      */
     public function except($keys)
     {
