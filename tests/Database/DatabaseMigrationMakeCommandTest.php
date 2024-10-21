@@ -129,7 +129,7 @@ class DatabaseMigrationMakeCommandTest extends TestCase
             ->with('create_foo', __DIR__.DIRECTORY_SEPARATOR.'migrations', 'foo', true)
             ->andReturn(__DIR__.'/migrations/2021_04_23_110457_create_foo.php');
         $events->shouldReceive('dispatch')
-            ->withArgs(function($event) {
+            ->withArgs(function ($event) {
                 return $event instanceof FileGenerated
                     && $event->path === __DIR__.DIRECTORY_SEPARATOR.'migrations'.DIRECTORY_SEPARATOR.'2021_04_23_110457_create_foo.php';
             })

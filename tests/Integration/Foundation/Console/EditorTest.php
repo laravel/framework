@@ -3,9 +3,7 @@
 namespace Illuminate\Tests\Integration\Foundation\Console;
 
 use Illuminate\Foundation\Console\Editor;
-use Illuminate\Process\Factory;
 use Illuminate\Support\Facades\Process;
-use Mockery as m;
 use Orchestra\Testbench\TestCase;
 
 class EditorTest extends TestCase
@@ -23,13 +21,13 @@ class EditorTest extends TestCase
 
     public function testEditorRunsBinary()
     {
-        $editor = new Editor( 'my-ide');
+        $editor = new Editor('my-ide');
 
         Process::fake();
 
         $editor->open('path/to/file');
 
-        Process::assertRan(function($process) {
+        Process::assertRan(function ($process) {
             return $process->command == ['my-ide', 'path/to/file'];
         });
     }
