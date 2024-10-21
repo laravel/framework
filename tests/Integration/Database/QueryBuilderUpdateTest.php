@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Database;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Orchestra\Testbench\Attributes\RequiresDatabase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 class QueryBuilderUpdateTest extends DatabaseTestCase
@@ -20,9 +21,10 @@ class QueryBuilderUpdateTest extends DatabaseTestCase
     }
 
     #[DataProvider('jsonValuesDataProvider')]
+    #[RequiresDatabase('sqlite')]
     public function testBasicUpdateForJson($given, $expected)
     {
-        $db = DB::table('example')->insert([
+        DB::table('example')->insert([
             'name' => 'Taylor Otwell',
             'title' => 'Mr.',
         ]);
