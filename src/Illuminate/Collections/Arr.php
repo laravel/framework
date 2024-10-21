@@ -4,7 +4,6 @@ namespace Illuminate\Support;
 
 use ArgumentCountError;
 use ArrayAccess;
-use BackedEnum;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use Random\Randomizer;
@@ -30,7 +29,7 @@ class Arr
      * Add an element to an array using "dot" notation if it doesn't exist.
      *
      * @param  array  $array
-     * @param  string|\BackedEnum|int|float  $key
+     * @param  string|\BackedEnum|\UnitEnum|int|float  $key
      * @param  mixed  $value
      * @return array
      */
@@ -147,7 +146,7 @@ class Arr
      * Get all of the given array except for a specified array of keys.
      *
      * @param  array  $array
-     * @param  array|string|\BackedEnum|int|float  $keys
+     * @param  array|string|\BackedEnum|\UnitEnum|int|float  $keys
      * @return array
      */
     public static function except($array, $keys)
@@ -161,7 +160,7 @@ class Arr
      * Determine if the given key exists in the provided array.
      *
      * @param  \ArrayAccess|array  $array
-     * @param  string|\BackedEnum|int|float  $key
+     * @param  string|\BackedEnum|\UnitEnum|int|float  $key
      * @return bool
      */
     public static function exists($array, $key)
@@ -285,7 +284,7 @@ class Arr
      * Remove one or many array items from a given array using "dot" notation.
      *
      * @param  array  $array
-     * @param  array|string|\BackedEnum|int|float  $keys
+     * @param  array|string|\BackedEnum|\UnitEnum|int|float  $keys
      * @return void
      */
     public static function forget(&$array, $keys)
@@ -333,7 +332,7 @@ class Arr
      * Get an item from an array using "dot" notation.
      *
      * @param  \ArrayAccess|array  $array
-     * @param  string|\BackedEnum|int|null  $key
+     * @param  string|\BackedEnum|\UnitEnum|int|null  $key
      * @param  mixed  $default
      * @return mixed
      */
@@ -372,7 +371,7 @@ class Arr
      * Check if an item or items exist in an array using "dot" notation.
      *
      * @param  \ArrayAccess|array  $array
-     * @param  string|\BackedEnum|array  $keys
+     * @param  string|\BackedEnum|\UnitEnum|array  $keys
      * @return bool
      */
     public static function has($array, $keys)
@@ -410,7 +409,7 @@ class Arr
      * Determine if any of the keys exist in an array using "dot" notation.
      *
      * @param  \ArrayAccess|array  $array
-     * @param  string|\BackedEnum|array  $keys
+     * @param  string|\BackedEnum|\UnitEnum|array  $keys
      * @return bool
      */
     public static function hasAny($array, $keys)
@@ -521,7 +520,7 @@ class Arr
      * Get a subset of the items from the given array.
      *
      * @param  array  $array
-     * @param  array|string|\BackedEnum  $keys
+     * @param  array|string|\BackedEnum|\UnitEnum  $keys
      * @return array
      */
     public static function only($array, $keys)
@@ -535,7 +534,7 @@ class Arr
      * Select an array of values from an array.
      *
      * @param  array  $array
-     * @param  array|string|\BackedEnum  $keys
+     * @param  array|string|\BackedEnum|\UnitEnum  $keys
      * @return array
      */
     public static function select($array, $keys)
@@ -566,7 +565,7 @@ class Arr
      *
      * @param  iterable  $array
      * @param  string|array|int|null  $value
-     * @param  string|\BackedEnum|array|null  $key
+     * @param  string|\BackedEnum|\UnitEnum|array|null  $key
      * @return array
      */
     public static function pluck($array, $value, $key = null)
@@ -603,7 +602,7 @@ class Arr
      * Explode the "value" and "key" arguments passed to "pluck".
      *
      * @param  string|array  $value
-     * @param  string|\BackedEnum|array|null  $key
+     * @param  string|\BackedEnum|\UnitEnum|array|null  $key
      * @return array
      */
     protected static function explodePluckParameters($value, $key)
@@ -708,7 +707,7 @@ class Arr
      * Get a value from the array, and remove it.
      *
      * @param  array  $array
-     * @param  string|\BackedEnum|int  $key
+     * @param  string|\BackedEnum|\UnitEnum|int  $key
      * @param  mixed  $default
      * @return mixed
      */
@@ -785,7 +784,7 @@ class Arr
      * If no key is given to the method, the entire array will be replaced.
      *
      * @param  array  $array
-     * @param  string|\BackedEnum|int|null  $key
+     * @param  string|\BackedEnum|\UnitEnum|int|null  $key
      * @param  mixed  $value
      * @return array
      */
