@@ -291,7 +291,7 @@ class Arr
     {
         $original = &$array;
 
-        $keys = $keys instanceof BackedEnum ? $keys->value : $keys;
+        $keys = enum_value($keys);
 
         $keys = (array) $keys;
 
@@ -376,7 +376,7 @@ class Arr
      */
     public static function has($array, $keys)
     {
-        $keys = $keys instanceof BackedEnum ? $keys->value : $keys;
+        $keys = enum_value($keys);
 
         $keys = (array) $keys;
 
@@ -418,7 +418,7 @@ class Arr
             return false;
         }
 
-        $keys = $keys instanceof BackedEnum ? $keys->value : $keys;
+        $keys = enum_value($keys);
 
         $keys = (array) $keys;
 
@@ -525,7 +525,7 @@ class Arr
      */
     public static function only($array, $keys)
     {
-        $keys = $keys instanceof BackedEnum ? $keys->value : $keys;
+        $keys = enum_value($keys);
 
         return array_intersect_key($array, array_flip((array) $keys));
     }
@@ -539,7 +539,7 @@ class Arr
      */
     public static function select($array, $keys)
     {
-        $keys = $keys instanceof BackedEnum ? $keys->value : $keys;
+        $keys = enum_value($keys);
 
         $keys = static::wrap($keys);
 
@@ -575,7 +575,7 @@ class Arr
         [$value, $key] = static::explodePluckParameters($value, $key);
 
         foreach ($array as $item) {
-            $value = $value instanceof BackedEnum ? $value->value : $value;
+            $value = enum_value($value);
 
             $itemValue = data_get($item, $value);
 
