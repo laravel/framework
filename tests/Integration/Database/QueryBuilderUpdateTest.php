@@ -39,7 +39,7 @@ class QueryBuilderUpdateTest extends DatabaseTestCase
 
     public static function jsonValuesDataProvider()
     {
-        yield [['Laravel', 'Founder'], json_encode(['Laravel', 'Founder'])];
-        yield [collect(['Laravel', 'Founder']), json_encode(['Laravel', 'Founder'])];
+        yield [['Laravel', 'Founder'], json_encode(['Laravel', 'Founder'], JSON_UNESCAPED_UNICODE)];
+        yield [collect(['Laravel', 'Founder']), json_encode(['Laravel', 'Founder'], JSON_UNESCAPED_UNICODE)];
     }
 }
