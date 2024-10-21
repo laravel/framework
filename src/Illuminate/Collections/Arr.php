@@ -8,8 +8,6 @@ use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use Random\Randomizer;
 
-use function Illuminate\Support\enum_value;
-
 class Arr
 {
     use Macroable;
