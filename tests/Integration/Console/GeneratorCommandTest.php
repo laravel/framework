@@ -2,6 +2,8 @@
 
 namespace Illuminate\Tests\Integration\Console;
 
+use Illuminate\Console\Events\FileGenerated;
+use Illuminate\Support\Facades\Event;
 use Orchestra\Testbench\Concerns\InteractsWithPublishedFiles;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -64,5 +66,19 @@ class GeneratorCommandTest extends TestCase
         yield ['ARRAY'];
         yield ['__class__'];
         yield ['__CLASS__'];
+    }
+
+    public function testItDispatchedFileGeneratedEvent()
+    {
+        Event::fake();
+
+        $this->artisan('make:command', ['name' => 'FooCommand'])
+            ->assertExitCode(0);
+
+        $this->assertFilenameExists('app/Console/Commands/FooCommand.php');
+
+        Event::assertDispatched(function (FileGenerated $event) {
+            return $event->path === base_path('app'.DIRECTORY_SEPARATOR.'Console'.DIRECTORY_SEPARATOR.'Commands'.DIRECTORY_SEPARATOR.'FooCommand.php');
+        });
     }
 }

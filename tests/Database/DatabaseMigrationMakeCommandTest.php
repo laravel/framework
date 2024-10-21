@@ -2,6 +2,8 @@
 
 namespace Illuminate\Tests\Database;
 
+use Illuminate\Console\Events\FileGenerated;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Console\Migrations\MigrateMakeCommand;
 use Illuminate\Database\Migrations\MigrationCreator;
 use Illuminate\Foundation\Application;
@@ -111,6 +113,29 @@ class DatabaseMigrationMakeCommandTest extends TestCase
                 ->with('create_foo', '/home/laravel/vendor/laravel-package/migrations', 'users', true)
                 ->andReturn('/home/laravel/vendor/laravel-package/migrations/2021_04_23_110457_create_foo.php');
         $this->runCommand($command, ['name' => 'create_foo', '--path' => 'vendor/laravel-package/migrations', '--create' => 'users']);
+    }
+
+    public function testDispatchesEvent()
+    {
+        $command = new MigrateMakeCommand(
+            $creator = m::mock(MigrationCreator::class),
+            $composer = m::mock(Composer::class)
+        );
+        $app = new Application;
+        $app->useDatabasePath(__DIR__);
+        $app->instance('events', $events = m::mock(Dispatcher::class));
+        $command->setLaravel($app);
+        $creator->shouldReceive('create')->once()
+            ->with('create_foo', __DIR__.DIRECTORY_SEPARATOR.'migrations', 'foo', true)
+            ->andReturn(__DIR__.'/migrations/2021_04_23_110457_create_foo.php');
+        $events->shouldReceive('dispatch')
+            ->withArgs(function($event) {
+                return $event instanceof FileGenerated
+                    && $event->path === __DIR__.DIRECTORY_SEPARATOR.'migrations'.DIRECTORY_SEPARATOR.'2021_04_23_110457_create_foo.php';
+            })
+            ->once();
+
+        $this->runCommand($command, ['name' => 'create_foo']);
     }
 
     protected function runCommand($command, $input = [])
