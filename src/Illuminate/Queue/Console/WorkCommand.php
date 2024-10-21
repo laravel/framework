@@ -13,6 +13,8 @@ use Illuminate\Queue\Worker;
 use Illuminate\Queue\WorkerOptions;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\InteractsWithTime;
+use SplObserver;
+use SplSubject;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Terminal;
 use Throwable;
@@ -20,7 +22,7 @@ use Throwable;
 use function Termwind\terminal;
 
 #[AsCommand(name: 'queue:work')]
-class WorkCommand extends Command
+class WorkCommand extends Command implements SplObserver
 {
     use InteractsWithTime;
 
@@ -127,6 +129,27 @@ class WorkCommand extends Command
     }
 
     /**
+     * Receive update from subjects.
+     *
+     * @param SplSubject $subject
+     * @return void
+     */
+    public function update(SplSubject $subject): void
+    {
+        if ($subject instanceof JobProcessing) {
+            $this->writeOutput($subject->job, 'starting');
+        } elseif ($subject instanceof JobProcessed) {
+            $this->writeOutput($subject->job, 'success');
+        } elseif ($subject instanceof JobReleasedAfterException) {
+            $this->writeOutput($subject->job, 'released_after_exception');
+        } elseif ($subject instanceof JobFailed) {
+            $this->writeOutput($subject->job, 'failed', $subject->exception);
+
+            $this->logFailedJob($subject);
+        }
+    }
+
+    /**
      * Run the worker instance.
      *
      * @param  string  $connection
@@ -136,6 +159,7 @@ class WorkCommand extends Command
     protected function runWorker($connection, $queue)
     {
         return $this->worker
+            ->setObserver($this)
             ->setName($this->option('name'))
             ->setCache($this->cache)
             ->{$this->option('once') ? 'runNextJob' : 'daemon'}(
@@ -163,32 +187,6 @@ class WorkCommand extends Command
             $this->option('max-time'),
             $this->option('rest')
         );
-    }
-
-    /**
-     * Listen for the queue events in order to update the console output.
-     *
-     * @return void
-     */
-    protected function listenForEvents()
-    {
-        $this->laravel['events']->listen(JobProcessing::class, function ($event) {
-            $this->writeOutput($event->job, 'starting');
-        });
-
-        $this->laravel['events']->listen(JobProcessed::class, function ($event) {
-            $this->writeOutput($event->job, 'success');
-        });
-
-        $this->laravel['events']->listen(JobReleasedAfterException::class, function ($event) {
-            $this->writeOutput($event->job, 'released_after_exception');
-        });
-
-        $this->laravel['events']->listen(JobFailed::class, function ($event) {
-            $this->writeOutput($event->job, 'failed', $event->exception);
-
-            $this->logFailedJob($event);
-        });
     }
 
     /**
