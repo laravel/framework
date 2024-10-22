@@ -300,11 +300,11 @@ class Number
      */
     public static function withCurrency(string $currency, callable $callback)
     {
-        $previousLCurrency = static::$currency;
+        $previousCurrency = static::$currency;
 
         static::useCurrency($currency);
 
-        return tap($callback(), fn () => static::useCurrency($previousLCurrency));
+        return tap($callback(), fn () => static::useCurrency($previousCurrency));
     }
 
     /**
