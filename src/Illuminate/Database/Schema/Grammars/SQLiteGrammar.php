@@ -36,7 +36,7 @@ class SQLiteGrammar extends Grammar
     {
         $alterCommands = ['change', 'primary', 'dropPrimary', 'foreign', 'dropForeign'];
 
-        if (version_compare($connection->getServerVersion(), '3.35', '<')) {
+        if (version_compare($connection->getServerVersion(), '3.35', '>=')) {
             $alterCommands[] = 'dropColumn';
         }
 
