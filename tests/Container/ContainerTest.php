@@ -474,6 +474,17 @@ class ContainerTest extends TestCase
         $this->assertTrue($container->resolved('foo'));
     }
 
+    public function testResolvedInstances()
+    {
+        $container = new Container;
+        $container->instance('ConcreteStub', function () {
+            //
+        });
+        $container->make('ConcreteStub');
+
+        $this->assertTrue($container->resolved('ConcreteStub'));
+    }
+
     public function testGetAlias()
     {
         $container = new Container;
