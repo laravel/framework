@@ -24,7 +24,7 @@ class Arr
     }
 
     /**
-     * Determine whether the given value is array accessible.
+     * Determine whether the given value is not array accessible.
      *
      * @param  mixed  $value
      * @return bool
