@@ -223,6 +223,7 @@ abstract class Job
             $event = new JobFailed($this->connectionName, $this, $e ?: new ManuallyFailedException);
             if ($this->observer) {
                 $event->attach($this->observer);
+                $event->notify();
             }
 
             $this->resolve(Dispatcher::class)->dispatch($event);

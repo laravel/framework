@@ -499,6 +499,7 @@ class Worker
                 $event = new JobReleasedAfterException($connectionName, $job);
                 if ($this->observer) {
                     $event->attach($this->observer);
+                    $event->notify();
                 }
 
                 $this->events->dispatch($event);
@@ -671,12 +672,13 @@ class Worker
      */
     protected function raiseBeforeJobEvent($connectionName, $job)
     {
-        $jobProcessing = new JobProcessing($connectionName, $job);
+        $event = new JobProcessing($connectionName, $job);
         if ($this->observer) {
-            $jobProcessing->attach($this->observer);
+            $event->attach($this->observer);
+            $event->notify();
         }
 
-        $this->events->dispatch($jobProcessing);
+        $this->events->dispatch($event);
     }
 
     /**
@@ -691,6 +693,7 @@ class Worker
         $event = new JobProcessed($connectionName, $job);
         if ($this->observer) {
             $event->attach($this->observer);
+            $event->notify();
         }
 
         $this->events->dispatch($event);
