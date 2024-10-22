@@ -9,7 +9,6 @@ use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\ManuallyFailedException;
 use Illuminate\Queue\TimeoutExceededException;
 use Illuminate\Support\InteractsWithTime;
-use SplObserver;
 use Throwable;
 
 abstract class Job
@@ -64,13 +63,6 @@ abstract class Job
      * @var string
      */
     protected $queue;
-
-    /**
-     * Event observer.
-     *
-     * @var SplObserver|null
-     */
-    protected $observer;
 
     /**
      * Get the job identifier.
@@ -220,13 +212,9 @@ abstract class Job
 
             $this->failed($e);
         } finally {
-            $event = new JobFailed($this->connectionName, $this, $e ?: new ManuallyFailedException);
-            if ($this->observer) {
-                $event->attach($this->observer);
-                $event->notify();
-            }
-
-            $this->resolve(Dispatcher::class)->dispatch($event);
+            $this->resolve(Dispatcher::class)->dispatch(new JobFailed(
+                $this->connectionName, $this, $e ?: new ManuallyFailedException
+            ));
         }
     }
 
@@ -388,16 +376,5 @@ abstract class Job
     public function getContainer()
     {
         return $this->container;
-    }
-
-    /**
-     * Set the event observer.
-     *
-     * @param SplObserver $observer
-     * @return void
-     */
-    public function setObserver(SplObserver $observer)
-    {
-        $this->observer = $observer;
     }
 }

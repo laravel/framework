@@ -18,7 +18,6 @@ use Illuminate\Queue\Events\JobTimedOut;
 use Illuminate\Queue\Events\Looping;
 use Illuminate\Queue\Events\WorkerStopping;
 use Illuminate\Support\Carbon;
-use SplObserver;
 use Throwable;
 
 class Worker
@@ -98,13 +97,6 @@ class Worker
      * @var callable[]
      */
     protected static $popCallbacks = [];
-
-    /**
-     * Attach observers to this handler to subscribe to messages.
-     *
-     * @var SplObserver|null
-     */
-    protected $observer;
 
     /**
      * Create a new queue worker.
@@ -496,13 +488,9 @@ class Worker
             if (! $job->isDeleted() && ! $job->isReleased() && ! $job->hasFailed()) {
                 $job->release($this->calculateBackoff($job, $options));
 
-                $event = new JobReleasedAfterException($connectionName, $job);
-                if ($this->observer) {
-                    $event->attach($this->observer);
-                    $event->notify();
-                }
-
-                $this->events->dispatch($event);
+                $this->events->dispatch(new JobReleasedAfterException(
+                    $connectionName, $job
+                ));
             }
         }
 
@@ -612,10 +600,6 @@ class Worker
      */
     protected function failJob($job, Throwable $e)
     {
-        if ($this->observer && method_exists($job, 'setObserver')) {
-            $job->setObserver($this->observer);
-        }
-
         $job->fail($e);
     }
 
@@ -672,13 +656,9 @@ class Worker
      */
     protected function raiseBeforeJobEvent($connectionName, $job)
     {
-        $event = new JobProcessing($connectionName, $job);
-        if ($this->observer) {
-            $event->attach($this->observer);
-            $event->notify();
-        }
-
-        $this->events->dispatch($event);
+        $this->events->dispatch(new JobProcessing(
+            $connectionName, $job
+        ));
     }
 
     /**
@@ -690,13 +670,9 @@ class Worker
      */
     protected function raiseAfterJobEvent($connectionName, $job)
     {
-        $event = new JobProcessed($connectionName, $job);
-        if ($this->observer) {
-            $event->attach($this->observer);
-            $event->notify();
-        }
-
-        $this->events->dispatch($event);
+        $this->events->dispatch(new JobProcessed(
+            $connectionName, $job
+        ));
     }
 
     /**
@@ -903,18 +879,5 @@ class Worker
     public function setManager(QueueManager $manager)
     {
         $this->manager = $manager;
-    }
-
-    /**
-     * Attach an observer.
-     *
-     * @param SplObserver $observer
-     * @return $this
-     */
-    public function setObserver(SplObserver $observer)
-    {
-        $this->observer = $observer;
-
-        return $this;
     }
 }

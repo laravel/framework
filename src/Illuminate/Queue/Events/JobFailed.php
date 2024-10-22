@@ -2,7 +2,7 @@
 
 namespace Illuminate\Queue\Events;
 
-class JobFailed extends QueueEvent
+class JobFailed
 {
     /**
      * The connection name.
@@ -38,6 +38,5 @@ class JobFailed extends QueueEvent
         $this->job = $job;
         $this->exception = $exception;
         $this->connectionName = $connectionName;
-        parent::__construct();
     }
 }

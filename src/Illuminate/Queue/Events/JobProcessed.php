@@ -2,7 +2,7 @@
 
 namespace Illuminate\Queue\Events;
 
-class JobProcessed extends QueueEvent
+class JobProcessed
 {
     /**
      * The connection name.
@@ -29,6 +29,5 @@ class JobProcessed extends QueueEvent
     {
         $this->job = $job;
         $this->connectionName = $connectionName;
-        parent::__construct();
     }
 }

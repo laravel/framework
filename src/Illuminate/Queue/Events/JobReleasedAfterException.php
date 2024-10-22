@@ -2,7 +2,7 @@
 
 namespace Illuminate\Queue\Events;
 
-class JobReleasedAfterException extends QueueEvent
+class JobReleasedAfterException
 {
     /**
      * The connection name.
@@ -29,6 +29,5 @@ class JobReleasedAfterException extends QueueEvent
     {
         $this->job = $job;
         $this->connectionName = $connectionName;
-        parent::__construct();
     }
 }
