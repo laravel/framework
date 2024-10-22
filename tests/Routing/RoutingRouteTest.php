@@ -947,14 +947,14 @@ class RoutingRouteTest extends TestCase
         /*
          * Conditional
          */
-        $route = new Route('GET','{subdomain}.awesome.test',function () {
+        $route = new Route('GET', '{subdomain}.awesome.test', function () {
             //
         });
 
         $route->when(true, function ($route) {
             $route->whereIn('subdomain', [
                 'one',
-                'two'
+                'two',
             ]);
         });
 
