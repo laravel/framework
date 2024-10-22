@@ -393,7 +393,7 @@ abstract class Job
     /**
      * Set the event observer.
      *
-     * @param SplObserver $observer
+     * @param  SplObserver  $observer
      * @return void
      */
     public function setObserver(SplObserver $observer)
