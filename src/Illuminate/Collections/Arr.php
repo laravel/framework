@@ -24,6 +24,17 @@ class Arr
     }
 
     /**
+     * Determine whether the given value is array accessible.
+     *
+     * @param  mixed  $value
+     * @return bool
+     */
+    public static function notAccessible($value)
+    {
+        return ! self::accessible(value: $value);
+    }
+
+    /**
      * Add an element to an array using "dot" notation if it doesn't exist.
      *
      * @param  array  $array

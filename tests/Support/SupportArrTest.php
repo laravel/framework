@@ -30,6 +30,24 @@ class SupportArrTest extends TestCase
         $this->assertFalse(Arr::accessible(static fn () => null));
     }
 
+    public function testNotAccessible(): void
+    {
+        $this->assertFalse(Arr::notAccessible([]));
+        $this->assertFalse(Arr::notAccessible([1, 2]));
+        $this->assertFalse(Arr::notAccessible(['a' => 1, 'b' => 2]));
+        $this->assertFalse(Arr::notAccessible(new Collection));
+
+        $this->assertTrue(Arr::notAccessible(null));
+        $this->assertTrue(Arr::notAccessible('abc'));
+        $this->assertTrue(Arr::notAccessible(new stdClass));
+        $this->assertTrue(Arr::notAccessible((object) ['a' => 1, 'b' => 2]));
+        $this->assertTrue(Arr::notAccessible(123));
+        $this->assertTrue(Arr::notAccessible(12.34));
+        $this->assertTrue(Arr::notAccessible(true));
+        $this->assertTrue(Arr::notAccessible(new \DateTime));
+        $this->assertTrue(Arr::notAccessible(static fn () => null));
+    }
+
     public function testAdd()
     {
         $array = Arr::add(['name' => 'Desk'], 'price', 100);
