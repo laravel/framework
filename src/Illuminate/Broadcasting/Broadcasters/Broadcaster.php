@@ -11,6 +11,7 @@ use Illuminate\Contracts\Routing\BindingRegistrar;
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Reflector;
+use Illuminate\Support\Facades\App;
 use ReflectionClass;
 use ReflectionFunction;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
