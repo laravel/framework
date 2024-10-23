@@ -119,13 +119,21 @@ abstract class Broadcaster implements BroadcasterContract
             $result = $handler($this->retrieveUser($request, $channel), ...$parameters);
 
             if ($result === false) {
-                throw new AccessDeniedHttpException;
+                if (App::environment('production')) {
+                    throw new AccessDeniedHttpException;
+                } else {
+                    throw new AccessDeniedHttpException('User does not have access to this channel.');
+                }
             } elseif ($result) {
                 return $this->validAuthenticationResponse($request, $result);
             }
         }
 
-        throw new AccessDeniedHttpException;
+        if (App::environment('production')) {
+            throw new AccessDeniedHttpException;
+        } else {
+            throw new AccessDeniedHttpException('No matching pattern found or user authentication failed.');
+        }
     }
 
     /**
