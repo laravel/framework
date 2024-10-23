@@ -27,7 +27,6 @@ trait ResolvesRouteDependencies
             return $parameters;
         }
 
-        dump(new ReflectionMethod($instance, $method));
         return $this->resolveMethodDependencies(
             $parameters, new ReflectionMethod($instance, $method)
         );
@@ -48,8 +47,23 @@ trait ResolvesRouteDependencies
 
         $skippableValue = new stdClass;
 
+        $resolvedInterfaces = [];
+
         foreach ($reflector->getParameters() as $key => $parameter) {
-            $instance = $this->transformDependency($parameter, $parameters, $skippableValue);
+            $className = Reflector::getParameterClassName($parameter);
+
+            // If the parameter has a type-hinted class, we will check to see if it is already in
+            // the list of parameters. If it is we will just skip it as it is probably a model
+            // binding and we do not want to mess with those; otherwise, we resolve it here.
+            if ($className && (! $this->alreadyInParameters($className, $parameters) || ! $this->alreadyInResolvedInterfaces($className, $resolvedInterfaces))) {
+                $instance = $this->transformDependency($parameter, $className);
+
+                if (interface_exists($className) && !class_exists($className) && $instance !== $skippableValue) {
+                    $resolvedInterfaces[] = $className;
+                }
+            } else {
+                $instance = $skippableValue;
+            }
 
             if ($instance !== $skippableValue) {
                 $instanceCount++;
@@ -74,26 +88,17 @@ trait ResolvesRouteDependencies
      * @param  object  $skippableValue
      * @return mixed
      */
-    protected function transformDependency(ReflectionParameter $parameter, $parameters, $skippableValue)
+    protected function transformDependency(ReflectionParameter $parameter, $className)
     {
-        $className = Reflector::getParameterClassName($parameter);
-
         if ($attribute = Util::getContextualAttributeFromDependency($parameter)) {
             return $this->container->resolveFromAttribute($attribute);
         }
 
-        // If the parameter has a type-hinted class, we will check to see if it is already in
-        // the list of parameters. If it is we will just skip it as it is probably a model
-        // binding and we do not want to mess with those; otherwise, we resolve it here.
-        if ($className && (interface_exists($className) || ! $this->alreadyInParameters($className, $parameters))) {
-                $isEnum = (new ReflectionClass($className))->isEnum();
+        $isEnum = (new ReflectionClass($className))->isEnum();
 
-            return $parameter->isDefaultValueAvailable()
-                ? ($isEnum ? $parameter->getDefaultValue() : null)
-                : $this->container->make($className);
-        }
-
-        return $skippableValue;
+        return $parameter->isDefaultValueAvailable()
+            ? ($isEnum ? $parameter->getDefaultValue() : null)
+            : $this->container->make($className);
     }
 
     /**
@@ -106,6 +111,11 @@ trait ResolvesRouteDependencies
     protected function alreadyInParameters($class, array $parameters)
     {
         return ! is_null(Arr::first($parameters, fn ($value) => $value instanceof $class));
+    }
+
+    protected function alreadyInResolvedInterfaces($class, array $resolvedInterfaces)
+    {
+        return in_array($class, $resolvedInterfaces);
     }
 
     /**
