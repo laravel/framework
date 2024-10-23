@@ -460,7 +460,7 @@ class SQLiteGrammar extends Grammar
      */
     public function compileDropColumn(Blueprint $blueprint, Fluent $command, Connection $connection)
     {
-        if (version_compare($connection->getServerVersion(), '3.35', '>=')) {
+        if (version_compare($connection->getServerVersion(), '3.35', '<')) {
             // Handled on table alteration...
 
             return null;

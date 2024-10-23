@@ -995,7 +995,13 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
             $table->dropColumn('name');
         });
 
-        $this->assertEquals(['alter table "users" drop column "name"'], $blueprint->toSql($this->getConnection(), $this->getGrammar()));
+        $connection = $this->getConnection();
+        $connection->shouldReceive('getSchemaBuilder->getColumns')->andReturn([ ['name' => 'foo', 'type' => 'varchar(255)'] ]);
+        $connection->shouldReceive('getSchemaBuilder->getForeignKeys')->andReturn([]);
+        $connection->shouldReceive('getSchemaBuilder->getIndexes')->andReturn([]);
+        $connection->shouldReceive('scalar')->andReturn('');
+
+        $this->assertEquals(['alter table "users" drop column "name"'], $blueprint->toSql($connection, $this->getGrammar()));
     }
 
     protected function getConnection()

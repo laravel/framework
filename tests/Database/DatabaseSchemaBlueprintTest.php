@@ -254,6 +254,8 @@ class DatabaseSchemaBlueprintTest extends TestCase
 
         $blueprint = clone $base;
         $connection->shouldReceive('getServerVersion')->andReturn('3.35');
+        $connection->shouldReceive('getSchemaBuilder->getColumns')->andReturn([ ['name' => 'foo', 'type' => 'varchar(255)' ] ]);
+
         $this->assertEquals(['alter table "users" drop column "foo"'], $blueprint->toSql($connection, new SQLiteGrammar));
 
         $blueprint = clone $base;
