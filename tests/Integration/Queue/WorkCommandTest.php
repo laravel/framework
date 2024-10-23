@@ -164,6 +164,8 @@ class WorkCommandTest extends QueueTestCase
 
     public function testFailedJobListenerOnlyRunsOnce()
     {
+        $this->markTestSkippedWhenUsingQueueDrivers(['redis', 'beanstalkd']);
+
         Exceptions::fake();
 
         Queue::push(new FirstJob);
