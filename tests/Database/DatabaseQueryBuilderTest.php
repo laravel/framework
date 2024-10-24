@@ -6840,7 +6840,7 @@ SQL;
 
         $builder = $this->getBuilder();
 
-        $builder->select('*')->from('users')->whenEmpty([], $callback)->where('email', '=', 'foo');;
+        $builder->select('*')->from('users')->whenEmpty([], $callback)->where('email', '=', 'foo');
         $this->assertSame('select * from "users" where "id" = ? and "email" = ?', $builder->toSql());
 
         $builder = $this->getBuilder();
