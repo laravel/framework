@@ -1322,6 +1322,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
         DB::table('posts_tags')->insert([
             ['post_id' => $post->id, 'tag_id' => $tag->id, 'flag' => 'foo'],
+            ['post_id' => $post->id, 'tag_id' => $tag->id, 'flag' => 'rab'],
         ]);
 
         $relationTag = $post->tags()->whereHasPivot('posts',
@@ -1329,22 +1330,40 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         )->first();
 
         $this->assertEquals($relationTag->getAttributes(), $tag->getAttributes());
+
+        $relationTag = $post->tags()->whereHasPivot('posts',
+            fn(BelongsToMany $builder) => $builder->wherePivotIn('flag', ['bar', 'rab'])
+        )->first();
+
+        $this->assertEquals($relationTag->getAttributes(), $tag->getAttributes());
+
+        $relationTag = $post->tags()->whereHasPivot('posts',
+            fn(BelongsToMany $builder) => $builder->wherePivotNull('flag')
+        )->first();
+
+        $this->assertNull($relationTag);
     }
 
     public function testWhereHasPivotForwardCall()
     {
-        $tag = Tag::create(['name' => Str::random()])->fresh();
-        $post = Post::create(['title' => Str::random()]);
+        $tag = Tag::create(['id' => 1, 'name' => Str::random()])->fresh();
+        $post = Post::create(['id' => 2, 'title' => Str::random()]);
 
         DB::table('posts_tags')->insert([
             ['post_id' => $post->id, 'tag_id' => $tag->id, 'flag' => 'foo'],
         ]);
 
         $relationTag = $post->tags()->whereHasPivot('posts',
-            fn(BelongsToMany $builder) => $builder->whereKey($tag->getKey())
+            fn(BelongsToMany $builder) => $builder->whereKey(2)
         )->first();
 
         $this->assertEquals($relationTag->getAttributes(), $tag->getAttributes());
+
+        $relationTag = $post->tags()->whereHasPivot('posts',
+            fn(BelongsToMany $builder) => $builder->whereKey(1)
+        )->first();
+
+        $this->assertNull($relationTag);
     }
 }
 
