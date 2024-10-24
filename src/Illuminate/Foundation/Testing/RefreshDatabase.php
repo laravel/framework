@@ -18,7 +18,7 @@ trait RefreshDatabase
     {
         $this->beforeRefreshingDatabase();
 
-        if ($this->usingInMemoryDatabase()) {
+        if ($this->usingInMemoryDatabases()) {
             $this->restoreInMemoryDatabase();
         }
 
@@ -32,11 +32,23 @@ trait RefreshDatabase
      *
      * @return bool
      */
-    protected function usingInMemoryDatabase()
+    protected function usingInMemoryDatabase(string $name)
     {
-        $default = config('database.default');
+        return config("database.connections.{$name}.database") === ':memory:';
+    }
 
-        return config("database.connections.$default.database") === ':memory:';
+    /**
+     * Determines if any of the connections transacting is using in-memory databases.
+     */
+    protected function usingInMemoryDatabases(): bool
+    {
+        foreach ($this->connectionsToTransact() as $name) {
+            if ($this->usingInMemoryDatabase($name)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -63,7 +75,7 @@ trait RefreshDatabase
     protected function refreshTestDatabase()
     {
         if (! RefreshDatabaseState::$migrated) {
-            $this->artisan('migrate:fresh', $this->migrateFreshUsing());
+            $this->migrateDatabases();
 
             $this->app[Kernel::class]->setArtisan(null);
 
@@ -89,7 +101,7 @@ trait RefreshDatabase
 
             $connection->setTransactionManager($transactionsManager);
 
-            if ($this->usingInMemoryDatabase()) {
+            if ($this->usingInMemoryDatabase($name)) {
                 RefreshDatabaseState::$inMemoryConnections[$name] ??= $connection->getPdo();
             }
 
@@ -121,7 +133,15 @@ trait RefreshDatabase
     protected function connectionsToTransact()
     {
         return property_exists($this, 'connectionsToTransact')
-                            ? $this->connectionsToTransact : [null];
+                            ? $this->connectionsToTransact : [config('database.default')];
+    }
+
+    /**
+     * Perform the database migration command.
+     */
+    protected function migrateDatabases(): void
+    {
+        $this->artisan('migrate:fresh', $this->migrateFreshUsing());
     }
 
     /**
