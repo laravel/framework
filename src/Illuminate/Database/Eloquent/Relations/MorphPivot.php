@@ -112,10 +112,8 @@ class MorphPivot extends Pivot
 
     /**
      * Get the queueable identity for the entity.
-     *
-     * @return mixed
      */
-    public function getQueueableId()
+    public function getQueueableId(): int|string
     {
         if (isset($this->attributes[$this->getKeyName()])) {
             return $this->getKey();

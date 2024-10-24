@@ -6,10 +6,8 @@ interface QueueableEntity
 {
     /**
      * Get the queueable identity for the entity.
-     *
-     * @return mixed
      */
-    public function getQueueableId();
+    public function getQueueableId(): int|string;
 
     /**
      * Get the relationships for the entity.
