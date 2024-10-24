@@ -57,6 +57,18 @@ class NullStore extends TaggableStore implements LockProvider
     }
 
     /**
+     * Get the time remaining on the key's expiration as a UNIX timestamp or readable string.
+     *
+     * @param  string  $key
+     * @param  bool  $format
+     * @return string|int|null
+     */
+    public function remaining($key, $format = true)
+    {
+        return null;
+    }
+
+    /**
      * Store an item in the cache indefinitely.
      *
      * @param  string  $key

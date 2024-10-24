@@ -3,6 +3,7 @@
 namespace Illuminate\Cache;
 
 use Illuminate\Contracts\Cache\LockProvider;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\InteractsWithTime;
 use Memcached;
 use ReflectionMethod;
@@ -102,9 +103,39 @@ class MemcachedStore extends TaggableStore implements LockProvider
      */
     public function put($key, $value, $seconds)
     {
-        return $this->memcached->set(
-            $this->prefix.$key, $value, $this->calculateExpiration($seconds)
+        $expiration = $this->calculateExpiration($seconds);
+
+        $set_item = $this->memcached->set(
+            $this->prefix.$key, $value, $expiration
         );
+
+        $set_ttl = $this->memcached->set(
+            $this->prefix.$key.'_ttl', $expiration, $expiration
+        );
+
+        return $set_item && $set_ttl;
+    }
+
+    /**
+     * Get the time remaining on the key's expiration as a UNIX timestamp or readable string.
+     *
+     * @param  string  $key
+     * @param  bool  $format
+     * @return string|int|null
+     */
+    public function remaining($key, $format = true)
+    {
+        $expiration = $this->memcached->get($key.'_ttl');
+
+        if (! $expiration) {
+            return;
+        }
+
+        if ($format) {
+            return Carbon::createFromTimestamp($expiration)->diffForHumans();
+        }
+
+        return (int) $expiration;
     }
 
     /**
@@ -211,7 +242,10 @@ class MemcachedStore extends TaggableStore implements LockProvider
      */
     public function forget($key)
     {
-        return $this->memcached->delete($this->prefix.$key);
+        $delete_item = $this->memcached->delete($this->prefix.$key);
+        $delete_ttl = $this->memcached->delete($this->prefix.$key.'_ttl');
+
+        return $delete_item && $delete_ttl;
     }
 
     /**

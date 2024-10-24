@@ -8,6 +8,7 @@ use Illuminate\Contracts\Cache\Store;
 use Illuminate\Contracts\Filesystem\LockTimeoutException;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Filesystem\LockableFile;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\InteractsWithTime;
 
 class FileStore implements Store, LockProvider
@@ -80,8 +81,10 @@ class FileStore implements Store, LockProvider
     {
         $this->ensureCacheDirectoryExists($path = $this->path($key));
 
+        $expiration = $this->expiration($seconds);
+
         $result = $this->files->put(
-            $path, $this->expiration($seconds).serialize($value), true
+            $path, $expiration.serialize($value), true
         );
 
         if ($result !== false && $result > 0) {
@@ -165,6 +168,36 @@ class FileStore implements Store, LockProvider
         }
 
         $this->files->chmod($path, $this->filePermission);
+    }
+
+    /**
+     * Get the time remaining on the key's expiration as a UNIX timestamp or readable string.
+     *
+     * @param  string  $key
+     * @param  bool  $format
+     * @return string|int|null
+     */
+    public function remaining($key, $format = true)
+    {
+        $path = $this->path($key);
+
+        try {
+            if (is_null($contents = $this->files->get($path, true))) {
+                return null;
+            }
+
+            $expire = substr($contents, 0, 10);
+
+            if ($format) {
+                return Carbon::createFromTimestamp($expire)->diffForHumans();
+            }
+
+            return (int) $contents;
+        } catch (Exception $e) {
+            // Do nothing...
+        }
+
+        return null;
     }
 
     /**

@@ -232,6 +232,7 @@ if (! function_exists('cache')) {
      *
      * @param  string|array<string, mixed>|null  $key  key|data
      * @param  mixed  $default  default|expiration|null
+     * @param  bool  $ttl
      * @return ($key is null ? \Illuminate\Cache\CacheManager : ($key is string ? mixed : bool))
      *
      * @throws \InvalidArgumentException
