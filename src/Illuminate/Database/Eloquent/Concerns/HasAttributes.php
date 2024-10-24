@@ -571,8 +571,14 @@ trait HasAttributes
             return false;
         }
 
-        return method_exists($this, $key) ||
-               $this->relationResolver(static::class, $key);
+        if (method_exists($this, $key)) {
+            $methodReturnType = (new ReflectionMethod($this, $key))->getReturnType()?->getName();
+            if (is_subclass_of($methodReturnType, Relation::class)) {
+                return true;
+            }
+        }
+
+        return !!$this->relationResolver(static::class, $key);
     }
 
     /**
