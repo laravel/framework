@@ -256,6 +256,32 @@ class DatabaseEloquentFactoryTest extends TestCase
         unset($_SERVER['__test.user.making'], $_SERVER['__test.user.creating']);
     }
 
+    public function test_after_making_callback_is_called_prior_to_create_attributes_being_set()
+    {
+        $user = FactoryTestUserFactory::new()
+            ->afterMaking(function ($user) {
+                $user->name = 'Taylor Otwell';
+            })
+            ->create(['name' => 'Claudio Dekker']);
+
+        $this->assertSame('Claudio Dekker', $user->name);
+    }
+
+    public function test_create_attributes_override_current_state_definition()
+    {
+        $user = FactoryTestUserFactory::new()->create();
+        $this->assertCount(1, FactoryTestUser::all());
+
+        FactoryTestPostFactory::new()->create([]);
+        $this->assertCount(2, FactoryTestUser::all());
+
+        FactoryTestPostFactory::new()->create(['user_id' => $user->id]);
+        $this->assertCount(2, FactoryTestUser::all());
+
+        FactoryTestPostFactory::new()->create(['user_id' => FactoryTestUserFactory::new()]);
+        $this->assertCount(3, FactoryTestUser::all());
+    }
+
     public function test_has_many_relationship()
     {
         $users = FactoryTestUserFactory::times(10)

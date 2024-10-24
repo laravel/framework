@@ -9,6 +9,7 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
@@ -119,6 +120,13 @@ abstract class Factory
      * @var callable
      */
     protected static $factoryNameResolver;
+
+    /**
+     * The raw attributes for each "make" model instance.
+     *
+     * @var array
+     */
+    protected static $expandedMakeAttributes = [];
 
     /**
      * Create a new factory instance.
@@ -277,11 +285,18 @@ abstract class Factory
      */
     public function create($attributes = [], ?Model $parent = null)
     {
-        if (! empty($attributes)) {
-            return $this->state($attributes)->create([], $parent);
-        }
+        $results = $this->state($attributes)->make([], $parent);
 
-        $results = $this->make($attributes, $parent);
+        Collection::wrap($results)->each(function (Model $model) use ($attributes, $parent) {
+            $transformer = $this->wrapStateTransformer($attributes);
+            $makeAttributes = Arr::pull(static::$expandedMakeAttributes, spl_object_hash($model));
+
+            $resolved = $this->resolveStateAttributes($transformer, $makeAttributes, $parent);
+
+            $expandedAttributes = $this->expandAttributes($resolved);
+
+            $model->forceFill($expandedAttributes);
+        });
 
         if ($results instanceof Model) {
             $this->store(collect([$results]));
@@ -414,7 +429,11 @@ abstract class Factory
     protected function makeInstance(?Model $parent)
     {
         return Model::unguarded(function () use ($parent) {
-            return tap($this->newModel($this->getExpandedAttributes($parent)), function ($instance) {
+            $attributes = $this->getExpandedAttributes($parent);
+
+            return tap($this->newModel($attributes), function ($instance) use ($attributes) {
+                Arr::set(static::$expandedMakeAttributes, spl_object_hash($instance), $attributes);
+
                 if (isset($this->connection)) {
                     $instance->setConnection($this->connection);
                 }
@@ -426,7 +445,7 @@ abstract class Factory
      * Get a raw attributes array for the model.
      *
      * @param  \Illuminate\Database\Eloquent\Model|null  $parent
-     * @return mixed
+     * @return array
      */
     protected function getExpandedAttributes(?Model $parent)
     {
@@ -446,11 +465,7 @@ abstract class Factory
                 return $this->parentResolvers();
             }], $states->all()));
         })->reduce(function ($carry, $state) use ($parent) {
-            if ($state instanceof Closure) {
-                $state = $state->bindTo($this);
-            }
-
-            return array_merge($carry, $state($carry, $parent));
+            return array_merge($carry, $this->resolveStateAttributes($state, $carry, $parent));
         }, $this->definition());
     }
 
@@ -511,9 +526,7 @@ abstract class Factory
     {
         return $this->newInstance([
             'states' => $this->states->concat([
-                is_callable($state) ? $state : function () use ($state) {
-                    return $state;
-                },
+                $this->wrapStateTransformer($state),
             ]),
         ]);
     }
@@ -946,5 +959,35 @@ abstract class Factory
                 $relationship
             );
         }
+    }
+
+    /**
+     * If the given state transformer is not a callable, wrap it in one.
+     *
+     * @param  (callable(array<string, mixed>, TModel|null): array<string, mixed>)|array<string, mixed>  $state
+     * @return callable(array<string, mixed>, TModel|null): array<string, mixed>
+     */
+    protected function wrapStateTransformer(array|callable $state): callable
+    {
+        return is_callable($state) ? $state : function () use ($state) {
+            return $state;
+        };
+    }
+
+    /**
+     * Resolve the attributes of a state transformation.
+     *
+     * @param  callable  $resolver
+     * @param  array  $state
+     * @param  \Illuminate\Database\Eloquent\Model|null  $parent
+     * @return array
+     */
+    protected function resolveStateAttributes(callable $resolver, array $state, ?Model $parent): array
+    {
+        if ($resolver instanceof Closure) {
+            $resolver = $resolver->bindTo($this);
+        }
+
+        return $resolver($state, $parent);
     }
 }
