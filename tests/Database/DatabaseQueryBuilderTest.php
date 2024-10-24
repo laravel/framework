@@ -6830,6 +6830,182 @@ SQL;
         $this->assertSame('select * from "users" where "email" = \'foo\'', $builder->toRawSql());
     }
 
+    public function testWhenEmptyCallback()
+    {
+        $callback = function ($query, $condition) {
+            $this->assertTrue($condition);
+
+            $query->where('id', '=', 1);
+        };
+
+        $builder = $this->getBuilder();
+
+        $builder->select('*')->from('users')->whenEmpty([], $callback)->where('email', '=', 'foo');;
+        $this->assertSame('select * from "users" where "id" = ? and "email" = ?', $builder->toSql());
+
+        $builder = $this->getBuilder();
+
+        $builder->select('*')->from('users')->whenEmpty(['email' => 'foo'], $callback)->where('email', '=', 'foo');
+        $this->assertSame('select * from "users" where "email" = ?', $builder->toSql());
+    }
+
+    public function testWhenEmptyCallbackWithDefault()
+    {
+        $callback = function ($query, $condition) {
+            $this->assertTrue($condition);
+
+            $query->where('id', '=', 1);
+        };
+
+        $default = function ($query, $condition) {
+            $this->assertFalse($condition);
+
+            $query->where('email', '=', 'foo');
+        };
+
+        $builder = $this->getBuilder();
+
+        $builder->select('*')->from('users')->whenEmpty([], $callback, $default);
+        $this->assertSame('select * from "users" where "id" = ?', $builder->toSql());
+
+        $builder = $this->getBuilder();
+
+        $builder->select('*')->from('users')->whenEmpty(['email' => 'foo'], $callback, $default);
+        $this->assertSame('select * from "users" where "email" = ?', $builder->toSql());
+    }
+
+    public function testUnlessEmptyCallback()
+    {
+        $callback = function ($query, $condition) {
+            $this->assertFalse($condition);
+
+            $query->where('id', '=', 1);
+        };
+
+        $builder = $this->getBuilder();
+
+        $builder->select('*')->from('users')->unlessEmpty(['email' => 'foo'], $callback)->where('email', '=', 'foo');
+        $this->assertSame('select * from "users" where "id" = ? and "email" = ?', $builder->toSql());
+
+        $builder = $this->getBuilder();
+
+        $builder->select('*')->from('users')->unlessEmpty([], $callback)->where('email', '=', 'foo');
+        $this->assertSame('select * from "users" where "email" = ?', $builder->toSql());
+    }
+
+    public function testUnlessEmptyCallbackWithDefault()
+    {
+        $callback = function ($query, $condition) {
+            $this->assertFalse($condition);
+
+            $query->where('id', '=', 1);
+        };
+
+        $default = function ($query, $condition) {
+            $this->assertTrue($condition);
+
+            $query->where('email', '=', 'foo');
+        };
+
+        $builder = $this->getBuilder();
+
+        $builder->select('*')->from('users')->unlessEmpty(['email' => 'foo'], $callback, $default);
+        $this->assertSame('select * from "users" where "id" = ?', $builder->toSql());
+
+        $builder = $this->getBuilder();
+
+        $builder->select('*')->from('users')->unlessEmpty([], $callback, $default);
+        $this->assertSame('select * from "users" where "email" = ?', $builder->toSql());
+    }
+
+    public function testWhenIssetCallback()
+    {
+        $callback = function ($query, $condition) {
+            $this->assertTrue($condition);
+
+            $query->where('id', '=', 1);
+        };
+
+        $builder = $this->getBuilder();
+        $array = ['email' => 'foo'];
+        $builder->select('*')->from('users')->whenIsset($array['email'], $callback)->where('email', '=', 'foo');
+        $this->assertSame('select * from "users" where "id" = ? and "email" = ?', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $array = ['email' => null];
+        $builder->select('*')->from('users')->whenIsset($array['email'], $callback)->where('email', '=', 'foo');
+        $this->assertSame('select * from "users" where "email" = ?', $builder->toSql());
+    }
+
+    public function testWhenIssetCallbackWithDefault()
+    {
+        $callback = function ($query, $condition) {
+            $this->assertTrue($condition);
+
+            $query->where('id', '=', 1);
+        };
+
+        $default = function ($query, $condition) {
+            $this->assertFalse($condition);
+
+            $query->where('email', '=', 'foo');
+        };
+
+        $builder = $this->getBuilder();
+        $array = ['email' => 'foo'];
+        $builder->select('*')->from('users')->whenIsset($array['email'], $callback, $default);
+        $this->assertSame('select * from "users" where "id" = ?', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $array = ['email' => null];
+        $builder->select('*')->from('users')->whenIsset($array['email'], $callback, $default);
+        $this->assertSame('select * from "users" where "email" = ?', $builder->toSql());
+    }
+
+    public function testUnlessIssetCallback()
+    {
+        $callback = function ($query, $condition) {
+            $this->assertFalse($condition);
+
+            $query->where('id', '=', 1);
+        };
+
+        $builder = $this->getBuilder();
+        $array = ['email' => 'foo'];
+        $builder->select('*')->from('users')->unlessIsset($array['email'], $callback)->where('email', '=', 'foo');
+        $this->assertSame('select * from "users" where "email" = ?', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $array = ['email' => null];
+        $builder->select('*')->from('users')->unlessIsset($array['email'], $callback)->where('email', '=', 'foo');
+        $this->assertSame('select * from "users" where "id" = ? and "email" = ?', $builder->toSql());
+    }
+
+    public function testUnlessIssetCallbackWithDefault()
+    {
+        $callback = function ($query, $condition) {
+            $this->assertFalse($condition);
+
+            $query->where('id', '=', 1);
+        };
+
+        $default = function ($query, $condition) {
+            $this->assertTrue($condition);
+
+            $query->where('email', '=', 'foo');
+        };
+
+        $builder = $this->getBuilder();
+        $array = ['email' => 'foo'];
+        $builder->select('*')->from('users')->unlessIsset($array['email'], $callback, $default);
+        $this->assertSame('select * from "users" where "email" = ?', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $array = ['email' => null];
+        $builder->select('*')->from('users')->unlessIsset($array['email'], $callback, $default);
+        $this->assertSame('select * from "users" where "id" = ?', $builder->toSql());
+    }
+
     protected function getConnection()
     {
         $connection = m::mock(ConnectionInterface::class);

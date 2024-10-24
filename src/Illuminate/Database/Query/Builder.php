@@ -4437,4 +4437,68 @@ class Builder implements BuilderContract
 
         static::throwBadMethodCallException($method);
     }
+
+    /**
+     * Apply the callback if the given "value" is empty.
+     *
+     * @template TWhenParameter
+     * @template TWhenReturnType
+     *
+     * @param  (\Closure($this): TWhenParameter)|TWhenParameter|null  $value
+     * @param  (callable($this, TWhenParameter): TWhenReturnType)|null  $callback
+     * @param  (callable($this, TWhenParameter): TWhenReturnType)|null  $default
+     * @return $this|TWhenReturnType
+     */
+    public function whenEmpty($value = null, ?callable $callback = null, ?callable $default = null)
+    {
+        return $this->when(empty($value), $callback, $default);
+    }
+
+    /**
+     * Apply the callback if the given "value" is not empty.
+     *
+     * @template TWhenParameter
+     * @template TWhenReturnType
+     *
+     * @param  (\Closure($this): TWhenParameter)|TWhenParameter|null  $value
+     * @param  (callable($this, TWhenParameter): TWhenReturnType)|null  $callback
+     * @param  (callable($this, TWhenParameter): TWhenReturnType)|null  $default
+     * @return $this|TWhenReturnType
+     */
+    public function unlessEmpty($value = null, ?callable $callback = null, ?callable $default = null)
+    {
+        return $this->unless(empty($value), $callback, $default);
+    }
+
+    /**
+     * Apply the callback if the given "value" is set.
+     *
+     * @template TWhenParameter
+     * @template TWhenReturnType
+     *
+     * @param  (\Closure($this): TWhenParameter)|TWhenParameter|null  $value
+     * @param  (callable($this, TWhenParameter): TWhenReturnType)|null  $callback
+     * @param  (callable($this, TWhenParameter): TWhenReturnType)|null  $default
+     * @return $this|TWhenReturnType
+     */
+    public function whenIsset($value = null, ?callable $callback = null, ?callable $default = null)
+    {
+        return $this->when(isset($value), $callback, $default);
+    }
+
+    /**
+     * Apply the callback if the given "value" is not set.
+     *
+     * @template TWhenParameter
+     * @template TWhenReturnType
+     *
+     * @param  (\Closure($this): TWhenParameter)|TWhenParameter|null  $value
+     * @param  (callable($this, TWhenParameter): TWhenReturnType)|null  $callback
+     * @param  (callable($this, TWhenParameter): TWhenReturnType)|null  $default
+     * @return $this|TWhenReturnType
+     */
+    public function unlessIsset($value = null, ?callable $callback = null, ?callable $default = null)
+    {
+        return $this->unless(isset($value), $callback, $default);
+    }
 }
