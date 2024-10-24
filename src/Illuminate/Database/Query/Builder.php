@@ -3848,7 +3848,11 @@ class Builder implements BuilderContract
 
         $values = collect($values)->map(function ($value) {
             if (! $value instanceof Builder) {
-                return ['value' => $value, 'bindings' => $value];
+                return ['value' => $value, 'bindings' => match (true) {
+                    $value instanceof Collection => $value->all(),
+                    $value instanceof UnitEnum => enum_value($value),
+                    default => $value,
+                }];
             }
 
             [$query, $bindings] = $this->parseSub($value);

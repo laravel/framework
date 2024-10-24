@@ -313,7 +313,7 @@ class Validator implements ValidatorContract
     /**
      * The exception to throw upon failure.
      *
-     * @var string
+     * @var class-string<\Illuminate\Validation\ValidationException>
      */
     protected $exception = ValidationException::class;
 
@@ -1513,7 +1513,7 @@ class Validator implements ValidatorContract
     /**
      * Get the exception to throw upon failed validation.
      *
-     * @return string
+     * @return class-string<\Illuminate\Validation\ValidationException>
      */
     public function getException()
     {
@@ -1523,7 +1523,7 @@ class Validator implements ValidatorContract
     /**
      * Set the exception to throw upon failed validation.
      *
-     * @param  string  $exception
+     * @param  class-string<\Illuminate\Validation\ValidationException>  $exception
      * @return $this
      *
      * @throws \InvalidArgumentException
