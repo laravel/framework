@@ -45,7 +45,7 @@ class Composer
      *
      * @throw \RuntimeException
      */
-    protected function hasPackage($package)
+    public function hasPackage($package)
     {
         $composer = json_decode(file_get_contents($this->findComposerFile()), true);
 
