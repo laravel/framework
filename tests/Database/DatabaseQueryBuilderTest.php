@@ -1826,6 +1826,10 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertSame('select * from "users" order by "name" desc', $builder->toSql());
 
         $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->orderByPriority('name', ['john', 'doe']);
+        $this->assertSame('select * from "users" order by FIELD(name, ?,?) asc', $builder->toSql());
+
+        $builder = $this->getBuilder();
         $builder->select('*')->from('posts')->where('public', 1)
             ->unionAll($this->getBuilder()->select('*')->from('videos')->where('public', 1))
             ->orderByRaw('field(category, ?, ?) asc', ['news', 'opinion']);
