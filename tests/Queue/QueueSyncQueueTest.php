@@ -109,7 +109,7 @@ class QueueSyncQueueTest extends TestCase
 
 class SyncQueueTestEntity implements QueueableEntity
 {
-    public function getQueueableId()
+    public function getQueueableId(): int
     {
         return 1;
     }

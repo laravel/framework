@@ -1985,20 +1985,16 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
     /**
      * Get the value of the model's primary key.
-     *
-     * @return mixed
      */
-    public function getKey()
+    public function getKey(): int|string
     {
         return $this->getAttribute($this->getKeyName());
     }
 
     /**
      * Get the queueable identity for the entity.
-     *
-     * @return mixed
      */
-    public function getQueueableId()
+    public function getQueueableId(): int|string
     {
         return $this->getKey();
     }

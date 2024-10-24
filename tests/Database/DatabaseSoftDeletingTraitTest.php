@@ -73,7 +73,7 @@ class DatabaseSoftDeletingTraitStub
         //
     }
 
-    public function getKey()
+    public function getKey(): int
     {
         return 1;
     }
