@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Database\EloquentBelongsToManyTest;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
@@ -1312,6 +1313,38 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
             'user_uuid',
             $instance->toArray(),
         );
+    }
+
+    public function testWhereHasPivot()
+    {
+        $tag = Tag::create(['name' => Str::random()])->fresh();
+        $post = Post::create(['title' => Str::random()]);
+
+        DB::table('posts_tags')->insert([
+            ['post_id' => $post->id, 'tag_id' => $tag->id, 'flag' => 'foo'],
+        ]);
+
+        $relationTag = $post->tags()->whereHasPivot('posts',
+            fn(BelongsToMany $builder) => $builder->wherePivot('flag', 'foo')
+        )->first();
+
+        $this->assertEquals($relationTag->getAttributes(), $tag->getAttributes());
+    }
+
+    public function testWhereHasPivotForwardCall()
+    {
+        $tag = Tag::create(['name' => Str::random()])->fresh();
+        $post = Post::create(['title' => Str::random()]);
+
+        DB::table('posts_tags')->insert([
+            ['post_id' => $post->id, 'tag_id' => $tag->id, 'flag' => 'foo'],
+        ]);
+
+        $relationTag = $post->tags()->whereHasPivot('posts',
+            fn(BelongsToMany $builder) => $builder->whereKey($tag->getKey())
+        )->first();
+
+        $this->assertEquals($relationTag->getAttributes(), $tag->getAttributes());
     }
 }
 

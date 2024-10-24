@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\RelationNotFoundException;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
@@ -154,6 +155,32 @@ trait QueriesRelationships
     }
 
     /**
+     * Add a relationship count / exists condition to the pivot relation with where clauses.
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>|string  $relation
+     * @param  \Closure|null  $callback
+     * @param  string  $operator
+     * @param  int  $count
+     *
+     * @return $this
+     */
+    public function whereHasPivot($relation, Closure $callback, $operator = '>=', $count = 1)
+    {
+        return $this->whereHas($relation,
+            function (Builder $builder) use ($callback, $relation) {
+                $relation = $this->getRelation($relation);
+
+                if ($relation instanceof BelongsToMany) {
+                    call_user_func($callback, $relation->setQuery($builder->getQuery()));
+                    return $builder;
+                }
+
+                throw new InvalidArgumentException("Only BelongsToMany relations are applicable.");
+            }, $operator, $count
+        );
+    }
+
+    /**
      * Add a relationship count / exists condition to the query with where clauses.
      *
      * Also load the relationship with same condition.
@@ -182,6 +209,31 @@ trait QueriesRelationships
     public function orWhereHas($relation, ?Closure $callback = null, $operator = '>=', $count = 1)
     {
         return $this->has($relation, $operator, $count, 'or', $callback);
+    }
+
+    /**
+     * Add a relationship count / exists condition to the pivot relation with where clauses and an "or".
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>|string  $relation
+     * @param  \Closure|null  $callback
+     * @param  string  $operator
+     * @param  int  $count
+     * @return $this
+     */
+    public function orWhereHasPivot($relation, Closure $callback, $operator = '>=', $count = 1): static
+    {
+        return $this->orWhereHas($relation,
+            function (Builder $builder) use ($callback, $relation) {
+                $relation = $this->getRelation($relation);
+
+                if ($relation instanceof BelongsToMany) {
+                    call_user_func($callback, $relation->setQuery($builder->getQuery()));
+                    return $builder;
+                }
+
+                throw new InvalidArgumentException("Only BelongsToMany relations are applicable.");
+            }, $operator, $count
+        );
     }
 
     /**
