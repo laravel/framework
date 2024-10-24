@@ -42,6 +42,7 @@ use Illuminate\Foundation\Console\ConfigClearCommand;
 use Illuminate\Foundation\Console\ConfigPublishCommand;
 use Illuminate\Foundation\Console\ConfigShowCommand;
 use Illuminate\Foundation\Console\ConsoleMakeCommand;
+use Illuminate\Foundation\Console\DeploymentFinishCommand;
 use Illuminate\Foundation\Console\DocsCommand;
 use Illuminate\Foundation\Console\DownCommand;
 use Illuminate\Foundation\Console\EnumMakeCommand;
@@ -130,6 +131,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'DbShow' => ShowCommand::class,
         'DbTable' => DatabaseTableCommand::class,
         'DbWipe' => WipeCommand::class,
+        'DeploymentFinish' => DeploymentFinishCommand::class,
         'Down' => DownCommand::class,
         'Environment' => EnvironmentCommand::class,
         'EnvironmentDecrypt' => EnvironmentDecryptCommand::class,
