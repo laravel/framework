@@ -168,7 +168,8 @@ trait QueriesRelationships
     {
         return $this->has($relation, $operator, $count, $boolean,
             function (Builder $builder) use ($callback, $relation) {
-                $relation = is_string($relation) ? $this->getRelation($relation) : $relation;
+                // As we modify given relation, will use its clone
+                $relation = is_string($relation) ? $this->getRelationWithoutConstraints($relation) : clone $relation;
 
                 if ($relation instanceof BelongsToMany) {
                     call_user_func($callback, $relation->setQuery($builder->getQuery()));

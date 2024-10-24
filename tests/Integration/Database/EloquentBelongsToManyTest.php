@@ -1359,11 +1359,15 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
             ['post_id' => $post->id, 'tag_id' => $tag->id, 'flag' => 'rab'],
         ]);
 
-        $relationTag = $post->tags()->whereHasPivot($tag->posts(),
+        $relation = $tag->posts();
+        $originalQuery = $relation->getQuery();
+
+        $relationTag = $post->tags()->whereHasPivot($relation,
             fn (BelongsToMany $builder) => $builder->wherePivot('flag', 'foo')
         )->first();
 
         $this->assertEquals($relationTag->getAttributes(), $tag->getAttributes());
+        $this->assertEquals($originalQuery, $relation->getQuery());
     }
 
     public function testWhereHasPivotForwardCall()
