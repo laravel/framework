@@ -5,12 +5,9 @@ namespace Illuminate\Tests\Integration\Database\EloquentBelongsToTest;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
-use Illuminate\Tests\Integration\Database\EloquentBelongsToManyTest\Post;
-use Illuminate\Tests\Integration\Database\EloquentBelongsToManyTest\Tag;
 
 class EloquentBelongsToTest extends DatabaseTestCase
 {
@@ -138,7 +135,7 @@ class EloquentBelongsToTest extends DatabaseTestCase
 
         $this->expectException(\InvalidArgumentException::class);
 
-        $user->whereHasPivot('parent', fn(BelongsToMany $pivot) => $pivot)->first();
+        $user->whereHasPivot('parent', fn (BelongsToMany $pivot) => $pivot)->first();
     }
 }
 

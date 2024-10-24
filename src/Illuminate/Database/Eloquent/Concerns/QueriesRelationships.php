@@ -161,7 +161,6 @@ trait QueriesRelationships
      * @param  \Closure|null  $callback
      * @param  string  $operator
      * @param  int  $count
-     *
      * @return $this
      */
     public function whereHasPivot($relation, Closure $callback, $operator = '>=', $count = 1)
@@ -172,10 +171,11 @@ trait QueriesRelationships
 
                 if ($relation instanceof BelongsToMany) {
                     call_user_func($callback, $relation->setQuery($builder->getQuery()));
+
                     return $builder;
                 }
 
-                throw new InvalidArgumentException("Only BelongsToMany relations are applicable.");
+                throw new InvalidArgumentException('Only BelongsToMany relations are applicable.');
             }, $operator, $count
         );
     }
@@ -228,10 +228,11 @@ trait QueriesRelationships
 
                 if ($relation instanceof BelongsToMany) {
                     call_user_func($callback, $relation->setQuery($builder->getQuery()));
+
                     return $builder;
                 }
 
-                throw new InvalidArgumentException("Only BelongsToMany relations are applicable.");
+                throw new InvalidArgumentException('Only BelongsToMany relations are applicable.');
             }, $operator, $count
         );
     }

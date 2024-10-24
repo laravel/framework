@@ -1326,19 +1326,19 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         ]);
 
         $relationTag = $post->tags()->whereHasPivot('posts',
-            fn(BelongsToMany $builder) => $builder->wherePivot('flag', 'foo')
+            fn (BelongsToMany $builder) => $builder->wherePivot('flag', 'foo')
         )->first();
 
         $this->assertEquals($relationTag->getAttributes(), $tag->getAttributes());
 
         $relationTag = $post->tags()->whereHasPivot('posts',
-            fn(BelongsToMany $builder) => $builder->wherePivotIn('flag', ['bar', 'rab'])
+            fn (BelongsToMany $builder) => $builder->wherePivotIn('flag', ['bar', 'rab'])
         )->first();
 
         $this->assertEquals($relationTag->getAttributes(), $tag->getAttributes());
 
         $relationTag = $post->tags()->whereHasPivot('posts',
-            fn(BelongsToMany $builder) => $builder->wherePivotNull('flag')
+            fn (BelongsToMany $builder) => $builder->wherePivotNull('flag')
         )->first();
 
         $this->assertNull($relationTag);
@@ -1346,21 +1346,21 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
     public function testWhereHasPivotForwardCall()
     {
-        $tag = Tag::create(['id' => 1, 'name' => Str::random()])->fresh();
-        $post = Post::create(['id' => 2, 'title' => Str::random()]);
+        $tag = Tag::create(['name' => Str::random()])->fresh();
+        $post = Post::create(['title' => Str::random()]);
 
         DB::table('posts_tags')->insert([
             ['post_id' => $post->id, 'tag_id' => $tag->id, 'flag' => 'foo'],
         ]);
 
         $relationTag = $post->tags()->whereHasPivot('posts',
-            fn(BelongsToMany $builder) => $builder->whereKey(2)
+            fn (BelongsToMany $builder) => $builder->whereKey($post->getKey())
         )->first();
 
         $this->assertEquals($relationTag->getAttributes(), $tag->getAttributes());
 
         $relationTag = $post->tags()->whereHasPivot('posts',
-            fn(BelongsToMany $builder) => $builder->whereKey(1)
+            fn (BelongsToMany $builder) => $builder->whereKey($post->getKey() + 1)
         )->first();
 
         $this->assertNull($relationTag);
