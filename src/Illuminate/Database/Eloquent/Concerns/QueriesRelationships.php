@@ -168,17 +168,16 @@ trait QueriesRelationships
     {
         return $this->has($relation, $operator, $count, $boolean,
             function (Builder $builder) use ($callback, $relation) {
+                $relation = is_string($relation) ? $this->getRelation($relation) : $relation;
 
-            $relation = is_string($relation) ? $this->getRelation($relation) : $relation;
+                if ($relation instanceof BelongsToMany) {
+                    call_user_func($callback, $relation->setQuery($builder->getQuery()));
 
-            if ($relation instanceof BelongsToMany) {
-                call_user_func($callback, $relation->setQuery($builder->getQuery()));
+                    return $builder;
+                }
 
-                return $builder;
-            }
-
-            throw new InvalidArgumentException('Only BelongsToMany relations are applicable.');
-        });
+                throw new InvalidArgumentException('Only BelongsToMany relations are applicable.');
+            });
     }
 
     /**
