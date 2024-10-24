@@ -9,6 +9,7 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
@@ -49,6 +50,13 @@ abstract class Factory
      * @var \Illuminate\Support\Collection
      */
     protected $states;
+
+    /**
+     * The "create" attributes that will be applied to the model during creation.
+     *
+     * @var array
+     */
+    protected $createAttributes;
 
     /**
      * The parent relationships that will be applied to the model.
@@ -151,6 +159,7 @@ abstract class Factory
         $this->connection = $connection;
         $this->recycle = $recycle ?? new Collection;
         $this->faker = $this->withFaker();
+        $this->createAttributes = [];
     }
 
     /**
@@ -278,16 +287,20 @@ abstract class Factory
     public function create($attributes = [], ?Model $parent = null)
     {
         if (! empty($attributes)) {
-            return $this->state($attributes)->create([], $parent);
+            return $this->captureCreateAttributeKeysState($attributes)->create([], $parent);
         }
 
-        $results = $this->make($attributes, $parent);
+        $results = $this->make([], $parent);
 
         if ($results instanceof Model) {
+            $results->forceFill($this->createAttributes);
+
             $this->store(collect([$results]));
 
             $this->callAfterCreating(collect([$results]), $parent);
         } else {
+            $results->each(fn (Model $model) => $model->forceFill($this->createAttributes));
+
             $this->store($results);
 
             $this->callAfterCreating($results, $parent);
@@ -414,7 +427,11 @@ abstract class Factory
     protected function makeInstance(?Model $parent)
     {
         return Model::unguarded(function () use ($parent) {
-            return tap($this->newModel($this->getExpandedAttributes($parent)), function ($instance) {
+            $attributes = $this->getExpandedAttributes($parent);
+
+            $this->captureCreateAttributes($attributes);
+
+            return tap($this->newModel($attributes), function ($instance) {
                 if (isset($this->connection)) {
                     $instance->setConnection($this->connection);
                 }
@@ -426,7 +443,7 @@ abstract class Factory
      * Get a raw attributes array for the model.
      *
      * @param  \Illuminate\Database\Eloquent\Model|null  $parent
-     * @return mixed
+     * @return array
      */
     protected function getExpandedAttributes(?Model $parent)
     {
@@ -446,11 +463,7 @@ abstract class Factory
                 return $this->parentResolvers();
             }], $states->all()));
         })->reduce(function ($carry, $state) use ($parent) {
-            if ($state instanceof Closure) {
-                $state = $state->bindTo($this);
-            }
-
-            return array_merge($carry, $state($carry, $parent));
+            return array_merge($carry, $this->resolveStateAttributes($state, $carry, $parent));
         }, $this->definition());
     }
 
@@ -511,9 +524,7 @@ abstract class Factory
     {
         return $this->newInstance([
             'states' => $this->states->concat([
-                is_callable($state) ? $state : function () use ($state) {
-                    return $state;
-                },
+                $this->wrapStateTransformer($state),
             ]),
         ]);
     }
@@ -946,5 +957,67 @@ abstract class Factory
                 $relationship
             );
         }
+    }
+
+    /**
+     * If the given state transformer is not a callable, wrap it in one.
+     *
+     * @param  (callable(array<string, mixed>, TModel|null): array<string, mixed>)|array<string, mixed>  $state
+     * @return callable(array<string, mixed>, TModel|null): array<string, mixed>
+     */
+    protected function wrapStateTransformer(array|callable $state): callable
+    {
+        return is_callable($state) ? $state : function () use ($state) {
+            return $state;
+        };
+    }
+
+    /**
+     * Resolve the attributes of a state transformation.
+     *
+     * @param  callable  $resolver
+     * @param  array  $state
+     * @param  \Illuminate\Database\Eloquent\Model|null  $parent
+     * @return array
+     */
+    protected function resolveStateAttributes(callable $resolver, array $state, ?Model $parent): array
+    {
+        if ($resolver instanceof Closure) {
+            $resolver = $resolver->bindTo($this);
+        }
+
+        return $resolver($state, $parent);
+    }
+
+    /**
+     * State transformer that captures the keys of the `create` attributes.
+     *
+     * @param  (callable(array<string, mixed>, TModel|null): array<string, mixed>)|array<string, mixed>  $state
+     * @return static
+     */
+    protected function captureCreateAttributeKeysState($state)
+    {
+        $callableState = $this->wrapStateTransformer($state);
+
+        return $this->state(function ($carry, $parent) use ($callableState) {
+            return tap($this->resolveStateAttributes($callableState, $carry, $parent), function ($newState) {
+                $this->createAttributes = array_fill_keys(array_keys($newState), null);
+            });
+        });
+    }
+
+    /**
+     * Capture the current state of the attributes that were passed to the `create` method (if any).
+     *
+     * @param  array  $attributes
+     * @return void
+     */
+    protected function captureCreateAttributes(array $attributes)
+    {
+        if (empty($createAttributeKeys = array_keys($this->createAttributes))) {
+            return;
+        }
+
+        $this->createAttributes = Arr::only($attributes, $createAttributeKeys);
     }
 }
