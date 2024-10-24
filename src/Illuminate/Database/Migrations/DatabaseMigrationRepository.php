@@ -117,7 +117,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
      */
     public function log($file, $batch)
     {
-        $record = ['migration' => $file, 'batch' => $batch];
+        $record = ['migration' => $file, 'batch' => $batch, 'created_at' => now()];
 
         $this->table()->insert($record);
     }
@@ -169,6 +169,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
             $table->increments('id');
             $table->string('migration');
             $table->integer('batch');
+            $table->dateTime('created_at');
         });
     }
 
