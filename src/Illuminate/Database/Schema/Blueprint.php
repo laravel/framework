@@ -445,7 +445,7 @@ class Blueprint
             return new Fluent();
         }
 
-        return $this->addCommand('dropColumn', compact('columns'));
+        return $this->dropColumn($columns);
     }
 
     /**
