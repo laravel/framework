@@ -513,13 +513,13 @@ if (!function_exists('dd_when')) {
      * Dump and die when a condition is met.
      *
      * @param bool $condition
-     * @param  mixed  ...$values
+     * @param  mixed  ...$vars
      * @return void
      */
-    function dd_when(bool $condition, ...$values): void
+    function dd_when(bool $condition, mixed ...$vars): void
     {
         if ($condition) {
-            dd(...$values);
+            dd(...$vars);
         }
     }
 }
