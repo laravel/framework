@@ -499,6 +499,7 @@ class DatabaseEloquentCollectionTest extends TestCase
         $this->assertEquals(BaseCollection::class, get_class($a->zip(['a', 'b'], ['c', 'd'])));
         $this->assertEquals(BaseCollection::class, get_class($a->countBy('foo')));
         $this->assertEquals(BaseCollection::class, get_class($b->flip()));
+        $this->assertEquals(BaseCollection::class, get_class($a->partition('foo', '=', 'bar')));
     }
 
     public function testMakeVisibleRemovesHiddenAndIncludesVisible()
