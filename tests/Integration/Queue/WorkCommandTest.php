@@ -7,6 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Queue\Console\WorkCommand;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Exceptions;
@@ -31,6 +32,13 @@ class WorkCommandTest extends QueueTestCase
         parent::setUp();
 
         $this->markTestSkippedWhenUsingSyncQueueDriver();
+    }
+
+    protected function tearDown(): void
+    {
+        WorkCommand::flushState();
+
+        parent::tearDown();
     }
 
     public function testRunningOneJob()

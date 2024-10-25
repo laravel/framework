@@ -373,4 +373,14 @@ class WorkCommand extends Command
 
         return $this->option('json');
     }
+
+    /**
+     * Reset static variables.
+     *
+     * @return void
+     */
+    public static function flushState()
+    {
+        static::$boundEvents = false;
+    }
 }
