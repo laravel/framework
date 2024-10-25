@@ -908,7 +908,7 @@ class Worker
     /**
      * Attach an observer.
      *
-     * @param  SplObserver  $observer
+     * @param SplObserver $observer
      * @return $this
      */
     public function setObserver(SplObserver $observer)

@@ -126,7 +126,7 @@ class WorkCommand extends Command implements SplObserver
     /**
      * Receive update from subjects.
      *
-     * @param  SplSubject  $subject
+     * @param SplSubject $subject
      * @return void
      */
     public function update(SplSubject $subject): void
