@@ -63,6 +63,30 @@ class MailMakeCommandTest extends TestCase
         $this->assertFilenameExists('resources/views/foo-mail.blade.php');
     }
 
+    public function testMailTemplateWillBePickedUp()
+    {
+        $this->app['files']
+            ->put(
+                $this->app->basePath('resources/views/existing-template.blade.php'),
+                '<div>My existing template</div>'
+            );
+        $this->artisan('make:mail', ['name' => 'FooMail', '--view' => 'existing-template'])
+            ->assertExitCode(0);
+
+        $this->assertFileContains([
+            'namespace App\Mail;',
+            'use Illuminate\Mail\Mailable;',
+            'class FooMail extends Mailable',
+            'return new Content(',
+            "view: 'existing-template',",
+        ], 'app/Mail/FooMail.php');
+
+        $this->assertFilenameExists('resources/views/existing-template.blade.php');
+        $this->assertFileContains([
+            '<div>My existing template</div>',
+        ], 'resources/views/existing-template.blade.php');
+    }
+
     public function testItCanGenerateMailFileWithTest()
     {
         $this->artisan('make:mail', ['name' => 'FooMail', '--test' => true])

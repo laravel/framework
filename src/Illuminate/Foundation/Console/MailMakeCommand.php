@@ -88,6 +88,10 @@ class MailMakeCommand extends GeneratorCommand
             str_replace('.', '/', $this->getView()).'.blade.php'
         );
 
+        if ($this->files->exists($path)) {
+            return $this->components->info(sprintf('%s [%s] has been picked up.', 'View', $path));
+        }
+
         $this->files->ensureDirectoryExists(dirname($path));
 
         $stub = str_replace(
