@@ -1776,16 +1776,16 @@ class Builder implements BuilderContract
     /**
      * Add a whenWhere to the query.
      *
-     * @param mixed $condition
-     * @param string $column
-     * @param string|null $operator
-     * @param mixed|null $value
-     * @param string $boolean
+     * @param  mixed  $condition
+     * @param  string  $column
+     * @param  string|null  $operator
+     * @param  mixed|null  $value
+     * @param  string  $boolean
      * @return $this
-    */
-    public function whenWhere($condition, string $column, $operator = null, $value = null, string $boolean = 'and')
+     */
+    public function whenWhere($condition, $column, $operator = null, $value = null, string $boolean = 'and')
     {
-        if(!$condition) {
+        if (! $condition) {
             return $this;
         }
 
@@ -1795,14 +1795,13 @@ class Builder implements BuilderContract
     /**
      * Add a or whenWhere to the query.
      *
-     * @param mixed $condition
-     * @param string $column
-     * @param string|null $operator
-     * @param mixed|null $value
-     * @param string
+     * @param  mixed  $condition
+     * @param  string  $column
+     * @param  string|null  $operator
+     * @param  mixed|null  $value
      * @return $this
      */
-    public function orWhenWhere($condition, string $column, $operator = null, $value = null)
+    public function orWhenWhere($condition, $column, $operator = null, $value = null)
     {
         return $this->whenWhere($condition, $column, $operator, $value, 'or');
     }

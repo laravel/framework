@@ -600,13 +600,13 @@ class QueryBuilderTest extends DatabaseTestCase
 
     public function testWhenWhere()
     {
-        $this->assertSame(1, DB::table('posts')->whenWhere(true,'id', 1)->count());
-        $this->assertSame(2, DB::table('posts')->whenWhere(false,'id', 1)->count());
+        $this->assertSame(1, DB::table('posts')->whenWhere(true, 'id', 1)->count());
+        $this->assertSame(2, DB::table('posts')->whenWhere(false, 'id', 1)->count());
     }
     public function testOrWhenWhere()
     {
-        $this->assertSame(1, DB::table('posts')->whenWhere(true,'id', 1)->count());
-        $this->assertSame(2, DB::table('posts')->whenWhere(false,'id', 1)->count());
+        $this->assertSame(1, DB::table('posts')->whenWhere(true, 'id', 1)->count());
+        $this->assertSame(2, DB::table('posts')->whenWhere(false, 'id', 1)->count());
     }
     public function testPluck()
     {
