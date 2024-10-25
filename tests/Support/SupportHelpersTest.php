@@ -1229,6 +1229,18 @@ class SupportHelpersTest extends TestCase
             preg_replace_array($pattern, $replacements, $subject)
         );
     }
+
+    public function testDdWhenDoesNotDumpWhenConditionIsFalse()
+    {
+        // Ensure that when the condition is false, dd() does not execute.
+        try {
+            dd_when(false, 'This should not dump');
+        } catch (RuntimeException $e) {
+            $this->fail('dd_when should not have called dd when condition is false.');
+        }
+
+        $this->assertTrue(true); // If no exception, the test passes.
+    }
 }
 
 trait SupportTestTraitOne
