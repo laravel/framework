@@ -9,6 +9,7 @@ use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Grammars\Grammar;
 use Illuminate\Database\Schema\Grammars\MySqlGrammar;
 use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\Traits\Macroable;
 
@@ -423,6 +424,26 @@ class Blueprint
     public function dropColumn($columns)
     {
         $columns = is_array($columns) ? $columns : func_get_args();
+
+        return $this->addCommand('dropColumn', compact('columns'));
+    }
+
+    /**
+     * Indicate that the given columns should be dropped if exists.
+     *
+     * @param  array|mixed  $columns
+     * @return \Illuminate\Support\Fluent
+     */
+    public function dropColumnIfExists($columns)
+    {
+        $current = Schema::getColumnListing($this->getTable());
+
+        $columns = is_array($columns) ? $columns : func_get_args();
+        $columns = array_filter($columns, fn ($column) => in_array($column, $current));
+
+        if (empty($columns)) {
+            return new Fluent();
+        }
 
         return $this->addCommand('dropColumn', compact('columns'));
     }
