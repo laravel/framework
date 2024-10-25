@@ -436,10 +436,8 @@ class Blueprint
      */
     public function dropColumnIfExists($columns)
     {
-        $current = Schema::getColumnListing($this->getTable());
-
         $columns = is_array($columns) ? $columns : func_get_args();
-        $columns = array_filter($columns, fn ($column) => in_array($column, $current));
+        $columns = array_intersect($columns, Schema::getColumnListing($this->getTable()));
 
         if (empty($columns)) {
             return new Fluent();
