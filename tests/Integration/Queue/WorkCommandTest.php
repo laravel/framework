@@ -169,7 +169,7 @@ class WorkCommandTest extends QueueTestCase
         Exceptions::fake();
 
         Queue::push(new FirstJob);
-        $this->artisan('queue:work', ['--once' => true])->assertExitCode(0);
+        $this->withoutMockingConsoleOutput()->artisan('queue:work', ['--once' => true, '--sleep' => 0]);
 
         Queue::push(new JobWillFail);
         $this->withoutMockingConsoleOutput()->artisan('queue:work', ['--once' => true]);

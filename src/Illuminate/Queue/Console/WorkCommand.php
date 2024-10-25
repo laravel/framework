@@ -25,6 +25,13 @@ class WorkCommand extends Command
     use InteractsWithTime;
 
     /**
+     * Prevents event listeners from being bound multiple times.
+     *
+     * @var bool
+     */
+    private static $boundEvents = false;
+
+    /**
      * The console command name.
      *
      * @var string
@@ -172,6 +179,10 @@ class WorkCommand extends Command
      */
     protected function listenForEvents()
     {
+        if (static::$boundEvents) {
+            return;
+        }
+
         $this->laravel['events']->listen(JobProcessing::class, function ($event) {
             $this->writeOutput($event->job, 'starting');
         });
@@ -189,6 +200,8 @@ class WorkCommand extends Command
 
             $this->logFailedJob($event);
         });
+
+        static::$boundEvents = true;
     }
 
     /**
