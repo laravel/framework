@@ -1507,6 +1507,7 @@ class ResourceTest extends TestCase
         $post->handle($request, fn () => null);
 
         $this->expectException(PostTooLargeException::class);
+        $this->expectExceptionMessage('The POST data is too large.');
 
         $request = new Request(server: ['CONTENT_LENGTH' => '2147483640']);
         $post = new ValidatePostSize;
