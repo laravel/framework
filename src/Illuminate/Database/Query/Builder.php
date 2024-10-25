@@ -1789,20 +1789,16 @@ class Builder implements BuilderContract
             return $this;
         }
 
-        [$value, $operator] = $this->prepareValueAndOperator(
-            $value, $operator, func_num_args() === 2
-        );
-
         return $this->where($column, $operator, $value, $boolean);
     }
 
     /**
      * Add a or whenWhere to the query.
      *
-     * @param mixed $condition The condition to check
-     * @param string $column The column to filter
-     * @param string|null $operator The comparison operator
-     * @param mixed|null $value The value to compare against
+     * @param mixed $condition
+     * @param string $column
+     * @param string|null $operator
+     * @param mixed|null $value
      * @param string
      * @return $this
      */
