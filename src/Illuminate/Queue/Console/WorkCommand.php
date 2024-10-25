@@ -104,6 +104,11 @@ class WorkCommand extends Command implements SplObserver
             return $this->worker->sleep($this->option('sleep'));
         }
 
+        // We'll listen to the processed and failed events so we can write information
+        // to the console as jobs are processed, which will let the developer watch
+        // which jobs are coming through a queue and be informed on its progress.
+        $this->listenForEvents();
+
         $connection = $this->argument('connection')
                         ?: $this->laravel['config']['queue.default'];
 
