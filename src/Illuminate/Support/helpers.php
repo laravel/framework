@@ -507,3 +507,19 @@ if (! function_exists('with')) {
         return is_null($callback) ? $value : $callback($value);
     }
 }
+
+if (!function_exists('dd_when')) {
+    /**
+     * Dump and die when a condition is met.
+     *
+     * @param bool $condition
+     * @param  mixed  ...$values
+     * @return void
+     */
+    function dd_when(bool $condition, ...$values): void
+    {
+        if ($condition) {
+            dd(...$values);
+        }
+    }
+}
