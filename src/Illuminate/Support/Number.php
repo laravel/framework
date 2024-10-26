@@ -170,7 +170,7 @@ class Number
      * @param  int  $precision
      * @param  int|null  $maxPrecision
      * @param  bool  $abbreviate
-     * @return bool|string
+     * @return false|string
      */
     public static function forHumans(int|float $number, int $precision = 0, ?int $maxPrecision = null, bool $abbreviate = false)
     {
@@ -300,11 +300,11 @@ class Number
      */
     public static function withCurrency(string $currency, callable $callback)
     {
-        $previousLCurrency = static::$currency;
+        $previousCurrency = static::$currency;
 
         static::useCurrency($currency);
 
-        return tap($callback(), fn () => static::useCurrency($previousLCurrency));
+        return tap($callback(), fn () => static::useCurrency($previousCurrency));
     }
 
     /**

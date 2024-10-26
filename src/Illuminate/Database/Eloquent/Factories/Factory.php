@@ -729,6 +729,16 @@ abstract class Factory
     }
 
     /**
+     * Get the name of the database connection that is used to generate models.
+     *
+     * @return string
+     */
+    public function getConnectionName()
+    {
+        return $this->connection;
+    }
+
+    /**
      * Specify the database connection that should be used to generate models.
      *
      * @param  string  $connection
