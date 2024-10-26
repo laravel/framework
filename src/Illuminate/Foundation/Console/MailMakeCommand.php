@@ -70,6 +70,10 @@ class MailMakeCommand extends GeneratorCommand
             str_replace('.', '/', $this->getView()).'.blade.php'
         );
 
+        if ($this->files->exists($path)) {
+            return $this->components->info(sprintf('%s [%s] has been picked up.', 'Markdown view', $path));
+        }
+
         $this->files->ensureDirectoryExists(dirname($path));
 
         $this->files->put($path, file_get_contents(__DIR__.'/stubs/markdown.stub'));
