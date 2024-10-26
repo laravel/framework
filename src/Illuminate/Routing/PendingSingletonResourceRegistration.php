@@ -185,6 +185,26 @@ class PendingSingletonResourceRegistration
     }
 
     /**
+     * Specify middleware that should be added to the specific resource routes.
+     *
+     * @param  array|string  $methods
+     * @param  array|string  $middleware
+     *
+     * @return $this
+     */
+    public function middlewareFor($methods, $middleware)
+    {
+        $methods = Arr::wrap($methods);
+        $middleware = Arr::wrap($middleware);
+
+        foreach ($methods as $method) {
+            $this->options['middleware_for'][$method] = $middleware;
+        }
+
+        return $this;
+    }
+
+    /**
      * Specify middleware that should be removed from the resource routes.
      *
      * @param  array|string  $middleware
