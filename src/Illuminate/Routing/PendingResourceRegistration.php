@@ -165,7 +165,6 @@ class PendingResourceRegistration
      *
      * @param  array|string  $methods
      * @param  array|string  $middleware
-     *
      * @return $this
      */
     public function middlewareFor($methods, $middleware)

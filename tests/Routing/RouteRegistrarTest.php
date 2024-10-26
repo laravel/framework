@@ -849,7 +849,7 @@ class RouteRegistrarTest extends TestCase
         $this->router->resource('users', RouteRegistrarControllerStub::class)
                      ->middlewareFor('index', RouteRegistrarMiddlewareStub::class)
                      ->middlewareFor(['create', 'store'], 'one')
-                     ->middlewareFor(['edit'],['one', 'two']);
+                     ->middlewareFor(['edit'], ['one', 'two']);
 
         $this->assertEquals($this->router->getRoutes()->getByName('users.index')->gatherMiddleware(), [RouteRegistrarMiddlewareStub::class]);
         $this->assertEquals($this->router->getRoutes()->getByName('users.create')->gatherMiddleware(), ['one']);
@@ -1361,7 +1361,7 @@ class RouteRegistrarTest extends TestCase
                     ->destroyable()
                     ->middlewareFor('show', RouteRegistrarMiddlewareStub::class)
                     ->middlewareFor(['create', 'store'], 'one')
-                    ->middlewareFor(['edit'],['one', 'two']);
+                    ->middlewareFor(['edit'], ['one', 'two']);
 
         $this->assertEquals($this->router->getRoutes()->getByName('users.create')->gatherMiddleware(), ['one']);
         $this->assertEquals($this->router->getRoutes()->getByName('users.store')->gatherMiddleware(), ['one']);
