@@ -28,16 +28,18 @@ class Number
 
     /**
      * @param string $locale
-     * @return void
+     * @return string
      * @throws \Exception
      */
-    public static function validateLocale(string $locale): void
+    public static function validateLocale(string $locale): string
     {
         $availableLocales = ResourceBundle::getLocales('');
 
         if ( ! in_array($locale, $availableLocales, true)){
             throw new \Exception("Locale is invalid");
         }
+
+        return $locale;
     }
 
     /**
@@ -54,7 +56,7 @@ class Number
     {
         static::ensureIntlExtensionIsInstalled();
 
-        static::validateLocale($locale);
+        $locale = $locale ? static::validateLocale($locale) : null;
 
         $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::DECIMAL);
 
