@@ -2,8 +2,8 @@
 
 namespace Illuminate\View\Concerns;
 
-use Illuminate\Support\Arr;
 use Illuminate\Support\LazyCollection;
+use StdClass;
 
 trait ManagesLoops
 {
@@ -12,34 +12,36 @@ trait ManagesLoops
      *
      * @var array
      */
-    protected $loopsStack = [];
+    protected array $loopsStack = [];
 
     /**
      * Add new loop to the stack.
      *
-     * @param  \Countable|array  $data
-     * @return void
+     * @template TData of \Countable|array
+     *
+     * @param  TData  $data
+     * @return TData
      */
-    public function addLoop($data)
+    public function addLoop(mixed $data): mixed
     {
         $length = is_countable($data) && ! $data instanceof LazyCollection
                             ? count($data)
                             : null;
 
-        $parent = Arr::last($this->loopsStack);
-
         $this->loopsStack[] = [
-            'iteration' => 0,
+            'iteration' => 1,
             'index' => 0,
-            'remaining' => $length ?? null,
+            'remaining' => isset($length) ? $length - 1 : null,
             'count' => $length,
             'first' => true,
-            'last' => isset($length) ? $length == 1 : null,
-            'odd' => false,
-            'even' => true,
+            'last' => isset($length) ? $length === 1 : null,
+            'odd' => true,
+            'even' => false,
             'depth' => count($this->loopsStack) + 1,
-            'parent' => $parent ? (object) $parent : null,
+            'parent' => $this->getLastLoop(),
         ];
+
+        return $data;
     }
 
     /**
@@ -47,29 +49,34 @@ trait ManagesLoops
      *
      * @return void
      */
-    public function incrementLoopIndices()
+    public function incrementLoopIndices(): void
     {
         $loop = $this->loopsStack[$index = count($this->loopsStack) - 1];
 
-        $this->loopsStack[$index] = array_merge($this->loopsStack[$index], [
+        $this->loopsStack[$index] = [
             'iteration' => $loop['iteration'] + 1,
             'index' => $loop['iteration'],
-            'first' => $loop['iteration'] == 0,
+            'remaining' => isset($loop['count']) ? $loop['remaining'] - 1 : null,
+            'count' => $loop['count'],
+            'first' => $loop['iteration'] === 0,
+            'last' => isset($loop['count']) ? $loop['iteration'] == $loop['count'] - 1 : null,
             'odd' => ! $loop['odd'],
             'even' => ! $loop['even'],
-            'remaining' => isset($loop['count']) ? $loop['remaining'] - 1 : null,
-            'last' => isset($loop['count']) ? $loop['iteration'] == $loop['count'] - 1 : null,
-        ]);
+            'depth' => $loop['depth'],
+            'parent' => $loop['parent'],
+        ];
     }
 
     /**
-     * Pop a loop from the top of the loop stack.
+     * Pop a loop from the top of the loop stack and return the last loop in the stack.
      *
-     * @return void
+     * @return \stdClass|null
      */
-    public function popLoop()
+    public function popLoop(): ?StdClass
     {
         array_pop($this->loopsStack);
+
+        return $this->getLastLoop();
     }
 
     /**
@@ -77,11 +84,9 @@ trait ManagesLoops
      *
      * @return \stdClass|null
      */
-    public function getLastLoop()
+    public function getLastLoop(): ?StdClass
     {
-        if ($last = Arr::last($this->loopsStack)) {
-            return (object) $last;
-        }
+        return ($loop = end($this->loopsStack)) ? (object) $loop : null;
     }
 
     /**
@@ -89,7 +94,7 @@ trait ManagesLoops
      *
      * @return array
      */
-    public function getLoopStack()
+    public function getLoopStack(): array
     {
         return $this->loopsStack;
     }

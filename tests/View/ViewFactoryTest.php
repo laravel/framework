@@ -917,14 +917,14 @@ class ViewFactoryTest extends TestCase
         $factory->addLoop([1, 2, 3]);
 
         $expectedLoop = [
-            'iteration' => 0,
+            'iteration' => 1,
             'index' => 0,
-            'remaining' => 3,
+            'remaining' => 2,
             'count' => 3,
             'first' => true,
             'last' => false,
-            'odd' => false,
-            'even' => true,
+            'odd' => true,
+            'even' => false,
             'depth' => 1,
             'parent' => null,
         ];
@@ -934,17 +934,18 @@ class ViewFactoryTest extends TestCase
         $factory->addLoop([1, 2, 3, 4]);
 
         $secondExpectedLoop = [
-            'iteration' => 0,
+            'iteration' => 1,
             'index' => 0,
-            'remaining' => 4,
+            'remaining' => 3,
             'count' => 4,
             'first' => true,
             'last' => false,
-            'odd' => false,
-            'even' => true,
+            'odd' => true,
+            'even' => false,
             'depth' => 2,
             'parent' => (object) $expectedLoop,
         ];
+
         $this->assertEquals([$expectedLoop, $secondExpectedLoop], $factory->getLoopStack());
 
         $factory->popLoop();
@@ -980,14 +981,14 @@ class ViewFactoryTest extends TestCase
         $factory->addLoop('');
 
         $expectedLoop = [
-            'iteration' => 0,
+            'iteration' => 1,
             'index' => 0,
             'remaining' => null,
             'count' => null,
             'first' => true,
             'last' => null,
-            'odd' => false,
-            'even' => true,
+            'odd' => true,
+            'even' => false,
             'depth' => 1,
             'parent' => null,
         ];
@@ -1004,14 +1005,14 @@ class ViewFactoryTest extends TestCase
         }));
 
         $expectedLoop = [
-            'iteration' => 0,
+            'iteration' => 1,
             'index' => 0,
             'remaining' => null,
             'count' => null,
             'first' => true,
             'last' => null,
-            'odd' => false,
-            'even' => true,
+            'odd' => true,
+            'even' => false,
             'depth' => 1,
             'parent' => null,
         ];
@@ -1024,8 +1025,6 @@ class ViewFactoryTest extends TestCase
         $factory = $this->getFactory();
 
         $factory->addLoop([1, 2, 3, 4]);
-
-        $factory->incrementLoopIndices();
 
         $this->assertEquals(1, $factory->getLoopStack()[0]['iteration']);
         $this->assertEquals(0, $factory->getLoopStack()[0]['index']);
@@ -1050,8 +1049,6 @@ class ViewFactoryTest extends TestCase
 
         $factory->incrementLoopIndices();
 
-        $factory->incrementLoopIndices();
-
         $this->assertTrue($factory->getLoopStack()[0]['last']);
     }
 
@@ -1060,8 +1057,6 @@ class ViewFactoryTest extends TestCase
         $factory = $this->getFactory();
 
         $factory->addLoop('');
-
-        $factory->incrementLoopIndices();
 
         $factory->incrementLoopIndices();
 

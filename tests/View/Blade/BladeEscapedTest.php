@@ -26,11 +26,11 @@ class BladeEscapedTest extends AbstractBladeTestCase
     @@endforeach
 @endforeach';
         $compiled = '
-<?php $__currentLoopData = $cols; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $col): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+<?php foreach($__env->addLoop($cols) as $col): $loop = $__env->getLastLoop(); ?>
     @foreach($issues as $issue_45915)
         👋 سلام 👋
     @endforeach
-<?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>';
+<?php $__env->incrementLoopIndices(); endforeach; $loop = $__env->popLoop(); ?>';
         $this->assertSame($compiled, $this->compiler->compileString($template));
     }
 }

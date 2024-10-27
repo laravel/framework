@@ -35,11 +35,11 @@ trait CompilesLoops
 
         $iteration = trim($matches[2]);
 
-        $initLoop = "\$__currentLoopData = {$iteratee}; \$__env->addLoop(\$__currentLoopData);";
+        $commenceLoop = "\$__env->addLoop({$iteratee})";
 
-        $iterateLoop = '$__env->incrementLoopIndices(); $loop = $__env->getLastLoop();';
+        $assignLoop = '$loop = $__env->getLastLoop();';
 
-        return "<?php {$empty} = true; {$initLoop} foreach(\$__currentLoopData as {$iteration}): {$iterateLoop} {$empty} = false; ?>";
+        return "<?php {$empty} = true; foreach({$commenceLoop} as {$iteration}): {$assignLoop} {$empty} = false; ?>";
     }
 
     /**
@@ -56,7 +56,7 @@ trait CompilesLoops
 
         $empty = '$__empty_'.$this->forElseCounter--;
 
-        return "<?php endforeach; \$__env->popLoop(); \$loop = \$__env->getLastLoop(); if ({$empty}): ?>";
+        return "<?php \$__env->incrementLoopIndices(); endforeach; \$loop = \$__env->popLoop(); if ({$empty}): ?>";
     }
 
     /**
@@ -110,11 +110,11 @@ trait CompilesLoops
 
         $iteration = trim($matches[2]);
 
-        $initLoop = "\$__currentLoopData = {$iteratee}; \$__env->addLoop(\$__currentLoopData);";
+        $commenceLoop = "\$__env->addLoop({$iteratee})";
 
-        $iterateLoop = '$__env->incrementLoopIndices(); $loop = $__env->getLastLoop();';
+        $assignLoop = '$loop = $__env->getLastLoop();';
 
-        return "<?php {$initLoop} foreach(\$__currentLoopData as {$iteration}): {$iterateLoop} ?>";
+        return "<?php foreach({$commenceLoop} as {$iteration}): {$assignLoop} ?>";
     }
 
     /**
@@ -168,7 +168,7 @@ trait CompilesLoops
      */
     protected function compileEndforeach()
     {
-        return '<?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>';
+        return '<?php $__env->incrementLoopIndices(); endforeach; $loop = $__env->popLoop(); ?>';
     }
 
     /**
