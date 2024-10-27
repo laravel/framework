@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Support;
 use Illuminate\Support\Number;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
+use TypeError;
 
 class SupportNumberTest extends TestCase
 {
@@ -314,4 +315,14 @@ class SupportNumberTest extends TestCase
         $this->assertSame(12.3456789, Number::trim(12.3456789));
         $this->assertSame(12.3456789, Number::trim(12.34567890000));
     }
+
+    /**
+     * Test invalid locale input in format method.
+     */
+    public function testInvalidLocale()
+    {
+        $this->expectException(\Exception::class);
+        Number::format(1234.56, locale: 'invalid-locale');
+    }
+
 }

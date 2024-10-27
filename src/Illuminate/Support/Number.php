@@ -4,6 +4,7 @@ namespace Illuminate\Support;
 
 use Illuminate\Support\Traits\Macroable;
 use NumberFormatter;
+use ResourceBundle;
 use RuntimeException;
 
 class Number
@@ -24,6 +25,21 @@ class Number
      */
     protected static $currency = 'USD';
 
+
+    /**
+     * @param string $locale
+     * @return void
+     * @throws \Exception
+     */
+    public static function validateLocale(string $locale): void
+    {
+        $availableLocales = ResourceBundle::getLocales('');
+
+        if ( ! in_array($locale, $availableLocales, true)){
+            throw new \Exception("Locale is invalid");
+        }
+    }
+
     /**
      * Format the given number according to the current locale.
      *
@@ -32,10 +48,13 @@ class Number
      * @param  int|null  $maxPrecision
      * @param  string|null  $locale
      * @return string|false
+     * @throws \Exception
      */
     public static function format(int|float $number, ?int $precision = null, ?int $maxPrecision = null, ?string $locale = null)
     {
         static::ensureIntlExtensionIsInstalled();
+
+        static::validateLocale($locale);
 
         $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::DECIMAL);
 
