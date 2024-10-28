@@ -980,7 +980,7 @@ trait ValidatesAttributes
             $extra = array_merge($extra, $this->currentRule->queryCallbacks());
         }
 
-        return $verifier->getExistence(
+        return ! $verifier->getExistence(
             $table, $column, $value, $id, $idColumn, $extra
         );
     }
