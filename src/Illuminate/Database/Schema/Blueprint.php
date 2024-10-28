@@ -525,7 +525,7 @@ class Blueprint
     }
 
     /**
-     * Indicate that the given foreign key should be dropped.
+     * Indicate that the given foreign key should be dropped if exists.
      *
      * @param  string|array  $index
      * @return \Illuminate\Support\Fluent
