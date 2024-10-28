@@ -61,7 +61,7 @@ class NotSoftDeletedInDatabase extends Constraint
         return $this->database->table($table)
                 ->where($this->data)
                 ->whereNull($this->deletedAtColumn)
-                ->count() > 0;
+                ->exists();
     }
 
     /**
