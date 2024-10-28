@@ -525,6 +525,25 @@ class Blueprint
     }
 
     /**
+     * Indicate that the given foreign key should be dropped.
+     *
+     * @param  string|array  $index
+     * @return \Illuminate\Support\Fluent
+     */
+    public function dropForeignIfExists($index)
+    {
+        if (is_array($index)) {
+            $index = $this->createIndexName('foreign', $index);
+        }
+
+        if (! in_array($index, Schema::getForeignKeys($this->getTable()))) {
+            return new Fluent();
+        }
+
+        return $this->dropIndexCommand('dropForeign', 'foreign', $index);
+    }
+
+    /**
      * Indicate that the given column and foreign key should be dropped.
      *
      * @param  string  $column
