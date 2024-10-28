@@ -36,7 +36,7 @@ class Number
         $availableLocales = ResourceBundle::getLocales('');
 
         if ( ! in_array($locale, $availableLocales, true)){
-            throw new \Exception("Locale is invalid");
+            throw new \InvalidArgumentException("Locale [$locale] is invalid");
         }
 
         return $locale;
