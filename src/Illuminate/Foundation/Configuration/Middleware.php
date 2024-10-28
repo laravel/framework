@@ -810,7 +810,7 @@ class Middleware
     }
 
     /**
-     * Get the middleware priority to append
+     * Get the middleware priority to append.
      *
      * @return array
      */
@@ -820,7 +820,7 @@ class Middleware
     }
 
     /**
-     * Get the middleware priority to prepend
+     * Get the middleware priority to prepend.
      *
      * @return array
      */
