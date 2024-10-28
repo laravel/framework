@@ -5,7 +5,6 @@ namespace Illuminate\Tests\Support;
 use Illuminate\Support\Number;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
-use TypeError;
 
 class SupportNumberTest extends TestCase
 {

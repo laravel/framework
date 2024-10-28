@@ -29,7 +29,7 @@ class Number
     /**
      * @param string $locale
      * @return string
-     * @throws \Exception
+     * @throws \InvalidArgumentException
      */
     public static function validateLocale(string $locale): string
     {
@@ -50,7 +50,7 @@ class Number
      * @param  int|null  $maxPrecision
      * @param  string|null  $locale
      * @return string|false
-     * @throws \Exception
+     * @throws \InvalidArgumentException
      */
     public static function format(int|float $number, ?int $precision = null, ?int $maxPrecision = null, ?string $locale = null)
     {
