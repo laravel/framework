@@ -16,6 +16,25 @@ class ValidationDatabasePresenceVerifierTest extends TestCase
         m::close();
     }
 
+    public function testBasicExistence()
+    {
+        $verifier = new DatabasePresenceVerifier($db = m::mock(ConnectionResolverInterface::class));
+        $verifier->setConnection('connection');
+        $db->shouldReceive('connection')->once()->with('connection')->andReturn($conn = m::mock(stdClass::class));
+        $conn->shouldReceive('table')->once()->with('table')->andReturn($builder = m::mock(stdClass::class));
+        $builder->shouldReceive('useWritePdo')->once()->andReturn($builder);
+        $builder->shouldReceive('where')->with('column', '=', 'value')->andReturn($builder);
+        $extra = ['foo' => 'NULL', 'bar' => 'NOT_NULL', 'baz' => 'taylor', 'faz' => true, 'not' => '!admin'];
+        $builder->shouldReceive('whereNull')->with('foo');
+        $builder->shouldReceive('whereNotNull')->with('bar');
+        $builder->shouldReceive('where')->with('baz', 'taylor');
+        $builder->shouldReceive('where')->with('faz', true);
+        $builder->shouldReceive('where')->with('not', '!=', 'admin');
+        $builder->shouldReceive('exists')->once()->andReturn(true);
+
+        $this->assertTrue($verifier->getExistence('table', 'column', 'value', null, null, $extra));
+    }
+
     public function testBasicCount()
     {
         $verifier = new DatabasePresenceVerifier($db = m::mock(ConnectionResolverInterface::class));

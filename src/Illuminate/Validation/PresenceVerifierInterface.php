@@ -5,6 +5,19 @@ namespace Illuminate\Validation;
 interface PresenceVerifierInterface
 {
     /**
+     * Check for existence of an object in a collection having the given value.
+     *
+     * @param  string  $collection
+     * @param  string  $column
+     * @param  string  $value
+     * @param  int|null  $excludeId
+     * @param  string|null  $idColumn
+     * @param  array  $extra
+     * @return bool
+     */
+    public function getExistence($collection, $column, $value, $excludeId = null, $idColumn = null, array $extra = []);
+
+    /**
      * Count the number of objects in a collection having the given value.
      *
      * @param  string  $collection

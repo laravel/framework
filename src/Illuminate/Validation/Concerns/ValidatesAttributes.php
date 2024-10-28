@@ -980,9 +980,9 @@ trait ValidatesAttributes
             $extra = array_merge($extra, $this->currentRule->queryCallbacks());
         }
 
-        return $verifier->getCount(
+        return $verifier->getExistence(
             $table, $column, $value, $id, $idColumn, $extra
-        ) == 0;
+        );
     }
 
     /**

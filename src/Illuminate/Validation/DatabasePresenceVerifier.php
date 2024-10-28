@@ -33,6 +33,28 @@ class DatabasePresenceVerifier implements DatabasePresenceVerifierInterface
     }
 
     /**
+     * Check for existence of an object in a collection having the given value.
+     *
+     * @param  string  $collection
+     * @param  string  $column
+     * @param  string  $value
+     * @param  int|null  $excludeId
+     * @param  string|null  $idColumn
+     * @param  array  $extra
+     * @return bool
+     */
+    public function getExistence($collection, $column, $value, $excludeId = null, $idColumn = null, array $extra = [])
+    {
+        $query = $this->table($collection)->where($column, '=', $value);
+
+        if (! is_null($excludeId) && $excludeId !== 'NULL') {
+            $query->where($idColumn ?: 'id', '<>', $excludeId);
+        }
+
+        return $this->addConditions($query, $extra)->exists();
+    }
+
+    /**
      * Count the number of objects in a collection having the given value.
      *
      * @param  string  $collection
