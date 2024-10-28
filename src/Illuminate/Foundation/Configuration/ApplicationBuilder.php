@@ -269,6 +269,10 @@ class ApplicationBuilder
             if ($priorities = $middleware->getMiddlewarePriority()) {
                 $kernel->setMiddlewarePriority($priorities);
             }
+
+            if ($middleware->shouldDisableControllerMiddleware()) {
+                $kernel->getRouter()->disableControllerMiddleware();
+            }
         });
 
         return $this;

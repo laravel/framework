@@ -101,6 +101,13 @@ class Router implements BindingRegistrar, RegistrarContract
     public $middlewarePriority = [];
 
     /**
+     * Whether to disable controller middleware
+     *
+     * @var bool
+     */
+    protected $disableControllerMiddleware = false;
+
+    /**
      * The registered route value binders.
      *
      * @var array
@@ -1502,5 +1509,39 @@ class Router implements BindingRegistrar, RegistrarContract
         }
 
         return (new RouteRegistrar($this))->attribute($method, array_key_exists(0, $parameters) ? $parameters[0] : true);
+    }
+
+    /**
+     * Skip the gathering of controller middleware.
+     *
+     * @return $this
+     */
+    public function skipControllerMiddleware()
+    {
+        $this->disableControllerMiddleware = true;
+
+        return $this;
+    }
+
+    /**
+     * Allow the gathering of controller middleware.
+     *
+     * @return $this
+     */
+    public function allowControllerMiddleware()
+    {
+        $this->disableControllerMiddleware = false;
+
+        return $this;
+    }
+
+    /**
+     * Whether the router should gather controller middleware.
+     *
+     * @return bool
+     */
+    public function shouldSkipControllerMiddleware()
+    {
+        return $this->disableControllerMiddleware;
     }
 }

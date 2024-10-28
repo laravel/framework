@@ -1103,7 +1103,7 @@ class Route
      */
     public function controllerMiddleware()
     {
-        if (! $this->isControllerAction()) {
+        if ($this->router->shouldSkipControllerMiddleware() || ! $this->isControllerAction()) {
             return [];
         }
 

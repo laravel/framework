@@ -699,4 +699,14 @@ class Kernel implements KernelContract
 
         return $this;
     }
+
+    /**
+     * Get the router.
+     *
+     * @return \Illuminate\Routing\Router
+     */
+    public function getRouter()
+    {
+        return $this->router;
+    }
 }

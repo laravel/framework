@@ -146,6 +146,13 @@ class Middleware
     protected $priority = [];
 
     /**
+     * Whether to disable controller middleware
+     *
+     * @var bool
+     */
+    protected $disableControllerMiddleware = false;
+
+    /**
      * Prepend middleware to the application's global middleware stack.
      *
      * @param  array|string  $middleware
@@ -765,5 +772,39 @@ class Middleware
     public function getMiddlewarePriority()
     {
         return $this->priority;
+    }
+
+    /**
+     * Disable controller middleware.
+     *
+     * @return $this
+     */
+    public function withoutControllerMiddleware()
+    {
+        $this->disableControllerMiddleware = true;
+
+        return $this;
+    }
+
+    /**
+     * Disable controller middleware.
+     *
+     * @return $this
+     */
+    public function withControllerMiddleware()
+    {
+        $this->disableControllerMiddleware = false;
+
+        return $this;
+    }
+
+    /**
+     * Whether controller middleware should be disabled.
+     *
+     * @return bool
+     */
+    public function shouldDisableControllerMiddleware()
+    {
+        return $this->disableControllerMiddleware;
     }
 }
