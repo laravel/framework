@@ -64,7 +64,7 @@ class PendingHasThroughRelationship
 
         $distantRelation = $callback($this->localRelationship->getRelated());
 
-        if ($distantRelation instanceof HasMany) {
+        if ($distantRelation instanceof HasMany || $this->localRelationship instanceof HasMany) {
             $returnedRelation = $this->rootModel->hasManyThrough(
                 $distantRelation->getRelated()::class,
                 $this->localRelationship->getRelated()::class,
