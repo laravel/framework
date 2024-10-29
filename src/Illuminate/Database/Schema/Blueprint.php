@@ -9,6 +9,7 @@ use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Grammars\Grammar;
 use Illuminate\Database\Schema\Grammars\MySqlGrammar;
 use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\Traits\Macroable;
 
@@ -428,6 +429,25 @@ class Blueprint
     }
 
     /**
+     * Indicate that the given columns should be dropped if they exist.
+     *
+     * @param  array|mixed  $columns
+     * @return \Illuminate\Support\Fluent
+     */
+    public function dropColumnIfExists($columns)
+    {
+        $columns = is_array($columns) ? $columns : func_get_args();
+
+        $columns = array_intersect($columns, Schema::getColumnListing($this->getTable()));
+
+        if (empty($columns)) {
+            return new Fluent;
+        }
+
+        return $this->dropColumn($columns);
+    }
+
+    /**
      * Indicate that the given columns should be renamed.
      *
      * @param  string  $from
@@ -502,6 +522,25 @@ class Blueprint
      */
     public function dropForeign($index)
     {
+        return $this->dropIndexCommand('dropForeign', 'foreign', $index);
+    }
+
+    /**
+     * Indicate that the given foreign key should be dropped if it exists.
+     *
+     * @param  string|array  $index
+     * @return \Illuminate\Support\Fluent
+     */
+    public function dropForeignIfExists($index)
+    {
+        if (is_array($index)) {
+            $index = $this->createIndexName('foreign', $index);
+        }
+
+        if (! in_array($index, Schema::getForeignKeys($this->getTable()))) {
+            return new Fluent;
+        }
+
         return $this->dropIndexCommand('dropForeign', 'foreign', $index);
     }
 
