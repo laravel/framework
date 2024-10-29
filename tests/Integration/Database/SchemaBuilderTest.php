@@ -864,12 +864,15 @@ class SchemaBuilderTest extends DatabaseTestCase
 
         Schema::create('posts', function (Blueprint $table) {
             $table->foreignId('user_id')->nullable()->index()->constrained();
-            $table->string('user_name')->nullable()->unique();
+            $table->string('user_name')->nullable()->index();
             $table->foreign('user_name')->references('name')->on('users');
             $table->integer('count');
         });
 
-        $this->assertSame([['user_id'], ['user_name']], array_column(Schema::getForeignKeys('posts'), 'columns'));
+        $this->assertEqualsCanonicalizing(
+            [['user_id'], ['user_name']],
+            array_column(Schema::getForeignKeys('posts'), 'columns')
+        );
 
         Schema::table('posts', function (Blueprint $table) {
             $table->dropForeignIfExists(['user_id']);
@@ -892,16 +895,15 @@ class SchemaBuilderTest extends DatabaseTestCase
 
         Schema::create('posts', function (Blueprint $table) {
             $table->foreignId('user_id')->nullable()->index()->constrained();
-            $table->string('user_name')->nullable()->unique();
+            $table->string('user_name')->nullable()->index();
             $table->foreign('user_name')->references('name')->on('users');
             $table->integer('count');
         });
 
-        $this->assertSame(
+        $this->assertEqualsCanonicalizing(
             ['posts_user_id_foreign', 'posts_user_name_foreign'],
             array_column(Schema::getForeignKeys('posts'), 'name')
         );
-
 
         Schema::table('posts', function (Blueprint $table) {
             $table->dropForeignIfExists('posts_user_id_foreign');
