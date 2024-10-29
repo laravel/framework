@@ -470,6 +470,10 @@ class SQLiteGrammar extends Grammar
 
         if ($command->ifExists) {
             $command->columns = array_intersect($command->columns, $connection->getSchemaBuilder()->getColumnListing($blueprint->getTable()));
+
+            if (empty($command->columns)) {
+                return null;
+            }
         }
 
         $columns = $this->prefixArray('drop column', $this->wrapArray($command->columns));

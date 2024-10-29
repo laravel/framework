@@ -400,6 +400,10 @@ class SqlServerGrammar extends Grammar
     {
         if ($command->ifExists) {
             $command->columns = array_intersect($command->columns, $connection->getSchemaBuilder()->getColumnListing($blueprint->getTable()));
+
+            if (empty($command->columns)) {
+                return null;
+            }
         }
 
         $columns = $this->wrapArray($command->columns);
@@ -500,7 +504,7 @@ class SqlServerGrammar extends Grammar
     {
         if ($command->ifExists &&
             ! in_array($command->index, array_column($connection->getSchemaBuilder()->getForeignKeys($blueprint->getTable()), 'name'))) {
-            return;
+            return null;
         }
 
         $index = $this->wrap($command->index);

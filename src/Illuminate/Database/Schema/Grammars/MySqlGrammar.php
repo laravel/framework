@@ -530,12 +530,16 @@ class MySqlGrammar extends Grammar
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $command
      * @param  \Illuminate\Database\Connection  $connection
-     * @return string
+     * @return string|null
      */
     public function compileDropColumn(Blueprint $blueprint, Fluent $command, Connection $connection)
     {
         if ($command->ifExists) {
             $command->columns = array_intersect($command->columns, $connection->getSchemaBuilder()->getColumnListing($blueprint->getTable()));
+
+            if (empty($command->columns)) {
+                return null;
+            }
         }
 
         $columns = $this->prefixArray('drop', $this->wrapArray($command->columns));
@@ -619,7 +623,7 @@ class MySqlGrammar extends Grammar
     {
         if ($command->ifExists &&
             ! in_array($command->index, array_column($connection->getSchemaBuilder()->getForeignKeys($blueprint->getTable()), 'name'))) {
-            return;
+            return null;
         }
 
         $index = $this->wrap($command->index);
