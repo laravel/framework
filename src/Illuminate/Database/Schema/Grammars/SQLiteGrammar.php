@@ -468,6 +468,10 @@ class SQLiteGrammar extends Grammar
 
         $table = $this->wrapTable($blueprint);
 
+        if ($command->ifExists) {
+            $command->columns = array_intersect($command->columns, $connection->getSchemaBuilder()->getColumnListing($blueprint->getTable()));
+        }
+
         $columns = $this->prefixArray('drop column', $this->wrapArray($command->columns));
 
         return collect($columns)->map(fn ($column) => 'alter table '.$table.' '.$column)->all();

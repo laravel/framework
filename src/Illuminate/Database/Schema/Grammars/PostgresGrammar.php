@@ -488,7 +488,9 @@ class PostgresGrammar extends Grammar
      */
     public function compileDropColumn(Blueprint $blueprint, Fluent $command)
     {
-        $columns = $this->prefixArray('drop column', $this->wrapArray($command->columns));
+        $sql = $command->ifExists ? 'drop column if exists' : 'drop column';
+
+        $columns = $this->prefixArray($sql, $this->wrapArray($command->columns));
 
         return 'alter table '.$this->wrapTable($blueprint).' '.implode(', ', $columns);
     }

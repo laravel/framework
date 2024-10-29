@@ -529,10 +529,15 @@ class MySqlGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $command
+     * @param  \Illuminate\Database\Connection  $connection
      * @return string
      */
-    public function compileDropColumn(Blueprint $blueprint, Fluent $command)
+    public function compileDropColumn(Blueprint $blueprint, Fluent $command, Connection $connection)
     {
+        if ($command->ifExists) {
+            $command->columns = array_intersect($command->columns, $connection->getSchemaBuilder()->getColumnListing($blueprint->getTable()));
+        }
+
         $columns = $this->prefixArray('drop', $this->wrapArray($command->columns));
 
         return 'alter table '.$this->wrapTable($blueprint).' '.implode(', ', $columns);

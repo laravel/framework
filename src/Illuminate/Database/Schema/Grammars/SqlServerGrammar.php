@@ -393,10 +393,15 @@ class SqlServerGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $command
+     * @param  \Illuminate\Database\Connection  $connection
      * @return string
      */
-    public function compileDropColumn(Blueprint $blueprint, Fluent $command)
+    public function compileDropColumn(Blueprint $blueprint, Fluent $command, Connection $connection)
     {
+        if ($command->ifExists) {
+            $command->columns = array_intersect($command->columns, $connection->getSchemaBuilder()->getColumnListing($blueprint->getTable()));
+        }
+
         $columns = $this->wrapArray($command->columns);
 
         $dropExistingConstraintsSql = $this->compileDropDefaultConstraint($blueprint, $command).';';
