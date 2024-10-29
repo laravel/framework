@@ -25,13 +25,6 @@ class WorkCommand extends Command
     use InteractsWithTime;
 
     /**
-     * Prevents event listeners from being bound multiple times.
-     *
-     * @var bool
-     */
-    private static $boundEvents = false;
-
-    /**
      * The console command name.
      *
      * @var string
@@ -82,6 +75,13 @@ class WorkCommand extends Command
      * @var float|null
      */
     protected $latestStartedAt;
+
+    /**
+     * Indicates if the worker's event listeners have been registered.
+     *
+     * @var bool
+     */
+    private static $hasRegisteredListeners = false;
 
     /**
      * Create a new queue work command.
@@ -179,7 +179,7 @@ class WorkCommand extends Command
      */
     protected function listenForEvents()
     {
-        if (static::$boundEvents) {
+        if (static::$hasRegisteredListeners) {
             return;
         }
 
@@ -201,7 +201,7 @@ class WorkCommand extends Command
             $this->logFailedJob($event);
         });
 
-        static::$boundEvents = true;
+        static::$hasRegisteredListeners = true;
     }
 
     /**
@@ -381,6 +381,6 @@ class WorkCommand extends Command
      */
     public static function flushState()
     {
-        static::$boundEvents = false;
+        static::$hasRegisteredListeners = false;
     }
 }
