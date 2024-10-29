@@ -17,7 +17,6 @@ use Ramsey\Uuid\UuidFactory;
 use Symfony\Component\Uid\NilUuid;
 use Symfony\Component\Uid\Ulid;
 use Symfony\Component\Uid\UuidV1;
-use Symfony\Component\Uid\UuidV2;
 use Symfony\Component\Uid\UuidV3;
 use Symfony\Component\Uid\UuidV4;
 use Symfony\Component\Uid\UuidV5;
@@ -620,7 +619,7 @@ class Str
         return match ($version) {
             -1, 0 => NilUuid::isValid($value),
             1 => UuidV1::isValid($value),
-            2 => UuidV2::isValid($value),
+            // 2 => UuidV2::isValid($value), // Symfony/uid doesn't implement version 2
             3 => UuidV3::isValid($value),
             4 => UuidV4::isValid($value),
             5 => UuidV5::isValid($value),
