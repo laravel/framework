@@ -859,12 +859,12 @@ class SchemaBuilderTest extends DatabaseTestCase
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->index();
+            $table->string('name')->unique();
         });
 
         Schema::create('posts', function (Blueprint $table) {
             $table->foreignId('user_id')->nullable()->index()->constrained();
-            $table->string('user_name')->nullable()->index();
+            $table->string('user_name')->nullable()->unique();
             $table->foreign('user_name')->references('name')->on('users');
             $table->integer('count');
         });
@@ -890,12 +890,12 @@ class SchemaBuilderTest extends DatabaseTestCase
 
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->index();
+            $table->string('name')->unique();
         });
 
         Schema::create('posts', function (Blueprint $table) {
             $table->foreignId('user_id')->nullable()->index()->constrained();
-            $table->string('user_name')->nullable()->index();
+            $table->string('user_name')->nullable()->unique();
             $table->foreign('user_name')->references('name')->on('users');
             $table->integer('count');
         });
