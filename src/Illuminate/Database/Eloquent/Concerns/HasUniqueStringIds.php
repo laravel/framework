@@ -8,19 +8,19 @@ use Illuminate\Support\Str;
 trait HasUniqueStringIds
 {
     /**
-     * Generate a new key for the Model.
+     * Generate a new unique key for the model.
      *
      * @return mixed
      */
     abstract public function newUniqueId();
 
     /**
-     * Determine if key is valid for Model.
+     * Determine if given key is valid.
      *
      * @param  mixed  $value
      * @return bool
      */
-    abstract protected function isValidKey($value): bool;
+    abstract protected function isValidUniqueId($value): bool;
 
     /**
      * Initialize the trait.
@@ -55,11 +55,11 @@ trait HasUniqueStringIds
      */
     public function resolveRouteBindingQuery($query, $value, $field = null)
     {
-        if ($field && in_array($field, $this->uniqueIds()) && ! $this->isValidKey($value)) {
+        if ($field && in_array($field, $this->uniqueIds()) && ! $this->isValidUniqueId($value)) {
             throw (new ModelNotFoundException)->setModel(get_class($this), $value);
         }
 
-        if (! $field && in_array($this->getRouteKeyName(), $this->uniqueIds()) && ! $this->isValidKey($value)) {
+        if (! $field && in_array($this->getRouteKeyName(), $this->uniqueIds()) && ! $this->isValidUniqueId($value)) {
             throw (new ModelNotFoundException)->setModel(get_class($this), $value);
         }
 

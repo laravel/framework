@@ -10,7 +10,7 @@ trait HasUuids
     use HasUniqueStringIds;
 
     /**
-     * Generate a new UUID for the model.
+     * Generate a new unique key for the model.
      *
      * @return string
      */
@@ -20,12 +20,12 @@ trait HasUuids
     }
 
     /**
-     * Determine if value is a valid UUID.
+     * Determine if given key is valid.
      *
      * @param  mixed  $value
      * @return bool
      */
-    protected function isValidKey($value): bool
+    protected function isValidUniqueId($value): bool
     {
         return Str::isUuid($value);
     }
