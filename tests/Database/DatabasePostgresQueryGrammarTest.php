@@ -31,7 +31,7 @@ class DatabasePostgresQueryGrammarTest extends TestCase
 
     public function testCustomOperators()
     {
-        PostgresGrammar::customOperators('@@@', '@>', '');
+        PostgresGrammar::customOperators(['@@@', '@>', '']);
         PostgresGrammar::customOperators(['@@>', 1]);
 
         $connection = m::mock(Connection::class);

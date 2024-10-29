@@ -23,7 +23,7 @@ class PostgresGrammar extends Grammar
     ];
 
     /**
-     * The grammar specific custom operators.
+     * The Postgres grammar specific custom operators.
      *
      * @var array
      */
@@ -781,34 +781,25 @@ class PostgresGrammar extends Grammar
     }
 
     /**
-     * Get the grammar specific operators.
+     * Get the Postgres grammar specific operators.
      *
      * @return array
      */
     public function getOperators()
     {
-        return array_values(
-            array_unique(
-                array_merge(parent::getOperators(), static::$customOperators)
-            )
-        );
+        return array_values(array_unique(array_merge(parent::getOperators(), static::$customOperators)));
     }
 
     /**
-     * Set any grammar specific custom operators.
+     * Set any Postgres grammar specific custom operators.
      *
-     * @param  array|mixed  $operators
+     * @param  array  $operators
      * @return void
      */
-    public static function customOperators($operators)
+    public static function customOperators(array $operators)
     {
-        $operators = array_filter(array_filter(
-            is_array($operators) ? $operators : func_get_args(),
-            'is_string'
-        ));
-
         static::$customOperators = array_values(
-            array_merge(static::$customOperators, $operators)
+            array_merge(static::$customOperators, array_filter(array_filter($operators, 'is_string')))
         );
     }
 }
