@@ -27,15 +27,16 @@ class Number
 
 
     /**
-     * @param string $locale
+     * @param  string  $locale
      * @return string
+     *
      * @throws \InvalidArgumentException
      */
     public static function validateLocale(string $locale): string
     {
         $availableLocales = ResourceBundle::getLocales('');
 
-        if ( ! in_array($locale, $availableLocales, true)){
+        if (! in_array($locale, $availableLocales, true)) {
             throw new \InvalidArgumentException("Locale [$locale] is invalid");
         }
 
@@ -50,6 +51,7 @@ class Number
      * @param  int|null  $maxPrecision
      * @param  string|null  $locale
      * @return string|false
+     *
      * @throws \InvalidArgumentException
      */
     public static function format(int|float $number, ?int $precision = null, ?int $maxPrecision = null, ?string $locale = null)
