@@ -28,19 +28,11 @@ trait RefreshDatabase
     }
 
     /**
-     * Determine if an in-memory database is being used.
+     * Determine if any of the connections transacting is using in-memory databases.
      *
      * @return bool
      */
-    protected function usingInMemoryDatabase(string $name)
-    {
-        return config("database.connections.{$name}.database") === ':memory:';
-    }
-
-    /**
-     * Determines if any of the connections transacting is using in-memory databases.
-     */
-    protected function usingInMemoryDatabases(): bool
+    protected function usingInMemoryDatabases()
     {
         foreach ($this->connectionsToTransact() as $name) {
             if ($this->usingInMemoryDatabase($name)) {
@@ -49,6 +41,16 @@ trait RefreshDatabase
         }
 
         return false;
+    }
+
+    /**
+     * Determine if a given database connection is an in-memory database.
+     *
+     * @return bool
+     */
+    protected function usingInMemoryDatabase(string $name)
+    {
+        return config("database.connections.{$name}.database") === ':memory:';
     }
 
     /**
@@ -83,6 +85,16 @@ trait RefreshDatabase
         }
 
         $this->beginDatabaseTransaction();
+    }
+
+    /**
+     * Migrate the database.
+     *
+     * @return void
+     */
+    protected function migrateDatabases()
+    {
+        $this->artisan('migrate:fresh', $this->migrateFreshUsing());
     }
 
     /**
@@ -134,14 +146,6 @@ trait RefreshDatabase
     {
         return property_exists($this, 'connectionsToTransact')
                             ? $this->connectionsToTransact : [config('database.default')];
-    }
-
-    /**
-     * Perform the database migration command.
-     */
-    protected function migrateDatabases(): void
-    {
-        $this->artisan('migrate:fresh', $this->migrateFreshUsing());
     }
 
     /**
