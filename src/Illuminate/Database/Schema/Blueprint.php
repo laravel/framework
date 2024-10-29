@@ -429,7 +429,7 @@ class Blueprint
     }
 
     /**
-     * Indicate that the given columns should be dropped if exists.
+     * Indicate that the given columns should be dropped if they exist.
      *
      * @param  array|mixed  $columns
      * @return \Illuminate\Support\Fluent
@@ -526,7 +526,7 @@ class Blueprint
     }
 
     /**
-     * Indicate that the given foreign key should be dropped if exists.
+     * Indicate that the given foreign key should be dropped if it exists.
      *
      * @param  string|array  $index
      * @return \Illuminate\Support\Fluent
