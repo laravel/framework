@@ -1456,10 +1456,10 @@ class Blueprint
      * Create a new vector column on the table.
      *
      * @param  string  $column
-     * @param  int|null  $dimensions  The number of dimensions for the vector, or null if unspecified.
+     * @param  int|null  $dimensions
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function vector($column, $dimensions)
+    public function vector($column, $dimensions = null)
     {
         $options = $dimensions ? compact('dimensions') : [];
 
