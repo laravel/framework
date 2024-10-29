@@ -1483,9 +1483,7 @@ class Blueprint
      */
     public function vector($column, $dimensions = null)
     {
-        $options = $dimensions ? compact('dimensions') : [];
-
-        return $this->addColumn('vector', $column, $options);
+        return $this->addColumn('vector', $column, compact('dimensions'));
     }
 
     /**

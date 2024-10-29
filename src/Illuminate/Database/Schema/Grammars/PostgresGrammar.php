@@ -1083,9 +1083,7 @@ class PostgresGrammar extends Grammar
      */
     protected function typeVector(Fluent $column)
     {
-        return isset($column->dimensions) && $column->dimensions !== ''
-            ? "vector({$column->dimensions})"
-            : 'vector';
+        return $column->dimensions ? "vector({$column->dimensions})" : 'vector';
     }
 
     /**
