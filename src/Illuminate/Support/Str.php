@@ -14,6 +14,7 @@ use Ramsey\Uuid\Codec\TimestampFirstCombCodec;
 use Ramsey\Uuid\Generator\CombGenerator;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidFactory;
+use Symfony\Component\Uid\Ulid;
 use Symfony\Component\Uid\NilUuid;
 use Symfony\Component\Uid\UuidV1;
 use Symfony\Component\Uid\UuidV2;
@@ -23,7 +24,6 @@ use Symfony\Component\Uid\UuidV5;
 use Symfony\Component\Uid\UuidV6;
 use Symfony\Component\Uid\UuidV7;
 use Symfony\Component\Uid\UuidV8;
-use Symfony\Component\Uid\Ulid;
 use Throwable;
 use Traversable;
 use voku\helper\ASCII;
@@ -604,7 +604,7 @@ class Str
      * Determine if a given value is a valid UUID.
      *
      * @param  mixed  $value
-     * @param  int<-1, 8>|null $version
+     * @param  int<-1, 8>|null  $version
      * @return bool
      */
     public static function isUuid($value, $version = null)
@@ -617,7 +617,7 @@ class Str
             return preg_match('/^[\da-fA-F]{8}-[\da-fA-F]{4}-[\da-fA-F]{4}-[\da-fA-F]{4}-[\da-fA-F]{12}$/D', $value) > 0;
         }
 
-        return match($version) {
+        return match ($version) {
             -1, 0 => NilUuid::isValid($value),
             1 => UuidV1::isValid($value),
             2 => UuidV2::isValid($value),
