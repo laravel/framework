@@ -441,7 +441,7 @@ class Blueprint
         $columns = array_intersect($columns, Schema::getColumnListing($this->getTable()));
 
         if (empty($columns)) {
-            return new Fluent();
+            return new Fluent;
         }
 
         return $this->dropColumn($columns);
@@ -538,7 +538,7 @@ class Blueprint
         }
 
         if (! in_array($index, Schema::getForeignKeys($this->getTable()))) {
-            return new Fluent();
+            return new Fluent;
         }
 
         return $this->dropIndexCommand('dropForeign', 'foreign', $index);
