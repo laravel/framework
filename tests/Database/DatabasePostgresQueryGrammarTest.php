@@ -28,4 +28,23 @@ class DatabasePostgresQueryGrammarTest extends TestCase
 
         $this->assertSame('select * from "users" where \'{}\' ? \'Hello\\\'\\\'World?\' AND "email" = \'foo\'', $query);
     }
+
+    public function testCustomOperators()
+    {
+        PostgresGrammar::customOperators(['@@@', '@>', '']);
+        PostgresGrammar::customOperators(['@@>', 1]);
+
+        $connection = m::mock(Connection::class);
+        $grammar = new PostgresGrammar;
+        $grammar->setConnection($connection);
+
+        $operators = $grammar->getOperators();
+
+        $this->assertIsList($operators);
+        $this->assertContains('@@@', $operators);
+        $this->assertContains('@@>', $operators);
+        $this->assertNotContains('', $operators);
+        $this->assertNotContains(1, $operators);
+        $this->assertSame(array_unique($operators), $operators);
+    }
 }
