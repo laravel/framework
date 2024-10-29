@@ -25,7 +25,6 @@ class Number
      */
     protected static $currency = 'USD';
 
-
     /**
      * @param  string  $locale
      * @return string

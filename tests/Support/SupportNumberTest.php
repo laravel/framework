@@ -324,5 +324,4 @@ class SupportNumberTest extends TestCase
         $this->expectExceptionMessage('Locale [invalid-locale] is invalid');
         Number::format(1234.56, locale: 'invalid-locale');
     }
-
 }
