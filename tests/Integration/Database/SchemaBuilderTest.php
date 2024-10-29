@@ -839,4 +839,75 @@ class SchemaBuilderTest extends DatabaseTestCase
         $this->assertTrue(Schema::hasForeignKeyForColumn('question_id', 'answers', 'questions'));
         $this->assertFalse(Schema::hasForeignKeyForColumn('body', 'answers', 'questions'));
     }
+
+    public function testDropColumnIfExists()
+    {
+        Schema::create('users', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->integer('age');
+        });
+
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumnIfExists(['name', 'foo']);
+        });
+
+        $this->assertSame(['id', 'age'], Schema::getColumnListing('users'));
+    }
+
+    public function testDropForeignIfExists()
+    {
+        Schema::create('users', function (Blueprint $table) {
+            $table->id();
+            $table->string('name')->index();
+        });
+
+        Schema::create('posts', function (Blueprint $table) {
+            $table->foreignId('user_id')->nullable()->index()->constrained();
+            $table->string('user_name')->nullable()->unique();
+            $table->foreign('user_name')->references('name')->on('users');
+            $table->integer('count');
+        });
+
+        $this->assertSame([['user_id'], ['user_name']], array_column(Schema::getForeignKeys('posts'), 'columns'));
+
+        Schema::table('posts', function (Blueprint $table) {
+            $table->dropForeignIfExists(['user_id']);
+            $table->dropForeignIfExists(['count']);
+        });
+
+        $this->assertSame([['user_name']], array_column(Schema::getForeignKeys('posts'), 'columns'));
+    }
+
+    public function testDropForeignIfExistsByName()
+    {
+        if ($this->driver === 'sqlite') {
+            $this->markTestSkipped('Foreign key constraints do not have name on SQLite.');
+        }
+
+        Schema::create('users', function (Blueprint $table) {
+            $table->id();
+            $table->string('name')->index();
+        });
+
+        Schema::create('posts', function (Blueprint $table) {
+            $table->foreignId('user_id')->nullable()->index()->constrained();
+            $table->string('user_name')->nullable()->unique();
+            $table->foreign('user_name')->references('name')->on('users');
+            $table->integer('count');
+        });
+
+        $this->assertSame(
+            ['posts_user_id_foreign', 'posts_user_name_foreign'],
+            array_column(Schema::getForeignKeys('posts'), 'name')
+        );
+
+
+        Schema::table('posts', function (Blueprint $table) {
+            $table->dropForeignIfExists('posts_user_id_foreign');
+            $table->dropForeignIfExists('posts_count_foreign');
+        });
+
+        $this->assertSame(['posts_user_name_foreign'], array_column(Schema::getForeignKeys('posts'), 'name'));
+    }
 }

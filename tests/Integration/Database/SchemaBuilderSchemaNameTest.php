@@ -249,6 +249,30 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
     }
 
     #[DataProvider('connectionProvider')]
+    public function testDropColumnsIfExists($connection)
+    {
+        $schema = Schema::connection($connection);
+
+        $schema->create('my_schema.table', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->integer('age');
+        });
+
+        $schema->create('table', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->integer('age');
+        });
+
+        $schema->dropColumnsIfExists('my_schema.table', ['name', 'foo']);
+        $schema->dropColumnsIfExists('table', ['age', 'bar']);
+
+        $this->assertSame(['id', 'age'], $schema->getColumnListing('my_schema.table'));
+        $this->assertSame(['id', 'name'], $schema->getColumnListing('table'));
+    }
+
+    #[DataProvider('connectionProvider')]
     public function testIndexes($connection)
     {
         $schema = Schema::connection($connection);
