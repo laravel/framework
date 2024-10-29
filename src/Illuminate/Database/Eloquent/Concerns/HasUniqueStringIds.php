@@ -3,7 +3,6 @@
 namespace Illuminate\Database\Eloquent\Concerns;
 
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Support\Str;
 
 trait HasUniqueStringIds
 {
@@ -41,7 +40,6 @@ trait HasUniqueStringIds
     {
         return [$this->getKeyName()];
     }
-
 
     /**
      * Retrieve the model for a bound value.
@@ -93,5 +91,4 @@ trait HasUniqueStringIds
 
         return $this->incrementing;
     }
-
 }
