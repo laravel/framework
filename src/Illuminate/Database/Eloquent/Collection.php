@@ -660,6 +660,19 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
+     * Partition the collection into two arrays using the given callback or key.
+     *
+     * @param  (callable(TModel, TKey): bool)|TModel|string  $key
+     * @param  TModel|string|null  $operator
+     * @param  TModel|null  $value
+     * @return \Illuminate\Support\Collection<int<0, 1>, static<TKey, TModel>>
+     */
+    public function partition($key, $operator = null, $value = null)
+    {
+        return parent::partition($key, $operator, $value)->toBase();
+    }
+
+    /**
      * Get an array with the values of a given key.
      *
      * @param  string|array<array-key, string>|null  $value
