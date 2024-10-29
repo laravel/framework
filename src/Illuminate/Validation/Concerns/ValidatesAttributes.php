@@ -2555,7 +2555,7 @@ trait ValidatesAttributes
      */
     public function validateUuid($attribute, $value, $parameters)
     {
-        return Str::isUuid($value, count($version) === 1 ? $parameters[0] : null);
+        return Str::isUuid($value, $version !== null && count($version) === 1 ? $parameters[0] : null);
     }
 
     /**
