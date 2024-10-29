@@ -493,10 +493,16 @@ class SqlServerGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $command
-     * @return string
+     * @param  \Illuminate\Database\Connection  $connection
+     * @return string|null
      */
-    public function compileDropForeign(Blueprint $blueprint, Fluent $command)
+    public function compileDropForeign(Blueprint $blueprint, Fluent $command, Connection $connection)
     {
+        if ($command->ifExists &&
+            ! in_array($command->index, array_column($connection->getSchemaBuilder()->getForeignKeys($blueprint->getTable()), 'name'))) {
+            return;
+        }
+
         $index = $this->wrap($command->index);
 
         return "alter table {$this->wrapTable($blueprint)} drop constraint {$index}";

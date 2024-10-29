@@ -9,7 +9,6 @@ use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Grammars\Grammar;
 use Illuminate\Database\Schema\Grammars\MySqlGrammar;
 use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\Traits\Macroable;
 
@@ -525,15 +524,7 @@ class Blueprint
      */
     public function dropForeignIfExists($index)
     {
-        if (is_array($index)) {
-            $index = $this->createIndexName('foreign', $index);
-        }
-
-        if (! in_array($index, Schema::getForeignKeys($this->getTable()))) {
-            return new Fluent;
-        }
-
-        return $this->dropIndexCommand('dropForeign', 'foreign', $index);
+        return tap($this->dropForeign($index))->ifExists();
     }
 
     /**

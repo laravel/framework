@@ -565,13 +565,16 @@ class PostgresGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $command
+     * @param  \Illuminate\Database\Connection  $connection
      * @return string
      */
-    public function compileDropForeign(Blueprint $blueprint, Fluent $command)
+    public function compileDropForeign(Blueprint $blueprint, Fluent $command, Connection $connection)
     {
-        $index = $this->wrap($command->index);
-
-        return "alter table {$this->wrapTable($blueprint)} drop constraint {$index}";
+        return sprintf('alter table %s drop constraint %s%s',
+            $this->wrapTable($blueprint),
+            $command->ifExists ? 'if exists ' : '',
+            $this->wrap($command->index)
+        );
     }
 
     /**

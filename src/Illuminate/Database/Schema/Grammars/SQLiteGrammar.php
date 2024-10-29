@@ -536,9 +536,10 @@ class SQLiteGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $command
-     * @return array
+     * @param  \Illuminate\Database\Connection  $connection
+     * @return void
      */
-    public function compileDropForeign(Blueprint $blueprint, Fluent $command)
+    public function compileDropForeign(Blueprint $blueprint, Fluent $command, Connection $connection)
     {
         if (empty($command->columns)) {
             throw new RuntimeException('This database driver does not support dropping foreign keys by name.');
