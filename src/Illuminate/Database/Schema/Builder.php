@@ -463,7 +463,7 @@ class Builder
     }
 
     /**
-     * Drop columns from a table schema if exists.
+     * Drop columns from a table schema if they exist.
      *
      * @param  string  $table
      * @param  string|array  $columns
