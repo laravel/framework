@@ -104,14 +104,16 @@ class PasswordBrokerManager implements FactoryContract
      */
     protected function createTokenRepository(array $config)
     {
-        // This is here so that we can default for the 'driver' database,
-        // as that's the default implementation.
-        if (isset($config['driver']) && $config['driver'] !== 'database') {
-            if (! isset($this->customRepositoryCreators[$config['driver']])) {
-                throw new InvalidArgumentException("Password reset token repository [{$config['driver']}] is not defined");
+        if (isset($config['driver'])) {
+            if (isset($this->customRepositoryCreators[$config['driver']])) {
+                return $this->customRepositoryCreators[$config['driver']]($this->app, $config);
             }
 
-            return $this->customRepositoryCreators[$config['driver']]($this->app, $config);
+            // If there's no custom provider for the driver, but the driver is
+            // 'database', use the default implementation.
+            if ($config['driver'] !== 'database') {
+                throw new InvalidArgumentException("Password reset token repository [{$config['driver']}] is not defined");
+            }
         }
 
         $key = $this->app['config']['app.key'];
