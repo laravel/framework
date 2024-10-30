@@ -70,6 +70,10 @@ class MailMakeCommand extends GeneratorCommand
             str_replace('.', '/', $this->getView()).'.blade.php'
         );
 
+        if ($this->files->exists($path)) {
+            return $this->components->error(sprintf('%s [%s] already exists.', 'Markdown view', $path));
+        }
+
         $this->files->ensureDirectoryExists(dirname($path));
 
         $this->files->put($path, file_get_contents(__DIR__.'/stubs/markdown.stub'));
@@ -87,6 +91,10 @@ class MailMakeCommand extends GeneratorCommand
         $path = $this->viewPath(
             str_replace('.', '/', $this->getView()).'.blade.php'
         );
+
+        if ($this->files->exists($path)) {
+            return $this->components->error(sprintf('%s [%s] already exists.', 'View', $path));
+        }
 
         $this->files->ensureDirectoryExists(dirname($path));
 
