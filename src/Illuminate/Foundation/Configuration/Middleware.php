@@ -146,7 +146,7 @@ class Middleware
     protected $priority = [];
 
     /**
-     * Whether to disable controller middleware
+     * Whether to disable controller middleware.
      *
      * @var bool
      */

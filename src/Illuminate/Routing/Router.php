@@ -101,7 +101,7 @@ class Router implements BindingRegistrar, RegistrarContract
     public $middlewarePriority = [];
 
     /**
-     * Whether to disable controller middleware
+     * Whether to disable controller middleware.
      *
      * @var bool
      */
