@@ -417,13 +417,13 @@ class Middleware
     /**
      * Append middleware to the priority middleware.
      *
-     * @param  array|string  $middlewareToPutTheNewMiddlewareAfter
-     * @param  string  $theMiddlewareToAppend
+     * @param  array|string  $after
+     * @param  string  $append
      * @return $this
      */
-    public function appendToPriorityList($middlewareToPutTheNewMiddlewareAfter, $theMiddlewareToAppend)
+    public function appendToPriorityList($after, $append)
     {
-        $this->appendPriority[$theMiddlewareToAppend] = $middlewareToPutTheNewMiddlewareAfter;
+        $this->appendPriority[$append] = $after;
 
         return $this;
     }
@@ -431,13 +431,13 @@ class Middleware
     /**
      * Prepend middleware to the priority middleware.
      *
-     * @param  array|string  $middlewareToPutTheNewMiddlewareBefore
-     * @param  string  $theMiddlewareToPrepend
+     * @param  array|string  $before
+     * @param  string  $prepend
      * @return $this
      */
-    public function prependToPriorityList($middlewareToPutTheNewMiddlewareBefore, $theMiddlewareToPrepend)
+    public function prependToPriorityList($before, $prepend)
     {
-        $this->prependPriority[$theMiddlewareToPrepend] = $middlewareToPutTheNewMiddlewareBefore;
+        $this->prependPriority[$prepend] = $before;
 
         return $this;
     }
