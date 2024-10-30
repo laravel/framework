@@ -2001,6 +2001,7 @@ class RoutingRouteTest extends TestCase
         $router->get('foo/{bar?}', [
             'middleware' => SubstituteBindings::class,
             'uses' => function (?\Illuminate\Tests\Routing\CategoryBackedEnum $bar = null) {
+//            dd($bar);
                 $this->assertInstanceOf(CategoryBackedEnum::class, $bar);
             },
         ]);
