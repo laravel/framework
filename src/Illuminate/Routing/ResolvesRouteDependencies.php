@@ -75,11 +75,11 @@ trait ResolvesRouteDependencies
      */
     protected function transformDependency(ReflectionParameter $parameter, $parameters, $skippableValue)
     {
-        $className = Reflector::getParameterClassName($parameter);
-
         if ($attribute = Util::getContextualAttributeFromDependency($parameter)) {
             return $this->container->resolveFromAttribute($attribute);
         }
+
+        $className = Reflector::getParameterClassName($parameter);
 
         // If the parameter has a type-hinted class, we will check to see if it is already in
         // the list of parameters. If it is we will just skip it as it is probably a model
