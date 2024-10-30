@@ -63,7 +63,7 @@ class PasswordBrokerManager implements FactoryContract
      * @param  \Closure  $callback
      * @return $this
      */
-    public function provider($name, Closure $callback)
+    public function repository($name, Closure $callback)
     {
         $this->customRepositoryCreators[$name] = $callback;
 
