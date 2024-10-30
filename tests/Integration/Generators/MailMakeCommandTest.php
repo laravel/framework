@@ -47,7 +47,7 @@ class MailMakeCommandTest extends TestCase
         ], 'resources/views/foo-mail.blade.php');
     }
 
-    public function testErrorsAreDisplayedWhenMarkdownsAlreadyExist()
+    public function testErrorsWillBeDisplayedWhenMarkdownsAlreadyExist()
     {
         $existingMarkdownPath = 'resources/views/existing-markdown.blade.php';
         $this->app['files']
