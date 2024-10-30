@@ -321,6 +321,24 @@ class Arr
     }
 
     /**
+     * Check if the key exists in array and is filled
+     *
+     * @param  \ArrayAccess|array  $array
+     * @param  string|int|null  $key
+     * @return bool
+     */
+    public static function filled($array, $key)
+    {
+        if (! static::has($array, $key)) {
+            return false;
+        }
+
+        $value = static::get($array, $key);
+
+        return ! is_null($value) && trim($value) !== '';
+    }
+
+    /**
      * Get an item from an array using "dot" notation.
      *
      * @param  \ArrayAccess|array  $array
