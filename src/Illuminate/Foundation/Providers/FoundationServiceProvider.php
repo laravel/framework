@@ -244,6 +244,7 @@ class FoundationServiceProvider extends AggregateServiceProvider
         }
 
         $this->loadViewsFrom(__DIR__.'/../resources/exceptions/renderer', 'laravel-exceptions-renderer');
+        $this->loadViewsFrom(__DIR__.'/../Exceptions/views', 'laravel-exceptions');
 
         $this->app->singleton(Renderer::class, function (Application $app) {
             $errorRenderer = new HtmlErrorRenderer(
