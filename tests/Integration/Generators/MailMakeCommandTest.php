@@ -47,6 +47,32 @@ class MailMakeCommandTest extends TestCase
         ], 'resources/views/foo-mail.blade.php');
     }
 
+    public function testErrorsWillBeDisplayedWhenMarkdownsAlreadyExist()
+    {
+        $existingMarkdownPath = 'resources/views/existing-markdown.blade.php';
+        $this->app['files']
+            ->put(
+                $this->app->basePath($existingMarkdownPath),
+                '<x-mail::message>My existing markdown</x-mail::message>'
+            );
+        $this->artisan('make:mail', ['name' => 'FooMail', '--markdown' => 'existing-markdown'])
+            ->expectsOutputToContain('already exists.')
+            ->assertExitCode(0);
+
+        $this->assertFileContains([
+            'namespace App\Mail;',
+            'use Illuminate\Mail\Mailable;',
+            'class FooMail extends Mailable',
+            'return new Content(',
+            "markdown: 'existing-markdown',",
+        ], 'app/Mail/FooMail.php');
+        $this->assertFileContains([
+            '<x-mail::message>',
+            'My existing markdown',
+            '</x-mail::message>',
+        ], $existingMarkdownPath);
+    }
+
     public function testItCanGenerateMailFileWithViewOption()
     {
         $this->artisan('make:mail', ['name' => 'FooMail', '--view' => 'foo-mail'])
@@ -61,6 +87,31 @@ class MailMakeCommandTest extends TestCase
         ], 'app/Mail/FooMail.php');
 
         $this->assertFilenameExists('resources/views/foo-mail.blade.php');
+    }
+
+    public function testErrorsWillBeDisplayedWhenViewsAlreadyExist()
+    {
+        $existingViewPath = 'resources/views/existing-template.blade.php';
+        $this->app['files']
+            ->put(
+                $this->app->basePath($existingViewPath),
+                '<div>My existing template</div>'
+            );
+        $this->artisan('make:mail', ['name' => 'FooMail', '--view' => 'existing-template'])
+            ->expectsOutputToContain('already exists.')
+            ->assertExitCode(0);
+
+        $this->assertFileContains([
+            'namespace App\Mail;',
+            'use Illuminate\Mail\Mailable;',
+            'class FooMail extends Mailable',
+            'return new Content(',
+            "view: 'existing-template',",
+        ], 'app/Mail/FooMail.php');
+        $this->assertFilenameExists($existingViewPath);
+        $this->assertFileContains([
+            '<div>My existing template</div>',
+        ], $existingViewPath);
     }
 
     public function testItCanGenerateMailFileWithTest()
