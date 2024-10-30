@@ -8491,12 +8491,15 @@ class ValidationValidatorTest extends TestCase
             ['a0a2a2d2-0b87-4a18-83f2-2529882be2de', 'uuid', true],
             ['a0a2a2d2-0b87-4a18-83f2-2529882be2de', 'uuid:1', false],
             ['a0a2a2d2-0b87-4a18-83f2-2529882be2de', 'uuid:4', true],
+            ['a0a2a2d2-0b87-4a18-83f2-2529882be2de', 'uuid:42', false],
             ['145a1e72-d11d-11e8-a8d5-f2801f1b9fd1', 'uuid', true],
             ['145a1e72-d11d-11e8-a8d5-f2801f1b9fd1', 'uuid:1', true],
             ['145a1e72-d11d-11e8-a8d5-f2801f1b9fd1', 'uuid:4', false],
+            ['145a1e72-d11d-11e8-a8d5-f2801f1b9fd1', 'uuid:42', false],
             ['zf6f8cb0-c57d-11e1-9b21-0800200c9a66', 'uuid', false],
             ['zf6f8cb0-c57d-11e1-9b21-0800200c9a66', 'uuid:1', false],
             ['zf6f8cb0-c57d-11e1-9b21-0800200c9a66', 'uuid:4', false],
+            ['zf6f8cb0-c57d-11e1-9b21-0800200c9a66', 'uuid:42', false],
         ];
     }
 
