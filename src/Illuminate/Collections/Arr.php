@@ -321,7 +321,7 @@ class Arr
     }
 
     /**
-     * Check if the key exists in array and is filled
+     * Check if the key exists in array and is filled.
      *
      * @param  \ArrayAccess|array  $array
      * @param  string|int|null  $key
