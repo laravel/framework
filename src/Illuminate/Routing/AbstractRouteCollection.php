@@ -18,6 +18,36 @@ use Traversable;
 abstract class AbstractRouteCollection implements Countable, IteratorAggregate, RouteCollectionInterface
 {
     /**
+     * The router instance used by the route.
+     *
+     * @var \Illuminate\Routing\Router
+     */
+    protected $router;
+
+    /**
+     * Get the router instance.
+     *
+     * @return \Illuminate\Routing\Router
+     */
+    public function getRouter()
+    {
+        return $this->router;
+    }
+
+    /**
+     * Set the router instance on the route.
+     *
+     * @param  \Illuminate\Routing\Router  $router
+     * @return $this
+     */
+    public function setRouter(Router $router)
+    {
+        $this->router = $router;
+
+        return $this;
+    }
+
+    /**
      * Handle the matched route.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -99,9 +129,9 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
     protected function getRouteForMethods($request, array $methods)
     {
         if ($request->isMethod('OPTIONS')) {
-            return (new Route('OPTIONS', $request->path(), function () use ($methods) {
+            return $this->getRouter()->newRoute('OPTIONS', $request->path(), function () use ($methods) {
                 return new Response('', 200, ['Allow' => implode(',', $methods)]);
-            }))->bind($request);
+            })->bind($request);
         }
 
         $this->requestMethodNotAllowed($request, $methods, $request->method());

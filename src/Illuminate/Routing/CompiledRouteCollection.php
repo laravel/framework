@@ -303,19 +303,6 @@ class CompiledRouteCollection extends AbstractRouteCollection
     }
 
     /**
-     * Set the router instance on the route.
-     *
-     * @param  \Illuminate\Routing\Router  $router
-     * @return $this
-     */
-    public function setRouter(Router $router)
-    {
-        $this->router = $router;
-
-        return $this;
-    }
-
-    /**
      * Set the container instance on the route.
      *
      * @param  \Illuminate\Container\Container  $container
