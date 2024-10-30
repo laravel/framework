@@ -63,7 +63,7 @@ class SoftDeletedInDatabase extends Constraint
         return $this->database->table($table)
                 ->where($this->data)
                 ->whereNotNull($this->deletedAtColumn)
-                ->count() > 0;
+                ->exists();
     }
 
     /**

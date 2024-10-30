@@ -1128,7 +1128,9 @@ class MySqlGrammar extends Grammar
      */
     protected function typeVector(Fluent $column)
     {
-        return "vector($column->dimensions)";
+        return isset($column->dimensions) && $column->dimensions !== ''
+            ? "vector({$column->dimensions})"
+            : 'vector';
     }
 
     /**
