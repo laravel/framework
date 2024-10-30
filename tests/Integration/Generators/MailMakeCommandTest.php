@@ -47,14 +47,16 @@ class MailMakeCommandTest extends TestCase
         ], 'resources/views/foo-mail.blade.php');
     }
 
-    public function testExistingMarkdownsWillBePickedUp()
+    public function testErrorsAreDisplayedWhenMarkdownsAlreadyExist()
     {
+        $existingMarkdownPath = 'resources/views/existing-markdown.blade.php';
         $this->app['files']
             ->put(
-                $this->app->basePath('resources/views/existing-markdown.blade.php'),
+                $this->app->basePath($existingMarkdownPath),
                 '<x-mail::message>My existing markdown</x-mail::message>'
             );
         $this->artisan('make:mail', ['name' => 'FooMail', '--markdown' => 'existing-markdown'])
+            ->expectsOutputToContain('already exists.')
             ->assertExitCode(0);
 
         $this->assertFileContains([
@@ -64,12 +66,11 @@ class MailMakeCommandTest extends TestCase
             'return new Content(',
             "markdown: 'existing-markdown',",
         ], 'app/Mail/FooMail.php');
-
         $this->assertFileContains([
             '<x-mail::message>',
             'My existing markdown',
             '</x-mail::message>',
-        ], 'resources/views/existing-markdown.blade.php');
+        ], $existingMarkdownPath);
     }
 
     public function testItCanGenerateMailFileWithViewOption()
@@ -88,14 +89,16 @@ class MailMakeCommandTest extends TestCase
         $this->assertFilenameExists('resources/views/foo-mail.blade.php');
     }
 
-    public function testMailTemplatesWillBePickedUp()
+    public function testErrorsWillBeDisplayedWhenViewsAlreadyExist()
     {
+        $existingViewPath = 'resources/views/existing-template.blade.php';
         $this->app['files']
             ->put(
-                $this->app->basePath('resources/views/existing-template.blade.php'),
+                $this->app->basePath($existingViewPath),
                 '<div>My existing template</div>'
             );
         $this->artisan('make:mail', ['name' => 'FooMail', '--view' => 'existing-template'])
+            ->expectsOutputToContain('already exists.')
             ->assertExitCode(0);
 
         $this->assertFileContains([
@@ -105,11 +108,10 @@ class MailMakeCommandTest extends TestCase
             'return new Content(',
             "view: 'existing-template',",
         ], 'app/Mail/FooMail.php');
-
-        $this->assertFilenameExists('resources/views/existing-template.blade.php');
+        $this->assertFilenameExists($existingViewPath);
         $this->assertFileContains([
             '<div>My existing template</div>',
-        ], 'resources/views/existing-template.blade.php');
+        ], $existingViewPath);
     }
 
     public function testItCanGenerateMailFileWithTest()
