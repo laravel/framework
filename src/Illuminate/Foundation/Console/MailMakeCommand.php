@@ -71,7 +71,7 @@ class MailMakeCommand extends GeneratorCommand
         );
 
         if ($this->files->exists($path)) {
-            return $this->components->info(sprintf('%s [%s] has been picked up.', 'Markdown view', $path));
+            return $this->components->error(sprintf('%s [%s] already exists.', 'Markdown view', $path));
         }
 
         $this->files->ensureDirectoryExists(dirname($path));
@@ -93,7 +93,7 @@ class MailMakeCommand extends GeneratorCommand
         );
 
         if ($this->files->exists($path)) {
-            return $this->components->info(sprintf('%s [%s] has been picked up.', 'View', $path));
+            return $this->components->error(sprintf('%s [%s] already exists.', 'View', $path));
         }
 
         $this->files->ensureDirectoryExists(dirname($path));
