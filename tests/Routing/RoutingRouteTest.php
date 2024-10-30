@@ -314,6 +314,26 @@ class RoutingRouteTest extends TestCase
         );
     }
 
+    public function testControllerMiddlewareCanBeSkipped()
+    {
+        $router = $this->getRouter();
+        $router->skipControllerMiddleware();
+        $router->get('foo/bar', [
+            'uses' => RouteTestClosureMiddlewareController::class.'@index',
+            'middleware' => 'foo',
+        ]);
+        $router->aliasMiddleware('foo', function ($request, $next) {
+            $request['foo-middleware'] = 'foo-middleware';
+
+            return $next($request);
+        });
+
+        $this->assertSame(
+            'index',
+            $router->dispatch(Request::create('foo/bar', 'GET'))->getContent()
+        );
+    }
+
     public function testFluentRouting()
     {
         $this->expectException(LogicException::class);
