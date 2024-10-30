@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Connection;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\Grammars\PostgresGrammar;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -46,5 +47,28 @@ class DatabasePostgresQueryGrammarTest extends TestCase
         $this->assertNotContains('', $operators);
         $this->assertNotContains(1, $operators);
         $this->assertSame(array_unique($operators), $operators);
+    }
+
+    public function testCompileTruncate()
+    {
+        $postgres = new PostgresGrammar;
+        $builder = m::mock(Builder::class);
+        $builder->from = 'users';
+
+        $this->assertEquals([
+            'truncate "users" restart identity cascade' => [],
+        ], $postgres->compileTruncate($builder));
+
+        PostgresGrammar::useCascadeTruncate(false);
+
+        $this->assertEquals([
+            'truncate "users" restart identity' => [],
+        ], $postgres->compileTruncate($builder));
+
+        PostgresGrammar::useCascadeTruncate();
+
+        $this->assertEquals([
+            'truncate "users" restart identity cascade' => [],
+        ], $postgres->compileTruncate($builder));
     }
 }
