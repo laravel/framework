@@ -2,6 +2,7 @@
 
 namespace Illuminate\Auth\Passwords;
 
+use Closure;
 use Illuminate\Contracts\Auth\PasswordBrokerFactory as FactoryContract;
 use InvalidArgumentException;
 
@@ -25,6 +26,13 @@ class PasswordBrokerManager implements FactoryContract
     protected $brokers = [];
 
     /**
+     * The registered custom token repository creators.
+     *
+     * @var array
+     */
+    protected $customRepositoryCreators = [];
+
+    /**
      * Create a new PasswordBroker manager instance.
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
@@ -46,6 +54,20 @@ class PasswordBrokerManager implements FactoryContract
         $name = $name ?: $this->getDefaultDriver();
 
         return $this->brokers[$name] ?? ($this->brokers[$name] = $this->resolve($name));
+    }
+
+    /**
+     * Register a custom token repository creator Closure.
+     *
+     * @param  string  $name
+     * @param  \Closure  $callback
+     * @return $this
+     */
+    public function provider($name, Closure $callback)
+    {
+        $this->customRepositoryCreators[$name] = $callback;
+
+        return $this;
     }
 
     /**
@@ -82,6 +104,16 @@ class PasswordBrokerManager implements FactoryContract
      */
     protected function createTokenRepository(array $config)
     {
+        // This is here so that we can default for the 'driver' database,
+        // as that's the default implementation.
+        if (isset($config['driver']) && $config['driver'] !== 'database') {
+            if (! isset($this->customRepositoryCreators[$config['driver']])) {
+                throw new InvalidArgumentException("Password reset token repository [{$config['driver']}] is not defined");
+            }
+
+            return $this->customRepositoryCreators[$config['driver']]($this->app, $config);
+        }
+
         $key = $this->app['config']['app.key'];
 
         if (str_starts_with($key, 'base64:')) {
