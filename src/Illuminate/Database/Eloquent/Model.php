@@ -540,10 +540,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
                 if (isset(static::$discardedAttributeViolationCallback)) {
                     call_user_func(static::$discardedAttributeViolationCallback, $this, [$key]);
                 } else {
-                    throw new MassAssignmentException(sprintf(
-                        'Add [%s] to fillable property to allow mass assignment on [%s].',
-                        $key, get_class($this)
-                    ));
+                    throw new MassAssignmentException($key, get_class($this));
                 }
             }
         }
@@ -555,11 +552,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             if (isset(static::$discardedAttributeViolationCallback)) {
                 call_user_func(static::$discardedAttributeViolationCallback, $this, $keys);
             } else {
-                throw new MassAssignmentException(sprintf(
-                    'Add fillable property [%s] to allow mass assignment on [%s].',
-                    implode(', ', $keys),
-                    get_class($this)
-                ));
+                throw new MassAssignmentException(implode(', ', $keys), get_class($this));
             }
         }
 

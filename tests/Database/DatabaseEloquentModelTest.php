@@ -1580,13 +1580,13 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals([], $model->getAttributes());
     }
 
-    public function testGuarded()
+    public function testGuarded(): void
     {
         $model = new EloquentModelStub;
 
         EloquentModelStub::setConnectionResolver($resolver = m::mock(Resolver::class));
-        $resolver->shouldReceive('connection')->andReturn($connection = m::mock(stdClass::class));
-        $connection->shouldReceive('getSchemaBuilder->getColumnListing')->andReturn(['name', 'age', 'foo']);
+        $resolver->allows('connection')->andReturns($connection = m::mock(stdClass::class));
+        $connection->allows('getSchemaBuilder->getColumnListing')->andReturns(['name', 'age', 'foo']);
 
         $model->guard(['name', 'age']);
         $model->fill(['name' => 'foo', 'age' => 'bar', 'foo' => 'bar']);
@@ -1599,11 +1599,14 @@ class DatabaseEloquentModelTest extends TestCase
         $model->fill(['Foo' => 'bar']);
         $this->assertFalse(isset($model->Foo));
 
-        $handledMassAssignmentExceptions = 0;
-
         Model::preventSilentlyDiscardingAttributes();
 
-        $this->expectException(MassAssignmentException::class);
+        $exception = new MassAssignmentException('Foo', EloquentModelStub::class);
+        $this->assertSame('Foo', $exception->getKey());
+        $this->assertSame(EloquentModelStub::class, $exception->getClass());
+        $this->assertSame('Add [Foo] to fillable property to allow mass assignment on [Illuminate\Tests\Database\EloquentModelStub].', $exception->getMessage());
+        $this->expectExceptionObject($exception);
+
         $model = new EloquentModelStub;
         $model->guard(['name', 'age']);
         $model->fill(['Foo' => 'bar']);
@@ -1650,10 +1653,14 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertSame('bar', $model->foo);
     }
 
-    public function testGlobalGuarded()
+    public function testGlobalGuarded(): void
     {
-        $this->expectException(MassAssignmentException::class);
-        $this->expectExceptionMessage('name');
+        $exception = new MassAssignmentException('name', EloquentModelStub::class);
+        $this->assertSame('name', $exception->getKey());
+        $this->assertSame(EloquentModelStub::class, $exception->getClass());
+        $this->assertSame('Add [name] to fillable property to allow mass assignment on [Illuminate\Tests\Database\EloquentModelStub].', $exception->getMessage());
+        $this->expectExceptionObject($exception);
+
 
         $model = new EloquentModelStub;
         $model->guard(['*']);
