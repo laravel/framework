@@ -42,8 +42,6 @@ use ReflectionNamedType;
 use RuntimeException;
 use ValueError;
 
-use function Illuminate\Support\enum_value;
-
 trait HasAttributes
 {
     /**
