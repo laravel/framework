@@ -14,15 +14,7 @@ use Ramsey\Uuid\Codec\TimestampFirstCombCodec;
 use Ramsey\Uuid\Generator\CombGenerator;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidFactory;
-use Symfony\Component\Uid\NilUuid;
 use Symfony\Component\Uid\Ulid;
-use Symfony\Component\Uid\UuidV1;
-use Symfony\Component\Uid\UuidV3;
-use Symfony\Component\Uid\UuidV4;
-use Symfony\Component\Uid\UuidV5;
-use Symfony\Component\Uid\UuidV6;
-use Symfony\Component\Uid\UuidV7;
-use Symfony\Component\Uid\UuidV8;
 use Throwable;
 use Traversable;
 use voku\helper\ASCII;
@@ -617,6 +609,7 @@ class Str
         }
         
         $factory = new UuidFactory();
+
         try {
             $factoryUuid = $factory->fromString($value);
         } catch (InvalidUuidStringException $ex) {
@@ -624,7 +617,7 @@ class Str
         }
         $fields = $factoryUuid->getFields();
 
-        if (!($fields instanceof FieldsInterface)) {
+        if (! ($fields instanceof FieldsInterface)) {
             return false;
         }
 
