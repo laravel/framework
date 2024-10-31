@@ -35,7 +35,7 @@ class MassAssignmentException extends RuntimeException
         $instance->keys = $properties->all();
         $instance->class = $model::class;
         $instance->message = sprintf(
-            "Add [%s] to fillable property to allow mass assignment on [%s].",
+            'Add [%s] to fillable property to allow mass assignment on [%s].',
             $properties->implode(', '), $model::class
         );
 
