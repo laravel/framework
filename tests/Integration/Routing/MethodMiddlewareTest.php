@@ -10,7 +10,7 @@ class MethodMiddlewareTest extends TestCase
 {
     public function test_method_middleware_is_respected()
     {
-        $route = Route::get('/', [MethodMiddlewareTestController::class, 'index']);
+        $route = Route::get('/', MethodMiddlewareTestController::class);
 
         $this->assertEquals(
             $route->methodMiddleware(),
@@ -29,11 +29,9 @@ class MethodMiddlewareTest extends TestCase
 class MethodMiddlewareTestController
 {
     #[Authorize('viewAny', MethodMiddlewareTestController::class)]
-    public function index()
+    public function __invoke()
     {
-        //
     }
-
 
     #[Authorize('view', 'param')]
     public function show(MethodMiddlewareTestController $param)
