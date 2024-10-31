@@ -3,7 +3,6 @@
 namespace Illuminate\Database\Eloquent;
 
 use RuntimeException;
-use Throwable;
 
 class MassAssignmentException extends RuntimeException
 {
@@ -12,36 +11,35 @@ class MassAssignmentException extends RuntimeException
      *
      * @var array
      */
-    private array $keys;
+    protected array $keys;
 
     /**
      * The affected Eloquent model class.
      *
      * @var string
      */
-    private string $class;
+    protected string $class;
 
     /**
      * Create a new exception instance.
      *
      * @param  array|string  $keys
      * @param  object  $model
-     * @param  int  $code
-     * @param  \Throwable|null  $previous
-     * @return void
+     * @return static
      */
-    public function __construct(array|string $keys, object $model, int $code = 0, ?Throwable $previous = null)
+    public static function make(array|string $keys, object $model): static
     {
-        $keysCollection = collect($keys)->unique()->sort()->values();
-        $this->keys = $keysCollection->all();
-        $this->class = get_class($model);
+        $properties = collect($keys)->unique()->sort()->values();
 
-        $message = sprintf(
+        $instance = new static;
+        $instance->keys = $properties->all();
+        $instance->class = $model::class;
+        $instance->message = sprintf(
             "Add [%s] to fillable property to allow mass assignment on [%s].",
-            $keysCollection->implode(', '), $this->class
+            $properties->implode(', '), $model::class
         );
 
-        parent::__construct($message, $code, $previous);
+        return $instance;
     }
 
     /**

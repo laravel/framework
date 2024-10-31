@@ -1601,7 +1601,7 @@ class DatabaseEloquentModelTest extends TestCase
 
         $model = new EloquentModelStub;
 
-        $exception = new MassAssignmentException(['Foo', 'Bar'], $model);
+        $exception = MassAssignmentException::make(['Foo', 'Bar'], $model);
         $this->assertSame(['Bar', 'Foo'], $exception->getKeys());
         $this->assertSame(EloquentModelStub::class, $exception->getClass());
         $this->assertSame('Add [Bar, Foo] to fillable property to allow mass assignment on [Illuminate\Tests\Database\EloquentModelStub].', $exception->getMessage());
@@ -1656,7 +1656,7 @@ class DatabaseEloquentModelTest extends TestCase
     {
         $model = new EloquentModelStub;
 
-        $exception = new MassAssignmentException(['name', 'age', 'votes'], $model);
+        $exception = MassAssignmentException::make(['name', 'age', 'votes'], $model);
         $this->assertSame(['age', 'name', 'votes'], $exception->getKeys());
         $this->assertSame(EloquentModelStub::class, $exception->getClass());
         $this->assertSame('Add [age, name, votes] to fillable property to allow mass assignment on [Illuminate\Tests\Database\EloquentModelStub].', $exception->getMessage());
