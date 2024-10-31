@@ -1477,6 +1477,19 @@ class Application extends Container implements ApplicationContract, CachesConfig
     }
 
     /**
+     * Remove an array of services from the application's deferred services.
+     *
+     * @param  array  $services
+     * @return void
+     */
+    public function removeDeferredServices(array $services)
+    {
+        foreach ($services as $service) {
+            unset($this->deferredServices[$service]);
+        }
+    }
+
+    /**
      * Determine if the given service is a deferred service.
      *
      * @param  string  $service
