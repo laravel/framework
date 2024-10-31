@@ -39,7 +39,7 @@ class PostgresGrammar extends Grammar
     ];
 
     /**
-     * Whether to use the cascade option for truncating.
+     * Indicates if the cascade option should be used when truncating.
      *
      * @var bool
      */
@@ -816,7 +816,7 @@ class PostgresGrammar extends Grammar
      * @param  bool  $value
      * @return void
      */
-    public static function useCascadeTruncate(bool $value = true)
+    public static function cascadeOnTrucate(bool $value = true)
     {
         static::$cascadeTruncate = $value;
     }

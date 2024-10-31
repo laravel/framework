@@ -59,13 +59,13 @@ class DatabasePostgresQueryGrammarTest extends TestCase
             'truncate "users" restart identity cascade' => [],
         ], $postgres->compileTruncate($builder));
 
-        PostgresGrammar::useCascadeTruncate(false);
+        PostgresGrammar::cascadeOnTrucate(false);
 
         $this->assertEquals([
             'truncate "users" restart identity' => [],
         ], $postgres->compileTruncate($builder));
 
-        PostgresGrammar::useCascadeTruncate();
+        PostgresGrammar::cascadeOnTrucate();
 
         $this->assertEquals([
             'truncate "users" restart identity cascade' => [],
