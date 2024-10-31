@@ -2550,12 +2550,22 @@ trait ValidatesAttributes
      *
      * @param  string  $attribute
      * @param  mixed  $value
-     * @param  array<int, int<-1, 8>>  $parameters
+     * @param  array<int, int<0, 8>|'max'>  $parameters
      * @return bool
      */
     public function validateUuid($attribute, $value, $parameters)
     {
-        return Str::isUuid($value, $parameters !== null && count($parameters) === 1 ? (int) $parameters[0] : null);
+        $version = null;
+
+        if ($parameters !== null && count($parameters) === 1) {
+            $version = $parameters[0];
+
+            if ($version !== 'max') {
+                $version = (int) $parameters[0];
+            }
+        }
+
+        return Str::isUuid($value, $version);
     }
 
     /**

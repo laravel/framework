@@ -603,7 +603,7 @@ class Str
      * Determine if a given value is a valid UUID.
      *
      * @param  mixed  $value
-     * @param  int<-1, 8>|null  $version
+     * @param  int<0, 8>|'max'|null  $version
      * @return bool
      */
     public static function isUuid($value, $version = null)
@@ -615,19 +615,28 @@ class Str
         if ($version === null) {
             return preg_match('/^[\da-fA-F]{8}-[\da-fA-F]{4}-[\da-fA-F]{4}-[\da-fA-F]{4}-[\da-fA-F]{12}$/D', $value) > 0;
         }
+        
+        $factory = new UuidFactory();
+        try {
+            $factoryUuid = $factory->fromString($value);
+        } catch (InvalidUuidStringException $ex) {
+            return false;
+        }
+        $fields = $factoryUuid->getFields();
 
-        return match ($version) {
-            -1, 0 => NilUuid::isValid($value),
-            1 => UuidV1::isValid($value),
-            // 2 => UuidV2::isValid($value), // Symfony/uid doesn't implement version 2
-            3 => UuidV3::isValid($value),
-            4 => UuidV4::isValid($value),
-            5 => UuidV5::isValid($value),
-            6 => UuidV6::isValid($value),
-            7 => UuidV7::isValid($value),
-            8 => UuidV8::isValid($value),
-            default => false,
-        };
+        if (!($fields instanceof FieldsInterface)) {
+            return false;
+        }
+
+        if ($version === 0 || $version === 'nil') {
+            return $fields->isNil();
+        }
+
+        if ($version === 'max') {
+            return $fields->isMax();
+        }
+
+        return $fields->getVersion() === $version;
     }
 
     /**
