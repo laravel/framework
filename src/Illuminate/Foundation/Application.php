@@ -1466,6 +1466,17 @@ class Application extends Container implements ApplicationContract, CachesConfig
     }
 
     /**
+     * Determine if the given service is a deferred service.
+     *
+     * @param  string  $service
+     * @return bool
+     */
+    public function isDeferredService($service)
+    {
+        return isset($this->deferredServices[$service]);
+    }
+
+    /**
      * Add an array of services to the application's deferred services.
      *
      * @param  array  $services
@@ -1487,17 +1498,6 @@ class Application extends Container implements ApplicationContract, CachesConfig
         foreach ($services as $service) {
             unset($this->deferredServices[$service]);
         }
-    }
-
-    /**
-     * Determine if the given service is a deferred service.
-     *
-     * @param  string  $service
-     * @return bool
-     */
-    public function isDeferredService($service)
-    {
-        return isset($this->deferredServices[$service]);
     }
 
     /**
