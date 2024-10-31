@@ -1599,13 +1599,14 @@ class DatabaseEloquentModelTest extends TestCase
 
         Model::preventSilentlyDiscardingAttributes();
 
-        $exception = new MassAssignmentException(['Foo', 'Bar'], EloquentModelStub::class);
+        $model = new EloquentModelStub;
+
+        $exception = new MassAssignmentException(['Foo', 'Bar'], $model);
         $this->assertSame(['Bar', 'Foo'], $exception->getKeys());
         $this->assertSame(EloquentModelStub::class, $exception->getClass());
         $this->assertSame('Add [Bar, Foo] to fillable property to allow mass assignment on [Illuminate\Tests\Database\EloquentModelStub].', $exception->getMessage());
         $this->expectExceptionObject($exception);
 
-        $model = new EloquentModelStub;
         $model->guard(['name', 'age']);
         $model->fill(['Foo' => 'bar', 'Bar' => 'baz']);
 
@@ -1653,14 +1654,14 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testGlobalGuarded(): void
     {
-        $exception = new MassAssignmentException(['name', 'age', 'votes'], EloquentModelStub::class);
+        $model = new EloquentModelStub;
+
+        $exception = new MassAssignmentException(['name', 'age', 'votes'], $model);
         $this->assertSame(['age', 'name', 'votes'], $exception->getKeys());
         $this->assertSame(EloquentModelStub::class, $exception->getClass());
         $this->assertSame('Add [age, name, votes] to fillable property to allow mass assignment on [Illuminate\Tests\Database\EloquentModelStub].', $exception->getMessage());
         $this->expectExceptionObject($exception);
 
-
-        $model = new EloquentModelStub;
         $model->guard(['*']);
         $model->fill(['name' => 'foo', 'age' => 'bar', 'votes' => 'baz']);
     }

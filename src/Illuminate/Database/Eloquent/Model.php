@@ -559,7 +559,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         }
 
         if (count($guarded) > 0) {
-            throw new MassAssignmentException($guarded, get_class($this));
+            throw new MassAssignmentException($guarded, $this);
         }
 
         return $this;

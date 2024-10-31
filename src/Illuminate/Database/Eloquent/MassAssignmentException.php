@@ -25,20 +25,20 @@ class MassAssignmentException extends RuntimeException
      * Create a new exception instance.
      *
      * @param  array|string  $keys
-     * @param  string  $class
+     * @param  object  $model
      * @param  int  $code
      * @param  \Throwable|null  $previous
      * @return void
      */
-    public function __construct(array|string $keys, string $class, int $code = 0, ?Throwable $previous = null)
+    public function __construct(array|string $keys, object $model, int $code = 0, ?Throwable $previous = null)
     {
         $keysCollection = collect($keys)->unique()->sort()->values();
         $this->keys = $keysCollection->all();
-        $this->class = $class;
+        $this->class = get_class($model);
 
         $message = sprintf(
             "Add [%s] to fillable property to allow mass assignment on [%s].",
-            $keysCollection->implode(', '), $class
+            $keysCollection->implode(', '), $this->class
         );
 
         parent::__construct($message, $code, $previous);
