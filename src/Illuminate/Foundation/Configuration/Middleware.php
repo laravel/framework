@@ -146,18 +146,18 @@ class Middleware
     protected $priority = [];
 
     /**
-     * The middleware priority to append.
-     *
-     * @var array
-     */
-    protected $appendPriority = [];
-
-    /**
-     * The middleware priority to prepend.
+     * The middleware to prepend to the middleware priority definition.
      *
      * @var array
      */
     protected $prependPriority = [];
+
+    /**
+     * The middleware to append to the middleware priority definition.
+     *
+     * @var array
+     */
+    protected $appendPriority = [];
 
     /**
      * Prepend middleware to the application's global middleware stack.
@@ -415,20 +415,6 @@ class Middleware
     }
 
     /**
-     * Append middleware to the priority middleware.
-     *
-     * @param  array|string  $after
-     * @param  string  $append
-     * @return $this
-     */
-    public function appendToPriorityList($after, $append)
-    {
-        $this->appendPriority[$append] = $after;
-
-        return $this;
-    }
-
-    /**
      * Prepend middleware to the priority middleware.
      *
      * @param  array|string  $before
@@ -438,6 +424,20 @@ class Middleware
     public function prependToPriorityList($before, $prepend)
     {
         $this->prependPriority[$prepend] = $before;
+
+        return $this;
+    }
+
+    /**
+     * Append middleware to the priority middleware.
+     *
+     * @param  array|string  $after
+     * @param  string  $append
+     * @return $this
+     */
+    public function appendToPriorityList($after, $append)
+    {
+        $this->appendPriority[$append] = $after;
 
         return $this;
     }
@@ -810,22 +810,22 @@ class Middleware
     }
 
     /**
-     * Get the middleware priority to append.
-     *
-     * @return array
-     */
-    public function getMiddlewarePriorityAppends()
-    {
-        return $this->appendPriority;
-    }
-
-    /**
-     * Get the middleware priority to prepend.
+     * Get the middleware to prepend to the middleware priority definition.
      *
      * @return array
      */
     public function getMiddlewarePriorityPrepends()
     {
         return $this->prependPriority;
+    }
+
+    /**
+     * Get the middleware to append to the middleware priority definition.
+     *
+     * @return array
+     */
+    public function getMiddlewarePriorityAppends()
+    {
+        return $this->appendPriority;
     }
 }
