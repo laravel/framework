@@ -8445,6 +8445,14 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
+    #[DataProvider('uuidVersionList')]
+    public function testValidateWithUuidWithVersionConstraint($uuid, $rule, $passes)
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => $uuid], ['foo' => $rule]);
+        $this->assertSame($v->passes(), $passes);
+    }
+
     public static function validUuidList()
     {
         return [
@@ -8474,6 +8482,24 @@ class ValidationValidatorTest extends TestCase
             ['af6f8cb-c57d-11e1-9b21-0800200c9a66'],
             ['af6f8cb0c57d11e19b210800200c9a66'],
             ['ff6f8cb0-c57da-51e1-9b21-0800200c9a66'],
+        ];
+    }
+
+    public static function uuidVersionList()
+    {
+        return [
+            ['a0a2a2d2-0b87-4a18-83f2-2529882be2de', 'uuid', true],
+            ['a0a2a2d2-0b87-4a18-83f2-2529882be2de', 'uuid:1', false],
+            ['a0a2a2d2-0b87-4a18-83f2-2529882be2de', 'uuid:4', true],
+            ['a0a2a2d2-0b87-4a18-83f2-2529882be2de', 'uuid:42', false],
+            ['145a1e72-d11d-11e8-a8d5-f2801f1b9fd1', 'uuid', true],
+            ['145a1e72-d11d-11e8-a8d5-f2801f1b9fd1', 'uuid:1', true],
+            ['145a1e72-d11d-11e8-a8d5-f2801f1b9fd1', 'uuid:4', false],
+            ['145a1e72-d11d-11e8-a8d5-f2801f1b9fd1', 'uuid:42', false],
+            ['zf6f8cb0-c57d-11e1-9b21-0800200c9a66', 'uuid', false],
+            ['zf6f8cb0-c57d-11e1-9b21-0800200c9a66', 'uuid:1', false],
+            ['zf6f8cb0-c57d-11e1-9b21-0800200c9a66', 'uuid:4', false],
+            ['zf6f8cb0-c57d-11e1-9b21-0800200c9a66', 'uuid:42', false],
         ];
     }
 

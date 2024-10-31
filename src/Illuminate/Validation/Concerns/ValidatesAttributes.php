@@ -2550,11 +2550,12 @@ trait ValidatesAttributes
      *
      * @param  string  $attribute
      * @param  mixed  $value
+     * @param  array<int, int<-1, 8>>  $parameters
      * @return bool
      */
-    public function validateUuid($attribute, $value)
+    public function validateUuid($attribute, $value, $parameters)
     {
-        return Str::isUuid($value);
+        return Str::isUuid($value, $parameters !== null && count($parameters) === 1 ? (int) $parameters[0] : null);
     }
 
     /**

@@ -597,6 +597,12 @@ class SupportStrTest extends TestCase
         $this->assertFalse(Str::isUuid($uuid));
     }
 
+    #[DataProvider('uuidVersionList')]
+    public function testIsUuidWithVersion($uuid, $version, $passes)
+    {
+        $this->assertSame(Str::isUuid($uuid, $version), $passes);
+    }
+
     public function testIsJson()
     {
         $this->assertTrue(Str::isJson('1'));
@@ -1303,6 +1309,24 @@ class SupportStrTest extends TestCase
             ['af6f8cb-c57d-11e1-9b21-0800200c9a66'],
             ['af6f8cb0c57d11e19b210800200c9a66'],
             ['ff6f8cb0-c57da-51e1-9b21-0800200c9a66'],
+        ];
+    }
+
+    public static function uuidVersionList()
+    {
+        return [
+            ['a0a2a2d2-0b87-4a18-83f2-2529882be2de', null, true],
+            ['a0a2a2d2-0b87-4a18-83f2-2529882be2de', 1, false],
+            ['a0a2a2d2-0b87-4a18-83f2-2529882be2de', 4, true],
+            ['a0a2a2d2-0b87-4a18-83f2-2529882be2de', 42, false],
+            ['145a1e72-d11d-11e8-a8d5-f2801f1b9fd1', null, true],
+            ['145a1e72-d11d-11e8-a8d5-f2801f1b9fd1', 1, true],
+            ['145a1e72-d11d-11e8-a8d5-f2801f1b9fd1', 4, false],
+            ['145a1e72-d11d-11e8-a8d5-f2801f1b9fd1', 42, false],
+            ['zf6f8cb0-c57d-11e1-9b21-0800200c9a66', null, false],
+            ['zf6f8cb0-c57d-11e1-9b21-0800200c9a66', 1, false],
+            ['zf6f8cb0-c57d-11e1-9b21-0800200c9a66', 4, false],
+            ['zf6f8cb0-c57d-11e1-9b21-0800200c9a66', 42, false],
         ];
     }
 
