@@ -7,6 +7,7 @@ use Closure;
 use Illuminate\Container\Container;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Attributes\Authorize;
 use Illuminate\Routing\Contracts\CallableDispatcher;
 use Illuminate\Routing\Contracts\ControllerDispatcher as ControllerDispatcherContract;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -1049,7 +1050,7 @@ class Route
         $this->computedMiddleware = [];
 
         return $this->computedMiddleware = Router::uniqueMiddleware(array_merge(
-            $this->middleware(), $this->controllerMiddleware()
+            $this->middleware(), $this->controllerMiddleware(), $this->methodMiddleware(),
         ));
     }
 
@@ -1125,6 +1126,35 @@ class Route
         }
 
         return [];
+    }
+    /**
+     * Get the middleware for the route's controller method.
+     *
+     * @return array<int, string>
+     */
+    public function methodMiddleware(): array
+    {
+        if (!$this->isControllerAction()) {
+            return [];
+        }
+
+        [$controllerClass, $controllerMethod] = [
+            $this->getControllerClass(),
+            $this->getControllerMethod(),
+        ];
+
+        $methodReflection = new \ReflectionMethod($controllerClass, $controllerMethod);
+
+        $attributes = $methodReflection->getAttributes(Authorize::class);
+
+        if (empty($attributes)) {
+            return [];
+        }
+
+        return collect($attributes)
+            ->map(fn($attribute) => "can:" . implode(',', $attribute->getArguments()))
+            ->flatten()
+            ->all();
     }
 
     /**
