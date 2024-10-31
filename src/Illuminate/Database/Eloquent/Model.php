@@ -530,6 +530,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
         $fillable = $this->fillableFromArray($attributes);
 
+        $guarded = [];
+
         foreach ($fillable as $key => $value) {
             // The developers may choose to place some attributes in the "fillable" array
             // which means only those attributes may be set through mass assignment to
@@ -540,7 +542,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
                 if (isset(static::$discardedAttributeViolationCallback)) {
                     call_user_func(static::$discardedAttributeViolationCallback, $this, [$key]);
                 } else {
-                    throw new MassAssignmentException($key, get_class($this));
+                    $guarded[] = $key;
                 }
             }
         }
@@ -552,8 +554,12 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             if (isset(static::$discardedAttributeViolationCallback)) {
                 call_user_func(static::$discardedAttributeViolationCallback, $this, $keys);
             } else {
-                throw new MassAssignmentException(implode(', ', $keys), get_class($this));
+                $guarded = array_merge($guarded, $keys);
             }
+        }
+
+        if (count($guarded) > 0) {
+            throw new MassAssignmentException($guarded, get_class($this));
         }
 
         return $this;

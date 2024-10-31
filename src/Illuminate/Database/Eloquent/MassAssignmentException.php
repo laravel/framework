@@ -8,11 +8,11 @@ use Throwable;
 class MassAssignmentException extends RuntimeException
 {
     /**
-     * The affected key.
+     * The affected keys.
      *
-     * @var string
+     * @var array
      */
-    private string $key;
+    private array $keys;
 
     /**
      * The affected Eloquent model class.
@@ -24,30 +24,34 @@ class MassAssignmentException extends RuntimeException
     /**
      * Create a new exception instance.
      *
-     * @param  string  $key
+     * @param  array|string  $keys
      * @param  string  $class
      * @param  int  $code
      * @param  \Throwable|null  $previous
-     *
+     * @return void
      */
-    public function __construct(string $key, string $class, int $code = 0, ?Throwable $previous = null)
+    public function __construct(array|string $keys, string $class, int $code = 0, ?Throwable $previous = null)
     {
-        $this->key = $key;
+        $keysCollection = collect($keys)->unique()->sort()->values();
+        $this->keys = $keysCollection->all();
         $this->class = $class;
 
-        $message = "Add [{$key}] to fillable property to allow mass assignment on [{$class}].";
+        $message = sprintf(
+            "Add [%s] to fillable property to allow mass assignment on [%s].",
+            $keysCollection->implode(', '), $class
+        );
 
         parent::__construct($message, $code, $previous);
     }
 
     /**
-     * Get the affected key.
+     * Get the affected keys.
      *
-     * @return string
+     * @return array
      */
-    public function getKey(): string
+    public function getKeys(): array
     {
-        return $this->key;
+        return $this->keys;
     }
 
     /**

@@ -10,7 +10,6 @@ use Foo\Bar\EloquentModelNamespacedStub;
 use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Contracts\Database\Eloquent\CastsInboundAttributes;
-use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolverInterface;
@@ -41,7 +40,6 @@ use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection as BaseCollection;
-use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
@@ -1601,15 +1599,15 @@ class DatabaseEloquentModelTest extends TestCase
 
         Model::preventSilentlyDiscardingAttributes();
 
-        $exception = new MassAssignmentException('Foo', EloquentModelStub::class);
-        $this->assertSame('Foo', $exception->getKey());
+        $exception = new MassAssignmentException(['Foo', 'Bar'], EloquentModelStub::class);
+        $this->assertSame(['Bar', 'Foo'], $exception->getKeys());
         $this->assertSame(EloquentModelStub::class, $exception->getClass());
-        $this->assertSame('Add [Foo] to fillable property to allow mass assignment on [Illuminate\Tests\Database\EloquentModelStub].', $exception->getMessage());
+        $this->assertSame('Add [Bar, Foo] to fillable property to allow mass assignment on [Illuminate\Tests\Database\EloquentModelStub].', $exception->getMessage());
         $this->expectExceptionObject($exception);
 
         $model = new EloquentModelStub;
         $model->guard(['name', 'age']);
-        $model->fill(['Foo' => 'bar']);
+        $model->fill(['Foo' => 'bar', 'Bar' => 'baz']);
 
         Model::preventSilentlyDiscardingAttributes(false);
     }
@@ -1655,10 +1653,10 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testGlobalGuarded(): void
     {
-        $exception = new MassAssignmentException('name', EloquentModelStub::class);
-        $this->assertSame('name', $exception->getKey());
+        $exception = new MassAssignmentException(['name', 'age', 'votes'], EloquentModelStub::class);
+        $this->assertSame(['age', 'name', 'votes'], $exception->getKeys());
         $this->assertSame(EloquentModelStub::class, $exception->getClass());
-        $this->assertSame('Add [name] to fillable property to allow mass assignment on [Illuminate\Tests\Database\EloquentModelStub].', $exception->getMessage());
+        $this->assertSame('Add [age, name, votes] to fillable property to allow mass assignment on [Illuminate\Tests\Database\EloquentModelStub].', $exception->getMessage());
         $this->expectExceptionObject($exception);
 
 
