@@ -1237,9 +1237,14 @@ trait HasAttributes
      */
     protected function getEnumCaseFromValue($enumClass, $value)
     {
-        return is_subclass_of($enumClass, BackedEnum::class)
-                ? $enumClass::from($value)
-                : constant($enumClass.'::'.$value);
+        if (is_subclass_of($enumClass, BackedEnum::class)) {
+            return $enumClass::from($value);
+        }
+
+        return match (gettype($value)) {
+            'string' => constant("{$enumClass}::{$value}"),
+            'integer' => $enumClass::cases()[$value],
+        };
     }
 
     /**
@@ -1255,7 +1260,12 @@ trait HasAttributes
             throw new ValueError(sprintf('Value [%s] is not of the expected enum type [%s].', var_export($value, true), $expectedEnum));
         }
 
-        return enum_value($value);
+        return transform($value, fn ($value) => match (true) {
+            $value instanceof \BackedEnum => $value->value,
+            $value instanceof \UnitEnum => array_search($value, $value->cases()),
+
+            default => $value,
+        }, $value);
     }
 
     /**
