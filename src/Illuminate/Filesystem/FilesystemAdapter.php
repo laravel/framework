@@ -11,6 +11,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Support\Url;
 use InvalidArgumentException;
 use League\Flysystem\FilesystemAdapter as FlysystemAdapter;
 use League\Flysystem\FilesystemOperator;
@@ -790,12 +791,12 @@ class FilesystemAdapter implements CloudFilesystemContract
      */
     protected function replaceBaseUrl($uri, $url)
     {
-        $parsed = parse_url($url);
+        $parsed = Url::parse($url);
 
         return $uri
-            ->withScheme($parsed['scheme'])
-            ->withHost($parsed['host'])
-            ->withPort($parsed['port'] ?? null);
+            ->withScheme($parsed->scheme)
+            ->withHost($parsed->host)
+            ->withPort($parsed->port);
     }
 
     /**
