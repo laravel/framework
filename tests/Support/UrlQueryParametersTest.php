@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Support;
 
-use PHPUnit\Framework\TestCase;
 use Illuminate\Support\UrlQueryParameters;
+use PHPUnit\Framework\TestCase;
 
 class UrlQueryParametersTest extends TestCase
 {
@@ -61,7 +61,7 @@ class UrlQueryParametersTest extends TestCase
     {
         $params = new UrlQueryParameters([
             'foo' => 'bar',
-            'baz' => 'qux'
+            'baz' => 'qux',
         ]);
 
         $this->assertSame([

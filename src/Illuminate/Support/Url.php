@@ -18,13 +18,13 @@ class Url implements Arrayable
         public $path = null,
         public $query = null,
         public $fragment = null,
-    ) {}
+    ) {
+    }
 
     /**
      * Parse a URL string into a URL object.
      *
      * @param  string  $url
-     *
      * @return static
      */
     public static function parse($url)

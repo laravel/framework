@@ -3,8 +3,8 @@
 namespace Illuminate\Tests\Support;
 
 use Illuminate\Support\Url;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Support\UrlQueryParameters;
+use PHPUnit\Framework\TestCase;
 
 class UrlTest extends TestCase
 {

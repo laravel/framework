@@ -20,7 +20,6 @@ class UrlQueryParameters implements Arrayable
      * Parse a query string.
      *
      * @param  string|null  $query
-     *
      * @return static
      */
     public static function parse($query)
