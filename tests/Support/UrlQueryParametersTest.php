@@ -1,0 +1,72 @@
+<?php
+
+namespace Illuminate\Tests\Support;
+
+use PHPUnit\Framework\TestCase;
+use Illuminate\Support\UrlQueryParameters;
+
+class UrlQueryParametersTest extends TestCase
+{
+    public function testParse()
+    {
+        $params = UrlQueryParameters::parse('foo=bar&baz=qux');
+
+        $this->assertInstanceOf(UrlQueryParameters::class, $params);
+        $this->assertSame('bar', $params->get('foo'));
+        $this->assertSame('qux', $params->get('baz'));
+    }
+
+    public function testParseWithEmptyString()
+    {
+        $params = UrlQueryParameters::parse('');
+
+        $this->assertInstanceOf(UrlQueryParameters::class, $params);
+        $this->assertEmpty($params->toArray());
+    }
+
+    public function testParseWithNull()
+    {
+        $params = UrlQueryParameters::parse(null);
+
+        $this->assertInstanceOf(UrlQueryParameters::class, $params);
+        $this->assertEmpty($params->toArray());
+    }
+
+    public function testParseWithEncodedCharacters()
+    {
+        $params = UrlQueryParameters::parse('foo=bar%20baz');
+
+        $this->assertInstanceOf(UrlQueryParameters::class, $params);
+        $this->assertSame('bar baz', $params->get('foo'));
+    }
+
+    public function testGet()
+    {
+        $params = new UrlQueryParameters(['foo' => 'bar']);
+
+        $this->assertSame('bar', $params->get('foo'));
+        $this->assertNull($params->get('baz'));
+        $this->assertSame('default', $params->get('baz', 'default'));
+    }
+
+    public function testHas()
+    {
+        $params = new UrlQueryParameters(['foo' => 'bar']);
+
+        $this->assertTrue($params->has('foo'));
+        $this->assertFalse($params->has('baz'));
+    }
+
+    public function testToArray()
+    {
+        $params = new UrlQueryParameters([
+            'foo' => 'bar',
+            'baz' => 'qux'
+        ]);
+
+        $this->assertSame([
+            'foo' => 'bar',
+            'baz' => 'qux',
+        ], $params->toArray());
+    }
+}
