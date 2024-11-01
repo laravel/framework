@@ -39,7 +39,8 @@
         }
     },
     "suggest": {
-        "illuminate/database": "Required to use the database presence verifier (^12.0)."
+        "illuminate/database": "Required to use the database presence verifier (^12.0).",
+        "ramsey/uuid": "Required to use Validator::validateUuid() (^4.7)."
     },
     "config": {
         "sort-packages": true
