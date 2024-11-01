@@ -23,4 +23,17 @@ class SimpleRouteTest extends TestCase
 
         $this->assertSame('bar', $response->baseRequest->query('foo'));
     }
+
+    public function testSimpleRouteWitStringBackedEnumRouteNameThroughTheFramework()
+    {
+        Route::get('/', function () {
+            return 'Hello World';
+        })->name(RouteNameEnum::UserIndex);
+
+        $response = $this->get(\route(RouteNameEnum::UserIndex, ['foo' => 'bar']));
+
+        $this->assertSame('Hello World', $response->content());
+
+        $this->assertSame('bar', $response->baseRequest->query('foo'));
+    }
 }

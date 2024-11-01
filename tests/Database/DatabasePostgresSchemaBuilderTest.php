@@ -20,16 +20,13 @@ class DatabasePostgresSchemaBuilderTest extends TestCase
     {
         $connection = m::mock(Connection::class);
         $grammar = m::mock(PostgresGrammar::class);
-        $processor = m::mock(PostgresProcessor::class);
         $connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
-        $connection->shouldReceive('getPostProcessor')->andReturn($processor);
         $connection->shouldReceive('getConfig')->with('schema')->andReturn('schema');
         $connection->shouldReceive('getConfig')->with('search_path')->andReturn('public');
         $builder = new PostgresBuilder($connection);
-        $grammar->shouldReceive('compileTables')->twice()->andReturn('sql');
-        $processor->shouldReceive('processTables')->twice()->andReturn([['schema' => 'public', 'name' => 'prefix_table']]);
+        $grammar->shouldReceive('compileTableExists')->twice()->andReturn('sql');
         $connection->shouldReceive('getTablePrefix')->twice()->andReturn('prefix_');
-        $connection->shouldReceive('selectFromWriteConnection')->twice()->with('sql')->andReturn([['schema' => 'public', 'name' => 'prefix_table']]);
+        $connection->shouldReceive('scalar')->twice()->with('sql')->andReturn(1);
 
         $this->assertTrue($builder->hasTable('table'));
         $this->assertTrue($builder->hasTable('public.table'));

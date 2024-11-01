@@ -21,7 +21,7 @@
         "illuminate/macroable": "^11.0",
         "illuminate/support": "^11.0",
         "illuminate/view": "^11.0",
-        "laravel/prompts": "^0.1.12",
+        "laravel/prompts": "^0.1.20|^0.2|^0.3",
         "nunomaduro/termwind": "^2.0",
         "symfony/console": "^7.0",
         "symfony/polyfill-php83": "^1.28",

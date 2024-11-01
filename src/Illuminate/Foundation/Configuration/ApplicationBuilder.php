@@ -28,6 +28,13 @@ class ApplicationBuilder
     protected array $pendingProviders = [];
 
     /**
+     * Any additional routing callbacks that should be invoked while registering routes.
+     *
+     * @var array
+     */
+    protected array $additionalRoutingCallbacks = [];
+
+    /**
      * The Folio / page middleware that have been defined by the user.
      *
      * @var array
@@ -222,6 +229,10 @@ class ApplicationBuilder
                 }
             }
 
+            foreach ($this->additionalRoutingCallbacks as $callback) {
+                $callback();
+            }
+
             if (is_string($pages) &&
                 realpath($pages) !== false &&
                 class_exists(Folio::class)) {
@@ -257,6 +268,18 @@ class ApplicationBuilder
 
             if ($priorities = $middleware->getMiddlewarePriority()) {
                 $kernel->setMiddlewarePriority($priorities);
+            }
+
+            if ($priorityAppends = $middleware->getMiddlewarePriorityAppends()) {
+                foreach ($priorityAppends as $middleware => $after) {
+                    $kernel->addToMiddlewarePriorityAfter($after, $middleware);
+                }
+            }
+
+            if ($priorityPrepends = $middleware->getMiddlewarePriorityPrepends()) {
+                foreach ($priorityPrepends as $middleware => $before) {
+                    $kernel->addToMiddlewarePriorityBefore($before, $middleware);
+                }
             }
         });
 

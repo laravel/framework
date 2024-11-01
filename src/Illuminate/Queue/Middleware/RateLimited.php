@@ -7,6 +7,8 @@ use Illuminate\Cache\RateLimiting\Unlimited;
 use Illuminate\Container\Container;
 use Illuminate\Support\Arr;
 
+use function Illuminate\Support\enum_value;
+
 class RateLimited
 {
     /**
@@ -33,14 +35,14 @@ class RateLimited
     /**
      * Create a new middleware instance.
      *
-     * @param  string  $limiterName
+     * @param  \BackedEnum|\UnitEnum|string  $limiterName
      * @return void
      */
     public function __construct($limiterName)
     {
         $this->limiter = Container::getInstance()->make(RateLimiter::class);
 
-        $this->limiterName = $limiterName;
+        $this->limiterName = (string) enum_value($limiterName);
     }
 
     /**

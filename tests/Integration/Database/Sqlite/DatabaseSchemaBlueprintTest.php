@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Integration\Database;
+namespace Illuminate\Tests\Integration\Database\Sqlite;
 
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Grammars\MySqlGrammar;
@@ -9,9 +9,11 @@ use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
 use Illuminate\Database\Schema\Grammars\SqlServerGrammar;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Orchestra\Testbench\Attributes\RequiresDatabase;
 use Orchestra\Testbench\TestCase;
 use RuntimeException;
 
+#[RequiresDatabase('sqlite')]
 class DatabaseSchemaBlueprintTest extends TestCase
 {
     protected function setUp(): void
@@ -321,7 +323,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $queries = $blueprint->toSql(DB::connection(), new SQLiteGrammar);
 
         $expected = [
-            'create table "__temp__products" ("changed_col" text not null, "timestamp_col" datetime not null default CURRENT_TIMESTAMP, "integer_col" integer not null default \'123\', "string_col" varchar not null default \'value\')',
+            'create table "__temp__products" ("changed_col" text not null, "timestamp_col" datetime not null default (CURRENT_TIMESTAMP), "integer_col" integer not null default (\'123\'), "string_col" varchar not null default (\'value\'))',
             'insert into "__temp__products" ("changed_col", "timestamp_col", "integer_col", "string_col") select "changed_col", "timestamp_col", "integer_col", "string_col" from "products"',
             'drop table "products"',
             'alter table "__temp__products" rename to "products"',

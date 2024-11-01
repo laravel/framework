@@ -8,6 +8,8 @@ use Illuminate\Support\Arr;
 use PHPUnit\Framework\Assert as PHPUnit;
 use RuntimeException;
 
+use function Illuminate\Support\enum_value;
+
 trait Queueable
 {
     /**
@@ -76,12 +78,12 @@ trait Queueable
     /**
      * Set the desired connection for the job.
      *
-     * @param  string|null  $connection
+     * @param  \BackedEnum|string|null  $connection
      * @return $this
      */
     public function onConnection($connection)
     {
-        $this->connection = $connection;
+        $this->connection = enum_value($connection);
 
         return $this;
     }
@@ -89,12 +91,12 @@ trait Queueable
     /**
      * Set the desired queue for the job.
      *
-     * @param  string|null  $queue
+     * @param  \BackedEnum|string|null  $queue
      * @return $this
      */
     public function onQueue($queue)
     {
-        $this->queue = $queue;
+        $this->queue = enum_value($queue);
 
         return $this;
     }
@@ -102,13 +104,15 @@ trait Queueable
     /**
      * Set the desired connection for the chain.
      *
-     * @param  string|null  $connection
+     * @param  \BackedEnum|string|null  $connection
      * @return $this
      */
     public function allOnConnection($connection)
     {
-        $this->chainConnection = $connection;
-        $this->connection = $connection;
+        $resolvedConnection = enum_value($connection);
+
+        $this->chainConnection = $resolvedConnection;
+        $this->connection = $resolvedConnection;
 
         return $this;
     }
@@ -116,13 +120,15 @@ trait Queueable
     /**
      * Set the desired queue for the chain.
      *
-     * @param  string|null  $queue
+     * @param  \BackedEnum|string|null  $queue
      * @return $this
      */
     public function allOnQueue($queue)
     {
-        $this->chainQueue = $queue;
-        $this->queue = $queue;
+        $resolvedQueue = enum_value($queue);
+
+        $this->chainQueue = $resolvedQueue;
+        $this->queue = $resolvedQueue;
 
         return $this;
     }
@@ -197,7 +203,9 @@ trait Queueable
      */
     public function chain($chain)
     {
-        $this->chained = collect($chain)->map(function ($job) {
+        $jobs = ChainedBatch::prepareNestedBatches(collect($chain));
+
+        $this->chained = $jobs->map(function ($job) {
             return $this->serializeJob($job);
         })->all();
 
@@ -212,7 +220,9 @@ trait Queueable
      */
     public function prependToChain($job)
     {
-        $this->chained = Arr::prepend($this->chained, $this->serializeJob($job));
+        $jobs = ChainedBatch::prepareNestedBatches(collect([$job]));
+
+        $this->chained = Arr::prepend($this->chained, $this->serializeJob($jobs->first()));
 
         return $this;
     }
@@ -225,7 +235,9 @@ trait Queueable
      */
     public function appendToChain($job)
     {
-        $this->chained = array_merge($this->chained, [$this->serializeJob($job)]);
+        $jobs = ChainedBatch::prepareNestedBatches(collect([$job]));
+
+        $this->chained = array_merge($this->chained, [$this->serializeJob($jobs->first())]);
 
         return $this;
     }

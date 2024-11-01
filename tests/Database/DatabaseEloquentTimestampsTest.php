@@ -113,6 +113,12 @@ class DatabaseEloquentTimestampsTest extends TestCase
 
         $user->withoutTimestamps(function () use ($user) {
             $this->assertFalse($user->usesTimestamps());
+
+            $user->withoutTimestamps(function () use ($user) {
+                $this->assertFalse($user->usesTimestamps());
+            });
+
+            $this->assertFalse($user->usesTimestamps());
             $user->update([
                 'email' => 'bar@example.com',
             ]);

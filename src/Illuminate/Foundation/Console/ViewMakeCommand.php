@@ -77,7 +77,7 @@ class ViewMakeCommand extends GeneratorCommand
     {
         $name = trim($this->argument('name'));
 
-        $name = str_replace(['\\', '.'], '/', $this->argument('name'));
+        $name = str_replace(['\\', '.'], '/', $name);
 
         return $name;
     }

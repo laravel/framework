@@ -393,7 +393,7 @@ if (! function_exists('throw_if')) {
      * @param  TValue  $condition
      * @param  TException|class-string<TException>|string  $exception
      * @param  mixed  ...$parameters
-     * @return TValue
+     * @return ($condition is true ? never : ($condition is non-empty-mixed ? never : TValue))
      *
      * @throws TException
      */
@@ -421,7 +421,7 @@ if (! function_exists('throw_unless')) {
      * @param  TValue  $condition
      * @param  TException|class-string<TException>|string  $exception
      * @param  mixed  ...$parameters
-     * @return TValue
+     * @return ($condition is false ? never : ($condition is non-empty-mixed ? TValue : never))
      *
      * @throws TException
      */

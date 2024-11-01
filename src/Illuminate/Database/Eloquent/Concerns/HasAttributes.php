@@ -42,6 +42,8 @@ use ReflectionNamedType;
 use RuntimeException;
 use ValueError;
 
+use function Illuminate\Support\enum_value;
+
 trait HasAttributes
 {
     /**
@@ -123,7 +125,7 @@ trait HasAttributes
     /**
      * The storage format of the model's date columns.
      *
-     * @var string
+     * @var string|null
      */
     protected $dateFormat;
 
@@ -1253,9 +1255,7 @@ trait HasAttributes
             throw new ValueError(sprintf('Value [%s] is not of the expected enum type [%s].', var_export($value, true), $expectedEnum));
         }
 
-        return $value instanceof BackedEnum
-                ? $value->value
-                : $value->name;
+        return enum_value($value);
     }
 
     /**
@@ -1332,7 +1332,11 @@ trait HasAttributes
      */
     public function fromJson($value, $asObject = false)
     {
-        return Json::decode($value ?? '', ! $asObject);
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        return Json::decode($value, ! $asObject);
     }
 
     /**
@@ -1396,7 +1400,7 @@ trait HasAttributes
             return Hash::make($value);
         }
 
-        /** @phpstan-ignore-next-line */
+        /** @phpstan-ignore staticMethod.notFound */
         if (! Hash::verifyConfiguration($value)) {
             throw new RuntimeException("Could not verify the hashed value's configuration.");
         }
@@ -1616,7 +1620,7 @@ trait HasAttributes
     /**
      * Get the attributes that should be cast.
      *
-     * @return array
+     * @return array<string, string>
      */
     protected function casts()
     {

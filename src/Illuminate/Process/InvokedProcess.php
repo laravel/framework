@@ -51,6 +51,18 @@ class InvokedProcess implements InvokedProcessContract
     }
 
     /**
+     * Stop the process if it is still running.
+     *
+     * @param  float  $timeout
+     * @param  int|null  $signal
+     * @return int|null
+     */
+    public function stop(float $timeout = 10, ?int $signal = null)
+    {
+        return $this->process->stop($timeout, $signal);
+    }
+
+    /**
      * Determine if the process is still running.
      *
      * @return bool
@@ -112,6 +124,25 @@ class InvokedProcess implements InvokedProcessContract
     {
         try {
             $this->process->wait($output);
+
+            return new ProcessResult($this->process);
+        } catch (SymfonyTimeoutException $e) {
+            throw new ProcessTimedOutException($e, new ProcessResult($this->process));
+        }
+    }
+
+    /**
+     * Wait until the given callback returns true.
+     *
+     * @param  callable|null  $output
+     * @return \Illuminate\Process\ProcessResult
+     *
+     * @throws \Illuminate\Process\Exceptions\ProcessTimedOutException
+     */
+    public function waitUntil(?callable $output = null)
+    {
+        try {
+            $this->process->waitUntil($output);
 
             return new ProcessResult($this->process);
         } catch (SymfonyTimeoutException $e) {

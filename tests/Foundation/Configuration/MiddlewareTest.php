@@ -132,10 +132,7 @@ class MiddlewareTest extends TestCase
 
         $reflection = new ReflectionClass($middleware);
         $method = $reflection->getMethod('proxies');
-        $method->setAccessible(true);
-
         $property = $reflection->getProperty('proxies');
-        $property->setAccessible(true);
 
         $this->assertNull($method->invoke($middleware));
 
@@ -169,15 +166,13 @@ class MiddlewareTest extends TestCase
 
         $reflection = new ReflectionClass($middleware);
         $method = $reflection->getMethod('headers');
-        $method->setAccessible(true);
-
         $property = $reflection->getProperty('headers');
-        $property->setAccessible(true);
 
         $this->assertEquals(Request::HEADER_X_FORWARDED_FOR |
             Request::HEADER_X_FORWARDED_HOST |
             Request::HEADER_X_FORWARDED_PORT |
             Request::HEADER_X_FORWARDED_PROTO |
+            Request::HEADER_X_FORWARDED_PREFIX |
             Request::HEADER_X_FORWARDED_AWS_ELB, $method->invoke($middleware));
 
         $property->setValue($middleware, Request::HEADER_X_FORWARDED_AWS_ELB);

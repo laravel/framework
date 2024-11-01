@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Providers;
 
+use Illuminate\Console\Events\CommandFinished;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Console\Kernel as ConsoleKernel;
 use Illuminate\Contracts\Container\Container;
@@ -22,7 +23,9 @@ use Illuminate\Foundation\Vite;
 use Illuminate\Http\Client\Factory as HttpFactory;
 use Illuminate\Http\Request;
 use Illuminate\Log\Events\MessageLogged;
+use Illuminate\Queue\Events\JobAttempted;
 use Illuminate\Support\AggregateServiceProvider;
+use Illuminate\Support\Defer\DeferredCallbackCollection;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Testing\LoggedExceptionCollection;
 use Illuminate\Testing\ParallelTestingServiceProvider;
@@ -86,6 +89,7 @@ class FoundationServiceProvider extends AggregateServiceProvider
         $this->registerDumper();
         $this->registerRequestValidation();
         $this->registerRequestSignatureValidation();
+        $this->registerDeferHandler();
         $this->registerExceptionTracking();
         $this->registerExceptionRenderer();
         $this->registerMaintenanceModeManager();
@@ -135,8 +139,6 @@ class FoundationServiceProvider extends AggregateServiceProvider
      * Register the "validate" macro on the request.
      *
      * @return void
-     *
-     * @throws \Illuminate\Validation\ValidationException
      */
     public function registerRequestValidation()
     {
@@ -187,6 +189,26 @@ class FoundationServiceProvider extends AggregateServiceProvider
     }
 
     /**
+     * Register the "defer" function termination handler.
+     *
+     * @return void
+     */
+    protected function registerDeferHandler()
+    {
+        $this->app->scoped(DeferredCallbackCollection::class);
+
+        $this->app['events']->listen(function (CommandFinished $event) {
+            app(DeferredCallbackCollection::class)->invokeWhen(fn ($callback) => app()->runningInConsole() && ($event->exitCode === 0 || $callback->always)
+            );
+        });
+
+        $this->app['events']->listen(function (JobAttempted $event) {
+            app(DeferredCallbackCollection::class)->invokeWhen(fn ($callback) => $event->connectionName !== 'sync' && ($event->successful() || $callback->always)
+            );
+        });
+    }
+
+    /**
      * Register an event listener to track logged exceptions.
      *
      * @return void
@@ -217,6 +239,8 @@ class FoundationServiceProvider extends AggregateServiceProvider
      */
     protected function registerExceptionRenderer()
     {
+        $this->loadViewsFrom(__DIR__.'/../Exceptions/views', 'laravel-exceptions');
+
         if (! $this->app->hasDebugModeEnabled()) {
             return;
         }

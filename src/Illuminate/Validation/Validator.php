@@ -313,7 +313,7 @@ class Validator implements ValidatorContract
     /**
      * The exception to throw upon failure.
      *
-     * @var string
+     * @var class-string<\Illuminate\Validation\ValidationException>
      */
     protected $exception = ValidationException::class;
 
@@ -593,7 +593,7 @@ class Validator implements ValidatorContract
             $value = data_get($this->getData(), $key, $missingValue);
 
             if ($this->excludeUnvalidatedArrayKeys &&
-                in_array('array', $rules) &&
+                (in_array('array', $rules) || in_array('list', $rules)) &&
                 $value !== null &&
                 ! empty(preg_grep('/^'.preg_quote($key, '/').'\.+/', array_keys($this->getRules())))) {
                 continue;
@@ -1513,7 +1513,7 @@ class Validator implements ValidatorContract
     /**
      * Get the exception to throw upon failed validation.
      *
-     * @return string
+     * @return class-string<\Illuminate\Validation\ValidationException>
      */
     public function getException()
     {
@@ -1523,7 +1523,7 @@ class Validator implements ValidatorContract
     /**
      * Set the exception to throw upon failed validation.
      *
-     * @param  string  $exception
+     * @param  class-string<\Illuminate\Validation\ValidationException>  $exception
      * @return $this
      *
      * @throws \InvalidArgumentException

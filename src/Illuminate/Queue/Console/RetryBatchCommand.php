@@ -15,7 +15,8 @@ class RetryBatchCommand extends Command implements Isolatable
      *
      * @var string
      */
-    protected $signature = 'queue:retry-batch {id : The ID of the batch whose failed jobs should be retried}';
+    protected $signature = 'queue:retry-batch
+                            {id?* : The ID of the batch whose failed jobs should be retried}';
 
     /**
      * The console command description.
@@ -31,25 +32,32 @@ class RetryBatchCommand extends Command implements Isolatable
      */
     public function handle()
     {
-        $batch = $this->laravel[BatchRepository::class]->find($id = $this->argument('id'));
+        $batchesFound = count($ids = $this->getBatchJobIds()) > 0;
 
-        if (! $batch) {
-            $this->components->error("Unable to find a batch with ID [{$id}].");
-
-            return 1;
-        } elseif (empty($batch->failedJobIds)) {
-            $this->components->error('The given batch does not contain any failed jobs.');
-
-            return 1;
+        if ($batchesFound) {
+            $this->components->info('Pushing failed batch jobs back onto the queue.');
         }
 
-        $this->components->info("Pushing failed queue jobs of the batch [$id] back onto the queue.");
+        foreach ($ids as $batchId) {
+            $batch = $this->laravel[BatchRepository::class]->find($batchId);
 
-        foreach ($batch->failedJobIds as $failedJobId) {
-            $this->components->task($failedJobId, fn () => $this->callSilent('queue:retry', ['id' => $failedJobId]) == 0);
+            if (! $batch) {
+                $this->components->error("Unable to find a batch with ID [{$batchId}].");
+            } elseif (empty($batch->failedJobIds)) {
+                $this->components->error('The given batch does not contain any failed jobs.');
+            }
+
+            $this->components->info("Pushing failed queue jobs of the batch [$batchId] back onto the queue.");
+
+            foreach ($batch->failedJobIds as $failedJobId) {
+                $this->components->task(
+                    $failedJobId,
+                    fn () => $this->callSilent('queue:retry', ['id' => $failedJobId]) == 0
+                );
+            }
+
+            $this->newLine();
         }
-
-        $this->newLine();
     }
 
     /**
@@ -60,5 +68,17 @@ class RetryBatchCommand extends Command implements Isolatable
     public function isolatableId()
     {
         return $this->argument('id');
+    }
+
+    /**
+     * Get the batch IDs to be retried.
+     *
+     * @return array
+     */
+    protected function getBatchJobIds()
+    {
+        $ids = (array) $this->argument('id');
+
+        return array_values(array_filter(array_unique($ids)));
     }
 }

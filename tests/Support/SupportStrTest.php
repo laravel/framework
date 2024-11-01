@@ -377,6 +377,12 @@ class SupportStrTest extends TestCase
         $this->assertEquals($expected, Str::containsAll($haystack, $needles, $ignoreCase));
     }
 
+    #[DataProvider('strDoesntContainProvider')]
+    public function testStrDoesntContain($haystack, $needles, $expected, $ignoreCase = false)
+    {
+        $this->assertEquals($expected, Str::doesntContain($haystack, $needles, $ignoreCase));
+    }
+
     public function testConvertCase()
     {
         // Upper Case Conversion
@@ -529,6 +535,7 @@ class SupportStrTest extends TestCase
     public function testIsUrl()
     {
         $this->assertTrue(Str::isUrl('https://laravel.com'));
+        $this->assertTrue(Str::isUrl('http://localhost'));
         $this->assertFalse(Str::isUrl('invalid url'));
     }
 
@@ -861,6 +868,16 @@ class SupportStrTest extends TestCase
         );
 
         $this->assertSame("\xE9", Str::trim(" \xE9 "));
+
+        $trimDefaultChars = [' ', "\n", "\r", "\t", "\v", "\0"];
+
+        foreach ($trimDefaultChars as $char) {
+            $this->assertSame('', Str::trim(" {$char} "));
+            $this->assertSame(trim(" {$char} "), Str::trim(" {$char} "));
+
+            $this->assertSame('foo bar', Str::trim("{$char} foo bar {$char}"));
+            $this->assertSame(trim("{$char} foo bar {$char}"), Str::trim("{$char} foo bar {$char}"));
+        }
     }
 
     public function testLtrim()
@@ -881,6 +898,16 @@ class SupportStrTest extends TestCase
             ')
         );
         $this->assertSame("\xE9 ", Str::ltrim(" \xE9 "));
+
+        $ltrimDefaultChars = [' ', "\n", "\r", "\t", "\v", "\0"];
+
+        foreach ($ltrimDefaultChars as $char) {
+            $this->assertSame('', Str::ltrim(" {$char} "));
+            $this->assertSame(ltrim(" {$char} "), Str::ltrim(" {$char} "));
+
+            $this->assertSame("foo bar {$char}", Str::ltrim("{$char} foo bar {$char}"));
+            $this->assertSame(ltrim("{$char} foo bar {$char}"), Str::ltrim("{$char} foo bar {$char}"));
+        }
     }
 
     public function testRtrim()
@@ -902,6 +929,16 @@ class SupportStrTest extends TestCase
         );
 
         $this->assertSame(" \xE9", Str::rtrim(" \xE9 "));
+
+        $rtrimDefaultChars = [' ', "\n", "\r", "\t", "\v", "\0"];
+
+        foreach ($rtrimDefaultChars as $char) {
+            $this->assertSame('', Str::rtrim(" {$char} "));
+            $this->assertSame(rtrim(" {$char} "), Str::rtrim(" {$char} "));
+
+            $this->assertSame("{$char} foo bar", Str::rtrim("{$char} foo bar {$char}"));
+            $this->assertSame(rtrim("{$char} foo bar {$char}"), Str::rtrim("{$char} foo bar {$char}"));
+        }
     }
 
     public function testSquish()
@@ -1251,6 +1288,13 @@ class SupportStrTest extends TestCase
             ['Taylor Otwell', ['taylor'], true, true],
             ['Taylor Otwell', ['taylor', 'xxx'], false, false],
             ['Taylor Otwell', ['taylor', 'xxx'], false, true],
+        ];
+    }
+
+    public static function strDoesntContainProvider()
+    {
+        return [
+            ['Tar', 'ylo', true, true],
         ];
     }
 

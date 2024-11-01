@@ -7,6 +7,7 @@ use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Queue\Factory as QueueManager;
 use Illuminate\Database\DetectsLostConnections;
+use Illuminate\Queue\Events\JobAttempted;
 use Illuminate\Queue\Events\JobExceptionOccurred;
 use Illuminate\Queue\Events\JobPopped;
 use Illuminate\Queue\Events\JobPopping;
@@ -345,8 +346,8 @@ class Worker
      */
     protected function getNextJob($connection, $queue)
     {
-        $popJobCallback = function ($queue) use ($connection) {
-            return $connection->pop($queue);
+        $popJobCallback = function ($queue, $index = 0) use ($connection) {
+            return $connection->pop($queue, $index);
         };
 
         $this->raiseBeforeJobPopEvent($connection->getConnectionName());
@@ -359,8 +360,8 @@ class Worker
                 );
             }
 
-            foreach (explode(',', $queue) as $queue) {
-                if (! is_null($job = $popJobCallback($queue))) {
+            foreach (explode(',', $queue) as $index => $queue) {
+                if (! is_null($job = $popJobCallback($queue, $index))) {
                     $this->raiseAfterJobPopEvent($connection->getConnectionName(), $job);
 
                     return $job;
@@ -440,7 +441,13 @@ class Worker
 
             $this->raiseAfterJobEvent($connectionName, $job);
         } catch (Throwable $e) {
+            $exceptionOccurred = true;
+
             $this->handleJobException($connectionName, $job, $options, $e);
+        } finally {
+            $this->events->dispatch(new JobAttempted(
+                $connectionName, $job, $exceptionOccurred ?? false
+            ));
         }
     }
 

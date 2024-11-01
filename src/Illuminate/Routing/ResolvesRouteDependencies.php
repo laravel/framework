@@ -2,6 +2,7 @@
 
 namespace Illuminate\Routing;
 
+use Illuminate\Container\Util;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Reflector;
 use ReflectionClass;
@@ -57,6 +58,8 @@ trait ResolvesRouteDependencies
                       $parameter->isDefaultValueAvailable()) {
                 $this->spliceIntoParameters($parameters, $key, $parameter->getDefaultValue());
             }
+
+            $this->container->fireAfterResolvingAttributeCallbacks($parameter->getAttributes(), $instance);
         }
 
         return $parameters;
@@ -72,6 +75,10 @@ trait ResolvesRouteDependencies
      */
     protected function transformDependency(ReflectionParameter $parameter, $parameters, $skippableValue)
     {
+        if ($attribute = Util::getContextualAttributeFromDependency($parameter)) {
+            return $this->container->resolveFromAttribute($attribute);
+        }
+
         $className = Reflector::getParameterClassName($parameter);
 
         // If the parameter has a type-hinted class, we will check to see if it is already in

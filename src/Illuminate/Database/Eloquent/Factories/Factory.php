@@ -678,7 +678,7 @@ abstract class Factory
     /**
      * Add a new "after creating" callback to the model definition.
      *
-     * @param  \Closure(TModel): mixed  $callback
+     * @param  \Closure(TModel, \Illuminate\Database\Eloquent\Model|null): mixed  $callback
      * @return static
      */
     public function afterCreating(Closure $callback)
@@ -726,6 +726,16 @@ abstract class Factory
     public function count(?int $count)
     {
         return $this->newInstance(['count' => $count]);
+    }
+
+    /**
+     * Get the name of the database connection that is used to generate models.
+     *
+     * @return string
+     */
+    public function getConnectionName()
+    {
+        return $this->connection;
     }
 
     /**

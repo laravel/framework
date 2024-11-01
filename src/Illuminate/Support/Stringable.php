@@ -478,11 +478,12 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      * Convert inline Markdown into HTML.
      *
      * @param  array  $options
+     * @param  array  $extensions
      * @return static
      */
-    public function inlineMarkdown(array $options = [])
+    public function inlineMarkdown(array $options = [], array $extensions = [])
     {
-        return new static(Str::inlineMarkdown($this->value, $options));
+        return new static(Str::inlineMarkdown($this->value, $options, $extensions));
     }
 
     /**

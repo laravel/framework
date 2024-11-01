@@ -24,6 +24,8 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Traits\Macroable;
 
+use function Illuminate\Support\defer;
+
 /**
  * @mixin \Illuminate\Contracts\Cache\Store
  */
@@ -99,11 +101,9 @@ class Repository implements ArrayAccess, CacheContract
     /**
      * Retrieve an item from the cache by key.
      *
-     * @template TCacheValue
-     *
      * @param  array|string  $key
-     * @param  TCacheValue|(\Closure(): TCacheValue)  $default
-     * @return (TCacheValue is null ? mixed : TCacheValue)
+     * @param  mixed  $default
+     * @return mixed
      */
     public function get($key, $default = null): mixed
     {
@@ -196,11 +196,9 @@ class Repository implements ArrayAccess, CacheContract
     /**
      * Retrieve an item from the cache and delete it.
      *
-     * @template TCacheValue
-     *
      * @param  array|string  $key
-     * @param  TCacheValue|(\Closure(): TCacheValue)  $default
-     * @return (TCacheValue is null ? mixed : TCacheValue)
+     * @param  mixed  $default
+     * @return mixed
      */
     public function pull($key, $default = null)
     {
@@ -467,6 +465,57 @@ class Repository implements ArrayAccess, CacheContract
         }
 
         $this->forever($key, $value = $callback());
+
+        return $value;
+    }
+
+    /**
+     * Retrieve an item from the cache by key, refreshing it in the background if it is stale.
+     *
+     * @template TCacheValue
+     *
+     * @param  string  $key
+     * @param  array{ 0: \DateTimeInterface|\DateInterval|int, 1: \DateTimeInterface|\DateInterval|int }  $ttl
+     * @param  (callable(): TCacheValue)  $callback
+     * @param  array{ seconds?: int, owner?: string }|null  $lock
+     * @return TCacheValue
+     */
+    public function flexible($key, $ttl, $callback, $lock = null)
+    {
+        [
+            $key => $value,
+            "illuminate:cache:flexible:created:{$key}" => $created,
+        ] = $this->many([$key, "illuminate:cache:flexible:created:{$key}"]);
+
+        if (in_array(null, [$value, $created], true)) {
+            return tap(value($callback), fn ($value) => $this->putMany([
+                $key => $value,
+                "illuminate:cache:flexible:created:{$key}" => Carbon::now()->getTimestamp(),
+            ], $ttl[1]));
+        }
+
+        if (($created + $this->getSeconds($ttl[0])) > Carbon::now()->getTimestamp()) {
+            return $value;
+        }
+
+        $refresh = function () use ($key, $ttl, $callback, $lock, $created) {
+            $this->store->lock(
+                "illuminate:cache:flexible:lock:{$key}",
+                $lock['seconds'] ?? 0,
+                $lock['owner'] ?? null,
+            )->get(function () use ($key, $callback, $created, $ttl) {
+                if ($created !== $this->get("illuminate:cache:flexible:created:{$key}")) {
+                    return;
+                }
+
+                $this->putMany([
+                    $key => value($callback),
+                    "illuminate:cache:flexible:created:{$key}" => Carbon::now()->getTimestamp(),
+                ], $ttl[1]);
+            });
+        };
+
+        defer($refresh, "illuminate:cache:flexible:{$key}");
 
         return $value;
     }

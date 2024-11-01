@@ -46,7 +46,6 @@ use Illuminate\Tests\Integration\Http\Fixtures\ResourceWithPreservedKeys;
 use Illuminate\Tests\Integration\Http\Fixtures\SerializablePostResource;
 use Illuminate\Tests\Integration\Http\Fixtures\Subscription;
 use LogicException;
-use Mockery as m;
 use Orchestra\Testbench\TestCase;
 
 class ResourceTest extends TestCase
@@ -1503,12 +1502,16 @@ class ResourceTest extends TestCase
 
     public function testPostTooLargeException()
     {
-        $this->expectException(PostTooLargeException::class);
-
-        $request = m::mock(Request::class, ['server' => ['CONTENT_LENGTH' => '2147483640']]);
+        $request = new Request(server: ['CONTENT_LENGTH' => '4']);
         $post = new ValidatePostSize;
-        $post->handle($request, function () {
-        });
+        $post->handle($request, fn () => null);
+
+        $this->expectException(PostTooLargeException::class);
+        $this->expectExceptionMessage('The POST data is too large.');
+
+        $request = new Request(server: ['CONTENT_LENGTH' => '2147483640']);
+        $post = new ValidatePostSize;
+        $post->handle($request, fn () => null);
     }
 
     public function testLeadingMergeKeyedValueIsMergedCorrectlyWhenFirstValueIsMissing()

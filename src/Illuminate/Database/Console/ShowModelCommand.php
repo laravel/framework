@@ -2,7 +2,6 @@
 
 namespace Illuminate\Database\Console;
 
-use BackedEnum;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -14,7 +13,8 @@ use ReflectionNamedType;
 use SplFileObject;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Output\OutputInterface;
-use UnitEnum;
+
+use function Illuminate\Support\enum_value;
 
 #[AsCommand(name: 'model:show')]
 class ShowModelCommand extends DatabaseInspectionCommand
@@ -474,11 +474,7 @@ class ShowModelCommand extends DatabaseInspectionCommand
     {
         $attributeDefault = $model->getAttributes()[$column['name']] ?? null;
 
-        return match (true) {
-            $attributeDefault instanceof BackedEnum => $attributeDefault->value,
-            $attributeDefault instanceof UnitEnum => $attributeDefault->name,
-            default => $attributeDefault ?? $column['default'],
-        };
+        return enum_value($attributeDefault, $column['default']);
     }
 
     /**

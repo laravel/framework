@@ -2,7 +2,9 @@
 
 namespace Illuminate\Tests\Cookie;
 
+use ArgumentCountError;
 use Illuminate\Cookie\CookieJar;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use ReflectionObject;
 use Symfony\Component\HttpFoundation\Cookie;
@@ -34,7 +36,7 @@ class CookieTest extends TestCase
         $this->assertTrue($c3->getExpiresTime() < time());
     }
 
-    public function testCookiesAreCreatedWithProperOptionsUsingDefaultPathAndDomain()
+    public function testCookiesAreCreatedWithProperOptionsUsingDefaultPathAndDomain(): void
     {
         $cookie = $this->getCreator();
         $cookie->setDefaultPathAndDomain('/path', '/domain', true, 'lax');
@@ -44,6 +46,7 @@ class CookieTest extends TestCase
         $this->assertSame('/domain', $c->getDomain());
         $this->assertSame('/path', $c->getPath());
         $this->assertSame('lax', $c->getSameSite());
+        $this->assertTrue($c->isHttpOnly());
     }
 
     public function testCookiesCanSetSecureOptionUsingDefaultPathAndDomain()
@@ -58,7 +61,42 @@ class CookieTest extends TestCase
         $this->assertSame('lax', $c->getSameSite());
     }
 
-    public function testQueuedCookies()
+    public function testQueuedCookiesWithoutName(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        $cookie = $this->getCreator();
+        $cookie->queue($cookie->make('', 'bar'));
+    }
+
+    public function testQueuedCookiesWithInvalidParameter(): void
+    {
+        $this->expectException(ArgumentCountError::class);
+
+        $cookie = $this->getCreator();
+        $cookie->queue('invalidCookie');
+    }
+
+    public function testQueuedCookiesWithHandlingEmptyValues(): void
+    {
+        $cookie = $this->getCreator();
+        $cookie->queue($cookie->make('foo', ''));
+        $this->assertTrue($cookie->hasQueued('foo'));
+        $this->assertEquals('', $cookie->queued('foo')->getValue());
+    }
+
+    public function testQueuedCookiesWithRepeatedValue(): void
+    {
+        $cookie = $this->getCreator();
+        $cookie->queue($cookie->make('foo', 'newBar'));
+        $this->assertTrue($cookie->hasQueued('foo'));
+        $this->assertEquals('newBar', $cookie->queued('foo')->getValue());
+
+        $this->expectException(ArgumentCountError::class);
+        $cookie->queue('invalidCookie');
+    }
+
+    public function testQueuedCookies(): void
     {
         $cookie = $this->getCreator();
         $this->assertEmpty($cookie->getQueuedCookies());
@@ -95,9 +133,13 @@ class CookieTest extends TestCase
     public function testHasQueued(): void
     {
         $cookieJar = $this->getCreator();
+        // test empty queue
+        $this->assertFalse($cookieJar->hasQueued('foo'));
+
         $cookie = $cookieJar->make('foo', 'bar');
         $cookieJar->queue($cookie);
         $this->assertTrue($cookieJar->hasQueued('foo'));
+        $this->assertFalse($cookieJar->hasQueued('nonexistent'));
     }
 
     public function testHasQueuedWithPath(): void
@@ -128,12 +170,26 @@ class CookieTest extends TestCase
         $this->assertCount(1, $cookieJar->getQueuedCookies());
     }
 
-    public function testUnqueue()
+    public function testUnqueue(): void
     {
         $cookie = $this->getCreator();
+
+        $cookie->unqueue('nonexistent');
+        $this->assertEmpty($cookie->getQueuedCookies());
+
         $cookie->queue($cookie->make('foo', 'bar'));
         $cookie->unqueue('foo');
         $this->assertEmpty($cookie->getQueuedCookies());
+    }
+
+    public function testUnqueueMultipleCookies(): void
+    {
+        $cookie = $this->getCreator();
+        $cookie->queue($cookie->make('foo', 'bar'));
+        $cookie->queue($cookie->make('baz', 'qux'));
+        $cookie->unqueue('foo');
+        $this->assertTrue($cookie->hasQueued('baz'));
+        $this->assertFalse($cookie->hasQueued('foo'));
     }
 
     public function testUnqueueWithPath(): void

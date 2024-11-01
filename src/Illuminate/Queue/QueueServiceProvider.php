@@ -198,7 +198,9 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
             };
 
             $resetScope = function () use ($app) {
-                $app['log']->flushSharedContext();
+                if (method_exists($app['log'], 'flushSharedContext')) {
+                    $app['log']->flushSharedContext();
+                }
 
                 if (method_exists($app['log'], 'withoutContext')) {
                     $app['log']->withoutContext();

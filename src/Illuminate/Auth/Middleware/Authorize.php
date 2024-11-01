@@ -6,6 +6,8 @@ use Closure;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Database\Eloquent\Model;
 
+use function Illuminate\Support\enum_value;
+
 class Authorize
 {
     /**
@@ -29,13 +31,13 @@ class Authorize
     /**
      * Specify the ability and models for the middleware.
      *
-     * @param  string  $ability
+     * @param  \BackedEnum|string  $ability
      * @param  string  ...$models
      * @return string
      */
     public static function using($ability, ...$models)
     {
-        return static::class.':'.implode(',', [$ability, ...$models]);
+        return static::class.':'.implode(',', [enum_value($ability), ...$models]);
     }
 
     /**
