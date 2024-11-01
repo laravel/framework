@@ -369,7 +369,7 @@ if (! function_exists('tap')) {
      *
      * @param  TValue  $value
      * @param  (callable(TValue): mixed)|null  $callback
-     * @return ($callback is null ? \Illuminate\Support\HigherOrderTapProxy : TValue)
+     * @return TValue|\Illuminate\Support\HigherOrderTapProxy<TValue>
      */
     function tap($value, $callback = null)
     {
