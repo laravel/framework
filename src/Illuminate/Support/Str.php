@@ -617,6 +617,7 @@ class Str
         } catch (InvalidUuidStringException $ex) {
             return false;
         }
+
         $fields = $factoryUuid->getFields();
 
         if (! ($fields instanceof FieldsInterface)) {
