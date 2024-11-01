@@ -77,10 +77,10 @@ trait ResolvesRouteDependencies
     /**
      * Attempt to transform the given parameter into a class instance.
      *
-     * @param  ReflectionParameter $parameter
-     * @param  array $parameters
+     * @param  ReflectionParameter  $parameter
+     * @param  array  $parameters
      * @param  $className
-     * @param  object $skippableValue
+     * @param  object  $skippableValue
      * @param  $resolvedInterfaces
      * @return mixed
      *
@@ -134,7 +134,7 @@ trait ResolvesRouteDependencies
      * in the list of parameters.
      *
      * @param  $className
-     * @param  array $parameters
+     * @param  array  $parameters
      * @param  $resolvedInterfaces
      * @return bool
      */
