@@ -1401,7 +1401,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Delete the model from the database.
      *
-     * @return bool|null
+     * @return bool
      *
      * @throws \LogicException
      */
