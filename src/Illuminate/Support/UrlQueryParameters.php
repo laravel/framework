@@ -1,6 +1,7 @@
 <?php
 
 namespace Illuminate\Support;
+
 use Illuminate\Contracts\Support\Arrayable;
 
 class UrlQueryParameters implements Arrayable
@@ -71,4 +72,3 @@ class UrlQueryParameters implements Arrayable
         return $this->parameters;
     }
 }
-
