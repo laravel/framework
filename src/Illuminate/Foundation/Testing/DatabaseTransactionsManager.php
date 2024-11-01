@@ -7,6 +7,21 @@ use Illuminate\Database\DatabaseTransactionsManager as BaseManager;
 class DatabaseTransactionsManager extends BaseManager
 {
     /**
+     * Number of connections transacting on tests to be skiped and run the callbacks correctly.
+     */
+    protected int $connectionsTransacting = 1;
+
+    /**
+     * @param  int  $connectionsTransacting  Number of root connections transacting on tests (to skip for callbacks).
+     */
+    public function __construct(int $connectionsTransacting = 1)
+    {
+        parent::__construct();
+
+        $this->connectionsTransacting = $connectionsTransacting;
+    }
+
+    /**
      * Register a transaction callback.
      *
      * @param  callable  $callback
@@ -31,7 +46,7 @@ class DatabaseTransactionsManager extends BaseManager
      */
     public function callbackApplicableTransactions()
     {
-        return $this->pendingTransactions->skip(1)->values();
+        return $this->pendingTransactions->skip($this->connectionsTransacting)->values();
     }
 
     /**
