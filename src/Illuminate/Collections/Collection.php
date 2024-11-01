@@ -195,6 +195,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     public function containsAny($values = [])
     {
         $values = new static($values);
+
         return $this->intersect($values->unique())->isNotEmpty();
     }
 
