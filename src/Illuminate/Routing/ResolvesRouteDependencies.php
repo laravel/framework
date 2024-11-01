@@ -77,12 +77,13 @@ trait ResolvesRouteDependencies
     /**
      * Attempt to transform the given parameter into a class instance.
      *
-     * @param ReflectionParameter $parameter
-     * @param array $parameters
-     * @param $className
-     * @param object $skippableValue
-     * @param $resolvedInterfaces
+     * @param  ReflectionParameter $parameter
+     * @param  array $parameters
+     * @param  $className
+     * @param  object $skippableValue
+     * @param  $resolvedInterfaces
      * @return mixed
+     *
      * @throws BindingResolutionException
      * @throws ReflectionException
      */
@@ -132,9 +133,9 @@ trait ResolvesRouteDependencies
      * a concrete class that implements it already exists
      * in the list of parameters.
      *
-     * @param $className
-     * @param array $parameters
-     * @param $resolvedInterfaces
+     * @param  $className
+     * @param  array $parameters
+     * @param  $resolvedInterfaces
      * @return bool
      */
     protected function shouldResolveInterface($className, array $parameters, $resolvedInterfaces): bool
@@ -142,7 +143,7 @@ trait ResolvesRouteDependencies
         return $className &&
             $this->alreadyInParameters($className, $parameters) &&
             interface_exists($className) &&
-            !$this->alreadyInResolvedInterfaces($className, $resolvedInterfaces) &&
+            ! $this->alreadyInResolvedInterfaces($className, $resolvedInterfaces) &&
             (new ReflectionClass($className))->isInterface();
     }
 
