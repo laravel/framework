@@ -3439,7 +3439,7 @@ class SupportCollectionTest extends TestCase
 
         $this->assertTrue($c->containsAny([false, 1]));
         $this->assertTrue($c->containsAny([null, 1]));
-        $this->assertTrue($c->containsAny([0, 1]));
+        $this->assertFalse($c->containsAny([0, 1]));
         $this->assertTrue($c->containsAny(['', 1]));
         $this->assertFalse($c->containsAny([]));
 

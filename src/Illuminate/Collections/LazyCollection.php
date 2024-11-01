@@ -252,7 +252,9 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
      */
     public function containsAny($values = [])
     {
-        return $this->passthru('containsAny', func_get_args());
+        $values = new static($values);
+
+        return $this->intersect($values->unique())->isNotEmpty();
     }
 
     /**
