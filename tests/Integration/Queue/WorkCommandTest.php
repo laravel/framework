@@ -4,11 +4,16 @@ namespace Illuminate\Tests\Integration\Queue;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Queue\Console\WorkCommand;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Exceptions;
 use Illuminate\Support\Facades\Queue;
 use Orchestra\Testbench\Attributes\WithMigration;
+use RuntimeException;
 
 #[WithMigration]
 #[WithMigration('queue')]
@@ -27,6 +32,13 @@ class WorkCommandTest extends QueueTestCase
         parent::setUp();
 
         $this->markTestSkippedWhenUsingSyncQueueDriver();
+    }
+
+    protected function tearDown(): void
+    {
+        WorkCommand::flushState();
+
+        parent::tearDown();
     }
 
     public function testRunningOneJob()
@@ -157,6 +169,21 @@ class WorkCommandTest extends QueueTestCase
         $this->assertFalse(FirstJob::$ran);
         $this->assertFalse(SecondJob::$ran);
     }
+
+    public function testFailedJobListenerOnlyRunsOnce()
+    {
+        $this->markTestSkippedWhenUsingQueueDrivers(['redis', 'beanstalkd']);
+
+        Exceptions::fake();
+
+        Queue::push(new FirstJob);
+        $this->withoutMockingConsoleOutput()->artisan('queue:work', ['--once' => true, '--sleep' => 0]);
+
+        Queue::push(new JobWillFail);
+        $this->withoutMockingConsoleOutput()->artisan('queue:work', ['--once' => true]);
+        Exceptions::assertNotReported(UniqueConstraintViolationException::class);
+        $this->assertSame(2, substr_count(Artisan::output(), JobWillFail::class));
+    }
 }
 
 class FirstJob implements ShouldQueue
@@ -194,5 +221,15 @@ class ThirdJob implements ShouldQueue
         sleep(1);
 
         static::$ran = true;
+    }
+}
+
+class JobWillFail implements ShouldQueue
+{
+    use Dispatchable, Queueable;
+
+    public function handle()
+    {
+        throw new RuntimeException;
     }
 }
