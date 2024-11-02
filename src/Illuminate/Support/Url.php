@@ -10,14 +10,14 @@ class Url implements Arrayable
      * Constructor.
      */
     public function __construct(
-        public $scheme = null,
-        public $host = null,
-        public $port = null,
-        public $user = null,
-        public $pass = null,
-        public $path = null,
-        public $query = null,
-        public $fragment = null,
+        public ?string $scheme = null,
+        public ?string $host = null,
+        public ?string $port = null,
+        public ?string $user = null,
+        public ?string $pass = null,
+        public ?string $path = null,
+        public ?string $query = null,
+        public ?string $fragment = null,
     ) {
     }
 
@@ -27,7 +27,7 @@ class Url implements Arrayable
      * @param  string  $url
      * @return static
      */
-    public static function parse($url)
+    public static function parse(string $url): static
     {
         $components = parse_url($url) ?? [];
 
@@ -48,7 +48,7 @@ class Url implements Arrayable
      *
      * @return \Illuminate\Support\UrlQueryParameters
      */
-    public function query()
+    public function query(): UrlQueryParameters
     {
         return UrlQueryParameters::parse($this->query);
     }
@@ -58,7 +58,7 @@ class Url implements Arrayable
      *
      * @return array<string, string|null>
      */
-    public function toArray()
+    public function toArray(): array
     {
         return [
             'scheme' => $this->scheme,

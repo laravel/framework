@@ -23,7 +23,7 @@ class UrlQueryParameters implements Arrayable
      * @param  string|null  $query
      * @return static
      */
-    public static function parse($query)
+    public static function parse(?string $query): static
     {
         if (is_null($query)) {
             return new static;
@@ -46,7 +46,7 @@ class UrlQueryParameters implements Arrayable
      * @param  mixed  $default
      * @return mixed
      */
-    public function get($key, $default = null)
+    public function get(string $key, mixed $default = null): mixed
     {
         return $this->parameters[$key] ?? $default;
     }
@@ -57,7 +57,7 @@ class UrlQueryParameters implements Arrayable
      * @param  string  $key
      * @return bool
      */
-    public function has($key)
+    public function has(string $key): bool
     {
         return isset($this->parameters[$key]);
     }
@@ -67,7 +67,7 @@ class UrlQueryParameters implements Arrayable
      *
      * @return array<string, mixed>
      */
-    public function toArray()
+    public function toArray(): array
     {
         return $this->parameters;
     }
