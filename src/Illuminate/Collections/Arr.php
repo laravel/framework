@@ -951,4 +951,15 @@ class Arr
 
         return is_array($value) ? $value : [$value];
     }
+
+    /**
+     * If the given value is an associative array, wrap it in an array.
+     *
+     * @param  array  $value
+     * @return array
+     */
+    public static function wrapAssoc(array $value)
+    {
+        return static::isAssoc($value) ? [$value] : $value;
+    }
 }

@@ -1358,6 +1358,21 @@ class SupportArrTest extends TestCase
         $this->assertSame($obj, Arr::wrap($obj)[0]);
     }
 
+    public function testWrapAssoc()
+    {
+        $sequential = ['a', 'b', 'c'];
+        $sequentialArrays = [['key' => 1], ['key' => 2], ['key' => 3]];
+        $associative = ['key' => 1, 'value' => 'foo'];
+        $combination = ['a', 'b', 'c' => ['abc']];
+        $empty = [];
+
+        $this->assertEquals($sequential, Arr::wrapAssoc($sequential));
+        $this->assertEquals($sequentialArrays, Arr::wrapAssoc($sequentialArrays));
+        $this->assertEquals([$associative], Arr::wrapAssoc($associative));
+        $this->assertEquals([$combination], Arr::wrapAssoc($combination));
+        $this->assertEquals([], Arr::wrapAssoc($empty));
+    }
+
     public function testSortByMany()
     {
         $unsorted = [
