@@ -215,11 +215,10 @@ class Rule
     /**
      * Get an uuid rule builder instance.
      *
-     * @param  class-string  $type
      * @return \Illuminate\Validation\Rules\Uuid
      */
-    public static function uuid($type)
+    public static function uuid()
     {
-        return new Uuid($type);
+        return new Uuid();
     }
 }
