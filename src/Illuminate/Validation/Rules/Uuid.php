@@ -54,6 +54,7 @@ class Uuid implements Rule, ValidatorAwareRule
 
     /**
      * Supported by v1, v2, v6, and v7.
+     *
      * @var callable
      */
     protected $dateTimeCallback;
@@ -138,6 +139,7 @@ class Uuid implements Rule, ValidatorAwareRule
     private function toV2(FieldsInterface $fields, UuidFactory $factory)
     {
         $features = new FeatureSet();
+
         return new UuidV2($fields, $factory->getNumberConverter(), $factory->getCodec(), $features->getTimeConverter());
     }
 
