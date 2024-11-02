@@ -17,6 +17,7 @@ use Illuminate\Validation\Rules\NotIn;
 use Illuminate\Validation\Rules\ProhibitedIf;
 use Illuminate\Validation\Rules\RequiredIf;
 use Illuminate\Validation\Rules\Unique;
+use Illuminate\Validation\Rules\Uuid;
 
 class Rule
 {
@@ -209,5 +210,16 @@ class Rule
     public static function dimensions(array $constraints = [])
     {
         return new Dimensions($constraints);
+    }
+
+    /**
+     * Get an uuid rule builder instance.
+     *
+     * @param  class-string  $type
+     * @return \Illuminate\Validation\Rules\Uuid
+     */
+    public static function uuid($type)
+    {
+        return new Uuid($type);
     }
 }
