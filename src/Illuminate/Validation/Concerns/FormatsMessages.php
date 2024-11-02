@@ -4,6 +4,7 @@ namespace Illuminate\Validation\Concerns;
 
 use Closure;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Number;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -426,18 +427,10 @@ trait FormatsMessages
      */
     protected function numberToIndexOrPositionWord(int $value)
     {
-        return [
-            1 => 'first',
-            2 => 'second',
-            3 => 'third',
-            4 => 'fourth',
-            5 => 'fifth',
-            6 => 'sixth',
-            7 => 'seventh',
-            8 => 'eighth',
-            9 => 'ninth',
-            10 => 'tenth',
-        ][(int) $value] ?? 'other';
+        return match($value) {
+            1, 2, 3, 4, 5, 6, 7, 8, 9, 10 => Number::spelloutOrdinal($value, 'en'),
+            default => 'other',
+        };
     }
 
     /**
