@@ -31,30 +31,30 @@ class Uuid implements Rule, ValidatorAwareRule
 
     /**
      * Usually, the MAC address (can be random)
-     * Supported by v1, v2, and v6
+     * Supported by v1, v2, and v6.
      */
     protected string $node;
 
     /**
-     * @var ':'|'-' $separator
+     * @var ':'|'-'
      */
     protected string $separator = ':';
 
     /**
      * Usually, the namespace
-     * Supported by v3 and v5
+     * Supported by v3 and v5.
      */
     protected string $domain;
 
     /**
      * Usually, the namespace ID
-     * Supported by v3 and v5
+     * Supported by v3 and v5.
      */
     protected string $identifier;
 
     /**
-     * Supported by v1, v2, v6, and v7
-     * @var callable $dateTimeCallback
+     * Supported by v1, v2, v6, and v7.
+     * @var callable
      */
     protected $dateTimeCallback;
 
@@ -78,16 +78,16 @@ class Uuid implements Rule, ValidatorAwareRule
             return false;
         }
 
-        foreach ([ 'version', 'node', 'domain', 'identifier', 'dateTimeCallback' ] as $prop) {
+        foreach (['version', 'node', 'domain', 'identifier', 'dateTimeCallback'] as $prop) {
             if (! $this->isInitialized($prop)) {
                 continue;
             }
 
             if (
                 $prop === 'version' && (
-                    (in_array($this->version, [ 0, 'nil' ], true) && ! $fields->isNil()) ||
+                    (in_array($this->version, [0, 'nil'], true) && ! $fields->isNil()) ||
                     ($this->version === 'max' && ! $fields->isMax()) ||
-                    (! in_array($this->version, [ 0, 'nil', 'max' ]) && $fields->getVersion() !== $this->version)
+                    (! in_array($this->version, [0, 'nil', 'max']) && $fields->getVersion() !== $this->version)
                 )
             ) {
                 return false;
@@ -188,7 +188,7 @@ class Uuid implements Rule, ValidatorAwareRule
 
     public function identifier(string|int $identifier)
     {
-        return tap($this, fn () => $this->identifier = (string)$identifier);
+        return tap($this, fn () => $this->identifier = (string) $identifier);
     }
 
     public function dateTime(callable $callback)
