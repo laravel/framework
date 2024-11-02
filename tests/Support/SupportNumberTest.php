@@ -106,6 +106,13 @@ class SupportNumberTest extends TestCase
         $this->assertSame('3rd', Number::ordinal(3));
     }
 
+    public function testSpelloutOrdinal()
+    {
+        $this->assertSame('first', Number::spelloutOrdinal(1));
+        $this->assertSame('second', Number::spelloutOrdinal(2));
+        $this->assertSame('third', Number::spelloutOrdinal(3));
+    }
+
     #[RequiresPhpExtension('intl')]
     public function testToPercent()
     {
