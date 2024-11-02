@@ -103,7 +103,7 @@ class Number
 
         $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::SPELLOUT);
 
-        $formatter->setTextAttribute(NumberFormatter::DEFAULT_RULESET, "%spellout-ordinal");
+        $formatter->setTextAttribute(NumberFormatter::DEFAULT_RULESET, '%spellout-ordinal');
 
         return $formatter->format($number);
     }
