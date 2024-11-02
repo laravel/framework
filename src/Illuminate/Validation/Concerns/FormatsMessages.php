@@ -427,7 +427,7 @@ trait FormatsMessages
      */
     protected function numberToIndexOrPositionWord(int $value)
     {
-        return match($value) {
+        return match ($value) {
             1, 2, 3, 4, 5, 6, 7, 8, 9, 10 => Number::spelloutOrdinal($value, 'en'),
             default => 'other',
         };
