@@ -91,6 +91,24 @@ class Number
     }
 
     /**
+     * Convert the given number to spelled out ordinal form.
+     *
+     * @param  int|float  $number
+     * @param  string|null  $locale
+     * @return string
+     */
+    public static function spelloutOrdinal(int|float $number, ?string $locale = null)
+    {
+        static::ensureIntlExtensionIsInstalled();
+
+        $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::SPELLOUT);
+
+        $formatter->setTextAttribute(NumberFormatter::DEFAULT_RULESET, "%spellout-ordinal");
+
+        return $formatter->format($number);
+    }
+
+    /**
      * Convert the given number to its percentage equivalent.
      *
      * @param  int|float  $number
