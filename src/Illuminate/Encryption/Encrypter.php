@@ -375,4 +375,44 @@ class Encrypter implements EncrypterContract, StringEncrypter
 
         return $this;
     }
+
+    public function isEncrypted(string $payload): bool
+    {
+        // 1. Ensure that $payload is a base64-encoded string
+        if (base64_decode($payload, true) === false) {
+            return false;
+        }
+
+        // 2. Decode base64 and check if it’s a JSON-encoded structure
+        $decodedPayload = json_decode(base64_decode($payload), true);
+        if (!is_array($decodedPayload)) {
+            return false;
+        }
+
+        // 3. Verify required keys (`iv`, `value`, `mac`), and `tag` if using AEAD
+        $requiredKeys = ['iv', 'value', 'mac'];
+        foreach ($requiredKeys as $key) {
+            if (!isset($decodedPayload[$key]) || !is_string($decodedPayload[$key])) {
+                return false;
+            }
+        }
+
+        // 4. Validate the IV length based on the cipher in use
+        $iv = base64_decode($decodedPayload['iv'], true);
+        if ($iv === false || strlen($iv) !== openssl_cipher_iv_length(strtolower($this->cipher))) {
+            return false;
+        }
+
+        // 5. If the cipher is AEAD, ensure a valid `tag`
+        $isAeadCipher = self::$supportedCiphers[strtolower($this->cipher)]['aead'] ?? false;
+        if ($isAeadCipher) {
+            $tag = $decodedPayload['tag'] ?? null;
+            if ($tag === null || !is_string($tag) || strlen(base64_decode($tag, true)) !== 16) {
+                return false;
+            }
+        }
+
+        // The payload has the expected encrypted structure.
+        return true;
+    }
 }
