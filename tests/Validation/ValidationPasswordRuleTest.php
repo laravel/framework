@@ -339,6 +339,33 @@ class ValidationPasswordRuleTest extends TestCase
         ]);
     }
 
+    public function testRegex()
+    {
+        $letters = '(?=.*[a-zA-Z])';
+        $mixedCase = '(?=.*[a-z])(?=.*[A-Z])';
+        $numbers = '(?=.*\d)';
+        $symbols = '(?=.*\d)(?=.*[^a-zA-Z\d\s])';
+
+        $passwords = [
+            [Password::min(2), "^.{2,}\$"],
+            [Password::min(3)->max(5), "^.{3,5}\$"],
+            [Password::min(4)->letters(), "^$letters.{4,}\$"],
+            [Password::min(5)->max(7)->mixedCase(), "^$mixedCase.{5,7}\$"],
+            [Password::min(6)->numbers(), "^$numbers.{6,}\$"],
+            [Password::min(7)->symbols(), "^$symbols.{7,}\$"],
+            [Password::min(8)->mixedCase()->symbols(), "^$mixedCase$symbols.{8,}\$"],
+            [Password::min(9)->symbols()->mixedCase(), "^$mixedCase$symbols.{9,}\$"],
+            [Password::min(8)->symbols()->max(9)->mixedCase(), "^$mixedCase$symbols.{8,9}\$"],
+            [Password::min(7)->symbols()->mixedCase(), "^$mixedCase$symbols.{7,}\$"],
+            [Password::min(6)->mixedCase()->symbols()->max(10)->numbers(), "^$mixedCase$numbers$symbols.{6,10}\$"],
+        ];
+
+        foreach ($passwords as $password) {
+            Password::defaults(fn () => $password[0]);
+            $this->assertSame(Password::default()->regex(), $password[1]);
+        }
+    }
+
     protected function passes($rule, $values)
     {
         $this->assertValidationRules($rule, $values, true, []);

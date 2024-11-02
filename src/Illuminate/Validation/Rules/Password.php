@@ -380,4 +380,37 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
 
         return false;
     }
+
+    /**
+     * Get a regex representing the minimum password requirements.
+     *
+     * @return string
+     */
+    public function regex()
+    {
+        $regex = '^';
+
+        if ($this->letters) {
+            $regex .= '(?=.*[a-zA-Z])';
+        }
+
+        if ($this->mixedCase) {
+            $regex .= '(?=.*[a-z])(?=.*[A-Z])';
+        }
+
+        if ($this->numbers) {
+            $regex .= '(?=.*\d)';
+        }
+
+        if ($this->symbols) {
+            $regex .= '(?=.*\d)(?=.*[^a-zA-Z\d\s])';
+        }
+
+        $regex .= '.';
+
+        $limit = "$this->min," . ($this->max ?? '');
+        $regex .= '{'.$limit.'}$';
+
+        return $regex;
+    }
 }
