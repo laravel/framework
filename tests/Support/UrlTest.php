@@ -14,7 +14,7 @@ class UrlTest extends TestCase
 
         $this->assertSame('https', $url->scheme);
         $this->assertSame('example.com', $url->host);
-        $this->assertSame(8080, $url->port);
+        $this->assertSame('8080', $url->port);
         $this->assertSame('user', $url->user);
         $this->assertSame('pass', $url->pass);
         $this->assertSame('/path/to/resource', $url->path);
@@ -52,7 +52,7 @@ class UrlTest extends TestCase
         $this->assertSame([
             'scheme' => 'https',
             'host' => 'example.com',
-            'port' => 8080,
+            'port' => '8080',
             'user' => 'user',
             'pass' => 'pass',
             'path' => '/path/to/resource',
