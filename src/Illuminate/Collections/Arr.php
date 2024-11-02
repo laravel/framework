@@ -941,7 +941,8 @@ class Arr
      * If the given value is not an array and not null, wrap it in one.
      *
      * @template T
-     * @param T|array|null $value
+     *
+     * @param  T|array|null  $value
      * @return ($value is array ? T : ($value is null ? array<never, never> : array{0: T}))
      */
     public static function wrap($value)
