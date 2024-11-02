@@ -2,6 +2,7 @@
 
 namespace Illuminate\Validation;
 
+use Illuminate\Contracts\Database\Query\Builder;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Validation\Rules\ArrayRule;
@@ -10,6 +11,7 @@ use Illuminate\Validation\Rules\Dimensions;
 use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\Rules\ExcludeIf;
 use Illuminate\Validation\Rules\Exists;
+use Illuminate\Validation\Rules\ExistsUsingBuilder;
 use Illuminate\Validation\Rules\File;
 use Illuminate\Validation\Rules\ImageFile;
 use Illuminate\Validation\Rules\In;
@@ -17,6 +19,7 @@ use Illuminate\Validation\Rules\NotIn;
 use Illuminate\Validation\Rules\ProhibitedIf;
 use Illuminate\Validation\Rules\RequiredIf;
 use Illuminate\Validation\Rules\Unique;
+use Illuminate\Validation\Rules\UniqueUsingBuilder;
 
 class Rule
 {
@@ -85,25 +88,29 @@ class Rule
     /**
      * Get a unique constraint builder instance.
      *
-     * @param  string  $table
+     * @param  string|\Illuminate\Contracts\Database\Query\Builder  $table
      * @param  string  $column
-     * @return \Illuminate\Validation\Rules\Unique
+     * @return ($table is string ? \Illuminate\Validation\Rules\Unique : \Illuminate\Validation\Rules\UniqueUsingBuilder)
      */
     public static function unique($table, $column = 'NULL')
     {
-        return new Unique($table, $column);
+        return $table instanceof Builder
+            ? new UniqueUsingBuilder($table, $column)
+            : new Unique($table, $column);
     }
 
     /**
      * Get an exists constraint builder instance.
      *
-     * @param  string  $table
+     * @param  string|\Illuminate\Contracts\Database\Query\Builder  $table
      * @param  string  $column
-     * @return \Illuminate\Validation\Rules\Exists
+     * @return ($table is string ? \Illuminate\Validation\Rules\Exists : \Illuminate\Validation\Rules\ExistsUsingBuilder)
      */
     public static function exists($table, $column = 'NULL')
     {
-        return new Exists($table, $column);
+        return $table instanceof Builder
+            ? new ExistsUsingBuilder($table, $column)
+            : new Exists($table, $column);
     }
 
     /**

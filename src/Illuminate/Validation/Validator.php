@@ -7,6 +7,7 @@ use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\ImplicitRule;
+use Illuminate\Contracts\Validation\RequiresPreviousRule;
 use Illuminate\Contracts\Validation\Rule as RuleContract;
 use Illuminate\Contracts\Validation\Validator as ValidatorContract;
 use Illuminate\Contracts\Validation\ValidatorAwareRule;
@@ -761,6 +762,7 @@ class Validator implements ValidatorContract
         return $this->presentOrRuleIsImplicit($rule, $attribute, $value) &&
                $this->passesOptionalCheck($attribute) &&
                $this->isNotNullIfMarkedAsNullable($rule, $attribute) &&
+               $this->hasNotFailedPreviousRuleIfRuleRequiresPrevious($rule, $attribute) &&
                $this->hasNotFailedPreviousRuleIfPresenceRule($rule, $attribute);
     }
 
@@ -840,6 +842,21 @@ class Validator implements ValidatorContract
     protected function hasNotFailedPreviousRuleIfPresenceRule($rule, $attribute)
     {
         return in_array($rule, ['Unique', 'Exists']) ? ! $this->messages->has($attribute) : true;
+    }
+
+    /**
+     * Determine if the attribute has not failed a previous rule if the current rule requires it.
+     *
+     * @param  mixed  $rule
+     * @param  string  $attribute
+     * @return bool
+     */
+    protected function hasNotFailedPreviousRuleIfRuleRequiresPrevious($rule, $attribute)
+    {
+        $requiresPreviousRule = $rule instanceof RequiresPreviousRule ||
+            ($rule instanceof InvokableValidationRule && $rule->invokable() instanceof RequiresPreviousRule);
+
+        return ! $requiresPreviousRule || ! $this->messages->has($attribute);
     }
 
     /**
