@@ -30,6 +30,7 @@ namespace Illuminate\Support\Facades;
  * @method static void defaults(array $defaults)
  * @method static array getDefaultParameters()
  * @method static void forceScheme(string|null $scheme)
+ * @method static void forceHttps(bool $force = true)
  * @method static void forceRootUrl(string|null $root)
  * @method static \Illuminate\Routing\UrlGenerator formatHostUsing(\Closure $callback)
  * @method static \Illuminate\Routing\UrlGenerator formatPathUsing(\Closure $callback)
