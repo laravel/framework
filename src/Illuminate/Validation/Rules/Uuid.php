@@ -8,6 +8,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Validator;
 use Ramsey\Uuid\Exception\InvalidUuidStringException;
+use Ramsey\Uuid\Exception\UnsupportedOperationException;
 use Ramsey\Uuid\FeatureSet;
 use Ramsey\Uuid\Rfc4122\FieldsInterface;
 use Ramsey\Uuid\Rfc4122\UuidV2;
@@ -94,17 +95,20 @@ class Uuid implements Rule, ValidatorAwareRule
                 return false;
             }
 
-            if ($prop === 'node' && in_array($fields->getVersion(), [
+            if ($prop === 'node' && ! in_array($fields->getVersion(), [
                 UuidUuid::UUID_TYPE_TIME,
                 UuidUuid::UUID_TYPE_DCE_SECURITY,
                 UuidUuid::UUID_TYPE_REORDERED_TIME,
-            ]) && $this->node !== $this->formatMacAddress($fields->getNode()->toString())) {
+            ])) {
+                throw new UnsupportedOperationException('Not a node-based UUID');
+            }
+
+            if ($prop === 'node' && $this->node !== $this->formatMacAddress($fields->getNode()->toString())) {
                 return false;
             }
 
             if (
                 $prop === 'domain' &&
-                $fields->getVersion() === UuidUuid::UUID_TYPE_DCE_SECURITY &&
                 $this->toV2($fields, $factory)->getLocalDomainName() !== $this->domain
             ) {
                 return false;
@@ -112,7 +116,6 @@ class Uuid implements Rule, ValidatorAwareRule
 
             if (
                 $prop === 'identifier' &&
-                $fields->getVersion() === UuidUuid::UUID_TYPE_DCE_SECURITY &&
                 $this->toV2($fields, $factory)->getLocalIdentifier()->toString() !== $this->identifier
             ) {
                 return false;
@@ -121,12 +124,6 @@ class Uuid implements Rule, ValidatorAwareRule
             if (
                 $prop === 'dateTimeCallback' &&
                 $this->dateTimeCallback !== null &&
-                in_array($fields->getVersion(), [
-                    UuidUuid::UUID_TYPE_TIME,
-                    UuidUuid::UUID_TYPE_DCE_SECURITY,
-                    UuidUuid::UUID_TYPE_REORDERED_TIME,
-                    UuidUuid::UUID_TYPE_UNIX_TIME,
-                ]) &&
                 ! call_user_func($this->dateTimeCallback, Carbon::createFromId($factoryUuid))
             ) {
                 return false;
