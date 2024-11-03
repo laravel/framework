@@ -451,8 +451,9 @@ class ResolvingCallbackTest extends TestCase
         // And a contract/implementation stub binding.
         $container->bind(ResolvingContractStub::class, ResolvingImplementationStub::class);
 
+        $container->alias(ResolvingContractStub::class, 'resolvingContractStubAlias');
         // When we add a before resolving callback that increment the counter by one.
-        $container->beforeResolving(ResolvingContractStub::class, function () use (&$callCounter) {
+        $container->beforeResolving('resolvingContractStubAlias', function () use (&$callCounter) {
             $callCounter++;
         });
 
