@@ -378,21 +378,22 @@ class Encrypter implements EncrypterContract, StringEncrypter
 
     public function isEncrypted(string $payload): bool
     {
+        $base64Decoded = base64_decode($payload, strict: true);
+
         // 1. Ensure that $payload is a base64-encoded string
-        if (base64_decode($payload, true) === false) {
+        if (!$base64Decoded) {
             return false;
         }
 
-        // 2. Decode base64 and check if it’s a JSON-encoded structure
-        $decodedPayload = json_decode(base64_decode($payload), true);
+        // 2. Decode base64 and check if it's a JSON-encoded structure
+        $decodedPayload = json_decode($base64Decoded, associative: true);
         if (!is_array($decodedPayload)) {
             return false;
         }
 
         // 3. Verify required keys (`iv`, `value`, `mac`), and `tag` if using AEAD
-        $requiredKeys = ['iv', 'value', 'mac'];
-        foreach ($requiredKeys as $key) {
-            if (!isset($decodedPayload[$key]) || !is_string($decodedPayload[$key])) {
+        foreach (['iv', 'value', 'mac'] as $requiredKey) {
+            if (!isset($decodedPayload[$requiredKey]) || !is_string($decodedPayload[$requiredKey])) {
                 return false;
             }
         }
@@ -406,13 +407,12 @@ class Encrypter implements EncrypterContract, StringEncrypter
         // 5. If the cipher is AEAD, ensure a valid `tag`
         $isAeadCipher = self::$supportedCiphers[strtolower($this->cipher)]['aead'] ?? false;
         if ($isAeadCipher) {
-            $tag = $decodedPayload['tag'] ?? null;
-            if ($tag === null || !is_string($tag) || strlen(base64_decode($tag, true)) !== 16) {
+            $authenticationTag = $decodedPayload['tag'] ?? null;
+            if ($authenticationTag === null || !is_string($authenticationTag) || strlen(base64_decode($authenticationTag, strict: true)) !== 16) {
                 return false;
             }
         }
 
-        // The payload has the expected encrypted structure.
         return true;
     }
 }
