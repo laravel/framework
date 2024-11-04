@@ -13,20 +13,7 @@ class DatabaseUuidFailedJobProviderTest extends TestCase
 {
     public function testJobsCanBeCounted()
     {
-        $db = new DB;
-        $db->addConnection([
-            'driver' => 'sqlite',
-            'database' => ':memory:',
-        ]);
-        $db->getConnection()->getSchemaBuilder()->create('failed_jobs', function (Blueprint $table) {
-            $table->uuid();
-            $table->text('connection');
-            $table->text('queue');
-            $table->longText('payload');
-            $table->longText('exception');
-            $table->timestamp('failed_at')->useCurrent();
-        });
-        $provider = new DatabaseUuidFailedJobProvider($db->getDatabaseManager(), 'default', 'failed_jobs');
+        $provider = $this->getFailedJobProvider();
 
         $this->assertSame(0, $provider->count());
 
@@ -40,20 +27,7 @@ class DatabaseUuidFailedJobProviderTest extends TestCase
 
     public function testJobsCanBeCountedByConnection()
     {
-        $db = new DB;
-        $db->addConnection([
-            'driver' => 'sqlite',
-            'database' => ':memory:',
-        ]);
-        $db->getConnection()->getSchemaBuilder()->create('failed_jobs', function (Blueprint $table) {
-            $table->uuid();
-            $table->text('connection');
-            $table->text('queue');
-            $table->longText('payload');
-            $table->longText('exception');
-            $table->timestamp('failed_at')->useCurrent();
-        });
-        $provider = new DatabaseUuidFailedJobProvider($db->getDatabaseManager(), 'default', 'failed_jobs');
+        $provider = $this->getFailedJobProvider();
 
         $provider->log('connection-1', 'default', json_encode(['uuid' => (string) Str::uuid()]), new RuntimeException());
         $provider->log('connection-2', 'default', json_encode(['uuid' => (string) Str::uuid()]), new RuntimeException());
@@ -67,20 +41,7 @@ class DatabaseUuidFailedJobProviderTest extends TestCase
 
     public function testJobsCanBeCountedByQueue()
     {
-        $db = new DB;
-        $db->addConnection([
-            'driver' => 'sqlite',
-            'database' => ':memory:',
-        ]);
-        $db->getConnection()->getSchemaBuilder()->create('failed_jobs', function (Blueprint $table) {
-            $table->uuid();
-            $table->text('connection');
-            $table->text('queue');
-            $table->longText('payload');
-            $table->longText('exception');
-            $table->timestamp('failed_at')->useCurrent();
-        });
-        $provider = new DatabaseUuidFailedJobProvider($db->getDatabaseManager(), 'default', 'failed_jobs');
+        $provider = $this->getFailedJobProvider();
 
         $provider->log('database', 'queue-1', json_encode(['uuid' => (string) Str::uuid()]), new RuntimeException());
         $provider->log('database', 'queue-2', json_encode(['uuid' => (string) Str::uuid()]), new RuntimeException());
@@ -93,6 +54,22 @@ class DatabaseUuidFailedJobProviderTest extends TestCase
     }
 
     public function testJobsCanBeCountedByQueueAndConnection()
+    {
+        $provider = $this->getFailedJobProvider();
+
+        $provider->log('connection-1', 'queue-99', json_encode(['uuid' => (string) Str::uuid()]), new RuntimeException());
+        $provider->log('connection-1', 'queue-99', json_encode(['uuid' => (string) Str::uuid()]), new RuntimeException());
+        $provider->log('connection-2', 'queue-99', json_encode(['uuid' => (string) Str::uuid()]), new RuntimeException());
+        $provider->log('connection-1', 'queue-1', json_encode(['uuid' => (string) Str::uuid()]), new RuntimeException());
+        $provider->log('connection-2', 'queue-1', json_encode(['uuid' => (string) Str::uuid()]), new RuntimeException());
+        $provider->log('connection-2', 'queue-1', json_encode(['uuid' => (string) Str::uuid()]), new RuntimeException());
+        $this->assertSame(2, $provider->count('connection-1', 'queue-99'));
+        $this->assertSame(1, $provider->count('connection-2', 'queue-99'));
+        $this->assertSame(1, $provider->count('connection-1', 'queue-1'));
+        $this->assertSame(2, $provider->count('connection-2', 'queue-1'));
+    }
+
+    protected function getFailedJobProvider(string $database = 'default', string $table = 'failed_jobs')
     {
         $db = new DB;
         $db->addConnection([
@@ -107,17 +84,6 @@ class DatabaseUuidFailedJobProviderTest extends TestCase
             $table->longText('exception');
             $table->timestamp('failed_at')->useCurrent();
         });
-        $provider = new DatabaseUuidFailedJobProvider($db->getDatabaseManager(), 'default', 'failed_jobs');
-
-        $provider->log('connection-1', 'queue-99', json_encode(['uuid' => (string) Str::uuid()]), new RuntimeException());
-        $provider->log('connection-1', 'queue-99', json_encode(['uuid' => (string) Str::uuid()]), new RuntimeException());
-        $provider->log('connection-2', 'queue-99', json_encode(['uuid' => (string) Str::uuid()]), new RuntimeException());
-        $provider->log('connection-1', 'queue-1', json_encode(['uuid' => (string) Str::uuid()]), new RuntimeException());
-        $provider->log('connection-2', 'queue-1', json_encode(['uuid' => (string) Str::uuid()]), new RuntimeException());
-        $provider->log('connection-2', 'queue-1', json_encode(['uuid' => (string) Str::uuid()]), new RuntimeException());
-        $this->assertSame(2, $provider->count('connection-1', 'queue-99'));
-        $this->assertSame(1, $provider->count('connection-2', 'queue-99'));
-        $this->assertSame(1, $provider->count('connection-1', 'queue-1'));
-        $this->assertSame(2, $provider->count('connection-2', 'queue-1'));
+        return new DatabaseUuidFailedJobProvider($db->getDatabaseManager(), $database, $table);
     }
 }
