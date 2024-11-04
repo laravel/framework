@@ -16,6 +16,7 @@ class EncrypterTest extends TestCase
         $reflection = new ReflectionClass(Encrypter::class);
         $property = $reflection->getProperty('supportedCiphers');
         $property->setAccessible(true);
+
         return $property->getValue();
     }
 
