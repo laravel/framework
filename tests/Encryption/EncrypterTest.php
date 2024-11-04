@@ -272,7 +272,7 @@ class EncrypterTest extends TestCase
     {
         foreach (Encrypter::$supportedCiphers as $cipher => $properties) {
             $e = new Encrypter(str_repeat('a', $properties['size']), $cipher);
-            
+
             $payload = $e->encrypt('foo');
             $this->assertTrue($e->isEncrypted($payload));
 
@@ -285,7 +285,7 @@ class EncrypterTest extends TestCase
     {
         foreach (Encrypter::$supportedCiphers as $cipher => $properties) {
             $e = new Encrypter(str_repeat('a', $properties['size']), $cipher);
-            
+
             $this->assertFalse($e->isEncrypted('foo'));
             $this->assertFalse($e->isEncrypted(json_encode(['foo' => 'bar'])));
             $this->assertFalse($e->isEncrypted($e->decrypt($e->encrypt('foo'))));
@@ -300,10 +300,10 @@ class EncrypterTest extends TestCase
 
         $this->assertTrue($e->isNotEncrypted('foo') === ! $e->isEncrypted('foo'));
         $this->assertTrue($e->isNotEncrypted(json_encode(['foo' => 'bar'])) === ! $e->isEncrypted(json_encode(['foo' => 'bar'])));
-        
+
         $encrypted = $e->encrypt('foo');
         $this->assertTrue($e->isNotEncrypted($encrypted) === ! $e->isEncrypted($encrypted));
-        
+
         $this->assertTrue($e->isNotEncrypted('') === ! $e->isEncrypted(''));
     }
 }
