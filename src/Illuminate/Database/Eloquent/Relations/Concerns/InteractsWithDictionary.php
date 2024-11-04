@@ -32,7 +32,7 @@ trait InteractsWithDictionary
         }
 
         if (is_float($attribute)) {
-            return (string)$attribute;
+            return (string) $attribute;
         }
 
         return $attribute;
