@@ -80,12 +80,6 @@ class UrlQueryParameters implements Arrayable, Stringable
      */
     public function __toString(): string
     {
-        $parameters = [];
-
-        foreach ($this->parameters as $key => $value) {
-            $parameters[] = $key.'='.$value;
-        }
-
-        return implode('&', $parameters);
+        return http_build_query($this->parameters);
     }
 }
