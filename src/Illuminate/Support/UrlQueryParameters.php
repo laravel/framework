@@ -2,8 +2,8 @@
 
 namespace Illuminate\Support;
 
-use Stringable;
 use Illuminate\Contracts\Support\Arrayable;
+use Stringable;
 
 class UrlQueryParameters implements Arrayable, Stringable
 {

@@ -2,8 +2,8 @@
 
 namespace Illuminate\Support;
 
-use Stringable;
 use Illuminate\Contracts\Support\Arrayable;
+use Stringable;
 
 class Url implements Arrayable, Stringable
 {
@@ -83,13 +83,13 @@ class Url implements Arrayable, Stringable
         $url = '';
 
         if ($this->scheme) {
-            $url .= $this->scheme . ':';
+            $url .= $this->scheme.':';
         }
 
         $url .= '//';
 
         if ($this->user) {
-            $url .= $this->user . ($this->pass ? ':' . $this->pass : '') . '@';
+            $url .= $this->user.($this->pass ? ':'.$this->pass : '').'@';
         }
 
         if ($this->host) {
@@ -97,7 +97,7 @@ class Url implements Arrayable, Stringable
         }
 
         if ($this->port) {
-            $url .= ':' . $this->port;
+            $url .= ':'.$this->port;
         }
 
         if ($this->path) {
@@ -105,11 +105,11 @@ class Url implements Arrayable, Stringable
         }
 
         if ($this->query) {
-            $url .= '?' . $this->query;
+            $url .= '?'.$this->query;
         }
 
         if ($this->fragment) {
-            $url .= '#' . $this->fragment;
+            $url .= '#'.$this->fragment;
         }
 
         return $url;
