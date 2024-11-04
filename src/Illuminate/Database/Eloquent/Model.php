@@ -1986,7 +1986,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Get the value of the model's primary key.
      *
-     * @return null|array-key
+     * @return array-key|null
      */
     public function getKey()
     {
