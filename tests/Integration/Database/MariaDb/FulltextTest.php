@@ -44,7 +44,7 @@ class FulltextTest extends MariaDbTestCase
     /** @link https://mariadb.com/kb/en/full-text-index-overview/#in-natural-language-mode */
     public function testWhereFulltext()
     {
-        $articles = DB::table('articles')->whereFulltext(['title', 'body'], 'database')->get();
+        $articles = DB::table('articles')->whereFullText(['title', 'body'], 'database')->get();
 
         $this->assertCount(2, $articles);
         $this->assertSame('MariaDB Tutorial', $articles[0]->title);
@@ -54,7 +54,7 @@ class FulltextTest extends MariaDbTestCase
     /** @link https://mariadb.com/kb/en/full-text-index-overview/#in-boolean-mode */
     public function testWhereFulltextWithBooleanMode()
     {
-        $articles = DB::table('articles')->whereFulltext(['title', 'body'], '+MariaDB -YourSQL', ['mode' => 'boolean'])->get();
+        $articles = DB::table('articles')->whereFullText(['title', 'body'], '+MariaDB -YourSQL', ['mode' => 'boolean'])->get();
 
         $this->assertCount(5, $articles);
     }
@@ -62,7 +62,7 @@ class FulltextTest extends MariaDbTestCase
     /** @link https://mariadb.com/kb/en/full-text-index-overview/#with-query-expansion */
     public function testWhereFulltextWithExpandedQuery()
     {
-        $articles = DB::table('articles')->whereFulltext(['title', 'body'], 'database', ['expanded' => true])->get();
+        $articles = DB::table('articles')->whereFullText(['title', 'body'], 'database', ['expanded' => true])->get();
 
         $this->assertCount(6, $articles);
     }
