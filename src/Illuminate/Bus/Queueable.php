@@ -31,14 +31,14 @@ trait Queueable
      *
      * @var \DateTimeInterface|\DateInterval|array|int|null
      */
-    public array|int|null|\DateTimeInterface|\DateInterval $delay;
+    public array|int|null|\DateTimeInterface|\DateInterval $delay = null;
 
     /**
      * Indicates whether the job should be dispatched after all database transactions have committed.
      *
      * @var bool|null
      */
-    public ?bool $afterCommit;
+    public ?bool $afterCommit = null;
 
     /**
      * The middleware the job should be dispatched through.
