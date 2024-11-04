@@ -60,4 +60,14 @@ class UrlTest extends TestCase
             'fragment' => 'fragment',
         ], $url->toArray());
     }
+
+    public function testToString()
+    {
+        $rawUrl = 'https://user:pass@example.com:8080/path/to/resource?foo=bar&baz=qux#fragment';
+
+        $url = Url::parse($rawUrl);
+
+        $this->assertSame($rawUrl, (string) $url);
+        $this->assertSame('foo=bar&baz=qux', (string) $url->query());
+    }
 }

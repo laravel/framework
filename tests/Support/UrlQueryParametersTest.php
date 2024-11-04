@@ -69,4 +69,14 @@ class UrlQueryParametersTest extends TestCase
             'baz' => 'qux',
         ], $params->toArray());
     }
+
+    public function testToString()
+    {
+        $params = new UrlQueryParameters([
+            'foo' => 'bar',
+            'baz' => 'qux',
+        ]);
+
+        $this->assertSame('foo=bar&baz=qux', (string) $params);
+    }
 }
