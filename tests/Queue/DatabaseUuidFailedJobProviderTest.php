@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Queue;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Queue\Failed\DatabaseUuidFailedJobProvider;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -79,6 +80,24 @@ class DatabaseUuidFailedJobProviderTest extends TestCase
         $this->assertCount(2, $provider->all());
 
         $provider->flush();
+
+        $this->assertEmpty($provider->all());
+    }
+
+    public function testPruningFailedJobs()
+    {
+        $provider = $this->getFailedJobProvider();
+
+        Carbon::setTestNow(Carbon::createFromDate(2024, 4, 28));
+
+        $provider->log('connection-1', 'queue-1', json_encode(['uuid' => 'uuid-1']), new RuntimeException());
+        $provider->log('connection-2', 'queue-2', json_encode(['uuid' => 'uuid-2']), new RuntimeException());
+
+        $provider->prune(Carbon::createFromDate(2024, 4, 26));
+
+        $this->assertCount(2, $provider->all());
+
+        $provider->prune(Carbon::createFromDate(2024, 4, 30));
 
         $this->assertEmpty($provider->all());
     }
