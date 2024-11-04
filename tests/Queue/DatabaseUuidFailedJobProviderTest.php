@@ -11,7 +11,7 @@ use RuntimeException;
 
 class DatabaseUuidFailedJobProviderTest extends TestCase
 {
-    public function testGetIdsOfAllFailedJobs()
+    public function testGettingIdsOfAllFailedJobs()
     {
         $provider = $this->getFailedJobProvider();
 
@@ -25,7 +25,7 @@ class DatabaseUuidFailedJobProviderTest extends TestCase
         $this->assertSame(['uuid-3', 'uuid-4'], $provider->ids('queue-2'));
     }
 
-    public function testGetAllFailedJobs()
+    public function testGettingAllFailedJobs()
     {
         $provider = $this->getFailedJobProvider();
 
@@ -44,7 +44,7 @@ class DatabaseUuidFailedJobProviderTest extends TestCase
         );
     }
 
-    public function testFindFailedJobsById()
+    public function testFindingFailedJobsById()
     {
         $provider = $this->getFailedJobProvider();
 
@@ -54,6 +54,33 @@ class DatabaseUuidFailedJobProviderTest extends TestCase
         $this->assertEquals('uuid-1', $provider->find('uuid-1')->id);
         $this->assertEquals('queue-1', $provider->find('uuid-1')->queue);
         $this->assertEquals('connection-1', $provider->find('uuid-1')->connection);
+    }
+
+    public function testRemovingJobsById()
+    {
+        $provider = $this->getFailedJobProvider();
+
+        $provider->log('connection-1', 'queue-1', json_encode(['uuid' => 'uuid-1']), new RuntimeException());
+
+        $this->assertNotNull($provider->find('uuid-1'));
+
+        $provider->forget('uuid-1');
+
+        $this->assertNull($provider->find('uuid-1'));
+    }
+
+    public function testRemovingAllFailedJobs()
+    {
+        $provider = $this->getFailedJobProvider();
+
+        $provider->log('connection-1', 'queue-1', json_encode(['uuid' => 'uuid-1']), new RuntimeException());
+        $provider->log('connection-2', 'queue-2', json_encode(['uuid' => 'uuid-2']), new RuntimeException());
+
+        $this->assertCount(2, $provider->all());
+
+        $provider->flush();
+
+        $this->assertEmpty($provider->all());
     }
 
     public function testJobsCanBeCounted()
