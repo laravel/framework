@@ -31,6 +31,10 @@ trait InteractsWithDictionary
             throw new InvalidArgumentException('Model attribute value is an object but does not have a __toString method.');
         }
 
+        if (is_float($attribute)) {
+            return (string)$attribute;
+        }
+
         return $attribute;
     }
 }
