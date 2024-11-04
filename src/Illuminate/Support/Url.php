@@ -2,9 +2,10 @@
 
 namespace Illuminate\Support;
 
+use Stringable;
 use Illuminate\Contracts\Support\Arrayable;
 
-class Url implements Arrayable
+class Url implements Arrayable, Stringable
 {
     /**
      * Constructor.
@@ -70,5 +71,47 @@ class Url implements Arrayable
             'query' => $this->query,
             'fragment' => $this->fragment,
         ];
+    }
+
+    /**
+     * Convert the URL object to a string.
+     *
+     * @return string
+     */
+    public function __toString(): string
+    {
+        $url = '';
+
+        if ($this->scheme) {
+            $url .= $this->scheme . ':';
+        }
+
+        $url .= '//';
+
+        if ($this->user) {
+            $url .= $this->user . ($this->pass ? ':' . $this->pass : '') . '@';
+        }
+
+        if ($this->host) {
+            $url .= $this->host;
+        }
+
+        if ($this->port) {
+            $url .= ':' . $this->port;
+        }
+
+        if ($this->path) {
+            $url .= $this->path;
+        }
+
+        if ($this->query) {
+            $url .= '?' . $this->query;
+        }
+
+        if ($this->fragment) {
+            $url .= '#' . $this->fragment;
+        }
+
+        return $url;
     }
 }

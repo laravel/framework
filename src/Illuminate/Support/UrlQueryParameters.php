@@ -2,9 +2,10 @@
 
 namespace Illuminate\Support;
 
+use Stringable;
 use Illuminate\Contracts\Support\Arrayable;
 
-class UrlQueryParameters implements Arrayable
+class UrlQueryParameters implements Arrayable, Stringable
 {
     /**
      * Constructor.
@@ -70,5 +71,21 @@ class UrlQueryParameters implements Arrayable
     public function toArray(): array
     {
         return $this->parameters;
+    }
+
+    /**
+     * Convert the query parameters to a string.
+     *
+     * @return string
+     */
+    public function __toString(): string
+    {
+        $parameters = [];
+
+        foreach ($this->parameters as $key => $value) {
+            $parameters[] = $key.'='.$value;
+        }
+
+        return implode('&', $parameters);
     }
 }
