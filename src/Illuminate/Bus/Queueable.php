@@ -17,71 +17,71 @@ trait Queueable
      *
      * @var string|null
      */
-    public $connection;
+    public ?string $connection;
 
     /**
      * The name of the queue the job should be sent to.
      *
      * @var string|null
      */
-    public $queue;
+    public ?string $queue;
 
     /**
      * The number of seconds before the job should be made available.
      *
      * @var \DateTimeInterface|\DateInterval|array|int|null
      */
-    public $delay;
+    public array|int|null|\DateTimeInterface|\DateInterval $delay;
 
     /**
      * Indicates whether the job should be dispatched after all database transactions have committed.
      *
      * @var bool|null
      */
-    public $afterCommit;
+    public ?bool $afterCommit;
 
     /**
      * The middleware the job should be dispatched through.
      *
      * @var array
      */
-    public $middleware = [];
+    public array $middleware = [];
 
     /**
      * The jobs that should run if this job is successful.
      *
      * @var array
      */
-    public $chained = [];
+    public array $chained = [];
 
     /**
      * The name of the connection the chain should be sent to.
      *
      * @var string|null
      */
-    public $chainConnection;
+    public ?string $chainConnection;
 
     /**
      * The name of the queue the chain should be sent to.
      *
      * @var string|null
      */
-    public $chainQueue;
+    public ?string $chainQueue;
 
     /**
      * The callbacks to be executed on chain failure.
      *
      * @var array|null
      */
-    public $chainCatchCallbacks;
+    public ?array $chainCatchCallbacks;
 
     /**
      * Set the desired connection for the job.
      *
-     * @param  \BackedEnum|string|null  $connection
+     * @param \BackedEnum|string|null $connection
      * @return $this
      */
-    public function onConnection($connection)
+    public function onConnection(\BackedEnum|string|null $connection): static
     {
         $this->connection = enum_value($connection);
 
@@ -91,10 +91,10 @@ trait Queueable
     /**
      * Set the desired queue for the job.
      *
-     * @param  \BackedEnum|string|null  $queue
+     * @param \BackedEnum|string|null $queue
      * @return $this
      */
-    public function onQueue($queue)
+    public function onQueue(\BackedEnum|string|null $queue): static
     {
         $this->queue = enum_value($queue);
 
@@ -104,10 +104,10 @@ trait Queueable
     /**
      * Set the desired connection for the chain.
      *
-     * @param  \BackedEnum|string|null  $connection
+     * @param \BackedEnum|string|null $connection
      * @return $this
      */
-    public function allOnConnection($connection)
+    public function allOnConnection(\BackedEnum|string|null $connection): static
     {
         $resolvedConnection = enum_value($connection);
 
@@ -120,10 +120,10 @@ trait Queueable
     /**
      * Set the desired queue for the chain.
      *
-     * @param  \BackedEnum|string|null  $queue
+     * @param \BackedEnum|string|null $queue
      * @return $this
      */
-    public function allOnQueue($queue)
+    public function allOnQueue(\BackedEnum|string|null $queue): static
     {
         $resolvedQueue = enum_value($queue);
 
@@ -136,10 +136,10 @@ trait Queueable
     /**
      * Set the desired delay in seconds for the job.
      *
-     * @param  \DateTimeInterface|\DateInterval|array|int|null  $delay
+     * @param \DateInterval|\DateTimeInterface|int|array|null $delay
      * @return $this
      */
-    public function delay($delay)
+    public function delay(\DateInterval|\DateTimeInterface|int|array|null $delay): static
     {
         $this->delay = $delay;
 
@@ -151,7 +151,7 @@ trait Queueable
      *
      * @return $this
      */
-    public function withoutDelay()
+    public function withoutDelay(): static
     {
         $this->delay = 0;
 
@@ -163,7 +163,7 @@ trait Queueable
      *
      * @return $this
      */
-    public function afterCommit()
+    public function afterCommit(): static
     {
         $this->afterCommit = true;
 
@@ -175,7 +175,7 @@ trait Queueable
      *
      * @return $this
      */
-    public function beforeCommit()
+    public function beforeCommit(): static
     {
         $this->afterCommit = false;
 
@@ -185,10 +185,10 @@ trait Queueable
     /**
      * Specify the middleware the job should be dispatched through.
      *
-     * @param  array|object  $middleware
+     * @param object|array $middleware
      * @return $this
      */
-    public function through($middleware)
+    public function through(object|array $middleware): static
     {
         $this->middleware = Arr::wrap($middleware);
 
@@ -198,10 +198,10 @@ trait Queueable
     /**
      * Set the jobs that should run if this job is successful.
      *
-     * @param  array  $chain
+     * @param array $chain
      * @return $this
      */
-    public function chain($chain)
+    public function chain(array $chain): static
     {
         $jobs = ChainedBatch::prepareNestedBatches(collect($chain));
 
@@ -218,7 +218,7 @@ trait Queueable
      * @param  mixed  $job
      * @return $this
      */
-    public function prependToChain($job)
+    public function prependToChain(mixed $job): static
     {
         $jobs = ChainedBatch::prepareNestedBatches(collect([$job]));
 
@@ -233,7 +233,7 @@ trait Queueable
      * @param  mixed  $job
      * @return $this
      */
-    public function appendToChain($job)
+    public function appendToChain(mixed $job): static
     {
         $jobs = ChainedBatch::prepareNestedBatches(collect([$job]));
 
@@ -250,7 +250,7 @@ trait Queueable
      *
      * @throws \RuntimeException
      */
-    protected function serializeJob($job)
+    protected function serializeJob(mixed $job): string
     {
         if ($job instanceof Closure) {
             if (! class_exists(CallQueuedClosure::class)) {
@@ -270,7 +270,7 @@ trait Queueable
      *
      * @return void
      */
-    public function dispatchNextJobInChain()
+    public function dispatchNextJobInChain(): void
     {
         if (! empty($this->chained)) {
             dispatch(tap(unserialize(array_shift($this->chained)), function ($next) {
@@ -289,10 +289,10 @@ trait Queueable
     /**
      * Invoke all of the chain's failed job callbacks.
      *
-     * @param  \Throwable  $e
+     * @param \Throwable $e
      * @return void
      */
-    public function invokeChainCatchCallbacks($e)
+    public function invokeChainCatchCallbacks(\Throwable $e): void
     {
         collect($this->chainCatchCallbacks)->each(function ($callback) use ($e) {
             $callback($e);
@@ -302,10 +302,10 @@ trait Queueable
     /**
      * Assert that the job has the given chain of jobs attached to it.
      *
-     * @param  array  $expectedChain
+     * @param array $expectedChain
      * @return void
      */
-    public function assertHasChain($expectedChain)
+    public function assertHasChain(array $expectedChain): void
     {
         PHPUnit::assertTrue(
             collect($expectedChain)->isNotEmpty(),
@@ -329,7 +329,7 @@ trait Queueable
      *
      * @return void
      */
-    public function assertDoesntHaveChain()
+    public function assertDoesntHaveChain(): void
     {
         PHPUnit::assertEmpty($this->chained, 'The job has chained jobs.');
     }
