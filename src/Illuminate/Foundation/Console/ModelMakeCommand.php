@@ -272,7 +272,6 @@ class ModelMakeCommand extends GeneratorCommand
         return $replacements;
     }
 
-
     /**
      * Get the console command options.
      *
