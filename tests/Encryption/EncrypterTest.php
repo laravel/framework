@@ -7,9 +7,18 @@ use Illuminate\Encryption\Encrypter;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
+use ReflectionClass;
 
 class EncrypterTest extends TestCase
 {
+    protected static function getSupportedCiphers()
+    {
+        $reflection = new ReflectionClass(Encrypter::class);
+        $property = $reflection->getProperty('supportedCiphers');
+        $property->setAccessible(true);
+        return $property->getValue();
+    }
+
     public function testEncryption(): void
     {
         $e = new Encrypter(str_repeat('a', 16));
@@ -270,7 +279,7 @@ class EncrypterTest extends TestCase
 
     public function testIsEncryptedReturnsTrueForValidPayloadsForAllSupportedCiphers()
     {
-        foreach (Encrypter::$supportedCiphers as $cipher => $properties) {
+        foreach (self::getSupportedCiphers() as $cipher => $properties) {
             $e = new Encrypter(str_repeat('a', $properties['size']), $cipher);
 
             $payload = $e->encrypt('foo');
@@ -283,7 +292,7 @@ class EncrypterTest extends TestCase
 
     public function testIsEncryptedReturnsFalseForInvalidPayloadsForAllSupportedCiphers()
     {
-        foreach (Encrypter::$supportedCiphers as $cipher => $properties) {
+        foreach (self::getSupportedCiphers() as $cipher => $properties) {
             $e = new Encrypter(str_repeat('a', $properties['size']), $cipher);
 
             $this->assertFalse($e->isEncrypted('foo'));
