@@ -148,10 +148,11 @@ class ModelMakeCommandTest extends TestCase
     public function testItGeneratesModelWithHasFactoryTraitWhenUsingAllOption()
     {
         $this->artisan('make:model', ['name' => 'Foo', '--all' => true])
+            ->expectsQuestion('A App\Models\Foo model does not exist. Do you want to generate it?', false)
             ->assertExitCode(0);
 
         $this->assertFileContains([
-            'namespace App\Models\Foo;',
+            'namespace App\Models;',
             'use Illuminate\Database\Eloquent\Factories\HasFactory;',
             'use Illuminate\Database\Eloquent\Model;',
             'class Foo extends Model',
