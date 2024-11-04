@@ -17,14 +17,14 @@ trait Queueable
      *
      * @var string|null
      */
-    public ?string $connection;
+    public ?string $connection = null;
 
     /**
      * The name of the queue the job should be sent to.
      *
      * @var string|null
      */
-    public ?string $queue;
+    public ?string $queue = null;
 
     /**
      * The number of seconds before the job should be made available.
@@ -59,21 +59,21 @@ trait Queueable
      *
      * @var string|null
      */
-    public ?string $chainConnection;
+    public ?string $chainConnection = null;
 
     /**
      * The name of the queue the chain should be sent to.
      *
      * @var string|null
      */
-    public ?string $chainQueue;
+    public ?string $chainQueue = null;
 
     /**
      * The callbacks to be executed on chain failure.
      *
      * @var array|null
      */
-    public ?array $chainCatchCallbacks;
+    public ?array $chainCatchCallbacks = null;
 
     /**
      * Set the desired connection for the job.
@@ -289,10 +289,10 @@ trait Queueable
     /**
      * Invoke all of the chain's failed job callbacks.
      *
-     * @param \Throwable $e
+     * @param \Throwable|null $e
      * @return void
      */
-    public function invokeChainCatchCallbacks(\Throwable $e): void
+    public function invokeChainCatchCallbacks(\Throwable|null $e): void
     {
         collect($this->chainCatchCallbacks)->each(function ($callback) use ($e) {
             $callback($e);
