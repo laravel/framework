@@ -36,7 +36,7 @@ class Encrypter implements EncrypterContract, StringEncrypter
      *
      * @var array
      */
-    private static $supportedCiphers = [
+    public static $supportedCiphers = [
         'aes-128-cbc' => ['size' => 16, 'aead' => false],
         'aes-256-cbc' => ['size' => 32, 'aead' => false],
         'aes-128-gcm' => ['size' => 16, 'aead' => true],
@@ -376,43 +376,57 @@ class Encrypter implements EncrypterContract, StringEncrypter
         return $this;
     }
 
-    public function isEncrypted(string $payload): bool
+    /**
+     * Determine if the given payload is encrypted.
+     *
+     * The method performs the following checks:
+     * 1. Attempts to base64 decode the payload
+     * 2. Tries to decode the payload as JSON
+     * 3. Validates that the payload has required encryption fields
+     * 4. For AEAD ciphers (GCM mode):
+     *    - Verifies the authentication tag exists and is a string
+     *    - Validates the tag is exactly 16 bytes when decoded
+     *
+     * @param  string  $payload
+     * @return bool Returns true if the payload is encrypted, false otherwise
+     */
+    public function isEncrypted(string $payload)
     {
-        $base64Decoded = base64_decode($payload, strict: true);
+        $decoded = base64_decode($payload, true);
 
-        // 1. Ensure that $payload is a base64-encoded string
-        if (!$base64Decoded) {
+        if ($decoded === false) {
             return false;
         }
 
-        // 2. Decode base64 and check if it's a JSON-encoded structure
-        $decodedPayload = json_decode($base64Decoded, associative: true);
-        if (!is_array($decodedPayload)) {
+        $payload = json_decode($decoded, true);
+
+        if (! $this->validPayload($payload)) {
             return false;
         }
 
-        // 3. Verify required keys (`iv`, `value`, `mac`), and `tag` if using AEAD
-        foreach (['iv', 'value', 'mac'] as $requiredKey) {
-            if (!isset($decodedPayload[$requiredKey]) || !is_string($decodedPayload[$requiredKey])) {
+        if (self::$supportedCiphers[strtolower($this->cipher)]['aead']) {
+            if (! isset($payload['tag']) || ! is_string($payload['tag'])) {
                 return false;
             }
-        }
 
-        // 4. Validate the IV length based on the cipher in use
-        $iv = base64_decode($decodedPayload['iv'], true);
-        if ($iv === false || strlen($iv) !== openssl_cipher_iv_length(strtolower($this->cipher))) {
-            return false;
-        }
+            $tag = base64_decode($payload['tag'], true);
 
-        // 5. If the cipher is AEAD, ensure a valid `tag`
-        $isAeadCipher = self::$supportedCiphers[strtolower($this->cipher)]['aead'] ?? false;
-        if ($isAeadCipher) {
-            $authenticationTag = $decodedPayload['tag'] ?? null;
-            if ($authenticationTag === null || !is_string($authenticationTag) || strlen(base64_decode($authenticationTag, strict: true)) !== 16) {
+            if ($tag === false || strlen($tag) !== 16) {
                 return false;
             }
         }
 
         return true;
+    }
+
+    /**
+     * Determine if the given payload is not encrypted.
+     *
+     * @param  string  $payload
+     * @return bool
+     */
+    public function isNotEncrypted(string $payload)
+    {
+        return ! $this->isEncrypted($payload);
     }
 }

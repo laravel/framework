@@ -13,6 +13,7 @@ namespace Illuminate\Support\Facades;
  * @method static array getAllKeys()
  * @method static array getPreviousKeys()
  * @method static bool isEncrypted(string $payload)
+ * @method static bool isNotEncrypted(string $payload)
  * @method static \Illuminate\Encryption\Encrypter previousKeys(array $keys)
  *
  * @see \Illuminate\Encryption\Encrypter

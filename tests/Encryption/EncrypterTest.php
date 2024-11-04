@@ -267,4 +267,43 @@ class EncrypterTest extends TestCase
         $enc = new Encrypter(str_repeat('x', 16));
         $enc->decrypt(base64_encode(json_encode($payload)));
     }
+
+    public function testIsEncryptedReturnsTrueForValidPayloadsForAllSupportedCiphers()
+    {
+        foreach (Encrypter::$supportedCiphers as $cipher => $properties) {
+            $e = new Encrypter(str_repeat('a', $properties['size']), $cipher);
+            
+            $payload = $e->encrypt('foo');
+            $this->assertTrue($e->isEncrypted($payload));
+
+            $payload = $e->encrypt(['foo' => 'bar']);
+            $this->assertTrue($e->isEncrypted($payload));
+        }
+    }
+
+    public function testIsEncryptedReturnsFalseForInvalidPayloadsForAllSupportedCiphers()
+    {
+        foreach (Encrypter::$supportedCiphers as $cipher => $properties) {
+            $e = new Encrypter(str_repeat('a', $properties['size']), $cipher);
+            
+            $this->assertFalse($e->isEncrypted('foo'));
+            $this->assertFalse($e->isEncrypted(json_encode(['foo' => 'bar'])));
+            $this->assertFalse($e->isEncrypted($e->decrypt($e->encrypt('foo'))));
+            $this->assertFalse($e->isEncrypted(''));
+            $this->assertFalse($e->isEncrypted(base64_encode('invalid-payload')));
+        }
+    }
+
+    public function testIsNotEncryptedReturnsOppositeOfIsEncrypted()
+    {
+        $e = new Encrypter(str_repeat('a', 16));
+
+        $this->assertTrue($e->isNotEncrypted('foo') === ! $e->isEncrypted('foo'));
+        $this->assertTrue($e->isNotEncrypted(json_encode(['foo' => 'bar'])) === ! $e->isEncrypted(json_encode(['foo' => 'bar'])));
+        
+        $encrypted = $e->encrypt('foo');
+        $this->assertTrue($e->isNotEncrypted($encrypted) === ! $e->isEncrypted($encrypted));
+        
+        $this->assertTrue($e->isNotEncrypted('') === ! $e->isEncrypted(''));
+    }
 }
