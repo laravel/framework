@@ -51,7 +51,7 @@ abstract class HasOneOrMany extends Relation
      * @param  string  $operator
      * @return void
      */
-    public function __construct(Builder $query, Model $parent, $foreignKey, $localKey, $operator)
+    public function __construct(Builder $query, Model $parent, $foreignKey, $localKey, $operator = '=')
     {
         $this->localKey = $localKey;
         $this->foreignKey = $foreignKey;

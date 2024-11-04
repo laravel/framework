@@ -160,7 +160,7 @@ class BelongsToMany extends Relation
      * @return void
      */
     public function __construct(Builder $query, Model $parent, $table, $foreignPivotKey,
-                                $relatedPivotKey, $parentKey, $relatedKey, $relationName = null, $operator)
+                                $relatedPivotKey, $parentKey, $relatedKey, $relationName = null, $operator = '=')
     {
         $this->parentKey = $parentKey;
         $this->relatedKey = $relatedKey;

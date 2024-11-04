@@ -69,7 +69,7 @@ class BelongsTo extends Relation
      * @param  string  $operator
      * @return void
      */
-    public function __construct(Builder $query, Model $child, $foreignKey, $ownerKey, $relationName, $operator)
+    public function __construct(Builder $query, Model $child, $foreignKey, $ownerKey, $relationName, $operator = '=')
     {
         $this->ownerKey = $ownerKey;
         $this->relationName = $relationName;
