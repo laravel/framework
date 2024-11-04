@@ -98,9 +98,10 @@ trait HasRelationships
      * @param  class-string<TRelatedModel>  $related
      * @param  string|null  $foreignKey
      * @param  string|null  $localKey
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne<TRelatedModel, $this>
+     * @param  string  $operator
+     * @return \Illuminate\Database\loquent\Relations\HasOne<TRelatedModel, $this>
      */
-    public function hasOne($related, $foreignKey = null, $localKey = null)
+    public function hasOne($related, $foreignKey = null, $localKey = null, $operator = '=')
     {
         $instance = $this->newRelatedInstance($related);
 
@@ -108,7 +109,7 @@ trait HasRelationships
 
         $localKey = $localKey ?: $this->getKeyName();
 
-        return $this->newHasOne($instance->newQuery(), $this, $instance->getTable().'.'.$foreignKey, $localKey);
+        return $this->newHasOne($instance->newQuery(), $this, $instance->getTable().'.'.$foreignKey, $localKey, $operator);
     }
 
     /**
@@ -121,11 +122,12 @@ trait HasRelationships
      * @param  TDeclaringModel  $parent
      * @param  string  $foreignKey
      * @param  string  $localKey
+     * @param  string  $operator
      * @return \Illuminate\Database\Eloquent\Relations\HasOne<TRelatedModel, TDeclaringModel>
      */
-    protected function newHasOne(Builder $query, Model $parent, $foreignKey, $localKey)
+    protected function newHasOne(Builder $query, Model $parent, $foreignKey, $localKey, $operator)
     {
-        return new HasOne($query, $parent, $foreignKey, $localKey);
+        return new HasOne($query, $parent, $foreignKey, $localKey, $operator);
     }
 
     /**
@@ -230,9 +232,10 @@ trait HasRelationships
      * @param  string|null  $foreignKey
      * @param  string|null  $ownerKey
      * @param  string|null  $relation
+     * @param  string  $operator
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<TRelatedModel, $this>
      */
-    public function belongsTo($related, $foreignKey = null, $ownerKey = null, $relation = null)
+    public function belongsTo($related, $foreignKey = null, $ownerKey = null, $relation = null, $operator = '=')
     {
         // If no relation name was given, we will use this debug backtrace to extract
         // the calling method's name and use that as the relationship name as most
@@ -256,7 +259,7 @@ trait HasRelationships
         $ownerKey = $ownerKey ?: $instance->getKeyName();
 
         return $this->newBelongsTo(
-            $instance->newQuery(), $this, $foreignKey, $ownerKey, $relation
+            $instance->newQuery(), $this, $foreignKey, $ownerKey, $relation, $operator
         );
     }
 
@@ -271,11 +274,12 @@ trait HasRelationships
      * @param  string  $foreignKey
      * @param  string  $ownerKey
      * @param  string  $relation
+     * @param  string  $operator
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<TRelatedModel, TDeclaringModel>
      */
-    protected function newBelongsTo(Builder $query, Model $child, $foreignKey, $ownerKey, $relation)
+    protected function newBelongsTo(Builder $query, Model $child, $foreignKey, $ownerKey, $relation, $operator)
     {
-        return new BelongsTo($query, $child, $foreignKey, $ownerKey, $relation);
+        return new BelongsTo($query, $child, $foreignKey, $ownerKey, $relation, $operator);
     }
 
     /**
@@ -414,9 +418,10 @@ trait HasRelationships
      * @param  class-string<TRelatedModel>  $related
      * @param  string|null  $foreignKey
      * @param  string|null  $localKey
+     * @param  string  $operator
      * @return \Illuminate\Database\Eloquent\Relations\HasMany<TRelatedModel, $this>
      */
-    public function hasMany($related, $foreignKey = null, $localKey = null)
+    public function hasMany($related, $foreignKey = null, $localKey = null, $operator = '=')
     {
         $instance = $this->newRelatedInstance($related);
 
@@ -425,7 +430,7 @@ trait HasRelationships
         $localKey = $localKey ?: $this->getKeyName();
 
         return $this->newHasMany(
-            $instance->newQuery(), $this, $instance->getTable().'.'.$foreignKey, $localKey
+            $instance->newQuery(), $this, $instance->getTable().'.'.$foreignKey, $localKey, $operator
         );
     }
 
@@ -439,11 +444,12 @@ trait HasRelationships
      * @param  TDeclaringModel  $parent
      * @param  string  $foreignKey
      * @param  string  $localKey
+     * @param  string  $operator
      * @return \Illuminate\Database\Eloquent\Relations\HasMany<TRelatedModel, TDeclaringModel>
      */
-    protected function newHasMany(Builder $query, Model $parent, $foreignKey, $localKey)
+    protected function newHasMany(Builder $query, Model $parent, $foreignKey, $localKey, $operator)
     {
-        return new HasMany($query, $parent, $foreignKey, $localKey);
+        return new HasMany($query, $parent, $foreignKey, $localKey, $operator);
     }
 
     /**
@@ -558,10 +564,11 @@ trait HasRelationships
      * @param  string|null  $parentKey
      * @param  string|null  $relatedKey
      * @param  string|null  $relation
+     * @param  string  $operator
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<TRelatedModel, $this>
      */
     public function belongsToMany($related, $table = null, $foreignPivotKey = null, $relatedPivotKey = null,
-                                  $parentKey = null, $relatedKey = null, $relation = null)
+                                  $parentKey = null, $relatedKey = null, $relation = null, $operator = '=')
     {
         // If no relationship name was passed, we will pull backtraces to get the
         // name of the calling function. We will use that function name as the
@@ -589,7 +596,7 @@ trait HasRelationships
         return $this->newBelongsToMany(
             $instance->newQuery(), $this, $table, $foreignPivotKey,
             $relatedPivotKey, $parentKey ?: $this->getKeyName(),
-            $relatedKey ?: $instance->getKeyName(), $relation
+            $relatedKey ?: $instance->getKeyName(), $relation, $operator
         );
     }
 
@@ -607,12 +614,13 @@ trait HasRelationships
      * @param  string  $parentKey
      * @param  string  $relatedKey
      * @param  string|null  $relationName
+     * @param  string  $operator
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<TRelatedModel, TDeclaringModel>
      */
     protected function newBelongsToMany(Builder $query, Model $parent, $table, $foreignPivotKey, $relatedPivotKey,
-                                        $parentKey, $relatedKey, $relationName = null)
+                                        $parentKey, $relatedKey, $relationName = null, $operator)
     {
-        return new BelongsToMany($query, $parent, $table, $foreignPivotKey, $relatedPivotKey, $parentKey, $relatedKey, $relationName);
+        return new BelongsToMany($query, $parent, $table, $foreignPivotKey, $relatedPivotKey, $parentKey, $relatedKey, $relationName, $operator);
     }
 
     /**

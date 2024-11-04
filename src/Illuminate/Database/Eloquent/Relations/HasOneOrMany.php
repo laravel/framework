@@ -35,18 +35,27 @@ abstract class HasOneOrMany extends Relation
     protected $localKey;
 
     /**
+     * The operator of relationship.
+     *
+     * @var string
+     */
+    protected $operator;
+
+    /**
      * Create a new has one or many relationship instance.
      *
      * @param  \Illuminate\Database\Eloquent\Builder<TRelatedModel>  $query
      * @param  TDeclaringModel  $parent
      * @param  string  $foreignKey
      * @param  string  $localKey
+     * @param  string  $operator
      * @return void
      */
-    public function __construct(Builder $query, Model $parent, $foreignKey, $localKey)
+    public function __construct(Builder $query, Model $parent, $foreignKey, $localKey, $operator)
     {
         $this->localKey = $localKey;
         $this->foreignKey = $foreignKey;
+        $this->operator = $operator;
 
         parent::__construct($query, $parent);
     }
@@ -92,7 +101,7 @@ abstract class HasOneOrMany extends Relation
         if (static::$constraints) {
             $query = $this->getRelationQuery();
 
-            $query->where($this->foreignKey, '=', $this->getParentKey());
+            $query->where($this->foreignKey, $this->operator, $this->getParentKey());
 
             $query->whereNotNull($this->foreignKey);
         }
@@ -475,7 +484,7 @@ abstract class HasOneOrMany extends Relation
         $query->getModel()->setTable($hash);
 
         return $query->select($columns)->whereColumn(
-            $this->getQualifiedParentKeyName(), '=', $hash.'.'.$this->getForeignKeyName()
+            $this->getQualifiedParentKeyName(), $this->operator, $hash.'.'.$this->getForeignKeyName()
         );
     }
 

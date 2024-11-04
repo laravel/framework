@@ -132,6 +132,13 @@ class BelongsToMany extends Relation
     protected $using;
 
     /**
+     * The operator for the relationship.
+     *
+     * @var string
+     */
+    protected $operator;
+
+    /**
      * The name of the accessor to use for the "pivot" relationship.
      *
      * @var string
@@ -149,16 +156,18 @@ class BelongsToMany extends Relation
      * @param  string  $parentKey
      * @param  string  $relatedKey
      * @param  string|null  $relationName
+     * @param  string  $operator
      * @return void
      */
     public function __construct(Builder $query, Model $parent, $table, $foreignPivotKey,
-                                $relatedPivotKey, $parentKey, $relatedKey, $relationName = null)
+                                $relatedPivotKey, $parentKey, $relatedKey, $relationName = null, $operator)
     {
         $this->parentKey = $parentKey;
         $this->relatedKey = $relatedKey;
         $this->relationName = $relationName;
         $this->relatedPivotKey = $relatedPivotKey;
         $this->foreignPivotKey = $foreignPivotKey;
+        $this->operator = $operator;
         $this->table = $this->resolveTableName($table);
 
         parent::__construct($query, $parent);
@@ -219,7 +228,7 @@ class BelongsToMany extends Relation
         $query->join(
             $this->table,
             $this->getQualifiedRelatedKeyName(),
-            '=',
+            $this->operator,
             $this->getQualifiedRelatedPivotKeyName()
         );
 
@@ -234,7 +243,7 @@ class BelongsToMany extends Relation
     protected function addWhereConstraints()
     {
         $this->query->where(
-            $this->getQualifiedForeignPivotKeyName(), '=', $this->parent->{$this->parentKey}
+            $this->getQualifiedForeignPivotKeyName(), $this->operator, $this->parent->{$this->parentKey}
         );
 
         return $this;

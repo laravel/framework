@@ -52,6 +52,13 @@ class BelongsTo extends Relation
     protected $relationName;
 
     /**
+     * The operator of the relationship.
+     *
+     * @var string
+     */
+    protected $operator;
+
+    /**
      * Create a new belongs to relationship instance.
      *
      * @param  \Illuminate\Database\Eloquent\Builder<TRelatedModel>  $query
@@ -59,13 +66,15 @@ class BelongsTo extends Relation
      * @param  string  $foreignKey
      * @param  string  $ownerKey
      * @param  string  $relationName
+     * @param  string  $operator
      * @return void
      */
-    public function __construct(Builder $query, Model $child, $foreignKey, $ownerKey, $relationName)
+    public function __construct(Builder $query, Model $child, $foreignKey, $ownerKey, $relationName, $operator)
     {
         $this->ownerKey = $ownerKey;
         $this->relationName = $relationName;
         $this->foreignKey = $foreignKey;
+        $this->operator = $operator;
 
         // In the underlying base relationship class, this variable is referred to as
         // the "parent" since most relationships are not inversed. But, since this
@@ -98,7 +107,7 @@ class BelongsTo extends Relation
             // of the related models matching on the foreign key that's on a parent.
             $table = $this->related->getTable();
 
-            $this->query->where($table.'.'.$this->ownerKey, '=', $this->getForeignKeyFrom($this->child));
+            $this->query->where($table.'.'.$this->ownerKey, $this->operator, $this->getForeignKeyFrom($this->child));
         }
     }
 
@@ -240,7 +249,7 @@ class BelongsTo extends Relation
         }
 
         return $query->select($columns)->whereColumn(
-            $this->getQualifiedForeignKeyName(), '=', $query->qualifyColumn($this->ownerKey)
+            $this->getQualifiedForeignKeyName(), $this->operator, $query->qualifyColumn($this->ownerKey)
         );
     }
 
@@ -261,7 +270,7 @@ class BelongsTo extends Relation
         $query->getModel()->setTable($hash);
 
         return $query->whereColumn(
-            $hash.'.'.$this->ownerKey, '=', $this->getQualifiedForeignKeyName()
+            $hash.'.'.$this->ownerKey, $this->operator, $this->getQualifiedForeignKeyName()
         );
     }
 
