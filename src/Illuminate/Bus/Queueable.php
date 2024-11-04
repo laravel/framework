@@ -78,7 +78,7 @@ trait Queueable
     /**
      * Set the desired connection for the job.
      *
-     * @param  \BackedEnum|string|null $connection
+     * @param  \BackedEnum|string|null  $connection
      * @return $this
      */
     public function onConnection(\BackedEnum|string|null $connection): static
@@ -91,7 +91,7 @@ trait Queueable
     /**
      * Set the desired queue for the job.
      *
-     * @param  \BackedEnum|string|null $queue
+     * @param  \BackedEnum|string|null  $queue
      * @return $this
      */
     public function onQueue(\BackedEnum|string|null $queue): static
@@ -104,7 +104,7 @@ trait Queueable
     /**
      * Set the desired connection for the chain.
      *
-     * @param  \BackedEnum|string|null $connection
+     * @param  \BackedEnum|string|null  $connection
      * @return $this
      */
     public function allOnConnection(\BackedEnum|string|null $connection): static
@@ -120,7 +120,7 @@ trait Queueable
     /**
      * Set the desired queue for the chain.
      *
-     * @param  \BackedEnum|string|null $queue
+     * @param  \BackedEnum|string|null  $queue
      * @return $this
      */
     public function allOnQueue(\BackedEnum|string|null $queue): static
@@ -136,7 +136,7 @@ trait Queueable
     /**
      * Set the desired delay in seconds for the job.
      *
-     * @param  \DateInterval|\DateTimeInterface|int|array|null $delay
+     * @param  \DateInterval|\DateTimeInterface|int|array|null  $delay
      * @return $this
      */
     public function delay(\DateInterval|\DateTimeInterface|int|array|null $delay): static
@@ -185,7 +185,7 @@ trait Queueable
     /**
      * Specify the middleware the job should be dispatched through.
      *
-     * @param  object|array $middleware
+     * @param  object|array  $middleware
      * @return $this
      */
     public function through(object|array $middleware): static
@@ -198,7 +198,7 @@ trait Queueable
     /**
      * Set the jobs that should run if this job is successful.
      *
-     * @param  array $chain
+     * @param  array  $chain
      * @return $this
      */
     public function chain(array $chain): static
@@ -289,7 +289,7 @@ trait Queueable
     /**
      * Invoke all of the chain's failed job callbacks.
      *
-     * @param  \Throwable|null $e
+     * @param  \Throwable|null  $e
      * @return void
      */
     public function invokeChainCatchCallbacks(\Throwable|null $e): void
@@ -302,7 +302,7 @@ trait Queueable
     /**
      * Assert that the job has the given chain of jobs attached to it.
      *
-     * @param  array $expectedChain
+     * @param  array  $expectedChain
      * @return void
      */
     public function assertHasChain(array $expectedChain): void
