@@ -11,6 +11,20 @@ use RuntimeException;
 
 class DatabaseUuidFailedJobProviderTest extends TestCase
 {
+    public function testGetIdsOfAllFailedJobs()
+    {
+        $provider = $this->getFailedJobProvider();
+
+        $provider->log('connection-1', 'queue-1', json_encode(['uuid' => 'uuid-1']), new RuntimeException());
+        $provider->log('connection-1', 'queue-1', json_encode(['uuid' => 'uuid-2']), new RuntimeException());
+        $provider->log('connection-2', 'queue-2', json_encode(['uuid' => 'uuid-3']), new RuntimeException());
+        $provider->log('connection-2', 'queue-2', json_encode(['uuid' => 'uuid-4']), new RuntimeException());
+
+        $this->assertSame(['uuid-1', 'uuid-2', 'uuid-3', 'uuid-4'], $provider->ids());
+        $this->assertSame(['uuid-1', 'uuid-2'], $provider->ids('queue-1'));
+        $this->assertSame(['uuid-3', 'uuid-4'], $provider->ids('queue-2'));
+    }
+
     public function testJobsCanBeCounted()
     {
         $provider = $this->getFailedJobProvider();
