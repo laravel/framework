@@ -7,7 +7,7 @@ use DateTimeInterface;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
 
-class FileFailedJobProvider implements CountableFailedJobProvider, FailedJobProviderInterface, PrunableFailedJobProvider
+class FileFailedJobProvider implements CountableFailedJobProvider, FailedJobProviderInterface, PrunableFailedJobProvider, LimitableFailedJobProvider
 {
     /**
      * The file path where the failed job file should be stored.
@@ -234,5 +234,18 @@ class FileFailedJobProvider implements CountableFailedJobProvider, FailedJobProv
         return (new Collection($this->read()))
             ->filter(fn ($job) => $job->connection === ($connection ?? $job->connection) && $job->queue === ($queue ?? $job->queue))
             ->count();
+    }
+
+    /**
+     * Get a specific number of failed jobs.
+     *
+     * @param  int  $value
+     * @return array
+     */
+    public function limit($value)
+    {
+        return collect($this->read())
+            ->take($value)
+            ->all();
     }
 }

@@ -200,4 +200,36 @@ class FileFailedJobProviderTest extends TestCase
 
         return [(string) $uuid, $exception];
     }
+
+    public function testCanRetrieveLimitedFailedJobs()
+    {
+        [$uuidOne, $exceptionOne] = $this->logFailedJob();
+        [$uuidTwo, $exceptionTwo] = $this->logFailedJob();
+        [$uuidThree, $exceptionThree] = $this->logFailedJob();
+
+        $failedJobs = $this->provider->limit(2);
+
+        $this->assertCount(2, $failedJobs);
+
+        $this->assertEquals([
+            (object) [
+                'id' => $uuidThree,
+                'connection' => 'connection',
+                'queue' => 'queue',
+                'payload' => json_encode(['uuid' => $uuidThree]),
+                'exception' => (string) mb_convert_encoding($exceptionThree, 'UTF-8'),
+                'failed_at' => $failedJobs[0]->failed_at,
+                'failed_at_timestamp' => $failedJobs[0]->failed_at_timestamp,
+            ],
+            (object) [
+                'id' => $uuidTwo,
+                'connection' => 'connection',
+                'queue' => 'queue',
+                'payload' => json_encode(['uuid' => $uuidTwo]),
+                'exception' => (string) mb_convert_encoding($exceptionTwo, 'UTF-8'),
+                'failed_at' => $failedJobs[1]->failed_at,
+                'failed_at_timestamp' => $failedJobs[1]->failed_at_timestamp,
+            ],
+        ], $failedJobs);
+    }
 }
