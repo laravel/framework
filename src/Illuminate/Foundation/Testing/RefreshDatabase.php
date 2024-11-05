@@ -84,7 +84,7 @@ trait RefreshDatabase
 
         $connections = $this->connectionsToTransact();
 
-        $this->app->instance('db.transactions', $transactionsManager = new DatabaseTransactionsManager(count($connections)));
+        $this->app->instance('db.transactions', $transactionsManager = new DatabaseTransactionsManager($connections));
 
         foreach ($connections as $name) {
             $connection = $database->connection($name);
