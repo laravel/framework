@@ -5,9 +5,17 @@ namespace Illuminate\Tests\Integration\Foundation\Console;
 use Illuminate\Foundation\Console\ClosureCommand;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Tests\Integration\Generators\TestCase;
+use Orchestra\Testbench\Concerns\InteractsWithPublishedFiles;
 
 class OptimizeCommandTest extends TestCase
 {
+    use InteractsWithPublishedFiles;
+
+    protected $files = [
+        'bootstrap/cache/config.php',
+        'bootstrap/cache/events.php',
+    ];
+
     protected function getPackageProviders($app): array
     {
         return [ServiceProviderWithOptimize::class];
