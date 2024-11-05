@@ -19,8 +19,8 @@ class EloquentTransactionWithAfterCommitUsingRefreshDatabaseOnMultipleConnection
         });
 
         parent::setUp();
-
     }
+
     /** {@inheritDoc} */
     protected function connectionsToTransact()
     {
