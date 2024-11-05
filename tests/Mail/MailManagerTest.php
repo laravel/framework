@@ -43,6 +43,28 @@ class MailManagerTest extends TestCase
         $this->assertSame(5876, $transport->getStream()->getPort());
     }
 
+    public function testBuild()
+    {
+        $config = [
+            'transport' => 'smtp',
+            'host' => '127.0.0.2',
+            'port' => 5876,
+            'encryption' => 'tls',
+            'username' => 'usr',
+            'password' => 'pwd',
+            'timeout' => 5,
+        ];
+
+        $mailer = $this->app['mail.manager']->build($config);
+        $transport = $mailer->getSymfonyTransport();
+
+        $this->assertInstanceOf(EsmtpTransport::class, $transport);
+        $this->assertSame('usr', $transport->getUsername());
+        $this->assertSame('pwd', $transport->getPassword());
+        $this->assertSame('127.0.0.2', $transport->getStream()->getHost());
+        $this->assertSame(5876, $transport->getStream()->getPort());
+    }
+
     public static function emptyTransportConfigDataProvider()
     {
         return [
