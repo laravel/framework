@@ -175,6 +175,7 @@ class DatabaseUuidFailedJobProviderTest extends TestCase
             $table->longText('exception');
             $table->timestamp('failed_at')->useCurrent();
         });
+
         return new DatabaseUuidFailedJobProvider($db->getDatabaseManager(), $database, $table);
     }
 }
