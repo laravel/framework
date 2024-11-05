@@ -28,31 +28,25 @@ class DatabaseFailedJobProviderTest extends TestCase
     {
         Date::setTestNow(Date::now());
 
-        $db = $this->createSimpleDatabaseWithFailedJobTable();
+        $this->createFailedJobsRecord(['failed_at' => Date::now()->subDays(10)]);
+        $this->provider->flush();
+        $this->assertSame(0, $this->failedJobsTable()->count());
 
-        $provider = new DatabaseFailedJobProvider($db->getDatabaseManager(), 'default', 'failed_jobs');
+        $this->createFailedJobsRecord(['failed_at' => Date::now()->subDays(10)]);
+        $this->provider->flush(15 * 24);
+        $this->assertSame(1, $this->failedJobsTable()->count());
 
-        $db->getConnection()->table('failed_jobs')->insert(['failed_at' => Date::now()->subDays(10)]);
-        $provider->flush();
-        $this->assertSame(0, $db->getConnection()->table('failed_jobs')->count());
-
-        $db->getConnection()->table('failed_jobs')->insert(['failed_at' => Date::now()->subDays(10)]);
-        $provider->flush(15 * 24);
-        $this->assertSame(1, $db->getConnection()->table('failed_jobs')->count());
-
-        $db->getConnection()->table('failed_jobs')->insert(['failed_at' => Date::now()->subDays(10)]);
-        $provider->flush(10 * 24);
-        $this->assertSame(0, $db->getConnection()->table('failed_jobs')->count());
+        $this->createFailedJobsRecord(['failed_at' => Date::now()->subDays(10)]);
+        $this->provider->flush(10 * 24);
+        $this->assertSame(0, $this->failedJobsTable()->count());
     }
 
     public function testCanProperlyLogFailedJob()
     {
         $uuid = Str::uuid();
-
         $exception = new Exception(mb_convert_encoding('ÐÑÙ0E\xE2\x�98\xA0World��7B¹!þÿ', 'ISO-8859-1', 'UTF-8'));
-        $provider = new DatabaseFailedJobProvider($this->db->getDatabaseManager(), 'default', 'failed_jobs');
 
-        $provider->log('database', 'default', json_encode(['uuid' => (string) $uuid]), $exception);
+        $this->provider->log('database', 'default', json_encode(['uuid' => (string) $uuid]), $exception);
 
         $exception = (string) mb_convert_encoding($exception, 'UTF-8');
 
@@ -157,5 +151,18 @@ class DatabaseFailedJobProviderTest extends TestCase
     protected function failedJobsTable()
     {
         return $this->db->getConnection()->table('failed_jobs');
+    }
+
+    protected function createFailedJobsRecord(array $overrides = [])
+    {
+        return $this->failedJobsTable()
+                ->insert(array_merge([
+                    'connection' => 'database',
+                    'queue' => 'default',
+                    'payload' => json_encode(['uuid' => (string) Str::uuid()]),
+                    'exception' => new Exception('Whoops!'),
+                    'failed_at' => Date::now()->subDays(10),
+                ], $overrides)
+            );
     }
 }
