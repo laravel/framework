@@ -5,7 +5,7 @@ namespace Illuminate\Queue\Failed;
 interface LimitableFailedJobProvider
 {
     /**
-     * Count the failed jobs.
+     * Get a specific number of failed jobs.
      *
      * @param  int  $value
      * @return array

@@ -6,7 +6,7 @@ use DateTimeInterface;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Support\Facades\Date;
 
-class DatabaseUuidFailedJobProvider implements CountableFailedJobProvider, FailedJobProviderInterface, PrunableFailedJobProvider
+class DatabaseUuidFailedJobProvider implements CountableFailedJobProvider, FailedJobProviderInterface, PrunableFailedJobProvider, LimitableFailedJobProvider
 {
     /**
      * The connection resolver implementation.
@@ -181,5 +181,21 @@ class DatabaseUuidFailedJobProvider implements CountableFailedJobProvider, Faile
     protected function getTable()
     {
         return $this->resolver->connection($this->database)->table($this->table);
+    }
+
+    /**
+     * Get a specific number of failed jobs.
+     *
+     * @param  int  $value
+     * @return array
+     */
+    public function limit($value)
+    {
+        return $this->getTable()->orderBy('id', 'desc')->limit($value)->get()->map(function ($record) {
+            $record->id = $record->uuid;
+            unset($record->uuid);
+
+            return $record;
+        })->all();
     }
 }

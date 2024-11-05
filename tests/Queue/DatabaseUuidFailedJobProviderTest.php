@@ -178,4 +178,23 @@ class DatabaseUuidFailedJobProviderTest extends TestCase
 
         return new DatabaseUuidFailedJobProvider($db->getDatabaseManager(), $database, $table);
     }
+
+    public function testFailedJobsCanBeLimited()
+    {
+        $provider = $this->getFailedJobProvider();
+
+        $this->assertEmpty($provider->all());
+
+        $provider->log('connection-1', 'queue-1', json_encode(['uuid' => 'uuid-1']), new RuntimeException());
+        $provider->log('connection-2', 'queue-2', json_encode(['uuid' => 'uuid-2']), new RuntimeException());
+        $provider->log('connection-3', 'queue-3', json_encode(['uuid' => 'uuid-3']), new RuntimeException());
+        $provider->log('connection-4', 'queue-4', json_encode(['uuid' => 'uuid-4']), new RuntimeException());
+
+        $this->assertCount(3, $provider->limit(3));
+
+        $this->assertSame(
+            ['uuid-1', 'uuid-2', 'uuid-3'],
+            array_column($provider->limit(3), 'id')
+        );
+    }
 }
