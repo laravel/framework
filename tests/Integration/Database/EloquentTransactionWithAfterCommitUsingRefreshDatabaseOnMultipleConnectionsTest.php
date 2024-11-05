@@ -10,6 +10,18 @@ use function Orchestra\Testbench\artisan;
 class EloquentTransactionWithAfterCommitUsingRefreshDatabaseOnMultipleConnectionsTest extends EloquentTransactionWithAfterCommitUsingRefreshDatabaseTest
 {
     /** {@inheritDoc} */
+    protected function setUp(): void
+    {
+        $this->afterApplicationCreated(function () {
+            $this->markTestSkippedWhen(
+                $this->usesSqliteInMemoryDatabaseConnection(), 'Skipped when default database is configured to use In-Memory SQLite Database'
+            );
+        });
+
+        parent::setUp();
+
+    }
+    /** {@inheritDoc} */
     protected function connectionsToTransact()
     {
         return [null, 'second'];
