@@ -44,7 +44,7 @@ class FulltextTest extends MySqlTestCase
     /** @link https://dev.mysql.com/doc/refman/8.0/en/fulltext-natural-language.html */
     public function testWhereFulltext()
     {
-        $articles = DB::table('articles')->whereFulltext(['title', 'body'], 'database')->get();
+        $articles = DB::table('articles')->whereFullText(['title', 'body'], 'database')->get();
 
         $this->assertCount(2, $articles);
         $this->assertSame('MySQL Tutorial', $articles[0]->title);
@@ -54,7 +54,7 @@ class FulltextTest extends MySqlTestCase
     /** @link https://dev.mysql.com/doc/refman/8.0/en/fulltext-boolean.html */
     public function testWhereFulltextWithBooleanMode()
     {
-        $articles = DB::table('articles')->whereFulltext(['title', 'body'], '+MySQL -YourSQL', ['mode' => 'boolean'])->get();
+        $articles = DB::table('articles')->whereFullText(['title', 'body'], '+MySQL -YourSQL', ['mode' => 'boolean'])->get();
 
         $this->assertCount(5, $articles);
     }
@@ -62,7 +62,7 @@ class FulltextTest extends MySqlTestCase
     /** @link https://dev.mysql.com/doc/refman/8.0/en/fulltext-query-expansion.html */
     public function testWhereFulltextWithExpandedQuery()
     {
-        $articles = DB::table('articles')->whereFulltext(['title', 'body'], 'database', ['expanded' => true])->get();
+        $articles = DB::table('articles')->whereFullText(['title', 'body'], 'database', ['expanded' => true])->get();
 
         $this->assertCount(6, $articles);
     }
