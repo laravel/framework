@@ -25,43 +25,37 @@ class DatabaseFailedJobProviderTest extends TestCase
             ->createProvider();
     }
 
-    public function testGettingAllFaildJobIds()
+    public function testCanGetAllFailedJobIds()
     {
         $this->assertEmpty($this->provider->ids());
 
-        foreach (range(1, 4) as $count) {
-            $this->createFailedJobsRecord();
-        }
+        array_map(fn () => $this->createFailedJobsRecord(), range(1, 4));
 
         $this->assertCount(4, $this->provider->ids());
         $this->assertSame([4, 3, 2, 1], $this->provider->ids());
     }
 
-    public function testGettingAllFailedJobs()
+    public function testCanGetAllFailedJobs()
     {
         $this->assertEmpty($this->provider->all());
 
-        foreach (range(1, 4) as $count) {
-            $this->createFailedJobsRecord();
-        }
+        array_map(fn () => $this->createFailedJobsRecord(), range(1, 4));
 
         $this->assertCount(4, $this->provider->all());
         $this->assertSame(3, $this->provider->all()[1]->id);
         $this->assertSame('default', $this->provider->all()[1]->queue);
     }
 
-    public function testGettingFailedJobsById()
+    public function testCanRetrieveFailedJobsById()
     {
-        foreach (range(1, 2) as $count) {
-            $this->createFailedJobsRecord();
-        }
+        array_map(fn () => $this->createFailedJobsRecord(), range(1, 2));
 
         $this->assertNotNull($this->provider->find(1));
         $this->assertNotNull($this->provider->find(2));
         $this->assertNull($this->provider->find(3));
     }
 
-    public function testRemovingFailedJobs()
+    public function testCanRemoveFailedJobsById()
     {
         $this->createFailedJobsRecord();
 
@@ -71,7 +65,7 @@ class DatabaseFailedJobProviderTest extends TestCase
         $this->assertSame(0, $this->failedJobsTable()->count());
     }
 
-    public function testPruningFailedJobs()
+    public function testCanPruneFailedJobs()
     {
         Carbon::setTestNow(Carbon::createFromDate(2024, 4, 28));
 
