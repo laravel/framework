@@ -141,7 +141,7 @@ class MailManager implements FactoryContract
     public function build($config)
     {
         $mailer = new Mailer(
-            $config['name'],
+            $config['name'] ?? 'ondemand',
             $this->app['view'],
             $this->createSymfonyTransport($config),
             $this->app['events']
