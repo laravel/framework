@@ -214,13 +214,12 @@ class DatabaseFailedJobProviderTest extends TestCase
     protected function createFailedJobsRecord(array $overrides = [])
     {
         return $this->failedJobsTable()
-                ->insert(array_merge([
-                    'connection' => 'database',
-                    'queue' => 'default',
-                    'payload' => json_encode(['uuid' => (string) Str::uuid()]),
-                    'exception' => new Exception('Whoops!'),
-                    'failed_at' => Date::now()->subDays(10),
-                ], $overrides)
-            );
+            ->insert(array_merge([
+                'connection' => 'database',
+                'queue' => 'default',
+                'payload' => json_encode(['uuid' => (string) Str::uuid()]),
+                'exception' => new Exception('Whoops!'),
+                'failed_at' => Date::now()->subDays(10),
+            ], $overrides));
     }
 }
