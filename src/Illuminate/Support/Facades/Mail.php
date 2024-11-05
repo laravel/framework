@@ -7,6 +7,7 @@ use Illuminate\Support\Testing\Fakes\MailFake;
 /**
  * @method static \Illuminate\Contracts\Mail\Mailer mailer(string|null $name = null)
  * @method static \Illuminate\Mail\Mailer driver(string|null $driver = null)
+ * @method static \Illuminate\Mail\Mailer build(array $config)
  * @method static \Symfony\Component\Mailer\Transport\TransportInterface createSymfonyTransport(array $config)
  * @method static string getDefaultDriver()
  * @method static void setDefaultDriver(string $name)
