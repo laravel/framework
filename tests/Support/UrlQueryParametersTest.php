@@ -34,10 +34,10 @@ class UrlQueryParametersTest extends TestCase
 
     public function testParseWithEncodedCharacters()
     {
-        $params = UrlQueryParameters::parse('foo=bar%20baz');
+        $params = UrlQueryParameters::parse('test=1%2B2');
 
         $this->assertInstanceOf(UrlQueryParameters::class, $params);
-        $this->assertSame('bar baz', $params->get('foo'));
+        $this->assertSame('1+2', $params->get('test'));
     }
 
     public function testGet()
