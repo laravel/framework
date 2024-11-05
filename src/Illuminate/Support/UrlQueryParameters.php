@@ -31,7 +31,7 @@ class UrlQueryParameters implements Arrayable, Stringable
         }
 
         parse_str(
-            Str::of(urldecode($query))
+            Str::of($query)
                 ->replaceStart('?', '')
                 ->toString(),
             $params
