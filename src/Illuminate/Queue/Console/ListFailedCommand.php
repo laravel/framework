@@ -15,14 +15,14 @@ class ListFailedCommand extends Command
      *
      * @var string
      */
-    protected $name = 'queue:failed';
+    protected $name = 'queue:failed {--limit= : The number of failed jobs to be displayed}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'List all of the failed queue jobs';
+    protected $description = 'List failed queue jobs';
 
     /**
      * The table headers for the command.
@@ -54,7 +54,9 @@ class ListFailedCommand extends Command
      */
     protected function getFailedJobs()
     {
-        $failed = $this->laravel['queue.failer']->all();
+        $failed = $this->option('limit') ?
+            $this->laravel['queue.failer']->limit($this->option('limit'))
+            : $this->laravel['queue.failer']->all();
 
         return (new Collection($failed))
             ->map(fn ($failed) => $this->parseFailedJob((array) $failed))
