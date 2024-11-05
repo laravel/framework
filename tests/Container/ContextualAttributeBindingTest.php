@@ -14,6 +14,7 @@ use Illuminate\Container\Attributes\Config;
 use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Container\Attributes\Database;
 use Illuminate\Container\Attributes\Log;
+use Illuminate\Container\Attributes\RouteParameter;
 use Illuminate\Container\Attributes\Storage;
 use Illuminate\Container\Attributes\Tag;
 use Illuminate\Container\Container;
@@ -24,7 +25,9 @@ use Illuminate\Contracts\Container\ContextualAttribute;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Database\Connection;
 use Illuminate\Database\DatabaseManager;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Filesystem\FilesystemManager;
+use Illuminate\Http\Request;
 use Illuminate\Log\LogManager;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -195,6 +198,20 @@ class ContextualAttributeBindingTest extends TestCase
         });
 
         $container->make(LogTest::class);
+    }
+
+    public function testRouteParameterAttribute()
+    {
+        $container = new Container;
+        $container->singleton('request', function () {
+            $request = m::mock(Request::class);
+            $request->shouldReceive('route')->with('foo')->andReturn(m::mock(Model::class));
+            $request->shouldReceive('route')->with('bar')->andReturn('bar');
+
+            return $request;
+        });
+
+        $container->make(RouteParameterTest::class);
     }
 
     public function testStorageAttribute()
@@ -424,6 +441,13 @@ final class GuardTest
 final class LogTest
 {
     public function __construct(#[Log('foo')] LoggerInterface $foo, #[Log('bar')] LoggerInterface $bar)
+    {
+    }
+}
+
+final class RouteParameterTest
+{
+    public function __construct(#[RouteParameter('foo')] Model $foo, #[RouteParameter('bar')] string $bar)
     {
     }
 }

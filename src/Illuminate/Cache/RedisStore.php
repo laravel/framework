@@ -292,10 +292,15 @@ class RedisStore extends TaggableStore implements LockProvider
             default => '',
         };
 
+        $defaultCursorValue = match (true) {
+            $connection instanceof PhpRedisConnection && version_compare(phpversion('redis'), '6.1.0', '>=') => null,
+            default => '0',
+        };
+
         $prefix = $connectionPrefix.$this->getPrefix();
 
-        return LazyCollection::make(function () use ($connection, $chunkSize, $prefix) {
-            $cursor = $defaultCursorValue = '0';
+        return LazyCollection::make(function () use ($connection, $chunkSize, $prefix, $defaultCursorValue) {
+            $cursor = $defaultCursorValue;
 
             do {
                 [$cursor, $tagsChunk] = $connection->scan(

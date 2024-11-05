@@ -2,11 +2,12 @@
 
 namespace Illuminate\Testing\Fluent\Concerns;
 
-use BackedEnum;
 use Closure;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
 use PHPUnit\Framework\Assert as PHPUnit;
+
+use function Illuminate\Support\enum_value;
 
 trait Matching
 {
@@ -32,13 +33,9 @@ trait Matching
             return $this;
         }
 
-        if ($expected instanceof Arrayable) {
-            $expected = $expected->toArray();
-        }
-
-        if ($expected instanceof BackedEnum) {
-            $expected = $expected->value;
-        }
+        $expected = $expected instanceof Arrayable
+            ? $expected->toArray()
+            : enum_value($expected);
 
         $this->ensureSorted($expected);
         $this->ensureSorted($actual);
@@ -74,13 +71,9 @@ trait Matching
             return $this;
         }
 
-        if ($expected instanceof Arrayable) {
-            $expected = $expected->toArray();
-        }
-
-        if ($expected instanceof BackedEnum) {
-            $expected = $expected->value;
-        }
+        $expected = $expected instanceof Arrayable
+            ? $expected->toArray()
+            : enum_value($expected);
 
         $this->ensureSorted($expected);
         $this->ensureSorted($actual);
@@ -169,7 +162,7 @@ trait Matching
         );
 
         $missing = Collection::make($expected)
-            ->map(fn ($search) => $search instanceof BackedEnum ? $search->value : $search)
+            ->map(fn ($search) => enum_value($search))
             ->reject(function ($search) use ($key, $actual) {
                 if ($actual->containsStrict($key, $search)) {
                     return true;

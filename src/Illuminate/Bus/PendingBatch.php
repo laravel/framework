@@ -12,6 +12,8 @@ use Illuminate\Support\Traits\Conditionable;
 use Laravel\SerializableClosure\SerializableClosure;
 use Throwable;
 
+use function Illuminate\Support\enum_value;
+
 class PendingBatch
 {
     use Conditionable;
@@ -261,12 +263,12 @@ class PendingBatch
     /**
      * Specify the queue that the batched jobs should run on.
      *
-     * @param  string  $queue
+     * @param  \BackedEnum|string|null  $queue
      * @return $this
      */
-    public function onQueue(string $queue)
+    public function onQueue($queue)
     {
-        $this->options['queue'] = $queue;
+        $this->options['queue'] = enum_value($queue);
 
         return $this;
     }

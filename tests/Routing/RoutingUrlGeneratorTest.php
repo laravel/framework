@@ -716,6 +716,20 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertSame('https://www.bar.com/foo', $url->route('plain'));
     }
 
+    public function testForceHttps()
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            Request::create('http://www.foo.com/')
+        );
+
+        $url->forceHttps();
+        $route = new Route(['GET'], '/foo', ['as' => 'plain']);
+        $routes->add($route);
+
+        $this->assertSame('https://www.foo.com/foo', $url->route('plain'));
+    }
+
     public function testPrevious()
     {
         $url = new UrlGenerator(

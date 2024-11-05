@@ -38,7 +38,7 @@ class RefreshCommand extends Command
     {
         if ($this->isProhibited() ||
             ! $this->confirmToProceed()) {
-            return 1;
+            return Command::FAILURE;
         }
 
         // Next we'll gather some of the options so that we can have the right options
