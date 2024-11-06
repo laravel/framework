@@ -88,7 +88,7 @@ class PasswordBrokerManager implements FactoryContract
             $key = base64_decode(substr($key, 7));
         }
 
-        if ($config['driver'] === 'cache') {
+        if (isset($config['driver']) && $config['driver'] === 'cache') {
             return new CacheTokenRepository(
                 $this->app['cache']->store($config['store'] ?? null),
                 $this->app['hash'],
