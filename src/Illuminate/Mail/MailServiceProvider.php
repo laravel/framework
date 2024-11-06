@@ -14,11 +14,11 @@ class MailServiceProvider extends ServiceProvider implements DeferrableProvider
      */
     public function boot()
     {
-        $this->loadViewsFrom(__DIR__ . '/resources/views', 'mails');
+        $this->loadViewsFrom(__DIR__.'/resources/views', 'mails');
 
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__ . '/resources/views' => $this->app->resourcePath('views/vendor/mail'),
+                __DIR__.'/resources/views' => $this->app->resourcePath('views/vendor/mail'),
             ], 'laravel-mail');
         }
     }
