@@ -175,6 +175,10 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     {
         if (func_num_args() === 1) {
             if ($this->useAsCallable($key)) {
+                if (function_exists('array_any')) {
+                    return array_any($this->items, $key);
+                }
+
                 $placeholder = new stdClass;
 
                 return $this->first($key, $placeholder) !== $placeholder;
@@ -573,6 +577,10 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     {
         $keys = is_array($key) ? $key : func_get_args();
 
+        if (function_exists('array_all')) {
+            return array_all($keys, fn ($key) => array_key_exists($key, $this->items));
+        }
+
         foreach ($keys as $value) {
             if (! array_key_exists($value, $this->items)) {
                 return false;
@@ -595,6 +603,10 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
         }
 
         $keys = is_array($key) ? $key : func_get_args();
+
+        if (function_exists('array_any')) {
+            return array_any($keys, fn ($key) => array_key_exists($key, $this->items));
+        }
 
         foreach ($keys as $value) {
             if ($this->has($value)) {
@@ -1152,6 +1164,10 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     {
         if (! $this->useAsCallable($value)) {
             return array_search($value, $this->items, $strict);
+        }
+
+        if (function_exists('array_find_key')) {
+            return array_find_key($this->items, $value) ?? false;
         }
 
         foreach ($this->items as $key => $item) {
