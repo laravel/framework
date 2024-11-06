@@ -24,7 +24,8 @@ class CacheTokenRepository implements TokenRepositoryInterface
         protected string $hashKey,
         protected int $expires = 3600,
         protected int $throttle = 60
-    ) {}
+    ) {
+    }
 
     /**
      * Create a new token.
