@@ -49,6 +49,19 @@ class FoundationViteTest extends TestCase
         );
     }
 
+    public function testViteWithCustomAttributes()
+    {
+        $this->makeViteManifest();
+
+        $result = app(Vite::class)(['resources/css/app.css' => ['media' => 'all'], 'resources/js/app.js' => ['async']]);
+
+        $this->assertStringEndsWith(
+            '<link rel="stylesheet" href="https://example.com/build/assets/app.versioned.css" media="all" />'
+            .'<script type="module" src="https://example.com/build/assets/app.versioned.js" async></script>',
+            $result->toHtml()
+        );
+    }
+
     public function testViteWithCssImport()
     {
         $this->makeViteManifest();
