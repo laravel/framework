@@ -78,6 +78,11 @@ class Schedule
     protected $mutexCache = [];
 
     /**
+     * @var array<int, ScheduleGroup>
+     */
+    protected $groupStack = [];
+
+    /**
      * Create a new schedule instance.
      *
      * @param  \DateTimeZone|string|null  $timezone
@@ -118,6 +123,8 @@ class Schedule
         $this->events[] = $event = new CallbackEvent(
             $this->eventMutex, $callback, $parameters, $this->timezone
         );
+
+        $this->mergeGroupAttributesWhenApplicable($event);
 
         return $event;
     }
@@ -171,6 +178,34 @@ class Schedule
                 $this->dispatchNow($job);
             }
         })->name($jobName);
+    }
+
+    /**
+     * Create new schedule group.
+     *
+     * @return ScheduleGroup
+     */
+    public function group()
+    {
+      return $this->groupStack[] = new ScheduleGroup($this, function () {
+          array_pop($this->groupStack);
+      });
+    }
+
+    /**
+     * Merge the attributes with the last group stack.
+     *
+     * @param  \Illuminate\Console\Scheduling\Event  $event
+     * @return void
+     */
+    protected function mergeGroupAttributesWhenApplicable(Event $event)
+    {
+        if(empty($this->groupStack)) {
+            return;
+        }
+
+        $group = end($this->groupStack);
+        $group->mergeAttributes($event);
     }
 
     /**
@@ -254,6 +289,8 @@ class Schedule
         }
 
         $this->events[] = $event = new Event($this->eventMutex, $command, $this->timezone);
+
+        $this->mergeGroupAttributesWhenApplicable($event);
 
         return $event;
     }
