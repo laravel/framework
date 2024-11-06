@@ -80,6 +80,6 @@ class UrlQueryParameters implements Arrayable, Stringable
      */
     public function __toString(): string
     {
-        return http_build_query($this->parameters);
+        return Arr::query($this->parameters);
     }
 }
