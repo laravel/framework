@@ -55,6 +55,15 @@ class Content
 
     /**
      * Create a new content definition.
+     *
+     * @param  string|null  $view
+     * @param  string|null  $html
+     * @param  string|null  $text
+     * @param  string|null  $markdown
+     * @param  array  $with
+     * @param  string|null  $htmlString
+     *
+     * @named-arguments-supported
      */
     public function __construct(
         ?string $view = null,
