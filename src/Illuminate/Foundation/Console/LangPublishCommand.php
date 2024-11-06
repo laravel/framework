@@ -32,8 +32,11 @@ class LangPublishCommand extends Command
      */
     public function handle()
     {
-        if (! is_dir($langPath = $this->laravel->resourcePath('lang/en'))
-            && ! is_dir($langPath = $this->laravel->basePath('lang/en'))) {
+        $langPath = is_dir($this->laravel->resourcePath('lang'))
+            ? $this->laravel->resourcePath('lang/en')
+            : $this->laravel->basePath('lang/en');
+
+        if (! is_dir($langPath)) {
             (new Filesystem)->makeDirectory($langPath, recursive: true);
         }
 
