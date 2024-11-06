@@ -255,6 +255,19 @@ class Container implements ArrayAccess, ContainerContract
     }
 
     /**
+     * Determine if a given type has a bind and specific instance,
+     * this should be because after define the bind, it has set a instance.
+     *
+     * @param  string  $abstract
+     * @return bool
+     */
+    public function hasBindWithInstance($abstract)
+    {
+        return isset($this->bindings[$abstract]) &&
+               isset($this->instances[$abstract]);
+    }
+
+    /**
      * Determine if a given string is an alias.
      *
      * @param  string  $name
@@ -793,12 +806,12 @@ class Container implements ArrayAccess, ContainerContract
 
         $concrete = $this->getContextualConcrete($abstract);
 
-        $needsContextualBuild = ! is_null($concrete);
+        $needsContextualBuild = ! is_null($concrete) || ! empty($parameters);
 
         // If an instance of the type is currently being managed as a singleton we'll
         // just return an existing instance instead of instantiating new instances
         // so the developer can keep using the same objects instance every time.
-        if (isset($this->instances[$abstract]) && ! $needsContextualBuild) {
+        if ((isset($this->instances[$abstract]) && ! $needsContextualBuild) || $this->hasBindWithInstance($abstract)) {
             return $this->instances[$abstract];
         }
 
