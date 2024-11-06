@@ -204,6 +204,12 @@ class Arr
             return value($default);
         }
 
+        if (function_exists('array_find_key')) {
+            $key = array_find_key($array, $callback);
+
+            return $key !== null ? $array[$key] : value($default);
+        }
+
         foreach ($array as $key => $value) {
             if ($callback($value, $key)) {
                 return $value;
