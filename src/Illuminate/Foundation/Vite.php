@@ -361,7 +361,7 @@ class Vite implements Htmlable
     /**
      * Generate Vite tags for an entrypoint.
      *
-     * @param  string|string[]  $entrypoints
+     * @param  string|array<string|array<string|array<bool|string>>>  $entrypoints
      * @param  string|null  $buildDirectory
      * @return \Illuminate\Support\HtmlString
      *
@@ -369,14 +369,14 @@ class Vite implements Htmlable
      */
     public function __invoke($entrypoints, $buildDirectory = null)
     {
-        $entrypoints = collect($entrypoints);
+        $entrypoints = collect($entrypoints)->mapWithKeys(fn ($attributes, $entrypoint) => is_array($attributes) ? [$entrypoint => $attributes] : [$attributes => []]);
         $buildDirectory ??= $this->buildDirectory;
 
         if ($this->isRunningHot()) {
             return new HtmlString(
                 $entrypoints
-                    ->prepend('@vite/client')
-                    ->map(fn ($entrypoint) => $this->makeTagForChunk($entrypoint, $this->hotAsset($entrypoint), null, null))
+                    ->prepend([], '@vite/client')
+                    ->map(fn ($attributes, $entrypoint) => $this->makeTagForChunk($entrypoint, $this->hotAsset($entrypoint), null, null, $attributes))
                     ->join('')
             );
         }
@@ -386,7 +386,7 @@ class Vite implements Htmlable
         $tags = collect();
         $preloads = collect();
 
-        foreach ($entrypoints as $entrypoint) {
+        foreach ($entrypoints as $entrypoint => $attributes) {
             $chunk = $this->chunk($manifest, $entrypoint);
 
             $preloads->push([
@@ -418,7 +418,8 @@ class Vite implements Htmlable
                         $partialManifest->keys()->first(),
                         $this->assetPath("{$buildDirectory}/{$css}"),
                         $partialManifest->first(),
-                        $manifest
+                        $manifest,
+                        $attributes
                     ));
                 }
             }
@@ -427,7 +428,8 @@ class Vite implements Htmlable
                 $entrypoint,
                 $this->assetPath("{$buildDirectory}/{$chunk['file']}"),
                 $chunk,
-                $manifest
+                $manifest,
+                $attributes
             ));
 
             foreach ($chunk['css'] ?? [] as $css) {
@@ -444,7 +446,8 @@ class Vite implements Htmlable
                     $partialManifest->keys()->first(),
                     $this->assetPath("{$buildDirectory}/{$css}"),
                     $partialManifest->first(),
-                    $manifest
+                    $manifest,
+                    $attributes
                 ));
             }
         }
@@ -463,7 +466,7 @@ class Vite implements Htmlable
 
         $discoveredImports = [];
 
-        return collect($entrypoints)
+        return $entrypoints->keys()
             ->flatMap(fn ($entrypoint) => collect($manifest[$entrypoint]['dynamicImports'] ?? [])
                 ->map(fn ($import) => $manifest[$import])
                 ->filter(fn ($chunk) => str_ends_with($chunk['file'], '.js') || str_ends_with($chunk['file'], '.css'))
@@ -580,29 +583,31 @@ class Vite implements Htmlable
      * @param  string  $url
      * @param  array|null  $chunk
      * @param  array|null  $manifest
+     * @param  array<string|array<bool|string>>  $attributes
      * @return string
      */
-    protected function makeTagForChunk($src, $url, $chunk, $manifest)
+    protected function makeTagForChunk($src, $url, $chunk, $manifest, array $attributes)
     {
         if (
             $this->nonce === null
             && $this->integrityKey !== false
             && ! array_key_exists($this->integrityKey, $chunk ?? [])
             && $this->scriptTagAttributesResolvers === []
-            && $this->styleTagAttributesResolvers === []) {
+            && $this->styleTagAttributesResolvers === []
+            && $attributes === []) {
             return $this->makeTag($url);
         }
 
         if ($this->isCssPath($url)) {
             return $this->makeStylesheetTagWithAttributes(
                 $url,
-                $this->resolveStylesheetTagAttributes($src, $url, $chunk, $manifest)
+                [...$this->resolveStylesheetTagAttributes($src, $url, $chunk, $manifest), ...$attributes]
             );
         }
 
         return $this->makeScriptTagWithAttributes(
             $url,
-            $this->resolveScriptTagAttributes($src, $url, $chunk, $manifest)
+            [...$this->resolveScriptTagAttributes($src, $url, $chunk, $manifest), ...$attributes]
         );
     }
 
