@@ -6,15 +6,12 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Support\Facades\Mail;
+use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\TestCase;
 
+#[WithConfig('mail.driver', 'array')]
 class MarkdownEmailWithoutCustomViewTest extends TestCase
 {
-    protected function getEnvironmentSetUp($app)
-    {
-        $app['config']->set('mail.driver', 'array');
-    }
-
     public function testDefaultMarkdownEmailContainsExpectedContent()
     {
         $mailable = new DefaultMarkdownMailable;
