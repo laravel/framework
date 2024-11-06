@@ -93,7 +93,7 @@ class PasswordBrokerManager implements FactoryContract
                 $this->app['cache']->store($config['store'] ?? null),
                 $this->app['hash'],
                 $key,
-                $config['expire'],
+                ($config['expire'] ?? 60) * 60,
                 $config['throttle'] ?? 0
             );
         }
