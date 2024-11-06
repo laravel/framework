@@ -793,7 +793,7 @@ class Container implements ArrayAccess, ContainerContract
 
         $concrete = $this->getContextualConcrete($abstract);
 
-        $needsContextualBuild = ! empty($parameters) || ! is_null($concrete);
+        $needsContextualBuild = ! is_null($concrete);
 
         // If an instance of the type is currently being managed as a singleton we'll
         // just return an existing instance instead of instantiating new instances
