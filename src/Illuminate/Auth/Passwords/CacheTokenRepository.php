@@ -19,11 +19,11 @@ class CacheTokenRepository implements TokenRepositoryInterface
      * Create a new token repository instance.
      */
     public function __construct(
-        protected Repository     $cache,
+        protected Repository $cache,
         protected HasherContract $hasher,
-        protected string         $hashKey,
-        protected int            $expires = 3600,
-        protected int            $throttle = 60
+        protected string $hashKey,
+        protected int $expires = 3600,
+        protected int $throttle = 60
     ) {}
 
     /**
@@ -120,6 +120,5 @@ class CacheTokenRepository implements TokenRepositoryInterface
      */
     public function deleteExpired()
     {
-        return;
     }
 }
