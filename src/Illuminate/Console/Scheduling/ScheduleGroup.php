@@ -63,6 +63,20 @@ class ScheduleGroup
      */
     protected bool $runInBackground;
 
+    /**
+     * The array of filter callbacks.
+     *
+     * @var array<int, Closure|bool>
+     */
+    protected array $filters = [];
+
+    /**
+     * The array of reject callbacks.
+     *
+     * @var array<int, Closure|bool>
+     */
+    protected array $rejects = [];
+
     public function __construct(
         protected Schedule $schedule,
         protected Closure $onRegister
@@ -82,6 +96,16 @@ class ScheduleGroup
 
         if (isset($this->withoutOverlapping) && $this->withoutOverlapping) {
             $event->withoutOverlapping($this->expiresAt);
+        }
+
+        // Merge the filter callbacks into the event.
+        foreach ($this->filters as $filter) {
+            $event->when($filter);
+        }
+
+        // Merge the reject callbacks into the event.
+        foreach ($this->rejects as $reject) {
+            $event->skip($reject);
         }
 
         /**
@@ -155,6 +179,26 @@ class ScheduleGroup
         $this->withoutOverlapping = true;
 
         $this->expiresAt = $expiresAt;
+
+        return $this;
+    }
+
+    /**
+     * Register a callback to further filter the grouped events.
+     */
+    public function when(Closure|bool $callback): self
+    {
+        $this->filters[] = $callback;
+
+        return $this;
+    }
+
+    /**
+     * Register a callback to further filter the grouped events.
+     */
+    public function skip(Closure|bool $callback): self
+    {
+        $this->rejects[] = $callback;
 
         return $this;
     }
