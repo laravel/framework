@@ -5,102 +5,68 @@ declare(strict_types=1);
 namespace Illuminate\Console\Scheduling;
 
 use Closure;
+use DateTimeZone;
 
 class ScheduleGroup
 {
     use ManagesFrequencies;
 
     /**
-     * The callback to be called after the group's events have been registered.
-     *
-     * @var Closure
-     */
-    protected $onRegister;
-
-    /**
-     * @var Schedule
-     */
-    protected $schedule;
-
-    /**
      * The cron expression representing the grouped events' frequency.
-     *
-     * @var string
      */
     protected string $expression = '* * * * *';
 
     /**
      * How often to repeat the grouped events during a minute.
-     *
-     * @var int|null
      */
     protected ?int $repeatSeconds = null;
 
     /**
      * The timezone the grouped events' date should be evaluated on.
-     *
-     * @var \DateTimeZone|string
      */
-    protected $timezone;
+    protected DateTimeZone|string $timezone;
 
     /**
      * The user the grouped events should run as.
-     *
-     * @var string|null
      */
-    protected $user;
+    protected ?string $user;
 
     /**
      * The list of environments the grouped events should run under.
      *
-     * @var array
+     * @var string[]
      */
     protected array $environments;
 
     /**
      * Indicates if the grouped events should run in maintenance mode.
-     *
-     * @var bool
      */
     protected bool $evenInMaintenanceMode;
 
     /**
      * Indicates if the grouped events should not overlap itself.
-     *
-     * @var bool
      */
     protected bool $withoutOverlapping;
 
     /**
      * Indicates if the grouped events should only be allowed to run on one server for each cron expression.
-     *
-     * @var bool
      */
     protected bool $onOneServer;
 
     /**
      * The number of minutes the grouped events' mutex should be valid.
-     *
-     * @var int
      */
-    protected $expiresAt;
+    protected int $expiresAt;
 
     /**
      * Indicates if the grouped events should run in the background.
-     *
-     * @var bool
      */
-    protected $runInBackground;
+    protected bool $runInBackground;
 
-    /**
-     * @param  Schedule  $schedule
-     * @param  callable  $onRegister
-     */
-    public function __construct($schedule, $onRegister)
-    {
-        $this->schedule = $schedule;
-        $this->onRegister = $onRegister;
-    }
+    public function __construct(
+        protected Schedule $schedule,
+        protected Closure $onRegister
+    ) {}
 
     public function schedules(callable $callback): void
     {
@@ -130,11 +96,8 @@ class ScheduleGroup
 
     /**
      * Set which user the grouped events should be run as.
-     *
-     * @param  string  $user
-     * @return $this
      */
-    public function user($user)
+    public function user(?string $user): self
     {
         $this->user = $user;
 
@@ -145,9 +108,8 @@ class ScheduleGroup
      * Limit the environments the grouped events should run in.
      *
      * @param  array|mixed  $environments
-     * @return $this
      */
-    public function environments($environments)
+    public function environments($environments): self
     {
         $this->environments = is_array($environments) ? $environments : func_get_args();
 
@@ -156,10 +118,8 @@ class ScheduleGroup
 
     /**
      * Allow the grouped events to only run on one server for each cron expression.
-     *
-     * @return $this
      */
-    public function onOneServer()
+    public function onOneServer(): self
     {
         $this->onOneServer = true;
 
@@ -168,10 +128,8 @@ class ScheduleGroup
 
     /**
      * State that the grouped events should run in the background.
-     *
-     * @return $this
      */
-    public function runInBackground()
+    public function runInBackground(): self
     {
         $this->runInBackground = true;
 
@@ -180,10 +138,8 @@ class ScheduleGroup
 
     /**
      * State that the grouped events should run even in maintenance mode.
-     *
-     * @return $this
      */
-    public function evenInMaintenanceMode()
+    public function evenInMaintenanceMode(): self
     {
         $this->evenInMaintenanceMode = true;
 
@@ -193,11 +149,8 @@ class ScheduleGroup
     /**
      * Do not allow the grouped events to overlap each other.
      * The expiration time of the underlying cache lock may be specified in minutes.
-     *
-     * @param  int  $expiresAt
-     * @return $this
      */
-    public function withoutOverlapping($expiresAt = 1440)
+    public function withoutOverlapping(int $expiresAt = 1440): self
     {
         $this->withoutOverlapping = true;
 
@@ -209,7 +162,7 @@ class ScheduleGroup
     /**
      * @return string[]
      */
-    protected function attributes()
+    protected function attributes(): array
     {
         return [
             'user',

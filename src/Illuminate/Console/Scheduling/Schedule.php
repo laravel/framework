@@ -80,7 +80,7 @@ class Schedule
     /**
      * @var array<int, ScheduleGroup>
      */
-    protected $groupStack = [];
+    protected array $groupStack = [];
 
     /**
      * Create a new schedule instance.
@@ -182,23 +182,18 @@ class Schedule
 
     /**
      * Create new schedule group.
-     *
-     * @return ScheduleGroup
      */
-    public function group()
+    public function group(): ScheduleGroup
     {
-      return $this->groupStack[] = new ScheduleGroup($this, function () {
-          array_pop($this->groupStack);
-      });
+        return $this->groupStack[] = new ScheduleGroup($this, function () {
+            array_pop($this->groupStack);
+        });
     }
 
     /**
      * Merge the attributes with the last group stack.
-     *
-     * @param  \Illuminate\Console\Scheduling\Event  $event
-     * @return void
      */
-    protected function mergeGroupAttributesWhenApplicable(Event $event)
+    protected function mergeGroupAttributesWhenApplicable(Event $event): void
     {
         if(empty($this->groupStack)) {
             return;

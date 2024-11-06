@@ -13,7 +13,7 @@ final class ScheduleGroupTest extends TestCase
 {
     public function testGroupCanSetScheduleCronExpression()
     {
-        $schedule = new ScheduleClass();
+        $schedule = new ScheduleClass;
 
         $schedule
             ->group()
@@ -108,7 +108,7 @@ final class ScheduleGroupTest extends TestCase
 
         $events = Schedule::events();
 
-        if ($property !== "withoutOverlapping") {
+        if ($property !== 'withoutOverlapping') {
             $this->assertSame($value, $events[0]->$property);
         } else {
             $this->assertSame($value, $events[0]->expiresAt);
