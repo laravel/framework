@@ -11,52 +11,20 @@ use Illuminate\Support\Str;
 class CacheTokenRepository implements TokenRepositoryInterface
 {
     /**
-     * The Hasher implementation.
+     * The format of the stored Carbon object.
      */
-    protected HasherContract $hasher;
-
-    /**
-     * The hashing key.
-     */
-    protected string $hashKey;
-
-    /**
-     * The number of seconds a token should last.
-     */
-    protected int|float $expires;
-
-    /**
-     * Minimum number of seconds before re-redefining the token.
-     */
-    protected int $throttle;
-
-    /**
-     * @var \Illuminate\Cache\Repository
-     */
-    private Repository $cache;
+    protected string $format = 'Y-m-d H:i:s';
 
     /**
      * Create a new token repository instance.
-     *
-     * @param  \Illuminate\Cache\Repository  $cache
-     * @param  \Illuminate\Contracts\Hashing\Hasher  $hasher
-     * @param  string  $hashKey
-     * @param  int  $expires
-     * @param  int  $throttle
      */
     public function __construct(
-        Repository     $cache,
-        HasherContract $hasher,
-        string         $hashKey,
-        int            $expires = 60,
-        int            $throttle = 60
-    ) {
-        $this->cache = $cache;
-        $this->hasher = $hasher;
-        $this->hashKey = $hashKey;
-        $this->expires = $expires * 60;
-        $this->throttle = $throttle;
-    }
+        protected Repository     $cache,
+        protected HasherContract $hasher,
+        protected string         $hashKey,
+        protected int            $expires = 3600,
+        protected int            $throttle = 60
+    ) {}
 
     /**
      * Create a new token.
@@ -68,11 +36,11 @@ class CacheTokenRepository implements TokenRepositoryInterface
     {
         $email = $user->getEmailForPasswordReset();
 
-        $this->cache->forget($email);
+        $this->delete($user);
 
         $token = hash_hmac('sha256', Str::random(40), $this->hashKey);
 
-        $this->cache->put($email, [$token, Carbon::now()], $this->expires);
+        $this->cache->put($email, [$token, Carbon::now()->format($this->format)], $this->expires);
 
         return $token;
     }
@@ -101,7 +69,7 @@ class CacheTokenRepository implements TokenRepositoryInterface
      */
     protected function tokenExpired($createdAt)
     {
-        return Carbon::parse($createdAt)->addSeconds($this->expires)->isPast();
+        return Carbon::createFromFormat($this->format, $createdAt)->addSeconds($this->expires)->isPast();
     }
 
     /**
@@ -129,7 +97,7 @@ class CacheTokenRepository implements TokenRepositoryInterface
             return false;
         }
 
-        return Carbon::parse($createdAt)->addSeconds(
+        return Carbon::createFromFormat($this->format, $createdAt)->addSeconds(
             $this->throttle
         )->isFuture();
     }
