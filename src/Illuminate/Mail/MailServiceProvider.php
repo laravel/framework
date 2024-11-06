@@ -8,6 +8,22 @@ use Illuminate\Support\ServiceProvider;
 class MailServiceProvider extends ServiceProvider implements DeferrableProvider
 {
     /**
+     * Boot the application services.
+     *
+     * @return void
+     */
+    public function boot()
+    {
+        $this->loadViewsFrom(__DIR__ . '/resources/views', 'mails');
+
+        if ($this->app->runningInConsole()) {
+            $this->publishes([
+                __DIR__ . '/resources/views' => $this->app->resourcePath('views/vendor/mail'),
+            ], 'laravel-mail');
+        }
+    }
+
+    /**
      * Register the service provider.
      *
      * @return void
@@ -41,12 +57,6 @@ class MailServiceProvider extends ServiceProvider implements DeferrableProvider
      */
     protected function registerMarkdownRenderer()
     {
-        if ($this->app->runningInConsole()) {
-            $this->publishes([
-                __DIR__.'/resources/views' => $this->app->resourcePath('views/vendor/mail'),
-            ], 'laravel-mail');
-        }
-
         $this->app->singleton(Markdown::class, function ($app) {
             $config = $app->make('config');
 

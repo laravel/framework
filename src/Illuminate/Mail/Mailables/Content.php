@@ -2,6 +2,7 @@
 
 namespace Illuminate\Mail\Mailables;
 
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Traits\Conditionable;
 
 class Content
@@ -34,9 +35,9 @@ class Content
     /**
      * The Blade view that represents the Markdown version of the message.
      *
-     * @var string|null
+     * @var string
      */
-    public $markdown;
+    public $markdown = 'mails::email';
 
     /**
      * The pre-rendered HTML of the message.
@@ -54,23 +55,20 @@ class Content
 
     /**
      * Create a new content definition.
-     *
-     * @param  string|null  $view
-     * @param  string|null  $html
-     * @param  string|null  $text
-     * @param  string|null  $markdown
-     * @param  array  $with
-     * @param  string|null  $htmlString
-     *
-     * @named-arguments-supported
      */
-    public function __construct(?string $view = null, ?string $html = null, ?string $text = null, $markdown = null, array $with = [], ?string $htmlString = null)
-    {
+    public function __construct(
+        ?string $view = null,
+        ?string $html = null,
+        ?string $text = null,
+        ?string $markdown = null,
+        array $with = [],
+        ?string $htmlString = null,
+    ) {
         $this->view = $view;
         $this->html = $html;
         $this->text = $text;
-        $this->markdown = $markdown;
-        $this->with = $with;
+        $this->markdown ??= $markdown;
+        $this->with = array_merge(['outroLines' => [], 'introLines' => []], $with);
         $this->htmlString = $htmlString;
     }
 
@@ -153,5 +151,125 @@ class Content
         }
 
         return $this;
+    }
+
+    /**
+     * Set the greeting of the notification.
+     *
+     * @param  string  $greeting
+     * @return $this
+     */
+    public function greeting($greeting)
+    {
+        return $this->with('greeting', $greeting);
+    }
+
+    /**
+     * Set the salutation of the notification.
+     *
+     * @param  string  $salutation
+     * @return $this
+     */
+    public function salutation($salutation)
+    {
+        return $this->with('salutation', $salutation);
+    }
+
+    /**
+     * Add a line of text to the notification.
+     *
+     * @param  mixed  $line
+     * @return $this
+     */
+    public function line($line)
+    {
+        $key = array_key_exists('actionText', $this->with)
+            ? 'outroLines'
+            : 'introLines';
+
+        return $this->with([$key => array_merge($this->with[$key] ?? [], [$this->formatLine($line)])]);
+    }
+
+    /**
+     * Add a line of text to the notification if the given condition is true.
+     *
+     * @param  bool  $boolean
+     * @param  mixed  $line
+     * @return $this
+     */
+    public function lineIf($boolean, $line)
+    {
+        if ($boolean) {
+            return $this->line($line);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Add lines of text to the notification.
+     *
+     * @param  iterable  $lines
+     * @return $this
+     */
+    public function lines($lines)
+    {
+        foreach ($lines as $line) {
+            $this->line($line);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Add lines of text to the notification if the given condition is true.
+     *
+     * @param  bool  $boolean
+     * @param  iterable  $lines
+     * @return $this
+     */
+    public function linesIf($boolean, $lines)
+    {
+        if ($boolean) {
+            return $this->lines($lines);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Format the given line of text.
+     *
+     * @param  \Illuminate\Contracts\Support\Htmlable|string|array|null  $line
+     * @return \Illuminate\Contracts\Support\Htmlable|string
+     */
+    protected function formatLine($line)
+    {
+        if ($line instanceof Htmlable) {
+            return $line;
+        }
+
+        if (is_array($line)) {
+            return implode(' ', array_map('trim', $line));
+        }
+
+        return trim(implode(' ', array_map('trim', preg_split('/\\r\\n|\\r|\\n/', $line ?? ''))));
+    }
+
+    /**
+     * Configure the "call to action" button.
+     *
+     * @param  string  $text
+     * @param  string  $url
+     * @return $this
+     */
+    public function action($text, $url, $color = 'primary')
+    {
+        return $this->with([
+            'actionText' => $text,
+            'actionUrl' => $url,
+            'color' => $color,
+            'displayableActionUrl' => str_replace(['mailto:', 'tel:'], '', $url),
+        ]);
     }
 }

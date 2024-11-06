@@ -1730,27 +1730,17 @@ class Mailable implements MailableContract, Renderable
 
         if ($content->view) {
             $this->view($content->view);
-        }
-
-        if ($content->html) {
+        } else if ($content->html) {
             $this->view($content->html);
-        }
-
-        if ($content->text) {
+        } else if ($content->text) {
             $this->text($content->text);
-        }
-
-        if ($content->markdown) {
+        } else if ($content->markdown) {
             $this->markdown($content->markdown);
-        }
-
-        if ($content->htmlString) {
+        } else if ($content->htmlString) {
             $this->html($content->htmlString);
         }
 
-        foreach ($content->with as $key => $value) {
-            $this->with($key, $value);
-        }
+        $this->with($content->with);
     }
 
     /**
