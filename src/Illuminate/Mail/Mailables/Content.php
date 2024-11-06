@@ -37,7 +37,7 @@ class Content
      *
      * @var string
      */
-    public $markdown = 'mails::email';
+    public $markdown;
 
     /**
      * The pre-rendered HTML of the message.
@@ -67,7 +67,7 @@ class Content
         $this->view = $view;
         $this->html = $html;
         $this->text = $text;
-        $this->markdown ??= $markdown;
+        $this->markdown = $markdown ?? 'mails::email';
         $this->with = array_merge(['outroLines' => [], 'introLines' => []], $with);
         $this->htmlString = $htmlString;
     }
