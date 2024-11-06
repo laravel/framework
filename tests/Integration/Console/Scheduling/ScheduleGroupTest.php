@@ -24,7 +24,6 @@ final class ScheduleGroupTest extends TestCase
 
         $events = $schedule->events();
         $this->assertSame('0 0 * * *', $events[0]->expression);
-
     }
 
     public function testGroupedScheduleCanOverrideGroupCronExpression()

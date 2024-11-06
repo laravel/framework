@@ -80,7 +80,8 @@ class ScheduleGroup
     public function __construct(
         protected Schedule $schedule,
         protected Closure $onRegister
-    ) {}
+    ) {
+    }
 
     public function schedules(callable $callback): void
     {

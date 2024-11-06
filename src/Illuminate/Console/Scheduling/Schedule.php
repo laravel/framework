@@ -195,7 +195,7 @@ class Schedule
      */
     protected function mergeGroupAttributesWhenApplicable(Event $event): void
     {
-        if(empty($this->groupStack)) {
+        if (empty($this->groupStack)) {
             return;
         }
 
