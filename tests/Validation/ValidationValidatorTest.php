@@ -7081,14 +7081,14 @@ class ValidationValidatorTest extends TestCase
 
         // Single parameter
         $v = new Validator($trans, [], [
-            'name' => 'required_without:user\.name'
+            'name' => 'required_without:user\.name',
         ]);
         $this->assertTrue($v->fails());
         $this->assertSame('The name field is required when user.name is not present.', $v->messages()->first());
 
         // Multiple parameters
         $v = new Validator($trans, [], [
-            'name' => 'required_without:user\.name,admin\.name'
+            'name' => 'required_without:user\.name,admin\.name',
         ]);
         $this->assertTrue($v->fails());
         $this->assertSame('The name field is required when user.name / admin.name is not present.', $v->messages()->first());
