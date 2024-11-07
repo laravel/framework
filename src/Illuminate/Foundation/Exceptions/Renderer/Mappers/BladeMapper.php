@@ -90,8 +90,15 @@ class BladeMapper
         $trace = Collection::make($exception->getTrace())
             ->map(function ($frame) {
                 if ($originalPath = $this->findCompiledView((string) Arr::get($frame, 'file', ''))) {
-                    $frame['blade'] = $originalPath;
-                    $frame['line'] = $this->detectLineNumber($frame['file'], $frame['line']);
+                    $originalPathLine = $this->detectLineNumber($originalPath, $frame['line']);
+
+                    if ($originalPathLine !== $frame['line']) {
+                        $frame['file'] = $originalPath;
+                        $frame['line'] = $originalPathLine;
+                    } else {
+                        $frame['blade'] = $originalPath;
+                        $frame['line'] = $this->detectLineNumber($frame['file'], $frame['line']);
+                    }
                 }
 
                 return $frame;
