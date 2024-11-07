@@ -14,7 +14,8 @@ class MethodField extends Component
     public function __construct(
         protected string $value,
         protected string $name = '_method',
-    ) {}
+    ) {
+    }
 
     /**
      * Get the view / contents that represent the component.
@@ -23,7 +24,7 @@ class MethodField extends Component
     {
         return view('laravel::method-field')
             ->with([
-                'name'  => $this->name,
+                'name' => $this->name,
                 'value' => $this->value,
             ]);
     }

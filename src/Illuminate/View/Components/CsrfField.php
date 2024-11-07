@@ -13,7 +13,8 @@ class CsrfField extends Component
      */
     public function __construct(
         protected string $name = '_token',
-    ) {}
+    ) {
+    }
 
     /**
      * Get the view / contents that represent the component.
@@ -22,7 +23,7 @@ class CsrfField extends Component
     {
         return view('laravel::csrf-field')
             ->with([
-                'name'  => $this->name,
+                'name' => $this->name,
                 'value' => csrf_token(),
             ]);
     }
