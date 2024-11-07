@@ -117,6 +117,24 @@ class DatabaseEloquentRelationshipsTest extends TestCase
         $this->assertSame('fluent_projects.p_id', $fluent->getQualifiedLocalKeyName());
         $this->assertSame('environments.pro_id', $fluent->getQualifiedFirstKeyName());
         $this->assertSame('environments.pro_id', $classic->getQualifiedFirstKeyName());
+
+        $fluent = (new FluentProject())->environmentData();
+        $classic = (new ClassicProject())->environmentData();
+
+        $this->assertInstanceOf(HasManyThrough::class, $classic);
+        $this->assertInstanceOf(HasManyThrough::class, $fluent);
+        $this->assertSame('p_id', $classic->getLocalKeyName());
+        $this->assertSame('p_id', $fluent->getLocalKeyName());
+        $this->assertSame('e_id', $classic->getSecondLocalKeyName());
+        $this->assertSame('e_id', $fluent->getSecondLocalKeyName());
+        $this->assertSame('pro_id', $classic->getFirstKeyName());
+        $this->assertSame('pro_id', $fluent->getFirstKeyName());
+        $this->assertSame('env_id', $classic->getForeignKeyName());
+        $this->assertSame('env_id', $fluent->getForeignKeyName());
+        $this->assertSame('classic_projects.p_id', $classic->getQualifiedLocalKeyName());
+        $this->assertSame('fluent_projects.p_id', $fluent->getQualifiedLocalKeyName());
+        $this->assertSame('environments.pro_id', $fluent->getQualifiedFirstKeyName());
+        $this->assertSame('environments.pro_id', $classic->getQualifiedFirstKeyName());
     }
 
     public function testStringyHasThroughApi()
@@ -473,6 +491,18 @@ class ClassicProject extends MockedConnectionModel
             'e_id',
         );
     }
+
+    public function environmentData()
+    {
+        return $this->hasManyThrough(
+            Metadata::class,
+            Environment::class,
+            'pro_id',
+            'env_id',
+            'p_id',
+            'e_id',
+        );
+    }
 }
 
 class FluentProject extends MockedConnectionModel
@@ -480,6 +510,11 @@ class FluentProject extends MockedConnectionModel
     public function deployments()
     {
         return $this->through($this->environments())->has(fn (Environment $env) => $env->deployments());
+    }
+
+    public function environmentData()
+    {
+        return $this->through($this->environments())->has(fn (Environment $env) => $env->metadata());
     }
 
     public function environments()
@@ -494,6 +529,16 @@ class Environment extends MockedConnectionModel
     {
         return $this->hasMany(Deployment::class, 'env_id', 'e_id');
     }
+
+    public function metadata()
+    {
+        return $this->hasOne(MetaData::class, 'env_id', 'e_id');
+    }
+}
+
+class MetaData extends MockedConnectionModel
+{
+    //
 }
 
 class Deployment extends MockedConnectionModel
