@@ -3,7 +3,6 @@
 namespace Illuminate\Database\Eloquent\Factories;
 
 use Closure;
-use Faker\Generator;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
@@ -93,13 +92,6 @@ abstract class Factory
     protected $connection;
 
     /**
-     * The current Faker instance.
-     *
-     * @var \Faker\Generator
-     */
-    protected $faker;
-
-    /**
      * The default namespace where factories reside.
      *
      * @var string
@@ -150,7 +142,6 @@ abstract class Factory
         $this->afterCreating = $afterCreating ?? new Collection;
         $this->connection = $connection;
         $this->recycle = $recycle ?? new Collection;
-        $this->faker = $this->withFaker();
     }
 
     /**
@@ -842,16 +833,6 @@ abstract class Factory
     public static function guessFactoryNamesUsing(callable $callback)
     {
         static::$factoryNameResolver = $callback;
-    }
-
-    /**
-     * Get a new Faker instance.
-     *
-     * @return \Faker\Generator
-     */
-    protected function withFaker()
-    {
-        return Container::getInstance()->make(Generator::class);
     }
 
     /**

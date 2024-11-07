@@ -17,7 +17,6 @@ use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Foundation\Testing\DatabaseTruncation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Illuminate\Http\Middleware\TrustHosts;
 use Illuminate\Http\Middleware\TrustProxies;
@@ -211,10 +210,6 @@ trait InteractsWithTestCaseLifecycle
 
         if (isset($uses[WithoutMiddleware::class])) {
             $this->disableMiddlewareForAllTests();
-        }
-
-        if (isset($uses[WithFaker::class])) {
-            $this->setUpFaker();
         }
 
         foreach ($uses as $trait) {

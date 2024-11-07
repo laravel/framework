@@ -848,7 +848,7 @@ class FactoryTestUserFactory extends Factory
     public function definition()
     {
         return [
-            'name' => $this->faker->name(),
+            'name' => fake()->name(),
             'options' => null,
         ];
     }
@@ -884,7 +884,7 @@ class FactoryTestPostFactory extends Factory
     {
         return [
             'user_id' => FactoryTestUserFactory::new(),
-            'title' => $this->faker->name(),
+            'title' => fake()->name(),
         ];
     }
 }
@@ -926,7 +926,7 @@ class FactoryTestCommentFactory extends Factory
             'commentable_id' => FactoryTestPostFactory::new(),
             'commentable_type' => FactoryTestPost::class,
             'user_id' => fn () => FactoryTestUserFactory::new(),
-            'body' => $this->faker->name(),
+            'body' => fake()->name(),
         ];
     }
 
@@ -957,7 +957,7 @@ class FactoryTestRoleFactory extends Factory
     public function definition()
     {
         return [
-            'name' => $this->faker->name(),
+            'name' => fake()->name(),
         ];
     }
 }
