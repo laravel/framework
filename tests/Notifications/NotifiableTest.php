@@ -22,11 +22,6 @@ class NotifiableTest extends TestCase
     }
 }
 
-class NotifiableTestModelInstance
-{
-    use Notifiable;
-}
-
 class NotifiableTestInstance
 {
     use Notifiable;
