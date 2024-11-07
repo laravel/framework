@@ -76,4 +76,14 @@ class AnonymousNotifiable
     {
         //
     }
+
+    /**
+     * Get all the drivers the notifiable supports being routed to.
+     *
+     * @return array
+     */
+    public function getDrivers(): array
+    {
+        return array_keys($this->routes);
+    }
 }
