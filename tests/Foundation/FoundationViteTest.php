@@ -1359,7 +1359,7 @@ class FoundationViteTest extends TestCase
 
                         if (assets.length) {
                             link.onload = () => loadNext(assets, 1)
-                            link.error = () => loadNext(assets, 1)
+                            link.onerror = () => loadNext(assets, 1)
                         }
                     }
 
@@ -1637,7 +1637,7 @@ class FoundationViteTest extends TestCase
 
                         if (assets.length) {
                             link.onload = () => loadNext(assets, 1)
-                            link.error = () => loadNext(assets, 1)
+                            link.onerror = () => loadNext(assets, 1)
                         }
                     }
 
