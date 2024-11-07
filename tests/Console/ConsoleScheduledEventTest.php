@@ -6,8 +6,8 @@ use Illuminate\Console\Scheduling\Event;
 use Illuminate\Console\Scheduling\EventMutex;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Carbon;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
 
 class ConsoleScheduledEventTest extends TestCase
 {
@@ -28,7 +28,6 @@ class ConsoleScheduledEventTest extends TestCase
     {
         date_default_timezone_set($this->defaultTimezone);
         Carbon::setTestNow(null);
-        m::close();
     }
 
     public function testBasicCronCompilation()

@@ -31,11 +31,11 @@ use Illuminate\Validation\ValidationData;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
 use InvalidArgumentException;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use Mockery as m;
 use Mockery\MockInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
-use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use stdClass;
 use Symfony\Component\HttpFoundation\File\File;
@@ -48,7 +48,6 @@ class ValidationValidatorTest extends TestCase
         parent::tearDown();
 
         Carbon::setTestNow(null);
-        m::close();
     }
 
     public function testNestedErrorMessagesAreRetrievedFromLocalArray()

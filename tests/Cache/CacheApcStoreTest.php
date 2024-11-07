@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Cache;
 use Illuminate\Cache\ApcStore;
 use Illuminate\Cache\ApcWrapper;
 use Mockery;
-use PHPUnit\Framework\TestCase;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 
 class CacheApcStoreTest extends TestCase
 {

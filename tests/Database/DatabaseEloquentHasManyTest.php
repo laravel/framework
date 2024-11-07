@@ -9,17 +9,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\UniqueConstraintViolationException;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use stdClass;
 
 class DatabaseEloquentHasManyTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testMakeMethodDoesNotSaveNewModel()
     {
         $relation = $this->getRelation();

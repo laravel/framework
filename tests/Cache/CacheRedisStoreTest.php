@@ -4,16 +4,11 @@ namespace Illuminate\Tests\Cache;
 
 use Illuminate\Cache\RedisStore;
 use Illuminate\Contracts\Redis\Factory;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
 
 class CacheRedisStoreTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testGetReturnsNullWhenNotFound()
     {
         $redis = $this->getRedis();

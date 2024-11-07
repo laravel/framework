@@ -14,8 +14,8 @@ use Illuminate\Database\Query\Builder as BaseBuilder;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Carbon;
 use Mockery;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use PDO;
-use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
 {
@@ -27,7 +27,6 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
     protected function tearDown(): void
     {
         Carbon::setTestNow();
-        Mockery::close();
     }
 
     public function testCreateOrFirstMethodCreatesNewRelated(): void

@@ -4,16 +4,11 @@ namespace Illuminate\Tests\Mail;
 
 use Illuminate\Mail\Markdown;
 use Illuminate\View\Factory;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
 
 class MailMarkdownTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testRenderFunctionReturnsHtml()
     {
         $viewFactory = m::mock(Factory::class);

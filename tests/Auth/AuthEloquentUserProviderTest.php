@@ -5,17 +5,12 @@ namespace Illuminate\Tests\Auth;
 use Illuminate\Auth\EloquentUserProvider;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Hashing\Hasher;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use stdClass;
 
 class AuthEloquentUserProviderTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testRetrieveByIDReturnsUser()
     {
         $provider = $this->getProviderMock();

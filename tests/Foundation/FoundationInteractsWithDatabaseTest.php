@@ -10,10 +10,10 @@ use Illuminate\Foundation\Testing\Concerns\InteractsWithDatabase;
 use Illuminate\Foundation\Testing\TestCase as TestingTestCase;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use Mockery as m;
 use Orchestra\Testbench\Concerns\CreatesApplication;
 use PHPUnit\Framework\ExpectationFailedException;
-use PHPUnit\Framework\TestCase;
 
 class FoundationInteractsWithDatabaseTest extends TestCase
 {
@@ -31,11 +31,6 @@ class FoundationInteractsWithDatabaseTest extends TestCase
     protected function setUp(): void
     {
         $this->connection = m::mock(Connection::class);
-    }
-
-    protected function tearDown(): void
-    {
-        m::close();
     }
 
     public function testSeeInDatabaseFindsResults()

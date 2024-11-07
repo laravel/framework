@@ -15,8 +15,8 @@ use Illuminate\Routing\Redirector;
 use Illuminate\Routing\UrlGenerator;
 use Illuminate\Validation\Factory as ValidationFactory;
 use Illuminate\Validation\ValidationException;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
 
 class FoundationFormRequestTest extends TestCase
 {
@@ -24,8 +24,6 @@ class FoundationFormRequestTest extends TestCase
 
     protected function tearDown(): void
     {
-        m::close();
-
         $this->mocks = [];
     }
 

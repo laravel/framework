@@ -9,8 +9,8 @@ use Illuminate\Console\Scheduling\EventMutex;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Console\Scheduling\SchedulingMutex;
 use Illuminate\Container\Container;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
 
 class ConsoleEventSchedulerTest extends TestCase
 {
@@ -30,11 +30,6 @@ class ConsoleEventSchedulerTest extends TestCase
         $container->instance(SchedulingMutex::class, m::mock(CacheSchedulingMutex::class));
 
         $container->instance(Schedule::class, $this->schedule = new Schedule(m::mock(EventMutex::class)));
-    }
-
-    protected function tearDown(): void
-    {
-        m::close();
     }
 
     public function testMutexCanReceiveCustomStore()

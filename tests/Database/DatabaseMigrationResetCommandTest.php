@@ -6,8 +6,8 @@ use Closure;
 use Illuminate\Database\Console\Migrations\ResetCommand;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Foundation\Application;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
 
@@ -16,7 +16,6 @@ class DatabaseMigrationResetCommandTest extends TestCase
     protected function tearDown(): void
     {
         ResetCommand::prohibit(false);
-        m::close();
     }
 
     public function testResetCommandCallsMigratorWithProperArguments()

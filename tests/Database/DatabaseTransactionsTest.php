@@ -5,8 +5,8 @@ namespace Illuminate\Tests\Database;
 use Exception;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\DatabaseTransactionsManager;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use Throwable;
 
 class DatabaseTransactionsTest extends TestCase
@@ -56,8 +56,6 @@ class DatabaseTransactionsTest extends TestCase
         foreach (['default', 'second_connection'] as $connection) {
             $this->schema($connection)->drop('users');
         }
-
-        m::close();
     }
 
     public function testTransactionIsRecordedAndCommitted()

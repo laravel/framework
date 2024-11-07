@@ -8,8 +8,8 @@ use Illuminate\Console\Scheduling\Event;
 use Illuminate\Contracts\Cache\Factory;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Support\Carbon;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
 
 class CacheSchedulingMutexTest extends TestCase
 {

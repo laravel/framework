@@ -20,18 +20,13 @@ use Illuminate\View\Factory;
 use Illuminate\View\View;
 use Illuminate\View\ViewFinderInterface;
 use InvalidArgumentException;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use ReflectionFunction;
 use stdClass;
 
 class ViewFactoryTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testMakeCreatesNewViewInstanceWithProperPathAndEngine()
     {
         unset($_SERVER['__test.view']);

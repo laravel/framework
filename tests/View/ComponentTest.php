@@ -14,8 +14,8 @@ use Illuminate\View\Component;
 use Illuminate\View\ComponentSlot;
 use Illuminate\View\Factory;
 use Illuminate\View\View;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
 
 class ComponentTest extends TestCase
 {
@@ -43,8 +43,6 @@ class ComponentTest extends TestCase
 
     protected function tearDown(): void
     {
-        m::close();
-
         Facade::clearResolvedInstances();
         Facade::setFacadeApplication(null);
         Container::setInstance(null);

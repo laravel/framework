@@ -28,11 +28,10 @@ use Illuminate\Testing\Assert;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
 use InvalidArgumentException;
-use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use Mockery as m;
 use OutOfRangeException;
 use PHPUnit\Framework\AssertionFailedError;
-use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use RuntimeException;
@@ -44,7 +43,6 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class FoundationExceptionsHandlerTest extends TestCase
 {
-    use MockeryPHPUnitIntegration;
     use InteractsWithExceptionHandling;
 
     protected $config;

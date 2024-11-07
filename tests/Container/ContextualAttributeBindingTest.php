@@ -29,17 +29,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Filesystem\FilesystemManager;
 use Illuminate\Http\Request;
 use Illuminate\Log\LogManager;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
 class ContextualAttributeBindingTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testDependencyCanBeResolvedFromAttributeBinding()
     {
         $container = new Container;

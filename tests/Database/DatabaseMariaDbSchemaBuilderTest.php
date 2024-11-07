@@ -6,16 +6,11 @@ use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Processors\MariaDbProcessor;
 use Illuminate\Database\Schema\Grammars\MariaDbGrammar;
 use Illuminate\Database\Schema\MariaDbBuilder;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
 
 class DatabaseMariaDbSchemaBuilderTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testHasTable()
     {
         $connection = m::mock(Connection::class);

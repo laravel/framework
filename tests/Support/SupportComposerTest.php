@@ -4,17 +4,12 @@ namespace Illuminate\Tests\Support;
 
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Composer;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
 
 class SupportComposerTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testDumpAutoloadRunsTheCorrectCommand()
     {
         $composer = $this->mockComposer(['composer', 'dump-autoload']);

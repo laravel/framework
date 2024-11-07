@@ -5,17 +5,12 @@ namespace Illuminate\Tests\Database;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Query\Grammars\Grammar;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
 class DatabaseQueryGrammarTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testWhereRawReturnsStringWhenExpressionPassed()
     {
         $builder = m::mock(Builder::class);

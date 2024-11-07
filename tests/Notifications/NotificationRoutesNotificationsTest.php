@@ -7,16 +7,14 @@ use Illuminate\Contracts\Notifications\Dispatcher;
 use Illuminate\Notifications\RoutesNotifications;
 use Illuminate\Support\Facades\Notification;
 use InvalidArgumentException;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use stdClass;
 
 class NotificationRoutesNotificationsTest extends TestCase
 {
     protected function tearDown(): void
     {
-        m::close();
-
         Container::setInstance(null);
     }
 

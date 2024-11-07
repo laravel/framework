@@ -4,16 +4,11 @@ namespace Illuminate\Tests\Translation;
 
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Translation\FileLoader;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
 
 class TranslationFileLoaderTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testLoadMethodWithoutNamespacesProperlyCallsLoader()
     {
         $loader = new FileLoader($files = m::mock(Filesystem::class), __DIR__);

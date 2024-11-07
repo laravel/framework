@@ -14,8 +14,8 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Testing\Fakes\EventFake;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
 
 class SupportFacadesEventTest extends TestCase
 {
@@ -40,8 +40,6 @@ class SupportFacadesEventTest extends TestCase
     {
         Event::clearResolvedInstances();
         Event::setFacadeApplication(null);
-
-        m::close();
     }
 
     public function testFakeFor()

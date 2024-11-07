@@ -8,9 +8,9 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Bootstrap\HandleExceptions;
 use Illuminate\Log\LogManager;
 use Illuminate\Support\Env;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use Mockery as m;
 use Monolog\Handler\NullHandler;
-use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use RuntimeException;
 
@@ -39,8 +39,6 @@ class HandleExceptionsTest extends TestCase
     {
         Application::setInstance(null);
         HandleExceptions::flushState();
-
-        m::close();
     }
 
     public function testPhpDeprecations()

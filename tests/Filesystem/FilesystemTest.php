@@ -6,12 +6,12 @@ use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Testing\Assert;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use Mockery as m;
 use PHPUnit\Framework\Attributes\AfterClass;
 use PHPUnit\Framework\Attributes\BeforeClass;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
-use PHPUnit\Framework\TestCase;
 use SplFileInfo;
 
 class FilesystemTest extends TestCase
@@ -35,8 +35,6 @@ class FilesystemTest extends TestCase
 
     protected function tearDown(): void
     {
-        m::close();
-
         $files = new Filesystem;
         $files->deleteDirectory(self::$tempDir, $preserve = true);
     }

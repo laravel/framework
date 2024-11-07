@@ -5,16 +5,11 @@ namespace Illuminate\Tests\Database;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Pivot;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentCollectionQueueableTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testSerializesPivotsEntitiesId()
     {
         $spy = m::spy(Pivot::class);

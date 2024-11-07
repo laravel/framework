@@ -16,8 +16,8 @@ use Illuminate\Database\Eloquent\Factories\Sequence;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Tests\Database\Fixtures\Models\Money\Price;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
 class DatabaseEloquentFactoryTest extends TestCase
@@ -96,8 +96,6 @@ class DatabaseEloquentFactoryTest extends TestCase
      */
     protected function tearDown(): void
     {
-        m::close();
-
         $this->schema()->drop('users');
 
         Container::setInstance(null);

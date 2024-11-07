@@ -5,17 +5,12 @@ namespace Illuminate\Tests\Validation;
 use Closure;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Validation\DatabasePresenceVerifier;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use stdClass;
 
 class ValidationDatabasePresenceVerifierTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testBasicCount()
     {
         $verifier = new DatabasePresenceVerifier($db = m::mock(ConnectionResolverInterface::class));

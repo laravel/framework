@@ -5,20 +5,13 @@ namespace Illuminate\Tests\Cache;
 use Illuminate\Cache\MemcachedStore;
 use Illuminate\Support\Carbon;
 use Memcached;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use Mockery as m;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
-use PHPUnit\Framework\TestCase;
 
 #[RequiresPhpExtension('memcached')]
 class CacheMemcachedStoreTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-
-        parent::tearDown();
-    }
-
     public function testGetReturnsNullWhenNotFound()
     {
         $memcache = $this->getMockBuilder(Memcached::class)->onlyMethods(['get', 'getResultCode'])->getMock();

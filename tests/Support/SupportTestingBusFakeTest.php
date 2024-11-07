@@ -10,10 +10,10 @@ use Illuminate\Contracts\Bus\QueueingDispatcher;
 use Illuminate\Support\Testing\Fakes\BatchRepositoryFake;
 use Illuminate\Support\Testing\Fakes\BusFake;
 use Illuminate\Support\Testing\Fakes\PendingBatchFake;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use Mockery as m;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\ExpectationFailedException;
-use PHPUnit\Framework\TestCase;
 
 class SupportTestingBusFakeTest extends TestCase
 {
@@ -24,12 +24,6 @@ class SupportTestingBusFakeTest extends TestCase
     {
         parent::setUp();
         $this->fake = new BusFake(m::mock(QueueingDispatcher::class));
-    }
-
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-        m::close();
     }
 
     public function testItUsesCustomBusRepository()

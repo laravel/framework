@@ -8,17 +8,12 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\ProviderRepository;
 use Illuminate\Support\ServiceProvider;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use stdClass;
 
 class FoundationProviderRepositoryTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testServicesAreRegisteredWhenManifestIsNotRecompiled()
     {
         $app = m::mock(Application::class);

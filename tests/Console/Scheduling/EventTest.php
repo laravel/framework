@@ -5,19 +5,12 @@ namespace Illuminate\Tests\Console\Scheduling;
 use Illuminate\Console\Scheduling\Event;
 use Illuminate\Console\Scheduling\EventMutex;
 use Illuminate\Support\Str;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use Mockery as m;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
-use PHPUnit\Framework\TestCase;
 
 class EventTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-
-        parent::tearDown();
-    }
-
     #[RequiresOperatingSystem('Linux|Darwin')]
     public function testBuildCommandUsingUnix()
     {

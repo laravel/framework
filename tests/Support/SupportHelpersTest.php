@@ -15,9 +15,9 @@ use Illuminate\Tests\Support\Fixtures\IntBackedEnum;
 use Illuminate\Tests\Support\Fixtures\StringBackedEnum;
 use IteratorAggregate;
 use LogicException;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use Mockery as m;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use RuntimeException;
 use stdClass;
@@ -25,13 +25,6 @@ use Traversable;
 
 class SupportHelpersTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-
-        parent::tearDown();
-    }
-
     public function testE()
     {
         $str = 'A \'quote\' is <b>bold</b>';

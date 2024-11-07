@@ -7,19 +7,14 @@ use Illuminate\Database\Connection;
 use Illuminate\Queue\DatabaseQueue;
 use Illuminate\Queue\Queue;
 use Illuminate\Support\Str;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use Mockery as m;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use stdClass;
 
 class QueueDatabaseQueueUnitTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     #[DataProvider('pushJobsDataProvider')]
     public function testPushProperlyPushesJobOntoDatabase($uuid, $job, $displayNameStartsWith, $jobStartsWith)
     {

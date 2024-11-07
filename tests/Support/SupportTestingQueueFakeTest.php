@@ -8,9 +8,9 @@ use Illuminate\Foundation\Application;
 use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Support\Testing\Fakes\QueueFake;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use Mockery as m;
 use PHPUnit\Framework\ExpectationFailedException;
-use PHPUnit\Framework\TestCase;
 
 class SupportTestingQueueFakeTest extends TestCase
 {
@@ -29,13 +29,6 @@ class SupportTestingQueueFakeTest extends TestCase
         parent::setUp();
         $this->fake = new QueueFake(new Application);
         $this->job = new JobStub;
-    }
-
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-
-        m::close();
     }
 
     public function testAssertPushed()

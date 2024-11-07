@@ -9,18 +9,13 @@ use Illuminate\Bus\PendingBatch;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Collection;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use stdClass;
 
 class BusPendingBatchTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function test_pending_batch_may_be_configured_and_dispatched()
     {
         $container = new Container;

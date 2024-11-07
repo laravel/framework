@@ -27,8 +27,8 @@ use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Tests\Database\Fixtures\Enums\Bar;
 use InvalidArgumentException;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use stdClass;
 
@@ -37,11 +37,6 @@ include_once 'Enums.php';
 class DatabaseQueryBuilderTest extends TestCase
 {
     protected $called;
-
-    protected function tearDown(): void
-    {
-        m::close();
-    }
 
     public function testBasicSelect()
     {

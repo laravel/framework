@@ -8,19 +8,14 @@ use Illuminate\Session\Store;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
 use Illuminate\Support\ViewErrorBag;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use SessionHandlerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 class SessionStoreTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testSessionIsLoadedFromHandler()
     {
         $session = $this->getSession();

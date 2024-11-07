@@ -4,8 +4,8 @@ namespace Illuminate\Tests\Support;
 
 use Exception;
 use Illuminate\Support\Timebox;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
 
 class SupportTimeboxTest extends TestCase
 {

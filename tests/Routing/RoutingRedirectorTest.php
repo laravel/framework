@@ -7,8 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Routing\UrlGenerator;
 use Illuminate\Session\Store;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\HeaderBag;
 
 class RoutingRedirectorTest extends TestCase
@@ -44,11 +44,6 @@ class RoutingRedirectorTest extends TestCase
 
         $this->redirect = new Redirector($this->url);
         $this->redirect->setSession($this->session);
-    }
-
-    protected function tearDown(): void
-    {
-        m::close();
     }
 
     public function testBasicRedirectTo()

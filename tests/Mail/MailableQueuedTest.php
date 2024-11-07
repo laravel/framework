@@ -13,17 +13,12 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailer;
 use Illuminate\Mail\SendQueuedMailable;
 use Illuminate\Support\Testing\Fakes\QueueFake;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 
 class MailableQueuedTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testQueuedMailableSent()
     {
         $queueFake = new QueueFake(new Application);

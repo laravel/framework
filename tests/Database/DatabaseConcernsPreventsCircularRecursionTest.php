@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Eloquent\Concerns\PreventsCircularRecursion;
 use Mockery;
-use PHPUnit\Framework\TestCase;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 
 class DatabaseConcernsPreventsCircularRecursionTest extends TestCase
 {

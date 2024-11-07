@@ -4,8 +4,8 @@ namespace Illuminate\Tests\Pagination;
 
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\AbstractPaginator;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
 
 class PaginatorLoadMorphCountTest extends TestCase
 {

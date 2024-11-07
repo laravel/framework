@@ -5,18 +5,13 @@ namespace Illuminate\Tests\Database;
 use Illuminate\Database\Console\Migrations\RollbackCommand;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Foundation\Application;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
 
 class DatabaseMigrationRollbackCommandTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testRollbackCommandCallsMigratorWithProperArguments()
     {
         $command = new RollbackCommand($migrator = m::mock(Migrator::class));

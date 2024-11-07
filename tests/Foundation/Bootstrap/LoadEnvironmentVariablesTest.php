@@ -4,8 +4,8 @@ namespace Illuminate\Tests\Foundation\Bootstrap;
 
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
 
 class LoadEnvironmentVariablesTest extends TestCase
 {
@@ -13,7 +13,6 @@ class LoadEnvironmentVariablesTest extends TestCase
     {
         unset($_ENV['FOO'], $_SERVER['FOO']);
         putenv('FOO');
-        m::close();
     }
 
     protected function getAppMock($file)

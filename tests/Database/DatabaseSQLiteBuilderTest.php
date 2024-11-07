@@ -8,8 +8,8 @@ use Illuminate\Database\Schema\SQLiteBuilder;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\File;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
 
 class DatabaseSQLiteBuilderTest extends TestCase
 {
@@ -25,8 +25,6 @@ class DatabaseSQLiteBuilderTest extends TestCase
 
     protected function tearDown(): void
     {
-        m::close();
-
         Container::setInstance(null);
         Facade::setFacadeApplication(null);
     }

@@ -6,8 +6,8 @@ use Illuminate\Console\Application;
 use Illuminate\Console\Command;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Console\View\Components\Factory;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -17,11 +17,6 @@ use Symfony\Component\Console\Question\ChoiceQuestion;
 
 class CommandTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testCallingClassCommandResolveCommandViaApplicationResolution()
     {
         $command = new class extends Command

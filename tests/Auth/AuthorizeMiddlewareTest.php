@@ -15,8 +15,8 @@ use Illuminate\Routing\CallableDispatcher;
 use Illuminate\Routing\Contracts\CallableDispatcher as CallableDispatcherContract;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Routing\Router;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use stdClass;
 
 include_once 'Enums.php';
@@ -50,8 +50,6 @@ class AuthorizeMiddlewareTest extends TestCase
 
     protected function tearDown(): void
     {
-        m::close();
-
         Container::setInstance(null);
     }
 

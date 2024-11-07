@@ -11,18 +11,11 @@ use Illuminate\Notifications\ChannelManager;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\NotificationSender;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
 
 class NotificationSenderTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-
-        m::close();
-    }
-
     public function testItCanSendQueuedNotificationsWithAStringVia()
     {
         $notifiable = m::mock(Notifiable::class);

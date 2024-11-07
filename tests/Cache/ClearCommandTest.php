@@ -8,8 +8,8 @@ use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Application;
 use InvalidArgumentException;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
 
@@ -50,11 +50,6 @@ class ClearCommandTest extends TestCase
         $app = new Application;
         $app['path.storage'] = __DIR__;
         $this->command->setLaravel($app);
-    }
-
-    protected function tearDown(): void
-    {
-        m::close();
     }
 
     public function testClearWithNoStoreArgument()

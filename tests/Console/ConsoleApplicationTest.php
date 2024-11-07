@@ -10,8 +10,8 @@ use Illuminate\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Foundation\Application as FoundationApplication;
 use Illuminate\Tests\Console\Fixtures\FakeCommandWithArrayInputPrompting;
 use Illuminate\Tests\Console\Fixtures\FakeCommandWithInputPrompting;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
@@ -19,11 +19,6 @@ use Throwable;
 
 class ConsoleApplicationTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testAddSetsLaravelInstance()
     {
         $app = $this->getMockConsole(['addToParent']);

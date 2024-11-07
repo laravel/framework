@@ -11,8 +11,8 @@ use Illuminate\Auth\RequestGuard;
 use Illuminate\Config\Repository as Config;
 use Illuminate\Container\Container;
 use Illuminate\Http\Request;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use stdClass;
 
 class AuthenticateMiddlewareTest extends TestCase
@@ -32,8 +32,6 @@ class AuthenticateMiddlewareTest extends TestCase
 
     protected function tearDown(): void
     {
-        m::close();
-
         Container::setInstance(null);
     }
 

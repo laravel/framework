@@ -10,8 +10,8 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Collection as BaseCollection;
 use LogicException;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use stdClass;
 
 class DatabaseEloquentCollectionTest extends TestCase
@@ -61,7 +61,6 @@ class DatabaseEloquentCollectionTest extends TestCase
         $this->schema()->drop('users');
         $this->schema()->drop('articles');
         $this->schema()->drop('comments');
-        m::close();
     }
 
     public function testAddingItemsToCollection()

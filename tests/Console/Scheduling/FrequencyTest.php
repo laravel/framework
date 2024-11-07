@@ -5,8 +5,8 @@ namespace Illuminate\Tests\Console\Scheduling;
 use Illuminate\Console\Scheduling\Event;
 use Illuminate\Console\Scheduling\EventMutex;
 use Illuminate\Support\Carbon;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
 
 class FrequencyTest extends TestCase
 {

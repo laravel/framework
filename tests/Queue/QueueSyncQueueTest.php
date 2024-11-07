@@ -13,15 +13,13 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Jobs\SyncJob;
 use Illuminate\Queue\SyncQueue;
 use LogicException;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
 
 class QueueSyncQueueTest extends TestCase
 {
     protected function tearDown(): void
     {
-        m::close();
-
         Container::setInstance(null);
     }
 

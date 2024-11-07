@@ -8,8 +8,8 @@ use Illuminate\Container\Container;
 use Illuminate\Queue\Jobs\SqsJob;
 use Illuminate\Queue\SqsQueue;
 use Illuminate\Support\Carbon;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
 
 class QueueSqsQueueTest extends TestCase
 {
@@ -29,11 +29,6 @@ class QueueSqsQueueTest extends TestCase
     protected $mockedReceiveMessageResponseModel;
     protected $mockedReceiveEmptyMessageResponseModel;
     protected $mockedQueueAttributesResponseModel;
-
-    protected function tearDown(): void
-    {
-        m::close();
-    }
 
     protected function setUp(): void
     {

@@ -6,6 +6,7 @@ use Illuminate\Container\Container;
 use Illuminate\Queue\BeanstalkdQueue;
 use Illuminate\Queue\Jobs\BeanstalkdJob;
 use Illuminate\Support\Str;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use Mockery as m;
 use Pheanstalk\Contract\JobIdInterface;
 use Pheanstalk\Contract\PheanstalkManagerInterface;
@@ -15,7 +16,6 @@ use Pheanstalk\Pheanstalk;
 use Pheanstalk\Values\Job;
 use Pheanstalk\Values\TubeList;
 use Pheanstalk\Values\TubeName;
-use PHPUnit\Framework\TestCase;
 
 class QueueBeanstalkdQueueTest extends TestCase
 {
@@ -28,11 +28,6 @@ class QueueBeanstalkdQueueTest extends TestCase
      * @var \Illuminate\Container\Container|\Mockery\LegacyMockInterface|\Mockery\MockInterface
      */
     private $container;
-
-    protected function tearDown(): void
-    {
-        m::close();
-    }
 
     public function testPushProperlyPushesJobOntoBeanstalkd()
     {

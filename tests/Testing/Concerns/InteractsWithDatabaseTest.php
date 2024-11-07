@@ -12,8 +12,8 @@ use Illuminate\Database\Query\Grammars\SqlServerGrammar;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Facade;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
 
 class InteractsWithDatabaseTest extends TestCase
 {
@@ -21,11 +21,6 @@ class InteractsWithDatabaseTest extends TestCase
     {
         Facade::clearResolvedInstances();
         Facade::setFacadeApplication(null);
-    }
-
-    protected function tearDown(): void
-    {
-        m::close();
     }
 
     public function testCastToJsonSqlite()

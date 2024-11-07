@@ -8,8 +8,8 @@ use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
 
 class CacheFileStoreTest extends TestCase
 {
@@ -129,7 +129,6 @@ class CacheFileStoreTest extends TestCase
         $this->assertTrue($result);
         $result = $store->put('foo', 'baz', 10);
         $this->assertTrue($result);
-        m::close();
     }
 
     public function testStoreItemDirectoryProperlySetsPermissions()
@@ -154,7 +153,6 @@ class CacheFileStoreTest extends TestCase
 
         $result = $store->put('foo', 'foo', 10);
         $this->assertTrue($result);
-        m::close();
     }
 
     public function testForeversAreStoredWithHighTimestamp()

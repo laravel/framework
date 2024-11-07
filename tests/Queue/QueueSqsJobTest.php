@@ -6,8 +6,8 @@ use Aws\Sqs\SqsClient;
 use Illuminate\Container\Container;
 use Illuminate\Queue\Jobs\SqsJob;
 use Illuminate\Queue\SqsQueue;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use stdClass;
 
 class QueueSqsJobTest extends TestCase
@@ -63,11 +63,6 @@ class QueueSqsJobTest extends TestCase
             'MessageId' => $this->mockedMessageId,
             'Attributes' => ['ApproximateReceiveCount' => 1],
         ];
-    }
-
-    protected function tearDown(): void
-    {
-        m::close();
     }
 
     public function testFireProperlyCallsTheJobHandler()

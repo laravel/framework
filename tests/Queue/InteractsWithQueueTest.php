@@ -5,8 +5,8 @@ namespace Illuminate\Tests\Queue;
 use Exception;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Queue\InteractsWithQueue;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
 
 class InteractsWithQueueTest extends TestCase
 {

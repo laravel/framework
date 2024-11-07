@@ -7,9 +7,9 @@ use Illuminate\Console\Command;
 use Illuminate\Contracts\Cache\Factory;
 use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Cache\Repository;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use Mockery as m;
 use Mockery\MockInterface;
-use PHPUnit\Framework\TestCase;
 
 class CacheCommandMutexTest extends TestCase
 {
@@ -42,12 +42,6 @@ class CacheCommandMutexTest extends TestCase
         {
             protected $name = 'command-name';
         };
-    }
-
-    protected function tearDown(): void
-    {
-        m::close();
-        parent::tearDown();
     }
 
     public function testCanCreateMutex()

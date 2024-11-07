@@ -19,8 +19,8 @@ use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection as BaseCollection;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use stdClass;
 
 class DatabaseEloquentBuilderTest extends TestCase
@@ -30,8 +30,6 @@ class DatabaseEloquentBuilderTest extends TestCase
         parent::tearDown();
 
         Carbon::setTestNow(null);
-
-        m::close();
     }
 
     public function testFindMethod()

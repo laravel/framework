@@ -5,17 +5,12 @@ namespace Illuminate\Tests\View;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\View\Compilers\BladeCompiler;
 use InvalidArgumentException;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use Mockery as m;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\TestCase;
 
 class ViewBladeCompilerTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testIsExpiredReturnsTrueIfCompiledFileDoesntExist()
     {
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);

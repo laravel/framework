@@ -11,16 +11,14 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\UniqueConstraintViolationException;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentMorphTest extends TestCase
 {
     protected function tearDown(): void
     {
         Relation::morphMap([], false);
-
-        m::close();
     }
 
     public function testMorphOneSetsProperConstraints()

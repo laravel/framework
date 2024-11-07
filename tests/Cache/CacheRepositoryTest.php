@@ -18,9 +18,9 @@ use Illuminate\Contracts\Cache\Store;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Carbon;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use Mockery as m;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\TestCase;
 
 class CacheRepositoryTest extends TestCase
 {
@@ -33,8 +33,6 @@ class CacheRepositoryTest extends TestCase
 
     protected function tearDown(): void
     {
-        m::close();
-
         Carbon::setTestNow(null);
     }
 

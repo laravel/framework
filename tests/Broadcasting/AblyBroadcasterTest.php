@@ -5,8 +5,8 @@ namespace Illuminate\Tests\Broadcasting;
 use Ably\AblyRest;
 use Illuminate\Broadcasting\Broadcasters\AblyBroadcaster;
 use Illuminate\Http\Request;
+use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class AblyBroadcasterTest extends TestCase
@@ -25,13 +25,6 @@ class AblyBroadcasterTest extends TestCase
         $this->ably = m::mock(AblyRest::class, ['abcd:efgh']);
 
         $this->broadcaster = m::mock(AblyBroadcaster::class, [$this->ably])->makePartial();
-    }
-
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-
-        m::close();
     }
 
     public function testAuthCallValidAuthenticationResponseWithPrivateChannelWhenCallbackReturnTrue()
