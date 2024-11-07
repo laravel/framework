@@ -3,6 +3,7 @@
 namespace Illuminate\View;
 
 use Illuminate\Container\Container;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\View\Compilers\BladeCompiler;
 use Illuminate\View\Engines\CompilerEngine;
@@ -23,6 +24,7 @@ class ViewServiceProvider extends ServiceProvider
         $this->registerViewFinder();
         $this->registerBladeCompiler();
         $this->registerEngineResolver();
+        $this->registerLaravelComponents();
 
         $this->app->terminating(static function () {
             Component::flushCache();
@@ -175,5 +177,11 @@ class ViewServiceProvider extends ServiceProvider
 
             return $compiler;
         });
+    }
+
+    protected function registerLaravelComponents()
+    {
+        $this->loadViewsFrom(__DIR__.'/Components/views', 'laravel');
+        Blade::componentNamespace('Illuminate\\View\\Components', 'laravel');
     }
 }
