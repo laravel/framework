@@ -53,11 +53,22 @@ class FoundationViteTest extends TestCase
     {
         $this->makeViteManifest();
 
-        $result = app(Vite::class)(['resources/css/app.css' => ['media' => 'all'], 'resources/js/app.js' => ['async']]);
+        $result = app(Vite::class)([
+            'resources/css/app.css' => ['media' => 'all'],
+            'resources/js/app.js' => ['async'],
+            'resources/js/app-with-shared-css.js' => ['data-attribute' => 'only-on-js'],
+        ]);
 
-        $this->assertStringEndsWith(
-            '<link rel="stylesheet" href="https://example.com/build/assets/app.versioned.css" media="all" />'
-            .'<script type="module" src="https://example.com/build/assets/app.versioned.js" async></script>',
+        $this->assertSame(
+            '<link rel="preload" as="style" href="https://example.com/build/assets/app.versioned.css" />'
+            .'<link rel="preload" as="style" href="https://example.com/build/assets/shared-css.versioned.css" />'
+            .'<link rel="modulepreload" href="https://example.com/build/assets/app.versioned.js" />'
+            .'<link rel="modulepreload" href="https://example.com/build/assets/app-with-shared-css.versioned.js" />'
+            .'<link rel="modulepreload" href="https://example.com/build/assets/someFile.versioned.js" />'
+            .'<link rel="stylesheet" href="https://example.com/build/assets/app.versioned.css" media="all" />'
+            .'<link rel="stylesheet" href="https://example.com/build/assets/shared-css.versioned.css" />'
+            .'<script type="module" src="https://example.com/build/assets/app.versioned.js" async></script>'
+            .'<script type="module" src="https://example.com/build/assets/app-with-shared-css.versioned.js" data-attribute="only-on-js"></script>',
             $result->toHtml()
         );
     }

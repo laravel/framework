@@ -419,7 +419,7 @@ class Vite implements Htmlable
                         $this->assetPath("{$buildDirectory}/{$css}"),
                         $partialManifest->first(),
                         $manifest,
-                        $attributes
+                        []
                     ));
                 }
             }
