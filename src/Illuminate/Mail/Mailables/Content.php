@@ -277,7 +277,7 @@ class Content
         return $this->with([
             'actionText' => $text,
             'actionUrl' => $url,
-            'color' => $color,
+            'actionColor' => $color,
             'displayableActionUrl' => str_replace(['mailto:', 'tel:'], '', $url),
         ]);
     }

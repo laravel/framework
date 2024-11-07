@@ -12,7 +12,7 @@
 
 {{-- Action Button --}}
 @isset($actionText)
-<x-mail::button :url="$actionUrl" :color="$color">
+<x-mail::button :url="$actionUrl" :color="$actionColor">
 {{ $actionText }}
 </x-mail::button>
 @endisset
