@@ -399,6 +399,19 @@ trait QueriesRelationships
     }
 
     /**
+     * Add a where in clause to a relationship query.
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>|string  $relation
+     * @param  \Closure|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @param  mixed  $values
+     * @return $this
+     */
+    public function whereRelationIn($relation, $column, $values)
+    {
+        return $this->whereHas($relation, fn($query) => $query->whereIn($column, $values));
+    }
+
+    /**
      * Add an "or where" clause to a relationship query.
      *
      * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>|string  $relation
