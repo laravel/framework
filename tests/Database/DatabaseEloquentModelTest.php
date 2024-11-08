@@ -1809,8 +1809,8 @@ class DatabaseEloquentModelTest extends TestCase
         $this->addMockConnection($model);
 
         $relation = $model->belongsToMany(EloquentModelSaveStub::class);
-        $this->assertSame('eloquent_model_save_stub_eloquent_model_stub.eloquent_model_stub_id', $relation->getQualifiedForeignPivotKeyName());
-        $this->assertSame('eloquent_model_save_stub_eloquent_model_stub.eloquent_model_save_stub_id', $relation->getQualifiedRelatedPivotKeyName());
+        $this->assertSame('save_stub_stub.eloquent_model_stub_id', $relation->getQualifiedForeignPivotKeyName());
+        $this->assertSame('save_stub_stub.eloquent_model_save_stub_id', $relation->getQualifiedRelatedPivotKeyName());
         $this->assertSame($model, $relation->getParent());
         $this->assertInstanceOf(EloquentModelSaveStub::class, $relation->getQuery()->getModel());
         $this->assertEquals(__FUNCTION__, $relation->getRelationName());
