@@ -158,6 +158,13 @@ class EloquentWhereHasTest extends DatabaseTestCase
         $this->assertEquals([1, 2], $comments->pluck('id')->all());
     }
 
+    public function testWhereRelationIn()
+    {
+        $posts = Post::whereRelationIn('user', 'id', [1])->get();
+
+        $this->assertEquals([1], $posts->pluck('id')->all());
+    }
+
     public function testWithCount()
     {
         $users = User::whereHas('posts', function ($query) {
