@@ -100,6 +100,13 @@ abstract class Factory
     protected $faker;
 
     /**
+     * Whether relationship should be automatically created.
+     *
+     * @var bool
+     */
+    protected $relationshipsEnabled = true;
+
+    /**
      * The default namespace where factories reside.
      *
      * @var string
@@ -189,6 +196,18 @@ abstract class Factory
      */
     public function configure()
     {
+        return $this;
+    }
+
+    /**
+     * Disable the creation of relationship factories.
+     *
+     * @return static
+     */
+    public function disableRelationships()
+    {
+        $this->relationshipsEnabled = false;
+
         return $this;
     }
 
@@ -478,7 +497,9 @@ abstract class Factory
     {
         return collect($definition)
             ->map($evaluateRelations = function ($attribute) {
-                if ($attribute instanceof self) {
+                if (! $this->relationshipsEnabled && $attribute instanceof self) {
+                    $attribute = null;
+                } elseif ($attribute instanceof self) {
                     $attribute = $this->getRandomRecycledModel($attribute->modelName())?->getKey()
                         ?? $attribute->recycle($this->recycle)->create()->getKey();
                 } elseif ($attribute instanceof Model) {
