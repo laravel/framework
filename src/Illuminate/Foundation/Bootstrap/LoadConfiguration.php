@@ -96,7 +96,7 @@ class LoadConfiguration
         $config = (fn () => require $path)();
 
         if (isset($base[$name])) {
-            $config += $base[$name];
+            $config = array_merge($base[$name], $config);
 
             foreach ($this->mergeableOptions($name) as $option) {
                 if (isset($config[$option])) {
