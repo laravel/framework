@@ -41,7 +41,7 @@ class CacheTokenRepository implements TokenRepositoryInterface
         $token = hash_hmac('sha256', Str::random(40), $this->hashKey);
 
         $this->cache->put(
-            $this->prefix . $user->getEmailForPasswordReset(),
+            $this->prefix.$user->getEmailForPasswordReset(),
             [$token, Carbon::now()->format($this->format)],
             $this->expires,
         );
@@ -58,7 +58,7 @@ class CacheTokenRepository implements TokenRepositoryInterface
      */
     public function exists(CanResetPasswordContract $user, #[\SensitiveParameter] $token)
     {
-        [$record, $createdAt] = $this->cache->get($this->prefix . $user->getEmailForPasswordReset());
+        [$record, $createdAt] = $this->cache->get($this->prefix.$user->getEmailForPasswordReset());
 
         return $record
             && ! $this->tokenExpired($createdAt)
@@ -84,7 +84,7 @@ class CacheTokenRepository implements TokenRepositoryInterface
      */
     public function recentlyCreatedToken(CanResetPasswordContract $user)
     {
-        [$record, $createdAt] = $this->cache->get($this->prefix . $user->getEmailForPasswordReset());
+        [$record, $createdAt] = $this->cache->get($this->prefix.$user->getEmailForPasswordReset());
 
         return $record && $this->tokenRecentlyCreated($createdAt);
     }
@@ -114,7 +114,7 @@ class CacheTokenRepository implements TokenRepositoryInterface
      */
     public function delete(CanResetPasswordContract $user)
     {
-        $this->cache->forget($this->prefix . $user->getEmailForPasswordReset());
+        $this->cache->forget($this->prefix.$user->getEmailForPasswordReset());
     }
 
     /**
