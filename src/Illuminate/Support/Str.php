@@ -525,9 +525,9 @@ class Str
     }
 
     /**
-     * Determine if a given string is a date in the specified format.
+     * Determine if a given value is a date in the specified format.
      *
-     * @param  string  $value
+     * @param  mixed  $value
      * @param  string  $format
      * @return bool
      */
@@ -543,9 +543,9 @@ class Str
     }
 
     /**
-     * Determine if a given string is a time in the specified format.
+     * Determine if a given value is a time in the specified format.
      *
-     * @param  string  $value
+     * @param  mixed  $value
      * @param  string  $format
      * @return bool
      */
@@ -561,9 +561,9 @@ class Str
     }
 
     /**
-     * Determine if a given string is a date and time in the specified format.
+     * Determine if a given value is a date and time in the specified format.
      *
-     * @param  string  $value
+     * @param  mixed  $value
      * @param  string  $format
      * @return bool
      */
