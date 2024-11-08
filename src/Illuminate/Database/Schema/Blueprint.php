@@ -1039,16 +1039,22 @@ class Blueprint
         $column = $column ?: $model->getForeignKey();
 
         if ($model->getKeyType() === 'int' && $model->getIncrementing()) {
-            return $this->foreignId($column)->table($model->getTable());
+            return $this->foreignId($column)
+                ->table($model->getTable())
+                ->referencesModelColumn($model->getKeyName());
         }
 
         $modelTraits = class_uses_recursive($model);
 
         if (in_array(HasUlids::class, $modelTraits, true)) {
-            return $this->foreignUlid($column, 26)->table($model->getTable());
+            return $this->foreignUlid($column, 26)
+                ->table($model->getTable())
+                ->referencesModelColumn($model->getKeyName());
         }
 
-        return $this->foreignUuid($column)->table($model->getTable());
+        return $this->foreignUuid($column)
+            ->table($model->getTable())
+            ->referencesModelColumn($model->getKeyName());
     }
 
     /**
