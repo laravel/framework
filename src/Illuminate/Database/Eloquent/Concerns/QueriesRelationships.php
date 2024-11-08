@@ -408,7 +408,7 @@ trait QueriesRelationships
      */
     public function whereRelationIn($relation, $column, $values)
     {
-        return $this->whereHas($relation, fn($query) => $query->whereIn($column, $values));
+        return $this->whereHas($relation, fn ($query) => $query->whereIn($column, $values));
     }
 
     /**
