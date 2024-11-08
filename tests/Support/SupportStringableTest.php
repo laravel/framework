@@ -35,6 +35,33 @@ class SupportStringableTest extends TestCase
         $this->assertFalse($this->stringable('ù')->isAscii());
     }
 
+    public function testIsDate()
+    {
+        $this->assertTrue($this->stringable('2024-11-08')->isDate());
+        $this->assertTrue($this->stringable('08/11/2024')->isDate('d/m/Y'));
+        $this->assertFalse($this->stringable('invalid-date')->isDate());
+        $this->assertFalse($this->stringable('2024-13-08')->isDate());
+        $this->assertFalse($this->stringable('2024-11-08')->isDate('d/m/Y'));
+    }
+
+    public function testIsTime()
+    {
+        $this->assertTrue($this->stringable('12:30:45')->isTime());
+        $this->assertTrue($this->stringable('23:59')->isTime('H:i'));
+        $this->assertFalse($this->stringable('25:00:00')->isTime());
+        $this->assertFalse($this->stringable('invalid-time')->isTime());
+        $this->assertFalse($this->stringable('12:30:45')->isTime('H:i'));
+    }
+
+    public function testIsDateTime()
+    {
+        $this->assertTrue($this->stringable('2023-10-15 12:30:45')->isDateTime());
+        $this->assertTrue($this->stringable('15/10/2023 12:30')->isDateTime('d/m/Y H:i'));
+        $this->assertFalse($this->stringable('2024-11-08')->isDateTime());
+        $this->assertFalse($this->stringable('invalid-datetime')->isDateTime());
+        $this->assertFalse($this->stringable('2023-10-15 12:30:45')->isDateTime('d/m/Y H:i'));
+    }
+
     public function testIsUrl()
     {
         $this->assertTrue($this->stringable('https://laravel.com')->isUrl());

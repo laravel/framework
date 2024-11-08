@@ -359,6 +359,39 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Determine if the string is a date in the specified format.
+     *
+     * @param  string  $format
+     * @return bool
+     */
+    public function isDate(string $format = 'Y-m-d')
+    {
+        return Str::isDate($this->value, $format);
+    }
+
+    /**
+     * Determine if the string is a time in the specified format.
+     *
+     * @param  string  $format
+     * @return bool
+     */
+    public function isTime(string $format = 'H:i:s')
+    {
+        return Str::isTime($this->value, $format);
+    }
+
+    /**
+     * Determine if the string is a date and time in the specified format.
+     *
+     * @param  string  $format
+     * @return bool
+     */
+    public function isDateTime(string $format = 'Y-m-d H:i:s')
+    {
+        return Str::isDateTime($this->value, $format);
+    }
+
+    /**
      * Determine if a given string is valid JSON.
      *
      * @return bool

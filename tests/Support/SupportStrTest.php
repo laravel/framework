@@ -532,6 +532,33 @@ class SupportStrTest extends TestCase
         $this->assertTrue(Str::is([null], null));
     }
 
+    public function testIsDate()
+    {
+        $this->assertTrue(Str::isDate('2024-11-08'));
+        $this->assertTrue(Str::isDate('08/11/2024', 'd/m/Y'));
+        $this->assertFalse(Str::isDate('invalid-date'));
+        $this->assertFalse(Str::isDate('2024-13-08'));
+        $this->assertFalse(Str::isDate('2024-11-08', 'd/m/Y'));
+    }
+
+    public function testIsTime()
+    {
+        $this->assertTrue(Str::isTime('12:30:45'));
+        $this->assertTrue(Str::isTime('23:59', 'H:i'));
+        $this->assertFalse(Str::isTime('25:00:00'));
+        $this->assertFalse(Str::isTime('invalid-time'));
+        $this->assertFalse(Str::isTime('12:30:45', 'H:i'));
+    }
+
+    public function testIsDateTime()
+    {
+        $this->assertTrue(Str::isDateTime('2023-10-15 12:30:45'));
+        $this->assertTrue(Str::isDateTime('15/10/2023 12:30', 'd/m/Y H:i'));
+        $this->assertFalse(Str::isDateTime('2024-11-08'));
+        $this->assertFalse(Str::isDateTime('invalid-datetime'));
+        $this->assertFalse(Str::isDateTime('2023-10-15 12:30:45', 'd/m/Y H:i'));
+    }
+
     public function testIsUrl()
     {
         $this->assertTrue(Str::isUrl('https://laravel.com'));

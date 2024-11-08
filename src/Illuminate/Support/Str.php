@@ -3,6 +3,7 @@
 namespace Illuminate\Support;
 
 use Closure;
+use DateTime;
 use Illuminate\Support\Traits\Macroable;
 use JsonException;
 use League\CommonMark\Environment\Environment;
@@ -521,6 +522,60 @@ class Str
     public static function isAscii($value)
     {
         return ASCII::is_ascii((string) $value);
+    }
+
+    /**
+     * Determine if a given string is a date in the specified format.
+     *
+     * @param  string  $value
+     * @param  string  $format
+     * @return bool
+     */
+    public static function isDate($value, $format = 'Y-m-d')
+    {
+        if (! is_string($value)) {
+            return false;
+        }
+
+        $date = DateTime::createFromFormat($format, $value);
+
+        return $date && $date->format($format) === $value;
+    }
+
+    /**
+     * Determine if a given string is a time in the specified format.
+     *
+     * @param  string  $value
+     * @param  string  $format
+     * @return bool
+     */
+    public static function isTime($value, $format = 'H:i:s')
+    {
+        if (! is_string($value)) {
+            return false;
+        }
+
+        $time = DateTime::createFromFormat($format, $value);
+
+        return $time && $time->format($format) === $value;
+    }
+
+    /**
+     * Determine if a given string is a date and time in the specified format.
+     *
+     * @param  string  $value
+     * @param  string  $format
+     * @return bool
+     */
+    public static function isDateTime($value, $format = 'Y-m-d H:i:s')
+    {
+        if (! is_string($value)) {
+            return false;
+        }
+
+        $dateTime = DateTime::createFromFormat($format, $value);
+
+        return $dateTime && $dateTime->format($format) === $value;
     }
 
     /**
