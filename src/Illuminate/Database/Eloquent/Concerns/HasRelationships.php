@@ -775,7 +775,7 @@ trait HasRelationships
      */
     public function joiningTableSegment()
     {
-        return Str::snake(class_basename($this));
+        return Str::singular($this->getTable());
     }
 
     /**
