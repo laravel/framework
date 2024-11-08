@@ -751,12 +751,15 @@ trait HasRelationships
      */
     public function joiningTable($related, $instance = null)
     {
+        if (is_null($instance)) {
+            $instance = $this->newRelatedInstance($related);
+        }
+
         // The joining table name, by convention, is simply the snake cased models
         // sorted alphabetically and concatenated with an underscore, so we can
         // just sort the models and join them together to get the table name.
         $segments = [
-            $instance ? $instance->joiningTableSegment()
-                      : Str::snake(class_basename($related)),
+            $instance->joiningTableSegment(),
             $this->joiningTableSegment(),
         ];
 
