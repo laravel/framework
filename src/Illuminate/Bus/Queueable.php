@@ -199,7 +199,7 @@ trait Queueable
      */
     public function prependToChain($job)
     {
-        $this->chained = Arr::prepend($this->chained, $this->serializeJob($job));
+        $this->chained = Arr::prepend($this->chained, $this->serializeJob($this->prepareJob($job)));
 
         return $this;
     }
@@ -212,7 +212,7 @@ trait Queueable
      */
     public function appendToChain($job)
     {
-        $this->chained = array_merge($this->chained, [$this->serializeJob($job)]);
+        $this->chained = array_merge($this->chained, [$this->serializeJob($this->prepareJob($job))]);
 
         return $this;
     }
@@ -238,6 +238,14 @@ trait Queueable
         }
 
         return serialize($job);
+    }
+
+    protected function prepareJob(mixed $job): mixed
+    {
+        return match (true) {
+            $job instanceof PendingBatch => new ChainedBatch($job),
+            default => $job,
+        };
     }
 
     /**
