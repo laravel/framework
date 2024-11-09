@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Schedule;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-final class ScheduleGroupTest extends TestCase
+class ScheduleGroupTest extends TestCase
 {
     public function testGroupCanSetScheduleCronExpression()
     {

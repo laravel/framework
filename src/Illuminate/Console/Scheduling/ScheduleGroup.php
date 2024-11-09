@@ -77,12 +77,18 @@ class ScheduleGroup
      */
     protected array $rejects = [];
 
+    /**
+     * Create a new schedule group instance.
+     */
     public function __construct(
         protected Schedule $schedule,
         protected Closure $onRegister
     ) {
     }
 
+    /**
+     * Register scheduled tasks within the current group.
+     */
     public function schedules(callable $callback): void
     {
         $callback($this->schedule);
@@ -90,6 +96,9 @@ class ScheduleGroup
         ($this->onRegister)();
     }
 
+    /**
+     * Merge the group's attributes to the given event.
+     */
     public function mergeAttributes(Event $event): void
     {
         $event->expression = $this->expression;
@@ -109,9 +118,7 @@ class ScheduleGroup
             $event->skip($reject);
         }
 
-        /**
-         * Loop through the attributes and only set the ones that were set on the group.
-         */
+        // Loop through the attributes and only set the ones that were set on the group.
         foreach ($this->attributes() as $attribute) {
             if (isset($this->{$attribute})) {
                 $event->{$attribute} = $this->{$attribute};
@@ -205,6 +212,7 @@ class ScheduleGroup
     }
 
     /**
+     * List of attributes that should be merged onto the events.
      * @return string[]
      */
     protected function attributes(): array
