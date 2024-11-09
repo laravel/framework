@@ -23,7 +23,8 @@ class CacheTokenRepository implements TokenRepositoryInterface
         protected HasherContract $hasher,
         protected string $hashKey,
         protected int $expires = 3600,
-        protected int $throttle = 60
+        protected int $throttle = 60,
+        protected string $prefix = '',
     ) {
     }
 
@@ -35,13 +36,15 @@ class CacheTokenRepository implements TokenRepositoryInterface
      */
     public function create(CanResetPasswordContract $user)
     {
-        $email = $user->getEmailForPasswordReset();
-
         $this->delete($user);
 
         $token = hash_hmac('sha256', Str::random(40), $this->hashKey);
 
-        $this->cache->put($email, [$token, Carbon::now()->format($this->format)], $this->expires);
+        $this->cache->put(
+            $this->prefix.$user->getEmailForPasswordReset(),
+            [$token, Carbon::now()->format($this->format)],
+            $this->expires,
+        );
 
         return $token;
     }
@@ -55,7 +58,7 @@ class CacheTokenRepository implements TokenRepositoryInterface
      */
     public function exists(CanResetPasswordContract $user, #[\SensitiveParameter] $token)
     {
-        [$record, $createdAt] = $this->cache->get($user->getEmailForPasswordReset());
+        [$record, $createdAt] = $this->cache->get($this->prefix.$user->getEmailForPasswordReset());
 
         return $record
             && ! $this->tokenExpired($createdAt)
@@ -81,7 +84,7 @@ class CacheTokenRepository implements TokenRepositoryInterface
      */
     public function recentlyCreatedToken(CanResetPasswordContract $user)
     {
-        [$record, $createdAt] = $this->cache->get($user->getEmailForPasswordReset());
+        [$record, $createdAt] = $this->cache->get($this->prefix.$user->getEmailForPasswordReset());
 
         return $record && $this->tokenRecentlyCreated($createdAt);
     }
@@ -111,7 +114,7 @@ class CacheTokenRepository implements TokenRepositoryInterface
      */
     public function delete(CanResetPasswordContract $user)
     {
-        $this->cache->forget($user->getEmailForPasswordReset());
+        $this->cache->forget($this->prefix.$user->getEmailForPasswordReset());
     }
 
     /**
