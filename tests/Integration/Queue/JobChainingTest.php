@@ -292,7 +292,7 @@ class JobChainingTest extends QueueTestCase
     {
         Bus::chain([
             new JobChainAddingPrependedBatch('j1'),
-            new JobChainingNamedTestJob('j2')
+            new JobChainingNamedTestJob('j2'),
         ])->dispatch();
 
         $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
@@ -304,7 +304,7 @@ class JobChainingTest extends QueueTestCase
     {
         Bus::chain([
             new JobChainAddingAppendingBatch('j1'),
-            new JobChainingNamedTestJob('j2')
+            new JobChainingNamedTestJob('j2'),
         ])->dispatch();
 
         $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
