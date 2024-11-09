@@ -213,6 +213,7 @@ class ScheduleGroup
 
     /**
      * List of attributes that should be merged onto the events.
+     *
      * @return string[]
      */
     protected function attributes(): array
