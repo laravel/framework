@@ -163,6 +163,7 @@ class AboutCommand extends Command
 
         $formatEnabledStatus = fn ($value) => $value ? '<fg=yellow;options=bold>ENABLED</>' : 'OFF';
         $formatCachedStatus = fn ($value) => $value ? '<fg=green;options=bold>CACHED</>' : '<fg=yellow;options=bold>NOT CACHED</>';
+        $formatStorageLinkedStatus = fn ($value) => $value ? '<fg=green;options=bold>LINKED</>' : '<fg=yellow;options=bold>NOT LINKED</>';
 
         static::addToSection('Environment', fn () => [
             'Application Name' => config('app.name'),
@@ -175,6 +176,7 @@ class AboutCommand extends Command
             'Maintenance Mode' => static::format($this->laravel->isDownForMaintenance(), console: $formatEnabledStatus),
             'Timezone' => config('app.timezone'),
             'Locale' => config('app.locale'),
+            'Storage Linked' => static::format(file_exists(public_path('storage')), console:$formatStorageLinkedStatus),
         ]);
 
         static::addToSection('Cache', fn () => [
