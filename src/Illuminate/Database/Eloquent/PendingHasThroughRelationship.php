@@ -10,6 +10,7 @@ use Illuminate\Support\Str;
 /**
  * @template TIntermediateModel of \Illuminate\Database\Eloquent\Model
  * @template TDeclaringModel of \Illuminate\Database\Eloquent\Model
+ * @template TLocalRelationship of \Illuminate\Database\Eloquent\Relations\HasOneOrMany<TIntermediateModel, TDeclaringModel>
  */
 class PendingHasThroughRelationship
 {
@@ -23,7 +24,7 @@ class PendingHasThroughRelationship
     /**
      * The local relationship.
      *
-     * @var \Illuminate\Database\Eloquent\Relations\HasMany<TIntermediateModel, TDeclaringModel>|\Illuminate\Database\Eloquent\Relations\HasOne<TIntermediateModel, TDeclaringModel>
+     * @var TLocalRelationship
      */
     protected $localRelationship;
 
@@ -31,7 +32,7 @@ class PendingHasThroughRelationship
      * Create a pending has-many-through or has-one-through relationship.
      *
      * @param  TDeclaringModel  $rootModel
-     * @param  \Illuminate\Database\Eloquent\Relations\HasMany<TIntermediateModel, TDeclaringModel>|\Illuminate\Database\Eloquent\Relations\HasOne<TIntermediateModel, TDeclaringModel>  $localRelationship
+     * @param  TLocalRelationship  $localRelationship
      */
     public function __construct($rootModel, $localRelationship)
     {
@@ -50,9 +51,13 @@ class PendingHasThroughRelationship
      *     $callback is string
      *     ? \Illuminate\Database\Eloquent\Relations\HasManyThrough<\Illuminate\Database\Eloquent\Model, TIntermediateModel, TDeclaringModel>|\Illuminate\Database\Eloquent\Relations\HasOneThrough<\Illuminate\Database\Eloquent\Model, TIntermediateModel, TDeclaringModel>
      *     : (
-     *         $callback is callable(TIntermediateModel): \Illuminate\Database\Eloquent\Relations\HasOne<TRelatedModel, TIntermediateModel>
-     *         ? \Illuminate\Database\Eloquent\Relations\HasOneThrough<TRelatedModel, TIntermediateModel, TDeclaringModel>
-     *         : \Illuminate\Database\Eloquent\Relations\HasManyThrough<TRelatedModel, TIntermediateModel, TDeclaringModel>
+     *         TLocalRelationship is \Illuminate\Database\Eloquent\Relations\HasMany<TIntermediateModel, TDeclaringModel>
+     *         ? \Illuminate\Database\Eloquent\Relations\HasManyThrough<TRelatedModel, TIntermediateModel, TDeclaringModel>
+     *         : (
+     *              $callback is callable(TIntermediateModel): \Illuminate\Database\Eloquent\Relations\HasMany<TRelatedModel, TIntermediateModel>
+     *              ? \Illuminate\Database\Eloquent\Relations\HasManyThrough<TRelatedModel, TIntermediateModel, TDeclaringModel>
+     *              : \Illuminate\Database\Eloquent\Relations\HasOneThrough<TRelatedModel, TIntermediateModel, TDeclaringModel>
+     *         )
      *     )
      * )
      */
@@ -64,7 +69,7 @@ class PendingHasThroughRelationship
 
         $distantRelation = $callback($this->localRelationship->getRelated());
 
-        if ($distantRelation instanceof HasMany) {
+        if ($distantRelation instanceof HasMany || $this->localRelationship instanceof HasMany) {
             $returnedRelation = $this->rootModel->hasManyThrough(
                 $distantRelation->getRelated()::class,
                 $this->localRelationship->getRelated()::class,

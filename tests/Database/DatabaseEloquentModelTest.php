@@ -15,6 +15,7 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
+use Illuminate\Database\Eloquent\Attributes\CollectedBy;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\ArrayObject;
@@ -3143,6 +3144,40 @@ class DatabaseEloquentModelTest extends TestCase
 
         $this->assertSame('{"name":"Mateus"}', $user->toJson(JSON_THROW_ON_ERROR));
     }
+
+    public function testFillableWithMutators()
+    {
+        $model = new EloquentModelWithMutators;
+        $model->fillable(['full_name', 'full_address']);
+        $model->fill(['id' => 1, 'full_name' => 'John Doe', 'full_address' => '123 Main Street, Anytown']);
+
+        $this->assertNull($model->id);
+        $this->assertSame('John', $model->first_name);
+        $this->assertSame('Doe', $model->last_name);
+        $this->assertSame('123 Main Street', $model->address_line_one);
+        $this->assertSame('Anytown', $model->address_line_two);
+    }
+
+    public function testGuardedWithMutators()
+    {
+        $model = new EloquentModelWithMutators;
+        $model->guard(['id']);
+        $model->fill(['id' => 1, 'full_name' => 'John Doe', 'full_address' => '123 Main Street, Anytown']);
+
+        $this->assertNull($model->id);
+        $this->assertSame('John', $model->first_name);
+        $this->assertSame('Doe', $model->last_name);
+        $this->assertSame('123 Main Street', $model->address_line_one);
+        $this->assertSame('Anytown', $model->address_line_two);
+    }
+
+    public function testCollectedByAttribute()
+    {
+        $model = new EloquentModelWithCollectedByAttribute;
+        $collection = $model->newCollection([$model]);
+
+        $this->assertInstanceOf(CustomEloquentCollection::class, $collection);
+    }
 }
 
 class EloquentTestObserverStub
@@ -3869,4 +3904,45 @@ class EloquentModelWithRecursiveRelationshipsStub extends Model
             $cache->offsetUnset($this);
         }
     }
+}
+
+class EloquentModelWithMutators extends Model
+{
+    public $attributes = [
+        'first_name' => null,
+        'last_name' => null,
+        'address_line_one' => null,
+        'address_line_two' => null,
+    ];
+
+    protected function fullName(): Attribute
+    {
+        return Attribute::make(
+            set: function (string $fullName) {
+                [$firstName, $lastName] = explode(' ', $fullName);
+
+                return [
+                    'first_name' => $firstName,
+                    'last_name' => $lastName,
+                ];
+            }
+        );
+    }
+
+    public function setFullAddressAttribute($fullAddress)
+    {
+        [$addressLineOne, $addressLineTwo] = explode(', ', $fullAddress);
+
+        $this->attributes['address_line_one'] = $addressLineOne;
+        $this->attributes['address_line_two'] = $addressLineTwo;
+    }
+}
+
+#[CollectedBy(CustomEloquentCollection::class)]
+class EloquentModelWithCollectedByAttribute extends Model
+{
+}
+
+class CustomEloquentCollection extends Collection
+{
 }

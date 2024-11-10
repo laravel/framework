@@ -2,10 +2,10 @@
 
 namespace Illuminate\Validation\Rules;
 
-use BackedEnum;
 use Illuminate\Contracts\Support\Arrayable;
 use Stringable;
-use UnitEnum;
+
+use function Illuminate\Support\enum_value;
 
 class In implements Stringable
 {
@@ -48,11 +48,7 @@ class In implements Stringable
     public function __toString()
     {
         $values = array_map(function ($value) {
-            $value = match (true) {
-                $value instanceof BackedEnum => $value->value,
-                $value instanceof UnitEnum => $value->name,
-                default => $value,
-            };
+            $value = enum_value($value);
 
             return '"'.str_replace('"', '""', $value).'"';
         }, $this->values);

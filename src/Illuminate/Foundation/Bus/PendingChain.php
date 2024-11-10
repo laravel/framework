@@ -8,6 +8,8 @@ use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Support\Traits\Conditionable;
 use Laravel\SerializableClosure\SerializableClosure;
 
+use function Illuminate\Support\enum_value;
+
 class PendingChain
 {
     use Conditionable;
@@ -83,12 +85,12 @@ class PendingChain
     /**
      * Set the desired queue for the job.
      *
-     * @param  string|null  $queue
+     * @param  \BackedEnum|string|null  $queue
      * @return $this
      */
     public function onQueue($queue)
     {
-        $this->queue = $queue;
+        $this->queue = enum_value($queue);
 
         return $this;
     }

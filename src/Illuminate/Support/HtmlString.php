@@ -42,7 +42,7 @@ class HtmlString implements Htmlable, Stringable
      */
     public function isEmpty()
     {
-        return $this->html === '';
+        return ($this->html ?? '') === '';
     }
 
     /**
@@ -62,6 +62,6 @@ class HtmlString implements Htmlable, Stringable
      */
     public function __toString()
     {
-        return $this->toHtml();
+        return $this->toHtml() ?? '';
     }
 }

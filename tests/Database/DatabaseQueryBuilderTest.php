@@ -1252,27 +1252,27 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testWhereFulltextMySql()
     {
         $builder = $this->getMySqlBuilderWithProcessor();
-        $builder->select('*')->from('users')->whereFulltext('body', 'Hello World');
+        $builder->select('*')->from('users')->whereFullText('body', 'Hello World');
         $this->assertSame('select * from `users` where match (`body`) against (? in natural language mode)', $builder->toSql());
         $this->assertEquals(['Hello World'], $builder->getBindings());
 
         $builder = $this->getMySqlBuilderWithProcessor();
-        $builder->select('*')->from('users')->whereFulltext('body', 'Hello World', ['expanded' => true]);
+        $builder->select('*')->from('users')->whereFullText('body', 'Hello World', ['expanded' => true]);
         $this->assertSame('select * from `users` where match (`body`) against (? in natural language mode with query expansion)', $builder->toSql());
         $this->assertEquals(['Hello World'], $builder->getBindings());
 
         $builder = $this->getMySqlBuilderWithProcessor();
-        $builder->select('*')->from('users')->whereFulltext('body', '+Hello -World', ['mode' => 'boolean']);
+        $builder->select('*')->from('users')->whereFullText('body', '+Hello -World', ['mode' => 'boolean']);
         $this->assertSame('select * from `users` where match (`body`) against (? in boolean mode)', $builder->toSql());
         $this->assertEquals(['+Hello -World'], $builder->getBindings());
 
         $builder = $this->getMySqlBuilderWithProcessor();
-        $builder->select('*')->from('users')->whereFulltext('body', '+Hello -World', ['mode' => 'boolean', 'expanded' => true]);
+        $builder->select('*')->from('users')->whereFullText('body', '+Hello -World', ['mode' => 'boolean', 'expanded' => true]);
         $this->assertSame('select * from `users` where match (`body`) against (? in boolean mode)', $builder->toSql());
         $this->assertEquals(['+Hello -World'], $builder->getBindings());
 
         $builder = $this->getMySqlBuilderWithProcessor();
-        $builder->select('*')->from('users')->whereFulltext(['body', 'title'], 'Car,Plane');
+        $builder->select('*')->from('users')->whereFullText(['body', 'title'], 'Car,Plane');
         $this->assertSame('select * from `users` where match (`body`, `title`) against (? in natural language mode)', $builder->toSql());
         $this->assertEquals(['Car,Plane'], $builder->getBindings());
     }
@@ -1280,37 +1280,37 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testWhereFulltextPostgres()
     {
         $builder = $this->getPostgresBuilderWithProcessor();
-        $builder->select('*')->from('users')->whereFulltext('body', 'Hello World');
+        $builder->select('*')->from('users')->whereFullText('body', 'Hello World');
         $this->assertSame('select * from "users" where (to_tsvector(\'english\', "body")) @@ plainto_tsquery(\'english\', ?)', $builder->toSql());
         $this->assertEquals(['Hello World'], $builder->getBindings());
 
         $builder = $this->getPostgresBuilderWithProcessor();
-        $builder->select('*')->from('users')->whereFulltext('body', 'Hello World', ['language' => 'simple']);
+        $builder->select('*')->from('users')->whereFullText('body', 'Hello World', ['language' => 'simple']);
         $this->assertSame('select * from "users" where (to_tsvector(\'simple\', "body")) @@ plainto_tsquery(\'simple\', ?)', $builder->toSql());
         $this->assertEquals(['Hello World'], $builder->getBindings());
 
         $builder = $this->getPostgresBuilderWithProcessor();
-        $builder->select('*')->from('users')->whereFulltext('body', 'Hello World', ['mode' => 'plain']);
+        $builder->select('*')->from('users')->whereFullText('body', 'Hello World', ['mode' => 'plain']);
         $this->assertSame('select * from "users" where (to_tsvector(\'english\', "body")) @@ plainto_tsquery(\'english\', ?)', $builder->toSql());
         $this->assertEquals(['Hello World'], $builder->getBindings());
 
         $builder = $this->getPostgresBuilderWithProcessor();
-        $builder->select('*')->from('users')->whereFulltext('body', 'Hello World', ['mode' => 'phrase']);
+        $builder->select('*')->from('users')->whereFullText('body', 'Hello World', ['mode' => 'phrase']);
         $this->assertSame('select * from "users" where (to_tsvector(\'english\', "body")) @@ phraseto_tsquery(\'english\', ?)', $builder->toSql());
         $this->assertEquals(['Hello World'], $builder->getBindings());
 
         $builder = $this->getPostgresBuilderWithProcessor();
-        $builder->select('*')->from('users')->whereFulltext('body', '+Hello -World', ['mode' => 'websearch']);
+        $builder->select('*')->from('users')->whereFullText('body', '+Hello -World', ['mode' => 'websearch']);
         $this->assertSame('select * from "users" where (to_tsvector(\'english\', "body")) @@ websearch_to_tsquery(\'english\', ?)', $builder->toSql());
         $this->assertEquals(['+Hello -World'], $builder->getBindings());
 
         $builder = $this->getPostgresBuilderWithProcessor();
-        $builder->select('*')->from('users')->whereFulltext('body', 'Hello World', ['language' => 'simple', 'mode' => 'plain']);
+        $builder->select('*')->from('users')->whereFullText('body', 'Hello World', ['language' => 'simple', 'mode' => 'plain']);
         $this->assertSame('select * from "users" where (to_tsvector(\'simple\', "body")) @@ plainto_tsquery(\'simple\', ?)', $builder->toSql());
         $this->assertEquals(['Hello World'], $builder->getBindings());
 
         $builder = $this->getPostgresBuilderWithProcessor();
-        $builder->select('*')->from('users')->whereFulltext(['body', 'title'], 'Car Plane');
+        $builder->select('*')->from('users')->whereFullText(['body', 'title'], 'Car Plane');
         $this->assertSame('select * from "users" where (to_tsvector(\'english\', "body") || to_tsvector(\'english\', "title")) @@ plainto_tsquery(\'english\', ?)', $builder->toSql());
         $this->assertEquals(['Car Plane'], $builder->getBindings());
     }
@@ -2316,10 +2316,55 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => 1, 1 => 'foo'], $builder->getBindings());
     }
 
+    public function testOrWheresHaveConsistentResults()
+    {
+        $queries = [];
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('xxxx', 'xxxx')->orWhere(['foo' => 1, 'bar' => 2]);
+        $queries[] = $builder->toSql();
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('xxxx', 'xxxx')->orWhere([['foo', 1], ['bar', 2]]);
+        $queries[] = $builder->toSql();
+
+        $this->assertSame([
+            'select * from "users" where "xxxx" = ? or ("foo" = ? or "bar" = ?)',
+            'select * from "users" where "xxxx" = ? or ("foo" = ? or "bar" = ?)',
+        ], $queries);
+
+        $queries = [];
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('xxxx', 'xxxx')->orWhereColumn(['foo' => '_foo', 'bar' => '_bar']);
+        $queries[] = $builder->toSql();
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('xxxx', 'xxxx')->orWhereColumn([['foo', '_foo'], ['bar', '_bar']]);
+        $queries[] = $builder->toSql();
+
+        $this->assertSame([
+            'select * from "users" where "xxxx" = ? or ("foo" = "_foo" or "bar" = "_bar")',
+            'select * from "users" where "xxxx" = ? or ("foo" = "_foo" or "bar" = "_bar")',
+        ], $queries);
+    }
+
     public function testWhereWithArrayConditions()
     {
+        /*
+         * where(key, value)
+         */
+
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->where([['foo', 1], ['bar', 2]]);
+        $this->assertSame('select * from "users" where ("foo" = ? and "bar" = ?)', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where([['foo', 1], ['bar', 2]], boolean: 'or');
+        $this->assertSame('select * from "users" where ("foo" = ? or "bar" = ?)', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where([['foo', 1], ['bar', 2]], boolean: 'and');
         $this->assertSame('select * from "users" where ("foo" = ? and "bar" = ?)', $builder->toSql());
         $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
 
@@ -2329,9 +2374,292 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
 
         $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where(['foo' => 1, 'bar' => 2], boolean: 'or');
+        $this->assertSame('select * from "users" where ("foo" = ? or "bar" = ?)', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where(['foo' => 1, 'bar' => 2], boolean: 'and');
+        $this->assertSame('select * from "users" where ("foo" = ? and "bar" = ?)', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
+
+        /*
+         * where(key, <, value)
+         */
+
+        $builder = $this->getBuilder();
         $builder->select('*')->from('users')->where([['foo', 1], ['bar', '<', 2]]);
         $this->assertSame('select * from "users" where ("foo" = ? and "bar" < ?)', $builder->toSql());
         $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where([['foo', 1], ['bar', '<', 2]], boolean: 'or');
+        $this->assertSame('select * from "users" where ("foo" = ? or "bar" < ?)', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where([['foo', 1], ['bar', '<', 2]], boolean: 'and');
+        $this->assertSame('select * from "users" where ("foo" = ? and "bar" < ?)', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
+
+        /*
+         * whereNot(key, value)
+         */
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereNot([['foo', 1], ['bar', 2]]);
+        $this->assertSame('select * from "users" where not (("foo" = ? and "bar" = ?))', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereNot([['foo', 1], ['bar', 2]], boolean: 'or');
+        $this->assertSame('select * from "users" where not (("foo" = ? or "bar" = ?))', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereNot([['foo', 1], ['bar', 2]], boolean: 'and');
+        $this->assertSame('select * from "users" where not (("foo" = ? and "bar" = ?))', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereNot(['foo' => 1, 'bar' => 2]);
+        $this->assertSame('select * from "users" where not (("foo" = ? and "bar" = ?))', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereNot(['foo' => 1, 'bar' => 2], boolean: 'or');
+        $this->assertSame('select * from "users" where not (("foo" = ? or "bar" = ?))', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereNot(['foo' => 1, 'bar' => 2], boolean: 'and');
+        $this->assertSame('select * from "users" where not (("foo" = ? and "bar" = ?))', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
+
+        /*
+         * whereNot(key, <, value)
+         */
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereNot([['foo', 1], ['bar', '<', 2]]);
+        $this->assertSame('select * from "users" where not (("foo" = ? and "bar" < ?))', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereNot([['foo', 1], ['bar', '<', 2]], boolean: 'or');
+        $this->assertSame('select * from "users" where not (("foo" = ? or "bar" < ?))', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereNot([['foo', 1], ['bar', '<', 2]], boolean: 'and');
+        $this->assertSame('select * from "users" where not (("foo" = ? and "bar" < ?))', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
+
+        /*
+         * whereColumn(col1, col2)
+         */
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereColumn([['foo', '_foo'], ['bar', '_bar']]);
+        $this->assertSame('select * from "users" where ("foo" = "_foo" and "bar" = "_bar")', $builder->toSql());
+        $this->assertEquals([], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereColumn([['foo', '_foo'], ['bar', '_bar']], boolean: 'or');
+        $this->assertSame('select * from "users" where ("foo" = "_foo" or "bar" = "_bar")', $builder->toSql());
+        $this->assertEquals([], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereColumn([['foo', '_foo'], ['bar', '_bar']], boolean: 'and');
+        $this->assertSame('select * from "users" where ("foo" = "_foo" and "bar" = "_bar")', $builder->toSql());
+        $this->assertEquals([], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereColumn(['foo' => '_foo', 'bar' => '_bar']);
+        $this->assertSame('select * from "users" where ("foo" = "_foo" and "bar" = "_bar")', $builder->toSql());
+        $this->assertEquals([], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereColumn(['foo' => '_foo', 'bar' => '_bar'], boolean: 'or');
+        $this->assertSame('select * from "users" where ("foo" = "_foo" or "bar" = "_bar")', $builder->toSql());
+        $this->assertEquals([], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereColumn(['foo' => '_foo', 'bar' => '_bar'], boolean: 'and');
+        $this->assertSame('select * from "users" where ("foo" = "_foo" and "bar" = "_bar")', $builder->toSql());
+        $this->assertEquals([], $builder->getBindings());
+
+        /*
+         * whereColumn(col1, <, col2)
+         */
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereColumn([['foo', '_foo'], ['bar', '<', '_bar']]);
+        $this->assertSame('select * from "users" where ("foo" = "_foo" and "bar" < "_bar")', $builder->toSql());
+        $this->assertEquals([], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereColumn([['foo', '_foo'], ['bar', '<', '_bar']], boolean: 'or');
+        $this->assertSame('select * from "users" where ("foo" = "_foo" or "bar" < "_bar")', $builder->toSql());
+        $this->assertEquals([], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereColumn([['foo', '_foo'], ['bar', '<', '_bar']], boolean: 'and');
+        $this->assertSame('select * from "users" where ("foo" = "_foo" and "bar" < "_bar")', $builder->toSql());
+        $this->assertEquals([], $builder->getBindings());
+
+        /*
+         * whereAll([...keys], value)
+         */
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereAll(['foo', 'bar'], 2);
+        $this->assertSame('select * from "users" where ("foo" = ? and "bar" = ?)', $builder->toSql());
+        $this->assertEquals([0 => 2, 1 => 2], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereAll(['foo', 'bar'], 2);
+        $this->assertSame('select * from "users" where ("foo" = ? and "bar" = ?)', $builder->toSql());
+        $this->assertEquals([0 => 2, 1 => 2], $builder->getBindings());
+
+        /*
+         * whereAny([...keys], value)
+         */
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereAny(['foo', 'bar'], 2);
+        $this->assertSame('select * from "users" where ("foo" = ? or "bar" = ?)', $builder->toSql());
+        $this->assertEquals([0 => 2, 1 => 2], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereAny(['foo', 'bar'], 2);
+        $this->assertSame('select * from "users" where ("foo" = ? or "bar" = ?)', $builder->toSql());
+        $this->assertEquals([0 => 2, 1 => 2], $builder->getBindings());
+
+        /*
+         * whereNone([...keys], value)
+         */
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereNone(['foo', 'bar'], 2);
+        $this->assertSame('select * from "users" where not ("foo" = ? or "bar" = ?)', $builder->toSql());
+        $this->assertEquals([0 => 2, 1 => 2], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereNone(['foo', 'bar'], 2);
+        $this->assertSame('select * from "users" where not ("foo" = ? or "bar" = ?)', $builder->toSql());
+        $this->assertEquals([0 => 2, 1 => 2], $builder->getBindings());
+
+        /*
+         * where()->orWhere(key, value)
+         */
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('xxxx', 'xxxx')->orWhere([['foo', 1], ['bar', 2]]);
+        $this->assertSame('select * from "users" where "xxxx" = ? or ("foo" = ? or "bar" = ?)', $builder->toSql());
+        $this->assertEquals([0 => 'xxxx', 1 => 1, 2 => 2], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('xxxx', 'xxxx')->orWhere(['foo' => 1, 'bar' => 2]);
+        $this->assertSame('select * from "users" where "xxxx" = ? or ("foo" = ? or "bar" = ?)', $builder->toSql());
+        $this->assertEquals([0 => 'xxxx', 1 => 1, 2 => 2], $builder->getBindings());
+
+        /*
+         * where()->orWhere(key, <, value)
+         */
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('xxxx', 'xxxx')->orWhere([['foo', 1], ['bar', '<', 2]]);
+        $this->assertSame('select * from "users" where "xxxx" = ? or ("foo" = ? or "bar" < ?)', $builder->toSql());
+        $this->assertEquals([0 => 'xxxx', 1 => 1, 2 => 2], $builder->getBindings());
+
+        /*
+         * where()->orWhereColumn(col1, col2)
+         */
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('xxxx', 'xxxx')->orWhereColumn([['foo', '_foo'], ['bar', '_bar']]);
+        $this->assertSame('select * from "users" where "xxxx" = ? or ("foo" = "_foo" or "bar" = "_bar")', $builder->toSql());
+        $this->assertEquals([0 => 'xxxx'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('xxxx', 'xxxx')->orWhereColumn(['foo' => '_foo', 'bar' => '_bar']);
+        $this->assertSame('select * from "users" where "xxxx" = ? or ("foo" = "_foo" or "bar" = "_bar")', $builder->toSql());
+        $this->assertEquals([0 => 'xxxx'], $builder->getBindings());
+
+        /*
+         * where()->orWhere(key, <, value)
+         */
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('xxxx', 'xxxx')->orWhere([['foo', 1], ['bar', '<', 2]]);
+        $this->assertSame('select * from "users" where "xxxx" = ? or ("foo" = ? or "bar" < ?)', $builder->toSql());
+        $this->assertEquals([0 => 'xxxx', 1 => 1, 2 => 2], $builder->getBindings());
+
+        /*
+         * where()->orWhereNot(key, value)
+         */
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('xxxx', 'xxxx')->orWhereNot([['foo', 1], ['bar', 2]]);
+        $this->assertSame('select * from "users" where "xxxx" = ? or not (("foo" = ? or "bar" = ?))', $builder->toSql());
+        $this->assertEquals([0 => 'xxxx', 1 => 1, 2 => 2], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('xxxx', 'xxxx')->orWhereNot(['foo' => 1, 'bar' => 2]);
+        $this->assertSame('select * from "users" where "xxxx" = ? or not (("foo" = ? or "bar" = ?))', $builder->toSql());
+        $this->assertEquals([0 => 'xxxx', 1 => 1, 2 => 2], $builder->getBindings());
+
+        /*
+         * where()->orWhereNot(key, <, value)
+         */
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('xxxx', 'xxxx')->orWhereNot([['foo', 1], ['bar', '<', 2]]);
+        $this->assertSame('select * from "users" where "xxxx" = ? or not (("foo" = ? or "bar" < ?))', $builder->toSql());
+        $this->assertEquals([0 => 'xxxx', 1 => 1, 2 => 2], $builder->getBindings());
+
+        /*
+         * where()->orWhereAll([...keys], value)
+         */
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('xxxx', 'xxxx')->orWhereAll(['foo', 'bar'], 2);
+        $this->assertSame('select * from "users" where "xxxx" = ? or ("foo" = ? and "bar" = ?)', $builder->toSql());
+        $this->assertEquals([0 => 'xxxx', 1 => 2, 2 => 2], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('xxxx', 'xxxx')->orWhereAll(['foo', 'bar'], 2);
+        $this->assertSame('select * from "users" where "xxxx" = ? or ("foo" = ? and "bar" = ?)', $builder->toSql());
+        $this->assertEquals([0 => 'xxxx', 1 => 2, 2 => 2], $builder->getBindings());
+
+        /*
+         * where()->orWhereAny([...keys], value)
+         */
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('xxxx', 'xxxx')->orWhereAny(['foo', 'bar'], 2);
+        $this->assertSame('select * from "users" where "xxxx" = ? or ("foo" = ? or "bar" = ?)', $builder->toSql());
+        $this->assertEquals([0 => 'xxxx', 1 => 2, 2 => 2], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('xxxx', 'xxxx')->orWhereAny(['foo', 'bar'], 2);
+        $this->assertSame('select * from "users" where "xxxx" = ? or ("foo" = ? or "bar" = ?)', $builder->toSql());
+        $this->assertEquals([0 => 'xxxx', 1 => 2, 2 => 2], $builder->getBindings());
+
+        /*
+         * where()->orWhereNone([...keys], value)
+         */
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('xxxx', 'xxxx')->orWhereNone(['foo', 'bar'], 2);
+        $this->assertSame('select * from "users" where "xxxx" = ? or not ("foo" = ? or "bar" = ?)', $builder->toSql());
+        $this->assertEquals([0 => 'xxxx', 1 => 2, 2 => 2], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('xxxx', 'xxxx')->orWhereNone(['foo', 'bar'], 2);
+        $this->assertSame('select * from "users" where "xxxx" = ? or not ("foo" = ? or "bar" = ?)', $builder->toSql());
+        $this->assertEquals([0 => 'xxxx', 1 => 2, 2 => 2], $builder->getBindings());
     }
 
     public function testNestedWheres()

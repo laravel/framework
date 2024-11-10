@@ -2,9 +2,10 @@
 
 namespace Illuminate\Database\Eloquent\Relations\Concerns;
 
-use BackedEnum;
 use InvalidArgumentException;
 use UnitEnum;
+
+use function Illuminate\Support\enum_value;
 
 trait InteractsWithDictionary
 {
@@ -24,7 +25,7 @@ trait InteractsWithDictionary
             }
 
             if ($attribute instanceof UnitEnum) {
-                return $attribute instanceof BackedEnum ? $attribute->value : $attribute->name;
+                return enum_value($attribute);
             }
 
             throw new InvalidArgumentException('Model attribute value is an object but does not have a __toString method.');

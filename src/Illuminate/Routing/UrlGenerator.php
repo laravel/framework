@@ -586,7 +586,7 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * Format the array of URL parameters.
      *
-     * @param  mixed|array  $parameters
+     * @param  mixed  $parameters
      * @return array
      */
     public function formatParameters($parameters)
@@ -726,6 +726,19 @@ class UrlGenerator implements UrlGeneratorContract
         $this->cachedScheme = null;
 
         $this->forceScheme = $scheme ? $scheme.'://' : null;
+    }
+
+    /**
+     * Force the use of the HTTPS scheme for all generated URLs.
+     *
+     * @param  bool  $force
+     * @return void
+     */
+    public function forceHttps($force = true)
+    {
+        if ($force) {
+            $this->forceScheme('https');
+        }
     }
 
     /**

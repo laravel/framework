@@ -52,14 +52,11 @@ class DatabasePostgresBuilderTest extends TestCase
         $connection->shouldReceive('getConfig')->with('search_path')->andReturn(null);
         $connection->shouldReceive('getConfig')->with('schema')->andReturn(null);
         $grammar = m::mock(PostgresGrammar::class);
-        $processor = m::mock(PostgresProcessor::class);
         $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
-        $connection->shouldReceive('getPostProcessor')->andReturn($processor);
-        $grammar->shouldReceive('compileTables')->andReturn('sql');
-        $connection->shouldReceive('selectFromWriteConnection')->with('sql')->andReturn([['schema' => 'public', 'name' => 'foo']]);
+        $grammar->shouldReceive('compileTableExists')->andReturn('sql');
+        $connection->shouldReceive('scalar')->with('sql')->andReturn(1);
         $connection->shouldReceive('getTablePrefix');
         $builder = $this->getBuilder($connection);
-        $processor->shouldReceive('processTables')->andReturn([['schema' => 'public', 'name' => 'foo']]);
 
         $this->assertTrue($builder->hasTable('foo'));
         $this->assertTrue($builder->hasTable('public.foo'));
@@ -70,14 +67,11 @@ class DatabasePostgresBuilderTest extends TestCase
         $connection = $this->getConnection();
         $connection->shouldReceive('getConfig')->with('search_path')->andReturn('myapp,public');
         $grammar = m::mock(PostgresGrammar::class);
-        $processor = m::mock(PostgresProcessor::class);
         $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
-        $connection->shouldReceive('getPostProcessor')->andReturn($processor);
-        $grammar->shouldReceive('compileTables')->andReturn('sql');
-        $connection->shouldReceive('selectFromWriteConnection')->with('sql')->andReturn([['schema' => 'myapp', 'name' => 'foo']]);
+        $grammar->shouldReceive('compileTableExists')->andReturn('sql');
+        $connection->shouldReceive('scalar')->with('sql')->andReturn(1);
         $connection->shouldReceive('getTablePrefix');
         $builder = $this->getBuilder($connection);
-        $processor->shouldReceive('processTables')->andReturn([['schema' => 'myapp', 'name' => 'foo']]);
 
         $this->assertTrue($builder->hasTable('foo'));
         $this->assertTrue($builder->hasTable('myapp.foo'));
@@ -89,14 +83,11 @@ class DatabasePostgresBuilderTest extends TestCase
         $connection->shouldReceive('getConfig')->with('search_path')->andReturn(null);
         $connection->shouldReceive('getConfig')->with('schema')->andReturn(['myapp', 'public']);
         $grammar = m::mock(PostgresGrammar::class);
-        $processor = m::mock(PostgresProcessor::class);
         $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
-        $connection->shouldReceive('getPostProcessor')->andReturn($processor);
-        $grammar->shouldReceive('compileTables')->andReturn('sql');
-        $connection->shouldReceive('selectFromWriteConnection')->with('sql')->andReturn([['schema' => 'myapp', 'name' => 'foo']]);
+        $grammar->shouldReceive('compileTableExists')->andReturn('sql');
+        $connection->shouldReceive('scalar')->with('sql')->andReturn(1);
         $connection->shouldReceive('getTablePrefix');
         $builder = $this->getBuilder($connection);
-        $processor->shouldReceive('processTables')->andReturn([['schema' => 'myapp', 'name' => 'foo']]);
 
         $this->assertTrue($builder->hasTable('foo'));
         $this->assertTrue($builder->hasTable('myapp.foo'));
@@ -108,14 +99,11 @@ class DatabasePostgresBuilderTest extends TestCase
         $connection->shouldReceive('getConfig')->with('username')->andReturn('foouser');
         $connection->shouldReceive('getConfig')->with('search_path')->andReturn('$user');
         $grammar = m::mock(PostgresGrammar::class);
-        $processor = m::mock(PostgresProcessor::class);
         $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
-        $connection->shouldReceive('getPostProcessor')->andReturn($processor);
-        $grammar->shouldReceive('compileTables')->andReturn('sql');
-        $connection->shouldReceive('selectFromWriteConnection')->with('sql')->andReturn([['schema' => 'foouser', 'name' => 'foo']]);
+        $grammar->shouldReceive('compileTableExists')->andReturn('sql');
+        $connection->shouldReceive('scalar')->with('sql')->andReturn(1);
         $connection->shouldReceive('getTablePrefix');
         $builder = $this->getBuilder($connection);
-        $processor->shouldReceive('processTables')->andReturn([['schema' => 'foouser', 'name' => 'foo']]);
 
         $this->assertTrue($builder->hasTable('foo'));
         $this->assertTrue($builder->hasTable('foouser.foo'));
@@ -126,14 +114,11 @@ class DatabasePostgresBuilderTest extends TestCase
         $connection = $this->getConnection();
         $connection->shouldReceive('getConfig')->with('search_path')->andReturn('public');
         $grammar = m::mock(PostgresGrammar::class);
-        $processor = m::mock(PostgresProcessor::class);
         $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
-        $connection->shouldReceive('getPostProcessor')->andReturn($processor);
-        $grammar->shouldReceive('compileTables')->andReturn('sql');
-        $connection->shouldReceive('selectFromWriteConnection')->with('sql')->andReturn([['schema' => 'myapp', 'name' => 'foo']]);
+        $grammar->shouldReceive('compileTableExists')->andReturn('sql');
+        $connection->shouldReceive('scalar')->with('sql')->andReturn(1);
         $connection->shouldReceive('getTablePrefix');
         $builder = $this->getBuilder($connection);
-        $processor->shouldReceive('processTables')->andReturn([['schema' => 'myapp', 'name' => 'foo']]);
 
         $this->assertTrue($builder->hasTable('myapp.foo'));
     }

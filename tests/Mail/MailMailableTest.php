@@ -592,6 +592,7 @@ class MailMailableTest extends TestCase
             'first_name' => 'Taylor',
             'lastName' => 'Otwell',
             'framework' => 'Laravel',
+            '__laravel_mailable' => get_class($mailable),
         ];
 
         $this->assertSame($expected, $mailable->buildViewData());

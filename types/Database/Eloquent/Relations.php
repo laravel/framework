@@ -169,6 +169,12 @@ class User extends Model
         return $this->hasOne(Mechanic::class);
     }
 
+    /** @return HasMany<Mechanic, $this> */
+    public function mechanics(): HasMany
+    {
+        return $this->hasMany(Mechanic::class);
+    }
+
     /** @return HasOneThrough<Car, Mechanic, $this> */
     public function car(): HasOneThrough
     {
@@ -187,7 +193,7 @@ class User extends Model
 
         $through = $this->through($this->mechanic());
         assertType(
-            'Illuminate\Database\Eloquent\PendingHasThroughRelationship<Illuminate\Types\Relations\Mechanic, $this(Illuminate\Types\Relations\User)>',
+            'Illuminate\Database\Eloquent\PendingHasThroughRelationship<Illuminate\Types\Relations\Mechanic, $this(Illuminate\Types\Relations\User), Illuminate\Database\Eloquent\Relations\HasOne<Illuminate\Types\Relations\Mechanic, $this(Illuminate\Types\Relations\User)>>',
             $through,
         );
         assertType(
@@ -200,6 +206,27 @@ class User extends Model
         );
 
         return $hasOneThrough;
+    }
+
+    /** @return HasManyThrough<Car, Mechanic, $this> */
+    public function cars(): HasManyThrough
+    {
+        $through = $this->through($this->mechanics());
+        assertType(
+            'Illuminate\Database\Eloquent\PendingHasThroughRelationship<Illuminate\Types\Relations\Mechanic, $this(Illuminate\Types\Relations\User), Illuminate\Database\Eloquent\Relations\HasMany<Illuminate\Types\Relations\Mechanic, $this(Illuminate\Types\Relations\User)>>',
+            $through,
+        );
+        $hasManyThrough = $through->has(function ($mechanic) {
+            assertType('Illuminate\Types\Relations\Mechanic', $mechanic);
+
+            return $mechanic->car();
+        });
+        assertType(
+            'Illuminate\Database\Eloquent\Relations\HasManyThrough<Illuminate\Types\Relations\Car, Illuminate\Types\Relations\Mechanic, $this(Illuminate\Types\Relations\User)>',
+            $hasManyThrough,
+        );
+
+        return $hasManyThrough;
     }
 
     /** @return HasManyThrough<Part, Mechanic, $this> */
