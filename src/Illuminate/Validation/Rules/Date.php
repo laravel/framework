@@ -12,11 +12,11 @@ class Date implements Stringable
     use Conditionable, Macroable;
 
     /**
-     * Array of validation rules.
+     * The constraints for the date rule.
      *
      * @var array
      */
-    protected $rules = ['date'];
+    protected $constraints = ['date'];
 
     /**
      * Specify the date format to validate against.
@@ -101,7 +101,7 @@ class Date implements Stringable
      */
     public function addRule($rules)
     {
-        $this->rules = array_merge($this->rules, Arr::wrap($rules));
+        $this->constraints = array_merge($this->constraints, Arr::wrap($rules));
 
         return $this;
     }
@@ -113,6 +113,6 @@ class Date implements Stringable
      */
     public function __toString()
     {
-        return implode(',', $this->rules);
+        return implode(',', $this->constraints);
     }
 }
