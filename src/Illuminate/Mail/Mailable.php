@@ -1694,6 +1694,7 @@ class Mailable implements MailableContract, Renderable
 
         foreach (['to', 'cc', 'bcc', 'replyTo'] as $type) {
             foreach ($envelope->{$type} as $address) {
+                if (is_array($address)) $address = new \Illuminate\Mail\Mailables\Address(...$address);
                 $this->{$type}($address->address, $address->name);
             }
         }
