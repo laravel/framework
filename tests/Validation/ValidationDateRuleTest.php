@@ -2,9 +2,9 @@
 
 namespace Tests\Unit\Rules;
 
-use PHPUnit\Framework\TestCase;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Date;
+use PHPUnit\Framework\TestCase;
 
 class ValidationDateRuleTest extends TestCase
 {
