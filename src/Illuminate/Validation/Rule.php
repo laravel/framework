@@ -7,6 +7,7 @@ use Illuminate\Support\Traits\Macroable;
 use Illuminate\Validation\Rules\ArrayRule;
 use Illuminate\Validation\Rules\Can;
 use Illuminate\Validation\Rules\Dimensions;
+use Illuminate\Validation\Rules\Date;
 use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\Rules\ExcludeIf;
 use Illuminate\Validation\Rules\Exists;
@@ -209,5 +210,15 @@ class Rule
     public static function dimensions(array $constraints = [])
     {
         return new Dimensions($constraints);
+    }
+
+    /**
+     * Get a date rule builder instance.
+     *
+     * @return \Illuminate\Validation\Rules\Date
+     */
+    public static function date()
+    {
+        return new Date;
     }
 }
