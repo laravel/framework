@@ -81,7 +81,7 @@ class MigrateCommand extends BaseCommand implements Isolatable
     public function handle()
     {
         if (! $this->confirmToProceed()) {
-            return 1;
+            return 0;
         }
 
         try {
@@ -90,7 +90,7 @@ class MigrateCommand extends BaseCommand implements Isolatable
             if ($this->option('graceful')) {
                 $this->components->warn($e->getMessage());
 
-                return 0;
+                return 1;
             }
 
             throw $e;
