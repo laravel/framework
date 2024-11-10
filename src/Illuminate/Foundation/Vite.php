@@ -509,7 +509,7 @@ class Vite implements Htmlable
             ->pipe(fn ($assets) => with(Js::from($assets), fn ($assets) => match ($this->prefetchStrategy) {
                 'waterfall' => new HtmlString($base.<<<HTML
 
-                    <script{$this->nonceAttribute()}>
+                    <script type="module"{$this->nonceAttribute()}>
                          window.addEventListener('{$this->prefetchEvent}', () => window.setTimeout(() => {
                             const makeLink = (asset) => {
                                 const link = document.createElement('link')
@@ -552,7 +552,7 @@ class Vite implements Htmlable
                     HTML),
                 'aggressive' => new HtmlString($base.<<<HTML
 
-                    <script{$this->nonceAttribute()}>
+                    <script type="module"{$this->nonceAttribute()}>
                          window.addEventListener('{$this->prefetchEvent}', () => window.setTimeout(() => {
                             const makeLink = (asset) => {
                                 const link = document.createElement('link')

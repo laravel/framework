@@ -1329,7 +1329,7 @@ class FoundationViteTest extends TestCase
         ]);
         $this->assertSame(<<<HTML
         <link rel="preload" as="style" href="https://example.com/{$buildDir}/assets/index-B3s1tYeC.css" /><link rel="modulepreload" href="https://example.com/{$buildDir}/assets/app-lliD09ip.js" /><link rel="modulepreload" href="https://example.com/{$buildDir}/assets/index-BSdK3M0e.js" /><link rel="stylesheet" href="https://example.com/{$buildDir}/assets/index-B3s1tYeC.css" /><script type="module" src="https://example.com/{$buildDir}/assets/app-lliD09ip.js"></script>
-        <script>
+        <script type="module">
              window.addEventListener('load', () => window.setTimeout(() => {
                 const makeLink = (asset) => {
                     const link = document.createElement('link')
@@ -1472,7 +1472,7 @@ class FoundationViteTest extends TestCase
 
         $this->assertSame(<<<HTML
         <link rel="preload" as="style" href="https://example.com/{$buildDir}/assets/index-B3s1tYeC.css" /><link rel="modulepreload" href="https://example.com/{$buildDir}/assets/app-lliD09ip.js" /><link rel="modulepreload" href="https://example.com/{$buildDir}/assets/index-BSdK3M0e.js" /><link rel="stylesheet" href="https://example.com/{$buildDir}/assets/index-B3s1tYeC.css" /><script type="module" src="https://example.com/{$buildDir}/assets/app-lliD09ip.js"></script>
-        <script>
+        <script type="module">
              window.addEventListener('load', () => window.setTimeout(() => {
                 const makeLink = (asset) => {
                     const link = document.createElement('link')
@@ -1607,7 +1607,7 @@ class FoundationViteTest extends TestCase
         ]);
         $this->assertSame(<<<HTML
         <link rel="preload" as="style" href="https://example.com/{$buildDir}/assets/index-B3s1tYeC.css" /><link rel="preload" as="style" href="https://example.com/{$buildDir}/assets/admin-BctAalm_.css" /><link rel="modulepreload" href="https://example.com/{$buildDir}/assets/admin-Sefg0Q45.js" /><link rel="modulepreload" href="https://example.com/{$buildDir}/assets/index-BSdK3M0e.js" /><link rel="stylesheet" href="https://example.com/{$buildDir}/assets/index-B3s1tYeC.css" /><link rel="stylesheet" href="https://example.com/{$buildDir}/assets/admin-BctAalm_.css" /><script type="module" src="https://example.com/{$buildDir}/assets/admin-Sefg0Q45.js"></script>
-        <script>
+        <script type="module">
              window.addEventListener('load', () => window.setTimeout(() => {
                 const makeLink = (asset) => {
                     const link = document.createElement('link')
@@ -1664,14 +1664,14 @@ class FoundationViteTest extends TestCase
             ->useBuildDirectory($buildDir)
             ->prefetch()
             ->toHtml();
-        $this->assertStringContainsString('<script nonce="abc123">', $html);
+        $this->assertStringContainsString('<script type="module" nonce="abc123">', $html);
 
         $html = (string) tap(ViteFacade::withEntryPoints(['resources/js/app.js']))
             ->useCspNonce('abc123')
             ->useBuildDirectory($buildDir)
             ->prefetch(concurrency: 3)
             ->toHtml();
-        $this->assertStringContainsString('<script nonce="abc123">', $html);
+        $this->assertStringContainsString('<script type="module" nonce="abc123">', $html);
 
         $this->cleanViteManifest($buildDir);
     }
