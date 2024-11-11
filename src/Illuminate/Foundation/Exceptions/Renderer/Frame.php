@@ -90,7 +90,17 @@ class Frame
     }
 
     /**
-     * Get the frame's blade file.
+     * Get the frame's file.
+     *
+     * @return string
+     */
+    public function file()
+    {
+        return str_replace($this->basePath.'/', '', $this->frame['file']);
+    }
+
+    /**
+     * Get the frame's Blade file if applicable.
      *
      * @return string|null
      */
@@ -99,16 +109,6 @@ class Frame
         if (isset($this->frame['blade']) && is_file($this->frame['blade'])) {
             return str_replace($this->basePath.'/', '', $this->frame['blade']);
         }
-    }
-
-    /**
-     * Get the frame's file.
-     *
-     * @return string
-     */
-    public function file()
-    {
-        return str_replace($this->basePath.'/', '', $this->frame['file']);
     }
 
     /**
