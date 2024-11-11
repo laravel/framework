@@ -41,7 +41,7 @@ jobs:
       fail-fast: true
       matrix:
         php: [8.2, 8.3]
-        phpunit: ['10.5', '11.0.1']
+        phpunit: ['10.5.12', '11.3.2']
         redis-extension: ['redis']
         stability: [prefer-lowest, prefer-stable]
         include:
@@ -64,7 +64,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, gd, ${{ matrix.redis-extension }}, igbinary, msgpack, lzf, zstd, lz4, memcached, gmp, :php-psr
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, gd, redis-6.1.0, igbinary, msgpack, lzf, zstd, lz4, memcached, gmp, :php-psr
           ini-values: error_reporting=E_ALL
           tools: composer:v2
           coverage: none
