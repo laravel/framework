@@ -14,11 +14,11 @@ class UrlTest extends TestCase
 
         $this->assertSame('https', $url->scheme);
         $this->assertSame('example.com', $url->host);
-        $this->assertSame('8080', $url->port);
+        $this->assertSame(8080, $url->port);
         $this->assertSame('user', $url->user);
         $this->assertSame('pass', $url->pass);
         $this->assertSame('/path/to/resource', $url->path);
-        $this->assertSame('foo=bar&baz=qux', $url->query);
+        $this->assertSame('foo=bar&baz=qux', (string) $url->query);
         $this->assertSame('fragment', $url->fragment);
     }
 
@@ -40,9 +40,17 @@ class UrlTest extends TestCase
     {
         $url = Url::parse('https://example.com?foo=bar&baz=qux');
 
-        $this->assertInstanceOf(UrlQueryParameters::class, $url->query());
-        $this->assertSame('bar', $url->query()->get('foo'));
-        $this->assertSame('qux', $url->query()->get('baz'));
+        $this->assertInstanceOf(UrlQueryParameters::class, $url->query);
+
+        $this->assertSame('bar', $url->query->get('foo'));
+        $this->assertSame('qux', $url->query->get('baz'));
+        $this->assertSame(['foo' => 'bar', 'baz' => 'qux'], $url->query->all());
+
+        $url->query->forget('foo');
+        $url->query->set('baz', 'zax');
+
+        $this->assertSame('zax', $url->query->get('baz'));
+        $this->assertSame('baz=zax', (string) $url->query);
     }
 
     public function testToArray()
@@ -52,7 +60,7 @@ class UrlTest extends TestCase
         $this->assertSame([
             'scheme' => 'https',
             'host' => 'example.com',
-            'port' => '8080',
+            'port' => 8080,
             'user' => 'user',
             'pass' => 'pass',
             'path' => '/path/to/resource',
@@ -68,6 +76,6 @@ class UrlTest extends TestCase
         $url = Url::parse($rawUrl);
 
         $this->assertSame($rawUrl, (string) $url);
-        $this->assertSame('foo=bar&baz=qux', (string) $url->query());
+        $this->assertSame('foo=bar&baz=qux', (string) $url->query);
     }
 }

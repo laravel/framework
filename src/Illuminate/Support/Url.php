@@ -13,13 +13,14 @@ class Url implements Arrayable, Stringable
     public function __construct(
         public ?string $scheme = null,
         public ?string $host = null,
-        public ?string $port = null,
+        public ?int $port = null,
         public ?string $user = null,
         public ?string $pass = null,
         public ?string $path = null,
-        public ?string $query = null,
+        public ?UrlQueryParameters $query = null,
         public ?string $fragment = null,
     ) {
+        $this->query ??= new UrlQueryParameters;
     }
 
     /**
@@ -30,28 +31,23 @@ class Url implements Arrayable, Stringable
      */
     public static function parse(string $url): static
     {
-        $components = parse_url($url) ?? [];
+        $components = parse_url($url) ?: [];
 
-        return new static(
-            $components['scheme'] ?? null,
-            $components['host'] ?? null,
-            $components['port'] ?? null,
-            $components['user'] ?? null,
-            $components['pass'] ?? null,
-            $components['path'] ?? null,
-            $components['query'] ?? null,
-            $components['fragment'] ?? null,
-        );
+        if (isset($components['query'])) {
+            $components['query'] = static::query($components['query']);
+        }
+
+        return new static(...$components);
     }
 
     /**
-     * Get the URL query parameters.
+     * Parse URL query parameters.
      *
      * @return \Illuminate\Support\UrlQueryParameters
      */
-    public function query(): UrlQueryParameters
+    protected static function query(?string $query): UrlQueryParameters
     {
-        return UrlQueryParameters::parse($this->query);
+        return UrlQueryParameters::parse($query);
     }
 
     /**
@@ -68,7 +64,7 @@ class Url implements Arrayable, Stringable
             'user' => $this->user,
             'pass' => $this->pass,
             'path' => $this->path,
-            'query' => $this->query,
+            'query' => (string) $this->query,
             'fragment' => $this->fragment,
         ];
     }

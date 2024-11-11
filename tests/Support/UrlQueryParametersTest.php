@@ -49,12 +49,80 @@ class UrlQueryParametersTest extends TestCase
         $this->assertSame('default', $params->get('baz', 'default'));
     }
 
+    public function testSet()
+    {
+        $params = new UrlQueryParameters(['foo' => 'bar']);
+
+        $params->set('baz', 'qux');
+
+        $this->assertSame('qux', $params->get('baz'));
+    }
+
+    public function testForget()
+    {
+        $params = new UrlQueryParameters(['foo' => 'bar']);
+
+        $params->forget('foo');
+
+        $this->assertNull($params->get('foo'));
+    }
+
+    public function testClear()
+    {
+        $params = new UrlQueryParameters(['foo' => 'bar']);
+
+        $params->clear();
+
+        $this->assertEmpty($params->toArray());
+    }
+
     public function testHas()
     {
         $params = new UrlQueryParameters(['foo' => 'bar']);
 
         $this->assertTrue($params->has('foo'));
         $this->assertFalse($params->has('baz'));
+    }
+
+    public function testAll()
+    {
+        $params = new UrlQueryParameters([
+            'foo' => 'bar',
+            'baz' => 'qux',
+        ]);
+
+        $this->assertSame([
+            'foo' => 'bar',
+            'baz' => 'qux',
+        ], $params->all());
+    }
+
+    public function testIsEmpty()
+    {
+        $params = new UrlQueryParameters;
+
+        $this->assertTrue($params->isEmpty());
+
+        $params = new UrlQueryParameters(['foo' => 'bar']);
+
+        $this->assertFalse($params->isEmpty());
+    }
+
+    public function testArrayAccess()
+    {
+        $params = new UrlQueryParameters([
+            'foo' => 'bar',
+            'baz' => 'qux',
+        ]);
+
+        $this->assertSame('bar', $params['foo']);
+        $this->assertSame('qux', $params['baz']);
+
+        $this->assertFalse(isset($params['zax']));
+
+        $params['zax'] = 'baz';
+
+        $this->assertSame('baz', $params['zax']);
     }
 
     public function testToArray()

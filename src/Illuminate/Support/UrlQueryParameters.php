@@ -2,15 +2,16 @@
 
 namespace Illuminate\Support;
 
-use Illuminate\Contracts\Support\Arrayable;
 use Stringable;
+use ArrayAccess;
+use Illuminate\Contracts\Support\Arrayable;
 
-class UrlQueryParameters implements Arrayable, Stringable
+class UrlQueryParameters implements Arrayable, ArrayAccess, Stringable
 {
     /**
      * Constructor.
      *
-     * @param  array  $parameters
+     * @param  array<string, string>  $parameters
      * @return void
      */
     public function __construct(
@@ -34,10 +35,10 @@ class UrlQueryParameters implements Arrayable, Stringable
             Str::of($query)
                 ->replaceStart('?', '')
                 ->toString(),
-            $params
+            $parameters
         );
 
-        return new static($params);
+        return new static($parameters);
     }
 
     /**
@@ -53,6 +54,45 @@ class UrlQueryParameters implements Arrayable, Stringable
     }
 
     /**
+     * Set a parameter value.
+     *
+     * @param  string  $key
+     * @param  string  $value
+     * @return $this
+     */
+    public function set(string $key, string $value): static
+    {
+        $this->parameters[$key] = $value;
+
+        return $this;
+    }
+
+    /**
+     * Remove a parameter.
+     *
+     * @param  string  $key
+     * @return $this
+     */
+    public function forget(string $key): static
+    {
+        unset($this->parameters[$key]);
+
+        return $this;
+    }
+
+    /**
+     * Clear all parameters.
+     *
+     * @return $this
+     */
+    public function clear(): static
+    {
+        $this->parameters = [];
+
+        return $this;
+    }
+
+    /**
      * Check if a parameter exists.
      *
      * @param  string  $key
@@ -64,13 +104,33 @@ class UrlQueryParameters implements Arrayable, Stringable
     }
 
     /**
-     * Get the instance as an array.
+     * Get all parameters.
      *
      * @return array<string, mixed>
      */
-    public function toArray(): array
+    public function all(): array
     {
         return $this->parameters;
+    }
+
+    /**
+     * Determine if the parameters are empty.
+     *
+     * @return bool
+     */
+    public function isEmpty(): bool
+    {
+        return empty($this->parameters);
+    }
+
+    /**
+     * Get the instance as an array.
+     *
+     * @return array<string, string>
+     */
+    public function toArray(): array
+    {
+        return $this->all();
     }
 
     /**
@@ -81,5 +141,50 @@ class UrlQueryParameters implements Arrayable, Stringable
     public function __toString(): string
     {
         return Arr::query($this->parameters);
+    }
+
+    /**
+     * Determine if a parameter exists.
+     *
+     * @param  mixed  $offset
+     * @return bool
+     */
+    public function offsetExists(mixed $offset): bool
+    {
+        return isset($this->parameters[$offset]);
+    }
+
+    /**
+     * Get a parameter value.
+     *
+     * @param  mixed  $offset
+     * @return mixed
+     */
+    public function offsetGet(mixed $offset): mixed
+    {
+        return $this->parameters[$offset];
+    }
+
+    /**
+     * Set a parameter value.
+     *
+     * @param  mixed  $offset
+     * @param  mixed  $value
+     * @return void
+     */
+    public function offsetSet(mixed $offset, mixed $value): void
+    {
+        $this->parameters[$offset] = $value;
+    }
+
+    /**
+     * Remove a parameter.
+     *
+     * @param  mixed  $offset
+     * @return void
+     */
+    public function offsetUnset(mixed $offset): void
+    {
+        unset($this->parameters[$offset]);
     }
 }
