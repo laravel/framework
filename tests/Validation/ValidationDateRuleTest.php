@@ -72,6 +72,12 @@ class ValidationDateRuleTest extends TestCase
         $this->assertEquals('date|after:2024-01-01|before:2024-02-01', (string) $rule);
     }
 
+    public function testBetweenOrEqualDatesRule()
+    {
+        $rule = Rule::date()->betweenOrEqual('2024-01-01', '2024-02-01');
+        $this->assertEquals('date|after_or_equal:2024-01-01|before_or_equal:2024-02-01', (string) $rule);
+    }
+
     public function testChainedRules()
     {
         $rule = Rule::date('Y-m-d H:i:s')
