@@ -167,7 +167,7 @@ class SupportTestingMailFakeTest extends TestCase
     public function testAssertNotSentWithClosure_withMailRaw()
     {
         $callback = function (Message $mail) {
-            return in_array('taylor@laravel.com', array_map(fn($a) => $a->getAddress(), $mail->getTo()));
+            return in_array('taylor@laravel.com', array_map(fn ($a) => $a->getAddress(), $mail->getTo()));
         };
 
         $this->fake->assertNotSent($callback);
@@ -439,7 +439,7 @@ class SupportTestingMailFakeTest extends TestCase
         $this->fake->raw('email text body', fn (Message $m) => $m->to($user->email));
 
         $this->fake->assertSent(function (Message $mail) use ($user) {
-            return in_array($user->email, array_map(fn($a) => $a->getAddress(), $mail->getTo()));
+            return in_array($user->email, array_map(fn ($a) => $a->getAddress(), $mail->getTo()));
         });
     }
 
