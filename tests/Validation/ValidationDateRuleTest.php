@@ -8,6 +8,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Date;
 use Illuminate\Validation\Validator;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Support\Carbon;
 
 class ValidationDateRuleTest extends TestCase
 {
@@ -22,6 +23,9 @@ class ValidationDateRuleTest extends TestCase
 
     public function testDateFormatRule()
     {
+        $rule = Rule::date()->format();
+        $this->assertEquals('date|date_format:Y-m-d', (string) $rule);
+
         $rule = Rule::date()->format('d/m/Y');
         $this->assertEquals('date|date_format:d/m/Y', (string) $rule);
     }
@@ -40,41 +44,41 @@ class ValidationDateRuleTest extends TestCase
 
     public function testAfterSpecificDateRule()
     {
-        $rule = Rule::date()->after('2024-01-01');
+        $rule = Rule::date()->after(Carbon::parse('2024-01-01'));
         $this->assertEquals('date|after:2024-01-01', (string) $rule);
-    }
-
-    public function testBetweenDatesRule()
-    {
-        $rule = Rule::date()->between('2024-01-01', '2024-02-01');
-        $this->assertEquals('date|after:2024-01-01|before:2024-02-01', (string) $rule);
     }
 
     public function testBeforeSpecificDateRule()
     {
-        $rule = Rule::date()->before('2024-01-01');
+        $rule = Rule::date()->before(Carbon::parse('2024-01-01'));
         $this->assertEquals('date|before:2024-01-01', (string) $rule);
     }
 
     public function testAfterOrEqualSpecificDateRule()
     {
-        $rule = Rule::date()->afterOrEqual('2024-01-01');
+        $rule = Rule::date()->afterOrEqual(Carbon::parse('2024-01-01'));
         $this->assertEquals('date|after_or_equal:2024-01-01', (string) $rule);
     }
 
     public function testBeforeOrEqualSpecificDateRule()
     {
-        $rule = Rule::date()->beforeOrEqual('2024-01-01');
+        $rule = Rule::date()->beforeOrEqual(Carbon::parse('2024-01-01'));
         $this->assertEquals('date|before_or_equal:2024-01-01', (string) $rule);
+    }
+
+    public function testBetweenDatesRule()
+    {
+        $rule = Rule::date()->between(Carbon::parse('2024-01-01'), Carbon::parse('2024-02-01'));
+        $this->assertEquals('date|after:2024-01-01|before:2024-02-01', (string) $rule);
     }
 
     public function testChainedRules()
     {
-        $rule = Rule::date()
+        $rule = Rule::date('Y-m-d H:i:s')
             ->format('Y-m-d')
-            ->after('2024-01-01')
-            ->before('2025-01-01');
-        $this->assertEquals('date|date_format:Y-m-d|after:2024-01-01|before:2025-01-01', (string) $rule);
+            ->after('2024-01-01 00:00:00')
+            ->before('2025-01-01 00:00:00');
+        $this->assertEquals('date|date_format:Y-m-d|after:2024-01-01 00:00:00|before:2025-01-01 00:00:00', (string) $rule);
 
         $rule = Rule::date()
             ->format('Y-m-d')
