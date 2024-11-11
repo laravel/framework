@@ -46,7 +46,7 @@ class Date implements Stringable
      */
     public function format($format = null)
     {
-        return $this->addRule('date_format:'. ($format ?? $this->format));
+        return $this->addRule('date_format:'.($format ?? $this->format));
     }
 
     /**
@@ -67,6 +67,26 @@ class Date implements Stringable
     public function beforeToday()
     {
         return $this->before('today');
+    }
+
+    /**
+     * Ensure the date is after or equal to today.
+     *
+     * @return $this
+     */
+    public function afterOrEqualToday()
+    {
+        return $this->afterOrEqual(Carbon::today());
+    }
+
+    /**
+     * Ensure the date is before or equal to today.
+     *
+     * @return $this
+     */
+    public function beforeOrEqualToday()
+    {
+        return $this->beforeOrEqual(Carbon::today());
     }
 
     /**
@@ -123,6 +143,18 @@ class Date implements Stringable
     public function between($from, $to)
     {
         return $this->after($from)->before($to);
+    }
+
+    /**
+     * Ensure the date is between or equal to two dates.
+     *
+     * @param  \Illuminate\Support\Carbon|\DateTime|string  $from
+     * @param  \Illuminate\Support\Carbon|\DateTime|string  $to
+     * @return $this
+     */
+    public function betweenOrEqual($from, $to)
+    {
+        return $this->afterOrEqual($from)->beforeOrEqual($to);
     }
 
     /**
