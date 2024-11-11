@@ -20,7 +20,7 @@ class SupportObjTest extends TestCase
 
         // Second level nested object within $department, representing a team or project
         $team = new stdClass();
-        $team->description = "Research and Development";
+        $team->description = 'Research and Development';
 
         // Assign nested structure
         $department->team = $team;  // $department contains $team as a nested object
@@ -30,15 +30,15 @@ class SupportObjTest extends TestCase
 
         $this->assertEquals(
             [
-              "name" => "Acme Corp",
-              "departments" =>  [
-                    0 =>  [
-                      "budget" => 12000,
-                      "team" =>  [
-                        "description" => "Research and Development"
-                      ]
-                    ]
-              ]
+                  'name' => 'Acme Corp',
+                  'departments' =>  [
+                        0 =>  [
+                          'budget' => 12000,
+                          'team' =>  [
+                            'description' => 'Research and Development'
+                          ]
+                        ]
+                  ]
             ], $array
         );
     }
