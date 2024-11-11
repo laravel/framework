@@ -30,6 +30,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\FrozenModelException;
 use Illuminate\Database\Eloquent\JsonEncodingException;
 use Illuminate\Database\Eloquent\MassAssignmentException;
 use Illuminate\Database\Eloquent\MissingAttributeException;
@@ -3177,6 +3178,47 @@ class DatabaseEloquentModelTest extends TestCase
         $collection = $model->newCollection([$model]);
 
         $this->assertInstanceOf(CustomEloquentCollection::class, $collection);
+    }
+
+    public function testCanFreezeModel()
+    {
+        $model = new EloquentModelStub();
+        $this->assertFalse($model->isFrozen());
+        $model->freeze();
+        $this->assertTrue($model->isFrozen());
+        $model->freeze(false);
+        $this->assertFalse($model->isFrozen());
+    }
+
+    public function testCannotSetAttributeOnFrozenModel()
+    {
+        $model = new EloquentModelStub();
+        $model->freeze();
+
+        try {
+            $model->castedFloat = 199.2;
+            $this->fail("No FrozenModelException thrown");
+        } catch (FrozenModelException $exception) {
+            $this->assertEquals("Cannot set property [castedFloat] on Model [Illuminate\Tests\Database\EloquentModelStub] because it is frozen.", $exception->getMessage());
+        }
+    }
+
+    public function testCannotFillOnFrozenModel()
+    {
+        $model = new EloquentModelStub();
+        $model->freeze();
+
+        try {
+            $model->fill([
+                'castedFloat' => 2001.3
+            ]);
+            $this->fail("No FrozenModelException thrown.");
+        } catch (FrozenModelException $exception) {
+            $this->assertEquals(
+                'Cannot fill properties on Model [Illuminate\Tests\Database\EloquentModelStub] because it is frozen.',
+                $exception->getMessage()
+            );
+        }
     }
 }
 

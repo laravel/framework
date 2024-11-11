@@ -21,6 +21,7 @@ use Illuminate\Database\Eloquent\Casts\AsEnumArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsEnumCollection;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Casts\Json;
+use Illuminate\Database\Eloquent\FrozenModelException;
 use Illuminate\Database\Eloquent\InvalidCastException;
 use Illuminate\Database\Eloquent\JsonEncodingException;
 use Illuminate\Database\Eloquent\MissingAttributeException;
@@ -1006,10 +1007,16 @@ trait HasAttributes
      * @param  string  $key
      * @param  mixed  $value
      * @return mixed
+     *
+     * @throws \Illuminate\Database\Eloquent\FrozenModelException
      */
     public function setAttribute($key, $value)
     {
-        // First we will check for the presence of a mutator for the set operation
+        if ($this->frozen) {
+            throw FrozenModelException::forSetAttribute($this, $key);
+        }
+
+        // Next we will check for the presence of a mutator for the set operation
         // which simply lets the developers tweak the attribute as it is set on
         // this model, such as "json_encoding" a listing of data for storage.
         if ($this->hasSetMutator($key)) {
