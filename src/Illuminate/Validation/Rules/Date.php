@@ -76,7 +76,7 @@ class Date implements Stringable
      */
     public function afterOrEqualToday()
     {
-        return $this->afterOrEqual(Carbon::today());
+        return $this->afterOrEqual('today');
     }
 
     /**
@@ -86,7 +86,7 @@ class Date implements Stringable
      */
     public function beforeOrEqualToday()
     {
-        return $this->beforeOrEqual(Carbon::today());
+        return $this->beforeOrEqual('today');
     }
 
     /**
