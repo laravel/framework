@@ -24,6 +24,7 @@ class Obj
             if (is_object($value) || is_array($value)) {
                 return self::deepArrayify($value);
             }
+
             return $value;
         }, $object);
     }
