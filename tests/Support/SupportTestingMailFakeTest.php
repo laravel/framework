@@ -6,6 +6,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\MailManager;
+use Illuminate\Mail\Message;
 use Illuminate\Support\Testing\Fakes\MailFake;
 use Mockery as m;
 use PHPUnit\Framework\ExpectationFailedException;
@@ -48,6 +49,9 @@ class SupportTestingMailFakeTest extends TestCase
         $this->fake->to('taylor@laravel.com')->send($this->mailable);
 
         $this->fake->assertSent(MailableStub::class);
+
+        $this->fake->raw('email text body', fn (Message $m) => $m->to('taylor@laravel.com'));
+        $this->fake->assertSent(Message::class);
     }
 
     public function testAssertSentTo()
@@ -130,6 +134,20 @@ class SupportTestingMailFakeTest extends TestCase
         }
     }
 
+    public function testAssertNotSent_withMailRaw()
+    {
+        $this->fake->assertNotSent(Message::class);
+
+        $this->fake->raw('email text body', fn (Message $m) => $m->to('taylor@laravel.com'));
+
+        try {
+            $this->fake->assertNotSent(Message::class);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('The unexpected [Illuminate\Mail\Message] mailable was sent.', $e->getMessage());
+        }
+    }
+
     public function testAssertNotSentWithClosure()
     {
         $callback = function (MailableStub $mail) {
@@ -142,6 +160,22 @@ class SupportTestingMailFakeTest extends TestCase
 
         $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessageMatches('/The unexpected \['.preg_quote(MailableStub::class, '/').'\] mailable was sent./m');
+
+        $this->fake->assertNotSent($callback);
+    }
+
+    public function testAssertNotSentWithClosure_withMailRaw()
+    {
+        $callback = function (Message $mail) {
+            return in_array('taylor@laravel.com', array_map(fn($a) => $a->getAddress(), $mail->getTo()));
+        };
+
+        $this->fake->assertNotSent($callback);
+
+        $this->fake->raw('email text body', fn (Message $m) => $m->to('taylor@laravel.com'));
+
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessageMatches('/The unexpected \['.preg_quote(Message::class, '/').'\] mailable was sent./m');
 
         $this->fake->assertNotSent($callback);
     }
@@ -174,6 +208,8 @@ class SupportTestingMailFakeTest extends TestCase
     {
         $this->fake->to('taylor@laravel.com')->send($this->mailable);
         $this->fake->to('taylor@laravel.com')->send($this->mailable);
+        $this->fake->raw('email text body', fn (Message $m) => $m->to('taylor@laravel.com'));
+        $this->fake->raw('email text body', fn (Message $m) => $m->to('taylor@laravel.com'));
 
         try {
             $this->fake->assertSent(MailableStub::class, 1);
@@ -183,21 +219,31 @@ class SupportTestingMailFakeTest extends TestCase
         }
 
         $this->fake->assertSent(MailableStub::class, 2);
+
+        try {
+            $this->fake->assertSent(Message::class, 1);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('The expected [Illuminate\Mail\Message] mailable was sent 2 times instead of 1 times.', $e->getMessage());
+        }
+
+        $this->fake->assertSent(Message::class, 2);
     }
 
     public function testAssertSentCount()
     {
         $this->fake->to('taylor@laravel.com')->send($this->mailable);
         $this->fake->to('taylor@laravel.com')->send($this->mailable);
+        $this->fake->raw('email text body', fn (Message $m) => $m->to('taylor@laravel.com'));
 
         try {
             $this->fake->assertSentCount(1);
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertStringContainsString('The total number of mailables sent was 2 instead of 1.', $e->getMessage());
+            $this->assertStringContainsString('The total number of mailables sent was 3 instead of 1.', $e->getMessage());
         }
 
-        $this->fake->assertSentCount(2);
+        $this->fake->assertSentCount(3);
     }
 
     public function testAssertQueued()
@@ -324,6 +370,20 @@ class SupportTestingMailFakeTest extends TestCase
         }
     }
 
+    public function testAssertNothingSent_withMailRaw()
+    {
+        $this->fake->assertNothingSent();
+
+        $this->fake->raw('email text body', fn (Message $m) => $m->to('taylor@laravel.com'));
+
+        try {
+            $this->fake->assertNothingSent();
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString("The following mailables were sent unexpectedly:\n\n- Illuminate\Mail\Message", $e->getMessage());
+        }
+    }
+
     public function testAssertNothingQueued()
     {
         $this->fake->assertNothingQueued();
@@ -343,17 +403,18 @@ class SupportTestingMailFakeTest extends TestCase
         $this->fake->assertNothingOutgoing();
 
         $this->fake->to('taylor@laravel.com')->queue($this->mailable);
+        $this->fake->raw('email text body', fn (Message $m) => $m->to('taylor@laravel.com'));
 
         try {
-            $this->fake->assertOutgoingCount(2);
+            $this->fake->assertOutgoingCount(3);
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertStringContainsString('The total number of outgoing mailables was 1 instead of 2.', $e->getMessage());
+            $this->assertStringContainsString('The total number of outgoing mailables was 2 instead of 3.', $e->getMessage());
         }
 
         $this->fake->to('taylor@laravel.com')->send($this->mailable);
 
-        $this->fake->assertOutgoingCount(2);
+        $this->fake->assertOutgoingCount(3);
     }
 
     public function testAssertQueuedWithClosure()
@@ -367,10 +428,18 @@ class SupportTestingMailFakeTest extends TestCase
 
     public function testAssertSentWithClosure()
     {
-        $this->fake->to($user = new LocalizedRecipientStub)->send($this->mailable);
+        $user = new LocalizedRecipientStub;
+
+        $this->fake->to($user)->send($this->mailable);
 
         $this->fake->assertSent(function (MailableStub $mail) use ($user) {
             return $mail->hasTo($user);
+        });
+
+        $this->fake->raw('email text body', fn (Message $m) => $m->to($user->email));
+
+        $this->fake->assertSent(function (Message $mail) use ($user) {
+            return in_array($user->email, array_map(fn($a) => $a->getAddress(), $mail->getTo()));
         });
     }
 

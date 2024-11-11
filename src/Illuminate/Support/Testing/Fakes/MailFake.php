@@ -9,10 +9,12 @@ use Illuminate\Contracts\Mail\Mailer;
 use Illuminate\Contracts\Mail\MailQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\MailManager;
+use Illuminate\Mail\Message;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\ReflectsClosures;
 use PHPUnit\Framework\Assert as PHPUnit;
+use Symfony\Component\Mime\Email;
 
 class MailFake implements Factory, Fake, Mailer, MailQueue
 {
@@ -462,7 +464,11 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
      */
     public function raw($text, $callback)
     {
-        //
+        $message = (new Message(new Email()))->text($text);
+        if (is_callable($callback)) {
+            $callback($message);
+        }
+        $this->mailables[] = $message;
     }
 
     /**
