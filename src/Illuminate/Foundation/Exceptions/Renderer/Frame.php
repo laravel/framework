@@ -78,7 +78,7 @@ class Frame
     }
 
     /**
-     * Get the frame's class, if any.
+     * Get the frame's class if applicable.
      *
      * @return string|null
      */
