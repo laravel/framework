@@ -5,6 +5,7 @@ on:
     branches:
       - master
       - '*.x'
+      - 'php84-support'
   pull_request:
   schedule:
     - cron: '0 0 * * *'
