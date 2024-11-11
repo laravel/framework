@@ -2,8 +2,12 @@
 
 namespace Tests\Unit\Rules;
 
+use Illuminate\Http\UploadedFile;
+use Illuminate\Translation\ArrayLoader;
+use Illuminate\Translation\Translator;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Date;
+use Illuminate\Validation\Validator;
 use PHPUnit\Framework\TestCase;
 
 class ValidationDateRuleTest extends TestCase
@@ -41,6 +45,12 @@ class ValidationDateRuleTest extends TestCase
         $this->assertEquals('date|after:2024-01-01', (string) $rule);
     }
 
+    public function testBetweenDatesRule()
+    {
+        $rule = Rule::date()->between('2024-01-01', '2024-02-01');
+        $this->assertEquals('date|after:2024-01-01|before:2024-02-01', (string) $rule);
+    }
+
     public function testBeforeSpecificDateRule()
     {
         $rule = Rule::date()->before('2024-01-01');
@@ -76,5 +86,41 @@ class ValidationDateRuleTest extends TestCase
                 $rule->before('2025-01-01');
             });
         $this->assertSame('date|date_format:Y-m-d|after:2024-01-01', (string) $rule);
+    }
+
+    public function testDateValidation()
+    {
+        $trans = new Translator(new ArrayLoader, 'en');
+
+        $rule = Rule::date();
+
+        $validator = new Validator(
+            $trans,
+            ['date' => 'not a date'],
+            ['date' => $rule]
+        );
+
+        $this->assertSame(
+            $trans->get('validation.date'),
+            $validator->errors()->first('date')
+        );
+
+        $validator = new Validator(
+            $trans,
+            ['date' => '2024-01-01'],
+            ['date' => $rule]
+        );
+
+        $this->assertEmpty($validator->errors()->first('date'));
+
+        $rule = Rule::date()->between('2024-01-01', '2025-01-01');
+
+        $validator = new Validator(
+            $trans,
+            ['date' => '2024-02-01'],
+            ['date' => (string)$rule]
+        );
+
+        $this->assertEmpty($validator->errors()->first('date'));
     }
 }

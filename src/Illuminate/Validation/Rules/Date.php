@@ -94,6 +94,18 @@ class Date implements Stringable
     }
 
     /**
+     * Ensure the date is between two dates. 
+     *
+     * @param  string  $from
+     * @param  string  $to
+     * @return $this
+     */
+    public function between($from, $to)
+    {
+        return $this->after($from)->before($to);
+    }
+
+    /**
      * Add custom rules to the validation rules array.
      *
      * @param  string|array  $rules
