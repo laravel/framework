@@ -30,15 +30,15 @@ class SupportObjTest extends TestCase
 
         $this->assertEquals(
             [
-                  'name' => 'Acme Corp',
-                  'departments' =>  [
-                        0 =>  [
-                          'budget' => 12000,
-                          'team' =>  [
-                            'description' => 'Research and Development'
-                          ]
-                        ]
-                  ]
+                 'name' => 'Acme Corp',
+                 'departments' =>  [
+                       0 =>  [
+                         'budget' => 12000,
+                         'team' =>  [
+                           'description' => 'Research and Development',
+                         ],
+                       ],
+                 ],
             ], $array
         );
     }
