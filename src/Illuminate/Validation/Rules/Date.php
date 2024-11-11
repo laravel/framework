@@ -113,6 +113,6 @@ class Date implements Stringable
      */
     public function __toString()
     {
-        return implode(',', $this->constraints);
+        return implode('|', $this->constraints);
     }
 }
