@@ -43,6 +43,13 @@ jobs:
         php: [8.2, 8.3, 8.4]
         phpunit: ['10.5', '11.0.1']
         stability: [prefer-lowest, prefer-stable]
+        exclude:
+          - php: 8.4
+            phpunit: '10.5'
+            stability: prefer-lowest
+          - php: 8.4
+            phpunit: '11.0.1'
+            stability: prefer-lowest
 
     name: PHP ${{ matrix.php }} - PHPUnit ${{ matrix.phpunit }} - ${{ matrix.stability }}
 
