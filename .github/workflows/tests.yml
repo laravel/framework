@@ -39,7 +39,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        php: [8.2, 8.3]
+        php: [8.2, 8.3, 8.4]
         phpunit: ['10.5', '11.0.1']
         stability: [prefer-lowest, prefer-stable]
 
