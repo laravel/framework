@@ -204,11 +204,12 @@ class Rule
     /**
      * Get a date rule builder instance.
      *
+     * @param  string  $format
      * @return \Illuminate\Validation\Rules\Date
      */
-    public static function date()
+    public static function date($format = 'Y-m-d')
     {
-        return new Date;
+        return new Date($format);
     }
 
     /**

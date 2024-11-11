@@ -2,7 +2,9 @@
 
 namespace Illuminate\Validation\Rules;
 
+use DateTime;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
 use Stringable;
@@ -19,14 +21,32 @@ class Date implements Stringable
     protected $constraints = ['date'];
 
     /**
-     * Specify the date format to validate against.
+     * The format for the date.
+     *
+     * @var string
+     */
+    protected $format;
+
+    /**
+     * Create a new date rule instance.
      *
      * @param  string  $format
+     * @return void
+     */
+    public function __construct($format = 'Y-m-d')
+    {
+        $this->format = $format;
+    }
+
+    /**
+     * Specify the date format to validate against.
+     *
+     * @param  ?string  $format
      * @return $this
      */
-    public function format($format = 'Y-m-d')
+    public function format($format = null)
     {
-        return $this->addRule("date_format:$format");
+        return $this->addRule('date_format:'. ($format ?? $this->format));
     }
 
     /**
@@ -52,52 +72,52 @@ class Date implements Stringable
     /**
      * Ensure the date is after the specified date.
      *
-     * @param  string  $date
+     * @param  \Illuminate\Support\Carbon|\DateTime|string  $date
      * @return $this
      */
     public function after($date)
     {
-        return $this->addRule("after:$date");
+        return $this->addRule('after:' . $this->formatDate($date));
     }
 
     /**
      * Ensure the date is before the specified date.
      *
-     * @param  string  $date
+     * @param  \Illuminate\Support\Carbon|\DateTime|string  $date
      * @return $this
      */
     public function before($date)
     {
-        return $this->addRule("before:$date");
+        return $this->addRule('before:' . $this->formatDate($date));
     }
 
     /**
      * Ensure the date is on or after the specified date.
      *
-     * @param  string  $date
+     * @param  \Illuminate\Support\Carbon|\DateTime|string  $date
      * @return $this
      */
     public function afterOrEqual($date)
     {
-        return $this->addRule("after_or_equal:$date");
+        return $this->addRule('after_or_equal:' . $this->formatDate($date));
     }
 
     /**
      * Ensure the date is on or before the specified date.
      *
-     * @param  string  $date
+     * @param  \Illuminate\Support\Carbon|\DateTime|string  $date
      * @return $this
      */
     public function beforeOrEqual($date)
     {
-        return $this->addRule("before_or_equal:$date");
+        return $this->addRule('before_or_equal:' . $this->formatDate($date));
     }
 
     /**
      * Ensure the date is between two dates.
      *
-     * @param  string  $from
-     * @param  string  $to
+     * @param  \Illuminate\Support\Carbon|\DateTime|string  $from
+     * @param  \Illuminate\Support\Carbon|\DateTime|string  $to
      * @return $this
      */
     public function between($from, $to)
@@ -116,6 +136,21 @@ class Date implements Stringable
         $this->constraints = array_merge($this->constraints, Arr::wrap($rules));
 
         return $this;
+    }
+
+    /**
+     * Format the date for the validation rule.
+     *
+     * @param  \Illuminate\Support\Carbon|\DateTime|string  $date
+     * @return string
+     */
+    protected function formatDate($date)
+    {
+        if ($date instanceof Carbon || $date instanceof DateTime) {
+            return $date->format($this->format);
+        }
+
+        return $date;
     }
 
     /**
