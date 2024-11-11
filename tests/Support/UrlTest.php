@@ -32,7 +32,7 @@ class UrlTest extends TestCase
         $this->assertNull($url->user);
         $this->assertNull($url->pass);
         $this->assertSame('/path/to/resource', $url->path);
-        $this->assertNull($url->query);
+        $this->assertInstanceOf(UrlQueryParameters::class, $url->query);
         $this->assertNull($url->fragment);
     }
 
