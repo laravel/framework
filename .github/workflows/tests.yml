@@ -40,16 +40,19 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        php: [8.2, 8.3, 8.4]
+        php: [8.2, 8.3]
         phpunit: ['10.5', '11.0.1']
+        redis-extension: ['redis']
         stability: [prefer-lowest, prefer-stable]
-        exclude:
+        include:
           - php: 8.4
             phpunit: '10.5'
-            stability: prefer-lowest
+            redis-extension: 'redis-6.1.0'
+            stability: prefer-stable
           - php: 8.4
             phpunit: '11.0.1'
-            stability: prefer-lowest
+            redis-extension: 'redis-6.1.0'
+            stability: prefer-stable
 
     name: PHP ${{ matrix.php }} - PHPUnit ${{ matrix.phpunit }} - ${{ matrix.stability }}
 
@@ -61,7 +64,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, gd, redis, igbinary, msgpack, lzf, zstd, lz4, memcached, gmp, :php-psr
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, gd, ${{ matrix.redis-extension }}, igbinary, msgpack, lzf, zstd, lz4, memcached, gmp, :php-psr
           ini-values: error_reporting=E_ALL
           tools: composer:v2
           coverage: none
