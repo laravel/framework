@@ -7,12 +7,15 @@ use Illuminate\Database\DatabaseTransactionsManager as BaseManager;
 class DatabaseTransactionsManager extends BaseManager
 {
     /**
-     * A list with the names of connections transacting on tests to be skiped and run the callbacks correctly.
+     * The names of the connections transacting during tests.
      */
     protected array $connectionsTransacting;
 
     /**
-     * @param  array  $connectionsTransacting  The name of the connections transacting on tests (to skip for callbacks).
+     * Create a new database transaction manager instance.
+     *
+     * @param  array  $connectionsTransacting
+     * @return void
      */
     public function __construct(array $connectionsTransacting)
     {
