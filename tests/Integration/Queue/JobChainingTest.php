@@ -288,6 +288,30 @@ class JobChainingTest extends QueueTestCase
         $this->assertTrue(JobChainAddingAddedJob::$ranAt->isAfter(JobChainAddingExistingJob::$ranAt));
     }
 
+    public function testChainJobsCanBePrependedBatch()
+    {
+        Bus::chain([
+            new JobChainAddingPrependedBatch('j1'),
+            new JobChainingNamedTestJob('j2'),
+        ])->dispatch();
+
+        $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
+
+        $this->assertEquals(['j1', 'b1', 'b2', 'j2'], JobRunRecorder::$results);
+    }
+
+    public function testChainJobsCanBeAppendedBatch()
+    {
+        Bus::chain([
+            new JobChainAddingAppendingBatch('j1'),
+            new JobChainingNamedTestJob('j2'),
+        ])->dispatch();
+
+        $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
+
+        $this->assertEquals(['j1', 'j2', 'b1', 'b2'], JobRunRecorder::$results);
+    }
+
     public function testChainJobsCanBeAppendedWithoutExistingChain()
     {
         JobChainAddingAppendingJob::dispatch();
@@ -649,6 +673,50 @@ class JobChainAddingAppendingJob implements ShouldQueue
     public function handle()
     {
         $this->appendToChain(new JobChainAddingAddedJob);
+    }
+}
+
+class JobChainAddingAppendingBatch implements ShouldQueue
+{
+    use Dispatchable, InteractsWithQueue, Queueable;
+
+    public string $id;
+
+    public function __construct(string $id)
+    {
+        $this->id = $id;
+    }
+
+    public function handle()
+    {
+        $this->appendToChain(Bus::batch([
+            new JobChainingNamedTestJob('b1'),
+            new JobChainingNamedTestJob('b2'),
+        ]));
+
+        JobRunRecorder::record($this->id);
+    }
+}
+
+class JobChainAddingPrependedBatch implements ShouldQueue
+{
+    use Dispatchable, InteractsWithQueue, Queueable;
+
+    public string $id;
+
+    public function __construct(string $id)
+    {
+        $this->id = $id;
+    }
+
+    public function handle()
+    {
+        $this->prependToChain(Bus::batch([
+            new JobChainingNamedTestJob('b1'),
+            new JobChainingNamedTestJob('b2'),
+        ]));
+
+        JobRunRecorder::record($this->id);
     }
 }
 
