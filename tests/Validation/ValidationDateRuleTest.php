@@ -2,13 +2,13 @@
 
 namespace Tests\Unit\Rules;
 
+use Illuminate\Support\Carbon;
 use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Date;
 use Illuminate\Validation\Validator;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Support\Carbon;
 
 class ValidationDateRuleTest extends TestCase
 {

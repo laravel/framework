@@ -97,7 +97,7 @@ class Date implements Stringable
      */
     public function after($date)
     {
-        return $this->addRule('after:' . $this->formatDate($date));
+        return $this->addRule('after:'.$this->formatDate($date));
     }
 
     /**
@@ -108,7 +108,7 @@ class Date implements Stringable
      */
     public function before($date)
     {
-        return $this->addRule('before:' . $this->formatDate($date));
+        return $this->addRule('before:'.$this->formatDate($date));
     }
 
     /**
@@ -119,7 +119,7 @@ class Date implements Stringable
      */
     public function afterOrEqual($date)
     {
-        return $this->addRule('after_or_equal:' . $this->formatDate($date));
+        return $this->addRule('after_or_equal:'.$this->formatDate($date));
     }
 
     /**
@@ -130,7 +130,7 @@ class Date implements Stringable
      */
     public function beforeOrEqual($date)
     {
-        return $this->addRule('before_or_equal:' . $this->formatDate($date));
+        return $this->addRule('before_or_equal:'.$this->formatDate($date));
     }
 
     /**
