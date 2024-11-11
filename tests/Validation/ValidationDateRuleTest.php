@@ -2,7 +2,6 @@
 
 namespace Tests\Unit\Rules;
 
-use Illuminate\Http\UploadedFile;
 use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator;
 use Illuminate\Validation\Rule;
@@ -118,7 +117,7 @@ class ValidationDateRuleTest extends TestCase
         $validator = new Validator(
             $trans,
             ['date' => '2024-02-01'],
-            ['date' => (string)$rule]
+            ['date' => (string) $rule]
         );
 
         $this->assertEmpty($validator->errors()->first('date'));

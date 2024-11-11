@@ -94,7 +94,7 @@ class Date implements Stringable
     }
 
     /**
-     * Ensure the date is between two dates. 
+     * Ensure the date is between two dates.
      *
      * @param  string  $from
      * @param  string  $to
