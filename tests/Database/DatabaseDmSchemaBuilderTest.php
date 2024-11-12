@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Database;
 use Illuminate\Database\DmConnection;
 use Illuminate\Database\Query\Processors\DmProcessor;
 use Illuminate\Database\Schema\DmBuilder;
-+use Illuminate\Database\Schema\Grammars\DmGrammar;
+use Illuminate\Database\Schema\Grammars\DmGrammar;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 

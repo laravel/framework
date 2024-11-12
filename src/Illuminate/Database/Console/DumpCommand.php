@@ -93,6 +93,7 @@ class DumpCommand extends Command
                 (new Filesystem)->ensureDirectoryExists(dirname($path));
             });
         }
+
         return tap($this->option('path') ?: database_path('schema/'.$connection->getName().'-schema.sql'), function ($path) {
             (new Filesystem)->ensureDirectoryExists(dirname($path));
         });

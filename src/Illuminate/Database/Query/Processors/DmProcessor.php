@@ -6,7 +6,6 @@ use Illuminate\Database\Query\Builder;
 
 class DmProcessor extends Processor
 {
-
     /**
      * Process an "insert get ID" query.
      *
@@ -65,7 +64,7 @@ class DmProcessor extends Processor
             ];
         }, $results);
     }
-    
+
     /**
      * Process the results of an indexes query.
      *
@@ -106,8 +105,8 @@ class DmProcessor extends Processor
                 'comment' => $result->COL_COMMENT,
                 'length' => $result->LENGTH,
                 'virtual' => ($result->VIR_COL & 0x01) == 1 ? true : false,
-             ];
-         }, $results);
+            ];
+        }, $results);
     }
 
     /**

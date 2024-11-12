@@ -126,7 +126,6 @@ class DmConnection extends Connection
         return $this->withTablePrefix($grammar);
     }
 
-
     /**
      * Get a schema builder instance for the connection.
      *

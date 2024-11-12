@@ -2040,15 +2040,14 @@ class Builder implements BuilderContract
 
         $this->wheres[] = compact('type', 'column', 'value', 'boolean', 'not');
 
-
         if (! $value instanceof ExpressionContract) {
             if ($this->connection instanceof DmConnection) {
                 $parts = explode('->', $column, 2);
                 $json_column = json_encode([$parts[1] => $value]);
                 $this->addBinding($json_column);
             } else {
-                 $this->addBinding($this->grammar->prepareBindingForJsonContains($value));
-             }
+                $this->addBinding($this->grammar->prepareBindingForJsonContains($value));
+            }
         }
 
         return $this;

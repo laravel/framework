@@ -4,8 +4,8 @@ namespace Illuminate\Database\Console\Migrations;
 
 use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Contracts\Console\Isolatable;
-use Illuminate\Database\DmConnection;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Database\DmConnection;
 use Illuminate\Database\Events\SchemaLoaded;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Database\SQLiteDatabaseDoesNotExistException;
@@ -314,6 +314,7 @@ class MigrateCommand extends BaseCommand implements Isolatable
         if ($connection instanceof DmConnection) {
             return database_path('schema/'.$connection->getName().'-schema.dmp');
         }
+
         return database_path('schema/'.$connection->getName().'-schema.sql');
     }
 }

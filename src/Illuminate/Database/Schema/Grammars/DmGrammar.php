@@ -99,7 +99,7 @@ class DmGrammar extends Grammar
     public function compileTableId($schema, $table)
     {
         return sprintf('select ID from SYSOBJECTS where name = %s and SCHID = (select ID from SYSOBJECTS where name = %s and TYPE$ = \'SCH\')', $this->quoteString($table), $this->quoteString($schema));
-     }
+    }
 
     /**
      * Compile the query to determine the id of the schema.
@@ -111,7 +111,7 @@ class DmGrammar extends Grammar
     {
         return sprintf('select ID from SYSOBJECTS where name = %s and TYPE$ = \'SCH\'', $this->quoteString($schema));
     }
-    
+
     /**
      * Compile the query to determine the indexes.
      *
@@ -166,15 +166,15 @@ class DmGrammar extends Grammar
      * @param  string  $constraint_name
      * @return string
      */
-     public function compileForeignReference($constraint_name)
-     {
-         return sprintf(
+    public function compileForeignReference($constraint_name)
+    {
+        return sprintf(
             'select OWNER,CONSTRAINT_NAME,TABLE_NAME,listagg(column_name, \',\') as COLUMNS 
          from all_cons_columns col, (select R_CONSTRAINT_NAME from dba_constraints where constraint_name = %s) con where  col.constraint_name = con.R_CONSTRAINT_NAME
          group by (OWNER,CONSTRAINT_NAME,TABLE_NAME)',
             $this->quoteString($constraint_name)
-         );
-     }
+        );
+    }
 
     /**
      * Compile the columns determine if an auto_increment column.
@@ -334,7 +334,7 @@ class DmGrammar extends Grammar
     {
         return 'create spatial index '.$this->wrap($command->index).' on '.$this->wrapTable($blueprint).' ('.$this->columnize($command->columns).')';
     }
-    
+
     /**
      * Compile a drop table command.
      *
@@ -406,6 +406,7 @@ class DmGrammar extends Grammar
         for ($i = 1; $i < count($columns); $i++) {
             $colSql = $colSql.' union select '.$this->quoteString($columns[$i]);
         }
+
         return'BEGIN FOR c IN ('.$colSql.') LOOP EXECUTE IMMEDIATE (\'alter table '.$table.' drop "\' || c.COL || \'"\'); END LOOP; END;';
     }
 

@@ -93,11 +93,11 @@ class DmConnector extends Connector implements ConnectorInterface
     {
         $config['dsn'] = "dm:host={$config['host']};";
         if ($config['port']) {
-             $config['dsn'] = $config['dsn']."port={$config['port']};";
-         }
+            $config['dsn'] = $config['dsn']."port={$config['port']};";
+        }
         if ($config['schema']) {
-             $config['dsn'] = $config['dsn']."schema={$config['schema']};";
-         }
+            $config['dsn'] = $config['dsn']."schema={$config['schema']};";
+        }
 
         return $config;
     }
@@ -116,5 +116,4 @@ class DmConnector extends Connector implements ConnectorInterface
 
         return $config;
     }
-
 }
