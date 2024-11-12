@@ -31,13 +31,13 @@ class SupportObjTest extends TestCase
         $this->assertEquals(
             [
                 'name' => 'Acme Corp',
-                'departments' =>  [
-                      0 =>  [
+                'departments' => [
+                     0 =>  [
                         'budget' => 12000,
-                        'team' =>  [
-                          'description' => 'Research and Development',
+                        'team' => [
+                            'description' => 'Research and Development',
                         ],
-                      ],
+                     ],
                 ],
             ], $array
         );
