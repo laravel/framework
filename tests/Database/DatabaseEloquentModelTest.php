@@ -3204,6 +3204,19 @@ class DatabaseEloquentModelTest extends TestCase
         }
     }
 
+    public function testCannotOffsetSetAttributeOnFrozenModel()
+    {
+        $model = new EloquentModelStub();
+        $model->freeze();
+
+        try {
+            $model['castedFloat'] = 199.2;
+            $this->fail("No FrozenModelException thrown");
+        } catch (FrozenModelException $exception) {
+            $this->assertEquals("Cannot set property [castedFloat] on Model [Illuminate\Tests\Database\EloquentModelStub] because it is frozen.", $exception->getMessage());
+        }
+    }
+
     #[DataProvider('cannotLoadRelationsDataProvider')]
     public function testCannotLoadRelationOnFrozenModel($relations, $relationsAsString)
     {
