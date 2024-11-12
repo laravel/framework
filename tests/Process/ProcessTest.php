@@ -23,7 +23,7 @@ class ProcessTest extends TestCase
         $this->assertFalse($result->failed());
         $this->assertEquals(0, $result->exitCode());
         $this->assertTrue(str_contains($result->output(), 'ProcessTest.php'));
-        $this->assertEquals('', $result->errorOutput());
+        $this->assertEmpty($result->errorOutput());
 
         $result->throw();
         $result->throwIf(true);
@@ -168,8 +168,8 @@ class ProcessTest extends TestCase
 
         $result = $factory->run('ls -la');
 
-        $this->assertEquals('', $result->output());
-        $this->assertEquals('', $result->errorOutput());
+        $this->assertEmpty($result->output());
+        $this->assertEmpty($result->errorOutput());
         $this->assertEquals(0, $result->exitCode());
         $this->assertTrue($result->successful());
     }
@@ -352,7 +352,7 @@ class ProcessTest extends TestCase
         $this->assertEquals("ls command 2\n", $result->output());
 
         $result = $factory->run('ls -la');
-        $this->assertEquals('', $result->output());
+        $this->assertEmpty($result->output());
     }
 
     public function testProcessFakeSequencesCanThrowWhenSequenceIsEmpty()
@@ -479,7 +479,7 @@ class ProcessTest extends TestCase
         $result = $factory->path(__DIR__)->run('echo "Hello World" >&2; exit 1;');
 
         $this->assertFalse($result->successful());
-        $this->assertEquals('', $result->output());
+        $this->assertEmpty($result->output());
         $this->assertEquals("Hello World\n", $result->errorOutput());
     }
 
@@ -738,7 +738,7 @@ class ProcessTest extends TestCase
         $this->assertEquals("THREE\n", $latestOutput[1]);
         $this->assertEquals("ONE\nTWO\nTHREE\n", $output[1]);
 
-        $this->assertEquals('', $latestOutput[2]);
+        $this->assertEmpty($latestOutput[2]);
         $this->assertEquals("ONE\nTWO\nTHREE\n", $output[2]);
     }
 

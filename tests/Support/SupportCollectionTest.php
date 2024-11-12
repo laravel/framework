@@ -3872,7 +3872,7 @@ class SupportCollectionTest extends TestCase
         $this->assertNull($c->after('', true));
         $this->assertEquals(0, $c->after(false, true));
         $this->assertEquals([], $c->after(1, true));
-        $this->assertEquals('', $c->after([], true));
+        $this->assertEmpty($c->after([], true));
     }
 
     #[DataProvider('collectionClassProvider')]

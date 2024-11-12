@@ -82,7 +82,7 @@ class CookieTest extends TestCase
         $cookie = $this->getCreator();
         $cookie->queue($cookie->make('foo', ''));
         $this->assertTrue($cookie->hasQueued('foo'));
-        $this->assertEquals('', $cookie->queued('foo')->getValue());
+        $this->assertEmpty($cookie->queued('foo')->getValue());
     }
 
     public function testQueuedCookiesWithRepeatedValue(): void
