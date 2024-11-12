@@ -1,6 +1,41 @@
 # Release Notes for 11.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v11.30.0...11.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v11.31.0...11.x)
+
+## [v11.31.0](https://github.com/laravel/framework/compare/v11.30.0...v11.31.0) - 2024-11-12
+
+* [11.x] Refactor: return Command::FAILURE by [@fernandokbs](https://github.com/fernandokbs) in https://github.com/laravel/framework/pull/53354
+* Allow the Batch and Chain onQueue method to accept Backed Enums by [@onlime](https://github.com/onlime) in https://github.com/laravel/framework/pull/53359
+* Add transaction generics by [@MatusBoa](https://github.com/MatusBoa) in https://github.com/laravel/framework/pull/53357
+* Add laravel default exception blade files to view:cache by [@SamuelWei](https://github.com/SamuelWei) in https://github.com/laravel/framework/pull/53353
+* [11.x] Added `useCascadeTruncate` method for `PostgresGrammar` by [@korkoshko](https://github.com/korkoshko) in https://github.com/laravel/framework/pull/53343
+* Add Application::removeDeferredServices method by [@ollieread](https://github.com/ollieread) in https://github.com/laravel/framework/pull/53362
+* Add the ability to append and prepend middleware priority from the application builder by [@ollieread](https://github.com/ollieread) in https://github.com/laravel/framework/pull/53326
+* Fix typo in Translator code comment by [@caendesilva](https://github.com/caendesilva) in https://github.com/laravel/framework/pull/53366
+* [11.x] Handle HtmlString constructed with a null by [@sperelson](https://github.com/sperelson) in https://github.com/laravel/framework/pull/53367
+* [11.x] Add `URL::forceHttps()` to enforce HTTPS scheme for URLs by [@dasundev](https://github.com/dasundev) in https://github.com/laravel/framework/pull/53381
+* [11.x] Refactor and add remaining test cases for the DatabaseUuidFailedJobProviderTest class by [@kevinb1989](https://github.com/kevinb1989) in https://github.com/laravel/framework/pull/53408
+* [11.X] Postgres Aurora failover - DetectsLostConnections by [@vifer](https://github.com/vifer) in https://github.com/laravel/framework/pull/53404
+* `whereFullText` case consistency by [@parth391](https://github.com/parth391) in https://github.com/laravel/framework/pull/53395
+* [11.x] Add `HasFactory` trait to `make:model` generation command using `--all` options by [@adel007gh](https://github.com/adel007gh) in https://github.com/laravel/framework/pull/53391
+* Introduce support for popping items from a stackable context item by [@denjaland](https://github.com/denjaland) in https://github.com/laravel/framework/pull/53403
+* [11.x] Test Improvements by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/53414
+* [11.x] Add ability to dynamically build mailers on-demand using `Mail::build` by [@stevebauman](https://github.com/stevebauman) in https://github.com/laravel/framework/pull/53411
+* [11.x] Refactor and add remaining test cases for the DatabaseFailedJobProviderTest class by [@kevinb1989](https://github.com/kevinb1989) in https://github.com/laravel/framework/pull/53409
+* [11.x] Fix error event listener in Vite prefetching by [@jnoordsij](https://github.com/jnoordsij) in https://github.com/laravel/framework/pull/53439
+* [11.x] Ensure datetime cache durations account for script execution time by [@timacdonald](https://github.com/timacdonald) in https://github.com/laravel/framework/pull/53431
+* [11.x] Fix fluent syntax for HasManyThrough when combining HasMany followed by HasOne by [@jnoordsij](https://github.com/jnoordsij) in https://github.com/laravel/framework/pull/53335
+* Correct parameter type of Collection::diffKeys() and Collection::diffKeysUsing() by [@AJenbo](https://github.com/AJenbo) in https://github.com/laravel/framework/pull/53441
+* Correct parameter type of Collection::intersectByKeys() by [@AJenbo](https://github.com/AJenbo) in https://github.com/laravel/framework/pull/53444
+* Fix schema foreign ID support for tables with non-standard primary key by [@willrowe](https://github.com/willrowe) in https://github.com/laravel/framework/pull/53442
+* [11.x] Cache token repository by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/53428
+* Fix validation message when there is a parameter with escaped dot "." by [@mdmahbubhelal](https://github.com/mdmahbubhelal) in https://github.com/laravel/framework/pull/53416
+* [11.x] add optional prefix for cache key by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/53448
+* [11.x] Do not overwrite existing link header(s) in `AddLinkHeadersForPreloadedAssets` middleware by [@jnoordsij](https://github.com/jnoordsij) in https://github.com/laravel/framework/pull/53463
+* [11.x] use assertTrue and assertFalse method, instead of using assertE… by [@iamyusuf](https://github.com/iamyusuf) in https://github.com/laravel/framework/pull/53453
+* [11.x] Add `DB::build` method by [@stevebauman](https://github.com/stevebauman) in https://github.com/laravel/framework/pull/53464
+* [11.x] Add ability to dynamically build cache repositories on-demand using `Cache::build` by [@stevebauman](https://github.com/stevebauman) in https://github.com/laravel/framework/pull/53454
+* [11.x] Skip the number of connections transacting while testing to run callbacks by [@tonysm](https://github.com/tonysm) in https://github.com/laravel/framework/pull/53377
 
 ## [v11.30.0](https://github.com/laravel/framework/compare/v11.29.0...v11.30.0) - 2024-10-30
 
