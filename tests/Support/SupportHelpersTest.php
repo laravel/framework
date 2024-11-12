@@ -509,8 +509,8 @@ class SupportHelpersTest extends TestCase
         );
 
         $this->assertEquals(
-            ['foo' => 'barboom'],
-            data_set($data, 'foo', fn ($old) => $old.'boom')
+            ['foo' => ['bar' => 'boomboom'], 'baz' => ['bar' => ['boom' => ['kaboom' => 'boom']]]],
+            data_set($data, 'foo.bar', fn ($old) => $old.'boom')
         );
     }
 
@@ -539,8 +539,8 @@ class SupportHelpersTest extends TestCase
         );
 
         $this->assertEquals(
-            ['foo' => [], 'bar' => ['overwritten', 'overwritten']],
-            data_set($data, 'bar.*', fn ($old) => 'overwritten')
+            ['foo' => [], 'bar' => ['overwrittenboom', 'overwrittenboom']],
+            data_set($data, 'bar.*', fn ($old) => $old.'boom')
         );
     }
 
