@@ -2,6 +2,8 @@
 
 namespace Illuminate\Console\Scheduling;
 
+use Random\Engine;
+use Random\Randomizer;
 use Illuminate\Support\Carbon;
 use InvalidArgumentException;
 
@@ -321,6 +323,19 @@ trait ManagesFrequencies
     public function daily()
     {
         return $this->hourBasedSchedule(0, 0);
+    }
+
+    /**
+     * Schedule the event to run daily at random time.
+     *
+     * @param \Random\Engine|null $engine
+     * @return $this
+     */
+    public function dailyAtRandomTime(?Engine $engine = null)
+    {
+        $randomizer = (new Randomizer($engine ?? new SeededRandomEngine(sha1($this->buildCommand()))));
+
+        return $this->at($randomizer->getInt(0, 23) . ':' . $randomizer->getInt(0, 59));
     }
 
     /**
