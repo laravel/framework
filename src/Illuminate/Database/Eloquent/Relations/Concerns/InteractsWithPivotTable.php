@@ -538,7 +538,7 @@ trait InteractsWithPivotTable
     /**
      * Get a new plain query builder for the pivot table.
      *
-     * @return \Illuminate\Database\Query\Builder
+     * @return \Illuminate\Database\Query\Builder<\PDO::FETCH_OBJ>
      */
     public function newPivotStatement()
     {
@@ -549,7 +549,7 @@ trait InteractsWithPivotTable
      * Get a new pivot statement for a given "other" ID.
      *
      * @param  mixed  $id
-     * @return \Illuminate\Database\Query\Builder
+     * @return \Illuminate\Database\Query\Builder<\PDO::FETCH_OBJ>
      */
     public function newPivotStatementForId($id)
     {
@@ -559,7 +559,7 @@ trait InteractsWithPivotTable
     /**
      * Create a new query builder for the pivot table.
      *
-     * @return \Illuminate\Database\Query\Builder
+     * @return \Illuminate\Database\Query\Builder<\PDO::FETCH_OBJ>
      */
     public function newPivotQuery()
     {

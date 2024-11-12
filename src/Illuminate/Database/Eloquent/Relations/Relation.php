@@ -316,7 +316,7 @@ abstract class Relation implements BuilderContract
     /**
      * Get the base query builder driving the Eloquent builder.
      *
-     * @return \Illuminate\Database\Query\Builder
+     * @return \Illuminate\Database\Query\Builder<\PDO::FETCH_OBJ>
      */
     public function getBaseQuery()
     {
@@ -326,7 +326,7 @@ abstract class Relation implements BuilderContract
     /**
      * Get a base query builder instance.
      *
-     * @return \Illuminate\Database\Query\Builder
+     * @return \Illuminate\Database\Query\Builder<\PDO::FETCH_OBJ>
      */
     public function toBase()
     {

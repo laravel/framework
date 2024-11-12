@@ -1607,7 +1607,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Get a new query builder instance for the connection.
      *
-     * @return \Illuminate\Database\Query\Builder
+     * @return \Illuminate\Database\Query\Builder<\PDO::FETCH_OBJ>
      */
     protected function newBaseQueryBuilder()
     {

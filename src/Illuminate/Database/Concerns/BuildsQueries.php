@@ -21,6 +21,7 @@ use RuntimeException;
 
 /**
  * @template TValue
+ * @template TFetchMode of \PDO::FETCH_*|false
  *
  * @mixin \Illuminate\Database\Eloquent\Builder
  * @mixin \Illuminate\Database\Query\Builder
@@ -337,7 +338,7 @@ trait BuildsQueries
      * Execute the query and get the first result.
      *
      * @param  array|string  $columns
-     * @return TValue|null
+     * @return (TFetchMode is false ? TValue : (TFetchMode is 1|5|8|9 ? object : array))|null
      */
     public function first($columns = ['*'])
     {
@@ -349,7 +350,7 @@ trait BuildsQueries
      *
      * @param  array|string  $columns
      * @param  string|null  $message
-     * @return TValue
+     * @return (TFetchMode is false ? TValue : (TFetchMode is 1|5|8|9 ? object : array))
      *
      * @throws \Illuminate\Database\RecordNotFoundException
      */
@@ -366,7 +367,7 @@ trait BuildsQueries
      * Execute the query and get the first result if it's the sole matching record.
      *
      * @param  array|string  $columns
-     * @return TValue
+     * @return (TFetchMode is false ? TValue : (TFetchMode is 1|5|8|9 ? object : array))
      *
      * @throws \Illuminate\Database\RecordsNotFoundException
      * @throws \Illuminate\Database\MultipleRecordsFoundException

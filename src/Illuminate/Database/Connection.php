@@ -312,7 +312,7 @@ class Connection implements ConnectionInterface
      *
      * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Contracts\Database\Query\Expression|string  $table
      * @param  string|null  $as
-     * @return \Illuminate\Database\Query\Builder
+     * @return \Illuminate\Database\Query\Builder<\PDO::FETCH_OBJ>
      */
     public function table($table, $as = null)
     {
@@ -322,7 +322,7 @@ class Connection implements ConnectionInterface
     /**
      * Get a new query builder instance.
      *
-     * @return \Illuminate\Database\Query\Builder
+     * @return \Illuminate\Database\Query\Builder<\PDO::FETCH_OBJ>
      */
     public function query()
     {
@@ -661,8 +661,10 @@ class Connection implements ConnectionInterface
     /**
      * Execute the given callback without "pretending".
      *
-     * @param  \Closure  $callback
-     * @return mixed
+     * @template TResult
+     *
+     * @param  \Closure():TResult  $callback
+     * @return TResult
      */
     public function withoutPretending(Closure $callback)
     {
@@ -682,8 +684,10 @@ class Connection implements ConnectionInterface
     /**
      * Execute the given callback in "dry run" mode.
      *
-     * @param  \Closure  $callback
-     * @return array
+     * @template TResult of array
+     *
+     * @param  \Closure():TResult  $callback
+     * @return TResult
      */
     protected function withFreshQueryLog($callback)
     {

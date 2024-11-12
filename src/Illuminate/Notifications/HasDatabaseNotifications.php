@@ -17,7 +17,7 @@ trait HasDatabaseNotifications
     /**
      * Get the entity's read notifications.
      *
-     * @return \Illuminate\Database\Query\Builder
+     * @return \Illuminate\Database\Query\Builder<\PDO::FETCH_OBJ>
      */
     public function readNotifications()
     {
@@ -27,7 +27,7 @@ trait HasDatabaseNotifications
     /**
      * Get the entity's unread notifications.
      *
-     * @return \Illuminate\Database\Query\Builder
+     * @return \Illuminate\Database\Query\Builder<\PDO::FETCH_OBJ>
      */
     public function unreadNotifications()
     {

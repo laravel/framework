@@ -12,7 +12,10 @@ use User;
 
 use function PHPStan\Testing\assertType;
 
-/** @param \Illuminate\Database\Eloquent\Builder<\User> $query */
+/**
+ * @param  \Illuminate\Database\Eloquent\Builder<\User>  $query
+ * @param  \Illuminate\Database\Query\Builder<\PDO::FETCH_OBJ>  $queryBuilder
+ */
 function test(
     Builder $query,
     Post $post,

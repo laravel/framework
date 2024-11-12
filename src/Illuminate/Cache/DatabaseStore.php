@@ -424,7 +424,7 @@ class DatabaseStore implements LockProvider, Store
     /**
      * Get a query builder for the cache table.
      *
-     * @return \Illuminate\Database\Query\Builder
+     * @return \Illuminate\Database\Query\Builder<\PDO::FETCH_OBJ>
      */
     protected function table()
     {

@@ -11,7 +11,7 @@ interface ConnectionInterface
      *
      * @param  \Closure|\Illuminate\Database\Query\Builder|string  $table
      * @param  string|null  $as
-     * @return \Illuminate\Database\Query\Builder
+     * @return \Illuminate\Database\Query\Builder<\PDO::FETCH_OBJ>
      */
     public function table($table, $as = null);
 

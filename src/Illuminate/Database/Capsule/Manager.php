@@ -80,7 +80,7 @@ class Manager
      * @param  \Closure|\Illuminate\Database\Query\Builder|string  $table
      * @param  string|null  $as
      * @param  string|null  $connection
-     * @return \Illuminate\Database\Query\Builder
+     * @return \Illuminate\Database\Query\Builder<\PDO::FETCH_OBJ>
      */
     public static function table($table, $as = null, $connection = null)
     {

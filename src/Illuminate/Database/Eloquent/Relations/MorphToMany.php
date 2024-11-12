@@ -127,7 +127,7 @@ class MorphToMany extends BelongsToMany
     /**
      * Create a new query builder for the pivot table.
      *
-     * @return \Illuminate\Database\Query\Builder
+     * @return \Illuminate\Database\Query\Builder<\PDO::FETCH_OBJ>
      */
     public function newPivotQuery()
     {

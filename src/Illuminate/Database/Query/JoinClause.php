@@ -125,7 +125,7 @@ class JoinClause extends Builder
     /**
      * Create a new query instance for sub-query.
      *
-     * @return \Illuminate\Database\Query\Builder
+     * @return \Illuminate\Database\Query\Builder<\PDO::FETCH_OBJ>
      */
     protected function forSubQuery()
     {
@@ -135,7 +135,7 @@ class JoinClause extends Builder
     /**
      * Create a new parent query instance.
      *
-     * @return \Illuminate\Database\Query\Builder
+     * @return \Illuminate\Database\Query\Builder<\PDO::FETCH_OBJ>
      */
     protected function newParentQuery()
     {

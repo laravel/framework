@@ -176,7 +176,7 @@ class DatabaseUuidFailedJobProvider implements CountableFailedJobProvider, Faile
     /**
      * Get a new query builder instance for the table.
      *
-     * @return \Illuminate\Database\Query\Builder
+     * @return \Illuminate\Database\Query\Builder<\PDO::FETCH_OBJ>
      */
     protected function getTable()
     {

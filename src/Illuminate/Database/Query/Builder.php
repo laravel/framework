@@ -31,9 +31,12 @@ use UnitEnum;
 
 use function Illuminate\Support\enum_value;
 
+/**
+ * @template TFetchMode of \PDO::FETCH_*
+ */
 class Builder implements BuilderContract
 {
-    /** @use \Illuminate\Database\Concerns\BuildsQueries<object> */
+    /** @use \Illuminate\Database\Concerns\BuildsQueries<array|object,TFetchMode> */
     use BuildsQueries, ExplainsQueries, ForwardsCalls, Macroable {
         __call as macroCall;
     }
@@ -1790,7 +1793,7 @@ class Builder implements BuilderContract
     /**
      * Create a new query instance for nested where condition.
      *
-     * @return \Illuminate\Database\Query\Builder
+     * @return \Illuminate\Database\Query\Builder<\PDO::FETCH_OBJ>
      */
     public function forNestedWhere()
     {
@@ -3030,7 +3033,7 @@ class Builder implements BuilderContract
      *
      * @param  int|string  $id
      * @param  array|string  $columns
-     * @return object|null
+     * @return (TFetchMode is 1|5|8|9 ? object : array)|null
      */
     public function find($id, $columns = ['*'])
     {
@@ -3045,7 +3048,7 @@ class Builder implements BuilderContract
      * @param  mixed  $id
      * @param  (\Closure(): TValue)|list<string>|string  $columns
      * @param  (\Closure(): TValue)|null  $callback
-     * @return object|TValue
+     * @return ($columns is Closure ? TValue|(TFetchMode is 1|5|8|9 ? object : array) : ($callback is Closure ? TValue|(TFetchMode is 1|5|8|9 ? object : array) : (TFetchMode is 1|5|8|9 ? object : array)))
      */
     public function findOr($id, $columns = ['*'], ?Closure $callback = null)
     {
@@ -3530,8 +3533,10 @@ class Builder implements BuilderContract
     /**
      * Execute the given callback if no rows exist for the current query.
      *
-     * @param  \Closure  $callback
-     * @return mixed
+     * @template TResult
+     *
+     * @param  \Closure():TResult  $callback
+     * @return true|TResult
      */
     public function existsOr(Closure $callback)
     {
@@ -3541,8 +3546,10 @@ class Builder implements BuilderContract
     /**
      * Execute the given callback if rows exist for the current query.
      *
-     * @param  \Closure  $callback
-     * @return mixed
+     * @template TResult
+     *
+     * @param  \Closure():TResult  $callback
+     * @return true|TResult
      */
     public function doesntExistOr(Closure $callback)
     {
@@ -3690,9 +3697,11 @@ class Builder implements BuilderContract
      *
      * After running the callback, the columns are reset to the original value.
      *
+     * @template TResult
+     *
      * @param  array  $columns
-     * @param  callable  $callback
-     * @return mixed
+     * @param  callable():TResult  $callback
+     * @return TResult
      */
     protected function onceWithColumns($columns, $callback)
     {
@@ -4086,7 +4095,7 @@ class Builder implements BuilderContract
     /**
      * Get a new instance of the query builder.
      *
-     * @return \Illuminate\Database\Query\Builder
+     * @return \Illuminate\Database\Query\Builder<\PDO::FETCH_OBJ>
      */
     public function newQuery()
     {
@@ -4096,7 +4105,7 @@ class Builder implements BuilderContract
     /**
      * Create a new query instance for a sub-query.
      *
-     * @return \Illuminate\Database\Query\Builder
+     * @return \Illuminate\Database\Query\Builder<\PDO::FETCH_OBJ>
      */
     protected function forSubQuery()
     {

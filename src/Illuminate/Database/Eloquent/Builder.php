@@ -33,7 +33,7 @@ use ReflectionMethod;
  */
 class Builder implements BuilderContract
 {
-    /** @use \Illuminate\Database\Concerns\BuildsQueries<TModel> */
+    /** @use \Illuminate\Database\Concerns\BuildsQueries<TModel,false> */
     use BuildsQueries, ForwardsCalls, QueriesRelationships {
         BuildsQueries::sole as baseSole;
     }
@@ -1797,7 +1797,7 @@ class Builder implements BuilderContract
     /**
      * Get the underlying query builder instance.
      *
-     * @return \Illuminate\Database\Query\Builder
+     * @return \Illuminate\Database\Query\Builder<\PDO::FETCH_OBJ>
      */
     public function getQuery()
     {
@@ -1820,7 +1820,7 @@ class Builder implements BuilderContract
     /**
      * Get a base query builder instance.
      *
-     * @return \Illuminate\Database\Query\Builder
+     * @return \Illuminate\Database\Query\Builder<\PDO::FETCH_OBJ>
      */
     public function toBase()
     {

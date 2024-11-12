@@ -199,7 +199,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
     /**
      * Get a query builder for the migration table.
      *
-     * @return \Illuminate\Database\Query\Builder
+     * @return \Illuminate\Database\Query\Builder<\PDO::FETCH_OBJ>
      */
     protected function table()
     {

@@ -75,7 +75,7 @@ class DatabasePresenceVerifier implements DatabasePresenceVerifierInterface
      *
      * @param  \Illuminate\Database\Query\Builder  $query
      * @param  array  $conditions
-     * @return \Illuminate\Database\Query\Builder
+     * @return \Illuminate\Database\Query\Builder<\PDO::FETCH_OBJ>
      */
     protected function addConditions($query, $conditions)
     {
@@ -117,7 +117,7 @@ class DatabasePresenceVerifier implements DatabasePresenceVerifierInterface
      * Get a query builder for the given table.
      *
      * @param  string  $table
-     * @return \Illuminate\Database\Query\Builder
+     * @return \Illuminate\Database\Query\Builder<\PDO::FETCH_OBJ>
      */
     protected function table($table)
     {
