@@ -6,11 +6,11 @@ use Illuminate\Console\Command;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolverInterface;
+use Illuminate\Database\DmConnection;
 use Illuminate\Database\Events\SchemaDumped;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Config;
 use Symfony\Component\Console\Attribute\AsCommand;
-use Illuminate\Database\DmConnection;
 
 #[AsCommand(name: 'schema:dump')]
 class DumpCommand extends Command

@@ -10,18 +10,18 @@ use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\Expression as Raw;
+use Illuminate\Database\Query\Grammars\DmGrammar;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Grammars\MariaDbGrammar;
 use Illuminate\Database\Query\Grammars\MySqlGrammar;
 use Illuminate\Database\Query\Grammars\PostgresGrammar;
 use Illuminate\Database\Query\Grammars\SQLiteGrammar;
 use Illuminate\Database\Query\Grammars\SqlServerGrammar;
-use Illuminate\Database\Query\Grammars\DmGrammar;
 use Illuminate\Database\Query\JoinClause;
+use Illuminate\Database\Query\Processors\DmProcessor;
 use Illuminate\Database\Query\Processors\MySqlProcessor;
 use Illuminate\Database\Query\Processors\PostgresProcessor;
 use Illuminate\Database\Query\Processors\Processor;
-use Illuminate\Database\Query\Processors\DmProcessor;
 use Illuminate\Database\RecordNotFoundException;
 use Illuminate\Pagination\AbstractPaginator as Paginator;
 use Illuminate\Pagination\Cursor;
@@ -4465,9 +4465,6 @@ class DatabaseQueryBuilderTest extends TestCase
         $result = $builder->from('users')->join('contacts', 'users.id', '=', 'contacts.id')->delete();
         $this->assertEquals(1, $result);
 
-		
-		
-		
         $builder = $this->getDmBuilder();
         $builder->getConnection()->shouldReceive('delete')->once()->with('delete "users" from "users" inner join "contacts" on "users"."id" = "contacts"."id" where "users"."email" = ?', [0 => 'foo'])->andReturn(1);
         $result = $builder->from('users')->join('contacts', 'users.id', '=', 'contacts.id')->where('users.email', '=', 'foo')->delete();
@@ -6930,6 +6927,7 @@ SQL;
         $builder->select('*')->from('users')->whereJsonDoesntContainKey('options->languages[0][1]');
         $this->assertSame('select * from "users" where not ifnull(json_contains_path("options", \'one\', \'$."languages"[0][1]\'), 0)', $builder->toSql());
     }
+
     public function testWhereJsonLengthMySql()
     {
         $builder = $this->getMySqlBuilder();

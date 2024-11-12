@@ -3,11 +3,11 @@
 namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Connectors\Connector;
+use Illuminate\Database\Connectors\DmConnector;
 use Illuminate\Database\Connectors\MySqlConnector;
 use Illuminate\Database\Connectors\PostgresConnector;
 use Illuminate\Database\Connectors\SQLiteConnector;
 use Illuminate\Database\Connectors\SqlServerConnector;
-use Illuminate\Database\Connectors\DmConnector;
 use Mockery as m;
 use PDO;
 use PDOStatement;
@@ -85,7 +85,6 @@ class DatabaseConnectorTest extends TestCase
 
         $this->assertSame($result, $connection);
     }
-
 
     public function testDmConnectCallsCreateConnectionWithProperArguments()
     {

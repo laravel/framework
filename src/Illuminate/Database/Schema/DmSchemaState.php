@@ -15,11 +15,11 @@ class DmSchemaState extends SchemaState
      */
     public function dump(Connection $connection, $path)
     {
-		$command = $this->baseDumpCommand().' FILE="${:LARAVEL_LOAD_PATH}" ROWS=N NOLOG=Y DUMMY=Y';
-		$variables = array_merge($this->baseVariables($this->connection->getConfig()), [
-                'LARAVEL_LOAD_PATH' => $path,
-            ]);
-		$this->makeProcess($command)->mustRun($this->output, $variables);
+        $command = $this->baseDumpCommand().' FILE="${:LARAVEL_LOAD_PATH}" ROWS=N NOLOG=Y DUMMY=Y';
+        $variables = array_merge($this->baseVariables($this->connection->getConfig()), [
+            'LARAVEL_LOAD_PATH' => $path,
+        ]);
+        $this->makeProcess($command)->mustRun($this->output, $variables);
     }
 
     /**
@@ -30,11 +30,12 @@ class DmSchemaState extends SchemaState
      */
     public function load($path)
     {
-		if ($path=="schema/dm-schema.sql")
-			$path="schema/dm-schema.dmp";
+        if ($path == 'schema/dm-schema.sql') {
+            $path = 'schema/dm-schema.dmp';
+        }
 
         $command = 'dimp "${:LARAVEL_LOAD_USER}"/"${:LARAVEL_LOAD_PASSWORD}"@"${:LARAVEL_LOAD_HOST}":"${:LARAVEL_LOAD_PORT}" FILE="${:LARAVEL_LOAD_PATH}"';
-		
+
         $process = $this->makeProcess($command);
 
         $process->mustRun(null, array_merge($this->baseVariables($this->connection->getConfig()), [

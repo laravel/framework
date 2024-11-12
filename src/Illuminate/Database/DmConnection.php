@@ -2,14 +2,12 @@
 
 namespace Illuminate\Database;
 
-use Exception;
 use Illuminate\Database\Query\Grammars\DmGrammar as QueryGrammar;
 use Illuminate\Database\Query\Processors\DmProcessor;
-use Illuminate\Database\Schema\Grammars\DmGrammar as SchemaGrammar;
 use Illuminate\Database\Schema\DmBuilder;
 use Illuminate\Database\Schema\DmSchemaState;
+use Illuminate\Database\Schema\Grammars\DmGrammar as SchemaGrammar;
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Support\Str;
 use PDO;
 
 class DmConnection extends Connection
@@ -99,7 +97,7 @@ class DmConnection extends Connection
     public function setDateFormat($format = 'YYYY-MM-DD HH24:MI:SS')
     {
         $sessionVars = [
-            'NLS_DATE_FORMAT'      => $format,
+            'NLS_DATE_FORMAT' => $format,
             'NLS_TIMESTAMP_FORMAT' => $format,
         ];
 
@@ -124,7 +122,7 @@ class DmConnection extends Connection
     protected function getDefaultQueryGrammar()
     {
         ($grammar = new QueryGrammar)->setConnection($this);
-                
+
         return $this->withTablePrefix($grammar);
     }
 

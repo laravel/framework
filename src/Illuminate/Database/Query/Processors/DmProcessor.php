@@ -2,8 +2,6 @@
 
 namespace Illuminate\Database\Query\Processors;
 
-use Exception;
-use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Builder;
 
 class DmProcessor extends Processor
@@ -62,7 +60,7 @@ class DmProcessor extends Processor
 
             return [
                 'NAME' => $result->NAME,
-                'SCHNAME' => $result->SCHNAME ?? null, 
+                'SCHNAME' => $result->SCHNAME ?? null,
                 'CRTDATE' => $result->CRTDATE,
             ];
         }, $results);
@@ -107,9 +105,9 @@ class DmProcessor extends Processor
                 'auto_increment' => $result->AUTO_INCREMENT,
                 'comment' => $result->COL_COMMENT,
                 'length' => $result->LENGTH,
-                'virtual' => ($result->VIR_COL & 0x01) == 1 ? true : false
-                ];
-            }, $results);
+                'virtual' => ($result->VIR_COL & 0x01) == 1 ? true : false,
+             ];
+         }, $results);
     }
 
     /**

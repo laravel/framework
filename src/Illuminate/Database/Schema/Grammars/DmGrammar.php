@@ -21,7 +21,7 @@ class DmGrammar extends Grammar
      *
      * @var array
      */
-    protected $modifiers = ['Collate', 'Increment', 'Nullable', 'Default', 'VirtualAs','Comment'];
+    protected $modifiers = ['Collate', 'Increment', 'Nullable', 'Default', 'VirtualAs', 'Comment'];
 
     /**
      * The possible column serials.
@@ -89,19 +89,19 @@ class DmGrammar extends Grammar
         $this->schema_prefix = $prefix;
     }
 
-     /**
+    /**
      * Compile the query to determine the id of the table.
      *
      * @param  string  $schema
      * @param  string  $table
      * @return string
      */
-    public function compileTableId($schema,$table)
+    public function compileTableId($schema, $table)
     {
-        return sprintf('select ID from SYSOBJECTS where name = %s and SCHID = (select ID from SYSOBJECTS where name = %s and TYPE$ = \'SCH\')',$this->quoteString($table),$this->quoteString($schema));
-    }
+        return sprintf('select ID from SYSOBJECTS where name = %s and SCHID = (select ID from SYSOBJECTS where name = %s and TYPE$ = \'SCH\')', $this->quoteString($table), $this->quoteString($schema));
+     }
 
-     /**
+    /**
      * Compile the query to determine the id of the schema.
      *
      * @param  string  $schema
@@ -109,7 +109,7 @@ class DmGrammar extends Grammar
      */
     public function compileSchemaId($schema)
     {
-        return sprintf('select ID from SYSOBJECTS where name = %s and TYPE$ = \'SCH\'',$this->quoteString($schema));
+        return sprintf('select ID from SYSOBJECTS where name = %s and TYPE$ = \'SCH\'', $this->quoteString($schema));
     }
     
     /**
@@ -122,9 +122,9 @@ class DmGrammar extends Grammar
     public function compileIndexes($schemaId, $tableId)
     {
         return sprintf(
-        'SELECT DISTINCT IND_OBJ.NAME, IND_OBJ.ID AS INDEXID, INDS.ISUNIQUE, INDS.XTYPE, INDS.GROUPID, INDS.TYPE$ AS TYPE, INDS.INIT_EXTENTS, INDS.BATCH_ALLOC, INDS.MIN_EXTENTS, FBI_DEF(IND_OBJ.ID), IND_OBJ.CRTDATE, SCH_OBJ.ID, SCH_OBJ.NAME AS SCHNAME, TAB_OBJ.ID, TAB_OBJ.NAME AS TABNAME, INDEX_USED_PAGES(IND_OBJ.ID)*(PAGE/1024), IND_OBJ.VALID, INDEX_USED_SPACE(IND_OBJ.ID)*(PAGE/1024), (SELECT MONITORING FROM V$OBJECT_USAGE WHERE INDEX_NAME=IND_OBJ.NAME AND SCH_NAME = SCH_OBJ.NAME) MONITORING, IND_OBJ.INFO7 FROM (SELECT * FROM SYSINDEXES WHERE ROOTFILE != -1 OR (XTYPE & 0X1000) = 0X1000 OR (XTYPE & 0X2000) = 0X2000 OR (XTYPE & 0X08) = 0X08 OR (FLAG & 0X08) = 0X08 OR (XTYPE & 0X8000) = 0X8000 OR (XTYPE & 0X40) = 0X40) INDS, SYSCOLUMNS COLS, (SELECT DISTINCT IND_OBJ_INNER.ID, IND_OBJ_INNER.NAME, IND_OBJ_INNER.CRTDATE, IND_OBJ_INNER.PID, IND_OBJ_INNER.VALID, IND_OBJ_INNER.INFO7 FROM SYSOBJECTS IND_OBJ_INNER WHERE IND_OBJ_INNER.SUBTYPE$ = \'INDEX\') IND_OBJ, (SELECT ID, NAME, SCHID FROM SYSOBJECTS WHERE TYPE$=\'SCHOBJ\' AND SUBTYPE$ LIKE \'_TAB\' AND  ID = %d) TAB_OBJ, (SELECT ID, NAME FROM SYSOBJECTS WHERE TYPE$=\'SCH\' AND  ID = %d) SCH_OBJ WHERE INDS.ID=IND_OBJ.ID AND IND_OBJ.PID=TAB_OBJ.ID AND TAB_OBJ.SCHID=SCH_OBJ.ID  AND COLS.ID = IND_OBJ.PID AND (SF_COL_IS_IDX_KEY(INDS.KEYNUM, INDS.KEYINFO, COLS.COLID)=1 OR (INDS.XTYPE & 0X1000) = 0X1000 OR (INDS.XTYPE & 0X2000) = 0X2000 OR (XTYPE & 0X08) = 0X08) ORDER BY IND_OBJ.NAME ',
-        $tableId,
-        $schemaId
+            'SELECT DISTINCT IND_OBJ.NAME, IND_OBJ.ID AS INDEXID, INDS.ISUNIQUE, INDS.XTYPE, INDS.GROUPID, INDS.TYPE$ AS TYPE, INDS.INIT_EXTENTS, INDS.BATCH_ALLOC, INDS.MIN_EXTENTS, FBI_DEF(IND_OBJ.ID), IND_OBJ.CRTDATE, SCH_OBJ.ID, SCH_OBJ.NAME AS SCHNAME, TAB_OBJ.ID, TAB_OBJ.NAME AS TABNAME, INDEX_USED_PAGES(IND_OBJ.ID)*(PAGE/1024), IND_OBJ.VALID, INDEX_USED_SPACE(IND_OBJ.ID)*(PAGE/1024), (SELECT MONITORING FROM V$OBJECT_USAGE WHERE INDEX_NAME=IND_OBJ.NAME AND SCH_NAME = SCH_OBJ.NAME) MONITORING, IND_OBJ.INFO7 FROM (SELECT * FROM SYSINDEXES WHERE ROOTFILE != -1 OR (XTYPE & 0X1000) = 0X1000 OR (XTYPE & 0X2000) = 0X2000 OR (XTYPE & 0X08) = 0X08 OR (FLAG & 0X08) = 0X08 OR (XTYPE & 0X8000) = 0X8000 OR (XTYPE & 0X40) = 0X40) INDS, SYSCOLUMNS COLS, (SELECT DISTINCT IND_OBJ_INNER.ID, IND_OBJ_INNER.NAME, IND_OBJ_INNER.CRTDATE, IND_OBJ_INNER.PID, IND_OBJ_INNER.VALID, IND_OBJ_INNER.INFO7 FROM SYSOBJECTS IND_OBJ_INNER WHERE IND_OBJ_INNER.SUBTYPE$ = \'INDEX\') IND_OBJ, (SELECT ID, NAME, SCHID FROM SYSOBJECTS WHERE TYPE$=\'SCHOBJ\' AND SUBTYPE$ LIKE \'_TAB\' AND  ID = %d) TAB_OBJ, (SELECT ID, NAME FROM SYSOBJECTS WHERE TYPE$=\'SCH\' AND  ID = %d) SCH_OBJ WHERE INDS.ID=IND_OBJ.ID AND IND_OBJ.PID=TAB_OBJ.ID AND TAB_OBJ.SCHID=SCH_OBJ.ID  AND COLS.ID = IND_OBJ.PID AND (SF_COL_IS_IDX_KEY(INDS.KEYNUM, INDS.KEYINFO, COLS.COLID)=1 OR (INDS.XTYPE & 0X1000) = 0X1000 OR (INDS.XTYPE & 0X2000) = 0X2000 OR (XTYPE & 0X08) = 0X08) ORDER BY IND_OBJ.NAME ',
+            $tableId,
+            $schemaId
         );
     }
 
@@ -138,9 +138,9 @@ class DmGrammar extends Grammar
     public function compileIndexColumns($indexId, $tableId)
     {
         return sprintf(
-        'SELECT COLS.NAME, COLS.TYPE$, SF_GET_INDEX_KEY_ORDER(INDS.KEYNUM, INDS.KEYINFO, COLS.COLID), SF_GET_INDEX_KEY_SEQ(INDS.KEYNUM, INDS.KEYINFO, COLS.COLID) SEQ FROM SYSCOLUMNS COLS, SYSINDEXES INDS WHERE INDS.ID = %d AND COLS.ID = %d AND SF_COL_IS_IDX_KEY(INDS.KEYNUM, INDS.KEYINFO, COLS.COLID) = 1 ORDER BY SEQ;',
-        $indexId,
-        $tableId
+            'SELECT COLS.NAME, COLS.TYPE$, SF_GET_INDEX_KEY_ORDER(INDS.KEYNUM, INDS.KEYINFO, COLS.COLID), SF_GET_INDEX_KEY_SEQ(INDS.KEYNUM, INDS.KEYINFO, COLS.COLID) SEQ FROM SYSCOLUMNS COLS, SYSINDEXES INDS WHERE INDS.ID = %d AND COLS.ID = %d AND SF_COL_IS_IDX_KEY(INDS.KEYNUM, INDS.KEYINFO, COLS.COLID) = 1 ORDER BY SEQ;',
+            $indexId,
+            $tableId
         );
     }
 
@@ -154,9 +154,9 @@ class DmGrammar extends Grammar
     public function compileForeignKeys($schema, $table)
     {
         return sprintf(
-        'select col.table_name,col.constraint_name,col.OWNER,listagg(col.column_name, \',\') as COL_NAME from syscons syc, sysobjects syo, all_cons_columns col where syc.id = syo.id and syc.type$ = \'F\' and syo.name = col.constraint_name and table_name = %s  and col.owner= %s group by (col.table_name, col.constraint_name, col.OWNER)',
-        $this->quoteString($table),
-        $this->quoteString($schema)
+            'select col.table_name,col.constraint_name,col.OWNER,listagg(col.column_name, \',\') as COL_NAME from syscons syc, sysobjects syo, all_cons_columns col where syc.id = syo.id and syc.type$ = \'F\' and syo.name = col.constraint_name and table_name = %s  and col.owner= %s group by (col.table_name, col.constraint_name, col.OWNER)',
+            $this->quoteString($table),
+            $this->quoteString($schema)
         );
     }
 
@@ -166,15 +166,15 @@ class DmGrammar extends Grammar
      * @param  string  $constraint_name
      * @return string
      */
-    public function compileForeignReference($constraint_name)
-    {
-        return sprintf(
-        'select OWNER,CONSTRAINT_NAME,TABLE_NAME,listagg(column_name, \',\') as COLUMNS 
-        from all_cons_columns col, (select R_CONSTRAINT_NAME from dba_constraints where constraint_name = %s) con where  col.constraint_name = con.R_CONSTRAINT_NAME
-        group by (OWNER,CONSTRAINT_NAME,TABLE_NAME)',
-        $this->quoteString($constraint_name)
-        );
-    }
+     public function compileForeignReference($constraint_name)
+     {
+         return sprintf(
+            'select OWNER,CONSTRAINT_NAME,TABLE_NAME,listagg(column_name, \',\') as COLUMNS 
+         from all_cons_columns col, (select R_CONSTRAINT_NAME from dba_constraints where constraint_name = %s) con where  col.constraint_name = con.R_CONSTRAINT_NAME
+         group by (OWNER,CONSTRAINT_NAME,TABLE_NAME)',
+            $this->quoteString($constraint_name)
+         );
+     }
 
     /**
      * Compile the columns determine if an auto_increment column.
@@ -184,7 +184,7 @@ class DmGrammar extends Grammar
      */
     public function compileIdentityColumns($tableId)
     {
-        return sprintf('select NAME from SYSCOLUMNS where ID = %d and INFO2 & 0x01 = 0x01',$tableId[0]->ID);
+        return sprintf('select NAME from SYSCOLUMNS where ID = %d and INFO2 & 0x01 = 0x01', $tableId[0]->ID);
     }
 
     /**
@@ -198,10 +198,10 @@ class DmGrammar extends Grammar
     public function compileColumns($schema, $table, $tableID)
     {
         return sprintf(
-        'SELECT NAME, COLID, TYPE$ AS TYPE_NAME, LENGTH$ AS LENGTH, SCALE, NULLABLE$ AS NULLABLE, DEFVAL,(SELECT DISTINCT CYT_NAME FROM SYS.V$CIPHERS WHERE TRUE AND CYT_ID = (SELECT ENC_ID FROM SYSCOLCYT WHERE TID = COL.ID AND CID = COL.COLID)) ENC_NAME,(SELECT ENC_TYPE FROM SYSCOLCYT WHERE TID = COL.ID  AND CID = COL.COLID) ENC_TYPE,(SELECT DISTINCT CYT_NAME FROM SYS.V$CIPHERS WHERE TRUE AND CYT_ID = (SELECT HASH_ID FROM SYSCOLCYT WHERE TID = COL.ID  AND CID = COL.COLID)) HASH_NAME,(SELECT HASH_TYPE FROM SYSCOLCYT WHERE TID = COL.ID  AND CID = COL.COLID) HASH_TYPE, (SELECT CIPHER FROM SYSCOLCYT WHERE TID = COL.ID  AND CID = COL.COLID) CIPHER, (SELECT INFO1 FROM SYSCOLINFOS WHERE ID = COL.ID AND COLID = COL.COLID) VIR_COL, INFO1, (SELECT COMMENT$ FROM SYSCOLUMNCOMMENTS WHERE SCHNAME=%s AND TVNAME=%s AND COLNAME=COL.NAME AND TABLE_TYPE=\'TABLE\') COL_COMMENT FROM (SELECT A.NAME,A.ID,A.COLID, CASE WHEN B.INFO1 IS NULL OR (((B.INFO1>>2) & 0X01)=0 AND ((B.INFO1>>3) & 0X01)=0) THEN A.TYPE$ WHEN (B.INFO2 & 0XFF) = 0 THEN \'NUMBER\' WHEN ((B.INFO1>>3) & 0X01)=1 THEN \'DATE\' ELSE \'FLOAT\' END AS TYPE$,  CASE WHEN B.INFO1 IS NULL OR ((B.INFO1>>2) & 0X01)=0 THEN A.SCALE WHEN (B.INFO2 & 0XFF) = 0 THEN 0 ELSE 129 END AS SCALE,   CASE WHEN B.INFO1 IS NULL OR ((B.INFO1>>2) & 0X01)=0 THEN A.LENGTH$ ELSE (B.INFO2 & 0XFF) END AS LENGTH$,A.NULLABLE$,A.DEFVAL,A.INFO1,A.INFO2 FROM SYSCOLUMNS A LEFT JOIN SYSCOLINFOS B ON A.ID=B.ID AND A.COLID=B.COLID  WHERE A.ID =%d) COL;',
-        $this->quoteString($schema),
-        $this->quoteString($table),
-        $tableID[0]->ID,
+            'SELECT NAME, COLID, TYPE$ AS TYPE_NAME, LENGTH$ AS LENGTH, SCALE, NULLABLE$ AS NULLABLE, DEFVAL,(SELECT DISTINCT CYT_NAME FROM SYS.V$CIPHERS WHERE TRUE AND CYT_ID = (SELECT ENC_ID FROM SYSCOLCYT WHERE TID = COL.ID AND CID = COL.COLID)) ENC_NAME,(SELECT ENC_TYPE FROM SYSCOLCYT WHERE TID = COL.ID  AND CID = COL.COLID) ENC_TYPE,(SELECT DISTINCT CYT_NAME FROM SYS.V$CIPHERS WHERE TRUE AND CYT_ID = (SELECT HASH_ID FROM SYSCOLCYT WHERE TID = COL.ID  AND CID = COL.COLID)) HASH_NAME,(SELECT HASH_TYPE FROM SYSCOLCYT WHERE TID = COL.ID  AND CID = COL.COLID) HASH_TYPE, (SELECT CIPHER FROM SYSCOLCYT WHERE TID = COL.ID  AND CID = COL.COLID) CIPHER, (SELECT INFO1 FROM SYSCOLINFOS WHERE ID = COL.ID AND COLID = COL.COLID) VIR_COL, INFO1, (SELECT COMMENT$ FROM SYSCOLUMNCOMMENTS WHERE SCHNAME=%s AND TVNAME=%s AND COLNAME=COL.NAME AND TABLE_TYPE=\'TABLE\') COL_COMMENT FROM (SELECT A.NAME,A.ID,A.COLID, CASE WHEN B.INFO1 IS NULL OR (((B.INFO1>>2) & 0X01)=0 AND ((B.INFO1>>3) & 0X01)=0) THEN A.TYPE$ WHEN (B.INFO2 & 0XFF) = 0 THEN \'NUMBER\' WHEN ((B.INFO1>>3) & 0X01)=1 THEN \'DATE\' ELSE \'FLOAT\' END AS TYPE$,  CASE WHEN B.INFO1 IS NULL OR ((B.INFO1>>2) & 0X01)=0 THEN A.SCALE WHEN (B.INFO2 & 0XFF) = 0 THEN 0 ELSE 129 END AS SCALE,   CASE WHEN B.INFO1 IS NULL OR ((B.INFO1>>2) & 0X01)=0 THEN A.LENGTH$ ELSE (B.INFO2 & 0XFF) END AS LENGTH$,A.NULLABLE$,A.DEFVAL,A.INFO1,A.INFO2 FROM SYSCOLUMNS A LEFT JOIN SYSCOLINFOS B ON A.ID=B.ID AND A.COLID=B.COLID  WHERE A.ID =%d) COL;',
+            $this->quoteString($schema),
+            $this->quoteString($table),
+            $tableID[0]->ID,
         );
     }
 
@@ -213,8 +213,8 @@ class DmGrammar extends Grammar
      */
     public function compileClassName($classId)
     {
-        return sprintf('SELECT  PKG.NAME as PKG, SCH.NAME as SCH FROM SYSOBJECTS PKG, SYSOBJECTS SCH WHERE PKG.SCHID = SCH.ID AND PKG.TYPE$ = \'SCHOBJ\' AND ( PKG.SUBTYPE$ = \'CLASS\' OR PKG.SUBTYPE$ = \'JCLASS\' OR PKG.SUBTYPE$ = \'TYPE\' ) AND PKG.ID = %d', 
-        $classId);
+        return sprintf('SELECT  PKG.NAME as PKG, SCH.NAME as SCH FROM SYSOBJECTS PKG, SYSOBJECTS SCH WHERE PKG.SCHID = SCH.ID AND PKG.TYPE$ = \'SCHOBJ\' AND ( PKG.SUBTYPE$ = \'CLASS\' OR PKG.SUBTYPE$ = \'JCLASS\' OR PKG.SUBTYPE$ = \'TYPE\' ) AND PKG.ID = %d',
+            $classId);
     }
 
     /**
@@ -259,7 +259,7 @@ class DmGrammar extends Grammar
         (select distinct VIEW_OBJ_INNER.ID, VIEW_OBJ_INNER.NAME, VIEW_OBJ_INNER.INFO1, VIEW_OBJ_INNER.CRTDATE, VIEW_OBJ_INNER.SCHID, VIEW_OBJ_INNER.VALID from SYSOBJECTS VIEW_OBJ_INNER, SYSOBJECTS SCH_OBJ_INNER, SYSOBJECTS USER_OBJ_INNER where VIEW_OBJ_INNER.SUBTYPE$=\'VIEW\' 
         and (VIEW_OBJ_INNER.INFO1 & 0x001FFFE0)=0 and (VIEW_OBJ_INNER.INFO1 & 0x10)=0 and USER_OBJ_INNER.SUBTYPE$ = \'USER\' and SCH_OBJ_INNER.ID = VIEW_OBJ_INNER.SCHID and SCH_OBJ_INNER.PID = USER_OBJ_INNER.ID and SF_CHECK_PRIV_OPT(UID(), CURRENT_USERTYPE(), VIEW_OBJ_INNER.ID, USER_OBJ_INNER.ID, USER_OBJ_INNER.INFO1, VIEW_OBJ_INNER.ID) = 1) VIEW_OBJ,
         (select id, seqno, txt as defination from systexts where seqno = 0) VIEW_TXT  where SCH_OBJ.ID=VIEW_OBJ.SCHID and VIEW_OBJ.ID=VIEW_TXT.ID ORDER BY VIEW_OBJ.NAME',
-        $this->quoteString($schema));
+            $this->quoteString($schema));
     }
 
     /**
@@ -320,7 +320,7 @@ class DmGrammar extends Grammar
      */
     public function compileIndex(Blueprint $blueprint, Fluent $command)
     {
-        return "create index ".$this->wrap($command->index)." on ".$this->wrapTable($blueprint).' ('.$this->columnize($command->columns).')';
+        return 'create index '.$this->wrap($command->index).' on '.$this->wrapTable($blueprint).' ('.$this->columnize($command->columns).')';
     }
 
     /**
@@ -332,7 +332,7 @@ class DmGrammar extends Grammar
      */
     public function compileSpatialIndex(Blueprint $blueprint, Fluent $command)
     {
-        return "create spatial index ".$this->wrap($command->index)." on ".$this->wrapTable($blueprint).' ('.$this->columnize($command->columns).')';
+        return 'create spatial index '.$this->wrap($command->index).' on '.$this->wrapTable($blueprint).' ('.$this->columnize($command->columns).')';
     }
     
     /**
@@ -366,11 +366,10 @@ class DmGrammar extends Grammar
     public function compileDropAllViews($views)
     {
         $view_sql = 'select \''.$this->wrapArray($views)[0].'\' as view_name';
-        for ($i=1; $i < count($views); $i++)
-        {
+        for ($i = 1; $i < count($views); $i++) {
             $view_sql = $view_sql.' union select \''.$this->wrapArray($views)[$i].'\' as view_name';
         }
-        
+
         return 'BEGIN FOR c IN ('.$view_sql.') LOOP EXECUTE IMMEDIATE (\'DROP VIEW "\' || c.view_name || \'" CASCADE\'); END LOOP; END;';
     }
 
@@ -397,15 +396,14 @@ class DmGrammar extends Grammar
     {
         // $columns = $this->wrapArray($command->columns);
         $columns = $command->columns;
-        
+
         $table = $this->wrapTable($blueprint);
 
         // return 'alter table '.$table.' drop ( '.implode(', ', $columns).' )';
-        
+
         $colSql = 'select '.$this->quoteString($columns[0]).' as COL';
-        
-        for ($i = 1; $i < count($columns); $i++)
-        {
+
+        for ($i = 1; $i < count($columns); $i++) {
             $colSql = $colSql.' union select '.$this->quoteString($columns[$i]);
         }
         return'BEGIN FOR c IN ('.$colSql.') LOOP EXECUTE IMMEDIATE (\'alter table '.$table.' drop "\' || c.COL || \'"\'); END LOOP; END;';
@@ -436,10 +434,12 @@ class DmGrammar extends Grammar
 
         if ($type === 'index') {
             $sql = "drop index {$index}";
+
             return $sql;
         }
 
         $sql = "alter table {$table} drop constraint {$index}";
+
         return $sql;
     }
 
@@ -531,7 +531,7 @@ class DmGrammar extends Grammar
         );
     }
 
-        /**
+    /**
      * Compile a change column command into a series of SQL statements.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
@@ -615,7 +615,7 @@ class DmGrammar extends Grammar
      */
     protected function typeChar(Fluent $column)
     {
-        return (!is_null($column->length)) ? "char({$column->length})" : 'char';
+        return (! is_null($column->length)) ? "char({$column->length})" : 'char';
     }
 
     /**
@@ -696,7 +696,7 @@ class DmGrammar extends Grammar
      */
     protected function typeBigInteger(Fluent $column)
     {
-        return "bigint";
+        return 'bigint';
     }
 
     /**
@@ -718,7 +718,7 @@ class DmGrammar extends Grammar
      */
     protected function typeSmallInteger(Fluent $column)
     {
-        return "smallint";
+        return 'smallint';
     }
 
     /**
@@ -729,7 +729,7 @@ class DmGrammar extends Grammar
      */
     protected function typeTinyInteger(Fluent $column)
     {
-        return "tinyint";
+        return 'tinyint';
     }
 
     /**
@@ -755,7 +755,7 @@ class DmGrammar extends Grammar
      */
     protected function typeDouble(Fluent $column)
     {
-        return "double";
+        return 'double';
     }
 
     /**
@@ -817,7 +817,8 @@ class DmGrammar extends Grammar
         if ($column->useCurrent) {
             $column->default(new Expression('CURRENT_TIMESTAMP'));
         }
-        return (!is_null($column->precision)) ? "datetime($column->precision)" : 'datetime';
+
+        return (! is_null($column->precision)) ? "datetime($column->precision)" : 'datetime';
     }
 
     /**
@@ -831,7 +832,8 @@ class DmGrammar extends Grammar
         if ($column->useCurrent) {
             $column->default(new Expression('CURRENT_TIMESTAMP'));
         }
-        return (!is_null($column->precision)) ? "datetime($column->precision) with time zone" : 'datetime with time zone';
+
+        return (! is_null($column->precision)) ? "datetime($column->precision) with time zone" : 'datetime with time zone';
     }
 
     /**
@@ -867,7 +869,8 @@ class DmGrammar extends Grammar
         if ($column->useCurrent) {
             $column->default(new Expression('CURRENT_TIMESTAMP'));
         }
-        return (!is_null($column->precision)) ? "timestamp($column->precision)" : 'timestamp';
+
+        return (! is_null($column->precision)) ? "timestamp($column->precision)" : 'timestamp';
     }
 
     /**
@@ -881,7 +884,8 @@ class DmGrammar extends Grammar
         if ($column->useCurrent) {
             $column->default(new Expression('CURRENT_TIMESTAMP'));
         }
-        return (!is_null($column->precision)) ? "timestamp($column->precision) with time zone" : 'timestamp with time zone';
+
+        return (! is_null($column->precision)) ? "timestamp($column->precision) with time zone" : 'timestamp with time zone';
     }
 
     /**
@@ -903,7 +907,7 @@ class DmGrammar extends Grammar
      */
     protected function typeBinary(Fluent $column)
     {
-        if (!is_null($column->length)) {
+        if (! is_null($column->length)) {
             return $column->fixed ? "binary({$column->length})" : "varbinary({$column->length})";
         }
 
@@ -973,12 +977,13 @@ class DmGrammar extends Grammar
      */
     protected function typeGeometry(Fluent $column)
     {
-        if($column->subtype){
+        if ($column->subtype) {
             return sprintf('SYSGEO2.ST_Geometry %s %s',
                 'CHECK(type = '.$column->subtype.')',
                 $column->srid ? 'CHECK(srid = '.$column->srid.')' : ''
             );
         }
+
         return 'SYSGEO2.ST_Geometry';
     }
 
@@ -990,12 +995,13 @@ class DmGrammar extends Grammar
      */
     protected function typeGeography(Fluent $column)
     {
-        if($column->subtype){
+        if ($column->subtype) {
             return sprintf('SYSGEO2.ST_Geography %s %s',
                 'CHECK(type = '.$column->subtype.')',
                 $column->srid ? 'CHECK(srid = '.$column->srid.')' : ''
             );
         }
+
         return 'SYSGEO2.ST_Geography';
     }
 
@@ -1044,11 +1050,10 @@ class DmGrammar extends Grammar
      */
     protected function modifyNullable(Blueprint $blueprint, Fluent $column)
     {
-        if (!is_null($column->virtualAs) || !is_null($column->virtualAsJson)) {
+        if (! is_null($column->virtualAs) || ! is_null($column->virtualAsJson)) {
             if ($column->nullable === false) {
                 return ' not null';
-            }
-            else{
+            } else {
                 return;
             }
         }
@@ -1069,7 +1074,7 @@ class DmGrammar extends Grammar
     {
         // implemented @modifyNullable
         // return '';
-        
+
         if (! is_null($column->default)) {
             return ' default '.$this->getDefaultValue($column->default);
         }
@@ -1102,5 +1107,4 @@ class DmGrammar extends Grammar
             return " comment '".addslashes($column->comment)."'";
         }
     }
-
 }

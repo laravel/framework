@@ -3,15 +3,12 @@
 namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Connection;
-use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Builder;
+use Illuminate\Database\Schema\DmBuilder;
 use Illuminate\Database\Schema\ForeignIdColumnDefinition;
 use Illuminate\Database\Schema\Grammars\DmGrammar;
-use Illuminate\Database\Schema\DmBuilder;
 use Mockery as m;
-use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseDmSchemaGrammarTest extends TestCase
@@ -363,7 +360,6 @@ class DatabaseDmSchemaGrammarTest extends TestCase
             'alter table "users" add constraint "users_team_id_foreign" foreign key ("team_id") references "teams" ("id")',
             'alter table "users" add column("team_column_id" bigint not null)',
             'alter table "users" add constraint "users_team_column_id_foreign" foreign key ("team_column_id") references "teams" ("id")',
-            
         ], $statements);
     }
 
@@ -810,7 +806,7 @@ class DatabaseDmSchemaGrammarTest extends TestCase
         $blueprint->timestamps();
         $statements = $blueprint->toSql();
         $this->assertCount(2, $statements);
-        $this->assertSame( [
+        $this->assertSame([
             'alter table "users" add column("created_at" timestamp null)',
             'alter table "users" add column("updated_at" timestamp null)',
         ], $statements);
@@ -886,7 +882,7 @@ class DatabaseDmSchemaGrammarTest extends TestCase
     public function testAddingGeneratedColumn()
     {
         $blueprint = new Blueprint($this->getConnection(), 'users');
-		$blueprint->create();
+        $blueprint->create();
         $blueprint->integer('foo');
         $blueprint->integer('bar')->virtualAs('"foo" - 5');
         $statements = $blueprint->toSql();
@@ -895,7 +891,7 @@ class DatabaseDmSchemaGrammarTest extends TestCase
         $this->assertSame('create table "users" ("foo" int not null, "bar" int as ("foo" - 5))', $statements[0]);
 
         $blueprint = new Blueprint($this->getConnection(), 'users');
-		$blueprint->create();
+        $blueprint->create();
         $blueprint->integer('foo');
         $blueprint->integer('bar')->virtualAs('"foo" - 5')->nullable(false);
         $statements = $blueprint->toSql();
@@ -1090,7 +1086,7 @@ class DatabaseDmSchemaGrammarTest extends TestCase
     {
         return mock(DmBuilder::class);
     }
-	
+
     public function testGrammarsAreMacroable()
     {
         // compileReplace macro.

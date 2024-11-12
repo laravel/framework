@@ -92,14 +92,12 @@ class DmConnector extends Connector implements ConnectorInterface
     protected function setDSN(array $config)
     {
         $config['dsn'] = "dm:host={$config['host']};";
-        if ($config['port'])
-        {
-            $config['dsn'] = $config['dsn']."port={$config['port']};";
-        }
-        if ($config['schema'])
-        {
-            $config['dsn'] = $config['dsn']."schema={$config['schema']};";
-        }
+        if ($config['port']) {
+             $config['dsn'] = $config['dsn']."port={$config['port']};";
+         }
+        if ($config['schema']) {
+             $config['dsn'] = $config['dsn']."schema={$config['schema']};";
+         }
 
         return $config;
     }

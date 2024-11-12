@@ -3,8 +3,6 @@
 namespace Illuminate\Database\Query\Grammars;
 
 use Illuminate\Database\Query\Builder;
-use Illuminate\Database\Query\Grammars\Grammar;
-use Illuminate\Support\Str;
 use RuntimeException;
 
 class DmGrammar extends Grammar
@@ -13,7 +11,6 @@ class DmGrammar extends Grammar
      * @var string
      */
     protected $schema_prefix = '';
-
 
     /**
      * Compile a "where like" clause.
@@ -31,10 +28,12 @@ class DmGrammar extends Grammar
         if ($where['caseSensitive']) {
             $where['operator'] .= 'regexp_like';
             $operator = str_replace('?', '??', $where['operator']);
+
             return $operator.'('.$this->wrap($where['column']).', '.$value.', \'i\')';
         } else {
             $where['operator'] .= 'like';
             $operator = str_replace('?', '??', $where['operator']);
+
             return $this->wrap($where['column']).' '.$operator.' '.$value;
         }
     }
@@ -71,7 +70,6 @@ class DmGrammar extends Grammar
 
         return parent::wrap($value, $prefixAlias);
     }
-
 
     /**
      * Return the schema prefix.
@@ -460,6 +458,7 @@ class DmGrammar extends Grammar
         $parts = explode('->', $column, 2);
         $field = $this->wrap($parts[0]);
         $sql = 'json_overlaps('.$field.', ?)';
+
         return $sql;
     }
 

@@ -2,8 +2,6 @@
 
 namespace Illuminate\Database\Schema;
 
-use Closure;
-
 class DmBuilder extends Builder
 {
     public static ?int $defaultTimePrecision = null;
@@ -69,8 +67,8 @@ class DmBuilder extends Builder
     protected function getTableId($schema, $table)
     {
         return $this->connection->selectFromWriteConnection(
-                $this->grammar->compileTableId($schema, $table)
-            );
+            $this->grammar->compileTableId($schema, $table)
+        );
     }
 
     /**
@@ -82,8 +80,8 @@ class DmBuilder extends Builder
     protected function getSchemaId($schema)
     {
         return $this->connection->selectFromWriteConnection(
-                $this->grammar->compileSchemaId($schema)
-            );
+            $this->grammar->compileSchemaId($schema)
+        );
     }
 
     /**
@@ -102,27 +100,26 @@ class DmBuilder extends Builder
             $idenLists = $this->connection->selectFromWriteConnection(
                 $this->grammar->compileIdentityColumns($tableId)
             );
-            
+
             // Get the tables' columns
             $results = $this->connection->selectFromWriteConnection(
                 $this->grammar->compileColumns($schema, $table, $tableId)
             );
 
             $i = 0;
-            foreach($results as $column) {
+            foreach ($results as $column) {
                 // Change the class name which starts with the "CLASS" to the real name
                 // such as SYSGEO2.ST_Geometry(CLASS234881137), SYSGEO2.ST_Point(CLASS234881138)...
-                if (str_starts_with($column->TYPE_NAME,'CLASS')) {
-                    $classId = substr($column->TYPE_NAME,5);
+                if (str_starts_with($column->TYPE_NAME, 'CLASS')) {
+                    $classId = substr($column->TYPE_NAME, 5);
                     $className = $this->connection->getPostProcessor()->processClassName(
                         $this->connection->selectFromWriteConnection(
                             $this->grammar->compileClassName($classId)
-                        )    
+                        )
                     );
-                    $classNameLists[$i] =  $className[0]['class_name'];
-                }
-                else {
-                    $classNameLists[$i] =  $column->TYPE_NAME;
+                    $classNameLists[$i] = $className[0]['class_name'];
+                } else {
+                    $classNameLists[$i] = $column->TYPE_NAME;
                 }
                 $i++;
             }
@@ -131,8 +128,7 @@ class DmBuilder extends Builder
             $results = $this->connection->getPostProcessor()->processColumnsIncrementClassName(
                 $results, $idenLists, $classNameLists
             );
-        }
-        else {
+        } else {
             $results = [];
         }
 
@@ -156,20 +152,20 @@ class DmBuilder extends Builder
             $tableId = $this->getTableID($schema, $table)[0]->ID;
             $results = $this->connection->selectFromWriteConnection($this->grammar->compileIndexes($schemaId, $tableId));
 
-            foreach($results as $result) {
+            foreach ($results as $result) {
                 $columns = $this->connection->selectFromWriteConnection(
-                            $this->grammar->compileIndexColumns($result->INDEXID, $tableId)
-                        );
+                    $this->grammar->compileIndexColumns($result->INDEXID, $tableId)
+                );
                 $columnList = [];
-                foreach($columns as $column) {
-                    array_push($columnList,$column->NAME);
+                foreach ($columns as $column) {
+                    array_push($columnList, $column->NAME);
                 }
                 $result->COLUMNS = $columnList;
             }
-        }
-        else {
+        } else {
             $results = [];
         }
+
         return $this->connection->getPostProcessor()->processIndexes($results);
     }
 
@@ -184,15 +180,15 @@ class DmBuilder extends Builder
         [$schema, $table] = $this->parseSchemaAndTable($table);
 
         $table = $this->connection->getTablePrefix().$table;
-        
+
         $results = $this->connection->selectFromWriteConnection(
             $this->grammar->compileForeignKeys($schema, $table)
         );
 
-        foreach($results as $result) {
+        foreach ($results as $result) {
             $foreign = $this->connection->selectFromWriteConnection(
-                        $this->grammar->compileForeignReference($result->CONSTRAINT_NAME)
-                    );
+                $this->grammar->compileForeignReference($result->CONSTRAINT_NAME)
+            );
             $result->FOREIGN_SCHEMA = $foreign[0]->OWNER;
             $result->FOREIGN_TABLE = $foreign[0]->TABLE_NAME;
             $result->FOREIGN_COLUMNS = $foreign[0]->COLUMNS;
@@ -218,8 +214,7 @@ class DmBuilder extends Builder
                     $this->grammar->compileTables($schema, $schemaId)
                 )
             );
-        }
-        else {
+        } else {
             $results = [];
         }
 

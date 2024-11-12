@@ -4,12 +4,12 @@ namespace Illuminate\Database\Console\Migrations;
 
 use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Contracts\Console\Isolatable;
+use Illuminate\Database\DmConnection;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Events\SchemaLoaded;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Database\SQLiteDatabaseDoesNotExistException;
 use Illuminate\Database\SqlServerConnection;
-use Illuminate\Database\DmConnection;
 use PDOException;
 use RuntimeException;
 use Symfony\Component\Console\Attribute\AsCommand;
