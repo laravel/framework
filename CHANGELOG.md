@@ -1,6 +1,11 @@
 # Release Notes for 10.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v10.48.22...10.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v10.48.23...10.x)
+
+## [v10.48.23](https://github.com/laravel/framework/compare/v10.48.22...v10.48.23) - 2024-11-12
+
+* [10.x] Ensure headers are only attached to illuminate responses by [@timacdonald](https://github.com/timacdonald) in https://github.com/laravel/framework/pull/53019
+* [10.x] Fix append and prepend batch to chain by [@Bencute](https://github.com/Bencute) in https://github.com/laravel/framework/pull/53455
 
 ## [v10.48.22](https://github.com/laravel/framework/compare/v10.48.20...v10.48.22) - 2024-09-12
 
