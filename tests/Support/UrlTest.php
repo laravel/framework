@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Support;
 use Illuminate\Support\Url;
 use Illuminate\Support\UrlQueryParameters;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 class UrlTest extends TestCase
 {
@@ -20,6 +21,16 @@ class UrlTest extends TestCase
         $this->assertSame('/path/to/resource', $url->path);
         $this->assertSame('foo=bar&baz=qux', (string) $url->query);
         $this->assertSame('fragment', $url->fragment);
+    }
+
+    public function testParseFailsWithMalformedUrl()
+    {
+        $url = '///**/foobar/**///';
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage("Invalid URL [$url].");
+
+        Url::parse($url);
     }
 
     public function testParseWithMissingComponents()

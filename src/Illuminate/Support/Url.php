@@ -3,6 +3,7 @@
 namespace Illuminate\Support;
 
 use Illuminate\Contracts\Support\Arrayable;
+use RuntimeException;
 use Stringable;
 
 class Url implements Arrayable, Stringable
@@ -31,7 +32,11 @@ class Url implements Arrayable, Stringable
      */
     public static function parse(string $url): static
     {
-        $components = parse_url($url) ?: [];
+        $components = parse_url($url);
+
+        if ($components === false) {
+            throw new RuntimeException("Invalid URL [$url].");
+        }
 
         if (isset($components['query'])) {
             $components['query'] = static::query($components['query']);
