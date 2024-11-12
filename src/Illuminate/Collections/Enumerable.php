@@ -45,9 +45,10 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      *
      * @param  int  $from
      * @param  int  $to
+     * @param  int  $step
      * @return static
      */
-    public static function range($from, $to);
+    public static function range($from, $to, $step = 1);
 
     /**
      * Wrap the given value in a collection if applicable.
