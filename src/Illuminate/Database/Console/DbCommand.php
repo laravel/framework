@@ -137,6 +137,7 @@ class DbCommand extends Command
             'pgsql' => 'psql',
             'sqlite' => 'sqlite3',
             'sqlsrv' => 'sqlcmd',
+            'dm' => 'dm',
         ][$connection['driver']];
     }
 

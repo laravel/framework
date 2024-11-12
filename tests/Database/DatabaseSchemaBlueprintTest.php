@@ -12,11 +12,13 @@ use Illuminate\Database\Schema\Grammars\MySqlGrammar;
 use Illuminate\Database\Schema\Grammars\PostgresGrammar;
 use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
 use Illuminate\Database\Schema\Grammars\SqlServerGrammar;
+use Illuminate\Database\Schema\Grammars\DmGrammar;
 use Illuminate\Database\Schema\MariaDbBuilder;
 use Illuminate\Database\Schema\MySqlBuilder;
 use Illuminate\Database\Schema\PostgresBuilder;
 use Illuminate\Database\Schema\SQLiteBuilder;
 use Illuminate\Database\Schema\SqlServerBuilder;
+use Illuminate\Database\Schema\DmBuilder;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -123,6 +125,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $this->assertEquals(['alter table "users" add column "created" timestamp(0) without time zone not null default CURRENT_TIMESTAMP'], $getSql(new PostgresGrammar));
         $this->assertEquals(['alter table "users" add column "created" datetime not null default CURRENT_TIMESTAMP'], $getSql(new SQLiteGrammar));
         $this->assertEquals(['alter table "users" add "created" datetime not null default CURRENT_TIMESTAMP'], $getSql(new SqlServerGrammar));
+        $this->assertEquals(['alter table "users" add column("created" datetime not null default CURRENT_TIMESTAMP)'], $getSql(new DmGrammar));
     }
 
     public function testDefaultCurrentTimestamp()
@@ -137,6 +140,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $this->assertEquals(['alter table "users" add column "created" timestamp(0) without time zone not null default CURRENT_TIMESTAMP'], $getSql(new PostgresGrammar));
         $this->assertEquals(['alter table "users" add column "created" datetime not null default CURRENT_TIMESTAMP'], $getSql(new SQLiteGrammar));
         $this->assertEquals(['alter table "users" add "created" datetime not null default CURRENT_TIMESTAMP'], $getSql(new SqlServerGrammar));
+        $this->assertEquals(['alter table "users" add column("created" timestamp not null default CURRENT_TIMESTAMP)'], $getSql(new DmGrammar));
     }
 
     public function testRemoveColumn()
@@ -168,6 +172,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $this->assertEquals(['alter table "users" rename column "foo" to "bar"'], $getSql(new PostgresGrammar));
         $this->assertEquals(['alter table "users" rename column "foo" to "bar"'], $getSql(new SQLiteGrammar));
         $this->assertEquals(['sp_rename N\'"users"."foo"\', "bar", N\'COLUMN\''], $getSql(new SqlServerGrammar));
+        $this->assertEquals(['alter table "users" alter column "foo" rename to "bar"'], $getSql(new DmGrammar));
     }
 
     public function testNativeRenameColumnOnMysql57()
@@ -233,6 +238,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $this->assertEquals(['alter table "users" drop column "foo"'], $getSql(new PostgresGrammar));
         $this->assertEquals(['alter table "users" drop column "foo"'], $getSql(new SQLiteGrammar));
         $this->assertStringContainsString('alter table "users" drop column "foo"', $getSql(new SqlServerGrammar)[0]);
+        $this->assertEquals(['BEGIN FOR c IN (select \'foo\' as COL) LOOP EXECUTE IMMEDIATE (\'alter table "users" drop "\' || c.COL || \'"\'); END LOOP; END;'], $getSql(new DmGrammar));
     }
 
     public function testMacroable()
@@ -395,6 +401,10 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $this->assertEquals([
             'alter table `posts` add `eloquent_model_ulid_stub_id` char(26) not null',
         ], $getSql(new MySqlGrammar));
+
+        $this->assertEquals([
+            'alter table "posts" add column("eloquent_model_ulid_stub_id" char(26) not null)',
+        ], $getSql(new DmGrammar));
     }
 
     public function testDropRelationshipColumnWithIncrementalModel()
@@ -467,6 +477,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $this->assertEquals(['alter table "posts" add column "note" text not null'], $getSql(new SQLiteGrammar));
         $this->assertEquals(['alter table "posts" add column "note" varchar(255) not null'], $getSql(new PostgresGrammar));
         $this->assertEquals(['alter table "posts" add "note" nvarchar(255) not null'], $getSql(new SqlServerGrammar));
+        $this->assertEquals(['alter table "posts" add column("note" text not null)'], $getSql(new DmGrammar));
     }
 
     public function testTinyTextNullableColumn()
@@ -481,6 +492,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $this->assertEquals(['alter table "posts" add column "note" text'], $getSql(new SQLiteGrammar));
         $this->assertEquals(['alter table "posts" add column "note" varchar(255) null'], $getSql(new PostgresGrammar));
         $this->assertEquals(['alter table "posts" add "note" nvarchar(255) null'], $getSql(new SqlServerGrammar));
+        $this->assertEquals(['alter table "posts" add column("note" text null)'], $getSql(new DmGrammar));
     }
 
     public function testTableComment()
@@ -493,6 +505,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
 
         $this->assertEquals(['alter table `posts` comment = \'Look at my comment, it is amazing\''], $getSql(new MySqlGrammar));
         $this->assertEquals(['comment on table "posts" is \'Look at my comment, it is amazing\''], $getSql(new PostgresGrammar));
+        $this->assertEquals(['comment on table "posts" is \'Look at my comment, it is amazing\''], $getSql(new DmGrammar));
     }
 
     protected function getConnection(?Grammar $grammar = null)
@@ -505,6 +518,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
             SQLiteGrammar::class => SQLiteBuilder::class,
             SqlServerGrammar::class => SqlServerBuilder::class,
             MariaDbGrammar::class => MariaDbBuilder::class,
+            DmGrammar::class => DmBuilder::class,
             default => Builder::class,
         });
 

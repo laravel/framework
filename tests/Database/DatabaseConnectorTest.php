@@ -7,6 +7,7 @@ use Illuminate\Database\Connectors\MySqlConnector;
 use Illuminate\Database\Connectors\PostgresConnector;
 use Illuminate\Database\Connectors\SQLiteConnector;
 use Illuminate\Database\Connectors\SqlServerConnector;
+use Illuminate\Database\Connectors\DmConnector;
 use Mockery as m;
 use PDO;
 use PDOStatement;
@@ -80,6 +81,21 @@ class DatabaseConnectorTest extends TestCase
         $statement = m::mock(PDOStatement::class);
         $connection->shouldReceive('prepare')->zeroOrMoreTimes()->andReturn($statement);
         $statement->shouldReceive('execute')->zeroOrMoreTimes();
+        $result = $connector->connect($config);
+
+        $this->assertSame($result, $connection);
+    }
+
+
+    public function testDmConnectCallsCreateConnectionWithProperArguments()
+    {
+        $dsn = 'dm:host=foo;port=111;schema=bar;';
+        $config = ['host' => 'foo', 'port' => 111, 'schema' => 'bar', 'charset' => 'UTF8'];
+        $connector = $this->getMockBuilder(DmConnector::class)->onlyMethods(['createConnection', 'getOptions'])->getMock();
+        $connection = m::mock(stdClass::class);
+        $connector->expects($this->once())->method('getOptions')->with($this->equalTo($config))->willReturn(['options']);
+        $connector->expects($this->once())->method('getOptions')->with($this->equalTo($config))->willReturn(['options']);
+        $connector->expects($this->once())->method('createConnection')->with($this->equalTo($dsn), $this->equalTo($config), $this->equalTo(['options', '1002' => 'UTF8']))->willReturn($connection);
         $result = $connector->connect($config);
 
         $this->assertSame($result, $connection);

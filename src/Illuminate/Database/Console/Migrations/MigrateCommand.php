@@ -9,6 +9,7 @@ use Illuminate\Database\Events\SchemaLoaded;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Database\SQLiteDatabaseDoesNotExistException;
 use Illuminate\Database\SqlServerConnection;
+use Illuminate\Database\DmConnection;
 use PDOException;
 use RuntimeException;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -310,6 +311,9 @@ class MigrateCommand extends BaseCommand implements Isolatable
             return $path;
         }
 
+        if ($connection instanceof DmConnection) {
+            return database_path('schema/'.$connection->getName().'-schema.dmp');
+        }
         return database_path('schema/'.$connection->getName().'-schema.sql');
     }
 }

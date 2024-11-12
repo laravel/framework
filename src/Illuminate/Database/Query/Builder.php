@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
+use Illuminate\Database\DmConnection;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -2039,8 +2040,16 @@ class Builder implements BuilderContract
 
         $this->wheres[] = compact('type', 'column', 'value', 'boolean', 'not');
 
+
         if (! $value instanceof ExpressionContract) {
-            $this->addBinding($this->grammar->prepareBindingForJsonContains($value));
+            if ($this->connection instanceof DmConnection) {
+                $parts = explode('->', $column, 2);
+                $json_column = json_encode([$parts[1] => $value]);
+                $this->addBinding($json_column);
+            }
+            else {
+                $this->addBinding($this->grammar->prepareBindingForJsonContains($value));
+            }
         }
 
         return $this;

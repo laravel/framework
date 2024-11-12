@@ -10,6 +10,7 @@ use Illuminate\Database\Events\SchemaDumped;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Config;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Illuminate\Database\DmConnection;
 
 #[AsCommand(name: 'schema:dump')]
 class DumpCommand extends Command
@@ -87,6 +88,11 @@ class DumpCommand extends Command
      */
     protected function path(Connection $connection)
     {
+        if ($connection instanceof DmConnection) {
+            return tap($this->option('path') ?: database_path('schema\\'.$connection->getName().'-schema.dmp'), function ($path) {
+                (new Filesystem)->ensureDirectoryExists(dirname($path));
+            });
+        }
         return tap($this->option('path') ?: database_path('schema/'.$connection->getName().'-schema.sql'), function ($path) {
             (new Filesystem)->ensureDirectoryExists(dirname($path));
         });
