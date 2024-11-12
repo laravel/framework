@@ -275,7 +275,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     protected function bootIfNotBooted()
     {
-        if (!isset(static::$booted[static::class])) {
+        if (! isset(static::$booted[static::class])) {
             static::$booted[static::class] = true;
 
             $this->fireModelEvent('booting', false);
@@ -324,7 +324,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         foreach (class_uses_recursive($class) as $trait) {
             $method = 'boot'.class_basename($trait);
 
-            if (method_exists($class, $method) && !in_array($method, $booted)) {
+            if (method_exists($class, $method) && ! in_array($method, $booted)) {
                 forward_static_call([$class, $method]);
 
                 $booted[] = $method;
@@ -413,7 +413,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     {
         $class = $class ?: static::class;
 
-        if (!get_class_vars($class)['timestamps'] || !$class::UPDATED_AT) {
+        if (! get_class_vars($class)['timestamps'] || ! $class::UPDATED_AT) {
             return true;
         }
 
@@ -586,7 +586,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function forceFill(array $attributes)
     {
-        return static::unguarded(fn() => $this->fill($attributes));
+        return static::unguarded(fn () => $this->fill($attributes));
     }
 
     /**
@@ -746,7 +746,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function loadMorph($relation, $relations)
     {
-        if (!$this->{$relation}) {
+        if (! $this->{$relation}) {
             return $this;
         }
 
@@ -870,7 +870,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function loadMorphAggregate($relation, $relations, $column, $function = null)
     {
-        if (!$this->{$relation}) {
+        if (! $this->{$relation}) {
             return $this;
         }
 
@@ -982,7 +982,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     protected function incrementOrDecrement($column, $amount, $extra, $method)
     {
-        if (!$this->exists) {
+        if (! $this->exists) {
             return $this->newQueryWithoutRelationships()->{$method}($column, $amount, $extra);
         }
 
@@ -1000,14 +1000,13 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             $amount = (clone $this)->setAttribute($column, $amount)->getAttributeFromArray($column);
         }
 
-        return tap($this->setKeysForSaveQuery($this->newQueryWithoutScopes())->{$method}($column, $amount, $extra),
-            function () use ($column) {
-                $this->syncChanges();
+        return tap($this->setKeysForSaveQuery($this->newQueryWithoutScopes())->{$method}($column, $amount, $extra), function () use ($column) {
+            $this->syncChanges();
 
-                $this->fireModelEvent('updated', false);
+            $this->fireModelEvent('updated', false);
 
-                $this->syncOriginalAttribute($column);
-            });
+            $this->syncOriginalAttribute($column);
+        });
     }
 
     /**
@@ -1019,7 +1018,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function update(array $attributes = [], array $options = [])
     {
-        if (!$this->exists) {
+        if (! $this->exists) {
             return false;
         }
 
@@ -1037,7 +1036,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function updateOrFail(array $attributes = [], array $options = [])
     {
-        if (!$this->exists) {
+        if (! $this->exists) {
             return false;
         }
 
@@ -1053,7 +1052,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function updateQuietly(array $attributes = [], array $options = [])
     {
-        if (!$this->exists) {
+        if (! $this->exists) {
             return false;
         }
 
@@ -1098,7 +1097,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     public function push()
     {
         return $this->withoutRecursion(function () {
-            if (!$this->save()) {
+            if (! $this->save()) {
                 return false;
             }
 
@@ -1110,7 +1109,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
                     ? $models->all() : [$models];
 
                 foreach (array_filter($models) as $model) {
-                    if (!$model->push()) {
+                    if (! $model->push()) {
                         return false;
                     }
                 }
@@ -1127,7 +1126,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function pushQuietly()
     {
-        return static::withoutEvents(fn() => $this->push());
+        return static::withoutEvents(fn () => $this->push());
     }
 
     /**
@@ -1138,7 +1137,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function saveQuietly(array $options = [])
     {
-        return static::withoutEvents(fn() => $this->save($options));
+        return static::withoutEvents(fn () => $this->save($options));
     }
 
     /**
@@ -1174,7 +1173,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         else {
             $saved = $this->performInsert($query);
 
-            if (!$this->getConnectionName() &&
+            if (! $this->getConnectionName() &&
                 $connection = $query->getConnection()) {
                 $this->setConnection($connection->getName());
             }
@@ -1200,7 +1199,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function saveOrFail(array $options = [])
     {
-        return $this->getConnection()->transaction(fn() => $this->save($options));
+        return $this->getConnection()->transaction(fn () => $this->save($options));
     }
 
     /**
@@ -1429,7 +1428,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         // If the model doesn't exist, there is nothing to delete so we'll just return
         // immediately and not do anything else. Otherwise, we will continue with a
         // deletion process on the model, firing the proper events, and so forth.
-        if (!$this->exists) {
+        if (! $this->exists) {
             return;
         }
 
@@ -1459,7 +1458,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function deleteQuietly()
     {
-        return static::withoutEvents(fn() => $this->delete());
+        return static::withoutEvents(fn () => $this->delete());
     }
 
     /**
@@ -1471,11 +1470,11 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function deleteOrFail()
     {
-        if (!$this->exists) {
+        if (! $this->exists) {
             return false;
         }
 
-        return $this->getConnection()->transaction(fn() => $this->delete());
+        return $this->getConnection()->transaction(fn () => $this->delete());
     }
 
     /**
@@ -1674,8 +1673,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     public function toArray()
     {
         return $this->withoutRecursion(
-            fn() => array_merge($this->attributesToArray(), $this->relationsToArray()),
-            fn() => $this->attributesToArray(),
+            fn () => array_merge($this->attributesToArray(), $this->relationsToArray()),
+            fn () => $this->attributesToArray(),
         );
     }
 
@@ -1716,7 +1715,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function fresh($with = [])
     {
-        if (!$this->exists) {
+        if (! $this->exists) {
             return;
         }
 
@@ -1733,7 +1732,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function refresh()
     {
-        if (!$this->exists) {
+        if (! $this->exists) {
             return $this;
         }
 
@@ -1791,7 +1790,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function replicateQuietly(?array $except = null)
     {
-        return static::withoutEvents(fn() => $this->replicate($except));
+        return static::withoutEvents(fn () => $this->replicate($except));
     }
 
     /**
@@ -1802,7 +1801,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function is($model)
     {
-        return !is_null($model) &&
+        return ! is_null($model) &&
             $this->getKey() === $model->getKey() &&
             $this->getTable() === $model->getTable() &&
             $this->getConnectionName() === $model->getConnectionName();
@@ -1816,7 +1815,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function isNot($model)
     {
-        return !$this->is($model);
+        return ! $this->is($model);
     }
 
     /**
@@ -2027,7 +2026,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             $relations = [];
 
             foreach ($this->getRelations() as $key => $relation) {
-                if (!method_exists($this, $key)) {
+                if (! method_exists($this, $key)) {
                     continue;
                 }
 
@@ -2312,7 +2311,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     public function offsetExists($offset): bool
     {
         try {
-            return !is_null($this->getAttribute($offset));
+            return ! is_null($this->getAttribute($offset));
         } catch (MissingAttributeException) {
             return false;
         }
