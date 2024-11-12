@@ -2,6 +2,7 @@
 
 namespace Illuminate\Http\Client;
 
+use Closure;
 use Illuminate\Support\Traits\Macroable;
 use OutOfBoundsException;
 
@@ -71,7 +72,7 @@ class ResponseSequence
     }
 
     /**
-     * Push response with the contents of a file as the body to the sequence.
+     * Push a response with the contents of a file as the body to the sequence.
      *
      * @param  string  $filePath
      * @param  int  $status
@@ -88,7 +89,7 @@ class ResponseSequence
     }
 
     /**
-     * Push connection exception to the sequence.
+     * Push a connection exception to the sequence.
      *
      * @param  string|null  $message
      * @return $this
@@ -167,6 +168,6 @@ class ResponseSequence
 
         $response = array_shift($this->responses);
 
-        return $response instanceof \Closure ? $response($request) : $response;
+        return $response instanceof Closure ? $response($request) : $response;
     }
 }
