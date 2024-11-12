@@ -3257,6 +3257,34 @@ class DatabaseEloquentModelTest extends TestCase
             );
         }
     }
+
+    public function testCannotUnsetAttributeOnFrozenModel()
+    {
+        $model = new EloquentModelStub();
+        $model->freeze();
+
+        try {
+            unset($model['castedFloat']);
+            $this->fail("No exception was thrown");
+        } catch (FrozenModelException $exception) {
+            $this->assertEquals("Cannot unset properties or relations on Model [Illuminate\Tests\Database\EloquentModelStub] because it is frozen.", $exception->getMessage());
+        }
+    }
+
+    public function testCannotOffsetUnsetAttributeOnFrozenModel()
+    {
+        $model = new EloquentModelStub();
+        $model->freeze();
+
+        try {
+            $model->offsetUnset('castedFloat');
+            $this->fail("No exception was thrown");
+        } catch (FrozenModelException $exception) {
+            $this->assertEquals("Cannot unset properties or relations on Model [Illuminate\Tests\Database\EloquentModelStub] because it is frozen.", $exception->getMessage());
+        }
+    }
+
+
 }
 
 class EloquentTestObserverStub

@@ -4,6 +4,7 @@ namespace Illuminate\Database\Eloquent;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use PhpParser\Node\Expr\AssignOp\Mod;
 
 class FrozenModelException extends \RuntimeException
 {
@@ -33,8 +34,13 @@ class FrozenModelException extends \RuntimeException
             sprintf(
                 "Cannot load relation(s) [%s] on Model [%s] because it is frozen.",
                 Arr::join($relations, ', '),
-                model::class
+                $model::class
             )
         );
+    }
+
+    public static function forUnset(Model $model)
+    {
+        return new self(sprintf("Cannot unset properties or relations on Model [%s] because it is frozen.", $model::class));
     }
 }

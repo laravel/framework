@@ -2349,9 +2349,14 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      *
      * @param  mixed  $offset
      * @return void
+     * @throws  FrozenModelException
      */
     public function offsetUnset($offset): void
     {
+        if ($this->frozen) {
+            throw FrozenModelException::forUnset($this);
+        }
+
         unset($this->attributes[$offset], $this->relations[$offset]);
     }
 
