@@ -15,6 +15,7 @@ class Url implements Arrayable, Stringable
         public ?string $host = null,
         public ?int $port = null,
         public ?string $user = null,
+        #[\SensitiveParameter]
         public ?string $pass = null,
         public ?string $path = null,
         public ?UrlQueryParameters $query = null,
