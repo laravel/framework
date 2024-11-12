@@ -510,7 +510,7 @@ class SupportHelpersTest extends TestCase
 
         $this->assertEquals(
             ['foo' => 'barboom'],
-            data_set($data, 'foo', fn ($old) => $old . 'boom')
+            data_set($data, 'foo', fn ($old) => $old.'boom')
         );
     }
 
