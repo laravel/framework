@@ -2134,7 +2134,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
-     * @param $frozen
+     * @param  bool $frozen
      * @return $this
      */
     public function freeze($frozen = true)
