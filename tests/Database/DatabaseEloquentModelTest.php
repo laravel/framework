@@ -3227,7 +3227,7 @@ class DatabaseEloquentModelTest extends TestCase
             $model->load($relations);
             $this->fail("No exception thrown");
         } catch (FrozenModelException $exception) {
-            $this->assertEquals("Cannot load relation(s) [$relationsAsString] on Model [Illuminate\Database\Eloquent\model] because it is frozen.", $exception->getMessage());
+            $this->assertEquals("Cannot load relation(s) [$relationsAsString] on Model [Illuminate\Tests\Database\EloquentModelStub] because it is frozen.", $exception->getMessage());
         }
     }
 
