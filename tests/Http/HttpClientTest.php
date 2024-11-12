@@ -2196,6 +2196,59 @@ class HttpClientTest extends TestCase
         ]);
     }
 
+    public function testFakeConnectionException()
+    {
+        $this->factory->fake($this->factory->failedConnection('Fake'));
+
+        $this->expectException(ConnectionException::class);
+        $this->expectExceptionMessage('Fake');
+
+        $this->factory->post('https://example.com');
+    }
+
+    public function testFakeConnectionExceptionWithinFakeClosure()
+    {
+        $this->factory->fake(fn () => $this->factory->failedConnection('Fake'));
+
+        $this->expectException(ConnectionException::class);
+        $this->expectExceptionMessage('Fake');
+
+        $this->factory->post('https://example.com');
+    }
+
+    public function testFakeConnectionExceptionWithinArray()
+    {
+        $this->factory->fake(['*' => $this->factory->failedConnection('Fake')]);
+
+        $this->expectException(ConnectionException::class);
+        $this->expectExceptionMessage('Fake');
+
+        $this->factory->post('https://example.com');
+    }
+
+    public function testFakeConnectionExceptionWithinSequence()
+    {
+        $this->factory->fake([
+            '*' => $this->factory->sequence()
+                ->pushFailedConnection('Fake')
+                ->push('Success'),
+        ]);
+
+        $exception = null;
+
+        $response = $this->factory->retry(3, function ($attempt, $e) use (&$exception) {
+            $exception = $e;
+
+            return true;
+        })->post('https://example.com');
+
+        $this->assertSame('Success', $response->body());
+
+        $this->assertNotNull($exception);
+        $this->assertInstanceOf(ConnectionException::class, $exception);
+        $this->assertSame('Fake', $exception->getMessage());
+    }
+
     public function testMiddlewareRunsWhenFaked()
     {
         $this->factory->fake(function (Request $request) {
