@@ -696,7 +696,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function detectEnvironment(Closure $callback)
     {
-        $args = $this->runningInConsole() && $_SERVER['argv']
+        $args = $this->runningInConsole() && isset($_SERVER['argv'])
             ? $_SERVER['argv']
             : null;
 
