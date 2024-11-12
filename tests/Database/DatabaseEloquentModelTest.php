@@ -49,6 +49,7 @@ use Illuminate\Support\Stringable;
 use InvalidArgumentException;
 use LogicException;
 use Mockery as m;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use stdClass;
@@ -3201,6 +3202,29 @@ class DatabaseEloquentModelTest extends TestCase
         } catch (FrozenModelException $exception) {
             $this->assertEquals("Cannot set property [castedFloat] on Model [Illuminate\Tests\Database\EloquentModelStub] because it is frozen.", $exception->getMessage());
         }
+    }
+
+    #[DataProvider('cannotLoadRelationsDataProvider')]
+    public function testCannotLoadRelationOnFrozenModel($relations, $relationsAsString)
+    {
+        $model = new EloquentModelStub();
+        $model->freeze();
+
+        try {
+            $model->load($relations);
+            $this->fail("No exception thrown");
+        } catch (FrozenModelException $exception) {
+            $this->assertEquals("Cannot load relation(s) [$relationsAsString] on Model [Illuminate\Database\Eloquent\model] because it is frozen.", $exception->getMessage());
+        }
+    }
+
+    public static function cannotLoadRelationsDataProvider()
+    {
+        return [
+            'single relation as string' => ['morphToStub', 'morphToStub'],
+            'single relation in array' => [['morphToStub'], 'morphToStub'],
+            'multiple relations in array' => [['belongsToStub', 'morphsToStub'], 'belongsToStub, morphsToStub']
+        ];
     }
 
     public function testCannotFillOnFrozenModel()

@@ -728,6 +728,10 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function load($relations)
     {
+        if ($this->frozen) {
+            throw FrozenModelException::forRelations($this, Arr::wrap($relations));
+        }
+
         $query = $this->newQueryWithoutRelationships()->with(
             is_string($relations) ? func_get_args() : $relations
         );

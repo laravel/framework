@@ -2,6 +2,9 @@
 
 namespace Illuminate\Database\Eloquent;
 
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
+
 class FrozenModelException extends \RuntimeException
 {
     /**
@@ -13,8 +16,25 @@ class FrozenModelException extends \RuntimeException
         return new self(sprintf("Cannot fill properties on Model [%s] because it is frozen.", $model::class));
     }
 
-    public static function forSetAttribute(Model $model, $attribute)
+    /**
+     * @param  Model  $model
+     * @param  string  $attribute
+     * @return self
+     */
+    public static function forSetAttribute(Model $model, string $attribute)
     {
-        return new self(sprintf("Cannot set property [%s] on Model [%s] because it is frozen.", $attribute, $model::class));
+        return new self(sprintf("Cannot set property [%s] on Model [%s] because it is frozen.", $attribute,
+            $model::class));
+    }
+
+    public static function forRelations(Model $model, array $relations)
+    {
+        return new self(
+            sprintf(
+                "Cannot load relation(s) [%s] on Model [%s] because it is frozen.",
+                Arr::join($relations, ', '),
+                model::class
+            )
+        );
     }
 }
