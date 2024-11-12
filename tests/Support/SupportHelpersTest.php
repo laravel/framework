@@ -507,6 +507,11 @@ class SupportHelpersTest extends TestCase
             ['foo' => ['bar' => 'boom'], 'baz' => ['bar' => ['boom' => ['kaboom' => 'boom']]]],
             data_set($data, 'baz.bar.boom.kaboom', 'boom')
         );
+
+        $this->assertEquals(
+            ['foo' => 'barboom'],
+            data_set($data, 'foo', fn ($old) => $old . 'boom')
+        );
     }
 
     public function testDataSetWithStar()
@@ -531,6 +536,11 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals(
             ['foo' => [], 'bar' => ['overwritten', 'overwritten']],
             data_set($data, 'bar.*', 'overwritten')
+        );
+
+        $this->assertEquals(
+            ['foo' => [], 'bar' => ['overwritten', 'overwritten']],
+            data_set($data, 'bar.*', fn ($old) => 'overwritten')
         );
     }
 
