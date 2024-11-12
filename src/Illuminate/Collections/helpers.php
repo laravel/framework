@@ -121,7 +121,7 @@ if (! function_exists('data_set')) {
                 }
             } elseif ($overwrite) {
                 foreach ($target as &$inner) {
-                    $inner = is_callable($value) ? $value($inner) : $value;
+                    $inner = $value instanceof Closure ? $value($inner) : $value;
                 }
             }
         } elseif (Arr::accessible($target)) {
@@ -132,7 +132,7 @@ if (! function_exists('data_set')) {
 
                 data_set($target[$segment], $segments, $value, $overwrite);
             } elseif ($overwrite || ! Arr::exists($target, $segment)) {
-                $target[$segment] = is_callable($value) ? $value(Arr::get($target, $segment)) : $value;
+                $target[$segment] = $value instanceof Closure ? $value(Arr::get($target, $segment)) : $value;
             }
         } elseif (is_object($target)) {
             if ($segments) {
@@ -142,7 +142,7 @@ if (! function_exists('data_set')) {
 
                 data_set($target->{$segment}, $segments, $value, $overwrite);
             } elseif ($overwrite || ! isset($target->{$segment})) {
-                $target->{$segment} = is_callable($value) ? $value($target->{$segment}) : $value;
+                $target->{$segment} = $value instanceof Closure ? $value($target->{$segment}) : $value;
             }
         } else {
             $target = [];
@@ -150,7 +150,7 @@ if (! function_exists('data_set')) {
             if ($segments) {
                 data_set($target[$segment], $segments, $value, $overwrite);
             } elseif ($overwrite) {
-                $target[$segment] = is_callable($value) ? $value(null) : $value;
+                $target[$segment] = $value instanceof Closure ? $value(null) : $value;
             }
         }
 
