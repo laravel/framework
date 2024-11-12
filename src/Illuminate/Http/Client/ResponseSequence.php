@@ -88,6 +88,19 @@ class ResponseSequence
     }
 
     /**
+     * Push connection exception to the sequence.
+     *
+     * @param  string|null  $message
+     * @return $this
+     */
+    public function pushFailedConnection($message = null)
+    {
+        return $this->pushResponse(
+            Factory::failedConnection($message)
+        );
+    }
+
+    /**
      * Push a response to the sequence.
      *
      * @param  mixed  $response
@@ -137,11 +150,12 @@ class ResponseSequence
     /**
      * Get the next response in the sequence.
      *
+     * @param  \Illuminate\Http\Client\Request  $request
      * @return mixed
      *
      * @throws \OutOfBoundsException
      */
-    public function __invoke()
+    public function __invoke($request)
     {
         if ($this->failWhenEmpty && $this->isEmpty()) {
             throw new OutOfBoundsException('A request was made, but the response sequence is empty.');
@@ -151,6 +165,8 @@ class ResponseSequence
             return value($this->emptyResponse ?? Factory::response());
         }
 
-        return array_shift($this->responses);
+        $response = array_shift($this->responses);
+
+        return $response instanceof \Closure ? $response($request) : $response;
     }
 }
