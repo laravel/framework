@@ -32,7 +32,7 @@ class SupportObjTest extends TestCase
             [
                 'name' => 'Acme Corp',
                 'departments' => [
-                    0 =>  [
+                    0 => [
                         'budget' => 12000,
                         'team' => [
                             'description' => 'Research and Development',
