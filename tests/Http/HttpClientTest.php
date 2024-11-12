@@ -2247,7 +2247,6 @@ class HttpClientTest extends TestCase
         $this->assertNotNull($exception);
         $this->assertInstanceOf(ConnectionException::class, $exception);
         $this->assertSame('Fake', $exception->getMessage());
-
     }
 
     public function testMiddlewareRunsWhenFaked()
