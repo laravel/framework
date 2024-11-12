@@ -98,7 +98,7 @@ if (! function_exists('data_get')) {
 
 if (! function_exists('data_set')) {
     /**
-     * Set an item on an array or object using dot notation.
+     * Set an item on an array or object using dot notation, with the ability to use a callable to transform the old data.
      *
      * @param  mixed  $target
      * @param  string|array  $key
@@ -121,7 +121,7 @@ if (! function_exists('data_set')) {
                 }
             } elseif ($overwrite) {
                 foreach ($target as &$inner) {
-                    $inner = $value;
+                    $inner = is_callable($value) ? $value($inner) : $value;
                 }
             }
         } elseif (Arr::accessible($target)) {
@@ -132,7 +132,7 @@ if (! function_exists('data_set')) {
 
                 data_set($target[$segment], $segments, $value, $overwrite);
             } elseif ($overwrite || ! Arr::exists($target, $segment)) {
-                $target[$segment] = $value;
+                $target[$segment] = is_callable($value) ? $value(Arr::get($target, $segment)) : $value;
             }
         } elseif (is_object($target)) {
             if ($segments) {
@@ -142,7 +142,7 @@ if (! function_exists('data_set')) {
 
                 data_set($target->{$segment}, $segments, $value, $overwrite);
             } elseif ($overwrite || ! isset($target->{$segment})) {
-                $target->{$segment} = $value;
+                $target->{$segment} = is_callable($value) ? $value($target->{$segment}) : $value;
             }
         } else {
             $target = [];
@@ -150,7 +150,7 @@ if (! function_exists('data_set')) {
             if ($segments) {
                 data_set($target[$segment], $segments, $value, $overwrite);
             } elseif ($overwrite) {
-                $target[$segment] = $value;
+                $target[$segment] = is_callable($value) ? $value(null) : $value;
             }
         }
 
