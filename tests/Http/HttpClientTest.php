@@ -25,7 +25,6 @@ use Illuminate\Http\Response as HttpResponse;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
@@ -2232,7 +2231,7 @@ class HttpClientTest extends TestCase
         $this->factory->fake([
             '*' => $this->factory->sequence()
                 ->pushFailedConnection('Fake')
-                ->push('Success')
+                ->push('Success'),
         ]);
 
         $exception = null;
