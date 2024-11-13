@@ -1815,6 +1815,42 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     }
 
     /**
+     * Get the index of the first item that matches the given condition.
+     *
+     * @param  callable(TValue, TKey): bool  $callback
+     * @return TKey|null
+     */
+    public function firstIndex(callable $callback)
+    {
+        foreach ($this as $key => $value) {
+            if ($callback($value, $key)) {
+                return $key;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Get the index of the last item that matches the given condition.
+     *
+     * @param  callable(TValue, TKey): bool  $callback
+     * @return TKey|null
+     */
+    public function lastIndex(callable $callback)
+    {
+        $foundKey = null;
+
+        foreach ($this as $key => $value) {
+            if ($callback($value, $key)) {
+                $foundKey = $key;
+            }
+        }
+
+        return $foundKey;
+    }
+
+    /**
      * Make an iterator from the given source.
      *
      * @template TIteratorKey of array-key
