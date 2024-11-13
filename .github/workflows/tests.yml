@@ -97,7 +97,6 @@ jobs:
 
       - name: Execute tests (display deprecations)
         run: vendor/bin/phpunit --display-deprecations --fail-on-deprecation
-        if: matrix.stability == "prefer-stable"
         env:
           DB_PORT: ${{ job.services.mysql.ports[3306] }}
           DB_USERNAME: root
@@ -105,10 +104,10 @@ jobs:
           DYNAMODB_ENDPOINT: "http://localhost:8888"
           AWS_ACCESS_KEY_ID: randomKey
           AWS_SECRET_ACCESS_KEY: randomSecret
+        if: matrix.stability == 'prefer-stable'
 
       - name: Execute tests
         run: vendor/bin/phpunit
-        if: matrix.stability != "prefer-stable"
         env:
           DB_PORT: ${{ job.services.mysql.ports[3306] }}
           DB_USERNAME: root
@@ -116,6 +115,7 @@ jobs:
           DYNAMODB_ENDPOINT: "http://localhost:8888"
           AWS_ACCESS_KEY_ID: randomKey
           AWS_SECRET_ACCESS_KEY: randomSecret
+        if: matrix.stability != 'prefer-stable'
           
       - name: Store artifacts
         uses: actions/upload-artifact@v4
