@@ -1356,4 +1356,11 @@ class SupportStringableTest extends TestCase
         $this->assertSame('foobar', (string) $this->stringable(base64_encode('foobar'))->fromBase64(true));
         $this->assertSame('foobarbaz', (string) $this->stringable(base64_encode('foobarbaz'))->fromBase64());
     }
+
+    public function testSimilar()
+    {
+        $percent = null;
+        $this->assertSame(3, $this->stringable('foo')->similar('foo', $percent));
+        $this->assertSame(100.0, $percent);
+    }
 }
