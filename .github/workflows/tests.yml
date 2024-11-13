@@ -95,8 +95,9 @@ jobs:
           max_attempts: 5
           command: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress
 
-      - name: Execute tests
+      - name: Execute tests (display deprecations)
         run: vendor/bin/phpunit --display-deprecations --fail-on-deprecation
+        if: matrix.stability == "prefer-stable"
         env:
           DB_PORT: ${{ job.services.mysql.ports[3306] }}
           DB_USERNAME: root
@@ -105,6 +106,17 @@ jobs:
           AWS_ACCESS_KEY_ID: randomKey
           AWS_SECRET_ACCESS_KEY: randomSecret
 
+      - name: Execute tests
+        run: vendor/bin/phpunit
+        if: matrix.stability != "prefer-stable"
+        env:
+          DB_PORT: ${{ job.services.mysql.ports[3306] }}
+          DB_USERNAME: root
+          DYNAMODB_CACHE_TABLE: laravel_dynamodb_test
+          DYNAMODB_ENDPOINT: "http://localhost:8888"
+          AWS_ACCESS_KEY_ID: randomKey
+          AWS_SECRET_ACCESS_KEY: randomSecret
+          
       - name: Store artifacts
         uses: actions/upload-artifact@v4
         with:
