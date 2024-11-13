@@ -248,6 +248,17 @@ abstract class Grammar extends BaseGrammar
     }
 
     /**
+     * Create the column definition for a custom column type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    protected function typeCustom(Fluent $column)
+    {
+        return $column->offsetGet('statement');
+    }
+
+    /**
      * Add the column modifiers to the definition.
      *
      * @param  string  $sql

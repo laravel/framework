@@ -570,6 +570,36 @@ class DatabaseSchemaBlueprintTest extends TestCase
         ], $blueprint->toSql($connection, new SqlServerGrammar));
     }
 
+    public function testCustomColumn()
+    {
+        $base = new Blueprint('posts', function ($table) {
+            $table->custom('legacy_boolean', 'INT(1)')->nullable();
+        });
+
+        $connection = m::mock(Connection::class);
+
+        $blueprint = clone $base;
+        $this->assertEquals([
+            'alter table `posts` add `legacy_boolean` INT(1)',
+        ], $blueprint->toSql($connection, new MySqlGrammar));
+
+        $blueprint = clone $base;
+        $connection->shouldReceive('getServerVersion')->andReturn('3.35');
+        $this->assertEquals([
+            'alter table "posts" add column "legacy_boolean" INT(1)',
+        ], $blueprint->toSql($connection, new SQLiteGrammar));
+
+        $blueprint = clone $base;
+        $this->assertEquals([
+            'alter table "posts" add column "legacy_boolean" INT(1) null',
+        ], $blueprint->toSql($connection, new PostgresGrammar));
+
+        $blueprint = clone $base;
+        $this->assertEquals([
+            'alter table "posts" add "legacy_boolean" INT(1) null',
+        ], $blueprint->toSql($connection, new SqlServerGrammar));
+    }
+
     public function testTableComment()
     {
         $base = new Blueprint('posts', function (Blueprint $table) {
