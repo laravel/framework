@@ -633,9 +633,13 @@ class Container implements ArrayAccess, ContainerContract
      */
     protected function rebound($abstract)
     {
+        if (! $callbacks = $this->getReboundCallbacks($abstract)) {
+            return;
+        }
+
         $instance = $this->make($abstract);
 
-        foreach ($this->getReboundCallbacks($abstract) as $callback) {
+        foreach ($callbacks as $callback) {
             $callback($this, $instance);
         }
     }
