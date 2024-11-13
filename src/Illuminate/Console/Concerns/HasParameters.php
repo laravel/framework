@@ -25,11 +25,11 @@ trait HasParameters
             }
         }
 
-        foreach ($this->getOptions() as $options) {
-            if ($options instanceof InputOption) {
-                $this->getDefinition()->addOption($options);
+        foreach ($this->getOptions() as $option) {
+            if ($option instanceof InputOption) {
+                $this->getDefinition()->addOption($option);
             } else {
-                $this->addOption(...$options);
+                $this->addOption(...$option);
             }
         }
     }
