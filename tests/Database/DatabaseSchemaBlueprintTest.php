@@ -580,7 +580,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
 
         $blueprint = clone $base;
         $this->assertEquals([
-            'alter table `posts` add `legacy_boolean` INT(1)',
+            'alter table `posts` add `legacy_boolean` INT(1) null',
         ], $blueprint->toSql($connection, new MySqlGrammar));
 
         $blueprint = clone $base;
