@@ -1626,6 +1626,13 @@ class SupportStrTest extends TestCase
             $this->assertSame($expected, Str::chopEnd($subject, $needle));
         }
     }
+
+    public function testSimilar()
+    {
+        $percent = null;
+        $this->assertSame(3, Str::similar('foo', 'foo', $percent));
+        $this->assertSame(100.0, $percent);
+    }
 }
 
 class StringableObjectStub

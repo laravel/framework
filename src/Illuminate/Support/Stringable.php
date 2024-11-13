@@ -877,6 +877,18 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Calculate the similarity between two strings.
+     *
+     * @param  string  $string
+     * @param  float|null  $percent
+     * @return int
+     */
+    public function similar(string $string, float|null &$percent = null): int
+    {
+        return Str::similar($this->value, $string, $percent);
+    }
+
+    /**
      * Get the singular form of an English word.
      *
      * @return static

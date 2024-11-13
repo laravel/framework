@@ -1437,6 +1437,19 @@ class Str
     }
 
     /**
+     * Calculate the similarity between two strings.
+     *
+     * @param  string  $string1
+     * @param  string  $string2
+     * @param  float|null  $percent
+     * @return int
+     */
+    public static function similar(string $string1, string $string2, float|null &$percent = null): int
+    {
+        return similar_text($string1, $string2, $percent);
+    }
+
+    /**
      * Get the singular form of an English word.
      *
      * @param  string  $value
