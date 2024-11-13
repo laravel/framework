@@ -1359,6 +1359,9 @@ class SupportStringableTest extends TestCase
 
     public function testSimilar()
     {
+        // percent is optional
+        $this->assertSame(3, $this->stringable('foo')->similar('foo'));
+
         $percent = null;
         $this->assertSame(3, $this->stringable('foo')->similar('foo', $percent));
         $this->assertSame(100.0, $percent);

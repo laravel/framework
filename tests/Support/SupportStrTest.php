@@ -1629,6 +1629,9 @@ class SupportStrTest extends TestCase
 
     public function testSimilar()
     {
+        // percent is optional
+        $this->assertSame(3, Str::similar('foo', 'foo'));
+
         $percent = null;
         $this->assertSame(3, Str::similar('foo', 'foo', $percent));
         $this->assertSame(100.0, $percent);
