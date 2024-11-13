@@ -1219,6 +1219,22 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public function count(): int;
 
     /**
+     * Get the index of the first item that matches the given condition.
+     *
+     * @param  callable(TValue, TKey): bool  $callback
+     * @return TKey|null
+     */
+    public function firstIndex(callable $callback);
+
+    /**
+     * Get the index of the last item that matches the given condition.
+     *
+     * @param  callable(TValue, TKey): bool  $callback
+     * @return TKey|null
+     */
+    public function lastIndex(callable $callback);
+
+    /**
      * Count the number of items in the collection by a field or using a callback.
      *
      * @param  (callable(TValue, TKey): array-key)|string|null  $countBy
