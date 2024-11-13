@@ -1585,7 +1585,7 @@ class Str
         }
 
         if ($includeSearch === 'after') {
-            $after = $search . $after;
+            $after = $search.$after;
         }
 
         return [

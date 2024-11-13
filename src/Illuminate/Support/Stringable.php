@@ -1034,7 +1034,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      *
      * @param  string|bool  $search
      * @return \Illuminate\Support\Collection<int, string>
- */
+     */
     public function splitLast($search, $includeSearch = false)
     {
         return collect(Str::splitLast($this->value, $search, $includeSearch));
