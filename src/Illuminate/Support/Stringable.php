@@ -1030,6 +1030,17 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Split a string into two pieces using the last occurrence of a given value.
+     *
+     * @param  string|bool  $search
+     * @return \Illuminate\Support\Collection<int, string>
+ */
+    public function splitLast($search, $includeSearch = false)
+    {
+        return collect(Str::splitLast($this->value, $search, $includeSearch));
+    }
+
+    /**
      * Make a string's first character lowercase.
      *
      * @return static

@@ -239,6 +239,45 @@ class SupportStringableTest extends TestCase
         $this->assertSame(['He_llo_', 'World'], $this->stringable('He_llo_World')->ucsplit()->toArray());
     }
 
+    public function testSplitLast()
+    {
+        $this->assertSame(['yve', ''], $this->stringable('yvette')->splitLast('tte')->toArray());
+        $this->assertSame(['yve', 'tte'], $this->stringable('yvette')->splitLast('tte', 'after')->toArray());
+        $this->assertSame(['yvette', ''], $this->stringable('yvette')->splitLast('tte', 'before')->toArray());
+
+        $this->assertSame(['yvet', 'e'], $this->stringable('yvette')->splitLast('t', false)->toArray());
+        $this->assertSame(['yvet', 'te'], $this->stringable('yvette')->splitLast('t', 'after')->toArray());
+
+        $this->assertSame(['ééé ', 'tte'], $this->stringable('ééé yvette')->splitLast('yve')->toArray());
+        $this->assertSame(['ééé ', 'yvette'], $this->stringable('ééé yvette')->splitLast('yve', 'after')->toArray());
+        $this->assertSame(['ééé yve', 'tte'], $this->stringable('ééé yvette')->splitLast('yve', 'before')->toArray());
+        $this->assertSame(['', 'tte'], $this->stringable('yvette')->splitLast('yve')->toArray());
+
+        $this->assertSame(['yvette', ''], $this->stringable('yvette')->splitLast('xxxx')->toArray());
+        $this->assertSame(['yvette', ''], $this->stringable('yvette')->splitLast('xxxx', 'before')->toArray());
+        $this->assertSame(['yvette', ''], $this->stringable('yvette')->splitLast('xxxx', 'after')->toArray());
+
+        $this->assertSame(['yvette', ''], $this->stringable('yvette')->splitLast('')->toArray());
+        $this->assertSame(['yvette', ''], $this->stringable('yvette')->splitLast('', 'before')->toArray());
+        $this->assertSame(['yvette', ''], $this->stringable('yvette')->splitLast('', 'after')->toArray());
+
+        $this->assertSame(['yv0et', 'te'], $this->stringable('yv0et0te')->splitLast('0')->toArray());
+        $this->assertSame(['yv0et0', 'te'], $this->stringable('yv0et0te')->splitLast('0', 'before')->toArray());
+        $this->assertSame(['yv0et', '0te'], $this->stringable('yv0et0te')->splitLast('0', 'after')->toArray());
+
+        $this->assertSame(['', ''], $this->stringable('')->splitLast('test')->toArray());
+        $this->assertSame(['', ''], $this->stringable('')->splitLast('test', 'before')->toArray());
+        $this->assertSame(['', ''], $this->stringable('')->splitLast('test', 'after, ')->toArray());
+
+        $this->assertSame(['laravel framework', '11'], $this->stringable('laravel framework 11')->splitLast(' ')->toArray());
+        $this->assertSame(['laravel framework ', '11'], $this->stringable('laravel framework 11')->splitLast(' ', 'before')->toArray());
+        $this->assertSame(['laravel framework', ' 11'], $this->stringable('laravel framework 11')->splitLast(' ', 'after')->toArray());
+
+        $this->assertSame(['yvette', 'yv0et0te'], $this->stringable("yvette\tyv0et0te")->splitLast("\t")->toArray());
+        $this->assertSame(["yvette\t", 'yv0et0te'], $this->stringable("yvette\tyv0et0te")->splitLast("\t", 'before')->toArray());
+        $this->assertSame(['yvette', "\tyv0et0te"], $this->stringable("yvette\tyv0et0te")->splitLast("\t", 'after')->toArray());
+    }
+
     public function testWhenEndsWith()
     {
         $this->assertSame('Tony Stark', (string) $this->stringable('tony stark')->whenEndsWith('ark', function ($stringable) {

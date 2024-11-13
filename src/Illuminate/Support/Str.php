@@ -1560,6 +1560,41 @@ class Str
     }
 
     /**
+     * Split a string into two pieces using the last occurrence of a given value.
+     *
+     * @param  string  $subject
+     * @param  string|bool  $search
+     * @return string[]
+     */
+    public static function splitLast($subject, $search, $includeSearch = false)
+    {
+        $splitPosition = mb_strrpos($subject, $search);
+
+        // If the search value doesn't exist in the subject, or the search
+        // value is an empty string, then return an array that contains
+        // the subject and an empty string.
+        if ($splitPosition === false || $search === '') {
+            return [$subject, ''];
+        }
+
+        $before = static::beforeLast($subject, $search);
+        $after = static::afterLast($subject, $search);
+
+        if ($includeSearch === 'before') {
+            $before .= $search;
+        }
+
+        if ($includeSearch === 'after') {
+            $after = $search . $after;
+        }
+
+        return [
+            $before,
+            $after,
+        ];
+    }
+
+    /**
      * Remove all "extra" blank space from the given string.
      *
      * @param  string  $value

@@ -1149,6 +1149,45 @@ class SupportStrTest extends TestCase
         $this->assertSame(['Öffentliche', 'Überraschungen'], Str::ucsplit('ÖffentlicheÜberraschungen'));
     }
 
+    public function testSplitLast()
+    {
+        $this->assertSame(['yve', ''], Str::splitLast('yvette', 'tte'));
+        $this->assertSame(['yve', 'tte'], Str::splitLast('yvette', 'tte', 'after'));
+        $this->assertSame(['yvette', ''], Str::splitLast('yvette', 'tte', 'before'));
+
+        $this->assertSame(['yvet', 'e'], Str::splitLast('yvette', 't', false));
+        $this->assertSame(['yvet', 'te'], Str::splitLast('yvette', 't', 'after'));
+
+        $this->assertSame(['ééé ', 'tte'], Str::splitLast('ééé yvette', 'yve'));
+        $this->assertSame(['ééé ', 'yvette'], Str::splitLast('ééé yvette', 'yve', 'after'));
+        $this->assertSame(['ééé yve', 'tte'], Str::splitLast('ééé yvette', 'yve', 'before'));
+        $this->assertSame(['', 'tte'], Str::splitLast('yvette', 'yve'));
+
+        $this->assertSame(['yvette', ''], Str::splitLast('yvette', 'xxxx'));
+        $this->assertSame(['yvette', ''], Str::splitLast('yvette', 'xxxx', 'before'));
+        $this->assertSame(['yvette', ''], Str::splitLast('yvette', 'xxxx', 'after'));
+
+        $this->assertSame(['yvette', ''], Str::splitLast('yvette', ''));
+        $this->assertSame(['yvette', ''], Str::splitLast('yvette', '', 'before'));
+        $this->assertSame(['yvette', ''], Str::splitLast('yvette', '', 'after'));
+
+        $this->assertSame(['yv0et', 'te'], Str::splitLast('yv0et0te', '0'));
+        $this->assertSame(['yv0et0', 'te'], Str::splitLast('yv0et0te', '0', 'before'));
+        $this->assertSame(['yv0et', '0te'], Str::splitLast('yv0et0te', '0', 'after'));
+
+        $this->assertSame(['', ''], Str::splitLast('', 'test'));
+        $this->assertSame(['', ''], Str::splitLast('', 'test', 'before'));
+        $this->assertSame(['', ''], Str::splitLast('', 'test', 'after, '));
+
+        $this->assertSame(['laravel framework', '11'], Str::splitLast('laravel framework 11', ' '));
+        $this->assertSame(['laravel framework ', '11'], Str::splitLast('laravel framework 11', ' ', 'before'));
+        $this->assertSame(['laravel framework', ' 11'], Str::splitLast('laravel framework 11', ' ', 'after'));
+
+        $this->assertSame(['yvette', 'yv0et0te'], Str::splitLast("yvette\tyv0et0te", "\t"));
+        $this->assertSame(["yvette\t", 'yv0et0te'], Str::splitLast("yvette\tyv0et0te", "\t", 'before'));
+        $this->assertSame(['yvette', "\tyv0et0te"], Str::splitLast("yvette\tyv0et0te", "\t", 'after'));
+    }
+
     public function testUuid()
     {
         $this->assertInstanceOf(UuidInterface::class, Str::uuid());
