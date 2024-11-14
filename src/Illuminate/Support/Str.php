@@ -1563,10 +1563,11 @@ class Str
      * Split a string into two pieces using the last occurrence of a given value.
      *
      * @param  string  $subject
-     * @param  string|bool  $search
+     * @param  string $search
+     * @param  string $includeSearch
      * @return string[]
      */
-    public static function splitLast($subject, $search, $includeSearch = false)
+    public static function splitLast($subject, $search, $includeSearch = '')
     {
         $splitPosition = mb_strrpos($subject, $search);
 
