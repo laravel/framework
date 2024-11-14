@@ -202,6 +202,13 @@ class Application extends Container implements ApplicationContract, CachesConfig
     protected $mergeFrameworkConfiguration = true;
 
     /**
+     * The custom framework's base configuration path defined by the developer.
+     *
+     * @var string|null
+     */
+    protected $frameworkConfigurationPath = null;
+
+    /**
      * The prefixes of absolute cache paths for use during normalization.
      *
      * @var string[]
@@ -1231,6 +1238,27 @@ class Application extends Container implements ApplicationContract, CachesConfig
     {
         $this->mergeFrameworkConfiguration = false;
 
+        return $this;
+    }
+
+    /**
+     * Get the path to the developer's custom framework's base configuration folder.
+     *
+     * @return string
+     */
+    public function getFrameworkConfigurationPath()
+    {
+        return $this->frameworkConfigurationPath;
+    }
+
+    /**
+     * Set the path for the developer's custom framework's base configuration folder.
+     *
+     * @return $this
+     */
+    public function setFrameworkConfigurationPath($path)
+    {
+        $this->frameworkConfigurationPath = $path;
         return $this;
     }
 

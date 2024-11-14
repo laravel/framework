@@ -66,7 +66,7 @@ class LoadConfiguration
             : true;
 
         $base = $shouldMerge
-            ? $this->getBaseConfiguration()
+            ? $this->getBaseConfiguration(method_exists($app, 'getFrameworkConfigurationPath') ? $app->getFrameworkConfigurationPath() : null)
             : [];
 
         foreach (array_diff(array_keys($base), array_keys($files)) as $name => $config) {
@@ -180,13 +180,14 @@ class LoadConfiguration
     /**
      * Get the base configuration files.
      *
+     * @param  string|null $path
      * @return array
      */
-    protected function getBaseConfiguration()
+    protected function getBaseConfiguration($path)
     {
         $config = [];
 
-        foreach (Finder::create()->files()->name('*.php')->in(__DIR__.'/../../../../config') as $file) {
+        foreach (Finder::create()->files()->name('*.php')->in($path === null ? __DIR__.'/../../../../config' : $path) as $file) {
             $config[basename($file->getRealPath(), '.php')] = require $file->getRealPath();
         }
 
