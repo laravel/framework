@@ -297,7 +297,7 @@ class Schedule
             unset($this->attributes);
         }
 
-        if (!empty($this->groupStack)) {
+        if (! empty($this->groupStack)) {
             $group = end($this->groupStack);
             $group->mergeAttributes($event);
         }
