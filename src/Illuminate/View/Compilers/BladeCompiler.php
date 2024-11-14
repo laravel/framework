@@ -935,7 +935,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
     }
 
     /**
-     * Register a handler for custom directives.
+     * Register a handler for custom directives, binding the handler to the compiler.
      *
      * @param  string  $name
      * @param  callable  $handler
@@ -943,13 +943,28 @@ class BladeCompiler extends Compiler implements CompilerInterface
      *
      * @throws \InvalidArgumentException
      */
-    public function directive($name, callable $handler)
+    public function bindDirective($name, callable $handler)
+    {
+        $this->directive($name, $handler, bind: true);
+    }
+
+    /**
+     * Register a handler for custom directives.
+     *
+     * @param  string  $name
+     * @param  callable  $handler
+     * @param  bool  $bind
+     * @return void
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function directive($name, callable $handler, bool $bind = false)
     {
         if (! preg_match('/^\w+(?:::\w+)?$/x', $name)) {
             throw new InvalidArgumentException("The directive name [{$name}] is not valid. Directive names must only contain alphanumeric characters and underscores.");
         }
 
-        $this->customDirectives[$name] = $handler;
+        $this->customDirectives[$name] = $bind ? $handler->bindTo($this, BladeCompiler::class) : $handler;
     }
 
     /**

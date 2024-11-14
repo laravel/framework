@@ -3,9 +3,11 @@
 namespace Illuminate\Routing;
 
 use Illuminate\Container\Util;
+use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Reflector;
 use ReflectionClass;
+use ReflectionException;
 use ReflectionFunctionAbstract;
 use ReflectionMethod;
 use ReflectionParameter;
@@ -51,18 +53,10 @@ trait ResolvesRouteDependencies
 
         foreach ($reflector->getParameters() as $key => $parameter) {
             $className = Reflector::getParameterClassName($parameter);
+            $instance = $this->transformDependency($parameter, $parameters, $className, $skippableValue, $resolvedInterfaces);
 
-            // If the parameter has a type-hinted class, we will check to see if it is already in
-            // the list of parameters. If it is we will just skip it as it is probably a model
-            // binding and we do not want to mess with those; otherwise, we resolve it here.
-            if ($className && (! $this->alreadyInParameters($className, $parameters) || ! $this->alreadyInResolvedInterfaces($className, $resolvedInterfaces))) {
-                $instance = $this->transformDependency($parameter, $className);
-
-                if (interface_exists($className) && !class_exists($className) && $instance !== $skippableValue) {
-                    $resolvedInterfaces[] = $className;
-                }
-            } else {
-                $instance = $skippableValue;
+            if ($instance !== $skippableValue && ! $this->alreadyInResolvedInterfaces($className, $resolvedInterfaces)) {
+                $resolvedInterfaces[] = $className;
             }
 
             if ($instance !== $skippableValue) {
@@ -83,22 +77,38 @@ trait ResolvesRouteDependencies
     /**
      * Attempt to transform the given parameter into a class instance.
      *
-     * @param  \ReflectionParameter  $parameter
+     * @param  ReflectionParameter  $parameter
      * @param  array  $parameters
+     * @param  $className
      * @param  object  $skippableValue
+     * @param  $resolvedInterfaces
      * @return mixed
+     *
+     * @throws BindingResolutionException
+     * @throws ReflectionException
      */
-    protected function transformDependency(ReflectionParameter $parameter, $className)
+    protected function transformDependency(ReflectionParameter $parameter, $parameters, $className, object $skippableValue, $resolvedInterfaces)
     {
         if ($attribute = Util::getContextualAttributeFromDependency($parameter)) {
             return $this->container->resolveFromAttribute($attribute);
         }
 
-        $isEnum = (new ReflectionClass($className))->isEnum();
+        if ($this->shouldResolveInterface($className, $parameters, $resolvedInterfaces)) {
+            return $this->container->make($className);
+        }
 
-        return $parameter->isDefaultValueAvailable()
-            ? ($isEnum ? $parameter->getDefaultValue() : null)
-            : $this->container->make($className);
+        // If the parameter has a type-hinted class, we will check to see if it is already in
+        // the list of parameters. If it is we will just skip it as it is probably a model
+        // binding and we do not want to mess with those; otherwise, we resolve it here.
+        if ($className && (! $this->alreadyInParameters($className, $parameters))) {
+            $isEnum = (new ReflectionClass($className))->isEnum();
+
+            return $parameter->isDefaultValueAvailable()
+                ? ($isEnum ? $parameter->getDefaultValue() : null)
+                : $this->container->make($className);
+        }
+
+        return $skippableValue;
     }
 
     /**
@@ -116,6 +126,25 @@ trait ResolvesRouteDependencies
     protected function alreadyInResolvedInterfaces($class, array $resolvedInterfaces)
     {
         return in_array($class, $resolvedInterfaces);
+    }
+
+    /**
+     * Determines if an interface should be resolved, even if
+     * a concrete class that implements it already exists
+     * in the list of parameters.
+     *
+     * @param  $className
+     * @param  array  $parameters
+     * @param  $resolvedInterfaces
+     * @return bool
+     */
+    protected function shouldResolveInterface($className, array $parameters, $resolvedInterfaces): bool
+    {
+        return $className &&
+            $this->alreadyInParameters($className, $parameters) &&
+            interface_exists($className) &&
+            ! $this->alreadyInResolvedInterfaces($className, $resolvedInterfaces) &&
+            (new ReflectionClass($className))->isInterface();
     }
 
     /**
