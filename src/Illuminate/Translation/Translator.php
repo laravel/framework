@@ -211,8 +211,6 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
         }
 
         if (! isset($replace['count'])) {
-            // Only if no replacement for ":count" is given via $replace, add it.
-            // This allows developers to pass a formatted count.
             $replace['count'] = $number;
         }
 
