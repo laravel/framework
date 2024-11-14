@@ -19,7 +19,7 @@ use Illuminate\Support\Traits\Macroable;
 use RuntimeException;
 
 /**
- * @mixin ScheduleAttributes
+ * @mixin \Illuminate\Console\Scheduling\ScheduleAttributes
  */
 class Schedule
 {
@@ -83,9 +83,14 @@ class Schedule
      */
     protected $mutexCache = [];
 
+    /**
+     * The attributes to pass to the event.
+     */
     protected ScheduleAttributes $attributes;
 
     /**
+     * The schedule group attributes stack.
+     *
      * @var array<int, ScheduleAttributes>
      */
     protected array $groupStack = [];

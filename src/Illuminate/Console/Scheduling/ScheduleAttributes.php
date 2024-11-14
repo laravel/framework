@@ -1,11 +1,9 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Illuminate\Console\Scheduling;
 
 /**
- * @mixin Schedule
+ * @mixin \Illuminate\Console\Scheduling\Schedule
  */
 class ScheduleAttributes
 {
