@@ -6,11 +6,25 @@ namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Database\Events\ConnectionEstablished;
+use Illuminate\Database\SQLiteConnection;
 use Illuminate\Events\Dispatcher;
 use RuntimeException;
 
 class DatabaseConnectionsTest extends DatabaseTestCase
 {
+    public function testBuildDatabaseConnection()
+    {
+        /** @var \Illuminate\Database\DatabaseManager $manager */
+        $manager = $this->app->make(DatabaseManager::class);
+
+        $connection = $manager->build([
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+        ]);
+
+        $this->assertInstanceOf(SQLiteConnection::class, $connection);
+    }
+
     public function testEstablishDatabaseConnection()
     {
         /** @var \Illuminate\Database\DatabaseManager $manager */
