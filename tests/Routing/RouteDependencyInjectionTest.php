@@ -31,11 +31,17 @@ class RouteDependencyInjectionTest extends TestCase
     }
 }
 
-interface TestDependencyInterfaceA {}
+interface TestDependencyInterfaceA
+{
+}
 
-interface TestDependencyInterfaceB {}
+interface TestDependencyInterfaceB
+{
+}
 
-class TestDependencyImplementation implements TestDependencyInterfaceA, TestDependencyInterfaceB {}
+class TestDependencyImplementation implements TestDependencyInterfaceA, TestDependencyInterfaceB
+{
+}
 
 class TestDependencyController extends Controller
 {
