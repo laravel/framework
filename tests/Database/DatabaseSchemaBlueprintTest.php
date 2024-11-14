@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Connection;
-use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Builder;
 use Illuminate\Database\Schema\Grammars\MariaDbGrammar;
@@ -599,40 +598,6 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $this->assertEquals([
             'alter table "posts" add "legacy_boolean" INT(1) null',
         ], $blueprint->toSql($connection, new SqlServerGrammar));
-    }
-
-    public function testRawColumnUsingCallback()
-    {
-        $connectionMock = m::mock(Connection::class);
-
-        $base = new Blueprint('posts', function ($table) use ($connectionMock) {
-            $table->rawColumn('legacy_boolean', function (ConnectionInterface $connection) use ($connectionMock) {
-                $this->assertSame($connection, $connectionMock);
-
-                return 'INT(1)';
-            })->nullable();
-        });
-
-        $blueprint = clone $base;
-        $this->assertEquals([
-            'alter table `posts` add `legacy_boolean` INT(1) null',
-        ], $blueprint->toSql($connectionMock, new MySqlGrammar));
-
-        $blueprint = clone $base;
-        $connectionMock->shouldReceive('getServerVersion')->andReturn('3.35');
-        $this->assertEquals([
-            'alter table "posts" add column "legacy_boolean" INT(1)',
-        ], $blueprint->toSql($connectionMock, new SQLiteGrammar));
-
-        $blueprint = clone $base;
-        $this->assertEquals([
-            'alter table "posts" add column "legacy_boolean" INT(1) null',
-        ], $blueprint->toSql($connectionMock, new PostgresGrammar));
-
-        $blueprint = clone $base;
-        $this->assertEquals([
-            'alter table "posts" add "legacy_boolean" INT(1) null',
-        ], $blueprint->toSql($connectionMock, new SqlServerGrammar));
     }
 
     public function testTableComment()

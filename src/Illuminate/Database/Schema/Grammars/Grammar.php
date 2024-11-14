@@ -251,11 +251,11 @@ abstract class Grammar extends BaseGrammar
      * Create the column definition for a raw column type.
      *
      * @param  \Illuminate\Support\Fluent  $column
-     * @return string|(\Closure(\Illuminate\Database\Connection): string)
+     * @return string
      */
     protected function typeRaw(Fluent $column)
     {
-        return value($column->offsetGet('definition'), $this->connection);
+        return $column->offsetGet('definition');
     }
 
     /**
