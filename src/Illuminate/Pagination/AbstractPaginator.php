@@ -14,7 +14,7 @@ use Traversable;
 /**
  * @template TKey of array-key
  *
- * @template-covariant TValue
+ * @template TValue
  *
  * @mixin \Illuminate\Support\Collection<TKey, TValue>
  */
@@ -653,7 +653,7 @@ abstract class AbstractPaginator implements Htmlable, Stringable
     /**
      * Get an iterator for the items.
      *
-     * @return \ArrayIterator
+     * @return \ArrayIterator<TKey, TValue>
      */
     public function getIterator(): Traversable
     {

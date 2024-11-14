@@ -14,7 +14,7 @@ use JsonSerializable;
 /**
  * @template TKey of array-key
  *
- * @template-covariant TValue
+ * @template TValue
  *
  * @implements Arrayable<TKey, TValue>
  * @implements ArrayAccess<TKey, TValue>
