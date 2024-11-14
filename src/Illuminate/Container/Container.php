@@ -1108,22 +1108,32 @@ class Container implements ArrayAccess, ContainerContract
      */
     protected function resolveClass(ReflectionParameter $parameter)
     {
+        $className = Util::getParameterClassName($parameter);
+
+        // First, we check if the dependency has been explicitly bound in
+        // the container, and if so, we resolve it directly from there
+        // to respect explicit bindings over developer set defaults.
+        if ($this->bound($className)) {
+            return $this->make($className);
+        }
+
+        // If no binding exists, we check if any default value is
+        // available and return it. This avoids overriding any
+        // developer set defaults when constructing classes.
+        if ($parameter->isDefaultValueAvailable()) {
+            return $parameter->getDefaultValue();
+        }
+
         try {
             return $parameter->isVariadic()
                         ? $this->resolveVariadicClass($parameter)
-                        : $this->make(Util::getParameterClassName($parameter));
+                        : $this->make($className);
         }
 
-        // If we can not resolve the class instance, we will check to see if the value
-        // is optional, and if it is we will return the optional parameter value as
-        // the value of the dependency, similarly to how we do this with scalars.
+        // If we can not resolve the class instance, we will check to see if the
+        // value is variadic, and if it is we will return an empty array as the
+        // value of the dependency, similarly to how we do this with scalars.
         catch (BindingResolutionException $e) {
-            if ($parameter->isDefaultValueAvailable()) {
-                array_pop($this->with);
-
-                return $parameter->getDefaultValue();
-            }
-
             if ($parameter->isVariadic()) {
                 array_pop($this->with);
 
