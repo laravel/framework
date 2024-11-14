@@ -1252,27 +1252,27 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testWhereFulltextMySql()
     {
         $builder = $this->getMySqlBuilderWithProcessor();
-        $builder->select('*')->from('users')->whereFulltext('body', 'Hello World');
+        $builder->select('*')->from('users')->whereFullText('body', 'Hello World');
         $this->assertSame('select * from `users` where match (`body`) against (? in natural language mode)', $builder->toSql());
         $this->assertEquals(['Hello World'], $builder->getBindings());
 
         $builder = $this->getMySqlBuilderWithProcessor();
-        $builder->select('*')->from('users')->whereFulltext('body', 'Hello World', ['expanded' => true]);
+        $builder->select('*')->from('users')->whereFullText('body', 'Hello World', ['expanded' => true]);
         $this->assertSame('select * from `users` where match (`body`) against (? in natural language mode with query expansion)', $builder->toSql());
         $this->assertEquals(['Hello World'], $builder->getBindings());
 
         $builder = $this->getMySqlBuilderWithProcessor();
-        $builder->select('*')->from('users')->whereFulltext('body', '+Hello -World', ['mode' => 'boolean']);
+        $builder->select('*')->from('users')->whereFullText('body', '+Hello -World', ['mode' => 'boolean']);
         $this->assertSame('select * from `users` where match (`body`) against (? in boolean mode)', $builder->toSql());
         $this->assertEquals(['+Hello -World'], $builder->getBindings());
 
         $builder = $this->getMySqlBuilderWithProcessor();
-        $builder->select('*')->from('users')->whereFulltext('body', '+Hello -World', ['mode' => 'boolean', 'expanded' => true]);
+        $builder->select('*')->from('users')->whereFullText('body', '+Hello -World', ['mode' => 'boolean', 'expanded' => true]);
         $this->assertSame('select * from `users` where match (`body`) against (? in boolean mode)', $builder->toSql());
         $this->assertEquals(['+Hello -World'], $builder->getBindings());
 
         $builder = $this->getMySqlBuilderWithProcessor();
-        $builder->select('*')->from('users')->whereFulltext(['body', 'title'], 'Car,Plane');
+        $builder->select('*')->from('users')->whereFullText(['body', 'title'], 'Car,Plane');
         $this->assertSame('select * from `users` where match (`body`, `title`) against (? in natural language mode)', $builder->toSql());
         $this->assertEquals(['Car,Plane'], $builder->getBindings());
     }
@@ -1280,37 +1280,37 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testWhereFulltextPostgres()
     {
         $builder = $this->getPostgresBuilderWithProcessor();
-        $builder->select('*')->from('users')->whereFulltext('body', 'Hello World');
+        $builder->select('*')->from('users')->whereFullText('body', 'Hello World');
         $this->assertSame('select * from "users" where (to_tsvector(\'english\', "body")) @@ plainto_tsquery(\'english\', ?)', $builder->toSql());
         $this->assertEquals(['Hello World'], $builder->getBindings());
 
         $builder = $this->getPostgresBuilderWithProcessor();
-        $builder->select('*')->from('users')->whereFulltext('body', 'Hello World', ['language' => 'simple']);
+        $builder->select('*')->from('users')->whereFullText('body', 'Hello World', ['language' => 'simple']);
         $this->assertSame('select * from "users" where (to_tsvector(\'simple\', "body")) @@ plainto_tsquery(\'simple\', ?)', $builder->toSql());
         $this->assertEquals(['Hello World'], $builder->getBindings());
 
         $builder = $this->getPostgresBuilderWithProcessor();
-        $builder->select('*')->from('users')->whereFulltext('body', 'Hello World', ['mode' => 'plain']);
+        $builder->select('*')->from('users')->whereFullText('body', 'Hello World', ['mode' => 'plain']);
         $this->assertSame('select * from "users" where (to_tsvector(\'english\', "body")) @@ plainto_tsquery(\'english\', ?)', $builder->toSql());
         $this->assertEquals(['Hello World'], $builder->getBindings());
 
         $builder = $this->getPostgresBuilderWithProcessor();
-        $builder->select('*')->from('users')->whereFulltext('body', 'Hello World', ['mode' => 'phrase']);
+        $builder->select('*')->from('users')->whereFullText('body', 'Hello World', ['mode' => 'phrase']);
         $this->assertSame('select * from "users" where (to_tsvector(\'english\', "body")) @@ phraseto_tsquery(\'english\', ?)', $builder->toSql());
         $this->assertEquals(['Hello World'], $builder->getBindings());
 
         $builder = $this->getPostgresBuilderWithProcessor();
-        $builder->select('*')->from('users')->whereFulltext('body', '+Hello -World', ['mode' => 'websearch']);
+        $builder->select('*')->from('users')->whereFullText('body', '+Hello -World', ['mode' => 'websearch']);
         $this->assertSame('select * from "users" where (to_tsvector(\'english\', "body")) @@ websearch_to_tsquery(\'english\', ?)', $builder->toSql());
         $this->assertEquals(['+Hello -World'], $builder->getBindings());
 
         $builder = $this->getPostgresBuilderWithProcessor();
-        $builder->select('*')->from('users')->whereFulltext('body', 'Hello World', ['language' => 'simple', 'mode' => 'plain']);
+        $builder->select('*')->from('users')->whereFullText('body', 'Hello World', ['language' => 'simple', 'mode' => 'plain']);
         $this->assertSame('select * from "users" where (to_tsvector(\'simple\', "body")) @@ plainto_tsquery(\'simple\', ?)', $builder->toSql());
         $this->assertEquals(['Hello World'], $builder->getBindings());
 
         $builder = $this->getPostgresBuilderWithProcessor();
-        $builder->select('*')->from('users')->whereFulltext(['body', 'title'], 'Car Plane');
+        $builder->select('*')->from('users')->whereFullText(['body', 'title'], 'Car Plane');
         $this->assertSame('select * from "users" where (to_tsvector(\'english\', "body") || to_tsvector(\'english\', "title")) @@ plainto_tsquery(\'english\', ?)', $builder->toSql());
         $this->assertEquals(['Car Plane'], $builder->getBindings());
     }

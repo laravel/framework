@@ -9,6 +9,7 @@ use Illuminate\Database\Console\WipeCommand;
 
 /**
  * @method static \Illuminate\Database\Connection connection(string|null $name = null)
+ * @method static \Illuminate\Database\ConnectionInterface build(array $config)
  * @method static \Illuminate\Database\ConnectionInterface connectUsing(string $name, array $config, bool $force = false)
  * @method static void purge(string|null $name = null)
  * @method static void disconnect(string|null $name = null)
@@ -105,7 +106,7 @@ use Illuminate\Database\Console\WipeCommand;
  * @method static string getServerVersion()
  * @method static void resolverFor(string $driver, \Closure $callback)
  * @method static \Closure|null getResolver(string $driver)
- * @method static mixed transaction(\Closure $callback, int $attempts = 1)
+ * @method static void transaction(\Closure $callback, int $attempts = 1)
  * @method static void beginTransaction()
  * @method static void commit()
  * @method static void rollBack(int|null $toLevel = null)

@@ -39,6 +39,13 @@ class PostgresGrammar extends Grammar
     ];
 
     /**
+     * Indicates if the cascade option should be used when truncating.
+     *
+     * @var bool
+     */
+    protected static $cascadeTruncate = true;
+
+    /**
      * Compile a basic where clause.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
@@ -653,7 +660,7 @@ class PostgresGrammar extends Grammar
      */
     public function compileTruncate(Builder $query)
     {
-        return ['truncate '.$this->wrapTable($query->from).' restart identity cascade' => []];
+        return ['truncate '.$this->wrapTable($query->from).' restart identity'.(static::$cascadeTruncate ? ' cascade' : '') => []];
     }
 
     /**
@@ -801,5 +808,16 @@ class PostgresGrammar extends Grammar
         static::$customOperators = array_values(
             array_merge(static::$customOperators, array_filter(array_filter($operators, 'is_string')))
         );
+    }
+
+    /**
+     * Enable or disable the "cascade" option when compiling the truncate statement.
+     *
+     * @param  bool  $value
+     * @return void
+     */
+    public static function cascadeOnTrucate(bool $value = true)
+    {
+        static::$cascadeTruncate = $value;
     }
 }

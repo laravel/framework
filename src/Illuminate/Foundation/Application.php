@@ -759,7 +759,9 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function detectEnvironment(Closure $callback)
     {
-        $args = $_SERVER['argv'] ?? null;
+        $args = $this->runningInConsole() && $_SERVER['argv']
+            ? $_SERVER['argv']
+            : null;
 
         return $this['env'] = (new EnvironmentDetector)->detect($callback, $args);
     }
@@ -1466,6 +1468,17 @@ class Application extends Container implements ApplicationContract, CachesConfig
     }
 
     /**
+     * Determine if the given service is a deferred service.
+     *
+     * @param  string  $service
+     * @return bool
+     */
+    public function isDeferredService($service)
+    {
+        return isset($this->deferredServices[$service]);
+    }
+
+    /**
      * Add an array of services to the application's deferred services.
      *
      * @param  array  $services
@@ -1477,14 +1490,16 @@ class Application extends Container implements ApplicationContract, CachesConfig
     }
 
     /**
-     * Determine if the given service is a deferred service.
+     * Remove an array of services from the application's deferred services.
      *
-     * @param  string  $service
-     * @return bool
+     * @param  array  $services
+     * @return void
      */
-    public function isDeferredService($service)
+    public function removeDeferredServices(array $services)
     {
-        return isset($this->deferredServices[$service]);
+        foreach ($services as $service) {
+            unset($this->deferredServices[$service]);
+        }
     }
 
     /**

@@ -7097,6 +7097,26 @@ class ValidationValidatorTest extends TestCase
         $this->assertArrayHasKey('foo.bar', $v->validated());
     }
 
+    public function testDotPlaceholdersInParametersAreReplacedIn()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.required_without' => 'The :attribute field is required when :values is not present.'], 'en');
+
+        // Single parameter
+        $v = new Validator($trans, [], [
+            'name' => 'required_without:user\.name',
+        ]);
+        $this->assertTrue($v->fails());
+        $this->assertSame('The name field is required when user.name is not present.', $v->messages()->first());
+
+        // Multiple parameters
+        $v = new Validator($trans, [], [
+            'name' => 'required_without:user\.name,admin\.name',
+        ]);
+        $this->assertTrue($v->fails());
+        $this->assertSame('The name field is required when user.name / admin.name is not present.', $v->messages()->first());
+    }
+
     public function testCoveringEmptyKeys()
     {
         $trans = $this->getIlluminateArrayTranslator();

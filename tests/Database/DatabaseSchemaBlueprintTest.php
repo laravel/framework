@@ -17,6 +17,7 @@ use Illuminate\Database\Schema\MySqlBuilder;
 use Illuminate\Database\Schema\PostgresBuilder;
 use Illuminate\Database\Schema\SQLiteBuilder;
 use Illuminate\Database\Schema\SqlServerBuilder;
+use Illuminate\Tests\Database\Fixtures\Models\User;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -395,6 +396,38 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $this->assertEquals([
             'alter table `posts` add `eloquent_model_ulid_stub_id` char(26) not null',
         ], $getSql(new MySqlGrammar));
+    }
+
+    public function testGenerateRelationshipConstrainedColumn()
+    {
+        $base = new Blueprint('posts', function ($table) {
+            $table->foreignIdFor('Illuminate\Foundation\Auth\User')->constrained();
+        });
+
+        $connection = m::mock(Connection::class);
+
+        $blueprint = clone $base;
+
+        $this->assertEquals([
+            'alter table `posts` add `user_id` bigint unsigned not null',
+            'alter table `posts` add constraint `posts_user_id_foreign` foreign key (`user_id`) references `users` (`id`)',
+        ], $blueprint->toSql($connection, new MySqlGrammar));
+    }
+
+    public function testGenerateRelationshipForModelWithNonStandardPrimaryKeyName()
+    {
+        $base = new Blueprint('posts', function ($table) {
+            $table->foreignIdFor(User::class)->constrained();
+        });
+
+        $connection = m::mock(Connection::class);
+
+        $blueprint = clone $base;
+
+        $this->assertEquals([
+            'alter table `posts` add `user_internal_id` bigint unsigned not null',
+            'alter table `posts` add constraint `posts_user_internal_id_foreign` foreign key (`user_internal_id`) references `users` (`internal_id`)',
+        ], $blueprint->toSql($connection, new MySqlGrammar));
     }
 
     public function testDropRelationshipColumnWithIncrementalModel()
