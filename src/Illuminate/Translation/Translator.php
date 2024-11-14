@@ -210,7 +210,11 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
             $number = count($number);
         }
 
-        $replace['count'] = $number;
+        if (!isset($replace['count'])) {
+            // Only if no replacement for ":count" is given via $replace, add it.
+            // This allows developers to pass a formatted count.
+            $replace['count'] = $number;
+        }
 
         return $this->makeReplacements(
             $this->getSelector()->choose($line, $number, $locale), $replace
