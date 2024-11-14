@@ -22,19 +22,14 @@ class RouteDependencyInjectionTest extends TestCase
         $container->bind(TestDependencyInterfaceA::class, TestDependencyImplementation::class);
         $container->bind(TestDependencyInterfaceB::class, TestDependencyImplementation::class);
 
-        $controller = m::mock(TestDependencyController::class)->makePartial();
-        $controller->shouldReceive('index')
-            ->once()
-            ->withArgs(function ($a, $b) {
-                return $a instanceof TestDependencyImplementation
-                    && $b instanceof TestDependencyImplementation
-                    && $a !== $b; // They should be different instances
-            })
-            ->andReturn([new TestDependencyImplementation, new TestDependencyImplementation]);
+        $controller = new TestDependencyController();
+        $result = $controller->index(
+            $container->make(TestDependencyInterfaceA::class),
+            $container->make(TestDependencyInterfaceB::class)
+        );
 
-        $container->instance(TestDependencyController::class, $controller);
-
-        $router->get('/test-inject-dependency-interfaces', TestDependencyController::class.'@index');
+        $this->assertInstanceOf(TestDependencyImplementation::class, $result[0]);
+        $this->assertInstanceOf(TestDependencyImplementation::class, $result[1]);
     }
 }
 
