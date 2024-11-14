@@ -16,9 +16,8 @@ class ScheduleGroupTest extends TestCase
         $schedule = new ScheduleClass;
 
         $schedule
-            ->group()
             ->daily()
-            ->schedules(function (ScheduleClass $schedule) {
+            ->group(function (ScheduleClass $schedule) {
                 $schedule->command('inspire');
             });
 
@@ -28,13 +27,11 @@ class ScheduleGroupTest extends TestCase
 
     public function testGroupedScheduleCanOverrideGroupCronExpression()
     {
-        Schedule::group()
-            ->daily()
-            ->schedules(function () {
-                Schedule::command('inspire');
-                Schedule::command('inspire')
-                    ->twiceDaily();
-            });
+        Schedule::daily()->group(function () {
+            Schedule::command('inspire');
+            Schedule::command('inspire')
+                ->twiceDaily();
+        });
 
         $events = Schedule::events();
         $this->assertSame('0 0 * * *', $events[0]->expression);
@@ -43,10 +40,9 @@ class ScheduleGroupTest extends TestCase
 
     public function testGroupCanSetScheduleRepeatSeconds()
     {
-        Schedule::group()
-            ->everyMinute()
+        Schedule::everyMinute()
             ->everyThirtySeconds()
-            ->schedules(function () {
+            ->group(function () {
                 Schedule::command('inspire');
             });
 
@@ -57,10 +53,9 @@ class ScheduleGroupTest extends TestCase
 
     public function testGroupedScheduleCanOverrideGroupRepeatSeconds()
     {
-        Schedule::group()
-            ->everyMinute()
+        Schedule::everyMinute()
             ->everyThirtySeconds()
-            ->schedules(function () {
+            ->group(function () {
                 Schedule::command('inspire');
                 Schedule::command('inspire')
                     ->everyTwentySeconds();
@@ -76,14 +71,13 @@ class ScheduleGroupTest extends TestCase
 
     public function testGroupedScheduleCanBeNested()
     {
-        Schedule::group()
-            ->daily()
+        Schedule::daily()
             ->timezone('UTC')
-            ->schedules(function () {
+            ->group(function () {
                 Schedule::command('inspire');
-                Schedule::group()
-                    ->timezone('Asia/Dhaka')
-                    ->schedules(function () {
+                Schedule::timezone('Asia/Dhaka')
+                    ->everyMinute()
+                    ->group(function () {
                         Schedule::command('inspire');
                     });
             });
@@ -99,11 +93,9 @@ class ScheduleGroupTest extends TestCase
     #[DataProvider('groupAttributes')]
     public function testGroupCanApplyAttributeToSchedules(string $property, mixed $value)
     {
-        Schedule::group()
-            ->$property($value)
-            ->schedules(function () {
-                Schedule::command('inspire');
-            });
+        Schedule::$property($value)->group(function () {
+            Schedule::command('inspire');
+        });
 
         $events = Schedule::events();
 

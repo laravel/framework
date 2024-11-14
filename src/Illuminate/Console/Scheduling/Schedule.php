@@ -2,6 +2,7 @@
 
 namespace Illuminate\Console\Scheduling;
 
+use BadMethodCallException;
 use Closure;
 use DateTimeInterface;
 use Illuminate\Bus\UniqueLock;
@@ -17,9 +18,14 @@ use Illuminate\Support\ProcessUtils;
 use Illuminate\Support\Traits\Macroable;
 use RuntimeException;
 
+/**
+ * @mixin ScheduleAttributes
+ */
 class Schedule
 {
-    use Macroable;
+    use Macroable {
+        __call as macroCall;
+    }
 
     const SUNDAY = 0;
 
@@ -77,8 +83,10 @@ class Schedule
      */
     protected $mutexCache = [];
 
+    protected ScheduleAttributes $attributes;
+
     /**
-     * @var array<int, ScheduleGroup>
+     * @var array<int, ScheduleAttributes>
      */
     protected array $groupStack = [];
 
@@ -124,7 +132,7 @@ class Schedule
             $this->eventMutex, $callback, $parameters, $this->timezone
         );
 
-        $this->mergeGroupAttributesWhenApplicable($event);
+        $this->mergeAttributes($event);
 
         return $event;
     }
@@ -183,24 +191,29 @@ class Schedule
     /**
      * Create new schedule group.
      */
-    public function group(): ScheduleGroup
+    public function group(Closure $events): void
     {
-        return $this->groupStack[] = new ScheduleGroup($this, function () {
-            array_pop($this->groupStack);
-        });
+        $this->groupStack[] = $this->attributes;
+
+        $events($this);
+
+        array_pop($this->groupStack);
     }
 
     /**
      * Merge the attributes with the last group stack.
      */
-    protected function mergeGroupAttributesWhenApplicable(Event $event): void
+    protected function mergeAttributes(Event $event): void
     {
-        if (empty($this->groupStack)) {
-            return;
+        if(isset($this->attributes)){
+            $this->attributes->mergeAttributes($event);
+            unset($this->attributes);
         }
 
-        $group = end($this->groupStack);
-        $group->mergeAttributes($event);
+        if (!empty($this->groupStack)) {
+            $group = end($this->groupStack);
+            $group->mergeAttributes($event);
+        }
     }
 
     /**
@@ -285,7 +298,7 @@ class Schedule
 
         $this->events[] = $event = new Event($this->eventMutex, $command, $this->timezone);
 
-        $this->mergeGroupAttributesWhenApplicable($event);
+        $this->mergeAttributes($event);
 
         return $event;
     }
@@ -410,5 +423,29 @@ class Schedule
         }
 
         return $this->dispatcher;
+    }
+
+    /**
+     * Dynamically handle calls into the schedule instance.
+     *
+     * @param  string  $method
+     * @param  array  $parameters
+     * @return mixed
+     */
+    public function __call($method, $parameters)
+    {
+        if (static::hasMacro($method)) {
+            return $this->macroCall($method, $parameters);
+        }
+
+        if(method_exists(ScheduleAttributes::class, $method)){
+            $this->attributes ??= new ScheduleAttributes($this);
+
+            return $this->attributes->$method(...$parameters);
+        }
+
+        throw new BadMethodCallException(sprintf(
+            'Method %s::%s does not exist.', static::class, $method
+        ));
     }
 }
