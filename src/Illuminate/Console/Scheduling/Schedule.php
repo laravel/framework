@@ -189,34 +189,6 @@ class Schedule
     }
 
     /**
-     * Create new schedule group.
-     */
-    public function group(Closure $events): void
-    {
-        $this->groupStack[] = $this->attributes;
-
-        $events($this);
-
-        array_pop($this->groupStack);
-    }
-
-    /**
-     * Merge the attributes with the last group stack.
-     */
-    protected function mergeAttributes(Event $event): void
-    {
-        if(isset($this->attributes)){
-            $this->attributes->mergeAttributes($event);
-            unset($this->attributes);
-        }
-
-        if (!empty($this->groupStack)) {
-            $group = end($this->groupStack);
-            $group->mergeAttributes($event);
-        }
-    }
-
-    /**
      * Dispatch the given job to the queue.
      *
      * @param  object  $job
@@ -301,6 +273,34 @@ class Schedule
         $this->mergeAttributes($event);
 
         return $event;
+    }
+
+    /**
+     * Create new schedule group.
+     */
+    public function group(Closure $events): void
+    {
+        $this->groupStack[] = $this->attributes;
+
+        $events($this);
+
+        array_pop($this->groupStack);
+    }
+
+    /**
+     * Merge the attributes with the given event.
+     */
+    protected function mergeAttributes(Event $event): void
+    {
+        if (isset($this->attributes)) {
+            $this->attributes->mergeAttributes($event);
+            unset($this->attributes);
+        }
+
+        if (!empty($this->groupStack)) {
+            $group = end($this->groupStack);
+            $group->mergeAttributes($event);
+        }
     }
 
     /**
@@ -438,7 +438,7 @@ class Schedule
             return $this->macroCall($method, $parameters);
         }
 
-        if(method_exists(ScheduleAttributes::class, $method)){
+        if (method_exists(ScheduleAttributes::class, $method)) {
             $this->attributes ??= new ScheduleAttributes($this);
 
             return $this->attributes->$method(...$parameters);
