@@ -1610,12 +1610,12 @@ class Blueprint
      * Create a new custom column on the table.
      *
      * @param  string  $column
-     * @param  string  $statement
+     * @param  string  $definition
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function custom($column, $statement)
+    public function rawColumn($column, $definition)
     {
-        return $this->addColumn('custom', $column, compact('statement'));
+        return $this->addColumn('raw', $column, compact('definition'));
     }
 
     /**

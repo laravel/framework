@@ -570,10 +570,10 @@ class DatabaseSchemaBlueprintTest extends TestCase
         ], $blueprint->toSql($connection, new SqlServerGrammar));
     }
 
-    public function testCustomColumn()
+    public function testRawColumn()
     {
         $base = new Blueprint('posts', function ($table) {
-            $table->custom('legacy_boolean', 'INT(1)')->nullable();
+            $table->rawColumn('legacy_boolean', 'INT(1)')->nullable();
         });
 
         $connection = m::mock(Connection::class);
