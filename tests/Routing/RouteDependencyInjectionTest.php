@@ -5,11 +5,9 @@ namespace Illuminate\Tests\Routing;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Routing\Registrar;
 use Illuminate\Events\Dispatcher;
-use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Routing\Router;
 use PHPUnit\Framework\TestCase;
-use Mockery as m;
 
 class RouteDependencyInjectionTest extends TestCase
 {
