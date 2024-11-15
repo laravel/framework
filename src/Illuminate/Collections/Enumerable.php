@@ -334,7 +334,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public function whenNotEmpty(callable $callback, ?callable $default = null);
 
     /**
-     * Apply the callback if the given "value" is (or resolves to) truthy.
+     * Apply the callback if the given "value" is (or resolves to) falsy.
      *
      * @template TUnlessReturnType
      *
