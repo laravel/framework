@@ -13,6 +13,7 @@ use JsonSerializable;
 
 /**
  * @template TKey of array-key
+ *
  * @template-covariant TValue
  *
  * @extends AbstractPaginator<TKey, TValue>

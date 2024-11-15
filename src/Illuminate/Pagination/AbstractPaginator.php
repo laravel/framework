@@ -13,6 +13,7 @@ use Traversable;
 
 /**
  * @template TKey of array-key
+ *
  * @template-covariant TValue
  *
  * @mixin \Illuminate\Support\Collection<TKey, TValue>

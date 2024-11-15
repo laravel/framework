@@ -4,6 +4,7 @@ namespace Illuminate\Contracts\Pagination;
 
 /**
  * @template TKey of array-key
+ *
  * @template-covariant TValue
  */
 interface CursorPaginator
