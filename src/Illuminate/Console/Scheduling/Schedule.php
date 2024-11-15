@@ -19,7 +19,7 @@ use Illuminate\Support\Traits\Macroable;
 use RuntimeException;
 
 /**
- * @mixin \Illuminate\Console\Scheduling\ScheduleAttributes
+ * @mixin \Illuminate\Console\Scheduling\PendingEventAttributes
  */
 class Schedule
 {
@@ -85,13 +85,15 @@ class Schedule
 
     /**
      * The attributes to pass to the event.
+     *
+     * @var \Illuminate\Console\Scheduling\PendingEventAttributes
      */
-    protected ScheduleAttributes $attributes;
+    protected $attributes;
 
     /**
      * The schedule group attributes stack.
      *
-     * @var array<int, ScheduleAttributes>
+     * @var array<int, PendingEventAttributes>
      */
     protected array $groupStack = [];
 
@@ -282,8 +284,11 @@ class Schedule
 
     /**
      * Create new schedule group.
+     *
+     * @param  \Illuminate\Console\Scheduling\Event  $event
+     * @return void
      */
-    public function group(Closure $events): void
+    public function group(Closure $events)
     {
         $this->groupStack[] = $this->attributes;
 
@@ -293,9 +298,12 @@ class Schedule
     }
 
     /**
-     * Merge the attributes with the given event.
+     * Merge the current group attributes with the given event.
+     *
+     * @param  \Illuminate\Console\Scheduling\Event  $event
+     * @return void
      */
-    protected function mergeAttributes(Event $event): void
+    protected function mergeAttributes(Event $event)
     {
         if (isset($this->attributes)) {
             $this->attributes->mergeAttributes($event);
@@ -305,6 +313,7 @@ class Schedule
 
         if (! empty($this->groupStack)) {
             $group = end($this->groupStack);
+
             $group->mergeAttributes($event);
         }
     }
@@ -444,8 +453,8 @@ class Schedule
             return $this->macroCall($method, $parameters);
         }
 
-        if (method_exists(ScheduleAttributes::class, $method)) {
-            $this->attributes ??= new ScheduleAttributes($this);
+        if (method_exists(PendingEventAttributes::class, $method)) {
+            $this->attributes ??= new PendingEventAttributes($this);
 
             return $this->attributes->$method(...$parameters);
         }

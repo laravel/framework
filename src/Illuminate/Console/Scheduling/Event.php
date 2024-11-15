@@ -22,7 +22,7 @@ use Throwable;
 
 class Event
 {
-    use Macroable, ManagesFrequencies, ManagesAttributes, ReflectsClosures, Tappable;
+    use Macroable, ManagesAttributes, ManagesFrequencies, ReflectsClosures, Tappable;
 
     /**
      * The command string.

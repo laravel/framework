@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Illuminate\Console\Scheduling;
 
 use Illuminate\Support\Reflector;
