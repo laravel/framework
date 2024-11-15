@@ -1626,6 +1626,35 @@ class SupportStrTest extends TestCase
             $this->assertSame($expected, Str::chopEnd($subject, $needle));
         }
     }
+
+    public function testIsAnagram()
+    {
+        // Valid anagrams
+        $this->assertTrue(Str::isAnagram('listen', 'silent'));
+        $this->assertTrue(Str::isAnagram('triangle', 'integral'));
+        $this->assertTrue(Str::isAnagram('anagram', 'nagaram'));
+
+        // Invalid anagrams
+        $this->assertFalse(Str::isAnagram('hello', 'world'));
+        $this->assertFalse(Str::isAnagram('test', 'settle'));
+        $this->assertFalse(Str::isAnagram('example', 'samples'));
+
+        // Case-insensitive anagrams
+        $this->assertTrue(Str::isAnagram('Listen', 'Silent'));
+        $this->assertTrue(Str::isAnagram('Triangle', 'Integral'));
+
+        // Anagrams with spaces
+        $this->assertTrue(Str::isAnagram('a gentleman', 'elegant man'));
+        $this->assertTrue(Str::isAnagram('The Morse Code', 'Here come dots'));
+
+        // Empty strings
+        $this->assertTrue(Str::isAnagram('', ''));
+        $this->assertFalse(Str::isAnagram('', 'notempty'));
+
+        // Special characters
+        $this->assertTrue(Str::isAnagram('!@#$', '#$@!'));
+        $this->assertFalse(Str::isAnagram('hello!', 'olleh'));
+    }
 }
 
 class StringableObjectStub

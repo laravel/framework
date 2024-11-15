@@ -2009,4 +2009,18 @@ class Str
         static::$camelCache = [];
         static::$studlyCache = [];
     }
+
+    /**
+     * Determine if two strings are anagrams of each other.
+     *
+     * @param  string  $string1
+     * @param  string  $string2
+     */
+    public static function isAnagram($string1, $string2): bool
+    {
+        $string1 = preg_replace('/\s+/', '', mb_strtolower($string1));
+        $string2 = preg_replace('/\s+/', '', mb_strtolower($string2));
+
+        return count_chars($string1, 1) === count_chars($string2, 1);
+    }
 }
