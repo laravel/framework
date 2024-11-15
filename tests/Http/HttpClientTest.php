@@ -2279,7 +2279,7 @@ class HttpClientTest extends TestCase
         $this->assertInstanceOf(ConnectionException::class, $exception);
         $this->assertSame('Fake', $exception->getMessage());
 
-        $this->factory->assertSentCount(1);
+        $this->factory->assertSentCount(2);
     }
 
     public function testMiddlewareRunsWhenFaked()
