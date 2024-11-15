@@ -37,6 +37,7 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use RuntimeException;
 use Symfony\Component\VarDumper\VarDumper;
+use Throwable;
 
 class HttpClientTest extends TestCase
 {
@@ -2200,30 +2201,60 @@ class HttpClientTest extends TestCase
     {
         $this->factory->fake($this->factory->failedConnection('Fake'));
 
-        $this->expectException(ConnectionException::class);
-        $this->expectExceptionMessage('Fake');
+        $exception = null;
 
-        $this->factory->post('https://example.com');
+        try {
+            $this->factory->post('https://example.com');
+        } catch (Throwable $e) {
+            $exception = $e;
+        }
+
+        $this->assertNotNull($exception);
+        $this->assertInstanceOf(ConnectionException::class, $exception);
+        $this->assertSame('Fake', $exception->getMessage());
+
+        $this->factory->assertSentCount(1);
+        $this->factory->assertSent(function (Request $request, ?Response $response) {
+            return $request->url() === 'https://example.com' && $response === null;
+        });
     }
 
     public function testFakeConnectionExceptionWithinFakeClosure()
     {
         $this->factory->fake(fn () => $this->factory->failedConnection('Fake'));
 
-        $this->expectException(ConnectionException::class);
-        $this->expectExceptionMessage('Fake');
+        $exception = null;
 
-        $this->factory->post('https://example.com');
+        try {
+            $this->factory->post('https://example.com');
+        } catch (Throwable $e) {
+            $exception = $e;
+        }
+
+        $this->assertNotNull($exception);
+        $this->assertInstanceOf(ConnectionException::class, $exception);
+        $this->assertSame('Fake', $exception->getMessage());
+
+        $this->factory->assertSentCount(1);
     }
 
     public function testFakeConnectionExceptionWithinArray()
     {
         $this->factory->fake(['*' => $this->factory->failedConnection('Fake')]);
 
-        $this->expectException(ConnectionException::class);
-        $this->expectExceptionMessage('Fake');
+        $exception = null;
 
-        $this->factory->post('https://example.com');
+        try {
+            $this->factory->post('https://example.com');
+        } catch (Throwable $e) {
+            $exception = $e;
+        }
+
+        $this->assertNotNull($exception);
+        $this->assertInstanceOf(ConnectionException::class, $exception);
+        $this->assertSame('Fake', $exception->getMessage());
+
+        $this->factory->assertSentCount(1);
     }
 
     public function testFakeConnectionExceptionWithinSequence()
@@ -2247,6 +2278,8 @@ class HttpClientTest extends TestCase
         $this->assertNotNull($exception);
         $this->assertInstanceOf(ConnectionException::class, $exception);
         $this->assertSame('Fake', $exception->getMessage());
+
+        $this->factory->assertSentCount(2);
     }
 
     public function testMiddlewareRunsWhenFaked()
