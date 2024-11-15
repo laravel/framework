@@ -72,7 +72,7 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
     /**
      * Set the items for the paginator.
      *
-     * @param  \Illuminate\Contracts\Support\Arrayable<TKey, TValue>|iterable<TKey, TValue>|Collection<TKey, TValue>|null  $items
+     * @param  Collection<TKey, TValue>|Arrayable<TKey, TValue>|iterable<TKey, TValue>|null  $items
      * @return void
      */
     protected function setItems($items)
