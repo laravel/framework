@@ -139,7 +139,7 @@ class Schedule
             $this->eventMutex, $callback, $parameters, $this->timezone
         );
 
-        $this->mergeAttributes($event);
+        $this->mergePendingAttributes($event);
 
         return $event;
     }
@@ -277,7 +277,7 @@ class Schedule
 
         $this->events[] = $event = new Event($this->eventMutex, $command, $this->timezone);
 
-        $this->mergeAttributes($event);
+        $this->mergePendingAttributes($event);
 
         return $event;
     }
@@ -303,7 +303,7 @@ class Schedule
      * @param  \Illuminate\Console\Scheduling\Event  $event
      * @return void
      */
-    protected function mergeAttributes(Event $event)
+    protected function mergePendingAttributes(Event $event)
     {
         if (isset($this->attributes)) {
             $this->attributes->mergeAttributes($event);
