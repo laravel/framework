@@ -104,7 +104,7 @@ jobs:
           DYNAMODB_ENDPOINT: "http://localhost:8888"
           AWS_ACCESS_KEY_ID: randomKey
           AWS_SECRET_ACCESS_KEY: randomSecret
-          
+
       - name: Store artifacts
         uses: actions/upload-artifact@v4
         with:
