@@ -13,10 +13,10 @@ use JsonSerializable;
 
 /**
  * @template TKey of array-key
- *
  * @template TValue
  *
  * @extends AbstractCursorPaginator<TKey, TValue>
+ *
  * @implements Arrayable<TKey, TValue>
  * @implements ArrayAccess<TKey, TValue>
  * @implements PaginatorContract<TKey, TValue>
@@ -34,7 +34,7 @@ class CursorPaginator extends AbstractCursorPaginator implements Arrayable, Arra
     /**
      * Create a new paginator instance.
      *
-     * @param Arrayable<TKey, TValue>|iterable<TKey, TValue>|Collection<TKey, TValue>|null  $items
+     * @param  Arrayable<TKey, TValue>|iterable<TKey, TValue>|Collection<TKey, TValue>|null  $items
      * @param  int  $perPage
      * @param  \Illuminate\Pagination\Cursor|null  $cursor
      * @param  array  $options  (path, query, fragment, pageName)
@@ -58,7 +58,7 @@ class CursorPaginator extends AbstractCursorPaginator implements Arrayable, Arra
     /**
      * Set the items for the paginator.
      *
-     * @param Arrayable<TKey, TValue>|iterable<TKey, TValue>|Collection<TKey, TValue>|null  $items
+     * @param  Arrayable<TKey, TValue>|iterable<TKey, TValue>|Collection<TKey, TValue>|null  $items
      * @return void
      */
     protected function setItems($items)

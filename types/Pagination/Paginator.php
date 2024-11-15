@@ -3,6 +3,7 @@
 use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
+
 use function PHPStan\Testing\assertType;
 
 $items = [new Post(), new Post(), new Post()];
