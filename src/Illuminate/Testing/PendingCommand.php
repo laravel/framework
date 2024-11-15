@@ -224,7 +224,7 @@ class PendingCommand
      * @param  array  $columnStyles
      * @return $this
      */
-    public function expectsTable($headers, $rows, $tableStyle = 'default', array $columnStyles = [])
+    public function expectsTable($headers, $rows, $tableStyle = 'symfony-style-guide', array $columnStyles = [])
     {
         $table = (new Table($output = new BufferedOutput))
             ->setHeaders((array) $headers)
