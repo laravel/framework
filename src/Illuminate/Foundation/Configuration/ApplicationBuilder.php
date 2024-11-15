@@ -211,9 +211,23 @@ class ApplicationBuilder
 
             if (is_string($health)) {
                 Route::get($health, function () {
-                    Event::dispatch(new DiagnosingHealth);
+                    $exception = null;
 
-                    return View::file(__DIR__.'/../resources/health-up.blade.php');
+                    try {
+                        Event::dispatch(new DiagnosingHealth);
+                    } catch (\Throwable $e) {
+                        if (app()->hasDebugModeEnabled()) {
+                            throw $e;
+                        }
+
+                        report($e);
+
+                        $exception = $e->getMessage();
+                    }
+
+                    return response(View::file(__DIR__.'/../resources/health-up.blade.php', [
+                        'exception' => $exception,
+                    ]), status: $exception ? 500 : 200);
                 });
             }
 
