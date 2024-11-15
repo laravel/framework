@@ -400,34 +400,30 @@ class DatabaseSchemaBlueprintTest extends TestCase
 
     public function testGenerateRelationshipConstrainedColumn()
     {
-        $base = new Blueprint('posts', function ($table) {
-            $table->foreignIdFor('Illuminate\Foundation\Auth\User')->constrained();
-        });
-
-        $connection = m::mock(Connection::class);
-
-        $blueprint = clone $base;
+        $getSql = function ($grammar) {
+            return $this->getBlueprint($grammar, 'posts', function ($table) {
+                $table->foreignIdFor('Illuminate\Foundation\Auth\User')->constrained();
+            })->toSql();
+        };
 
         $this->assertEquals([
             'alter table `posts` add `user_id` bigint unsigned not null',
             'alter table `posts` add constraint `posts_user_id_foreign` foreign key (`user_id`) references `users` (`id`)',
-        ], $blueprint->toSql($connection, new MySqlGrammar));
+        ], $getSql(new MySqlGrammar));
     }
 
     public function testGenerateRelationshipForModelWithNonStandardPrimaryKeyName()
     {
-        $base = new Blueprint('posts', function ($table) {
-            $table->foreignIdFor(User::class)->constrained();
-        });
-
-        $connection = m::mock(Connection::class);
-
-        $blueprint = clone $base;
+        $getSql = function ($grammar) {
+            return $this->getBlueprint($grammar, 'posts', function ($table) {
+                $table->foreignIdFor(User::class)->constrained();
+            })->toSql();
+        };
 
         $this->assertEquals([
             'alter table `posts` add `user_internal_id` bigint unsigned not null',
             'alter table `posts` add constraint `posts_user_internal_id_foreign` foreign key (`user_internal_id`) references `users` (`internal_id`)',
-        ], $blueprint->toSql($connection, new MySqlGrammar));
+        ], $getSql(new MySqlGrammar));
     }
 
     public function testDropRelationshipColumnWithIncrementalModel()
