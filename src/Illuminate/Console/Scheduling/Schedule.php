@@ -299,7 +299,7 @@ class Schedule
     {
         if (isset($this->attributes)) {
             $this->attributes->mergeAttributes($event);
-            
+
             unset($this->attributes);
         }
 
