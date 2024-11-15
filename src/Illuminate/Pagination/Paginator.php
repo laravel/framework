@@ -14,8 +14,9 @@ use JsonSerializable;
 /**
  * @template TKey of array-key
  *
- * @template-covariant TValue
+ * @template TValue
  *
+ * @extends AbstractPaginator<TKey, TValue>
  * @implements Arrayable<TKey, TValue>
  * @implements ArrayAccess<TKey, TValue>
  * @implements IteratorAggregate<TKey, TValue>

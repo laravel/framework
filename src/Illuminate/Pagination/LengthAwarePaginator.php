@@ -16,6 +16,7 @@ use JsonSerializable;
  *
  * @template TValue
  *
+ * @extends AbstractPaginator<TKey, TValue>
  * @implements Arrayable<TKey, TValue>
  * @implements ArrayAccess<TKey, TValue>
  * @implements LengthAwarePaginatorContract<TKey, TValue>
@@ -40,7 +41,7 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
     /**
      * Create a new paginator instance.
      *
-     * @param  \Illuminate\Contracts\Support\Arrayable<TKey, TValue>|iterable<TKey, TValue>|Collection<TKey, TValue>|null  $items
+     * @param Arrayable<TKey, TValue>|iterable<TKey, TValue>|Collection<TKey, TValue>|null  $items
      * @param  int  $total
      * @param  int  $perPage
      * @param  int|null  $currentPage
