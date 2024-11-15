@@ -23,6 +23,7 @@ width: 100% !important;
 }
 }
 </style>
+{{ $head ?? '' }}
 </head>
 <body>
 
