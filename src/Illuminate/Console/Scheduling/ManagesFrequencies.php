@@ -333,7 +333,7 @@ trait ManagesFrequencies
      */
     public function dailyAtRandomTime(?Engine $engine = null)
     {
-        $randomizer = (new Randomizer($engine ?? new SeededRandomEngine(sha1($this->buildCommand()))));
+        $randomizer = new Randomizer($engine ?? new SeededRandomEngine(sha1($this->buildCommand())));
 
         return $this->at($randomizer->getInt(0, 23) . ':' . $randomizer->getInt(0, 59));
     }

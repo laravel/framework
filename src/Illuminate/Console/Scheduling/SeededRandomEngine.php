@@ -20,7 +20,7 @@ class SeededRandomEngine implements Engine
     /**
      * @return string
      */
-    public function generate()
+    public function generate(): string
     {
         return $this->seed;
     }
