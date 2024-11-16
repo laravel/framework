@@ -422,7 +422,7 @@ trait InteractsWithInput
     public function enums($key, $enumClass)
     {
         if ($this->isNotFilled($key) || ! $this->isBackedEnum($enumClass)) {
-             return [];
+            return [];
         }
 
         return $this->collect($key)->map(function ($value) use ($enumClass) {
