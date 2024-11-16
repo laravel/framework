@@ -22,7 +22,7 @@ class ModelInfoExtractorTest extends DatabaseTestCase
             $table->uuid();
             $table->string('name');
             $table->boolean('a_bool');
-            $table->foreignId('parent_model_id')->constrained();
+            $table->foreignId('parent_test_model_id')->constrained();
             $table->timestamp('nullable_date')->nullable();
             $table->timestamps();
         });
