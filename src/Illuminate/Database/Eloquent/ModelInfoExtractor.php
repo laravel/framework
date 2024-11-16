@@ -10,6 +10,7 @@ use ReflectionClass;
 use ReflectionMethod;
 use ReflectionNamedType;
 use SplFileObject;
+
 use function Illuminate\Support\enum_value;
 
 class ModelInfoExtractor
@@ -41,7 +42,7 @@ class ModelInfoExtractor
     ];
 
     /**
-     * @param \Illuminate\Contracts\Foundation\Application $app
+     * @param  \Illuminate\Contracts\Foundation\Application  $app
      */
     public function __construct($app)
     {
@@ -76,7 +77,7 @@ class ModelInfoExtractor
             'attributes' => $this->getAttributes($model),
             'relations' => $this->getRelations($model),
             'events' => $this->getEvents($model),
-            'observers' => $this->getObservers($model)
+            'observers' => $this->getObservers($model),
         ];
     }
 
@@ -235,6 +236,7 @@ class ModelInfoExtractor
      *
      * @param  \Illuminate\Database\Eloquent\Model  $model
      * @return \Illuminate\Support\Collection
+     *
      * @throws BindingResolutionException
      */
     protected function getObservers($model)

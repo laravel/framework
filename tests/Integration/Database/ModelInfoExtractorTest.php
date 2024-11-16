@@ -40,114 +40,114 @@ class ModelInfoExtractorTest extends DatabaseTestCase
         $this->assertCount(8, $modelInfo['attributes']);
 
         $this->assertEqualsCanonicalizing([
-            "name" => "id",
-            "type" => "integer",
-            "increments" => true,
-            "nullable" => false,
-            "default" => null,
-            "unique" => true,
-            "fillable" => true,
-            "hidden" => false,
-            "appended" => null,
-            "cast" => null,
+            'name' => 'id',
+            'type' => 'integer',
+            'increments' => true,
+            'nullable' => false,
+            'default' => null,
+            'unique' => true,
+            'fillable' => true,
+            'hidden' => false,
+            'appended' => null,
+            'cast' => null,
         ], $modelInfo['attributes'][0]);
 
         $this->assertEqualsCanonicalizing([
-            "name" => "uuid",
-            "type" => "varchar",
-            "increments" => false,
-            "nullable" => false,
-            "default" => null,
-            "unique" => false,
-            "fillable" => true,
-            "hidden" => false,
-            "appended" => null,
-            "cast" => null,
+            'name' => 'uuid',
+            'type' => 'varchar',
+            'increments' => false,
+            'nullable' => false,
+            'default' => null,
+            'unique' => false,
+            'fillable' => true,
+            'hidden' => false,
+            'appended' => null,
+            'cast' => null,
         ], $modelInfo['attributes'][1]);
 
         $this->assertEqualsCanonicalizing([
-            "name" => "name",
-            "type" => "varchar",
-            "increments" => false,
-            "nullable" => false,
-            "default" => null,
-            "unique" => false,
-            "fillable" => false,
-            "hidden" => false,
-            "appended" => null,
-            "cast" => null
+            'name' => 'name',
+            'type' => 'varchar',
+            'increments' => false,
+            'nullable' => false,
+            'default' => null,
+            'unique' => false,
+            'fillable' => false,
+            'hidden' => false,
+            'appended' => null,
+            'cast' => null,
         ], $modelInfo['attributes'][2]);
 
         $this->assertEqualsCanonicalizing([
-            "name" => "a_bool",
-            "type" => "tinyint(1)",
-            "increments" => false,
-            "nullable" => false,
-            "default" => null,
-            "unique" => false,
-            "fillable" => true,
-            "hidden" => false,
-            "appended" => null,
-            "cast" => "bool",
+            'name' => 'a_bool',
+            'type' => 'tinyint(1)',
+            'increments' => false,
+            'nullable' => false,
+            'default' => null,
+            'unique' => false,
+            'fillable' => true,
+            'hidden' => false,
+            'appended' => null,
+            'cast' => 'bool',
         ], $modelInfo['attributes'][3]);
 
         $this->assertEqualsCanonicalizing([
-            "name" => "parent_model_id",
-            "type" => "integer",
-            "increments" => false,
-            "nullable" => false,
-            "default" => null,
-            "unique" => false,
-            "fillable" => true,
-            "hidden" => false,
-            "appended" => null,
-            "cast" => null,
+            'name' => 'parent_model_id',
+            'type' => 'integer',
+            'increments' => false,
+            'nullable' => false,
+            'default' => null,
+            'unique' => false,
+            'fillable' => true,
+            'hidden' => false,
+            'appended' => null,
+            'cast' => null,
         ], $modelInfo['attributes'][4]);
 
         $this->assertEqualsCanonicalizing([
-            "name" => "nullable_date",
-            "type" => "datetime",
-            "increments" => false,
-            "nullable" => true,
-            "default" => null,
-            "unique" => false,
-            "fillable" => true,
-            "hidden" => false,
-            "appended" => null,
-            "cast" => "datetime",
+            'name' => 'nullable_date',
+            'type' => 'datetime',
+            'increments' => false,
+            'nullable' => true,
+            'default' => null,
+            'unique' => false,
+            'fillable' => true,
+            'hidden' => false,
+            'appended' => null,
+            'cast' => 'datetime',
         ], $modelInfo['attributes'][5]);
 
         $this->assertEqualsCanonicalizing([
-            "name" => "created_at",
-            "type" => "datetime",
-            "increments" => false,
-            "nullable" => true,
-            "default" => null,
-            "unique" => false,
-            "fillable" => true,
-            "hidden" => false,
-            "appended" => null,
-            "cast" => "datetime",
+            'name' => 'created_at',
+            'type' => 'datetime',
+            'increments' => false,
+            'nullable' => true,
+            'default' => null,
+            'unique' => false,
+            'fillable' => true,
+            'hidden' => false,
+            'appended' => null,
+            'cast' => 'datetime',
         ], $modelInfo['attributes'][6]);
 
         $this->assertEqualsCanonicalizing([
-            "name" => "updated_at",
-            "type" => "datetime",
-            "increments" => false,
-            "nullable" => true,
-            "default" => null,
-            "unique" => false,
-            "fillable" => true,
-            "hidden" => false,
-            "appended" => null,
-            "cast" => "datetime",
+            'name' => 'updated_at',
+            'type' => 'datetime',
+            'increments' => false,
+            'nullable' => true,
+            'default' => null,
+            'unique' => false,
+            'fillable' => true,
+            'hidden' => false,
+            'appended' => null,
+            'cast' => 'datetime',
         ], $modelInfo['attributes'][7]);
 
         $this->assertCount(1, $modelInfo['relations']);
         $this->assertEqualsCanonicalizing([
-            "name" => "parentModel",
-            "type" => "BelongsTo",
-            "related" => "Illuminate\Tests\Integration\Database\ParentTestModel",
+            'name' => 'parentModel',
+            'type' => 'BelongsTo',
+            'related' => "Illuminate\Tests\Integration\Database\ParentTestModel",
         ], $modelInfo['relations'][0]);
 
         $this->assertEmpty($modelInfo['events']);
@@ -157,7 +157,6 @@ class ModelInfoExtractorTest extends DatabaseTestCase
         $this->assertEquals("Illuminate\Tests\Integration\Database\ModelInfoExtractorTestModelObserver@created", $modelInfo['observers'][0]['observer'][0]);
     }
 }
-
 
 #[ObservedBy(ModelInfoExtractorTestModelObserver::class)]
 class ModelInfoExtractorTestModel extends Model
