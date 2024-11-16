@@ -35,7 +35,7 @@ trait CallsCommands
      * @param  array  $arguments
      * @return int
      */
-    public function callSilent($command, array $arguments = [])
+    public function callSilent($command, array $arguments = []): int
     {
         return $this->runCommand($command, $arguments, new NullOutput);
     }
@@ -47,7 +47,7 @@ trait CallsCommands
      * @param  array  $arguments
      * @return int
      */
-    public function callSilently($command, array $arguments = [])
+    public function callSilently($command, array $arguments = []): int
     {
         return $this->callSilent($command, $arguments);
     }
@@ -60,12 +60,13 @@ trait CallsCommands
      * @param  \Symfony\Component\Console\Output\OutputInterface  $output
      * @return int
      */
-    protected function runCommand($command, array $arguments, OutputInterface $output)
+    protected function runCommand($command, array $arguments, OutputInterface $output): int
     {
         $arguments['command'] = $command;
 
         $result = $this->resolveCommand($command)->run(
-            $this->createInputFromArguments($arguments), $output
+            $this->createInputFromArguments($arguments),
+            $output
         );
 
         $this->restorePrompts();
@@ -79,7 +80,7 @@ trait CallsCommands
      * @param  array  $arguments
      * @return \Symfony\Component\Console\Input\ArrayInput
      */
-    protected function createInputFromArguments(array $arguments)
+    protected function createInputFromArguments(array $arguments): ArrayInput
     {
         return tap(new ArrayInput(array_merge($this->context(), $arguments)), function ($input) {
             if ($input->getParameterOption('--no-interaction')) {
@@ -93,7 +94,7 @@ trait CallsCommands
      *
      * @return array
      */
-    protected function context()
+    protected function context(): array
     {
         return collect($this->option())->only([
             'ansi',
