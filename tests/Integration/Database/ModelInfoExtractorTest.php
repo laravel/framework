@@ -14,7 +14,7 @@ class ModelInfoExtractorTest extends DatabaseTestCase
 {
     protected function afterRefreshingDatabase()
     {
-        Schema::create('parent_test_model', function (Blueprint $table) {
+        Schema::create('parent_test_models', function (Blueprint $table) {
             $table->id();
         });
         Schema::create('model_info_extractor_test_model', function (Blueprint $table) {
@@ -34,7 +34,7 @@ class ModelInfoExtractorTest extends DatabaseTestCase
         $modelInfo = $extractor->handle(ModelInfoExtractorTestModel::class);
 
         $this->assertEquals(ModelInfoExtractorTestModel::class, $modelInfo['class']);
-        $this->assertEquals('testing', $modelInfo['database']);
+        $this->assertEquals(Schema::getConnection()->getConfig()['name'], $modelInfo['database']);
         $this->assertEquals('model_info_extractor_test_model', $modelInfo['table']);
         $this->assertNull($modelInfo['policy']);
         $this->assertCount(8, $modelInfo['attributes']);
@@ -92,7 +92,7 @@ class ModelInfoExtractorTest extends DatabaseTestCase
         ], $modelInfo['attributes'][3]);
 
         $this->assertEqualsCanonicalizing([
-            'name' => 'parent_model_id',
+            'name' => 'parent_test_model_id',
             'type' => 'integer',
             'increments' => false,
             'nullable' => false,
@@ -175,7 +175,7 @@ class ModelInfoExtractorTestModel extends Model
 
 class ParentTestModel extends Model
 {
-    public $table = 'parent_test_model';
+    public $table = 'parent_test_models';
     public $timestamps = false;
 }
 
