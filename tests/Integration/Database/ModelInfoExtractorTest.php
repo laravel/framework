@@ -175,7 +175,7 @@ class ModelInfoExtractorTestModel extends Model
 
 class ParentTestModel extends Model
 {
-    public $table = 'parent_model';
+    public $table = 'parent_test_model';
     public $timestamps = false;
 }
 
