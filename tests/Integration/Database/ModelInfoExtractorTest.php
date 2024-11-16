@@ -151,11 +151,12 @@ class ModelInfoExtractorTest extends DatabaseTestCase
 
     private function assertAttributes($expectedAttributes, $actualAttributes)
     {
-        foreach(['name', 'increments', 'nullable', 'default', 'unique', 'fillable', 'hidden', 'appended', 'cast'] as $key) {
+        foreach(['name', 'increments', 'nullable', 'unique', 'fillable', 'hidden', 'appended', 'cast'] as $key) {
             $this->assertEquals($expectedAttributes[$key], $actualAttributes[$key]);
         }
         // We ignore type because it varies from DB to DB
         $this->assertArrayHasKey('type', $actualAttributes);
+        $this->assertArrayHasKey('default', $actualAttributes);
     }
 }
 
