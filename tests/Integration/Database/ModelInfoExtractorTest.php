@@ -17,7 +17,7 @@ class ModelInfoExtractorTest extends DatabaseTestCase
         Schema::create('parent_test_model', function (Blueprint $table) {
             $table->id();
         });
-        Schema::create('test_model1', function (Blueprint $table) {
+        Schema::create('model_info_extractor_test_model', function (Blueprint $table) {
             $table->increments('id');
             $table->uuid();
             $table->string('name');
@@ -31,11 +31,11 @@ class ModelInfoExtractorTest extends DatabaseTestCase
     public function test_extracts_model_data()
     {
         $extractor = new ModelInfoExtractor($this->app);
-        $modelInfo = $extractor->handle(TestModel1::class);
+        $modelInfo = $extractor->handle(ModelInfoExtractorTestModel::class);
 
-        $this->assertEquals(TestModel1::class, $modelInfo['class']);
+        $this->assertEquals(ModelInfoExtractorTestModel::class, $modelInfo['class']);
         $this->assertEquals('testing', $modelInfo['database']);
-        $this->assertEquals('test_model1', $modelInfo['table']);
+        $this->assertEquals('model_info_extractor_test_model', $modelInfo['table']);
         $this->assertNull($modelInfo['policy']);
         $this->assertCount(8, $modelInfo['attributes']);
 
@@ -154,17 +154,17 @@ class ModelInfoExtractorTest extends DatabaseTestCase
         $this->assertCount(1, $modelInfo['observers']);
         $this->assertEquals('created', $modelInfo['observers'][0]['event']);
         $this->assertCount(1, $modelInfo['observers'][0]['observer']);
-        $this->assertEquals("Illuminate\Tests\Integration\Database\TestModel1Observer@created", $modelInfo['observers'][0]['observer'][0]);
+        $this->assertEquals("Illuminate\Tests\Integration\Database\ModelInfoExtractorTestModelObserver@created", $modelInfo['observers'][0]['observer'][0]);
     }
 }
 
 
-#[ObservedBy(TestModel1Observer::class)]
-class TestModel1 extends Model
+#[ObservedBy(ModelInfoExtractorTestModelObserver::class)]
+class ModelInfoExtractorTestModel extends Model
 {
     use HasUuids;
 
-    public $table = 'test_model1';
+    public $table = 'model_info_extractor_test_model';
     protected $guarded = ['name'];
     protected $casts = ['nullable_date' => 'datetime', 'a_bool' => 'bool'];
 
@@ -180,7 +180,7 @@ class ParentTestModel extends Model
     public $timestamps = false;
 }
 
-class TestModel1Observer
+class ModelInfoExtractorTestModelObserver
 {
     public function created()
     {
