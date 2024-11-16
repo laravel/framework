@@ -39,10 +39,7 @@ class ModelInfoExtractorTest extends DatabaseTestCase
         $this->assertNull($modelInfo['policy']);
         $this->assertCount(8, $modelInfo['attributes']);
 
-        // We ignore type because it will vary by DB engine
-        $keys = ['name', 'increments', 'nullable', 'default', 'unique', 'fillable', 'hidden', 'appended', 'cast'];
-
-        $this->assertEqualsCanonicalizing([
+        $this->assertAttributes([
             'name' => 'id',
             'increments' => true,
             'nullable' => false,
@@ -52,9 +49,9 @@ class ModelInfoExtractorTest extends DatabaseTestCase
             'hidden' => false,
             'appended' => null,
             'cast' => null,
-        ], collect($modelInfo['attributes'][0])->only($keys)->all());
+        ], $modelInfo['attributes'][0]);
 
-        $this->assertEqualsCanonicalizing([
+        $this->assertAttributes([
             'name' => 'uuid',
             'increments' => false,
             'nullable' => false,
@@ -64,9 +61,9 @@ class ModelInfoExtractorTest extends DatabaseTestCase
             'hidden' => false,
             'appended' => null,
             'cast' => null,
-        ], collect($modelInfo['attributes'][1])->only($keys)->all());
+        ], $modelInfo['attributes'][1]);
 
-        $this->assertEqualsCanonicalizing([
+        $this->assertAttributes([
             'name' => 'name',
             'increments' => false,
             'nullable' => false,
@@ -76,9 +73,9 @@ class ModelInfoExtractorTest extends DatabaseTestCase
             'hidden' => false,
             'appended' => null,
             'cast' => null,
-        ], collect($modelInfo['attributes'][2])->only($keys)->all());
+        ], $modelInfo['attributes'][2]);
 
-        $this->assertEqualsCanonicalizing([
+        $this->assertAttributes([
             'name' => 'a_bool',
             'increments' => false,
             'nullable' => false,
@@ -88,9 +85,9 @@ class ModelInfoExtractorTest extends DatabaseTestCase
             'hidden' => false,
             'appended' => null,
             'cast' => 'bool',
-        ], collect($modelInfo['attributes'][3])->only($keys)->all());
+        ], $modelInfo['attributes'][3]);
 
-        $this->assertEqualsCanonicalizing([
+        $this->assertAttributes([
             'name' => 'parent_test_model_id',
             'increments' => false,
             'nullable' => false,
@@ -100,9 +97,9 @@ class ModelInfoExtractorTest extends DatabaseTestCase
             'hidden' => false,
             'appended' => null,
             'cast' => null,
-        ], collect($modelInfo['attributes'][4])->only($keys)->all());
+        ], $modelInfo['attributes'][4]);
 
-        $this->assertEqualsCanonicalizing([
+        $this->assertAttributes([
             'name' => 'nullable_date',
             'increments' => false,
             'nullable' => true,
@@ -112,9 +109,9 @@ class ModelInfoExtractorTest extends DatabaseTestCase
             'hidden' => false,
             'appended' => null,
             'cast' => 'datetime',
-        ], collect($modelInfo['attributes'][5])->only($keys)->all());
+        ], $modelInfo['attributes'][5]);
 
-        $this->assertEqualsCanonicalizing([
+        $this->assertAttributes([
             'name' => 'created_at',
             'increments' => false,
             'nullable' => true,
@@ -124,9 +121,9 @@ class ModelInfoExtractorTest extends DatabaseTestCase
             'hidden' => false,
             'appended' => null,
             'cast' => 'datetime',
-        ], collect($modelInfo['attributes'][6])->only($keys)->all());
+        ], $modelInfo['attributes'][6]);
 
-        $this->assertEqualsCanonicalizing([
+        $this->assertAttributes([
             'name' => 'updated_at',
             'increments' => false,
             'nullable' => true,
@@ -136,7 +133,7 @@ class ModelInfoExtractorTest extends DatabaseTestCase
             'hidden' => false,
             'appended' => null,
             'cast' => 'datetime',
-        ], collect($modelInfo['attributes'][7])->only($keys)->all());
+        ], $modelInfo['attributes'][7]);
 
         $this->assertCount(1, $modelInfo['relations']);
         $this->assertEqualsCanonicalizing([
@@ -150,6 +147,15 @@ class ModelInfoExtractorTest extends DatabaseTestCase
         $this->assertEquals('created', $modelInfo['observers'][0]['event']);
         $this->assertCount(1, $modelInfo['observers'][0]['observer']);
         $this->assertEquals("Illuminate\Tests\Integration\Database\ModelInfoExtractorTestModelObserver@created", $modelInfo['observers'][0]['observer'][0]);
+    }
+
+    private function assertAttributes($expectedAttributes, $actualAttributes)
+    {
+        foreach(['name', 'increments', 'nullable', 'default', 'unique', 'fillable', 'hidden', 'appended', 'cast'] as $key) {
+            $this->assertEquals($expectedAttributes[$key], $actualAttributes[$key]);
+        }
+        // We ignore type because it varies from DB to DB
+        $this->assertArrayHasKey('type', $actualAttributes);
     }
 }
 
