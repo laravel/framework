@@ -2,6 +2,7 @@
 
 namespace Illuminate\Validation;
 
+use Illuminate\Contracts\Database\Query\Builder;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Validation\Rules\ArrayRule;
@@ -10,6 +11,7 @@ use Illuminate\Validation\Rules\Dimensions;
 use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\Rules\ExcludeIf;
 use Illuminate\Validation\Rules\Exists;
+use Illuminate\Validation\Rules\ExistsUsingBuilder;
 use Illuminate\Validation\Rules\File;
 use Illuminate\Validation\Rules\ImageFile;
 use Illuminate\Validation\Rules\In;
@@ -97,13 +99,15 @@ class Rule
     /**
      * Get an exists constraint builder instance.
      *
-     * @param  string  $table
+     * @param  string|\Illuminate\Contracts\Database\Query\Builder  $table
      * @param  string  $column
-     * @return \Illuminate\Validation\Rules\Exists
+     * @return ($table is string ? \Illuminate\Validation\Rules\Exists : \Illuminate\Validation\Rules\ExistsUsingBuilder)
      */
     public static function exists($table, $column = 'NULL')
     {
-        return new Exists($table, $column);
+        return $table instanceof Builder
+            ? new ExistsUsingBuilder($table, $column)
+            : new Exists($table, $column);
     }
 
     /**
