@@ -91,7 +91,7 @@ class ServeCommand extends Command
     public function handle()
     {
         $environmentFile = $this->option('env')
-            ? base_path('.env').'.'.$this->option('env')
+            ? base_path('.env') . '.' . $this->option('env')
             : base_path('.env');
 
         $hasEnvironment = file_exists($environmentFile);
@@ -107,9 +107,11 @@ class ServeCommand extends Command
                 clearstatcache(false, $environmentFile);
             }
 
-            if (! $this->option('no-reload') &&
+            if (
+                ! $this->option('no-reload') &&
                 $hasEnvironment &&
-                filemtime($environmentFile) > $environmentLastModified) {
+                filemtime($environmentFile) > $environmentLastModified
+            ) {
                 $environmentLastModified = filemtime($environmentFile);
 
                 $this->newLine();
@@ -153,7 +155,7 @@ class ServeCommand extends Command
             return in_array($key, static::$passthroughVariables) ? [$key => $value] : [$key => false];
         })->all());
 
-        $this->trap(fn () => [SIGTERM, SIGINT, SIGHUP, SIGUSR1, SIGUSR2, SIGQUIT], function ($signal) use ($process) {
+        $this->trap(fn() => [SIGTERM, SIGINT, SIGHUP, SIGUSR1, SIGUSR2, SIGQUIT], function ($signal) use ($process) {
             if ($process->isRunning()) {
                 $process->stop(10, $signal);
             }
@@ -175,12 +177,12 @@ class ServeCommand extends Command
     {
         $server = file_exists(base_path('server.php'))
             ? base_path('server.php')
-            : __DIR__.'/../resources/server.php';
+            : __DIR__ . '/../resources/server.php';
 
         return [
             php_binary(),
             '-S',
-            $this->host().':'.$this->port(),
+            $this->host() . ':' . $this->port(),
             $server,
         ];
     }
@@ -274,7 +276,7 @@ class ServeCommand extends Command
         $this->outputBuffer = (string) $lines->pop();
 
         $lines
-            ->map(fn ($line) => trim($line))
+            ->map(fn($line) => trim($line))
             ->filter()
             ->each(function ($line) {
                 if (str($line)->contains('Development Server (http')) {
@@ -335,7 +337,7 @@ class ServeCommand extends Command
 
                     $dots = max(terminal()->width() - mb_strlen($formattedStartedAt) - mb_strlen($file) - mb_strlen($runTime) - 9, 0);
 
-                    $this->output->write(' '.str_repeat('<fg=gray>.</>', $dots));
+                    $this->output->write(' ' . str_repeat('<fg=gray>.</>', $dots));
                     $this->output->writeln(" <fg=gray>~ {$runTime}</>");
                 } elseif (str($line)->contains(['Closed without sending a request', 'Failed to poll event'])) {
                     // ...
@@ -374,11 +376,22 @@ class ServeCommand extends Command
      * @param  string  $line
      * @return int
      */
-    protected function getRequestPortFromLine($line)
+    protected function getRequestPortFromLine($line): int
     {
-        preg_match('/:(\d+)\s(?:(?:\w+$)|(?:\[.*))/', $line, $matches);
+        /**
+         * Updated regex to match the log line with or without a datetime prefix.
+         * The regex checks for an optional datetime prefix (example: [Wed Nov 15 2024 10:12:45]) followed by a colon and the port number.
+         */
+        preg_match('/(\[\w+\s\w+\s\d+\s[\d:]+\s\d{4}\]\s)?:(\d+)\s(?:(?:\w+$)|(?:\[.*))/', $line, $matches);
 
-        return (int) $matches[1];
+        /**
+         * If the port number could not be extracted (if no match for the port number found), an exception is thrown with a message containing the problematic line for easier debugging.
+         */
+        if (!isset($matches[2])) {
+            throw new \Exception("Failed to extract request port from line: $line");
+        }
+
+        return (int) $matches[2];
     }
 
     /**
