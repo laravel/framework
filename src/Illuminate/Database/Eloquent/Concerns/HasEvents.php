@@ -253,6 +253,7 @@ trait HasEvents
 
         return $result;
     }
+
     /**
      * @param  \Illuminate\Events\QueuedClosure|\Closure|string|array  $events
      * @param  \Illuminate\Events\QueuedClosure|\Closure|string|array|null  $callback
