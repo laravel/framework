@@ -385,7 +385,7 @@ class ServeCommand extends Command
         /**
          * If the port number could not be extracted (if no match for the port number found), an exception is thrown with a message containing the problematic line for easier debugging.
          */
-        if (!isset($matches[2])) {
+        if (! isset($matches[2])) {
             throw new \Exception("Failed to extract request port from line: $line");
         }
 
