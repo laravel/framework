@@ -38,10 +38,13 @@ class ShowModelCommand extends DatabaseInspectionCommand
      *
      * @return int
      */
-    public function handle(ModelInfoExtractor $extractor)
+    public function handle()
     {
         try {
-            $info = $extractor->handle($this->argument('model'), $this->option('database'));
+            $info = (new ModelInfoExtractor($this->laravel))->handle(
+                $this->argument('model'),
+                $this->option('database')
+            );
         } catch (BindingResolutionException $e) {
             $this->components->error($e->getMessage());
 

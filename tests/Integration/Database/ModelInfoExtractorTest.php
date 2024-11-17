@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelInfoExtractor;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schema;
 
 class ModelInfoExtractorTest extends DatabaseTestCase
@@ -32,7 +33,19 @@ class ModelInfoExtractorTest extends DatabaseTestCase
     {
         $extractor = new ModelInfoExtractor($this->app);
         $modelInfo = $extractor->handle(ModelInfoExtractorTestModel::class);
+        $this->assertModelInfo($modelInfo);
+    }
 
+    public function test_command_returns_json()
+    {
+        $this->withoutMockingConsoleOutput()->artisan('model:show', ['model' => ModelInfoExtractorTestModel::class, '--json' => true]);
+        $o = Artisan::output();
+        $this->assertJson($o);
+        $modelInfo = json_decode($o, true);
+        $this->assertModelInfo($modelInfo);
+    }
+
+    private function assertModelInfo(array $modelInfo) {
         $this->assertEquals(ModelInfoExtractorTestModel::class, $modelInfo['class']);
         $this->assertEquals(Schema::getConnection()->getConfig()['name'], $modelInfo['database']);
         $this->assertEquals('model_info_extractor_test_model', $modelInfo['table']);
@@ -151,13 +164,14 @@ class ModelInfoExtractorTest extends DatabaseTestCase
 
     private function assertAttributes($expectedAttributes, $actualAttributes)
     {
-        foreach(['name', 'increments', 'nullable', 'unique', 'fillable', 'hidden', 'appended', 'cast'] as $key) {
+        foreach (['name', 'increments', 'nullable', 'unique', 'fillable', 'hidden', 'appended', 'cast'] as $key) {
             $this->assertEquals($expectedAttributes[$key], $actualAttributes[$key]);
         }
         // We ignore type because it varies from DB to DB
         $this->assertArrayHasKey('type', $actualAttributes);
         $this->assertArrayHasKey('default', $actualAttributes);
     }
+
 }
 
 #[ObservedBy(ModelInfoExtractorTestModelObserver::class)]
