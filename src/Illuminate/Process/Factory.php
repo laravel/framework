@@ -21,6 +21,13 @@ class Factory
     protected $recording = false;
 
     /**
+     * All created process sequences.
+     *
+     * @var \Illuminate\Process\FakeProcessSequence[]
+     */
+    protected $processSequences = [];
+
+    /**
      * All of the recorded processes.
      *
      * @var array
@@ -76,7 +83,7 @@ class Factory
      */
     public function sequence(array $processes = [])
     {
-        return new FakeProcessSequence($processes);
+        return $this->processSequences[] = new FakeProcessSequence($processes);
     }
 
     /**
@@ -171,6 +178,21 @@ class Factory
     public function preventingStrayProcesses()
     {
         return $this->preventStrayProcesses;
+    }
+
+    /**
+     * Assert that every created process sequence is empty.
+     *
+     * @return void
+     */
+    public function assertSequencesAreEmpty()
+    {
+        foreach ($this->processSequences as $processSequence) {
+            PHPUnit::assertTrue(
+                $processSequence->isEmpty(),
+                'Not all process sequences are empty.'
+            );
+        }
     }
 
     /**
