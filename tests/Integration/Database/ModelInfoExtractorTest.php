@@ -45,7 +45,8 @@ class ModelInfoExtractorTest extends DatabaseTestCase
         $this->assertModelInfo($modelInfo);
     }
 
-    private function assertModelInfo(array $modelInfo) {
+    private function assertModelInfo(array $modelInfo)
+    {
         $this->assertEquals(ModelInfoExtractorTestModel::class, $modelInfo['class']);
         $this->assertEquals(Schema::getConnection()->getConfig()['name'], $modelInfo['database']);
         $this->assertEquals('model_info_extractor_test_model', $modelInfo['table']);
@@ -171,7 +172,6 @@ class ModelInfoExtractorTest extends DatabaseTestCase
         $this->assertArrayHasKey('type', $actualAttributes);
         $this->assertArrayHasKey('default', $actualAttributes);
     }
-
 }
 
 #[ObservedBy(ModelInfoExtractorTestModelObserver::class)]
