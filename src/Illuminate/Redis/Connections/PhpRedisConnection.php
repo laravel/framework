@@ -164,9 +164,9 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     /**
      * Returns the specified elements of the list stored at key.
      *
-     * @param  string $key
-     * @param  int|string $start
-     * @param  int|string $stop
+     * @param  string  $key
+     * @param  int|string  $start
+     * @param  int|string  $stop
      * @return array|null
      */
     public function lrange($key, $start, $stop)
