@@ -697,7 +697,7 @@ class RedisConnectionTest extends TestCase
         foreach ($this->connections() as $redis) {
             // Inserts to the head of the list
             $redis->lpush('list', 'one');
-            $redis->lpush('list','two');
+            $redis->lpush('list', 'two');
             $redis->lpush('list', 'three');
 
             $this->assertEquals(['three', 'two'], $redis->lrange('list', 0, 1));
