@@ -8,6 +8,7 @@ use Illuminate\Process\Exceptions\ProcessTimedOutException;
 use Illuminate\Process\Factory;
 use OutOfBoundsException;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
+use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
@@ -770,6 +771,29 @@ class ProcessTest extends TestCase
         $factory->fake();
 
         $factory->assertNothingRan();
+    }
+
+    public function testAssertSequencesAreEmpty()
+    {
+        $factory = new Factory;
+
+        $factory->fake([
+            'ls *' => $factory->sequence()
+                ->push('ls command 1')
+                ->push('ls command 2'),
+        ]);
+
+        $factory->run('ls la');
+
+        try {
+            $factory->assertSequencesAreEmpty();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('Not all process sequences are empty.', $e->getMessage());
+        }
+
+        $factory->run('ls la');
+
+        $factory->assertSequencesAreEmpty();
     }
 
     protected function ls()
