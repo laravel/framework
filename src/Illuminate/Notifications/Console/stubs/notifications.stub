@@ -6,12 +6,18 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    public const TABLENAME = 'notifications';
+
     /**
      * Run the migrations.
      */
     public function up(): void
     {
-        Schema::create('notifications', function (Blueprint $table) {
+        if (Schema::hasTable(self::TABLENAME)) {
+            return;
+        }
+
+        Schema::create(self::TABLENAME, function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('type');
             $table->morphs('notifiable');
@@ -26,6 +32,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('notifications');
+        Schema::dropIfExists(self::TABLENAME);
     }
 };

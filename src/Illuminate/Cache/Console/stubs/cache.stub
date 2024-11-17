@@ -6,18 +6,29 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    public const CACHE_TABLENAME = 'cache';
+    public const CACHE_LOCKS_TABLENAME = 'cache_locks';
+
     /**
      * Run the migrations.
      */
     public function up(): void
     {
-        Schema::create('cache', function (Blueprint $table) {
+        if (Schema::hasTable(self::CACHE_TABLENAME)) {
+            return;
+        }
+
+        Schema::create(self::CACHE_TABLENAME, function (Blueprint $table) {
             $table->string('key')->primary();
             $table->mediumText('value');
             $table->integer('expiration');
         });
 
-        Schema::create('cache_locks', function (Blueprint $table) {
+        if (Schema::hasTable(self::CACHE_LOCKS_TABLENAME)) {
+            return;
+        }
+
+        Schema::create(self::CACHE_LOCKS_TABLENAME, function (Blueprint $table) {
             $table->string('key')->primary();
             $table->string('owner');
             $table->integer('expiration');
@@ -29,7 +40,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('cache');
-        Schema::dropIfExists('cache_locks');
+        Schema::dropIfExists(self::CACHE_TABLENAME);
+        Schema::dropIfExists(self::CACHE_LOCKS_TABLENAME);
     }
 };

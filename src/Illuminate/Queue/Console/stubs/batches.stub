@@ -6,12 +6,18 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    public const TABLENAME = '{{table}}';
+
     /**
      * Run the migrations.
      */
     public function up(): void
     {
-        Schema::create('{{table}}', function (Blueprint $table) {
+        if (Schema::hasTable(self::TABLENAME)) {
+            return;
+        }
+
+        Schema::create(self::TABLENAME, function (Blueprint $table) {
             $table->string('id')->primary();
             $table->string('name');
             $table->integer('total_jobs');
@@ -30,6 +36,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('{{table}}');
+        Schema::dropIfExists(self::TABLENAME);
     }
 };
