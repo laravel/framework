@@ -154,6 +154,22 @@ class SupportTestingEventFakeTest extends TestCase
             $this->assertStringContainsString("2 unexpected events were dispatched:\n\n- Illuminate\Tests\Support\EventStub dispatched 2 times", $e->getMessage());
         }
     }
+
+    public function testAssertCount()
+    {
+        $this->fake->assertCount(0);
+
+        $this->fake->dispatch(EventStub::class);
+        $this->fake->dispatch(EventStub::class);
+
+        $this->fake->assertCount(2);
+
+        try {
+            $this->fake->assertCount(1);
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString("Expected 1 events to be dispatched, but found 2 instead.", $e->getMessage());
+        }
+    }
 }
 
 class EventStub
