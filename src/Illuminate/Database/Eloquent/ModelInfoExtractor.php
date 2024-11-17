@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Eloquent;
 
 use Illuminate\Contracts\Container\BindingResolutionException;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
@@ -44,7 +45,7 @@ class ModelInfoExtractor
     /**
      * @param  \Illuminate\Contracts\Foundation\Application  $app
      */
-    public function __construct($app)
+    public function __construct(Application $app)
     {
         $this->app = $app;
     }
