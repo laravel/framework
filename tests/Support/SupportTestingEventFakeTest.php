@@ -167,7 +167,7 @@ class SupportTestingEventFakeTest extends TestCase
         try {
             $this->fake->assertCount(1);
         } catch (ExpectationFailedException $e) {
-            $this->assertStringContainsString("Expected 1 events to be dispatched, but found 2 instead.", $e->getMessage());
+            $this->assertStringContainsString('Expected 1 events to be dispatched, but found 2 instead.', $e->getMessage());
         }
     }
 }
