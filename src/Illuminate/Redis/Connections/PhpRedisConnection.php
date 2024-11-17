@@ -162,6 +162,21 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     }
 
     /**
+     * Returns the specified elements of the list stored at key.
+     *
+     * @param string $key
+     * @param int|string $start
+     * @param int|string $stop
+     * @return array|null
+     */
+    public function lrange($key, $start, $stop)
+    {
+        $result = $this->command('lrange', [$key, $start, $stop]);
+
+        return empty($result) ? null : $result;
+    }
+
+    /**
      * Removes and returns the first element of the list stored at key.
      *
      * @param  mixed  ...$arguments

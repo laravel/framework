@@ -692,6 +692,21 @@ class RedisConnectionTest extends TestCase
         }
     }
 
+    public function testItReturnKeysByLrange(): void
+    {
+        foreach ($this->connections() as $redis) {
+            // Inserts to the head of the list
+            $redis->lpush('list', 'one');
+            $redis->lpush('list','two');
+            $redis->lpush('list', 'three');
+
+            $this->assertEquals(['three', 'two'], $redis->lrange('list', 0, 1));
+            $this->assertEquals(['two', 'one'], $redis->lrange('list', 1, 2));
+
+            $redis->flushall();
+        }
+    }
+
     public function testItSscansForKeys()
     {
         foreach ($this->connections() as $redis) {
