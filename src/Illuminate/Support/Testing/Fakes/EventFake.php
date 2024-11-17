@@ -208,6 +208,22 @@ class EventFake implements Dispatcher, Fake
     }
 
     /**
+     * Assert the total number of events dispatched.
+     *
+     * @param  int  $expectedCount
+     * @return void
+     */
+    public function assertCount($expectedCount)
+    {
+        $actualCount = collect($this->events)->flatten(1)->count();
+
+        PHPUnit::assertSame(
+            $expectedCount, $actualCount,
+            "Expected {$expectedCount} events to be dispatched, but found {$actualCount} instead."
+        );
+    }
+
+    /**
      * Get all of the events matching a truth-test callback.
      *
      * @param  string  $event
