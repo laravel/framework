@@ -12,7 +12,8 @@ class MigrateMakeCommandTest extends TestCase
         $this->assertMigrationFileContains([
             'use Illuminate\Database\Migrations\Migration;',
             'return new class extends Migration',
-            'Schema::table(\'foos\', function (Blueprint $table) {',
+            'public const TABLENAME = \'foos\';',
+            'Schema::table(self::TABLENAME, function (Blueprint $table) {',
         ], 'add_bar_to_foos_table.php');
     }
 
@@ -24,7 +25,8 @@ class MigrateMakeCommandTest extends TestCase
         $this->assertMigrationFileContains([
             'use Illuminate\Database\Migrations\Migration;',
             'return new class extends Migration',
-            'Schema::table(\'foobar\', function (Blueprint $table) {',
+            'public const TABLENAME = \'foobar\';',
+            'Schema::table(self::TABLENAME, function (Blueprint $table) {',
         ], 'add_bar_to_foos_table.php');
     }
 
@@ -36,8 +38,9 @@ class MigrateMakeCommandTest extends TestCase
         $this->assertMigrationFileContains([
             'use Illuminate\Database\Migrations\Migration;',
             'return new class extends Migration',
-            'Schema::create(\'foos\', function (Blueprint $table) {',
-            'Schema::dropIfExists(\'foos\');',
+            'public const TABLENAME = \'foos\';',
+            'Schema::create(self::TABLENAME, function (Blueprint $table) {',
+            'Schema::dropIfExists(self::TABLENAME);',
         ], 'create_foos_table.php');
     }
 
@@ -49,8 +52,9 @@ class MigrateMakeCommandTest extends TestCase
         $this->assertMigrationFileContains([
             'use Illuminate\Database\Migrations\Migration;',
             'return new class extends Migration',
-            'Schema::create(\'foobar\', function (Blueprint $table) {',
-            'Schema::dropIfExists(\'foobar\');',
+            'public const TABLENAME = \'foobar\';',
+            'Schema::create(self::TABLENAME, function (Blueprint $table) {',
+            'Schema::dropIfExists(self::TABLENAME);',
         ], 'foos_table.php');
     }
 }

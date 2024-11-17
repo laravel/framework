@@ -13,8 +13,9 @@ class NotificationTableCommandTest extends TestCase
         $this->assertMigrationFileContains([
             'use Illuminate\Database\Migrations\Migration;',
             'return new class extends Migration',
-            'Schema::create(\'notifications\', function (Blueprint $table) {',
-            'Schema::dropIfExists(\'notifications\');',
+            'public const TABLENAME = \'notifications\';',
+            'Schema::create(self::TABLENAME, function (Blueprint $table) {',
+            'Schema::dropIfExists(self::TABLENAME);',
         ], 'create_notifications_table.php');
     }
 }

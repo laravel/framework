@@ -13,8 +13,9 @@ class SessionTableCommandTest extends TestCase
         $this->assertMigrationFileContains([
             'use Illuminate\Database\Migrations\Migration;',
             'return new class extends Migration',
-            'Schema::create(\'sessions\', function (Blueprint $table) {',
-            'Schema::dropIfExists(\'sessions\');',
+            'public const TABLENAME = \'sessions\';',
+            'Schema::create(self::TABLENAME, function (Blueprint $table) {',
+            'Schema::dropIfExists(self::TABLENAME);',
         ], 'create_sessions_table.php');
     }
 }

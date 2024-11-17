@@ -13,8 +13,9 @@ class QueueTableCommandTest extends TestCase
         $this->assertMigrationFileContains([
             'use Illuminate\Database\Migrations\Migration;',
             'return new class extends Migration',
-            'Schema::create(\'jobs\', function (Blueprint $table) {',
-            'Schema::dropIfExists(\'jobs\');',
+            'public const TABLENAME = \'jobs\';',
+            'Schema::create(self::TABLENAME, function (Blueprint $table) {',
+            'Schema::dropIfExists(self::TABLENAME);',
         ], 'create_jobs_table.php');
     }
 }

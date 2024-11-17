@@ -13,10 +13,12 @@ class CacheTableCommandTest extends TestCase
         $this->assertMigrationFileContains([
             'use Illuminate\Database\Migrations\Migration;',
             'return new class extends Migration',
-            'Schema::create(\'cache\', function (Blueprint $table) {',
-            'Schema::create(\'cache_locks\', function (Blueprint $table) {',
-            'Schema::dropIfExists(\'cache\');',
-            'Schema::dropIfExists(\'cache_locks\');',
+            'public const CACHE_TABLENAME = \'cache\';',
+            'public const CACHE_LOCKS_TABLENAME = \'cache_locks\';',
+            'Schema::create(self::CACHE_TABLENAME, function (Blueprint $table) {',
+            'Schema::create(self::CACHE_LOCKS_TABLENAME, function (Blueprint $table) {',
+            'Schema::dropIfExists(self::CACHE_TABLENAME);',
+            'Schema::dropIfExists(self::CACHE_LOCKS_TABLENAME);',
         ], 'create_cache_table.php');
     }
 }

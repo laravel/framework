@@ -13,8 +13,9 @@ class QueueFailedTableCommandTest extends TestCase
         $this->assertMigrationFileContains([
             'use Illuminate\Database\Migrations\Migration;',
             'return new class extends Migration',
-            'Schema::create(\'failed_jobs\', function (Blueprint $table) {',
-            'Schema::dropIfExists(\'failed_jobs\');',
+            'public const TABLENAME = \'failed_jobs\';',
+            'Schema::create(self::TABLENAME, function (Blueprint $table) {',
+            'Schema::dropIfExists(self::TABLENAME);',
         ], 'create_failed_jobs_table.php');
     }
 }
