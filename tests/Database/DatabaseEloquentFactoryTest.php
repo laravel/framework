@@ -823,7 +823,7 @@ class DatabaseEloquentFactoryTest extends TestCase
     public function test_can_disable_relationships()
     {
         $post = FactoryTestPostFactory::new()
-            ->disableRelationships()
+            ->withoutRelationships()
             ->make();
 
         $this->assertNull($post->user_id);

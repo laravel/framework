@@ -204,7 +204,7 @@ abstract class Factory
      *
      * @return static
      */
-    public function disableRelationships()
+    public function withoutRelationships()
     {
         $this->relationshipsEnabled = false;
 
