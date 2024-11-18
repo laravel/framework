@@ -2,7 +2,10 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
+use Illuminate\Database\Eloquent\Attributes\CollectedBy;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelInspector;
@@ -34,6 +37,8 @@ class ModelInspectorTest extends DatabaseTestCase
         $extractor = new ModelInspector($this->app);
         $modelInfo = $extractor->inspect(ModelInspectorTestModel::class);
         $this->assertModelInfo($modelInfo);
+        $this->assertSame(ModelInspectorTestModelEloquentCollection::class, $modelInfo['collection']);
+        $this->assertSame(ModelInspectorTestModelBuilder::class, $modelInfo['builder']);
     }
 
     public function test_command_returns_json()
@@ -175,10 +180,12 @@ class ModelInspectorTest extends DatabaseTestCase
 }
 
 #[ObservedBy(ModelInspectorTestModelObserver::class)]
+#[CollectedBy(ModelInspectorTestModelEloquentCollection::class)]
 class ModelInspectorTestModel extends Model
 {
     use HasUuids;
 
+    protected static string $builder = ModelInspectorTestModelBuilder::class;
     public $table = 'model_info_extractor_test_model';
     protected $guarded = ['name'];
     protected $casts = ['nullable_date' => 'datetime', 'a_bool' => 'bool'];
@@ -200,4 +207,13 @@ class ModelInspectorTestModelObserver
     public function created()
     {
     }
+}
+
+class ModelInspectorTestModelEloquentCollection extends Collection
+{
+}
+
+class ModelInspectorTestModelBuilder extends Builder
+{
+
 }

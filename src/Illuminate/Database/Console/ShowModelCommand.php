@@ -51,7 +51,16 @@ class ShowModelCommand extends DatabaseInspectionCommand
             return 1;
         }
 
-        $this->display(...$info);
+        $this->display(
+            $info['class'],
+            $info['database'],
+            $info['table'],
+            $info['policy'],
+            $info['attributes'],
+            $info['relations'],
+            $info['events'],
+            $info['observers']
+        );
 
         return 0;
     }
