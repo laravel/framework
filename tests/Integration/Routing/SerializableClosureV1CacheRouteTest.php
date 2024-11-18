@@ -43,7 +43,7 @@ class SerializableClosureV1CacheRouteTest extends TestCase
         parent::tearDown();
     }
 
-    public function testItCanCachedRoute()
+    public function testItCanUseCachedRouteFromSerializableClosureV1()
     {
         $user = UserFactory::new()->create();
 
