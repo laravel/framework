@@ -51,12 +51,13 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
      * @param  bool  $dispatchAfterCommit
      * @return void
      */
-    public function __construct(Connection $database,
-                                $table,
-                                $default = 'default',
-                                $retryAfter = 60,
-                                $dispatchAfterCommit = false)
-    {
+    public function __construct(
+        Connection $database,
+        $table,
+        $default = 'default',
+        $retryAfter = 60,
+        $dispatchAfterCommit = false,
+    ) {
         $this->table = $table;
         $this->default = $default;
         $this->database = $database;

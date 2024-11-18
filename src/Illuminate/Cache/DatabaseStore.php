@@ -76,13 +76,14 @@ class DatabaseStore implements LockProvider, Store
      * @param  array  $lockLottery
      * @return void
      */
-    public function __construct(ConnectionInterface $connection,
-                                                    $table,
-                                                    $prefix = '',
-                                                    $lockTable = 'cache_locks',
-                                                    $lockLottery = [2, 100],
-                                                    $defaultLockTimeoutInSeconds = 86400)
-    {
+    public function __construct(
+        ConnectionInterface $connection,
+        $table,
+        $prefix = '',
+        $lockTable = 'cache_locks',
+        $lockLottery = [2, 100],
+        $defaultLockTimeoutInSeconds = 86400,
+    ) {
         $this->table = $table;
         $this->prefix = $prefix;
         $this->connection = $connection;
