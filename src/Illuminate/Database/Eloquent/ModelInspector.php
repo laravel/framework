@@ -58,7 +58,7 @@ class ModelInspector
      *
      * @param  class-string<\Illuminate\Database\Eloquent\Model>|string  $model
      * @param  string|null  $connection
-     * @return array{"class": class-string<\Illuminate\Database\Eloquent\Model>, database: string, table: string, policy: string|null, attributes: \Illuminate\Support\Collection, relations: \Illuminate\Support\Collection, events: \Illuminate\Support\Collection, observers: \Illuminate\Support\Collection}
+     * @return array{"class": class-string<\Illuminate\Database\Eloquent\Model>, database: string, table: string, policy: class-string|null, attributes: \Illuminate\Support\Collection, relations: \Illuminate\Support\Collection, events: \Illuminate\Support\Collection, observers: \Illuminate\Support\Collection, collection: class-string<\Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>>, builder: class-string<\Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>>}
      *
      * @throws BindingResolutionException
      */
@@ -82,6 +82,8 @@ class ModelInspector
             'relations' => $this->getRelations($model),
             'events' => $this->getEvents($model),
             'observers' => $this->getObservers($model),
+            'collection' => $this->getCollectedBy($model),
+            'builder' => $this->getBuilder($model),
         ];
     }
 
@@ -269,6 +271,30 @@ class ModelInspector
         }
 
         return collect($formatted);
+    }
+
+    /**
+     * Get the collection class being used by the model.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model $model
+     * @return class-string<\Illuminate\Database\Eloquent\Collection>
+     */
+    protected function getCollectedBy($model)
+    {
+        return $model->newCollection()::class;
+    }
+
+    /**
+     * Get the builder class being used by the model.
+     *
+     * @template TModel of \Illuminate\Database\Eloquent\Model
+     *
+     * @param  TModel $model
+     * @return class-string<\Illuminate\Database\Eloquent\Builder<TModel>>
+     */
+    protected function getBuilder($model)
+    {
+        return $model->newQuery()::class;
     }
 
     /**
