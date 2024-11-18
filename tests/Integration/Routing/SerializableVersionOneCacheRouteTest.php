@@ -1,0 +1,62 @@
+<?php
+
+namespace Illuminate\Tests\Integration\Route;
+
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Orchestra\Testbench\Attributes\WithConfig;
+use Orchestra\Testbench\Attributes\WithMigration;
+use Orchestra\Testbench\Concerns\InteractsWithPublishedFiles;
+use Orchestra\Testbench\Factories\UserFactory;
+use Orchestra\Testbench\TestCase;
+use function Illuminate\Filesystem\join_paths;
+use function Orchestra\Testbench\default_skeleton_path;
+
+#[WithConfig('app.key', 'AckfSECXIvnK5r28GVIWUAxmbBSjTsmF')]
+#[WithMigration]
+class SerializableVersionOneCacheRouteTest extends TestCase
+{
+    use InteractsWithPublishedFiles, RefreshDatabase;
+
+    protected $files = [
+        'bootstrap/cache/routes-v*.php',
+    ];
+
+    /** {@inheritDoc} */
+    #[\Override]
+    protected function getPackageProviders($app)
+    {
+        return [
+            \Illuminate\Foundation\Support\Providers\RouteServiceProvider::class,
+        ];
+    }
+
+    /** {@inheritDoc} */
+    #[\Override]
+    protected function setUp(): void
+    {
+        $_ENV['APP_ROUTES_CACHE'] = realpath(join_paths(__DIR__, 'stubs', 'serializable-closure-v1', 'routes-v7.php'));
+
+        parent::setUp();
+    }
+
+    /** {@inheritDoc} */
+    #[\Override]
+    protected function tearDown(): void
+    {
+        unset($_ENV['APP_ROUTES_CACHE']);
+
+        parent::tearDown();
+    }
+
+    public function testItCanCachedRoute()
+    {
+        $user = UserFactory::new()->create();
+
+        $this->assertTrue($this->app->routesAreCached());
+
+        $this->get('/')->assertSee('Laravel');
+
+        $this->get("/users/{$user->getKey()}")
+            ->assertJson($user->toArray());
+    }
+}
