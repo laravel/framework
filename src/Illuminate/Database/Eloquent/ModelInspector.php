@@ -276,7 +276,7 @@ class ModelInspector
     /**
      * Get the collection class being used by the model.
      *
-     * @param  \Illuminate\Database\Eloquent\Model $model
+     * @param  \Illuminate\Database\Eloquent\Model  $model
      * @return class-string<\Illuminate\Database\Eloquent\Collection>
      */
     protected function getCollectedBy($model)
@@ -289,7 +289,7 @@ class ModelInspector
      *
      * @template TModel of \Illuminate\Database\Eloquent\Model
      *
-     * @param  TModel $model
+     * @param  TModel  $model
      * @return class-string<\Illuminate\Database\Eloquent\Builder<TModel>>
      */
     protected function getBuilder($model)

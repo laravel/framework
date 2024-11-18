@@ -215,5 +215,4 @@ class ModelInspectorTestModelEloquentCollection extends Collection
 
 class ModelInspectorTestModelBuilder extends Builder
 {
-
 }
