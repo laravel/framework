@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Console;
 use Illuminate\Console\Concerns\CreatesMatchingTest;
 use Illuminate\Console\GeneratorCommand;
 use Illuminate\Foundation\Inspiring;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputOption;
@@ -129,7 +130,7 @@ class ComponentMakeCommand extends GeneratorCommand
 
         $path[] = $name;
 
-        return collect($path)
+        return (new Collection($path))
             ->map(fn ($segment) => Str::kebab($segment))
             ->implode('.');
     }

@@ -141,16 +141,17 @@ abstract class Factory
      * @param  bool  $withoutRelationships
      * @return void
      */
-    public function __construct($count = null,
-                                ?Collection $states = null,
-                                ?Collection $has = null,
-                                ?Collection $for = null,
-                                ?Collection $afterMaking = null,
-                                ?Collection $afterCreating = null,
-                                $connection = null,
-                                ?Collection $recycle = null,
-                                bool $withoutRelationships = false)
-    {
+    public function __construct(
+        $count = null,
+        ?Collection $states = null,
+        ?Collection $has = null,
+        ?Collection $for = null,
+        ?Collection $afterMaking = null,
+        ?Collection $afterCreating = null,
+        $connection = null,
+        ?Collection $recycle = null,
+        bool $withoutRelationships = false
+    ) {
         $this->count = $count;
         $this->states = $states ?? new Collection;
         $this->has = $has ?? new Collection;

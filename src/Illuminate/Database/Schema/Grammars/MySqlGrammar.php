@@ -29,7 +29,7 @@ class MySqlGrammar extends Grammar
     protected $serials = ['bigInteger', 'integer', 'mediumInteger', 'smallInteger', 'tinyInteger'];
 
     /**
-     * The commands to be executed outside of create or alter command.
+     * The commands to be executed outside of create or alter commands.
      *
      * @var string[]
      */

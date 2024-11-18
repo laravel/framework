@@ -9,6 +9,7 @@ class PaginatorTest extends TestCase
 {
     public function testSimplePaginatorReturnsRelevantContextInformation()
     {
+        /** @var Paginator<int, string> $p */
         $p = new Paginator(['item3', 'item4', 'item5'], 2, 2);
 
         $this->assertEquals(2, $p->currentPage());

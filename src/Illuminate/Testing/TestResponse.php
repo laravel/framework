@@ -217,7 +217,7 @@ class TestResponse implements ArrayAccess
     /**
      * Assert whether the response is redirecting to a given route.
      *
-     * @param  string  $name
+     * @param  \BackedEnum|string  $name
      * @param  mixed  $parameters
      * @return $this
      */
@@ -238,7 +238,7 @@ class TestResponse implements ArrayAccess
     /**
      * Assert whether the response is redirecting to a given signed route.
      *
-     * @param  string|null  $name
+     * @param  \BackedEnum|string|null  $name
      * @param  mixed  $parameters
      * @param  bool  $absolute
      * @return $this

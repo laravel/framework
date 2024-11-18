@@ -6,6 +6,7 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Contracts\Cache\Repository store(string|null $name = null)
  * @method static \Illuminate\Contracts\Cache\Repository driver(string|null $driver = null)
  * @method static \Illuminate\Contracts\Cache\Repository resolve(string $name)
+ * @method static \Illuminate\Cache\Repository build(array $config)
  * @method static \Illuminate\Cache\Repository repository(\Illuminate\Contracts\Cache\Store $store, array $config = [])
  * @method static void refreshEventDispatcher()
  * @method static string getDefaultDriver()
