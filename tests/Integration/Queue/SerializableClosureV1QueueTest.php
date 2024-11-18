@@ -4,19 +4,26 @@ namespace Illuminate\Tests\Integration\Queue;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
-use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\Factories\UserFactory;
 use Orchestra\Testbench\TestCase;
 
-#[WithConfig('app.key', 'AckfSECXIvnK5r28GVIWUAxmbBSjTsmF')]
-#[WithConfig('database.default', 'testing')]
-#[WithConfig('queue.default', 'database')]
-#[WithConfig('queue.connections.database.connection', 'testing')]
 #[WithMigration]
 class SerializableClosureV1QueueTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function defineEnvironment($app)
+    {
+        tap($app->make('config'), function ($config) {
+            $config->set([
+                'app.key' => 'AckfSECXIvnK5r28GVIWUAxmbBSjTsmF',
+                'database.default' => 'testing',
+                'queue.default' => 'database',
+                'queue.connections.database.connection' => 'testing',
+            ]);
+        });
+    }
 
     /** {@inheritDoc} */
     protected function afterRefreshingDatabase()
