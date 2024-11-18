@@ -5,8 +5,8 @@ namespace Illuminate\Auth\Middleware;
 use Closure;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Database\Eloquent\Model;
-
 use Illuminate\Support\Collection;
+
 use function Illuminate\Support\enum_value;
 
 class Authorize

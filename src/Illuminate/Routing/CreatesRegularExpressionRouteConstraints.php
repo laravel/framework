@@ -3,8 +3,8 @@
 namespace Illuminate\Routing;
 
 use Illuminate\Support\Arr;
-
 use Illuminate\Support\Collection;
+
 use function Illuminate\Support\enum_value;
 
 trait CreatesRegularExpressionRouteConstraints
