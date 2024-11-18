@@ -104,7 +104,7 @@ abstract class Factory
      *
      * @var bool
      */
-    protected $withoutRelationships = false;
+    protected $expandRelationships = true;
 
     /**
      * The default namespace where factories reside.
@@ -138,7 +138,7 @@ abstract class Factory
      * @param  \Illuminate\Support\Collection|null  $afterCreating
      * @param  string|null  $connection
      * @param  \Illuminate\Support\Collection|null  $recycle
-     * @param  bool  $withoutRelationships
+     * @param  bool  $expandRelationships
      * @return void
      */
     public function __construct(
@@ -150,7 +150,7 @@ abstract class Factory
         ?Collection $afterCreating = null,
         $connection = null,
         ?Collection $recycle = null,
-        bool $withoutRelationships = false
+        bool $expandRelationships = true
     ) {
         $this->count = $count;
         $this->states = $states ?? new Collection;
@@ -161,7 +161,7 @@ abstract class Factory
         $this->connection = $connection;
         $this->recycle = $recycle ?? new Collection;
         $this->faker = $this->withFaker();
-        $this->withoutRelationships = $withoutRelationships;
+        $this->expandRelationships = $expandRelationships;
     }
 
     /**
@@ -200,18 +200,6 @@ abstract class Factory
      */
     public function configure()
     {
-        return $this;
-    }
-
-    /**
-     * Disable the creation of relationship factories.
-     *
-     * @return static
-     */
-    public function withoutRelationships()
-    {
-        $this->withoutRelationships = true;
-
         return $this;
     }
 
@@ -501,7 +489,7 @@ abstract class Factory
     {
         return collect($definition)
             ->map($evaluateRelations = function ($attribute) {
-                if ($this->withoutRelationships && $attribute instanceof self) {
+                if (! $this->expandRelationships && $attribute instanceof self) {
                     $attribute = null;
                 } elseif ($attribute instanceof self) {
                     $attribute = $this->getRandomRecycledModel($attribute->modelName())?->getKey()
@@ -754,6 +742,16 @@ abstract class Factory
     }
 
     /**
+     * Disable the creation of relationship factories.
+     *
+     * @return static
+     */
+    public function withoutRelationships()
+    {
+        return $this->newInstance(['expandRelationships' => false]);
+    }
+
+    /**
      * Get the name of the database connection that is used to generate models.
      *
      * @return string
@@ -791,7 +789,7 @@ abstract class Factory
             'afterCreating' => $this->afterCreating,
             'connection' => $this->connection,
             'recycle' => $this->recycle,
-            'withoutRelationships' => $this->withoutRelationships,
+            'expandRelationships' => $this->expandRelationships,
         ], $arguments)));
     }
 
