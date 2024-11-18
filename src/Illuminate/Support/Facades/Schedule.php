@@ -24,7 +24,6 @@ use Illuminate\Console\Scheduling\Schedule as ConsoleSchedule;
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes user(string $user)
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes environments(array|mixed $environments)
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes evenInMaintenanceMode()
- * @method static \Illuminate\Console\Scheduling\PendingEventAttributes withoutOverlapping(int $expiresAt = 1440)
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes onOneServer()
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes runInBackground()
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes when(\Closure|bool $callback)
@@ -80,6 +79,7 @@ use Illuminate\Console\Scheduling\Schedule as ConsoleSchedule;
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes yearlyOn(int $month = 1, int|string $dayOfMonth = 1, string $time = '0:0')
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes days(array|mixed $days)
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes timezone(\DateTimeZone|string $timezone)
+ * @method static \Illuminate\Console\Scheduling\PendingEventAttributes withoutOverlapping(int $expiresAt = 1440)
  *
  * @see \Illuminate\Console\Scheduling\Schedule
  */
