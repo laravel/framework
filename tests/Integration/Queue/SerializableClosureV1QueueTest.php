@@ -10,6 +10,7 @@ use Orchestra\Testbench\Factories\UserFactory;
 use Orchestra\Testbench\TestCase;
 
 #[WithConfig('app.key', 'AckfSECXIvnK5r28GVIWUAxmbBSjTsmF')]
+#[WithConfig('database.default', 'testing')]
 #[WithConfig('queue.default', 'database')]
 #[WithConfig('queue.connections.database.connection', 'testing')]
 #[WithMigration]
