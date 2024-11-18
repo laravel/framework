@@ -43,7 +43,7 @@ class SerializableClosureV1QueueTest extends TestCase
         ]);
 
         $this->artisan('queue:work', [
-            '--stop-when-empty' => true,
+            '--once' => true,
             '--daemon' => true,
         ])->assertExitCode(0);
 
