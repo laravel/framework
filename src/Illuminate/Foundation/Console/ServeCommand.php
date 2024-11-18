@@ -374,7 +374,7 @@ class ServeCommand extends Command
      * @param  string  $line
      * @return int
      */
-    protected function getRequestPortFromLine($line): int
+    protected function getRequestPortFromLine($line)
     {
         /**
          * Updated regex to match the log line with or without a datetime prefix.
@@ -386,7 +386,7 @@ class ServeCommand extends Command
          * If the port number could not be extracted (if no match for the port number found), an exception is thrown with a message containing the problematic line for easier debugging.
          */
         if (! isset($matches[2])) {
-            throw new \Exception("Failed to extract request port from line: $line");
+            throw new \Exception("Failed to extract request port from line: {$line}");
         }
 
         return (int) $matches[2];
