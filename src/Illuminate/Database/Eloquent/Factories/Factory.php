@@ -86,6 +86,13 @@ abstract class Factory
     protected $afterCreating;
 
     /**
+     * Whether relationships should not be automatically created.
+     *
+     * @var bool
+     */
+    protected $expandRelationships = true;
+
+    /**
      * The name of the database connection that will be used to create the models.
      *
      * @var string|null
@@ -98,13 +105,6 @@ abstract class Factory
      * @var \Faker\Generator
      */
     protected $faker;
-
-    /**
-     * Whether relationships should not be automatically created.
-     *
-     * @var bool
-     */
-    protected $expandRelationships = true;
 
     /**
      * The default namespace where factories reside.
