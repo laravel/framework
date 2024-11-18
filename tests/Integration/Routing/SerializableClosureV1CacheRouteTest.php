@@ -12,7 +12,7 @@ use function Illuminate\Filesystem\join_paths;
 
 #[WithConfig('app.key', 'AckfSECXIvnK5r28GVIWUAxmbBSjTsmF')]
 #[WithMigration]
-class SerializableVersionOneCacheRouteTest extends TestCase
+class SerializableClosureV1CacheRouteTest extends TestCase
 {
     use RefreshDatabase;
 
