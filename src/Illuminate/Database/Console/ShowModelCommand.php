@@ -3,7 +3,7 @@
 namespace Illuminate\Database\Console;
 
 use Illuminate\Contracts\Container\BindingResolutionException;
-use Illuminate\Database\Eloquent\ModelInfoExtractor;
+use Illuminate\Database\Eloquent\ModelInspector;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -38,7 +38,7 @@ class ShowModelCommand extends DatabaseInspectionCommand
      *
      * @return int
      */
-    public function handle(ModelInfoExtractor $modelInfoExtractor)
+    public function handle(ModelInspector $modelInfoExtractor)
     {
         try {
             $info = $modelInfoExtractor->handle(

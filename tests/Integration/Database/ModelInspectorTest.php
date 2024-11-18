@@ -5,13 +5,13 @@ namespace Illuminate\Tests\Integration\Database;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\ModelInfoExtractor;
+use Illuminate\Database\Eloquent\ModelInspector;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schema;
 
-class ModelInfoExtractorTest extends DatabaseTestCase
+class ModelInspectorTest extends DatabaseTestCase
 {
     protected function afterRefreshingDatabase()
     {
@@ -31,14 +31,14 @@ class ModelInfoExtractorTest extends DatabaseTestCase
 
     public function test_extracts_model_data()
     {
-        $extractor = new ModelInfoExtractor($this->app);
-        $modelInfo = $extractor->handle(ModelInfoExtractorTestModel::class);
+        $extractor = new ModelInspector($this->app);
+        $modelInfo = $extractor->handle(ModelInspectorTestModel::class);
         $this->assertModelInfo($modelInfo);
     }
 
     public function test_command_returns_json()
     {
-        $this->withoutMockingConsoleOutput()->artisan('model:show', ['model' => ModelInfoExtractorTestModel::class, '--json' => true]);
+        $this->withoutMockingConsoleOutput()->artisan('model:show', ['model' => ModelInspectorTestModel::class, '--json' => true]);
         $o = Artisan::output();
         $this->assertJson($o);
         $modelInfo = json_decode($o, true);
@@ -47,7 +47,7 @@ class ModelInfoExtractorTest extends DatabaseTestCase
 
     private function assertModelInfo(array $modelInfo)
     {
-        $this->assertEquals(ModelInfoExtractorTestModel::class, $modelInfo['class']);
+        $this->assertEquals(ModelInspectorTestModel::class, $modelInfo['class']);
         $this->assertEquals(Schema::getConnection()->getConfig()['name'], $modelInfo['database']);
         $this->assertEquals('model_info_extractor_test_model', $modelInfo['table']);
         $this->assertNull($modelInfo['policy']);
@@ -160,7 +160,7 @@ class ModelInfoExtractorTest extends DatabaseTestCase
         $this->assertCount(1, $modelInfo['observers']);
         $this->assertEquals('created', $modelInfo['observers'][0]['event']);
         $this->assertCount(1, $modelInfo['observers'][0]['observer']);
-        $this->assertEquals("Illuminate\Tests\Integration\Database\ModelInfoExtractorTestModelObserver@created", $modelInfo['observers'][0]['observer'][0]);
+        $this->assertEquals("Illuminate\Tests\Integration\Database\ModelInspectorTestModelObserver@created", $modelInfo['observers'][0]['observer'][0]);
     }
 
     private function assertAttributes($expectedAttributes, $actualAttributes)
@@ -174,8 +174,8 @@ class ModelInfoExtractorTest extends DatabaseTestCase
     }
 }
 
-#[ObservedBy(ModelInfoExtractorTestModelObserver::class)]
-class ModelInfoExtractorTestModel extends Model
+#[ObservedBy(ModelInspectorTestModelObserver::class)]
+class ModelInspectorTestModel extends Model
 {
     use HasUuids;
 
@@ -195,7 +195,7 @@ class ParentTestModel extends Model
     public $timestamps = false;
 }
 
-class ModelInfoExtractorTestModelObserver
+class ModelInspectorTestModelObserver
 {
     public function created()
     {

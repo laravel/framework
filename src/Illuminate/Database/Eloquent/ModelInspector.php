@@ -14,7 +14,7 @@ use SplFileObject;
 
 use function Illuminate\Support\enum_value;
 
-class ModelInfoExtractor
+class ModelInspector
 {
     /**
      * The Laravel application instance.
@@ -43,7 +43,10 @@ class ModelInfoExtractor
     ];
 
     /**
+     * Create a new model inspector instance.
+     *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
+     * @return void
      */
     public function __construct(Application $app)
     {
@@ -51,7 +54,7 @@ class ModelInfoExtractor
     }
 
     /**
-     * Extract model details.
+     * Extract model details for the given model.
      *
      * @param  class-string<\Illuminate\Database\Eloquent\Model>|string  $model
      * @param  string|null  $connection
@@ -80,19 +83,6 @@ class ModelInfoExtractor
             'events' => $this->getEvents($model),
             'observers' => $this->getObservers($model),
         ];
-    }
-
-    /**
-     * Get the first policy associated with this model.
-     *
-     * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @return string|null
-     */
-    protected function getPolicy($model)
-    {
-        $policy = Gate::getPolicyFor($model::class);
-
-        return $policy ? $policy::class : null;
     }
 
     /**
@@ -218,7 +208,20 @@ class ModelInfoExtractor
     }
 
     /**
-     * Get the Events that the model dispatches.
+     * Get the first policy associated with this model.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @return string|null
+     */
+    protected function getPolicy($model)
+    {
+        $policy = Gate::getPolicyFor($model::class);
+
+        return $policy ? $policy::class : null;
+    }
+
+    /**
+     * Get the events that the model dispatches.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $model
      * @return \Illuminate\Support\Collection
@@ -233,7 +236,7 @@ class ModelInfoExtractor
     }
 
     /**
-     * Get the Observers watching this model.
+     * Get the observers watching this model.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $model
      * @return \Illuminate\Support\Collection
@@ -333,20 +336,6 @@ class ModelInfoExtractor
     }
 
     /**
-     * Get the default value for the given column.
-     *
-     * @param  array<string, mixed>  $column
-     * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @return mixed|null
-     */
-    protected function getColumnDefault($column, $model)
-    {
-        $attributeDefault = $model->getAttributes()[$column['name']] ?? null;
-
-        return enum_value($attributeDefault, $column['default']);
-    }
-
-    /**
      * Determine if the given attribute is hidden.
      *
      * @param  string  $attribute
@@ -364,6 +353,20 @@ class ModelInfoExtractor
         }
 
         return false;
+    }
+
+    /**
+     * Get the default value for the given column.
+     *
+     * @param  array<string, mixed>  $column
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @return mixed|null
+     */
+    protected function getColumnDefault($column, $model)
+    {
+        $attributeDefault = $model->getAttributes()[$column['name']] ?? null;
+
+        return enum_value($attributeDefault, $column['default']);
     }
 
     /**
