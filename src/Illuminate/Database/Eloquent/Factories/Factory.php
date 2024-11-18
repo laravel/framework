@@ -746,7 +746,7 @@ abstract class Factory
      *
      * @return static
      */
-    public function withoutRelationships()
+    public function withoutParents()
     {
         return $this->newInstance(['expandRelationships' => false]);
     }
