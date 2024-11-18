@@ -10,6 +10,7 @@ use Illuminate\Database\PostgresConnection;
 use Illuminate\Database\QueryException;
 use Illuminate\Database\SqlServerConnection;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Str;
 
@@ -379,7 +380,7 @@ class DatabaseStore implements LockProvider, Store
      */
     protected function forgetMany(array $keys)
     {
-        $this->table()->whereIn('key', collect($keys)->flatMap(fn ($key) => [
+        $this->table()->whereIn('key', (new Collection($keys))->flatMap(fn ($key) => [
             $this->prefix.$key,
             "{$this->prefix}illuminate:cache:flexible:created:{$key}",
         ])->all())->delete();
@@ -397,7 +398,7 @@ class DatabaseStore implements LockProvider, Store
     protected function forgetManyIfExpired(array $keys, bool $prefixed = false)
     {
         $this->table()
-            ->whereIn('key', collect($keys)->flatMap(fn ($key) => $prefixed ? [
+            ->whereIn('key', (new Collection($keys))->flatMap(fn ($key) => $prefixed ? [
                 $key,
                 $this->prefix.'illuminate:cache:flexible:created:'.Str::chopStart($key, $this->prefix),
             ] : [

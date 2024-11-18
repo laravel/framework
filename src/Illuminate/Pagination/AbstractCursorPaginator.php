@@ -209,7 +209,7 @@ abstract class AbstractCursorPaginator implements Htmlable, Stringable
      */
     public function getParametersForItem($item)
     {
-        return collect($this->parameters)
+        return (new Collection($this->parameters))
             ->filter()
             ->flip()
             ->map(function ($_, $parameterName) use ($item) {
