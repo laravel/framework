@@ -86,6 +86,13 @@ abstract class Factory
     protected $afterCreating;
 
     /**
+     * Whether relationships should not be automatically created.
+     *
+     * @var bool
+     */
+    protected $expandRelationships = true;
+
+    /**
      * The name of the database connection that will be used to create the models.
      *
      * @var string|null
@@ -131,6 +138,7 @@ abstract class Factory
      * @param  \Illuminate\Support\Collection|null  $afterCreating
      * @param  string|null  $connection
      * @param  \Illuminate\Support\Collection|null  $recycle
+     * @param  bool  $expandRelationships
      * @return void
      */
     public function __construct(
@@ -142,6 +150,7 @@ abstract class Factory
         ?Collection $afterCreating = null,
         $connection = null,
         ?Collection $recycle = null,
+        bool $expandRelationships = true
     ) {
         $this->count = $count;
         $this->states = $states ?? new Collection;
@@ -152,6 +161,7 @@ abstract class Factory
         $this->connection = $connection;
         $this->recycle = $recycle ?? new Collection;
         $this->faker = $this->withFaker();
+        $this->expandRelationships = $expandRelationships;
     }
 
     /**
@@ -479,7 +489,9 @@ abstract class Factory
     {
         return collect($definition)
             ->map($evaluateRelations = function ($attribute) {
-                if ($attribute instanceof self) {
+                if (! $this->expandRelationships && $attribute instanceof self) {
+                    $attribute = null;
+                } elseif ($attribute instanceof self) {
                     $attribute = $this->getRandomRecycledModel($attribute->modelName())?->getKey()
                         ?? $attribute->recycle($this->recycle)->create()->getKey();
                 } elseif ($attribute instanceof Model) {
@@ -730,6 +742,16 @@ abstract class Factory
     }
 
     /**
+     * Disable the creation of relationship factories.
+     *
+     * @return static
+     */
+    public function withoutRelationships()
+    {
+        return $this->newInstance(['expandRelationships' => false]);
+    }
+
+    /**
      * Get the name of the database connection that is used to generate models.
      *
      * @return string
@@ -767,6 +789,7 @@ abstract class Factory
             'afterCreating' => $this->afterCreating,
             'connection' => $this->connection,
             'recycle' => $this->recycle,
+            'expandRelationships' => $this->expandRelationships,
         ], $arguments)));
     }
 
