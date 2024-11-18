@@ -100,11 +100,11 @@ abstract class Factory
     protected $faker;
 
     /**
-     * Whether relationship should be automatically created.
+     * Whether relationships should not be automatically created.
      *
      * @var bool
      */
-    protected $relationshipsEnabled = true;
+    protected $withoutRelationships = false;
 
     /**
      * The default namespace where factories reside.
@@ -206,7 +206,7 @@ abstract class Factory
      */
     public function withoutRelationships()
     {
-        $this->relationshipsEnabled = false;
+        $this->withoutRelationships = true;
 
         return $this;
     }
@@ -497,7 +497,7 @@ abstract class Factory
     {
         return collect($definition)
             ->map($evaluateRelations = function ($attribute) {
-                if (! $this->relationshipsEnabled && $attribute instanceof self) {
+                if ($this->withoutRelationships && $attribute instanceof self) {
                     $attribute = null;
                 } elseif ($attribute instanceof self) {
                     $attribute = $this->getRandomRecycledModel($attribute->modelName())?->getKey()
