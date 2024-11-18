@@ -16,6 +16,7 @@ class DeleteUser implements ShouldQueue
     public function __construct(
         public User $user
     ) {
+        log($user);
     }
 
     /**
