@@ -3554,18 +3554,20 @@ class Builder implements BuilderContract
      * Retrieve the "count" result of the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $columns
-     * @return int
+     * @return \Illuminate\Support\Collection|int
      */
     public function count($columns = '*')
     {
-        return (int) $this->aggregate(__FUNCTION__, Arr::wrap($columns));
+        $results = $this->aggregate(__FUNCTION__, Arr::wrap($columns));
+
+        return $results instanceof Collection ? $results : (int) $results;
     }
 
     /**
      * Retrieve the minimum value of a given column.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
-     * @return mixed
+     * @return \Illuminate\Support\Collection|mixed
      */
     public function min($column)
     {
@@ -3576,7 +3578,7 @@ class Builder implements BuilderContract
      * Retrieve the maximum value of a given column.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
-     * @return mixed
+     * @return \Illuminate\Support\Collection|mixed
      */
     public function max($column)
     {
@@ -3587,7 +3589,7 @@ class Builder implements BuilderContract
      * Retrieve the sum of the values of a given column.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
-     * @return mixed
+     * @return \Illuminate\Support\Collection|mixed
      */
     public function sum($column)
     {
@@ -3600,7 +3602,7 @@ class Builder implements BuilderContract
      * Retrieve the average of the values of a given column.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
-     * @return mixed
+     * @return \Illuminate\Support\Collection|mixed
      */
     public function avg($column)
     {
@@ -3611,7 +3613,7 @@ class Builder implements BuilderContract
      * Alias for the "avg" method.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
-     * @return mixed
+     * @return \Illuminate\Support\Collection|mixed
      */
     public function average($column)
     {
@@ -3623,7 +3625,7 @@ class Builder implements BuilderContract
      *
      * @param  string  $function
      * @param  array  $columns
-     * @return mixed
+     * @return \Illuminate\Support\Collection|mixed
      */
     public function aggregate($function, $columns = ['*'])
     {
@@ -3631,6 +3633,10 @@ class Builder implements BuilderContract
                         ->cloneWithoutBindings($this->unions || $this->havings ? [] : ['select'])
                         ->setAggregate($function, $columns)
                         ->get($columns);
+
+        if ($this->groups) {
+            return $results;
+        }
 
         if (! $results->isEmpty()) {
             return array_change_key_case((array) $results[0])['aggregate'];
