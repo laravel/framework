@@ -5,7 +5,6 @@ namespace Illuminate\Tests\Integration\Route;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\Attributes\WithMigration;
-use Orchestra\Testbench\Concerns\InteractsWithPublishedFiles;
 use Orchestra\Testbench\Factories\UserFactory;
 use Orchestra\Testbench\TestCase;
 
@@ -15,11 +14,7 @@ use function Illuminate\Filesystem\join_paths;
 #[WithMigration]
 class SerializableVersionOneCacheRouteTest extends TestCase
 {
-    use InteractsWithPublishedFiles, RefreshDatabase;
-
-    protected $files = [
-        'bootstrap/cache/routes-v*.php',
-    ];
+    use RefreshDatabase;
 
     /** {@inheritDoc} */
     #[\Override]
