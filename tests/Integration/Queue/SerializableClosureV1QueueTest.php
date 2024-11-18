@@ -11,6 +11,7 @@ use Orchestra\Testbench\TestCase;
 
 #[WithConfig('app.key', 'AckfSECXIvnK5r28GVIWUAxmbBSjTsmF')]
 #[WithConfig('queue.default', 'database')]
+#[WithConfig('queue.connections.database.connection', 'testing')]
 #[WithMigration]
 class SerializableClosureV1QueueTest extends TestCase
 {
