@@ -274,6 +274,30 @@ class ModelInspector
     }
 
     /**
+     * Get the collection class being used by the model.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model $model
+     * @return class-string<\Illuminate\Database\Eloquent\Collection>
+     */
+    protected function getCollectedBy($model)
+    {
+        return $model->newCollection()::class;
+    }
+
+    /**
+     * Get the builder class being used by the model.
+     *
+     * @template TModel of \Illuminate\Database\Eloquent\Model
+     *
+     * @param  TModel $model
+     * @return class-string<\Illuminate\Database\Eloquent\Builder<TModel>>
+     */
+    protected function getBuilder($model)
+    {
+        return $model->newQuery()::class;
+    }
+
+    /**
      * Qualify the given model class base name.
      *
      * @param  string  $model
@@ -383,25 +407,5 @@ class ModelInspector
         return collect($indexes)->contains(
             fn ($index) => count($index['columns']) === 1 && $index['columns'][0] === $column && $index['unique']
         );
-    }
-
-    /**
-     * @param  \Illuminate\Database\Eloquent\Model $model
-     * @return class-string<\Illuminate\Database\Eloquent\Collection>
-     */
-    protected function getCollectedBy($model)
-    {
-        return $model->newCollection()::class;
-    }
-
-    /**
-     * @template TModel of \Illuminate\Database\Eloquent\Model
-     *
-     * @param  TModel $model
-     * @return class-string<\Illuminate\Database\Eloquent\Builder<TModel>>
-     */
-    protected function getBuilder($model)
-    {
-        return $model->newQuery()::class;
     }
 }
