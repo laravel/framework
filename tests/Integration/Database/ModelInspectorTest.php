@@ -32,7 +32,7 @@ class ModelInspectorTest extends DatabaseTestCase
     public function test_extracts_model_data()
     {
         $extractor = new ModelInspector($this->app);
-        $modelInfo = $extractor->handle(ModelInspectorTestModel::class);
+        $modelInfo = $extractor->inspect(ModelInspectorTestModel::class);
         $this->assertModelInfo($modelInfo);
     }
 

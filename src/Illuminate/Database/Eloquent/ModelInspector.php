@@ -62,7 +62,7 @@ class ModelInspector
      *
      * @throws BindingResolutionException
      */
-    public function handle($model, $connection = null)
+    public function inspect($model, $connection = null)
     {
         $class = $this->qualifyModel($model);
 

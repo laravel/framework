@@ -38,10 +38,10 @@ class ShowModelCommand extends DatabaseInspectionCommand
      *
      * @return int
      */
-    public function handle(ModelInspector $modelInfoExtractor)
+    public function handle(ModelInspector $modelInspector)
     {
         try {
-            $info = $modelInfoExtractor->handle(
+            $info = $modelInspector->inspect(
                 $this->argument('model'),
                 $this->option('database')
             );
