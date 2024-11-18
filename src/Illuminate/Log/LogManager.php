@@ -633,7 +633,7 @@ class LogManager implements LoggerInterface
             $driver ??= 'null';
         }
 
-        return $driver;
+        return trim($driver);
     }
 
     /**
