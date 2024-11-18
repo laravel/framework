@@ -742,7 +742,7 @@ abstract class Factory
     }
 
     /**
-     * Disable the creation of relationship factories.
+     * Indicate that related parent models should not be created.
      *
      * @return static
      */
