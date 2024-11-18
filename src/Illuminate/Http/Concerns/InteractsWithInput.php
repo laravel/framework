@@ -403,13 +403,42 @@ trait InteractsWithInput
      */
     public function enum($key, $enumClass)
     {
-        if ($this->isNotFilled($key) ||
-            ! enum_exists($enumClass) ||
-            ! method_exists($enumClass, 'tryFrom')) {
+        if ($this->isNotFilled($key) || ! $this->isBackedEnum($enumClass)) {
             return null;
         }
 
         return $enumClass::tryFrom($this->input($key));
+    }
+
+    /**
+     * Retrieve input from the request as an array of enums.
+     *
+     * @template TEnum
+     *
+     * @param  string  $key
+     * @param  class-string<TEnum>  $enumClass
+     * @return TEnum[]
+     */
+    public function enums($key, $enumClass)
+    {
+        if ($this->isNotFilled($key) || ! $this->isBackedEnum($enumClass)) {
+            return [];
+        }
+
+        return $this->collect($key)->map(function ($value) use ($enumClass) {
+            return $enumClass::tryFrom($value);
+        })->filter()->all();
+    }
+
+    /**
+     * Determine if the given enum class is backed.
+     *
+     * @param  class-string  $enumClass
+     * @return bool
+     */
+    protected function isBackedEnum($enumClass)
+    {
+        return enum_exists($enumClass) && method_exists($enumClass, 'tryFrom');
     }
 
     /**
