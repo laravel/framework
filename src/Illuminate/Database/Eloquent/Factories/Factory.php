@@ -138,6 +138,7 @@ abstract class Factory
      * @param  \Illuminate\Support\Collection|null  $afterCreating
      * @param  string|null  $connection
      * @param  \Illuminate\Support\Collection|null  $recycle
+     * @param  bool  $withoutRelationships
      * @return void
      */
     public function __construct($count = null,
@@ -147,7 +148,8 @@ abstract class Factory
                                 ?Collection $afterMaking = null,
                                 ?Collection $afterCreating = null,
                                 $connection = null,
-                                ?Collection $recycle = null)
+                                ?Collection $recycle = null,
+                                bool $withoutRelationships = false)
     {
         $this->count = $count;
         $this->states = $states ?? new Collection;
@@ -158,6 +160,7 @@ abstract class Factory
         $this->connection = $connection;
         $this->recycle = $recycle ?? new Collection;
         $this->faker = $this->withFaker();
+        $this->withoutRelationships = $withoutRelationships;
     }
 
     /**
@@ -787,6 +790,7 @@ abstract class Factory
             'afterCreating' => $this->afterCreating,
             'connection' => $this->connection,
             'recycle' => $this->recycle,
+            'withoutRelationships' => $this->withoutRelationships,
         ], $arguments)));
     }
 
