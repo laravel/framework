@@ -3109,7 +3109,7 @@ class Builder implements BuilderContract
      * Execute the query as a "select" statement.
      *
      * @param  array|string  $columns
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Support\Collection<int, \stdClass>
      */
     public function get($columns = ['*'])
     {
@@ -3339,7 +3339,7 @@ class Builder implements BuilderContract
     /**
      * Get a lazy collection for the given query.
      *
-     * @return \Illuminate\Support\LazyCollection
+     * @return \Illuminate\Support\LazyCollection<int, \stdClass>
      */
     public function cursor()
     {
