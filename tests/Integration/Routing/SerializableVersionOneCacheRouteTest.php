@@ -8,8 +8,8 @@ use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\Concerns\InteractsWithPublishedFiles;
 use Orchestra\Testbench\Factories\UserFactory;
 use Orchestra\Testbench\TestCase;
+
 use function Illuminate\Filesystem\join_paths;
-use function Orchestra\Testbench\default_skeleton_path;
 
 #[WithConfig('app.key', 'AckfSECXIvnK5r28GVIWUAxmbBSjTsmF')]
 #[WithMigration]
