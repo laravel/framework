@@ -255,6 +255,26 @@ trait HasEvents
     }
 
     /**
+     * @param  \Illuminate\Events\QueuedClosure|\Closure|string|array  $events
+     * @param  \Illuminate\Events\QueuedClosure|\Closure|string|array|null  $callback
+     * @return void
+     */
+    public static function listen($events, $callback = null)
+    {
+        if (! is_string($events) && ! is_array($events)) {
+            $callback = $events;
+            $events = '*';
+        }
+
+        if (isset(static::$dispatcher)) {
+            $name = static::class;
+            $events = Arr::map((array) $events, fn ($event) => "eloquent.{$event}: {$name}");
+
+            static::$dispatcher->listen($events, $callback);
+        }
+    }
+
+    /**
      * Register a retrieved model event with the dispatcher.
      *
      * @param  \Illuminate\Events\QueuedClosure|\Closure|string|array  $callback
