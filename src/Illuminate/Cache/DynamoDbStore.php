@@ -68,13 +68,14 @@ class DynamoDbStore implements LockProvider, Store
      * @param  string  $prefix
      * @return void
      */
-    public function __construct(DynamoDbClient $dynamo,
-                                $table,
-                                $keyAttribute = 'key',
-                                $valueAttribute = 'value',
-                                $expirationAttribute = 'expires_at',
-                                $prefix = '')
-    {
+    public function __construct(
+        DynamoDbClient $dynamo,
+        $table,
+        $keyAttribute = 'key',
+        $valueAttribute = 'value',
+        $expirationAttribute = 'expires_at',
+        $prefix = '',
+    ) {
         $this->table = $table;
         $this->dynamo = $dynamo;
         $this->keyAttribute = $keyAttribute;
