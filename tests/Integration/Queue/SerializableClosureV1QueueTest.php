@@ -2,7 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Queue;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\DB;
 use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\Factories\UserFactory;
@@ -11,8 +11,10 @@ use Orchestra\Testbench\TestCase;
 #[WithMigration]
 class SerializableClosureV1QueueTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseMigrations;
 
+    /** {@inheritDoc} */
+    #[\Override]
     protected function defineEnvironment($app)
     {
         tap($app->make('config'), function ($config) {
@@ -52,8 +54,9 @@ class SerializableClosureV1QueueTest extends TestCase
         ]);
 
         $this->artisan('queue:work', [
-            '--once' => true,
-            '--daemon' => true,
+            'connection' => 'database',
+            '--stop-when-empty' => true,
+            '--memory' => 1024,
         ])->assertExitCode(0);
 
         $this->assertDatabaseMissing('users', [
