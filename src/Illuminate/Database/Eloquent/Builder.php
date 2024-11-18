@@ -1081,6 +1081,21 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Save a new model and return the instance or throw an exception.
+     *
+     * @param  array  $attributes
+     * @return TModel
+     *
+     * @throws \Throwable
+     */
+    public function createOrFail(array $attributes = [])
+    {
+        return tap($this->newModelInstance($attributes), function ($instance) {
+            $instance->saveOrFail();
+        });
+    }
+
+    /**
      * Save a new model and return the instance. Allow mass-assignment.
      *
      * @param  array  $attributes
