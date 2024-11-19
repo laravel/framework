@@ -344,6 +344,10 @@ class BelongsTo extends Relation
      */
     public function getQualifiedOwnerKeyName()
     {
+        if (is_null($this->ownerKey)) {
+            return '';
+        }
+
         return $this->related->qualifyColumn($this->ownerKey);
     }
 
