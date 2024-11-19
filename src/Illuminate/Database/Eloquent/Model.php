@@ -583,7 +583,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * @param  string  $column
      * @return string
      */
-    public function qualifyColumn($column)
+    public function qualifyColumn(string $column)
     {
         if (str_contains($column, '.')) {
             return $column;

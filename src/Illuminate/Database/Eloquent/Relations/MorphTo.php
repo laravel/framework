@@ -73,7 +73,7 @@ class MorphTo extends BelongsTo
      * @param  \Illuminate\Database\Eloquent\Builder<TRelatedModel>  $query
      * @param  TDeclaringModel  $parent
      * @param  string  $foreignKey
-     * @param  string  $ownerKey
+     * @param  string|null  $ownerKey
      * @param  string  $type
      * @param  string  $relation
      * @return void
