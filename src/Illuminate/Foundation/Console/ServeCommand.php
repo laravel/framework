@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Foundation\Support\LogParser;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Env;
 use Illuminate\Support\InteractsWithTime;
@@ -376,20 +377,7 @@ class ServeCommand extends Command
      */
     protected function getRequestPortFromLine($line)
     {
-        /**
-         * Updated regex to match the log line with or without a datetime prefix.
-         * The regex checks for an optional datetime prefix (example: [Wed Nov 15 2024 10:12:45]) followed by a colon and the port number.
-         */
-        preg_match('/(\[\w+\s\w+\s\d+\s[\d:]+\s\d{4}\]\s)?:(\d+)\s(?:(?:\w+$)|(?:\[.*))/', $line, $matches);
-
-        /**
-         * If the port number could not be extracted (if no match for the port number found), an exception is thrown with a message containing the problematic line for easier debugging.
-         */
-        if (! isset($matches[2])) {
-            throw new \Exception("Failed to extract request port from line: {$line}");
-        }
-
-        return (int) $matches[2];
+        return LogParser::extractRequestPort($line);
     }
 
     /**
