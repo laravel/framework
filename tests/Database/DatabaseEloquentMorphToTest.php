@@ -370,7 +370,6 @@ class DatabaseEloquentMorphToTest extends TestCase
         $related->shouldReceive('getTable')->andReturn('relation');
         $related->shouldReceive('qualifyColumn')->andReturnUsing(fn (string $column) => "relation.{$column}");
         $builder->shouldReceive('getModel')->andReturn($related);
-        $related->shouldReceive('qualifyColumn')->andReturnUsing(fn (string $column) => "relation.{$column}");
 
         return new MorphTo($builder, $parent, 'foreign_key', 'id', 'morph_type', 'relation');
     }
