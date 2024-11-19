@@ -8,10 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Events\NullDispatcher;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use Illuminate\Tests\Database\EloquentModelStub;
-use Illuminate\Tests\Database\EloquentModelWithObserveAttributeGrandchildStub;
-use Illuminate\Tests\Database\EloquentModelWithObserveAttributeGrandparentStub;
-use Illuminate\Tests\Database\EloquentModelWithObserveAttributeParentStub;
 use InvalidArgumentException;
 use ReflectionClass;
 
