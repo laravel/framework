@@ -52,12 +52,11 @@ trait HasEvents
             && get_parent_class(static::class) !== Model::class;
 
         return collect($reflectionClass->getAttributes(ObservedBy::class))
-            ->when($isEloquentGrandchild, function (Collection $attributes) {
-                $parentReflection = new ReflectionClass(get_parent_class(static::class));
-                return $attributes->merge($parentReflection->getAttributes(ObservedBy::class));
-            })
             ->map(fn ($attribute) => $attribute->getArguments())
             ->flatten()
+            ->when($isEloquentGrandchild, function (Collection $attributes) {
+                return $attributes->merge(get_parent_class(static::class)::resolveObserveAttributes());
+            })
             ->all();
     }
 
