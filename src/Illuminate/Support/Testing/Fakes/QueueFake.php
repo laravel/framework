@@ -316,7 +316,7 @@ class QueueFake extends QueueManager implements Fake, Queue
     public function pushed($job, $callback = null)
     {
         if (! $this->hasPushed($job)) {
-            return collect();
+            return new Collection;
         }
 
         $callback = $callback ?: fn () => true;

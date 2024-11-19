@@ -841,7 +841,7 @@ class Str
         preg_match_all($pattern, $subject, $matches);
 
         if (empty($matches[0])) {
-            return collect();
+            return new Collection;
         }
 
         return collect($matches[1] ?? $matches[0]);

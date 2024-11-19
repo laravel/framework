@@ -514,7 +514,7 @@ class BusFake implements Fake, QueueingDispatcher
     public function dispatched($command, $callback = null)
     {
         if (! $this->hasDispatched($command)) {
-            return collect();
+            return new Collection;
         }
 
         $callback = $callback ?: fn () => true;
@@ -532,7 +532,7 @@ class BusFake implements Fake, QueueingDispatcher
     public function dispatchedSync(string $command, $callback = null)
     {
         if (! $this->hasDispatchedSync($command)) {
-            return collect();
+            return new Collection;
         }
 
         $callback = $callback ?: fn () => true;
@@ -550,7 +550,7 @@ class BusFake implements Fake, QueueingDispatcher
     public function dispatchedAfterResponse(string $command, $callback = null)
     {
         if (! $this->hasDispatchedAfterResponse($command)) {
-            return collect();
+            return new Collection;
         }
 
         $callback = $callback ?: fn () => true;
@@ -567,7 +567,7 @@ class BusFake implements Fake, QueueingDispatcher
     public function batched(callable $callback)
     {
         if (empty($this->batches)) {
-            return collect();
+            return new Collection;
         }
 
         return collect($this->batches)->filter(fn ($batch) => $callback($batch));

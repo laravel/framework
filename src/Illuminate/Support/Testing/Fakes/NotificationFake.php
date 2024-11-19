@@ -246,7 +246,7 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
     public function sent($notifiable, $notification, $callback = null)
     {
         if (! $this->hasSent($notifiable, $notification)) {
-            return collect();
+            return new Collection;
         }
 
         $callback = $callback ?: fn () => true;

@@ -3393,7 +3393,7 @@ class Builder implements BuilderContract
         );
 
         if (empty($queryResult)) {
-            return collect();
+            return new Collection;
         }
 
         // If the columns are qualified with a table or have an alias, we cannot use

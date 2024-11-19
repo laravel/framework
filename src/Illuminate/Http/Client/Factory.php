@@ -10,6 +10,7 @@ use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Response as Psr7Response;
 use GuzzleHttp\TransferStats;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use PHPUnit\Framework\Assert as PHPUnit;
@@ -89,7 +90,7 @@ class Factory
     {
         $this->dispatcher = $dispatcher;
 
-        $this->stubCallbacks = collect();
+        $this->stubCallbacks = new Collection;
     }
 
     /**
@@ -218,7 +219,7 @@ class Factory
             return $this;
         }
 
-        $this->stubCallbacks = $this->stubCallbacks->merge(collect([
+        $this->stubCallbacks = $this->stubCallbacks->merge(new Collection([
             function ($request, $options) use ($callback) {
                 $response = $callback;
 
@@ -430,14 +431,14 @@ class Factory
     public function recorded($callback = null)
     {
         if (empty($this->recorded)) {
-            return collect();
+            return new Collection;
         }
 
         $callback = $callback ?: function () {
             return true;
         };
 
-        return collect($this->recorded)->filter(function ($pair) use ($callback) {
+        return (new Collection($this->recorded))->filter(function ($pair) use ($callback) {
             return $callback($pair[0], $pair[1]);
         });
     }
