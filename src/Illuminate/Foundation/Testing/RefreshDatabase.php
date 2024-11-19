@@ -82,9 +82,11 @@ trait RefreshDatabase
     {
         $database = $this->app->make('db');
 
-        $this->app->instance('db.transactions', $transactionsManager = new DatabaseTransactionsManager);
+        $connections = $this->connectionsToTransact();
 
-        foreach ($this->connectionsToTransact() as $name) {
+        $this->app->instance('db.transactions', $transactionsManager = new DatabaseTransactionsManager($connections));
+
+        foreach ($connections as $name) {
             $connection = $database->connection($name);
 
             $connection->setTransactionManager($transactionsManager);
