@@ -248,6 +248,17 @@ abstract class Grammar extends BaseGrammar
     }
 
     /**
+     * Create the column definition for a raw column type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    protected function typeRaw(Fluent $column)
+    {
+        return $column->offsetGet('definition');
+    }
+
+    /**
      * Add the column modifiers to the definition.
      *
      * @param  string  $sql

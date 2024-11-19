@@ -67,7 +67,7 @@ class Renderer
         Listener $listener,
         HtmlErrorRenderer $htmlErrorRenderer,
         BladeMapper $bladeMapper,
-        string $basePath
+        string $basePath,
     ) {
         $this->viewFactory = $viewFactory;
         $this->listener = $listener;

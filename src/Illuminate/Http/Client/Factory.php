@@ -322,7 +322,7 @@ class Factory
      * Record a request response pair.
      *
      * @param  \Illuminate\Http\Client\Request  $request
-     * @param  \Illuminate\Http\Client\Response  $response
+     * @param  \Illuminate\Http\Client\Response|null  $response
      * @return void
      */
     public function recordRequestResponsePair($request, $response)

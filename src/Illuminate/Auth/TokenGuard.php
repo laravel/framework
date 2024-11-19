@@ -54,8 +54,8 @@ class TokenGuard implements Guard
         Request $request,
         $inputKey = 'api_token',
         $storageKey = 'api_token',
-        $hash = false)
-    {
+        $hash = false,
+    ) {
         $this->hash = $hash;
         $this->request = $request;
         $this->provider = $provider;

@@ -160,6 +160,7 @@ namespace Illuminate\Support\Facades;
  * @method static float float(string $key, float $default = 0)
  * @method static \Illuminate\Support\Carbon|null date(string $key, string|null $format = null, string|null $tz = null)
  * @method static object|null enum(string $key, string $enumClass)
+ * @method static object[] enums(string $key, string $enumClass)
  * @method static \Illuminate\Support\Collection collect(array|string|null $key = null)
  * @method static array only(array|mixed $keys)
  * @method static array except(array|mixed $keys)

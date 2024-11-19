@@ -939,8 +939,11 @@ class PendingRequest
                 });
             } catch (ConnectException $e) {
                 $exception = new ConnectionException($e->getMessage(), 0, $e);
+                $request = new Request($e->getRequest());
 
-                $this->dispatchConnectionFailedEvent(new Request($e->getRequest()), $exception);
+                $this->factory->recordRequestResponsePair($request, null);
+
+                $this->dispatchConnectionFailedEvent($request, $exception);
 
                 throw $exception;
             }

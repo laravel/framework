@@ -1615,6 +1615,18 @@ class Blueprint
     }
 
     /**
+     * Create a new custom column on the table.
+     *
+     * @param  string  $column
+     * @param  string  $definition
+     * @return \Illuminate\Database\Schema\ColumnDefinition
+     */
+    public function rawColumn($column, $definition)
+    {
+        return $this->addColumn('raw', $column, compact('definition'));
+    }
+
+    /**
      * Add a comment to the table.
      *
      * @param  string  $comment
