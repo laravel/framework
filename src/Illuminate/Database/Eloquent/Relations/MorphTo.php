@@ -26,6 +26,13 @@ class MorphTo extends BelongsTo
     protected $morphType;
 
     /**
+     * The associated key on the parent model.
+     *
+     * @var string|null
+     */
+    protected $ownerKey;
+
+    /**
      * The models whose relations are being eager loaded.
      *
      * @var \Illuminate\Database\Eloquent\Collection<int, TDeclaringModel>
@@ -73,7 +80,7 @@ class MorphTo extends BelongsTo
      * @param  \Illuminate\Database\Eloquent\Builder<TRelatedModel>  $query
      * @param  TDeclaringModel  $parent
      * @param  string  $foreignKey
-     * @param  string  $ownerKey
+     * @param  string|null  $ownerKey
      * @param  string  $type
      * @param  string  $relation
      * @return void
