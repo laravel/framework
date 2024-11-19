@@ -22,9 +22,9 @@ class SerializableClosureV1QueueTest extends TestCase
         tap($app->make('config'), function ($config) {
             $config->set([
                 'app.key' => 'AckfSECXIvnK5r28GVIWUAxmbBSjTsmF',
-                'database.default' => 'sqlite',
+                // 'database.default' => 'sqlite',
                 'queue.default' => 'database',
-                'queue.connections.database.connection' => 'sqlite',
+                // 'queue.connections.database.connection' => 'sqlite',
             ]);
         });
     }
