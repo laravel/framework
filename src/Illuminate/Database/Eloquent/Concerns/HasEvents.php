@@ -2,9 +2,11 @@
 
 namespace Illuminate\Database\Eloquent\Concerns;
 
+use Closure;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Events\NullDispatcher;
+use Illuminate\Events\QueuedClosure;
 use Illuminate\Support\Arr;
 use InvalidArgumentException;
 use ReflectionClass;
@@ -261,7 +263,7 @@ trait HasEvents
      */
     public static function listen($events, $callback = null)
     {
-        if (! is_string($events) && ! is_array($events)) {
+        if ($events instanceof Closure || $events instanceof QueuedClosure) {
             $callback = $events;
             $events = '*';
         }
