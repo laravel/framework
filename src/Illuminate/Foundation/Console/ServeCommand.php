@@ -3,14 +3,14 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
-use Illuminate\Foundation\Support\LogParser;
+use Illuminate\Foundation\Support\ServeCommandLogParser;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Env;
 use Illuminate\Support\InteractsWithTime;
+use InvalidArgumentException;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Process\Process;
-
 use function Illuminate\Support\php_binary;
 use function Termwind\terminal;
 
@@ -292,7 +292,7 @@ class ServeCommand extends Command
                 }
 
                 if (str($line)->contains(' Accepted')) {
-                    $requestPort = $this->getRequestPortFromLine($line);
+                    $requestPort = static::getRequestPortFromLine($line);
 
                     $this->requestsPool[$requestPort] = [
                         $this->getDateFromLine($line),
@@ -300,15 +300,15 @@ class ServeCommand extends Command
                         microtime(true),
                     ];
                 } elseif (str($line)->contains([' [200]: GET '])) {
-                    $requestPort = $this->getRequestPortFromLine($line);
+                    $requestPort = static::getRequestPortFromLine($line);
 
                     $this->requestsPool[$requestPort][1] = trim(explode('[200]: GET', $line)[1]);
                 } elseif (str($line)->contains('URI:')) {
-                    $requestPort = $this->getRequestPortFromLine($line);
+                    $requestPort = static::getRequestPortFromLine($line);
 
                     $this->requestsPool[$requestPort][1] = trim(explode('URI: ', $line)[1]);
                 } elseif (str($line)->contains(' Closing')) {
-                    $requestPort = $this->getRequestPortFromLine($line);
+                    $requestPort = static::getRequestPortFromLine($line);
 
                     if (empty($this->requestsPool[$requestPort])) {
                         $this->requestsPool[$requestPort] = [
@@ -375,9 +375,15 @@ class ServeCommand extends Command
      * @param  string  $line
      * @return int
      */
-    protected function getRequestPortFromLine($line)
+    public static function getRequestPortFromLine($line)
     {
-        return LogParser::extractRequestPort($line);
+        preg_match('/(\[\w+\s\w+\s\d+\s[\d:]+\s\d{4}\]\s)?:(\d+)\s(?:(?:\w+$)|(?:\[.*))/', $line, $matches);
+
+        if (! isset($matches[2])) {
+            throw new \InvalidArgumentException("Failed to extract the request port. Ensure the log line contains a valid port: {$line}");
+        }
+
+        return (int) $matches[2];
     }
 
     /**
