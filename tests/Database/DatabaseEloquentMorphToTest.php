@@ -379,7 +379,7 @@ class DatabaseEloquentMorphToTest extends TestCase
         $this->builder = $builder ?: m::mock(Builder::class);
         $this->builder->shouldReceive('where')->with('relation.id', '=', 'foreign.value');
         $this->related = m::mock(Model::class);
-        $this->related->shouldReceive('getcolumn')->andReturn('id');
+        $this->related->shouldReceive('getKeyName')->andReturn('id');
         $this->related->shouldReceive('getTable')->andReturn('relation');
         $this->related->shouldReceive('qualifyColumn')->andReturnUsing(fn (string $column) => "relation.{$column}");
         $this->builder->shouldReceive('getModel')->andReturn($this->related);
