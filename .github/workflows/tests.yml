@@ -41,16 +41,13 @@ jobs:
       matrix:
         php: [8.2, 8.3]
         phpunit: ['10.5.12', '11.3.2']
-        redis-extension: ['redis']
         stability: [prefer-lowest, prefer-stable]
         include:
           - php: 8.4
             phpunit: '10.5'
-            redis-extension: 'redis-6.1.0'
             stability: prefer-stable
           - php: 8.4
             phpunit: '11.0.1'
-            redis-extension: 'redis-6.1.0'
             stability: prefer-stable
 
     name: PHP ${{ matrix.php }} - PHPUnit ${{ matrix.phpunit }} - ${{ matrix.stability }}
