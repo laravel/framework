@@ -55,7 +55,8 @@ trait HasEvents
             ->map(fn ($attribute) => $attribute->getArguments())
             ->flatten()
             ->when($isEloquentGrandchild, function (Collection $attributes) {
-                return $attributes->merge(get_parent_class(static::class)::resolveObserveAttributes());
+                return collect(get_parent_class(static::class)::resolveObserveAttributes())
+                    ->merge($attributes);
             })
             ->all();
     }
