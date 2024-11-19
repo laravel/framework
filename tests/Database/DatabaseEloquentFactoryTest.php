@@ -820,6 +820,15 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertSame(2, FactoryTestUser::count());
     }
 
+    public function test_can_disable_relationships()
+    {
+        $post = FactoryTestPostFactory::new()
+            ->withoutParents()
+            ->make();
+
+        $this->assertNull($post->user_id);
+    }
+
     /**
      * Get a database connection instance.
      *

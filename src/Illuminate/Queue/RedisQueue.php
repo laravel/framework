@@ -75,14 +75,15 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      * @param  int  $migrationBatchSize
      * @return void
      */
-    public function __construct(Redis $redis,
-                                $default = 'default',
-                                $connection = null,
-                                $retryAfter = 60,
-                                $blockFor = null,
-                                $dispatchAfterCommit = false,
-                                $migrationBatchSize = -1)
-    {
+    public function __construct(
+        Redis $redis,
+        $default = 'default',
+        $connection = null,
+        $retryAfter = 60,
+        $blockFor = null,
+        $dispatchAfterCommit = false,
+        $migrationBatchSize = -1,
+    ) {
         $this->redis = $redis;
         $this->default = $default;
         $this->blockFor = $blockFor;

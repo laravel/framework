@@ -42,7 +42,7 @@ class CacheTokenRepository implements TokenRepositoryInterface
 
         $this->cache->put(
             $this->prefix.$user->getEmailForPasswordReset(),
-            [$token, Carbon::now()->format($this->format)],
+            [$this->hasher->make($token), Carbon::now()->format($this->format)],
             $this->expires,
         );
 

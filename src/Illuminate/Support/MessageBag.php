@@ -223,7 +223,7 @@ class MessageBag implements Jsonable, JsonSerializable, MessageBagContract, Mess
      */
     protected function getMessagesForWildcardKey($key, $format)
     {
-        return collect($this->messages)
+        return (new Collection($this->messages))
                 ->filter(function ($messages, $messageKey) use ($key) {
                     return Str::is($key, $messageKey);
                 })
@@ -291,7 +291,7 @@ class MessageBag implements Jsonable, JsonSerializable, MessageBagContract, Mess
             return (array) $messages;
         }
 
-        return collect((array) $messages)
+        return (new Collection((array) $messages))
             ->map(function ($message) use ($format, $messageKey) {
                 // We will simply spin through the given messages and transform each one
                 // replacing the :message place holder with the real message allowing
