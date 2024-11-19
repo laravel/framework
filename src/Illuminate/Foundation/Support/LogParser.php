@@ -7,8 +7,9 @@ class LogParser
     /**
      * Extracts the request port from a log line.
      *
-     * @param string $line
+     * @param  string  $line
      * @return int
+     *
      * @throws \InvalidArgumentException
      */
     public static function extractRequestPort(string $line)
