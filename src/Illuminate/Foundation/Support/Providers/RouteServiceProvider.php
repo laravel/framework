@@ -53,8 +53,9 @@ class RouteServiceProvider extends ServiceProvider
         $this->booted(function () {
             $this->setRootControllerNamespace();
 
-            if ($this->routesAreCached()) {
-                $this->loadCachedRoutes();
+            $routes = $this->getCachedRoutes();
+            if ($routes !== false) {
+                $this->loadCachedRoutes($routes);
             } else {
                 $this->loadRoutes();
 
@@ -124,13 +125,13 @@ class RouteServiceProvider extends ServiceProvider
     }
 
     /**
-     * Determine if the application routes are cached.
+     * Fetch the cached routes
      *
-     * @return bool
+     * @return array|bool
      */
-    protected function routesAreCached()
+    protected function getCachedRoutes()
     {
-        return $this->app->routesAreCached();
+        return @unserialize(@file_get_contents($this->app->getCachedRoutesPath()));
     }
 
     /**
@@ -138,7 +139,7 @@ class RouteServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    protected function loadCachedRoutes()
+    protected function loadCachedRoutes($routes)
     {
         if (! is_null(self::$alwaysLoadCachedRoutesUsing)) {
             $this->app->call(self::$alwaysLoadCachedRoutesUsing);
@@ -146,9 +147,7 @@ class RouteServiceProvider extends ServiceProvider
             return;
         }
 
-        $this->app->booted(function () {
-            require $this->app->getCachedRoutesPath();
-        });
+        $this->app['router']->setCompiledRoutes($routes);
     }
 
     /**
