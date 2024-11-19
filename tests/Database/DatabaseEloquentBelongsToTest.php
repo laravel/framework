@@ -403,6 +403,7 @@ class DatabaseEloquentBelongsToTest extends TestCase
         $this->related = m::mock(Model::class);
         $this->related->shouldReceive('getKeyType')->andReturn($keyType);
         $this->related->shouldReceive('getKeyName')->andReturn('id');
+        $this->related->shouldReceive('qualifyColumn')->andReturnUsing(fn (string $column) => "relation.{$column}");
         $this->related->shouldReceive('getTable')->andReturn('relation');
         $this->related->shouldReceive('qualifyColumn')->andReturnUsing(fn (string $column) => "relation.{$column}");
         $this->builder->shouldReceive('getModel')->andReturn($this->related);
