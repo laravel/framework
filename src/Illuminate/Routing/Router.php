@@ -709,7 +709,7 @@ class Router implements BindingRegistrar, RegistrarContract
     {
         $route->setAction($this->mergeWithLastGroup(
             $route->getAction(),
-            false
+            prependExistingPrefix: false
         ));
     }
 
