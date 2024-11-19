@@ -23,7 +23,7 @@
         "illuminate/filesystem": "^11.0",
         "illuminate/pipeline": "^11.0",
         "illuminate/support": "^11.0",
-        "laravel/serializable-closure": "^1.2.2",
+        "laravel/serializable-closure": "^1.3|^2.0",
         "ramsey/uuid": "^4.7",
         "symfony/process": "^7.0"
     },
