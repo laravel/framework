@@ -1,6 +1,30 @@
 # Release Notes for 11.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v11.32.0...11.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v11.33.0...11.x)
+
+## [v11.33.0](https://github.com/laravel/framework/compare/v11.32.0...v11.33.0) - 2024-11-19
+
+* [11.x] Add "createQuietly" method by [@bramr94](https://github.com/bramr94) in https://github.com/laravel/framework/pull/53558
+* [11.x] Trim log channel names by [@mathieutu](https://github.com/mathieutu) in https://github.com/laravel/framework/pull/53554
+* [11.x] Fix `withoutOverlapping` via `PendingEventAttributes` proxy  by [@istiak-tridip](https://github.com/istiak-tridip) in https://github.com/laravel/framework/pull/53553
+* [11.x] Update docblocks using latest documenter by [@timacdonald](https://github.com/timacdonald) in https://github.com/laravel/framework/pull/53550
+* fix: use qualifyColumn rather than assuming format by [@willtj](https://github.com/willtj) in https://github.com/laravel/framework/pull/53559
+* [11.x] Add `Request::enums` method to retrieve an array of enums by [@stevebauman](https://github.com/stevebauman) in https://github.com/laravel/framework/pull/53540
+* [11.x] hash the token going into the cache by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/53561
+* Output clean error page on health check route by [@chrispage1](https://github.com/chrispage1) in https://github.com/laravel/framework/pull/53528
+* [11.x] Extract `ShowModelCommand` functionality to separate class by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/53541
+* Add Collection/Generator generic types to public query builder methods by [@rudiedirkx](https://github.com/rudiedirkx) in https://github.com/laravel/framework/pull/53567
+* [11.x] consistent multiline constructors by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/53566
+* [11.x] prefer `new Collection()` over `collect()` by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/53563
+* [11.x] Add builder and collection to `ModelInspector` by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/53565
+* [11.x] Support DB aggregate by group by [@GromNaN](https://github.com/GromNaN) in https://github.com/laravel/framework/pull/53209
+* [11.x] add ability to disable relationships in factories by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/53450
+* Revert "fix: use qualifyColumn rather than assuming format (#53559)"  by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/53568
+* Bump cross-spawn from 7.0.3 to 7.0.6 in /src/Illuminate/Foundation/resources/exceptions/renderer by [@dependabot](https://github.com/dependabot) in https://github.com/laravel/framework/pull/53569
+* [11.x] Removing unused var assignment in Illuminate Router by [@Carnicero90](https://github.com/Carnicero90) in https://github.com/laravel/framework/pull/53575
+* [11.x] PHP 8.4 Code compatibility by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/53571
+* [11.x] Supports `laravel/serializable-closure` 2 by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/53552
+* [11.x] Use getQualifiedOwnerKeyName in relations by [@willtj](https://github.com/willtj) in https://github.com/laravel/framework/pull/53573
 
 ## [v11.32.0](https://github.com/laravel/framework/compare/v11.31.0...v11.32.0) - 2024-11-15
 
