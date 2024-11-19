@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasAttributes;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -49,6 +50,17 @@ class DatabaseConcernsHasAttributesTest extends TestCase
 
         $this->assertTrue(json_last_error() === JSON_ERROR_NONE);
     }
+
+    public function testUnsettingCachedAttribute()
+    {
+        $instance = new HasCacheableAttributeWithAccessor();
+        $this->assertEquals('foo', $instance->getAttribute('cacheableProperty'));
+        $this->assertTrue($instance->cachedAttributeIsset('cacheableProperty'));
+
+        unset($instance->cacheableProperty);
+
+        $this->assertFalse($instance->cachedAttributeIsset('cacheableProperty'));
+    }
 }
 
 class HasAttributesWithoutConstructor
@@ -86,5 +98,23 @@ class HasAttributesWithArrayCast
     public function usesTimestamps(): bool
     {
         return false;
+    }
+}
+
+/**
+ * @property string $cacheableProperty
+ */
+class HasCacheableAttributeWithAccessor extends Model
+{
+    public function cacheableProperty(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => 'foo'
+        )->shouldCache();
+    }
+
+    public function cachedAttributeIsset($attribute): bool
+    {
+        return isset($this->attributeCastCache[$attribute]);
     }
 }
