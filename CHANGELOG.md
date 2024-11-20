@@ -1,6 +1,8 @@
 # Release Notes for 10.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v10.48.23...10.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v10.48.24...10.x)
+
+## [v10.48.24](https://github.com/laravel/framework/compare/v10.48.23...v10.48.24) - 2024-11-20
 
 ## [v10.48.23](https://github.com/laravel/framework/compare/v10.48.22...v10.48.23) - 2024-11-12
 
