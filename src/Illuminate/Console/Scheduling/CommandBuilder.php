@@ -62,6 +62,8 @@ class CommandBuilder
         }
 
         if (laravel_cloud()) {
+            $event->storeOutput();
+
             return $this->ensureCorrectUser($event,
                 '('.$event->command.' 2>&1 | tee '.($event->shouldAppendOutput ? '-a ' : '').$output.'; '.$finished.' "$?") 2>&1 &'
             );
