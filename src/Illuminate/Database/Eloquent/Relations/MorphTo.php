@@ -99,17 +99,6 @@ class MorphTo extends BelongsTo
         $this->buildDictionary($this->models = Collection::make($models));
     }
 
-    /** @inheritDoc */
-    #[\Override]
-    public function getQualifiedOwnerKeyName()
-    {
-        if (is_null($this->ownerKey)) {
-            return '';
-        }
-
-        return parent::getQualifiedOwnerKeyName();
-    }
-
     /**
      * Build a dictionary with the models.
      *
@@ -423,6 +412,17 @@ class MorphTo extends BelongsTo
         }
 
         return $query;
+    }
+
+    /** @inheritDoc */
+    #[\Override]
+    public function getQualifiedOwnerKeyName()
+    {
+        if (is_null($this->ownerKey)) {
+            return '';
+        }
+
+        return parent::getQualifiedOwnerKeyName();
     }
 
     /**
