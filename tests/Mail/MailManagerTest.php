@@ -30,6 +30,7 @@ class MailManagerTest extends TestCase
     public function testMailUrlConfig()
     {
         $this->app['config']->set('mail.mailers.smtp_url', [
+            'scheme' => 'smtp',
             'url' => 'smtp://usr:pwd@127.0.0.2:5876',
         ]);
 
