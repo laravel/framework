@@ -109,9 +109,7 @@ class Dispatcher implements QueueingDispatcher
     {
         $uses = class_uses_recursive($command);
 
-        if (in_array(InteractsWithQueue::class, $uses) &&
-            in_array(Queueable::class, $uses) &&
-            ! $command->job) {
+        if (isset($uses[InteractsWithQueue::class], $uses[Queueable::class]) && ! $command->job) {
             $command->setJob(new SyncJob($this->container, json_encode([]), 'sync', 'sync'));
         }
 
@@ -217,7 +215,7 @@ class Dispatcher implements QueueingDispatcher
     {
         $connection = $command->connection ?? null;
 
-        $queue = call_user_func($this->queueResolver, $connection);
+        $queue = ($this->queueResolver)($connection);
 
         if (! $queue instanceof Queue) {
             throw new RuntimeException('Queue resolver did not return a Queue implementation.');
@@ -239,19 +237,11 @@ class Dispatcher implements QueueingDispatcher
      */
     protected function pushCommandToQueue($queue, $command)
     {
-        if (isset($command->queue, $command->delay)) {
-            return $queue->laterOn($command->queue, $command->delay, $command);
-        }
-
-        if (isset($command->queue)) {
-            return $queue->pushOn($command->queue, $command);
-        }
-
         if (isset($command->delay)) {
-            return $queue->later($command->delay, $command);
+            return $queue->later($command->delay, $command, queue: $command->queue ?? null);
         }
 
-        return $queue->push($command);
+        return $queue->push($command, queue: $command->queue ?? null);
     }
 
     /**
