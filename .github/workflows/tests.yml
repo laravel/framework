@@ -71,13 +71,6 @@ jobs:
           max_attempts: 5
           command: composer require guzzlehttp/psr7:^2.4 --no-interaction --no-update
 
-      - name: Requires Symfony 7.2
-        uses: nick-fields/retry@v3
-        with:
-          timeout_minutes: 5
-          max_attempts: 5
-          command: composer require "symfony/console:^7.2" "symfony/http-foundation:^7.2" "symfony/http-kernel:^7.2" --no-interaction --no-update
-
       - name: Set PHPUnit
         uses: nick-fields/retry@v3
         with:
