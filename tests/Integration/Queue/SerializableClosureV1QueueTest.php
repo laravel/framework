@@ -17,7 +17,7 @@ class SerializableClosureV1QueueTest extends TestCase
     #[\Override]
     protected function defineEnvironment($app)
     {
-        $this->markTestSkippedWhen($this->usingInMemoryDatabase(null), 'Test does not support using :memory: database connection');
+        $this->markTestSkippedWhen($this->usingInMemoryDatabase(), 'Test does not support using :memory: database connection');
 
         tap($app->make('config'), function ($config) {
             $config->set([
