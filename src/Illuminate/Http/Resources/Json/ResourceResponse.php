@@ -106,11 +106,9 @@ class ResourceResponse implements Responsable
      */
     protected function wrapper()
     {
-        if ($this->resource instanceof JsonResource) {
-            return $this->resource->wrapper;
-        }
-
-        return get_class($this->resource)::$wrap;
+        return $this->resource instanceof JsonResource
+            ? $this->resource->wrapper
+            : get_class($this->resource)::$wrap;
     }
 
     /**

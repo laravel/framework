@@ -43,13 +43,18 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     public $additional = [];
 
     /**
+     * The instance level wrapper configured for the resource.
+     *
+     * @var string|null
+     */
+    public $wrapper = null;
+
+    /**
      * The "data" wrapper that should be applied.
      *
      * @var string|null
      */
     public static $wrap = 'data';
-
-    public ?string $wrapper = null;
 
     /**
      * Create a new resource instance.
@@ -207,24 +212,35 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     /**
      * Set the string that should wrap the outer-most resource array.
      *
+     * @param  string|null  $value
+     * @return $this
+     */
+    public function withWrapper(?string $value)
+    {
+        $this->wrapper = $value;
+
+        return $this;
+    }
+
+    /**
+     * Disable wrapping of the outer-most resource array.
+     *
+     * @return $this
+     */
+    public function withoutWrapper()
+    {
+        return $this->withWrapper(null);
+    }
+
+    /**
+     * Set the string that should wrap the outer-most resource array.
+     *
      * @param  string  $value
      * @return void
      */
     public static function wrap($value)
     {
         static::$wrap = $value;
-    }
-
-    /**
-     * Set the string that should wrap the outer-most resource array.
-     *
-     * @return $this
-     */
-    public function withWrapper(?string $value): static
-    {
-        $this->wrapper = $value;
-
-        return $this;
     }
 
     /**
@@ -235,16 +251,6 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     public static function withoutWrapping()
     {
         static::$wrap = null;
-    }
-
-    /**
-     * Disable wrapping of the outer-most resource array.
-     *
-     * @return $this
-     */
-    public function withoutWrapper(): static
-    {
-        return $this->withWrapper(null);
     }
 
     /**
