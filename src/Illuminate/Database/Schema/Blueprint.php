@@ -750,7 +750,7 @@ class Blueprint
      * @param  string  $column
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function increments($column)
+    public function increments($column = 'id')
     {
         return $this->unsignedInteger($column, true);
     }
@@ -761,7 +761,7 @@ class Blueprint
      * @param  string  $column
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function integerIncrements($column)
+    public function integerIncrements($column = 'id')
     {
         return $this->unsignedInteger($column, true);
     }
@@ -772,7 +772,7 @@ class Blueprint
      * @param  string  $column
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function tinyIncrements($column)
+    public function tinyIncrements($column = 'id')
     {
         return $this->unsignedTinyInteger($column, true);
     }
@@ -783,7 +783,7 @@ class Blueprint
      * @param  string  $column
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function smallIncrements($column)
+    public function smallIncrements($column = 'id')
     {
         return $this->unsignedSmallInteger($column, true);
     }
@@ -794,7 +794,7 @@ class Blueprint
      * @param  string  $column
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function mediumIncrements($column)
+    public function mediumIncrements($column = 'id')
     {
         return $this->unsignedMediumInteger($column, true);
     }
@@ -805,7 +805,7 @@ class Blueprint
      * @param  string  $column
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function bigIncrements($column)
+    public function bigIncrements($column = 'id')
     {
         return $this->unsignedBigInteger($column, true);
     }
