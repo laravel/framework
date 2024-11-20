@@ -514,7 +514,7 @@ trait ValidatesAttributes
     {
         $this->requireParameterCount(1, $parameters, 'contains');
 
-        if (is_string($value)){
+        if (is_string($value)) {
             return str($value)->containsAll($parameters);
         }
 
