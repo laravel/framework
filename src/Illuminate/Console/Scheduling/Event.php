@@ -204,9 +204,13 @@ class Event
      */
     protected function execute($container)
     {
+        $callback = laravel_cloud()
+            ? fn ($type, $line) => fwrite($type, $line)
+            : fn () => true;
+
         return Process::fromShellCommandline(
             $this->buildCommand(), base_path(), null, null, null
-        )->run();
+        )->run($callback);
     }
 
     /**
