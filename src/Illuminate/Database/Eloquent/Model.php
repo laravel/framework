@@ -578,6 +578,24 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
+     * Set the foreign key for a relationship to another model.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  string|null  $relationship
+     * @return $this
+     */
+    public function for($model, $relationship = null)
+    {
+        $relationship ??= Str::camel(class_basename($model));
+
+        $foreignKey = $this->{$relationship}()->getForeignKeyName();
+
+        $this->forceFill([$foreignKey => $model->getKey()]);
+
+        return $this;
+    }
+
+    /**
      * Qualify the given column name by the model's table.
      *
      * @param  string  $column

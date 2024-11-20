@@ -3178,6 +3178,29 @@ class DatabaseEloquentModelTest extends TestCase
 
         $this->assertInstanceOf(CustomEloquentCollection::class, $collection);
     }
+
+    public function testForCanSetForeignKeysForRelationships()
+    {
+        $post = new Post();
+        $post->id = 123;
+
+        $user = new User();
+        $user->id = 456;
+
+        $comment = (new Comment());
+        $this->addMockConnection($comment);
+
+        // Set some data so we can make sure "for" isn't clearing it.
+        $comment->content = 'Hello';
+
+        $comment
+            ->for($post, 'blogPost')
+            ->for($user);
+
+        $this->assertSame($comment->content, 'Hello');
+        $this->assertSame($comment->the_post_id, 123);
+        $this->assertSame($comment->user_id, 456);
+    }
 }
 
 class EloquentTestObserverStub
@@ -3945,4 +3968,29 @@ class EloquentModelWithCollectedByAttribute extends Model
 
 class CustomEloquentCollection extends Collection
 {
+}
+
+class User extends Model
+{
+    protected $guarded = [];
+}
+
+class Post extends Model
+{
+    protected $guarded = [];
+}
+
+class Comment extends Model
+{
+    protected $guarded = [];
+
+    public function blogPost(): BelongsTo
+    {
+        return $this->belongsTo(Post::class, 'the_post_id');
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
 }
