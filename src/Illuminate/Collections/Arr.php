@@ -951,4 +951,34 @@ class Arr
 
         return is_array($value) ? $value : [$value];
     }
+
+    /**
+     * Split an array into chunks based on a callback function.
+     *
+     * Each chunk will contain consecutive elements until the callback's return value changes.
+     *
+     * @param  array  $array  The array to chunk.
+     * @param  callable  $callback  A callback function that determines the chunking logic.
+     *                              The callback should accept the value and key as parameters.
+     * @return array  An array of chunks.
+     */
+    public static function chunkBy(array $array, callable $callback): array
+    {
+        $chunks = [];
+        $lastGroup = null;
+
+        foreach ($array as $key => $value) {
+            $group = $callback($value, $key);
+
+            if ($group !== $lastGroup) {
+                $chunks[] = [];
+                $lastGroup = $group;
+            }
+
+            $chunks[array_key_last($chunks)][$key] = $value;
+        }
+
+        return $chunks;
+    }
+
 }

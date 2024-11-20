@@ -1502,4 +1502,45 @@ class SupportArrTest extends TestCase
             ],
         ], Arr::select($array, 'name'));
     }
+
+    public function testChunkBy(): void
+    {
+        $array = [1, 2, 2, 3, 4, 4, 5];
+        $chunks = Arr::chunkBy($array, fn ($value) => $value % 2 === 0);
+
+        $this->assertSame(
+            [
+                [0 => 1],
+                [1 => 2, 2 => 2],
+                [3 => 3],
+                [4 => 4, 5 => 4],
+                [6 => 5]
+            ],
+            $chunks
+        );
+
+        $timestamps = [
+            '2024-11-20 10:00:00',
+            '2024-11-20 10:15:00',
+            '2024-11-20 11:00:00',
+            '2024-11-21 10:00:00',
+        ];
+
+        $chunks = Arr::chunkBy($timestamps, fn ($time) => date('Y-m-d', strtotime($time)));
+
+        $this->assertSame(
+            [
+                [
+                    0 => '2024-11-20 10:00:00',
+                    1 => '2024-11-20 10:15:00',
+                    2 => '2024-11-20 11:00:00',
+                ],
+                [
+                    3 => '2024-11-21 10:00:00',
+                ],
+            ],
+            $chunks
+        );
+    }
+
 }
