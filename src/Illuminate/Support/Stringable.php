@@ -1032,12 +1032,14 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     /**
      * Split a string into two pieces using the last occurrence of a given value.
      *
-     * @param  string|bool  $search
+     * @param  string  $search
+     * @param  bool  $prependSearch
+     * @param  bool  $appendSearch
      * @return \Illuminate\Support\Collection<int, string>
      */
-    public function splitLast($search, $includeSearch = false)
+    public function splitLast($search, $prependSearch = false, $appendSearch = false)
     {
-        return collect(Str::splitLast($this->value, $search, $includeSearch));
+        return collect(Str::splitLast($this->value, $search, $prependSearch, $appendSearch));
     }
 
     /**

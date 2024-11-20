@@ -1564,10 +1564,11 @@ class Str
      *
      * @param  string  $subject
      * @param  string $search
-     * @param  string $includeSearch
+     * @param  bool $prependSearch
+     * @param  bool $appendSearch
      * @return string[]
      */
-    public static function splitLast($subject, $search, $includeSearch = '')
+    public static function splitLast($subject, $search, $prependSearch = false, $appendSearch = false)
     {
         $splitPosition = mb_strrpos($subject, $search);
 
@@ -1581,11 +1582,11 @@ class Str
         $before = static::beforeLast($subject, $search);
         $after = static::afterLast($subject, $search);
 
-        if ($includeSearch === 'before') {
+        if ($prependSearch) {
             $before .= $search;
         }
 
-        if ($includeSearch === 'after') {
+        if ($appendSearch) {
             $after = $search.$after;
         }
 
