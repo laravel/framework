@@ -3184,7 +3184,7 @@ class DatabaseEloquentModelTest extends TestCase
         $post = new Post();
         $post->id = 123;
 
-        $user = new User();
+        $user = new DatabaseEloquentModelTestUser();
         $user->id = 456;
 
         $comment = (new Comment());
@@ -3194,12 +3194,12 @@ class DatabaseEloquentModelTest extends TestCase
         $comment->content = 'Hello';
 
         $comment
-            ->for($post, 'blogPost')
-            ->for($user);
+            ->for($post)
+            ->for($user, 'user');
 
         $this->assertSame($comment->content, 'Hello');
-        $this->assertSame($comment->the_post_id, 123);
-        $this->assertSame($comment->user_id, 456);
+        $this->assertSame($comment->post_id, 123);
+        $this->assertSame($comment->the_user_id, 456);
     }
 }
 
@@ -3970,7 +3970,7 @@ class CustomEloquentCollection extends Collection
 {
 }
 
-class User extends Model
+class DatabaseEloquentModelTestUser extends Model
 {
     protected $guarded = [];
 }
@@ -3984,13 +3984,13 @@ class Comment extends Model
 {
     protected $guarded = [];
 
-    public function blogPost(): BelongsTo
+    public function post(): BelongsTo
     {
-        return $this->belongsTo(Post::class, 'the_post_id');
+        return $this->belongsTo(Post::class);
     }
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(DatabaseEloquentModelTestUser::class, 'the_user_id');
     }
 }
