@@ -37,6 +37,7 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use RuntimeException;
 use Symfony\Component\VarDumper\VarDumper;
+use Throwable;
 
 class HttpClientTest extends TestCase
 {
@@ -2194,6 +2195,91 @@ class HttpClientTest extends TestCase
             Sleep::usleep(100_000),
             Sleep::usleep(200_000),
         ]);
+    }
+
+    public function testFakeConnectionException()
+    {
+        $this->factory->fake($this->factory->failedConnection('Fake'));
+
+        $exception = null;
+
+        try {
+            $this->factory->post('https://example.com');
+        } catch (Throwable $e) {
+            $exception = $e;
+        }
+
+        $this->assertNotNull($exception);
+        $this->assertInstanceOf(ConnectionException::class, $exception);
+        $this->assertSame('Fake', $exception->getMessage());
+
+        $this->factory->assertSentCount(1);
+        $this->factory->assertSent(function (Request $request, ?Response $response) {
+            return $request->url() === 'https://example.com' && $response === null;
+        });
+    }
+
+    public function testFakeConnectionExceptionWithinFakeClosure()
+    {
+        $this->factory->fake(fn () => $this->factory->failedConnection('Fake'));
+
+        $exception = null;
+
+        try {
+            $this->factory->post('https://example.com');
+        } catch (Throwable $e) {
+            $exception = $e;
+        }
+
+        $this->assertNotNull($exception);
+        $this->assertInstanceOf(ConnectionException::class, $exception);
+        $this->assertSame('Fake', $exception->getMessage());
+
+        $this->factory->assertSentCount(1);
+    }
+
+    public function testFakeConnectionExceptionWithinArray()
+    {
+        $this->factory->fake(['*' => $this->factory->failedConnection('Fake')]);
+
+        $exception = null;
+
+        try {
+            $this->factory->post('https://example.com');
+        } catch (Throwable $e) {
+            $exception = $e;
+        }
+
+        $this->assertNotNull($exception);
+        $this->assertInstanceOf(ConnectionException::class, $exception);
+        $this->assertSame('Fake', $exception->getMessage());
+
+        $this->factory->assertSentCount(1);
+    }
+
+    public function testFakeConnectionExceptionWithinSequence()
+    {
+        $this->factory->fake([
+            '*' => $this->factory->sequence()
+                ->pushFailedConnection('Fake')
+                ->push('Success'),
+        ]);
+
+        $exception = null;
+
+        $response = $this->factory->retry(3, function ($attempt, $e) use (&$exception) {
+            $exception = $e;
+
+            return true;
+        })->post('https://example.com');
+
+        $this->assertSame('Success', $response->body());
+
+        $this->assertNotNull($exception);
+        $this->assertInstanceOf(ConnectionException::class, $exception);
+        $this->assertSame('Fake', $exception->getMessage());
+
+        $this->factory->assertSentCount(2);
     }
 
     public function testMiddlewareRunsWhenFaked()

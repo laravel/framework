@@ -795,6 +795,44 @@ class HttpRequestTest extends TestCase
         $this->assertNull($request->enum('int.doesnt_exist', TestIntegerEnumBacked::class));
     }
 
+    public function testEnumsMethod()
+    {
+        $request = Request::create('/', 'GET', [
+            'valid_enum_values' => ['test', 'test'],
+            'invalid_enum_values' => ['invalid', 'invalid'],
+            'empty_value_request' => [],
+            'string' => [
+                'minus_1' => ['-1', '0'],
+                '0' => '0',
+                'plus_1' => '1',
+                'doesnt_exist' => '-1024',
+            ],
+            'int' => [
+                'minus_1' => -1,
+                '0' => 0,
+                'plus_1' => 1,
+                'doesnt_exist' => 1024,
+            ],
+        ]);
+
+        $this->assertEmpty($request->enums('doesnt_exist', TestEnumBacked::class));
+
+        $this->assertEquals([TestEnumBacked::test, TestEnumBacked::test], $request->enums('valid_enum_values', TestEnumBacked::class));
+
+        $this->assertEmpty($request->enums('invalid_enum_value', TestEnumBacked::class));
+        $this->assertEmpty($request->enums('empty_value_request', TestEnumBacked::class));
+        $this->assertEmpty($request->enums('valid_enum_value', TestEnum::class));
+
+        $this->assertEquals([TestIntegerEnumBacked::minus_1, TestIntegerEnumBacked::zero], $request->enums('string.minus_1', TestIntegerEnumBacked::class));
+        $this->assertEquals([TestIntegerEnumBacked::zero], $request->enums('string.0', TestIntegerEnumBacked::class));
+        $this->assertEquals([TestIntegerEnumBacked::plus_1], $request->enums('string.plus_1', TestIntegerEnumBacked::class));
+        $this->assertEmpty($request->enums('string.doesnt_exist', TestIntegerEnumBacked::class));
+        $this->assertEquals([TestIntegerEnumBacked::minus_1], $request->enums('int.minus_1', TestIntegerEnumBacked::class));
+        $this->assertEquals([TestIntegerEnumBacked::zero], $request->enums('int.0', TestIntegerEnumBacked::class));
+        $this->assertEquals([TestIntegerEnumBacked::plus_1], $request->enums('int.plus_1', TestIntegerEnumBacked::class));
+        $this->assertEmpty($request->enums('int.doesnt_exist', TestIntegerEnumBacked::class));
+    }
+
     public function testArrayAccess()
     {
         $request = Request::create('/', 'GET', ['name' => null, 'foo' => ['bar' => null, 'baz' => '']]);

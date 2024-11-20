@@ -512,6 +512,31 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $this->assertEquals(['alter table "posts" add "note" nvarchar(255) null'], $getSql(new SqlServerGrammar));
     }
 
+    public function testRawColumn()
+    {
+        $getSql = function ($grammar) {
+            return $this->getBlueprint($grammar, 'posts', function ($table) {
+                $table->rawColumn('legacy_boolean', 'INT(1)')->nullable();
+            })->toSql();
+        };
+
+        $this->assertEquals([
+            'alter table `posts` add `legacy_boolean` INT(1) null',
+        ], $getSql(new MySqlGrammar));
+
+        $this->assertEquals([
+            'alter table "posts" add column "legacy_boolean" INT(1)',
+        ], $getSql(new SQLiteGrammar));
+
+        $this->assertEquals([
+            'alter table "posts" add column "legacy_boolean" INT(1) null',
+        ], $getSql(new PostgresGrammar));
+
+        $this->assertEquals([
+            'alter table "posts" add "legacy_boolean" INT(1) null',
+        ], $getSql(new SqlServerGrammar));
+    }
+
     public function testTableComment()
     {
         $getSql = function ($grammar) {

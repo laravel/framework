@@ -3,6 +3,7 @@
 namespace Illuminate\Http\Client;
 
 use Closure;
+use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Promise\Create;
 use GuzzleHttp\Promise\PromiseInterface;
@@ -165,6 +166,22 @@ class Factory
     }
 
     /**
+     * Create a new connection exception for use during stubbing.
+     *
+     * @param  string|null  $message
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public static function failedConnection($message = null)
+    {
+        return function ($request) use ($message) {
+            return Create::rejectionFor(new ConnectException(
+                $message ?? "cURL error 6: Could not resolve host: {$request->toPsrRequest()->getUri()->getHost()} (see https://curl.haxx.se/libcurl/c/libcurl-errors.html) for {$request->toPsrRequest()->getUri()}.",
+                $request->toPsrRequest(),
+            ));
+        };
+    }
+
+    /**
      * Get an invokable object that returns a sequence of responses in order for use during stubbing.
      *
      * @param  array  $responses
@@ -203,9 +220,11 @@ class Factory
 
         $this->stubCallbacks = $this->stubCallbacks->merge(collect([
             function ($request, $options) use ($callback) {
-                $response = $callback instanceof Closure
-                                ? $callback($request, $options)
-                                : $callback;
+                $response = $callback;
+
+                while ($response instanceof Closure) {
+                    $response = $response($request, $options);
+                }
 
                 if ($response instanceof PromiseInterface) {
                     $options['on_stats'](new TransferStats(
@@ -303,7 +322,7 @@ class Factory
      * Record a request response pair.
      *
      * @param  \Illuminate\Http\Client\Request  $request
-     * @param  \Illuminate\Http\Client\Response  $response
+     * @param  \Illuminate\Http\Client\Response|null  $response
      * @return void
      */
     public function recordRequestResponsePair($request, $response)
