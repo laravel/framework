@@ -1563,9 +1563,9 @@ class Str
      * Split a string into two pieces using the last occurrence of a given value.
      *
      * @param  string  $subject
-     * @param  string $search
-     * @param  bool $prependSearch
-     * @param  bool $appendSearch
+     * @param  string  $search
+     * @param  bool  $prependSearch
+     * @param  bool  $appendSearch
      * @return string[]
      */
     public static function splitLast($subject, $search, $prependSearch = false, $appendSearch = false)
