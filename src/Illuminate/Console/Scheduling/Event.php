@@ -205,7 +205,7 @@ class Event
     protected function execute($container)
     {
         $callback = laravel_cloud()
-            ? fn ($type, $line) => fwrite($type, $line)
+            ? fn ($type, $line) => fwrite($type === 'out' ? STDOUT : STDERR, $line)
             : fn () => true;
 
         return Process::fromShellCommandline(
