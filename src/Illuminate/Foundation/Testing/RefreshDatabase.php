@@ -48,7 +48,7 @@ trait RefreshDatabase
      *
      * @return bool
      */
-    protected function usingInMemoryDatabase(?string $name)
+    protected function usingInMemoryDatabase(?string $name = null)
     {
         if (is_null($name)) {
             $name = config('database.default');
