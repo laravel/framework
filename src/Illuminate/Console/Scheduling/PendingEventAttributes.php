@@ -35,6 +35,18 @@ class PendingEventAttributes
     }
 
     /**
+     * State that the command should run in the background.
+     *
+     * @return $this
+     */
+    public function runInBackground()
+    {
+        $this->runInBackground = true;
+
+        return $this;
+    }
+
+    /**
      * Merge the current attributes into the given event.
      */
     public function mergeAttributes(Event $event): void

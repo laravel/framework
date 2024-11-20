@@ -167,6 +167,18 @@ trait ManagesAttributes
     {
         $this->runInBackground = true;
 
+        if (laravel_cloud()) {
+            $this->storeOutput();
+
+            $this->then(function () {
+                $output = is_file($output) ? file_get_contents($output) : '';
+
+                if (! empty($output)) {
+                    fwrite(STDOUT, $output);
+                }
+            });
+        }
+
         return $this;
     }
 
