@@ -41,7 +41,6 @@ class CommandBuilder
                 $event, $event->command.($event->shouldAppendOutput ? ' >> ' : ' > ').$output.' 2>&1'
             );
         }
-
     }
 
     /**
