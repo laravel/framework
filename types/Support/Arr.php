@@ -24,3 +24,18 @@ assertType('string|User', Arr::first($array, function ($user) {
 assertType('string|User', Arr::first($array, null, function () {
     return 'string';
 }));
+
+assertType('User|null', Arr::last($array));
+assertType('User|null', Arr::last($array, function ($user) {
+    assertType('User', $user);
+
+    return true;
+}));
+assertType('string|User', Arr::last($array, function ($user) {
+    assertType('User', $user);
+
+    return false;
+}, 'string'));
+assertType('string|User', Arr::last($array, null, function () {
+    return 'string';
+}));
