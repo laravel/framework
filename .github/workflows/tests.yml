@@ -64,19 +64,12 @@ jobs:
       - name: Set Framework version
         run: composer config version "11.x-dev"
 
-      - name: Set minimum PHP 8.2 versions
-        uses: nick-fields/retry@v3
-        with:
-          timeout_minutes: 5
-          max_attempts: 5
-          command: composer require guzzlehttp/psr7:^2.4 --no-interaction --no-update
-
       - name: Set Minimum PHP 8.4 Versions
         uses: nick-fields/retry@v3
         with:
           timeout_minutes: 5
           max_attempts: 5
-          command: composer require guzzlehttp/promises:^2.0.3 nesbot/carbon:^3.4 --no-interaction --no-update
+          command: composer require  nesbot/carbon:^3.4 --no-interaction --no-update
           shell: bash
         if: matrix.php >= 8.4
 
@@ -146,14 +139,6 @@ jobs:
 
       - name: Set Framework version
         run: composer config version "11.x-dev"
-
-      - name: Set Minimum PHP 8.2 Versions
-        uses: nick-fields/retry@v3
-        with:
-          timeout_minutes: 5
-          max_attempts: 5
-          command: composer require guzzlehttp/psr7:~2.4 --no-interaction --no-update
-          shell: bash
 
       - name: Set PHPUnit
         uses: nick-fields/retry@v3
