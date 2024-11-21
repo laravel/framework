@@ -57,7 +57,7 @@
         "symfony/var-dumper": "^7.0.3",
         "tijsverkoyen/css-to-inline-styles": "^2.2.5",
         "vlucas/phpdotenv": "^5.6.1",
-        "voku/portable-ascii": "^2.0"
+        "voku/portable-ascii": "^2.0.2"
     },
     "replace": {
         "illuminate/auth": "self.version",
@@ -116,6 +116,7 @@
         "resend/resend-php": "^0.10.0",
         "symfony/cache": "^7.0.3",
         "symfony/http-client": "^7.0.3",
+        "symfony/translation": "^7.0.3",
         "symfony/psr-http-message-bridge": "^7.0.3"
     },
     "conflict": {
