@@ -24,7 +24,7 @@
         "illuminate/contracts": "^11.0",
         "illuminate/macroable": "^11.0",
         "nesbot/carbon": "^2.72.2|^3.4",
-        "voku/portable-ascii": "^2.0"
+        "voku/portable-ascii": "^2.0.2"
     },
     "conflict": {
         "tightenco/collect": "<5.5.33"
