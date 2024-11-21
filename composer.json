@@ -135,7 +135,8 @@
             "src/Illuminate/Foundation/helpers.php",
             "src/Illuminate/Log/functions.php",
             "src/Illuminate/Support/functions.php",
-            "src/Illuminate/Support/helpers.php"
+            "src/Illuminate/Support/helpers.php",
+            "vendor/symfony/symfony/src/Symfony/VarDumper/Resources/functions/dump.php"
         ],
         "psr-4": {
             "Illuminate\\": "src/Illuminate/",
