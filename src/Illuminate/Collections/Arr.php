@@ -959,7 +959,7 @@ class Arr
      *
      * @param  iterable  $iterable  The iterable to chunk (e.g., array, generator).
      * @param  callable  $callback  A callback function that determines the chunking logic.
-     *                               The callback should accept the value and key as parameters.
+     *                              The callback should accept the value and key as parameters.
      * @return array An array of chunks.
      */
     public static function chunkBy(iterable $iterable, callable $callback): array
