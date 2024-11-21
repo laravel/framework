@@ -58,7 +58,7 @@ trait InteractsWithInput
     {
         $header = $this->header('Authorization', '');
 
-        $position = strrpos($header, 'Bearer ');
+        $position = strripos($header, 'Bearer ');
 
         if ($position !== false) {
             $header = substr($header, $position + 7);
@@ -395,7 +395,7 @@ trait InteractsWithInput
     /**
      * Retrieve input from the request as an enum.
      *
-     * @template TEnum
+     * @template TEnum of \BackedEnum
      *
      * @param  string  $key
      * @param  class-string<TEnum>  $enumClass
@@ -413,7 +413,7 @@ trait InteractsWithInput
     /**
      * Retrieve input from the request as an array of enums.
      *
-     * @template TEnum
+     * @template TEnum of \BackedEnum
      *
      * @param  string  $key
      * @param  class-string<TEnum>  $enumClass

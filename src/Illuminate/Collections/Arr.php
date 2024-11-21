@@ -216,10 +216,14 @@ class Arr
     /**
      * Return the last element in an array passing a given truth test.
      *
-     * @param  array  $array
-     * @param  callable|null  $callback
-     * @param  mixed  $default
-     * @return mixed
+     * @template TKey
+     * @template TValue
+     * @template TLastDefault
+     *
+     * @param  iterable<TKey, TValue>  $array
+     * @param  (callable(TValue, TKey): bool)|null  $callback
+     * @param  TLastDefault|(\Closure(): TLastDefault)  $default
+     * @return TValue|TLastDefault
      */
     public static function last($array, ?callable $callback = null, $default = null)
     {

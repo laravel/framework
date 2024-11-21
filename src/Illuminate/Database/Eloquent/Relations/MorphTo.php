@@ -93,6 +93,7 @@ class MorphTo extends BelongsTo
     }
 
     /** @inheritDoc */
+    #[\Override]
     public function addEagerConstraints(array $models)
     {
         $this->buildDictionary($this->models = Collection::make($models));
@@ -199,6 +200,7 @@ class MorphTo extends BelongsTo
     }
 
     /** @inheritDoc */
+    #[\Override]
     public function match(array $models, Collection $results, $relation)
     {
         return $models;
@@ -230,6 +232,7 @@ class MorphTo extends BelongsTo
      * @param  TRelatedModel|null  $model
      * @return TDeclaringModel
      */
+    #[\Override]
     public function associate($model)
     {
         if ($model instanceof Model) {
@@ -254,6 +257,7 @@ class MorphTo extends BelongsTo
      *
      * @return TDeclaringModel
      */
+    #[\Override]
     public function dissociate()
     {
         $this->parent->setAttribute($this->foreignKey, null);
@@ -263,11 +267,8 @@ class MorphTo extends BelongsTo
         return $this->parent->setRelation($this->relationName, null);
     }
 
-    /**
-     * Touch all of the related models for the relationship.
-     *
-     * @return void
-     */
+    /** @inheritDoc */
+    #[\Override]
     public function touch()
     {
         if (! is_null($this->getParentKey())) {
@@ -276,6 +277,7 @@ class MorphTo extends BelongsTo
     }
 
     /** @inheritDoc */
+    #[\Override]
     protected function newRelatedInstanceFor(Model $parent)
     {
         return $parent->{$this->getRelationName()}()->getRelated()->newInstance();
@@ -410,6 +412,17 @@ class MorphTo extends BelongsTo
         }
 
         return $query;
+    }
+
+    /** @inheritDoc */
+    #[\Override]
+    public function getQualifiedOwnerKeyName()
+    {
+        if (is_null($this->ownerKey)) {
+            return '';
+        }
+
+        return parent::getQualifiedOwnerKeyName();
     }
 
     /**
