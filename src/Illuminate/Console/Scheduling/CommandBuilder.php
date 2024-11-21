@@ -32,15 +32,9 @@ class CommandBuilder
     {
         $output = ProcessUtils::escapeArgument($event->output);
 
-        if (laravel_cloud()) {
-            return $this->ensureCorrectUser(
-                $event, $event->command.' 2>&1 | tee '.($event->shouldAppendOutput ? '-a ' : '').$output
-            );
-        } else {
-            return $this->ensureCorrectUser(
-                $event, $event->command.($event->shouldAppendOutput ? ' >> ' : ' > ').$output.' 2>&1'
-            );
-        }
+        return laravel_cloud()
+            ? $this->ensureCorrectUser($event, $event->command.' 2>&1 | tee '.($event->shouldAppendOutput ? '-a ' : '').$output)
+            : $this->ensureCorrectUser($event, $event->command.($event->shouldAppendOutput ? ' >> ' : ' > ').$output.' 2>&1');
     }
 
     /**
@@ -59,14 +53,6 @@ class CommandBuilder
 
         if (windows_os()) {
             return 'start /b cmd /v:on /c "('.$event->command.' & '.$finished.' ^!ERRORLEVEL^!)'.$redirect.$output.' 2>&1"';
-        }
-
-        if (laravel_cloud()) {
-            $event->storeOutput();
-
-            return $this->ensureCorrectUser($event,
-                '('.$event->command.' 2>&1 | tee '.($event->shouldAppendOutput ? '-a ' : '').$output.'; '.$finished.' "$?") 2>&1 &'
-            );
         }
 
         return $this->ensureCorrectUser($event,
