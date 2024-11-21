@@ -58,7 +58,7 @@ trait InteractsWithInput
     {
         $header = $this->header('Authorization', '');
 
-        $position = strrpos($header, 'Bearer ');
+        $position = strripos($header, 'Bearer ');
 
         if ($position !== false) {
             $header = substr($header, $position + 7);
