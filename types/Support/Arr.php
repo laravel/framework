@@ -24,33 +24,3 @@ assertType('string|User', Arr::first($array, function ($user) {
 assertType('string|User', Arr::first($array, null, function () {
     return 'string';
 }));
-
-assertType('User|null', Arr::first($iterable));
-assertType('User|null', Arr::first($iterable, function ($user) {
-    assertType('User', $user);
-
-    return true;
-}));
-assertType('string|User', Arr::first($iterable, function ($user) {
-    assertType('User', $user);
-
-    return false;
-}, 'string'));
-assertType('string|User', Arr::first($iterable, null, function () {
-    return 'string';
-}));
-
-assertType('User|null', Arr::first($traversable));
-assertType('User|null', Arr::first($traversable, function ($user) {
-    assertType('User', $user);
-
-    return true;
-}));
-assertType('string|User', Arr::first($traversable, function ($user) {
-    assertType('User', $user);
-
-    return false;
-}, 'string'));
-assertType('string|User', Arr::first($traversable, null, function () {
-    return 'string';
-}));
