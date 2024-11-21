@@ -6,9 +6,13 @@ use Illuminate\Contracts\Queue\QueueableCollection;
 use Illuminate\Contracts\Queue\QueueableEntity;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithDictionary;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Illuminate\Support\Collection as BaseCollection;
 use LogicException;
+use BadMethodCallException;
+use InvalidArgumentException;
 
 /**
  * @template TKey of array-key
@@ -816,5 +820,44 @@ class Collection extends BaseCollection implements QueueableCollection
         }
 
         return $model->newModelQuery()->whereKey($this->modelKeys());
+    }
+
+    /**
+     * Filter collection items by their "belongs to" relationship
+     *
+     * @param  \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection<int, \Illuminate\Database\Eloquent\Model>  $related
+     *
+     * @return \Illuminate\Support\Collection<TKey, TModel>
+     */
+    public function whereBelongsTo($related, ?string $relationshipName = null)
+    {
+        if (! $related instanceof Collection) {
+            $relatedCollection = $related->newCollection([$related]);
+        } else {
+            $relatedCollection = $related;
+            $related = $relatedCollection->first();
+        }
+
+        if ($relatedCollection->isEmpty()) {
+            throw new InvalidArgumentException('Collection given to whereBelongsTo method may not be empty.');
+        }
+
+        $relationshipName ??= Str::camel(class_basename($related));
+        $item = $this->toBase()->first();
+
+        try {
+            $relationship = $item->{$relationshipName}();
+        } catch (BadMethodCallException) {
+            throw RelationNotFoundException::make($item, $relationshipName);
+        }
+
+        if (! $relationship instanceof BelongsTo) {
+            throw RelationNotFoundException::make($item, $relationshipName, BelongsTo::class);
+        }
+
+        $keyName = $relationship->getForeignKeyName();
+        $values = $relatedCollection->pluck($relationship->getOwnerKeyName())->toArray();
+
+        return $this->toBase()->filter(fn ($item) => in_array($item->{$keyName}, $values));
     }
 }
