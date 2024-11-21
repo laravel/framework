@@ -395,7 +395,7 @@ trait InteractsWithInput
     /**
      * Retrieve input from the request as an enum.
      *
-     * @template TEnum
+     * @template TEnum of \BackedEnum
      *
      * @param  string  $key
      * @param  class-string<TEnum>  $enumClass
@@ -413,7 +413,7 @@ trait InteractsWithInput
     /**
      * Retrieve input from the request as an array of enums.
      *
-     * @template TEnum
+     * @template TEnum of \BackedEnum
      *
      * @param  string  $key
      * @param  class-string<TEnum>  $enumClass
