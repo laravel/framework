@@ -76,7 +76,7 @@ jobs:
         with:
           timeout_minutes: 5
           max_attempts: 5
-          command: composer require nesbot/carbon:^3.4 --no-interaction --no-update
+          command: composer require guzzlehttp/promises:^2.0.3 nesbot/carbon:^3.4 --no-interaction --no-update
           shell: bash
         if: matrix.php >= 8.4
 
