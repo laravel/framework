@@ -43,7 +43,7 @@ class Logger implements LoggerInterface
      * @param  \Illuminate\Contracts\Events\Dispatcher|null  $dispatcher
      * @return void
      */
-    public function __construct(LoggerInterface $logger, Dispatcher $dispatcher = null)
+    public function __construct(LoggerInterface $logger, ?Dispatcher $dispatcher = null)
     {
         $this->logger = $logger;
         $this->dispatcher = $dispatcher;

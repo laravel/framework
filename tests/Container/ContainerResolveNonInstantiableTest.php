@@ -44,7 +44,7 @@ class ParentClass
      */
     public $i;
 
-    public function __construct(TestInterface $testObject = null, int $i = 0)
+    public function __construct(?TestInterface $testObject = null, int $i = 0)
     {
         $this->i = $i;
     }

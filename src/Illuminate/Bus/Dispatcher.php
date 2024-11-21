@@ -58,7 +58,7 @@ class Dispatcher implements QueueingDispatcher
      * @param  \Closure|null  $queueResolver
      * @return void
      */
-    public function __construct(Container $container, Closure $queueResolver = null)
+    public function __construct(Container $container, ?Closure $queueResolver = null)
     {
         $this->container = $container;
         $this->queueResolver = $queueResolver;

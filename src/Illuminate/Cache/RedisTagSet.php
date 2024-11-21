@@ -15,7 +15,7 @@ class RedisTagSet extends TagSet
      * @param  string  $updateWhen
      * @return void
      */
-    public function addEntry(string $key, int $ttl = null, $updateWhen = null)
+    public function addEntry(string $key, ?int $ttl = null, $updateWhen = null)
     {
         $ttl = is_null($ttl) ? -1 : Carbon::now()->addSeconds($ttl)->getTimestamp();
 
