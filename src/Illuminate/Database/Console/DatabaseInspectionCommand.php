@@ -54,7 +54,7 @@ abstract class DatabaseInspectionCommand extends Command
      * @param  \Illuminate\Support\Composer|null  $composer
      * @return void
      */
-    public function __construct(Composer $composer = null)
+    public function __construct(?Composer $composer = null)
     {
         parent::__construct();
 

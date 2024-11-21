@@ -959,7 +959,7 @@ class Str
      * @param  callable|null  $factory
      * @return void
      */
-    public static function createRandomStringsUsing(callable $factory = null)
+    public static function createRandomStringsUsing(?callable $factory = null)
     {
         static::$randomStringFactory = $factory;
     }
@@ -1665,7 +1665,7 @@ class Str
      * @param  callable|null  $factory
      * @return void
      */
-    public static function createUuidsUsing(callable $factory = null)
+    public static function createUuidsUsing(?callable $factory = null)
     {
         static::$uuidFactory = $factory;
     }
@@ -1710,7 +1710,7 @@ class Str
      * @param  \Closure|null  $callback
      * @return \Ramsey\Uuid\UuidInterface
      */
-    public static function freezeUuids(Closure $callback = null)
+    public static function freezeUuids(?Closure $callback = null)
     {
         $uuid = Str::uuid();
 
@@ -1772,7 +1772,7 @@ class Str
      * @param  callable|null  $factory
      * @return void
      */
-    public static function createUlidsUsing(callable $factory = null)
+    public static function createUlidsUsing(?callable $factory = null)
     {
         static::$ulidFactory = $factory;
     }
@@ -1817,7 +1817,7 @@ class Str
      * @param  Closure|null  $callback
      * @return Ulid
      */
-    public static function freezeUlids(Closure $callback = null)
+    public static function freezeUlids(?Closure $callback = null)
     {
         $ulid = Str::ulid();
 

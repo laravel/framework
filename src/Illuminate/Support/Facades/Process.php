@@ -65,7 +65,7 @@ class Process extends Facade
      * @param  \Closure|array|null  $callback
      * @return \Illuminate\Process\Factory
      */
-    public static function fake(Closure|array $callback = null)
+    public static function fake(Closure|array|null $callback = null)
     {
         return tap(static::getFacadeRoot(), function ($fake) use ($callback) {
             static::swap($fake->fake($callback));

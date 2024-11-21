@@ -107,7 +107,7 @@
         "nyholm/psr7": "^1.2",
         "orchestra/testbench-core": "^8.23.4",
         "pda/pheanstalk": "^4.0",
-        "phpstan/phpstan": "^1.4.7",
+        "phpstan/phpstan": "~1.11.11",
         "phpunit/phpunit": "^10.0.7",
         "predis/predis": "^2.0.2",
         "symfony/cache": "^6.2",
