@@ -953,21 +953,21 @@ class Arr
     }
 
     /**
-     * Split an array into chunks based on a callback function.
+     * Split an iterable into chunks based on a callback function.
      *
      * Each chunk will contain consecutive elements until the callback's return value changes.
      *
-     * @param  array  $array  The array to chunk.
+     * @param  iterable  $iterable  The iterable to chunk (e.g., array, generator).
      * @param  callable  $callback  A callback function that determines the chunking logic.
-     *                              The callback should accept the value and key as parameters.
-     * @return array  An array of chunks.
+     *                               The callback should accept the value and key as parameters.
+     * @return array An array of chunks.
      */
-    public static function chunkBy(array $array, callable $callback): array
+    public static function chunkBy(iterable $iterable, callable $callback): array
     {
         $chunks = [];
         $lastGroup = null;
 
-        foreach ($array as $key => $value) {
+        foreach ($iterable as $key => $value) {
             $group = $callback($value, $key);
 
             if ($group !== $lastGroup) {
@@ -980,5 +980,4 @@ class Arr
 
         return $chunks;
     }
-
 }

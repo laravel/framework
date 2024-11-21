@@ -9,6 +9,7 @@ use Illuminate\Support\Collection;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use stdClass;
+use function PHPUnit\Framework\assertSame;
 
 class SupportArrTest extends TestCase
 {
@@ -1514,7 +1515,7 @@ class SupportArrTest extends TestCase
                 [1 => 2, 2 => 2],
                 [3 => 3],
                 [4 => 4, 5 => 4],
-                [6 => 5]
+                [6 => 5],
             ],
             $chunks
         );
@@ -1543,4 +1544,35 @@ class SupportArrTest extends TestCase
         );
     }
 
+    public function testChunkByWithGenerator(): void
+    {
+        $generator = $this->generateOrders();
+
+        $grouped = Arr::chunkBy($generator, fn ($order) => $order['user_id']);
+
+        $this->assertSame(
+            [
+                [
+                    ['id' => 1, 'user_id' => 1],
+                    ['id' => 2, 'user_id' => 1],
+                ],
+                [
+                    2 => ['id' => 3, 'user_id' => 2],
+                ],
+            ],
+            $grouped
+        );
+    }
+
+    /**
+     * Generator for testing chunkBy method.
+     *
+     * @return \Generator
+     */
+    private function generateOrders(): \Generator
+    {
+        yield ['id' => 1, 'user_id' => 1];
+        yield ['id' => 2, 'user_id' => 1];
+        yield ['id' => 3, 'user_id' => 2];
+    }
 }
