@@ -29,7 +29,7 @@ interface Gate
      * @param  array|null  $abilities
      * @return $this
      */
-    public function resource($name, $class, array $abilities = null);
+    public function resource($name, $class, ?array $abilities = null);
 
     /**
      * Define a policy class for a given class type.

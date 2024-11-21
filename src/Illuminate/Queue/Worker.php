@@ -111,7 +111,7 @@ class Worker
                                 Dispatcher $events,
                                 ExceptionHandler $exceptions,
                                 callable $isDownForMaintenance,
-                                callable $resetScope = null)
+                                ?callable $resetScope = null)
     {
         $this->events = $events;
         $this->manager = $manager;

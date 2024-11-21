@@ -39,7 +39,7 @@ class CompilerEngine extends PhpEngine
      * @param  \Illuminate\Filesystem\Filesystem|null  $files
      * @return void
      */
-    public function __construct(CompilerInterface $compiler, Filesystem $files = null)
+    public function __construct(CompilerInterface $compiler, ?Filesystem $files = null)
     {
         parent::__construct($files ?: new Filesystem);
 

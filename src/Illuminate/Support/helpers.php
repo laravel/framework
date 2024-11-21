@@ -187,7 +187,7 @@ if (! function_exists('optional')) {
      * @param  callable|null  $callback
      * @return mixed
      */
-    function optional($value = null, callable $callback = null)
+    function optional($value = null, ?callable $callback = null)
     {
         if (is_null($callback)) {
             return new Optional($value);
@@ -427,7 +427,7 @@ if (! function_exists('with')) {
      * @param  (callable(TValue): (TReturn))|null  $callback
      * @return ($callback is null ? TValue : TReturn)
      */
-    function with($value, callable $callback = null)
+    function with($value, ?callable $callback = null)
     {
         return is_null($callback) ? $value : $callback($value);
     }
