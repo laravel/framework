@@ -454,7 +454,7 @@ class Schedule
         }
 
         if (method_exists(PendingEventAttributes::class, $method)) {
-            $this->attributes ??= new PendingEventAttributes($this);
+            $this->attributes ??= end($this->groupStack) ?: new PendingEventAttributes($this);
 
             return $this->attributes->$method(...$parameters);
         }
