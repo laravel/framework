@@ -39,8 +39,8 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        php: [8.2, 8.3]
-        phpunit: ['10.5', '11.0.1']
+        php: [8.2, 8.3, 8.4]
+        phpunit: ['10.5.12', '11.3.2']
         stability: [prefer-lowest, prefer-stable]
 
     name: PHP ${{ matrix.php }} - PHPUnit ${{ matrix.phpunit }} - ${{ matrix.stability }}
@@ -53,7 +53,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, gd, redis, igbinary, msgpack, lzf, zstd, lz4, memcached, gmp, :php-psr
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, gd, redis, igbinary, msgpack, memcached, gmp, :php-psr
           ini-values: error_reporting=E_ALL
           tools: composer:v2
           coverage: none
@@ -64,12 +64,14 @@ jobs:
       - name: Set Framework version
         run: composer config version "11.x-dev"
 
-      - name: Set minimum PHP 8.2 versions
+      - name: Set Minimum PHP 8.4 Versions
         uses: nick-fields/retry@v3
         with:
           timeout_minutes: 5
           max_attempts: 5
-          command: composer require guzzlehttp/psr7:^2.4 --no-interaction --no-update
+          command: composer require  nesbot/carbon:^3.4 --no-interaction --no-update
+          shell: bash
+        if: matrix.php >= 8.4
 
       - name: Set PHPUnit
         uses: nick-fields/retry@v3
@@ -109,9 +111,12 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        php: [8.2, 8.3]
+        php: [8.2, 8.3, 8.4]
         phpunit: ['10.5', '11.0.1']
         stability: [prefer-lowest, prefer-stable]
+        exclude:
+          - php: 8.4
+            stability: prefer-lowest
 
     name: PHP ${{ matrix.php }} - PHPUnit ${{ matrix.phpunit }} - ${{ matrix.stability }} - Windows
 
@@ -134,14 +139,6 @@ jobs:
 
       - name: Set Framework version
         run: composer config version "11.x-dev"
-
-      - name: Set Minimum PHP 8.2 Versions
-        uses: nick-fields/retry@v3
-        with:
-          timeout_minutes: 5
-          max_attempts: 5
-          command: composer require guzzlehttp/psr7:^2.4 --no-interaction --no-update
-          shell: bash
 
       - name: Set PHPUnit
         uses: nick-fields/retry@v3
