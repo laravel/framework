@@ -225,6 +225,19 @@ if (! function_exists('object_get')) {
     }
 }
 
+if (! function_exists('laravel_cloud')) {
+    /**
+     * Determine if the appliation is running on Laravel Cloud.
+     *
+     * @return bool
+     */
+    function laravel_cloud()
+    {
+        return ($_ENV['LARAVEL_CLOUD'] ?? false) === '1' ||
+               ($_SERVER['LARAVEL_CLOUD'] ?? false) === '1';
+    }
+}
+
 if (! function_exists('once')) {
     /**
      * Ensures a callable is only called once, and returns the result on subsequent calls.
