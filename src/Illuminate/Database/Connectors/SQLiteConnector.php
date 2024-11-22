@@ -26,7 +26,7 @@ class SQLiteConnector extends Connector implements ConnectorInterface
             str_contains($config['database'], '?mode=memory') ||
             str_contains($config['database'], '&mode=memory')
         ) {
-            return $this->createConnection('sqlite:' . $config['database'], $config, $options);
+            return $this->createConnection('sqlite:'.$config['database'], $config, $options);
         }
 
         $path = realpath($config['database']);
