@@ -227,7 +227,7 @@ if (! function_exists('object_get')) {
 
 if (! function_exists('laravel_cloud')) {
     /**
-     * Determine if the appliation is running on Laravel Cloud.
+     * Determine if the application is running on Laravel Cloud.
      *
      * @return bool
      */
