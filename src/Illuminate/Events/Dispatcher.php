@@ -80,8 +80,8 @@ class Dispatcher implements DispatcherContract
     /**
      * Register an event listener with the dispatcher.
      *
-     * @param  \Illuminate\Events\QueuedClosure|\Closure|string|array  $events
-     * @param  \Illuminate\Events\QueuedClosure|\Closure|string|array|null  $listener
+     * @param  \Illuminate\Events\QueuedClosure|string|class-string|array|callable  $events
+     * @param  \Illuminate\Events\QueuedClosure|class-string|array|callable|null  $listener
      * @return void
      */
     public function listen($events, $listener = null)
