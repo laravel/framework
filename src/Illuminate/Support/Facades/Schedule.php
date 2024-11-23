@@ -30,6 +30,7 @@ use Illuminate\Console\Scheduling\Schedule as ConsoleSchedule;
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes when(\Closure|bool $callback)
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes skip(\Closure|bool $callback)
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes cron(string $expression)
+ * @method static \Illuminate\Console\Scheduling\PendingEventAttributes resetFrequency()
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes between(string $startTime, string $endTime)
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes unlessBetween(string $startTime, string $endTime)
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes everySecond()
