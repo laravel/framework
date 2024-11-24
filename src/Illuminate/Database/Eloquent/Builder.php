@@ -854,9 +854,13 @@ class Builder implements BuilderContract
             $models = $builder->eagerLoadRelations($models);
         }
 
-        return $this->applyAfterQueryCallbacks(
-            $builder->getModel()->newCollection($models)
-        );
+        $collection = $builder->getModel()->newCollection($models);
+
+        if (Model::alwaysAutoloadsRelations()) {
+            $collection->enableRelationAutoload();
+        }
+
+        return $this->applyAfterQueryCallbacks($collection);
     }
 
     /**

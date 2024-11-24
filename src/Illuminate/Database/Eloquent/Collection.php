@@ -249,6 +249,31 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
+     * Load a relationship path with types if it is not already eager loaded.
+     *
+     * @return void
+     */
+    public function loadMissingRelationWithTypes(array $path)
+    {
+        list($name, $class) = array_shift($path);
+
+        $this->filter(fn ($model) => ! is_null($model) && ! $model->relationLoaded($name) && $model::class === $class)
+            ->load($name);
+
+        if (empty($path)) {
+            return;
+        }
+
+        $models = $this->pluck($name)->whereNotNull();
+
+        if ($models->first() instanceof BaseCollection) {
+            $models = $models->collapse();
+        }
+
+        (new static($models))->loadMissingRelationWithTypes($path);
+    }
+
+    /**
      * Load a relationship path if it is not already eager loaded.
      *
      * @param  \Illuminate\Database\Eloquent\Collection<int, TModel>  $models
@@ -310,6 +335,22 @@ class Collection extends BaseCollection implements QueueableCollection
             ->filter()
             ->groupBy(fn ($model) => get_class($model))
             ->each(fn ($models, $className) => static::make($models)->loadCount($relations[$className] ?? []));
+
+        return $this;
+    }
+
+    /**
+     * Enable relation autoload for the collection.
+     *
+     *  @return $this
+     */
+    public function enableRelationAutoload()
+    {
+        $callback = fn ($path) => $this->loadMissingRelationWithTypes($path);
+
+        $this
+            ->filter(fn ($model) => ! $model->hasRelationAutoloadCallback())
+            ->each(fn ($model) => $model->usingRelationAutoloadCallback($this, $callback));
 
         return $this;
     }
