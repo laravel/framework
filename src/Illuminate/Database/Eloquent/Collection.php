@@ -255,7 +255,7 @@ class Collection extends BaseCollection implements QueueableCollection
      */
     public function loadMissingRelationWithTypes(array $path)
     {
-        list($name, $class) = array_shift($path);
+        [$name, $class] = array_shift($path);
 
         $this->filter(fn ($model) => ! is_null($model) && ! $model->relationLoaded($name) && $model::class === $class)
             ->load($name);
@@ -342,7 +342,7 @@ class Collection extends BaseCollection implements QueueableCollection
     /**
      * Enable relation autoload for the collection.
      *
-     *  @return $this
+     * @return $this
      */
     public function enableRelationAutoload()
     {
