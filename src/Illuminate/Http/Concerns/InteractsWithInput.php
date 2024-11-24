@@ -651,4 +651,51 @@ trait InteractsWithInput
 
         return $this;
     }
+
+    /**
+     * Dump the request items and end the script.
+     *
+     * @return never
+     */
+    public function ddAll()
+    {
+        $this->dump($this->all());
+        exit(1);
+    }
+
+    /**
+     * Dump the provided keys with values from the input data
+     * 
+     * @param  mixed  ...$keys
+     * @return never
+     */
+    public function ddOnly(...$keys)
+    {
+        $this->dump($this->only($keys));
+        exit(1);
+    }
+
+    /**
+     * Dump the provided keys with values from the input data
+     * 
+     * @param  mixed  ...$keys
+     * @return never
+     */
+
+    public function ddExcept(...$keys)
+    {
+        $this->dump($this->except($keys));
+        exit(1);
+    }
+
+    /**
+     * Dump the keys for all of the input and files.
+     * 
+     * @return never
+     */
+    public function ddKeys()
+    {
+        $this->dump($this->keys());
+        exit(1);
+    }
 }
