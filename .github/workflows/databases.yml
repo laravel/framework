@@ -35,9 +35,9 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: 8.2
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, :php-psr
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, xml, xdebug, :php-psr
           tools: composer:v2
-          coverage: none
+          coverage: xdebug
 
       - name: Set Framework version
         run: composer config version "12.x-dev"
@@ -82,9 +82,9 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: 8.2
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, :php-psr
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, xml, xdebug, :php-psr
           tools: composer:v2
-          coverage: none
+          coverage: xdebug
 
       - name: Set Framework version
         run: composer config version "12.x-dev"
@@ -128,9 +128,9 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: 8.2
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, :php-psr
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, xml, xdebug, :php-psr
           tools: composer:v2
-          coverage: none
+          coverage: xdebug
 
       - name: Set Framework version
         run: composer config version "12.x-dev"
@@ -175,9 +175,9 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: 8.2
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_pgsql, :php-psr
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_pgsql, xml, xdebug, :php-psr
           tools: composer:v2
-          coverage: none
+          coverage: xdebug
 
       - name: Set Framework version
         run: composer config version "12.x-dev"
@@ -224,9 +224,9 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: 8.2
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_pgsql, :php-psr
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_pgsql, xml, xdebug, :php-psr
           tools: composer:v2
-          coverage: none
+          coverage: xdebug
 
       - name: Set Framework version
         run: composer config version "12.x-dev"
@@ -271,9 +271,9 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: 8.2
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, sqlsrv, pdo, pdo_sqlsrv, odbc, pdo_odbc, :php-psr
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, sqlsrv, pdo, pdo_sqlsrv, odbc, pdo_odbc, xml, xdebug, :php-psr
           tools: composer:v2
-          coverage: none
+          coverage: xdebug
 
       - name: Set Framework version
         run: composer config version "12.x-dev"
@@ -319,9 +319,9 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: 8.2
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, sqlsrv, pdo, pdo_sqlsrv, odbc, pdo_odbc, :php-psr
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, sqlsrv, pdo, pdo_sqlsrv, odbc, pdo_odbc, xml, xdebug, :php-psr
           tools: composer:v2
-          coverage: none
+          coverage: xdebug
 
       - name: Set Framework version
         run: composer config version "12.x-dev"
@@ -358,9 +358,9 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: 8.2
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, sqlsrv, pdo, pdo_sqlsrv, odbc, pdo_odbc, :php-psr
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, sqlsrv, pdo, pdo_sqlsrv, odbc, pdo_odbc, xml, xdebug, :php-psr
           tools: composer:v2
-          coverage: none
+          coverage: xdebug
 
       - name: Set Framework version
         run: composer config version "12.x-dev"
