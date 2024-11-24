@@ -1,0 +1,74 @@
+name: coveralls
+
+on:
+  push:
+    branches:
+      - master
+      - '*.x'
+  pull_request:
+
+jobs:
+  types:
+    runs-on: ubuntu-24.04
+
+    strategy:
+      fail-fast: true
+      matrix:
+        php: [ 8.1, 8.2, 8.3 ]
+        phpunit: [ '10.0.7', '10.5.12' ]
+
+    name: PHP ${{ matrix.php }} - PHPUnit ${{ matrix.phpunit }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.1
+          extensions: mbstring, xml, xdebug
+          tools: composer:v2
+          coverage: xdebug
+
+      - name: Set Framework version
+        run: composer config version "10.x-dev"
+
+      - name: Set minimum PHP 8.1 versions
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: composer require symfony/css-selector:^6.0 --no-interaction --no-update
+
+      - name: Set minimum PHP 8.2 versions
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: composer require guzzlehttp/psr7:^2.4 --no-interaction --no-update
+        if: matrix.php >= 8.2
+
+      - name: Set PHPUnit
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: composer require phpunit/phpunit:^${{ matrix.phpunit }} --dev --no-interaction --no-update
+
+      - name: Install dependencies
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: composer update --prefer-stable --prefer-dist --no-interaction --no-progress
+
+      - name: Execute tests with coverage
+        run: vendor/bin/phpunit --configuration="phpunit.xml.dist" --coverage-clover="build/logs/clover.xml"
+
+      - name: Store coverage results to Coveralls
+        env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          composer global require php-coveralls/php-coveralls --prefer-stable --prefer-dist --no-interaction --no-progress
+          php-coveralls --coverage_clover="build/logs/clover.xml" -v
