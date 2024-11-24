@@ -93,8 +93,6 @@ class EloquentModelRelationAutoloadTest extends DatabaseTestCase
             });
         });
 
-        Post::alwaysAutoloadRelations();
-
         $likes = Like::get();
 
         DB::enableQueryLog();
@@ -102,7 +100,7 @@ class EloquentModelRelationAutoloadTest extends DatabaseTestCase
         $videos = [];
         $videoLike = null;
 
-//        $likes->enableRelationAutoload();
+        $likes->enableRelationAutoload();
 
         foreach ($likes as $like) {
             $likeable = $like->likeable;
