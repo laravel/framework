@@ -1,0 +1,68 @@
+name: coveralls
+
+on:
+  push:
+    branches:
+      - master
+      - '*.x'
+  pull_request:
+
+jobs:
+  types:
+    runs-on: ubuntu-24.04
+
+    strategy:
+      fail-fast: true
+      matrix:
+        php: [ 8.2, 8.3, 8.4 ]
+        phpunit: [ '10.5.12', '11.3.2' ]
+
+    name: PHP ${{ matrix.php }} - PHPUnit ${{ matrix.phpunit }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.2
+          extensions: mbstring, xml, xdebug
+          tools: composer:v2
+          coverage: xdebug
+
+      - name: Set Framework version
+        run: composer config version "11.x-dev"
+
+      - name: Set Minimum PHP 8.4 Versions
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: composer require  nesbot/carbon:^3.4 --no-interaction --no-update
+          shell: bash
+        if: matrix.php >= 8.4
+
+      - name: Set PHPUnit
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: composer require phpunit/phpunit:^${{ matrix.phpunit }} --dev --no-interaction --no-update
+
+      - name: Install dependencies
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: composer update --prefer-stable --prefer-dist --no-interaction --no-progress
+
+      - name: Execute tests with coverage
+        run: vendor/bin/phpunit --configuration="phpunit.xml.dist" --coverage-clover="build/logs/clover.xml"
+
+      - name: Store coverage results to Coveralls
+        env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          composer global require php-coveralls/php-coveralls --prefer-stable --prefer-dist --no-interaction --no-progress
+          php-coveralls --coverage_clover="build/logs/clover.xml" -v
