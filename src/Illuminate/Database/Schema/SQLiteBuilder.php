@@ -92,8 +92,7 @@ class SQLiteBuilder extends Builder
     {
         $database = $this->connection->getDatabaseName();
 
-        if (
-            $database !== ':memory:' &&
+        if ($database !== ':memory:' &&
             ! str_contains($database, '?mode=memory') &&
             ! str_contains($database, '&mode=memory')
         ) {

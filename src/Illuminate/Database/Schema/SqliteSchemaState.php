@@ -62,8 +62,7 @@ class SqliteSchemaState extends SchemaState
     {
         $database = $this->connection->getDatabaseName();
 
-        if (
-            $database === ':memory:' ||
+        if ($database === ':memory:' ||
             str_contains($database, '?mode=memory') ||
             str_contains($database, '&mode=memory')
         ) {

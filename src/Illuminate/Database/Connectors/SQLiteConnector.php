@@ -20,9 +20,8 @@ class SQLiteConnector extends Connector implements ConnectorInterface
 
         // SQLite supports "in-memory" databases that only last as long as the owning
         // connection does. These are useful for tests or for short lifetime store
-        // querying. In-memory databases may be anonymous (:memory:) or named.
-        if (
-            $config['database'] === ':memory:' ||
+        // querying. In-memory databases shall be anonymous (:memory:) or named.
+        if ($config['database'] === ':memory:' ||
             str_contains($config['database'], '?mode=memory') ||
             str_contains($config['database'], '&mode=memory')
         ) {
