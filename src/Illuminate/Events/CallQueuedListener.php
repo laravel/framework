@@ -166,7 +166,7 @@ class CallQueuedListener implements ShouldQueue
     /**
      * Get the display name for the queued job.
      *
-     * @return class-string
+     * @return string
      */
     public function displayName()
     {
