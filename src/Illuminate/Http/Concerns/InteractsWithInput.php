@@ -70,6 +70,16 @@ trait InteractsWithInput
     }
 
     /**
+     * Get the keys for all of the input and files.
+     *
+     * @return array
+     */
+    public function keys()
+    {
+        return array_merge(array_keys($this->input()), $this->files->keys());
+    }
+
+    /**
      * Retrieve an input item from the request.
      *
      * @param  string|null  $key
@@ -235,7 +245,7 @@ trait InteractsWithInput
      * @param  mixed  $default
      * @return mixed
      */
-    public function data($key = null, $default = null)
+    protected function data($key = null, $default = null)
     {
         return $this->input($key, $default);
     }

@@ -113,7 +113,7 @@ class Fluent implements Arrayable, ArrayAccess, Jsonable, JsonSerializable
      * @param  mixed  $default
      * @return mixed
      */
-    public function data($key = null, $default = null)
+    protected function data($key = null, $default = null)
     {
         return $this->get($key, $default);
     }
