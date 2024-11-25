@@ -275,9 +275,11 @@ class Factory
                 return static::response($callback);
             }
 
-            return $callback instanceof Closure || $callback instanceof ResponseSequence
-                        ? $callback($request, $options)
-                        : $callback;
+            if ($callback instanceof Closure || $callback instanceof ResponseSequence) {
+                return $callback($request, $options);
+            }
+
+            return $callback;
         });
     }
 
