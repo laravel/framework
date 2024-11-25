@@ -60,7 +60,12 @@ class SqliteSchemaState extends SchemaState
      */
     public function load($path)
     {
-        if ($this->connection->getDatabaseName() === ':memory:') {
+        $database = $this->connection->getDatabaseName();
+
+        if ($database === ':memory:' ||
+            str_contains($database, '?mode=memory') ||
+            str_contains($database, '&mode=memory')
+        ) {
             $this->connection->getPdo()->exec($this->files->get($path));
 
             return;

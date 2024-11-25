@@ -270,6 +270,19 @@ class DatabaseConnectorTest extends TestCase
         $this->assertSame($result, $connection);
     }
 
+    public function testSQLiteNamedMemoryDatabasesMayBeConnectedTo()
+    {
+        $dsn = 'sqlite:file:mydb?mode=memory&cache=shared';
+        $config = ['database' => 'file:mydb?mode=memory&cache=shared'];
+        $connector = $this->getMockBuilder(SQLiteConnector::class)->onlyMethods(['createConnection', 'getOptions'])->getMock();
+        $connection = m::mock(stdClass::class);
+        $connector->expects($this->once())->method('getOptions')->with($this->equalTo($config))->willReturn(['options']);
+        $connector->expects($this->once())->method('createConnection')->with($this->equalTo($dsn), $this->equalTo($config), $this->equalTo(['options']))->willReturn($connection);
+        $result = $connector->connect($config);
+
+        $this->assertSame($result, $connection);
+    }
+
     public function testSQLiteFileDatabasesMayBeConnectedTo()
     {
         $dsn = 'sqlite:'.__DIR__;
