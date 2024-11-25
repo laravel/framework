@@ -856,7 +856,7 @@ class Builder implements BuilderContract
 
         $collection = $builder->getModel()->newCollection($models);
 
-        if (Model::alwaysAutoloadsRelations()) {
+        if (Model::isAutoloadingRelationsGlobally()) {
             $collection->enableRelationAutoload();
         }
 
