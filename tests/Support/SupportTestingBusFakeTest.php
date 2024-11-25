@@ -661,6 +661,47 @@ class SupportTestingBusFakeTest extends TestCase
         }
     }
 
+    public function testAssertEmptyPasses()
+    {
+        $this->fake->assertNothingPlaced();
+    }
+
+    public function testAssertEmptyFailedWhenJobBatched()
+    {
+        $this->fake->batch([new BusJobStub])->dispatch();
+
+        $this->expectException(ExpectationFailedException::class);
+
+        $this->fake->assertNothingPlaced();
+    }
+
+    public function testAssertEmptyFailedWhenJobDispatched()
+    {
+        $this->fake->dispatch(new BusJobStub);
+
+        $this->expectException(ExpectationFailedException::class);
+
+        $this->fake->assertNothingPlaced();
+    }
+
+    public function testAssertEmptyFailedWhenJobChained()
+    {
+        $this->fake->chain([new ChainedJobStub])->dispatch();
+
+        $this->expectException(ExpectationFailedException::class);
+
+        $this->fake->assertNothingPlaced();
+    }
+
+    public function testAssertEmptyFailedWhenJobDispatchedNow()
+    {
+        $this->fake->dispatchNow(new BusJobStub);
+
+        $this->expectException(ExpectationFailedException::class);
+
+        $this->fake->assertNothingPlaced();
+    }
+
     public function testFindBatch()
     {
         $this->assertNull($this->fake->findBatch('non-existent-batch'));

@@ -505,6 +505,17 @@ class BusFake implements Fake, QueueingDispatcher
     }
 
     /**
+     * Assert that no jobs were dispatched, chained, or batched.
+     *
+     * @return void
+     */
+    public function assertNothingPlaced()
+    {
+        $this->assertNothingDispatched();
+        $this->assertNothingBatched();
+    }
+
+    /**
      * Get all of the jobs matching a truth-test callback.
      *
      * @param  string  $command
