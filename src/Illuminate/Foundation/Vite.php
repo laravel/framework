@@ -564,7 +564,7 @@ class Vite implements Htmlable
                                 return link
                             }
 
-                            const fragment = new DocumentFragment
+                            const fragment = new DocumentFragment;
                             {$assets}.forEach((asset) => fragment.append(makeLink(asset)))
                             document.head.append(fragment)
                          }))
