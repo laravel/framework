@@ -362,6 +362,16 @@ class BusFake implements Fake, QueueingDispatcher
     }
 
     /**
+     * Assert no chained jobs was dispatched.
+     *
+     * @return void
+     */
+    public function assertNothingChained()
+    {
+        $this->assertNothingDispatched();
+    }
+
+    /**
      * Reset the chain properties to their default values on the job.
      *
      * @param  mixed  $job

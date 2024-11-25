@@ -548,6 +548,20 @@ class SupportTestingBusFakeTest extends TestCase
         Container::setInstance(null);
     }
 
+    public function testAssertNothingChained()
+    {
+        $this->fake->assertNothingChained();
+    }
+
+    public function testAssertNothingChainedFails()
+    {
+        $this->fake->chain([new ChainedJobStub])->dispatch();
+
+        $this->expectException(ExpectationFailedException::class);
+
+        $this->fake->assertNothingChained();
+    }
+
     public function testAssertDispatchedWithIgnoreClass()
     {
         $dispatcher = m::mock(QueueingDispatcher::class);
