@@ -58,7 +58,7 @@ trait ForwardsCalls
      * Throw a bad method call exception for the given method.
      *
      * @param  string  $method
-     * @return void
+     * @return never
      *
      * @throws \BadMethodCallException
      */
