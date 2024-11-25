@@ -162,6 +162,7 @@ namespace Illuminate\Support\Facades;
  * @method static \BackedEnum|null enum(string $key, string $enumClass)
  * @method static \BackedEnum[] enums(string $key, string $enumClass)
  * @method static \Illuminate\Support\Collection collect(array|string|null $key = null)
+ * @method static \Illuminate\Support\Fluent fluent(array|string|null $key = null)
  * @method static array only(array|mixed $keys)
  * @method static array except(array|mixed $keys)
  * @method static string|array|null query(string|null $key = null, string|array|null $default = null)

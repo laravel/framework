@@ -86,7 +86,7 @@ class Schedule
     /**
      * The attributes to pass to the event.
      *
-     * @var \Illuminate\Console\Scheduling\PendingEventAttributes
+     * @var \Illuminate\Console\Scheduling\PendingEventAttributes|null
      */
     protected $attributes;
 
@@ -287,9 +287,15 @@ class Schedule
      *
      * @param  \Illuminate\Console\Scheduling\Event  $event
      * @return void
+     *
+     * @throws \RuntimeException
      */
     public function group(Closure $events)
     {
+        if ($this->attributes === null) {
+            throw new RuntimeException('Invoke an attribute method such as Schedule::daily() before defining a schedule group.');
+        }
+
         $this->groupStack[] = $this->attributes;
 
         $events($this);
@@ -308,7 +314,7 @@ class Schedule
         if (isset($this->attributes)) {
             $this->attributes->mergeAttributes($event);
 
-            unset($this->attributes);
+            $this->attributes = null;
         }
 
         if (! empty($this->groupStack)) {

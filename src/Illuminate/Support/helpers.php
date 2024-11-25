@@ -169,7 +169,7 @@ if (! function_exists('filled')) {
 
 if (! function_exists('fluent')) {
     /**
-     * Create an Fluent object from the given value.
+     * Create a Fluent object from the given value.
      *
      * @param  object|array  $value
      * @return \Illuminate\Support\Fluent

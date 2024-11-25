@@ -114,6 +114,17 @@ trait InteractsWithInput
     }
 
     /**
+     * Retrieve input from the request as a Fluent object instance.
+     *
+     * @param  array|string|null  $key
+     * @return \Illuminate\Support\Fluent
+     */
+    public function fluent($key = null)
+    {
+        return fluent(is_array($key) ? $this->only($key) : $this->input($key));
+    }
+
+    /**
      * Retrieve a query string item from the request.
      *
      * @param  string|null  $key
