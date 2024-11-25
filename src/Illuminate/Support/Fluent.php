@@ -5,6 +5,7 @@ namespace Illuminate\Support;
 use ArrayAccess;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Support\Traits\InteractsWithData;
 use JsonSerializable;
 
 /**
@@ -16,6 +17,8 @@ use JsonSerializable;
  */
 class Fluent implements Arrayable, ArrayAccess, Jsonable, JsonSerializable
 {
+    use InteractsWithData;
+
     /**
      * All of the attributes set on the fluent instance.
      *
@@ -81,6 +84,18 @@ class Fluent implements Arrayable, ArrayAccess, Jsonable, JsonSerializable
     }
 
     /**
+     * Get data from the fluent instance.
+     *
+     * @param  string  $key
+     * @param  mixed  $default
+     * @return mixed
+     */
+    protected function data($key, $default = null)
+    {
+        return $this->get($key, $default);
+    }
+
+    /**
      * Get the attributes from the fluent instance.
      *
      * @return array<TKey, TValue>
@@ -98,17 +113,6 @@ class Fluent implements Arrayable, ArrayAccess, Jsonable, JsonSerializable
     public function toArray()
     {
         return $this->attributes;
-    }
-
-    /**
-     * Convert the fluent instance to a Collection.
-     *
-     * @param  string|null  $key
-     * @return \Illuminate\Support\Collection
-     */
-    public function collect($key = null)
-    {
-        return new Collection($this->get($key));
     }
 
     /**
