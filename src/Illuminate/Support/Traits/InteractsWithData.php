@@ -9,13 +9,21 @@ use stdClass;
 trait InteractsWithData
 {
     /**
+     * Retrieve all data from the instance.
+     *
+     * @param array|mixed|null $keys
+     * @return array
+     */
+    abstract public function all($keys = null);
+
+    /**
      * Retrieve data from the instance.
      *
-     * @param  string  $key
+     * @param  string|null  $key
      * @param  mixed  $default
      * @return mixed
      */
-    abstract protected function data($key, $default = null);
+    abstract public function data($key = null, $default = null);
 
     /**
      * Determine if the data contains a given key.
@@ -50,7 +58,7 @@ trait InteractsWithData
     }
 
     /**
-     * Determine if the request contains any of the given inputs.
+     * Determine if the instance contains any of the given inputs.
      *
      * @param  string|array  $keys
      * @return bool
@@ -65,7 +73,7 @@ trait InteractsWithData
     }
 
     /**
-     * Apply the callback if the request contains the given input item key.
+     * Apply the callback if the instance contains the given input item key.
      *
      * @param  string  $key
      * @param  callable  $callback
@@ -86,7 +94,7 @@ trait InteractsWithData
     }
 
     /**
-     * Determine if the request contains a non-empty value for an input item.
+     * Determine if the instance contains a non-empty value for an input item.
      *
      * @param  string|array  $key
      * @return bool
@@ -105,7 +113,7 @@ trait InteractsWithData
     }
 
     /**
-     * Determine if the request contains an empty value for an input item.
+     * Determine if the instance contains an empty value for an input item.
      *
      * @param  string|array  $key
      * @return bool
@@ -124,7 +132,7 @@ trait InteractsWithData
     }
 
     /**
-     * Determine if the request contains a non-empty value for any of the given inputs.
+     * Determine if the instance contains a non-empty value for any of the given inputs.
      *
      * @param  string|array  $keys
      * @return bool
@@ -143,7 +151,7 @@ trait InteractsWithData
     }
 
     /**
-     * Apply the callback if the request contains a non-empty value for the given input item key.
+     * Apply the callback if the instance contains a non-empty value for the given input item key.
      *
      * @param  string  $key
      * @param  callable  $callback
@@ -164,7 +172,7 @@ trait InteractsWithData
     }
 
     /**
-     * Determine if the request is missing a given input item key.
+     * Determine if the instance is missing a given input item key.
      *
      * @param  string|array  $key
      * @return bool
@@ -177,7 +185,7 @@ trait InteractsWithData
     }
 
     /**
-     * Apply the callback if the request is missing the given input item key.
+     * Apply the callback if the instance is missing the given input item key.
      *
      * @param  string  $key
      * @param  callable  $callback
@@ -221,29 +229,6 @@ trait InteractsWithData
     }
 
     /**
-     * Get all of the input and files for the request.
-     *
-     * @param  array|mixed|null  $keys
-     * @return array
-     */
-    public function all($keys = null)
-    {
-        $data = array_replace_recursive($this->data(), $this->allFiles());
-
-        if (! $keys) {
-            return $data;
-        }
-
-        $results = [];
-
-        foreach (is_array($keys) ? $keys : func_get_args() as $key) {
-            Arr::set($results, $key, Arr::get($data, $key));
-        }
-
-        return $results;
-    }
-
-    /**
      * Retrieve data from the instnce as a Stringable instance.
      *
      * @param  string  $key
@@ -256,7 +241,7 @@ trait InteractsWithData
     }
 
     /**
-     * Retrieve data from the request as a Stringable instance.
+     * Retrieve data from the instance as a Stringable instance.
      *
      * @param  string  $key
      * @param  mixed  $default

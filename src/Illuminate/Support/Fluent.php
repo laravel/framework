@@ -84,13 +84,36 @@ class Fluent implements Arrayable, ArrayAccess, Jsonable, JsonSerializable
     }
 
     /**
+     * Get all of the attributes from the fluent instance.
+     *
+     * @param  array|mixed|null  $keys
+     * @return array
+     */
+    public function all($keys = null)
+    {
+        $input = $this->data();
+
+        if (! $keys) {
+            return $input;
+        }
+
+        $results = [];
+
+        foreach (is_array($keys) ? $keys : func_get_args() as $key) {
+            Arr::set($results, $key, Arr::get($input, $key));
+        }
+
+        return $results;
+    }
+
+    /**
      * Get data from the fluent instance.
      *
      * @param  string  $key
      * @param  mixed  $default
      * @return mixed
      */
-    protected function data($key, $default = null)
+    public function data($key = null, $default = null)
     {
         return $this->get($key, $default);
     }
