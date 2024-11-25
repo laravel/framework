@@ -21,16 +21,6 @@ trait ManagesFrequencies
     }
 
     /**
-     * Reset the cron expression to its default value.
-     *
-     * @return $this
-     */
-    public function resetFrequency()
-    {
-        return $this->cron('* * * * *');
-    }
-
-    /**
      * Schedule the event to run between start and end time.
      *
      * @param  string  $startTime

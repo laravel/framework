@@ -293,7 +293,7 @@ class Schedule
     public function group(Closure $events)
     {
         if ($this->attributes === null) {
-            throw new RuntimeException('Cannot create a schedule group without first declaring attributes.');
+            throw new RuntimeException('Invoke an attribute method such as Schedule::daily() before defining a schedule group.');
         }
 
         $this->groupStack[] = $this->attributes;
