@@ -453,6 +453,17 @@ trait InteractsWithInput
     }
 
     /**
+     * Retrieve input from the request as a fluent instance.
+     *
+     * @param  string|null  $key
+     * @return \Illuminate\Support\Fluent
+     */
+    public function fluent($key = null)
+    {
+        return fluent(is_array($key) ? $this->only($key) : $this->input($key));
+    }
+
+    /**
      * Get a subset containing the provided keys with values from the input data.
      *
      * @param  array|mixed  $keys
