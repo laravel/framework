@@ -390,4 +390,3 @@ class FluentArrayIteratorStub implements IteratorAggregate
         return new ArrayIterator($this->items);
     }
 }
-

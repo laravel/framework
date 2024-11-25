@@ -11,7 +11,7 @@ trait InteractsWithData
     /**
      * Retrieve all data from the instance.
      *
-     * @param array|mixed|null $keys
+     * @param  array|mixed|null  $keys
      * @return array
      */
     abstract public function all($keys = null);
