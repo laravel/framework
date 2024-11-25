@@ -664,7 +664,7 @@ trait InteractsWithInput
     }
 
     /**
-     * Dump the provided keys with values from the input data
+     * Dump the provided keys with values from the input data.
      * 
      * @param  mixed  ...$keys
      * @return never
@@ -676,7 +676,7 @@ trait InteractsWithInput
     }
 
     /**
-     * Dump the input except provided keys with values from the request data
+     * Dump the input except provided keys with values from the request data.
      * 
      * @param  mixed  ...$keys
      * @return never
@@ -689,7 +689,7 @@ trait InteractsWithInput
 
     /**
      * Dump the keys for all of the input and files.
-     * 
+     *
      * @return never
      */
     public function ddKeys()
