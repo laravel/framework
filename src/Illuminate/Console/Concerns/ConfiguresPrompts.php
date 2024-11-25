@@ -56,6 +56,7 @@ trait ConfiguresPrompts
         PausePrompt::fallbackUsing(fn (PausePrompt $prompt) => $this->promptUntilValid(
             function () use ($prompt) {
                 $this->components->ask($prompt->message, $prompt->value());
+
                 return $prompt->value();
             },
             $prompt->required,
