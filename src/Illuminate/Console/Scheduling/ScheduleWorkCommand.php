@@ -36,7 +36,7 @@ class ScheduleWorkCommand extends Command
     {
         $this->components->info(
             'Running scheduled tasks every minute.',
-            $this->getLaravel()->isLocal() ? OutputInterface::VERBOSITY_NORMAL : OutputInterface::VERBOSITY_VERBOSE
+            $this->getLaravel()->environment('local') ? OutputInterface::VERBOSITY_NORMAL : OutputInterface::VERBOSITY_VERBOSE
         );
 
         [$lastExecutionStartedAt, $executions] = [Carbon::now()->subMinutes(10), []];
