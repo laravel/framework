@@ -28,7 +28,7 @@ use function Illuminate\Support\enum_value;
 
 class Route
 {
-    use CreatesRegularExpressionRouteConstraints, Conditionable, FiltersControllerMiddleware, Macroable, ResolvesRouteDependencies;
+    use Conditionable, CreatesRegularExpressionRouteConstraints, FiltersControllerMiddleware, Macroable, ResolvesRouteDependencies;
 
     /**
      * The URI pattern the route responds to.
