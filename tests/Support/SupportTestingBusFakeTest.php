@@ -548,6 +548,20 @@ class SupportTestingBusFakeTest extends TestCase
         Container::setInstance(null);
     }
 
+    public function testAssertNothingChained()
+    {
+        $this->fake->assertNothingChained();
+    }
+
+    public function testAssertNothingChainedFails()
+    {
+        $this->fake->chain([new ChainedJobStub])->dispatch();
+
+        $this->expectException(ExpectationFailedException::class);
+
+        $this->fake->assertNothingChained();
+    }
+
     public function testAssertDispatchedWithIgnoreClass()
     {
         $dispatcher = m::mock(QueueingDispatcher::class);
@@ -659,6 +673,47 @@ class SupportTestingBusFakeTest extends TestCase
         } catch (ExpectationFailedException $e) {
             $this->assertStringContainsString("The following batched jobs were dispatched unexpectedly:\n\n- ".get_class($job), $e->getMessage());
         }
+    }
+
+    public function testAssertEmptyPasses()
+    {
+        $this->fake->assertNothingPlaced();
+    }
+
+    public function testAssertEmptyFailedWhenJobBatched()
+    {
+        $this->fake->batch([new BusJobStub])->dispatch();
+
+        $this->expectException(ExpectationFailedException::class);
+
+        $this->fake->assertNothingPlaced();
+    }
+
+    public function testAssertEmptyFailedWhenJobDispatched()
+    {
+        $this->fake->dispatch(new BusJobStub);
+
+        $this->expectException(ExpectationFailedException::class);
+
+        $this->fake->assertNothingPlaced();
+    }
+
+    public function testAssertEmptyFailedWhenJobChained()
+    {
+        $this->fake->chain([new ChainedJobStub])->dispatch();
+
+        $this->expectException(ExpectationFailedException::class);
+
+        $this->fake->assertNothingPlaced();
+    }
+
+    public function testAssertEmptyFailedWhenJobDispatchedNow()
+    {
+        $this->fake->dispatchNow(new BusJobStub);
+
+        $this->expectException(ExpectationFailedException::class);
+
+        $this->fake->assertNothingPlaced();
     }
 
     public function testFindBatch()
