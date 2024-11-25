@@ -453,7 +453,7 @@ trait InteractsWithInput
     }
 
     /**
-     * Retrieve input from the request as a fluent instance.
+     * Retrieve input from the request as a Fluent object instance.
      *
      * @param  array|string|null  $key
      * @return \Illuminate\Support\Fluent
