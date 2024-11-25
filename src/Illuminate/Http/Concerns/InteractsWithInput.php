@@ -80,6 +80,29 @@ trait InteractsWithInput
     }
 
     /**
+     * Get all of the input and files for the request.
+     *
+     * @param  array|mixed|null  $keys
+     * @return array
+     */
+    public function all($keys = null)
+    {
+        $input = array_replace_recursive($this->input(), $this->allFiles());
+
+        if (! $keys) {
+            return $input;
+        }
+
+        $results = [];
+
+        foreach (is_array($keys) ? $keys : func_get_args() as $key) {
+            Arr::set($results, $key, Arr::get($input, $key));
+        }
+
+        return $results;
+    }
+
+    /**
      * Retrieve an input item from the request.
      *
      * @param  string|null  $key
@@ -213,29 +236,6 @@ trait InteractsWithInput
     public function file($key = null, $default = null)
     {
         return data_get($this->allFiles(), $key, $default);
-    }
-
-    /**
-     * Get all of the input and files for the request.
-     *
-     * @param  array|mixed|null  $keys
-     * @return array
-     */
-    public function all($keys = null)
-    {
-        $input = array_replace_recursive($this->input(), $this->allFiles());
-
-        if (! $keys) {
-            return $input;
-        }
-
-        $results = [];
-
-        foreach (is_array($keys) ? $keys : func_get_args() as $key) {
-            Arr::set($results, $key, Arr::get($input, $key));
-        }
-
-        return $results;
     }
 
     /**
