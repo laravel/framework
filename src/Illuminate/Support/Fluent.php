@@ -82,7 +82,7 @@ class Fluent implements Arrayable, ArrayAccess, Jsonable, JsonSerializable
             (array) $this->get($key, $default)
         );
     }
-    
+
     /**
      * Get all of the attributes from the fluent instance.
      *
