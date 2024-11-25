@@ -11,8 +11,7 @@ use Symfony\Component\HttpFoundation\InputBag;
 
 trait InteractsWithInput
 {
-    use Dumpable;
-    use InteractsWithData;
+    use Dumpable, InteractsWithData;
 
     /**
      * Retrieve a server variable from the request.
