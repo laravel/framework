@@ -455,7 +455,7 @@ trait InteractsWithInput
     /**
      * Retrieve input from the request as a fluent instance.
      *
-     * @param  string|null  $key
+     * @param  array|string|null  $key
      * @return \Illuminate\Support\Fluent
      */
     public function fluent($key = null)
