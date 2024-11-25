@@ -91,16 +91,16 @@ class Fluent implements Arrayable, ArrayAccess, Jsonable, JsonSerializable
      */
     public function all($keys = null)
     {
-        $input = $this->data();
+        $data = $this->data();
 
         if (! $keys) {
-            return $input;
+            return $data;
         }
 
         $results = [];
 
         foreach (is_array($keys) ? $keys : func_get_args() as $key) {
-            Arr::set($results, $key, Arr::get($input, $key));
+            Arr::set($results, $key, Arr::get($data, $key));
         }
 
         return $results;
