@@ -257,7 +257,7 @@ class Factory
      * Stub the given URL using the given callback.
      *
      * @param  string  $url
-     * @param  \Illuminate\Http\Client\Response|\GuzzleHttp\Promise\PromiseInterface|callable  $callback
+     * @param  \Illuminate\Http\Client\Response|\GuzzleHttp\Promise\PromiseInterface|callable|int|string|array  $callback
      * @return $this
      */
     public function stubUrl($url, $callback)
@@ -265,6 +265,14 @@ class Factory
         return $this->fake(function ($request, $options) use ($url, $callback) {
             if (! Str::is(Str::start($url, '*'), $request->url())) {
                 return;
+            }
+
+            if (is_int($callback) && $callback >= 100 && $callback < 600) {
+                return static::response(status: $callback);
+            }
+
+            if (is_int($callback) || is_string($callback)) {
+                return static::response($callback);
             }
 
             return $callback instanceof Closure || $callback instanceof ResponseSequence
