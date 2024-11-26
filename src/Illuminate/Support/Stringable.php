@@ -1399,6 +1399,96 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Checks if a given string contains only digits.
+     *
+     * @return bool
+     */
+    public function isNumeric()
+    {
+        return Str::isNumeric($this->value);
+    }
+
+    /**
+     * Checks if a given string contains only alphabetic characters.
+     *
+     * @return bool
+     */
+    public function isAlphabetic()
+    {
+        return Str::isAlphabetic($this->value);
+    }
+
+    /**
+     * Checks if a given string contains only alphabetic characters and digits.
+     *
+     * @return bool
+     */
+    public function isAlphaNumeric()
+    {
+        return Str::isAlphaNumeric($this->value);
+    }
+
+    /**
+     * Checks if a given string contains only binary characters.
+     *
+     * @return bool
+     */
+    public function isBinary()
+    {
+        return Str::isBinary($this->value);
+    }
+
+    /**
+     * Checks if a given string contains only whitespace characters.
+     *
+     * @return bool
+     */
+    public function isWhitespace()
+    {
+        return Str::isWhitespace($this->value);
+    }
+
+    /**
+     * Checks if a given string contains only printable characters.
+     *
+     * @return bool
+     */
+    public function isPrintable()
+    {
+        return Str::isPrintable($this->value);
+    }
+
+    /**
+     * Checks if a given string contains only lower case characters.
+     *
+     * @return bool
+     */
+    public function isLowerCase()
+    {
+        return Str::isLowerCase($this->value);
+    }
+
+    /**
+     * Checks if a given string contains only upper case characters.
+     *
+     * @return bool
+     */
+    public function isUpperCase()
+    {
+        return Str::isUpperCase($this->value);
+    }
+
+    /**
+     * Checks if a given string contains only puctuation characters.
+     *
+     * @return bool
+     */
+    public function containsPunctuationsOnly()
+    {
+        return Str::containsPunctuationsOnly($this->value);
+    }
+
+    /**
      * Convert the object to a string when JSON encoded.
      *
      * @return string

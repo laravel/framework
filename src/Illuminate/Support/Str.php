@@ -1999,6 +1999,105 @@ class Str
     }
 
     /**
+     * Checks if a given string contains only digits.
+     *
+     * @param  string  $value
+     * @return bool
+     */
+    public static function isNumeric($value)
+    {
+        return ctype_digit($value);
+    }
+
+    /**
+     * Checks if a given string contains only alphabetic characters.
+     *
+     * @param  string  $value
+     * @return bool
+     */
+    public static function isAlphabetic($value)
+    {
+        return ctype_alpha($value);
+    }
+
+    /**
+     * Checks if a given string contains only alphabetic characters and digits.
+     *
+     * @param  string  $value
+     * @return bool
+     */
+    public static function isAlphaNumeric($value)
+    {
+        return ctype_alnum($value);
+    }
+
+    /**
+     * Checks if a given string contains only binary characters.
+     *
+     * @param  string  $value
+     * @return bool
+     */
+    public static function isBinary($value)
+    {
+        return ctype_xdigit($value);
+    }
+
+    /**
+     * Checks if a given string contains only whitespace characters.
+     *
+     * @param  string  $value
+     * @return bool
+     */
+    public static function isWhitespace($value)
+    {
+        return ctype_space($value);
+    }
+
+    /**
+     * Checks if a given string contains only printable characters.
+     *
+     * @param  string  $value
+     * @return bool
+     */
+    public static function isPrintable($value)
+    {
+        return ctype_print($value);
+    }
+
+    /**
+     * Checks if a given string contains only lower case characters.
+     *
+     * @param  string  $value
+     * @return bool
+     */
+    public static function isLowerCase($value)
+    {
+        return ctype_lower($value);
+    }
+
+    /**
+     * Checks if a given string contains only upper case characters.
+     *
+     * @param  string  $value
+     * @return bool
+     */
+    public static function isUpperCase($value)
+    {
+        return ctype_upper($value);
+    }
+
+    /**
+     * Checks if a given string contains only puctuation characters.
+     *
+     * @param  string  $value
+     * @return bool
+     */
+    public static function containsPunctuationsOnly($value)
+    {
+        return ctype_punct($value);
+    }
+
+    /**
      * Remove all strings from the casing caches.
      *
      * @return void

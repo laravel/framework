@@ -1626,6 +1626,37 @@ class SupportStrTest extends TestCase
             $this->assertSame($expected, Str::chopEnd($subject, $needle));
         }
     }
+
+    public function testStringTypes()
+    {
+        $this->assertTrue(Str::isNumeric('123'));
+        $this->assertFalse(Str::isNumeric('A123'));
+
+        $this->assertTrue(Str::isAlphabetic('Abc'));
+        $this->assertFalse(Str::isAlphabetic('123'));
+
+        $this->assertTrue(Str::isAlphaNumeric('Abc123'));
+        $this->assertFalse(Str::isAlphaNumeric('Abc123!'));
+
+        $this->assertTrue(Str::isBinary('0F'));
+        $this->assertFalse(Str::isBinary('0FZ'));
+
+        $this->assertTrue(Str::isWhitespace('   ')); 
+        $this->assertTrue(Str::isWhitespace("\n\r\t"));
+        $this->assertFalse(Str::isWhitespace('Abc'));
+
+        $this->assertTrue(Str::isPrintable('Hello World'));
+        $this->assertFalse(Str::isPrintable("Hello World\n\r\t"));
+
+        $this->assertTrue(Str::isLowerCase('abc'));
+        $this->assertFalse(Str::isLowerCase('ABC'));
+
+        $this->assertTrue(Str::isUpperCase('ABC'));
+        $this->assertFalse(Str::isUpperCase('abc'));
+
+        $this->assertTrue(Str::containsPunctuationsOnly('*&$()!'));
+        $this->assertFalse(Str::containsPunctuationsOnly('Hello World'));
+    }
 }
 
 class StringableObjectStub
