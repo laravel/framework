@@ -119,9 +119,14 @@ class Application extends SymfonyApplication implements ApplicationContract
      */
     protected static function getPhpOptionsWithoutDeprecations()
     {
-        $errorReportingWithoutDeprecations = error_reporting() & ~E_DEPRECATED;
+        $currentErrorReporting = error_reporting();
+        $errorReportingWithoutDeprecations = $currentErrorReporting & ~E_DEPRECATED;
 
-        return '-d error_reporting="' . $errorReportingWithoutDeprecations . '"';
+        if ($currentErrorReporting !== $errorReportingWithoutDeprecations) {
+            return '-d error_reporting="' . $errorReportingWithoutDeprecations . '"';
+        }
+
+        return '';
     }
 
     /**
