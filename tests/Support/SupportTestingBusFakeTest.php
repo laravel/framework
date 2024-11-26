@@ -557,9 +557,13 @@ class SupportTestingBusFakeTest extends TestCase
     {
         $this->fake->chain([new ChainedJobStub])->dispatch();
 
-        $this->expectException(ExpectationFailedException::class);
-
-        $this->fake->assertNothingChained();
+        try {
+            $this->fake->assertNothingDispatched();
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('The following jobs were dispatched unexpectedly:', $e->getMessage());
+            $this->assertStringContainsString(ChainedJobStub::class, $e->getMessage());
+        }
     }
 
     public function testAssertDispatchedWithIgnoreClass()
