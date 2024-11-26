@@ -1641,7 +1641,7 @@ class SupportStrTest extends TestCase
         $this->assertTrue(Str::isBinary('0F'));
         $this->assertFalse(Str::isBinary('0FZ'));
 
-        $this->assertTrue(Str::isWhitespace('   ')); 
+        $this->assertTrue(Str::isWhitespace('   '));
         $this->assertTrue(Str::isWhitespace("\n\r\t"));
         $this->assertFalse(Str::isWhitespace('Abc'));
 
