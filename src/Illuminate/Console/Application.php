@@ -109,7 +109,13 @@ class Application extends SymfonyApplication implements ApplicationContract
     {
         $phpOptions = $silenceDeprecations ? self::getPhpOptionsWithoutDeprecations() : '';
 
-        return sprintf('%s %s %s %s', static::phpBinary(), $phpOptions, static::artisanBinary(), $string);
+        $php = static::phpBinary();
+
+        if ($phpOptions) {
+            $php .= ' ' . $phpOptions;
+        }
+
+        return sprintf('%s %s %s', $php, static::artisanBinary(), $string);
     }
 
     /**
