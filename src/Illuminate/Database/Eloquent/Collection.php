@@ -344,7 +344,7 @@ class Collection extends BaseCollection implements QueueableCollection
      *
      * @return $this
      */
-    public function enableRelationAutoload()
+    public function withRelationAutoload()
     {
         $callback = fn ($path) => $this->loadMissingRelationWithTypes($path);
 
