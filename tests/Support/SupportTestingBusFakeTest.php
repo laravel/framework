@@ -465,7 +465,7 @@ class SupportTestingBusFakeTest extends TestCase
             $this->fail();
         } catch (ExpectationFailedException $e) {
             $this->assertStringContainsString('The following jobs were dispatched unexpectedly:', $e->getMessage());
-            $this->assertStringContainsString(get_class(new BusJobStub), $e->getMessage());
+            $this->assertStringContainsString(BusJobStub::class, $e->getMessage());
         }
     }
 
@@ -557,9 +557,13 @@ class SupportTestingBusFakeTest extends TestCase
     {
         $this->fake->chain([new ChainedJobStub])->dispatch();
 
-        $this->expectException(ExpectationFailedException::class);
-
-        $this->fake->assertNothingChained();
+        try {
+            $this->fake->assertNothingDispatched();
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('The following jobs were dispatched unexpectedly:', $e->getMessage());
+            $this->assertStringContainsString(ChainedJobStub::class, $e->getMessage());
+        }
     }
 
     public function testAssertDispatchedWithIgnoreClass()
@@ -675,12 +679,12 @@ class SupportTestingBusFakeTest extends TestCase
         }
     }
 
-    public function testAssertEmptyPasses()
+    public function testAssertNothingPlacedPasses()
     {
         $this->fake->assertNothingPlaced();
     }
 
-    public function testAssertEmptyFailedWhenJobBatched()
+    public function testAssertNothingPlacedWhenJobBatched()
     {
         $this->fake->batch([new BusJobStub])->dispatch();
 
@@ -689,7 +693,7 @@ class SupportTestingBusFakeTest extends TestCase
         $this->fake->assertNothingPlaced();
     }
 
-    public function testAssertEmptyFailedWhenJobDispatched()
+    public function testAssertNothingPlacedWhenJobDispatched()
     {
         $this->fake->dispatch(new BusJobStub);
 
@@ -698,7 +702,7 @@ class SupportTestingBusFakeTest extends TestCase
         $this->fake->assertNothingPlaced();
     }
 
-    public function testAssertEmptyFailedWhenJobChained()
+    public function testAssertNothingPlacedWhenJobChained()
     {
         $this->fake->chain([new ChainedJobStub])->dispatch();
 
@@ -707,7 +711,7 @@ class SupportTestingBusFakeTest extends TestCase
         $this->fake->assertNothingPlaced();
     }
 
-    public function testAssertEmptyFailedWhenJobDispatchedNow()
+    public function testAssertNothingPlacedWhenJobDispatchedNow()
     {
         $this->fake->dispatchNow(new BusJobStub);
 
