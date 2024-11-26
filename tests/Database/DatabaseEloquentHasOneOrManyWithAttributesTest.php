@@ -135,6 +135,26 @@ class DatabaseEloquentHasOneOrManyWithAttributesTest extends TestCase
         $this->assertSame($parentId, $relatedModel->parent_id);
         $this->assertSame($value, $relatedModel->$key);
     }
+
+    public function testAttributesCanBeAppended(): void
+    {
+        $parent = new RelatedWithAttributesModel;
+
+        $relationship = $parent
+            ->hasMany(RelatedWithAttributesModel::class, 'parent_id')
+            ->withAttributes(['a' => 'A'])
+            ->withAttributes(['b' => 'B'])
+            ->withAttributes(['a' => 'AA']);
+
+        $relatedModel = $relationship->make([
+            'b' => 'BB',
+            'c' => 'C',
+        ]);
+
+        $this->assertSame('AA', $relatedModel->a);
+        $this->assertSame('BB', $relatedModel->b);
+        $this->assertSame('C', $relatedModel->c);
+    }
 }
 
 class RelatedWithAttributesModel extends Model {}
