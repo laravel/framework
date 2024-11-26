@@ -115,6 +115,26 @@ class DatabaseEloquentHasOneOrManyWithAttributesTest extends TestCase
 
         $this->assertSame($value, $relatedModel->$key);
     }
+
+    public function testQueryingDoesNotBreakWither(): void
+    {
+        $parentId = 123;
+        $key = 'a key';
+        $value = 'the value';
+
+        $parent = new RelatedWithAttributesModel;
+        $parent->id = $parentId;
+
+        $relationship = $parent
+            ->hasMany(RelatedWithAttributesModel::class, 'parent_id')
+            ->where($key, $value)
+            ->withAttributes([$key => $value]);
+
+        $relatedModel = $relationship->make();
+
+        $this->assertSame($parentId, $relatedModel->parent_id);
+        $this->assertSame($value, $relatedModel->$key);
+    }
 }
 
 class RelatedWithAttributesModel extends Model {}
