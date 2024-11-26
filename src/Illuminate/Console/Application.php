@@ -112,7 +112,7 @@ class Application extends SymfonyApplication implements ApplicationContract
         $php = static::phpBinary();
 
         if ($phpOptions) {
-            $php .= ' ' . $phpOptions;
+            $php .= ' '.$phpOptions;
         }
 
         return sprintf('%s %s %s', $php, static::artisanBinary(), $string);
@@ -129,7 +129,7 @@ class Application extends SymfonyApplication implements ApplicationContract
         $errorReportingWithoutDeprecations = $currentErrorReporting & ~E_DEPRECATED;
 
         if ($currentErrorReporting !== $errorReportingWithoutDeprecations) {
-            return '-d error_reporting="' . $errorReportingWithoutDeprecations . '"';
+            return '-d error_reporting="'.$errorReportingWithoutDeprecations.'"';
         }
 
         return '';
