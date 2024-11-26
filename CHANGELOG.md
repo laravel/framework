@@ -1,6 +1,10 @@
 # Release Notes for 11.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v11.34.0...11.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v11.34.1...11.x)
+
+## [v11.34.1](https://github.com/laravel/framework/compare/v11.34.0...v11.34.1) - 2024-11-26
+
+* Configure cloud log socket by [@taylorotwell](https://github.com/taylorotwell) in https://github.com/laravel/framework/pull/53666
 
 ## [v11.34.0](https://github.com/laravel/framework/compare/v11.33.2...v11.34.0) - 2024-11-26
 
