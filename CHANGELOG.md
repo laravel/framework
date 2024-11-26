@@ -1,6 +1,10 @@
 # Release Notes for 10.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v10.48.24...10.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v10.48.25...10.x)
+
+## [v10.48.25](https://github.com/laravel/framework/compare/v10.48.24...v10.48.25) - 2024-11-26
+
+* [10.x] PHP 8.4 Code Compatibility by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/53612
 
 ## [v10.48.24](https://github.com/laravel/framework/compare/v10.48.23...v10.48.24) - 2024-11-20
 
