@@ -453,7 +453,7 @@ abstract class HasOneOrMany extends Relation
         $model->setAttribute($this->getForeignKeyName(), $this->getParentKey());
 
         foreach ($this->pendingAttributes as $key => $value) {
-            if (!$model->hasAttribute($key)) {
+            if (! $model->hasAttribute($key)) {
                 $model->setAttribute($key, $value);
             }
         }

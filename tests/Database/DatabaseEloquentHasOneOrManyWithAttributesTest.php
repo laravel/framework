@@ -104,7 +104,6 @@ class DatabaseEloquentHasOneOrManyWithAttributesTest extends TestCase
         $defaultValue = 'a value';
         $value = 'the value';
 
-        RelatedWithAttributesModel::unguard();
         $parent = new RelatedWithAttributesModel;
 
         $relationship = $parent
@@ -157,4 +156,7 @@ class DatabaseEloquentHasOneOrManyWithAttributesTest extends TestCase
     }
 }
 
-class RelatedWithAttributesModel extends Model {}
+class RelatedWithAttributesModel extends Model
+{
+    protected $guarded = [];
+}
