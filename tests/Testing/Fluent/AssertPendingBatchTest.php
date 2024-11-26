@@ -7,6 +7,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Testing\Fakes\PendingBatchFake;
 use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\AssertionFailedError;
 
 class AssertPendingBatchTest extends TestCase
 {
@@ -147,6 +148,41 @@ class AssertPendingBatchTest extends TestCase
         );
     }
 
+    public function test_equal_with_nested_jobs_in_pending_batch()
+    {
+        Bus::fake();
+
+        Bus::batch([
+            new AJob(1),
+            [
+                new BJob(2, 3),
+                new CJob,
+                new DJob(4),
+            ],
+            [
+                new AJob(1, 2),
+                new BJob,
+            ],
+            new CJob,
+        ])->dispatch();
+
+        Bus::assertBatched(fn (PendingBatchFake $assert) =>
+            $assert->equal([
+                AJob::class => [1],
+                [
+                    BJob::class => [2, 3],
+                    CJob::class,
+                    DJob::class => [4],
+                ],
+                [
+                    AJob::class => [1, 2],
+                    BJob::class,
+                ],
+                CJob::class,
+            ])
+        );
+    }
+
     public function test_etc_with_additional_job()
     {
         Bus::fake();
@@ -165,6 +201,136 @@ class AssertPendingBatchTest extends TestCase
                 ->etc()
         );
     }
+
+    public function test_etc_with_different_order()
+    {
+        Bus::fake();
+
+        Bus::batch([
+            new AJob,
+            new BJob,
+            new CJob,
+            new DJob,
+        ])->dispatch();
+
+        Bus::assertBatched(fn (PendingBatchFake $assert) =>
+            $assert->has(CJob::class)
+                ->has(AJob::class)
+                ->has(BJob::class)
+                ->etc()
+        );
+    }
+
+    public function test_etc_with_single_duplicate()
+    {
+        Bus::fake();
+
+        Bus::batch([
+            new AJob,
+            new BJob,
+            new AJob,
+            new CJob,
+            new DJob,
+        ])->dispatch();
+
+        Bus::assertBatched(fn (PendingBatchFake $assert) =>
+            $assert->has(AJob::class)
+                ->has(BJob::class)
+                ->has(AJob::class)
+                ->has(CJob::class)
+                ->etc()
+        );
+    }
+
+    public function test_etc_with_multiple_duplicates()
+    {
+        Bus::fake();
+
+        Bus::batch([
+            new AJob,
+            new BJob,
+            new AJob,
+            new BJob,
+            new CJob,
+            new DJob,
+        ])->dispatch();
+
+        Bus::assertBatched(fn (PendingBatchFake $assert) =>
+            $assert->has(AJob::class)
+                ->has(BJob::class)
+                ->has(AJob::class)
+                ->has(BJob::class)
+                ->has(CJob::class)
+                ->etc()
+        );
+    }
+
+    public function test_etc_with_reordered_duplicates()
+    {
+        Bus::fake();
+
+        Bus::batch([
+            new AJob,
+            new BJob,
+            new AJob,
+            new CJob,
+            new DJob,
+        ])->dispatch();
+
+        Bus::assertBatched(fn (PendingBatchFake $assert) =>
+            $assert->has(BJob::class)
+                ->has(AJob::class)
+                ->has(CJob::class)
+                ->has(AJob::class)
+                ->etc()
+        );
+    }
+
+    public function test_etc_with_no_unexpected_jobs()
+    {
+        Bus::fake();
+
+        Bus::batch([
+            new AJob,
+            new BJob,
+        ])->dispatch();
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Failed to assert that there are unexpected jobs in the batch.');
+
+        Bus::assertBatched(fn (PendingBatchFake $assert) =>
+            $assert->has(AJob::class)
+                ->has(BJob::class)
+                ->etc()
+        );
+    }
+
+    public function test_etc_with_nested_jobs()
+    {
+        Bus::fake();
+
+        Bus::batch([
+            [
+                new AJob,
+                new BJob,
+            ],
+            new CJob,
+            [
+                new CJob,
+                new DJob,
+            ],
+        ])->dispatch();
+
+        Bus::assertBatched(fn (PendingBatchFake $assert) =>
+            $assert->first(fn (PendingBatchFake $assert) =>
+                    $assert->has(AJob::class)
+                        ->has(BJob::class)
+                )
+                ->nth(1, fn (PendingBatchFake $assert) =>
+                    $assert->has(CJob::class)
+                )->etc()
+        );
+    }
 }
 
 trait Parameterable
@@ -176,22 +342,27 @@ trait Parameterable
     }
 }
 
-class AJob {
+class AJob
+{
     use Queueable, Batchable, Parameterable;
 }
 
-class BJob {
+class BJob
+{
     use Queueable, Batchable, Parameterable;
 }
 
-class CJob {
+class CJob
+{
     use Queueable, Batchable, Parameterable;
 }
 
-class DJob {
+class DJob
+{
     use Queueable, Batchable, Parameterable;
 }
 
-class EJob {
+class EJob
+{
     use Queueable, Batchable, Parameterable;
 }
