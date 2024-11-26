@@ -104,8 +104,19 @@ class Application extends SymfonyApplication implements ApplicationContract
      * @param  string  $string
      * @return string
      */
-    public static function formatCommandString($string)
+    public static function formatCommandString($string, $silenceDeprecations = false)
     {
+        if ($silenceDeprecations) {
+            $errorReportingWithoutDeprecations = error_reporting() & ~E_DEPRECATED;
+
+            return sprintf('%s %s %s %s',
+                static::phpBinary(),
+                '-d error_reporting="' . $errorReportingWithoutDeprecations . '"',
+                static::artisanBinary(),
+                'invoke-serialized-closure'
+            );
+        }
+
         return sprintf('%s %s %s', static::phpBinary(), static::artisanBinary(), $string);
     }
 
