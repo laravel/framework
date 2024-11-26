@@ -465,7 +465,7 @@ class SupportTestingBusFakeTest extends TestCase
             $this->fail();
         } catch (ExpectationFailedException $e) {
             $this->assertStringContainsString('The following jobs were dispatched unexpectedly:', $e->getMessage());
-            $this->assertStringContainsString(get_class(new BusJobStub), $e->getMessage());
+            $this->assertStringContainsString(BusJobStub::class, $e->getMessage());
         }
     }
 
