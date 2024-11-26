@@ -675,12 +675,12 @@ class SupportTestingBusFakeTest extends TestCase
         }
     }
 
-    public function testAssertEmptyPasses()
+    public function testAssertNothingPlacedPasses()
     {
         $this->fake->assertNothingPlaced();
     }
 
-    public function testAssertEmptyFailedWhenJobBatched()
+    public function testAssertNothingPlacedWhenJobBatched()
     {
         $this->fake->batch([new BusJobStub])->dispatch();
 
@@ -689,7 +689,7 @@ class SupportTestingBusFakeTest extends TestCase
         $this->fake->assertNothingPlaced();
     }
 
-    public function testAssertEmptyFailedWhenJobDispatched()
+    public function testAssertNothingPlacedWhenJobDispatched()
     {
         $this->fake->dispatch(new BusJobStub);
 
@@ -698,7 +698,7 @@ class SupportTestingBusFakeTest extends TestCase
         $this->fake->assertNothingPlaced();
     }
 
-    public function testAssertEmptyFailedWhenJobChained()
+    public function testAssertNothingPlacedWhenJobChained()
     {
         $this->fake->chain([new ChainedJobStub])->dispatch();
 
@@ -707,7 +707,7 @@ class SupportTestingBusFakeTest extends TestCase
         $this->fake->assertNothingPlaced();
     }
 
-    public function testAssertEmptyFailedWhenJobDispatchedNow()
+    public function testAssertNothingPlacedWhenJobDispatchedNow()
     {
         $this->fake->dispatchNow(new BusJobStub);
 
