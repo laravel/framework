@@ -5,7 +5,7 @@ namespace Illuminate\Support;
 use Illuminate\Contracts\Support\Arrayable;
 use Stringable;
 
-class UrlString implements Stringable, Arrayable
+class UrlString implements Arrayable, Stringable
 {
     /**
      * The URL parts.
