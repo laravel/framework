@@ -233,6 +233,29 @@ class ResourceTest extends TestCase
         ]);
     }
 
+    public function testResourcesCanSetWithoutWrappingAfterCreatingInstance()
+    {
+        Route::get('/', function () {
+            $resource = new PostResource(new Post([
+                'id' => 5,
+                'title' => 'Test Title',
+            ]));
+
+            $resource::withoutWrapping();
+
+            return $resource;
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertJson([
+            'id' => 5,
+            'title' => 'Test Title',
+        ]);
+    }
+
     public function testResourcesMayHaveOptionalValues()
     {
         Route::get('/', function () {

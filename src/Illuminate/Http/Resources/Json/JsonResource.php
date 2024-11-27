@@ -50,6 +50,13 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     public $wrapper = null;
 
     /**
+     * Indicates if the wrapper has been set on this instance
+     *
+     * @var bool
+     */
+    public $wrapperSet = false;
+
+    /**
      * The "data" wrapper that should be applied.
      *
      * @var string|null
@@ -65,8 +72,6 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     public function __construct($resource)
     {
         $this->resource = $resource;
-
-        $this->withWrapper(static::$wrap);
     }
 
     /**
@@ -218,6 +223,7 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     public function withWrapper(?string $value)
     {
         $this->wrapper = $value;
+        $this->wrapperSet = true;
 
         return $this;
     }
