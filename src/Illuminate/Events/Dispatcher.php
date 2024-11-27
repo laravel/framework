@@ -4,11 +4,13 @@ namespace Illuminate\Events;
 
 use Closure;
 use Exception;
+use Fiber;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Broadcasting\Factory as BroadcastFactory;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Container\Container as ContainerContract;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
+use Illuminate\Contracts\Events\RunsOnFiber;
 use Illuminate\Contracts\Events\ShouldDispatchAfterCommit;
 use Illuminate\Contracts\Events\ShouldHandleEventsAfterCommit;
 use Illuminate\Contracts\Queue\ShouldBeEncrypted;
@@ -514,6 +516,10 @@ class Dispatcher implements DispatcherContract
      */
     protected function parseClassCallable($listener)
     {
+        if (in_array(RunsOnFiber::class, class_uses_recursive($listener))) {
+            return Str::parseCallback($listener, 'handleWithFiber');
+        }
+
         return Str::parseCallback($listener, 'handle');
     }
 

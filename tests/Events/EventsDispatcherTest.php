@@ -4,8 +4,11 @@ namespace Illuminate\Tests\Events;
 
 use Error;
 use Exception;
+use Fiber;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Events\RunsOnFiber;
 use Illuminate\Events\Dispatcher;
+use Illuminate\Support\Facades\Event;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -582,6 +585,30 @@ class EventsDispatcherTest extends TestCase
         $d->dispatch('myEvent', 'somePayload');
 
         unset($_SERVER['__event.test']);
+    }
+
+    public function testDispatchesEventsRunningOnFibersUsingTrait()
+    {
+        unset($_SERVER['__event.test']);
+        $d = new Dispatcher;
+        $d->listen('foo', FiberListener::class);
+
+        $response = $d->dispatch('foo', ['bar']);
+
+        $this->assertEquals([null], $response);
+        $this->assertSame('bar', $_SERVER['__event.test']);
+        $this->assertNotNull($_SERVER['__event.test.fiber']);
+    }
+}
+
+class FiberListener
+{
+    use RunsOnFiber;
+
+    public function handle($value)
+    {
+        $_SERVER['__event.test'] = $value;
+        $_SERVER['__event.test.fiber'] = Fiber::getCurrent();
     }
 }
 
