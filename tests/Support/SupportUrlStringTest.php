@@ -143,4 +143,4 @@ class SupportUrlStringTest extends TestCase
             (new UrlString($url))->toArray()
         );
     }
-}#
+}
