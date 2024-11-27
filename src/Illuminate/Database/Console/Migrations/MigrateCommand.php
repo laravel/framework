@@ -306,10 +306,10 @@ class MigrateCommand extends BaseCommand implements Isolatable
             return $this->option('schema-path');
         }
 
-        if (file_exists($path = database_path('schema/'.$connection->getName().'-schema.dump'))) {
+        if (file_exists($path = database_path('schema'.DIRECTORY_SEPARATOR.$connection->getName().'-schema.dump'))) {
             return $path;
         }
 
-        return database_path('schema/'.$connection->getName().'-schema.sql');
+        return database_path('schema'.DIRECTORY_SEPARATOR.$connection->getName().'-schema.sql');
     }
 }
