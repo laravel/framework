@@ -1,6 +1,13 @@
 # Release Notes for 11.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v11.34.1...11.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v11.34.2...11.x)
+
+## [v11.34.2](https://github.com/laravel/framework/compare/v11.34.1...v11.34.2) - 2024-11-27
+
+* Revert "[11.x] Add non-static JsonResource wrapping" by [@taylorotwell](https://github.com/taylorotwell) in https://github.com/laravel/framework/pull/53686
+* [11.x] groupBy() return type phpdoc by [@lorenzolosa](https://github.com/lorenzolosa) in https://github.com/laravel/framework/pull/53684
+* [11.x] Fix `withoutOverlapping` for grouped scheduled closures by [@istiak-tridip](https://github.com/istiak-tridip) in https://github.com/laravel/framework/pull/53680
+* [11.x] Fix `ResendTransport` missing custom headers by [@lucasmichot](https://github.com/lucasmichot) in https://github.com/laravel/framework/pull/53687
 
 ## [v11.34.1](https://github.com/laravel/framework/compare/v11.34.0...v11.34.1) - 2024-11-26
 
