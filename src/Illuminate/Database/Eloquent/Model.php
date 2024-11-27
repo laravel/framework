@@ -1622,12 +1622,13 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * @param  string  $table
      * @param  bool  $exists
      * @param  string|null  $using
+     * @param  \Illuminate\Database\Eloquent\Model|null  $related
      * @return \Illuminate\Database\Eloquent\Relations\Pivot
      */
-    public function newPivot(self $parent, array $attributes, $table, $exists, $using = null)
+    public function newPivot(self $parent, array $attributes, $table, $exists, $using = null, ?self $related = null)
     {
-        return $using ? $using::fromRawAttributes($parent, $attributes, $table, $exists)
-            : Pivot::fromAttributes($parent, $attributes, $table, $exists);
+        return $using ? $using::fromRawAttributes($parent, $attributes, $table, $exists, $related)
+            : Pivot::fromAttributes($parent, $attributes, $table, $exists, $related);
     }
 
     /**
