@@ -50,7 +50,7 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     public $wrapper = null;
 
     /**
-     * Indicates if the wrapper has been set on this instance
+     * Indicates if the wrapper has been set on this instance.
      *
      * @var bool
      */
