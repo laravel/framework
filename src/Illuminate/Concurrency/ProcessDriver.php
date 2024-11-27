@@ -28,7 +28,7 @@ class ProcessDriver implements Driver
      */
     public function run(Closure|array $tasks): array
     {
-        $command = Application::formatCommandString('invoke-serialized-closure', true);
+        $command = Application::formatCommandString('invoke-serialized-closure', silenceDeprecations: true);
 
         $results = $this->processFactory->pool(function (Pool $pool) use ($tasks, $command) {
             foreach (Arr::wrap($tasks) as $task) {

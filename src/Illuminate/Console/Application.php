@@ -126,6 +126,7 @@ class Application extends SymfonyApplication implements ApplicationContract
     protected static function getPhpOptionsWithoutDeprecations()
     {
         $currentErrorReporting = error_reporting();
+
         $errorReportingWithoutDeprecations = $currentErrorReporting & ~E_DEPRECATED;
 
         if ($currentErrorReporting !== $errorReportingWithoutDeprecations) {
