@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Foundation;
 
 use Exception;
 use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Orchestra\Testbench\Attributes\WithConfig;
@@ -142,6 +143,40 @@ class FoundationHelpersTest extends TestCase
 
         // Should fallback to en_US
         $this->assertSame('Australian Capital Territory', fake()->state());
+    }
+
+    public function testStatusCodeResponsesWithIntegers()
+    {
+        $code = Arr::random([100, 200, 201, 400, 409, 422, 500, 503]);
+
+        Route::get('test-status-helper', fn () => status($code));
+
+        $response = $this->get('/test-status-helper');
+
+        $response->assertStatus($code);
+        $response->assertContent('');
+    }
+
+    public function testStatusCodeResponsesWithMethodNames()
+    {
+        $status = Arr::random([100 => 'continue', 200 => 'ok', 405 => 'methodNotAllowed', 418 => 'iAmATeapot', 503 => 'serviceUnavailable'], 1, preserveKeys: true);
+        $code = key($status);
+        $name = current($status);
+
+        Route::get('test-status-helper', fn () => status()->$name());
+
+        $response = $this->get('/test-status-helper');
+
+        $response->assertStatus($code);
+        $response->assertContent('');
+    }
+
+    public function testStatusCodeResponsesThrowsException()
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Invalid status code method: unknownName');
+
+        status()->unknownName();
     }
 
     protected function makeManifest($directory = '')

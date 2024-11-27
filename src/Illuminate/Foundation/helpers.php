@@ -21,6 +21,7 @@ use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\HtmlString;
+use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response;
 
 if (! function_exists('abort')) {
@@ -902,6 +903,36 @@ if (! function_exists('session')) {
         }
 
         return app('session')->get($key, $default);
+    }
+}
+
+if (! function_exists('status')) {
+    /**
+     * Create a response with the given code.
+     *
+     * @param  int|null  $code
+     * @return ($code is null ? object : \Illuminate\Http\Response)
+     *
+     * @throws RuntimeException
+     */
+    function status($code = null)
+    {
+        if (! is_null($code)) {
+            return response()->noContent($code);
+        }
+
+        return new class
+        {
+            public function __call(string $name, array $arguments)
+            {
+                $constant = 'Symfony\Component\HttpFoundation\Response::HTTP_'.Str::upper(Str::snake($name));
+                if (! defined($constant)) {
+                    throw new RuntimeException('Invalid status code method: '.$name);
+                }
+
+                return response()->noContent(constant($constant));
+            }
+        };
     }
 }
 
