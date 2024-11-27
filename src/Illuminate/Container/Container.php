@@ -1130,9 +1130,9 @@ class Container implements ArrayAccess, ContainerContract
                         : $this->make($className);
         }
 
-        // If we can not resolve the class instance, we will check to see if the
-        // value is variadic, and if it is we will return an empty array as the
-        // value of the dependency, similarly to how we do this with scalars.
+        // If we can not resolve the class instance, we will check to see if the value
+        // is variadic. If it is, we will return an empty array as the value of the
+        // dependency similarly to how we handle scalar values in this situation.
         catch (BindingResolutionException $e) {
             if ($parameter->isVariadic()) {
                 array_pop($this->with);
