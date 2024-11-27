@@ -46,6 +46,10 @@ class PendingEventAttributes
             $event->timezone($this->timezone);
         }
 
+        if ($this->description !== null) {
+            $event->name($this->description);
+        }
+
         if ($this->user !== null) {
             $event->user = $this->user;
         }
