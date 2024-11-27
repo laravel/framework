@@ -184,7 +184,7 @@ class Schedule
                 : $job::class;
         }
 
-        return $this->call(function () use ($job, $queue, $connection) {
+        return $this->name($jobName)->call(function () use ($job, $queue, $connection) {
             $job = is_string($job) ? Container::getInstance()->make($job) : $job;
 
             if ($job instanceof ShouldQueue) {
@@ -192,7 +192,7 @@ class Schedule
             } else {
                 $this->dispatchNow($job);
             }
-        })->name($jobName);
+        });
     }
 
     /**
