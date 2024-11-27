@@ -239,6 +239,16 @@ class UrlString implements Stringable, Arrayable
     }
 
     /**
+     * Removes the fragment.
+     */
+    public function withoutFragment(): static
+    {
+        $this->parts['fragment'] = null;
+
+        return $this;
+    }
+
+    /**
      * Build the URL from the parts.
      */
     public function build(): string

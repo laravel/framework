@@ -109,8 +109,10 @@ class SupportUrlStringTest extends TestCase
         $this->assertNull($url->getFragment());
 
         $url->setFragment('eloquent');
-
         $this->assertSame('eloquent', $url->getFragment());
+
+        $url->withoutFragment();
+        $this->assertNull($url->getFragment());
     }
 
     public function testToString(): void
