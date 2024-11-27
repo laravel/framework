@@ -1143,10 +1143,10 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function booted($callback)
     {
-        $this->bootedCallbacks[] = $callback;
-
         if ($this->isBooted()) {
             $callback($this);
+        } else {
+            $this->bootedCallbacks[] = $callback;
         }
     }
 
