@@ -1052,6 +1052,12 @@ class Blueprint
                 ->referencesModelColumn($model->getKeyName());
         }
 
+        if ($model->getKeyType() === 'int') {
+            return $this->foreignId($column)
+                ->table($model->getTable())
+                ->referencesModelColumn($model->getKeyName());
+        }
+
         return $this->foreignUuid($column)
             ->table($model->getTable())
             ->referencesModelColumn($model->getKeyName());
