@@ -405,6 +405,22 @@ class DatabaseSchemaBlueprintTest extends TestCase
         ], $blueprint->toSql($connection, new MySqlGrammar));
     }
 
+    public function testGenerateRelationshipColumnWithNonIncrementalModel()
+    {
+        require_once __DIR__.'/stubs/EloquentModelNonIncrementedIntStub.php';
+        $base = new Blueprint('posts', function ($table) {
+            $table->foreignIdFor('EloquentModelNonIncrementedIntStub');
+        });
+
+        $connection = m::mock(Connection::class);
+
+        $blueprint = clone $base;
+
+        $this->assertEquals([
+            'alter table `posts` add `eloquent_model_non_incremented_int_stub_id` bigint unsigned not null',
+        ], $blueprint->toSql($connection, new MySqlGrammar));
+    }
+
     public function testGenerateRelationshipColumnWithUuidModel()
     {
         require_once __DIR__.'/stubs/EloquentModelUuidStub.php';
