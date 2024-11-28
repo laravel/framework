@@ -365,6 +365,10 @@ class FoundationApplicationTest extends TestCase
             $this->assertSame($application, $app);
         };
 
+        $closure2Booted = function ($app) use ($closure2) {
+            $app->booted($closure2);
+        };
+
         $closure3 = function ($app) use (&$counter, $application) {
             $counter++;
             $this->assertSame($application, $app);
@@ -373,13 +377,14 @@ class FoundationApplicationTest extends TestCase
         $application->booting($closure);
         $application->booted($closure);
         $application->booted($closure2);
+        $application->booted($closure2Booted);
         $application->boot();
 
-        $this->assertEquals(3, $counter);
+        $this->assertEquals(4, $counter);
 
         $application->booted($closure3);
 
-        $this->assertEquals(4, $counter);
+        $this->assertEquals(5, $counter);
     }
 
     public function testGetNamespace()

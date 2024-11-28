@@ -76,6 +76,13 @@ class Application extends Container implements ApplicationContract, CachesConfig
     protected $booted = false;
 
     /**
+     * Indicates if the application is currently firing booted callbacks.
+     *
+     * @var bool
+     */
+    protected $firingBootedCallbacks = false;
+
+    /**
      * The array of booting callbacks.
      *
      * @var callable[]
@@ -1083,6 +1090,16 @@ class Application extends Container implements ApplicationContract, CachesConfig
     }
 
     /**
+     * Determine if the application is currently firing booted callbacks.
+     *
+     * @return bool
+     */
+    public function isFiringBootedCallbacks()
+    {
+        return $this->firingBootedCallbacks;
+    }
+
+    /**
      * Boot the application's service providers.
      *
      * @return void
@@ -1103,8 +1120,13 @@ class Application extends Container implements ApplicationContract, CachesConfig
         });
 
         $this->booted = true;
+        $this->firingBootedCallbacks = true;
 
-        $this->fireAppCallbacks($this->bootedCallbacks);
+        try {
+            $this->fireAppCallbacks($this->bootedCallbacks);
+        } finally {
+            $this->firingBootedCallbacks = false;
+        }
     }
 
     /**
@@ -1145,7 +1167,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     {
         $this->bootedCallbacks[] = $callback;
 
-        if ($this->isBooted()) {
+        if ($this->isBooted() && ! $this->isFiringBootedCallbacks()) {
             $callback($this);
         }
     }
