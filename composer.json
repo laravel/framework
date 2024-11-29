@@ -118,7 +118,7 @@
         "resend/resend-php": "^0.10.0",
         "symfony/cache": "^7.0.3",
         "symfony/http-client": "^7.0.3",
-        "symfony/psr-http-message-bridge": "^7.1",
+        "symfony/psr-http-message-bridge": "^7.0.3",
         "symfony/translation": "^7.0.3"
     },
     "conflict": {
@@ -196,7 +196,7 @@
         "symfony/http-client": "Required to enable support for the Symfony API mail transports (^7.0).",
         "symfony/mailgun-mailer": "Required to enable support for the Mailgun mail transport (^7.0).",
         "symfony/postmark-mailer": "Required to enable support for the Postmark mail transport (^7.0).",
-        "symfony/psr-http-message-bridge": "Required to use PSR-7 bridging features (^7.1)."
+        "symfony/psr-http-message-bridge": "Required to use PSR-7 bridging features (^7.0)."
     },
     "config": {
         "sort-packages": true,
