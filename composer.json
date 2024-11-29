@@ -109,17 +109,17 @@
         "league/flysystem-read-only": "^3.25.1",
         "league/flysystem-sftp-v3": "^3.25.1",
         "mockery/mockery": "^1.6.10",
-        "nyholm/psr7": "^1.2",
         "orchestra/testbench-core": "^9.6",
         "pda/pheanstalk": "^5.0.6",
+        "php-http/discovery": "^1.15",
         "phpstan/phpstan": "^1.11.5",
         "phpunit/phpunit": "^10.5.35|^11.3.6",
         "predis/predis": "^2.3",
         "resend/resend-php": "^0.10.0",
         "symfony/cache": "^7.0.3",
         "symfony/http-client": "^7.0.3",
-        "symfony/translation": "^7.0.3",
-        "symfony/psr-http-message-bridge": "^7.0.3"
+        "symfony/psr-http-message-bridge": "^7.0.3",
+        "symfony/translation": "^7.0.3"
     },
     "conflict": {
         "mockery/mockery": "1.6.8",
@@ -184,8 +184,8 @@
         "league/flysystem-read-only": "Required to use read-only disks (^3.25.1)",
         "league/flysystem-sftp-v3": "Required to use the Flysystem SFTP driver (^3.25.1).",
         "mockery/mockery": "Required to use mocking (^1.6).",
-        "nyholm/psr7": "Required to use PSR-7 bridging features (^1.2).",
         "pda/pheanstalk": "Required to use the beanstalk queue driver (^5.0).",
+        "php-http/discovery": "Required to use PSR-7 bridging features (^1.15).",
         "phpunit/phpunit": "Required to use assertions and run tests (^10.5|^11.0).",
         "predis/predis": "Required to use the predis connector (^2.3).",
         "psr/http-message": "Required to allow Storage::put to accept a StreamInterface (^1.0).",
@@ -201,7 +201,8 @@
     "config": {
         "sort-packages": true,
         "allow-plugins": {
-            "composer/package-versions-deprecated": true
+            "composer/package-versions-deprecated": true,
+            "php-http/discovery": false
         }
     },
     "minimum-stability": "stable",

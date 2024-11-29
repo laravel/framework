@@ -41,11 +41,14 @@
     },
     "suggest": {
         "illuminate/console": "Required to use the make commands (^11.0).",
-        "nyholm/psr7": "Required to use PSR-7 bridging features (^1.2).",
+        "php-http/discovery": "Required to use PSR-7 bridging features (^1.15).",
         "symfony/psr-http-message-bridge": "Required to use PSR-7 bridging features (^7.0)."
     },
     "config": {
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "php-http/discovery": false
+        }
     },
     "minimum-stability": "dev"
 }
