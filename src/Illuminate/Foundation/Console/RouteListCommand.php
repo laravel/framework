@@ -116,11 +116,7 @@ class RouteListCommand extends Command
             return $this->getRouteInformation($route);
         })->filter()->all();
 
-        if (($sort = $this->option('sort')) !== null) {
-            $routes = $this->sortRoutes($sort, $routes);
-        } else {
-            $routes = $this->sortRoutes('uri', $routes);
-        }
+        $routes = $this->sortRoutes($this->option('sort'), $routes);
 
         if ($this->option('reverse')) {
             $routes = array_reverse($routes);
@@ -157,6 +153,11 @@ class RouteListCommand extends Command
      */
     protected function sortRoutes($sort, array $routes)
     {
+
+        if ($sort === 'precedence') {
+            return $routes;
+        }
+
         if (Str::contains($sort, ',')) {
             $sort = explode(',', $sort);
         }
@@ -495,7 +496,7 @@ class RouteListCommand extends Command
             ['path', null, InputOption::VALUE_OPTIONAL, 'Only show routes matching the given path pattern'],
             ['except-path', null, InputOption::VALUE_OPTIONAL, 'Do not display the routes matching the given path pattern'],
             ['reverse', 'r', InputOption::VALUE_NONE, 'Reverse the ordering of the routes'],
-            ['sort', null, InputOption::VALUE_OPTIONAL, 'The column (domain, method, uri, name, action, middleware) to sort by', 'uri'],
+            ['sort', null, InputOption::VALUE_OPTIONAL, 'The column (domain, method, uri, name, action, middleware, precedence) to sort by', 'uri'],
             ['except-vendor', null, InputOption::VALUE_NONE, 'Do not display routes defined by vendor packages'],
             ['only-vendor', null, InputOption::VALUE_NONE, 'Only display routes defined by vendor packages'],
         ];
