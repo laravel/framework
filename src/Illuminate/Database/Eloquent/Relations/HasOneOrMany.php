@@ -35,7 +35,9 @@ abstract class HasOneOrMany extends Relation
     protected $localKey;
 
     /**
-     * Attributes to be added on new instances on related models.
+     * Attributes to be added to new instances of related models.
+     *
+     * @var array
      */
     protected array $pendingAttributes = [];
 
@@ -519,6 +521,19 @@ abstract class HasOneOrMany extends Relation
     }
 
     /**
+     * Add attributes to be added to new instances of related models.
+     *
+     * @param  array  $attributes
+     * @return $this
+     */
+    public function withAttributes(array $attributes): static
+    {
+        $this->pendingAttributes = array_merge($this->pendingAttributes, $attributes);
+
+        return $this;
+    }
+
+    /**
      * Get the key for comparing against the parent key in "has" query.
      *
      * @return string
@@ -578,15 +593,5 @@ abstract class HasOneOrMany extends Relation
     public function getLocalKeyName()
     {
         return $this->localKey;
-    }
-
-    /**
-     * Add attributes to be added to new instances of related models.
-     */
-    public function withAttributes(array $attributes): static
-    {
-        $this->pendingAttributes = array_merge($this->pendingAttributes, $attributes);
-
-        return $this;
     }
 }
