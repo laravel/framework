@@ -7,7 +7,7 @@ class ModelIdentifier
     /**
      * The class name of the model.
      *
-     * @var string
+     * @var class-string<\Illuminate\Database\Eloquent\Model>
      */
     public $class;
 
@@ -37,14 +37,14 @@ class ModelIdentifier
     /**
      * The class name of the model collection.
      *
-     * @var string|null
+     * @var class-string<\Illuminate\Database\Eloquent\Collection>|null
      */
     public $collectionClass;
 
     /**
      * Create a new model identifier.
      *
-     * @param  string  $class
+     * @param  class-string<\Illuminate\Database\Eloquent\Model>  $class
      * @param  mixed  $id
      * @param  array  $relations
      * @param  mixed  $connection
@@ -61,7 +61,7 @@ class ModelIdentifier
     /**
      * Specify the collection class that should be used when serializing / restoring collections.
      *
-     * @param  string|null  $collectionClass
+     * @param  class-string<\Illuminate\Database\Eloquent\Collection>  $collectionClass
      * @return $this
      */
     public function useCollectionClass(?string $collectionClass)

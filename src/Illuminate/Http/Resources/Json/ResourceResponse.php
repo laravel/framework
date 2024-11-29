@@ -102,13 +102,11 @@ class ResourceResponse implements Responsable
     /**
      * Get the default data wrapper for the resource.
      *
-     * @return string|null
+     * @return string
      */
     protected function wrapper()
     {
-        return $this->resource instanceof JsonResource
-            ? $this->resource->wrapper
-            : get_class($this->resource)::$wrap;
+        return get_class($this->resource)::$wrap;
     }
 
     /**

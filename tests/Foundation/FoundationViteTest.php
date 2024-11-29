@@ -1484,7 +1484,7 @@ class FoundationViteTest extends TestCase
                     return link
                 }
 
-                const fragment = new DocumentFragment
+                const fragment = new DocumentFragment;
                 {$expectedAssets}.forEach((asset) => fragment.append(makeLink(asset)))
                 document.head.append(fragment)
              }))

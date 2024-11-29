@@ -83,6 +83,53 @@ class HttpClientTest extends TestCase
         $this->assertFalse($response->created());
     }
 
+    public function testStatusCodeShorthand()
+    {
+        $this->factory->fake([
+            'forge.laravel.com' => 204,
+            'vapor.laravel.com' => HttpResponse::HTTP_CREATED,
+        ]);
+
+        $response = $this->factory->post('http://forge.laravel.com');
+        $this->assertTrue($response->noContent());
+
+        $response = $this->factory->post('http://vapor.laravel.com');
+        $this->assertTrue($response->created());
+    }
+
+    public function testStatusCodeShorthandAssumeBodyWhenInvalidHttpStatusCode()
+    {
+        $this->factory->fake([
+            'forge.laravel.com' => 999,
+            'vapor.laravel.com' => 1,
+        ]);
+
+        $response = $this->factory->post('http://forge.laravel.com');
+        $this->assertTrue($response->ok());
+        $this->assertSame('999', $response->body());
+
+        $response = $this->factory->post('http://vapor.laravel.com');
+        $this->assertTrue($response->ok());
+        $this->assertSame('1', $response->body());
+    }
+
+    public function testBodyShorthands()
+    {
+        $this->factory->fake([
+            'google.com' => 'Hello World',
+            'github.com' => ['foo' => 'bar'],
+        ]);
+
+        $response = $this->factory->get('http://google.com');
+        $this->assertTrue($response->ok());
+        $this->assertSame('Hello World', $response->body());
+
+        $response = $this->factory->post('http://github.com');
+        $this->assertTrue($response->ok());
+        $this->assertSame('{"foo":"bar"}', $response->body());
+        $this->assertSame(['foo' => 'bar'], $response->json());
+    }
+
     public function testAcceptedRequest()
     {
         $this->factory->fake([

@@ -113,7 +113,7 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
      * @param  \Illuminate\Http\Request  $request
      * @param  array  $others
      * @param  string  $method
-     * @return void
+     * @return never
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
