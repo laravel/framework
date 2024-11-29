@@ -1038,7 +1038,7 @@ class Blueprint
 
         $column = $column ?: $model->getForeignKey();
 
-        if ($model->getKeyType() === 'int' && $model->getIncrementing()) {
+        if ($model->getKeyType() === 'int') {
             return $this->foreignId($column)
                 ->table($model->getTable())
                 ->referencesModelColumn($model->getKeyName());
@@ -1048,12 +1048,6 @@ class Blueprint
 
         if (in_array(HasUlids::class, $modelTraits, true)) {
             return $this->foreignUlid($column, 26)
-                ->table($model->getTable())
-                ->referencesModelColumn($model->getKeyName());
-        }
-
-        if ($model->getKeyType() === 'int') {
-            return $this->foreignId($column)
                 ->table($model->getTable())
                 ->referencesModelColumn($model->getKeyName());
         }
