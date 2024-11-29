@@ -153,7 +153,6 @@ class RouteListCommand extends Command
      */
     protected function sortRoutes($sort, array $routes)
     {
-
         if ($sort === 'precedence') {
             return $routes;
         }
