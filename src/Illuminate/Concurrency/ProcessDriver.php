@@ -3,6 +3,7 @@
 namespace Illuminate\Concurrency;
 
 use Closure;
+use Exception;
 use Illuminate\Console\Application;
 use Illuminate\Contracts\Concurrency\Driver;
 use Illuminate\Contracts\Process\ProcessResult;
@@ -40,12 +41,8 @@ class ProcessDriver implements Driver
         })->start()->wait();
 
         return $results->collect()->map(function ($result) {
-            /** @var ProcessResult $result */
             if ($result->failed()) {
-                $errorMessage = $result->errorOutput();
-                $errorMessage = ! empty($errorMessage) ? "With message: $errorMessage" : 'Without error message.';
-
-                throw new \Exception('Process exited with error! '.$errorMessage, $result->exitCode());
+                throw new Exception('Concurrent process failed ['.$result->exitCode().']: '.$result->errorOutput());
             }
 
             $result = json_decode($result->output(), true);
