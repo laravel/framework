@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Mail;
 use InvalidArgumentException;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
 
 class MailManagerTest extends TestCase
@@ -27,9 +28,12 @@ class MailManagerTest extends TestCase
         $this->app['mail.manager']->mailer('custom_smtp');
     }
 
-    public function testMailUrlConfig()
+    #[TestWith(['smtp'])]
+    #[TestWith(['smtps'])]
+    public function testMailUrlConfig($scheme)
     {
         $this->app['config']->set('mail.mailers.smtp_url', [
+            'scheme' => $scheme,
             'url' => 'smtp://usr:pwd@127.0.0.2:5876',
         ]);
 
