@@ -2,6 +2,9 @@
 
 namespace Illuminate\Tests\Integration\Concurrency;
 
+use Illuminate\Concurrency\ProcessDriver;
+use Illuminate\Foundation\Application;
+use Illuminate\Process\Factory as ProcessFactory;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 
@@ -35,5 +38,15 @@ PHP);
 
         $this->assertEquals(2, $first);
         $this->assertEquals(4, $second);
+    }
+
+    public function testRunHandlerProcessErrorCode()
+    {
+        $this->expectException(\Exception::class);
+        $app = new Application(__DIR__);
+        $processDriver = new ProcessDriver($app->make(ProcessFactory::class));
+        $processDriver->run([
+            fn () => exit(1),
+        ]);
     }
 }
