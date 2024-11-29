@@ -39,7 +39,7 @@ abstract class HasOneOrMany extends Relation
      *
      * @var array
      */
-    protected array $pendingAttributes = [];
+    protected $pendingAttributes = [];
 
     /**
      * Create a new has one or many relationship instance.
@@ -526,7 +526,7 @@ abstract class HasOneOrMany extends Relation
      * @param  array  $attributes
      * @return $this
      */
-    public function withAttributes(array $attributes): static
+    public function withAttributes(array $attributes)
     {
         $this->pendingAttributes = array_merge($this->pendingAttributes, $attributes);
 
