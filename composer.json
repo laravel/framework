@@ -119,8 +119,7 @@
         "symfony/cache": "^7.0.3",
         "symfony/http-client": "^7.0.3",
         "symfony/translation": "^7.0.3",
-        "symfony/psr-http-message-bridge": "^7.0.3",
-        "symfony/symfony": "7.2.x-dev"
+        "symfony/psr-http-message-bridge": "^7.0.3"
     },
     "conflict": {
         "mockery/mockery": "1.6.8",
