@@ -43,14 +43,14 @@ class ProcessDriver implements Driver
             /** @var ProcessResult $result */
             if ($result->failed()) {
                 $errorMessage = $result->errorOutput();
-                $errorMessage = !empty($errorMessage) ? "With message: $errorMessage" : "Without error message.";
+                $errorMessage = ! empty($errorMessage) ? "With message: $errorMessage" : 'Without error message.';
 
-                throw new \Exception('Process exited with error! '. $errorMessage, $result->exitCode());
+                throw new \Exception('Process exited with error! '.$errorMessage, $result->exitCode());
             }
 
             $result = json_decode($result->output(), true);
 
-            if (!$result['successful']) {
+            if (! $result['successful']) {
                 throw new $result['exception'](
                     $result['message']
                 );

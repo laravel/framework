@@ -15,7 +15,7 @@ class ProcessDriverTest extends TestCase
         $app = new Application(__DIR__);
         $processDriver = new ProcessDriver($app->make(ProcessFactory::class));
         $processDriver->run([
-            fn() => exit(1)
+            fn () => exit(1),
         ]);
     }
 }
