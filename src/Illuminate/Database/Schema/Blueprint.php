@@ -1038,7 +1038,7 @@ class Blueprint
 
         $column = $column ?: $model->getForeignKey();
 
-        if ($model->getKeyType() === 'int' && $model->getIncrementing()) {
+        if ($model->getKeyType() === 'int') {
             return $this->foreignId($column)
                 ->table($model->getTable())
                 ->referencesModelColumn($model->getKeyName());
