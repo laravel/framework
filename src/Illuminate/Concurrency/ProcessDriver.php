@@ -6,7 +6,6 @@ use Closure;
 use Exception;
 use Illuminate\Console\Application;
 use Illuminate\Contracts\Concurrency\Driver;
-use Illuminate\Contracts\Process\ProcessResult;
 use Illuminate\Process\Factory as ProcessFactory;
 use Illuminate\Process\Pool;
 use Illuminate\Support\Arr;
