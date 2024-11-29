@@ -109,7 +109,7 @@ class RouteListCommandTest extends TestCase
 
     public function testSortRouteListPrecedence()
     {
-        $this->app->call('route:list', ['--json' => true, '--sort' => 'precedence']);
+        $this->app->call('route:list', ['--json' => true, '--sort' => 'definition']);
         $output = $this->app->output();
 
         $expectedOrder = '[{"domain":null,"method":"GET|HEAD","uri":"example","name":null,"action":"Closure","middleware":["exampleMiddleware"]},{"domain":"sub","method":"GET|HEAD","uri":"sub-example","name":null,"action":"Closure","middleware":["exampleMiddleware"]}, {"domain":null,"method":"GET|HEAD","uri":"example-group","name":null,"action":"Closure","middleware":["web","auth"]}]';
