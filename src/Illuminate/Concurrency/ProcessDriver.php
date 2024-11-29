@@ -42,7 +42,7 @@ class ProcessDriver implements Driver
 
         return $results->collect()->map(function ($result) {
             if ($result->failed()) {
-                throw new Exception('Concurrent process failed ['.$result->exitCode().']: '.$result->errorOutput());
+                throw new Exception('Concurrent process failed with exit code ['.$result->exitCode().']. Message: '.$result->errorOutput());
             }
 
             $result = json_decode($result->output(), true);
