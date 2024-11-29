@@ -30,6 +30,40 @@ class AssertPendingBatchTest extends TestCase
         );
     }
 
+    public function test_pending_batch_has_fail_when_missing()
+    {
+        Bus::fake();
+
+        Bus::batch([
+            new AJob(1, 2),
+            new BJob,
+        ])->dispatch();
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage(
+            'The batch does not contain a job of type [Illuminate\Testing\Fluent\CJob].'
+        );
+
+        Bus::assertBatched(fn (PendingBatchFake $assert) => $assert->has(CJob::class));
+    }
+
+    public function test_pending_batch_has_count_fail_when_incorrect()
+    {
+        Bus::fake();
+
+        Bus::batch([
+            new AJob(1, 2),
+            new BJob,
+        ])->dispatch();
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage(
+            'Failed to assert the batch contains the exact number of [3] jobs.'
+        );
+
+        Bus::assertBatched(fn (PendingBatchFake $assert) => $assert->has(3));
+    }
+
     public function test_pending_batch_missing()
     {
         Bus::fake();
@@ -45,7 +79,24 @@ class AssertPendingBatchTest extends TestCase
         );
     }
 
-    public function test_pending_batch_has_all_and_missing_all()
+    public function test_pending_batch_missing_fail_when_has()
+    {
+        Bus::fake();
+
+        Bus::batch([
+            new AJob,
+            new CJob,
+        ])->dispatch();
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage(
+            'The batch does not miss a job of type [Illuminate\Testing\Fluent\AJob].'
+        );
+
+        Bus::assertBatched(fn (PendingBatchFake $assert) => $assert->missing(AJob::class));
+    }
+
+    public function test_pending_batch_has_all()
     {
         Bus::fake();
 
@@ -56,8 +107,53 @@ class AssertPendingBatchTest extends TestCase
 
         Bus::assertBatched(fn (PendingBatchFake $assert) =>
             $assert->hasAll([AJob::class, BJob::class])
-                ->missingAll([CJob::class, DJob::class])
         );
+    }
+
+    public function test_pending_batch_has_all_fail_when_missing()
+    {
+        Bus::fake();
+
+        Bus::batch([
+            new BJob,
+            new CJob,
+        ])->dispatch();
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('The batch does not contain all expected jobs.');
+
+        Bus::assertBatched(fn (PendingBatchFake $assert) =>
+            $assert->hasAll([AJob::class, BJob::class])
+        );
+    }
+
+    public function test_pending_batch_missing_all()
+    {
+        Bus::fake();
+
+        Bus::batch([
+            new AJob,
+            new BJob,
+        ])->dispatch();
+
+        Bus::assertBatched(fn (PendingBatchFake $assert) =>
+            $assert->missingAll([CJob::class, DJob::class])
+        );
+    }
+
+    public function test_pending_batch_missing_all_fail_when_has()
+    {
+        Bus::fake();
+
+        Bus::batch([
+            new AJob,
+            new BJob,
+        ])->dispatch();
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('The batch does not miss all of given jobs.');
+
+        Bus::assertBatched(fn (PendingBatchFake $assert) => $assert->missingAll([AJob::class]));
     }
 
     public function test_pending_batch_has_and_has_any()
@@ -73,6 +169,22 @@ class AssertPendingBatchTest extends TestCase
             $assert->has(2)
                 ->has(AJob::class)
                 ->hasAny(BJob::class, CJob::class, DJob::class)
+        );
+    }
+
+    public function test_pending_batch_has_any_fail_when_missing()
+    {
+        Bus::fake();
+
+        Bus::batch([
+            new AJob,
+        ])->dispatch();
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('The batch does not contains any of the expected jobs.');
+
+        Bus::assertBatched(fn (PendingBatchFake $assert) =>
+            $assert->hasAny(BJob::class, CJob::class, DJob::class)
         );
     }
 

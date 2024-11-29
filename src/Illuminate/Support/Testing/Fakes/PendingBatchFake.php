@@ -5,6 +5,7 @@ namespace Illuminate\Support\Testing\Fakes;
 use Illuminate\Bus\PendingBatch;
 use Illuminate\Support\Collection;
 use PHPUnit\Framework\Assert as PHPUnit;
+use Throwable;
 
 class PendingBatchFake extends PendingBatch
 {
@@ -79,7 +80,7 @@ class PendingBatchFake extends PendingBatch
                 get_class($job) === $expectedJob &&
                     $this->parametersMatch($job, $expectedJob, $expectedParameters)
             ),
-            "Failed to assert the batch contains a job of type [{$expectedJob}]."
+            "The batch does not contain a job of type [{$expectedJob}]."
         );
 
         array_push($this->expected, $expectedJob);
@@ -90,16 +91,16 @@ class PendingBatchFake extends PendingBatch
     /**
      * Assert that the batch does not contain a job of the given type.
      *
-     * @param  string  $expectedJob
+     * @param  string  $unexpectedJob
      * @return $this
      */
-    public function missing(string $expectedJob)
+    public function missing(string $unexpectedJob)
     {
         PHPUnit::assertFalse(
-            $this->jobs->contains(function ($job) use ($expectedJob) {
-                return get_class($job) === $expectedJob;
+            $this->jobs->contains(function ($job) use ($unexpectedJob) {
+                return get_class($job) === $unexpectedJob;
             }),
-            "Failed to assert the batch misses a job of type [{$expectedJob}]."
+            "The batch does not miss a job of type [{$unexpectedJob}]."
         );
 
         return $this;
@@ -113,8 +114,12 @@ class PendingBatchFake extends PendingBatch
      */
     public function hasAll(array $expectedJobs)
     {
-        foreach ($expectedJobs as $expectedJob) {
-            $this->has($expectedJob);
+        try {
+            foreach ($expectedJobs as $expectedJob) {
+                $this->has($expectedJob);
+            }
+        } catch (Throwable $e) {
+            throw new $e('The batch does not contain all expected jobs.');
         }
 
         return $this;
@@ -123,13 +128,17 @@ class PendingBatchFake extends PendingBatch
     /**
      * Assert that the batch does not contain any of the given jobs.
      *
-     * @param  array  $expectedJobs
+     * @param  array  $unexpectedJobs
      * @return $this
      */
-    public function missingAll(array $expectedJobs)
+    public function missingAll(array $unexpectedJobs)
     {
-        foreach ($expectedJobs as $expectedJob) {
-            $this->missing($expectedJob);
+        try {
+            foreach ($unexpectedJobs as $unexpectedJob) {
+                $this->missing($unexpectedJob);
+            }
+        } catch (Throwable $e) {
+            throw new $e('The batch does not miss all of given jobs.');
         }
 
         return $this;
@@ -147,7 +156,7 @@ class PendingBatchFake extends PendingBatch
             $this->jobs->contains(function ($job) use ($expectedJobs) {
                 return in_array(get_class($job), $expectedJobs);
             }),
-            "Failed to assert the batch contains any of the specified jobs."
+            "The batch does not contains any of the expected jobs."
         );
 
         array_push($this->expected, ...$expectedJobs);
