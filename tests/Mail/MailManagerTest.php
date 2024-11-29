@@ -28,13 +28,17 @@ class MailManagerTest extends TestCase
         $this->app['mail.manager']->mailer('custom_smtp');
     }
 
-    #[TestWith(['smtp'])]
-    #[TestWith(['smtps'])]
-    public function testMailUrlConfig($scheme)
+    #[TestWith([null, 5876])]
+    #[TestWith([null, 465])]
+    #[TestWith(['smtp', 25])]
+    #[TestWith(['smtp', 2525])]
+    #[TestWith(['smtps', 465])]
+    #[TestWith(['smtp', 465])]
+    public function testMailUrlConfig($scheme, $port)
     {
         $this->app['config']->set('mail.mailers.smtp_url', [
             'scheme' => $scheme,
-            'url' => 'smtp://usr:pwd@127.0.0.2:5876',
+            'url' => "smtp://usr:pwd@127.0.0.2:{$port}",
         ]);
 
         $mailer = $this->app['mail.manager']->mailer('smtp_url');
@@ -44,7 +48,8 @@ class MailManagerTest extends TestCase
         $this->assertSame('usr', $transport->getUsername());
         $this->assertSame('pwd', $transport->getPassword());
         $this->assertSame('127.0.0.2', $transport->getStream()->getHost());
-        $this->assertSame(5876, $transport->getStream()->getPort());
+        $this->assertSame($port, $transport->getStream()->getPort());
+        $this->assertSame($port === 465, $transport->getStream()->isTLS());
     }
 
     public function testBuild()
