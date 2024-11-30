@@ -40,7 +40,7 @@ abstract class HasOneOrMany extends Relation
      *
      * @var array
      */
-    protected $pendingAttributes = [];
+    public $pendingAttributes = [];
 
     /**
      * Create a new has one or many relationship instance.

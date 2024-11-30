@@ -31,6 +31,8 @@ class MorphMany extends MorphOneOrMany
                 if ($inverse = $this->getInverseRelationship()) {
                     $morphOne->inverse($inverse);
                 }
+
+                $morphOne->pendingAttributes = $this->pendingAttributes;
             }
         ));
     }

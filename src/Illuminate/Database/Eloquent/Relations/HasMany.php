@@ -30,6 +30,8 @@ class HasMany extends HasOneOrMany
                 if ($inverse = $this->getInverseRelationship()) {
                     $hasOne->inverse($inverse);
                 }
+
+                $hasOne->pendingAttributes = $this->pendingAttributes;
             }
         ));
     }
