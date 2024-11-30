@@ -6,6 +6,8 @@ use Illuminate\Bus\PendingBatch;
 use Illuminate\Support\Collection;
 use PHPUnit\Framework\Assert as PHPUnit;
 use Throwable;
+use Closure;
+use Illuminate\Support\Number;
 
 class PendingBatchFake extends PendingBatch
 {
@@ -167,21 +169,25 @@ class PendingBatchFake extends PendingBatch
     /**
      * Assert that the first job in the batch matches the given callback.
      *
-     * @param  callable  $callback
+     * @param  Closure  $callback
      * @return $this
      */
-    public function first(callable $callback)
+    public function first(Closure $callback)
     {
         $firstJob = $this->jobs->first();
 
         PHPUnit::assertNotNull($firstJob, "Failed to assert the batch contains any jobs.");
 
-        $callback(
-            new self(
-                $this->bus,
-                is_array($firstJob) ? collect($firstJob) : collect([$firstJob])
-            )
-        );
+        try {
+            $callback(
+                new self(
+                    $this->bus,
+                    is_array($firstJob) ? collect($firstJob) : collect([$firstJob])
+                )
+            );
+        } catch (Throwable $e) {
+            throw new $e('The first one in the batch does not matches the given callback because of: ' . $e->getMessage());
+        }
 
         array_push($this->expected, is_array($firstJob) ?
             array_map(fn ($job) => get_class($job), $firstJob) :
@@ -195,24 +201,32 @@ class PendingBatchFake extends PendingBatch
      * Assert that the nth job in the batch matches the given callback.
      *
      * @param  int  $index
-     * @param  callable  $callback
+     * @param  Closure  $callback
      * @param  array  $parameters
      * @return $this
      */
-    public function nth(int $index, callable|string $callback, array $parameters = [])
+    public function nth(int $index, Closure|string $callback, array $parameters = [])
     {
         $nthJob = $this->jobs->slice($index, 1)->first();
 
-        PHPUnit::assertNotNull($nthJob, "Failed to assert the batch contains a job at index [{$index}].");
+        PHPUnit::assertNotNull($nthJob, "The batch does not contains a job at index [{$index}].");
 
-        // If the callback is a callable, we will assume the nthJob will matches the callback.
+        // If the callback is a Closure, we will assume the nthJob will matches the callback.
         if (func_num_args() == 2) {
-            $callback(
-                new self(
-                    $this->bus,
-                    is_array($nthJob) ? collect($nthJob) : collect([$nthJob])
-                )
-            );
+            try {
+                $callback(
+                    new self(
+                        $this->bus,
+                        is_array($nthJob) ? collect($nthJob) : collect([$nthJob])
+                    )
+                );
+            } catch (Throwable $e) {
+                throw new $e(sprintf(
+                    'The [%s] one in the batch does not matches the given callback because of: %s',
+                    Number::ordinal($index, 'en'),
+                    $e->getMessage()
+                ));
+            }
 
             array_push($this->expected, is_array($nthJob) ?
                 array_map(fn ($job) => get_class($job), $nthJob) :
@@ -225,7 +239,7 @@ class PendingBatchFake extends PendingBatch
             PHPUnit::assertTrue(
                 get_class($nthJob) === $callback &&
                     $this->parametersMatch($nthJob, $callback, $parameters),
-                "Failed to assert the [{$index}]th job in the batch has a type of [{$callback}]."
+                "The batch does not contain a job of type [{$callback}] at index [{$index}]."
             );
 
             array_push($this->expected, $callback);
@@ -304,7 +318,7 @@ class PendingBatchFake extends PendingBatch
         PHPUnit::assertEquals(
             new $expectedClass(...$expectedParameters),
             $actual,
-            "Failed to assert that the job parameters match the expected values for class [{$expectedClass}]."
+            "The job parameters does not match the expected values for class [{$expectedClass}]."
         );
 
         return true;

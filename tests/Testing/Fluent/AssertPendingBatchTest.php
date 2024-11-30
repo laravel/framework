@@ -47,6 +47,23 @@ class AssertPendingBatchTest extends TestCase
         Bus::assertBatched(fn (PendingBatchFake $assert) => $assert->has(CJob::class));
     }
 
+    public function test_pending_batch_has_fail_when_has_but_parameters_dont_match()
+    {
+        Bus::fake();
+
+        Bus::batch([
+            new AJob(1, 2),
+            new BJob,
+        ])->dispatch();
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage(
+            'The job parameters does not match the expected values for class [Illuminate\Testing\Fluent\AJob].'
+        );
+
+        Bus::assertBatched(fn (PendingBatchFake $assert) => $assert->has(AJob::class));
+    }
+
     public function test_pending_batch_has_count_fail_when_incorrect()
     {
         Bus::fake();
@@ -220,6 +237,32 @@ class AssertPendingBatchTest extends TestCase
         );
     }
 
+    public function test_nested_jobs_in_pending_batch_fail_when_first_missing()
+    {
+        Bus::fake();
+
+        Bus::batch([
+            [
+                new AJob(1),
+                new BJob(1),
+            ],
+            new CJob(2),
+        ])->dispatch();
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage(
+            'The first one in the batch does not matches the given callback because of: The batch does not contain a job of type [Illuminate\Testing\Fluent\CJob]'
+        );
+
+        Bus::assertBatched(fn (PendingBatchFake $assert) =>
+            $assert->first(fn (PendingBatchFake $assert) =>
+                    $assert->has(2)
+                        ->has(BJob::class, [1])
+                        ->has(CJob::class, [2])
+                )
+        );
+    }
+
     public function test_nth_job_in_pending_batch()
     {
         Bus::fake();
@@ -234,6 +277,94 @@ class AssertPendingBatchTest extends TestCase
             $assert->nth(0, AJob::class, [0, 1])
                 ->nth(1, BJob::class, [1])
                 ->nth(2, CJob::class, [1])
+        );
+    }
+
+    public function test_nth_job_in_pending_batch_fail_when_missing()
+    {
+        Bus::fake();
+
+        Bus::batch([
+            new AJob(0, 1),
+            new BJob(1),
+            new CJob(1),
+        ])->dispatch();
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('The batch does not contains a job at index [3].');
+
+        Bus::assertBatched(fn (PendingBatchFake $assert) =>
+            $assert->nth(3, CJob::class)
+        );
+    }
+
+    public function test_nested_jobs_in_pending_batch_fail_when_nth_missing()
+    {
+        Bus::fake();
+
+        Bus::batch([
+            [
+                new AJob(1),
+                new BJob(1),
+            ],
+            new CJob(2),
+        ])->dispatch();
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage(
+            'The [1st] one in the batch does not matches the given callback because of: The batch does not contain a job of type [Illuminate\Testing\Fluent\AJob]'
+        );
+
+        Bus::assertBatched(fn (PendingBatchFake $assert) =>
+            $assert->nth(1, fn (PendingBatchFake $assert) =>
+                $assert->has(AJob::class, [1])->has(BJob::class, [1])
+            )
+        );
+    }
+
+    public function test_nested_jobs_in_pending_batch_fail_when_nth_does_not_match()
+    {
+        Bus::fake();
+
+        Bus::batch([
+            new AJob(0, 1),
+            new BJob(1),
+            new CJob(1),
+        ])->dispatch();
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage(
+            'The batch does not contain a job of type [Illuminate\Testing\Fluent\DJob] at index [2].'
+        );
+
+        Bus::assertBatched(fn (PendingBatchFake $assert) =>
+            $assert->nth(0, AJob::class, [0, 1])
+                ->nth(1, BJob::class, [1])
+                ->nth(2, DJob::class, [1])
+        );
+    }
+
+    public function test_nested_jobs_in_pending_batch_fail_when_nth_has_but_params_does_not_match()
+    {
+        Bus::fake();
+
+        Bus::batch([
+            [
+                new AJob(1),
+                new BJob(1),
+            ],
+            new CJob(2),
+        ])->dispatch();
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage(
+            'The [0th] one in the batch does not matches the given callback because of: The job parameters does not match the expected values for class [Illuminate\Testing\Fluent\AJob].'
+        );
+
+        Bus::assertBatched(fn (PendingBatchFake $assert) =>
+            $assert->nth(0, fn (PendingBatchFake $assert) =>
+                $assert->has(AJob::class, [2])->has(BJob::class)
+            )
         );
     }
 
