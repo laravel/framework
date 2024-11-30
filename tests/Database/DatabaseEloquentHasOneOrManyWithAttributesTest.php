@@ -154,6 +154,54 @@ class DatabaseEloquentHasOneOrManyWithAttributesTest extends TestCase
         $this->assertSame('BB', $relatedModel->b);
         $this->assertSame('C', $relatedModel->c);
     }
+
+    public function testSingleAttributeApi(): void
+    {
+        $parent = new RelatedWithAttributesModel;
+        $key = 'attr';
+        $value = 'Value';
+
+        $relationship = $parent
+            ->hasMany(RelatedWithAttributesModel::class, 'parent_id')
+            ->withAttributes($key, $value);
+
+        $relatedModel = $relationship->make();
+
+        $this->assertSame($value, $relatedModel->$key);
+    }
+
+    public function testWheresAreSet(): void
+    {
+        $parentId = 123;
+        $key = 'a key';
+        $value = 'the value';
+
+        $parent = new RelatedWithAttributesModel;
+        $parent->id = $parentId;
+
+        $relationship = $parent
+            ->hasMany(RelatedWithAttributesModel::class, 'parent_id')
+            ->withAttributes([$key => $value]);
+
+        $wheres = $relationship->toBase()->wheres;
+
+        $this->assertContains([
+            'type' => 'Basic',
+            'column' => $key,
+            'operator' => '=',
+            'value' => $value,
+            'boolean' => 'and',
+        ], $wheres);
+
+        // Ensure this doesn't break the default where either.
+        $this->assertContains([
+            'type' => 'Basic',
+            'column' => $parent->qualifyColumn('parent_id'),
+            'operator' => '=',
+            'value' => $parentId,
+            'boolean' => 'and',
+        ], $wheres);
+    }
 }
 
 class RelatedWithAttributesModel extends Model

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Eloquent\Relations;
 
+use Illuminate\Contracts\Database\Query\Expression;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -523,11 +524,24 @@ abstract class HasOneOrMany extends Relation
     /**
      * Add attributes to be added to new instances of related models.
      *
-     * @param  array  $attributes
+     * @param  array|string|\Illuminate\Contracts\Database\Query\Expression  $attributes
+     * @param  mixed  $value
      * @return $this
      */
-    public function withAttributes(array $attributes)
+    public function withAttributes(array|string|Expression $attributes, $value = null)
     {
+        if (! is_array($attributes)) {
+            $attributes = [$attributes => $value];
+        }
+
+        foreach ($attributes as $column => $value) {
+            if (is_null($value)) {
+                $this->whereNull($column);
+            } else {
+                $this->where($column, $value);
+            }
+        }
+
         $this->pendingAttributes = array_merge($this->pendingAttributes, $attributes);
 
         return $this;
