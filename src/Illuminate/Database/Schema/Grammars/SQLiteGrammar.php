@@ -317,13 +317,15 @@ class SQLiteGrammar extends Grammar
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $command
      * @param  \Illuminate\Database\Connection  $connection
-     * @return array|string
+     * @return null
      *
      * @throws \RuntimeException
      */
     public function compileChange(Blueprint $blueprint, Fluent $command, Connection $connection)
     {
         // Handled on table alteration...
+
+        return null;
     }
 
     /**
@@ -331,11 +333,13 @@ class SQLiteGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $command
-     * @return string
+     * @return null
      */
     public function compilePrimary(Blueprint $blueprint, Fluent $command)
     {
         // Handled on table creation or alteration...
+
+        return null;
     }
 
     /**
@@ -389,11 +393,13 @@ class SQLiteGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $command
-     * @return string|null
+     * @return null
      */
     public function compileForeign(Blueprint $blueprint, Fluent $command)
     {
         // Handled on table creation or alteration...
+
+        return null;
     }
 
     /**
@@ -478,11 +484,13 @@ class SQLiteGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $command
-     * @return string
+     * @return null
      */
     public function compileDropPrimary(Blueprint $blueprint, Fluent $command)
     {
         // Handled on table alteration...
+
+        return null;
     }
 
     /**
@@ -532,7 +540,7 @@ class SQLiteGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $command
-     * @return array
+     * @return null
      */
     public function compileDropForeign(Blueprint $blueprint, Fluent $command)
     {
@@ -541,6 +549,8 @@ class SQLiteGrammar extends Grammar
         }
 
         // Handled on table alteration...
+
+        return null;
     }
 
     /**

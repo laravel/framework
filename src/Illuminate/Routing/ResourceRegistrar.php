@@ -701,7 +701,7 @@ class ResourceRegistrar
      * Get or set the action verbs used in the resource URIs.
      *
      * @param  array  $verbs
-     * @return array
+     * @return array|null
      */
     public static function verbs(array $verbs = [])
     {
@@ -710,5 +710,7 @@ class ResourceRegistrar
         }
 
         static::$verbs = array_merge(static::$verbs, $verbs);
+
+        return null;
     }
 }

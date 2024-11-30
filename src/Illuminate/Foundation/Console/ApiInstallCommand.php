@@ -82,6 +82,8 @@ class ApiInstallCommand extends Command
 
             $this->components->info('API scaffolding installed. Please add the [Laravel\Sanctum\HasApiTokens] trait to your User model.');
         }
+
+        return 0;
     }
 
     /**

@@ -242,7 +242,7 @@ class PostgresGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $command
-     * @return string
+     * @return string|null
      */
     public function compileAutoIncrementStartingValues(Blueprint $blueprint, Fluent $command)
     {
@@ -252,6 +252,8 @@ class PostgresGrammar extends Grammar
 
             return 'alter sequence '.$blueprint->getPrefix().$table.'_'.$command->column->name.'_seq restart with '.$value;
         }
+
+        return null;
     }
 
     /**
@@ -626,7 +628,7 @@ class PostgresGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $command
-     * @return string
+     * @return string|null
      */
     public function compileComment(Blueprint $blueprint, Fluent $command)
     {
@@ -637,6 +639,8 @@ class PostgresGrammar extends Grammar
                 is_null($comment) ? 'NULL' : "'".str_replace("'", "''", $comment)."'"
             );
         }
+
+        return null;
     }
 
     /**

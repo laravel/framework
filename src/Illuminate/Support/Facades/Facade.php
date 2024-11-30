@@ -58,7 +58,7 @@ abstract class Facade
     /**
      * Convert the facade into a Mockery spy.
      *
-     * @return \Mockery\MockInterface
+     * @return \Mockery\MockInterface|null
      */
     public static function spy()
     {
@@ -69,6 +69,8 @@ abstract class Facade
                 static::swap($spy);
             });
         }
+
+        return null;
     }
 
     /**

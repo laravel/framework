@@ -328,6 +328,7 @@ if (! function_exists('retry')) {
         $attempts++;
         $times--;
 
+        /** @phpstan-ignore return.missing */
         try {
             return $callback($attempts);
         } catch (Throwable $e) {

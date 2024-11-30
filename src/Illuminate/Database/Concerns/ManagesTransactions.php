@@ -16,7 +16,7 @@ trait ManagesTransactions
      *
      * @param  (\Closure(static): TReturn)  $callback
      * @param  int  $attempts
-     * @return TReturn
+     * @return TReturn|null
      *
      * @throws \Throwable
      */
@@ -70,6 +70,8 @@ trait ManagesTransactions
 
             return $callbackResult;
         }
+
+        return null;
     }
 
     /**

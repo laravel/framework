@@ -59,6 +59,8 @@ class ConfigPublishCommand extends Command
         }
 
         $this->publish($name, $config[$name], $this->laravel->configPath().'/'.$name.'.php');
+
+        return 0;
     }
 
     /**

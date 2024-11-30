@@ -543,11 +543,11 @@ class QueueFake extends QueueManager implements Fake, Queue
     /**
      * Get the connection name for the queue.
      *
-     * @return string
+     * @return null
      */
     public function getConnectionName()
     {
-        //
+        return null;
     }
 
     /**

@@ -318,7 +318,7 @@ class MySqlGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $command
-     * @return string
+     * @return string|null
      */
     public function compileAutoIncrementStartingValues(Blueprint $blueprint, Fluent $command)
     {
@@ -326,6 +326,8 @@ class MySqlGrammar extends Grammar
             && $value = $command->column->get('startingValue', $command->column->get('from'))) {
             return 'alter table '.$this->wrapTable($blueprint).' auto_increment = '.$value;
         }
+
+        return null;
     }
 
     /**

@@ -78,6 +78,8 @@ class BroadcastingInstallCommand extends Command
         $this->installReverb();
 
         $this->installNodeDependencies();
+
+        return 0;
     }
 
     /**
