@@ -203,6 +203,30 @@ class DatabaseEloquentHasOneOrManyWithAttributesTest extends TestCase
         ], $wheres);
     }
 
+    public function testNullValueIsAccepted(): void
+    {
+        $parentId = 123;
+        $key = 'a key';
+
+        $parent = new RelatedWithAttributesModel;
+        $parent->id = $parentId;
+
+        $relationship = $parent
+            ->hasMany(RelatedWithAttributesModel::class, 'parent_id')
+            ->withAttributes([$key => null]);
+
+        $wheres = $relationship->toBase()->wheres;
+        $relatedModel = $relationship->make();
+
+        $this->assertNull($relatedModel->$key);
+
+        $this->assertContains([
+            'type' => 'Null',
+            'column' => $key,
+            'boolean' => 'and',
+        ], $wheres);
+    }
+
     public function testOneKeepsAttributesFromHasMany(): void
     {
         $parentId = 123;

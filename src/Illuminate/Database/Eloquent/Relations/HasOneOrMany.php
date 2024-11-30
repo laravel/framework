@@ -535,11 +535,7 @@ abstract class HasOneOrMany extends Relation
         }
 
         foreach ($attributes as $column => $value) {
-            if (is_null($value)) {
-                $this->whereNull($column);
-            } else {
-                $this->where($column, $value);
-            }
+            $this->where($column, $value);
         }
 
         $this->pendingAttributes = array_merge($this->pendingAttributes, $attributes);
