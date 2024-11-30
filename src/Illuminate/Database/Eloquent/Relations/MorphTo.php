@@ -190,7 +190,7 @@ class MorphTo extends BelongsTo
      */
     public function createModelByType($type)
     {
-        $class = Model::getActualClassNameForMorph($type);
+        $class = $this->parent::getActualClassNameForMorph($type);
 
         return tap(new $class, function ($instance) {
             if (! $instance->getConnectionName()) {
