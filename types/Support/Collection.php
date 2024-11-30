@@ -5,13 +5,21 @@ use Illuminate\Support\Collection;
 
 use function PHPStan\Testing\assertType;
 
+/** @implements Arrayable<int, User> */
+class Users implements Arrayable
+{
+    public function toArray(): array
+    {
+        return [new User()];
+    }
+}
+
 $collection = collect([new User]);
-/** @var Arrayable<int, User> $arrayable */
-$arrayable = [];
+$arrayable = new Users;
 /** @var iterable<int, int> $iterable */
 $iterable = [1];
 /** @var Traversable<int, string> $traversable */
-$traversable = [];
+$traversable = new ArrayIterator(['string']);
 
 class Invokable
 {

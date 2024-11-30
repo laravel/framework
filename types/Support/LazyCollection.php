@@ -6,14 +6,21 @@ use Illuminate\Support\LazyCollection;
 
 use function PHPStan\Testing\assertType;
 
+/** @implements Arrayable<int, User> */
+class Users implements Arrayable
+{
+    public function toArray(): array
+    {
+        return [new User()];
+    }
+}
+
 $collection = new LazyCollection([new User]);
-/** @var Arrayable<int, User> $arrayable */
-$arrayable = [];
+$arrayable = new Users();
 /** @var iterable<int, int> $iterable */
 $iterable = [1];
 /** @var Traversable<int, string> $traversable */
-$traversable = ['foo'];
-/** @var Closure(): Generator<int, User, mixed, void> $generator */
+$traversable = new ArrayIterator(['string']);
 $generator = function () {
     yield new User();
 };

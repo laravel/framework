@@ -8,7 +8,7 @@ $array = [new User];
 /** @var iterable<int, User> $iterable */
 $iterable = [];
 /** @var Traversable<int, User> $traversable */
-$traversable = [];
+$traversable = new ArrayIterator([new User]);
 
 assertType('User|null', Arr::first($array));
 assertType('User|null', Arr::first($array, function ($user) {
