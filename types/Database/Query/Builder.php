@@ -12,8 +12,8 @@ function test(Builder $query, EloquentBuilder $userQuery): void
 {
     assertType('object|null', $query->first());
     assertType('object|null', $query->find(1));
-    assertType('int|object', $query->findOr(1, fn () => 42));
-    assertType('int|object', $query->findOr(1, callback: fn () => 42));
+    assertType('42|object', $query->findOr(1, fn () => 42));
+    assertType('42|object', $query->findOr(1, callback: fn () => 42));
     assertType('Illuminate\Database\Query\Builder', $query->selectSub($userQuery, 'alias'));
     assertType('Illuminate\Database\Query\Builder', $query->fromSub($userQuery, 'alias'));
     assertType('Illuminate\Database\Query\Builder', $query->from($userQuery, 'alias'));
