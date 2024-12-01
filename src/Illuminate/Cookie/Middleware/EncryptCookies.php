@@ -7,6 +7,7 @@ use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
 use Illuminate\Cookie\CookieValuePrefix;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -214,7 +215,15 @@ class EncryptCookies
      */
     public function isDisabled($name)
     {
-        return in_array($name, array_merge($this->except, static::$neverEncrypt));
+        $exclude = Collection::make($this->except)
+            ->merge(static::$neverEncrypt)
+            ->filter(fn ($cookie) => Str::contains($cookie,'*'));
+
+        return $exclude->isEmpty()
+            ? in_array($name, $exclude->toArray())
+            : $exclude->filter(fn ($cookie) => Str::startsWith(
+                $name, Str::replace('*', '', $cookie)
+            ))->isNotEmpty();
     }
 
     /**
