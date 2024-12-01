@@ -16,6 +16,7 @@ use ReflectionClass;
 use ReflectionFunction;
 
 use function Illuminate\Support\enum_value;
+use function is_object;
 
 class Gate implements GateContract
 {
@@ -325,7 +326,7 @@ class Gate implements GateContract
     /**
      * Determine if all of the given abilities should be granted for the current user.
      *
-     * @param  iterable|\BackedEnum|string  $ability
+     * @param  iterable|\BackedEnum|string|object  $ability
      * @param  array|mixed  $arguments
      * @return bool
      */
@@ -337,7 +338,7 @@ class Gate implements GateContract
     /**
      * Determine if any of the given abilities should be denied for the current user.
      *
-     * @param  iterable|\BackedEnum|string  $ability
+     * @param  iterable|\BackedEnum|string|object  $ability
      * @param  array|mixed  $arguments
      * @return bool
      */
@@ -349,13 +350,13 @@ class Gate implements GateContract
     /**
      * Determine if all of the given abilities should be granted for the current user.
      *
-     * @param  iterable|\BackedEnum|string  $abilities
+     * @param  iterable|\BackedEnum|string|object  $abilities
      * @param  array|mixed  $arguments
      * @return bool
      */
     public function check($abilities, $arguments = [])
     {
-        return (new Collection($abilities))->every(
+        return (new Collection(Arr::wrap($abilities)))->every(
             fn ($ability) => $this->inspect($ability, $arguments)->allowed()
         );
     }
@@ -363,7 +364,7 @@ class Gate implements GateContract
     /**
      * Determine if any one of the given abilities should be granted for the current user.
      *
-     * @param  iterable|\BackedEnum|string  $abilities
+     * @param  iterable|\BackedEnum|string|object  $abilities
      * @param  array|mixed  $arguments
      * @return bool
      */
@@ -375,7 +376,7 @@ class Gate implements GateContract
     /**
      * Determine if all of the given abilities should be denied for the current user.
      *
-     * @param  iterable|\BackedEnum|string  $abilities
+     * @param  iterable|\BackedEnum|string|object  $abilities
      * @param  array|mixed  $arguments
      * @return bool
      */
@@ -387,7 +388,7 @@ class Gate implements GateContract
     /**
      * Determine if the given ability should be granted for the current user.
      *
-     * @param  \BackedEnum|string  $ability
+     * @param  \BackedEnum|string|object  $ability
      * @param  array|mixed  $arguments
      * @return \Illuminate\Auth\Access\Response
      *
@@ -401,7 +402,7 @@ class Gate implements GateContract
     /**
      * Inspect the user for the given ability.
      *
-     * @param  \BackedEnum|string  $ability
+     * @param  \BackedEnum|string|object  $ability
      * @param  array|mixed  $arguments
      * @return \Illuminate\Auth\Access\Response
      */
@@ -425,7 +426,7 @@ class Gate implements GateContract
     /**
      * Get the raw result from the authorization callback.
      *
-     * @param  string  $ability
+     * @param  string|object  $ability
      * @param  array|mixed  $arguments
      * @return mixed
      *
@@ -542,7 +543,7 @@ class Gate implements GateContract
      * Resolve and call the appropriate authorization callback.
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
-     * @param  string  $ability
+     * @param  string|object  $ability
      * @param  array  $arguments
      * @return bool
      */
@@ -620,29 +621,35 @@ class Gate implements GateContract
      * Resolve the callable for the given ability and arguments.
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
-     * @param  string  $ability
+     * @param  string|object  $ability
      * @param  array  $arguments
      * @return callable
      */
     protected function resolveAuthCallback($user, $ability, array $arguments)
     {
+        $abilityName = is_object($ability) ? $ability::class : $ability;
+
         if (isset($arguments[0]) &&
             ! is_null($policy = $this->getPolicyFor($arguments[0])) &&
-            $callback = $this->resolvePolicyCallback($user, $ability, $arguments, $policy)) {
+            $callback = $this->resolvePolicyCallback($user, $abilityName, $arguments, $policy)) {
             return $callback;
         }
 
-        if (isset($this->stringCallbacks[$ability])) {
-            [$class, $method] = Str::parseCallback($this->stringCallbacks[$ability]);
+        if (isset($this->stringCallbacks[$abilityName])) {
+            [$class, $method] = Str::parseCallback($this->stringCallbacks[$abilityName]);
 
             if ($this->canBeCalledWithUser($user, $class, $method ?: '__invoke')) {
-                return $this->abilities[$ability];
+                return $this->abilities[$abilityName];
             }
         }
 
-        if (isset($this->abilities[$ability]) &&
-            $this->canBeCalledWithUser($user, $this->abilities[$ability])) {
-            return $this->abilities[$ability];
+        if (isset($this->abilities[$abilityName]) &&
+            $this->canBeCalledWithUser($user, $this->abilities[$abilityName])) {
+            return $this->abilities[$abilityName];
+        }
+
+        if (is_object($ability)) {
+            return [$ability, 'granted'];
         }
 
         return function () {

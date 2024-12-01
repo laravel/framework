@@ -7,6 +7,7 @@ use Illuminate\Auth\Access\Gate;
 use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Container\Container;
+use Illuminate\Tests\Auth\Fixtures\ObjectAbility;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -62,6 +63,30 @@ class AuthAccessGateTest extends TestCase
         $gate->before([AccessGateTestBeforeCallback::class, 'allowEverythingStatically']);
 
         $this->assertTrue($gate->check('anything'));
+    }
+
+    public function testBeforeCanTakeObjectAbilityAsArgument()
+    {
+        $gate = $this->getBasicGate();
+        $ability = new ObjectAbility(false);
+
+        $gate->before(function ($user, ObjectAbility $ability) {
+            return true;
+        });
+
+        $this->assertTrue($gate->check($ability));
+    }
+
+    public function testAfterCanTakeObjectAbilityAsArgument()
+    {
+        $gate = $this->getBasicGate();
+        $ability = new ObjectAbility(false);
+
+        $gate->after(function ($user, ObjectAbility $ability) {
+            return true;
+        });
+
+        $this->assertTrue($gate->check($ability));
     }
 
     public function testBeforeCanAllowGuests()
@@ -191,7 +216,7 @@ class AuthAccessGateTest extends TestCase
             $_SERVER['__laravel.gateBefore'],
             $_SERVER['__laravel.gateBefore2'],
             $_SERVER['__laravel.gateAfter'],
-            $_SERVER['__laravel.gateAfter2']
+            $_SERVER['__laravel.gateAfter2'],
         );
     }
 
@@ -361,6 +386,48 @@ class AuthAccessGateTest extends TestCase
         $this->assertTrue($gate->denies(AbilitiesEnum::VIEW_DASHBOARD));
     }
 
+    public function testObjectAbilityInAllows()
+    {
+        $gate = $this->getBasicGate();
+
+        $ability = new ObjectAbility;
+
+        $this->assertTrue($gate->allows($ability));
+    }
+
+    public function testObjectAbilityInDenies()
+    {
+        $gate = $this->getBasicGate();
+
+        $ability = new ObjectAbility(false);
+
+        $this->assertTrue($gate->denies($ability));
+    }
+
+    public function testObjectAbilitiesCanAllowGuestUsers()
+    {
+        $gate = $this->getBasicGate();
+
+        $guestAbility = new class
+        {
+            public function granted(?stdClass $user)
+            {
+                return true;
+            }
+        };
+
+        $userAbility = new class
+        {
+            public function granted(stdClass $user)
+            {
+                return false;
+            }
+        };
+
+        $this->assertTrue($gate->check($guestAbility));
+        $this->assertFalse($gate->check($userAbility));
+    }
+
     public function testArrayAbilitiesInAllows()
     {
         $gate = $this->getBasicGate();
@@ -377,9 +444,11 @@ class AuthAccessGateTest extends TestCase
         $gate->define('deny', function ($user) {
             return false;
         });
+        $ability = new ObjectAbility;
 
         $this->assertTrue($gate->allows(['allow_1']));
         $this->assertTrue($gate->allows(['allow_1', 'allow_2', AbilitiesEnum::VIEW_DASHBOARD]));
+        $this->assertTrue($gate->allows(['allow_1', 'allow_2', AbilitiesEnum::VIEW_DASHBOARD, $ability]));
         $this->assertFalse($gate->allows(['allow_1', 'allow_2', 'deny']));
         $this->assertFalse($gate->allows(['deny', 'allow_1', 'allow_2']));
     }
@@ -400,9 +469,10 @@ class AuthAccessGateTest extends TestCase
         $gate->define('allow', function ($user) {
             return true;
         });
+        $ability = new ObjectAbility(false);
 
         $this->assertTrue($gate->denies(['deny_1']));
-        $this->assertTrue($gate->denies(['deny_1', 'deny_2', AbilitiesEnum::VIEW_DASHBOARD]));
+        $this->assertTrue($gate->denies(['deny_1', 'deny_2', AbilitiesEnum::VIEW_DASHBOARD, $ability]));
         $this->assertTrue($gate->denies(['deny_1', 'allow']));
         $this->assertTrue($gate->denies(['allow', 'deny_1']));
         $this->assertFalse($gate->denies(['allow']));
@@ -507,6 +577,27 @@ class AuthAccessGateTest extends TestCase
         $gate->define('foo', [AccessGateTestStaticClass::class, 'foo']);
 
         $this->assertTrue($gate->check('foo'));
+    }
+
+    public function testObjectAbilitiesDontNeedToBeDefined(): void
+    {
+        $gate = $this->getBasicGate();
+
+        $ability = new ObjectAbility;
+
+        $this->assertTrue($gate->check($ability));
+    }
+
+    public function testObjectAbilitiesCanBeDefined(): void
+    {
+        $gate = $this->getBasicGate();
+        $ability = new ObjectAbility;
+
+        $gate->define(ObjectAbility::class, function () {
+            return false;
+        });
+
+        $this->assertFalse($gate->check($ability));
     }
 
     public function testPolicyClassesCanBeDefinedToHandleChecksForGivenType()

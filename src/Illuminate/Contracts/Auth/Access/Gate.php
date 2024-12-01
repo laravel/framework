@@ -7,7 +7,7 @@ interface Gate
     /**
      * Determine if a given ability has been defined.
      *
-     * @param  string  $ability
+     * @param  string|array  $ability
      * @return bool
      */
     public function has($ability);
@@ -59,7 +59,7 @@ interface Gate
     /**
      * Determine if all of the given abilities should be granted for the current user.
      *
-     * @param  iterable|string  $ability
+     * @param  iterable|string|object  $ability
      * @param  array|mixed  $arguments
      * @return bool
      */
@@ -68,7 +68,7 @@ interface Gate
     /**
      * Determine if any of the given abilities should be denied for the current user.
      *
-     * @param  iterable|string  $ability
+     * @param  iterable|string|object  $ability
      * @param  array|mixed  $arguments
      * @return bool
      */
@@ -77,7 +77,7 @@ interface Gate
     /**
      * Determine if all of the given abilities should be granted for the current user.
      *
-     * @param  iterable|string  $abilities
+     * @param  iterable|string|object  $abilities
      * @param  array|mixed  $arguments
      * @return bool
      */
@@ -86,7 +86,7 @@ interface Gate
     /**
      * Determine if any one of the given abilities should be granted for the current user.
      *
-     * @param  iterable|string  $abilities
+     * @param  iterable|string|object  $abilities
      * @param  array|mixed  $arguments
      * @return bool
      */
@@ -95,7 +95,7 @@ interface Gate
     /**
      * Determine if the given ability should be granted for the current user.
      *
-     * @param  string  $ability
+     * @param  string|object  $ability
      * @param  array|mixed  $arguments
      * @return \Illuminate\Auth\Access\Response
      *
@@ -106,7 +106,7 @@ interface Gate
     /**
      * Inspect the user for the given ability.
      *
-     * @param  string  $ability
+     * @param  string|object  $ability
      * @param  array|mixed  $arguments
      * @return \Illuminate\Auth\Access\Response
      */
@@ -115,7 +115,7 @@ interface Gate
     /**
      * Get the raw result from the authorization callback.
      *
-     * @param  string  $ability
+     * @param  string|object  $ability
      * @param  array|mixed  $arguments
      * @return mixed
      *
