@@ -36,6 +36,28 @@ class DatabaseEloquentBelongsToManyWithAttributesTest extends TestCase
         $this->assertSame($tag->id, $pivot->tag_id);
     }
 
+    public function testQueriesWithAttributesAndPivotValues(): void
+    {
+        $post = new ManyToManyWithAttributesPost(['id' => 2]);
+        $wheres = $post->metaTags()->toBase()->wheres;
+
+        $this->assertContains([
+            'type' => 'Basic',
+            'column' => 'visible',
+            'operator' => '=',
+            'value' => true,
+            'boolean' => 'and',
+        ], $wheres);
+
+        $this->assertContains([
+            'type' => 'Basic',
+            'column' => 'with_attributes_pivot.type',
+            'operator' => '=',
+            'value' => 'meta',
+            'boolean' => 'and',
+        ], $wheres);
+    }
+
     protected function createSchema()
     {
         $this->schema()->create('with_attributes_posts', function ($table) {
