@@ -221,7 +221,7 @@ class EncryptCookies
             ->filter(fn ($cookie) => Str::contains($cookie,'*'));
 
         return $exclude->isEmpty()
-            ? in_array($name, $exclude->collapse()->toArray())
+            ? in_array($name, array_merge($this->except, static::$neverEncrypt))
             : $exclude->filter(fn ($cookie) => Str::startsWith(
                 $name, Str::replace('*', '', $cookie)
             ))->isNotEmpty();
