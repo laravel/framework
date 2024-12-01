@@ -462,7 +462,13 @@ class MySqlGrammar extends Grammar
      */
     protected function compileDeleteWithoutJoins(Builder $query, $table, $where)
     {
-        $sql = parent::compileDeleteWithoutJoins($query, $table, $where);
+        if (isset($query->indexHint)) {
+            $alias = last(explode(' as ', $table));
+            $table = $this->compileTableWithIndex($query, $table);
+            $sql = "delete {$alias} from {$table} {$where}";
+        } else {
+            $sql = parent::compileDeleteWithoutJoins($query, $table, $where);
+        }
 
         // When using MySQL, delete statements may contain order by statements and limits
         // so we will compile both of those here. Once we have finished compiling this

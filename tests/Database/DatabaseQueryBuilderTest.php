@@ -6717,67 +6717,211 @@ SQL;
         $this->assertSame('select * from "users" where "roles" ??& ?', $builder->toSql());
     }
 
-    public function testUseIndexMySql()
+    public function testUseIndexMySqlSelect()
     {
         $builder = $this->getMySqlBuilder();
         $builder->select('foo')->from('users')->useIndex('test_index');
         $this->assertSame('select `foo` from `users` use index (test_index)', $builder->toSql());
     }
 
-    public function testForceIndexMySql()
+    public function testForceIndexMySqlSelect()
     {
         $builder = $this->getMySqlBuilder();
         $builder->select('foo')->from('users')->forceIndex('test_index');
         $this->assertSame('select `foo` from `users` force index (test_index)', $builder->toSql());
     }
 
-    public function testIgnoreIndexMySql()
+    public function testIgnoreIndexMySqlSelect()
     {
         $builder = $this->getMySqlBuilder();
         $builder->select('foo')->from('users')->ignoreIndex('test_index');
         $this->assertSame('select `foo` from `users` ignore index (test_index)', $builder->toSql());
     }
 
-    public function testUseIndexSqlite()
+    public function testUseIndexSqliteSelect()
     {
         $builder = $this->getSQLiteBuilder();
         $builder->select('foo')->from('users')->useIndex('test_index');
         $this->assertSame('select "foo" from "users"', $builder->toSql());
     }
 
-    public function testForceIndexSqlite()
+    public function testForceIndexSqliteSelect()
     {
         $builder = $this->getSQLiteBuilder();
         $builder->select('foo')->from('users')->forceIndex('test_index');
         $this->assertSame('select "foo" from "users" indexed by test_index', $builder->toSql());
     }
 
-    public function testIgnoreIndexSqlite()
+    public function testIgnoreIndexSqliteSelect()
     {
         $builder = $this->getSQLiteBuilder();
         $builder->select('foo')->from('users')->ignoreIndex('test_index');
         $this->assertSame('select "foo" from "users"', $builder->toSql());
     }
 
-    public function testUseIndexSqlServer()
+    public function testUseIndexSqlServerSelect()
     {
         $builder = $this->getSqlServerBuilder();
         $builder->select('foo')->from('users')->useIndex('test_index');
         $this->assertSame('select [foo] from [users]', $builder->toSql());
     }
 
-    public function testForceIndexSqlServer()
+    public function testForceIndexSqlServerSelect()
     {
         $builder = $this->getSqlServerBuilder();
         $builder->select('foo')->from('users')->forceIndex('test_index');
         $this->assertSame('select [foo] from [users] with (index(test_index))', $builder->toSql());
     }
 
-    public function testIgnoreIndexSqlServer()
+    public function testIgnoreIndexSqlServerSelect()
     {
         $builder = $this->getSqlServerBuilder();
         $builder->select('foo')->from('users')->ignoreIndex('test_index');
         $this->assertSame('select [foo] from [users]', $builder->toSql());
+    }
+
+    public function testUseIndexMySqlUpdate()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->getConnection()->shouldReceive('update')->once()->with('update `users` use index (test_index) set `email` = ?, `name` = ?', ['foo', 'bar'])->andReturn(1);
+        $result = $builder->from('users')->useIndex('test_index')->update(['email' => 'foo', 'name' => 'bar']);
+        $this->assertEquals(1, $result);
+    }
+
+    public function testForceIndexMySqlUpdate()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->getConnection()->shouldReceive('update')->once()->with('update `users` force index (test_index) set `email` = ?, `name` = ?', ['foo', 'bar'])->andReturn(1);
+        $result = $builder->from('users')->forceIndex('test_index')->update(['email' => 'foo', 'name' => 'bar']);
+        $this->assertEquals(1, $result);
+    }
+
+    public function testIgnoreIndexMySqlUpdate()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->getConnection()->shouldReceive('update')->once()->with('update `users` ignore index (test_index) set `email` = ?, `name` = ?', ['foo', 'bar'])->andReturn(1);
+        $result = $builder->from('users')->ignoreIndex('test_index')->update(['email' => 'foo', 'name' => 'bar']);
+        $this->assertEquals(1, $result);
+    }
+
+    public function testUseIndexSqliteUpdate()
+    {
+        $builder = $this->getSQLiteBuilder();
+        $builder->getConnection()->shouldReceive('update')->once()->with('update "users" set "email" = ?, "name" = ?', ['foo', 'bar'])->andReturn(1);
+        $result = $builder->from('users')->useIndex('test_index')->update(['email' => 'foo', 'name' => 'bar']);
+        $this->assertEquals(1, $result);
+    }
+
+    public function testForceIndexSqliteUpdate()
+    {
+        $builder = $this->getSQLiteBuilder();
+        $builder->getConnection()->shouldReceive('update')->once()->with('update "users" indexed by test_index set "email" = ?, "name" = ?', ['foo', 'bar'])->andReturn(1);
+        $result = $builder->from('users')->forceIndex('test_index')->update(['email' => 'foo', 'name' => 'bar']);
+        $this->assertEquals(1, $result);
+    }
+
+    public function testIgnoreIndexSqliteUpdate()
+    {
+        $builder = $this->getSQLiteBuilder();
+        $builder->getConnection()->shouldReceive('update')->once()->with('update "users" set "email" = ?, "name" = ?', ['foo', 'bar'])->andReturn(1);
+        $result = $builder->from('users')->ignoreIndex('test_index')->update(['email' => 'foo', 'name' => 'bar']);
+        $this->assertEquals(1, $result);
+    }
+
+    public function testUseIndexSqlServerUpdate()
+    {
+        $builder = $this->getSqlServerBuilder();
+        $builder->getConnection()->shouldReceive('update')->once()->with('update [users] set [email] = ?, [name] = ?', ['foo', 'bar'])->andReturn(1);
+        $result = $builder->from('users')->useIndex('test_index')->update(['email' => 'foo', 'name' => 'bar']);
+        $this->assertEquals(1, $result);
+    }
+
+    public function testForceIndexSqlServerUpdate()
+    {
+        $builder = $this->getSqlServerBuilder();
+        $builder->getConnection()->shouldReceive('update')->once()->with('update [users] with (index(test_index)) set [email] = ?, [name] = ?', ['foo', 'bar'])->andReturn(1);
+        $result = $builder->from('users')->forceIndex('test_index')->update(['email' => 'foo', 'name' => 'bar']);
+        $this->assertEquals(1, $result);
+    }
+
+    public function testIgnoreIndexSqlServerUpdate()
+    {
+        $builder = $this->getSqlServerBuilder();
+        $builder->getConnection()->shouldReceive('update')->once()->with('update [users] set [email] = ?, [name] = ?', ['foo', 'bar'])->andReturn(1);
+        $result = $builder->from('users')->ignoreIndex('test_index')->update(['email' => 'foo', 'name' => 'bar']);
+        $this->assertEquals(1, $result);
+    }
+
+    public function testUseIndexMySqlDelete()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->getConnection()->shouldReceive('delete')->once()->with('delete `users` from `users` use index (test_index) where `name` = ?', ['bar'])->andReturn(1);
+        $result = $builder->from('users')->useIndex('test_index')->where('name', 'bar')->delete();
+        $this->assertEquals(1, $result);
+    }
+
+    public function testForceIndexMySqlDelete()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->getConnection()->shouldReceive('delete')->once()->with('delete `users` from `users` force index (test_index) where `name` = ?', ['bar'])->andReturn(1);
+        $result = $builder->from('users')->forceIndex('test_index')->where('name', 'bar')->delete();
+        $this->assertEquals(1, $result);
+    }
+
+    public function testIgnoreIndexMySqlDelete()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->getConnection()->shouldReceive('delete')->once()->with('delete `users` from `users` ignore index (test_index) where `name` = ?', ['bar'])->andReturn(1);
+        $result = $builder->from('users')->ignoreIndex('test_index')->where('name', 'bar')->delete();
+        $this->assertEquals(1, $result);
+    }
+
+    public function testUseIndexSqliteDelete()
+    {
+        $builder = $this->getSQLiteBuilder();
+        $builder->getConnection()->shouldReceive('delete')->once()->with('delete from "users" where "name" = ?', ['bar'])->andReturn(1);
+        $result = $builder->from('users')->useIndex('test_index')->where('name', 'bar')->delete();
+        $this->assertEquals(1, $result);
+    }
+
+    public function testForceIndexSqliteDelete()
+    {
+        $builder = $this->getSQLiteBuilder();
+        $builder->getConnection()->shouldReceive('delete')->once()->with('delete from "users" indexed by test_index where "name" = ?', ['bar'])->andReturn(1);
+        $result = $builder->from('users')->forceIndex('test_index')->where('name', 'bar')->delete();
+        $this->assertEquals(1, $result);
+    }
+
+    public function testIgnoreIndexSqliteDelete()
+    {
+        $builder = $this->getSQLiteBuilder();
+        $builder->getConnection()->shouldReceive('delete')->once()->with('delete from "users" where "name" = ?', ['bar'])->andReturn(1);
+        $result = $builder->from('users')->ignoreIndex('test_index')->where('name', 'bar')->delete();
+        $this->assertEquals(1, $result);
+    }
+
+    public function testUseIndexSqlServerDelete()
+    {
+        $builder = $this->getSqlServerBuilder();
+        $builder->getConnection()->shouldReceive('delete')->once()->with('delete from [users] where [name] = ?', ['bar'])->andReturn(1);
+        $result = $builder->from('users')->useIndex('test_index')->where('name', 'bar')->delete();
+        $this->assertEquals(1, $result);
+    }
+
+    public function testForceIndexSqlServerDelete()
+    {
+        $builder = $this->getSqlServerBuilder();
+        $builder->getConnection()->shouldReceive('delete')->once()->with('delete from [users] with (index(test_index)) where [name] = ?', ['bar'])->andReturn(1);
+        $result = $builder->from('users')->forceIndex('test_index')->where('name', 'bar')->delete();
+        $this->assertEquals(1, $result);
+    }
+
+    public function testIgnoreIndexSqlServerDelete()
+    {
+        $builder = $this->getSqlServerBuilder();
+        $builder->getConnection()->shouldReceive('delete')->once()->with('delete from [users] where [name] = ?', ['bar'])->andReturn(1);
+        $result = $builder->from('users')->ignoreIndex('test_index')->where('name', 'bar')->delete();
+        $this->assertEquals(1, $result);
     }
 
     public function testClone()

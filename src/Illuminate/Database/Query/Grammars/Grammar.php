@@ -1291,6 +1291,8 @@ class Grammar extends BaseGrammar
      */
     protected function compileUpdateWithoutJoins(Builder $query, $table, $columns, $where)
     {
+        $table = $this->compileTableWithIndex($query, $table);
+
         return "update {$table} set {$columns} {$where}";
     }
 
@@ -1306,6 +1308,8 @@ class Grammar extends BaseGrammar
     protected function compileUpdateWithJoins(Builder $query, $table, $columns, $where)
     {
         $joins = $this->compileJoins($query, $query->joins);
+
+        $table = $this->compileTableWithIndex($query, $table);
 
         return "update {$table} {$joins} set {$columns} {$where}";
     }
@@ -1373,6 +1377,8 @@ class Grammar extends BaseGrammar
      */
     protected function compileDeleteWithoutJoins(Builder $query, $table, $where)
     {
+        $table = $this->compileTableWithIndex($query, $table);
+
         return "delete from {$table} {$where}";
     }
 
@@ -1389,6 +1395,8 @@ class Grammar extends BaseGrammar
         $alias = last(explode(' as ', $table));
 
         $joins = $this->compileJoins($query, $query->joins);
+
+        $table = $this->compileTableWithIndex($query, $table);
 
         return "delete {$alias} from {$table} {$joins} {$where}";
     }
@@ -1573,5 +1581,23 @@ class Grammar extends BaseGrammar
     public function getBitwiseOperators()
     {
         return $this->bitwiseOperators;
+    }
+
+    /**
+     * Compile table name with index hint.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  string  $table
+     * @return string
+     */
+    protected function compileTableWithIndex(Builder $query, $table)
+    {
+        if (! isset($query->indexHint)) {
+            return $table;
+        }
+
+        $index = $this->compileIndexHint($query, $query->indexHint);
+
+        return $index !== '' ? $table.' '.$index : $table;
     }
 }
