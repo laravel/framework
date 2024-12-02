@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithDictionary;
 use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithPivotTable;
 use Illuminate\Database\Query\Grammars\MySqlGrammar;
 use Illuminate\Database\UniqueConstraintViolationException;
+use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 
@@ -908,7 +909,7 @@ class BelongsToMany extends Relation
     {
         $defaults = [$this->foreignPivotKey, $this->relatedPivotKey];
 
-        return collect(array_merge($defaults, $this->pivotColumns))->map(function ($column) {
+        return (new BaseCollection(array_merge($defaults, $this->pivotColumns)))->map(function ($column) {
             return $this->qualifyPivotColumn($column).' as pivot_'.$column;
         })->unique()->all();
     }

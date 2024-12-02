@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Console;
 
 use Closure;
 use Illuminate\Console\Command;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Composer;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -69,8 +70,8 @@ class AboutCommand extends Command
     {
         $this->gatherApplicationInformation();
 
-        collect(static::$data)
-            ->map(fn ($items) => collect($items)
+        (new Collection(static::$data))
+            ->map(fn ($items) => (new Collection($items))
                 ->map(function ($value) {
                     if (is_array($value)) {
                         return [$value];
@@ -80,7 +81,7 @@ class AboutCommand extends Command
                         $value = $this->laravel->make($value);
                     }
 
-                    return collect($this->laravel->call($value))
+                    return (new Collection($this->laravel->call($value)))
                         ->map(fn ($value, $key) => [$key, $value])
                         ->values()
                         ->all();
@@ -192,7 +193,7 @@ class AboutCommand extends Command
                 $logChannel = config('logging.default');
 
                 if (config('logging.channels.'.$logChannel.'.driver') === 'stack') {
-                    $secondary = collect(config('logging.channels.'.$logChannel.'.channels'));
+                    $secondary = new Collection(config('logging.channels.'.$logChannel.'.channels'));
 
                     return value(static::format(
                         value: $logChannel,
@@ -212,7 +213,7 @@ class AboutCommand extends Command
             'Session' => config('session.driver'),
         ]));
 
-        collect(static::$customDataResolvers)->each->__invoke();
+        (new Collection(static::$customDataResolvers))->each->__invoke();
     }
 
     /**
@@ -267,7 +268,7 @@ class AboutCommand extends Command
      */
     protected function sections()
     {
-        return collect(explode(',', $this->option('only') ?? ''))
+        return (new Collection(explode(',', $this->option('only') ?? '')))
             ->filter()
             ->map(fn ($only) => $this->toSearchKeyword($only))
             ->all();

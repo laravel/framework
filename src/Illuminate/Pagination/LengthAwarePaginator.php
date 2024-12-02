@@ -113,12 +113,12 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
      */
     public function linkCollection()
     {
-        return collect($this->elements())->flatMap(function ($item) {
+        return (new Collection($this->elements()))->flatMap(function ($item) {
             if (! is_array($item)) {
                 return [['url' => null, 'label' => '...', 'active' => false]];
             }
 
-            return collect($item)->map(function ($url, $page) {
+            return (new Collection($item))->map(function ($url, $page) {
                 return [
                     'url' => $url,
                     'label' => (string) $page,

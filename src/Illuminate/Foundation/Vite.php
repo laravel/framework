@@ -479,7 +479,7 @@ class Vite implements Htmlable
                         ->reduce(
                             fn ($chunks, $import) => $chunks->merge(
                                 $f($manifest[$import])
-                            ), (new Collection([$chunk])))
+                            ), new Collection([$chunk]))
                         ->merge((new Collection($chunk['css'] ?? []))->map(
                             fn ($css) => (new Collection($manifest))->first(fn ($chunk) => $chunk['file'] === $css) ?? [
                                 'file' => $css,
