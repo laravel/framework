@@ -5,6 +5,8 @@ namespace Illuminate\Support;
 use Closure;
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Tappable;
 use League\Uri\Contracts\UriInterface;
@@ -12,7 +14,7 @@ use League\Uri\Uri as LeagueUri;
 use SensitiveParameter;
 use Stringable;
 
-class Uri implements Htmlable
+class Uri implements Htmlable, Responsable
 {
     use Conditionable, Tappable;
 
@@ -264,6 +266,51 @@ class Uri implements Htmlable
     }
 
     /**
+     * Create a redirect HTTP response for the given URI.
+     */
+    public function redirect(int $status = 302, array $headers = []): RedirectResponse
+    {
+        return new RedirectResponse((string) $this, $status, $headers);
+    }
+
+    /**
+     * Create an HTTP response that represents the object.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function toResponse($request)
+    {
+        return new RedirectResponse((string) $this);
+    }
+
+    /**
+     * Get content as a string of HTML.
+     *
+     * @return string
+     */
+    public function toHtml()
+    {
+        return (string) $this;
+    }
+
+    /**
+     * Get the string representation of the URI.
+     */
+    public function value(): string
+    {
+        return (string) $this;
+    }
+
+    /**
+     * Determine if the URI is currently an empty string.
+     */
+    public function isEmpty(): bool
+    {
+        return trim((string) $this) === '';
+    }
+
+    /**
      * Set the URL generator resolver.
      */
     public static function setUrlGeneratorResolver(Closure $urlGeneratorResolver): void
@@ -277,16 +324,6 @@ class Uri implements Htmlable
     public function getUri(): UriInterface
     {
         return $this->uri;
-    }
-
-    /**
-     * Get content as a string of HTML.
-     *
-     * @return string
-     */
-    public function toHtml()
-    {
-        return (string) $this;
     }
 
     /**
