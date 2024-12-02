@@ -5,7 +5,7 @@ namespace Illuminate\Database\Eloquent\Concerns;
 use BadMethodCallException;
 use Closure;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\RelationNotFoundException;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
@@ -550,7 +550,7 @@ trait QueriesRelationships
      */
     public function whereBelongsTo($related, $relationshipName = null, $boolean = 'and')
     {
-        if (! $related instanceof Collection) {
+        if (! $related instanceof EloquentCollection) {
             $relatedCollection = $related->newCollection([$related]);
         } else {
             $relatedCollection = $related;
