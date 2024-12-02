@@ -38,15 +38,6 @@ class DatabaseEloquentPivotTest extends TestCase
         $this->assertSame($parent, $pivot->pivotParent);
     }
 
-    public function testRelatedPivotModelCanBeSetCorrectly()
-    {
-        $parent = new DummyModel;
-        $related = new DummyModel;
-        $pivot = Pivot::fromAttributes($parent, ['foo' => 'bar', 'created_at' => '2024-11-27'], 'table', true, $related);
-
-        $this->assertSame($related, $pivot->pivotRelated);
-    }
-
     public function testMutatorsAreCalledFromConstructor()
     {
         $parent = m::mock(Model::class.'[getConnectionName]');

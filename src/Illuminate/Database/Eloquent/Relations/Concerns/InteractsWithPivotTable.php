@@ -500,7 +500,8 @@ trait InteractsWithPivotTable
         return $this->newPivotQuery()->get()->map(function ($record) {
             $class = $this->using ?: Pivot::class;
 
-            $pivot = $class::fromRawAttributes($this->parent, (array) $record, $this->getTable(), true, $this->related);
+            $pivot = $class::fromRawAttributes($this->parent, (array) $record, $this->getTable(), true)
+                ->setRelatedModel($this->related);
 
             return $pivot->setPivotKeys($this->foreignPivotKey, $this->relatedPivotKey);
         });
@@ -518,8 +519,8 @@ trait InteractsWithPivotTable
         $attributes = array_merge(array_column($this->pivotValues, 'value', 'column'), $attributes);
 
         $pivot = $this->related->newPivot(
-            $this->parent, $attributes, $this->table, $exists, $this->using, $this->related
-        );
+            $this->parent, $attributes, $this->table, $exists, $this->using
+        )->setRelatedModel($this->related);
 
         return $pivot->setPivotKeys($this->foreignPivotKey, $this->relatedPivotKey);
     }

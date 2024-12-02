@@ -42,10 +42,9 @@ trait AsPivot
      * @param  array  $attributes
      * @param  string  $table
      * @param  bool  $exists
-     * @param  \Illuminate\Database\Eloquent\Model|null  $related
      * @return static
      */
-    public static function fromAttributes(Model $parent, $attributes, $table, $exists = false, ?Model $related = null)
+    public static function fromAttributes(Model $parent, $attributes, $table, $exists = false)
     {
         $instance = new static;
 
@@ -64,11 +63,6 @@ trait AsPivot
         // from the developer's point of view. We can use the parents to get these.
         $instance->pivotParent = $parent;
 
-        // Also store a model instance of the relationship that was called on the parent
-        // so the developer is able to identify which relationship methods were used
-        // in their custom pivot class, and within their fromRawAttributes method.
-        $instance->pivotRelated = $related;
-
         $instance->exists = $exists;
 
         return $instance;
@@ -81,12 +75,11 @@ trait AsPivot
      * @param  array  $attributes
      * @param  string  $table
      * @param  bool  $exists
-     * @param  \Illuminate\Database\Eloquent\Model|null  $related
      * @return static
      */
-    public static function fromRawAttributes(Model $parent, $attributes, $table, $exists = false, ?Model $related = null)
+    public static function fromRawAttributes(Model $parent, $attributes, $table, $exists = false)
     {
-        $instance = static::fromAttributes($parent, [], $table, $exists, $related);
+        $instance = static::fromAttributes($parent, [], $table, $exists);
 
         $instance->timestamps = $instance->hasTimestampAttributes($attributes);
 
@@ -229,6 +222,19 @@ trait AsPivot
     }
 
     /**
+     * Set the related model of the relationship.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model|null  $related
+     * @return $this
+     */
+    public function setRelatedModel(?Model $related = null)
+    {
+        $this->pivotRelated = $related;
+
+        return $this;
+    }
+
+    /**
      * Determine if the pivot model or given attributes has timestamp attributes.
      *
      * @param  array|null  $attributes
@@ -340,6 +346,7 @@ trait AsPivot
     public function unsetRelations()
     {
         $this->pivotParent = null;
+        $this->pivotRelated = null;
         $this->relations = [];
 
         return $this;
