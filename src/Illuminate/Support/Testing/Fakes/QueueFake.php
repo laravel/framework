@@ -63,7 +63,7 @@ class QueueFake extends QueueManager implements Fake, Queue
         parent::__construct($app);
 
         $this->jobsToFake = Collection::wrap($jobsToFake);
-        $this->jobsToBeQueued = Collection::make();
+        $this->jobsToBeQueued = new Collection;
         $this->queue = $queue;
     }
 

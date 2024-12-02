@@ -105,7 +105,7 @@ class Response implements ArrayAccess, Stringable
      */
     public function collect($key = null)
     {
-        return Collection::make($this->json($key));
+        return new Collection($this->json($key));
     }
 
     /**

@@ -67,7 +67,7 @@ class Inspiring
      */
     public static function quotes()
     {
-        return Collection::make([
+        return new Collection([
             'Act only according to that maxim whereby you can, at the same time, will that it should become a universal law. - Immanuel Kant',
             'An unexamined life is not worth living. - Socrates',
             'Be present above all else. - Naval Ravikant',
