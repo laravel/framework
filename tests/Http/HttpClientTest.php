@@ -1261,8 +1261,7 @@ class HttpClientTest extends TestCase
 
         throw new RequestException(new Response($response));
     }
-
-
+    
     public function testRequestExceptionWithCustomTruncatedSummary()
     {
         RequestException::truncateAt(60);
