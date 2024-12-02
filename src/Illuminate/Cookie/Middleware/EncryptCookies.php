@@ -218,7 +218,7 @@ class EncryptCookies
     {
         $except = Collection::make($this->except)->merge(static::$neverEncrypt);
 
-        return $except->some(fn ($cookie) => Str::contains($cookie, '*'))
+        return $except->doesntContain(fn ($cookie) => Str::contains($cookie, '*'))
             ? $except->contains($name)
             : $except->filter(fn ($cookie) => Str::startsWith(
                 $name, Str::replace('*', '', $cookie)
