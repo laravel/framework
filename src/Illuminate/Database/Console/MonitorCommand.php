@@ -5,6 +5,7 @@ namespace Illuminate\Database\Console;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\Events\DatabaseBusy;
+use Illuminate\Support\Collection;
 use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'db:monitor')]
@@ -78,7 +79,7 @@ class MonitorCommand extends DatabaseInspectionCommand
      */
     protected function parseDatabases($databases)
     {
-        return collect(explode(',', $databases))->map(function ($database) {
+        return (new Collection(explode(',', $databases)))->map(function ($database) {
             if (! $database) {
                 $database = $this->laravel['config']['database.default'];
             }

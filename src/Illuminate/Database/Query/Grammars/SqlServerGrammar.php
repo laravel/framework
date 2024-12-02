@@ -5,6 +5,7 @@ namespace Illuminate\Database\Query\Grammars;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\JoinLateralClause;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
 class SqlServerGrammar extends Grammar
@@ -418,20 +419,20 @@ class SqlServerGrammar extends Grammar
 
         $sql = 'merge '.$this->wrapTable($query->from).' ';
 
-        $parameters = collect($values)->map(function ($record) {
+        $parameters = (new Collection($values))->map(function ($record) {
             return '('.$this->parameterize($record).')';
         })->implode(', ');
 
         $sql .= 'using (values '.$parameters.') '.$this->wrapTable('laravel_source').' ('.$columns.') ';
 
-        $on = collect($uniqueBy)->map(function ($column) use ($query) {
+        $on = (new Collection($uniqueBy))->map(function ($column) use ($query) {
             return $this->wrap('laravel_source.'.$column).' = '.$this->wrap($query->from.'.'.$column);
         })->implode(' and ');
 
         $sql .= 'on '.$on.' ';
 
         if ($update) {
-            $update = collect($update)->map(function ($value, $key) {
+            $update = (new Collection($update))->map(function ($value, $key) {
                 return is_numeric($key)
                     ? $this->wrap($value).' = '.$this->wrap('laravel_source.'.$value)
                     : $this->wrap($key).' = '.$this->parameter($value);

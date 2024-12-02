@@ -7,6 +7,7 @@ use Illuminate\Cache\RateLimiting\Unlimited;
 use Illuminate\Container\Container;
 use Illuminate\Support\Arr;
 
+use Illuminate\Support\Collection;
 use function Illuminate\Support\enum_value;
 
 class RateLimited
@@ -67,7 +68,7 @@ class RateLimited
         return $this->handleJob(
             $job,
             $next,
-            collect(Arr::wrap($limiterResponse))->map(function ($limit) {
+            (new Collection(Arr::wrap($limiterResponse)))->map(function ($limit) {
                 return (object) [
                     'key' => md5($this->limiterName.$limit->key),
                     'maxAttempts' => $limit->maxAttempts,
