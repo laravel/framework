@@ -15,6 +15,8 @@ use Illuminate\Routing\CallableDispatcher;
 use Illuminate\Routing\Contracts\CallableDispatcher as CallableDispatcherContract;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Routing\Router;
+use Illuminate\Testing\Assert;
+use Illuminate\Tests\Auth\Fixtures\ObjectAbility;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use stdClass;
@@ -219,6 +221,169 @@ class AuthorizeMiddlewareTest extends TestCase
 
         $this->router->get('dashboard/{route_parameter}', [
             'middleware' => Authorize::class.':view-dashboard,route_parameter',
+            'uses' => function () {
+                return 'success';
+            },
+        ]);
+
+        $response = $this->router->dispatch(Request::create('dashboard/0', 'GET'));
+
+        $this->assertSame('success', $response->content());
+    }
+
+    public function testObjectAbilityUnauthorized()
+    {
+        $this->expectException(AuthorizationException::class);
+        $this->expectExceptionMessage('This action is unauthorized.');
+
+        $ability = new class
+        {
+            public function granted()
+            {
+                return false;
+            }
+        };
+
+        $this->router->get('dashboard', [
+            'middleware' => Authorize::class.':'.$ability::class,
+            'uses' => function () {
+                return 'success';
+            },
+        ]);
+
+        $this->router->dispatch(Request::create('dashboard', 'GET'));
+    }
+
+    public function testObjectAbilityAuthorized()
+    {
+        $this->router->get('dashboard', [
+            'middleware' => Authorize::class.':'.ObjectAbility::class,
+            'uses' => function () {
+                return 'success';
+            },
+        ]);
+
+        $response = $this->router->dispatch(Request::create('dashboard', 'GET'));
+
+        $this->assertSame('success', $response->content());
+    }
+
+    public function testObjectAbilityWithStringParameter()
+    {
+        $ability = new class
+        {
+            public function granted($user, $param)
+            {
+                return $param === 'some string';
+            }
+        };
+
+        $this->router->get('dashboard', [
+            'middleware' => Authorize::class.':'.$ability::class.',"some string"',
+            'uses' => function () {
+                return 'success';
+            },
+        ]);
+
+        $response = $this->router->dispatch(Request::create('dashboard', 'GET'));
+
+        $this->assertSame('success', $response->content());
+    }
+
+    public function testObjectAbilityWithNullParameter()
+    {
+        $ability = new class
+        {
+            public function granted($user, $param = null)
+            {
+                Assert::assertNull($param);
+
+                return true;
+            }
+        };
+
+        $this->router->get('dashboard', [
+            'middleware' => Authorize::class.':'.$ability::class.',null',
+            'uses' => function () {
+                return 'success';
+            },
+        ]);
+
+        $this->router->dispatch(Request::create('dashboard', 'GET'));
+    }
+
+    public function testObjectAbilityWithOptionalParameter()
+    {
+        $post = new stdClass;
+
+        $this->router->bind('post', function () use ($post) {
+            return $post;
+        });
+
+        $ability = new class
+        {
+            public function granted($user, $model = null)
+            {
+                return true;
+            }
+        };
+
+        $middleware = [SubstituteBindings::class, Authorize::class.':'.$ability::class.',post'];
+
+        $this->router->get('comments', [
+            'middleware' => $middleware,
+            'uses' => function () {
+                return 'success';
+            },
+        ]);
+        $this->router->get('posts/{post}/comments', [
+            'middleware' => $middleware,
+            'uses' => function () {
+                return 'success';
+            },
+        ]);
+
+        $response = $this->router->dispatch(Request::create('posts/1/comments', 'GET'));
+        $this->assertSame('success', $response->content());
+
+        $response = $this->router->dispatch(Request::create('comments', 'GET'));
+        $this->assertSame('success', $response->content());
+    }
+
+    public function testObjectAbilityWithStringParameterFromRouteParameter()
+    {
+        $ability = new class
+        {
+            public function granted($user, $param)
+            {
+                return $param === 'true';
+            }
+        };
+
+        $this->router->get('dashboard/{route_parameter}', [
+            'middleware' => Authorize::class.':'.$ability::class.',route_parameter',
+            'uses' => function () {
+                return 'success';
+            },
+        ]);
+
+        $response = $this->router->dispatch(Request::create('dashboard/true', 'GET'));
+
+        $this->assertSame('success', $response->content());
+    }
+
+    public function testObjectAbilityWithStringParameter0FromRouteParameter()
+    {
+        $ability = new class
+        {
+            public function granted($user, $param)
+            {
+                return $param === '0';
+            }
+        };
+
+        $this->router->get('dashboard/{route_parameter}', [
+            'middleware' => Authorize::class.':'.$ability::class.',route_parameter',
             'uses' => function () {
                 return 'success';
             },
