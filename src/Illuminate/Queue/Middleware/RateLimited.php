@@ -6,8 +6,8 @@ use Illuminate\Cache\RateLimiter;
 use Illuminate\Cache\RateLimiting\Unlimited;
 use Illuminate\Container\Container;
 use Illuminate\Support\Arr;
-
 use Illuminate\Support\Collection;
+
 use function Illuminate\Support\enum_value;
 
 class RateLimited
