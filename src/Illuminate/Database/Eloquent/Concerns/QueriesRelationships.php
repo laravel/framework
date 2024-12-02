@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Query\Expression;
+use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 
@@ -838,8 +839,8 @@ trait QueriesRelationships
      */
     protected function requalifyWhereTables(array $wheres, string $from, string $to): array
     {
-        return collect($wheres)->map(function ($where) use ($from, $to) {
-            return collect($where)->map(function ($value) use ($from, $to) {
+        return (new BaseCollection($wheres))->map(function ($where) use ($from, $to) {
+            return (new BaseCollection($where))->map(function ($value) use ($from, $to) {
                 return is_string($value) && str_starts_with($value, $from.'.')
                     ? $to.'.'.Str::afterLast($value, '.')
                     : $value;
