@@ -44,7 +44,7 @@ class DatabaseEloquentBelongsToManyWithAttributesTest extends TestCase
 
         $this->assertContains([
             'type' => 'Basic',
-            'column' => 'visible',
+            'column' => 'with_attributes_tags.visible',
             'operator' => '=',
             'value' => true,
             'boolean' => 'and',
@@ -66,7 +66,7 @@ class DatabaseEloquentBelongsToManyWithAttributesTest extends TestCase
 
         $this->assertContains([
             'type' => 'Basic',
-            'column' => 'visible',
+            'column' => 'with_attributes_tags.visible',
             'operator' => '=',
             'value' => true,
             'boolean' => 'and',
@@ -110,7 +110,7 @@ class DatabaseEloquentBelongsToManyWithAttributesTest extends TestCase
 
         $this->assertContains([
             'type' => 'Basic',
-            'column' => 'title',
+            'column' => 'with_attributes_posts.title',
             'operator' => '=',
             'value' => 'Title!',
             'boolean' => 'and',

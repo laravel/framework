@@ -187,7 +187,7 @@ class DatabaseEloquentHasOneOrManyWithAttributesTest extends TestCase
 
         $this->assertContains([
             'type' => 'Basic',
-            'column' => $key,
+            'column' => 'related_with_attributes_models.'.$key,
             'operator' => '=',
             'value' => $value,
             'boolean' => 'and',
@@ -222,7 +222,7 @@ class DatabaseEloquentHasOneOrManyWithAttributesTest extends TestCase
 
         $this->assertContains([
             'type' => 'Null',
-            'column' => $key,
+            'column' => 'related_with_attributes_models.'.$key,
             'boolean' => 'and',
         ], $wheres);
     }

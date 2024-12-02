@@ -1801,7 +1801,7 @@ class Builder implements BuilderContract
         }
 
         foreach ($attributes as $column => $value) {
-            $this->where($column, $value);
+            $this->where($this->qualifyColumn($column), $value);
         }
 
         $this->pendingAttributes = array_merge($this->pendingAttributes, $attributes);

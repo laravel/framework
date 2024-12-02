@@ -45,7 +45,7 @@ class DatabaseEloquentWithAttributesTest extends TestCase
 
         $this->assertContains([
             'type' => 'Basic',
-            'column' => $key,
+            'column' => 'with_attributes_models.'.$key,
             'operator' => '=',
             'value' => $value,
             'boolean' => 'and',
