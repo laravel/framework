@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Database;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentBelongsToManyWithAttributesTest extends TestCase
@@ -58,10 +59,97 @@ class DatabaseEloquentBelongsToManyWithAttributesTest extends TestCase
         ], $wheres);
     }
 
+    public function testMorphToManyWithAttributes(): void
+    {
+        $post = new ManyToManyWithAttributesPost(['id' => 2]);
+        $wheres = $post->morphedTags()->toBase()->wheres;
+
+        $this->assertContains([
+            'type' => 'Basic',
+            'column' => 'visible',
+            'operator' => '=',
+            'value' => true,
+            'boolean' => 'and',
+        ], $wheres);
+
+        $this->assertContains([
+            'type' => 'Basic',
+            'column' => 'with_attributes_taggables.type',
+            'operator' => '=',
+            'value' => 'meta',
+            'boolean' => 'and',
+        ], $wheres);
+
+        $this->assertContains([
+            'type' => 'Basic',
+            'column' => 'with_attributes_taggables.taggable_type',
+            'operator' => '=',
+            'value' => ManyToManyWithAttributesPost::class,
+            'boolean' => 'and',
+        ], $wheres);
+
+        $this->assertContains([
+            'type' => 'Basic',
+            'column' => 'with_attributes_taggables.taggable_id',
+            'operator' => '=',
+            'value' => 2,
+            'boolean' => 'and',
+        ], $wheres);
+
+        $tag = $post->morphedTags()->create(['name' => 'new tag']);
+
+        $this->assertTrue($tag->visible);
+        $this->assertSame('new tag', $tag->name);
+        $this->assertSame($tag->id, $post->morphedTags()->first()->id);
+    }
+
+    public function testMorphedByManyWithAttributes(): void
+    {
+        $tag = new ManyToManyWithAttributesTag(['id' => 4]);
+        $wheres = $tag->morphedPosts()->toBase()->wheres;
+
+        $this->assertContains([
+            'type' => 'Basic',
+            'column' => 'title',
+            'operator' => '=',
+            'value' => 'Title!',
+            'boolean' => 'and',
+        ], $wheres);
+
+        $this->assertContains([
+            'type' => 'Basic',
+            'column' => 'with_attributes_taggables.type',
+            'operator' => '=',
+            'value' => 'meta',
+            'boolean' => 'and',
+        ], $wheres);
+
+        $this->assertContains([
+            'type' => 'Basic',
+            'column' => 'with_attributes_taggables.taggable_type',
+            'operator' => '=',
+            'value' => ManyToManyWithAttributesPost::class,
+            'boolean' => 'and',
+        ], $wheres);
+
+        $this->assertContains([
+            'type' => 'Basic',
+            'column' => 'with_attributes_taggables.tag_id',
+            'operator' => '=',
+            'value' => 4,
+            'boolean' => 'and',
+        ], $wheres);
+
+        $post = $tag->morphedPosts()->create();
+        $this->assertSame('Title!', $post->title);
+        $this->assertSame($post->id, $tag->morphedPosts()->first()->id);
+    }
+
     protected function createSchema()
     {
         $this->schema()->create('with_attributes_posts', function ($table) {
             $table->increments('id');
+            $table->string('title')->nullable();
             $table->timestamps();
         });
 
@@ -75,6 +163,13 @@ class DatabaseEloquentBelongsToManyWithAttributesTest extends TestCase
         $this->schema()->create('with_attributes_pivot', function ($table) {
             $table->integer('post_id');
             $table->integer('tag_id');
+            $table->string('type');
+        });
+
+        $this->schema()->create('with_attributes_taggables', function($table){
+            $table->integer('tag_id');
+            $table->integer('taggable_id');
+            $table->string('taggable_type');
             $table->string('type');
         });
     }
@@ -133,10 +228,34 @@ class ManyToManyWithAttributesPost extends Model
             ->withAttributes('visible', true)
             ->withPivotValue('type', 'meta');
     }
+
+    public function morphedTags(): MorphToMany
+    {
+        return $this->morphToMany(
+                ManyToManyWithAttributesTag::class,
+                'taggable',
+                'with_attributes_taggables',
+                relatedPivotKey: 'tag_id'
+            )
+            ->withAttributes('visible', true)
+            ->withPivotValue('type', 'meta');
+    }
 }
 
 class ManyToManyWithAttributesTag extends Model
 {
     protected $guarded = [];
     protected $table = 'with_attributes_tags';
+
+    public function morphedPosts(): MorphToMany
+    {
+        return $this->morphedByMany(
+                ManyToManyWithAttributesPost::class,
+                'taggable',
+                'with_attributes_taggables',
+                'tag_id',
+            )
+            ->withAttributes('title', 'Title!')
+            ->withPivotValue('type', 'meta');
+    }
 }
