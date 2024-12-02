@@ -6,9 +6,9 @@ use Closure;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
 use Illuminate\Cookie\CookieValuePrefix;
-use Illuminate\Support\Str;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -218,7 +218,7 @@ class EncryptCookies
     {
         $except = Collection::make($this->except)->merge(static::$neverEncrypt);
 
-        return $except->some(fn ($cookie) => Str::contains($cookie,'*'))
+        return $except->some(fn ($cookie) => Str::contains($cookie, '*'))
             ? $except->contains($name)
             : $except->filter(fn ($cookie) => Str::startsWith(
                 $name, Str::replace('*', '', $cookie)
