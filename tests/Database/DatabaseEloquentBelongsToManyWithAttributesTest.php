@@ -166,7 +166,7 @@ class DatabaseEloquentBelongsToManyWithAttributesTest extends TestCase
             $table->string('type');
         });
 
-        $this->schema()->create('with_attributes_taggables', function($table) {
+        $this->schema()->create('with_attributes_taggables', function ($table) {
             $table->integer('tag_id');
             $table->integer('taggable_id');
             $table->string('taggable_type');
