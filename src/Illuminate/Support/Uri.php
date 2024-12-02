@@ -2,6 +2,7 @@
 
 namespace Illuminate\Support;
 
+use Closure;
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Traits\Conditionable;
@@ -14,6 +15,11 @@ use Stringable;
 class Uri implements Htmlable
 {
     use Conditionable, Tappable;
+
+    /**
+     * The URL generator resolver.
+     */
+    protected static ?Closure $urlGeneratorResolver = null;
 
     /**
      * Create a new parsed URI instance.
@@ -29,6 +35,29 @@ class Uri implements Htmlable
     public static function of(UriInterface|Stringable|string $uri = ''): static
     {
         return new static($uri);
+    }
+
+    /**
+     * Generate an absolute URL to the given path.
+     */
+    public static function to(string $path): static
+    {
+        return new static(call_user_func(static::$urlGeneratorResolver)->to($path));
+    }
+
+    /**
+     * Get a URI instance for a named route.
+     *
+     * @param  \BackedEnum|string  $name
+     * @param  mixed  $parameters
+     * @param  bool  $absolute
+     * @return static
+     *
+     * @throws \Symfony\Component\Routing\Exception\RouteNotFoundException|\InvalidArgumentException
+     */
+    public static function route($name, $parameters = [], $absolute = true): static
+    {
+        return new static(call_user_func(static::$urlGeneratorResolver)->route($name, $parameters, $absolute));
     }
 
     /**
@@ -195,6 +224,14 @@ class Uri implements Htmlable
     public function withFragment(string $fragment): static
     {
         return new static($this->uri->withFragment($fragment));
+    }
+
+    /**
+     * Set the URL generator resolver.
+     */
+    public static function setUrlGeneratorResolver(Closure $urlGeneratorResolver): void
+    {
+        static::$urlGeneratorResolver = $urlGeneratorResolver;
     }
 
     /**
