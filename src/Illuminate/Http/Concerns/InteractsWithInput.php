@@ -4,6 +4,7 @@ namespace Illuminate\Http\Concerns;
 
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Traits\Dumpable;
 use SplFileInfo;
@@ -449,7 +450,7 @@ trait InteractsWithInput
      */
     public function collect($key = null)
     {
-        return collect(is_array($key) ? $this->only($key) : $this->input($key));
+        return new Collection(is_array($key) ? $this->only($key) : $this->input($key));
     }
 
     /**

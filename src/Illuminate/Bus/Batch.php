@@ -205,7 +205,7 @@ class Batch implements Arrayable, JsonSerializable
      */
     protected function prepareBatchedChain(array $chain)
     {
-        return collect($chain)->map(function ($job) {
+        return (new Collection($chain))->map(function ($job) {
             $job = $job instanceof Closure ? CallQueuedClosure::create($job) : $job;
 
             return $job->withBatchId($this->id);
@@ -245,7 +245,7 @@ class Batch implements Arrayable, JsonSerializable
         if ($this->hasProgressCallbacks()) {
             $batch = $this->fresh();
 
-            collect($this->options['progress'])->each(function ($handler) use ($batch) {
+            (new Collection($this->options['progress']))->each(function ($handler) use ($batch) {
                 $this->invokeHandlerCallback($handler, $batch);
             });
         }
@@ -257,7 +257,7 @@ class Batch implements Arrayable, JsonSerializable
         if ($counts->pendingJobs === 0 && $this->hasThenCallbacks()) {
             $batch = $this->fresh();
 
-            collect($this->options['then'])->each(function ($handler) use ($batch) {
+            (new Collection($this->options['then']))->each(function ($handler) use ($batch) {
                 $this->invokeHandlerCallback($handler, $batch);
             });
         }
@@ -265,7 +265,7 @@ class Batch implements Arrayable, JsonSerializable
         if ($counts->allJobsHaveRanExactlyOnce() && $this->hasFinallyCallbacks()) {
             $batch = $this->fresh();
 
-            collect($this->options['finally'])->each(function ($handler) use ($batch) {
+            (new Collection($this->options['finally']))->each(function ($handler) use ($batch) {
                 $this->invokeHandlerCallback($handler, $batch);
             });
         }
@@ -350,7 +350,7 @@ class Batch implements Arrayable, JsonSerializable
         if ($this->hasProgressCallbacks() && $this->allowsFailures()) {
             $batch = $this->fresh();
 
-            collect($this->options['progress'])->each(function ($handler) use ($batch, $e) {
+            (new Collection($this->options['progress']))->each(function ($handler) use ($batch, $e) {
                 $this->invokeHandlerCallback($handler, $batch, $e);
             });
         }
@@ -358,7 +358,7 @@ class Batch implements Arrayable, JsonSerializable
         if ($counts->failedJobs === 1 && $this->hasCatchCallbacks()) {
             $batch = $this->fresh();
 
-            collect($this->options['catch'])->each(function ($handler) use ($batch, $e) {
+            (new Collection($this->options['catch']))->each(function ($handler) use ($batch, $e) {
                 $this->invokeHandlerCallback($handler, $batch, $e);
             });
         }
@@ -366,7 +366,7 @@ class Batch implements Arrayable, JsonSerializable
         if ($counts->allJobsHaveRanExactlyOnce() && $this->hasFinallyCallbacks()) {
             $batch = $this->fresh();
 
-            collect($this->options['finally'])->each(function ($handler) use ($batch, $e) {
+            (new Collection($this->options['finally']))->each(function ($handler) use ($batch, $e) {
                 $this->invokeHandlerCallback($handler, $batch, $e);
             });
         }
