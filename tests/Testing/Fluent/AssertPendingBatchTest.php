@@ -251,7 +251,7 @@ class AssertPendingBatchTest extends TestCase
 
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage(
-            'The first one in the batch does not matches the given callback because of: The batch does not contain a job of type [Illuminate\Testing\Fluent\CJob]'
+            'The first one in the batch does not matches the given callback: The batch does not contain a job of type [Illuminate\Testing\Fluent\CJob]'
         );
 
         Bus::assertBatched(fn (PendingBatchFake $assert) =>
@@ -312,7 +312,7 @@ class AssertPendingBatchTest extends TestCase
 
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage(
-            'The [1st] one in the batch does not matches the given callback because of: The batch does not contain a job of type [Illuminate\Testing\Fluent\AJob]'
+            'The [1st] one in the batch does not matches the given callback: The batch does not contain a job of type [Illuminate\Testing\Fluent\AJob]'
         );
 
         Bus::assertBatched(fn (PendingBatchFake $assert) =>
@@ -358,7 +358,7 @@ class AssertPendingBatchTest extends TestCase
 
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage(
-            'The [0th] one in the batch does not matches the given callback because of: The job parameters does not match the expected values for class [Illuminate\Testing\Fluent\AJob].'
+            'The [0th] one in the batch does not matches the given callback: The job parameters does not match the expected values for class [Illuminate\Testing\Fluent\AJob].'
         );
 
         Bus::assertBatched(fn (PendingBatchFake $assert) =>
@@ -387,6 +387,61 @@ class AssertPendingBatchTest extends TestCase
                 CJob::class => [1],
                 DJob::class => [2],
                 EJob::class => [2, 3],
+            ])
+        );
+    }
+
+    public function test_equal_jobs_in_pending_batch_fail_when_job_missing()
+    {
+        Bus::fake();
+
+        Bus::batch([
+            new AJob(0, 1),
+            new BJob(1),
+            new CJob(1),
+            new DJob(2),
+            new EJob(2, 3),
+        ])->dispatch();
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage(
+            'The job of type [Illuminate\Testing\Fluent\EJob] does not exists.'
+        );
+
+        Bus::assertBatched(fn (PendingBatchFake $assert) =>
+            $assert->equal([
+                AJob::class => [0, 1],
+                BJob::class => [1],
+                CJob::class => [1],
+                DJob::class => [2],
+            ])
+        );
+    }
+
+    public function test_equal_jobs_in_pending_batch_fail_when_job_parameters_does_not_match()
+    {
+        Bus::fake();
+
+        Bus::batch([
+            new AJob(0, 1),
+            new BJob(1),
+            new CJob(1),
+            new DJob(2),
+            new EJob(2, 3),
+        ])->dispatch();
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage(
+            'The job parameters does not match the expected values for class [Illuminate\Testing\Fluent\EJob].'
+        );
+
+        Bus::assertBatched(fn (PendingBatchFake $assert) =>
+            $assert->equal([
+                AJob::class => [0, 1],
+                BJob::class => [1],
+                CJob::class => [1],
+                DJob::class => [2],
+                EJob::class,
             ])
         );
     }
@@ -422,6 +477,59 @@ class AssertPendingBatchTest extends TestCase
                     BJob::class,
                 ],
                 CJob::class,
+            ])
+        );
+    }
+
+    public function test_equal_with_nested_jobs_in_pending_batch_fail_when_is_not_array()
+    {
+        Bus::fake();
+
+        Bus::batch([
+            new AJob(1),
+            [
+                new BJob(2, 3),
+                new CJob,
+                new DJob(4),
+            ]
+        ])->dispatch();
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('The one in the batch at index [1] is not an array.');
+
+        Bus::assertBatched(fn (PendingBatchFake $assert) =>
+            $assert->equal([
+                AJob::class => [1],
+                BJob::class => [2, 3],
+                CJob::class,
+                DJob::class => [4],
+            ])
+        );
+    }
+
+    public function test_equal_with_nested_jobs_in_pending_batch_fail_when_is_not_same()
+    {
+        Bus::fake();
+
+        Bus::batch([
+            new AJob(1),
+            [
+                new BJob(2, 3),
+                new CJob,
+                new DJob(4),
+            ]
+        ])->dispatch();
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('The [1st] one in the batch at index [2] does not match: The job of type [Illuminate\Testing\Fluent\DJob] does not exists.');
+
+        Bus::assertBatched(fn (PendingBatchFake $assert) =>
+            $assert->equal([
+                AJob::class => [1],
+                [
+                    BJob::class => [2, 3],
+                    CJob::class,
+                ]
             ])
         );
     }

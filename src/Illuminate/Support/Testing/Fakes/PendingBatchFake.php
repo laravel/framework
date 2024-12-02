@@ -186,7 +186,7 @@ class PendingBatchFake extends PendingBatch
                 )
             );
         } catch (Throwable $e) {
-            throw new $e('The first one in the batch does not matches the given callback because of: ' . $e->getMessage());
+            throw new $e('The first one in the batch does not matches the given callback: ' . $e->getMessage());
         }
 
         array_push($this->expected, is_array($firstJob) ?
@@ -222,7 +222,7 @@ class PendingBatchFake extends PendingBatch
                 );
             } catch (Throwable $e) {
                 throw new $e(sprintf(
-                    'The [%s] one in the batch does not matches the given callback because of: %s',
+                    'The [%s] one in the batch does not matches the given callback: %s',
                     Number::ordinal($index, 'en'),
                     $e->getMessage()
                 ));
@@ -258,14 +258,31 @@ class PendingBatchFake extends PendingBatch
     {
         $this->jobs->each(function ($actualJob, $nth) use (&$expectedJobs) {
             if (is_array($actualJob)) {
+                $nestedJobs = is_string(key($expectedJobs)) ?
+                    key($expectedJobs) :
+                    current($expectedJobs);
+
                 PHPUnit::assertTrue(
-                    is_array(current($expectedJobs)),
-                    "Failed to assert that the [{$nth}]th job in the batch is an array."
+                    is_array($nestedJobs),
+                    "The one in the batch at index [{$nth}] is not an array."
                 );
 
-                foreach ($actualJob as $nestedJob) {
-                    $jobClass = get_class($nestedJob);
-                    $this->parametersMatch($nestedJob, $jobClass, current($expectedJobs)[$jobClass] ?? []);
+                try {
+                    foreach ($actualJob as $index => $actual) {
+                        $this->parametersMatch(
+                            $actual,
+                            is_string(key($nestedJobs)) ? key($nestedJobs) : current($nestedJobs),
+                            $nestedJobs[get_class($actual)] ?? []
+                        );
+                        next($nestedJobs);
+                    }
+                } catch (Throwable $e) {
+                    throw new $e(sprintf(
+                        'The [%s] one in the batch at index [%s] does not match: %s',
+                        Number::ordinal($nth, 'en'),
+                        $index,
+                        $e->getMessage()
+                    ));
                 }
 
                 next($expectedJobs);
@@ -273,8 +290,11 @@ class PendingBatchFake extends PendingBatch
                 return true;
             }
 
-            $jobClass = get_class($actualJob);
-            $this->parametersMatch($actualJob, $jobClass, $expectedJobs[$jobClass] ?? []);
+            $this->parametersMatch(
+                $actualJob,
+                is_string(key($expectedJobs)) ? key($expectedJobs) : current($expectedJobs),
+                $expectedJobs[get_class($actualJob)] ?? []
+            );
             next($expectedJobs);
         });
 
@@ -315,6 +335,11 @@ class PendingBatchFake extends PendingBatch
      */
     protected function parametersMatch($actual, string $expectedClass, array $expectedParameters)
     {
+        PHPUnit::assertNotEmpty(
+            $expectedClass,
+            sprintf("The job of type [%s] does not exists.", get_class($actual))
+        );
+
         PHPUnit::assertEquals(
             new $expectedClass(...$expectedParameters),
             $actual,
