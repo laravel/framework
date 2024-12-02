@@ -489,7 +489,7 @@ class Arr
      */
     public static function keyBy($array, $keyBy)
     {
-        return Collection::make($array)->keyBy($keyBy)->all();
+        return (new Collection($array))->keyBy($keyBy)->all();
     }
 
     /**
@@ -816,7 +816,7 @@ class Arr
      */
     public static function sort($array, $callback = null)
     {
-        return Collection::make($array)->sortBy($callback)->all();
+        return (new Collection($array))->sortBy($callback)->all();
     }
 
     /**
@@ -828,7 +828,7 @@ class Arr
      */
     public static function sortDesc($array, $callback = null)
     {
-        return Collection::make($array)->sortByDesc($callback)->all();
+        return (new Collection($array))->sortByDesc($callback)->all();
     }
 
     /**

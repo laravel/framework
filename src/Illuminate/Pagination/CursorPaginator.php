@@ -64,7 +64,7 @@ class CursorPaginator extends AbstractCursorPaginator implements Arrayable, Arra
      */
     protected function setItems($items)
     {
-        $this->items = $items instanceof Collection ? $items : Collection::make($items);
+        $this->items = $items instanceof Collection ? $items : new Collection($items);
 
         $this->hasMore = $this->items->count() > $this->perPage;
 

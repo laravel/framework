@@ -96,7 +96,7 @@ class MorphTo extends BelongsTo
     #[\Override]
     public function addEagerConstraints(array $models)
     {
-        $this->buildDictionary($this->models = Collection::make($models));
+        $this->buildDictionary($this->models = new Collection($models));
     }
 
     /**

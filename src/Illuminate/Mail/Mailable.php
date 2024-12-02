@@ -1046,7 +1046,7 @@ class Mailable implements MailableContract, Renderable
 
         $attachments = $this->attachments();
 
-        return Collection::make(is_object($attachments) ? [$attachments] : $attachments)
+        return (new Collection(is_object($attachments) ? [$attachments] : $attachments))
                 ->map(fn ($attached) => $attached instanceof Attachable ? $attached->toMailAttachment() : $attached)
                 ->contains(fn ($attached) => $attached->isEquivalent($attachment, $options));
     }
@@ -1766,7 +1766,7 @@ class Mailable implements MailableContract, Renderable
 
         $attachments = $this->attachments();
 
-        Collection::make(is_object($attachments) ? [$attachments] : $attachments)
+        (new Collection(is_object($attachments) ? [$attachments] : $attachments))
             ->each(function ($attachment) {
                 $this->attach($attachment);
             });
