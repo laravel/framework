@@ -233,11 +233,13 @@ class Uri implements Htmlable, Responsable
     {
         $currentValue = data_get($this->query()->all(), $key);
 
+        $values = Arr::wrap($value);
+
         return $this->withQuery([$key => match (true) {
-            is_array($currentValue) && array_is_list($currentValue) => array_values(array_unique([...$currentValue, $value])),
-            is_array($currentValue) => [...$currentValue, $value],
-            ! is_null($currentValue) => [$currentValue, $value],
-            default => Arr::wrap($value),
+            is_array($currentValue) && array_is_list($currentValue) => array_values(array_unique([...$currentValue, ...$values])),
+            is_array($currentValue) => [...$currentValue, ...$values],
+            ! is_null($currentValue) => [$currentValue, ...$values],
+            default => $values,
         }]);
     }
 
