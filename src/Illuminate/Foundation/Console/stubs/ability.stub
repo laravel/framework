@@ -1,0 +1,22 @@
+<?php
+
+namespace {{ namespace }};
+
+use Illuminate\Auth\Access\Response;
+use {{ namespacedModel }};
+use {{ namespacedUserModel }};
+
+class {{ class }}
+{
+    public function __construct(
+        public {{ model }} ${{ modelVariable }},
+    ) {}
+
+    /**
+     * Determine whether the ability is granted to the user.
+     */
+    public function granted({{ user }} $user): bool
+    {
+        return false;
+    }
+}

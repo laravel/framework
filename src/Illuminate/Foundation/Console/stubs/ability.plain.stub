@@ -1,0 +1,17 @@
+<?php
+
+namespace {{ namespace }};
+
+use Illuminate\Auth\Access\Response;
+use {{ namespacedUserModel }};
+
+class {{ class }}
+{
+    /**
+     * Determine whether the ability is granted to the user.
+     */
+    public function granted({{ user }} $user): bool
+    {
+        return false;
+    }
+}
