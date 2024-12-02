@@ -5,8 +5,8 @@ namespace Illuminate\Validation\Rules;
 use Closure;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
-
 use Illuminate\Support\Collection;
+
 use function Illuminate\Support\enum_value;
 
 trait DatabaseRule
