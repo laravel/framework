@@ -17,6 +17,7 @@ use ReflectionFunction;
 
 use function Illuminate\Support\enum_value;
 use function is_object;
+use function method_exists;
 
 class Gate implements GateContract
 {
@@ -650,6 +651,10 @@ class Gate implements GateContract
 
         if (is_object($ability)) {
             return [$ability, 'granted'];
+        }
+
+        if (method_exists($abilityName, 'granted')) {
+            return [new $abilityName(...$arguments), 'granted'];
         }
 
         return function () {

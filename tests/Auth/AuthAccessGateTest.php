@@ -80,13 +80,17 @@ class AuthAccessGateTest extends TestCase
     public function testAfterCanTakeObjectAbilityAsArgument()
     {
         $gate = $this->getBasicGate();
-        $ability = new ObjectAbility(false);
+        $ability = new ObjectAbility(true);
+        $afterCalledWithArg = null;
 
-        $gate->after(function ($user, ObjectAbility $ability) {
-            return true;
+        $gate->after(function ($user, ObjectAbility $ability) use (&$afterCalledWithArg) {
+            $afterCalledWithArg = $ability;
+
+            return false;
         });
 
         $this->assertTrue($gate->check($ability));
+        $this->assertSame($ability, $afterCalledWithArg);
     }
 
     public function testBeforeCanAllowGuests()
@@ -402,6 +406,36 @@ class AuthAccessGateTest extends TestCase
         $ability = new ObjectAbility(false);
 
         $this->assertTrue($gate->denies($ability));
+    }
+
+    public function testObjectAbilityUsingClassNameInAllows()
+    {
+        $gate = $this->getBasicGate();
+
+        $ability = new class
+        {
+            public function granted()
+            {
+                return true;
+            }
+        };
+
+        $this->assertTrue($gate->allows($ability::class));
+    }
+
+    public function testObjectAbilityUsingClassNameInDenies()
+    {
+        $gate = $this->getBasicGate();
+
+        $ability = new class
+        {
+            public function granted()
+            {
+                return false;
+            }
+        };
+
+        $this->assertTrue($gate->denies($ability::class));
     }
 
     public function testObjectAbilitiesCanAllowGuestUsers()
