@@ -69,6 +69,14 @@ class UriQueryString implements Arrayable
     }
 
     /**
+     * Get the string representation of the query string.
+     */
+    public function value(): string
+    {
+        return (string) $this;
+    }
+
+    /**
      * Convert the query string into an array.
      */
     public function toArray()
