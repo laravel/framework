@@ -82,11 +82,12 @@ class InteractsWithContainerTest extends TestCase
         });
         $this->assertSame([], $called);
 
-        $this->withoutDefer();
+        $instance = $this->withoutDefer();
         defer(function () use (&$called) {
             $called[] = 2;
         });
         $this->assertSame([2], $called);
+        $this->assertSame($this, $instance);
 
         $this->withDefer();
         $this->assertSame([2], $called);

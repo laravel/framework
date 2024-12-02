@@ -362,6 +362,16 @@ class BusFake implements Fake, QueueingDispatcher
     }
 
     /**
+     * Assert no chained jobs was dispatched.
+     *
+     * @return void
+     */
+    public function assertNothingChained()
+    {
+        $this->assertNothingDispatched();
+    }
+
+    /**
      * Reset the chain properties to their default values on the job.
      *
      * @param  mixed  $job
@@ -502,6 +512,17 @@ class BusFake implements Fake, QueueingDispatcher
             ->join("\n- ");
 
         PHPUnit::assertEmpty($this->batches, "The following batched jobs were dispatched unexpectedly:\n\n- $jobNames\n");
+    }
+
+    /**
+     * Assert that no jobs were dispatched, chained, or batched.
+     *
+     * @return void
+     */
+    public function assertNothingPlaced()
+    {
+        $this->assertNothingDispatched();
+        $this->assertNothingBatched();
     }
 
     /**

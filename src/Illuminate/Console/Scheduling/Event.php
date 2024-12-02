@@ -60,13 +60,6 @@ class Event
     protected $afterCallbacks = [];
 
     /**
-     * The human readable description of the event.
-     *
-     * @var string|null
-     */
-    public $description;
-
-    /**
      * The event mutex implementation.
      *
      * @var \Illuminate\Console\Scheduling\EventMutex
@@ -206,7 +199,11 @@ class Event
     {
         return Process::fromShellCommandline(
             $this->buildCommand(), base_path(), null, null, null
-        )->run();
+        )->run(
+            laravel_cloud()
+                ? fn ($type, $line) => fwrite($type === 'out' ? STDOUT : STDERR, $line)
+                : fn () => true
+        );
     }
 
     /**
@@ -724,30 +721,6 @@ class Event
                             ? null
                             : $container->call($callback, ['output' => new Stringable($output)]);
         };
-    }
-
-    /**
-     * Set the human-friendly description of the event.
-     *
-     * @param  string  $description
-     * @return $this
-     */
-    public function name($description)
-    {
-        return $this->description($description);
-    }
-
-    /**
-     * Set the human-friendly description of the event.
-     *
-     * @param  string  $description
-     * @return $this
-     */
-    public function description($description)
-    {
-        $this->description = $description;
-
-        return $this;
     }
 
     /**

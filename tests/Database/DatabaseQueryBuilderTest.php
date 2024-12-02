@@ -25,7 +25,6 @@ use Illuminate\Pagination\AbstractPaginator as Paginator;
 use Illuminate\Pagination\Cursor;
 use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Collection;
 use Illuminate\Tests\Database\Fixtures\Enums\Bar;
 use InvalidArgumentException;
 use Mockery as m;
@@ -1805,36 +1804,6 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(['whereRawBinding', 'groupByRawBinding', 'havingRawBinding'], $builder->getBindings());
     }
 
-    public function testGroupByAndAggregate()
-    {
-        $builder = $this->getBuilder();
-
-        $queryResults = [['aggregate' => 2, 'role' => 'admin', 'city' => 'NY'], ['aggregate' => 5, 'role' => 'user', 'city' => 'LA']];
-        $builder->getConnection()
-            ->shouldReceive('select')->once()
-            ->with('select "role", "city", count(*) as aggregate from "users" group by "role", "city"', [], true)
-            ->andReturn($queryResults);
-        $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(fn ($builder, $results) => $results);
-        $results = $builder->from('users')->groupBy('role', 'city')->aggregate('count');
-        $this->assertEquals($queryResults, $results->toArray());
-    }
-
-    public function testGroupByUnionAndAggregate()
-    {
-        $builder = $this->getBuilder();
-
-        $queryResults = [['aggregate' => 2, 'role' => 'admin'], ['aggregate' => 5, 'role' => 'user']];
-        $builder->getConnection()
-            ->shouldReceive('select')->once()
-            ->with('select "role", count(*) as aggregate from ((select * from "users") union (select * from "members")) as "temp_table" group by "role"', [], true)
-            ->andReturn($queryResults);
-        $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(fn ($builder, $results) => $results);
-        $results = $builder->from('users')
-            ->union($this->getBuilder()->select('*')->from('members'))
-            ->groupBy('role')->aggregate('count');
-        $this->assertEquals($queryResults, $results->toArray());
-    }
-
     public function testOrderBys()
     {
         $builder = $this->getBuilder();
@@ -3493,51 +3462,6 @@ class DatabaseQueryBuilderTest extends TestCase
         });
         $results = $builder->from('users')->average('id');
         $this->assertEquals(1, $results);
-    }
-
-    public function testAggregateFunctionsWithGroupBy()
-    {
-        $builder = $this->getBuilder();
-        $builder->getConnection()->shouldReceive('select')->once()->with('select "role", count(*) as aggregate from "users" group by "role"', [], true)->andReturn([['role' => 'admin', 'aggregate' => 1]]);
-        $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(fn ($builder, $results) => $results);
-        $results = $builder->from('users')->groupBy('role')->count();
-        $this->assertInstanceOf(Collection::class, $results);
-        $this->assertEquals([['role' => 'admin', 'aggregate' => 1]], $results->toArray());
-
-        $builder = $this->getBuilder();
-        $builder->getConnection()->shouldReceive('select')->once()->with('select "role", max("id") as aggregate from "users" group by "role"', [], true)->andReturn([['role' => 'admin', 'aggregate' => 1]]);
-        $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(fn ($builder, $results) => $results);
-        $results = $builder->from('users')->groupBy('role')->max('id');
-        $this->assertInstanceOf(Collection::class, $results);
-        $this->assertEquals([['role' => 'admin', 'aggregate' => 1]], $results->toArray());
-
-        $builder = $this->getBuilder();
-        $builder->getConnection()->shouldReceive('select')->once()->with('select "role", min("id") as aggregate from "users" group by "role"', [], true)->andReturn([['role' => 'admin', 'aggregate' => 1]]);
-        $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(fn ($builder, $results) => $results);
-        $results = $builder->from('users')->groupBy('role')->min('id');
-        $this->assertInstanceOf(Collection::class, $results);
-        $this->assertEquals([['role' => 'admin', 'aggregate' => 1]], $results->toArray());
-
-        $builder = $this->getBuilder();
-        $builder->getConnection()->shouldReceive('select')->once()->with('select "role", sum("id") as aggregate from "users" group by "role"', [], true)->andReturn([['role' => 'admin', 'aggregate' => 1]]);
-        $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(fn ($builder, $results) => $results);
-        $results = $builder->from('users')->groupBy('role')->sum('id');
-        $this->assertInstanceOf(Collection::class, $results);
-        $this->assertEquals([['role' => 'admin', 'aggregate' => 1]], $results->toArray());
-
-        $builder = $this->getBuilder();
-        $builder->getConnection()->shouldReceive('select')->once()->with('select "role", avg("id") as aggregate from "users" group by "role"', [], true)->andReturn([['role' => 'admin', 'aggregate' => 1]]);
-        $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(fn ($builder, $results) => $results);
-        $results = $builder->from('users')->groupBy('role')->avg('id');
-        $this->assertInstanceOf(Collection::class, $results);
-        $this->assertEquals([['role' => 'admin', 'aggregate' => 1]], $results->toArray());
-
-        $builder = $this->getBuilder();
-        $builder->getConnection()->shouldReceive('select')->once()->with('select "role", avg("id") as aggregate from "users" group by "role"', [], true)->andReturn([['role' => 'admin', 'aggregate' => 1]]);
-        $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(fn ($builder, $results) => $results);
-        $results = $builder->from('users')->groupBy('role')->average('id');
-        $this->assertInstanceOf(Collection::class, $results);
-        $this->assertEquals([['role' => 'admin', 'aggregate' => 1]], $results->toArray());
     }
 
     public function testSqlServerExists()

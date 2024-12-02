@@ -943,6 +943,26 @@ class RoutingRouteTest extends TestCase
         });
         $route->where('bar', '[0-9]+');
         $this->assertFalse($route->matches($request));
+
+        /*
+         * Conditional
+         */
+        $route = new Route('GET', '{subdomain}.awesome.test', function () {
+            //
+        });
+
+        $route->when(true, function ($route) {
+            $route->whereIn('subdomain', [
+                'one',
+                'two',
+            ]);
+        });
+
+        $request = Request::create('test.awesome.test', 'GET');
+        $this->assertFalse($route->matches($request));
+
+        $request = Request::create('one.awesome.test', 'GET');
+        $this->assertTrue($route->matches($request));
     }
 
     public function testRoutePrefixParameterParsing()

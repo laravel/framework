@@ -679,7 +679,7 @@ class Blueprint
     }
 
     /**
-     * Specify an fulltext for the table.
+     * Specify a fulltext index for the table.
      *
      * @param  string|array  $columns
      * @param  string|null  $name
@@ -1038,7 +1038,7 @@ class Blueprint
 
         $column = $column ?: $model->getForeignKey();
 
-        if ($model->getKeyType() === 'int' && $model->getIncrementing()) {
+        if ($model->getKeyType() === 'int') {
             return $this->foreignId($column)
                 ->table($model->getTable())
                 ->referencesModelColumn($model->getKeyName());
@@ -1605,7 +1605,7 @@ class Blueprint
     }
 
     /**
-     * Adds the `remember_token` column to the table.
+     * Add the `remember_token` column to the table.
      *
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */

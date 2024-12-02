@@ -23,8 +23,8 @@
         "illuminate/conditionable": "^11.0",
         "illuminate/contracts": "^11.0",
         "illuminate/macroable": "^11.0",
-        "nesbot/carbon": "^2.72.2|^3.0",
-        "voku/portable-ascii": "^2.0"
+        "nesbot/carbon": "^2.72.2|^3.4",
+        "voku/portable-ascii": "^2.0.2"
     },
     "conflict": {
         "tightenco/collect": "<5.5.33"
@@ -54,7 +54,7 @@
         "symfony/process": "Required to use the composer class (^7.0).",
         "symfony/uid": "Required to use Str::ulid() (^7.0).",
         "symfony/var-dumper": "Required to use the dd function (^7.0).",
-        "vlucas/phpdotenv": "Required to use the Env class and env helper (^5.4.1)."
+        "vlucas/phpdotenv": "Required to use the Env class and env helper (^5.6.1)."
     },
     "config": {
         "sort-packages": true
