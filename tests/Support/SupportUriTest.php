@@ -53,7 +53,7 @@ class SupportUriTest extends TestCase
                         'foo' => [
                             9 => 'bar',
                         ],
-                    ]
+                    ],
                 ],
             ],
             'flag_value' => '',
