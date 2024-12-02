@@ -216,13 +216,11 @@ class EncryptCookies
      */
     public function isDisabled($name)
     {
-        $exclude = Collection::make($this->except)
-            ->merge(static::$neverEncrypt)
-            ->filter(fn ($cookie) => Str::contains($cookie,'*'));
+        $except = Collection::make($this->except)->merge(static::$neverEncrypt);
 
-        return $exclude->isEmpty()
-            ? in_array($name, array_merge($this->except, static::$neverEncrypt))
-            : $exclude->filter(fn ($cookie) => Str::startsWith(
+        return $except->some(fn ($cookie) => Str::contains($cookie,'*'))
+            ? $except->contains($name)
+            : $except->filter(fn ($cookie) => Str::startsWith(
                 $name, Str::replace('*', '', $cookie)
             ))->isNotEmpty();
     }
