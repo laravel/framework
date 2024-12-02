@@ -166,7 +166,7 @@ class DatabaseEloquentBelongsToManyWithAttributesTest extends TestCase
             $table->string('type');
         });
 
-        $this->schema()->create('with_attributes_taggables', function($table){
+        $this->schema()->create('with_attributes_taggables', function($table) {
             $table->integer('tag_id');
             $table->integer('taggable_id');
             $table->string('taggable_type');
@@ -231,7 +231,8 @@ class ManyToManyWithAttributesPost extends Model
 
     public function morphedTags(): MorphToMany
     {
-        return $this->morphToMany(
+        return $this
+            ->morphToMany(
                 ManyToManyWithAttributesTag::class,
                 'taggable',
                 'with_attributes_taggables',
@@ -249,7 +250,8 @@ class ManyToManyWithAttributesTag extends Model
 
     public function morphedPosts(): MorphToMany
     {
-        return $this->morphedByMany(
+        return $this
+            ->morphedByMany(
                 ManyToManyWithAttributesPost::class,
                 'taggable',
                 'with_attributes_taggables',
