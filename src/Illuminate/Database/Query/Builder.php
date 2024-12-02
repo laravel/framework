@@ -3353,7 +3353,7 @@ class Builder implements BuilderContract
                 $this->toSql(), $this->getBindings(), ! $this->useWritePdo
             );
         }))->map(function ($item) {
-            return $this->applyAfterQueryCallbacks((new Collection([$item])))->first();
+            return $this->applyAfterQueryCallbacks(new Collection([$item]))->first();
         })->reject(fn ($item) => is_null($item));
     }
 
