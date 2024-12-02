@@ -10,7 +10,8 @@ class {{ class }}
 {
     public function __construct(
         public {{ model }} ${{ modelVariable }},
-    ) {}
+    ) {
+    }
 
     /**
      * Determine whether the ability is granted to the user.
