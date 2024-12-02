@@ -172,7 +172,7 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
      */
     public function assertNothingSent()
     {
-        $mailableNames = collect($this->mailables)->map(
+        $mailableNames = (new Collection($this->mailables))->map(
             fn ($mailable) => get_class($mailable)
         )->join("\n- ");
 
@@ -267,7 +267,7 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
      */
     public function assertNothingQueued()
     {
-        $mailableNames = collect($this->queuedMailables)->map(
+        $mailableNames = (new Collection($this->queuedMailables))->map(
             fn ($mailable) => get_class($mailable)
         )->join("\n- ");
 
@@ -282,7 +282,7 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
      */
     public function assertSentCount($count)
     {
-        $total = collect($this->mailables)->count();
+        $total = (new Collection($this->mailables))->count();
 
         PHPUnit::assertSame(
             $count, $total,
@@ -298,7 +298,7 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
      */
     public function assertQueuedCount($count)
     {
-        $total = collect($this->queuedMailables)->count();
+        $total = (new Collection($this->queuedMailables))->count();
 
         PHPUnit::assertSame(
             $count, $total,
@@ -314,7 +314,7 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
      */
     public function assertOutgoingCount($count)
     {
-        $total = collect($this->mailables)
+        $total = (new Collection($this->mailables))
             ->concat($this->queuedMailables)
             ->count();
 
@@ -394,7 +394,7 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
      */
     protected function mailablesOf($type)
     {
-        return collect($this->mailables)->filter(fn ($mailable) => $mailable instanceof $type);
+        return (new Collection($this->mailables))->filter(fn ($mailable) => $mailable instanceof $type);
     }
 
     /**
@@ -405,7 +405,7 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
      */
     protected function queuedMailablesOf($type)
     {
-        return collect($this->queuedMailables)->filter(fn ($mailable) => $mailable instanceof $type);
+        return (new Collection($this->queuedMailables))->filter(fn ($mailable) => $mailable instanceof $type);
     }
 
     /**

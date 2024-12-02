@@ -193,7 +193,7 @@ class EventFake implements Dispatcher, Fake
     {
         $count = count(Arr::flatten($this->events));
 
-        $eventNames = collect($this->events)
+        $eventNames = (new Collection($this->events))
             ->map(fn ($events, $eventName) => sprintf(
                 '%s dispatched %s %s',
                 $eventName,
@@ -223,7 +223,7 @@ class EventFake implements Dispatcher, Fake
 
         $callback = $callback ?: fn () => true;
 
-        return collect($this->events[$event])->filter(
+        return (new Collection($this->events[$event]))->filter(
             fn ($arguments) => $callback(...$arguments)
         );
     }
@@ -332,7 +332,7 @@ class EventFake implements Dispatcher, Fake
             return true;
         }
 
-        return collect($this->eventsToFake)
+        return (new Collection($this->eventsToFake))
             ->filter(function ($event) use ($eventName, $payload) {
                 return $event instanceof Closure
                             ? $event($eventName, $payload)
@@ -372,7 +372,7 @@ class EventFake implements Dispatcher, Fake
             return false;
         }
 
-        return collect($this->eventsToDispatch)
+        return (new Collection($this->eventsToDispatch))
             ->filter(function ($event) use ($eventName, $payload) {
                 return $event instanceof Closure
                     ? $event($eventName, $payload)

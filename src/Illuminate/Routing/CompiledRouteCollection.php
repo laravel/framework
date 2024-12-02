@@ -208,7 +208,7 @@ class CompiledRouteCollection extends AbstractRouteCollection
      */
     public function getByAction($action)
     {
-        $attributes = collect($this->attributes)->first(function (array $attributes) use ($action) {
+        $attributes = (new Collection($this->attributes))->first(function (array $attributes) use ($action) {
             if (isset($attributes['action']['controller'])) {
                 return trim($attributes['action']['controller'], '\\') === $action;
             }

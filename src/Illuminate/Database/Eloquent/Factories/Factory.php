@@ -295,9 +295,9 @@ abstract class Factory
         $results = $this->make($attributes, $parent);
 
         if ($results instanceof Model) {
-            $this->store((new Collection([$results])));
+            $this->store(new Collection([$results]));
 
-            $this->callAfterCreating((new Collection([$results])), $parent);
+            $this->callAfterCreating(new Collection([$results]), $parent);
         } else {
             $this->store($results);
 
