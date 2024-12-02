@@ -38,7 +38,7 @@ class Uri implements Htmlable
     }
 
     /**
-     * Generate an absolute URL to the given path.
+     * Get a URI instance of an absolute URL for the given path.
      */
     public static function to(string $path): static
     {
@@ -185,35 +185,72 @@ class Uri implements Htmlable
     /**
      * Merge new query parameters into the URI.
      */
-    public function withQuery(Stringable|array|string $query, bool $merge = true): static
+    public function withQuery(array $query, bool $merge = true): static
     {
-        [$newQuery, $currentQuery] = [[], []];
-
-        if ($query instanceof Stringable || is_string($query)) {
-            parse_str($query, (string) $newQuery);
-        } else {
-            $newQuery = $query;
-        }
-
-        foreach ($newQuery as $key => $parameter) {
-            if ($parameter instanceof UrlRoutable) {
-                $newQuery[$key] = $parameter->getRouteKey();
+        foreach ($query as $key => $value) {
+            if ($value instanceof UrlRoutable) {
+                $query[$key] = $value->getRouteKey();
             }
         }
 
         if ($merge) {
-            parse_str($this->uri->getQuery(), $currentQuery);
+            $mergedQuery = $this->query()->all();
 
-            $newQuery = array_merge($currentQuery, $newQuery);
+            foreach ($query as $key => $value) {
+                data_set($mergedQuery, $key, $value);
+            }
+
+            $newQuery = $mergedQuery;
+        } else {
+            $newQuery = $query;
         }
 
         return new static($this->uri->withQuery(Arr::query($newQuery)));
     }
 
     /**
+     * Merge new query parameters into the URI if they are not already in the query string.
+     */
+    public function withQueryIfMissing(array $query): static
+    {
+        $currentQuery = $this->query();
+
+        foreach ($query as $key => $value) {
+            if (! $currentQuery->missing($key)) {
+                Arr::forget($query, $key);
+            }
+        }
+
+        return $this->withQuery($query);
+    }
+
+    /**
+     * Push a value onto the end of a query string parameter that is a list.
+     */
+    public function pushOntoQuery(string $key, mixed $value): static
+    {
+        $currentValue = data_get($this->query()->all(), $key);
+
+        return $this->withQuery([$key => match (true) {
+            is_array($currentValue) && array_is_list($currentValue) => array_values(array_unique([...$currentValue, $value])),
+            is_array($currentValue) => [...$currentValue, $value],
+            ! is_null($currentValue) => [$currentValue, $value],
+            default => Arr::wrap($value),
+        }]);
+    }
+
+    /**
+     * Remove the given query parameters from the URI.
+     */
+    public function withoutQuery(array $keys): static
+    {
+        return $this->replaceQuery(Arr::except($this->query()->all(), $keys));
+    }
+
+    /**
      * Specify new query parameters for the URI.
      */
-    public function replaceQuery(Stringable|array|string $query)
+    public function replaceQuery(array $query): static
     {
         return $this->withQuery($query, merge: false);
     }
