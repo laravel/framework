@@ -9,6 +9,7 @@ use Illuminate\Routing\Route;
 use Illuminate\Routing\Router;
 use Illuminate\Routing\ViewController;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use ReflectionClass;
 use ReflectionFunction;
@@ -112,7 +113,7 @@ class RouteListCommand extends Command
      */
     protected function getRoutes()
     {
-        $routes = collect($this->router->getRoutes())->map(function ($route) {
+        $routes = (new Collection($this->router->getRoutes()))->map(function ($route) {
             return $this->getRouteInformation($route);
         })->filter()->all();
 
@@ -165,7 +166,7 @@ class RouteListCommand extends Command
             $sort = explode(',', $sort);
         }
 
-        return collect($routes)
+        return (new Collection($routes))
             ->sortBy($sort)
             ->toArray();
     }
@@ -191,7 +192,7 @@ class RouteListCommand extends Command
      */
     protected function displayRoutes(array $routes)
     {
-        $routes = collect($routes);
+        $routes = new Collection($routes);
 
         $this->output->writeln(
             $this->option('json') ? $this->asJson($routes) : $this->forCli($routes)
@@ -206,7 +207,7 @@ class RouteListCommand extends Command
      */
     protected function getMiddleware($route)
     {
-        return collect($this->router->gatherRouteMiddleware($route))->map(function ($middleware) {
+        return (new Collection($this->router->gatherRouteMiddleware($route)))->map(function ($middleware) {
             return $middleware instanceof Closure ? 'Closure' : $middleware;
         })->implode("\n");
     }
@@ -435,7 +436,7 @@ class RouteListCommand extends Command
         $actionClass = explode('@', $action)[0];
 
         if (class_exists($actionClass) && str_starts_with((new ReflectionClass($actionClass))->getFilename(), base_path('vendor'))) {
-            $actionCollection = collect(explode('\\', $action));
+            $actionCollection = new Collection(explode('\\', $action));
 
             return $name.$actionCollection->take(2)->implode('\\').'   '.$actionCollection->last();
         }

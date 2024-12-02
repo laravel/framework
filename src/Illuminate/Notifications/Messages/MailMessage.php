@@ -8,6 +8,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Mail\Attachment;
 use Illuminate\Mail\Markdown;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\Conditionable;
 
 class MailMessage extends SimpleMessage implements Renderable
@@ -371,7 +372,7 @@ class MailMessage extends SimpleMessage implements Renderable
      */
     protected function parseAddresses($value)
     {
-        return collect($value)->map(function ($address, $name) {
+        return (new Collection($value))->map(function ($address, $name) {
             return [$address, is_numeric($name) ? null : $name];
         })->values()->all();
     }

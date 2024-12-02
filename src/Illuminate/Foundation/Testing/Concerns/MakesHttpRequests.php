@@ -6,6 +6,7 @@ use BackedEnum;
 use Illuminate\Contracts\Http\Kernel as HttpKernel;
 use Illuminate\Cookie\CookieValuePrefix;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Testing\LoggedExceptionCollection;
 use Illuminate\Testing\TestResponse;
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
@@ -638,7 +639,7 @@ trait MakesHttpRequests
      */
     protected function transformHeadersToServerVars(array $headers)
     {
-        return collect(array_merge($this->defaultHeaders, $headers))->mapWithKeys(function ($value, $name) {
+        return (new Collection(array_merge($this->defaultHeaders, $headers)))->mapWithKeys(function ($value, $name) {
             $name = strtr(strtoupper($name), '-', '_');
 
             return [$this->formatServerHeaderKey($name) => $value];
@@ -698,7 +699,7 @@ trait MakesHttpRequests
             return array_merge($this->defaultCookies, $this->unencryptedCookies);
         }
 
-        return collect($this->defaultCookies)->map(function ($value, $key) {
+        return (new Collection($this->defaultCookies))->map(function ($value, $key) {
             return encrypt(CookieValuePrefix::create($key, app('encrypter')->getKey()).$value, false);
         })->merge($this->unencryptedCookies)->all();
     }

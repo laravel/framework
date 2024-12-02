@@ -230,7 +230,7 @@ class CompiledRouteCollection extends AbstractRouteCollection
      */
     public function getRoutes()
     {
-        return collect($this->attributes)
+        return (new Collection($this->attributes))
             ->map(function (array $attributes) {
                 return $this->newRoute($attributes);
             })
@@ -246,7 +246,7 @@ class CompiledRouteCollection extends AbstractRouteCollection
      */
     public function getRoutesByMethod()
     {
-        return collect($this->getRoutes())
+        return (new Collection($this->getRoutes()))
             ->groupBy(function (Route $route) {
                 return $route->methods();
             })
@@ -265,7 +265,7 @@ class CompiledRouteCollection extends AbstractRouteCollection
      */
     public function getRoutesByName()
     {
-        return collect($this->getRoutes())
+        return (new Collection($this->getRoutes()))
             ->keyBy(function (Route $route) {
                 return $route->getName();
             })
