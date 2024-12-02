@@ -99,7 +99,7 @@ class StatusCommand extends BaseCommand
      */
     protected function getStatusFor(array $ran, array $batches)
     {
-        return Collection::make($this->getAllMigrationFiles())
+        return (new Collection($this->getAllMigrationFiles()))
                     ->map(function ($migration) use ($ran, $batches) {
                         $migrationName = $this->migrator->getMigrationName($migration);
 

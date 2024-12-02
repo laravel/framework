@@ -405,7 +405,7 @@ class Vite implements Htmlable
                 ]);
 
                 foreach ($manifest[$import]['css'] ?? [] as $css) {
-                    $partialManifest = Collection::make($manifest)->where('file', $css);
+                    $partialManifest = (new Collection($manifest))->where('file', $css);
 
                     $preloads->push([
                         $partialManifest->keys()->first(),
@@ -431,7 +431,7 @@ class Vite implements Htmlable
             ));
 
             foreach ($chunk['css'] ?? [] as $css) {
-                $partialManifest = Collection::make($manifest)->where('file', $css);
+                $partialManifest = (new Collection($manifest))->where('file', $css);
 
                 $preloads->push([
                     $partialManifest->keys()->first(),
@@ -624,7 +624,7 @@ class Vite implements Htmlable
         }
 
         $this->preloadedAssets[$url] = $this->parseAttributes(
-            Collection::make($attributes)->forget('href')->all()
+            (new Collection($attributes))->forget('href')->all()
         );
 
         return '<link '.implode(' ', $this->parseAttributes($attributes)).' />';
@@ -811,7 +811,7 @@ class Vite implements Htmlable
      */
     protected function parseAttributes($attributes)
     {
-        return Collection::make($attributes)
+        return (new Collection($attributes))
             ->reject(fn ($value, $key) => in_array($value, [false, null], true))
             ->flatMap(fn ($value, $key) => $value === true ? [$key] : [$key => $value])
             ->map(fn ($value, $key) => is_int($key) ? $value : $key.'="'.$value.'"')

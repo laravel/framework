@@ -1752,7 +1752,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
         $iterables = func_get_args();
 
         return new static(function () use ($iterables) {
-            $iterators = Collection::make($iterables)->map(function ($iterable) {
+            $iterators = (new Collection($iterables))->map(function ($iterable) {
                 return $this->makeIterator($iterable);
             })->prepend($this->getIterator());
 

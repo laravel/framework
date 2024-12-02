@@ -134,7 +134,7 @@ class Migrator
      */
     protected function pendingMigrations($files, $ran)
     {
-        return Collection::make($files)
+        return (new Collection($files))
             ->reject(fn ($file) => in_array($this->getMigrationName($file), $ran))
             ->values()
             ->all();
@@ -536,7 +536,7 @@ class Migrator
      */
     public function getMigrationFiles($paths)
     {
-        return Collection::make($paths)
+        return (new Collection($paths))
             ->flatMap(fn ($path) => str_ends_with($path, '.php') ? [$path] : $this->files->glob($path.'/*_*.php'))
             ->filter()
             ->values()
