@@ -264,7 +264,9 @@ class HandleExceptions
             'handler' => SocketHandler::class,
             'formatter' => JsonFormatter::class,
             'with' => [
-                'connectionString' => $_ENV['LARAVEL_CLOUD_LOG_SOCKET'] ?? '127.0.0.1:8765',
+                'connectionString' => $_ENV['LARAVEL_CLOUD_LOG_SOCKET'] ??
+                                      $_SERVER['LARAVEL_CLOUD_LOG_SOCKET'] ??
+                                      '127.0.0.1:8765',
                 'persistent' => true,
             ],
         ]);
