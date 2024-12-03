@@ -15,8 +15,8 @@ class Benchmark
      */
     public static function measure(Closure|array $benchmarkables, int $iterations = 1): array|float
     {
-        return collect(Arr::wrap($benchmarkables))->map(function ($callback) use ($iterations) {
-            return collect(range(1, $iterations))->map(function () use ($callback) {
+        return (new Collection(Arr::wrap($benchmarkables)))->map(function ($callback) use ($iterations) {
+            return (new Collection(range(1, $iterations)))->map(function () use ($callback) {
                 gc_collect_cycles();
 
                 $start = hrtime(true);
@@ -60,7 +60,7 @@ class Benchmark
      */
     public static function dd(Closure|array $benchmarkables, int $iterations = 1): void
     {
-        $result = collect(static::measure(Arr::wrap($benchmarkables), $iterations))
+        $result = (new Collection(static::measure(Arr::wrap($benchmarkables), $iterations)))
             ->map(fn ($average) => number_format($average, 3).'ms')
             ->when($benchmarkables instanceof Closure, fn ($c) => $c->first(), fn ($c) => $c->all());
 

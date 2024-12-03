@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Env;
 use Illuminate\Support\InteractsWithTime;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -145,7 +146,7 @@ class ServeCommand extends Command
      */
     protected function startProcess($hasEnvironment)
     {
-        $process = new Process($this->serverCommand(), public_path(), collect($_ENV)->mapWithKeys(function ($value, $key) use ($hasEnvironment) {
+        $process = new Process($this->serverCommand(), public_path(), (new Collection($_ENV))->mapWithKeys(function ($value, $key) use ($hasEnvironment) {
             if ($this->option('no-reload') || ! $hasEnvironment) {
                 return [$key => $value];
             }

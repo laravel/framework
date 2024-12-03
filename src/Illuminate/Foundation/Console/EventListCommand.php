@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Collection;
 use ReflectionFunction;
 use Symfony\Component\Console\Attribute\AsCommand;
 
@@ -65,7 +66,7 @@ class EventListCommand extends Command
      */
     protected function getEvents()
     {
-        $events = collect($this->getListenersOnDispatcher());
+        $events = new Collection($this->getListenersOnDispatcher());
 
         if ($this->filteringByEvent()) {
             $events = $this->filterEvents($events);

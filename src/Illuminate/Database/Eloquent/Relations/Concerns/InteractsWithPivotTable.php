@@ -137,7 +137,7 @@ trait InteractsWithPivotTable
      */
     public function syncWithPivotValues($ids, array $values, bool $detaching = true)
     {
-        return $this->sync(collect($this->parseIds($ids))->mapWithKeys(function ($id) use ($values) {
+        return $this->sync((new BaseCollection($this->parseIds($ids)))->mapWithKeys(function ($id) use ($values) {
             return [$id => $values];
         }), $detaching);
     }
@@ -150,7 +150,7 @@ trait InteractsWithPivotTable
      */
     protected function formatRecordsList(array $records)
     {
-        return collect($records)->mapWithKeys(function ($attributes, $id) {
+        return (new BaseCollection($records))->mapWithKeys(function ($attributes, $id) {
             if (! is_array($attributes)) {
                 [$id, $attributes] = [$attributes, []];
             }
@@ -616,7 +616,7 @@ trait InteractsWithPivotTable
         }
 
         if ($value instanceof BaseCollection || is_array($value)) {
-            return collect($value)->map(function ($item) {
+            return (new BaseCollection($value))->map(function ($item) {
                 return $item instanceof Model ? $item->{$this->relatedKey} : $item;
             })->all();
         }

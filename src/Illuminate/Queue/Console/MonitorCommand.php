@@ -79,7 +79,7 @@ class MonitorCommand extends Command
      */
     protected function parseQueues($queues)
     {
-        return collect(explode(',', $queues))->map(function ($queue) {
+        return (new Collection(explode(',', $queues)))->map(function ($queue) {
             [$connection, $queue] = array_pad(explode(':', $queue, 2), 2, null);
 
             if (! isset($queue)) {

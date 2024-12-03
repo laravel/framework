@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Exceptions;
 
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\View;
 
 class RegisterErrorViewPaths
@@ -13,7 +14,7 @@ class RegisterErrorViewPaths
      */
     public function __invoke()
     {
-        View::replaceNamespace('errors', collect(config('view.paths'))->map(function ($path) {
+        View::replaceNamespace('errors', (new Collection(config('view.paths')))->map(function ($path) {
             return "{$path}/errors";
         })->push(__DIR__.'/views')->all());
     }

@@ -9,6 +9,7 @@ use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Grammars\Grammar;
 use Illuminate\Database\Schema\Grammars\MySqlGrammar;
 use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\Traits\Macroable;
 
@@ -180,7 +181,7 @@ class Blueprint
      */
     protected function commandsNamed(array $names)
     {
-        return collect($this->commands)->filter(function ($command) use ($names) {
+        return (new Collection($this->commands))->filter(function ($command) use ($names) {
             return in_array($command->name, $names);
         });
     }
@@ -326,7 +327,7 @@ class Blueprint
      */
     public function creating()
     {
-        return collect($this->commands)->contains(function ($command) {
+        return (new Collection($this->commands))->contains(function ($command) {
             return ! $command instanceof ColumnDefinition && $command->name === 'create';
         });
     }

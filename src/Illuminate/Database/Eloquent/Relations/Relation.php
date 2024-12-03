@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\MultipleRecordsFoundException;
 use Illuminate\Database\Query\Expression;
+use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\Macroable;
 
@@ -288,7 +289,7 @@ abstract class Relation implements BuilderContract
      */
     protected function getKeys(array $models, $key = null)
     {
-        return collect($models)->map(function ($value) use ($key) {
+        return (new BaseCollection($models))->map(function ($value) use ($key) {
             return $key ? $value->getAttribute($key) : $value->getKey();
         })->values()->unique(null, true)->sort()->all();
     }
