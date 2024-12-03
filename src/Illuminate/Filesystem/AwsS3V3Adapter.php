@@ -76,6 +76,11 @@ class AwsS3V3Adapter extends FilesystemAdapter
      */
     public function temporaryUrl($path, $expiration, array $options = [])
     {
+        // Use the default options from the filesystems disk config if none are provided.
+        if (empty($options)) {
+            $options = $this->config['options'] ?? [];
+        }
+
         $command = $this->client->getCommand('GetObject', array_merge([
             'Bucket' => $this->config['bucket'],
             'Key' => $this->prefixer->prefixPath($path),
@@ -105,6 +110,11 @@ class AwsS3V3Adapter extends FilesystemAdapter
      */
     public function temporaryUploadUrl($path, $expiration, array $options = [])
     {
+        // Use the default options from the filesystems disk config if none are provided.
+        if (empty($options)) {
+            $options = $this->config['options'] ?? [];
+        }
+
         $command = $this->client->getCommand('PutObject', array_merge([
             'Bucket' => $this->config['bucket'],
             'Key' => $this->prefixer->prefixPath($path),
