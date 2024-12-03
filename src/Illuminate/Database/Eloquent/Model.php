@@ -2172,7 +2172,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function getForeignKey()
     {
-        return Str::snake(class_basename($this)).'_'.$this->getKeyName();
+        return Str::singular($this->getTable()).'_'.$this->getKeyName();
     }
 
     /**
