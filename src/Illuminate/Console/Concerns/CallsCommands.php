@@ -96,14 +96,16 @@ trait CallsCommands
      */
     protected function context()
     {
-        return (new Collection($this->option()))->only([
-            'ansi',
-            'no-ansi',
-            'no-interaction',
-            'quiet',
-            'verbose',
-        ])->filter()->mapWithKeys(function ($value, $key) {
-            return ["--{$key}" => $value];
-        })->all();
+        return (new Collection($this->option()))
+            ->only([
+                'ansi',
+                'no-ansi',
+                'no-interaction',
+                'quiet',
+                'verbose',
+            ])
+            ->filter()
+            ->mapWithKeys(fn ($value, $key) => ["--{$key}" => $value])
+            ->all();
     }
 }

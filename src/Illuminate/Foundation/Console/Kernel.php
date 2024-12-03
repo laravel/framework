@@ -513,9 +513,9 @@ class Kernel implements KernelContract
     public function bootstrapWithoutBootingProviders()
     {
         $this->app->bootstrapWith(
-            (new Collection($this->bootstrappers()))->reject(function ($bootstrapper) {
-                return $bootstrapper === \Illuminate\Foundation\Bootstrap\BootProviders::class;
-            })->all()
+            (new Collection($this->bootstrappers()))
+                ->reject(fn ($bootstrapper) => $bootstrapper === \Illuminate\Foundation\Bootstrap\BootProviders::class)
+                ->all()
         );
     }
 

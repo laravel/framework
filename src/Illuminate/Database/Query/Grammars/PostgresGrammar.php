@@ -493,9 +493,9 @@ class PostgresGrammar extends Grammar
             // When using Postgres, updates with joins list the joined tables in the from
             // clause, which is different than other systems like MySQL. Here, we will
             // compile out the tables that are joined and add them to a from clause.
-            $froms = (new Collection($query->joins))->map(function ($join) {
-                return $this->wrapTable($join->table);
-            })->all();
+            $froms = (new Collection($query->joins))
+                ->map(fn ($join) => $this->wrapTable($join->table))
+                ->all();
 
             if (count($froms) > 0) {
                 $from = ' from '.implode(', ', $froms);
@@ -566,11 +566,13 @@ class PostgresGrammar extends Grammar
      */
     public function prepareBindingsForUpdateFrom(array $bindings, array $values)
     {
-        $values = (new Collection($values))->map(function ($value, $column) {
-            return is_array($value) || ($this->isJsonSelector($column) && ! $this->isExpression($value))
-                ? json_encode($value)
-                : $value;
-        })->all();
+        $values = (new Collection($values))
+            ->map(function ($value, $column) {
+                return is_array($value) || ($this->isJsonSelector($column) && ! $this->isExpression($value))
+                    ? json_encode($value)
+                    : $value;
+            })
+            ->all();
 
         $bindingsWithoutWhere = Arr::except($bindings, ['select', 'where']);
 
@@ -734,13 +736,15 @@ class PostgresGrammar extends Grammar
     {
         $quote = func_num_args() === 2 ? func_get_arg(1) : "'";
 
-        return (new Collection($path))->map(function ($attribute) {
-            return $this->parseJsonPathArrayKeys($attribute);
-        })->collapse()->map(function ($attribute) use ($quote) {
-            return filter_var($attribute, FILTER_VALIDATE_INT) !== false
-                        ? $attribute
-                        : $quote.$attribute.$quote;
-        })->all();
+        return (new Collection($path))
+            ->map(fn ($attribute) => $this->parseJsonPathArrayKeys($attribute))
+            ->collapse()
+            ->map(function ($attribute) use ($quote) {
+                return filter_var($attribute, FILTER_VALIDATE_INT) !== false
+                    ? $attribute
+                    : $quote.$attribute.$quote;
+            })
+            ->all();
     }
 
     /**

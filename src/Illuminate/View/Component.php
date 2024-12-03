@@ -238,15 +238,10 @@ abstract class Component
             $reflection = new ReflectionClass($this);
 
             static::$propertyCache[$class] = (new Collection($reflection->getProperties(ReflectionProperty::IS_PUBLIC)))
-                ->reject(function (ReflectionProperty $property) {
-                    return $property->isStatic();
-                })
-                ->reject(function (ReflectionProperty $property) {
-                    return $this->shouldIgnore($property->getName());
-                })
-                ->map(function (ReflectionProperty $property) {
-                    return $property->getName();
-                })->all();
+                ->reject(fn (ReflectionProperty $property) => $property->isStatic())
+                ->reject(fn (ReflectionProperty $property) => $this->shouldIgnore($property->getName()))
+                ->map(fn (ReflectionProperty $property) => $property->getName())
+                ->all();
         }
 
         $values = [];
@@ -271,12 +266,8 @@ abstract class Component
             $reflection = new ReflectionClass($this);
 
             static::$methodCache[$class] = (new Collection($reflection->getMethods(ReflectionMethod::IS_PUBLIC)))
-                ->reject(function (ReflectionMethod $method) {
-                    return $this->shouldIgnore($method->getName());
-                })
-                ->map(function (ReflectionMethod $method) {
-                    return $method->getName();
-                });
+                ->reject(fn (ReflectionMethod $method) => $this->shouldIgnore($method->getName()))
+                ->map(fn (ReflectionMethod $method) => $method->getName());
         }
 
         $values = [];
@@ -442,7 +433,8 @@ abstract class Component
             }
 
             static::$ignoredParameterNames[static::class] = (new Collection($constructor->getParameters()))
-                ->map->getName()
+                ->map
+                ->getName()
                 ->all();
         }
 

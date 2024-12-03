@@ -157,9 +157,9 @@ class PruneCommand extends Command
     protected function getPath()
     {
         if (! empty($path = $this->option('path'))) {
-            return (new Collection($path))->map(function ($path) {
-                return base_path($path);
-            })->all();
+            return (new Collection($path))
+                ->map(fn ($path) => base_path($path))
+                ->all();
         }
 
         return app_path('Models');

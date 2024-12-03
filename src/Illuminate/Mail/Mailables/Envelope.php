@@ -111,9 +111,9 @@ class Envelope
      */
     protected function normalizeAddresses($addresses)
     {
-        return (new Collection($addresses))->map(function ($address) {
-            return is_string($address) ? new Address($address) : $address;
-        })->all();
+        return (new Collection($addresses))
+            ->map(fn ($address) => is_string($address) ? new Address($address) : $address)
+            ->all();
     }
 
     /**
