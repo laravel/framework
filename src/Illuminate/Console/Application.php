@@ -102,11 +102,38 @@ class Application extends SymfonyApplication implements ApplicationContract
      * Format the given command as a fully-qualified executable command.
      *
      * @param  string  $string
+     * @param  bool  $silenceDeprecations
      * @return string
      */
-    public static function formatCommandString($string)
+    public static function formatCommandString($string, $silenceDeprecations = false)
     {
-        return sprintf('%s %s %s', static::phpBinary(), static::artisanBinary(), $string);
+        $phpOptions = $silenceDeprecations ? self::getPhpOptionsWithoutDeprecations() : '';
+
+        $php = static::phpBinary();
+
+        if ($phpOptions) {
+            $php .= ' '.$phpOptions;
+        }
+
+        return sprintf('%s %s %s', $php, static::artisanBinary(), $string);
+    }
+
+    /**
+     * Get PHP options to exclude deprecation warnings.
+     *
+     * @return string
+     */
+    protected static function getPhpOptionsWithoutDeprecations()
+    {
+        $currentErrorReporting = error_reporting();
+
+        $errorReportingWithoutDeprecations = $currentErrorReporting & ~E_DEPRECATED;
+
+        if ($currentErrorReporting !== $errorReportingWithoutDeprecations) {
+            return '-d error_reporting="'.$errorReportingWithoutDeprecations.'"';
+        }
+
+        return '';
     }
 
     /**
