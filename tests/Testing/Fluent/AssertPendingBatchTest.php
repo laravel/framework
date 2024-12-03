@@ -452,8 +452,8 @@ class AssertPendingBatchTest extends TestCase
             [
                 new BJob(2, 3),
                 new CJob,
-                new DJob(4)
-            ]
+                new DJob(4),
+            ],
         ])->dispatch();
 
         $this->expectException(AssertionFailedError::class);
