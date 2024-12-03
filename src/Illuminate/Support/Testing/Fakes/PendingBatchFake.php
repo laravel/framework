@@ -319,7 +319,7 @@ class PendingBatchFake extends PendingBatch
 
         PHPUnit::assertNotEmpty(
             array_diff($actualJobs, $expectedJobs),
-            'Failed to assert that there are unexpected jobs in the batch.'
+            'There are no additional jobs in the batch.'
         );
 
         return $this;

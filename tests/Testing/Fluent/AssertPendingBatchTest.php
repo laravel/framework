@@ -647,7 +647,7 @@ class AssertPendingBatchTest extends TestCase
         ])->dispatch();
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Failed to assert that there are unexpected jobs in the batch.');
+        $this->expectExceptionMessage('There are no additional jobs in the batch.');
 
         Bus::assertBatched(fn (PendingBatchFake $assert) =>
             $assert->has(AJob::class)
@@ -679,6 +679,39 @@ class AssertPendingBatchTest extends TestCase
                 )
                 ->nth(1, fn (PendingBatchFake $assert) =>
                     $assert->has(CJob::class)
+                )->etc()
+        );
+    }
+
+    public function test_etc_with_nested_jobs_fail()
+    {
+        Bus::fake();
+
+        Bus::batch([
+            [
+                new AJob,
+                new BJob,
+            ],
+            new CJob,
+            [
+                new CJob,
+                new DJob,
+            ],
+        ])->dispatch();
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('There are no additional jobs in the batch.');
+
+        Bus::assertBatched(fn (PendingBatchFake $assert) =>
+            $assert->first(fn (PendingBatchFake $assert) =>
+                    $assert->has(AJob::class)
+                        ->has(BJob::class)
+                )
+                ->nth(1, fn (PendingBatchFake $assert) =>
+                    $assert->has(CJob::class)
+                )->nth(2, fn (PendingBatchFake $assert) =>
+                    $assert->has(CJob::class)
+                        ->has(DJob::class)
                 )->etc()
         );
     }
