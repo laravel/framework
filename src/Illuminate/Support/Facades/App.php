@@ -4,6 +4,7 @@ namespace Illuminate\Support\Facades;
 
 /**
  * @method static \Illuminate\Foundation\Configuration\ApplicationBuilder configure(string|null $basePath = null)
+ * @method static \Illuminate\Foundation\Application fromBootstrap(string $bootstrapPath)
  * @method static string inferBasePath()
  * @method static string version()
  * @method static void bootstrapWith(string[] $bootstrappers)

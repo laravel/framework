@@ -246,6 +246,22 @@ class Application extends Container implements ApplicationContract, CachesConfig
     }
 
     /**
+     * Get the application from the bootstrap file.
+     *
+     * @param  string  $bootstrapPath
+     * @return static
+     */
+    public static function fromBootstrap(string $bootstrapPath)
+    {
+        $application = (require_once $bootstrapPath);
+
+        return match (true) {
+            ($application instanceof static) => $application,
+            default => null,
+        };
+    }
+
+    /**
      * Infer the application's base directory from the environment.
      *
      * @return string
