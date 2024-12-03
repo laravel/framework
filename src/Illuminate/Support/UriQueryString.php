@@ -81,7 +81,11 @@ class UriQueryString implements Arrayable
      */
     public function toArray()
     {
-        parse_str($this->uri->getUri()->getQuery(), $currentQuery);
+        if (is_null($query = $this->uri->getUri()->getQuery())) {
+            return [];
+        }
+
+        parse_str($query, $currentQuery);
 
         return $currentQuery;
     }
