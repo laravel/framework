@@ -2,9 +2,9 @@
 
 namespace Illuminate\Testing\Fluent;
 
-use Illuminate\Support\Facades\Bus;
-use Illuminate\Bus\Queueable;
 use Illuminate\Bus\Batchable;
+use Illuminate\Bus\Queueable;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Testing\Fakes\PendingBatchFake;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\AssertionFailedError;
@@ -22,8 +22,7 @@ class AssertPendingBatchTest extends TestCase
             new DJob,
         ])->dispatch();
 
-        Bus::assertBatched(fn (PendingBatchFake $assert) =>
-            $assert->has(AJob::class, [1, 2])
+        Bus::assertBatched(fn (PendingBatchFake $assert) => $assert->has(AJob::class, [1, 2])
                 ->has(BJob::class)
                 ->has(CJob::class)
                 ->etc()
@@ -90,8 +89,7 @@ class AssertPendingBatchTest extends TestCase
             new CJob,
         ])->dispatch();
 
-        Bus::assertBatched(fn (PendingBatchFake $assert) =>
-            $assert->has(AJob::class)
+        Bus::assertBatched(fn (PendingBatchFake $assert) => $assert->has(AJob::class)
                 ->missing(BJob::class)
         );
     }
@@ -122,9 +120,7 @@ class AssertPendingBatchTest extends TestCase
             new BJob,
         ])->dispatch();
 
-        Bus::assertBatched(fn (PendingBatchFake $assert) =>
-            $assert->hasAll([AJob::class, BJob::class])
-        );
+        Bus::assertBatched(fn (PendingBatchFake $assert) => $assert->hasAll([AJob::class, BJob::class]));
     }
 
     public function test_pending_batch_has_all_fail_when_missing()
@@ -139,9 +135,7 @@ class AssertPendingBatchTest extends TestCase
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('The batch does not contain all expected jobs.');
 
-        Bus::assertBatched(fn (PendingBatchFake $assert) =>
-            $assert->hasAll([AJob::class, BJob::class])
-        );
+        Bus::assertBatched(fn (PendingBatchFake $assert) => $assert->hasAll([AJob::class, BJob::class]));
     }
 
     public function test_pending_batch_missing_all()
@@ -153,9 +147,7 @@ class AssertPendingBatchTest extends TestCase
             new BJob,
         ])->dispatch();
 
-        Bus::assertBatched(fn (PendingBatchFake $assert) =>
-            $assert->missingAll([CJob::class, DJob::class])
-        );
+        Bus::assertBatched(fn (PendingBatchFake $assert) => $assert->missingAll([CJob::class, DJob::class]));
     }
 
     public function test_pending_batch_missing_all_fail_when_has()
@@ -182,8 +174,7 @@ class AssertPendingBatchTest extends TestCase
             new CJob,
         ])->dispatch();
 
-        Bus::assertBatched(fn (PendingBatchFake $assert) =>
-            $assert->has(2)
+        Bus::assertBatched(fn (PendingBatchFake $assert) => $assert->has(2)
                 ->has(AJob::class)
                 ->hasAny(BJob::class, CJob::class, DJob::class)
         );
@@ -200,9 +191,7 @@ class AssertPendingBatchTest extends TestCase
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('The batch does not contains any of the expected jobs.');
 
-        Bus::assertBatched(fn (PendingBatchFake $assert) =>
-            $assert->hasAny(BJob::class, CJob::class, DJob::class)
-        );
+        Bus::assertBatched(fn (PendingBatchFake $assert) => $assert->hasAny(BJob::class, CJob::class, DJob::class));
     }
 
     public function test_nested_jobs_in_pending_batch()
@@ -221,18 +210,13 @@ class AssertPendingBatchTest extends TestCase
             ],
         ])->dispatch();
 
-        Bus::assertBatched(fn (PendingBatchFake $assert) =>
-            $assert->has(3)
-                ->first(fn (PendingBatchFake $assert) =>
-                    $assert->has(AJob::class, [1])
-                        ->has(BJob::class, [1])
+        Bus::assertBatched(fn (PendingBatchFake $assert) => $assert->has(3)
+                ->first(fn (PendingBatchFake $assert) => $assert->has(AJob::class, [1])
+                    ->has(BJob::class, [1])
                 )
-                ->nth(1, fn (PendingBatchFake $assert) =>
-                    $assert->has(CJob::class, [2])
-                )
-                ->nth(2, fn (PendingBatchFake $assert) =>
-                    $assert->has(CJob::class, [2])
-                        ->has(DJob::class, [2])
+                ->nth(1, fn (PendingBatchFake $assert) => $assert->has(CJob::class, [2]))
+                ->nth(2, fn (PendingBatchFake $assert) => $assert->has(CJob::class, [2])
+                    ->has(DJob::class, [2])
                 )
         );
     }
@@ -254,12 +238,10 @@ class AssertPendingBatchTest extends TestCase
             'The first one in the batch does not matches the given callback: The batch does not contain a job of type [Illuminate\Testing\Fluent\CJob]'
         );
 
-        Bus::assertBatched(fn (PendingBatchFake $assert) =>
-            $assert->first(fn (PendingBatchFake $assert) =>
-                    $assert->has(2)
+        Bus::assertBatched(fn (PendingBatchFake $assert) => $assert->first(fn (PendingBatchFake $assert) => $assert->has(2)
                         ->has(BJob::class, [1])
                         ->has(CJob::class, [2])
-                )
+            )
         );
     }
 
@@ -273,8 +255,7 @@ class AssertPendingBatchTest extends TestCase
             new CJob(1),
         ])->dispatch();
 
-        Bus::assertBatched(fn (PendingBatchFake $assert) =>
-            $assert->nth(0, AJob::class, [0, 1])
+        Bus::assertBatched(fn (PendingBatchFake $assert) => $assert->nth(0, AJob::class, [0, 1])
                 ->nth(1, BJob::class, [1])
                 ->nth(2, CJob::class, [1])
         );
@@ -293,9 +274,7 @@ class AssertPendingBatchTest extends TestCase
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('The batch does not contains a job at index [3].');
 
-        Bus::assertBatched(fn (PendingBatchFake $assert) =>
-            $assert->nth(3, CJob::class)
-        );
+        Bus::assertBatched(fn (PendingBatchFake $assert) => $assert->nth(3, CJob::class));
     }
 
     public function test_nested_jobs_in_pending_batch_fail_when_nth_missing()
@@ -315,11 +294,7 @@ class AssertPendingBatchTest extends TestCase
             'The [1st] one in the batch does not matches the given callback: The batch does not contain a job of type [Illuminate\Testing\Fluent\AJob]'
         );
 
-        Bus::assertBatched(fn (PendingBatchFake $assert) =>
-            $assert->nth(1, fn (PendingBatchFake $assert) =>
-                $assert->has(AJob::class, [1])->has(BJob::class, [1])
-            )
-        );
+        Bus::assertBatched(fn (PendingBatchFake $assert) => $assert->nth(1, fn (PendingBatchFake $assert) => $assert->has(AJob::class, [1])->has(BJob::class, [1])));
     }
 
     public function test_nested_jobs_in_pending_batch_fail_when_nth_does_not_match()
@@ -337,10 +312,9 @@ class AssertPendingBatchTest extends TestCase
             'The batch does not contain a job of type [Illuminate\Testing\Fluent\DJob] at index [2].'
         );
 
-        Bus::assertBatched(fn (PendingBatchFake $assert) =>
-            $assert->nth(0, AJob::class, [0, 1])
-                ->nth(1, BJob::class, [1])
-                ->nth(2, DJob::class, [1])
+        Bus::assertBatched(fn (PendingBatchFake $assert) => $assert->nth(0, AJob::class, [0, 1])
+            ->nth(1, BJob::class, [1])
+            ->nth(2, DJob::class, [1])
         );
     }
 
@@ -361,11 +335,7 @@ class AssertPendingBatchTest extends TestCase
             'The [0th] one in the batch does not matches the given callback: The job parameters does not match the expected values for class [Illuminate\Testing\Fluent\AJob].'
         );
 
-        Bus::assertBatched(fn (PendingBatchFake $assert) =>
-            $assert->nth(0, fn (PendingBatchFake $assert) =>
-                $assert->has(AJob::class, [2])->has(BJob::class)
-            )
-        );
+        Bus::assertBatched(fn (PendingBatchFake $assert) => $assert->nth(0, fn (PendingBatchFake $assert) => $assert->has(AJob::class, [2])->has(BJob::class)));
     }
 
     public function test_equal_jobs_in_pending_batch()
@@ -380,15 +350,13 @@ class AssertPendingBatchTest extends TestCase
             new EJob(2, 3),
         ])->dispatch();
 
-        Bus::assertBatched(fn (PendingBatchFake $assert) =>
-            $assert->equal([
-                AJob::class => [0, 1],
-                BJob::class => [1],
-                CJob::class => [1],
-                DJob::class => [2],
-                EJob::class => [2, 3],
-            ])
-        );
+        Bus::assertBatched(fn (PendingBatchFake $assert) => $assert->equal([
+            AJob::class => [0, 1],
+            BJob::class => [1],
+            CJob::class => [1],
+            DJob::class => [2],
+            EJob::class => [2, 3],
+        ]));
     }
 
     public function test_equal_jobs_in_pending_batch_fail_when_job_missing()
@@ -408,14 +376,12 @@ class AssertPendingBatchTest extends TestCase
             'The job of type [Illuminate\Testing\Fluent\EJob] does not exists.'
         );
 
-        Bus::assertBatched(fn (PendingBatchFake $assert) =>
-            $assert->equal([
-                AJob::class => [0, 1],
-                BJob::class => [1],
-                CJob::class => [1],
-                DJob::class => [2],
-            ])
-        );
+        Bus::assertBatched(fn (PendingBatchFake $assert) => $assert->equal([
+            AJob::class => [0, 1],
+            BJob::class => [1],
+            CJob::class => [1],
+            DJob::class => [2],
+        ]));
     }
 
     public function test_equal_jobs_in_pending_batch_fail_when_job_parameters_does_not_match()
@@ -435,15 +401,13 @@ class AssertPendingBatchTest extends TestCase
             'The job parameters does not match the expected values for class [Illuminate\Testing\Fluent\EJob].'
         );
 
-        Bus::assertBatched(fn (PendingBatchFake $assert) =>
-            $assert->equal([
-                AJob::class => [0, 1],
-                BJob::class => [1],
-                CJob::class => [1],
-                DJob::class => [2],
-                EJob::class,
-            ])
-        );
+        Bus::assertBatched(fn (PendingBatchFake $assert) => $assert->equal([
+            AJob::class => [0, 1],
+            BJob::class => [1],
+            CJob::class => [1],
+            DJob::class => [2],
+            EJob::class,
+        ]));
     }
 
     public function test_equal_with_nested_jobs_in_pending_batch()
@@ -464,21 +428,19 @@ class AssertPendingBatchTest extends TestCase
             new CJob,
         ])->dispatch();
 
-        Bus::assertBatched(fn (PendingBatchFake $assert) =>
-            $assert->equal([
-                AJob::class => [1],
-                [
-                    BJob::class => [2, 3],
-                    CJob::class,
-                    DJob::class => [4],
-                ],
-                [
-                    AJob::class => [1, 2],
-                    BJob::class,
-                ],
+        Bus::assertBatched(fn (PendingBatchFake $assert) => $assert->equal([
+            AJob::class => [1],
+            [
+                BJob::class => [2, 3],
                 CJob::class,
-            ])
-        );
+                DJob::class => [4],
+            ],
+            [
+                AJob::class => [1, 2],
+                BJob::class,
+            ],
+            CJob::class,
+        ]));
     }
 
     public function test_equal_with_nested_jobs_in_pending_batch_fail_when_is_not_array()
@@ -490,21 +452,19 @@ class AssertPendingBatchTest extends TestCase
             [
                 new BJob(2, 3),
                 new CJob,
-                new DJob(4),
+                new DJob(4)
             ]
         ])->dispatch();
 
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('The one in the batch at index [1] is not an array.');
 
-        Bus::assertBatched(fn (PendingBatchFake $assert) =>
-            $assert->equal([
-                AJob::class => [1],
-                BJob::class => [2, 3],
-                CJob::class,
-                DJob::class => [4],
-            ])
-        );
+        Bus::assertBatched(fn (PendingBatchFake $assert) => $assert->equal([
+            AJob::class => [1],
+            BJob::class => [2, 3],
+            CJob::class,
+            DJob::class => [4],
+        ]));
     }
 
     public function test_equal_with_nested_jobs_in_pending_batch_fail_when_is_not_same()
@@ -523,15 +483,13 @@ class AssertPendingBatchTest extends TestCase
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('The [1st] one in the batch at index [2] does not match: The job of type [Illuminate\Testing\Fluent\DJob] does not exists.');
 
-        Bus::assertBatched(fn (PendingBatchFake $assert) =>
-            $assert->equal([
-                AJob::class => [1],
-                [
-                    BJob::class => [2, 3],
-                    CJob::class,
-                ]
-            ])
-        );
+        Bus::assertBatched(fn (PendingBatchFake $assert) => $assert->equal([
+            AJob::class => [1],
+            [
+                BJob::class => [2, 3],
+                CJob::class,
+            ]
+        ]));
     }
 
     public function test_etc_with_additional_job()
@@ -545,11 +503,10 @@ class AssertPendingBatchTest extends TestCase
             new DJob,
         ])->dispatch();
 
-        Bus::assertBatched(fn (PendingBatchFake $assert) =>
-            $assert->has(AJob::class)
-                ->has(BJob::class)
-                ->has(CJob::class)
-                ->etc()
+        Bus::assertBatched(fn (PendingBatchFake $assert) => $assert->has(AJob::class)
+            ->has(BJob::class)
+            ->has(CJob::class)
+            ->etc()
         );
     }
 
@@ -564,11 +521,10 @@ class AssertPendingBatchTest extends TestCase
             new DJob,
         ])->dispatch();
 
-        Bus::assertBatched(fn (PendingBatchFake $assert) =>
-            $assert->has(CJob::class)
-                ->has(AJob::class)
-                ->has(BJob::class)
-                ->etc()
+        Bus::assertBatched(fn (PendingBatchFake $assert) => $assert->has(CJob::class)
+            ->has(AJob::class)
+            ->has(BJob::class)
+            ->etc()
         );
     }
 
@@ -584,12 +540,11 @@ class AssertPendingBatchTest extends TestCase
             new DJob,
         ])->dispatch();
 
-        Bus::assertBatched(fn (PendingBatchFake $assert) =>
-            $assert->has(AJob::class)
-                ->has(BJob::class)
-                ->has(AJob::class)
-                ->has(CJob::class)
-                ->etc()
+        Bus::assertBatched(fn (PendingBatchFake $assert) => $assert->has(AJob::class)
+            ->has(BJob::class)
+            ->has(AJob::class)
+            ->has(CJob::class)
+            ->etc()
         );
     }
 
@@ -606,13 +561,12 @@ class AssertPendingBatchTest extends TestCase
             new DJob,
         ])->dispatch();
 
-        Bus::assertBatched(fn (PendingBatchFake $assert) =>
-            $assert->has(AJob::class)
-                ->has(BJob::class)
-                ->has(AJob::class)
-                ->has(BJob::class)
-                ->has(CJob::class)
-                ->etc()
+        Bus::assertBatched(fn (PendingBatchFake $assert) => $assert->has(AJob::class)
+            ->has(BJob::class)
+            ->has(AJob::class)
+            ->has(BJob::class)
+            ->has(CJob::class)
+            ->etc()
         );
     }
 
@@ -628,12 +582,11 @@ class AssertPendingBatchTest extends TestCase
             new DJob,
         ])->dispatch();
 
-        Bus::assertBatched(fn (PendingBatchFake $assert) =>
-            $assert->has(BJob::class)
-                ->has(AJob::class)
-                ->has(CJob::class)
-                ->has(AJob::class)
-                ->etc()
+        Bus::assertBatched(fn (PendingBatchFake $assert) => $assert->has(BJob::class)
+            ->has(AJob::class)
+            ->has(CJob::class)
+            ->has(AJob::class)
+            ->etc()
         );
     }
 
@@ -649,10 +602,9 @@ class AssertPendingBatchTest extends TestCase
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('There are no additional jobs in the batch.');
 
-        Bus::assertBatched(fn (PendingBatchFake $assert) =>
-            $assert->has(AJob::class)
-                ->has(BJob::class)
-                ->etc()
+        Bus::assertBatched(fn (PendingBatchFake $assert) => $assert->has(AJob::class)
+            ->has(BJob::class)
+            ->etc()
         );
     }
 
@@ -672,14 +624,10 @@ class AssertPendingBatchTest extends TestCase
             ],
         ])->dispatch();
 
-        Bus::assertBatched(fn (PendingBatchFake $assert) =>
-            $assert->first(fn (PendingBatchFake $assert) =>
-                    $assert->has(AJob::class)
-                        ->has(BJob::class)
-                )
-                ->nth(1, fn (PendingBatchFake $assert) =>
-                    $assert->has(CJob::class)
-                )->etc()
+        Bus::assertBatched(fn (PendingBatchFake $assert) => $assert->first(fn (PendingBatchFake $assert) => $assert->has(AJob::class)
+            ->has(BJob::class))
+            ->nth(1, fn (PendingBatchFake $assert) => $assert->has(CJob::class))
+            ->etc()
         );
     }
 
@@ -702,17 +650,12 @@ class AssertPendingBatchTest extends TestCase
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('There are no additional jobs in the batch.');
 
-        Bus::assertBatched(fn (PendingBatchFake $assert) =>
-            $assert->first(fn (PendingBatchFake $assert) =>
-                    $assert->has(AJob::class)
-                        ->has(BJob::class)
-                )
-                ->nth(1, fn (PendingBatchFake $assert) =>
-                    $assert->has(CJob::class)
-                )->nth(2, fn (PendingBatchFake $assert) =>
-                    $assert->has(CJob::class)
-                        ->has(DJob::class)
-                )->etc()
+        Bus::assertBatched(fn (PendingBatchFake $assert) => $assert->first(fn (PendingBatchFake $assert) => $assert->has(AJob::class)
+            ->has(BJob::class))
+            ->nth(1, fn (PendingBatchFake $assert) => $assert->has(CJob::class))
+            ->nth(2, fn (PendingBatchFake $assert) => $assert->has(CJob::class)
+                ->has(DJob::class)
+            )->etc()
         );
     }
 }
@@ -721,7 +664,8 @@ trait Parameterable
 {
     public $parameters = [];
 
-    public function __construct(...$parameters) {
+    public function __construct(...$parameters)
+    {
         $this->parameters = $parameters;
     }
 }

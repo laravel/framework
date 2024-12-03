@@ -2,12 +2,12 @@
 
 namespace Illuminate\Support\Testing\Fakes;
 
+use Closure;
 use Illuminate\Bus\PendingBatch;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Number;
 use PHPUnit\Framework\Assert as PHPUnit;
 use Throwable;
-use Closure;
-use Illuminate\Support\Number;
 
 class PendingBatchFake extends PendingBatch
 {
@@ -78,8 +78,7 @@ class PendingBatchFake extends PendingBatch
         }
 
         PHPUnit::assertTrue(
-            $this->jobs->contains(fn ($job) =>
-                get_class($job) === $expectedJob &&
+            $this->jobs->contains(fn ($job) => get_class($job) === $expectedJob &&
                     $this->parametersMatch($job, $expectedJob, $expectedParameters)
             ),
             "The batch does not contain a job of type [{$expectedJob}]."
@@ -158,7 +157,7 @@ class PendingBatchFake extends PendingBatch
             $this->jobs->contains(function ($job) use ($expectedJobs) {
                 return in_array(get_class($job), $expectedJobs);
             }),
-            "The batch does not contains any of the expected jobs."
+            'The batch does not contains any of the expected jobs.'
         );
 
         array_push($this->expected, ...$expectedJobs);
@@ -176,7 +175,7 @@ class PendingBatchFake extends PendingBatch
     {
         $firstJob = $this->jobs->first();
 
-        PHPUnit::assertNotNull($firstJob, "Failed to assert the batch contains any jobs.");
+        PHPUnit::assertNotNull($firstJob, 'Failed to assert the batch contains any jobs.');
 
         try {
             $callback(
@@ -186,7 +185,7 @@ class PendingBatchFake extends PendingBatch
                 )
             );
         } catch (Throwable $e) {
-            throw new $e('The first one in the batch does not matches the given callback: ' . $e->getMessage());
+            throw new $e('The first one in the batch does not matches the given callback: '.$e->getMessage());
         }
 
         array_push($this->expected, is_array($firstJob) ?
@@ -311,8 +310,8 @@ class PendingBatchFake extends PendingBatch
         $expectedJobs = array_map('serialize', $this->expected);
 
         $actualJobs = $this->jobs->map(
-            fn($job) => serialize(is_array($job) ?
-                array_map(fn($j) => get_class($j), $job) :
+            fn ($job) => serialize(is_array($job) ?
+                array_map(fn ($j) => get_class($j), $job) :
                 get_class($job)
             )
         )->toArray();
@@ -337,7 +336,7 @@ class PendingBatchFake extends PendingBatch
     {
         PHPUnit::assertNotEmpty(
             $expectedClass,
-            sprintf("The job of type [%s] does not exists.", get_class($actual))
+            sprintf('The job of type [%s] does not exists.', get_class($actual))
         );
 
         PHPUnit::assertEquals(
