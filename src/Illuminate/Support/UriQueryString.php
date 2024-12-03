@@ -12,9 +12,9 @@ class UriQueryString implements Arrayable
     /**
      * Create a new URI query string instance.
      */
-    public function __construct(Uri $uri)
+    public function __construct(protected Uri $uri)
     {
-        $this->uri = $uri;
+        //
     }
 
     /**
