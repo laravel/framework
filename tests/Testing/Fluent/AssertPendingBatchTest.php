@@ -241,7 +241,7 @@ class AssertPendingBatchTest extends TestCase
         Bus::assertBatched(fn (PendingBatchFake $assert) => $assert->first(fn (PendingBatchFake $assert) => $assert->has(2)
                         ->has(BJob::class, [1])
                         ->has(CJob::class, [2])
-            )
+        )
         );
     }
 
@@ -477,7 +477,7 @@ class AssertPendingBatchTest extends TestCase
                 new BJob(2, 3),
                 new CJob,
                 new DJob(4),
-            ]
+            ],
         ])->dispatch();
 
         $this->expectException(AssertionFailedError::class);
@@ -488,7 +488,7 @@ class AssertPendingBatchTest extends TestCase
             [
                 BJob::class => [2, 3],
                 CJob::class,
-            ]
+            ],
         ]));
     }
 
