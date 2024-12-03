@@ -471,9 +471,7 @@ class BroadcastManager implements FactoryContract
      */
     public function extend($driver, Closure $callback)
     {
-        $this->customCreators[$driver] = $callback;
-
-        return $this;
+        return tap($this, fn () => $this->customCreators[$driver] = $callback);
     }
 
     /**
@@ -494,9 +492,7 @@ class BroadcastManager implements FactoryContract
      */
     public function setApplication($app)
     {
-        $this->app = $app;
-
-        return $this;
+        return tap($this, fn () => $this->app = $app);
     }
 
     /**
@@ -506,9 +502,7 @@ class BroadcastManager implements FactoryContract
      */
     public function forgetDrivers()
     {
-        $this->drivers = [];
-
-        return $this;
+        return tap($this, fn () => $this->drivers = []);
     }
 
     /**

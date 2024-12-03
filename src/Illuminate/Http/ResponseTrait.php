@@ -74,9 +74,7 @@ trait ResponseTrait
      */
     public function header($key, $values, $replace = true)
     {
-        $this->headers->set($key, $values, $replace);
-
-        return $this;
+        return tap($this, fn () => $this->headers->set($key, $values, $replace));
     }
 
     /**
@@ -163,9 +161,7 @@ trait ResponseTrait
      */
     public function withException(Throwable $e)
     {
-        $this->exception = $e;
-
-        return $this;
+        return tap($this, fn () => $this->exception = $e);
     }
 
     /**

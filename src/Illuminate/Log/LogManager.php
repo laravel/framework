@@ -544,9 +544,7 @@ class LogManager implements LoggerInterface
      */
     public function flushSharedContext()
     {
-        $this->sharedContext = [];
-
-        return $this;
+        return tap($this, fn () => $this->sharedContext = []);
     }
 
     /**
@@ -600,9 +598,7 @@ class LogManager implements LoggerInterface
      */
     public function extend($driver, Closure $callback)
     {
-        $this->customCreators[$driver] = $callback->bindTo($this, $this);
-
-        return $this;
+        return tap($this, fn () => $this->customCreators[$driver] = $callback->bindTo($this, $this));
     }
 
     /**
@@ -775,9 +771,7 @@ class LogManager implements LoggerInterface
      */
     public function setApplication($app)
     {
-        $this->app = $app;
-
-        return $this;
+        return tap($this, fn () => $this->app = $app);
     }
 
     /**

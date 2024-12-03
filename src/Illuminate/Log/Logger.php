@@ -197,9 +197,7 @@ class Logger implements LoggerInterface
      */
     public function withContext(array $context = [])
     {
-        $this->context = array_merge($this->context, $context);
-
-        return $this;
+        return tap($this, fn () => $this->context = array_merge($this->context, $context));
     }
 
     /**
@@ -209,9 +207,7 @@ class Logger implements LoggerInterface
      */
     public function withoutContext()
     {
-        $this->context = [];
-
-        return $this;
+        return tap($this, fn () => $this->context = []);
     }
 
     /**

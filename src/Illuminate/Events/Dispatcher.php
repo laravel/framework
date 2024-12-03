@@ -738,9 +738,7 @@ class Dispatcher implements DispatcherContract
      */
     public function setQueueResolver(callable $resolver)
     {
-        $this->queueResolver = $resolver;
-
-        return $this;
+        return tap($this, fn () => $this->queueResolver = $resolver);
     }
 
     /**
@@ -761,9 +759,7 @@ class Dispatcher implements DispatcherContract
      */
     public function setTransactionManagerResolver(callable $resolver)
     {
-        $this->transactionManagerResolver = $resolver;
-
-        return $this;
+        return tap($this, fn () => $this->transactionManagerResolver = $resolver);
     }
 
     /**

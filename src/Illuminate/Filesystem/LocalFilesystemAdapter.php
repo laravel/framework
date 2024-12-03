@@ -81,9 +81,7 @@ class LocalFilesystemAdapter extends FilesystemAdapter
      */
     public function diskName(string $disk)
     {
-        $this->disk = $disk;
-
-        return $this;
+        return tap($this, fn () => $this->disk = $disk);
     }
 
     /**

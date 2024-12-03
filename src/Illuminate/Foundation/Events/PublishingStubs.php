@@ -33,8 +33,6 @@ class PublishingStubs
      */
     public function add(string $path, string $name)
     {
-        $this->stubs[$path] = $name;
-
-        return $this;
+        return tap($this, fn () => $this->stubs[$path] = $name);
     }
 }

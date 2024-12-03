@@ -350,9 +350,7 @@ class ApplicationBuilder
      */
     public function withSchedule(callable $callback)
     {
-        Artisan::starting(fn () => $callback($this->app->make(Schedule::class)));
-
-        return $this;
+        return tap($this, fn () => Artisan::starting(fn () => $callback($this->app->make(Schedule::class))));
     }
 
     /**
@@ -420,9 +418,7 @@ class ApplicationBuilder
      */
     public function registered(callable $callback)
     {
-        $this->app->registered($callback);
-
-        return $this;
+        return tap($this, fn () => $this->app->registered($callback));
     }
 
     /**
@@ -432,10 +428,8 @@ class ApplicationBuilder
      * @return $this
      */
     public function booting(callable $callback)
-    {
-        $this->app->booting($callback);
-
-        return $this;
+    {        
+        return tap($this, fn () => $this->app->booting($callback));
     }
 
     /**
@@ -446,9 +440,7 @@ class ApplicationBuilder
      */
     public function booted(callable $callback)
     {
-        $this->app->booted($callback);
-
-        return $this;
+        return tap($this, fn () => $this->app->booted($callback));
     }
 
     /**

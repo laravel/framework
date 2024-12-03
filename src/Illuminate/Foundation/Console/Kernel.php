@@ -569,9 +569,7 @@ class Kernel implements KernelContract
      */
     public function addCommands(array $commands)
     {
-        $this->commands = array_values(array_unique(array_merge($this->commands, $commands)));
-
-        return $this;
+        return tap($this, fn () => $this->commands = array_values(array_unique(array_merge($this->commands, $commands))));
     }
 
     /**
@@ -582,9 +580,7 @@ class Kernel implements KernelContract
      */
     public function addCommandPaths(array $paths)
     {
-        $this->commandPaths = array_values(array_unique(array_merge($this->commandPaths, $paths)));
-
-        return $this;
+        return tap($this, fn () => $this->commandPaths = array_values(array_unique(array_merge($this->commandPaths, $paths))));
     }
 
     /**
@@ -595,9 +591,7 @@ class Kernel implements KernelContract
      */
     public function addCommandRoutePaths(array $paths)
     {
-        $this->commandRoutePaths = array_values(array_unique(array_merge($this->commandRoutePaths, $paths)));
-
-        return $this;
+        return tap($this, fn () => $this->commandRoutePaths = array_values(array_unique(array_merge($this->commandRoutePaths, $paths))));
     }
 
     /**

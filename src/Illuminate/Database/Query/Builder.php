@@ -494,9 +494,7 @@ class Builder implements BuilderContract
      */
     public function useIndex($index)
     {
-        $this->indexHint = new IndexHint('hint', $index);
-
-        return $this;
+        return tap($this, fn () => $this->indexHint = new IndexHint('hint', $index));
     }
 
     /**
@@ -507,9 +505,7 @@ class Builder implements BuilderContract
      */
     public function forceIndex($index)
     {
-        $this->indexHint = new IndexHint('force', $index);
-
-        return $this;
+        return tap($this, fn () => $this->indexHint = new IndexHint('force', $index));
     }
 
     /**
@@ -520,9 +516,7 @@ class Builder implements BuilderContract
      */
     public function ignoreIndex($index)
     {
-        $this->indexHint = new IndexHint('ignore', $index);
-
-        return $this;
+        return tap($this, fn () => $this->indexHint = new IndexHint('ignore', $index));
     }
 
     /**
@@ -2955,9 +2949,7 @@ class Builder implements BuilderContract
      */
     public function beforeQuery(callable $callback)
     {
-        $this->beforeQueryCallbacks[] = $callback;
-
-        return $this;
+        return tap($this, fn () => $this->beforeQueryCallbacks[] = $callback);
     }
 
     /**
@@ -2982,9 +2974,7 @@ class Builder implements BuilderContract
      */
     public function afterQuery(Closure $callback)
     {
-        $this->afterQueryCallbacks[] = $callback;
-
-        return $this;
+        return tap($this, fn () => $this->afterQueryCallbacks[] = $callback);
     }
 
     /**
@@ -4229,9 +4219,7 @@ class Builder implements BuilderContract
      */
     public function mergeBindings(self $query)
     {
-        $this->bindings = array_merge_recursive($this->bindings, $query->bindings);
-
-        return $this;
+        return tap($this, fn () => $this->bindings = array_merge_recursive($this->bindings, $query->bindings));
     }
 
     /**
@@ -4309,9 +4297,7 @@ class Builder implements BuilderContract
      */
     public function useWritePdo()
     {
-        $this->useWritePdo = true;
-
-        return $this;
+        return tap($this, fn () => $this->useWritePdo = true);
     }
 
     /**
@@ -4392,9 +4378,7 @@ class Builder implements BuilderContract
      */
     public function dumpRawSql()
     {
-        dump($this->toRawSql());
-
-        return $this;
+        return tap($this, fn () => dump($this->toRawSql()));
     }
 
     /**

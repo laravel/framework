@@ -252,9 +252,7 @@ class PendingRequest
      */
     public function baseUrl(string $url)
     {
-        $this->baseUrl = $url;
-
-        return $this;
+        return tap($this, fn () => $this->baseUrl = $url);
     }
 
     /**
@@ -372,9 +370,7 @@ class PendingRequest
      */
     public function contentType(string $contentType)
     {
-        $this->options['headers']['Content-Type'] = $contentType;
-
-        return $this;
+        return tap($this, fn () => $this->options['headers']['Content-Type'] = $contentType);
     }
 
     /**
@@ -433,9 +429,7 @@ class PendingRequest
      */
     public function replaceHeaders(array $headers)
     {
-        $this->options['headers'] = array_merge($this->options['headers'] ?? [], $headers);
-
-        return $this;
+        return tap($this, fn () => $this->options['headers'] = array_merge($this->options['headers'] ?? [], $headers));
     }
 
     /**
@@ -641,9 +635,7 @@ class PendingRequest
      */
     public function withMiddleware(callable $middleware)
     {
-        $this->middleware->push($middleware);
-
-        return $this;
+        return tap($this, fn () => $this->middleware->push($middleware));
     }
 
     /**
@@ -654,9 +646,7 @@ class PendingRequest
      */
     public function withRequestMiddleware(callable $middleware)
     {
-        $this->middleware->push(Middleware::mapRequest($middleware));
-
-        return $this;
+        return tap($this, fn () => $this->middleware->push(Middleware::mapRequest($middleware)));
     }
 
     /**
@@ -667,9 +657,7 @@ class PendingRequest
      */
     public function withResponseMiddleware(callable $middleware)
     {
-        $this->middleware->push(Middleware::mapResponse($middleware));
-
-        return $this;
+        return tap($this, fn () => $this->middleware->push(Middleware::mapResponse($middleware)));
     }
 
     /**
@@ -693,9 +681,7 @@ class PendingRequest
      */
     public function throw(?callable $callback = null)
     {
-        $this->throwCallback = $callback ?: fn () => null;
-
-        return $this;
+        return tap($this, fn () => $this->throwCallback = $callback ?: fn () => null);
     }
 
     /**
@@ -1430,9 +1416,7 @@ class PendingRequest
      */
     public function stub($callback)
     {
-        $this->stubCallbacks = new Collection($callback);
-
-        return $this;
+        return tap($this, fn () => $this->stubCallbacks = new Collection($callback));
     }
 
     /**
@@ -1443,9 +1427,7 @@ class PendingRequest
      */
     public function preventStrayRequests($prevent = true)
     {
-        $this->preventStrayRequests = $prevent;
-
-        return $this;
+        return tap($this, fn () => $this->preventStrayRequests = $prevent);
     }
 
     /**
@@ -1456,9 +1438,7 @@ class PendingRequest
      */
     public function async(bool $async = true)
     {
-        $this->async = $async;
-
-        return $this;
+        return tap($this, fn () => $this->async = $async);
     }
 
     /**
@@ -1520,9 +1500,7 @@ class PendingRequest
      */
     public function setClient(Client $client)
     {
-        $this->client = $client;
-
-        return $this;
+        return tap($this, fn () => $this->client = $client);
     }
 
     /**
@@ -1533,9 +1511,7 @@ class PendingRequest
      */
     public function setHandler($handler)
     {
-        $this->handler = $handler;
-
-        return $this;
+        return tap($this, fn () => $this->handler = $handler);
     }
 
     /**

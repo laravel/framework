@@ -31,9 +31,7 @@ trait SupportsDefaultModels
      */
     public function withDefault($callback = true)
     {
-        $this->withDefault = $callback;
-
-        return $this;
+        return tap($this, fn () => $this->withDefault = $callback);
     }
 
     /**

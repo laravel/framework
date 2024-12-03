@@ -157,9 +157,7 @@ class Vite implements Htmlable
      */
     public function useIntegrityKey($key)
     {
-        $this->integrityKey = $key;
-
-        return $this;
+        return tap($this, fn () => $this->integrityKey = $key);
     }
 
     /**
@@ -170,9 +168,7 @@ class Vite implements Htmlable
      */
     public function withEntryPoints($entryPoints)
     {
-        $this->entryPoints = $entryPoints;
-
-        return $this;
+        return tap($this, fn () => $this->entryPoints = $entryPoints);
     }
 
     /**
@@ -197,9 +193,7 @@ class Vite implements Htmlable
      */
     public function useManifestFilename($filename)
     {
-        $this->manifestFilename = $filename;
-
-        return $this;
+        return tap($this, fn () => $this->manifestFilename = $filename);
     }
 
     /**
@@ -210,9 +204,7 @@ class Vite implements Htmlable
      */
     public function createAssetPathsUsing($resolver)
     {
-        $this->assetPathResolver = $resolver;
-
-        return $this;
+        return tap($this, fn () => $this->assetPathResolver = $resolver);
     }
 
     /**
@@ -233,9 +225,7 @@ class Vite implements Htmlable
      */
     public function useHotFile($path)
     {
-        $this->hotFile = $path;
-
-        return $this;
+        return tap($this, fn () => $this->hotFile = $path);
     }
 
     /**
@@ -246,9 +236,7 @@ class Vite implements Htmlable
      */
     public function useBuildDirectory($path)
     {
-        $this->buildDirectory = $path;
-
-        return $this;
+        return tap($this, fn () => $this->buildDirectory = $path);
     }
 
     /**

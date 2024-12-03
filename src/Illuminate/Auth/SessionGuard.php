@@ -864,9 +864,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      */
     public function setRememberDuration($minutes)
     {
-        $this->rememberDuration = $minutes;
-
-        return $this;
+        return tap($this, fn () => $this->rememberDuration = $minutes);
     }
 
     /**
@@ -972,9 +970,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      */
     public function setRequest(Request $request)
     {
-        $this->request = $request;
-
-        return $this;
+        return tap($this, fn () => $this->request = $request);
     }
 
     /**

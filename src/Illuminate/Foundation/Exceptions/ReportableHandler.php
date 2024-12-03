@@ -75,8 +75,6 @@ class ReportableHandler
      */
     public function stop()
     {
-        $this->shouldStop = true;
-
-        return $this;
+        return tap($this, fn () => $this->shouldStop = true);
     }
 }

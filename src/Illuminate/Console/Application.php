@@ -277,9 +277,7 @@ class Application extends SymfonyApplication implements ApplicationContract
      */
     public function setContainerCommandLoader()
     {
-        $this->setCommandLoader(new ContainerCommandLoader($this->laravel, $this->commandMap));
-
-        return $this;
+        return tap($this, fn () => $this->setCommandLoader(new ContainerCommandLoader($this->laravel, $this->commandMap)));
     }
 
     /**

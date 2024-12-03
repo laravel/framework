@@ -86,9 +86,7 @@ class Attribute
      */
     public function withoutObjectCaching()
     {
-        $this->withObjectCaching = false;
-
-        return $this;
+        return tap($this, fn () => $this->withObjectCaching = false);
     }
 
     /**
@@ -98,8 +96,6 @@ class Attribute
      */
     public function shouldCache()
     {
-        $this->withCaching = true;
-
-        return $this;
+        return tap($this, fn () => $this->withCaching = true);
     }
 }

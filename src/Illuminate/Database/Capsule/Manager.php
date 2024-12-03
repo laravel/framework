@@ -150,9 +150,7 @@ class Manager
      */
     public function setFetchMode($fetchMode)
     {
-        $this->container['config']['database.fetch'] = $fetchMode;
-
-        return $this;
+        return tap($this, fn () => $this->container['config']['database.fetch'] = $fetchMode);
     }
 
     /**

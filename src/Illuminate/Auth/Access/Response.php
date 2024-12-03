@@ -165,9 +165,7 @@ class Response implements Arrayable, Stringable
      */
     public function withStatus($status)
     {
-        $this->status = $status;
-
-        return $this;
+        return tap($this, fn () => $this->status = $status);
     }
 
     /**

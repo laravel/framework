@@ -1028,9 +1028,7 @@ class Connection implements ConnectionInterface
      */
     public function beforeStartingTransaction(Closure $callback)
     {
-        $this->beforeStartingTransaction[] = $callback;
-
-        return $this;
+        return tap($this, fn () => $this->beforeStartingTransaction[] = $callback);
     }
 
     /**
@@ -1041,9 +1039,7 @@ class Connection implements ConnectionInterface
      */
     public function beforeExecuting(Closure $callback)
     {
-        $this->beforeExecutingCallbacks[] = $callback;
-
-        return $this;
+        return tap($this, fn () => $this->beforeExecutingCallbacks[] = $callback);
     }
 
     /**
@@ -1192,9 +1188,7 @@ class Connection implements ConnectionInterface
      */
     public function setRecordModificationState(bool $value)
     {
-        $this->recordsModified = $value;
-
-        return $this;
+        return tap($this, fn () => $this->recordsModified = $value);
     }
 
     /**
@@ -1215,9 +1209,7 @@ class Connection implements ConnectionInterface
      */
     public function useWriteConnectionWhenReading($value = true)
     {
-        $this->readOnWriteConnection = $value;
-
-        return $this;
+        return tap($this, fn () => $this->readOnWriteConnection = $value);
     }
 
     /**
@@ -1300,9 +1292,7 @@ class Connection implements ConnectionInterface
      */
     public function setReadPdo($pdo)
     {
-        $this->readPdo = $pdo;
-
-        return $this;
+        return tap($this, fn () => $this->readPdo = $pdo);
     }
 
     /**
@@ -1313,9 +1303,7 @@ class Connection implements ConnectionInterface
      */
     public function setReconnector(callable $reconnector)
     {
-        $this->reconnector = $reconnector;
-
-        return $this;
+        return tap($this, fn () => $this->reconnector = $reconnector);
     }
 
     /**
@@ -1387,9 +1375,7 @@ class Connection implements ConnectionInterface
      */
     public function setQueryGrammar(Query\Grammars\Grammar $grammar)
     {
-        $this->queryGrammar = $grammar;
-
-        return $this;
+        return tap($this, fn () => $this->queryGrammar = $grammar);
     }
 
     /**
@@ -1410,9 +1396,7 @@ class Connection implements ConnectionInterface
      */
     public function setSchemaGrammar(Schema\Grammars\Grammar $grammar)
     {
-        $this->schemaGrammar = $grammar;
-
-        return $this;
+        return tap($this, fn () => $this->schemaGrammar = $grammar);
     }
 
     /**
@@ -1433,9 +1417,7 @@ class Connection implements ConnectionInterface
      */
     public function setPostProcessor(Processor $processor)
     {
-        $this->postProcessor = $processor;
-
-        return $this;
+        return tap($this, fn () => $this->postProcessor = $processor);
     }
 
     /**
@@ -1456,9 +1438,7 @@ class Connection implements ConnectionInterface
      */
     public function setEventDispatcher(Dispatcher $events)
     {
-        $this->events = $events;
-
-        return $this;
+        return tap($this, fn () => $this->events = $events);
     }
 
     /**
@@ -1479,9 +1459,7 @@ class Connection implements ConnectionInterface
      */
     public function setTransactionManager($manager)
     {
-        $this->transactionsManager = $manager;
-
-        return $this;
+        return tap($this, fn () => $this->transactionsManager = $manager);
     }
 
     /**
@@ -1588,9 +1566,7 @@ class Connection implements ConnectionInterface
      */
     public function setDatabaseName($database)
     {
-        $this->database = $database;
-
-        return $this;
+        return tap($this, fn () => $this->database = $database);
     }
 
     /**
@@ -1601,9 +1577,7 @@ class Connection implements ConnectionInterface
      */
     public function setReadWriteType($readWriteType)
     {
-        $this->readWriteType = $readWriteType;
-
-        return $this;
+        return tap($this, fn () => $this->readWriteType = $readWriteType);
     }
 
     /**

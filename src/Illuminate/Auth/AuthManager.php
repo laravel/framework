@@ -261,9 +261,7 @@ class AuthManager implements FactoryContract
      */
     public function resolveUsersUsing(Closure $userResolver)
     {
-        $this->userResolver = $userResolver;
-
-        return $this;
+        return tap($this, fn () => $this->userResolver = $userResolver);
     }
 
     /**
@@ -275,9 +273,7 @@ class AuthManager implements FactoryContract
      */
     public function extend($driver, Closure $callback)
     {
-        $this->customCreators[$driver] = $callback;
-
-        return $this;
+        return tap($this, fn () => $this->customCreators[$driver] = $callback);
     }
 
     /**
@@ -289,9 +285,7 @@ class AuthManager implements FactoryContract
      */
     public function provider($name, Closure $callback)
     {
-        $this->customProviderCreators[$name] = $callback;
-
-        return $this;
+        return tap($this, fn () => $this->customProviderCreators[$name] = $callback);
     }
 
     /**
@@ -311,9 +305,7 @@ class AuthManager implements FactoryContract
      */
     public function forgetGuards()
     {
-        $this->guards = [];
-
-        return $this;
+        return tap($this, fn() => $this->guards = []);
     }
 
     /**
@@ -324,9 +316,7 @@ class AuthManager implements FactoryContract
      */
     public function setApplication($app)
     {
-        $this->app = $app;
-
-        return $this;
+        return tap($this, fn() => $this->app = $app);
     }
 
     /**

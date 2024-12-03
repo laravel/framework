@@ -50,9 +50,7 @@ trait GuardsAttributes
      */
     public function fillable(array $fillable)
     {
-        $this->fillable = $fillable;
-
-        return $this;
+        return tap($this, fn () => $this->fillable = $fillable);
     }
 
     /**
@@ -63,9 +61,7 @@ trait GuardsAttributes
      */
     public function mergeFillable(array $fillable)
     {
-        $this->fillable = array_values(array_unique(array_merge($this->fillable, $fillable)));
-
-        return $this;
+        return tap($this, fn () => $this->fillable = array_values(array_unique(array_merge($this->fillable, $fillable))));
     }
 
     /**
@@ -88,9 +84,7 @@ trait GuardsAttributes
      */
     public function guard(array $guarded)
     {
-        $this->guarded = $guarded;
-
-        return $this;
+        return tap($this, fn () => $this->guarded = $guarded);
     }
 
     /**
@@ -101,9 +95,7 @@ trait GuardsAttributes
      */
     public function mergeGuarded(array $guarded)
     {
-        $this->guarded = array_values(array_unique(array_merge($this->guarded, $guarded)));
-
-        return $this;
+        return tap($this, fn () => $this->guarded = array_values(array_unique(array_merge($this->guarded, $guarded))));
     }
 
     /**

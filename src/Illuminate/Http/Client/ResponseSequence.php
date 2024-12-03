@@ -109,9 +109,7 @@ class ResponseSequence
      */
     public function pushResponse($response)
     {
-        $this->responses[] = $response;
-
-        return $this;
+        return tap($this, fn () => $this->responses[] = $response);
     }
 
     /**

@@ -92,9 +92,7 @@ class MorphPivot extends Pivot
      */
     public function setMorphType($morphType)
     {
-        $this->morphType = $morphType;
-
-        return $this;
+        return tap($this, fn () => $this->morphType = $morphType);
     }
 
     /**
@@ -105,9 +103,7 @@ class MorphPivot extends Pivot
      */
     public function setMorphClass($morphClass)
     {
-        $this->morphClass = $morphClass;
-
-        return $this;
+        return tap($this, fn () => $this->morphClass = $morphClass);
     }
 
     /**

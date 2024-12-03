@@ -343,9 +343,7 @@ class FilesystemManager implements FactoryContract
      */
     public function set($name, $disk)
     {
-        $this->disks[$name] = $disk;
-
-        return $this;
+        return tap($this, fn () => $this->disks[$name] = $disk);
     }
 
     /**
@@ -416,9 +414,7 @@ class FilesystemManager implements FactoryContract
      */
     public function extend($driver, Closure $callback)
     {
-        $this->customCreators[$driver] = $callback;
-
-        return $this;
+        return tap($this, fn () => $this->customCreators[$driver] = $callback);
     }
 
     /**
@@ -429,9 +425,7 @@ class FilesystemManager implements FactoryContract
      */
     public function setApplication($app)
     {
-        $this->app = $app;
-
-        return $this;
+        return tap($this, fn () => $this->app = $app);
     }
 
     /**

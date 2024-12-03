@@ -451,9 +451,7 @@ class DatabaseStore implements LockProvider, Store
      */
     public function setLockConnection($connection)
     {
-        $this->lockConnection = $connection;
-
-        return $this;
+        return tap($this, fn () => $this->lockConnection = $connection);
     }
 
     /**

@@ -148,9 +148,7 @@ abstract class Seeder
      */
     public function setContainer(Container $container)
     {
-        $this->container = $container;
-
-        return $this;
+        return tap($this, fn () => $this->container = $container);
     }
 
     /**
@@ -161,9 +159,7 @@ abstract class Seeder
      */
     public function setCommand(Command $command)
     {
-        $this->command = $command;
-
-        return $this;
+        return tap($this, fn () => $this->command = $command);
     }
 
     /**

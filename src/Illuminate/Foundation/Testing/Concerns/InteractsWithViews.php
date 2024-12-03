@@ -76,8 +76,6 @@ trait InteractsWithViews
      */
     protected function withViewErrors(array $errors, $key = 'default')
     {
-        ViewFacade::share('errors', (new ViewErrorBag)->put($key, new MessageBag($errors)));
-
-        return $this;
+        return tap($this, fn () => ViewFacade::share('errors', (new ViewErrorBag)->put($key, new MessageBag($errors))));
     }
 }

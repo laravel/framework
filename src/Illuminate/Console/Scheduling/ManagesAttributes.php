@@ -104,10 +104,8 @@ trait ManagesAttributes
      * @return $this
      */
     public function user($user)
-    {
-        $this->user = $user;
-
-        return $this;
+    {        
+        return tap($this, fn () => $this->user = $user);
     }
 
     /**
@@ -118,9 +116,7 @@ trait ManagesAttributes
      */
     public function environments($environments)
     {
-        $this->environments = is_array($environments) ? $environments : func_get_args();
-
-        return $this;
+        return tap($this, fn () => $this->environments = is_array($environments) ? $environments : func_get_args());
     }
 
     /**
@@ -130,9 +126,7 @@ trait ManagesAttributes
      */
     public function evenInMaintenanceMode()
     {
-        $this->evenInMaintenanceMode = true;
-
-        return $this;
+        return tap($this, fn () => $this->evenInMaintenanceMode = true);
     }
 
     /**
@@ -160,9 +154,7 @@ trait ManagesAttributes
      */
     public function onOneServer()
     {
-        $this->onOneServer = true;
-
-        return $this;
+        return tap($this, fn () => $this->onOneServer = true);
     }
 
     /**
@@ -172,9 +164,7 @@ trait ManagesAttributes
      */
     public function runInBackground()
     {
-        $this->runInBackground = true;
-
-        return $this;
+        return tap($this, fn () => $this->runInBackground = true;
     }
 
     /**
@@ -226,8 +216,6 @@ trait ManagesAttributes
      */
     public function description($description)
     {
-        $this->description = $description;
-
-        return $this;
+        return tap($this, fn () => $this->description = $description);
     }
 }

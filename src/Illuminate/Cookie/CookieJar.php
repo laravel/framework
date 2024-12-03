@@ -213,9 +213,7 @@ class CookieJar implements JarContract
      */
     public function setDefaultPathAndDomain($path, $domain, $secure = false, $sameSite = null)
     {
-        [$this->path, $this->domain, $this->secure, $this->sameSite] = [$path, $domain, $secure, $sameSite];
-
-        return $this;
+        return tap($this, fn () => [$this->path, $this->domain, $this->secure, $this->sameSite] = [$path, $domain, $secure, $sameSite]);
     }
 
     /**
@@ -235,8 +233,6 @@ class CookieJar implements JarContract
      */
     public function flushQueuedCookies()
     {
-        $this->queued = [];
-
-        return $this;
+        return tap($this, fn () => $this->queued = []);
     }
 }

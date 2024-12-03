@@ -150,8 +150,6 @@ trait SupportsInverseRelations
      */
     public function withoutChaperone()
     {
-        $this->inverseRelationship = null;
-
-        return $this;
+        return tap($this, fn () => $this->inverseRelationship = null);
     }
 }

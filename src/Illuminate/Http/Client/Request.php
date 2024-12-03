@@ -240,9 +240,7 @@ class Request implements ArrayAccess
      */
     public function withData(array $data)
     {
-        $this->data = $data;
-
-        return $this;
+        return tap($this, fn () => $this->data = $data);
     }
 
     /**

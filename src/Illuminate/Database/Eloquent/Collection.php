@@ -289,12 +289,11 @@ class Collection extends BaseCollection implements QueueableCollection
      */
     public function loadMorph($relation, $relations)
     {
-        $this->pluck($relation)
+        return tap($this)
+            ->pluck($relation)
             ->filter()
             ->groupBy(fn ($model) => get_class($model))
             ->each(fn ($models, $className) => static::make($models)->load($relations[$className] ?? []));
-
-        return $this;
     }
 
     /**
@@ -306,12 +305,11 @@ class Collection extends BaseCollection implements QueueableCollection
      */
     public function loadMorphCount($relation, $relations)
     {
-        $this->pluck($relation)
+        return tap($this)
+            ->pluck($relation)
             ->filter()
             ->groupBy(fn ($model) => get_class($model))
             ->each(fn ($models, $className) => static::make($models)->loadCount($relations[$className] ?? []));
-
-        return $this;
     }
 
     /**

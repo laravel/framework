@@ -695,8 +695,6 @@ class Kernel implements KernelContract
      */
     public function setApplication(Application $app)
     {
-        $this->app = $app;
-
-        return $this;
+        return tap($this, fn () => $this->app = $app);
     }
 }

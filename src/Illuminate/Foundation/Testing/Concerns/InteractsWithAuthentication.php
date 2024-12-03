@@ -46,9 +46,7 @@ trait InteractsWithAuthentication
      */
     public function assertAuthenticated($guard = null)
     {
-        $this->assertTrue($this->isAuthenticated($guard), 'The user is not authenticated');
-
-        return $this;
+        return tap($this)->assertTrue($this->isAuthenticated($guard), 'The user is not authenticated');
     }
 
     /**
@@ -59,9 +57,7 @@ trait InteractsWithAuthentication
      */
     public function assertGuest($guard = null)
     {
-        $this->assertFalse($this->isAuthenticated($guard), 'The user is authenticated');
-
-        return $this;
+        return tap($this)->assertFalse($this->isAuthenticated($guard), 'The user is authenticated');
     }
 
     /**
@@ -110,11 +106,9 @@ trait InteractsWithAuthentication
      */
     public function assertCredentials(array $credentials, $guard = null)
     {
-        $this->assertTrue(
+        return tap($this)->assertTrue(
             $this->hasCredentials($credentials, $guard), 'The given credentials are invalid.'
         );
-
-        return $this;
     }
 
     /**
@@ -126,11 +120,9 @@ trait InteractsWithAuthentication
      */
     public function assertInvalidCredentials(array $credentials, $guard = null)
     {
-        $this->assertFalse(
+        return tap($this)->assertFalse(
             $this->hasCredentials($credentials, $guard), 'The given credentials are valid.'
         );
-
-        return $this;
     }
 
     /**

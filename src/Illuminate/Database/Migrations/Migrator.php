@@ -719,9 +719,7 @@ class Migrator
      */
     public function setOutput(OutputInterface $output)
     {
-        $this->output = $output;
-
-        return $this;
+        return tap($this, fn () => $this->output = $output);
     }
 
     /**

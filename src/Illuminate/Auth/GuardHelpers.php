@@ -86,9 +86,7 @@ trait GuardHelpers
      */
     public function setUser(AuthenticatableContract $user)
     {
-        $this->user = $user;
-
-        return $this;
+        return tap($this, fn () => $this->user = $user);
     }
 
     /**
@@ -98,9 +96,7 @@ trait GuardHelpers
      */
     public function forgetUser()
     {
-        $this->user = null;
-
-        return $this;
+        return tap($this, fn () => $this->user = null);
     }
 
     /**

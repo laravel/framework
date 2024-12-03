@@ -676,9 +676,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function useEnvironmentPath($path)
     {
-        $this->environmentPath = $path;
-
-        return $this;
+        return tap($this, fn () => $this->environmentPath = $path);
     }
 
     /**
@@ -689,9 +687,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function loadEnvironmentFrom($file)
     {
-        $this->environmentFile = $file;
-
-        return $this;
+        return tap($this, fn () => $this->environmentFile = $file);
     }
 
     /**
@@ -1229,9 +1225,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function dontMergeFrameworkConfiguration()
     {
-        $this->mergeFrameworkConfiguration = false;
-
-        return $this;
+        return tap($this, fn () => $this->mergeFrameworkConfiguration = false);
     }
 
     /**
@@ -1351,9 +1345,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function addAbsoluteCachePathPrefix($prefix)
     {
-        $this->absoluteCachePathPrefixes[] = $prefix;
-
-        return $this;
+        return tap($this, fn () => $this->absoluteCachePathPrefixes[] = $prefix);
     }
 
     /**
@@ -1404,9 +1396,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function terminating($callback)
     {
-        $this->terminatingCallbacks[] = $callback;
-
-        return $this;
+        return tap($this, fn () => $this->terminatingCallbacks[] = $callback);
     }
 
     /**

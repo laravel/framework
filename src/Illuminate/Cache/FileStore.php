@@ -392,9 +392,7 @@ class FileStore implements Store, LockProvider
      */
     public function setDirectory($directory)
     {
-        $this->directory = $directory;
-
-        return $this;
+        return tap($this, fn () => $this->directory = $directory);
     }
 
     /**
@@ -405,9 +403,7 @@ class FileStore implements Store, LockProvider
      */
     public function setLockDirectory($lockDirectory)
     {
-        $this->lockDirectory = $lockDirectory;
-
-        return $this;
+        return tap($this, fn () => $this->lockDirectory = $lockDirectory);
     }
 
     /**

@@ -263,9 +263,7 @@ class Response implements ArrayAccess, Stringable
      */
     public function close()
     {
-        $this->response->getBody()->close();
-
-        return $this;
+        return tap($this, fn () => $this->response->getBody()->close());
     }
 
     /**

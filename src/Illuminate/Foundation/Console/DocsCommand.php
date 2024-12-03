@@ -496,9 +496,7 @@ class DocsCommand extends Command
      */
     public function setVersion($version)
     {
-        $this->version = $version;
-
-        return $this;
+        return tap($this, fn () => $this->version = $version);
     }
 
     /**
@@ -509,9 +507,7 @@ class DocsCommand extends Command
      */
     public function setUrlOpener($opener)
     {
-        $this->urlOpener = $opener;
-
-        return $this;
+        return tap($this, fn () => $this->urlOpener = $opener);
     }
 
     /**
@@ -522,8 +518,6 @@ class DocsCommand extends Command
      */
     public function setSystemOsFamily($family)
     {
-        $this->systemOsFamily = $family;
-
-        return $this;
+        return tap($this, fn () => $this->systemOsFamily = $family);
     }
 }

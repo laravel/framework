@@ -36,9 +36,7 @@ trait HidesAttributes
      */
     public function setHidden(array $hidden)
     {
-        $this->hidden = $hidden;
-
-        return $this;
+        return tap($this, fn () => $this->hidden = $hidden);
     }
 
     /**
@@ -59,9 +57,7 @@ trait HidesAttributes
      */
     public function setVisible(array $visible)
     {
-        $this->visible = $visible;
-
-        return $this;
+        return tap($this, fn () => $this->visible = $visible);
     }
 
     /**

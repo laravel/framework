@@ -117,9 +117,7 @@ class BroadcastableModelEventOccurred implements ShouldBroadcast
      */
     public function onChannels(array $channels)
     {
-        $this->channels = $channels;
-
-        return $this;
+        return tap($this, fn () => $this->channels = $channels);
     }
 
     /**

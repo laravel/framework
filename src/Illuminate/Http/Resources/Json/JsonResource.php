@@ -173,9 +173,7 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
      */
     public function additional(array $data)
     {
-        $this->additional = $data;
-
-        return $this;
+        return tap($this, fn () => $this->additional = $data);
     }
 
     /**

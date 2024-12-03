@@ -52,9 +52,7 @@ class AnonymousEvent implements ShouldBroadcast
      */
     public function via(string $connection): static
     {
-        $this->connection = $connection;
-
-        return $this;
+        return tap($this, fn () => $this->connection = $connection);
     }
 
     /**
@@ -62,9 +60,7 @@ class AnonymousEvent implements ShouldBroadcast
      */
     public function as(string $name): static
     {
-        $this->name = $name;
-
-        return $this;
+        return tap($this, fn () => $this->name = $name);
     }
 
     /**
@@ -86,9 +82,7 @@ class AnonymousEvent implements ShouldBroadcast
      */
     public function toOthers(): static
     {
-        $this->includeCurrentUser = false;
-
-        return $this;
+        return tap($this, fn () => $this->includeCurrentUser = false);
     }
 
     /**

@@ -103,9 +103,7 @@ trait InteractsWithContainer
      */
     protected function forgetMock($abstract)
     {
-        $this->app->forgetInstance($abstract);
-
-        return $this;
+        return tap($this, fn () => $this->app->forgetInstance($abstract));
     }
 
     /**

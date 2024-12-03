@@ -84,9 +84,7 @@ class RouteServiceProvider extends ServiceProvider
      */
     protected function routes(Closure $routesCallback)
     {
-        $this->loadRoutesUsing = $routesCallback;
-
-        return $this;
+        return tap($this, fn () => $this->loadRoutesUsing = $routesCallback);
     }
 
     /**

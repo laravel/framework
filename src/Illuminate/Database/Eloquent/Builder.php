@@ -882,9 +882,7 @@ class Builder implements BuilderContract
      */
     public function afterQuery(Closure $callback)
     {
-        $this->afterQueryCallbacks[] = $callback;
-
-        return $this;
+        return tap($this, fn () => $this->afterQueryCallbacks[] = $callback);
     }
 
     /**
@@ -1774,9 +1772,7 @@ class Builder implements BuilderContract
      */
     public function withCasts($casts)
     {
-        $this->model->mergeCasts($casts);
-
-        return $this;
+        return tap($this, fn () => $this->model->mergeCasts($casts));
     }
 
     /**
@@ -1824,9 +1820,7 @@ class Builder implements BuilderContract
      */
     public function setQuery($query)
     {
-        $this->query = $query;
-
-        return $this;
+        return tap($this, fn () => $this->query = $query);
     }
 
     /**
@@ -1857,9 +1851,7 @@ class Builder implements BuilderContract
      */
     public function setEagerLoads(array $eagerLoad)
     {
-        $this->eagerLoad = $eagerLoad;
-
-        return $this;
+        return tap($this, fn () => $this->eagerLoad = $eagerLoad);
     }
 
     /**

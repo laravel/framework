@@ -770,9 +770,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function loadAggregate($relations, $column, $function = null)
     {
-        $this->newCollection([$this])->loadAggregate($relations, $column, $function);
-
-        return $this;
+        return tap($this, fn () => $this->newCollection([$this])->loadAggregate($relations, $column, $function));
     }
 
     /**
@@ -1834,9 +1832,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function setConnection($name)
     {
-        $this->connection = $name;
-
-        return $this;
+        return tap($this, fn () => $this->connection = $name);
     }
 
     /**
@@ -1899,9 +1895,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function setTable($table)
     {
-        $this->table = $table;
-
-        return $this;
+        return tap($this, fn () => $this->table = $table);
     }
 
     /**
@@ -1922,9 +1916,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function setKeyName($key)
     {
-        $this->primaryKey = $key;
-
-        return $this;
+        return tap($this, fn () => $this->primaryKey = $key);
     }
 
     /**
@@ -1955,9 +1947,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function setKeyType($type)
     {
-        $this->keyType = $type;
-
-        return $this;
+        return tap($this, fn () => $this->keyType = $type);
     }
 
     /**
@@ -1978,9 +1968,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function setIncrementing($value)
     {
-        $this->incrementing = $value;
-
-        return $this;
+        return tap($this, fn () => $this->incrementing = $value);
     }
 
     /**
@@ -2193,9 +2181,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function setPerPage($perPage)
     {
-        $this->perPage = $perPage;
-
-        return $this;
+        return tap($this, fn () => $this->perPage = $perPage);
     }
 
     /**
@@ -2399,9 +2385,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function escapeWhenCastingToString($escape = true)
     {
-        $this->escapeWhenCastingToString = $escape;
-
-        return $this;
+        return tap($this, fn () => $this->escapeWhenCastingToString = $escape);
     }
 
     /**

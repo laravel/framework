@@ -229,9 +229,7 @@ trait AsPivot
      */
     public function setRelatedModel(?Model $related = null)
     {
-        $this->pivotRelated = $related;
-
-        return $this;
+        return tap($this, fn () => $this->pivotRelated = $related);
     }
 
     /**

@@ -48,9 +48,7 @@ class Exceptions
      */
     public function render(callable $using)
     {
-        $this->handler->renderable($using);
-
-        return $this;
+        return tap($this, fn () => $this->handler->renderable($using));
     }
 
     /**
@@ -61,9 +59,7 @@ class Exceptions
      */
     public function renderable(callable $renderUsing)
     {
-        $this->handler->renderable($renderUsing);
-
-        return $this;
+        return tap($this, fn () => $this->handler->renderable($renderUsing));
     }
 
     /**
@@ -74,9 +70,7 @@ class Exceptions
      */
     public function respond(callable $using)
     {
-        $this->handler->respondUsing($using);
-
-        return $this;
+        return tap($this, fn () => $this->handler->respondUsing($using));
     }
 
     /**
@@ -87,9 +81,7 @@ class Exceptions
      */
     public function throttle(callable $throttleUsing)
     {
-        $this->handler->throttleUsing($throttleUsing);
-
-        return $this;
+        return tap($this, fn () => $this->handler->throttleUsing($throttleUsing));
     }
 
     /**
@@ -103,9 +95,7 @@ class Exceptions
      */
     public function map($from, $to = null)
     {
-        $this->handler->map($from, $to);
-
-        return $this;
+        return tap($this, fn () => $this->handler->map($from, $to));
     }
 
     /**
@@ -117,9 +107,7 @@ class Exceptions
      */
     public function level(string $type, string $level)
     {
-        $this->handler->level($type, $level);
-
-        return $this;
+        return tap($this, fn () => $this->handler->level($type, $level));
     }
 
     /**
@@ -130,9 +118,7 @@ class Exceptions
      */
     public function context(Closure $contextCallback)
     {
-        $this->handler->buildContextUsing($contextCallback);
-
-        return $this;
+        return tap($this, fn () => $this->handler->buildContextUsing($contextCallback));
     }
 
     /**
@@ -157,9 +143,7 @@ class Exceptions
      */
     public function dontReportDuplicates()
     {
-        $this->handler->dontReportDuplicates();
-
-        return $this;
+        return tap($this, fn () => $this->handler->dontReportDuplicates());
     }
 
     /**
@@ -170,9 +154,7 @@ class Exceptions
      */
     public function dontFlash(array|string $attributes)
     {
-        $this->handler->dontFlash($attributes);
-
-        return $this;
+        return tap($this, fn () => $this->handler->dontFlash($attributes));
     }
 
     /**
@@ -183,9 +165,7 @@ class Exceptions
      */
     public function shouldRenderJsonWhen(callable $callback)
     {
-        $this->handler->shouldRenderJsonWhen($callback);
-
-        return $this;
+        return tap($this, fn () => $this->handler->shouldRenderJsonWhen($callback));
     }
 
     /**
@@ -196,8 +176,6 @@ class Exceptions
      */
     public function stopIgnoring(array|string $class)
     {
-        $this->handler->stopIgnoring($class);
-
-        return $this;
+        return tap($this, fn () => $this->handler->stopIgnoring($class));
     }
 }
