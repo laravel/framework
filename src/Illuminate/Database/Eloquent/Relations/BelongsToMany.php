@@ -5,7 +5,7 @@ namespace Illuminate\Database\Eloquent\Relations;
 use Closure;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
@@ -270,7 +270,7 @@ class BelongsToMany extends Relation
     }
 
     /** @inheritDoc */
-    public function match(array $models, Collection $results, $relation)
+    public function match(array $models, EloquentCollection $results, $relation)
     {
         $dictionary = $this->buildDictionary($results);
 
@@ -296,7 +296,7 @@ class BelongsToMany extends Relation
      * @param  \Illuminate\Database\Eloquent\Collection<int, TRelatedModel>  $results
      * @return array<array<string, TRelatedModel>>
      */
-    protected function buildDictionary(Collection $results)
+    protected function buildDictionary(EloquentCollection $results)
     {
         // First we'll build a dictionary of child models keyed by the foreign key
         // of the relation so that we will easily and quickly match them to the

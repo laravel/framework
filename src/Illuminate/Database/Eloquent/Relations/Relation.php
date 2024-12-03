@@ -5,7 +5,7 @@ namespace Illuminate\Database\Eloquent\Relations;
 use Closure;
 use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\MultipleRecordsFoundException;
@@ -152,7 +152,7 @@ abstract class Relation implements BuilderContract
      * @param  string  $relation
      * @return array<int, TDeclaringModel>
      */
-    abstract public function match(array $models, Collection $results, $relation);
+    abstract public function match(array $models, EloquentCollection $results, $relation);
 
     /**
      * Get the results of the relationship.

@@ -3,7 +3,7 @@
 namespace Illuminate\Database\Eloquent\Relations\Concerns;
 
 use BackedEnum;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Support\Collection as BaseCollection;
@@ -611,7 +611,7 @@ trait InteractsWithPivotTable
             return [$value->{$this->relatedKey}];
         }
 
-        if ($value instanceof Collection) {
+        if ($value instanceof EloquentCollection) {
             return $value->pluck($this->relatedKey)->all();
         }
 
