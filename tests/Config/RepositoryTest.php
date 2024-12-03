@@ -214,6 +214,18 @@ class RepositoryTest extends TestCase
         $this->assertSame(['xxx'], $this->repository->get('new_key'));
     }
 
+    public function testMerge()
+    {
+        $this->assertSame('xxx', $this->repository->get('associate.x'));
+        $this->assertSame('yyy', $this->repository->get('associate.y'));
+        $this->repository->merge('associate', ['z' => 'zzz']);
+        $this->assertSame('xxx', $this->repository->get('associate.x'));
+        $this->assertSame('yyy', $this->repository->get('associate.y'));
+        $this->assertSame('zzz', $this->repository->get('associate.z'));
+
+        $this->assertCount(3, $this->repository->get('associate'));
+    }
+
     public function testAll()
     {
         $this->assertSame($this->config, $this->repository->all());
