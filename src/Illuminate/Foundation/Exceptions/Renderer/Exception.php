@@ -121,9 +121,9 @@ class Exception
             array_shift($trace);
         }
 
-        return new Collection(array_map(
-            fn (array $trace) => new Frame($this->exception, $classMap, $trace, $this->basePath), $trace,
-        ));
+        return (new Collection($trace))->map(
+            fn (array $trace) => new Frame($this->exception, $classMap, $trace, $this->basePath),
+        );
     }
 
     /**

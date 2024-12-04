@@ -453,9 +453,11 @@ abstract class Factory
     protected function getRawAttributes(?Model $parent)
     {
         return $this->states->pipe(function ($states) {
-            return $this->for->isEmpty() ? $states : new Collection(array_merge([function () {
-                return $this->parentResolvers();
-            }], $states->all()));
+            return $this->for->isEmpty() ? $states : (new Collection([
+                function () {
+                    return $this->parentResolvers();
+                }
+            ]))->merge($states->all());
         })->reduce(function ($carry, $state) use ($parent) {
             if ($state instanceof Closure) {
                 $state = $state->bindTo($this);

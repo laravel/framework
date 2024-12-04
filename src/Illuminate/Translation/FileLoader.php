@@ -144,7 +144,7 @@ class FileLoader implements Loader
      */
     protected function loadJsonPaths($locale)
     {
-        return (new Collection(array_merge($this->jsonPaths, $this->paths)))
+        return (new Collection($this->jsonPaths))->merge($this->paths)
             ->reduce(function ($output, $path) use ($locale) {
                 if ($this->files->exists($full = "{$path}/{$locale}.json")) {
                     $decoded = json_decode($this->files->get($full), true);
