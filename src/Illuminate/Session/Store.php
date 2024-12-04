@@ -712,7 +712,7 @@ class Store implements Session
     /**
      * Get the CSRF token value.
      *
-     * @return string
+     * @return string|null
      */
     public function token()
     {
