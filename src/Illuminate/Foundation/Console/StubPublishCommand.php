@@ -7,6 +7,8 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Events\PublishingStubs;
 use Symfony\Component\Console\Attribute\AsCommand;
 
+use function Laravel\Prompts\multisearch;
+
 #[AsCommand(name: 'stub:publish')]
 class StubPublishCommand extends Command
 {
@@ -17,7 +19,8 @@ class StubPublishCommand extends Command
      */
     protected $signature = 'stub:publish
                     {--existing : Publish and overwrite only the files that have already been published}
-                    {--force : Overwrite any existing files}';
+                    {--force : Overwrite any existing files}
+                    {--all : Publish all stubs that are available for customization}';
 
     /**
      * The console command description.
@@ -94,7 +97,7 @@ class StubPublishCommand extends Command
             realpath(__DIR__.'/../../Routing/Console/stubs/middleware.stub') => 'middleware.stub',
         ];
 
-        $this->laravel['events']->dispatch($event = new PublishingStubs($stubs));
+        $this->laravel['events']->dispatch($event = new PublishingStubs($this->determineStubsToPublish($stubs)));
 
         foreach ($event->stubs as $from => $to) {
             $to = $stubsPath.DIRECTORY_SEPARATOR.ltrim($to, DIRECTORY_SEPARATOR);
@@ -106,5 +109,24 @@ class StubPublishCommand extends Command
         }
 
         $this->components->info('Stubs published successfully.');
+    }
+
+    /**
+     * Determine the stubs that should be published.
+     */
+    protected function determineStubsToPublish(array $stubs): array
+    {
+        if ($this->option('all')) {
+            return $stubs;
+        }
+
+        return collect($stubs)->only(multisearch(
+            'Which stubs would you like to publish?',
+            options: fn($search) => collect($stubs)
+                ->filter(fn($to) => str_contains($to, $search))
+                ->map(fn($to) => $to)
+                ->all(),
+            scroll: 10,
+        ))->all();
     }
 }
