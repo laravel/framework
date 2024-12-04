@@ -10,6 +10,7 @@ use Illuminate\Contracts\Broadcasting\HasBroadcastChannel;
 use Illuminate\Contracts\Routing\BindingRegistrar;
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Reflector;
 use ReflectionClass;
 use ReflectionFunction;
@@ -140,7 +141,7 @@ abstract class Broadcaster implements BroadcasterContract
     {
         $callbackParameters = $this->extractParameters($callback);
 
-        return collect($this->extractChannelKeys($pattern, $channel))->reject(function ($value, $key) {
+        return (new Collection($this->extractChannelKeys($pattern, $channel)))->reject(function ($value, $key) {
             return is_numeric($key);
         })->map(function ($value, $key) use ($callbackParameters) {
             return $this->resolveBinding($key, $value, $callbackParameters);
@@ -381,6 +382,6 @@ abstract class Broadcaster implements BroadcasterContract
      */
     public function getChannels()
     {
-        return collect($this->channels);
+        return new Collection($this->channels);
     }
 }

@@ -163,9 +163,9 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
      */
     public function assertNothingSent()
     {
-        $notificationNames = collect($this->notifications)
-            ->map(fn ($notifiableModels) => collect($notifiableModels)
-                ->map(fn ($notifiables) => collect($notifiables)->keys())
+        $notificationNames = (new Collection($this->notifications))
+            ->map(fn ($notifiableModels) => (new Collection($notifiableModels))
+                ->map(fn ($notifiables) => (new Collection($notifiables))->keys())
             )
             ->flatten()->join("\n- ");
 
@@ -209,7 +209,7 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
      */
     public function assertSentTimes($notification, $expectedCount)
     {
-        $actualCount = collect($this->notifications)
+        $actualCount = (new Collection($this->notifications))
             ->flatten(1)
             ->reduce(fn ($count, $sent) => $count + count($sent[$notification] ?? []), 0);
 
@@ -227,7 +227,7 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
      */
     public function assertCount($expectedCount)
     {
-        $actualCount = collect($this->notifications)->flatten(3)->count();
+        $actualCount = (new Collection($this->notifications))->flatten(3)->count();
 
         PHPUnit::assertSame(
             $expectedCount, $actualCount,
@@ -246,12 +246,12 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
     public function sent($notifiable, $notification, $callback = null)
     {
         if (! $this->hasSent($notifiable, $notification)) {
-            return collect();
+            return new Collection;
         }
 
         $callback = $callback ?: fn () => true;
 
-        $notifications = collect($this->notificationsFor($notifiable, $notification));
+        $notifications = new Collection($this->notificationsFor($notifiable, $notification));
 
         return $notifications->filter(
             fn ($arguments) => $callback(...array_values($arguments))

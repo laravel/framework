@@ -260,7 +260,7 @@ abstract class Factory
         }
 
         return new EloquentCollection(
-            collect($records)->map(function ($record) {
+            (new Collection($records))->map(function ($record) {
                 return $this->state($record)->create();
             })
         );
@@ -295,9 +295,9 @@ abstract class Factory
         $results = $this->make($attributes, $parent);
 
         if ($results instanceof Model) {
-            $this->store(collect([$results]));
+            $this->store(new Collection([$results]));
 
-            $this->callAfterCreating(collect([$results]), $parent);
+            $this->callAfterCreating(new Collection([$results]), $parent);
         } else {
             $this->store($results);
 
@@ -399,7 +399,7 @@ abstract class Factory
 
         if ($this->count === null) {
             return tap($this->makeInstance($parent), function ($instance) {
-                $this->callAfterMaking(collect([$instance]));
+                $this->callAfterMaking(new Collection([$instance]));
             });
         }
 
@@ -487,7 +487,7 @@ abstract class Factory
      */
     protected function expandAttributes(array $definition)
     {
-        return collect($definition)
+        return (new Collection($definition))
             ->map($evaluateRelations = function ($attribute) {
                 if (! $this->expandRelationships && $attribute instanceof self) {
                     $attribute = null;

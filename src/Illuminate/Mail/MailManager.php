@@ -194,9 +194,7 @@ class MailManager implements FactoryContract
         $scheme = $config['scheme'] ?? null;
 
         if (! $scheme) {
-            $scheme = ! empty($config['encryption']) && $config['encryption'] === 'tls'
-                ? (($config['port'] == 465) ? 'smtps' : 'smtp')
-                : '';
+            $scheme = ($config['port'] == 465) ? 'smtps' : 'smtp';
         }
 
         $transport = $factory->create(new Dsn(
@@ -301,7 +299,11 @@ class MailManager implements FactoryContract
     protected function addSesCredentials(array $config)
     {
         if (! empty($config['key']) && ! empty($config['secret'])) {
-            $config['credentials'] = Arr::only($config, ['key', 'secret', 'token']);
+            $config['credentials'] = Arr::only($config, ['key', 'secret']);
+
+            if (! empty($config['token'])) {
+                $config['credentials']['token'] = $config['token'];
+            }
         }
 
         return Arr::except($config, ['token']);

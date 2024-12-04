@@ -600,7 +600,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function qualifyColumns($columns)
     {
-        return collect($columns)->map(function ($column) {
+        return (new BaseCollection($columns))->map(function ($column) {
             return $this->qualifyColumn($column);
         })->all();
     }
@@ -1731,7 +1731,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
                 ->attributes
         );
 
-        $this->load(collect($this->relations)->reject(function ($relation) {
+        $this->load((new BaseCollection($this->relations))->reject(function ($relation) {
             return $relation instanceof Pivot
                 || (is_object($relation) && in_array(AsPivot::class, class_uses_recursive($relation), true));
         })->keys()->all());
@@ -2317,7 +2317,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function offsetUnset($offset): void
     {
-        unset($this->attributes[$offset], $this->relations[$offset]);
+        unset($this->attributes[$offset], $this->relations[$offset], $this->attributeCastCache[$offset]);
     }
 
     /**

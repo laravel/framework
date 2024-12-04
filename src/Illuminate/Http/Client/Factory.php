@@ -10,6 +10,7 @@ use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Response as Psr7Response;
 use GuzzleHttp\TransferStats;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use PHPUnit\Framework\Assert as PHPUnit;
@@ -89,7 +90,7 @@ class Factory
     {
         $this->dispatcher = $dispatcher;
 
-        $this->stubCallbacks = collect();
+        $this->stubCallbacks = new Collection;
     }
 
     /**
@@ -218,7 +219,7 @@ class Factory
             return $this;
         }
 
-        $this->stubCallbacks = $this->stubCallbacks->merge(collect([
+        $this->stubCallbacks = $this->stubCallbacks->merge(new Collection([
             function ($request, $options) use ($callback) {
                 $response = $callback;
 
@@ -257,7 +258,7 @@ class Factory
      * Stub the given URL using the given callback.
      *
      * @param  string  $url
-     * @param  \Illuminate\Http\Client\Response|\GuzzleHttp\Promise\PromiseInterface|callable  $callback
+     * @param  \Illuminate\Http\Client\Response|\GuzzleHttp\Promise\PromiseInterface|callable|int|string|array  $callback
      * @return $this
      */
     public function stubUrl($url, $callback)
@@ -267,9 +268,19 @@ class Factory
                 return;
             }
 
-            return $callback instanceof Closure || $callback instanceof ResponseSequence
-                        ? $callback($request, $options)
-                        : $callback;
+            if (is_int($callback) && $callback >= 100 && $callback < 600) {
+                return static::response(status: $callback);
+            }
+
+            if (is_int($callback) || is_string($callback)) {
+                return static::response($callback);
+            }
+
+            if ($callback instanceof Closure || $callback instanceof ResponseSequence) {
+                return $callback($request, $options);
+            }
+
+            return $callback;
         });
     }
 
@@ -430,14 +441,14 @@ class Factory
     public function recorded($callback = null)
     {
         if (empty($this->recorded)) {
-            return collect();
+            return new Collection;
         }
 
         $callback = $callback ?: function () {
             return true;
         };
 
-        return collect($this->recorded)->filter(function ($pair) use ($callback) {
+        return (new Collection($this->recorded))->filter(function ($pair) use ($callback) {
             return $callback($pair[0], $pair[1]);
         });
     }

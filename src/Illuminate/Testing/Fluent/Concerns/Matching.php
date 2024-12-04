@@ -26,7 +26,7 @@ trait Matching
 
         if ($expected instanceof Closure) {
             PHPUnit::assertTrue(
-                $expected(is_array($actual) ? Collection::make($actual) : $actual),
+                $expected(is_array($actual) ? new Collection($actual) : $actual),
                 sprintf('Property [%s] was marked as invalid using a closure.', $this->dotPath($key))
             );
 
@@ -64,7 +64,7 @@ trait Matching
 
         if ($expected instanceof Closure) {
             PHPUnit::assertFalse(
-                $expected(is_array($actual) ? Collection::make($actual) : $actual),
+                $expected(is_array($actual) ? new Collection($actual) : $actual),
                 sprintf('Property [%s] was marked as invalid using a closure.', $this->dotPath($key))
             );
 
@@ -157,11 +157,11 @@ trait Matching
      */
     public function whereContains(string $key, $expected)
     {
-        $actual = Collection::make(
+        $actual = new Collection(
             $this->prop($key) ?? $this->prop()
         );
 
-        $missing = Collection::make($expected)
+        $missing = (new Collection($expected))
             ->map(fn ($search) => enum_value($search))
             ->reject(function ($search) use ($key, $actual) {
                 if ($actual->containsStrict($key, $search)) {

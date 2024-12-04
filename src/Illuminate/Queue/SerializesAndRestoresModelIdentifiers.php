@@ -8,6 +8,7 @@ use Illuminate\Contracts\Queue\QueueableEntity;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
 use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Support\Collection;
 
 trait SerializesAndRestoresModelIdentifiers
 {
@@ -90,7 +91,7 @@ trait SerializesAndRestoresModelIdentifiers
         $collectionClass = get_class($collection);
 
         return new $collectionClass(
-            collect($value->id)->map(function ($id) use ($collection) {
+            (new Collection($value->id))->map(function ($id) use ($collection) {
                 return $collection[$id] ?? null;
             })->filter()
         );

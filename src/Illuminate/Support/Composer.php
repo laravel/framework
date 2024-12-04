@@ -64,11 +64,11 @@ class Composer
      */
     public function requirePackages(array $packages, bool $dev = false, Closure|OutputInterface|null $output = null, $composerBinary = null)
     {
-        $command = collect([
+        $command = (new Collection([
             ...$this->findComposer($composerBinary),
             'require',
             ...$packages,
-        ])
+        ]))
         ->when($dev, function ($command) {
             $command->push('--dev');
         })->all();
@@ -93,11 +93,11 @@ class Composer
      */
     public function removePackages(array $packages, bool $dev = false, Closure|OutputInterface|null $output = null, $composerBinary = null)
     {
-        $command = collect([
+        $command = (new Collection([
             ...$this->findComposer($composerBinary),
             'remove',
             ...$packages,
-        ])
+        ]))
         ->when($dev, function ($command) {
             $command->push('--dev');
         })->all();

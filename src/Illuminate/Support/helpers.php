@@ -169,7 +169,7 @@ if (! function_exists('filled')) {
 
 if (! function_exists('fluent')) {
     /**
-     * Create an Fluent object from the given value.
+     * Create a Fluent object from the given value.
      *
      * @param  object|array  $value
      * @return \Illuminate\Support\Fluent
@@ -222,6 +222,19 @@ if (! function_exists('object_get')) {
         }
 
         return $object;
+    }
+}
+
+if (! function_exists('laravel_cloud')) {
+    /**
+     * Determine if the application is running on Laravel Cloud.
+     *
+     * @return bool
+     */
+    function laravel_cloud()
+    {
+        return ($_ENV['LARAVEL_CLOUD'] ?? false) === '1' ||
+               ($_SERVER['LARAVEL_CLOUD'] ?? false) === '1';
     }
 }
 

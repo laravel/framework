@@ -107,6 +107,14 @@ class SupportNumberTest extends TestCase
     }
 
     #[RequiresPhpExtension('intl')]
+    public function testSpellOrdinal()
+    {
+        $this->assertSame('first', Number::spellOrdinal(1));
+        $this->assertSame('second', Number::spellOrdinal(2));
+        $this->assertSame('third', Number::spellOrdinal(3));
+    }
+
+    #[RequiresPhpExtension('intl')]
     public function testToPercent()
     {
         $this->assertSame('0%', Number::percentage(0, precision: 0));

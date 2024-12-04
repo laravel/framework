@@ -738,7 +738,7 @@ class Mailable implements MailableContract, Renderable
             ];
         }
 
-        $this->{$property} = collect($this->{$property})
+        $this->{$property} = (new Collection($this->{$property}))
             ->reverse()
             ->unique('address')
             ->reverse()
@@ -818,7 +818,7 @@ class Mailable implements MailableContract, Renderable
             return true;
         }
 
-        return collect($this->{$property})->contains(function ($actual) use ($expected) {
+        return (new Collection($this->{$property}))->contains(function ($actual) use ($expected) {
             if (! isset($expected['name'])) {
                 return $actual['address'] == $expected['address'];
             }
@@ -964,7 +964,7 @@ class Mailable implements MailableContract, Renderable
             return $file->attachTo($this, $options);
         }
 
-        $this->attachments = collect($this->attachments)
+        $this->attachments = (new Collection($this->attachments))
                     ->push(compact('file', 'options'))
                     ->unique('file')
                     ->all();
@@ -1026,7 +1026,7 @@ class Mailable implements MailableContract, Renderable
                 : $parts;
         }
 
-        return collect($this->attachments)->contains(
+        return (new Collection($this->attachments))->contains(
             fn ($attachment) => $attachment['file'] === $file && array_filter($attachment['options']) === array_filter($options)
         );
     }
@@ -1046,7 +1046,7 @@ class Mailable implements MailableContract, Renderable
 
         $attachments = $this->attachments();
 
-        return Collection::make(is_object($attachments) ? [$attachments] : $attachments)
+        return (new Collection(is_object($attachments) ? [$attachments] : $attachments))
                 ->map(fn ($attached) => $attached instanceof Attachable ? $attached->toMailAttachment() : $attached)
                 ->contains(fn ($attached) => $attached->isEquivalent($attachment, $options));
     }
@@ -1075,7 +1075,7 @@ class Mailable implements MailableContract, Renderable
      */
     public function attachFromStorageDisk($disk, $path, $name = null, array $options = [])
     {
-        $this->diskAttachments = collect($this->diskAttachments)->push([
+        $this->diskAttachments = (new Collection($this->diskAttachments))->push([
             'disk' => $disk,
             'path' => $path,
             'name' => $name ?? basename($path),
@@ -1111,7 +1111,7 @@ class Mailable implements MailableContract, Renderable
      */
     public function hasAttachmentFromStorageDisk($disk, $path, $name = null, array $options = [])
     {
-        return collect($this->diskAttachments)->contains(
+        return (new Collection($this->diskAttachments))->contains(
             fn ($attachment) => $attachment['disk'] === $disk
                 && $attachment['path'] === $path
                 && $attachment['name'] === ($name ?? basename($path))
@@ -1129,7 +1129,7 @@ class Mailable implements MailableContract, Renderable
      */
     public function attachData($data, $name, array $options = [])
     {
-        $this->rawAttachments = collect($this->rawAttachments)
+        $this->rawAttachments = (new Collection($this->rawAttachments))
                 ->push(compact('data', 'name', 'options'))
                 ->unique(function ($file) {
                     return $file['name'].$file['data'];
@@ -1148,7 +1148,7 @@ class Mailable implements MailableContract, Renderable
      */
     public function hasAttachedData($data, $name, array $options = [])
     {
-        return collect($this->rawAttachments)->contains(
+        return (new Collection($this->rawAttachments))->contains(
             fn ($attachment) => $attachment['data'] === $data
                 && $attachment['name'] === $name
                 && array_filter($attachment['options']) === array_filter($options)
@@ -1766,7 +1766,7 @@ class Mailable implements MailableContract, Renderable
 
         $attachments = $this->attachments();
 
-        Collection::make(is_object($attachments) ? [$attachments] : $attachments)
+        (new Collection(is_object($attachments) ? [$attachments] : $attachments))
             ->each(function ($attachment) {
                 $this->attach($attachment);
             });

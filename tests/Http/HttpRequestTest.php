@@ -1084,10 +1084,16 @@ class HttpRequestTest extends TestCase
         $request = Request::create('/', 'GET', [], [], [], ['HTTP_AUTHORIZATION' => 'Bearer fooBearerbar']);
         $this->assertSame('fooBearerbar', $request->bearerToken());
 
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_AUTHORIZATION' => 'bearer fooBearerbar']);
+        $this->assertSame('fooBearerbar', $request->bearerToken());
+
         $request = Request::create('/', 'GET', [], [], [], ['HTTP_AUTHORIZATION' => 'Basic foo, Bearer bar']);
         $this->assertSame('bar', $request->bearerToken());
 
         $request = Request::create('/', 'GET', [], [], [], ['HTTP_AUTHORIZATION' => 'Bearer foo,bar']);
+        $this->assertSame('foo', $request->bearerToken());
+
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_AUTHORIZATION' => 'bearer foo,bar']);
         $this->assertSame('foo', $request->bearerToken());
 
         $request = Request::create('/', 'GET', [], [], [], ['HTTP_AUTHORIZATION' => 'foo,bar']);
