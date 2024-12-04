@@ -226,9 +226,7 @@ class Composer
      */
     public function setWorkingPath($path)
     {
-        $this->workingPath = realpath($path);
-
-        return $this;
+        return tap($this, fn () => $this->workingPath = realpath($path));
     }
 
     /**

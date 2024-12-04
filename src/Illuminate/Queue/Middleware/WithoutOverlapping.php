@@ -92,9 +92,7 @@ class WithoutOverlapping
      */
     public function releaseAfter($releaseAfter)
     {
-        $this->releaseAfter = $releaseAfter;
-
-        return $this;
+        return tap($this, fn () => $this->releaseAfter = $releaseAfter);
     }
 
     /**
@@ -104,9 +102,7 @@ class WithoutOverlapping
      */
     public function dontRelease()
     {
-        $this->releaseAfter = null;
-
-        return $this;
+        return tap($this, fn () => $this->releaseAfter = null);
     }
 
     /**
@@ -117,9 +113,7 @@ class WithoutOverlapping
      */
     public function expireAfter($expiresAfter)
     {
-        $this->expiresAfter = $this->secondsUntil($expiresAfter);
-
-        return $this;
+        return tap($this, fn () => $this->expiresAfter = $this->secondsUntil($expiresAfter));
     }
 
     /**
@@ -130,9 +124,7 @@ class WithoutOverlapping
      */
     public function withPrefix(string $prefix)
     {
-        $this->prefix = $prefix;
-
-        return $this;
+        return tap($this, fn () => $this->prefix = $prefix);
     }
 
     /**
@@ -142,9 +134,7 @@ class WithoutOverlapping
      */
     public function shared()
     {
-        $this->shareKey = true;
-
-        return $this;
+        return tap($this, fn () => $this->shareKey = true);
     }
 
     /**

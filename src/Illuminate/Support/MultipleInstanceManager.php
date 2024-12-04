@@ -196,9 +196,7 @@ abstract class MultipleInstanceManager
      */
     public function extend($name, Closure $callback)
     {
-        $this->customCreators[$name] = $callback->bindTo($this, $this);
-
-        return $this;
+        return tap($this, fn () => $this->customCreators[$name] = $callback->bindTo($this, $this));
     }
 
     /**
@@ -209,9 +207,7 @@ abstract class MultipleInstanceManager
      */
     public function setApplication($app)
     {
-        $this->app = $app;
-
-        return $this;
+        return tap($this, fn () => $this->app = $app);
     }
 
     /**

@@ -89,9 +89,7 @@ trait InteractsWithQueue
      */
     public function withFakeQueueInteractions()
     {
-        $this->job = new FakeJob;
-
-        return $this;
+        return tap($this, fn () => $this->job = new FakeJob);
     }
 
     /**
@@ -229,8 +227,6 @@ trait InteractsWithQueue
      */
     public function setJob(JobContract $job)
     {
-        $this->job = $job;
-
-        return $this;
+        return tap($this, fn () => $this->job = $job);
     }
 }

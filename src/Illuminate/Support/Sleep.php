@@ -168,9 +168,7 @@ class Sleep
      */
     public function minutes()
     {
-        $this->duration->add('minutes', $this->pullPending());
-
-        return $this;
+        return tap($this, fn () => $this->duration->add('minutes', $this->pullPending()));
     }
 
     /**
@@ -190,9 +188,7 @@ class Sleep
      */
     public function seconds()
     {
-        $this->duration->add('seconds', $this->pullPending());
-
-        return $this;
+        return tap($this, fn () => $this->duration->add('seconds', $this->pullPending()));
     }
 
     /**
@@ -212,9 +208,7 @@ class Sleep
      */
     public function milliseconds()
     {
-        $this->duration->add('milliseconds', $this->pullPending());
-
-        return $this;
+        return tap($this, fn () => $this->duration->add('milliseconds', $this->pullPending()));
     }
 
     /**
@@ -234,9 +228,7 @@ class Sleep
      */
     public function microseconds()
     {
-        $this->duration->add('microseconds', $this->pullPending());
-
-        return $this;
+        return tap($this, fn () => $this->duration->add('microseconds', $this->pullPending()));
     }
 
     /**
@@ -257,9 +249,7 @@ class Sleep
      */
     public function and($duration)
     {
-        $this->pending = $duration;
-
-        return $this;
+        return tap($this, fn () => $this->pending = $duration);
     }
 
     /**
@@ -270,9 +260,7 @@ class Sleep
      */
     public function while(Closure $callback)
     {
-        $this->while = $callback;
-
-        return $this;
+        return tap($this, fn () => $this->while = $callback);
     }
 
     /**
@@ -492,9 +480,7 @@ class Sleep
      */
     protected function shouldNotSleep()
     {
-        $this->shouldSleep = false;
-
-        return $this;
+        return tap($this, fn () => $this->shouldSleep = false);
     }
 
     /**
@@ -505,9 +491,7 @@ class Sleep
      */
     public function when($condition)
     {
-        $this->shouldSleep = (bool) value($condition, $this);
-
-        return $this;
+        return tap($this, fn () => $this->shouldSleep = (bool) value($condition, $this));
     }
 
     /**

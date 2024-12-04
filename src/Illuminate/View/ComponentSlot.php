@@ -44,9 +44,7 @@ class ComponentSlot implements Htmlable, Stringable
      */
     public function withAttributes(array $attributes)
     {
-        $this->attributes = new ComponentAttributeBag($attributes);
-
-        return $this;
+        return tap($this, fn () => $this->attributes = new ComponentAttributeBag($attributes));
     }
 
     /**

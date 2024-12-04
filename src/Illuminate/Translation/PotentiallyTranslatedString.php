@@ -49,9 +49,7 @@ class PotentiallyTranslatedString implements Stringable
      */
     public function translate($replace = [], $locale = null)
     {
-        $this->translation = $this->translator->get($this->string, $replace, $locale);
-
-        return $this;
+        return tap($this, fn () => $this->translation = $this->translator->get($this->string, $replace, $locale));
     }
 
     /**
@@ -64,9 +62,7 @@ class PotentiallyTranslatedString implements Stringable
      */
     public function translateChoice($number, array $replace = [], $locale = null)
     {
-        $this->translation = $this->translator->choice($this->string, $number, $replace, $locale);
-
-        return $this;
+        return tap($this, fn () => $this->translation = $this->translator->choice($this->string, $number, $replace, $locale));
     }
 
     /**

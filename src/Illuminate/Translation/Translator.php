@@ -387,9 +387,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      */
     public function handleMissingKeysUsing(?callable $callback)
     {
-        $this->missingTranslationKeyCallback = $callback;
-
-        return $this;
+        return tap($this, fn () => $this->missingTranslationKeyCallback = $callback);
     }
 
     /**

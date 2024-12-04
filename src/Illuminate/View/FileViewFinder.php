@@ -285,9 +285,7 @@ class FileViewFinder implements ViewFinderInterface
      */
     public function setPaths($paths)
     {
-        $this->paths = $paths;
-
-        return $this;
+        return tap($this, fn () => $this->paths = $paths);
     }
 
     /**

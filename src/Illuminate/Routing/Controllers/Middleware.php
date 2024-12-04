@@ -25,9 +25,7 @@ class Middleware
      */
     public function only(array|string $only)
     {
-        $this->only = Arr::wrap($only);
-
-        return $this;
+        return tap($this, fn () => $this->only = Arr::wrap($only));
     }
 
     /**
@@ -38,8 +36,6 @@ class Middleware
      */
     public function except(array|string $except)
     {
-        $this->except = Arr::wrap($except);
-
-        return $this;
+        return tap($this, fn () => $this->except = Arr::wrap($except));
     }
 }

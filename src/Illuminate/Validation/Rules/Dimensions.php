@@ -35,9 +35,7 @@ class Dimensions implements Stringable
      */
     public function width($value)
     {
-        $this->constraints['width'] = $value;
-
-        return $this;
+        return tap($this, fn () => $this->constraints['width'] = $value);
     }
 
     /**
@@ -48,9 +46,7 @@ class Dimensions implements Stringable
      */
     public function height($value)
     {
-        $this->constraints['height'] = $value;
-
-        return $this;
+        return tap($this, fn () => $this->constraints['height'] = $value);
     }
 
     /**
@@ -61,9 +57,7 @@ class Dimensions implements Stringable
      */
     public function minWidth($value)
     {
-        $this->constraints['min_width'] = $value;
-
-        return $this;
+        return tap($this, fn () => $this->constraints['min_width'] = $value);
     }
 
     /**
@@ -74,9 +68,7 @@ class Dimensions implements Stringable
      */
     public function minHeight($value)
     {
-        $this->constraints['min_height'] = $value;
-
-        return $this;
+        return tap($this, fn () => $this->constraints['min_height'] = $value);
     }
 
     /**
@@ -87,9 +79,7 @@ class Dimensions implements Stringable
      */
     public function maxWidth($value)
     {
-        $this->constraints['max_width'] = $value;
-
-        return $this;
+        return tap($this, fn () => $this->constraints['max_width'] = $value);
     }
 
     /**
@@ -100,9 +90,7 @@ class Dimensions implements Stringable
      */
     public function maxHeight($value)
     {
-        $this->constraints['max_height'] = $value;
-
-        return $this;
+        return tap($this, fn () => $this->constraints['max_height'] = $value);
     }
 
     /**
@@ -113,9 +101,7 @@ class Dimensions implements Stringable
      */
     public function ratio($value)
     {
-        $this->constraints['ratio'] = $value;
-
-        return $this;
+        return tap($this, fn () => $this->constraints['ratio'] = $value);
     }
 
     /**
@@ -126,9 +112,7 @@ class Dimensions implements Stringable
      */
     public function minRatio($value)
     {
-        $this->constraints['min_ratio'] = $value;
-
-        return $this;
+        return tap($this, fn () => $this->constraints['min_ratio'] = $value);
     }
 
     /**
@@ -139,9 +123,7 @@ class Dimensions implements Stringable
      */
     public function maxRatio($value)
     {
-        $this->constraints['max_ratio'] = $value;
-
-        return $this;
+        return tap($this, fn () => $this->constraints['max_ratio'] = $value);
     }
 
     /**

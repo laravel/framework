@@ -417,9 +417,7 @@ abstract class Queue
      */
     public function setConnectionName($name)
     {
-        $this->connectionName = $name;
-
-        return $this;
+        return tap($this, fn () => $this->connectionName = $name);
     }
 
     /**

@@ -181,9 +181,7 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
      */
     public function setValidator($validator)
     {
-        $this->validator = $validator;
-
-        return $this;
+        return tap($this, fn () => $this->validator = $validator);
     }
 
     /**
@@ -194,9 +192,7 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
      */
     public function setData($data)
     {
-        $this->data = $data;
-
-        return $this;
+        return tap($this, fn () => $this->data = $data);
     }
 
     /**
@@ -218,9 +214,7 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
      */
     public function max($size)
     {
-        $this->max = $size;
-
-        return $this;
+        return tap($this, fn () => $this->max = $size);
     }
 
     /**
@@ -245,9 +239,7 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
      */
     public function mixedCase()
     {
-        $this->mixedCase = true;
-
-        return $this;
+        return tap($this, fn () => $this->mixedCase = true);
     }
 
     /**
@@ -257,9 +249,7 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
      */
     public function letters()
     {
-        $this->letters = true;
-
-        return $this;
+        return tap($this, fn () => $this->letters = true);
     }
 
     /**
@@ -269,9 +259,7 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
      */
     public function numbers()
     {
-        $this->numbers = true;
-
-        return $this;
+        return tap($this, fn () => $this->numbers = true);
     }
 
     /**
@@ -281,9 +269,7 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
      */
     public function symbols()
     {
-        $this->symbols = true;
-
-        return $this;
+        return tap($this, fn () => $this->symbols = true);
     }
 
     /**
@@ -294,9 +280,7 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
      */
     public function rules($rules)
     {
-        $this->customRules = Arr::wrap($rules);
-
-        return $this;
+        return tap($this, fn () => $this->customRules = Arr::wrap($rules));
     }
 
     /**

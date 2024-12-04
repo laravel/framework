@@ -112,9 +112,7 @@ class PendingProcess
      */
     public function command(array|string $command)
     {
-        $this->command = $command;
-
-        return $this;
+        return tap($this, fn () => $this->command = $command);
     }
 
     /**
@@ -125,9 +123,7 @@ class PendingProcess
      */
     public function path(string $path)
     {
-        $this->path = $path;
-
-        return $this;
+        return tap($this, fn () => $this->path = $path);
     }
 
     /**
@@ -138,9 +134,7 @@ class PendingProcess
      */
     public function timeout(int $timeout)
     {
-        $this->timeout = $timeout;
-
-        return $this;
+        return tap($this, fn () => $this->timeout = $timeout);
     }
 
     /**
@@ -151,9 +145,7 @@ class PendingProcess
      */
     public function idleTimeout(int $timeout)
     {
-        $this->idleTimeout = $timeout;
-
-        return $this;
+        return tap($this, fn () => $this->idleTimeout = $timeout);
     }
 
     /**
@@ -163,9 +155,7 @@ class PendingProcess
      */
     public function forever()
     {
-        $this->timeout = null;
-
-        return $this;
+        return tap($this, fn () => $this->timeout = null);
     }
 
     /**
@@ -176,9 +166,7 @@ class PendingProcess
      */
     public function env(array $environment)
     {
-        $this->environment = $environment;
-
-        return $this;
+        return tap($this, fn () => $this->environment = $environment);
     }
 
     /**
@@ -189,9 +177,7 @@ class PendingProcess
      */
     public function input($input)
     {
-        $this->input = $input;
-
-        return $this;
+        return tap($this, fn () => $this->input = $input);
     }
 
     /**
@@ -201,9 +187,7 @@ class PendingProcess
      */
     public function quietly()
     {
-        $this->quietly = true;
-
-        return $this;
+        return tap($this, fn () => $this->quietly = true);
     }
 
     /**
@@ -214,9 +198,7 @@ class PendingProcess
      */
     public function tty(bool $tty = true)
     {
-        $this->tty = $tty;
-
-        return $this;
+        return tap($this, fn () => $this->tty = $tty);
     }
 
     /**
@@ -227,9 +209,7 @@ class PendingProcess
      */
     public function options(array $options)
     {
-        $this->options = $options;
-
-        return $this;
+        return tap($this, fn () => $this->options = $options);
     }
 
     /**
@@ -337,9 +317,7 @@ class PendingProcess
      */
     public function withFakeHandlers(array $fakeHandlers)
     {
-        $this->fakeHandlers = $fakeHandlers;
-
-        return $this;
+        return tap($this, fn () => $this->fakeHandlers = $fakeHandlers);
     }
 
     /**

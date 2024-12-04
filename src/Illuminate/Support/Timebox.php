@@ -56,9 +56,7 @@ class Timebox
      */
     public function returnEarly()
     {
-        $this->earlyReturn = true;
-
-        return $this;
+        return tap($this, fn () => $this->earlyReturn = true);
     }
 
     /**
@@ -68,9 +66,7 @@ class Timebox
      */
     public function dontReturnEarly()
     {
-        $this->earlyReturn = false;
-
-        return $this;
+        return tap($this, fn () => $this->earlyReturn = false);
     }
 
     /**

@@ -973,9 +973,7 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     public function substituteImplicitBindingsUsing($callback)
     {
-        $this->implicitBindingCallback = $callback;
-
-        return $this;
+        return tap($this, fn () => $this->implicitBindingCallback = $callback);
     }
 
     /**
@@ -1023,9 +1021,7 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     public function aliasMiddleware($name, $class)
     {
-        $this->middleware[$name] = $class;
-
-        return $this;
+        return tap($this, fn () => $this->middleware[$name] = $class);
     }
 
     /**
@@ -1058,9 +1054,7 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     public function middlewareGroup($name, array $middleware)
     {
-        $this->middlewareGroups[$name] = $middleware;
-
-        return $this;
+        return tap($this, fn () => $this->middlewareGroups[$name] = $middleware);
     }
 
     /**
@@ -1136,9 +1130,7 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     public function flushMiddlewareGroups()
     {
-        $this->middlewareGroups = [];
-
-        return $this;
+        return tap($this, fn () => $this->middlewareGroups = []);
     }
 
     /**
@@ -1475,9 +1467,7 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     public function setContainer(Container $container)
     {
-        $this->container = $container;
-
-        return $this;
+        return tap($this, fn () => $this->container = $container);
     }
 
     /**

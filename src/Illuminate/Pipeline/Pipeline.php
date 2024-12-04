@@ -60,9 +60,7 @@ class Pipeline implements PipelineContract
      */
     public function send($passable)
     {
-        $this->passable = $passable;
-
-        return $this;
+        return tap($this, fn () => $this->passable = $passable);
     }
 
     /**
@@ -73,9 +71,7 @@ class Pipeline implements PipelineContract
      */
     public function through($pipes)
     {
-        $this->pipes = is_array($pipes) ? $pipes : func_get_args();
-
-        return $this;
+        return tap($this, fn () => $this->pipes = is_array($pipes) ? $pipes : func_get_args());
     }
 
     /**
@@ -86,9 +82,7 @@ class Pipeline implements PipelineContract
      */
     public function pipe($pipes)
     {
-        array_push($this->pipes, ...(is_array($pipes) ? $pipes : func_get_args()));
-
-        return $this;
+        return tap($this, fn () => array_push($this->pipes, ...(is_array($pipes) ? $pipes : func_get_args())));
     }
 
     /**
@@ -99,9 +93,7 @@ class Pipeline implements PipelineContract
      */
     public function via($method)
     {
-        $this->method = $method;
-
-        return $this;
+        return tap($this, fn () => $this->method = $method);
     }
 
     /**
@@ -242,9 +234,7 @@ class Pipeline implements PipelineContract
      */
     public function setContainer(Container $container)
     {
-        $this->container = $container;
-
-        return $this;
+        return tap($this, fn () => $this->container = $container);
     }
 
     /**

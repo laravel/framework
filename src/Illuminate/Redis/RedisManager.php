@@ -259,9 +259,7 @@ class RedisManager implements Factory
      */
     public function extend($driver, Closure $callback)
     {
-        $this->customCreators[$driver] = $callback->bindTo($this, $this);
-
-        return $this;
+        return tap($this, fn () => $this->customCreators[$driver] = $callback->bindTo($this, $this));
     }
 
     /**

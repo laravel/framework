@@ -45,9 +45,7 @@ class InvokedProcess implements InvokedProcessContract
      */
     public function signal(int $signal)
     {
-        $this->process->signal($signal);
-
-        return $this;
+        return tap($this, fn () => $this->process->signal($signal));
     }
 
     /**

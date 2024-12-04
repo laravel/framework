@@ -763,9 +763,7 @@ class UrlGenerator implements UrlGeneratorContract
      */
     public function formatHostUsing(Closure $callback)
     {
-        $this->formatHostUsing = $callback;
-
-        return $this;
+        return tap($this, fn () => $this->formatHostUsing = $callback);
     }
 
     /**
@@ -776,9 +774,7 @@ class UrlGenerator implements UrlGeneratorContract
      */
     public function formatPathUsing(Closure $callback)
     {
-        $this->formatPathUsing = $callback;
-
-        return $this;
+        return tap($this, fn () => $this->formatPathUsing = $callback);
     }
 
     /**
@@ -833,9 +829,7 @@ class UrlGenerator implements UrlGeneratorContract
      */
     public function setRoutes(RouteCollectionInterface $routes)
     {
-        $this->routes = $routes;
-
-        return $this;
+        return tap($this, fn () => $this->routes = $routes);
     }
 
     /**
@@ -858,9 +852,7 @@ class UrlGenerator implements UrlGeneratorContract
      */
     public function setSessionResolver(callable $sessionResolver)
     {
-        $this->sessionResolver = $sessionResolver;
-
-        return $this;
+        return tap($this, fn () => $this->sessionResolver = $sessionResolver);
     }
 
     /**
@@ -871,9 +863,7 @@ class UrlGenerator implements UrlGeneratorContract
      */
     public function setKeyResolver(callable $keyResolver)
     {
-        $this->keyResolver = $keyResolver;
-
-        return $this;
+        return tap($this, fn () => $this->keyResolver = $keyResolver);
     }
 
     /**
@@ -895,9 +885,7 @@ class UrlGenerator implements UrlGeneratorContract
      */
     public function resolveMissingNamedRoutesUsing(callable $missingNamedRouteResolver)
     {
-        $this->missingNamedRouteResolver = $missingNamedRouteResolver;
-
-        return $this;
+        return tap($this, fn () => $this->missingNamedRouteResolver = $missingNamedRouteResolver);
     }
 
     /**
@@ -918,8 +906,6 @@ class UrlGenerator implements UrlGeneratorContract
      */
     public function setRootControllerNamespace($rootNamespace)
     {
-        $this->rootNamespace = $rootNamespace;
-
-        return $this;
+        return tap($this, fn () => $this->rootNamespace = $rootNamespace);
     }
 }

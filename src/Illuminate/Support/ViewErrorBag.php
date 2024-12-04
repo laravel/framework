@@ -59,9 +59,7 @@ class ViewErrorBag implements Countable, Stringable
      */
     public function put($key, MessageBagContract $bag)
     {
-        $this->bags[$key] = $bag;
-
-        return $this;
+        return tap($this, fn () => $this->bags[$key] = $bag);
     }
 
     /**

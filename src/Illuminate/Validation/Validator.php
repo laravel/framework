@@ -1140,9 +1140,7 @@ class Validator implements ValidatorContract
     {
         $this->data = $this->parseData($data);
 
-        $this->setRules($this->initialRules);
-
-        return $this;
+        return tap($this)->setRules($this->initialRules);
     }
 
     /**
@@ -1208,9 +1206,7 @@ class Validator implements ValidatorContract
 
         $this->rules = [];
 
-        $this->addRules($rules);
-
-        return $this;
+        return tap($this)->addRules($rules);
     }
 
     /**
@@ -1290,9 +1286,7 @@ class Validator implements ValidatorContract
      */
     public function stopOnFirstFailure($stopOnFirstFailure = true)
     {
-        $this->stopOnFirstFailure = $stopOnFirstFailure;
-
-        return $this;
+        return tap($this, fn () => $this->stopOnFirstFailure = $stopOnFirstFailure);
     }
 
     /**
@@ -1419,9 +1413,7 @@ class Validator implements ValidatorContract
      */
     public function setCustomMessages(array $messages)
     {
-        $this->customMessages = array_merge($this->customMessages, $messages);
-
-        return $this;
+        return tap($this, fn () => $this->customMessages = array_merge($this->customMessages, $messages));
     }
 
     /**
@@ -1432,9 +1424,7 @@ class Validator implements ValidatorContract
      */
     public function setAttributeNames(array $attributes)
     {
-        $this->customAttributes = $attributes;
-
-        return $this;
+        return tap($this, fn () => $this->customAttributes = $attributes);
     }
 
     /**
@@ -1445,9 +1435,7 @@ class Validator implements ValidatorContract
      */
     public function addCustomAttributes(array $attributes)
     {
-        $this->customAttributes = array_merge($this->customAttributes, $attributes);
-
-        return $this;
+        return tap($this, fn () => $this->customAttributes = array_merge($this->customAttributes, $attributes));
     }
 
     /**
@@ -1458,9 +1446,7 @@ class Validator implements ValidatorContract
      */
     public function setImplicitAttributesFormatter(?callable $formatter = null)
     {
-        $this->implicitAttributesFormatter = $formatter;
-
-        return $this;
+        return tap($this, fn () => $this->implicitAttributesFormatter = $formatter);
     }
 
     /**
@@ -1471,9 +1457,7 @@ class Validator implements ValidatorContract
      */
     public function setValueNames(array $values)
     {
-        $this->customValues = $values;
-
-        return $this;
+        return tap($this, fn () => $this->customValues = $values);
     }
 
     /**
@@ -1484,9 +1468,7 @@ class Validator implements ValidatorContract
      */
     public function addCustomValues(array $customValues)
     {
-        $this->customValues = array_merge($this->customValues, $customValues);
-
-        return $this;
+        return tap($this, fn () => $this->customValues = array_merge($this->customValues, $customValues));
     }
 
     /**
@@ -1571,9 +1553,7 @@ class Validator implements ValidatorContract
      */
     public function ensureExponentWithinAllowedRangeUsing($callback)
     {
-        $this->ensureExponentWithinAllowedRangeUsing = $callback;
-
-        return $this;
+        return tap($this, fn () => $this->ensureExponentWithinAllowedRangeUsing = $callback);
     }
 
     /**

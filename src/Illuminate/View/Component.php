@@ -357,9 +357,7 @@ abstract class Component
      */
     public function withName($name)
     {
-        $this->componentName = $name;
-
-        return $this;
+        return tap($this, fn () => $this->componentName = $name);
     }
 
     /**

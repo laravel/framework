@@ -23,8 +23,6 @@ trait Dumpable
      */
     public function dump(...$args)
     {
-        dump($this, ...$args);
-
-        return $this;
+        return tap($this, fn () => dump($this, ...$args));
     }
 }

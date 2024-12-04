@@ -299,9 +299,7 @@ class DatabaseSessionHandler implements ExistenceAwareInterface, SessionHandlerI
      */
     public function setContainer($container)
     {
-        $this->container = $container;
-
-        return $this;
+        return tap($this, fn () => $this->container = $container);
     }
 
     /**
@@ -312,8 +310,6 @@ class DatabaseSessionHandler implements ExistenceAwareInterface, SessionHandlerI
      */
     public function setExists($value)
     {
-        $this->exists = $value;
-
-        return $this;
+        return tap($this, fn () => $this->exists = $value);
     }
 }

@@ -79,8 +79,6 @@ class Can implements Rule, ValidatorAwareRule
      */
     public function setValidator($validator)
     {
-        $this->validator = $validator;
-
-        return $this;
+        return tap($this, fn () => $this->validator = $validator);
     }
 }

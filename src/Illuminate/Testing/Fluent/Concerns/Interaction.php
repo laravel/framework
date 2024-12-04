@@ -52,9 +52,7 @@ trait Interaction
      */
     public function etc(): self
     {
-        $this->interacted = array_keys($this->prop());
-
-        return $this;
+        return tap($this, fn () => $this->interacted = array_keys($this->prop()));
     }
 
     /**

@@ -416,9 +416,7 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
      */
     public function mailer($name = null)
     {
-        $this->currentMailer = $name;
-
-        return $this;
+        return tap($this, fn () => $this->currentMailer = $name);
     }
 
     /**
@@ -572,9 +570,7 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
      */
     public function forgetMailers()
     {
-        $this->currentMailer = null;
-
-        return $this;
+        return tap($this, fn () => $this->currentMailer = null);
     }
 
     /**

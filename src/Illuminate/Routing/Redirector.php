@@ -256,8 +256,6 @@ class Redirector
      */
     public function setIntendedUrl($url)
     {
-        $this->session->put('url.intended', $url);
-
-        return $this;
+        return tap($this, fn () => $this->session->put('url.intended', $url));
     }
 }

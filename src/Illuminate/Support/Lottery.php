@@ -79,9 +79,7 @@ class Lottery
      */
     public function winner($callback)
     {
-        $this->winner = $callback;
-
-        return $this;
+        return tap($this, fn () => $this->winner = $callback);
     }
 
     /**
@@ -92,9 +90,7 @@ class Lottery
      */
     public function loser($callback)
     {
-        $this->loser = $callback;
-
-        return $this;
+        return tap($this, fn () => $this->loser = $callback);
     }
 
     /**

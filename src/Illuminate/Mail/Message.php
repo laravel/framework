@@ -85,9 +85,7 @@ class Message
      */
     public function returnPath($address)
     {
-        $this->message->returnPath($address);
-
-        return $this;
+        return tap($this, fn () => $this->message->returnPath($address));
     }
 
     /**
@@ -275,9 +273,7 @@ class Message
      */
     public function subject($subject)
     {
-        $this->message->subject($subject);
-
-        return $this;
+        return tap($this, fn () => $this->message->subject($subject));
     }
 
     /**
@@ -288,9 +284,7 @@ class Message
      */
     public function priority($level)
     {
-        $this->message->priority($level);
-
-        return $this;
+        return tap($this, fn () => $this->message->priority($level));
     }
 
     /**
@@ -325,9 +319,7 @@ class Message
      */
     public function attachData($data, $name, array $options = [])
     {
-        $this->message->attach($data, $name, $options['mime'] ?? null);
-
-        return $this;
+        return tap($this, fn () => $this->message->attach($data, $name, $options['mime'] ?? null));
     }
 
     /**

@@ -567,9 +567,7 @@ class Mailable implements MailableContract, Renderable
      */
     public function locale($locale)
     {
-        $this->locale = $locale;
-
-        return $this;
+        return tap($this, fn () => $this->locale = $locale);
     }
 
     /**
@@ -854,9 +852,7 @@ class Mailable implements MailableContract, Renderable
      */
     public function subject($subject)
     {
-        $this->subject = $subject;
-
-        return $this;
+        return tap($this, fn () => $this->subject = $subject);
     }
 
     /**
@@ -909,9 +905,7 @@ class Mailable implements MailableContract, Renderable
      */
     public function html($html)
     {
-        $this->html = $html;
-
-        return $this;
+        return tap($this, fn () => $this->html = $html);
     }
 
     /**
@@ -1163,9 +1157,9 @@ class Mailable implements MailableContract, Renderable
      */
     public function tag($value)
     {
-        array_push($this->tags, $value);
+        return tap($this, fn () => array_push($this->tags, $value)(;
 
-        return $this;
+        return $this);
     }
 
     /**
@@ -1189,9 +1183,7 @@ class Mailable implements MailableContract, Renderable
      */
     public function metadata($key, $value)
     {
-        $this->metadata[$key] = $value;
-
-        return $this;
+        return tap($this, fn () => $this->metadata[$key] = $value);
     }
 
     /**
@@ -1780,9 +1772,7 @@ class Mailable implements MailableContract, Renderable
      */
     public function mailer($mailer)
     {
-        $this->mailer = $mailer;
-
-        return $this;
+        return tap($this, fn () => $this->mailer = $mailer);
     }
 
     /**
@@ -1793,9 +1783,7 @@ class Mailable implements MailableContract, Renderable
      */
     public function withSymfonyMessage($callback)
     {
-        $this->callbacks[] = $callback;
-
-        return $this;
+        return tap($this, fn () => $this->callbacks[] = $callback);
     }
 
     /**

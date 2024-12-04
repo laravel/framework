@@ -16,9 +16,7 @@ trait Debugging
      */
     public function dump(?string $prop = null): self
     {
-        dump($this->prop($prop));
-
-        return $this;
+        return tap($this, fn () => dump($this->prop($prop)));
     }
 
     /**

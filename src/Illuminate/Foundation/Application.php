@@ -376,9 +376,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     {
         $this->basePath = rtrim($basePath, '\/');
 
-        $this->bindPathsInContainer();
-
-        return $this;
+        return tap($this)->bindPathsInContainer();
     }
 
     /**
@@ -430,9 +428,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     {
         $this->appPath = $path;
 
-        $this->instance('path', $path);
-
-        return $this;
+        return tap($this)->instance('path', $path);
     }
 
     /**
@@ -477,9 +473,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     {
         $this->bootstrapPath = $path;
 
-        $this->instance('path.bootstrap', $path);
-
-        return $this;
+        return tap($this)->instance('path.bootstrap', $path);
     }
 
     /**
@@ -503,9 +497,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     {
         $this->configPath = $path;
 
-        $this->instance('path.config', $path);
-
-        return $this;
+        return tap($this)->instance('path.config', $path);
     }
 
     /**
@@ -529,9 +521,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     {
         $this->databasePath = $path;
 
-        $this->instance('path.database', $path);
-
-        return $this;
+        return tap($this)->instance('path.database', $path);
     }
 
     /**
@@ -555,9 +545,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     {
         $this->langPath = $path;
 
-        $this->instance('path.lang', $path);
-
-        return $this;
+        return tap($this)->$this->instance('path.lang', $path);
     }
 
     /**
@@ -581,9 +569,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     {
         $this->publicPath = $path;
 
-        $this->instance('path.public', $path);
-
-        return $this;
+        return tap($this)->instance('path.public', $path);
     }
 
     /**
@@ -615,9 +601,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     {
         $this->storagePath = $path;
 
-        $this->instance('path.storage', $path);
-
-        return $this;
+        return tap($this)->instance('path.storage', $path);
     }
 
     /**

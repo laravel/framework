@@ -121,9 +121,7 @@ class Attachment
      */
     public function as($name)
     {
-        $this->as = $name;
-
-        return $this;
+        return tap($this, fn () => $this->as = $name);
     }
 
     /**
@@ -134,9 +132,7 @@ class Attachment
      */
     public function withMime($mime)
     {
-        $this->mime = $mime;
-
-        return $this;
+        return tap($this, fn () => $this->mime = $mime);
     }
 
     /**

@@ -125,9 +125,7 @@ class Envelope
      */
     public function from(Address|string $address, $name = null)
     {
-        $this->from = is_string($address) ? new Address($address, $name) : $address;
-
-        return $this;
+        return tap($this, fn () => $this->from = is_string($address) ? new Address($address, $name) : $address);
     }
 
     /**
@@ -202,9 +200,7 @@ class Envelope
      */
     public function subject(string $subject)
     {
-        $this->subject = $subject;
-
-        return $this;
+        return tap($this, fn () => $this->subject = $subject);
     }
 
     /**
@@ -215,9 +211,7 @@ class Envelope
      */
     public function tags(array $tags)
     {
-        $this->tags = array_merge($this->tags, $tags);
-
-        return $this;
+        return tap($this, fn () => $this->tags = array_merge($this->tags, $tags));
     }
 
     /**
@@ -228,9 +222,7 @@ class Envelope
      */
     public function tag(string $tag)
     {
-        $this->tags[] = $tag;
-
-        return $this;
+        return tap($this, fn () => $this->tags[] = $tag);
     }
 
     /**
@@ -242,9 +234,7 @@ class Envelope
      */
     public function metadata(string $key, string|int $value)
     {
-        $this->metadata[$key] = $value;
-
-        return $this;
+        return tap($this, fn () => $this->metadata[$key] = $value);
     }
 
     /**
@@ -255,9 +245,7 @@ class Envelope
      */
     public function using(Closure $callback)
     {
-        $this->using[] = $callback;
-
-        return $this;
+        return tap($this, fn () => $this->using[] = $callback);
     }
 
     /**

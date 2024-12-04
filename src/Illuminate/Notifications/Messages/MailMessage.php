@@ -170,9 +170,7 @@ class MailMessage extends SimpleMessage implements Renderable
      */
     public function template($template)
     {
-        $this->markdown = $template;
-
-        return $this;
+        return tap($this, fn () => $this->markdown = $template);
     }
 
     /**
@@ -183,9 +181,7 @@ class MailMessage extends SimpleMessage implements Renderable
      */
     public function theme($theme)
     {
-        $this->theme = $theme;
-
-        return $this;
+        return tap($this, fn () => $this->theme = $theme);
     }
 
     /**
@@ -197,9 +193,7 @@ class MailMessage extends SimpleMessage implements Renderable
      */
     public function from($address, $name = null)
     {
-        $this->from = [$address, $name];
-
-        return $this;
+        return tap($this, fn () => $this->from = [$address, $name]);
     }
 
     /**
@@ -307,9 +301,7 @@ class MailMessage extends SimpleMessage implements Renderable
      */
     public function attachData($data, $name, array $options = [])
     {
-        $this->rawAttachments[] = compact('data', 'name', 'options');
-
-        return $this;
+        return tap($this, fn () => $this->rawAttachments[] = compact('data', 'name', 'options'));
     }
 
     /**
@@ -320,9 +312,7 @@ class MailMessage extends SimpleMessage implements Renderable
      */
     public function tag($value)
     {
-        array_push($this->tags, $value);
-
-        return $this;
+        return tap($this, fn () => array_push($this->tags, $value));
     }
 
     /**
@@ -334,9 +324,7 @@ class MailMessage extends SimpleMessage implements Renderable
      */
     public function metadata($key, $value)
     {
-        $this->metadata[$key] = $value;
-
-        return $this;
+        return tap($this, fn () => $this->metadata[$key] = $value);
     }
 
     /**
@@ -349,9 +337,7 @@ class MailMessage extends SimpleMessage implements Renderable
      */
     public function priority($level)
     {
-        $this->priority = $level;
-
-        return $this;
+        return tap($this, fn () => $this->priority = $level);
     }
 
     /**
@@ -415,8 +401,6 @@ class MailMessage extends SimpleMessage implements Renderable
      */
     public function withSymfonyMessage($callback)
     {
-        $this->callbacks[] = $callback;
-
-        return $this;
+        return tap($this, fn () => $this->callbacks[] = $callback);
     }
 }

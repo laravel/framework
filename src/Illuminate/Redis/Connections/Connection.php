@@ -177,9 +177,7 @@ abstract class Connection
      */
     public function setName($name)
     {
-        $this->name = $name;
-
-        return $this;
+        return tap($this, fn () => $this->name = $name);
     }
 
     /**

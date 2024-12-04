@@ -353,9 +353,7 @@ class Builder implements BuilderContract
     {
         $this->from = new Expression($expression);
 
-        $this->addBinding($bindings, 'from');
-
-        return $this;
+        return tap($this)->addBinding($bindings, 'from');
     }
 
     /**
@@ -1101,9 +1099,7 @@ class Builder implements BuilderContract
     {
         $this->wheres[] = ['type' => 'raw', 'sql' => $sql, 'boolean' => $boolean];
 
-        $this->addBinding((array) $bindings, 'where');
-
-        return $this;
+        return tap($this)->addBinding((array) $bindings, 'where');
     }
 
     /**
@@ -1138,9 +1134,7 @@ class Builder implements BuilderContract
             $value = $this->grammar->prepareWhereLikeBinding($value, $caseSensitive);
         }
 
-        $this->addBinding($value);
-
-        return $this;
+        return tap($this)->addBinding($value);
     }
 
     /**
@@ -1223,9 +1217,7 @@ class Builder implements BuilderContract
         // Finally, we'll add a binding for each value unless that value is an expression
         // in which case we will just skip over it since it will be the query as a raw
         // string and not as a parameterized place-holder to be replaced by the PDO.
-        $this->addBinding($this->cleanBindings($values), 'where');
-
-        return $this;
+        return tap($this)->addBinding($this->cleanBindings($values), 'where');
     }
 
     /**
@@ -1391,9 +1383,7 @@ class Builder implements BuilderContract
 
         $this->wheres[] = compact('type', 'column', 'values', 'boolean', 'not');
 
-        $this->addBinding(array_slice($this->cleanBindings(Arr::flatten($values)), 0, 2), 'where');
-
-        return $this;
+        return tap($this)->addBinding(array_slice($this->cleanBindings(Arr::flatten($values)), 0, 2), 'where');
     }
 
     /**
@@ -1838,9 +1828,7 @@ class Builder implements BuilderContract
             'type', 'column', 'operator', 'query', 'boolean'
         );
 
-        $this->addBinding($query->getBindings(), 'where');
-
-        return $this;
+        return tap($this)->addBinding($query->getBindings(), 'where');
     }
 
     /**
@@ -1916,9 +1904,7 @@ class Builder implements BuilderContract
 
         $this->wheres[] = compact('type', 'query', 'boolean');
 
-        $this->addBinding($query->getBindings(), 'where');
-
-        return $this;
+        return tap($this)->addBinding($query->getBindings(), 'where');
     }
 
     /**
@@ -1942,9 +1928,7 @@ class Builder implements BuilderContract
 
         $this->wheres[] = compact('type', 'columns', 'operator', 'values', 'boolean');
 
-        $this->addBinding($this->cleanBindings($values));
-
-        return $this;
+        return tap($this)->addBinding($this->cleanBindings($values));
     }
 
     /**
@@ -2257,9 +2241,7 @@ class Builder implements BuilderContract
 
         $this->wheres[] = compact('type', 'columns', 'value', 'options', 'boolean');
 
-        $this->addBinding($value);
-
-        return $this;
+        return tap($this)->addBinding($value);
     }
 
     /**
@@ -2404,9 +2386,7 @@ class Builder implements BuilderContract
     {
         $this->groups[] = new Expression($sql);
 
-        $this->addBinding($bindings, 'groupBy');
-
-        return $this;
+        return tap($this)->addBinding($bindings, 'groupBy');
     }
 
     /**
@@ -2584,9 +2564,7 @@ class Builder implements BuilderContract
 
         $this->havings[] = compact('type', 'column', 'values', 'boolean', 'not');
 
-        $this->addBinding(array_slice($this->cleanBindings(Arr::flatten($values)), 0, 2), 'having');
-
-        return $this;
+        return tap($this)->addBinding(array_slice($this->cleanBindings(Arr::flatten($values)), 0, 2), 'having');
     }
 
     /**
@@ -2603,9 +2581,7 @@ class Builder implements BuilderContract
 
         $this->havings[] = compact('type', 'sql', 'boolean');
 
-        $this->addBinding($bindings, 'having');
-
-        return $this;
+        tap($this)->addBinding($bindings, 'having');
     }
 
     /**
@@ -2710,9 +2686,7 @@ class Builder implements BuilderContract
 
         $this->{$this->unions ? 'unionOrders' : 'orders'}[] = compact('type', 'sql');
 
-        $this->addBinding($bindings, $this->unions ? 'unionOrder' : 'order');
-
-        return $this;
+        return tap($this)->addBinding($bindings, $this->unions ? 'unionOrder' : 'order');
     }
 
     /**
@@ -2888,9 +2862,7 @@ class Builder implements BuilderContract
 
         $this->unions[] = compact('query', 'all');
 
-        $this->addBinding($query->getBindings(), 'union');
-
-        return $this;
+        return tap($this)->addBinding($query->getBindings(), 'union');
     }
 
     /**

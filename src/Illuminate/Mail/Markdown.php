@@ -172,9 +172,7 @@ class Markdown
      */
     public function theme($theme)
     {
-        $this->theme = $theme;
-
-        return $this;
+        return tap($this, fn () => $this->theme = $theme);
     }
 
     /**

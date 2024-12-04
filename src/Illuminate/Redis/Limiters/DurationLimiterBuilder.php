@@ -72,9 +72,7 @@ class DurationLimiterBuilder
      */
     public function allow($maxLocks)
     {
-        $this->maxLocks = $maxLocks;
-
-        return $this;
+        return tap($this, fn () => $this->maxLocks = $maxLocks);
     }
 
     /**
@@ -85,9 +83,7 @@ class DurationLimiterBuilder
      */
     public function every($decay)
     {
-        $this->decay = $this->secondsUntil($decay);
-
-        return $this;
+        return tap($this, fn () => $this->decay = $this->secondsUntil($decay));
     }
 
     /**
@@ -98,9 +94,7 @@ class DurationLimiterBuilder
      */
     public function block($timeout)
     {
-        $this->timeout = $timeout;
-
-        return $this;
+        return tap($this, fn () => $this->timeout = $timeout);
     }
 
     /**
@@ -111,9 +105,7 @@ class DurationLimiterBuilder
      */
     public function sleep($sleep)
     {
-        $this->sleep = $sleep;
-
-        return $this;
+        return tap($this, fn () => $this->sleep = $sleep);
     }
 
     /**
