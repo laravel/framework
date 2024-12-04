@@ -55,7 +55,7 @@ namespace Illuminate\Support\Facades;
  * @method static void setId(string|null $id)
  * @method static bool isValidId(string|null $id)
  * @method static void setExists(bool $value)
- * @method static string token()
+ * @method static string|null token()
  * @method static void regenerateToken()
  * @method static string|null previousUrl()
  * @method static void setPreviousUrl(string $url)
