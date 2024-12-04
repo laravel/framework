@@ -376,7 +376,9 @@ class Application extends Container implements ApplicationContract, CachesConfig
     {
         $this->basePath = rtrim($basePath, '\/');
 
-        return tap($this)->bindPathsInContainer();
+        $this->bindPathsInContainer();
+
+        return $this;
     }
 
     /**

@@ -2042,7 +2042,9 @@ class Builder implements BuilderContract
             return $this->toBase()->{$method}(...$parameters);
         }
 
-        return tap($this)->forwardCallTo($this->query, $method, $parameters);
+        $this->forwardCallTo($this->query, $method, $parameters);
+
+        return $this;
     }
 
     /**
