@@ -164,7 +164,7 @@ trait ManagesAttributes
      */
     public function runInBackground()
     {
-        return tap($this, fn () => $this->runInBackground = true;
+        return tap($this, fn () => $this->runInBackground = true);
     }
 
     /**
