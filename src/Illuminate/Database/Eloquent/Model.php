@@ -2321,6 +2321,37 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
+     * Transform the given value if it is present.
+     * 
+     * @param string $attribute
+     * @param callable $callback
+     * @param mixed $default
+     * @return mixed
+     */
+    function transform($attribute, callable $callback, $default = null)
+    {
+        $relations = explode("->", $attribute);
+
+        $value = $this;
+        foreach($relations as $relation) {
+            $value = $value->$relation;
+            if (!filled($value)) {
+                break;
+            }
+        }
+
+        if(filled($value)) {
+            return $callback($value);
+        }
+    
+        if (is_callable($default)) {
+            return $default($value);
+        }
+
+        return $default;
+    }
+
+    /**
      * Determine if an attribute or relation exists on the model.
      *
      * @param  string  $key
