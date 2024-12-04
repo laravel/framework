@@ -122,9 +122,9 @@ class StubPublishCommand extends Command
 
         return collect($stubs)->only(multisearch(
             'Which stubs would you like to publish?',
-            options: fn($search) => collect($stubs)
-                ->filter(fn($to) => str_contains($to, $search))
-                ->map(fn($to) => $to)
+            options: fn ($search) => collect($stubs)
+                ->filter(fn ($to) => str_contains($to, $search))
+                ->map(fn ($to) => $to)
                 ->all(),
             scroll: 10,
         ))->all();
