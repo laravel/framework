@@ -529,7 +529,7 @@ class UrlGenerator implements UrlGeneratorContract
      */
     public function toRoute($route, $parameters, $absolute)
     {
-        $parameters = (new Collection(Arr::wrap($parameters)))->map(function ($value, $key) use ($route) {
+        $parameters = Collection::wrap($parameters)->map(function ($value, $key) use ($route) {
             return $value instanceof UrlRoutable && $route->bindingFieldFor($key)
                     ? $value->{$route->bindingFieldFor($key)}
                     : $value;
