@@ -545,7 +545,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     {
         $this->langPath = $path;
 
-        return tap($this)->$this->instance('path.lang', $path);
+        return tap($this)->instance('path.lang', $path);
     }
 
     /**
