@@ -194,7 +194,9 @@ class MailManager implements FactoryContract
         $scheme = $config['scheme'] ?? null;
 
         if (! $scheme) {
-            $scheme = ($config['port'] == 465) ? 'smtps' : 'smtp';
+            $scheme = ! empty($config['encryption']) && $config['encryption'] === 'tls'
+                ? 'smtps'
+                : 'smtp';
         }
 
         $transport = $factory->create(new Dsn(
