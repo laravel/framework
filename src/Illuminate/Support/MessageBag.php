@@ -272,7 +272,9 @@ class MessageBag implements Jsonable, JsonSerializable, MessageBagContract, Mess
      */
     public function forget($key)
     {
-        return tap($this, fn () => unset($this->messages[$key]));
+        unset($this->messages[$key]);
+
+        return $this;
     }
 
     /**

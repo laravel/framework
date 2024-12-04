@@ -96,7 +96,9 @@ trait MakesHttpRequests
      */
     public function withoutHeader(string $name)
     {
-        return tap($this, fn () => unset($this->defaultHeaders[$name]));
+        unset($this->defaultHeaders[$name]);
+
+        return $this;
     }
 
     /**

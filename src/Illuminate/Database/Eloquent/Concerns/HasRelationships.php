@@ -926,7 +926,9 @@ trait HasRelationships
      */
     public function unsetRelation($relation)
     {
-        return tap($this, fn () => unset($this->relations[$relation]));
+        unset($this->relations[$relation]);
+
+        return $this;
     }
 
     /**
