@@ -456,7 +456,7 @@ abstract class Factory
             return $this->for->isEmpty() ? $states : (new Collection([
                 function () {
                     return $this->parentResolvers();
-                }
+                },
             ]))->merge($states->all());
         })->reduce(function ($carry, $state) use ($parent) {
             if ($state instanceof Closure) {

@@ -214,7 +214,7 @@ abstract class Queue
             return;
         }
 
-        return (new Collection::wrap($backoff)
+        return Collection::wrap($backoff)
             ->map(function ($backoff) {
                 return $backoff instanceof DateTimeInterface
                                 ? $this->secondsUntil($backoff) : $backoff;

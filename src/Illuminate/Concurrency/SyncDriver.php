@@ -26,6 +26,6 @@ class SyncDriver implements Driver
      */
     public function defer(Closure|array $tasks): DeferredCallback
     {
-        return defer(fn () => Collection::wrap($tasks))->each(fn ($task) => $task()));
+        return defer(fn () => Collection::wrap($tasks))->each(fn ($task) => $task());
     }
 }
