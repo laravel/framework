@@ -104,7 +104,7 @@ trait ManagesAttributes
      * @return $this
      */
     public function user($user)
-    {        
+    {
         return tap($this, fn () => $this->user = $user);
     }
 

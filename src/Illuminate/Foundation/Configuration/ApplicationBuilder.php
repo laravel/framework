@@ -428,7 +428,7 @@ class ApplicationBuilder
      * @return $this
      */
     public function booting(callable $callback)
-    {        
+    {
         return tap($this, fn () => $this->app->booting($callback));
     }
 

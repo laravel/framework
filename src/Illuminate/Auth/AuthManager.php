@@ -305,7 +305,7 @@ class AuthManager implements FactoryContract
      */
     public function forgetGuards()
     {
-        return tap($this, fn() => $this->guards = []);
+        return tap($this, fn () => $this->guards = []);
     }
 
     /**
@@ -316,7 +316,7 @@ class AuthManager implements FactoryContract
      */
     public function setApplication($app)
     {
-        return tap($this, fn() => $this->app = $app);
+        return tap($this, fn () => $this->app = $app);
     }
 
     /**
