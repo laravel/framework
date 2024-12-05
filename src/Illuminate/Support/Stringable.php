@@ -338,6 +338,16 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Formats a string into a valid PAN (Primary Account Number, which is used for e.g. IBAN and credit card numbers).
+     *
+     * @return string
+     */
+    public function pan()
+    {
+        return Str::pan($this->value);
+    }
+
+    /**
      * Determine if a given string matches a given pattern.
      *
      * @param  string|iterable<string>  $pattern

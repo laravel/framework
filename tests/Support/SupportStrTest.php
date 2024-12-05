@@ -1626,6 +1626,17 @@ class SupportStrTest extends TestCase
             $this->assertSame($expected, Str::chopEnd($subject, $needle));
         }
     }
+
+    public function testPan()
+    {
+        foreach ([
+            'AT866000031866916134' => 'AT86 6000 0318 6691 6134',
+            'DE49500105179335377574' => 'DE49 5001 0517 9335 3775 74',
+            'GB81BARC20032633441187' => 'GB81 BARC 2003 2633 4411 87'
+        ] as $subject => $value) {
+            $this->assertSame($value, Str::pan($subject));
+        }
+    }
 }
 
 class StringableObjectStub

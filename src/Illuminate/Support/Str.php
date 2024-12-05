@@ -473,6 +473,19 @@ class Str
     }
 
     /**
+     * Formats a given string into a valid IBAN.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public static function pan($value)
+    {
+        $value = (string) $value;
+
+        return join(' ', str_split($value, 4));
+    }
+
+    /**
      * Determine if a given string matches a given pattern.
      *
      * @param  string|iterable<string>  $pattern
