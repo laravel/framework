@@ -6,8 +6,6 @@ use Illuminate\Support\Traits\ForwardsCalls;
 
 trait HasMiddlewareHooks
 {
-    use ForwardsCalls;
-
     /**
      * The wrapper we are creating for this middleware.
      */
@@ -17,10 +15,12 @@ trait HasMiddlewareHooks
      * Adds a hook to the middleware and returns a wrapped middleware instance.
      * The hook should accept the job instance as its only argument.
      * Supported hooks are `before`, `after`, and `onFail`.
+     *
+     * @throws \BadMethodCallException
      */
     public function addHook(string $hookType, callable $hook): WrappedMiddleware
     {
-        return $this->forwardCallTo($this->getHookWrapper(), $hookType, [$hook]);
+        return $this->getHookWrapper()->$hookType($hook);
     }
 
     /**
@@ -69,5 +69,21 @@ trait HasMiddlewareHooks
     public function onPass(callable $callback): WrappedMiddleware
     {
         return $this->addHook('after', $callback);
+    }
+
+    /**
+     * When condition is evaluated as false, the middleware will be skipped.
+     */
+    public function skipUnless(callable|bool $condition): WrappedMiddleware
+    {
+        return $this->getHookWrapper()->skipUnless($condition);
+    }
+
+    /**
+     * When condition is evaluated as true, the middleware will be skipped.
+     */
+    public function skipWhen(callable|bool $condition): WrappedMiddleware
+    {
+        return $this->getHookWrapper()->skipWhen($condition);
     }
 }

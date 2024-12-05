@@ -69,7 +69,7 @@ class WrappedMiddlewareTest extends TestCase
     {
         $job = new WrappedMiddlewareTestJob();
 
-        $this->assertMiddlewareSkipped($job);
+        $this->assertMiddlewareShortCircuited($job);
         $this->assertContains('before', $job::$calls);
         $this->assertNotContains('middlewareBefore', $job::$calls);
         $this->assertNotContains('middlewareAfter', $job::$calls);
@@ -78,14 +78,53 @@ class WrappedMiddlewareTest extends TestCase
         $this->assertSame(['before'], $job::$calls);
     }
 
+    public function testMiddlewareCanBeSkipped()
+    {
+        $job = new WrappedMiddlewareTestJob();
+
+        $this->assertMiddlewareSkipped($job, true);
+        $this->assertNotContains('before', $job::$calls);
+        $this->assertNotContains('middlewareBefore', $job::$calls);
+        $this->assertNotContains('middlewareAfter', $job::$calls);
+        $this->assertNotContains('after', $job::$calls);
+        $this->assertNotContains('onFail', $job::$calls);
+        $this->assertSame(['jobHandle'], $job::$calls);
+
+        $this->assertMiddlewareSkipped($job, false);
+        $this->assertContains('before', $job::$calls);
+        $this->assertContains('middlewareBefore', $job::$calls);
+        $this->assertContains('middlewareAfter', $job::$calls);
+        $this->assertContains('after', $job::$calls);
+        $this->assertNotContains('onFail', $job::$calls);
+        $this->assertSame(['before', 'middlewareBefore', 'after', 'jobHandle', 'middlewareAfter'], $job::$calls);
+
+        $this->assertMiddlewareSkippedUnless($job, false);
+        $this->assertNotContains('before', $job::$calls);
+        $this->assertNotContains('middlewareBefore', $job::$calls);
+        $this->assertNotContains('middlewareAfter', $job::$calls);
+        $this->assertNotContains('after', $job::$calls);
+        $this->assertNotContains('onFail', $job::$calls);
+        $this->assertSame(['jobHandle'], $job::$calls);
+
+        $this->assertMiddlewareSkippedUnless($job, true);
+        $this->assertContains('before', $job::$calls);
+        $this->assertContains('middlewareBefore', $job::$calls);
+        $this->assertContains('middlewareAfter', $job::$calls);
+        $this->assertContains('after', $job::$calls);
+        $this->assertNotContains('onFail', $job::$calls);
+        $this->assertSame(['before', 'middlewareBefore', 'after', 'jobHandle', 'middlewareAfter'], $job::$calls);
+    }
+
     protected function assertJobRanSuccessfully($class)
     {
         $class::$calls = [];
-        $class::$before = fn ($job) => $job::$calls[] = 'before';
-        $class::$after = fn ($job) => $job::$calls[] = 'after';
-        $class::$onFail = fn ($job) => $job::$calls[] = 'onFail';
         $class::$shouldRelease = false;
-        $class::$middlewareToUse = DefaultMiddlewareToBeWrapped::class;
+        $class::$middlewareToUse = [
+            (new WrappedMiddleware(new DefaultMiddleware()))
+                ->before(fn ($job) => $job::$calls[] = 'before')
+                ->after(fn ($job) => $job::$calls[] = 'after')
+                ->onFail(fn ($job) => $job::$calls[] = 'onFail'),
+        ];
 
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
@@ -107,11 +146,13 @@ class WrappedMiddlewareTest extends TestCase
     protected function assertReleasedInMiddleware($class)
     {
         $class::$calls = [];
-        $class::$before = fn ($job) => $job::$calls[] = 'before';
-        $class::$after = fn ($job) => $job::$calls[] = 'after';
-        $class::$onFail = fn ($job) => $job::$calls[] = 'onFail';
         $class::$shouldRelease = false;
-        $class::$middlewareToUse = ReleaseMiddleware::class;
+        $class::$middlewareToUse = [
+            (new WrappedMiddleware(new ReleaseMiddleware))
+                ->before(fn ($job) => $job::$calls[] = 'before')
+                ->after(fn ($job) => $job::$calls[] = 'after')
+                ->onFail(fn ($job) => $job::$calls[] = 'onFail'),
+        ];
 
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
@@ -135,11 +176,13 @@ class WrappedMiddlewareTest extends TestCase
     protected function assertReleasedInJob($class)
     {
         $class::$calls = [];
-        $class::$before = fn ($job) => $job::$calls[] = 'before';
-        $class::$after = fn ($job) => $job::$calls[] = 'after';
-        $class::$onFail = fn ($job) => $job::$calls[] = 'onFail';
         $class::$shouldRelease = true;
-        $class::$middlewareToUse = DefaultMiddlewareToBeWrapped::class;
+        $class::$middlewareToUse = [
+            (new WrappedMiddleware(new DefaultMiddleware))
+                ->before(fn ($job) => $job::$calls[] = 'before')
+                ->after(fn ($job) => $job::$calls[] = 'after')
+                ->onFail(fn ($job) => $job::$calls[] = 'onFail'),
+        ];
 
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
@@ -163,11 +206,13 @@ class WrappedMiddlewareTest extends TestCase
     protected function assertFailedInMiddleware($class)
     {
         $class::$calls = [];
-        $class::$before = fn ($job) => $job::$calls[] = 'before';
-        $class::$after = fn ($job) => $job::$calls[] = 'after';
-        $class::$onFail = fn ($job) => $job::$calls[] = 'onFail';
         $class::$shouldRelease = false;
-        $class::$middlewareToUse = FailureMiddleware::class;
+        $class::$middlewareToUse = [
+            (new WrappedMiddleware(new FailureMiddleware))
+                ->before(fn ($job) => $job::$calls[] = 'before')
+                ->after(fn ($job) => $job::$calls[] = 'after')
+                ->onFail(fn ($job) => $job::$calls[] = 'onFail'),
+        ];
 
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
@@ -188,18 +233,20 @@ class WrappedMiddlewareTest extends TestCase
         $this->assertNotContains('jobHandle', $class::$calls);
     }
 
-    protected function assertMiddlewareSkipped($class)
+    protected function assertMiddlewareShortCircuited($class)
     {
         $class::$calls = [];
-        $class::$before = function ($job) {
-            $job::$calls[] = 'before';
-
-            return false;
-        };
-        $class::$after = fn ($job) => $job::$calls[] = 'after';
-        $class::$onFail = fn ($job) => $job::$calls[] = 'onFail';
         $class::$shouldRelease = false;
-        $class::$middlewareToUse = DefaultMiddlewareToBeWrapped::class;
+        $class::$middlewareToUse = [
+            (new WrappedMiddleware(new DefaultMiddleware))
+                ->before(function ($job) {
+                    $job::$calls[] = 'before';
+
+                    return false;
+                })
+                ->after(fn ($job) => $job::$calls[] = 'after')
+                ->onFail(fn ($job) => $job::$calls[] = 'onFail'),
+        ];
 
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
@@ -219,9 +266,71 @@ class WrappedMiddlewareTest extends TestCase
 
         $this->assertNotContains('jobHandle', $class::$calls);
     }
+
+    protected function assertMiddlewareSkipped($class, bool $skip = true)
+    {
+        $class::$calls = [];
+        $class::$shouldRelease = false;
+        $class::$middlewareToUse = [
+            (new WrappedMiddleware(new DefaultMiddleware))
+                ->before(fn ($job) => $job::$calls[] = 'before')
+                ->after(fn ($job) => $job::$calls[] = 'after')
+                ->onFail(fn ($job) => $job::$calls[] = 'onFail')
+                ->skipWhen($skip),
+        ];
+
+        $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
+
+        $job = m::mock(Job::class);
+        $job->shouldNotReceive('release');
+        $job->shouldNotReceive('fail');
+
+        $job->shouldReceive('hasFailed')->andReturn(false);
+        $job->shouldReceive('isReleased')->andReturn(false);
+        $job->shouldReceive('isDeletedOrReleased')->once()->andReturn(false);
+        $job->shouldReceive('delete')->once();
+        $job->shouldReceive('uuid')->andReturn('simple-test-uuid');
+
+        $instance->call($job, [
+            'command' => serialize($command = new $class),
+        ]);
+
+        $this->assertContains('jobHandle', $class::$calls);
+    }
+
+    protected function assertMiddlewareSkippedUnless($class, bool $unless = true)
+    {
+        $class::$calls = [];
+        $class::$shouldRelease = false;
+        $class::$middlewareToUse = [
+            (new WrappedMiddleware(new DefaultMiddleware))
+                ->before(fn ($job) => $job::$calls[] = 'before')
+                ->after(fn ($job) => $job::$calls[] = 'after')
+                ->onFail(fn ($job) => $job::$calls[] = 'onFail')
+                ->skipUnless($unless),
+        ];
+
+        $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
+
+        $job = m::mock(Job::class);
+        $job->shouldNotReceive('release');
+        $job->shouldNotReceive('fail');
+
+        $job->shouldReceive('hasFailed')->andReturn(false);
+        $job->shouldReceive('isReleased')->andReturn(false);
+        $job->shouldReceive('isDeletedOrReleased')->once()->andReturn(false);
+        $job->shouldReceive('delete')->once();
+        $job->shouldReceive('uuid')->andReturn('simple-test-uuid');
+
+        $instance->call($job, [
+            'command' => serialize($command = new $class),
+        ]);
+
+        $this->assertContains('jobHandle', $class::$calls);
+    }
 }
 
-class DefaultMiddlewareToBeWrapped
+class DefaultMiddleware
 {
     public function handle($job, $next): void
     {
@@ -259,13 +368,7 @@ class WrappedMiddlewareTestJob
 
     public static $calls = [];
 
-    public static $before;
-
-    public static $after;
-
-    public static $onFail;
-
-    public static $middlewareToUse = DefaultMiddlewareToBeWrapped::class;
+    public static $middlewareToUse;
 
     public static $shouldRelease = false;
 
@@ -280,11 +383,6 @@ class WrappedMiddlewareTestJob
 
     public function middleware(): array
     {
-        return [
-            (new WrappedMiddleware(new self::$middlewareToUse))
-                ->before(self::$before)
-                ->after(self::$after)
-                ->onFail(self::$onFail),
-        ];
+        return self::$middlewareToUse;
     }
 }

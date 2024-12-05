@@ -9,14 +9,14 @@ class WrappedMiddleware
      *
      * @var callable|null
      */
-    protected mixed $beforeMiddleware = null;
+    protected mixed $before = null;
 
     /**
      * The callback that is executed after the middleware is handled successfully (before `$next` is called).
      *
      * @var callable|null
      */
-    protected mixed $afterMiddleware = null;
+    protected mixed $after = null;
 
     /**
      * The callback that is executed if the middleware does not call `$next` and fails.
@@ -29,6 +29,8 @@ class WrappedMiddleware
      * Indicates if the middleware has passed.
      */
     protected bool $middlewarePassed = false;
+
+    protected bool $skip = false;
 
     /**
      * @var object $middleware The initialized middleware instance.
@@ -47,10 +49,16 @@ class WrappedMiddleware
      */
     public function handle($job, $next)
     {
+        if ($this->skip) {
+            $next($job);
+
+            return;
+        }
+
         if (
-            $this->beforeMiddleware &&
+            $this->before &&
             (
-                call_user_func($this->beforeMiddleware, $job) === false ||
+                call_user_func($this->before, $job) === false ||
                 $job->job->isReleased() ||
                 $job->job->hasFailed()
             )
@@ -61,8 +69,8 @@ class WrappedMiddleware
         $next = function ($job) use ($next) {
             $this->middlewarePassed = true;
 
-            if ($this->afterMiddleware) {
-                call_user_func($this->afterMiddleware, $job);
+            if ($this->after) {
+                call_user_func($this->after, $job);
             }
 
             $next($job);
@@ -75,46 +83,16 @@ class WrappedMiddleware
         }
     }
 
-    /**
-     * Registers a callback to be executed before the middleware is handled.
-     * If the callback returns false or releases or fails the job, the middleware will be aborted.
-     * The callback should accept the job instance as its only argument.
-     */
-    public function before(callable $before): object
+    public function skipWhen(callable|bool $condition): self
     {
-        $this->beforeMiddleware = $before;
+        $this->skip = value($condition);
 
         return $this;
     }
 
-    /**
-     * Registers a callback to be executed after the middleware is handled, but before `$next` is called.
-     * The callback should accept the job instance as its only argument.
-     */
-    public function after(callable $after): object
+    public function skipUnless(callable|bool $condition): self
     {
-        $this->afterMiddleware = $after;
-
-        return $this;
-    }
-
-    /**
-     * Registers a callback to be executed if the middleware does not call `$next` and fails.
-     * The callback should accept the job instance as its only argument.
-     */
-    public function onFail(callable $callback): object
-    {
-        $this->onFail = $callback;
-
-        return $this;
-    }
-
-    /**
-     * Same as `after`, just a more semantic name.
-     */
-    public function onPass(callable $callback): object
-    {
-        $this->after($callback);
+        $this->skip = ! value($condition);
 
         return $this;
     }
@@ -126,6 +104,31 @@ class WrappedMiddleware
      */
     public function addHook(string $hookType, callable $hook): object
     {
-        return $this->$hookType($hook);
+        $this->$hookType = $hook;
+
+        return $this;
     }
+
+    /**
+     * Handles dynamic method calls for the various middleware hooks that are supported.
+     *
+     * @throws \BadMethodCallException
+     */
+    public function __call(string $method, array $arguments)
+    {
+        $hooks = [
+            'before' => 'before',
+            'after' => 'after',
+            'onFail' => 'onFail',
+            'onPass' => 'after',
+        ];
+
+        if (array_key_exists($method, $hooks)) {
+            return $this->addHook($hooks[$method], $arguments[0]);
+        }
+
+        throw new \BadMethodCallException("Method {$method} does not exist.");
+    }
+
+
 }
