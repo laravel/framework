@@ -33,7 +33,7 @@ class WrappedMiddleware
     protected bool $skip = false;
 
     /**
-     * @var object $middleware The initialized middleware instance.
+     * @var object The initialized middleware instance.
      */
     public function __construct(
         protected object $middleware,
@@ -41,7 +41,7 @@ class WrappedMiddleware
     }
 
     /**
-     * Handles the job by wrapping the initial middleware and executing the before and after callbacks
+     * Handles the job by wrapping the initial middleware and executing the before and after callbacks.
      *
      * @param  mixed  $job
      * @param  callable  $next
@@ -129,6 +129,4 @@ class WrappedMiddleware
 
         throw new \BadMethodCallException("Method {$method} does not exist.");
     }
-
-
 }

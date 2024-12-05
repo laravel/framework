@@ -2,7 +2,6 @@
 
 namespace Illuminate\Queue\Middleware;
 
-use Illuminate\Support\Traits\ForwardsCalls;
 
 trait HasMiddlewareHooks
 {
