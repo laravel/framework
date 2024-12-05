@@ -8,7 +8,7 @@ use Illuminate\Support\InteractsWithTime;
 
 class WithoutOverlapping
 {
-    use InteractsWithTime;
+    use HasMiddlewareHooks, InteractsWithTime;
 
     /**
      * The job's unique key used for preventing overlaps.

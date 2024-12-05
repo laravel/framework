@@ -12,6 +12,8 @@ use function Illuminate\Support\enum_value;
 
 class RateLimited
 {
+    use HasMiddlewareHooks;
+
     /**
      * The rate limiter instance.
      *

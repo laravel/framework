@@ -8,6 +8,8 @@ use Throwable;
 
 class ThrottlesExceptions
 {
+    use HasMiddlewareHooks;
+
     /**
      * The developer specified key that the rate limiter should use.
      *
