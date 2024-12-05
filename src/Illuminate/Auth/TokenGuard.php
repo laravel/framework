@@ -9,14 +9,7 @@ use Illuminate\Support\Traits\Macroable;
 
 class TokenGuard implements Guard
 {
-    use GuardHelpers, Macroable;
-
-    /**
-     * The request instance.
-     *
-     * @var \Illuminate\Http\Request
-     */
-    protected $request;
+    use GuardHelpers, Macroable, HasRequest;
 
     /**
      * The name of the query string item from the request containing the API token.
@@ -133,18 +126,5 @@ class TokenGuard implements Guard
         }
 
         return false;
-    }
-
-    /**
-     * Set the current request instance.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return $this
-     */
-    public function setRequest(Request $request)
-    {
-        $this->request = $request;
-
-        return $this;
     }
 }

@@ -5,10 +5,11 @@ namespace Illuminate\Validation;
 use Illuminate\Contracts\Validation\Rule as RuleContract;
 use Illuminate\Contracts\Validation\ValidatorAwareRule;
 use Illuminate\Translation\CreatesPotentiallyTranslatedStrings;
+use Illuminate\Validation\Concerns\HasValidator;
 
 class ClosureValidationRule implements RuleContract, ValidatorAwareRule
 {
-    use CreatesPotentiallyTranslatedStrings;
+    use CreatesPotentiallyTranslatedStrings, HasValidator;
 
     /**
      * The callback that validates the attribute.
@@ -30,13 +31,6 @@ class ClosureValidationRule implements RuleContract, ValidatorAwareRule
      * @var array
      */
     public $messages = [];
-
-    /**
-     * The current validator.
-     *
-     * @var \Illuminate\Validation\Validator
-     */
-    protected $validator;
 
     /**
      * Create a new Closure based validation rule.
@@ -77,18 +71,5 @@ class ClosureValidationRule implements RuleContract, ValidatorAwareRule
     public function message()
     {
         return $this->messages;
-    }
-
-    /**
-     * Set the current validator.
-     *
-     * @param  \Illuminate\Validation\Validator  $validator
-     * @return $this
-     */
-    public function setValidator($validator)
-    {
-        $this->validator = $validator;
-
-        return $this;
     }
 }

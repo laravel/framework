@@ -2,6 +2,7 @@
 
 namespace Illuminate\Auth;
 
+use Illuminate\Auth\Concerns\HasRequest;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Http\Request;
@@ -9,7 +10,7 @@ use Illuminate\Support\Traits\Macroable;
 
 class RequestGuard implements Guard
 {
-    use GuardHelpers, Macroable;
+    use GuardHelpers, Macroable, HasRequest;
 
     /**
      * The guard callback.
@@ -17,13 +18,6 @@ class RequestGuard implements Guard
      * @var callable
      */
     protected $callback;
-
-    /**
-     * The request instance.
-     *
-     * @var \Illuminate\Http\Request
-     */
-    protected $request;
 
     /**
      * Create a new authentication guard.
@@ -70,18 +64,5 @@ class RequestGuard implements Guard
         return ! is_null((new static(
             $this->callback, $credentials['request'], $this->getProvider()
         ))->user());
-    }
-
-    /**
-     * Set the current request instance.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return $this
-     */
-    public function setRequest(Request $request)
-    {
-        $this->request = $request;
-
-        return $this;
     }
 }

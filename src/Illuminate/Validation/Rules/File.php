@@ -11,11 +11,12 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Validation\Concerns\HasValidator;
 use InvalidArgumentException;
 
 class File implements Rule, DataAwareRule, ValidatorAwareRule
 {
-    use Conditionable, Macroable;
+    use Conditionable, Macroable, HasValidator;
 
     /**
      * The MIME types that the given file should match. This array may also contain file extensions.
@@ -65,13 +66,6 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
      * @var array
      */
     protected $data;
-
-    /**
-     * The validator performing the validation.
-     *
-     * @var \Illuminate\Validation\Validator
-     */
-    protected $validator;
 
     /**
      * The callback that will generate the "default" version of the file rule.
@@ -347,19 +341,6 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
     public function message()
     {
         return $this->messages;
-    }
-
-    /**
-     * Set the current validator.
-     *
-     * @param  \Illuminate\Contracts\Validation\Validator  $validator
-     * @return $this
-     */
-    public function setValidator($validator)
-    {
-        $this->validator = $validator;
-
-        return $this;
     }
 
     /**

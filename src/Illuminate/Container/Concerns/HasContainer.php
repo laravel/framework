@@ -2,6 +2,8 @@
 
 namespace Illuminate\Container\Concerns;
 
+use Illuminate\Container\Container;
+
 trait HasContainer
 {
     /**

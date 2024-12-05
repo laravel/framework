@@ -10,18 +10,12 @@ use Illuminate\Contracts\Validation\ValidatorAwareRule;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Traits\Conditionable;
+use Illuminate\Validation\Concerns\HasValidator;
 use InvalidArgumentException;
 
 class Password implements Rule, DataAwareRule, ValidatorAwareRule
 {
-    use Conditionable;
-
-    /**
-     * The validator performing the validation.
-     *
-     * @var \Illuminate\Contracts\Validation\Validator
-     */
-    protected $validator;
+    use Conditionable, HasValidator;
 
     /**
      * The data under validation.
@@ -171,19 +165,6 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
     public static function sometimes()
     {
         return ['sometimes', static::default()];
-    }
-
-    /**
-     * Set the performing validator.
-     *
-     * @param  \Illuminate\Contracts\Validation\Validator  $validator
-     * @return $this
-     */
-    public function setValidator($validator)
-    {
-        $this->validator = $validator;
-
-        return $this;
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Auth;
 
+use Illuminate\Auth\Concerns\HasRequest;
 use Illuminate\Auth\Events\Attempting;
 use Illuminate\Auth\Events\Authenticated;
 use Illuminate\Auth\Events\CurrentDeviceLogout;
@@ -29,7 +30,7 @@ use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
 class SessionGuard implements StatefulGuard, SupportsBasicAuth
 {
-    use GuardHelpers, Macroable;
+    use GuardHelpers, Macroable, HasRequest;
 
     /**
      * The name of the guard. Typically "web".
@@ -74,13 +75,6 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * @var \Illuminate\Contracts\Cookie\QueueingFactory
      */
     protected $cookie;
-
-    /**
-     * The request instance.
-     *
-     * @var \Symfony\Component\HttpFoundation\Request
-     */
-    protected $request;
 
     /**
      * The event dispatcher instance.
@@ -962,19 +956,6 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     public function getRequest()
     {
         return $this->request ?: Request::createFromGlobals();
-    }
-
-    /**
-     * Set the current request instance.
-     *
-     * @param  \Symfony\Component\HttpFoundation\Request  $request
-     * @return $this
-     */
-    public function setRequest(Request $request)
-    {
-        $this->request = $request;
-
-        return $this;
     }
 
     /**

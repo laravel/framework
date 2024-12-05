@@ -9,10 +9,11 @@ use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Contracts\Validation\ValidatorAwareRule;
 use Illuminate\Translation\CreatesPotentiallyTranslatedStrings;
+use Illuminate\Validation\Concerns\HasValidator;
 
 class InvokableValidationRule implements Rule, ValidatorAwareRule
 {
-    use CreatesPotentiallyTranslatedStrings;
+    use CreatesPotentiallyTranslatedStrings, HasValidator;
 
     /**
      * The invokable that validates the attribute.
@@ -34,13 +35,6 @@ class InvokableValidationRule implements Rule, ValidatorAwareRule
      * @var array
      */
     protected $messages = [];
-
-    /**
-     * The current validator.
-     *
-     * @var \Illuminate\Validation\Validator
-     */
-    protected $validator;
 
     /**
      * The data under validation.
@@ -137,19 +131,6 @@ class InvokableValidationRule implements Rule, ValidatorAwareRule
     public function setData($data)
     {
         $this->data = $data;
-
-        return $this;
-    }
-
-    /**
-     * Set the current validator.
-     *
-     * @param  \Illuminate\Validation\Validator  $validator
-     * @return $this
-     */
-    public function setValidator($validator)
-    {
-        $this->validator = $validator;
 
         return $this;
     }

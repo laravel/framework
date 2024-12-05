@@ -7,11 +7,12 @@ use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Contracts\Validation\ValidatorAwareRule;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Traits\Conditionable;
+use Illuminate\Validation\Concerns\HasValidator;
 use TypeError;
 
 class Enum implements Rule, ValidatorAwareRule
 {
-    use Conditionable;
+    use Conditionable, HasValidator;
 
     /**
      * The type of the enum.
@@ -19,13 +20,6 @@ class Enum implements Rule, ValidatorAwareRule
      * @var class-string
      */
     protected $type;
-
-    /**
-     * The current validator instance.
-     *
-     * @var \Illuminate\Validation\Validator
-     */
-    protected $validator;
 
     /**
      * The cases that should be considered valid.
@@ -131,18 +125,5 @@ class Enum implements Rule, ValidatorAwareRule
         return $message === 'validation.enum'
             ? ['The selected :attribute is invalid.']
             : $message;
-    }
-
-    /**
-     * Set the current validator.
-     *
-     * @param  \Illuminate\Validation\Validator  $validator
-     * @return $this
-     */
-    public function setValidator($validator)
-    {
-        $this->validator = $validator;
-
-        return $this;
     }
 }
