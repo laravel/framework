@@ -213,7 +213,7 @@ class ApplicationBuilder
 
             if (is_string($health)) {
                 PreventRequestsDuringMaintenance::except($health);
-                
+
                 Route::get($health, function () {
                     $exception = null;
 
