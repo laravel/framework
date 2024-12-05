@@ -425,6 +425,40 @@ class Str
     }
 
     /**
+     * Extract values from the haystack using the given template pattern.
+     *
+     * @param string $haystack
+     * @param string $pattern
+     * @return array
+     */
+    public static function extract($haystack, $pattern)
+    {
+        $pattern = static::replace(
+            ["\*", "\{", "\}"], ["*", "{", "}"],
+            preg_quote($pattern, "/")
+        );
+
+        $placeholders = static::matchAll("/\{(.*?)}/", $pattern);
+
+        foreach ($placeholders as $placeholder) {
+            $pattern = static::replace(
+                ["{" . $placeholder . "}"],
+                "(?<" . $placeholder . ">[^\/]+)",
+                $pattern,
+                false,
+            );
+        }
+
+        $pattern = static::replace("*", ".*", $pattern);
+
+        if (preg_match("/$pattern/i", $haystack, $matches)) {
+            return array_intersect_key($matches, $placeholders->flip()->all());
+        }
+
+        return [];
+    }
+
+    /**
      * Cap a string with a single instance of a given value.
      *
      * @param  string  $value
