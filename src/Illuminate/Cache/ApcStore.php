@@ -2,9 +2,11 @@
 
 namespace Illuminate\Cache;
 
+use Illuminate\Cache\Concerns\HasPrefix;
+
 class ApcStore extends TaggableStore
 {
-    use RetrievesMultipleKeys;
+    use RetrievesMultipleKeys, HasPrefix;
 
     /**
      * The APC wrapper instance.
@@ -12,13 +14,6 @@ class ApcStore extends TaggableStore
      * @var \Illuminate\Cache\ApcWrapper
      */
     protected $apc;
-
-    /**
-     * A string that should be prepended to keys.
-     *
-     * @var string
-     */
-    protected $prefix;
 
     /**
      * Create a new APC store.
@@ -112,26 +107,5 @@ class ApcStore extends TaggableStore
     public function flush()
     {
         return $this->apc->flush();
-    }
-
-    /**
-     * Get the cache key prefix.
-     *
-     * @return string
-     */
-    public function getPrefix()
-    {
-        return $this->prefix;
-    }
-
-    /**
-     * Set the cache key prefix.
-     *
-     * @param  string  $prefix
-     * @return void
-     */
-    public function setPrefix($prefix)
-    {
-        $this->prefix = $prefix;
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Cache;
 
+use Illuminate\Cache\Concerns\HasPrefix;
 use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Support\InteractsWithTime;
 use Memcached;
@@ -9,7 +10,7 @@ use ReflectionMethod;
 
 class MemcachedStore extends TaggableStore implements LockProvider
 {
-    use InteractsWithTime;
+    use InteractsWithTime, HasPrefix;
 
     /**
      * The Memcached instance.
@@ -17,13 +18,6 @@ class MemcachedStore extends TaggableStore implements LockProvider
      * @var \Memcached
      */
     protected $memcached;
-
-    /**
-     * A string that should be prepended to keys.
-     *
-     * @var string
-     */
-    protected $prefix;
 
     /**
      * Indicates whether we are using Memcached version >= 3.0.0.
@@ -254,26 +248,5 @@ class MemcachedStore extends TaggableStore implements LockProvider
     public function getMemcached()
     {
         return $this->memcached;
-    }
-
-    /**
-     * Get the cache key prefix.
-     *
-     * @return string
-     */
-    public function getPrefix()
-    {
-        return $this->prefix;
-    }
-
-    /**
-     * Set the cache key prefix.
-     *
-     * @param  string  $prefix
-     * @return void
-     */
-    public function setPrefix($prefix)
-    {
-        $this->prefix = $prefix;
     }
 }

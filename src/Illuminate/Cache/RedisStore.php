@@ -2,6 +2,7 @@
 
 namespace Illuminate\Cache;
 
+use Illuminate\Cache\Concerns\HasPrefix;
 use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Redis\Factory as Redis;
 use Illuminate\Redis\Connections\PhpRedisConnection;
@@ -11,19 +12,14 @@ use Illuminate\Support\Str;
 
 class RedisStore extends TaggableStore implements LockProvider
 {
+    use HasPrefix;
+
     /**
      * The Redis factory implementation.
      *
      * @var \Illuminate\Contracts\Redis\Factory
      */
     protected $redis;
-
-    /**
-     * A string that should be prepended to keys.
-     *
-     * @var string
-     */
-    protected $prefix;
 
     /**
      * The Redis connection instance that should be used to manage locks.
@@ -377,27 +373,6 @@ class RedisStore extends TaggableStore implements LockProvider
     public function getRedis()
     {
         return $this->redis;
-    }
-
-    /**
-     * Get the cache key prefix.
-     *
-     * @return string
-     */
-    public function getPrefix()
-    {
-        return $this->prefix;
-    }
-
-    /**
-     * Set the cache key prefix.
-     *
-     * @param  string  $prefix
-     * @return void
-     */
-    public function setPrefix($prefix)
-    {
-        $this->prefix = $prefix;
     }
 
     /**

@@ -4,6 +4,7 @@ namespace Illuminate\Cache;
 
 use Aws\DynamoDb\DynamoDbClient;
 use Aws\DynamoDb\Exception\DynamoDbException;
+use Illuminate\Cache\Concerns\HasPrefix;
 use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Support\Carbon;
@@ -14,7 +15,7 @@ use RuntimeException;
 
 class DynamoDbStore implements LockProvider, Store
 {
-    use InteractsWithTime;
+    use InteractsWithTime, HasPrefix;
 
     /**
      * The DynamoDB client instance.
@@ -50,13 +51,6 @@ class DynamoDbStore implements LockProvider, Store
      * @var string
      */
     protected $expirationAttribute;
-
-    /**
-     * A string that should be prepended to keys.
-     *
-     * @var string
-     */
-    protected $prefix;
 
     /**
      * Create a new store instance.
@@ -513,27 +507,6 @@ class DynamoDbStore implements LockProvider, Store
     protected function type($value)
     {
         return is_numeric($value) ? 'N' : 'S';
-    }
-
-    /**
-     * Get the cache key prefix.
-     *
-     * @return string
-     */
-    public function getPrefix()
-    {
-        return $this->prefix;
-    }
-
-    /**
-     * Set the cache key prefix.
-     *
-     * @param  string  $prefix
-     * @return void
-     */
-    public function setPrefix($prefix)
-    {
-        $this->prefix = $prefix;
     }
 
     /**

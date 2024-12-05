@@ -3,6 +3,7 @@
 namespace Illuminate\Cache;
 
 use Closure;
+use Illuminate\Cache\Concerns\HasPrefix;
 use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Database\ConnectionInterface;
@@ -16,7 +17,7 @@ use Illuminate\Support\Str;
 
 class DatabaseStore implements LockProvider, Store
 {
-    use InteractsWithTime;
+    use InteractsWithTime, HasPrefix;
 
     /**
      * The database connection instance.
@@ -38,13 +39,6 @@ class DatabaseStore implements LockProvider, Store
      * @var string
      */
     protected $table;
-
-    /**
-     * A string that should be prepended to keys.
-     *
-     * @var string
-     */
-    protected $prefix;
 
     /**
      * The name of the cache locks table.
@@ -454,27 +448,6 @@ class DatabaseStore implements LockProvider, Store
         $this->lockConnection = $connection;
 
         return $this;
-    }
-
-    /**
-     * Get the cache key prefix.
-     *
-     * @return string
-     */
-    public function getPrefix()
-    {
-        return $this->prefix;
-    }
-
-    /**
-     * Set the cache key prefix.
-     *
-     * @param  string  $prefix
-     * @return void
-     */
-    public function setPrefix($prefix)
-    {
-        $this->prefix = $prefix;
     }
 
     /**
