@@ -193,6 +193,7 @@ class WrappedMiddlewareTest extends TestCase
         $class::$calls = [];
         $class::$before = function ($job) {
             $job::$calls[] = 'before';
+
             return false;
         };
         $class::$after = fn ($job) => $job::$calls[] = 'after';

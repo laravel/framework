@@ -14,7 +14,8 @@ class WrappedMiddleware
 
     public function __construct(
         protected object $middleware,
-    ) {}
+    ) {
+    }
 
     public function handle($job, $next): void
     {
