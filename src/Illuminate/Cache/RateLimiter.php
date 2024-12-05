@@ -85,7 +85,9 @@ class RateLimiter
 
             foreach ($result as $limit) {
                 if ($duplicates->contains($limit->key)) {
-                    $limit->key = $limit->fallbackKey();
+                    $limit->key = empty($limit->key)
+                        ? $limit->fallbackKey()
+                        : $limit->key.':'.$limit->fallbackKey();
                 }
             }
 
