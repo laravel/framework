@@ -2,6 +2,7 @@
 
 namespace Illuminate\Session;
 
+use Illuminate\Container\Concerns\HasContainer;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Database\ConnectionInterface;
@@ -35,13 +36,6 @@ class DatabaseSessionHandler implements ExistenceAwareInterface, SessionHandlerI
      * @var int
      */
     protected $minutes;
-
-    /**
-     * The container instance.
-     *
-     * @var \Illuminate\Contracts\Container\Container|null
-     */
-    protected $container;
 
     /**
      * The existence state of the session.
@@ -289,19 +283,6 @@ class DatabaseSessionHandler implements ExistenceAwareInterface, SessionHandlerI
     protected function getQuery()
     {
         return $this->connection->table($this->table);
-    }
-
-    /**
-     * Set the application instance used by the handler.
-     *
-     * @param  \Illuminate\Contracts\Foundation\Application  $container
-     * @return $this
-     */
-    public function setContainer($container)
-    {
-        $this->container = $container;
-
-        return $this;
     }
 
     /**

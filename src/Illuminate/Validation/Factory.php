@@ -3,6 +3,7 @@
 namespace Illuminate\Validation;
 
 use Closure;
+use Illuminate\Container\Concerns\HasContainer;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Contracts\Validation\Factory as FactoryContract;
@@ -10,6 +11,8 @@ use Illuminate\Support\Str;
 
 class Factory implements FactoryContract
 {
+    use HasContainer;
+
     /**
      * The Translator implementation.
      *
@@ -23,13 +26,6 @@ class Factory implements FactoryContract
      * @var \Illuminate\Validation\PresenceVerifierInterface
      */
     protected $verifier;
-
-    /**
-     * The IoC container instance.
-     *
-     * @var \Illuminate\Contracts\Container\Container|null
-     */
-    protected $container;
 
     /**
      * All of the custom validator extensions.
@@ -318,18 +314,5 @@ class Factory implements FactoryContract
     public function getContainer()
     {
         return $this->container;
-    }
-
-    /**
-     * Set the container instance used by the validation factory.
-     *
-     * @param  \Illuminate\Contracts\Container\Container  $container
-     * @return $this
-     */
-    public function setContainer(Container $container)
-    {
-        $this->container = $container;
-
-        return $this;
     }
 }

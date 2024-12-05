@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database;
 
+use Illuminate\Container\Concerns\HasApplication;
 use Illuminate\Database\Connectors\ConnectionFactory;
 use Illuminate\Database\Events\ConnectionEstablished;
 use Illuminate\Support\Arr;
@@ -20,13 +21,7 @@ class DatabaseManager implements ConnectionResolverInterface
     use Macroable {
         __call as macroCall;
     }
-
-    /**
-     * The application instance.
-     *
-     * @var \Illuminate\Contracts\Foundation\Application
-     */
-    protected $app;
+    use HasApplication;
 
     /**
      * The database connection factory instance.
@@ -442,19 +437,6 @@ class DatabaseManager implements ConnectionResolverInterface
     public function setReconnector(callable $reconnector)
     {
         $this->reconnector = $reconnector;
-    }
-
-    /**
-     * Set the application instance used by the manager.
-     *
-     * @param  \Illuminate\Contracts\Foundation\Application  $app
-     * @return $this
-     */
-    public function setApplication($app)
-    {
-        $this->app = $app;
-
-        return $this;
     }
 
     /**

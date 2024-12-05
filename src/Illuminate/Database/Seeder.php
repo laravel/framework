@@ -4,6 +4,7 @@ namespace Illuminate\Database;
 
 use Illuminate\Console\Command;
 use Illuminate\Console\View\Components\TwoColumnDetail;
+use Illuminate\Container\Concerns\HasContainer;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Support\Arr;
@@ -11,12 +12,7 @@ use InvalidArgumentException;
 
 abstract class Seeder
 {
-    /**
-     * The container instance.
-     *
-     * @var \Illuminate\Contracts\Container\Container
-     */
-    protected $container;
+    use HasContainer;
 
     /**
      * The console command instance.
@@ -138,19 +134,6 @@ abstract class Seeder
         }
 
         return $instance;
-    }
-
-    /**
-     * Set the IoC container instance.
-     *
-     * @param  \Illuminate\Contracts\Container\Container  $container
-     * @return $this
-     */
-    public function setContainer(Container $container)
-    {
-        $this->container = $container;
-
-        return $this;
     }
 
     /**

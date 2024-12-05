@@ -3,17 +3,13 @@
 namespace Illuminate\Support;
 
 use Closure;
+use Illuminate\Container\Concerns\HasContainer;
 use Illuminate\Contracts\Container\Container;
 use InvalidArgumentException;
 
 abstract class Manager
 {
-    /**
-     * The container instance.
-     *
-     * @var \Illuminate\Contracts\Container\Container
-     */
-    protected $container;
+    use HasContainer;
 
     /**
      * The configuration repository instance.
@@ -152,19 +148,6 @@ abstract class Manager
     public function getContainer()
     {
         return $this->container;
-    }
-
-    /**
-     * Set the container instance used by the manager.
-     *
-     * @param  \Illuminate\Contracts\Container\Container  $container
-     * @return $this
-     */
-    public function setContainer(Container $container)
-    {
-        $this->container = $container;
-
-        return $this;
     }
 
     /**

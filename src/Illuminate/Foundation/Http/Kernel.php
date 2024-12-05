@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Http;
 
 use Carbon\CarbonInterval;
 use DateTimeInterface;
+use Illuminate\Container\Concerns\HasApplication;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Http\Kernel as KernelContract;
@@ -19,14 +20,7 @@ use Throwable;
 
 class Kernel implements KernelContract
 {
-    use InteractsWithTime;
-
-    /**
-     * The application implementation.
-     *
-     * @var \Illuminate\Contracts\Foundation\Application
-     */
-    protected $app;
+    use InteractsWithTime, HasApplication;
 
     /**
      * The router instance.
@@ -685,18 +679,5 @@ class Kernel implements KernelContract
     public function getApplication()
     {
         return $this->app;
-    }
-
-    /**
-     * Set the Laravel application instance.
-     *
-     * @param  \Illuminate\Contracts\Foundation\Application  $app
-     * @return $this
-     */
-    public function setApplication(Application $app)
-    {
-        $this->app = $app;
-
-        return $this;
     }
 }

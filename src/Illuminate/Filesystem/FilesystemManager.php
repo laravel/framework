@@ -4,6 +4,7 @@ namespace Illuminate\Filesystem;
 
 use Aws\S3\S3Client;
 use Closure;
+use Illuminate\Container\Concerns\HasApplication;
 use Illuminate\Contracts\Filesystem\Factory as FactoryContract;
 use Illuminate\Support\Arr;
 use InvalidArgumentException;
@@ -27,12 +28,7 @@ use League\Flysystem\Visibility;
  */
 class FilesystemManager implements FactoryContract
 {
-    /**
-     * The application instance.
-     *
-     * @var \Illuminate\Contracts\Foundation\Application
-     */
-    protected $app;
+    use HasApplication;
 
     /**
      * The array of resolved filesystem drivers.
@@ -417,19 +413,6 @@ class FilesystemManager implements FactoryContract
     public function extend($driver, Closure $callback)
     {
         $this->customCreators[$driver] = $callback;
-
-        return $this;
-    }
-
-    /**
-     * Set the application instance used by the manager.
-     *
-     * @param  \Illuminate\Contracts\Foundation\Application  $app
-     * @return $this
-     */
-    public function setApplication($app)
-    {
-        $this->app = $app;
 
         return $this;
     }

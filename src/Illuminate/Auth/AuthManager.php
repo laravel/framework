@@ -3,6 +3,7 @@
 namespace Illuminate\Auth;
 
 use Closure;
+use Illuminate\Container\Concerns\HasApplication;
 use Illuminate\Contracts\Auth\Factory as FactoryContract;
 use InvalidArgumentException;
 
@@ -12,14 +13,7 @@ use InvalidArgumentException;
  */
 class AuthManager implements FactoryContract
 {
-    use CreatesUserProviders;
-
-    /**
-     * The application instance.
-     *
-     * @var \Illuminate\Contracts\Foundation\Application
-     */
-    protected $app;
+    use CreatesUserProviders, HasApplication;
 
     /**
      * The registered custom driver creators.
@@ -312,19 +306,6 @@ class AuthManager implements FactoryContract
     public function forgetGuards()
     {
         $this->guards = [];
-
-        return $this;
-    }
-
-    /**
-     * Set the application instance used by the manager.
-     *
-     * @param  \Illuminate\Contracts\Foundation\Application  $app
-     * @return $this
-     */
-    public function setApplication($app)
-    {
-        $this->app = $app;
 
         return $this;
     }

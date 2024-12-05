@@ -4,6 +4,7 @@ namespace Illuminate\Cache;
 
 use Aws\DynamoDb\DynamoDbClient;
 use Closure;
+use Illuminate\Container\Concerns\HasApplication;
 use Illuminate\Contracts\Cache\Factory as FactoryContract;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
@@ -16,12 +17,7 @@ use InvalidArgumentException;
  */
 class CacheManager implements FactoryContract
 {
-    /**
-     * The application instance.
-     *
-     * @var \Illuminate\Contracts\Foundation\Application
-     */
-    protected $app;
+    use HasApplication;
 
     /**
      * The array of resolved cache stores.
@@ -424,19 +420,6 @@ class CacheManager implements FactoryContract
     public function extend($driver, Closure $callback)
     {
         $this->customCreators[$driver] = $callback->bindTo($this, $this);
-
-        return $this;
-    }
-
-    /**
-     * Set the application instance used by the manager.
-     *
-     * @param  \Illuminate\Contracts\Foundation\Application  $app
-     * @return $this
-     */
-    public function setApplication($app)
-    {
-        $this->app = $app;
 
         return $this;
     }

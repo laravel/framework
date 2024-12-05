@@ -5,15 +5,11 @@ namespace Illuminate\Support;
 use Closure;
 use InvalidArgumentException;
 use RuntimeException;
+use Illuminate\Container\Concerns\HasApplication;
 
 abstract class MultipleInstanceManager
 {
-    /**
-     * The application instance.
-     *
-     * @var \Illuminate\Contracts\Foundation\Application
-     */
-    protected $app;
+    use HasApplication;
 
     /**
      * The configuration repository instance.
@@ -197,19 +193,6 @@ abstract class MultipleInstanceManager
     public function extend($name, Closure $callback)
     {
         $this->customCreators[$name] = $callback->bindTo($this, $this);
-
-        return $this;
-    }
-
-    /**
-     * Set the application instance used by the manager.
-     *
-     * @param  \Illuminate\Contracts\Foundation\Application  $app
-     * @return $this
-     */
-    public function setApplication($app)
-    {
-        $this->app = $app;
 
         return $this;
     }

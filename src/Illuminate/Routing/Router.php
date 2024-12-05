@@ -4,6 +4,7 @@ namespace Illuminate\Routing;
 
 use ArrayObject;
 use Closure;
+use Illuminate\Container\Concerns\HasContainer;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Routing\BindingRegistrar;
@@ -40,7 +41,7 @@ class Router implements BindingRegistrar, RegistrarContract
     use Macroable {
         __call as macroCall;
     }
-    use Tappable;
+    use Tappable, HasContainer;
 
     /**
      * The event dispatcher instance.
@@ -48,13 +49,6 @@ class Router implements BindingRegistrar, RegistrarContract
      * @var \Illuminate\Contracts\Events\Dispatcher
      */
     protected $events;
-
-    /**
-     * The IoC container instance.
-     *
-     * @var \Illuminate\Container\Container
-     */
-    protected $container;
 
     /**
      * The route collection instance.
@@ -1465,19 +1459,6 @@ class Router implements BindingRegistrar, RegistrarContract
         }
 
         return $result;
-    }
-
-    /**
-     * Set the container instance used by the router.
-     *
-     * @param  \Illuminate\Container\Container  $container
-     * @return $this
-     */
-    public function setContainer(Container $container)
-    {
-        $this->container = $container;
-
-        return $this;
     }
 
     /**

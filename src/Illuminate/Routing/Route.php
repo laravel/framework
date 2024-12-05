@@ -4,6 +4,7 @@ namespace Illuminate\Routing;
 
 use BackedEnum;
 use Closure;
+use Illuminate\Container\Concerns\HasContainer;
 use Illuminate\Container\Container;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
@@ -29,7 +30,7 @@ use function Illuminate\Support\enum_value;
 
 class Route
 {
-    use Conditionable, CreatesRegularExpressionRouteConstraints, FiltersControllerMiddleware, Macroable, ResolvesRouteDependencies;
+    use Conditionable, CreatesRegularExpressionRouteConstraints, FiltersControllerMiddleware, Macroable, ResolvesRouteDependencies, HasContainer;
 
     /**
      * The URI pattern the route responds to.
@@ -142,13 +143,6 @@ class Route
      * @var \Illuminate\Routing\Router
      */
     protected $router;
-
-    /**
-     * The container instance used by the route.
-     *
-     * @var \Illuminate\Container\Container
-     */
-    protected $container;
 
     /**
      * The fields that implicit binding should use for a given parameter.
@@ -1342,19 +1336,6 @@ class Route
     public function setRouter(Router $router)
     {
         $this->router = $router;
-
-        return $this;
-    }
-
-    /**
-     * Set the container instance on the route.
-     *
-     * @param  \Illuminate\Container\Container  $container
-     * @return $this
-     */
-    public function setContainer(Container $container)
-    {
-        $this->container = $container;
 
         return $this;
     }

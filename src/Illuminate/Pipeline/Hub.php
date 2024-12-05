@@ -3,17 +3,13 @@
 namespace Illuminate\Pipeline;
 
 use Closure;
+use Illuminate\Container\Concerns\HasContainer;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Pipeline\Hub as HubContract;
 
 class Hub implements HubContract
 {
-    /**
-     * The container implementation.
-     *
-     * @var \Illuminate\Contracts\Container\Container|null
-     */
-    protected $container;
+    use HasContainer;
 
     /**
      * All of the available pipelines.
@@ -80,18 +76,5 @@ class Hub implements HubContract
     public function getContainer()
     {
         return $this->container;
-    }
-
-    /**
-     * Set the container instance used by the hub.
-     *
-     * @param  \Illuminate\Contracts\Container\Container  $container
-     * @return $this
-     */
-    public function setContainer(Container $container)
-    {
-        $this->container = $container;
-
-        return $this;
     }
 }

@@ -3,6 +3,7 @@
 namespace Illuminate\Log;
 
 use Closure;
+use Illuminate\Container\Concerns\HasApplication;
 use Illuminate\Log\Context\Repository as ContextRepository;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -28,14 +29,7 @@ use Throwable;
  */
 class LogManager implements LoggerInterface
 {
-    use ParsesLogConfiguration;
-
-    /**
-     * The application instance.
-     *
-     * @var \Illuminate\Contracts\Foundation\Application
-     */
-    protected $app;
+    use ParsesLogConfiguration, HasApplication;
 
     /**
      * The array of resolved channels.
@@ -765,19 +759,6 @@ class LogManager implements LoggerInterface
     public function log($level, $message, array $context = []): void
     {
         $this->driver()->log($level, $message, $context);
-    }
-
-    /**
-     * Set the application instance used by the manager.
-     *
-     * @param  \Illuminate\Contracts\Foundation\Application  $app
-     * @return $this
-     */
-    public function setApplication($app)
-    {
-        $this->app = $app;
-
-        return $this;
     }
 
     /**

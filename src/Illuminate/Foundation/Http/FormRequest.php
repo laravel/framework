@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Http;
 
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\Access\Response;
+use Illuminate\Container\Concerns\HasContainer;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Illuminate\Contracts\Validation\ValidatesWhenResolved;
@@ -14,14 +15,7 @@ use Illuminate\Validation\ValidatesWhenResolvedTrait;
 
 class FormRequest extends Request implements ValidatesWhenResolved
 {
-    use ValidatesWhenResolvedTrait;
-
-    /**
-     * The container instance.
-     *
-     * @var \Illuminate\Contracts\Container\Container
-     */
-    protected $container;
+    use ValidatesWhenResolvedTrait, HasContainer;
 
     /**
      * The redirector instance.
@@ -287,19 +281,6 @@ class FormRequest extends Request implements ValidatesWhenResolved
     public function setRedirector(Redirector $redirector)
     {
         $this->redirector = $redirector;
-
-        return $this;
-    }
-
-    /**
-     * Set the container implementation.
-     *
-     * @param  \Illuminate\Contracts\Container\Container  $container
-     * @return $this
-     */
-    public function setContainer(Container $container)
-    {
-        $this->container = $container;
 
         return $this;
     }

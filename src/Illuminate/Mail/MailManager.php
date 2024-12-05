@@ -5,6 +5,7 @@ namespace Illuminate\Mail;
 use Aws\Ses\SesClient;
 use Aws\SesV2\SesV2Client;
 use Closure;
+use Illuminate\Container\Concerns\HasApplication;
 use Illuminate\Contracts\Mail\Factory as FactoryContract;
 use Illuminate\Log\LogManager;
 use Illuminate\Mail\Transport\ArrayTransport;
@@ -34,12 +35,7 @@ use Symfony\Component\Mailer\Transport\Smtp\Stream\SocketStream;
  */
 class MailManager implements FactoryContract
 {
-    /**
-     * The application instance.
-     *
-     * @var \Illuminate\Contracts\Foundation\Application
-     */
-    protected $app;
+    use HasApplication;
 
     /**
      * The array of resolved mailers.
@@ -583,19 +579,6 @@ class MailManager implements FactoryContract
     public function getApplication()
     {
         return $this->app;
-    }
-
-    /**
-     * Set the application instance used by the manager.
-     *
-     * @param  \Illuminate\Contracts\Foundation\Application  $app
-     * @return $this
-     */
-    public function setApplication($app)
-    {
-        $this->app = $app;
-
-        return $this;
     }
 
     /**

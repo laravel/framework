@@ -3,6 +3,7 @@
 namespace Illuminate\Pipeline;
 
 use Closure;
+use Illuminate\Container\Concerns\HasContainer;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Pipeline\Pipeline as PipelineContract;
 use Illuminate\Support\Traits\Conditionable;
@@ -11,14 +12,7 @@ use Throwable;
 
 class Pipeline implements PipelineContract
 {
-    use Conditionable;
-
-    /**
-     * The container implementation.
-     *
-     * @var \Illuminate\Contracts\Container\Container|null
-     */
-    protected $container;
+    use Conditionable, HasContainer;
 
     /**
      * The object being passed through the pipeline.
@@ -232,19 +226,6 @@ class Pipeline implements PipelineContract
         }
 
         return $this->container;
-    }
-
-    /**
-     * Set the container instance.
-     *
-     * @param  \Illuminate\Contracts\Container\Container  $container
-     * @return $this
-     */
-    public function setContainer(Container $container)
-    {
-        $this->container = $container;
-
-        return $this;
     }
 
     /**

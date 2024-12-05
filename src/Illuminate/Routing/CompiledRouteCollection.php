@@ -2,6 +2,7 @@
 
 namespace Illuminate\Routing;
 
+use Illuminate\Container\Concerns\HasContainer;
 use Illuminate\Container\Container;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -14,6 +15,8 @@ use Symfony\Component\Routing\RequestContext;
 
 class CompiledRouteCollection extends AbstractRouteCollection
 {
+    use HasContainer;
+
     /**
      * The compiled routes collection.
      *
@@ -41,13 +44,6 @@ class CompiledRouteCollection extends AbstractRouteCollection
      * @var \Illuminate\Routing\Router
      */
     protected $router;
-
-    /**
-     * The container instance used by the route.
-     *
-     * @var \Illuminate\Container\Container
-     */
-    protected $container;
 
     /**
      * Create a new CompiledRouteCollection instance.
@@ -311,19 +307,6 @@ class CompiledRouteCollection extends AbstractRouteCollection
     public function setRouter(Router $router)
     {
         $this->router = $router;
-
-        return $this;
-    }
-
-    /**
-     * Set the container instance on the route.
-     *
-     * @param  \Illuminate\Container\Container  $container
-     * @return $this
-     */
-    public function setContainer(Container $container)
-    {
-        $this->container = $container;
 
         return $this;
     }

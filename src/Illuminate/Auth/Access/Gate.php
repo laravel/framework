@@ -5,6 +5,7 @@ namespace Illuminate\Auth\Access;
 use Closure;
 use Exception;
 use Illuminate\Auth\Access\Events\GateEvaluated;
+use Illuminate\Container\Concerns\HasContainer;
 use Illuminate\Contracts\Auth\Access\Gate as GateContract;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -19,14 +20,7 @@ use function Illuminate\Support\enum_value;
 
 class Gate implements GateContract
 {
-    use HandlesAuthorization;
-
-    /**
-     * The container instance.
-     *
-     * @var \Illuminate\Contracts\Container\Container
-     */
-    protected $container;
+    use HandlesAuthorization, HasContainer;
 
     /**
      * The user resolver callable.
@@ -884,19 +878,6 @@ class Gate implements GateContract
     public function defaultDenialResponse(Response $response)
     {
         $this->defaultDenialResponse = $response;
-
-        return $this;
-    }
-
-    /**
-     * Set the container instance used by the gate.
-     *
-     * @param  \Illuminate\Contracts\Container\Container  $container
-     * @return $this
-     */
-    public function setContainer(Container $container)
-    {
-        $this->container = $container;
 
         return $this;
     }
