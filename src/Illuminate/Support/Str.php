@@ -473,7 +473,7 @@ class Str
     }
 
     /**
-     * Formats a given string into a valid IBAN.
+     * Formats a given string into a valid PAN (Primary Account Number, which is used for  e.g. IBAN and credit card numbers).
      *
      * @param  string  $value
      * @return string
