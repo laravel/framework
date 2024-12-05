@@ -157,6 +157,18 @@ trait Matching
      */
     public function whereContains(string $key, $expected)
     {
+        if (is_string($expected)) {
+            PHPUnit::assertTrue(
+                str_contains($key, $expected),
+                sprintf(
+                    'Property [%s] does not contain string [%s].',
+                    $key,
+                    $expected
+                )
+            );
+            return $this;
+        }
+
         $actual = new Collection(
             $this->prop($key) ?? $this->prop()
         );

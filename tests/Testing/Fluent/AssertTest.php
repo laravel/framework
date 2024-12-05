@@ -580,6 +580,23 @@ class AssertTest extends TestCase
         $assert->where('bar', BackedEnum::test_empty);
     }
 
+    public function testAssertWhereContainsStringFailsWithEmptyValue()
+    {
+        $assert = AssertableJson::fromArray([]);
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Property [foo] does not contain string [b].');
+
+        $assert->whereContains('foo', 'b');
+    }
+
+    public function testAssertWhereContainsStringWithExistingValue()
+    {
+        $assert = AssertableJson::fromArray([]);
+
+        $assert->whereContains('foo', 'f');
+    }
+
     public function testAssertWhereContainsFailsWithEmptyValue()
     {
         $assert = AssertableJson::fromArray([]);
