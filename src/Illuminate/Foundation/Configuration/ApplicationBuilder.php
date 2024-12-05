@@ -12,6 +12,7 @@ use Illuminate\Foundation\Bootstrap\RegisterProviders;
 use Illuminate\Foundation\Events\DiagnosingHealth;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as AppEventServiceProvider;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as AppRouteServiceProvider;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
@@ -313,7 +314,7 @@ class ApplicationBuilder
         }
 
         $this->app->afterResolving(ConsoleKernel::class, function ($kernel) use ($commands) {
-            [$commands, $paths] = collect($commands)->partition(fn ($command) => class_exists($command));
+            [$commands, $paths] = (new Collection($commands))->partition(fn ($command) => class_exists($command));
             [$routes, $paths] = $paths->partition(fn ($path) => is_file($path));
 
             $this->app->booted(static function () use ($kernel, $commands, $paths, $routes) {

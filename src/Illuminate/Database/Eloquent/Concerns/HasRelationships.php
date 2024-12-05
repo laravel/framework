@@ -5,7 +5,7 @@ namespace Illuminate\Database\Eloquent\Concerns;
 use Closure;
 use Illuminate\Database\ClassMorphViolationException;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\PendingHasThroughRelationship;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -804,7 +804,7 @@ trait HasRelationships
                     $this->$relation->fireModelEvent('saved', false);
 
                     $this->$relation->touchOwners();
-                } elseif ($this->$relation instanceof Collection) {
+                } elseif ($this->$relation instanceof EloquentCollection) {
                     $this->$relation->each->touchOwners();
                 }
             }

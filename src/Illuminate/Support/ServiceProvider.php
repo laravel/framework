@@ -388,7 +388,7 @@ abstract class ServiceProvider
             return $paths;
         }
 
-        return collect(static::$publishes)->reduce(function ($paths, $p) {
+        return (new Collection(static::$publishes))->reduce(function ($paths, $p) {
             return array_merge($paths, $p);
         }, []);
     }
@@ -563,7 +563,7 @@ abstract class ServiceProvider
             opcache_invalidate($path, true);
         }
 
-        $providers = collect(require $path)
+        $providers = (new Collection(require $path))
             ->merge([$provider])
             ->unique()
             ->sort()

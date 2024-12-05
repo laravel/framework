@@ -4,7 +4,7 @@ namespace Illuminate\Database\Eloquent\Relations;
 
 use BadMethodCallException;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithDictionary;
 
@@ -96,7 +96,7 @@ class MorphTo extends BelongsTo
     #[\Override]
     public function addEagerConstraints(array $models)
     {
-        $this->buildDictionary($this->models = new Collection($models));
+        $this->buildDictionary($this->models = new EloquentCollection($models));
     }
 
     /**
@@ -105,7 +105,7 @@ class MorphTo extends BelongsTo
      * @param  \Illuminate\Database\Eloquent\Collection<int, TRelatedModel>  $models
      * @return void
      */
-    protected function buildDictionary(Collection $models)
+    protected function buildDictionary(EloquentCollection $models)
     {
         foreach ($models as $model) {
             if ($model->{$this->morphType}) {
@@ -201,7 +201,7 @@ class MorphTo extends BelongsTo
 
     /** @inheritDoc */
     #[\Override]
-    public function match(array $models, Collection $results, $relation)
+    public function match(array $models, EloquentCollection $results, $relation)
     {
         return $models;
     }
@@ -213,7 +213,7 @@ class MorphTo extends BelongsTo
      * @param  \Illuminate\Database\Eloquent\Collection<int, TRelatedModel>  $results
      * @return void
      */
-    protected function matchToMorphParents($type, Collection $results)
+    protected function matchToMorphParents($type, EloquentCollection $results)
     {
         foreach ($results as $result) {
             $ownerKey = ! is_null($this->ownerKey) ? $this->getDictionaryKey($result->{$this->ownerKey}) : $result->getKey();

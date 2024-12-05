@@ -8,6 +8,7 @@ use DateTimeZone;
 use Illuminate\Console\Application;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use ReflectionClass;
 use ReflectionFunction;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -50,7 +51,7 @@ class ScheduleListCommand extends Command
      */
     public function handle(Schedule $schedule)
     {
-        $events = collect($schedule->events());
+        $events = new Collection($schedule->events());
 
         if ($events->isEmpty()) {
             $this->components->info('No scheduled tasks have been defined.');
@@ -87,7 +88,7 @@ class ScheduleListCommand extends Command
     {
         $rows = $events->map(fn ($event) => array_map('mb_strlen', preg_split("/\s+/", $event->expression)));
 
-        return collect($rows[0] ?? [])->keys()->map(fn ($key) => $rows->max($key))->all();
+        return (new Collection($rows[0] ?? []))->keys()->map(fn ($key) => $rows->max($key))->all();
     }
 
     /**
@@ -244,7 +245,7 @@ class ScheduleListCommand extends Command
     {
         $expressions = preg_split("/\s+/", $expression);
 
-        return collect($spacing)
+        return (new Collection($spacing))
             ->map(fn ($length, $index) => str_pad($expressions[$index], $length))
             ->implode(' ');
     }

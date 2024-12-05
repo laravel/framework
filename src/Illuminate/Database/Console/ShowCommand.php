@@ -6,6 +6,7 @@ use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\Schema\Builder;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Number;
 use Symfony\Component\Console\Attribute\AsCommand;
 
@@ -75,7 +76,7 @@ class ShowCommand extends DatabaseInspectionCommand
      */
     protected function tables(ConnectionInterface $connection, Builder $schema)
     {
-        return collect($schema->getTables())->map(fn ($table) => [
+        return (new Collection($schema->getTables()))->map(fn ($table) => [
             'table' => $table['name'],
             'schema' => $table['schema'],
             'size' => $table['size'],
@@ -97,7 +98,7 @@ class ShowCommand extends DatabaseInspectionCommand
      */
     protected function views(ConnectionInterface $connection, Builder $schema)
     {
-        return collect($schema->getViews())
+        return (new Collection($schema->getViews()))
             ->reject(fn ($view) => str($view['name'])->startsWith(['pg_catalog', 'information_schema', 'spt_']))
             ->map(fn ($view) => [
                 'view' => $view['name'],
@@ -115,7 +116,7 @@ class ShowCommand extends DatabaseInspectionCommand
      */
     protected function types(ConnectionInterface $connection, Builder $schema)
     {
-        return collect($schema->getTypes())
+        return (new Collection($schema->getTypes()))
             ->map(fn ($type) => [
                 'name' => $type['name'],
                 'schema' => $type['schema'],

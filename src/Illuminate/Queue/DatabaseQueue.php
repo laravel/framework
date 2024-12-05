@@ -8,6 +8,7 @@ use Illuminate\Database\Connection;
 use Illuminate\Queue\Jobs\DatabaseJob;
 use Illuminate\Queue\Jobs\DatabaseJobRecord;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use PDO;
 
@@ -148,7 +149,7 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
 
         $now = $this->availableAt();
 
-        return $this->database->table($this->table)->insert(collect((array) $jobs)->map(
+        return $this->database->table($this->table)->insert((new Collection((array) $jobs))->map(
             function ($job) use ($queue, $data, $now) {
                 return $this->buildDatabaseRecord(
                     $queue,

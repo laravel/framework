@@ -369,7 +369,7 @@ class Vite implements Htmlable
      */
     public function __invoke($entrypoints, $buildDirectory = null)
     {
-        $entrypoints = collect($entrypoints);
+        $entrypoints = new Collection($entrypoints);
         $buildDirectory ??= $this->buildDirectory;
 
         if ($this->isRunningHot()) {
@@ -383,8 +383,8 @@ class Vite implements Htmlable
 
         $manifest = $this->manifest($buildDirectory);
 
-        $tags = collect();
-        $preloads = collect();
+        $tags = new Collection;
+        $preloads = new Collection;
 
         foreach ($entrypoints as $entrypoint) {
             $chunk = $this->chunk($manifest, $entrypoint);
@@ -463,12 +463,12 @@ class Vite implements Htmlable
 
         $discoveredImports = [];
 
-        return collect($entrypoints)
-            ->flatMap(fn ($entrypoint) => collect($manifest[$entrypoint]['dynamicImports'] ?? [])
+        return (new Collection($entrypoints))
+            ->flatMap(fn ($entrypoint) => (new Collection($manifest[$entrypoint]['dynamicImports'] ?? []))
                 ->map(fn ($import) => $manifest[$import])
                 ->filter(fn ($chunk) => str_ends_with($chunk['file'], '.js') || str_ends_with($chunk['file'], '.css'))
                 ->flatMap($f = function ($chunk) use (&$f, $manifest, &$discoveredImports) {
-                    return collect([...$chunk['imports'] ?? [], ...$chunk['dynamicImports'] ?? []])
+                    return (new Collection([...$chunk['imports'] ?? [], ...$chunk['dynamicImports'] ?? []]))
                         ->reject(function ($import) use (&$discoveredImports) {
                             if (isset($discoveredImports[$import])) {
                                 return true;
@@ -479,15 +479,15 @@ class Vite implements Htmlable
                         ->reduce(
                             fn ($chunks, $import) => $chunks->merge(
                                 $f($manifest[$import])
-                            ), collect([$chunk]))
-                        ->merge(collect($chunk['css'] ?? [])->map(
-                            fn ($css) => collect($manifest)->first(fn ($chunk) => $chunk['file'] === $css) ?? [
+                            ), new Collection([$chunk]))
+                        ->merge((new Collection($chunk['css'] ?? []))->map(
+                            fn ($css) => (new Collection($manifest))->first(fn ($chunk) => $chunk['file'] === $css) ?? [
                                 'file' => $css,
                             ],
                         ));
                 })
                 ->map(function ($chunk) use ($buildDirectory, $manifest) {
-                    return collect([
+                    return (new Collection([
                         ...$this->resolvePreloadTagAttributes(
                             $chunk['src'] ?? null,
                             $url = $this->assetPath("{$buildDirectory}/{$chunk['file']}"),
@@ -497,7 +497,7 @@ class Vite implements Htmlable
                         'rel' => 'prefetch',
                         'fetchpriority' => 'low',
                         'href' => $url,
-                    ])->reject(
+                    ]))->reject(
                         fn ($value) => in_array($value, [null, false], true)
                     )->mapWithKeys(fn ($value, $key) => [
                         $key = (is_int($key) ? $value : $key) => $value === true ? $key : $value,
