@@ -251,7 +251,7 @@ class SupportStrTest extends TestCase
         $this->assertSame(['uuid' => 'a1b2c3d4-e5f6-7890-1234-567890abcdef'], Str::extract('/users/a1b2c3d4-e5f6-7890-1234-567890abcdef/profile', '/users/{uuid}/profile'));
 
         // Edge cases
-        // $this->assertSame(['foo' => '{bar}'], Str::extract('{\\{bar}\\}', '*{foo}\\}'));
+        // $this->assertSame(['foo' => '{bar}'], Str::extract('{\\{bar}\\}', '*{foo}\\}')); //  ['foo' => '}'],
 
         $this->assertSame(['foo' => '{bar}'], Str::extract('{bar}', '{foo}'));
         $this->assertSame(['foo' => '{bar}'], Str::extract('foo bar {{bar}}', '* {{foo}}'));
