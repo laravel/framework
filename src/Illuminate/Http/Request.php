@@ -9,6 +9,7 @@ use Illuminate\Session\SymfonySessionDecorator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Exception\SessionNotFoundException;
@@ -27,6 +28,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
         Concerns\InteractsWithContentTypes,
         Concerns\InteractsWithFlashData,
         Concerns\InteractsWithInput,
+        Conditionable,
         Macroable;
 
     /**
@@ -366,27 +368,6 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
         return $this->merge((new Collection($input))->filter(function ($value, $key) {
             return $this->missing($key);
         })->toArray());
-    }
-
-    /**
-     * Apply the callback if the given "value" is (or resolves to) truthy.
-     *
-     * @param  Closure|null  $value
-     * @param  callable|null  $callback
-     * @param  callable|null  $default
-     * @return $this
-     */
-    public function when($value = null, ?callable $callback = null, ?callable $default = null)
-    {
-        $value = $value instanceof Closure ? $value($this) : $value;
-
-        if ($value) {
-            return $callback($this, $value) ?? $this;
-        } elseif ($default) {
-            return $default($this, $value) ?? $this;
-        }
-
-        return $this;
     }
 
     /**
