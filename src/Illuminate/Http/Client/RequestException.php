@@ -34,7 +34,7 @@ class RequestException extends HttpClientException
     }
 
     /**
-     * Enable truncation of the exception message.
+     * Enable truncation of request exception messages.
      *
      * @return void
      */
@@ -44,24 +44,24 @@ class RequestException extends HttpClientException
     }
 
     /**
-     * Disable truncation of the exception message.
+     * Set the truncation length for request exception messages.
+     *
+     * @param  int  $length
+     * @return void
+     */
+    public static function truncateAt(int $length)
+    {
+        static::$truncateAt = $length;
+    }
+
+    /**
+     * Disable truncation of request exception messages.
      *
      * @return void
      */
     public static function dontTruncate()
     {
         static::$truncateAt = false;
-    }
-
-    /**
-     * Set the truncation length for the exception message.
-     *
-     * @param  int  $length
-     * @return void
-     */
-    public static function truncateAt($length)
-    {
-        static::$truncateAt = $length;
     }
 
     /**
