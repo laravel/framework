@@ -369,6 +369,27 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
+     * Apply the callback if the given "value" is (or resolves to) truthy.
+     *
+     * @param  Closure|null  $value
+     * @param  callable|null  $callback
+     * @param  callable|null  $default
+     * @return $this
+     */
+    public function when($value = null, ?callable $callback = null, ?callable $default = null)
+    {
+        $value = $value instanceof Closure ? $value($this) : $value;
+
+        if ($value) {
+            return $callback($this, $value) ?? $this;
+        } elseif ($default) {
+            return $default($this, $value) ?? $this;
+        }
+
+        return $this;
+    }
+
+    /**
      * Replace the input values for the current request.
      *
      * @param  array  $input
