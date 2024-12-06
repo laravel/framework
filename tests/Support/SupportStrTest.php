@@ -224,7 +224,6 @@ class SupportStrTest extends TestCase
         $this->assertSame(['area_code' => '800'], Str::extract("Phone Number: 1-(800)-555-5555", "*1-({area_code})-*"));
         $this->assertSame(['email' => 'john.doe@example.com'], Str::extract('Contact us at john.doe@example.com.', '* at {email}.'));
         $this->assertSame(['user_id' => '1', 'post_id' => '2'], Str::extract("/users/1/posts/2", "/users/{user_id}/posts/{post_id}"));
-
         $this->assertSame(['day' => '1st', 'month' => 'January'], Str::extract("My birthday is on the 1st of January", "My birthday is on the {day} of {month}"));
         $this->assertSame(['street' => '123 Main St', 'city' => 'Anytown', 'region' =>'CA'], Str::extract('The address is 123 Main St, Anytown, CA.', '*address is {street}, {city}, {region}.'));
 
