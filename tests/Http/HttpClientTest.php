@@ -402,6 +402,21 @@ class HttpClientTest extends TestCase
         $this->assertEquals(collect(), $response->collect('missing_key'));
     }
 
+    public function testResponseCanBeReturnedAsFluent()
+    {
+        $this->factory->fake([
+            '*' => ['result' => ['foo' => 'bar']],
+        ]);
+
+        $response = $this->factory->get('http://foo.com/api');
+
+        $this->assertInstanceOf(Fluent::class, $response->fluent());
+        $this->assertEquals(fluent(['result' => ['foo' => 'bar']]), $response->fluent());
+        $this->assertEquals(fluent(['foo' => 'bar']), $response->fluent('result'));
+        $this->assertEquals(fluent(['bar']), $response->fluent('result.foo'));
+        $this->assertEquals(fluent([]), $response->fluent('missing_key'));
+    }
+
     public function testSendRequestBodyAsJsonByDefault()
     {
         $body = '{"test":"phpunit"}';
