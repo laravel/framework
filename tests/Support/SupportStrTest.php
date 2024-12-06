@@ -221,6 +221,7 @@ class SupportStrTest extends TestCase
     {
         // Basic extraction
         $this->assertSame(['last_4' => '5000'], Str::extract('4242-4242-4242-5000', '*-*-*-{last_4}'));
+        $this->assertSame(['last_4' => '{5000}'], Str::extract('4242-4242-4242-{5000}', '*-*-*-{last_4}'));
         $this->assertSame(['area_code' => '800'], Str::extract('Phone Number: 1-(800)-555-5555', '*1-({area_code})-*'));
         $this->assertSame(['email' => 'john.doe@example.com'], Str::extract('Contact us at john.doe@example.com.', '* at {email}.'));
         $this->assertSame(['user_id' => '1', 'post_id' => '2'], Str::extract('/users/1/posts/2', '/users/{user_id}/posts/{post_id}'));
@@ -229,16 +230,16 @@ class SupportStrTest extends TestCase
 
         // Extraction with wildcard
         $this->assertSame(['user_id' => '1', 'post_id' => '2'], Str::extract('/users/1/posts/2', '/users/{user_id}/posts/{post_id}'));
-        $this->assertSame(['user_id' => '1', 'post_id' => '2'], Str::extract('/users/1/posts/2', '/users/{user_id}*/posts/{post_id}'));
-        $this->assertSame(['user_id' => '1', 'post_id' => '2'], Str::extract('/users/1/posts/2/comments', '/users/{user_id}/posts/{post_id}*'));
-        $this->assertSame(['user_id' => '1', 'post_id' => '2'], Str::extract('https://foo.com/users/1/posts/2/comments', '*users/{user_id}/posts/{post_id}*'));
+        $this->assertSame(['user_id' => '1', 'post_id' => '2'], Str::extract('/users/1/posts/2', '/users/{user_id}*posts/{post_id}'));
+        $this->assertSame(['user_id' => '1', 'post_id' => '2'], Str::extract('/users/1/posts/2/comments', '/users/{user_id}/posts/{post_id}/*'));
+        $this->assertSame(['user_id' => '1', 'post_id' => '2'], Str::extract('https://foo.com/users/1/posts/2/comments', '*users/{user_id}/posts/{post_id}/*'));
 
         // Extraction with different characters
         $this->assertSame(['user_id' => '1?', 'post_id' => '2-'], Str::extract('/users/1?/posts/2-', '/users/{user_id}/posts/{post_id}'));
         $this->assertSame(['user_id' => '1_a', 'post_id' => '2.b'], Str::extract('/users/1_a/posts/2.b', '/users/{user_id}/posts/{post_id}'));
 
         // Extraction with multiple wildcards
-        $this->assertSame(['user_id' => '1', 'post_id' => '2'], Str::extract('/users/1/posts/2/comments/3', '/users/{user_id}/posts/{post_id}*'));
+        $this->assertSame(['user_id' => '1', 'post_id' => '2'], Str::extract('/users/1/posts/2/comments/3', '/users/{user_id}/posts/{post_id}/*'));
         $this->assertSame(['user_id' => '1', 'post_id' => '2', 'comment_id' => '3'], Str::extract('/users/1/posts/2/comments/3/replies/4', '/users/{user_id}/posts/{post_id}*/comments/{comment_id}*'));
         $this->assertSame(['user_id' => '1', 'comment_id' => '3'], Str::extract('/users/1/posts/2/comments/3/replies/4', '*users/{user_id}/*/comments/{comment_id}*'));
 
@@ -250,6 +251,14 @@ class SupportStrTest extends TestCase
         $this->assertSame(['uuid' => 'a1b2c3d4-e5f6-7890-1234-567890abcdef'], Str::extract('/users/a1b2c3d4-e5f6-7890-1234-567890abcdef/profile', '/users/{uuid}/profile'));
 
         // Edge cases
+        // $this->assertSame(['foo' => '{bar}'], Str::extract('{\\{bar}\\}', '*{foo}\\}'));
+
+        $this->assertSame(['foo' => '{bar}'], Str::extract('{bar}', '{foo}'));
+        $this->assertSame(['foo' => '{bar}'], Str::extract('foo bar {{bar}}', '* {{foo}}'));
+        $this->assertSame(['foo' => '{{bar}}'], Str::extract('foo bar {{{bar}}}', '* {{foo}}'));
+        $this->assertSame(['foo' => 'bar'], Str::extract('{(|\*&!@$/\bar/|}', '*\{foo}/*'));
+        $this->assertSame(['foo' => 'bar'], Str::extract('{(|\*&!@$/\bar/|}', '{(|\*&!@$/\{foo}/|}'));
+
         $this->assertSame([], Str::extract('/users/1/posts/2', '')); // Empty pattern
         $this->assertSame([], Str::extract('', '/users/{user_id}/posts/{post_id}')); // Empty haystack
         $this->assertSame([], Str::extract('/users/1/posts', '/users/{user_id}/posts/{post_id}')); // Missing segment in haystack
