@@ -303,7 +303,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      */
     public function extract($pattern)
     {
-        return Str::extract($pattern, $this->value);
+        return Str::extract($this->value, $pattern);
     }
 
     /**
