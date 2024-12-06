@@ -482,7 +482,11 @@ class Str
     {
         $value = (string) $value;
 
-        return join(' ', str_split($value, 4));
+        return trim(chunk_split(
+            str_replace(' ', '', $value),
+            4,
+            ' '
+        ));
     }
 
     /**
