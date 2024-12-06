@@ -119,8 +119,8 @@ class Storage extends Facade
     /**
      * Replace the given disk with a persistent local testing disk.
      *
-     * @param  string|null $disk
-     * @param  array $config
+     * @param  string|null  $disk
+     * @param  array  $config
      * @return \Illuminate\Contracts\Filesystem\Filesystem
      */
     public static function persistentFake($disk = null, array $config = [])
