@@ -2,7 +2,6 @@
 
 namespace Illuminate\Queue\Middleware;
 
-
 trait HasMiddlewareHooks
 {
     /**
