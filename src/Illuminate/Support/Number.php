@@ -301,11 +301,11 @@ class Number
      */
     public static function duration(int|float $seconds)
     {
-        $duration = $seconds;
+        $duration = (int) $seconds;
 
         $hours = intdiv($duration, 3600);
         $minutes = intdiv($duration % 3600, 60);
-        $seconds = $duration % 60;
+        $seconds = ((int) $duration) % 60;
 
         if ($hours > 0) {
             return sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
