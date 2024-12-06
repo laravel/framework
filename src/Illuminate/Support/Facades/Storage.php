@@ -96,9 +96,9 @@ class Storage extends Facade
      */
     public static function fake($disk = null, array $config = [])
     {
-        $disk = $disk ?: static::$app['config']->get('filesystems.default');
-
-        $root = storage_path('framework/testing/disks/'.$disk);
+        $disk   = $disk ?: static::$app['config']->get('filesystems.default');
+        $root   = storage_path('framework/testing/disks/' . $disk);
+        $config = self::assembleConfig($disk, $config, $root);
 
         if ($token = ParallelTesting::token()) {
             $root = "{$root}_test_{$token}";
@@ -106,29 +106,32 @@ class Storage extends Facade
 
         (new Filesystem)->cleanDirectory($root);
 
-        static::set($disk, $fake = static::createLocalDriver(array_merge($config, [
-            'root' => $root,
-        ])));
+        static::set(
+            $disk,
+            $fake = static::createLocalDriver($config)
+        );
 
         return tap($fake)->buildTemporaryUrlsUsing(function ($path, $expiration) {
-            return URL::to($path.'?expiration='.$expiration->getTimestamp());
+            return URL::to($path . '?expiration=' . $expiration->getTimestamp());
         });
     }
 
     /**
      * Replace the given disk with a persistent local testing disk.
      *
-     * @param  string|null  $disk
-     * @param  array  $config
+     * @param string|null $disk
+     * @param array       $config
      * @return \Illuminate\Contracts\Filesystem\Filesystem
      */
     public static function persistentFake($disk = null, array $config = [])
     {
-        $disk = $disk ?: static::$app['config']->get('filesystems.default');
+        $disk   = $disk ?: static::$app['config']->get('filesystems.default');
+        $config = self::assembleConfig($disk, $config, storage_path('framework/testing/disks/' . $disk));
 
-        static::set($disk, $fake = static::createLocalDriver(array_merge($config, [
-            'root' => storage_path('framework/testing/disks/'.$disk),
-        ])));
+        static::set(
+            $disk,
+            $fake = static::createLocalDriver($config)
+        );
 
         return $fake;
     }
@@ -141,5 +144,12 @@ class Storage extends Facade
     protected static function getFacadeAccessor()
     {
         return 'filesystem';
+    }
+
+    private static function assembleConfig(string $disk, array $configOverWrite, string $rootPath): array
+    {
+        $originalConfig = static::$app['config']["filesystems.disks.{$disk}"] ?? [];
+        $throw          = $originalConfig['throw'] ?? false;
+        return array_merge(['throw' => $throw], $configOverWrite, ['root' => $rootPath]);
     }
 }
