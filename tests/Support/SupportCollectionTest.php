@@ -258,6 +258,20 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testFirstWhereUsingEnum($collection)
+    {
+        $data = new $collection([
+            ['id' => 1, 'name' => StaffEnum::Taylor],
+            ['id' => 2, 'name' => StaffEnum::Joe],
+            ['id' => 3, 'name' => StaffEnum::James],
+        ]);
+
+        $this->assertSame(1, $data->firstWhere('name', 'Taylor')['id']);
+        $this->assertSame(2, $data->firstWhere('name', StaffEnum::Joe)['id']);
+        $this->assertSame(3, $data->firstWhere('name', StaffEnum::James)['id']);
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testLastReturnsLastItemInCollection($collection)
     {
         $c = new $collection(['foo', 'bar']);
@@ -1128,6 +1142,15 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['value' => 'foo'], $c->value('pivot'));
         $this->assertEquals('foo', $c->value('pivot.value'));
         $this->assertEquals('bar', $c->where('id', 2)->value('pivot.value'));
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testValueUsingEnum($collection)
+    {
+        $c = new $collection([['id' => 1, 'name' => StaffEnum::Taylor], ['id' => 2, 'name' => StaffEnum::Joe]]);
+
+        $this->assertSame(StaffEnum::Taylor, $c->value('name'));
+        $this->assertEquals(StaffEnum::Joe, $c->where('id', 2)->value('name'));
     }
 
     #[DataProvider('collectionClassProvider')]
@@ -5736,4 +5759,10 @@ class TestCollectionMapIntoObject
 class TestCollectionSubclass extends Collection
 {
     //
+}
+
+enum StaffEnum {
+    case Taylor;
+    case Joe;
+    case James;
 }
