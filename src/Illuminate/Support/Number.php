@@ -301,7 +301,7 @@ class Number
      */
     public static function duration(int|float $seconds)
     {
-        $duration = (int) $seconds;
+        $duration = (int) abs($seconds);
 
         $hours = intdiv($duration, 3600);
         $minutes = intdiv($duration % 3600, 60);

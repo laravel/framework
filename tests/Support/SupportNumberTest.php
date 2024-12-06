@@ -332,6 +332,7 @@ class SupportNumberTest extends TestCase
         $this->assertSame('05:00', Number::duration(300));
         $this->assertSame('59:59', Number::duration(3599));
         $this->assertSame('01:00:00', Number::duration(3600));
+        $this->assertSame('01:00:00', Number::duration(-3600));
         $this->assertSame('8760:00:00', Number::duration(3.1536e+7));
     }
 }
