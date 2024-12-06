@@ -5761,7 +5761,8 @@ class TestCollectionSubclass extends Collection
     //
 }
 
-enum StaffEnum {
+enum StaffEnum
+{
     case Taylor;
     case Joe;
     case James;
