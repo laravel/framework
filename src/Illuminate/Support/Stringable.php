@@ -296,7 +296,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
-     * Extract values from the haystack using the given template pattern.
+     * Extract values in the string matching the given template pattern.
      *
      * @param  string  $pattern
      * @return array
