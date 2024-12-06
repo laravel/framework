@@ -55,4 +55,3 @@ class StorageFacadeTest extends TestCase
         $this->assertNull($result);
     }
 }
-
