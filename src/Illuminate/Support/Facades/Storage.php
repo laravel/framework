@@ -96,8 +96,8 @@ class Storage extends Facade
      */
     public static function fake($disk = null, array $config = [])
     {
-        $disk   = $disk ?: static::$app['config']->get('filesystems.default');
-        $root   = storage_path('framework/testing/disks/' . $disk);
+        $disk = $disk ?: static::$app['config']->get('filesystems.default');
+        $root = self::getRootPath($disk);
         $config = self::assembleConfig($disk, $config, $root);
 
         if ($token = ParallelTesting::token()) {
@@ -112,21 +112,21 @@ class Storage extends Facade
         );
 
         return tap($fake)->buildTemporaryUrlsUsing(function ($path, $expiration) {
-            return URL::to($path . '?expiration=' . $expiration->getTimestamp());
+            return URL::to($path.'?expiration='.$expiration->getTimestamp());
         });
     }
 
     /**
      * Replace the given disk with a persistent local testing disk.
      *
-     * @param string|null $disk
-     * @param array       $config
+     * @param  string|null $disk
+     * @param  array       $config
      * @return \Illuminate\Contracts\Filesystem\Filesystem
      */
     public static function persistentFake($disk = null, array $config = [])
     {
-        $disk   = $disk ?: static::$app['config']->get('filesystems.default');
-        $config = self::assembleConfig($disk, $config, storage_path('framework/testing/disks/' . $disk));
+        $disk = $disk ?: static::$app['config']->get('filesystems.default');
+        $config = self::assembleConfig($disk, $config, self::getRootPath($disk));
 
         static::set(
             $disk,
@@ -149,7 +149,13 @@ class Storage extends Facade
     private static function assembleConfig(string $disk, array $configOverWrite, string $rootPath): array
     {
         $originalConfig = static::$app['config']["filesystems.disks.{$disk}"] ?? [];
-        $throw          = $originalConfig['throw'] ?? false;
+        $throw = $originalConfig['throw'] ?? false;
+
         return array_merge(['throw' => $throw], $configOverWrite, ['root' => $rootPath]);
+    }
+
+    private static function getRootPath(string $disk): string
+    {
+        return storage_path('framework/testing/disks/'.$disk);
     }
 }
