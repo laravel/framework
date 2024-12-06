@@ -451,7 +451,7 @@ class Str
 
         $pattern = static::replace("*", ".*", $pattern);
 
-        if (preg_match("/$pattern/i", $haystack, $matches)) {
+        if (preg_match("/^$pattern$/i", $haystack, $matches)) {
             return array_intersect_key($matches, $placeholders->flip()->all());
         }
 
