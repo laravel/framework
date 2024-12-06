@@ -639,7 +639,7 @@ trait MakesHttpRequests
      */
     protected function transformHeadersToServerVars(array $headers)
     {
-        return (new Collection(array_merge($this->defaultHeaders, $headers)))->mapWithKeys(function ($value, $name) {
+        return (new Collection($this->defaultHeaders))->merge($headers)->mapWithKeys(function ($value, $name) {
             $name = strtr(strtoupper($name), '-', '_');
 
             return [$this->formatServerHeaderKey($name) => $value];

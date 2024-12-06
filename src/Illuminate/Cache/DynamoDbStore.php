@@ -156,9 +156,9 @@ class DynamoDbStore implements LockProvider, Store
 
         $now = Carbon::now();
 
-        return array_merge((new Collection(array_flip($keys)))->map(function () {
+        return (new Collection($keys))->flip()->map(function () {
             //
-        })->all(), (new Collection($response['Responses'][$this->table]))->mapWithKeys(function ($response) use ($now) {
+        })->merge((new Collection($response['Responses'][$this->table]))->mapWithKeys(function ($response) use ($now) {
             if ($this->isExpired($response, $now)) {
                 $value = null;
             } else {
@@ -170,7 +170,7 @@ class DynamoDbStore implements LockProvider, Store
             }
 
             return [Str::replaceFirst($this->prefix, '', $response[$this->keyAttribute]['S']) => $value];
-        })->all());
+        }))->all();
     }
 
     /**
