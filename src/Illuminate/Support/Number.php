@@ -294,6 +294,27 @@ class Number
     }
 
     /**
+     * Convert the given number to its formatted duration equivalent.
+     *
+     * @param  int|float  $seconds
+     * @return string
+     */
+    public static function duration(int|float $seconds)
+    {
+        $duration = $seconds;
+
+        $hours = intdiv($duration, 3600);
+        $minutes = intdiv($duration % 3600, 60);
+        $seconds = $duration % 60;
+
+        if ($hours > 0) {
+            return sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
+        } else {
+            return sprintf('%02d:%02d', $minutes, $seconds);
+        }
+    }
+
+    /**
      * Execute the given callback using the given locale.
      *
      * @param  string  $locale

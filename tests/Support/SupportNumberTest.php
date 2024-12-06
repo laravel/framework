@@ -322,4 +322,16 @@ class SupportNumberTest extends TestCase
         $this->assertSame(12.3456789, Number::trim(12.3456789));
         $this->assertSame(12.3456789, Number::trim(12.34567890000));
     }
+
+    public function testDuration()
+    {
+        $this->assertSame('00:00', Number::duration(0));
+        $this->assertSame('00:00', Number::duration(-0));
+        $this->assertSame('00:00', Number::duration(0.1));
+        $this->assertSame('00:05', Number::duration(5));
+        $this->assertSame('05:00', Number::duration(300));
+        $this->assertSame('59:59', Number::duration(3599));
+        $this->assertSame('01:00:00', Number::duration(3600));
+        $this->assertSame('8760:00:00', Number::duration(3.1536e+7));
+    }
 }
