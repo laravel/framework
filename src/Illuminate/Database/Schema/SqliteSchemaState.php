@@ -45,10 +45,9 @@ class SqliteSchemaState extends SchemaState
             //
         ]));
 
-        $migrations = (new Collection(preg_split("/\r\n|\n|\r/", $process->getOutput())))->filter(function ($line) {
-            return preg_match('/^\s*(--|INSERT\s)/iu', $line) === 1 &&
-                   strlen($line) > 0;
-        })->all();
+        $migrations = (new Collection(preg_split("/\r\n|\n|\r/", $process->getOutput())))
+            ->filter(fn ($line) => preg_match('/^\s*(--|INSERT\s)/iu', $line) === 1 && strlen($line) > 0)
+            ->all();
 
         $this->files->append($path, implode(PHP_EOL, $migrations).PHP_EOL);
     }

@@ -91,9 +91,9 @@ trait SerializesAndRestoresModelIdentifiers
         $collectionClass = get_class($collection);
 
         return new $collectionClass(
-            (new Collection($value->id))->map(function ($id) use ($collection) {
-                return $collection[$id] ?? null;
-            })->filter()
+            (new Collection($value->id))
+                ->map(fn ($id) => $collection[$id] ?? null)
+                ->filter()
         );
     }
 

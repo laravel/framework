@@ -444,11 +444,10 @@ class MySqlGrammar extends Grammar
      */
     public function prepareBindingsForUpdate(array $bindings, array $values)
     {
-        $values = (new Collection($values))->reject(function ($value, $column) {
-            return $this->isJsonSelector($column) && is_bool($value);
-        })->map(function ($value) {
-            return is_array($value) ? json_encode($value) : $value;
-        })->all();
+        $values = (new Collection($values))
+            ->reject(fn ($value, $column) => $this->isJsonSelector($column) && is_bool($value))
+            ->map(fn ($value) => is_array($value) ? json_encode($value) : $value)
+            ->all();
 
         return parent::prepareBindingsForUpdate($bindings, $values);
     }

@@ -1008,9 +1008,10 @@ class PendingRequest
      */
     protected function parseMultipartBodyFormat(array $data)
     {
-        return (new Collection($data))->map(function ($value, $key) {
-            return is_array($value) ? $value : ['name' => $key, 'contents' => $value];
-        })->values()->all();
+        return (new Collection($data))
+            ->map(fn ($value, $key) => is_array($value) ? $value : ['name' => $key, 'contents' => $value])
+            ->values()
+            ->all();
     }
 
     /**
