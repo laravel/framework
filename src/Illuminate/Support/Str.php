@@ -427,28 +427,28 @@ class Str
     /**
      * Extract values from the haystack using the given template pattern.
      *
-     * @param string $haystack
-     * @param string $pattern
+     * @param  string  $haystack
+     * @param  string  $pattern
      * @return array
      */
     public static function extract($haystack, $pattern)
     {
         $pattern = static::replace(
-            ["\*", "\{", "\}"], ["*", "{", "}"],
-            preg_quote($pattern, "/")
+            ['\*', '\{', '\}'], ['*', '{', '}'],
+            preg_quote($pattern, '/')
         );
 
         $placeholders = static::matchAll("/\{(.*?)}/", $pattern);
 
         foreach ($placeholders as $placeholder) {
             $pattern = static::replace(
-                "{".$placeholder."}",
-                "(?<".$placeholder.">[^\/]+)",
+                '{'.$placeholder.'}',
+                '(?<'.$placeholder.'>[^\/]+)',
                 $pattern,
             );
         }
 
-        $pattern = static::replace("*", ".*", $pattern);
+        $pattern = static::replace('*', '.*', $pattern);
 
         if (preg_match("/^$pattern$/i", $haystack, $matches)) {
             return array_intersect_key($matches, $placeholders->flip()->all());
