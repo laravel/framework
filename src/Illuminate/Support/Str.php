@@ -433,12 +433,13 @@ class Str
      */
     public static function extract($haystack, $pattern)
     {
+        $placeholders = static::matchAll('/\{([^{}]+)}/', $pattern);
+
         $pattern = static::replace(
-            ['\*', '\{', '\}'], ['*', '{', '}'],
+            ['\*', '\{', '\}'],
+            ['*', '{', '}'],
             preg_quote($pattern, '/')
         );
-
-        $placeholders = static::matchAll("/\{(.*?)}/", $pattern);
 
         foreach ($placeholders as $placeholder) {
             $pattern = static::replace(
