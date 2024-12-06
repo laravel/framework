@@ -296,6 +296,17 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Extract values from the haystack using the given template pattern.
+     *
+     * @param string $pattern
+     * @return array
+     */
+    public function extract($pattern)
+    {
+        return Str::extract($pattern, $this->value);
+    }
+
+    /**
      * Explode the string into a collection.
      *
      * @param  string  $delimiter
