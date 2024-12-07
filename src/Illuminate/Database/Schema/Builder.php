@@ -585,6 +585,17 @@ class Builder
     }
 
     /**
+     * Qualify the given table name with the prefix and connection's default schema name.
+     *
+     * @param  string  $table
+     * @return string
+     */
+    public function schemaQualifyTable(string $table): string
+    {
+        return $this->connection->getTablePrefix().$table;
+    }
+
+    /**
      * Get the database connection instance.
      *
      * @return \Illuminate\Database\Connection

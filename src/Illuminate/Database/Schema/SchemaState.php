@@ -111,7 +111,7 @@ abstract class SchemaState
      */
     protected function getMigrationTable(): string
     {
-        return $this->connection->getTablePrefix().$this->migrationTable;
+        return $this->connection->getSchemaBuilder()->schemaQualifyTable($this->migrationTable);
     }
 
     /**

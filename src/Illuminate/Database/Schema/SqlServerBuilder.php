@@ -175,4 +175,19 @@ class SqlServerBuilder extends Builder
 
         return $parts;
     }
+
+    /**
+     * Qualify the given table name with the prefix and connection's default schema name.
+     *
+     * @param  string  $table
+     * @return string
+     */
+    public function schemaQualifyTable(string $table): string
+    {
+        [$schema, $table] = $this->parseSchemaAndTable($table);
+
+        $schema ??= $this->getDefaultSchema();
+
+        return $schema.'.'.$this->connection->getTablePrefix().$table;
+    }
 }
