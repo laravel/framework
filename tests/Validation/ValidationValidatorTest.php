@@ -3906,10 +3906,10 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['name' => 'Bar'], ['name' => 'includes:bar']);
         $this->assertFalse($v->passes());
 
-        $v = new Validator($trans, ['name' => 'Foo'], ['name' => 'contains:Foo']);
+        $v = new Validator($trans, ['name' => 'Foo'], ['name' => 'includes:Foo']);
         $this->assertTrue($v->passes());
 
-        $v = new Validator($trans, ['name' => 'Bar'], ['name' => 'contains:ar']);
+        $v = new Validator($trans, ['name' => 'Bar'], ['name' => 'includes:ar']);
         $this->assertTrue($v->passes());
     }
 
