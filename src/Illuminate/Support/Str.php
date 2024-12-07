@@ -444,7 +444,7 @@ class Str
         foreach ($placeholders as $placeholder) {
             $pattern = static::replace(
                 '{'.$placeholder.'}',
-                '(?<'.$placeholder.'>[^\/]+)',
+                '(?<'.$placeholder.'>.*?)',
                 $pattern,
             );
         }
