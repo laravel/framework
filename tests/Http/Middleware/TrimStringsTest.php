@@ -243,7 +243,7 @@ class TrimStringsTest extends TestCase
 
         $middleware = new TrimStringsWithExceptAttribute;
 
-        $middleware->handle($request, function ($req) use($text) {
+        $middleware->handle($request, function ($req) use ($text) {
             $this->assertSame($text, $req->title);
             $this->assertSame($text, $req->about);
             $this->assertSame(Str::trim($text), $req->summary); // Assert that the summary is trimmed
