@@ -249,16 +249,16 @@ class SupportStrTest extends TestCase
         $this->assertSame(['file_name' => 'my_file_(1).txt'], Str::extract('/path/to/my_file_(1).txt', '/path/to/{file_name}'));
         $this->assertSame(['product_id' => 'abc-123', 'category' => 'electronics'], Str::extract('/products/abc-123/electronics', '/products/{product_id}/{category}'));
         $this->assertSame(['uuid' => 'a1b2c3d4-e5f6-7890-1234-567890abcdef'], Str::extract('/users/a1b2c3d4-e5f6-7890-1234-567890abcdef/profile', '/users/{uuid}/profile'));
-        //  Extraction with UUIDs
 
         // Edge cases
         $this->assertSame(['foo' => '{bar}'], Str::extract('{bar}', '{foo}'));
         $this->assertSame(['foo' => '{bar}'], Str::extract('{\\{bar}\\}', '*{\{foo}\}*'));
         $this->assertSame(['foo' => '{bar}'], Str::extract('foo bar* {{bar}}', '* {{foo}}'));
-        $this->assertSame(['foo' => 'bar'], Str::extract('{(|\*&!@$/\bar/|*}', '*\{foo}/*'));
+        $this->assertSame(['foo' => 'bar'], Str::extract('{(|\*&!@$/\bar/|*}', '*/\{foo}/*'));
         $this->assertSame(['foo' => '{{bar}}'], Str::extract('foo bar {{{bar}}}', '* {{foo}}'));
         $this->assertSame(['foo' => 'bar'], Str::extract('{(|\*&!@$/\bar/|}', '{(|\*&!@$/\{foo}/|}'));
         $this->assertSame(['foo' => '{bar}'], Str::extract('Example: \\{{bar}\\}', 'Example: \\{{foo}\\}'));
+        $this->assertSame(['first' => '131415*\\', 'second' => '\\d+d'], Str::extract('123/131415*\\/\\d+d/7\\8\\9/101112', '*/{first}/{second}/*'));
 
         $this->assertSame([], Str::extract('/users/1/posts/2', '')); // Empty pattern
         $this->assertSame([], Str::extract('', '/users/{user_id}/posts/{post_id}')); // Empty haystack

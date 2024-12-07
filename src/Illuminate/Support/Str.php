@@ -435,21 +435,21 @@ class Str
     {
         $placeholders = static::matchAll('/\{([^{}]+)}/', $pattern);
 
-        $pattern = static::replace(
-            ['\*', '\{', '\}'],
-            ['*', '{', '}'],
-            preg_quote($pattern, '/')
-        );
+        $pattern = preg_quote($pattern, '/');
 
         foreach ($placeholders as $placeholder) {
             $pattern = static::replace(
-                '{'.$placeholder.'}',
-                '(?<'.$placeholder.'>.*?)',
+                preg_quote('{'.$placeholder.'}', '/'),
+                '(?<'.$placeholder.'>[^\/]+?)',
                 $pattern,
             );
         }
 
-        $pattern = static::replace('*', '.*', $pattern);
+        $pattern = static::replace(
+            ['\*', '\{', '\}'],
+            ['.*?', '{', '}'],
+            $pattern
+        );
 
         if (preg_match("/^$pattern$/i", $haystack, $matches)) {
             return array_intersect_key($matches, $placeholders->flip()->all());
