@@ -3894,22 +3894,25 @@ class ValidationValidatorTest extends TestCase
     {
         $trans = $this->getIlluminateArrayTranslator();
 
-        $v = new Validator($trans, ['name' => 'foo'], ['name' => 'includes:bar']);
+        $v = new Validator($trans, ['name' => 'foo'], ['name' => 'str_contains:bar']);
         $this->assertFalse($v->passes());
 
-        $v = new Validator($trans, ['name' => 'foo'], ['name' => 'includes:baz']);
+        $v = new Validator($trans, ['name' => 'foo'], ['name' => 'str_contains:baz']);
         $this->assertFalse($v->passes());
 
-        $v = new Validator($trans, ['name' => 'Hello World'], ['name' => 'includes:HELLO WORLD']);
+        $v = new Validator($trans, ['name' => 'Hello World'], ['name' => 'str_contains:HELLO WORLD']);
         $this->assertFalse($v->passes());
 
-        $v = new Validator($trans, ['name' => 'Bar'], ['name' => 'includes:bar']);
+        $v = new Validator($trans, ['name' => 'Bar'], ['name' => 'str_contains:bar']);
         $this->assertFalse($v->passes());
 
-        $v = new Validator($trans, ['name' => 'Foo'], ['name' => 'includes:Foo']);
+        $v = new Validator($trans, ['name' => 'Hello World'], ['name' => 'str_contains:ello,or']);
         $this->assertTrue($v->passes());
 
-        $v = new Validator($trans, ['name' => 'Bar'], ['name' => 'includes:ar']);
+        $v = new Validator($trans, ['name' => 'Foo'], ['name' => 'str_contains:Foo']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['name' => 'Bar'], ['name' => 'str_contains:ar']);
         $this->assertTrue($v->passes());
     }
 

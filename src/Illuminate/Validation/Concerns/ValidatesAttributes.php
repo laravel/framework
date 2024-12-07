@@ -533,7 +533,7 @@ trait ValidatesAttributes
      * @param  array<int, int|string>  $parameters
      * @return bool
      */
-    public function validateIncludes($attribute, $value, $parameters)
+    public function validateStrContains($attribute, $value, $parameters)
     {
         if (! is_string($value)) {
             return false;
