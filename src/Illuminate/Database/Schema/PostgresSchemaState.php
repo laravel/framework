@@ -53,6 +53,18 @@ class PostgresSchemaState extends SchemaState
     }
 
     /**
+     * Get the name of the application's migration table.
+     *
+     * @return string
+     */
+    protected function getMigrationTable(): string
+    {
+        [$schema, $table] = $this->connection->getSchemaBuilder()->parseSchemaAndTable($this->migrationTable);
+
+        return $schema.'.'.$this->connection->getTablePrefix().$table;
+    }
+
+    /**
      * Get the base dump command arguments for PostgreSQL as a string.
      *
      * @return string

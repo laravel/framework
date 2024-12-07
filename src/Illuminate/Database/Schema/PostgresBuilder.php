@@ -247,7 +247,7 @@ class PostgresBuilder extends Builder
      * @param  string  $reference
      * @return array
      */
-    protected function parseSchemaAndTable($reference)
+    public function parseSchemaAndTable($reference)
     {
         $parts = explode('.', $reference);
 
@@ -268,19 +268,6 @@ class PostgresBuilder extends Builder
         }
 
         return [$schema, $parts[0]];
-    }
-
-    /**
-     * Qualify the given table name with the prefix and connection's default schema name.
-     *
-     * @param  string  $table
-     * @return string
-     */
-    public function schemaQualifyTable(string $table): string
-    {
-        [$schema, $table] = $this->parseSchemaAndTable($table);
-
-        return $schema.'.'.$this->connection->getTablePrefix().$table;
     }
 
     /**

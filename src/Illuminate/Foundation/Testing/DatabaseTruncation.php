@@ -87,30 +87,40 @@ trait DatabaseTruncation
         $connection->unsetEventDispatcher();
         $schema = $connection->getSchemaBuilder();
 
-        static::$allTables[$name] ??= collect($schema->getTables())
+        (new Collection(static::$allTables[$name] ??= $schema->getTables()))
             ->when(
                 $schema instanceof PostgresBuilder ? $schema->getSchemas() : null,
                 fn ($tables, $schemas) => $tables->filter(fn ($table) => in_array($table['schema'], $schemas))
             )
-            ->map(fn (array $table) => $table['schema'] ? $table['schema'].'.'.$table['name'] : $table['name'])
-            ->all();
-
-        (new Collection(static::$allTables[$name]))
             ->when(
                 property_exists($this, 'tablesToTruncate'),
-                fn ($tables) => $tables->intersect(array_map(
-                    fn ($table) => $schema->schemaQualifyTable($table),
-                    $this->tablesToTruncate
-                )),
-                fn ($tables) => $tables->diff(array_map(
-                    fn ($table) => $schema->schemaQualifyTable($table),
-                    $this->exceptTables($name)
-                ))
+                fn (Collection $tables) => $tables->intersectUsing(
+                    $this->tablesToTruncate,
+                    $this->compareTablesWithSchema(...)
+                ),
+                fn (Collection $tables) => $tables->diffUsing(
+                    $this->exceptTables($name),
+                    $this->compareTablesWithSchema(...)
+                )
             )
             ->filter(fn ($table) => $connection->table(new Expression($table))->exists())
             ->each(fn ($table) => $connection->table(new Expression($table))->truncate());
 
         $connection->setEventDispatcher($dispatcher);
+    }
+
+    /**
+     * Compare the given tables with or without schema.
+     *
+     * @param  array  $firstTable
+     * @param  string  $secondTable
+     * @return int
+     */
+    protected function compareTablesWithSchema(array $firstTable, string $secondTable): int
+    {
+        return $firstTable['schema'] && str_contains($secondTable, '.')
+            ? $firstTable['schema'].'.'.$firstTable['name'] <=> $secondTable
+            : $firstTable['name'] <=> $secondTable;
     }
 
     /**
