@@ -244,19 +244,19 @@ class SupportStrTest extends TestCase
         $this->assertSame(['user_id' => '1', 'comment_id' => '3'], Str::extract('/users/1/posts/2/comments/3/replies/4', '*users/{user_id}/*/comments/{comment_id}*'));
 
         // Extraction with numbers and special characters in the pattern
-        $this->assertSame(['file_id' => '123-abc'], Str::extract('/files/123-abc.pdf', '/files/{file_id}.pdf'));
+        $this->assertSame(['file_name' => '123-abc'], Str::extract('/files/123-abc.pdf', '/files/{file_name}.pdf'));
+        $this->assertSame(['file_name' => '123-abc'], Str::extract('/user/home/files/123-abc.pdf', '*/{file_name}.pdf'));
         $this->assertSame(['product_id' => 'abc-123', 'category' => 'electronics'], Str::extract('/products/abc-123/electronics', '/products/{product_id}/{category}'));
 
         //  Extraction with UUIDs
         $this->assertSame(['uuid' => 'a1b2c3d4-e5f6-7890-1234-567890abcdef'], Str::extract('/users/a1b2c3d4-e5f6-7890-1234-567890abcdef/profile', '/users/{uuid}/profile'));
 
         // Edge cases
-        // $this->assertSame(['foo' => '{bar}'], Str::extract('{\\{bar}\\}', '*{foo}\\}')); //  ['foo' => '}'],
-
         $this->assertSame(['foo' => '{bar}'], Str::extract('{bar}', '{foo}'));
+        $this->assertSame(['foo' => '{bar}'], Str::extract('{\\{bar}\\}', '*{\{foo}\}*'));
         $this->assertSame(['foo' => '{bar}'], Str::extract('foo bar {{bar}}', '* {{foo}}'));
-        $this->assertSame(['foo' => '{{bar}}'], Str::extract('foo bar {{{bar}}}', '* {{foo}}'));
         $this->assertSame(['foo' => 'bar'], Str::extract('{(|\*&!@$/\bar/|}', '*\{foo}/*'));
+        $this->assertSame(['foo' => '{{bar}}'], Str::extract('foo bar {{{bar}}}', '* {{foo}}'));
         $this->assertSame(['foo' => 'bar'], Str::extract('{(|\*&!@$/\bar/|}', '{(|\*&!@$/\{foo}/|}'));
 
         $this->assertSame([], Str::extract('/users/1/posts/2', '')); // Empty pattern
