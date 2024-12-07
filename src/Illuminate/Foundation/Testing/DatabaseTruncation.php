@@ -103,6 +103,7 @@ trait DatabaseTruncation
                     $this->compareTablesWithSchema(...)
                 )
             )
+            ->map(fn (array $table) => $table['schema'] ? $table['schema'].'.'.$table['name'] : $table['name'])
             ->filter(fn ($table) => $connection->table(new Expression($table))->exists())
             ->each(fn ($table) => $connection->table(new Expression($table))->truncate());
 
@@ -110,7 +111,7 @@ trait DatabaseTruncation
     }
 
     /**
-     * Compare the given tables with or without schema.
+     * Compare the given tables with or without schema name.
      *
      * @param  array  $firstTable
      * @param  string  $secondTable
