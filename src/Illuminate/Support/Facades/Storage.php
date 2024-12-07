@@ -146,6 +146,14 @@ class Storage extends Facade
         return 'filesystem';
     }
 
+    /**
+     * Assemble the configuration of the given disk
+     *
+     * @param  string  $disk
+     * @param  array  $configOverWrite
+     * @param  string  $rootPath
+     * @return array
+     */
     private static function assembleConfig(string $disk, array $configOverWrite, string $rootPath): array
     {
         $originalConfig = static::$app['config']["filesystems.disks.{$disk}"] ?? [];
@@ -154,6 +162,12 @@ class Storage extends Facade
         return array_merge(['throw' => $throw], $configOverWrite, ['root' => $rootPath]);
     }
 
+    /**
+     * Get the root path of the given disk
+     *
+     * @param  string  $disk
+     * @return string
+     */
     private static function getRootPath(string $disk): string
     {
         return storage_path('framework/testing/disks/'.$disk);
