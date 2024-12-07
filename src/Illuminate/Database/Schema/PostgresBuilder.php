@@ -97,16 +97,15 @@ class PostgresBuilder extends Builder
     {
         $tables = [];
 
-        $excludedTables = array_map(fn ($table) => $this->schemaQualifyTable($table),
-            $this->connection->getConfig('dont_drop') ?? ['spatial_ref_sys', 'postgis.spatial_ref_sys']
-        );
+        $excludedTables = $this->connection->getConfig('dont_drop') ?? ['spatial_ref_sys'];
 
         $schemas = $this->getSchemas();
 
         foreach ($this->getTables() as $table) {
             $qualifiedName = $table['schema'].'.'.$table['name'];
 
-            if (in_array($table['schema'], $schemas) && ! in_array($qualifiedName, $excludedTables)) {
+            if (in_array($table['schema'], $schemas) &&
+                empty(array_intersect([$table['name'], $qualifiedName], $excludedTables))) {
                 $tables[] = $qualifiedName;
             }
         }
