@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Http\Middleware;
 
 use Illuminate\Foundation\Http\Middleware\TrimStrings;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
 
 class TrimStringsTest extends TestCase
@@ -222,4 +223,37 @@ class TrimStringsTest extends TestCase
             $this->assertEquals('This title contains a combination of a invisible character at beginning and the end', $req->title);
         });
     }
+
+    /**
+     * Test leading invisible character are trimmed [U+200F] using a custom middleware.
+     */
+    public function test_trim_strings_using_a_custom_middleware()
+    {
+        $request = new Request;
+
+        $text = '‎‎This title contains a combination of a invisible character at beginning and the end‎‎';
+
+        $request->merge([
+            'title' => $text,
+            'about' => $text,
+            'summary' => $text, // This should be trimmed
+        ]);
+
+        TrimStrings::except(['title']);
+
+        $middleware = new TrimStringsWithExceptAttribute;
+
+        $middleware->handle($request, function ($req) use($text) {
+            $this->assertSame($text, $req->title);
+            $this->assertSame($text, $req->about);
+            $this->assertSame(Str::trim($text), $req->summary); // Assert that the summary is trimmed
+        });
+    }
+}
+
+class TrimStringsWithExceptAttribute extends TrimStrings
+{
+    protected $except = [
+        'about',
+    ];
 }

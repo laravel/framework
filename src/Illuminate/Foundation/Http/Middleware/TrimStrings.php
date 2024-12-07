@@ -22,16 +22,23 @@ class TrimStrings extends TransformsRequest
     /**
      * The globally ignored attributes that should not be trimmed.
      *
-     * @var array
+     * @var array<string, bool>
      */
     protected static $neverTrim = [];
 
     /**
      * All of the registered skip callbacks.
      *
-     * @var array
+     * @var array<Closure>
      */
     protected static $skipCallbacks = [];
+
+    /**
+     * Combined except cache to avoid repeated array merges.
+     *
+     * @var array<string, bool>
+     */
+    private $exceptCache = [];
 
     /**
      * Handle an incoming request.
@@ -48,6 +55,10 @@ class TrimStrings extends TransformsRequest
             }
         }
 
+        $this->exceptCache = array_flip(
+            array_merge($this->except, array_keys(static::$neverTrim))
+        );
+
         return parent::handle($request, $next);
     }
 
@@ -60,9 +71,7 @@ class TrimStrings extends TransformsRequest
      */
     protected function transform($key, $value)
     {
-        $except = array_merge($this->except, static::$neverTrim);
-
-        if ($this->shouldSkip($key, $except) || ! is_string($value)) {
+        if (! is_string($value) || $this->shouldSkip($key, $this->exceptCache)) {
             return $value;
         }
 
@@ -78,7 +87,7 @@ class TrimStrings extends TransformsRequest
      */
     protected function shouldSkip($key, $except)
     {
-        return in_array($key, $except, true);
+        return isset($except[$key]);
     }
 
     /**
@@ -89,9 +98,9 @@ class TrimStrings extends TransformsRequest
      */
     public static function except($attributes)
     {
-        static::$neverTrim = array_values(array_unique(
-            array_merge(static::$neverTrim, Arr::wrap($attributes))
-        ));
+        foreach (Arr::wrap($attributes) as $attribute) {
+            static::$neverTrim[$attribute] = true;
+        }
     }
 
     /**
