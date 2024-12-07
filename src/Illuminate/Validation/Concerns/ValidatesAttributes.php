@@ -526,7 +526,7 @@ trait ValidatesAttributes
     }
 
     /**
-     * Validate an attribute (string) contains a list of values.
+     * Validate that an attribute (string) contains a list of values.
      *
      * @param  string  $attribute
      * @param  mixed  $value
