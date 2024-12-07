@@ -79,7 +79,7 @@ class Builder implements BuilderContract
     /**
      * An aggregate function and column to be run.
      *
-     * @var array
+     * @var array|null
      */
     public $aggregate;
 
@@ -109,35 +109,35 @@ class Builder implements BuilderContract
     /**
      * The index hint for the query.
      *
-     * @var \Illuminate\Database\Query\IndexHint
+     * @var \Illuminate\Database\Query\IndexHint|null
      */
     public $indexHint;
 
     /**
      * The table joins for the query.
      *
-     * @var array
+     * @var array|null
      */
     public $joins;
 
     /**
      * The where constraints for the query.
      *
-     * @var array
+     * @var array|null
      */
     public $wheres = [];
 
     /**
      * The groupings for the query.
      *
-     * @var array
+     * @var array|null
      */
     public $groups;
 
     /**
      * The having constraints for the query.
      *
-     * @var array
+     * @var array|null
      */
     public $havings;
 
@@ -158,7 +158,7 @@ class Builder implements BuilderContract
     /**
      * The maximum number of records to return per group.
      *
-     * @var array
+     * @var array|null
      */
     public $groupLimit;
 
@@ -172,7 +172,7 @@ class Builder implements BuilderContract
     /**
      * The query union statements.
      *
-     * @var array
+     * @var array|null
      */
     public $unions;
 
@@ -200,7 +200,7 @@ class Builder implements BuilderContract
     /**
      * Indicates whether row locking is being used.
      *
-     * @var string|bool
+     * @var string|bool|null
      */
     public $lock;
 
