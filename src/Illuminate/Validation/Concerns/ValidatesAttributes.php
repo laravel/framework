@@ -526,6 +526,23 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate an attribute (string) contains a list of values.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|string>  $parameters
+     * @return bool
+     */
+    public function validateIncludes($attribute, $value, $parameters)
+    {
+        if (! is_string($value)) {
+            return false;
+        }
+
+        return str($value)->containsAll($parameters);
+    }
+
+    /**
      * Validate that the password of the currently authenticated user matches the given value.
      *
      * @param  string  $attribute

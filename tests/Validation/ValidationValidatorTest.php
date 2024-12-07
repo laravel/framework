@@ -3890,6 +3890,29 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
+    public function testValidateIncludes()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $v = new Validator($trans, ['name' => 'foo'], ['name' => 'includes:bar']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['name' => 'foo'], ['name' => 'includes:baz']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['name' => 'Hello World'], ['name' => 'includes:HELLO WORLD']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['name' => 'Bar'], ['name' => 'includes:bar']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['name' => 'Foo'], ['name' => 'contains:Foo']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['name' => 'Bar'], ['name' => 'contains:ar']);
+        $this->assertTrue($v->passes());
+    }
+
     public function testValidateIn()
     {
         $trans = $this->getIlluminateArrayTranslator();
