@@ -3890,7 +3890,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
-    public function testValidateIncludes()
+    public function testValidateStrContains()
     {
         $trans = $this->getIlluminateArrayTranslator();
 
