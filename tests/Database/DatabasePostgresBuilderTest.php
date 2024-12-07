@@ -221,6 +221,7 @@ class DatabasePostgresBuilderTest extends TestCase
     public function testDropAllTablesWhenSearchPathIsString()
     {
         $connection = $this->getConnection();
+        $connection->shouldReceive('getTablePrefix')->andReturn('');
         $connection->shouldReceive('getConfig')->with('search_path')->andReturn('public');
         $connection->shouldReceive('getConfig')->with('dont_drop')->andReturn(['foo']);
         $grammar = m::mock(PostgresGrammar::class);
@@ -240,6 +241,7 @@ class DatabasePostgresBuilderTest extends TestCase
     public function testDropAllTablesWhenSearchPathIsStringOfMany()
     {
         $connection = $this->getConnection();
+        $connection->shouldReceive('getTablePrefix')->andReturn('');
         $connection->shouldReceive('getConfig')->with('username')->andReturn('foouser');
         $connection->shouldReceive('getConfig')->with('search_path')->andReturn('"$user", public, foo_bar-Baz.Áüõß');
         $connection->shouldReceive('getConfig')->with('dont_drop')->andReturn(['foo']);
@@ -260,6 +262,7 @@ class DatabasePostgresBuilderTest extends TestCase
     public function testDropAllTablesWhenSearchPathIsArrayOfMany()
     {
         $connection = $this->getConnection();
+        $connection->shouldReceive('getTablePrefix')->andReturn('');
         $connection->shouldReceive('getConfig')->with('username')->andReturn('foouser');
         $connection->shouldReceive('getConfig')->with('search_path')->andReturn([
             '$user',
