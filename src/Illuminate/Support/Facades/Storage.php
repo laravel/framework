@@ -147,7 +147,7 @@ class Storage extends Facade
     }
 
     /**
-     * Assemble the configuration of the given disk
+     * Assemble the configuration of the given disk.
      *
      * @param  string  $disk
      * @param  array  $configOverWrite
@@ -163,7 +163,7 @@ class Storage extends Facade
     }
 
     /**
-     * Get the root path of the given disk
+     * Get the root path of the given disk.
      *
      * @param  string  $disk
      * @return string
