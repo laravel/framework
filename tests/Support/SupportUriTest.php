@@ -34,7 +34,7 @@ class SupportUriTest extends TestCase
 
     public function test_complicated_query_string_parsing()
     {
-        $uri = Uri::of('https://example.com/users?key_1=value&key_2[sub_field]=value&key_3[]=value&key_4[9]=value&key_5[][][foo][9]=bar&flag_value');
+        $uri = Uri::of('https://example.com/users?key_1=value&key_2[sub_field]=value&key_3[]=value&key_4[9]=value&key_5[][][foo][9]=bar&key.6=value&flag_value');
 
         $this->assertEquals([
             'key_1' => 'value',
@@ -56,10 +56,11 @@ class SupportUriTest extends TestCase
                     ],
                 ],
             ],
+            'key.6' => 'value',
             'flag_value' => '',
         ], $uri->query()->all());
 
-        $this->assertEquals('key_1=value&key_2[sub_field]=value&key_3[]=value&key_4[9]=value&key_5[][][foo][9]=bar&flag_value', $uri->query()->decode());
+        $this->assertEquals('key_1=value&key_2[sub_field]=value&key_3[]=value&key_4[9]=value&key_5[][][foo][9]=bar&key.6=value&flag_value', $uri->query()->decode());
     }
 
     public function test_uri_building()

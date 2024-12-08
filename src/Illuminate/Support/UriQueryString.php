@@ -4,6 +4,7 @@ namespace Illuminate\Support;
 
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Traits\InteractsWithData;
+use League\Uri\QueryString;
 
 class UriQueryString implements Arrayable
 {
@@ -81,13 +82,7 @@ class UriQueryString implements Arrayable
      */
     public function toArray()
     {
-        if (is_null($query = $this->uri->getUri()->getQuery())) {
-            return [];
-        }
-
-        parse_str($query, $currentQuery);
-
-        return $currentQuery;
+        return QueryString::extract($this->value());
     }
 
     /**
