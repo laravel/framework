@@ -328,8 +328,6 @@ class Factory implements FactoryContract
      */
     public function setContainer(Container $container)
     {
-        $this->container = $container;
-
-        return $this;
+        return tap($this, fn () => $this->container = $container);
     }
 }

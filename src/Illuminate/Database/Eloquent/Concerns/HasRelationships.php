@@ -915,9 +915,7 @@ trait HasRelationships
      */
     public function setRelation($relation, $value)
     {
-        $this->relations[$relation] = $value;
-
-        return $this;
+        return tap($this, fn () => $this->relations[$relation] = $value);
     }
 
     /**
@@ -941,9 +939,7 @@ trait HasRelationships
      */
     public function setRelations(array $relations)
     {
-        $this->relations = $relations;
-
-        return $this;
+        return tap($this, fn () => $this->relations = $relations);
     }
 
     /**
@@ -965,9 +961,7 @@ trait HasRelationships
      */
     public function unsetRelations()
     {
-        $this->relations = [];
-
-        return $this;
+        return tap($this, fn () => $this->relations = []);
     }
 
     /**
@@ -988,8 +982,6 @@ trait HasRelationships
      */
     public function setTouchedRelations(array $touches)
     {
-        $this->touches = $touches;
-
-        return $this;
+        return tap($this, fn () => $this->touches = $touches);
     }
 }

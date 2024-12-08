@@ -65,9 +65,7 @@ class PendingMail
      */
     public function locale($locale)
     {
-        $this->locale = $locale;
-
-        return $this;
+        return tap($this, fn () => $this->locale = $locale);
     }
 
     /**
@@ -95,9 +93,7 @@ class PendingMail
      */
     public function cc($users)
     {
-        $this->cc = $users;
-
-        return $this;
+        return tap($this, fn () => $this->cc = $users);
     }
 
     /**
@@ -108,9 +104,7 @@ class PendingMail
      */
     public function bcc($users)
     {
-        $this->bcc = $users;
-
-        return $this;
+        return tap($this, fn () => $this->bcc = $users);
     }
 
     /**

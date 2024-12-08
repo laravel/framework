@@ -443,9 +443,7 @@ class Repository
      */
     public function dehydrating($callback)
     {
-        $this->events->listen(fn (Dehydrating $event) => $callback($event->context));
-
-        return $this;
+        return tap($this, fn () => $this->events->listen(fn (Dehydrating $event) => $callback($event->context)));
     }
 
     /**
@@ -456,9 +454,7 @@ class Repository
      */
     public function hydrated($callback)
     {
-        $this->events->listen(fn (Hydrated $event) => $callback($event->context));
-
-        return $this;
+        return tap($this, fn () => $this->events->listen(fn (Hydrated $event) => $callback($event->context)));
     }
 
     /**
@@ -469,9 +465,7 @@ class Repository
      */
     public function handleUnserializeExceptionsUsing($callback)
     {
-        static::$handleUnserializeExceptionsUsing = $callback;
-
-        return $this;
+        return tap($this, fn () => static::$handleUnserializeExceptionsUsing = $callback);
     }
 
     /**

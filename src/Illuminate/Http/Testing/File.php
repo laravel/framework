@@ -97,9 +97,7 @@ class File extends UploadedFile
      */
     public function size($kilobytes)
     {
-        $this->sizeToReport = $kilobytes * 1024;
-
-        return $this;
+        return tap($this, fn () => $this->sizeToReport = $kilobytes * 1024);
     }
 
     /**
@@ -120,9 +118,7 @@ class File extends UploadedFile
      */
     public function mimeType($mimeType)
     {
-        $this->mimeTypeToReport = $mimeType;
-
-        return $this;
+        return tap($this, fn () => $this->mimeTypeToReport = $mimeType);
     }
 
     /**

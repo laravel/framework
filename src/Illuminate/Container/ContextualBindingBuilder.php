@@ -49,9 +49,7 @@ class ContextualBindingBuilder implements ContextualBindingBuilderContract
      */
     public function needs($abstract)
     {
-        $this->needs = $abstract;
-
-        return $this;
+        return tap($this, fn () => $this->needs = $abstract);
     }
 
     /**

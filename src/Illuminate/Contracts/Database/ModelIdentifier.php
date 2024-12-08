@@ -66,8 +66,6 @@ class ModelIdentifier
      */
     public function useCollectionClass(?string $collectionClass)
     {
-        $this->collectionClass = $collectionClass;
-
-        return $this;
+        return tap($this, fn () => $this->collectionClass = $collectionClass);
     }
 }

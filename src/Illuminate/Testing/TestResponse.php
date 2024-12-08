@@ -386,9 +386,7 @@ class TestResponse implements ArrayAccess
      */
     public function assertPlainCookie($cookieName, $value = null)
     {
-        $this->assertCookie($cookieName, $value, false);
-
-        return $this;
+        return tap($this)->assertCookie($cookieName, $value, false);
     }
 
     /**
@@ -527,9 +525,7 @@ class TestResponse implements ArrayAccess
      */
     public function assertContent($value)
     {
-        PHPUnit::withResponse($this)->assertSame($value, $this->content());
-
-        return $this;
+        return tap($this, fn () => PHPUnit::withResponse($this)->assertSame($value, $this->content()));
     }
 
     /**
@@ -540,9 +536,7 @@ class TestResponse implements ArrayAccess
      */
     public function assertStreamedContent($value)
     {
-        PHPUnit::withResponse($this)->assertSame($value, $this->streamedContent());
-
-        return $this;
+        return tap($this, fn () => PHPUnit::withResponse($this)->assertSame($value, $this->streamedContent()));
     }
 
     /**
@@ -740,9 +734,7 @@ class TestResponse implements ArrayAccess
      */
     public function assertJsonPath($path, $expect)
     {
-        $this->decodeResponseJson()->assertPath($path, $expect);
-
-        return $this;
+        return tap($this, fn () => $this->decodeResponseJson()->assertPath($path, $expect));
     }
 
     /**
@@ -754,9 +746,7 @@ class TestResponse implements ArrayAccess
      */
     public function assertJsonPathCanonicalizing($path, array $expect)
     {
-        $this->decodeResponseJson()->assertPathCanonicalizing($path, $expect);
-
-        return $this;
+        return tap($this, fn () => $this->decodeResponseJson()->assertPathCanonicalizing($path, $expect));
     }
 
     /**
@@ -767,9 +757,7 @@ class TestResponse implements ArrayAccess
      */
     public function assertExactJson(array $data)
     {
-        $this->decodeResponseJson()->assertExact($data);
-
-        return $this;
+        return tap($this, fn () => $this->decodeResponseJson()->assertExact($data));
     }
 
     /**
@@ -780,9 +768,7 @@ class TestResponse implements ArrayAccess
      */
     public function assertSimilarJson(array $data)
     {
-        $this->decodeResponseJson()->assertSimilar($data);
-
-        return $this;
+        return tap($this, fn () => $this->decodeResponseJson()->assertSimilar($data));
     }
 
     /**
@@ -793,9 +779,7 @@ class TestResponse implements ArrayAccess
      */
     public function assertJsonFragment(array $data)
     {
-        $this->decodeResponseJson()->assertFragment($data);
-
-        return $this;
+        return tap($this, fn () => $this->decodeResponseJson()->assertFragment($data));
     }
 
     /**
@@ -807,9 +791,7 @@ class TestResponse implements ArrayAccess
      */
     public function assertJsonMissing(array $data, $exact = false)
     {
-        $this->decodeResponseJson()->assertMissing($data, $exact);
-
-        return $this;
+        return tap($this, fn () => $this->decodeResponseJson()->assertMissing($data, $exact));
     }
 
     /**
@@ -820,9 +802,7 @@ class TestResponse implements ArrayAccess
      */
     public function assertJsonMissingExact(array $data)
     {
-        $this->decodeResponseJson()->assertMissingExact($data);
-
-        return $this;
+        return tap($this, fn () => $this->decodeResponseJson()->assertMissingExact($data));
     }
 
     /**
@@ -833,9 +813,7 @@ class TestResponse implements ArrayAccess
      */
     public function assertJsonMissingPath(string $path)
     {
-        $this->decodeResponseJson()->assertMissingPath($path);
-
-        return $this;
+        return tap($this, fn () => $this->decodeResponseJson()->assertMissingPath($path));
     }
 
     /**
@@ -847,9 +825,7 @@ class TestResponse implements ArrayAccess
      */
     public function assertJsonStructure(?array $structure = null, $responseData = null)
     {
-        $this->decodeResponseJson()->assertStructure($structure, $responseData);
-
-        return $this;
+        return tap($this, fn () => $this->decodeResponseJson()->assertStructure($structure, $responseData));
     }
 
     /**
@@ -861,9 +837,7 @@ class TestResponse implements ArrayAccess
      */
     public function assertExactJsonStructure(?array $structure = null, $responseData = null)
     {
-        $this->decodeResponseJson()->assertStructure($structure, $responseData, true);
-
-        return $this;
+        return tap($this, fn () => $this->decodeResponseJson()->assertStructure($structure, $responseData, true));
     }
 
     /**
@@ -875,9 +849,7 @@ class TestResponse implements ArrayAccess
      */
     public function assertJsonCount(int $count, $key = null)
     {
-        $this->decodeResponseJson()->assertCount($count, $key);
-
-        return $this;
+        return tap($this, fn () => $this->decodeResponseJson()->assertCount($count, $key));
     }
 
     /**
@@ -1589,9 +1561,7 @@ class TestResponse implements ArrayAccess
      */
     public function dumpHeaders()
     {
-        dump($this->headers->all());
-
-        return $this;
+        return tap($this, fn () => dump($this->headers->all()));
     }
 
     /**
@@ -1650,9 +1620,7 @@ class TestResponse implements ArrayAccess
      */
     public function withExceptions(Collection $exceptions)
     {
-        $this->exceptions = $exceptions;
-
-        return $this;
+        return tap($this, fn () => $this->exceptions = $exceptions);
     }
 
     /**

@@ -196,9 +196,7 @@ class RouteRegistrar
      */
     public function group($callback)
     {
-        $this->router->group($this->attributes, $callback);
-
-        return $this;
+        return tap($this, fn () => $this->router->group($this->attributes, $callback));
     }
 
     /**

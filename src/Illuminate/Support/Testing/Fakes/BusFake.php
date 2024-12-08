@@ -103,9 +103,7 @@ class BusFake implements Fake, QueueingDispatcher
      */
     public function except($jobsToDispatch)
     {
-        $this->jobsToDispatch = array_merge($this->jobsToDispatch, Arr::wrap($jobsToDispatch));
-
-        return $this;
+        return tap($this, fn () => $this->jobsToDispatch = array_merge($this->jobsToDispatch, Arr::wrap($jobsToDispatch)));
     }
 
     /**
@@ -814,9 +812,7 @@ class BusFake implements Fake, QueueingDispatcher
      */
     public function serializeAndRestore(bool $serializeAndRestore = true)
     {
-        $this->serializeAndRestore = $serializeAndRestore;
-
-        return $this;
+        return tap($this, fn () => $this->serializeAndRestore = $serializeAndRestore);
     }
 
     /**
@@ -849,9 +845,7 @@ class BusFake implements Fake, QueueingDispatcher
      */
     public function pipeThrough(array $pipes)
     {
-        $this->dispatcher->pipeThrough($pipes);
-
-        return $this;
+        return tap($this, fn () => $this->dispatcher->pipeThrough($pipes));
     }
 
     /**
@@ -884,9 +878,7 @@ class BusFake implements Fake, QueueingDispatcher
      */
     public function map(array $map)
     {
-        $this->dispatcher->map($map);
-
-        return $this;
+        return tap($this, fn () => $this->dispatcher->map($map));
     }
 
     /**

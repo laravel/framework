@@ -184,9 +184,7 @@ trait DatabaseRule
      */
     public function withoutTrashed($deletedAtColumn = 'deleted_at')
     {
-        $this->whereNull($deletedAtColumn);
-
-        return $this;
+        return tap($this)->whereNull($deletedAtColumn);
     }
 
     /**
@@ -197,9 +195,7 @@ trait DatabaseRule
      */
     public function onlyTrashed($deletedAtColumn = 'deleted_at')
     {
-        $this->whereNotNull($deletedAtColumn);
-
-        return $this;
+        return tap($this)->whereNotNull($deletedAtColumn);
     }
 
     /**
@@ -210,9 +206,7 @@ trait DatabaseRule
      */
     public function using(Closure $callback)
     {
-        $this->using[] = $callback;
-
-        return $this;
+        return tap($this, fn () => $this->using[] = $callback);
     }
 
     /**

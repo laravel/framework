@@ -356,9 +356,7 @@ class MessageBag implements Jsonable, JsonSerializable, MessageBagContract, Mess
      */
     public function setFormat($format = ':message')
     {
-        $this->format = $format;
-
-        return $this;
+        return tap($this, fn () => $this->format = $format);
     }
 
     /**

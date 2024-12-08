@@ -148,9 +148,7 @@ trait HasEvents
      */
     public function setObservableEvents(array $observables)
     {
-        $this->observables = $observables;
-
-        return $this;
+        return tap($this, fn () => $this->observables = $observables);
     }
 
     /**

@@ -671,9 +671,7 @@ class Repository implements ArrayAccess, CacheContract
      */
     public function setDefaultCacheTime($seconds)
     {
-        $this->default = $seconds;
-
-        return $this;
+        return tap($this, fn () => $this->default = $seconds);
     }
 
     /**
@@ -694,9 +692,7 @@ class Repository implements ArrayAccess, CacheContract
      */
     public function setStore($store)
     {
-        $this->store = $store;
-
-        return $this;
+        return tap($this, fn () => $this->store = $store);
     }
 
     /**

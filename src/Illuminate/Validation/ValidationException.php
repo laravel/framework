@@ -120,9 +120,7 @@ class ValidationException extends Exception
      */
     public function status($status)
     {
-        $this->status = $status;
-
-        return $this;
+        return tap($this, fn () => $this->status = $status);
     }
 
     /**
@@ -133,9 +131,7 @@ class ValidationException extends Exception
      */
     public function errorBag($errorBag)
     {
-        $this->errorBag = $errorBag;
-
-        return $this;
+        return tap($this, fn () => $this->errorBag = $errorBag);
     }
 
     /**
@@ -146,9 +142,7 @@ class ValidationException extends Exception
      */
     public function redirectTo($url)
     {
-        $this->redirectTo = $url;
-
-        return $this;
+        return tap($this, fn () => $this->redirectTo = $url);
     }
 
     /**

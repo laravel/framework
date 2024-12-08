@@ -86,9 +86,7 @@ class Enum implements Rule, ValidatorAwareRule
      */
     public function only($values)
     {
-        $this->only = $values instanceof Arrayable ? $values->toArray() : Arr::wrap($values);
-
-        return $this;
+        return tap($this, fn () => $this->only = $values instanceof Arrayable ? $values->toArray() : Arr::wrap($values));
     }
 
     /**
@@ -99,9 +97,7 @@ class Enum implements Rule, ValidatorAwareRule
      */
     public function except($values)
     {
-        $this->except = $values instanceof Arrayable ? $values->toArray() : Arr::wrap($values);
-
-        return $this;
+        return tap($this, fn () => $this->except = $values instanceof Arrayable ? $values->toArray() : Arr::wrap($values));
     }
 
     /**
@@ -141,8 +137,6 @@ class Enum implements Rule, ValidatorAwareRule
      */
     public function setValidator($validator)
     {
-        $this->validator = $validator;
-
-        return $this;
+        return tap($this, fn () => $this->validator = $validator);
     }
 }

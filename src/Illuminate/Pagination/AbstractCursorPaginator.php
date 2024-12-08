@@ -370,9 +370,7 @@ abstract class AbstractCursorPaginator implements Htmlable, Stringable
      */
     public function loadMorph($relation, $relations)
     {
-        $this->getCollection()->loadMorph($relation, $relations);
-
-        return $this;
+        return tap($this, fn () => $this->getCollection()->loadMorph($relation, $relations));
     }
 
     /**
@@ -384,9 +382,7 @@ abstract class AbstractCursorPaginator implements Htmlable, Stringable
      */
     public function loadMorphCount($relation, $relations)
     {
-        $this->getCollection()->loadMorphCount($relation, $relations);
-
-        return $this;
+        return tap($this, fn () => $this->getCollection()->loadMorphCount($relation, $relations));
     }
 
     /**
@@ -407,9 +403,7 @@ abstract class AbstractCursorPaginator implements Htmlable, Stringable
      */
     public function through(callable $callback)
     {
-        $this->items->transform($callback);
-
-        return $this;
+        return tap($this, fn () => $this->items->transform($callback));
     }
 
     /**
@@ -450,9 +444,7 @@ abstract class AbstractCursorPaginator implements Htmlable, Stringable
      */
     public function setCursorName($name)
     {
-        $this->cursorName = $name;
-
-        return $this;
+        return tap($this, fn () => $this->cursorName = $name);
     }
 
     /**
@@ -474,9 +466,7 @@ abstract class AbstractCursorPaginator implements Htmlable, Stringable
      */
     public function setPath($path)
     {
-        $this->path = $path;
-
-        return $this;
+        return tap($this, fn () => $this->path = $path);
     }
 
     /**
@@ -583,9 +573,7 @@ abstract class AbstractCursorPaginator implements Htmlable, Stringable
      */
     public function setCollection(Collection $collection)
     {
-        $this->items = $collection;
-
-        return $this;
+        return tap($this, fn () => $this->items = $collection);
     }
 
     /**

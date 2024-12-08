@@ -43,9 +43,7 @@ class FakeProcessDescription
      */
     public function id(int $processId)
     {
-        $this->processId = $processId;
-
-        return $this;
+        return tap($this, fn () => $this->processId = $processId);
     }
 
     /**
@@ -138,9 +136,7 @@ class FakeProcessDescription
      */
     public function exitCode(int $exitCode)
     {
-        $this->exitCode = $exitCode;
-
-        return $this;
+        return tap($this, fn () => $this->exitCode = $exitCode);
     }
 
     /**
@@ -162,9 +158,7 @@ class FakeProcessDescription
      */
     public function runsFor(int $iterations)
     {
-        $this->runIterations = $iterations;
-
-        return $this;
+        return tap($this, fn () => $this->runIterations = $iterations);
     }
 
     /**

@@ -575,9 +575,7 @@ class Route
      */
     public function setBindingFields(array $bindingFields)
     {
-        $this->bindingFields = $bindingFields;
-
-        return $this;
+        return tap($this, fn () => $this->bindingFields = $bindingFields);
     }
 
     /**
@@ -605,9 +603,7 @@ class Route
      */
     public function withTrashed($withTrashed = true)
     {
-        $this->withTrashedBindings = $withTrashed;
-
-        return $this;
+        return tap($this, fn () => $this->withTrashedBindings = $withTrashed);
     }
 
     /**
@@ -629,9 +625,7 @@ class Route
      */
     public function defaults($key, $value)
     {
-        $this->defaults[$key] = $value;
-
-        return $this;
+        return tap($this, fn () => $this->defaults[$key] = $value);
     }
 
     /**
@@ -642,9 +636,7 @@ class Route
      */
     public function setDefaults(array $defaults)
     {
-        $this->defaults = $defaults;
-
-        return $this;
+        return tap($this, fn () => $this->defaults = $defaults);
     }
 
     /**
@@ -697,9 +689,7 @@ class Route
      */
     public function fallback()
     {
-        $this->isFallback = true;
-
-        return $this;
+        return tap($this, fn () => $this->isFallback = true);
     }
 
     /**
@@ -710,9 +700,7 @@ class Route
      */
     public function setFallback($isFallback)
     {
-        $this->isFallback = $isFallback;
-
-        return $this;
+        return tap($this, fn () => $this->isFallback = $isFallback);
     }
 
     /**
@@ -853,9 +841,7 @@ class Route
      */
     public function setUri($uri)
     {
-        $this->uri = $this->parseUri($uri);
-
-        return $this;
+        return tap($this, fn () => $this->uri = $this->parseUri($uri));
     }
 
     /**
@@ -1032,9 +1018,7 @@ class Route
      */
     public function missing($missing)
     {
-        $this->action['missing'] = $missing;
-
-        return $this;
+        return tap($this, fn () => $this->action['missing'] = $missing);
     }
 
     /**
@@ -1181,9 +1165,7 @@ class Route
      */
     public function scopeBindings()
     {
-        $this->action['scope_bindings'] = true;
-
-        return $this;
+        return tap($this, fn () => $this->action['scope_bindings'] = true);
     }
 
     /**
@@ -1193,9 +1175,7 @@ class Route
      */
     public function withoutScopedBindings()
     {
-        $this->action['scope_bindings'] = false;
-
-        return $this;
+        return tap($this, fn () => $this->action['scope_bindings'] = false);
     }
 
     /**
@@ -1341,9 +1321,7 @@ class Route
      */
     public function setRouter(Router $router)
     {
-        $this->router = $router;
-
-        return $this;
+        return tap($this, fn () => $this->router = $router);
     }
 
     /**
@@ -1354,9 +1332,7 @@ class Route
      */
     public function setContainer(Container $container)
     {
-        $this->container = $container;
-
-        return $this;
+        return tap($this, fn () => $this->container = $container);
     }
 
     /**

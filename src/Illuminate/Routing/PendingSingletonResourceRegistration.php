@@ -69,9 +69,7 @@ class PendingSingletonResourceRegistration
      */
     public function only($methods)
     {
-        $this->options['only'] = is_array($methods) ? $methods : func_get_args();
-
-        return $this;
+        return tap($this, fn () => $this->options['only'] = is_array($methods) ? $methods : func_get_args());
     }
 
     /**
@@ -82,9 +80,7 @@ class PendingSingletonResourceRegistration
      */
     public function except($methods)
     {
-        $this->options['except'] = is_array($methods) ? $methods : func_get_args();
-
-        return $this;
+        return tap($this, fn () => $this->options['except'] = is_array($methods) ? $methods : func_get_args());
     }
 
     /**
@@ -94,9 +90,7 @@ class PendingSingletonResourceRegistration
      */
     public function creatable()
     {
-        $this->options['creatable'] = true;
-
-        return $this;
+        return tap($this, fn () => $this->options['creatable'] = true);
     }
 
     /**
@@ -106,9 +100,7 @@ class PendingSingletonResourceRegistration
      */
     public function destroyable()
     {
-        $this->options['destroyable'] = true;
-
-        return $this;
+        return tap($this, fn () => $this->options['destroyable'] = true);
     }
 
     /**
@@ -119,9 +111,7 @@ class PendingSingletonResourceRegistration
      */
     public function names($names)
     {
-        $this->options['names'] = $names;
-
-        return $this;
+        return tap($this, fn () => $this->options['names'] = $names);
     }
 
     /**
@@ -133,9 +123,7 @@ class PendingSingletonResourceRegistration
      */
     public function name($method, $name)
     {
-        $this->options['names'][$method] = $name;
-
-        return $this;
+        return tap($this, fn () => $this->options['names'][$method] = $name);
     }
 
     /**
@@ -146,9 +134,7 @@ class PendingSingletonResourceRegistration
      */
     public function parameters($parameters)
     {
-        $this->options['parameters'] = $parameters;
-
-        return $this;
+        return tap($this, fn () => $this->options['parameters'] = $parameters);
     }
 
     /**
@@ -160,9 +146,7 @@ class PendingSingletonResourceRegistration
      */
     public function parameter($previous, $new)
     {
-        $this->options['parameters'][$previous] = $new;
-
-        return $this;
+        return tap($this, fn () => $this->options['parameters'][$previous] = $new);
     }
 
     /**
@@ -207,9 +191,7 @@ class PendingSingletonResourceRegistration
      */
     public function where($wheres)
     {
-        $this->options['wheres'] = $wheres;
-
-        return $this;
+        return tap($this, fn () => $this->options['wheres'] = $wheres);
     }
 
     /**

@@ -72,9 +72,7 @@ class ConcurrencyLimiterBuilder
      */
     public function limit($maxLocks)
     {
-        $this->maxLocks = $maxLocks;
-
-        return $this;
+        return tap($this, fn () => $this->maxLocks = $maxLocks);
     }
 
     /**
@@ -85,9 +83,7 @@ class ConcurrencyLimiterBuilder
      */
     public function releaseAfter($releaseAfter)
     {
-        $this->releaseAfter = $this->secondsUntil($releaseAfter);
-
-        return $this;
+        return tap($this, fn () => $this->releaseAfter = $this->secondsUntil($releaseAfter));
     }
 
     /**
@@ -98,9 +94,7 @@ class ConcurrencyLimiterBuilder
      */
     public function block($timeout)
     {
-        $this->timeout = $timeout;
-
-        return $this;
+        return tap($this, fn () => $this->timeout = $timeout);
     }
 
     /**
@@ -111,9 +105,7 @@ class ConcurrencyLimiterBuilder
      */
     public function sleep($sleep)
     {
-        $this->sleep = $sleep;
-
-        return $this;
+        return tap($this, fn () => $this->sleep = $sleep);
     }
 
     /**

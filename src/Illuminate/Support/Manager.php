@@ -129,9 +129,7 @@ abstract class Manager
      */
     public function extend($driver, Closure $callback)
     {
-        $this->customCreators[$driver] = $callback;
-
-        return $this;
+        return tap($this, fn () => $this->customCreators[$driver] = $callback);
     }
 
     /**
@@ -162,9 +160,7 @@ abstract class Manager
      */
     public function setContainer(Container $container)
     {
-        $this->container = $container;
-
-        return $this;
+        return tap($this, fn () => $this->container = $container);
     }
 
     /**
@@ -174,9 +170,7 @@ abstract class Manager
      */
     public function forgetDrivers()
     {
-        $this->drivers = [];
-
-        return $this;
+        return tap($this, fn () => $this->drivers = []);
     }
 
     /**

@@ -84,9 +84,7 @@ trait Queueable
      */
     public function onConnection($connection)
     {
-        $this->connection = enum_value($connection);
-
-        return $this;
+        return tap($this, fn () => $this->connection = enum_value($connection));
     }
 
     /**
@@ -97,9 +95,7 @@ trait Queueable
      */
     public function onQueue($queue)
     {
-        $this->queue = enum_value($queue);
-
-        return $this;
+        return tap($this, fn () => $this->queue = enum_value($queue));
     }
 
     /**
@@ -142,9 +138,7 @@ trait Queueable
      */
     public function delay($delay)
     {
-        $this->delay = $delay;
-
-        return $this;
+        return tap($this, fn () => $this->delay = $delay);
     }
 
     /**
@@ -154,9 +148,7 @@ trait Queueable
      */
     public function withoutDelay()
     {
-        $this->delay = 0;
-
-        return $this;
+        return tap($this, fn () => $this->delay = 0);
     }
 
     /**
@@ -166,9 +158,7 @@ trait Queueable
      */
     public function afterCommit()
     {
-        $this->afterCommit = true;
-
-        return $this;
+        return tap($this, fn () => $this->afterCommit = true);
     }
 
     /**
@@ -178,9 +168,7 @@ trait Queueable
      */
     public function beforeCommit()
     {
-        $this->afterCommit = false;
-
-        return $this;
+        return tap($this, fn () => $this->afterCommit = false);
     }
 
     /**
@@ -191,9 +179,7 @@ trait Queueable
      */
     public function through($middleware)
     {
-        $this->middleware = Arr::wrap($middleware);
-
-        return $this;
+        return tap($this, fn () => $this->middleware = Arr::wrap($middleware));
     }
 
     /**

@@ -266,9 +266,7 @@ class Dispatcher implements QueueingDispatcher
      */
     public function pipeThrough(array $pipes)
     {
-        $this->pipes = $pipes;
-
-        return $this;
+        return tap($this, fn () => $this->pipes = $pipes);
     }
 
     /**
@@ -279,8 +277,6 @@ class Dispatcher implements QueueingDispatcher
      */
     public function map(array $map)
     {
-        $this->handlers = array_merge($this->handlers, $map);
-
-        return $this;
+        return tap($this, fn () => $this->handlers = array_merge($this->handlers, $map));
     }
 }

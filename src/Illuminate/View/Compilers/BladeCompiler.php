@@ -986,9 +986,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     public function prepareStringsForCompilationUsing(callable $callback)
     {
-        $this->prepareStringsForCompilationUsing[] = $callback;
-
-        return $this;
+        return tap($this, fn () => $this->prepareStringsForCompilationUsing[] = $callback);
     }
 
     /**

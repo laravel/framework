@@ -76,11 +76,9 @@ trait InteractsWithDatabase
      */
     protected function assertDatabaseCount($table, int $count, $connection = null)
     {
-        $this->assertThat(
+        return tap($this)->assertThat(
             $this->getTable($table), new CountInDatabase($this->getConnection($connection, $table), $count)
         );
-
-        return $this;
     }
 
     /**
@@ -92,11 +90,9 @@ trait InteractsWithDatabase
      */
     protected function assertDatabaseEmpty($table, $connection = null)
     {
-        $this->assertThat(
+        return tap($this)->assertThat(
             $this->getTable($table), new CountInDatabase($this->getConnection($connection, $table), 0)
         );
-
-        return $this;
     }
 
     /**

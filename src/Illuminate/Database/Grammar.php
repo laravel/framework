@@ -296,9 +296,7 @@ abstract class Grammar
      */
     public function setTablePrefix($prefix)
     {
-        $this->tablePrefix = $prefix;
-
-        return $this;
+        return tap($this, fn () => $this->tablePrefix = $prefix);
     }
 
     /**
@@ -309,8 +307,6 @@ abstract class Grammar
      */
     public function setConnection($connection)
     {
-        $this->connection = $connection;
-
-        return $this;
+        return tap($this, fn () => $this->connection = $connection);
     }
 }

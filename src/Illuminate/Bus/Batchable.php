@@ -59,9 +59,7 @@ trait Batchable
      */
     public function withBatchId(string $batchId)
     {
-        $this->batchId = $batchId;
-
-        return $this;
+        return tap($this, fn () => $this->batchId = $batchId);
     }
 
     /**

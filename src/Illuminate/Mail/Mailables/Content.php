@@ -82,9 +82,7 @@ class Content
      */
     public function view(string $view)
     {
-        $this->view = $view;
-
-        return $this;
+        return tap($this, fn () => $this->view = $view);
     }
 
     /**
@@ -106,9 +104,7 @@ class Content
      */
     public function text(string $view)
     {
-        $this->text = $view;
-
-        return $this;
+        return tap($this, fn () => $this->text = $view);
     }
 
     /**
@@ -119,9 +115,7 @@ class Content
      */
     public function markdown(string $view)
     {
-        $this->markdown = $view;
-
-        return $this;
+        return tap($this, fn () => $this->markdown = $view);
     }
 
     /**
@@ -132,9 +126,7 @@ class Content
      */
     public function htmlString(string $html)
     {
-        $this->htmlString = $html;
-
-        return $this;
+        return tap($this, fn () => $this->htmlString = $html);
     }
 
     /**

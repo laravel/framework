@@ -136,9 +136,7 @@ class InvokableValidationRule implements Rule, ValidatorAwareRule
      */
     public function setData($data)
     {
-        $this->data = $data;
-
-        return $this;
+        return tap($this, fn () => $this->data = $data);
     }
 
     /**
@@ -149,8 +147,6 @@ class InvokableValidationRule implements Rule, ValidatorAwareRule
      */
     public function setValidator($validator)
     {
-        $this->validator = $validator;
-
-        return $this;
+        return tap($this, fn () => $this->validator = $validator);
     }
 }

@@ -1010,9 +1010,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function prepend($value, $key = null)
     {
-        $this->items = Arr::prepend($this->items, ...func_get_args());
-
-        return $this;
+        return tap($this, fn () => $this->items = Arr::prepend($this->items, ...func_get_args()));
     }
 
     /**
@@ -1038,9 +1036,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function unshift(...$values)
     {
-        array_unshift($this->items, ...$values);
-
-        return $this;
+        return tap($this, fn () => array_unshift($this->items, ...$values));
     }
 
     /**
@@ -1086,9 +1082,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function put($key, $value)
     {
-        $this->offsetSet($key, $value);
-
-        return $this;
+        return tap($this)->offsetSet($key, $value);
     }
 
     /**
@@ -1715,9 +1709,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function transform(callable $callback)
     {
-        $this->items = $this->map($callback)->all();
-
-        return $this;
+        return tap($this, fn () => $this->items = $this->map($callback)->all());
     }
 
     /**
@@ -1849,9 +1841,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function add($item)
     {
-        $this->items[] = $item;
-
-        return $this;
+        return tap($this, fn () => $this->items[] = $item);
     }
 
     /**

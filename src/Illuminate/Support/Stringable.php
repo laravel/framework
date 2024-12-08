@@ -1322,9 +1322,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      */
     public function dump(...$args)
     {
-        dump($this->value, ...$args);
-
-        return $this;
+        return tap($this, fn () => dump($this->value, ...$args));
     }
 
     /**

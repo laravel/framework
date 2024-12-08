@@ -273,9 +273,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
      */
     public function setValidator(Validator $validator)
     {
-        $this->validator = $validator;
-
-        return $this;
+        return tap($this, fn () => $this->validator = $validator);
     }
 
     /**
@@ -286,9 +284,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
      */
     public function setRedirector(Redirector $redirector)
     {
-        $this->redirector = $redirector;
-
-        return $this;
+        return tap($this, fn () => $this->redirector = $redirector);
     }
 
     /**
@@ -299,8 +295,6 @@ class FormRequest extends Request implements ValidatesWhenResolved
      */
     public function setContainer(Container $container)
     {
-        $this->container = $container;
-
-        return $this;
+        return tap($this, fn () => $this->container = $container);
     }
 }

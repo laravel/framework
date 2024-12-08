@@ -126,9 +126,7 @@ class ThrottlesExceptions
      */
     public function when(callable $callback)
     {
-        $this->whenCallback = $callback;
-
-        return $this;
+        return tap($this, fn () => $this->whenCallback = $callback);
     }
 
     /**
@@ -139,9 +137,7 @@ class ThrottlesExceptions
      */
     public function withPrefix(string $prefix)
     {
-        $this->prefix = $prefix;
-
-        return $this;
+        return tap($this, fn () => $this->prefix = $prefix);
     }
 
     /**
@@ -152,9 +148,7 @@ class ThrottlesExceptions
      */
     public function backoff($backoff)
     {
-        $this->retryAfterMinutes = $backoff;
-
-        return $this;
+        return tap($this, fn () => $this->retryAfterMinutes = $backoff);
     }
 
     /**
@@ -182,9 +176,7 @@ class ThrottlesExceptions
      */
     public function by($key)
     {
-        $this->key = $key;
-
-        return $this;
+        return tap($this, fn () => $this->key = $key);
     }
 
     /**
@@ -194,9 +186,7 @@ class ThrottlesExceptions
      */
     public function byJob()
     {
-        $this->byJob = true;
-
-        return $this;
+        return tap($this, fn () => $this->byJob = true);
     }
 
     /**
@@ -207,9 +197,7 @@ class ThrottlesExceptions
      */
     public function report(?callable $callback = null)
     {
-        $this->reportCallback = $callback ?? fn () => true;
-
-        return $this;
+        return tap($this, fn () => $this->reportCallback = $callback ?? fn () => true);
     }
 
     /**

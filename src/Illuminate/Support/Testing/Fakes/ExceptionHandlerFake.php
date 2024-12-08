@@ -228,9 +228,7 @@ class ExceptionHandlerFake implements ExceptionHandler, Fake
      */
     public function throwOnReport()
     {
-        $this->throwOnReport = true;
-
-        return $this;
+        return tap($this, fn () => $this->throwOnReport = true);
     }
 
     /**
@@ -257,9 +255,7 @@ class ExceptionHandlerFake implements ExceptionHandler, Fake
      */
     public function setHandler(ExceptionHandler $handler)
     {
-        $this->handler = $handler;
-
-        return $this;
+        return tap($this, fn () => $this->handler = $handler);
     }
 
     /**

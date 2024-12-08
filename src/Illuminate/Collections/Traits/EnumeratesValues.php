@@ -242,9 +242,7 @@ trait EnumeratesValues
      */
     public function dump(...$args)
     {
-        dump($this->all(), ...$args);
-
-        return $this;
+        return tap($this, fn () => dump($this->all(), ...$args));
     }
 
     /**
@@ -890,9 +888,7 @@ trait EnumeratesValues
      */
     public function tap(callable $callback)
     {
-        $callback($this);
-
-        return $this;
+        return tap($this, $callback(...));
     }
 
     /**
@@ -1010,9 +1006,7 @@ trait EnumeratesValues
      */
     public function escapeWhenCastingToString($escape = true)
     {
-        $this->escapeWhenCastingToString = $escape;
-
-        return $this;
+        return tap($this, fn () => $this->escapeWhenCastingToString = $escape);
     }
 
     /**

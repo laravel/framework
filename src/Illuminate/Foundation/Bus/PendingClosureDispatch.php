@@ -14,8 +14,6 @@ class PendingClosureDispatch extends PendingDispatch
      */
     public function catch(Closure $callback)
     {
-        $this->job->onFailure($callback);
-
-        return $this;
+        return tap($this, fn () => $this->job->onFailure($callback));
     }
 }

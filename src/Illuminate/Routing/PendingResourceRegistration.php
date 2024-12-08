@@ -69,9 +69,7 @@ class PendingResourceRegistration
      */
     public function only($methods)
     {
-        $this->options['only'] = is_array($methods) ? $methods : func_get_args();
-
-        return $this;
+        return tap($this, fn () => $this->options['only'] = is_array($methods) ? $methods : func_get_args());
     }
 
     /**
@@ -82,9 +80,7 @@ class PendingResourceRegistration
      */
     public function except($methods)
     {
-        $this->options['except'] = is_array($methods) ? $methods : func_get_args();
-
-        return $this;
+        return tap($this, fn () => $this->options['except'] = is_array($methods) ? $methods : func_get_args());
     }
 
     /**
@@ -95,9 +91,7 @@ class PendingResourceRegistration
      */
     public function names($names)
     {
-        $this->options['names'] = $names;
-
-        return $this;
+        return tap($this, fn () => $this->options['names'] = $names);
     }
 
     /**
@@ -109,9 +103,7 @@ class PendingResourceRegistration
      */
     public function name($method, $name)
     {
-        $this->options['names'][$method] = $name;
-
-        return $this;
+        return tap($this, fn () => $this->options['names'][$method] = $name);
     }
 
     /**
@@ -122,9 +114,7 @@ class PendingResourceRegistration
      */
     public function parameters($parameters)
     {
-        $this->options['parameters'] = $parameters;
-
-        return $this;
+        return tap($this, fn () => $this->options['parameters'] = $parameters);
     }
 
     /**
@@ -136,9 +126,7 @@ class PendingResourceRegistration
      */
     public function parameter($previous, $new)
     {
-        $this->options['parameters'][$previous] = $new;
-
-        return $this;
+        return tap($this, fn () => $this->options['parameters'][$previous] = $new);
     }
 
     /**
@@ -183,9 +171,7 @@ class PendingResourceRegistration
      */
     public function where($wheres)
     {
-        $this->options['wheres'] = $wheres;
-
-        return $this;
+        return tap($this, fn () => $this->options['wheres'] = $wheres);
     }
 
     /**
@@ -196,9 +182,7 @@ class PendingResourceRegistration
      */
     public function shallow($shallow = true)
     {
-        $this->options['shallow'] = $shallow;
-
-        return $this;
+        return tap($this, fn () => $this->options['shallow'] = $shallow);
     }
 
     /**
@@ -209,9 +193,7 @@ class PendingResourceRegistration
      */
     public function missing($callback)
     {
-        $this->options['missing'] = $callback;
-
-        return $this;
+        return tap($this, fn () => $this->options['missing'] = $callback);
     }
 
     /**
@@ -222,9 +204,7 @@ class PendingResourceRegistration
      */
     public function scoped(array $fields = [])
     {
-        $this->options['bindingFields'] = $fields;
-
-        return $this;
+        return tap($this, fn () => $this->options['bindingFields'] = $fields);
     }
 
     /**
@@ -235,9 +215,7 @@ class PendingResourceRegistration
      */
     public function withTrashed(array $methods = [])
     {
-        $this->options['trashed'] = $methods;
-
-        return $this;
+        return tap($this, fn () => $this->options['trashed'] = $methods);
     }
 
     /**

@@ -125,9 +125,7 @@ class Limit
      */
     public function by($key)
     {
-        $this->key = $key;
-
-        return $this;
+        return tap($this, fn () => $this->key = $key);
     }
 
     /**
@@ -138,9 +136,7 @@ class Limit
      */
     public function response(callable $callback)
     {
-        $this->responseCallback = $callback;
-
-        return $this;
+        return tap($this, fn () => $this->responseCallback = $callback);
     }
 
     /**

@@ -34,8 +34,6 @@ class BroadcastMessage
      */
     public function data($data)
     {
-        $this->data = $data;
-
-        return $this;
+        return tap($this, fn () => $this->data = $data);
     }
 }

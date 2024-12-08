@@ -602,9 +602,7 @@ class Builder
      */
     public function setConnection(Connection $connection)
     {
-        $this->connection = $connection;
-
-        return $this;
+        return tap($this, fn () => $this->connection = $connection);
     }
 
     /**

@@ -54,9 +54,7 @@ class AuthorizationException extends Exception
      */
     public function setResponse($response)
     {
-        $this->response = $response;
-
-        return $this;
+        return tap($this, fn () => $this->response = $response);
     }
 
     /**
@@ -67,9 +65,7 @@ class AuthorizationException extends Exception
      */
     public function withStatus($status)
     {
-        $this->status = $status;
-
-        return $this;
+        return tap($this, fn () => $this->status = $status);
     }
 
     /**

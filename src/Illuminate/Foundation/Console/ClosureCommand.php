@@ -89,9 +89,7 @@ class ClosureCommand extends Command
      */
     public function describe($description)
     {
-        $this->setDescription($description);
-
-        return $this;
+        return tap($this, fn () => $this->setDescription($description));
     }
 
     /**

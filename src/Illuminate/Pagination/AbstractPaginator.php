@@ -292,9 +292,7 @@ abstract class AbstractPaginator implements Htmlable, Stringable
      */
     public function loadMorph($relation, $relations)
     {
-        $this->getCollection()->loadMorph($relation, $relations);
-
-        return $this;
+        return tap($this, fn () => $this->getCollection()->loadMorph($relation, $relations));
     }
 
     /**
@@ -306,9 +304,7 @@ abstract class AbstractPaginator implements Htmlable, Stringable
      */
     public function loadMorphCount($relation, $relations)
     {
-        $this->getCollection()->loadMorphCount($relation, $relations);
-
-        return $this;
+        return tap($this, fn () => $this->getCollection()->loadMorphCount($relation, $relations));
     }
 
     /**
@@ -349,9 +345,7 @@ abstract class AbstractPaginator implements Htmlable, Stringable
      */
     public function through(callable $callback)
     {
-        $this->items->transform($callback);
-
-        return $this;
+        return tap($this, fn () => $this->items->transform($callback));
     }
 
     /**
@@ -422,9 +416,7 @@ abstract class AbstractPaginator implements Htmlable, Stringable
      */
     public function setPageName($name)
     {
-        $this->pageName = $name;
-
-        return $this;
+        return tap($this, fn () => $this->pageName = $name);
     }
 
     /**
@@ -446,9 +438,7 @@ abstract class AbstractPaginator implements Htmlable, Stringable
      */
     public function setPath($path)
     {
-        $this->path = $path;
-
-        return $this;
+        return tap($this, fn () => $this->path = $path);
     }
 
     /**
@@ -459,9 +449,7 @@ abstract class AbstractPaginator implements Htmlable, Stringable
      */
     public function onEachSide($count)
     {
-        $this->onEachSide = $count;
-
-        return $this;
+        return tap($this, fn () => $this->onEachSide = $count);
     }
 
     /**
@@ -708,9 +696,7 @@ abstract class AbstractPaginator implements Htmlable, Stringable
      */
     public function setCollection(Collection $collection)
     {
-        $this->items = $collection;
-
-        return $this;
+        return tap($this, fn () => $this->items = $collection);
     }
 
     /**

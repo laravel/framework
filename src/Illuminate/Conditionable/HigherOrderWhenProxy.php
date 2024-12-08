@@ -51,9 +51,7 @@ class HigherOrderWhenProxy
      */
     public function condition($condition)
     {
-        [$this->condition, $this->hasCondition] = [$condition, true];
-
-        return $this;
+        return tap($this, fn () => [$this->condition, $this->hasCondition] = [$condition, true]);
     }
 
     /**
@@ -63,9 +61,7 @@ class HigherOrderWhenProxy
      */
     public function negateConditionOnCapture()
     {
-        $this->negateConditionOnCapture = true;
-
-        return $this;
+        return tap($this, fn () => $this->negateConditionOnCapture = true);
     }
 
     /**

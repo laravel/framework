@@ -143,8 +143,6 @@ class TokenGuard implements Guard
      */
     public function setRequest(Request $request)
     {
-        $this->request = $request;
-
-        return $this;
+        return tap($this, fn () => $this->request = $request);
     }
 }

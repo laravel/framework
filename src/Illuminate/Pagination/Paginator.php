@@ -130,9 +130,7 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
      */
     public function hasMorePagesWhen($hasMore = true)
     {
-        $this->hasMore = $hasMore;
-
-        return $this;
+        return tap($this, fn () => $this->hasMore = $hasMore);
     }
 
     /**

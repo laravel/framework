@@ -430,9 +430,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     {
         $this->appPath = $path;
 
-        $this->instance('path', $path);
-
-        return $this;
+        return tap($this)->instance('path', $path);
     }
 
     /**
@@ -477,9 +475,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     {
         $this->bootstrapPath = $path;
 
-        $this->instance('path.bootstrap', $path);
-
-        return $this;
+        return tap($this)->instance('path.bootstrap', $path);
     }
 
     /**
@@ -503,9 +499,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     {
         $this->configPath = $path;
 
-        $this->instance('path.config', $path);
-
-        return $this;
+        return tap($this)->instance('path.config', $path);
     }
 
     /**
@@ -529,9 +523,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     {
         $this->databasePath = $path;
 
-        $this->instance('path.database', $path);
-
-        return $this;
+        return tap($this)->instance('path.database', $path);
     }
 
     /**
@@ -555,9 +547,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     {
         $this->langPath = $path;
 
-        $this->instance('path.lang', $path);
-
-        return $this;
+        return tap($this)->instance('path.lang', $path);
     }
 
     /**
@@ -581,9 +571,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     {
         $this->publicPath = $path;
 
-        $this->instance('path.public', $path);
-
-        return $this;
+        return tap($this)->instance('path.public', $path);
     }
 
     /**
@@ -615,9 +603,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     {
         $this->storagePath = $path;
 
-        $this->instance('path.storage', $path);
-
-        return $this;
+        return tap($this)->instance('path.storage', $path);
     }
 
     /**
@@ -676,9 +662,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function useEnvironmentPath($path)
     {
-        $this->environmentPath = $path;
-
-        return $this;
+        return tap($this, fn () => $this->environmentPath = $path);
     }
 
     /**
@@ -689,9 +673,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function loadEnvironmentFrom($file)
     {
-        $this->environmentFile = $file;
-
-        return $this;
+        return tap($this, fn () => $this->environmentFile = $file);
     }
 
     /**
@@ -1229,9 +1211,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function dontMergeFrameworkConfiguration()
     {
-        $this->mergeFrameworkConfiguration = false;
-
-        return $this;
+        return tap($this, fn () => $this->mergeFrameworkConfiguration = false);
     }
 
     /**
@@ -1351,9 +1331,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function addAbsoluteCachePathPrefix($prefix)
     {
-        $this->absoluteCachePathPrefixes[] = $prefix;
-
-        return $this;
+        return tap($this, fn () => $this->absoluteCachePathPrefixes[] = $prefix);
     }
 
     /**
@@ -1404,9 +1382,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function terminating($callback)
     {
-        $this->terminatingCallbacks[] = $callback;
-
-        return $this;
+        return tap($this, fn () => $this->terminatingCallbacks[] = $callback);
     }
 
     /**

@@ -20,9 +20,7 @@ trait InteractsWithSockets
      */
     public function dontBroadcastToCurrentUser()
     {
-        $this->socket = Broadcast::socket();
-
-        return $this;
+        return tap($this, fn () => $this->socket = Broadcast::socket());
     }
 
     /**
@@ -32,8 +30,6 @@ trait InteractsWithSockets
      */
     public function broadcastToEveryone()
     {
-        $this->socket = null;
-
-        return $this;
+        return tap($this, fn () => $this->socket = null);
     }
 }

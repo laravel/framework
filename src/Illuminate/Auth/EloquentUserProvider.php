@@ -227,9 +227,7 @@ class EloquentUserProvider implements UserProvider
      */
     public function setHasher(HasherContract $hasher)
     {
-        $this->hasher = $hasher;
-
-        return $this;
+        return tap($this, fn () => $this->hasher = $hasher);
     }
 
     /**
@@ -250,9 +248,7 @@ class EloquentUserProvider implements UserProvider
      */
     public function setModel($model)
     {
-        $this->model = $model;
-
-        return $this;
+        return tap($this, fn () => $this->model = $model);
     }
 
     /**
@@ -273,8 +269,6 @@ class EloquentUserProvider implements UserProvider
      */
     public function withQuery($queryCallback = null)
     {
-        $this->queryCallback = $queryCallback;
-
-        return $this;
+        return tap($this, fn () => $this->queryCallback = $queryCallback);
     }
 }
