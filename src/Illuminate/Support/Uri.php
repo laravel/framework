@@ -24,6 +24,11 @@ class Uri implements Htmlable, Responsable
     protected static ?Closure $urlGeneratorResolver = null;
 
     /**
+     * The URI instance.
+     */
+    protected UriInterface $uri;
+
+    /**
      * Create a new parsed URI instance.
      */
     public function __construct(UriInterface|Stringable|string $uri = '')
@@ -75,19 +80,9 @@ class Uri implements Htmlable, Responsable
      */
     public function user(bool $withPassword = false): ?string
     {
-        if ($withPassword) {
-            return $this->uri->getUserInfo();
-        }
-
-        $userInfo = $this->uri->getUserInfo();
-
-        if (is_null($userInfo)) {
-            return null;
-        }
-
-        return str_contains($userInfo, ':')
-            ? Str::before($userInfo, ':')
-            : $userInfo;
+        return $withPassword
+            ? $this->uri->getUserInfo()
+            : $this->uri->getUsername();
     }
 
     /**
@@ -95,9 +90,7 @@ class Uri implements Htmlable, Responsable
      */
     public function password(): ?string
     {
-        $userInfo = $this->uri->getUserInfo();
-
-        return ! is_null($userInfo) ? Str::after($userInfo, ':') : null;
+        return $this->uri->getPassword();
     }
 
     /**
@@ -272,7 +265,7 @@ class Uri implements Htmlable, Responsable
      */
     public function redirect(int $status = 302, array $headers = []): RedirectResponse
     {
-        return new RedirectResponse((string) $this, $status, $headers);
+        return new RedirectResponse($this->value(), $status, $headers);
     }
 
     /**
@@ -283,7 +276,7 @@ class Uri implements Htmlable, Responsable
      */
     public function toResponse($request)
     {
-        return new RedirectResponse((string) $this);
+        return new RedirectResponse($this->value());
     }
 
     /**
@@ -293,7 +286,7 @@ class Uri implements Htmlable, Responsable
      */
     public function toHtml()
     {
-        return (string) $this;
+        return $this->value();
     }
 
     /**
@@ -309,7 +302,7 @@ class Uri implements Htmlable, Responsable
      */
     public function isEmpty(): bool
     {
-        return trim((string) $this) === '';
+        return trim($this->value()) === '';
     }
 
     /**
