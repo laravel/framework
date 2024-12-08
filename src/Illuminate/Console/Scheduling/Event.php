@@ -532,6 +532,18 @@ class Event
     }
 
     /**
+     * Register a callback to ping a given URL if the operation succeeds and if the given condition is true.
+     *
+     * @param  bool  $value
+     * @param  string  $url
+     * @return $this
+     */
+    public function pingOnSuccessIf($value, $url)
+    {
+        return $value ? $this->onSuccess($this->pingCallback($url)) : $this;
+    }
+
+    /**
      * Register a callback to ping a given URL if the operation fails.
      *
      * @param  string  $url
@@ -540,6 +552,18 @@ class Event
     public function pingOnFailure($url)
     {
         return $this->onFailure($this->pingCallback($url));
+    }
+
+    /**
+     * Register a callback to ping a given URL if the operation fails and if the given condition is true.
+     *
+     * @param  bool  $value
+     * @param  string  $url
+     * @return $this
+     */
+    public function pingOnFailureIf($value, $url)
+    {
+        return $value ? $this->onFailure($this->pingCallback($url)) : $this;
     }
 
     /**
