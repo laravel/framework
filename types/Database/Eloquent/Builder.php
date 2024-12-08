@@ -46,11 +46,11 @@ function test(
     assertType('Illuminate\Database\Eloquent\Collection<int, User>', $query->findOr([1], callback: fn () => 42));
     assertType('User', $query->findOrFail(1));
     assertType('User|null', $query->find(1));
-    assertType('int|User', $query->findOr(1, fn () => 42));
-    assertType('int|User', $query->findOr(1, callback: fn () => 42));
+    assertType('42|User', $query->findOr(1, fn () => 42));
+    assertType('42|User', $query->findOr(1, callback: fn () => 42));
     assertType('User|null', $query->first());
-    assertType('int|User', $query->firstOr(fn () => 42));
-    assertType('int|User', $query->firstOr(callback: fn () => 42));
+    assertType('42|User', $query->firstOr(fn () => 42));
+    assertType('42|User', $query->firstOr(callback: fn () => 42));
     assertType('User', $query->firstOrNew(['id' => 1]));
     assertType('User', $query->findOrNew(1));
     assertType('User', $query->firstOrCreate(['id' => 1]));

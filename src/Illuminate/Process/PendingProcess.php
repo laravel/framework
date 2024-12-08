@@ -259,6 +259,7 @@ class PendingProcess
 
             return new ProcessResult(tap($process)->run($output));
         } catch (SymfonyTimeoutException $e) {
+            /** @phpstan-ignore variable.undefined */
             throw new ProcessTimedOutException($e, new ProcessResult($process));
         }
     }
