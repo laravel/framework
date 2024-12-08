@@ -4,6 +4,8 @@ namespace Illuminate\Foundation\Testing;
 
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Database\ConnectionInterface;
+use Illuminate\Database\Query\Expression;
+use Illuminate\Database\Schema\PostgresBuilder;
 use Illuminate\Foundation\Testing\Traits\CanConfigureMigrationCommands;
 use Illuminate\Support\Collection;
 
@@ -83,33 +85,43 @@ trait DatabaseTruncation
         $dispatcher = $connection->getEventDispatcher();
 
         $connection->unsetEventDispatcher();
+        $schema = $connection->getSchemaBuilder();
 
-        (new Collection(static::$allTables[$name] ??= $connection->getSchemaBuilder()->getTableListing()))
+        (new Collection(static::$allTables[$name] ??= $schema->getTables()))
+            ->when(
+                $schema instanceof PostgresBuilder ? $schema->getSchemas() : null,
+                fn ($tables, $schemas) => $tables->filter(fn ($table) => in_array($table['schema'], $schemas))
+            )
             ->when(
                 property_exists($this, 'tablesToTruncate'),
-                fn ($tables) => $tables->intersect($this->tablesToTruncate),
-                fn ($tables) => $tables->diff($this->exceptTables($name))
+                fn (Collection $tables) => $tables->intersectUsing(
+                    $this->tablesToTruncate,
+                    $this->compareTablesWithSchema(...)
+                ),
+                fn (Collection $tables) => $tables->diffUsing(
+                    $this->exceptTables($name),
+                    $this->compareTablesWithSchema(...)
+                )
             )
-            ->filter(fn ($table) => $connection->table($this->withoutTablePrefix($connection, $table))->exists())
-            ->each(fn ($table) => $connection->table($this->withoutTablePrefix($connection, $table))->truncate());
+            ->map(fn (array $table) => $table['schema'] ? $table['schema'].'.'.$table['name'] : $table['name'])
+            ->filter(fn ($table) => $connection->table(new Expression($table))->exists())
+            ->each(fn ($table) => $connection->table(new Expression($table))->truncate());
 
         $connection->setEventDispatcher($dispatcher);
     }
 
     /**
-     * Remove the table prefix from a table name, if it exists.
+     * Compare the given tables with or without schema name.
      *
-     * @param  \Illuminate\Database\ConnectionInterface  $connection
-     * @param  string  $table
-     * @return string
+     * @param  array  $firstTable
+     * @param  string  $secondTable
+     * @return int
      */
-    protected function withoutTablePrefix(ConnectionInterface $connection, string $table)
+    protected function compareTablesWithSchema(array $firstTable, string $secondTable): int
     {
-        $prefix = $connection->getTablePrefix();
-
-        return strpos($table, $prefix) === 0
-            ? substr($table, strlen($prefix))
-            : $table;
+        return $firstTable['schema'] && str_contains($secondTable, '.')
+            ? $firstTable['schema'].'.'.$firstTable['name'] <=> $secondTable
+            : $firstTable['name'] <=> $secondTable;
     }
 
     /**
