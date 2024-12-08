@@ -11,6 +11,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Support\Uri;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Exception\SessionNotFoundException;
 use Symfony\Component\HttpFoundation\InputBag;
@@ -89,6 +90,16 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     public function method()
     {
         return $this->getMethod();
+    }
+
+    /**
+     * Get a URI instance for the request.
+     *
+     * @return \Illuminate\Support\Uri
+     */
+    public function uri()
+    {
+        return Uri::of($this->fullUrl());
     }
 
     /**
