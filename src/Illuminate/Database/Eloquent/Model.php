@@ -1048,6 +1048,35 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
+     * Update the model in the database optimistically by comparing column values.
+     *
+     * @param  array  $columns
+     * @param  array  $attributes
+     * @return bool
+     *
+     * @throws \Throwable
+     */
+    public function updateOptimistically(array $attributes = [], array $columns = [])
+    {
+        if (! $this->exists) {
+            return false;
+        }
+
+        // If the developer didn't set any columns to compare, try to use the "updated at" attribute.
+        if ($columns === []) {
+            $updatedAt = Arr::get($attributes, $this->getUpdatedAtColumn());
+
+            if (is_null($updatedAt)) {
+                throw new LogicException('At least one column and its value is required to compare optimistically.');
+            }
+
+            $columns = [$this->getQualifiedUpdatedAtColumn() => $updatedAt];
+        }
+
+        return (bool) $this->newModelQuery()->whereKey($this->getKey())->where($columns)->update($attributes);
+    }
+
+    /**
      * Increment a column's value by a given amount without raising any events.
      *
      * @param  string  $column
