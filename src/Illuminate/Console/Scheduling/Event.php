@@ -532,7 +532,7 @@ class Event
     }
 
     /**
-     * Register a callback to ping a given URL if the operation succeeds if the given condition is true.
+     * Register a callback to ping a given URL if the operation succeeds and if the given condition is true.
      *
      * @param  bool  $value
      * @param  string  $url
@@ -555,7 +555,7 @@ class Event
     }
 
     /**
-     * Register a callback to ping a given URL if the operation fails if the given condition is true.
+     * Register a callback to ping a given URL if the operation fails and if the given condition is true.
      *
      * @param  bool  $value
      * @param  string  $url
