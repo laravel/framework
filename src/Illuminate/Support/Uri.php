@@ -19,14 +19,14 @@ class Uri implements Htmlable, Responsable
     use Conditionable, Tappable;
 
     /**
-     * The URL generator resolver.
-     */
-    protected static ?Closure $urlGeneratorResolver = null;
-
-    /**
      * The URI instance.
      */
     protected UriInterface $uri;
+
+    /**
+     * The URL generator resolver.
+     */
+    protected static ?Closure $urlGeneratorResolver = null;
 
     /**
      * Create a new parsed URI instance.
