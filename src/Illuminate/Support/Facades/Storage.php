@@ -97,8 +97,8 @@ class Storage extends Facade
     public static function fake($disk = null, array $config = [])
     {
         $disk = $disk ?: static::$app['config']->get('filesystems.default');
-
-        $root = storage_path('framework/testing/disks/'.$disk);
+        $root = self::getRootPath($disk);
+        $config = self::assembleConfig($disk, $config, $root);
 
         if ($token = ParallelTesting::token()) {
             $root = "{$root}_test_{$token}";
@@ -106,9 +106,10 @@ class Storage extends Facade
 
         (new Filesystem)->cleanDirectory($root);
 
-        static::set($disk, $fake = static::createLocalDriver(array_merge($config, [
-            'root' => $root,
-        ])));
+        static::set(
+            $disk,
+            $fake = static::createLocalDriver($config)
+        );
 
         return tap($fake)->buildTemporaryUrlsUsing(function ($path, $expiration) {
             return URL::to($path.'?expiration='.$expiration->getTimestamp());
@@ -125,10 +126,12 @@ class Storage extends Facade
     public static function persistentFake($disk = null, array $config = [])
     {
         $disk = $disk ?: static::$app['config']->get('filesystems.default');
+        $config = self::assembleConfig($disk, $config, self::getRootPath($disk));
 
-        static::set($disk, $fake = static::createLocalDriver(array_merge($config, [
-            'root' => storage_path('framework/testing/disks/'.$disk),
-        ])));
+        static::set(
+            $disk,
+            $fake = static::createLocalDriver($config)
+        );
 
         return $fake;
     }
@@ -141,5 +144,32 @@ class Storage extends Facade
     protected static function getFacadeAccessor()
     {
         return 'filesystem';
+    }
+
+    /**
+     * Assemble the configuration of the given disk.
+     *
+     * @param  string  $disk
+     * @param  array  $configOverWrite
+     * @param  string  $rootPath
+     * @return array
+     */
+    private static function assembleConfig(string $disk, array $configOverWrite, string $rootPath): array
+    {
+        $originalConfig = static::$app['config']["filesystems.disks.{$disk}"] ?? [];
+        $throw = $originalConfig['throw'] ?? false;
+
+        return array_merge(['throw' => $throw], $configOverWrite, ['root' => $rootPath]);
+    }
+
+    /**
+     * Get the root path of the given disk.
+     *
+     * @param  string  $disk
+     * @return string
+     */
+    private static function getRootPath(string $disk): string
+    {
+        return storage_path('framework/testing/disks/'.$disk);
     }
 }
