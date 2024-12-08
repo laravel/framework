@@ -543,7 +543,6 @@ class Event
         return $value ? $this->onSuccess($this->pingCallback($url)) : $this;
     }
 
-
     /**
      * Register a callback to ping a given URL if the operation fails.
      *
