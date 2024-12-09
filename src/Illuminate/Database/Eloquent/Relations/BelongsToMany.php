@@ -331,9 +331,7 @@ class BelongsToMany extends Relation
      */
     public function using($class)
     {
-        $this->using = $class;
-
-        return $this;
+        return tap($this, fn () => $this->using = $class);
     }
 
     /**
@@ -344,9 +342,7 @@ class BelongsToMany extends Relation
      */
     public function as($accessor)
     {
-        $this->accessor = $accessor;
-
-        return $this;
+        return tap($this, fn () => $this->accessor = $accessor);
     }
 
     /**

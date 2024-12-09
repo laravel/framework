@@ -68,8 +68,6 @@ class CacheSchedulingMutex implements SchedulingMutex, CacheAware
      */
     public function useStore($store)
     {
-        $this->store = $store;
-
-        return $this;
+        return tap($this, fn () => $this->store = $store);
     }
 }

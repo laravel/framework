@@ -572,9 +572,7 @@ class MailManager implements FactoryContract
      */
     public function extend($driver, Closure $callback)
     {
-        $this->customCreators[$driver] = $callback;
-
-        return $this;
+        return tap($this, fn () => $this->customCreators[$driver] = $callback);
     }
 
     /**
@@ -595,9 +593,7 @@ class MailManager implements FactoryContract
      */
     public function setApplication($app)
     {
-        $this->app = $app;
-
-        return $this;
+        return tap($this, fn () => $this->app = $app);
     }
 
     /**
@@ -607,9 +603,7 @@ class MailManager implements FactoryContract
      */
     public function forgetMailers()
     {
-        $this->mailers = [];
-
-        return $this;
+        return tap($this, fn () => $this->mailers = []);
     }
 
     /**

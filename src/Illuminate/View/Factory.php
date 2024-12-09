@@ -444,9 +444,7 @@ class Factory implements FactoryContract
      */
     public function addNamespace($namespace, $hints)
     {
-        $this->finder->addNamespace($namespace, $hints);
-
-        return $this;
+        return tap($this, fn () => $this->finder->addNamespace($namespace, $hints));
     }
 
     /**
@@ -458,9 +456,7 @@ class Factory implements FactoryContract
      */
     public function prependNamespace($namespace, $hints)
     {
-        $this->finder->prependNamespace($namespace, $hints);
-
-        return $this;
+        return tap($this, fn () => $this->finder->prependNamespace($namespace, $hints));
     }
 
     /**
@@ -472,9 +468,7 @@ class Factory implements FactoryContract
      */
     public function replaceNamespace($namespace, $hints)
     {
-        $this->finder->replaceNamespace($namespace, $hints);
-
-        return $this;
+        return tap($this, fn () => $this->finder->replaceNamespace($namespace, $hints));
     }
 
     /**

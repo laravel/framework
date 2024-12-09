@@ -291,9 +291,7 @@ class Gate implements GateContract
      */
     public function policy($class, $policy)
     {
-        $this->policies[$class] = $policy;
-
-        return $this;
+        return tap($this, fn () => $this->policies[$class] = $policy);
     }
 
     /**
@@ -304,9 +302,7 @@ class Gate implements GateContract
      */
     public function before(callable $callback)
     {
-        $this->beforeCallbacks[] = $callback;
-
-        return $this;
+        return tap($this, fn () => $this->beforeCallbacks[] = $callback);
     }
 
     /**
@@ -317,9 +313,7 @@ class Gate implements GateContract
      */
     public function after(callable $callback)
     {
-        $this->afterCallbacks[] = $callback;
-
-        return $this;
+        return tap($this, fn () => $this->afterCallbacks[] = $callback);
     }
 
     /**
@@ -716,9 +710,7 @@ class Gate implements GateContract
      */
     public function guessPolicyNamesUsing(callable $callback)
     {
-        $this->guessPolicyNamesUsingCallback = $callback;
-
-        return $this;
+        return tap($this, fn () => $this->guessPolicyNamesUsingCallback = $callback);
     }
 
     /**
@@ -883,9 +875,7 @@ class Gate implements GateContract
      */
     public function defaultDenialResponse(Response $response)
     {
-        $this->defaultDenialResponse = $response;
-
-        return $this;
+        return tap($this, fn () => $this->defaultDenialResponse = $response);
     }
 
     /**
@@ -896,8 +886,6 @@ class Gate implements GateContract
      */
     public function setContainer(Container $container)
     {
-        $this->container = $container;
-
-        return $this;
+        return tap($this, fn () => $this->container = $container);
     }
 }

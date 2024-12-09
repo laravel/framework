@@ -572,8 +572,6 @@ trait BuildsQueries
      */
     public function tap($callback)
     {
-        $callback($this);
-
-        return $this;
+        return tap($this, $callback(...));
     }
 }

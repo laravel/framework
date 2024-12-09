@@ -209,9 +209,7 @@ class PendingBatch
      */
     public function allowFailures($allowFailures = true)
     {
-        $this->options['allowFailures'] = $allowFailures;
-
-        return $this;
+        return tap($this, fn () => $this->options['allowFailures'] = $allowFailures);
     }
 
     /**
@@ -232,9 +230,7 @@ class PendingBatch
      */
     public function name(string $name)
     {
-        $this->name = $name;
-
-        return $this;
+        return tap($this, fn () => $this->name = $name);
     }
 
     /**
@@ -245,9 +241,7 @@ class PendingBatch
      */
     public function onConnection(string $connection)
     {
-        $this->options['connection'] = $connection;
-
-        return $this;
+        return tap($this, fn () => $this->options['connection'] = $connection);
     }
 
     /**
@@ -268,9 +262,7 @@ class PendingBatch
      */
     public function onQueue($queue)
     {
-        $this->options['queue'] = enum_value($queue);
-
-        return $this;
+        return tap($this, fn () => $this->options['queue'] = enum_value($queue));
     }
 
     /**
@@ -292,9 +284,7 @@ class PendingBatch
      */
     public function withOption(string $key, $value)
     {
-        $this->options[$key] = $value;
-
-        return $this;
+        return tap($this, fn () => $this->options[$key] = $value);
     }
 
     /**

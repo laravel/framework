@@ -423,9 +423,7 @@ class CacheManager implements FactoryContract
      */
     public function extend($driver, Closure $callback)
     {
-        $this->customCreators[$driver] = $callback->bindTo($this, $this);
-
-        return $this;
+        return tap($this, fn () => $this->customCreators[$driver] = $callback->bindTo($this, $this));
     }
 
     /**
@@ -436,9 +434,7 @@ class CacheManager implements FactoryContract
      */
     public function setApplication($app)
     {
-        $this->app = $app;
-
-        return $this;
+        return tap($this, fn () => $this->app = $app);
     }
 
     /**

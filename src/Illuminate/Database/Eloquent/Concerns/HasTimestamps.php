@@ -86,9 +86,7 @@ trait HasTimestamps
      */
     public function setCreatedAt($value)
     {
-        $this->{$this->getCreatedAtColumn()} = $value;
-
-        return $this;
+        return tap($this, fn () => $this->{$this->getCreatedAtColumn()} = $value);
     }
 
     /**
@@ -99,9 +97,7 @@ trait HasTimestamps
      */
     public function setUpdatedAt($value)
     {
-        $this->{$this->getUpdatedAtColumn()} = $value;
-
-        return $this;
+        return tap($this, fn () => $this->{$this->getUpdatedAtColumn()} = $value);
     }
 
     /**

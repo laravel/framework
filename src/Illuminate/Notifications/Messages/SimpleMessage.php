@@ -77,9 +77,7 @@ class SimpleMessage
      */
     public function success()
     {
-        $this->level = 'success';
-
-        return $this;
+        return tap($this, fn () => $this->level = 'success');
     }
 
     /**
@@ -89,9 +87,7 @@ class SimpleMessage
      */
     public function error()
     {
-        $this->level = 'error';
-
-        return $this;
+        return tap($this, fn () => $this->level = 'error');
     }
 
     /**
@@ -102,9 +98,7 @@ class SimpleMessage
      */
     public function level($level)
     {
-        $this->level = $level;
-
-        return $this;
+        return tap($this, fn () => $this->level = $level);
     }
 
     /**
@@ -115,9 +109,7 @@ class SimpleMessage
      */
     public function subject($subject)
     {
-        $this->subject = $subject;
-
-        return $this;
+        return tap($this, fn () => $this->subject = $subject);
     }
 
     /**
@@ -128,9 +120,7 @@ class SimpleMessage
      */
     public function greeting($greeting)
     {
-        $this->greeting = $greeting;
-
-        return $this;
+        return tap($this, fn () => $this->greeting = $greeting);
     }
 
     /**
@@ -141,9 +131,7 @@ class SimpleMessage
      */
     public function salutation($salutation)
     {
-        $this->salutation = $salutation;
-
-        return $this;
+        return tap($this, fn () => $this->salutation = $salutation);
     }
 
     /**
@@ -265,9 +253,7 @@ class SimpleMessage
      */
     public function mailer($mailer)
     {
-        $this->mailer = $mailer;
-
-        return $this;
+        return tap($this, fn () => $this->mailer = $mailer);
     }
 
     /**

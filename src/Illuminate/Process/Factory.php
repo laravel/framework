@@ -146,9 +146,7 @@ class Factory
      */
     public function record(PendingProcess $process, ProcessResultContract $result)
     {
-        $this->recorded[] = [$process, $result];
-
-        return $this;
+        return tap($this, fn () => $this->recorded[] = [$process, $result]);
     }
 
     /**
@@ -159,9 +157,7 @@ class Factory
      */
     public function preventStrayProcesses(bool $prevent = true)
     {
-        $this->preventStrayProcesses = $prevent;
-
-        return $this;
+        return tap($this, fn () => $this->preventStrayProcesses = $prevent);
     }
 
     /**

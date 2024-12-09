@@ -99,9 +99,7 @@ class PendingCommand
      */
     public function expectsQuestion($question, $answer)
     {
-        $this->test->expectedQuestions[] = [$question, $answer];
-
-        return $this;
+        return tap($this, fn () => $this->test->expectedQuestions[] = [$question, $answer]);
     }
 
     /**
@@ -197,9 +195,7 @@ class PendingCommand
      */
     public function expectsOutputToContain($string)
     {
-        $this->test->expectedOutputSubstrings[] = $string;
-
-        return $this;
+        return tap($this, fn () => $this->test->expectedOutputSubstrings[] = $string);
     }
 
     /**
@@ -210,9 +206,7 @@ class PendingCommand
      */
     public function doesntExpectOutputToContain($string)
     {
-        $this->test->unexpectedOutputSubstrings[$string] = false;
-
-        return $this;
+        return tap($this, fn () => $this->test->unexpectedOutputSubstrings[$string] = false);
     }
 
     /**
@@ -256,9 +250,7 @@ class PendingCommand
      */
     public function assertExitCode($exitCode)
     {
-        $this->expectedExitCode = $exitCode;
-
-        return $this;
+        return tap($this, fn () => $this->expectedExitCode = $exitCode);
     }
 
     /**
@@ -269,9 +261,7 @@ class PendingCommand
      */
     public function assertNotExitCode($exitCode)
     {
-        $this->unexpectedExitCode = $exitCode;
-
-        return $this;
+        return tap($this, fn () => $this->unexpectedExitCode = $exitCode);
     }
 
     /**

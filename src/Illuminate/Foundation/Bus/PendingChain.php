@@ -77,9 +77,7 @@ class PendingChain
      */
     public function onConnection($connection)
     {
-        $this->connection = $connection;
-
-        return $this;
+        return tap($this, fn () => $this->connection = $connection);
     }
 
     /**
@@ -90,9 +88,7 @@ class PendingChain
      */
     public function onQueue($queue)
     {
-        $this->queue = enum_value($queue);
-
-        return $this;
+        return tap($this, fn () => $this->queue = enum_value($queue));
     }
 
     /**
@@ -103,9 +99,7 @@ class PendingChain
      */
     public function delay($delay)
     {
-        $this->delay = $delay;
-
-        return $this;
+        return tap($this, fn () => $this->delay = $delay);
     }
 
     /**

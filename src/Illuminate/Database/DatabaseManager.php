@@ -452,9 +452,7 @@ class DatabaseManager implements ConnectionResolverInterface
      */
     public function setApplication($app)
     {
-        $this->app = $app;
-
-        return $this;
+        return tap($this, fn () => $this->app = $app);
     }
 
     /**

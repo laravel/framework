@@ -122,9 +122,7 @@ abstract class SchemaState
      */
     public function withMigrationTable(string $table)
     {
-        $this->migrationTable = $table;
-
-        return $this;
+        return tap($this, fn () => $this->migrationTable = $table);
     }
 
     /**
@@ -135,8 +133,6 @@ abstract class SchemaState
      */
     public function handleOutputUsing(callable $output)
     {
-        $this->output = $output;
-
-        return $this;
+        return tap($this, fn () => $this->output = $output);
     }
 }

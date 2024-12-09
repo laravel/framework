@@ -21,8 +21,6 @@ class ImageFile extends File
      */
     public function dimensions($dimensions)
     {
-        $this->rules($dimensions);
-
-        return $this;
+        return tap($this, fn () => $this->rules($dimensions));
     }
 }

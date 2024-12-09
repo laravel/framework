@@ -12,9 +12,7 @@ trait InteractsWithSession
      */
     public function withSession(array $data)
     {
-        $this->session($data);
-
-        return $this;
+        return tap($this, fn () => $this->session($data));
     }
 
     /**

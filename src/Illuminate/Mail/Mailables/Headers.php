@@ -56,9 +56,7 @@ class Headers
      */
     public function messageId(string $messageId)
     {
-        $this->messageId = $messageId;
-
-        return $this;
+        return tap($this, fn () => $this->messageId = $messageId);
     }
 
     /**
@@ -69,9 +67,7 @@ class Headers
      */
     public function references(array $references)
     {
-        $this->references = array_merge($this->references, $references);
-
-        return $this;
+        return tap($this, fn () => $this->references = array_merge($this->references, $references));
     }
 
     /**
@@ -82,9 +78,7 @@ class Headers
      */
     public function text(array $text)
     {
-        $this->text = array_merge($this->text, $text);
-
-        return $this;
+        return tap($this, fn () => $this->text = array_merge($this->text, $text));
     }
 
     /**

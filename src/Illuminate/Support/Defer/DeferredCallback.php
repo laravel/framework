@@ -25,9 +25,7 @@ class DeferredCallback
      */
     public function name(string $name): self
     {
-        $this->name = $name;
-
-        return $this;
+        return tap($this, fn () => $this->name = $name);
     }
 
     /**
@@ -38,9 +36,7 @@ class DeferredCallback
      */
     public function always(bool $always = true): self
     {
-        $this->always = $always;
-
-        return $this;
+        return tap($this, fn () => $this->always = $always);
     }
 
     /**

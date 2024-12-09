@@ -363,9 +363,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function merge(array $input)
     {
-        $this->getInputSource()->add($input);
-
-        return $this;
+        return tap($this, fn () => $this->getInputSource()->add($input));
     }
 
     /**
@@ -390,9 +388,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function replace(array $input)
     {
-        $this->getInputSource()->replace($input);
-
-        return $this;
+        return tap($this, fn () => $this->getInputSource()->replace($input));
     }
 
     /**
@@ -671,9 +667,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function setJson($json)
     {
-        $this->json = $json;
-
-        return $this;
+        return tap($this, fn () => $this->json = $json);
     }
 
     /**
@@ -696,9 +690,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function setUserResolver(Closure $callback)
     {
-        $this->userResolver = $callback;
-
-        return $this;
+        return tap($this, fn () => $this->userResolver = $callback);
     }
 
     /**
@@ -721,9 +713,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function setRouteResolver(Closure $callback)
     {
-        $this->routeResolver = $callback;
-
-        return $this;
+        return tap($this, fn () => $this->routeResolver = $callback);
     }
 
     /**

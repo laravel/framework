@@ -345,9 +345,7 @@ class Event
      */
     public function storeOutput()
     {
-        $this->ensureOutputIsBeingCaptured();
-
-        return $this;
+        return tap($this, fn () => $this->ensureOutputIsBeingCaptured());
     }
 
     /**
@@ -610,9 +608,7 @@ class Event
      */
     public function before(Closure $callback)
     {
-        $this->beforeCallbacks[] = $callback;
-
-        return $this;
+        return tap($this, fn () => $this->beforeCallbacks[] = $callback);
     }
 
     /**
@@ -793,9 +789,7 @@ class Event
      */
     public function preventOverlapsUsing(EventMutex $mutex)
     {
-        $this->mutex = $mutex;
-
-        return $this;
+        return tap($this, fn () => $this->mutex = $mutex);
     }
 
     /**
@@ -822,9 +816,7 @@ class Event
      */
     public function createMutexNameUsing(Closure|string $mutexName)
     {
-        $this->mutexNameResolver = is_string($mutexName) ? fn () => $mutexName : $mutexName;
-
-        return $this;
+        return tap($this, fn () => $this->mutexNameResolver = is_string($mutexName) ? fn () => $mutexName : $mutexName);
     }
 
     /**

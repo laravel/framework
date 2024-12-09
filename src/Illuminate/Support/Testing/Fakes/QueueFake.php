@@ -75,9 +75,7 @@ class QueueFake extends QueueManager implements Fake, Queue
      */
     public function except($jobsToBeQueued)
     {
-        $this->jobsToBeQueued = Collection::wrap($jobsToBeQueued)->merge($this->jobsToBeQueued);
-
-        return $this;
+        return tap($this, fn () => $this->jobsToBeQueued = Collection::wrap($jobsToBeQueued)->merge($this->jobsToBeQueued));
     }
 
     /**
@@ -524,9 +522,7 @@ class QueueFake extends QueueManager implements Fake, Queue
      */
     public function serializeAndRestore(bool $serializeAndRestore = true)
     {
-        $this->serializeAndRestore = $serializeAndRestore;
-
-        return $this;
+        return tap($this, fn () => $this->serializeAndRestore = $serializeAndRestore);
     }
 
     /**

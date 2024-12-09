@@ -299,9 +299,7 @@ class Command extends SymfonyCommand
     #[\Override]
     public function setHidden(bool $hidden = true): static
     {
-        parent::setHidden($this->hidden = $hidden);
-
-        return $this;
+        return tap($this, fn () => parent::setHidden($this->hidden = $hidden));
     }
 
     /**

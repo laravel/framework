@@ -101,9 +101,7 @@ class Factory
      */
     public function globalMiddleware($middleware)
     {
-        $this->globalMiddleware[] = $middleware;
-
-        return $this;
+        return tap($this, fn () => $this->globalMiddleware[] = $middleware);
     }
 
     /**
@@ -114,9 +112,7 @@ class Factory
      */
     public function globalRequestMiddleware($middleware)
     {
-        $this->globalMiddleware[] = Middleware::mapRequest($middleware);
-
-        return $this;
+        return tap($this, fn () => $this->globalMiddleware[] = Middleware::mapRequest($middleware));
     }
 
     /**
@@ -127,9 +123,7 @@ class Factory
      */
     public function globalResponseMiddleware($middleware)
     {
-        $this->globalMiddleware[] = Middleware::mapResponse($middleware);
-
-        return $this;
+        return tap($this, fn () => $this->globalMiddleware[] = Middleware::mapResponse($middleware));
     }
 
     /**
@@ -140,9 +134,7 @@ class Factory
      */
     public function globalOptions($options)
     {
-        $this->globalOptions = $options;
-
-        return $this;
+        return tap($this, fn () => $this->globalOptions = $options);
     }
 
     /**
@@ -292,9 +284,7 @@ class Factory
      */
     public function preventStrayRequests($prevent = true)
     {
-        $this->preventStrayRequests = $prevent;
-
-        return $this;
+        return tap($this, fn () => $this->preventStrayRequests = $prevent);
     }
 
     /**
@@ -324,9 +314,7 @@ class Factory
      */
     protected function record()
     {
-        $this->recording = true;
-
-        return $this;
+        return tap($this, fn () => $this->recording = true);
     }
 
     /**

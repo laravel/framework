@@ -142,9 +142,7 @@ class BcryptHasher extends AbstractHasher implements HasherContract
      */
     public function setRounds($rounds)
     {
-        $this->rounds = (int) $rounds;
-
-        return $this;
+        return tap($this, fn () => $this->rounds = (int) $rounds);
     }
 
     /**

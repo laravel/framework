@@ -176,8 +176,6 @@ abstract class Lock implements LockContract
      */
     public function betweenBlockedAttemptsSleepFor($milliseconds)
     {
-        $this->sleepMilliseconds = $milliseconds;
-
-        return $this;
+        return tap($this, fn () => $this->sleepMilliseconds = $milliseconds);
     }
 }

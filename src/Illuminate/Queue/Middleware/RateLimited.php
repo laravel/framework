@@ -108,9 +108,7 @@ class RateLimited
      */
     public function dontRelease()
     {
-        $this->shouldRelease = false;
-
-        return $this;
+        return tap($this, fn () => $this->shouldRelease = false);
     }
 
     /**

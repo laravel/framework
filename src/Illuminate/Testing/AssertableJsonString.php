@@ -222,9 +222,7 @@ class AssertableJsonString implements ArrayAccess, Countable
      */
     public function assertMissingPath($path)
     {
-        PHPUnit::assertFalse(Arr::has($this->json(), $path));
-
-        return $this;
+        return tap($this, fn () => PHPUnit::assertFalse(Arr::has($this->json(), $path)));
     }
 
     /**
@@ -254,9 +252,7 @@ class AssertableJsonString implements ArrayAccess, Countable
      */
     public function assertPathCanonicalizing($path, $expect)
     {
-        PHPUnit::assertEqualsCanonicalizing($expect, $this->json($path));
-
-        return $this;
+        return tap($this, fn () => PHPUnit::assertEqualsCanonicalizing($expect, $this->json($path)));
     }
 
     /**

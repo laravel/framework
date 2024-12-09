@@ -217,9 +217,7 @@ class Middleware
      */
     public function replace(string $search, string $replace)
     {
-        $this->replacements[$search] = $replace;
-
-        return $this;
+        return tap($this, fn () => $this->replacements[$search] = $replace);
     }
 
     /**
@@ -230,9 +228,7 @@ class Middleware
      */
     public function use(array $middleware)
     {
-        $this->global = $middleware;
-
-        return $this;
+        return tap($this, fn () => $this->global = $middleware);
     }
 
     /**
@@ -244,9 +240,7 @@ class Middleware
      */
     public function group(string $group, array $middleware)
     {
-        $this->groups[$group] = $middleware;
-
-        return $this;
+        return tap($this, fn () => $this->groups[$group] = $middleware);
     }
 
     /**
@@ -310,9 +304,7 @@ class Middleware
      */
     public function replaceInGroup(string $group, string $search, string $replace)
     {
-        $this->groupReplacements[$group][$search] = $replace;
-
-        return $this;
+        return tap($this, fn () => $this->groupReplacements[$group][$search] = $replace);
     }
 
     /**
@@ -384,9 +376,7 @@ class Middleware
      */
     public function pages(array $middleware)
     {
-        $this->pageMiddleware = $middleware;
-
-        return $this;
+        return tap($this, fn () => $this->pageMiddleware = $middleware);
     }
 
     /**
@@ -397,9 +387,7 @@ class Middleware
      */
     public function alias(array $aliases)
     {
-        $this->customAliases = $aliases;
-
-        return $this;
+        return tap($this, fn () => $this->customAliases = $aliases);
     }
 
     /**
@@ -410,9 +398,7 @@ class Middleware
      */
     public function priority(array $priority)
     {
-        $this->priority = $priority;
-
-        return $this;
+        return tap($this, fn () => $this->priority = $priority);
     }
 
     /**
@@ -424,9 +410,7 @@ class Middleware
      */
     public function prependToPriorityList($before, $prepend)
     {
-        $this->prependPriority[$prepend] = $before;
-
-        return $this;
+        return tap($this, fn () => $this->prependPriority[$prepend] = $before);
     }
 
     /**
@@ -438,9 +422,7 @@ class Middleware
      */
     public function appendToPriorityList($after, $append)
     {
-        $this->appendPriority[$append] = $after;
-
-        return $this;
+        return tap($this, fn () => $this->appendPriority[$append] = $after);
     }
 
     /**
@@ -584,9 +566,7 @@ class Middleware
      */
     public function encryptCookies(array $except = [])
     {
-        EncryptCookies::except($except);
-
-        return $this;
+        return tap($this, fn () => EncryptCookies::except($except));
     }
 
     /**
@@ -597,9 +577,7 @@ class Middleware
      */
     public function validateCsrfTokens(array $except = [])
     {
-        ValidateCsrfToken::except($except);
-
-        return $this;
+        return tap($this, fn () => ValidateCsrfToken::except($except));
     }
 
     /**
@@ -610,9 +588,7 @@ class Middleware
      */
     public function validateSignatures(array $except = [])
     {
-        ValidateSignature::except($except);
-
-        return $this;
+        return tap($this, fn () => ValidateSignature::except($except));
     }
 
     /**
@@ -623,9 +599,7 @@ class Middleware
      */
     public function convertEmptyStringsToNull(array $except = [])
     {
-        (new Collection($except))->each(fn (Closure $callback) => ConvertEmptyStringsToNull::skipWhen($callback));
-
-        return $this;
+        return tap($this, fn () => (new Collection($except))->each(fn (Closure $callback) => ConvertEmptyStringsToNull::skipWhen($callback)));
     }
 
     /**
@@ -691,9 +665,7 @@ class Middleware
      */
     public function preventRequestsDuringMaintenance(array $except = [])
     {
-        PreventRequestsDuringMaintenance::except($except);
-
-        return $this;
+        return tap($this, fn () => PreventRequestsDuringMaintenance::except($except));
     }
 
     /**
@@ -703,9 +675,7 @@ class Middleware
      */
     public function statefulApi()
     {
-        $this->statefulApi = true;
-
-        return $this;
+        return tap($this, fn () => $this->statefulApi = true);
     }
 
     /**
@@ -733,9 +703,7 @@ class Middleware
      */
     public function throttleWithRedis()
     {
-        $this->throttleWithRedis = true;
-
-        return $this;
+        return tap($this, fn () => $this->throttleWithRedis = true);
     }
 
     /**
@@ -745,9 +713,7 @@ class Middleware
      */
     public function authenticateSessions()
     {
-        $this->authenticatedSessions = true;
-
-        return $this;
+        return tap($this, fn () => $this->authenticatedSessions = true);
     }
 
     /**

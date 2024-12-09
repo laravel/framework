@@ -1583,9 +1583,7 @@ trait HasAttributes
      */
     public function setDateFormat($format)
     {
-        $this->dateFormat = $format;
-
-        return $this;
+        return tap($this, fn () => $this->dateFormat = $format);
     }
 
     /**
@@ -1983,9 +1981,7 @@ trait HasAttributes
      */
     public function syncOriginal()
     {
-        $this->original = $this->getAttributes();
-
-        return $this;
+        return tap($this, fn () => $this->original = $this->getAttributes());
     }
 
     /**
@@ -2025,9 +2021,7 @@ trait HasAttributes
      */
     public function syncChanges()
     {
-        $this->changes = $this->getDirty();
-
-        return $this;
+        return tap($this, fn () => $this->changes = $this->getDirty());
     }
 
     /**
@@ -2061,9 +2055,7 @@ trait HasAttributes
      */
     public function discardChanges()
     {
-        [$this->attributes, $this->changes] = [$this->original, []];
-
-        return $this;
+        return tap($this, fn () => [$this->attributes, $this->changes] = [$this->original, []]);
     }
 
     /**
@@ -2273,9 +2265,7 @@ trait HasAttributes
      */
     public function setAppends(array $appends)
     {
-        $this->appends = $appends;
-
-        return $this;
+        return tap($this, fn () => $this->appends = $appends);
     }
 
     /**

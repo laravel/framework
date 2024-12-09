@@ -144,9 +144,7 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
      */
     public function extensions($extensions)
     {
-        $this->allowedExtensions = (array) $extensions;
-
-        return $this;
+        return tap($this, fn () => $this->allowedExtensions = (array) $extensions);
     }
 
     /**
@@ -186,9 +184,7 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
      */
     public function min($size)
     {
-        $this->minimumFileSize = $this->toKilobytes($size);
-
-        return $this;
+        return tap($this, fn () => $this->minimumFileSize = $this->toKilobytes($size));
     }
 
     /**
@@ -199,9 +195,7 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
      */
     public function max($size)
     {
-        $this->maximumFileSize = $this->toKilobytes($size);
-
-        return $this;
+        return tap($this, fn () => $this->maximumFileSize = $this->toKilobytes($size));
     }
 
     /**
@@ -235,9 +229,7 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
      */
     public function rules($rules)
     {
-        $this->customRules = array_merge($this->customRules, Arr::wrap($rules));
-
-        return $this;
+        return tap($this, fn () => $this->customRules = array_merge($this->customRules, Arr::wrap($rules)));
     }
 
     /**
@@ -357,9 +349,7 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
      */
     public function setValidator($validator)
     {
-        $this->validator = $validator;
-
-        return $this;
+        return tap($this, fn () => $this->validator = $validator);
     }
 
     /**
@@ -370,8 +360,6 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
      */
     public function setData($data)
     {
-        $this->data = $data;
-
-        return $this;
+        return tap($this, fn () => $this->data = $data);
     }
 }

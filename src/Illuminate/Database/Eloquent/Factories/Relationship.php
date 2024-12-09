@@ -68,8 +68,6 @@ class Relationship
      */
     public function recycle($recycle)
     {
-        $this->factory = $this->factory->recycle($recycle);
-
-        return $this;
+        return tap($this, fn () => $this->factory = $this->factory->recycle($recycle));
     }
 }

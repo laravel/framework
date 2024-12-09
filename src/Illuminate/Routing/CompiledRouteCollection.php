@@ -310,9 +310,7 @@ class CompiledRouteCollection extends AbstractRouteCollection
      */
     public function setRouter(Router $router)
     {
-        $this->router = $router;
-
-        return $this;
+        return tap($this, fn () => $this->router = $router);
     }
 
     /**
@@ -323,8 +321,6 @@ class CompiledRouteCollection extends AbstractRouteCollection
      */
     public function setContainer(Container $container)
     {
-        $this->container = $container;
-
-        return $this;
+        return tap($this, fn () => $this->container = $container);
     }
 }

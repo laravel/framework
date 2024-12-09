@@ -295,8 +295,6 @@ class FakeInvokedProcess implements InvokedProcessContract
      */
     public function withOutputHandler(?callable $outputHandler)
     {
-        $this->outputHandler = $outputHandler;
-
-        return $this;
+        return tap($this, fn () => $this->outputHandler = $outputHandler);
     }
 }

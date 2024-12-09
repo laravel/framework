@@ -43,9 +43,7 @@ class PendingDispatch
      */
     public function onConnection($connection)
     {
-        $this->job->onConnection($connection);
-
-        return $this;
+        return tap($this, fn () => $this->job->onConnection($connection));
     }
 
     /**
@@ -56,9 +54,7 @@ class PendingDispatch
      */
     public function onQueue($queue)
     {
-        $this->job->onQueue($queue);
-
-        return $this;
+        return tap($this, fn () => $this->job->onQueue($queue));
     }
 
     /**
@@ -69,9 +65,7 @@ class PendingDispatch
      */
     public function allOnConnection($connection)
     {
-        $this->job->allOnConnection($connection);
-
-        return $this;
+        return tap($this, fn () => $this->job->allOnConnection($connection));
     }
 
     /**
@@ -82,9 +76,7 @@ class PendingDispatch
      */
     public function allOnQueue($queue)
     {
-        $this->job->allOnQueue($queue);
-
-        return $this;
+        return tap($this, fn () => $this->job->allOnQueue($queue));
     }
 
     /**
@@ -95,9 +87,7 @@ class PendingDispatch
      */
     public function delay($delay)
     {
-        $this->job->delay($delay);
-
-        return $this;
+        return tap($this, fn () => $this->job->delay($delay));
     }
 
     /**
@@ -107,9 +97,7 @@ class PendingDispatch
      */
     public function withoutDelay()
     {
-        $this->job->withoutDelay();
-
-        return $this;
+        return tap($this, fn () => $this->job->withoutDelay());
     }
 
     /**
@@ -119,9 +107,7 @@ class PendingDispatch
      */
     public function afterCommit()
     {
-        $this->job->afterCommit();
-
-        return $this;
+        return tap($this, fn () => $this->job->afterCommit());
     }
 
     /**
@@ -131,9 +117,7 @@ class PendingDispatch
      */
     public function beforeCommit()
     {
-        $this->job->beforeCommit();
-
-        return $this;
+        return tap($this, fn () => $this->job->beforeCommit());
     }
 
     /**
@@ -144,9 +128,7 @@ class PendingDispatch
      */
     public function chain($chain)
     {
-        $this->job->chain($chain);
-
-        return $this;
+        return tap($this, fn () => $this->job->chain($chain));
     }
 
     /**
@@ -156,9 +138,7 @@ class PendingDispatch
      */
     public function afterResponse()
     {
-        $this->afterResponse = true;
-
-        return $this;
+        return tap($this, fn () => $this->afterResponse = true);
     }
 
     /**
@@ -185,9 +165,7 @@ class PendingDispatch
      */
     public function __call($method, $parameters)
     {
-        $this->job->{$method}(...$parameters);
-
-        return $this;
+        return tap($this, fn () => $this->job->{$method}(...$parameters));
     }
 
     /**

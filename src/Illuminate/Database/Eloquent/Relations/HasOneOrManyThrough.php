@@ -155,9 +155,7 @@ abstract class HasOneOrManyThrough extends Relation
      */
     public function withTrashedParents()
     {
-        $this->query->withoutGlobalScope('SoftDeletableHasManyThrough');
-
-        return $this;
+        return tap($this, fn () => $this->query->withoutGlobalScope('SoftDeletableHasManyThrough'));
     }
 
     /** @inheritDoc */

@@ -155,8 +155,6 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
      */
     public function locale($locale)
     {
-        $this->locale = $locale;
-
-        return $this;
+        return tap($this, fn () => $this->locale = $locale);
     }
 }

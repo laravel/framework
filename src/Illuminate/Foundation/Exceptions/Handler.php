@@ -318,9 +318,7 @@ class Handler implements ExceptionHandlerContract
      */
     public function level($type, $level)
     {
-        $this->levels[$type] = $level;
-
-        return $this;
+        return tap($this, fn () => $this->levels[$type] = $level);
     }
 
     /**
@@ -550,9 +548,7 @@ class Handler implements ExceptionHandlerContract
      */
     public function buildContextUsing(Closure $contextCallback)
     {
-        $this->contextCallbacks[] = $contextCallback;
-
-        return $this;
+        return tap($this, fn () => $this->contextCallbacks[] = $contextCallback);
     }
 
     /**
@@ -617,9 +613,7 @@ class Handler implements ExceptionHandlerContract
      */
     public function respondUsing($callback)
     {
-        $this->finalizeResponseCallback = $callback;
-
-        return $this;
+        return tap($this, fn () => $this->finalizeResponseCallback = $callback);
     }
 
     /**
@@ -788,9 +782,7 @@ class Handler implements ExceptionHandlerContract
      */
     public function shouldRenderJsonWhen($callback)
     {
-        $this->shouldRenderJsonWhenCallback = $callback;
-
-        return $this;
+        return tap($this, fn () => $this->shouldRenderJsonWhenCallback = $callback);
     }
 
     /**
@@ -1033,9 +1025,7 @@ class Handler implements ExceptionHandlerContract
      */
     public function dontReportDuplicates()
     {
-        $this->withoutDuplicates = true;
-
-        return $this;
+        return tap($this, fn () => $this->withoutDuplicates = true);
     }
 
     /**

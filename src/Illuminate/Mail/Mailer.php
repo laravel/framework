@@ -659,8 +659,6 @@ class Mailer implements MailerContract, MailQueueContract
      */
     public function setQueue(QueueContract $queue)
     {
-        $this->queue = $queue;
-
-        return $this;
+        return tap($this, fn () => $this->queue = $queue);
     }
 }

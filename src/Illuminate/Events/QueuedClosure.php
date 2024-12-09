@@ -64,9 +64,7 @@ class QueuedClosure
      */
     public function onConnection($connection)
     {
-        $this->connection = $connection;
-
-        return $this;
+        return tap($this, fn () => $this->connection = $connection);
     }
 
     /**
@@ -77,9 +75,7 @@ class QueuedClosure
      */
     public function onQueue($queue)
     {
-        $this->queue = enum_value($queue);
-
-        return $this;
+        return tap($this, fn () => $this->queue = enum_value($queue));
     }
 
     /**
@@ -90,9 +86,7 @@ class QueuedClosure
      */
     public function delay($delay)
     {
-        $this->delay = $delay;
-
-        return $this;
+        return tap($this, fn () => $this->delay = $delay);
     }
 
     /**
@@ -103,9 +97,7 @@ class QueuedClosure
      */
     public function catch(Closure $closure)
     {
-        $this->catchCallbacks[] = $closure;
-
-        return $this;
+        return tap($this, fn () => $this->catchCallbacks[] = $closure);
     }
 
     /**

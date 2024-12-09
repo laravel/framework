@@ -48,8 +48,6 @@ abstract class CacheEvent
      */
     public function setTags($tags)
     {
-        $this->tags = $tags;
-
-        return $this;
+        return tap($this, fn () => $this->tags = $tags);
     }
 }

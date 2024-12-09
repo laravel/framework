@@ -827,9 +827,7 @@ class Worker
      */
     public function setCache(CacheContract $cache)
     {
-        $this->cache = $cache;
-
-        return $this;
+        return tap($this, fn () => $this->cache = $cache);
     }
 
     /**
@@ -840,9 +838,7 @@ class Worker
      */
     public function setName($name)
     {
-        $this->name = $name;
-
-        return $this;
+        return tap($this, fn () => $this->name = $name);
     }
 
     /**

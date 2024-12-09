@@ -73,9 +73,7 @@ trait MakesHttpRequests
      */
     public function withHeaders(array $headers)
     {
-        $this->defaultHeaders = array_merge($this->defaultHeaders, $headers);
-
-        return $this;
+        return tap($this, fn () => $this->defaultHeaders = array_merge($this->defaultHeaders, $headers));
     }
 
     /**
@@ -87,9 +85,7 @@ trait MakesHttpRequests
      */
     public function withHeader(string $name, string $value)
     {
-        $this->defaultHeaders[$name] = $value;
-
-        return $this;
+        return tap($this, fn () => $this->defaultHeaders[$name] = $value);
     }
 
     /**
@@ -161,9 +157,7 @@ trait MakesHttpRequests
      */
     public function flushHeaders()
     {
-        $this->defaultHeaders = [];
-
-        return $this;
+        return tap($this, fn () => $this->defaultHeaders = []);
     }
 
     /**
@@ -174,9 +168,7 @@ trait MakesHttpRequests
      */
     public function withServerVariables(array $server)
     {
-        $this->serverVariables = $server;
-
-        return $this;
+        return tap($this, fn () => $this->serverVariables = $server);
     }
 
     /**
@@ -235,9 +227,7 @@ trait MakesHttpRequests
      */
     public function withCookies(array $cookies)
     {
-        $this->defaultCookies = array_merge($this->defaultCookies, $cookies);
-
-        return $this;
+        return tap($this, fn () => $this->defaultCookies = array_merge($this->defaultCookies, $cookies));
     }
 
     /**
@@ -249,9 +239,7 @@ trait MakesHttpRequests
      */
     public function withCookie(string $name, string $value)
     {
-        $this->defaultCookies[$name] = $value;
-
-        return $this;
+        return tap($this, fn () => $this->defaultCookies[$name] = $value);
     }
 
     /**
@@ -262,9 +250,7 @@ trait MakesHttpRequests
      */
     public function withUnencryptedCookies(array $cookies)
     {
-        $this->unencryptedCookies = array_merge($this->unencryptedCookies, $cookies);
-
-        return $this;
+        return tap($this, fn () => $this->unencryptedCookies = array_merge($this->unencryptedCookies, $cookies));
     }
 
     /**
@@ -276,9 +262,7 @@ trait MakesHttpRequests
      */
     public function withUnencryptedCookie(string $name, string $value)
     {
-        $this->unencryptedCookies[$name] = $value;
-
-        return $this;
+        return tap($this, fn () => $this->unencryptedCookies[$name] = $value);
     }
 
     /**
@@ -288,9 +272,7 @@ trait MakesHttpRequests
      */
     public function followingRedirects()
     {
-        $this->followRedirects = true;
-
-        return $this;
+        return tap($this, fn () => $this->followRedirects = true);
     }
 
     /**
@@ -300,9 +282,7 @@ trait MakesHttpRequests
      */
     public function withCredentials()
     {
-        $this->withCredentials = true;
-
-        return $this;
+        return tap($this, fn () => $this->withCredentials = true);
     }
 
     /**
@@ -312,9 +292,7 @@ trait MakesHttpRequests
      */
     public function disableCookieEncryption()
     {
-        $this->encryptCookies = false;
-
-        return $this;
+        return tap($this, fn () => $this->encryptCookies = false);
     }
 
     /**

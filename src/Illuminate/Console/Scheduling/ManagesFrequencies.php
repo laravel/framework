@@ -15,9 +15,7 @@ trait ManagesFrequencies
      */
     public function cron($expression)
     {
-        $this->expression = $expression;
-
-        return $this;
+        return tap($this, fn () => $this->expression = $expression);
     }
 
     /**
@@ -644,9 +642,7 @@ trait ManagesFrequencies
      */
     public function timezone($timezone)
     {
-        $this->timezone = $timezone;
-
-        return $this;
+        return tap($this, fn () => $this->timezone = $timezone);
     }
 
     /**
