@@ -9,7 +9,6 @@ use Illuminate\Http\Request;
 
 class HandleCors
 {
-
     /**
      * Create a new middleware instance.
      *
