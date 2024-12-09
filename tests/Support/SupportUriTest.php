@@ -111,4 +111,12 @@ class SupportUriTest extends TestCase
 
         $this->assertEquals(['tag' => ['foo', 'bar']], $uri->pushOntoQuery('tag', 'bar')->query()->all());
     }
+
+    public function test_query_strings_with_dots_can_be_replaced_or_merged_consistently()
+    {
+        $uri = Uri::of('https://dot.test/?foo.bar=baz');
+
+        $this->assertEquals('foo.bar=baz&foo[bar]=zab', $uri->withQuery(['foo.bar' => 'zab'])->query()->decode());
+        $this->assertEquals('foo[bar]=zab', $uri->replaceQuery(['foo.bar' => 'zab'])->query()->decode());
+    }
 }

@@ -197,7 +197,11 @@ class Uri implements Htmlable, Responsable
 
             $newQuery = $mergedQuery;
         } else {
-            $newQuery = $query;
+            $newQuery = [];
+
+            foreach ($query as $key => $value) {
+                data_set($newQuery, $key, $value);
+            }
         }
 
         return new static($this->uri->withQuery(Arr::query($newQuery)));
