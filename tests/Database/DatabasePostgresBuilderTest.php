@@ -221,6 +221,7 @@ class DatabasePostgresBuilderTest extends TestCase
     public function testDropAllTablesWhenSearchPathIsString()
     {
         $connection = $this->getConnection();
+        $connection->shouldReceive('getTablePrefix')->andReturn('');
         $connection->shouldReceive('getConfig')->with('search_path')->andReturn('public');
         $connection->shouldReceive('getConfig')->with('dont_drop')->andReturn(['foo']);
         $grammar = m::mock(PostgresGrammar::class);
@@ -230,9 +231,6 @@ class DatabasePostgresBuilderTest extends TestCase
         $grammar->shouldReceive('compileTables')->andReturn('sql');
         $processor->shouldReceive('processTables')->once()->andReturn([['name' => 'users', 'schema' => 'public']]);
         $connection->shouldReceive('selectFromWriteConnection')->with('sql')->andReturn([['name' => 'users', 'schema' => 'public']]);
-        $grammar->shouldReceive('escapeNames')->with(['public'])->andReturn(['"public"']);
-        $grammar->shouldReceive('escapeNames')->with(['foo'])->andReturn(['"foo"']);
-        $grammar->shouldReceive('escapeNames')->with(['users', 'public.users'])->andReturn(['"users"', '"public"."users"']);
         $grammar->shouldReceive('compileDropAllTables')->with(['public.users'])->andReturn('drop table "public"."users" cascade');
         $connection->shouldReceive('statement')->with('drop table "public"."users" cascade');
         $builder = $this->getBuilder($connection);
@@ -243,6 +241,7 @@ class DatabasePostgresBuilderTest extends TestCase
     public function testDropAllTablesWhenSearchPathIsStringOfMany()
     {
         $connection = $this->getConnection();
+        $connection->shouldReceive('getTablePrefix')->andReturn('');
         $connection->shouldReceive('getConfig')->with('username')->andReturn('foouser');
         $connection->shouldReceive('getConfig')->with('search_path')->andReturn('"$user", public, foo_bar-Baz.Áüõß');
         $connection->shouldReceive('getConfig')->with('dont_drop')->andReturn(['foo']);
@@ -253,10 +252,6 @@ class DatabasePostgresBuilderTest extends TestCase
         $processor->shouldReceive('processTables')->once()->andReturn([['name' => 'users', 'schema' => 'foouser']]);
         $grammar->shouldReceive('compileTables')->andReturn('sql');
         $connection->shouldReceive('selectFromWriteConnection')->with('sql')->andReturn([['name' => 'users', 'schema' => 'foouser']]);
-        $grammar->shouldReceive('escapeNames')->with(['foouser', 'public', 'foo_bar-Baz.Áüõß'])->andReturn(['"foouser"', '"public"', '"foo_bar-Baz"."Áüõß"']);
-        $grammar->shouldReceive('escapeNames')->with(['foo'])->andReturn(['"foo"']);
-        $grammar->shouldReceive('escapeNames')->with(['foouser'])->andReturn(['"foouser"']);
-        $grammar->shouldReceive('escapeNames')->with(['users', 'foouser.users'])->andReturn(['"users"', '"foouser"."users"']);
         $grammar->shouldReceive('compileDropAllTables')->with(['foouser.users'])->andReturn('drop table "foouser"."users" cascade');
         $connection->shouldReceive('statement')->with('drop table "foouser"."users" cascade');
         $builder = $this->getBuilder($connection);
@@ -267,6 +262,7 @@ class DatabasePostgresBuilderTest extends TestCase
     public function testDropAllTablesWhenSearchPathIsArrayOfMany()
     {
         $connection = $this->getConnection();
+        $connection->shouldReceive('getTablePrefix')->andReturn('');
         $connection->shouldReceive('getConfig')->with('username')->andReturn('foouser');
         $connection->shouldReceive('getConfig')->with('search_path')->andReturn([
             '$user',
@@ -282,10 +278,6 @@ class DatabasePostgresBuilderTest extends TestCase
         $processor->shouldReceive('processTables')->once()->andReturn([['name' => 'users', 'schema' => 'foouser']]);
         $grammar->shouldReceive('compileTables')->andReturn('sql');
         $connection->shouldReceive('selectFromWriteConnection')->with('sql')->andReturn([['name' => 'users', 'schema' => 'foouser']]);
-        $grammar->shouldReceive('escapeNames')->with(['foouser', 'dev', 'test', 'spaced schema'])->andReturn(['"foouser"', '"dev"', '"test"', '"spaced schema"']);
-        $grammar->shouldReceive('escapeNames')->with(['foo'])->andReturn(['"foo"']);
-        $grammar->shouldReceive('escapeNames')->with(['users', 'foouser.users'])->andReturn(['"users"', '"foouser"."users"']);
-        $grammar->shouldReceive('escapeNames')->with(['foouser'])->andReturn(['"foouser"']);
         $grammar->shouldReceive('compileDropAllTables')->with(['foouser.users'])->andReturn('drop table "foouser"."users" cascade');
         $connection->shouldReceive('statement')->with('drop table "foouser"."users" cascade');
         $builder = $this->getBuilder($connection);
