@@ -112,6 +112,13 @@ class SupportUriTest extends TestCase
         $this->assertEquals(['tag' => ['foo', 'bar']], $uri->pushOntoQuery('tag', 'bar')->query()->all());
     }
 
+    public function test_decoding_the_entire_uri()
+    {
+        $uri = Uri::of('https://laravel.com/docs/11.x/installation')->withQuery(['tags' => ['first', 'second']]);
+
+        $this->assertEquals('https://laravel.com/docs/11.x/installation?tags[0]=first&tags[1]=second', $uri->decode());
+    }
+
     public function test_query_string_manipulation()
     {
         $uri = Uri::of('https://laravel.com?foo.bar=value&foo[bar]=4&bar[foo]=7');
@@ -119,7 +126,7 @@ class SupportUriTest extends TestCase
         // Test `withQuery`
         $this->assertEquals('foo.bar=value&foo=9&bar[foo]=7', $uri->withQuery(['foo' => 9])->query()->decode());
         $this->assertEquals('foo.bar=value&foo[bar]=9&bar[foo]=7', $uri->withQuery(['foo' => ['bar' => 9]])->query()->decode());
-        $this->assertEquals('foo.bar=9&foo[bar]=4&bar[foo]=7', $uri->withQuery(['foo.bar' => 9])->query()->decode()); // fixed
+        $this->assertEquals('foo.bar=9&foo[bar]=4&bar[foo]=7', $uri->withQuery(['foo.bar' => 9])->query()->decode());
         $this->assertEquals('foo=9', $uri->withQuery(['foo' => 9], false)->query()->decode());
         $this->assertEquals('foo[bar]=9', $uri->withQuery(['foo' => ['bar' => 9]], false)->query()->decode());
         $this->assertEquals('foo.bar=9', $uri->withQuery(['foo.bar' => 9], false)->query()->decode());
@@ -133,12 +140,12 @@ class SupportUriTest extends TestCase
         $this->assertEquals('foo.bar=value&foo[bar]=4&bar[foo]=7', $uri->withQueryIfMissing(['foo' => 9])->query()->decode());
         $this->assertEquals('foo.bar=value&foo[bar]=4&bar[foo]=7', $uri->withQueryIfMissing(['foo' => ['bar' => 9]])->query()->decode());
         $this->assertEquals('foo.bar=value&foo[bar]=4&bar[foo]=7', $uri->withQueryIfMissing(['foo.bar' => 9])->query()->decode());
-        $this->assertEquals('foo.bar=value&foo[bar]=4&bar[foo]=7&bar.foo=9', $uri->withQueryIfMissing(['bar.foo' => 9])->query()->decode()); // fixed
+        $this->assertEquals('foo.bar=value&foo[bar]=4&bar[foo]=7&bar.foo=9', $uri->withQueryIfMissing(['bar.foo' => 9])->query()->decode());
 
         // Test `pushOntoQuery`
         $this->assertEquals('foo.bar=value&foo[bar]=4&foo[0]=9&bar[foo]=7', $uri->pushOntoQuery('foo', 9)->query()->decode());
         $this->assertEquals('foo.bar=value&foo[bar]=9&bar[foo]=7', $uri->pushOntoQuery('foo', ['bar' => 9])->query()->decode());
-        $this->assertEquals('foo.bar[0]=value&foo.bar[1]=9&foo[bar]=4&bar[foo]=7', $uri->pushOntoQuery('foo.bar', 9)->query()->decode()); // fixed
+        $this->assertEquals('foo.bar[0]=value&foo.bar[1]=9&foo[bar]=4&bar[foo]=7', $uri->pushOntoQuery('foo.bar', 9)->query()->decode());
 
         // Test `withoutQuery`
         $this->assertEquals('foo.bar=value&bar[foo]=7', $uri->withoutQuery(['foo'])->query()->decode());

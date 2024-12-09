@@ -269,6 +269,18 @@ class Uri implements Htmlable, Responsable
     }
 
     /**
+     * Get the decoded string representation of the URI.
+     */
+    public function decode(): string
+    {
+        if (empty($this->query()->toArray())) {
+            return $this->value();
+        }
+
+        return Str::replace(Str::after($this->value(), '?'), $this->query()->decode(), $this->value());
+    }
+
+    /**
      * Get the string representation of the URI.
      */
     public function value(): string
