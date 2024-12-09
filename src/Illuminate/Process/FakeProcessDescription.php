@@ -57,7 +57,7 @@ class FakeProcessDescription
     public function output(array|string $output)
     {
         if (is_array($output)) {
-            (new Collection($output))->each(fn ($line) => $this->output($line));
+            (new Collection($output))->each($this->output(...));
 
             return $this;
         }
@@ -76,7 +76,7 @@ class FakeProcessDescription
     public function errorOutput(array|string $output)
     {
         if (is_array($output)) {
-            (new Collection($output))->each(fn ($line) => $this->errorOutput($line));
+            (new Collection($output))->each($this->errorOutput(...));
 
             return $this;
         }
