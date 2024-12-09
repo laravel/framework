@@ -9,19 +9,6 @@ use Illuminate\Http\Request;
 
 class HandleCors
 {
-    /**
-     * The container instance.
-     *
-     * @var \Illuminate\Contracts\Container\Container
-     */
-    protected $container;
-
-    /**
-     * The CORS service instance.
-     *
-     * @var \Fruitcake\Cors\CorsService
-     */
-    protected $cors;
 
     /**
      * Create a new middleware instance.
@@ -30,11 +17,10 @@ class HandleCors
      * @param  \Fruitcake\Cors\CorsService  $cors
      * @return void
      */
-    public function __construct(Container $container, CorsService $cors)
-    {
-        $this->container = $container;
-        $this->cors = $cors;
-    }
+    public function __construct(
+        protected Container $container,
+        protected CorsService $cors,
+    ) {}
 
     /**
      * Handle the incoming request.
