@@ -94,8 +94,12 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
             $this->createPayload($job, $this->getQueue($queue), $data),
             $queue,
             null,
-            function ($payload, $queue) {
-                return $this->pushToDatabase($queue, $payload);
+            function ($payload, $queue) use ($job) {
+                $jobId = $this->pushToDatabase($queue, $payload);
+                if(is_object($job) && method_exists($job, 'afterEnqueue')) {
+                    $job->afterEnqueue($jobId);
+                }
+                return $jobId;
             }
         );
     }
@@ -129,8 +133,12 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
             $this->createPayload($job, $this->getQueue($queue), $data),
             $queue,
             $delay,
-            function ($payload, $queue, $delay) {
-                return $this->pushToDatabase($queue, $payload, $delay);
+            function ($payload, $queue, $delay) use ($job) {
+                $jobId = $this->pushToDatabase($queue, $payload, $delay);
+                if(is_object($job) && method_exists($job, 'afterEnqueue')) {
+                    $job->afterEnqueue($jobId);
+                }
+                return $jobId;
             }
         );
     }
