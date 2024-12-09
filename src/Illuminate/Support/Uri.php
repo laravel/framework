@@ -33,7 +33,7 @@ class Uri implements Htmlable, Responsable
      */
     public function __construct(UriInterface|Stringable|string $uri = '')
     {
-        $this->uri = $uri instanceof UriInterface ? $uri : LeagueUri::new((string) $uri);
+        $this->uri = $uri instanceof UriInterface ? $uri : LeagueUri::new($uri);
     }
 
     /**
@@ -116,7 +116,7 @@ class Uri implements Htmlable, Responsable
      */
     public function path(): ?string
     {
-        $path = trim((string) $this->uri->getPath(), '/');
+        $path = trim($this->uri->getPath(), '/');
 
         return $path === '' ? '/' : $path;
     }
@@ -126,7 +126,7 @@ class Uri implements Htmlable, Responsable
      */
     public function query(): UriQueryString
     {
-        return new UriQueryString($this);
+        return new UriQueryString($this->uri->getQuery());
     }
 
     /**
@@ -188,23 +188,15 @@ class Uri implements Htmlable, Responsable
             }
         }
 
+        $currentQuery = $this->query();
+
         if ($merge) {
-            $mergedQuery = $this->query()->all();
-
-            foreach ($query as $key => $value) {
-                data_set($mergedQuery, $key, $value);
-            }
-
-            $newQuery = $mergedQuery;
+            $currentQuery->merge($query);
         } else {
-            $newQuery = [];
-
-            foreach ($query as $key => $value) {
-                data_set($newQuery, $key, $value);
-            }
+            $currentQuery->set($query);
         }
 
-        return new static($this->uri->withQuery(Arr::query($newQuery)));
+        return new static($this->uri->withQuery($currentQuery->value()));
     }
 
     /**
@@ -212,15 +204,7 @@ class Uri implements Htmlable, Responsable
      */
     public function withQueryIfMissing(array $query): static
     {
-        $currentQuery = $this->query();
-
-        foreach ($query as $key => $value) {
-            if (! $currentQuery->missing($key)) {
-                Arr::forget($query, $key);
-            }
-        }
-
-        return $this->withQuery($query);
+        return $this->withQuery($this->query()->mergeIfMissing($query));
     }
 
     /**
@@ -228,16 +212,7 @@ class Uri implements Htmlable, Responsable
      */
     public function pushOntoQuery(string $key, mixed $value): static
     {
-        $currentValue = data_get($this->query()->all(), $key);
-
-        $values = Arr::wrap($value);
-
-        return $this->withQuery([$key => match (true) {
-            is_array($currentValue) && array_is_list($currentValue) => array_values(array_unique([...$currentValue, ...$values])),
-            is_array($currentValue) => [...$currentValue, ...$values],
-            ! is_null($currentValue) => [$currentValue, ...$values],
-            default => $values,
-        }]);
+        return $this->withQuery($this->query()->push($key, $value));
     }
 
     /**
@@ -245,7 +220,7 @@ class Uri implements Htmlable, Responsable
      */
     public function withoutQuery(array $keys): static
     {
-        return $this->replaceQuery(Arr::except($this->query()->all(), $keys));
+        return $this->replaceQuery($this->query()->except($keys));
     }
 
     /**
@@ -291,18 +266,6 @@ class Uri implements Htmlable, Responsable
     public function toHtml()
     {
         return $this->value();
-    }
-
-    /**
-     * Get the decoded string representation of the URI.
-     */
-    public function decode(): string
-    {
-        if (empty($this->query()->toArray())) {
-            return $this->value();
-        }
-
-        return Str::replace(Str::after($this->value(), '?'), $this->query()->decode(), $this->value());
     }
 
     /**

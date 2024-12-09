@@ -11,11 +11,32 @@ class UriQueryString implements Arrayable
     use InteractsWithData;
 
     /**
+     * Query string parameters.
+     */
+    protected array $data;
+
+    /**
      * Create a new URI query string instance.
      */
-    public function __construct(protected Uri $uri)
+    public function __construct(Stringable|string|array|null $data = [])
     {
-        //
+        $this->data = is_array($data) ? $data : static::parse($data);
+    }
+
+    /**
+     * Create a new URI Query String instance.
+     */
+    public static function of(Stringable|string|array $query = []): static
+    {
+        return new static($query);
+    }
+
+    /**
+     * Parse the given query string.
+     */
+    public static function parse(Stringable|string|null $query): array
+    {
+        return QueryString::extract($query);
     }
 
     /**
@@ -35,7 +56,7 @@ class UriQueryString implements Arrayable
         $results = [];
 
         foreach (is_array($keys) ? $keys : func_get_args() as $key) {
-            Arr::set($results, $key, Arr::get($query, $key));
+            $results[$key] = $query[$key] ?? null;
         }
 
         return $results;
@@ -58,7 +79,36 @@ class UriQueryString implements Arrayable
      */
     public function get(?string $key = null, mixed $default = null): mixed
     {
-        return data_get($this->toArray(), $key, $default);
+        return array_key_exists($key, $this->data) ? $this->data[$key] : value($default);
+    }
+
+    /**
+     * Determine if the data contains a given key.
+     *
+     * @param  string|array  $key
+     * @return bool
+     */
+    public function has($key): bool
+    {
+        $keys = is_array($key) ? $key : func_get_args();
+
+        $data = $this->toArray();
+
+        foreach ($keys as $value) {
+            if (! array_key_exists($value, $data)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Set the query string.
+     */
+    public function set(array $value = null): void
+    {
+        $this->data = $value;
     }
 
     /**
@@ -66,7 +116,54 @@ class UriQueryString implements Arrayable
      */
     public function decode(): string
     {
-        return rawurldecode((string) $this);
+        return rawurldecode($this->value());
+    }
+
+    /**
+     * Merge new query parameters into the query string.
+     */
+    public function merge(array $query): array
+    {
+        $results = $this->all();
+
+        foreach ($query as $key => $value) {
+            $results[$key] = $value;
+        }
+
+        $this->set($results);
+
+        return $results;
+    }
+
+    /**
+     * Merge new query parameters if they are not already in the query string.
+     */
+    public function mergeIfMissing(array $query): array
+    {
+        foreach ($query as $key => $value) {
+            if ($this->has($key)) {
+                unset($query[$key]);
+            }
+        }
+
+        return $this->merge($query);
+    }
+
+    /**
+     * Push a value onto the query string.
+     */
+    public function push(string $key, mixed $value): array
+    {
+        $currentValue = $this->get($key);
+
+        $values = Arr::wrap($value);
+
+        return $this->merge([$key => match (true) {
+            is_array($currentValue) && array_is_list($currentValue) => array_values(array_unique([...$currentValue, ...$values])),
+            is_array($currentValue) => [...$currentValue, ...$values],
+            ! is_null($currentValue) => [$currentValue, ...$values],
+            default => $values,
+        }]);
     }
 
     /**
@@ -82,7 +179,7 @@ class UriQueryString implements Arrayable
      */
     public function toArray()
     {
-        return QueryString::extract($this->value());
+        return $this->data;
     }
 
     /**
@@ -90,6 +187,6 @@ class UriQueryString implements Arrayable
      */
     public function __toString(): string
     {
-        return (string) $this->uri->getUri()->getQuery();
+        return Arr::query($this->toArray());
     }
 }
