@@ -598,6 +598,18 @@ class QueryBuilderTest extends DatabaseTestCase
         $this->assertCount(3, DB::getQueryLog());
     }
 
+    public function testWhenWhere()
+    {
+        $this->assertSame(1, DB::table('posts')->whenWhere(true, 'id', 1)->count());
+        $this->assertSame(2, DB::table('posts')->whenWhere(false, 'id', 1)->count());
+    }
+
+    public function testOrWhenWhere()
+    {
+        $this->assertSame(1, DB::table('posts')->whenWhere(true, 'id', 1)->count());
+        $this->assertSame(2, DB::table('posts')->whenWhere(false, 'id', 1)->count());
+    }
+
     public function testPluck()
     {
         // Test SELECT override, since pluck will take the first column.
