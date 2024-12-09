@@ -60,7 +60,8 @@ class Repository implements ArrayAccess, CacheContract
     public function __construct(
         protected Store $store,
         protected array $config = [],
-    ) {}
+    ) {
+    }
 
     /**
      * Determine if an item exists in the cache.

@@ -18,5 +18,6 @@ class OtherDeviceLogout
     public function __construct(
         public $guard,
         public $user,
-    ) {}
+    ) {
+    }
 }

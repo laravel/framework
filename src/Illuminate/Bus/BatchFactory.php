@@ -15,7 +15,8 @@ class BatchFactory
      */
     public function __construct(
         protected QueueFactory $queue,
-    ) {}
+    ) {
+    }
 
     /**
      * Create a new batch instance.

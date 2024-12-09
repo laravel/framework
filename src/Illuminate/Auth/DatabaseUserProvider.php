@@ -23,7 +23,8 @@ class DatabaseUserProvider implements UserProvider
         protected ConnectionInterface $connection,
         protected HasherContract $hasher,
         protected $table,
-    ) {}
+    ) {
+    }
 
     /**
      * Retrieve a user by their unique identifier.

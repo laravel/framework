@@ -16,7 +16,8 @@ class TagSet
     public function __construct(
         protected Store $store,
         protected array $names = [],
-    ) {}
+    ) {
+    }
 
     /**
      * Reset all tags in the set.

@@ -32,7 +32,8 @@ class Logger implements LoggerInterface
     public function __construct(
         protected LoggerInterface $logger,
         protected ?Dispatcher $dispatcher = null,
-    ) {}
+    ) {
+    }
 
     /**
      * Log an emergency message to the logs.

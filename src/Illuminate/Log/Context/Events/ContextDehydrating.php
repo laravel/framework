@@ -11,5 +11,6 @@ class ContextDehydrating
      */
     public function __construct(
         public $context,
-    ) {}
+    ) {
+    }
 }

@@ -47,7 +47,8 @@ class PendingMail
      */
     public function __construct(
         protected MailerContract $mailer,
-    ) {}
+    ) {
+    }
 
     /**
      * Set the locale of the message.

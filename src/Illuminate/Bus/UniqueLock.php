@@ -14,7 +14,8 @@ class UniqueLock
      */
     public function __construct(
         protected Cache $cache,
-    ) {}
+    ) {
+    }
 
     /**
      * Attempt to acquire a lock for the given job.

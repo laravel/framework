@@ -16,7 +16,8 @@ class ApcStore extends TaggableStore
     public function __construct(
         protected ApcWrapper $apc,
         protected $prefix = '',
-    ) {}
+    ) {
+    }
 
     /**
      * Retrieve an item from the cache by key.

@@ -48,7 +48,8 @@ class Response implements ArrayAccess, Stringable
      */
     public function __construct(
         protected $response,
-    ) {}
+    ) {
+    }
 
     /**
      * Get the body of the response.

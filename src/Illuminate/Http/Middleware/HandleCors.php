@@ -20,7 +20,8 @@ class HandleCors
     public function __construct(
         protected Container $container,
         protected CorsService $cors,
-    ) {}
+    ) {
+    }
 
     /**
      * Handle the incoming request.

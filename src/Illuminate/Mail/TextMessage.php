@@ -19,7 +19,8 @@ class TextMessage
      */
     public function __construct(
         protected $message,
-    ) {}
+    ) {
+    }
 
     /**
      * Embed a file in the message and get the CID.

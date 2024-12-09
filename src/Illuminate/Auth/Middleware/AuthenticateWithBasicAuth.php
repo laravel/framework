@@ -15,7 +15,8 @@ class AuthenticateWithBasicAuth
      */
     public function __construct(
         protected AuthFactory $auth,
-    ) {}
+    ) {
+    }
 
     /**
      * Specify the guard and field for the middleware.

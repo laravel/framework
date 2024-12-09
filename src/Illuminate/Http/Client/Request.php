@@ -27,7 +27,8 @@ class Request implements ArrayAccess
      */
     public function __construct(
         protected $request,
-    ) {}
+    ) {
+    }
 
     /**
      * Get the request method.

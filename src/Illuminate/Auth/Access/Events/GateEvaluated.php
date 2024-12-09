@@ -18,5 +18,6 @@ class GateEvaluated
         public $ability,
         public $result,
         public $arguments,
-    ) {}
+    ) {
+    }
 }

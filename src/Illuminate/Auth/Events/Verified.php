@@ -16,5 +16,6 @@ class Verified
      */
     public function __construct(
         public $user,
-    ) {}
+    ) {
+    }
 }

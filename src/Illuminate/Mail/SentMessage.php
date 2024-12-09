@@ -21,7 +21,8 @@ class SentMessage
      */
     public function __construct(
         protected SymfonySentMessage $sentMessage,
-    ) {}
+    ) {
+    }
 
     /**
      * Get the underlying Symfony Email instance.

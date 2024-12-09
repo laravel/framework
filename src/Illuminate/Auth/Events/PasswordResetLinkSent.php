@@ -16,5 +16,6 @@ class PasswordResetLinkSent
      */
     public function __construct(
         public $user,
-    ) {}
+    ) {
+    }
 }

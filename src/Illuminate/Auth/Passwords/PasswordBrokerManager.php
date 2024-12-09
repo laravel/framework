@@ -25,7 +25,8 @@ class PasswordBrokerManager implements FactoryContract
      */
     public function __construct(
         protected $app,
-    ) {}
+    ) {
+    }
 
     /**
      * Attempt to get the broker from the local cache.

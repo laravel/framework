@@ -66,7 +66,8 @@ class LogManager implements LoggerInterface
      */
     public function __construct(
         protected $app,
-    ) {}
+    ) {
+    }
 
     /**
      * Build an on-demand log channel.

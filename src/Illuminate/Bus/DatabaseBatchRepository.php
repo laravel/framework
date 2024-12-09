@@ -24,7 +24,8 @@ class DatabaseBatchRepository implements PrunableBatchRepository
         protected BatchFactory $factory,
         protected Connection $connection,
         protected string $table,
-    ) {}
+    ) {
+    }
 
     /**
      * Retrieve a list of batches.

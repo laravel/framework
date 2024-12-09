@@ -20,7 +20,8 @@ class LogTransport implements Stringable, TransportInterface
      */
     public function __construct(
         protected LoggerInterface $logger,
-    ) {}
+    ) {
+    }
 
     /**
      * {@inheritdoc}

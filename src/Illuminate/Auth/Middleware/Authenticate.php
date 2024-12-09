@@ -25,7 +25,8 @@ class Authenticate implements AuthenticatesRequests
      */
     public function __construct(
         protected Auth $auth,
-    ) {}
+    ) {
+    }
 
     /**
      * Specify the guards for the middleware.

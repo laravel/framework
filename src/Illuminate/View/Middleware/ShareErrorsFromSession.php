@@ -16,7 +16,8 @@ class ShareErrorsFromSession
      */
     public function __construct(
         protected ViewFactory $view
-    ) {}
+    ) {
+    }
 
     /**
      * Handle an incoming request.

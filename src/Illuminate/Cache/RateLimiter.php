@@ -28,7 +28,8 @@ class RateLimiter
      */
     public function __construct(
         protected Cache $cache,
-    ) {}
+    ) {
+    }
 
     /**
      * Register a named limiter configuration.

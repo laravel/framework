@@ -18,5 +18,6 @@ class Validated
     public function __construct(
         public $guard,
         public $user,
-    ) {}
+    ) {
+    }
 }

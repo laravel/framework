@@ -18,5 +18,6 @@ class Logout
     public function __construct(
         public $guard,
         public $user,
-    ) {}
+    ) {
+    }
 }

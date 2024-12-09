@@ -18,5 +18,6 @@ class CurrentDeviceLogout
     public function __construct(
         public $guard,
         public $user,
-    ) {}
+    ) {
+    }
 }

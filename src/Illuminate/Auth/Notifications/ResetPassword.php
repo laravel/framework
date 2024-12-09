@@ -30,7 +30,8 @@ class ResetPassword extends Notification
      */
     public function __construct(
         #[\SensitiveParameter] public $token,
-    ) {}
+    ) {
+    }
 
     /**
      * Get the notification's channels.

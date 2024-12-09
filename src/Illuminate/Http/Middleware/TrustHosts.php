@@ -29,7 +29,8 @@ class TrustHosts
      */
     public function __construct(
         protected Application $app,
-    ) {}
+    ) {
+    }
 
     /**
      * Get the host patterns that should be trusted.

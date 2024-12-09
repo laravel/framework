@@ -19,7 +19,8 @@ class Authorize
      */
     public function __construct(
         protected Gate $gate,
-    ) {}
+    ) {
+    }
 
     /**
      * Specify the ability and models for the middleware.

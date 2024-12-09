@@ -38,7 +38,8 @@ class CacheManager implements FactoryContract
      */
     public function __construct(
         protected $app,
-    ) {}
+    ) {
+    }
 
     /**
      * Get a cache store instance by name, wrapped in a repository.

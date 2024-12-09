@@ -15,7 +15,8 @@ class FileEngine implements Engine
      */
     public function __construct(
         protected Filesystem $files,
-    ) {}
+    ) {
+    }
 
     /**
      * Get the evaluated contents of the view.

@@ -11,5 +11,6 @@ class ContextHydrated
      */
     public function __construct(
         public $context,
-    ) {}
+    ) {
+    }
 }

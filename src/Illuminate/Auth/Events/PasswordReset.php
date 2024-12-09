@@ -16,5 +16,6 @@ class PasswordReset
      */
     public function __construct(
         public $user,
-    ) {}
+    ) {
+    }
 }

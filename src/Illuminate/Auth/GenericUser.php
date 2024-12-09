@@ -14,7 +14,8 @@ class GenericUser implements UserContract
      */
     public function __construct(
         protected array $attributes,
-    ) {}
+    ) {
+    }
 
     /**
      * Get the name of the unique identifier for the user.

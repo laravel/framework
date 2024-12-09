@@ -32,7 +32,8 @@ class ResponseSequence
      */
     public function __construct(
         protected array $responses,
-    ) {}
+    ) {
+    }
 
     /**
      * Push a response to the sequence.

@@ -16,5 +16,6 @@ class Registered
      */
     public function __construct(
         public $user,
-    ) {}
+    ) {
+    }
 }

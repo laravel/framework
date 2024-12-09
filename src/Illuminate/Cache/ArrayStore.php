@@ -32,7 +32,8 @@ class ArrayStore extends TaggableStore implements LockProvider
      */
     public function __construct(
         protected $serializesValues = false,
-    ) {}
+    ) {
+    }
 
     /**
      * Retrieve an item from the cache by key.
