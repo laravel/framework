@@ -122,11 +122,9 @@ class AuthManager implements FactoryContract
      */
     public function createSessionDriver($name, $config)
     {
-        $provider = $this->createUserProvider($config['provider'] ?? null);
-
         $guard = new SessionGuard(
             $name,
-            $provider,
+            $this->createUserProvider($config['provider'] ?? null),
             $this->app['session.store'],
             rehashOnLogin: $this->app['config']->get('hashing.rehash_on_login', true),
         );
