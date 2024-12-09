@@ -88,6 +88,17 @@ trait Dispatchable
     }
 
     /**
+     * Dispatch a command and return the result.
+     *
+     * @param  mixed  ...$arguments
+     * @return mixed
+     */
+    public static function dispatchAndGetResponse(...$arguments)
+    {
+        return app(Dispatcher::class)->dispatchToQueue(new static(...$arguments));
+    }
+
+    /**
      * Set the jobs that should run if this job is successful.
      *
      * @param  array  $chain
