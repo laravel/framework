@@ -7,6 +7,7 @@ use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Tappable;
 use League\Uri\Contracts\UriInterface;
@@ -291,6 +292,18 @@ class Uri implements Htmlable, Responsable
     public function toHtml()
     {
         return $this->value();
+    }
+
+    /**
+     * Get the decoded string representation of the URI.
+     */
+    public function decode(): string
+    {
+        if (empty($this->query()->toArray())) {
+            return $this->value();
+        }
+
+        return Str::replace(Str::after($this->value(), '?'), $this->query()->decode(), $this->value());
     }
 
     /**

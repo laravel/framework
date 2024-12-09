@@ -119,4 +119,11 @@ class SupportUriTest extends TestCase
         $this->assertEquals('foo.bar=baz&foo[bar]=zab', $uri->withQuery(['foo.bar' => 'zab'])->query()->decode());
         $this->assertEquals('foo[bar]=zab', $uri->replaceQuery(['foo.bar' => 'zab'])->query()->decode());
     }
+
+    public function test_decoding_the_entire_uri()
+    {
+        $uri = Uri::of('https://laravel.com/docs/11.x/installation')->withQuery(['tags' => ['first', 'second']]);
+
+        $this->assertEquals('https://laravel.com/docs/11.x/installation?tags[0]=first&tags[1]=second', $uri->decode());
+    }
 }
