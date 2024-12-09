@@ -106,7 +106,7 @@ class UriQueryString implements Arrayable
     /**
      * Set the query string.
      */
-    public function set(array $value = null): void
+    public function set(array $value): void
     {
         $this->data = $value;
     }
