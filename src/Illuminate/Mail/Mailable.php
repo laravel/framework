@@ -1163,7 +1163,7 @@ class Mailable implements MailableContract, Renderable
      */
     public function tag($value)
     {
-        array_push($this->tags, $value);
+        $this->tags[] = $value;
 
         return $this;
     }
