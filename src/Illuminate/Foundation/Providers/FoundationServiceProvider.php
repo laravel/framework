@@ -191,7 +191,7 @@ class FoundationServiceProvider extends AggregateServiceProvider
     }
 
     /**
-     * Register the "defer" function termination handler.
+     * Register the URI url generator.
      *
      * @return void
      */
