@@ -2,10 +2,10 @@
 
 namespace Illuminate\Foundation\Console;
 
-use Illuminate\Support\Str;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Events\PublishingStubs;
+use Illuminate\Support\Str;
 use Symfony\Component\Console\Attribute\AsCommand;
 
 use function Laravel\Prompts\multisearch;
@@ -134,7 +134,7 @@ class StubPublishCommand extends Command
     /**
      * Get a human-readable name for the given stub.
      */
-    private function forHumans(string $stub): string 
+    private function forHumans(string $stub): string
     {
         $parts = Str::of($stub)
             ->beforeLast('.stub')
