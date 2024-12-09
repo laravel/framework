@@ -35,9 +35,9 @@ assertType('null', logger('foo'));
 assertType('Illuminate\Log\LogManager', logs());
 assertType('Psr\Log\LoggerInterface', logs('foo'));
 
-assertType('int|null', rescue(fn () => 123));
-assertType('int', rescue(fn () => 123, 345));
-assertType('int', rescue(fn () => 123, fn () => 345));
+assertType('123|null', rescue(fn () => 123));
+assertType('123|345', rescue(fn () => 123, 345));
+assertType('123|345', rescue(fn () => 123, fn () => 345));
 
 assertType('Illuminate\Routing\Redirector', redirect());
 assertType('Illuminate\Http\RedirectResponse', redirect('foo'));
