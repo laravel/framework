@@ -416,7 +416,8 @@ trait ConditionallyLoadsAttributes
 
         return $this->when(
             $this->hasPivotLoadedAs($accessor, $table),
-            ...[$value, $default]
+            $value,
+            $default,
         );
     }
 
