@@ -5,6 +5,7 @@ namespace Illuminate\Queue;
 use Aws\DynamoDb\DynamoDbClient;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Support\DeferrableProvider;
+use Illuminate\Foundation\Events\DeploymentFinished;
 use Illuminate\Queue\Connectors\BeanstalkdConnector;
 use Illuminate\Queue\Connectors\DatabaseConnector;
 use Illuminate\Queue\Connectors\NullConnector;
@@ -17,6 +18,7 @@ use Illuminate\Queue\Failed\DynamoDbFailedJobProvider;
 use Illuminate\Queue\Failed\FileFailedJobProvider;
 use Illuminate\Queue\Failed\NullFailedJobProvider;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\ServiceProvider;
 use Laravel\SerializableClosure\SerializableClosure;
@@ -38,6 +40,7 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
         $this->registerConnection();
         $this->registerWorker();
         $this->registerListener();
+        $this->registerDeploymentListener();
         $this->registerFailedJobServices();
     }
 
@@ -237,6 +240,18 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
     {
         $this->app->singleton('queue.listener', function ($app) {
             return new Listener($app->basePath());
+        });
+    }
+
+    /**
+     * Register the deployment listener.
+     *
+     * @return void
+     */
+    protected function registerDeploymentListener()
+    {
+        $this->app['events']->listen(function (DeploymentFinished $event) {
+            $this->app['cache']->forever('illuminate:queue:restart', Carbon::now()->getTimestamp());
         });
     }
 
