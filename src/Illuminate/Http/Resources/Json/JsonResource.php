@@ -20,13 +20,6 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     use ConditionallyLoadsAttributes, DelegatesToResource;
 
     /**
-     * The resource instance.
-     *
-     * @var mixed
-     */
-    public $resource;
-
-    /**
      * The additional data that should be added to the top-level resource array.
      *
      * @var array
@@ -55,9 +48,9 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
      * @param  mixed  $resource
      * @return void
      */
-    public function __construct($resource)
-    {
-        $this->resource = $resource;
+    public function __construct(
+        public $resource,
+    ) {
     }
 
     /**

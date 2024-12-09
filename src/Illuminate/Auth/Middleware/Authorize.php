@@ -12,21 +12,14 @@ use function Illuminate\Support\enum_value;
 class Authorize
 {
     /**
-     * The gate instance.
-     *
-     * @var \Illuminate\Contracts\Auth\Access\Gate
-     */
-    protected $gate;
-
-    /**
      * Create a new middleware instance.
      *
      * @param  \Illuminate\Contracts\Auth\Access\Gate  $gate
      * @return void
      */
-    public function __construct(Gate $gate)
-    {
-        $this->gate = $gate;
+    public function __construct(
+        protected Gate $gate,
+    ) {
     }
 
     /**

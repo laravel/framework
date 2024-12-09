@@ -7,21 +7,14 @@ use Illuminate\Contracts\Cache\Repository as Cache;
 class UniqueLock
 {
     /**
-     * The cache repository implementation.
-     *
-     * @var \Illuminate\Contracts\Cache\Repository
-     */
-    protected $cache;
-
-    /**
      * Create a new unique lock manager instance.
      *
      * @param  \Illuminate\Contracts\Cache\Repository  $cache
      * @return void
      */
-    public function __construct(Cache $cache)
-    {
-        $this->cache = $cache;
+    public function __construct(
+        protected Cache $cache,
+    ) {
     }
 
     /**
