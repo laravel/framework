@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Illuminate\Support\Str;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Events\PublishingStubs;
@@ -124,9 +125,31 @@ class StubPublishCommand extends Command
             'Which stubs would you like to publish?',
             options: fn ($search) => collect($stubs)
                 ->filter(fn ($to) => str_contains($to, $search))
-                ->map(fn ($to) => $to)
+                ->mapWithKeys(fn ($to, $from) => [$from => $this->forHumans($to)])
                 ->all(),
             scroll: 10,
         ))->all();
+    }
+
+    /**
+     * Get a human-readable name for the given stub.
+     */
+    private function forHumans(string $stub): string 
+    {
+        $parts = Str::of($stub)
+            ->beforeLast('.stub')
+            ->replace('-', ' ')
+            ->explode('.');
+
+        if ($parts->count() <= 1) {
+            return Str::title($parts->first());
+        }
+
+        return $parts
+            ->splice(1, 1)
+            ->pipe(fn ($lead) => collect([
+                Str::title($lead->first()),
+                $parts->map(fn ($part) => $part === 'api' ? 'API' : Str::title($part))->join(' '),
+            ])->filter()->join(' '));
     }
 }
