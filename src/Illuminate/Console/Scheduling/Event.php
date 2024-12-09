@@ -811,7 +811,7 @@ class Event
             return $mutexNameResolver($this);
         }
 
-        // Strip the PHP binary path from the command string to ensure that 
+        // Strip the PHP binary path from the command string to ensure that
         // the mutexName remains consistent across different environments.
         // This accounts for variations in PHP executable paths caused by:
         // - Different PHP versions being used on different servers.
