@@ -320,10 +320,12 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
      */
     protected function marshalJob($queue, $job)
     {
-        $job = $this->markJobAsReserved($job);
-
         return new DatabaseJob(
-            $this->container, $this, $job, $this->connectionName, $queue
+            $this->container,
+            $this,
+            $this->markJobAsReserved($job),
+            $this->connectionName,
+            $queue,
         );
     }
 
