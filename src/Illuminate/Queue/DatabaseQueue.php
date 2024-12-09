@@ -139,7 +139,7 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
                 if (is_object($job) && method_exists($job, 'afterEnqueue')) {
                     $job->afterQueued($jobId);
                 }
-                
+
                 return $jobId;
             }
         );
