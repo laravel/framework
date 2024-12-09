@@ -737,7 +737,7 @@ class PostgresGrammar extends Grammar
         $quote = func_num_args() === 2 ? func_get_arg(1) : "'";
 
         return (new Collection($path))
-            ->map(fn ($attribute) => $this->parseJsonPathArrayKeys($attribute))
+            ->map($this->parseJsonPathArrayKeys(...))
             ->collapse()
             ->map(function ($attribute) use ($quote) {
                 return filter_var($attribute, FILTER_VALIDATE_INT) !== false

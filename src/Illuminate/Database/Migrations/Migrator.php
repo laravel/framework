@@ -540,7 +540,7 @@ class Migrator
             ->flatMap(fn ($path) => str_ends_with($path, '.php') ? [$path] : $this->files->glob($path.'/*_*.php'))
             ->filter()
             ->values()
-            ->keyBy(fn ($file) => $this->getMigrationName($file))
+            ->keyBy($this->getMigrationName(...))
             ->sortBy(fn ($file, $key) => $key)
             ->all();
     }

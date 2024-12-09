@@ -186,7 +186,7 @@ class DatabaseTransactionsManager
         // also need to remove. We will recurse down the children of all removed transaction
         // instances until there are no more deeply nested child transactions for removal.
         $removedTransactions->each(
-            fn ($transaction) => $this->removeCommittedTransactionsThatAreChildrenOf($transaction)
+            $this->removeCommittedTransactionsThatAreChildrenOf(...)
         );
     }
 
