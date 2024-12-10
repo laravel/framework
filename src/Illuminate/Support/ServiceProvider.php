@@ -16,12 +16,6 @@ use Illuminate\View\Compilers\BladeCompiler;
  */
 abstract class ServiceProvider
 {
-    /**
-     * The application instance.
-     *
-     * @var \Illuminate\Contracts\Foundation\Application
-     */
-    protected $app;
 
     /**
      * All of the registered booting callbacks.
@@ -78,9 +72,9 @@ abstract class ServiceProvider
      * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @return void
      */
-    public function __construct($app)
-    {
-        $this->app = $app;
+    public function __construct(
+        protected $app,
+    ) {
     }
 
     /**

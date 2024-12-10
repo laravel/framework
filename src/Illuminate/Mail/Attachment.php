@@ -27,21 +27,14 @@ class Attachment
     public $mime;
 
     /**
-     * A callback that attaches the attachment to the mail message.
-     *
-     * @var \Closure
-     */
-    protected $resolver;
-
-    /**
      * Create a mail attachment.
      *
      * @param  \Closure  $resolver
      * @return void
      */
-    private function __construct(Closure $resolver)
-    {
-        $this->resolver = $resolver;
+    private function __construct(
+        protected Closure $resolver,
+    ) {
     }
 
     /**

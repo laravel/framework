@@ -28,13 +28,6 @@ use League\Flysystem\Visibility;
 class FilesystemManager implements FactoryContract
 {
     /**
-     * The application instance.
-     *
-     * @var \Illuminate\Contracts\Foundation\Application
-     */
-    protected $app;
-
-    /**
      * The array of resolved filesystem drivers.
      *
      * @var array
@@ -54,9 +47,9 @@ class FilesystemManager implements FactoryContract
      * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @return void
      */
-    public function __construct($app)
-    {
-        $this->app = $app;
+    public function __construct(
+        protected $app,
+    ) {
     }
 
     /**

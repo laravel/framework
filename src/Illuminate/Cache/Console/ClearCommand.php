@@ -27,32 +27,17 @@ class ClearCommand extends Command
     protected $description = 'Flush the application cache';
 
     /**
-     * The cache manager instance.
-     *
-     * @var \Illuminate\Cache\CacheManager
-     */
-    protected $cache;
-
-    /**
-     * The filesystem instance.
-     *
-     * @var \Illuminate\Filesystem\Filesystem
-     */
-    protected $files;
-
-    /**
      * Create a new cache clear command instance.
      *
      * @param  \Illuminate\Cache\CacheManager  $cache
      * @param  \Illuminate\Filesystem\Filesystem  $files
      * @return void
      */
-    public function __construct(CacheManager $cache, Filesystem $files)
-    {
+    public function __construct(
+        protected CacheManager $cache,
+        protected Filesystem $files,
+    ) {
         parent::__construct();
-
-        $this->cache = $cache;
-        $this->files = $files;
     }
 
     /**

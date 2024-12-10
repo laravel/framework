@@ -23,27 +23,6 @@ class Factory implements FactoryContract
         Concerns\ManagesTranslations;
 
     /**
-     * The engine implementation.
-     *
-     * @var \Illuminate\View\Engines\EngineResolver
-     */
-    protected $engines;
-
-    /**
-     * The view finder implementation.
-     *
-     * @var \Illuminate\View\ViewFinderInterface
-     */
-    protected $finder;
-
-    /**
-     * The event dispatcher instance.
-     *
-     * @var \Illuminate\Contracts\Events\Dispatcher
-     */
-    protected $events;
-
-    /**
      * The IoC container instance.
      *
      * @var \Illuminate\Contracts\Container\Container
@@ -112,12 +91,11 @@ class Factory implements FactoryContract
      * @param  \Illuminate\Contracts\Events\Dispatcher  $events
      * @return void
      */
-    public function __construct(EngineResolver $engines, ViewFinderInterface $finder, Dispatcher $events)
-    {
-        $this->finder = $finder;
-        $this->events = $events;
-        $this->engines = $engines;
-
+    public function __construct(
+        protected EngineResolver $engines,
+        protected ViewFinderInterface $finder,
+        protected Dispatcher $events,
+    ) {
         $this->share('__env', $this);
     }
 

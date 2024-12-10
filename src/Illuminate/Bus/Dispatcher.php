@@ -17,13 +17,6 @@ use RuntimeException;
 class Dispatcher implements QueueingDispatcher
 {
     /**
-     * The container implementation.
-     *
-     * @var \Illuminate\Contracts\Container\Container
-     */
-    protected $container;
-
-    /**
      * The pipeline instance for the bus.
      *
      * @var \Illuminate\Pipeline\Pipeline
@@ -45,23 +38,16 @@ class Dispatcher implements QueueingDispatcher
     protected $handlers = [];
 
     /**
-     * The queue resolver callback.
-     *
-     * @var \Closure|null
-     */
-    protected $queueResolver;
-
-    /**
      * Create a new command dispatcher instance.
      *
      * @param  \Illuminate\Contracts\Container\Container  $container
      * @param  \Closure|null  $queueResolver
      * @return void
      */
-    public function __construct(Container $container, ?Closure $queueResolver = null)
-    {
-        $this->container = $container;
-        $this->queueResolver = $queueResolver;
+    public function __construct(
+        protected Container $container,
+        protected ?Closure $queueResolver = null,
+    ) {
         $this->pipeline = new Pipeline($container);
     }
 

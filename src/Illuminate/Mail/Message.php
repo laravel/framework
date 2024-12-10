@@ -19,13 +19,6 @@ class Message
     use ForwardsCalls;
 
     /**
-     * The Symfony Email instance.
-     *
-     * @var \Symfony\Component\Mime\Email
-     */
-    protected $message;
-
-    /**
      * CIDs of files embedded in the message.
      *
      * @deprecated Will be removed in a future Laravel version.
@@ -40,9 +33,9 @@ class Message
      * @param  \Symfony\Component\Mime\Email  $message
      * @return void
      */
-    public function __construct(Email $message)
-    {
-        $this->message = $message;
+    public function __construct(
+        protected Email $message,
+    ) {
     }
 
     /**

@@ -13,13 +13,6 @@ use InvalidArgumentException;
 class QueueManager implements FactoryContract, MonitorContract
 {
     /**
-     * The application instance.
-     *
-     * @var \Illuminate\Contracts\Foundation\Application
-     */
-    protected $app;
-
-    /**
      * The array of resolved queue connections.
      *
      * @var array
@@ -39,9 +32,9 @@ class QueueManager implements FactoryContract, MonitorContract
      * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @return void
      */
-    public function __construct($app)
-    {
-        $this->app = $app;
+    public function __construct(
+        protected $app,
+    ) {
     }
 
     /**

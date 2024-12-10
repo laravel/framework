@@ -27,13 +27,6 @@ use Pusher\Pusher;
 class BroadcastManager implements FactoryContract
 {
     /**
-     * The application instance.
-     *
-     * @var \Illuminate\Contracts\Container\Container
-     */
-    protected $app;
-
-    /**
      * The array of resolved broadcast drivers.
      *
      * @var array
@@ -53,9 +46,9 @@ class BroadcastManager implements FactoryContract
      * @param  \Illuminate\Contracts\Container\Container  $app
      * @return void
      */
-    public function __construct($app)
-    {
-        $this->app = $app;
+    public function __construct(
+        protected $app,
+    ) {
     }
 
     /**

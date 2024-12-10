@@ -35,13 +35,6 @@ use Symfony\Component\Mailer\Transport\Smtp\Stream\SocketStream;
 class MailManager implements FactoryContract
 {
     /**
-     * The application instance.
-     *
-     * @var \Illuminate\Contracts\Foundation\Application
-     */
-    protected $app;
-
-    /**
      * The array of resolved mailers.
      *
      * @var array
@@ -61,10 +54,9 @@ class MailManager implements FactoryContract
      * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @return void
      */
-    public function __construct($app)
-    {
-        $this->app = $app;
-    }
+    public function __construct(
+        protected $app,
+    ) {}
 
     /**
      * Get a mailer instance by name.

@@ -15,31 +15,16 @@ use Symfony\Component\Mime\Message;
 class SesV2Transport extends AbstractTransport implements Stringable
 {
     /**
-     * The Amazon SES V2 instance.
-     *
-     * @var \Aws\SesV2\SesV2Client
-     */
-    protected $ses;
-
-    /**
-     * The Amazon SES transmission options.
-     *
-     * @var array
-     */
-    protected $options = [];
-
-    /**
      * Create a new SES V2 transport instance.
      *
      * @param  \Aws\SesV2\SesV2Client  $ses
      * @param  array  $options
      * @return void
      */
-    public function __construct(SesV2Client $ses, $options = [])
-    {
-        $this->ses = $ses;
-        $this->options = $options;
-
+    public function __construct(
+        protected SesV2Client $ses,
+        protected $options = [],
+    ) {
         parent::__construct();
     }
 
