@@ -191,7 +191,7 @@ class FoundationServiceProvider extends AggregateServiceProvider
     }
 
     /**
-     * Register the URI url generator.
+     * Register the URL resolver for the URI generator.
      *
      * @return void
      */
