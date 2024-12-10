@@ -107,7 +107,7 @@ trait DatabaseTruncation
     {
         $prefix = $connection->getTablePrefix();
 
-        return strpos($table, $prefix) === 0
+        return str_starts_with($table, $prefix)
             ? substr($table, strlen($prefix))
             : $table;
     }
