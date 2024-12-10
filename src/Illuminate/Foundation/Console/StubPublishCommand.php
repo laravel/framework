@@ -123,18 +123,18 @@ class StubPublishCommand extends Command
 
         $commonStubs = collect($stubs)
             ->filter(fn ($to, $from) => Str::contains($from, [
-                    'model',
-                    'controller',
-                    'migration',
-                    'seeder',
-                    'factory',
-                    'test',
-                    'pest',
-                    'resource',
-                    'notification',
-                    'mail',
-                    'job',
-                ]))
+                'model',
+                'controller',
+                'migration',
+                'seeder',
+                'factory',
+                'test',
+                'pest',
+                'resource',
+                'notification',
+                'mail',
+                'job',
+            ]))
             ->all();
 
         return collect($commonStubs)
@@ -144,7 +144,7 @@ class StubPublishCommand extends Command
                     options: fn ($search) => collect($stubs)
                         ->filter(fn ($to) => str_contains($to, $search))
                         ->mapWithKeys(fn ($to, $from) => [
-                            $from => $this->forHumans($to)
+                            $from => $this->forHumans($to),
                         ])
                         ->sort()
                         ->all(),
@@ -171,7 +171,7 @@ class StubPublishCommand extends Command
         if ($parts->count() <= 1) {
             return $parts->first();
         }
-        
+
         // Set the second segment as the prefix and join the remaining segments.
         return $parts
             ->splice(1, 1)
