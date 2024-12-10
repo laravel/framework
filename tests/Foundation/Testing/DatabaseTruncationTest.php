@@ -187,7 +187,7 @@ class DatabaseTruncationTest extends TestCase
         $grammar = m::mock(Grammar::class);
 
         $connection = m::mock(Connection::class);
-        $connection->shouldReceive('getTablePrefix')->once()->andReturn($prefix);
+        $connection->shouldReceive('getTablePrefix')->andReturn($prefix);
         $connection->shouldReceive('getEventDispatcher')->once()->andReturn($dispatcher = m::mock(Dispatcher::class));
         $connection->shouldReceive('unsetEventDispatcher')->once();
         $connection->shouldReceive('setEventDispatcher')->once()->with($dispatcher);
