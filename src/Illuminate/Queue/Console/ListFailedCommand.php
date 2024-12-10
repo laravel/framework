@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Input\InputOption;
 
 #[AsCommand(name: 'queue:failed')]
 class ListFailedCommand extends Command
@@ -15,7 +16,7 @@ class ListFailedCommand extends Command
      *
      * @var string
      */
-    protected $name = 'queue:failed {--limit= : The number of failed jobs to be displayed}';
+    protected $name = 'queue:failed';
 
     /**
      * The console command description.
@@ -123,5 +124,17 @@ class ListFailedCommand extends Command
                 sprintf('<fg=gray>%s@%s</> %s', $job[1], $job[2], $job[3])
             ),
         );
+    }
+
+    /**
+     * Get the console command options.
+     *
+     * @return array
+     */
+    protected function getOptions()
+    {
+        return [
+            ['limit', null, InputOption::VALUE_OPTIONAL, 'The number of failed jobs to be displayed',],
+        ];
     }
 }
