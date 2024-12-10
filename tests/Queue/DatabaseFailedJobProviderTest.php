@@ -46,6 +46,16 @@ class DatabaseFailedJobProviderTest extends TestCase
         $this->assertSame('default', $this->provider->all()[1]->queue);
     }
 
+    public function testCanLimitANumberOfFailedJobs()
+    {
+        $this->assertEmpty($this->provider->all());
+
+        array_map(fn () => $this->createFailedJobsRecord(), range(1, 5));
+
+        $this->assertCount(4, $this->provider->limit(4));
+        $this->assertSame([5, 4, 3], array_column($this->provider->limit(3), 'id'));
+    }
+
     public function testCanRetrieveFailedJobsById()
     {
         array_map(fn () => $this->createFailedJobsRecord(), range(1, 2));

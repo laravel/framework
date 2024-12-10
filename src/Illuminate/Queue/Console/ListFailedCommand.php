@@ -134,7 +134,7 @@ class ListFailedCommand extends Command
     protected function getOptions()
     {
         return [
-            ['limit', null, InputOption::VALUE_OPTIONAL, 'The number of failed jobs to be displayed',],
+            ['limit', null, InputOption::VALUE_OPTIONAL, 'The number of failed jobs to be displayed'],
         ];
     }
 }
