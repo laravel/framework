@@ -121,14 +121,37 @@ class StubPublishCommand extends Command
             return $stubs;
         }
 
-        return collect($stubs)->only(multisearch(
-            'Which stubs would you like to publish?',
-            options: fn ($search) => collect($stubs)
-                ->filter(fn ($to) => str_contains($to, $search))
-                ->mapWithKeys(fn ($to, $from) => [$from => $this->forHumans($to)])
-                ->all(),
-            scroll: 10,
-        ))->all();
+        $commonStubs = collect($stubs)
+            ->filter(fn ($to, $from) => Str::contains($from, [
+                    'model',
+                    'controller',
+                    'migration',
+                    'seeder',
+                    'factory',
+                    'test',
+                    'pest',
+                    'resource',
+                    'notification',
+                    'mail',
+                    'job',
+                ]))
+            ->all();
+
+        return collect($commonStubs)
+            ->only(
+                multisearch(
+                    'Which stubs would you like to publish?',
+                    options: fn ($search) => collect($stubs)
+                        ->filter(fn ($to) => str_contains($to, $search))
+                        ->mapWithKeys(fn ($to, $from) => [
+                            $from => $this->forHumans($to)
+                        ])
+                        ->sort()
+                        ->all(),
+                    scroll: 10,
+                )
+            )
+            ->all();
     }
 
     /**
@@ -137,19 +160,24 @@ class StubPublishCommand extends Command
     private function forHumans(string $stub): string
     {
         $parts = Str::of($stub)
-            ->beforeLast('.stub')
+            ->before('.stub')
             ->replace('-', ' ')
-            ->explode('.');
+            ->explode('.')
+            ->map(fn ($part) => Str::of($part)
+                ->title()
+                ->replace('Api', 'API')
+            );
 
         if ($parts->count() <= 1) {
-            return Str::title($parts->first());
+            return $parts->first();
         }
-
+        
+        // Set the second segment as the prefix and join the remaining segments.
         return $parts
             ->splice(1, 1)
             ->pipe(fn ($lead) => collect([
-                Str::title($lead->first()),
-                $parts->map(fn ($part) => $part === 'api' ? 'API' : Str::title($part))->join(' '),
+                $lead->first(),
+                $parts->join(' '),
             ])->filter()->join(' '));
     }
 }
