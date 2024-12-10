@@ -6,6 +6,7 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Http\Request capture()
  * @method static \Illuminate\Http\Request instance()
  * @method static string method()
+ * @method static \Illuminate\Support\Uri uri()
  * @method static string root()
  * @method static string url()
  * @method static string fullUrl()

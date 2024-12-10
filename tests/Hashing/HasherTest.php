@@ -117,4 +117,25 @@ class HasherTest extends TestCase
     {
         $this->assertFalse($this->hashManager->isHashed('foo'));
     }
+
+    public function testBasicBcryptNotSupported()
+    {
+        $this->expectException(RuntimeException::class);
+
+        (new BcryptHasher(['rounds' => 0]))->make('password');
+    }
+
+    public function testBasicArgon2iNotSupported()
+    {
+        $this->expectException(RuntimeException::class);
+
+        (new ArgonHasher(['time' => 0]))->make('password');
+    }
+
+    public function testBasicArgon2idNotSupported()
+    {
+        $this->expectException(RuntimeException::class);
+
+        (new Argon2IdHasher(['time' => 0]))->make('password');
+    }
 }

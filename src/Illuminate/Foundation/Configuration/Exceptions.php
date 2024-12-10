@@ -223,5 +223,7 @@ class Exceptions
     public function dontTruncateRequestExceptions()
     {
         RequestException::dontTruncate();
+
+        return $this;
     }
 }
