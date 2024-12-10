@@ -9,14 +9,21 @@ use Illuminate\Support\ViewErrorBag;
 class ShareErrorsFromSession
 {
     /**
+     * The view factory implementation.
+     *
+     * @var \Illuminate\Contracts\View\Factory
+     */
+    protected $view;
+
+    /**
      * Create a new error binder instance.
      *
      * @param  \Illuminate\Contracts\View\Factory  $view
      * @return void
      */
-    public function __construct(
-        protected ViewFactory $view
-    ) {
+    public function __construct(ViewFactory $view)
+    {
+        $this->view = $view;
     }
 
     /**

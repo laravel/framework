@@ -25,14 +25,21 @@ class ArrayStore extends TaggableStore implements LockProvider
     public $locks = [];
 
     /**
+     * Indicates if values are serialized within the store.
+     *
+     * @var bool
+     */
+    protected $serializesValues;
+
+    /**
      * Create a new Array store.
      *
      * @param  bool  $serializesValues
      * @return void
      */
-    public function __construct(
-        protected $serializesValues = false,
-    ) {
+    public function __construct($serializesValues = false)
+    {
+        $this->serializesValues = $serializesValues;
     }
 
     /**

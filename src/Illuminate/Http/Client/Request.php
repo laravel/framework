@@ -13,6 +13,13 @@ class Request implements ArrayAccess
     use Macroable;
 
     /**
+     * The underlying PSR request.
+     *
+     * @var \Psr\Http\Message\RequestInterface
+     */
+    protected $request;
+
+    /**
      * The decoded payload for the request.
      *
      * @var array
@@ -25,9 +32,9 @@ class Request implements ArrayAccess
      * @param  \Psr\Http\Message\RequestInterface  $request
      * @return void
      */
-    public function __construct(
-        protected $request,
-    ) {
+    public function __construct($request)
+    {
+        $this->request = $request;
     }
 
     /**

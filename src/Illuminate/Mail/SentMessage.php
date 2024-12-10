@@ -14,14 +14,21 @@ class SentMessage
     use ForwardsCalls;
 
     /**
+     * The Symfony SentMessage instance.
+     *
+     * @var \Symfony\Component\Mailer\SentMessage
+     */
+    protected $sentMessage;
+
+    /**
      * Create a new SentMessage instance.
      *
      * @param  \Symfony\Component\Mailer\SentMessage  $sentMessage
      * @return void
      */
-    public function __construct(
-        protected SymfonySentMessage $sentMessage,
-    ) {
+    public function __construct(SymfonySentMessage $sentMessage)
+    {
+        $this->sentMessage = $sentMessage;
     }
 
     /**

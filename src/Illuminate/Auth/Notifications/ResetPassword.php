@@ -9,6 +9,13 @@ use Illuminate\Support\Facades\Lang;
 class ResetPassword extends Notification
 {
     /**
+     * The password reset token.
+     *
+     * @var string
+     */
+    public $token;
+
+    /**
      * The callback that should be used to create the reset password URL.
      *
      * @var (\Closure(mixed, string): string)|null
@@ -28,9 +35,9 @@ class ResetPassword extends Notification
      * @param  string  $token
      * @return void
      */
-    public function __construct(
-        #[\SensitiveParameter] public $token,
-    ) {
+    public function __construct(#[\SensitiveParameter] $token)
+    {
+        $this->token = $token;
     }
 
     /**

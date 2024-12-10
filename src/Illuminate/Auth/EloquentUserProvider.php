@@ -11,6 +11,20 @@ use Illuminate\Contracts\Support\Arrayable;
 class EloquentUserProvider implements UserProvider
 {
     /**
+     * The hasher implementation.
+     *
+     * @var \Illuminate\Contracts\Hashing\Hasher
+     */
+    protected $hasher;
+
+    /**
+     * The Eloquent user model.
+     *
+     * @var string
+     */
+    protected $model;
+
+    /**
      * The callback that may modify the user retrieval queries.
      *
      * @var (\Closure(\Illuminate\Database\Eloquent\Builder<*>):mixed)|null
@@ -24,10 +38,10 @@ class EloquentUserProvider implements UserProvider
      * @param  string  $model
      * @return void
      */
-    public function __construct(
-        protected HasherContract $hasher,
-        protected $model,
-    ) {
+    public function __construct(HasherContract $hasher, $model)
+    {
+        $this->model = $model;
+        $this->hasher = $hasher;
     }
 
     /**

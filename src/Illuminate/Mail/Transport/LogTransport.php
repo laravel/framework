@@ -13,14 +13,21 @@ use Symfony\Component\Mime\RawMessage;
 class LogTransport implements Stringable, TransportInterface
 {
     /**
+     * The Logger instance.
+     *
+     * @var \Psr\Log\LoggerInterface
+     */
+    protected $logger;
+
+    /**
      * Create a new log transport instance.
      *
      * @param  \Psr\Log\LoggerInterface  $logger
      * @return void
      */
-    public function __construct(
-        protected LoggerInterface $logger,
-    ) {
+    public function __construct(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
     }
 
     /**

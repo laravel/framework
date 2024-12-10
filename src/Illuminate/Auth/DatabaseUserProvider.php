@@ -12,6 +12,27 @@ use Illuminate\Database\ConnectionInterface;
 class DatabaseUserProvider implements UserProvider
 {
     /**
+     * The active database connection.
+     *
+     * @var \Illuminate\Database\ConnectionInterface
+     */
+    protected $connection;
+
+    /**
+     * The hasher implementation.
+     *
+     * @var \Illuminate\Contracts\Hashing\Hasher
+     */
+    protected $hasher;
+
+    /**
+     * The table containing the users.
+     *
+     * @var string
+     */
+    protected $table;
+
+    /**
      * Create a new database user provider.
      *
      * @param  \Illuminate\Database\ConnectionInterface  $connection
@@ -19,11 +40,11 @@ class DatabaseUserProvider implements UserProvider
      * @param  string  $table
      * @return void
      */
-    public function __construct(
-        protected ConnectionInterface $connection,
-        protected HasherContract $hasher,
-        protected $table,
-    ) {
+    public function __construct(ConnectionInterface $connection, HasherContract $hasher, $table)
+    {
+        $this->connection = $connection;
+        $this->table = $table;
+        $this->hasher = $hasher;
     }
 
     /**
