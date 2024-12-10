@@ -192,7 +192,7 @@ class DatabaseSessionHandler implements ExistenceAwareInterface, SessionHandlerI
 
         return tap($payload, function (&$payload) {
             $this->addUserInformation($payload)
-                 ->addRequestInformation($payload);
+                ->addRequestInformation($payload);
         });
     }
 

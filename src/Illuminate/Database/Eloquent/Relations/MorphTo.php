@@ -146,14 +146,14 @@ class MorphTo extends BelongsTo
         $ownerKey = $this->ownerKey ?? $instance->getKeyName();
 
         $query = $this->replayMacros($instance->newQuery())
-                            ->mergeConstraintsFrom($this->getQuery())
-                            ->with(array_merge(
-                                $this->getQuery()->getEagerLoads(),
-                                (array) ($this->morphableEagerLoads[get_class($instance)] ?? [])
-                            ))
-                            ->withCount(
-                                (array) ($this->morphableEagerLoadCounts[get_class($instance)] ?? [])
-                            );
+            ->mergeConstraintsFrom($this->getQuery())
+            ->with(array_merge(
+                $this->getQuery()->getEagerLoads(),
+                (array) ($this->morphableEagerLoads[get_class($instance)] ?? [])
+            ))
+            ->withCount(
+                (array) ($this->morphableEagerLoadCounts[get_class($instance)] ?? [])
+            );
 
         if ($callback = ($this->morphableConstraints[get_class($instance)] ?? null)) {
             $callback($query);

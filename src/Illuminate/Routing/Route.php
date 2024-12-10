@@ -378,7 +378,7 @@ class Route
         $this->compileRoute();
 
         $this->parameters = (new RouteParameterBinder($this))
-                        ->parameters($request);
+            ->parameters($request);
 
         $this->originalParameters = $this->parameters;
 

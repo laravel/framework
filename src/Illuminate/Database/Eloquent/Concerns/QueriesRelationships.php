@@ -252,7 +252,7 @@ trait QueriesRelationships
                     }
 
                     $query->where($this->qualifyColumn($relation->getMorphType()), '=', (new $type)->getMorphClass())
-                                ->whereHas($belongsTo, $callback, $operator, $count);
+                        ->whereHas($belongsTo, $callback, $operator, $count);
                 });
             }
         }, null, null, $boolean);
