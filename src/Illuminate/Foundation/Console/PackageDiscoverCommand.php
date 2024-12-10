@@ -38,7 +38,7 @@ class PackageDiscoverCommand extends Command
 
         (new Collection($manifest->manifest))
             ->keys()
-            ->each(fn ($description) => $this->components->task($description))
+            ->each($this->components->task(...))
             ->whenNotEmpty(fn () => $this->newLine());
     }
 }

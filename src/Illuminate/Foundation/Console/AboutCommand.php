@@ -95,7 +95,7 @@ class AboutCommand extends Command
             ->filter(function ($data, $key) {
                 return $this->option('only') ? in_array($this->toSearchKeyword($key), $this->sections()) : true;
             })
-            ->pipe(fn ($data) => $this->display($data));
+            ->pipe($this->display(...));
 
         $this->newLine();
 
@@ -270,7 +270,7 @@ class AboutCommand extends Command
     {
         return (new Collection(explode(',', $this->option('only') ?? '')))
             ->filter()
-            ->map(fn ($only) => $this->toSearchKeyword($only))
+            ->map($this->toSearchKeyword(...))
             ->all();
     }
 
