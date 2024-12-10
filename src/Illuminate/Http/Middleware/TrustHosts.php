@@ -8,6 +8,13 @@ use Illuminate\Http\Request;
 class TrustHosts
 {
     /**
+     * The application instance.
+     *
+     * @var \Illuminate\Contracts\Foundation\Application
+     */
+    protected $app;
+
+    /**
      * The trusted hosts that have been configured to always be trusted.
      *
      * @var array<int, string>|(callable(): array<int, string>)|null
@@ -27,9 +34,9 @@ class TrustHosts
      * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @return void
      */
-    public function __construct(
-        protected Application $app,
-    ) {
+    public function __construct(Application $app)
+    {
+        $this->app = $app;
     }
 
     /**

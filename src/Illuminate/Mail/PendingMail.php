@@ -12,6 +12,13 @@ class PendingMail
     use Conditionable;
 
     /**
+     * The mailer instance.
+     *
+     * @var \Illuminate\Contracts\Mail\Mailer
+     */
+    protected $mailer;
+
+    /**
      * The locale of the message.
      *
      * @var string
@@ -45,9 +52,9 @@ class PendingMail
      * @param  \Illuminate\Contracts\Mail\Mailer  $mailer
      * @return void
      */
-    public function __construct(
-        protected MailerContract $mailer,
-    ) {
+    public function __construct(MailerContract $mailer)
+    {
+        $this->mailer = $mailer;
     }
 
     /**

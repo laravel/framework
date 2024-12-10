@@ -9,14 +9,21 @@ use Illuminate\Support\Collection;
 class ResourceResponse implements Responsable
 {
     /**
+     * The underlying resource.
+     *
+     * @var mixed
+     */
+    public $resource;
+
+    /**
      * Create a new resource response.
      *
      * @param  mixed  $resource
      * @return void
      */
-    public function __construct(
-        public $resource,
-    ) {
+    public function __construct($resource)
+    {
+        $this->resource = $resource;
     }
 
     /**

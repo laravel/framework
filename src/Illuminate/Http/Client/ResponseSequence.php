@@ -11,6 +11,13 @@ class ResponseSequence
     use Macroable;
 
     /**
+     * The responses in the sequence.
+     *
+     * @var array
+     */
+    protected $responses;
+
+    /**
      * Indicates that invoking this sequence when it is empty should throw an exception.
      *
      * @var bool
@@ -30,9 +37,9 @@ class ResponseSequence
      * @param  array  $responses
      * @return void
      */
-    public function __construct(
-        protected array $responses,
-    ) {
+    public function __construct(array $responses)
+    {
+        $this->responses = $responses;
     }
 
     /**

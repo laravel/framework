@@ -7,16 +7,30 @@ use Illuminate\Contracts\Cache\Store;
 class TagSet
 {
     /**
+     * The cache store implementation.
+     *
+     * @var \Illuminate\Contracts\Cache\Store
+     */
+    protected $store;
+
+    /**
+     * The tag names.
+     *
+     * @var array
+     */
+    protected $names = [];
+
+    /**
      * Create a new TagSet instance.
      *
      * @param  \Illuminate\Contracts\Cache\Store  $store
      * @param  array  $names
      * @return void
      */
-    public function __construct(
-        protected Store $store,
-        protected array $names = [],
-    ) {
+    public function __construct(Store $store, array $names = [])
+    {
+        $this->store = $store;
+        $this->names = $names;
     }
 
     /**

@@ -11,6 +11,13 @@ use InvalidArgumentException;
 class PasswordBrokerManager implements FactoryContract
 {
     /**
+     * The application instance.
+     *
+     * @var \Illuminate\Contracts\Foundation\Application
+     */
+    protected $app;
+
+    /**
      * The array of created "drivers".
      *
      * @var array
@@ -23,9 +30,9 @@ class PasswordBrokerManager implements FactoryContract
      * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @return void
      */
-    public function __construct(
-        protected $app,
-    ) {
+    public function __construct($app)
+    {
+        $this->app = $app;
     }
 
     /**

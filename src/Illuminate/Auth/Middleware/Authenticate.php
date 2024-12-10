@@ -11,6 +11,13 @@ use Illuminate\Http\Request;
 class Authenticate implements AuthenticatesRequests
 {
     /**
+     * The authentication factory instance.
+     *
+     * @var \Illuminate\Contracts\Auth\Factory
+     */
+    protected $auth;
+
+    /**
      * The callback that should be used to generate the authentication redirect path.
      *
      * @var callable
@@ -23,9 +30,9 @@ class Authenticate implements AuthenticatesRequests
      * @param  \Illuminate\Contracts\Auth\Factory  $auth
      * @return void
      */
-    public function __construct(
-        protected Auth $auth,
-    ) {
+    public function __construct(Auth $auth)
+    {
+        $this->auth = $auth;
     }
 
     /**

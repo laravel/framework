@@ -8,14 +8,21 @@ use Illuminate\Contracts\Auth\Factory as AuthFactory;
 class AuthenticateWithBasicAuth
 {
     /**
+     * The guard factory instance.
+     *
+     * @var \Illuminate\Contracts\Auth\Factory
+     */
+    protected $auth;
+
+    /**
      * Create a new middleware instance.
      *
      * @param  \Illuminate\Contracts\Auth\Factory  $auth
      * @return void
      */
-    public function __construct(
-        protected AuthFactory $auth,
-    ) {
+    public function __construct(AuthFactory $auth)
+    {
+        $this->auth = $auth;
     }
 
     /**
