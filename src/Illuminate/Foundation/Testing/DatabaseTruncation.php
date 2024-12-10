@@ -85,43 +85,59 @@ trait DatabaseTruncation
         $dispatcher = $connection->getEventDispatcher();
 
         $connection->unsetEventDispatcher();
-        $schema = $connection->getSchemaBuilder();
 
-        (new Collection(static::$allTables[$name] ??= $schema->getTables()))
-            ->when(
-                $schema instanceof PostgresBuilder ? $schema->getSchemas() : null,
-                fn ($tables, $schemas) => $tables->filter(fn ($table) => in_array($table['schema'], $schemas))
-            )
+        (new Collection($this->getAllTablesForConnection($connection, $name)))
             ->when(
                 property_exists($this, 'tablesToTruncate'),
-                fn (Collection $tables) => $tables->intersectUsing(
-                    $this->tablesToTruncate,
-                    $this->compareTablesWithSchema(...)
-                ),
-                fn (Collection $tables) => $tables->diffUsing(
-                    $this->exceptTables($name),
-                    $this->compareTablesWithSchema(...)
-                )
+                function (Collection $tables) {
+                    return $tables->filter(fn (array $table) => $this->tableExistsIn($table, $this->tablesToTruncate));
+                },
+                function (Collection $tables) use ($connection, $name) {
+                    $exceptTables = $this->exceptTables($connection, $name);
+
+                    return $tables->filter(fn (array $table) => ! $this->tableExistsIn($table, $exceptTables));
+                }
             )
-            ->map(fn (array $table) => $table['schema'] ? $table['schema'].'.'.$table['name'] : $table['name'])
-            ->filter(fn ($table) => $connection->table(new Expression($table))->exists())
-            ->each(fn ($table) => $connection->table(new Expression($table))->truncate());
+            ->each(function (array $table) use ($connection) {
+                $table = $connection->table(
+                    new Expression($table['schema'] ? $table['schema'].'.'.$table['name'] : $table['name'])
+                );
+
+                if ($table->exists()) {
+                    $table->truncate();
+                }
+            });
 
         $connection->setEventDispatcher($dispatcher);
     }
 
     /**
-     * Compare the given tables with or without schema name.
-     *
-     * @param  array  $firstTable
-     * @param  string  $secondTable
-     * @return int
+     * Get all the tables that belong to the connection.
      */
-    protected function compareTablesWithSchema(array $firstTable, string $secondTable): int
+    protected function getAllTablesForConnection(ConnectionInterface $connection, ?string $name): array
     {
-        return $firstTable['schema'] && str_contains($secondTable, '.')
-            ? $firstTable['schema'].'.'.$firstTable['name'] <=> $secondTable
-            : $firstTable['name'] <=> $secondTable;
+        if (isset(static::$allTables[$name])) {
+            return static::$allTables[$name];
+        }
+
+        $schema = $connection->getSchemaBuilder();
+
+        return static::$allTables[$name] = (new Collection($schema->getTables()))->when(
+            $schema instanceof PostgresBuilder ? $schema->getSchemas() : null,
+            fn (Collection $tables, array $schemas) => $tables->filter(
+                fn (array $table) => in_array($table['schema'], $schemas)
+            )
+        )->all();
+    }
+
+    /**
+     * Determine if a table exists in the given list, with or without its schema.
+     */
+    protected function tableExistsIn(array $table, array $tables): bool
+    {
+        return $table['schema']
+            ? ! empty(array_intersect([$table['name'], $table['schema'].'.'.$table['name']], $tables))
+            : in_array($table['name'], $tables);
     }
 
     /**
@@ -137,15 +153,13 @@ trait DatabaseTruncation
 
     /**
      * Get the tables that should not be truncated.
-     *
-     * @param  string|null  $connectionName
-     * @return array
      */
-    protected function exceptTables(?string $connectionName): array
+    protected function exceptTables(ConnectionInterface $connection, ?string $connectionName): array
     {
         $migrations = $this->app['config']->get('database.migrations');
 
-        $migrationsTable = is_array($migrations) ? ($migrations['table'] ?? null) : $migrations;
+        $migrationsTable = is_array($migrations) ? ($migrations['table'] ?? 'migrations') : $migrations;
+        $migrationsTable = $connection->getTablePrefix().$migrationsTable;
 
         if (property_exists($this, 'exceptTables')) {
             if (array_is_list($this->exceptTables ?? [])) {
