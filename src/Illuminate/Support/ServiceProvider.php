@@ -16,7 +16,6 @@ use Illuminate\View\Compilers\BladeCompiler;
  */
 abstract class ServiceProvider
 {
-
     /**
      * All of the registered booting callbacks.
      *

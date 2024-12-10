@@ -16,7 +16,8 @@ class ResourceResponse implements Responsable
      */
     public function __construct(
         public $resource,
-    ) {}
+    ) {
+    }
 
     /**
      * Create an HTTP response that represents the object.

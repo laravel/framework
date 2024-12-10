@@ -56,7 +56,8 @@ class MailManager implements FactoryContract
      */
     public function __construct(
         protected $app,
-    ) {}
+    ) {
+    }
 
     /**
      * Get a mailer instance by name.
