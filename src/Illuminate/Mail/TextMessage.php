@@ -12,21 +12,14 @@ class TextMessage
     use ForwardsCalls;
 
     /**
-     * The underlying message instance.
-     *
-     * @var \Illuminate\Mail\Message
-     */
-    protected $message;
-
-    /**
      * Create a new text message instance.
      *
      * @param  \Illuminate\Mail\Message  $message
      * @return void
      */
-    public function __construct($message)
-    {
-        $this->message = $message;
+    public function __construct(
+        protected $message,
+    ) {
     }
 
     /**

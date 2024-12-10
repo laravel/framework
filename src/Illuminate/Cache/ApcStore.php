@@ -7,30 +7,16 @@ class ApcStore extends TaggableStore
     use RetrievesMultipleKeys;
 
     /**
-     * The APC wrapper instance.
-     *
-     * @var \Illuminate\Cache\ApcWrapper
-     */
-    protected $apc;
-
-    /**
-     * A string that should be prepended to keys.
-     *
-     * @var string
-     */
-    protected $prefix;
-
-    /**
      * Create a new APC store.
      *
      * @param  \Illuminate\Cache\ApcWrapper  $apc
      * @param  string  $prefix
      * @return void
      */
-    public function __construct(ApcWrapper $apc, $prefix = '')
-    {
-        $this->apc = $apc;
-        $this->prefix = $prefix;
+    public function __construct(
+        protected ApcWrapper $apc,
+        protected $prefix = '',
+    ) {
     }
 
     /**

@@ -16,20 +16,6 @@ class Logger implements LoggerInterface
     use Conditionable;
 
     /**
-     * The underlying logger implementation.
-     *
-     * @var \Psr\Log\LoggerInterface
-     */
-    protected $logger;
-
-    /**
-     * The event dispatcher instance.
-     *
-     * @var \Illuminate\Contracts\Events\Dispatcher|null
-     */
-    protected $dispatcher;
-
-    /**
      * Any context to be added to logs.
      *
      * @var array
@@ -43,10 +29,10 @@ class Logger implements LoggerInterface
      * @param  \Illuminate\Contracts\Events\Dispatcher|null  $dispatcher
      * @return void
      */
-    public function __construct(LoggerInterface $logger, ?Dispatcher $dispatcher = null)
-    {
-        $this->logger = $logger;
-        $this->dispatcher = $dispatcher;
+    public function __construct(
+        protected LoggerInterface $logger,
+        protected ?Dispatcher $dispatcher = null,
+    ) {
     }
 
     /**

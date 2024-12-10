@@ -14,13 +14,6 @@ class RateLimiter
     use InteractsWithTime;
 
     /**
-     * The cache store implementation.
-     *
-     * @var \Illuminate\Contracts\Cache\Repository
-     */
-    protected $cache;
-
-    /**
      * The configured limit object resolvers.
      *
      * @var array
@@ -33,9 +26,9 @@ class RateLimiter
      * @param  \Illuminate\Contracts\Cache\Repository  $cache
      * @return void
      */
-    public function __construct(Cache $cache)
-    {
-        $this->cache = $cache;
+    public function __construct(
+        protected Cache $cache,
+    ) {
     }
 
     /**
