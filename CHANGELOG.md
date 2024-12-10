@@ -1,6 +1,55 @@
 # Release Notes for 11.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v11.34.2...11.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v11.35.0...11.x)
+
+## [v11.35.0](https://github.com/laravel/framework/compare/v11.34.2...v11.35.0) - 2024-12-10
+
+* [11.x] Supports Symfony 7.2 by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/53585
+* [11.x] Fix database reconnecting logic by [@stancl](https://github.com/stancl) in https://github.com/laravel/framework/pull/53693
+* [11.x] Test Improvements by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/53708
+* [11.x] Fix foreignIdFor() when the foreign key is a non-incrementing integer other than ULID by [@edgrosvenor](https://github.com/edgrosvenor) in https://github.com/laravel/framework/pull/53696
+* [11.x] Allow sorting routes by precedence in artisan routes:list. by [@mathieutu](https://github.com/mathieutu) in https://github.com/laravel/framework/pull/53706
+* [11.x] Update the message for the schedule:work command. by [@AbdelElrafa](https://github.com/AbdelElrafa) in https://github.com/laravel/framework/pull/53710
+* [11.x] Support auto-discovery of PSR-17 implementations by [@hafezdivandari](https://github.com/hafezdivandari) in https://github.com/laravel/framework/pull/53711
+* [11.x] Improve Error Handler in the ProcessDriver by [@WillTorres10](https://github.com/WillTorres10) in https://github.com/laravel/framework/pull/53712
+* [11.x] Comment grammar fixes by [@nexxai](https://github.com/nexxai) in https://github.com/laravel/framework/pull/53714
+* [11.x] Replace get_called_class with static::class by [@fernandokbs](https://github.com/fernandokbs) in https://github.com/laravel/framework/pull/53725
+* [11.x] Add the pivot's related model when creating from attributes by [@alexwass-lr](https://github.com/alexwass-lr) in https://github.com/laravel/framework/pull/53694
+* [11.x] use a consistent alias for `Illuminate\Database\Eloquent\Collection` by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/53730
+* [11.x] switch `Collection::make()` for `new Collection()` by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/53733
+* [11.x] always alias the `Illuminate\Database\Eloquent\Collection` by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/53735
+* [11.x] convert `collect()` helper to `new Collection()` by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/53726
+* [11.x] Improves `Collection` support for enums using `firstWhere()` and `value()` by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/53777
+* [11.x] Add Conditionable Trait to Request by [@ahmeti](https://github.com/ahmeti) in https://github.com/laravel/framework/pull/53775
+* [11.x] Ignore health endpoint when in maintenance mode by [@joshmanders](https://github.com/joshmanders) in https://github.com/laravel/framework/pull/53772
+* [11.x] Add ability to transform `Http\Client\Response` into `Fluent` by [@stevebauman](https://github.com/stevebauman) in https://github.com/laravel/framework/pull/53771
+* set schema to smtps if MAIL_ENCRYPTION === tls by [@danielrona](https://github.com/danielrona) in https://github.com/laravel/framework/pull/53749
+* [11.x] more consistent and readable chaining by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/53748
+* [11.x] Fix the RateLimiter issue when using dynamic keys by [@MilesChou](https://github.com/MilesChou) in https://github.com/laravel/framework/pull/53763
+* [11.x] Add ability to customize or disable `Http\Client\RequestException` message truncation by [@stevebauman](https://github.com/stevebauman) in https://github.com/laravel/framework/pull/53734
+* [11.x] Include the initial value in the return types of `reduce()` by [@lorenzolosa](https://github.com/lorenzolosa) in https://github.com/laravel/framework/pull/53798
+* [11.x] Add pingOnSuccessIf & pingOnFailureIf to Schedule handling by [@lucacastelnuovo](https://github.com/lucacastelnuovo) in https://github.com/laravel/framework/pull/53795
+* [11.x] Improve PHPDoc for nullable properties in `Illuminate\Database\Query\Builder` class by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/53793
+* [11.x] Remove usage of `compact()` in Container by [@KennedyTedesco](https://github.com/KennedyTedesco) in https://github.com/laravel/framework/pull/53789
+* [11.x] Make `Exceptions@dontTruncateRequestExceptions()` fluent by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/53786
+* [11.x] Make mailables tappable by [@kevinb1989](https://github.com/kevinb1989) in https://github.com/laravel/framework/pull/53788
+* URI by [@taylorotwell](https://github.com/taylorotwell) in https://github.com/laravel/framework/pull/53731
+* [11.x] Require `laravel/serializable-closure` on Database component by [@patrickcarlohickman](https://github.com/patrickcarlohickman) in https://github.com/laravel/framework/pull/53822
+* [11.x] use new PHP 8 `str_` functions by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/53817
+* [11.x] handle `password_hash()` failures better by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/53821
+* [11.x] remove unnecessary `return` statement by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/53816
+* [11.x] simplify passing arguments to `when()` by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/53815
+* [11.x] remove redundant `array_values` call by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/53814
+* [11.x] prefer assignment over `array_push` for 1 element by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/53813
+* [11.x] fix `chopStart` and `chopEnd` tests by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/53812
+* [11.x] remove temporary variables by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/53810
+* [11.x] fix `$events` docblock type by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/53808
+* [11.x] Fix docblock for URI by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/53804
+* Bump nanoid from 3.3.7 to 3.3.8 in /src/Illuminate/Foundation/resources/exceptions/renderer by [@dependabot](https://github.com/dependabot) in https://github.com/laravel/framework/pull/53831
+* [11.x] use promoted properties by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/53807
+* Revert "[11.x] use promoted properties" by [@taylorotwell](https://github.com/taylorotwell) in https://github.com/laravel/framework/pull/53832
+* Using throw config of filesystem disks when faking by [@emulgeator](https://github.com/emulgeator) in https://github.com/laravel/framework/pull/53779
+* [11.x] Fix schema names on `DatabaseTruncation` trait (PostgreSQL and SQLServer) by [@hafezdivandari](https://github.com/hafezdivandari) in https://github.com/laravel/framework/pull/53787
 
 ## [v11.34.2](https://github.com/laravel/framework/compare/v11.34.1...v11.34.2) - 2024-11-27
 
