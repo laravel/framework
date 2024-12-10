@@ -87,7 +87,7 @@ class EventFake implements Dispatcher, Fake
     {
         foreach ($this->dispatcher->getListeners($expectedEvent) as $listenerClosure) {
             $actualListener = (new ReflectionFunction($listenerClosure))
-                        ->getStaticVariables()['listener'];
+                ->getStaticVariables()['listener'];
 
             $normalizedListener = $expectedListener;
 

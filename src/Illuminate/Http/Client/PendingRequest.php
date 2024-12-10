@@ -1326,10 +1326,10 @@ class PendingRequest
         return function ($handler) {
             return function ($request, $options) use ($handler) {
                 $response = ($this->stubCallbacks ?? new Collection)
-                     ->map
-                     ->__invoke((new Request($request))->withData($options['laravel_data']), $options)
-                     ->filter()
-                     ->first();
+                    ->map
+                    ->__invoke((new Request($request))->withData($options['laravel_data']), $options)
+                    ->filter()
+                    ->first();
 
                 if (is_null($response)) {
                     if ($this->preventStrayRequests) {

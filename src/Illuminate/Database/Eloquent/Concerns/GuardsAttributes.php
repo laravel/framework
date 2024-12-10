@@ -220,8 +220,8 @@ trait GuardsAttributes
 
         if (! isset(static::$guardableColumns[get_class($this)])) {
             $columns = $this->getConnection()
-                        ->getSchemaBuilder()
-                        ->getColumnListing($this->getTable());
+                ->getSchemaBuilder()
+                ->getColumnListing($this->getTable());
 
             if (empty($columns)) {
                 return true;

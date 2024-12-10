@@ -166,8 +166,8 @@ class FormRequest extends Request implements ValidatesWhenResolved
         $exception = $validator->getException();
 
         throw (new $exception($validator))
-                    ->errorBag($this->errorBag)
-                    ->redirectTo($this->getRedirectUrl());
+            ->errorBag($this->errorBag)
+            ->redirectTo($this->getRedirectUrl());
     }
 
     /**

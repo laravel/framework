@@ -404,7 +404,7 @@ class MailMessage extends SimpleMessage implements Renderable
         $markdown = Container::getInstance()->make(Markdown::class);
 
         return $markdown->theme($this->theme ?: $markdown->getTheme())
-                ->render($this->markdown, $this->data());
+            ->render($this->markdown, $this->data());
     }
 
     /**

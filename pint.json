@@ -1,0 +1,9 @@
+{
+    "preset": "empty",
+    "rules": {
+        "method_chaining_indentation": true
+    },
+    "exclude": [
+        "tests"
+    ]
+}
