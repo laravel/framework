@@ -88,9 +88,9 @@ trait DatabaseTruncation
 
         (new Collection($this->getAllTablesForConnection($connection, $name)))
             ->when(
-                property_exists($this, 'tablesToTruncate'),
-                function (Collection $tables) {
-                    return $tables->filter(fn (array $table) => $this->tableExistsIn($table, $this->tablesToTruncate));
+                $this->tablesToTruncate($connection, $name),
+                function (Collection $tables, array $tablesToTruncate) {
+                    return $tables->filter(fn (array $table) => $this->tableExistsIn($table, $tablesToTruncate));
                 },
                 function (Collection $tables) use ($connection, $name) {
                     $exceptTables = $this->exceptTables($connection, $name);
@@ -152,6 +152,16 @@ trait DatabaseTruncation
     }
 
     /**
+     * Get the tables that should be truncated.
+     */
+    protected function tablesToTruncate(ConnectionInterface $connection, ?string $connectionName): ?array
+    {
+        return property_exists($this, 'tablesToTruncate') && is_array($this->tablesToTruncate)
+            ? $this->tablesToTruncate[$connectionName] ?? $this->tablesToTruncate
+            : null;
+    }
+
+    /**
      * Get the tables that should not be truncated.
      */
     protected function exceptTables(ConnectionInterface $connection, ?string $connectionName): array
@@ -161,21 +171,12 @@ trait DatabaseTruncation
         $migrationsTable = is_array($migrations) ? ($migrations['table'] ?? 'migrations') : $migrations;
         $migrationsTable = $connection->getTablePrefix().$migrationsTable;
 
-        if (property_exists($this, 'exceptTables')) {
-            if (array_is_list($this->exceptTables ?? [])) {
-                return array_merge(
-                    $this->exceptTables ?? [],
-                    [$migrationsTable],
-                );
-            }
-
-            return array_merge(
-                $this->exceptTables[$connectionName] ?? [],
+        return property_exists($this, 'exceptTables') && is_array($this->exceptTables)
+            ? array_merge(
+                $this->exceptTables[$connectionName] ?? $this->exceptTables,
                 [$migrationsTable],
-            );
-        }
-
-        return [$migrationsTable];
+            )
+            : [$migrationsTable];
     }
 
     /**

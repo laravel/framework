@@ -19,6 +19,10 @@ class DatabaseTruncationTest extends TestCase
 
     private ?array $app;
 
+    private ?array $tablesToTruncate = null;
+
+    private ?array $exceptTables = null;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -37,8 +41,9 @@ class DatabaseTruncationTest extends TestCase
         parent::tearDown();
 
         $this->app = null;
-
         static::$allTables = [];
+        $this->tablesToTruncate = null;
+        $this->exceptTables = null;
     }
 
     public function testTruncateTables()
