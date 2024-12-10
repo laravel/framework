@@ -811,12 +811,7 @@ class Event
             return $mutexNameResolver($this);
         }
 
-        // Strip the PHP binary path from the command string to ensure that
-        // the mutexName remains consistent across different environments.
-        // This accounts for variations in PHP executable paths caused by:
-        // - Different PHP versions being used on different servers.
-        // - Differences in operating systems that result in varying PHP paths.
-        // The remaining command (artisan and arguments) is preserved for further processing.
+        // Strip PHP binary path...
         $artisanCommand = explode(' ', $this->command, 2)[1] ?? $this->command;
 
         return 'framework'.DIRECTORY_SEPARATOR.'schedule-'.sha1($this->expression.$artisanCommand);
