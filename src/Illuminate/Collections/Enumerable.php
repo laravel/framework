@@ -847,7 +847,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      *
      * @param  callable(TReduceInitial|TReduceReturnType, TValue, TKey): TReduceReturnType  $callback
      * @param  TReduceInitial  $initial
-     * @return TReduceReturnType
+     * @return TReduceInitial|TReduceReturnType
      */
     public function reduce(callable $callback, $initial = null);
 

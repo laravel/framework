@@ -10,6 +10,7 @@ use Illuminate\Contracts\Http\Kernel as HttpKernel;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Bootstrap\RegisterProviders;
 use Illuminate\Foundation\Events\DiagnosingHealth;
+use Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as AppEventServiceProvider;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as AppRouteServiceProvider;
 use Illuminate\Support\Collection;
@@ -211,6 +212,8 @@ class ApplicationBuilder
             }
 
             if (is_string($health)) {
+                PreventRequestsDuringMaintenance::except($health);
+
                 Route::get($health, function () {
                     $exception = null;
 

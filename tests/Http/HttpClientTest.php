@@ -51,6 +51,8 @@ class HttpClientTest extends TestCase
         parent::setUp();
 
         $this->factory = new Factory;
+
+        RequestException::truncate();
     }
 
     protected function tearDown(): void
@@ -400,6 +402,21 @@ class HttpClientTest extends TestCase
         $this->assertEquals(collect(['foo' => 'bar']), $response->collect('result'));
         $this->assertEquals(collect(['bar']), $response->collect('result.foo'));
         $this->assertEquals(collect(), $response->collect('missing_key'));
+    }
+
+    public function testResponseCanBeReturnedAsFluent()
+    {
+        $this->factory->fake([
+            '*' => ['result' => ['foo' => 'bar']],
+        ]);
+
+        $response = $this->factory->get('http://foo.com/api');
+
+        $this->assertInstanceOf(Fluent::class, $response->fluent());
+        $this->assertEquals(fluent(['result' => ['foo' => 'bar']]), $response->fluent());
+        $this->assertEquals(fluent(['foo' => 'bar']), $response->fluent('result'));
+        $this->assertEquals(fluent(['bar']), $response->fluent('result.foo'));
+        $this->assertEquals(fluent([]), $response->fluent('missing_key'));
     }
 
     public function testSendRequestBodyAsJsonByDefault()
@@ -1230,6 +1247,42 @@ class HttpClientTest extends TestCase
     {
         $this->expectException(RequestException::class);
         $this->expectExceptionMessage('{"error":{"code":403,"message":"The Request can not be completed because quota limit was exceeded. Please, check our sup (truncated...)');
+
+        $error = [
+            'error' => [
+                'code' => 403,
+                'message' => 'The Request can not be completed because quota limit was exceeded. Please, check our support team to increase your limit',
+            ],
+        ];
+        $response = new Psr7Response(403, [], json_encode($error));
+
+        throw new RequestException(new Response($response));
+    }
+
+    public function testRequestExceptionWithoutTruncatedSummary()
+    {
+        RequestException::dontTruncate();
+
+        $this->expectException(RequestException::class);
+        $this->expectExceptionMessage('{"error":{"code":403,"message":"The Request can not be completed because quota limit was exceeded. Please, check our support team to increase your limit');
+
+        $error = [
+            'error' => [
+                'code' => 403,
+                'message' => 'The Request can not be completed because quota limit was exceeded. Please, check our support team to increase your limit',
+            ],
+        ];
+        $response = new Psr7Response(403, [], json_encode($error));
+
+        throw new RequestException(new Response($response));
+    }
+
+    public function testRequestExceptionWithCustomTruncatedSummary()
+    {
+        RequestException::truncateAt(60);
+
+        $this->expectException(RequestException::class);
+        $this->expectExceptionMessage('{"error":{"code":403,"message":"The Request can not be compl (truncated...)');
 
         $error = [
             'error' => [

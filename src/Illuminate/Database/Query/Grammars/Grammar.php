@@ -250,9 +250,9 @@ class Grammar extends BaseGrammar
      */
     protected function compileWheresToArray($query)
     {
-        return (new Collection($query->wheres))->map(function ($where) use ($query) {
-            return $where['boolean'].' '.$this->{"where{$where['type']}"}($query, $where);
-        })->all();
+        return (new Collection($query->wheres))
+            ->map(fn ($where) => $where['boolean'].' '.$this->{"where{$where['type']}"}($query, $where))
+            ->all();
     }
 
     /**

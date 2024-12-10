@@ -488,9 +488,9 @@ class ComponentTagCompiler
                     ? (new Collection($constructor->getParameters()))->map->getName()->all()
                     : [];
 
-        return (new Collection($attributes))->partition(function ($value, $key) use ($parameterNames) {
-            return in_array(Str::camel($key), $parameterNames);
-        })->all();
+        return (new Collection($attributes))
+            ->partition(fn ($value, $key) => in_array(Str::camel($key), $parameterNames))
+            ->all();
     }
 
     /**
