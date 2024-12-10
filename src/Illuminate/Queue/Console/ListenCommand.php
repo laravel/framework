@@ -109,9 +109,9 @@ class ListenCommand extends Command
             memory: $this->option('memory'),
             timeout: $this->option('timeout'),
             sleep: $this->option('sleep'),
-            rest: $this->option('rest'),
             maxTries: $this->option('tries'),
-            force: $this->option('force')
+            force: $this->option('force'),
+            rest: $this->option('rest')
         );
     }
 
