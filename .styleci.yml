@@ -2,6 +2,7 @@ php:
   preset: laravel
   version: 8.2
   enabled:
+    - method_chaining_indentation
     - nullable_type_declarations
   finder:
     not-name:
