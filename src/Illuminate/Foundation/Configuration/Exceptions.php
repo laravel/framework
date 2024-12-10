@@ -6,9 +6,12 @@ use Closure;
 use Illuminate\Foundation\Exceptions\Handler;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Traits\Conditionable;
 
 class Exceptions
 {
+    use Conditionable;
+
     /**
      * Create a new exception handling configuration instance.
      *
