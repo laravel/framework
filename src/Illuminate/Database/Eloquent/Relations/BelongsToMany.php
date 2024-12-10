@@ -1351,6 +1351,8 @@ class BelongsToMany extends Relation
      */
     public function create(array $attributes = [], array $joining = [], $touch = true)
     {
+        $attributes = array_merge($this->getQuery()->pendingAttributes, $attributes);
+
         $instance = $this->related->newInstance($attributes);
 
         // Once we save the related model, we need to attach it to the base model via
