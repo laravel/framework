@@ -8,8 +8,6 @@ use Illuminate\Queue\Failed\DatabaseUuidFailedJobProvider;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Input\InputDefinition;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\NullOutput;
 
 class ListFailedCommandTest extends TestCase
