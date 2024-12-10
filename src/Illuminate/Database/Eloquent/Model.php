@@ -1699,9 +1699,10 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * Reload a fresh model instance from the database.
      *
      * @param  array|string  $with
+     * @param  array|string  $columns
      * @return static|null
      */
-    public function fresh($with = [])
+    public function fresh($with = [], $columns = ['*'])
     {
         if (! $this->exists) {
             return;
@@ -1710,15 +1711,16 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         return $this->setKeysForSelectQuery($this->newQueryWithoutScopes())
             ->useWritePdo()
             ->with(is_string($with) ? func_get_args() : $with)
-            ->first();
+            ->first($columns);
     }
 
     /**
      * Reload the current model instance with fresh attributes from the database.
      *
+     * @param  array|string  $columns
      * @return $this
      */
-    public function refresh()
+    public function refresh($columns = ['*'])
     {
         if (! $this->exists) {
             return $this;
@@ -1727,7 +1729,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         $this->setRawAttributes(
             $this->setKeysForSelectQuery($this->newQueryWithoutScopes())
                 ->useWritePdo()
-                ->firstOrFail()
+                ->firstOrFail($columns)
                 ->attributes
         );
 

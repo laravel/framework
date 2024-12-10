@@ -399,9 +399,10 @@ class Collection extends BaseCollection implements QueueableCollection
      * Reload a fresh model instance from the database for all the entities.
      *
      * @param  array<array-key, string>|string  $with
+     * @param  array<array-key, string>|string  $columns
      * @return static
      */
-    public function fresh($with = [])
+    public function fresh($with = [], $columns = ['*'])
     {
         if ($this->isEmpty()) {
             return new static;
@@ -412,7 +413,7 @@ class Collection extends BaseCollection implements QueueableCollection
         $freshModels = $model->newQueryWithoutScopes()
             ->with(is_string($with) ? func_get_args() : $with)
             ->whereIn($model->getKeyName(), $this->modelKeys())
-            ->get()
+            ->get($columns)
             ->getDictionary();
 
         return $this->filter(fn ($model) => $model->exists && isset($freshModels[$model->getKey()]))
