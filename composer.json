@@ -37,7 +37,7 @@
         "league/flysystem": "^3.25.1",
         "league/flysystem-local": "^3.25.1",
         "monolog/monolog": "^3.0",
-        "nesbot/carbon": "^2.72.2|^3.4",
+        "nesbot/carbon": "^3.4",
         "nunomaduro/termwind": "^2.0",
         "psr/container": "^1.1.1|^2.0.1",
         "psr/log": "^1.0|^2.0|^3.0",
