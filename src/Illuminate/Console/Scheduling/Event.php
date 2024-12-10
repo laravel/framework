@@ -811,7 +811,10 @@ class Event
             return $mutexNameResolver($this);
         }
 
-        return 'framework'.DIRECTORY_SEPARATOR.'schedule-'.sha1($this->expression.$this->command);
+        // Strip PHP binary path...
+        $artisanCommand = explode(' ', $this->command, 2)[1] ?? $this->command;
+
+        return 'framework'.DIRECTORY_SEPARATOR.'schedule-'.sha1($this->expression.$artisanCommand);
     }
 
     /**

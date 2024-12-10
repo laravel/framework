@@ -40,7 +40,7 @@ class EventTest extends TestCase
         $event = new Event(m::mock(EventMutex::class), 'php -i');
         $event->runInBackground();
 
-        $scheduleId = '"framework'.DIRECTORY_SEPARATOR.'schedule-eeb46c93d45e928d62aaf684d727e213b7094822"';
+        $scheduleId = '"framework'.DIRECTORY_SEPARATOR.'schedule-31c321e939d61c321842e8f8a9d1cddafd3c76d1"';
 
         $this->assertSame("(php -i > '/dev/null' 2>&1 ; '".PHP_BINARY."' 'artisan' schedule:finish {$scheduleId} \"$?\") > '/dev/null' 2>&1 &", $event->buildCommand());
     }
@@ -51,7 +51,7 @@ class EventTest extends TestCase
         $event = new Event(m::mock(EventMutex::class), 'php -i');
         $event->runInBackground();
 
-        $scheduleId = '"framework'.DIRECTORY_SEPARATOR.'schedule-eeb46c93d45e928d62aaf684d727e213b7094822"';
+        $scheduleId = '"framework'.DIRECTORY_SEPARATOR.'schedule-31c321e939d61c321842e8f8a9d1cddafd3c76d1"';
 
         $this->assertSame('start /b cmd /v:on /c "(php -i & "'.PHP_BINARY.'" artisan schedule:finish '.$scheduleId.' ^!ERRORLEVEL^!) > "NUL" 2>&1"', $event->buildCommand());
     }
@@ -94,7 +94,7 @@ class EventTest extends TestCase
         $event = new Event(m::mock(EventMutex::class), 'php -i');
         $event->description('Fancy command description');
 
-        $this->assertSame('framework'.DIRECTORY_SEPARATOR.'schedule-eeb46c93d45e928d62aaf684d727e213b7094822', $event->mutexName());
+        $this->assertSame('framework'.DIRECTORY_SEPARATOR.'schedule-31c321e939d61c321842e8f8a9d1cddafd3c76d1', $event->mutexName());
 
         $event->createMutexNameUsing(function (Event $event) {
             return Str::slug($event->description);
