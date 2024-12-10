@@ -836,12 +836,14 @@ class Gate implements GateContract
      */
     public function forUser($user)
     {
-        $callback = fn () => $user;
-
         return new static(
-            $this->container, $callback, $this->abilities,
-            $this->policies, $this->beforeCallbacks, $this->afterCallbacks,
-            $this->guessPolicyNamesUsingCallback
+            $this->container,
+            fn () => $user,
+            $this->abilities,
+            $this->policies,
+            $this->beforeCallbacks,
+            $this->afterCallbacks,
+            $this->guessPolicyNamesUsingCallback,
         );
     }
 
