@@ -71,6 +71,16 @@ class DatabaseEloquentDynamicRelationsTest extends TestCase
         $this->assertTrue($model->isRelation('hardCodedRelation'));
     }
 
+    public function testNotDetectRegularFunctionAsRelation()
+    {
+        $model = new NoRelationModel;
+
+        if (!isset($model->comment)) {
+            $model->comment();
+        }
+        $this->assertTrue(true);
+    }
+
     public function testRelationResolvers()
     {
         $model1 = new DynamicRelationModel;
@@ -136,4 +146,10 @@ class FakeHasManyRel extends HasMany
     {
         return ['many' => 'related'];
     }
+}
+
+class NoRelationModel extends Model
+{
+    public function comment(): void
+    {}
 }
