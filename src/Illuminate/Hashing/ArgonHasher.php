@@ -64,8 +64,8 @@ class ArgonHasher extends AbstractHasher implements HasherContract
         try {
             $hash = password_hash($value, $this->algorithm(), [
                 'memory_cost' => $this->memory($options),
-                'time_cost'   => $this->time($options),
-                'threads'     => $this->threads($options),
+                'time_cost' => $this->time($options),
+                'threads' => $this->threads($options),
             ]);
         } catch (Error) {
             throw new RuntimeException('Argon2 hashing not supported.');
