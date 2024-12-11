@@ -99,9 +99,7 @@ trait DatabaseTruncation
                 }
             )
             ->each(function (array $table) use ($connection) {
-                $table = $connection->table(
-                    new Expression($table['schema'] ? $table['schema'].'.'.$table['name'] : $table['name'])
-                );
+                $table = $connection->table($table['schema'] ? $table['schema'].'.'.$table['name'] : $table['name']);
 
                 if ($table->exists()) {
                     $table->truncate();
