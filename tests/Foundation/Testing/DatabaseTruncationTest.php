@@ -5,8 +5,6 @@ namespace Illuminate\Tests\Foundation\Testing;
 use Illuminate\Config\Repository;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Connection;
-use Illuminate\Database\Grammar;
-use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Builder;
 use Illuminate\Database\Schema\PostgresBuilder;
 use Illuminate\Foundation\Testing\DatabaseTruncation;

@@ -4,7 +4,6 @@ namespace Illuminate\Foundation\Testing;
 
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Database\ConnectionInterface;
-use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\PostgresBuilder;
 use Illuminate\Foundation\Testing\Traits\CanConfigureMigrationCommands;
 use Illuminate\Support\Collection;
