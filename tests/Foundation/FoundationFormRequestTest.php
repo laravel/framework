@@ -232,16 +232,17 @@ class FoundationFormRequestTest extends TestCase
 
     public function testValidatedEnumMethodReturnsTheValidatedData()
     {
+        FoundationFormRequestWithEnumRules::$useRuleSet = 'a';
         $request = $this->createRequest(['day' => 'Monday'], FoundationFormRequestWithEnumRules::class);
         $request->validateResolved();
 
         $this->assertEquals(DaysOfWeekEnum::Monday, $request->validatedEnum('day', DaysOfWeekEnum::class));
 
-        $this->expectException(ValidationException::class);
+        FoundationFormRequestWithEnumRules::$useRuleSet = 'b';
         $request = $this->createRequest(['day' => 'Sunday'], FoundationFormRequestWithEnumRules::class);
         $request->validateResolved();
 
-        $this->assertEquals(null, $request->validatedEnum('day', DaysOfWeekEnum::class));
+        $this->assertNull($request->validatedEnum('day', DaysOfWeekEnum::class));
     }
 
     /**
@@ -534,11 +535,17 @@ class FoundationTestFormRequestWithGetRules extends FormRequest
 
 class FoundationFormRequestWithEnumRules extends FormRequest
 {
+    public static $useRuleSet = 'a';
+
     public function rules()
     {
-        return [
-            'day' => ['required', Rule::enum(DaysOfWeekEnum::class), 'in:Monday,Tuesday,Wednesday,Thursday,Friday'],
-        ];
+        if (self::$useRuleSet === 'a') {
+            return [
+                'day' => ['required', Rule::enum(DaysOfWeekEnum::class), 'in:Monday,Tuesday,Wednesday,Thursday,Friday'],
+            ];
+        } else {
+            return [];
+        }
     }
 
     public function authorize()
