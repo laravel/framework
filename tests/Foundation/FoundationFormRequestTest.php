@@ -14,6 +14,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Redirector;
 use Illuminate\Routing\UrlGenerator;
 use Illuminate\Validation\Factory as ValidationFactory;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -227,6 +228,21 @@ class FoundationFormRequestTest extends TestCase
         $request = $this->createRequest(['a' => 1], FoundationTestFormRequestWithGetRules::class);
 
         $request->validateResolved();
+    }
+
+    public function testValidatedEnumMethodReturnsTheValidatedData()
+    {
+        FoundationFormRequestWithEnumRules::$useRuleSet = 'a';
+        $request = $this->createRequest(['day' => 'Monday'], FoundationFormRequestWithEnumRules::class);
+        $request->validateResolved();
+
+        $this->assertEquals(DaysOfWeekEnum::Monday, $request->validatedEnum('day', DaysOfWeekEnum::class));
+
+        FoundationFormRequestWithEnumRules::$useRuleSet = 'b';
+        $request = $this->createRequest(['day' => 'Sunday'], FoundationFormRequestWithEnumRules::class);
+        $request->validateResolved();
+
+        $this->assertNull($request->validatedEnum('day', DaysOfWeekEnum::class));
     }
 
     /**
@@ -515,4 +531,36 @@ class FoundationTestFormRequestWithGetRules extends FormRequest
             ];
         }
     }
+}
+
+class FoundationFormRequestWithEnumRules extends FormRequest
+{
+    public static $useRuleSet = 'a';
+
+    public function rules()
+    {
+        if (self::$useRuleSet === 'a') {
+            return [
+                'day' => ['required', Rule::enum(DaysOfWeekEnum::class), 'in:Monday,Tuesday,Wednesday,Thursday,Friday'],
+            ];
+        } else {
+            return [];
+        }
+    }
+
+    public function authorize()
+    {
+        return true;
+    }
+}
+
+enum DaysOfWeekEnum: string
+{
+    case Sunday = 'Sunday';
+    case Monday = 'Monday';
+    case Tuesday = 'Tuesday';
+    case Wednesday = 'Wednesday';
+    case Thursday = 'Thursday';
+    case Friday = 'Friday';
+    case Saturday = 'Saturday';
 }
