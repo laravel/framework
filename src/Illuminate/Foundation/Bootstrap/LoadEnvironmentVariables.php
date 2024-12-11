@@ -12,6 +12,11 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 class LoadEnvironmentVariables
 {
     /**
+     * The externally provided APP_ENV environment variable.
+     */
+    protected static ?string $externallyProvidedAppEnv = null;
+
+    /**
      * Bootstrap the given application.
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
@@ -46,7 +51,7 @@ class LoadEnvironmentVariables
             return;
         }
 
-        $environment = Env::get('APP_ENV');
+        $environment = self::getExternallyProvidedAppEnv();
 
         if (! $environment) {
             return;
@@ -106,5 +111,21 @@ class LoadEnvironmentVariables
         http_response_code(500);
 
         exit(1);
+    }
+
+    /**
+     * Get the APP_ENV environment variable that is provided externally.
+     *
+     * Purely externally provided variables can only be retrieved
+     * before Dotenv is loaded, so the second and subsequent bootstrap processes
+     * reuse the values retrieved the first time.
+     */
+    protected static function getExternallyProvidedAppEnv(): string
+    {
+        if (self::$externallyProvidedAppEnv === null) {
+            self::$externallyProvidedAppEnv = Env::get('APP_ENV', '');
+        }
+
+        return self::$externallyProvidedAppEnv;
     }
 }
