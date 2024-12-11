@@ -368,7 +368,7 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     public function apiResource($name, $controller, array $options = [])
     {
-        $only = ['index', 'show', 'store', 'update', 'destroy'];
+        $only = ['index', 'store', 'show', 'update', 'destroy'];
 
         if (isset($options['except'])) {
             $only = array_diff($only, (array) $options['except']);
