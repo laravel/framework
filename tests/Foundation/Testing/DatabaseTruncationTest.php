@@ -5,8 +5,6 @@ namespace Illuminate\Tests\Foundation\Testing;
 use Illuminate\Config\Repository;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Connection;
-use Illuminate\Database\Grammar;
-use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Builder;
 use Illuminate\Database\Schema\PostgresBuilder;
 use Illuminate\Foundation\Testing\DatabaseTruncation;
@@ -189,8 +187,6 @@ class DatabaseTruncationTest extends TestCase
             $schema->shouldReceive('getSchemas')->once()->andReturn($schemas);
         }
 
-        $grammar = m::mock(Grammar::class);
-
         $connection = m::mock(Connection::class);
         $connection->shouldReceive('getTablePrefix')->andReturn($prefix);
         $connection->shouldReceive('getEventDispatcher')->once()->andReturn($dispatcher = m::mock(Dispatcher::class));
@@ -198,9 +194,9 @@ class DatabaseTruncationTest extends TestCase
         $connection->shouldReceive('setEventDispatcher')->once()->with($dispatcher);
         $connection->shouldReceive('getSchemaBuilder')->once()->andReturn($schema);
         $connection->shouldReceive('table')
-            ->with(m::type(Expression::class))
-            ->andReturnUsing(function (Expression $expression) use (&$actual, $grammar) {
-                $actual[] = $expression->getValue($grammar);
+            ->with(m::type('string'))
+            ->andReturnUsing(function (string $expression) use (&$actual) {
+                $actual[] = $expression;
 
                 $table = m::mock();
                 $table->shouldReceive('exists')->andReturnTrue();
