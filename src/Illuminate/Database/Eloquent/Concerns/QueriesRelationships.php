@@ -229,7 +229,10 @@ trait QueriesRelationships
         $types = (array) $types;
 
         if ($types === ['*']) {
-            $types = $this->model->newModelQuery()->distinct()->pluck($relation->getMorphType())->filter()->all();
+            $types = $this->model->newModelQuery()->distinct()->pluck($relation->getMorphType())
+                ->filter()
+                ->map(fn($item) => $item instanceof \BackedEnum ? $item->value : $item)
+                ->all();
         }
 
         if (empty($types)) {
