@@ -8,6 +8,7 @@ use Illuminate\Database\DatabaseManager;
 use Illuminate\Database\Events\ConnectionEstablished;
 use Illuminate\Database\SQLiteConnection;
 use Illuminate\Events\Dispatcher;
+use Illuminate\Support\Facades\DB;
 use RuntimeException;
 
 class DatabaseConnectionsTest extends DatabaseTestCase
@@ -117,5 +118,20 @@ class DatabaseConnectionsTest extends DatabaseTestCase
         );
 
         self::assertSame('my-phpunit-connection', $event->connectionName);
+    }
+
+    public function testTablePrefix()
+    {
+        DB::setTablePrefix('prefix_');
+        $this->assertSame('prefix_', DB::getTablePrefix());
+
+        DB::withoutTablePrefix(function ($connection) {
+            $this->assertSame('', $connection->getTablePrefix());
+        });
+
+        $this->assertSame('prefix_', DB::getTablePrefix());
+
+        DB::setTablePrefix('');
+        $this->assertSame('', DB::getTablePrefix());
     }
 }
