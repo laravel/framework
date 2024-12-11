@@ -40,7 +40,7 @@ trait Authorizable
      */
     public function cant($abilities, $arguments = [])
     {
-        return !$this->can($abilities, $arguments);
+        return ! $this->can($abilities, $arguments);
     }
 
     /**

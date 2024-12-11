@@ -103,7 +103,7 @@ class AuthorizableTest extends TestCase
             $pendingAuthorization->getAttributes();
         } catch (\RuntimeException $exception) {
             $this->assertSame(
-                "Method [getAttributes] cannot be called on Illuminate\Foundation\Auth\Access\PendingAuthorize",
+                "Method [getAttributes] cannot be called on Illuminate\Foundation\Auth\Access\PendingAuthorization",
                 $exception->getMessage()
             );
         }
@@ -133,5 +133,10 @@ class BookPolicy
     }
 }
 
-class Book extends Model {}
-class Library extends Model {}
+class Book extends Model
+{
+}
+
+class Library extends Model
+{
+}
