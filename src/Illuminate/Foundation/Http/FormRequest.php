@@ -250,8 +250,8 @@ class FormRequest extends Request implements ValidatesWhenResolved
      *
      * @template TEnum of \BackedEnum
      *
-     * @param $key
-     * @param $enumClass
+     * @param  $key
+     * @param  $enumClass
      * @return TEnum|null
      */
     public function validatedEnum($key, $enumClass)
