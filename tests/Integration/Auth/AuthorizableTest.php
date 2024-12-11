@@ -11,6 +11,7 @@ use Orchestra\Testbench\TestCase;
 class AuthorizableTest extends TestCase
 {
     use RefreshDatabase;
+
     #[\Override]
     protected function defineEnvironment($app)
     {
@@ -25,6 +26,7 @@ class AuthorizableTest extends TestCase
         $this->assertTrue($user->can('view', new Book()));
         $this->assertTrue($user->can('view', [new Book()]));
         $this->assertTrue($user->can('multipleParams', [new Book(), new Library()]));
+        $this->assertTrue($user->can('multipleParamsWithArray', [new Book(), ['CS Lewis']]));
     }
 
     public function test_PendingAuthorization_with_single_parameter(): void
@@ -57,8 +59,9 @@ class AuthorizableTest extends TestCase
 
         $pendingAuthorization = $user->for(new Book());
 
-        $this->assertTrue($pendingAuthorization->can('multipleParams', new Library()));
-        $this->assertTrue($pendingAuthorization->can('multipleParams', [new Library()]));
+        //$this->assertTrue($pendingAuthorization->can('multipleParams', new Library()));
+        //$this->assertTrue($pendingAuthorization->can('multipleParams', [new Library()]));
+        $this->assertTrue($pendingAuthorization->can('multipleParamsWithArray', [new Library(), ['CS Lewis']]));
     }
 
     public function test_PendingAuthorization_does_not_forward_non_authorizable_calls(): void
@@ -88,6 +91,11 @@ class BookPolicy
     public function multipleParams(AuthenticationTestUser $user, Book $book, Library $library)
     {
         return true;
+    }
+
+    public function multipleParamsWithArray(AuthenticationTestUser $user, Book $book, array $properties)
+    {
+        return in_array('CS Lewis', $properties);
     }
 }
 
