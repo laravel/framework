@@ -16,6 +16,8 @@ use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 
+use function Illuminate\Support\enum_value;
+
 /** @mixin \Illuminate\Database\Eloquent\Builder */
 trait QueriesRelationships
 {
