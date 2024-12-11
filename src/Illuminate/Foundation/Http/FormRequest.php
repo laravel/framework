@@ -246,6 +246,24 @@ class FormRequest extends Request implements ValidatesWhenResolved
     }
 
     /**
+     * Retrieve data from the instance as an enum ensuring validation.
+     *
+     * @template TEnum of \BackedEnum
+     *
+     * @param $key
+     * @param $enumClass
+     * @return TEnum|null
+     */
+    public function validatedEnum($key, $enumClass)
+    {
+        if ($this->validated($key) === null) {
+            return null;
+        }
+
+        return $this->enum($key, $enumClass);
+    }
+
+    /**
      * Get custom messages for validator errors.
      *
      * @return array
