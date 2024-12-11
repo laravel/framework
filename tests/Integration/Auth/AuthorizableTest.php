@@ -74,6 +74,8 @@ class AuthorizableTest extends TestCase
         $this->assertTrue($pendingAuthorization->can('multipleParams'));
         $this->assertTrue($pendingAuthorization->can('multipleParamsWithArray', [['CS Lewis']]));
 
+        $pendingAuthorization = (new AuthenticationTestUser())->for(new Book())->for([new Library(), ['CS Lewis']]);
+        $this->assertTrue($pendingAuthorization->can('multipleParamsWithArray'));
     }
 
     public function test_for_can_receive_array_of_arguments(): void
@@ -82,6 +84,13 @@ class AuthorizableTest extends TestCase
         $pendingAuthorization = $user->for([new Book(), new Library()]);
 
         $this->assertTrue($pendingAuthorization->can('multipleParams'));
+    }
+
+    public function test_can_receive_a_class_string(): void
+    {
+        $pendingAuthorization = (new AuthenticationTestUser())->for(Book::class);
+
+        $this->assertTrue($pendingAuthorization->can('viewAny'));
     }
 
     public function test_PendingAuthorization_does_not_forward_non_authorizable_calls(): void
