@@ -21,25 +21,7 @@ class PhpRedisClusterConnection extends PhpRedisConnection
     protected $defaultNode;
 
     /**
-     * Flush the selected Redis database on all master nodes.
-     *
-     * @return void
-     */
-    public function flushdb()
-    {
-        $arguments = func_get_args();
-
-        $async = strtoupper((string) ($arguments[0] ?? null)) === 'ASYNC';
-
-        foreach ($this->client->_masters() as $master) {
-            $async
-                ? $this->command('rawCommand', [$master, 'flushdb', 'async'])
-                : $this->command('flushdb', [$master]);
-        }
-    }
-
-    /**
-     * Scans all keys based on options.
+     * Scan all keys based on the given options.
      *
      * @param  mixed  $cursor
      * @param  array  $options
@@ -64,6 +46,24 @@ class PhpRedisClusterConnection extends PhpRedisConnection
     }
 
     /**
+     * Flush the selected Redis database on all master nodes.
+     *
+     * @return void
+     */
+    public function flushdb()
+    {
+        $arguments = func_get_args();
+
+        $async = strtoupper((string) ($arguments[0] ?? null)) === 'ASYNC';
+
+        foreach ($this->client->_masters() as $master) {
+            $async
+                ? $this->command('rawCommand', [$master, 'flushdb', 'async'])
+                : $this->command('flushdb', [$master]);
+        }
+    }
+
+    /**
      * Return default node to use for cluster.
      *
      * @return string|array
@@ -73,7 +73,7 @@ class PhpRedisClusterConnection extends PhpRedisConnection
     private function defaultNode()
     {
         if (! isset($this->defaultNode)) {
-            $this->defaultNode = $this->client->_masters()[0] ?? throw new InvalidArgumentException('No master nodes found in the cluster.');
+            $this->defaultNode = $this->client->_masters()[0] ?? throw new InvalidArgumentException('Unable to determine default node. No master nodes found in the cluster.');
         }
 
         return $this->defaultNode;

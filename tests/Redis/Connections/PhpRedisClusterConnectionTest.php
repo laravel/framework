@@ -57,7 +57,7 @@ class PhpRedisClusterConnectionTest extends TestCase
         $client->shouldReceive('_masters')->once()->andReturn([]);
         $client->shouldReceive('scan');
 
-        $this->expectExceptionMessage('No master nodes found in the cluster.');
+        $this->expectExceptionMessage('Unable to determine default node. No master nodes found in the cluster.');
 
         $connection = new PhpRedisClusterConnection($client);
         $connection->scan(0);
