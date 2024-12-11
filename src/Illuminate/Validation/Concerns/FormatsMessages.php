@@ -486,7 +486,7 @@ trait FormatsMessages
         }
 
         if (is_null($value)) {
-            return 'empty';
+            return $this->translator->get("validation.empty");
         }
 
         return (string) $value;
