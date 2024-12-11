@@ -9,20 +9,13 @@ class Registered
     use SerializesModels;
 
     /**
-     * The authenticated user.
-     *
-     * @var \Illuminate\Contracts\Auth\Authenticatable
-     */
-    public $user;
-
-    /**
      * Create a new event instance.
      *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user  The authenticated user.
      * @return void
      */
-    public function __construct($user)
-    {
-        $this->user = $user;
+    public function __construct(
+        public $user,
+    ) {
     }
 }
