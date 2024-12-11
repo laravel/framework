@@ -7,20 +7,13 @@ use Illuminate\Console\Scheduling\Event;
 class ScheduledTaskStarting
 {
     /**
-     * The scheduled event being run.
-     *
-     * @var \Illuminate\Console\Scheduling\Event
-     */
-    public $task;
-
-    /**
      * Create a new event instance.
      *
-     * @param  \Illuminate\Console\Scheduling\Event  $task
+     * @param  \Illuminate\Console\Scheduling\Event  $task  The scheduled event being run.
      * @return void
      */
-    public function __construct(Event $task)
-    {
-        $this->task = $task;
+    public function __construct(
+        public Event $task,
+    ) {
     }
 }
