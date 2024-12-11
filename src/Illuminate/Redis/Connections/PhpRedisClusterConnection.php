@@ -47,6 +47,7 @@ class PhpRedisClusterConnection extends PhpRedisConnection
      *
      * @throws \InvalidArgumentException
      */
+    #[\Override]
     public function scan($cursor, $options = [])
     {
         $result = $this->client->scan($cursor,
