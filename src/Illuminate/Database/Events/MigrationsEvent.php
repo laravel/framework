@@ -7,20 +7,13 @@ use Illuminate\Contracts\Database\Events\MigrationEvent as MigrationEventContrac
 abstract class MigrationsEvent implements MigrationEventContract
 {
     /**
-     * The migration method that was invoked.
-     *
-     * @var string
-     */
-    public $method;
-
-    /**
      * Create a new event instance.
      *
-     * @param  string  $method
+     * @param  string  $method  The migration method that was invoked.
      * @return void
      */
-    public function __construct($method)
-    {
-        $this->method = $method;
+    public function __construct(
+        public $method,
+    ) {
     }
 }
