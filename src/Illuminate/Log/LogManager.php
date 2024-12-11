@@ -31,13 +31,6 @@ class LogManager implements LoggerInterface
     use ParsesLogConfiguration;
 
     /**
-     * The application instance.
-     *
-     * @var \Illuminate\Contracts\Foundation\Application
-     */
-    protected $app;
-
-    /**
      * The array of resolved channels.
      *
      * @var array
@@ -71,9 +64,9 @@ class LogManager implements LoggerInterface
      * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @return void
      */
-    public function __construct($app)
-    {
-        $this->app = $app;
+    public function __construct(
+        protected $app,
+    ) {
     }
 
     /**

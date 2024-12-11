@@ -26,34 +26,6 @@ class Mailer implements MailerContract, MailQueueContract
     use Macroable;
 
     /**
-     * The name that is configured for the mailer.
-     *
-     * @var string
-     */
-    protected $name;
-
-    /**
-     * The view factory instance.
-     *
-     * @var \Illuminate\Contracts\View\Factory
-     */
-    protected $views;
-
-    /**
-     * The Symfony Transport instance.
-     *
-     * @var \Symfony\Component\Mailer\Transport\TransportInterface
-     */
-    protected $transport;
-
-    /**
-     * The event dispatcher instance.
-     *
-     * @var \Illuminate\Contracts\Events\Dispatcher|null
-     */
-    protected $events;
-
-    /**
      * The global from address and name.
      *
      * @var array
@@ -97,12 +69,12 @@ class Mailer implements MailerContract, MailQueueContract
      * @param  \Illuminate\Contracts\Events\Dispatcher|null  $events
      * @return void
      */
-    public function __construct(string $name, Factory $views, TransportInterface $transport, ?Dispatcher $events = null)
-    {
-        $this->name = $name;
-        $this->views = $views;
-        $this->events = $events;
-        $this->transport = $transport;
+    public function __construct(
+        protected string $name,
+        protected Factory $views,
+        protected TransportInterface $transport,
+        protected ?Dispatcher $events = null,
+    ) {
     }
 
     /**

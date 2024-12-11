@@ -17,32 +17,11 @@ use InvalidArgumentException;
 class RedisManager implements Factory
 {
     /**
-     * The application instance.
-     *
-     * @var \Illuminate\Contracts\Foundation\Application
-     */
-    protected $app;
-
-    /**
-     * The name of the default driver.
-     *
-     * @var string
-     */
-    protected $driver;
-
-    /**
      * The registered custom driver creators.
      *
      * @var array
      */
     protected $customCreators = [];
-
-    /**
-     * The Redis server configurations.
-     *
-     * @var array
-     */
-    protected $config;
 
     /**
      * The Redis connections.
@@ -66,11 +45,11 @@ class RedisManager implements Factory
      * @param  array  $config
      * @return void
      */
-    public function __construct($app, $driver, array $config)
-    {
-        $this->app = $app;
-        $this->driver = $driver;
-        $this->config = $config;
+    public function __construct(
+        protected $app,
+        protected $driver,
+        protected array $config,
+    ) {
     }
 
     /**

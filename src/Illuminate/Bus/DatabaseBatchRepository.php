@@ -14,38 +14,17 @@ use Throwable;
 class DatabaseBatchRepository implements PrunableBatchRepository
 {
     /**
-     * The batch factory instance.
-     *
-     * @var \Illuminate\Bus\BatchFactory
-     */
-    protected $factory;
-
-    /**
-     * The database connection instance.
-     *
-     * @var \Illuminate\Database\Connection
-     */
-    protected $connection;
-
-    /**
-     * The database table to use to store batch information.
-     *
-     * @var string
-     */
-    protected $table;
-
-    /**
      * Create a new batch repository instance.
      *
      * @param  \Illuminate\Bus\BatchFactory  $factory
      * @param  \Illuminate\Database\Connection  $connection
      * @param  string  $table
      */
-    public function __construct(BatchFactory $factory, Connection $connection, string $table)
-    {
-        $this->factory = $factory;
-        $this->connection = $connection;
-        $this->table = $table;
+    public function __construct(
+        protected BatchFactory $factory,
+        protected Connection $connection,
+        protected string $table,
+    ) {
     }
 
     /**
