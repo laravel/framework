@@ -189,18 +189,18 @@ class DatabaseTruncationTest extends TestCase
             $schema->shouldReceive('getSchemas')->once()->andReturn($schemas);
         }
 
-        $grammar = m::mock(Grammar::class);
-
         $connection = m::mock(Connection::class);
         $connection->shouldReceive('getTablePrefix')->andReturn($prefix);
         $connection->shouldReceive('getEventDispatcher')->once()->andReturn($dispatcher = m::mock(Dispatcher::class));
         $connection->shouldReceive('unsetEventDispatcher')->once();
         $connection->shouldReceive('setEventDispatcher')->once()->with($dispatcher);
         $connection->shouldReceive('getSchemaBuilder')->once()->andReturn($schema);
+        $connection->shouldReceive('withoutTablePrefix')->andReturnUsing(function ($callback) use ($connection) {
+            $callback($connection);
+        });
         $connection->shouldReceive('table')
-            ->with(m::type(Expression::class))
-            ->andReturnUsing(function (Expression $expression) use (&$actual, $grammar) {
-                $actual[] = $expression->getValue($grammar);
+            ->andReturnUsing(function (string $tableName) use (&$actual) {
+                $actual[] = $tableName;
 
                 $table = m::mock();
                 $table->shouldReceive('exists')->andReturnTrue();

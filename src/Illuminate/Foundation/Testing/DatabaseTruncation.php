@@ -99,13 +99,15 @@ trait DatabaseTruncation
                 }
             )
             ->each(function (array $table) use ($connection) {
-                $table = $connection->table(
-                    new Expression($table['schema'] ? $table['schema'].'.'.$table['name'] : $table['name'])
-                );
+                $connection->withoutTablePrefix(function ($connection) use ($table) {
+                    $table = $connection->table(
+                        $table['schema'] ? $table['schema'].'.'.$table['name'] : $table['name']
+                    );
 
-                if ($table->exists()) {
-                    $table->truncate();
-                }
+                    if ($table->exists()) {
+                        $table->truncate();
+                    }
+                });
             });
 
         $connection->setEventDispatcher($dispatcher);
