@@ -41,6 +41,19 @@ class Arr
     }
 
     /**
+     * Split an array into chunks.
+     *
+     * @param  array  $array
+     * @param  int  $length
+     * @param  bool  $preserve_keys
+     * @return array
+     */
+    public static function chunk($array, $length, $preserve_keys = false)
+    {
+        return array_chunk($array, $length, $preserve_keys);
+    }
+
+    /**
      * Collapse an array of arrays into a single array.
      *
      * @param  iterable  $array
