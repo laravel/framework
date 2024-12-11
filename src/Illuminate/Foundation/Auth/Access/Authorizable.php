@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Auth\Access;
 
 use Illuminate\Contracts\Auth\Access\Gate;
+use Illuminate\Support\Arr;
 
 trait Authorizable
 {
@@ -39,7 +40,7 @@ trait Authorizable
      */
     public function cant($abilities, $arguments = [])
     {
-        return ! $this->can($abilities, $arguments);
+        return !$this->can($abilities, $arguments);
     }
 
     /**
@@ -54,8 +55,14 @@ trait Authorizable
         return $this->cant($abilities, $arguments);
     }
 
-    public function for(...$arguments)
+    /**
+     * Create a PendingAuthorization for a model.
+     *
+     * @param  mixed  $for
+     * @return PendingAuthorization
+     */
+    public function for($for)
     {
-        return new PendingAuthorize($this, $arguments);
+        return new PendingAuthorization($this, Arr::wrap($for));
     }
 }
