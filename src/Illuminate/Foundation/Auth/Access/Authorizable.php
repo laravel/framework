@@ -53,4 +53,9 @@ trait Authorizable
     {
         return $this->cant($abilities, $arguments);
     }
+
+    public function for(...$arguments)
+    {
+        return new PendingAuthorize($this, $arguments);
+    }
 }
