@@ -17,6 +17,5 @@ class DatabaseRefreshed implements MigrationEventContract
         public ?string $database = null,
         public bool $seeding = false,
     ) {
-        //
     }
 }
