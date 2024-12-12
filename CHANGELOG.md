@@ -1,6 +1,16 @@
 # Release Notes for 11.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v11.35.0...11.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v11.35.1...11.x)
+
+## [v11.35.1](https://github.com/laravel/framework/compare/v11.35.0...v11.35.1) - 2024-12-12
+
+* [11.x] Fix incorrect typechange in `Illuminate\Database\Query\Builder` by [@jnoordsij](https://github.com/jnoordsij) in https://github.com/laravel/framework/pull/53841
+* Fixed Enum usage in whereHasMorph condition when morph attribute casting by [@Outsidaz](https://github.com/Outsidaz) in https://github.com/laravel/framework/pull/53839
+* [11.x] Fix unescaped table names issue of `DatabaseTruncation` trait by introducing `Connection::withoutTablePrefix()` method by [@hafezdivandari](https://github.com/hafezdivandari) in https://github.com/laravel/framework/pull/53842
+* Specify node when sending scan to RedisCluster by [@bentleyo](https://github.com/bentleyo) in https://github.com/laravel/framework/pull/53837
+* [11.x] fix: cast session lifetime to int by [@calebdw](https://github.com/calebdw) in https://github.com/laravel/framework/pull/53846
+* [11.x] allow sub second timeout value for http requests by [@mihaileu](https://github.com/mihaileu) in https://github.com/laravel/framework/pull/53850
+* Revert "set schema to smtps if MAIL_ENCRYPTION === tls" by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/53863
 
 ## [v11.35.0](https://github.com/laravel/framework/compare/v11.34.2...v11.35.0) - 2024-12-10
 
