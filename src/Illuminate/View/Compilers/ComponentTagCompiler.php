@@ -421,8 +421,8 @@ class ComponentTagCompiler
     public function guessClassName(string $component)
     {
         $namespace = Container::getInstance()
-                    ->make(Application::class)
-                    ->getNamespace();
+            ->make(Application::class)
+            ->getNamespace();
 
         $class = $this->formatClassName($component);
 
@@ -787,12 +787,12 @@ class ComponentTagCompiler
     protected function attributesToString(array $attributes, $escapeBound = true)
     {
         return (new Collection($attributes))
-                ->map(function (string $value, string $attribute) use ($escapeBound) {
-                    return $escapeBound && isset($this->boundAttributes[$attribute]) && $value !== 'true' && ! is_numeric($value)
-                                ? "'{$attribute}' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute({$value})"
-                                : "'{$attribute}' => {$value}";
-                })
-                ->implode(',');
+            ->map(function (string $value, string $attribute) use ($escapeBound) {
+                return $escapeBound && isset($this->boundAttributes[$attribute]) && $value !== 'true' && ! is_numeric($value)
+                            ? "'{$attribute}' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute({$value})"
+                            : "'{$attribute}' => {$value}";
+            })
+            ->implode(',');
     }
 
     /**

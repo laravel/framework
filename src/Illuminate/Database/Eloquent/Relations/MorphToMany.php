@@ -129,7 +129,7 @@ class MorphToMany extends BelongsToMany
         return parent::getCurrentlyAttachedPivots()->map(function ($record) {
             return $record instanceof MorphPivot
                             ? $record->setMorphType($this->morphType)
-                                     ->setMorphClass($this->morphClass)
+                                ->setMorphClass($this->morphClass)
                             : $record;
         });
     }
@@ -161,9 +161,9 @@ class MorphToMany extends BelongsToMany
                         : MorphPivot::fromAttributes($this->parent, $attributes, $this->table, $exists);
 
         $pivot->setPivotKeys($this->foreignPivotKey, $this->relatedPivotKey)
-              ->setRelatedModel($this->related)
-              ->setMorphType($this->morphType)
-              ->setMorphClass($this->morphClass);
+            ->setRelatedModel($this->related)
+            ->setMorphType($this->morphType)
+            ->setMorphClass($this->morphClass);
 
         return $pivot;
     }

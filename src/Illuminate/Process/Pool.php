@@ -79,7 +79,7 @@ class Pool
                         $output($type, $buffer, $key);
                     } : null)];
                 })
-            ->all()
+                ->all()
         );
     }
 
