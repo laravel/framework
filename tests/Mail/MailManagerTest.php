@@ -52,6 +52,31 @@ class MailManagerTest extends TestCase
         $this->assertSame($port === 465, $transport->getStream()->isTLS());
     }
 
+    #[TestWith([null, 5876])]
+    #[TestWith([null, 465])]
+    #[TestWith(['smtp', 25])]
+    #[TestWith(['smtp', 2525])]
+    #[TestWith(['smtps', 465])]
+    #[TestWith(['smtp', 465])]
+    public function testMailUrlConfigWithAutoTls($scheme, $port)
+    {
+        $this->app['config']->set('mail.mailers.smtp_url', [
+            'scheme' => $scheme,
+            'url' => "smtp://usr:pwd@127.0.0.2:{$port}?auto_tls=true",
+        ]);
+
+        $mailer = $this->app['mail.manager']->mailer('smtp_url');
+        $transport = $mailer->getSymfonyTransport();
+
+        $this->assertInstanceOf(EsmtpTransport::class, $transport);
+        $this->assertSame('usr', $transport->getUsername());
+        $this->assertSame('pwd', $transport->getPassword());
+        $this->assertSame('127.0.0.2', $transport->getStream()->getHost());
+        $this->assertSame($port, $transport->getStream()->getPort());
+        $this->assertSame($port === 465, $transport->getStream()->isTLS());
+        $this->assertTrue($transport->isAutoTls());
+    }
+
     public function testBuild()
     {
         $config = [
