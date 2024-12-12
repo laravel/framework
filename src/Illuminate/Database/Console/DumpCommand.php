@@ -7,6 +7,7 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\Events\SchemaDumped;
+use Illuminate\Database\Events\SchemaPruned;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Config;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -52,10 +53,12 @@ class DumpCommand extends Command
 
         if ($this->option('prune')) {
             (new Filesystem)->deleteDirectory(
-                database_path('migrations'), $preserve = false
+                $path = database_path('migrations'), $preserve = false
             );
 
             $info .= ' and pruned';
+
+            $dispatcher->dispatch(new SchemaPruned($connection, $path));
         }
 
         $this->components->info($info.' successfully.');
