@@ -74,7 +74,11 @@ class MailManagerTest extends TestCase
         $this->assertSame('127.0.0.2', $transport->getStream()->getHost());
         $this->assertSame($port, $transport->getStream()->getPort());
         $this->assertSame($port === 465, $transport->getStream()->isTLS());
-        $this->assertTrue($transport->isAutoTls());
+
+        if (method_exists($transport, 'isAutoTls')) {
+            // Only available on Symfony Mailer 7.2
+            $this->assertTrue($transport->isAutoTls());
+        }
     }
 
     public function testBuild()
