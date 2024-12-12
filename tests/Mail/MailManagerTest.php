@@ -52,7 +52,7 @@ class MailManagerTest extends TestCase
         $this->assertSame($port === 465, $transport->getStream()->isTLS());
 
         if (method_exists($transport, 'isAutoTls')) {
-            // Only available on Symfony Mailer 7.1
+            // Only available from Symfony Mailer 7.1
             $this->assertTrue($transport->isAutoTls());
         }
     }
@@ -81,7 +81,7 @@ class MailManagerTest extends TestCase
         $this->assertSame($port === 465, $transport->getStream()->isTLS());
 
         if (method_exists($transport, 'isAutoTls')) {
-            // Only available on Symfony Mailer 7.1
+            // Only available from Symfony Mailer 7.1
             $this->assertTrue($transport->isAutoTls());
         }
     }
@@ -110,7 +110,7 @@ class MailManagerTest extends TestCase
         $this->assertSame($port === 465 && $scheme !== 'smtp', $transport->getStream()->isTLS());
 
         if (method_exists($transport, 'isAutoTls')) {
-            // Only available on Symfony Mailer 7.1
+            // Only available from Symfony Mailer 7.1
             $this->assertFalse($transport->isAutoTls());
         }
     }
