@@ -9,6 +9,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Support\Uri;
 use Illuminate\Support\ViewErrorBag;
 use RuntimeException;
 use SessionHandlerInterface;
