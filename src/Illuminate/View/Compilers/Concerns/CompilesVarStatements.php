@@ -12,7 +12,7 @@ trait CompilesVarStatements
      */
     protected function compileVar($expression)
     {
-        $var = preg_replace("/[()]/", '', $expression);
+        $var = preg_replace('/[()]/', '', $expression);
 
         $var = ltrim(trim($var, " '\""), '\\');
 
