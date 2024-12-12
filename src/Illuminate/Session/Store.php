@@ -753,7 +753,7 @@ class Store implements Session
             return Uri::of($previousUrl);
         }
 
-        throw new RuntimeException("Unable to generate URI instance for previous URL. No previous URL detected.");
+        throw new RuntimeException('Unable to generate URI instance for previous URL. No previous URL detected.');
     }
 
     /**
