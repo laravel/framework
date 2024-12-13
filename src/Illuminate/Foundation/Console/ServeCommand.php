@@ -279,7 +279,9 @@ class ServeCommand extends Command
             ->map(fn ($line) => trim($line))
             ->filter()
             ->each(function ($line) {
-                if ((new Stringable($line))->contains('Development Server (http')) {
+                $stringable = new Stringable($line);
+
+                if ($stringable->contains('Development Server (http')) {
                     if ($this->serverRunningHasBeenDisplayed === false) {
                         $this->serverRunningHasBeenDisplayed = true;
 
@@ -292,23 +294,19 @@ class ServeCommand extends Command
                     return;
                 }
 
-                if ((new Stringable($line))->contains(' Accepted')) {
-                    $requestPort = static::getRequestPortFromLine($line);
+                $requestPort = static::getRequestPortFromLine($line);
 
+                if ($stringable->contains(' Accepted')) {
                     $this->requestsPool[$requestPort] = [
                         $this->getDateFromLine($line),
                         $this->requestsPool[$requestPort][1] ?? false,
                         microtime(true),
                     ];
-                } elseif ((new Stringable($line))->contains([' [200]: GET '])) {
-                    $requestPort = static::getRequestPortFromLine($line);
-
+                } elseif ($stringable->contains([' [200]: GET '])) {
                     $this->requestsPool[$requestPort][1] = trim(explode('[200]: GET', $line)[1]);
-                } elseif ((new Stringable($line))->contains('URI:')) {
-                    $requestPort = static::getRequestPortFromLine($line);
-
+                } elseif ($stringable->contains('URI:')) {
                     $this->requestsPool[$requestPort][1] = trim(explode('URI: ', $line)[1]);
-                } elseif ((new Stringable($line))->contains(' Closing')) {
+                } elseif ($stringable->contains(' Closing')) {
                     $requestPort = static::getRequestPortFromLine($line);
 
                     if (empty($this->requestsPool[$requestPort])) {
@@ -339,11 +337,11 @@ class ServeCommand extends Command
 
                     $this->output->write(' '.str_repeat('<fg=gray>.</>', $dots));
                     $this->output->writeln(" <fg=gray>~ {$runTime}</>");
-                } elseif ((new Stringable($line))->contains(['Closed without sending a request', 'Failed to poll event'])) {
+                } elseif ($stringable->contains(['Closed without sending a request', 'Failed to poll event'])) {
                     // ...
                 } elseif (! empty($line)) {
-                    if ((new Stringable($line))->startsWith('[')) {
-                        $line = (new Stringable($line))->after('] ');
+                    if ($stringable->startsWith('[')) {
+                        $line = $stringable->after('] ');
                     }
 
                     $this->output->writeln("  <fg=gray>$line</>");
