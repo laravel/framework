@@ -127,7 +127,7 @@ class ValidatedInput implements ValidatedData
      */
     public function string($key, $default = null)
     {
-        return str($this->input($key, $default));
+        return Str::of($this->input($key, $default));
     }
 
     /**
