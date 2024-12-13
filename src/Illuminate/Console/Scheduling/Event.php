@@ -7,6 +7,7 @@ use Cron\CronExpression;
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\ClientInterface as HttpClientInterface;
 use GuzzleHttp\Exception\TransferException;
+use Illuminate\Console\Application;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Mail\Mailer;
@@ -786,6 +787,26 @@ class Event
     }
 
     /**
+     * Get the command string with normalized binary path of PHP.
+     *
+     * @return string
+     */
+    public function getNormalizedCommand()
+    {
+        return str_replace(
+            [
+                Application::phpBinary(),
+                Application::artisanBinary(),
+            ],
+            [
+                'php',
+                preg_replace("#['\"]#", '', Application::artisanBinary()),
+            ],
+                $this->command ?? ''
+        );
+    }
+
+    /**
      * Set the event mutex implementation to be used.
      *
      * @param  \Illuminate\Console\Scheduling\EventMutex  $mutex
@@ -811,10 +832,7 @@ class Event
             return $mutexNameResolver($this);
         }
 
-        // Strip PHP binary path...
-        $artisanCommand = explode(' ', $this->command, 2)[1] ?? $this->command;
-
-        return 'framework'.DIRECTORY_SEPARATOR.'schedule-'.sha1($this->expression.$artisanCommand);
+        return 'framework'.DIRECTORY_SEPARATOR.'schedule-'.sha1($this->expression.$this->getNormalizedCommand());
     }
 
     /**
