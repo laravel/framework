@@ -14,7 +14,7 @@ use League\Uri\Uri as LeagueUri;
 use SensitiveParameter;
 use Stringable;
 
-class Uri implements Htmlable, Responsable
+class Uri implements Htmlable, Responsable, Stringable
 {
     use Conditionable, Tappable;
 
