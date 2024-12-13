@@ -3,7 +3,7 @@
 namespace Illuminate\Tests\Integration\Foundation;
 
 use Illuminate\Foundation\Events\DiscoverEvents;
-use Illuminate\Support\Str;
+use Illuminate\Support\Stringable;
 use Illuminate\Tests\Integration\Foundation\Fixtures\EventDiscovery\Events\EventOne;
 use Illuminate\Tests\Integration\Foundation\Fixtures\EventDiscovery\Events\EventTwo;
 use Illuminate\Tests\Integration\Foundation\Fixtures\EventDiscovery\Listeners\AbstractListener;
@@ -60,7 +60,7 @@ class DiscoverEventsTest extends TestCase
     public function testEventsCanBeDiscoveredUsingCustomClassNameGuessing()
     {
         DiscoverEvents::guessClassNamesUsing(function (SplFileInfo $file, $basePath) {
-            return Str::of($file->getRealPath())
+            return (new Stringable($file->getRealPath()))
                 ->after($basePath.DIRECTORY_SEPARATOR)
                 ->before('.php')
                 ->replace(DIRECTORY_SEPARATOR, '\\')
