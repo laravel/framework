@@ -2,7 +2,9 @@
 
 namespace Illuminate\Support;
 
-class DefaultProviders
+use Illuminate\Contracts\Support\Arrayable;
+
+class DefaultProviders implements Arrayable
 {
     /**
      * The current providers.

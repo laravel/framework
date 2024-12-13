@@ -15,7 +15,7 @@ use Illuminate\Http\Resources\DelegatesToResource;
 use JsonException;
 use JsonSerializable;
 
-class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutable
+class JsonResource implements Arrayable, ArrayAccess, JsonSerializable, Responsable, UrlRoutable
 {
     use ConditionallyLoadsAttributes, DelegatesToResource;
 

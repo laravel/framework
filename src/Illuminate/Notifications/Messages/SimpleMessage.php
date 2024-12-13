@@ -2,10 +2,11 @@
 
 namespace Illuminate\Notifications\Messages;
 
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Notifications\Action;
 
-class SimpleMessage
+class SimpleMessage implements Arrayable
 {
     /**
      * The "level" of the notification (info, success, error).
