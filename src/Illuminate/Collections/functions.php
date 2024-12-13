@@ -8,24 +8,11 @@ if (! function_exists('Illuminate\Support\enum_value')) {
      *
      * @internal
      *
-     * @template TValue
-     * @template TDefault
-     *
-     * @param  TValue  $value
-     * @param  TDefault|callable(TValue): TDefault  $default
-     * @return ($value is empty ? TDefault : mixed)
+     * @param  mixed  $value
+     * @return mixed
      */
-    function enum_value($value, $default = null)
+    function enum_value($value)
     {
-        if (function_exists('transform')) {
-            return transform($value, fn ($value) => match (true) {
-                $value instanceof \BackedEnum => $value->value,
-                $value instanceof \UnitEnum => $value->name,
-
-                default => $value,
-            }, $default ?? $value);
-        }
-
         return match (true) {
             $value instanceof \BackedEnum => $value->value,
             $value instanceof \UnitEnum => $value->name,
