@@ -8,16 +8,20 @@ if (! function_exists('Illuminate\Support\enum_value')) {
      *
      * @internal
      *
-     * @param  mixed  $value
-     * @return mixed
+     * @template TValue
+     * @template TDefault
+     *
+     * @param  TValue  $value
+     * @param  TDefault|callable(TValue): TDefault  $default
+     * @return ($value is empty ? TDefault : mixed)
      */
-    function enum_value($value)
+    function enum_value($value, $default = null)
     {
         return match (true) {
             $value instanceof \BackedEnum => $value->value,
             $value instanceof \UnitEnum => $value->name,
 
-            default => $value,
+            default => $value ?? value($default),
         };
     }
 }

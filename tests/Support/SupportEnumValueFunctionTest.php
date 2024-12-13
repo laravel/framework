@@ -28,6 +28,12 @@ class SupportEnumValueFunctionTest extends TestCase
         $this->assertSame($expected, enum_value($given));
     }
 
+    public function test_it_can_fallback_to_use_default_if_value_is_null()
+    {
+        $this->assertSame('laravel', enum_value(null, 'laravel'));
+        $this->assertSame('laravel', enum_value(null, fn () => 'laravel'));
+    }
+
     public static function scalarDataProvider()
     {
         yield [null, null];
