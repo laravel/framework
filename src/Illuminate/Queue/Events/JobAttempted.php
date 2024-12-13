@@ -26,18 +26,27 @@ class JobAttempted
     public $exceptionOccurred;
 
     /**
+     * The time it took the job to process.
+     *
+     * @var float
+     */
+    public $time;
+
+    /**
      * Create a new event instance.
      *
      * @param  string  $connectionName
      * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @param  float  $time
      * @param  bool  $exceptionOccurred
      * @return void
      */
-    public function __construct($connectionName, $job, $exceptionOccurred = false)
+    public function __construct($connectionName, $job, $time, $exceptionOccurred = false)
     {
         $this->job = $job;
         $this->connectionName = $connectionName;
         $this->exceptionOccurred = $exceptionOccurred;
+        $this->time = $time;
     }
 
     /**

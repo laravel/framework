@@ -422,6 +422,8 @@ class Worker
     public function process($connectionName, $job, WorkerOptions $options)
     {
         try {
+            $start = microtime(true);
+
             // First we will raise the before job event and determine if the job has already run
             // over its maximum attempt limits, which could primarily happen when this job is
             // continually timing out and not actually throwing any exceptions from itself.
@@ -447,7 +449,7 @@ class Worker
             $this->handleJobException($connectionName, $job, $options, $e);
         } finally {
             $this->events->dispatch(new JobAttempted(
-                $connectionName, $job, $exceptionOccurred ?? false
+                $connectionName, $job, $this->getElapsedTime($start), $exceptionOccurred ?? false
             ));
         }
     }
@@ -880,5 +882,16 @@ class Worker
     public function setManager(QueueManager $manager)
     {
         $this->manager = $manager;
+    }
+
+    /**
+     * Get the elapsed time since a given starting point.
+     *
+     * @param  float  $start
+     * @return float
+     */
+    protected function getElapsedTime($start)
+    {
+        return round((microtime(true) - $start) * 1000, 2);
     }
 }
