@@ -421,9 +421,9 @@ class Worker
      */
     public function process($connectionName, $job, WorkerOptions $options)
     {
-        try {
-            $start = microtime(true);
+        $start = microtime(true);
 
+        try {
             // First we will raise the before job event and determine if the job has already run
             // over its maximum attempt limits, which could primarily happen when this job is
             // continually timing out and not actually throwing any exceptions from itself.
