@@ -802,7 +802,7 @@ class Event
                 'php',
                 preg_replace("#['\"]#", '', Application::artisanBinary()),
             ],
-                $this->command ?? ''
+            $this->command ?? ''
         );
     }
 
