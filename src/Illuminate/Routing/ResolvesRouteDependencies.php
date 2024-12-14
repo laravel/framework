@@ -53,6 +53,7 @@ trait ResolvesRouteDependencies
 
         foreach ($reflector->getParameters() as $key => $parameter) {
             $className = Reflector::getParameterClassName($parameter);
+
             $instance = $this->transformDependency($parameter, $parameters, $className, $skippableValue, $resolvedInterfaces);
 
             if ($instance !== $skippableValue && ! $this->alreadyInResolvedInterfaces($className, $resolvedInterfaces)) {
@@ -79,7 +80,7 @@ trait ResolvesRouteDependencies
      *
      * @param  ReflectionParameter  $parameter
      * @param  array  $parameters
-     * @param  $className
+     * @param  string  $className
      * @param  object  $skippableValue
      * @param  $resolvedInterfaces
      * @return mixed
@@ -123,28 +124,33 @@ trait ResolvesRouteDependencies
         return ! is_null(Arr::first($parameters, fn ($value) => $value instanceof $class));
     }
 
-    protected function alreadyInResolvedInterfaces($class, array $resolvedInterfaces)
-    {
-        return in_array($class, $resolvedInterfaces);
-    }
-
     /**
-     * Determines if an interface should be resolved, even if
-     * a concrete class that implements it already exists
-     * in the list of parameters.
+     * Determines if an interface should be resolved.
      *
-     * @param  $className
+     * @param  string  $className
      * @param  array  $parameters
-     * @param  $resolvedInterfaces
+     * @param  array  $resolvedInterfaces
      * @return bool
      */
-    protected function shouldResolveInterface($className, array $parameters, $resolvedInterfaces): bool
+    protected function shouldResolveInterface($className, array $parameters, array $resolvedInterfaces)
     {
         return $className &&
             $this->alreadyInParameters($className, $parameters) &&
             interface_exists($className) &&
             ! $this->alreadyInResolvedInterfaces($className, $resolvedInterfaces) &&
             (new ReflectionClass($className))->isInterface();
+    }
+
+    /**
+     * Determine if the given class name is already in the list of resolved interfaces.
+     *
+     * @param  string  $class
+     * @param  array  $resolvedInterfaces
+     * @return bool
+     */
+    protected function alreadyInResolvedInterfaces(string $class, array $resolvedInterfaces)
+    {
+        return in_array($class, $resolvedInterfaces);
     }
 
     /**
