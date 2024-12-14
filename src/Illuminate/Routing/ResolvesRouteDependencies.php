@@ -56,7 +56,8 @@ trait ResolvesRouteDependencies
 
             $instance = $this->transformDependency($parameter, $parameters, $className, $skippableValue, $resolvedInterfaces);
 
-            if ($instance !== $skippableValue && ! $this->alreadyInResolvedInterfaces($className, $resolvedInterfaces)) {
+            if ($instance !== $skippableValue &&
+                ! $this->alreadyInResolvedInterfaces($className, $resolvedInterfaces)) {
                 $resolvedInterfaces[] = $className;
             }
 
