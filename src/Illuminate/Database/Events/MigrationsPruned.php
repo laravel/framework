@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Illuminate\Database\Events;
 
 use Illuminate\Database\Connection;
@@ -13,21 +11,21 @@ class MigrationsPruned
      *
      * @var \Illuminate\Database\Connection
      */
-    public Connection $connection;
+    public $connection;
 
     /**
      * The database connection name.
      *
      * @var string|null
      */
-    public ?string $connectionName;
+    public $connectionName;
 
     /**
-     * Path to the deleted directory.
+     * The path to the directory where migrations were pruned.
      *
      * @var string
      */
-    public string $path;
+    public $path;
 
     /**
      * Create a new event instance.
