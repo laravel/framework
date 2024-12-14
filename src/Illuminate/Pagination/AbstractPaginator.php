@@ -159,7 +159,7 @@ abstract class AbstractPaginator implements Htmlable, Stringable
      */
     public function getUrlRange($start, $end)
     {
-        return (new Collection(range($start, $end)))
+        return Collection::range($start, $end)
             ->mapWithKeys(fn ($page) => [$page => $this->url($page)])
             ->all();
     }

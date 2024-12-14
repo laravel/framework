@@ -16,7 +16,7 @@ class Benchmark
     public static function measure(Closure|array $benchmarkables, int $iterations = 1): array|float
     {
         return Collection::wrap($benchmarkables)->map(function ($callback) use ($iterations) {
-            return (new Collection(range(1, $iterations)))->map(function () use ($callback) {
+            return Collection::range(1, $iterations)->map(function () use ($callback) {
                 gc_collect_cycles();
 
                 $start = hrtime(true);
