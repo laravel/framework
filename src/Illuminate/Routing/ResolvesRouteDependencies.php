@@ -148,13 +148,17 @@ trait ResolvesRouteDependencies
     /**
      * Determine if the given class name is already in the list of resolved interfaces.
      *
-     * @param  string  $class
+     * @param  string|null  $class
      * @param  array  $resolvedInterfaces
      * @return bool
      */
-    protected function alreadyInResolvedInterfaces(string $class, array $resolvedInterfaces)
+    protected function alreadyInResolvedInterfaces($class, array $resolvedInterfaces)
     {
-        return in_array($class, $resolvedInterfaces);
+        if (! is_null($class)) {
+            return in_array($class, $resolvedInterfaces);
+        }
+
+        return false;
     }
 
     /**
