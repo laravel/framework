@@ -94,14 +94,16 @@ trait ResolvesRouteDependencies
             return $this->container->resolveFromAttribute($attribute);
         }
 
-        if ($this->shouldResolveInterface($className, $parameters, $resolvedInterfaces)) {
+        if ($this->isSimilarConcreteToExistingParameterButDifferentInterface(
+            $className, $parameters, $resolvedInterfaces
+        )) {
             return $this->container->make($className);
         }
 
         // If the parameter has a type-hinted class, we will check to see if it is already in
         // the list of parameters. If it is we will just skip it as it is probably a model
         // binding and we do not want to mess with those; otherwise, we resolve it here.
-        if ($className && (! $this->alreadyInParameters($className, $parameters))) {
+        if ($className && ! $this->alreadyInParameters($className, $parameters)) {
             $isEnum = (new ReflectionClass($className))->isEnum();
 
             return $parameter->isDefaultValueAvailable()
@@ -125,15 +127,16 @@ trait ResolvesRouteDependencies
     }
 
     /**
-     * Determines if an interface should be resolved.
+     * Determines if an instance of the given class is already in the parameters, but the route is type-hinting another interface that hasn't yet been resolved.
      *
      * @param  string  $className
      * @param  array  $parameters
      * @param  array  $resolvedInterfaces
      * @return bool
      */
-    protected function shouldResolveInterface($className, array $parameters, array $resolvedInterfaces)
+    protected function isSimilarConcreteToExistingParameterButDifferentInterface($className, array $parameters, array $resolvedInterfaces)
     {
+        // See: https://github.com/laravel/framework/pull/53275
         return $className &&
             $this->alreadyInParameters($className, $parameters) &&
             interface_exists($className) &&
