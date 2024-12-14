@@ -62,7 +62,7 @@ class Builder implements BuilderContract
     /**
      * The current query value bindings.
      *
-     * @var array
+     * @var array<string, array>
      */
     public $bindings = [
         'select' => [],
@@ -79,7 +79,7 @@ class Builder implements BuilderContract
     /**
      * An aggregate function and column to be run.
      *
-     * @var array|null
+     * @var array<string, mixed>|null
      */
     public $aggregate;
 
@@ -116,35 +116,35 @@ class Builder implements BuilderContract
     /**
      * The table joins for the query.
      *
-     * @var array|null
+     * @var array<int, \Illuminate\Database\Query\JoinClause|\Illuminate\Database\Query\JoinLateralClause>|null
      */
     public $joins;
 
     /**
      * The where constraints for the query.
      *
-     * @var array
+     * @var array<string, mixed>
      */
     public $wheres = [];
 
     /**
      * The groupings for the query.
      *
-     * @var array|null
+     * @var array<int, \Illuminate\Contracts\Database\Query\Expression|string>|null
      */
     public $groups;
 
     /**
      * The having constraints for the query.
      *
-     * @var array|null
+     * @var array<string, mixed>|null
      */
     public $havings;
 
     /**
      * The orderings for the query.
      *
-     * @var array|null
+     * @var array<string, mixed>|null
      */
     public $orders;
 
@@ -158,7 +158,7 @@ class Builder implements BuilderContract
     /**
      * The maximum number of records to return per group.
      *
-     * @var array|null
+     * @var array<string, mixed>|null
      */
     public $groupLimit;
 
@@ -172,7 +172,7 @@ class Builder implements BuilderContract
     /**
      * The query union statements.
      *
-     * @var array|null
+     * @var array<string, mixed>|null
      */
     public $unions;
 
@@ -207,14 +207,14 @@ class Builder implements BuilderContract
     /**
      * The callbacks that should be invoked before the query is executed.
      *
-     * @var array
+     * @var callable[]
      */
     public $beforeQueryCallbacks = [];
 
     /**
      * The callbacks that should be invoked after retrieving data from the database.
      *
-     * @var array
+     * @var \Closure[]
      */
     protected $afterQueryCallbacks = [];
 
