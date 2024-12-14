@@ -6,7 +6,7 @@ namespace Illuminate\Database\Events;
 
 use Illuminate\Database\Connection;
 
-class SchemaPruned
+class MigrationsPruned
 {
     /**
      * The database connection instance.
@@ -18,7 +18,7 @@ class SchemaPruned
     /**
      * The database connection name.
      *
-     * @var string
+     * @var string|null
      */
     public ?string $connectionName;
 

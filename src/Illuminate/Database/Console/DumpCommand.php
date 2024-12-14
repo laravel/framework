@@ -6,8 +6,8 @@ use Illuminate\Console\Command;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolverInterface;
+use Illuminate\Database\Events\MigrationsPruned;
 use Illuminate\Database\Events\SchemaDumped;
-use Illuminate\Database\Events\SchemaPruned;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Config;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -58,7 +58,7 @@ class DumpCommand extends Command
 
             $info .= ' and pruned';
 
-            $dispatcher->dispatch(new SchemaPruned($connection, $path));
+            $dispatcher->dispatch(new MigrationsPruned($connection, $path));
         }
 
         $this->components->info($info.' successfully.');
