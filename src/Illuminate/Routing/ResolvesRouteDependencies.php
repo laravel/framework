@@ -116,18 +116,6 @@ trait ResolvesRouteDependencies
     }
 
     /**
-     * Determine if an object of the given class is in a list of parameters.
-     *
-     * @param  string  $class
-     * @param  array  $parameters
-     * @return bool
-     */
-    protected function alreadyInParameters($class, array $parameters)
-    {
-        return ! is_null(Arr::first($parameters, fn ($value) => $value instanceof $class));
-    }
-
-    /**
      * Determines if an instance of the given class is already in the parameters, but the route is type-hinting another interface that hasn't yet been resolved.
      *
      * @param  string  $className
@@ -143,6 +131,18 @@ trait ResolvesRouteDependencies
             interface_exists($className) &&
             ! $this->alreadyInResolvedInterfaces($className, $resolvedInterfaces) &&
             (new ReflectionClass($className))->isInterface();
+    }
+
+    /**
+     * Determine if an object of the given class is in a list of parameters.
+     *
+     * @param  string  $class
+     * @param  array  $parameters
+     * @return bool
+     */
+    protected function alreadyInParameters($class, array $parameters)
+    {
+        return ! is_null(Arr::first($parameters, fn ($value) => $value instanceof $class));
     }
 
     /**
