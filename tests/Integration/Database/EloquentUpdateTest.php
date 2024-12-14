@@ -41,9 +41,9 @@ class EloquentUpdateTest extends DatabaseTestCase
             'title' => 'Ms.',
         ]);
 
-        TestUpdateModel1::where('title', 'Ms.')->delete();
+        TestUpdateModel1::where('title', 'Ms.')->update(['title' => 'Dr.']);
 
-        $this->assertCount(0, TestUpdateModel1::all());
+        $this->assertSame('Dr.', TestUpdateModel1::first()->title);
     }
 
     public function testUpdateWithLimitsAndOrders()
@@ -135,6 +135,47 @@ class EloquentUpdateTest extends DatabaseTestCase
 
         $deletedModel->decrement('counter');
         $this->assertEquals(0, $deletedModel->fresh()->counter);
+    }
+
+    public function testUpdateSyncsPrevious()
+    {
+        $model = TestUpdateModel1::create([
+            'name' => Str::random(),
+            'title' => 'Ms.',
+        ]);
+
+        $model->update(['title' => 'Dr.']);
+
+        $this->assertSame('Dr.', $model->title);
+        $this->assertSame('Dr.', $model->getOriginal('title'));
+        $this->assertSame('Ms.', $model->getPrevious('title'));
+    }
+
+    public function testSaveSyncsPrevious()
+    {
+        $model = TestUpdateModel1::create([
+            'name' => Str::random(),
+            'title' => 'Ms.',
+        ]);
+
+        $model->title = 'Dr.';
+        $model->save();
+
+        $this->assertSame('Dr.', $model->title);
+        $this->assertSame('Dr.', $model->getOriginal('title'));
+        $this->assertSame('Ms.', $model->getPrevious('title'));
+    }
+
+    public function testIncrementSyncsPrevious()
+    {
+        $model = TestUpdateModel3::create([
+            'counter' => 0,
+        ]);
+
+        $model->increment('counter');
+
+        $this->assertEquals(1, $model->counter);
+        $this->assertEquals(0, $model->getPrevious('counter'));
     }
 }
 
