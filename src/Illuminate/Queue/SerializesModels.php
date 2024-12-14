@@ -32,6 +32,10 @@ trait SerializesModels
                 continue;
             }
 
+            if ($this->isVirtualProperty($property)) {
+                continue;
+            }
+
             if (! $property->isInitialized($this)) {
                 continue;
             }
@@ -77,6 +81,10 @@ trait SerializesModels
                 continue;
             }
 
+            if ($this->isVirtualProperty($property)) {
+                continue;
+            }
+
             $name = $property->getName();
 
             if ($property->isPrivate()) {
@@ -104,5 +112,14 @@ trait SerializesModels
     protected function getPropertyValue(ReflectionProperty $property)
     {
         return $property->getValue($this);
+    }
+
+    /**
+     * @param  \ReflectionProperty  $property
+     * @return bool
+     */
+    protected function isVirtualProperty(ReflectionProperty $property): bool
+    {
+        return method_exists($property, 'isVirtual') && $property->isVirtual();
     }
 }
