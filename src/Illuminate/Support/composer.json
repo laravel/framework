@@ -49,7 +49,7 @@
     "suggest": {
         "illuminate/filesystem": "Required to use the Composer class (^11.0).",
         "laravel/serializable-closure": "Required to use the once function (^1.3).",
-        "league/commonmark": "Required to use Str::markdown() and Stringable::markdown() (^2.0.2).",
+        "league/commonmark": "Required to use Str::markdown() and Stringable::markdown() (^2.6).",
         "league/uri": "Required to use the Uri class (^7.5.1).",
         "ramsey/uuid": "Required to use Str::uuid() (^4.7).",
         "symfony/process": "Required to use the Composer class (^7.0).",
