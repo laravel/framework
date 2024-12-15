@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Auth\Concerns;
+namespace Illuminate\Validation\Concerns;
 
 trait HasValidator
 {
