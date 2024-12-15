@@ -18,8 +18,8 @@ class DatabaseTokenRepository implements TokenRepositoryInterface
         protected HasherContract $hasher,
         protected string $table,
         protected string $hashKey,
-        protected int $expires = 3600,
-        protected int $throttle = 60,
+        protected int $expiresSeconds = 3600,
+        protected int $throttleSeconds = 60,
     ) {
     }
 
@@ -94,7 +94,7 @@ class DatabaseTokenRepository implements TokenRepositoryInterface
      */
     protected function tokenExpired($createdAt)
     {
-        return Carbon::parse($createdAt)->addSeconds($this->expires)->isPast();
+        return Carbon::parse($createdAt)->addSeconds($this->expiresSeconds)->isPast();
     }
 
     /**
@@ -120,12 +120,12 @@ class DatabaseTokenRepository implements TokenRepositoryInterface
      */
     protected function tokenRecentlyCreated($createdAt)
     {
-        if ($this->throttle <= 0) {
+        if ($this->throttleSeconds <= 0) {
             return false;
         }
 
         return Carbon::parse($createdAt)->addSeconds(
-            $this->throttle
+            $this->throttleSeconds
         )->isFuture();
     }
 
@@ -147,7 +147,7 @@ class DatabaseTokenRepository implements TokenRepositoryInterface
      */
     public function deleteExpired()
     {
-        $expiredAt = Carbon::now()->subSeconds($this->expires);
+        $expiredAt = Carbon::now()->subSeconds($this->expiresSeconds);
 
         $this->getTable()->where('created_at', '<', $expiredAt)->delete();
     }
