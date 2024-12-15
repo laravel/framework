@@ -28,30 +28,6 @@ if (! function_exists('Illuminate\Support\defer')) {
     }
 }
 
-if (! function_exists('Illuminate\Support\enum_value')) {
-    /**
-     * Return a scalar value for the given value that might be an enum.
-     *
-     * @internal
-     *
-     * @template TValue
-     * @template TDefault
-     *
-     * @param  TValue  $value
-     * @param  TDefault|callable(TValue): TDefault  $default
-     * @return ($value is empty ? TDefault : mixed)
-     */
-    function enum_value($value, $default = null)
-    {
-        return transform($value, fn ($value) => match (true) {
-            $value instanceof \BackedEnum => $value->value,
-            $value instanceof \UnitEnum => $value->name,
-
-            default => $value,
-        }, $default ?? $value);
-    }
-}
-
 if (! function_exists('Illuminate\Support\php_binary')) {
     /**
      * Determine the PHP Binary.

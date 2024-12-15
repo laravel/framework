@@ -121,6 +121,7 @@ class Builder implements BuilderContract
         'insertorignoreusing',
         'max',
         'min',
+        'numericaggregate',
         'raw',
         'rawvalue',
         'sum',

@@ -1942,9 +1942,9 @@ trait HasAttributes
             );
         }
 
-        return (new Collection($this->original))->mapWithKeys(function ($value, $key) {
-            return [$key => $this->transformModelValue($key, $value)];
-        })->all();
+        return (new Collection($this->original))
+            ->mapWithKeys(fn ($value, $key) => [$key => $this->transformModelValue($key, $value)])
+            ->all();
     }
 
     /**
@@ -2315,17 +2315,14 @@ trait HasAttributes
 
         $class = $reflection->getName();
 
-        static::$getAttributeMutatorCache[$class] =
-            (new Collection($attributeMutatorMethods = static::getAttributeMarkedMutatorMethods($classOrInstance)))
-                    ->mapWithKeys(function ($match) {
-                        return [lcfirst(static::$snakeAttributes ? Str::snake($match) : $match) => true];
-                    })->all();
+        static::$getAttributeMutatorCache[$class] = (new Collection($attributeMutatorMethods = static::getAttributeMarkedMutatorMethods($classOrInstance)))
+            ->mapWithKeys(fn ($match) => [lcfirst(static::$snakeAttributes ? Str::snake($match) : $match) => true])
+            ->all();
 
         static::$mutatorCache[$class] = (new Collection(static::getMutatorMethods($class)))
-                ->merge($attributeMutatorMethods)
-                ->map(function ($match) {
-                    return lcfirst(static::$snakeAttributes ? Str::snake($match) : $match);
-                })->all();
+            ->merge($attributeMutatorMethods)
+            ->map(fn ($match) => lcfirst(static::$snakeAttributes ? Str::snake($match) : $match))
+            ->all();
     }
 
     /**

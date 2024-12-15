@@ -19,6 +19,7 @@ use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\Localizable;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Support\Traits\Tappable;
 use Illuminate\Testing\Constraints\SeeInOrder;
 use PHPUnit\Framework\Assert as PHPUnit;
 use ReflectionClass;
@@ -29,7 +30,7 @@ use Symfony\Component\Mime\Address;
 
 class Mailable implements MailableContract, Renderable
 {
-    use Conditionable, ForwardsCalls, Localizable, Macroable {
+    use Conditionable, ForwardsCalls, Localizable, Tappable, Macroable {
         __call as macroCall;
     }
 
@@ -1080,9 +1081,9 @@ class Mailable implements MailableContract, Renderable
             'path' => $path,
             'name' => $name ?? basename($path),
             'options' => $options,
-        ])->unique(function ($file) {
-            return $file['name'].$file['disk'].$file['path'];
-        })->all();
+        ])
+            ->unique(fn ($file) => $file['name'].$file['disk'].$file['path'])
+            ->all();
 
         return $this;
     }
@@ -1130,10 +1131,9 @@ class Mailable implements MailableContract, Renderable
     public function attachData($data, $name, array $options = [])
     {
         $this->rawAttachments = (new Collection($this->rawAttachments))
-                ->push(compact('data', 'name', 'options'))
-                ->unique(function ($file) {
-                    return $file['name'].$file['data'];
-                })->all();
+            ->push(compact('data', 'name', 'options'))
+            ->unique(fn ($file) => $file['name'].$file['data'])
+            ->all();
 
         return $this;
     }
@@ -1163,7 +1163,7 @@ class Mailable implements MailableContract, Renderable
      */
     public function tag($value)
     {
-        array_push($this->tags, $value);
+        $this->tags[] = $value;
 
         return $this;
     }

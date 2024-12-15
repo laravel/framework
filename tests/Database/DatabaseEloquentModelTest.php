@@ -43,7 +43,6 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\InteractsWithTime;
-use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
 use InvalidArgumentException;
 use LogicException;
@@ -255,10 +254,10 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertInstanceOf(Stringable::class, $model->asStringableAttribute);
         $this->assertFalse($model->isDirty('asStringableAttribute'));
 
-        $model->asStringableAttribute = Str::of('foo bar');
+        $model->asStringableAttribute = new Stringable('foo bar');
         $this->assertFalse($model->isDirty('asStringableAttribute'));
 
-        $model->asStringableAttribute = Str::of('foo baz');
+        $model->asStringableAttribute = new Stringable('foo baz');
         $this->assertTrue($model->isDirty('asStringableAttribute'));
     }
 

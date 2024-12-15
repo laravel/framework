@@ -1647,6 +1647,23 @@ class Connection implements ConnectionInterface
     }
 
     /**
+     * Execute the given callback without table prefix.
+     *
+     * @param  \Closure  $callback
+     * @return void
+     */
+    public function withoutTablePrefix(Closure $callback): void
+    {
+        $tablePrefix = $this->getTablePrefix();
+
+        $this->setTablePrefix('');
+
+        $callback($this);
+
+        $this->setTablePrefix($tablePrefix);
+    }
+
+    /**
      * Get the server version for the connection.
      *
      * @return string

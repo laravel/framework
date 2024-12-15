@@ -57,6 +57,8 @@ namespace Illuminate\Support\Facades;
  * @method static void setExists(bool $value)
  * @method static string token()
  * @method static void regenerateToken()
+ * @method static bool hasPreviousUri()
+ * @method static \Illuminate\Support\Uri previousUri()
  * @method static string|null previousUrl()
  * @method static void setPreviousUrl(string $url)
  * @method static void passwordConfirmed()

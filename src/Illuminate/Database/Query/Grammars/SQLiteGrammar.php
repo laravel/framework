@@ -386,11 +386,11 @@ class SQLiteGrammar extends Grammar
     {
         $groups = $this->groupJsonColumnsForUpdate($values);
 
-        $values = (new Collection($values))->reject(function ($value, $key) {
-            return $this->isJsonSelector($key);
-        })->merge($groups)->map(function ($value) {
-            return is_array($value) ? json_encode($value) : $value;
-        })->all();
+        $values = (new Collection($values))
+            ->reject(fn ($value, $key) => $this->isJsonSelector($key))
+            ->merge($groups)
+            ->map(fn ($value) => is_array($value) ? json_encode($value) : $value)
+            ->all();
 
         $cleanBindings = Arr::except($bindings, 'select');
 

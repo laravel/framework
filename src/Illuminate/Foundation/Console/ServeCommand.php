@@ -7,6 +7,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Env;
 use Illuminate\Support\InteractsWithTime;
+use Illuminate\Support\Stringable;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Process\Process;
@@ -71,6 +72,7 @@ class ServeCommand extends Command
         'HERD_PHP_81_INI_SCAN_DIR',
         'HERD_PHP_82_INI_SCAN_DIR',
         'HERD_PHP_83_INI_SCAN_DIR',
+        'HERD_PHP_84_INI_SCAN_DIR',
         'IGNITION_LOCAL_SITES_PATH',
         'LARAVEL_SAIL',
         'PATH',
@@ -270,7 +272,7 @@ class ServeCommand extends Command
      */
     protected function flushOutputBuffer()
     {
-        $lines = str($this->outputBuffer)->explode("\n");
+        $lines = (new Stringable($this->outputBuffer))->explode("\n");
 
         $this->outputBuffer = (string) $lines->pop();
 
@@ -278,7 +280,9 @@ class ServeCommand extends Command
             ->map(fn ($line) => trim($line))
             ->filter()
             ->each(function ($line) {
-                if (str($line)->contains('Development Server (http')) {
+                $stringable = new Stringable($line);
+
+                if ($stringable->contains('Development Server (http')) {
                     if ($this->serverRunningHasBeenDisplayed === false) {
                         $this->serverRunningHasBeenDisplayed = true;
 
@@ -291,23 +295,19 @@ class ServeCommand extends Command
                     return;
                 }
 
-                if (str($line)->contains(' Accepted')) {
-                    $requestPort = static::getRequestPortFromLine($line);
+                $requestPort = static::getRequestPortFromLine($line);
 
+                if ($stringable->contains(' Accepted')) {
                     $this->requestsPool[$requestPort] = [
                         $this->getDateFromLine($line),
                         $this->requestsPool[$requestPort][1] ?? false,
                         microtime(true),
                     ];
-                } elseif (str($line)->contains([' [200]: GET '])) {
-                    $requestPort = static::getRequestPortFromLine($line);
-
+                } elseif ($stringable->contains([' [200]: GET '])) {
                     $this->requestsPool[$requestPort][1] = trim(explode('[200]: GET', $line)[1]);
-                } elseif (str($line)->contains('URI:')) {
-                    $requestPort = static::getRequestPortFromLine($line);
-
+                } elseif ($stringable->contains('URI:')) {
                     $this->requestsPool[$requestPort][1] = trim(explode('URI: ', $line)[1]);
-                } elseif (str($line)->contains(' Closing')) {
+                } elseif ($stringable->contains(' Closing')) {
                     $requestPort = static::getRequestPortFromLine($line);
 
                     if (empty($this->requestsPool[$requestPort])) {
@@ -338,11 +338,11 @@ class ServeCommand extends Command
 
                     $this->output->write(' '.str_repeat('<fg=gray>.</>', $dots));
                     $this->output->writeln(" <fg=gray>~ {$runTime}</>");
-                } elseif (str($line)->contains(['Closed without sending a request', 'Failed to poll event'])) {
+                } elseif ($stringable->contains(['Closed without sending a request', 'Failed to poll event'])) {
                     // ...
                 } elseif (! empty($line)) {
-                    if (str($line)->startsWith('[')) {
-                        $line = str($line)->after('] ');
+                    if ($stringable->startsWith('[')) {
+                        $line = $stringable->after('] ');
                     }
 
                     $this->output->writeln("  <fg=gray>$line</>");

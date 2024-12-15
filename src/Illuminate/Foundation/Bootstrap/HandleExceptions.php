@@ -273,7 +273,7 @@ class HandleExceptions
             'with' => [
                 'connectionString' => $_ENV['LARAVEL_CLOUD_LOG_SOCKET'] ??
                                       $_SERVER['LARAVEL_CLOUD_LOG_SOCKET'] ??
-                                      '127.0.0.1:8765',
+                                      'unix:///tmp/cloud-init.sock',
                 'persistent' => true,
             ],
         ]);

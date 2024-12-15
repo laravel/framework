@@ -448,9 +448,8 @@ class Factory
             return true;
         };
 
-        return (new Collection($this->recorded))->filter(function ($pair) use ($callback) {
-            return $callback($pair[0], $pair[1]);
-        });
+        return (new Collection($this->recorded))
+            ->filter(fn ($pair) => $callback($pair[0], $pair[1]));
     }
 
     /**
