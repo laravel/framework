@@ -3,9 +3,9 @@
 namespace Illuminate\Support;
 
 use Closure;
+use Illuminate\Container\Concerns\HasApplication;
 use InvalidArgumentException;
 use RuntimeException;
-use Illuminate\Container\Concerns\HasApplication;
 
 abstract class MultipleInstanceManager
 {
