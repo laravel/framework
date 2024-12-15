@@ -14,7 +14,7 @@ use SessionHandlerInterface;
 
 class DatabaseSessionHandler implements ExistenceAwareInterface, SessionHandlerInterface
 {
-    use InteractsWithTime;
+    use InteractsWithTime, HasContainer;
 
     /**
      * The database connection instance.
