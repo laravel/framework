@@ -2,6 +2,7 @@
 
 namespace Illuminate\Auth;
 
+use Illuminate\Auth\Concerns\HasRequest;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Http\Request;
