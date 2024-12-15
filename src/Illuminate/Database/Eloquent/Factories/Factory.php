@@ -827,7 +827,17 @@ abstract class Factory
                         : $appNamespace.$factoryBasename;
         };
 
-        return $this->model ?? $resolver($this);
+        return $this->getModel() ?? $resolver($this);
+    }
+
+    /**
+     * Get the model class.
+     *
+     * @return class-string<TModel>
+     */
+    protected function getModel()
+    {
+        return $this->model;
     }
 
     /**
