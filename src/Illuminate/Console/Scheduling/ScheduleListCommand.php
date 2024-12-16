@@ -122,7 +122,7 @@ class ScheduleListCommand extends Command
         $description = $event->description ?? '';
 
         if (! $this->output->isVerbose()) {
-            $command = $event->getNormalizedCommand();
+            $command = $event->normalizeCommand($command);
         }
 
         if ($event instanceof CallbackEvent) {

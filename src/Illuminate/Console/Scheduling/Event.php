@@ -787,26 +787,6 @@ class Event
     }
 
     /**
-     * Get the command string with normalized binary path of PHP.
-     *
-     * @return string
-     */
-    public function getNormalizedCommand()
-    {
-        return str_replace(
-            [
-                Application::phpBinary(),
-                Application::artisanBinary(),
-            ],
-            [
-                'php',
-                preg_replace("#['\"]#", '', Application::artisanBinary()),
-            ],
-            $this->command ?? ''
-        );
-    }
-
-    /**
      * Set the event mutex implementation to be used.
      *
      * @param  \Illuminate\Console\Scheduling\EventMutex  $mutex
@@ -832,7 +812,8 @@ class Event
             return $mutexNameResolver($this);
         }
 
-        return 'framework'.DIRECTORY_SEPARATOR.'schedule-'.sha1($this->expression.$this->getNormalizedCommand());
+        return 'framework'.DIRECTORY_SEPARATOR.'schedule-'.
+            sha1($this->expression.$this->normalizeCommand($this->command ?? ''));
     }
 
     /**
@@ -858,5 +839,22 @@ class Event
         if ($this->withoutOverlapping) {
             $this->mutex->forget($this);
         }
+    }
+
+    /**
+     * Format the given command string with a normalized PHP binary path.
+     *
+     * @param  string  $command
+     * @return string
+     */
+    public static function normalizeCommand($command)
+    {
+        return str_replace([
+            Application::phpBinary(),
+            Application::artisanBinary(),
+        ], [
+            'php',
+            preg_replace("#['\"]#", '', Application::artisanBinary()),
+        ], $command);
     }
 }
