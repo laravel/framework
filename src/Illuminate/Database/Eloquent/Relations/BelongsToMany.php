@@ -927,9 +927,10 @@ class BelongsToMany extends Relation
     {
         $this->query->addSelect($this->shouldSelect($columns));
 
-        return tap($this->query->paginate($perPage, $columns, $pageName, $page), function ($paginator) {
-            $this->hydratePivotRelation($paginator->items());
-        });
+        return tap(
+            $this->query->paginate($perPage, $columns, $pageName, $page),
+            fn ($paginator) => $this->hydratePivotRelation($paginator->items()),
+        );
     }
 
     /**
@@ -1083,11 +1084,7 @@ class BelongsToMany extends Relation
      */
     public function lazy($chunkSize = 1000)
     {
-        return $this->prepareQueryBuilder()->lazy($chunkSize)->map(function ($model) {
-            $this->hydratePivotRelation([$model]);
-
-            return $model;
-        });
+        return $this->prepareQueryBuilder()->lazy($chunkSize)->map($this->hydratePivotRelationFluent(...));
     }
 
     /**
@@ -1106,11 +1103,9 @@ class BelongsToMany extends Relation
 
         $alias ??= $this->getRelatedKeyName();
 
-        return $this->prepareQueryBuilder()->lazyById($chunkSize, $column, $alias)->map(function ($model) {
-            $this->hydratePivotRelation([$model]);
-
-            return $model;
-        });
+        return $this->prepareQueryBuilder()
+            ->lazyById($chunkSize, $column, $alias)
+            ->map($this->hydratePivotRelationFluent(...));
     }
 
     /**
@@ -1129,11 +1124,10 @@ class BelongsToMany extends Relation
 
         $alias ??= $this->getRelatedKeyName();
 
-        return $this->prepareQueryBuilder()->lazyByIdDesc($chunkSize, $column, $alias)->map(function ($model) {
-            $this->hydratePivotRelation([$model]);
-
-            return $model;
-        });
+        return $this
+            ->prepareQueryBuilder()
+            ->lazyByIdDesc($chunkSize, $column, $alias)
+            ->map($this->hydratePivotRelationFluent(...));
     }
 
     /**
@@ -1143,11 +1137,7 @@ class BelongsToMany extends Relation
      */
     public function cursor()
     {
-        return $this->prepareQueryBuilder()->cursor()->map(function ($model) {
-            $this->hydratePivotRelation([$model]);
-
-            return $model;
-        });
+        return $this->prepareQueryBuilder()->cursor()->map($this->hydratePivotRelationFluent(...));
     }
 
     /**
@@ -1634,5 +1624,12 @@ class BelongsToMany extends Relation
         return str_contains($column, '.')
                     ? $column
                     : $this->table.'.'.$column;
+    }
+
+    private function hydratePivotRelationFluent($model)
+    {
+        $this->hydratePivotRelation([$model]);
+
+        return $model;
     }
 }

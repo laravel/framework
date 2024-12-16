@@ -117,11 +117,8 @@ class RouteListCommand extends Command
             return $this->getRouteInformation($route);
         })->filter()->all();
 
-        if (($sort = $this->option('sort')) !== null) {
-            $routes = $this->sortRoutes($sort, $routes);
-        } else {
-            $routes = $this->sortRoutes('uri', $routes);
-        }
+        $sort = $this->option('sort') ?? 'uri';
+        $routes = $this->sortRoutes($sort, $routes);
 
         if ($this->option('reverse')) {
             $routes = array_reverse($routes);
