@@ -78,7 +78,8 @@ class SupportHelpersTest extends TestCase
 
     public function testBlankDoesntJsonSerializeModels()
     {
-        $model = new class extends Model {
+        $model = new class extends Model
+        {
             public function jsonSerialize(): mixed
             {
                 throw new RuntimeException('Model should not be serialized');
