@@ -836,7 +836,7 @@ class Router implements BindingRegistrar, RegistrarContract
             ->all();
 
         $middleware = (new Collection($middleware))
-            ->map(fn ($name) => (array) MiddlewareNameResolver::resolve($name, $this->middleware, $this->middlewareGroups)))
+            ->map(fn ($name) => (array) MiddlewareNameResolver::resolve($name, $this->middleware, $this->middlewareGroups))
             ->flatten()
             ->reject(function ($name) use ($excluded) {
                 if (empty($excluded)) {

@@ -306,7 +306,7 @@ class Store implements Session
     public function hasAny($key)
     {
         return (new Collection(is_array($key) ? $key : func_get_args()))
-            ->filter(fn ($key) => ! is_null($this->get($key))
+            ->filter(fn ($key) => ! is_null($this->get($key)))
             ->count() >= 1;
     }
 

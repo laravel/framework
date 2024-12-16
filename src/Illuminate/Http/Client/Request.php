@@ -148,7 +148,7 @@ class Request implements ArrayAccess
         }
 
         return (new Collection($this->data))
-            ->reject(fn ($file) use ($name, $value, $filename) => $file['name'] != $name ||
+            ->reject(fn ($file) => $file['name'] != $name ||
                 ($value && $file['contents'] != $value) ||
                 ($filename && $file['filename'] != $filename))
             ->count() > 0;
