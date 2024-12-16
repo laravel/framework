@@ -225,9 +225,7 @@ class MessageBag implements Jsonable, JsonSerializable, MessageBagContract, Mess
     {
         return (new Collection($this->messages))
             ->filter(fn ($messages, $messageKey) => Str::is($key, $messageKey))
-            ->map(function ($messages, $messageKey) use ($format) {
-                return $this->transform($messages, $this->checkFormat($format), $messageKey);
-            })
+            ->map(fn ($messages, $messageKey) => $this->transform($messages, $this->checkFormat($format), $messageKey))
             ->all();
     }
 

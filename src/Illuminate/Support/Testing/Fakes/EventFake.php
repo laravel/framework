@@ -333,11 +333,9 @@ class EventFake implements Dispatcher, Fake
         }
 
         return (new Collection($this->eventsToFake))
-            ->filter(function ($event) use ($eventName, $payload) {
-                return $event instanceof Closure
-                            ? $event($eventName, $payload)
-                            : $event === $eventName;
-            })
+            ->filter(fn ($event) => $event instanceof Closure
+                ? $event($eventName, $payload)
+                : $event === $eventName)
             ->isNotEmpty();
     }
 
@@ -373,11 +371,9 @@ class EventFake implements Dispatcher, Fake
         }
 
         return (new Collection($this->eventsToDispatch))
-            ->filter(function ($event) use ($eventName, $payload) {
-                return $event instanceof Closure
-                    ? $event($eventName, $payload)
-                    : $event === $eventName;
-            })
+            ->filter(fn ($event) => $event instanceof Closure
+                ? $event($eventName, $payload)
+                : $event === $eventName)
             ->isNotEmpty();
     }
 

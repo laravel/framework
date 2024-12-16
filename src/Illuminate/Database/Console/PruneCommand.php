@@ -55,9 +55,7 @@ class PruneCommand extends Command
         }
 
         if ($this->option('pretend')) {
-            $models->each(function ($model) {
-                $this->pretendToPrune($model);
-            });
+            $models->each($this->pretendToPrune(...));
 
             return;
         }
@@ -78,9 +76,7 @@ class PruneCommand extends Command
 
         $events->dispatch(new ModelPruningStarting($models->all()));
 
-        $models->each(function ($model) {
-            $this->pruneModel($model);
-        });
+        $models->each($this->pruneModel(...));
 
         $events->dispatch(new ModelPruningFinished($models->all()));
 

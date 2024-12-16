@@ -419,24 +419,24 @@ class SqlServerGrammar extends Grammar
 
         $sql = 'merge '.$this->wrapTable($query->from).' ';
 
-        $parameters = (new Collection($values))->map(function ($record) {
-            return '('.$this->parameterize($record).')';
-        })->implode(', ');
+        $parameters = (new Collection($values))
+            ->map(fn ($record) => '('.$this->parameterize($record).')')
+            ->implode(', ');
 
         $sql .= 'using (values '.$parameters.') '.$this->wrapTable('laravel_source').' ('.$columns.') ';
 
-        $on = (new Collection($uniqueBy))->map(function ($column) use ($query) {
-            return $this->wrap('laravel_source.'.$column).' = '.$this->wrap($query->from.'.'.$column);
-        })->implode(' and ');
+        $on = (new Collection($uniqueBy))
+            ->map(fn ($column) => $this->wrap('laravel_source.'.$column).' = '.$this->wrap($query->from.'.'.$column))
+            ->implode(' and ');
 
         $sql .= 'on '.$on.' ';
 
         if ($update) {
-            $update = (new Collection($update))->map(function ($value, $key) {
-                return is_numeric($key)
+            $update = (new Collection($update))
+                ->map(fn ($value, $key) => is_numeric($key)
                     ? $this->wrap($value).' = '.$this->wrap('laravel_source.'.$value)
-                    : $this->wrap($key).' = '.$this->parameter($value);
-            })->implode(', ');
+                    : $this->wrap($key).' = '.$this->parameter($value))
+                ->implode(', ');
 
             $sql .= 'when matched then update set '.$update.' ';
         }

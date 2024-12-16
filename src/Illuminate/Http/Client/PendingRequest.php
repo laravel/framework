@@ -1269,9 +1269,7 @@ class PendingRequest
     public function pushHandlers($handlerStack)
     {
         return tap($handlerStack, function ($stack) {
-            $this->middleware->each(function ($middleware) use ($stack) {
-                $stack->push($middleware);
-            });
+            $this->middleware->each(fn ($middleware) => $stack->push($middleware));
 
             $stack->push($this->buildBeforeSendingHandler());
             $stack->push($this->buildRecorderHandler());

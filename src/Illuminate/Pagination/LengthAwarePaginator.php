@@ -118,13 +118,11 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
                 return [['url' => null, 'label' => '...', 'active' => false]];
             }
 
-            return (new Collection($item))->map(function ($url, $page) {
-                return [
-                    'url' => $url,
-                    'label' => (string) $page,
-                    'active' => $this->currentPage() === $page,
-                ];
-            });
+            return (new Collection($item))->map(fn ($url, $page) => [
+                'url' => $url,
+                'label' => (string) $page,
+                'active' => $this->currentPage() === $page,
+            ]);
         })->prepend([
             'url' => $this->previousPageUrl(),
             'label' => function_exists('__') ? __('pagination.previous') : 'Previous',

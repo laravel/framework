@@ -2873,10 +2873,9 @@ class Builder implements BuilderContract
     protected function removeExistingOrdersFor($column)
     {
         return (new Collection($this->orders))
-                    ->reject(function ($order) use ($column) {
-                        return isset($order['column'])
-                               ? $order['column'] === $column : false;
-                    })->values()->all();
+                    ->reject(fn ($order) => isset($order['column']) ? $order['column'] === $column : false)
+                    ->values()
+                    ->all();
     }
 
     /**
@@ -3352,9 +3351,9 @@ class Builder implements BuilderContract
             yield from $this->connection->cursor(
                 $this->toSql(), $this->getBindings(), ! $this->useWritePdo
             );
-        }))->map(function ($item) {
-            return $this->applyAfterQueryCallbacks(new Collection([$item]))->first();
-        })->reject(fn ($item) => is_null($item));
+        }))
+            ->map(fn ($item) => $this->applyAfterQueryCallbacks(new Collection([$item]))->first())
+            ->reject(fn ($item) => is_null($item));
     }
 
     /**
@@ -4243,9 +4242,7 @@ class Builder implements BuilderContract
     public function cleanBindings(array $bindings)
     {
         return (new Collection($bindings))
-                    ->reject(function ($binding) {
-                        return $binding instanceof ExpressionContract;
-                    })
+                    ->reject(fn ($binding) => $binding instanceof ExpressionContract)
                     ->map([$this, 'castBinding'])
                     ->values()
                     ->all();

@@ -24,11 +24,11 @@ class PostgresSchemaState extends SchemaState
             $commands->push($this->baseDumpCommand().' -t '.$this->getMigrationTable().' --data-only >> '.$path);
         }
 
-        $commands->map(function ($command, $path) {
-            $this->makeProcess($command)->mustRun($this->output, array_merge($this->baseVariables($this->connection->getConfig()), [
+        $commands->map(fn ($command, $path) => $this
+            ->makeProcess($command)
+            ->mustRun($this->output, array_merge($this->baseVariables($this->connection->getConfig()), [
                 'LARAVEL_LOAD_PATH' => $path,
-            ]));
-        });
+            ])));
     }
 
     /**

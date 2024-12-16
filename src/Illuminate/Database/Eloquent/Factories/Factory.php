@@ -260,9 +260,7 @@ abstract class Factory
         }
 
         return new EloquentCollection(
-            (new Collection($records))->map(function ($record) {
-                return $this->state($record)->create();
-            })
+            (new Collection($records))->map(fn ($record) => $this->state($record)->create())
         );
     }
 
@@ -367,9 +365,7 @@ abstract class Factory
     protected function createChildren(Model $model)
     {
         Model::unguarded(function () use ($model) {
-            $this->has->each(function ($has) use ($model) {
-                $has->recycle($this->recycle)->createFor($model);
-            });
+            $this->has->each(fn ($has) => $has->recycle($this->recycle)->createFor($model));
         });
     }
 
@@ -708,9 +704,7 @@ abstract class Factory
     protected function callAfterMaking(Collection $instances)
     {
         $instances->each(function ($model) {
-            $this->afterMaking->each(function ($callback) use ($model) {
-                $callback($model);
-            });
+            $this->afterMaking->each(fn ($callback) => $callback($model));
         });
     }
 
@@ -724,9 +718,7 @@ abstract class Factory
     protected function callAfterCreating(Collection $instances, ?Model $parent = null)
     {
         $instances->each(function ($model) use ($parent) {
-            $this->afterCreating->each(function ($callback) use ($model, $parent) {
-                $callback($model, $parent);
-            });
+            $this->afterCreating->each(fn ($callback) => $callback($model, $parent));
         });
     }
 

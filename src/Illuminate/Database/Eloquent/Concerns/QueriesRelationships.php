@@ -845,11 +845,10 @@ trait QueriesRelationships
     protected function requalifyWhereTables(array $wheres, string $from, string $to): array
     {
         return (new BaseCollection($wheres))->map(function ($where) use ($from, $to) {
-            return (new BaseCollection($where))->map(function ($value) use ($from, $to) {
-                return is_string($value) && str_starts_with($value, $from.'.')
+            return (new BaseCollection($where))
+                ->map(fn ($value) => is_string($value) && str_starts_with($value, $from.'.')
                     ? $to.'.'.Str::afterLast($value, '.')
-                    : $value;
-            });
+                    : $value);
         })->toArray();
     }
 

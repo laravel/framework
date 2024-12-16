@@ -94,9 +94,10 @@ EOF;
             return '';
         }
 
-        return '@props('.'[\''.implode('\',\'', (new Collection($bindings))->map(function ($dataKey) {
-            return Str::camel($dataKey);
-        })->all()).'\']'.')';
+        return '@props('.'[\''.implode(
+            '\',\'',
+            (new Collection($bindings))->map(Str::camel(...))->all(),
+        ).'\']'.')';
     }
 
     /**

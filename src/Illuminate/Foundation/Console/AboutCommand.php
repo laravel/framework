@@ -93,9 +93,7 @@ class AboutCommand extends Command
 
                 return $index === false ? 99 : $index;
             })
-            ->filter(function ($data, $key) {
-                return $this->option('only') ? in_array($this->toSearchKeyword($key), $this->sections()) : true;
-            })
+            ->filter(fn ($data, $key) => $this->option('only') ? in_array($this->toSearchKeyword($key), $this->sections()) : true)
             ->pipe(fn ($data) => $this->display($data));
 
         $this->newLine();

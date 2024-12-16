@@ -44,19 +44,18 @@ class AsEnumCollection implements Castable
 
                 $enumClass = $this->arguments[0];
 
-                return (new Collection($data))->map(function ($value) use ($enumClass) {
-                    return is_subclass_of($enumClass, BackedEnum::class)
+                return (new Collection($data))
+                    ->map(fn ($value) => is_subclass_of($enumClass, BackedEnum::class)
                         ? $enumClass::from($value)
-                        : constant($enumClass.'::'.$value);
-                });
+                        : constant($enumClass.'::'.$value));
             }
 
             public function set($model, $key, $value, $attributes)
             {
                 $value = $value !== null
-                    ? Json::encode((new Collection($value))->map(function ($enum) {
-                        return $this->getStorableEnumValue($enum);
-                    })->jsonSerialize())
+                    ? Json::encode((new Collection($value))
+                        ->map($this->getStorableEnumValue(...))
+                        ->jsonSerialize())
                     : null;
 
                 return [$key => $value];
@@ -64,9 +63,9 @@ class AsEnumCollection implements Castable
 
             public function serialize($model, string $key, $value, array $attributes)
             {
-                return (new Collection($value))->map(function ($enum) {
-                    return $this->getStorableEnumValue($enum);
-                })->toArray();
+                return (new Collection($value))
+                    ->map($this->getStorableEnumValue(...))
+                    ->toArray();
             }
 
             protected function getStorableEnumValue($enum)

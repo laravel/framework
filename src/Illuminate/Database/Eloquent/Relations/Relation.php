@@ -289,9 +289,12 @@ abstract class Relation implements BuilderContract
      */
     protected function getKeys(array $models, $key = null)
     {
-        return (new BaseCollection($models))->map(function ($value) use ($key) {
-            return $key ? $value->getAttribute($key) : $value->getKey();
-        })->values()->unique(null, true)->sort()->all();
+        return (new BaseCollection($models))
+            ->map(fn ($value) => $key ? $value->getAttribute($key) : $value->getKey())
+            ->values()
+            ->unique(null, true)
+            ->sort()
+            ->all();
     }
 
     /**

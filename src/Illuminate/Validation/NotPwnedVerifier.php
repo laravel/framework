@@ -97,8 +97,9 @@ class NotPwnedVerifier implements UncompromisedVerifier
             ? $response->body()
             : '';
 
-        return (new Stringable($body))->trim()->explode("\n")->filter(function ($line) {
-            return str_contains($line, ':');
-        });
+        return (new Stringable($body))
+            ->trim()
+            ->explode("\n")
+            ->filter(fn ($line) => str_contains($line, ':'));
     }
 }

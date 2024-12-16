@@ -157,9 +157,9 @@ class PostgresGrammar extends Grammar
             $language = 'english';
         }
 
-        $columns = (new Collection($where['columns']))->map(function ($column) use ($language) {
-            return "to_tsvector('{$language}', {$this->wrap($column)})";
-        })->implode(' || ');
+        $columns = (new Collection($where['columns']))
+            ->map(fn ($column) => "to_tsvector('{$language}', {$this->wrap($column)})")
+            ->implode(' || ');
 
         $mode = 'plainto_tsquery';
 
@@ -432,11 +432,11 @@ class PostgresGrammar extends Grammar
 
         $sql .= ' on conflict ('.$this->columnize($uniqueBy).') do update set ';
 
-        $columns = (new Collection($update))->map(function ($value, $key) {
-            return is_numeric($key)
+        $columns = (new Collection($update))
+            ->map(fn ($value, $key) => is_numeric($key)
                 ? $this->wrap($value).' = '.$this->wrapValue('excluded').'.'.$this->wrap($value)
-                : $this->wrap($key).' = '.$this->parameter($value);
-        })->implode(', ');
+                : $this->wrap($key).' = '.$this->parameter($value))
+            ->implode(', ');
 
         return $sql.$columns;
     }
@@ -567,11 +567,9 @@ class PostgresGrammar extends Grammar
     public function prepareBindingsForUpdateFrom(array $bindings, array $values)
     {
         $values = (new Collection($values))
-            ->map(function ($value, $column) {
-                return is_array($value) || ($this->isJsonSelector($column) && ! $this->isExpression($value))
-                    ? json_encode($value)
-                    : $value;
-            })
+            ->map(fn ($value, $column) => is_array($value) || ($this->isJsonSelector($column) && ! $this->isExpression($value))
+                ? json_encode($value)
+                : $value)
             ->all();
 
         $bindingsWithoutWhere = Arr::except($bindings, ['select', 'where']);
@@ -610,11 +608,11 @@ class PostgresGrammar extends Grammar
      */
     public function prepareBindingsForUpdate(array $bindings, array $values)
     {
-        $values = (new Collection($values))->map(function ($value, $column) {
-            return is_array($value) || ($this->isJsonSelector($column) && ! $this->isExpression($value))
+        $values = (new Collection($values))
+            ->map(fn ($value, $column) => is_array($value) || ($this->isJsonSelector($column) && ! $this->isExpression($value))
                 ? json_encode($value)
-                : $value;
-        })->all();
+                : $value)
+            ->all();
 
         $cleanBindings = Arr::except($bindings, 'select');
 
@@ -739,11 +737,9 @@ class PostgresGrammar extends Grammar
         return (new Collection($path))
             ->map(fn ($attribute) => $this->parseJsonPathArrayKeys($attribute))
             ->collapse()
-            ->map(function ($attribute) use ($quote) {
-                return filter_var($attribute, FILTER_VALIDATE_INT) !== false
-                    ? $attribute
-                    : $quote.$attribute.$quote;
-            })
+            ->map(fn ($attribute) => filter_var($attribute, FILTER_VALIDATE_INT) !== false
+                ? $attribute
+                : $quote.$attribute.$quote)
             ->all();
     }
 

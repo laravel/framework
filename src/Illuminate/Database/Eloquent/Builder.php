@@ -954,9 +954,7 @@ class Builder implements BuilderContract
         }
 
         return $this->applyAfterQueryCallbacks(
-            $results->map(function ($value) use ($column) {
-                return $this->model->newFromBuilder([$column => $value])->{$column};
-            })
+            $results->map(fn ($value) => $this->model->newFromBuilder([$column => $value])->{$column})
         );
     }
 

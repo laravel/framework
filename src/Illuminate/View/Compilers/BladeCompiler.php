@@ -224,9 +224,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
     {
         return (new Collection(token_get_all($contents)))
             ->pluck(0)
-            ->filter(function ($token) {
-                return in_array($token, [T_OPEN_TAG, T_OPEN_TAG_WITH_ECHO, T_CLOSE_TAG]);
-            });
+            ->filter(fn ($token) => in_array($token, [T_OPEN_TAG, T_OPEN_TAG_WITH_ECHO, T_CLOSE_TAG]));
     }
 
     /**
@@ -762,9 +760,9 @@ class BladeCompiler extends Compiler implements CompilerInterface
 
         if (is_null($alias)) {
             $alias = str_contains($class, '\\View\\Components\\')
-                            ? (new Collection(explode('\\', Str::after($class, '\\View\\Components\\'))))->map(function ($segment) {
-                                return Str::kebab($segment);
-                            })->implode(':')
+                            ? (new Collection(explode('\\', Str::after($class, '\\View\\Components\\'))))
+                                ->map(Str::kebab(...))
+                                ->implode(':')
                             : Str::kebab(class_basename($class));
         }
 

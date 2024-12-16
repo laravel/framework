@@ -18,11 +18,11 @@ class BaseCommand extends Command
         // use the path relative to the root of the installation folder so our database
         // migrations may be run for any customized path from within the application.
         if ($this->input->hasOption('path') && $this->option('path')) {
-            return (new Collection($this->option('path')))->map(function ($path) {
-                return ! $this->usingRealPath()
-                                ? $this->laravel->basePath().'/'.$path
-                                : $path;
-            })->all();
+            return (new Collection($this->option('path')))
+            ->map(fn ($path) => ! $this->usingRealPath()
+                ? $this->laravel->basePath().'/'.$path
+                : $path)
+            ->all();
         }
 
         return array_merge(

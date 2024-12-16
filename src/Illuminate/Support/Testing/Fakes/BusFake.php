@@ -783,10 +783,9 @@ class BusFake implements Fake, QueueingDispatcher
         }
 
         return (new Collection($this->jobsToFake))
-            ->filter(function ($job) use ($command) {
-                return $job instanceof Closure
-                            ? $job($command)
-                            : $job === get_class($command);
+            ->filter(fn ($job) => $job instanceof Closure
+                ? $job($command)
+                : $job === get_class($command);
             })->isNotEmpty();
     }
 
@@ -799,10 +798,9 @@ class BusFake implements Fake, QueueingDispatcher
     protected function shouldDispatchCommand($command)
     {
         return (new Collection($this->jobsToDispatch))
-            ->filter(function ($job) use ($command) {
-                return $job instanceof Closure
-                    ? $job($command)
-                    : $job === get_class($command);
+            ->filter(fn ($job) => $job instanceof Closure
+                ? $job($command)
+                : $job === get_class($command);
             })->isNotEmpty();
     }
 

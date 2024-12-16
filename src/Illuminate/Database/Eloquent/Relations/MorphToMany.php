@@ -126,12 +126,11 @@ class MorphToMany extends BelongsToMany
      */
     protected function getCurrentlyAttachedPivots()
     {
-        return parent::getCurrentlyAttachedPivots()->map(function ($record) {
-            return $record instanceof MorphPivot
-                            ? $record->setMorphType($this->morphType)
-                                     ->setMorphClass($this->morphClass)
-                            : $record;
-        });
+        return parent::getCurrentlyAttachedPivots()
+            ->map(fn ($record) => $record instanceof MorphPivot
+                ? $record->setMorphType($this->morphType)
+                            ->setMorphClass($this->morphClass)
+                : $record);
     }
 
     /**
@@ -179,9 +178,10 @@ class MorphToMany extends BelongsToMany
     {
         $defaults = [$this->foreignPivotKey, $this->relatedPivotKey, $this->morphType];
 
-        return (new Collection(array_merge($defaults, $this->pivotColumns)))->map(function ($column) {
-            return $this->qualifyPivotColumn($column).' as pivot_'.$column;
-        })->unique()->all();
+        return (new Collection(array_merge($defaults, $this->pivotColumns)))
+            ->map(fn ($column) => $this->qualifyPivotColumn($column).' as pivot_'.$column)
+            ->unique()
+            ->all();
     }
 
     /**

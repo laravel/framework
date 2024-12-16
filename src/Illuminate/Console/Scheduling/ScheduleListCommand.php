@@ -69,9 +69,8 @@ class ScheduleListCommand extends Command
 
         $events = $this->sortEvents($events, $timezone);
 
-        $events = $events->map(function ($event) use ($terminalWidth, $expressionSpacing, $repeatExpressionSpacing, $timezone) {
-            return $this->listEvent($event, $terminalWidth, $expressionSpacing, $repeatExpressionSpacing, $timezone);
-        });
+        $events = $events
+            ->map(fn ($event) => $this->listEvent($event, $terminalWidth, $expressionSpacing, $repeatExpressionSpacing, $timezone));
 
         $this->line(
             $events->flatten()->filter()->prepend('')->push('')->toArray()

@@ -206,9 +206,7 @@ trait Queueable
     {
         $jobs = ChainedBatch::prepareNestedBatches(new Collection($chain));
 
-        $this->chained = $jobs->map(function ($job) {
-            return $this->serializeJob($job);
-        })->all();
+        $this->chained = $jobs->map($this->serializeJob(...))->all();
 
         return $this;
     }
@@ -295,9 +293,8 @@ trait Queueable
      */
     public function invokeChainCatchCallbacks($e)
     {
-        (new Collection($this->chainCatchCallbacks))->each(function ($callback) use ($e) {
-            $callback($e);
-        });
+        (new Collection($this->chainCatchCallbacks))
+            ->each(fn ($callback) => $callback($e));
     }
 
     /**

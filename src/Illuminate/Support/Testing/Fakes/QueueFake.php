@@ -214,12 +214,8 @@ class QueueFake extends QueueManager implements Fake, Queue
     protected function assertPushedWithChainOfClasses($job, $expectedChain, $callback)
     {
         $matching = $this->pushed($job, $callback)->map->chained->map(function ($chain) {
-            return (new Collection($chain))->map(function ($job) {
-                return get_class(unserialize($job));
-            });
-        })->filter(function ($chain) use ($expectedChain) {
-            return $chain->all() === $expectedChain;
-        });
+            return (new Collection($chain))->map(fn ($job) => get_class(unserialize($job)));
+        })->filter(fn ($chain) => $chain->all() === $expectedChain);
 
         PHPUnit::assertTrue(
             $matching->isNotEmpty(), 'The expected chain was not pushed.'

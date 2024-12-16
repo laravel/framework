@@ -67,13 +67,13 @@ class RateLimited
         return $this->handleJob(
             $job,
             $next,
-            Collection::wrap($limiterResponse)->map(function ($limit) {
-                return (object) [
+            Collection::wrap($limiterResponse)
+                ->map(fn ($limit) => (object) [
                     'key' => md5($this->limiterName.$limit->key),
                     'maxAttempts' => $limit->maxAttempts,
                     'decaySeconds' => $limit->decaySeconds,
-                ];
-            })->all()
+                ])
+                ->all()
         );
     }
 

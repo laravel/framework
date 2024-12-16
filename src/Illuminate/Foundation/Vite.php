@@ -486,8 +486,7 @@ class Vite implements Htmlable
                             ],
                         ));
                 })
-                ->map(function ($chunk) use ($buildDirectory, $manifest) {
-                    return (new Collection([
+                ->map(fn ($chunk) => (new Collection([
                         ...$this->resolvePreloadTagAttributes(
                             $chunk['src'] ?? null,
                             $url = $this->assetPath("{$buildDirectory}/{$chunk['file']}"),
@@ -501,8 +500,7 @@ class Vite implements Htmlable
                         fn ($value) => in_array($value, [null, false], true)
                     )->mapWithKeys(fn ($value, $key) => [
                         $key = (is_int($key) ? $value : $key) => $value === true ? $key : $value,
-                    ])->all();
-                })
+                    ])->all())
                 ->reject(fn ($attributes) => isset($this->preloadedAssets[$attributes['href']])))
             ->unique('href')
             ->values()

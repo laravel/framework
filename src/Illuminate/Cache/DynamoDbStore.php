@@ -143,13 +143,11 @@ class DynamoDbStore implements LockProvider, Store
             'RequestItems' => [
                 $this->table => [
                     'ConsistentRead' => false,
-                    'Keys' => (new Collection($prefixedKeys))->map(function ($key) {
-                        return [
-                            $this->keyAttribute => [
-                                'S' => $key,
-                            ],
-                        ];
-                    })->all(),
+                    'Keys' => (new Collection($prefixedKeys))->map(fn ($key) => [
+                        $this->keyAttribute => [
+                            'S' => $key,
+                        ],
+                    ])->all(),
                 ],
             ],
         ]);
@@ -233,23 +231,21 @@ class DynamoDbStore implements LockProvider, Store
 
         $this->dynamo->batchWriteItem([
             'RequestItems' => [
-                $this->table => (new Collection($values))->map(function ($value, $key) use ($expiration) {
-                    return [
-                        'PutRequest' => [
-                            'Item' => [
-                                $this->keyAttribute => [
-                                    'S' => $this->prefix.$key,
-                                ],
-                                $this->valueAttribute => [
-                                    $this->type($value) => $this->serialize($value),
-                                ],
-                                $this->expirationAttribute => [
-                                    'N' => (string) $expiration,
-                                ],
+                $this->table => (new Collection($values))->map(fn ($value, $key) => [
+                    'PutRequest' => [
+                        'Item' => [
+                            $this->keyAttribute => [
+                                'S' => $this->prefix.$key,
+                            ],
+                            $this->valueAttribute => [
+                                $this->type($value) => $this->serialize($value),
+                            ],
+                            $this->expirationAttribute => [
+                                'N' => (string) $expiration,
                             ],
                         ],
-                    ];
-                })->values()->all(),
+                    ],
+                ])->values()->all(),
             ],
         ]);
 

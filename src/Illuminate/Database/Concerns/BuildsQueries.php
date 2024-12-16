@@ -83,9 +83,7 @@ trait BuildsQueries
         $collection = new Collection;
 
         $this->chunk($count, function ($items) use ($collection, $callback) {
-            $items->each(function ($item) use ($collection, $callback) {
-                $collection->push($callback($item));
-            });
+            $items->each(fn ($item) => $collection->push($callback($item)));
         });
 
         return $collection;

@@ -109,9 +109,10 @@ class Renderer
         ]))->map(function ($fileAndAttributes) {
             [$filename, $attributes] = $fileAndAttributes;
 
-            return '<style '.(new Collection($attributes))->map(function ($value, $attribute) {
-                return $attribute.'="'.$value.'"';
-            })->implode(' ').'>'
+            return '<style '.(new Collection($attributes))
+                    ->map(fn ($value, $attribute) => $attribute.'="'.$value.'"')
+                    ->implode(' ')
+                .'>'
                 .file_get_contents(static::DIST.$filename)
                 .'</style>';
         })->implode('');

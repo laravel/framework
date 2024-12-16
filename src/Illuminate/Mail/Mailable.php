@@ -1767,9 +1767,7 @@ class Mailable implements MailableContract, Renderable
         $attachments = $this->attachments();
 
         (new Collection(is_object($attachments) ? [$attachments] : $attachments))
-            ->each(function ($attachment) {
-                $this->attach($attachment);
-            });
+            ->each(fn ($attachment) => $this->attach($attachment));
     }
 
     /**

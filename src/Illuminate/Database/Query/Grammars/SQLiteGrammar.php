@@ -289,15 +289,17 @@ class SQLiteGrammar extends Grammar
     {
         $jsonGroups = $this->groupJsonColumnsForUpdate($values);
 
-        return (new Collection($values))->reject(function ($value, $key) {
-            return $this->isJsonSelector($key);
-        })->merge($jsonGroups)->map(function ($value, $key) use ($jsonGroups) {
-            $column = last(explode('.', $key));
+        return (new Collection($values))
+            ->reject(fn ($value, $key) => $this->isJsonSelector($key))
+            ->merge($jsonGroups)
+            ->map(function ($value, $key) use ($jsonGroups) {
+                $column = last(explode('.', $key));
 
-            $value = isset($jsonGroups[$key]) ? $this->compileJsonPatch($column, $value) : $this->parameter($value);
+                $value = isset($jsonGroups[$key]) ? $this->compileJsonPatch($column, $value) : $this->parameter($value);
 
-            return $this->wrap($column).' = '.$value;
-        })->implode(', ');
+                return $this->wrap($column).' = '.$value;
+            })
+            ->implode(', ');
     }
 
     /**
@@ -315,11 +317,11 @@ class SQLiteGrammar extends Grammar
 
         $sql .= ' on conflict ('.$this->columnize($uniqueBy).') do update set ';
 
-        $columns = (new Collection($update))->map(function ($value, $key) {
-            return is_numeric($key)
+        $columns = (new Collection($update))
+            ->map(fn ($value, $key) => is_numeric($key)
                 ? $this->wrap($value).' = '.$this->wrapValue('excluded').'.'.$this->wrap($value)
-                : $this->wrap($key).' = '.$this->parameter($value);
-        })->implode(', ');
+                : $this->wrap($key).' = '.$this->parameter($value))
+            ->implode(', ');
 
         return $sql.$columns;
     }

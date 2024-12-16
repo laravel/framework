@@ -123,13 +123,9 @@ class DatabaseStore implements LockProvider, Store
         // the prefix value. Then we will need to iterate through each of the items
         // and convert them to an object when they are currently in array format.
         $values = $this->table()
-            ->whereIn('key', array_map(function ($key) {
-                return $this->prefix.$key;
-            }, $keys))
+            ->whereIn('key', array_map(fn ($key) => $this->prefix.$key, $keys))
             ->get()
-            ->map(function ($value) {
-                return is_array($value) ? (object) $value : $value;
-            });
+            ->map(fn ($value) => is_array($value) ? (object) $value : $value);
 
         $currentTime = $this->currentTime();
 
