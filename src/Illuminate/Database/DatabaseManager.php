@@ -117,12 +117,12 @@ class DatabaseManager implements ConnectionResolverInterface
     public function build(array $config)
     {
         if (! isset($config['name'])) {
-            $config['name'] = 'dynamic_' . Str::uuid();
+            $config['name'] = 'dynamic_'.Str::uuid();
         }
 
         $this->dynamicConnections[$config['name']] = $config;
 
-        return $this->connectUsing($config['name'], $config,true);
+        return $this->connectUsing($config['name'], $config, true);
     }
 
     /**
