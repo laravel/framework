@@ -954,11 +954,10 @@ abstract class Factory
 
         $relatedModel = get_class($this->newModel()->{$relationship}()->getRelated());
 
-        if (method_exists($relatedModel, 'newFactory') && ($_factory = $relatedModel::newFactory()) !== null) {
-            $factory = $_factory;
-        } else {
-            $factory = static::factoryForModel($relatedModel);
+        if (method_exists($relatedModel, 'newFactory')) {
+            $factory = $relatedModel::newFactory();
         }
+        $factory ??= static::factoryForModel($relatedModel);
 
         if (str_starts_with($method, 'for')) {
             return $this->for($factory->state($parameters[0] ?? []), $relationship);
