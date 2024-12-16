@@ -10,7 +10,6 @@ use Illuminate\Database\SQLiteConnection;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
-use Mockery;
 use RuntimeException;
 
 class DatabaseConnectionsTest extends DatabaseTestCase
