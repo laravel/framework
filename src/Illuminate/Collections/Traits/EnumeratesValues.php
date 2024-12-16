@@ -457,7 +457,7 @@ trait EnumeratesValues
         $callback = $this->valueRetriever($callback);
 
         return $this->map(fn ($value) => $callback($value))
-            ->filter(fn ($value) => ! is_null($value))
+            ->reject(fn ($value) => is_null($value))
             ->reduce(fn ($result, $value) => is_null($result) || $value < $result ? $value : $result);
     }
 
@@ -471,7 +471,7 @@ trait EnumeratesValues
     {
         $callback = $this->valueRetriever($callback);
 
-        return $this->filter(fn ($value) => ! is_null($value))->reduce(function ($result, $item) use ($callback) {
+        return $this->reject(fn ($value) => is_null($value))->reduce(function ($result, $item) use ($callback) {
             $value = $callback($item);
 
             return is_null($result) || $value > $result ? $value : $result;
