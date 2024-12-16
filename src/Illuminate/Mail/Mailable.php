@@ -1415,7 +1415,7 @@ class Mailable implements MailableContract, Renderable
      */
     public function assertSeeInOrderInHtml($strings, $escape = true)
     {
-        $strings = $escape ? array_map('e', $strings) : $strings;
+        $strings = $escape ? array_map(e(...), $strings) : $strings;
 
         [$html, $text] = $this->renderForAssertions();
 

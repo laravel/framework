@@ -412,7 +412,7 @@ trait EnumeratesValues
     {
         $groups = $this->mapToDictionary($callback);
 
-        return $groups->map([$this, 'make']);
+        return $groups->map($this->make(...));
     }
 
     /**

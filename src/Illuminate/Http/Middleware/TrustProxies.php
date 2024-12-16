@@ -77,7 +77,7 @@ class TrustProxies
         }
 
         $trustedIps = is_string($trustedIps)
-                ? array_map('trim', explode(',', $trustedIps))
+                ? array_map(trim(...), explode(',', $trustedIps))
                 : $trustedIps;
 
         if (is_array($trustedIps)) {

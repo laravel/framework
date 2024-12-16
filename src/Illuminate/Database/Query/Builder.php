@@ -4220,7 +4220,7 @@ class Builder implements BuilderContract
 
         if (is_array($value)) {
             $this->bindings[$type] = array_values(array_map(
-                [$this, 'castBinding'],
+                $this->castBinding(...),
                 array_merge($this->bindings[$type], $value),
             ));
         } else {
@@ -4270,7 +4270,7 @@ class Builder implements BuilderContract
                     ->reject(function ($binding) {
                         return $binding instanceof ExpressionContract;
                     })
-                    ->map([$this, 'castBinding'])
+                    ->map($this->castBinding(...))
                     ->values()
                     ->all();
     }

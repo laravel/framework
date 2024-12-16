@@ -1406,8 +1406,8 @@ class Str
         $parts = explode(' ', $value);
 
         $parts = count($parts) > 1
-            ? array_map([static::class, 'title'], $parts)
-            : array_map([static::class, 'title'], static::ucsplit(implode('_', $parts)));
+            ? array_map(static::title(...), $parts)
+            : array_map(static::title(...), static::ucsplit(implode('_', $parts)));
 
         $collapsed = static::replace(['-', '_', ' '], '_', implode('_', $parts));
 
