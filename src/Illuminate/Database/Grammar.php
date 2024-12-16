@@ -147,11 +147,9 @@ abstract class Grammar
      */
     protected function wrapValue($value)
     {
-        if ($value !== '*') {
-            return '"'.str_replace('"', '""', $value).'"';
-        }
-
-        return $value;
+        return $value !== '*'
+            ? '"'.str_replace('"', '""', $value).'"'
+            : $value;
     }
 
     /**

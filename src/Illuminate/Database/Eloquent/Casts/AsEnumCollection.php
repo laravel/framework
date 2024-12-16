@@ -71,11 +71,9 @@ class AsEnumCollection implements Castable
 
             protected function getStorableEnumValue($enum)
             {
-                if (is_string($enum) || is_int($enum)) {
-                    return $enum;
-                }
-
-                return enum_value($enum);
+                return is_string($enum) || is_int($enum)
+                    ? $enum;
+                    : enum_value($enum);
             }
         };
     }
