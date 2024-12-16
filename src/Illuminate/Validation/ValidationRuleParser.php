@@ -96,7 +96,7 @@ class ValidationRuleParser
         }
 
         return array_map(
-            [$this, 'prepareRule'],
+            $this->prepareRule(...),
             $rule,
             array_fill((int) array_key_first($rule), count($rule), $attribute)
         );

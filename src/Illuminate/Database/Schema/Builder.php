@@ -239,7 +239,7 @@ class Builder
     public function hasColumn($table, $column)
     {
         return in_array(
-            strtolower($column), array_map('strtolower', $this->getColumnListing($table))
+            strtolower($column), array_map(strtolower(...), $this->getColumnListing($table))
         );
     }
 
@@ -252,7 +252,7 @@ class Builder
      */
     public function hasColumns($table, array $columns)
     {
-        $tableColumns = array_map('strtolower', $this->getColumnListing($table));
+        $tableColumns = array_map(strtolower(...), $this->getColumnListing($table));
 
         foreach ($columns as $column) {
             if (! in_array(strtolower($column), $tableColumns)) {

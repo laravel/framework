@@ -86,7 +86,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
         $factory = $this->container->make(ValidationFactory::class);
 
         if (method_exists($this, 'validator')) {
-            $validator = $this->container->call([$this, 'validator'], compact('factory'));
+            $validator = $this->container->call($this->validator(...), compact('factory'));
         } else {
             $validator = $this->createDefaultValidator($factory);
         }
@@ -150,7 +150,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
      */
     protected function validationRules()
     {
-        return method_exists($this, 'rules') ? $this->container->call([$this, 'rules']) : [];
+        return method_exists($this, 'rules') ? $this->container->call($this->rules(...)) : [];
     }
 
     /**
@@ -200,7 +200,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
     protected function passesAuthorization()
     {
         if (method_exists($this, 'authorize')) {
-            $result = $this->container->call([$this, 'authorize']);
+            $result = $this->container->call($this->authorize(...));
 
             return $result instanceof Response ? $result->authorize() : $result;
         }

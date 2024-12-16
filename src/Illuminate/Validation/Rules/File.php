@@ -277,7 +277,7 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
         $rules = array_merge($rules, $this->buildMimetypes());
 
         if (! empty($this->allowedExtensions)) {
-            $rules[] = 'extensions:'.implode(',', array_map('strtolower', $this->allowedExtensions));
+            $rules[] = 'extensions:'.implode(',', array_map(strtolower(...), $this->allowedExtensions));
         }
 
         $rules[] = match (true) {

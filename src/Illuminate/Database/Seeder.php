@@ -181,7 +181,7 @@ abstract class Seeder
         }
 
         $callback = fn () => isset($this->container)
-            ? $this->container->call([$this, 'run'], $parameters)
+            ? $this->container->call($this->run(...), $parameters)
             : $this->run(...$parameters);
 
         $uses = array_flip(class_uses_recursive(static::class));

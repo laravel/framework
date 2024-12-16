@@ -299,7 +299,7 @@ class RouteListCommand extends Command
      */
     protected function getColumns()
     {
-        return array_map('strtolower', $this->headers);
+        return array_map(strtolower(...), $this->headers);
     }
 
     /**
@@ -320,7 +320,7 @@ class RouteListCommand extends Command
             }
         }
 
-        return array_map('strtolower', $results);
+        return array_map(strtolower(...), $results);
     }
 
     /**

@@ -165,7 +165,7 @@ class RouteServiceProvider extends ServiceProvider
         if (! is_null($this->loadRoutesUsing)) {
             $this->app->call($this->loadRoutesUsing);
         } elseif (method_exists($this, 'map')) {
-            $this->app->call([$this, 'map']);
+            $this->app->call($this->map(...));
         }
     }
 

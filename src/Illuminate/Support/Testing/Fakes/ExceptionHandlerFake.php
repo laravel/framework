@@ -73,7 +73,7 @@ class ExceptionHandlerFake implements ExceptionHandler, Fake
 
         if (is_string($exception)) {
             Assert::assertTrue(
-                in_array($exception, array_map('get_class', $this->reported), true),
+                in_array($exception, array_map(get_class(...), $this->reported), true),
                 $message,
             );
 
@@ -135,7 +135,7 @@ class ExceptionHandlerFake implements ExceptionHandler, Fake
             $this->reported,
             sprintf(
                 'The following exceptions were reported: %s.',
-                implode(', ', array_map('get_class', $this->reported)),
+                implode(', ', array_map(get_class(...), $this->reported)),
             ),
         );
     }
