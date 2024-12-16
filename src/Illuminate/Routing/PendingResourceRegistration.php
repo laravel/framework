@@ -66,7 +66,7 @@ class PendingResourceRegistration
     /**
      * Set the methods the controller should apply to.
      *
-     * @param  list<string|\UnitEnum|\BackedEnum>|string|mixed  $methods
+     * @param  list<string|\UnitEnum|\BackedEnum>|\UnitEnum|\BackedEnum|string|mixed  $methods
      * @return \Illuminate\Routing\PendingResourceRegistration
      */
     public function only($methods)
@@ -82,7 +82,7 @@ class PendingResourceRegistration
     /**
      * Set the methods the controller should exclude.
      *
-     * @param  list<string|\UnitEnum|\BackedEnum>|string|mixed  $methods
+     * @param  list<string|\UnitEnum|\BackedEnum>|\UnitEnum|\BackedEnum|string|mixed  $methods
      * @return \Illuminate\Routing\PendingResourceRegistration
      */
     public function except($methods)
