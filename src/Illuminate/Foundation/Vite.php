@@ -487,20 +487,20 @@ class Vite implements Htmlable
                         ));
                 })
                 ->map(fn ($chunk) => (new Collection([
-                        ...$this->resolvePreloadTagAttributes(
-                            $chunk['src'] ?? null,
-                            $url = $this->assetPath("{$buildDirectory}/{$chunk['file']}"),
-                            $chunk,
-                            $manifest,
-                        ),
-                        'rel' => 'prefetch',
-                        'fetchpriority' => 'low',
-                        'href' => $url,
-                    ]))->reject(
-                        fn ($value) => in_array($value, [null, false], true)
-                    )->mapWithKeys(fn ($value, $key) => [
-                        $key = (is_int($key) ? $value : $key) => $value === true ? $key : $value,
-                    ])->all())
+                    ...$this->resolvePreloadTagAttributes(
+                        $chunk['src'] ?? null,
+                        $url = $this->assetPath("{$buildDirectory}/{$chunk['file']}"),
+                        $chunk,
+                        $manifest,
+                    ),
+                    'rel' => 'prefetch',
+                    'fetchpriority' => 'low',
+                    'href' => $url,
+                ]))->reject(
+                    fn ($value) => in_array($value, [null, false], true)
+                )->mapWithKeys(fn ($value, $key) => [
+                    $key = (is_int($key) ? $value : $key) => $value === true ? $key : $value,
+                ])->all())
                 ->reject(fn ($attributes) => isset($this->preloadedAssets[$attributes['href']])))
             ->unique('href')
             ->values()
