@@ -48,7 +48,7 @@ class DatabaseManager implements ConnectionResolverInterface
      *
      * @var array<string, array>
      */
-    protected $dynamicConnections = [];
+    protected $dynamicConnectionConfigurations = [];
 
     /**
      * The custom connection resolvers.
@@ -121,7 +121,7 @@ class DatabaseManager implements ConnectionResolverInterface
             $config['name'] = static::calculateDynamicConnectionName($config);
         }
 
-        $this->dynamicConnections[$config['name']] = $config;
+        $this->dynamicConnectionConfigurations[$config['name']] = $config;
 
         return $this->connectUsing($config['name'], $config, true);
     }
@@ -221,7 +221,7 @@ class DatabaseManager implements ConnectionResolverInterface
 
         $connections = $this->app['config']['database.connections'];
 
-        $config = $this->dynamicConnections[$name] ?? Arr::get($connections, $name);
+        $config = $this->dynamicConnectionConfigurations[$name] ?? Arr::get($connections, $name);
 
         if (is_null($config)) {
             throw new InvalidArgumentException("Database connection [{$name}] not configured.");
