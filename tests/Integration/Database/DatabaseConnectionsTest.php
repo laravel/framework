@@ -9,6 +9,7 @@ use Illuminate\Database\Events\ConnectionEstablished;
 use Illuminate\Database\SQLiteConnection;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Support\Facades\DB;
+use InvalidArgumentException;
 use RuntimeException;
 
 class DatabaseConnectionsTest extends DatabaseTestCase
@@ -133,5 +134,42 @@ class DatabaseConnectionsTest extends DatabaseTestCase
 
         DB::setTablePrefix('');
         $this->assertSame('', DB::getTablePrefix());
+    }
+
+    public function testDynamicConnectionDoesntFailOnReconnect()
+    {
+        $connection = DB::build([
+            'name' => 'projects',
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+        ]);
+
+        $this->expectNotToPerformAssertions();
+
+        try {
+            $connection->reconnect();
+        } catch (InvalidArgumentException $e) {
+            if ($e->getMessage() === 'Database connection [projects] not configured.') {
+                $this->fail('Dynamic connection should not throw an exception on reconnect.');
+            }
+        }
+    }
+
+    public function testDynamicConnectionWithNoNameDoesntFailOnReconnect()
+    {
+        $connection = DB::build([
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+        ]);
+
+        $this->expectNotToPerformAssertions();
+
+        try {
+            $connection->reconnect();
+        } catch (InvalidArgumentException $e) {
+            if ($e->getMessage() === 'Database connection [projects] not configured.') {
+                $this->fail('Dynamic connection should not throw an exception on reconnect.');
+            }
+        }
     }
 }
