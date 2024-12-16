@@ -12,7 +12,7 @@ class DatabaseTokenRepository implements TokenRepositoryInterface
 {
     /**
      * Create a new token repository instance.
-     * 
+     *
      * @param  int  $expires  The number of seconds a token should last.
      * @param  int  $throttle  Minimum number of seconds before re-redefining the token.
      */
