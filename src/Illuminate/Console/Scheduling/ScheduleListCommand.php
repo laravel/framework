@@ -24,6 +24,7 @@ class ScheduleListCommand extends Command
     protected $signature = 'schedule:list
         {--timezone= : The timezone that times should be displayed in}
         {--next : Sort the listed tasks by their next due date}
+        {--environment : Only show tasks for the current environment}
     ';
 
     /**
@@ -51,6 +52,10 @@ class ScheduleListCommand extends Command
     public function handle(Schedule $schedule)
     {
         $events = new Collection($schedule->events());
+
+        if ($this->option('environment')) {
+            $events = $events->filter->runsInEnvironment($this->laravel->environment());
+        }
 
         if ($events->isEmpty()) {
             $this->components->info('No scheduled tasks have been defined.');

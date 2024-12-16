@@ -99,6 +99,21 @@ class ScheduleListCommandTest extends TestCase
             ->expectsOutput('  0 0     1 1-12/3 *  php artisan foo:command .... Next Due: 3 months from now');
     }
 
+    public function testDisplayScheduleForEnvironment()
+    {
+        $this->schedule->command(FooCommand::class)->quarterly();
+        $this->schedule->command('inspire')->twiceDaily(14, 18)->environments(['local', 'production']);
+        $this->schedule->command('foobar')->everyMinute()->environments(['production']);
+
+        $this->app->detectEnvironment(fn () => 'local');
+
+        $this->artisan(ScheduleListCommand::class, ['--environment' => true])
+            ->assertSuccessful()
+            ->expectsOutputToContain('foo:command')
+            ->expectsOutputToContain('inspire')
+            ->doesntExpectOutputToContain('foobar');
+    }
+
     public function testDisplayScheduleInVerboseMode()
     {
         $this->schedule->command(FooCommand::class)->everyMinute();
