@@ -43,6 +43,13 @@ class DatabaseManager implements ConnectionResolverInterface
     protected $connections = [];
 
     /**
+     * Connection configuration for dynamic connections.
+     *
+     * @var array<string, \Illuminate\Database\Connection>
+     */
+    protected $dynamicConnections = [];
+
+    /**
      * The custom connection resolvers.
      *
      * @var array<string, callable>
@@ -109,11 +116,13 @@ class DatabaseManager implements ConnectionResolverInterface
      */
     public function build(array $config)
     {
-        return $this->connectUsing(
-            $config['name'] ?? 'ondemand',
-            $config,
-            true,
-        );
+        if (! isset($config['name'])) {
+            $config['name'] = 'dynamic_' . Str::uuid();
+        }
+
+        $this->dynamicConnections[$config['name']] = $config;
+
+        return $this->connectUsing($config['name'], $config,true);
     }
 
     /**
@@ -195,13 +204,14 @@ class DatabaseManager implements ConnectionResolverInterface
     protected function configuration($name)
     {
         $name = $name ?: $this->getDefaultConnection();
-
-        // To get the database connection configuration, we will just pull each of the
-        // connection configurations and get the configurations for the given name.
-        // If the configuration doesn't exist, we'll throw an exception and bail.
         $connections = $this->app['config']['database.connections'];
 
-        if (is_null($config = Arr::get($connections, $name))) {
+        // Attempt to find the config in dynamicConnections first,
+        // otherwise fallback to the regular connections config.
+        // If the configuration doesn't exist, we'll throw an exception and bail.
+        $config = $this->dynamicConnections[$name] ?? Arr::get($connections, $name);
+
+        if (is_null($config)) {
             throw new InvalidArgumentException("Database connection [{$name}] not configured.");
         }
 
