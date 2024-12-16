@@ -5,6 +5,7 @@ namespace Illuminate\Database;
 use Illuminate\Database\Connectors\ConnectionFactory;
 use Illuminate\Database\Events\ConnectionEstablished;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\ConfigurationUrlParser;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
@@ -43,9 +44,9 @@ class DatabaseManager implements ConnectionResolverInterface
     protected $connections = [];
 
     /**
-     * Connection configuration for dynamic connections.
+     * The dynamically configured (DB::build) connection configurations.
      *
-     * @var array<string, \Illuminate\Database\Connection>
+     * @var array<string, array>
      */
     protected $dynamicConnections = [];
 
@@ -117,12 +118,25 @@ class DatabaseManager implements ConnectionResolverInterface
     public function build(array $config)
     {
         if (! isset($config['name'])) {
-            $config['name'] = 'dynamic_'.Str::uuid();
+            $config['name'] = static::calculateDynamicConnectionName($config);
         }
 
         $this->dynamicConnections[$config['name']] = $config;
 
         return $this->connectUsing($config['name'], $config, true);
+    }
+
+    /**
+     * Calculate the dynamic connection name for an on-demand connection based on its configuration.
+     *
+     * @param  array  $config
+     * @return string
+     */
+    public static function calculateDynamicConnectionName(array $config)
+    {
+        return 'dynamic_'.md5((new Collection($config))->map(function ($value, $key) {
+            return $key.(is_string($value) || is_int($value) ? $value : '');
+        })->implode(''));
     }
 
     /**
@@ -204,11 +218,9 @@ class DatabaseManager implements ConnectionResolverInterface
     protected function configuration($name)
     {
         $name = $name ?: $this->getDefaultConnection();
+
         $connections = $this->app['config']['database.connections'];
 
-        // Attempt to find the config in dynamicConnections first,
-        // otherwise fallback to the regular connections config.
-        // If the configuration doesn't exist, we'll throw an exception and bail.
         $config = $this->dynamicConnections[$name] ?? Arr::get($connections, $name);
 
         if (is_null($config)) {

@@ -136,10 +136,28 @@ class DatabaseConnectionsTest extends DatabaseTestCase
         $this->assertSame('', DB::getTablePrefix());
     }
 
-    public function testDynamicConnectionFailsOnReconnect()
+    public function testDynamicConnectionDoesntFailOnReconnect()
     {
         $connection = DB::build([
             'name' => 'projects',
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+        ]);
+
+        $this->expectNotToPerformAssertions();
+
+        try {
+            $connection->reconnect();
+        } catch (InvalidArgumentException $e) {
+            if ($e->getMessage() === 'Database connection [projects] not configured.') {
+                $this->fail('Dynamic connection should not throw an exception on reconnect.');
+            }
+        }
+    }
+
+    public function testDynamicConnectionWithNoNameDoesntFailOnReconnect()
+    {
+        $connection = DB::build([
             'driver' => 'sqlite',
             'database' => ':memory:',
         ]);
