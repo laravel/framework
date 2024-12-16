@@ -2,9 +2,7 @@
 
 namespace Illuminate\Support\Defer;
 
-use ArrayAccess;
 use Closure;
-use Countable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\EnumeratesValues;
 
