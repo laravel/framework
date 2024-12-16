@@ -64,6 +64,17 @@ trait Dispatchable
     }
 
     /**
+     * Dispatch the job immediately with the given arguments.
+     *
+     * @param  mixed  ...$arguments
+     * @return mixed
+     */
+    public static function dispatchNow(...$arguments)
+    {
+        return app(Dispatcher::class)->dispatchNow(new static(...$arguments));
+    }
+
+    /**
      * Dispatch a command to its appropriate handler in the current process.
      *
      * Queueable jobs will be dispatched to the "sync" queue.
