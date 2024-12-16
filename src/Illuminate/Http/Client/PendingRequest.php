@@ -991,13 +991,12 @@ class PendingRequest
             $options[$this->bodyFormat] = $this->pendingBody;
         }
 
-        return (new Collection($options))->map(function ($value, $key) {
-            if ($key === 'json' && $value instanceof JsonSerializable) {
-                return $value;
-            }
-
-            return $value instanceof Arrayable ? $value->toArray() : $value;
-        })->all();
+        return (new Collection($options))
+            ->map(fn ($value, $key) => match (true) {
+                $key === 'json' && $value instanceof JsonSerializable => $value,
+                $value instanceof Arrayable => $value->toArray(),
+                default => $value,
+            })->all();
     }
 
     /**

@@ -24,12 +24,11 @@ class SetCacheHeaders
         }
 
         return (new Collection($options))
-            ->map(function ($value, $key) {
-                if (is_bool($value)) {
-                    return $value ? $key : null;
-                }
-
-                return is_int($key) ? $value : "{$key}={$value}";
+            ->map(fn ($value, $key) => match (true) {
+                $value === true => $key,
+                $value === false => null,
+                is_int($key) => $value,
+                default => "{$key}={$value}",
             })
             ->filter()
             ->map(fn ($value) => Str::finish($value, ';'))

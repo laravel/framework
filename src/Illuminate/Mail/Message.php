@@ -226,21 +226,14 @@ class Message
         if (is_array($address)) {
             $type = lcfirst($type);
 
-            $addresses = (new Collection($address))->map(function ($address, $key) {
-                if (is_string($key) && is_string($address)) {
-                    return new Address($key, $address);
-                }
-
-                if (is_array($address)) {
-                    return new Address($address['email'] ?? $address['address'], $address['name'] ?? null);
-                }
-
-                if (is_null($address)) {
-                    return new Address($key);
-                }
-
-                return $address;
-            })->all();
+            $addresses = (new Collection($address))
+                ->map(fn ($address, $key) => match (true) {
+                    is_string($key) && is_string($address) => new Address($key, $address),
+                    is_array($address) => new Address($address['email'] ?? $address['address'], $address['name'] ?? null),
+                    is_null($address) => new Address($key),
+                    default => $address,
+                })
+                ->all();
 
             $this->message->{"{$type}"}(...$addresses);
         } else {
