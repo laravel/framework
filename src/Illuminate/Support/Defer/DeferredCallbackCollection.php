@@ -5,8 +5,8 @@ namespace Illuminate\Support\Defer;
 use ArrayAccess;
 use Closure;
 use Countable;
-use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Traits\ForwardsCalls;
 
 /**
  * @method bool offsetExists(mixed $offset) Determine if the collection has a callback with the given key.
