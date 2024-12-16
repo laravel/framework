@@ -146,7 +146,9 @@ class EventServiceProvider extends ServiceProvider
     public function discoverEvents()
     {
         return (new Collection($this->discoverEventsWithin()))
-                    ->filter(is_dir(...))
+                    ->reject(function ($directory) {
+                        return ! is_dir($directory);
+                    })
                     ->reduce(fn ($discovered, $directory) => array_merge_recursive(
                         $discovered,
                         DiscoverEvents::within($directory, $this->eventDiscoveryBasePath())
