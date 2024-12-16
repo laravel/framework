@@ -10,6 +10,7 @@ use Illuminate\Database\Console\WipeCommand;
 /**
  * @method static \Illuminate\Database\Connection connection(string|null $name = null)
  * @method static \Illuminate\Database\ConnectionInterface build(array $config)
+ * @method static string calculateDynamicConnectionName(array $config)
  * @method static \Illuminate\Database\ConnectionInterface connectUsing(string $name, array $config, bool $force = false)
  * @method static void purge(string|null $name = null)
  * @method static void disconnect(string|null $name = null)
