@@ -800,8 +800,8 @@ class BusFake implements Fake, QueueingDispatcher
         return (new Collection($this->jobsToDispatch))
             ->filter(fn ($job) => $job instanceof Closure
                 ? $job($command)
-                : $job === get_class($command);
-            })->isNotEmpty();
+                : $job === get_class($command))
+            ->isNotEmpty();
     }
 
     /**
