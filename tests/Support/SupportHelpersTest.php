@@ -7,6 +7,7 @@ use ArrayIterator;
 use Countable;
 use Error;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Env;
 use Illuminate\Support\Optional;
 use Illuminate\Support\Sleep;
@@ -73,6 +74,18 @@ class SupportHelpersTest extends TestCase
 
         $object = new SupportTestCountable();
         $this->assertTrue(blank($object));
+    }
+
+    public function testBlankDoesntJsonSerializeModels()
+    {
+        $model = new class extends Model {
+            public function jsonSerialize(): mixed
+            {
+                throw new RuntimeException('Model should not be serialized');
+            }
+        };
+
+        $this->assertFalse(blank($model));
     }
 
     public function testClassBasename()
