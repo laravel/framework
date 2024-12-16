@@ -5,6 +5,8 @@ namespace Illuminate\Routing;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Traits\Macroable;
 
+use function Illuminate\Support\enum_value;
+
 class PendingResourceRegistration
 {
     use CreatesRegularExpressionRouteConstraints, Macroable;
@@ -64,12 +66,15 @@ class PendingResourceRegistration
     /**
      * Set the methods the controller should apply to.
      *
-     * @param  array|string|mixed  $methods
+     * @param  list<string|\UnitEnum|\BackedEnum>|string|mixed  $methods
      * @return \Illuminate\Routing\PendingResourceRegistration
      */
     public function only($methods)
     {
-        $this->options['only'] = is_array($methods) ? $methods : func_get_args();
+        $this->options['only'] = array_map(
+            enum_value(...),
+            is_array($methods) ? $methods : func_get_args(),
+        );
 
         return $this;
     }
@@ -77,12 +82,15 @@ class PendingResourceRegistration
     /**
      * Set the methods the controller should exclude.
      *
-     * @param  array|string|mixed  $methods
+     * @param  list<string|\UnitEnum|\BackedEnum>|string|mixed  $methods
      * @return \Illuminate\Routing\PendingResourceRegistration
      */
     public function except($methods)
     {
-        $this->options['except'] = is_array($methods) ? $methods : func_get_args();
+        $this->options['except'] = array_map(
+            enum_value(...),
+            is_array($methods) ? $methods : func_get_args(),
+        );
 
         return $this;
     }
