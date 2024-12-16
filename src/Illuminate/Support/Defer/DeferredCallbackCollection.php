@@ -89,6 +89,38 @@ class DeferredCallbackCollection implements ArrayAccess, Countable
     }
 
     /**
+     * Filter the callbacks in the collection.
+     *
+     * @param  (callable(mixed): bool)  $callback
+     * @return $this
+     */
+    public function filter(callable $callback): self
+    {
+        $this->callbacks = (new Collection($this->callbacks))
+            ->filter($callback)
+            ->values()
+            ->all();
+
+        return $this;
+    }
+
+    /**
+     * Filter the callbacks in the collection.
+     *
+     * @param  (callable(mixed): bool)  $callback
+     * @return $this
+     */
+    public function reject(callable $callback): self
+    {
+        $this->callbacks = (new Collection($this->callbacks))
+            ->reject($callback)
+            ->values()
+            ->all();
+
+        return $this;
+    }
+
+    /**
      * Determine if the collection has a callback with the given key.
      *
      * @param  mixed  $offset
