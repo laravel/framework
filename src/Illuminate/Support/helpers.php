@@ -2,6 +2,7 @@
 
 use Illuminate\Contracts\Support\DeferringDisplayableValue;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Env;
 use Illuminate\Support\Fluent;
@@ -58,6 +59,10 @@ if (! function_exists('blank')) {
         }
 
         if (is_numeric($value) || is_bool($value)) {
+            return false;
+        }
+
+        if ($value instanceof Model) {
             return false;
         }
 
