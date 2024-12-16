@@ -95,7 +95,7 @@ trait DatabaseTruncation
                 function (Collection $tables) use ($connection, $name) {
                     $exceptTables = $this->exceptTables($connection, $name);
 
-                    return $tables->filter(fn (array $table) => ! $this->tableExistsIn($table, $exceptTables));
+                    return $tables->reject(fn (array $table) => $this->tableExistsIn($table, $exceptTables));
                 }
             )
             ->each(function (array $table) use ($connection) {
