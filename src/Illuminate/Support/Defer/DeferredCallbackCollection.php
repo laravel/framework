@@ -37,7 +37,7 @@ class DeferredCallbackCollection extends Collection
                 rescue($callback);
             }
 
-            unset($this->callbacks[$index]);
+            parent::offsetUnset($index);
         }
     }
 
@@ -48,7 +48,7 @@ class DeferredCallbackCollection extends Collection
      */
     protected function forgetDuplicates(): self
     {
-        $this->callbacks = $this
+        $this->items = $this
                             ->reverse()
                             ->unique(fn ($c) => $c->name)
                             ->reverse()
