@@ -8,9 +8,15 @@ use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Queue;
 use Orchestra\Testbench\Attributes\WithMigration;
 
 #[WithMigration]
@@ -130,6 +136,25 @@ class UniqueJobTest extends QueueTestCase
         $this->assertTrue($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
     }
 
+    public function testLockIsReleasedOnModelNotFoundException()
+    {
+        UniqueTestFailJobWithSerializedModels::$handled = false;
+        $user = User::factoryCreate();
+        $user->delete();
+        $this->expectException(ModelNotFoundException::class);
+
+        try {
+            dispatch($job = (new UniqueTestFailJobWithSerializedModels($user)));
+            $this->runQueueWorkerCommand(['--once' => true]);
+            Queue::assertPushed(UniqueTestFailJobWithSerializedModels::class, 1);
+        } finally {
+
+            $this->assertFalse($job::$handled);
+            $this->assertModelMissing($user);
+            $this->assertTrue($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
+        }
+    }
+
     protected function getLockKey($job)
     {
         return 'laravel_unique_job:'.(is_string($job) ? $job : get_class($job)).':';
@@ -184,4 +209,41 @@ class UniqueTestRetryJob extends UniqueTestFailJob
 class UniqueUntilStartTestJob extends UniqueTestJob implements ShouldBeUniqueUntilProcessing
 {
     public $tries = 2;
+}
+
+class UniqueTestFailJobWithSerializedModels implements ShouldBeUnique, ShouldQueue
+{
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
+    public $tries = 1;
+
+    public static $handled = false;
+
+    public User $user;
+
+    public function __construct(User $user)
+    {
+        $this->user = $user;
+    }
+
+    public function handle()
+    {
+        static::$handled = true;
+    }
+}
+
+class User extends Model
+{
+    use HasFactory;
+
+    protected $guarded = [];
+
+    public static function factoryCreate()
+    {
+        return self::create([
+            'name' => 'test user',
+            'email' => 'testUser@test.com',
+            'password' => Hash::make('password'),
+        ]);
+    }
 }
