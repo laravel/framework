@@ -16,8 +16,8 @@ class CommandStarting
      * @return void
      */
     public function __construct(
-        public string          $command,
-        public InputInterface  $input,
+        public string $command,
+        public InputInterface $input,
         public OutputInterface $output,
     ) {
     }

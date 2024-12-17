@@ -17,10 +17,10 @@ class CommandFinished
      * @return void
      */
     public function __construct(
-        public string          $command,
-        public InputInterface  $input,
+        public string $command,
+        public InputInterface $input,
         public OutputInterface $output,
-        public int             $exitCode,
+        public int $exitCode,
     ) {
     }
 }
