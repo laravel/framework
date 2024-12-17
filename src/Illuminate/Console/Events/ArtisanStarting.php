@@ -2,6 +2,8 @@
 
 namespace Illuminate\Console\Events;
 
+use Illuminate\Console\Application;
+
 class ArtisanStarting
 {
     /**
@@ -11,7 +13,7 @@ class ArtisanStarting
      * @return void
      */
     public function __construct(
-        public $artisan,
+        public Application $artisan,
     ) {
     }
 }
