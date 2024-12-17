@@ -62,7 +62,7 @@ class SupportFluentTest extends TestCase
         $this->assertNull($fluent->foo);
     }
 
-    public function setSetMethodSetsAttribute()
+    public function testSetMethodSetsAttribute()
     {
         $fluent = new Fluent;
 
@@ -74,7 +74,7 @@ class SupportFluentTest extends TestCase
         $this->assertSame('Taylor', $fluent->name);
         $this->assertTrue($fluent->developer);
         $this->assertSame(25, $fluent->posts);
-        $this->assertSame(['color' => 'silver'], $fluent->foo['computer']);
+        $this->assertSame(['color' => 'silver'], $fluent->computer);
     }
 
     public function testArrayAccessToAttributes()
