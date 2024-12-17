@@ -7,10 +7,13 @@ use Illuminate\Auth\Access\Response;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Debug\ShouldntReport;
 use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Tests\Integration\Database\Fixtures\User;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Process\PhpProcess;
 use Throwable;
 
@@ -236,5 +239,19 @@ EOF, __DIR__.'/../../../', ['APP_RUNNING_IN_CONSOLE' => true]);
         $this->assertSame('Undefined variable $foo (View: '.__DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'MalformedErrorViews'.DIRECTORY_SEPARATOR.'errors'.DIRECTORY_SEPARATOR.'404.blade.php)', $reported[0]->getMessage());
         $this->assertNotNull($response);
         $response->assertStatus(500);
+    }
+
+    public function test_it_can_set_a_custom_model_not_found_handler()
+    {
+        $this->app[ExceptionHandler::class]->setModelNotFoundCallback(function(ModelNotFoundException $exception) {
+            return new NotFoundHttpException("my message", $exception);
+        });
+
+        Route::get('/foo', fn () => throw (new ModelNotFoundException)->setModel(User::class, [1,2,3])
+        );
+
+        $response = $this->getJson('/foo');
+
+        $this->assertEqualsCanonicalizing(['message' => 'my message'], $response->json());
     }
 }

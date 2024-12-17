@@ -226,4 +226,17 @@ class Exceptions
 
         return $this;
     }
+
+    /**
+     * Set a callback to build the resulting exception for a ModelNotFoundException.
+     *
+     * @param  \Closure(\Illuminate\Database\Eloquent\ModelNotFoundException):  \Throwable  $callback
+     * @return $this
+     */
+    public function mapModelNotFoundException(\Closure $callback)
+    {
+        $this->handler->setModelNotFoundCallback($callback);
+
+        return $this;
+    }
 }

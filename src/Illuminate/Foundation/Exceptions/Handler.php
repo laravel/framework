@@ -181,6 +181,13 @@ class Handler implements ExceptionHandlerContract
     protected $reportedExceptionMap;
 
     /**
+     * Function to handle mapping a ModelNotFoundException.
+     *
+     * @var \Closure(\Illuminate\Database\Eloquent\ModelNotFoundException): \Throwable
+     */
+    protected $modelNotFoundResponseCallback;
+
+    /**
      * Create a new exception handler instance.
      *
      * @param  \Illuminate\Contracts\Container\Container  $container
@@ -633,7 +640,7 @@ class Handler implements ExceptionHandlerContract
     {
         return match (true) {
             $e instanceof BackedEnumCaseNotFoundException => new NotFoundHttpException($e->getMessage(), $e),
-            $e instanceof ModelNotFoundException => new NotFoundHttpException($e->getMessage(), $e),
+            $e instanceof ModelNotFoundException => $this->mapModelNotFoundException($e),
             $e instanceof AuthorizationException && $e->hasStatus() => new HttpException(
                 $e->status(), $e->response()?->message() ?: (Response::$statusTexts[$e->status()] ?? 'Whoops, looks like something went wrong.'), $e
             ),
@@ -1071,5 +1078,33 @@ class Handler implements ExceptionHandlerContract
     protected function newLogger()
     {
         return $this->container->make(LoggerInterface::class);
+    }
+
+    /**
+     * Set a callback to build the resulting exception for a ModelNotFoundException.
+     *
+     * @param  \Closure(\Illuminate\Database\Eloquent\ModelNotFoundException):  \Throwable   $callback
+     * @return $this
+     */
+    public function setModelNotFoundCallback($callback)
+    {
+        $this->modelNotFoundResponseCallback = $callback;
+
+        return $this;
+    }
+
+    /**
+     * Build a Throwable from a ModelNotFoundException.
+     *
+     * @param  ModelNotFoundException  $e
+     * @return \Throwable
+     */
+    protected function mapModelNotFoundException($e)
+    {
+        if (isset($this->modelNotFoundResponseCallback)) {
+            return call_user_func($this->modelNotFoundResponseCallback, $e);
+        }
+
+        return new NotFoundHttpException($e->getMessage(), $e);
     }
 }
