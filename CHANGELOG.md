@@ -1,6 +1,15 @@
 # Release Notes for 11.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v11.36.0...11.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v11.36.1...11.x)
+
+## [v11.36.1](https://github.com/laravel/framework/compare/v11.36.0...v11.36.1) - 2024-12-17
+
+* Once Remember Null Values by [@dbpolito](https://github.com/dbpolito) in https://github.com/laravel/framework/pull/53949
+* [11.x] Add wildcard directory discovery to the EventServiceProvider by [@jared-cannon](https://github.com/jared-cannon) in https://github.com/laravel/framework/pull/53932
+* [11.x] Add `getJob()` method to `PendingDispatch` class + Introduced tests by [@pascalbaljet](https://github.com/pascalbaljet) in https://github.com/laravel/framework/pull/53951
+* Avoid writing multiple keys when using redis in cluster mode by [@bentleyo](https://github.com/bentleyo) in https://github.com/laravel/framework/pull/53940
+* Revert "[11.x] fix: allows injection using multiple interfaces with the same concrete implementation" by [@taylorotwell](https://github.com/taylorotwell) in https://github.com/laravel/framework/pull/53955
+* Revert "[11.x] No need to redeclare variables" by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/53954
 
 ## [v11.36.0](https://github.com/laravel/framework/compare/v11.35.1...v11.36.0) - 2024-12-17
 
