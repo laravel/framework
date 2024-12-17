@@ -295,49 +295,50 @@ class ServeCommand extends Command
                     return;
                 }
 
-                $requestPort = static::getRequestPortFromLine($line);
+                if ($stringable->contains([' Accepted', ' Closing'])) {
+                    // Only attempt to extract the request port if the line contains the necessary keywords.
+                    $requestPort = null;
 
-                if ($stringable->contains(' Accepted')) {
-                    $this->requestsPool[$requestPort] = [
-                        $this->getDateFromLine($line),
-                        $this->requestsPool[$requestPort][1] ?? false,
-                        microtime(true),
-                    ];
-                } elseif ($stringable->contains([' [200]: GET '])) {
-                    $this->requestsPool[$requestPort][1] = trim(explode('[200]: GET', $line)[1]);
-                } elseif ($stringable->contains('URI:')) {
-                    $this->requestsPool[$requestPort][1] = trim(explode('URI: ', $line)[1]);
-                } elseif ($stringable->contains(' Closing')) {
-                    $requestPort = static::getRequestPortFromLine($line);
+                    if ($stringable->contains(' Accepted') || $stringable->contains(' Closing')) {
+                        $requestPort = static::getRequestPortFromLine($line);
+                    }
 
-                    if (empty($this->requestsPool[$requestPort])) {
+                    if ($stringable->contains(' Accepted') && $requestPort !== null) {
                         $this->requestsPool[$requestPort] = [
                             $this->getDateFromLine($line),
-                            false,
+                            $this->requestsPool[$requestPort][1] ?? false,
                             microtime(true),
                         ];
+                    } elseif ($stringable->contains([' Closing']) && $requestPort !== null) {
+                        if (empty($this->requestsPool[$requestPort])) {
+                            $this->requestsPool[$requestPort] = [
+                                $this->getDateFromLine($line),
+                                false,
+                                microtime(true),
+                            ];
+                        }
+
+                        [$startDate, $file, $startMicrotime] = $this->requestsPool[$requestPort];
+
+                        $formattedStartedAt = $startDate->format('Y-m-d H:i:s');
+
+                        unset($this->requestsPool[$requestPort]);
+
+                        [$date, $time] = explode(' ', $formattedStartedAt);
+
+                        $this->output->write("  <fg=gray>$date</> $time");
+
+                        $runTime = $this->runTimeForHumans($startMicrotime);
+
+                        if ($file) {
+                            $this->output->write($file = " $file");
+                        }
+
+                        $dots = max(terminal()->width() - mb_strlen($formattedStartedAt) - mb_strlen($file) - mb_strlen($runTime) - 9, 0);
+
+                        $this->output->write(' '.str_repeat('<fg=gray>.</>', $dots));
+                        $this->output->writeln(" <fg=gray>~ {$runTime}</>");
                     }
-
-                    [$startDate, $file, $startMicrotime] = $this->requestsPool[$requestPort];
-
-                    $formattedStartedAt = $startDate->format('Y-m-d H:i:s');
-
-                    unset($this->requestsPool[$requestPort]);
-
-                    [$date, $time] = explode(' ', $formattedStartedAt);
-
-                    $this->output->write("  <fg=gray>$date</> $time");
-
-                    $runTime = $this->runTimeForHumans($startMicrotime);
-
-                    if ($file) {
-                        $this->output->write($file = " $file");
-                    }
-
-                    $dots = max(terminal()->width() - mb_strlen($formattedStartedAt) - mb_strlen($file) - mb_strlen($runTime) - 9, 0);
-
-                    $this->output->write(' '.str_repeat('<fg=gray>.</>', $dots));
-                    $this->output->writeln(" <fg=gray>~ {$runTime}</>");
                 } elseif ($stringable->contains(['Closed without sending a request', 'Failed to poll event'])) {
                     // ...
                 } elseif (! empty($line)) {
