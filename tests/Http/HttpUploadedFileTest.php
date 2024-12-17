@@ -2,12 +2,9 @@
 
 namespace Illuminate\Tests\Http;
 
-use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use PHPUnit\Framework\TestCase;
-
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
-
 
 class HttpUploadedFileTest extends TestCase
 {
@@ -26,7 +23,6 @@ class HttpUploadedFileTest extends TestCase
 
     public function testUploadedFileInRequestContainsOriginalPathAndName()
     {
-
         $symfonyFile = new SymfonyUploadedFile(__FILE__, '');
         $this->assertSame('', $symfonyFile->getClientOriginalName());
         $this->assertSame('', $symfonyFile->getClientOriginalPath());
@@ -62,13 +58,11 @@ class HttpUploadedFileTest extends TestCase
         $this->assertSame('test.txt', $file->getClientOriginalName());
         $this->assertSame('/foo/bar/test.txt', $file->getClientOriginalPath());
 
-
         $symfonyFile = new SymfonyUploadedFile(__FILE__, 'file:\\foo\\test.txt');
         $this->assertSame('test.txt', $symfonyFile->getClientOriginalName());
         $this->assertSame('file:/foo/test.txt', $symfonyFile->getClientOriginalPath());
         $file = UploadedFile::createFromBase($symfonyFile);
         $this->assertSame('test.txt', $file->getClientOriginalName());
         $this->assertSame('file:/foo/test.txt', $file->getClientOriginalPath());
-
     }
 }
