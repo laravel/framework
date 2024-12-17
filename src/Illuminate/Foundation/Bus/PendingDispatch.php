@@ -162,16 +162,6 @@ class PendingDispatch
     }
 
     /**
-     * Get the underlying job instance.
-     *
-     * @var mixed
-     */
-    public function getJob()
-    {
-        return $this->job;
-    }
-
-    /**
      * Determine if the job should be dispatched.
      *
      * @return bool
@@ -184,6 +174,16 @@ class PendingDispatch
 
         return (new UniqueLock(Container::getInstance()->make(Cache::class)))
                     ->acquire($this->job);
+    }
+
+    /**
+     * Get the underlying job instance.
+     *
+     * @var mixed
+     */
+    public function getJob()
+    {
+        return $this->job;
     }
 
     /**
