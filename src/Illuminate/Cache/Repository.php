@@ -273,7 +273,9 @@ class Repository implements ArrayAccess, CacheContract
             return $this->deleteMultiple(array_keys($values));
         }
 
-        $this->event(new WritingManyKeys($this->getName(), array_keys($values), array_values($values), $seconds));
+        if (count($values) > 0) {
+            $this->event(new WritingManyKeys($this->getName(), array_keys($values), array_values($values), $seconds));
+        }
 
         $result = $this->store->putMany($values, $seconds);
 
