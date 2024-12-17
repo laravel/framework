@@ -8,6 +8,7 @@ use DateInterval;
 use DateTime;
 use DateTimeImmutable;
 use Illuminate\Cache\ArrayStore;
+use Illuminate\Cache\Events\WritingManyKeys;
 use Illuminate\Cache\FileStore;
 use Illuminate\Cache\RedisStore;
 use Illuminate\Cache\Repository;
@@ -200,6 +201,13 @@ class CacheRepositoryTest extends TestCase
         $repo->getStore()->shouldReceive('forever')->with('foo', 'bar')->andReturn(true);
         $repo->getStore()->shouldReceive('forever')->with('bar', 'baz')->andReturn(true);
         $this->assertTrue($repo->putMany(['foo' => 'bar', 'bar' => 'baz']));
+    }
+
+    public function testPutManyWithEmptyArray()
+    {
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('putMany')->with([], 60)->andReturn(false);
+        $this->assertFalse($repo->putMany([], 60));
     }
 
     public function testAddWithStoreFailureReturnsFalse()
