@@ -93,7 +93,7 @@ trait HasUniqueStringIds
     }
 
     /**
-     * Throw an exception when there the key isn't valid.
+     * Throw an exception for the given invalid unique ID.
      *
      * @param  mixed  $value
      * @param  string|null  $field
