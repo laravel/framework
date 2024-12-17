@@ -54,6 +54,20 @@ class Fluent implements Arrayable, ArrayAccess, Jsonable, JsonSerializable
     }
 
     /**
+     * Set an attribute on the fluent instance using "dot" notation.
+     *
+     * @param  TKey  $key
+     * @param  TValue  $value
+     * @return $this
+     */
+    public function set($key, $value)
+    {
+        data_set($this->attributes, $key, $value);
+
+        return $this;
+    }
+
+    /**
      * Get an attribute from the fluent instance.
      *
      * @param  string  $key
