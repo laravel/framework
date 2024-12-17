@@ -1,6 +1,34 @@
 # Release Notes for 11.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v11.35.1...11.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v11.36.0...11.x)
+
+## [v11.36.0](https://github.com/laravel/framework/compare/v11.35.1...v11.36.0) - 2024-12-17
+
+* [11.x] Update `config/mail.php` with supported configuration by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/53874
+* [11.x] Allows `enum_value()` to be use in standalone `illuminate/collections` by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/53871
+* [11.x] `Uri` and `UriQueryString` implement `Stringable` by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/53873
+* [11.x] Prefer `new Stringable` over `Str::of` and `str()` by [@lucasmichot](https://github.com/lucasmichot) in https://github.com/laravel/framework/pull/53883
+* [11.x] No need to redeclare variables by [@lucasmichot](https://github.com/lucasmichot) in https://github.com/laravel/framework/pull/53887
+* [11.x] Add PHP 8.4 with herd to passthrough variables by [@lucasmichot](https://github.com/lucasmichot) in https://github.com/laravel/framework/pull/53885
+* Add new `Uri` class to default, global aliases by [@jasonmccreary](https://github.com/jasonmccreary) in https://github.com/laravel/framework/pull/53884
+* [11.x] Fix attribute mutator access in `loadMissing` by [@SychO9](https://github.com/SychO9) in https://github.com/laravel/framework/pull/53879
+* [11.x] Fix `numericAggregate`  on eloquent builder by [@AmirRezaM75](https://github.com/AmirRezaM75) in https://github.com/laravel/framework/pull/53880
+* [11.x] Prefer `new Fluent` over `fluent()` helper by [@lucasmichot](https://github.com/lucasmichot) in https://github.com/laravel/framework/pull/53890
+* Patch by [@angelej](https://github.com/angelej) in https://github.com/laravel/framework/pull/53869
+* [11.x] `Collection::wrap` by [@lucasmichot](https://github.com/lucasmichot) in https://github.com/laravel/framework/pull/53891
+* [11.x] Bump minimum league/commonmark by [@ah-rahimi](https://github.com/ah-rahimi) in https://github.com/laravel/framework/pull/53899
+* [11.x] `Collection::range` by [@lucasmichot](https://github.com/lucasmichot) in https://github.com/laravel/framework/pull/53895
+* [11.x] Added an event that reports files being deleted when calling the `schema:dump --prune` command by [@andrey-helldar](https://github.com/andrey-helldar) in https://github.com/laravel/framework/pull/53870
+* [11.x] fix: allows injection using multiple interfaces with the same concrete implementation by [@jamiethorpe](https://github.com/jamiethorpe) in https://github.com/laravel/framework/pull/53275
+* [11.x] Early return in Factory::modelName() by [@shaedrich](https://github.com/shaedrich) in https://github.com/laravel/framework/pull/53912
+* [11.x] Prevent `blank` Helper from Serializing Eloquent Models by [@SanderMuller](https://github.com/SanderMuller) in https://github.com/laravel/framework/pull/53911
+* [11.x] Add word-break to mail links by [@seblavoie](https://github.com/seblavoie) in https://github.com/laravel/framework/pull/53906
+* Preserve dynamic database connections on reconnect by [@nickakitch](https://github.com/nickakitch) in https://github.com/laravel/framework/pull/53914
+* Fix mutexName inconsistency caused by different PHP binary paths on multiple servers by [@waska14](https://github.com/waska14) in https://github.com/laravel/framework/pull/53811
+* [11.x] Add `Fluent::set` method by [@stevebauman](https://github.com/stevebauman) in https://github.com/laravel/framework/pull/53946
+* [11.x] Fix inspecting columns of raw indexes by [@hafezdivandari](https://github.com/hafezdivandari) in https://github.com/laravel/framework/pull/53945
+* [11.x] Allow easier overriding of the exception thrown by invalid ID in route binding by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/53944
+* [11.x] Fix client path value in file uploads by [@gyaaniguy](https://github.com/gyaaniguy) in https://github.com/laravel/framework/pull/53941
 
 ## [v11.35.1](https://github.com/laravel/framework/compare/v11.35.0...v11.35.1) - 2024-12-12
 
