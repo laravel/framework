@@ -1083,7 +1083,7 @@ class Handler implements ExceptionHandlerContract
     /**
      * Set a callback to build the resulting exception for a ModelNotFoundException.
      *
-     * @param  string|\Closure(\Illuminate\Database\Eloquent\ModelNotFoundException):  \Throwable   $callback
+     * @param  string|null|\Closure(\Illuminate\Database\Eloquent\ModelNotFoundException):  \Throwable   $callback
      * @return $this
      */
     public function setModelNotFoundCallback($callback)
