@@ -8,7 +8,6 @@ use DateInterval;
 use DateTime;
 use DateTimeImmutable;
 use Illuminate\Cache\ArrayStore;
-use Illuminate\Cache\Events\WritingManyKeys;
 use Illuminate\Cache\FileStore;
 use Illuminate\Cache\RedisStore;
 use Illuminate\Cache\Repository;
