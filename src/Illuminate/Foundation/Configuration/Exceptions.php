@@ -23,7 +23,7 @@ class Exceptions
      * Register a reportable callback.
      *
      * @param  callable  $using
-     * @return \Illuminate\Foundation\Exceptions\ReportableHandler
+     * @return $this
      */
     public function report(callable $using)
     {
@@ -34,7 +34,7 @@ class Exceptions
      * Register a reportable callback.
      *
      * @param  callable  $reportUsing
-     * @return \Illuminate\Foundation\Exceptions\ReportableHandler
+     * @return $this
      */
     public function reportable(callable $reportUsing)
     {
