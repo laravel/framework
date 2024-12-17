@@ -1168,7 +1168,8 @@ class Grammar extends BaseGrammar
             return "insert into {$table} default values";
         }
 
-        if (! is_array(reset($values))) {
+        reset($values);
+        if (! array_is_list($values)) {
             $values = [$values];
         }
 
