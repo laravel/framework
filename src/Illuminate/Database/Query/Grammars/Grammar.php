@@ -1171,7 +1171,7 @@ class Grammar extends BaseGrammar
 
         if (! array_is_list($values)) {
             $arrayKeysCollection = new Collection(array_keys($values));
-            $someKeyIsString = $arrayKeysCollection->some(fn (string|int $key) => !is_numeric($key));
+            $someKeyIsString = $arrayKeysCollection->some(fn (string|int $key) => ! is_numeric($key));
 
             $values = $someKeyIsString ? [$values] : array_values($values);
         }
