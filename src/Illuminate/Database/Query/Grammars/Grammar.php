@@ -1168,7 +1168,6 @@ class Grammar extends BaseGrammar
             return "insert into {$table} default values";
         }
 
-
         if (! array_is_list($values)) {
             $arrayKeysCollection = new Collection(array_keys($values));
             $someKeyIsString = $arrayKeysCollection->some(fn (string|int $key) => ! is_numeric($key));
