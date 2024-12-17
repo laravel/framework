@@ -27,7 +27,7 @@ class Exceptions
      */
     public function report(callable $using)
     {
-        return $this->handler->reportable($using);
+        return $this->reportable($using);
     }
 
     /**
