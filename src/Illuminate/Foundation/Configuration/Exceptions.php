@@ -233,7 +233,7 @@ class Exceptions
      * @param  \Closure(\Illuminate\Database\Eloquent\ModelNotFoundException):  \Throwable  $callback
      * @return $this
      */
-    public function mapModelNotFoundException(\Closure $callback)
+    public function mapModelNotFoundException(\Closure|string $callback)
     {
         $this->handler->setModelNotFoundCallback($callback);
 

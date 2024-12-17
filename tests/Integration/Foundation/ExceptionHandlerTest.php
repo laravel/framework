@@ -241,7 +241,7 @@ EOF, __DIR__.'/../../../', ['APP_RUNNING_IN_CONSOLE' => true]);
         $response->assertStatus(500);
     }
 
-    public function test_it_can_set_a_custom_model_not_found_handler()
+    public function test_it_can_set_a_custom_model_not_found_handler_as_callback()
     {
         $this->app[ExceptionHandler::class]->setModelNotFoundCallback(function(ModelNotFoundException $exception) {
             return new NotFoundHttpException("my message", $exception);
@@ -253,5 +253,17 @@ EOF, __DIR__.'/../../../', ['APP_RUNNING_IN_CONSOLE' => true]);
         $response = $this->getJson('/foo');
 
         $this->assertEqualsCanonicalizing(['message' => 'my message'], $response->json());
+    }
+
+    public function test_it_can_set_a_custom_model_not_found_handler_as_string()
+    {
+        $this->app[ExceptionHandler::class]->setModelNotFoundCallback('Not found!');
+
+        Route::get('/foo', fn () => throw (new ModelNotFoundException)->setModel(User::class, [1,2,3])
+        );
+
+        $response = $this->getJson('/foo');
+
+        $this->assertEqualsCanonicalizing(['message' => 'Not found!'], $response->json());
     }
 }
