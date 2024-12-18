@@ -83,7 +83,7 @@ class MigratorTest extends TestCase
 
         $this->expectTwoColumnDetail('CreatePeopleTable');
         $this->expectBulletList([
-            'create table "people" ("id" integer primary key autoincrement not null, "name" varchar not null, "email" varchar not null, "password" varchar not null, "remember_token" varchar, "created_at" datetime, "updated_at" datetime)',
+            'create table "people" ("id" integer primary key not null, "name" varchar not null, "email" varchar not null, "password" varchar not null, "remember_token" varchar, "created_at" datetime, "updated_at" datetime)',
             'create unique index "people_email_unique" on "people" ("email")',
         ]);
 
@@ -183,7 +183,7 @@ class MigratorTest extends TestCase
         $this->expectInfo('Running migrations.');
         $this->expectTwoColumnDetail('DynamicContentIsShown');
         $this->expectBulletList([
-            'create table "blogs" ("id" integer primary key autoincrement not null, "url" varchar, "name" varchar)',
+            'create table "blogs" ("id" integer primary key not null, "url" varchar, "name" varchar)',
             'insert into "blogs" ("url") values (\'www.janedoe.com\'), (\'www.johndoe.com\')',
             'ALTER TABLE \'pseudo_table_name\' MODIFY \'column_name\' VARCHAR(191)',
             'select * from "people"',
@@ -216,7 +216,7 @@ class MigratorTest extends TestCase
         $this->expectInfo('Running migrations.');
         $this->expectTwoColumnDetail('DynamicContentNotShown');
         $this->expectBulletList([
-            'create table "blogs" ("id" integer primary key autoincrement not null, "url" varchar, "name" varchar)',
+            'create table "blogs" ("id" integer primary key not null, "url" varchar, "name" varchar)',
             'insert into "blogs" ("url") values (\'www.janedoe.com\'), (\'www.johndoe.com\')',
             'ALTER TABLE \'pseudo_table_name\' MODIFY \'column_name\' VARCHAR(191)',
             'select * from "people"',
