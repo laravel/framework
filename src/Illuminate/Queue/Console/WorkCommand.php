@@ -149,6 +149,7 @@ class WorkCommand extends Command
             ->{$this->option('once') ? 'runNextJob' : 'daemon'}(
                 $connection, $queue, $this->gatherWorkerOptions()
             );
+
         return enum_value($exitCode);
     }
 
