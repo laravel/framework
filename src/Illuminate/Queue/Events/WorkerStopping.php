@@ -4,7 +4,7 @@ namespace Illuminate\Queue\Events;
 
 class WorkerStopping
 {
-    public WorkerExitCode;
+    public WorkerExitCode $status;
 
     /**
      * Create a new event instance.
