@@ -19,6 +19,6 @@ class WorkerStopping
         $status = 0,
         public $workerOptions = null
     ) {
-        $this->status = WorkerExitCode::from($status);
+        $this->status = $status instanceof WorkerExitCode ? $status : WorkerExitCode::from($status);
     }
 }
