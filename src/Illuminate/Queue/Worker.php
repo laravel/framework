@@ -781,7 +781,8 @@ class Worker
      */
     public function kill($status = 0, $options = null)
     {
-        $this->events->dispatch(new WorkerStopping(enum_value($status), $options));
+        $status = enum_value($status);
+        $this->events->dispatch(new WorkerStopping($status, $options));
 
         if (extension_loaded('posix')) {
             posix_kill(getmypid(), SIGKILL);
