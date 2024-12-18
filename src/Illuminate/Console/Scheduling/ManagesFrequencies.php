@@ -13,7 +13,7 @@ trait ManagesFrequencies
     /**
      * The Cron expression representing the event's frequency.
      *
-     * @param  string|\Illuminate\Console\Enums\ScheduleOn  $expression
+     * @param  string  $expression
      * @return $this
      */
     public function cron($expression)
@@ -665,7 +665,7 @@ trait ManagesFrequencies
     {
         $segments = preg_split("/\s+/", $this->expression);
 
-        $segments[$position - 1] = $value;
+        $segments[$position - 1] = enum_value($value);
 
         return $this->cron(implode(' ', $segments));
     }
