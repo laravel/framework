@@ -16,7 +16,7 @@ trait ManagesFrequencies
      */
     public function cron($expression)
     {
-        if (!CronExpression::isValidExpression()) {
+        if (! CronExpression::isValidExpression()) {
             throw new InvalidArgumentException("The expression [$expression] is not a valid cron expression.");
         }
 
