@@ -12,35 +12,35 @@ interface PasswordBroker
      *
      * @var string
      */
-    const RESET_LINK_SENT = PasswordStatus::RESET_LINK_SENT;
+    const RESET_LINK_SENT = PasswordStatus::ResetLinkSent;
 
     /**
      * Constant representing a successfully reset password.
      *
      * @var string
      */
-    const PASSWORD_RESET = PasswordStatus::PASSWORD_RESET;
+    const PASSWORD_RESET = PasswordStatus::PasswordReset;
 
     /**
      * Constant representing the user not found response.
      *
      * @var string
      */
-    const INVALID_USER = PasswordStatus::INVALID_USER;
+    const INVALID_USER = PasswordStatus::InvalidUser;
 
     /**
      * Constant representing an invalid token.
      *
      * @var string
      */
-    const INVALID_TOKEN = PasswordStatus::INVALID_TOKEN;
+    const INVALID_TOKEN = PasswordStatus::InvalidToken;
 
     /**
      * Constant representing a throttled reset attempt.
      *
      * @var string
      */
-    const RESET_THROTTLED = PasswordStatus::RESET_THROTTLED;
+    const RESET_THROTTLED = PasswordStatus::ResetThrottled;
 
     /**
      * Send a password reset link to a user.

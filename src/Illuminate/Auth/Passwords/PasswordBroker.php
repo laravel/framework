@@ -65,17 +65,17 @@ class PasswordBroker implements PasswordBrokerContract
         $user = $this->getUser($credentials);
 
         if (is_null($user)) {
-            return PasswordStatus::INVALID_USER;
+            return PasswordStatus::InvalidUser;
         }
 
         if ($this->tokens->recentlyCreatedToken($user)) {
-            return PasswordStatus::RESET_THROTTLED;
+            return PasswordStatus::ResetThrottled;
         }
 
         $token = $this->tokens->create($user);
 
         if ($callback) {
-            return $callback($user, $token) ?? PasswordStatus::RESET_LINK_SENT;
+            return $callback($user, $token) ?? PasswordStatus::ResetLinkSent;
         }
 
         // Once we have the reset token, we are ready to send the message out to this
@@ -85,7 +85,7 @@ class PasswordBroker implements PasswordBrokerContract
 
         $this->events?->dispatch(new PasswordResetLinkSent($user));
 
-        return PasswordStatus::RESET_LINK_SENT;
+        return PasswordStatus::ResetLinkSent;
     }
 
     /**
@@ -115,7 +115,7 @@ class PasswordBroker implements PasswordBrokerContract
 
         $this->tokens->delete($user);
 
-        return PasswordStatus::PASSWORD_RESET;
+        return PasswordStatus::PasswordReset;
     }
 
     /**
@@ -127,11 +127,11 @@ class PasswordBroker implements PasswordBrokerContract
     protected function validateReset(#[\SensitiveParameter] array $credentials)
     {
         if (is_null($user = $this->getUser($credentials))) {
-            return PasswordStatus::INVALID_USER;
+            return PasswordStatus::InvalidUser;
         }
 
         if (! $this->tokens->exists($user, $credentials['token'])) {
-            return PasswordStatus::INVALID_TOKEN;
+            return PasswordStatus::InvalidToken;
         }
 
         return $user;
