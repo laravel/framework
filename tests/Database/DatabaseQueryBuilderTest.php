@@ -1812,10 +1812,12 @@ class DatabaseQueryBuilderTest extends TestCase
         $queryResults = [['aggregate' => 2, 'role' => 'admin', 'city' => 'NY'], ['aggregate' => 5, 'role' => 'user', 'city' => 'LA']];
         $builder->getConnection()
             ->shouldReceive('select')->once()
-            ->with('select "role", "city", count(*) as aggregate from "users" group by "role", "city"', [], true)
+            ->with('select count(*) as aggregate, "role", "city" from "users" group by "role", "city"', [], true)
             ->andReturn($queryResults);
         $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(fn ($builder, $results) => $results);
-        $results = $builder->from('users')->groupBy('role', 'city')->aggregateByGroup('count');
+        $builder->from('users')->groupBy('role', 'city');
+        $builder->aggregate = ['function' => 'count', 'columns' => ['*']];
+        $results = $builder->get();
         $this->assertEquals($queryResults, $results->toArray());
     }
 
@@ -1826,7 +1828,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $queryResults = [['aggregate' => 2, 'role' => 'admin'], ['aggregate' => 5, 'role' => 'user']];
         $builder->getConnection()
             ->shouldReceive('select')->once()
-            ->with('select "role", count(*) as aggregate from ((select * from "users") union (select * from "members")) as "temp_table" group by "role"', [], true)
+            ->with('select count(*) as aggregate, "role" from ((select * from "users") union (select * from "members")) as "temp_table" group by "role"', [], true)
             ->andReturn($queryResults);
         $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(fn ($builder, $results) => $results);
         $results = $builder->from('users')
@@ -3498,35 +3500,35 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testAggregateFunctionsWithGroupBy()
     {
         $builder = $this->getBuilder();
-        $builder->getConnection()->shouldReceive('select')->once()->with('select "role", count(*) as aggregate from "users" group by "role"', [], true)->andReturn([['role' => 'admin', 'aggregate' => 1]]);
+        $builder->getConnection()->shouldReceive('select')->once()->with('select count(*) as aggregate, "role" from "users" group by "role"', [], true)->andReturn([['role' => 'admin', 'aggregate' => 1]]);
         $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(fn ($builder, $results) => $results);
         $results = $builder->from('users')->groupBy('role')->countByGroup();
         $this->assertInstanceOf(Collection::class, $results);
         $this->assertEquals([['role' => 'admin', 'aggregate' => 1]], $results->toArray());
 
         $builder = $this->getBuilder();
-        $builder->getConnection()->shouldReceive('select')->once()->with('select "role", max("id") as aggregate from "users" group by "role"', [], true)->andReturn([['role' => 'admin', 'aggregate' => 1]]);
+        $builder->getConnection()->shouldReceive('select')->once()->with('select max("id") as aggregate, "role" from "users" group by "role"', [], true)->andReturn([['role' => 'admin', 'aggregate' => 1]]);
         $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(fn ($builder, $results) => $results);
         $results = $builder->from('users')->groupBy('role')->maxByGroup('id');
         $this->assertInstanceOf(Collection::class, $results);
         $this->assertEquals([['role' => 'admin', 'aggregate' => 1]], $results->toArray());
 
         $builder = $this->getBuilder();
-        $builder->getConnection()->shouldReceive('select')->once()->with('select "role", min("id") as aggregate from "users" group by "role"', [], true)->andReturn([['role' => 'admin', 'aggregate' => 1]]);
+        $builder->getConnection()->shouldReceive('select')->once()->with('select min("id") as aggregate, "role" from "users" group by "role"', [], true)->andReturn([['role' => 'admin', 'aggregate' => 1]]);
         $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(fn ($builder, $results) => $results);
         $results = $builder->from('users')->groupBy('role')->minByGroup('id');
         $this->assertInstanceOf(Collection::class, $results);
         $this->assertEquals([['role' => 'admin', 'aggregate' => 1]], $results->toArray());
 
         $builder = $this->getBuilder();
-        $builder->getConnection()->shouldReceive('select')->once()->with('select "role", sum("id") as aggregate from "users" group by "role"', [], true)->andReturn([['role' => 'admin', 'aggregate' => 1]]);
+        $builder->getConnection()->shouldReceive('select')->once()->with('select sum("id") as aggregate, "role" from "users" group by "role"', [], true)->andReturn([['role' => 'admin', 'aggregate' => 1]]);
         $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(fn ($builder, $results) => $results);
         $results = $builder->from('users')->groupBy('role')->sumByGroup('id');
         $this->assertInstanceOf(Collection::class, $results);
         $this->assertEquals([['role' => 'admin', 'aggregate' => 1]], $results->toArray());
 
         $builder = $this->getBuilder();
-        $builder->getConnection()->shouldReceive('select')->once()->with('select "role", avg("id") as aggregate from "users" group by "role"', [], true)->andReturn([['role' => 'admin', 'aggregate' => 1]]);
+        $builder->getConnection()->shouldReceive('select')->once()->with('select avg("id") as aggregate, "role" from "users" group by "role"', [], true)->andReturn([['role' => 'admin', 'aggregate' => 1]]);
         $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(fn ($builder, $results) => $results);
         $results = $builder->from('users')->groupBy('role')->avgByGroup('id');
         $this->assertInstanceOf(Collection::class, $results);

@@ -141,11 +141,11 @@ class Grammar extends BaseGrammar
 
         $sql = 'select ';
 
-        if ($query->groups) {
-            $sql .= $this->columnize($query->groups).', ';
-        }
-
         $sql .= $aggregate['function'].'('.$column.') as aggregate';
+
+        if ($query->groups) {
+            $sql .= ', '.$this->columnize($query->groups);
+        }
 
         return $sql;
     }
