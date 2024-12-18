@@ -6,7 +6,6 @@ use ArrayAccess;
 use Closure;
 use Countable;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Defer\DeferredCallback;
 
 class DeferredCallbackCollection implements ArrayAccess, Countable
 {
