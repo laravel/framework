@@ -72,7 +72,7 @@ class QueueWorkerTest extends TestCase
 
         $this->assertTrue($secondJob->fired);
 
-        $this->assertSame(0, $status);
+        $this->assertSame(0, $status->value);
 
         $this->events->shouldHaveReceived('dispatch')->with(m::type(JobProcessing::class))->twice();
 
@@ -93,7 +93,7 @@ class QueueWorkerTest extends TestCase
 
         $this->assertTrue($firstJob->fired);
         $this->assertFalse($secondJob->fired);
-        $this->assertSame(12, $status);
+        $this->assertSame(12, $status->value);
 
         $this->events->shouldHaveReceived('dispatch')->with(m::type(JobProcessing::class))->once();
 
