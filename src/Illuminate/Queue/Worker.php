@@ -240,7 +240,7 @@ class Worker
                 ));
             }
 
-            $this->kill(WorkerExitCode::EXIT_ERROR, $options);
+            $this->kill(WorkerExitCode::ERROR, $options);
         }, true);
 
         pcntl_alarm(
@@ -312,12 +312,12 @@ class Worker
     protected function stopIfNecessary(WorkerOptions $options, $lastRestart, $startTime = 0, $jobsProcessed = 0, $job = null)
     {
         return match (true) {
-            $this->shouldQuit => WorkerExitCode::EXIT_SUCCESS,
+            $this->shouldQuit => WorkerExitCode::SUCCESS,
             $this->memoryExceeded($options->memory) => WorkerExitCode::EXIT_MEMORY_LIMIT,
-            $this->queueShouldRestart($lastRestart) => WorkerExitCode::EXIT_SUCCESS,
-            $options->stopWhenEmpty && is_null($job) => WorkerExitCode::EXIT_SUCCESS,
-            $options->maxTime && hrtime(true) / 1e9 - $startTime >= $options->maxTime => WorkerExitCode::EXIT_SUCCESS,
-            $options->maxJobs && $jobsProcessed >= $options->maxJobs => WorkerExitCode::EXIT_SUCCESS,
+            $this->queueShouldRestart($lastRestart) => WorkerExitCode::SUCCESS,
+            $options->stopWhenEmpty && is_null($job) => WorkerExitCode::SUCCESS,
+            $options->maxTime && hrtime(true) / 1e9 - $startTime >= $options->maxTime => WorkerExitCode::SUCCESS,
+            $options->maxJobs && $jobsProcessed >= $options->maxJobs => WorkerExitCode::SUCCESS,
             default => null
         };
     }
