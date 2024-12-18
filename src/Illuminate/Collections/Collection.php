@@ -589,7 +589,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Determine if any of the keys exist in the collection.
      *
-     * @param  mixed  $key
+     * @param  TKey|array<array-key, TKey>  $key
      * @return bool
      */
     public function hasAny($key)
@@ -601,7 +601,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
         $keys = is_array($key) ? $key : func_get_args();
 
         foreach ($keys as $value) {
-            if ($this->has($value)) {
+            if (array_key_exists($value, $this->items)) {
                 return true;
             }
         }
