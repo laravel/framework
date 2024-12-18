@@ -7,6 +7,7 @@ use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Queue\Factory as QueueManager;
 use Illuminate\Database\DetectsLostConnections;
+use Illuminate\Queue\Enums\WorkerExitCode;
 use Illuminate\Queue\Events\JobAttempted;
 use Illuminate\Queue\Events\JobExceptionOccurred;
 use Illuminate\Queue\Events\JobPopped;
@@ -20,13 +21,20 @@ use Illuminate\Queue\Events\WorkerStopping;
 use Illuminate\Support\Carbon;
 use Throwable;
 
+use function Illuminate\Support\enum_value;
+
 class Worker
 {
     use DetectsLostConnections;
 
-    const EXIT_SUCCESS = 0;
-    const EXIT_ERROR = 1;
-    const EXIT_MEMORY_LIMIT = 12;
+    /** @deprecated Use \Illuminate\Queue\Enums\WorkerExitCode::SUCCESS instead */
+    const EXIT_SUCCESS = WorkerExitCode::SUCCESS;
+
+    /** @deprecated Use \Illuminate\Queue\Enums\WorkerExitCode::ERROR instead */
+    const EXIT_ERROR = WorkerExitCode::ERROR;
+
+    /** @deprecated Use \Illuminate\Queue\Enums\WorkerExitCode::MEMORY_LIMIT instead */
+    const EXIT_MEMORY_LIMIT = WorkerExitCode::MEMORY_LIMIT;
 
     /**
      * The name of the worker.
@@ -232,7 +240,7 @@ class Worker
                 ));
             }
 
-            $this->kill(static::EXIT_ERROR, $options);
+            $this->kill(WorkerExitCode::EXIT_ERROR, $options);
         }, true);
 
         pcntl_alarm(
@@ -299,17 +307,17 @@ class Worker
      * @param  int  $startTime
      * @param  int  $jobsProcessed
      * @param  mixed  $job
-     * @return int|null
+     * @return \Illuminate\Queue\Enums\WorkerExitCode|null
      */
     protected function stopIfNecessary(WorkerOptions $options, $lastRestart, $startTime = 0, $jobsProcessed = 0, $job = null)
     {
         return match (true) {
-            $this->shouldQuit => static::EXIT_SUCCESS,
-            $this->memoryExceeded($options->memory) => static::EXIT_MEMORY_LIMIT,
-            $this->queueShouldRestart($lastRestart) => static::EXIT_SUCCESS,
-            $options->stopWhenEmpty && is_null($job) => static::EXIT_SUCCESS,
-            $options->maxTime && hrtime(true) / 1e9 - $startTime >= $options->maxTime => static::EXIT_SUCCESS,
-            $options->maxJobs && $jobsProcessed >= $options->maxJobs => static::EXIT_SUCCESS,
+            $this->shouldQuit => WorkerExitCode::EXIT_SUCCESS,
+            $this->memoryExceeded($options->memory) => WorkerExitCode::EXIT_MEMORY_LIMIT,
+            $this->queueShouldRestart($lastRestart) => WorkerExitCode::EXIT_SUCCESS,
+            $options->stopWhenEmpty && is_null($job) => WorkerExitCode::EXIT_SUCCESS,
+            $options->maxTime && hrtime(true) / 1e9 - $startTime >= $options->maxTime => WorkerExitCode::EXIT_SUCCESS,
+            $options->maxJobs && $jobsProcessed >= $options->maxJobs => WorkerExitCode::EXIT_SUCCESS,
             default => null
         };
     }
@@ -767,13 +775,13 @@ class Worker
     /**
      * Kill the process.
      *
-     * @param  int  $status
+     * @param  \Illuminate\Queue\Enums\WorkerExitCode|int  $status
      * @param  \Illuminate\Queue\WorkerOptions|null  $options
      * @return never
      */
     public function kill($status = 0, $options = null)
     {
-        $this->events->dispatch(new WorkerStopping($status, $options));
+        $this->events->dispatch(new WorkerStopping(enum_value($status), $options));
 
         if (extension_loaded('posix')) {
             posix_kill(getmypid(), SIGKILL);

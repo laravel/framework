@@ -2,8 +2,11 @@
 
 namespace Illuminate\Console\Scheduling;
 
+use Illuminate\Console\Enums\ScheduleOn;
 use Illuminate\Support\Carbon;
 use InvalidArgumentException;
+
+use function Illuminate\Support\enum_value;
 
 trait ManagesFrequencies
 {
@@ -421,7 +424,7 @@ trait ManagesFrequencies
      */
     public function mondays()
     {
-        return $this->days(Schedule::MONDAY);
+        return $this->days(ScheduleOn::MONDAY);
     }
 
     /**
@@ -431,7 +434,7 @@ trait ManagesFrequencies
      */
     public function tuesdays()
     {
-        return $this->days(Schedule::TUESDAY);
+        return $this->days(ScheduleOn::TUESDAY);
     }
 
     /**
@@ -441,7 +444,7 @@ trait ManagesFrequencies
      */
     public function wednesdays()
     {
-        return $this->days(Schedule::WEDNESDAY);
+        return $this->days(ScheduleOn::WEDNESDAY);
     }
 
     /**
@@ -451,7 +454,7 @@ trait ManagesFrequencies
      */
     public function thursdays()
     {
-        return $this->days(Schedule::THURSDAY);
+        return $this->days(ScheduleOn::THURSDAY);
     }
 
     /**
@@ -461,7 +464,7 @@ trait ManagesFrequencies
      */
     public function fridays()
     {
-        return $this->days(Schedule::FRIDAY);
+        return $this->days(ScheduleOn::FRIDAY);
     }
 
     /**
@@ -471,7 +474,7 @@ trait ManagesFrequencies
      */
     public function saturdays()
     {
-        return $this->days(Schedule::SATURDAY);
+        return $this->days(ScheduleOn::SATURDAY);
     }
 
     /**
@@ -481,7 +484,7 @@ trait ManagesFrequencies
      */
     public function sundays()
     {
-        return $this->days(Schedule::SUNDAY);
+        return $this->days(Schedule::SUNDAYOn);
     }
 
     /**
@@ -632,6 +635,8 @@ trait ManagesFrequencies
     public function days($days)
     {
         $days = is_array($days) ? $days : func_get_args();
+
+        $days = array_map(enum_value(...), $days);
 
         return $this->spliceIntoPosition(5, implode(',', $days));
     }
