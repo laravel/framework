@@ -2,8 +2,6 @@
 
 namespace Illuminate\Queue\Events;
 
-use Illuminate\Queue\Enums\WorkerExitCode;
-
 class WorkerStopping
 {
     public WorkerExitCode $status;
@@ -11,7 +9,7 @@ class WorkerStopping
     /**
      * Create a new event instance.
      *
-     * @param  int|\Illuminate\Queue\Enums\WorkerExitCode  $status  The worker exit status.
+     * @param  int  $status  The worker exit status.
      * @param  \Illuminate\Queue\WorkerOptions|null  $workerOptions  The worker options.
      * @return void
      */
@@ -19,6 +17,6 @@ class WorkerStopping
         $status = 0,
         public $workerOptions = null
     ) {
-        $this->status = $status instanceof WorkerExitCode ? $status : WorkerExitCode::from($status);
+        $this->status = $status;
     }
 }
