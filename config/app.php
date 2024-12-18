@@ -163,7 +163,7 @@ return [
     */
 
     'http' => [
-        'request_exception_message_limit' => 120
+        'request_exception_message_limit' => 120,
     ],
 
     /*
