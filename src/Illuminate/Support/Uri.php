@@ -337,6 +337,19 @@ class Uri implements Htmlable, Responsable, Stringable
     }
 
     /**
+     * Dump the string representation of the URI.
+     *
+     * @param  mixed  ...$args
+     * @return $this
+     */
+    public function dump(...$args)
+    {
+        dump($this->value(), ...$args);
+
+        return $this;
+    }
+
+    /**
      * Get the string representation of the URI.
      */
     public function value(): string
