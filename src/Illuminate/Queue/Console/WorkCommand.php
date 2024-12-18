@@ -17,6 +17,7 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Terminal;
 use Throwable;
 
+use function Illuminate\Support\enum_value;
 use function Termwind\terminal;
 
 #[AsCommand(name: 'queue:work')]
@@ -142,12 +143,13 @@ class WorkCommand extends Command
      */
     protected function runWorker($connection, $queue)
     {
-        return $this->worker
+        $exitCode = $this->worker
             ->setName($this->option('name'))
             ->setCache($this->cache)
             ->{$this->option('once') ? 'runNextJob' : 'daemon'}(
                 $connection, $queue, $this->gatherWorkerOptions()
             );
+        return enum_value($exitCode);
     }
 
     /**

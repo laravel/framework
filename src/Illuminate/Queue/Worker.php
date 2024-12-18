@@ -290,7 +290,7 @@ class Worker
      *
      * @param  \Illuminate\Queue\WorkerOptions  $options
      * @param  int  $lastRestart
-     * @return int|null
+     * @return \Illuminate\Queue\Enums\WorkerExitCode|null
      */
     protected function pauseWorker(WorkerOptions $options, $lastRestart)
     {
@@ -761,7 +761,7 @@ class Worker
     /**
      * Stop listening and bail out of the script.
      *
-     * @param  int  $status
+     * @param  int|\Illuminate\Queue\Enums\WorkerExitCode  $status
      * @param  WorkerOptions|null  $options
      * @return int
      */
