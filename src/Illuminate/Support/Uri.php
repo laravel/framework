@@ -8,6 +8,7 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Traits\Conditionable;
+use Illuminate\Support\Traits\Dumpable;
 use Illuminate\Support\Traits\Tappable;
 use League\Uri\Contracts\UriInterface;
 use League\Uri\Uri as LeagueUri;
@@ -16,7 +17,7 @@ use Stringable;
 
 class Uri implements Htmlable, Responsable, Stringable
 {
-    use Conditionable, Tappable;
+    use Conditionable, Dumpable, Tappable;
 
     /**
      * The URI instance.
@@ -349,6 +350,19 @@ class Uri implements Htmlable, Responsable, Stringable
     public function isEmpty(): bool
     {
         return trim($this->value()) === '';
+    }
+
+    /**
+     * Dump the string representation of the URI.
+     *
+     * @param  mixed  ...$args
+     * @return $this
+     */
+    public function dump(...$args)
+    {
+        dump($this->value(), ...$args);
+
+        return $this;
     }
 
     /**
