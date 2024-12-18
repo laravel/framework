@@ -3,6 +3,7 @@
 namespace Illuminate\Auth\Passwords;
 
 use Closure;
+use Illuminate\Auth\Enums\PasswordStatus;
 use Illuminate\Auth\Events\PasswordResetLinkSent;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 use Illuminate\Contracts\Auth\PasswordBroker as PasswordBrokerContract;
