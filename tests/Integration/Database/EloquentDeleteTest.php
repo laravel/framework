@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 use Illuminate\Tests\Integration\Database\Fixtures\Post;
 use Illuminate\Tests\Integration\Database\Fixtures\PostStringyKey;
 
@@ -31,6 +32,18 @@ class EloquentDeleteTest extends DatabaseTestCase
             $table->timestamps();
             $table->softDeletes();
         });
+    }
+
+    public function testBasicDelete()
+    {
+        TestUpdateModel1::create([
+            'name' => Str::random(),
+            'title' => 'Ms.',
+        ]);
+
+        TestUpdateModel1::where('title', 'Ms.')->delete();
+
+        $this->assertCount(0, TestUpdateModel1::all());
     }
 
     public function testDeleteWithLimit()
