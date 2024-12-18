@@ -30,7 +30,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql();
 
         $this->assertCount(1, $statements);
-        $this->assertSame('create table "users" ("id" integer primary key autoincrement not null, "email" varchar not null)', $statements[0]);
+        $this->assertSame('create table "users" ("id" integer primary key not null, "email" varchar not null)', $statements[0]);
 
         $blueprint = new Blueprint($this->getConnection(), 'users');
         $blueprint->increments('id');
@@ -39,7 +39,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
 
         $this->assertCount(2, $statements);
         $expected = [
-            'alter table "users" add column "id" integer primary key autoincrement not null',
+            'alter table "users" add column "id" integer primary key not null',
             'alter table "users" add column "email" varchar not null',
         ];
         $this->assertEquals($expected, $statements);
@@ -55,7 +55,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql();
 
         $this->assertCount(1, $statements);
-        $this->assertSame('create temporary table "users" ("id" integer primary key autoincrement not null, "email" varchar not null)', $statements[0]);
+        $this->assertSame('create temporary table "users" ("id" integer primary key not null, "email" varchar not null)', $statements[0]);
     }
 
     public function testDropTable()
@@ -262,7 +262,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql();
 
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add column "id" integer primary key autoincrement not null', $statements[0]);
+        $this->assertSame('alter table "users" add column "id" integer primary key not null', $statements[0]);
     }
 
     public function testAddingSmallIncrementingID()
@@ -272,7 +272,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql();
 
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add column "id" integer primary key autoincrement not null', $statements[0]);
+        $this->assertSame('alter table "users" add column "id" integer primary key not null', $statements[0]);
     }
 
     public function testAddingMediumIncrementingID()
@@ -282,7 +282,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql();
 
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add column "id" integer primary key autoincrement not null', $statements[0]);
+        $this->assertSame('alter table "users" add column "id" integer primary key not null', $statements[0]);
     }
 
     public function testAddingID()
@@ -292,14 +292,14 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql();
 
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add column "id" integer primary key autoincrement not null', $statements[0]);
+        $this->assertSame('alter table "users" add column "id" integer primary key not null', $statements[0]);
 
         $blueprint = new Blueprint($this->getConnection(), 'users');
         $blueprint->id('foo');
         $statements = $blueprint->toSql();
 
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add column "foo" integer primary key autoincrement not null', $statements[0]);
+        $this->assertSame('alter table "users" add column "foo" integer primary key not null', $statements[0]);
     }
 
     public function testAddingForeignID()
@@ -374,7 +374,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql();
 
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add column "id" integer primary key autoincrement not null', $statements[0]);
+        $this->assertSame('alter table "users" add column "id" integer primary key not null', $statements[0]);
     }
 
     public function testAddingString()
@@ -425,7 +425,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql();
 
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add column "foo" integer primary key autoincrement not null', $statements[0]);
+        $this->assertSame('alter table "users" add column "foo" integer primary key not null', $statements[0]);
     }
 
     public function testAddingInteger()
@@ -442,7 +442,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql();
 
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add column "foo" integer primary key autoincrement not null', $statements[0]);
+        $this->assertSame('alter table "users" add column "foo" integer primary key not null', $statements[0]);
     }
 
     public function testAddingMediumInteger()
@@ -459,7 +459,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql();
 
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add column "foo" integer primary key autoincrement not null', $statements[0]);
+        $this->assertSame('alter table "users" add column "foo" integer primary key not null', $statements[0]);
     }
 
     public function testAddingTinyInteger()
@@ -476,7 +476,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql();
 
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add column "foo" integer primary key autoincrement not null', $statements[0]);
+        $this->assertSame('alter table "users" add column "foo" integer primary key not null', $statements[0]);
     }
 
     public function testAddingSmallInteger()
@@ -493,7 +493,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql();
 
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add column "foo" integer primary key autoincrement not null', $statements[0]);
+        $this->assertSame('alter table "users" add column "foo" integer primary key not null', $statements[0]);
     }
 
     public function testAddingFloat()
