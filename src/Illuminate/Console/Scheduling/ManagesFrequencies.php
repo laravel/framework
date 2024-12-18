@@ -18,7 +18,7 @@ trait ManagesFrequencies
      */
     public function cron($expression)
     {
-        $this->expression = enum_value($expression);
+        $this->expression = $expression;
 
         return $this;
     }
