@@ -2,7 +2,7 @@
 
 namespace Illuminate\Queue\Events;
 
-use \Illuminate\Queue\Enums\WorkerExitCode;
+use Illuminate\Queue\Enums\WorkerExitCode;
 
 class WorkerStopping
 {
