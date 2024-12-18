@@ -17,7 +17,6 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Terminal;
 use Throwable;
 
-use function Illuminate\Support\enum_value;
 use function Termwind\terminal;
 
 #[AsCommand(name: 'queue:work')]
