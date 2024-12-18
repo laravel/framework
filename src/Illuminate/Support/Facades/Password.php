@@ -33,28 +33,28 @@ class Password extends Facade
      *
      * @var string
      */
-    const PASSWORD_RESET  = PasswordStatus::PASSWORD_RESET;
+    const PASSWORD_RESET = PasswordStatus::PASSWORD_RESET;
 
     /**
      * Constant representing the user not found response.
      *
      * @var string
      */
-    const INVALID_USER  = PasswordStatus::INVALID_USER;
+    const INVALID_USER = PasswordStatus::INVALID_USER;
 
     /**
      * Constant representing an invalid token.
      *
      * @var string
      */
-    const INVALID_TOKEN  = PasswordStatus::INVALID_TOKEN;
+    const INVALID_TOKEN = PasswordStatus::INVALID_TOKEN;
 
     /**
      * Constant representing a throttled reset attempt.
      *
      * @var string
      */
-    const RESET_THROTTLED  = PasswordStatus::RESET_THROTTLED;
+    const RESET_THROTTLED = PasswordStatus::RESET_THROTTLED;
 
     /**
      * Get the registered name of the component.
