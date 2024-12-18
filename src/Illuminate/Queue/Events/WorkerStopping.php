@@ -2,6 +2,8 @@
 
 namespace Illuminate\Queue\Events;
 
+use \Illuminate\Queue\Enums\WorkerExitCode;
+
 class WorkerStopping
 {
     public WorkerExitCode $status;
