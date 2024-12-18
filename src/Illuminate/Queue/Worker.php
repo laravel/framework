@@ -313,7 +313,7 @@ class Worker
     {
         return match (true) {
             $this->shouldQuit => WorkerExitCode::SUCCESS,
-            $this->memoryExceeded($options->memory) => WorkerExitCode::EXIT_MEMORY_LIMIT,
+            $this->memoryExceeded($options->memory) => WorkerExitCode::MEMORY_LIMIT,
             $this->queueShouldRestart($lastRestart) => WorkerExitCode::SUCCESS,
             $options->stopWhenEmpty && is_null($job) => WorkerExitCode::SUCCESS,
             $options->maxTime && hrtime(true) / 1e9 - $startTime >= $options->maxTime => WorkerExitCode::SUCCESS,
