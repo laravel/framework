@@ -21,6 +21,8 @@ class RedisStoreTest extends TestCase
         parent::setUp();
 
         $this->setUpRedis();
+
+        Redis::flushAll();
     }
 
     protected function tearDown(): void
