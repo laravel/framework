@@ -154,6 +154,20 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | HTTP (RequestException message limit (truncation), etc.)
+    |--------------------------------------------------------------------------
+    |
+    | There configuration options set default values used within the HTTP
+    | component.
+    |
+    */
+
+    'http' => [
+        'request_exception_message_limit' => 120
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Autoloaded Service Providers
     |--------------------------------------------------------------------------
     |

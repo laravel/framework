@@ -18,7 +18,7 @@ class RequestException extends HttpClientException
      *
      * @var int|false
      */
-    public static $truncateAt = 120;
+    public static $truncateAt;
 
     /**
      * Create a new exception instance.
@@ -30,6 +30,8 @@ class RequestException extends HttpClientException
     {
         parent::__construct($this->prepareMessage($response), $response->status());
 
+        self::truncate();
+
         $this->response = $response;
     }
 
@@ -40,7 +42,7 @@ class RequestException extends HttpClientException
      */
     public static function truncate()
     {
-        static::$truncateAt = 120;
+        static::$truncateAt = config('app.http.request_exception_message_limit');
     }
 
     /**
