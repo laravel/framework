@@ -28,8 +28,6 @@ class RequestException extends HttpClientException
      */
     public function __construct(Response $response)
     {
-        self::truncate();
-
         parent::__construct($this->prepareMessage($response), $response->status());
 
         $this->response = $response;
@@ -66,6 +64,11 @@ class RequestException extends HttpClientException
         static::$truncateAt = false;
     }
 
+    protected function shouldTruncate()
+    {
+        return static::$truncateAt ?? config('app.http.request_exception_message_limit');
+    }
+
     /**
      * Prepare the exception message.
      *
@@ -76,7 +79,7 @@ class RequestException extends HttpClientException
     {
         $message = "HTTP request returned status code {$response->status()}";
 
-        $summary = static::$truncateAt
+        $summary = $this->shouldTruncate()
             ? Message::bodySummary($response->toPsrResponse(), static::$truncateAt)
             : Message::toString($response->toPsrResponse());
 
