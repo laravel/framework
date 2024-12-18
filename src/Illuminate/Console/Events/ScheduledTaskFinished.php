@@ -15,7 +15,7 @@ class ScheduledTaskFinished
      */
     public function __construct(
         public Event $task,
-        public $runtime,
+        public float $runtime,
     ) {
     }
 }
