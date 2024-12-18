@@ -2,9 +2,8 @@
 
 namespace Illuminate\Contracts\Auth;
 
-use Illuminate\Auth\Enums\PasswordStatus;
-
 use Closure;
+use Illuminate\Auth\Enums\PasswordStatus;
 
 interface PasswordBroker
 {
