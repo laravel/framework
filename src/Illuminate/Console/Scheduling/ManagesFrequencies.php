@@ -484,7 +484,7 @@ trait ManagesFrequencies
      */
     public function sundays()
     {
-        return $this->days(Schedule::SUNDAYOn);
+        return $this->days(ScheduleOn::SUNDAY);
     }
 
     /**
