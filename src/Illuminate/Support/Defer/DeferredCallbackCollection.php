@@ -6,13 +6,14 @@ use ArrayAccess;
 use Closure;
 use Countable;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Defer\DeferredCallback;
 
 class DeferredCallbackCollection implements ArrayAccess, Countable
 {
     /**
      * All of the deferred callbacks.
      *
-     * @var array
+     * @var \Illuminate\Support\Defer\DeferredCallback[]
      */
     protected array $callbacks = [];
 
@@ -66,7 +67,7 @@ class DeferredCallbackCollection implements ArrayAccess, Countable
     public function forget(string $name): void
     {
         $this->callbacks = (new Collection($this->callbacks))
-            ->reject(fn ($callback) => $callback->name === $name)
+            ->reject(fn (DeferredCallback $callback) => $callback->name === $name)
             ->values()
             ->all();
     }
@@ -80,7 +81,7 @@ class DeferredCallbackCollection implements ArrayAccess, Countable
     {
         $this->callbacks = (new Collection($this->callbacks))
             ->reverse()
-            ->unique(fn ($c) => $c->name)
+            ->unique(fn (DeferredCallback $c) => $c->name)
             ->reverse()
             ->values()
             ->all();
@@ -118,7 +119,7 @@ class DeferredCallbackCollection implements ArrayAccess, Countable
      * Set the callback with the given key.
      *
      * @param  mixed  $offset
-     * @param  mixed  $value
+     * @param  \Illuminate\Support\Defer\DeferredCallback  $value
      * @return void
      */
     public function offsetSet(mixed $offset, mixed $value): void
