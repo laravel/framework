@@ -13,12 +13,12 @@ trait ManagesFrequencies
     /**
      * The Cron expression representing the event's frequency.
      *
-     * @param  string  $expression
+     * @param  string|\Illuminate\Console\Enums\ScheduleOn  $expression
      * @return $this
      */
     public function cron($expression)
     {
-        $this->expression = $expression;
+        $this->expression = enum_value($expression);
 
         return $this;
     }
@@ -404,7 +404,7 @@ trait ManagesFrequencies
      */
     public function weekdays()
     {
-        return $this->days(Schedule::MONDAY.'-'.Schedule::FRIDAY);
+        return $this->days(ScheduleOn::MONDAY->value.'-'.ScheduleOn::FRIDAY->value);
     }
 
     /**
@@ -414,7 +414,7 @@ trait ManagesFrequencies
      */
     public function weekends()
     {
-        return $this->days(Schedule::SATURDAY.','.Schedule::SUNDAY);
+        return $this->days(ScheduleOn::SATURDAY->value.','.ScheduleOn::SUNDAY->value);
     }
 
     /**
