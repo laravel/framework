@@ -2,6 +2,7 @@
 
 namespace Illuminate\Console\Scheduling;
 
+use Cron\CronExpression;
 use Illuminate\Support\Carbon;
 use InvalidArgumentException;
 
@@ -15,6 +16,10 @@ trait ManagesFrequencies
      */
     public function cron($expression)
     {
+        if (!CronExpression::isValidExpression()) {
+            throw new InvalidArgumentException("The expression [$expression] is not a valid cron expression.");
+        }
+
         $this->expression = $expression;
 
         return $this;
