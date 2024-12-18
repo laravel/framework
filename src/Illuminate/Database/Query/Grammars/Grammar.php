@@ -1169,10 +1169,10 @@ class Grammar extends BaseGrammar
         }
 
         if (! array_is_list($values)) {
-            $arrayKeysCollection = new Collection(array_keys($values));
-            $someKeyIsString = $arrayKeysCollection->some(fn (string|int $key) => ! is_numeric($key));
-
-            $values = $someKeyIsString ? [$values] : array_values($values);
+            $values = (new Collection(array_keys($values)))
+                ->some(fn ($key) => ! is_numeric($key))
+                    ? [$values]
+                    : array_values($values);
         }
 
         $columns = $this->columnize(array_keys(reset($values)));
