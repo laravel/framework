@@ -28,9 +28,9 @@ class RequestException extends HttpClientException
      */
     public function __construct(Response $response)
     {
-        parent::__construct($this->prepareMessage($response), $response->status());
-
         self::truncate();
+        
+        parent::__construct($this->prepareMessage($response), $response->status());
 
         $this->response = $response;
     }
