@@ -479,7 +479,7 @@ class Str
      * @param  string  $value
      * @return bool
      */
-    public static function is($pattern, $value)
+    public static function is($pattern, $value, $ignoreCase = false)
     {
         $value = (string) $value;
 
@@ -497,6 +497,10 @@ class Str
                 return true;
             }
 
+            if ($ignoreCase && mb_strtolower($pattern) === mb_strtolower($value)) {
+                return true;
+            }
+
             $pattern = preg_quote($pattern, '#');
 
             // Asterisks are translated into zero-or-more regular expression wildcards
@@ -504,7 +508,7 @@ class Str
             // pattern such as "library/*", making any string check convenient.
             $pattern = str_replace('\*', '.*', $pattern);
 
-            if (preg_match('#^'.$pattern.'\z#u', $value) === 1) {
+            if (preg_match('#^'.$pattern.'\z#'.($ignoreCase ? 'iu' : 'u'), $value) === 1) {
                 return true;
             }
         }
