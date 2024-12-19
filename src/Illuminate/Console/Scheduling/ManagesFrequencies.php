@@ -253,7 +253,7 @@ trait ManagesFrequencies
     /**
      * Schedule the event to run hourly at a given offset in the hour.
      *
-     * @param  array|string|int<0, 24>  $offset
+     * @param  array|string|int<0,  24>  $offset
      * @return $this
      */
     public function hourlyAt($offset)
@@ -356,8 +356,8 @@ trait ManagesFrequencies
     /**
      * Schedule the event to run twice daily.
      *
-     * @param  int  $first<0, 24>
-     * @param  int  $second<0, 24>
+     * @param  int  $first<0,  24>
+     * @param  int  $second<0,  24>
      * @return $this
      */
     public function twiceDaily($first = 1, $second = 13)
@@ -368,9 +368,9 @@ trait ManagesFrequencies
     /**
      * Schedule the event to run twice daily at a given offset.
      *
-     * @param  int  $first<0, 24>
-     * @param  int  $second<0, 24>
-     * @param  int  $offset<0, 59>
+     * @param  int  $first<0,  24>
+     * @param  int  $second<0,  24>
+     * @param  int  $offset<0,  59>
      * @return $this
      */
     public function twiceDailyAt($first = 1, $second = 13, $offset = 0)
@@ -383,8 +383,8 @@ trait ManagesFrequencies
     /**
      * Schedule the event to run at the given minutes and hours.
      *
-     * @param  array|string|int<0, 59>  $minutes
-     * @param  array|string|int<0, 24>  $hours
+     * @param  array|string|int<0,  59>  $minutes
+     * @param  array|string|int<0,  24>  $hours
      * @return $this
      */
     protected function hourBasedSchedule($minutes, $hours)
@@ -528,7 +528,7 @@ trait ManagesFrequencies
     /**
      * Schedule the event to run monthly on a given day and time.
      *
-     * @param  int<0, 31>  $dayOfMonth
+     * @param  int<0,  31>  $dayOfMonth
      * @param  string  $time
      * @return $this
      */
@@ -542,8 +542,8 @@ trait ManagesFrequencies
     /**
      * Schedule the event to run twice monthly at a given time.
      *
-     * @param  int  $first<0, 31>
-     * @param  int  $second<0, 31>
+     * @param  int  $first<0,  31>
+     * @param  int  $second<0,  31>
      * @param  string  $time
      * @return $this
      */
@@ -614,7 +614,7 @@ trait ManagesFrequencies
      * Schedule the event to run yearly on a given month, day, and time.
      *
      * @param  int<0, 12>  $month
-     * @param  int<0, 31>|string  $dayOfMonth
+     * @param  int<0,  31>|string  $dayOfMonth
      * @param  string  $time
      * @return $this
      */
