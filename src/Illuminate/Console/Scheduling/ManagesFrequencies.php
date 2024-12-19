@@ -253,7 +253,7 @@ trait ManagesFrequencies
     /**
      * Schedule the event to run hourly at a given offset in the hour.
      *
-     * @param  array|string|int<0,  24>  $offset
+     * @param  array|string|int<0,  24>|int<0,  24>[]  $offset
      * @return $this
      */
     public function hourlyAt($offset)
