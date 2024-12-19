@@ -274,7 +274,7 @@ class Uri implements Htmlable, Responsable, Stringable
     /**
      * Remove the given query parameters from the URI.
      */
-    public function withoutQuery(array $keys): static
+    public function withoutQuery(array|string $keys): static
     {
         return $this->replaceQuery(Arr::except($this->query()->all(), $keys));
     }
