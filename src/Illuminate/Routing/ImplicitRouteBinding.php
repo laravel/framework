@@ -3,14 +3,34 @@
 namespace Illuminate\Routing;
 
 use Illuminate\Contracts\Routing\UrlRoutable;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Routing\Exceptions\BackedEnumCaseNotFoundException;
+use Illuminate\Routing\Exceptions\ModelParameterMismatchException;
 use Illuminate\Support\Reflector;
 use Illuminate\Support\Str;
 
 class ImplicitRouteBinding
 {
+    /**
+     * Indicates if an exception should be thrown when a route parameter mismatches the model name.
+     *
+     * @var bool
+     */
+    protected static $shouldPreventModelParameterMismatch = false;
+
+    /**
+     * Prevent when a route parameter mismatches the model name.
+     *
+     * @param  bool  $value
+     * @return void
+     */
+    public static function preventModelParameterMismatch($value = true)
+    {
+        static::$shouldPreventModelParameterMismatch = $value;
+    }
+
     /**
      * Resolve the implicit route bindings for the given route.
      *
@@ -29,6 +49,8 @@ class ImplicitRouteBinding
 
         foreach ($route->signatureParameters(['subClass' => UrlRoutable::class]) as $parameter) {
             if (! $parameterName = static::getParameterName($parameter->getName(), $parameters)) {
+                static::handleMissingParameter($parameter);
+
                 continue;
             }
 
@@ -63,6 +85,26 @@ class ImplicitRouteBinding
             }
 
             $route->setParameter($parameterName, $model);
+        }
+    }
+
+    /**
+     * Handle a missing parameter for a route binding.
+     *
+     * @param  \ReflectionParameter  $parameter
+     */
+    protected static function handleMissingParameter($parameter)
+    {
+        if (
+            ! $parameter->isDefaultValueAvailable() &&
+            static::$shouldPreventModelParameterMismatch &&
+            is_subclass_of($model = $parameter->getType()->getName(), Model::class)
+        ) {
+            $modelName = Str::camel(class_basename($model));
+
+            throw new ModelParameterMismatchException(
+                "Route parameter name '{$parameter->getName()}' does not match expected model binding name '{$modelName}'."
+            );
         }
     }
 
