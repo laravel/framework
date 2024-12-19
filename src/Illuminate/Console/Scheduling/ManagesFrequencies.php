@@ -2,8 +2,11 @@
 
 namespace Illuminate\Console\Scheduling;
 
+use Illuminate\Console\Enums\CronExpressionPosition;
 use Illuminate\Support\Carbon;
 use InvalidArgumentException;
+
+use function Illuminate\Support\enum_value;
 
 trait ManagesFrequencies
 {
@@ -164,7 +167,7 @@ trait ManagesFrequencies
      */
     public function everyMinute()
     {
-        return $this->spliceIntoPosition(1, '*');
+        return $this->spliceIntoPosition(CronExpressionPosition::Minutes, '*');
     }
 
     /**
@@ -174,7 +177,7 @@ trait ManagesFrequencies
      */
     public function everyTwoMinutes()
     {
-        return $this->spliceIntoPosition(1, '*/2');
+        return $this->spliceIntoPosition(CronExpressionPosition::Minutes, '*/2');
     }
 
     /**
@@ -184,7 +187,7 @@ trait ManagesFrequencies
      */
     public function everyThreeMinutes()
     {
-        return $this->spliceIntoPosition(1, '*/3');
+        return $this->spliceIntoPosition(CronExpressionPosition::Minutes, '*/3');
     }
 
     /**
@@ -194,7 +197,7 @@ trait ManagesFrequencies
      */
     public function everyFourMinutes()
     {
-        return $this->spliceIntoPosition(1, '*/4');
+        return $this->spliceIntoPosition(CronExpressionPosition::Minutes, '*/4');
     }
 
     /**
@@ -204,7 +207,7 @@ trait ManagesFrequencies
      */
     public function everyFiveMinutes()
     {
-        return $this->spliceIntoPosition(1, '*/5');
+        return $this->spliceIntoPosition(CronExpressionPosition::Minutes, '*/5');
     }
 
     /**
@@ -214,7 +217,7 @@ trait ManagesFrequencies
      */
     public function everyTenMinutes()
     {
-        return $this->spliceIntoPosition(1, '*/10');
+        return $this->spliceIntoPosition(CronExpressionPosition::Minutes, '*/10');
     }
 
     /**
@@ -224,7 +227,7 @@ trait ManagesFrequencies
      */
     public function everyFifteenMinutes()
     {
-        return $this->spliceIntoPosition(1, '*/15');
+        return $this->spliceIntoPosition(CronExpressionPosition::Minutes, '*/15');
     }
 
     /**
@@ -234,7 +237,7 @@ trait ManagesFrequencies
      */
     public function everyThirtyMinutes()
     {
-        return $this->spliceIntoPosition(1, '*/30');
+        return $this->spliceIntoPosition(CronExpressionPosition::Minutes, '*/30');
     }
 
     /**
@@ -244,7 +247,7 @@ trait ManagesFrequencies
      */
     public function hourly()
     {
-        return $this->spliceIntoPosition(1, 0);
+        return $this->spliceIntoPosition(CronExpressionPosition::Minutes, 0);
     }
 
     /**
@@ -390,8 +393,8 @@ trait ManagesFrequencies
 
         $hours = is_array($hours) ? implode(',', $hours) : $hours;
 
-        return $this->spliceIntoPosition(1, $minutes)
-                    ->spliceIntoPosition(2, $hours);
+        return $this->spliceIntoPosition(CronExpressionPosition::Minutes, $minutes)
+                    ->spliceIntoPosition(CronExpressionPosition::Hours, $hours);
     }
 
     /**
@@ -491,9 +494,9 @@ trait ManagesFrequencies
      */
     public function weekly()
     {
-        return $this->spliceIntoPosition(1, 0)
-                    ->spliceIntoPosition(2, 0)
-                    ->spliceIntoPosition(5, 0);
+        return $this->spliceIntoPosition(CronExpressionPosition::Minutes, 0)
+                    ->spliceIntoPosition(CronExpressionPosition::Hours, 0)
+                    ->spliceIntoPosition(CronExpressionPosition::DayOfWeek, 0);
     }
 
     /**
@@ -517,9 +520,9 @@ trait ManagesFrequencies
      */
     public function monthly()
     {
-        return $this->spliceIntoPosition(1, 0)
-                    ->spliceIntoPosition(2, 0)
-                    ->spliceIntoPosition(3, 1);
+        return $this->spliceIntoPosition(CronExpressionPosition::Minutes, 0)
+                    ->spliceIntoPosition(CronExpressionPosition::Hours, 0)
+                    ->spliceIntoPosition(CronExpressionPosition::DayOfMonth, 1);
     }
 
     /**
@@ -533,7 +536,7 @@ trait ManagesFrequencies
     {
         $this->dailyAt($time);
 
-        return $this->spliceIntoPosition(3, $dayOfMonth);
+        return $this->spliceIntoPosition(CronExpressionPosition::DayOfMonth, $dayOfMonth);
     }
 
     /**
@@ -550,7 +553,7 @@ trait ManagesFrequencies
 
         $this->dailyAt($time);
 
-        return $this->spliceIntoPosition(3, $daysOfMonth);
+        return $this->spliceIntoPosition(CronExpressionPosition::DayOfMonth, $daysOfMonth);
     }
 
     /**
@@ -563,7 +566,7 @@ trait ManagesFrequencies
     {
         $this->dailyAt($time);
 
-        return $this->spliceIntoPosition(3, Carbon::now()->endOfMonth()->day);
+        return $this->spliceIntoPosition(CronExpressionPosition::DayOfMonth, Carbon::now()->endOfMonth()->day);
     }
 
     /**
@@ -573,10 +576,10 @@ trait ManagesFrequencies
      */
     public function quarterly()
     {
-        return $this->spliceIntoPosition(1, 0)
-                    ->spliceIntoPosition(2, 0)
-                    ->spliceIntoPosition(3, 1)
-                    ->spliceIntoPosition(4, '1-12/3');
+        return $this->spliceIntoPosition(CronExpressionPosition::Minutes, 0)
+                    ->spliceIntoPosition(CronExpressionPosition::Hours, 0)
+                    ->spliceIntoPosition(CronExpressionPosition::DayOfMonth, 1)
+                    ->spliceIntoPosition(CronExpressionPosition::Month, '1-12/3');
     }
 
     /**
@@ -590,8 +593,8 @@ trait ManagesFrequencies
     {
         $this->dailyAt($time);
 
-        return $this->spliceIntoPosition(3, $dayOfQuarter)
-                    ->spliceIntoPosition(4, '1-12/3');
+        return $this->spliceIntoPosition(CronExpressionPosition::DayOfMonth, $dayOfQuarter)
+                    ->spliceIntoPosition(CronExpressionPosition::Month, '1-12/3');
     }
 
     /**
@@ -601,10 +604,10 @@ trait ManagesFrequencies
      */
     public function yearly()
     {
-        return $this->spliceIntoPosition(1, 0)
-                    ->spliceIntoPosition(2, 0)
-                    ->spliceIntoPosition(3, 1)
-                    ->spliceIntoPosition(4, 1);
+        return $this->spliceIntoPosition(CronExpressionPosition::Minutes, 0)
+                    ->spliceIntoPosition(CronExpressionPosition::Hours, 0)
+                    ->spliceIntoPosition(CronExpressionPosition::DayOfMonth, 1)
+                    ->spliceIntoPosition(CronExpressionPosition::Month, 1);
     }
 
     /**
@@ -619,8 +622,8 @@ trait ManagesFrequencies
     {
         $this->dailyAt($time);
 
-        return $this->spliceIntoPosition(3, $dayOfMonth)
-                    ->spliceIntoPosition(4, $month);
+        return $this->spliceIntoPosition(CronExpressionPosition::DayOfMonth, $dayOfMonth)
+                    ->spliceIntoPosition(CronExpressionPosition::Month, $month);
     }
 
     /**
@@ -633,7 +636,7 @@ trait ManagesFrequencies
     {
         $days = is_array($days) ? $days : func_get_args();
 
-        return $this->spliceIntoPosition(5, implode(',', $days));
+        return $this->spliceIntoPosition(CronExpressionPosition::DayOfWeek, implode(',', $days));
     }
 
     /**
@@ -652,7 +655,7 @@ trait ManagesFrequencies
     /**
      * Splice the given value into the given position of the expression.
      *
-     * @param  int  $position
+     * @param  int|\Illuminate\Console\Enums\CronExpressionPosition  $position
      * @param  string  $value
      * @return $this
      */
@@ -660,7 +663,9 @@ trait ManagesFrequencies
     {
         $segments = preg_split("/\s+/", $this->expression);
 
-        $segments[$position - 1] = $value;
+        $index = enum_value($position) - 1;
+
+        $segments[$index] = $value;
 
         return $this->cron(implode(' ', $segments));
     }
