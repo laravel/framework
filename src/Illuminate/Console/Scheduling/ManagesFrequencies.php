@@ -630,7 +630,7 @@ trait ManagesFrequencies
     /**
      * Set the days of the week the command should run on.
      *
-     * @param  \Illuminate\Support\Date\Day[]|\Illuminate\Support\Date\Day|array|int[]|int|string[]|string|mixed  $days
+     * @param  \Illuminate\Support\Date\Day[]|\Illuminate\Support\Date\Day|array|int<0, 6>[]|int<0, 6>|string[]|string|mixed  $days
      * @return $this
      */
     public function days($days)
