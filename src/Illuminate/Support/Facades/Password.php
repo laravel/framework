@@ -2,13 +2,13 @@
 
 namespace Illuminate\Support\Facades;
 
-use Illuminate\Auth\Enums\PasswordResetResult;
+use Illuminate\Auth\Passwords\PasswordResetResult;
 
 /**
  * @method static \Illuminate\Contracts\Auth\PasswordBroker broker(string|null $name = null)
  * @method static string getDefaultDriver()
  * @method static void setDefaultDriver(string $name)
- * @method static \Illuminate\Auth\Enums\PasswordResetResult sendResetLink(array $credentials, \Closure|null $callback = null)
+ * @method static string sendResetLink(array $credentials, \Closure|null $callback = null)
  * @method static mixed reset(array $credentials, \Closure $callback)
  * @method static \Illuminate\Contracts\Auth\CanResetPassword|null getUser(array $credentials)
  * @method static string createToken(\Illuminate\Contracts\Auth\CanResetPassword $user)

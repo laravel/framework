@@ -3,8 +3,8 @@
 namespace Illuminate\Auth\Passwords;
 
 use Closure;
-use Illuminate\Auth\Enums\PasswordResetResult;
 use Illuminate\Auth\Events\PasswordResetLinkSent;
+use Illuminate\Auth\Passwords\PasswordResetResult;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 use Illuminate\Contracts\Auth\PasswordBroker as PasswordBrokerContract;
 use Illuminate\Contracts\Auth\UserProvider;
@@ -55,7 +55,7 @@ class PasswordBroker implements PasswordBrokerContract
      *
      * @param  array  $credentials
      * @param  \Closure|null  $callback
-     * @return \Illuminate\Auth\Enums\PasswordResetResult
+     * @return string
      */
     public function sendResetLink(#[\SensitiveParameter] array $credentials, ?Closure $callback = null)
     {
@@ -122,7 +122,7 @@ class PasswordBroker implements PasswordBrokerContract
      * Validate a password reset for the given credentials.
      *
      * @param  array  $credentials
-     * @return \Illuminate\Contracts\Auth\CanResetPassword|\Illuminate\Auth\Enums\PasswordResetResult
+     * @return \Illuminate\Contracts\Auth\CanResetPassword|string
      */
     protected function validateReset(#[\SensitiveParameter] array $credentials)
     {

@@ -3,42 +3,42 @@
 namespace Illuminate\Contracts\Auth;
 
 use Closure;
-use Illuminate\Auth\Enums\PasswordResetResult;
+use Illuminate\Auth\Passwords\PasswordResetResult;
 
 interface PasswordBroker
 {
     /**
      * Constant representing a successfully sent reminder.
      *
-     * @var \Illuminate\Auth\Enums\PasswordStatus
+     * @var string
      */
     const RESET_LINK_SENT = PasswordResetResult::ResetLinkSent;
 
     /**
      * Constant representing a successfully reset password.
      *
-     * @var \Illuminate\Auth\Enums\PasswordStatus
+     * @var string
      */
     const PASSWORD_RESET = PasswordResetResult::PasswordReset;
 
     /**
      * Constant representing the user not found response.
      *
-     * @var \Illuminate\Auth\Enums\PasswordStatus
+     * @var string
      */
     const INVALID_USER = PasswordResetResult::InvalidUser;
 
     /**
      * Constant representing an invalid token.
      *
-     * @var \Illuminate\Auth\Enums\PasswordStatus
+     * @var string
      */
     const INVALID_TOKEN = PasswordResetResult::InvalidToken;
 
     /**
      * Constant representing a throttled reset attempt.
      *
-     * @var \Illuminate\Auth\Enums\PasswordStatus
+     * @var string
      */
     const RESET_THROTTLED = PasswordResetResult::Throttled;
 
@@ -47,7 +47,7 @@ interface PasswordBroker
      *
      * @param  array  $credentials
      * @param  \Closure|null  $callback
-     * @return \Illuminate\Auth\Enums\PasswordStatus
+     * @return string
      */
     public function sendResetLink(array $credentials, ?Closure $callback = null);
 
