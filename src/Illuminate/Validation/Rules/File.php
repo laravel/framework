@@ -330,7 +330,7 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
      */
     protected function fail($messages)
     {
-        $messages = (new Collection(Arr::wrap($messages)))
+        $messages = Collection::wrap($messages)
             ->map(fn ($message) => $this->validator->getTranslator()->get($message))
             ->all();
 

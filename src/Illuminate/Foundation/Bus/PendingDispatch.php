@@ -177,6 +177,16 @@ class PendingDispatch
     }
 
     /**
+     * Get the underlying job instance.
+     *
+     * @var mixed
+     */
+    public function getJob()
+    {
+        return $this->job;
+    }
+
+    /**
      * Dynamically proxy methods to the underlying job.
      *
      * @param  string  $method

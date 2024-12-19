@@ -11,6 +11,7 @@ use Illuminate\Routing\ViewController;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Illuminate\Support\Stringable;
 use ReflectionClass;
 use ReflectionFunction;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -372,7 +373,7 @@ class RouteListCommand extends Command
                 'uri' => $uri,
             ] = $route;
 
-            $middleware = Str::of($middleware)->explode("\n")->filter()->whenNotEmpty(
+            $middleware = (new Stringable($middleware))->explode("\n")->filter()->whenNotEmpty(
                 fn ($collection) => $collection->map(
                     fn ($middleware) => sprintf('         %s⇂ %s', str_repeat(' ', $maxMethod), $middleware)
                 )
@@ -390,7 +391,7 @@ class RouteListCommand extends Command
                 $action = substr($action, 0, $terminalWidth - 7 - mb_strlen($method.$spaces.$uri.$dots)).'…';
             }
 
-            $method = Str::of($method)->explode('|')->map(
+            $method = (new Stringable($method))->explode('|')->map(
                 fn ($method) => sprintf('<fg=%s>%s</>', $this->verbColors[$method] ?? 'default', $method),
             )->implode('<fg=#6C7280>|</>');
 

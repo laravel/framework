@@ -14,7 +14,7 @@ use League\Uri\Uri as LeagueUri;
 use SensitiveParameter;
 use Stringable;
 
-class Uri implements Htmlable, Responsable
+class Uri implements Htmlable, Responsable, Stringable
 {
     use Conditionable, Tappable;
 
@@ -65,6 +65,36 @@ class Uri implements Htmlable, Responsable
     public static function route($name, $parameters = [], $absolute = true): static
     {
         return new static(call_user_func(static::$urlGeneratorResolver)->route($name, $parameters, $absolute));
+    }
+
+    /**
+     * Create a signed route URI instance for a named route.
+     *
+     * @param  \BackedEnum|string  $name
+     * @param  mixed  $parameters
+     * @param  \DateTimeInterface|\DateInterval|int|null  $expiration
+     * @param  bool  $absolute
+     * @return static
+     *
+     * @throws \InvalidArgumentException
+     */
+    public static function signedRoute($name, $parameters = [], $expiration = null, $absolute = true): static
+    {
+        return new static(call_user_func(static::$urlGeneratorResolver)->signedRoute($name, $parameters, $expiration, $absolute));
+    }
+
+    /**
+     * Create a temporary signed route URI instance for a named route.
+     *
+     * @param  \BackedEnum|string  $name
+     * @param  \DateTimeInterface|\DateInterval|int  $expiration
+     * @param  array  $parameters
+     * @param  bool  $absolute
+     * @return static
+     */
+    public static function temporarySignedRoute($name, $expiration, $parameters = [], $absolute = true): static
+    {
+        return static::signedRoute($name, $parameters, $expiration, $absolute);
     }
 
     /**

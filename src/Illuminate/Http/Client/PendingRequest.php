@@ -575,10 +575,10 @@ class PendingRequest
     /**
      * Specify the timeout (in seconds) for the request.
      *
-     * @param  int  $seconds
+     * @param  int|float  $seconds
      * @return $this
      */
-    public function timeout(int $seconds)
+    public function timeout(int|float $seconds)
     {
         return tap($this, function () use ($seconds) {
             $this->options['timeout'] = $seconds;
@@ -588,10 +588,10 @@ class PendingRequest
     /**
      * Specify the connect timeout (in seconds) for the request.
      *
-     * @param  int  $seconds
+     * @param  int|float  $seconds
      * @return $this
      */
-    public function connectTimeout(int $seconds)
+    public function connectTimeout(int|float $seconds)
     {
         return tap($this, function () use ($seconds) {
             $this->options['connect_timeout'] = $seconds;
@@ -1153,7 +1153,7 @@ class PendingRequest
 
         $laravelData = $options[$this->bodyFormat] ?? $options['query'] ?? [];
 
-        $urlString = Str::of($url);
+        $urlString = (new Stringable($url));
 
         if (empty($laravelData) && $method === 'GET' && $urlString->contains('?')) {
             $laravelData = (string) $urlString->after('?');

@@ -4,6 +4,7 @@ namespace Illuminate\Http\Concerns;
 
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Fluent;
 use Illuminate\Support\Traits\Dumpable;
 use Illuminate\Support\Traits\InteractsWithData;
 use SplFileInfo;
@@ -121,7 +122,7 @@ trait InteractsWithInput
      */
     public function fluent($key = null)
     {
-        return fluent(is_array($key) ? $this->only($key) : $this->input($key));
+        return new Fluent(is_array($key) ? $this->only($key) : $this->input($key));
     }
 
     /**

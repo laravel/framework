@@ -33,6 +33,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Lottery;
 use Illuminate\Support\Reflector;
+use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ReflectsClosures;
 use Illuminate\Support\ViewErrorBag;
 use Illuminate\Validation\ValidationException;
@@ -1007,7 +1008,7 @@ class Handler implements ExceptionHandlerContract
     public function renderForConsole($output, Throwable $e)
     {
         if ($e instanceof CommandNotFoundException) {
-            $message = str($e->getMessage())->explode('.')->first();
+            $message = Str::of($e->getMessage())->explode('.')->first();
 
             if (! empty($alternatives = $e->getAlternatives())) {
                 $message .= '. Did you mean one of these?';

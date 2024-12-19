@@ -15,6 +15,7 @@ use Illuminate\Support\ItemNotFoundException;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\MultipleItemsFoundException;
 use Illuminate\Support\Str;
+use Illuminate\Support\Stringable;
 use InvalidArgumentException;
 use IteratorAggregate;
 use JsonSerializable;
@@ -2314,13 +2315,13 @@ class SupportCollectionTest extends TestCase
         $this->assertSame('taylor,dayle', $data->implode(','));
 
         $data = new $collection([
-            ['name' => Str::of('taylor'), 'email' => Str::of('foo')],
-            ['name' => Str::of('dayle'), 'email' => Str::of('bar')],
+            ['name' => new Stringable('taylor'), 'email' => new Stringable('foo')],
+            ['name' => new Stringable('dayle'), 'email' => new Stringable('bar')],
         ]);
         $this->assertSame('foobar', $data->implode('email'));
         $this->assertSame('foo,bar', $data->implode('email', ','));
 
-        $data = new $collection([Str::of('taylor'), Str::of('dayle')]);
+        $data = new $collection([new Stringable('taylor'), new Stringable('dayle')]);
         $this->assertSame('taylordayle', $data->implode(''));
         $this->assertSame('taylor,dayle', $data->implode(','));
         $this->assertSame('taylor_dayle', $data->implode('_'));
@@ -3161,7 +3162,7 @@ class SupportCollectionTest extends TestCase
     public function testGroupByAttributeWithStringableKey($collection)
     {
         $data = new $collection($payload = [
-            ['name' => Str::of('Laravel'), 'url' => '1'],
+            ['name' => new Stringable('Laravel'), 'url' => '1'],
             ['name' => new HtmlString('Laravel'), 'url' => '1'],
             ['name' => new class()
             {

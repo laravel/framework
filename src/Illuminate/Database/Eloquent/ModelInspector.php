@@ -393,7 +393,7 @@ class ModelInspector
     {
         $attributeDefault = $model->getAttributes()[$column['name']] ?? null;
 
-        return enum_value($attributeDefault, $column['default']);
+        return enum_value($attributeDefault) ?? $column['default'];
     }
 
     /**

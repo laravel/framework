@@ -28,6 +28,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
+use Illuminate\Support\Stringable;
 use JsonSerializable;
 use Mockery as m;
 use OutOfBoundsException;
@@ -413,10 +414,10 @@ class HttpClientTest extends TestCase
         $response = $this->factory->get('http://foo.com/api');
 
         $this->assertInstanceOf(Fluent::class, $response->fluent());
-        $this->assertEquals(fluent(['result' => ['foo' => 'bar']]), $response->fluent());
-        $this->assertEquals(fluent(['foo' => 'bar']), $response->fluent('result'));
-        $this->assertEquals(fluent(['bar']), $response->fluent('result.foo'));
-        $this->assertEquals(fluent([]), $response->fluent('missing_key'));
+        $this->assertEquals(new Fluent(['result' => ['foo' => 'bar']]), $response->fluent());
+        $this->assertEquals(new Fluent(['foo' => 'bar']), $response->fluent('result'));
+        $this->assertEquals(new Fluent(['bar']), $response->fluent('result.foo'));
+        $this->assertEquals(new Fluent([]), $response->fluent('missing_key'));
     }
 
     public function testSendRequestBodyAsJsonByDefault()
@@ -603,7 +604,7 @@ class HttpClientTest extends TestCase
             'X-Test-Header' => 'foo',
             'X-Test-ArrayHeader' => ['bar', 'baz'],
         ])->post('http://foo.com/json', [
-            'name' => Str::of('Taylor'),
+            'name' => new Stringable('Taylor'),
         ]);
 
         $this->factory->assertSent(function (Request $request) {
@@ -620,7 +621,7 @@ class HttpClientTest extends TestCase
         $this->factory->fake();
 
         $this->factory->asForm()->post('http://foo.com/form', [
-            'name' => Str::of('Taylor'),
+            'name' => new Stringable('Taylor'),
             'title' => 'Laravel Developer',
         ]);
 
@@ -636,7 +637,7 @@ class HttpClientTest extends TestCase
         $this->factory->fake();
 
         $this->factory->asForm()->post('http://foo.com/form', [
-            'posts' => [['title' => Str::of('Taylor')]],
+            'posts' => [['title' => new Stringable('Taylor')]],
         ]);
 
         $this->factory->assertSent(function (Request $request) {
@@ -970,7 +971,7 @@ class HttpClientTest extends TestCase
         $this->factory->fake();
 
         $this->factory->withQueryParameters(
-            ['foo' => Str::of('bar')]
+            ['foo' => new Stringable('bar')]
         )->get('https://laravel.com');
 
         $this->factory->assertSent(function (Request $request) {
@@ -983,7 +984,7 @@ class HttpClientTest extends TestCase
         $this->factory->fake();
 
         $this->factory->withQueryParameters(
-            ['foo' => ['bar', Str::of('baz')]],
+            ['foo' => ['bar', new Stringable('baz')]],
         )->get('https://laravel.com');
 
         $this->factory->assertSent(function (Request $request) {
