@@ -76,6 +76,15 @@ class Response extends SymfonyResponse
     }
 
     /**
+     * Gets the current response content.
+     */
+    #[\Override]
+    public function getContent(): string|false
+    {
+        return transform(parent::getContent(), fn ($content) => $content, '');
+    }
+
+    /**
      * Determine if the given content should be turned into JSON.
      *
      * @param  mixed  $content
