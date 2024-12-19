@@ -11,7 +11,7 @@ interface PasswordBroker
      * Constant representing a successfully sent reminder.
      *
      * @var \Illuminate\Auth\Enums\PasswordStatus
-     * 
+     *
      * @deprecated Use \Illuminate\Auth\Enums\PasswordStatus::ResetLinkSent instead
      */
     const RESET_LINK_SENT = PasswordStatus::ResetLinkSent;
@@ -29,7 +29,7 @@ interface PasswordBroker
      * Constant representing the user not found response.
      *
      * @var \Illuminate\Auth\Enums\PasswordStatus
-     * 
+     *
      * @deprecated Use \Illuminate\Auth\Enums\PasswordStatus::InvalidUser instead
      */
     const INVALID_USER = PasswordStatus::InvalidUser;
@@ -38,7 +38,7 @@ interface PasswordBroker
      * Constant representing an invalid token.
      *
      * @var \Illuminate\Auth\Enums\PasswordStatus
-     * 
+     *
      * @deprecated Use \Illuminate\Auth\Enums\PasswordStatus::InvalidToken instead
      */
     const INVALID_TOKEN = PasswordStatus::InvalidToken;
@@ -47,7 +47,7 @@ interface PasswordBroker
      * Constant representing a throttled reset attempt.
      *
      * @var \Illuminate\Auth\Enums\PasswordStatus
-     * 
+     *
      * @deprecated Use \Illuminate\Auth\Enums\PasswordStatus::ResetThrottled instead
      */
     const RESET_THROTTLED = PasswordStatus::ResetThrottled;
