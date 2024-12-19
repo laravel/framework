@@ -15,6 +15,5 @@ class WorkerStopping
         public $status = 0,
         public $workerOptions = null
     ) {
-        $this->status = $status;
     }
 }
