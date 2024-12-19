@@ -425,7 +425,7 @@ trait ManagesFrequencies
      */
     public function mondays()
     {
-        return $this->days(Day::MONDAY);
+        return $this->days(Day::Monday);
     }
 
     /**
@@ -435,7 +435,7 @@ trait ManagesFrequencies
      */
     public function tuesdays()
     {
-        return $this->days(Day::TUESDAY);
+        return $this->days(Day::Tuesday);
     }
 
     /**
@@ -445,7 +445,7 @@ trait ManagesFrequencies
      */
     public function wednesdays()
     {
-        return $this->days(Day::WEDNESDAY);
+        return $this->days(Day::Wednesday);
     }
 
     /**
@@ -455,7 +455,7 @@ trait ManagesFrequencies
      */
     public function thursdays()
     {
-        return $this->days(Day::THURSDAY);
+        return $this->days(Day::Thursday);
     }
 
     /**
@@ -465,7 +465,7 @@ trait ManagesFrequencies
      */
     public function fridays()
     {
-        return $this->days(Day::FRIDAY);
+        return $this->days(Day::Friday);
     }
 
     /**
@@ -475,7 +475,7 @@ trait ManagesFrequencies
      */
     public function saturdays()
     {
-        return $this->days(Day::SATURDAY);
+        return $this->days(Day::Saturday);
     }
 
     /**
@@ -485,7 +485,7 @@ trait ManagesFrequencies
      */
     public function sundays()
     {
-        return $this->days(Day::SUNDAY);
+        return $this->days(Day::Sunday);
     }
 
     /**
