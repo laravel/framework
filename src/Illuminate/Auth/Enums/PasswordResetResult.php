@@ -5,27 +5,27 @@ namespace Illuminate\Auth\Enums;
 enum PasswordResetResult: string
 {
     /**
-     * Constant representing a successfully sent reminder.
+     * Result indicating a successfully sent password reset email.
      */
     case ResetLinkSent = 'passwords.sent';
 
     /**
-     * Constant representing a successfully reset password.
+     * Result representing a successfully reset password.
      */
     case PasswordReset = 'passwords.reset';
 
     /**
-     * Constant representing the user not found response.
+     * Result indicating the user is invalid.
      */
     case InvalidUser = 'passwords.user';
 
     /**
-     * Constant representing an invalid token.
+     * Result indicating the token is invalid.
      */
     case InvalidToken = 'passwords.token';
 
     /**
-     * Constant representing a throttled reset attempt.
+     * Result indicating the password reset attempt has been throttled.
      */
     case Throttled = 'passwords.throttled';
 }
