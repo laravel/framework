@@ -2,8 +2,11 @@
 
 namespace Illuminate\Console\Scheduling;
 
+use Illuminate\Console\Scheduling\Enums\ScheduledMonth;
 use Illuminate\Support\Carbon;
 use InvalidArgumentException;
+
+use function Illuminate\Support\enum_value;
 
 trait ManagesFrequencies
 {
@@ -610,7 +613,7 @@ trait ManagesFrequencies
     /**
      * Schedule the event to run yearly on a given month, day, and time.
      *
-     * @param  int  $month
+     * @param  int|\Illuminate\Console\Scheduling\Enums\ScheduledMonth  $month
      * @param  int|string  $dayOfMonth
      * @param  string  $time
      * @return $this
@@ -620,7 +623,7 @@ trait ManagesFrequencies
         $this->dailyAt($time);
 
         return $this->spliceIntoPosition(3, $dayOfMonth)
-                    ->spliceIntoPosition(4, $month);
+                    ->spliceIntoPosition(4, enum_value($month));
     }
 
     /**
