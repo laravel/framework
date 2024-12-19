@@ -18,12 +18,12 @@ assertType('mixed', $cache->pull('cache', 28));
 assertType('mixed', $cache->pull('cache', function (): int {
     return 30;
 }));
-assertType('int', $cache->sear('cache', function (): int {
+assertType('33', $cache->sear('cache', function (): int {
     return 33;
 }));
-assertType('int', $cache->remember('cache', now(), function (): int {
+assertType('36', $cache->remember('cache', now(), function (): int {
     return 36;
 }));
-assertType('int', $cache->rememberForever('cache', function (): int {
+assertType('36', $cache->rememberForever('cache', function (): int {
     return 36;
 }));
