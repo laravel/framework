@@ -613,7 +613,7 @@ trait ManagesFrequencies
     /**
      * Schedule the event to run yearly on a given month, day, and time.
      *
-     * @param  int<0, 12>  $month
+     * @param  int<1, 12>  $month
      * @param  int<0,  31>|string  $dayOfMonth
      * @param  string  $time
      * @return $this
