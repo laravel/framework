@@ -76,7 +76,7 @@ class Pipeline implements PipelineContract
     /**
      * Set the extra parameters being sent with the traveller object.
      *
-     * @param array|mixed $parameters
+     * @param  mixed|array  $parameters
      * @return $this
      */
     public function with($parameters)

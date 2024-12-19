@@ -292,7 +292,7 @@ class PipelineTest extends TestCase
         $result = (new Pipeline(new Container))
             ->send('foo')
             ->with($parameters[1])
-            ->through(PipelineTestParameterPipe::class . ':' . $parameters[0])
+            ->through(PipelineTestParameterPipe::class.':'.$parameters[0])
             ->thenReturn();
 
         $this->assertSame('foo', $result);

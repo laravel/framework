@@ -25,7 +25,7 @@ interface Pipeline
     /**
      * Set the extra parameters being sent with the traveller object.
      *
-     * @param mixed|array $parameters
+     * @param  mixed|array  $parameters
      * @return $this
      */
     public function with($parameters);
