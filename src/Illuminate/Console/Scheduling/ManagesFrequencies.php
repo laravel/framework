@@ -502,7 +502,7 @@ trait ManagesFrequencies
     /**
      * Schedule the event to run weekly on a given day and time.
      *
-     * @param  array|mixed  $dayOfWeek
+     * @param  array|int|int[]|\|\Illuminate\Console\Enums\ScheduleOn|Illuminate\Console\Enums\ScheduleOn|mixed  $dayOfWeek
      * @param  string  $time
      * @return $this
      */
@@ -629,7 +629,7 @@ trait ManagesFrequencies
     /**
      * Set the days of the week the command should run on.
      *
-     * @param  array|mixed  $days
+     * @param  array|\Illuminate\Console\Enums\ScheduleOn|Illuminate\Console\Enums\ScheduleOn[]|int|int[]|string|string[]|mixed  $days
      * @return $this
      */
     public function days($days)
