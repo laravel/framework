@@ -106,7 +106,7 @@ class Env
                 'null', '(null)' => null,
                 default => preg_match('/\A([\'"])(.*)\1\z/', $value, $matches)
                     ? $matches[2]
-                    $value,
+                    : $value,
             });
     }
 }
