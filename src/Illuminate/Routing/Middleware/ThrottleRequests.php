@@ -98,7 +98,7 @@ class ThrottleRequests
                 (object) [
                     'key' => $prefix.$this->resolveRequestSignature($request),
                     'maxAttempts' => $this->resolveMaxAttempts($request, $maxAttempts),
-                    'decaySeconds' => SECONDS_PER_DAY * $decayMinutes,
+                    'decaySeconds' => SECONDS_PER_MINUTE * $decayMinutes,
                     'responseCallback' => null,
                 ],
             ]
