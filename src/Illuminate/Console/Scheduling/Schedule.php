@@ -30,25 +30,25 @@ class Schedule
     }
 
     /** @deprecated Use \Illuminate\Console\Enums\ScheduleOn::SUNDAY instead */
-    const SUNDAY = ScheduleOn::SUNDAY;
+    const SUNDAY = ScheduleOn::Sunday;
 
     /** @deprecated Use \Illuminate\Console\Enums\ScheduleOn::MONDAY instead */
-    const MONDAY = ScheduleOn::MONDAY;
+    const MONDAY = ScheduleOn::Monday;
 
     /** @deprecated Use \Illuminate\Console\Enums\ScheduleOn::TUESDAY instead */
-    const TUESDAY = ScheduleOn::TUESDAY;
+    const TUESDAY = ScheduleOn::Tuesday;
 
     /** @deprecated Use \Illuminate\Console\Enums\ScheduleOn::WEDNESDAY instead */
-    const WEDNESDAY = ScheduleOn::WEDNESDAY;
+    const WEDNESDAY = ScheduleOn::Wednesday;
 
     /** @deprecated Use \Illuminate\Console\Enums\ScheduleOn::THURSDAY instead */
-    const THURSDAY = ScheduleOn::THURSDAY;
+    const THURSDAY = ScheduleOn::Thursday;
 
     /** @deprecated Use \Illuminate\Console\Enums\ScheduleOn::FRIDAY instead */
-    const FRIDAY = ScheduleOn::FRIDAY;
+    const FRIDAY = ScheduleOn::Friday;
 
     /** @deprecated Use \Illuminate\Console\Enums\ScheduleOn::SATURDAY instead */
-    const SATURDAY = ScheduleOn::SATURDAY;
+    const SATURDAY = ScheduleOn::Saturday;
 
     /**
      * All of the events on the schedule.

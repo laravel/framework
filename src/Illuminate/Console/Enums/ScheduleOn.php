@@ -4,17 +4,17 @@ namespace Illuminate\Console\Enums;
 
 enum ScheduleOn: int
 {
-    case SUNDAY = 0;
+    case Sunday = 0;
 
-    case MONDAY = 1;
+    case Monday = 1;
 
-    case TUESDAY = 2;
+    case Tuesday = 2;
 
-    case WEDNESDAY = 3;
+    case Wednesday = 3;
 
-    case THURSDAY = 4;
+    case Thursday = 4;
 
-    case FRIDAY = 5;
+    case Friday = 5;
 
-    case SATURDAY = 6;
+    case Saturday = 6;
 }
