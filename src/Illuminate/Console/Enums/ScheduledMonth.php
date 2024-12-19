@@ -2,7 +2,7 @@
 
 namespace Illuminate\Console\Enums;
 
-enum ScheduledMonth: string
+enum ScheduledMonth: int
 {
     case January = 1;
     case February = 2;
