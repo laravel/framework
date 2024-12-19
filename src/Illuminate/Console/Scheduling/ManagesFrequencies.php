@@ -404,7 +404,7 @@ trait ManagesFrequencies
      */
     public function weekdays()
     {
-        return $this->days(ScheduleOn::MONDAY->value.'-'.ScheduleOn::FRIDAY->value);
+        return $this->days(ScheduleOn::Monday->value.'-'.ScheduleOn::Friday->value);
     }
 
     /**
@@ -414,7 +414,7 @@ trait ManagesFrequencies
      */
     public function weekends()
     {
-        return $this->days(ScheduleOn::SATURDAY->value.','.ScheduleOn::SUNDAY->value);
+        return $this->days(ScheduleOn::Saturday->value.','.ScheduleOn::Sunday->value);
     }
 
     /**
@@ -424,7 +424,7 @@ trait ManagesFrequencies
      */
     public function mondays()
     {
-        return $this->days(ScheduleOn::MONDAY);
+        return $this->days(ScheduleOn::Monday);
     }
 
     /**
@@ -434,7 +434,7 @@ trait ManagesFrequencies
      */
     public function tuesdays()
     {
-        return $this->days(ScheduleOn::TUESDAY);
+        return $this->days(ScheduleOn::Tuesday);
     }
 
     /**
@@ -444,7 +444,7 @@ trait ManagesFrequencies
      */
     public function wednesdays()
     {
-        return $this->days(ScheduleOn::WEDNESDAY);
+        return $this->days(ScheduleOn::Wednesday);
     }
 
     /**
@@ -454,7 +454,7 @@ trait ManagesFrequencies
      */
     public function thursdays()
     {
-        return $this->days(ScheduleOn::THURSDAY);
+        return $this->days(ScheduleOn::Thursday);
     }
 
     /**
@@ -464,7 +464,7 @@ trait ManagesFrequencies
      */
     public function fridays()
     {
-        return $this->days(ScheduleOn::FRIDAY);
+        return $this->days(ScheduleOn::Friday);
     }
 
     /**
@@ -474,7 +474,7 @@ trait ManagesFrequencies
      */
     public function saturdays()
     {
-        return $this->days(ScheduleOn::SATURDAY);
+        return $this->days(ScheduleOn::Saturday);
     }
 
     /**
@@ -484,7 +484,7 @@ trait ManagesFrequencies
      */
     public function sundays()
     {
-        return $this->days(ScheduleOn::SUNDAY);
+        return $this->days(ScheduleOn::Sunday);
     }
 
     /**
