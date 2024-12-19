@@ -2,7 +2,7 @@
 
 namespace Illuminate\Auth\Enums;
 
-enum PasswordStatus: string
+enum PasswordResetResult: string
 {
     /**
      * Constant representing a successfully sent reminder.
@@ -27,5 +27,5 @@ enum PasswordStatus: string
     /**
      * Constant representing a throttled reset attempt.
      */
-    case ResetThrottled = 'passwords.throttled';
+    case Throttled = 'passwords.throttled';
 }

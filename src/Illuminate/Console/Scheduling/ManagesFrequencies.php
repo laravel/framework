@@ -2,7 +2,7 @@
 
 namespace Illuminate\Console\Scheduling;
 
-use Illuminate\Console\Enums\ScheduleOn;
+use Illuminate\Console\Scheduling\Enums\Day;
 use Illuminate\Support\Carbon;
 use InvalidArgumentException;
 
@@ -404,7 +404,7 @@ trait ManagesFrequencies
      */
     public function weekdays()
     {
-        return $this->days(ScheduleOn::Monday->value.'-'.ScheduleOn::Friday->value);
+        return $this->days(Day::Monday->value.'-'.Day::Friday->value);
     }
 
     /**
@@ -414,7 +414,7 @@ trait ManagesFrequencies
      */
     public function weekends()
     {
-        return $this->days(ScheduleOn::Saturday->value.','.ScheduleOn::Sunday->value);
+        return $this->days(Day::Saturday->value.','.Day::Sunday->value);
     }
 
     /**
@@ -424,7 +424,7 @@ trait ManagesFrequencies
      */
     public function mondays()
     {
-        return $this->days(ScheduleOn::Monday);
+        return $this->days(Day::Monday);
     }
 
     /**
@@ -434,7 +434,7 @@ trait ManagesFrequencies
      */
     public function tuesdays()
     {
-        return $this->days(ScheduleOn::Tuesday);
+        return $this->days(Day::Tuesday);
     }
 
     /**
@@ -444,7 +444,7 @@ trait ManagesFrequencies
      */
     public function wednesdays()
     {
-        return $this->days(ScheduleOn::Wednesday);
+        return $this->days(Day::Wednesday);
     }
 
     /**
@@ -454,7 +454,7 @@ trait ManagesFrequencies
      */
     public function thursdays()
     {
-        return $this->days(ScheduleOn::Thursday);
+        return $this->days(Day::Thursday);
     }
 
     /**
@@ -464,7 +464,7 @@ trait ManagesFrequencies
      */
     public function fridays()
     {
-        return $this->days(ScheduleOn::Friday);
+        return $this->days(Day::Friday);
     }
 
     /**
@@ -474,7 +474,7 @@ trait ManagesFrequencies
      */
     public function saturdays()
     {
-        return $this->days(ScheduleOn::Saturday);
+        return $this->days(Day::Saturday);
     }
 
     /**
@@ -484,7 +484,7 @@ trait ManagesFrequencies
      */
     public function sundays()
     {
-        return $this->days(ScheduleOn::Sunday);
+        return $this->days(Day::Sunday);
     }
 
     /**
@@ -502,7 +502,7 @@ trait ManagesFrequencies
     /**
      * Schedule the event to run weekly on a given day and time.
      *
-     * @param  array|int|int[]|\|\Illuminate\Console\Enums\ScheduleOn|Illuminate\Console\Enums\ScheduleOn[]|mixed  $dayOfWeek
+     * @param  Day[]|Day|array|int|int[]|mixed  $dayOfWeek
      * @param  string  $time
      * @return $this
      */
@@ -629,7 +629,7 @@ trait ManagesFrequencies
     /**
      * Set the days of the week the command should run on.
      *
-     * @param  array|\Illuminate\Console\Enums\ScheduleOn|Illuminate\Console\Enums\ScheduleOn[]|int|int[]|string|string[]|mixed  $days
+     * @param  Day[]|Day|array|int[]|int|string[]|string|mixed  $days
      * @return $this
      */
     public function days($days)

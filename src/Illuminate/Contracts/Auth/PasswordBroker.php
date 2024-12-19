@@ -3,7 +3,7 @@
 namespace Illuminate\Contracts\Auth;
 
 use Closure;
-use Illuminate\Auth\Enums\PasswordStatus;
+use Illuminate\Auth\Enums\PasswordResetResult;
 
 interface PasswordBroker
 {
@@ -11,46 +11,36 @@ interface PasswordBroker
      * Constant representing a successfully sent reminder.
      *
      * @var \Illuminate\Auth\Enums\PasswordStatus
-     *
-     * @deprecated Use \Illuminate\Auth\Enums\PasswordStatus::ResetLinkSent instead
      */
-    const RESET_LINK_SENT = PasswordStatus::ResetLinkSent;
+    const RESET_LINK_SENT = PasswordResetResult::ResetLinkSent;
 
     /**
      * Constant representing a successfully reset password.
      *
      * @var \Illuminate\Auth\Enums\PasswordStatus
-     *
-     * @deprecated Use \Illuminate\Auth\Enums\PasswordStatus::PasswordReset instead
      */
-    const PASSWORD_RESET = PasswordStatus::PasswordReset;
+    const PASSWORD_RESET = PasswordResetResult::PasswordReset;
 
     /**
      * Constant representing the user not found response.
      *
      * @var \Illuminate\Auth\Enums\PasswordStatus
-     *
-     * @deprecated Use \Illuminate\Auth\Enums\PasswordStatus::InvalidUser instead
      */
-    const INVALID_USER = PasswordStatus::InvalidUser;
+    const INVALID_USER = PasswordResetResult::InvalidUser;
 
     /**
      * Constant representing an invalid token.
      *
      * @var \Illuminate\Auth\Enums\PasswordStatus
-     *
-     * @deprecated Use \Illuminate\Auth\Enums\PasswordStatus::InvalidToken instead
      */
-    const INVALID_TOKEN = PasswordStatus::InvalidToken;
+    const INVALID_TOKEN = PasswordResetResult::InvalidToken;
 
     /**
      * Constant representing a throttled reset attempt.
      *
      * @var \Illuminate\Auth\Enums\PasswordStatus
-     *
-     * @deprecated Use \Illuminate\Auth\Enums\PasswordStatus::ResetThrottled instead
      */
-    const RESET_THROTTLED = PasswordStatus::ResetThrottled;
+    const RESET_THROTTLED = PasswordResetResult::Throttled;
 
     /**
      * Send a password reset link to a user.
