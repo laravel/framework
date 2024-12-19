@@ -2,13 +2,13 @@
 
 namespace Illuminate\Support\Facades;
 
-use Illuminate\Contracts\Auth\PasswordBroker;
+use Illuminate\Auth\Enums\PasswordStatus;
 
 /**
  * @method static \Illuminate\Contracts\Auth\PasswordBroker broker(string|null $name = null)
  * @method static string getDefaultDriver()
  * @method static void setDefaultDriver(string $name)
- * @method static string sendResetLink(array $credentials, \Closure|null $callback = null)
+ * @method static \Illuminate\Auth\Enums\PasswordStatus sendResetLink(array $credentials, \Closure|null $callback = null)
  * @method static mixed reset(array $credentials, \Closure $callback)
  * @method static \Illuminate\Contracts\Auth\CanResetPassword|null getUser(array $credentials)
  * @method static string createToken(\Illuminate\Contracts\Auth\CanResetPassword $user)
@@ -26,35 +26,35 @@ class Password extends Facade
      *
      * @var string
      */
-    const RESET_LINK_SENT = PasswordBroker::RESET_LINK_SENT;
+    const RESET_LINK_SENT = PasswordStatus::ResetLinkSent;
 
     /**
      * Constant representing a successfully reset password.
      *
      * @var string
      */
-    const PASSWORD_RESET = PasswordBroker::PASSWORD_RESET;
+    const PASSWORD_RESET = PasswordStatus::PasswordReset;
 
     /**
      * Constant representing the user not found response.
      *
      * @var string
      */
-    const INVALID_USER = PasswordBroker::INVALID_USER;
+    const INVALID_USER = PasswordStatus::InvalidUser;
 
     /**
      * Constant representing an invalid token.
      *
      * @var string
      */
-    const INVALID_TOKEN = PasswordBroker::INVALID_TOKEN;
+    const INVALID_TOKEN = PasswordStatus::InvalidToken;
 
     /**
      * Constant representing a throttled reset attempt.
      *
      * @var string
      */
-    const RESET_THROTTLED = PasswordBroker::RESET_THROTTLED;
+    const RESET_THROTTLED = PasswordStatus::ResetThrottled;
 
     /**
      * Get the registered name of the component.

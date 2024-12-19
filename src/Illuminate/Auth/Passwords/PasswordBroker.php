@@ -3,6 +3,7 @@
 namespace Illuminate\Auth\Passwords;
 
 use Closure;
+use Illuminate\Auth\Enums\PasswordStatus;
 use Illuminate\Auth\Events\PasswordResetLinkSent;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 use Illuminate\Contracts\Auth\PasswordBroker as PasswordBrokerContract;
@@ -54,7 +55,7 @@ class PasswordBroker implements PasswordBrokerContract
      *
      * @param  array  $credentials
      * @param  \Closure|null  $callback
-     * @return string
+     * @return \Illuminate\Auth\Enums\PasswordStatus
      */
     public function sendResetLink(#[\SensitiveParameter] array $credentials, ?Closure $callback = null)
     {
@@ -64,17 +65,17 @@ class PasswordBroker implements PasswordBrokerContract
         $user = $this->getUser($credentials);
 
         if (is_null($user)) {
-            return static::INVALID_USER;
+            return PasswordStatus::InvalidUser;
         }
 
         if ($this->tokens->recentlyCreatedToken($user)) {
-            return static::RESET_THROTTLED;
+            return PasswordStatus::ResetThrottled;
         }
 
         $token = $this->tokens->create($user);
 
         if ($callback) {
-            return $callback($user, $token) ?? static::RESET_LINK_SENT;
+            return $callback($user, $token) ?? PasswordStatus::ResetLinkSent;
         }
 
         // Once we have the reset token, we are ready to send the message out to this
@@ -84,7 +85,7 @@ class PasswordBroker implements PasswordBrokerContract
 
         $this->events?->dispatch(new PasswordResetLinkSent($user));
 
-        return static::RESET_LINK_SENT;
+        return PasswordStatus::ResetLinkSent;
     }
 
     /**
@@ -114,23 +115,23 @@ class PasswordBroker implements PasswordBrokerContract
 
         $this->tokens->delete($user);
 
-        return static::PASSWORD_RESET;
+        return PasswordStatus::PasswordReset;
     }
 
     /**
      * Validate a password reset for the given credentials.
      *
      * @param  array  $credentials
-     * @return \Illuminate\Contracts\Auth\CanResetPassword|string
+     * @return \Illuminate\Contracts\Auth\CanResetPassword|\Illuminate\Auth\Enums\PasswordStatus
      */
     protected function validateReset(#[\SensitiveParameter] array $credentials)
     {
         if (is_null($user = $this->getUser($credentials))) {
-            return static::INVALID_USER;
+            return PasswordStatus::InvalidUser;
         }
 
         if (! $this->tokens->exists($user, $credentials['token'])) {
-            return static::INVALID_TOKEN;
+            return PasswordStatus::InvalidToken;
         }
 
         return $user;

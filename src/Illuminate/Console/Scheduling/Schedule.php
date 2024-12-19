@@ -7,6 +7,7 @@ use Closure;
 use DateTimeInterface;
 use Illuminate\Bus\UniqueLock;
 use Illuminate\Console\Application;
+use Illuminate\Console\Enums\ScheduleOn;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Cache\Repository as Cache;
@@ -28,19 +29,26 @@ class Schedule
         __call as macroCall;
     }
 
-    const SUNDAY = 0;
+    /** @deprecated Use \Illuminate\Console\Enums\ScheduleOn::SUNDAY instead */
+    const SUNDAY = ScheduleOn::Sunday;
 
-    const MONDAY = 1;
+    /** @deprecated Use \Illuminate\Console\Enums\ScheduleOn::MONDAY instead */
+    const MONDAY = ScheduleOn::Monday;
 
-    const TUESDAY = 2;
+    /** @deprecated Use \Illuminate\Console\Enums\ScheduleOn::TUESDAY instead */
+    const TUESDAY = ScheduleOn::Tuesday;
 
-    const WEDNESDAY = 3;
+    /** @deprecated Use \Illuminate\Console\Enums\ScheduleOn::WEDNESDAY instead */
+    const WEDNESDAY = ScheduleOn::Wednesday;
 
-    const THURSDAY = 4;
+    /** @deprecated Use \Illuminate\Console\Enums\ScheduleOn::THURSDAY instead */
+    const THURSDAY = ScheduleOn::Thursday;
 
-    const FRIDAY = 5;
+    /** @deprecated Use \Illuminate\Console\Enums\ScheduleOn::FRIDAY instead */
+    const FRIDAY = ScheduleOn::Friday;
 
-    const SATURDAY = 6;
+    /** @deprecated Use \Illuminate\Console\Enums\ScheduleOn::SATURDAY instead */
+    const SATURDAY = ScheduleOn::Saturday;
 
     /**
      * All of the events on the schedule.
