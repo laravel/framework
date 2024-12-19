@@ -539,8 +539,8 @@ trait ManagesFrequencies
     /**
      * Schedule the event to run twice monthly at a given time.
      *
-     * @param  int  $first<1,  31>
-     * @param  int  $second<1,  31>
+     * @param  int<1, 31>  $first
+     * @param  int<1, 31>  $second
      * @param  string  $time
      * @return $this
      */
