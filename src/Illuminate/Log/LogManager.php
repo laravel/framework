@@ -23,6 +23,8 @@ use Monolog\Processor\PsrLogMessageProcessor;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
+use const Illuminate\Support\Date\DAYS_PER_WEEK;
+
 /**
  * @mixin \Illuminate\Log\Logger
  */
@@ -328,7 +330,7 @@ class LogManager implements LoggerInterface
     {
         return new Monolog($this->parseChannel($config), [
             $this->prepareHandler(new RotatingFileHandler(
-                $config['path'], $config['days'] ?? 7, $this->level($config),
+                $config['path'], $config['days'] ?? DAYS_PER_WEEK, $this->level($config),
                 $config['bubble'] ?? true, $config['permission'] ?? null, $config['locking'] ?? false
             ), $config),
         ], $config['replace_placeholders'] ?? false ? [new PsrLogMessageProcessor()] : []);

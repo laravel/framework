@@ -13,6 +13,8 @@ use Illuminate\Support\InteractsWithTime;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Response;
 
+use const Illuminate\Support\Date\SECONDS_PER_MINUTE;
+
 class ThrottleRequests
 {
     use InteractsWithTime;
@@ -96,7 +98,7 @@ class ThrottleRequests
                 (object) [
                     'key' => $prefix.$this->resolveRequestSignature($request),
                     'maxAttempts' => $this->resolveMaxAttempts($request, $maxAttempts),
-                    'decaySeconds' => 60 * $decayMinutes,
+                    'decaySeconds' => SECONDS_PER_DAY * $decayMinutes,
                     'responseCallback' => null,
                 ],
             ]

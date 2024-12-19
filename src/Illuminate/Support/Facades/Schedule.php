@@ -71,7 +71,7 @@ use Illuminate\Console\Scheduling\Schedule as ConsoleSchedule;
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes saturdays()
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes sundays()
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes weekly()
- * @method static \Illuminate\Console\Scheduling\PendingEventAttributes weeklyOn(array|mixed $dayOfWeek, string $time = '0:0')
+ * @method static \Illuminate\Console\Scheduling\PendingEventAttributes weeklyOn(array|int|int[]|\Illuminate\Support\Date\Day|Illuminate\Support\Date\Day[]|mixed $dayOfWeek, string $time = '0:0')
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes monthly()
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes monthlyOn(int $dayOfMonth = 1, string $time = '0:0')
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes twiceMonthly(int $first = 1, int $second = 16, string $time = '0:0')
@@ -80,7 +80,7 @@ use Illuminate\Console\Scheduling\Schedule as ConsoleSchedule;
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes quarterlyOn(int $dayOfQuarter = 1, string $time = '0:0')
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes yearly()
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes yearlyOn(int $month = 1, int|string $dayOfMonth = 1, string $time = '0:0')
- * @method static \Illuminate\Console\Scheduling\PendingEventAttributes days(array|mixed $days)
+ * @method static \Illuminate\Console\Scheduling\PendingEventAttributes days(array|\Illuminate\Support\Date\Day|Illuminate\Support\Date\Day[]|int|int[]|string|string[]|mixed $days)
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes timezone(\DateTimeZone|string $timezone)
  *
  * @see \Illuminate\Console\Scheduling\Schedule

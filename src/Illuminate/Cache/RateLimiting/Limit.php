@@ -2,6 +2,8 @@
 
 namespace Illuminate\Cache\RateLimiting;
 
+use const Illuminate\Support\Date\{SECONDS_PER_MINUTE, MINUTES_PER_HOUR, HOURS_PER_DAY};
+
 class Limit
 {
     /**
@@ -40,7 +42,7 @@ class Limit
      * @param  int  $decaySeconds
      * @return void
      */
-    public function __construct($key = '', int $maxAttempts = 60, int $decaySeconds = 60)
+    public function __construct($key = '', int $maxAttempts = 60, int $decaySeconds = SECONDS_PER_MINUTE)
     {
         $this->key = $key;
         $this->maxAttempts = $maxAttempts;
@@ -68,7 +70,7 @@ class Limit
      */
     public static function perMinute($maxAttempts, $decayMinutes = 1)
     {
-        return new static('', $maxAttempts, 60 * $decayMinutes);
+        return new static('', $maxAttempts, MINUTES_PER_HOUR * $decayMinutes);
     }
 
     /**
@@ -80,7 +82,7 @@ class Limit
      */
     public static function perMinutes($decayMinutes, $maxAttempts)
     {
-        return new static('', $maxAttempts, 60 * $decayMinutes);
+        return new static('', $maxAttempts, MINUTES_PER_HOUR * $decayMinutes);
     }
 
     /**
@@ -92,7 +94,7 @@ class Limit
      */
     public static function perHour($maxAttempts, $decayHours = 1)
     {
-        return new static('', $maxAttempts, 60 * 60 * $decayHours);
+        return new static('', $maxAttempts, SECONDS_PER_MINUTE * MINUTES_PER_HOUR * $decayHours);
     }
 
     /**
@@ -104,7 +106,7 @@ class Limit
      */
     public static function perDay($maxAttempts, $decayDays = 1)
     {
-        return new static('', $maxAttempts, 60 * 60 * 24 * $decayDays);
+        return new static('', $maxAttempts, SECONDS_PER_MINUTE * MINUTES_PER_HOUR * HOURS_PER_DAY * $decayDays);
     }
 
     /**

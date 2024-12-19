@@ -7,6 +7,8 @@ use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Support\Collection;
 use Illuminate\Support\InteractsWithTime;
 
+use const Illuminate\Support\Date\SECONDS_PER_MINUTE;
+
 use function Illuminate\Support\enum_value;
 
 class RateLimiter
@@ -144,7 +146,7 @@ class RateLimiter
      * @param  int  $decaySeconds
      * @return int
      */
-    public function hit($key, $decaySeconds = 60)
+    public function hit($key, $decaySeconds = SECONDS_PER_MINUTE)
     {
         return $this->increment($key, $decaySeconds);
     }
@@ -157,7 +159,7 @@ class RateLimiter
      * @param  int  $amount
      * @return int
      */
-    public function increment($key, $decaySeconds = 60, $amount = 1)
+    public function increment($key, $decaySeconds = SECONDS_PER_MINUTE, $amount = 1)
     {
         $key = $this->cleanRateLimiterKey($key);
 
@@ -184,7 +186,7 @@ class RateLimiter
      * @param  int  $amount
      * @return int
      */
-    public function decrement($key, $decaySeconds = 60, $amount = 1)
+    public function decrement($key, $decaySeconds = SECONDS_PER_MINUTE, $amount = 1)
     {
         return $this->increment($key, $decaySeconds, $amount * -1);
     }
