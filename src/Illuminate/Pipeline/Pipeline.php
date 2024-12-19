@@ -5,6 +5,7 @@ namespace Illuminate\Pipeline;
 use Closure;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Pipeline\Pipeline as PipelineContract;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Traits\Conditionable;
 use RuntimeException;
 use Throwable;
@@ -42,6 +43,13 @@ class Pipeline implements PipelineContract
     protected $method = 'handle';
 
     /**
+     * The array of extra travelling parameters.
+     *
+     * @var array
+     */
+    protected $with = [];
+
+    /**
      * Create a new class instance.
      *
      * @param  \Illuminate\Contracts\Container\Container|null  $container
@@ -61,6 +69,19 @@ class Pipeline implements PipelineContract
     public function send($passable)
     {
         $this->passable = $passable;
+
+        return $this;
+    }
+
+    /**
+     * Set the extra parameters being sent with the traveller object.
+     *
+     * @param array|mixed $parameters
+     * @return $this
+     */
+    public function with($parameters)
+    {
+        $this->with = Arr::wrap($parameters);
 
         return $this;
     }
@@ -162,7 +183,7 @@ class Pipeline implements PipelineContract
                         // If the pipe is a callable, then we will call it directly, but otherwise we
                         // will resolve the pipes out of the dependency container and call it with
                         // the appropriate method and arguments, returning the results back out.
-                        return $pipe($passable, $stack);
+                        return $pipe($passable, $stack, ...$this->with);
                     } elseif (! is_object($pipe)) {
                         [$name, $parameters] = $this->parsePipeString($pipe);
 
@@ -178,6 +199,8 @@ class Pipeline implements PipelineContract
                         // since the object we're given was already a fully instantiated object.
                         $parameters = [$passable, $stack];
                     }
+
+                    $parameters = array_merge($parameters, $this->with);
 
                     $carry = method_exists($pipe, $this->method)
                                     ? $pipe->{$this->method}(...$parameters)

@@ -23,6 +23,14 @@ interface Pipeline
     public function through($stops);
 
     /**
+     * Set the extra parameters being sent with the traveller object.
+     *
+     * @param mixed|array $parameters
+     * @return $this
+     */
+    public function with($parameters);
+
+    /**
      * Set the method to call on the stops.
      *
      * @param  string  $method

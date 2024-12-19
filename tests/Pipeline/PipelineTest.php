@@ -273,6 +273,33 @@ class PipelineTest extends TestCase
         $this->assertNull($_SERVER['__test.pipe.one']);
         unset($_SERVER['__test.pipe.one']);
     }
+
+    public function testPipelinePassesWithParametersToPipes()
+    {
+        $parameters = ['one', 'two'];
+
+        $result = (new Pipeline(new Container))
+            ->send('foo')
+            ->with($parameters)
+            ->through(PipelineTestParameterPipe::class)
+            ->thenReturn();
+
+        $this->assertSame('foo', $result);
+        $this->assertEquals($parameters, $_SERVER['__test.pipe.parameters']);
+        unset($_SERVER['__test.pipe.parameters']);
+
+        // test that parameters set by "with" are passed after "through" parameters.
+        $result = (new Pipeline(new Container))
+            ->send('foo')
+            ->with($parameters[1])
+            ->through(PipelineTestParameterPipe::class . ':' . $parameters[0])
+            ->thenReturn();
+
+        $this->assertSame('foo', $result);
+        $this->assertEquals($parameters, $_SERVER['__test.pipe.parameters']);
+
+        unset($_SERVER['__test.pipe.parameters']);
+    }
 }
 
 class PipelineTestPipeOne
