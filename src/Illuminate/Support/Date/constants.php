@@ -2,22 +2,22 @@
 
 namespace Illuminate\Support\Date;
 
-if (! defined('SECONDS_PER_MINUTE')) {
-    define('SECONDS_PER_MINUTE', 60);
+if (! defined(__NAMESPACE__.'\\'.($constant  = 'SECONDS_PER_MINUTE'))) {
+    define(__NAMESPACE__.'\\'.$constant, 60);
 }
 
-if (! defined('MINUTES_PER_HOUR')) {
-    define('MINUTES_PER_HOUR', 60);
+if (! defined(__NAMESPACE__.'\\'.($constant  = 'MINUTES_PER_HOUR'))) {
+    define(__NAMESPACE__.'\\'.$constant, 60);
 }
 
-if (! defined('HOURS_PER_DAY')) {
-    define('HOURS_PER_DAY', 24);
+if (! defined(__NAMESPACE__.'\\'.($constant  = 'HOURS_PER_DAY'))) {
+    define(__NAMESPACE__.'\\'.$constant, 24);
 }
 
-if (! defined('DAYS_PER_WEEK')) {
-    define('DAYS_PER_WEEK', 7);
+if (! defined(__NAMESPACE__.'\\'.($constant  = 'DAYS_PER_WEEK'))) {
+    define(__NAMESPACE__.'\\'.$constant, 7);
 }
 
-if (! defined('MONTHS_PER_YEAR')) {
-    define('MONTHS_PER_YEAR', 12);
+if (! defined(__NAMESPACE__.'\\'.($constant  = 'MONTHS_PER_YEAR'))) {
+    define(__NAMESPACE__.'\\'.$constant, 12);
 }
