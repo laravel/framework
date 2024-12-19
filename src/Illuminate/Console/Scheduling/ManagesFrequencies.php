@@ -146,7 +146,7 @@ trait ManagesFrequencies
     /**
      * Schedule the event to run multiple times per minute.
      *
-     * @param  int  $seconds
+     * @param  int<0, 59>  $seconds
      * @return $this
      */
     protected function repeatEvery($seconds)
