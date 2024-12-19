@@ -123,7 +123,6 @@
         "symfony/translation": "^7.0.3"
     },
     "conflict": {
-        "mockery/mockery": "1.6.8",
         "tightenco/collect": "<5.5.33"
     },
     "provide": {
