@@ -3,7 +3,6 @@
 namespace Illuminate\Contracts\Auth;
 
 use Closure;
-use Illuminate\Auth\Passwords\PasswordResetResult;
 
 interface PasswordBroker
 {
@@ -12,35 +11,35 @@ interface PasswordBroker
      *
      * @var string
      */
-    const RESET_LINK_SENT = PasswordResetResult::ResetLinkSent;
+    const RESET_LINK_SENT = 'passwords.sent';
 
     /**
      * Constant representing a successfully reset password.
      *
      * @var string
      */
-    const PASSWORD_RESET = PasswordResetResult::PasswordReset;
+    const PASSWORD_RESET = 'passwords.reset';
 
     /**
      * Constant representing the user not found response.
      *
      * @var string
      */
-    const INVALID_USER = PasswordResetResult::InvalidUser;
+    const INVALID_USER = 'passwords.user';
 
     /**
      * Constant representing an invalid token.
      *
      * @var string
      */
-    const INVALID_TOKEN = PasswordResetResult::InvalidToken;
+    const INVALID_TOKEN = 'passwords.token';
 
     /**
      * Constant representing a throttled reset attempt.
      *
      * @var string
      */
-    const RESET_THROTTLED = PasswordResetResult::Throttled;
+    const RESET_THROTTLED = 'passwords.throttled';
 
     /**
      * Send a password reset link to a user.
