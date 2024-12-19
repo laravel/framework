@@ -477,6 +477,7 @@ class Str
      *
      * @param  string|iterable<string>  $pattern
      * @param  string  $value
+     * @param  bool  $ignoreCase
      * @return bool
      */
     public static function is($pattern, $value, $ignoreCase = false)
