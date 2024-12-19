@@ -80,7 +80,7 @@ use Illuminate\Console\Scheduling\Schedule as ConsoleSchedule;
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes quarterlyOn(int $dayOfQuarter = 1, string $time = '0:0')
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes yearly()
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes yearlyOn(int<1, 12> $month = 1, int<0,  31>|string $dayOfMonth = 1, string $time = '0:0')
- * @method static \Illuminate\Console\Scheduling\PendingEventAttributes days(array||\Illuminate\Console\Enums\ScheduleOn|Illuminate\Console\Enums\ScheduleOn[]|int|int[]|string|string[]|mixed $days)
+ * @method static \Illuminate\Console\Scheduling\PendingEventAttributes days(array|\Illuminate\Console\Enums\ScheduleOn|Illuminate\Console\Enums\ScheduleOn[]|int|int[]|string|string[]|mixed $days)
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes timezone(\DateTimeZone|string $timezone)
  *
  * @see \Illuminate\Console\Scheduling\Schedule
