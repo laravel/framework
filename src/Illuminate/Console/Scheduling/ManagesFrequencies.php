@@ -503,7 +503,7 @@ trait ManagesFrequencies
     /**
      * Schedule the event to run weekly on a given day and time.
      *
-     * @param  \Illuminate\Support\Date\Day[]|\Illuminate\Support\Date\Day|array|int|int[]|mixed  $dayOfWeek
+     * @param  \Illuminate\Support\Date\Day[]|\Illuminate\Support\Date\Day|array|int<0,  6>|int<0,  6>[]|mixed  $dayOfWeek
      * @param  string  $time
      * @return $this
      */
@@ -614,7 +614,7 @@ trait ManagesFrequencies
     /**
      * Schedule the event to run yearly on a given month, day, and time.
      *
-     * @param  int|\Illuminate\Support\Date\Month  $month
+     * @param  int<1, 12>|\Illuminate\Support\Date\Month  $month
      * @param  int|string  $dayOfMonth
      * @param  string  $time
      * @return $this
