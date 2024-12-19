@@ -20,7 +20,7 @@ interface PasswordBroker
      * Constant representing a successfully reset password.
      *
      * @var \Illuminate\Auth\Enums\PasswordStatus
-     * 
+     *
      * @deprecated Use \Illuminate\Auth\Enums\PasswordStatus::PasswordReset instead
      */
     const PASSWORD_RESET = PasswordStatus::PasswordReset;
