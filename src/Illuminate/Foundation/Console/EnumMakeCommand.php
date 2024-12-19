@@ -57,8 +57,8 @@ class EnumMakeCommand extends GeneratorCommand
     protected function resolveStubPath($stub)
     {
         return file_exists($customPath = $this->laravel->basePath(trim($stub, '/')))
-                        ? $customPath
-                        : __DIR__.$stub;
+            ? $customPath
+            : __DIR__ . $stub;
     }
 
     /**
@@ -70,9 +70,9 @@ class EnumMakeCommand extends GeneratorCommand
     protected function getDefaultNamespace($rootNamespace)
     {
         return match (true) {
-            is_dir(app_path('Enums')) => $rootNamespace.'\\Enums',
-            is_dir(app_path('Enumerations')) => $rootNamespace.'\\Enumerations',
-            default => $rootNamespace,
+            is_dir(app_path('Enums')) => $rootNamespace . '\\Enums',
+            is_dir(app_path('Enumerations')) => $rootNamespace . '\\Enumerations',
+            default => $rootNamespace . '\\Enums',
         };
     }
 
