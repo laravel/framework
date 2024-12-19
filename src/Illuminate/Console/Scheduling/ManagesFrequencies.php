@@ -250,7 +250,7 @@ trait ManagesFrequencies
     /**
      * Schedule the event to run hourly at a given offset in the hour.
      *
-     * @param  array|string|int<0, 24>|int<0, 24>[]  $offset
+     * @param  array|string|int<0, 23>|int<0, 23>[]  $offset
      * @return $this
      */
     public function hourlyAt($offset)
@@ -353,8 +353,8 @@ trait ManagesFrequencies
     /**
      * Schedule the event to run twice daily.
      *
-     * @param  int<0, 24>  $first
-     * @param  int<0, 24>  $second
+     * @param  int<0, 23>  $first
+     * @param  int<0, 23>  $second
      * @return $this
      */
     public function twiceDaily($first = 1, $second = 13)
@@ -365,8 +365,8 @@ trait ManagesFrequencies
     /**
      * Schedule the event to run twice daily at a given offset.
      *
-     * @param  int<0, 24>  $first
-     * @param  int<0, 24>  $second
+     * @param  int<0, 23>  $first
+     * @param  int<0, 23>  $second
      * @param  int<0, 59>  $offset
      * @return $this
      */
@@ -381,7 +381,7 @@ trait ManagesFrequencies
      * Schedule the event to run at the given minutes and hours.
      *
      * @param  array|string|int<0, 59>  $minutes
-     * @param  array|string|int<0, 24>  $hours
+     * @param  array|string|int<0, 23>  $hours
      * @return $this
      */
     protected function hourBasedSchedule($minutes, $hours)
