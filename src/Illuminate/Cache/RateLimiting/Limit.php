@@ -2,7 +2,7 @@
 
 namespace Illuminate\Cache\RateLimiting;
 
-use const Illuminate\Support\Date\{SECONDS_PER_MINUTE, MINUTES_PER_HOUR, HOURS_PER_DAY};
+use const Illuminate\Support\Date\{HOURS_PER_DAY, MINUTES_PER_HOUR, SECONDS_PER_MINUTE};
 
 class Limit
 {

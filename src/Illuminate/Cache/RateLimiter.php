@@ -7,9 +7,9 @@ use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Support\Collection;
 use Illuminate\Support\InteractsWithTime;
 
-use const Illuminate\Support\Date\SECONDS_PER_MINUTE;
-
 use function Illuminate\Support\enum_value;
+
+use const Illuminate\Support\Date\SECONDS_PER_MINUTE;
 
 class RateLimiter
 {
