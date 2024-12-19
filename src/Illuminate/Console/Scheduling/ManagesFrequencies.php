@@ -525,7 +525,7 @@ trait ManagesFrequencies
     /**
      * Schedule the event to run monthly on a given day and time.
      *
-     * @param  int<0, 31>  $dayOfMonth
+     * @param  int<1, 31>  $dayOfMonth
      * @param  string  $time
      * @return $this
      */
@@ -539,8 +539,8 @@ trait ManagesFrequencies
     /**
      * Schedule the event to run twice monthly at a given time.
      *
-     * @param  int  $first<0,  31>
-     * @param  int  $second<0,  31>
+     * @param  int<1, 31>  $first
+     * @param  int<1, 31>  $second
      * @param  string  $time
      * @return $this
      */
@@ -611,7 +611,7 @@ trait ManagesFrequencies
      * Schedule the event to run yearly on a given month, day, and time.
      *
      * @param  int  $month
-     * @param  int<0, 31>|string  $dayOfMonth
+     * @param  int<1, 31>|string  $dayOfMonth
      * @param  string  $time
      * @return $this
      */
