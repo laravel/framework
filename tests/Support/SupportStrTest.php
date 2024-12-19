@@ -507,6 +507,15 @@ class SupportStrTest extends TestCase
         $this->assertFalse(Str::is('*FOO*', 'foo/bar/baz'));
         $this->assertFalse(Str::is('A', 'a'));
 
+        // is not case sensitive
+        $this->assertTrue(Str::is('A', 'a', true));
+        $this->assertTrue(Str::is('*BAZ*', 'foo/bar/baz', true));
+        $this->assertTrue(Str::is(['A*', 'B*'], 'a/', true));
+        $this->assertFalse(Str::is(['A*', 'B*'], 'f/', true));
+        $this->assertTrue(Str::is('FOO', 'foo', true));
+        $this->assertTrue(Str::is('*FOO*', 'foo/bar/baz', true));
+        $this->assertTrue(Str::is('foo/*', 'FOO/bar', true));
+
         // Accepts array of patterns
         $this->assertTrue(Str::is(['a*', 'b*'], 'a/'));
         $this->assertTrue(Str::is(['a*', 'b*'], 'b/'));
