@@ -989,6 +989,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             $amount = (clone $this)->setAttribute($column, $amount)->getAttributeFromArray($column);
         }
 
+        $this->syncPrevious();
+
         return tap($this->setKeysForSaveQuery($this->newQueryWithoutScopes())->{$method}($column, $amount, $extra), function () use ($column) {
             $this->syncChanges();
 
@@ -1236,6 +1238,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         $dirty = $this->getDirtyForUpdate();
 
         if (count($dirty) > 0) {
+            $this->syncPrevious();
+
             $this->setKeysForSaveQuery($query)->update($dirty);
 
             $this->syncChanges();
