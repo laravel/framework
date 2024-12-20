@@ -38,7 +38,7 @@ class Response extends SymfonyResponse
     }
 
     /**
-     * Get the current response content.
+     * Get the response content.
      */
     #[\Override]
     public function getContent(): string|false
