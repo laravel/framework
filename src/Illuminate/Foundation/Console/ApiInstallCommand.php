@@ -211,15 +211,6 @@ class ApiInstallCommand extends Command
             return;
         }
 
-        // Confirm with the user before making changes
-        if (! $this->components->confirm(
-            "Would you like to add the [$trait] trait to your [$model] model now?",
-            true
-        )) {
-            $this->components->info("No changes were made to your [$model] model.");
-            return;
-        }
-
         $modified = false;
 
         // Add the top-level `use` statement if missing
