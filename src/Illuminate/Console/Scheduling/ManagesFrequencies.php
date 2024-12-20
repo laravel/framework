@@ -2,11 +2,14 @@
 
 namespace Illuminate\Console\Scheduling;
 
+use Illuminate\Console\Scheduling\ValidatesFrequencies;
 use Illuminate\Support\Carbon;
 use InvalidArgumentException;
 
 trait ManagesFrequencies
 {
+    use ValidatesFrequencies;
+
     /**
      * The Cron expression representing the event's frequency.
      *
@@ -386,6 +389,14 @@ trait ManagesFrequencies
      */
     protected function hourBasedSchedule($minutes, $hours)
     {
+        if (is_array($hours) || is_int($hours)) {
+            array_walk((array)$hours, $this->validateHour(...));
+        }
+
+        if (is_array($minutes) || is_int($minutes)) {
+            array_walk((array)$minutes, $this->validateMinute(...));
+        }
+
         $minutes = is_array($minutes) ? implode(',', $minutes) : $minutes;
 
         $hours = is_array($hours) ? implode(',', $hours) : $hours;
@@ -533,6 +544,8 @@ trait ManagesFrequencies
     {
         $this->dailyAt($time);
 
+        $this->validateDayOfMonth($dayOfMonth);
+
         return $this->spliceIntoPosition(3, $dayOfMonth);
     }
 
@@ -546,6 +559,8 @@ trait ManagesFrequencies
      */
     public function twiceMonthly($first = 1, $second = 16, $time = '0:0')
     {
+        array_walk([$first, $second], $this->validateDayOfMonth(...));
+
         $daysOfMonth = $first.','.$second;
 
         $this->dailyAt($time);
@@ -619,6 +634,12 @@ trait ManagesFrequencies
     {
         $this->dailyAt($time);
 
+        $this->validateMonth($month);
+
+        if (is_int($dayOfMonth)) {
+            $this->validateDayOfMonth($dayOfMonth);
+        }
+
         return $this->spliceIntoPosition(3, $dayOfMonth)
                     ->spliceIntoPosition(4, $month);
     }
@@ -632,6 +653,8 @@ trait ManagesFrequencies
     public function days($days)
     {
         $days = is_array($days) ? $days : func_get_args();
+
+        array_walk($days, $this->validateDayOfWeek(...));
 
         return $this->spliceIntoPosition(5, implode(',', $days));
     }
