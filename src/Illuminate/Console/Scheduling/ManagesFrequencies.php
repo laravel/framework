@@ -2,7 +2,6 @@
 
 namespace Illuminate\Console\Scheduling;
 
-use Illuminate\Console\Scheduling\ValidatesFrequencies;
 use Illuminate\Support\Carbon;
 use InvalidArgumentException;
 
