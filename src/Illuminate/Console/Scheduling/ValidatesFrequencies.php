@@ -39,12 +39,12 @@ trait ValidatesFrequencies
     }
 
     /**
-     * @param  int  $month
+     * @param  int  $dayOfMonth
      */
     protected function validateDayOfMonth(int $dayOfMonth)
     {
-        if ($month < 0 || $month > MONTHS_PER_YEAR) {
-            throw new InvalidArgumentException('Month cron expression component must be between 0 and '.MONTHS_PER_YEAR.". [$month] given");
+        if ($dayOfMonth < 0 || $dayOfMonth > 31) {
+            throw new InvalidArgumentException("Day of month cron expression component must be between 0 and 31 (at most). [$dayOfMonth] given");
         }
     }
 }
