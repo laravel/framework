@@ -74,6 +74,15 @@ class ApiInstallCommand extends Command
             ]));
 
             $this->components->info('API scaffolding installed. Please add the [Laravel\Passport\HasApiTokens] trait to your User model.');
+
+            if ($this->confirm("Would you like to add the [Laravel\\Sanctum\\HasApiTokens] trait to your User model now?", true)) {
+                if (class_exists('App\\Models\\User')) {
+                    $this->addTraitToModel('Laravel\\Sanctum\\HasApiTokens', 'App\\Models\\User');
+                } else {
+                    $this->components->warn("The [App\\Models\\User] model does not exist. Please manually add the trait to your User model if you've moved or renamed it.");
+                }
+            }
+
         } else {
             if (! $this->option('without-migration-prompt')) {
                 if ($this->confirm('One new database migration has been published. Would you like to run all pending database migrations?', true)) {
@@ -82,7 +91,17 @@ class ApiInstallCommand extends Command
             }
 
             $this->components->info('API scaffolding installed. Please add the [Laravel\Sanctum\HasApiTokens] trait to your User model.');
+
+            if ($this->confirm("Would you like to add the [Laravel\\Sanctum\\HasApiTokens] trait to your User model now?", true)) {
+                if (class_exists('App\\Models\\User')) {
+                    $this->addTraitToModel('Laravel\\Sanctum\\HasApiTokens', 'App\\Models\\User');
+                } else {
+                    $this->components->warn("The [App\\Models\\User] model does not exist. Please manually add the trait to your User model if you've moved or renamed it.");
+                }
+            }
         }
+
+        return Command::SUCCESS;
     }
 
     /**
@@ -93,7 +112,6 @@ class ApiInstallCommand extends Command
     protected function uncommentApiRoutesFile()
     {
         $appBootstrapPath = $this->laravel->bootstrapPath('app.php');
-
         $content = file_get_contents($appBootstrapPath);
 
         if (str_contains($content, '// api: ')) {
@@ -151,5 +169,70 @@ class ApiInstallCommand extends Command
         $this->requireComposerPackages($this->option('composer'), [
             'laravel/passport:^12.0',
         ]);
+    }
+
+    /**
+     * Attempt to add the given trait to the specified model.
+     *
+     * @param  string  $trait
+     * @param  string  $model
+     * @return void
+     */
+    protected function addTraitToModel(string $trait, string $model)
+    {
+        $modelPath = $this->laravel->basePath(str_replace('\\', '/', $model).'.php');
+
+        if (! file_exists($modelPath)) {
+            $this->components->error("Model not found at {$modelPath}.");
+            return;
+        }
+
+        $content = file_get_contents($modelPath);
+        $traitBasename = class_basename($trait);
+
+        // If trait already present, do nothing
+        if (strpos($content, $traitBasename) !== false) {
+            $this->components->info("The [{$trait}] trait is already present in your [{$model}] model.");
+            return;
+        }
+
+        $modified = false;
+
+        // Ensure the 'use $trait;' statement is present
+        if (!str_contains($content, "use $trait;")) {
+            $content = preg_replace(
+                '/(namespace\s+.*;)/',
+                "$1\n\nuse $trait;",
+                $content,
+                1,
+                $count
+            );
+
+            if ($count > 0) {
+                $modified = true;
+            }
+        }
+
+        // Insert the trait into the class if not present
+        if (!str_contains($content, "use $traitBasename;")) {
+            $content = preg_replace(
+                '/(class\s+\w+\s+extends\s+\w+[A-Za-z\\\\]*)(\s*\{)/',
+                "$1 {\n    use $traitBasename;\n",
+                $content,
+                1,
+                $count
+            );
+
+            if ($count > 0) {
+                $modified = true;
+            }
+        }
+
+        if ($modified) {
+            file_put_contents($modelPath, $content);
+            $this->components->info("The [{$trait}] trait has been added to your [{$model}] model.");
+        } else {
+            $this->components->info("No changes were made to your [{$model}] model.");
+        }
     }
 }
