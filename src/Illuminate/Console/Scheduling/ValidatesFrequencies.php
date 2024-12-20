@@ -9,7 +9,7 @@ use const Illuminate\Support\Date\{DAYS_PER_WEEK, HOURS_PER_DAY, MINUTES_PER_HOU
 trait ValidatesFrequencies
 {
     /**
-     * @param  int  $hours
+     * @param  int  $hour
      */
     protected function validateHour(int $hour)
     {
