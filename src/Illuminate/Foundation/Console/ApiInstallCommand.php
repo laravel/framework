@@ -75,11 +75,11 @@ class ApiInstallCommand extends Command
 
             $this->components->info('API scaffolding installed. Please add the [Laravel\Passport\HasApiTokens] trait to your User model.');
 
-            if ($this->confirm("Would you like to add the [Laravel\\Sanctum\\HasApiTokens] trait to your User model now?", true)) {
+            if ($this->confirm('Would you like to add the [Laravel\\Sanctum\\HasApiTokens] trait to your User model now?', true)) {
                 if (class_exists('App\\Models\\User')) {
                     $this->addTraitToModel('Laravel\\Sanctum\\HasApiTokens', 'App\\Models\\User');
                 } else {
-                    $this->components->warn("The [App\\Models\\User] model does not exist. Please manually add the trait to your User model if you've moved or renamed it.");
+                    $this->components->warn('The [App\\Models\\User] model does not exist. Please manually add the trait to your User model if you\'ve moved or renamed it.');
                 }
             }
 
@@ -92,11 +92,11 @@ class ApiInstallCommand extends Command
 
             $this->components->info('API scaffolding installed. Please add the [Laravel\Sanctum\HasApiTokens] trait to your User model.');
 
-            if ($this->confirm("Would you like to add the [Laravel\\Sanctum\\HasApiTokens] trait to your User model now?", true)) {
+            if ($this->confirm('Would you like to add the [Laravel\\Sanctum\\HasApiTokens] trait to your User model now?', true)) {
                 if (class_exists('App\\Models\\User')) {
                     $this->addTraitToModel('Laravel\\Sanctum\\HasApiTokens', 'App\\Models\\User');
                 } else {
-                    $this->components->warn("The [App\\Models\\User] model does not exist. Please manually add the trait to your User model if you've moved or renamed it.");
+                    $this->components->warn('The [App\\Models\\User] model does not exist. Please manually add the trait to your User model if you\'ve moved or renamed it.');
                 }
             }
         }
@@ -184,6 +184,7 @@ class ApiInstallCommand extends Command
 
         if (! file_exists($modelPath)) {
             $this->components->error("Model not found at {$modelPath}.");
+
             return;
         }
 
@@ -193,13 +194,14 @@ class ApiInstallCommand extends Command
         // If trait already present, do nothing
         if (strpos($content, $traitBasename) !== false) {
             $this->components->info("The [{$trait}] trait is already present in your [{$model}] model.");
+
             return;
         }
 
         $modified = false;
 
         // Ensure the 'use $trait;' statement is present
-        if (!str_contains($content, "use $trait;")) {
+        if (! str_contains($content, "use $trait;")) {
             $content = preg_replace(
                 '/(namespace\s+.*;)/',
                 "$1\n\nuse $trait;",
@@ -214,7 +216,7 @@ class ApiInstallCommand extends Command
         }
 
         // Insert the trait into the class if not present
-        if (!str_contains($content, "use $traitBasename;")) {
+        if (! str_contains($content, "use $traitBasename;")) {
             $content = preg_replace(
                 '/(class\s+\w+\s+extends\s+\w+[A-Za-z\\\\]*)(\s*\{)/',
                 "$1 {\n    use $traitBasename;\n",
