@@ -389,11 +389,11 @@ trait ManagesFrequencies
     protected function hourBasedSchedule($minutes, $hours)
     {
         if (is_array($hours) || is_int($hours)) {
-            array_walk((array) $hours, $this->validateHour(...));
+            array_map($this->validateHour(...), (array) $hours);
         }
 
         if (is_array($minutes) || is_int($minutes)) {
-            array_walk((array) $minutes, $this->validateMinute(...));
+            array_map($this->validateMinute(...), (array) $minutes);
         }
 
         $minutes = is_array($minutes) ? implode(',', $minutes) : $minutes;
@@ -558,7 +558,7 @@ trait ManagesFrequencies
      */
     public function twiceMonthly($first = 1, $second = 16, $time = '0:0')
     {
-        array_walk([$first, $second], $this->validateDayOfMonth(...));
+        array_map($this->validateDayOfMonth(...), [$first, $second]);
 
         $daysOfMonth = $first.','.$second;
 
@@ -653,7 +653,7 @@ trait ManagesFrequencies
     {
         $days = is_array($days) ? $days : func_get_args();
 
-        array_walk($days, $this->validateDayOfWeek(...));
+        array_map($this->validateDayOfWeek(...), $days);
 
         return $this->spliceIntoPosition(5, implode(',', $days));
     }
