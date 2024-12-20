@@ -15,7 +15,24 @@ trait ManagesFrequencies
      */
     public function cron($expression)
     {
+        if (str_starts_with($expression, '@')) {
+            return $this->parseAtExpression(substr($expression, 1));
+        }
+
         $this->expression = $expression;
+
+        return $this;
+    }
+
+    public function parseAtExpression(string $expression)
+    {
+        match ($expression) {
+            'annually' => $this->yearly(),
+            'midnight' => $this->daily(),
+            default => method_exists($this, $expression)
+                ? $this->{$expression}()
+                : throw new InvalidArgumentException("The at expression [$expression] is invalid");
+        };
 
         return $this;
     }
