@@ -43,7 +43,9 @@ trait ValidatesFrequencies
      */
     protected function validateDayOfMonth(int|string $dayOfMonth)
     {
-        if (is_string($dayOfMonth)) return;
+        if (is_string($dayOfMonth)) {
+            return;    
+        }
 
         if ($dayOfMonth < 0 || $dayOfMonth > 31) {
             throw new InvalidArgumentException("Day of month cron expression component must be between 0 and 31 (at most). [$dayOfMonth] given");
