@@ -189,8 +189,8 @@ class ApiInstallCommand extends Command
         $content = file_get_contents($modelPath);
         $traitBasename = class_basename($trait);
 
-        // Check if the trait is already used in the model
-        if (strpos($content, $traitBasename) !== false) {
+        // Check if the trait is already imported or used
+        if (strpos($content, "use $trait;") !== false || strpos($content, $traitBasename) !== false) {
             $this->components->info("The [{$trait}] trait is already present in your [{$model}] model.");
 
             return;
@@ -198,7 +198,7 @@ class ApiInstallCommand extends Command
 
         $modified = false;
 
-        // Ensure the 'use $trait;' statement is inserted correctly below other imports
+        // Add the trait import statement if it doesn't exist
         if (! str_contains($content, "use $trait;")) {
             $content = preg_replace(
                 '/(use\s+[\w\\\\]+;(\s+\/\/.*\n)*\s*)+/s',
@@ -213,26 +213,24 @@ class ApiInstallCommand extends Command
             }
         }
 
-        // Ensure the trait is added to the `use` block within the class
+        // Add the trait usage within the class
         if (preg_match('/class\s+\w+\s+extends\s+\w+[A-Za-z\\\\]*\s*\{/', $content, $matches, PREG_OFFSET_CAPTURE)) {
             $insertPosition = $matches[0][1] + strlen($matches[0][0]);
 
-            // Add the trait to the existing 'use' block if found
             if (preg_match('/use\s+(.*?);/s', $content, $useMatches, PREG_OFFSET_CAPTURE, $insertPosition)) {
-                $traits = $useMatches[1][0];
-                $traitList = array_map('trim', explode(',', $traits));
-                if (! in_array($traitBasename, $traitList)) {
-                    $traitList[] = $traitBasename;
+                $traits = array_map('trim', explode(',', $useMatches[1][0]));
+
+                if (! in_array($traitBasename, $traits)) {
+                    $traits[] = $traitBasename;
                     $content = substr_replace(
                         $content,
-                        'use '.implode(', ', $traitList).';',
+                        'use '.implode(', ', $traits).';',
                         $useMatches[0][1],
                         strlen($useMatches[0][0])
                     );
                     $modified = true;
                 }
             } else {
-                // Add a new 'use' block for traits if none exists
                 $content = substr_replace(
                     $content,
                     "\n    use $traitBasename;",
