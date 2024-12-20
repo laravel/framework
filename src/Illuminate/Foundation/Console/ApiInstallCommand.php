@@ -187,22 +187,24 @@ class ApiInstallCommand extends Command
 
         $content = file_get_contents($modelPath);
         $traitBasename = class_basename($trait);
-        $topLevelCheck = "use $trait;";
-        $classLevelCheck = $traitBasename;
+        $sanctumTrait = 'Laravel\\Sanctum\\HasApiTokens';
+        $passportTrait = 'Laravel\\Passport\\HasApiTokens';
 
-        // 1. Check if the trait is already imported or used
-        $isTopLevelImported = strpos($content, $topLevelCheck) !== false;
-        $isClassLevelUsed = preg_match('/use\s+([A-Za-z,\\\\\s]+);/', $content, $matches) &&
-            strpos($matches[1], $classLevelCheck) !== false;
-
-        if ($isTopLevelImported && $isClassLevelUsed) {
-            $this->components->info("The [{$trait}] trait is already present in your [{$model}] model.");
+        // Detect conflicts
+        if (str_contains($content, "use $sanctumTrait;")) {
+            $this->warn("Sanctum is already installed in your [$model] model. Please manually switch to Passport if needed.");
             return;
         }
 
-        $modified = false;
+        if (str_contains($content, "use $passportTrait;")) {
+            $this->warn("Passport is already installed in your [$model] model. Please manually switch to Sanctum if needed.");
+            return;
+        }
 
-        // 2. Add the top-level `use` statement if missing
+        // Add the top-level `use` statement if missing
+        $modified = false;
+        $isTopLevelImported = str_contains($content, "use $trait;");
+
         if (! $isTopLevelImported) {
             $content = preg_replace(
                 '/^(namespace\s+[\w\\\\]+;\s*(?:\/\/.*\n)*)((?:use\s+[\w\\\\]+;\n)*)/m',
@@ -216,7 +218,10 @@ class ApiInstallCommand extends Command
             }
         }
 
-        // 3. Add the class-level trait if missing
+        // Add the class-level trait if missing
+        $isClassLevelUsed = preg_match('/use\s+([A-Za-z,\\\\\s]+);/', $content, $matches) &&
+            str_contains($matches[1], $traitBasename);
+
         if (! $isClassLevelUsed) {
             if (preg_match('/class\s+\w+\s+extends\s+\w+[A-Za-z\\\\]*\s*\{/', $content, $matches, PREG_OFFSET_CAPTURE)) {
                 $insertPosition = $matches[0][1] + strlen($matches[0][0]);
@@ -224,7 +229,7 @@ class ApiInstallCommand extends Command
                 if (preg_match('/use\s+(.*?);/s', $content, $useMatches, PREG_OFFSET_CAPTURE, $insertPosition)) {
                     $traits = array_map('trim', explode(',', $useMatches[1][0]));
 
-                    if (! in_array($traitBasename, $traits)) {
+                    if (!in_array($traitBasename, $traits, true)) {
                         $traits[] = $traitBasename;
                         $content = substr_replace(
                             $content,
@@ -246,12 +251,12 @@ class ApiInstallCommand extends Command
             }
         }
 
-        // 4. Write the changes back to the file
+        // Save changes if modified
         if ($modified) {
             file_put_contents($modelPath, $content);
-            $this->components->info("The [{$trait}] trait has been added to your [{$model}] model.");
+            $this->components->info("The [$trait] trait has been added to your [$model] model.");
         } else {
-            $this->components->info("No changes were made to your [{$model}] model.");
+            $this->components->info("No changes were made to your [$model] model.");
         }
     }
 }
