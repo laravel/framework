@@ -4,7 +4,7 @@ namespace Illuminate\Console\Scheduling;
 
 use InvalidArgumentException;
 
-use const Illuminate\Support\Date\{DAYS_PER_WEEK, HOURS_PER_DAY, MONTHS_PER_YEAR};
+use const Illuminate\Support\Date\{DAYS_PER_WEEK, HOURS_PER_DAY, MINUTES_PER_HOUR, MONTHS_PER_YEAR};
 
 trait ValidatesFrequencies
 {
@@ -15,6 +15,16 @@ trait ValidatesFrequencies
     {
         if ($hour < 0 || $hour > HOURS_PER_DAY) {
             throw new InvalidArgumentException('Hour cron expression component must be between 0 and '.HOURS_PER_DAY.". [$hour] given");
+        }
+    }
+
+    /**
+     * @param  int  $minute
+     */
+    protected function validateMinute(int $minute)
+    {
+        if ($minute < 0 || $minute > MINUTES_PER_HOUR) {
+            throw new InvalidArgumentException('Minute cron expression component must be between 0 and '.MINUTES_PER_HOUR.". [$minute] given");
         }
     }
 
@@ -44,7 +54,7 @@ trait ValidatesFrequencies
     protected function validateDayOfMonth(int|string $dayOfMonth)
     {
         if (is_string($dayOfMonth)) {
-            return;    
+            return;
         }
 
         if ($dayOfMonth < 0 || $dayOfMonth > 31) {
