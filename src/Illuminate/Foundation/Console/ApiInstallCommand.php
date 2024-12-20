@@ -180,31 +180,29 @@ class ApiInstallCommand extends Command
      */
     protected function addTraitToModel(string $trait, string $model)
     {
-        $modelPath = $this->laravel->basePath(str_replace('\\', '/', $model).'.php');
+        $modelPath = $this->laravel->basePath(str_replace('\\', '/', $model) . '.php');
 
-        if (! file_exists($modelPath)) {
+        if (!file_exists($modelPath)) {
             $this->components->error("Model not found at {$modelPath}.");
-
             return;
         }
 
         $content = file_get_contents($modelPath);
         $traitBasename = class_basename($trait);
 
-        // If trait already present, do nothing
+        // Check if the trait is already used in the model
         if (strpos($content, $traitBasename) !== false) {
             $this->components->info("The [{$trait}] trait is already present in your [{$model}] model.");
-
             return;
         }
 
         $modified = false;
 
-        // Ensure the 'use $trait;' statement is present
-        if (! str_contains($content, "use $trait;")) {
+        // Ensure the 'use $trait;' statement is inserted correctly below other imports
+        if (!str_contains($content, "use $trait;")) {
             $content = preg_replace(
-                '/(namespace\s+.*;)/',
-                "$1\n\nuse $trait;",
+                '/(use\s+[\w\\\\]+;(\s+\/\/.*\n)*\s*)+/s',
+                "$0use $trait;\n",
                 $content,
                 1,
                 $count
@@ -215,17 +213,32 @@ class ApiInstallCommand extends Command
             }
         }
 
-        // Insert the trait into the class if not present
-        if (! str_contains($content, "use $traitBasename;")) {
-            $content = preg_replace(
-                '/(class\s+\w+\s+extends\s+\w+[A-Za-z\\\\]*)(\s*\{)/',
-                "$1 {\n    use $traitBasename;\n",
-                $content,
-                1,
-                $count
-            );
+        // Ensure the trait is added to the `use` block within the class
+        if (preg_match('/class\s+\w+\s+extends\s+\w+[A-Za-z\\\\]*\s*\{/', $content, $matches, PREG_OFFSET_CAPTURE)) {
+            $insertPosition = $matches[0][1] + strlen($matches[0][0]);
 
-            if ($count > 0) {
+            // Add the trait to the existing 'use' block if found
+            if (preg_match('/use\s+(.*?);/s', $content, $useMatches, PREG_OFFSET_CAPTURE, $insertPosition)) {
+                $traits = $useMatches[1][0];
+                $traitList = array_map('trim', explode(',', $traits));
+                if (!in_array($traitBasename, $traitList)) {
+                    $traitList[] = $traitBasename;
+                    $content = substr_replace(
+                        $content,
+                        'use ' . implode(', ', $traitList) . ';',
+                        $useMatches[0][1],
+                        strlen($useMatches[0][0])
+                    );
+                    $modified = true;
+                }
+            } else {
+                // Add a new 'use' block for traits if none exists
+                $content = substr_replace(
+                    $content,
+                    "\n    use $traitBasename;",
+                    $insertPosition,
+                    0
+                );
                 $modified = true;
             }
         }
