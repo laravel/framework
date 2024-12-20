@@ -40,14 +40,16 @@ class ApiInstallCommand extends Command
      */
     public function handle()
     {
+        // Install Passport or Sanctum
         if ($this->option('passport')) {
             $this->installPassport();
         } else {
             $this->installSanctum();
         }
 
-        if (file_exists($apiRoutesPath = $this->laravel->basePath('routes/api.php')) &&
-            ! $this->option('force')) {
+        // Handle API Routes
+        $apiRoutesPath = $this->laravel->basePath('routes/api.php');
+        if (file_exists($apiRoutesPath) && ! $this->option('force')) {
             $this->components->error('API routes file already exists.');
         } else {
             $this->components->info('Published API routes file.');
@@ -55,16 +57,13 @@ class ApiInstallCommand extends Command
             copy(__DIR__.'/stubs/api-routes.stub', $apiRoutesPath);
 
             if ($this->option('passport')) {
-                (new Filesystem)->replaceInFile(
-                    'auth:sanctum',
-                    'auth:api',
-                    $apiRoutesPath,
-                );
+                (new Filesystem)->replaceInFile('auth:sanctum', 'auth:api', $apiRoutesPath);
             }
 
             $this->uncommentApiRoutesFile();
         }
 
+        // Handle Passport-Specific Commands
         if ($this->option('passport')) {
             Process::run(array_filter([
                 php_binary(),
@@ -76,14 +75,10 @@ class ApiInstallCommand extends Command
             $this->components->info('API scaffolding installed. Please add the [Laravel\Passport\HasApiTokens] trait to your User model.');
 
             if ($this->confirm('Would you like to add the [Laravel\Passport\HasApiTokens] trait to your User model now?', true)) {
-                if (class_exists('App\\Models\\User')) {
-                    $this->addTraitToModel('Laravel\Passport\HasApiTokens', 'App\\Models\\User');
-                } else {
-                    $this->components->warn('The [App\\Models\\User] model does not exist. Please manually add the trait to your User model if you\'ve moved or renamed it.');
-                }
+                $this->addTraitIfExists('Laravel\Passport\HasApiTokens', 'App\\Models\\User');
             }
-
         } else {
+            // Handle Sanctum-Specific Migration Prompt
             if (! $this->option('without-migration-prompt')) {
                 if ($this->confirm('One new database migration has been published. Would you like to run all pending database migrations?', true)) {
                     $this->call('migrate');
@@ -93,15 +88,27 @@ class ApiInstallCommand extends Command
             $this->components->info('API scaffolding installed. Please add the [Laravel\Sanctum\HasApiTokens] trait to your User model.');
 
             if ($this->confirm('Would you like to add the [Laravel\\Sanctum\\HasApiTokens] trait to your User model now?', true)) {
-                if (class_exists('App\\Models\\User')) {
-                    $this->addTraitToModel('Laravel\\Sanctum\\HasApiTokens', 'App\\Models\\User');
-                } else {
-                    $this->components->warn('The [App\\Models\\User] model does not exist. Please manually add the trait to your User model if you\'ve moved or renamed it.');
-                }
+                $this->addTraitIfExists('Laravel\\Sanctum\\HasApiTokens', 'App\\Models\\User');
             }
         }
 
         return Command::SUCCESS;
+    }
+
+    /**
+     * Attempt to add the given trait to the specified model if it exists.
+     *
+     * @param string $trait
+     * @param string $model
+     * @return void
+     */
+    protected function addTraitIfExists(string $trait, string $model)
+    {
+        if (class_exists($model)) {
+            $this->addTraitToModel($trait, $model);
+        } else {
+            $this->components->warn("The [$model] model does not exist. Please manually add the [$trait] trait to your model.");
+        }
     }
 
     /**
