@@ -38,6 +38,15 @@ class Response extends SymfonyResponse
     }
 
     /**
+     * Get the current response content.
+     */
+    #[\Override]
+    public function getContent(): string|false
+    {
+        return transform(parent::getContent(), fn ($content) => $content, '');
+    }
+
+    /**
      * Set the content on the response.
      *
      * @param  mixed  $content
@@ -73,15 +82,6 @@ class Response extends SymfonyResponse
         parent::setContent($content);
 
         return $this;
-    }
-
-    /**
-     * Gets the current response content.
-     */
-    #[\Override]
-    public function getContent(): string|false
-    {
-        return transform(parent::getContent(), fn ($content) => $content, '');
     }
 
     /**
