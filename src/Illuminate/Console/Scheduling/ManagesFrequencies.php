@@ -390,11 +390,11 @@ trait ManagesFrequencies
     protected function hourBasedSchedule($minutes, $hours)
     {
         if (is_array($hours) || is_int($hours)) {
-            array_walk((array)$hours, $this->validateHour(...));
+            array_walk((array) $hours, $this->validateHour(...));
         }
 
         if (is_array($minutes) || is_int($minutes)) {
-            array_walk((array)$minutes, $this->validateMinute(...));
+            array_walk((array) $minutes, $this->validateMinute(...));
         }
 
         $minutes = is_array($minutes) ? implode(',', $minutes) : $minutes;
