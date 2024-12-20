@@ -196,7 +196,7 @@ class ApiInstallCommand extends Command
 
         $modified = false;
 
-        // 1. Add the top-level `use` statement if it doesn't exist
+        // Add the top-level `use` statement if it doesn't exist
         $content = preg_replace(
             '/^(namespace\s+[\w\\\\]+;\s*(?:\/\/.*\n)*)((?:use\s+[\w\\\\]+;\n)*)\s*/m',
             '$1$2use ' . $trait . ";\n",
@@ -209,13 +209,14 @@ class ApiInstallCommand extends Command
             $modified = true;
         }
 
-        // 2. Add the trait usage within the class
+        // Add the trait usage within the class, avoiding duplicate additions
         if (preg_match('/class\s+\w+\s+extends\s+\w+[A-Za-z\\\\]*\s*\{/', $content, $matches, PREG_OFFSET_CAPTURE)) {
             $insertPosition = $matches[0][1] + strlen($matches[0][0]);
 
             if (preg_match('/use\s+(.*?);/s', $content, $useMatches, PREG_OFFSET_CAPTURE, $insertPosition)) {
                 $traits = array_map('trim', explode(',', $useMatches[1][0]));
 
+                // Only add the trait if it doesn't already exist in the class-level use block
                 if (! in_array($traitBasename, $traits)) {
                     $traits[] = $traitBasename;
                     $content = substr_replace(
@@ -227,6 +228,7 @@ class ApiInstallCommand extends Command
                     $modified = true;
                 }
             } else {
+                // No existing use block in the class, insert a new one
                 $content = substr_replace(
                     $content,
                     "\n    use $traitBasename;",
