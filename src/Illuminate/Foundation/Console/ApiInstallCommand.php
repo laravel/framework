@@ -182,7 +182,6 @@ class ApiInstallCommand extends Command
 
         if (! file_exists($modelPath)) {
             $this->components->error("Model not found at {$modelPath}.");
-
             return;
         }
 
@@ -192,28 +191,25 @@ class ApiInstallCommand extends Command
         // Check if the trait is already imported or used
         if (strpos($content, "use $trait;") !== false || strpos($content, $traitBasename) !== false) {
             $this->components->info("The [{$trait}] trait is already present in your [{$model}] model.");
-
             return;
         }
 
         $modified = false;
 
-        // Add the trait import statement if it doesn't exist
-        if (! str_contains($content, "use $trait;")) {
-            $content = preg_replace(
-                '/(use\s+[\w\\\\]+;(\s+\/\/.*\n)*\s*)+/s',
-                "$0use $trait;\n",
-                $content,
-                1,
-                $count
-            );
+        // 1. Add the top-level `use` statement if it doesn't exist
+        $content = preg_replace(
+            '/^(namespace\s+[\w\\\\]+;\s*(?:\/\/.*\n)*)((?:use\s+[\w\\\\]+;\n)*)\s*/m',
+            '$1$2use ' . $trait . ";\n",
+            $content,
+            1,
+            $count
+        );
 
-            if ($count > 0) {
-                $modified = true;
-            }
+        if ($count > 0) {
+            $modified = true;
         }
 
-        // Add the trait usage within the class
+        // 2. Add the trait usage within the class
         if (preg_match('/class\s+\w+\s+extends\s+\w+[A-Za-z\\\\]*\s*\{/', $content, $matches, PREG_OFFSET_CAPTURE)) {
             $insertPosition = $matches[0][1] + strlen($matches[0][0]);
 
@@ -241,6 +237,7 @@ class ApiInstallCommand extends Command
             }
         }
 
+        // Write the updated content back to the file if modified
         if ($modified) {
             file_put_contents($modelPath, $content);
             $this->components->info("The [{$trait}] trait has been added to your [{$model}] model.");
