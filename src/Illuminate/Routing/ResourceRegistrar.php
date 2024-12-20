@@ -104,8 +104,15 @@ class ResourceRegistrar
         $resourceMethods = $this->getResourceMethods($defaults, $options);
 
         foreach ($resourceMethods as $m) {
+            $optionsForMethod = $options;
+
+            if (isset($optionsForMethod['middleware_for'][$m])) {
+                $optionsForMethod['middleware'] ??= [];
+                $optionsForMethod['middleware'] = [...$optionsForMethod['middleware_for'][$m], ...$optionsForMethod['middleware']];
+            }
+
             $route = $this->{'addResource'.ucfirst($m)}(
-                $name, $base, $controller, $options
+                $name, $base, $controller, $optionsForMethod
             );
 
             if (isset($options['bindingFields'])) {
@@ -159,8 +166,15 @@ class ResourceRegistrar
         $resourceMethods = $this->getResourceMethods($defaults, $options);
 
         foreach ($resourceMethods as $m) {
+            $optionsForMethod = $options;
+
+            if (isset($options['middleware_for'][$m])) {
+                $optionsForMethod['middleware'] ??= [];
+                $optionsForMethod['middleware'] = [...$optionsForMethod['middleware_for'][$m], ...$optionsForMethod['middleware']];
+            }
+
             $route = $this->{'addSingleton'.ucfirst($m)}(
-                $name, $controller, $options
+                $name, $controller, $optionsForMethod
             );
 
             if (isset($options['bindingFields'])) {
