@@ -172,10 +172,10 @@ class ApiInstallCommand extends Command
     }
 
     /**
-     * Attempt to add the given trait to the specified model.
-     *
-     * @return void
-     */
+    * Attempt to add the given trait to the specified model.
+    *
+    * @return void
+    */
     protected function addTraitToModel(string $trait, string $model)
     {
         $modelPath = $this->laravel->basePath(str_replace('\\', '/', $model) . '.php');
@@ -190,7 +190,7 @@ class ApiInstallCommand extends Command
         $sanctumTrait = 'Laravel\\Sanctum\\HasApiTokens';
         $passportTrait = 'Laravel\\Passport\\HasApiTokens';
 
-        // Detect conflicts
+        // Detect existing traits and warn
         if (str_contains($content, "use $sanctumTrait;")) {
             $this->warn("Sanctum is already installed in your [$model] model. Please manually switch to Passport if needed.");
             return;
@@ -201,8 +201,18 @@ class ApiInstallCommand extends Command
             return;
         }
 
-        // Add the top-level `use` statement if missing
+        // Confirm with the user before making changes
+        if (! $this->components->confirm(
+            "Would you like to add the [$trait] trait to your [$model] model now?",
+            true
+        )) {
+            $this->components->info("No changes were made to your [$model] model.");
+            return;
+        }
+
         $modified = false;
+
+        // Add the top-level `use` statement if missing
         $isTopLevelImported = str_contains($content, "use $trait;");
 
         if (! $isTopLevelImported) {
