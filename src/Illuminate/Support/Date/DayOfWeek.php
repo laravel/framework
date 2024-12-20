@@ -2,7 +2,7 @@
 
 namespace Illuminate\Support\Date;
 
-enum Day: int
+enum DayOfWeek: int
 {
     case Sunday = 0;
     case Monday = 1;

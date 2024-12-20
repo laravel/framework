@@ -71,7 +71,7 @@ use Illuminate\Console\Scheduling\Schedule as ConsoleSchedule;
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes saturdays()
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes sundays()
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes weekly()
- * @method static \Illuminate\Console\Scheduling\PendingEventAttributes weeklyOn(array|int<0,  6>|int<0,  6>[]|\Illuminate\Support\Date\Day|Illuminate\Support\Date\Day[]|mixed $dayOfWeek, string $time = '0:0')
+ * @method static \Illuminate\Console\Scheduling\PendingEventAttributes weeklyOn(array|int<0,  6>|int<0,  6>[]|\Illuminate\Support\Date\DayOfWeek|Illuminate\Support\Date\DayOfWeek[]|mixed $dayOfWeek, string $time = '0:0')
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes monthly()
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes monthlyOn(int $dayOfMonth = 1, string $time = '0:0')
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes twiceMonthly(int $first = 1, int $second = 16, string $time = '0:0')
@@ -80,7 +80,7 @@ use Illuminate\Console\Scheduling\Schedule as ConsoleSchedule;
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes quarterlyOn(int $dayOfQuarter = 1, string $time = '0:0')
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes yearly()
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes yearlyOn(int<1, 12>|\Illuminate\Support\Date\Month $month = 1, int|string $dayOfMonth = 1, string $time = '0:0')
- * @method static \Illuminate\Console\Scheduling\PendingEventAttributes days(array|\Illuminate\Support\Date\Day|Illuminate\Support\Date\Day[]|int<0,  6>|int<0,  6>[]|string|string[]|mixed $days)
+ * @method static \Illuminate\Console\Scheduling\PendingEventAttributes days(array|\Illuminate\Support\Date\DayOfWeek|Illuminate\Support\Date\DayOfWeek[]|int<0,  6>|int<0,  6>[]|string|string[]|mixed $days)
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes timezone(\DateTimeZone|string $timezone)
  *
  * @see \Illuminate\Console\Scheduling\Schedule

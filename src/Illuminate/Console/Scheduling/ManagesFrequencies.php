@@ -3,7 +3,7 @@
 namespace Illuminate\Console\Scheduling;
 
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Date\Day;
+use Illuminate\Support\Date\DayOfWeek;
 use Illuminate\Support\Date\Month;
 use InvalidArgumentException;
 
@@ -405,7 +405,7 @@ trait ManagesFrequencies
      */
     public function weekdays()
     {
-        return $this->days(Day::Monday->value.'-'.Day::Friday->value);
+        return $this->days(DayOfWeek::Monday->value.'-'.DayOfWeek::Friday->value);
     }
 
     /**
@@ -415,7 +415,7 @@ trait ManagesFrequencies
      */
     public function weekends()
     {
-        return $this->days(Day::Saturday->value.','.Day::Sunday->value);
+        return $this->days(DayOfWeek::Saturday->value.','.DayOfWeek::Sunday->value);
     }
 
     /**
@@ -425,7 +425,7 @@ trait ManagesFrequencies
      */
     public function mondays()
     {
-        return $this->days(Day::Monday);
+        return $this->days(DayOfWeek::Monday);
     }
 
     /**
@@ -435,7 +435,7 @@ trait ManagesFrequencies
      */
     public function tuesdays()
     {
-        return $this->days(Day::Tuesday);
+        return $this->days(DayOfWeek::Tuesday);
     }
 
     /**
@@ -445,7 +445,7 @@ trait ManagesFrequencies
      */
     public function wednesdays()
     {
-        return $this->days(Day::Wednesday);
+        return $this->days(DayOfWeek::Wednesday);
     }
 
     /**
@@ -455,7 +455,7 @@ trait ManagesFrequencies
      */
     public function thursdays()
     {
-        return $this->days(Day::Thursday);
+        return $this->days(DayOfWeek::Thursday);
     }
 
     /**
@@ -465,7 +465,7 @@ trait ManagesFrequencies
      */
     public function fridays()
     {
-        return $this->days(Day::Friday);
+        return $this->days(DayOfWeek::Friday);
     }
 
     /**
@@ -475,7 +475,7 @@ trait ManagesFrequencies
      */
     public function saturdays()
     {
-        return $this->days(Day::Saturday);
+        return $this->days(DayOfWeek::Saturday);
     }
 
     /**
@@ -485,7 +485,7 @@ trait ManagesFrequencies
      */
     public function sundays()
     {
-        return $this->days(Day::Sunday);
+        return $this->days(DayOfWeek::Sunday);
     }
 
     /**
@@ -503,7 +503,7 @@ trait ManagesFrequencies
     /**
      * Schedule the event to run weekly on a given day and time.
      *
-     * @param  \Illuminate\Support\Date\Day[]|\Illuminate\Support\Date\Day|array|int<0,  6>|int<0,  6>[]|mixed  $dayOfWeek
+     * @param  \Illuminate\Support\Date\DayOfWeek[]|\Illuminate\Support\Date\DayOfWeek|array|int<0,  6>|int<0,  6>[]|mixed  $dayOfWeek
      * @param  string  $time
      * @return $this
      */
@@ -630,7 +630,7 @@ trait ManagesFrequencies
     /**
      * Set the days of the week the command should run on.
      *
-     * @param  \Illuminate\Support\Date\Day[]|\Illuminate\Support\Date\Day|array|int<0, 6>[]|int<0, 6>|string[]|string|mixed  $days
+     * @param  \Illuminate\Support\Date\DayOfWeek[]|\Illuminate\Support\Date\DayOfWeek|array|int<0, 6>[]|int<0, 6>|string[]|string|mixed  $days
      * @return $this
      */
     public function days($days)
