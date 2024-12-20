@@ -31,7 +31,7 @@ trait ManagesFrequencies
             'midnight' => $this->daily(),
             default => method_exists($this, $expression)
                 ? $this->{$expression}()
-                : throw new InvalidArgumentException("The at expression [$expression] is invalid");
+                : throw new InvalidArgumentException("The at expression [$expression] is invalid"),
         };
 
         return $this;
