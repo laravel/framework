@@ -172,10 +172,10 @@ class ApiInstallCommand extends Command
     }
 
     /**
-    * Attempt to add the given trait to the specified model.
-    *
-    * @return void
-    */
+     * Attempt to add the given trait to the specified model.
+     *
+     * @return void
+     */
     protected function addTraitToModel(string $trait, string $model)
     {
         $modelPath = $this->laravel->basePath(str_replace('\\', '/', $model) . '.php');
@@ -187,23 +187,27 @@ class ApiInstallCommand extends Command
 
         $content = file_get_contents($modelPath);
         $traitBasename = class_basename($trait);
-        $sanctumTrait = 'Laravel\\Sanctum\\HasApiTokens';
-        $passportTrait = 'Laravel\\Passport\\HasApiTokens';
 
-        // Detect existing traits and warn
-        if (str_contains($content, "use $sanctumTrait;")) {
-            $this->warn("Sanctum is already installed in your [$model] model. Please manually switch to Passport if needed.");
-            return;
-        }
+        // Map traits to their readable names
+        $traitNames = [
+            'Laravel\\Sanctum\\HasApiTokens' => 'Sanctum',
+            'Laravel\\Passport\\HasApiTokens' => 'Passport',
+        ];
 
-        if (str_contains($content, "use $passportTrait;")) {
-            $this->warn("Passport is already installed in your [$model] model. Please manually switch to Sanctum if needed.");
-            return;
+        // Determine the readable name for the requested trait
+        $traitName = $traitNames[$trait] ?? $traitBasename;
+
+        // Detect existing traits and warn with improved messages
+        foreach ($traitNames as $existingTrait => $existingTraitName) {
+            if (str_contains($content, "use $existingTrait;")) {
+                $this->warn("$existingTraitName is already installed in your [$model] model. Please manually install [$traitName] if needed.");
+                return;
+            }
         }
 
         // Confirm with the user before making changes
         if (! $this->components->confirm(
-            "Would you like to add the [$trait] trait to your [$model] model now?",
+            "Would you like to add the [$traitName] trait to your [$model] model now?",
             true
         )) {
             $this->components->info("No changes were made to your [$model] model.");
@@ -264,7 +268,7 @@ class ApiInstallCommand extends Command
         // Save changes if modified
         if ($modified) {
             file_put_contents($modelPath, $content);
-            $this->components->info("The [$trait] trait has been added to your [$model] model.");
+            $this->components->info("The [$traitName] trait has been added to your [$model] model.");
         } else {
             $this->components->info("No changes were made to your [$model] model.");
         }
