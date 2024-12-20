@@ -75,9 +75,9 @@ class ApiInstallCommand extends Command
 
             $this->components->info('API scaffolding installed. Please add the [Laravel\Passport\HasApiTokens] trait to your User model.');
 
-            if ($this->confirm('Would you like to add the [Laravel\\Sanctum\\HasApiTokens] trait to your User model now?', true)) {
+            if ($this->confirm('Would you like to add the [Laravel\Passport\HasApiTokens] trait to your User model now?', true)) {
                 if (class_exists('App\\Models\\User')) {
-                    $this->addTraitToModel('Laravel\\Sanctum\\HasApiTokens', 'App\\Models\\User');
+                    $this->addTraitToModel('Laravel\Passport\HasApiTokens', 'App\\Models\\User');
                 } else {
                     $this->components->warn('The [App\\Models\\User] model does not exist. Please manually add the trait to your User model if you\'ve moved or renamed it.');
                 }
