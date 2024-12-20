@@ -182,62 +182,52 @@ class ApiInstallCommand extends Command
 
         if (! file_exists($modelPath)) {
             $this->components->error("Model not found at {$modelPath}.");
-
             return;
         }
 
         $content = file_get_contents($modelPath);
         $traitBasename = class_basename($trait);
 
-        // Check if the trait is already imported or used
         if (strpos($content, "use $trait;") !== false || strpos($content, $traitBasename) !== false) {
             $this->components->info("The [{$trait}] trait is already present in your [{$model}] model.");
-
             return;
         }
 
         $modified = false;
 
-        // Add the trait import statement if it doesn't exist
-        if (! str_contains($content, "use $trait;")) {
-            $content = preg_replace(
-                '/(use\s+[\w\\\\]+;(\s+\/\/.*\n)*\s*)+/s',
-                "$0use $trait;\n",
-                $content,
-                1,
-                $count
-            );
+        // Insert the trait at the top-level (import)
+        $topLevelUsePattern = '/(namespace\s+[\w\\\\]+;\s*(?:use\s+[\w\\\\]+;\s*)*)/s';
+        $topLevelUseReplacement = '$1use ' . $trait . ';' . "\n";
 
-            if ($count > 0) {
-                $modified = true;
-            }
+        $newContent = preg_replace($topLevelUsePattern, $topLevelUseReplacement, $content, 1, $count);
+        if ($count > 0) {
+            $modified = true;
+            $content = $newContent;
         }
 
-        // Add the trait usage within the class
-        if (preg_match('/class\s+\w+\s+extends\s+\w+[A-Za-z\\\\]*\s*\{/', $content, $matches, PREG_OFFSET_CAPTURE)) {
-            $insertPosition = $matches[0][1] + strlen($matches[0][0]);
+        // Insert or merge the trait at the class-level
+        $classPattern = '/(class\s+\w+(?:\s+extends\s+\w+(?:\\\\\w+)*)?(?:\s+implements\s+[^{]+)?\s*\{)/s';
 
-            if (preg_match('/use\s+(.*?);/s', $content, $useMatches, PREG_OFFSET_CAPTURE, $insertPosition)) {
-                $traits = array_map('trim', explode(',', $useMatches[1][0]));
+        if (preg_match('/class\s+\w+(?:\s+extends\s+\w+(?:\\\\\w+)*)?(?:\s+implements\s+[^{]+)?\s*\{\s*(use\s+[^;]+;)?/s', $content, $m, PREG_OFFSET_CAPTURE)) {
+            if (!empty($m[1][0])) {
+                // Existing class-level use line
+                $useLineStart = $m[1][1];
+                preg_match('/use\s+([^;]+);/', $m[1][0], $traitsMatches);
+                $existingTraits = array_map('trim', explode(',', $traitsMatches[1]));
 
-                if (! in_array($traitBasename, $traits)) {
-                    $traits[] = $traitBasename;
-                    $content = substr_replace(
-                        $content,
-                        'use '.implode(', ', $traits).';',
-                        $useMatches[0][1],
-                        strlen($useMatches[0][0])
-                    );
+                if (!in_array($traitBasename, $existingTraits)) {
+                    $existingTraits[] = $traitBasename;
+                    $newUseLine = 'use ' . implode(', ', $existingTraits) . ';';
+                    $content = substr_replace($content, $newUseLine, $useLineStart, strlen($m[1][0]));
                     $modified = true;
                 }
             } else {
-                $content = substr_replace(
-                    $content,
-                    "\n    use $traitBasename;",
-                    $insertPosition,
-                    0
-                );
-                $modified = true;
+                // No class-level use line, insert a new one
+                $newContent = preg_replace($classPattern, '$1' . "\n    use $traitBasename;", $content, 1, $count);
+                if ($count > 0) {
+                    $modified = true;
+                    $content = $newContent;
+                }
             }
         }
 
