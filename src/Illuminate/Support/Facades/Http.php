@@ -138,12 +138,13 @@ class Http extends Facade
     /**
      * Indicate that an exception should be thrown if any request is not faked.
      *
+     * @param  bool  $prevent
      * @return \Illuminate\Http\Client\Factory
      */
-    public static function preventStrayRequests()
+    public static function preventStrayRequests($prevent = true)
     {
-        return tap(static::getFacadeRoot(), function ($fake) {
-            static::swap($fake->preventStrayRequests());
+        return tap(static::getFacadeRoot(), function ($fake) use ($prevent) {
+            static::swap($fake->preventStrayRequests($prevent));
         });
     }
 
