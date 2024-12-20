@@ -178,7 +178,7 @@ class ApiInstallCommand extends Command
      */
     protected function addTraitToModel(string $trait, string $model)
     {
-        $modelPath = $this->laravel->basePath(str_replace('\\', '/', $model).'.php');
+        $modelPath = $this->laravel->basePath(str_replace('\\', '/', $model) . '.php');
 
         if (! file_exists($modelPath)) {
             $this->components->error("Model not found at {$modelPath}.");
@@ -187,59 +187,66 @@ class ApiInstallCommand extends Command
 
         $content = file_get_contents($modelPath);
         $traitBasename = class_basename($trait);
+        $topLevelCheck = "use $trait;";
+        $classLevelCheck = $traitBasename;
 
-        // Check if the trait is already imported or used
-        if (strpos($content, "use $trait;") !== false || strpos($content, $traitBasename) !== false) {
+        // 1. Check if the trait is already imported or used
+        $isTopLevelImported = strpos($content, $topLevelCheck) !== false;
+        $isClassLevelUsed = preg_match('/use\s+([A-Za-z,\\\\\s]+);/', $content, $matches) &&
+            strpos($matches[1], $classLevelCheck) !== false;
+
+        if ($isTopLevelImported && $isClassLevelUsed) {
             $this->components->info("The [{$trait}] trait is already present in your [{$model}] model.");
             return;
         }
 
         $modified = false;
 
-        // Add the top-level `use` statement if it doesn't exist
-        $content = preg_replace(
-            '/^(namespace\s+[\w\\\\]+;\s*(?:\/\/.*\n)*)((?:use\s+[\w\\\\]+;\n)*)\s*/m',
-            '$1$2use ' . $trait . ";\n",
-            $content,
-            1,
-            $count
-        );
-
-        if ($count > 0) {
-            $modified = true;
-        }
-
-        // Add the trait usage within the class, avoiding duplicate additions
-        if (preg_match('/class\s+\w+\s+extends\s+\w+[A-Za-z\\\\]*\s*\{/', $content, $matches, PREG_OFFSET_CAPTURE)) {
-            $insertPosition = $matches[0][1] + strlen($matches[0][0]);
-
-            if (preg_match('/use\s+(.*?);/s', $content, $useMatches, PREG_OFFSET_CAPTURE, $insertPosition)) {
-                $traits = array_map('trim', explode(',', $useMatches[1][0]));
-
-                // Only add the trait if it doesn't already exist in the class-level use block
-                if (! in_array($traitBasename, $traits)) {
-                    $traits[] = $traitBasename;
-                    $content = substr_replace(
-                        $content,
-                        'use '.implode(', ', $traits).';',
-                        $useMatches[0][1],
-                        strlen($useMatches[0][0])
-                    );
-                    $modified = true;
-                }
-            } else {
-                // No existing use block in the class, insert a new one
-                $content = substr_replace(
-                    $content,
-                    "\n    use $traitBasename;",
-                    $insertPosition,
-                    0
-                );
+        // 2. Add the top-level `use` statement if missing
+        if (! $isTopLevelImported) {
+            $content = preg_replace(
+                '/^(namespace\s+[\w\\\\]+;\s*(?:\/\/.*\n)*)((?:use\s+[\w\\\\]+;\n)*)/m',
+                '$1$2use ' . $trait . ";\n",
+                $content,
+                1,
+                $count
+            );
+            if ($count > 0) {
                 $modified = true;
             }
         }
 
-        // Write the updated content back to the file if modified
+        // 3. Add the class-level trait if missing
+        if (! $isClassLevelUsed) {
+            if (preg_match('/class\s+\w+\s+extends\s+\w+[A-Za-z\\\\]*\s*\{/', $content, $matches, PREG_OFFSET_CAPTURE)) {
+                $insertPosition = $matches[0][1] + strlen($matches[0][0]);
+
+                if (preg_match('/use\s+(.*?);/s', $content, $useMatches, PREG_OFFSET_CAPTURE, $insertPosition)) {
+                    $traits = array_map('trim', explode(',', $useMatches[1][0]));
+
+                    if (! in_array($traitBasename, $traits)) {
+                        $traits[] = $traitBasename;
+                        $content = substr_replace(
+                            $content,
+                            'use ' . implode(', ', $traits) . ';',
+                            $useMatches[0][1],
+                            strlen($useMatches[0][0])
+                        );
+                        $modified = true;
+                    }
+                } else {
+                    $content = substr_replace(
+                        $content,
+                        "\n    use $traitBasename;",
+                        $insertPosition,
+                        0
+                    );
+                    $modified = true;
+                }
+            }
+        }
+
+        // 4. Write the changes back to the file
         if ($modified) {
             file_put_contents($modelPath, $content);
             $this->components->info("The [{$trait}] trait has been added to your [{$model}] model.");
