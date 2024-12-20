@@ -40,14 +40,16 @@ class ApiInstallCommand extends Command
      */
     public function handle()
     {
+        // Install Passport or Sanctum
         if ($this->option('passport')) {
             $this->installPassport();
         } else {
             $this->installSanctum();
         }
 
-        if (file_exists($apiRoutesPath = $this->laravel->basePath('routes/api.php')) &&
-            ! $this->option('force')) {
+        // Handle API Routes
+        $apiRoutesPath = $this->laravel->basePath('routes/api.php');
+        if (file_exists($apiRoutesPath) && ! $this->option('force')) {
             $this->components->error('API routes file already exists.');
         } else {
             $this->components->info('Published API routes file.');
@@ -55,16 +57,13 @@ class ApiInstallCommand extends Command
             copy(__DIR__.'/stubs/api-routes.stub', $apiRoutesPath);
 
             if ($this->option('passport')) {
-                (new Filesystem)->replaceInFile(
-                    'auth:sanctum',
-                    'auth:api',
-                    $apiRoutesPath,
-                );
+                (new Filesystem)->replaceInFile('auth:sanctum', 'auth:api', $apiRoutesPath);
             }
 
             $this->uncommentApiRoutesFile();
         }
 
+        // Handle Passport-Specific Commands
         if ($this->option('passport')) {
             Process::run(array_filter([
                 php_binary(),
@@ -74,7 +73,12 @@ class ApiInstallCommand extends Command
             ]));
 
             $this->components->info('API scaffolding installed. Please add the [Laravel\Passport\HasApiTokens] trait to your User model.');
+
+            if ($this->confirm('Would you like to add the [Laravel\Passport\HasApiTokens] trait to your User model now?', true)) {
+                $this->addTraitIfExists('Laravel\Passport\HasApiTokens', 'App\\Models\\User');
+            }
         } else {
+            // Handle Sanctum-Specific Migration Prompt
             if (! $this->option('without-migration-prompt')) {
                 if ($this->confirm('One new database migration has been published. Would you like to run all pending database migrations?', true)) {
                     $this->call('migrate');
@@ -82,6 +86,28 @@ class ApiInstallCommand extends Command
             }
 
             $this->components->info('API scaffolding installed. Please add the [Laravel\Sanctum\HasApiTokens] trait to your User model.');
+
+            if ($this->confirm('Would you like to add the [Laravel\\Sanctum\\HasApiTokens] trait to your User model now?', true)) {
+                $this->addTraitIfExists('Laravel\\Sanctum\\HasApiTokens', 'App\\Models\\User');
+            }
+        }
+
+        return Command::SUCCESS;
+    }
+
+    /**
+     * Attempt to add the given trait to the specified model if it exists.
+     *
+     * @param string $trait
+     * @param string $model
+     * @return void
+     */
+    protected function addTraitIfExists(string $trait, string $model)
+    {
+        if (class_exists($model)) {
+            $this->addTraitToModel($trait, $model);
+        } else {
+            $this->components->warn("The [$model] model does not exist. Please manually add the [$trait] trait to your model.");
         }
     }
 
@@ -93,7 +119,6 @@ class ApiInstallCommand extends Command
     protected function uncommentApiRoutesFile()
     {
         $appBootstrapPath = $this->laravel->bootstrapPath('app.php');
-
         $content = file_get_contents($appBootstrapPath);
 
         if (str_contains($content, '// api: ')) {
@@ -151,5 +176,98 @@ class ApiInstallCommand extends Command
         $this->requireComposerPackages($this->option('composer'), [
             'laravel/passport:^12.0',
         ]);
+    }
+
+    /**
+    * Attempt to add the given trait to the specified model.
+    *
+    * @return void
+    */
+    protected function addTraitToModel(string $trait, string $model)
+    {
+        $modelPath = $this->laravel->basePath(str_replace('\\', '/', $model) . '.php');
+
+        if (! file_exists($modelPath)) {
+            $this->components->error("Model not found at {$modelPath}.");
+            return;
+        }
+
+        $content = file_get_contents($modelPath);
+        $traitBasename = class_basename($trait);
+        $sanctumTrait = 'Laravel\\Sanctum\\HasApiTokens';
+        $passportTrait = 'Laravel\\Passport\\HasApiTokens';
+
+        // Determine whether the requested trait is Sanctum or Passport
+        $traitName = ($trait === $sanctumTrait) ? 'Sanctum' : (($trait === $passportTrait) ? 'Passport' : $traitBasename);
+
+        // Detect existing traits and warn with improved messages
+        if (str_contains($content, "use $sanctumTrait;")) {
+            $this->warn("Sanctum is already installed in your [$model] model. Please manually install [$traitName] if needed.");
+            return;
+        }
+
+        if (str_contains($content, "use $passportTrait;")) {
+            $this->warn("Passport is already installed in your [$model] model. Please manually install [$traitName] if needed.");
+            return;
+        }
+
+        $modified = false;
+
+        // Add the top-level `use` statement if missing
+        $isTopLevelImported = str_contains($content, "use $trait;");
+
+        if (! $isTopLevelImported) {
+            $content = preg_replace(
+                '/^(namespace\s+[\w\\\\]+;\s*(?:\/\/.*\n)*)((?:use\s+[\w\\\\]+;\n)*)/m',
+                '$1$2use ' . $trait . ";\n",
+                $content,
+                1,
+                $count
+            );
+            if ($count > 0) {
+                $modified = true;
+            }
+        }
+
+        // Add the class-level trait if missing
+        $isClassLevelUsed = preg_match('/use\s+([A-Za-z,\\\\\s]+);/', $content, $matches) &&
+            str_contains($matches[1], $traitBasename);
+
+        if (! $isClassLevelUsed) {
+            if (preg_match('/class\s+\w+\s+extends\s+\w+[A-Za-z\\\\]*\s*\{/', $content, $matches, PREG_OFFSET_CAPTURE)) {
+                $insertPosition = $matches[0][1] + strlen($matches[0][0]);
+
+                if (preg_match('/use\s+(.*?);/s', $content, $useMatches, PREG_OFFSET_CAPTURE, $insertPosition)) {
+                    $traits = array_map('trim', explode(',', $useMatches[1][0]));
+
+                    if (!in_array($traitBasename, $traits, true)) {
+                        $traits[] = $traitBasename;
+                        $content = substr_replace(
+                            $content,
+                            'use ' . implode(', ', $traits) . ';',
+                            $useMatches[0][1],
+                            strlen($useMatches[0][0])
+                        );
+                        $modified = true;
+                    }
+                } else {
+                    $content = substr_replace(
+                        $content,
+                        "\n    use $traitBasename;",
+                        $insertPosition,
+                        0
+                    );
+                    $modified = true;
+                }
+            }
+        }
+
+        // Save changes if modified
+        if ($modified) {
+            file_put_contents($modelPath, $content);
+            $this->components->info("The [$trait] trait has been added to your [$model] model.");
+        } else {
+            $this->components->info("No changes were made to your [$model] model.");
+        }
     }
 }
