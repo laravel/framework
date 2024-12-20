@@ -174,16 +174,15 @@ class ApiInstallCommand extends Command
     /**
      * Attempt to add the given trait to the specified model.
      *
-     * @param  string  $trait
-     * @param  string  $model
      * @return void
      */
     protected function addTraitToModel(string $trait, string $model)
     {
-        $modelPath = $this->laravel->basePath(str_replace('\\', '/', $model) . '.php');
+        $modelPath = $this->laravel->basePath(str_replace('\\', '/', $model).'.php');
 
-        if (!file_exists($modelPath)) {
+        if (! file_exists($modelPath)) {
             $this->components->error("Model not found at {$modelPath}.");
+
             return;
         }
 
@@ -193,13 +192,14 @@ class ApiInstallCommand extends Command
         // Check if the trait is already used in the model
         if (strpos($content, $traitBasename) !== false) {
             $this->components->info("The [{$trait}] trait is already present in your [{$model}] model.");
+
             return;
         }
 
         $modified = false;
 
         // Ensure the 'use $trait;' statement is inserted correctly below other imports
-        if (!str_contains($content, "use $trait;")) {
+        if (! str_contains($content, "use $trait;")) {
             $content = preg_replace(
                 '/(use\s+[\w\\\\]+;(\s+\/\/.*\n)*\s*)+/s',
                 "$0use $trait;\n",
@@ -221,11 +221,11 @@ class ApiInstallCommand extends Command
             if (preg_match('/use\s+(.*?);/s', $content, $useMatches, PREG_OFFSET_CAPTURE, $insertPosition)) {
                 $traits = $useMatches[1][0];
                 $traitList = array_map('trim', explode(',', $traits));
-                if (!in_array($traitBasename, $traitList)) {
+                if (! in_array($traitBasename, $traitList)) {
                     $traitList[] = $traitBasename;
                     $content = substr_replace(
                         $content,
-                        'use ' . implode(', ', $traitList) . ';',
+                        'use '.implode(', ', $traitList).';',
                         $useMatches[0][1],
                         strlen($useMatches[0][0])
                     );
