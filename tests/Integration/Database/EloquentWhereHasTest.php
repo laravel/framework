@@ -86,6 +86,44 @@ class EloquentWhereHasTest extends DatabaseTestCase
         $this->assertEquals($userOrWhereHas->first()->id, $query->first()->id);
     }
 
+    /**
+     * Check that the 'whereDoesntHaveRelation' callback function works.
+     */
+    #[DataProvider('dataProviderWhereRelationCallback')]
+    public function testWhereDoesntRelationCallback($callbackEloquent, $callbackQuery)
+    {
+        $userWhereDoesntRelation = User::whereDoesntHaveRelation('posts', $callbackEloquent);
+        $userWhereHas = User::whereDoesntHave('posts', $callbackEloquent);
+        $query = DB::table('users')->whereNotExists($callbackQuery);
+
+        $this->assertEquals($userWhereDoesntRelation->getQuery()->toSql(), $query->toSql());
+        $this->assertEquals($userWhereDoesntRelation->getQuery()->toSql(), $userWhereHas->toSql());
+        $this->assertEquals($userWhereHas->getQuery()->toSql(), $query->toSql());
+
+        $this->assertEquals($userWhereDoesntRelation->first()->id, $query->first()->id);
+        $this->assertEquals($userWhereDoesntRelation->first()->id, $userWhereHas->first()->id);
+        $this->assertEquals($userWhereHas->first()->id, $query->first()->id);
+    }
+
+    /**
+     * Check that the 'orWhereDoesntRelation' callback function works.
+     */
+    #[DataProvider('dataProviderWhereRelationCallback')]
+    public function testOrWhereDoesntRelationCallback($callbackEloquent, $callbackQuery)
+    {
+        $userOrWhereDoesntRelation = User::orWhereDoesntHaveRelation('posts', $callbackEloquent);
+        $userOrWhereHas = User::orWhereDoesntHave('posts', $callbackEloquent);
+        $query = DB::table('users')->orWhereNotExists($callbackQuery);
+
+        $this->assertEquals($userOrWhereDoesntRelation->getQuery()->toSql(), $query->toSql());
+        $this->assertEquals($userOrWhereDoesntRelation->getQuery()->toSql(), $userOrWhereHas->toSql());
+        $this->assertEquals($userOrWhereHas->getQuery()->toSql(), $query->toSql());
+
+        $this->assertEquals($userOrWhereDoesntRelation->first()->id, $query->first()->id);
+        $this->assertEquals($userOrWhereDoesntRelation->first()->id, $userOrWhereHas->first()->id);
+        $this->assertEquals($userOrWhereHas->first()->id, $query->first()->id);
+    }
+
     public static function dataProviderWhereRelationCallback()
     {
         $callbackArray = function ($value) {
@@ -153,6 +191,50 @@ class EloquentWhereHasTest extends DatabaseTestCase
     {
         $comments = Comment::whereMorphRelation('commentable', '*', 'public', true)
             ->orWhereMorphRelation('commentable', '*', 'public', false)
+            ->get();
+
+        $this->assertEquals([1, 2], $comments->pluck('id')->all());
+    }
+
+    public function testWhereDoesntHaveRelation()
+    {
+        $users = User::whereDoesntHaveRelation('posts', 'public', true)->get();
+
+        $this->assertEquals([2], $users->pluck('id')->all());
+    }
+
+    public function testOrWhereDoesntHaveRelation()
+    {
+        $users = User::whereDoesntHaveRelation('posts', 'public', true)->orWhereDoesntHaveRelation('posts', 'public', false)->get();
+
+        $this->assertEquals([1, 2], $users->pluck('id')->all());
+    }
+
+    public function testNestedWhereDoesntHaveRelation()
+    {
+        $texts = User::whereDoesntHaveRelation('posts.texts', 'content', 'test')->get();
+
+        $this->assertEquals([2], $texts->pluck('id')->all());
+    }
+
+    public function testNestedOrWhereDoesntHaveRelation()
+    {
+        $texts = User::whereDoesntHaveRelation('posts.texts', 'content', 'test')->orWhereDoesntHaveRelation('posts.texts', 'content', 'test2')->get();
+
+        $this->assertEquals([1, 2], $texts->pluck('id')->all());
+    }
+
+    public function testWhereMorphDoesntHaveRelation()
+    {
+        $comments = Comment::whereMorphDoesntHaveRelation('commentable', '*', 'public', true)->get();
+
+        $this->assertEquals([2], $comments->pluck('id')->all());
+    }
+
+    public function testOrWhereMorphDoesntHaveRelation()
+    {
+        $comments = Comment::whereMorphDoesntHaveRelation('commentable', '*', 'public', true)
+            ->orWhereMorphDoesntHaveRelation('commentable', '*', 'public', false)
             ->get();
 
         $this->assertEquals([1, 2], $comments->pluck('id')->all());
