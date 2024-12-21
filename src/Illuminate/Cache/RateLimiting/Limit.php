@@ -2,7 +2,7 @@
 
 namespace Illuminate\Cache\RateLimiting;
 
-use const Illuminate\Support\Date\{HOURS_PER_DAY, MINUTES_PER_HOUR, SECONDS_PER_MINUTE};
+use const Illuminate\Support\Date\{SECONDS_PER_HOUR, SECONDS_PER_DAY};
 
 class Limit
 {
@@ -94,7 +94,7 @@ class Limit
      */
     public static function perHour($maxAttempts, $decayHours = 1)
     {
-        return new static('', $maxAttempts, SECONDS_PER_MINUTE * MINUTES_PER_HOUR * $decayHours);
+        return new static('', $maxAttempts, SECONDS_PER_HOUR * $decayHours);
     }
 
     /**
@@ -106,7 +106,7 @@ class Limit
      */
     public static function perDay($maxAttempts, $decayDays = 1)
     {
-        return new static('', $maxAttempts, SECONDS_PER_MINUTE * MINUTES_PER_HOUR * HOURS_PER_DAY * $decayDays);
+        return new static('', $maxAttempts, SECONDS_PER_DAY * $decayDays);
     }
 
     /**
