@@ -3,7 +3,11 @@
 namespace Illuminate\Console\Scheduling;
 
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Date\DayOfWeek;
+use Illuminate\Support\Date\Month;
 use InvalidArgumentException;
+
+use function Illuminate\Support\enum_value;
 
 trait ManagesFrequencies
 {
@@ -401,7 +405,7 @@ trait ManagesFrequencies
      */
     public function weekdays()
     {
-        return $this->days(Schedule::MONDAY.'-'.Schedule::FRIDAY);
+        return $this->days(DayOfWeek::Monday->value.'-'.DayOfWeek::Friday->value);
     }
 
     /**
@@ -411,7 +415,7 @@ trait ManagesFrequencies
      */
     public function weekends()
     {
-        return $this->days(Schedule::SATURDAY.','.Schedule::SUNDAY);
+        return $this->days(DayOfWeek::Saturday->value.','.DayOfWeek::Sunday->value);
     }
 
     /**
@@ -421,7 +425,7 @@ trait ManagesFrequencies
      */
     public function mondays()
     {
-        return $this->days(Schedule::MONDAY);
+        return $this->days(DayOfWeek::Monday);
     }
 
     /**
@@ -431,7 +435,7 @@ trait ManagesFrequencies
      */
     public function tuesdays()
     {
-        return $this->days(Schedule::TUESDAY);
+        return $this->days(DayOfWeek::Tuesday);
     }
 
     /**
@@ -441,7 +445,7 @@ trait ManagesFrequencies
      */
     public function wednesdays()
     {
-        return $this->days(Schedule::WEDNESDAY);
+        return $this->days(DayOfWeek::Wednesday);
     }
 
     /**
@@ -451,7 +455,7 @@ trait ManagesFrequencies
      */
     public function thursdays()
     {
-        return $this->days(Schedule::THURSDAY);
+        return $this->days(DayOfWeek::Thursday);
     }
 
     /**
@@ -461,7 +465,7 @@ trait ManagesFrequencies
      */
     public function fridays()
     {
-        return $this->days(Schedule::FRIDAY);
+        return $this->days(DayOfWeek::Friday);
     }
 
     /**
@@ -471,7 +475,7 @@ trait ManagesFrequencies
      */
     public function saturdays()
     {
-        return $this->days(Schedule::SATURDAY);
+        return $this->days(DayOfWeek::Saturday);
     }
 
     /**
@@ -481,7 +485,7 @@ trait ManagesFrequencies
      */
     public function sundays()
     {
-        return $this->days(Schedule::SUNDAY);
+        return $this->days(DayOfWeek::Sunday);
     }
 
     /**
@@ -499,7 +503,7 @@ trait ManagesFrequencies
     /**
      * Schedule the event to run weekly on a given day and time.
      *
-     * @param  array|mixed  $dayOfWeek
+     * @param  \Illuminate\Support\Date\DayOfWeek[]|\Illuminate\Support\Date\DayOfWeek|array|int<0,  6>|int<0,  6>[]|mixed  $dayOfWeek
      * @param  string  $time
      * @return $this
      */
@@ -610,7 +614,7 @@ trait ManagesFrequencies
     /**
      * Schedule the event to run yearly on a given month, day, and time.
      *
-     * @param  int  $month
+     * @param  int<1, 12>|\Illuminate\Support\Date\Month  $month
      * @param  int<1, 31>|string  $dayOfMonth
      * @param  string  $time
      * @return $this
@@ -620,18 +624,20 @@ trait ManagesFrequencies
         $this->dailyAt($time);
 
         return $this->spliceIntoPosition(3, $dayOfMonth)
-                    ->spliceIntoPosition(4, $month);
+                    ->spliceIntoPosition(4, enum_value($month));
     }
 
     /**
      * Set the days of the week the command should run on.
      *
-     * @param  array|mixed  $days
+     * @param  \Illuminate\Support\Date\DayOfWeek[]|\Illuminate\Support\Date\DayOfWeek|array|int<0, 6>[]|int<0, 6>|string[]|string|mixed  $days
      * @return $this
      */
     public function days($days)
     {
         $days = is_array($days) ? $days : func_get_args();
+
+        $days = array_map(enum_value(...), $days);
 
         return $this->spliceIntoPosition(5, implode(',', $days));
     }
@@ -660,7 +666,7 @@ trait ManagesFrequencies
     {
         $segments = preg_split("/\s+/", $this->expression);
 
-        $segments[$position - 1] = $value;
+        $segments[$position - 1] = enum_value($value);
 
         return $this->cron(implode(' ', $segments));
     }

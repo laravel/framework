@@ -5,6 +5,8 @@ namespace Illuminate\Session;
 use Illuminate\Contracts\Cache\Repository as CacheContract;
 use SessionHandlerInterface;
 
+use const Illuminate\Support\Date\SECONDS_PER_MINUTE;
+
 class CacheBasedSessionHandler implements SessionHandlerInterface
 {
     /**
@@ -71,7 +73,7 @@ class CacheBasedSessionHandler implements SessionHandlerInterface
      */
     public function write($sessionId, $data): bool
     {
-        return $this->cache->put($sessionId, $data, $this->minutes * 60);
+        return $this->cache->put($sessionId, $data, $this->minutes * SECONDS_PER_MINUTE);
     }
 
     /**

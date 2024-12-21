@@ -8,6 +8,8 @@ use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Traits\Macroable;
 use Symfony\Component\HttpFoundation\Cookie;
 
+use const Illuminate\Support\Date\SECONDS_PER_MINUTE;
+
 class CookieJar implements JarContract
 {
     use InteractsWithTime, Macroable;
@@ -65,7 +67,7 @@ class CookieJar implements JarContract
     {
         [$path, $domain, $secure, $sameSite] = $this->getPathAndDomain($path, $domain, $secure, $sameSite);
 
-        $time = ($minutes == 0) ? 0 : $this->availableAt($minutes * 60);
+        $time = ($minutes == 0) ? 0 : $this->availableAt($minutes * SECONDS_PER_MINUTE);
 
         return new Cookie($name, $value, $time, $path, $domain, $secure, $httpOnly, $raw, $sameSite);
     }
