@@ -7,6 +7,8 @@ use Illuminate\Support\InteractsWithTime;
 use SessionHandlerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
+use const Illuminate\Support\Date\SECONDS_PER_MINUTE;
+
 class CookieSessionHandler implements SessionHandlerInterface
 {
     use InteractsWithTime;
@@ -100,7 +102,7 @@ class CookieSessionHandler implements SessionHandlerInterface
     {
         $this->cookie->queue($sessionId, json_encode([
             'data' => $data,
-            'expires' => $this->availableAt($this->minutes * 60),
+            'expires' => $this->availableAt($this->minutes * SECONDS_PER_MINUTE),
         ]), $this->expireOnClose ? 0 : $this->minutes);
 
         return true;

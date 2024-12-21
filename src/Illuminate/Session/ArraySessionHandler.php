@@ -5,6 +5,8 @@ namespace Illuminate\Session;
 use Illuminate\Support\InteractsWithTime;
 use SessionHandlerInterface;
 
+use const Illuminate\Support\Date\SECONDS_PER_MINUTE;
+
 class ArraySessionHandler implements SessionHandlerInterface
 {
     use InteractsWithTime;
@@ -67,7 +69,7 @@ class ArraySessionHandler implements SessionHandlerInterface
 
         $session = $this->storage[$sessionId];
 
-        $expiration = $this->calculateExpiration($this->minutes * 60);
+        $expiration = $this->calculateExpiration($this->minutes * SECONDS_PER_MINUTE);
 
         if (isset($session['time']) && $session['time'] >= $expiration) {
             return $session['data'];
