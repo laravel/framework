@@ -235,7 +235,7 @@ class CallQueuedHandler
     protected function handleModelNotFound(Job $job, $e)
     {
         $class = $job->resolveName();
-        $this->ensureUniqueJobLockIsReleasedWithoutInstance();
+
         try {
             $reflectionClass = new ReflectionClass($class);
 
@@ -248,6 +248,8 @@ class CallQueuedHandler
         if ($shouldDelete) {
             return $job->delete();
         }
+
+        $this->ensureUniqueJobLockIsReleasedWithoutInstance();
 
         return $job->fail($e);
     }
