@@ -146,7 +146,8 @@ class UniqueJobTest extends QueueTestCase
 
         try {
             $user->delete();
-            dispatch($job);
+            dispatch_sync($job);
+            unserialize(serialize($job));
         } finally {
             $this->assertFalse($job::$handled);
             $this->assertModelMissing($user);
