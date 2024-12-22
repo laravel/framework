@@ -9,32 +9,36 @@ use Illuminate\Support\Arr;
 trait InteractsWithUniqueJobs
 {
     /**
-     * Determine if job has unique lock.
-     */
-    public function hasUniqueJob($job): bool
-    {
-        return $job instanceof ShouldBeUnique;
-    }
-
-    /**
      * Saves the used cache driver for the lock and
      * the lock key for emergency forceRelease in
      * case we can't instantiate a job instance.
      */
-    public function addLockToContext($job)
+    public function rememberLockIfJobIsUnique($job): void
     {
-        context()->addHidden([
-            'laravel_unique_job_cache_driver' => $this->getCacheDriver($job),
-            'laravel_unique_job_key' => $this->getKey($job),
-        ]);
+        if ($this->isUniqueJob($job)) {
+            context()->addHidden([
+                'laravel_unique_job_cache_driver' => $this->getCacheDriver($job),
+                'laravel_unique_job_key' => $this->getKey($job),
+            ]);
+        }
     }
 
     /**
      * forget the used lock.
      */
-    public function forgetLockFromContext(): void
+    public function forgetLockIfJobIsUnique($job): void
     {
-        context()->forgetHidden(['laravel_unique_job_cache_driver', 'laravel_unique_job_key']);
+        if ($this->isUniqueJob($job)) {
+            context()->forgetHidden(['laravel_unique_job_cache_driver', 'laravel_unique_job_key']);
+        }
+    }
+
+    /**
+     * Determine if job has unique lock.
+     */
+    private function isUniqueJob($job): bool
+    {
+        return $job instanceof ShouldBeUnique;
     }
 
     /**

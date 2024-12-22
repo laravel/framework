@@ -209,11 +209,11 @@ class PendingDispatch
      */
     public function __destruct()
     {
-        if($this->hasUniqueJob($this->job)){
-            $this->addLockToContext($this->job);
-        }
+        $this->rememberLockIfJobIsUnique($this->job);
 
         if (! $this->shouldDispatch()) {
+            $this->forgetLockIfJobIsUnique($this->job);
+
             return;
         } elseif ($this->afterResponse) {
             app(Dispatcher::class)->dispatchAfterResponse($this->job);
@@ -221,8 +221,6 @@ class PendingDispatch
             app(Dispatcher::class)->dispatch($this->job);
         }
 
-        if($this->hasUniqueJob($this->job)){
-            $this->forgetLockFromContext();
-        }
+        $this->forgetLockIfJobIsUnique($this->job);
     }
 }
