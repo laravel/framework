@@ -246,9 +246,8 @@ class PendingProcess
     {
         $this->command = $command ?: $this->command;
 
+        $process = $this->toSymfonyProcess($command);
         try {
-            $process = $this->toSymfonyProcess($command);
-
             if ($fake = $this->fakeFor($command = $process->getCommandline())) {
                 return tap($this->resolveSynchronousFake($command, $fake), function ($result) {
                     $this->factory->recordIfRecording($this, $result);
@@ -259,7 +258,6 @@ class PendingProcess
 
             return new ProcessResult(tap($process)->run($output));
         } catch (SymfonyTimeoutException $e) {
-            /** @phpstan-ignore variable.undefined */
             throw new ProcessTimedOutException($e, new ProcessResult($process));
         }
     }
