@@ -208,6 +208,24 @@ class CallQueuedHandler
     }
 
     /**
+     * Ensure the lock for a unique job is released
+     * when can't instantiate a job instance.
+     *
+     * @return void
+     */
+    protected function ensureUniqueJobLockIsReleasedWithoutInstance()
+    {
+        /**  @var string  */
+        $driver = context()->getHidden('lockCacheDriver');
+        /**  @var string  */
+        $key = context()->getHidden('lockKey');
+
+        if ($driver && $key) {
+            cache()->driver($driver)->lock($key)->forceRelease();
+        }
+    }
+
+    /**
      * Handle a model not found exception.
      *
      * @param  \Illuminate\Contracts\Queue\Job  $job
@@ -217,7 +235,7 @@ class CallQueuedHandler
     protected function handleModelNotFound(Job $job, $e)
     {
         $class = $job->resolveName();
-
+        $this->ensureUniqueJobLockIsReleasedWithoutInstance();
         try {
             $reflectionClass = new ReflectionClass($class);
 
