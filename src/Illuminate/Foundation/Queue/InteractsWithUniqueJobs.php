@@ -24,8 +24,8 @@ trait InteractsWithUniqueJobs
     public function addLockToContext($job)
     {
         context()->addHidden([
-            'lockCacheDriver' => $this->getCacheDriver($job),
-            'lockKey' => $this->getKey($job),
+            'laravel_unique_job_cache_driver' => $this->getCacheDriver($job),
+            'laravel_unique_job_key' => $this->getKey($job),
         ]);
     }
 
@@ -34,11 +34,11 @@ trait InteractsWithUniqueJobs
      */
     public function forgetLockFromContext(): void
     {
-        context()->forgetHidden(['lockCacheDriver', 'lockKey']);
+        context()->forgetHidden(['laravel_unique_job_cache_driver', 'laravel_unique_job_key']);
     }
 
     /**
-     * Get the used cache driver as string from the config.
+     * Get the used cache driver as string from the config,
      * CacheManger will handle invalid drivers.
      */
     private function getCacheDriver($job): ?string
