@@ -59,7 +59,7 @@ class Number
 
         // Append decimal part if exists
         if ($decimal !== '') {
-            $result .= '.' . $decimal;
+            $result .= '.'.$decimal;
         }
 
         return $result;
