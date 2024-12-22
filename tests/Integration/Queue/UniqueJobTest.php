@@ -136,18 +136,18 @@ class UniqueJobTest extends QueueTestCase
 
     public function testLockIsReleasedOnModelNotFoundException()
     {
-        UniqueTestFailJobWithSerializedModels::$handled = false;
+        UniqueTestSerializesModelsJob::$handled = false;
+
         /**  @var  \Illuminate\Foundation\Auth\User */
         $user = UserFactory::new()->create();
-        $job = new UniqueTestFailJobWithSerializedModels($user);
+        $job = new UniqueTestSerializesModelsJob($user);
+
         $this->expectException(ModelNotFoundException::class);
 
         try {
-
             $user->delete();
             dispatch($job);
         } finally {
-
             $this->assertFalse($job::$handled);
             $this->assertModelMissing($user);
             $this->assertTrue($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
@@ -210,23 +210,9 @@ class UniqueUntilStartTestJob extends UniqueTestJob implements ShouldBeUniqueUnt
     public $tries = 2;
 }
 
-class UniqueTestFailJobWithSerializedModels implements ShouldBeUnique, ShouldQueue
+class UniqueTestSerializesModelsJob extends UniqueTestJob
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use SerializesModels;
 
-    public $tries = 1;
-
-    public static $handled = false;
-
-    public User $user;
-
-    public function __construct(User $user)
-    {
-        $this->user = $user;
-    }
-
-    public function handle()
-    {
-        static::$handled = true;
-    }
+    public function __construct(public User $user) {}
 }

@@ -209,7 +209,7 @@ class CallQueuedHandler
 
     /**
      * Ensure the lock for a unique job is released
-     * when can't instantiate a job instance.
+     * when can't unserialize the job instance.
      *
      * @return void
      */
