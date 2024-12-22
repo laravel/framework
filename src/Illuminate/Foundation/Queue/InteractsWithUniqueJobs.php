@@ -56,7 +56,7 @@ trait InteractsWithUniqueJobs
 
             ->firstWhere(
                 function ($store) use ($cache) {
-                    return $cache === rescue(fn () => cache()->driver(($store['driver'])));
+                    return $cache === rescue(fn () => cache()->driver($store['driver']));
                 }
             );
 

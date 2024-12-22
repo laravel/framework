@@ -215,9 +215,9 @@ class CallQueuedHandler
      */
     protected function ensureUniqueJobLockIsReleasedWithoutInstance()
     {
-        /**  @var string  */
+        /** @var string */
         $driver = context()->getHidden('laravel_unique_job_cache_driver');
-        /**  @var string  */
+        /** @var string */
         $key = context()->getHidden('laravel_unique_job_key');
 
         if ($driver && $key) {

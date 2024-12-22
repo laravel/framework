@@ -9,13 +9,13 @@ use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Foundation\Auth\User;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Bus;
 use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\Factories\UserFactory;
-use Illuminate\Foundation\Auth\User;
 
 #[WithMigration]
 #[WithMigration('cache')]
@@ -138,7 +138,7 @@ class UniqueJobTest extends QueueTestCase
     {
         UniqueTestSerializesModelsJob::$handled = false;
 
-        /**  @var  \Illuminate\Foundation\Auth\User */
+        /** @var \Illuminate\Foundation\Auth\User */
         $user = UserFactory::new()->create();
         $job = new UniqueTestSerializesModelsJob($user);
 
@@ -214,5 +214,7 @@ class UniqueTestSerializesModelsJob extends UniqueTestJob
 {
     use SerializesModels;
 
-    public function __construct(public User $user) {}
+    public function __construct(public User $user)
+    {
+    }
 }
