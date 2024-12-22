@@ -25,6 +25,47 @@ class Number
     protected static $currency = 'USD';
 
     /**
+     * Divides a number into pairs of specified intervals with optional delimiters and padding.
+     *
+     * @param  string|int|float  $number
+     * @param  int  $interval
+     * @param  string  $delimiter
+     * @param  string  $padding
+     * @return string
+     */
+    public static function divides(string|int|float $number, int $interval = 1, string $delimiter = '', string $padding = '')
+    {
+        // Convert number to string
+        $number = strval($number);
+
+        // Handle decimal part separately
+        $parts = explode('.', $number);
+        $number = $parts[0];
+        $decimal = $parts[1] ?? '';
+
+        $pairs = [];
+        $length = strlen($number);
+
+        for ($i = 0; $i < $length; $i += $interval) {
+            $segment = substr($number, $i, $interval);
+            if (strlen($segment) < $interval && $padding) {
+                $segment = str_pad($segment, $interval, $padding, STR_PAD_RIGHT);
+            }
+            $pairs[] = $segment;
+        }
+
+        // Join pairs with the delimiter
+        $result = implode($delimiter, $pairs);
+
+        // Append decimal part if exists
+        if ($decimal !== '') {
+            $result .= '.' . $decimal;
+        }
+
+        return $result;
+    }
+
+    /**
      * Format the given number according to the current locale.
      *
      * @param  int|float  $number
