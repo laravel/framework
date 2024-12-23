@@ -134,6 +134,8 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals('False', when([], 'True', 'False'));  // Empty Array = Falsy
         $this->assertTrue(when(true, fn ($value) => $value, fn ($value) => ! $value)); // lazy evaluation
         $this->assertTrue(when(false, fn ($value) => $value, fn ($value) => ! $value)); // lazy evaluation
+        $this->assertEquals('Hello', when(fn () => true, 'Hello')); // lazy evaluation condition
+        $this->assertEquals('World', when(fn () => false, 'Hello', 'World')); // lazy evaluation condition
     }
 
     public function testFilled()
