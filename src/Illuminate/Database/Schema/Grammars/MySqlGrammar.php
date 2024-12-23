@@ -492,12 +492,21 @@ class MySqlGrammar extends Grammar
      */
     protected function compileKey(Blueprint $blueprint, Fluent $command, $type)
     {
-        return sprintf('alter table %s add %s %s%s(%s)',
+        $columns = collect($command->columns)->map(function ($column) {
+            // Check if the column contains a functional expression
+            if (preg_match('/\(.+\)/', $column)) {
+                return $column; // Return as-is if it's a functional expression
+            }
+            return $this->wrap($column); // Wrap normal columns
+        })->implode(', ');
+
+        return sprintf(
+            'alter table %s add %s %s%s(%s)',
             $this->wrapTable($blueprint),
             $type,
             $this->wrap($command->index),
-            $command->algorithm ? ' using '.$command->algorithm : '',
-            $this->columnize($command->columns)
+            $command->algorithm ? ' using ' . $command->algorithm : '',
+            $columns
         );
     }
 
