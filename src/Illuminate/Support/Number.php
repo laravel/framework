@@ -48,7 +48,7 @@ class Number
 
         // Split the integer part into chunks of the specified interval using callback
         $pairs = array_map(
-            fn($chunk) => Str::padRight($chunk, $interval, $padding),
+            fn ($chunk) => Str::padRight($chunk, $interval, $padding),
             str_split($integer, $interval)
         );
 
