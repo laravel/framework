@@ -99,7 +99,7 @@ class ResendTransport extends AbstractTransport
                 'attachments' => $attachments,
             ]);
 
-            throw_if($result['statusCode'] != Response::HTTP_OK, Exception::class, $result['message']);
+            throw_if(isset($result['statusCode']) && $result['statusCode'] != Response::HTTP_OK, Exception::class, $result['message']);
         } catch (Exception $exception) {
             throw new TransportException(
                 sprintf('Request to Resend API failed. Reason: %s.', $exception->getMessage()),
