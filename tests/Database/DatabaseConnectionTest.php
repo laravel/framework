@@ -540,6 +540,40 @@ class DatabaseConnectionTest extends TestCase
         $this->assertEquals(1.23, $log[0]['time']);
     }
 
+    public function testQueryExceptionMessageOnNoMasking()
+    {
+        $this->expectException(QueryException::class);
+        $this->expectExceptionMessage('server has gone away (Connection: , SQL: SELECT * FROM users WHERE id = 1)');
+
+        $pdo = m::mock(PDO::class);
+        $pdo->shouldReceive('beginTransaction')->once();
+        $statement = m::mock(PDOStatement::class);
+        $statement->shouldReceive('bindValue')->once();
+        $pdo->shouldReceive('prepare')->once()->andReturn($statement);
+        $statement->shouldReceive('execute')->once()->andThrow(new PDOException('server has gone away'));
+
+        $connection = new Connection($pdo);
+        $connection->beginTransaction();
+        $connection->statement('SELECT * FROM users WHERE id = ?', [1]);
+    }
+
+    public function testQueryExceptionMessageOnMasking()
+    {
+        $this->expectException(QueryException::class);
+        $this->expectExceptionMessage('server has gone away (Connection: , SQL: SELECT * FROM users WHERE id = ?)');
+
+        $pdo = m::mock(PDO::class);
+        $pdo->shouldReceive('beginTransaction')->once();
+        $statement = m::mock(PDOStatement::class);
+        $statement->shouldReceive('bindValue')->once();
+        $pdo->shouldReceive('prepare')->once()->andReturn($statement);
+        $statement->shouldReceive('execute')->once()->andThrow(new PDOException('server has gone away'));
+
+        $connection = new Connection($pdo, '', '', ['mask_bindings_on_exception_message' => true]);
+        $connection->beginTransaction();
+        $connection->statement('SELECT * FROM users WHERE id = ?', [1]);
+    }
+
     protected function getMockConnection($methods = [], $pdo = null)
     {
         $pdo = $pdo ?: new DatabaseConnectionTestMockPDO;

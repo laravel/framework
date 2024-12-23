@@ -816,14 +816,15 @@ class Connection implements ConnectionInterface
         // message to include the bindings with SQL, which will make this exception a
         // lot more helpful to the developer instead of just the database's errors.
         catch (Exception $e) {
+            $maskBindings = Arr::get($this->config, 'mask_bindings_on_exception_message', false);
             if ($this->isUniqueConstraintError($e)) {
                 throw new UniqueConstraintViolationException(
-                    $this->getName(), $query, $this->prepareBindings($bindings), $e
+                    $this->getName(), $query, $this->prepareBindings($bindings), $e, $maskBindings
                 );
             }
 
             throw new QueryException(
-                $this->getName(), $query, $this->prepareBindings($bindings), $e
+                $this->getName(), $query, $this->prepareBindings($bindings), $e, $maskBindings
             );
         }
     }
