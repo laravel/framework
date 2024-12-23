@@ -326,7 +326,7 @@ class AboutCommand extends Command
     }
 
     /**
-     * Check storage symbolic links status
+     * Check storage symbolic links status.
      * @param  callable  $formatStorageLinkedStatus  Formatter for link status
      * @return array<string,mixed> Array of paths and their link status
      */
@@ -335,6 +335,7 @@ class AboutCommand extends Command
         return collect(config('filesystems.links', []))
             ->mapWithKeys(function ($target, $link) use ($formatStorageLinkedStatus) {
                 $path = Str::replace(public_path(), '', $link);
+                
                 return [public_path($path) => static::format(file_exists($link), console: $formatStorageLinkedStatus)];
             })
             ->toArray();
