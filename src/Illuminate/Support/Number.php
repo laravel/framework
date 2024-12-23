@@ -3,7 +3,6 @@
 namespace Illuminate\Support;
 
 use Illuminate\Support\Traits\Macroable;
-use Illuminate\Support\Str;
 use NumberFormatter;
 use RuntimeException;
 
@@ -47,8 +46,11 @@ class Number
             $integer = Str::padRight($integer, ceil(strlen($integer) / $interval) * $interval, $padding);
         }
 
-        // Split the integer part into chunks of the specified interval
-        $pairs = Str::split($integer, $interval);
+        // Split the integer part into chunks of the specified interval using callback
+        $pairs = array_map(
+            fn($chunk) => Str::padRight($chunk, $interval, $padding),
+            str_split($integer, $interval)
+        );
 
         // Join pairs with the delimiter
         $result = implode($delimiter, $pairs);
