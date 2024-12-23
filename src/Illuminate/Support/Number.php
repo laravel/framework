@@ -46,15 +46,15 @@ class Number
             $integer = Str::padRight($integer, ceil(strlen($integer) / $interval) * $interval, $padding);
         }
 
-        // Split the integer part into chunks of the specified interval 
+        // Split the integer part into chunks of the specified interval
         $pairs = Str::split($integer, $interval);
 
-        // Join pairs with the delimiter 
+        // Join pairs with the delimiter
         $result = implode($delimiter, $pairs);
 
         // Append decimal part if exists
-        if (! empty($decimal)) { 
-            $result .= '.'.$decimal; 
+        if (! empty($decimal)) {
+            $result .= '.'.$decimal;
         }
 
         return $result;
