@@ -80,7 +80,7 @@ trait BuildsQueries
      */
     public function chunkMap(callable $callback, $count = 1000)
     {
-        $collection = Collection::make();
+        $collection = new Collection;
 
         $this->chunk($count, function ($items) use ($collection, $callback) {
             $items->each(function ($item) use ($collection, $callback) {

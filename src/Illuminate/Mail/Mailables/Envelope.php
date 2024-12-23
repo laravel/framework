@@ -4,6 +4,7 @@ namespace Illuminate\Mail\Mailables;
 
 use Closure;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\Conditionable;
 
 class Envelope
@@ -110,9 +111,9 @@ class Envelope
      */
     protected function normalizeAddresses($addresses)
     {
-        return collect($addresses)->map(function ($address) {
-            return is_string($address) ? new Address($address) : $address;
-        })->all();
+        return (new Collection($addresses))
+            ->map(fn ($address) => is_string($address) ? new Address($address) : $address)
+            ->all();
     }
 
     /**
@@ -334,7 +335,7 @@ class Envelope
      */
     protected function hasRecipient(array $recipients, string $address, ?string $name = null)
     {
-        return collect($recipients)->contains(function ($recipient) use ($address, $name) {
+        return (new Collection($recipients))->contains(function ($recipient) use ($address, $name) {
             if (is_null($name)) {
                 return $recipient->address === $address;
             }

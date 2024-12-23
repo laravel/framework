@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Stringable;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -234,17 +235,17 @@ class MigratorTest extends TestCase
     protected function expectInfo($message): void
     {
         $this->output->shouldReceive('writeln')->once()->with(m::on(
-            fn ($argument) => str($argument)->contains($message),
+            fn ($argument) => (new Stringable($argument))->contains($message),
         ), m::any());
     }
 
     protected function expectTwoColumnDetail($first, $second = null)
     {
         $this->output->shouldReceive('writeln')->with(m::on(function ($argument) use ($first, $second) {
-            $result = str($argument)->contains($first);
+            $result = (new Stringable($argument))->contains($first);
 
             if ($result && $second) {
-                $result = str($argument)->contains($second);
+                $result = (new Stringable($argument))->contains($second);
             }
 
             return $result;
@@ -255,7 +256,7 @@ class MigratorTest extends TestCase
     {
         $this->output->shouldReceive('writeln')->once()->with(m::on(function ($argument) use ($elements) {
             foreach ($elements as $element) {
-                if (! str($argument)->contains("⇂ $element")) {
+                if (! (new Stringable($argument))->contains("⇂ $element")) {
                     return false;
                 }
             }
@@ -268,20 +269,20 @@ class MigratorTest extends TestCase
     {
         // Ignore dots...
         $this->output->shouldReceive('write')->with(m::on(
-            fn ($argument) => str($argument)->contains(['<fg=gray></>', '<fg=gray>.</>']),
+            fn ($argument) => (new Stringable($argument))->contains(['<fg=gray></>', '<fg=gray>.</>']),
         ), m::any(), m::any());
 
         // Ignore duration...
         $this->output->shouldReceive('write')->with(m::on(
-            fn ($argument) => str($argument)->contains(['ms</>']),
+            fn ($argument) => (new Stringable($argument))->contains(['ms</>']),
         ), m::any(), m::any());
 
         $this->output->shouldReceive('write')->once()->with(m::on(
-            fn ($argument) => str($argument)->contains($description),
+            fn ($argument) => (new Stringable($argument))->contains($description),
         ), m::any(), m::any());
 
         $this->output->shouldReceive('writeln')->once()->with(m::on(
-            fn ($argument) => str($argument)->contains($result),
+            fn ($argument) => (new Stringable($argument))->contains($result),
         ), m::any());
     }
 }

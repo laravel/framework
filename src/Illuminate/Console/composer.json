@@ -23,9 +23,9 @@
         "illuminate/view": "^11.0",
         "laravel/prompts": "^0.1.20|^0.2|^0.3",
         "nunomaduro/termwind": "^2.0",
-        "symfony/console": "^7.0",
-        "symfony/polyfill-php83": "^1.28",
-        "symfony/process": "^7.0"
+        "symfony/console": "^7.0.3",
+        "symfony/polyfill-php83": "^1.31",
+        "symfony/process": "^7.0.3"
     },
     "autoload": {
         "psr-4": {

@@ -7,6 +7,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Mail\Markdown;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Stringable;
 use Orchestra\Testbench\TestCase;
 
 class SendingMarkdownMailTest extends TestCase
@@ -50,7 +51,7 @@ class SendingMarkdownMailTest extends TestCase
 
         $email = app('mailer')->getSymfonyTransport()->messages()[0]->getOriginalMessage()->toString();
 
-        $cid = explode(' cid:', str($email)->explode("\r\n")
+        $cid = explode(' cid:', (new Stringable($email))->explode("\r\n")
             ->filter(fn ($line) => str_contains($line, 'Embed content: cid:'))
             ->first())[1];
 

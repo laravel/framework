@@ -12,7 +12,11 @@ use Stringable;
 use Traversable;
 
 /**
- * @mixin \Illuminate\Support\Collection
+ * @template TKey of array-key
+ *
+ * @template-covariant TValue
+ *
+ * @mixin \Illuminate\Support\Collection<TKey, TValue>
  */
 abstract class AbstractPaginator implements Htmlable, Stringable
 {
@@ -21,7 +25,7 @@ abstract class AbstractPaginator implements Htmlable, Stringable
     /**
      * All of the items being paginated.
      *
-     * @var \Illuminate\Support\Collection
+     * @var \Illuminate\Support\Collection<TKey, TValue>
      */
     protected $items;
 
@@ -155,9 +159,9 @@ abstract class AbstractPaginator implements Htmlable, Stringable
      */
     public function getUrlRange($start, $end)
     {
-        return collect(range($start, $end))->mapWithKeys(function ($page) {
-            return [$page => $this->url($page)];
-        })->all();
+        return Collection::range($start, $end)
+            ->mapWithKeys(fn ($page) => [$page => $this->url($page)])
+            ->all();
     }
 
     /**
@@ -310,7 +314,7 @@ abstract class AbstractPaginator implements Htmlable, Stringable
     /**
      * Get the slice of items being paginated.
      *
-     * @return array
+     * @return array<TKey, TValue>
      */
     public function items()
     {
@@ -649,7 +653,7 @@ abstract class AbstractPaginator implements Htmlable, Stringable
     /**
      * Get an iterator for the items.
      *
-     * @return \ArrayIterator
+     * @return \ArrayIterator<TKey, TValue>
      */
     public function getIterator(): Traversable
     {
@@ -689,7 +693,7 @@ abstract class AbstractPaginator implements Htmlable, Stringable
     /**
      * Get the paginator's underlying collection.
      *
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Support\Collection<TKey, TValue>
      */
     public function getCollection()
     {
@@ -699,7 +703,7 @@ abstract class AbstractPaginator implements Htmlable, Stringable
     /**
      * Set the paginator's underlying collection.
      *
-     * @param  \Illuminate\Support\Collection  $collection
+     * @param  \Illuminate\Support\Collection<TKey, TValue>  $collection
      * @return $this
      */
     public function setCollection(Collection $collection)

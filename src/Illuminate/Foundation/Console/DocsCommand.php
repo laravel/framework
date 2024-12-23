@@ -381,10 +381,10 @@ class DocsCommand extends Command
             return;
         }
 
-        $binary = Collection::make(match ($this->systemOsFamily) {
+        $binary = (new Collection(match ($this->systemOsFamily) {
             'Darwin' => ['open'],
             'Linux' => ['xdg-open', 'wslview'],
-        })->first(fn ($binary) => (new ExecutableFinder)->find($binary) !== null);
+        }))->first(fn ($binary) => (new ExecutableFinder)->find($binary) !== null);
 
         if ($binary === null) {
             $this->components->warn('Unable to open the URL on your system. You will need to open it yourself or create a custom opener for your system.');
@@ -475,7 +475,7 @@ class DocsCommand extends Command
      */
     protected function searchQuery()
     {
-        return Collection::make($_SERVER['argv'])->skip(3)->implode(' ');
+        return (new Collection($_SERVER['argv']))->skip(3)->implode(' ');
     }
 
     /**

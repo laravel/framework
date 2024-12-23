@@ -789,6 +789,15 @@ class SupportStringableTest extends TestCase
         $this->assertFalse($this->stringable('foo/bar/baz')->is('*FOO*'));
         $this->assertFalse($this->stringable('a')->is('A'));
 
+        // is not case sensitive
+        $this->assertTrue($this->stringable('a')->is('A', true));
+        $this->assertTrue($this->stringable('foo/bar/baz')->is('*BAZ*', true));
+        $this->assertTrue($this->stringable('a/')->is(['A*', 'B*'], true));
+        $this->assertFalse($this->stringable('f/')->is(['A*', 'B*'], true));
+        $this->assertTrue($this->stringable('foo')->is('FOO', true));
+        $this->assertTrue($this->stringable('foo/bar/baz')->is('*FOO*', true));
+        $this->assertTrue($this->stringable('FOO/bar')->is('foo/*', true));
+
         // Accepts array of patterns
         $this->assertTrue($this->stringable('a/')->is(['a*', 'b*']));
         $this->assertTrue($this->stringable('b/')->is(['a*', 'b*']));

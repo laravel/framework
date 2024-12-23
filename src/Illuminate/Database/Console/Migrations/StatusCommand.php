@@ -4,6 +4,7 @@ namespace Illuminate\Database\Console\Migrations;
 
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Stringable;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -64,7 +65,7 @@ class StatusCommand extends BaseCommand
 
             $migrations = $this->getStatusFor($ran, $batches)
                 ->when($this->option('pending') !== false, fn ($collection) => $collection->filter(function ($migration) {
-                    return str($migration[1])->contains('Pending');
+                    return (new Stringable($migration[1]))->contains('Pending');
                 }));
 
             if (count($migrations) > 0) {
@@ -84,7 +85,7 @@ class StatusCommand extends BaseCommand
                 $this->components->info('No migrations found');
             }
 
-            if ($this->option('pending') && $migrations->some(fn ($m) => str($m[1])->contains('Pending'))) {
+            if ($this->option('pending') && $migrations->some(fn ($m) => (new Stringable($m[1]))->contains('Pending'))) {
                 return $this->option('pending');
             }
         });
@@ -99,7 +100,7 @@ class StatusCommand extends BaseCommand
      */
     protected function getStatusFor(array $ran, array $batches)
     {
-        return Collection::make($this->getAllMigrationFiles())
+        return (new Collection($this->getAllMigrationFiles()))
                     ->map(function ($migration) use ($ran, $batches) {
                         $migrationName = $this->migrator->getMigrationName($migration);
 

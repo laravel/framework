@@ -7,6 +7,7 @@ use Closure;
 use Countable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Testing\Assert as PHPUnit;
 use JsonSerializable;
@@ -279,10 +280,10 @@ class AssertableJsonString implements ArrayAccess, Countable
         if ($exact) {
             PHPUnit::assertIsArray($this->decoded);
 
-            $keys = collect($structure)->map(fn ($value, $key) => is_array($value) ? $key : $value)->values();
+            $keys = (new Collection($structure))->map(fn ($value, $key) => is_array($value) ? $key : $value)->values();
 
             if ($keys->all() !== ['*']) {
-                PHPUnit::assertEquals($keys->sort()->values()->all(), collect($this->decoded)->keys()->sort()->values()->all());
+                PHPUnit::assertEquals($keys->sort()->values()->all(), (new Collection($this->decoded))->keys()->sort()->values()->all());
             }
         }
 

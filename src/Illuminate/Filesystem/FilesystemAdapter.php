@@ -143,6 +143,27 @@ class FilesystemAdapter implements CloudFilesystemContract
     }
 
     /**
+     * Assert that the number of files in path equals the expected count.
+     *
+     * @param  string  $path
+     * @param  int  $count
+     * @param  bool  $recursive
+     * @return $this
+     */
+    public function assertCount($path, $count, $recursive = false)
+    {
+        clearstatcache();
+
+        $actual = count($this->files($path, $recursive));
+
+        PHPUnit::assertEquals(
+            $actual, $count, "Expected [{$count}] files at [{$path}], but found [{$actual}]."
+        );
+
+        return $this;
+    }
+
+    /**
      * Assert that the given file or directory does not exist.
      *
      * @param  string|array  $path

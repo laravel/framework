@@ -4,6 +4,7 @@ namespace Illuminate\Cache;
 
 use Closure;
 use Illuminate\Contracts\Cache\Repository as Cache;
+use Illuminate\Support\Collection;
 use Illuminate\Support\InteractsWithTime;
 
 use function Illuminate\Support\enum_value;
@@ -76,7 +77,7 @@ class RateLimiter
                 return $result;
             }
 
-            $duplicates = collect($result)->duplicates('key');
+            $duplicates = (new Collection($result))->duplicates('key');
 
             if ($duplicates->isEmpty()) {
                 return $result;

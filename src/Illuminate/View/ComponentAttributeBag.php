@@ -6,6 +6,7 @@ use ArrayAccess;
 use ArrayIterator;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Conditionable;
@@ -169,7 +170,7 @@ class ComponentAttributeBag implements ArrayAccess, IteratorAggregate, JsonSeria
      */
     public function filter($callback)
     {
-        return new static(collect($this->attributes)->filter($callback)->all());
+        return new static((new Collection($this->attributes))->filter($callback)->all());
     }
 
     /**
@@ -272,7 +273,7 @@ class ComponentAttributeBag implements ArrayAccess, IteratorAggregate, JsonSeria
                         : $value;
         }, $attributeDefaults);
 
-        [$appendableAttributes, $nonAppendableAttributes] = collect($this->attributes)
+        [$appendableAttributes, $nonAppendableAttributes] = (new Collection($this->attributes))
                     ->partition(function ($value, $key) use ($attributeDefaults) {
                         return $key === 'class' || $key === 'style' || (
                             isset($attributeDefaults[$key]) &&

@@ -32,9 +32,9 @@ class CommandBuilder
     {
         $output = ProcessUtils::escapeArgument($event->output);
 
-        return $this->ensureCorrectUser(
-            $event, $event->command.($event->shouldAppendOutput ? ' >> ' : ' > ').$output.' 2>&1'
-        );
+        return laravel_cloud()
+            ? $this->ensureCorrectUser($event, $event->command.' 2>&1 | tee '.($event->shouldAppendOutput ? '-a ' : '').$output)
+            : $this->ensureCorrectUser($event, $event->command.($event->shouldAppendOutput ? ' >> ' : ' > ').$output.' 2>&1');
     }
 
     /**

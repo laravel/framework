@@ -454,7 +454,7 @@ class Connection implements ConnectionInterface
      * @param  string  $query
      * @param  array  $bindings
      * @param  bool  $useReadPdo
-     * @return \Generator
+     * @return \Generator<int, \stdClass>
      */
     public function cursor($query, $bindings = [], $useReadPdo = true)
     {
@@ -1644,6 +1644,23 @@ class Connection implements ConnectionInterface
         $grammar->setTablePrefix($this->tablePrefix);
 
         return $grammar;
+    }
+
+    /**
+     * Execute the given callback without table prefix.
+     *
+     * @param  \Closure  $callback
+     * @return void
+     */
+    public function withoutTablePrefix(Closure $callback): void
+    {
+        $tablePrefix = $this->getTablePrefix();
+
+        $this->setTablePrefix('');
+
+        $callback($this);
+
+        $this->setTablePrefix($tablePrefix);
     }
 
     /**

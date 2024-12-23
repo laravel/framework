@@ -11,6 +11,18 @@ use Illuminate\Support\Collection;
 use IteratorAggregate;
 use JsonSerializable;
 
+/**
+ * @template TKey of array-key
+ *
+ * @template-covariant TValue
+ *
+ * @extends AbstractPaginator<TKey, TValue>
+ *
+ * @implements Arrayable<TKey, TValue>
+ * @implements ArrayAccess<TKey, TValue>
+ * @implements IteratorAggregate<TKey, TValue>
+ * @implements PaginatorContract<TKey, TValue>
+ */
 class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Countable, IteratorAggregate, Jsonable, JsonSerializable, PaginatorContract
 {
     /**
@@ -23,7 +35,7 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
     /**
      * Create a new paginator instance.
      *
-     * @param  mixed  $items
+     * @param  Collection<TKey, TValue>|Arrayable<TKey, TValue>|iterable<TKey, TValue>  $items
      * @param  int  $perPage
      * @param  int|null  $currentPage
      * @param  array  $options  (path, query, fragment, pageName)
@@ -60,12 +72,12 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
     /**
      * Set the items for the paginator.
      *
-     * @param  mixed  $items
+     * @param  Collection<TKey, TValue>|Arrayable<TKey, TValue>|iterable<TKey, TValue>|null  $items
      * @return void
      */
     protected function setItems($items)
     {
-        $this->items = $items instanceof Collection ? $items : Collection::make($items);
+        $this->items = $items instanceof Collection ? $items : new Collection($items);
 
         $this->hasMore = $this->items->count() > $this->perPage;
 

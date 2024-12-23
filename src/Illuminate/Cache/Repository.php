@@ -21,6 +21,7 @@ use Illuminate\Contracts\Cache\Repository as CacheContract;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Traits\Macroable;
 
@@ -141,13 +142,13 @@ class Repository implements ArrayAccess, CacheContract
     {
         $this->event(new RetrievingManyKeys($this->getName(), $keys));
 
-        $values = $this->store->many(collect($keys)->map(function ($value, $key) {
+        $values = $this->store->many((new Collection($keys))->map(function ($value, $key) {
             return is_string($key) ? $key : $value;
         })->values()->all());
 
-        return collect($values)->map(function ($value, $key) use ($keys) {
-            return $this->handleManyResult($keys, $key, $value);
-        })->all();
+        return (new Collection($values))
+            ->map(fn ($value, $key) => $this->handleManyResult($keys, $key, $value))
+            ->all();
     }
 
     /**

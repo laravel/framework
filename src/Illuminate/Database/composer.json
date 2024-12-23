@@ -22,7 +22,8 @@
         "illuminate/container": "^11.0",
         "illuminate/contracts": "^11.0",
         "illuminate/macroable": "^11.0",
-        "illuminate/support": "^11.0"
+        "illuminate/support": "^11.0",
+        "laravel/serializable-closure": "^1.3|^2.0"
     },
     "autoload": {
         "psr-4": {
@@ -36,12 +37,11 @@
     },
     "suggest": {
         "ext-filter": "Required to use the Postgres database driver.",
-        "fakerphp/faker": "Required to use the eloquent factory builder (^1.21).",
+        "fakerphp/faker": "Required to use the eloquent factory builder (^1.24).",
         "illuminate/console": "Required to use the database commands (^11.0).",
         "illuminate/events": "Required to use the observers with Eloquent (^11.0).",
         "illuminate/filesystem": "Required to use the migrations (^11.0).",
         "illuminate/pagination": "Required to paginate the result set (^11.0).",
-        "laravel/serializable-closure": "Required to handle circular references in model serialization (^1.3).",
         "symfony/finder": "Required to use Eloquent model factories (^7.0)."
     },
     "config": {

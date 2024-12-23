@@ -15,6 +15,7 @@ use Illuminate\Contracts\Queue\ShouldBeEncrypted;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\ReflectsClosures;
@@ -80,19 +81,19 @@ class Dispatcher implements DispatcherContract
     /**
      * Register an event listener with the dispatcher.
      *
-     * @param  \Illuminate\Events\QueuedClosure|\Closure|string|array  $events
-     * @param  \Illuminate\Events\QueuedClosure|\Closure|string|array|null  $listener
+     * @param  \Illuminate\Events\QueuedClosure|callable|array|class-string|string  $events
+     * @param  \Illuminate\Events\QueuedClosure|callable|array|class-string|null  $listener
      * @return void
      */
     public function listen($events, $listener = null)
     {
         if ($events instanceof Closure) {
-            return collect($this->firstClosureParameterTypes($events))
+            return (new Collection($this->firstClosureParameterTypes($events)))
                 ->each(function ($event) use ($events) {
                     $this->listen($event, $events);
                 });
         } elseif ($events instanceof QueuedClosure) {
-            return collect($this->firstClosureParameterTypes($events->closure))
+            return (new Collection($this->firstClosureParameterTypes($events->closure)))
                 ->each(function ($event) use ($events) {
                     $this->listen($event, $events->resolve());
                 });

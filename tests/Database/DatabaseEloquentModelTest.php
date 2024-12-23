@@ -43,7 +43,6 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\InteractsWithTime;
-use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
 use InvalidArgumentException;
 use LogicException;
@@ -255,10 +254,10 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertInstanceOf(Stringable::class, $model->asStringableAttribute);
         $this->assertFalse($model->isDirty('asStringableAttribute'));
 
-        $model->asStringableAttribute = Str::of('foo bar');
+        $model->asStringableAttribute = new Stringable('foo bar');
         $this->assertFalse($model->isDirty('asStringableAttribute'));
 
-        $model->asStringableAttribute = Str::of('foo baz');
+        $model->asStringableAttribute = new Stringable('foo baz');
         $this->assertTrue($model->isDirty('asStringableAttribute'));
     }
 
@@ -2106,6 +2105,20 @@ class DatabaseEloquentModelTest extends TestCase
         EloquentModelWithObserveAttributeUsingArrayStub::flushEventListeners();
     }
 
+    public function testModelObserversCanBeAttachedToModelsThroughAttributesOnParentClasses()
+    {
+        EloquentModelWithObserveAttributeGrandchildStub::setEventDispatcher($events = m::mock(Dispatcher::class));
+        $events->shouldReceive('dispatch');
+        $events->shouldReceive('listen')->once()->with('eloquent.creating: Illuminate\Tests\Database\EloquentModelWithObserveAttributeGrandchildStub', EloquentTestObserverStub::class.'@creating');
+        $events->shouldReceive('listen')->once()->with('eloquent.saved: Illuminate\Tests\Database\EloquentModelWithObserveAttributeGrandchildStub', EloquentTestObserverStub::class.'@saved');
+        $events->shouldReceive('listen')->once()->with('eloquent.creating: Illuminate\Tests\Database\EloquentModelWithObserveAttributeGrandchildStub', EloquentTestAnotherObserverStub::class.'@creating');
+        $events->shouldReceive('listen')->once()->with('eloquent.saved: Illuminate\Tests\Database\EloquentModelWithObserveAttributeGrandchildStub', EloquentTestAnotherObserverStub::class.'@saved');
+        $events->shouldReceive('listen')->once()->with('eloquent.creating: Illuminate\Tests\Database\EloquentModelWithObserveAttributeGrandchildStub', EloquentTestThirdObserverStub::class.'@creating');
+        $events->shouldReceive('listen')->once()->with('eloquent.saved: Illuminate\Tests\Database\EloquentModelWithObserveAttributeGrandchildStub', EloquentTestThirdObserverStub::class.'@saved');
+        $events->shouldReceive('forget');
+        EloquentModelWithObserveAttributeGrandchildStub::flushEventListeners();
+    }
+
     public function testThrowExceptionOnAttachingNotExistsModelObserverWithString()
     {
         $this->expectException(InvalidArgumentException::class);
@@ -3206,6 +3219,19 @@ class EloquentTestAnotherObserverStub
     }
 }
 
+class EloquentTestThirdObserverStub
+{
+    public function creating()
+    {
+        //
+    }
+
+    public function saved()
+    {
+        //
+    }
+}
+
 class EloquentModelStub extends Model
 {
     public $connection;
@@ -3695,6 +3721,24 @@ class EloquentModelWithObserveAttributeStub extends EloquentModelStub
 
 #[ObservedBy([EloquentTestObserverStub::class])]
 class EloquentModelWithObserveAttributeUsingArrayStub extends EloquentModelStub
+{
+    //
+}
+
+#[ObservedBy([EloquentTestObserverStub::class])]
+class EloquentModelWithObserveAttributeGrandparentStub extends EloquentModelStub
+{
+    //
+}
+
+#[ObservedBy([EloquentTestAnotherObserverStub::class])]
+class EloquentModelWithObserveAttributeParentStub extends EloquentModelWithObserveAttributeGrandparentStub
+{
+    //
+}
+
+#[ObservedBy([EloquentTestThirdObserverStub::class])]
+class EloquentModelWithObserveAttributeGrandchildStub extends EloquentModelWithObserveAttributeParentStub
 {
     //
 }

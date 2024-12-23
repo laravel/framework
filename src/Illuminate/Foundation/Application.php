@@ -45,7 +45,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      *
      * @var string
      */
-    const VERSION = '11.31.0';
+    const VERSION = '11.36.1';
 
     /**
      * The base path for the Laravel installation.
@@ -836,7 +836,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function registerConfiguredProviders()
     {
-        $providers = Collection::make($this->make('config')->get('app.providers'))
+        $providers = (new Collection($this->make('config')->get('app.providers')))
                         ->partition(fn ($provider) => str_starts_with($provider, 'Illuminate\\'));
 
         $providers->splice(1, 0, [$this->make(PackageManifest::class)->providers()]);

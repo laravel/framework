@@ -28,6 +28,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
+use Illuminate\Support\Stringable;
 use JsonSerializable;
 use Mockery as m;
 use OutOfBoundsException;
@@ -37,6 +38,7 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use RuntimeException;
 use Symfony\Component\VarDumper\VarDumper;
+use Throwable;
 
 class HttpClientTest extends TestCase
 {
@@ -50,6 +52,8 @@ class HttpClientTest extends TestCase
         parent::setUp();
 
         $this->factory = new Factory;
+
+        RequestException::truncate();
     }
 
     protected function tearDown(): void
@@ -80,6 +84,53 @@ class HttpClientTest extends TestCase
 
         $response = $this->factory->post('http://forge.laravel.com');
         $this->assertFalse($response->created());
+    }
+
+    public function testStatusCodeShorthand()
+    {
+        $this->factory->fake([
+            'forge.laravel.com' => 204,
+            'vapor.laravel.com' => HttpResponse::HTTP_CREATED,
+        ]);
+
+        $response = $this->factory->post('http://forge.laravel.com');
+        $this->assertTrue($response->noContent());
+
+        $response = $this->factory->post('http://vapor.laravel.com');
+        $this->assertTrue($response->created());
+    }
+
+    public function testStatusCodeShorthandAssumeBodyWhenInvalidHttpStatusCode()
+    {
+        $this->factory->fake([
+            'forge.laravel.com' => 999,
+            'vapor.laravel.com' => 1,
+        ]);
+
+        $response = $this->factory->post('http://forge.laravel.com');
+        $this->assertTrue($response->ok());
+        $this->assertSame('999', $response->body());
+
+        $response = $this->factory->post('http://vapor.laravel.com');
+        $this->assertTrue($response->ok());
+        $this->assertSame('1', $response->body());
+    }
+
+    public function testBodyShorthands()
+    {
+        $this->factory->fake([
+            'google.com' => 'Hello World',
+            'github.com' => ['foo' => 'bar'],
+        ]);
+
+        $response = $this->factory->get('http://google.com');
+        $this->assertTrue($response->ok());
+        $this->assertSame('Hello World', $response->body());
+
+        $response = $this->factory->post('http://github.com');
+        $this->assertTrue($response->ok());
+        $this->assertSame('{"foo":"bar"}', $response->body());
+        $this->assertSame(['foo' => 'bar'], $response->json());
     }
 
     public function testAcceptedRequest()
@@ -354,6 +405,21 @@ class HttpClientTest extends TestCase
         $this->assertEquals(collect(), $response->collect('missing_key'));
     }
 
+    public function testResponseCanBeReturnedAsFluent()
+    {
+        $this->factory->fake([
+            '*' => ['result' => ['foo' => 'bar']],
+        ]);
+
+        $response = $this->factory->get('http://foo.com/api');
+
+        $this->assertInstanceOf(Fluent::class, $response->fluent());
+        $this->assertEquals(new Fluent(['result' => ['foo' => 'bar']]), $response->fluent());
+        $this->assertEquals(new Fluent(['foo' => 'bar']), $response->fluent('result'));
+        $this->assertEquals(new Fluent(['bar']), $response->fluent('result.foo'));
+        $this->assertEquals(new Fluent([]), $response->fluent('missing_key'));
+    }
+
     public function testSendRequestBodyAsJsonByDefault()
     {
         $body = '{"test":"phpunit"}';
@@ -538,7 +604,7 @@ class HttpClientTest extends TestCase
             'X-Test-Header' => 'foo',
             'X-Test-ArrayHeader' => ['bar', 'baz'],
         ])->post('http://foo.com/json', [
-            'name' => Str::of('Taylor'),
+            'name' => new Stringable('Taylor'),
         ]);
 
         $this->factory->assertSent(function (Request $request) {
@@ -555,7 +621,7 @@ class HttpClientTest extends TestCase
         $this->factory->fake();
 
         $this->factory->asForm()->post('http://foo.com/form', [
-            'name' => Str::of('Taylor'),
+            'name' => new Stringable('Taylor'),
             'title' => 'Laravel Developer',
         ]);
 
@@ -571,7 +637,7 @@ class HttpClientTest extends TestCase
         $this->factory->fake();
 
         $this->factory->asForm()->post('http://foo.com/form', [
-            'posts' => [['title' => Str::of('Taylor')]],
+            'posts' => [['title' => new Stringable('Taylor')]],
         ]);
 
         $this->factory->assertSent(function (Request $request) {
@@ -905,7 +971,7 @@ class HttpClientTest extends TestCase
         $this->factory->fake();
 
         $this->factory->withQueryParameters(
-            ['foo' => Str::of('bar')]
+            ['foo' => new Stringable('bar')]
         )->get('https://laravel.com');
 
         $this->factory->assertSent(function (Request $request) {
@@ -918,7 +984,7 @@ class HttpClientTest extends TestCase
         $this->factory->fake();
 
         $this->factory->withQueryParameters(
-            ['foo' => ['bar', Str::of('baz')]],
+            ['foo' => ['bar', new Stringable('baz')]],
         )->get('https://laravel.com');
 
         $this->factory->assertSent(function (Request $request) {
@@ -1182,6 +1248,42 @@ class HttpClientTest extends TestCase
     {
         $this->expectException(RequestException::class);
         $this->expectExceptionMessage('{"error":{"code":403,"message":"The Request can not be completed because quota limit was exceeded. Please, check our sup (truncated...)');
+
+        $error = [
+            'error' => [
+                'code' => 403,
+                'message' => 'The Request can not be completed because quota limit was exceeded. Please, check our support team to increase your limit',
+            ],
+        ];
+        $response = new Psr7Response(403, [], json_encode($error));
+
+        throw new RequestException(new Response($response));
+    }
+
+    public function testRequestExceptionWithoutTruncatedSummary()
+    {
+        RequestException::dontTruncate();
+
+        $this->expectException(RequestException::class);
+        $this->expectExceptionMessage('{"error":{"code":403,"message":"The Request can not be completed because quota limit was exceeded. Please, check our support team to increase your limit');
+
+        $error = [
+            'error' => [
+                'code' => 403,
+                'message' => 'The Request can not be completed because quota limit was exceeded. Please, check our support team to increase your limit',
+            ],
+        ];
+        $response = new Psr7Response(403, [], json_encode($error));
+
+        throw new RequestException(new Response($response));
+    }
+
+    public function testRequestExceptionWithCustomTruncatedSummary()
+    {
+        RequestException::truncateAt(60);
+
+        $this->expectException(RequestException::class);
+        $this->expectExceptionMessage('{"error":{"code":403,"message":"The Request can not be compl (truncated...)');
 
         $error = [
             'error' => [
@@ -2200,30 +2302,60 @@ class HttpClientTest extends TestCase
     {
         $this->factory->fake($this->factory->failedConnection('Fake'));
 
-        $this->expectException(ConnectionException::class);
-        $this->expectExceptionMessage('Fake');
+        $exception = null;
 
-        $this->factory->post('https://example.com');
+        try {
+            $this->factory->post('https://example.com');
+        } catch (Throwable $e) {
+            $exception = $e;
+        }
+
+        $this->assertNotNull($exception);
+        $this->assertInstanceOf(ConnectionException::class, $exception);
+        $this->assertSame('Fake', $exception->getMessage());
+
+        $this->factory->assertSentCount(1);
+        $this->factory->assertSent(function (Request $request, ?Response $response) {
+            return $request->url() === 'https://example.com' && $response === null;
+        });
     }
 
     public function testFakeConnectionExceptionWithinFakeClosure()
     {
         $this->factory->fake(fn () => $this->factory->failedConnection('Fake'));
 
-        $this->expectException(ConnectionException::class);
-        $this->expectExceptionMessage('Fake');
+        $exception = null;
 
-        $this->factory->post('https://example.com');
+        try {
+            $this->factory->post('https://example.com');
+        } catch (Throwable $e) {
+            $exception = $e;
+        }
+
+        $this->assertNotNull($exception);
+        $this->assertInstanceOf(ConnectionException::class, $exception);
+        $this->assertSame('Fake', $exception->getMessage());
+
+        $this->factory->assertSentCount(1);
     }
 
     public function testFakeConnectionExceptionWithinArray()
     {
         $this->factory->fake(['*' => $this->factory->failedConnection('Fake')]);
 
-        $this->expectException(ConnectionException::class);
-        $this->expectExceptionMessage('Fake');
+        $exception = null;
 
-        $this->factory->post('https://example.com');
+        try {
+            $this->factory->post('https://example.com');
+        } catch (Throwable $e) {
+            $exception = $e;
+        }
+
+        $this->assertNotNull($exception);
+        $this->assertInstanceOf(ConnectionException::class, $exception);
+        $this->assertSame('Fake', $exception->getMessage());
+
+        $this->factory->assertSentCount(1);
     }
 
     public function testFakeConnectionExceptionWithinSequence()
@@ -2247,6 +2379,8 @@ class HttpClientTest extends TestCase
         $this->assertNotNull($exception);
         $this->assertInstanceOf(ConnectionException::class, $exception);
         $this->assertSame('Fake', $exception->getMessage());
+
+        $this->factory->assertSentCount(2);
     }
 
     public function testMiddlewareRunsWhenFaked()
