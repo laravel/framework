@@ -33,33 +33,28 @@ class Number
      * @param  string  $padding
      * @return string
      */
-    public static function divides(string|int|float $number, int $interval = 1, string $delimiter = '', string $padding = '')
+    public static function group($number, int $interval = 1, string $delimiter = '', string $padding = '')
     {
         // Convert number to string
-        $number = strval($number);
+        $number = (string) $number;
 
         // Handle decimal part separately
-        $parts = explode('.', $number);
-        $number = $parts[0];
-        $decimal = $parts[1] ?? '';
+        [$integer, $decimal] = explode('.', $number.'.0');
 
-        $pairs = [];
-        $length = strlen($number);
-
-        for ($i = 0; $i < $length; $i += $interval) {
-            $segment = substr($number, $i, $interval);
-            if (strlen($segment) < $interval && $padding) {
-                $segment = str_pad($segment, $interval, $padding, STR_PAD_RIGHT);
-            }
-            $pairs[] = $segment;
+        // Pad the integer part to ensure it's a multiple of the interval
+        if ($padding) {
+            $integer = Str::padRight($integer, ceil(strlen($integer) / $interval) * $interval, $padding);
         }
 
-        // Join pairs with the delimiter
+        // Split the integer part into chunks of the specified interval 
+        $pairs = Str::split($integer, $interval);
+
+        // Join pairs with the delimiter 
         $result = implode($delimiter, $pairs);
 
         // Append decimal part if exists
-        if ($decimal !== '') {
-            $result .= '.'.$decimal;
+        if (! empty($decimal)) { 
+            $result .= '.'.$decimal; 
         }
 
         return $result;
