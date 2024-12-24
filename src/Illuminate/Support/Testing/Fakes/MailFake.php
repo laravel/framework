@@ -501,11 +501,9 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
      */
     protected function sendMail($view, $shouldQueue = false)
     {
-        if (! $view instanceof Mailable) {
-            return;
+        if ($view instanceof Mailable) {
+            $view->mailer($this->currentMailer);
         }
-
-        $view->mailer($this->currentMailer);
 
         if ($shouldQueue) {
             return $this->queue($view);
