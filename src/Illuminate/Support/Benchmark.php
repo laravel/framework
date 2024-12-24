@@ -127,6 +127,7 @@ class Benchmark
     {
         if ($task) {
             unset(static::$tasks[$task]);
+
             return;
         }
 
