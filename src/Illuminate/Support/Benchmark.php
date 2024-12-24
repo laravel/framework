@@ -104,17 +104,15 @@ class Benchmark
      *
      * @param  string  $task
      * @param  string  $start
-     * @param  string  $end
+     * @param  ?string  $end
      * @return float
      */
-    public static function computeTags(string $task, string $start, string $end): float
+    public static function computeTags(string $task, string $start, ?string $end = null): float
     {
         $start = static::$tasks[$task][$start] ?? throw new \InvalidArgumentException(
             sprintf('The start tag "%s" does not exist.', $start)
         );
-        $end = static::$tasks[$task][$end] ?? throw new \InvalidArgumentException(
-            sprintf('The end tag "%s" does not exist.', $end)
-        );
+        $end = static::$tasks[$task][$end] ?? hrtime(true);
 
         return ($end - $start) / 1000000;
     }
