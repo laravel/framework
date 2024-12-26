@@ -33,4 +33,20 @@ return [
         realpath(storage_path('framework/views'))
     ),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Component Boolean Attributes
+    |--------------------------------------------------------------------------
+    |
+    | This option determines which HTML attributes should be considered as
+    | boolean attributes when rendering components. HTML attributes listed
+    | here will not have their values rendered when the component is rendered.
+    | Given values will be check start with given string or full string.
+    | For example, 'x-foo' will be rendered as '<div x-foo></div>'
+    |
+    */
+    'boolean_attributes' => [
+        'x-', // Alpine.js
+        'wire:', // Laravel Livewire
+    ],
 ];

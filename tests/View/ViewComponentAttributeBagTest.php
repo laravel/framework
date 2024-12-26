@@ -124,6 +124,19 @@ class ViewComponentAttributeBagTest extends TestCase
         $this->assertSame('wire:loading="" wire:loading.remove="" wire:poll=""', (string) $bag);
     }
 
+    public function testBooleanAttributesLivewireWireAndAlpineJS()
+    {
+        $bag = new ComponentAttributeBag([
+            'wire:loading' => true,
+            'wire:loading.remove' => true,
+            'wire:poll' => true,
+            'x-data' => true,
+            'x-transition' => true,
+        ]);
+
+        $this->assertSame('wire:loading="" wire:loading.remove="" wire:poll="" x-data="" x-transition=""', (string) $bag);
+    }
+
     public function testAttributeExistence()
     {
         $bag = new ComponentAttributeBag(['name' => 'test']);

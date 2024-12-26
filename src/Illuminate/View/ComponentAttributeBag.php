@@ -4,6 +4,7 @@ namespace Illuminate\View;
 
 use ArrayAccess;
 use ArrayIterator;
+use Illuminate\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -507,13 +508,25 @@ class ComponentAttributeBag implements ArrayAccess, IteratorAggregate, JsonSeria
     {
         $string = '';
 
+        $configBooleanAttributes = app(ConfigRepository::class)->get('view.boolean_attributes', [
+            'x-', // Alpine.js
+            'wire:', // Laravel Livewire
+        ]);
+
         foreach ($this->attributes as $key => $value) {
             if ($value === false || is_null($value)) {
                 continue;
             }
 
             if ($value === true) {
-                $value = $key === 'x-data' || str_starts_with($key, 'wire:') ? '' : $key;
+                $value = $key;
+
+                foreach ($configBooleanAttributes as $attribute) {
+                    if (Str::startsWith($key, $attribute) || $key === $attribute) {
+                        $value = '';
+                        break;
+                    }
+                }
             }
 
             $string .= ' '.$key.'="'.str_replace('"', '\\"', trim($value)).'"';
