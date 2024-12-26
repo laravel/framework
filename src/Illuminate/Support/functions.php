@@ -4,7 +4,7 @@ namespace Illuminate\Support;
 
 use Illuminate\Support\Defer\DeferredCallback;
 use Illuminate\Support\Defer\DeferredCallbackCollection;
-use Illuminate\Support\Process\PhpExecutableFinder;
+use Symfony\Component\Process\PhpExecutableFinder;
 
 if (! function_exists('Illuminate\Support\defer')) {
     /**

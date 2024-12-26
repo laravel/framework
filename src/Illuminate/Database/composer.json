@@ -42,7 +42,7 @@
         "illuminate/events": "Required to use the observers with Eloquent (^12.0).",
         "illuminate/filesystem": "Required to use the migrations (^12.0).",
         "illuminate/pagination": "Required to paginate the result set (^12.0).",
-        "symfony/finder": "Required to use Eloquent model factories (^7.0)."
+        "symfony/finder": "Required to use Eloquent model factories (^7.2)."
     },
     "config": {
         "sort-packages": true
