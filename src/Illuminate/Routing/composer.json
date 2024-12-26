@@ -25,9 +25,9 @@
         "illuminate/pipeline": "^12.0",
         "illuminate/session": "^12.0",
         "illuminate/support": "^12.0",
-        "symfony/http-foundation": "^7.0.3",
-        "symfony/http-kernel": "^7.0.3",
-        "symfony/routing": "^7.0.3"
+        "symfony/http-foundation": "^7.2.0",
+        "symfony/http-kernel": "^7.2.0",
+        "symfony/routing": "^7.2.0"
     },
     "autoload": {
         "psr-4": {
@@ -42,7 +42,7 @@
     "suggest": {
         "illuminate/console": "Required to use the make commands (^12.0).",
         "php-http/discovery": "Required to use PSR-7 bridging features (^1.15).",
-        "symfony/psr-http-message-bridge": "Required to use PSR-7 bridging features (^7.0)."
+        "symfony/psr-http-message-bridge": "Required to use PSR-7 bridging features (^7.2)."
     },
     "config": {
         "sort-packages": true,
