@@ -159,7 +159,7 @@ trait InteractsWithQueue
             PHPUnit::assertInstanceOf(
                 $exception,
                 $this->job->failedWith,
-                'Job was expected to be manually failed with ['.$exception.'], but was not.'
+                'Expected job to be manually failed with ['.$exception.'], but was failed with ['.get_class($this->job->failedWith).'].'
             );
 
             return $this;
