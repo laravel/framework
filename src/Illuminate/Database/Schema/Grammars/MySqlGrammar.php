@@ -493,9 +493,7 @@ class MySqlGrammar extends Grammar
     protected function compileKey(Blueprint $blueprint, Fluent $command, $type)
     {
         $columns = collect($command->columns)->map(function ($column) {
-            // Check if the column contains a functional expression
-            // and return as-is, otherwise wrap
-            return preg_match('/\(.+\)/', $column) ? $column : $this->wrap($column);
+            return self::isFunctionalExpression($column) ? $column : $this->wrap($column);
         })->implode(', ');
 
         return sprintf(
