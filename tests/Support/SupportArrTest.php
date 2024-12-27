@@ -1508,5 +1508,4 @@ class SupportArrTest extends TestCase
         $array = ['one', 'two', 'one'];
         $this->assertEquals(['one' => 2, 'two' => 1], Arr::flip($array));
     }
-
 }
