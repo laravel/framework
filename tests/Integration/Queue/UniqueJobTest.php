@@ -147,6 +147,7 @@ class UniqueJobTest extends QueueTestCase
         try {
             $user->delete();
             dispatch($job);
+            $this->runQueueWorkerCommand(['--once' => true]);
             unserialize(serialize($job));
         } finally {
             $this->assertFalse($job::$handled);
