@@ -245,11 +245,11 @@ class CallQueuedHandler
             $shouldDelete = false;
         }
 
+        $this->ensureUniqueJobLockIsReleasedWithoutInstance();
+
         if ($shouldDelete) {
             return $job->delete();
         }
-
-        $this->ensureUniqueJobLockIsReleasedWithoutInstance();
 
         return $job->fail($e);
     }

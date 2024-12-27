@@ -146,7 +146,7 @@ class UniqueJobTest extends QueueTestCase
 
         try {
             $user->delete();
-            dispatch_sync($job);
+            dispatch($job);
             unserialize(serialize($job));
         } finally {
             $this->assertFalse($job::$handled);
@@ -214,6 +214,8 @@ class UniqueUntilStartTestJob extends UniqueTestJob implements ShouldBeUniqueUnt
 class UniqueTestSerializesModelsJob extends UniqueTestJob
 {
     use SerializesModels;
+
+    public $deleteWhenMissingModels = true;
 
     public function __construct(public User $user)
     {
