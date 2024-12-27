@@ -425,6 +425,46 @@ trait QueriesRelationships
     }
 
     /**
+     * Add a basic count / exists condition to a relationship query.
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>|string  $relation
+     * @param  \Closure|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function whereDoesntHaveRelation($relation, $column, $operator = null, $value = null)
+    {
+        return $this->whereDoesntHave($relation, function ($query) use ($column, $operator, $value) {
+            if ($column instanceof Closure) {
+                $column($query);
+            } else {
+                $query->where($column, $operator, $value);
+            }
+        });
+    }
+
+    /**
+     * Add an "or where" clause to a relationship query.
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>|string  $relation
+     * @param  \Closure|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function orWhereDoesntHaveRelation($relation, $column, $operator = null, $value = null)
+    {
+        return $this->orWhereDoesntHave($relation, function ($query) use ($column, $operator, $value) {
+            if ($column instanceof Closure) {
+                $column($query);
+            } else {
+                $query->where($column, $operator, $value);
+            }
+        });
+    }
+
+    /**
      * Add a polymorphic relationship condition to the query with a where clause.
      *
      * @param  \Illuminate\Database\Eloquent\Relations\MorphTo<*, *>|string  $relation
@@ -454,6 +494,40 @@ trait QueriesRelationships
     public function orWhereMorphRelation($relation, $types, $column, $operator = null, $value = null)
     {
         return $this->orWhereHasMorph($relation, $types, function ($query) use ($column, $operator, $value) {
+            $query->where($column, $operator, $value);
+        });
+    }
+
+    /**
+     * Add a polymorphic relationship condition to the query with a doesn't have clause.
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\MorphTo<*, *>|string  $relation
+     * @param  string|array  $types
+     * @param  \Closure|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function whereMorphDoesntHaveRelation($relation, $types, $column, $operator = null, $value = null)
+    {
+        return $this->whereDoesntHaveMorph($relation, $types, function ($query) use ($column, $operator, $value) {
+            $query->where($column, $operator, $value);
+        });
+    }
+
+    /**
+     * Add a polymorphic relationship condition to the query with an "or doesn't have" clause.
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\MorphTo<*, *>|string  $relation
+     * @param  string|array  $types
+     * @param  \Closure|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function orWhereMorphDoesntHaveRelation($relation, $types, $column, $operator = null, $value = null)
+    {
+        return $this->orWhereDoesntHaveMorph($relation, $types, function ($query) use ($column, $operator, $value) {
             $query->where($column, $operator, $value);
         });
     }
