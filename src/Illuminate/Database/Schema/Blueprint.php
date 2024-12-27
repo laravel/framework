@@ -684,7 +684,7 @@ class Blueprint
      * This method allows you to create a functional index using MySQL expressions
      * like `LOWER`, `UPPER`, or other supported functions directly on columns.
      *
-     * @param  string|array  $columns  The column(s) to include in the index.
+     * @param  string|string[]  $columns  The column(s) to include in the index.
      * @param  string $function The SQL function to apply to the column(s).
      * @param string $name The name of index if you want to add a unique index
      * @return \Illuminate\Database\Schema\IndexDefinition
