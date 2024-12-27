@@ -1506,7 +1506,7 @@ class SupportArrTest extends TestCase
     public function testFlip()
     {
         $array = ['one', 'two', 'one'];
-        $this->assertEquals(['one' => 2 , 'two' => 1], Arr::flip($array));
+        $this->assertEquals(['one' => 2, 'two' => 1], Arr::flip($array));
     }
 
 }
