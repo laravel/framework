@@ -4,7 +4,6 @@ namespace Illuminate\Support;
 
 use Illuminate\Support\Traits\Macroable;
 use NumberFormatter;
-use Random\RandomException;
 use RuntimeException;
 
 class Number
@@ -371,7 +370,7 @@ class Number
     /**
      * Generate a random number of the given length.
      *
-     * @param int $length
+     * @param  int  $length
      * @return int
      */
     public static function random(int $length = 6): int
