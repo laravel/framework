@@ -706,7 +706,7 @@ class Blueprint
         ]);
 
         // Add the index for the generated column
-        return $this->index($generatedColumn, $name ?? $this->createIndexName('index', [$generatedColumn]));
+        return $this->index([ new Expression($expression) ], $generatedColumn);
     }
 
     /**
