@@ -18,12 +18,12 @@
 
 {{-- Action Button --}}
 @isset($actionText)
-<?php
+@php
     $color = match ($level) {
         'success', 'error' => $level,
         default => 'primary',
     };
-?>
+@endphp
 <x-mail::button :url="$actionUrl" :color="$color">
 {{ $actionText }}
 </x-mail::button>
