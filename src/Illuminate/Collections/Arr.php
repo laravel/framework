@@ -955,4 +955,15 @@ class Arr
 
         return is_array($value) ? $value : [$value];
     }
+
+    /**
+     * To swap the keys with their corresponding values in an array.
+     *
+     * @param array $array
+     * @return array
+     */
+    public static function flip($array)
+    {
+        return array_flip($array);
+    }
 }
