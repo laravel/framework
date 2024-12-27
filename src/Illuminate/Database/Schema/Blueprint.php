@@ -686,7 +686,7 @@ class Blueprint
      *
      * @param  string|array  $columns  The column(s) to include in the index.
      * @param  string $function The SQL function to apply to the column(s).
-     * @param string $name The nam of index if you want to add a unique index
+     * @param string $name The name of index if you want to add a unique index
      * @return \Illuminate\Database\Schema\IndexDefinition
      */
     public function functionalIndex($columns, $function, $name = null)
