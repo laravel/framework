@@ -106,8 +106,7 @@ class DatabaseUuidFailedJobProvider implements CountableFailedJobProvider, Faile
     public function find($id)
     {
         if ($record = $this->getTable()->where('uuid', $id)->first()) {
-            // incase of nosql database specially mongodb
-            if (isset($record['uuid'])) {
+            if (gettype($record) === 'array') {
                 $record['id'] = $record['uuid'];
                 unset($record['uuid']);
                 return (object) $record;
