@@ -679,6 +679,37 @@ class Blueprint
     }
 
     /**
+     * Specify a functional index for the table.
+     *
+     * This method allows you to create a functional index using MySQL expressions
+     * like LOWER, UPPER, or other supported functions directly on columns.
+     *
+     * @param  string|array  $columns  The column(s) to include in the index.
+     * @param  string $function The SQL function to apply to the column(s).
+     * @param string $name The nam of index if you want to add a unique index
+     * @return \Illuminate\Database\Schema\IndexDefinition
+     */
+    public function functionalIndex($columns, $function, $name = null)
+    {
+        $columns = is_array($columns) ? $columns : [$columns];
+
+        // Create a unique generated column name
+        $generatedColumn = implode('_', $columns) . "_{$function}";
+
+        // Define the expression for the generated column
+        $expression = strtoupper($function) . '(' . implode(', ', $columns) . ')';
+
+        // Add the generated column with the correct VARCHAR length
+        $this->addColumn('string', $generatedColumn, [
+            'length' => 255,  // Specify length for VARCHAR
+            'virtualAs' => $expression,
+        ]);
+
+        // Add the index for the generated column
+        return $this->index($generatedColumn, $name ?? $this->createIndexName('index', [$generatedColumn]));
+    }
+
+    /**
      * Specify a fulltext index for the table.
      *
      * @param  string|array  $columns
