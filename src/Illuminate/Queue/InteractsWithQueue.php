@@ -148,7 +148,7 @@ trait InteractsWithQueue
     /**
      * Assert that the job was manually failed with a specific exception.
      *
-     * @param \Throwable|string $exception
+     * @param  \Throwable|string  $exception
      * @return $this
      */
     public function assertFailedWith($exception)
