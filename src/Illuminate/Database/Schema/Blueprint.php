@@ -691,7 +691,7 @@ class Blueprint
      */
     public function functionalIndex($columns, $function, $name = null)
     {
-        $columns = is_array($columns) ? $columns : [$columns];
+        $columns = (array)$columns;
 
         // Create a unique generated column name
         $generatedColumn = implode('_', $columns) . "_{$function}";
