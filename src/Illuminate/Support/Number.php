@@ -4,6 +4,7 @@ namespace Illuminate\Support;
 
 use Illuminate\Support\Traits\Macroable;
 use NumberFormatter;
+use Random\RandomException;
 use RuntimeException;
 
 class Number
@@ -365,6 +366,30 @@ class Number
     public static function defaultCurrency()
     {
         return static::$currency;
+    }
+
+    /**
+     * Generate a random number of the given length.
+     *
+     * @param int $length
+     * @return int
+     */
+    public static function random(int $length = 6): int
+    {
+        $maxLength = strlen((string) PHP_INT_MAX);
+
+        if ($length < 1 || $length > $maxLength) {
+            return 0;
+        }
+
+        $min = 10 ** ($length - 1);
+        $max = (10 ** $length) - 1;
+
+        if ($length == $maxLength) {
+            $max = PHP_INT_MAX;
+        }
+
+        return random_int($min, $max);
     }
 
     /**

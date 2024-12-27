@@ -322,4 +322,13 @@ class SupportNumberTest extends TestCase
         $this->assertSame(12.3456789, Number::trim(12.3456789));
         $this->assertSame(12.3456789, Number::trim(12.34567890000));
     }
+
+    public function testRandom()
+    {
+        $this->assertIsInt(Number::random());
+        $this->assertSame(0, Number::random(-1));
+        $this->assertSame(0, Number::random(0));
+        $this->assertSame(0, Number::random(strlen((string) PHP_INT_MAX) + 1));
+        $this->assertSame(8, strlen((string) Number::random(8)));
+    }
 }
