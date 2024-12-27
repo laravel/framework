@@ -494,10 +494,8 @@ class MySqlGrammar extends Grammar
     {
         $columns = collect($command->columns)->map(function ($column) {
             // Check if the column contains a functional expression
-            if (preg_match('/\(.+\)/', $column)) {
-                return $column; // Return as-is if it's a functional expression
-            }
-            return $this->wrap($column); // Wrap normal columns
+            // and return as-is, otherwise wrap
+            return preg_match('/\(.+\)/', $column) ? $column : $this->wrap($column);
         })->implode(', ');
 
         return sprintf(
