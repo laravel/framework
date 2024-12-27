@@ -492,7 +492,7 @@ class MySqlGrammar extends Grammar
      */
     protected function compileKey(Blueprint $blueprint, Fluent $command, $type)
     {
-        $columns = collect($command->columns)->map(function ($column) {
+        $columns = collect($command->columns)->map(function (string $column) {
             return self::isFunctionalExpression($column) ? $column : $this->wrap($column);
         })->implode(', ');
 
