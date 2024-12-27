@@ -109,9 +109,10 @@ class DatabaseUuidFailedJobProvider implements CountableFailedJobProvider, Faile
             if (is_array($record)) {
                 $record['id'] = $record['uuid'];
                 unset($record['uuid']);
+
                 return (object) $record;
             }
-            
+
             $record->id = $record->uuid;
             unset($record->uuid);
         }
