@@ -149,7 +149,6 @@ trait InteractsWithQueue
      * Assert that the job was manually failed with a specific exception.
      *
      * @param \Throwable|string $exception
-     *
      * @return $this
      */
     public function assertFailedWith($exception)
@@ -160,8 +159,9 @@ trait InteractsWithQueue
             PHPUnit::assertInstanceOf(
                 $exception,
                 $this->job->failedWith,
-                'Job was expected to be manually failed with '. $exception . ', but was not.'
+                'Job was expected to be manually failed with ['.$exception.'], but was not.'
             );
+
             return $this;
         }
 
@@ -173,19 +173,19 @@ trait InteractsWithQueue
             PHPUnit::assertInstanceOf(
                 get_class($exception),
                 $this->job->failedWith,
-                'Job was expected to be manually failed with '. get_class($exception) . ', but was not.'
+                'Job was expected to be manually failed with ['.get_class($exception).'], but was not.'
             );
 
             PHPUnit::assertEquals(
                 $exception->getCode(),
                 $this->job->failedWith->getCode(),
-                'Exception code does not match. Code should be ' . $exception->getCode() . ' but is ' . $this->job->failedWith->getCode() . '.'
+                'Expected exception code ['.$exception->getCode().'] but job failed with exception code ['.$this->job->failedWith->getCode().'].'
             );
+
             PHPUnit::assertEquals(
                 $exception->getMessage(),
                 $this->job->failedWith->getMessage(),
-                'Exception message does not match. Message should be ' . $exception->getMessage() . ' but is ' . $this->job->failedWith->getMessage() . '.'
-                );
+                'Expected exceptoin message ['.$exception->getMessage().'] but job failed with exception message ['.$this->job->failedWith->getMessage().'].');
         }
 
         return $this;
