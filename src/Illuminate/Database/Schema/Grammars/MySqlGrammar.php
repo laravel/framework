@@ -507,7 +507,10 @@ class MySqlGrammar extends Grammar
             $columns
         );
     }
-
+protected static function isFunctionalExpression(string $column): bool
+{
+    return preg_match('/\(.+\)/', $column);
+}
     /**
      * Compile a drop table command.
      *
