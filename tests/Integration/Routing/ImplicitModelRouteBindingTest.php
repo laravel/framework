@@ -310,6 +310,23 @@ PHP);
         $response = $this->getJson("/post/{$post->id}/tag-slug/{$tag->slug}");
         $response->assertJsonFragment(['id' => $tag->id]);
     }
+
+    public function test_invalid_key_returns_unprocessable()
+    {
+        Route::middleware(['web'])->get(
+            '/comments/{comment}',
+            function(ImplicitBindingCommentByUuid $comment) {
+                return response()->json(['ok' => true]);
+            }
+        );
+
+        $response = $this->getJson('comments/not-a-uuid');
+
+        $response->assertUnprocessable();
+        $response->assertJson([
+            'message' => 'No query results for model [Illuminate\Tests\Integration\Routing\ImplicitBindingCommentByUuid] not-a-uuid'
+        ]);
+    }
 }
 
 class ImplicitBindingUser extends Model
@@ -357,14 +374,18 @@ class ImplicitBindingTag extends Model
     }
 }
 
-class ImplicitBindingComment extends Model
+
+class ImplicitBindingCommentByUuid extends Model
 {
     use HasUuids;
 
     public $table = 'comments';
 
     protected $fillable = ['slug', 'user_id'];
+}
 
+class ImplicitBindingComment extends ImplicitBindingCommentByUuid
+{
     public function getRouteKeyName()
     {
         return 'slug';
