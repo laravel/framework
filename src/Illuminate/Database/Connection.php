@@ -92,7 +92,7 @@ class Connection implements ConnectionInterface
     /**
      * The schema grammar implementation.
      *
-     * @var \Illuminate\Database\Schema\Grammars\Grammar
+     * @var \Illuminate\Database\Schema\Grammars\Grammar|null
      */
     protected $schemaGrammar;
 
@@ -1395,7 +1395,7 @@ class Connection implements ConnectionInterface
     /**
      * Get the schema grammar used by the connection.
      *
-     * @return \Illuminate\Database\Schema\Grammars\Grammar
+     * @return \Illuminate\Database\Schema\Grammars\Grammar|null
      */
     public function getSchemaGrammar()
     {
