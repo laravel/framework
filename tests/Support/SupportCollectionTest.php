@@ -1735,8 +1735,26 @@ class SupportCollectionTest extends TestCase
     #[DataProvider('collectionClassProvider')]
     public function testCollapse($collection)
     {
+        // Normal case: a two-dimensional array with different elements
         $data = new $collection([[$object1 = new stdClass], [$object2 = new stdClass]]);
         $this->assertEquals([$object1, $object2], $data->collapse()->all());
+
+        // Case including numeric and string elements
+        $data = new $collection([[1], [2], [3], ['foo', 'bar'], new $collection(['baz', 'boom'])]);
+        $this->assertEquals([1, 2, 3, 'foo', 'bar', 'baz', 'boom'], $data->collapse()->all());
+
+        // Case with empty two-dimensional arrays
+        $data = new $collection([[], [], []]);
+        $this->assertEquals([], $data->collapse()->all());
+
+        // Case with both empty arrays and arrays with elements
+        $data = new $collection([[], [1, 2], [], ['foo', 'bar']]);
+        $this->assertEquals([1, 2, 'foo', 'bar'], $data->collapse()->all());
+
+        // Case including collections and arrays
+        $collection = new $collection(['baz', 'boom']);
+        $data = new $collection([[1], [2], [3], ['foo', 'bar'], $collection]);
+        $this->assertEquals([1, 2, 3, 'foo', 'bar', 'baz', 'boom'], $data->collapse()->all());
     }
 
     #[DataProvider('collectionClassProvider')]
