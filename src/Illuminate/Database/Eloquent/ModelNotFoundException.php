@@ -25,13 +25,6 @@ class ModelNotFoundException extends RecordsNotFoundException
     protected $ids;
 
     /**
-     * The HTTP status code.
-     *
-     * @var int
-     */
-    protected int $status = 404;
-
-    /**
      * Set the affected Eloquent model and instance ids.
      *
      * @param  class-string<TModel>  $model
@@ -55,19 +48,6 @@ class ModelNotFoundException extends RecordsNotFoundException
     }
 
     /**
-     * Set the HTTP status code.
-     *
-     * @param  int  $status
-     * @return $this
-     */
-    public function setStatus(int $status)
-    {
-        $this->status = $status;
-
-        return $this;
-    }
-
-    /**
      * Get the affected Eloquent model.
      *
      * @return class-string<TModel>
@@ -85,25 +65,5 @@ class ModelNotFoundException extends RecordsNotFoundException
     public function getIds()
     {
         return $this->ids;
-    }
-
-    /**
-     * Get the HTTP status code.
-     *
-     * @return int
-     */
-    public function getStatus(): int
-    {
-        return $this->status;
-    }
-
-    /**
-     * Should the response render as a 404?
-     *
-     * @return bool
-     */
-    public function isNotFound(): bool
-    {
-        return $this->status === 404;
     }
 }
