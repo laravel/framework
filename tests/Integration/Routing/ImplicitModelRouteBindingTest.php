@@ -403,8 +403,14 @@ class ImplicitBindingCommentByUuid extends Model
     }
 }
 
-class ImplicitBindingComment extends ImplicitBindingCommentByUuid
+class ImplicitBindingComment extends Model
 {
+    use HasUuids;
+
+    public $table = 'comments';
+
+    protected $fillable = ['slug', 'user_id'];
+
     public function getRouteKeyName()
     {
         return 'slug';

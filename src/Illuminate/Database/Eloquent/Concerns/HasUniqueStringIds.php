@@ -3,7 +3,6 @@
 namespace Illuminate\Database\Eloquent\Concerns;
 
 use Illuminate\Database\Eloquent\InvalidIdFormatException;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 trait HasUniqueStringIds
 {
