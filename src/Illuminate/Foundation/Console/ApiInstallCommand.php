@@ -24,6 +24,7 @@ class ApiInstallCommand extends Command
                     {--composer=global : Absolute path to the Composer binary which should be used to install packages}
                     {--force : Overwrite any existing API routes file}
                     {--passport : Install Laravel Passport instead of Laravel Sanctum}
+                    {--without-sanctum : Do not install Laravel Sanctum}
                     {--without-migration-prompt : Do not prompt to run pending migrations}';
 
     /**
@@ -42,6 +43,8 @@ class ApiInstallCommand extends Command
     {
         if ($this->option('passport')) {
             $this->installPassport();
+        } elseif ($this->option('without-sanctum')) {
+            $this->components->info('Skipping installation of Laravel Sanctum.');
         } else {
             $this->installSanctum();
         }
@@ -62,6 +65,14 @@ class ApiInstallCommand extends Command
                 );
             }
 
+            if ($this->option('without-sanctum')) {
+                (new Filesystem)->replaceInFile(
+                    'auth:sanctum',
+                    'auth',
+                    $apiRoutesPath,
+                );
+            }
+
             $this->uncommentApiRoutesFile();
         }
 
@@ -74,6 +85,8 @@ class ApiInstallCommand extends Command
             ]));
 
             $this->components->info('API scaffolding installed. Please add the [Laravel\Passport\HasApiTokens] trait to your User model.');
+        } elseif ($this->option('without-sanctum')) {
+            $this->components->info('API scaffolding installed');
         } else {
             if (! $this->option('without-migration-prompt')) {
                 if ($this->confirm('One new database migration has been published. Would you like to run all pending database migrations?', true)) {
