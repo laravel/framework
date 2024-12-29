@@ -147,6 +147,7 @@ class Handler implements ExceptionHandlerContract
         BackedEnumCaseNotFoundException::class,
         HttpException::class,
         HttpResponseException::class,
+        InvalidIdFormatException::class,
         ModelNotFoundException::class,
         MultipleRecordsFoundException::class,
         RecordNotFoundException::class,
