@@ -313,18 +313,27 @@ PHP);
 
     public function test_invalid_key_returns_unprocessable()
     {
-        Route::middleware(['web'])->get(
-            '/comments/{comment}',
-            function(ImplicitBindingCommentByUuid $comment) {
-                return response()->json(['ok' => true]);
-            }
-        );
+        $routeResolution = static fn(ImplicitBindingCommentByUuid $comment) => response()->json(['ok' => true]);
+
+        Route::middleware(['web'])->group(function() use ($routeResolution) {
+            Route::get('/comments/{comment}', $routeResolution);
+            Route::get('/comments-by-uuid/{comment:uuid}', $routeResolution);
+        });
 
         $response = $this->getJson('comments/not-a-uuid');
 
         $response->assertUnprocessable();
         $response->assertJson([
-            'message' => 'No query results for model [Illuminate\Tests\Integration\Routing\ImplicitBindingCommentByUuid] not-a-uuid'
+            'message' => 'Invalid key for model [Illuminate\\Tests\\Integration\\Routing\\ImplicitBindingCommentByUuid] not-a-uuid.'
+        ]);
+
+        // When explicitly setting a route key field
+        $response = $this->getJson('comments-by-uuid/1234!');
+
+        $response->assertUnprocessable();
+        // Then the key is specified
+        $response->assertJson([
+            'message' => 'Invalid key [uuid] for model [Illuminate\\Tests\\Integration\\Routing\\ImplicitBindingCommentByUuid] 1234!.'
         ]);
     }
 }
@@ -382,6 +391,16 @@ class ImplicitBindingCommentByUuid extends Model
     public $table = 'comments';
 
     protected $fillable = ['slug', 'user_id'];
+
+    public function getRouteKeyName()
+    {
+        return 'uuid';
+    }
+
+    public function uniqueIds()
+    {
+        return ['uuid'];
+    }
 }
 
 class ImplicitBindingComment extends ImplicitBindingCommentByUuid

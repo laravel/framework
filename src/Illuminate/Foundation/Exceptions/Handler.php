@@ -16,6 +16,7 @@ use Illuminate\Contracts\Debug\ExceptionHandler as ExceptionHandlerContract;
 use Illuminate\Contracts\Debug\ShouldntReport;
 use Illuminate\Contracts\Foundation\ExceptionRenderer;
 use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Database\Eloquent\InvalidIdFormatException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\MultipleRecordsFoundException;
 use Illuminate\Database\RecordNotFoundException;
@@ -633,7 +634,8 @@ class Handler implements ExceptionHandlerContract
     {
         return match (true) {
             $e instanceof BackedEnumCaseNotFoundException => new NotFoundHttpException($e->getMessage(), $e),
-            $e instanceof ModelNotFoundException => $e->isNotFound() ? new NotFoundHttpException($e->getMessage(), $e) : new HttpException($e->getStatus(), $e->getMessage(), $e),
+            $e instanceof ModelNotFoundException => new NotFoundHttpException($e->getMessage(), $e),
+            $e instanceof InvalidIdFormatException => new HttpException(422, $e->getMessage(), $e),
             $e instanceof AuthorizationException && $e->hasStatus() => new HttpException(
                 $e->status(), $e->response()?->message() ?: (Response::$statusTexts[$e->status()] ?? 'Whoops, looks like something went wrong.'), $e
             ),

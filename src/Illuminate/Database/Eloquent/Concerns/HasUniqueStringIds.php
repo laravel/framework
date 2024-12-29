@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Eloquent\Concerns;
 
+use Illuminate\Database\Eloquent\InvalidIdFormatException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 trait HasUniqueStringIds
@@ -99,10 +100,10 @@ trait HasUniqueStringIds
      * @param  string|null  $field
      * @return never
      *
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @throws \Illuminate\Database\Eloquent\InvalidIdFormatException
      */
     protected function handleInvalidUniqueId($value, $field)
     {
-        throw (new ModelNotFoundException)->setModel(get_class($this), $value)->setStatus(422);
+        throw (new InvalidIdFormatException)->setModel(get_class($this), $value, $field);
     }
 }
