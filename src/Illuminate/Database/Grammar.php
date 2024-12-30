@@ -73,7 +73,7 @@ abstract class Grammar
     /**
      * Wrap a value in keyword identifiers.
      *
-     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $value
+     * @param  \Illuminate\Contracts\Database\Query\Expression|\StringBackedEnum|string  $value
      * @return string
      */
     public function wrap($value)
