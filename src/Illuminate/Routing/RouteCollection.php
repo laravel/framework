@@ -79,7 +79,7 @@ class RouteCollection extends AbstractRouteCollection
     {
         // If the route has a name, we will add it to the name look-up table, so that we
         // will quickly be able to find the route associated with a name and not have
-        // to iterate through every route every time we need to perform a look-up.
+        // to iterate through every route every time we need to find a named route.
         if ($name = $route->getName()) {
             $this->nameList[$name] = $route;
         }
