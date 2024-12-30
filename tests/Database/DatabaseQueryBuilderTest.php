@@ -1979,12 +1979,15 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->select('*')->from('users')->orderBy('age', 'asec');
     }
 
-    public function testOrderByStringBackedEnums()
+    public function testOrderByBackedEnums()
     {
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->orderBy(StringStatus::done)->orderBy('age', 'desc');
 
-        $this->assertSame('select * from "users" order by "done" asc, "age" desc', $builder->toSql());
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->orderBy(IntegerStatus::done)->orderBy('age', 'desc');
+
+        $this->assertSame('select * from "users" order by "2" asc, "age" desc', $builder->toSql());
     }
 
     public function testHavings()
