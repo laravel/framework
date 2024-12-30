@@ -6,6 +6,7 @@ use Illuminate\Contracts\Database\Query\Expression;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\Macroable;
 use RuntimeException;
+use StringBackedEnum;
 
 abstract class Grammar
 {
@@ -79,6 +80,10 @@ abstract class Grammar
     {
         if ($this->isExpression($value)) {
             return $this->getValue($value);
+        }
+
+        if($value instanceof StringBackedEnum) {
+            $value = $value->value;
         }
 
         // If the value being wrapped has a column alias we will need to separate out
