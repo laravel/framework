@@ -13,6 +13,9 @@ class SyncDriver implements Driver
 {
     /**
      * Run the given tasks concurrently and return an array containing the results.
+     *
+     * @param  Closure|array  $tasks
+     * @return array
      */
     public function run(Closure|array $tasks): array
     {
@@ -23,6 +26,9 @@ class SyncDriver implements Driver
 
     /**
      * Start the given tasks in the background after the current task has finished.
+     *
+     * @param  Closure|array  $tasks
+     * @return \Illuminate\Support\Defer\DeferredCallback
      */
     public function defer(Closure|array $tasks): DeferredCallback
     {

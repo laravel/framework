@@ -28,6 +28,8 @@ class ConcurrencyManager extends MultipleInstanceManager
      *
      * @param  array  $config
      * @return \Illuminate\Concurrency\ProcessDriver
+     *
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     public function createProcessDriver(array $config)
     {
