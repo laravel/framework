@@ -45,8 +45,9 @@ if (! function_exists('data_get')) {
      */
     function data_get($target, $key, $default = null)
     {
+        // no such thing as a null index so return default
         if (is_null($key)) {
-            return $target;
+            return $default;
         }
 
         $key = is_array($key) ? $key : explode('.', $key);
