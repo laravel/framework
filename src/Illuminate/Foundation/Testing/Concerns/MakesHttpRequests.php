@@ -356,7 +356,7 @@ trait MakesHttpRequests
     /**
      * Visit the given URI with a GET request.
      *
-     * @param  string|\Illuminate\Support\Uri  $uri
+     * @param  \Illuminate\Support\Uri|string  $uri
      * @param  array  $headers
      * @return \Illuminate\Testing\TestResponse
      */
@@ -371,7 +371,7 @@ trait MakesHttpRequests
     /**
      * Visit the given URI with a GET request, expecting a JSON response.
      *
-     * @param  string|\Illuminate\Support\Uri  $uri
+     * @param  \Illuminate\Support\Uri|string  $uri
      * @param  array  $headers
      * @param  int  $options
      * @return \Illuminate\Testing\TestResponse
@@ -384,7 +384,7 @@ trait MakesHttpRequests
     /**
      * Visit the given URI with a POST request.
      *
-     * @param  string|\Illuminate\Support\Uri  $uri
+     * @param  \Illuminate\Support\Uri|string  $uri
      * @param  array  $data
      * @param  array  $headers
      * @return \Illuminate\Testing\TestResponse
@@ -400,7 +400,7 @@ trait MakesHttpRequests
     /**
      * Visit the given URI with a POST request, expecting a JSON response.
      *
-     * @param  string|\Illuminate\Support\Uri  $uri
+     * @param  \Illuminate\Support\Uri|string  $uri
      * @param  array  $data
      * @param  array  $headers
      * @param  int  $options
@@ -414,7 +414,7 @@ trait MakesHttpRequests
     /**
      * Visit the given URI with a PUT request.
      *
-     * @param  string|\Illuminate\Support\Uri  $uri
+     * @param  \Illuminate\Support\Uri|string  $uri
      * @param  array  $data
      * @param  array  $headers
      * @return \Illuminate\Testing\TestResponse
@@ -430,7 +430,7 @@ trait MakesHttpRequests
     /**
      * Visit the given URI with a PUT request, expecting a JSON response.
      *
-     * @param  string|\Illuminate\Support\Uri  $uri
+     * @param  \Illuminate\Support\Uri|string  $uri
      * @param  array  $data
      * @param  array  $headers
      * @param  int  $options
@@ -444,7 +444,7 @@ trait MakesHttpRequests
     /**
      * Visit the given URI with a PATCH request.
      *
-     * @param  string|\Illuminate\Support\Uri  $uri
+     * @param  \Illuminate\Support\Uri|string  $uri
      * @param  array  $data
      * @param  array  $headers
      * @return \Illuminate\Testing\TestResponse
@@ -460,7 +460,7 @@ trait MakesHttpRequests
     /**
      * Visit the given URI with a PATCH request, expecting a JSON response.
      *
-     * @param  string|\Illuminate\Support\Uri  $uri
+     * @param  \Illuminate\Support\Uri|string  $uri
      * @param  array  $data
      * @param  array  $headers
      * @param  int  $options
@@ -474,7 +474,7 @@ trait MakesHttpRequests
     /**
      * Visit the given URI with a DELETE request.
      *
-     * @param  string|\Illuminate\Support\Uri  $uri
+     * @param  \Illuminate\Support\Uri|string  $uri
      * @param  array  $data
      * @param  array  $headers
      * @return \Illuminate\Testing\TestResponse
@@ -490,7 +490,7 @@ trait MakesHttpRequests
     /**
      * Visit the given URI with a DELETE request, expecting a JSON response.
      *
-     * @param  string|\Illuminate\Support\Uri  $uri
+     * @param  \Illuminate\Support\Uri|string  $uri
      * @param  array  $data
      * @param  array  $headers
      * @param  int  $options
@@ -504,7 +504,7 @@ trait MakesHttpRequests
     /**
      * Visit the given URI with an OPTIONS request.
      *
-     * @param  string|\Illuminate\Support\Uri  $uri
+     * @param  \Illuminate\Support\Uri|string  $uri
      * @param  array  $data
      * @param  array  $headers
      * @return \Illuminate\Testing\TestResponse
@@ -521,7 +521,7 @@ trait MakesHttpRequests
     /**
      * Visit the given URI with an OPTIONS request, expecting a JSON response.
      *
-     * @param  string|\Illuminate\Support\Uri  $uri
+     * @param  \Illuminate\Support\Uri|string  $uri
      * @param  array  $data
      * @param  array  $headers
      * @param  int  $options
@@ -535,7 +535,7 @@ trait MakesHttpRequests
     /**
      * Visit the given URI with a HEAD request.
      *
-     * @param  string|\Illuminate\Support\Uri  $uri
+     * @param  \Illuminate\Support\Uri|string  $uri
      * @param  array  $headers
      * @return \Illuminate\Testing\TestResponse
      */
@@ -552,7 +552,7 @@ trait MakesHttpRequests
      * Call the given URI with a JSON request.
      *
      * @param  string  $method
-     * @param  string|\Illuminate\Support\Uri  $uri
+     * @param  \Illuminate\Support\Uri|string  $uri
      * @param  array  $data
      * @param  array  $headers
      * @param  int  $options
@@ -585,7 +585,7 @@ trait MakesHttpRequests
      * Call the given URI and return the Response.
      *
      * @param  string  $method
-     * @param  string|\Illuminate\Support\Uri  $uri
+     * @param  \Illuminate\Support\Uri|string  $uri
      * @param  array  $parameters
      * @param  array  $cookies
      * @param  array  $files
@@ -620,7 +620,7 @@ trait MakesHttpRequests
     /**
      * Turn the given URI into a fully qualified URL.
      *
-     * @param  string|\Illuminate\Support\Uri  $uri
+     * @param  \Illuminate\Support\Uri|string  $uri
      * @return string
      */
     protected function prepareUrlForRequest($uri)
