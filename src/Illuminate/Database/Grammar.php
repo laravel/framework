@@ -82,7 +82,7 @@ abstract class Grammar
             return $this->getValue($value);
         }
 
-        if($value instanceof BackedEnum) {
+        if ($value instanceof BackedEnum) {
             $value = $value->value;
         }
 
