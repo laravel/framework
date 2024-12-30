@@ -7,7 +7,6 @@ use Illuminate\Contracts\Database\Query\Expression;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\Macroable;
 use RuntimeException;
-use StringBackedEnum;
 
 abstract class Grammar
 {
