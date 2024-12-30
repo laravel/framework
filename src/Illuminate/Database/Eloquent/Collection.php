@@ -349,7 +349,7 @@ class Collection extends BaseCollection implements QueueableCollection
         $callback = fn ($path) => $this->loadMissingRelationWithTypes($path);
 
         $this->each(fn ($model) => $model->hasRelationAutoloadCallback()
-            || $model->usingRelationAutoloadCallback($this, $callback));
+            || $model->usingRelationAutoloadCallback($callback));
 
         return $this;
     }

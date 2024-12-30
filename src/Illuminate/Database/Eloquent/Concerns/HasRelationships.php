@@ -47,13 +47,6 @@ trait HasRelationships
     protected $relationAutoloadCallback = null;
 
     /**
-     * The relationship autoload context.
-     *
-     * @var ?Collection
-     */
-    protected $relationAutoloadContext = null;
-
-    /**
      * The many to many relationship methods.
      *
      * @var string[]
@@ -109,30 +102,19 @@ trait HasRelationships
     /**
      * Set relation autoload callback for model and its relations.
      *
-     * @param  mixed  $context
      * @param  Closure  $callback
+     * @param  mixed  $context
      * @return $this
      */
-    public function usingRelationAutoloadCallback($context, Closure $callback)
+    public function usingRelationAutoloadCallback(Closure $callback, $context = null)
     {
-        $this->relationAutoloadContext = $context;
         $this->relationAutoloadCallback = $callback;
 
         foreach ($this->relations as $key => $value) {
-            $this->applyRelationAutoloadCallbackToValue($key, $value);
+            $this->applyRelationAutoloadCallbackToValue($key, $value, $context);
         }
 
         return $this;
-    }
-
-    /**
-     * Get relation autoload context.
-     *
-     * @return mixed
-     */
-    public function getRelationAutoloadContext()
-    {
-        return $this->relationAutoloadContext;
     }
 
     /**
@@ -149,7 +131,6 @@ trait HasRelationships
         $collection = new Collection([$this]);
 
         $this->usingRelationAutoloadCallback(
-            $collection,
             fn ($path) => $collection->loadMissingRelationWithTypes($path)
         );
 
@@ -203,9 +184,10 @@ trait HasRelationships
      *
      * @param  string  $key
      * @param  mixed  $values
+     * @param  mixed  $context
      * @return void
      */
-    protected function applyRelationAutoloadCallbackToValue($key, $values)
+    protected function applyRelationAutoloadCallbackToValue($key, $values, $context = null)
     {
         if (! $this->hasRelationAutoloadCallback() || ! $values) {
             return;
@@ -222,12 +204,10 @@ trait HasRelationships
         $callback = fn (array $keys) => $this->triggerRelationAutoloadCallback($key, $keys);
 
         foreach ($values as $item) {
-            $context = $item->getRelationAutoloadContext();
-
             // check if relation autoload contexts are different
             // to avoid circular relation autoload
-            if (is_null($context) || $context !== $this->relationAutoloadContext) {
-                $item->usingRelationAutoloadCallback($this->relationAutoloadContext, $callback);
+            if (is_null($context) || $context !== $item) {
+                $item->usingRelationAutoloadCallback($callback, $context);
             }
         }
     }
@@ -1128,7 +1108,7 @@ trait HasRelationships
     {
         $this->relations[$relation] = $value;
 
-        $this->applyRelationAutoloadCallbackToValue($relation, $value);
+        $this->applyRelationAutoloadCallbackToValue($relation, $value, $this);
 
         return $this;
     }
