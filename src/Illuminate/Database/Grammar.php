@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database;
 
+use BackedEnum;
 use Illuminate\Contracts\Database\Query\Expression;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\Macroable;
@@ -82,7 +83,7 @@ abstract class Grammar
             return $this->getValue($value);
         }
 
-        if($value instanceof StringBackedEnum) {
+        if($value instanceof BackedEnum) {
             $value = $value->value;
         }
 
