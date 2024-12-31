@@ -135,6 +135,12 @@ class SupportNumberTest extends TestCase
         $this->assertSame('0.00%', Number::percentage(0, precision: 2));
         $this->assertSame('0.12%', Number::percentage(0.12345, precision: 2));
         $this->assertSame('0.1235%', Number::percentage(0.12345, precision: 4));
+
+        $this->assertSame('12.34%', Number::percentage(0.12345, precision: 2, scaled: true));
+        $this->assertSame('12.3450%', Number::percentage(0.12345, precision: 4, scaled: true));
+        $this->assertSame('0.1235%', Number::percentage(0.12345, precision: 4, scaled: false));
+        $this->assertSame('12%', Number::percentage(0.12345, scaled: true));
+        $this->assertSame('0%', Number::percentage(0.12345, scaled: false));
     }
 
     #[RequiresPhpExtension('intl')]
