@@ -13,14 +13,12 @@ class Parser
      *
      * @param  string  $expression
      * @return array
-     *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
-    public static function parse(string $expression)
+    public static function parse(string $expression): array
     {
         $name = static::name($expression);
-
-        if (preg_match_all('/\{\s*(.*?)\s*\}/', $expression, $matches) && count($matches[1])) {
+        if (preg_match_all('/\{([^}]*)}/s', $expression, $matches) && count($matches[1])) {
             return array_merge([$name], static::parameters($matches[1]));
         }
 
@@ -32,10 +30,9 @@ class Parser
      *
      * @param  string  $expression
      * @return string
-     *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
-    protected static function name(string $expression)
+    protected static function name(string $expression): string
     {
         if (! preg_match('/[^\s]+/', $expression, $matches)) {
             throw new InvalidArgumentException('Unable to determine command name from signature.');
@@ -50,7 +47,7 @@ class Parser
      * @param  array  $tokens
      * @return array
      */
-    protected static function parameters(array $tokens)
+    protected static function parameters(array $tokens): array
     {
         $arguments = [];
 
@@ -73,7 +70,7 @@ class Parser
      * @param  string  $token
      * @return \Symfony\Component\Console\Input\InputArgument
      */
-    protected static function parseArgument(string $token)
+    protected static function parseArgument(string $token): InputArgument
     {
         [$token, $description] = static::extractDescription($token);
 
@@ -99,7 +96,7 @@ class Parser
      * @param  string  $token
      * @return \Symfony\Component\Console\Input\InputOption
      */
-    protected static function parseOption(string $token)
+    protected static function parseOption(string $token): InputOption
     {
         [$token, $description] = static::extractDescription($token);
 
@@ -132,7 +129,7 @@ class Parser
      * @param  string  $token
      * @return array
      */
-    protected static function extractDescription(string $token)
+    protected static function extractDescription(string $token): array
     {
         $parts = preg_split('/\s+:\s+/', trim($token), 2);
 
