@@ -115,9 +115,10 @@ class Number
      * @param  int  $precision
      * @param  int|null  $maxPrecision
      * @param  string|null  $locale
+     * @param  bool  $scaled
      * @return string|false
      */
-    public static function percentage(int|float $number, int $precision = 0, ?int $maxPrecision = null, ?string $locale = null)
+    public static function percentage(int|float $number, int $precision = 0, ?int $maxPrecision = null, ?string $locale = null, bool $scaled = false)
     {
         static::ensureIntlExtensionIsInstalled();
 
@@ -127,6 +128,10 @@ class Number
             $formatter->setAttribute(NumberFormatter::MAX_FRACTION_DIGITS, $maxPrecision);
         } else {
             $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, $precision);
+        }
+
+        if ($scaled) {
+            return $formatter->format($number);
         }
 
         return $formatter->format($number / 100);
