@@ -335,6 +335,7 @@ class ValidatedInput implements ValidatedData
      */
     public function input($key = null, $default = null)
     {
+        if (is_null($key)) return $this->all() ?? $default;
         return data_get(
             $this->all(), $key, $default
         );

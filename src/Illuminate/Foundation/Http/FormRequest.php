@@ -242,6 +242,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
      */
     public function validated($key = null, $default = null)
     {
+        if (is_null($key)) return $this->validator->validated() ?? $default;
         return data_get($this->validator->validated(), $key, $default);
     }
 

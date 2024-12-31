@@ -109,6 +109,7 @@ trait InteractsWithInput
      */
     public function input($key = null, $default = null)
     {
+        if (is_null($key)) return $this->getInputSource()->all() ?? $default;
         return data_get(
             $this->getInputSource()->all() + $this->query->all(), $key, $default
         );
@@ -244,6 +245,7 @@ trait InteractsWithInput
      */
     public function file($key = null, $default = null)
     {
+        if (is_null($key)) return $this->allFiles() ?? $default;
         return data_get($this->allFiles(), $key, $default);
     }
 

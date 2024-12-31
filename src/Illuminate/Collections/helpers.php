@@ -56,7 +56,7 @@ if (! function_exists('data_get')) {
             unset($key[$i]);
 
             if (is_null($segment)) {
-                return $target;
+                $segment = '*';
             }
 
             if ($segment === '*') {

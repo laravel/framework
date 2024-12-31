@@ -1094,7 +1094,7 @@ trait EnumeratesValues
         }
 
         return function ($item) use ($key, $operator, $value) {
-            $retrieved = enum_value(data_get($item, $key));
+            $retrieved = enum_value(is_null($key) ? $item : data_get($item, $key));
             $value = enum_value($value);
 
             $strings = array_filter([$retrieved, $value], function ($value) {
@@ -1149,7 +1149,7 @@ trait EnumeratesValues
             return $value;
         }
 
-        return fn ($item) => data_get($item, $value);
+        return fn ($item) => is_null($value) ? $item : data_get($item, $value);
     }
 
     /**

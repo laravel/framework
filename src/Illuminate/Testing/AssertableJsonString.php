@@ -57,6 +57,7 @@ class AssertableJsonString implements ArrayAccess, Countable
      */
     public function json($key = null)
     {
+        if (is_null($key)) return $this->decoded;
         return data_get($this->decoded, $key);
     }
 

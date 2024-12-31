@@ -50,6 +50,7 @@ class Fluent implements Arrayable, ArrayAccess, Jsonable, JsonSerializable
      */
     public function get($key, $default = null)
     {
+        if (is_null($key)) return $this->attributes ?? $default;
         return data_get($this->attributes, $key, $default);
     }
 
