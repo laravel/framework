@@ -7,7 +7,6 @@ use PHPUnit\Framework\TestCase;
 
 class SupportBenchmarkTest extends TestCase
 {
-
     public function testMeasure(): void
     {
         $this->assertIsNumeric(Benchmark::measure(fn () => 1 + 1));
@@ -18,7 +17,7 @@ class SupportBenchmarkTest extends TestCase
         ], 3));
     }
 
-    public function testValue()
+    public function testValue(): void
     {
         $this->assertIsArray(Benchmark::value(fn () => 1 + 1));
     }
