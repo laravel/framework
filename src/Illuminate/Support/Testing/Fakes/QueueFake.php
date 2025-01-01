@@ -5,6 +5,7 @@ namespace Illuminate\Support\Testing\Fakes;
 use BadMethodCallException;
 use Closure;
 use Illuminate\Contracts\Queue\Queue;
+use Illuminate\Events\CallQueuedListener;
 use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Support\Collection;
@@ -42,6 +43,13 @@ class QueueFake extends QueueManager implements Fake, Queue
      * @var array
      */
     protected $jobs = [];
+
+    /**
+     * All of the listeners that have been pushed.
+     *
+     * @var array
+     */
+    protected $listeners = [];
 
     /**
      * Indicates if items should be serialized and restored when pushed to the queue.
@@ -104,6 +112,29 @@ class QueueFake extends QueueManager implements Fake, Queue
     }
 
     /**
+     * Assert if a listener was pushed based on a truth-test callback.
+     *
+     * @param  string|\Closure  $listener
+     * @param  callable|int|null  $callback
+     * @return void
+     */
+    public function assertListenerPushed($listener, $callback = null)
+    {
+        if ($listener instanceof Closure) {
+            [$listener, $callback] = [$this->firstClosureParameterType($listener), $listener];
+        }
+
+        if (is_numeric($callback)) {
+            return $this->assertListenerPushedTimes($listener, $callback);
+        }
+
+        PHPUnit::assertTrue(
+            $this->listenersPushed($listener, $callback)->count() > 0,
+            "The expected [{$listener}] listener was not pushed."
+        );
+    }
+
+    /**
      * Assert if a job was pushed a number of times.
      *
      * @param  string  $job
@@ -117,6 +148,23 @@ class QueueFake extends QueueManager implements Fake, Queue
         PHPUnit::assertSame(
             $times, $count,
             "The expected [{$job}] job was pushed {$count} times instead of {$times} times."
+        );
+    }
+
+    /**
+     * Assert if a listener was pushed a number of times.
+     *
+     * @param  string  $listener
+     * @param  int  $times
+     * @return void
+     */
+    protected function assertListenerPushedTimes($listener, $times = 1)
+    {
+        $count = $this->listenersPushed($listener)->count();
+
+        PHPUnit::assertSame(
+            $times, $count,
+            "The expected [{$listener}] listener was pushed {$count} times instead of {$times} times."
         );
     }
 
@@ -135,6 +183,29 @@ class QueueFake extends QueueManager implements Fake, Queue
         }
 
         $this->assertPushed($job, function ($job, $pushedQueue) use ($callback, $queue) {
+            if ($pushedQueue !== $queue) {
+                return false;
+            }
+
+            return $callback ? $callback(...func_get_args()) : true;
+        });
+    }
+
+    /**
+     * Assert if a listener was pushed based on a truth-test callback.
+     *
+     * @param  string  $queue
+     * @param  string|\Closure  $listener
+     * @param  callable|null  $callback
+     * @return void
+     */
+    public function assertListenerPushedOn($queue, $listener, $callback = null)
+    {
+        if ($listener instanceof Closure) {
+            [$listener, $callback] = [$this->firstClosureParameterType($listener), $listener];
+        }
+
+        $this->assertListenerPushed($listener, function ($listener, $pushedQueue) use ($callback, $queue) {
             if ($pushedQueue !== $queue) {
                 return false;
             }
@@ -279,6 +350,25 @@ class QueueFake extends QueueManager implements Fake, Queue
     }
 
     /**
+     * Determine if a listener was pushed based on a truth-test callback.
+     *
+     * @param  string|\Closure  $listener
+     * @param  callable|null  $callback
+     * @return void
+     */
+    public function assertListenerNotPushed($listener, $callback = null)
+    {
+        if ($listener instanceof Closure) {
+            [$listener, $callback] = [$this->firstClosureParameterType($listener), $listener];
+        }
+
+        PHPUnit::assertCount(
+            0, $this->listenersPushed($listener, $callback),
+            "The unexpected [{$listener}] listener was pushed."
+        );
+    }
+
+    /**
      * Assert the total count of jobs that were pushed.
      *
      * @param  int  $expectedCount
@@ -327,6 +417,34 @@ class QueueFake extends QueueManager implements Fake, Queue
     }
 
     /**
+     * Get all of the listeners matching a truth-test callback.
+     *
+     * @param  string  $listener
+     * @param  callable|null  $callback
+     * @return \Illuminate\Support\Collection
+     */
+    public function listenersPushed($listener, $callback = null)
+    {
+        if (! $this->hasListenerPushed($listener)) {
+            return new Collection;
+        }
+
+        $callback = $callback ?: fn () => true;
+
+        return (new Collection($this->listeners[$listener]))
+            ->filter(
+                function ($data) use ($callback) {
+                    return $callback(
+                        new $data['job']->class,
+                        $data['queue'],
+                        $data['data'],
+                    );
+                }
+            )
+            ->pluck('job');
+    }
+
+    /**
      * Determine if there are any stored jobs for a given class.
      *
      * @param  string  $job
@@ -335,6 +453,17 @@ class QueueFake extends QueueManager implements Fake, Queue
     public function hasPushed($job)
     {
         return isset($this->jobs[$job]) && ! empty($this->jobs[$job]);
+    }
+
+    /**
+     * Determine if there are any stored listeners for a given class.
+     *
+     * @param  string  $listener
+     * @return bool
+     */
+    public function hasListenerPushed($listener)
+    {
+        return isset($this->listeners[$listener]) && ! empty($this->listeners[$listener]);
     }
 
     /**
@@ -376,6 +505,14 @@ class QueueFake extends QueueManager implements Fake, Queue
                 $job = CallQueuedClosure::create($job);
             }
 
+            if ($job instanceof CallQueuedListener) {
+                $this->listeners[$job->displayName()][] = [
+                    'job' => $this->serializeAndRestore ? $this->serializeAndRestoreJob($job) : $job,
+                    'queue' => $queue,
+                    'data' => $job->data,
+                ];
+            }
+
             $this->jobs[is_object($job) ? get_class($job) : $job][] = [
                 'job' => $this->serializeAndRestore ? $this->serializeAndRestoreJob($job) : $job,
                 'queue' => $queue,
@@ -391,7 +528,7 @@ class QueueFake extends QueueManager implements Fake, Queue
     /**
      * Determine if a job should be faked or actually dispatched.
      *
-     * @param  object  $job
+     * @param  string|object  $job
      * @return bool
      */
     public function shouldFakeJob($job)
@@ -405,14 +542,16 @@ class QueueFake extends QueueManager implements Fake, Queue
         }
 
         return $this->jobsToFake->contains(
-            fn ($jobToFake) => $job instanceof ((string) $jobToFake) || $job === (string) $jobToFake
+            fn ($jobToFake) => $job instanceof ((string) $jobToFake)
+                || ($job instanceof CallQueuedListener && $job->displayName() === (string) $jobToFake)
+                || $job === (string) $jobToFake
         );
     }
 
     /**
      * Determine if a job should be pushed to the queue instead of faked.
      *
-     * @param  object  $job
+     * @param  string|object  $job
      * @return bool
      */
     protected function shouldDispatchJob($job)
@@ -423,6 +562,8 @@ class QueueFake extends QueueManager implements Fake, Queue
 
         return $this->jobsToBeQueued->contains(
             fn ($jobToQueue) => $job instanceof ((string) $jobToQueue)
+                || ($job instanceof CallQueuedListener && $job->displayName() === (string) $jobToQueue)
+                || $job === (string) $jobToQueue
         );
     }
 

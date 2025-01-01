@@ -50,6 +50,7 @@ class QueuedEventsTest extends TestCase
         $d->dispatch('some.event', ['foo', 'bar']);
 
         $fakeQueue->assertPushedOn('my_queue', CallQueuedListener::class);
+        $fakeQueue->assertListenerPushedOn('my_queue', TestDispatcherConnectionQueuedHandler::class);
     }
 
     public function testQueueIsSetByGetQueue()
@@ -66,6 +67,7 @@ class QueuedEventsTest extends TestCase
         $d->dispatch('some.event', ['foo', 'bar']);
 
         $fakeQueue->assertPushedOn('some_other_queue', CallQueuedListener::class);
+        $fakeQueue->assertListenerPushedOn('some_other_queue', TestDispatcherGetQueue::class);
     }
 
     public function testQueueIsSetByGetConnection()
@@ -116,6 +118,7 @@ class QueuedEventsTest extends TestCase
         $d->dispatch('some.event', [['useHighPriorityQueue' => true], 'bar']);
 
         $fakeQueue->assertPushedOn('p0', CallQueuedListener::class);
+        $fakeQueue->assertListenerPushedOn('p0', TestDispatcherGetQueueDynamically::class);
     }
 
     public function testQueueIsSetByGetConnectionDynamically()

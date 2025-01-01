@@ -24,10 +24,12 @@ class QueuedListenersTest extends TestCase
         Queue::assertPushed(CallQueuedListener::class, function ($job) {
             return $job->class == QueuedListenersTestListenerShouldQueue::class;
         });
+        Queue::assertListenerPushed(QueuedListenersTestListenerShouldQueue::class);
 
         Queue::assertNotPushed(CallQueuedListener::class, function ($job) {
             return $job->class == QueuedListenersTestListenerShouldNotQueue::class;
         });
+        Queue::assertListenerNotPushed(QueuedListenersTestListenerShouldNotQueue::class);
     }
 }
 

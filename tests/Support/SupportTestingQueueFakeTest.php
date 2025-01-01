@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Support;
 
 use BadMethodCallException;
 use Illuminate\Bus\Queueable;
+use Illuminate\Events\CallQueuedListener;
 use Illuminate\Foundation\Application;
 use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Queue\QueueManager;
@@ -24,11 +25,17 @@ class SupportTestingQueueFakeTest extends TestCase
      */
     private $job;
 
+    /**
+     * @var \Illuminate\Events\CallQueuedListener
+     */
+    private $callQueuedListenerJob;
+
     protected function setUp(): void
     {
         parent::setUp();
         $this->fake = new QueueFake(new Application);
         $this->job = new JobStub;
+        $this->callQueuedListenerJob = new CallQueuedListener(ListenerJobStub::class, 'handle', []);
     }
 
     protected function tearDown(): void
@@ -52,12 +59,40 @@ class SupportTestingQueueFakeTest extends TestCase
         $this->fake->assertPushed(JobStub::class);
     }
 
+    public function testAssertListenerPushed()
+    {
+        try {
+            $this->fake->assertListenerPushed(ListenerJobStub::class);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('The expected [Illuminate\Tests\Support\ListenerJobStub] listener was not pushed.', $e->getMessage());
+        }
+
+        $this->fake->push($this->callQueuedListenerJob);
+
+        $this->fake->assertListenerPushed(ListenerJobStub::class);
+    }
+
     public function testItCanAssertAgainstDataWithPush()
     {
         $data = null;
         $this->fake->push(JobStub::class, ['foo' => 'bar'], 'redis');
 
         $this->fake->assertPushed(JobStub::class, function ($job, $queue, $jobData) use (&$data) {
+            $data = $jobData;
+
+            return true;
+        });
+
+        $this->assertSame(['foo' => 'bar'], $data);
+    }
+
+    public function testItCanAssertAgainstDataWithPushForListener()
+    {
+        $data = null;
+        $this->fake->push(new CallQueuedListener(ListenerJobStub::class, 'handle', ['foo' => 'bar']), '', 'redis');
+
+        $this->fake->assertListenerPushed(ListenerJobStub::class, function ($job, $queue, $jobData) use (&$data) {
             $data = $jobData;
 
             return true;
@@ -84,11 +119,41 @@ class SupportTestingQueueFakeTest extends TestCase
         $fake->assertPushed(JobToFakeStub::class);
     }
 
+    public function testAssertListenerPushedWithIgnore()
+    {
+        $listener = new CallQueuedListener(ListenerJobStub::class, 'handle', []);
+
+        $manager = m::mock(QueueManager::class);
+        $manager->shouldReceive('push')->once()->withArgs(function ($passedListener) use ($listener) {
+            return $passedListener === $listener;
+        });
+
+        $fake = new QueueFake(new Application, ListenerJobToFakeStub::class, $manager);
+
+        $fake->push($listener);
+        $fake->push(new CallQueuedListener(ListenerJobToFakeStub::class, 'handle', []));
+
+        $fake->assertListenerNotPushed(ListenerJobStub::class);
+        $fake->assertListenerPushed(ListenerJobToFakeStub::class);
+    }
+
     public function testAssertPushedWithClosure()
     {
         $this->fake->push($this->job);
 
         $this->fake->assertPushed(function (JobStub $job) {
+            return true;
+        });
+    }
+
+    public function testAssertListenerPushedWithClosure()
+    {
+        $this->fake->push($this->callQueuedListenerJob);
+
+        $this->fake->assertPushed(function (CallQueuedListener $job) {
+            return true;
+        });
+        $this->fake->assertListenerPushed(function (ListenerJobStub $job) {
             return true;
         });
     }
@@ -102,6 +167,15 @@ class SupportTestingQueueFakeTest extends TestCase
         $this->assertEquals(1, $this->fake->size());
     }
 
+    public function testQueueSizeForCallQueuedListener()
+    {
+        $this->assertEquals(0, $this->fake->size());
+
+        $this->fake->push($this->callQueuedListenerJob);
+
+        $this->assertEquals(1, $this->fake->size());
+    }
+
     public function testAssertNotPushed()
     {
         $this->fake->push($this->job);
@@ -111,6 +185,18 @@ class SupportTestingQueueFakeTest extends TestCase
             $this->fail();
         } catch (ExpectationFailedException $e) {
             $this->assertStringContainsString('The unexpected [Illuminate\Tests\Support\JobStub] job was pushed.', $e->getMessage());
+        }
+    }
+
+    public function testAssertListenerNotPushed()
+    {
+        $this->fake->push($this->callQueuedListenerJob);
+
+        try {
+            $this->fake->assertListenerNotPushed(ListenerJobStub::class);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('The unexpected [Illuminate\Tests\Support\ListenerJobStub] listener was pushed.', $e->getMessage());
         }
     }
 
@@ -130,6 +216,22 @@ class SupportTestingQueueFakeTest extends TestCase
         }
     }
 
+    public function testAssertListenerNotPushedWithClosure()
+    {
+        $this->fake->assertListenerNotPushed(ListenerJobStub::class);
+
+        $this->fake->push($this->callQueuedListenerJob);
+
+        try {
+            $this->fake->assertListenerNotPushed(function (ListenerJobStub $job) {
+                return true;
+            });
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('The unexpected [Illuminate\Tests\Support\ListenerJobStub] listener was pushed.', $e->getMessage());
+        }
+    }
+
     public function testAssertPushedOn()
     {
         $this->fake->push($this->job, '', 'foo');
@@ -142,6 +244,20 @@ class SupportTestingQueueFakeTest extends TestCase
         }
 
         $this->fake->assertPushedOn('foo', JobStub::class);
+    }
+
+    public function testAssertListenerPushedOn()
+    {
+        $this->fake->push($this->callQueuedListenerJob, '', 'foo');
+
+        try {
+            $this->fake->assertListenerPushedOn('bar', ListenerJobStub::class);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('The expected [Illuminate\Tests\Support\ListenerJobStub] listener was not pushed.', $e->getMessage());
+        }
+
+        $this->fake->assertListenerPushedOn('foo', ListenerJobStub::class);
     }
 
     public function testAssertPushedOnWithClosure()
@@ -162,6 +278,24 @@ class SupportTestingQueueFakeTest extends TestCase
         });
     }
 
+    public function testAssertListenerPushedOnWithClosure()
+    {
+        $this->fake->push($this->callQueuedListenerJob, '', 'foo');
+
+        try {
+            $this->fake->assertListenerPushedOn('bar', function (ListenerJobStub $listener) {
+                return true;
+            });
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('The expected [Illuminate\Tests\Support\ListenerJobStub] listener was not pushed.', $e->getMessage());
+        }
+
+        $this->fake->assertListenerPushedOn('foo', function (ListenerJobStub $job) {
+            return true;
+        });
+    }
+
     public function testAssertPushedTimes()
     {
         $this->fake->push($this->job);
@@ -177,6 +311,21 @@ class SupportTestingQueueFakeTest extends TestCase
         $this->fake->assertPushed(JobStub::class, 2);
     }
 
+    public function testAssertListenerPushedTimes()
+    {
+        $this->fake->push($this->callQueuedListenerJob);
+        $this->fake->push($this->callQueuedListenerJob);
+
+        try {
+            $this->fake->assertListenerPushed(ListenerJobStub::class, 1);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('The expected [Illuminate\Tests\Support\ListenerJobStub] listener was pushed 2 times instead of 1 times.', $e->getMessage());
+        }
+
+        $this->fake->assertListenerPushed(ListenerJobStub::class, 2);
+    }
+
     public function testAssertCount()
     {
         $this->fake->push(function () {
@@ -184,7 +333,7 @@ class SupportTestingQueueFakeTest extends TestCase
         });
 
         $this->fake->push($this->job);
-        $this->fake->push($this->job);
+        $this->fake->push($this->callQueuedListenerJob);
 
         $this->fake->assertCount(3);
     }
@@ -194,6 +343,8 @@ class SupportTestingQueueFakeTest extends TestCase
         $this->fake->assertNothingPushed();
 
         $this->fake->push($this->job);
+
+        $this->fake->push($this->callQueuedListenerJob);
 
         $this->fake->push(function () {
             //
@@ -372,6 +523,7 @@ class SupportTestingQueueFakeTest extends TestCase
     public function testAssertClosureNotPushed()
     {
         $this->fake->push($this->job);
+        $this->fake->push($this->callQueuedListenerJob);
 
         $this->fake->assertClosureNotPushed();
     }
@@ -392,6 +544,24 @@ class SupportTestingQueueFakeTest extends TestCase
 
         $fake->assertNotPushed(JobStub::class);
         $fake->assertPushed(JobToFakeStub::class);
+    }
+
+    public function testItDoesntFakeListenersPassedViaExcept()
+    {
+        $job = new CallQueuedListener(ListenerJobStub::class, 'handle', []);
+
+        $manager = m::mock(QueueManager::class);
+        $manager->shouldReceive('push')->once()->withArgs(function ($passedJob) use ($job) {
+            return $passedJob === $job;
+        });
+
+        $fake = (new QueueFake(new Application, [], $manager))->except(ListenerJobStub::class);
+
+        $fake->push($job);
+        $fake->push(new CallQueuedListener(ListenerJobToFakeStub::class, 'handle', []));
+
+        $fake->assertListenerNotPushed(ListenerJobStub::class);
+        $fake->assertListenerPushed(ListenerJobToFakeStub::class);
     }
 
     public function testItCanSerializeAndRestoreJobs()
@@ -555,4 +725,25 @@ class JobWithSerialization
     {
         $this->value = $data['value'].'-unserialized';
     }
+}
+
+class ListenerJobStub
+{
+    public function handle(EventStub $event)
+    {
+        //
+    }
+}
+
+class ListenerJobToFakeStub
+{
+    public function handle(EventStub $event)
+    {
+        //
+    }
+}
+
+class EvenStub
+{
+    //
 }
