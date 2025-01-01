@@ -181,6 +181,15 @@ class PendingSingletonResourceRegistration
 
         $this->options['middleware'] = $middleware;
 
+        if (isset($this->options['middleware_for'])) {
+            foreach ($this->options['middleware_for'] as $method => $value) {
+                $this->options['middleware_for'][$method] = Router::uniqueMiddleware(array_merge(
+                    Arr::wrap($value),
+                    $middleware
+                ));
+            }
+        }
+
         return $this;
     }
 
@@ -195,6 +204,13 @@ class PendingSingletonResourceRegistration
     {
         $methods = Arr::wrap($methods);
         $middleware = Arr::wrap($middleware);
+
+        if (isset($this->options['middleware'])) {
+            $middleware = Router::uniqueMiddleware(array_merge(
+                $this->options['middleware'],
+                $middleware
+            ));
+        }
 
         foreach ($methods as $method) {
             $this->options['middleware_for'][$method] = $middleware;
