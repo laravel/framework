@@ -270,6 +270,17 @@ trait ManagesFrequencies
     }
 
     /**
+     * Schedule the event to run every even hour.
+     *
+     * @param  array|string|int  $offset
+     * @return $this
+     */
+    public function everyEvenHour($offset = 0)
+    {
+        return $this->hourBasedSchedule($offset, '0-22/2');
+    }
+
+    /**
      * Schedule the event to run every two hours.
      *
      * @param  array|string|int  $offset
