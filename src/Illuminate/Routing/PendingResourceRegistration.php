@@ -211,6 +211,25 @@ class PendingResourceRegistration
     }
 
     /**
+     * Specify middleware that should be removed from the specified resource routes.
+     *
+     * @param  array|string  $methods
+     * @param  array|string  $middleware
+     * @return $this
+     */
+    public function withoutMiddlewareFor($methods, $middleware)
+    {
+        $methods = Arr::wrap($methods);
+        $middleware = Arr::wrap($middleware);
+
+        foreach ($methods as $method) {
+            $this->options['excluded_middleware_for'][$method] = $middleware;
+        }
+
+        return $this;
+    }
+
+    /**
      * Add "where" constraints to the resource routes.
      *
      * @param  mixed  $wheres

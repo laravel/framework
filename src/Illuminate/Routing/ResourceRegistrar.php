@@ -110,6 +110,13 @@ class ResourceRegistrar
                 $optionsForMethod['middleware'] = $optionsForMethod['middleware_for'][$m];
             }
 
+            if (isset($optionsForMethod['excluded_middleware_for'][$m])) {
+                $optionsForMethod['excluded_middleware'] = Router::uniqueMiddleware(array_merge(
+                    $optionsForMethod['excluded_middleware'] ?? [],
+                    $optionsForMethod['excluded_middleware_for'][$m]
+                ));
+            }
+
             $route = $this->{'addResource'.ucfirst($m)}(
                 $name, $base, $controller, $optionsForMethod
             );
@@ -169,6 +176,13 @@ class ResourceRegistrar
 
             if (isset($optionsForMethod['middleware_for'][$m])) {
                 $optionsForMethod['middleware'] = $optionsForMethod['middleware_for'][$m];
+            }
+
+            if (isset($optionsForMethod['excluded_middleware_for'][$m])) {
+                $optionsForMethod['excluded_middleware'] = Router::uniqueMiddleware(array_merge(
+                    $optionsForMethod['excluded_middleware'] ?? [],
+                    $optionsForMethod['excluded_middleware_for'][$m]
+                ));
             }
 
             $route = $this->{'addSingleton'.ucfirst($m)}(
