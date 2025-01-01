@@ -185,7 +185,7 @@ class PendingSingletonResourceRegistration
     }
 
     /**
-     * Specify middleware that should be added to the specific resource routes.
+     * Specify middleware that should be added to the specified resource routes.
      *
      * @param  array|string  $methods
      * @param  array|string  $middleware
