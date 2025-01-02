@@ -14,7 +14,7 @@ class Parser
      * @param  string  $expression
      * @return array
      *
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      */
     public static function parse(string $expression)
     {
@@ -33,7 +33,7 @@ class Parser
      * @param  string  $expression
      * @return string
      *
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      */
     protected static function name(string $expression)
     {
