@@ -1,6 +1,33 @@
 # Release Notes for 11.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v11.36.1...11.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v11.37.0...11.x)
+
+## [v11.37.0](https://github.com/laravel/framework/compare/v11.36.1...v11.37.0) - 2025-01-02
+
+* [11.x] Update Collection::hasAny by [@JeftaAtSiip](https://github.com/JeftaAtSiip) in https://github.com/laravel/framework/pull/53963
+* [11.x] Update DetectsLostConnections trait by [@holgerk](https://github.com/holgerk) in https://github.com/laravel/framework/pull/53966
+* Fix: (Queue Worker) firing the JobPopped event when $popCallbacks returns null by [@rudenav](https://github.com/rudenav) in https://github.com/laravel/framework/pull/53962
+* [11.x] Add `Dumpable` trait to `Uri` by [@nuernbergerA](https://github.com/nuernbergerA) in https://github.com/laravel/framework/pull/53960
+* Fix: Handle mixed-type values in compileInsert by [@alipadron](https://github.com/alipadron) in https://github.com/laravel/framework/pull/53948
+* [11.x] Add `$ignoreCase` option to `Str::is` by [@stevebauman](https://github.com/stevebauman) in https://github.com/laravel/framework/pull/53981
+* [11.x] Updates component dependencies  by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/53975
+* [11.x] Update Uri `withoutQuery` method to accept string or array input by [@1weiho](https://github.com/1weiho) in https://github.com/laravel/framework/pull/53973
+* [11.x] Fix cached health endpoint not working when in maintenance mode by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/53974
+* Add PHPDoc type hints by [@shaedrich](https://github.com/shaedrich) in https://github.com/laravel/framework/pull/53984
+* [11.x] Allow passing bool to facade Http@preventStrayRequests() by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/53992
+* [11.x] Use Str::wrap() instead of nesting Str::start() inside Str::finish() by [@shaedrich](https://github.com/shaedrich) in https://github.com/laravel/framework/pull/53987
+* Fix day range in docblock by [@timacdonald](https://github.com/timacdonald) in https://github.com/laravel/framework/pull/53985
+* [11.x] Fixes `Illuminate\Http\Response` to output empty string if `$content` is set to `null` by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/53872
+* [11.x] Fix/Improve Resend transport response handling by [@markovic-nikola](https://github.com/markovic-nikola) in https://github.com/laravel/framework/pull/54004
+* [11.x] Update View::withErrors() docblock to reflect string parameter support by [@cheack](https://github.com/cheack) in https://github.com/laravel/framework/pull/54009
+* 11.x improve resend transport response handling - fix by [@markovic-nikola](https://github.com/markovic-nikola) in https://github.com/laravel/framework/pull/54006
+* [11.x] Added new Eloquent methods: `whereDoesntHaveRelation`, `whereMorphDoesntHaveRelation` and their variants with `OR` by [@andrey-helldar](https://github.com/andrey-helldar) in https://github.com/laravel/framework/pull/53996
+* [11.x] Re-refresh the database if the `RefreshDatabase` transaction was committed by [@SjorsO](https://github.com/SjorsO) in https://github.com/laravel/framework/pull/53997
+* [11.x] add assertFailedWith to InteractsWithQueue trait by [@teddy-francfort](https://github.com/teddy-francfort) in https://github.com/laravel/framework/pull/53980
+* Quick doc fix by [@mathiasgrimm](https://github.com/mathiasgrimm) in https://github.com/laravel/framework/pull/54040
+* [11.x] Allow using `Illuminate\Support\Uri` on testing HTTP Requests by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/54038
+* [11.x] Adding tests for Overlapping Routes by [@mathiasgrimm](https://github.com/mathiasgrimm) in https://github.com/laravel/framework/pull/54050
+* [11.x] adding tests for `null` & `*` key given in `data_get` by [@jwjenkin](https://github.com/jwjenkin) in https://github.com/laravel/framework/pull/54059
 
 ## [v11.36.1](https://github.com/laravel/framework/compare/v11.36.0...v11.36.1) - 2024-12-17
 
