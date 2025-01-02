@@ -16,7 +16,7 @@ class Parser
      *
      * @throws InvalidArgumentException
      */
-    public static function parse(string $expression): array
+    public static function parse(string $expression)
     {
         $name = static::name($expression);
 
@@ -35,7 +35,7 @@ class Parser
      *
      * @throws InvalidArgumentException
      */
-    protected static function name(string $expression): string
+    protected static function name(string $expression)
     {
         if (! preg_match('/[^\s]+/', $expression, $matches)) {
             throw new InvalidArgumentException('Unable to determine command name from signature.');
@@ -50,7 +50,7 @@ class Parser
      * @param  array  $tokens
      * @return array
      */
-    protected static function parameters(array $tokens): array
+    protected static function parameters(array $tokens)
     {
         $arguments = [];
 
@@ -73,7 +73,7 @@ class Parser
      * @param  string  $token
      * @return \Symfony\Component\Console\Input\InputArgument
      */
-    protected static function parseArgument(string $token): InputArgument
+    protected static function parseArgument(string $token)
     {
         [$token, $description] = static::extractDescription($token);
 
@@ -99,7 +99,7 @@ class Parser
      * @param  string  $token
      * @return \Symfony\Component\Console\Input\InputOption
      */
-    protected static function parseOption(string $token): InputOption
+    protected static function parseOption(string $token)
     {
         [$token, $description] = static::extractDescription($token);
 
@@ -132,7 +132,7 @@ class Parser
      * @param  string  $token
      * @return array
      */
-    protected static function extractDescription(string $token): array
+    protected static function extractDescription(string $token)
     {
         $parts = preg_split('/\s+:\s+/', trim($token), 2);
 
