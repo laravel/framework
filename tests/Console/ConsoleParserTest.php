@@ -5,6 +5,8 @@ namespace Illuminate\Tests\Console;
 use Illuminate\Console\Parser;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 
 class ConsoleParserTest extends TestCase
 {
@@ -160,5 +162,25 @@ class ConsoleParserTest extends TestCase
         $this->expectExceptionMessage('Unable to determine command name from signature.');
 
         Parser::parse('');
+    }
+
+    public function testItParsesCommandWithArgumentAndOptionWithNewLines()
+    {
+        $signature = 'command:name
+                    {argument= :
+                        The description of the argument.
+                        This can span multiple lines for clarity.}
+                    {--o|option= : The description of the option. Can be a value like "value1", "value2", etc.}';
+
+        $result = Parser::parse($signature);
+
+        $this->assertIsArray($result);
+        $this->assertEquals('command:name', $result[0]);
+
+        $this->assertCount(1, $result[1]);
+        $this->assertInstanceOf(InputArgument::class, $result[1][0]);
+
+        $this->assertCount(1, $result[2]);
+        $this->assertInstanceOf(InputOption::class, $result[2][0]);
     }
 }

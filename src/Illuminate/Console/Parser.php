@@ -19,6 +19,7 @@ class Parser
     public static function parse(string $expression): array
     {
         $name = static::name($expression);
+
         if (preg_match_all('/\{([^}]*)}/s', $expression, $matches) && count($matches[1])) {
             return array_merge([$name], static::parameters($matches[1]));
         }
