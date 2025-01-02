@@ -411,6 +411,15 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals('caret', data_get($array, 'symbols.{last}.description'));
     }
 
+    public function testDataGetStar()
+    {
+        $data = ['foo' => 'bar'];
+        $this->assertEquals([ 'bar' ], data_get($data, '*'));
+
+        $data = collect(['foo' => 'bar']);
+        $this->assertEquals([ 'bar' ], data_get($data, '*'));
+    }
+
     public function testDataGetNullKey()
     {
         $data = ['foo' => 'bar'];
