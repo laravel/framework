@@ -2,7 +2,9 @@
 
 namespace Illuminate\Validation;
 
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Validation\Rules\ArrayRule;
 use Illuminate\Validation\Rules\Can;
@@ -13,6 +15,7 @@ use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\File;
 use Illuminate\Validation\Rules\ImageFile;
 use Illuminate\Validation\Rules\In;
+use Illuminate\Validation\Rules\ModelExists;
 use Illuminate\Validation\Rules\NotIn;
 use Illuminate\Validation\Rules\ProhibitedIf;
 use Illuminate\Validation\Rules\RequiredIf;
@@ -104,6 +107,17 @@ class Rule
     public static function exists($table, $column = 'NULL')
     {
         return new Exists($table, $column);
+    }
+
+    /**
+     * Get an ModelExists constraint builder instance.
+     *
+     * @param  Builder<TModel>|TModel|class-string<TModel>  $model
+     * @return \Illuminate\Validation\Rules\ModelExists<Builder<TModel>>
+     */
+    public static function modelExists(Builder|Model|string $model, ?string $column = null): ModelExists
+    {
+        return ModelExists::make($model, $column);
     }
 
     /**
