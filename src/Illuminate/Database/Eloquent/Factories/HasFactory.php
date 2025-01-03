@@ -34,7 +34,7 @@ trait HasFactory
         $attributes = (new \ReflectionClass(static::class))
             ->getAttributes(UseFactory::class);
 
-        if (!empty($attributes)) {
+        if ($attributes !== []) {
             $useFactory = $attributes[0]->newInstance();
             $factory = new $useFactory->factoryClass;
             $factory->guessModelNamesUsing(fn() => static::class);
@@ -53,10 +53,6 @@ trait HasFactory
             return static::$factory::new();
         }
 
-        if($useFactory = static::getUseFactoryAttribute()) {
-            return $useFactory;
-        }
-
-        return null;
+        return static::getUseFactoryAttribute() ?? null;
     }
 }

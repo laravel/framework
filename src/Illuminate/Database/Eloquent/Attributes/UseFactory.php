@@ -10,7 +10,7 @@ class UseFactory
     /**
      * Create a new attribute instance.
      *
-     * @param  string  $factoryClass
+     * @param  class-string $factoryClass
      * @return void
      */
     public function __construct(public string $factoryClass) {}
