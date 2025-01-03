@@ -62,6 +62,13 @@ trait HasAttributes
     protected $original = [];
 
     /**
+     * The model attribute's previous state.
+     *
+     * @var array
+     */
+    protected $previous = [];
+
+    /**
      * The changed model attributes.
      *
      * @var array
@@ -1960,6 +1967,32 @@ trait HasAttributes
     }
 
     /**
+     * Get the model's previous attribute values.
+     *
+     * @param  string|null  $key
+     * @param  mixed  $default
+     * @return mixed|array
+     */
+    public function getPrevious($key = null, $default = null)
+    {
+        return (new static)->setRawAttributes(
+            $this->previous, $sync = true
+        )->getOriginalWithoutRewindingModel($key, $default);
+    }
+
+    /**
+     * Get the model's raw previous attribute values.
+     *
+     * @param  string|null  $key
+     * @param  mixed  $default
+     * @return mixed|array
+     */
+    public function getRawPrevious($key = null, $default = null)
+    {
+        return Arr::get($this->previous, $key, $default);
+    }
+
+    /**
      * Get a subset of the model's attributes.
      *
      * @param  array|mixed  $attributes
@@ -2014,6 +2047,18 @@ trait HasAttributes
         foreach ($attributes as $attribute) {
             $this->original[$attribute] = $modelAttributes[$attribute];
         }
+
+        return $this;
+    }
+
+    /**
+     * Sync the previous attributes with the original.
+     *
+     * @return $this
+     */
+    public function syncPrevious()
+    {
+        $this->previous = $this->original;
 
         return $this;
     }

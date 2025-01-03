@@ -33,6 +33,15 @@ class EloquentDeleteTest extends DatabaseTestCase
         });
     }
 
+    public function testBasicDelete()
+    {
+        $post = Post::create();
+
+        Post::where('id', $post->id)->delete();
+
+        $this->assertCount(0, Post::all());
+    }
+
     public function testDeleteWithLimit()
     {
         if ($this->driver === 'sqlsrv') {
