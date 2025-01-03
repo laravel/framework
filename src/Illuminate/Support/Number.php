@@ -71,7 +71,7 @@ class Number
 
         $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::SPELLOUT);
 
-        return $formatter->format($number);
+        return new Stringable($formatter->format($number));
     }
 
     /**
@@ -105,7 +105,7 @@ class Number
 
         $formatter->setTextAttribute(NumberFormatter::DEFAULT_RULESET, '%spellout-ordinal');
 
-        return $formatter->format($number);
+        return new Stringable($formatter->format($number));
     }
 
     /**

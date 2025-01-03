@@ -74,29 +74,29 @@ class SupportNumberTest extends TestCase
 
     public function testSpellout()
     {
-        $this->assertSame('ten', Number::spell(10));
-        $this->assertSame('one point two', Number::spell(1.2));
+        $this->assertSame('ten', (string) Number::spell(10));
+        $this->assertSame('one point two', (string) Number::spell(1.2));
     }
 
     #[RequiresPhpExtension('intl')]
     public function testSpelloutWithLocale()
     {
-        $this->assertSame('trois', Number::spell(3, 'fr'));
+        $this->assertSame('trois', (string) Number::spell(3, 'fr'));
     }
 
     #[RequiresPhpExtension('intl')]
     public function testSpelloutWithThreshold()
     {
-        $this->assertSame('9', Number::spell(9, after: 10));
-        $this->assertSame('10', Number::spell(10, after: 10));
-        $this->assertSame('eleven', Number::spell(11, after: 10));
+        $this->assertSame('9', (string) Number::spell(9, after: 10));
+        $this->assertSame('10', (string) Number::spell(10, after: 10));
+        $this->assertSame('eleven', (string) Number::spell(11, after: 10));
 
-        $this->assertSame('nine', Number::spell(9, until: 10));
-        $this->assertSame('10', Number::spell(10, until: 10));
-        $this->assertSame('11', Number::spell(11, until: 10));
+        $this->assertSame('nine', (string) Number::spell(9, until: 10));
+        $this->assertSame('10', (string) Number::spell(10, until: 10));
+        $this->assertSame('11', (string) Number::spell(11, until: 10));
 
-        $this->assertSame('ten thousand', Number::spell(10000, until: 50000));
-        $this->assertSame('100,000', Number::spell(100000, until: 50000));
+        $this->assertSame('ten thousand', (string) Number::spell(10000, until: 50000));
+        $this->assertSame('100,000', (string) Number::spell(100000, until: 50000));
     }
 
     public function testOrdinal()
@@ -109,9 +109,9 @@ class SupportNumberTest extends TestCase
     #[RequiresPhpExtension('intl')]
     public function testSpellOrdinal()
     {
-        $this->assertSame('first', Number::spellOrdinal(1));
-        $this->assertSame('second', Number::spellOrdinal(2));
-        $this->assertSame('third', Number::spellOrdinal(3));
+        $this->assertSame('first', (string) Number::spellOrdinal(1));
+        $this->assertSame('second', (string) Number::spellOrdinal(2));
+        $this->assertSame('third', (string) Number::spellOrdinal(3));
     }
 
     #[RequiresPhpExtension('intl')]
