@@ -24,15 +24,15 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
 {
     use Conditionable, Macroable;
 
-    public bool $rfcCompliantWithoutWarnings = false;
+    public bool $rfcCompliantStrict = false;
 
-    public bool $domainExists = false;
+    public bool $verifyMxRecord = false;
 
     public bool $preventEmailSpoofing = false;
 
-    public bool $basicFormat = false;
+    public bool $nativeFilter = false;
 
-    public bool $basicFormatUnicodeAllowed = false;
+    public bool $nativeFilterWithUnicodeAllowed = false;
 
     public bool $rfcCompliant = false;
 
@@ -114,8 +114,8 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
     public static function strictSecurity()
     {
         return (new self())
-            ->rfcCompliantWithoutWarnings()
-            ->domainExists()
+            ->rfcCompliant(true)
+            ->verifyMxRecord()
             ->preventEmailSpoofing();
     }
 
@@ -124,23 +124,20 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
      *
      * @return $this
      */
-    public function rfcCompliant()
+    public function rfcCompliant(bool $strict = false)
     {
-        $this->rfcCompliant = true;
+        if ($strict) {
+            $this->rfcCompliantStrict = true;
+        } else {
+            $this->rfcCompliant = true;
+        }
 
         return $this;
     }
 
-    /**
-     * Validate against NoRFCWarningsValidation.
-     *
-     * @return $this
-     */
-    public function rfcCompliantWithoutWarnings()
+    public function strict()
     {
-        $this->rfcCompliantWithoutWarnings = true;
-
-        return $this;
+        return $this->rfcCompliant(true);
     }
 
     /**
@@ -149,9 +146,9 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
      *
      * @return $this
      */
-    public function domainExists()
+    public function verifyMxRecord()
     {
-        $this->domainExists = true;
+        $this->verifyMxRecord = true;
 
         return $this;
     }
@@ -174,21 +171,13 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
      *
      * @return $this
      */
-    public function basicFormat()
+    public function nativeFilter(bool $unicodeAllowed = false)
     {
-        $this->basicFormat = true;
-
-        return $this;
-    }
-
-    /**
-     * Validate against FilterEmailValidation::unicode().
-     *
-     * @return $this
-     */
-    public function basicFormatUnicodeAllowed()
-    {
-        $this->basicFormatUnicodeAllowed = true;
+        if ($unicodeAllowed) {
+            $this->nativeFilterWithUnicodeAllowed = true;
+        } else {
+            $this->nativeFilter = true;
+        }
 
         return $this;
     }
@@ -260,11 +249,11 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
             $rules[] = new RFCValidation;
         }
 
-        if ($this->rfcCompliantWithoutWarnings) {
+        if ($this->rfcCompliantStrict) {
             $rules[] = new NoRFCWarningsValidation;
         }
 
-        if ($this->domainExists) {
+        if ($this->verifyMxRecord) {
             $rules[] = new DNSCheckValidation;
         }
 
@@ -272,11 +261,11 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
             $rules[] = new SpoofCheckValidation;
         }
 
-        if ($this->basicFormat) {
+        if ($this->nativeFilter) {
             $rules[] = new FilterEmailValidation;
         }
 
-        if ($this->basicFormatUnicodeAllowed) {
+        if ($this->nativeFilterWithUnicodeAllowed) {
             $rules[] = FilterEmailValidation::unicode();
         }
 
