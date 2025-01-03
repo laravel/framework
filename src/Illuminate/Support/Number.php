@@ -2,10 +2,10 @@
 
 namespace Illuminate\Support;
 
+use Illuminate\Support\Traits\Macroable;
 use NumberFormatter;
 use RuntimeException;
 use Illuminate\Support\Stringable;
-use Illuminate\Support\Traits\Macroable;
 
 class Number
 {
