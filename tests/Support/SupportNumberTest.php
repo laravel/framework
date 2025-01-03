@@ -74,14 +74,14 @@ class SupportNumberTest extends TestCase
 
     public function testSpellout()
     {
-        $this->assertSame('ten', Number::spell(10));
-        $this->assertSame('one point two', Number::spell(1.2));
+        $this->assertSame('ten', (string) Number::spell(10));
+        $this->assertSame('one point two', (string) Number::spell(1.2));
     }
 
     #[RequiresPhpExtension('intl')]
     public function testSpelloutWithLocale()
     {
-        $this->assertSame('trois', Number::spell(3, 'fr'));
+        $this->assertSame('trois', (string) Number::spell(3, 'fr'));
     }
 
     #[RequiresPhpExtension('intl')]
