@@ -109,9 +109,9 @@ class SupportNumberTest extends TestCase
     #[RequiresPhpExtension('intl')]
     public function testSpellOrdinal()
     {
-        $this->assertSame('first', Number::spellOrdinal(1));
-        $this->assertSame('second', Number::spellOrdinal(2));
-        $this->assertSame('third', Number::spellOrdinal(3));
+        $this->assertSame('first', (string) Number::spellOrdinal(1));
+        $this->assertSame('second', (string) Number::spellOrdinal(2));
+        $this->assertSame('third', (string) Number::spellOrdinal(3));
     }
 
     #[RequiresPhpExtension('intl')]

@@ -2,9 +2,10 @@
 
 namespace Illuminate\Support;
 
-use Illuminate\Support\Traits\Macroable;
 use NumberFormatter;
 use RuntimeException;
+use Illuminate\Support\Stringable;
+use Illuminate\Support\Traits\Macroable;
 
 class Number
 {
@@ -71,7 +72,7 @@ class Number
 
         $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::SPELLOUT);
 
-        return $formatter->format($number);
+        return new Stringable($formatter->format($number));
     }
 
     /**
@@ -105,7 +106,7 @@ class Number
 
         $formatter->setTextAttribute(NumberFormatter::DEFAULT_RULESET, '%spellout-ordinal');
 
-        return $formatter->format($number);
+        return new Stringable($formatter->format($number));
     }
 
     /**
