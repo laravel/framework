@@ -24,17 +24,17 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
 {
     use Conditionable, Macroable;
 
-    public bool $strict = false;
+    public bool $rfcCompliantWithoutWarnings = false;
 
-    public bool $dns = false;
+    public bool $domainExists = false;
 
-    public bool $spoof = false;
+    public bool $preventEmailSpoofing = false;
 
-    public bool $filter = false;
+    public bool $basicFormat = false;
 
-    public bool $filter_unicode = false;
+    public bool $basicFormatUnicodeAllowed = false;
 
-    public bool $rfc = false;
+    public bool $rfcCompliant = false;
 
     /**
      * An array of custom rules that will be merged into the validation rules.
@@ -113,7 +113,22 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
      */
     public static function strictSecurity()
     {
-        return (new self())->strict()->dns()->spoof();
+        return (new self())
+            ->rfcCompliantWithoutWarnings()
+            ->domainExists()
+            ->preventEmailSpoofing();
+    }
+
+    /**
+     * Validate against RFCValidation.
+     *
+     * @return $this
+     */
+    public function rfcCompliant()
+    {
+        $this->rfcCompliant = true;
+
+        return $this;
     }
 
     /**
@@ -121,9 +136,9 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
      *
      * @return $this
      */
-    public function strict()
+    public function rfcCompliantWithoutWarnings()
     {
-        $this->strict = true;
+        $this->rfcCompliantWithoutWarnings = true;
 
         return $this;
     }
@@ -134,9 +149,9 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
      *
      * @return $this
      */
-    public function dns()
+    public function domainExists()
     {
-        $this->dns = true;
+        $this->domainExists = true;
 
         return $this;
     }
@@ -147,9 +162,9 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
      *
      * @return $this
      */
-    public function spoof()
+    public function preventEmailSpoofing()
     {
-        $this->spoof = true;
+        $this->preventEmailSpoofing = true;
 
         return $this;
     }
@@ -159,9 +174,9 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
      *
      * @return $this
      */
-    public function filter()
+    public function basicFormat()
     {
-        $this->filter = true;
+        $this->basicFormat = true;
 
         return $this;
     }
@@ -171,21 +186,9 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
      *
      * @return $this
      */
-    public function filterUnicode()
+    public function basicFormatUnicodeAllowed()
     {
-        $this->filter_unicode = true;
-
-        return $this;
-    }
-
-    /**
-     * Validate against RFCValidation.
-     *
-     * @return $this
-     */
-    public function rfc()
-    {
-        $this->rfc = true;
+        $this->basicFormatUnicodeAllowed = true;
 
         return $this;
     }
@@ -253,27 +256,27 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
     {
         $rules = [];
 
-        if ($this->rfc) {
+        if ($this->rfcCompliant) {
             $rules[] = new RFCValidation;
         }
 
-        if ($this->strict) {
+        if ($this->rfcCompliantWithoutWarnings) {
             $rules[] = new NoRFCWarningsValidation;
         }
 
-        if ($this->dns) {
+        if ($this->domainExists) {
             $rules[] = new DNSCheckValidation;
         }
 
-        if ($this->spoof) {
+        if ($this->preventEmailSpoofing) {
             $rules[] = new SpoofCheckValidation;
         }
 
-        if ($this->filter) {
+        if ($this->basicFormat) {
             $rules[] = new FilterEmailValidation;
         }
 
-        if ($this->filter_unicode) {
+        if ($this->basicFormatUnicodeAllowed) {
             $rules[] = FilterEmailValidation::unicode();
         }
 

@@ -76,36 +76,36 @@ class ValidationEmailRuleTest extends TestCase
     public function testStrict()
     {
         $this->fails(
-            (new Email())->strict(),
+            (new Email())->rfcCompliantWithoutWarnings(),
             'invalid.@example.com',
             ['validation.email'],
         );
 
         $this->fails(
-            Rule::email()->strict(),
+            Rule::email()->rfcCompliantWithoutWarnings(),
             'invalid.@example.com',
             ['validation.email'],
         );
 
         $this->fails(
-            (new Email())->strict(),
+            (new Email())->rfcCompliantWithoutWarnings(),
             'username@sub..example.com',
             ['validation.email'],
         );
 
         $this->fails(
-            Rule::email()->strict(),
+            Rule::email()->rfcCompliantWithoutWarnings(),
             'username@sub..example.com',
             ['validation.email'],
         );
 
         $this->passes(
-            (new Email())->strict(),
+            (new Email())->rfcCompliantWithoutWarnings(),
             'plainaddress@example.com',
         );
 
         $this->passes(
-            Rule::email()->strict(),
+            Rule::email()->rfcCompliantWithoutWarnings(),
             'plainaddress@example.com',
         );
     }
@@ -113,24 +113,24 @@ class ValidationEmailRuleTest extends TestCase
     public function testDns()
     {
         $this->fails(
-            (new Email())->dns(),
+            (new Email())->domainExists(),
             'plainaddress@example.com',
             ['validation.email'],
         );
 
         $this->fails(
-            Rule::email()->dns(),
+            Rule::email()->domainExists(),
             'plainaddress@example.com',
             ['validation.email'],
         );
 
         $this->passes(
-            (new Email())->dns(),
+            (new Email())->domainExists(),
             'taylor@laravel.com',
         );
 
         $this->passes(
-            Rule::email()->dns(),
+            Rule::email()->domainExists(),
             'taylor@laravel.com',
         );
     }
@@ -138,47 +138,47 @@ class ValidationEmailRuleTest extends TestCase
     public function testSpoof()
     {
         $this->fails(
-            (new Email())->spoof(),
+            (new Email())->preventEmailSpoofing(),
             'admin@examрle.com',// Contains a Cyrillic 'р' (U+0440), not a Latin 'p'
             ['validation.email'],
         );
 
         $this->fails(
-            Rule::email()->spoof(),
+            Rule::email()->preventEmailSpoofing(),
             'admin@examрle.com',// Contains a Cyrillic 'р' (U+0440), not a Latin 'p'
             ['validation.email'],
         );
 
         $spoofingEmail = 'admin@exam'."\u{0440}".'le.com';
         $this->fails(
-            (new Email())->spoof(),
+            (new Email())->preventEmailSpoofing(),
             $spoofingEmail,
             ['validation.email'],
         );
 
         $this->fails(
-            Rule::email()->spoof(),
+            Rule::email()->preventEmailSpoofing(),
             $spoofingEmail,
             ['validation.email'],
         );
 
         $this->passes(
-            (new Email())->spoof(),
+            (new Email())->preventEmailSpoofing(),
             'admin@example.com',
         );
 
         $this->passes(
-            Rule::email()->spoof(),
+            Rule::email()->preventEmailSpoofing(),
             'admin@example.com',
         );
 
         $this->passes(
-            (new Email())->spoof(),
+            (new Email())->preventEmailSpoofing(),
             'test👨‍💻@domain.com',
         );
 
         $this->passes(
-            Rule::email()->spoof(),
+            Rule::email()->preventEmailSpoofing(),
             'test👨‍💻@domain.com',
         );
     }
@@ -186,24 +186,24 @@ class ValidationEmailRuleTest extends TestCase
     public function testFilter()
     {
         $this->fails(
-            (new Email())->filter(),
+            (new Email())->basicFormat(),
             'tést@domain.com',
             ['validation.email'],
         );
 
         $this->fails(
-            Rule::email()->filter(),
+            Rule::email()->basicFormat(),
             'tést@domain.com',
             ['validation.email'],
         );
 
         $this->passes(
-            (new Email())->filter(),
+            (new Email())->basicFormat(),
             'admin@example.com',
         );
 
         $this->passes(
-            Rule::email()->filter(),
+            Rule::email()->basicFormat(),
             'admin@example.com',
         );
     }
@@ -211,34 +211,34 @@ class ValidationEmailRuleTest extends TestCase
     public function testFilterUnicode()
     {
         $this->fails(
-            (new Email())->filterUnicode(),
+            (new Email())->basicFormatUnicodeAllowed(),
             'invalid.@example.com',
             ['validation.email'],
         );
 
         $this->fails(
-            Rule::email()->filterUnicode(),
+            Rule::email()->basicFormatUnicodeAllowed(),
             'invalid.@example.com',
             ['validation.email'],
         );
 
         $this->passes(
-            (new Email())->filterUnicode(),
+            (new Email())->basicFormatUnicodeAllowed(),
             'tést@domain.com',
         );
 
         $this->passes(
-            Rule::email()->filterUnicode(),
+            Rule::email()->basicFormatUnicodeAllowed(),
             'tést@domain.com',
         );
 
         $this->passes(
-            (new Email())->filterUnicode(),
+            (new Email())->basicFormatUnicodeAllowed(),
             'admin@example.com',
         );
 
         $this->passes(
-            Rule::email()->filterUnicode(),
+            Rule::email()->basicFormatUnicodeAllowed(),
             'admin@example.com',
         );
     }
@@ -246,46 +246,46 @@ class ValidationEmailRuleTest extends TestCase
     public function testRfc()
     {
         $this->fails(
-            (new Email())->rfc(),
+            (new Email())->rfcCompliant(),
             'invalid.@example.com',
             ['validation.email'],
         );
 
         $this->fails(
-            Rule::email()->rfc(),
+            Rule::email()->rfcCompliant(),
             'invalid.@example.com',
             ['validation.email'],
         );
 
         $this->fails(
-            (new Email())->rfc(),
+            (new Email())->rfcCompliant(),
             'test👨‍💻@domain.com',
             ['validation.email'],
         );
 
         $this->fails(
-            Rule::email()->rfc(),
+            Rule::email()->rfcCompliant(),
             'test👨‍💻@domain.com',
             ['validation.email'],
         );
 
         $this->passes(
-            (new Email())->rfc(),
+            (new Email())->rfcCompliant(),
             'admin@example.com',
         );
 
         $this->passes(
-            Rule::email()->rfc(),
+            Rule::email()->rfcCompliant(),
             'admin@example.com',
         );
 
         $this->passes(
-            (new Email())->rfc(),
+            (new Email())->rfcCompliant(),
             'tést@domain.com',
         );
 
         $this->passes(
-            Rule::email()->rfc(),
+            Rule::email()->rfcCompliant(),
             'tést@domain.com',
         );
     }
@@ -293,45 +293,45 @@ class ValidationEmailRuleTest extends TestCase
     public function testCombiningRules()
     {
         $this->passes(
-            (new Email())->rfc()->strict()->spoof(),
+            (new Email())->rfcCompliant()->rfcCompliantWithoutWarnings()->preventEmailSpoofing(),
             'test@example.com',
         );
 
         $this->passes(
-            Rule::email()->rfc()->strict()->spoof(),
+            Rule::email()->rfcCompliant()->rfcCompliantWithoutWarnings()->preventEmailSpoofing(),
             'test@example.com',
         );
 
         $this->fails(
-            (new Email())->rfc()->strict()->spoof()->dns(),
+            (new Email())->rfcCompliant()->rfcCompliantWithoutWarnings()->preventEmailSpoofing()->domainExists(),
             'test@example.com',
             ['validation.email'],
         );
 
         $this->fails(
-            Rule::email()->rfc()->strict()->spoof()->dns(),
+            Rule::email()->rfcCompliant()->rfcCompliantWithoutWarnings()->preventEmailSpoofing()->domainExists(),
             'test@example.com',
             ['validation.email'],
         );
 
         $this->passes(
-            (new Email())->spoof(),
+            (new Email())->preventEmailSpoofing(),
             'test👨‍💻@domain.com',
         );
 
         $this->passes(
-            Rule::email()->spoof(),
+            Rule::email()->preventEmailSpoofing(),
             'test👨‍💻@domain.com',
         );
 
         $this->fails(
-            (new Email())->spoof()->rfc(),
+            (new Email())->preventEmailSpoofing()->rfcCompliant(),
             'test👨‍💻@domain.com',
             ['validation.email'],
         );
 
         $this->fails(
-            Rule::email()->spoof()->rfc(),
+            Rule::email()->preventEmailSpoofing()->rfcCompliant(),
             'test👨‍💻@domain.com',
             ['validation.email'],
         );
@@ -339,23 +339,23 @@ class ValidationEmailRuleTest extends TestCase
         $spoofingEmail = 'admin@exam'."\u{0440}".'le.com';
 
         $this->passes(
-            (new Email())->rfc(),
+            (new Email())->rfcCompliant(),
             $spoofingEmail,
         );
 
         $this->passes(
-            Rule::email()->rfc(),
+            Rule::email()->rfcCompliant(),
             $spoofingEmail,
         );
 
         $this->fails(
-            (new Email())->rfc()->spoof(),
+            (new Email())->rfcCompliant()->preventEmailSpoofing(),
             $spoofingEmail,
             ['validation.email'],
         );
 
         $this->fails(
-            Rule::email()->rfc()->spoof(),
+            Rule::email()->rfcCompliant()->preventEmailSpoofing(),
             $spoofingEmail,
             ['validation.email'],
         );
@@ -402,7 +402,7 @@ class ValidationEmailRuleTest extends TestCase
         );
 
         Email::defaults(function () {
-            return (new Email())->spoof();
+            return (new Email())->preventEmailSpoofing();
         });
 
         $this->fails(
@@ -412,7 +412,7 @@ class ValidationEmailRuleTest extends TestCase
         );
 
         Email::defaults(function () {
-            return Rule::email()->rfc();
+            return Rule::email()->rfcCompliant();
         });
 
         $this->passes(
@@ -421,7 +421,7 @@ class ValidationEmailRuleTest extends TestCase
         );
 
         Email::defaults(function () {
-            return Rule::email()->spoof();
+            return Rule::email()->preventEmailSpoofing();
         });
 
         $this->fails(
