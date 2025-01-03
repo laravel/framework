@@ -5,8 +5,7 @@
     >
         <div class="mb-3">
             <div class="text-md text-gray-500 dark:text-gray-400">
-                <div class="mb-2">
-
+                <div>
                     @if (config('app.editor'))
                         <a href="{{ $frame->editorHref() }}" class="text-blue-500 hover:underline">
                             <span class="wrap text-gray-900 dark:text-gray-300">{{ $frame->file() }}</span>
@@ -16,6 +15,12 @@
                     @endif
 
                     <span class="font-mono text-xs">:{{ $frame->line() }}</span>
+                </div>
+
+                <div class="mb-2">
+                    @unless(is_null($bladeSourceFile = $frame->blade()))
+                        <span class="font-mono text-xs">View: {{ $bladeSourceFile }}</span>
+                    @endunless
                 </div>
             </div>
         </div>
