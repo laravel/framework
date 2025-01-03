@@ -40,7 +40,7 @@ class OptimizeClearCommand extends Command
             ->unique()
             ->flip();
 
-        $tasks = Collection::wrap($this->getOptimizeTasks())
+        $tasks = Collection::wrap($this->getOptimizeClearTasks())
             ->reject(fn ($command, $key) => $exceptions->hasAny([$command, $key]))
             ->toArray();
 
