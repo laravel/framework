@@ -55,14 +55,14 @@ class ValidationEmailRuleTest extends TestCase
         foreach ($values as $value) {
             $v = new Validator(
                 resolve('translator'),
-                ['my_file' => $value],
-                ['my_file' => is_object($rule) ? clone $rule : $rule]
+                ['my_email' => $value],
+                ['my_email' => is_object($rule) ? clone $rule : $rule]
             );
 
             $this->assertSame($result, $v->passes());
 
             $this->assertSame(
-                $result ? [] : ['my_file' => $messages],
+                $result ? [] : ['my_email' => $messages],
                 $v->messages()->toArray()
             );
         }
@@ -149,16 +149,16 @@ class ValidationEmailRuleTest extends TestCase
             ['validation.email'],
         );
 
-        $email = 'admin@exam' . "\u{0440}" . 'le.com';
+        $spoofingEmail = 'admin@exam'."\u{0440}".'le.com';
         $this->fails(
             (new Email())->spoof(),
-            $email,
+            $spoofingEmail,
             ['validation.email'],
         );
 
         $this->fails(
             Rule::email()->spoof(),
-            $email,
+            $spoofingEmail,
             ['validation.email'],
         );
 
@@ -336,7 +336,7 @@ class ValidationEmailRuleTest extends TestCase
             ['validation.email'],
         );
 
-        $spoofingEmail = 'admin@exam' . "\u{0440}" . 'le.com';
+        $spoofingEmail = 'admin@exam'."\u{0440}".'le.com';
 
         $this->passes(
             (new Email())->rfc(),
@@ -394,7 +394,7 @@ class ValidationEmailRuleTest extends TestCase
     {
         $this->assertInstanceOf(Email::class, Email::default());
 
-        $spoofingEmail = 'admin@exam' . "\u{0440}" . 'le.com';
+        $spoofingEmail = 'admin@exam'."\u{0440}".'le.com';
 
         $this->passes(
             Email::default(),

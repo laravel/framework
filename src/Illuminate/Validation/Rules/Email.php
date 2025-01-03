@@ -9,20 +9,16 @@ use Egulias\EmailValidator\Validation\MultipleValidationWithAnd;
 use Egulias\EmailValidator\Validation\NoRFCWarningsValidation;
 use Egulias\EmailValidator\Validation\RFCValidation;
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Contracts\Validation\ValidatorAwareRule;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Validation\Concerns\FilterEmailValidation;
 use InvalidArgumentException;
-use Stringable;
-use function Illuminate\Support\enum_value;
 
 class Email implements Rule, DataAwareRule, ValidatorAwareRule
 {
