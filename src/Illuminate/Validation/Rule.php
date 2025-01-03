@@ -171,7 +171,7 @@ class Rule
     }
 
     /**
-     * Get am email rule builder instance.
+     * Get an email rule builder instance.
      *
      * @return \Illuminate\Validation\Rules\Email
      */
