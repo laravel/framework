@@ -69,12 +69,13 @@ class CacheDatabaseStoreTest extends TestCase
         $this->assertSame('bar', $store->get('foo'));
     }
 
-    public function testValueIsReturnedOnSqlite() {
+    public function testValueIsReturnedOnSqlite()
+    {
         $store = $this->getSqliteStore();
         $table = m::mock(stdClass::class);
         $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
         $table->shouldReceive('whereIn')->once()->with('key', ['prefixfoo'])->andReturn($table);
-        $table->shouldReceive('get')->once()->andReturn(collect([(object)['key' => 'prefixfoo', 'value' => base64_encode(serialize("\0bar\0")), 'expiration' => 999999999999999]]));
+        $table->shouldReceive('get')->once()->andReturn(collect([(object) ['key' => 'prefixfoo', 'value' => base64_encode(serialize("\0bar\0")), 'expiration' => 999999999999999]]));
 
         $this->assertSame("\0bar\0", $store->get('foo'));
     }
@@ -103,7 +104,8 @@ class CacheDatabaseStoreTest extends TestCase
         $this->assertTrue($result);
     }
 
-    public function testValueIsUpsertedOnSqlite() {
+    public function testValueIsUpsertedOnSqlite()
+    {
         $store = $this->getMockBuilder(DatabaseStore::class)->onlyMethods(['getTime'])->setConstructorArgs($this->getSqliteMocks())->getMock();
         $table = m::mock(stdClass::class);
         $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
