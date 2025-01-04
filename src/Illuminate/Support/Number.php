@@ -10,6 +10,14 @@ class Number
 {
     use Macroable;
 
+    private const BASE_UNITS = [
+        3 => 'K',
+        6 => 'M',
+        9 => 'B',
+        12 => 'T',
+        15 => 'Q',
+    ];
+
     /**
      * The current default locale.
      *
@@ -192,13 +200,7 @@ class Number
      */
     public static function forHumans(int|float $number, int $precision = 0, ?int $maxPrecision = null, bool $abbreviate = false)
     {
-        return static::summarize($number, $precision, $maxPrecision, $abbreviate ? [
-            3 => 'K',
-            6 => 'M',
-            9 => 'B',
-            12 => 'T',
-            15 => 'Q',
-        ] : [
+        return static::summarize($number, $precision, $maxPrecision, $abbreviate ? self::BASE_UNITS : [
             3 => ' thousand',
             6 => ' million',
             9 => ' billion',
@@ -218,14 +220,8 @@ class Number
      */
     protected static function summarize(int|float $number, int $precision = 0, ?int $maxPrecision = null, array $units = [])
     {
-        if (empty($units)) {
-            $units = [
-                3 => 'K',
-                6 => 'M',
-                9 => 'B',
-                12 => 'T',
-                15 => 'Q',
-            ];
+        if ($units === []) {
+            $units = self::BASE_UNITS;
         }
 
         switch (true) {
