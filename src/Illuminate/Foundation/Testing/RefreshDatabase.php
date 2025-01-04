@@ -109,7 +109,7 @@ trait RefreshDatabase
 
                 $connection->unsetEventDispatcher();
 
-                if (! $connection->getPdo()->inTransaction()) {
+                if ($connection->getPdo() && ! $connection->getPdo()->inTransaction()) {
                     RefreshDatabaseState::$migrated = false;
                 }
 
