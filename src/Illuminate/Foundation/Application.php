@@ -1156,7 +1156,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      * @param  callable[]  $callbacks
      * @return void
      */
-    protected function fireAppCallbacks(array &$callbacks)
+    protected function fireAppCallbacks(array $callbacks)
     {
         $index = 0;
 
