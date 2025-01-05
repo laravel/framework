@@ -283,6 +283,139 @@ class Number
     }
 
     /**
+     * @see https://stackoverflow.com/questions/14330713/converting-float-decimal-to-fraction
+     * @param bool|'auto'|'manual' $stylized
+     */
+    public static function toFraction(
+        float $value,
+        int $limes = 10,
+        bool|string $stylized = false,
+        string $glue = ' ',
+        bool $improper = false,
+        bool $allowApproximation = true,
+    ): ?string {
+        if ($value < 0.001) {
+            return null;
+        }
+
+        $wholeNumber = (int) floor($value);
+        $remainingDecimal = $value - $wholeNumber;
+
+        [$numerator, $denominator] = self::fareyFraction($remainingDecimal, $limes);
+
+        // Values rounded to 1 should be added to base value and returned without fraction part
+        if (is_int($simplifiedFraction = $numerator / $denominator)) {
+            $wholeNumber += $simplifiedFraction;
+            $numerator = 0;
+        }
+
+        // Too small values cannot be made into fractions
+        if (0 === $wholeNumber && 0 === $numerator) {
+            return null;
+        }
+
+        if ($allowApproximation === false && (($wholeNumber * $denominator) + ($numerator / 100)) !== $value) {
+            return null;
+        }
+
+        if ($improper) {
+            $numerator += ($wholeNumber * $denominator);
+            $wholeNumber = 0;
+        }
+
+        // Otherwise let's format value - only non-0 whole value / fractions will be returned
+        return trim(sprintf(
+            '%s%s%s',
+            (string) $wholeNumber ?: '',
+            $wholeNumber > 0 ? $glue : '',
+            0 === $numerator ? '' : self::formatFraction($numerator, $denominator, $stylized),
+        ));
+    }
+
+    private static function formatFraction(int $numerator, int $denominator, bool|string $stylized = false): string
+    {
+        $fractionSlash = "\u{2044}";
+
+        if (in_array($stylized, ['auto', false], true)) {
+            return $numerator . ($stylized === 'auto' ? $fractionSlash : '/') . $denominator;
+        }
+
+        $numeratorFormatted = match ($numerator) {
+            0 => "\u{2070}",
+            1 => "\u{00B9}",
+            2 => "\u{00B2}",
+            3 => "\u{00B3}",
+            4 => "\u{2074}",
+            5 => "\u{2075}",
+            6 => "\u{2076}",
+            7 => "\u{2077}",
+            8 => "\u{2078}",
+            9 => "\u{2079}",
+        };
+
+        $denominatorFormatted = match ($denominator) {
+            0 => "\u{2080}",
+            1 => "\u{2081}",
+            2 => "\u{2082}",
+            3 => "\u{2083}",
+            4 => "\u{2084}",
+            5 => "\u{2085}",
+            6 => "\u{2086}",
+            7 => "\u{2087}",
+            8 => "\u{2088}",
+            9 => "\u{2089}",
+        };
+
+        return $numeratorFormatted . $fractionSlash . $denominatorFormatted;
+    }
+
+    /**
+     * @see https://stackoverflow.com/a/14330799/842480
+     *
+     * @return int[] Numerator and Denominator values
+     */
+    private static function fareyFraction(float $value, int $limes): array
+    {
+        if ($value < 0) {
+            [$numerator, $denominator] = self::fareyFraction(-$value, $limes);
+
+            return [-$numerator, $denominator];
+        }
+
+        $zero = $limes - $limes;
+        $lower = [$zero, $zero + 1];
+        $upper = [$zero + 1, $zero];
+
+        while (true) {
+            $mediant = [$lower[0] + $upper[0], $lower[1] + $upper[1]];
+
+            if ($value * $mediant[1] > $mediant[0]) {
+                if ($limes < $mediant[1]) {
+                    return $upper;
+                }
+
+                $lower = $mediant;
+            } elseif ($value * $mediant[1] === $mediant[0]) {
+                if ($limes >= $mediant[1]) {
+                    return $mediant;
+                }
+
+                if ($lower[1] < $upper[1]) {
+                    return $lower;
+                }
+
+                return $upper;
+            } else {
+                if ($limes < $mediant[1]) {
+                    return $lower;
+                }
+
+                $upper = $mediant;
+            }
+        }
+    }
+
+    /**
      * Remove any trailing zero digits after the decimal point of the given number.
      *
      * @param  int|float  $number

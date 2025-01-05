@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Support;
 
 use Illuminate\Support\Number;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 
@@ -321,5 +322,41 @@ class SupportNumberTest extends TestCase
         $this->assertSame(12.3, Number::trim(12.30));
         $this->assertSame(12.3456789, Number::trim(12.3456789));
         $this->assertSame(12.3456789, Number::trim(12.34567890000));
+    }
+
+    #[DataProvider('providesNumbersForFractions')]
+    public function testToFraction(float $input, ?string $output, int $limes = 10, bool $improper = false, bool $allowApproximation = true)
+    {
+        $this->assertSame($output, Number::toFraction($input, $limes, improper: $improper, allowApproximation: $allowApproximation));
+    }
+
+    public static function providesNumbersForFractions()
+    {
+        return [
+            'cannot be made into a fraction' => [0.06, null],
+            'exact fraction possible' => [0.75, '3/4'],
+            'exact fraction with integer' => [1.75, '1 3/4'],
+            'exact improper fraction' => [1.75, '7/4', 10, true],
+            'approximate fraction with integer' => [2.33, '2 1/3'],
+            'approximatation not allowed' => [2.33, null, 10, false, false],
+            'with limes' => [2.58, '2 3/5', 5],
+            'only integer' => [ 1.97, '2'],
+        ];
+    }
+
+    #[DataProvider('providesNumbersForFractionFormats')]
+    public function testToFractionFormat(float $input, ?string $output, bool|string $stylized = false, string $glue = ' ')
+    {
+        $this->assertSame($output, Number::toFraction($input, stylized: $stylized, glue: $glue));
+    }
+
+    public static function providesNumbersForFractionFormats()
+    {
+        return [
+            'with defaults' => [1.75, '1 3/4'],
+            'no stylization' => [1.75, '1 3/4', false],
+            'automatic stylization' => [1.75, '1 3⁄4', 'auto'],
+            'manual stylization' => [1.75, '1 ³⁄₄', 'manual'],
+        ];
     }
 }
