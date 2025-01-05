@@ -285,7 +285,7 @@ class Number
     /**
      * @see https://stackoverflow.com/questions/14330713/converting-float-decimal-to-fraction
      *
-     * @param bool|'auto'|'manual'  $stylized
+     * @param  bool|'auto'|'manual'  $stylized
      */
     public static function toFraction(
         float $value,
