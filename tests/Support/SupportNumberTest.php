@@ -339,7 +339,8 @@ class SupportNumberTest extends TestCase
             'exact improper fraction' => [1.75, '7/4', 10, true],
             'approximate fraction with integer' => [2.33, '2 1/3'],
             'approximatation not allowed' => [2.33, null, 10, false, false],
-            'with limes' => [2.58, '2 3/5', 5],
+            'with default limes' => [2.58, '2 4/7'],
+            'with custom limes' => [2.58, '2 3/5', 5],
             'only integer' => [1.97, '2'],
         ];
     }
@@ -357,6 +358,7 @@ class SupportNumberTest extends TestCase
             'no stylization' => [1.75, '1 3/4', false],
             'automatic stylization' => [1.75, '1 3⁄4', 'auto'],
             'manual stylization' => [1.75, '1 ³⁄₄', 'manual'],
+            'manual stylization with less glue' => [1.75, '1³⁄₄', 'manual', ''],
         ];
     }
 }
