@@ -340,7 +340,7 @@ class SupportNumberTest extends TestCase
             'approximate fraction with integer' => [2.33, '2 1/3'],
             'approximatation not allowed' => [2.33, null, 10, false, false],
             'with limes' => [2.58, '2 3/5', 5],
-            'only integer' => [ 1.97, '2'],
+            'only integer' => [1.97, '2'],
         ];
     }
 

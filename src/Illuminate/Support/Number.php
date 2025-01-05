@@ -284,7 +284,8 @@ class Number
 
     /**
      * @see https://stackoverflow.com/questions/14330713/converting-float-decimal-to-fraction
-     * @param bool|'auto'|'manual' $stylized
+     *
+     * @param bool|'auto'|'manual'  $stylized
      */
     public static function toFraction(
         float $value,
@@ -337,7 +338,7 @@ class Number
         $fractionSlash = "\u{2044}";
 
         if (in_array($stylized, ['auto', false], true)) {
-            return $numerator . ($stylized === 'auto' ? $fractionSlash : '/') . $denominator;
+            return $numerator.($stylized === 'auto' ? $fractionSlash : '/').$denominator;
         }
 
         $numeratorFormatted = match ($numerator) {
@@ -366,7 +367,7 @@ class Number
             9 => "\u{2089}",
         };
 
-        return $numeratorFormatted . $fractionSlash . $denominatorFormatted;
+        return $numeratorFormatted.$fractionSlash.$denominatorFormatted;
     }
 
     /**
