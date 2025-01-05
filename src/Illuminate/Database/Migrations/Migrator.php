@@ -188,7 +188,7 @@ class Migrator
                 $this->write(Info::class, $e->getMessage());
 
                 Log::error($e->getMessage());
-                
+
                 $migration = (object) $file;
                 $this->runDown($file, $migration, $pretend);
             }

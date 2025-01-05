@@ -130,7 +130,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
      */
     public function delete($migration)
     {
-        if(property_exists($migration, 'migration')) {
+        if (property_exists($migration, 'migration')) {
             $this->table()->where('migration', $migration->migration)->delete();
         }
     }
