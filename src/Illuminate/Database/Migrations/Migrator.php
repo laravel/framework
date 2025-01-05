@@ -184,9 +184,7 @@ class Migrator
                 if ($step) {
                     $batch++;
                 }
-            }
-            catch(\Exception $e) {
-
+            } catch(\Exception $e) {
                 $this->write(Info::class, $e->getMessage());
 
                 Log::error($e->getMessage());
