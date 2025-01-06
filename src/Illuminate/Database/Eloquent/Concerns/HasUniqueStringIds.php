@@ -38,7 +38,7 @@ trait HasUniqueStringIds
      */
     public function uniqueIds()
     {
-        return [$this->getKeyName()];
+        return $this->usesUniqueIds() ? [$this->getKeyName()] : parent::uniqueIds();
     }
 
     /**
@@ -75,7 +75,7 @@ trait HasUniqueStringIds
             return 'string';
         }
 
-        return $this->keyType;
+        return parent::getKeyType();
     }
 
     /**
@@ -89,7 +89,7 @@ trait HasUniqueStringIds
             return false;
         }
 
-        return $this->incrementing;
+        return parent::getIncrementing();
     }
 
     /**
