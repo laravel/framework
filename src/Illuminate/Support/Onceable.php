@@ -65,7 +65,9 @@ class Onceable
             fn (mixed $argument) => is_object($argument) ? spl_object_hash($argument) : $argument,
             $callable instanceof Closure ? (new ReflectionClosure($callable))->getClosureUsedVariables() : [],
         );
+
         $class = $callable instanceof Closure ? (new ReflectionClosure($callable))->getClosureCalledClass()?->getName() : null;
+
         $class ??= isset($trace[1]['class']) ? $trace[1]['class'] : null;
 
         return hash('xxh128', sprintf(
