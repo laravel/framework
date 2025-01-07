@@ -27,6 +27,7 @@ use Illuminate\Database\Eloquent\Casts\AsEnumArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsEnumCollection;
 use Illuminate\Database\Eloquent\Casts\AsStringable;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Casts\InRangeCastable;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -47,6 +48,7 @@ use Illuminate\Support\Stringable;
 use InvalidArgumentException;
 use LogicException;
 use Mockery as m;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use stdClass;
@@ -2507,6 +2509,43 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals(-14173440, $arr['timestampAttribute']);
     }
 
+    #[TestWith([-1], 'below range')]
+    #[TestWith([128], 'beyond range')]
+    public function testIntegerRangeCastThrowsDomainExceptionWhenOutsideRange(int $value): void
+    {
+        $model = new EloquentModelCastingStub;
+        $message = null;
+        try {
+            $model->integerRangeAttribute = $value;
+            $this->fail("No exception was thrown");
+        } catch (\DomainException $exception) {
+            $message = $exception->getMessage();
+        }
+
+        $this->assertSame('Value of key [integerRangeAttribute] must be between 0 and 127.', $message);
+    }
+
+    public function testStringInRangeCastable(): void
+    {
+        $model = new EloquentModelCastingStub;
+        $model->stringRangeAttribute = "hi";
+
+        self::assertSame("hi", $model->getAttribute('stringRangeAttribute'));
+    }
+
+    #[TestWith(['hello'], 'string is longer than limit')]
+    #[TestWith([''], 'string is shorter than limit')]
+    public function testStringOutsideRangeThrowsDomainException(string $string): void
+    {
+        $model = new EloquentModelCastingStub;
+        try {
+            $model->stringRangeAttribute = $string;
+            $this->fail("No exception was thrown");
+        } catch (\DomainException $exception) {
+            self::assertEquals('Length of key [stringRangeAttribute] must be between 1 and 4.', $exception->getMessage());
+        }
+    }
+
     public function testModelDateAttributeCastingResetsTime()
     {
         $model = new EloquentModelCastingStub;
@@ -3584,6 +3623,9 @@ class EloquentModelCastingStub extends Model
     {
         return [
             'intAttribute' => 'int',
+            'intRangeAttribute' => InRangeCastable::class.':integer,0,127',
+            'integerRangeAttribute' => InRangeCastable::class.':integer,0,127',
+            'stringRangeAttribute' => InRangeCastable::forString(1, 4),
             'stringAttribute' => 'string',
             'booleanAttribute' => 'boolean',
             'arrayAttribute' => 'array',
