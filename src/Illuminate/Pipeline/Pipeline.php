@@ -145,8 +145,9 @@ class Pipeline implements PipelineContract
     }
 
     /**
-     * Sets a final callback to be executed after the pipeline ends regardless of the outcome.
+     * Set a final callback to be executed after the pipeline ends regardless of the outcome.
      *
+     * @param  \Closure  $callback
      * @return $this
      */
     public function finally(Closure $callback)
