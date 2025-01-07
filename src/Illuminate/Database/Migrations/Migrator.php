@@ -16,6 +16,7 @@ use Illuminate\Database\Events\NoPendingMigrations;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use ReflectionClass;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -177,10 +178,19 @@ class Migrator
         // migrations "up" so the changes are made to the databases. We'll then log
         // that the migration was run so we don't repeat it next time we execute.
         foreach ($migrations as $file) {
-            $this->runUp($file, $batch, $pretend);
+            try {
+                $this->runUp($file, $batch, $pretend);
 
-            if ($step) {
-                $batch++;
+                if ($step) {
+                    $batch++;
+                }
+            } catch(\Exception $e) {
+                $this->write(Info::class, $e->getMessage());
+
+                Log::error($e->getMessage());
+
+                $migration = (object) $file;
+                $this->runDown($file, $migration, $pretend);
             }
         }
 
