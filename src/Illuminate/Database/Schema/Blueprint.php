@@ -531,7 +531,7 @@ class Blueprint
             $model = new $model;
         }
 
-        return $this->dropForeign([$column ?: $model->getForeignKey()]);
+        return $this->dropColumn($column ?: $model->getForeignKey());
     }
 
     /**
