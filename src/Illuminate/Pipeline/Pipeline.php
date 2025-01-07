@@ -42,6 +42,13 @@ class Pipeline implements PipelineContract
     protected $method = 'handle';
 
     /**
+     * The final callback to be executed after the pipeline ends regardless of the outcome.
+     *
+     * @var \Closure|null
+     */
+    protected $finally;
+
+    /**
      * Create a new class instance.
      *
      * @param  \Illuminate\Contracts\Container\Container|null  $container
@@ -116,7 +123,14 @@ class Pipeline implements PipelineContract
             array_reverse($this->pipes()), $this->carry(), $this->prepareDestination($destination)
         );
 
-        return $pipeline($this->passable);
+        try {
+            return $pipeline($this->passable);
+        } finally {
+            if ($this->finally) {
+                ($this->finally)($this->passable);
+            }
+        }
+
     }
 
     /**
@@ -129,6 +143,18 @@ class Pipeline implements PipelineContract
         return $this->then(function ($passable) {
             return $passable;
         });
+    }
+
+    /**
+     * Sets a final callback to be executed after the pipeline ends regardless of the outcome.
+     *
+     * @return $this
+     */
+    public function finally(Closure $callback)
+    {
+        $this->finally = $callback;
+
+        return $this;
     }
 
     /**
