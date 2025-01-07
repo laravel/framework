@@ -49,7 +49,7 @@ class MigrateCommandTest extends TestCase
     }
 
     /**
-     * Creates migration file with multiple Schema::create calls gives it proper permission
+     * Creates migration file with multiple Schema::create calls and gives it proper permission
      * 
      * @return string
      */
