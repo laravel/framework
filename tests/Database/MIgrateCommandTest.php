@@ -17,7 +17,7 @@ class MigrateCommandTest extends TestCase
         Schema::dropIfExists('test_table_2');
 
         // Create the migrations table if it doesn't exist
-        if (!Schema::hasTable('migrations')) {
+        if (! Schema::hasTable('migrations')) {
             Schema::create('migrations', function ($table) {
                 $table->id();
                 $table->string('migration');
@@ -50,15 +50,15 @@ class MigrateCommandTest extends TestCase
 
     /**
      * Creates migration file with multiple Schema::create calls and gives it proper permission
-     * 
+     *
      * @return string
      */
     public function makeMigration(): string
     {
         $migrationPath = database_path('migrations');
-        $migrationFile = $migrationPath . '/2025_01_06_000000_test_migration.php';
+        $migrationFile = $migrationPath.'/2025_01_06_000000_test_migration.php';
 
-        if (!is_dir($migrationPath)) {
+        if (! is_dir($migrationPath)) {
             mkdir($migrationPath, 0777, true);
         }
 
@@ -111,7 +111,7 @@ class MigrateCommandTest extends TestCase
         // Assert the migration is not logged in the migrations table
         $this->assertFalse(
             DB::table('migrations')->where('migration', '2025_01_06_000000_test_migration')->exists(),
-            "The migration should not be logged in the migrations table after failure."
+            'The migration should not be logged in the migrations table after failure.'
         );
 
         // Clean up the temporary migration file
