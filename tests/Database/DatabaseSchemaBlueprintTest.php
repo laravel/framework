@@ -444,7 +444,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
         };
 
         $this->assertEquals([
-            'alter table `posts` drop foreign key `posts_user_id_foreign`',
+            'alter table `posts` drop `user_id`',
         ], $getSql(new MySqlGrammar));
     }
 
@@ -457,7 +457,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
         };
 
         $this->assertEquals([
-            'alter table `posts` drop foreign key `posts_model_using_uuid_id_foreign`',
+            'alter table `posts` drop `model_using_uuid_id`',
         ], $getSql(new MySqlGrammar));
     }
 
