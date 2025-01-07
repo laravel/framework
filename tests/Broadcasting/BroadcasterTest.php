@@ -339,6 +339,11 @@ class BroadcasterTest extends TestCase
             ['customerorder.1', 'order.{id}', false],
         ];
     }
+
+    public function testDefinedChannelPerConnection()
+    {
+
+    }
 }
 
 class FakeBroadcaster extends Broadcaster

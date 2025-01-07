@@ -89,11 +89,55 @@ class BroadcastEvent implements ShouldQueue
         $payload = $this->getPayloadFromEvent($this->event);
 
         foreach ($connections as $connection) {
+            $connectionChannels = $this->getConnectionChannels($channels, $connection);
+            $connectionPayload = $this->getConnectionPayload($payload, $connection);
+
             $manager->connection($connection)->broadcast(
-                $channels, $name, $payload
+                $connectionChannels, $name, $connectionPayload
             );
         }
     }
+
+    /**
+     * Get the channels for the given connection.
+     *
+     * @param  array  $channels
+     * @param  string  $connection
+     * @return array
+     */
+    protected function getConnectionChannels($channels, $connection): array
+    {
+        return is_array($channels[$connection] ?? null)
+            ? $channels[$connection]
+            : $channels;
+    }
+
+    /**
+     * Get the payload for the given connection.
+     *
+     * @param  array  $payload
+     * @param  string  $connection
+     * @return array
+     */
+    protected function getConnectionPayload($payload, $connection): array
+    {
+        $connectionPayload = is_array($payload[$connection] ?? null)
+            ? $payload[$connection]
+            : $payload;
+
+        if (isset($payload['socket'])) {
+            $connectionPayload['socket'] = $payload['socket'];
+        }
+
+        return $connectionPayload;
+    }
+
+    /**
+     * Get the payload for the given event.
+     *
+     * @param  mixed  $event
+     * @return array
+     */
 
     /**
      * Get the payload for the given event.
