@@ -130,7 +130,6 @@ class Pipeline implements PipelineContract
                 ($this->finally)($this->passable);
             }
         }
-
     }
 
     /**
