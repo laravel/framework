@@ -79,7 +79,7 @@ trait SerializesAndRestoresModelIdentifiers
 
         $collection = $this->getQueryForModelRestoration(
             (new $value->class)->setConnection($value->connection), $value->id
-        )->useWritePdo()->get();
+        )->with($value->relations ?? [])->useWritePdo()->get();
 
         if (is_a($value->class, Pivot::class, true) ||
             in_array(AsPivot::class, class_uses($value->class))) {

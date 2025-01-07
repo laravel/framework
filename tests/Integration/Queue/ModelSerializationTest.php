@@ -88,10 +88,10 @@ class ModelSerializationTest extends TestCase
 
         $unSerialized = unserialize($serialized);
 
-        $this->assertSame($defaultConnection, $unSerialized->users[0]->getConnectionName());
-        $this->assertSame('mohamed@laravel.com', $unSerialized->users[0]->email);
-        $this->assertSame($defaultConnection, $unSerialized->users[1]->getConnectionName());
-        $this->assertSame('taylor@laravel.com', $unSerialized->users[1]->email);
+        $this->assertSame($defaultConnection, $unSerialized->items[0]->getConnectionName());
+        $this->assertSame('mohamed@laravel.com', $unSerialized->items[0]->email);
+        $this->assertSame($defaultConnection, $unSerialized->items[1]->getConnectionName());
+        $this->assertSame('taylor@laravel.com', $unSerialized->items[1]->email);
     }
 
     public function testItSerializeUserOnDifferentConnection()
@@ -115,10 +115,10 @@ class ModelSerializationTest extends TestCase
 
         $unSerialized = unserialize($serialized);
 
-        $this->assertSame('custom', $unSerialized->users[0]->getConnectionName());
-        $this->assertSame('mohamed@laravel.com', $unSerialized->users[0]->email);
-        $this->assertSame('custom', $unSerialized->users[1]->getConnectionName());
-        $this->assertSame('taylor@laravel.com', $unSerialized->users[1]->email);
+        $this->assertSame('custom', $unSerialized->items[0]->getConnectionName());
+        $this->assertSame('mohamed@laravel.com', $unSerialized->items[0]->email);
+        $this->assertSame('custom', $unSerialized->items[1]->getConnectionName());
+        $this->assertSame('taylor@laravel.com', $unSerialized->items[1]->email);
     }
 
     public function testItFailsIfModelsOnMultiConnections()
@@ -243,8 +243,8 @@ class ModelSerializationTest extends TestCase
 
         $unserialized = unserialize($serialized);
 
-        $this->assertSame('taylor@laravel.com', $unserialized->users->first()->email);
-        $this->assertSame('mohamed@laravel.com', $unserialized->users->last()->email);
+        $this->assertSame('taylor@laravel.com', $unserialized->items->first()->email);
+        $this->assertSame('mohamed@laravel.com', $unserialized->items->last()->email);
     }
 
     public function testItCanUnserializeACollectionInCorrectOrderAndHandleDeletedModels()
@@ -261,10 +261,10 @@ class ModelSerializationTest extends TestCase
 
         $unserialized = unserialize($serialized);
 
-        $this->assertCount(2, $unserialized->users);
+        $this->assertCount(2, $unserialized->items);
 
-        $this->assertSame('3@laravel.com', $unserialized->users->first()->email);
-        $this->assertSame('1@laravel.com', $unserialized->users->last()->email);
+        $this->assertSame('3@laravel.com', $unserialized->items->first()->email);
+        $this->assertSame('1@laravel.com', $unserialized->items->last()->email);
     }
 
     public function testItCanUnserializeCustomCollection()
@@ -278,7 +278,29 @@ class ModelSerializationTest extends TestCase
 
         $unserialized = unserialize($serialized);
 
-        $this->assertInstanceOf(ModelSerializationTestCustomUserCollection::class, $unserialized->users);
+        $this->assertInstanceOf(ModelSerializationTestCustomUserCollection::class, $unserialized->items);
+    }
+
+    public function testItReloadsRelationshipsInCollection()
+    {
+        $order = tap(Order::create(), function (Order $order) {
+            $order->wasRecentlyCreated = false;
+        });
+
+        $product1 = Product::create();
+        $product2 = Product::create();
+
+        Line::create(['order_id' => $order->id, 'product_id' => $product1->id]);
+        Line::create(['order_id' => $order->id, 'product_id' => $product2->id]);
+
+        $lines = Line::with('product')->get();
+
+        $serialized = serialize(new CollectionSerializationTestClass($lines));
+
+        $unserialized = unserialize($serialized);
+
+        $this->assertEquals($lines[0]->getRelations(), $unserialized->items[0]->getRelations());
+        $this->assertEquals($lines[1]->getRelations(), $unserialized->items[1]->getRelations());
     }
 
     public function testItSerializesTypedProperties()
@@ -583,11 +605,11 @@ class CollectionSerializationTestClass
 {
     use SerializesModels;
 
-    public $users;
+    public $items;
 
-    public function __construct($users)
+    public function __construct($items)
     {
-        $this->users = $users;
+        $this->items = $items;
     }
 }
 
