@@ -106,7 +106,7 @@ class TestBroadcastEvent
     }
 }
 
-class TestBroadcastEventWithcoManualData extends TestBroadcastEvent
+class TestBroadcastEventWithManualData extends TestBroadcastEvent
 {
     public function broadcastWith()
     {
