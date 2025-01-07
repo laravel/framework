@@ -21,12 +21,12 @@ class InRangeCastable implements Castable
     public static function castUsing(array $arguments)
     {
         if (count($arguments) < 2) {
-            throw new \InvalidArgumentException("InRangeCastable must be called with at least 2 arguments.");
+            throw new \InvalidArgumentException('InRangeCastable must be called with at least 2 arguments.');
         }
 
         $type = $arguments[0];
-        if (!in_array($type, self::$validTypes)) {
-            throw new \InvalidArgumentException("Cast value must be one of: ".implode(", ", self::$validTypes));
+        if (! in_array($type, self::$validTypes)) {
+            throw new \InvalidArgumentException('Cast value must be one of: '.implode(', ', self::$validTypes));
         }
 
         $min = $arguments[1];
@@ -49,10 +49,11 @@ class InRangeCastable implements Castable
         }
 
         if (is_null($min) && is_null($max)) {
-            throw new \InvalidArgumentException("You must specify at least one of min and max.");
+            throw new \InvalidArgumentException('You must specify at least one of min and max.');
         }
 
-        return new class($type, $min, $max) implements CastsAttributes {
+        return new class($type, $min, $max) implements CastsAttributes
+        {
             public function __construct(
                 protected string $type,
                 protected int $min,
@@ -104,7 +105,7 @@ class InRangeCastable implements Castable
      * @param  positive-int|null  $max
      * @return string
      */
-    public static function forString(int $min = null, int $max = null): string
+    public static function forString(?int $min = null, ?int $max = null): string
     {
         return static::class.":string,{$min},{$max}";
     }
@@ -114,7 +115,7 @@ class InRangeCastable implements Castable
      * @param  positive-int|null  $max
      * @return string
      */
-    public static function forInteger(int $min = null, int $max = null): string
+    public static function forInteger(?int $min = null, ?int $max = null): string
     {
         return static::class.":integer,{$min},{$max}";
     }

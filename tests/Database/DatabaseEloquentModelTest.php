@@ -2517,7 +2517,7 @@ class DatabaseEloquentModelTest extends TestCase
         $message = null;
         try {
             $model->integerRangeAttribute = $value;
-            $this->fail("No exception was thrown");
+            $this->fail('No exception was thrown');
         } catch (\DomainException $exception) {
             $message = $exception->getMessage();
         }
@@ -2528,9 +2528,9 @@ class DatabaseEloquentModelTest extends TestCase
     public function testStringInRangeCastable(): void
     {
         $model = new EloquentModelCastingStub;
-        $model->stringRangeAttribute = "hi";
+        $model->stringRangeAttribute = 'hi';
 
-        self::assertSame("hi", $model->getAttribute('stringRangeAttribute'));
+        self::assertSame('hi', $model->getAttribute('stringRangeAttribute'));
     }
 
     #[TestWith(['hello'], 'string is longer than limit')]
@@ -2540,7 +2540,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model = new EloquentModelCastingStub;
         try {
             $model->stringRangeAttribute = $string;
-            $this->fail("No exception was thrown");
+            $this->fail('No exception was thrown');
         } catch (\DomainException $exception) {
             self::assertEquals('Length of key [stringRangeAttribute] must be between 1 and 4.', $exception->getMessage());
         }
