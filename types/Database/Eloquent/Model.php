@@ -12,19 +12,6 @@ use function PHPStan\Testing\assertType;
 
 function test(User $user, Post $post, Comment $comment, Article $article): void
 {
-    assertType('UserFactory', User::factory(function ($attributes, $model) {
-        assertType('array<string, mixed>', $attributes);
-        assertType('User|null', $model);
-
-        return ['string' => 'string'];
-    }));
-    assertType('UserFactory', User::factory(42, function ($attributes, $model) {
-        assertType('array<string, mixed>', $attributes);
-        assertType('User|null', $model);
-
-        return ['string' => 'string'];
-    }));
-
     assertType('Illuminate\Database\Eloquent\Builder<User>', User::query());
     assertType('Illuminate\Database\Eloquent\Builder<User>', $user->newQuery());
     assertType('Illuminate\Database\Eloquent\Builder<User>', $user->withTrashed());

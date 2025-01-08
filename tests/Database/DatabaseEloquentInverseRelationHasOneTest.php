@@ -59,7 +59,7 @@ class DatabaseEloquentInverseRelationHasOneTest extends TestCase
 
     public function testHasOneInverseRelationIsProperlySetToParentWhenLazyLoaded()
     {
-        HasOneInverseChildModel::factory(5)->create();
+        HasOneInverseChildModel::factory()->count(5)->create();
         $models = HasOneInverseParentModel::all();
 
         foreach ($models as $parent) {
@@ -72,7 +72,7 @@ class DatabaseEloquentInverseRelationHasOneTest extends TestCase
 
     public function testHasOneInverseRelationIsProperlySetToParentWhenEagerLoaded()
     {
-        HasOneInverseChildModel::factory(5)->create();
+        HasOneInverseChildModel::factory()->count(5)->create();
 
         $models = HasOneInverseParentModel::with('child')->get();
 

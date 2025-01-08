@@ -59,7 +59,7 @@ class DatabaseEloquentInverseRelationMorphOneTest extends TestCase
 
     public function testMorphOneInverseRelationIsProperlySetToParentWhenLazyLoaded()
     {
-        MorphOneInverseImageModel::factory(6)->create();
+        MorphOneInverseImageModel::factory()->count(6)->create();
         $posts = MorphOneInversePostModel::all();
 
         foreach ($posts as $post) {
@@ -72,7 +72,7 @@ class DatabaseEloquentInverseRelationMorphOneTest extends TestCase
 
     public function testMorphOneInverseRelationIsProperlySetToParentWhenEagerLoaded()
     {
-        MorphOneInverseImageModel::factory(6)->create();
+        MorphOneInverseImageModel::factory()->count(6)->create();
         $posts = MorphOneInversePostModel::with('image')->get();
 
         foreach ($posts as $post) {
@@ -85,7 +85,7 @@ class DatabaseEloquentInverseRelationMorphOneTest extends TestCase
 
     public function testMorphOneGuessedInverseRelationIsProperlySetToParentWhenLazyLoaded()
     {
-        MorphOneInverseImageModel::factory(6)->create();
+        MorphOneInverseImageModel::factory()->count(6)->create();
         $posts = MorphOneInversePostModel::all();
 
         foreach ($posts as $post) {
@@ -98,7 +98,7 @@ class DatabaseEloquentInverseRelationMorphOneTest extends TestCase
 
     public function testMorphOneGuessedInverseRelationIsProperlySetToParentWhenEagerLoaded()
     {
-        MorphOneInverseImageModel::factory(6)->create();
+        MorphOneInverseImageModel::factory()->count(6)->create();
         $posts = MorphOneInversePostModel::with('guessedImage')->get();
 
         foreach ($posts as $post) {
