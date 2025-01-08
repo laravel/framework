@@ -19,6 +19,20 @@ class OptimizeClearCommandTest extends TestCase
             ->assertSuccessful()
             ->expectsOutputToContain('ServiceProviderWithOptimizeClear');
     }
+
+    public function testCanExcludeCommandsByKey(): void
+    {
+        $this->artisan('optimize:clear', ['--except' => 'my package'])
+            ->assertSuccessful()
+            ->doesntExpectOutputToContain('my package');
+    }
+
+    public function testCanExcludeCommandsByCommand(): void
+    {
+        $this->artisan('optimize:clear', ['--except' => 'my_package:cache'])
+            ->assertSuccessful()
+            ->doesntExpectOutputToContain('my_package:cache');
+    }
 }
 
 class ServiceProviderWithOptimizeClear extends ServiceProvider
