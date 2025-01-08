@@ -26,8 +26,6 @@ assertType('UserFactory', UserFactory::new(function ($attributes) {
 
 assertType('array<string, mixed>', $factory->definition());
 
-assertType('UserFactory', $factory::times(10));
-
 assertType('UserFactory', $factory->configure());
 
 assertType('array<int|string, mixed>', $factory->raw());

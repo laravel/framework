@@ -183,17 +183,6 @@ abstract class Factory
     }
 
     /**
-     * Get a new factory instance for the given number of models.
-     *
-     * @param  int  $count
-     * @return static
-     */
-    public static function times(int $count)
-    {
-        return static::new()->count($count);
-    }
-
-    /**
      * Configure the factory.
      *
      * @return static

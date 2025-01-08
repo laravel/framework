@@ -17,8 +17,8 @@ class OnceHelperTest extends TestCase
 
     protected function afterRefreshingDatabase()
     {
-        UserFactory::new()->times(3)->create();
-        UserFactory::new()->times(2)->unverified()->create();
+        UserFactory::new()->count(3)->create();
+        UserFactory::new()->count(2)->unverified()->create();
     }
 
     public function testItCanCacheStaticMethodWithoutParameters()

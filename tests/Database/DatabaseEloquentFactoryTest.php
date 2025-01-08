@@ -131,17 +131,17 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertCount(2, $users);
         $this->assertInstanceOf(FactoryTestUser::class, $users->first());
 
-        $users = FactoryTestUserFactory::times(2)->createMany();
+        $users = FactoryTestUserFactory::new()->count(2)->createMany();
         $this->assertInstanceOf(Collection::class, $users);
         $this->assertCount(2, $users);
         $this->assertInstanceOf(FactoryTestUser::class, $users->first());
 
-        $users = FactoryTestUserFactory::times(2)->createMany();
+        $users = FactoryTestUserFactory::new()->count(2)->createMany();
         $this->assertInstanceOf(Collection::class, $users);
         $this->assertCount(2, $users);
         $this->assertInstanceOf(FactoryTestUser::class, $users->first());
 
-        $users = FactoryTestUserFactory::times(3)->createMany([
+        $users = FactoryTestUserFactory::new()->count(3)->createMany([
             ['name' => 'Taylor Otwell'],
             ['name' => 'Jeffrey Way'],
         ]);
@@ -154,7 +154,7 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertCount(1, $users);
         $this->assertInstanceOf(FactoryTestUser::class, $users->first());
 
-        $users = FactoryTestUserFactory::times(10)->create();
+        $users = FactoryTestUserFactory::new()->count(10)->create();
         $this->assertCount(10, $users);
     }
 
@@ -233,7 +233,7 @@ class DatabaseEloquentFactoryTest extends TestCase
 
     public function test_multiple_model_attributes_can_be_created()
     {
-        $posts = FactoryTestPostFactory::new()->times(10)->raw();
+        $posts = FactoryTestPostFactory::new()->count(10)->raw();
         $this->assertIsArray($posts);
 
         $this->assertCount(10, $posts);
@@ -258,9 +258,9 @@ class DatabaseEloquentFactoryTest extends TestCase
 
     public function test_has_many_relationship()
     {
-        $users = FactoryTestUserFactory::times(10)
+        $users = FactoryTestUserFactory::new()->count(10)
             ->has(
-                FactoryTestPostFactory::times(3)
+                FactoryTestPostFactory::new()->count(3)
                     ->state(function ($attributes, $user) {
                         // Test parent is passed to child state mutations...
                         $_SERVER['__test.post.state-user'] = $user;
@@ -289,7 +289,7 @@ class DatabaseEloquentFactoryTest extends TestCase
 
     public function test_belongs_to_relationship()
     {
-        $posts = FactoryTestPostFactory::times(3)
+        $posts = FactoryTestPostFactory::new()->count(3)
             ->for(FactoryTestUserFactory::new(['name' => 'Taylor Otwell']), 'user')
             ->create();
 
@@ -304,7 +304,7 @@ class DatabaseEloquentFactoryTest extends TestCase
     public function test_belongs_to_relationship_with_existing_model_instance()
     {
         $user = FactoryTestUserFactory::new(['name' => 'Taylor Otwell'])->create();
-        $posts = FactoryTestPostFactory::times(3)
+        $posts = FactoryTestPostFactory::new()->count(3)
             ->for($user, 'user')
             ->create();
 
@@ -319,7 +319,7 @@ class DatabaseEloquentFactoryTest extends TestCase
     public function test_belongs_to_relationship_with_existing_model_instance_with_relationship_name_implied_from_model()
     {
         $user = FactoryTestUserFactory::new(['name' => 'Taylor Otwell'])->create();
-        $posts = FactoryTestPostFactory::times(3)
+        $posts = FactoryTestPostFactory::new()->count(3)
             ->for($user)
             ->create();
 
@@ -333,7 +333,7 @@ class DatabaseEloquentFactoryTest extends TestCase
 
     public function test_morph_to_relationship()
     {
-        $posts = FactoryTestCommentFactory::times(3)
+        $posts = FactoryTestCommentFactory::new()->count(3)
             ->for(FactoryTestPostFactory::new(['title' => 'Test Title']), 'commentable')
             ->create();
 
@@ -347,7 +347,7 @@ class DatabaseEloquentFactoryTest extends TestCase
     public function test_morph_to_relationship_with_existing_model_instance()
     {
         $post = FactoryTestPostFactory::new(['title' => 'Test Title'])->create();
-        $posts = FactoryTestCommentFactory::times(3)
+        $posts = FactoryTestCommentFactory::new()->count(3)
             ->for($post, 'commentable')
             ->create();
 
@@ -360,9 +360,9 @@ class DatabaseEloquentFactoryTest extends TestCase
 
     public function test_belongs_to_many_relationship()
     {
-        $users = FactoryTestUserFactory::times(3)
+        $users = FactoryTestUserFactory::new()->count(3)
             ->hasAttached(
-                FactoryTestRoleFactory::times(3)->afterCreating(function ($role, $user) {
+                FactoryTestRoleFactory::new()->count(3)->afterCreating(function ($role, $user) {
                     $_SERVER['__test.role.creating-role'] = $role;
                     $_SERVER['__test.role.creating-user'] = $user;
                 }),
@@ -412,12 +412,12 @@ class DatabaseEloquentFactoryTest extends TestCase
 
     public function test_belongs_to_many_relationship_with_existing_model_instances()
     {
-        $roles = FactoryTestRoleFactory::times(3)
+        $roles = FactoryTestRoleFactory::new()->count(3)
             ->afterCreating(function ($role) {
                 $_SERVER['__test.role.creating-role'] = $role;
             })
             ->create();
-        FactoryTestUserFactory::times(3)
+        FactoryTestUserFactory::new()->count(3)
             ->hasAttached($roles, ['admin' => 'Y'], 'roles')
             ->create();
 
@@ -435,12 +435,12 @@ class DatabaseEloquentFactoryTest extends TestCase
 
     public function test_belongs_to_many_relationship_with_existing_model_instances_using_array()
     {
-        $roles = FactoryTestRoleFactory::times(3)
+        $roles = FactoryTestRoleFactory::new()->count(3)
             ->afterCreating(function ($role) {
                 $_SERVER['__test.role.creating-role'] = $role;
             })
             ->create();
-        FactoryTestUserFactory::times(3)
+        FactoryTestUserFactory::new()->count(3)
             ->hasAttached($roles->toArray(), ['admin' => 'Y'], 'roles')
             ->create();
 
@@ -458,12 +458,12 @@ class DatabaseEloquentFactoryTest extends TestCase
 
     public function test_belongs_to_many_relationship_with_existing_model_instances_with_relationship_name_implied_from_model()
     {
-        $roles = FactoryTestRoleFactory::times(3)
+        $roles = FactoryTestRoleFactory::new()->count(3)
             ->afterCreating(function ($role) {
                 $_SERVER['__test.role.creating-role'] = $role;
             })
             ->create();
-        FactoryTestUserFactory::times(3)
+        FactoryTestUserFactory::new()->count(3)
             ->hasAttached($roles, ['admin' => 'Y'])
             ->create();
 
@@ -481,7 +481,7 @@ class DatabaseEloquentFactoryTest extends TestCase
 
     public function test_sequences()
     {
-        $users = FactoryTestUserFactory::times(2)->sequence(
+        $users = FactoryTestUserFactory::new()->count(2)->sequence(
             ['name' => 'Taylor Otwell'],
             ['name' => 'Abigail Otwell'],
         )->create();
@@ -491,7 +491,7 @@ class DatabaseEloquentFactoryTest extends TestCase
 
         $user = FactoryTestUserFactory::new()
             ->hasAttached(
-                FactoryTestRoleFactory::times(4),
+                FactoryTestRoleFactory::new()->count(4),
                 new Sequence(['admin' => 'Y'], ['admin' => 'N']),
                 'roles'
             )
@@ -507,7 +507,7 @@ class DatabaseEloquentFactoryTest extends TestCase
             return $role->pivot->admin === 'N';
         }));
 
-        $users = FactoryTestUserFactory::times(2)->sequence(function ($sequence) {
+        $users = FactoryTestUserFactory::new()->count(2)->sequence(function ($sequence) {
             return ['name' => 'index: '.$sequence->index];
         })->create();
 
@@ -548,7 +548,7 @@ class DatabaseEloquentFactoryTest extends TestCase
             }
         };
 
-        $usersByClass = FactoryTestUserFactory::times(4)
+        $usersByClass = FactoryTestUserFactory::new()->count(4)
             ->state(
                 new CrossJoinSequence(
                     [['first_name' => 'Thomas'], ['first_name' => 'Agent']],
@@ -559,7 +559,7 @@ class DatabaseEloquentFactoryTest extends TestCase
 
         $assert($usersByClass);
 
-        $usersByMethod = FactoryTestUserFactory::times(4)
+        $usersByMethod = FactoryTestUserFactory::new()->count(4)
             ->crossJoinSequence(
                 [['first_name' => 'Thomas'], ['first_name' => 'Agent']],
                 [['last_name' => 'Anderson'], ['last_name' => 'Smith']],
