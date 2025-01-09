@@ -26,8 +26,8 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
 
     public bool $validateMxRecord = false;
     public bool $preventSpoofing = false;
-    public bool $nativeFilter = false;
-    public bool $nativeFilterWithUnicodeAllowed = false;
+    public bool $nativeValidation = false;
+    public bool $nativeValidationWithUnicodeAllowed = false;
     public bool $rfcCompliant = false;
     public bool $strictRfcCompliant = false;
 
@@ -163,9 +163,9 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
     public function withNativeValidation(bool $allowUnicode = false)
     {
         if ($allowUnicode) {
-            $this->nativeFilterWithUnicodeAllowed = true;
+            $this->nativeValidationWithUnicodeAllowed = true;
         } else {
-            $this->nativeFilter = true;
+            $this->nativeValidation = true;
         }
 
         return $this;
@@ -250,11 +250,11 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
             $rules[] = new SpoofCheckValidation;
         }
 
-        if ($this->nativeFilter) {
+        if ($this->nativeValidation) {
             $rules[] = new FilterEmailValidation;
         }
 
-        if ($this->nativeFilterWithUnicodeAllowed) {
+        if ($this->nativeValidationWithUnicodeAllowed) {
             $rules[] = FilterEmailValidation::unicode();
         }
 
