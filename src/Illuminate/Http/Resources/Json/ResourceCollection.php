@@ -99,7 +99,7 @@ class ResourceCollection extends JsonResource implements Countable, IteratorAggr
      */
     public function toArray(Request $request)
     {
-        return $this->collection->map->toArray($request)->all();
+        return $this->collection->map->only($this->only)->map->toArray($request)->all();
     }
 
     /**

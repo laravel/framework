@@ -18,6 +18,8 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Tests\Integration\Http\Fixtures\Author;
 use Illuminate\Tests\Integration\Http\Fixtures\AuthorResourceWithOptionalRelationship;
 use Illuminate\Tests\Integration\Http\Fixtures\EmptyPostCollectionResource;
+use Illuminate\Tests\Integration\Http\Fixtures\FilterableObjectResource;
+use Illuminate\Tests\Integration\Http\Fixtures\FilterableObjectResourceWithCallableFields;
 use Illuminate\Tests\Integration\Http\Fixtures\ObjectResource;
 use Illuminate\Tests\Integration\Http\Fixtures\Post;
 use Illuminate\Tests\Integration\Http\Fixtures\PostCollectionResource;
@@ -1851,6 +1853,80 @@ class ResourceTest extends TestCase
         } finally {
             Model::preventAccessingMissingAttributes($originalMode);
         }
+    }
+
+    public function testResourceFieldsCanBeFiltered()
+    {
+        Route::get('/', function () {
+            return FilterableObjectResource::make((object)['id' => 32, 'first_name' => 'Mouhcine', 'last_name' => 'Mahfoud', 'address' => 'somewhere'])->only(['id', 'address']);
+        });
+
+        $this->withoutExceptionHandling()
+            ->get('/', ['Accept' => 'application/json'])
+            ->assertStatus(200)
+            ->assertExactJson([
+                'data' => [
+                    'id'      => 32,
+                    'address' => 'somewhere',
+                ],
+            ]);
+    }
+
+    public function testResourceCollectionFieldsCanBeFiltered()
+    {
+        Route::get('/', function () {
+            $objects = [
+                (object)['id' => 1, 'first_name' => 'Mouhcine', 'last_name' => 'Mahfoud', 'address' => 'somewhere here'],
+                (object)['id' => 2, 'first_name' => 'Mahfoud', 'last_name' => 'Mouhcine', 'address' => 'somewhere there'],
+            ];
+
+            return FilterableObjectResource::collection($objects)->only(['full_name']);
+        });
+
+        $this->withoutExceptionHandling()
+            ->get('/', ['Accept' => 'application/json'])
+            ->assertStatus(200)
+            ->assertExactJson([
+                'data' => [
+                    ['full_name' => 'Mouhcine Mahfoud'],
+                    ['full_name' => 'Mahfoud Mouhcine'],
+                ],
+            ]);
+    }
+
+
+    public function testResourceCollectionFieldsAreAllReturnedWhenNoFiltersAreSpecified()
+    {
+        Route::get('/', function () {
+            $objects = [
+                (object)['id' => 1, 'first_name' => 'Mouhcine', 'last_name' => 'Mahfoud', 'address' => 'somewhere here'],
+                (object)['id' => 2, 'first_name' => 'Mahfoud', 'last_name' => 'Mouhcine', 'address' => 'somewhere there'],
+            ];
+
+            return FilterableObjectResource::collection($objects);
+        });
+
+        $this->withoutExceptionHandling()
+            ->get('/', ['Accept' => 'application/json'])
+            ->assertStatus(200)
+            ->assertExactJson([
+                'data' => [
+                    ['id' => 1, 'full_name' => 'Mouhcine Mahfoud', 'address' => 'somewhere here'],
+                    ['id' => 2, 'full_name' => 'Mahfoud Mouhcine', 'address' => 'somewhere there'],
+                ],
+            ]);
+    }
+
+    public function testResourceFieldsAreEvaluatedWhenIncludedInOnlyFilter()
+    {
+        Route::get('/', function () {
+            return FilterableObjectResourceWithCallableFields::make((object)['id' => 32, 'first_name' => 'Mouhcine', 'last_name' => 'Mahfoud'])->only(['id', 'full_name', 'addresses']);
+        });
+
+        $this->expectExceptionMessage('This should be evaluated only if requested, like an eager relationship.');
+
+        $this->withoutExceptionHandling()
+            ->get('/', ['Accept' => 'application/json']);
     }
 
     private function assertJsonResourceResponse($data, $expectedJson)
