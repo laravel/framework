@@ -3568,7 +3568,7 @@ class Builder implements BuilderContract
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $columns
      * @return \Illuminate\Support\Collection
      */
-    public function countByGroup($columns = '*'): Collection
+    public function countByGroup($columns = '*')
     {
         return $this->aggregateByGroup('count', Arr::wrap($columns));
     }
@@ -3590,7 +3590,7 @@ class Builder implements BuilderContract
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
      * @return \Illuminate\Support\Collection
      */
-    public function minByGroup($column): Collection
+    public function minByGroup($column)
     {
         return $this->aggregateByGroup('min', [$column]);
     }
@@ -3612,7 +3612,7 @@ class Builder implements BuilderContract
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
      * @return \Illuminate\Support\Collection
      */
-    public function maxByGroup($column): Collection
+    public function maxByGroup($column)
     {
         return $this->aggregateByGroup('max', [$column]);
     }
@@ -3636,7 +3636,7 @@ class Builder implements BuilderContract
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
      * @return \Illuminate\Support\Collection
      */
-    public function sumByGroup($column): Collection
+    public function sumByGroup($column)
     {
         return $this->aggregateByGroup('sum', [$column]);
     }
@@ -3658,7 +3658,7 @@ class Builder implements BuilderContract
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
      * @return \Illuminate\Support\Collection
      */
-    public function avgByGroup($column): Collection
+    public function avgByGroup($column)
     {
         return $this->aggregateByGroup('avg', [$column]);
     }
@@ -3694,14 +3694,13 @@ class Builder implements BuilderContract
     }
 
     /**
-     * Execute an aggregate function for each group and return the results
-     * in a collection of objects with the group columns and aggregate value.
+     * Execute an aggregate function for each group.
      *
-     * @param  string  $function  The aggregate function to call
-     * @param  array  $columns  The columns to perform the aggregate function on
+     * @param  string  $function
+     * @param  array  $columns
      * @return \Illuminate\Support\Collection
      */
-    public function aggregateByGroup(string $function, array $columns = ['*']): Collection
+    public function aggregateByGroup(string $function, array $columns = ['*'])
     {
         return $this->cloneWithout($this->unions || $this->havings ? [] : ['columns'])
                     ->cloneWithoutBindings($this->unions || $this->havings ? [] : ['select'])
