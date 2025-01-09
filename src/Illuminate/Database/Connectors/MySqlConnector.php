@@ -23,8 +23,9 @@ class MySqlConnector extends Connector implements ConnectorInterface
         // connection's behavior, and some might be specified by the developers.
         $connection = $this->createConnection($dsn, $config, $options);
 
-        // Allow skipping of explicit `USE database` statement.
-        if (! empty($config['database']) && (! isset($config['explicit_use_db']) || $config['explicit_use_db'])) {
+        if (! empty($config['database']) && 
+            (! isset($config['use_db_after_connecting']) || 
+             $config['use_db_after_connecting'])) {
             $connection->exec("use `{$config['database']}`;");
         }
 
