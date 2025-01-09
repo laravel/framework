@@ -99,6 +99,38 @@ class FilesystemManagerTest extends TestCase
         }
     }
 
+    public function testCanBuildScopedDiskFromScopedDisk()
+    {
+        try {
+            $filesystem = new FilesystemManager(tap(new Application, function ($app) {
+                $app['config'] = [
+                    'filesystems.disks.local' => [
+                        'driver' => 'local',
+                        'root' => 'root-to-be-scoped',
+                    ],
+                    'filesystems.disks.scoped-from-root' => [
+                        'driver' => 'scoped',
+                        'disk' => 'local',
+                        'prefix' => 'scoped-from-root-prefix',
+                    ],
+                ];
+            }));
+
+            $root = $filesystem->disk('local');
+            $nestedScoped = $filesystem->build([
+                'driver' => 'scoped',
+                'disk' => 'scoped-from-root',
+                'prefix' => 'nested-scoped-prefix',
+            ]);
+
+            $nestedScoped->put('dirname/filename.txt', 'file content');
+            $this->assertEquals('file content', $root->get('scoped-from-root-prefix/nested-scoped-prefix/dirname/filename.txt'));
+            $root->deleteDirectory('scoped-from-root-prefix');
+        } finally {
+            rmdir(__DIR__.'/../../root-to-be-scoped');
+        }
+    }
+
     #[RequiresOperatingSystem('Linux|Darwin')]
     public function testCanBuildScopedDisksWithVisibility()
     {
