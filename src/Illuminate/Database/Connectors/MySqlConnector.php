@@ -24,7 +24,7 @@ class MySqlConnector extends Connector implements ConnectorInterface
         $connection = $this->createConnection($dsn, $config, $options);
 
         if (! empty($config['database']) && 
-            (! isset($config['use_db_after_connecting']) || 
+            (! isset($config['use_db_after_connecting']) ||
              $config['use_db_after_connecting'])) {
             $connection->exec("use `{$config['database']}`;");
         }
