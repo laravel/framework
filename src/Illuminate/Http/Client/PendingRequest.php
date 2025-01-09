@@ -941,7 +941,7 @@ class PendingRequest
                 $exception = new ConnectionException($e->getMessage(), 0, $e);
                 $request = new Request($e->getRequest());
 
-                $this->factory->recordRequestResponsePair($request, null);
+                $this->factory?->recordRequestResponsePair($request, null);
 
                 $this->dispatchConnectionFailedEvent($request, $exception);
 
