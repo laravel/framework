@@ -7,6 +7,7 @@ use Illuminate\Support\Traits\Macroable;
 use Illuminate\Validation\Rules\ArrayRule;
 use Illuminate\Validation\Rules\Can;
 use Illuminate\Validation\Rules\Dimensions;
+use Illuminate\Validation\Rules\Email;
 use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\Rules\ExcludeIf;
 use Illuminate\Validation\Rules\Exists;
@@ -167,6 +168,16 @@ class Rule
     public static function prohibitedIf($callback)
     {
         return new ProhibitedIf($callback);
+    }
+
+    /**
+     * Get an email rule builder instance.
+     *
+     * @return \Illuminate\Validation\Rules\Email
+     */
+    public static function email()
+    {
+        return new Email;
     }
 
     /**
