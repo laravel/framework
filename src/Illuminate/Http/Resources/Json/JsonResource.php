@@ -20,7 +20,7 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     use ConditionallyLoadsAttributes, DelegatesToResource;
 
     /**
-     * The only fields that should be evaluated and returned when resource is displayed
+     * The only fields that should be evaluated and returned when resource is displayed.
      *
      * @var array
      */
@@ -126,9 +126,9 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     }
 
     /**
-     * Returns the default fields that define a resource, which will be filtered when 'only' filter is used
+     * Returns the default fields that define a resource, which will be filtered when 'only' filter is used.
      *
-     * @param Request $request
+     * @param  Request  $request
      * @return array
      */
     public function defaultToArray(Request $request)
@@ -144,7 +144,7 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
      */
     public function toArray(Request $request)
     {
-        if (!empty($this->defaultToArray($request))) {
+        if (! empty($this->defaultToArray($request))) {
             return $this->applyOnlyFilter($this->defaultToArray($request));
         }
 
@@ -177,9 +177,9 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     }
 
     /**
-     * Set the only fields to be evaluated and returned when a resource is displayed
+     * Set the only fields to be evaluated and returned when a resource is displayed.
      *
-     * @param array $only
+     * @param  array  $only
      * @return $this
      */
     public function only(array $only)
@@ -293,17 +293,17 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     /**
      * Evaluates and returns only the desired fields from default fields when 'only' filter is used.
      *
-     * @param array $default_fields
+     * @param  array  $default_fields
      * @return array
      */
     public function applyOnlyFilter(array $default_fields): array
     {
         return array_map(
-            fn($item) => is_callable($item) ? $item() : $item,
-            !empty($this->only)
+            fn ($item) => is_callable($item) ? $item() : $item,
+            ! empty($this->only)
                 ? array_filter(
-                $default_fields,
-                fn($key) => in_array($key, $this->only ?? []), ARRAY_FILTER_USE_KEY)
+                    $default_fields,
+                    fn ($key) => in_array($key, $this->only ?? []), ARRAY_FILTER_USE_KEY)
                 : $default_fields
         );
     }

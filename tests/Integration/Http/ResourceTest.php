@@ -1858,7 +1858,7 @@ class ResourceTest extends TestCase
     public function testResourceFieldsCanBeFiltered()
     {
         Route::get('/', function () {
-            return FilterableObjectResource::make((object)['id' => 32, 'first_name' => 'Mouhcine', 'last_name' => 'Mahfoud', 'address' => 'somewhere'])->only(['id', 'address']);
+            return FilterableObjectResource::make((object) ['id' => 32, 'first_name' => 'Mouhcine', 'last_name' => 'Mahfoud', 'address' => 'somewhere'])->only(['id', 'address']);
         });
 
         $this->withoutExceptionHandling()
@@ -1866,7 +1866,7 @@ class ResourceTest extends TestCase
             ->assertStatus(200)
             ->assertExactJson([
                 'data' => [
-                    'id'      => 32,
+                    'id' => 32,
                     'address' => 'somewhere',
                 ],
             ]);
@@ -1876,8 +1876,8 @@ class ResourceTest extends TestCase
     {
         Route::get('/', function () {
             $objects = [
-                (object)['id' => 1, 'first_name' => 'Mouhcine', 'last_name' => 'Mahfoud', 'address' => 'somewhere here'],
-                (object)['id' => 2, 'first_name' => 'Mahfoud', 'last_name' => 'Mouhcine', 'address' => 'somewhere there'],
+                (object) ['id' => 1, 'first_name' => 'Mouhcine', 'last_name' => 'Mahfoud', 'address' => 'somewhere here'],
+                (object) ['id' => 2, 'first_name' => 'Mahfoud', 'last_name' => 'Mouhcine', 'address' => 'somewhere there'],
             ];
 
             return FilterableObjectResource::collection($objects)->only(['full_name']);
@@ -1894,13 +1894,12 @@ class ResourceTest extends TestCase
             ]);
     }
 
-
     public function testResourceCollectionFieldsAreAllReturnedWhenNoFiltersAreSpecified()
     {
         Route::get('/', function () {
             $objects = [
-                (object)['id' => 1, 'first_name' => 'Mouhcine', 'last_name' => 'Mahfoud', 'address' => 'somewhere here'],
-                (object)['id' => 2, 'first_name' => 'Mahfoud', 'last_name' => 'Mouhcine', 'address' => 'somewhere there'],
+                (object) ['id' => 1, 'first_name' => 'Mouhcine', 'last_name' => 'Mahfoud', 'address' => 'somewhere here'],
+                (object) ['id' => 2, 'first_name' => 'Mahfoud', 'last_name' => 'Mouhcine', 'address' => 'somewhere there'],
             ];
 
             return FilterableObjectResource::collection($objects);
@@ -1920,7 +1919,7 @@ class ResourceTest extends TestCase
     public function testResourceFieldsAreEvaluatedWhenIncludedInOnlyFilter()
     {
         Route::get('/', function () {
-            return FilterableObjectResourceWithCallableFields::make((object)['id' => 32, 'first_name' => 'Mouhcine', 'last_name' => 'Mahfoud'])->only(['id', 'full_name', 'addresses']);
+            return FilterableObjectResourceWithCallableFields::make((object) ['id' => 32, 'first_name' => 'Mouhcine', 'last_name' => 'Mahfoud'])->only(['id', 'full_name', 'addresses']);
         });
 
         $this->expectExceptionMessage('This should be evaluated only if requested, like an eager relationship.');
