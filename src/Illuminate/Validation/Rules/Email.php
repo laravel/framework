@@ -24,17 +24,26 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
 {
     use Conditionable, Macroable;
 
-    public bool $rfcCompliantStrict = false;
-
-    public bool $verifyMxRecord = false;
-
-    public bool $preventEmailSpoofing = false;
-
+    public bool $validateMxRecord = false;
+    public bool $preventSpoofing = false;
     public bool $nativeFilter = false;
-
     public bool $nativeFilterWithUnicodeAllowed = false;
-
     public bool $rfcCompliant = false;
+    public bool $strictRfcCompliant = false;
+
+    /**
+     * The validator performing the validation.
+     *
+     * @var \Illuminate\Validation\Validator
+     */
+    protected $validator;
+
+    /**
+     * The data under validation.
+     *
+     * @var array
+     */
+    protected $data;
 
     /**
      * An array of custom rules that will be merged into the validation rules.
@@ -49,20 +58,6 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
      * @var array
      */
     protected $messages = [];
-
-    /**
-     * The data under validation.
-     *
-     * @var array
-     */
-    protected $data;
-
-    /**
-     * The validator performing the validation.
-     *
-     * @var \Illuminate\Validation\Validator
-     */
-    protected $validator;
 
     /**
      * The callback that will generate the "default" version of the file rule.
@@ -103,31 +98,19 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
             ? call_user_func(static::$defaultCallback)
             : static::$defaultCallback;
 
-        return $email instanceof self ? $email : new self();
+        return $email instanceof static ? $email : new static;
     }
 
     /**
-     * A strict rule set which includes DNS and Spoof checks.
+     * Ensure that the email is an RFC compliant email address.
      *
-     * @return static
-     */
-    public static function strictSecurity()
-    {
-        return (new self())
-            ->rfcCompliant(true)
-            ->verifyMxRecord()
-            ->preventEmailSpoofing();
-    }
-
-    /**
-     * Validate against RFCValidation.
-     *
+     * @param  bool  $strict
      * @return $this
      */
     public function rfcCompliant(bool $strict = false)
     {
         if ($strict) {
-            $this->rfcCompliantStrict = true;
+            $this->strictRfcCompliant = true;
         } else {
             $this->rfcCompliant = true;
         }
@@ -135,45 +118,51 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
         return $this;
     }
 
+    /**
+     * Ensure that the email is a strictly enforced RFC compliant email address.
+     *
+     * @return $this
+     */
     public function strict()
     {
         return $this->rfcCompliant(true);
     }
 
     /**
-     * Validate against DNSCheckValidation.
+     * Ensure that the email address has a valid MX record.
+     *
      * Requires the PHP intl extension.
      *
      * @return $this
      */
-    public function verifyMxRecord()
+    public function validateMxRecord()
     {
-        $this->verifyMxRecord = true;
+        $this->validateMxRecord = true;
 
         return $this;
     }
 
     /**
-     * Validate against SpoofCheckValidation.
-     * Requires the PHP intl extension.
+     * Ensure that the email address is not attempting to spoof another email address using invalid unicode characters.
      *
      * @return $this
      */
-    public function preventEmailSpoofing()
+    public function preventSpoofing()
     {
-        $this->preventEmailSpoofing = true;
+        $this->preventSpoofing = true;
 
         return $this;
     }
 
     /**
-     * Validate against FilterEmailValidation.
+     * Ensure the email address is valid using PHP's native email validation functions.
      *
+     * @param  bool  $allowUnicode
      * @return $this
      */
-    public function nativeFilter(bool $unicodeAllowed = false)
+    public function withNativeValidation(bool $allowUnicode = false)
     {
-        if ($unicodeAllowed) {
+        if ($allowUnicode) {
             $this->nativeFilterWithUnicodeAllowed = true;
         } else {
             $this->nativeFilter = true;
@@ -249,15 +238,15 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
             $rules[] = new RFCValidation;
         }
 
-        if ($this->rfcCompliantStrict) {
+        if ($this->strictRfcCompliant) {
             $rules[] = new NoRFCWarningsValidation;
         }
 
-        if ($this->verifyMxRecord) {
+        if ($this->validateMxRecord) {
             $rules[] = new DNSCheckValidation;
         }
 
-        if ($this->preventEmailSpoofing) {
+        if ($this->preventSpoofing) {
             $rules[] = new SpoofCheckValidation;
         }
 
