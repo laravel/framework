@@ -948,6 +948,7 @@ class Builder implements BuilderContract
         // the results and mutate the values so that the mutated version of these
         // columns are returned as you would expect from these Eloquent models.
         if (! $this->model->hasGetMutator($column) &&
+            ! $this->model->hasAttributeGetMutator($column) &&
             ! $this->model->hasCast($column) &&
             ! in_array($column, $this->model->getDates())) {
             return $results;
