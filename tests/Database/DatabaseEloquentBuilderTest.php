@@ -626,20 +626,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->getQuery()->shouldReceive('pluck')->with('name', '')->andReturn(new BaseCollection(['bar', 'baz']));
         $builder->setModel($this->getMockModel());
-        $builder->getModel()->shouldReceive('hasGetMutator')->with('name')->andReturn(true);
-        $builder->getModel()->shouldReceive('newFromBuilder')->with(['name' => 'bar'])->andReturn(new EloquentBuilderTestPluckStub(['name' => 'bar']));
-        $builder->getModel()->shouldReceive('newFromBuilder')->with(['name' => 'baz'])->andReturn(new EloquentBuilderTestPluckStub(['name' => 'baz']));
-
-        $this->assertEquals(['foo_bar', 'foo_baz'], $builder->pluck('name')->all());
-    }
-
-    public function testPluckReturnsTheMutatedAttributesOfAModelWithAttributeReturn()
-    {
-        $builder = $this->getBuilder();
-        $builder->getQuery()->shouldReceive('pluck')->with('name', '')->andReturn(new BaseCollection(['bar', 'baz']));
-        $builder->setModel($this->getMockModel());
-        $builder->getModel()->shouldReceive('hasGetMutator')->with('name')->andReturn(false);
-        $builder->getModel()->shouldReceive('hasAttributeGetMutator')->with('name')->andReturn(true);
+        $builder->getModel()->shouldReceive('hasAnyGetMutator')->with('name')->andReturn(true);
         $builder->getModel()->shouldReceive('newFromBuilder')->with(['name' => 'bar'])->andReturn(new EloquentBuilderTestPluckStub(['name' => 'bar']));
         $builder->getModel()->shouldReceive('newFromBuilder')->with(['name' => 'baz'])->andReturn(new EloquentBuilderTestPluckStub(['name' => 'baz']));
 
@@ -651,8 +638,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->getQuery()->shouldReceive('pluck')->with('name', '')->andReturn(new BaseCollection(['bar', 'baz']));
         $builder->setModel($this->getMockModel());
-        $builder->getModel()->shouldReceive('hasGetMutator')->with('name')->andReturn(false);
-        $builder->getModel()->shouldReceive('hasAttributeGetMutator')->with('name')->andReturn(false);
+        $builder->getModel()->shouldReceive('hasAnyGetMutator')->with('name')->andReturn(false);
         $builder->getModel()->shouldReceive('hasCast')->with('name')->andReturn(true);
         $builder->getModel()->shouldReceive('newFromBuilder')->with(['name' => 'bar'])->andReturn(new EloquentBuilderTestPluckStub(['name' => 'bar']));
         $builder->getModel()->shouldReceive('newFromBuilder')->with(['name' => 'baz'])->andReturn(new EloquentBuilderTestPluckStub(['name' => 'baz']));
@@ -665,8 +651,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->getQuery()->shouldReceive('pluck')->with('created_at', '')->andReturn(new BaseCollection(['2010-01-01 00:00:00', '2011-01-01 00:00:00']));
         $builder->setModel($this->getMockModel());
-        $builder->getModel()->shouldReceive('hasGetMutator')->with('created_at')->andReturn(false);
-        $builder->getModel()->shouldReceive('hasAttributeGetMutator')->with('created_at')->andReturn(false);
+        $builder->getModel()->shouldReceive('hasAnyGetMutator')->with('created_at')->andReturn(false);
         $builder->getModel()->shouldReceive('hasCast')->with('created_at')->andReturn(false);
         $builder->getModel()->shouldReceive('getDates')->andReturn(['created_at']);
         $builder->getModel()->shouldReceive('newFromBuilder')->with(['created_at' => '2010-01-01 00:00:00'])->andReturn(new EloquentBuilderTestPluckDatesStub(['created_at' => '2010-01-01 00:00:00']));
@@ -683,23 +668,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->getQuery()->shouldReceive('pluck')->with($model->qualifyColumn('name'), '')->andReturn(new BaseCollection(['bar', 'baz']));
         $builder->setModel($model);
-        $builder->getModel()->shouldReceive('hasGetMutator')->with('name')->andReturn(true);
-        $builder->getModel()->shouldReceive('newFromBuilder')->with(['name' => 'bar'])->andReturn(new EloquentBuilderTestPluckStub(['name' => 'bar']));
-        $builder->getModel()->shouldReceive('newFromBuilder')->with(['name' => 'baz'])->andReturn(new EloquentBuilderTestPluckStub(['name' => 'baz']));
-
-        $this->assertEquals(['foo_bar', 'foo_baz'], $builder->pluck($model->qualifyColumn('name'))->all());
-    }
-
-    public function testQualifiedPluckReturnsTheMutatedAttributesOfAModelWithAttributeReturn()
-    {
-        $model = $this->getMockModel();
-        $model->shouldReceive('qualifyColumn')->with('name')->andReturn('foo_table.name');
-
-        $builder = $this->getBuilder();
-        $builder->getQuery()->shouldReceive('pluck')->with($model->qualifyColumn('name'), '')->andReturn(new BaseCollection(['bar', 'baz']));
-        $builder->setModel($model);
-        $builder->getModel()->shouldReceive('hasGetMutator')->with('name')->andReturn(false);
-        $builder->getModel()->shouldReceive('hasAttributeGetMutator')->with('name')->andReturn(true);
+        $builder->getModel()->shouldReceive('hasAnyGetMutator')->with('name')->andReturn(true);
         $builder->getModel()->shouldReceive('newFromBuilder')->with(['name' => 'bar'])->andReturn(new EloquentBuilderTestPluckStub(['name' => 'bar']));
         $builder->getModel()->shouldReceive('newFromBuilder')->with(['name' => 'baz'])->andReturn(new EloquentBuilderTestPluckStub(['name' => 'baz']));
 
@@ -714,8 +683,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->getQuery()->shouldReceive('pluck')->with($model->qualifyColumn('name'), '')->andReturn(new BaseCollection(['bar', 'baz']));
         $builder->setModel($model);
-        $builder->getModel()->shouldReceive('hasGetMutator')->with('name')->andReturn(false);
-        $builder->getModel()->shouldReceive('hasAttributeGetMutator')->with('name')->andReturn(false);
+        $builder->getModel()->shouldReceive('hasAnyGetMutator')->with('name')->andReturn(false);
         $builder->getModel()->shouldReceive('hasCast')->with('name')->andReturn(true);
         $builder->getModel()->shouldReceive('newFromBuilder')->with(['name' => 'bar'])->andReturn(new EloquentBuilderTestPluckStub(['name' => 'bar']));
         $builder->getModel()->shouldReceive('newFromBuilder')->with(['name' => 'baz'])->andReturn(new EloquentBuilderTestPluckStub(['name' => 'baz']));
@@ -731,8 +699,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->getQuery()->shouldReceive('pluck')->with($model->qualifyColumn('created_at'), '')->andReturn(new BaseCollection(['2010-01-01 00:00:00', '2011-01-01 00:00:00']));
         $builder->setModel($model);
-        $builder->getModel()->shouldReceive('hasGetMutator')->with('created_at')->andReturn(false);
-        $builder->getModel()->shouldReceive('hasAttributeGetMutator')->with('created_at')->andReturn(false);
+        $builder->getModel()->shouldReceive('hasAnyGetMutator')->with('created_at')->andReturn(false);
         $builder->getModel()->shouldReceive('hasCast')->with('created_at')->andReturn(false);
         $builder->getModel()->shouldReceive('getDates')->andReturn(['created_at']);
         $builder->getModel()->shouldReceive('newFromBuilder')->with(['created_at' => '2010-01-01 00:00:00'])->andReturn(new EloquentBuilderTestPluckDatesStub(['created_at' => '2010-01-01 00:00:00']));
@@ -746,8 +713,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->getQuery()->shouldReceive('pluck')->with('name', '')->andReturn(new BaseCollection(['bar', 'baz']));
         $builder->setModel($this->getMockModel());
-        $builder->getModel()->shouldReceive('hasGetMutator')->with('name')->andReturn(false);
-        $builder->getModel()->shouldReceive('hasAttributeGetMutator')->with('name')->andReturn(false);
+        $builder->getModel()->shouldReceive('hasAnyGetMutator')->with('name')->andReturn(false);
         $builder->getModel()->shouldReceive('hasCast')->with('name')->andReturn(false);
         $builder->getModel()->shouldReceive('getDates')->andReturn(['created_at']);
 
