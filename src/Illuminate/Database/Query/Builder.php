@@ -3562,8 +3562,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     * Retrieve the "count" of the distinct results of a given column
-     * for each group.
+     * Retrieve the "count" of the distinct results of a given column for each group.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $columns
      * @return \Illuminate\Support\Collection
