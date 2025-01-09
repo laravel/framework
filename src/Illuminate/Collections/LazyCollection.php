@@ -844,6 +844,20 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     }
 
     /**
+     * Run an associative map over each of the item's values filtered by their key.
+     *
+     * The callback should return the same resultset with the modified values of the given keys.
+     *
+     * @param  string|array  $keys
+     * @param  callable  $callback
+     * @return static
+     */
+    public function mapByKey($keys, callable $callback)
+    {
+        return $this->passthru('mapByKey', func_get_args());
+    }
+
+    /**
      * Merge the collection with the given items.
      *
      * @param  \Illuminate\Contracts\Support\Arrayable<TKey, TValue>|iterable<TKey, TValue>  $items
