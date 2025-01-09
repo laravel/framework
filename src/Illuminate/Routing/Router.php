@@ -258,7 +258,7 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     public function redirect($uri, $destination, $status = 302)
     {
-        return $this->any($uri, '\Illuminate\Routing\RedirectController')
+        return $this->any($uri, \Illuminate\Routing\RedirectController::class)
                 ->defaults('destination', $destination)
                 ->defaults('status', $status);
     }
@@ -287,7 +287,7 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     public function view($uri, $view, $data = [], $status = 200, array $headers = [])
     {
-        return $this->match(['GET', 'HEAD'], $uri, '\Illuminate\Routing\ViewController')
+        return $this->match(['GET', 'HEAD'], $uri, \Illuminate\Routing\ViewController::class)
                 ->setDefaults([
                     'view' => $view,
                     'data' => $data,
