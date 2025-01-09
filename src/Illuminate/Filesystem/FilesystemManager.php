@@ -302,6 +302,7 @@ class FilesystemManager implements FactoryContract
                     $parent['prefix'] = $config['prefix'];
                 } else {
                     $separator = $parent['directory_separator'] ?? DIRECTORY_SEPARATOR;
+
                     $parentPrefix = rtrim($parent['prefix'], $separator);
                     $scopedPrefix = ltrim($config['prefix'], $separator);
 
