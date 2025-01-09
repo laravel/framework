@@ -77,7 +77,7 @@ class OptimizeClearCommand extends Command
     protected function getOptions()
     {
         return [
-            ['except', 'e', InputOption::VALUE_OPTIONAL, 'Do not run the commands matching the key or name'],
+            ['except', 'e', InputOption::VALUE_OPTIONAL, 'The commands to skip'],
         ];
     }
 }
