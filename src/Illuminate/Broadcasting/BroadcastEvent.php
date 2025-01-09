@@ -143,7 +143,7 @@ class BroadcastEvent implements ShouldQueue
      * @param  string  $connection
      * @return array
      */
-    protected function getConnectionChannels($channels, $connection): array
+    protected function getConnectionChannels($channels, $connection)
     {
         return is_array($channels[$connection] ?? null)
             ? $channels[$connection]
@@ -157,7 +157,7 @@ class BroadcastEvent implements ShouldQueue
      * @param  string  $connection
      * @return array
      */
-    protected function getConnectionPayload($payload, $connection): array
+    protected function getConnectionPayload($payload, $connection)
     {
         $connectionPayload = is_array($payload[$connection] ?? null)
             ? $payload[$connection]
