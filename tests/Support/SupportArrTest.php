@@ -6,6 +6,8 @@ use ArrayObject;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Number;
+use Illuminate\Support\Str;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use stdClass;
@@ -800,6 +802,60 @@ class SupportArrTest extends TestCase
 
         $this->assertEquals(
             ['Blastoise' => 'Water', 'Charmander' => 'Fire', 'Dragonair' => 'Dragon'],
+            $data
+        );
+    }
+
+    public function testMapByKey()
+    {
+        $invoices = [
+            ['recipient' => 'Dries', 'currency' => 'USD', 'amount' => 1],
+            ['recipient' => 'Taylor', 'currency' => 'USD', 'amount' => 25.67],
+            ['recipient' => 'Nuno', 'currency' => 'EUR', 'amount' => 123987],
+        ];
+
+        $invoices = Arr::mapByKey($invoices, 'amount', function ($value, $key, $row) {
+            return Number::currency($value, $row['currency']);
+        });
+
+        $this->assertEquals(
+            [
+                ['recipient' => 'Dries', 'currency' => 'USD', 'amount' => '$1.00'],
+                ['recipient' => 'Taylor', 'currency' => 'USD', 'amount' => '$25.67'],
+                ['recipient' => 'Nuno', 'currency' => 'EUR', 'amount' => '€123,987.00'],
+            ],
+            $invoices
+        );
+
+        $posts = [
+            ['title' => 'Hello World', 'body' => '# Hello World', 'preview' => 'Test *post*'],
+            ['title' => 'New Release', 'body' => '**New Release**', 'preview' => '**Release notes**'],
+        ];
+
+        $posts = Arr::mapByKey($posts, ['body', 'preview'], fn ($value) => Str::markdown($value));
+
+        $this->assertEquals(
+            [
+                ['title' => 'Hello World', 'body' => "<h1>Hello World</h1>\n", 'preview' => "<p>Test <em>post</em></p>\n"],
+                ['title' => 'New Release', 'body' => "<p><strong>New Release</strong></p>\n", 'preview' => "<p><strong>Release notes</strong></p>\n"],
+            ],
+            $posts
+        );
+
+        $data = [
+            ['foo' => 'Dries', 'bar' => 'Joe', 'baz' => 'Jess'],
+            ['foo' => 'Taylor', 'baz' => 'James'],
+            ['bar' => 'Nuno'],
+        ];
+
+        $data = Arr::mapByKey($data, ['bar', 'baz'], fn ($value) => Str::lower($value));
+
+        $this->assertEquals(
+            [
+                ['foo' => 'Dries', 'bar' => 'joe', 'baz' => 'jess'],
+                ['foo' => 'Taylor', 'baz' => 'james'],
+                ['bar' => 'nuno'],
+            ],
             $data
         );
     }

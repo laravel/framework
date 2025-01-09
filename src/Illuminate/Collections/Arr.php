@@ -644,6 +644,35 @@ class Arr
     }
 
     /**
+     * Run an associative map over each of the item's values filtered by their key.
+     *
+     * The callback should return the same resultset with the modified values of the given keys.
+     *
+     * @param  array  $array
+     * @param  string|array  $keys
+     * @param  callable  $callback
+     * @return array
+     */
+    public static function mapByKey(array $array, $keys, callable $callback)
+    {
+        $result = [];
+
+        foreach ($array as $parentKey => $row) {
+            foreach ($row as $key => $value) {
+                if (! in_array($key, (array) $keys, true)) {
+                    $result[$parentKey][$key] = $value;
+
+                    continue;
+                }
+
+                $result[$parentKey][$key] = $callback($value, $key, $row);
+            }
+        }
+
+        return $result;
+    }
+
+    /**
      * Run a map over each nested chunk of items.
      *
      * @template TKey

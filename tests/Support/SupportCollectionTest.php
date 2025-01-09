@@ -3054,6 +3054,27 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testMapByKey($collection)
+    {
+        $data = new $collection([
+            ['foo' => 'Dries', 'bar' => 'Joe', 'baz' => 'Jess'],
+            ['foo' => 'Taylor', 'baz' => 'James'],
+            ['bar' => 'Nuno'],
+        ]);
+
+        $data = $data->mapByKey(['bar', 'baz'], fn ($value) => Str::lower($value));
+
+        $this->assertEquals(
+            [
+                ['foo' => 'Dries', 'bar' => 'joe', 'baz' => 'jess'],
+                ['foo' => 'Taylor', 'baz' => 'james'],
+                ['bar' => 'nuno'],
+            ],
+            $data->all()
+        );
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testMapInto($collection)
     {
         $data = new $collection([
