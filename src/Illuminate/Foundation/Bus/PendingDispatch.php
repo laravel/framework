@@ -179,7 +179,7 @@ class PendingDispatch
     /**
      * Get the underlying job instance.
      *
-     * @var mixed
+     * @return mixed
      */
     public function getJob()
     {
