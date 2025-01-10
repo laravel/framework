@@ -16,7 +16,7 @@ trait Dispatchable
      */
     public static function dispatch(...$arguments)
     {
-        return new PendingDispatch(new static(...$arguments));
+        return static::createPendingDispatch(new static(...$arguments));
     }
 
     /**
@@ -32,12 +32,12 @@ trait Dispatchable
             $dispatchable = new static(...$arguments);
 
             return value($boolean, $dispatchable)
-                ? new PendingDispatch($dispatchable)
+                ? static::createPendingDispatch($dispatchable)
                 : new Fluent;
         }
 
         return value($boolean)
-            ? new PendingDispatch(new static(...$arguments))
+            ? static::createPendingDispatch(new static(...$arguments))
             : new Fluent;
     }
 
@@ -53,13 +53,13 @@ trait Dispatchable
         if ($boolean instanceof Closure) {
             $dispatchable = new static(...$arguments);
 
-            return ! value($boolean, $dispatchable)
-                ? new PendingDispatch($dispatchable)
+            return !value($boolean, $dispatchable)
+                ? static::createPendingDispatch($dispatchable)
                 : new Fluent;
         }
 
-        return ! value($boolean)
-            ? new PendingDispatch(new static(...$arguments))
+        return !value($boolean)
+            ? static::createPendingDispatch(new static(...$arguments))
             : new Fluent;
     }
 
@@ -96,5 +96,16 @@ trait Dispatchable
     public static function withChain($chain)
     {
         return new PendingChain(static::class, $chain);
+    }
+
+    /**
+     * Prepare a pending job dispatch.
+     *
+     * @param  mixed  $job
+     * @return \Illuminate\Foundation\Bus\PendingDispatch
+     */
+    protected static function createPendingDispatch($job)
+    {
+        return new PendingDispatch($job);
     }
 }
