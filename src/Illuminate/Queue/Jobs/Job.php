@@ -212,7 +212,7 @@ abstract class Job
         if ($e instanceof TimeoutExceededException && 
             ! is_null($failedJobConnectionName) &&
             $this->container->bound('db')) {
-            $this->container->make('db')->connection($failedJobConnectionName)->rollBack();
+            $this->container->make('db')->connection($failedJobConnectionName)->rollBack(toLevel: 0);
         }
 
         try {

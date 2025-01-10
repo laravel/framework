@@ -16,6 +16,8 @@ class TimeOutNonBatchableJobWithTransaction implements ShouldQueue
 
     public function handle(): void
     {
-        DB::transaction(fn () => sleep(20));
+        DB::transaction(function () {
+            DB::transaction(fn () => sleep(20));
+        });
     }
 }
