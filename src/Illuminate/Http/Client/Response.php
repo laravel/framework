@@ -91,7 +91,7 @@ class Response implements ArrayAccess, Stringable
     /**
      * Get the JSON decoded body of the response as an object.
      *
-     * @return object|null
+     * @return object|array|null
      */
     public function object()
     {
