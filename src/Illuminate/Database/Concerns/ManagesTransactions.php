@@ -20,8 +20,12 @@ trait ManagesTransactions
      *
      * @throws \Throwable
      */
-    public function transaction(Closure $callback, $attempts = 1)
+    public function transaction(Closure $callback, $attempts = null)
     {
+        if (is_null($attempts)) {
+            $attempts = max(config('database.transactions.attempts', 1), 1);
+        }
+
         for ($currentAttempt = 1; $currentAttempt <= $attempts; $currentAttempt++) {
             $this->beginTransaction();
 
