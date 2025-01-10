@@ -5587,6 +5587,36 @@ class SupportCollectionTest extends TestCase
         $this->assertNull($collection->percentage(fn ($value) => $value === 1));
     }
 
+    #[DataProvider('collectionClassProvider')]
+    public function testToDeepArrayOnNestedCollectionOfObjects($collection)
+    {
+        $data = (new $collection([
+            (object) [
+                'name' => 'taylor',
+                'email' => 'foo',
+                'posts' => [
+                    (object) [
+                        'id' => 1,
+                        'content' => 'Hello world',
+                    ],
+                    (object) [
+                        'id' => 2,
+                        'content' => 'Foo bar',
+                    ],
+                ],
+            ],
+            [
+                'name' => 'dayle',
+                'email' => 'bar',
+            ],
+        ]))->toDeepArray();
+
+        $this->assertIsArray($data[0]);
+        $this->assertIsArray($data[0]['posts'][0]);
+        $this->assertIsArray($data[0]['posts'][1]);
+        $this->assertIsArray($data[1]);
+    }
+
     /**
      * Provides each collection class, respectively.
      *
