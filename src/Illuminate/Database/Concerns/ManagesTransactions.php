@@ -4,6 +4,7 @@ namespace Illuminate\Database\Concerns;
 
 use Closure;
 use Illuminate\Database\DeadlockException;
+use Illuminate\Support\Arr;
 use RuntimeException;
 use Throwable;
 
@@ -20,8 +21,12 @@ trait ManagesTransactions
      *
      * @throws \Throwable
      */
-    public function transaction(Closure $callback, $attempts = 1)
+    public function transaction(Closure $callback, $attempts = null)
     {
+        if (is_null($attempts)) {
+            $attempts = Arr::get($this->config, 'transactions.attempts', 1);
+        }
+
         for ($currentAttempt = 1; $currentAttempt <= $attempts; $currentAttempt++) {
             $this->beginTransaction();
 

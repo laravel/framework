@@ -116,6 +116,21 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Database Transactions
+    |--------------------------------------------------------------------------
+    |
+    | This option controls the behavior of database transactions. The attempts
+    | value is the number of times the transaction will be attempted before
+    | an exception is thrown. The default value is 1, but can be any positive integer set from .env
+    |
+    */
+
+    'transactions' => [
+        'attempts' => (int) env('DB_TRANSACTION_ATTEMPTS', 1),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Migration Repository Table
     |--------------------------------------------------------------------------
     |

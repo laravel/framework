@@ -227,6 +227,10 @@ class DatabaseManager implements ConnectionResolverInterface
             throw new InvalidArgumentException("Database connection [{$name}] not configured.");
         }
 
+        if ($transactions = $this->app['config']['database.transactions'] ?? null) {
+            $config['transactions'] = $transactions;
+        }
+
         return (new ConfigurationUrlParser)
                     ->parseConfiguration($config);
     }
