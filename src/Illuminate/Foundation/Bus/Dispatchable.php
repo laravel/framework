@@ -16,7 +16,7 @@ trait Dispatchable
      */
     public static function dispatch(...$arguments)
     {
-        return static::createPendingDispatch(new static(...$arguments));
+        return static::newPendingDispatch(new static(...$arguments));
     }
 
     /**
@@ -32,12 +32,12 @@ trait Dispatchable
             $dispatchable = new static(...$arguments);
 
             return value($boolean, $dispatchable)
-                ? static::createPendingDispatch($dispatchable)
+                ? static::newPendingDispatch($dispatchable)
                 : new Fluent;
         }
 
         return value($boolean)
-            ? static::createPendingDispatch(new static(...$arguments))
+            ? static::newPendingDispatch(new static(...$arguments))
             : new Fluent;
     }
 
@@ -54,12 +54,12 @@ trait Dispatchable
             $dispatchable = new static(...$arguments);
 
             return ! value($boolean, $dispatchable)
-                ? static::createPendingDispatch($dispatchable)
+                ? static::newPendingDispatch($dispatchable)
                 : new Fluent;
         }
 
         return ! value($boolean)
-            ? static::createPendingDispatch(new static(...$arguments))
+            ? static::newPendingDispatch(new static(...$arguments))
             : new Fluent;
     }
 
@@ -99,12 +99,12 @@ trait Dispatchable
     }
 
     /**
-     * Prepare a pending job dispatch.
+     * Create a new pending job dispatch instance.
      *
      * @param  mixed  $job
      * @return \Illuminate\Foundation\Bus\PendingDispatch
      */
-    protected static function createPendingDispatch($job)
+    protected static function newPendingDispatch($job)
     {
         return new PendingDispatch($job);
     }
