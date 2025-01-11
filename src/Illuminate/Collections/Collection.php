@@ -1874,8 +1874,8 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
         return $this->map(function ($value) {
             return match (true) {
                 $value instanceof Collection => $value->toDeepArray(), // Recursively convert nested collections
-                is_object($value) => collect($value)->toDeepArray(),  // Convert objects to arrays
-                is_array($value) => collect($value)->toDeepArray(),   // Process nested arrays
+                is_object($value) => (new static($value))->toDeepArray(),  // Convert objects to arrays
+                is_array($value) => (new static($value))->toDeepArray(),   // Process nested arrays
                 default => $value,                                   // Leave primitive values as-is
             };
         })->toArray();
