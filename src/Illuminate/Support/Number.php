@@ -143,7 +143,7 @@ class Number
      */
     public static function currency(int|float $number, string $in = '', ?string $locale = null, bool $inCents = false )
     {
-        if ($inCents){
+        if ($inCents) {
             $number /= 100;
         }
 
