@@ -572,6 +572,8 @@ class Gate implements GateContract
                 return $result;
             }
         }
+
+        return null;
     }
 
     /**
