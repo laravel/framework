@@ -165,6 +165,11 @@ class SupportNumberTest extends TestCase
         $this->assertSame('1 234,56 $US', Number::currency(1234.56, 'USD', 'fr'));
     }
 
+    public function testToCurrencyInCents()
+    {
+        $this->assertSame('$15.00', Number::currency(1500, 'USD', 'en', true));
+    }
+
     public function testBytesToHuman()
     {
         $this->assertSame('0 B', Number::fileSize(0));
