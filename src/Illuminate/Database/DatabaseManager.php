@@ -91,7 +91,7 @@ class DatabaseManager implements ConnectionResolverInterface
      */
     public function connection($name = null)
     {
-        $name = $name ?: $this->getDefaultConnection();
+        $name = $this->mapConnectionName($name);
 
         [$database, $type] = $this->parseConnectionName($name);
 
@@ -167,6 +167,19 @@ class DatabaseManager implements ConnectionResolverInterface
     }
 
     /**
+     * Map the given connection name to its configuration name or default if not provided.
+     *
+     * @param  string  $name
+     * @return string
+     */
+    protected function mapConnectionName($name)
+    {
+        $name = $name ?: $this->getDefaultConnection();
+
+        return $this->app['config']['database.' . $name] ??= $name;
+    }
+
+    /**
      * Parse the connection into an array of the name and read / write type.
      *
      * @param  string  $name
@@ -174,7 +187,7 @@ class DatabaseManager implements ConnectionResolverInterface
      */
     protected function parseConnectionName($name)
     {
-        $name = $name ?: $this->getDefaultConnection();
+        $name = $this->mapConnectionName($name);
 
         return Str::endsWith($name, ['::read', '::write'])
                             ? explode('::', $name, 2) : [$name, null];
@@ -217,7 +230,7 @@ class DatabaseManager implements ConnectionResolverInterface
      */
     protected function configuration($name)
     {
-        $name = $name ?: $this->getDefaultConnection();
+        $name = $this->mapConnectionName($name);
 
         $connections = $this->app['config']['database.connections'];
 
@@ -304,7 +317,7 @@ class DatabaseManager implements ConnectionResolverInterface
      */
     public function purge($name = null)
     {
-        $name = $name ?: $this->getDefaultConnection();
+        $name = $this->mapConnectionName($name);
 
         $this->disconnect($name);
 
