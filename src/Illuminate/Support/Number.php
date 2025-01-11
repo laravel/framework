@@ -138,10 +138,10 @@ class Number
      * @param  int|float  $number
      * @param  string  $in
      * @param  string|null  $locale
-     * @param  bool $inCents
+     * @param bool $inCents
      * @return string|false
      */
-    public static function currency(int|float $number, string $in = '', ?string $locale = null, bool $inCents = false )
+    public static function currency(int|float $number, string $in = '', ?string $locale = null, bool $inCents = false)
     {
         if ($inCents) {
             $number /= 100;
