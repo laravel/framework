@@ -176,7 +176,7 @@ class DatabaseManager implements ConnectionResolverInterface
     {
         $name = $name ?: $this->getDefaultConnection();
 
-        return $this->app['config']['database.' . $name] ??= $name;
+        return $this->app['config']['database.'.$name] ??= $name;
     }
 
     /**
