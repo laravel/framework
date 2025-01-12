@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Routing\ImplicitRouteBinding;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 use Orchestra\Testbench\Concerns\InteractsWithPublishedFiles;
@@ -309,6 +310,70 @@ PHP);
 
         $response = $this->getJson("/post/{$post->id}/tag-slug/{$tag->slug}");
         $response->assertJsonFragment(['id' => $tag->id]);
+    }
+
+    public function testMismatchedRouteBindingDoesNotThrowExceptionWhenDisabled()
+    {
+        $user = ImplicitBindingUser::create(['name' => 'Dries']);
+
+        Route::middleware(['web'])->group(function () {
+            Route::get('/user/{user}/', fn (ImplicitBindingUser $usr) => null);
+        });
+
+        $response = $this->getJson("/user/{$user->id}/");
+
+        $response->assertOk();
+    }
+
+    public function testMismatchedRouteBindingThrowsExceptionWhenEnabled()
+    {
+        ImplicitRouteBinding::preventModelParameterMismatch();
+
+        $user = ImplicitBindingUser::create(['name' => 'Dries']);
+
+        Route::middleware(['web'])->group(function () {
+            Route::get('/user/{user}/', fn (ImplicitBindingUser $usr) => null);
+        });
+
+        $response = $this->getJson("/user/{$user->id}/");
+
+        $response->assertServerError();
+
+        ImplicitRouteBinding::preventModelParameterMismatch(false);
+    }
+
+    public function testMismatchedRouteBindingDoesNotThrowExceptionWhenEnabledAndParameterIsNullable()
+    {
+        ImplicitRouteBinding::preventModelParameterMismatch();
+
+        $user = ImplicitBindingUser::create(['name' => 'Dries']);
+
+        Route::middleware(['web'])->group(function () {
+            Route::get('/user/{user}/', fn (ImplicitBindingUser $usr = null) => null);
+        });
+
+        $response = $this->getJson("/user/{$user->id}/");
+
+        $response->assertOk();
+
+        ImplicitRouteBinding::preventModelParameterMismatch(false);
+    }
+
+    public function testMismatchedRouteBindingDoesNotThrowExceptionWhenEnabledAndParameterIsSnakeOrCamelCase()
+    {
+        ImplicitRouteBinding::preventModelParameterMismatch();
+
+        $user = ImplicitBindingUser::create(['name' => 'Dries']);
+
+        Route::middleware(['web'])->group(function () {
+            Route::get('/user/{privateUser}/bar', fn (ImplicitBindingUser $privateUser) => null);
+            Route::get('/user/{private_user}/foo', fn (ImplicitBindingUser $privateUser) => null);
+        });
+
+        $this->getJson("/user/{$user->id}/foo")->assertOk();
+        $this->getJson("/user/{$user->id}/bar")->assertOk();
+
+        ImplicitRouteBinding::preventModelParameterMismatch(false);
     }
 }
 
