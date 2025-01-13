@@ -7,6 +7,7 @@ use Illuminate\Support\Composer;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
+
 use function Illuminate\Support\php_binary;
 
 class SupportComposerTest extends TestCase

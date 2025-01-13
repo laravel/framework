@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Console\Scheduling;
 
-use Illuminate\Console\Application;
 use Illuminate\Console\Scheduling\Event;
 use Illuminate\Console\Scheduling\EventMutex;
 use Illuminate\Support\Str;
