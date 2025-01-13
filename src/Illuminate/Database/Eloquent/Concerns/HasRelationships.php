@@ -854,6 +854,7 @@ trait HasRelationships
      * Create a new model instance for a related model.
      *
      * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
+     *
      * @param  class-string<TRelatedModel>  $class
      * @return TRelatedModel
      */
@@ -870,6 +871,7 @@ trait HasRelationships
      * Create a new model instance for a related "through" model.
      *
      * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
+     *
      * @param  class-string<TRelatedModel>  $class
      * @return TRelatedModel
      */
