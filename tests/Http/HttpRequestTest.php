@@ -688,7 +688,7 @@ class HttpRequestTest extends TestCase
         $request = Request::create('/', 'GET', [
             'users' => [1, 2, 3],
             'roles' => [4, 5, 6],
-            'email' => 'test@example.com'
+            'email' => 'test@example.com',
         ]);
 
         $this->assertEmpty($request->array('missing'));
@@ -700,7 +700,7 @@ class HttpRequestTest extends TestCase
         $this->assertEquals([
             'users' => [1, 2, 3],
             'roles' => [4, 5, 6],
-            'email' => 'test@example.com'
+            'email' => 'test@example.com',
         ], $request->array());
     }
 
