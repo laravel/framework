@@ -55,7 +55,6 @@ trait CompilesHelpers
      * @param  string  $arguments
      * @return string
      */
-
     protected function compileUrl($arguments)
     {
         return "<?php echo url{$arguments}; ?>";
@@ -67,7 +66,6 @@ trait CompilesHelpers
      * @param  string  $arguments
      * @return string
      */
-
     protected function compileRoute($arguments)
     {
         return "<?php echo route{$arguments}; ?>";
@@ -79,7 +77,6 @@ trait CompilesHelpers
      * @param  string  $arguments
      * @return string
      */
-
     protected function compileAsset($arguments)
     {
         return "<?php echo asset{$arguments}; ?>";
@@ -91,7 +88,6 @@ trait CompilesHelpers
      * @param  string  $arguments
      * @return string
      */
-
     protected function compileOld($arguments)
     {
         return "<?php echo old{$arguments}; ?>";
