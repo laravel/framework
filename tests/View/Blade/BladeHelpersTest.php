@@ -16,5 +16,12 @@ class BladeHelpersTest extends AbstractBladeTestCase
         $this->assertSame('<?php echo app(\'Illuminate\Foundation\Vite\')(\'resources/js/app.js\'); ?>', $this->compiler->compileString('@vite(\'resources/js/app.js\')'));
         $this->assertSame('<?php echo app(\'Illuminate\Foundation\Vite\')([\'resources/js/app.js\']); ?>', $this->compiler->compileString('@vite([\'resources/js/app.js\'])'));
         $this->assertSame('<?php echo app(\'Illuminate\Foundation\Vite\')->reactRefresh(); ?>', $this->compiler->compileString('@viteReactRefresh'));
+        $this->assertSame('<?php echo url(\'/home\'); ?>', $this->compiler->compileString('@url(\'/home\')'));
+        $this->assertSame('<?php echo url(\'/home\', [1]); ?>', $this->compiler->compileString('@url(\'/home\', [1])'));
+        $this->assertSame('<?php echo route(\'home.index\'); ?>', $this->compiler->compileString('@route(\'home.index\')'));
+        $this->assertSame('<?php echo route(\'user.profile\', [\'id\' => 1]); ?>', $this->compiler->compileString('@route(\'user.profile\', [\'id\' => 1])'));
+        $this->assertSame('<?php echo old(\'name\'); ?>', $this->compiler->compileString('@old(\'name\')'));
+        $this->assertSame('<?php echo old(\'name\', \'test\'); ?>', $this->compiler->compileString('@old(\'name\', \'test\')'));
+        $this->assertSame('<?php echo asset(\'/css/style.css\'); ?>', $this->compiler->compileString('@asset(\'/css/style.css\')'));
     }
 }
