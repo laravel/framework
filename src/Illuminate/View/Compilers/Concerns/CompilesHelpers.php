@@ -19,7 +19,7 @@ trait CompilesHelpers
     /**
      * Compile the "dd" statements into valid PHP.
      *
-     * @param  string  $arguments
+     * @param string $arguments
      * @return string
      */
     protected function compileDd($arguments)
@@ -30,7 +30,7 @@ trait CompilesHelpers
     /**
      * Compile the "dump" statements into valid PHP.
      *
-     * @param  string  $arguments
+     * @param string $arguments
      * @return string
      */
     protected function compileDump($arguments)
@@ -41,7 +41,7 @@ trait CompilesHelpers
     /**
      * Compile the method statements into valid PHP.
      *
-     * @param  string  $method
+     * @param string $method
      * @return string
      */
     protected function compileMethod($method)
@@ -50,9 +50,57 @@ trait CompilesHelpers
     }
 
     /**
+     * Compile the "url" statements into valid PHP.
+     *
+     * @param string $arguments
+     * @return string
+     */
+
+    protected function compileUrl($arguments)
+    {
+        return "<?php echo url{$arguments}; ?>";
+    }
+
+    /**
+     * Compile the "route" statements into valid PHP.
+     *
+     * @param string $arguments
+     * @return string
+     */
+
+    protected function compileRoute($arguments)
+    {
+        return "<?php echo route{$arguments}; ?>";
+    }
+
+    /**
+     * Compile the "assets" statements into valid PHP.
+     *
+     * @param string $arguments
+     * @return string
+     */
+
+    protected function compileAsset($arguments)
+    {
+        return "<?php echo asset{$arguments}; ?>";
+    }
+
+    /**
+     * Compile the "old" statements into valid PHP.
+     *
+     * @param string $arguments
+     * @return string
+     */
+
+    protected function compileOld($arguments)
+    {
+        return "<?php echo old{$arguments}; ?>";
+    }
+
+    /**
      * Compile the "vite" statements into valid PHP.
      *
-     * @param  string|null  $arguments
+     * @param string|null $arguments
      * @return string
      */
     protected function compileVite($arguments)
