@@ -8,6 +8,7 @@ use Illuminate\Support\Str;
 use Mockery as m;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 use PHPUnit\Framework\TestCase;
+
 use function Illuminate\Support\php_binary;
 
 class EventTest extends TestCase
