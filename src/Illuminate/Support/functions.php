@@ -39,3 +39,15 @@ if (! function_exists('Illuminate\Support\php_binary')) {
         return (new PhpExecutableFinder)->find(false) ?: 'php';
     }
 }
+
+if (! function_exists('Illuminate\Support\artisan_binary')) {
+    /**
+     * Determine the PHP Binary.
+     *
+     * @return string
+     */
+    function artisan_binary()
+    {
+        return defined('ARTISAN_BINARY') ? ARTISAN_BINARY : 'artisan';
+    }
+}

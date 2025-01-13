@@ -7,6 +7,7 @@ use Illuminate\Support\Composer;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
+use function Illuminate\Support\php_binary;
 
 class SupportComposerTest extends TestCase
 {
@@ -24,7 +25,7 @@ class SupportComposerTest extends TestCase
 
     public function testDumpAutoloadRunsTheCorrectCommandWhenCustomComposerPharIsPresent()
     {
-        $expectedProcessArguments = [PHP_BINARY,  'composer.phar', 'dump-autoload'];
+        $expectedProcessArguments = [php_binary(),  'composer.phar', 'dump-autoload'];
         $customComposerPhar = true;
 
         $composer = $this->mockComposer($expectedProcessArguments, $customComposerPhar);
