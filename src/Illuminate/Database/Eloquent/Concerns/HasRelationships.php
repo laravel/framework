@@ -58,9 +58,11 @@ trait HasRelationships
     /**
      * Get the dynamic relation resolver if defined or inherited, or return null.
      *
-     * @param  string  $class
+     * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
+     *
+     * @param  class-string<TRelatedModel>  $class
      * @param  string  $key
-     * @return mixed
+     * @return Closure|null
      */
     public function relationResolver($class, $key)
     {
@@ -851,8 +853,10 @@ trait HasRelationships
     /**
      * Create a new model instance for a related model.
      *
-     * @param  string  $class
-     * @return mixed
+     * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
+     *
+     * @param  class-string<TRelatedModel>  $class
+     * @return TRelatedModel
      */
     protected function newRelatedInstance($class)
     {
@@ -866,8 +870,10 @@ trait HasRelationships
     /**
      * Create a new model instance for a related "through" model.
      *
-     * @param  string  $class
-     * @return mixed
+     * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
+     *
+     * @param  class-string<TRelatedModel>  $class
+     * @return TRelatedModel
      */
     protected function newRelatedThroughInstance($class)
     {
