@@ -42,7 +42,7 @@ if (! function_exists('Illuminate\Support\php_binary')) {
 
 if (! function_exists('Illuminate\Support\artisan_binary')) {
     /**
-     * Determine the PHP Binary.
+     * Determine the proper Artisan executable.
      *
      * @return string
      */
