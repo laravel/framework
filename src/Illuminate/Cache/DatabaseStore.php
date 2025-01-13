@@ -488,7 +488,9 @@ class DatabaseStore implements LockProvider, Store
     {
         $result = serialize($value);
 
-        if (($this->connection instanceof PostgresConnection || $this->connection instanceof SQLiteConnection) && str_contains($result, "\0")) {
+        if (($this->connection instanceof PostgresConnection ||
+             $this->connection instanceof SQLiteConnection) &&
+            str_contains($result, "\0")) {
             $result = base64_encode($result);
         }
 
@@ -503,7 +505,9 @@ class DatabaseStore implements LockProvider, Store
      */
     protected function unserialize($value)
     {
-        if (($this->connection instanceof PostgresConnection || $this->connection instanceof SQLiteConnection) && ! Str::contains($value, [':', ';'])) {
+        if (($this->connection instanceof PostgresConnection ||
+             $this->connection instanceof SQLiteConnection) &&
+            ! Str::contains($value, [':', ';'])) {
             $value = base64_decode($value);
         }
 
