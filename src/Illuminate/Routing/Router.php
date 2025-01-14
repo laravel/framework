@@ -136,6 +136,16 @@ class Router implements BindingRegistrar, RegistrarContract
     public static $verbs = ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'];
 
     /**
+     * The Framework built-in route controllers.
+     *
+     * @var list<class-string<Controller>>
+     */
+    protected $frameworkControllers = [
+        RedirectController::class,
+        ViewController::class,
+    ];
+
+    /**
      * Create a new Router instance.
      *
      * @param  \Illuminate\Contracts\Events\Dispatcher  $events
@@ -258,7 +268,7 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     public function redirect($uri, $destination, $status = 302)
     {
-        return $this->any($uri, '\Illuminate\Routing\RedirectController')
+        return $this->any($uri, RedirectController::class)
                 ->defaults('destination', $destination)
                 ->defaults('status', $status);
     }
@@ -287,7 +297,7 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     public function view($uri, $view, $data = [], $status = 200, array $headers = [])
     {
-        return $this->match(['GET', 'HEAD'], $uri, '\Illuminate\Routing\ViewController')
+        return $this->match(['GET', 'HEAD'], $uri, ViewController::class)
                 ->setDefaults([
                     'view' => $view,
                     'data' => $data,
@@ -627,6 +637,10 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     protected function prependGroupNamespace($class)
     {
+        if ($this->isFrameworkController($class)) {
+            return '\\'.$class;
+        }
+
         $group = end($this->groupStack);
 
         return isset($group['namespace']) && ! str_starts_with($class, '\\') && ! str_starts_with($class, $group['namespace'])
@@ -1427,6 +1441,27 @@ class Router implements BindingRegistrar, RegistrarContract
         $this->routes = $routes;
 
         $this->container->instance('routes', $this->routes);
+    }
+
+    /**
+     * Determine if the route uses a framework controller.
+     *
+     * @param  string  $class
+     * @return bool
+     */
+    public function isFrameworkController($class)
+    {
+        return in_array($class, $this->frameworkControllers, true);
+    }
+
+    /**
+     * Get the controllers belonging to the framework
+     *
+     * @return class-string<Controller>[]
+     */
+    public function getFrameworkControllers()
+    {
+        return $this->frameworkControllers;
     }
 
     /**
