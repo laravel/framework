@@ -1434,7 +1434,7 @@ class Router implements BindingRegistrar, RegistrarContract
     }
 
     /**
-     * Determine if the route uses a framework controller.
+     * Determine if the class is a framework controller.
      *
      * @param  string  $class
      * @return bool
