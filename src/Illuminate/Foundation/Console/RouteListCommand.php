@@ -250,8 +250,8 @@ class RouteListCommand extends Command
     protected function isFrameworkController(Route $route)
     {
         return in_array($route->getControllerClass(), [
-            \Illuminate\Routing\RedirectController::class,
-            \Illuminate\Routing\ViewController::class,
+            '\Illuminate\Routing\RedirectController',
+            '\Illuminate\Routing\ViewController',
         ], true);
     }
 
