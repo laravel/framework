@@ -344,6 +344,15 @@ class RouteRegistrarTest extends TestCase
             'App\Http\Controllers\UsersController@index',
             $this->getRoute()->getAction()['uses']
         );
+
+        $this->router->namespace('App\Http\Controllers')->group(function ($router) {
+            $router->redirect('users', '/');
+        });
+
+        $this->assertSame(
+            '\Illuminate\Routing\RedirectController@__invoke',
+            $this->getRoute()->getAction()['uses']
+        );
     }
 
     public function testCanRegisterGroupWithPrefix()
