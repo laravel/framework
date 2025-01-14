@@ -892,7 +892,7 @@ class BelongsToMany extends Relation
     protected function shouldSelect(array $columns = ['*'])
     {
         if ($columns == ['*']) {
-            $columns = [$this->related->getTable().'.*'];
+            $columns = [$this->related->qualifyColumn('*')];
         }
 
         return array_merge($columns, $this->aliasedPivotColumns());
