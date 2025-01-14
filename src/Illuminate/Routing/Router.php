@@ -136,16 +136,6 @@ class Router implements BindingRegistrar, RegistrarContract
     public static $verbs = ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'];
 
     /**
-     * The Framework built-in route controllers.
-     *
-     * @var list<class-string<Controller>>
-     */
-    protected $frameworkControllers = [
-        RedirectController::class,
-        ViewController::class,
-    ];
-
-    /**
      * Create a new Router instance.
      *
      * @param  \Illuminate\Contracts\Events\Dispatcher  $events
@@ -1451,7 +1441,10 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     public function isFrameworkController($class)
     {
-        return in_array($class, $this->frameworkControllers, true);
+        return in_array($class, [
+            RedirectController::class,
+            ViewController::class,
+        ], true);
     }
 
     /**
