@@ -150,7 +150,9 @@ class PostgresConnector extends Connector implements ConnectorInterface
             $dsn .= ";application_name='".str_replace("'", "\'", $application_name)."'";
         }
 
-        return $this->addSslOptions($dsn, $config);
+        $dsn = $this->addSslOptions($dsn, $config);
+
+        return $this->addPostgresOptions($dsn, $config);
     }
 
     /**
@@ -162,7 +164,62 @@ class PostgresConnector extends Connector implements ConnectorInterface
      */
     protected function addSslOptions($dsn, array $config)
     {
-        foreach (['sslmode', 'sslcert', 'sslkey', 'sslrootcert'] as $option) {
+        foreach ([
+            'sslmode',
+            'sslcert',
+            'sslkey',
+            'sslrootcert',
+            'requiressl',
+            'sslnegotiation',
+            'sslcompression',
+            'sslpassword',
+            'sslcertmode',
+            'sslcrl',
+            'sslcrldir',
+            'sslsni',
+        ] as $option) {
+            if (isset($config[$option])) {
+                $dsn .= ";{$option}={$config[$option]}";
+            }
+        }
+
+        return $dsn;
+    }
+
+    /**
+     * Add Postgres specific options to the DSN.
+     *
+     * @param  string  $dsn
+     * @param  array  $config
+     * @return string
+     */
+    protected function addPostgresOptions($dsn, array $config)
+    {
+        foreach ([
+            'channel_binding',
+            'connect_timeout',
+            'fallback_application_name',
+            'gssdelegation',
+            'gssencmode',
+            'gsslib',
+            'hostaddr',
+            'keepalives',
+            'keepalives_count',
+            'keepalives_idle',
+            'keepalives_interval',
+            'krbsrvname',
+            'load_balance_hosts',
+            'options',
+            'passfile',
+            'replication',
+            'require_auth',
+            'requirepeer',
+            'service',
+            'ssl_max_protocol_version',
+            'ssl_min_protocol_version',
+            'target_session_attrs',
+            'tcp_user_timeout',
+        ] as $option) {
             if (isset($config[$option])) {
                 $dsn .= ";{$option}={$config[$option]}";
             }
