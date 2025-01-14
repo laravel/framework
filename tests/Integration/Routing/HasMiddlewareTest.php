@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Routing;
 
+use Illuminate\Routing\Controller;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Route;
@@ -19,7 +20,7 @@ class HasMiddlewareTest extends TestCase
     }
 }
 
-class HasMiddlewareTestController implements HasMiddleware
+class HasMiddlewareTestController extends Controller implements HasMiddleware
 {
     public static function middleware()
     {
