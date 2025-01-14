@@ -1455,16 +1455,6 @@ class Router implements BindingRegistrar, RegistrarContract
     }
 
     /**
-     * Get the controllers belonging to the framework
-     *
-     * @return class-string<Controller>[]
-     */
-    public function getFrameworkControllers()
-    {
-        return $this->frameworkControllers;
-    }
-
-    /**
      * Set the compiled route collection instance.
      *
      * @param  array  $routes
