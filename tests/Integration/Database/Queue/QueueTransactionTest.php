@@ -56,7 +56,9 @@ class QueueTransactionTest extends DatabaseTestCase
     {
         return [
             [new Fixtures\TimeOutJobWithTransaction()],
+            [new Fixtures\TimeOutJobWithNestedTransactions()],
             [new Fixtures\TimeOutNonBatchableJobWithTransaction()],
+            [new Fixtures\TimeOutNonBatchableJobWithNestedTransactions()],
         ];
     }
 }

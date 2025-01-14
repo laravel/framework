@@ -7,7 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\DB;
 
-class TimeOutNonBatchableJobWithTransaction implements ShouldQueue
+class TimeOutNonBatchableJobWithNestedTransactions implements ShouldQueue
 {
     use InteractsWithQueue, Queueable;
 
@@ -16,6 +16,8 @@ class TimeOutNonBatchableJobWithTransaction implements ShouldQueue
 
     public function handle(): void
     {
-        DB::transaction(fn () => sleep(20));
+        DB::transaction(function () {
+            DB::transaction(fn () => sleep(20));
+        });
     }
 }

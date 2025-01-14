@@ -17,8 +17,6 @@ class TimeOutJobWithTransaction implements ShouldQueue
 
     public function handle(): void
     {
-        DB::transaction(function () {
-            DB::transaction(fn () => sleep(20));
-        });
+        DB::transaction(fn () => sleep(20));
     }
 }
