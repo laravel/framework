@@ -46,11 +46,22 @@ class ValidatedInput implements ValidatedData
     /**
      * Get the raw, underlying input array.
      *
+     * @param  array|mixed|null  $keys
      * @return array
      */
     public function all($keys = null)
     {
-        return $this->input;
+        if (! $keys) {
+            return $this->input;
+        }
+
+        $input = [];
+
+        foreach (is_array($keys) ? $keys : func_get_args() as $key) {
+            Arr::set($input, $key, Arr::get($this->input, $key));
+        }
+
+        return $input;
     }
 
     /**
