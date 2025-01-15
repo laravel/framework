@@ -151,6 +151,13 @@ class Builder implements BuilderContract
     protected $afterQueryCallbacks = [];
 
     /**
+     * Attributes to be added to new instances.
+     *
+     * @var array
+     */
+    public $pendingAttributes = [];
+
+    /**
      * Create a new Eloquent query builder instance.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
@@ -1603,6 +1610,8 @@ class Builder implements BuilderContract
      */
     public function newModelInstance($attributes = [])
     {
+        $attributes = array_merge($this->pendingAttributes, $attributes);
+
         return $this->model->newInstance($attributes)->setConnection(
             $this->query->getConnection()->getName()
         );
@@ -1772,6 +1781,28 @@ class Builder implements BuilderContract
     public function withCasts($casts)
     {
         $this->model->mergeCasts($casts);
+
+        return $this;
+    }
+
+    /**
+     * Add attributes to be added to new instances of models.
+     *
+     * @param  array|string|\Illuminate\Contracts\Database\Query\Expression  $attributes
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function withAttributes(array|string|Expression $attributes, $value = null)
+    {
+        if (! is_array($attributes)) {
+            $attributes = [$attributes => $value];
+        }
+
+        foreach ($attributes as $column => $value) {
+            $this->where($this->qualifyColumn($column), $value);
+        }
+
+        $this->pendingAttributes = array_merge($this->pendingAttributes, $attributes);
 
         return $this;
     }
