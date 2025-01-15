@@ -22,7 +22,7 @@ class HasMiddlewareTest extends TestCase
 
 class HasMiddlewareTestController extends Controller implements HasMiddleware
 {
-    public static function middleware()
+    public static function setMiddleware(): array
     {
         return [
             new Middleware('all'),

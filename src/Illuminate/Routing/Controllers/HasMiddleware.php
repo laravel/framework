@@ -9,5 +9,5 @@ interface HasMiddleware
      *
      * @return array<int,\Illuminate\Routing\Controllers\Middleware|\Closure|string>
      */
-    public static function middleware();
+    public static function setMiddleware(): array;
 }
