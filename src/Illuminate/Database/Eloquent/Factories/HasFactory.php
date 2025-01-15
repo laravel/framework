@@ -25,24 +25,6 @@ trait HasFactory
     }
 
     /**
-     * Get the factory from the UseFactory class attribute.
-     *
-     * @return TFactory|null
-     */
-    protected static function getUseFactoryAttribute()
-    {
-        $attributes = (new \ReflectionClass(static::class))
-            ->getAttributes(UseFactory::class);
-
-        if ($attributes !== []) {
-            $useFactory = $attributes[0]->newInstance();
-            $factory = new $useFactory->factoryClass;
-            $factory->guessModelNamesUsing(fn() => static::class);
-            return $factory;
-        }
-    }
-
-    /**
      * Create a new factory instance for the model.
      *
      * @return TFactory|null
@@ -54,5 +36,26 @@ trait HasFactory
         }
 
         return static::getUseFactoryAttribute() ?? null;
+    }
+
+    /**
+     * Get the factory from the UseFactory class attribute.
+     *
+     * @return TFactory|null
+     */
+    protected static function getUseFactoryAttribute()
+    {
+        $attributes = (new \ReflectionClass(static::class))
+            ->getAttributes(UseFactory::class);
+
+        if ($attributes !== []) {
+            $useFactory = $attributes[0]->newInstance();
+
+            $factory = new $useFactory->factoryClass;
+
+            $factory->guessModelNamesUsing(fn() => static::class);
+
+            return $factory;
+        }
     }
 }
