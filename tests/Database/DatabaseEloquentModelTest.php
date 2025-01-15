@@ -54,7 +54,6 @@ use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use stdClass;
 
-
 include_once 'Enums.php';
 
 class DatabaseEloquentModelTest extends TestCase
@@ -4006,7 +4005,6 @@ class EloquentModelWithCollectedByAttribute extends Model
 class CustomEloquentCollection extends Collection
 {
 }
-
 
 class EloquentModelWithUseFactoryAttributeFactory extends Factory
 {

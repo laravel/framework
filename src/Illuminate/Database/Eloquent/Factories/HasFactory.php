@@ -1,6 +1,7 @@
 <?php
 
 namespace Illuminate\Database\Eloquent\Factories;
+
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
 
 /**
@@ -53,7 +54,7 @@ trait HasFactory
 
             $factory = new $useFactory->factoryClass;
 
-            $factory->guessModelNamesUsing(fn() => static::class);
+            $factory->guessModelNamesUsing(fn () => static::class);
 
             return $factory;
         }
