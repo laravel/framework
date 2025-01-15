@@ -260,21 +260,21 @@ trait InteractsWithPivotTable
     /**
      * Attach a model to the parent.
      *
-     * @param  mixed  $id
+     * @param  mixed  $ids
      * @param  array  $attributes
      * @param  bool  $touch
      * @return void
      */
-    public function attach($id, array $attributes = [], $touch = true)
+    public function attach($ids, array $attributes = [], $touch = true)
     {
         if ($this->using) {
-            $this->attachUsingCustomClass($id, $attributes);
+            $this->attachUsingCustomClass($ids, $attributes);
         } else {
             // Here we will insert the attachment records into the pivot table. Once we have
             // inserted the records, we will touch the relationships if necessary and the
             // function will return. We can parse the IDs before inserting the records.
             $this->newPivotStatement()->insert($this->formatAttachRecords(
-                $this->parseIds($id), $attributes
+                $this->parseIds($ids), $attributes
             ));
         }
 
@@ -286,14 +286,14 @@ trait InteractsWithPivotTable
     /**
      * Attach a model to the parent using a custom class.
      *
-     * @param  mixed  $id
+     * @param  mixed  $ids
      * @param  array  $attributes
      * @return void
      */
-    protected function attachUsingCustomClass($id, array $attributes)
+    protected function attachUsingCustomClass($ids, array $attributes)
     {
         $records = $this->formatAttachRecords(
-            $this->parseIds($id), $attributes
+            $this->parseIds($ids), $attributes
         );
 
         foreach ($records as $record) {
