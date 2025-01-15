@@ -1,6 +1,12 @@
 # Release Notes for 11.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v11.38.1...11.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v11.38.2...11.x)
+
+## [v11.38.2](https://github.com/laravel/framework/compare/v11.38.1...v11.38.2) - 2025-01-15
+
+* [11.x] Simplify Codebase by Using `qualifyColumn` Helper Method by [@SanderMuller](https://github.com/SanderMuller) in https://github.com/laravel/framework/pull/54187
+* Revert "Add support for missing Postgres connection options" by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/54195
+* Revert "[11.x] Support DB aggregate by group (new methods)" by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/54196
 
 ## [v11.38.1](https://github.com/laravel/framework/compare/v11.38.0...v11.38.1) - 2025-01-14
 
