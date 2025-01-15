@@ -15,6 +15,8 @@ class OptimizeClearCommandTest extends TestCase
 
     public function testCanListenToOptimizingEvent(): void
     {
+        $this->withoutDeprecationHandling();
+
         $this->artisan('optimize:clear')
             ->assertSuccessful()
             ->expectsOutputToContain('ServiceProviderWithOptimizeClear');
