@@ -48,7 +48,7 @@ class ValidationEmailRuleTest extends TestCase
 
     /**
      * @param  mixed  $rule
-     * @param  string|array $values
+     * @param  string|array  $values
      * @param  array  $expectedMessages
      * @param  string|null  $customValidationMessage
      * @return void
@@ -90,8 +90,8 @@ class ValidationEmailRuleTest extends TestCase
     }
 
     /**
-     * @param mixed $rule
-     * @param string|array $values
+     * @param  mixed  $rule
+     * @param  string|array  $values
      * @return void
      */
     protected function passes($rule, $values)
@@ -481,7 +481,7 @@ class ValidationEmailRuleTest extends TestCase
         $this->fails(
             Email::default(),
             $spoofingEmail,
-            ["Please check the entered ".self::ATTRIBUTE_REPLACED.", it must be a valid email address, {$spoofingEmail} given."],
+            ['Please check the entered '.self::ATTRIBUTE_REPLACED.", it must be a valid email address, {$spoofingEmail} given."],
             'Please check the entered :attribute, it must be a valid email address, :input given.'
         );
 
