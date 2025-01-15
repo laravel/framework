@@ -208,6 +208,24 @@ class CallQueuedHandler
     }
 
     /**
+     * Ensure the lock for a unique job is released
+     * when can't unserialize the job instance.
+     *
+     * @return void
+     */
+    protected function ensureUniqueJobLockIsReleasedWithoutInstance()
+    {
+        /** @var string */
+        $driver = context()->getHidden('laravel_unique_job_cache_driver');
+        /** @var string */
+        $key = context()->getHidden('laravel_unique_job_key');
+
+        if ($driver && $key) {
+            cache()->driver($driver)->lock($key)->forceRelease();
+        }
+    }
+
+    /**
      * Handle a model not found exception.
      *
      * @param  \Illuminate\Contracts\Queue\Job  $job
@@ -226,6 +244,8 @@ class CallQueuedHandler
         } catch (Exception) {
             $shouldDelete = false;
         }
+
+        $this->ensureUniqueJobLockIsReleasedWithoutInstance();
 
         if ($shouldDelete) {
             return $job->delete();
