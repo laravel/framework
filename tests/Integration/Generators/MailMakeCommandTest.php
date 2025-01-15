@@ -128,29 +128,18 @@ class MailMakeCommandTest extends TestCase
     {
         $this->artisan('make:mail')
             ->expectsQuestion('What should the mailable be named?', 'FooMail')
-            ->expectsQuestion('Would you like to create a view?', 'none')
+            ->expectsQuestion('Would you like to create a markdown view?', false)
             ->assertExitCode(0);
 
         $this->assertFilenameExists('app/Mail/FooMail.php');
         $this->assertFilenameDoesNotExists('resources/views/mail/foo-mail.blade.php');
     }
 
-    public function testItCanGenerateMailWithViewWithNoInitialInput()
-    {
-        $this->artisan('make:mail')
-            ->expectsQuestion('What should the mailable be named?', 'MyFooMail')
-            ->expectsQuestion('Would you like to create a view?', 'view')
-            ->assertExitCode(0);
-
-        $this->assertFilenameExists('app/Mail/MyFooMail.php');
-        $this->assertFilenameExists('resources/views/mail/my-foo-mail.blade.php');
-    }
-
     public function testItCanGenerateMailWithMarkdownViewWithNoInitialInput()
     {
         $this->artisan('make:mail')
             ->expectsQuestion('What should the mailable be named?', 'FooMail')
-            ->expectsQuestion('Would you like to create a view?', 'markdown')
+            ->expectsQuestion('Would you like to create a markdown view?', true)
             ->assertExitCode(0);
 
         $this->assertFilenameExists('app/Mail/FooMail.php');
