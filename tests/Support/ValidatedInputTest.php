@@ -17,6 +17,7 @@ class ValidatedInputTest extends TestCase
 
         $this->assertSame('Taylor', $input->name);
         $this->assertSame('Taylor', $input['name']);
+        $this->assertEquals(['name' => 'Taylor'], $input->all(['name']));
         $this->assertEquals(['name' => 'Taylor'], $input->only(['name']));
         $this->assertEquals(['name' => 'Taylor'], $input->except(['votes']));
         $this->assertEquals(['name' => 'Taylor', 'votes' => 100], $input->all());
@@ -476,6 +477,20 @@ class ValidatedInputTest extends TestCase
         $this->assertEquals(StringBackedEnum::HELLO_WORLD, $input->enum('valid_enum_value', StringBackedEnum::class));
 
         $this->assertNull($input->enum('invalid_enum_value', StringBackedEnum::class));
+    }
+
+    public function test_enums_method()
+    {
+        $input = new ValidatedInput([
+            'valid_enum_value' => 'Hello world',
+            'invalid_enum_value' => 'invalid',
+        ]);
+
+        $this->assertEmpty($input->enums('doesnt_exists', StringBackedEnum::class));
+
+        $this->assertEquals([StringBackedEnum::HELLO_WORLD], $input->enums('valid_enum_value', StringBackedEnum::class));
+
+        $this->assertEmpty($input->enums('invalid_enum_value', StringBackedEnum::class));
     }
 
     public function test_collect_method()
