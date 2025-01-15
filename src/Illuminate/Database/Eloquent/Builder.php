@@ -1729,12 +1729,8 @@ class Builder implements BuilderContract
     {
         return [explode(':', $name)[0], static function ($query) use ($name) {
             $query->select(array_map(static function ($column) use ($query) {
-                if (str_contains($column, '.')) {
-                    return $column;
-                }
-
                 return $query instanceof BelongsToMany
-                        ? $query->getRelated()->getTable().'.'.$column
+                        ? $query->getRelated()->qualifyColumn($column)
                         : $column;
             }, explode(',', explode(':', $name)[1])));
         }];

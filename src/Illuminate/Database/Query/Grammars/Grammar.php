@@ -139,15 +139,7 @@ class Grammar extends BaseGrammar
             $column = 'distinct '.$column;
         }
 
-        $sql = 'select ';
-
-        $sql .= $aggregate['function'].'('.$column.') as aggregate';
-
-        if ($query->groups) {
-            $sql .= ', '.$this->columnize($query->groups);
-        }
-
-        return $sql;
+        return 'select '.$aggregate['function'].'('.$column.') as aggregate';
     }
 
     /**
@@ -1139,12 +1131,10 @@ class Grammar extends BaseGrammar
     protected function compileUnionAggregate(Builder $query)
     {
         $sql = $this->compileAggregate($query, $query->aggregate);
-        $groups = $query->groups ? ' '.$this->compileGroups($query, $query->groups) : '';
 
         $query->aggregate = null;
-        $query->groups = null;
 
-        return $sql.' from ('.$this->compileSelect($query).') as '.$this->wrapTable('temp_table').$groups;
+        return $sql.' from ('.$this->compileSelect($query).') as '.$this->wrapTable('temp_table');
     }
 
     /**
