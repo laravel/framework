@@ -12,7 +12,6 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 use function Laravel\Prompts\confirm;
-use function Laravel\Prompts\text;
 
 #[AsCommand(name: 'make:notification')]
 class NotificationMakeCommand extends GeneratorCommand
@@ -64,7 +63,7 @@ class NotificationMakeCommand extends GeneratorCommand
     protected function writeMarkdownTemplate()
     {
         $path = $this->viewPath(
-            str_replace('.', '/', $this->option('markdown')).'.blade.php'
+            str_replace('.', '/', $this->getView()).'.blade.php'
         );
 
         if (! $this->files->isDirectory(dirname($path))) {
@@ -73,7 +72,7 @@ class NotificationMakeCommand extends GeneratorCommand
 
         $this->files->put($path, file_get_contents(__DIR__.'/stubs/markdown.stub'));
 
-        $this->components->info(sprintf('%s [%s] created successfully.', 'Markdown', $path));
+        $this->components->info(sprintf('%s [%s] created successfully.', 'Markdown view', $path));
     }
 
     /**
@@ -87,10 +86,31 @@ class NotificationMakeCommand extends GeneratorCommand
         $class = parent::buildClass($name);
 
         if ($this->option('markdown')) {
-            $class = str_replace(['DummyView', '{{ view }}'], $this->option('markdown'), $class);
+            $class = str_replace(['DummyView', '{{ view }}'], $this->getView(), $class);
         }
 
         return $class;
+    }
+
+    /**
+     * Get the view name.
+     *
+     * @return string
+     */
+    protected function getView()
+    {
+        $view = $this->option('markdown');
+
+        if (! $view) {
+            $name = str_replace('\\', '/', $this->argument('name'));
+
+            $view = (new Collection(explode('/', $name)))
+                ->map(fn ($path) => Str::kebab($path))
+                ->prepend('mail')
+                ->implode('.');
+        }
+
+        return $view;
     }
 
     /**
@@ -145,14 +165,7 @@ class NotificationMakeCommand extends GeneratorCommand
         $wantsMarkdownView = confirm('Would you like to create a markdown view?');
 
         if ($wantsMarkdownView) {
-            $defaultMarkdownView = (new Collection(explode('/', str_replace('\\', '/', $this->argument('name')))))
-                ->map(fn ($path) => Str::kebab($path))
-                ->prepend('mail')
-                ->implode('.');
-
-            $markdownView = text('What should the markdown view be named?', default: $defaultMarkdownView);
-
-            $input->setOption('markdown', $markdownView);
+            $input->setOption('markdown', $this->getView());
         }
     }
 
