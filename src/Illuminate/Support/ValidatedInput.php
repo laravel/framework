@@ -4,9 +4,7 @@ namespace Illuminate\Support;
 
 use ArrayIterator;
 use Illuminate\Contracts\Support\ValidatedData;
-use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Traits\InteractsWithData;
-use stdClass;
 use Symfony\Component\VarDumper\VarDumper;
 use Traversable;
 
