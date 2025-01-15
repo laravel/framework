@@ -12,7 +12,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use function Laravel\Prompts\select;
+use function Laravel\Prompts\confirm;
 
 #[AsCommand(name: 'make:mail')]
 class MailMakeCommand extends GeneratorCommand
@@ -143,8 +143,9 @@ class MailMakeCommand extends GeneratorCommand
         if (! $view) {
             $name = str_replace('\\', '/', $this->argument('name'));
 
-            $view = 'mail.'.(new Collection(explode('/', $name)))
-                ->map(fn ($part) => Str::kebab($part))
+            $view = (new Collection(explode('/', $name)))
+                ->map(fn ($path) => Str::kebab($path))
+                ->prepend('mail')
                 ->implode('.');
         }
 
@@ -194,20 +195,6 @@ class MailMakeCommand extends GeneratorCommand
     }
 
     /**
-     * Get the console command options.
-     *
-     * @return array
-     */
-    protected function getOptions()
-    {
-        return [
-            ['force', 'f', InputOption::VALUE_NONE, 'Create the class even if the mailable already exists'],
-            ['markdown', 'm', InputOption::VALUE_OPTIONAL, 'Create a new Markdown template for the mailable', false],
-            ['view', null, InputOption::VALUE_OPTIONAL, 'Create a new Blade template for the mailable', false],
-        ];
-    }
-
-    /**
      * Interact further with the user if they were prompted for missing arguments.
      *
      * @param  \Symfony\Component\Console\Input\InputInterface  $input
@@ -220,14 +207,24 @@ class MailMakeCommand extends GeneratorCommand
             return;
         }
 
-        $type = select('Would you like to create a view?', [
-            'markdown' => 'Markdown View',
-            'view' => 'Empty View',
-            'none' => 'No View',
-        ]);
+        $wantsMarkdownView = confirm('Would you like to create a markdown view?');
 
-        if ($type !== 'none') {
-            $input->setOption($type, null);
+        if ($wantsMarkdownView) {
+            $input->setOption('markdown', $this->getView());
         }
+    }
+
+    /**
+     * Get the console command options.
+     *
+     * @return array
+     */
+    protected function getOptions()
+    {
+        return [
+            ['force', 'f', InputOption::VALUE_NONE, 'Create the class even if the mailable already exists'],
+            ['markdown', 'm', InputOption::VALUE_OPTIONAL, 'Create a new Markdown template for the mailable', false],
+            ['view', null, InputOption::VALUE_OPTIONAL, 'Create a new Blade template for the mailable', false],
+        ];
     }
 }
