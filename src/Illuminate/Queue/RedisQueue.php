@@ -6,6 +6,10 @@ use Illuminate\Contracts\Queue\ClearableQueue;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
 use Illuminate\Contracts\Redis\Factory as Redis;
 use Illuminate\Queue\Jobs\RedisJob;
+use Illuminate\Redis\Connections\PhpRedisClusterConnection;
+use Illuminate\Redis\Connections\PhpRedisConnection;
+use Illuminate\Redis\Connections\PredisClusterConnection;
+use Illuminate\Redis\Connections\PredisConnection;
 use Illuminate\Support\Str;
 
 class RedisQueue extends Queue implements QueueContract, ClearableQueue
@@ -118,17 +122,29 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      */
     public function bulk($jobs, $data = '', $queue = null)
     {
-        $this->getConnection()->pipeline(function () use ($jobs, $data, $queue) {
-            $this->getConnection()->transaction(function () use ($jobs, $data, $queue) {
-                foreach ((array) $jobs as $job) {
-                    if (isset($job->delay)) {
-                        $this->later($job->delay, $job, $data, $queue);
-                    } else {
-                        $this->push($job, $data, $queue);
-                    }
+        $connection = $this->getConnection();
+        $bulk = function () use ($jobs, $data, $queue) {
+            foreach ((array) $jobs as $job) {
+                if (isset($job->delay)) {
+                    $this->later($job->delay, $job, $data, $queue);
+                } else {
+                    $this->push($job, $data, $queue);
                 }
-            });
-        });
+            }
+        };
+        /**
+         * PhpRedis supports transactions, but not pipelining with Redis Cluster.
+         * Predis supports pipelining, but not transactions with Redis Cluster.
+         */
+        if ($connection instanceof PhpRedisClusterConnection) {
+            $connection->transaction($bulk);
+        } elseif ($connection instanceof PredisClusterConnection) {
+            $connection->pipeline($bulk);
+        } elseif ($connection instanceof PhpRedisConnection || $connection instanceof PredisConnection) {
+            $connection->pipeline(fn () => $connection->transaction($bulk));
+        } else {
+            $bulk();
+        }
     }
 
     /**
