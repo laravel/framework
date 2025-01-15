@@ -6,6 +6,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Validation\Rules\ArrayRule;
 use Illuminate\Validation\Rules\Can;
+use Illuminate\Validation\Rules\Date;
 use Illuminate\Validation\Rules\Dimensions;
 use Illuminate\Validation\Rules\Email;
 use Illuminate\Validation\Rules\Enum;
@@ -209,6 +210,17 @@ class Rule
     public static function imageFile()
     {
         return new ImageFile;
+    }
+
+    /**
+     * Get a date rule builder instance.
+     *
+     * @param  string  $format
+     * @return \Illuminate\Validation\Rules\Date
+     */
+    public static function date($format = 'Y-m-d')
+    {
+        return new Date($format);
     }
 
     /**
