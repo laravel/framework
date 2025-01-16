@@ -10,7 +10,7 @@ class UseFactory
     /**
      * Create a new attribute instance.
      *
-     * @param  class-string  $factoryClass
+     * @param  class-string<\Illuminate\Database\Eloquent\Factories\Factory>  $factoryClass
      * @return void
      */
     public function __construct(public string $factoryClass)
