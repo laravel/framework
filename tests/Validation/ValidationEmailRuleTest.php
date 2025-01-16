@@ -242,34 +242,34 @@ class ValidationEmailRuleTest extends TestCase
     public function testWithNativeValidationAllowUnicode()
     {
         $this->fails(
-            (new Email())->withNativeValidation(true),
+            (new Email())->withNativeValidation(allowUnicode: true),
             'invalid.@example.com',
             ['The '.self::ATTRIBUTE_REPLACED.' must be a valid email address.'],
         );
 
         $this->fails(
-            Rule::email()->withNativeValidation(true),
+            Rule::email()->withNativeValidation(allowUnicode: true),
             'invalid.@example.com',
             ['The '.self::ATTRIBUTE_REPLACED.' must be a valid email address.'],
         );
 
         $this->passes(
-            (new Email())->withNativeValidation(true),
+            (new Email())->withNativeValidation(allowUnicode: true),
             'tést@domain.com',
         );
 
         $this->passes(
-            Rule::email()->withNativeValidation(true),
+            Rule::email()->withNativeValidation(allowUnicode: true),
             'tést@domain.com',
         );
 
         $this->passes(
-            (new Email())->withNativeValidation(true),
+            (new Email())->withNativeValidation(allowUnicode: true),
             'admin@example.com',
         );
 
         $this->passes(
-            Rule::email()->withNativeValidation(true),
+            Rule::email()->withNativeValidation(allowUnicode: true),
             'admin@example.com',
         );
     }
@@ -451,7 +451,7 @@ class ValidationEmailRuleTest extends TestCase
             );
 
             $this->passes(
-                Rule::email()->withNativeValidation(true),
+                Rule::email()->withNativeValidation(allowUnicode: true),
                 $email,
             );
         }
@@ -477,7 +477,7 @@ class ValidationEmailRuleTest extends TestCase
             );
 
             $this->fails(
-                Rule::email()->withNativeValidation(true),
+                Rule::email()->withNativeValidation(allowUnicode: true),
                 $email,
                 ["The " . self::ATTRIBUTE_REPLACED . " must be a valid email address."],
             );
@@ -503,7 +503,7 @@ class ValidationEmailRuleTest extends TestCase
             );
 
             $this->passes(
-                Rule::email()->withNativeValidation(true),
+                Rule::email()->withNativeValidation(allowUnicode: true),
                 $email,
             );
         }
