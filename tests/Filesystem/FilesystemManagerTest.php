@@ -2,12 +2,15 @@
 
 namespace Illuminate\Tests\Filesystem;
 
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Filesystem\FilesystemManager;
 use Illuminate\Foundation\Application;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 use PHPUnit\Framework\TestCase;
+use Mockery as m;
+use Throwable;
 
 class FilesystemManagerTest extends TestCase
 {
@@ -153,6 +156,59 @@ class FilesystemManagerTest extends TestCase
             rmdir(__DIR__.'/../../to-be-scoped/path-prefix/dirname');
             rmdir(__DIR__.'/../../to-be-scoped/path-prefix');
             rmdir(__DIR__.'/../../to-be-scoped');
+        }
+    }
+
+    public function testApplicationExceptionIsThrown()
+    {
+        try {
+            $filesystem = new FilesystemManager(new Application);
+
+            $scoped = $filesystem->build([
+                'driver' => 'scoped',
+                'disk' => [
+                    'driver' => 'local',
+                    'root' => 'exception-handling',
+                    'throw' => true,
+                ],
+                'prefix' => 'path-prefix',
+            ]);
+
+            $scoped->get('dirname/filename.txt');
+        } catch (Throwable) {
+            return;
+        } finally {
+            rmdir(__DIR__.'/../../exception-handling');
+        }
+
+        $this->fail('Exception was not thrown.');
+    }
+
+    public function testApplicationExceptionHandlerIsUsed()
+    {
+        try {
+            $filesystem = new FilesystemManager(tap(new Application, function ($app) {
+                $exceptionHandler = m::mock(ExceptionHandler::class);
+                $exceptionHandler->shouldReceive('report')->once()->andReturnNull();
+                $app[ExceptionHandler::class] = $exceptionHandler;
+            }));
+
+            $scoped = $filesystem->build([
+                'driver' => 'scoped',
+                'disk' => [
+                    'driver' => 'local',
+                    'root' => 'exception-handling',
+                    'report' => true,
+                    'throw' => false,
+                ],
+                'prefix' => 'path-prefix',
+            ]);
+
+            $scoped->get('dirname/filename.txt');
+        } catch (Throwable) {
+            $this->fail('Exception was thrown.');
+        } finally {
+            rmdir(__DIR__.'/../../exception-handling');
         }
     }
 }

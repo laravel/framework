@@ -3,6 +3,7 @@
 namespace Illuminate\Filesystem;
 
 use Closure;
+use Illuminate\Contracts\Debug\ExceptionHandler as ExceptionHandlerContract;
 use Illuminate\Contracts\Filesystem\Cloud as CloudFilesystemContract;
 use Illuminate\Contracts\Filesystem\Filesystem as FilesystemContract;
 use Illuminate\Http\File;
@@ -35,6 +36,7 @@ use PHPUnit\Framework\Assert as PHPUnit;
 use Psr\Http\Message\StreamInterface;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Throwable;
 
 /**
  * @mixin \League\Flysystem\FilesystemOperator
@@ -89,18 +91,25 @@ class FilesystemAdapter implements CloudFilesystemContract
     protected $temporaryUrlCallback;
 
     /**
+     * @var ExceptionHandlerContract|null
+     */
+    protected $exceptionHandler;
+
+    /**
      * Create a new filesystem adapter instance.
      *
      * @param  \League\Flysystem\FilesystemOperator  $driver
      * @param  \League\Flysystem\FilesystemAdapter  $adapter
      * @param  array  $config
+     * @param  ExceptionHandlerContract|null  $exceptionHandler
      * @return void
      */
-    public function __construct(FilesystemOperator $driver, FlysystemAdapter $adapter, array $config = [])
+    public function __construct(FilesystemOperator $driver, FlysystemAdapter $adapter, array $config = [], ?ExceptionHandlerContract $exceptionHandler = null)
     {
         $this->driver = $driver;
         $this->adapter = $adapter;
         $this->config = $config;
+        $this->exceptionHandler = $exceptionHandler;
         $separator = $config['directory_separator'] ?? DIRECTORY_SEPARATOR;
 
         $this->prefixer = new PathPrefixer($config['root'] ?? '', $separator);
@@ -288,7 +297,7 @@ class FilesystemAdapter implements CloudFilesystemContract
             return $this->driver->read($path);
         } catch (UnableToReadFile $e) {
             throw_if($this->throwsExceptions(), $e);
-            report_if($this->shouldReport(), $e);
+            $this->report($e);
         }
     }
 
@@ -417,7 +426,7 @@ class FilesystemAdapter implements CloudFilesystemContract
                 : $this->driver->write($path, $contents, $options);
         } catch (UnableToWriteFile|UnableToSetVisibility $e) {
             throw_if($this->throwsExceptions(), $e);
-            report_if($this->shouldReport(), $e);
+            $this->report($e);
 
             return false;
         }
@@ -503,7 +512,7 @@ class FilesystemAdapter implements CloudFilesystemContract
             $this->driver->setVisibility($path, $this->parseVisibility($visibility));
         } catch (UnableToSetVisibility $e) {
             throw_if($this->throwsExceptions(), $e);
-            report_if($this->shouldReport(), $e);
+            $this->report($e);
 
             return false;
         }
@@ -562,7 +571,7 @@ class FilesystemAdapter implements CloudFilesystemContract
                 $this->driver->delete($path);
             } catch (UnableToDeleteFile $e) {
                 throw_if($this->throwsExceptions(), $e);
-                report_if($this->shouldReport(), $e);
+                $this->report($e);
 
                 $success = false;
             }
@@ -584,7 +593,7 @@ class FilesystemAdapter implements CloudFilesystemContract
             $this->driver->copy($from, $to);
         } catch (UnableToCopyFile $e) {
             throw_if($this->throwsExceptions(), $e);
-            report_if($this->shouldReport(), $e);
+            $this->report($e);
 
             return false;
         }
@@ -605,7 +614,7 @@ class FilesystemAdapter implements CloudFilesystemContract
             $this->driver->move($from, $to);
         } catch (UnableToMoveFile $e) {
             throw_if($this->throwsExceptions(), $e);
-            report_if($this->shouldReport(), $e);
+            $this->report($e);
 
             return false;
         }
@@ -637,7 +646,7 @@ class FilesystemAdapter implements CloudFilesystemContract
             return $this->driver->checksum($path, $options);
         } catch (UnableToProvideChecksum $e) {
             throw_if($this->throwsExceptions(), $e);
-            report_if($this->shouldReport(), $e);
+            $this->report($e);
 
             return false;
         }
@@ -655,7 +664,8 @@ class FilesystemAdapter implements CloudFilesystemContract
             return $this->driver->mimeType($path);
         } catch (UnableToRetrieveMetadata $e) {
             throw_if($this->throwsExceptions(), $e);
-            report_if($this->shouldReport(), $e);
+
+            $this->report($e);
         }
 
         return false;
@@ -681,7 +691,7 @@ class FilesystemAdapter implements CloudFilesystemContract
             return $this->driver->readStream($path);
         } catch (UnableToReadFile $e) {
             throw_if($this->throwsExceptions(), $e);
-            report_if($this->shouldReport(), $e);
+            $this->report($e);
         }
     }
 
@@ -694,7 +704,7 @@ class FilesystemAdapter implements CloudFilesystemContract
             $this->driver->writeStream($path, $resource, $options);
         } catch (UnableToWriteFile|UnableToSetVisibility $e) {
             throw_if($this->throwsExceptions(), $e);
-            report_if($this->shouldReport(), $e);
+            $this->report($e);
 
             return false;
         }
@@ -927,7 +937,7 @@ class FilesystemAdapter implements CloudFilesystemContract
             $this->driver->createDirectory($path);
         } catch (UnableToCreateDirectory|UnableToSetVisibility $e) {
             throw_if($this->throwsExceptions(), $e);
-            report_if($this->shouldReport(), $e);
+            $this->report($e);
 
             return false;
         }
@@ -947,7 +957,7 @@ class FilesystemAdapter implements CloudFilesystemContract
             $this->driver->deleteDirectory($directory);
         } catch (UnableToDeleteDirectory $e) {
             throw_if($this->throwsExceptions(), $e);
-            report_if($this->shouldReport(), $e);
+            $this->report($e);
 
             return false;
         }
@@ -1046,6 +1056,18 @@ class FilesystemAdapter implements CloudFilesystemContract
     protected function shouldReport(): bool
     {
         return (bool) ($this->config['report'] ?? false);
+    }
+
+    /**
+     * @param Throwable $exception
+     * @return void
+     * @throws Throwable
+     */
+    protected function report($exception)
+    {
+        if ($this->shouldReport() && $this->exceptionHandler !== null) {
+            $this->exceptionHandler->report($exception);
+        }
     }
 
     /**

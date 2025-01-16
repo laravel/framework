@@ -566,6 +566,27 @@ class FilesystemAdapterTest extends TestCase
             return $exceptionHandler;
         });
 
+        $adapter = new FilesystemAdapter($this->filesystem, $this->adapter, ['report' => true], $exceptionHandler);
+
+        try {
+            $adapter->get('/foo.txt');
+        } catch (UnableToReadFile) {
+            $this->fail('Exception was thrown.');
+        }
+    }
+
+    public function testDoesntReportExceptionsForGetWithoutHandler()
+    {
+        $container = Container::getInstance();
+
+        $exceptionHandler = m::mock(ExceptionHandler::class);
+
+        $exceptionHandler->shouldNotReceive('report');
+
+        $container->bind(ExceptionHandler::class, function () use ($exceptionHandler) {
+            return $exceptionHandler;
+        });
+
         $adapter = new FilesystemAdapter($this->filesystem, $this->adapter, ['report' => true]);
 
         try {
@@ -594,7 +615,7 @@ class FilesystemAdapterTest extends TestCase
             return $exceptionHandler;
         });
 
-        $adapter = new FilesystemAdapter($this->filesystem, $this->adapter, ['report' => true]);
+        $adapter = new FilesystemAdapter($this->filesystem, $this->adapter, ['report' => true], $exceptionHandler);
 
         try {
             $adapter->readStream('/foo.txt');
@@ -626,7 +647,7 @@ class FilesystemAdapterTest extends TestCase
 
         chmod(__DIR__.'/tmp/foo.txt', 0400);
 
-        $adapter = new FilesystemAdapter($this->filesystem, $this->adapter, ['report' => true]);
+        $adapter = new FilesystemAdapter($this->filesystem, $this->adapter, ['report' => true], $exceptionHandler);
 
         try {
             $adapter->put('/foo.txt', 'Hello World!');
@@ -658,7 +679,7 @@ class FilesystemAdapterTest extends TestCase
 
         $this->filesystem->write('unknown.mime-type', '');
 
-        $adapter = new FilesystemAdapter($this->filesystem, $this->adapter, ['report' => true]);
+        $adapter = new FilesystemAdapter($this->filesystem, $this->adapter, ['report' => true], $exceptionHandler);
 
         try {
             $adapter->mimeType('unknown.mime-type');
