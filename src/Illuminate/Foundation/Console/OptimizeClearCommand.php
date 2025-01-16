@@ -43,6 +43,7 @@ class OptimizeClearCommand extends Command
                         ->filter()
                         ->unique()
                         ->flip();
+
                     return $collection->reject(fn ($command, $key) => $exceptions->hasAny([$command, $key]));
                 }
             )
