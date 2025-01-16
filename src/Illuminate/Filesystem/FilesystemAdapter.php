@@ -1059,7 +1059,7 @@ class FilesystemAdapter implements CloudFilesystemContract
     }
 
     /**
-     * @param Throwable $exception
+     * @param  Throwable  $exception
      * @return void
      * @throws Throwable
      */
