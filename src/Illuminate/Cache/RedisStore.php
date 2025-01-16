@@ -313,7 +313,7 @@ class RedisStore extends TaggableStore implements LockProvider
 
         $prefix = $connectionPrefix.$this->getPrefix();
 
-        return LazyCollection::make(function () use ($connection, $chunkSize, $prefix, $defaultCursorValue) {
+        return (new LazyCollection(function () use ($connection, $chunkSize, $prefix, $defaultCursorValue) {
             $cursor = $defaultCursorValue;
 
             do {
@@ -336,7 +336,7 @@ class RedisStore extends TaggableStore implements LockProvider
                     yield $tag;
                 }
             } while (((string) $cursor) !== $defaultCursorValue);
-        })->map(fn (string $tagKey) => Str::match('/^'.preg_quote($prefix, '/').'tag:(.*):entries$/', $tagKey));
+        }))->map(fn (string $tagKey) => Str::match('/^'.preg_quote($prefix, '/').'tag:(.*):entries$/', $tagKey));
     }
 
     /**
