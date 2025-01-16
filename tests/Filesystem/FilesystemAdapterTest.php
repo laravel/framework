@@ -555,7 +555,7 @@ class FilesystemAdapterTest extends TestCase
 
         $exceptionHandler->shouldReceive('report')
             ->once()
-            ->andReturnUsing(function(UnableToReadFile $e) {
+            ->andReturnUsing(function (UnableToReadFile $e) {
                 self::assertStringContainsString(
                     'Unable to read file from location: foo.txt.',
                     $e->getMessage(),
@@ -583,7 +583,7 @@ class FilesystemAdapterTest extends TestCase
 
         $exceptionHandler->shouldReceive('report')
             ->once()
-            ->andReturnUsing(function(UnableToReadFile $e) {
+            ->andReturnUsing(function (UnableToReadFile $e) {
                 self::assertStringContainsString(
                     'Unable to read file from location: foo.txt.',
                     $e->getMessage(),
@@ -611,7 +611,7 @@ class FilesystemAdapterTest extends TestCase
 
         $exceptionHandler->shouldReceive('report')
             ->once()
-            ->andReturnUsing(function(UnableToWriteFile $e) {
+            ->andReturnUsing(function (UnableToWriteFile $e) {
                 self::assertStringContainsString(
                     'Unable to write file at location: foo.txt.',
                     $e->getMessage(),
@@ -645,7 +645,7 @@ class FilesystemAdapterTest extends TestCase
 
         $exceptionHandler->shouldReceive('report')
             ->once()
-            ->andReturnUsing(function(UnableToRetrieveMetadata $e) {
+            ->andReturnUsing(function (UnableToRetrieveMetadata $e) {
                 self::assertStringContainsString(
                     'Unable to retrieve the mime_type for file at location: unknown.mime-type.',
                     $e->getMessage(),
