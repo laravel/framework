@@ -345,7 +345,7 @@ class ValidationEmailRuleTest extends TestCase
             $this->fails(
                 Rule::email()->rfcCompliant(strict: true),
                 $email,
-                ['The ' . self::ATTRIBUTE_REPLACED . ' must be a valid email address.'],
+                ['The '.self::ATTRIBUTE_REPLACED.' must be a valid email address.'],
             );
         }
 
@@ -403,13 +403,13 @@ class ValidationEmailRuleTest extends TestCase
             $this->fails(
                 Rule::email()->rfcCompliant(),
                 $email,
-                ['The ' . self::ATTRIBUTE_REPLACED . ' must be a valid email address.'],
+                ['The '.self::ATTRIBUTE_REPLACED.' must be a valid email address.'],
             );
 
             $this->fails(
                 Rule::email()->rfcCompliant(strict: true),
                 $email,
-                ['The ' . self::ATTRIBUTE_REPLACED . ' must be a valid email address.'],
+                ['The '.self::ATTRIBUTE_REPLACED.' must be a valid email address.'],
             );
         }
 
@@ -457,7 +457,7 @@ class ValidationEmailRuleTest extends TestCase
         }
 
         /**
-         * Emails that fail both ASCII and Unicode modes
+         * Emails that fail both ASCII and Unicode modes.
          */
         $emailsThatFailOnBoth = [
             'test@üñîçødé.com',  // Unicode domain
@@ -512,7 +512,7 @@ class ValidationEmailRuleTest extends TestCase
     public function testNativeValidationVsRfcCompliant()
     {
         $emailsThatPassNativeFailRfc = [
-           // none I could find
+            // none I could find
         ];
 
         foreach ($emailsThatPassNativeFailRfc as $email) {
@@ -529,9 +529,8 @@ class ValidationEmailRuleTest extends TestCase
         }
 
         /**
-         * Addresses that fail withNativeValidation (ASCII-only)
-         * but pass rfcCompliant().
-         * (Typical scenario for emails with accented or Unicode local parts.)
+         * Addresses that fail withNativeValidation (ASCII-only) but pass rfcCompliant().
+         * Typical scenario for emails with accented or Unicode local parts.
          */
         $emailsThatFailNativePassRfc = [
             'some(comment)@example.com',        // Comment in local part
@@ -601,7 +600,6 @@ class ValidationEmailRuleTest extends TestCase
 
         /**
          * Addresses that fail both native validation and rfcCompliant.
-         * (Truly invalid syntax or domain usage.)
          */
         $emailsThatFailBoth = [
             'test@@example.com',        // Multiple @
