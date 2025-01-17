@@ -1454,6 +1454,17 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Add hyphens at specified position(s) in the string.
+     *
+     * @param  array|int  $chunks
+     * @return static
+     */
+    public function hyphenate(...$chunks)
+    {
+        return new static(Str::hyphenate($this->value, $chunks));
+    }
+
+    /**
      * Proxy dynamic properties onto methods.
      *
      * @param  string  $key

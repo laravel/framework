@@ -1056,6 +1056,47 @@ class Str
     }
 
     /**
+     * Add hyphens at specified position(s) in the string.
+     *
+     * @param  string  $value
+     * @param  array|int  $chunks
+     * @return string
+     */
+    public static function hyphenate(string $value, mixed ...$chunks)
+    {
+         $chunksArray = Arr::flatten($chunks);
+
+         if (count($chunksArray) === 1 && !is_array($chunksArray[0])) {
+             $chunkSize = (int)$chunksArray[0];
+             $totalChunks = ceil(strlen($value) / $chunkSize);
+             $chunksArray = array_fill(0, $totalChunks, $chunkSize);
+         }
+
+         $result = '';
+         $position = 0;
+
+         foreach ($chunksArray as $chunk) {
+             if ($position >= strlen($value)) {
+                 break;
+             }
+
+             if ($position > 0 && $position < strlen($value)) {
+                 $result .= '-';
+             }
+
+             $chunkSize = (int)$chunk;
+             $result .= substr($value, $position, $chunkSize);
+             $position += $chunkSize;
+         }
+
+         if ($position < strlen($value)) {
+             $result .= ($result ? '-' : '') . substr($value, $position);
+         }
+
+         return $result;
+    }
+
+    /**
      * Set the callable that will be used to generate random strings.
      *
      * @param  callable|null  $factory

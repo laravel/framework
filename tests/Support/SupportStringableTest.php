@@ -1365,4 +1365,14 @@ class SupportStringableTest extends TestCase
         $this->assertSame('foobar', (string) $this->stringable(base64_encode('foobar'))->fromBase64(true));
         $this->assertSame('foobarbaz', (string) $this->stringable(base64_encode('foobarbaz'))->fromBase64());
     }
+
+    public function testHyphenate()
+    {
+        $this->assertSame('abc-123-xyz', (string) $this->stringable('abc123xyz')->hyphenate(3));
+        $this->assertSame('abc-12-3x', (string) $this->stringable('abc123x')->hyphenate(3, 2));
+        $this->assertSame('abc-12-3x', (string) $this->stringable('abc123x')->hyphenate([3, 2]));
+        $this->assertSame('abc-12', (string) $this->stringable('abc12')->hyphenate(3));
+        $this->assertSame('abc', (string) $this->stringable('abc')->hyphenate(4));
+        $this->assertSame('', (string) $this->stringable('', 4)->hyphenate());
+    }
 }
