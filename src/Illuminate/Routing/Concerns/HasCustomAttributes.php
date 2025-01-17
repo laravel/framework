@@ -17,7 +17,7 @@ trait HasCustomAttributes
         $attributes->each(function (ReflectionAttribute $attribute) {
             $instance = $attribute->newInstance();
 
-            if(method_exists($instance, 'handle')) {
+            if (method_exists($instance, 'handle')) {
                 $attribute->newInstance()->handle(...$attribute->getArguments());
             }
         });
@@ -28,6 +28,6 @@ trait HasCustomAttributes
     private function gteCustomAttributes(ReflectionMethod $reflection): Collection
     {
         return collect($reflection->getAttributes())
-            ->filter(fn(ReflectionAttribute $attr) => $attr->newInstance() instanceof ICustomAttribute);
+            ->filter(fn (ReflectionAttribute $attr) => $attr->newInstance() instanceof ICustomAttribute);
     }
 }
