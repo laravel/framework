@@ -38,7 +38,7 @@ class RetryCommand extends Command
      */
     public function handle()
     {
-        $jobsFound = count($ids = $this->getJobIds()) > 0;
+        $jobsFound = $ids = $this->getJobIds() !== [];
 
         if ($jobsFound) {
             $this->components->info('Pushing failed queue jobs back onto the queue.');

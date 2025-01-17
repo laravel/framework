@@ -225,7 +225,7 @@ class AboutCommand extends Command
      */
     protected function hasPhpFiles(string $path): bool
     {
-        return count(glob($path.'/*.php')) > 0;
+        return glob($path.'/*.php') !== [];
     }
 
     /**

@@ -60,7 +60,7 @@ class RedisTagSet extends TagSet
 
                     $entries = array_unique(array_keys($entries));
 
-                    if (count($entries) === 0) {
+                    if ($entries === []) {
                         continue;
                     }
 

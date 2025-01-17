@@ -97,7 +97,7 @@ class ApplicationBuilder
      */
     public function withEvents(array|bool $discover = [])
     {
-        if (is_array($discover) && count($discover) > 0) {
+        if (is_array($discover) && $discover !== []) {
             AppEventServiceProvider::setEventDiscoveryPaths($discover);
         }
 

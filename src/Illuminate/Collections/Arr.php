@@ -293,7 +293,7 @@ class Arr
 
         $keys = (array) $keys;
 
-        if (count($keys) === 0) {
+        if ($keys === []) {
             return;
         }
 
@@ -467,7 +467,7 @@ class Arr
             return implode($glue, $array);
         }
 
-        if (count($array) === 0) {
+        if ($array === []) {
             return '';
         }
 

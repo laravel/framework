@@ -127,7 +127,7 @@ trait ValidatesAttributes
             try {
                 $records = $this->getDnsRecords($url.'.', DNS_A | DNS_AAAA);
 
-                if (is_array($records) && count($records) > 0) {
+                if (is_array($records) && $records !== []) {
                     return true;
                 }
             } catch (Exception) {

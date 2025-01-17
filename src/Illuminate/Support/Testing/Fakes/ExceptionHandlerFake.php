@@ -173,7 +173,7 @@ class ExceptionHandlerFake implements ExceptionHandler, Fake
      */
     protected function isFakedException(Throwable $e)
     {
-        return count($this->exceptions) === 0 || in_array(get_class($e), $this->exceptions, true);
+        return $this->exceptions === [] || in_array(get_class($e), $this->exceptions, true);
     }
 
     /**
