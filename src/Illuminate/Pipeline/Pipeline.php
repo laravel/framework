@@ -42,7 +42,7 @@ class Pipeline implements PipelineContract
     protected $method = 'handle';
 
     /**
-     * The catch callback to be executed when an exception is thrown
+     * The catch callback to be executed when an exception is thrown.
      *
      * @var \Closure|null
      */
