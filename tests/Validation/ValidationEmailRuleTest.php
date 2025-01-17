@@ -565,13 +565,13 @@ class ValidationEmailRuleTest extends TestCase
         $this->fails(
             Rule::email()->withNativeValidation(),
             $email,
-            ['The ' . self::ATTRIBUTE_REPLACED . ' must be a valid email address.']
+            ['The '.self::ATTRIBUTE_REPLACED.' must be a valid email address.']
         );
 
         $this->fails(
             Rule::email()->rfcCompliant(),
             $email,
-            ['The ' . self::ATTRIBUTE_REPLACED . ' must be a valid email address.']
+            ['The '.self::ATTRIBUTE_REPLACED.' must be a valid email address.']
         );
     }
 
@@ -610,7 +610,7 @@ class ValidationEmailRuleTest extends TestCase
         $this->fails(
             Rule::email()->rfcCompliant(true),
             $email,
-            ['The ' . self::ATTRIBUTE_REPLACED . ' must be a valid email address.']
+            ['The '.self::ATTRIBUTE_REPLACED.' must be a valid email address.']
         );
     }
 
@@ -622,7 +622,7 @@ class ValidationEmailRuleTest extends TestCase
         $this->fails(
             Rule::email()->withNativeValidation(),
             $email,
-            ['The ' . self::ATTRIBUTE_REPLACED . ' must be a valid email address.']
+            ['The '.self::ATTRIBUTE_REPLACED.' must be a valid email address.']
         );
 
         $this->passes(
@@ -664,13 +664,13 @@ class ValidationEmailRuleTest extends TestCase
         $this->fails(
             Rule::email()->withNativeValidation(),
             $email,
-            ['The ' . self::ATTRIBUTE_REPLACED . ' must be a valid email address.']
+            ['The '.self::ATTRIBUTE_REPLACED.' must be a valid email address.']
         );
 
         $this->fails(
             Rule::email()->rfcCompliant(true),
             $email,
-            ['The ' . self::ATTRIBUTE_REPLACED . ' must be a valid email address.']
+            ['The '.self::ATTRIBUTE_REPLACED.' must be a valid email address.']
         );
     }
 
