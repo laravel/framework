@@ -2,80 +2,65 @@
 
 namespace Illuminate\Foundation\Queue;
 
-use Illuminate\Cache\Repository;
+use Illuminate\Bus\UniqueLock;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
-use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Context;
 
 trait InteractsWithUniqueJobs
 {
     /**
-     * Saves the used cache driver for the lock and
-     * the lock key for emergency forceRelease in
-     * case we can't instantiate a job instance.
+     * Store unique job information in the context in case we can't resolve the job on the queue side.
+     *
+     * @param  object  $job
+     * @return void
      */
-    public function rememberLockIfJobIsUnique($job): void
+    public function addUniqueJobInformationToContext($job): void
     {
         if ($this->isUniqueJob($job)) {
-            context()->addHidden([
-                'laravel_unique_job_cache_driver' => $this->getCacheDriver($job),
-                'laravel_unique_job_key' => $this->getKey($job),
+            Context::addHidden([
+                'laravel_unique_job_cache_driver' => $this->getUniqueJobCacheStore($job),
+                'laravel_unique_job_key' => UniqueLock::getKey($job),
             ]);
         }
     }
 
     /**
-     * forget the used lock.
+     * Remove the unique job information from the context.
+     *
+     * @param  object  $job
+     * @return void
      */
-    public function forgetLockIfJobIsUnique($job): void
+    public function removeUniqueJobInformationFromContext($job): void
     {
         if ($this->isUniqueJob($job)) {
-            context()->forgetHidden(['laravel_unique_job_cache_driver', 'laravel_unique_job_key']);
+            Context::forgetHidden([
+                'laravel_unique_job_cache_driver',
+                'laravel_unique_job_key',
+            ]);
         }
     }
 
     /**
-     * Determine if job has unique lock.
+     * Determine the cache store used by the unique job to acquire locks.
+     *
+     * @param  object  $job
+     * @return string
+     */
+    private function getUniqueJobCacheStore($job): ?string
+    {
+        return method_exists($job, 'uniqueVia')
+            ? $job->uniqueVia()
+            : config('cache.default');
+    }
+
+    /**
+     * Determine if job should be unique.
+     *
+     * @param  mixed  $job
+     * @return bool
      */
     private function isUniqueJob($job): bool
     {
         return $job instanceof ShouldBeUnique;
-    }
-
-    /**
-     * Get the used cache driver as string from the config,
-     * CacheManger will handle invalid drivers.
-     */
-    private function getCacheDriver($job): ?string
-    {
-        /** @var \Illuminate\Cache\Repository */
-        $cache = method_exists($job, 'uniqueVia') ?
-            $job->uniqueVia() :
-            app()->make(Repository::class);
-
-        $store = collect(config('cache')['stores'])
-
-            ->firstWhere(
-                function ($store) use ($cache) {
-                    return $cache === rescue(fn () => cache()->driver($store['driver']));
-                }
-            );
-
-        return Arr::get($store, 'driver');
-    }
-
-    //NOTE: can I change visibility of the original method in src/Illuminate/Bus/UniqueLock.php ?
-    /**
-     * Generate the lock key for the given job.
-     *
-     * @param  mixed  $job
-     * @return string
-     */
-    private function getKey($job)
-    {
-        $uniqueId = method_exists($job, 'uniqueId')
-                    ? $job->uniqueId()
-                    : ($job->uniqueId ?? '');
-
-        return 'laravel_unique_job:'.get_class($job).':'.$uniqueId;
     }
 }

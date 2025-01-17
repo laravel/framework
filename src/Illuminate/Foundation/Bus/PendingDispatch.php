@@ -12,6 +12,7 @@ use Illuminate\Foundation\Queue\InteractsWithUniqueJobs;
 class PendingDispatch
 {
     use InteractsWithUniqueJobs;
+
     /**
      * The job.
      *
@@ -209,10 +210,10 @@ class PendingDispatch
      */
     public function __destruct()
     {
-        $this->rememberLockIfJobIsUnique($this->job);
+        $this->addUniqueJobInformationToContext($this->job);
 
         if (! $this->shouldDispatch()) {
-            $this->forgetLockIfJobIsUnique($this->job);
+            $this->removeUniqueJobInformationFromContext($this->job);
 
             return;
         } elseif ($this->afterResponse) {
@@ -221,6 +222,6 @@ class PendingDispatch
             app(Dispatcher::class)->dispatch($this->job);
         }
 
-        $this->forgetLockIfJobIsUnique($this->job);
+        $this->removeUniqueJobInformationFromContext($this->job);
     }
 }

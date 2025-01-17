@@ -64,7 +64,7 @@ class UniqueLock
      * @param  mixed  $job
      * @return string
      */
-    protected function getKey($job)
+    public static function getKey($job)
     {
         $uniqueId = method_exists($job, 'uniqueId')
                     ? $job->uniqueId()
