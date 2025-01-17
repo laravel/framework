@@ -335,6 +335,7 @@ class ValidationEmailRuleTest extends TestCase
             'user@[IPv6:::1]',                      // Domain-literal with unusual IPv6 short form
             'a@[IPv6:2001:db8::1]',                 // Domain-literal with normal IPv6
             'user@[IPv6:::]',                       // invalid shorthand IPv6
+            '"ab\\(c"@example.com',
         ];
 
         foreach ($emailsThatPassOnRfcCompliantButFailOnStrict as $email) {
