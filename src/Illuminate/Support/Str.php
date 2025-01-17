@@ -1061,7 +1061,7 @@ class Str
      * @param  string  $string
      * @return \Illuminate\Support\Stringable
      */
-    public static function makeRandom($length = 16)
+    public static function createRandom($length = 16)
     {
         return new Stringable(Str::random($length));
     }

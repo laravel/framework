@@ -1369,10 +1369,10 @@ class SupportStringableTest extends TestCase
 
     public function testRandom()
     {
-        $this->assertSame(16, $this->stringable()->makeRandom()->length());
-        $this->assertSame(17, $this->stringable()->makeRandom(17)->length());
+        $this->assertSame(16, $this->stringable()->createRandom()->length());
+        $this->assertSame(17, $this->stringable()->createRandom(17)->length());
 
         Str::createRandomStringsUsing(fn () => 'xyz');
-        $this->assertSame('XYZ', $this->stringable()->makeRandom(18)->upper()->toString());
+        $this->assertSame('XYZ', $this->stringable()->createRandom(18)->upper()->toString());
     }
 }
