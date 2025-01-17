@@ -39,10 +39,18 @@ class PendingDispatch
         $this->setQueueAndConnectionFromAttributesIfNotSet();
     }
 
+    /**
+     * Set the job's queue and connection values based on the job's OnQueue/OnConnection attributes.
+     *
+     * @return void
+     * @throws \ReflectionException
+     */
     protected function setQueueAndConnectionFromAttributesIfNotSet(): void
     {
-        if (($hasQueueSet = isset($this->job->queue))
-            && ($hasConnectionSet = isset($this->job->connection))) {
+        $hasQueueSet = isset($this->job->queue);
+        $hasConnectionSet = isset($this->job->connection);
+
+        if ($hasQueueSet && $hasConnectionSet) {
             return;
         }
 
