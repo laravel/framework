@@ -5,11 +5,11 @@ namespace Illuminate\Tests\Support;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
+use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
 use League\CommonMark\Environment\EnvironmentBuilderInterface;
 use League\CommonMark\Extension\ExtensionInterface;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Support\Str;
 
 class SupportStringableTest extends TestCase
 {
@@ -1372,7 +1372,7 @@ class SupportStringableTest extends TestCase
         $this->assertSame(16, $this->stringable()->makeRandom()->length());
         $this->assertSame(17, $this->stringable()->makeRandom(17)->length());
 
-        Str::createRandomStringsUsing(fn () =>'xyz');
+        Str::createRandomStringsUsing(fn () => 'xyz');
         $this->assertSame('XYZ', $this->stringable()->makeRandom(18)->upper()->toString());
     }
 }
