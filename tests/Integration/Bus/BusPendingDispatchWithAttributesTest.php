@@ -1,6 +1,7 @@
 <?php
 
-namespace Illuminate\Tests\Bus;
+namespace Illuminate\Tests\Integration\Bus;
+
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -65,6 +66,32 @@ class BusPendingDispatchWithAttributesTest extends TestCase
                 && $job->value === 'abc';
         });
     }
+
+    public function testAllowsEnumsInAttributes(): void
+    {
+        Queue::fake();
+
+        FakeJobWithAttributesUsingEnums::dispatch(1234);
+
+        Queue::assertPushed(
+            fn (FakeJobWithAttributesUsingEnums $job) => $job->queue === 'my-value'
+                && $job->connection == 'other-value'
+                && $job->value === 1234
+        );
+    }
+
+    public function testWorksWithDispatchFunction(): void
+    {
+        Queue::fake();
+
+        dispatch(new FakeJobWithAttributesUsingEnums('laravel'))->onConnection('zzz');
+
+        Queue::assertPushed(
+            fn (FakeJobWithAttributesUsingEnums $job) => $job->queue === 'my-value'
+                && $job->connection == 'zzz'
+                && $job->value === 'laravel'
+        );
+    }
 }
 
 #[OnQueue('queue-from-attribute')]
@@ -102,4 +129,23 @@ class FakeJobWithOnConnection implements ShouldQueue
     public function __construct(public $value)
     {
     }
+}
+
+#[OnQueue(PendingDispatchWithAttributesEnum::MyValue)]
+#[OnConnection(PendingDispatchWithAttributesEnum::OtherValue)]
+class FakeJobWithAttributesUsingEnums implements ShouldQueue
+{
+    use Dispatchable;
+    use Queueable;
+    use InteractsWithQueue;
+
+    public function __construct(public $value)
+    {
+    }
+}
+
+enum PendingDispatchWithAttributesEnum: string
+{
+    case MyValue = 'my-value';
+    case OtherValue = 'other-value';
 }
