@@ -7,6 +7,8 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
+use Illuminate\Foundation\Bus\Attributes\OnConnection;
+use Illuminate\Foundation\Bus\Attributes\OnQueue;
 
 class PendingDispatch
 {
@@ -33,6 +35,31 @@ class PendingDispatch
     public function __construct($job)
     {
         $this->job = $job;
+
+        $this->setQueueAndConnectionFromAttributesIfNotSet();
+    }
+
+    protected function setQueueAndConnectionFromAttributesIfNotSet(): void
+    {
+        if (($hasQueueSet = isset($this->job->queue))
+            && ($hasConnectionSet = isset($this->job->connection))) {
+            return;
+        }
+
+        $reflectionClass = new \ReflectionClass($this->job);
+        if (!$hasQueueSet) {
+            $onQueue = $reflectionClass->getAttributes(OnQueue::class);
+            if ($onQueue !== []) {
+                $this->onQueue($onQueue[0]->newInstance()->queue);
+            }
+        }
+
+        if (!$hasConnectionSet) {
+            $onConnection = $reflectionClass->getAttributes(OnConnection::class);
+            if ($onConnection !== []) {
+                $this->onConnection($onConnection[0]->newInstance()->connection);
+            }
+        }
     }
 
     /**
