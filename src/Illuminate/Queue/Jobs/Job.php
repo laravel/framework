@@ -232,10 +232,10 @@ abstract class Job
      */
     protected function shouldRollBackDatabaseTransaction($e)
     {
-        return ($e instanceof TimeoutExceededException &&
+        return $e instanceof TimeoutExceededException &&
             $this->container['config']['queue.failed.database'] &&
             in_array($this->container['config']['queue.failed.driver'], ['database', 'database-uuids']) &&
-            $this->container->bound('db'));
+            $this->container->bound('db');
     }
 
     /**
