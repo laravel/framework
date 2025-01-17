@@ -145,7 +145,7 @@ class MailMailerTest extends TestCase
         rendered.view
         Text;
 
-        $this->assertStringContainsString($expected, $sentMessage->toString());
+        $this->assertStringContainsString(str_replace("\r\n", "\n", $expected), $sentMessage->toString());
 
         $expected = <<<Text
         Content-Type: text/plain; charset=utf-8\r
@@ -154,7 +154,7 @@ class MailMailerTest extends TestCase
         rendered.plain
         Text;
 
-        $this->assertStringContainsString($expected, $sentMessage->toString());
+        $this->assertStringContainsString(str_replace("\r\n", "\n", $expected), $sentMessage->toString());
     }
 
     public function testMailerSendSendsMessageWithProperPlainViewContentWhenExplicit()
@@ -177,7 +177,7 @@ class MailMailerTest extends TestCase
         rendered.view
         Text;
 
-        $this->assertStringContainsString($expected, $sentMessage->toString());
+        $this->assertStringContainsString(str_replace("\r\n", "\n", $expected), $sentMessage->toString());
 
         $expected = <<<Text
         Content-Type: text/plain; charset=utf-8\r
@@ -186,7 +186,7 @@ class MailMailerTest extends TestCase
         rendered.plain
         Text;
 
-        $this->assertStringContainsString($expected, $sentMessage->toString());
+        $this->assertStringContainsString(str_replace("\r\n", "\n", $expected), $sentMessage->toString());
     }
 
     public function testToAllowsEmailAndName()
