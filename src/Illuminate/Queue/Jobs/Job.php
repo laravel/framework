@@ -204,11 +204,10 @@ abstract class Job
             }
         }
 
-        if ($e instanceof TimeoutExceededException &&
-            ($failedJobConnectionName = $this->container['config']['queue.failed.database']) &&
-            in_array($this->container['config']['queue.failed.driver'], ['database', 'database-uuids']) &&
-            $this->container->bound('db')) {
-            $this->container->make('db')->connection($failedJobConnectionName)->rollBack(toLevel: 0);
+        if ($this->shouldRollBackDatabaseTransaction($e)) {
+            $this->container->make('db')
+                ->connection($this->container['config']['queue.failed.database'])
+                ->rollBack(toLevel: 0);
         }
 
         try {
@@ -223,6 +222,20 @@ abstract class Job
                 $this->connectionName, $this, $e ?: new ManuallyFailedException
             ));
         }
+    }
+
+    /**
+     * Determine if the current database transaction should be rolled back to level zero.
+     *
+     * @param  \Throwable  $e
+     * @return bool
+     */
+    protected function shouldRollBackDatabaseTransaction($e)
+    {
+        return ($e instanceof TimeoutExceededException &&
+            $this->container['config']['queue.failed.database'] &&
+            in_array($this->container['config']['queue.failed.driver'], ['database', 'database-uuids']) &&
+            $this->container->bound('db'));
     }
 
     /**
