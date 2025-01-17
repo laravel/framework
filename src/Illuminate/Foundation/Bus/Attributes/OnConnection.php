@@ -8,7 +8,7 @@ use Attribute;
 class OnConnection
 {
     /**
-     * @param  string|\BackedEnum $connection
+     * @param  string|\UnitEnum $connection
      * @return void
      */
     public function __construct(public $connection)
