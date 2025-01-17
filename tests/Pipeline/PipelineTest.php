@@ -8,6 +8,7 @@ use Illuminate\Pipeline\Pipeline;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use stdClass;
+use Throwable;
 
 class PipelineTest extends TestCase
 {
@@ -356,6 +357,34 @@ class PipelineTest extends TestCase
         $this->assertSame(4, $result->value);
     }
 
+    public function testPipelineFinallyOutOfOrder()
+    {
+        $std = new stdClass;
+
+        ($pipeline = new Pipeline(new Container))
+            ->send($std)
+            ->through([
+                function ($std, $next) {
+                    $std->value = 100;
+
+                    return $next($std);
+                },
+                function ($std, $next) {
+                    $std->value = 200;
+
+                    return $next($std);
+                },
+            ])->then(function ($std) use (&$pipeline) {
+                $std->value = 300;
+
+                return $pipeline;
+            })->finally(function () {
+                $this->fail('Finally should not be called');
+            });
+
+        $this->assertSame(300, $std->value);
+    }
+
     public function testPipelineFinallyWhenExceptionOccurs()
     {
         $std = new stdClass();
@@ -390,6 +419,186 @@ class PipelineTest extends TestCase
 
             throw $e;
         }
+    }
+
+    public function testPipelineCatch()
+    {
+        $std = new stdClass;
+
+        (new Pipeline(new Container))
+            ->send($std)
+            ->through([
+                function ($std, $next) {
+                    $std->value = 1;
+
+                    return $next($std);
+                },
+                function ($std) {
+                    throw new Exception('My Exception: '.$std->value);
+                },
+                function ($std, $next) {
+                    $std->value++;
+
+                    return $next($std);
+                },
+            ])->catch(function ($std, Throwable $e) {
+                $std->value = 100;
+                $this->assertSame('My Exception: 1', $e->getMessage());
+            })
+            ->then(function ($std) {
+                $this->assertSame(1, $std->value);
+
+                return $std;
+            });
+
+        $this->assertSame(100, $std->value);
+    }
+
+    public function testPipelineCatchWhenThereIsNoException()
+    {
+        $std = new stdClass;
+
+        (new Pipeline(new Container))
+            ->send($std)
+            ->through([
+                function ($std, $next) {
+                    $std->value = 1;
+
+                    return $next($std);
+                },
+                function ($std, $next) {
+                    $std->value++;
+
+                    return $next($std);
+                },
+            ])->catch(function () {
+                $this->fail('Catch should not be called');
+            })
+            ->then(function ($std) {
+                $this->assertSame(2, $std->value);
+
+                return $std;
+            });
+    }
+
+    public function testPipelineCatchAndFinallyWhenThereIsException()
+    {
+        $std = new stdClass;
+
+        (new Pipeline(new Container))
+            ->send($std)
+            ->through([
+                function ($std, $next) {
+                    $std->value = 1;
+
+                    return $next($std);
+                },
+                function ($std) {
+                    $std->value++;
+                    throw new Exception('My Exception: '.$std->value);
+                },
+            ])->finally(function ($std) {
+                $this->assertSame(100, $std->value);
+
+                $std->value = 200;
+            })->catch(function ($std, Throwable $e) {
+                $std->value = 100;
+
+                $this->assertSame('My Exception: 2', $e->getMessage());
+            })->then(function ($std) {
+                $this->assertSame(2, $std->value);
+
+                return $std;
+            });
+
+        $this->assertSame(200, $std->value);
+    }
+
+    public function testPipelineCatchAndFinallyWhenThereIsNoException()
+    {
+        $std = new stdClass;
+
+        (new Pipeline(new Container))
+            ->send($std)
+            ->through([
+                function ($std, $next) {
+                    $std->value = 1;
+
+                    return $next($std);
+                },
+            ])->catch(function () {
+                $this->fail('Catch should not be called');
+            })
+            ->finally(function ($std) {
+                $this->assertSame(200, $std->value);
+                $std->value = 300;
+            })
+            ->then(function ($std) {
+                $this->assertSame(1, $std->value);
+                $std->value = 200;
+
+                return $std;
+            });
+
+        $this->assertSame(300, $std->value);
+    }
+
+    public function testPipelineCatchOutOfOrder()
+    {
+        $std = new stdClass;
+
+        try {
+            (new Pipeline(new Container))
+                ->send($std)
+                ->through([
+                    function ($std, $next) {
+                        $std->value = 1;
+
+                        return $next($std);
+                    },
+                    function ($std) {
+                        $std->value++;
+                        throw new Exception('My Exception: '.$std->value);
+                    },
+                ])->then(function () {
+                    $this->fail('Then should not be called');
+                })->catch(function () {
+                    $this->fail('Catch should not be called');
+                });
+        } catch (Throwable $e) {
+            $this->assertSame('My Exception: 2', $e->getMessage());
+        }
+
+        $this->assertSame(2, $std->value);
+    }
+
+    public function testPipelineCatchWithReturn()
+    {
+        $std = new stdClass;
+
+        $result = (new Pipeline(new Container))
+            ->send($std)
+            ->through([
+                function ($std) {
+                    $std->value = 1;
+                    throw new Exception('My Exception: '.$std->value);
+                },
+            ])->catch(function ($std, Throwable $e) {
+                $this->assertSame(1, $std->value);
+                $std->value = 100;
+                $this->assertSame('My Exception: 1', $e->getMessage());
+
+                return 1000;
+            })
+            ->then(function ($std) {
+                $this->assertSame(1, $std->value);
+                $std->value = 200;
+
+                return $std;
+            });
+
+        $this->assertSame(100, $std->value);
+        $this->assertSame(1000, $result);
     }
 }
 
