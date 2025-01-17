@@ -11,12 +11,12 @@ trait InteractsWithUniqueJobs
     /**
      * Store unique job information in the context in case we can't resolve the job on the queue side.
      *
-     * @param  object  $job
+     * @param  mixed  $job
      * @return void
      */
     public function addUniqueJobInformationToContext($job): void
     {
-        if ($this->isUniqueJob($job)) {
+        if ($job instanceof ShouldBeUnique) {
             Context::addHidden([
                 'laravel_unique_job_cache_store' => $this->getUniqueJobCacheStore($job),
                 'laravel_unique_job_key' => UniqueLock::getKey($job),
@@ -27,12 +27,12 @@ trait InteractsWithUniqueJobs
     /**
      * Remove the unique job information from the context.
      *
-     * @param  object  $job
+     * @param  mixed  $job
      * @return void
      */
     public function removeUniqueJobInformationFromContext($job): void
     {
-        if ($this->isUniqueJob($job)) {
+        if ($job instanceof ShouldBeUnique) {
             Context::forgetHidden([
                 'laravel_unique_job_cache_store',
                 'laravel_unique_job_key',
@@ -43,24 +43,13 @@ trait InteractsWithUniqueJobs
     /**
      * Determine the cache store used by the unique job to acquire locks.
      *
-     * @param  object  $job
-     * @return string
+     * @param  mixed  $job
+     * @return string|null
      */
-    private function getUniqueJobCacheStore($job): ?string
+    protected function getUniqueJobCacheStore($job): ?string
     {
         return method_exists($job, 'uniqueVia')
-            ? $job->uniqueVia()
+            ? $job->uniqueVia()->getName()
             : config('cache.default');
-    }
-
-    /**
-     * Determine if job uses unique locks.
-     *
-     * @param  mixed  $job
-     * @return bool
-     */
-    private function isUniqueJob($job): bool
-    {
-        return $job instanceof ShouldBeUnique;
     }
 }
