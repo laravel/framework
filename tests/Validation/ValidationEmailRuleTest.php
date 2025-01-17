@@ -348,166 +348,231 @@ class ValidationEmailRuleTest extends TestCase
         );
     }
 
-    public function testPassesRfcCompliantButNotRfcCompliantStrict()
+    #[TestWith(['plainaddress@example.com'])]
+    #[TestWith(['joe.smith@example.io'])]
+    #[TestWith(['custom-tag+dev@example.org'])]
+    #[TestWith(['hyphens--@example.org'])]
+    #[TestWith(['underscore_name@example.co.uk'])]
+    #[TestWith(['underscores__@example.org'])]
+    #[TestWith(['user@subdomain.example.com'])]
+    #[TestWith(['numbers123@domain.com'])]
+    #[TestWith(['john-doe@some-domain.com'])]
+    #[TestWith(['UPPERlower@example.org'])]
+    #[TestWith(['dots.ok@sub.domain.io'])]
+    #[TestWith(['some_email+tag@domain.dev'])]
+    #[TestWith(['a@b.c'])]
+    #[TestWith(['user@xn--bcher-kva.example'])]
+    #[TestWith(['user@bücher.example'])]
+    public function testEmailsThatPassOnBothRfcCompliantAndStrict($email)
     {
-        $emailsThatPassOnBothRfcCompliantAndOnStrict = [
-            'plainaddress@example.com',
-            'joe.smith@example.io',
-            'custom-tag+dev@example.org',
-            'hyphens--@example.org',
-            'underscore_name@example.co.uk',
-            'underscores__@example.org',
-            'user@subdomain.example.com',
-            'numbers123@domain.com',
-            'john-doe@some-domain.com',
-            'UPPERlower@example.org',
-            'dots.ok@sub.domain.io',
-            'some_email+tag@domain.dev',
-            'a@b.c',
-            'user@xn--bcher-kva.example',
-            'user@bücher.example',
-        ];
+        $this->passes(
+            Rule::email()->rfcCompliant(),
+            $email
+        );
 
-        foreach ($emailsThatPassOnBothRfcCompliantAndOnStrict as $email) {
-            $this->passes(
-                Rule::email()->rfcCompliant(),
-                $email
-            );
-
-            $this->passes(
-                Rule::email()->rfcCompliant(strict: true),
-                $email
-            );
-        }
-
-        $emailsThatFailOnBoth = [
-            'invalid.@example.com',
-            'invalid@.example.com',
-            '.invalid@example.com',
-            'invalid@example.com.',
-            'some..dots@example.com',
-            'username@sub..example.com',
-            'test@example..com',
-            'test@@example.com',
-            'test👨‍💻@domain.com',
-            'username@domain-with-hyphen-.com',
-            '()<>[]:,;@example.com',
-            '@example.com',
-            '[test]@example.com',
-            'user@example.com:3000',
-            '"unescaped"quote@example.com',
-            'https://example.com',
-            'with\\escape@example.com',
-        ];
-
-        foreach ($emailsThatFailOnBoth as $email) {
-            $this->fails(
-                Rule::email()->rfcCompliant(),
-                $email,
-                ['The '.self::ATTRIBUTE_REPLACED.' must be a valid email address.']
-            );
-
-            $this->fails(
-                Rule::email()->rfcCompliant(strict: true),
-                $email,
-                ['The '.self::ATTRIBUTE_REPLACED.' must be a valid email address.']
-            );
-        }
-
-        $emailsThatPassOnBoth = [
-            'plainaddress@example.com',
-            'tést@example.com',
-            'user@üñîçødé.com',
-            'test@xn--bcher-kva.com',
-        ];
-
-        foreach ($emailsThatPassOnBoth as $email) {
-            $this->passes(
-                Rule::email()->rfcCompliant(),
-                $email
-            );
-
-            $this->passes(
-                Rule::email()->rfcCompliant(strict: true),
-                $email
-            );
-        }
+        $this->passes(
+            Rule::email()->rfcCompliant(strict: true),
+            $email
+        );
     }
 
-    public function testWithNativeValidationAsciiVsUnicode()
+    #[TestWith(['invalid.@example.com'])]
+    #[TestWith(['invalid@.example.com'])]
+    #[TestWith(['.invalid@example.com'])]
+    #[TestWith(['invalid@example.com.'])]
+    #[TestWith(['some..dots@example.com'])]
+    #[TestWith(['username@sub..example.com'])]
+    #[TestWith(['test@example..com'])]
+    #[TestWith(['test@@example.com'])]
+    #[TestWith(['test👨‍💻@domain.com'])]
+    #[TestWith(['username@domain-with-hyphen-.com'])]
+    #[TestWith(['()<>[]:,;@example.com'])]
+    #[TestWith(['@example.com'])]
+    #[TestWith(['[test]@example.com'])]
+    #[TestWith(['user@example.com:3000'])]
+    #[TestWith(['"unescaped"quote@example.com'])]
+    #[TestWith(['https://example.com'])]
+    #[TestWith(['with\\escape@example.com'])]
+    public function testEmailsThatFailOnBothRfcCompliantAndStrict($email)
     {
-        /**
-         * Emails that fail ASCII-only native validation but pass with Unicode turned on.
-         */
-        $emailsThatFailOnAsciiButPassOnUnicode = [
-            'déjà@example.com',  // Accented local part
-            '测试@example.com',   // Chinese local part
-        ];
+        $this->fails(
+            Rule::email()->rfcCompliant(),
+            $email,
+            ['The '.self::ATTRIBUTE_REPLACED.' must be a valid email address.']
+        );
 
-        foreach ($emailsThatFailOnAsciiButPassOnUnicode as $email) {
-            $this->fails(
-                Rule::email()->withNativeValidation(),
-                $email,
-                ['The '.self::ATTRIBUTE_REPLACED.' must be a valid email address.']
-            );
+        $this->fails(
+            Rule::email()->rfcCompliant(strict: true),
+            $email,
+            ['The '.self::ATTRIBUTE_REPLACED.' must be a valid email address.']
+        );
+    }
 
-            $this->passes(
-                Rule::email()->withNativeValidation(allowUnicode: true),
-                $email
-            );
-        }
+    #[TestWith(['plainaddress@example.com'])]       // Simple valid address
+    #[TestWith(['joe.smith@example.io'])]           // Dotted local part with TLD
+    #[TestWith(['custom-tag+dev@example.org'])]     // Plus tag in local part
+    #[TestWith(['hyphens--@example.org'])]          // Hyphens in local part
+    #[TestWith(['underscore_name@example.co.uk'])]  // Underscore in local part
+    #[TestWith(['underscores__@example.org'])]      // Double underscores in local part
+    #[TestWith(['user@subdomain.example.com'])]     // Subdomain in domain part
+    #[TestWith(['numbers123@domain.com'])]          // Numbers in local part
+    #[TestWith(['john-doe@some-domain.com'])]       // Hyphenated domain
+    #[TestWith(['UPPERlower@example.org'])]         // Mixed case local part
+    #[TestWith(['dots.ok@sub.domain.io'])]          // Dots in local and subdomain
+    #[TestWith(['some_email+tag@domain.dev'])]      // Email with plus tag and underscore
+    #[TestWith(['a@b.c'])]                          // Minimal email
+    #[TestWith(['user@xn--bcher-kva.example'])]     // Punycode domain (bücher)
+    #[TestWith(['user@bücher.example'])]            // Unicode domain
+    public function testEmailsThatPassOnBothRfcCompliantAndRfcCompliantStrict($email)
+    {
+        $this->passes(
+            Rule::email()->rfcCompliant(),
+            $email
+        );
 
-        /**
-         * Emails that fail both ASCII and Unicode modes.
-         */
-        $emailsThatFailOnBoth = [
-            'test@üñîçødé.com',  // Unicode domain
-            'user@domain..com',     // Double dots in domain
-            'test@.example.com',    // Domain starts with a dot
-            'username@domain-with-hyphen-.com',
-            'пример@пример.рф',
-            '例子@例子.公司',
-            'name@123.123.123.123',
-        ];
+        $this->passes(
+            Rule::email()->rfcCompliant(strict: true),
+            $email
+        );
+    }
 
-        foreach ($emailsThatFailOnBoth as $email) {
-            $this->fails(
-                Rule::email()->withNativeValidation(),
-                $email,
-                ['The '.self::ATTRIBUTE_REPLACED.' must be a valid email address.']
-            );
+    #[TestWith(['déjà@example.com'])]
+    #[TestWith(['测试@example.com'])]
+    public function testEmailsThatFailWithNativeValidationAsciiPassUnicode($email)
+    {
+        $this->fails(
+            Rule::email()->withNativeValidation(),
+            $email,
+            ['The '.self::ATTRIBUTE_REPLACED.' must be a valid email address.']
+        );
 
-            $this->fails(
-                Rule::email()->withNativeValidation(allowUnicode: true),
-                $email,
-                ['The '.self::ATTRIBUTE_REPLACED.' must be a valid email address.']
-            );
-        }
+        $this->passes(
+            Rule::email()->withNativeValidation(allowUnicode: true),
+            $email
+        );
+    }
 
-        /**
-         * Emails that pass both ASCII-only and Unicode modes.
-         * Typically straightforward addresses with no special chars,
-         * or punycode that is valid under both validations.
-         */
-        $emailsThatPassOnBoth = [
-            'user@example.com',
-            'user.name+tag@example.co.uk',
-            'joe_smith@example.org',
-            'user@[IPv6:2001:db8:1ff::a0b:dbd0]',
-            'test@xn--bcher-kva.com', // Punycode for bücher.com
-        ];
+    #[TestWith(['test@üñîçødé.com'])]                   // Unicode domain
+    #[TestWith(['user@domain..com'])]                   // Double dots in domain
+    #[TestWith(['test@.example.com'])]                  // Domain starts with a dot
+    #[TestWith(['username@domain-with-hyphen-.com'])]
+    #[TestWith(['пример@пример.рф'])]                   // Cyrillic domain
+    #[TestWith(['例子@例子.公司'])]                       // Chinese domain
+    #[TestWith(['name@123.123.123.123'])]               // Numeric domain
+    public function testEmailsThatFailOnBothWithNativeValidationAsciiAndUnicode($email)
+    {
+        $this->fails(
+            Rule::email()->withNativeValidation(),
+            $email,
+            ['The '.self::ATTRIBUTE_REPLACED.' must be a valid email address.']
+        );
 
-        foreach ($emailsThatPassOnBoth as $email) {
-            $this->passes(
-                Rule::email()->withNativeValidation(),
-                $email
-            );
+        $this->fails(
+            Rule::email()->withNativeValidation(allowUnicode: true),
+            $email,
+            ['The '.self::ATTRIBUTE_REPLACED.' must be a valid email address.']
+        );
+    }
 
-            $this->passes(
-                Rule::email()->withNativeValidation(allowUnicode: true),
-                $email
-            );
-        }
+    #[TestWith(['user@example.com'])]
+    #[TestWith(['user.name+tag@example.co.uk'])]
+    #[TestWith(['joe_smith@example.org'])]
+    #[TestWith(['user@[IPv6:2001:db8:1ff::a0b:dbd0]'])]
+    #[TestWith(['test@xn--bcher-kva.com'])] // Punycode for bücher.com
+    public function testEmailsThatPassBothWithNativeValidationAsciiAndUnicode($email)
+    {
+        $this->passes(
+            Rule::email()->withNativeValidation(),
+            $email
+        );
+
+        $this->passes(
+            Rule::email()->withNativeValidation(allowUnicode: true),
+            $email
+        );
+    }
+
+    #[TestWith(['some(comment)@example.com'])]      // Comment in local part
+    #[TestWith(['tést@example.com'])]               // Accented local part
+    #[TestWith(['user@üñîçødé.com'])]               // Unicode domain
+    #[TestWith(['user@bücher.example'])]            // Unicode domain
+    #[TestWith(['"has space"@example.com'])]        // Quoted local part with space
+    #[TestWith(['"escaped\\\"quote"@example.com'])] // Escaped quote inside quoted local part
+    #[TestWith(['test@localhost'])]                 // Domain without TLD
+    #[TestWith(['test@example'])]                   // Domain without TLD
+    #[TestWith(['пример@пример.рф'])]               // Cyrillic local and domain
+    #[TestWith(['例子@例子.公司'])]                   // Chinese local and domain
+    #[TestWith(['name@123.123.123.123'])]           // Numeric domain
+    public function testEmailsThatFailWithNativeValidationAsciiPassRfcCompliant($email)
+    {
+        $this->fails(
+            Rule::email()->withNativeValidation(),
+            $email,
+            ['The '.self::ATTRIBUTE_REPLACED.' must be a valid email address.']
+        );
+
+        $this->passes(
+            Rule::email()->rfcCompliant(),
+            $email
+        );
+    }
+
+    #[TestWith(['plainaddress@example.com'])]           // Simple valid address
+    #[TestWith(['joe.smith@example.io'])]               // Dot in local part
+    #[TestWith(['custom-tag+dev@example.org'])]         // Plus tag in local part
+    #[TestWith(['hyphens--@example.org'])]              // Double hyphen in local part
+    #[TestWith(['underscore_name@example.co.uk'])]      // Underscore in local part
+    #[TestWith(['underscores__@example.org'])]          // Double underscores in local part
+    #[TestWith(['user@subdomain.example.com'])]         // Subdomain in domain
+    #[TestWith(['numbers123@domain.com'])]              // Numbers in local part
+    #[TestWith(['john-doe@some-domain.com'])]           // Hyphen in domain
+    #[TestWith(['UPPERlower@example.org'])]             // Mixed-case local part
+    #[TestWith(['dots.ok@sub.domain.io'])]              // Subdomain with dot in local part
+    #[TestWith(['some_email+tag@domain.dev'])]          // Underscore and tag in local part
+    #[TestWith(['a@b.c'])]                              // Minimal valid address
+    #[TestWith(['user@xn--bcher-kva.example'])]         // Punycode domain (bücher.example)
+    #[TestWith(['user_name+tag@example.io'])]           // Underscore with tag
+    #[TestWith(['UPPERCASE@EXAMPLE.IO'])]               // All uppercase local and domain
+    #[TestWith(['abc."test"@example.com'])]             // Mixed quoted/unquoted local part
+    #[TestWith(['name@[127.0.0.1]'])]                   // IPv4 domain literal
+    #[TestWith(['user@[IPv6:::1]'])]                    // IPv6 domain with unusual short form
+    #[TestWith(['a@[IPv6:2001:db8::1]'])]               // IPv6 domain normal form
+    #[TestWith(['user@[IPv6:2001:db8:1ff::a0b:dbd0]'])] // Fully expanded IPv6
+    public function testEmailsThatPassWithNativeValidationAndRfcCompliant($email)
+    {
+        $this->passes(
+            Rule::email()->withNativeValidation(),
+            $email
+        );
+
+        $this->passes(
+            Rule::email()->rfcCompliant(),
+            $email
+        );
+    }
+
+    #[TestWith(['test@@example.com'])]                  // Multiple @ symbols
+    #[TestWith(['user@domain..com'])]                   // Double dots in domain
+    #[TestWith(['.leadingdot@example.com'])]            // Leading dot in local part
+    #[TestWith(['with\\escape@example.com'])]           // Backslash in local part
+    #[TestWith(['@example.com'])]                       // Missing local part
+    #[TestWith(['some)@example.com'])]                  // Unmatched parenthesis in local part
+    #[TestWith([' space@domain.com'])]                  // Leading space in local part
+    #[TestWith(['user@domain:port.com'])]               // Colon in domain (mimics a port)
+    #[TestWith(['username@domain-with-hyphen-.com'])]   // Trailing hyphen in domain
+    public function testEmailsThatFailWithNativeValidationAndRfcCompliant($email)
+    {
+        $this->fails(
+            Rule::email()->withNativeValidation(),
+            $email,
+            ['The ' . self::ATTRIBUTE_REPLACED . ' must be a valid email address.']
+        );
+
+        $this->fails(
+            Rule::email()->rfcCompliant(),
+            $email,
+            ['The ' . self::ATTRIBUTE_REPLACED . ' must be a valid email address.']
+        );
     }
 
     public function testNativeValidationVsRfcCompliant()
@@ -528,194 +593,85 @@ class ValidationEmailRuleTest extends TestCase
                 ['The '.self::ATTRIBUTE_REPLACED.' must be a valid email address.']
             );
         }
-
-        /**
-         * Addresses that fail withNativeValidation (ASCII-only) but pass rfcCompliant().
-         * Typical scenario for emails with accented or Unicode local parts.
-         */
-        $emailsThatFailNativePassRfc = [
-            'some(comment)@example.com',        // Comment in local part
-            'tést@example.com',                 // Accented local part
-            'user@üñîçødé.com',                 // Unicode domain
-            'user@bücher.example',              // Unicode domain
-            '"has space"@example.com',          // Quoted local part with space
-            '"escaped\\\"quote"@example.com',   // Escaped quote inside quoted local part
-            'test@localhost',                   // Domain without TLD
-            'test@example',                     // Domain without TLD
-            'пример@пример.рф',
-            '例子@例子.公司',
-            'name@123.123.123.123',
-        ];
-
-        foreach ($emailsThatFailNativePassRfc as $email) {
-            $this->fails(
-                Rule::email()->withNativeValidation(),
-                $email,
-                ['The '.self::ATTRIBUTE_REPLACED.' must be a valid email address.']
-            );
-
-            $this->passes(
-                Rule::email()->rfcCompliant(),
-                $email
-            );
-        }
-
-        /**
-         * Addresses that pass both withNativeValidation() and rfcCompliant().
-         */
-        $emailsThatPassBoth = [
-            'plainaddress@example.com',
-            'joe.smith@example.io',
-            'custom-tag+dev@example.org',
-            'hyphens--@example.org',
-            'underscore_name@example.co.uk',
-            'underscores__@example.org',
-            'user@subdomain.example.com',
-            'numbers123@domain.com',
-            'john-doe@some-domain.com',
-            'UPPERlower@example.org',
-            'dots.ok@sub.domain.io',
-            'some_email+tag@domain.dev',
-            'a@b.c',
-            'user@xn--bcher-kva.example',    // Punycode for user@bücher.example
-            'user_name+tag@example.io',      // Underscore + plus tag, standard TLD
-            'UPPERCASE@EXAMPLE.IO',          // All uppercase local + domain
-            'abc."test"@example.com',        // Mixed quoted/unquoted local part
-            'name@[127.0.0.1]',              // Local-part with domain-literal IPv4 address
-            'user@[IPv6:::1]',               // Domain-literal with unusual IPv6 short form
-            'a@[IPv6:2001:db8::1]',          // Domain-literal with normal IPv6
-            'user@[IPv6:2001:db8:1ff::a0b:dbd0]',
-        ];
-
-        foreach ($emailsThatPassBoth as $email) {
-            $this->passes(
-                Rule::email()->withNativeValidation(),
-                $email
-            );
-            $this->passes(
-                Rule::email()->rfcCompliant(),
-                $email
-            );
-        }
-
-        /**
-         * Addresses that fail both native validation and rfcCompliant.
-         */
-        $emailsThatFailBoth = [
-            'test@@example.com',        // Multiple @
-            'user@domain..com',         // Double dots in domain
-            '.leadingdot@example.com',  // Leading dot in local part
-            'with\\escape@example.com', // Backslash in local part
-            '@example.com',             // Missing local part
-            'some)@example.com',        // Unmatched parenthesis in local part
-            ' space@domain.com',        // Leading space in local part
-            'user@domain:port.com',     // Colon in domain (mimics a port)
-            'username@domain-with-hyphen-.com',
-        ];
-
-        foreach ($emailsThatFailBoth as $email) {
-            $this->fails(
-                Rule::email()->withNativeValidation(),
-                $email,
-                ['The '.self::ATTRIBUTE_REPLACED.' must be a valid email address.']
-            );
-
-            $this->fails(
-                Rule::email()->rfcCompliant(),
-                $email,
-                ['The '.self::ATTRIBUTE_REPLACED.' must be a valid email address.']
-            );
-        }
     }
 
-    public function testNativeValidationVsRfcCompliantStrict()
+    #[TestWith(['abc."test"@example.com'])]             // Mixed quotes in local part
+    #[TestWith(['name@[127.0.0.1]'])]                   // Local-part with domain-literal IPv4 address
+    #[TestWith(['user@[IPv6:2001:db8::1]'])]            // Domain-literal with normal IPv6
+    #[TestWith(['user@[IPv6:2001:db8:1ff::a0b:dbd0]'])] // Domain-literal with full IPv6 address
+    #[TestWith(['"ab\\(c"@example.com'])]               // Quoted local part with escaped character
+    public function testEmailsThatPassNativeValidationFailRfcCompliantStrict($email)
     {
-        $emailsThatPassNativeFailStrict = [
-            'abc."test"@example.com',      // Mixed quotes in local part
-            'name@[127.0.0.1]',            // Local-part with domain-literal IPv4 address
-            'user@[IPv6:2001:db8::1]',     // Domain-literal with normal IPv6
-            'user@[IPv6:2001:db8:1ff::a0b:dbd0]',
-            '"ab\\(c"@example.com',
-        ];
+        $this->passes(
+            Rule::email()->withNativeValidation(),
+            $email
+        );
 
-        foreach ($emailsThatPassNativeFailStrict as $email) {
-            $this->passes(
-                Rule::email()->withNativeValidation(),
-                $email
-            );
+        $this->fails(
+            Rule::email()->rfcCompliant(true),
+            $email,
+            ['The ' . self::ATTRIBUTE_REPLACED . ' must be a valid email address.']
+        );
+    }
 
-            $this->fails(
-                Rule::email()->rfcCompliant(true),
-                $email,
-                ['The '.self::ATTRIBUTE_REPLACED.' must be a valid email address.']
-            );
-        }
+    #[TestWith(['пример@пример.рф'])]       // Unicode domain in Cyrillic script
+    #[TestWith(['例子@例子.公司'])]           // Unicode domain in Chinese script
+    #[TestWith(['name@123.123.123.123'])]   // IP address in domain part
+    public function testEmailsThatFailNativeValidationPassRfcCompliantStrict($email)
+    {
+        $this->fails(
+            Rule::email()->withNativeValidation(),
+            $email,
+            ['The ' . self::ATTRIBUTE_REPLACED . ' must be a valid email address.']
+        );
 
-        $emailsThatFailNativePassStrict = [
-            'пример@пример.рф',
-            '例子@例子.公司',
-            'name@123.123.123.123',
-        ];
+        $this->passes(
+            Rule::email()->rfcCompliant(true),
+            $email
+        );
+    }
 
-        foreach ($emailsThatFailNativePassStrict as $email) {
-            $this->fails(
-                Rule::email()->withNativeValidation(),
-                $email,
-                ['The '.self::ATTRIBUTE_REPLACED.' must be a valid email address.']
-            );
+    #[TestWith(['user@example.com'])]                       // Simple, valid email
+    #[TestWith(['joe.smith+dev@example.co.uk'])]            // Plus-tagged email with subdomain TLD
+    #[TestWith(['user!#$%&\'*+/=?^_`{|}~@example.com'])]    // Unusual valid characters in local part
+    public function testEmailsThatPassBothNativeValidationAndRfcCompliantStrict($email)
+    {
+        $this->passes(
+            Rule::email()->withNativeValidation(),
+            $email
+        );
 
-            $this->passes(
-                Rule::email()->rfcCompliant(true),
-                $email
-            );
-        }
+        $this->passes(
+            Rule::email()->rfcCompliant(true),
+            $email
+        );
+    }
 
-        $emailsThatPassBoth = [
-            'user@example.com',
-            'joe.smith+dev@example.co.uk',
-            'user!#$%&\'*+/=?^_`{|}~@example.com', // Unusual valid characters in local part
-        ];
+    #[TestWith(['test@@example.com'])]                  // Multiple @
+    #[TestWith(['.leadingdot@example.com'])]            // Leading dot in local part
+    #[TestWith(['user@domain..com'])]                   // Double dots in domain
+    #[TestWith(['test@'])]                              // Missing domain
+    #[TestWith(['abc"quote@example.com'])]              // Unescaped quote in local part
+    #[TestWith(['some(comment)@example.com'])]          // Local part comment
+    #[TestWith(['"has space"@example.com'])]            // Quoted local part with space
+    #[TestWith(['user@domain(comment)'])]               // Comment in domain
+    #[TestWith(['user@[127.0.0.1(comment)]'])]          // Comment in domain-literal IPv4 address
+    #[TestWith(['some((double))comment@example.com'])]  // Nested comment in local part
+    #[TestWith(['"test\\\"quote"@example.com'])]        // Escaped quote in quoted local part
+    #[TestWith(['" leading.space"@example.com'])]       // Leading space in quoted local part
+    public function testEmailsThatFailBothNativeValidationAndRfcCompliantStrict($email)
+    {
+        $this->fails(
+            Rule::email()->withNativeValidation(),
+            $email,
+            ['The ' . self::ATTRIBUTE_REPLACED . ' must be a valid email address.']
+        );
 
-        foreach ($emailsThatPassBoth as $email) {
-            $this->passes(
-                Rule::email()->withNativeValidation(),
-                $email
-            );
-
-            $this->passes(
-                Rule::email()->rfcCompliant(true),
-                $email
-            );
-        }
-
-        $emailsThatFailBoth = [
-            'test@@example.com',          // Multiple @
-            '.leadingdot@example.com',    // Leading dot in local part
-            'user@domain..com',           // Double dots in domain
-            'test@',                      // Missing domain
-            'abc"quote@example.com',
-            'some(comment)@example.com',   // Local part comment
-            '"has space"@example.com',     // Quoted local part with space
-            'user@domain(comment)',
-            'user@[127.0.0.1(comment)]',
-            'some((double))comment@example.com',
-            '"test\\\"quote"@example.com',     // Escaped quote in quoted local part
-            '" leading.space"@example.com',    // Leading space in quoted local part
-        ];
-
-        foreach ($emailsThatFailBoth as $email) {
-            $this->fails(
-                Rule::email()->withNativeValidation(),
-                $email,
-                ['The '.self::ATTRIBUTE_REPLACED.' must be a valid email address.']
-            );
-
-            $this->fails(
-                Rule::email()->rfcCompliant(true),
-                $email,
-                ['The '.self::ATTRIBUTE_REPLACED.' must be a valid email address.']
-            );
-        }
+        $this->fails(
+            Rule::email()->rfcCompliant(true),
+            $email,
+            ['The ' . self::ATTRIBUTE_REPLACED . ' must be a valid email address.']
+        );
     }
 
     public function testCombiningRules()
