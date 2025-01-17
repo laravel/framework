@@ -18,7 +18,7 @@ trait InteractsWithUniqueJobs
     {
         if ($this->isUniqueJob($job)) {
             Context::addHidden([
-                'laravel_unique_job_cache_driver' => $this->getUniqueJobCacheStore($job),
+                'laravel_unique_job_cache_store' => $this->getUniqueJobCacheStore($job),
                 'laravel_unique_job_key' => UniqueLock::getKey($job),
             ]);
         }
@@ -34,7 +34,7 @@ trait InteractsWithUniqueJobs
     {
         if ($this->isUniqueJob($job)) {
             Context::forgetHidden([
-                'laravel_unique_job_cache_driver',
+                'laravel_unique_job_cache_store',
                 'laravel_unique_job_key',
             ]);
         }
