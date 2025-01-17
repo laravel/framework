@@ -423,6 +423,28 @@ class RedisStore extends TaggableStore implements LockProvider
     }
 
     /**
+     * Prepare a value to be used with the Redis cache store when used by eval scripts.
+     *
+     * @param  mixed  $value
+     * @param  \Illuminate\Redis\Connections\Connection  $connection
+     * @return mixed
+     */
+    protected function pack($value, $connection)
+    {
+        if ($connection instanceof PhpRedisConnection) {
+            if ($connection->serialized()) {
+                return $connection->pack([$value])[0];
+            }
+
+            if ($connection->compressed()) {
+                return $connection->pack([$this->serialize($value)])[0];
+            }
+        }
+
+        return $this->serialize($value);
+    }
+
+    /**
      * Serialize the value.
      *
      * @param  mixed  $value
@@ -445,29 +467,7 @@ class RedisStore extends TaggableStore implements LockProvider
     }
 
     /**
-     * Prepares a value to be used with the redis cache store when used with eval scripts.
-     *
-     * @param  mixed  $value
-     * @param  \Illuminate\Redis\Connections\Connection  $connection
-     * @return mixed
-     */
-    protected function pack($value, $connection)
-    {
-        if ($connection instanceof PhpRedisConnection) {
-            if ($connection->serialized()) {
-                return $connection->pack([$value])[0];
-            }
-
-            if ($connection->compressed()) {
-                return $connection->pack([$this->serialize($value)])[0];
-            }
-        }
-
-        return $this->serialize($value);
-    }
-
-    /**
-     * Does connection specific considerations when a value needs to be serialized.
+     * Handle connection specific considerations when a value needs to be serialized.
      *
      * @param  mixed  $value
      * @param  \Illuminate\Redis\Connections\Connection  $connection
@@ -483,7 +483,7 @@ class RedisStore extends TaggableStore implements LockProvider
     }
 
     /**
-     * Does connection specific considerations when a value needs to be unserialized.
+     * Handle connection specific considerations when a value needs to be unserialized.
      *
      * @param  mixed  $value
      * @param  \Illuminate\Redis\Connections\Connection  $connection
