@@ -1454,6 +1454,17 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Get a new stringable object from generated random string.
+     *
+     * @param  string  $string
+     * @return \Illuminate\Support\Stringable
+     */
+    public static function makeRandom($length = 16)
+    {
+        return new static(Str::random($length));
+    }
+
+    /**
      * Proxy dynamic properties onto methods.
      *
      * @param  string  $key

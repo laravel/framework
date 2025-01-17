@@ -1056,6 +1056,17 @@ class Str
     }
 
     /**
+     * Get a new stringable object from generated random string.
+     *
+     * @param  string  $string
+     * @return \Illuminate\Support\Stringable
+     */
+    public static function makeRandom($length = 16)
+    {
+        return new Stringable(Str::random($length));
+    }
+
+    /**
      * Set the callable that will be used to generate random strings.
      *
      * @param  callable|null  $factory
