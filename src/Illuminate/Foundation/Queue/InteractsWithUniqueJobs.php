@@ -54,7 +54,7 @@ trait InteractsWithUniqueJobs
     }
 
     /**
-     * Determine if job should be unique.
+     * Determine if job uses unique locks.
      *
      * @param  mixed  $job
      * @return bool
