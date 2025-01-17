@@ -11,6 +11,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Email;
 use Illuminate\Validation\ValidationServiceProvider;
 use Illuminate\Validation\Validator;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 
 class ValidationEmailRuleTest extends TestCase
@@ -322,35 +323,33 @@ class ValidationEmailRuleTest extends TestCase
         );
     }
 
+    #[TestWith(['"has space"@example.com'])]             // Quoted local part with space
+    #[TestWith(['some(comment)@example.com'])]            // Comment in local part
+    #[TestWith(['abc."test"@example.com'])]               // Mixed quoted/unquoted local part
+    #[TestWith(['"escaped\\\"quote"@example.com'])]       // Escaped quote inside quoted local part
+    #[TestWith(['test@example'])]                         // Domain without TLD
+    #[TestWith(['test@localhost'])]                       // Domain without TLD
+    #[TestWith(['name@[127.0.0.1]'])]                     // Local-part with domain-literal IPv4 address
+    #[TestWith(['user@[IPv6:::1]'])]                      // Domain-literal with unusual IPv6 short form
+    #[TestWith(['a@[IPv6:2001:db8::1]'])]                 // Domain-literal with normal IPv6
+    #[TestWith(['user@[IPv6:::]'])]                       // invalid shorthand IPv6
+    #[TestWith(['"ab\\(c"@example.com'])]
+    public function testEmailsThatPassOnRfcCompliantButFailOnStrict($email)
+    {
+        $this->passes(
+            Rule::email()->rfcCompliant(),
+            $email
+        );
+
+        $this->fails(
+            Rule::email()->rfcCompliant(strict: true),
+            $email,
+            ['The '.self::ATTRIBUTE_REPLACED.' must be a valid email address.']
+        );
+    }
+
     public function testPassesRfcCompliantButNotRfcCompliantStrict()
     {
-        $emailsThatPassOnRfcCompliantButFailOnStrict = [
-            '"has space"@example.com',              // Quoted local part with space
-            'some(comment)@example.com',            // Comment in local part
-            'abc."test"@example.com',               // Mixed quoted/unquoted local part
-            '"escaped\\\"quote"@example.com',       // Escaped quote inside quoted local part
-            'test@example',                         // Domain without TLD
-            'test@localhost',                       // Domain without TLD
-            'name@[127.0.0.1]',                     // Local-part with domain-literal IPv4 address
-            'user@[IPv6:::1]',                      // Domain-literal with unusual IPv6 short form
-            'a@[IPv6:2001:db8::1]',                 // Domain-literal with normal IPv6
-            'user@[IPv6:::]',                       // invalid shorthand IPv6
-            '"ab\\(c"@example.com',
-        ];
-
-        foreach ($emailsThatPassOnRfcCompliantButFailOnStrict as $email) {
-            $this->passes(
-                Rule::email()->rfcCompliant(),
-                $email
-            );
-
-            $this->fails(
-                Rule::email()->rfcCompliant(strict: true),
-                $email,
-                ['The '.self::ATTRIBUTE_REPLACED.' must be a valid email address.']
-            );
-        }
-
         $emailsThatPassOnBothRfcCompliantAndOnStrict = [
             'plainaddress@example.com',
             'joe.smith@example.io',
