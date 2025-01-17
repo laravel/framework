@@ -566,27 +566,6 @@ class FilesystemAdapterTest extends TestCase
             return $exceptionHandler;
         });
 
-        $adapter = new FilesystemAdapter($this->filesystem, $this->adapter, ['report' => true], $exceptionHandler);
-
-        try {
-            $adapter->get('/foo.txt');
-        } catch (UnableToReadFile) {
-            $this->fail('Exception was thrown.');
-        }
-    }
-
-    public function testDoesntReportExceptionsForGetWithoutHandler()
-    {
-        $container = Container::getInstance();
-
-        $exceptionHandler = m::mock(ExceptionHandler::class);
-
-        $exceptionHandler->shouldNotReceive('report');
-
-        $container->bind(ExceptionHandler::class, function () use ($exceptionHandler) {
-            return $exceptionHandler;
-        });
-
         $adapter = new FilesystemAdapter($this->filesystem, $this->adapter, ['report' => true]);
 
         try {

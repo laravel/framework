@@ -3,7 +3,6 @@
 namespace Illuminate\Filesystem;
 
 use Aws\S3\S3Client;
-use Illuminate\Contracts\Debug\ExceptionHandler as ExceptionHandlerContract;
 use Illuminate\Support\Traits\Conditionable;
 use League\Flysystem\AwsS3V3\AwsS3V3Adapter as S3Adapter;
 use League\Flysystem\FilesystemOperator;
@@ -28,9 +27,9 @@ class AwsS3V3Adapter extends FilesystemAdapter
      * @param  \Aws\S3\S3Client  $client
      * @return void
      */
-    public function __construct(FilesystemOperator $driver, S3Adapter $adapter, array $config, S3Client $client, ?ExceptionHandlerContract $exceptionHandler = null)
+    public function __construct(FilesystemOperator $driver, S3Adapter $adapter, array $config, S3Client $client)
     {
-        parent::__construct($driver, $adapter, $config, $exceptionHandler);
+        parent::__construct($driver, $adapter, $config);
 
         $this->client = $client;
     }

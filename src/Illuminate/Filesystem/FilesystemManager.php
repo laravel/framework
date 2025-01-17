@@ -4,7 +4,6 @@ namespace Illuminate\Filesystem;
 
 use Aws\S3\S3Client;
 use Closure;
-use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Filesystem\Factory as FactoryContract;
 use Illuminate\Support\Arr;
 use InvalidArgumentException;
@@ -187,7 +186,7 @@ class FilesystemManager implements FactoryContract
         );
 
         return (new LocalFilesystemAdapter(
-            $this->createFlysystem($adapter, $config), $adapter, $config, $this->app[ExceptionHandler::class] ?? null
+            $this->createFlysystem($adapter, $config), $adapter, $config
         ))->diskName(
             $name
         )->shouldServeSignedUrls(
@@ -257,7 +256,7 @@ class FilesystemManager implements FactoryContract
         $adapter = new S3Adapter($client, $s3Config['bucket'], $root, $visibility, null, $config['options'] ?? [], $streamReads);
 
         return new AwsS3V3Adapter(
-            $this->createFlysystem($adapter, $config), $adapter, $s3Config, $client, $this->app[ExceptionHandler::class] ?? null
+            $this->createFlysystem($adapter, $config), $adapter, $s3Config, $client
         );
     }
 
