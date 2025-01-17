@@ -204,11 +204,9 @@ abstract class Job
             }
         }
 
-        // If the job times out and has an open database transaction on the same connection as
-        // the failed jobs table, we need to rollback that transaction to ensure the failed job
-        // can be properly logged. Otherwise, the current transaction will never commit.
         if ($e instanceof TimeoutExceededException &&
             ($failedJobConnectionName = $this->container['config']['queue.failed.database']) &&
+            in_array($this->container['config']['queue.failed.driver'], ['database', 'database-uuids']) &&
             $this->container->bound('db')) {
             $this->container->make('db')->connection($failedJobConnectionName)->rollBack(toLevel: 0);
         }
