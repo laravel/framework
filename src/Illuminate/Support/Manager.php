@@ -103,7 +103,7 @@ abstract class Manager
         $method = 'create'.Str::studly($driver).'Driver';
 
         if (method_exists($this, $method)) {
-            return $this->$method();
+            return $this->container->call($this->$method(...));
         }
 
         throw new InvalidArgumentException("Driver [$driver] not supported.");
