@@ -1934,7 +1934,7 @@ trait HasAttributes
     public function getOriginal($key = null, $default = null)
     {
         return (new static)->setRawAttributes(
-            $this->original, $sync = true
+            $this->original, true
         )->getOriginalWithoutRewindingModel($key, $default);
     }
 
