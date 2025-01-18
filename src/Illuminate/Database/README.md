@@ -54,7 +54,7 @@ $results = Capsule::select('select * from users where id = ?', [1]);
 Capsule::schema()->create('users', function ($table) {
     $table->increments('id');
     $table->string('email')->unique();
-    $table->timestamps();
+    $table->datetimes();
 });
 ```
 
