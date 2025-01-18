@@ -6,6 +6,28 @@ use Illuminate\Support\Collection;
 use ReflectionAttribute;
 use ReflectionMethod;
 
+/**
+ * Trait HasCustomAttributes
+ *
+ * This trait allows Laravel controllers to handle custom PHP attributes on controller methods.
+ * Attributes are metadata annotations that can be added to classes, methods, or properties.
+ * They provide additional context or functionality and can be retrieved at runtime using reflection.
+ *
+ * This trait specifically retrieves attributes from controller methods and invokes their `handle` method (if it exists)
+ * before executing the controller action. Attributes must implement the `ICustomAttribute` interface to be processed.
+ *
+ * For more information on PHP attributes, see the official documentation:
+ * @link https://www.php.net/manual/en/language.attributes.overview.php
+ *
+ * Example usage:
+ * ```php
+ * #[SomeCustomAttribute]
+ * public function myControllerMethod()
+ * {
+ *     // Action logic here
+ * }
+ * ```
+ */
 trait HasCustomAttributes
 {
     /**
