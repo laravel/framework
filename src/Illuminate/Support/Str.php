@@ -1793,7 +1793,11 @@ class Str
             return substr_count($string, "\n") + 1;
         }
 
-        return count(array_filter(explode("\n", $string), 'mb_strlen'));
+        $lines = preg_match_all(
+            '/(?(DEFINE)(?<lineBreak>\r\n|\r|\n))(.+)(?P>lineBreak)/',
+            $string
+        );
+        return $lines === 0 && $string !== '' ? 1 : $lines;
     }
 
     /**
