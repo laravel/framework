@@ -28,7 +28,7 @@ class DatabaseMigrationRollbackCommandTest extends TestCase
             return $callback();
         });
         $migrator->shouldReceive('setOutput')->once()->andReturn($migrator);
-        $migrator->shouldReceive('rollback')->once()->with([__DIR__.DIRECTORY_SEPARATOR.'migrations'], ['pretend' => false, 'step' => 0, 'batch' => 0, 'selected' => []]);
+        $migrator->shouldReceive('rollback')->once()->with([__DIR__ . DIRECTORY_SEPARATOR . 'migrations'], ['pretend' => false, 'step' => 0, 'batch' => 0, 'selected' => []]);
 
         $this->runCommand($command);
     }
@@ -44,7 +44,7 @@ class DatabaseMigrationRollbackCommandTest extends TestCase
             return $callback();
         });
         $migrator->shouldReceive('setOutput')->once()->andReturn($migrator);
-        $migrator->shouldReceive('rollback')->once()->with([__DIR__.DIRECTORY_SEPARATOR.'migrations'], ['pretend' => false, 'step' => 2, 'batch' => 0, 'selected' => []]);
+        $migrator->shouldReceive('rollback')->once()->with([__DIR__ . DIRECTORY_SEPARATOR . 'migrations'], ['pretend' => false, 'step' => 2, 'batch' => 0, 'selected' => []]);
 
         $this->runCommand($command, ['--step' => 2]);
     }
@@ -60,7 +60,7 @@ class DatabaseMigrationRollbackCommandTest extends TestCase
             return $callback();
         });
         $migrator->shouldReceive('setOutput')->once()->andReturn($migrator);
-        $migrator->shouldReceive('rollback')->once()->with([__DIR__.DIRECTORY_SEPARATOR.'migrations'], true);
+        $migrator->shouldReceive('rollback')->once()->with([__DIR__ . DIRECTORY_SEPARATOR . 'migrations'], true);
 
         $this->runCommand($command, ['--pretend' => true, '--database' => 'foo']);
     }
@@ -69,14 +69,14 @@ class DatabaseMigrationRollbackCommandTest extends TestCase
     {
         $command = new RollbackCommand($migrator = m::mock(Migrator::class));
         $app = new ApplicationDatabaseRollbackStub(['path.database' => __DIR__]);
-        $app->useDatabasePath(__DIR__);`
+        $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $migrator->shouldReceive('paths')->once()->andReturn([]);
         $migrator->shouldReceive('usingConnection')->once()->andReturnUsing(function ($name, $callback) {
             return $callback();
         });
         $migrator->shouldReceive('setOutput')->once()->andReturn($migrator);
-        $migrator->shouldReceive('rollback')->once()->with([__DIR__.DIRECTORY_SEPARATOR.'migrations'], ['pretend' => true, 'step' => 2, 'batch' => 0, 'selected' => []]);
+        $migrator->shouldReceive('rollback')->once()->with([__DIR__ . DIRECTORY_SEPARATOR . 'migrations'], ['pretend' => true, 'step' => 2, 'batch' => 0, 'selected' => []]);
 
         $this->runCommand($command, ['--pretend' => true, '--database' => 'foo', '--step' => 2, '--select' => true]);
     }
