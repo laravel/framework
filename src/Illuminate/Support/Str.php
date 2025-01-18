@@ -1790,7 +1790,7 @@ class Str
         $string = str_replace("\r\n", "\n", $string);
 
         if ($withEmptyLines) {
-            return count(explode("\n", $string));
+            return substr_count($string, "\n") + 1;
         }
 
         return count(array_filter(explode("\n", $string), 'mb_strlen'));
