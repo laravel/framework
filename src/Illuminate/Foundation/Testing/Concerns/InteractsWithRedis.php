@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Testing\Concerns;
 
 use Exception;
+use Illuminate\Contracts\Redis\Factory as Redis;
 use Illuminate\Foundation\Application;
 use Illuminate\Redis\RedisManager;
 use Illuminate\Support\Env;
@@ -71,13 +72,21 @@ trait InteractsWithRedis
                         'timeout' => 0.5,
                         'name' => 'default',
                     ],
+                    'cache' => [
+                        'host' => $host,
+                        'port' => $port,
+                        'database' => 6,
+                        'timeout' => 0.5,
+                    ],
                 ];
             }
             $this->redis[$driver[0]] = new RedisManager($app, $driver[0], $config);
         }
 
+        $defaultDriver = Env::get('REDIS_CLIENT', 'phpredis');
+
         try {
-            $this->redis['phpredis']->connection()->flushdb();
+            $this->redis[$defaultDriver]->connection()->flushdb();
         } catch (Exception) {
             if ($host === '127.0.0.1' && $port === 6379 && Env::get('REDIS_HOST') === null) {
                 static::$connectionFailedOnceWithDefaultsSkip = true;
@@ -85,6 +94,8 @@ trait InteractsWithRedis
                 $this->markTestSkipped('Trying default host/port failed, please set environment variable REDIS_HOST & REDIS_PORT to enable '.__CLASS__);
             }
         }
+
+        $app->instance('redis', $this->redis[$defaultDriver]);
     }
 
     /**
