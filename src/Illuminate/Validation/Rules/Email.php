@@ -210,8 +210,8 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
     /**
      * Build the array of underlying validation rules based on the current state.
      *
-     * @param string $attribute
-     * @param mixed $value
+     * @param  string  $attribute
+     * @param  mixed  $value
      * @return array
      */
     public function buildValidationRules($attribute, $value)
