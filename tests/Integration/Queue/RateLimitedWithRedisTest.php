@@ -8,6 +8,7 @@ use Illuminate\Cache\RateLimiter;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Contracts\Redis\Factory as Redis;
+use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Queue\CallQueuedHandler;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Middleware\RateLimitedWithRedis;
@@ -21,6 +22,22 @@ use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 #[RequiresPhpExtension('redis')]
 class RateLimitedWithRedisTest extends TestCase
 {
+    use InteractsWithRedis;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->setUpRedis();
+    }
+
+    protected function tearDown(): void
+    {
+        $this->tearDownRedis();
+
+        parent::tearDown();
+    }
+
     public function testUnlimitedJobsAreExecuted()
     {
         $rateLimiter = $this->app->make(RateLimiter::class);
