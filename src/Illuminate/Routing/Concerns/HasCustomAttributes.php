@@ -17,6 +17,7 @@ use ReflectionMethod;
  * before executing the controller action. Attributes must implement the `ICustomAttribute` interface to be processed.
  *
  * For more information on PHP attributes, see the official documentation:
+ *
  * @link https://www.php.net/manual/en/language.attributes.overview.php
  *
  * Example usage:
