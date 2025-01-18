@@ -9,6 +9,7 @@ use Illuminate\Support\Fluent;
  * @method $this language(string $language) Specify a language for the full text index (PostgreSQL)
  * @method $this deferrable(bool $value = true) Specify that the unique index is deferrable (PostgreSQL)
  * @method $this initiallyImmediate(bool $value = true) Specify the default time to check the unique index constraint (PostgreSQL)
+ * @method $this useCreateIndex(bool $value = true) Specify if the unique index will be created using CREATE UNIQUE INDEX (PostgreSQL)
  */
 class IndexDefinition extends Fluent
 {

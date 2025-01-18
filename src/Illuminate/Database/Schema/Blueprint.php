@@ -717,6 +717,18 @@ class Blueprint
     }
 
     /**
+     * Specify a raw unique index for the table.
+     *
+     * @param  string  $expression
+     * @param  string  $name
+     * @return \Illuminate\Database\Schema\IndexDefinition
+     */
+    public function rawUnique($expression, $name)
+    {
+        return $this->unique([new Expression($expression)], $name);
+    }
+
+    /**
      * Specify a foreign key for the table.
      *
      * @param  string|array  $columns

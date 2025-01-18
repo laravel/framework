@@ -314,6 +314,14 @@ class PostgresGrammar extends Grammar
      */
     public function compileUnique(Blueprint $blueprint, Fluent $command)
     {
+        if ($command->useCreateIndex) {
+            return sprintf('create unique index %s on %s (%s)',
+                $this->wrap($command->index),
+                $this->wrapTable($blueprint),
+                $this->columnize($command->columns),
+            );
+        }
+
         $sql = sprintf('alter table %s add constraint %s unique (%s)',
             $this->wrapTable($blueprint),
             $this->wrap($command->index),
