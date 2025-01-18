@@ -80,6 +80,10 @@ class ModelMakeCommand extends GeneratorCommand
         if ($this->option('policy')) {
             $this->createPolicy();
         }
+
+        if($this->option('test')) {
+            $this->createTest();
+        }
     }
 
     /**
@@ -182,6 +186,47 @@ class ModelMakeCommand extends GeneratorCommand
             'name' => "{$policy}Policy",
             '--model' => $this->qualifyClass($this->getNameInput()),
         ]);
+    }
+
+    /**
+     * Create a test file for the model.
+     *
+     * @return void
+     */
+    protected function createTest()
+    {
+        $testName = $this->argument('name').'Test';
+        $modelName = $this->argument('name');
+        $modelNamespace = $this->qualifyClass($modelName);
+
+        $this->call('make:test', [
+            'name' => $testName,
+            '--unit' => $this->option('unit'),
+        ]);
+
+        $testPath = $this->getTestPath($testName);
+        if (file_exists($subPath = $this->resolveStubPath('/stubs/test.model.stub'))) {
+            $stub = $this->files->get($subPath);
+            $stub = str_replace(
+                ['{{ $unit }}',
+                 '{{ $modelNamespace }}',
+                 '{{ $modelName }}',
+                 '{{ $testName }}'
+            ],[
+                $this->option('unit') ? 'Unit' : 'Feature',
+                $modelNamespace,
+                $modelName,
+                $testName
+            ], $stub);
+
+            $this->files->put($testPath, $stub);
+        }
+    }
+
+    protected function getTestPath($testName)
+    {
+        $directory = $this->option('unit') ? 'Unit' : 'Feature';
+        return base_path('tests/'.$directory.'/'.$testName.'.php');
     }
 
     /**
@@ -293,7 +338,8 @@ class ModelMakeCommand extends GeneratorCommand
             ['resource', 'r', InputOption::VALUE_NONE, 'Indicates if the generated controller should be a resource controller'],
             ['api', null, InputOption::VALUE_NONE, 'Indicates if the generated controller should be an API resource controller'],
             ['requests', 'R', InputOption::VALUE_NONE, 'Create new form request classes and use them in the resource controller'],
-        ];
+            ['test', 't', InputOption::VALUE_NONE, 'Create a new test for the model'],
+            ['unit', null, InputOption::VALUE_NONE, 'Create the test in the unit directory'],        ];
     }
 
     /**
@@ -316,6 +362,7 @@ class ModelMakeCommand extends GeneratorCommand
             'migration' => 'Migration',
             'policy' => 'Policy',
             'resource' => 'Resource Controller',
+            'test' => 'Test',
         ])))->each(fn ($option) => $input->setOption($option, true));
     }
 }

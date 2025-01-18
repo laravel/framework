@@ -1,0 +1,19 @@
+<?php
+
+namespace Tests\{{ $unit ? 'Unit' : 'Feature}};
+
+use Tests\TestCase;
+use {{ $modelNamespace }}\{{ $modelName }};
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
+class {{ $testName }} extends TestCase
+{
+    use RefreshDatabase;
+
+    /** @test */
+    public function it_can_create_a_model_instance()
+    {
+        $model = {{ $modelName }}::factory()->create();
+        $this->assertModelExists($model);
+    }
+}
