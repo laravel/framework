@@ -14,6 +14,7 @@ use Illuminate\Contracts\Console\Kernel as ConsoleKernelContract;
  * @method static void registerCommand(\Symfony\Component\Console\Command\Command $command)
  * @method static int call(string $command, array $parameters = [], \Symfony\Component\Console\Output\OutputInterface|null $outputBuffer = null)
  * @method static \Illuminate\Foundation\Bus\PendingDispatch queue(string $command, array $parameters = [])
+ * @method static \Illuminate\Foundation\Bus\PendingDispatch queueUnique(string $command, array $parameters = [])
  * @method static array all()
  * @method static string output()
  * @method static void bootstrap()
