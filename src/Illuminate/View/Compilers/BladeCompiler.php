@@ -277,7 +277,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
             $value = $precompiler($value);
         }
 
-        // Here we will loop through all of the tokens returned by the Zend lexer and
+        // Here we will loop through all tokens returned by the Zend lexer and
         // parse each one into the corresponding valid PHP. We will then have this
         // template as the correctly rendered PHP that can be rendered natively.
         foreach (token_get_all($value) as $token) {
