@@ -7,6 +7,7 @@ use Illuminate\Console\Command;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Foundation\Console\QueuedCommand;
+use Illuminate\Foundation\Console\QueuedUniqueCommand;
 use Illuminate\Support\Facades\Queue;
 use Orchestra\Testbench\TestCase;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -106,6 +107,27 @@ class ConsoleApplicationTest extends TestCase
 
         Queue::assertPushed(QueuedCommand::class, function ($job) {
             return $job->displayName() === 'foo:bar';
+        });
+    }
+
+    public function testArtisanQueueUnique()
+    {
+        Queue::fake();
+
+        $job = $this->app[Kernel::class]->queueUnique('foo:bar', [
+            'id' => 1,
+        ])->getJob();
+
+        $job->setUniqueBy('test_id');
+        $job->setUniqueVia('test_cache');
+        $job->setUniqueFor(3000);
+
+        Queue::assertPushed(QueuedCommand::class, function ($job) {
+            return $job instanceof QueuedUniqueCommand
+                && $job->displayName() === 'foo:bar'
+                && $job->uniqueBy() === 'test_id'
+                && $job->uniqueVia() === 'test_cache'
+                && $job->uniqueFor() === 3000;
         });
     }
 }

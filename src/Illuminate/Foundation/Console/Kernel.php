@@ -440,6 +440,18 @@ class Kernel implements KernelContract
     }
 
     /**
+     * Queue the given console command uniquely.
+     *
+     * @param  string  $command
+     * @param  array  $parameters
+     * @return \Illuminate\Foundation\Bus\PendingDispatch
+     */
+    public function queueUnique($command, array $parameters = [])
+    {
+        return QueuedUniqueCommand::dispatch(func_get_args());
+    }
+
+    /**
      * Get all of the commands registered with the console.
      *
      * @return array
