@@ -28,7 +28,7 @@ class DatabaseMigrationRollbackCommandTest extends TestCase
             return $callback();
         });
         $migrator->shouldReceive('setOutput')->once()->andReturn($migrator);
-        $migrator->shouldReceive('rollback')->once()->with([__DIR__.DIRECTORY_SEPARATOR.'migrations'], ['pretend' => false, 'step' => 0, 'batch' => 0]);
+        $migrator->shouldReceive('rollback')->once()->with([__DIR__ . DIRECTORY_SEPARATOR . 'migrations'], ['pretend' => false, 'step' => 0, 'batch' => 0]);
 
         $this->runCommand($command);
     }
@@ -44,7 +44,7 @@ class DatabaseMigrationRollbackCommandTest extends TestCase
             return $callback();
         });
         $migrator->shouldReceive('setOutput')->once()->andReturn($migrator);
-        $migrator->shouldReceive('rollback')->once()->with([__DIR__.DIRECTORY_SEPARATOR.'migrations'], ['pretend' => false, 'step' => 2, 'batch' => 0]);
+        $migrator->shouldReceive('rollback')->once()->with([__DIR__ . DIRECTORY_SEPARATOR . 'migrations'], ['pretend' => false, 'step' => 2, 'batch' => 0]);
 
         $this->runCommand($command, ['--step' => 2]);
     }
@@ -60,7 +60,7 @@ class DatabaseMigrationRollbackCommandTest extends TestCase
             return $callback();
         });
         $migrator->shouldReceive('setOutput')->once()->andReturn($migrator);
-        $migrator->shouldReceive('rollback')->once()->with([__DIR__.DIRECTORY_SEPARATOR.'migrations'], true);
+        $migrator->shouldReceive('rollback')->once()->with([__DIR__ . DIRECTORY_SEPARATOR . 'migrations'], true);
 
         $this->runCommand($command, ['--pretend' => true, '--database' => 'foo']);
     }
@@ -76,7 +76,7 @@ class DatabaseMigrationRollbackCommandTest extends TestCase
             return $callback();
         });
         $migrator->shouldReceive('setOutput')->once()->andReturn($migrator);
-        $migrator->shouldReceive('rollback')->once()->with([__DIR__.DIRECTORY_SEPARATOR.'migrations'], ['pretend' => true, 'step' => 2, 'batch' => 0]);
+        $migrator->shouldReceive('rollback')->once()->with([__DIR__ . DIRECTORY_SEPARATOR . 'migrations'], ['pretend' => true, 'step' => 2, 'batch' => 0]);
 
         $this->runCommand($command, ['--pretend' => true, '--database' => 'foo', '--step' => 2]);
     }

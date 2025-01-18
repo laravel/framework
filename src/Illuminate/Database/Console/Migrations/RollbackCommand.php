@@ -74,8 +74,8 @@ class RollbackCommand extends BaseCommand
                     'pretend' => $this->option('pretend'),
                     'step' => (int) $this->option('step'),
                     'batch' => (int) $this->option('batch'),
-                ],
-                $migrations
+                    'select' => $migrations,
+                ]
             );
         });
 

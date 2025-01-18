@@ -225,14 +225,13 @@ class Migrator
      * @param  string[]|string  $paths
      * @param  array<string, mixed>  $options
      * @return string[]
-     * @param  array  $userChosenMigrations
      */
-    public function rollback($paths = [], array $options = [], array $userChosenMigrations = [])
+    public function rollback($paths = [], array $options = [])
     {
         // We want to pull in the last batch of migrations that ran on the previous
         // migration operation. We'll then reverse those migrations and run each
         // of them "down" to reverse the last migration "operation" which ran.
-        $migrations = count($userChosenMigrations) > 0 ? $userChosenMigrations : $this->getMigrationsForRollback($options);
+        $migrations = count($options['select']) > 0 ? $options['select'] : $this->getMigrationsForRollback($options);
 
         if (count($migrations) === 0) {
             $this->fireMigrationEvent(new NoPendingMigrations('down'));
