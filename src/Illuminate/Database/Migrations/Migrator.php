@@ -231,7 +231,7 @@ class Migrator
         // We want to pull in the last batch of migrations that ran on the previous
         // migration operation. We'll then reverse those migrations and run each
         // of them "down" to reverse the last migration "operation" which ran.
-        $migrations = count($options['selected']) > 0 ? $options['selected'] : $this->getMigrationsForRollback($options);
+        $migrations = isset($options['selected']) && count($options['selected']) > 0 ? $options['selected'] : $this->getMigrationsForRollback($options);
 
         if (count($migrations) === 0) {
             $this->fireMigrationEvent(new NoPendingMigrations('down'));
