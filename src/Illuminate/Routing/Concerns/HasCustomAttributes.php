@@ -54,7 +54,7 @@ trait HasCustomAttributes
         return parent::callAction($method, $parameters);
     }
 
-    private function gteCustomAttributes(ReflectionMethod $reflection): Collection
+    private function getCustomAttributes(ReflectionMethod $reflection): Collection
     {
         return collect($reflection->getAttributes())
             ->filter(fn (ReflectionAttribute $attr) => $attr->newInstance() instanceof ICustomAttribute);
