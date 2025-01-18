@@ -4,8 +4,11 @@ namespace Illuminate\Database\Console\Migrations;
 
 use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Database\Migrations\Migrator;
+use Illuminate\Support\Facades\DB;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputOption;
+
+use function Laravel\Prompts\multiselect;
 
 #[AsCommand('migrate:rollback')]
 class RollbackCommand extends BaseCommand
@@ -57,13 +60,22 @@ class RollbackCommand extends BaseCommand
             return 1;
         }
 
-        $this->migrator->usingConnection($this->option('database'), function () {
+        // if step or batch is not set, we need to rollback all migrations
+        $migrations = [];
+        if (($this->option('step') == null && $this->option('batch') == null)) {
+            $migrations = $this->getMigrationsForRollback();
+        }
+
+        // if step or batch is set, we need to rollback the migrations
+        $this->migrator->usingConnection($this->option('database'), function () use ($migrations) {
             $this->migrator->setOutput($this->output)->rollback(
-                $this->getMigrationPaths(), [
+                $this->getMigrationPaths(),
+                [
                     'pretend' => $this->option('pretend'),
                     'step' => (int) $this->option('step'),
                     'batch' => (int) $this->option('batch'),
-                ]
+                ],
+                $migrations
             );
         });
 
@@ -86,5 +98,31 @@ class RollbackCommand extends BaseCommand
             ['step', null, InputOption::VALUE_OPTIONAL, 'The number of migrations to be reverted'],
             ['batch', null, InputOption::VALUE_REQUIRED, 'The batch of migrations (identified by their batch number) to be reverted'],
         ];
+    }
+
+    /**
+     * Get the list of migrations selected by the user for rollback.
+     *
+     * This method presents an interactive prompt allowing users to select
+     * which migrations they want to rollback from the existing migrations
+     * in the database.
+     *
+     * @return array<int, object> Returns an array of migration records, or empty array if no migrations exist
+     */
+    private function getMigrationsForRollback()
+    {
+        $migrationsInstance = DB::table('migrations');
+
+        if ($migrationsInstance->count() > 0) {
+            $options = multiselect(
+                label: 'Which migrations would you like to rollback',
+                options: $migrationsInstance->pluck('migration')->toArray(),
+                hint: 'Use the space bar to select options.',
+                scroll: 10,
+                required: true,
+            );
+            return $migrationsInstance->whereIn('migration', $options)->get()->toArray();
+        }
+        return [];
     }
 }

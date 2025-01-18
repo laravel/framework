@@ -114,7 +114,8 @@ class Migrator
         $files = $this->getMigrationFiles($paths);
 
         $this->requireFiles($migrations = $this->pendingMigrations(
-            $files, $this->repository->getRan()
+            $files,
+            $this->repository->getRan()
         ));
 
         // Once we have all these migrations that are outstanding we are ready to run
@@ -135,7 +136,7 @@ class Migrator
     protected function pendingMigrations($files, $ran)
     {
         return (new Collection($files))
-            ->reject(fn ($file) => in_array($this->getMigrationName($file), $ran))
+            ->reject(fn($file) => in_array($this->getMigrationName($file), $ran))
             ->values()
             ->all();
     }
@@ -210,7 +211,7 @@ class Migrator
             return $this->pretendToRun($migration, 'up');
         }
 
-        $this->write(Task::class, $name, fn () => $this->runMigration($migration, 'up'));
+        $this->write(Task::class, $name, fn() => $this->runMigration($migration, 'up'));
 
         // Once we have run a migrations class, we will log that it was run in this
         // repository so that we don't try to run it next time we do a migration
@@ -225,12 +226,12 @@ class Migrator
      * @param  array<string, mixed>  $options
      * @return string[]
      */
-    public function rollback($paths = [], array $options = [])
+    public function rollback($paths = [], array $options = [], array $userChosenMigrations = [])
     {
         // We want to pull in the last batch of migrations that ran on the previous
         // migration operation. We'll then reverse those migrations and run each
         // of them "down" to reverse the last migration "operation" which ran.
-        $migrations = $this->getMigrationsForRollback($options);
+        $migrations = count($userChosenMigrations) > 0 ? $userChosenMigrations : $this->getMigrationsForRollback($options);
 
         if (count($migrations) === 0) {
             $this->fireMigrationEvent(new NoPendingMigrations('down'));
@@ -297,7 +298,8 @@ class Migrator
             $rolledBack[] = $file;
 
             $this->runDown(
-                $file, $migration,
+                $file,
+                $migration,
                 $options['pretend'] ?? false
             );
         }
@@ -345,10 +347,12 @@ class Migrator
         // Since the getRan method that retrieves the migration name just gives us the
         // migration name, we will format the names into objects with the name as a
         // property on the objects so that we can pass it to the rollback method.
-        $migrations = (new Collection($migrations))->map(fn ($m) => (object) ['migration' => $m])->all();
+        $migrations = (new Collection($migrations))->map(fn($m) => (object) ['migration' => $m])->all();
 
         return $this->rollbackMigrations(
-            $migrations, $paths, compact('pretend')
+            $migrations,
+            $paths,
+            compact('pretend')
         );
     }
 
@@ -373,7 +377,7 @@ class Migrator
             return $this->pretendToRun($instance, 'down');
         }
 
-        $this->write(Task::class, $name, fn () => $this->runMigration($instance, 'down'));
+        $this->write(Task::class, $name, fn() => $this->runMigration($instance, 'down'));
 
         // Once we have successfully run the migration "down" we will remove it from
         // the migration repository so it will be considered to have not been run
@@ -406,8 +410,8 @@ class Migrator
 
         $this->getSchemaGrammar($connection)->supportsSchemaTransactions()
             && $migration->withinTransaction
-                    ? $connection->transaction($callback)
-                    : $callback();
+            ? $connection->transaction($callback)
+            : $callback();
     }
 
     /**
@@ -431,7 +435,7 @@ class Migrator
 
         $this->write(
             BulletList::class,
-            (new Collection($this->getQueries($migration, $method)))->map(fn ($query) => $query['query'])
+            (new Collection($this->getQueries($migration, $method)))->map(fn($query) => $query['query'])
         );
     }
 
@@ -510,8 +514,8 @@ class Migrator
 
         if (is_object($migration)) {
             return method_exists($migration, '__construct')
-                    ? $this->files->getRequire($path)
-                    : clone $migration;
+                ? $this->files->getRequire($path)
+                : clone $migration;
         }
 
         return new $class;
@@ -537,11 +541,11 @@ class Migrator
     public function getMigrationFiles($paths)
     {
         return (new Collection($paths))
-            ->flatMap(fn ($path) => str_ends_with($path, '.php') ? [$path] : $this->files->glob($path.'/*_*.php'))
+            ->flatMap(fn($path) => str_ends_with($path, '.php') ? [$path] : $this->files->glob($path . '/*_*.php'))
             ->filter()
             ->values()
-            ->keyBy(fn ($file) => $this->getMigrationName($file))
-            ->sortBy(fn ($file, $key) => $key)
+            ->keyBy(fn($file) => $this->getMigrationName($file))
+            ->sortBy(fn($file, $key) => $key)
             ->all();
     }
 
@@ -613,7 +617,7 @@ class Migrator
 
         $this->setConnection($name);
 
-        return tap($callback(), fn () => $this->setConnection($previousConnection));
+        return tap($callback(), fn() => $this->setConnection($previousConnection));
     }
 
     /**
