@@ -274,6 +274,16 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertSame('alter table "users" add constraint "bar" unique ("foo")', $statements[0]);
     }
 
+    public function testAddingUniqueKeyViaUseCreateIndex()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->unique('foo', 'bar')->useCreateIndex();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create unique index "bar" on "users" ("foo")', $statements[0]);
+    }
+
     public function testAddingIndex()
     {
         $blueprint = new Blueprint('users');
@@ -362,6 +372,26 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertSame('create index "raw_index" on "users" ((function(column)))', $statements[0]);
+    }
+
+    public function testAddingRawUniqueKey()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->rawUnique('foo,bar', 'baz');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table "users" add constraint "baz" unique (foo,bar)', $statements[0]);
+    }
+
+    public function testAddingRawUniqueKeyViaUseCreateIndex()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->rawUnique('function(column)', 'baz')->useCreateIndex();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create unique index "baz" on "users" (function(column))', $statements[0]);
     }
 
     public function testAddingIncrementingID()
