@@ -815,6 +815,89 @@ class ValidationEmailRuleTest extends TestCase
         );
     }
 
+    public function testDefaultsCanBeUnset()
+    {
+        Email::defaults(function () {
+            return Rule::email()
+                ->rfcCompliant(strict: true)
+                ->preventSpoofing()
+                ->validateMxRecord();
+        });
+
+        $ssoSocialiteEmail = 'sso-user@laravel.onmicrosoft.com';
+
+        $this->fails(
+            Email::default(),
+            $ssoSocialiteEmail,
+            ['The '.self::ATTRIBUTE_REPLACED.' must be a valid email address.']
+        );
+        $this->fails(
+            Email::default()->preventSpoofing(condition: false),
+            $ssoSocialiteEmail,
+            ['The '.self::ATTRIBUTE_REPLACED.' must be a valid email address.']
+        );
+        // Validating MX records is disabled again when unset, allowing the Socialite SSO user without inbox to pass the rule again.
+        $this->passes(
+            Email::default()->validateMxRecord(condition: false),
+            $ssoSocialiteEmail
+        );
+        // Closure can be used to dynamically determine if the rule should be applied.
+        $this->fails(
+            Email::default()->validateMxRecord(condition: function ($attribute, $value) {
+                return ! str_ends_with($value, '.onmicrosoft.com');
+            }),
+            'sso-user@example.com',
+            ['The '.self::ATTRIBUTE_REPLACED.' must be a valid email address.']
+        );
+        $this->passes(
+            Email::default()->validateMxRecord(condition: function ($attribute, $value) {
+                return ! str_ends_with($value, '.onmicrosoft.com');
+            }),
+            $ssoSocialiteEmail,
+        );
+
+        $spoofingEmail = 'apр@laravel.com';
+
+        $this->fails(
+            Email::default(),
+            $spoofingEmail,
+            ['The '.self::ATTRIBUTE_REPLACED.' must be a valid email address.']
+        );
+        $this->fails(
+            Email::default()->strict(condition: false),
+            $spoofingEmail,
+            ['The '.self::ATTRIBUTE_REPLACED.' must be a valid email address.']
+        );
+        // Spoofing is allowed again when unset, so the spoofed email will pass the rule again.
+        $this->passes(
+            Email::default()->preventSpoofing(condition: false),
+            $spoofingEmail,
+        );
+
+        $failsInStrict = '"has space"@laravel.com';
+
+        $this->fails(
+            Email::default(),
+            $failsInStrict,
+            ['The '.self::ATTRIBUTE_REPLACED.' must be a valid email address.']
+        );
+        $this->fails(
+            Email::default()->validateMxRecord(condition: false),
+            $failsInStrict,
+            ['The '.self::ATTRIBUTE_REPLACED.' must be a valid email address.']
+        );
+        $this->fails(
+            Email::default()->preventSpoofing(condition: false),
+            $failsInStrict,
+            ['The '.self::ATTRIBUTE_REPLACED.' must be a valid email address.']
+        );
+        // Strict is disabled again when unset, so the rule will pass again.
+        $this->passes(
+            Email::default()->strict(condition: false),
+            $failsInStrict
+        );
+    }
+
     public function testValidationMessages()
     {
         Email::defaults(function () {

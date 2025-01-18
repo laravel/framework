@@ -2,6 +2,7 @@
 
 namespace Illuminate\Validation\Rules;
 
+use Closure;
 use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Contracts\Validation\ValidatorAwareRule;
@@ -15,12 +16,12 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
 {
     use Conditionable, Macroable;
 
-    public bool $validateMxRecord = false;
-    public bool $preventSpoofing = false;
-    public bool $nativeValidation = false;
-    public bool $nativeValidationWithUnicodeAllowed = false;
-    public bool $rfcCompliant = false;
-    public bool $strictRfcCompliant = false;
+    public bool|Closure $validateMxRecord = false;
+    public bool|Closure $preventSpoofing = false;
+    public bool|Closure $nativeValidation = false;
+    public bool|Closure $nativeValidationWithUnicodeAllowed = false;
+    public bool|Closure $rfcCompliant = false;
+    public bool|Closure $strictRfcCompliant = false;
 
     /**
      * The validator performing the validation.
@@ -98,12 +99,12 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
      * @param  bool  $strict
      * @return $this
      */
-    public function rfcCompliant(bool $strict = false)
+    public function rfcCompliant(bool $strict = false, bool|Closure $condition = true)
     {
         if ($strict) {
-            $this->strictRfcCompliant = true;
+            $this->strictRfcCompliant = $condition;
         } else {
-            $this->rfcCompliant = true;
+            $this->rfcCompliant = $condition;
         }
 
         return $this;
@@ -114,9 +115,9 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
      *
      * @return $this
      */
-    public function strict()
+    public function strict(bool|Closure $condition = true)
     {
-        return $this->rfcCompliant(true);
+        return $this->rfcCompliant(strict: true, condition: $condition);
     }
 
     /**
@@ -126,9 +127,9 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
      *
      * @return $this
      */
-    public function validateMxRecord()
+    public function validateMxRecord(bool|Closure $condition = true)
     {
-        $this->validateMxRecord = true;
+        $this->validateMxRecord = $condition;
 
         return $this;
     }
@@ -138,9 +139,9 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
      *
      * @return $this
      */
-    public function preventSpoofing()
+    public function preventSpoofing(bool|Closure $condition = true)
     {
-        $this->preventSpoofing = true;
+        $this->preventSpoofing = $condition;
 
         return $this;
     }
@@ -151,12 +152,12 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
      * @param  bool  $allowUnicode
      * @return $this
      */
-    public function withNativeValidation(bool $allowUnicode = false)
+    public function withNativeValidation(bool $allowUnicode = false, bool|Closure $condition = true)
     {
         if ($allowUnicode) {
-            $this->nativeValidationWithUnicodeAllowed = true;
+            $this->nativeValidationWithUnicodeAllowed = $condition;
         } else {
-            $this->nativeValidation = true;
+            $this->nativeValidation = $condition;
         }
 
         return $this;
@@ -192,7 +193,7 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
 
         $validator = Validator::make(
             $this->data,
-            [$attribute => $this->buildValidationRules()],
+            [$attribute => $this->buildValidationRules($attribute, $value)],
             $this->validator->customMessages,
             $this->validator->customAttributes
         );
@@ -209,33 +210,35 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
     /**
      * Build the array of underlying validation rules based on the current state.
      *
+     * @param string $attribute
+     * @param mixed $value
      * @return array
      */
-    protected function buildValidationRules()
+    public function buildValidationRules($attribute, $value)
     {
         $rules = [];
 
-        if ($this->rfcCompliant) {
+        if (value($this->rfcCompliant, $attribute, $value)) {
             $rules[] = 'rfc';
         }
 
-        if ($this->strictRfcCompliant) {
+        if (value($this->strictRfcCompliant, $attribute, $value)) {
             $rules[] = 'strict';
         }
 
-        if ($this->validateMxRecord) {
+        if (value($this->validateMxRecord, $attribute, $value)) {
             $rules[] = 'dns';
         }
 
-        if ($this->preventSpoofing) {
+        if (value($this->preventSpoofing, $attribute, $value)) {
             $rules[] = 'spoof';
         }
 
-        if ($this->nativeValidation) {
+        if (value($this->nativeValidation, $attribute, $value)) {
             $rules[] = 'filter';
         }
 
-        if ($this->nativeValidationWithUnicodeAllowed) {
+        if (value($this->nativeValidationWithUnicodeAllowed, $attribute, $value)) {
             $rules[] = 'filter_unicode';
         }
 
