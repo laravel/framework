@@ -62,7 +62,7 @@ class RollbackCommand extends BaseCommand
 
         // if step or batch is not set, we need to rollback all migrations
         $migrations = [];
-        if (($this->option('step') == null && $this->option('batch') == null)) {
+        if (($this->option('select'))) {
             $migrations = $this->getMigrationsForRollback();
         }
 
@@ -97,6 +97,7 @@ class RollbackCommand extends BaseCommand
             ['pretend', null, InputOption::VALUE_NONE, 'Dump the SQL queries that would be run'],
             ['step', null, InputOption::VALUE_OPTIONAL, 'The number of migrations to be reverted'],
             ['batch', null, InputOption::VALUE_REQUIRED, 'The batch of migrations (identified by their batch number) to be reverted'],
+            ['select', null, InputOption::VALUE_NONE, 'Select the migrations to rollback'],
         ];
     }
 
