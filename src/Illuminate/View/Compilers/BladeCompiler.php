@@ -605,6 +605,10 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function hasEvenNumberOfParentheses(string $expression)
     {
+        if (substr($expression, -1) !== ')') {
+            return false;
+        }
+
         return substr_count($expression, '(') === substr_count($expression, ')');
     }
 
