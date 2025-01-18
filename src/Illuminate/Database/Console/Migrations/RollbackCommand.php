@@ -62,7 +62,7 @@ class RollbackCommand extends BaseCommand
 
         $migrations = [];
         if ($this->option('select')) {
-            $migrations = $this->getMigrationsForRollback();
+            $migrations = $this->getMigrationsForRollbacks();
         }
 
         $this->migrator->usingConnection($this->option('database'), function () use ($migrations) {
@@ -108,7 +108,8 @@ class RollbackCommand extends BaseCommand
      *
      * @return array<int, object> Returns an array of migration records, or empty array if no migrations exist
      */
-    private function getMigrationsForRollback()
+
+    private function getMigrationsForRollbacks()
     {
         $migrationsInstance = DB::table('migrations');
 

@@ -758,4 +758,32 @@ class Migrator
     {
         $this->events?->dispatch($event);
     }
+
+    protected function getMigrationBatches($migrations)
+    {
+        $options = $this->resolveOptions($migrations);
+        $selected = $options['selected'] ?? [];
+
+        if (count($selected) > 0) {
+            return collect($selected)->map(function ($migration) {
+                return (object) $migration;
+            })->pluck('batch', 'migration')->all();
+        }
+
+        return $this->repository->getRan();
+    }
+
+    protected function resolveOptions($migrations)
+    {
+        if (is_array($migrations)) {
+            return $migrations;
+        }
+
+        return [
+            'pretend' => false,
+            'step' => 0,
+            'batch' => 0,
+            'selected' => [],
+        ];
+    }
 }

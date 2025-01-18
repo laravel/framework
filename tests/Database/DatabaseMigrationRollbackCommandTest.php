@@ -78,7 +78,7 @@ class DatabaseMigrationRollbackCommandTest extends TestCase
         $migrator->shouldReceive('setOutput')->once()->andReturn($migrator);
         $migrator->shouldReceive('rollback')->once()->with([__DIR__ . DIRECTORY_SEPARATOR . 'migrations'], ['pretend' => true, 'step' => 2, 'batch' => 0, 'selected' => []]);
 
-        $this->runCommand($command, ['--pretend' => true, '--database' => 'foo', '--step' => 2, '--select' => true]);
+        $this->runCommand($command, ['--pretend' => true, '--step' => 2]);
     }
 
     protected function runCommand($command, $input = [])
