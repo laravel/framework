@@ -8,6 +8,13 @@ use ReflectionMethod;
 
 trait HasCustomAttributes
 {
+    /**
+     * Call a controller action with custom attribute handling.
+     *
+     * @param string $method
+     * @param array $parameters
+     * @return mixed
+     */
     public function callAction($method, $parameters)
     {
         $reflection = new ReflectionMethod($this, $method);
