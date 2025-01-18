@@ -115,11 +115,11 @@ class RollbackCommand extends BaseCommand
 
         if ($migrationsInstance->count() > 0) {
             $options = multiselect(
-                label: 'Which migrations would you like to rollback',
+                label: 'Which migrations would you like to rollback (leave blank to default behaviour)',
                 options: $migrationsInstance->pluck('migration')->toArray(),
                 hint: 'Use the space bar to select options.',
                 scroll: 10,
-                required: true,
+                required: false,
             );
             return $migrationsInstance->whereIn('migration', $options)->get()->toArray();
         }
