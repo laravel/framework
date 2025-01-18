@@ -225,6 +225,7 @@ class Migrator
      * @param  string[]|string  $paths
      * @param  array<string, mixed>  $options
      * @return string[]
+     * @param  array  $userChosenMigrations
      */
     public function rollback($paths = [], array $options = [], array $userChosenMigrations = [])
     {
