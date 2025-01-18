@@ -19,7 +19,7 @@ trait HasCustomAttributes
     {
         $reflection = new ReflectionMethod($this, $method);
 
-        $attributes = $this->gteCustomAttributes($reflection);
+        $attributes = $this->getCustomAttributes($reflection);
 
         $attributes->each(function (ReflectionAttribute $attribute) {
             $instance = $attribute->newInstance();
