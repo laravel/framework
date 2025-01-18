@@ -43,19 +43,37 @@ trait InteractsWithRedis
         $port = Env::get('REDIS_PORT', 6379);
 
         foreach (static::redisDriverProvider() as $driver) {
-            $this->redis[$driver[0]] = new RedisManager($app, $driver[0], [
-                'cluster' => false,
-                'options' => [
-                    'prefix' => 'test_',
-                ],
-                'default' => [
-                    'host' => $host,
-                    'port' => $port,
-                    'database' => 5,
-                    'timeout' => 0.5,
-                    'name' => 'default',
-                ],
-            ]);
+            if (Env::get('REDIS_CLUSTER_HOSTS_AND_PORTS')) {
+                $config = [
+                    'options' => [
+                        'cluster' => 'redis',
+                        'prefix' => 'test_',
+                    ],
+                    'clusters' => [
+                        'default' => array_map(
+                            static fn ($hostAndPort) => [
+                                'host' => explode(':', $hostAndPort)[0],
+                                'port' => explode(':', $hostAndPort)[1],
+                            ],
+                            explode(',', Env::get('REDIS_CLUSTER_HOSTS_AND_PORTS')),
+                        ),
+                    ],
+                ];
+            } else {
+                $config = [
+                    'options' => [
+                        'prefix' => 'test_',
+                    ],
+                    'default' => [
+                        'host' => $host,
+                        'port' => $port,
+                        'database' => 5,
+                        'timeout' => 0.5,
+                        'name' => 'default',
+                    ],
+                ];
+            }
+            $this->redis[$driver[0]] = new RedisManager($app, $driver[0], $config);
         }
 
         try {
