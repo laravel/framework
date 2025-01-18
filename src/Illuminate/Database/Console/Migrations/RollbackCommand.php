@@ -60,13 +60,11 @@ class RollbackCommand extends BaseCommand
             return 1;
         }
 
-        // if step or batch is not set, we need to rollback all migrations
         $migrations = [];
-        if (($this->option('select'))) {
+        if ($this->option('select')) {
             $migrations = $this->getMigrationsForRollback();
         }
 
-        // if step or batch is set, we need to rollback the migrations
         $this->migrator->usingConnection($this->option('database'), function () use ($migrations) {
             $this->migrator->setOutput($this->output)->rollback(
                 $this->getMigrationPaths(),
@@ -74,7 +72,7 @@ class RollbackCommand extends BaseCommand
                     'pretend' => $this->option('pretend'),
                     'step' => (int) $this->option('step'),
                     'batch' => (int) $this->option('batch'),
-                    'select' => $migrations,
+                    'selected' => $migrations ?: [],
                 ]
             );
         });
@@ -120,7 +118,7 @@ class RollbackCommand extends BaseCommand
                 options: $migrationsInstance->pluck('migration')->toArray(),
                 hint: 'Use the space bar to select options.',
                 scroll: 10,
-                required: false,
+                required: true,
             );
             return $migrationsInstance->whereIn('migration', $options)->get()->toArray();
         }
