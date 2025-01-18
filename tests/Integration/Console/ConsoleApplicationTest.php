@@ -110,24 +110,33 @@ class ConsoleApplicationTest extends TestCase
         });
     }
 
+    public function testArtisanQueueUniqueWithDefaults()
+    {
+        Queue::fake();
+
+        $this->app[Kernel::class]->queueUnique('foo:bar', [
+            'id' => 1,
+        ]);
+
+        Queue::assertPushed(QueuedUniqueCommand::class, function ($job) {
+            return $job->displayName() === 'foo:bar'
+                && $job->uniqueId === QueuedUniqueCommand::class
+                && $job->uniqueFor === 0;
+        });
+    }
+
     public function testArtisanQueueUnique()
     {
         Queue::fake();
 
-        $job = $this->app[Kernel::class]->queueUnique('foo:bar', [
+        $this->app[Kernel::class]->queueUnique('foo:bar', [
             'id' => 1,
-        ])->getJob();
+        ])->setUniqueId('test_id')->setUniqueFor(3000);
 
-        $job->setUniqueBy('test_id');
-        $job->setUniqueVia('test_cache');
-        $job->setUniqueFor(3000);
-
-        Queue::assertPushed(QueuedCommand::class, function ($job) {
-            return $job instanceof QueuedUniqueCommand
-                && $job->displayName() === 'foo:bar'
-                && $job->uniqueBy() === 'test_id'
-                && $job->uniqueVia() === 'test_cache'
-                && $job->uniqueFor() === 3000;
+        Queue::assertPushed(QueuedUniqueCommand::class, function ($job) {
+            return $job->displayName() === 'foo:bar'
+                && $job->uniqueId === 'test_id'
+                && $job->uniqueFor === 3000;
         });
     }
 }
