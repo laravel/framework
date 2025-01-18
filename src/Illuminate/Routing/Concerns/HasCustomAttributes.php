@@ -7,7 +7,7 @@ use ReflectionAttribute;
 use ReflectionMethod;
 
 /**
- * Trait HasCustomAttributes
+ * Trait HasCustomAttributes.
  *
  * This trait allows Laravel controllers to handle custom PHP attributes on controller methods.
  * Attributes are metadata annotations that can be added to classes, methods, or properties.
@@ -33,8 +33,8 @@ trait HasCustomAttributes
     /**
      * Call a controller action with custom attribute handling.
      *
-     * @param string $method
-     * @param array $parameters
+     * @param  string  $method
+     * @param  array  $parameters
      * @return mixed
      */
     public function callAction($method, $parameters)
