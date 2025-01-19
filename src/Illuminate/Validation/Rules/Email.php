@@ -16,11 +16,29 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
 {
     use Conditionable, Macroable;
 
+    /**
+     * @var bool|\Closure(string $attribute, mixed $value, static $rule): bool
+     */
     public bool|Closure $validateMxRecord = false;
+    /**
+     * @var bool|\Closure(string $attribute, mixed $value, static $rule): bool
+     */
     public bool|Closure $preventSpoofing = false;
+    /**
+     * @var bool|\Closure(string $attribute, mixed $value, static $rule): bool
+     */
     public bool|Closure $nativeValidation = false;
+    /**
+     * @var bool|\Closure(string $attribute, mixed $value, static $rule): bool
+     */
     public bool|Closure $nativeValidationWithUnicodeAllowed = false;
+    /**
+     * @var bool|\Closure(string $attribute, mixed $value, static $rule): bool
+     */
     public bool|Closure $rfcCompliant = false;
+    /**
+     * @var bool|\Closure(string $attribute, mixed $value, static $rule): bool
+     */
     public bool|Closure $strictRfcCompliant = false;
 
     /**
@@ -97,6 +115,7 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
      * Ensure that the email is an RFC compliant email address.
      *
      * @param  bool  $strict
+     * @param  bool|\Closure(string $attribute, mixed $value, static $rule): bool  $condition
      * @return $this
      */
     public function rfcCompliant(bool $strict = false, bool|Closure $condition = true)
@@ -113,6 +132,7 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
     /**
      * Ensure that the email is a strictly enforced RFC compliant email address.
      *
+     * @param  bool|\Closure(string $attribute, mixed $value, static $rule): bool  $condition
      * @return $this
      */
     public function strict(bool|Closure $condition = true)
@@ -125,6 +145,7 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
      *
      * Requires the PHP intl extension.
      *
+     * @param  bool|\Closure(string $attribute, mixed $value, static $rule): bool  $condition
      * @return $this
      */
     public function validateMxRecord(bool|Closure $condition = true)
@@ -137,6 +158,7 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
     /**
      * Ensure that the email address is not attempting to spoof another email address using invalid unicode characters.
      *
+     * @param  bool|\Closure(string $attribute, mixed $value, static $rule): bool $condition
      * @return $this
      */
     public function preventSpoofing(bool|Closure $condition = true)
@@ -150,6 +172,7 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
      * Ensure the email address is valid using PHP's native email validation functions.
      *
      * @param  bool  $allowUnicode
+     * @param  bool|\Closure(string $attribute, mixed $value, static $rule): bool  $condition
      * @return $this
      */
     public function withNativeValidation(bool $allowUnicode = false, bool|Closure $condition = true)
