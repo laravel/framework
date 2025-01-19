@@ -31,17 +31,20 @@ class UniqueUntilProcessingJobTest extends QueueTestCase
         $this->assertNotNull($lockKey);
         $this->runQueueWorkerCommand(['--once' => true]);
         $this->assertFalse(UniqueTestJob::$released);
-        $lockKey = DB::table('cache_locks')->orderBy('id')->first()->key ?? null;
+        $lockKey = DB::table('cache_locks')->first()->key ?? null;
         $this->assertNull($lockKey);
 
         // Job that releases and does not get processed
         UniqueUntilProcessingJob::dispatch();
-        $lockKey = DB::table('cache_locks')->orderBy('id')->first()->key;
+        $lockKey = DB::table('cache_locks')->first()->key;
         $this->assertNotNull($lockKey);
         $this->runQueueWorkerCommand(['--once' => true]);
         $this->assertTrue(UniqueUntilProcessingJob::$released);
         $lockKey = DB::table('cache_locks')->orderBy('id')->first()->key ?? null;
         $this->assertNotNull($lockKey);
+
+        UniqueUntilProcessingJob::dispatch();
+        $this->assertDatabaseCount('jobs', 1);
     }
 }
 
