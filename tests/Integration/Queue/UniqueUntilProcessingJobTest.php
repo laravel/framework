@@ -77,7 +77,7 @@ class UniqueUntilProcessingJobThatReleases extends UniqueTestJobThatDoesNotRelea
         return [
             function ($job) {
                 static::$released = true;
-                $job->release(30);
+                return $job->release(30);
             },
         ];
     }
