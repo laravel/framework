@@ -364,11 +364,11 @@ class PendingCommand
      */
     protected function verifyExpectations()
     {
-        if (count($this->test->expectedQuestions)) {
+        if ($this->test->expectedQuestions !== []) {
             $this->test->fail('Question "'.Arr::first($this->test->expectedQuestions)[0].'" was not asked.');
         }
 
-        if (count($this->test->expectedChoices) > 0) {
+        if ($this->test->expectedChoices !== []) {
             foreach ($this->test->expectedChoices as $question => $answers) {
                 $assertion = $answers['strict'] ? 'assertEquals' : 'assertEqualsCanonicalizing';
 
@@ -380,11 +380,11 @@ class PendingCommand
             }
         }
 
-        if (count($this->test->expectedOutput)) {
+        if ($this->test->expectedOutput !== []) {
             $this->test->fail('Output "'.Arr::first($this->test->expectedOutput).'" was not printed.');
         }
 
-        if (count($this->test->expectedOutputSubstrings)) {
+        if ($this->test->expectedOutputSubstrings !== []) {
             $this->test->fail('Output does not contain "'.Arr::first($this->test->expectedOutputSubstrings).'".');
         }
 
@@ -453,8 +453,8 @@ class PendingCommand
         }
 
         if ($this->test->expectsOutput === true
-            && count($this->test->expectedOutput) === 0
-            && count($this->test->expectedOutputSubstrings) === 0) {
+            && $this->test->expectedOutput === []
+            && $this->test->expectedOutputSubstrings === []) {
             $mock->shouldReceive('doWrite')->atLeast()->once();
         }
 

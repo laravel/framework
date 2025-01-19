@@ -32,7 +32,8 @@ class RetryBatchCommand extends Command implements Isolatable
      */
     public function handle()
     {
-        $batchesFound = count($ids = $this->getBatchJobIds()) > 0;
+        $ids = $this->getBatchJobIds();
+        $batchesFound = $ids !== [];
 
         if ($batchesFound) {
             $this->components->info('Pushing failed batch jobs back onto the queue.');

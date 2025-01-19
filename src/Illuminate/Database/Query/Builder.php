@@ -459,7 +459,7 @@ class Builder implements BuilderContract
     {
         $columns = func_get_args();
 
-        if (count($columns) > 0) {
+        if ($columns !== []) {
             $this->distinct = is_array($columns[0]) || is_bool($columns[0]) ? $columns[0] : $columns;
         } else {
             $this->distinct = true;
@@ -1807,7 +1807,7 @@ class Builder implements BuilderContract
      */
     public function addNestedWhereQuery($query, $boolean = 'and')
     {
-        if (count($query->wheres)) {
+        if ($query->wheres !== []) {
             $type = 'Nested';
 
             $this->wheres[] = compact('type', 'query', 'boolean');
@@ -3073,7 +3073,7 @@ class Builder implements BuilderContract
     {
         $result = (array) $this->first([$column]);
 
-        return count($result) > 0 ? reset($result) : null;
+        return $result !== [] ? reset($result) : null;
     }
 
     /**
@@ -3087,7 +3087,7 @@ class Builder implements BuilderContract
     {
         $result = (array) $this->selectRaw($expression, $bindings)->first();
 
-        return count($result) > 0 ? reset($result) : null;
+        return $result !== [] ? reset($result) : null;
     }
 
     /**

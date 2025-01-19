@@ -299,7 +299,7 @@ class AuthManager implements FactoryContract
      */
     public function hasResolvedGuards()
     {
-        return count($this->guards) > 0;
+        return $this->guards !== [];
     }
 
     /**
