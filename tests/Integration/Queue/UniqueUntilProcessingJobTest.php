@@ -26,7 +26,7 @@ class UniqueUntilProcessingJobTest extends QueueTestCase
     public function testShouldBeUniqueUntilProcessingReleasesLockWhenJobIsReleasedByAMiddleware()
     {
         // Job that does not release and gets processed
-        UniqueTestJob::dispatch();
+        UniqueTestJobThatDoesNotRelease::dispatch();
         $lockKey = DB::table('cache_locks')->orderBy('id')->first()->key;
         $this->assertNotNull($lockKey);
         $this->runQueueWorkerCommand(['--once' => true]);
@@ -35,20 +35,20 @@ class UniqueUntilProcessingJobTest extends QueueTestCase
         $this->assertNull($lockKey);
 
         // Job that releases and does not get processed
-        UniqueUntilProcessingJob::dispatch();
+        UniqueUntilProcessingJobThatReleases::dispatch();
         $lockKey = DB::table('cache_locks')->first()->key;
         $this->assertNotNull($lockKey);
         $this->runQueueWorkerCommand(['--once' => true]);
-        $this->assertTrue(UniqueUntilProcessingJob::$released);
+        $this->assertTrue(UniqueUntilProcessingJobThatReleases::$released);
         $lockKey = DB::table('cache_locks')->orderBy('id')->first()->key ?? null;
         $this->assertNotNull($lockKey);
 
-        UniqueUntilProcessingJob::dispatch();
+        UniqueUntilProcessingJobThatReleases::dispatch();
         $this->assertDatabaseCount('jobs', 1);
     }
 }
 
-class UniqueTestJob implements ShouldQueue, ShouldBeUniqueUntilProcessing
+class UniqueTestJobThatDoesNotRelease implements ShouldQueue, ShouldBeUniqueUntilProcessing
 {
     use InteractsWithQueue, Queueable, Dispatchable;
 
@@ -61,7 +61,7 @@ class UniqueTestJob implements ShouldQueue, ShouldBeUniqueUntilProcessing
     }
 }
 
-class UniqueUntilProcessingJob extends UniqueTestJob
+class UniqueUntilProcessingJobThatReleases extends UniqueTestJob
 {
     public function middleware()
     {
