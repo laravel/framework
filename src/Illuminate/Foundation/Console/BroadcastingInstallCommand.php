@@ -117,18 +117,23 @@ class BroadcastingInstallCommand extends Command
     protected function enableBroadcastServiceProvider()
     {
         $filesystem = new Filesystem;
-
+    
+        // Ensure the necessary files exist
         if (! $filesystem->exists(app()->configPath('app.php')) ||
-            ! $filesystem->exists('app/Providers/BroadcastServiceProvider.php')) {
+            ! $filesystem->exists(app_path('Providers/BroadcastServiceProvider.php'))) {
             return;
         }
-
+    
         $config = $filesystem->get(app()->configPath('app.php'));
-
-        if (str_contains($config, '// App\Providers\BroadcastServiceProvider::class')) {
+        $namespace = trim(app()->getNamespace(), '\\'); // Dynamically get the app namespace
+    
+        $placeholder = "// {$namespace}\Providers\BroadcastServiceProvider::class";
+        $replacement = "{$namespace}\Providers\BroadcastServiceProvider::class";
+    
+        if (str_contains($config, $placeholder)) {
             $filesystem->replaceInFile(
-                '// App\Providers\BroadcastServiceProvider::class',
-                'App\Providers\BroadcastServiceProvider::class',
+                $placeholder,
+                $replacement,
                 app()->configPath('app.php'),
             );
         }
