@@ -815,6 +815,48 @@ class ValidationEmailRuleTest extends TestCase
         );
     }
 
+    public function testSetRulesDynamically()
+    {
+        $domainMxLookupWhitelist = [
+            'laravel.com',
+            'onmicrosoft.com',
+            'gmail.com',
+            'yahoo.com',
+            'hotmail.com',
+            'doesnotexistandwouldfailmxlookup.com',
+        ];
+
+        Email::defaults(function () use ($domainMxLookupWhitelist) {
+            return Rule::email()
+                ->rfcCompliant(strict: true)
+                ->preventSpoofing()
+                ->validateMxRecord(function ($attribute, $value) use ($domainMxLookupWhitelist) {
+                    $domain = str($value)
+                        ->afterLast('@')  // Get everything after '@'
+                        ->beforeLast('.') // Remove the TLD
+                        ->afterLast('.')// Get the root domain
+                        ->append('.'.str($value)->afterLast('.')); // Append the TLD again
+
+                    // Prevent MX lookup for known domains
+                    return ! $domain->contains($domainMxLookupWhitelist);
+                });
+        });
+
+        $this->passes(
+            Email::default(),
+            [
+                'sso-user@laravel.onmicrosoft.com',
+                'taylor@laravel.com',
+                'user@doesnotexistandwouldfailmxlookup.com',
+            ],
+        );
+        $this->fails(
+            Email::default(),
+            'sso-user@example.com',
+            ['The '.self::ATTRIBUTE_REPLACED.' must be a valid email address.']
+        );
+    }
+
     public function testDefaultsCanBeUnset()
     {
         Email::defaults(function () {
@@ -824,7 +866,7 @@ class ValidationEmailRuleTest extends TestCase
                 ->validateMxRecord();
         });
 
-        $ssoSocialiteEmail = 'sso-user@laravel.onmicrosoft.com';
+        $ssoSocialiteEmail = 'sso-user@example.com';
 
         $this->fails(
             Email::default(),
@@ -851,7 +893,7 @@ class ValidationEmailRuleTest extends TestCase
         );
         $this->passes(
             Email::default()->validateMxRecord(condition: function ($attribute, $value) {
-                return ! str_ends_with($value, '.onmicrosoft.com');
+                return ! str_ends_with($value, '@example.com');
             }),
             $ssoSocialiteEmail,
         );
