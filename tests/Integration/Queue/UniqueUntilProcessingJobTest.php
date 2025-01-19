@@ -33,6 +33,7 @@ class UniqueUntilProcessingJobTest extends QueueTestCase
         $this->assertFalse(UniqueTestJobThatDoesNotRelease::$released);
         $lockKey = DB::table('cache_locks')->first()->key ?? null;
         $this->assertNull($lockKey);
+        $this->assertDatabaseCount('jobs', 0);
 
         // Job that releases and does not get processed
         UniqueUntilProcessingJobThatReleases::dispatch();
