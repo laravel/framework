@@ -55,24 +55,21 @@ class UniqueTestJob implements ShouldQueue, ShouldBeUniqueUntilProcessing
     public static $handled = false;
     public static $released = false;
 
-
     public function handle()
     {
         static::$handled = true;
     }
 }
 
-
 class UniqueUntilProcessingJob extends UniqueTestJob
 {
-
     public function middleware()
     {
         return [
             function ($job) {
                 static::$released = true;
                 $job->release(30);
-            }
+            },
         ];
     }
 
