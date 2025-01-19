@@ -40,9 +40,11 @@ class UniqueUntilProcessingJobTest extends QueueTestCase
         $lockKey = DB::table('cache_locks')->first()->key;
         $this->assertNotNull($lockKey);
         $this->runQueueWorkerCommand(['--once' => true]);
+        $this->assertFalse(UniqueUntilProcessingJobThatReleases::$handled);
         $this->assertTrue(UniqueUntilProcessingJobThatReleases::$released);
         $lockKey = DB::table('cache_locks')->orderBy('id')->first()->key ?? null;
         $this->assertNotNull($lockKey);
+
 
         UniqueUntilProcessingJobThatReleases::dispatch();
         $this->assertDatabaseCount('jobs', 1);
@@ -55,6 +57,12 @@ class UniqueTestJobThatDoesNotRelease implements ShouldQueue, ShouldBeUniqueUnti
 
     public static $handled = false;
     public static $released = false;
+
+    public function __construct()
+    {
+        static::$handled = false;
+        static::$released = false;
+    }
 
     public function handle()
     {
