@@ -75,14 +75,19 @@ class Unique implements Stringable
     }
 
     /**
-     * Exclude soft-deleted records from the unique check.
+     * Apply a condition to exclude soft-deleted records.
      *
+     * @param Model|null $model
      * @return $this
      */
-    public function withSoftDeletes()
+    public function withSoftDeletes(?Model $model = null): static
     {
-        $this->where(function ($query) {
-            $query->whereNull('deleted_at');
+        $this->where(function ($query) use ($model) {
+            $deletedAtColumn = $model && method_exists($model, 'getDeletedAtColumn')
+                ? $model->getDeletedAtColumn()
+                : 'deleted_at';
+
+            $query->whereNull($deletedAtColumn);
         });
 
         return $this;
