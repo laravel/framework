@@ -185,12 +185,12 @@ class FileLoader implements Loader
     /**
      * Add a new path to the loader.
      *
-     * @param  string  $path
+     * @param  string|array  $path
      * @return void
      */
     public function addPath($path)
     {
-        $this->paths[] = $hint;
+        $this->paths[] = $path;
     }
 
     /**
