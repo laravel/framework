@@ -46,6 +46,7 @@ class PendingDispatch
      * Set the job's queue and connection values based on the job's OnQueue/OnConnection attributes.
      *
      * @return void
+     *
      * @throws \ReflectionException
      */
     protected function setQueueAndConnectionFromAttributesIfNotSet(): void
@@ -58,14 +59,14 @@ class PendingDispatch
         }
 
         $reflectionClass = new \ReflectionClass($this->job);
-        if (!$hasQueueSet) {
+        if (! $hasQueueSet) {
             $onQueue = $reflectionClass->getAttributes(OnQueue::class);
             if ($onQueue !== []) {
                 $this->onQueue($onQueue[0]->newInstance()->queue);
             }
         }
 
-        if (!$hasConnectionSet) {
+        if (! $hasConnectionSet) {
             $onConnection = $reflectionClass->getAttributes(OnConnection::class);
             if ($onConnection !== []) {
                 $this->onConnection($onConnection[0]->newInstance()->connection);

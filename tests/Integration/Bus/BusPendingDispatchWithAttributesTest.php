@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Integration\Bus;
 
-
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Attributes\OnConnection;
@@ -20,8 +19,8 @@ class BusPendingDispatchWithAttributesTest extends TestCase
         FakeJobWithOnQueueAndOnConnection::dispatch(123);
 
         Queue::assertPushed(function (FakeJobWithOnQueueAndOnConnection $job) {
-            return $job->connection === "connection_from_attribute"
-                && $job->queue === "queue-from-attribute"
+            return $job->connection === 'connection_from_attribute'
+                && $job->queue === 'queue-from-attribute'
                 && $job->value === 123;
         });
     }
@@ -30,11 +29,11 @@ class BusPendingDispatchWithAttributesTest extends TestCase
     {
         Queue::fake();
 
-        FakeJobWithOnQueueFromAttribute::dispatch(1234)->onConnection("not-from-attribute");
+        FakeJobWithOnQueueFromAttribute::dispatch(1234)->onConnection('not-from-attribute');
 
         Queue::assertPushed(function (FakeJobWithOnQueueFromAttribute $job) {
-            return $job->connection === "not-from-attribute"
-                && $job->queue === "queue-from-attribute"
+            return $job->connection === 'not-from-attribute'
+                && $job->queue === 'queue-from-attribute'
                 && $job->value === 1234;
         });
     }
@@ -46,8 +45,8 @@ class BusPendingDispatchWithAttributesTest extends TestCase
         FakeJobWithOnConnection::dispatch(999);
 
         Queue::assertPushed(function (FakeJobWithOnConnection $job) {
-            return $job->connection === "connection_from_attribute"
-                && !isset($job->queue)
+            return $job->connection === 'connection_from_attribute'
+                && ! isset($job->queue)
                 && $job->value === 999;
         });
     }
@@ -61,8 +60,8 @@ class BusPendingDispatchWithAttributesTest extends TestCase
             ->onConnection('setViaMethodToo');
 
         Queue::assertPushed(function (FakeJobWithOnQueueAndOnConnection $job) {
-            return $job->queue === "setViaMethod"
-                && $job->connection === "setViaMethodToo"
+            return $job->queue === 'setViaMethod'
+                && $job->connection === 'setViaMethodToo'
                 && $job->value === 'abc';
         });
     }

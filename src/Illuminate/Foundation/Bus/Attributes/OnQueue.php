@@ -8,11 +8,10 @@ use Attribute;
 class OnQueue
 {
     /**
-     * @param  string|\UnitEnum $queue
+     * @param  string|\UnitEnum  $queue
      * @return void
      */
     public function __construct(public $queue)
     {
-
     }
 }
