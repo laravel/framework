@@ -1261,6 +1261,17 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Counts the number of lines in the input string.
+     *
+     * @param  bool  $withEmptyLines
+     * @return int
+     */
+    public function lineCount(bool $withEmptyLines = true)
+    {
+        return Str::lineCount($this->value, $withEmptyLines);
+    }
+
+    /**
      * Wrap the string with the given strings.
      *
      * @param  string  $before

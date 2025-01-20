@@ -1289,6 +1289,37 @@ class SupportStrTest extends TestCase
         $this->assertEquals('❤Multi<br />Byte☆❤☆❤☆❤', Str::wordWrap('❤Multi Byte☆❤☆❤☆❤', 3, '<br />'));
     }
 
+    public function testLineCount()
+    {
+        $this->assertEquals(4, Str::lineCount('Line 1
+                                                              Line 2
+
+                                                              Line 3'));
+        $this->assertEquals(3, Str::lineCount('Line 1
+                                                              Line 2
+
+                                                              Line 3', false));
+
+        $this->assertEquals(5, Str::lineCount("Line 1\n\nLine 2\nLine 3\n"));
+        $this->assertEquals(3, Str::lineCount("Line 1\n\nLine 2\nLine 3\n", false));
+
+        $this->assertEquals(4, Str::lineCount("\n\n\n"));
+        $this->assertEquals(0, Str::lineCount("\n\n\n", false));
+
+        $this->assertEquals(1, Str::lineCount('Single line string'));
+        $this->assertEquals(1, Str::lineCount('Single line string', false));
+
+        $this->assertEquals(1, Str::lineCount(''));
+        $this->assertEquals(0, Str::lineCount('', false));
+
+        $this->assertEquals(3, Str::lineCount("Line 1\r\nLine 2\r\nLine 3"));
+
+        $this->assertEquals(0, Str::lineCount("   \n\n   \n", false));
+
+        $this->assertEquals(5, Str::lineCount("Line 1\n   \nLine 2\n\n"));
+        $this->assertEquals(2, Str::lineCount("Line 1\n   \nLine 2\n\n", false));
+    }
+
     public static function validUuidList()
     {
         return [

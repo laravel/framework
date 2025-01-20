@@ -1808,6 +1808,24 @@ class Str
     }
 
     /**
+     * Counts the number of lines in the input string.
+     *
+     * @param  string  $string
+     * @param  bool  $withNoContentLines
+     * @return int
+     */
+    public static function lineCount(string $string, bool $withNoContentLines = true): int
+    {
+        $string = str_replace(["\r\n", "\r"], "\n", $string);
+
+        if ($withNoContentLines) {
+            return substr_count($string, "\n") + 1;
+        }
+
+        return count(array_filter(explode("\n", $string), 'mb_trim'));
+    }
+
+    /**
      * Generate a UUID (version 4).
      *
      * @return \Ramsey\Uuid\UuidInterface
