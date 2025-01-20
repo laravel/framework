@@ -1635,6 +1635,22 @@ class SupportStrTest extends TestCase
             $this->assertSame($expected, Str::chopEnd($subject, $needle));
         }
     }
+
+    #[DataProvider('providesFormatByPattern')]
+    public function testFormatByPattern(string $input, string $pattern, string $output)
+    {
+        $this->assertSame($output, Str::formatByPattern($input, $pattern));
+    }
+
+    public static function providesFormatByPattern()
+    {
+        return [
+            'hyphenated-triplets' => ['123456789', '***-***-***', '123-456-789'],
+            'slashed-triplets' => ['123456789', '***/***/***', '123/456/789'],
+            'uneven-hyphenated' => ['123456789', '**-*****-**', '12-34567-89'],
+            'different-delimiters' => ['123456789', '***;***,***', '123;456,789'],
+        ];
+    }
 }
 
 class StringableObjectStub
