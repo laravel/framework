@@ -98,6 +98,16 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertSame('drop index "foo"', $statements[0]);
     }
 
+    public function testDropIndexWithSchema()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'my_schema.users');
+        $blueprint->dropIndex('foo');
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('drop index "my_schema"."foo"', $statements[0]);
+    }
+
     public function testDropColumn()
     {
         $db = new Manager;
@@ -223,6 +233,22 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertSame('create index "baz" on "users" ("foo", "bar")', $statements[0]);
+    }
+
+    public function testAddingUniqueKeyWithSchema()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'foo.users');
+        $blueprint->unique('foo', 'bar');
+
+        $this->assertSame(['create unique index "foo"."bar" on "users" ("foo")'], $blueprint->toSql());
+    }
+
+    public function testAddingIndexWithSchema()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'foo.users');
+        $blueprint->index(['foo', 'bar'], 'baz');
+
+        $this->assertSame(['create index "foo"."baz" on "users" ("foo", "bar")'], $blueprint->toSql());
     }
 
     public function testAddingSpatialIndex()
@@ -992,28 +1018,83 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals(['alter table "users" drop column "name"'], $blueprint->toSql());
     }
 
+    public function testRenamingAndChangingColumnsWork()
+    {
+        $builder = mock(SQLiteBuilder::class)
+            ->makePartial()
+            ->shouldReceive('getColumns')->andReturn([
+                ['name' => 'name', 'type_name' => 'varchar', 'type' => 'varchar', 'collation' => null, 'nullable' => false, 'default' => null, 'auto_increment' => false, 'comment' => null, 'generation'=> null],
+                ['name' => 'age', 'type_name' => 'varchar', 'type' => 'varchar', 'collation' => null, 'nullable' => false, 'default' => null, 'auto_increment' => false, 'comment' => null, 'generation'=> null],
+            ])
+            ->shouldReceive('getIndexes')->andReturn([])
+            ->shouldReceive('getForeignKeys')->andReturn([])
+            ->getMock();
+
+        $blueprint = new Blueprint($this->getConnection(builder: $builder), 'users');
+        $blueprint->renameColumn('name', 'first_name');
+        $blueprint->integer('age')->change();
+
+        $this->assertEquals([
+            'alter table "users" rename column "name" to "first_name"',
+            'create table "__temp__users" ("first_name" varchar not null, "age" integer not null)',
+            'insert into "__temp__users" ("first_name", "age") select "first_name", "age" from "users"',
+            'drop table "users"',
+            'alter table "__temp__users" rename to "users"',
+        ], $blueprint->toSql());
+    }
+
+    public function testRenamingAndChangingColumnsWorkWithSchema()
+    {
+        $builder = mock(SQLiteBuilder::class)
+            ->makePartial()
+            ->shouldReceive('getColumns')->andReturn([
+                ['name' => 'name', 'type_name' => 'varchar', 'type' => 'varchar', 'collation' => null, 'nullable' => false, 'default' => null, 'auto_increment' => false, 'comment' => null, 'generation'=> null],
+                ['name' => 'age', 'type_name' => 'varchar', 'type' => 'varchar', 'collation' => null, 'nullable' => false, 'default' => null, 'auto_increment' => false, 'comment' => null, 'generation'=> null],
+            ])
+            ->shouldReceive('getIndexes')->andReturn([])
+            ->shouldReceive('getForeignKeys')->andReturn([])
+            ->getMock();
+
+        $blueprint = new Blueprint($this->getConnection(builder: $builder), 'my_schema.users');
+        $blueprint->renameColumn('name', 'first_name');
+        $blueprint->integer('age')->change();
+
+        $this->assertEquals([
+            'alter table "my_schema"."users" rename column "name" to "first_name"',
+            'create table "my_schema"."__temp__users" ("first_name" varchar not null, "age" integer not null)',
+            'insert into "my_schema"."__temp__users" ("first_name", "age") select "first_name", "age" from "my_schema"."users"',
+            'drop table "my_schema"."users"',
+            'alter table "my_schema"."__temp__users" rename to "users"',
+        ], $blueprint->toSql());
+    }
+
     protected function getConnection(
         ?SQLiteGrammar $grammar = null,
         ?SQLiteBuilder $builder = null,
+        $prefix = ''
     ) {
-        $grammar ??= $this->getGrammar();
+        $connection = m::mock(Connection::class);
+        $grammar ??= $this->getGrammar($connection);
         $builder ??= $this->getBuilder();
 
-        return m::mock(Connection::class)
+        return $connection
+            ->shouldReceive('getTablePrefix')->andReturn($prefix)
+            ->shouldReceive('getConfig')->andReturn(null)
             ->shouldReceive('getSchemaGrammar')->andReturn($grammar)
             ->shouldReceive('getSchemaBuilder')->andReturn($builder)
             ->shouldReceive('getServerVersion')->andReturn('3.35')
             ->getMock();
     }
 
-    public function getGrammar()
+    public function getGrammar(Connection $connection = null)
     {
-        return new SQLiteGrammar();
+        return (new SQLiteGrammar())->setConnection($connection ?? $this->getConnection());
     }
 
     public function getBuilder()
     {
         return mock(SQLiteBuilder::class)
+            ->makePartial()
             ->shouldReceive('getColumns')->andReturn([])
             ->shouldReceive('getIndexes')->andReturn([])
             ->shouldReceive('getForeignKeys')->andReturn([])

@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Schema;
 
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\File;
 
 class SQLiteBuilder extends Builder
@@ -32,39 +33,59 @@ class SQLiteBuilder extends Builder
     }
 
     /**
-     * Determine if the given table exists.
+     * Get the tables that belong to the connection.
      *
-     * @param  string  $table
-     * @return bool
+     * @param  string|string[]|null  $schema
+     * @return array
      */
-    public function hasTable($table)
+    public function getTables($schema = null)
     {
-        $table = $this->connection->getTablePrefix().$table;
+        try {
+            $withSize = $this->connection->scalar($this->grammar->compileDbstatExists());
+        } catch (QueryException) {
+            $withSize = false;
+        }
 
-        return (bool) $this->connection->scalar(
-            $this->grammar->compileTableExists($table)
+        if (version_compare($this->connection->getServerVersion(), '3.37.0', '<')) {
+            $schema ??= array_column($this->getSchemas(), 'name');
+
+            $tables = [];
+
+            foreach (Arr::wrap($schema) as $name) {
+                $tables = array_merge($tables, $this->connection->selectFromWriteConnection(
+                    $this->grammar->compileLegacyTables($name, $withSize)
+                ));
+            }
+
+            return $this->connection->getPostProcessor()->processTables($tables);
+        }
+
+        return $this->connection->getPostProcessor()->processTables(
+            $this->connection->selectFromWriteConnection(
+                $this->grammar->compileTables($schema, $withSize)
+            )
         );
     }
 
     /**
-     * Get the tables for the database.
+     * Get the views that belong to the connection.
      *
-     * @param  bool  $withSize
+     * @param  string|string[]|null  $schema
      * @return array
      */
-    public function getTables($withSize = true)
+    public function getViews($schema = null)
     {
-        if ($withSize) {
-            try {
-                $withSize = $this->connection->scalar($this->grammar->compileDbstatExists());
-            } catch (QueryException $e) {
-                $withSize = false;
-            }
+        $schema ??= array_column($this->getSchemas(), 'name');
+
+        $views = [];
+
+        foreach (Arr::wrap($schema) as $name) {
+            $views = array_merge($views, $this->connection->selectFromWriteConnection(
+                $this->grammar->compileViews($name)
+            ));
         }
 
-        return $this->connection->getPostProcessor()->processTables(
-            $this->connection->selectFromWriteConnection($this->grammar->compileTables($withSize))
-        );
+        return $this->connection->getPostProcessor()->processViews($views);
     }
 
     /**
@@ -75,11 +96,13 @@ class SQLiteBuilder extends Builder
      */
     public function getColumns($table)
     {
+        [$schema, $table] = $this->parseSchemaAndTable($table);
+
         $table = $this->connection->getTablePrefix().$table;
 
         return $this->connection->getPostProcessor()->processColumns(
-            $this->connection->selectFromWriteConnection($this->grammar->compileColumns($table)),
-            $this->connection->scalar($this->grammar->compileSqlCreateStatement($table))
+            $this->connection->selectFromWriteConnection($this->grammar->compileColumns($schema, $table)),
+            $this->connection->scalar($this->grammar->compileSqlCreateStatement($schema, $table))
         );
     }
 
@@ -101,7 +124,9 @@ class SQLiteBuilder extends Builder
 
         $this->connection->select($this->grammar->compileEnableWriteableSchema());
 
-        $this->connection->select($this->grammar->compileDropAllTables());
+        foreach ($this->getCurrentSchemaListing() as $schema) {
+            $this->connection->select($this->grammar->compileDropAllTables($schema));
+        }
 
         $this->connection->select($this->grammar->compileDisableWriteableSchema());
 
@@ -117,7 +142,9 @@ class SQLiteBuilder extends Builder
     {
         $this->connection->select($this->grammar->compileEnableWriteableSchema());
 
-        $this->connection->select($this->grammar->compileDropAllViews());
+        foreach ($this->getCurrentSchemaListing() as $schema) {
+            $this->connection->select($this->grammar->compileDropAllViews($schema));
+        }
 
         $this->connection->select($this->grammar->compileDisableWriteableSchema());
 
@@ -171,5 +198,15 @@ class SQLiteBuilder extends Builder
     public function refreshDatabaseFile()
     {
         file_put_contents($this->connection->getDatabaseName(), '');
+    }
+
+    /**
+     * Get the names of current schemas for the connection.
+     *
+     * @return string[]|null
+     */
+    public function getCurrentSchemaListing()
+    {
+        return ['main'];
     }
 }

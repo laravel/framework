@@ -40,9 +40,10 @@ abstract class Grammar
      * Wrap a table in keyword identifiers.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $table
+     * @param  string|null  $prefix
      * @return string
      */
-    public function wrapTable($table)
+    public function wrapTable($table, $prefix = null)
     {
         if ($this->isExpression($table)) {
             return $this->getValue($table);
@@ -55,18 +56,20 @@ abstract class Grammar
             return $this->wrapAliasedTable($table);
         }
 
+        $prefix ??= $this->tablePrefix;
+
         // If the table being wrapped has a custom schema name specified, we need to
         // prefix the last segment as the table name then wrap each segment alone
         // and eventually join them both back together using the dot connector.
         if (str_contains($table, '.')) {
-            $table = substr_replace($table, '.'.$this->tablePrefix, strrpos($table, '.'), 1);
+            $table = substr_replace($table, '.'.$prefix, strrpos($table, '.'), 1);
 
             return (new Collection(explode('.', $table)))
                 ->map($this->wrapValue(...))
                 ->implode('.');
         }
 
-        return $this->wrapValue($this->tablePrefix.$table);
+        return $this->wrapValue($prefix.$table);
     }
 
     /**

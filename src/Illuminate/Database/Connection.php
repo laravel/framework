@@ -1650,17 +1650,19 @@ class Connection implements ConnectionInterface
      * Execute the given callback without table prefix.
      *
      * @param  \Closure  $callback
-     * @return void
+     * @return mixed
      */
-    public function withoutTablePrefix(Closure $callback): void
+    public function withoutTablePrefix(Closure $callback): mixed
     {
         $tablePrefix = $this->getTablePrefix();
 
         $this->setTablePrefix('');
 
-        $callback($this);
-
-        $this->setTablePrefix($tablePrefix);
+        try {
+            return $callback($this);
+        } finally {
+            $this->setTablePrefix($tablePrefix);
+        }
     }
 
     /**

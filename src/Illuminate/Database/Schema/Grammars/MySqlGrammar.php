@@ -78,18 +78,30 @@ class MySqlGrammar extends Grammar
     }
 
     /**
+     * Compile the query to determine the schemas.
+     *
+     * @return string
+     */
+    public function compileSchemas()
+    {
+        return 'select schema_name as name, schema_name = schema() as `default` from information_schema.schemata where '
+            .$this->compileSchemaWhereClause(null, 'schema_name')
+            .' order by schema_name';
+    }
+
+    /**
      * Compile the query to determine if the given table exists.
      *
-     * @param  string  $database
+     * @param  string|null  $schema
      * @param  string  $table
      * @return string
      */
-    public function compileTableExists($database, $table)
+    public function compileTableExists($schema, $table)
     {
         return sprintf(
             'select exists (select 1 from information_schema.tables where '
             ."table_schema = %s and table_name = %s and table_type in ('BASE TABLE', 'SYSTEM VERSIONED')) as `exists`",
-            $this->quoteString($database),
+            $schema ? $this->quoteString($schema) : 'schema()',
             $this->quoteString($table)
         );
     }
@@ -97,44 +109,59 @@ class MySqlGrammar extends Grammar
     /**
      * Compile the query to determine the tables.
      *
-     * @param  string  $database
+     * @param  string|string[]|null  $schema
      * @return string
      */
-    public function compileTables($database)
+    public function compileTables($schema)
     {
         return sprintf(
-            'select table_name as `name`, (data_length + index_length) as `size`, '
+            'select table_name as `name`, table_schema as `schema`, (data_length + index_length) as `size`, '
             .'table_comment as `comment`, engine as `engine`, table_collation as `collation` '
-            ."from information_schema.tables where table_schema = %s and table_type in ('BASE TABLE', 'SYSTEM VERSIONED') "
-            .'order by table_name',
-            $this->quoteString($database)
+            ."from information_schema.tables where table_type in ('BASE TABLE', 'SYSTEM VERSIONED') and "
+            .$this->compileSchemaWhereClause($schema, 'table_schema')
+            .' order by table_schema, table_name',
+            $this->quoteString($schema)
         );
     }
 
     /**
      * Compile the query to determine the views.
      *
-     * @param  string  $database
+     * @param  string|string[]|null  $schema
      * @return string
      */
-    public function compileViews($database)
+    public function compileViews($schema)
     {
-        return sprintf(
-            'select table_name as `name`, view_definition as `definition` '
-            .'from information_schema.views where table_schema = %s '
-            .'order by table_name',
-            $this->quoteString($database)
-        );
+        return 'select table_name as `name`, table_schema as `schema`, view_definition as `definition` '
+            .'from information_schema.views where '
+            .$this->compileSchemaWhereClause($schema, 'table_schema')
+            .' order by table_schema, table_name';
+    }
+
+    /**
+     * Compile the query to compare the schema.
+     *
+     * @param  string|string[]|null  $schema
+     * @param  string  $column
+     * @return string
+     */
+    protected function compileSchemaWhereClause($schema, $column)
+    {
+        return $column.(match (true) {
+            ! empty($schema) && is_array($schema) => ' in ('.$this->quoteString($schema).')',
+            ! empty($schema) => ' = '.$this->quoteString($schema),
+            default => " not in ('information_schema', 'mysql', 'ndbinfo', 'performance_schema', 'sys')",
+        });
     }
 
     /**
      * Compile the query to determine the columns.
      *
-     * @param  string  $database
+     * @param  string|null  $schema
      * @param  string  $table
      * @return string
      */
-    public function compileColumns($database, $table)
+    public function compileColumns($schema, $table)
     {
         return sprintf(
             'select column_name as `name`, data_type as `type_name`, column_type as `type`, '
@@ -143,7 +170,7 @@ class MySqlGrammar extends Grammar
             .'generation_expression as `expression`, extra as `extra` '
             .'from information_schema.columns where table_schema = %s and table_name = %s '
             .'order by ordinal_position asc',
-            $this->quoteString($database),
+            $schema ? $this->quoteString($schema) : 'schema()',
             $this->quoteString($table)
         );
     }
@@ -151,18 +178,18 @@ class MySqlGrammar extends Grammar
     /**
      * Compile the query to determine the indexes.
      *
-     * @param  string  $database
+     * @param  string|null  $schema
      * @param  string  $table
      * @return string
      */
-    public function compileIndexes($database, $table)
+    public function compileIndexes($schema, $table)
     {
         return sprintf(
             'select index_name as `name`, group_concat(column_name order by seq_in_index) as `columns`, '
             .'index_type as `type`, not non_unique as `unique` '
             .'from information_schema.statistics where table_schema = %s and table_name = %s '
             .'group by index_name, index_type, non_unique',
-            $this->quoteString($database),
+            $schema ? $this->quoteString($schema) : 'schema()',
             $this->quoteString($table)
         );
     }
@@ -170,11 +197,11 @@ class MySqlGrammar extends Grammar
     /**
      * Compile the query to determine the foreign keys.
      *
-     * @param  string  $database
+     * @param  string|null  $schema
      * @param  string  $table
      * @return string
      */
-    public function compileForeignKeys($database, $table)
+    public function compileForeignKeys($schema, $table)
     {
         return sprintf(
             'select kc.constraint_name as `name`, '
@@ -188,7 +215,7 @@ class MySqlGrammar extends Grammar
             .'on kc.constraint_schema = rc.constraint_schema and kc.constraint_name = rc.constraint_name '
             .'where kc.table_schema = %s and kc.table_name = %s and kc.referenced_table_name is not null '
             .'group by kc.constraint_name, kc.referenced_table_schema, kc.referenced_table_name, rc.update_rule, rc.delete_rule',
-            $this->quoteString($database),
+            $schema ? $this->quoteString($schema) : 'schema()',
             $this->quoteString($table)
         );
     }

@@ -47,11 +47,12 @@ class DatabaseSchemaBuilderTest extends TestCase
     public function testHasTableCorrectlyCallsGrammar()
     {
         $connection = m::mock(Connection::class);
-        $grammar = m::mock(stdClass::class);
+        $grammar = m::mock(Grammar::class);
         $processor = m::mock(Processor::class);
         $connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
         $connection->shouldReceive('getPostProcessor')->andReturn($processor);
         $builder = new Builder($connection);
+        $grammar->shouldReceive('compileTableExists');
         $grammar->shouldReceive('compileTables')->once()->andReturn('sql');
         $processor->shouldReceive('processTables')->once()->andReturn([['name' => 'prefix_table']]);
         $connection->shouldReceive('getTablePrefix')->once()->andReturn('prefix_');
@@ -82,7 +83,7 @@ class DatabaseSchemaBuilderTest extends TestCase
         $processor->shouldReceive('processColumns')->once()->andReturn([['name' => 'id', 'type_name' => 'integer']]);
         $builder = new Builder($connection);
         $connection->shouldReceive('getTablePrefix')->once()->andReturn('prefix_');
-        $grammar->shouldReceive('compileColumns')->once()->with('prefix_users')->andReturn('sql');
+        $grammar->shouldReceive('compileColumns')->once()->with(null, 'prefix_users')->andReturn('sql');
         $connection->shouldReceive('selectFromWriteConnection')->once()->with('sql')->andReturn([['name' => 'id', 'type_name' => 'integer']]);
 
         $this->assertSame('integer', $builder->getColumnType('users', 'id'));

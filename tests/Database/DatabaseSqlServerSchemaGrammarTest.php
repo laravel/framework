@@ -53,7 +53,9 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
 
     public function testCreateTemporaryTable()
     {
-        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $connection = $this->getConnection();
+        $connection->shouldReceive('getTablePrefix')->andReturn('');
+        $blueprint = new Blueprint($connection, 'users');
         $blueprint->create();
         $blueprint->temporary();
         $blueprint->increments('id');
@@ -62,6 +64,21 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertSame('create table "#users" ("id" int not null identity primary key, "email" nvarchar(255) not null)', $statements[0]);
+    }
+
+    public function testCreateTemporaryTableWithPrefix()
+    {
+        $connection = $this->getConnection();
+        $connection->shouldReceive('getTablePrefix')->andReturn('prefix_');
+        $blueprint = new Blueprint($connection, 'users');
+        $blueprint->create();
+        $blueprint->temporary();
+        $blueprint->increments('id');
+        $blueprint->string('email');
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create table "#prefix_users" ("id" int not null identity primary key, "email" nvarchar(255) not null)', $statements[0]);
     }
 
     public function testDropTable()
@@ -953,18 +970,20 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         ?SqlServerGrammar $grammar = null,
         ?SqlServerBuilder $builder = null
     ) {
-        $grammar ??= $this->getGrammar();
+        $connection = m::mock(Connection::class);
+        $grammar ??= $this->getGrammar($connection);
         $builder ??= $this->getBuilder();
 
-        return m::mock(Connection::class)
+        return $connection
             ->shouldReceive('getSchemaGrammar')->andReturn($grammar)
             ->shouldReceive('getSchemaBuilder')->andReturn($builder)
             ->getMock();
     }
 
-    public function getGrammar()
+    public function getGrammar(Connection $connection = null)
     {
-        return new SqlServerGrammar;
+        return ($grammar = new SqlServerGrammar)
+            ->setConnection($connection ?? $this->getConnection(grammar: $grammar));
     }
 
     public function getBuilder()
