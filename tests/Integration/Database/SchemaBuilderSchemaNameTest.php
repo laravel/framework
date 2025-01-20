@@ -64,7 +64,7 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
                 'mysql', 'mariadb' => ['laravel', 'my_schema'],
                 'pgsql' => ['public', 'my_schema'],
                 'sqlite' => ['main', 'my_schema'],
-                'sqlsrv' => ['dbo', 'my_schema'],
+                'sqlsrv' => ['dbo', 'guest', 'my_schema'],
             },
             array_column($schemas, 'name'),
         );

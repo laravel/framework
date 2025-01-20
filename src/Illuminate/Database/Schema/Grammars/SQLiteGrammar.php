@@ -133,7 +133,7 @@ class SQLiteGrammar extends Grammar
             ? sprintf(
                 'select m.tbl_name as name, %s as schema, sum(s.pgsize) as size from %s.sqlite_master as m '
                 .'join dbstat(%s) as s on s.name = m.name '
-                ."where m.type in ('table', 'index') and m.tbl_name not like 'sqlite\_%' escape '\' "
+                ."where m.type in ('table', 'index') and m.tbl_name not like 'sqlite\_%%' escape '\' "
                 .'group by m.tbl_name '
                 .'order by m.tbl_name',
                 $this->quoteString($schema),
@@ -142,7 +142,7 @@ class SQLiteGrammar extends Grammar
             )
             : sprintf(
                 'select name, %s as schema from %s.sqlite_master '
-                ."where type = 'table' and name not like 'sqlite\_%' escape '\' order by name",
+                ."where type = 'table' and name not like 'sqlite\_%%' escape '\' order by name",
                 $this->quoteString($schema),
                 $this->wrapValue($schema)
             );

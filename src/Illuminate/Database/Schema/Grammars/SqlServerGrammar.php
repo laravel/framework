@@ -114,7 +114,8 @@ class SqlServerGrammar extends Grammar
         return 'select t.name as name, schema_name(t.schema_id) as [schema], sum(u.total_pages) * 8 * 1024 as size '
             .'from sys.tables as t '
             .'join sys.partitions as p on p.object_id = t.object_id '
-            .'join sys.allocation_units as u on u.container_id = p.hobt_id'
+            .'join sys.allocation_units as u on u.container_id = p.hobt_id '
+            ."where t.is_ms_shipped = 0 and t.name <> 'sysdiagrams'"
             .$this->compileSchemaWhereClause($schema, 'schema_name(t.schema_id)')
             .' group by t.name, t.schema_id '
             .'order by [schema], t.name';
@@ -129,7 +130,8 @@ class SqlServerGrammar extends Grammar
     public function compileViews($schema)
     {
         return 'select name, schema_name(v.schema_id) as [schema], definition from sys.views as v '
-            .'inner join sys.sql_modules as m on v.object_id = m.object_id'
+            .'inner join sys.sql_modules as m on v.object_id = m.object_id '
+            .'where t.is_ms_shipped = 0'
             .$this->compileSchemaWhereClause($schema, 'schema_name(v.schema_id)')
             .' order by [schema], name';
     }
@@ -144,8 +146,8 @@ class SqlServerGrammar extends Grammar
     protected function compileSchemaWhereClause($schema, $column)
     {
         return match (true) {
-            ! empty($schema) && is_array($schema) => " where $column in (".$this->quoteString($schema).')',
-            ! empty($schema) => " where $column = ".$this->quoteString($schema),
+            ! empty($schema) && is_array($schema) => " and $column in (".$this->quoteString($schema).')',
+            ! empty($schema) => " and $column = ".$this->quoteString($schema),
             default => '',
         };
     }
