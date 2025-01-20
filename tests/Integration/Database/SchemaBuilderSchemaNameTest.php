@@ -10,14 +10,27 @@ use PHPUnit\Framework\Attributes\DataProvider;
 
 class SchemaBuilderSchemaNameTest extends DatabaseTestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->skipOnTestingConnection();
+    }
+
+    protected function skipOnTestingConnection()
+    {
+        if ($this->driver === 'sqlite') {
+            $this->markTestSkipped('SQLite test file is here: \Illuminate\Tests\Integration\Database\Sqlite\SchemaBuilderSchemaNameTest');
+        }
+    }
+
     protected function defineDatabaseMigrations()
     {
         if (in_array($this->driver, ['mariadb', 'mysql'])) {
             Schema::createDatabase('my_schema');
         } elseif ($this->driver === 'sqlite') {
-            Schema::createDatabase($path = database_path('attached.sqlite'));
-            DB::connection('without-prefix')->statement("attach database '$path' as my_schema");
-            DB::connection('with-prefix')->statement("attach database '$path' as my_schema");
+            DB::connection('without-prefix')->statement("attach database ':memory:' as my_schema");
+            DB::connection('with-prefix')->statement("attach database ':memory:' as my_schema");
         } elseif ($this->driver === 'pgsql') {
             DB::statement('create schema if not exists my_schema');
         } elseif ($this->driver === 'sqlsrv') {
@@ -32,7 +45,6 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
         } elseif ($this->driver === 'sqlite') {
             DB::connection('without-prefix')->statement('detach database my_schema');
             DB::connection('with-prefix')->statement('detach database my_schema');
-            Schema::dropDatabaseIfExists(database_path('attached.sqlite'));
         } elseif ($this->driver === 'pgsql') {
             DB::statement('drop schema if exists my_schema cascade');
         } elseif ($this->driver === 'sqlsrv') {
@@ -44,9 +56,11 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
     {
         parent::defineEnvironment($app);
 
-        $app['config']->set('database.connections.sqlite.prefix_indexes', true);
+        $connection = $app['config']->get('database.default');
+
+        $app['config']->set("database.connections.$connection.prefix_indexes", true);
         $app['config']->set('database.connections.pgsql.search_path', 'public,my_schema');
-        $app['config']->set('database.connections.without-prefix', $app['config']->get('database.connections.'.$this->driver));
+        $app['config']->set('database.connections.without-prefix', $app['config']->get('database.connections.'.$connection));
         $app['config']->set('database.connections.with-prefix', $app['config']->get('database.connections.without-prefix'));
         $app['config']->set('database.connections.with-prefix.prefix', 'example_');
     }

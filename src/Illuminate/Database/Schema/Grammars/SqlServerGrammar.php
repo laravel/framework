@@ -131,7 +131,7 @@ class SqlServerGrammar extends Grammar
     {
         return 'select name, schema_name(v.schema_id) as [schema], definition from sys.views as v '
             .'inner join sys.sql_modules as m on v.object_id = m.object_id '
-            .'where t.is_ms_shipped = 0'
+            .'where v.is_ms_shipped = 0'
             .$this->compileSchemaWhereClause($schema, 'schema_name(v.schema_id)')
             .' order by [schema], name';
     }
