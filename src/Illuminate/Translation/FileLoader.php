@@ -183,6 +183,17 @@ class FileLoader implements Loader
     }
 
     /**
+     * Add a new namespace to the loader.
+     *
+     * @param  string  $path
+     * @return void
+     */
+    public function addLocation($path)
+    {
+        $this->paths[] = $hint;
+    }
+
+    /**
      * Add a new JSON path to the loader.
      *
      * @param  string  $path
