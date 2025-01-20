@@ -48,6 +48,13 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
     protected $queuedMailables = [];
 
     /**
+     * Indicates if mails should be queued by default.
+     * 
+     * @var bool
+     */
+    protected $queueMailsByDefault = false;
+
+    /**
      * Create a new mail fake.
      *
      * @param  MailManager  $manager
@@ -476,7 +483,7 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
      */
     public function send($view, array $data = [], $callback = null)
     {
-        return $this->sendMail($view, $view instanceof ShouldQueue);
+        return $this->sendMail($view, ($view instanceof ShouldQueue || $this->queueMailsByDefault));
     }
 
     /**
@@ -514,6 +521,17 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
         $this->currentMailer = null;
 
         $this->mailables[] = $view;
+    }
+
+    /**
+     * Indicate that all mailables should be queued by default.
+     * 
+     * @param  bool  $queue
+     * @return void
+     */
+    public function queueMailsByDefault(bool $shouldQueue = true)
+    {
+        $this->queueMailsByDefault = $shouldQueue;
     }
 
     /**
