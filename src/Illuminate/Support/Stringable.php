@@ -1316,6 +1316,19 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Formats the input string accodring to the pattern passed in
+     *
+     * @param  string  $pattern  asterisks will be replaced with the character
+     *                           at the respective position of the input string
+     *                           while other characters will put inserted as
+     *                           is into the output string
+     */
+    public function formatByPattern(string $pattern)
+    {
+       return Str::formatByPattern($this->value, $pattern);
+    }
+
+    /**
      * Dump the string.
      *
      * @param  mixed  ...$args
