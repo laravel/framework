@@ -7,8 +7,5 @@ use Orchestra\Testbench\Attributes\RequiresDatabase;
 #[RequiresDatabase('sqlite')]
 class SchemaBuilderSchemaNameTest extends \Illuminate\Tests\Integration\Database\SchemaBuilderSchemaNameTest
 {
-    protected function skipOnTestingConnection()
-    {
-        //
-    }
+    //
 }

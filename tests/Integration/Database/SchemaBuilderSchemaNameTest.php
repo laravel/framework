@@ -14,13 +14,8 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
     {
         parent::setUp();
 
-        $this->skipOnTestingConnection();
-    }
-
-    protected function skipOnTestingConnection()
-    {
-        if ($this->driver === 'sqlite') {
-            $this->markTestSkipped('SQLite test file is here: \Illuminate\Tests\Integration\Database\Sqlite\SchemaBuilderSchemaNameTest');
+        if ($this->usesSqliteInMemoryDatabaseConnection()) {
+            $this->markTestSkipped('Test cannot be run using :memory: database connection, SQLite test file is here: \Illuminate\Tests\Integration\Database\Sqlite\SchemaBuilderSchemaNameTest');
         }
     }
 
