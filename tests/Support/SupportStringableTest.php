@@ -1252,7 +1252,6 @@ class SupportStringableTest extends TestCase
         $this->assertEquals(5, $this->stringable("Line 1\n\nLine 2\nLine 3\n")->lineCount());
         $this->assertEquals(4, $this->stringable("\n\n\n")->lineCount());
         $this->assertEquals(3, $this->stringable("Line 1\r\nLine 2\r\nLine 3")->lineCount());
-
     }
 
     public function testWrap()
