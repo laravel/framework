@@ -2005,7 +2005,7 @@ class Str
     }
 
     /**
-     * Formats the input string accodring to the pattern passed in
+     * Formats the input string accodring to the pattern passed in.
      *
      * @param  string  $string  the input string
      * @param  string  $pattern  asterisks will be replaced with the character
@@ -2018,14 +2018,14 @@ class Str
         if (strlen($string) !== substr_count($pattern, '*')) {
             throw new InvalidArgumentException('Number of placeholders must be the same as the length of the input string');
         }
-        
+
         $res = '';
         $index = 0;
-        
+
         for ($i = 0; $i < strlen($pattern); $i++) {
             $res .= $pattern[$i] === '*' ? $string[$index++] : $pattern[$i];
         }
-        
+
         return $res;
     }
 
