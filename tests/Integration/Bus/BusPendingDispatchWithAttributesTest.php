@@ -91,6 +91,21 @@ class BusPendingDispatchWithAttributesTest extends TestCase
                 && $job->value === 'laravel'
         );
     }
+
+    public function testIgnoresAttributesWhenCallingOnQueueAndOnConnection(): void
+    {
+        Queue::fake();
+
+        FakeJobWithAttributesUsingEnums::dispatch(76543)
+            ->onQueue('called-onQueue')
+            ->onConnection('called-onConnection');
+
+        Queue::assertPushed(
+            fn (FakeJobWithAttributesUsingEnums $job) => $job->queue === 'called-onQueue'
+                && $job->connection == 'called-onConnection'
+                && $job->value === 76543
+        );
+    }
 }
 
 #[OnQueue('queue-from-attribute')]
