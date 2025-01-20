@@ -37,7 +37,7 @@ class MySqlBuilder extends Builder
      */
     public function dropAllTables()
     {
-        $tables = array_column($this->getTableListing($this->getCurrentSchemaListing()), 'schema_qualified_name');
+        $tables = $this->getTableListing($this->getCurrentSchemaListing());
 
         if (empty($tables)) {
             return;

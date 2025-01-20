@@ -143,11 +143,11 @@ class SqlServerGrammar extends Grammar
      */
     protected function compileSchemaWhereClause($schema, $column)
     {
-        return (match (true) {
+        return match (true) {
             ! empty($schema) && is_array($schema) => " where $column in (".$this->quoteString($schema).')',
             ! empty($schema) => " where $column = ".$this->quoteString($schema),
             default => '',
-        });
+        };
     }
 
     /**

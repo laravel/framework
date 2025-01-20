@@ -359,7 +359,7 @@ class SQLiteGrammar extends Grammar
         $table = $this->wrapTable($blueprint);
         $columnNames = implode(', ', $columnNames);
 
-        $foreignKeyConstraintsEnabled = $connection->getConfig('foreign_key_constraints') ?? false;
+        $foreignKeyConstraintsEnabled = $connection->scalar('pragma foreign_keys');
 
         return array_filter(array_merge([
             $foreignKeyConstraintsEnabled ? $this->compileDisableForeignKeyConstraints() : null,
@@ -506,9 +506,10 @@ class SQLiteGrammar extends Grammar
     /**
      * Compile the SQL needed to drop all views.
      *
+     * @param  string|null  $schema
      * @return string
      */
-    public function compileDropAllViews()
+    public function compileDropAllViews($schema = null)
     {
         return sprintf("delete from %s.sqlite_master where type in ('view')",
             $this->wrapValue($schema ?? 'main')

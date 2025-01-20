@@ -980,7 +980,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
             ->getMock();
     }
 
-    public function getGrammar(Connection $connection = null)
+    public function getGrammar(?Connection $connection = null)
     {
         return ($grammar = new SqlServerGrammar)
             ->setConnection($connection ?? $this->getConnection(grammar: $grammar));

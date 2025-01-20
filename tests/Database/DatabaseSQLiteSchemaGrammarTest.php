@@ -1023,8 +1023,8 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $builder = mock(SQLiteBuilder::class)
             ->makePartial()
             ->shouldReceive('getColumns')->andReturn([
-                ['name' => 'name', 'type_name' => 'varchar', 'type' => 'varchar', 'collation' => null, 'nullable' => false, 'default' => null, 'auto_increment' => false, 'comment' => null, 'generation'=> null],
-                ['name' => 'age', 'type_name' => 'varchar', 'type' => 'varchar', 'collation' => null, 'nullable' => false, 'default' => null, 'auto_increment' => false, 'comment' => null, 'generation'=> null],
+                ['name' => 'name', 'type_name' => 'varchar', 'type' => 'varchar', 'collation' => null, 'nullable' => false, 'default' => null, 'auto_increment' => false, 'comment' => null, 'generation' => null],
+                ['name' => 'age', 'type_name' => 'varchar', 'type' => 'varchar', 'collation' => null, 'nullable' => false, 'default' => null, 'auto_increment' => false, 'comment' => null, 'generation' => null],
             ])
             ->shouldReceive('getIndexes')->andReturn([])
             ->shouldReceive('getForeignKeys')->andReturn([])
@@ -1048,8 +1048,8 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $builder = mock(SQLiteBuilder::class)
             ->makePartial()
             ->shouldReceive('getColumns')->andReturn([
-                ['name' => 'name', 'type_name' => 'varchar', 'type' => 'varchar', 'collation' => null, 'nullable' => false, 'default' => null, 'auto_increment' => false, 'comment' => null, 'generation'=> null],
-                ['name' => 'age', 'type_name' => 'varchar', 'type' => 'varchar', 'collation' => null, 'nullable' => false, 'default' => null, 'auto_increment' => false, 'comment' => null, 'generation'=> null],
+                ['name' => 'name', 'type_name' => 'varchar', 'type' => 'varchar', 'collation' => null, 'nullable' => false, 'default' => null, 'auto_increment' => false, 'comment' => null, 'generation' => null],
+                ['name' => 'age', 'type_name' => 'varchar', 'type' => 'varchar', 'collation' => null, 'nullable' => false, 'default' => null, 'auto_increment' => false, 'comment' => null, 'generation' => null],
             ])
             ->shouldReceive('getIndexes')->andReturn([])
             ->shouldReceive('getForeignKeys')->andReturn([])
@@ -1086,7 +1086,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
             ->getMock();
     }
 
-    public function getGrammar(Connection $connection = null)
+    public function getGrammar(?Connection $connection = null)
     {
         return (new SQLiteGrammar())->setConnection($connection ?? $this->getConnection());
     }
