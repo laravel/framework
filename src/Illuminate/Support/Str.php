@@ -2025,7 +2025,7 @@ class Str
      *
      * @param  string  $string  The input string to sanitize.
      * @param  HtmlSanitizerConfig|null  $config  Custom configuration to use for sanitizing.
-     * @return string The sanitized string.
+     * @return string|null The sanitized string.
      */
     public static function sanitize($string, ?HtmlSanitizerConfig $config = null)
     {
