@@ -1647,7 +1647,7 @@ class SupportStrTest extends TestCase
             ['Hello<script>alert("XSS")</script>', 'Hello', null],
             ['<script>alert("XSS")</script>', '', null],
             ['<span data-attr="foo"></span>', '<span></span>', null],
-            ['<img src="https://laravel.com/does-not-exist.jpg" />', '<img src="https://laravel.com/does-not-exist.jpg" />', null],
+            ['<img src="https://laravel.com/does-not-exist.jpg" onerror="alert(1)" />', '<img src="https://laravel.com/does-not-exist.jpg" />', null],
             ['<a href="javascript:alert(1)">Click me</a>', '<a>Click me</a>', null],
             ['<img src="/does-not-exist.jpg" />', '<img src="/does-not-exist.jpg" />', (new HtmlSanitizerConfig)->allowElement('img', 'src')->allowRelativeMedias()],
             ['<img src="http://laravel.com/safe.jpg" />', '<img src="https://laravel.com/safe.jpg" />', (new HtmlSanitizerConfig)->allowElement('img', 'src')->forceHttpsUrls()],
