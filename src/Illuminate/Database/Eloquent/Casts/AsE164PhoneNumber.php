@@ -17,8 +17,12 @@ class AsE164PhoneNumber implements Castable
      */
     public static function castUsing(array $arguments)
     {
-        return new class implements CastsAttributes
+        return new class($arguments) implements CastsAttributes
         {
+            public function __construct(protected array $arguments)
+            {
+            }
+
             public function get($model, $key, $value, $attributes)
             {
                 if (! $value) {
@@ -44,7 +48,11 @@ class AsE164PhoneNumber implements Castable
                     $value = PhoneNumber::of($value);
                 }
 
-                return $value->formatE164();
+                $countryField = $this->arguments[0] ?? $key . '_country';
+
+                return $value
+                    ->setCountry($attributes[$countryField] ?? $value->getCountry())
+                    ->formatE164();
             }
 
             public function serialize($model, string $key, $value, array $attributes)
@@ -56,5 +64,16 @@ class AsE164PhoneNumber implements Castable
                 return $value->getRawNumber();
             }
         };
+    }
+
+    /**
+     * Specify the country field for the cast.
+     *
+     * @param  string  $countryField
+     * @return string
+     */
+    public static function of($countryField)
+    {
+        return static::class . ':' . $countryField;
     }
 }

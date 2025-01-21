@@ -43,6 +43,16 @@ class PhoneNumber
     }
 
     /**
+     * Set the country code of the phone number.
+     */
+    public function setCountry(string $country): static
+    {
+        $this->country = $country;
+
+        return $this;
+    }
+
+    /**
      * Get the country code of the phone number.
      */
     public function getCountry(): ?string

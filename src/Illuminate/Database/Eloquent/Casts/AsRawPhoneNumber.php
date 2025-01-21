@@ -17,15 +17,21 @@ class AsRawPhoneNumber implements Castable
      */
     public static function castUsing(array $arguments)
     {
-        return new class implements CastsAttributes
+        return new class($arguments) implements CastsAttributes
         {
+            public function __construct(protected array $arguments)
+            {
+            }
+
             public function get($model, $key, $value, $attributes)
             {
                 if (! $value) {
                     return null;
                 }
 
-                $phone = PhoneNumber::of($value);
+                $countryField = $this->arguments[0] ?? $key . '_country';
+
+                $phone = PhoneNumber::of($value, $countryField);
 
                 if (! $phone->getCountry()) {
                     throw new InvalidArgumentException('Missing country specification for ' . $key . ' attribute cast');
@@ -56,5 +62,16 @@ class AsRawPhoneNumber implements Castable
                 return $value->getRawNumber();
             }
         };
+    }
+
+    /**
+     * Specify the country field for the cast.
+     *
+     * @param  string  $countryField
+     * @return string
+     */
+    public static function of($countryField)
+    {
+        return static::class . ':' . $countryField;
     }
 }
