@@ -38,6 +38,13 @@ class Phone implements Rule, ValidatorAwareRule, DataAwareRule
     protected $countryField;
 
     /**
+     * The country code.
+     *
+     * @var string
+     */
+    protected $country;
+
+    /**
      * The callback that will generate the "default" version of the file rule.
      *
      * @var string|array|callable|null
@@ -87,7 +94,7 @@ class Phone implements Rule, ValidatorAwareRule, DataAwareRule
      */
     public function passes($attribute, $value): bool
     {
-        $country = $this->getCountryFieldValue($attribute);
+        $country = $this->country ?? $this->getCountryFieldValue($attribute);
 
         try {
             $phone = PhoneNumber::of($value, $country);
@@ -96,6 +103,16 @@ class Phone implements Rule, ValidatorAwareRule, DataAwareRule
         } catch (Error) {
             return false;
         }
+    }
+
+    /**
+     * Set the country code of the phone number.
+     */
+    public function country(string $country): static
+    {
+        $this->country = $country;
+
+        return $this;
     }
 
     /**
