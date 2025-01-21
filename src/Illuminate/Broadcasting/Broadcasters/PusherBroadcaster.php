@@ -14,21 +14,14 @@ class PusherBroadcaster extends Broadcaster
     use UsePusherChannelConventions;
 
     /**
-     * The Pusher SDK instance.
-     *
-     * @var \Pusher\Pusher
-     */
-    protected $pusher;
-
-    /**
      * Create a new broadcaster instance.
      *
-     * @param  \Pusher\Pusher  $pusher
+     * @param  \Pusher\Pusher  $pusher  The Pusher SDK instance.
      * @return void
      */
-    public function __construct(Pusher $pusher)
-    {
-        $this->pusher = $pusher;
+    public function __construct(
+        protected Pusher $pusher,
+    ) {
     }
 
     /**

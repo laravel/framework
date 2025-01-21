@@ -16,21 +16,14 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 class AblyBroadcaster extends Broadcaster
 {
     /**
-     * The AblyRest SDK instance.
-     *
-     * @var \Ably\AblyRest
-     */
-    protected $ably;
-
-    /**
      * Create a new broadcaster instance.
      *
-     * @param  \Ably\AblyRest  $ably
+     * @param  \Ably\AblyRest  $ably  The Ably SDK instance.
      * @return void
      */
-    public function __construct(AblyRest $ably)
-    {
-        $this->ably = $ably;
+    public function __construct(
+        protected AblyRest $ably,
+    ) {
     }
 
     /**

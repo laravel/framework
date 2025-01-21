@@ -7,21 +7,14 @@ use Psr\Log\LoggerInterface;
 class LogBroadcaster extends Broadcaster
 {
     /**
-     * The logger implementation.
-     *
-     * @var \Psr\Log\LoggerInterface
-     */
-    protected $logger;
-
-    /**
      * Create a new broadcaster instance.
      *
-     * @param  \Psr\Log\LoggerInterface  $logger
+     * @param  \Psr\Log\LoggerInterface  $logger  The logger implementation.
      * @return void
      */
-    public function __construct(LoggerInterface $logger)
-    {
-        $this->logger = $logger;
+    public function __construct(
+        protected LoggerInterface $logger,
+    ) {
     }
 
     /**

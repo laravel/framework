@@ -14,39 +14,18 @@ class RedisBroadcaster extends Broadcaster
     use UsePusherChannelConventions;
 
     /**
-     * The Redis instance.
-     *
-     * @var \Illuminate\Contracts\Redis\Factory
-     */
-    protected $redis;
-
-    /**
-     * The Redis connection to use for broadcasting.
-     *
-     * @var string|null
-     */
-    protected $connection = null;
-
-    /**
-     * The Redis key prefix.
-     *
-     * @var string
-     */
-    protected $prefix = '';
-
-    /**
      * Create a new broadcaster instance.
      *
-     * @param  \Illuminate\Contracts\Redis\Factory  $redis
-     * @param  string|null  $connection
-     * @param  string  $prefix
+     * @param  \Illuminate\Contracts\Redis\Factory  $redis  The Redis instance.
+     * @param  string|null  $connection  The Redis connection to use for broadcasting.
+     * @param  string  $prefix  The Redis key prefix.
      * @return void
      */
-    public function __construct(Redis $redis, $connection = null, $prefix = '')
-    {
-        $this->redis = $redis;
-        $this->prefix = $prefix;
-        $this->connection = $connection;
+    public function __construct(
+        protected Redis $redis,
+        protected $connection = null,
+        protected $prefix = '',
+    ) {
     }
 
     /**
