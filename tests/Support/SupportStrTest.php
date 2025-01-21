@@ -1637,26 +1637,28 @@ class SupportStrTest extends TestCase
         }
     }
 
-    public function testSanitize()
+    #[DataProvider('provideStrSanatizeTestStrings')]
+    public function testSanitize($subject, ?string $expected, ?HtmlSanitizerConfig $config)
     {
-        foreach ([
-            ['Hello', 'Hello', null],
-            [123, '123', null],
-            [null, null, null],
-            ['', '', null],
-            ['Hello<script>alert("XSS")</script>', 'Hello', null],
-            ['<script>alert("XSS")</script>', '', null],
-            ['<span data-attr="foo"></span>', '<span></span>', null],
-            ['<img src="https://laravel.com/does-not-exist.jpg" onerror="alert(1)" />', '<img src="https://laravel.com/does-not-exist.jpg" />', null],
-            ['<a href="javascript:alert(1)">Click me</a>', '<a>Click me</a>', null],
-            ['<img src="/does-not-exist.jpg" />', '<img src="/does-not-exist.jpg" />', (new HtmlSanitizerConfig)->allowElement('img', 'src')->allowRelativeMedias()],
-            ['<img src="http://laravel.com/safe.jpg" />', '<img src="https://laravel.com/safe.jpg" />', (new HtmlSanitizerConfig)->allowElement('img', 'src')->forceHttpsUrls()],
-            ['<span data-attr="foo"></span>', '<span data-attr="foo"></span>', (new HtmlSanitizerConfig)->allowElement('span')->allowAttribute('data-attr', '*')],
-        ] as $value) {
-            [$subject, $expected, $config] = $value;
-
-            $this->assertSame($expected, Str::sanitize($subject, $config));
-        }
+        $this->assertSame($expected, Str::sanitize($subject, $config));
+    }
+    
+    public static function provideStrSanatizeTestStrings()
+    {
+        return [
+            'non-empty string is returned as is' => ['Hello', 'Hello', null],
+            'stringified number' => [123, '123', null],
+            'null is returned as is' => [null, null, null],
+            'empty string is returned as is' => ['', '', null],
+            'XSS attack in string is sanitized' => ['Hello<script>alert("XSS")</script>', 'Hello', null],
+            'XSS attack is sanitized to empty string' => ['<script>alert("XSS")</script>', '', null],
+            'data attribute in HTML element is sanitized' => ['<span data-attr="foo"></span>', '<span></span>', null],
+            'event handler in HTML element is sanitized' => ['<img src="https://laravel.com/does-not-exist.jpg" onerror="alert(1)" />', '<img src="https://laravel.com/does-not-exist.jpg" />', null],
+            'inline JavaScript in HTML hyperlink element is sanitized' => ['<a href="javascript:alert(1)">Click me</a>', '<a>Click me</a>', null],
+            'HTML image element is returned as is' => ['<img src="/does-not-exist.jpg" />', '<img src="/does-not-exist.jpg" />', (new HtmlSanitizerConfig)->allowElement('img', 'src')->allowRelativeMedias()],
+            'HTML image element src URL is rewritten to use TLS' => ['<img src="http://laravel.com/safe.jpg" />', '<img src="https://laravel.com/safe.jpg" />', (new HtmlSanitizerConfig)->allowElement('img', 'src')->forceHttpsUrls()],
+            'data attribute in HTML element is not sanitized' => ['<span data-attr="foo"></span>', '<span data-attr="foo"></span>', (new HtmlSanitizerConfig)->allowElement('span')->allowAttribute('data-attr', '*')],
+        ];
     }
 }
 

@@ -2033,10 +2033,8 @@ class Str
             return null;
         }
 
-        if (! $config) {
-            $config = (new HtmlSanitizerConfig)
-                ->allowSafeElements();
-        }
+        $config ??= (new HtmlSanitizerConfig)
+            ->allowSafeElements();
 
         return (new HtmlSanitizer($config))->sanitize($string);
     }
