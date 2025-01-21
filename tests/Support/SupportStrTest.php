@@ -8,8 +8,8 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\UuidInterface;
 use ReflectionClass;
-use ValueError;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig;
+use ValueError;
 
 class SupportStrTest extends TestCase
 {
@@ -1639,7 +1639,7 @@ class SupportStrTest extends TestCase
 
     public function testSanitize()
     {
-        foreach([
+        foreach ([
             ['Hello', 'Hello', null],
             [123, '123', null],
             [null, null, null],

@@ -2020,15 +2020,16 @@ class Str
     /**
      * Sanitize the given string.
      * 
+     * 
      * See: https://symfony.com/doc/current/html_sanitizer.html
      *
-     * @param string $string The input string to sanitize.
-     * @param HtmlSanitizerConfig|null $config Custom configuration to use for sanitizing.
+     * @param  string  $string  The input string to sanitize.
+     * @param  HtmlSanitizerConfig|null  $config  Custom configuration to use for sanitizing.
      * @return string The sanitized string.
      */
     public static function sanitize($string, ?HtmlSanitizerConfig $config = null)
     {
-        if(is_null($string)) {
+        if (is_null($string)) {
             return null;
         }
 
