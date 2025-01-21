@@ -3,18 +3,16 @@
 namespace Illuminate\Support;
 
 use Exception;
-use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
-use JsonSerializable;
 use libphonenumber\PhoneNumberFormat;
 use libphonenumber\PhoneNumberType;
 use libphonenumber\PhoneNumberUtil;
 use libphonenumber\PhoneNumber as LibPhoneNumber;
 use ReflectionClass;
 
-class PhoneNumber implements Jsonable, JsonSerializable
+class PhoneNumber
 {
     use Macroable, Conditionable;
 
@@ -116,7 +114,7 @@ class PhoneNumber implements Jsonable, JsonSerializable
     {
         $sanitizedFormat = $this->sanitizeType($format);
 
-        if (! $sanitizedFormat) {
+        if (is_null($sanitizedFormat)) {
             throw new Exception('Invalid format ' . $format);
         }
 
@@ -212,7 +210,7 @@ class PhoneNumber implements Jsonable, JsonSerializable
     public function equals(string|PhoneNumber $number): bool
     {
         try {
-            if (! $number instanceof static) {
+            if (is_string($number)) {
                 $number = new static($number);
             }
 
@@ -230,37 +228,6 @@ class PhoneNumber implements Jsonable, JsonSerializable
         return ! $this->equals($number);
     }
 
-    /**
-     * Convert the phone number to its JSON representation.
-     */
-    public function toJson($options = 0)
-    {
-        return json_encode($this->jsonSerialize(), $options);
-    }
-
-    /**
-     * Json serialize the phone number.
-     */
-    public function jsonSerialize(): string
-    {
-        return $this->formatE164();
-    }
-
-    /**
-     * Serialize the phone number.
-     */
-    public function __serialize()
-    {
-        return ['number' => $this->formatE164()];
-    }
-
-    /**
-     * Unserialize the phone number.
-     */
-    public function __unserialize(array $serialized)
-    {
-        $this->number = $serialized['number'];
-    }
 
     /**
      * Convert the phone number to a string.
