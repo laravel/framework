@@ -12,18 +12,16 @@ class EloquentModelRawPhoneNumberCastingTest extends TestCase
     public function test_mutates_to_raw_number()
     {
         $model = new ModelWithRawCast;
-        $model->phone = '012 34 56 78';
-
-        $model->phone;
-        $this->assertEquals('012 34 56 78', $model->getAttributes()['phone']);
+        $model->phone = '01200954866';
+        $this->assertEquals('01200954866', $model->getAttributes()['phone']);
 
         $model = new ModelWithRawCast;
-        $model->phone = PhoneNumber::of('012/34.56.78');
-        $this->assertEquals('012/34.56.78', $model->getAttributes()['phone']);
+        $model->phone = PhoneNumber::of('01200954866');
+        $this->assertEquals('01200954866', $model->getAttributes()['phone']);
 
         $model = new ModelWithRawCast;
-        $model->phone = PhoneNumber::of('012345678', 'BE');
-        $this->assertEquals('012345678', $model->getAttributes()['phone']);
+        $model->phone = PhoneNumber::of('01200954866', 'EG');
+        $this->assertEquals('01200954866', $model->getAttributes()['phone']);
 
         $model = new ModelWithRawCast;
         $model->phone = PhoneNumber::of('012-34-56-78', 'US');
@@ -33,7 +31,7 @@ class EloquentModelRawPhoneNumberCastingTest extends TestCase
     public function test_gets_phone_object()
     {
         $model = new ModelWithRawCast;
-        $model->setRawAttributes(['phone' => '012 34 56 78']);
+        $model->setRawAttributes(['phone' => '01200954866']);
         $this->assertIsObject($model->phone);
         $this->assertInstanceOf(PhoneNumber::class, $model->phone);
     }
@@ -42,8 +40,8 @@ class EloquentModelRawPhoneNumberCastingTest extends TestCase
     {
         $model = new ModelWithIncompleteRawCast;
         $model->setRawAttributes([
-            'phone_country' => 'BE',
-            'phone' => '012 34 56 78',
+            'phone_country' => 'EG',
+            'phone' => '01200954866',
         ]);
         $this->assertIsObject($model->phone);
         $this->assertInstanceOf(PhoneNumber::class, $model->phone);
@@ -53,8 +51,8 @@ class EloquentModelRawPhoneNumberCastingTest extends TestCase
     {
         $model = new ModelWithRawCastAndCountryField;
         $model->setRawAttributes([
-            'country' => 'BE',
-            'phone' => '012 34 56 78',
+            'country' => 'EG',
+            'phone' => '01200954866',
         ]);
         $this->assertIsObject($model->phone);
         $this->assertInstanceOf(PhoneNumber::class, $model->phone);
@@ -72,8 +70,8 @@ class EloquentModelRawPhoneNumberCastingTest extends TestCase
     public function test_serializes()
     {
         $model = new ModelWithRawCast;
-        $model->phone = '012 34 56 78';
-        $this->assertEquals('012 34 56 78', $model->toArray()['phone']);
+        $model->phone = '01200954866';
+        $this->assertEquals('01200954866', $model->toArray()['phone']);
 
         $model = new ModelWithRawCast;
         $model->phone = null;

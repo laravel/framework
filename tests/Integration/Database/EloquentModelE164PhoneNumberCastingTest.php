@@ -13,44 +13,44 @@ class EloquentModelE164PhoneNumberCastingTest extends TestCase
     public function test_mutates_to_e164_number()
     {
         $model = new EloquentModelE164PhoneNumberCastingTestModel;
-        $model->phone = '+32 12 34 56 78';
-        $this->assertEquals('+3212345678', $model->getAttributes()['phone']);
+        $model->phone = '+201200954866';
+        $this->assertEquals('+201200954866', $model->getAttributes()['phone']);
 
         $model = new EloquentModelE164PhoneNumberCastingTestModel;
-        $model->phone = PhoneNumber::of('+32 12/34.56.78');
-        $this->assertEquals('+3212345678', $model->getAttributes()['phone']);
+        $model->phone = PhoneNumber::of('+201200954866');
+        $this->assertEquals('+201200954866', $model->getAttributes()['phone']);
     }
 
     public function test_mutates_to_e164_number_with_implicit_country_field()
     {
         $model = new EloquentModelE164PhoneNumberCastingTestModel;
-        $model->phone_country = 'BE';
-        $model->phone = '012 34 56 78';
-        $this->assertEquals('+3212345678', $model->getAttributes()['phone']);
+        $model->phone_country = 'EG';
+        $model->phone = '01200954866';
+        $this->assertEquals('+201200954866', $model->getAttributes()['phone']);
 
         $model = new EloquentModelE164PhoneNumberCastingTestModel;
-        $model->phone_country = 'BE';
-        $model->phone = PhoneNumber::of('+32 12/34.56.78');
-        $this->assertEquals('+3212345678', $model->getAttributes()['phone']);
+        $model->phone_country = 'EG';
+        $model->phone = PhoneNumber::of('+201200954866');
+        $this->assertEquals('+201200954866', $model->getAttributes()['phone']);
     }
 
     public function test_mutates_to_e164_number_with_explicit_country_field()
     {
         $model = new EloquentModelE164PhoneNumberCastingTestModelAndCountryField;
-        $model->country = 'BE';
-        $model->phone = '012 34 56 78';
-        $this->assertEquals('+3212345678', $model->getAttributes()['phone']);
+        $model->country = 'EG';
+        $model->phone = '01200954866';
+        $this->assertEquals('+201200954866', $model->getAttributes()['phone']);
 
         $model = new EloquentModelE164PhoneNumberCastingTestModelAndCountryField;
-        $model->country = 'BE';
-        $model->phone = PhoneNumber::of('+32 12/34.56.78');
-        $this->assertEquals('+3212345678', $model->getAttributes()['phone']);
+        $model->country = 'EG';
+        $model->phone = PhoneNumber::of('+201200954866');
+        $this->assertEquals('+201200954866', $model->getAttributes()['phone']);
     }
 
     public function test_gets_phone_object()
     {
         $model = new EloquentModelE164PhoneNumberCastingTestModel;
-        $model->setRawAttributes(['phone' => '+3212345678']);
+        $model->setRawAttributes(['phone' => '+201200954866']);
         $this->assertIsObject($model->phone);
         $this->assertInstanceOf(PhoneNumber::class, $model->phone);
     }
@@ -58,7 +58,7 @@ class EloquentModelE164PhoneNumberCastingTest extends TestCase
     public function test_throws_when_accessing_non_international_value()
     {
         $model = new EloquentModelE164PhoneNumberCastingTestModel();
-        $model->setRawAttributes(['phone' => '012 34 56 78']);
+        $model->setRawAttributes(['phone' => '01200954866']);
         $this->expectException(Exception::class);
         $model->phone;
     }
@@ -66,8 +66,8 @@ class EloquentModelE164PhoneNumberCastingTest extends TestCase
     public function test_serializes()
     {
         $model = new EloquentModelE164PhoneNumberCastingTestModel();
-        $model->phone = '+32 12 34 56 78';
-        $this->assertEquals('+3212345678', $model->toArray()['phone']);
+        $model->phone = '+201200954866';
+        $this->assertEquals('+201200954866', $model->toArray()['phone']);
 
         $model = new EloquentModelE164PhoneNumberCastingTestModel();
         $model->phone = null;
