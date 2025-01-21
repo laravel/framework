@@ -2019,8 +2019,8 @@ class Str
 
     /**
      * Sanitize the given string.
-     * 
-     * 
+     *
+     *
      * See: https://symfony.com/doc/current/html_sanitizer.html
      *
      * @param  string  $string  The input string to sanitize.
