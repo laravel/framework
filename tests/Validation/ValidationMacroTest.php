@@ -10,11 +10,11 @@ class ValidationMacroTest extends TestCase
     public function testMacroable()
     {
         // Define a phone validation macro
-        Rule::macro('phone', function () {
+        Rule::macro('phoneRegex', function () {
             return 'regex:/^([0-9\s\-\+\(\)]*)$/';
         });
 
-        $actualRule = Rule::phone();
+        $actualRule = Rule::phoneRegex();
         $this->assertSame('regex:/^([0-9\s\-\+\(\)]*)$/', $actualRule);
     }
 
