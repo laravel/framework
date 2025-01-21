@@ -47,7 +47,7 @@ class DynamoDbFailedJobProviderTest extends TestCase
             ],
         ]);
 
-        $provider = new DynamoDbFailedJobProvider($dynamoDbClient, 'application', 'table');
+        $provider = new DynamoDbFailedJobProvider($dynamoDbClient, 'application', 'table', '3');
 
         $provider->log('connection', 'queue', json_encode(['uuid' => (string) $uuid]), $exception);
 
@@ -83,7 +83,7 @@ class DynamoDbFailedJobProviderTest extends TestCase
             ],
         ]);
 
-        $provider = new DynamoDbFailedJobProvider($dynamoDbClient, 'application', 'table');
+        $provider = new DynamoDbFailedJobProvider($dynamoDbClient, 'application', 'table', '3');
 
         $response = $provider->all();
 
@@ -124,7 +124,7 @@ class DynamoDbFailedJobProviderTest extends TestCase
             ],
         ]);
 
-        $provider = new DynamoDbFailedJobProvider($dynamoDbClient, 'application', 'table');
+        $provider = new DynamoDbFailedJobProvider($dynamoDbClient, 'application', 'table', '3');
 
         $response = $provider->find('id');
 
@@ -152,7 +152,7 @@ class DynamoDbFailedJobProviderTest extends TestCase
             ],
         ])->andReturn([]);
 
-        $provider = new DynamoDbFailedJobProvider($dynamoDbClient, 'application', 'table');
+        $provider = new DynamoDbFailedJobProvider($dynamoDbClient, 'application', 'table', '3');
 
         $response = $provider->find('id');
 
@@ -171,7 +171,7 @@ class DynamoDbFailedJobProviderTest extends TestCase
             ],
         ])->andReturn([]);
 
-        $provider = new DynamoDbFailedJobProvider($dynamoDbClient, 'application', 'table');
+        $provider = new DynamoDbFailedJobProvider($dynamoDbClient, 'application', 'table', '3');
 
         $provider->forget('id');
     }
