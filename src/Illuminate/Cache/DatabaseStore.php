@@ -431,7 +431,7 @@ class DatabaseStore implements LockProvider, Store
      */
     protected function table()
     {
-        return $this->connection->table($this->table);//->useWritePdo();
+        return $this->connection->table($this->table)->useWritePdo();
     }
 
     /**
