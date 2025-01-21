@@ -15,6 +15,7 @@ use Illuminate\Validation\Rules\File;
 use Illuminate\Validation\Rules\ImageFile;
 use Illuminate\Validation\Rules\In;
 use Illuminate\Validation\Rules\NotIn;
+use Illuminate\Validation\Rules\Phone;
 use Illuminate\Validation\Rules\ProhibitedIf;
 use Illuminate\Validation\Rules\RequiredIf;
 use Illuminate\Validation\Rules\Unique;
@@ -157,6 +158,16 @@ class Rule
     public static function excludeIf($callback)
     {
         return new ExcludeIf($callback);
+    }
+
+    /**
+     * Get a phone rule builder instance.
+     *
+     * @return \Illuminate\Validation\Rules\Phone
+     */
+    public static function phone()
+    {
+        return new Phone;
     }
 
     /**

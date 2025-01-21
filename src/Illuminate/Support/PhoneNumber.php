@@ -23,7 +23,7 @@ class PhoneNumber implements Jsonable, JsonSerializable
      */
     protected PhoneNumberUtil $phoneNumberInstance;
 
-    public function __construct(protected string $number)
+    public function __construct(protected string $number, protected ?string $country = null)
     {
         $this->phoneNumberInstance = PhoneNumberUtil::getInstance();
     }
@@ -31,9 +31,9 @@ class PhoneNumber implements Jsonable, JsonSerializable
     /**
      * Create a new PhoneNumber instance.
      */
-    public static function of(string $number): static
+    public static function of(string $number, ?string $country = null): static
     {
-        return new static($number);
+        return new static($number, $country);
     }
 
     /**
@@ -49,6 +49,10 @@ class PhoneNumber implements Jsonable, JsonSerializable
      */
     public function getCountry(): ?string
     {
+        if ($this->country) {
+            return $this->country;
+        }
+
         try {
             return $this->phoneNumberInstance->getRegionCodeForNumber(
                 $this->phoneNumberInstance->parse($this->number, 'ZZ')

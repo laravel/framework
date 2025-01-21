@@ -124,6 +124,7 @@ return [
         'symbols' => 'The :attribute field must contain at least one symbol.',
         'uncompromised' => 'The given :attribute has appeared in a data leak. Please choose a different :attribute.',
     ],
+    'phone' => 'The :attribute field must be a valid phone number.',
     'present' => 'The :attribute field must be present.',
     'present_if' => 'The :attribute field must be present when :other is :value.',
     'present_unless' => 'The :attribute field must be present unless :other is :value.',
