@@ -1642,7 +1642,7 @@ class SupportStrTest extends TestCase
     {
         $this->assertSame($expected, Str::sanitize($subject, $config));
     }
-    
+
     public static function provideStrSanatizeTestStrings()
     {
         return [
