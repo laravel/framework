@@ -1,6 +1,29 @@
 # Release Notes for 11.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v11.38.2...11.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v11.39.0...11.x)
+
+## [v11.39.0](https://github.com/laravel/framework/compare/v11.38.2...v11.39.0) - 2025-01-21
+
+* [11.x] Replace duplicate `ValidatedInput` functions with `InteractsWithData` trait by [@stevebauman](https://github.com/stevebauman) in https://github.com/laravel/framework/pull/54208
+* [11.x] Improve `Email` validation rule custom translation messages by [@SanderMuller](https://github.com/SanderMuller) in https://github.com/laravel/framework/pull/54202
+* [11.x] Fix deprecation warnings in `optimize:clear` and `optimize` by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/54197
+* [11.x] Add support for phpredis backoff and max retry config options by [@TheLevti](https://github.com/TheLevti) in https://github.com/laravel/framework/pull/54191
+* Introduces UseFactory attribute by [@christopherarter](https://github.com/christopherarter) in https://github.com/laravel/framework/pull/54065
+* [11.x] Set class-string generic on `UseFactory` by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/54215
+* [11.x] switch LazyCollection::make() for new LazyCollection() by [@AhmedAlaa4611](https://github.com/AhmedAlaa4611) in https://github.com/laravel/framework/pull/54216
+* support style file name hashes with query strings in manifest by [@newapx](https://github.com/newapx) in https://github.com/laravel/framework/pull/54219
+* [11.x] Solidify `Rule::email()` tests by [@SanderMuller](https://github.com/SanderMuller) in https://github.com/laravel/framework/pull/54226
+* [11.x] Fix line-ending mismatch in CliDumperTest::testArray and CliDumperTest::testObject by [@AhmedAlaa4611](https://github.com/AhmedAlaa4611) in https://github.com/laravel/framework/pull/54222
+* Add a report/log option to filesystem exceptions without throwing by [@lotharthesavior](https://github.com/lotharthesavior) in https://github.com/laravel/framework/pull/54212
+* [11.x] Fix Cache component to be aware of phpredis serialization and compression settings by [@TheLevti](https://github.com/TheLevti) in https://github.com/laravel/framework/pull/54221
+* [11.x] fix: Forcing DB Session driver to always use the write connection by [@mathiasgrimm](https://github.com/mathiasgrimm) in https://github.com/laravel/framework/pull/54231
+* [11.x] Fix line-ending mismatch in `BladeComponentTagCompilerTest` under `Illuminate\Tests\View\Blade` by [@AhmedAlaa4611](https://github.com/AhmedAlaa4611) in https://github.com/laravel/framework/pull/54233
+* [11.x]  Fix job not logged in failed_jobs table if timeout occurs within database transaction by [@decaylala](https://github.com/decaylala) in https://github.com/laravel/framework/pull/54173
+* [11.x] Fix unique job lock is not released on model not found exception, lock gets stuck. by [@zackAJ](https://github.com/zackAJ) in https://github.com/laravel/framework/pull/54000
+* [11.x] Fix line-ending mismatch on Windows test by [@AhmedAlaa4611](https://github.com/AhmedAlaa4611) in https://github.com/laravel/framework/pull/54236
+* Added support in DB::prohibitDestructiveCommands to preventing destructive Rollback… by [@hexathos](https://github.com/hexathos) in https://github.com/laravel/framework/pull/54238
+* [11.x] Add applyAfterQueryCallbacks Support to Non-Mutator Cases in pluck Method by [@batinmustu](https://github.com/batinmustu) in https://github.com/laravel/framework/pull/54268
+* [11.x] `addPath()` Allow adding new path for translation loader. by [@selcukcukur](https://github.com/selcukcukur) in https://github.com/laravel/framework/pull/54277
 
 ## [v11.38.2](https://github.com/laravel/framework/compare/v11.38.1...v11.38.2) - 2025-01-15
 
