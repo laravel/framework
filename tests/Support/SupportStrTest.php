@@ -3,12 +3,12 @@
 namespace Illuminate\Tests\Support;
 
 use Exception;
-use ValueError;
-use ReflectionClass;
 use Illuminate\Support\Str;
-use Ramsey\Uuid\UuidInterface;
-use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
+use Ramsey\Uuid\UuidInterface;
+use ReflectionClass;
+use ValueError;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig;
 
 class SupportStrTest extends TestCase
