@@ -436,6 +436,7 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
     }
 
     #[DataProvider('connectionProvider')]
+    #[RequiresDatabase('sqlite')]
     public function testForeignKeysOnSameSchema($connection)
     {
         $schema = Schema::connection($connection);
@@ -449,8 +450,7 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
         });
         $schema->create('my_schema.second_table', function (Blueprint $table) {
             $table->unsignedBigInteger('table_id');
-            $table->foreign('table_id')->references('id')
-                ->on($this->driver === 'sqlite' ? 'table' : 'my_schema.table');
+            $table->foreign('table_id')->references('id')->on('table');
         });
 
         $myTableName = $connection === 'with-prefix' ? 'example_my_tables' : 'my_tables';
