@@ -43,7 +43,7 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
         } elseif ($this->driver === 'pgsql') {
             DB::statement('drop schema if exists my_schema cascade');
         } elseif ($this->driver === 'sqlsrv') {
-            DB::statement("if schema_id('my_schema') is not null begin exec('drop schema my_schema') end");
+            // DB::statement("if schema_id('my_schema') is not null begin exec('drop schema my_schema') end");
         }
     }
 
