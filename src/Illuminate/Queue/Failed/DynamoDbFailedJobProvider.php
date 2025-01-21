@@ -33,18 +33,27 @@ class DynamoDbFailedJobProvider implements FailedJobProviderInterface
     protected $table;
 
     /**
+     * The number of days a failed job should be retained.
+     *
+     * @var string
+     */
+    protected $expireDays;
+
+    /**
      * Create a new DynamoDb failed job provider.
      *
      * @param  \Aws\DynamoDb\DynamoDbClient  $dynamo
      * @param  string  $applicationName
      * @param  string  $table
+     * @param  string  $expireDays
      * @return void
      */
-    public function __construct(DynamoDbClient $dynamo, $applicationName, $table)
+    public function __construct(DynamoDbClient $dynamo, $applicationName, $table, $expireDays)
     {
         $this->table = $table;
         $this->dynamo = $dynamo;
         $this->applicationName = $applicationName;
+        $this->expireDays = (int) $expireDays;
     }
 
     /**
@@ -72,7 +81,7 @@ class DynamoDbFailedJobProvider implements FailedJobProviderInterface
                 'payload' => ['S' => $payload],
                 'exception' => ['S' => (string) $exception],
                 'failed_at' => ['N' => (string) $failedAt->getTimestamp()],
-                'expires_at' => ['N' => (string) $failedAt->addDays(3)->getTimestamp()],
+                'expires_at' => ['N' => (string) $failedAt->addDays($this->expireDays)->getTimestamp()],
             ],
         ]);
 
