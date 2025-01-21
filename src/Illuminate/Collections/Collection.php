@@ -148,7 +148,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function collapseWithKeys()
     {
-        if(! $this->items){
+        if (! $this->items) {
             return $this;
         }
 
