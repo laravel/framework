@@ -2,10 +2,10 @@
 
 namespace Illuminate\Database\Eloquent\Casts;
 
+use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Support\PhoneNumber;
 use InvalidArgumentException;
-use Illuminate\Contracts\Database\Eloquent\Castable;
 
 class AsRawPhoneNumber implements Castable
 {
@@ -29,12 +29,12 @@ class AsRawPhoneNumber implements Castable
                     return null;
                 }
 
-                $countryField = $this->arguments[0] ?? $key . '_country';
+                $countryField = $this->arguments[0] ?? $key.'_country';
 
                 $phone = PhoneNumber::of($value, $countryField);
 
                 if (! $phone->getCountry()) {
-                    throw new InvalidArgumentException('Missing country specification for ' . $key . ' attribute cast');
+                    throw new InvalidArgumentException('Missing country specification for '.$key.' attribute cast');
                 }
 
                 return $phone;
@@ -72,6 +72,6 @@ class AsRawPhoneNumber implements Castable
      */
     public static function of($countryField)
     {
-        return static::class . ':' . $countryField;
+        return static::class.':'.$countryField;
     }
 }

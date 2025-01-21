@@ -61,7 +61,7 @@ class EloquentModelRawPhoneNumberCastingTest extends TestCase
     public function test_gets_phone_object_when_accessing_incomplete_raw_cast_with_international_number()
     {
         $model = new ModelWithIncompleteRawCast;
-        $model->setRawAttributes(['phone' => '+32 12 34 56 78']);
+        $model->setRawAttributes(['phone' => '+201200954866']);
 
         $this->assertIsObject($model->phone);
         $this->assertInstanceOf(PhoneNumber::class, $model->phone);
@@ -82,14 +82,14 @@ class EloquentModelRawPhoneNumberCastingTest extends TestCase
 class ModelWithRawCast extends Model
 {
     protected $casts = [
-        'phone' => AsRawPhoneNumber::class . ':BE,NL',
+        'phone' => AsRawPhoneNumber::class.':EG',
     ];
 }
 
 class ModelWithRawCastAndCountryField extends Model
 {
     protected $casts = [
-        'phone' => AsRawPhoneNumber::class . ':country',
+        'phone' => AsRawPhoneNumber::class.':country',
     ];
 }
 

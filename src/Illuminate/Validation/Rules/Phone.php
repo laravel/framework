@@ -66,7 +66,7 @@ class Phone implements Rule, ValidatorAwareRule, DataAwareRule
         }
 
         if (! is_callable($callback) && ! $callback instanceof static) {
-            throw new InvalidArgumentException('The given callback should be callable or an instance of ' . static::class);
+            throw new InvalidArgumentException('The given callback should be callable or an instance of '.static::class);
         }
 
         static::$defaultCallback = $callback;
@@ -130,7 +130,7 @@ class Phone implements Rule, ValidatorAwareRule, DataAwareRule
      */
     protected function getCountryFieldValue(string $attribute)
     {
-        return Arr::get($this->data, $this->countryField ?: $attribute . '_country');
+        return Arr::get($this->data, $this->countryField ?: $attribute.'_country');
     }
 
     /**

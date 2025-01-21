@@ -2,8 +2,8 @@
 
 namespace Illuminate\Database\Eloquent\Casts;
 
-use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Contracts\Database\Eloquent\Castable;
+use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Support\PhoneNumber;
 use InvalidArgumentException;
 
@@ -32,7 +32,7 @@ class AsE164PhoneNumber implements Castable
                 $phone = PhoneNumber::of($value);
 
                 if (! $phone->getCountry()) {
-                    throw new InvalidArgumentException('Missing country specification for ' . $key . ' attribute cast');
+                    throw new InvalidArgumentException('Missing country specification for '.$key.' attribute cast');
                 }
 
                 return $phone;
@@ -48,7 +48,7 @@ class AsE164PhoneNumber implements Castable
                     $value = PhoneNumber::of($value);
                 }
 
-                $countryField = $this->arguments[0] ?? $key . '_country';
+                $countryField = $this->arguments[0] ?? $key.'_country';
 
                 return $value
                     ->setCountry($attributes[$countryField] ?? $value->getCountry())
@@ -74,6 +74,6 @@ class AsE164PhoneNumber implements Castable
      */
     public static function of($countryField)
     {
-        return static::class . ':' . $countryField;
+        return static::class.':'.$countryField;
     }
 }

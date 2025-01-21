@@ -6,10 +6,10 @@ use Exception;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
+use libphonenumber\PhoneNumber as LibPhoneNumber;
 use libphonenumber\PhoneNumberFormat;
 use libphonenumber\PhoneNumberType;
 use libphonenumber\PhoneNumberUtil;
-use libphonenumber\PhoneNumber as LibPhoneNumber;
 use ReflectionClass;
 
 class PhoneNumber
@@ -108,6 +108,7 @@ class PhoneNumber
 
     /**
      * Check if the phone number is of the given country.
+     *
      * @param  mixed  $country
      */
     public function isOfCountry($country): bool
@@ -125,7 +126,7 @@ class PhoneNumber
         $sanitizedFormat = $this->sanitizeType($format);
 
         if (is_null($sanitizedFormat)) {
-            throw new Exception('Invalid format ' . $format);
+            throw new Exception('Invalid format '.$format);
         }
 
         return $this->phoneNumberInstance->format(
@@ -168,6 +169,7 @@ class PhoneNumber
 
     /**
      * Format the phone number for a given country.
+     *
      * @param  mixed  $country
      */
     public function formatForCountry($country): string
@@ -180,6 +182,7 @@ class PhoneNumber
 
     /**
      * Format the phone number for mobile dialing in a given country.
+     *
      * @param  mixed  $country
      */
     public function formatForMobileDialingInCountry($country, bool $withFormatting = false): string
@@ -193,6 +196,7 @@ class PhoneNumber
 
     /**
      * Check if the phone number is of the given type.
+     *
      * @param  mixed  $type
      */
     public function isOfType($type): bool
@@ -278,12 +282,12 @@ class PhoneNumber
             ->map(function ($format) {
                 return Arr::get($this->allTypes(), strtoupper($format), $format);
             })
-            ->filter(fn($format): bool => $this->isValidType($format))
+            ->filter(fn ($format): bool => $this->isValidType($format))
             ->unique()
             ->when(
                 is_array($types),
-                fn($collection) => $collection->toArray(),
-                fn($collection) => $collection->first(),
+                fn ($collection) => $collection->toArray(),
+                fn ($collection) => $collection->first(),
             );
     }
 }
