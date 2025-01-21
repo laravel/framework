@@ -30,7 +30,6 @@ class Phone implements Rule, ValidatorAwareRule, DataAwareRule
      */
     protected $data;
 
-
     /**
      * The name of the country field.
      *
