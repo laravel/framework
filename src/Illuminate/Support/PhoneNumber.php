@@ -3,7 +3,6 @@
 namespace Illuminate\Support;
 
 use Exception;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
 use libphonenumber\PhoneNumber as LibPhoneNumber;
@@ -241,7 +240,6 @@ class PhoneNumber
     {
         return ! $this->equals($number);
     }
-
 
     /**
      * Convert the phone number to a string.
