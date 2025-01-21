@@ -3,21 +3,23 @@
 namespace Illuminate\Support;
 
 use Closure;
-use Illuminate\Support\Traits\Macroable;
-use JsonException;
-use League\CommonMark\Environment\Environment;
-use League\CommonMark\Extension\GithubFlavoredMarkdownExtension;
-use League\CommonMark\Extension\InlinesOnly\InlinesOnlyExtension;
-use League\CommonMark\GithubFlavoredMarkdownConverter;
-use League\CommonMark\MarkdownConverter;
-use Ramsey\Uuid\Codec\TimestampFirstCombCodec;
-use Ramsey\Uuid\Generator\CombGenerator;
-use Ramsey\Uuid\Uuid;
-use Ramsey\Uuid\UuidFactory;
-use Symfony\Component\Uid\Ulid;
 use Throwable;
 use Traversable;
+use JsonException;
+use Ramsey\Uuid\Uuid;
 use voku\helper\ASCII;
+use Ramsey\Uuid\UuidFactory;
+use Symfony\Component\Uid\Ulid;
+use Illuminate\Support\Traits\Macroable;
+use League\CommonMark\MarkdownConverter;
+use Ramsey\Uuid\Generator\CombGenerator;
+use League\CommonMark\Environment\Environment;
+use Ramsey\Uuid\Codec\TimestampFirstCombCodec;
+use Symfony\Component\HtmlSanitizer\HtmlSanitizer;
+use League\CommonMark\GithubFlavoredMarkdownConverter;
+use Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig;
+use League\CommonMark\Extension\GithubFlavoredMarkdownExtension;
+use League\CommonMark\Extension\InlinesOnly\InlinesOnlyExtension;
 
 class Str
 {
@@ -2013,5 +2015,28 @@ class Str
         static::$snakeCache = [];
         static::$camelCache = [];
         static::$studlyCache = [];
+    }
+
+    /**
+     * Sanitize the given string.
+     * 
+     * See: https://symfony.com/doc/current/html_sanitizer.html
+     *
+     * @param string $string The input string to sanitize.
+     * @param HtmlSanitizerConfig|null $config Custom configuration to use for sanitizing.
+     * @return string The sanitized string.
+     */
+    public static function sanitize($string, ?HtmlSanitizerConfig $config = null)
+    {
+        if(is_null($string)) {
+            return null;
+        }
+
+        if (! $config) {
+            $config = (new HtmlSanitizerConfig)
+                ->allowSafeElements();
+        }
+
+        return (new HtmlSanitizer($config))->sanitize($string);
     }
 }

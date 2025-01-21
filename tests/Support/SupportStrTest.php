@@ -3,12 +3,13 @@
 namespace Illuminate\Tests\Support;
 
 use Exception;
-use Illuminate\Support\Str;
-use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\TestCase;
-use Ramsey\Uuid\UuidInterface;
-use ReflectionClass;
 use ValueError;
+use ReflectionClass;
+use Illuminate\Support\Str;
+use Ramsey\Uuid\UuidInterface;
+use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig;
 
 class SupportStrTest extends TestCase
 {
@@ -1633,6 +1634,28 @@ class SupportStrTest extends TestCase
             [$subject, $needle, $expected] = $value;
 
             $this->assertSame($expected, Str::chopEnd($subject, $needle));
+        }
+    }
+
+    public function testSanitize()
+    {
+        foreach([
+            ['Hello', 'Hello', null],
+            [123, '123', null],
+            [null, null, null],
+            ['', '', null],
+            ['Hello<script>alert("XSS")</script>', 'Hello', null],
+            ['<script>alert("XSS")</script>', '', null],
+            ['<span data-attr="foo"></span>', '<span></span>', null],
+            ['<img src="https://laravel.com/does-not-exist.jpg" />', '<img src="https://laravel.com/does-not-exist.jpg" />', null],
+            ['<a href="javascript:alert(1)">Click me</a>', '<a>Click me</a>', null],
+            ['<img src="/does-not-exist.jpg" />', '<img src="/does-not-exist.jpg" />', (new HtmlSanitizerConfig)->allowElement('img', 'src')->allowRelativeMedias()],
+            ['<img src="http://laravel.com/safe.jpg" />', '<img src="https://laravel.com/safe.jpg" />', (new HtmlSanitizerConfig)->allowElement('img', 'src')->forceHttpsUrls()],
+            ['<span data-attr="foo"></span>', '<span data-attr="foo"></span>', (new HtmlSanitizerConfig)->allowElement('span')->allowAttribute('data-attr', '*')],
+        ] as $value) {
+            [$subject, $expected, $config] = $value;
+
+            $this->assertSame($expected, Str::sanitize($subject, $config));
         }
     }
 }
