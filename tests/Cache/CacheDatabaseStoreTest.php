@@ -21,7 +21,7 @@ class CacheDatabaseStoreTest extends TestCase
     public function testNullIsReturnedWhenItemNotFound()
     {
         $store = $this->getStore();
-        $table = m::mock(stdClass::class);
+        $table = $this->getTableMock();
         $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
         $table->shouldReceive('whereIn')->once()->with('key', ['prefixfoo'])->andReturn($table);
         $table->shouldReceive('get')->once()->andReturn(collect([]));
@@ -33,11 +33,11 @@ class CacheDatabaseStoreTest extends TestCase
     {
         $store = $this->getMockBuilder(DatabaseStore::class)->onlyMethods(['forgetIfExpired'])->setConstructorArgs($this->getMocks())->getMock();
 
-        $getQuery = m::mock(stdClass::class);
+        $getQuery = $this->getTableMock();
         $getQuery->shouldReceive('whereIn')->once()->with('key', ['prefixfoo'])->andReturn($getQuery);
         $getQuery->shouldReceive('get')->once()->andReturn(collect([(object) ['key' => 'prefixfoo', 'expiration' => 1]]));
 
-        $deleteQuery = m::mock(stdClass::class);
+        $deleteQuery = $this->getTableMock();
         $deleteQuery->shouldReceive('whereIn')->once()->with('key', ['prefixfoo', 'prefixilluminate:cache:flexible:created:foo'])->andReturn($deleteQuery);
         $deleteQuery->shouldReceive('where')->once()->with('expiration', '<=', m::any())->andReturn($deleteQuery);
         $deleteQuery->shouldReceive('delete')->once()->andReturnNull();
@@ -50,7 +50,7 @@ class CacheDatabaseStoreTest extends TestCase
     public function testDecryptedValueIsReturnedWhenItemIsValid()
     {
         $store = $this->getStore();
-        $table = m::mock(stdClass::class);
+        $table = $this->getTableMock();
         $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
         $table->shouldReceive('whereIn')->once()->with('key', ['prefixfoo'])->andReturn($table);
         $table->shouldReceive('get')->once()->andReturn(collect([(object) ['key' => 'prefixfoo', 'value' => serialize('bar'), 'expiration' => 999999999999999]]));
@@ -61,7 +61,7 @@ class CacheDatabaseStoreTest extends TestCase
     public function testValueIsReturnedOnPostgres()
     {
         $store = $this->getPostgresStore();
-        $table = m::mock(stdClass::class);
+        $table = $this->getTableMock();
         $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
         $table->shouldReceive('whereIn')->once()->with('key', ['prefixfoo'])->andReturn($table);
         $table->shouldReceive('get')->once()->andReturn(collect([(object) ['key' => 'prefixfoo', 'value' => base64_encode(serialize('bar')), 'expiration' => 999999999999999]]));
@@ -72,7 +72,7 @@ class CacheDatabaseStoreTest extends TestCase
     public function testValueIsReturnedOnSqlite()
     {
         $store = $this->getSqliteStore();
-        $table = m::mock(stdClass::class);
+        $table = $this->getTableMock();
         $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
         $table->shouldReceive('whereIn')->once()->with('key', ['prefixfoo'])->andReturn($table);
         $table->shouldReceive('get')->once()->andReturn(collect([(object) ['key' => 'prefixfoo', 'value' => base64_encode(serialize("\0bar\0")), 'expiration' => 999999999999999]]));
@@ -83,7 +83,7 @@ class CacheDatabaseStoreTest extends TestCase
     public function testValueIsUpserted()
     {
         $store = $this->getMockBuilder(DatabaseStore::class)->onlyMethods(['getTime'])->setConstructorArgs($this->getMocks())->getMock();
-        $table = m::mock(stdClass::class);
+        $table = $this->getTableMock();
         $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
         $store->expects($this->once())->method('getTime')->willReturn(1);
         $table->shouldReceive('upsert')->once()->with([['key' => 'prefixfoo', 'value' => serialize('bar'), 'expiration' => 61]], 'key')->andReturnTrue();
@@ -95,7 +95,7 @@ class CacheDatabaseStoreTest extends TestCase
     public function testValueIsUpsertedOnPostgres()
     {
         $store = $this->getMockBuilder(DatabaseStore::class)->onlyMethods(['getTime'])->setConstructorArgs($this->getPostgresMocks())->getMock();
-        $table = m::mock(stdClass::class);
+        $table = $this->getTableMock();
         $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
         $store->expects($this->once())->method('getTime')->willReturn(1);
         $table->shouldReceive('upsert')->once()->with([['key' => 'prefixfoo', 'value' => base64_encode(serialize("\0")), 'expiration' => 61]], 'key')->andReturn(1);
@@ -107,7 +107,7 @@ class CacheDatabaseStoreTest extends TestCase
     public function testValueIsUpsertedOnSqlite()
     {
         $store = $this->getMockBuilder(DatabaseStore::class)->onlyMethods(['getTime'])->setConstructorArgs($this->getSqliteMocks())->getMock();
-        $table = m::mock(stdClass::class);
+        $table = $this->getTableMock();
         $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
         $store->expects($this->once())->method('getTime')->willReturn(1);
         $table->shouldReceive('upsert')->once()->with([['key' => 'prefixfoo', 'value' => base64_encode(serialize("\0")), 'expiration' => 61]], 'key')->andReturn(1);
@@ -127,7 +127,7 @@ class CacheDatabaseStoreTest extends TestCase
     public function testItemsMayBeRemovedFromCache()
     {
         $store = $this->getStore();
-        $table = m::mock(stdClass::class);
+        $table = $this->getTableMock();
         $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
         $table->shouldReceive('whereIn')->once()->with('key', ['prefixfoo', 'prefixilluminate:cache:flexible:created:foo'])->andReturn($table);
         $table->shouldReceive('delete')->once();
@@ -138,7 +138,7 @@ class CacheDatabaseStoreTest extends TestCase
     public function testItemsMayBeFlushedFromCache()
     {
         $store = $this->getStore();
-        $table = m::mock(stdClass::class);
+        $table = $this->getTableMock();
         $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
         $table->shouldReceive('delete')->once()->andReturn(2);
 
@@ -149,7 +149,7 @@ class CacheDatabaseStoreTest extends TestCase
     public function testIncrementReturnsCorrectValues()
     {
         $store = $this->getStore();
-        $table = m::mock(stdClass::class);
+        $table = $this->getTableMock(4);
         $cache = m::mock(stdClass::class);
 
         $store->getConnection()->shouldReceive('transaction')->once()->with(m::type(Closure::class))->andReturnUsing(function ($closure) {
@@ -188,7 +188,7 @@ class CacheDatabaseStoreTest extends TestCase
     public function testDecrementReturnsCorrectValues()
     {
         $store = $this->getStore();
-        $table = m::mock(stdClass::class);
+        $table = $this->getTableMock(4);
         $cache = m::mock(stdClass::class);
 
         $store->getConnection()->shouldReceive('transaction')->once()->with(m::type(Closure::class))->andReturnUsing(function ($closure) {
@@ -252,5 +252,16 @@ class CacheDatabaseStoreTest extends TestCase
     protected function getSqliteMocks()
     {
         return [m::mock(SQLiteConnection::class), 'table', 'prefix'];
+    }
+
+    protected function getTableMock($times = 1)
+    {
+        $table = m::mock(stdClass::class);
+
+        $table->shouldReceive('useWritePdo')
+            ->times($times)
+            ->andReturnSelf();
+
+        return $table;
     }
 }
