@@ -641,23 +641,23 @@ class QueryBuilderTest extends DatabaseTestCase
     }
 
     #[DataProvider('providesWhereOperators')]
-    public function testWhereOperatorEnums($value, $operator, $output)
+    public function testWhereOperatorEnums($value, $operator, $useDefault, $output)
     {
         $connection = DB::table('accounting')->getConnection();
         if ($output === false) {
             $this->expectException(InvalidArgumentException::class);
             $this->expectExceptionMessage('Illegal operator and value combination.');
         }
-        $this->assertSame($output, (new Builder($connection))->prepareValueAndOperator($value, $operator, $operator === null));
+        $this->assertSame($output, (new Builder($connection))->prepareValueAndOperator($value, $operator, $useDefault));
     }
 
     public static function providesWhereOperators()
     {
         return [
-            // 'simple where with default operator' => [ 'gibberish', null, [ 'gibberish', '=' ] ],
-            'simple where with explicit string operator' => [ 'gibberish', '=', [ 'gibberish', '=' ] ],
-            'simple where with non-nullable operator' => [ null, 'like', false ],
-            'simple where with explicit enum operator' => [ 'gibberish', Comperator::Equals, [ 'gibberish', '=' ] ],
+            'simple where with default operator' => [ 'gibberish', 'gibberish', true, [ 'gibberish', '=' ] ],
+            'simple where with explicit string operator' => [ 'gibberish', '=', false, [ 'gibberish', '=' ] ],
+            'simple where with non-nullable operator' => [ null, 'like', false, false ],
+            'simple where with explicit enum operator' => [ 'gibberish', Comperator::Equals, false, [ 'gibberish', '=' ] ],
         ];
     }
 
