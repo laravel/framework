@@ -409,14 +409,14 @@ class Str
 
         $start = ltrim($matches[1]);
 
-        $start = str(mb_substr($start, max(mb_strlen($start, 'UTF-8') - $radius, 0), $radius, 'UTF-8'))->ltrim()->unless(
+        $start = Str::of(mb_substr($start, max(mb_strlen($start, 'UTF-8') - $radius, 0), $radius, 'UTF-8'))->ltrim()->unless(
             fn ($startWithRadius) => $startWithRadius->exactly($start),
             fn ($startWithRadius) => $startWithRadius->prepend($omission),
         );
 
         $end = rtrim($matches[3]);
 
-        $end = str(mb_substr($end, 0, $radius, 'UTF-8'))->rtrim()->unless(
+        $end = Str::of(mb_substr($end, 0, $radius, 'UTF-8'))->rtrim()->unless(
             fn ($endWithRadius) => $endWithRadius->exactly($end),
             fn ($endWithRadius) => $endWithRadius->append($omission),
         );
@@ -477,9 +477,10 @@ class Str
      *
      * @param  string|iterable<string>  $pattern
      * @param  string  $value
+     * @param  bool  $ignoreCase
      * @return bool
      */
-    public static function is($pattern, $value)
+    public static function is($pattern, $value, $ignoreCase = false)
     {
         $value = (string) $value;
 
@@ -497,6 +498,10 @@ class Str
                 return true;
             }
 
+            if ($ignoreCase && mb_strtolower($pattern) === mb_strtolower($value)) {
+                return true;
+            }
+
             $pattern = preg_quote($pattern, '#');
 
             // Asterisks are translated into zero-or-more regular expression wildcards
@@ -504,7 +509,7 @@ class Str
             // pattern such as "library/*", making any string check convenient.
             $pattern = str_replace('\*', '.*', $pattern);
 
-            if (preg_match('#^'.$pattern.'\z#u', $value) === 1) {
+            if (preg_match('#^'.$pattern.'\z#'.($ignoreCase ? 'iu' : 'u'), $value) === 1) {
                 return true;
             }
         }

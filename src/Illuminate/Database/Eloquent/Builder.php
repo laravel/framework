@@ -121,6 +121,7 @@ class Builder implements BuilderContract
         'insertorignoreusing',
         'max',
         'min',
+        'numericaggregate',
         'raw',
         'rawvalue',
         'sum',
@@ -622,6 +623,25 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Create a record matching the attributes, or increment the existing record.
+     *
+     * @param  array  $attributes
+     * @param  string  $column
+     * @param  int|float  $default
+     * @param  int|float  $step
+     * @param  array  $extra
+     * @return TModel
+     */
+    public function incrementOrCreate(array $attributes, string $column = 'count', $default = 1, $step = 1, array $extra = [])
+    {
+        return tap($this->firstOrCreate($attributes, [$column => $default]), function ($instance) use ($column, $step, $extra) {
+            if (! $instance->wasRecentlyCreated) {
+                $instance->increment($column, $step, $extra);
+            }
+        });
+    }
+
+    /**
      * Execute the query and get the first result or throw an exception.
      *
      * @param  array|string  $columns
@@ -946,10 +966,10 @@ class Builder implements BuilderContract
         // If the model has a mutator for the requested column, we will spin through
         // the results and mutate the values so that the mutated version of these
         // columns are returned as you would expect from these Eloquent models.
-        if (! $this->model->hasGetMutator($column) &&
+        if (! $this->model->hasAnyGetMutator($column) &&
             ! $this->model->hasCast($column) &&
             ! in_array($column, $this->model->getDates())) {
-            return $results;
+            return $this->applyAfterQueryCallbacks($results);
         }
 
         return $this->applyAfterQueryCallbacks(
@@ -1728,12 +1748,8 @@ class Builder implements BuilderContract
     {
         return [explode(':', $name)[0], static function ($query) use ($name) {
             $query->select(array_map(static function ($column) use ($query) {
-                if (str_contains($column, '.')) {
-                    return $column;
-                }
-
                 return $query instanceof BelongsToMany
-                        ? $query->getRelated()->getTable().'.'.$column
+                        ? $query->getRelated()->qualifyColumn($column)
                         : $column;
             }, explode(',', explode(':', $name)[1])));
         }];

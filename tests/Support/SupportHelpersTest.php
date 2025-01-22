@@ -7,6 +7,7 @@ use ArrayIterator;
 use Countable;
 use Error;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Env;
 use Illuminate\Support\Optional;
 use Illuminate\Support\Sleep;
@@ -73,6 +74,19 @@ class SupportHelpersTest extends TestCase
 
         $object = new SupportTestCountable();
         $this->assertTrue(blank($object));
+    }
+
+    public function testBlankDoesntJsonSerializeModels()
+    {
+        $model = new class extends Model
+        {
+            public function jsonSerialize(): mixed
+            {
+                throw new RuntimeException('Model should not be serialized');
+            }
+        };
+
+        $this->assertFalse(blank($model));
     }
 
     public function testClassBasename()
@@ -395,6 +409,27 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals(['dollar', 'asterisk', 'caret'], data_get($array, 'symbols.*.description'));
         $this->assertEquals('dollar', data_get($array, 'symbols.\{last}.description'));
         $this->assertEquals('caret', data_get($array, 'symbols.{last}.description'));
+    }
+
+    public function testDataGetStar()
+    {
+        $data = ['foo' => 'bar'];
+        $this->assertEquals(['bar'], data_get($data, '*'));
+
+        $data = collect(['foo' => 'bar']);
+        $this->assertEquals(['bar'], data_get($data, '*'));
+    }
+
+    public function testDataGetNullKey()
+    {
+        $data = ['foo' => 'bar'];
+
+        $this->assertEquals(['foo' => 'bar'], data_get($data, null));
+        $this->assertEquals(['foo' => 'bar'], data_get($data, null, '42'));
+        $this->assertEquals(['foo' => 'bar'], data_get($data, [null]));
+
+        $data = ['foo' => 'bar', 'baz' => 42];
+        $this->assertEquals(['foo' => 'bar', 'baz' => 42], data_get($data, [null, 'foo']));
     }
 
     public function testDataFill()

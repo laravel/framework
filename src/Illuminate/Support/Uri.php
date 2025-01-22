@@ -8,15 +8,16 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Traits\Conditionable;
+use Illuminate\Support\Traits\Dumpable;
 use Illuminate\Support\Traits\Tappable;
 use League\Uri\Contracts\UriInterface;
 use League\Uri\Uri as LeagueUri;
 use SensitiveParameter;
 use Stringable;
 
-class Uri implements Htmlable, Responsable
+class Uri implements Htmlable, Responsable, Stringable
 {
-    use Conditionable, Tappable;
+    use Conditionable, Dumpable, Tappable;
 
     /**
      * The URI instance.
@@ -65,6 +66,36 @@ class Uri implements Htmlable, Responsable
     public static function route($name, $parameters = [], $absolute = true): static
     {
         return new static(call_user_func(static::$urlGeneratorResolver)->route($name, $parameters, $absolute));
+    }
+
+    /**
+     * Create a signed route URI instance for a named route.
+     *
+     * @param  \BackedEnum|string  $name
+     * @param  mixed  $parameters
+     * @param  \DateTimeInterface|\DateInterval|int|null  $expiration
+     * @param  bool  $absolute
+     * @return static
+     *
+     * @throws \InvalidArgumentException
+     */
+    public static function signedRoute($name, $parameters = [], $expiration = null, $absolute = true): static
+    {
+        return new static(call_user_func(static::$urlGeneratorResolver)->signedRoute($name, $parameters, $expiration, $absolute));
+    }
+
+    /**
+     * Create a temporary signed route URI instance for a named route.
+     *
+     * @param  \BackedEnum|string  $name
+     * @param  \DateTimeInterface|\DateInterval|int  $expiration
+     * @param  array  $parameters
+     * @param  bool  $absolute
+     * @return static
+     */
+    public static function temporarySignedRoute($name, $expiration, $parameters = [], $absolute = true): static
+    {
+        return static::signedRoute($name, $parameters, $expiration, $absolute);
     }
 
     /**
@@ -243,7 +274,7 @@ class Uri implements Htmlable, Responsable
     /**
      * Remove the given query parameters from the URI.
      */
-    public function withoutQuery(array $keys): static
+    public function withoutQuery(array|string $keys): static
     {
         return $this->replaceQuery(Arr::except($this->query()->all(), $keys));
     }
@@ -319,6 +350,19 @@ class Uri implements Htmlable, Responsable
     public function isEmpty(): bool
     {
         return trim($this->value()) === '';
+    }
+
+    /**
+     * Dump the string representation of the URI.
+     *
+     * @param  mixed  ...$args
+     * @return $this
+     */
+    public function dump(...$args)
+    {
+        dump($this->value(), ...$args);
+
+        return $this;
     }
 
     /**

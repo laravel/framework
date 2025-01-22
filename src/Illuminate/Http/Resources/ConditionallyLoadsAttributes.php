@@ -3,7 +3,7 @@
 namespace Illuminate\Http\Resources;
 
 use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
+use Illuminate\Support\Stringable;
 
 trait ConditionallyLoadsAttributes
 {
@@ -297,7 +297,7 @@ trait ConditionallyLoadsAttributes
             $default = new MissingValue;
         }
 
-        $attribute = (string) Str::of($relationship)->snake()->finish('_count');
+        $attribute = (new Stringable($relationship))->snake()->finish('_count')->value();
 
         if (! array_key_exists($attribute, $this->resource->getAttributes())) {
             return value($default);
@@ -334,7 +334,7 @@ trait ConditionallyLoadsAttributes
             $default = new MissingValue;
         }
 
-        $attribute = (string) Str::of($relationship)->snake()->append('_')->append($aggregate)->append('_')->finish($column);
+        $attribute = (new Stringable($relationship))->snake()->append('_')->append($aggregate)->append('_')->finish($column)->value();
 
         if (! array_key_exists($attribute, $this->resource->getAttributes())) {
             return value($default);
@@ -369,7 +369,7 @@ trait ConditionallyLoadsAttributes
             $default = new MissingValue;
         }
 
-        $attribute = (string) Str::of($relationship)->snake()->finish('_exists');
+        $attribute = (new Stringable($relationship))->snake()->finish('_exists')->value();
 
         if (! array_key_exists($attribute, $this->resource->getAttributes())) {
             return value($default);

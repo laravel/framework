@@ -6,6 +6,7 @@ use Exception;
 use Illuminate\Bus\Batchable;
 use Illuminate\Bus\UniqueLock;
 use Illuminate\Contracts\Bus\Dispatcher;
+use Illuminate\Contracts\Cache\Factory as CacheFactory;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Encryption\Encrypter;
@@ -13,6 +14,7 @@ use Illuminate\Contracts\Queue\Job;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Log\Context\Repository as ContextRepository;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Queue\Attributes\DeleteWhenMissingModels;
 use ReflectionClass;
@@ -227,11 +229,42 @@ class CallQueuedHandler
             $shouldDelete = false;
         }
 
+        $this->ensureUniqueJobLockIsReleasedViaContext();
+
         if ($shouldDelete) {
             return $job->delete();
         }
 
         return $job->fail($e);
+    }
+
+    /**
+     * Ensure the lock for a unique job is released via context.
+     *
+     * This is required when we can't unserialize the job due to missing models.
+     *
+     * @return void
+     */
+    protected function ensureUniqueJobLockIsReleasedViaContext()
+    {
+        if (! $this->container->bound(ContextRepository::class) ||
+            ! $this->container->bound(CacheFactory::class)) {
+            return;
+        }
+
+        $context = $this->container->make(ContextRepository::class);
+
+        [$store, $key] = [
+            $context->getHidden('laravel_unique_job_cache_store'),
+            $context->getHidden('laravel_unique_job_key'),
+        ];
+
+        if ($store && $key) {
+            $this->container->make(CacheFactory::class)
+                ->store($store)
+                ->lock($key)
+                ->forceRelease();
+        }
     }
 
     /**

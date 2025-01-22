@@ -62,6 +62,21 @@ class SupportFluentTest extends TestCase
         $this->assertNull($fluent->foo);
     }
 
+    public function testSetMethodSetsAttribute()
+    {
+        $fluent = new Fluent;
+
+        $fluent->set('name', 'Taylor');
+        $fluent->set('developer', true);
+        $fluent->set('posts', 25);
+        $fluent->set('computer.color', 'silver');
+
+        $this->assertSame('Taylor', $fluent->name);
+        $this->assertTrue($fluent->developer);
+        $this->assertSame(25, $fluent->posts);
+        $this->assertSame(['color' => 'silver'], $fluent->computer);
+    }
+
     public function testArrayAccessToAttributes()
     {
         $fluent = new Fluent(['attributes' => '1']);
@@ -226,6 +241,33 @@ class SupportFluentTest extends TestCase
         $this->assertSame(123.456, $fluent->float('unknown_key', 123.456));
         $this->assertSame(0.0, $fluent->float('null'));
         $this->assertSame(0.0, $fluent->float('null', 123.456));
+    }
+
+    public function testArrayMethod()
+    {
+        $fluent = new Fluent(['users' => [1, 2, 3]]);
+
+        $this->assertIsArray($fluent->array('users'));
+        $this->assertEquals([1, 2, 3], $fluent->array('users'));
+        $this->assertEquals(['users' => [1, 2, 3]], $fluent->array());
+
+        $fluent = new Fluent(['text-payload']);
+        $this->assertEquals(['text-payload'], $fluent->array());
+
+        $fluent = new Fluent(['email' => 'test@example.com']);
+        $this->assertEquals(['test@example.com'], $fluent->array('email'));
+
+        $fluent = new Fluent([]);
+        $this->assertIsArray($fluent->array());
+        $this->assertEmpty($fluent->array());
+
+        $fluent = new Fluent(['users' => [1, 2, 3], 'roles' => [4, 5, 6], 'foo' => ['bar', 'baz'], 'email' => 'test@example.com']);
+        $this->assertEmpty($fluent->array(['developers']));
+        $this->assertNotEmpty($fluent->array(['roles']));
+        $this->assertEquals(['roles' => [4, 5, 6]], $fluent->array(['roles']));
+        $this->assertEquals(['users' => [1, 2, 3], 'email' => 'test@example.com'], $fluent->array(['users', 'email']));
+        $this->assertEquals(['roles' => [4, 5, 6], 'foo' => ['bar', 'baz']], $fluent->array(['roles', 'foo']));
+        $this->assertEquals(['users' => [1, 2, 3], 'roles' => [4, 5, 6], 'foo' => ['bar', 'baz'], 'email' => 'test@example.com'], $fluent->array());
     }
 
     public function testCollectMethod()

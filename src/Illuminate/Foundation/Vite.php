@@ -800,7 +800,7 @@ class Vite implements Htmlable
      */
     protected function isCssPath($path)
     {
-        return preg_match('/\.(css|less|sass|scss|styl|stylus|pcss|postcss)$/', $path) === 1;
+        return preg_match('/\.(css|less|sass|scss|styl|stylus|pcss|postcss)(\?[^\.]*)?$/', $path) === 1;
     }
 
     /**

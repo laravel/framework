@@ -162,7 +162,7 @@ class MorphTo extends BelongsTo
         $whereIn = $this->whereInMethod($instance, $ownerKey);
 
         return $query->{$whereIn}(
-            $instance->getTable().'.'.$ownerKey, $this->gatherKeysByType($type, $instance->getKeyType())
+            $instance->qualifyColumn($ownerKey), $this->gatherKeysByType($type, $instance->getKeyType())
         )->get();
     }
 

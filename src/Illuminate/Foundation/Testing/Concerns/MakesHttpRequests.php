@@ -7,6 +7,7 @@ use Illuminate\Contracts\Http\Kernel as HttpKernel;
 use Illuminate\Cookie\CookieValuePrefix;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Uri;
 use Illuminate\Testing\LoggedExceptionCollection;
 use Illuminate\Testing\TestResponse;
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
@@ -355,7 +356,7 @@ trait MakesHttpRequests
     /**
      * Visit the given URI with a GET request.
      *
-     * @param  string  $uri
+     * @param  \Illuminate\Support\Uri|string  $uri
      * @param  array  $headers
      * @return \Illuminate\Testing\TestResponse
      */
@@ -370,7 +371,7 @@ trait MakesHttpRequests
     /**
      * Visit the given URI with a GET request, expecting a JSON response.
      *
-     * @param  string  $uri
+     * @param  \Illuminate\Support\Uri|string  $uri
      * @param  array  $headers
      * @param  int  $options
      * @return \Illuminate\Testing\TestResponse
@@ -383,7 +384,7 @@ trait MakesHttpRequests
     /**
      * Visit the given URI with a POST request.
      *
-     * @param  string  $uri
+     * @param  \Illuminate\Support\Uri|string  $uri
      * @param  array  $data
      * @param  array  $headers
      * @return \Illuminate\Testing\TestResponse
@@ -399,7 +400,7 @@ trait MakesHttpRequests
     /**
      * Visit the given URI with a POST request, expecting a JSON response.
      *
-     * @param  string  $uri
+     * @param  \Illuminate\Support\Uri|string  $uri
      * @param  array  $data
      * @param  array  $headers
      * @param  int  $options
@@ -413,7 +414,7 @@ trait MakesHttpRequests
     /**
      * Visit the given URI with a PUT request.
      *
-     * @param  string  $uri
+     * @param  \Illuminate\Support\Uri|string  $uri
      * @param  array  $data
      * @param  array  $headers
      * @return \Illuminate\Testing\TestResponse
@@ -429,7 +430,7 @@ trait MakesHttpRequests
     /**
      * Visit the given URI with a PUT request, expecting a JSON response.
      *
-     * @param  string  $uri
+     * @param  \Illuminate\Support\Uri|string  $uri
      * @param  array  $data
      * @param  array  $headers
      * @param  int  $options
@@ -443,7 +444,7 @@ trait MakesHttpRequests
     /**
      * Visit the given URI with a PATCH request.
      *
-     * @param  string  $uri
+     * @param  \Illuminate\Support\Uri|string  $uri
      * @param  array  $data
      * @param  array  $headers
      * @return \Illuminate\Testing\TestResponse
@@ -459,7 +460,7 @@ trait MakesHttpRequests
     /**
      * Visit the given URI with a PATCH request, expecting a JSON response.
      *
-     * @param  string  $uri
+     * @param  \Illuminate\Support\Uri|string  $uri
      * @param  array  $data
      * @param  array  $headers
      * @param  int  $options
@@ -473,7 +474,7 @@ trait MakesHttpRequests
     /**
      * Visit the given URI with a DELETE request.
      *
-     * @param  string  $uri
+     * @param  \Illuminate\Support\Uri|string  $uri
      * @param  array  $data
      * @param  array  $headers
      * @return \Illuminate\Testing\TestResponse
@@ -489,7 +490,7 @@ trait MakesHttpRequests
     /**
      * Visit the given URI with a DELETE request, expecting a JSON response.
      *
-     * @param  string  $uri
+     * @param  \Illuminate\Support\Uri|string  $uri
      * @param  array  $data
      * @param  array  $headers
      * @param  int  $options
@@ -503,7 +504,7 @@ trait MakesHttpRequests
     /**
      * Visit the given URI with an OPTIONS request.
      *
-     * @param  string  $uri
+     * @param  \Illuminate\Support\Uri|string  $uri
      * @param  array  $data
      * @param  array  $headers
      * @return \Illuminate\Testing\TestResponse
@@ -520,7 +521,7 @@ trait MakesHttpRequests
     /**
      * Visit the given URI with an OPTIONS request, expecting a JSON response.
      *
-     * @param  string  $uri
+     * @param  \Illuminate\Support\Uri|string  $uri
      * @param  array  $data
      * @param  array  $headers
      * @param  int  $options
@@ -534,7 +535,7 @@ trait MakesHttpRequests
     /**
      * Visit the given URI with a HEAD request.
      *
-     * @param  string  $uri
+     * @param  \Illuminate\Support\Uri|string  $uri
      * @param  array  $headers
      * @return \Illuminate\Testing\TestResponse
      */
@@ -551,7 +552,7 @@ trait MakesHttpRequests
      * Call the given URI with a JSON request.
      *
      * @param  string  $method
-     * @param  string  $uri
+     * @param  \Illuminate\Support\Uri|string  $uri
      * @param  array  $data
      * @param  array  $headers
      * @param  int  $options
@@ -584,7 +585,7 @@ trait MakesHttpRequests
      * Call the given URI and return the Response.
      *
      * @param  string  $method
-     * @param  string  $uri
+     * @param  \Illuminate\Support\Uri|string  $uri
      * @param  array  $parameters
      * @param  array  $cookies
      * @param  array  $files
@@ -619,11 +620,13 @@ trait MakesHttpRequests
     /**
      * Turn the given URI into a fully qualified URL.
      *
-     * @param  string  $uri
+     * @param  \Illuminate\Support\Uri|string  $uri
      * @return string
      */
     protected function prepareUrlForRequest($uri)
     {
+        $uri = $uri instanceof Uri ? $uri->value() : $uri;
+
         if (str_starts_with($uri, '/')) {
             $uri = substr($uri, 1);
         }

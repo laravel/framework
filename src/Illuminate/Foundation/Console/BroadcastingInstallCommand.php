@@ -8,6 +8,7 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Process;
 use Symfony\Component\Console\Attribute\AsCommand;
 
+use function Illuminate\Support\artisan_binary;
 use function Illuminate\Support\php_binary;
 use function Laravel\Prompts\confirm;
 
@@ -156,7 +157,7 @@ class BroadcastingInstallCommand extends Command
 
         Process::run([
             php_binary(),
-            defined('ARTISAN_BINARY') ? ARTISAN_BINARY : 'artisan',
+            artisan_binary(),
             'reverb:install',
         ]);
 

@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation;
 
 use Illuminate\Support\Collection;
+use Illuminate\Support\Stringable;
 
 /*
                                                    .~))>>
@@ -118,7 +119,7 @@ class Inspiring
      */
     protected static function formatForConsole($quote)
     {
-        [$text, $author] = str($quote)->explode('-');
+        [$text, $author] = (new Stringable($quote))->explode('-');
 
         return sprintf(
             "\n  <options=bold>“ %s ”</>\n  <fg=gray>— %s</>\n",

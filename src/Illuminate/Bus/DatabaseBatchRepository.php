@@ -319,7 +319,7 @@ class DatabaseBatchRepository implements PrunableBatchRepository
      */
     public function rollBack()
     {
-        $this->connection->rollBack();
+        $this->connection->rollBack(toLevel: 0);
     }
 
     /**

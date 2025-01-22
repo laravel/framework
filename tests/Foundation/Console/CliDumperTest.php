@@ -68,7 +68,10 @@ class CliDumperTest extends TestCase
 
         EOF;
 
-        $this->assertSame($expected, $output);
+        $this->assertSame(
+            str_replace("\r\n", "\n", $expected),
+            str_replace("\r\n", "\n", $output)
+        );
     }
 
     public function testBoolean()
@@ -96,7 +99,10 @@ class CliDumperTest extends TestCase
 
         EOF;
 
-        $this->assertSame($expected, $output);
+        $this->assertSame(
+            str_replace("\r\n", "\n", $expected),
+            str_replace("\r\n", "\n", $output)
+        );
     }
 
     public function testNull()

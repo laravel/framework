@@ -86,7 +86,7 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
      * If no arguments are passed, the default file rule configuration will be returned.
      *
      * @param  static|callable|null  $callback
-     * @return static|null
+     * @return static|void
      */
     public static function defaults($callback = null)
     {
@@ -330,7 +330,7 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
      */
     protected function fail($messages)
     {
-        $messages = (new Collection(Arr::wrap($messages)))
+        $messages = Collection::wrap($messages)
             ->map(fn ($message) => $this->validator->getTranslator()->get($message))
             ->all();
 

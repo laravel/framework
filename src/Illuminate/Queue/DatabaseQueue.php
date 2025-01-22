@@ -10,6 +10,7 @@ use Illuminate\Queue\Jobs\DatabaseJobRecord;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Illuminate\Support\Stringable;
 use PDO;
 
 class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
@@ -260,10 +261,10 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
         $databaseEngine = $this->database->getPdo()->getAttribute(PDO::ATTR_DRIVER_NAME);
         $databaseVersion = $this->database->getConfig('version') ?? $this->database->getPdo()->getAttribute(PDO::ATTR_SERVER_VERSION);
 
-        if (Str::of($databaseVersion)->contains('MariaDB')) {
+        if ((new Stringable($databaseVersion))->contains('MariaDB')) {
             $databaseEngine = 'mariadb';
             $databaseVersion = Str::before(Str::after($databaseVersion, '5.5.5-'), '-');
-        } elseif (Str::of($databaseVersion)->contains(['vitess', 'PlanetScale'])) {
+        } elseif ((new Stringable($databaseVersion))->contains(['vitess', 'PlanetScale'])) {
             $databaseEngine = 'vitess';
             $databaseVersion = Str::before($databaseVersion, '-');
         }

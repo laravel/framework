@@ -274,9 +274,7 @@ abstract class Factory
      */
     public function createManyQuietly(int|iterable|null $records = null)
     {
-        return Model::withoutEvents(function () use ($records) {
-            return $this->createMany($records);
-        });
+        return Model::withoutEvents(fn () => $this->createMany($records));
     }
 
     /**
@@ -316,9 +314,7 @@ abstract class Factory
      */
     public function createQuietly($attributes = [], ?Model $parent = null)
     {
-        return Model::withoutEvents(function () use ($attributes, $parent) {
-            return $this->create($attributes, $parent);
-        });
+        return Model::withoutEvents(fn () => $this->create($attributes, $parent));
     }
 
     /**
@@ -472,11 +468,10 @@ abstract class Factory
      */
     protected function parentResolvers()
     {
-        $model = $this->newModel();
-
-        return $this->for->map(function (BelongsToRelationship $for) use ($model) {
-            return $for->recycle($this->recycle)->attributesFor($model);
-        })->collapse()->all();
+        return $this->for
+            ->map(fn (BelongsToRelationship $for) => $for->recycle($this->recycle)->attributesFor($this->newModel()))
+            ->collapse()
+            ->all();
     }
 
     /**
@@ -524,9 +519,7 @@ abstract class Factory
     {
         return $this->newInstance([
             'states' => $this->states->concat([
-                is_callable($state) ? $state : function () use ($state) {
-                    return $state;
-                },
+                is_callable($state) ? $state : fn () => $state,
             ]),
         ]);
     }
@@ -813,6 +806,10 @@ abstract class Factory
      */
     public function modelName()
     {
+        if ($this->model !== null) {
+            return $this->model;
+        }
+
         $resolver = static::$modelNameResolver ?? function (self $factory) {
             $namespacedFactoryBasename = Str::replaceLast(
                 'Factory', '', Str::replaceFirst(static::$namespace, '', get_class($factory))
@@ -827,7 +824,7 @@ abstract class Factory
                         : $appNamespace.$factoryBasename;
         };
 
-        return $this->model ?? $resolver($this);
+        return $resolver($this);
     }
 
     /**

@@ -147,7 +147,7 @@ trait RunsInParallel
             ? $this->options->processes
             : $this->options->processes();
 
-        (new Collection(range(1, $processes)))->each(function ($token) use ($callback) {
+        Collection::range(1, $processes)->each(function ($token) use ($callback) {
             tap($this->createApplication(), function ($app) use ($callback, $token) {
                 ParallelTesting::resolveTokenUsing(fn () => $token);
 
