@@ -1775,7 +1775,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     * Specify attributes that should be added to any new models created by this builder.
+     * Specify attributes that should be added to any new models created by this builder, as well as qualify queries executed by this builder.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|array|string  $attributes
      * @param  mixed  $value
