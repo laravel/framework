@@ -2,6 +2,8 @@
 
 namespace Illuminate\Database\Schema;
 
+use Illuminate\Support\Arr;
+
 class SqlServerBuilder extends Builder
 {
     /**
@@ -59,6 +61,6 @@ class SqlServerBuilder extends Builder
      */
     public function getCurrentSchemaName()
     {
-        return $this->connection->scalar($this->grammar->compileDefaultSchema());
+        return Arr::first($this->getSchemas(), fn ($schema) => $schema['default'])['name'];
     }
 }

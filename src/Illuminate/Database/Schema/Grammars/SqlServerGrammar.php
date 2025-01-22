@@ -38,16 +38,6 @@ class SqlServerGrammar extends Grammar
     protected $fluentCommands = ['Default'];
 
     /**
-     * Compile a query to determine the name of the default schema.
-     *
-     * @return string
-     */
-    public function compileDefaultSchema()
-    {
-        return 'select schema_name()';
-    }
-
-    /**
      * Compile a create database command.
      *
      * @param  string  $name
@@ -77,6 +67,17 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
+     * Compile the query to determine the schemas.
+     *
+     * @return string
+     */
+    public function compileSchemas()
+    {
+        return 'select name, iif(schema_id = schema_id(), 1, 0) as [default] from sys.schemas '
+            ."where name not in ('information_schema', 'sys') and name not like 'db[_]%' order by name";
+    }
+
+    /**
      * Compile the query to determine if the given table exists.
      *
      * @param  string|null  $schema
@@ -89,18 +90,6 @@ class SqlServerGrammar extends Grammar
             'select (case when object_id(%s, \'U\') is null then 0 else 1 end) as [exists]',
             $this->quoteString($schema ? $schema.'.'.$table : $table)
         );
-    }
-
-    /**
-     * Compile the query to determine the schemas.
-     *
-     * @return string
-     */
-    public function compileSchemas()
-    {
-        return 'select name, iif(schema_id = schema_id(), 1, 0) as [default] from sys.schemas '
-            ."where name not in ('information_schema', 'sys') and name not like 'db[_]%' "
-            .'order by name';
     }
 
     /**

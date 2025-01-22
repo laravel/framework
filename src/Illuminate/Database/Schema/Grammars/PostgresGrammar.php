@@ -78,7 +78,7 @@ class PostgresGrammar extends Grammar
     {
         return 'select nspname as name, nspname = current_schema() as "default" from pg_namespace where '
             .$this->compileSchemaWhereClause(null, 'nspname')
-            .' order by name';
+            .' order by nspname';
     }
 
     /**
