@@ -38,40 +38,6 @@ class PendingDispatch
     public function __construct($job)
     {
         $this->job = $job;
-
-        $this->setQueueAndConnectionFromAttributesIfNotSet();
-    }
-
-    /**
-     * Set the job's queue and connection values based on the job's OnQueue/OnConnection attributes.
-     *
-     * @return void
-     *
-     * @throws \ReflectionException
-     */
-    protected function setQueueAndConnectionFromAttributesIfNotSet(): void
-    {
-        $hasQueueSet = isset($this->job->queue);
-        $hasConnectionSet = isset($this->job->connection);
-
-        if ($hasQueueSet && $hasConnectionSet) {
-            return;
-        }
-
-        $reflectionClass = new \ReflectionClass($this->job);
-        if (! $hasQueueSet) {
-            $onQueue = $reflectionClass->getAttributes(OnQueue::class);
-            if ($onQueue !== []) {
-                $this->onQueue($onQueue[0]->newInstance()->queue);
-            }
-        }
-
-        if (! $hasConnectionSet) {
-            $onConnection = $reflectionClass->getAttributes(OnConnection::class);
-            if ($onConnection !== []) {
-                $this->onConnection($onConnection[0]->newInstance()->connection);
-            }
-        }
     }
 
     /**
@@ -226,6 +192,38 @@ class PendingDispatch
     }
 
     /**
+     * Set the job's queue and connection values based on the job's OnQueue/OnConnection attributes.
+     *
+     * @return void
+     *
+     * @throws \ReflectionException
+     */
+    protected function setQueueAndConnectionFromAttributesIfNotSet(): void
+    {
+        $hasQueueSet = isset($this->job->queue);
+        $hasConnectionSet = isset($this->job->connection);
+
+        if ($hasQueueSet && $hasConnectionSet) {
+            return;
+        }
+
+        $reflectionClass = new \ReflectionClass($this->job);
+        if (! $hasQueueSet) {
+            $onQueue = $reflectionClass->getAttributes(OnQueue::class);
+            if ($onQueue !== []) {
+                $this->onQueue($onQueue[0]->newInstance()->queue);
+            }
+        }
+
+        if (! $hasConnectionSet) {
+            $onConnection = $reflectionClass->getAttributes(OnConnection::class);
+            if ($onConnection !== []) {
+                $this->onConnection($onConnection[0]->newInstance()->connection);
+            }
+        }
+    }
+
+    /**
      * Dynamically proxy methods to the underlying job.
      *
      * @param  string  $method
@@ -247,6 +245,7 @@ class PendingDispatch
     public function __destruct()
     {
         $this->addUniqueJobInformationToContext($this->job);
+        $this->setQueueAndConnectionFromAttributesIfNotSet();
 
         if (! $this->shouldDispatch()) {
             $this->removeUniqueJobInformationFromContext($this->job);
