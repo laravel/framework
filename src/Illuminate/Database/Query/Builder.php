@@ -15,6 +15,8 @@ use Illuminate\Database\Concerns\ExplainsQueries;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Enums\Comperator;
+use Illuminate\Database\Enums\LogicalOperator;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Pagination\Paginator;
@@ -814,11 +816,13 @@ class Builder implements BuilderContract
      * @param  \Closure|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
      * @param  mixed  $operator
      * @param  mixed  $value
-     * @param  string  $boolean
+     * @param  string|\Illuminate\Database\Enums\LogicalOperator  $boolean
      * @return $this
      */
     public function where($column, $operator = null, $value = null, $boolean = 'and')
     {
+        $boolean = enum_value($boolean);
+
         if ($column instanceof ConditionExpression) {
             $type = 'Expression';
 
@@ -939,7 +943,7 @@ class Builder implements BuilderContract
      * Prepare the value and operator for a where clause.
      *
      * @param  string  $value
-     * @param  string  $operator
+     * @param  string|\Illuminate\Database\Enums\Comperator  $operator
      * @param  bool  $useDefault
      * @return array
      *
@@ -949,11 +953,11 @@ class Builder implements BuilderContract
     {
         if ($useDefault) {
             return [$operator, '='];
-        } elseif ($this->invalidOperatorAndValue($operator, $value)) {
+        } elseif (!($operator instanceof Comperator) && $this->invalidOperatorAndValue($operator, $value)) {
             throw new InvalidArgumentException('Illegal operator and value combination.');
         }
 
-        return [$value, $operator];
+        return [$value, enum_value($operator)];
     }
 
     /**
