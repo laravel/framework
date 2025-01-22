@@ -49,7 +49,7 @@ class Processor
 
             return [
                 'name' => $result->name,
-                'path' => $result->path ?? null, // SQLite only
+                'path' => $result->path ?? null, // SQLite Only...
                 'default' => (bool) $result->default,
             ];
         }, $results);
