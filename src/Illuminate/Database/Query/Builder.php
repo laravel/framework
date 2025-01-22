@@ -814,7 +814,7 @@ class Builder implements BuilderContract
     /**
      * Add a basic where clause to the query.
      *
-     * @param  \Closure(\Illuminate\Database\Query\Builder): mixed|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @param  \Closure(\Illuminate\Database\Query\Builder): mixed|string|array<string, mixed>|(array{string, string, mixed}|array{string, mixed}|array{column: string, operator?: string, value: mixed})[]|\Illuminate\Contracts\Database\Query\Expression  $column
      * @param  Operator|null  $operator
      * @param  mixed  $value
      * @param  'and'|'or'  $boolean
@@ -920,7 +920,7 @@ class Builder implements BuilderContract
     /**
      * Add an array of where clauses to the query.
      *
-     * @param  array  $column
+     * @param  array<string, mixed>|(array{string, string, mixed}|array{string, mixed}|array{column: string, operator?: string, value: mixed})[]  $column
      * @param  'and'|'or'  $boolean
      * @param  string  $method
      * @return $this
@@ -1001,7 +1001,7 @@ class Builder implements BuilderContract
     /**
      * Add an "or where" clause to the query.
      *
-     * @param  \Closure(\Illuminate\Database\Query\Builder): mixed|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @param  \Closure(\Illuminate\Database\Query\Builder): mixed|string|array<string, mixed>|(array{string, string, mixed}|array{string, mixed}|array{column: string, operator?: string, value: mixed})[]|\Illuminate\Contracts\Database\Query\Expression  $column
      * @param  Operator|null  $operator
      * @param  mixed  $value
      * @return $this
@@ -1018,7 +1018,7 @@ class Builder implements BuilderContract
     /**
      * Add a basic "where not" clause to the query.
      *
-     * @param  \Closure(\Illuminate\Database\Query\Builder): mixed|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @param  \Closure(\Illuminate\Database\Query\Builder): mixed|string|array<string, mixed>|(array{string, string, mixed}|array{string, mixed}|array{column: string, operator?: string, value: mixed})[]|\Illuminate\Contracts\Database\Query\Expression  $column
      * @param  Operator|null  $operator
      * @param  mixed  $value
      * @param  'and'|'or'  $boolean
@@ -1038,7 +1038,7 @@ class Builder implements BuilderContract
     /**
      * Add an "or where not" clause to the query.
      *
-     * @param  \Closure(\Illuminate\Database\Query\Builder): mixed|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @param  \Closure(\Illuminate\Database\Query\Builder): mixed|string|array<string, mixed>|(array{string, string, mixed}|array{string, mixed}|array{column: string, operator?: string, value: mixed})[]|\Illuminate\Contracts\Database\Query\Expression  $column
      * @param  Operator|null  $operator
      * @param  mixed  $value
      * @return $this
