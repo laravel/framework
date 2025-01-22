@@ -3,8 +3,8 @@
 namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\MultipleRecordsFoundException;
 use Illuminate\Database\Enums\Comperator;
+use Illuminate\Database\MultipleRecordsFoundException;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\RecordsNotFoundException;
 use Illuminate\Database\Schema\Blueprint;
@@ -657,7 +657,7 @@ class QueryBuilderTest extends DatabaseTestCase
             'simple where with default operator' => ['gibberish', 'gibberish', true, ['gibberish', '=']],
             'simple where with explicit string operator' => ['gibberish', '=', false, ['gibberish', '=']],
             'simple where with non-nullable operator' => [null, 'like', false, false],
-            'simple where with explicit enum operator' => ['gibberish', Comperator::Equals, false, [ 'gibberish', '=']],
+            'simple where with explicit enum operator' => ['gibberish', Comperator::Equals, false, ['gibberish', '=']],
         ];
     }
 
