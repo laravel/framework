@@ -48,7 +48,7 @@ class DynamoDbFailedJobProvider implements FailedJobProviderInterface
      * @param  int  $expireDays
      * @return void
      */
-    public function __construct(DynamoDbClient $dynamo, $applicationName, $table, $expireDays)
+    public function __construct(DynamoDbClient $dynamo, $applicationName, $table, $expireDays = 3)
     {
         $this->table = $table;
         $this->dynamo = $dynamo;
