@@ -373,6 +373,7 @@ abstract class Broadcaster implements BroadcasterContract
     protected function channelNameMatchesPattern($channel, $pattern)
     {
         $pattern = str_replace('.', '\.', $pattern);
+
         return preg_match('/^'.preg_replace('/\{(.*?)\}/', '([^\.]+)', $pattern).'$/', $channel);
     }
 
