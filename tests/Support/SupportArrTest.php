@@ -648,7 +648,7 @@ class SupportArrTest extends TestCase
 
         // Test with array having numeric keys
         $this->assertEquals(['foo'], Arr::only(['foo', 'bar', 'baz'], 0));
-        $this->assertEquals([1 => 'bar', 2 =>'baz'], Arr::only(['foo', 'bar', 'baz'], [1, 2]));
+        $this->assertEquals([1 => 'bar', 2 => 'baz'], Arr::only(['foo', 'bar', 'baz'], [1, 2]));
         $this->assertEmpty(Arr::only(['foo', 'bar', 'baz'], [3]));
 
         // Test with array having numeric key and string key
