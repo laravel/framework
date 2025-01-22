@@ -169,7 +169,7 @@ class RedirectResponse extends BaseRedirectResponse
     public function withFragment($fragment)
     {
         return $this->withoutFragment()
-                ->setTargetUrl($this->getTargetUrl().'#'.Str::after($fragment, '#'));
+            ->setTargetUrl($this->getTargetUrl().'#'.Str::after($fragment, '#'));
     }
 
     /**

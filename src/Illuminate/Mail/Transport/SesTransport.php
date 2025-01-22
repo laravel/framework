@@ -68,10 +68,10 @@ class SesTransport extends AbstractTransport implements Stringable
                     $options, [
                         'Source' => $message->getEnvelope()->getSender()->toString(),
                         'Destinations' => (new Collection($message->getEnvelope()->getRecipients()))
-                                ->map
-                                ->toString()
-                                ->values()
-                                ->all(),
+                            ->map
+                            ->toString()
+                            ->values()
+                            ->all(),
                         'RawMessage' => [
                             'Data' => $message->toString(),
                         ],
