@@ -4,14 +4,18 @@ namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\MultipleRecordsFoundException;
+use Illuminate\Database\Enums\Comperator;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Database\RecordsNotFoundException;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Testing\Assert as PHPUnit;
+use InvalidArgumentException;
 use Orchestra\Testbench\Attributes\DefineEnvironment;
 use PDOException;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class QueryBuilderTest extends DatabaseTestCase
 {
@@ -634,6 +638,27 @@ class QueryBuilderTest extends DatabaseTestCase
         $this->assertSame([
             'Lorem Ipsum.' => 'Bar Post',
         ], DB::table('posts')->pluck('title', 'content')->toArray());
+    }
+
+    #[DataProvider('providesWhereOperators')]
+    public function testWhereOperatorEnums($value, $operator, $output)
+    {
+        $connection = DB::table('accounting')->getConnection();
+        if ($output === false) {
+            $this->expectException(InvalidArgumentException::class);
+            $this->expectExceptionMessage('Illegal operator and value combination.');
+        }
+        $this->assertSame($output, (new Builder($connection))->prepareValueAndOperator($value, $operator, $operator === null));
+    }
+
+    public static function providesWhereOperators()
+    {
+        return [
+            // 'simple where with default operator' => [ 'gibberish', null, [ 'gibberish', '=' ] ],
+            'simple where with explicit string operator' => [ 'gibberish', '=', [ 'gibberish', '=' ] ],
+            'simple where with non-nullable operator' => [ null, 'like', false ],
+            'simple where with explicit enum operator' => [ 'gibberish', Comperator::Equals, [ 'gibberish', '=' ] ],
+        ];
     }
 
     protected function defineEnvironmentWouldThrowsPDOException($app)
