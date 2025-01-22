@@ -576,4 +576,20 @@ trait BuildsQueries
 
         return $this;
     }
+
+    /**
+     * Apply the callback inside a grouped where if the given "value" is (or resolves to) truthy.
+     *
+     * @template TWhenParameter
+     * @template TWhenReturnType
+     *
+     * @param  (\Closure($this): TWhenParameter)|TWhenParameter|null  $value
+     * @param  (callable($this, TWhenParameter): TWhenReturnType)|null  $callback
+     * @param  (callable($this, TWhenParameter): TWhenReturnType)|null  $default
+     * @return $this|TWhenReturnType
+     */
+    public function whenGrouped($value = null, ?callable $callback = null, ?callable $default = null)
+    {
+        return $this->where(fn($query) => $query->when($value, $callback, $default));
+    }
 }
