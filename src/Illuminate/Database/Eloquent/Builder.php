@@ -53,6 +53,13 @@ class Builder implements BuilderContract
     protected $model;
 
     /**
+     * The attributes that should be added to new models created by this builder.
+     *
+     * @var array
+     */
+    public $pendingAttributes = [];
+
+    /**
      * The relationships that should be eager loaded.
      *
      * @var array
@@ -147,13 +154,6 @@ class Builder implements BuilderContract
      * @var array
      */
     protected $afterQueryCallbacks = [];
-
-    /**
-     * Attributes to be added to new instances.
-     *
-     * @var array
-     */
-    public $pendingAttributes = [];
 
     /**
      * Create a new Eloquent query builder instance.
@@ -1775,26 +1775,13 @@ class Builder implements BuilderContract
     }
 
     /**
-     * Apply query-time casts to the model instance.
+     * Specify attributes that should be added to any new models created by this builder.
      *
-     * @param  array  $casts
-     * @return $this
-     */
-    public function withCasts($casts)
-    {
-        $this->model->mergeCasts($casts);
-
-        return $this;
-    }
-
-    /**
-     * Add attributes to be added to new instances of models.
-     *
-     * @param  array|string|\Illuminate\Contracts\Database\Query\Expression  $attributes
+     * @param  \Illuminate\Contracts\Database\Query\Expression|array|string  $attributes
      * @param  mixed  $value
      * @return $this
      */
-    public function withAttributes(array|string|Expression $attributes, $value = null)
+    public function withAttributes(Expression|array|string $attributes, $value = null)
     {
         if (! is_array($attributes)) {
             $attributes = [$attributes => $value];
@@ -1805,6 +1792,19 @@ class Builder implements BuilderContract
         }
 
         $this->pendingAttributes = array_merge($this->pendingAttributes, $attributes);
+
+        return $this;
+    }
+
+    /**
+     * Apply query-time casts to the model instance.
+     *
+     * @param  array  $casts
+     * @return $this
+     */
+    public function withCasts($casts)
+    {
+        $this->model->mergeCasts($casts);
 
         return $this;
     }
