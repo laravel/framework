@@ -623,6 +623,23 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Create a record matching the attributes, or increment the existing record.
+     *
+     * @param  array  $attributes
+     * @param  string  $column
+     * @param  int  $default
+     * @return TModel
+     */
+    public function incrementOrCreate(array $attributes, string $column = 'count', $default = 1)
+    {
+        return tap($this->firstOrCreate($attributes, [$column => $default]), function ($instance) use ($column) {
+           if (! $instance->wasRecentlyCreated) {
+               $instance->increment($column);
+           }
+        });
+    }
+
+    /**
      * Execute the query and get the first result or throw an exception.
      *
      * @param  array|string  $columns
