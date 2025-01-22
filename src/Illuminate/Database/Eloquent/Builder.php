@@ -54,6 +54,13 @@ class Builder implements BuilderContract
     protected $model;
 
     /**
+     * The attributes that should be added to new models created by this builder.
+     *
+     * @var array
+     */
+    public $pendingAttributes = [];
+
+    /**
      * The relationships that should be eager loaded.
      *
      * @var array
@@ -1622,6 +1629,8 @@ class Builder implements BuilderContract
      */
     public function newModelInstance($attributes = [])
     {
+        $attributes = array_merge($this->pendingAttributes, $attributes);
+
         return $this->model->newInstance($attributes)->setConnection(
             $this->query->getConnection()->getName()
         );
@@ -1780,6 +1789,30 @@ class Builder implements BuilderContract
         }
 
         return $results;
+    }
+
+    /**
+     * Specify attributes that should be added to any new models created by this builder.
+     *
+     * The given key / value pairs will also be added as where conditions to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|array|string  $attributes
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function withAttributes(Expression|array|string $attributes, $value = null)
+    {
+        if (! is_array($attributes)) {
+            $attributes = [$attributes => $value];
+        }
+
+        foreach ($attributes as $column => $value) {
+            $this->where($this->qualifyColumn($column), $value);
+        }
+
+        $this->pendingAttributes = array_merge($this->pendingAttributes, $attributes);
+
+        return $this;
     }
 
     /**
