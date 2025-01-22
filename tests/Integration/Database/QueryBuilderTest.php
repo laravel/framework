@@ -654,10 +654,10 @@ class QueryBuilderTest extends DatabaseTestCase
     public static function providesWhereOperators()
     {
         return [
-            'simple where with default operator' => [ 'gibberish', 'gibberish', true, [ 'gibberish', '=' ] ],
-            'simple where with explicit string operator' => [ 'gibberish', '=', false, [ 'gibberish', '=' ] ],
-            'simple where with non-nullable operator' => [ null, 'like', false, false ],
-            'simple where with explicit enum operator' => [ 'gibberish', Comperator::Equals, false, [ 'gibberish', '=' ] ],
+            'simple where with default operator' => ['gibberish', 'gibberish', true, ['gibberish', '=']],
+            'simple where with explicit string operator' => ['gibberish', '=', false, ['gibberish', '=']],
+            'simple where with non-nullable operator' => [null, 'like', false, false],
+            'simple where with explicit enum operator' => ['gibberish', Comperator::Equals, false, [ 'gibberish', '=']],
         ];
     }
 

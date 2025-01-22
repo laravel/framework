@@ -16,7 +16,6 @@ use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Enums\Comperator;
-use Illuminate\Database\Enums\LogicalOperator;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Pagination\Paginator;
@@ -953,7 +952,7 @@ class Builder implements BuilderContract
     {
         if ($useDefault) {
             return [$operator, '='];
-        } elseif (!($operator instanceof Comperator) && $this->invalidOperatorAndValue($operator, $value)) {
+        } elseif (! ($operator instanceof Comperator) && $this->invalidOperatorAndValue($operator, $value)) {
             throw new InvalidArgumentException('Illegal operator and value combination.');
         }
 
