@@ -627,7 +627,6 @@ class SupportArrTest extends TestCase
         $this->assertTrue(Arr::isList([0 => 'foo', 'bar']));
         $this->assertTrue(Arr::isList([0 => 'foo', 1 => 'bar']));
 
-
         $this->assertFalse(Arr::isList([-1 => 1]));
         $this->assertFalse(Arr::isList([-1 => 1, 0 => 2]));
         $this->assertFalse(Arr::isList([1 => 'foo', 'bar']));
