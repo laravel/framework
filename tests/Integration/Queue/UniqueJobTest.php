@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Queue;
 
 use Exception;
 use Illuminate\Bus\Queueable;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
@@ -49,6 +50,14 @@ class UniqueJobTest extends QueueTestCase
         $this->assertFalse(
             $this->app->get(Cache::class)->lock($this->getLockKey(UniqueTestJob::class), 10)->get()
         );
+    }
+
+    public function testUniqueJobWithViaDispatched()
+    {
+        Bus::fake();
+
+        UniqueViaJob::dispatch();
+        Bus::assertDispatched(UniqueViaJob::class);
     }
 
     public function testLockIsReleasedForSuccessfulJobs()
@@ -220,5 +229,13 @@ class UniqueTestSerializesModelsJob extends UniqueTestJob
 
     public function __construct(public User $user)
     {
+    }
+}
+
+class UniqueViaJob extends UniqueTestJob
+{
+    public function uniqueVia(): Cache
+    {
+        return Container::getInstance()->make(Cache::class);
     }
 }

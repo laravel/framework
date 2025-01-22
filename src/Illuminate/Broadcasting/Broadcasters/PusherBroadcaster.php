@@ -135,7 +135,7 @@ class PusherBroadcaster extends Broadcaster
         }
 
         return response()->json(json_decode($response, true))
-                    ->withCallback($request->callback);
+            ->withCallback($request->callback);
     }
 
     /**

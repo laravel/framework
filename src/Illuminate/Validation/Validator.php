@@ -1225,7 +1225,7 @@ class Validator implements ValidatorContract
         // of the explicit rules needed for the given data. For example the rule
         // names.* would get expanded to names.0, names.1, etc. for this data.
         $response = (new ValidationRuleParser($this->data))
-                            ->explode(ValidationRuleParser::filterConditionalRules($rules, $this->data));
+            ->explode(ValidationRuleParser::filterConditionalRules($rules, $this->data));
 
         foreach ($response->rules as $key => $rule) {
             $this->rules[$key] = array_merge($this->rules[$key] ?? [], $rule);

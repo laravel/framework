@@ -5,31 +5,27 @@ namespace Illuminate\Database\Query;
 use Illuminate\Contracts\Database\Query\Expression as ExpressionContract;
 use Illuminate\Database\Grammar;
 
+/**
+ * @template TValue of string|int|float
+ */
 class Expression implements ExpressionContract
 {
     /**
-     * The value of the expression.
-     *
-     * @var string|int|float
-     */
-    protected $value;
-
-    /**
      * Create a new raw query expression.
      *
-     * @param  string|int|float  $value
+     * @param  TValue  $value
      * @return void
      */
-    public function __construct($value)
-    {
-        $this->value = $value;
+    public function __construct(
+        protected $value
+    ) {
     }
 
     /**
      * Get the value of the expression.
      *
      * @param  \Illuminate\Database\Grammar  $grammar
-     * @return string|int|float
+     * @return TValue
      */
     public function getValue(Grammar $grammar)
     {
