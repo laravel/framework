@@ -590,6 +590,6 @@ trait BuildsQueries
      */
     public function whenGrouped($value = null, ?callable $callback = null, ?callable $default = null)
     {
-        return $this->where(fn($query) => $query->when($value, $callback, $default));
+        return $this->where(fn ($query) => $query->when($value, $callback, $default));
     }
 }
