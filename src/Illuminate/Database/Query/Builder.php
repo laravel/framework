@@ -31,6 +31,9 @@ use UnitEnum;
 
 use function Illuminate\Support\enum_value;
 
+/**
+ * @phpstan-type Operator '='|'<'|'>'|'<='|'>='|'<>'|'!='|'<=>'|'like'|'like binary'|'not like'|'ilike'|'&'|'|'|'^'|'<<'|'>>'|'&~'|'is'|'is not'|'rlike'|'not rlike'|'regexp'|'not regexp'|'~'|'~*'|'!~'|'!~*'|'similar to'|'not similar to'|'not ilike'|'~~*'|'!~~*'
+ */
 class Builder implements BuilderContract
 {
     /** @use \Illuminate\Database\Concerns\BuildsQueries<object> */
@@ -530,7 +533,7 @@ class Builder implements BuilderContract
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $table
      * @param  \Closure|\Illuminate\Contracts\Database\Query\Expression|string  $first
-     * @param  string|null  $operator
+     * @param  Operator|null  $operator
      * @param  \Illuminate\Contracts\Database\Query\Expression|string|null  $second
      * @param  string  $type
      * @param  bool  $where
@@ -570,7 +573,7 @@ class Builder implements BuilderContract
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $table
      * @param  \Closure|\Illuminate\Contracts\Database\Query\Expression|string  $first
-     * @param  string  $operator
+     * @param  Operator  $operator
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $second
      * @param  string  $type
      * @return $this
@@ -586,7 +589,7 @@ class Builder implements BuilderContract
      * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|string  $query
      * @param  string  $as
      * @param  \Closure|\Illuminate\Contracts\Database\Query\Expression|string  $first
-     * @param  string|null  $operator
+     * @param  Operator|null  $operator
      * @param  \Illuminate\Contracts\Database\Query\Expression|string|null  $second
      * @param  string  $type
      * @param  bool  $where
@@ -643,7 +646,7 @@ class Builder implements BuilderContract
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $table
      * @param  \Closure|\Illuminate\Contracts\Database\Query\Expression|string  $first
-     * @param  string|null  $operator
+     * @param  Operator|null  $operator
      * @param  \Illuminate\Contracts\Database\Query\Expression|string|null  $second
      * @return $this
      */
@@ -657,7 +660,7 @@ class Builder implements BuilderContract
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $table
      * @param  \Closure|\Illuminate\Contracts\Database\Query\Expression|string  $first
-     * @param  string  $operator
+     * @param  Operator  $operator
      * @param  \Illuminate\Contracts\Database\Query\Expression|string|null  $second
      * @return $this
      */
@@ -672,7 +675,7 @@ class Builder implements BuilderContract
      * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|string  $query
      * @param  string  $as
      * @param  \Closure|\Illuminate\Contracts\Database\Query\Expression|string  $first
-     * @param  string|null  $operator
+     * @param  Operator|null  $operator
      * @param  \Illuminate\Contracts\Database\Query\Expression|string|null  $second
      * @return $this
      */
@@ -686,7 +689,7 @@ class Builder implements BuilderContract
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $table
      * @param  \Closure|string  $first
-     * @param  string|null  $operator
+     * @param  Operator|null  $operator
      * @param  \Illuminate\Contracts\Database\Query\Expression|string|null  $second
      * @return $this
      */
@@ -700,7 +703,7 @@ class Builder implements BuilderContract
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $table
      * @param  \Closure|\Illuminate\Contracts\Database\Query\Expression|string  $first
-     * @param  string  $operator
+     * @param  Operator  $operator
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $second
      * @return $this
      */
@@ -715,7 +718,7 @@ class Builder implements BuilderContract
      * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|string  $query
      * @param  string  $as
      * @param  \Closure|\Illuminate\Contracts\Database\Query\Expression|string  $first
-     * @param  string|null  $operator
+     * @param  Operator|null  $operator
      * @param  \Illuminate\Contracts\Database\Query\Expression|string|null  $second
      * @return $this
      */
@@ -729,7 +732,7 @@ class Builder implements BuilderContract
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $table
      * @param  \Closure|\Illuminate\Contracts\Database\Query\Expression|string|null  $first
-     * @param  string|null  $operator
+     * @param  Operator|null  $operator
      * @param  \Illuminate\Contracts\Database\Query\Expression|string|null  $second
      * @return $this
      */
@@ -812,9 +815,9 @@ class Builder implements BuilderContract
      * Add a basic where clause to the query.
      *
      * @param  \Closure|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
-     * @param  mixed  $operator
+     * @param  Operator|null $operator
      * @param  mixed  $value
-     * @param  string  $boolean
+     * @param  'and'|'or'  $boolean
      * @return $this
      */
     public function where($column, $operator = null, $value = null, $boolean = 'and')
@@ -918,7 +921,7 @@ class Builder implements BuilderContract
      * Add an array of where clauses to the query.
      *
      * @param  array  $column
-     * @param  string  $boolean
+     * @param  'and'|'or'  $boolean
      * @param  string  $method
      * @return $this
      */
@@ -939,7 +942,7 @@ class Builder implements BuilderContract
      * Prepare the value and operator for a where clause.
      *
      * @param  string  $value
-     * @param  string  $operator
+     * @param  Operator  $operator
      * @param  bool  $useDefault
      * @return array
      *
@@ -961,7 +964,7 @@ class Builder implements BuilderContract
      *
      * Prevents using Null values with invalid operators.
      *
-     * @param  string  $operator
+     * @param  Operator  $operator
      * @param  mixed  $value
      * @return bool
      */
@@ -974,7 +977,7 @@ class Builder implements BuilderContract
     /**
      * Determine if the given operator is supported.
      *
-     * @param  string  $operator
+     * @param  Operator  $operator
      * @return bool
      */
     protected function invalidOperator($operator)
@@ -986,7 +989,7 @@ class Builder implements BuilderContract
     /**
      * Determine if the operator is a bitwise operator.
      *
-     * @param  string  $operator
+     * @param  Operator  $operator
      * @return bool
      */
     protected function isBitwiseOperator($operator)
@@ -999,7 +1002,7 @@ class Builder implements BuilderContract
      * Add an "or where" clause to the query.
      *
      * @param  \Closure|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
-     * @param  mixed  $operator
+     * @param  Operator|null  $operator
      * @param  mixed  $value
      * @return $this
      */
@@ -1016,9 +1019,9 @@ class Builder implements BuilderContract
      * Add a basic "where not" clause to the query.
      *
      * @param  \Closure|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
-     * @param  mixed  $operator
+     * @param  Operator|null  $operator
      * @param  mixed  $value
-     * @param  string  $boolean
+     * @param  'and'|'or'  $boolean
      * @return $this
      */
     public function whereNot($column, $operator = null, $value = null, $boolean = 'and')
@@ -1036,7 +1039,7 @@ class Builder implements BuilderContract
      * Add an "or where not" clause to the query.
      *
      * @param  \Closure|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
-     * @param  mixed  $operator
+     * @param  Operator|null  $operator
      * @param  mixed  $value
      * @return $this
      */
@@ -1049,9 +1052,9 @@ class Builder implements BuilderContract
      * Add a "where" clause comparing two columns to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string|array  $first
-     * @param  string|null  $operator
+     * @param  Operator|null  $operator
      * @param  string|null  $second
-     * @param  string|null  $boolean
+     * @param  'and'|'or'|null  $boolean
      * @return $this
      */
     public function whereColumn($first, $operator = null, $second = null, $boolean = 'and')
@@ -1086,7 +1089,7 @@ class Builder implements BuilderContract
      * Add an "or where" clause comparing two columns to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string|array  $first
-     * @param  string|null  $operator
+     * @param  Operator|null  $operator
      * @param  string|null  $second
      * @return $this
      */
@@ -1100,7 +1103,7 @@ class Builder implements BuilderContract
      *
      * @param  string  $sql
      * @param  mixed  $bindings
-     * @param  string  $boolean
+     * @param  'and'|'or'  $boolean
      * @return $this
      */
     public function whereRaw($sql, $bindings = [], $boolean = 'and')
@@ -1130,7 +1133,7 @@ class Builder implements BuilderContract
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
      * @param  string  $value
      * @param  bool  $caseSensitive
-     * @param  string  $boolean
+     * @param  'and'|'or'  $boolean
      * @param  bool  $not
      * @return $this
      */
@@ -1168,7 +1171,7 @@ class Builder implements BuilderContract
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
      * @param  string  $value
      * @param  bool  $caseSensitive
-     * @param  string  $boolean
+     * @param  'and'|'or'  $boolean
      * @return $this
      */
     public function whereNotLike($column, $value, $caseSensitive = false, $boolean = 'and')
@@ -1194,7 +1197,7 @@ class Builder implements BuilderContract
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
      * @param  mixed  $values
-     * @param  string  $boolean
+     * @param  'and'|'or'  $boolean
      * @param  bool  $not
      * @return $this
      */
@@ -1251,7 +1254,7 @@ class Builder implements BuilderContract
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
      * @param  mixed  $values
-     * @param  string  $boolean
+     * @param  'and'|'or'  $boolean
      * @return $this
      */
     public function whereNotIn($column, $values, $boolean = 'and')
@@ -1276,7 +1279,7 @@ class Builder implements BuilderContract
      *
      * @param  string  $column
      * @param  \Illuminate\Contracts\Support\Arrayable|array  $values
-     * @param  string  $boolean
+     * @param  'and'|'or'  $boolean
      * @param  bool  $not
      * @return $this
      */
@@ -1316,7 +1319,7 @@ class Builder implements BuilderContract
      *
      * @param  string  $column
      * @param  \Illuminate\Contracts\Support\Arrayable|array  $values
-     * @param  string  $boolean
+     * @param  'and'|'or'  $boolean
      * @return $this
      */
     public function whereIntegerNotInRaw($column, $values, $boolean = 'and')
@@ -1340,7 +1343,7 @@ class Builder implements BuilderContract
      * Add a "where null" clause to the query.
      *
      * @param  string|array|\Illuminate\Contracts\Database\Query\Expression  $columns
-     * @param  string  $boolean
+     * @param  'and'|'or'  $boolean
      * @param  bool  $not
      * @return $this
      */
@@ -1370,7 +1373,7 @@ class Builder implements BuilderContract
      * Add a "where not null" clause to the query.
      *
      * @param  string|array|\Illuminate\Contracts\Database\Query\Expression  $columns
-     * @param  string  $boolean
+     * @param  'and'|'or'  $boolean
      * @return $this
      */
     public function whereNotNull($columns, $boolean = 'and')
@@ -1383,7 +1386,7 @@ class Builder implements BuilderContract
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
      * @param  iterable  $values
-     * @param  string  $boolean
+     * @param  'and'|'or'  $boolean
      * @param  bool  $not
      * @return $this
      */
@@ -1407,7 +1410,7 @@ class Builder implements BuilderContract
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
      * @param  array  $values
-     * @param  string  $boolean
+     * @param  'and'|'or'  $boolean
      * @param  bool  $not
      * @return $this
      */
@@ -1449,7 +1452,7 @@ class Builder implements BuilderContract
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
      * @param  iterable  $values
-     * @param  string  $boolean
+     * @param  'and'|'or'  $boolean
      * @return $this
      */
     public function whereNotBetween($column, iterable $values, $boolean = 'and')
@@ -1462,7 +1465,7 @@ class Builder implements BuilderContract
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
      * @param  array  $values
-     * @param  string  $boolean
+     * @param  'and'|'or'  $boolean
      * @return $this
      */
     public function whereNotBetweenColumns($column, array $values, $boolean = 'and')
@@ -1511,7 +1514,7 @@ class Builder implements BuilderContract
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
      * @param  \DateTimeInterface|string|null  $operator
      * @param  \DateTimeInterface|string|null  $value
-     * @param  string  $boolean
+     * @param  'and'|'or'  $boolean
      * @return $this
      */
     public function whereDate($column, $operator, $value = null, $boolean = 'and')
@@ -1559,7 +1562,7 @@ class Builder implements BuilderContract
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
      * @param  \DateTimeInterface|string|null  $operator
      * @param  \DateTimeInterface|string|null  $value
-     * @param  string  $boolean
+     * @param  'and'|'or'  $boolean
      * @return $this
      */
     public function whereTime($column, $operator, $value = null, $boolean = 'and')
@@ -1607,7 +1610,7 @@ class Builder implements BuilderContract
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
      * @param  \DateTimeInterface|string|int|null  $operator
      * @param  \DateTimeInterface|string|int|null  $value
-     * @param  string  $boolean
+     * @param  'and'|'or'  $boolean
      * @return $this
      */
     public function whereDay($column, $operator, $value = null, $boolean = 'and')
@@ -1659,7 +1662,7 @@ class Builder implements BuilderContract
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
      * @param  \DateTimeInterface|string|int|null  $operator
      * @param  \DateTimeInterface|string|int|null  $value
-     * @param  string  $boolean
+     * @param  'and'|'or'  $boolean
      * @return $this
      */
     public function whereMonth($column, $operator, $value = null, $boolean = 'and')
@@ -1711,7 +1714,7 @@ class Builder implements BuilderContract
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
      * @param  \DateTimeInterface|string|int|null  $operator
      * @param  \DateTimeInterface|string|int|null  $value
-     * @param  string  $boolean
+     * @param  'and'|'or'  $boolean
      * @return $this
      */
     public function whereYear($column, $operator, $value = null, $boolean = 'and')
@@ -1758,9 +1761,9 @@ class Builder implements BuilderContract
      *
      * @param  string  $type
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
-     * @param  string  $operator
+     * @param  Operator  $operator
      * @param  mixed  $value
-     * @param  string  $boolean
+     * @param  'and'|'or'  $boolean
      * @return $this
      */
     protected function addDateBasedWhere($type, $column, $operator, $value, $boolean = 'and')
@@ -1778,7 +1781,7 @@ class Builder implements BuilderContract
      * Add a nested where statement to the query.
      *
      * @param  \Closure  $callback
-     * @param  string  $boolean
+     * @param  'and'|'or'  $boolean
      * @return $this
      */
     public function whereNested(Closure $callback, $boolean = 'and')
@@ -1802,7 +1805,7 @@ class Builder implements BuilderContract
      * Add another query builder as a nested where to the query builder.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  string  $boolean
+     * @param  'and'|'or'  $boolean
      * @return $this
      */
     public function addNestedWhereQuery($query, $boolean = 'and')
@@ -1822,9 +1825,9 @@ class Builder implements BuilderContract
      * Add a full sub-select to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
-     * @param  string  $operator
+     * @param  Operator  $operator
      * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>  $callback
-     * @param  string  $boolean
+     * @param  'and'|'or'  $boolean
      * @return $this
      */
     protected function whereSub($column, $operator, $callback, $boolean)
@@ -1853,7 +1856,7 @@ class Builder implements BuilderContract
      * Add an exists clause to the query.
      *
      * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>  $callback
-     * @param  string  $boolean
+     * @param  'and'|'or'  $boolean
      * @param  bool  $not
      * @return $this
      */
@@ -1889,7 +1892,7 @@ class Builder implements BuilderContract
      * Add a where not exists clause to the query.
      *
      * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>  $callback
-     * @param  string  $boolean
+     * @param  'and'|'or'  $boolean
      * @return $this
      */
     public function whereNotExists($callback, $boolean = 'and')
@@ -1912,7 +1915,7 @@ class Builder implements BuilderContract
      * Add an exists clause to the query.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  string  $boolean
+     * @param  'and'|'or'  $boolean
      * @param  bool  $not
      * @return $this
      */
@@ -1931,9 +1934,9 @@ class Builder implements BuilderContract
      * Adds a where condition using row values.
      *
      * @param  array  $columns
-     * @param  string  $operator
+     * @param  Operator  $operator
      * @param  array  $values
-     * @param  string  $boolean
+     * @param  'and'|'or'  $boolean
      * @return $this
      *
      * @throws \InvalidArgumentException
@@ -1957,7 +1960,7 @@ class Builder implements BuilderContract
      * Adds an or where condition using row values.
      *
      * @param  array  $columns
-     * @param  string  $operator
+     * @param  Operator  $operator
      * @param  array  $values
      * @return $this
      */
@@ -1971,7 +1974,7 @@ class Builder implements BuilderContract
      *
      * @param  string  $column
      * @param  mixed  $value
-     * @param  string  $boolean
+     * @param  Operator  $boolean
      * @param  bool  $not
      * @return $this
      */
@@ -2005,7 +2008,7 @@ class Builder implements BuilderContract
      *
      * @param  string  $column
      * @param  mixed  $value
-     * @param  string  $boolean
+     * @param  'and'|'or'  $boolean
      * @return $this
      */
     public function whereJsonDoesntContain($column, $value, $boolean = 'and')
@@ -2030,7 +2033,7 @@ class Builder implements BuilderContract
      *
      * @param  string  $column
      * @param  mixed  $value
-     * @param  string  $boolean
+     * @param  'and'|'or'  $boolean
      * @param  bool  $not
      * @return $this
      */
@@ -2064,7 +2067,7 @@ class Builder implements BuilderContract
      *
      * @param  string  $column
      * @param  mixed  $value
-     * @param  string  $boolean
+     * @param  'and'|'or'  $boolean
      * @return $this
      */
     public function whereJsonDoesntOverlap($column, $value, $boolean = 'and')
@@ -2088,7 +2091,7 @@ class Builder implements BuilderContract
      * Add a clause that determines if a JSON path exists to the query.
      *
      * @param  string  $column
-     * @param  string  $boolean
+     * @param  'and'|'or'  $boolean
      * @param  bool  $not
      * @return $this
      */
@@ -2116,7 +2119,7 @@ class Builder implements BuilderContract
      * Add a clause that determines if a JSON path does not exist to the query.
      *
      * @param  string  $column
-     * @param  string  $boolean
+     * @param  'and'|'or'  $boolean
      * @return $this
      */
     public function whereJsonDoesntContainKey($column, $boolean = 'and')
@@ -2139,9 +2142,9 @@ class Builder implements BuilderContract
      * Add a "where JSON length" clause to the query.
      *
      * @param  string  $column
-     * @param  mixed  $operator
+     * @param  Operator  $operator
      * @param  mixed  $value
-     * @param  string  $boolean
+     * @param  'and'|'or'  $boolean
      * @return $this
      */
     public function whereJsonLength($column, $operator, $value = null, $boolean = 'and')
@@ -2172,7 +2175,7 @@ class Builder implements BuilderContract
      * Add an "or where JSON length" clause to the query.
      *
      * @param  string  $column
-     * @param  mixed  $operator
+     * @param  Operator  $operator
      * @param  mixed  $value
      * @return $this
      */
@@ -2252,7 +2255,7 @@ class Builder implements BuilderContract
      *
      * @param  string|string[]  $columns
      * @param  string  $value
-     * @param  string  $boolean
+     * @param  'and'|'or'  $boolean
      * @return $this
      */
     public function whereFullText($columns, $value, array $options = [], $boolean = 'and')
@@ -2284,9 +2287,9 @@ class Builder implements BuilderContract
      * Add a "where" clause to the query for multiple columns with "and" conditions between them.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression[]|\Closure[]|string[]  $columns
-     * @param  mixed  $operator
+     * @param  Operator|null  $operator
      * @param  mixed  $value
-     * @param  string  $boolean
+     * @param  'and'|'or'  $boolean
      * @return $this
      */
     public function whereAll($columns, $operator = null, $value = null, $boolean = 'and')
@@ -2308,7 +2311,7 @@ class Builder implements BuilderContract
      * Add an "or where" clause to the query for multiple columns with "and" conditions between them.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression[]|\Closure[]|string[]  $columns
-     * @param  mixed  $operator
+     * @param  Operator|null  $operator
      * @param  mixed  $value
      * @return $this
      */
@@ -2321,9 +2324,9 @@ class Builder implements BuilderContract
      * Add a "where" clause to the query for multiple columns with "or" conditions between them.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression[]|\Closure[]|string[]  $columns
-     * @param  mixed  $operator
+     * @param  Operator|null  $operator
      * @param  mixed  $value
-     * @param  string  $boolean
+     * @param  'and'|'or'  $boolean
      * @return $this
      */
     public function whereAny($columns, $operator = null, $value = null, $boolean = 'and')
@@ -2345,7 +2348,7 @@ class Builder implements BuilderContract
      * Add an "or where" clause to the query for multiple columns with "or" conditions between them.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression[]|\Closure[]|string[]  $columns
-     * @param  mixed  $operator
+     * @param  Operator|null  $operator
      * @param  mixed  $value
      * @return $this
      */
@@ -2358,9 +2361,9 @@ class Builder implements BuilderContract
      * Add a "where not" clause to the query for multiple columns where none of the conditions should be true.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression[]|\Closure[]|string[]  $columns
-     * @param  mixed  $operator
+     * @param  Operator|null  $operator
      * @param  mixed  $value
-     * @param  string  $boolean
+     * @param  'and'|'or'  $boolean
      * @return $this
      */
     public function whereNone($columns, $operator = null, $value = null, $boolean = 'and')
@@ -2372,7 +2375,7 @@ class Builder implements BuilderContract
      * Add an "or where not" clause to the query for multiple columns where none of the conditions should be true.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression[]|\Closure[]|string[]  $columns
-     * @param  mixed  $operator
+     * @param  Operator|null  $operator
      * @param  mixed  $value
      * @return $this
      */
@@ -2421,7 +2424,7 @@ class Builder implements BuilderContract
      * @param  \Illuminate\Contracts\Database\Query\Expression|\Closure|string  $column
      * @param  string|int|float|null  $operator
      * @param  string|int|float|null  $value
-     * @param  string  $boolean
+     * @param  'and'|'or'  $boolean
      * @return $this
      */
     public function having($column, $operator = null, $value = null, $boolean = 'and')
@@ -2488,7 +2491,7 @@ class Builder implements BuilderContract
      * Add a nested having statement to the query.
      *
      * @param  \Closure  $callback
-     * @param  string  $boolean
+     * @param  'and'|'or'  $boolean
      * @return $this
      */
     public function havingNested(Closure $callback, $boolean = 'and')
@@ -2502,7 +2505,7 @@ class Builder implements BuilderContract
      * Add another query builder as a nested having to the query builder.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  string  $boolean
+     * @param  'and'|'or'  $boolean
      * @return $this
      */
     public function addNestedHavingQuery($query, $boolean = 'and')
@@ -2522,7 +2525,7 @@ class Builder implements BuilderContract
      * Add a "having null" clause to the query.
      *
      * @param  string|array  $columns
-     * @param  string  $boolean
+     * @param  'and'|'or'  $boolean
      * @param  bool  $not
      * @return $this
      */
@@ -2552,7 +2555,7 @@ class Builder implements BuilderContract
      * Add a "having not null" clause to the query.
      *
      * @param  string|array  $columns
-     * @param  string  $boolean
+     * @param  'and'|'or'  $boolean
      * @return $this
      */
     public function havingNotNull($columns, $boolean = 'and')
@@ -2576,7 +2579,7 @@ class Builder implements BuilderContract
      *
      * @param  string  $column
      * @param  iterable  $values
-     * @param  string  $boolean
+     * @param  'and'|'or'  $boolean
      * @param  bool  $not
      * @return $this
      */
@@ -2600,7 +2603,7 @@ class Builder implements BuilderContract
      *
      * @param  string  $sql
      * @param  array  $bindings
-     * @param  string  $boolean
+     * @param  'and'|'or'  $boolean
      * @return $this
      */
     public function havingRaw($sql, array $bindings = [], $boolean = 'and')
