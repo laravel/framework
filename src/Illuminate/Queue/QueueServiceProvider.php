@@ -325,7 +325,7 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
             new DynamoDbClient($dynamoConfig),
             $this->app['config']['app.name'],
             $config['table'],
-            $config['expire_days'] ?? '3'
+            $config['expire_days'] ?? 3
         );
     }
 

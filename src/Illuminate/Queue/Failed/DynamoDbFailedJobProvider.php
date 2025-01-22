@@ -35,7 +35,7 @@ class DynamoDbFailedJobProvider implements FailedJobProviderInterface
     /**
      * The number of days a failed job should be retained.
      *
-     * @var string
+     * @var int
      */
     protected $expireDays;
 
@@ -45,7 +45,7 @@ class DynamoDbFailedJobProvider implements FailedJobProviderInterface
      * @param  \Aws\DynamoDb\DynamoDbClient  $dynamo
      * @param  string  $applicationName
      * @param  string  $table
-     * @param  string  $expireDays
+     * @param  int  $expireDays
      * @return void
      */
     public function __construct(DynamoDbClient $dynamo, $applicationName, $table, $expireDays)
@@ -53,7 +53,7 @@ class DynamoDbFailedJobProvider implements FailedJobProviderInterface
         $this->table = $table;
         $this->dynamo = $dynamo;
         $this->applicationName = $applicationName;
-        $this->expireDays = (int) $expireDays;
+        $this->expireDays = $expireDays;
     }
 
     /**
