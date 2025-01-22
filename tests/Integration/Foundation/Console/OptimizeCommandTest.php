@@ -23,6 +23,8 @@ class OptimizeCommandTest extends TestCase
 
     public function testCanListenToOptimizingEvent(): void
     {
+        $this->withoutDeprecationHandling();
+
         $this->artisan('optimize')
             ->assertSuccessful()
             ->expectsOutputToContain('my package');

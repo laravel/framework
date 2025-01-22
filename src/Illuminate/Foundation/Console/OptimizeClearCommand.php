@@ -34,7 +34,7 @@ class OptimizeClearCommand extends Command
     {
         $this->components->info('Clearing cached bootstrap files.');
 
-        $exceptions = Collection::wrap(explode(',', $this->option('except')))
+        $exceptions = Collection::wrap(explode(',', $this->option('except') ?? ''))
             ->map(fn ($except) => trim($except))
             ->filter()
             ->unique()

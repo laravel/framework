@@ -8,10 +8,14 @@ use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Foundation\Auth\User;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Bus;
 use Orchestra\Testbench\Attributes\WithMigration;
+use Orchestra\Testbench\Factories\UserFactory;
 
 #[WithMigration]
 #[WithMigration('cache')]
@@ -130,6 +134,28 @@ class UniqueJobTest extends QueueTestCase
         $this->assertTrue($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
     }
 
+    public function testLockIsReleasedOnModelNotFoundException()
+    {
+        UniqueTestSerializesModelsJob::$handled = false;
+
+        /** @var \Illuminate\Foundation\Auth\User */
+        $user = UserFactory::new()->create();
+        $job = new UniqueTestSerializesModelsJob($user);
+
+        $this->expectException(ModelNotFoundException::class);
+
+        try {
+            $user->delete();
+            dispatch($job);
+            $this->runQueueWorkerCommand(['--once' => true]);
+            unserialize(serialize($job));
+        } finally {
+            $this->assertFalse($job::$handled);
+            $this->assertModelMissing($user);
+            $this->assertTrue($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
+        }
+    }
+
     protected function getLockKey($job)
     {
         return 'laravel_unique_job:'.(is_string($job) ? $job : get_class($job)).':';
@@ -184,4 +210,15 @@ class UniqueTestRetryJob extends UniqueTestFailJob
 class UniqueUntilStartTestJob extends UniqueTestJob implements ShouldBeUniqueUntilProcessing
 {
     public $tries = 2;
+}
+
+class UniqueTestSerializesModelsJob extends UniqueTestJob
+{
+    use SerializesModels;
+
+    public $deleteWhenMissingModels = true;
+
+    public function __construct(public User $user)
+    {
+    }
 }

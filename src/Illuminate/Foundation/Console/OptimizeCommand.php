@@ -34,7 +34,7 @@ class OptimizeCommand extends Command
     {
         $this->components->info('Caching framework bootstrap, configuration, and metadata.');
 
-        $exceptions = Collection::wrap(explode(',', $this->option('except')))
+        $exceptions = Collection::wrap(explode(',', $this->option('except') ?? ''))
             ->map(fn ($except) => trim($except))
             ->filter()
             ->unique()
