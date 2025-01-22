@@ -1,6 +1,16 @@
 # Release Notes for 11.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v11.39.0...11.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v11.39.1...11.x)
+
+## [v11.39.1](https://github.com/laravel/framework/compare/v11.39.0...v11.39.1) - 2025-01-22
+
+* fix: collapseWithKeys on empty collection by [@benatoff](https://github.com/benatoff) in https://github.com/laravel/framework/pull/54290
+* fix(broadcaster): incorrect channel matching because of dot in pattern by [@021-projects](https://github.com/021-projects) in https://github.com/laravel/framework/pull/54303
+* [11.x] Use constructor property promotion for database query condition expression by [@shaedrich](https://github.com/shaedrich) in https://github.com/laravel/framework/pull/54302
+* [11.x] Add IncrementOrCreate method to Eloquent by [@carloeusebi](https://github.com/carloeusebi) in https://github.com/laravel/framework/pull/54300
+* [11.x] Add additional test cases for Arr helper to enhance coverage by [@mrvipchien](https://github.com/mrvipchien) in https://github.com/laravel/framework/pull/54298
+* Bump vite from 5.2.14 to 5.4.12 in /src/Illuminate/Foundation/resources/exceptions/renderer by [@dependabot](https://github.com/dependabot) in https://github.com/laravel/framework/pull/54296
+* [11.x] Fix unique jobs that have a uniqueVia method by [@DougSisk](https://github.com/DougSisk) in https://github.com/laravel/framework/pull/54294
 
 ## [v11.39.0](https://github.com/laravel/framework/compare/v11.38.2...v11.39.0) - 2025-01-21
 
