@@ -31,6 +31,14 @@ use UnitEnum;
 
 use function Illuminate\Support\enum_value;
 
+/**
+ * @method self where(string $column, $value)
+ * @method self where(string $column, string $operator, $value)
+ * @method self where(string $column, string $operator, $value, 'and'|'or' $boolean)
+ * @method self where(\Closure(): mixed)
+ * @method self where(array<string, mixed> $column)
+ * @method self where((array{string, 'and'|'or', mixed}|array{string, mixed}|array{column: string, operator?: 'and'|'or', value: mixed})[] $column)
+ */
 class Builder implements BuilderContract
 {
     /** @use \Illuminate\Database\Concerns\BuildsQueries<object> */
