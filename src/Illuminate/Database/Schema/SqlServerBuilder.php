@@ -2,7 +2,7 @@
 
 namespace Illuminate\Database\Schema;
 
-use InvalidArgumentException;
+use Illuminate\Support\Arr;
 
 class SqlServerBuilder extends Builder
 {
@@ -33,46 +33,6 @@ class SqlServerBuilder extends Builder
     }
 
     /**
-     * Determine if the given table exists.
-     *
-     * @param  string  $table
-     * @return bool
-     */
-    public function hasTable($table)
-    {
-        [$schema, $table] = $this->parseSchemaAndTable($table);
-
-        $table = $this->connection->getTablePrefix().$table;
-
-        return (bool) $this->connection->scalar(
-            $this->grammar->compileTableExists($schema, $table)
-        );
-    }
-
-    /**
-     * Determine if the given view exists.
-     *
-     * @param  string  $view
-     * @return bool
-     */
-    public function hasView($view)
-    {
-        [$schema, $view] = $this->parseSchemaAndTable($view);
-
-        $schema ??= $this->getDefaultSchema();
-        $view = $this->connection->getTablePrefix().$view;
-
-        foreach ($this->getViews() as $value) {
-            if (strtolower($view) === strtolower($value['name'])
-                && strtolower($schema) === strtolower($value['schema'])) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
      * Drop all tables from the database.
      *
      * @return void
@@ -95,84 +55,12 @@ class SqlServerBuilder extends Builder
     }
 
     /**
-     * Get the columns for a given table.
+     * Get the default schema name for the connection.
      *
-     * @param  string  $table
-     * @return array
+     * @return string|null
      */
-    public function getColumns($table)
+    public function getCurrentSchemaName()
     {
-        [$schema, $table] = $this->parseSchemaAndTable($table);
-
-        $table = $this->connection->getTablePrefix().$table;
-
-        $results = $this->connection->selectFromWriteConnection(
-            $this->grammar->compileColumns($schema, $table)
-        );
-
-        return $this->connection->getPostProcessor()->processColumns($results);
-    }
-
-    /**
-     * Get the indexes for a given table.
-     *
-     * @param  string  $table
-     * @return array
-     */
-    public function getIndexes($table)
-    {
-        [$schema, $table] = $this->parseSchemaAndTable($table);
-
-        $table = $this->connection->getTablePrefix().$table;
-
-        return $this->connection->getPostProcessor()->processIndexes(
-            $this->connection->selectFromWriteConnection($this->grammar->compileIndexes($schema, $table))
-        );
-    }
-
-    /**
-     * Get the foreign keys for a given table.
-     *
-     * @param  string  $table
-     * @return array
-     */
-    public function getForeignKeys($table)
-    {
-        [$schema, $table] = $this->parseSchemaAndTable($table);
-
-        $table = $this->connection->getTablePrefix().$table;
-
-        return $this->connection->getPostProcessor()->processForeignKeys(
-            $this->connection->selectFromWriteConnection($this->grammar->compileForeignKeys($schema, $table))
-        );
-    }
-
-    /**
-     * Get the default schema for the connection.
-     *
-     * @return string
-     */
-    protected function getDefaultSchema()
-    {
-        return $this->connection->scalar($this->grammar->compileDefaultSchema());
-    }
-
-    /**
-     * Parse the database object reference and extract the schema and table.
-     *
-     * @param  string  $reference
-     * @return array
-     */
-    protected function parseSchemaAndTable($reference)
-    {
-        $parts = array_pad(explode('.', $reference, 2), -2, null);
-
-        if (str_contains($parts[1], '.')) {
-            $database = $parts[0];
-
-            throw new InvalidArgumentException("Using three-part reference is not supported, you may use `Schema::connection('$database')` instead.");
-        }
-
-        return $parts;
+        return Arr::first($this->getSchemas(), fn ($schema) => $schema['default'])['name'];
     }
 }

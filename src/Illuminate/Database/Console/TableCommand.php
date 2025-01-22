@@ -39,10 +39,8 @@ class TableCommand extends DatabaseInspectionCommand
     public function handle(ConnectionResolverInterface $connections)
     {
         $connection = $connections->connection($this->input->getOption('database'));
-        $schema = $connection->getSchemaBuilder();
-        $tables = (new Collection($schema->getTables()))
-            ->keyBy(fn ($table) => $table['schema'] ? $table['schema'].'.'.$table['name'] : $table['name'])
-            ->all();
+        $tables = (new Collection($connection->getSchemaBuilder()->getTables()))
+            ->keyBy('schema_qualified_name')->all();
 
         $tableName = $this->argument('table') ?: select(
             'Which table would you like to inspect?',
@@ -57,16 +55,22 @@ class TableCommand extends DatabaseInspectionCommand
             return 1;
         }
 
-        $tableName = ($table['schema'] ? $table['schema'].'.' : '').$this->withoutTablePrefix($connection, $table['name']);
+        [$columns, $indexes, $foreignKeys] = $connection->withoutTablePrefix(function ($connection) use ($table) {
+            $schema = $connection->getSchemaBuilder();
+            $tableName = $table['schema_qualified_name'];
 
-        $columns = $this->columns($schema, $tableName);
-        $indexes = $this->indexes($schema, $tableName);
-        $foreignKeys = $this->foreignKeys($schema, $tableName);
+            return [
+                $this->columns($schema, $tableName),
+                $this->indexes($schema, $tableName),
+                $this->foreignKeys($schema, $tableName),
+            ];
+        });
 
         $data = [
             'table' => [
                 'schema' => $table['schema'],
                 'name' => $table['name'],
+                'schema_qualified_name' => $table['schema_qualified_name'],
                 'columns' => count($columns),
                 'size' => $table['size'],
                 'comment' => $table['comment'],
@@ -205,7 +209,7 @@ class TableCommand extends DatabaseInspectionCommand
 
         $this->newLine();
 
-        $this->components->twoColumnDetail('<fg=green;options=bold>'.($table['schema'] ? $table['schema'].'.'.$table['name'] : $table['name']).'</>', $table['comment'] ? '<fg=gray>'.$table['comment'].'</>' : null);
+        $this->components->twoColumnDetail('<fg=green;options=bold>'.$table['schema_qualified_name'].'</>', $table['comment'] ? '<fg=gray>'.$table['comment'].'</>' : null);
         $this->components->twoColumnDetail('Columns', $table['columns']);
 
         if (! is_null($table['size'])) {

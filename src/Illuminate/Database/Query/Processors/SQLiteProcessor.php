@@ -104,7 +104,7 @@ class SQLiteProcessor extends Processor
             return [
                 'name' => null,
                 'columns' => explode(',', $result->columns),
-                'foreign_schema' => null,
+                'foreign_schema' => $result->foreign_schema,
                 'foreign_table' => $result->foreign_table,
                 'foreign_columns' => explode(',', $result->foreign_columns),
                 'on_update' => strtolower($result->on_update),

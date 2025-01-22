@@ -44,6 +44,7 @@ class PostgresProcessor extends Processor
             return [
                 'name' => $result->name,
                 'schema' => $result->schema,
+                'schema_qualified_name' => $result->schema.'.'.$result->name,
                 'implicit' => (bool) $result->implicit,
                 'type' => match (strtolower($result->type)) {
                     'b' => 'base',

@@ -38,16 +38,6 @@ class SqlServerGrammar extends Grammar
     protected $fluentCommands = ['Default'];
 
     /**
-     * Compile a query to determine the name of the default schema.
-     *
-     * @return string
-     */
-    public function compileDefaultSchema()
-    {
-        return 'select schema_name()';
-    }
-
-    /**
      * Compile a create database command.
      *
      * @param  string  $name
@@ -77,6 +67,17 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
+     * Compile the query to determine the schemas.
+     *
+     * @return string
+     */
+    public function compileSchemas()
+    {
+        return 'select name, iif(schema_id = schema_id(), 1, 0) as [default] from sys.schemas '
+            ."where name not in ('information_schema', 'sys') and name not like 'db[_]%' order by name";
+    }
+
+    /**
      * Compile the query to determine if the given table exists.
      *
      * @param  string|null  $schema
@@ -94,34 +95,56 @@ class SqlServerGrammar extends Grammar
     /**
      * Compile the query to determine the tables.
      *
+     * @param  string|string[]|null  $schema
      * @return string
      */
-    public function compileTables()
+    public function compileTables($schema)
     {
         return 'select t.name as name, schema_name(t.schema_id) as [schema], sum(u.total_pages) * 8 * 1024 as size '
             .'from sys.tables as t '
             .'join sys.partitions as p on p.object_id = t.object_id '
             .'join sys.allocation_units as u on u.container_id = p.hobt_id '
-            .'group by t.name, t.schema_id '
-            .'order by t.name';
+            ."where t.is_ms_shipped = 0 and t.name <> 'sysdiagrams'"
+            .$this->compileSchemaWhereClause($schema, 'schema_name(t.schema_id)')
+            .' group by t.name, t.schema_id '
+            .'order by [schema], t.name';
     }
 
     /**
      * Compile the query to determine the views.
      *
+     * @param  string|string[]|null  $schema
      * @return string
      */
-    public function compileViews()
+    public function compileViews($schema)
     {
         return 'select name, schema_name(v.schema_id) as [schema], definition from sys.views as v '
             .'inner join sys.sql_modules as m on v.object_id = m.object_id '
-            .'order by name';
+            .'where v.is_ms_shipped = 0'
+            .$this->compileSchemaWhereClause($schema, 'schema_name(v.schema_id)')
+            .' order by [schema], name';
+    }
+
+    /**
+     * Compile the query to compare the schema.
+     *
+     * @param  string|string[]|null  $schema
+     * @param  string  $column
+     * @return string
+     */
+    protected function compileSchemaWhereClause($schema, $column)
+    {
+        return match (true) {
+            ! empty($schema) && is_array($schema) => " and $column in (".$this->quoteString($schema).')',
+            ! empty($schema) => " and $column = ".$this->quoteString($schema),
+            default => '',
+        };
     }
 
     /**
      * Compile the query to determine the columns.
      *
-     * @param  string  $schema
+     * @param  string|null  $schema
      * @param  string  $table
      * @return string
      */
@@ -151,7 +174,7 @@ class SqlServerGrammar extends Grammar
     /**
      * Compile the query to determine the indexes.
      *
-     * @param  string  $schema
+     * @param  string|null  $schema
      * @param  string  $table
      * @return string
      */
@@ -175,7 +198,7 @@ class SqlServerGrammar extends Grammar
     /**
      * Compile the query to determine the foreign keys.
      *
-     * @param  string  $schema
+     * @param  string|null  $schema
      * @param  string  $table
      * @return string
      */
@@ -212,9 +235,10 @@ class SqlServerGrammar extends Grammar
      */
     public function compileCreate(Blueprint $blueprint, Fluent $command)
     {
-        $columns = implode(', ', $this->getColumns($blueprint));
-
-        return 'create table '.$this->wrapTable($blueprint)." ($columns)";
+        return sprintf('create table %s (%s)',
+            $this->wrapTable($blueprint, $blueprint->temporary ? '#'.$this->connection->getTablePrefix() : null),
+            implode(', ', $this->getColumns($blueprint))
+        );
     }
 
     /**
@@ -1038,21 +1062,6 @@ class SqlServerGrammar extends Grammar
         if ($column->persisted) {
             return ' persisted';
         }
-    }
-
-    /**
-     * Wrap a table in keyword identifiers.
-     *
-     * @param  \Illuminate\Database\Schema\Blueprint|\Illuminate\Contracts\Database\Query\Expression|string  $table
-     * @return string
-     */
-    public function wrapTable($table)
-    {
-        if ($table instanceof Blueprint && $table->temporary) {
-            $this->setTablePrefix('#');
-        }
-
-        return parent::wrapTable($table);
     }
 
     /**

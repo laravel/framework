@@ -65,6 +65,109 @@ abstract class Grammar extends BaseGrammar
     }
 
     /**
+     * Compile the query to determine the schemas.
+     *
+     * @return string
+     */
+    public function compileSchemas()
+    {
+        throw new RuntimeException('This database driver does not support retrieving schemas.');
+    }
+
+    /**
+     * Compile the query to determine if the given table exists.
+     *
+     * @param  string|null  $schema
+     * @param  string  $table
+     * @return string|null
+     */
+    public function compileTableExists($schema, $table)
+    {
+        //
+    }
+
+    /**
+     * Compile the query to determine the tables.
+     *
+     * @param  string|string[]|null  $schema
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    public function compileTables($schema)
+    {
+        throw new RuntimeException('This database driver does not support retrieving tables.');
+    }
+
+    /**
+     * Compile the query to determine the views.
+     *
+     * @param  string|string[]|null  $schema
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    public function compileViews($schema)
+    {
+        throw new RuntimeException('This database driver does not support retrieving views.');
+    }
+
+    /**
+     * Compile the query to determine the user-defined types.
+     *
+     * @param  string|string[]|null  $schema
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    public function compileTypes($schema)
+    {
+        throw new RuntimeException('This database driver does not support retrieving user-defined types.');
+    }
+
+    /**
+     * Compile the query to determine the columns.
+     *
+     * @param  string|null  $schema
+     * @param  string  $table
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    public function compileColumns($schema, $table)
+    {
+        throw new RuntimeException('This database driver does not support retrieving columns.');
+    }
+
+    /**
+     * Compile the query to determine the indexes.
+     *
+     * @param  string|null  $schema
+     * @param  string  $table
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    public function compileIndexes($schema, $table)
+    {
+        throw new RuntimeException('This database driver does not support retrieving indexes.');
+    }
+
+    /**
+     * Compile the query to determine the foreign keys.
+     *
+     * @param  string|null  $schema
+     * @param  string  $table
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    public function compileForeignKeys($schema, $table)
+    {
+        throw new RuntimeException('This database driver does not support retrieving foreign keys.');
+    }
+
+    /**
      * Compile a rename column command.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
@@ -343,12 +446,14 @@ abstract class Grammar extends BaseGrammar
      * Wrap a table in keyword identifiers.
      *
      * @param  mixed  $table
+     * @param  string|null  $prefix
      * @return string
      */
-    public function wrapTable($table)
+    public function wrapTable($table, $prefix = null)
     {
         return parent::wrapTable(
-            $table instanceof Blueprint ? $table->getTable() : $table
+            $table instanceof Blueprint ? $table->getTable() : $table,
+            $prefix
         );
     }
 

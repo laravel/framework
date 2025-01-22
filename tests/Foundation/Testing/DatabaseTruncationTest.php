@@ -47,8 +47,8 @@ class DatabaseTruncationTest extends TestCase
     public function testTruncateTables()
     {
         $connection = $this->arrangeConnection($truncatedTables, [
-            ['schema' => null, 'name' => 'foo'],
-            ['schema' => null, 'name' => 'bar'],
+            ['schema' => null, 'name' => 'foo', 'schema_qualified_name' => 'foo'],
+            ['schema' => null, 'name' => 'bar', 'schema_qualified_name' => 'bar'],
         ]);
 
         $this->truncateTablesForConnection($connection, 'test');
@@ -61,10 +61,10 @@ class DatabaseTruncationTest extends TestCase
         $this->tablesToTruncate = ['foo', 'bar', 'qux'];
 
         $connection = $this->arrangeConnection($truncatedTables, [
-            ['schema' => null, 'name' => 'migrations'],
-            ['schema' => null, 'name' => 'foo'],
-            ['schema' => null, 'name' => 'bar'],
-            ['schema' => null, 'name' => 'baz'],
+            ['schema' => null, 'name' => 'migrations', 'schema_qualified_name' => 'migrations'],
+            ['schema' => null, 'name' => 'foo', 'schema_qualified_name' => 'foo'],
+            ['schema' => null, 'name' => 'bar', 'schema_qualified_name' => 'bar'],
+            ['schema' => null, 'name' => 'baz', 'schema_qualified_name' => 'baz'],
         ]);
 
         $this->truncateTablesForConnection($connection, 'test');
@@ -77,10 +77,10 @@ class DatabaseTruncationTest extends TestCase
         $this->exceptTables = ['baz', 'qux'];
 
         $connection = $this->arrangeConnection($truncatedTables, [
-            ['schema' => null, 'name' => 'migrations'],
-            ['schema' => null, 'name' => 'foo'],
-            ['schema' => null, 'name' => 'bar'],
-            ['schema' => null, 'name' => 'baz'],
+            ['schema' => null, 'name' => 'migrations', 'schema_qualified_name' => 'migrations'],
+            ['schema' => null, 'name' => 'foo', 'schema_qualified_name' => 'foo'],
+            ['schema' => null, 'name' => 'bar', 'schema_qualified_name' => 'bar'],
+            ['schema' => null, 'name' => 'baz', 'schema_qualified_name' => 'baz'],
         ]);
 
         $this->truncateTablesForConnection($connection, 'test');
@@ -91,12 +91,12 @@ class DatabaseTruncationTest extends TestCase
     public function testTruncateTablesWithSchema()
     {
         $connection = $this->arrangeConnection($truncatedTables, [
-            ['schema' => 'public', 'name' => 'migrations'],
-            ['schema' => 'public', 'name' => 'foo'],
-            ['schema' => 'public', 'name' => 'bar'],
-            ['schema' => 'private', 'name' => 'migrations'],
-            ['schema' => 'private', 'name' => 'foo'],
-            ['schema' => 'private', 'name' => 'baz'],
+            ['schema' => 'public', 'name' => 'migrations', 'schema_qualified_name' => 'public.migrations'],
+            ['schema' => 'public', 'name' => 'foo', 'schema_qualified_name' => 'public.foo'],
+            ['schema' => 'public', 'name' => 'bar', 'schema_qualified_name' => 'public.bar'],
+            ['schema' => 'private', 'name' => 'migrations', 'schema_qualified_name' => 'private.migrations'],
+            ['schema' => 'private', 'name' => 'foo', 'schema_qualified_name' => 'private.foo'],
+            ['schema' => 'private', 'name' => 'baz', 'schema_qualified_name' => 'private.baz'],
         ]);
 
         $this->truncateTablesForConnection($connection, 'test');
@@ -109,13 +109,13 @@ class DatabaseTruncationTest extends TestCase
         $this->tablesToTruncate = ['foo', 'public.bar'];
 
         $connection = $this->arrangeConnection($truncatedTables, [
-            ['schema' => 'public', 'name' => 'migrations'],
-            ['schema' => 'public', 'name' => 'foo'],
-            ['schema' => 'public', 'name' => 'bar'],
-            ['schema' => 'public', 'name' => 'baz'],
-            ['schema' => 'private', 'name' => 'migrations'],
-            ['schema' => 'private', 'name' => 'foo'],
-            ['schema' => 'private', 'name' => 'bar'],
+            ['schema' => 'public', 'name' => 'migrations', 'schema_qualified_name' => 'public.migrations'],
+            ['schema' => 'public', 'name' => 'foo', 'schema_qualified_name' => 'public.foo'],
+            ['schema' => 'public', 'name' => 'bar', 'schema_qualified_name' => 'public.bar'],
+            ['schema' => 'public', 'name' => 'baz', 'schema_qualified_name' => 'public.baz'],
+            ['schema' => 'private', 'name' => 'migrations', 'schema_qualified_name' => 'private.migrations'],
+            ['schema' => 'private', 'name' => 'foo', 'schema_qualified_name' => 'private.foo'],
+            ['schema' => 'private', 'name' => 'bar', 'schema_qualified_name' => 'private.bar'],
         ]);
 
         $this->truncateTablesForConnection($connection, 'test');
@@ -128,13 +128,13 @@ class DatabaseTruncationTest extends TestCase
         $this->exceptTables = ['foo', 'public.bar'];
 
         $connection = $this->arrangeConnection($truncatedTables, [
-            ['schema' => 'public', 'name' => 'migrations'],
-            ['schema' => 'public', 'name' => 'foo'],
-            ['schema' => 'public', 'name' => 'bar'],
-            ['schema' => 'public', 'name' => 'baz'],
-            ['schema' => 'private', 'name' => 'migrations'],
-            ['schema' => 'private', 'name' => 'foo'],
-            ['schema' => 'private', 'name' => 'bar'],
+            ['schema' => 'public', 'name' => 'migrations', 'schema_qualified_name' => 'public.migrations'],
+            ['schema' => 'public', 'name' => 'foo', 'schema_qualified_name' => 'public.foo'],
+            ['schema' => 'public', 'name' => 'bar', 'schema_qualified_name' => 'public.bar'],
+            ['schema' => 'public', 'name' => 'baz', 'schema_qualified_name' => 'public.baz'],
+            ['schema' => 'private', 'name' => 'migrations', 'schema_qualified_name' => 'private.migrations'],
+            ['schema' => 'private', 'name' => 'foo', 'schema_qualified_name' => 'private.foo'],
+            ['schema' => 'private', 'name' => 'bar', 'schema_qualified_name' => 'private.bar'],
         ]);
 
         $this->truncateTablesForConnection($connection, 'test');
@@ -145,11 +145,11 @@ class DatabaseTruncationTest extends TestCase
     public function testTruncateTablesWithConnectionPrefix()
     {
         $connection = $this->arrangeConnection($truncatedTables, [
-            ['schema' => 'public', 'name' => 'my_migrations'],
-            ['schema' => 'public', 'name' => 'my_foo'],
-            ['schema' => 'public', 'name' => 'my_baz'],
-            ['schema' => 'private', 'name' => 'my_migrations'],
-            ['schema' => 'private', 'name' => 'my_foo'],
+            ['schema' => 'public', 'name' => 'my_migrations', 'schema_qualified_name' => 'public.my_migrations'],
+            ['schema' => 'public', 'name' => 'my_foo', 'schema_qualified_name' => 'public.my_foo'],
+            ['schema' => 'public', 'name' => 'my_baz', 'schema_qualified_name' => 'public.my_baz'],
+            ['schema' => 'private', 'name' => 'my_migrations', 'schema_qualified_name' => 'private.my_migrations'],
+            ['schema' => 'private', 'name' => 'my_foo', 'schema_qualified_name' => 'private.my_foo'],
         ], 'my_');
 
         $this->truncateTablesForConnection($connection, 'test');
@@ -160,14 +160,14 @@ class DatabaseTruncationTest extends TestCase
     public function testTruncateTablesOnPgsqlWithSearchPath()
     {
         $connection = $this->arrangeConnection($truncatedTables, [
-            ['schema' => 'public', 'name' => 'migrations'],
-            ['schema' => 'public', 'name' => 'foo'],
-            ['schema' => 'public', 'name' => 'bar'],
-            ['schema' => 'my_schema', 'name' => 'foo'],
-            ['schema' => 'my_schema', 'name' => 'baz'],
-            ['schema' => 'private', 'name' => 'migrations'],
-            ['schema' => 'private', 'name' => 'foo'],
-            ['schema' => 'private', 'name' => 'baz'],
+            ['schema' => 'public', 'name' => 'migrations', 'schema_qualified_name' => 'public.migrations'],
+            ['schema' => 'public', 'name' => 'foo', 'schema_qualified_name' => 'public.foo'],
+            ['schema' => 'public', 'name' => 'bar', 'schema_qualified_name' => 'public.bar'],
+            ['schema' => 'my_schema', 'name' => 'foo', 'schema_qualified_name' => 'my_schema.foo'],
+            ['schema' => 'my_schema', 'name' => 'baz', 'schema_qualified_name' => 'my_schema.baz'],
+            ['schema' => 'private', 'name' => 'migrations', 'schema_qualified_name' => 'private.migrations'],
+            ['schema' => 'private', 'name' => 'foo', 'schema_qualified_name' => 'private.foo'],
+            ['schema' => 'private', 'name' => 'baz', 'schema_qualified_name' => 'private.baz'],
         ], '', PostgresBuilder::class, ['my_schema', 'public']);
 
         $this->truncateTablesForConnection($connection, 'test');
@@ -181,11 +181,12 @@ class DatabaseTruncationTest extends TestCase
         $actual = [];
 
         $schema = m::mock($builder ?? Builder::class);
-        $schema->shouldReceive('getTables')->once()->andReturn($allTables);
-
-        if ($builder === PostgresBuilder::class && $schemas) {
-            $schema->shouldReceive('getSchemas')->once()->andReturn($schemas);
-        }
+        $schema->shouldReceive('getTables')->with($schemas)->once()->andReturn(
+            empty($schemas)
+                ? $allTables
+                : array_filter($allTables, fn ($table) => in_array($table['schema'], $schemas))
+        );
+        $schema->shouldReceive('getCurrentSchemaListing')->once()->andReturn($schemas);
 
         $connection = m::mock(Connection::class);
         $connection->shouldReceive('getTablePrefix')->andReturn($prefix);

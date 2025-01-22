@@ -148,6 +148,18 @@ class Builder
     }
 
     /**
+     * Get the schemas that belong to the connection.
+     *
+     * @return array
+     */
+    public function getSchemas()
+    {
+        return $this->connection->getPostProcessor()->processSchemas(
+            $this->connection->selectFromWriteConnection($this->grammar->compileSchemas())
+        );
+    }
+
+    /**
      * Determine if the given table exists.
      *
      * @param  string  $table
@@ -155,9 +167,15 @@ class Builder
      */
     public function hasTable($table)
     {
+        [$schema, $table] = $this->parseSchemaAndTable($table);
+
         $table = $this->connection->getTablePrefix().$table;
 
-        foreach ($this->getTables() as $value) {
+        if ($sql = $this->grammar->compileTableExists($schema, $table)) {
+            return (bool) $this->connection->scalar($sql);
+        }
+
+        foreach ($this->getTables($schema ?? $this->getCurrentSchemaName()) as $value) {
             if (strtolower($table) === strtolower($value['name'])) {
                 return true;
             }
@@ -174,9 +192,11 @@ class Builder
      */
     public function hasView($view)
     {
+        [$schema, $view] = $this->parseSchemaAndTable($view);
+
         $view = $this->connection->getTablePrefix().$view;
 
-        foreach ($this->getViews() as $value) {
+        foreach ($this->getViews($schema ?? $this->getCurrentSchemaName()) as $value) {
             if (strtolower($view) === strtolower($value['name'])) {
                 return true;
             }
@@ -186,47 +206,57 @@ class Builder
     }
 
     /**
-     * Get the tables that belong to the database.
+     * Get the tables that belong to the connection.
      *
+     * @param  string|string[]|null  $schema
      * @return array
      */
-    public function getTables()
+    public function getTables($schema = null)
     {
         return $this->connection->getPostProcessor()->processTables(
-            $this->connection->selectFromWriteConnection($this->grammar->compileTables())
+            $this->connection->selectFromWriteConnection($this->grammar->compileTables($schema))
         );
     }
 
     /**
-     * Get the names of the tables that belong to the database.
+     * Get the names of the tables that belong to the connection.
      *
+     * @param  string|string[]|null  $schema
+     * @param  bool  $schemaQualified
      * @return array
      */
-    public function getTableListing()
+    public function getTableListing($schema = null, $schemaQualified = true)
     {
-        return array_column($this->getTables(), 'name');
+        return array_column(
+            $this->getTables($schema),
+            $schemaQualified ? 'schema_qualified_name' : 'name'
+        );
     }
 
     /**
-     * Get the views that belong to the database.
+     * Get the views that belong to the connection.
      *
+     * @param  string|string[]|null  $schema
      * @return array
      */
-    public function getViews()
+    public function getViews($schema = null)
     {
         return $this->connection->getPostProcessor()->processViews(
-            $this->connection->selectFromWriteConnection($this->grammar->compileViews())
+            $this->connection->selectFromWriteConnection($this->grammar->compileViews($schema))
         );
     }
 
     /**
-     * Get the user-defined types that belong to the database.
+     * Get the user-defined types that belong to the connection.
      *
+     * @param  string|string[]|null  $schema
      * @return array
      */
-    public function getTypes()
+    public function getTypes($schema = null)
     {
-        throw new LogicException('This database driver does not support user-defined types.');
+        return $this->connection->getPostProcessor()->processTypes(
+            $this->connection->selectFromWriteConnection($this->grammar->compileTypes($schema))
+        );
     }
 
     /**
@@ -333,10 +363,14 @@ class Builder
      */
     public function getColumns($table)
     {
+        [$schema, $table] = $this->parseSchemaAndTable($table);
+
         $table = $this->connection->getTablePrefix().$table;
 
         return $this->connection->getPostProcessor()->processColumns(
-            $this->connection->selectFromWriteConnection($this->grammar->compileColumns($table))
+            $this->connection->selectFromWriteConnection(
+                $this->grammar->compileColumns($schema, $table)
+            )
         );
     }
 
@@ -348,10 +382,14 @@ class Builder
      */
     public function getIndexes($table)
     {
+        [$schema, $table] = $this->parseSchemaAndTable($table);
+
         $table = $this->connection->getTablePrefix().$table;
 
         return $this->connection->getPostProcessor()->processIndexes(
-            $this->connection->selectFromWriteConnection($this->grammar->compileIndexes($table))
+            $this->connection->selectFromWriteConnection(
+                $this->grammar->compileIndexes($schema, $table)
+            )
         );
     }
 
@@ -400,10 +438,14 @@ class Builder
      */
     public function getForeignKeys($table)
     {
+        [$schema, $table] = $this->parseSchemaAndTable($table);
+
         $table = $this->connection->getTablePrefix().$table;
 
         return $this->connection->getPostProcessor()->processForeignKeys(
-            $this->connection->selectFromWriteConnection($this->grammar->compileForeignKeys($table))
+            $this->connection->selectFromWriteConnection(
+                $this->grammar->compileForeignKeys($schema, $table)
+            )
         );
     }
 
@@ -595,6 +637,55 @@ class Builder
         }
 
         return Container::getInstance()->make(Blueprint::class, compact('connection', 'table', 'callback', 'prefix'));
+    }
+
+    /**
+     * Get the names of the current schemas for the connection.
+     *
+     * @return string[]|null
+     */
+    public function getCurrentSchemaListing()
+    {
+        return null;
+    }
+
+    /**
+     * Get the default schema name for the connection.
+     *
+     * @return string|null
+     */
+    public function getCurrentSchemaName()
+    {
+        return $this->getCurrentSchemaListing()[0] ?? null;
+    }
+
+    /**
+     * Parse the given database object reference and extract the schema and table.
+     *
+     * @param  string  $reference
+     * @param  string|bool|null  $withDefaultSchema
+     * @return array
+     */
+    public function parseSchemaAndTable($reference, $withDefaultSchema = null)
+    {
+        $segments = explode('.', $reference);
+
+        if (count($segments) > 2) {
+            throw new InvalidArgumentException(
+                "Using three-part references is not supported, you may use `Schema::connection('{$segments[0]}')` instead."
+            );
+        }
+
+        $table = $segments[1] ?? $segments[0];
+
+        $schema = match (true) {
+            isset($segments[1]) => $segments[0],
+            is_string($withDefaultSchema) => $withDefaultSchema,
+            $withDefaultSchema => $this->getCurrentSchemaName(),
+            default => null,
+        };
+
+        return [$schema, $table];
     }
 
     /**

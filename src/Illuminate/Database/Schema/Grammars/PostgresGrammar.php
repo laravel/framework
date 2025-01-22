@@ -70,9 +70,21 @@ class PostgresGrammar extends Grammar
     }
 
     /**
+     * Compile the query to determine the schemas.
+     *
+     * @return string
+     */
+    public function compileSchemas()
+    {
+        return 'select nspname as name, nspname = current_schema() as "default" from pg_namespace where '
+            .$this->compileSchemaWhereClause(null, 'nspname')
+            .' order by nspname';
+    }
+
+    /**
      * Compile the query to determine if the given table exists.
      *
-     * @param  string  $schema
+     * @param  string|null  $schema
      * @param  string  $table
      * @return string
      */
@@ -81,7 +93,7 @@ class PostgresGrammar extends Grammar
         return sprintf(
             'select exists (select 1 from pg_class c, pg_namespace n where '
             ."n.nspname = %s and c.relname = %s and c.relkind in ('r', 'p') and n.oid = c.relnamespace)",
-            $this->quoteString($schema),
+            $schema ? $this->quoteString($schema) : 'current_schema()',
             $this->quoteString($table)
         );
     }
@@ -89,32 +101,38 @@ class PostgresGrammar extends Grammar
     /**
      * Compile the query to determine the tables.
      *
+     * @param  string|string[]|null  $schema
      * @return string
      */
-    public function compileTables()
+    public function compileTables($schema)
     {
         return 'select c.relname as name, n.nspname as schema, pg_total_relation_size(c.oid) as size, '
             ."obj_description(c.oid, 'pg_class') as comment from pg_class c, pg_namespace n "
-            ."where c.relkind in ('r', 'p') and n.oid = c.relnamespace and n.nspname not in ('pg_catalog', 'information_schema') "
-            .'order by c.relname';
+            ."where c.relkind in ('r', 'p') and n.oid = c.relnamespace and "
+            .$this->compileSchemaWhereClause($schema, 'n.nspname')
+            .' order by n.nspname, c.relname';
     }
 
     /**
      * Compile the query to determine the views.
      *
+     * @param  string|string[]|null  $schema
      * @return string
      */
-    public function compileViews()
+    public function compileViews($schema)
     {
-        return "select viewname as name, schemaname as schema, definition from pg_views where schemaname not in ('pg_catalog', 'information_schema') order by viewname";
+        return 'select viewname as name, schemaname as schema, definition from pg_views where '
+            .$this->compileSchemaWhereClause($schema, 'schemaname')
+            .' order by schemaname, viewname';
     }
 
     /**
      * Compile the query to determine the user-defined types.
      *
+     * @param  string|string[]|null  $schema
      * @return string
      */
-    public function compileTypes()
+    public function compileTypes($schema)
     {
         return 'select t.typname as name, n.nspname as schema, t.typtype as type, t.typcategory as category, '
             ."((t.typinput = 'array_in'::regproc and t.typoutput = 'array_out'::regproc) or t.typtype = 'm') as implicit "
@@ -123,14 +141,30 @@ class PostgresGrammar extends Grammar
             .'left join pg_type el on el.oid = t.typelem '
             .'left join pg_class ce on ce.oid = el.typrelid '
             ."where ((t.typrelid = 0 and (ce.relkind = 'c' or ce.relkind is null)) or c.relkind = 'c') "
-            ."and not exists (select 1 from pg_depend d where d.objid in (t.oid, t.typelem) and d.deptype = 'e') "
-            ."and n.nspname not in ('pg_catalog', 'information_schema')";
+            ."and not exists (select 1 from pg_depend d where d.objid in (t.oid, t.typelem) and d.deptype = 'e') and "
+            .$this->compileSchemaWhereClause($schema, 'n.nspname');
+    }
+
+    /**
+     * Compile the query to compare the schema.
+     *
+     * @param  string|string[]|null  $schema
+     * @param  string  $column
+     * @return string
+     */
+    protected function compileSchemaWhereClause($schema, $column)
+    {
+        return $column.(match (true) {
+            ! empty($schema) && is_array($schema) => ' in ('.$this->quoteString($schema).')',
+            ! empty($schema) => ' = '.$this->quoteString($schema),
+            default => " <> 'information_schema' and $column not like 'pg\_%'",
+        });
     }
 
     /**
      * Compile the query to determine the columns.
      *
-     * @param  string  $schema
+     * @param  string|null  $schema
      * @param  string  $table
      * @return string
      */
@@ -147,14 +181,14 @@ class PostgresGrammar extends Grammar
             .'where c.relname = %s and n.nspname = %s and a.attnum > 0 and a.attrelid = c.oid and a.atttypid = t.oid and n.oid = c.relnamespace '
             .'order by a.attnum',
             $this->quoteString($table),
-            $this->quoteString($schema)
+            $schema ? $this->quoteString($schema) : 'current_schema()'
         );
     }
 
     /**
      * Compile the query to determine the indexes.
      *
-     * @param  string  $schema
+     * @param  string|null  $schema
      * @param  string  $table
      * @return string
      */
@@ -173,14 +207,14 @@ class PostgresGrammar extends Grammar
             .'where tc.relname = %s and tn.nspname = %s '
             .'group by ic.relname, am.amname, i.indisunique, i.indisprimary',
             $this->quoteString($table),
-            $this->quoteString($schema)
+            $schema ? $this->quoteString($schema) : 'current_schema()'
         );
     }
 
     /**
      * Compile the query to determine the foreign keys.
      *
-     * @param  string  $schema
+     * @param  string|null  $schema
      * @param  string  $table
      * @return string
      */
@@ -203,7 +237,7 @@ class PostgresGrammar extends Grammar
             ."where c.contype = 'f' and tc.relname = %s and tn.nspname = %s "
             .'group by c.conname, fn.nspname, fc.relname, c.confupdtype, c.confdeltype',
             $this->quoteString($table),
-            $this->quoteString($schema)
+            $schema ? $this->quoteString($schema) : 'current_schema()'
         );
     }
 
