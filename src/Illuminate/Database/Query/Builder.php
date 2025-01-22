@@ -296,7 +296,7 @@ class Builder implements BuilderContract
     /**
      * Add a subselect expression to the query.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|string  $query
+     * @param  \Closure(\Illuminate\Database\Query\Builder): mixed|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|string  $query
      * @param  string  $as
      * @return $this
      *
@@ -332,7 +332,7 @@ class Builder implements BuilderContract
     /**
      * Makes "from" fetch from a subquery.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|string  $query
+     * @param  \Closure(\Illuminate\Database\Query\Builder): mixed|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|string  $query
      * @param  string  $as
      * @return $this
      *
@@ -364,7 +364,7 @@ class Builder implements BuilderContract
     /**
      * Creates a subquery and parse it.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|string  $query
+     * @param  \Closure(\Illuminate\Database\Query\Builder): mixed|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|string  $query
      * @return array
      */
     protected function createSub($query)
@@ -474,7 +474,7 @@ class Builder implements BuilderContract
     /**
      * Set the table which the query is targeting.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|\Illuminate\Contracts\Database\Query\Expression|string  $table
+     * @param  \Closure(\Illuminate\Database\Query\Builder): mixed|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|\Illuminate\Contracts\Database\Query\Expression|string  $table
      * @param  string|null  $as
      * @return $this
      */
@@ -532,7 +532,7 @@ class Builder implements BuilderContract
      * Add a join clause to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $table
-     * @param  \Closure|\Illuminate\Contracts\Database\Query\Expression|string  $first
+     * @param  \Closure(\Illuminate\Database\Query\JoinClause): mixed|\Illuminate\Contracts\Database\Query\Expression|string  $first
      * @param  Operator|null  $operator
      * @param  \Illuminate\Contracts\Database\Query\Expression|string|null  $second
      * @param  string  $type
@@ -572,7 +572,7 @@ class Builder implements BuilderContract
      * Add a "join where" clause to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $table
-     * @param  \Closure|\Illuminate\Contracts\Database\Query\Expression|string  $first
+     * @param  \Closure(\Illuminate\Database\Query\JoinClause): mixed|\Illuminate\Contracts\Database\Query\Expression|string  $first
      * @param  Operator  $operator
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $second
      * @param  string  $type
@@ -586,9 +586,9 @@ class Builder implements BuilderContract
     /**
      * Add a subquery join clause to the query.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|string  $query
+     * @param  \Closure(\Illuminate\Database\Query\Builder): mixed|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|string  $query
      * @param  string  $as
-     * @param  \Closure|\Illuminate\Contracts\Database\Query\Expression|string  $first
+     * @param  \Closure(\Illuminate\Database\Query\JoinClause): mixed|\Illuminate\Contracts\Database\Query\Expression|string  $first
      * @param  Operator|null  $operator
      * @param  \Illuminate\Contracts\Database\Query\Expression|string|null  $second
      * @param  string  $type
@@ -611,7 +611,7 @@ class Builder implements BuilderContract
     /**
      * Add a lateral join clause to the query.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|string  $query
+     * @param  \Closure(\Illuminate\Database\Query\Builder): mixed|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|string  $query
      * @param  string  $as
      * @param  string  $type
      * @return $this
@@ -632,7 +632,7 @@ class Builder implements BuilderContract
     /**
      * Add a lateral left join to the query.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|string  $query
+     * @param  \Closure(\Illuminate\Database\Query\JoinClause): mixed|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|string  $query
      * @param  string  $as
      * @return $this
      */
@@ -645,7 +645,7 @@ class Builder implements BuilderContract
      * Add a left join to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $table
-     * @param  \Closure|\Illuminate\Contracts\Database\Query\Expression|string  $first
+     * @param  \Closure(\Illuminate\Database\Query\JoinClause): mixed|\Illuminate\Contracts\Database\Query\Expression|string  $first
      * @param  Operator|null  $operator
      * @param  \Illuminate\Contracts\Database\Query\Expression|string|null  $second
      * @return $this
@@ -659,7 +659,7 @@ class Builder implements BuilderContract
      * Add a "join where" clause to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $table
-     * @param  \Closure|\Illuminate\Contracts\Database\Query\Expression|string  $first
+     * @param  \Closure(\Illuminate\Database\Query\JoinClause): mixed|\Illuminate\Contracts\Database\Query\Expression|string  $first
      * @param  Operator  $operator
      * @param  \Illuminate\Contracts\Database\Query\Expression|string|null  $second
      * @return $this
@@ -672,9 +672,9 @@ class Builder implements BuilderContract
     /**
      * Add a subquery left join to the query.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|string  $query
+     * @param  \Closure(\Illuminate\Database\Query\Builder): mixed|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|string  $query
      * @param  string  $as
-     * @param  \Closure|\Illuminate\Contracts\Database\Query\Expression|string  $first
+     * @param  \Closure(\Illuminate\Database\Query\JoinClause): mixed|\Illuminate\Contracts\Database\Query\Expression|string  $first
      * @param  Operator|null  $operator
      * @param  \Illuminate\Contracts\Database\Query\Expression|string|null  $second
      * @return $this
@@ -688,7 +688,7 @@ class Builder implements BuilderContract
      * Add a right join to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $table
-     * @param  \Closure|string  $first
+     * @param  \Closure(\Illuminate\Database\Query\JoinClause): mixed|string  $first
      * @param  Operator|null  $operator
      * @param  \Illuminate\Contracts\Database\Query\Expression|string|null  $second
      * @return $this
@@ -702,7 +702,7 @@ class Builder implements BuilderContract
      * Add a "right join where" clause to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $table
-     * @param  \Closure|\Illuminate\Contracts\Database\Query\Expression|string  $first
+     * @param  \Closure(\Illuminate\Database\Query\JoinClause): mixed|\Illuminate\Contracts\Database\Query\Expression|string  $first
      * @param  Operator  $operator
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $second
      * @return $this
@@ -715,9 +715,9 @@ class Builder implements BuilderContract
     /**
      * Add a subquery right join to the query.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|string  $query
+     * @param  \Closure(\Illuminate\Database\Query\Builder): mixed|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|string  $query
      * @param  string  $as
-     * @param  \Closure|\Illuminate\Contracts\Database\Query\Expression|string  $first
+     * @param  \Closure(\Illuminate\Database\Query\JoinClause): mixed|\Illuminate\Contracts\Database\Query\Expression|string  $first
      * @param  Operator|null  $operator
      * @param  \Illuminate\Contracts\Database\Query\Expression|string|null  $second
      * @return $this
@@ -731,7 +731,7 @@ class Builder implements BuilderContract
      * Add a "cross join" clause to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $table
-     * @param  \Closure|\Illuminate\Contracts\Database\Query\Expression|string|null  $first
+     * @param  \Closure(\Illuminate\Database\Query\JoinClause): mixed|\Illuminate\Contracts\Database\Query\Expression|string|null  $first
      * @param  Operator|null  $operator
      * @param  \Illuminate\Contracts\Database\Query\Expression|string|null  $second
      * @return $this
@@ -750,7 +750,7 @@ class Builder implements BuilderContract
     /**
      * Add a subquery cross join to the query.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|string  $query
+     * @param  \Closure(\Illuminate\Database\Query\Builder): mixed|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|string  $query
      * @param  string  $as
      * @return $this
      */
@@ -814,7 +814,7 @@ class Builder implements BuilderContract
     /**
      * Add a basic where clause to the query.
      *
-     * @param  \Closure|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @param  \Closure(\Illuminate\Database\Query\Builder): mixed|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
      * @param  Operator|null  $operator
      * @param  mixed  $value
      * @param  'and'|'or'  $boolean
@@ -1001,7 +1001,7 @@ class Builder implements BuilderContract
     /**
      * Add an "or where" clause to the query.
      *
-     * @param  \Closure|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @param  \Closure(\Illuminate\Database\Query\Builder): mixed|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
      * @param  Operator|null  $operator
      * @param  mixed  $value
      * @return $this
@@ -1018,7 +1018,7 @@ class Builder implements BuilderContract
     /**
      * Add a basic "where not" clause to the query.
      *
-     * @param  \Closure|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @param  \Closure(\Illuminate\Database\Query\Builder): mixed|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
      * @param  Operator|null  $operator
      * @param  mixed  $value
      * @param  'and'|'or'  $boolean
@@ -1038,7 +1038,7 @@ class Builder implements BuilderContract
     /**
      * Add an "or where not" clause to the query.
      *
-     * @param  \Closure|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @param  \Closure(\Illuminate\Database\Query\Builder): mixed|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
      * @param  Operator|null  $operator
      * @param  mixed  $value
      * @return $this
@@ -1826,7 +1826,7 @@ class Builder implements BuilderContract
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
      * @param  Operator  $operator
-     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>  $callback
+     * @param  \Closure(\Illuminate\Database\Query\Builder): mixed|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>  $callback
      * @param  'and'|'or'  $boolean
      * @return $this
      */
@@ -1855,7 +1855,7 @@ class Builder implements BuilderContract
     /**
      * Add an exists clause to the query.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>  $callback
+     * @param  \Closure(\Illuminate\Database\Query\Builder): mixed|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>  $callback
      * @param  'and'|'or'  $boolean
      * @param  bool  $not
      * @return $this
@@ -1879,7 +1879,7 @@ class Builder implements BuilderContract
     /**
      * Add an or exists clause to the query.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>  $callback
+     * @param  \Closure(\Illuminate\Database\Query\Builder): mixed|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>  $callback
      * @param  bool  $not
      * @return $this
      */
@@ -1891,7 +1891,7 @@ class Builder implements BuilderContract
     /**
      * Add a where not exists clause to the query.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>  $callback
+     * @param  \Closure(\Illuminate\Database\Query\Builder): mixed|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>  $callback
      * @param  'and'|'or'  $boolean
      * @return $this
      */
@@ -1903,7 +1903,7 @@ class Builder implements BuilderContract
     /**
      * Add a where not exists clause to the query.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>  $callback
+     * @param  \Closure(\Illuminate\Database\Query\Builder): mixed|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>  $callback
      * @return $this
      */
     public function orWhereNotExists($callback)
@@ -2632,7 +2632,7 @@ class Builder implements BuilderContract
     /**
      * Add an "order by" clause to the query.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|\Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  \Closure(\Illuminate\Database\Query\Builder): mixed|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|\Illuminate\Contracts\Database\Query\Expression|string  $column
      * @param  string  $direction
      * @return $this
      *
@@ -2665,7 +2665,7 @@ class Builder implements BuilderContract
     /**
      * Add a descending "order by" clause to the query.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|\Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  \Closure(\Illuminate\Database\Query\Builder): mixed|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|\Illuminate\Contracts\Database\Query\Expression|string  $column
      * @return $this
      */
     public function orderByDesc($column)
@@ -2676,7 +2676,7 @@ class Builder implements BuilderContract
     /**
      * Add an "order by" clause for a timestamp to the query.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  \Closure(\Illuminate\Database\Query\Builder): mixed|\Illuminate\Database\Query\Builder|\Illuminate\Contracts\Database\Query\Expression|string  $column
      * @return $this
      */
     public function latest($column = 'created_at')
@@ -2687,7 +2687,7 @@ class Builder implements BuilderContract
     /**
      * Add an "order by" clause for a timestamp to the query.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  \Closure(\Illuminate\Database\Query\Builder): mixed|\Illuminate\Database\Query\Builder|\Illuminate\Contracts\Database\Query\Expression|string  $column
      * @return $this
      */
     public function oldest($column = 'created_at')
@@ -2849,7 +2849,7 @@ class Builder implements BuilderContract
     /**
      * Remove all existing orders and optionally add a new order.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Contracts\Database\Query\Expression|string|null  $column
+     * @param  \Closure(\Illuminate\Database\Query\Builder): mixed|\Illuminate\Database\Query\Builder|\Illuminate\Contracts\Database\Query\Expression|string|null  $column
      * @param  string  $direction
      * @return $this
      */
@@ -2885,7 +2885,7 @@ class Builder implements BuilderContract
     /**
      * Add a union statement to the query.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>  $query
+     * @param  \Closure(\Illuminate\Database\Query\Builder): mixed|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>  $query
      * @param  bool  $all
      * @return $this
      */
@@ -2905,7 +2905,7 @@ class Builder implements BuilderContract
     /**
      * Add a union all statement to the query.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>  $query
+     * @param  \Closure(\Illuminate\Database\Query\Builder): mixed|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>  $query
      * @return $this
      */
     public function unionAll($query)
@@ -3171,7 +3171,7 @@ class Builder implements BuilderContract
      * @param  array|string  $columns
      * @param  string  $pageName
      * @param  int|null  $page
-     * @param  \Closure|int|null  $total
+     * @param  (\Closure(): int|null)|int|null  $total
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
     public function paginate($perPage = 15, $columns = ['*'], $pageName = 'page', $page = null, $total = null)
@@ -3806,7 +3806,7 @@ class Builder implements BuilderContract
      * Insert new records into the table using a subquery.
      *
      * @param  array  $columns
-     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|string  $query
+     * @param  \Closure(\Illuminate\Database\Query\Builder): mixed|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|string  $query
      * @return int
      */
     public function insertUsing(array $columns, $query)
@@ -3825,7 +3825,7 @@ class Builder implements BuilderContract
      * Insert new records into the table using a subquery while ignoring errors.
      *
      * @param  array  $columns
-     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|string  $query
+     * @param  \Closure(\Illuminate\Database\Query\Builder): mixed|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|string  $query
      * @return int
      */
     public function insertOrIgnoreUsing(array $columns, $query)
