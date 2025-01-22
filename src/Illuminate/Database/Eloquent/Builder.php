@@ -637,7 +637,7 @@ class Builder implements BuilderContract
         return tap($this->firstOrCreate($attributes, [$column => $default]), function ($instance) use ($column, $step, $extra) {
             if (! $instance->wasRecentlyCreated) {
                 $instance->increment($column, $step, $extra);
-           }
+            }
         });
     }
 

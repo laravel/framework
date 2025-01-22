@@ -300,7 +300,8 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
         ], $result->toArray());
     }
 
-    public function testIncrementOrCreateMethodIncrementsExistingRecord(): void {
+    public function testIncrementOrCreateMethodIncrementsExistingRecord(): void
+    {
         $model = new EloquentBuilderCreateOrFirstTestModel();
         $this->mockConnectionForModel($model, 'SQLite');
         $model->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
@@ -341,7 +342,8 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
         ], $result->toArray());
     }
 
-    public function testIncrementOrCreateMethodCreatesNewRecord(): void {
+    public function testIncrementOrCreateMethodCreatesNewRecord(): void
+    {
         $model = new EloquentBuilderCreateOrFirstTestModel();
         $this->mockConnectionForModel($model, 'SQLite', [123]);
         $model->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
@@ -412,7 +414,8 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
         ], $result->toArray());
     }
 
-    public function testIncrementOrCreateMethodRetrievesRecordCreatedJustNow(): void {
+    public function testIncrementOrCreateMethodRetrievesRecordCreatedJustNow(): void
+    {
         $model = new EloquentBuilderCreateOrFirstTestModel();
         $this->mockConnectionForModel($model, 'SQLite');
         $model->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
@@ -437,7 +440,7 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
             ->andReturn([[
                 'id' => 123,
                 'attr' => 'foo',
-                'count' =>  1 ,
+                'count' => 1,
                 'created_at' => '2023-01-01 00:00:00',
                 'updated_at' => '2023-01-01 00:00:00',
             ]]);
@@ -446,7 +449,6 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
             ->expects('raw')
             ->with('"count" + 1')
             ->andReturn('2');
-
 
         $model->getConnection()
             ->expects('update')
