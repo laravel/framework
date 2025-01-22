@@ -815,7 +815,7 @@ class Builder implements BuilderContract
      * Add a basic where clause to the query.
      *
      * @param  \Closure|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
-     * @param  Operator|null $operator
+     * @param  Operator|null  $operator
      * @param  mixed  $value
      * @param  'and'|'or'  $boolean
      * @return $this
