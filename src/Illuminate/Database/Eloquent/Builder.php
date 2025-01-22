@@ -627,14 +627,16 @@ class Builder implements BuilderContract
      *
      * @param  array  $attributes
      * @param  string  $column
-     * @param  int  $default
+     * @param  int|float  $default
+     * @param  int|float  $step
+     * @param  array  $extra
      * @return TModel
      */
-    public function incrementOrCreate(array $attributes, string $column = 'count', $default = 1)
+    public function incrementOrCreate(array $attributes, string $column = 'count', $default = 1, $step = 1, array $extra = [])
     {
-        return tap($this->firstOrCreate($attributes, [$column => $default]), function ($instance) use ($column) {
-           if (! $instance->wasRecentlyCreated) {
-               $instance->increment($column);
+        return tap($this->firstOrCreate($attributes, [$column => $default]), function ($instance) use ($column, $step, $extra) {
+            if (! $instance->wasRecentlyCreated) {
+                $instance->increment($column, $step, $extra);
            }
         });
     }
