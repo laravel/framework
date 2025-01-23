@@ -2,9 +2,8 @@
 
 namespace Illuminate\Validation\Rules;
 
-use DateTime;
+use DateTimeInterface;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
 use Stringable;
@@ -15,155 +14,101 @@ class Date implements Stringable
 
     /**
      * The constraints for the date rule.
-     *
-     * @var array
      */
-    protected $constraints = ['date'];
+    protected array $constraints = ['date'];
 
     /**
-     * The format for the date.
-     *
-     * @var string
+     * Ensure the date has the given format.
      */
-    protected $format;
-
-    /**
-     * Create a new date rule instance.
-     *
-     * @param  string  $format
-     * @return void
-     */
-    public function __construct($format = 'Y-m-d')
+    public function format(string $format): static
     {
-        $this->format = $format;
-    }
-
-    /**
-     * Specify the date format to validate against.
-     *
-     * @param  ?string  $format
-     * @return $this
-     */
-    public function format($format = null)
-    {
-        return $this->addRule('date_format:'.($format ?? $this->format));
-    }
-
-    /**
-     * Ensure the date is after today.
-     *
-     * @return $this
-     */
-    public function afterToday()
-    {
-        return $this->after('today');
+        return $this->addRule('date_format:'.$format);
     }
 
     /**
      * Ensure the date is before today.
-     *
-     * @return $this
      */
-    public function beforeToday()
+    public function beforeToday(): static
     {
         return $this->before('today');
     }
 
     /**
-     * Ensure the date is after or equal to today.
-     *
-     * @return $this
+     * Ensure the date is after today.
      */
-    public function afterOrEqualToday()
+    public function afterToday(): static
     {
-        return $this->afterOrEqual('today');
+        return $this->after('today');
     }
 
     /**
      * Ensure the date is before or equal to today.
-     *
-     * @return $this
      */
-    public function beforeOrEqualToday()
+    public function todayOrBefore(): static
     {
         return $this->beforeOrEqual('today');
     }
 
     /**
-     * Ensure the date is after the specified date.
-     *
-     * @param  \Illuminate\Support\Carbon|\DateTime|string  $date
-     * @return $this
+     * Ensure the date is after or equal to today.
      */
-    public function after($date)
+    public function todayOrAfter(): static
     {
-        return $this->addRule('after:'.$this->formatDate($date));
+        return $this->afterOrEqual('today');
     }
 
     /**
-     * Ensure the date is before the specified date.
-     *
-     * @param  \Illuminate\Support\Carbon|\DateTime|string  $date
-     * @return $this
+     * Ensure the date is before the given date or date field.
      */
-    public function before($date)
+    public function before(DateTimeInterface|string $date): static
     {
         return $this->addRule('before:'.$this->formatDate($date));
     }
 
     /**
-     * Ensure the date is on or after the specified date.
-     *
-     * @param  \Illuminate\Support\Carbon|\DateTime|string  $date
-     * @return $this
+     * Ensure the date is after the given date or date field.
      */
-    public function afterOrEqual($date)
+    public function after(DateTimeInterface|string $date): static
     {
-        return $this->addRule('after_or_equal:'.$this->formatDate($date));
+        return $this->addRule('after:'.$this->formatDate($date));
     }
 
     /**
-     * Ensure the date is on or before the specified date.
-     *
-     * @param  \Illuminate\Support\Carbon|\DateTime|string  $date
-     * @return $this
+     * Ensure the date is on or before the specified date or date field.
      */
-    public function beforeOrEqual($date)
+    public function beforeOrEqual(DateTimeInterface|string $date): static
     {
         return $this->addRule('before_or_equal:'.$this->formatDate($date));
     }
 
     /**
-     * Ensure the date is between two dates.
-     *
-     * @param  \Illuminate\Support\Carbon|\DateTime|string  $from
-     * @param  \Illuminate\Support\Carbon|\DateTime|string  $to
-     * @return $this
+     * Ensure the date is on or after the given date or date field.
      */
-    public function between($from, $to)
+    public function afterOrEqual(DateTimeInterface|string $date): static
+    {
+        return $this->addRule('after_or_equal:'.$this->formatDate($date));
+    }
+
+    /**
+     * Ensure the date is between two dates or date fields.
+     */
+    public function between(DateTimeInterface|string $from, DateTimeInterface|string $to): static
     {
         return $this->after($from)->before($to);
     }
 
     /**
-     * Ensure the date is between or equal to two dates.
-     *
-     * @param  \Illuminate\Support\Carbon|\DateTime|string  $from
-     * @param  \Illuminate\Support\Carbon|\DateTime|string  $to
-     * @return $this
+     * Ensure the date is between or equal to two dates or date fields.
      */
-    public function betweenOrEqual($from, $to)
+    public function betweenOrEqual(DateTimeInterface|string $from, DateTimeInterface|string $to): static
     {
         return $this->afterOrEqual($from)->beforeOrEqual($to);
     }
 
     /**
      * Add custom rules to the validation rules array.
-     *
-     * @param  string|array  $rules
-     * @return $this
      */
-    public function addRule($rules)
+    protected function addRule(array|string $rules): static
     {
         $this->constraints = array_merge($this->constraints, Arr::wrap($rules));
 
@@ -172,25 +117,18 @@ class Date implements Stringable
 
     /**
      * Format the date for the validation rule.
-     *
-     * @param  \Illuminate\Support\Carbon|\DateTime|string  $date
-     * @return string
      */
-    protected function formatDate($date)
+    protected function formatDate(DateTimeInterface|string $date): string
     {
-        if ($date instanceof Carbon || $date instanceof DateTime) {
-            return $date->format($this->format);
-        }
-
-        return $date;
+        return $date instanceof DateTimeInterface
+            ? $date->format('Y-m-d')
+            : $date;
     }
 
     /**
      * Convert the rule to a validation string.
-     *
-     * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         return implode('|', $this->constraints);
     }

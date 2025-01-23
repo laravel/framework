@@ -23,9 +23,6 @@ class ValidationDateRuleTest extends TestCase
 
     public function testDateFormatRule()
     {
-        $rule = Rule::date()->format();
-        $this->assertEquals('date|date_format:Y-m-d', (string) $rule);
-
         $rule = Rule::date()->format('d/m/Y');
         $this->assertEquals('date|date_format:d/m/Y', (string) $rule);
     }
@@ -34,12 +31,18 @@ class ValidationDateRuleTest extends TestCase
     {
         $rule = Rule::date()->afterToday();
         $this->assertEquals('date|after:today', (string) $rule);
+
+        $rule = Rule::date()->todayOrAfter();
+        $this->assertEquals('date|after_or_equal:today', (string) $rule);
     }
 
     public function testBeforeTodayRule()
     {
         $rule = Rule::date()->beforeToday();
         $this->assertEquals('date|before:today', (string) $rule);
+
+        $rule = Rule::date()->todayOrBefore();
+        $this->assertEquals('date|before_or_equal:today', (string) $rule);
     }
 
     public function testAfterSpecificDateRule()

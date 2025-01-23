@@ -171,6 +171,16 @@ class Rule
     }
 
     /**
+     * Get a date rule builder instance.
+     *
+     * @return \Illuminate\Validation\Rules\Date
+     */
+    public static function date()
+    {
+        return new Date;
+    }
+
+    /**
      * Get an enum rule builder instance.
      *
      * @param  class-string  $type
@@ -199,17 +209,6 @@ class Rule
     public static function imageFile()
     {
         return new ImageFile;
-    }
-
-    /**
-     * Get a date rule builder instance.
-     *
-     * @param  string  $format
-     * @return \Illuminate\Validation\Rules\Date
-     */
-    public static function date($format = 'Y-m-d')
-    {
-        return new Date($format);
     }
 
     /**
