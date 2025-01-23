@@ -816,9 +816,9 @@ class RouteRegistrarTest extends TestCase
 
         $this->router->resource('users', RouteRegistrarControllerStub::class)
             ->only('create', 'store')->names([
-                         'create' => 'user.build',
-                         'store' => 'user.save',
-                     ]);
+                'create' => 'user.build',
+                'store' => 'user.save',
+            ]);
 
         $this->router->resource('posts', RouteRegistrarControllerStub::class)
             ->only('create', 'destroy')
