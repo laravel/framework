@@ -57,7 +57,7 @@ class RouteListCommandTest extends TestCase
         $router->get('/sub-example', function () {
             return 'Hello World';
         })->domain('sub')
-        ->middleware('exampleMiddleware');
+            ->middleware('exampleMiddleware');
 
         $router->get('/example-group', function () {
             return 'Hello Group';

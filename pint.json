@@ -3,7 +3,7 @@
     "rules": {
         "method_chaining_indentation": true
     },
-    "exclude": [
-        "tests"
+    "notPath": [
+        "tests/Foundation/fixtures/bad-syntax-strategy.php"
     ]
 }
