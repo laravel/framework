@@ -13,9 +13,9 @@ class ImageFile extends File
     public function __construct($allowSvgMimeType = false)
     {
         if ($allowSvgMimeType) {
-            $this->rules('image');
+            $this->rules('image:allow_svg');
         } else {
-            $this->rules('image:without_svg');
+            $this->rules('image');
         }
     }
 

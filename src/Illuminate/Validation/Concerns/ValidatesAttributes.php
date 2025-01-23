@@ -1390,11 +1390,11 @@ trait ValidatesAttributes
      * @param  array<int, string>  $parameters
      * @return bool
      */
-    public function validateImage($attribute, $value, $parameters)
+    public function validateImage($attribute, $value, $parameters = [])
     {
         $mimes = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'];
 
-        if (! $parameters || ! in_array('without_svg', $parameters)) {
+        if (is_array($parameters) && in_array('allow_svg', $parameters)) {
             $mimes[] = 'svg';
         }
 
