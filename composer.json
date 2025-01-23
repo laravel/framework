@@ -111,11 +111,11 @@
         "league/flysystem-read-only": "^3.25.1",
         "league/flysystem-sftp-v3": "^3.25.1",
         "mockery/mockery": "^1.6.10",
-        "orchestra/testbench-core": "^9.6",
+        "orchestra/testbench-core": "dev-phpunit12",
         "pda/pheanstalk": "^5.0.6",
         "php-http/discovery": "^1.15",
         "phpstan/phpstan": "^1.11.5",
-        "phpunit/phpunit": "^10.5.35|^11.3.6",
+        "phpunit/phpunit": "^10.5.35|^11.3.6|^12.0",
         "predis/predis": "^2.3",
         "resend/resend-php": "^0.10.0",
         "symfony/cache": "^7.0.3",
@@ -207,6 +207,6 @@
             "php-http/discovery": false
         }
     },
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "prefer-stable": true
 }
