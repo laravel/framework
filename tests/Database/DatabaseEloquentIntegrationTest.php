@@ -1175,7 +1175,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $user = EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
 
         $user->posts()->create(['name' => 'Post 2'])
-             ->photos()->create(['name' => 'photo.jpg']);
+            ->photos()->create(['name' => 'photo.jpg']);
 
         $query = EloquentTestUser::has('postWithPhotos');
 
@@ -2322,7 +2322,7 @@ class EloquentTestUserWithCustomFriendPivot extends EloquentTestUser
     public function friends()
     {
         return $this->belongsToMany(EloquentTestUser::class, 'friends', 'user_id', 'friend_id')
-                        ->using(EloquentTestFriendPivot::class)->withPivot('user_id', 'friend_id', 'friend_level_id');
+            ->using(EloquentTestFriendPivot::class)->withPivot('user_id', 'friend_id', 'friend_level_id');
     }
 }
 

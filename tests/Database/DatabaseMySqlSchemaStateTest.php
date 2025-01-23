@@ -99,9 +99,9 @@ class DatabaseMySqlSchemaStateTest extends TestCase
         $mockVariables = [];
 
         $schemaState = $this->getMockBuilder(MySqlSchemaState::class)
-                            ->disableOriginalConstructor()
-                            ->onlyMethods(['makeProcess'])
-                            ->getMock();
+            ->disableOriginalConstructor()
+            ->onlyMethods(['makeProcess'])
+            ->getMock();
 
         $schemaState->method('makeProcess')->willReturn($mockProcess);
 
