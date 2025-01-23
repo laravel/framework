@@ -30,6 +30,7 @@
         "include": true,
         "indentation_type": true,
         "integer_literal_case": true,
+        "line_ending": true,
         "lowercase_cast": true,
         "lowercase_keywords": true,
         "lowercase_static_reference": true,
@@ -48,6 +49,13 @@
         "no_closing_tag": true,
         "no_empty_phpdoc": true,
         "no_empty_statement": true,
+        "no_extra_blank_lines": {
+            "tokens": [
+                "extra",
+                "throw",
+                "use"
+            ]
+        },
         "no_leading_import_slash": true,
         "no_leading_namespace_whitespace": true,
         "no_multiline_whitespace_around_double_arrow": true,
@@ -106,6 +114,7 @@
         "ternary_operator_spaces": true,
         "trim_array_spaces": true,
         "type_declaration_spaces": true,
+        "types_spaces": true,
         "unary_operator_spaces": true,
         "visibility_required": {
             "elements": [
