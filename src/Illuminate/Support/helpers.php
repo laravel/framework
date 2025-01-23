@@ -5,6 +5,7 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Env;
+use Illuminate\Support\Facades\Pipeline;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\HigherOrderTapProxy;
 use Illuminate\Support\Once;
@@ -526,3 +527,18 @@ if (! function_exists('with')) {
         return is_null($callback) ? $value : $callback($value);
     }
 }
+
+if (! function_exists('flow')) {
+    /**
+     * Sets the object to be processed through the pipeline.
+     *
+     * @param  mixed  $passable
+     * @return \Illuminate\Pipeline\Pipeline
+     */
+    function flow($passable = null)
+    {
+        return Pipeline::send($passable);
+    }
+}
+
+
