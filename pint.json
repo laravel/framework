@@ -124,7 +124,7 @@
         },
         "whitespace_after_comma_in_array": true
     },
-    "exclude": [
-        "tests"
+    "notPath": [
+        "tests/Foundation/fixtures/bad-syntax-strategy.php"
     ]
 }

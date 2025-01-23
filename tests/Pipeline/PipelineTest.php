@@ -20,11 +20,11 @@ class PipelineTest extends TestCase
         };
 
         $result = (new Pipeline(new Container))
-                    ->send('foo')
-                    ->through([PipelineTestPipeOne::class, $pipeTwo])
-                    ->then(function ($piped) {
-                        return $piped;
-                    });
+            ->send('foo')
+            ->through([PipelineTestPipeOne::class, $pipeTwo])
+            ->then(function ($piped) {
+                return $piped;
+            });
 
         $this->assertSame('foo', $result);
         $this->assertSame('foo', $_SERVER['__test.pipe.one']);
@@ -235,9 +235,9 @@ class PipelineTest extends TestCase
     public function testPipelineThenReturnMethodRunsPipelineThenReturnsPassable()
     {
         $result = (new Pipeline(new Container))
-                    ->send('foo')
-                    ->through([PipelineTestPipeOne::class])
-                    ->thenReturn();
+            ->send('foo')
+            ->through([PipelineTestPipeOne::class])
+            ->thenReturn();
 
         $this->assertSame('foo', $result);
         $this->assertSame('foo', $_SERVER['__test.pipe.one']);

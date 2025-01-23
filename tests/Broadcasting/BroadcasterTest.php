@@ -206,9 +206,9 @@ class BroadcasterTest extends TestCase
 
         $request = m::mock(Request::class);
         $request->shouldReceive('user')
-                ->once()
-                ->withNoArgs()
-                ->andReturn(new DummyUser);
+            ->once()
+            ->withNoArgs()
+            ->andReturn(new DummyUser);
 
         $this->assertInstanceOf(
             DummyUser::class,
@@ -224,9 +224,9 @@ class BroadcasterTest extends TestCase
 
         $request = m::mock(Request::class);
         $request->shouldReceive('user')
-                ->once()
-                ->with('myguard')
-                ->andReturn(new DummyUser);
+            ->once()
+            ->with('myguard')
+            ->andReturn(new DummyUser);
 
         $this->assertInstanceOf(
             DummyUser::class,
@@ -245,14 +245,14 @@ class BroadcasterTest extends TestCase
 
         $request = m::mock(Request::class);
         $request->shouldReceive('user')
-                ->once()
-                ->with('myguard1')
-                ->andReturn(null);
+            ->once()
+            ->with('myguard1')
+            ->andReturn(null);
         $request->shouldReceive('user')
-                ->twice()
-                ->with('myguard2')
-                ->andReturn(new DummyUser)
-                ->ordered('user');
+            ->twice()
+            ->with('myguard2')
+            ->andReturn(new DummyUser)
+            ->ordered('user');
 
         $this->assertInstanceOf(
             DummyUser::class,
@@ -273,11 +273,11 @@ class BroadcasterTest extends TestCase
 
         $request = m::mock(Request::class);
         $request->shouldReceive('user')
-                ->once()
-                ->with('myguard')
-                ->andReturn(null);
+            ->once()
+            ->with('myguard')
+            ->andReturn(null);
         $request->shouldNotReceive('user')
-                ->withNoArgs();
+            ->withNoArgs();
 
         $this->broadcaster->retrieveUser($request, 'somechannel');
     }
@@ -290,15 +290,15 @@ class BroadcasterTest extends TestCase
 
         $request = m::mock(Request::class);
         $request->shouldReceive('user')
-                ->once()
-                ->with('myguard1')
-                ->andReturn(null);
+            ->once()
+            ->with('myguard1')
+            ->andReturn(null);
         $request->shouldReceive('user')
-                ->once()
-                ->with('myguard2')
-                ->andReturn(null);
+            ->once()
+            ->with('myguard2')
+            ->andReturn(null);
         $request->shouldNotReceive('user')
-                ->withNoArgs();
+            ->withNoArgs();
 
         $this->broadcaster->retrieveUser($request, 'somechannel');
     }
