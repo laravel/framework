@@ -164,7 +164,7 @@ class MigrateCommand extends BaseCommand implements Isolatable
     {
         return retry(2, fn () => $this->migrator->repositoryExists(), 0, function ($e) {
             try {
-                return $this->handleMissingDatabase($e);
+                return $this->handleMissingDatabase($e->getPrevious());
             } catch (Throwable) {
                 return false;
             }
@@ -176,22 +176,22 @@ class MigrateCommand extends BaseCommand implements Isolatable
      */
     protected function handleMissingDatabase(Throwable $e): bool
     {
-        if ($e->getPrevious() instanceof SQLiteDatabaseDoesNotExistException) {
-            return $this->createMissingSqliteDatabase($e->getPrevious()->path);
+        if ($e instanceof SQLiteDatabaseDoesNotExistException) {
+            return $this->createMissingSqliteDatabase($e->path);
         }
 
         $connection = $this->migrator->resolveConnection($this->option('database'));
 
-        if (! $e->getPrevious() instanceof PDOException) {
+        if (! $e instanceof PDOException) {
             return false;
         }
 
         if (
-            ($e->getPrevious()->getCode() === 1049 && in_array($connection->getDriverName(), ['mysql', 'mariadb']))
+            ($e->getCode() === 1049 && in_array($connection->getDriverName(), ['mysql', 'mariadb']))
             || (
-                ($e->getPrevious()->errorInfo[0] ?? null) == '08006'
+                ($e->errorInfo[0] ?? null) == '08006'
                 && $connection->getDriverName() == 'pgsql'
-                && Str::contains($e->getPrevious()->getMessage(), '"'.$connection->getDatabaseName().'"')
+                && Str::contains($e->getMessage(), '"'.$connection->getDatabaseName().'"')
             )
         ) {
             return $this->createMissingMySqlOrPgsqlDatabase($connection);
