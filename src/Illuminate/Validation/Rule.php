@@ -180,7 +180,7 @@ class Rule
     {
         return new Date;
     }
-  
+
     /**
      * Get an email rule builder instance.
      *
