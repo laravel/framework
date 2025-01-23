@@ -9,7 +9,6 @@ use Illuminate\Support\Fluent;
 use Illuminate\Support\Traits\Macroable;
 use LogicException;
 use Stringable;
-use Symfony\Component\VarDumper\VarDumper;
 
 /**
  * @mixin \Psr\Http\Message\ResponseInterface
