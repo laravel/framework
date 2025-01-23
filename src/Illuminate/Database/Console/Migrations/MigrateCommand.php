@@ -9,6 +9,7 @@ use Illuminate\Database\Events\SchemaLoaded;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Database\SQLiteDatabaseDoesNotExistException;
 use Illuminate\Database\SqlServerConnection;
+use Illuminate\Support\Str;
 use PDOException;
 use RuntimeException;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -187,7 +188,11 @@ class MigrateCommand extends BaseCommand implements Isolatable
 
         if (
             ($e->getPrevious()->getCode() === 1049 && in_array($connection->getDriverName(), ['mysql', 'mariadb']))
-            || (($e->getPrevious()->errorInfo[0] ?? null) == '08006' && $connection->getDriverName() == 'pgsql')
+            || (
+                ($e->getPrevious()->errorInfo[0] ?? null) == '08006'
+                && $connection->getDriverName() == 'pgsql'
+                && Str::contains($e->getPrevious()->getMessage(), '"'.$connection->getDatabaseName().'" does not exist')
+            )
         ) {
             return $this->createMissingMySqlOrPgsqlDatabase($connection);
         }
@@ -250,11 +255,10 @@ class MigrateCommand extends BaseCommand implements Isolatable
                 throw new RuntimeException('Database was not created. Aborting migration.');
             }
         }
-
         try {
             $this->laravel['config']->set(
                 "database.connections.{$connection->getName()}.database",
-                match ($connection->getDatabaseName()) {
+                match ($connection->getDriverName()) {
                     'mysql', 'mariadb' => null,
                     'pgsql' => 'postgres',
                 },
@@ -272,6 +276,8 @@ class MigrateCommand extends BaseCommand implements Isolatable
             ), function () {
                 $this->laravel['db']->purge();
             });
+        } catch (Throwable $e) {
+            dd($e);
         } finally {
             $this->laravel['config']->set("database.connections.{$connection->getName()}.database", $connection->getDatabaseName());
         }
