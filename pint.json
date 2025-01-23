@@ -1,7 +1,27 @@
 {
     "preset": "empty",
     "rules": {
-        "method_chaining_indentation": true
+        "array_indentation": true,
+        "blank_line_after_namespace": true,
+        "blank_line_after_opening_tag": true,
+        "blank_line_between_import_groups": true,
+        "cast_spaces": true,
+        "class_reference_name_casing": true,
+        "clean_namespace": true,
+        "compact_nullable_type_declaration": true,
+        "elseif": true,
+        "method_chaining_indentation": true,
+        "ordered_imports": {
+            "sort_algorithm": "alpha",
+            "imports_order": [
+                "const",
+                "class",
+                "function"
+            ]
+        },
+        "ternary_operator_spaces": true,
+        "trim_array_spaces": true,
+        "whitespace_after_comma_in_array": true
     },
     "exclude": [
         "tests"
