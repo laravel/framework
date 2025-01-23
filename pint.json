@@ -75,8 +75,22 @@
         "phpdoc_trim": true,
         "phpdoc_types": true,
         "phpdoc_var_without_name": true,
+        "return_type_declaration": {
+            "space_before": "none"
+        },
+        "short_scalar_cast": true,
+        "single_blank_line_at_eof": true,
+        "single_class_element_per_statement": true,
+        "single_line_after_imports": true,
+        "single_quote": true,
+        "space_after_semicolon": true,
+        "standardize_not_equals": true,
+        "switch_case_semicolon_to_colon": true,
+        "switch_case_space": true,
+        "switch_continue_to_break": true,
         "ternary_operator_spaces": true,
         "trim_array_spaces": true,
+        "unary_operator_spaces": true,
         "whitespace_after_comma_in_array": true
     },
     "exclude": [
