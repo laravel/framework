@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Foundation\Bus\Attributes;
+namespace Illuminate\Foundation\Queue;
 
 use Attribute;
 

@@ -7,12 +7,12 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
-use Illuminate\Foundation\Bus\Attributes\OnConnection;
-use Illuminate\Foundation\Bus\Attributes\OnQueue;
+use Illuminate\Foundation\Queue\InteractsWithQueueAndConnection;
 use Illuminate\Foundation\Queue\InteractsWithUniqueJobs;
 
 class PendingDispatch
 {
+    use InteractsWithQueueAndConnection;
     use InteractsWithUniqueJobs;
 
     /**
@@ -209,16 +209,14 @@ class PendingDispatch
 
         $reflectionClass = new \ReflectionClass($this->job);
         if (! $hasQueueSet) {
-            $onQueue = $reflectionClass->getAttributes(OnQueue::class);
-            if ($onQueue !== []) {
-                $this->onQueue($onQueue[0]->newInstance()->queue);
+            if ($queue = $this->getQueueFromOnConnectionAttribute($reflectionClass)) {
+                $this->onQueue($queue);
             }
         }
 
         if (! $hasConnectionSet) {
-            $onConnection = $reflectionClass->getAttributes(OnConnection::class);
-            if ($onConnection !== []) {
-                $this->onConnection($onConnection[0]->newInstance()->connection);
+            if ($connection = $this->getConnectionFromOnConnectionAttribute($reflectionClass)) {
+                $this->onConnection($connection);
             }
         }
     }

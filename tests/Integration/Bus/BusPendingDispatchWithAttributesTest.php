@@ -4,9 +4,9 @@ namespace Illuminate\Tests\Integration\Bus;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Bus\Attributes\OnConnection;
-use Illuminate\Foundation\Bus\Attributes\OnQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Foundation\Queue\OnConnection;
+use Illuminate\Foundation\Queue\OnQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Queue;
 use Orchestra\Testbench\TestCase;
