@@ -540,5 +540,3 @@ if (! function_exists('flow')) {
         return Pipeline::send($passable);
     }
 }
-
-
