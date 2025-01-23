@@ -9,20 +9,13 @@ class PasswordResetLinkSent
     use SerializesModels;
 
     /**
-     * The user instance.
-     *
-     * @var \Illuminate\Contracts\Auth\CanResetPassword
-     */
-    public $user;
-
-    /**
      * Create a new event instance.
      *
-     * @param  \Illuminate\Contracts\Auth\CanResetPassword  $user
+     * @param  \Illuminate\Contracts\Auth\CanResetPassword  $user  The user instance.
      * @return void
      */
-    public function __construct($user)
-    {
-        $this->user = $user;
+    public function __construct(
+        public $user,
+    ) {
     }
 }

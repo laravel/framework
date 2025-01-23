@@ -15,6 +15,7 @@ use Illuminate\Support\ItemNotFoundException;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\MultipleItemsFoundException;
 use Illuminate\Support\Str;
+use Illuminate\Support\Stringable;
 use InvalidArgumentException;
 use IteratorAggregate;
 use JsonSerializable;
@@ -255,6 +256,20 @@ class SupportCollectionTest extends TestCase
         $this->assertSame('gasket', $data->firstWhere(fn ($value) => $value['material'] === 'rubber')['type']);
         $this->assertNull($data->firstWhere(fn ($value) => $value['material'] === 'nonexistent'));
         $this->assertNull($data->firstWhere(fn ($value) => ($value['nonexistent'] ?? null) === 'key'));
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testFirstWhereUsingEnum($collection)
+    {
+        $data = new $collection([
+            ['id' => 1, 'name' => StaffEnum::Taylor],
+            ['id' => 2, 'name' => StaffEnum::Joe],
+            ['id' => 3, 'name' => StaffEnum::James],
+        ]);
+
+        $this->assertSame(1, $data->firstWhere('name', 'Taylor')['id']);
+        $this->assertSame(2, $data->firstWhere('name', StaffEnum::Joe)['id']);
+        $this->assertSame(3, $data->firstWhere('name', StaffEnum::James)['id']);
     }
 
     #[DataProvider('collectionClassProvider')]
@@ -1131,6 +1146,15 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testValueUsingEnum($collection)
+    {
+        $c = new $collection([['id' => 1, 'name' => StaffEnum::Taylor], ['id' => 2, 'name' => StaffEnum::Joe]]);
+
+        $this->assertSame(StaffEnum::Taylor, $c->value('name'));
+        $this->assertEquals(StaffEnum::Joe, $c->where('id', 2)->value('name'));
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testBetween($collection)
     {
         $c = new $collection([['v' => 1], ['v' => 2], ['v' => 3], ['v' => '3'], ['v' => 4]]);
@@ -1711,8 +1735,26 @@ class SupportCollectionTest extends TestCase
     #[DataProvider('collectionClassProvider')]
     public function testCollapse($collection)
     {
+        // Normal case: a two-dimensional array with different elements
         $data = new $collection([[$object1 = new stdClass], [$object2 = new stdClass]]);
         $this->assertEquals([$object1, $object2], $data->collapse()->all());
+
+        // Case including numeric and string elements
+        $data = new $collection([[1], [2], [3], ['foo', 'bar'], new $collection(['baz', 'boom'])]);
+        $this->assertEquals([1, 2, 3, 'foo', 'bar', 'baz', 'boom'], $data->collapse()->all());
+
+        // Case with empty two-dimensional arrays
+        $data = new $collection([[], [], []]);
+        $this->assertEquals([], $data->collapse()->all());
+
+        // Case with both empty arrays and arrays with elements
+        $data = new $collection([[], [1, 2], [], ['foo', 'bar']]);
+        $this->assertEquals([1, 2, 'foo', 'bar'], $data->collapse()->all());
+
+        // Case including collections and arrays
+        $collection = new $collection(['baz', 'boom']);
+        $data = new $collection([[1], [2], [3], ['foo', 'bar'], $collection]);
+        $this->assertEquals([1, 2, 3, 'foo', 'bar', 'baz', 'boom'], $data->collapse()->all());
     }
 
     #[DataProvider('collectionClassProvider')]
@@ -2291,13 +2333,13 @@ class SupportCollectionTest extends TestCase
         $this->assertSame('taylor,dayle', $data->implode(','));
 
         $data = new $collection([
-            ['name' => Str::of('taylor'), 'email' => Str::of('foo')],
-            ['name' => Str::of('dayle'), 'email' => Str::of('bar')],
+            ['name' => new Stringable('taylor'), 'email' => new Stringable('foo')],
+            ['name' => new Stringable('dayle'), 'email' => new Stringable('bar')],
         ]);
         $this->assertSame('foobar', $data->implode('email'));
         $this->assertSame('foo,bar', $data->implode('email', ','));
 
-        $data = new $collection([Str::of('taylor'), Str::of('dayle')]);
+        $data = new $collection([new Stringable('taylor'), new Stringable('dayle')]);
         $this->assertSame('taylordayle', $data->implode(''));
         $this->assertSame('taylor,dayle', $data->implode(','));
         $this->assertSame('taylor_dayle', $data->implode('_'));
@@ -3138,7 +3180,7 @@ class SupportCollectionTest extends TestCase
     public function testGroupByAttributeWithStringableKey($collection)
     {
         $data = new $collection($payload = [
-            ['name' => Str::of('Laravel'), 'url' => '1'],
+            ['name' => new Stringable('Laravel'), 'url' => '1'],
             ['name' => new HtmlString('Laravel'), 'url' => '1'],
             ['name' => new class()
             {
@@ -5736,4 +5778,11 @@ class TestCollectionMapIntoObject
 class TestCollectionSubclass extends Collection
 {
     //
+}
+
+enum StaffEnum
+{
+    case Taylor;
+    case Joe;
+    case James;
 }

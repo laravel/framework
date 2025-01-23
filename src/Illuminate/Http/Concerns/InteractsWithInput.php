@@ -4,15 +4,15 @@ namespace Illuminate\Http\Concerns;
 
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Fluent;
 use Illuminate\Support\Traits\Dumpable;
+use Illuminate\Support\Traits\InteractsWithData;
 use SplFileInfo;
-use stdClass;
 use Symfony\Component\HttpFoundation\InputBag;
 
 trait InteractsWithInput
 {
-    use Dumpable;
+    use Dumpable, InteractsWithData;
 
     /**
      * Retrieve a server variable from the request.
@@ -58,206 +58,13 @@ trait InteractsWithInput
     {
         $header = $this->header('Authorization', '');
 
-        $position = strrpos($header, 'Bearer ');
+        $position = strripos($header, 'Bearer ');
 
         if ($position !== false) {
             $header = substr($header, $position + 7);
 
             return str_contains($header, ',') ? strstr($header, ',', true) : $header;
         }
-    }
-
-    /**
-     * Determine if the request contains a given input item key.
-     *
-     * @param  string|array  $key
-     * @return bool
-     */
-    public function exists($key)
-    {
-        return $this->has($key);
-    }
-
-    /**
-     * Determine if the request contains a given input item key.
-     *
-     * @param  string|array  $key
-     * @return bool
-     */
-    public function has($key)
-    {
-        $keys = is_array($key) ? $key : func_get_args();
-
-        $input = $this->all();
-
-        foreach ($keys as $value) {
-            if (! Arr::has($input, $value)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * Determine if the request contains any of the given inputs.
-     *
-     * @param  string|array  $keys
-     * @return bool
-     */
-    public function hasAny($keys)
-    {
-        $keys = is_array($keys) ? $keys : func_get_args();
-
-        $input = $this->all();
-
-        return Arr::hasAny($input, $keys);
-    }
-
-    /**
-     * Apply the callback if the request contains the given input item key.
-     *
-     * @param  string  $key
-     * @param  callable  $callback
-     * @param  callable|null  $default
-     * @return $this|mixed
-     */
-    public function whenHas($key, callable $callback, ?callable $default = null)
-    {
-        if ($this->has($key)) {
-            return $callback(data_get($this->all(), $key)) ?: $this;
-        }
-
-        if ($default) {
-            return $default();
-        }
-
-        return $this;
-    }
-
-    /**
-     * Determine if the request contains a non-empty value for an input item.
-     *
-     * @param  string|array  $key
-     * @return bool
-     */
-    public function filled($key)
-    {
-        $keys = is_array($key) ? $key : func_get_args();
-
-        foreach ($keys as $value) {
-            if ($this->isEmptyString($value)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * Determine if the request contains an empty value for an input item.
-     *
-     * @param  string|array  $key
-     * @return bool
-     */
-    public function isNotFilled($key)
-    {
-        $keys = is_array($key) ? $key : func_get_args();
-
-        foreach ($keys as $value) {
-            if (! $this->isEmptyString($value)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * Determine if the request contains a non-empty value for any of the given inputs.
-     *
-     * @param  string|array  $keys
-     * @return bool
-     */
-    public function anyFilled($keys)
-    {
-        $keys = is_array($keys) ? $keys : func_get_args();
-
-        foreach ($keys as $key) {
-            if ($this->filled($key)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Apply the callback if the request contains a non-empty value for the given input item key.
-     *
-     * @param  string  $key
-     * @param  callable  $callback
-     * @param  callable|null  $default
-     * @return $this|mixed
-     */
-    public function whenFilled($key, callable $callback, ?callable $default = null)
-    {
-        if ($this->filled($key)) {
-            return $callback(data_get($this->all(), $key)) ?: $this;
-        }
-
-        if ($default) {
-            return $default();
-        }
-
-        return $this;
-    }
-
-    /**
-     * Determine if the request is missing a given input item key.
-     *
-     * @param  string|array  $key
-     * @return bool
-     */
-    public function missing($key)
-    {
-        $keys = is_array($key) ? $key : func_get_args();
-
-        return ! $this->has($keys);
-    }
-
-    /**
-     * Apply the callback if the request is missing the given input item key.
-     *
-     * @param  string  $key
-     * @param  callable  $callback
-     * @param  callable|null  $default
-     * @return $this|mixed
-     */
-    public function whenMissing($key, callable $callback, ?callable $default = null)
-    {
-        if ($this->missing($key)) {
-            return $callback(data_get($this->all(), $key)) ?: $this;
-        }
-
-        if ($default) {
-            return $default();
-        }
-
-        return $this;
-    }
-
-    /**
-     * Determine if the given input key is an empty string for "filled".
-     *
-     * @param  string  $key
-     * @return bool
-     */
-    protected function isEmptyString($key)
-    {
-        $value = $this->input($key);
-
-        return ! is_bool($value) && ! is_array($value) && trim((string) $value) === '';
     }
 
     /**
@@ -308,161 +115,14 @@ trait InteractsWithInput
     }
 
     /**
-     * Retrieve input from the request as a Stringable instance.
-     *
-     * @param  string  $key
-     * @param  mixed  $default
-     * @return \Illuminate\Support\Stringable
-     */
-    public function str($key, $default = null)
-    {
-        return $this->string($key, $default);
-    }
-
-    /**
-     * Retrieve input from the request as a Stringable instance.
-     *
-     * @param  string  $key
-     * @param  mixed  $default
-     * @return \Illuminate\Support\Stringable
-     */
-    public function string($key, $default = null)
-    {
-        return str($this->input($key, $default));
-    }
-
-    /**
-     * Retrieve input as a boolean value.
-     *
-     * Returns true when value is "1", "true", "on", and "yes". Otherwise, returns false.
-     *
-     * @param  string|null  $key
-     * @param  bool  $default
-     * @return bool
-     */
-    public function boolean($key = null, $default = false)
-    {
-        return filter_var($this->input($key, $default), FILTER_VALIDATE_BOOLEAN);
-    }
-
-    /**
-     * Retrieve input as an integer value.
-     *
-     * @param  string  $key
-     * @param  int  $default
-     * @return int
-     */
-    public function integer($key, $default = 0)
-    {
-        return intval($this->input($key, $default));
-    }
-
-    /**
-     * Retrieve input as a float value.
-     *
-     * @param  string  $key
-     * @param  float  $default
-     * @return float
-     */
-    public function float($key, $default = 0.0)
-    {
-        return floatval($this->input($key, $default));
-    }
-
-    /**
-     * Retrieve input from the request as a Carbon instance.
-     *
-     * @param  string  $key
-     * @param  string|null  $format
-     * @param  string|null  $tz
-     * @return \Illuminate\Support\Carbon|null
-     *
-     * @throws \Carbon\Exceptions\InvalidFormatException
-     */
-    public function date($key, $format = null, $tz = null)
-    {
-        if ($this->isNotFilled($key)) {
-            return null;
-        }
-
-        if (is_null($format)) {
-            return Date::parse($this->input($key), $tz);
-        }
-
-        return Date::createFromFormat($format, $this->input($key), $tz);
-    }
-
-    /**
-     * Retrieve input from the request as an enum.
-     *
-     * @template TEnum
-     *
-     * @param  string  $key
-     * @param  class-string<TEnum>  $enumClass
-     * @return TEnum|null
-     */
-    public function enum($key, $enumClass)
-    {
-        if ($this->isNotFilled($key) ||
-            ! enum_exists($enumClass) ||
-            ! method_exists($enumClass, 'tryFrom')) {
-            return null;
-        }
-
-        return $enumClass::tryFrom($this->input($key));
-    }
-
-    /**
-     * Retrieve input from the request as a collection.
+     * Retrieve input from the request as a Fluent object instance.
      *
      * @param  array|string|null  $key
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Support\Fluent
      */
-    public function collect($key = null)
+    public function fluent($key = null)
     {
-        return collect(is_array($key) ? $this->only($key) : $this->input($key));
-    }
-
-    /**
-     * Get a subset containing the provided keys with values from the input data.
-     *
-     * @param  array|mixed  $keys
-     * @return array
-     */
-    public function only($keys)
-    {
-        $results = [];
-
-        $input = $this->all();
-
-        $placeholder = new stdClass;
-
-        foreach (is_array($keys) ? $keys : func_get_args() as $key) {
-            $value = data_get($input, $key, $placeholder);
-
-            if ($value !== $placeholder) {
-                Arr::set($results, $key, $value);
-            }
-        }
-
-        return $results;
-    }
-
-    /**
-     * Get all of the input except for a specified array of items.
-     *
-     * @param  array|mixed  $keys
-     * @return array
-     */
-    public function except($keys)
-    {
-        $keys = is_array($keys) ? $keys : func_get_args();
-
-        $results = $this->all();
-
-        Arr::forget($results, $keys);
-
-        return $results;
+        return new Fluent(is_array($key) ? $this->only($key) : $this->input($key));
     }
 
     /**
@@ -585,6 +245,18 @@ trait InteractsWithInput
     public function file($key = null, $default = null)
     {
         return data_get($this->allFiles(), $key, $default);
+    }
+
+    /**
+     * Retrieve data from the instance.
+     *
+     * @param  string  $key
+     * @param  mixed  $default
+     * @return mixed
+     */
+    protected function data($key = null, $default = null)
+    {
+        return $this->input($key, $default);
     }
 
     /**

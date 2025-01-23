@@ -4,7 +4,7 @@ namespace Illuminate\Support;
 
 use Illuminate\Support\Defer\DeferredCallback;
 use Illuminate\Support\Defer\DeferredCallbackCollection;
-use Illuminate\Support\Process\PhpExecutableFinder;
+use Symfony\Component\Process\PhpExecutableFinder;
 
 if (! function_exists('Illuminate\Support\defer')) {
     /**
@@ -28,30 +28,6 @@ if (! function_exists('Illuminate\Support\defer')) {
     }
 }
 
-if (! function_exists('Illuminate\Support\enum_value')) {
-    /**
-     * Return a scalar value for the given value that might be an enum.
-     *
-     * @internal
-     *
-     * @template TValue
-     * @template TDefault
-     *
-     * @param  TValue  $value
-     * @param  TDefault|callable(TValue): TDefault  $default
-     * @return ($value is empty ? TDefault : mixed)
-     */
-    function enum_value($value, $default = null)
-    {
-        return transform($value, fn ($value) => match (true) {
-            $value instanceof \BackedEnum => $value->value,
-            $value instanceof \UnitEnum => $value->name,
-
-            default => $value,
-        }, $default ?? $value);
-    }
-}
-
 if (! function_exists('Illuminate\Support\php_binary')) {
     /**
      * Determine the PHP Binary.
@@ -61,5 +37,17 @@ if (! function_exists('Illuminate\Support\php_binary')) {
     function php_binary()
     {
         return (new PhpExecutableFinder)->find(false) ?: 'php';
+    }
+}
+
+if (! function_exists('Illuminate\Support\artisan_binary')) {
+    /**
+     * Determine the proper Artisan executable.
+     *
+     * @return string
+     */
+    function artisan_binary()
+    {
+        return defined('ARTISAN_BINARY') ? ARTISAN_BINARY : 'artisan';
     }
 }

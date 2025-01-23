@@ -18,7 +18,11 @@ use Stringable;
 use Traversable;
 
 /**
- * @mixin \Illuminate\Support\Collection
+ * @template TKey of array-key
+ *
+ * @template-covariant TValue
+ *
+ * @mixin \Illuminate\Support\Collection<TKey, TValue>
  */
 abstract class AbstractCursorPaginator implements Htmlable, Stringable
 {
@@ -27,7 +31,7 @@ abstract class AbstractCursorPaginator implements Htmlable, Stringable
     /**
      * All of the items being paginated.
      *
-     * @var \Illuminate\Support\Collection
+     * @var \Illuminate\Support\Collection<TKey, TValue>
      */
     protected $items;
 
@@ -205,7 +209,7 @@ abstract class AbstractCursorPaginator implements Htmlable, Stringable
      */
     public function getParametersForItem($item)
     {
-        return collect($this->parameters)
+        return (new Collection($this->parameters))
             ->filter()
             ->flip()
             ->map(function ($_, $parameterName) use ($item) {
@@ -388,7 +392,7 @@ abstract class AbstractCursorPaginator implements Htmlable, Stringable
     /**
      * Get the slice of items being paginated.
      *
-     * @return array
+     * @return array<TKey, TValue>
      */
     public function items()
     {
@@ -524,7 +528,7 @@ abstract class AbstractCursorPaginator implements Htmlable, Stringable
     /**
      * Get an iterator for the items.
      *
-     * @return \ArrayIterator
+     * @return \ArrayIterator<TKey, TValue>
      */
     public function getIterator(): Traversable
     {

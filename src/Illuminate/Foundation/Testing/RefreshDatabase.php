@@ -48,8 +48,12 @@ trait RefreshDatabase
      *
      * @return bool
      */
-    protected function usingInMemoryDatabase(string $name)
+    protected function usingInMemoryDatabase(?string $name = null)
     {
+        if (is_null($name)) {
+            $name = config('database.default');
+        }
+
         return config("database.connections.{$name}.database") === ':memory:';
     }
 
@@ -132,6 +136,11 @@ trait RefreshDatabase
                 $dispatcher = $connection->getEventDispatcher();
 
                 $connection->unsetEventDispatcher();
+
+                if ($connection->getPdo() && ! $connection->getPdo()->inTransaction()) {
+                    RefreshDatabaseState::$migrated = false;
+                }
+
                 $connection->rollBack();
                 $connection->setEventDispatcher($dispatcher);
                 $connection->disconnect();

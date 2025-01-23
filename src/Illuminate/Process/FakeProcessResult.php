@@ -4,6 +4,7 @@ namespace Illuminate\Process;
 
 use Illuminate\Contracts\Process\ProcessResult as ProcessResultContract;
 use Illuminate\Process\Exceptions\ProcessFailedException;
+use Illuminate\Support\Collection;
 
 class FakeProcessResult implements ProcessResultContract
 {
@@ -66,7 +67,7 @@ class FakeProcessResult implements ProcessResultContract
             return rtrim($output, "\n")."\n";
         } elseif (is_array($output)) {
             return rtrim(
-                collect($output)
+                (new Collection($output))
                     ->map(fn ($line) => rtrim($line, "\n")."\n")
                     ->implode(''),
                 "\n"

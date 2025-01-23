@@ -297,7 +297,7 @@ class Container implements ArrayAccess, ContainerContract
             $concrete = $this->getClosure($abstract, $concrete);
         }
 
-        $this->bindings[$abstract] = compact('concrete', 'shared');
+        $this->bindings[$abstract] = ['concrete' => $concrete, 'shared' => $shared];
 
         // If the abstract type was already resolved in this container we'll fire the
         // rebound listener so that any objects which have already gotten resolved
@@ -635,9 +635,13 @@ class Container implements ArrayAccess, ContainerContract
      */
     protected function rebound($abstract)
     {
+        if (! $callbacks = $this->getReboundCallbacks($abstract)) {
+            return;
+        }
+
         $instance = $this->make($abstract);
 
-        foreach ($this->getReboundCallbacks($abstract) as $callback) {
+        foreach ($callbacks as $callback) {
             $callback($this, $instance);
         }
     }
@@ -838,7 +842,9 @@ class Container implements ArrayAccess, ContainerContract
         // Before returning, we will also set the resolved flag to "true" and pop off
         // the parameter overrides for this build. After those two things are done
         // we will be ready to return back the fully constructed class instance.
-        $this->resolved[$abstract] = true;
+        if (! $needsContextualBuild) {
+            $this->resolved[$abstract] = true;
+        }
 
         array_pop($this->with);
 
@@ -1108,22 +1114,32 @@ class Container implements ArrayAccess, ContainerContract
      */
     protected function resolveClass(ReflectionParameter $parameter)
     {
+        $className = Util::getParameterClassName($parameter);
+
+        // First, we check if the dependency has been explicitly bound in the container
+        // and if so, we will resolve it directly from there to respect any explicit
+        // bindings the developer has defined rather than using any default value.
+        if ($this->bound($className)) {
+            return $this->make($className);
+        }
+
+        // If no binding exists, we will check if a default value has been defined for
+        // the parameter. If it has, we should return it to avoid overriding any of
+        // the developer specified default values for the constructor parameters.
+        if ($parameter->isDefaultValueAvailable()) {
+            return $parameter->getDefaultValue();
+        }
+
         try {
             return $parameter->isVariadic()
                         ? $this->resolveVariadicClass($parameter)
-                        : $this->make(Util::getParameterClassName($parameter));
+                        : $this->make($className);
         }
 
         // If we can not resolve the class instance, we will check to see if the value
-        // is optional, and if it is we will return the optional parameter value as
-        // the value of the dependency, similarly to how we do this with scalars.
+        // is variadic. If it is, we will return an empty array as the value of the
+        // dependency similarly to how we handle scalar values in this situation.
         catch (BindingResolutionException $e) {
-            if ($parameter->isDefaultValueAvailable()) {
-                array_pop($this->with);
-
-                return $parameter->getDefaultValue();
-            }
-
             if ($parameter->isVariadic()) {
                 array_pop($this->with);
 

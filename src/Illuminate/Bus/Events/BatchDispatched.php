@@ -7,20 +7,13 @@ use Illuminate\Bus\Batch;
 class BatchDispatched
 {
     /**
-     * The batch instance.
-     *
-     * @var \Illuminate\Bus\Batch
-     */
-    public $batch;
-
-    /**
      * Create a new event instance.
      *
-     * @param  \Illuminate\Bus\Batch  $batch
+     * @param  \Illuminate\Bus\Batch  $batch  The batch instance.
      * @return void
      */
-    public function __construct(Batch $batch)
-    {
-        $this->batch = $batch;
+    public function __construct(
+        public Batch $batch,
+    ) {
     }
 }

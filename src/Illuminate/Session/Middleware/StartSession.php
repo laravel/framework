@@ -83,8 +83,8 @@ class StartSession
                         : $this->manager->defaultRouteBlockLockSeconds();
 
         $lock = $this->cache($this->manager->blockDriver())
-                    ->lock('session:'.$session->getId(), $lockFor)
-                    ->betweenBlockedAttemptsSleepFor(50);
+            ->lock('session:'.$session->getId(), $lockFor)
+            ->betweenBlockedAttemptsSleepFor(50);
 
         try {
             $lock->block(
@@ -266,7 +266,7 @@ class StartSession
         $config = $this->manager->getSessionConfig();
 
         return $config['expire_on_close'] ? 0 : Date::instance(
-            Carbon::now()->addRealMinutes($config['lifetime'])
+            Carbon::now()->addMinutes($config['lifetime'])
         );
     }
 

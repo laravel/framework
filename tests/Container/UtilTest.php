@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Container;
 
 use Illuminate\Container\Util;
 use PHPUnit\Framework\TestCase;
+use ReflectionParameter;
 use stdClass;
 
 class UtilTest extends TestCase
@@ -39,5 +40,16 @@ class UtilTest extends TestCase
         $obj = unserialize(serialize($obj));
         $this->assertEquals([$obj], Util::arrayWrap($obj));
         $this->assertSame($obj, Util::arrayWrap($obj)[0]);
+    }
+
+    public function testGetParameterClassName()
+    {
+        $parameter = new ReflectionParameter(function (stdClass $foo) {
+        }, 0);
+        $this->assertSame('stdClass', Util::getParameterClassName($parameter));
+
+        $parameter = new ReflectionParameter(function (string $foo) {
+        }, 0);
+        $this->assertNull(Util::getParameterClassName($parameter));
     }
 }

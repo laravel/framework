@@ -150,7 +150,7 @@ class Limit
      */
     public function fallbackKey()
     {
-        $prefix = $this->key ? '' : "{$this->key}:";
+        $prefix = $this->key ? "{$this->key}:" : '';
 
         return "{$prefix}attempts:{$this->maxAttempts}:decay:{$this->decaySeconds}";
     }

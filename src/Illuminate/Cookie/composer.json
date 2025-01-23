@@ -20,8 +20,8 @@
         "illuminate/contracts": "^12.0",
         "illuminate/macroable": "^12.0",
         "illuminate/support": "^12.0",
-        "symfony/http-foundation": "^7.0",
-        "symfony/http-kernel": "^7.0"
+        "symfony/http-foundation": "^7.2.0",
+        "symfony/http-kernel": "^7.2.0"
     },
     "autoload": {
         "psr-4": {

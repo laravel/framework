@@ -77,9 +77,9 @@ if (! function_exists('data_get')) {
             $segment = match ($segment) {
                 '\*' => '*',
                 '\{first}' => '{first}',
-                '{first}' => array_key_first(is_array($target) ? $target : collect($target)->all()),
+                '{first}' => array_key_first(is_array($target) ? $target : (new Collection($target))->all()),
                 '\{last}' => '{last}',
-                '{last}' => array_key_last(is_array($target) ? $target : collect($target)->all()),
+                '{last}' => array_key_last(is_array($target) ? $target : (new Collection($target))->all()),
                 default => $segment,
             };
 
@@ -248,6 +248,8 @@ if (! function_exists('when')) {
      */
     function when($condition, $value, $default = null)
     {
+        $condition = $condition instanceof Closure ? $condition() : $condition;
+
         if ($condition) {
             return value($value, $condition);
         }

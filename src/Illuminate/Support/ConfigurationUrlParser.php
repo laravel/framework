@@ -42,7 +42,7 @@ class ConfigurationUrlParser
         $rawComponents = $this->parseUrl($url);
 
         $decodedComponents = $this->parseStringsToNativeTypes(
-            array_map('rawurldecode', $rawComponents)
+            array_map(rawurldecode(...), $rawComponents)
         );
 
         return array_merge(
@@ -151,7 +151,7 @@ class ConfigurationUrlParser
     protected function parseStringsToNativeTypes($value)
     {
         if (is_array($value)) {
-            return array_map([$this, 'parseStringsToNativeTypes'], $value);
+            return array_map($this->parseStringsToNativeTypes(...), $value);
         }
 
         if (! is_string($value)) {

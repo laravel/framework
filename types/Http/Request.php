@@ -4,8 +4,9 @@ use Illuminate\Http\Request;
 
 use function PHPStan\Testing\assertType;
 
-class TestEnum
+enum TestEnum: string
 {
+    case Foo = 'foo';
 }
 
 $request = Request::create('/', 'GET', [

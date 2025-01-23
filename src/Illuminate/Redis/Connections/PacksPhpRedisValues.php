@@ -42,7 +42,7 @@ trait PacksPhpRedisValues
         }
 
         if ($this->supportsPacking()) {
-            return array_map([$this->client, '_pack'], $values);
+            return array_map($this->client->_pack(...), $values);
         }
 
         if ($this->compressed()) {
@@ -80,6 +80,17 @@ trait PacksPhpRedisValues
         }
 
         return array_map($processor, $values);
+    }
+
+    /**
+     * Determine if serialization is enabled.
+     *
+     * @return bool
+     */
+    public function serialized(): bool
+    {
+        return defined('Redis::OPT_SERIALIZER') &&
+               $this->client->getOption(Redis::OPT_SERIALIZER) !== Redis::SERIALIZER_NONE;
     }
 
     /**

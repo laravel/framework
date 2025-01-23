@@ -74,28 +74,6 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $this->assertTrue($schema->hasColumns('test', ['bar', 'qux']));
     }
 
-    public function testNativeColumnModifyingOnMySql()
-    {
-        $blueprint = $this->getBlueprint(new MySqlGrammar, 'users', function ($table) {
-            $table->double('amount')->nullable()->invisible()->after('name')->change();
-            $table->timestamp('added_at', 4)->nullable(false)->useCurrent()->useCurrentOnUpdate()->change();
-            $table->enum('difficulty', ['easy', 'hard'])->default('easy')->charset('utf8mb4')->collation('unicode')->change();
-            $table->geometry('positions', 'multipolygon', 1234)->storedAs('expression')->change();
-            $table->string('old_name', 50)->renameTo('new_name')->change();
-            $table->bigIncrements('id')->first()->from(10)->comment('my comment')->change();
-        });
-
-        $this->assertEquals([
-            'alter table `users` modify `amount` double null invisible after `name`',
-            'alter table `users` modify `added_at` timestamp(4) not null default CURRENT_TIMESTAMP(4) on update CURRENT_TIMESTAMP(4)',
-            "alter table `users` modify `difficulty` enum('easy', 'hard') character set utf8mb4 collate 'unicode' not null default 'easy'",
-            'alter table `users` modify `positions` multipolygon srid 1234 as (expression) stored',
-            'alter table `users` change `old_name` `new_name` varchar(50) not null',
-            "alter table `users` modify `id` bigint unsigned not null auto_increment comment 'my comment' first",
-            'alter table `users` auto_increment = 10',
-        ], $blueprint->toSql());
-    }
-
     public function testNativeColumnModifyingOnPostgreSql()
     {
         $blueprint = $this->getBlueprint(new PostgresGrammar, 'users', function ($table) {
@@ -542,6 +520,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
         Closure $callback,
     ): Blueprint {
         $connection = DB::connection()->setSchemaGrammar($grammar);
+        $grammar->setConnection($connection);
 
         return new Blueprint($connection, $table, $callback);
     }

@@ -4255,10 +4255,12 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testTruncateMethod()
     {
         $builder = $this->getBuilder();
-        $builder->getConnection()->shouldReceive('statement')->once()->with('truncate table "users"', []);
+        $connection = $builder->getConnection();
+        $connection->shouldReceive('statement')->once()->with('truncate table "users"', []);
+        $connection->shouldReceive('getSchemaBuilder->parseSchemaAndTable')->andReturn([null, 'users']);
         $builder->from('users')->truncate();
 
-        $sqlite = new SQLiteGrammar;
+        $sqlite = (new SQLiteGrammar)->setConnection($connection);
         $builder = $this->getBuilder();
         $builder->from('users');
         $this->assertEquals([
@@ -4271,16 +4273,37 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $builder = $this->getBuilder();
         $builder->getGrammar()->setTablePrefix('prefix_');
-        $builder->getConnection()->shouldReceive('statement')->once()->with('truncate table "prefix_users"', []);
+        $connection = $builder->getConnection();
+        $connection->shouldReceive('statement')->once()->with('truncate table "prefix_users"', []);
+        $connection->shouldReceive('getSchemaBuilder->parseSchemaAndTable')->andReturn([null, 'users']);
         $builder->from('users')->truncate();
 
-        $sqlite = new SQLiteGrammar;
+        $sqlite = (new SQLiteGrammar)->setConnection($connection);
         $sqlite->setTablePrefix('prefix_');
         $builder = $this->getBuilder();
         $builder->from('users');
         $this->assertEquals([
             'delete from sqlite_sequence where name = ?' => ['prefix_users'],
             'delete from "prefix_users"' => [],
+        ], $sqlite->compileTruncate($builder));
+    }
+
+    public function testTruncateMethodWithPrefixAndSchema()
+    {
+        $builder = $this->getBuilder();
+        $builder->getGrammar()->setTablePrefix('prefix_');
+        $connection = $builder->getConnection();
+        $connection->shouldReceive('statement')->once()->with('truncate table "my_schema"."prefix_users"', []);
+        $connection->shouldReceive('getSchemaBuilder->parseSchemaAndTable')->andReturn(['my_schema', 'users']);
+        $builder->from('my_schema.users')->truncate();
+
+        $sqlite = (new SQLiteGrammar)->setConnection($connection);
+        $sqlite->setTablePrefix('prefix_');
+        $builder = $this->getBuilder();
+        $builder->from('my_schema.users');
+        $this->assertEquals([
+            'delete from "my_schema".sqlite_sequence where name = ?' => ['prefix_users'],
+            'delete from "my_schema"."prefix_users"' => [],
         ], $sqlite->compileTruncate($builder));
     }
 
