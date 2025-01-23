@@ -2,11 +2,15 @@
     "preset": "empty",
     "rules": {
         "array_indentation": true,
+        "array_syntax": {
+            "syntax": "short"
+        },
         "binary_operator_spaces": {
             "default": "single_space"
         },
         "blank_line_after_namespace": true,
         "blank_line_after_opening_tag": true,
+        "blank_lines_before_namespace": true,
         "blank_line_before_statement": {
             "statements": [
                 "return"
@@ -28,9 +32,16 @@
         "function_declaration": true,
         "heredoc_to_nowdoc": true,
         "include": true,
+        "increment_style": {
+            "style": "post"
+        },
         "indentation_type": true,
         "integer_literal_case": true,
+        "lambda_not_used_import": true,
         "line_ending": true,
+        "list_syntax": {
+            "syntax": "short"
+        },
         "lowercase_cast": true,
         "lowercase_keywords": true,
         "lowercase_static_reference": true,
@@ -63,6 +74,7 @@
         "no_singleline_whitespace_before_semicolons": true,
         "no_space_around_double_colon": true,
         "no_spaces_after_function_name": true,
+        "no_trailing_comma_in_singleline": true,
         "no_trailing_whitespace": true,
         "no_trailing_whitespace_in_comment": true,
         "no_unneeded_braces": true,
@@ -90,6 +102,13 @@
         "phpdoc_no_access": true,
         "phpdoc_no_package": true,
         "phpdoc_no_useless_inheritdoc": true,
+        "phpdoc_order": {
+            "order": [
+                "param",
+                "return",
+                "throws"
+            ]
+        },
         "phpdoc_return_self_reference": true,
         "phpdoc_scalar": true,
         "phpdoc_single_line_var_spacing": true,
@@ -103,6 +122,7 @@
         "short_scalar_cast": true,
         "single_blank_line_at_eof": true,
         "single_class_element_per_statement": true,
+        "single_import_per_statement": true,
         "single_line_after_imports": true,
         "single_line_comment_style": true,
         "single_quote": true,
@@ -112,6 +132,7 @@
         "switch_case_space": true,
         "switch_continue_to_break": true,
         "ternary_operator_spaces": true,
+        "trailing_comma_in_multiline": true,
         "trim_array_spaces": true,
         "type_declaration_spaces": true,
         "types_spaces": true,
