@@ -276,8 +276,6 @@ class MigrateCommand extends BaseCommand implements Isolatable
             ), function () {
                 $this->laravel['db']->purge();
             });
-        } catch (Throwable $e) {
-            dd($e);
         } finally {
             $this->laravel['config']->set("database.connections.{$connection->getName()}.database", $connection->getDatabaseName());
         }
