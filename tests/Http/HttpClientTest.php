@@ -1606,6 +1606,63 @@ class HttpClientTest extends TestCase
         VarDumper::setHandler(null);
     }
 
+    public function testResponseCanDump()
+    {
+        $dumped = [];
+
+        VarDumper::setHandler(function ($value) use (&$dumped) {
+            $dumped[] = $value;
+        });
+
+        $this->factory->fake([
+            '200.com' => $this->factory::response('hello', 200),
+        ]);
+
+        $this->factory->get('http://200.com')->dump();
+
+        $this->assertSame('hello', $dumped[0]);
+
+        VarDumper::setHandler(null);
+    }
+
+    public function testResponseCanDumpWithKey()
+    {
+        $dumped = [];
+
+        VarDumper::setHandler(function ($value) use (&$dumped) {
+            $dumped[] = $value;
+        });
+
+        $this->factory->fake([
+            '200.com' => $this->factory::response(['hello' => 'world'], 200),
+        ]);
+
+        $this->factory->get('http://200.com')->dump('hello');
+
+        $this->assertSame('world', $dumped[0]);
+
+        VarDumper::setHandler(null);
+    }
+
+    public function testResponseCanDumpHeaders()
+    {
+        $dumped = [];
+
+        VarDumper::setHandler(function ($value) use (&$dumped) {
+            $dumped[] = $value;
+        });
+
+        $this->factory->fake([
+            '200.com' => $this->factory::response('hello', 200, ['hello' => 'world']),
+        ]);
+
+        $this->factory->get('http://200.com')->dumpHeaders();
+
+        $this->assertSame(['hello' => ['world']], $dumped[0]);
+
+        VarDumper::setHandler(null);
+    }
+
     public function testResponseSequenceIsMacroable()
     {
         ResponseSequence::macro('customMethod', function () {
