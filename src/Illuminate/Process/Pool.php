@@ -2,6 +2,7 @@
 
 namespace Illuminate\Process;
 
+use Illuminate\Support\Collection;
 use InvalidArgumentException;
 
 /**
@@ -68,7 +69,7 @@ class Pool
         call_user_func($this->callback, $this);
 
         return new InvokedProcessPool(
-            collect($this->pendingProcesses)
+            (new Collection($this->pendingProcesses))
                 ->each(function ($pendingProcess) {
                     if (! $pendingProcess instanceof PendingProcess) {
                         throw new InvalidArgumentException('Process pool must only contain pending processes.');
@@ -78,7 +79,7 @@ class Pool
                         $output($type, $buffer, $key);
                     } : null)];
                 })
-            ->all()
+                ->all()
         );
     }
 

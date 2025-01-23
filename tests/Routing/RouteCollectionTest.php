@@ -325,4 +325,20 @@ class RouteCollectionTest extends TestCase
 
         $this->assertInstanceOf("\Symfony\Component\Routing\RouteCollection", $this->routeCollection->toSymfonyRouteCollection());
     }
+
+    public function testOverlappingRoutesMatchesFirstRoute()
+    {
+        $this->routeCollection->add(
+            new Route('GET', 'users/{id}/{other}', ['uses' => 'UsersController@other', 'as' => 'first'])
+        );
+
+        $this->routeCollection->add(
+            new Route('GET', 'users/{id}/show', ['uses' => 'UsersController@show', 'as' => 'second'])
+        );
+
+        $request = Request::create('users/1/show', 'GET');
+
+        $this->assertCount(2, $this->routeCollection->getRoutes());
+        $this->assertEquals('first', $this->routeCollection->match($request)->getName());
+    }
 }

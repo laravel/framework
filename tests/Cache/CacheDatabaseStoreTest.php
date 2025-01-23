@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Cache\DatabaseStore;
 use Illuminate\Database\Connection;
 use Illuminate\Database\PostgresConnection;
+use Illuminate\Database\SQLiteConnection;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use stdClass;
@@ -68,6 +69,17 @@ class CacheDatabaseStoreTest extends TestCase
         $this->assertSame('bar', $store->get('foo'));
     }
 
+    public function testValueIsReturnedOnSqlite()
+    {
+        $store = $this->getSqliteStore();
+        $table = m::mock(stdClass::class);
+        $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
+        $table->shouldReceive('whereIn')->once()->with('key', ['prefixfoo'])->andReturn($table);
+        $table->shouldReceive('get')->once()->andReturn(collect([(object) ['key' => 'prefixfoo', 'value' => base64_encode(serialize("\0bar\0")), 'expiration' => 999999999999999]]));
+
+        $this->assertSame("\0bar\0", $store->get('foo'));
+    }
+
     public function testValueIsUpserted()
     {
         $store = $this->getMockBuilder(DatabaseStore::class)->onlyMethods(['getTime'])->setConstructorArgs($this->getMocks())->getMock();
@@ -83,6 +95,18 @@ class CacheDatabaseStoreTest extends TestCase
     public function testValueIsUpsertedOnPostgres()
     {
         $store = $this->getMockBuilder(DatabaseStore::class)->onlyMethods(['getTime'])->setConstructorArgs($this->getPostgresMocks())->getMock();
+        $table = m::mock(stdClass::class);
+        $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
+        $store->expects($this->once())->method('getTime')->willReturn(1);
+        $table->shouldReceive('upsert')->once()->with([['key' => 'prefixfoo', 'value' => base64_encode(serialize("\0")), 'expiration' => 61]], 'key')->andReturn(1);
+
+        $result = $store->put('foo', "\0", 60);
+        $this->assertTrue($result);
+    }
+
+    public function testValueIsUpsertedOnSqlite()
+    {
+        $store = $this->getMockBuilder(DatabaseStore::class)->onlyMethods(['getTime'])->setConstructorArgs($this->getSqliteMocks())->getMock();
         $table = m::mock(stdClass::class);
         $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
         $store->expects($this->once())->method('getTime')->willReturn(1);
@@ -210,6 +234,11 @@ class CacheDatabaseStoreTest extends TestCase
         return new DatabaseStore(m::mock(PostgresConnection::class), 'table', 'prefix');
     }
 
+    protected function getSqliteStore()
+    {
+        return new DatabaseStore(m::mock(SQLiteConnection::class), 'table', 'prefix');
+    }
+
     protected function getMocks()
     {
         return [m::mock(Connection::class), 'table', 'prefix'];
@@ -218,5 +247,10 @@ class CacheDatabaseStoreTest extends TestCase
     protected function getPostgresMocks()
     {
         return [m::mock(PostgresConnection::class), 'table', 'prefix'];
+    }
+
+    protected function getSqliteMocks()
+    {
+        return [m::mock(SQLiteConnection::class), 'table', 'prefix'];
     }
 }

@@ -6,6 +6,7 @@ use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\ColumnDefinition;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Fluent;
 use RuntimeException;
 
@@ -29,7 +30,7 @@ class MySqlGrammar extends Grammar
     protected $serials = ['bigInteger', 'integer', 'mediumInteger', 'smallInteger', 'tinyInteger'];
 
     /**
-     * The commands to be executed outside of create or alter command.
+     * The commands to be executed outside of create or alter commands.
      *
      * @var string[]
      */
@@ -358,7 +359,7 @@ class MySqlGrammar extends Grammar
      */
     protected function compileLegacyRenameColumn(Blueprint $blueprint, Fluent $command, Connection $connection)
     {
-        $column = collect($connection->getSchemaBuilder()->getColumns($blueprint->getTable()))
+        $column = (new Collection($connection->getSchemaBuilder()->getColumns($blueprint->getTable())))
             ->firstWhere('name', $command->from);
 
         $modifiers = $this->addModifiers($column['type'], $blueprint, new ColumnDefinition([

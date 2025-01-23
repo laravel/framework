@@ -3,10 +3,13 @@
 namespace Illuminate\Tests\Integration\Cache;
 
 use DateTime;
+use Illuminate\Cache\RedisStore;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
+use Illuminate\Redis\Connections\PhpRedisClusterConnection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Sleep;
+use Mockery as m;
 use Orchestra\Testbench\TestCase;
 
 class RedisStoreTest extends TestCase
@@ -25,6 +28,7 @@ class RedisStoreTest extends TestCase
         parent::tearDown();
 
         $this->tearDownRedis();
+        m::close();
     }
 
     public function testCacheTtl(): void
@@ -230,5 +234,19 @@ class RedisStoreTest extends TestCase
         ], $store->many(['foo', 'fizz', 'quz', 'norf']));
 
         $this->assertEquals([], $store->many([]));
+    }
+
+    public function testPutManyCallsPutWhenClustered()
+    {
+        $store = m::mock(RedisStore::class)->makePartial();
+        $store->expects('connection')->andReturn(m::mock(PhpRedisClusterConnection::class));
+        $store->expects('put')
+            ->twice()
+            ->andReturn(true);
+
+        $store->putMany([
+            'foo' => 'bar',
+            'fizz' => 'buz',
+        ], 10);
     }
 }

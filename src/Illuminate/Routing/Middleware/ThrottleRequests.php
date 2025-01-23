@@ -8,7 +8,7 @@ use Illuminate\Cache\RateLimiting\Unlimited;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Illuminate\Routing\Exceptions\MissingRateLimiterException;
-use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\InteractsWithTime;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Response;
@@ -127,7 +127,7 @@ class ThrottleRequests
         return $this->handleRequest(
             $request,
             $next,
-            collect(Arr::wrap($limiterResponse))->map(function ($limit) use ($limiterName) {
+            Collection::wrap($limiterResponse)->map(function ($limit) use ($limiterName) {
                 return (object) [
                     'key' => self::$shouldHashKeys ? md5($limiterName.$limit->key) : $limiterName.':'.$limit->key,
                     'maxAttempts' => $limit->maxAttempts,

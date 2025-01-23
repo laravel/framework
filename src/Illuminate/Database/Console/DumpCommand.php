@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolverInterface;
+use Illuminate\Database\Events\MigrationsPruned;
 use Illuminate\Database\Events\SchemaDumped;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Config;
@@ -52,10 +53,12 @@ class DumpCommand extends Command
 
         if ($this->option('prune')) {
             (new Filesystem)->deleteDirectory(
-                database_path('migrations'), $preserve = false
+                $path = database_path('migrations'), $preserve = false
             );
 
             $info .= ' and pruned';
+
+            $dispatcher->dispatch(new MigrationsPruned($connection, $path));
         }
 
         $this->components->info($info.' successfully.');
@@ -74,10 +77,10 @@ class DumpCommand extends Command
         $migrationTable = is_array($migrations) ? ($migrations['table'] ?? 'migrations') : $migrations;
 
         return $connection->getSchemaState()
-                ->withMigrationTable($migrationTable)
-                ->handleOutputUsing(function ($type, $buffer) {
-                    $this->output->write($buffer);
-                });
+            ->withMigrationTable($migrationTable)
+            ->handleOutputUsing(function ($type, $buffer) {
+                $this->output->write($buffer);
+            });
     }
 
     /**

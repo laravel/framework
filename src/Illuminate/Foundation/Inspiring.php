@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation;
 
 use Illuminate\Support\Collection;
+use Illuminate\Support\Stringable;
 
 /*
                                                    .~))>>
@@ -67,7 +68,7 @@ class Inspiring
      */
     public static function quotes()
     {
-        return Collection::make([
+        return new Collection([
             'Act only according to that maxim whereby you can, at the same time, will that it should become a universal law. - Immanuel Kant',
             'An unexamined life is not worth living. - Socrates',
             'Be present above all else. - Naval Ravikant',
@@ -118,7 +119,7 @@ class Inspiring
      */
     protected static function formatForConsole($quote)
     {
-        [$text, $author] = str($quote)->explode('-');
+        [$text, $author] = (new Stringable($quote))->explode('-');
 
         return sprintf(
             "\n  <options=bold>“ %s ”</>\n  <fg=gray>— %s</>\n",

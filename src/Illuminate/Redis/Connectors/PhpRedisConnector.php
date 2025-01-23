@@ -85,6 +85,22 @@ class PhpRedisConnector implements Connector
                 );
             }
 
+            if (array_key_exists('max_retries', $config)) {
+                $client->setOption(Redis::OPT_MAX_RETRIES, $config['max_retries']);
+            }
+
+            if (array_key_exists('backoff_algorithm', $config)) {
+                $client->setOption(Redis::OPT_BACKOFF_ALGORITHM, $config['backoff_algorithm']);
+            }
+
+            if (array_key_exists('backoff_base', $config)) {
+                $client->setOption(Redis::OPT_BACKOFF_BASE, $config['backoff_base']);
+            }
+
+            if (array_key_exists('backoff_cap', $config)) {
+                $client->setOption(Redis::OPT_BACKOFF_CAP, $config['backoff_cap']);
+            }
+
             $this->establishConnection($client, $config);
 
             if (! empty($config['password'])) {

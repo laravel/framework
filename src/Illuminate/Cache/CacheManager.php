@@ -90,6 +90,19 @@ class CacheManager implements FactoryContract
 
         $config = Arr::add($config, 'store', $name);
 
+        return $this->build($config);
+    }
+
+    /**
+     * Build a cache repository with the given configuration.
+     *
+     * @param  array  $config
+     * @return \Illuminate\Cache\Repository
+     */
+    public function build(array $config)
+    {
+        $config = Arr::add($config, 'store', $config['name'] ?? 'ondemand');
+
         if (isset($this->customCreators[$config['driver']])) {
             return $this->callCustomCreator($config);
         }
@@ -270,10 +283,10 @@ class CacheManager implements FactoryContract
             $dynamoConfig['credentials'] = Arr::only(
                 $config, ['key', 'secret']
             );
-        }
 
-        if (! empty($config['token'])) {
-            $dynamoConfig['credentials']['token'] = $config['token'];
+            if (! empty($config['token'])) {
+                $dynamoConfig['credentials']['token'] = $config['token'];
+            }
         }
 
         return new DynamoDbClient($dynamoConfig);

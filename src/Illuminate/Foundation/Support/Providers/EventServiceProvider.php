@@ -6,6 +6,7 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Events\DiscoverEvents;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 
@@ -144,16 +145,19 @@ class EventServiceProvider extends ServiceProvider
      */
     public function discoverEvents()
     {
-        return collect($this->discoverEventsWithin())
-                    ->reject(function ($directory) {
-                        return ! is_dir($directory);
-                    })
-                    ->reduce(function ($discovered, $directory) {
-                        return array_merge_recursive(
-                            $discovered,
-                            DiscoverEvents::within($directory, $this->eventDiscoveryBasePath())
-                        );
-                    }, []);
+        return (new Collection($this->discoverEventsWithin()))
+            ->flatMap(function ($directory) {
+                return glob($directory, GLOB_ONLYDIR);
+            })
+            ->reject(function ($directory) {
+                return ! is_dir($directory);
+            })
+            ->reduce(function ($discovered, $directory) {
+                return array_merge_recursive(
+                    $discovered,
+                    DiscoverEvents::within($directory, $this->eventDiscoveryBasePath())
+                );
+            }, []);
     }
 
     /**

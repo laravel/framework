@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Concerns\CreatesMatchingTest;
 use Illuminate\Console\GeneratorCommand;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -252,7 +253,7 @@ class ModelMakeCommand extends GeneratorCommand
         $replacements = [];
 
         if ($this->option('factory') || $this->option('all')) {
-            $modelPath = str($this->argument('name'))->studly()->replace('/', '\\')->toString();
+            $modelPath = Str::of($this->argument('name'))->studly()->replace('/', '\\')->toString();
 
             $factoryNamespace = '\\Database\\Factories\\'.$modelPath.'Factory';
 
@@ -308,13 +309,13 @@ class ModelMakeCommand extends GeneratorCommand
             return;
         }
 
-        collect(multiselect('Would you like any of the following?', [
+        (new Collection(multiselect('Would you like any of the following?', [
             'seed' => 'Database Seeder',
             'factory' => 'Factory',
             'requests' => 'Form Requests',
             'migration' => 'Migration',
             'policy' => 'Policy',
             'resource' => 'Resource Controller',
-        ]))->each(fn ($option) => $input->setOption($option, true));
+        ])))->each(fn ($option) => $input->setOption($option, true));
     }
 }

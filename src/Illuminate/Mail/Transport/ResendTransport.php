@@ -4,6 +4,7 @@ namespace Illuminate\Mail\Transport;
 
 use Exception;
 use Resend\Contracts\Client;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\SentMessage;
@@ -70,12 +71,12 @@ class ResendTransport extends AbstractTransport
 
         if ($email->getAttachments()) {
             foreach ($email->getAttachments() as $attachment) {
-                $headers = $attachment->getPreparedHeaders();
+                $attachmentHeaders = $attachment->getPreparedHeaders();
 
-                $filename = $headers->getHeaderParameter('Content-Disposition', 'filename');
+                $filename = $attachmentHeaders->getHeaderParameter('Content-Disposition', 'filename');
 
                 $item = [
-                    'content_type' => $headers->get('Content-Type')->getBody(),
+                    'content_type' => $attachmentHeaders->get('Content-Type')->getBody(),
                     'content' => str_replace("\r\n", '', $attachment->bodyToString()),
                     'filename' => $filename,
                 ];
@@ -97,6 +98,8 @@ class ResendTransport extends AbstractTransport
                 'text' => $email->getTextBody(),
                 'attachments' => $attachments,
             ]);
+
+            throw_if(isset($result['statusCode']) && $result['statusCode'] != Response::HTTP_OK, Exception::class, $result['message']);
         } catch (Exception $exception) {
             throw new TransportException(
                 sprintf('Request to Resend API failed. Reason: %s.', $exception->getMessage()),
