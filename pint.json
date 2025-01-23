@@ -2,13 +2,22 @@
     "preset": "empty",
     "rules": {
         "array_indentation": true,
+        "binary_operator_spaces": {
+            "default": "single_space"
+        },
         "blank_line_after_namespace": true,
         "blank_line_after_opening_tag": true,
+        "blank_line_before_statement": {
+            "statements": [
+                "return"
+            ]
+        },
         "blank_line_between_import_groups": true,
         "cast_spaces": true,
         "class_reference_name_casing": true,
         "clean_namespace": true,
         "compact_nullable_type_declaration": true,
+        "concat_space": true,
         "constant_case": {
             "case": "lower"
         },
@@ -19,12 +28,16 @@
         "function_declaration": true,
         "heredoc_to_nowdoc": true,
         "include": true,
+        "indentation_type": true,
         "integer_literal_case": true,
         "lowercase_cast": true,
         "lowercase_keywords": true,
         "lowercase_static_reference": true,
         "magic_constant_casing": true,
         "magic_method_casing": true,
+        "method_argument_space": {
+            "on_multiline": "ignore"
+        },
         "method_chaining_indentation": true,
         "native_function_casing": true,
         "native_type_declaration_casing": true,
@@ -54,6 +67,7 @@
         "no_whitespace_in_blank_line": true,
         "normalize_index_brace": true,
         "not_operator_with_successor_space": true,
+        "nullable_type_declaration_for_default_null_value": true,
         "object_operator_without_whitespace": true,
         "ordered_imports": {
             "sort_algorithm": "alpha",
@@ -82,6 +96,7 @@
         "single_blank_line_at_eof": true,
         "single_class_element_per_statement": true,
         "single_line_after_imports": true,
+        "single_line_comment_style": true,
         "single_quote": true,
         "space_after_semicolon": true,
         "standardize_not_equals": true,
@@ -90,7 +105,14 @@
         "switch_continue_to_break": true,
         "ternary_operator_spaces": true,
         "trim_array_spaces": true,
+        "type_declaration_spaces": true,
         "unary_operator_spaces": true,
+        "visibility_required": {
+            "elements": [
+                "method",
+                "property"
+            ]
+        },
         "whitespace_after_comma_in_array": true
     },
     "exclude": [
