@@ -398,6 +398,7 @@ class FoundationApplicationTest extends TestCase
         $ds = DIRECTORY_SEPARATOR;
         $this->assertSame('/base/path'.$ds.'bootstrap'.$ds.'cache/services.php', $app->getCachedServicesPath());
         $this->assertSame('/base/path'.$ds.'bootstrap'.$ds.'cache/packages.php', $app->getCachedPackagesPath());
+        $this->assertSame('/base/path'.$ds.'bootstrap'.$ds.'cache/classmap.php', $app->getCachedClassmapPath());
         $this->assertSame('/base/path'.$ds.'bootstrap'.$ds.'cache/config.php', $app->getCachedConfigPath());
         $this->assertSame('/base/path'.$ds.'bootstrap'.$ds.'cache/routes-v7.php', $app->getCachedRoutesPath());
         $this->assertSame('/base/path'.$ds.'bootstrap'.$ds.'cache/events.php', $app->getCachedEventsPath());
@@ -408,12 +409,14 @@ class FoundationApplicationTest extends TestCase
         $app = new Application('/base/path');
         $_SERVER['APP_SERVICES_CACHE'] = '/absolute/path/services.php';
         $_SERVER['APP_PACKAGES_CACHE'] = '/absolute/path/packages.php';
+        $_SERVER['APP_CLASSMAP_CACHE'] = '/absolute/path/classmap.php';
         $_SERVER['APP_CONFIG_CACHE'] = '/absolute/path/config.php';
         $_SERVER['APP_ROUTES_CACHE'] = '/absolute/path/routes.php';
         $_SERVER['APP_EVENTS_CACHE'] = '/absolute/path/events.php';
 
         $this->assertSame('/absolute/path/services.php', $app->getCachedServicesPath());
         $this->assertSame('/absolute/path/packages.php', $app->getCachedPackagesPath());
+        $this->assertSame('/absolute/path/classmap.php', $app->getCachedClassmapPath());
         $this->assertSame('/absolute/path/config.php', $app->getCachedConfigPath());
         $this->assertSame('/absolute/path/routes.php', $app->getCachedRoutesPath());
         $this->assertSame('/absolute/path/events.php', $app->getCachedEventsPath());
@@ -421,6 +424,7 @@ class FoundationApplicationTest extends TestCase
         unset(
             $_SERVER['APP_SERVICES_CACHE'],
             $_SERVER['APP_PACKAGES_CACHE'],
+            $_SERVER['APP_CLASSMAP_CACHE'],
             $_SERVER['APP_CONFIG_CACHE'],
             $_SERVER['APP_ROUTES_CACHE'],
             $_SERVER['APP_EVENTS_CACHE']
@@ -432,6 +436,7 @@ class FoundationApplicationTest extends TestCase
         $app = new Application('/base/path');
         $_SERVER['APP_SERVICES_CACHE'] = 'relative/path/services.php';
         $_SERVER['APP_PACKAGES_CACHE'] = 'relative/path/packages.php';
+        $_SERVER['APP_CLASSMAP_CACHE'] = 'relative/path/classmap.php';
         $_SERVER['APP_CONFIG_CACHE'] = 'relative/path/config.php';
         $_SERVER['APP_ROUTES_CACHE'] = 'relative/path/routes.php';
         $_SERVER['APP_EVENTS_CACHE'] = 'relative/path/events.php';
@@ -439,6 +444,7 @@ class FoundationApplicationTest extends TestCase
         $ds = DIRECTORY_SEPARATOR;
         $this->assertSame('/base/path'.$ds.'relative/path/services.php', $app->getCachedServicesPath());
         $this->assertSame('/base/path'.$ds.'relative/path/packages.php', $app->getCachedPackagesPath());
+        $this->assertSame('/base/path'.$ds.'relative/path/classmap.php', $app->getCachedClassmapPath());
         $this->assertSame('/base/path'.$ds.'relative/path/config.php', $app->getCachedConfigPath());
         $this->assertSame('/base/path'.$ds.'relative/path/routes.php', $app->getCachedRoutesPath());
         $this->assertSame('/base/path'.$ds.'relative/path/events.php', $app->getCachedEventsPath());
@@ -446,6 +452,7 @@ class FoundationApplicationTest extends TestCase
         unset(
             $_SERVER['APP_SERVICES_CACHE'],
             $_SERVER['APP_PACKAGES_CACHE'],
+            $_SERVER['APP_CLASSMAP_CACHE'],
             $_SERVER['APP_CONFIG_CACHE'],
             $_SERVER['APP_ROUTES_CACHE'],
             $_SERVER['APP_EVENTS_CACHE']
@@ -457,6 +464,7 @@ class FoundationApplicationTest extends TestCase
         $app = new Application;
         $_SERVER['APP_SERVICES_CACHE'] = 'relative/path/services.php';
         $_SERVER['APP_PACKAGES_CACHE'] = 'relative/path/packages.php';
+        $_SERVER['APP_CLASSMAP_CACHE'] = 'relative/path/classmap.php';
         $_SERVER['APP_CONFIG_CACHE'] = 'relative/path/config.php';
         $_SERVER['APP_ROUTES_CACHE'] = 'relative/path/routes.php';
         $_SERVER['APP_EVENTS_CACHE'] = 'relative/path/events.php';
@@ -464,6 +472,7 @@ class FoundationApplicationTest extends TestCase
         $ds = DIRECTORY_SEPARATOR;
         $this->assertSame($ds.'relative/path/services.php', $app->getCachedServicesPath());
         $this->assertSame($ds.'relative/path/packages.php', $app->getCachedPackagesPath());
+        $this->assertSame($ds.'relative/path/classmap.php', $app->getCachedClassmapPath());
         $this->assertSame($ds.'relative/path/config.php', $app->getCachedConfigPath());
         $this->assertSame($ds.'relative/path/routes.php', $app->getCachedRoutesPath());
         $this->assertSame($ds.'relative/path/events.php', $app->getCachedEventsPath());
@@ -471,6 +480,7 @@ class FoundationApplicationTest extends TestCase
         unset(
             $_SERVER['APP_SERVICES_CACHE'],
             $_SERVER['APP_PACKAGES_CACHE'],
+            $_SERVER['APP_CLASSMAP_CACHE'],
             $_SERVER['APP_CONFIG_CACHE'],
             $_SERVER['APP_ROUTES_CACHE'],
             $_SERVER['APP_EVENTS_CACHE']
@@ -483,12 +493,14 @@ class FoundationApplicationTest extends TestCase
         $app->addAbsoluteCachePathPrefix('C:');
         $_SERVER['APP_SERVICES_CACHE'] = 'C:\framework\services.php';
         $_SERVER['APP_PACKAGES_CACHE'] = 'C:\framework\packages.php';
+        $_SERVER['APP_CLASSMAP_CACHE'] = 'C:\framework\classmap.php';
         $_SERVER['APP_CONFIG_CACHE'] = 'C:\framework\config.php';
         $_SERVER['APP_ROUTES_CACHE'] = 'C:\framework\routes.php';
         $_SERVER['APP_EVENTS_CACHE'] = 'C:\framework\events.php';
 
         $this->assertSame('C:\framework\services.php', $app->getCachedServicesPath());
         $this->assertSame('C:\framework\packages.php', $app->getCachedPackagesPath());
+        $this->assertSame('C:\framework\classmap.php', $app->getCachedClassmapPath());
         $this->assertSame('C:\framework\config.php', $app->getCachedConfigPath());
         $this->assertSame('C:\framework\routes.php', $app->getCachedRoutesPath());
         $this->assertSame('C:\framework\events.php', $app->getCachedEventsPath());
@@ -496,6 +508,7 @@ class FoundationApplicationTest extends TestCase
         unset(
             $_SERVER['APP_SERVICES_CACHE'],
             $_SERVER['APP_PACKAGES_CACHE'],
+            $_SERVER['APP_CLASSMAP_CACHE'],
             $_SERVER['APP_CONFIG_CACHE'],
             $_SERVER['APP_ROUTES_CACHE'],
             $_SERVER['APP_EVENTS_CACHE']
