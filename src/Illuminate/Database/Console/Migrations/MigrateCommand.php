@@ -173,8 +173,10 @@ class MigrateCommand extends BaseCommand implements Isolatable
 
     /**
      * Attempt to create the database if it's missing.
+     *
+     * @return bool
      */
-    protected function handleMissingDatabase(Throwable $e): bool
+    protected function handleMissingDatabase(Throwable $e)
     {
         if ($e instanceof SQLiteDatabaseDoesNotExistException) {
             return $this->createMissingSqliteDatabase($e->path);
