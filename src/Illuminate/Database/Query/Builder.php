@@ -38,7 +38,7 @@ use function Illuminate\Support\enum_value;
  * @method self where(\Closure(): mixed)
  * @method self where(array<string, mixed> $column)
  * @method self where((array{string, 'and'|'or', mixed}|array{string, mixed}|array{column: string, operator?: 'and'|'or', value: mixed})[] $column)
- * @method self where(\Closure|string|array|\Illuminate\Contracts\Database\Query\Expression $column, mixed $operator, mixed $value, string $boolean)
+ * @method self where(\Closure|string|array|\Illuminate\Contracts\Database\Query\Expression $column, mixed $operator  null, mixed $value = null, string $boolean = 'and')
  */
 class Builder implements BuilderContract
 {
