@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Exceptions\Renderer;
 use Closure;
 use Composer\Autoload\ClassLoader;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Bootstrap\HandleExceptions;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -34,11 +35,25 @@ class Exception
     protected $listener;
 
     /**
+     * The filesystem instance.
+     *
+     * @var \Illuminate\Filesystem\Filesystem
+     */
+    public $files;
+
+    /**
      * The application's base path.
      *
      * @var string
      */
     protected $basePath;
+
+    /**
+     * The application's base path.
+     *
+     * @var string
+     */
+    protected $classmapPath;
 
     /**
      * Creates a new exception renderer instance.
@@ -49,12 +64,14 @@ class Exception
      * @param  string  $basePath
      * @return void
      */
-    public function __construct(FlattenException $exception, Request $request, Listener $listener, string $basePath)
+    public function __construct(FlattenException $exception, Request $request, Listener $listener, Filesystem $files, string $basePath, string $classmapPath)
     {
         $this->exception = $exception;
         $this->request = $request;
         $this->listener = $listener;
+        $this->files = $files;
         $this->basePath = $basePath;
+        $this->classmapPath = $classmapPath;
     }
 
     /**
@@ -108,9 +125,7 @@ class Exception
      */
     public function frames()
     {
-        $classMap = once(fn () => array_map(function ($path) {
-            return (string) realpath($path);
-        }, array_values(ClassLoader::getRegisteredLoaders())[0]->getClassMap()));
+        $classMap = once(fn () => $this->getClassmap());
 
         $trace = array_values(array_filter(
             $this->exception->getTrace(), fn ($trace) => isset($trace['file']),
@@ -124,6 +139,54 @@ class Exception
         return new Collection(array_map(
             fn (array $trace) => new Frame($this->exception, $classMap, $trace, $this->basePath), $trace,
         ));
+    }
+
+    /**
+     * Get the current classmap.
+     *
+     * @return array
+     */
+    public function getClassmap(): array
+    {
+        if (! $this->files->exists($this->classmapPath)) {
+            $this->buildClassmap();
+        }
+
+        return $this->files->exists($this->classmapPath) ?
+            $this->files->getRequire($this->classmapPath) : [];
+
+        return [];
+    }
+
+    /**
+     * Build the classmap and write it to disk.
+     *
+     * @return array
+     */
+    public function buildClassmap()
+    {
+        $this->write(array_map(function ($path) {
+            return (string) realpath($path);
+        }, array_values(ClassLoader::getRegisteredLoaders())[0]->getClassMap()));
+    }
+
+    /**
+     * Write the given classmap array to disk.
+     *
+     * @param  array  $classmap
+     * @return void
+     *
+     * @throws \Exception
+     */
+    protected function write(array $classmap)
+    {
+        if (! is_writable($dirname = dirname($this->classmapPath))) {
+            throw new \Exception("The {$dirname} directory must be present and writable.");
+        }
+
+        $this->files->replace(
+            $this->classmapPath, '<?php return '.var_export($classmap, true).';'
+        );
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Exceptions\Renderer;
 
 use Illuminate\Contracts\View\Factory;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Exceptions\Renderer\Mappers\BladeMapper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -90,8 +91,12 @@ class Renderer
             $this->htmlErrorRenderer->render($throwable),
         );
 
+        $classmapPath = app()->getCachedClassmapPath();
+
         return $this->viewFactory->make('laravel-exceptions-renderer::show', [
-            'exception' => new Exception($flattenException, $request, $this->listener, $this->basePath),
+            'exception' => new Exception(
+                $flattenException, $request, $this->listener, new Filesystem, $this->basePath, $classmapPath
+            ),
         ])->render();
     }
 

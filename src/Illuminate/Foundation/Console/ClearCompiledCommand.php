@@ -37,6 +37,10 @@ class ClearCompiledCommand extends Command
             @unlink($packagesPath);
         }
 
-        $this->components->info('Compiled services and packages files removed successfully.');
+        if (is_file($classmapPath = $this->laravel->getCachedClassmapPath())) {
+            @unlink($classmapPath);
+        }
+
+        $this->components->info('Compiled services, packages and classmap files removed successfully.');
     }
 }

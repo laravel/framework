@@ -1269,6 +1269,16 @@ class Application extends Container implements ApplicationContract, CachesConfig
     }
 
     /**
+     * Get the path to the cached classmap.php file.
+     *
+     * @return string
+     */
+    public function getCachedClassmapPath()
+    {
+        return $this->normalizeCachePath('APP_CLASSMAP_CACHE', 'cache/classmap.php');
+    }
+
+    /**
      * Determine if the application configuration is cached.
      *
      * @return bool
