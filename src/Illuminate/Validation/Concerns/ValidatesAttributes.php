@@ -1387,11 +1387,18 @@ trait ValidatesAttributes
      *
      * @param  string  $attribute
      * @param  mixed  $value
+     * @param  array<int, string>  $parameters
      * @return bool
      */
-    public function validateImage($attribute, $value)
+    public function validateImage($attribute, $value, $parameters)
     {
-        return $this->validateMimes($attribute, $value, ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp']);
+        $mimes = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'];
+
+        if (! $parameters || ! in_array('without_svg', $parameters)) {
+            $mimes[] = 'svg';
+        }
+
+        return $this->validateMimes($attribute, $value, $mimes);
     }
 
     /**

@@ -7,17 +7,23 @@ class ImageFile extends File
     /**
      * Create a new image file rule instance.
      *
+     * @param  bool  $allowSvgMimeType
      * @return void
      */
-    public function __construct()
+    public function __construct($allowSvgMimeType = false)
     {
-        $this->rules('image');
+        if ($allowSvgMimeType) {
+            $this->rules('image');
+        } else {
+            $this->rules('image:without_svg');
+        }
     }
 
     /**
      * The dimension constraints for the uploaded file.
      *
      * @param  \Illuminate\Validation\Rules\Dimensions  $dimensions
+     * @return $this
      */
     public function dimensions($dimensions)
     {
