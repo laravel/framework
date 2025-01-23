@@ -28,6 +28,7 @@ use ReflectionProperty;
 use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\Header\TagHeader;
 use Symfony\Component\Mime\Address;
+use function Illuminate\Support\enum_value;
 
 class Mailable implements MailableContract, Renderable
 {
@@ -463,23 +464,23 @@ class Mailable implements MailableContract, Renderable
     /**
      * Get the queue specified on the class or from the OnQueue attribute.
      *
-     * @return string|\UnitEnum|null
+     * @return string|null
      */
     protected function getQueue()
     {
         $queue = property_exists($this, 'queue') ? $this->queue : null;
 
         if ($queue === null) {
-            $queue = $this->getQueueFromOnConnectionAttribute(new ReflectionClass($this));
+            $queue = $this->getQueueFromOnQueueAttribute(new ReflectionClass($this));
         }
 
-        return $queue;
+        return $queue !== null ? enum_value($queue) : null;
     }
 
     /**
      * Get the connection specified on the class or from the OnConnection attribute.
      *
-     * @return string|\UnitEnum|null
+     * @return string|null
      */
     protected function getConnection()
     {
@@ -489,7 +490,7 @@ class Mailable implements MailableContract, Renderable
             $connection = $this->getConnectionFromOnConnectionAttribute(new ReflectionClass($this));
         }
 
-        return $connection;
+        return $connection !== null ? enum_value($connection) : null;
     }
 
     /**

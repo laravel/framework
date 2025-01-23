@@ -4,8 +4,6 @@ namespace Illuminate\Foundation\Queue;
 
 use ReflectionClass;
 
-use function Illuminate\Support\enum_value;
-
 trait InteractsWithQueueAndConnection
 {
     /**
@@ -21,7 +19,7 @@ trait InteractsWithQueueAndConnection
             return null;
         }
 
-        return enum_value($onConnection[0]->newInstance()->connection);
+        return $onConnection[0]->newInstance()->connection;
     }
 
     /**
@@ -30,13 +28,13 @@ trait InteractsWithQueueAndConnection
      * @param  \ReflectionClass  $reflectionClass
      * @return string|\UnitEnum|null
      */
-    protected function getQueueFromOnConnectionAttribute(ReflectionClass $reflectionClass)
+    protected function getQueueFromOnQueueAttribute(ReflectionClass $reflectionClass)
     {
         $onQueue = $reflectionClass->getAttributes(OnQueue::class);
         if ($onQueue === []) {
             return null;
         }
 
-        return enum_value($onQueue[0]->newInstance()->queue);
+        return $onQueue[0]->newInstance()->queue;
     }
 }

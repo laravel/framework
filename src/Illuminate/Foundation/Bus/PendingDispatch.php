@@ -209,7 +209,7 @@ class PendingDispatch
 
         $reflectionClass = new \ReflectionClass($this->job);
         if (! $hasQueueSet) {
-            if ($queue = $this->getQueueFromOnConnectionAttribute($reflectionClass)) {
+            if ($queue = $this->getQueueFromOnQueueAttribute($reflectionClass)) {
                 $this->onQueue($queue);
             }
         }
