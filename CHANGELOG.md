@@ -1,6 +1,23 @@
 # Release Notes for 11.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v11.39.1...11.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v11.40.0...11.x)
+
+## [v11.40.0](https://github.com/laravel/framework/compare/v11.39.1...v11.40.0) - 2025-01-24
+
+* draft: fix: Don't release lock for ShouldBeUniqueUntilProcessing Job that gets released by [@mathiasgrimm](https://github.com/mathiasgrimm) in https://github.com/laravel/framework/pull/54261
+* [11.x] Add Laravel Pint by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/53835
+* Add self to HasCollection type param in Model by [@thena-seer-sfg](https://github.com/thena-seer-sfg) in https://github.com/laravel/framework/pull/54311
+* [11.x] Add pending attributes by [@tontonsb](https://github.com/tontonsb) in https://github.com/laravel/framework/pull/53720
+* fix: `schedule:test` on commands using runInBackground by [@dallyger](https://github.com/dallyger) in https://github.com/laravel/framework/pull/54321
+* [11.x] Helper methods to dump responses of the Laravel HTTP client by [@morrislaptop](https://github.com/morrislaptop) in https://github.com/laravel/framework/pull/54317
+* Add support for cursor editor in ResolvesDumpSource by [@tuxfamily](https://github.com/tuxfamily) in https://github.com/laravel/framework/pull/54318
+* [11.x] Add Customizable Date Validation Rule with Flexible Date Constraints by [@michaelnabil230](https://github.com/michaelnabil230) in https://github.com/laravel/framework/pull/53465
+* [11.x] start syncing StyleCI rules to Pint by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/54326
+* [11.x] apply our new Pint rule to the `/tests` directory by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/54325
+* fix(Collection::pop()): count < 1 by [@artumi-richard](https://github.com/artumi-richard) in https://github.com/laravel/framework/pull/54340
+* Patch CVE-2025-22145 in nesbot/carbon package by [@dennis-koster](https://github.com/dennis-koster) in https://github.com/laravel/framework/pull/54335
+* [11.x] Prevent unintended serialization and compression by [@JeppeKnockaert](https://github.com/JeppeKnockaert) in https://github.com/laravel/framework/pull/54337
+* [11.x] Pass collection of models to `whereMorphedTo` /  `whereNotMorphedTo` by [@gdebrauwer](https://github.com/gdebrauwer) in https://github.com/laravel/framework/pull/54324
 
 ## [v11.39.1](https://github.com/laravel/framework/compare/v11.39.0...v11.39.1) - 2025-01-22
 
