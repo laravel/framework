@@ -3840,7 +3840,7 @@ class Builder implements BuilderContract
     /**
      * Update records in the database.
      *
-     * @param  array  $values
+     * @param  array<string, mixed>  $values
      * @return int
      */
     public function update(array $values)
@@ -3893,7 +3893,7 @@ class Builder implements BuilderContract
      * Insert or update a record matching the attributes, and fill it with values.
      *
      * @param  array  $attributes
-     * @param  array|callable  $values
+     * @param  array<string, mixed>|callable  $values
      * @return bool
      */
     public function updateOrInsert(array $attributes, array|callable $values = [])
