@@ -1809,7 +1809,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $thirdRelatedModel = new EloquentBuilderTestModelCloseRelatedStub;
         $thirdRelatedModel->id = 3;
 
-        $builder = $model->whereMorphedTo('morph', new Collection([$firstRelatedModel, $secondRelatedModel, $thirdRelatedModel]));
+        $builder = $model->whereMorphedTo('morph', [$firstRelatedModel, $secondRelatedModel, $thirdRelatedModel]);
 
         $this->assertSame('select * from "eloquent_builder_test_model_parent_stubs" where (("eloquent_builder_test_model_parent_stubs"."morph_type" = ? and "eloquent_builder_test_model_parent_stubs"."morph_id" in (?, ?)) or ("eloquent_builder_test_model_parent_stubs"."morph_type" = ? and "eloquent_builder_test_model_parent_stubs"."morph_id" in (?)))', $builder->toSql());
         $this->assertEquals([$firstRelatedModel->getMorphClass(), $firstRelatedModel->getKey(), $thirdRelatedModel->getKey(), $secondRelatedModel->getMorphClass(), $secondRelatedModel->id], $builder->getBindings());
@@ -1869,7 +1869,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $thirdRelatedModel = new EloquentBuilderTestModelCloseRelatedStub;
         $thirdRelatedModel->id = 3;
 
-        $builder = $model->whereNotMorphedTo('morph', new Collection([$firstRelatedModel, $secondRelatedModel, $thirdRelatedModel]));
+        $builder = $model->whereNotMorphedTo('morph', [$firstRelatedModel, $secondRelatedModel, $thirdRelatedModel]);
 
         $this->assertSame('select * from "eloquent_builder_test_model_parent_stubs" where not (("eloquent_builder_test_model_parent_stubs"."morph_type" <=> ? and "eloquent_builder_test_model_parent_stubs"."morph_id" not in (?, ?)) or ("eloquent_builder_test_model_parent_stubs"."morph_type" <=> ? and "eloquent_builder_test_model_parent_stubs"."morph_id" not in (?)))', $builder->toSql());
         $this->assertEquals([$firstRelatedModel->getMorphClass(), $firstRelatedModel->getKey(), $thirdRelatedModel->getKey(), $secondRelatedModel->getMorphClass(), $secondRelatedModel->id], $builder->getBindings());
@@ -1920,7 +1920,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $thirdRelatedModel = new EloquentBuilderTestModelCloseRelatedStub;
         $thirdRelatedModel->id = 3;
 
-        $builder = $model->where('bar', 'baz')->orWhereMorphedTo('morph', new Collection([$firstRelatedModel, $secondRelatedModel, $thirdRelatedModel]));
+        $builder = $model->where('bar', 'baz')->orWhereMorphedTo('morph', [$firstRelatedModel, $secondRelatedModel, $thirdRelatedModel]);
 
         $this->assertSame('select * from "eloquent_builder_test_model_parent_stubs" where "bar" = ? or (("eloquent_builder_test_model_parent_stubs"."morph_type" = ? and "eloquent_builder_test_model_parent_stubs"."morph_id" in (?, ?)) or ("eloquent_builder_test_model_parent_stubs"."morph_type" = ? and "eloquent_builder_test_model_parent_stubs"."morph_id" in (?)))', $builder->toSql());
         $this->assertEquals(['baz', $firstRelatedModel->getMorphClass(), $firstRelatedModel->getKey(), $thirdRelatedModel->getKey(), $secondRelatedModel->getMorphClass(), $secondRelatedModel->id], $builder->getBindings());
@@ -1982,7 +1982,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $thirdRelatedModel = new EloquentBuilderTestModelCloseRelatedStub;
         $thirdRelatedModel->id = 3;
 
-        $builder = $model->where('bar', 'baz')->orWhereNotMorphedTo('morph', new Collection([$firstRelatedModel, $secondRelatedModel, $thirdRelatedModel]));
+        $builder = $model->where('bar', 'baz')->orWhereNotMorphedTo('morph', [$firstRelatedModel, $secondRelatedModel, $thirdRelatedModel]);
 
         $this->assertSame('select * from "eloquent_builder_test_model_parent_stubs" where "bar" = ? or not (("eloquent_builder_test_model_parent_stubs"."morph_type" <=> ? and "eloquent_builder_test_model_parent_stubs"."morph_id" not in (?, ?)) or ("eloquent_builder_test_model_parent_stubs"."morph_type" <=> ? and "eloquent_builder_test_model_parent_stubs"."morph_id" not in (?)))', $builder->toSql());
         $this->assertEquals(['baz', $firstRelatedModel->getMorphClass(), $firstRelatedModel->getKey(), $thirdRelatedModel->getKey(), $secondRelatedModel->getMorphClass(), $secondRelatedModel->id], $builder->getBindings());
