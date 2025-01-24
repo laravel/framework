@@ -1120,7 +1120,7 @@ class Builder implements BuilderContract
     /**
      * Update records in the database.
      *
-     * @param  array  $values
+     * @param  array<string, mixed>  $values
      * @return int
      */
     public function update(array $values)
