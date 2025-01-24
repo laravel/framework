@@ -7,12 +7,12 @@ class ImageFile extends File
     /**
      * Create a new image file rule instance.
      *
-     * @param  bool  $allowSvgMimeType
+     * @param  bool  $allowSvg
      * @return void
      */
-    public function __construct($allowSvgMimeType = false)
+    public function __construct($allowSvg = false)
     {
-        if ($allowSvgMimeType) {
+        if ($allowSvg) {
             $this->rules('image:allow_svg');
         } else {
             $this->rules('image');

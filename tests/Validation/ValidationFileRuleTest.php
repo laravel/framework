@@ -219,11 +219,11 @@ class ValidationFileRuleTest extends TestCase
         );
 
         $this->passes(
-            File::image(allowSvgMimeType: true),
+            File::image(allowSvg: true),
             $maliciousSvgFileWithXSS
         );
         $this->passes(
-            Rule::imageFile(allowSvgMimeType: true),
+            Rule::imageFile(allowSvg: true),
             $maliciousSvgFileWithXSS
         );
     }

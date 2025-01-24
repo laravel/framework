@@ -204,12 +204,12 @@ class Rule
     /**
      * Get an image file rule builder instance.
      *
-     * @param  bool  $allowSvgMimeType
+     * @param  bool  $allowSvg
      * @return \Illuminate\Validation\Rules\ImageFile
      */
-    public static function imageFile($allowSvgMimeType = false)
+    public static function imageFile($allowSvg = false)
     {
-        return new ImageFile($allowSvgMimeType);
+        return new ImageFile($allowSvg);
     }
 
     /**

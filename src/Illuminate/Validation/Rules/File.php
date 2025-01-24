@@ -118,12 +118,12 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
     /**
      * Limit the uploaded file to only image types.
      *
-     * @param  bool  $allowSvgMimeType
+     * @param  bool  $allowSvg
      * @return ImageFile
      */
-    public static function image($allowSvgMimeType = false)
+    public static function image($allowSvg = false)
     {
-        return new ImageFile($allowSvgMimeType);
+        return new ImageFile($allowSvg);
     }
 
     /**
