@@ -50,6 +50,7 @@ class ValidationValidatorTest extends TestCase
 
         Carbon::setTestNow(null);
         m::close();
+        ImageFile::allowSvg(allowByDefault: true);
     }
 
     public function testNestedErrorMessagesAreRetrievedFromLocalArray()
