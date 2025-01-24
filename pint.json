@@ -11,13 +11,13 @@
         },
         "blank_line_after_namespace": true,
         "blank_line_after_opening_tag": true,
-        "blank_lines_before_namespace": true,
         "blank_line_before_statement": {
             "statements": [
                 "return"
             ]
         },
         "blank_line_between_import_groups": true,
+        "blank_lines_before_namespace": true,
         "braces_position": {
             "control_structures_opening_brace": "same_line",
             "functions_opening_brace": "next_line_unless_newline_at_signature_end",
