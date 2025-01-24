@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation;
 
+use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Foundation\Bootstrap\LoadConfiguration;
 use Monolog\Formatter\JsonFormatter;
 use Monolog\Handler\SocketHandler;
@@ -24,6 +25,7 @@ class Cloud
         (match ($bootstrapper) {
             LoadConfiguration::class => function () use ($app) {
                 static::configureUnpooledPostgresConnection($app);
+                static::ensureMigrationsUseUnpooledConnection($app);
             },
             HandleExceptions::class => function () use ($app) {
                 static::configureCloudLogging($app);
@@ -48,6 +50,24 @@ class Cloud
                 ])
             );
         }
+    }
+
+    /**
+     * Ensure that migrations use the unpooled Postgres connection if applicable.
+     */
+    protected static function ensureMigrationsUseUnpooledConnection(Application $app): void
+    {
+        if (! is_array($app['config']->get('database.connections.pgsql-unpooled'))) {
+            return;
+        }
+
+        Migrator::resolveConnectionsUsing(function ($resolver, $connection) use ($app) {
+            $connection = $connection ?? $app['config']->get('database.default');
+
+            return $resolver->connection(
+                $connection === 'pgsql' ? 'pgsql-unpooled' : 'pgsql'
+            );
+        });
     }
 
     /**
