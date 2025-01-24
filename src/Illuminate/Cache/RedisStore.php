@@ -432,6 +432,10 @@ class RedisStore extends TaggableStore implements LockProvider
     protected function pack($value, $connection)
     {
         if ($connection instanceof PhpRedisConnection) {
+            if ($this->storePlainValue($value)) {
+                return $value;
+            }
+
             if ($connection->serialized()) {
                 return $connection->pack([$value])[0];
             }
@@ -445,6 +449,17 @@ class RedisStore extends TaggableStore implements LockProvider
     }
 
     /**
+     * Determine if the given value should be stored as plain value or be serialized/compressed instead.
+     *
+     * @param  mixed  $value
+     * @return bool
+     */
+    protected function storePlainValue($value): bool
+    {
+        return is_numeric($value) && ! in_array($value, [INF, -INF]) && ! is_nan($value);
+    }
+
+    /**
      * Serialize the value.
      *
      * @param  mixed  $value
@@ -452,7 +467,7 @@ class RedisStore extends TaggableStore implements LockProvider
      */
     protected function serialize($value)
     {
-        return is_numeric($value) && ! in_array($value, [INF, -INF]) && ! is_nan($value) ? $value : serialize($value);
+        return $this->storePlainValue($value) ? $value : serialize($value);
     }
 
     /**
