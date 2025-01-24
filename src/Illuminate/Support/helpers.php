@@ -239,6 +239,7 @@ if (! function_exists('laravel_cloud')) {
      */
     function laravel_cloud()
     {
+        return true;
         return ($_ENV['LARAVEL_CLOUD'] ?? false) === '1' ||
                ($_SERVER['LARAVEL_CLOUD'] ?? false) === '1';
     }
