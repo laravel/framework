@@ -10,6 +10,7 @@ use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\File;
+use Illuminate\Validation\Rules\ImageFile;
 use Illuminate\Validation\ValidationServiceProvider;
 use Illuminate\Validation\Validator;
 use PHPUnit\Framework\TestCase;
@@ -206,6 +207,17 @@ class ValidationFileRuleTest extends TestCase
                     </svg>
                     XML
         );
+
+        $this->passes(
+            File::image(),
+            $maliciousSvgFileWithXSS,
+        );
+        $this->passes(
+            Rule::imageFile(),
+            $maliciousSvgFileWithXSS,
+        );
+
+        ImageFile::allowSvg(allowByDefault: false);
 
         $this->fails(
             File::image(),

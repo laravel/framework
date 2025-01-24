@@ -23,6 +23,7 @@ use Illuminate\Support\Exceptions\MathException;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Exists;
+use Illuminate\Validation\Rules\ImageFile;
 use Illuminate\Validation\Rules\Unique;
 use Illuminate\Validation\ValidationData;
 use InvalidArgumentException;
@@ -1394,7 +1395,7 @@ trait ValidatesAttributes
     {
         $mimes = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'];
 
-        if (is_array($parameters) && in_array('allow_svg', $parameters)) {
+        if (ImageFile::$allowSvgByDefault || (is_array($parameters) && in_array('allow_svg', $parameters))) {
             $mimes[] = 'svg';
         }
 

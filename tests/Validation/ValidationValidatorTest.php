@@ -25,6 +25,7 @@ use Illuminate\Translation\Translator;
 use Illuminate\Validation\DatabasePresenceVerifierInterface;
 use Illuminate\Validation\Rule as ValidationRule;
 use Illuminate\Validation\Rules\Exists;
+use Illuminate\Validation\Rules\ImageFile;
 use Illuminate\Validation\Rules\ProhibitedIf;
 use Illuminate\Validation\Rules\Unique;
 use Illuminate\Validation\ValidationData;
@@ -4886,6 +4887,8 @@ class ValidationValidatorTest extends TestCase
         $file5->expects($this->any())->method('getClientOriginalExtension')->willReturn('png');
         $v = new Validator($trans, ['x' => $file5], ['x' => 'image']);
         $this->assertTrue($v->passes());
+
+        ImageFile::allowSvg(allowByDefault: false);
 
         $file6 = $this->getMockBuilder(UploadedFile::class)->onlyMethods(['guessExtension', 'getClientOriginalExtension'])->setConstructorArgs($uploadedFile)->getMock();
         $file6->expects($this->any())->method('guessExtension')->willReturn('svg');

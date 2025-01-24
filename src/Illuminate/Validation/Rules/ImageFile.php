@@ -4,14 +4,23 @@ namespace Illuminate\Validation\Rules;
 
 class ImageFile extends File
 {
+    public static $allowSvgByDefault = true;
+
+    public static function allowSvg($allowByDefault = true)
+    {
+        static::$allowSvgByDefault = $allowByDefault;
+    }
+
     /**
      * Create a new image file rule instance.
      *
-     * @param  bool  $allowSvg
+     * @param  bool|null  $allowSvg
      * @return void
      */
-    public function __construct($allowSvg = false)
+    public function __construct($allowSvg = null)
     {
+        $allowSvg ??= static::$allowSvgByDefault;
+
         if ($allowSvg) {
             $this->rules('image:allow_svg');
         } else {

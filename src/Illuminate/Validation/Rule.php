@@ -215,10 +215,10 @@ class Rule
     /**
      * Get an image file rule builder instance.
      *
-     * @param  bool  $allowSvg
+     * @param  bool | null  $allowSvg
      * @return \Illuminate\Validation\Rules\ImageFile
      */
-    public static function imageFile($allowSvg = false)
+    public static function imageFile($allowSvg = null)
     {
         return new ImageFile($allowSvg);
     }
