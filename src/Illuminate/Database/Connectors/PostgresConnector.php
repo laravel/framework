@@ -180,10 +180,8 @@ class PostgresConnector extends Connector implements ConnectorInterface
      */
     protected function configureSynchronousCommit($connection, array $config)
     {
-        if (! isset($config['synchronous_commit'])) {
-            return;
+        if (isset($config['synchronous_commit'])) {
+            $connection->prepare("set synchronous_commit to '{$config['synchronous_commit']}'")->execute();
         }
-
-        $connection->prepare("set synchronous_commit to '{$config['synchronous_commit']}'")->execute();
     }
 }
