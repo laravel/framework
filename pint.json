@@ -28,6 +28,7 @@
             "allow_single_line_anonymous_functions": false
         },
         "cast_spaces": true,
+        "class_definition": true,
         "class_reference_name_casing": true,
         "clean_namespace": true,
         "compact_nullable_type_declaration": true,
