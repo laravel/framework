@@ -51,20 +51,6 @@ class PostgresConnector extends Connector implements ConnectorInterface
     }
 
     /**
-     * Set the connection transaction isolation level.
-     *
-     * @param  \PDO  $connection
-     * @param  array  $config
-     * @return void
-     */
-    protected function configureIsolationLevel($connection, array $config)
-    {
-        if (isset($config['isolation_level'])) {
-            $connection->prepare("set session characteristics as transaction isolation level {$config['isolation_level']}")->execute();
-        }
-    }
-
-    /**
      * Create a DSN string from a configuration.
      *
      * @param  array  $config
@@ -127,6 +113,20 @@ class PostgresConnector extends Connector implements ConnectorInterface
     }
 
     /**
+     * Set the connection transaction isolation level.
+     *
+     * @param  \PDO  $connection
+     * @param  array  $config
+     * @return void
+     */
+    protected function configureIsolationLevel($connection, array $config)
+    {
+        if (isset($config['isolation_level'])) {
+            $connection->prepare("set session characteristics as transaction isolation level {$config['isolation_level']}")->execute();
+        }
+    }
+
+    /**
      * Set the timezone on the connection.
      *
      * @param  \PDO  $connection
@@ -180,10 +180,8 @@ class PostgresConnector extends Connector implements ConnectorInterface
      */
     protected function configureSynchronousCommit($connection, array $config)
     {
-        if (! isset($config['synchronous_commit'])) {
-            return;
+        if (isset($config['synchronous_commit'])) {
+            $connection->prepare("set synchronous_commit to '{$config['synchronous_commit']}'")->execute();
         }
-
-        $connection->prepare("set synchronous_commit to '{$config['synchronous_commit']}'")->execute();
     }
 }
