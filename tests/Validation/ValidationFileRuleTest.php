@@ -8,6 +8,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\File;
 use Illuminate\Validation\ValidationServiceProvider;
 use Illuminate\Validation\Validator;
@@ -191,6 +192,39 @@ class ValidationFileRuleTest extends TestCase
         $this->passes(
             File::image(),
             UploadedFile::fake()->image('foo.png'),
+        );
+    }
+
+    public function testImageFailsOnSvgByDefault()
+    {
+        $maliciousSvgFileWithXSS = UploadedFile::fake()->createWithContent(
+            name: 'foo.svg',
+            content: <<<'XML'
+                    <svg xmlns="http://www.w3.org/2000/svg" width="383" height="97" viewBox="0 0 383 97">
+                        <text x="10" y="50" font-size="30" fill="black">XSS Logo</text>
+                        <script>alert('XSS');</script>
+                    </svg>
+                    XML
+        );
+
+        $this->fails(
+            File::image(),
+            $maliciousSvgFileWithXSS,
+            ['validation.image']
+        );
+        $this->fails(
+            Rule::imageFile(),
+            $maliciousSvgFileWithXSS,
+            ['validation.image']
+        );
+
+        $this->passes(
+            File::image(allowSvg: true),
+            $maliciousSvgFileWithXSS
+        );
+        $this->passes(
+            Rule::imageFile(allowSvg: true),
+            $maliciousSvgFileWithXSS
         );
     }
 
