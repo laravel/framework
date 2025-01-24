@@ -404,6 +404,28 @@ class Repository implements ArrayAccess, CacheContract
     }
 
     /**
+     * * If unless is true, execute the given Closure, store the result and return it (even if the value already exists), otherwise run remember.
+     *
+     * @template TCacheValue
+     *
+     * @param  bool  $unless
+     * @param  string  $key
+     * @param  \Closure|\DateTimeInterface|\DateInterval|int|null  $ttl
+     * @param  \Closure(): TCacheValue  $callback
+     * @return TCacheValue
+     */
+    public function rememberUnless($unless, $key, $ttl, Closure $callback)
+    {
+        if ($unless) {
+            $this->put($key, $value = $callback(), $ttl);
+
+            return $value;
+        }
+
+        return $this->remember($key, $ttl, $callback);
+    }
+
+    /**
      * Get an item from the cache, or execute the given Closure and store the result.
      *
      * @template TCacheValue
@@ -424,9 +446,7 @@ class Repository implements ArrayAccess, CacheContract
             return $value;
         }
 
-        $value = $callback();
-
-        $this->put($key, $value, value($ttl, $value));
+        $this->put($key, $value = $callback(), value($ttl, $value));
 
         return $value;
     }
@@ -442,6 +462,27 @@ class Repository implements ArrayAccess, CacheContract
      */
     public function sear($key, Closure $callback)
     {
+        return $this->rememberForever($key, $callback);
+    }
+
+    /**
+    * If unless is true, execute the given Closure, store the result forever and return it (even if the value already exists), otherwise run rememberForever.
+     *
+     * @template TCacheValue
+     *
+     * @param  bool  $unless
+     * @param  string  $key
+     * @param  \Closure(): TCacheValue  $callback
+     * @return TCacheValue
+     */
+    public function rememberForeverUnless($unless, $key, Closure $callback)
+    {
+        if ($unless) {
+            $this->put($key, $value = $callback());
+
+            return $value;
+        }
+
         return $this->rememberForever($key, $callback);
     }
 
