@@ -536,7 +536,7 @@ trait QueriesRelationships
      * Add a morph-to relationship condition to the query.
      *
      * @param  \Illuminate\Database\Eloquent\Relations\MorphTo<*, *>|string  $relation
-     * @param  \Illuminate\Database\Eloquent\Model|Iterable<int, \Illuminate\Database\Eloquent\Model>|string|null  $model
+     * @param  \Illuminate\Database\Eloquent\Model|iterable<int, \Illuminate\Database\Eloquent\Model>|string|null  $model
      * @return $this
      */
     public function whereMorphedTo($relation, $model, $boolean = 'and')
@@ -579,7 +579,7 @@ trait QueriesRelationships
      * Add a not morph-to relationship condition to the query.
      *
      * @param  \Illuminate\Database\Eloquent\Relations\MorphTo<*, *>|string  $relation
-     * @param  \Illuminate\Database\Eloquent\Model|Iterable<int, \Illuminate\Database\Eloquent\Model>|string  $model
+     * @param  \Illuminate\Database\Eloquent\Model|iterable<int, \Illuminate\Database\Eloquent\Model>|string  $model
      * @return $this
      */
     public function whereNotMorphedTo($relation, $model, $boolean = 'and')
@@ -618,7 +618,7 @@ trait QueriesRelationships
      * Add a morph-to relationship condition to the query with an "or where" clause.
      *
      * @param  \Illuminate\Database\Eloquent\Relations\MorphTo<*, *>|string  $relation
-     * @param  \Illuminate\Database\Eloquent\Model|Iterable<int, \Illuminate\Database\Eloquent\Model>|string|null  $model
+     * @param  \Illuminate\Database\Eloquent\Model|iterable<int, \Illuminate\Database\Eloquent\Model>|string|null  $model
      * @return $this
      */
     public function orWhereMorphedTo($relation, $model)
@@ -630,7 +630,7 @@ trait QueriesRelationships
      * Add a not morph-to relationship condition to the query with an "or where" clause.
      *
      * @param  \Illuminate\Database\Eloquent\Relations\MorphTo<*, *>|string  $relation
-     * @param  \Illuminate\Database\Eloquent\Model|Iterable<int, \Illuminate\Database\Eloquent\Model>|string  $model
+     * @param  \Illuminate\Database\Eloquent\Model|iterable<int, \Illuminate\Database\Eloquent\Model>|string  $model
      * @return $this
      */
     public function orWhereNotMorphedTo($relation, $model)
