@@ -416,6 +416,17 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     }
 
     /**
+     * Add a new path to the loader.
+     *
+     * @param  string  $path
+     * @return void
+     */
+    public function addPath($path)
+    {
+        $this->loader->addPath($path);
+    }
+
+    /**
      * Parse a key into namespace, group, and item.
      *
      * @param  string  $key
