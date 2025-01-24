@@ -1885,8 +1885,45 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $builder = $model->where('bar', 'baz')->orWhereMorphedTo('morph', $relatedModel);
 
-        $this->assertSame('select * from "eloquent_builder_test_model_parent_stubs" where "bar" = ? or ("eloquent_builder_test_model_parent_stubs"."morph_type" = ? and "eloquent_builder_test_model_parent_stubs"."morph_id" = ?)', $builder->toSql());
+        $this->assertSame('select * from "eloquent_builder_test_model_parent_stubs" where "bar" = ? or (("eloquent_builder_test_model_parent_stubs"."morph_type" = ? and "eloquent_builder_test_model_parent_stubs"."morph_id" in (?)))', $builder->toSql());
         $this->assertEquals(['baz', $relatedModel->getMorphClass(), $relatedModel->getKey()], $builder->getBindings());
+    }
+
+    public function testOrWhereMorphedToCollection()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+        $this->mockConnectionForModel($model, '');
+
+        $firstRelatedModel = new EloquentBuilderTestModelCloseRelatedStub;
+        $firstRelatedModel->id = 1;
+
+        $secondRelatedModel = new EloquentBuilderTestModelCloseRelatedStub;
+        $secondRelatedModel->id = 2;
+
+        $builder = $model->where('bar', 'baz')->orWhereMorphedTo('morph', new Collection([$firstRelatedModel, $secondRelatedModel]));
+
+        $this->assertSame('select * from "eloquent_builder_test_model_parent_stubs" where "bar" = ? or (("eloquent_builder_test_model_parent_stubs"."morph_type" = ? and "eloquent_builder_test_model_parent_stubs"."morph_id" in (?, ?)))', $builder->toSql());
+        $this->assertEquals(['baz', $firstRelatedModel->getMorphClass(), $firstRelatedModel->getKey(), $secondRelatedModel->getKey()], $builder->getBindings());
+    }
+
+    public function testOrWhereMorphedToCollectionWithDifferentModels()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+        $this->mockConnectionForModel($model, '');
+
+        $firstRelatedModel = new EloquentBuilderTestModelCloseRelatedStub;
+        $firstRelatedModel->id = 1;
+
+        $secondRelatedModel = new EloquentBuilderTestModelFarRelatedStub;
+        $secondRelatedModel->id = 2;
+
+        $thirdRelatedModel = new EloquentBuilderTestModelCloseRelatedStub;
+        $thirdRelatedModel->id = 3;
+
+        $builder = $model->where('bar', 'baz')->orWhereMorphedTo('morph', new Collection([$firstRelatedModel, $secondRelatedModel, $thirdRelatedModel]));
+
+        $this->assertSame('select * from "eloquent_builder_test_model_parent_stubs" where "bar" = ? or (("eloquent_builder_test_model_parent_stubs"."morph_type" = ? and "eloquent_builder_test_model_parent_stubs"."morph_id" in (?, ?)) or ("eloquent_builder_test_model_parent_stubs"."morph_type" = ? and "eloquent_builder_test_model_parent_stubs"."morph_id" in (?)))', $builder->toSql());
+        $this->assertEquals(['baz', $firstRelatedModel->getMorphClass(), $firstRelatedModel->getKey(), $thirdRelatedModel->getKey(), $secondRelatedModel->getMorphClass(), $secondRelatedModel->id], $builder->getBindings());
     }
 
     public function testOrWhereMorphedToNull()
@@ -1910,8 +1947,45 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $builder = $model->where('bar', 'baz')->orWhereNotMorphedTo('morph', $relatedModel);
 
-        $this->assertSame('select * from "eloquent_builder_test_model_parent_stubs" where "bar" = ? or not ("eloquent_builder_test_model_parent_stubs"."morph_type" <=> ? and "eloquent_builder_test_model_parent_stubs"."morph_id" <=> ?)', $builder->toSql());
+        $this->assertSame('select * from "eloquent_builder_test_model_parent_stubs" where "bar" = ? or not (("eloquent_builder_test_model_parent_stubs"."morph_type" <=> ? and "eloquent_builder_test_model_parent_stubs"."morph_id" not in (?)))', $builder->toSql());
         $this->assertEquals(['baz', $relatedModel->getMorphClass(), $relatedModel->getKey()], $builder->getBindings());
+    }
+
+    public function testOrWhereNotMorphedToCollection()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+        $this->mockConnectionForModel($model, '');
+
+        $firstRelatedModel = new EloquentBuilderTestModelCloseRelatedStub;
+        $firstRelatedModel->id = 1;
+
+        $secondRelatedModel = new EloquentBuilderTestModelCloseRelatedStub;
+        $secondRelatedModel->id = 2;
+
+        $builder = $model->where('bar', 'baz')->orWhereNotMorphedTo('morph', new Collection([$firstRelatedModel, $secondRelatedModel]));
+
+        $this->assertSame('select * from "eloquent_builder_test_model_parent_stubs" where "bar" = ? or not (("eloquent_builder_test_model_parent_stubs"."morph_type" <=> ? and "eloquent_builder_test_model_parent_stubs"."morph_id" not in (?, ?)))', $builder->toSql());
+        $this->assertEquals(['baz', $firstRelatedModel->getMorphClass(), $firstRelatedModel->getKey(), $secondRelatedModel->getKey()], $builder->getBindings());
+    }
+
+    public function testOrWhereNotMorphedToCollectionWithDifferentModels()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+        $this->mockConnectionForModel($model, '');
+
+        $firstRelatedModel = new EloquentBuilderTestModelCloseRelatedStub;
+        $firstRelatedModel->id = 1;
+
+        $secondRelatedModel = new EloquentBuilderTestModelFarRelatedStub;
+        $secondRelatedModel->id = 2;
+
+        $thirdRelatedModel = new EloquentBuilderTestModelCloseRelatedStub;
+        $thirdRelatedModel->id = 3;
+
+        $builder = $model->where('bar', 'baz')->orWhereNotMorphedTo('morph', new Collection([$firstRelatedModel, $secondRelatedModel, $thirdRelatedModel]));
+
+        $this->assertSame('select * from "eloquent_builder_test_model_parent_stubs" where "bar" = ? or not (("eloquent_builder_test_model_parent_stubs"."morph_type" <=> ? and "eloquent_builder_test_model_parent_stubs"."morph_id" not in (?, ?)) or ("eloquent_builder_test_model_parent_stubs"."morph_type" <=> ? and "eloquent_builder_test_model_parent_stubs"."morph_id" not in (?)))', $builder->toSql());
+        $this->assertEquals(['baz', $firstRelatedModel->getMorphClass(), $firstRelatedModel->getKey(), $thirdRelatedModel->getKey(), $secondRelatedModel->getMorphClass(), $secondRelatedModel->id], $builder->getBindings());
     }
 
     public function testWhereMorphedToClass()
