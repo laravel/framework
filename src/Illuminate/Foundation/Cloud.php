@@ -46,7 +46,7 @@ class Cloud
             $app['config']->set(
                 'database.connections.pgsql-unpooled',
                 array_merge($app['config']->get('database.connections.pgsql'), [
-                    'host' => str_replace('-pooler', '', $host)
+                    'host' => str_replace('-pooler', '', $host),
                 ])
             );
         }
