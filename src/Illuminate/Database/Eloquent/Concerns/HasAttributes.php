@@ -1873,7 +1873,7 @@ trait HasAttributes
     /**
      * Get all of the current attributes on the model.
      *
-     * @return array<string, mixed>
+     * @return array
      */
     public function getAttributes()
     {
@@ -2110,7 +2110,7 @@ trait HasAttributes
     /**
      * Get the attributes that have been changed since the last sync.
      *
-     * @return array<string, mixed>
+     * @return array
      */
     public function getDirty()
     {
@@ -2128,7 +2128,7 @@ trait HasAttributes
     /**
      * Get the attributes that have been changed since the last sync for an update operation.
      *
-     * @return array<string, mixed>
+     * @return array
      */
     protected function getDirtyForUpdate()
     {

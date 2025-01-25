@@ -520,7 +520,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Fill the model with an array of attributes.
      *
-     * @param  array<string, mixed>  $attributes
+     * @param  array $attributes
      * @return $this
      *
      * @throws \Illuminate\Database\Eloquent\MassAssignmentException

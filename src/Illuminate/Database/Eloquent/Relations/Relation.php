@@ -230,7 +230,7 @@ abstract class Relation implements BuilderContract
     /**
      * Run a raw update against the base query.
      *
-     * @param  array<string, mixed>  $attributes
+     * @param  array  $attributes
      * @return int
      */
     public function rawUpdate(array $attributes = [])

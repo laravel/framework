@@ -1252,7 +1252,7 @@ class Grammar extends BaseGrammar
      * Compile an update statement into SQL.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  array<string, mixed>  $values
+     * @param  array  $values
      * @return string
      */
     public function compileUpdate(Builder $query, array $values)
@@ -1274,7 +1274,7 @@ class Grammar extends BaseGrammar
      * Compile the columns for an update statement.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  array<string, mixed>  $values
+     * @param  array  $values
      * @return string
      */
     protected function compileUpdateColumns(Builder $query, array $values)

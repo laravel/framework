@@ -665,8 +665,8 @@ trait InteractsWithPivotTable
     /**
      * Cast the given pivot attributes.
      *
-     * @param  array<string, mixed> $attributes
-     * @return array<string, mixed>
+     * @param  array  $attributes
+     * @return array
      */
     protected function castAttributes($attributes)
     {
