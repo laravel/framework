@@ -4,6 +4,7 @@ namespace Illuminate\Validation\Rules;
 
 use DateTimeInterface;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
 use Stringable;
@@ -18,10 +19,22 @@ class Date implements Stringable
     protected array $constraints = ['date'];
 
     /**
+     * The date format.
+     */
+    protected string $format = 'Y-m-d';
+
+    /**
+     * The value of the date.
+     */
+    protected array $dates = [];
+
+    /**
      * Ensure the date has the given format.
      */
     public function format(string $format): static
     {
+        $this->format = $format;
+
         return $this->addRule('date_format:'.$format);
     }
 
@@ -62,7 +75,9 @@ class Date implements Stringable
      */
     public function before(DateTimeInterface|string $date): static
     {
-        return $this->addRule('before:'.$this->formatDate($date));
+        $this->dates[] = $date;
+
+        return $this->addRule('before:?');
     }
 
     /**
@@ -70,7 +85,9 @@ class Date implements Stringable
      */
     public function after(DateTimeInterface|string $date): static
     {
-        return $this->addRule('after:'.$this->formatDate($date));
+        $this->dates[] = $date;
+
+        return $this->addRule('after:?');
     }
 
     /**
@@ -78,7 +95,9 @@ class Date implements Stringable
      */
     public function beforeOrEqual(DateTimeInterface|string $date): static
     {
-        return $this->addRule('before_or_equal:'.$this->formatDate($date));
+        $this->dates[] = $date;
+
+        return $this->addRule('before_or_equal:?');
     }
 
     /**
@@ -86,7 +105,9 @@ class Date implements Stringable
      */
     public function afterOrEqual(DateTimeInterface|string $date): static
     {
-        return $this->addRule('after_or_equal:'.$this->formatDate($date));
+        $this->dates[] = $date;
+
+        return $this->addRule('after_or_equal:?');
     }
 
     /**
@@ -121,7 +142,7 @@ class Date implements Stringable
     protected function formatDate(DateTimeInterface|string $date): string
     {
         return $date instanceof DateTimeInterface
-            ? $date->format('Y-m-d')
+            ? $date->format($this->format)
             : $date;
     }
 
@@ -130,6 +151,10 @@ class Date implements Stringable
      */
     public function __toString(): string
     {
-        return implode('|', $this->constraints);
+        return Str::replaceArray(
+            '?',
+            array_map([$this, 'formatDate'], $this->dates),
+            implode('|', $this->constraints)
+        );
     }
 }
