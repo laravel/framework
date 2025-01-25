@@ -178,7 +178,7 @@ class PendingDispatch
         }
 
         return (new UniqueLock(Container::getInstance()->make(Cache::class)))
-                    ->acquire($this->job);
+            ->acquire($this->job);
     }
 
     /**

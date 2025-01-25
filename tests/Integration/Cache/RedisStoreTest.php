@@ -249,4 +249,20 @@ class RedisStoreTest extends TestCase
             'fizz' => 'buz',
         ], 10);
     }
+
+    public function testIncrementWithSerializationEnabled()
+    {
+        /** @var \Illuminate\Cache\RedisStore $store */
+        $store = Cache::store('redis');
+        /** @var \Redis $client */
+        $client = $store->connection()->client();
+        $client->setOption(\Redis::OPT_SERIALIZER, \Redis::SERIALIZER_PHP);
+
+        $store->flush();
+        $store->add('foo', 1, 10);
+        $this->assertEquals(1, $store->get('foo'));
+
+        $store->increment('foo');
+        $this->assertEquals(2, $store->get('foo'));
+    }
 }

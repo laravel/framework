@@ -727,7 +727,7 @@ class HttpClientTest extends TestCase
         $this->factory->fake();
 
         $this->factory->attach('foo', 'data', 'file.txt', ['X-Test-Header' => 'foo'])
-                ->post('http://foo.com/file');
+            ->post('http://foo.com/file');
 
         $this->factory->assertSent(function (Request $request) {
             return $request->url() === 'http://foo.com/file' &&
@@ -1602,6 +1602,63 @@ class HttpClientTest extends TestCase
         $this->assertSame(3, $dumped[2]);
         $this->assertInstanceOf(Request::class, $dumped[3]);
         $this->assertSame(1000, $dumped[4]['delay']);
+
+        VarDumper::setHandler(null);
+    }
+
+    public function testResponseCanDump()
+    {
+        $dumped = [];
+
+        VarDumper::setHandler(function ($value) use (&$dumped) {
+            $dumped[] = $value;
+        });
+
+        $this->factory->fake([
+            '200.com' => $this->factory::response('hello', 200),
+        ]);
+
+        $this->factory->get('http://200.com')->dump();
+
+        $this->assertSame('hello', $dumped[0]);
+
+        VarDumper::setHandler(null);
+    }
+
+    public function testResponseCanDumpWithKey()
+    {
+        $dumped = [];
+
+        VarDumper::setHandler(function ($value) use (&$dumped) {
+            $dumped[] = $value;
+        });
+
+        $this->factory->fake([
+            '200.com' => $this->factory::response(['hello' => 'world'], 200),
+        ]);
+
+        $this->factory->get('http://200.com')->dump('hello');
+
+        $this->assertSame('world', $dumped[0]);
+
+        VarDumper::setHandler(null);
+    }
+
+    public function testResponseCanDumpHeaders()
+    {
+        $dumped = [];
+
+        VarDumper::setHandler(function ($value) use (&$dumped) {
+            $dumped[] = $value;
+        });
+
+        $this->factory->fake([
+            '200.com' => $this->factory::response('hello', 200, ['hello' => 'world']),
+        ]);
+
+        $this->factory->get('http://200.com')->dumpHeaders();
+
+        $this->assertSame(['hello' => ['world']], $dumped[0]);
 
         VarDumper::setHandler(null);
     }

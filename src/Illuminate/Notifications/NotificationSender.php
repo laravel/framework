@@ -228,10 +228,10 @@ class NotificationSender
 
                 $this->bus->dispatch(
                     (new SendQueuedNotifications($notifiable, $notification, [$channel]))
-                            ->onConnection($connection)
-                            ->onQueue($queue)
-                            ->delay(is_array($delay) ? ($delay[$channel] ?? null) : $delay)
-                            ->through($middleware)
+                        ->onConnection($connection)
+                        ->onQueue($queue)
+                        ->delay(is_array($delay) ? ($delay[$channel] ?? null) : $delay)
+                        ->through($middleware)
                 );
             }
         }

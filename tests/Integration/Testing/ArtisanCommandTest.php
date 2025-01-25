@@ -73,24 +73,24 @@ class ArtisanCommandTest extends TestCase
     public function test_console_command_that_passes_with_output()
     {
         $this->artisan('survey')
-             ->expectsQuestion('What is your name?', 'Taylor Otwell')
-             ->expectsQuestion('Which language do you prefer?', 'PHP')
-             ->expectsOutput('Your name is Taylor Otwell and you prefer PHP.')
-             ->doesntExpectOutput('Your name is Taylor Otwell and you prefer Ruby.')
-             ->assertExitCode(0);
+            ->expectsQuestion('What is your name?', 'Taylor Otwell')
+            ->expectsQuestion('Which language do you prefer?', 'PHP')
+            ->expectsOutput('Your name is Taylor Otwell and you prefer PHP.')
+            ->doesntExpectOutput('Your name is Taylor Otwell and you prefer Ruby.')
+            ->assertExitCode(0);
     }
 
     public function test_console_command_that_passes_with_repeating_output()
     {
         $this->artisan('slim')
-             ->expectsQuestion('Who?', 'Taylor')
-             ->expectsQuestion('What?', 'Taylor')
-             ->expectsQuestion('Huh?', 'Taylor')
-             ->expectsOutput('Taylor')
-             ->doesntExpectOutput('Otwell')
-             ->expectsOutput('Taylor')
-             ->expectsOutput('Taylor')
-             ->assertExitCode(0);
+            ->expectsQuestion('Who?', 'Taylor')
+            ->expectsQuestion('What?', 'Taylor')
+            ->expectsQuestion('Huh?', 'Taylor')
+            ->expectsOutput('Taylor')
+            ->doesntExpectOutput('Otwell')
+            ->expectsOutput('Taylor')
+            ->expectsOutput('Taylor')
+            ->assertExitCode(0);
     }
 
     public function test_console_command_that_fails_from_unexpected_output()
@@ -99,10 +99,10 @@ class ArtisanCommandTest extends TestCase
         $this->expectExceptionMessage('Output "Your name is Taylor Otwell and you prefer PHP." was printed.');
 
         $this->artisan('survey')
-             ->expectsQuestion('What is your name?', 'Taylor Otwell')
-             ->expectsQuestion('Which language do you prefer?', 'PHP')
-             ->doesntExpectOutput('Your name is Taylor Otwell and you prefer PHP.')
-             ->assertExitCode(0);
+            ->expectsQuestion('What is your name?', 'Taylor Otwell')
+            ->expectsQuestion('Which language do you prefer?', 'PHP')
+            ->doesntExpectOutput('Your name is Taylor Otwell and you prefer PHP.')
+            ->assertExitCode(0);
     }
 
     public function test_console_command_that_fails_from_unexpected_output_substring()
@@ -111,8 +111,8 @@ class ArtisanCommandTest extends TestCase
         $this->expectExceptionMessage('Output "Taylor Otwell" was printed.');
 
         $this->artisan('contains')
-             ->doesntExpectOutputToContain('Taylor Otwell')
-             ->assertExitCode(0);
+            ->doesntExpectOutputToContain('Taylor Otwell')
+            ->assertExitCode(0);
     }
 
     public function test_console_command_that_fails_from_missing_output()
@@ -122,10 +122,10 @@ class ArtisanCommandTest extends TestCase
 
         $this->ignoringMockOnceExceptions(function () {
             $this->artisan('survey')
-                 ->expectsQuestion('What is your name?', 'Taylor Otwell')
-                 ->expectsQuestion('Which language do you prefer?', 'Ruby')
-                 ->expectsOutput('Your name is Taylor Otwell and you prefer PHP.')
-                 ->assertExitCode(0);
+                ->expectsQuestion('What is your name?', 'Taylor Otwell')
+                ->expectsQuestion('Which language do you prefer?', 'Ruby')
+                ->expectsOutput('Your name is Taylor Otwell and you prefer PHP.')
+                ->assertExitCode(0);
         });
     }
 
@@ -135,9 +135,9 @@ class ArtisanCommandTest extends TestCase
         $this->expectExceptionMessage('Expected status code 1 but received 0.');
 
         $this->artisan('survey')
-             ->expectsQuestion('What is your name?', 'Taylor Otwell')
-             ->expectsQuestion('Which language do you prefer?', 'PHP')
-             ->assertExitCode(1);
+            ->expectsQuestion('What is your name?', 'Taylor Otwell')
+            ->expectsQuestion('Which language do you prefer?', 'PHP')
+            ->assertExitCode(1);
     }
 
     public function test_console_command_that_fails_from_unordered_output()
@@ -146,21 +146,21 @@ class ArtisanCommandTest extends TestCase
 
         $this->ignoringMockOnceExceptions(function () {
             $this->artisan('slim')
-                 ->expectsQuestion('Who?', 'Taylor')
-                 ->expectsQuestion('What?', 'Danger')
-                 ->expectsQuestion('Huh?', 'Otwell')
-                 ->expectsOutput('Taylor')
-                 ->expectsOutput('Otwell')
-                 ->expectsOutput('Danger')
-                 ->assertExitCode(0);
+                ->expectsQuestion('Who?', 'Taylor')
+                ->expectsQuestion('What?', 'Danger')
+                ->expectsQuestion('Huh?', 'Otwell')
+                ->expectsOutput('Taylor')
+                ->expectsOutput('Otwell')
+                ->expectsOutput('Danger')
+                ->assertExitCode(0);
         });
     }
 
     public function test_console_command_that_passes_if_the_output_contains()
     {
         $this->artisan('contains')
-             ->expectsOutputToContain('Taylor Otwell')
-             ->assertExitCode(0);
+            ->expectsOutputToContain('Taylor Otwell')
+            ->assertExitCode(0);
     }
 
     public function test_console_command_that_passes_if_outputs_something()
@@ -270,8 +270,8 @@ class ArtisanCommandTest extends TestCase
 
         $this->ignoringMockOnceExceptions(function () {
             $this->artisan('contains')
-                 ->expectsOutputToContain('Otwell Taylor')
-                 ->assertExitCode(0);
+                ->expectsOutputToContain('Otwell Taylor')
+                ->assertExitCode(0);
         });
     }
 

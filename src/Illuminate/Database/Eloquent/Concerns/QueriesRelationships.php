@@ -257,7 +257,7 @@ trait QueriesRelationships
                     }
 
                     $query->where($this->qualifyColumn($relation->getMorphType()), '=', (new $type)->getMorphClass())
-                                ->whereHas($belongsTo, $callback, $operator, $count);
+                        ->whereHas($belongsTo, $callback, $operator, $count);
                 });
             }
         }, null, null, $boolean);
@@ -536,7 +536,7 @@ trait QueriesRelationships
      * Add a morph-to relationship condition to the query.
      *
      * @param  \Illuminate\Database\Eloquent\Relations\MorphTo<*, *>|string  $relation
-     * @param  \Illuminate\Database\Eloquent\Model|string|null  $model
+     * @param  \Illuminate\Database\Eloquent\Model|iterable<int, \Illuminate\Database\Eloquent\Model>|string|null  $model
      * @return $this
      */
     public function whereMorphedTo($relation, $model, $boolean = 'and')
@@ -559,9 +559,19 @@ trait QueriesRelationships
             return $this->where($relation->qualifyColumn($relation->getMorphType()), $model, null, $boolean);
         }
 
-        return $this->where(function ($query) use ($relation, $model) {
-            $query->where($relation->qualifyColumn($relation->getMorphType()), $model->getMorphClass())
-                ->where($relation->qualifyColumn($relation->getForeignKeyName()), $model->getKey());
+        $models = BaseCollection::wrap($model);
+
+        if ($models->isEmpty()) {
+            throw new InvalidArgumentException('Collection given to whereMorphedTo method may not be empty.');
+        }
+
+        return $this->where(function ($query) use ($relation, $models) {
+            $models->groupBy(fn ($model) => $model->getMorphClass())->each(function ($models) use ($query, $relation) {
+                $query->orWhere(function ($query) use ($relation, $models) {
+                    $query->where($relation->qualifyColumn($relation->getMorphType()), $models->first()->getMorphClass())
+                        ->whereIn($relation->qualifyColumn($relation->getForeignKeyName()), $models->map->getKey());
+                });
+            });
         }, null, null, $boolean);
     }
 
@@ -569,7 +579,7 @@ trait QueriesRelationships
      * Add a not morph-to relationship condition to the query.
      *
      * @param  \Illuminate\Database\Eloquent\Relations\MorphTo<*, *>|string  $relation
-     * @param  \Illuminate\Database\Eloquent\Model|string  $model
+     * @param  \Illuminate\Database\Eloquent\Model|iterable<int, \Illuminate\Database\Eloquent\Model>|string  $model
      * @return $this
      */
     public function whereNotMorphedTo($relation, $model, $boolean = 'and')
@@ -588,9 +598,19 @@ trait QueriesRelationships
             return $this->whereNot($relation->qualifyColumn($relation->getMorphType()), '<=>', $model, $boolean);
         }
 
-        return $this->whereNot(function ($query) use ($relation, $model) {
-            $query->where($relation->qualifyColumn($relation->getMorphType()), '<=>', $model->getMorphClass())
-                ->where($relation->qualifyColumn($relation->getForeignKeyName()), '<=>', $model->getKey());
+        $models = BaseCollection::wrap($model);
+
+        if ($models->isEmpty()) {
+            throw new InvalidArgumentException('Collection given to whereNotMorphedTo method may not be empty.');
+        }
+
+        return $this->whereNot(function ($query) use ($relation, $models) {
+            $models->groupBy(fn ($model) => $model->getMorphClass())->each(function ($models) use ($query, $relation) {
+                $query->orWhere(function ($query) use ($relation, $models) {
+                    $query->where($relation->qualifyColumn($relation->getMorphType()), '<=>', $models->first()->getMorphClass())
+                        ->whereNotIn($relation->qualifyColumn($relation->getForeignKeyName()), $models->map->getKey());
+                });
+            });
         }, null, null, $boolean);
     }
 
@@ -598,7 +618,7 @@ trait QueriesRelationships
      * Add a morph-to relationship condition to the query with an "or where" clause.
      *
      * @param  \Illuminate\Database\Eloquent\Relations\MorphTo<*, *>|string  $relation
-     * @param  \Illuminate\Database\Eloquent\Model|string|null  $model
+     * @param  \Illuminate\Database\Eloquent\Model|iterable<int, \Illuminate\Database\Eloquent\Model>|string|null  $model
      * @return $this
      */
     public function orWhereMorphedTo($relation, $model)
@@ -610,7 +630,7 @@ trait QueriesRelationships
      * Add a not morph-to relationship condition to the query with an "or where" clause.
      *
      * @param  \Illuminate\Database\Eloquent\Relations\MorphTo<*, *>|string  $relation
-     * @param  \Illuminate\Database\Eloquent\Model|string  $model
+     * @param  \Illuminate\Database\Eloquent\Model|iterable<int, \Illuminate\Database\Eloquent\Model>|string  $model
      * @return $this
      */
     public function orWhereNotMorphedTo($relation, $model)

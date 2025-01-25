@@ -331,8 +331,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
         };
 
         $view = Container::getInstance()
-                    ->make(ViewFactory::class)
-                    ->make($component->resolveView(), $data);
+            ->make(ViewFactory::class)
+            ->make($component->resolveView(), $data);
 
         return tap($view->render(), function () use ($view, $deleteCachedView) {
             if ($deleteCachedView) {
@@ -821,8 +821,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
         ];
 
         Container::getInstance()
-                ->make(ViewFactory::class)
-                ->addNamespace($prefixHash, $path);
+            ->make(ViewFactory::class)
+            ->addNamespace($prefixHash, $path);
     }
 
     /**
@@ -837,9 +837,9 @@ class BladeCompiler extends Compiler implements CompilerInterface
         $prefix ??= $directory;
 
         $this->anonymousComponentNamespaces[$prefix] = (new Stringable($directory))
-                ->replace('/', '.')
-                ->trim('. ')
-                ->toString();
+            ->replace('/', '.')
+            ->trim('. ')
+            ->toString();
     }
 
     /**

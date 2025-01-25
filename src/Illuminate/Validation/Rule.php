@@ -6,6 +6,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Validation\Rules\ArrayRule;
 use Illuminate\Validation\Rules\Can;
+use Illuminate\Validation\Rules\Date;
 use Illuminate\Validation\Rules\Dimensions;
 use Illuminate\Validation\Rules\Email;
 use Illuminate\Validation\Rules\Enum;
@@ -168,6 +169,16 @@ class Rule
     public static function prohibitedIf($callback)
     {
         return new ProhibitedIf($callback);
+    }
+
+    /**
+     * Get a date rule builder instance.
+     *
+     * @return \Illuminate\Validation\Rules\Date
+     */
+    public static function date()
+    {
+        return new Date;
     }
 
     /**
