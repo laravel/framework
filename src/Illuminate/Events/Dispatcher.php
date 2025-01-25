@@ -621,8 +621,6 @@ class Dispatcher implements DispatcherContract
     {
         [$listener, $job] = $this->createListenerAndJob($class, $method, $arguments);
 
-        $listenerReflectionClass = null;
-
         /**
          * We determine connection and queue based on the ways the user may specify it for the listener,
          * stopping once we find the first value set. In order of precedence: via* methods,
@@ -631,7 +629,7 @@ class Dispatcher implements DispatcherContract
         $connection = $this->resolveQueue()->connection(method_exists($listener, 'viaConnection')
             ? (isset($arguments[0]) ? $listener->viaConnection($arguments[0]) : $listener->viaConnection())
             : $listener->connection
-            ?? enum_value($this->getConnectionFromOnConnectionAttribute($listenerReflectionClass ??= new ReflectionClass($listener)))
+            ?? enum_value($this->getConnectionFromOnConnectionAttribute($listenerReflectionClass = new ReflectionClass($listener)))
         );
 
         $queue = method_exists($listener, 'viaQueue')
