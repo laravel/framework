@@ -6316,6 +6316,12 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['x' => '1970-01-02', '2018-05-12' => '1970-01-01'], ['x' => 'date_format:Y-m-d|after:2018-05-12']);
         $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['x' => '2020-08-05', 'y' => '2020-06-08'], ['x' => 'date_format:Y-m-d|before:y', 'y' => 'date_format:Y-d-m']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => '2020-05-08', 'y' => '2020-08-06'], ['x' => 'date_format:Y-m-d', 'y' => 'date_format:Y-d-m|after:x']);
+        $this->assertTrue($v->passes());
     }
 
     public function testWeakBeforeAndAfter()
@@ -6417,6 +6423,12 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['foo' => '2012-01-15 11:00', 'bar' => null], ['foo' => 'before_or_equal:bar', 'bar' => 'nullable']);
         $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['x' => '2020-08-05', 'y' => '2020-05-08'], ['x' => 'date_format:Y-m-d|before_or_equal:y', 'y' => 'date_format:Y-d-m']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => '2020-05-08', 'y' => '2020-08-05'], ['x' => 'date_format:Y-m-d', 'y' => 'date_format:Y-d-m|after_or_equal:x']);
+        $this->assertTrue($v->passes());
     }
 
     public function testSometimesAddingRules()
