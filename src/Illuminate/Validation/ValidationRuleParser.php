@@ -96,11 +96,18 @@ class ValidationRuleParser
             return Arr::wrap($this->prepareRule($rule, $attribute));
         }
 
-        return Arr::flatten(array_map(
-            [$this, 'prepareRule'],
-            $rule,
-            array_fill((int) array_key_first($rule), count($rule), $attribute)
-        ));
+        $rules = [];
+
+        foreach ($rule as $value) {
+            if ($value instanceof Date) {
+                $rules = array_merge($rules, explode('|', (string) $value));
+            }
+            else {
+                $rules[] = $this->prepareRule($value, $attribute);
+            }
+        }
+
+        return $rules;
     }
 
     /**
@@ -125,10 +132,6 @@ class ValidationRuleParser
             ($rule instanceof Exists && $rule->queryCallbacks()) ||
             ($rule instanceof Unique && $rule->queryCallbacks())) {
             return $rule;
-        }
-
-        if ($rule instanceof Date) {
-            return explode('|', (string) $rule);
         }
 
         if ($rule instanceof NestedRules) {
