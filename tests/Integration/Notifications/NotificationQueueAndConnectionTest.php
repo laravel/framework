@@ -53,7 +53,7 @@ class NotificationQueueAndConnectionTest extends TestCase
     {
         return [
             'string attribute values' => [
-                NotificationQueueAndConnectionTestWithStringAttributesNotification::class, 'connection-string', 'queue-string'
+                NotificationQueueAndConnectionTestWithStringAttributesNotification::class, 'connection-string', 'queue-string',
             ],
             'enum attribute values' => [
                 NotificationQueueAndConnectionTestWithEnumAttributesNotification::class, 'my_connection_name', 'my_queue_name',
@@ -67,7 +67,6 @@ class NotificationQueueAndConnectionTest extends TestCase
         ];
     }
 }
-
 
 class NotificationStub extends Notification implements ShouldQueue
 {
@@ -107,12 +106,12 @@ class NotificationQueueAndConnectionTestCanSetConnectionAndQueueAsEnums extends 
 {
     use Queueable;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->queue = NotificationQueueAndConnectionTestEnum::my_queue_name;
         $this->connection = NotificationQueueAndConnectionTestEnum::my_connection_name;
     }
 }
-
 
 class UserStub extends Model
 {

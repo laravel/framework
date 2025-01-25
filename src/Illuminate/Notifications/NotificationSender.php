@@ -206,7 +206,7 @@ class NotificationSender
                     $notification->connection
                         ?? $this->getConnectionFromOnConnectionAttribute(
                             $notifiableReflectionClass = new \ReflectionClass($original)
-                    )
+                        )
                 );
 
                 if (method_exists($notification, 'viaConnections')) {
@@ -217,7 +217,7 @@ class NotificationSender
                     $notification->queue
                         ?? $this->getQueueFromOnQueueAttribute(
                             $notifiableReflectionClass ?? new \ReflectionClass($original)
-                    )
+                        )
                 );
 
                 if (method_exists($notification, 'viaQueues')) {
