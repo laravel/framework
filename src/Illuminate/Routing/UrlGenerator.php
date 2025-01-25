@@ -176,7 +176,7 @@ class UrlGenerator implements UrlGeneratorContract
     }
 
     /**
-     * Get the previous path info for the request.
+     * Get the URL for the previous request without query parameters.
      *
      * @param  mixed  $fallback
      * @return string
