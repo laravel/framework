@@ -101,8 +101,7 @@ class ValidationRuleParser
         foreach ($rule as $value) {
             if ($value instanceof Date) {
                 $rules = array_merge($rules, explode('|', (string) $value));
-            }
-            else {
+            } else {
                 $rules[] = $this->prepareRule($value, $attribute);
             }
         }
