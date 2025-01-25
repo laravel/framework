@@ -135,8 +135,8 @@ class Dispatcher implements DispatcherContract
     public function hasListeners($eventName)
     {
         return isset($this->listeners[$eventName]) ||
-            isset($this->wildcards[$eventName]) ||
-            $this->hasWildcardListeners($eventName);
+               isset($this->wildcards[$eventName]) ||
+               $this->hasWildcardListeners($eventName);
     }
 
     /**
@@ -258,9 +258,9 @@ class Dispatcher implements DispatcherContract
         // dispatching this event on the next successful DB transaction commit.
         if ($isEventObject &&
             $payload[0] instanceof ShouldDispatchAfterCommit &&
-            !is_null($transactions = $this->resolveTransactionManager())) {
+            ! is_null($transactions = $this->resolveTransactionManager())) {
             $transactions->addCallback(
-                fn() => $this->invokeListeners($event, $payload, $halt)
+                fn () => $this->invokeListeners($event, $payload, $halt)
             );
 
             return null;
@@ -291,7 +291,7 @@ class Dispatcher implements DispatcherContract
             // If a response is returned from the listener and event halting is enabled
             // we will just return this response, and not call the rest of the event
             // listeners. Otherwise we will add the response on the response list.
-            if ($halt && !is_null($response)) {
+            if ($halt && ! is_null($response)) {
                 return $response;
             }
 
@@ -333,8 +333,8 @@ class Dispatcher implements DispatcherContract
     protected function shouldBroadcast(array $payload)
     {
         return isset($payload[0]) &&
-            $payload[0] instanceof ShouldBroadcast &&
-            $this->broadcastWhen($payload[0]);
+               $payload[0] instanceof ShouldBroadcast &&
+               $this->broadcastWhen($payload[0]);
     }
 
     /**
@@ -346,7 +346,7 @@ class Dispatcher implements DispatcherContract
     protected function broadcastWhen($event)
     {
         return method_exists($event, 'broadcastWhen')
-            ? $event->broadcastWhen() : true;
+                ? $event->broadcastWhen() : true;
     }
 
     /**
@@ -374,8 +374,8 @@ class Dispatcher implements DispatcherContract
         );
 
         return class_exists($eventName, false)
-            ? $this->addInterfaceListeners($eventName, $listeners)
-            : $listeners;
+                    ? $this->addInterfaceListeners($eventName, $listeners)
+                    : $listeners;
     }
 
     /**
@@ -491,10 +491,10 @@ class Dispatcher implements DispatcherContract
     protected function createClassCallable($listener)
     {
         [$class, $method] = is_array($listener)
-            ? $listener
-            : $this->parseClassCallable($listener);
+                            ? $listener
+                            : $this->parseClassCallable($listener);
 
-        if (!method_exists($class, $method)) {
+        if (! method_exists($class, $method)) {
             $method = '__invoke';
         }
 
@@ -505,8 +505,8 @@ class Dispatcher implements DispatcherContract
         $listener = $this->container->make($class);
 
         return $this->handlerShouldBeDispatchedAfterDatabaseTransactions($listener)
-            ? $this->createCallbackForListenerRunningAfterCommits($listener, $method)
-            : [$listener, $method];
+                    ? $this->createCallbackForListenerRunningAfterCommits($listener, $method)
+                    : [$listener, $method];
     }
 
     /**
@@ -567,7 +567,7 @@ class Dispatcher implements DispatcherContract
     {
         return (($listener->afterCommit ?? null) ||
                 $listener instanceof ShouldHandleEventsAfterCommit) &&
-            $this->resolveTransactionManager();
+                $this->resolveTransactionManager();
     }
 
     /**
@@ -659,11 +659,9 @@ class Dispatcher implements DispatcherContract
     {
         $listener = (new ReflectionClass($class))->newInstanceWithoutConstructor();
 
-        return [
-            $listener, $this->propagateListenerOptions(
-                $listener, new CallQueuedListener($class, $method, $arguments)
-            )
-        ];
+        return [$listener, $this->propagateListenerOptions(
+            $listener, new CallQueuedListener($class, $method, $arguments)
+        )];
     }
 
     /**
@@ -684,8 +682,7 @@ class Dispatcher implements DispatcherContract
                 $job->afterCommit = property_exists($listener, 'afterCommit') ? $listener->afterCommit : null;
             }
 
-            $job->backoff = method_exists($listener, 'backoff') ? $listener->backoff(...
-                $data) : ($listener->backoff ?? null);
+            $job->backoff = method_exists($listener, 'backoff') ? $listener->backoff(...$data) : ($listener->backoff ?? null);
             $job->maxExceptions = $listener->maxExceptions ?? null;
             $job->retryUntil = method_exists($listener, 'retryUntil') ? $listener->retryUntil(...$data) : null;
             $job->shouldBeEncrypted = $listener instanceof ShouldBeEncrypted;
