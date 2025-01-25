@@ -28,6 +28,7 @@ use ReflectionProperty;
 use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\Header\TagHeader;
 use Symfony\Component\Mime\Address;
+
 use function Illuminate\Support\enum_value;
 
 class Mailable implements MailableContract, Renderable

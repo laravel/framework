@@ -39,13 +39,12 @@ class QueuedListenersTest extends TestCase
         string $className,
         string $connectionName,
         string $queueName
-    )
-    {
+    ) {
         config(["queue.connections.{$connectionName}" => ['driver' => 'sync']]);
 
         Event::listen(QueuedListenersTestEvent::class, $className);
 
-        Queue::before(function(JobProcessing $jobProcessing) use ($connectionName, $queueName) {
+        Queue::before(function (JobProcessing $jobProcessing) use ($connectionName, $queueName) {
             $this->assertSame($connectionName, $jobProcessing->connectionName);
             $actualQueue = (new \ReflectionProperty($jobProcessing->job::class, 'queue'))->getValue($jobProcessing->job);
             $this->assertSame($queueName, $actualQueue);
@@ -93,20 +92,27 @@ class QueuedListenersTestListenerShouldNotQueue implements ShouldQueue
 #[OnQueue('queue-string')]
 class QueuedListenerWithStringAttributes implements ShouldQueue
 {
-    public function __invoke() {}
+    public function __invoke()
+    {
+    }
 }
 
 #[OnConnection(QueuedListenersTestEnum::connection_name_from_enum)]
 #[OnQueue(QueuedListenersTestEnum::queue_name_from_enum)]
-class QueuedListenerWithEnumAttributes implements ShouldQueue {
-    public function __invoke() {}
+class QueuedListenerWithEnumAttributes implements ShouldQueue
+{
+    public function __invoke()
+    {
+    }
 }
 
 #[OnConnection(QueuedListenersTestEnum::connection_name_from_enum)]
 #[OnQueue('should-not-see-this')]
 class QueuedListenerWithOnQueueAndOnConnectionMethods implements ShouldQueue
 {
-    public function __invoke() {}
+    public function __invoke()
+    {
+    }
 
     public function viaQueue(): string
     {
@@ -126,7 +132,9 @@ class QueuedListenerWithQueueAndConnectionProperties implements ShouldQueue
     public $queue = 'queue-from-property';
     public $connection = 'connection-from-property';
 
-    public function __invoke() {}
+    public function __invoke()
+    {
+    }
 }
 
 enum QueuedListenersTestEnum

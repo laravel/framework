@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Queue;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\TestWith;
 
 class SupportMailTest extends TestCase
 {
@@ -86,7 +85,6 @@ class SupportMailTest extends TestCase
         });
 
         Mail::send(new $mailableClass());
-
     }
 
     #[DataProvider('connectionDataProvider')]
@@ -189,7 +187,6 @@ class TestMailWithEnumOnConnection extends Mailable implements ShouldQueue
         return $this->view('view');
     }
 }
-
 
 #[OnQueue(SupportMailTestEnum::Queue)]
 #[OnConnection(SupportMailTestEnum::Connection)]
