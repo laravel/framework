@@ -14,16 +14,18 @@ use Illuminate\Contracts\Events\ShouldHandleEventsAfterCommit;
 use Illuminate\Contracts\Queue\ShouldBeEncrypted;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
+use Illuminate\Foundation\Queue\InteractsWithQueueAndConnection;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\ReflectsClosures;
 use ReflectionClass;
+use function Illuminate\Support\enum_value;
 
 class Dispatcher implements DispatcherContract
 {
-    use Macroable, ReflectsClosures;
+    use InteractsWithQueueAndConnection, Macroable, ReflectsClosures;
 
     /**
      * The IoC container instance.
@@ -133,8 +135,8 @@ class Dispatcher implements DispatcherContract
     public function hasListeners($eventName)
     {
         return isset($this->listeners[$eventName]) ||
-               isset($this->wildcards[$eventName]) ||
-               $this->hasWildcardListeners($eventName);
+            isset($this->wildcards[$eventName]) ||
+            $this->hasWildcardListeners($eventName);
     }
 
     /**
@@ -256,9 +258,9 @@ class Dispatcher implements DispatcherContract
         // dispatching this event on the next successful DB transaction commit.
         if ($isEventObject &&
             $payload[0] instanceof ShouldDispatchAfterCommit &&
-            ! is_null($transactions = $this->resolveTransactionManager())) {
+            !is_null($transactions = $this->resolveTransactionManager())) {
             $transactions->addCallback(
-                fn () => $this->invokeListeners($event, $payload, $halt)
+                fn() => $this->invokeListeners($event, $payload, $halt)
             );
 
             return null;
@@ -289,7 +291,7 @@ class Dispatcher implements DispatcherContract
             // If a response is returned from the listener and event halting is enabled
             // we will just return this response, and not call the rest of the event
             // listeners. Otherwise we will add the response on the response list.
-            if ($halt && ! is_null($response)) {
+            if ($halt && !is_null($response)) {
                 return $response;
             }
 
@@ -331,8 +333,8 @@ class Dispatcher implements DispatcherContract
     protected function shouldBroadcast(array $payload)
     {
         return isset($payload[0]) &&
-               $payload[0] instanceof ShouldBroadcast &&
-               $this->broadcastWhen($payload[0]);
+            $payload[0] instanceof ShouldBroadcast &&
+            $this->broadcastWhen($payload[0]);
     }
 
     /**
@@ -344,7 +346,7 @@ class Dispatcher implements DispatcherContract
     protected function broadcastWhen($event)
     {
         return method_exists($event, 'broadcastWhen')
-                ? $event->broadcastWhen() : true;
+            ? $event->broadcastWhen() : true;
     }
 
     /**
@@ -372,8 +374,8 @@ class Dispatcher implements DispatcherContract
         );
 
         return class_exists($eventName, false)
-                    ? $this->addInterfaceListeners($eventName, $listeners)
-                    : $listeners;
+            ? $this->addInterfaceListeners($eventName, $listeners)
+            : $listeners;
     }
 
     /**
@@ -489,10 +491,10 @@ class Dispatcher implements DispatcherContract
     protected function createClassCallable($listener)
     {
         [$class, $method] = is_array($listener)
-                            ? $listener
-                            : $this->parseClassCallable($listener);
+            ? $listener
+            : $this->parseClassCallable($listener);
 
-        if (! method_exists($class, $method)) {
+        if (!method_exists($class, $method)) {
             $method = '__invoke';
         }
 
@@ -503,8 +505,8 @@ class Dispatcher implements DispatcherContract
         $listener = $this->container->make($class);
 
         return $this->handlerShouldBeDispatchedAfterDatabaseTransactions($listener)
-                    ? $this->createCallbackForListenerRunningAfterCommits($listener, $method)
-                    : [$listener, $method];
+            ? $this->createCallbackForListenerRunningAfterCommits($listener, $method)
+            : [$listener, $method];
     }
 
     /**
@@ -565,7 +567,7 @@ class Dispatcher implements DispatcherContract
     {
         return (($listener->afterCommit ?? null) ||
                 $listener instanceof ShouldHandleEventsAfterCommit) &&
-                $this->resolveTransactionManager();
+            $this->resolveTransactionManager();
     }
 
     /**
@@ -618,13 +620,23 @@ class Dispatcher implements DispatcherContract
     {
         [$listener, $job] = $this->createListenerAndJob($class, $method, $arguments);
 
+        $listenerReflectionClass = null;
+
+        /**
+         * We determine connection and queue based on the ways the user may specify it for the listener,
+         * stopping once we find the first value set. In order of precedence: via* methods,
+         * property, and finally On* attributes.
+         */
         $connection = $this->resolveQueue()->connection(method_exists($listener, 'viaConnection')
             ? (isset($arguments[0]) ? $listener->viaConnection($arguments[0]) : $listener->viaConnection())
-            : $listener->connection ?? null);
+            : $listener->connection
+            ?? enum_value($this->getConnectionFromOnConnectionAttribute($listenerReflectionClass ??= new ReflectionClass($listener)))
+        );
 
         $queue = method_exists($listener, 'viaQueue')
             ? (isset($arguments[0]) ? $listener->viaQueue($arguments[0]) : $listener->viaQueue())
-            : $listener->queue ?? null;
+            : $listener->queue
+            ?? enum_value($this->getQueueFromOnQueueAttribute($listenerReflectionClass ?? new ReflectionClass($listener)));
 
         $delay = method_exists($listener, 'withDelay')
             ? (isset($arguments[0]) ? $listener->withDelay($arguments[0]) : $listener->withDelay())
@@ -647,9 +659,11 @@ class Dispatcher implements DispatcherContract
     {
         $listener = (new ReflectionClass($class))->newInstanceWithoutConstructor();
 
-        return [$listener, $this->propagateListenerOptions(
-            $listener, new CallQueuedListener($class, $method, $arguments)
-        )];
+        return [
+            $listener, $this->propagateListenerOptions(
+                $listener, new CallQueuedListener($class, $method, $arguments)
+            )
+        ];
     }
 
     /**
@@ -670,7 +684,8 @@ class Dispatcher implements DispatcherContract
                 $job->afterCommit = property_exists($listener, 'afterCommit') ? $listener->afterCommit : null;
             }
 
-            $job->backoff = method_exists($listener, 'backoff') ? $listener->backoff(...$data) : ($listener->backoff ?? null);
+            $job->backoff = method_exists($listener, 'backoff') ? $listener->backoff(...
+                $data) : ($listener->backoff ?? null);
             $job->maxExceptions = $listener->maxExceptions ?? null;
             $job->retryUntil = method_exists($listener, 'retryUntil') ? $listener->retryUntil(...$data) : null;
             $job->shouldBeEncrypted = $listener instanceof ShouldBeEncrypted;
