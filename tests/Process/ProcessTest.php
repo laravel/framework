@@ -342,8 +342,8 @@ class ProcessTest extends TestCase
 
         $factory->fake([
             'ls *' => $factory->sequence()
-                        ->push('ls command 1')
-                        ->push('ls command 2'),
+                ->push('ls command 1')
+                ->push('ls command 2'),
             'cat *' => 'cat command',
         ]);
 
@@ -363,9 +363,9 @@ class ProcessTest extends TestCase
 
         $factory->fake([
             'ls *' => $factory->sequence()
-                        ->push('ls command 1')
-                        ->push('ls command 2')
-                        ->dontFailWhenEmpty(),
+                ->push('ls command 1')
+                ->push('ls command 2')
+                ->dontFailWhenEmpty(),
         ]);
 
         $result = $factory->run('ls -la');
@@ -386,8 +386,8 @@ class ProcessTest extends TestCase
 
         $factory->fake([
             'ls *' => $factory->sequence()
-                        ->push('ls command 1')
-                        ->push('ls command 2'),
+                ->push('ls command 1')
+                ->push('ls command 2'),
         ]);
 
         $result = $factory->run('ls -la');
@@ -739,10 +739,10 @@ class ProcessTest extends TestCase
 
         $factory->fake(function () use ($factory) {
             return $factory->describe()
-                    ->output('ONE')
-                    ->output('TWO')
-                    ->output('THREE')
-                    ->runsFor(iterations: 3);
+                ->output('ONE')
+                ->output('TWO')
+                ->output('THREE')
+                ->runsFor(iterations: 3);
         });
 
         $process = $factory->start('echo "ONE"; sleep 1; echo "TWO"; sleep 1; echo "THREE"; sleep 1;');

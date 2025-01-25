@@ -3578,9 +3578,9 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $builder = $this->getBuilder()->select('*')->from('users')->where('email', '=', function ($q) {
             $q->select(new Raw('max(id)'))
-              ->from('users')->where('email', '=', 'bar')
-              ->orderByRaw('email like ?', '%.com')
-              ->groupBy('id')->having('id', '=', 4);
+                ->from('users')->where('email', '=', 'bar')
+                ->orderByRaw('email like ?', '%.com')
+                ->groupBy('id')->having('id', '=', 4);
         })->orWhere('id', '=', 'foo')->groupBy('id')->having('id', '=', 5);
         $this->assertEquals([0 => 'bar', 1 => 4, 2 => '%.com', 3 => 'foo', 4 => 5], $builder->getBindings());
     }
@@ -4075,9 +4075,9 @@ class DatabaseQueryBuilderTest extends TestCase
         $result = $builder->from('users')
             ->join('orders', function ($join) {
                 $join->on('users.id', '=', 'orders.user_id')
-                   ->where('users.id', '=', 1);
+                    ->where('users.id', '=', 1);
             })->where('name', 'baz')
-           ->updateFrom(['email' => 'foo', 'name' => 'bar']);
+            ->updateFrom(['email' => 'foo', 'name' => 'bar']);
         $this->assertEquals(1, $result);
     }
 
@@ -4450,11 +4450,11 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $connection = $this->createMock(ConnectionInterface::class);
         $connection->expects($this->once())
-                    ->method('update')
-                    ->with(
-                        'update `users` set `name` = json_set(`name`, \'$."first_name"\', ?), `name` = json_set(`name`, \'$."last_name"\', ?) where `active` = ?',
-                        ['John', 'Doe', 1]
-                    );
+            ->method('update')
+            ->with(
+                'update `users` set `name` = json_set(`name`, \'$."first_name"\', ?), `name` = json_set(`name`, \'$."last_name"\', ?) where `active` = ?',
+                ['John', 'Doe', 1]
+            );
 
         $builder = new Builder($connection, $grammar, $processor);
 
@@ -4468,11 +4468,11 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $connection = $this->createMock(ConnectionInterface::class);
         $connection->expects($this->once())
-                    ->method('update')
-                    ->with(
-                        'update `users` set `meta` = json_set(`meta`, \'$."name"."first_name"\', ?), `meta` = json_set(`meta`, \'$."name"."last_name"\', ?) where `active` = ?',
-                        ['John', 'Doe', 1]
-                    );
+            ->method('update')
+            ->with(
+                'update `users` set `meta` = json_set(`meta`, \'$."name"."first_name"\', ?), `meta` = json_set(`meta`, \'$."name"."last_name"\', ?) where `active` = ?',
+                ['John', 'Doe', 1]
+            );
 
         $builder = new Builder($connection, $grammar, $processor);
 
@@ -4486,16 +4486,16 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $connection = $this->createMock(ConnectionInterface::class);
         $connection->expects($this->once())
-                    ->method('update')
-                    ->with(
-                        'update `users` set `options` = ?, `meta` = json_set(`meta`, \'$."tags"\', cast(? as json)), `group_id` = 45, `created_at` = ? where `active` = ?',
-                        [
-                            json_encode(['2fa' => false, 'presets' => ['laravel', 'vue']]),
-                            json_encode(['white', 'large']),
-                            new DateTime('2019-08-06'),
-                            1,
-                        ]
-                    );
+            ->method('update')
+            ->with(
+                'update `users` set `options` = ?, `meta` = json_set(`meta`, \'$."tags"\', cast(? as json)), `group_id` = 45, `created_at` = ? where `active` = ?',
+                [
+                    json_encode(['2fa' => false, 'presets' => ['laravel', 'vue']]),
+                    json_encode(['white', 'large']),
+                    new DateTime('2019-08-06'),
+                    1,
+                ]
+            );
 
         $builder = new Builder($connection, $grammar, $processor);
         $builder->from('users')->where('active', 1)->update([
@@ -4513,14 +4513,14 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $connection = $this->createMock(ConnectionInterface::class);
         $connection->expects($this->once())
-                    ->method('update')
-                    ->with(
-                        'update `users` set `options` = json_set(`options`, \'$[1]."2fa"\', false), `meta` = json_set(`meta`, \'$."tags"[0][2]\', ?) where `active` = ?',
-                        [
-                            'large',
-                            1,
-                        ]
-                    );
+            ->method('update')
+            ->with(
+                'update `users` set `options` = json_set(`options`, \'$[1]."2fa"\', false), `meta` = json_set(`meta`, \'$."tags"[0][2]\', ?) where `active` = ?',
+                [
+                    'large',
+                    1,
+                ]
+            );
 
         $builder = new Builder($connection, $grammar, $processor);
         $builder->from('users')->where('active', 1)->update([
@@ -4536,11 +4536,11 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $connection = m::mock(ConnectionInterface::class);
         $connection->shouldReceive('update')
-                    ->once()
-                    ->with(
-                        'update `users` set `options` = json_set(`options`, \'$."enable"\', false), `updated_at` = ? where `id` = ?',
-                        ['2015-05-26 22:02:06', 0]
-                    );
+            ->once()
+            ->with(
+                'update `users` set `options` = json_set(`options`, \'$."enable"\', false), `updated_at` = ? where `id` = ?',
+                ['2015-05-26 22:02:06', 0]
+            );
         $builder = new Builder($connection, $grammar, $processor);
         $builder->from('users')->where('id', '=', 0)->update(['options->enable' => false, 'updated_at' => '2015-05-26 22:02:06']);
 
