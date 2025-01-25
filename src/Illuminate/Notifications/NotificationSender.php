@@ -6,15 +6,18 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Queue\InteractsWithQueueAndConnection;
 use Illuminate\Notifications\Events\NotificationSending;
 use Illuminate\Notifications\Events\NotificationSent;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Localizable;
 
+use function Illuminate\Support\enum_value;
+
 class NotificationSender
 {
-    use Localizable;
+    use InteractsWithQueueAndConnection, Localizable;
 
     /**
      * The notification manager instance.
@@ -199,13 +202,23 @@ class NotificationSender
                     $notification->locale = $this->locale;
                 }
 
-                $connection = $notification->connection;
+                $connection = enum_value(
+                    $notification->connection
+                        ?? $this->getConnectionFromOnConnectionAttribute(
+                            $notifiableReflectionClass = new \ReflectionClass($original)
+                    )
+                );
 
                 if (method_exists($notification, 'viaConnections')) {
                     $connection = $notification->viaConnections()[$channel] ?? null;
                 }
 
-                $queue = $notification->queue;
+                $queue = enum_value(
+                    $notification->queue
+                        ?? $this->getQueueFromOnQueueAttribute(
+                            $notifiableReflectionClass ?? new \ReflectionClass($original)
+                    )
+                );
 
                 if (method_exists($notification, 'viaQueues')) {
                     $queue = $notification->viaQueues()[$channel] ?? null;
