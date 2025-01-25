@@ -2,6 +2,7 @@
 
 namespace Illuminate\Queue\Middleware;
 
+use Closure;
 use Illuminate\Cache\RateLimiter;
 use Illuminate\Cache\RateLimiting\Unlimited;
 use Illuminate\Container\Container;
@@ -17,6 +18,13 @@ class RateLimited
      * @var \Illuminate\Cache\RateLimiter
      */
     protected $limiter;
+
+    /**
+     * The custom rate limiter callback.
+     *
+     * @var \Closure|null
+     */
+    protected ?Closure $limiterCallback = null;
 
     /**
      * The name of the rate limiter.
@@ -46,6 +54,21 @@ class RateLimited
     }
 
     /**
+     * Create a new rate-limited middleware instance with the given limiter and rate limit logic.
+     *
+     * @param  \BackedEnum|\UnitEnum|string  $limiterName
+     * @param  Closure  $limiterCallback
+     * @return self
+     */
+    public static function create($limiterName, Closure $limiterCallback): self
+    {
+        $instance = new self($limiterName);
+        $instance->limiterCallback = $limiterCallback;
+
+        return $instance;
+    }
+
+    /**
      * Process the job.
      *
      * @param  mixed  $job
@@ -54,6 +77,10 @@ class RateLimited
      */
     public function handle($job, $next)
     {
+        if ($this->limiterCallback) {
+            $this->limiter->for($this->limiterName, $this->limiterCallback);
+        }
+
         if (is_null($limiter = $this->limiter->limiter($this->limiterName))) {
             return $next($job);
         }

@@ -44,6 +44,24 @@ class RateLimitedTest extends TestCase
         $this->assertJobRanSuccessfully(RateLimitedTestJobUsingBackedEnum::class);
     }
 
+    public function testJobsUsingCustomRateLimitedAreProperlyLimited()
+    {
+        $rateLimiter = new RateLimiter(new Repository(new ArrayStore));
+        $this->app->instance(RateLimiter::class, $rateLimiter);
+
+        Carbon::setTestNow('2000-01-01 00:00:00');
+
+        $this->assertJobRanSuccessfully(CustomRateLimitedTestJob::class);
+        $this->assertJobRanSuccessfully(CustomRateLimitedTestJob::class);
+
+        // Third job should be rate limited
+        $this->assertJobWasReleased(CustomRateLimitedTestJob::class);
+
+        // Job should run successfully again after limit expires
+        Carbon::setTestNow('2000-01-01 01:00:00');
+        $this->assertJobRanSuccessfully(CustomRateLimitedTestJob::class);
+    }
+
     public function testUnlimitedJobsAreExecutedUsingUnitEnum()
     {
         $rateLimiter = $this->app->make(RateLimiter::class);
@@ -337,6 +355,18 @@ class RateLimitedDontReleaseTestJob extends RateLimitedTestJob
     public function middleware()
     {
         return [(new RateLimited('test'))->dontRelease()];
+    }
+}
+
+class CustomRateLimitedTestJob extends RateLimitedTestJob
+{
+    public function middleware()
+    {
+        return [
+            RateLimited::create(self::class, function () {
+                return Limit::perHour(2);
+            }),
+        ];
     }
 }
 

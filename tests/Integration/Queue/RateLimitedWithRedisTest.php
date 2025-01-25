@@ -10,6 +10,7 @@ use Illuminate\Contracts\Queue\Job;
 use Illuminate\Contracts\Redis\Factory as Redis;
 use Illuminate\Queue\CallQueuedHandler;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\Middleware\RateLimited;
 use Illuminate\Queue\Middleware\RateLimitedWithRedis;
 use Illuminate\Support\Str;
 use Mockery as m;
@@ -44,6 +45,14 @@ class RateLimitedWithRedisTest extends TestCase
         $rateLimiter->for($testJob->key, function ($job) {
             return Limit::perMinute(1);
         });
+
+        $this->assertJobRanSuccessfully($testJob);
+        $this->assertJobWasReleased($testJob);
+    }
+
+    public function testJobsUsingCustomRateLimitedAreProperlyLimited()
+    {
+        $testJob = new CustomRedisRateLimitedTestJob;
 
         $this->assertJobRanSuccessfully($testJob);
         $this->assertJobWasReleased($testJob);
@@ -214,5 +223,17 @@ class RedisRateLimitedDontReleaseTestJob extends RedisRateLimitedTestJob
     public function middleware()
     {
         return [(new RateLimitedWithRedis($this->key))->dontRelease()];
+    }
+}
+
+class CustomRedisRateLimitedTestJob extends RedisRateLimitedTestJob
+{
+    public function middleware()
+    {
+        return [
+            RateLimited::create(self::class, function () {
+                return Limit::perMinute(1);
+            }),
+        ];
     }
 }
