@@ -4,8 +4,19 @@ namespace Illuminate\Validation\Rules;
 
 class ImageFile extends File
 {
+    /**
+     * Indicates if SVG files are allowed by default.
+     *
+     * @var bool
+     */
     public static $allowSvgByDefault = true;
 
+    /**
+     * Indicate whether SVG files are allowed by default.
+     *
+     * @param  bool  $allowByDefault
+     * @return void
+     */
     public static function allowSvg($allowByDefault = true)
     {
         static::$allowSvgByDefault = $allowByDefault;
