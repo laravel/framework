@@ -230,12 +230,36 @@ trait QueriesRelationships
 
         $types = (array) $types;
 
-        // 1. does this deal with the callback?
-        // 2. does this handle types properly?
-        // 3. does this handle other operators (>= > <= < = !=)
+        // operators;
+        // 1. >=
+        //   a) positive: doesnt need nulls as is inclusionary
+        //   b) zero:     will always be true...
+        //   c) negative: will always be true...
+        // 2. >
+        //   a) positive: doesnt need nulls as is inclusionary
+        //   b) zero:     doesnt need nulls as is inclusionary
+        //   c) negative: will always be true...
+        // 3. <=
+        //   a) positive: needs nulls as is exclusionary
+        //   b) zero:     needs nulls as is exclusionary
+        //   c) negative: can never be true...
+        // 4. <
+        //   a) positive: needs nulls as is exclusionary
+        //   b) zero:     can never be true...
+        //   c) negative: can never be true...
+        // 5. =
+        //   a) positive: doesnt need nulls as is inclusionary
+        //   b) zero:     needs nulls as is exclusionary
+        //   c) negative: can never be true...
+        // 6. !=
+        //   a) positive: needs nulls as is exclusionary
+        //   b) zero:     doesnt need nulls as is inclusionary
+        //   c) negative: will always be true...
 
-        $checkMorphNull = ($operator === '<')
-            || ($operator === '=' && $count === 0);
+        $checkMorphNull = ($operator === '<' && $count >= 1)
+            || ($operator === '<=' && $count >= 0)
+            || ($operator === '=' && $count === 0)
+            || ($operator === '!=' && $count >= 1);
 
         if($types === ['*'] && $checkMorphNull) {
             return $this->whereMorphedTo($relation, null);
