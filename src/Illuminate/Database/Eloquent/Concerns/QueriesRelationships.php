@@ -232,9 +232,9 @@ trait QueriesRelationships
 
         // 1. does this deal with the callback?
         // 2. does this handle types properly?
-        // 3. does this handle < 2 properly?
+        // 3. does this handle other operators (>= > <= < = !=)
 
-        $checkMorphNull = ($operator === '<' && $count === 1)
+        $checkMorphNull = ($operator === '<')
             || ($operator === '=' && $count === 0);
 
         if($types === ['*'] && $checkMorphNull) {
