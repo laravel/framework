@@ -2,9 +2,6 @@
 
 namespace Illuminate\Queue\Failed;
 
-/**
- * @method array ids(string $queue = null)
- */
 interface FailedJobProviderInterface
 {
     /**
@@ -17,6 +14,14 @@ interface FailedJobProviderInterface
      * @return string|int|null
      */
     public function log($connection, $queue, $payload, $exception);
+
+    /**
+     * Get the IDs of all of the failed jobs.
+     *
+     * @param  string|null  $queue
+     * @return array
+     */
+    public function ids($queue = null);
 
     /**
      * Get a list of all of the failed jobs.
