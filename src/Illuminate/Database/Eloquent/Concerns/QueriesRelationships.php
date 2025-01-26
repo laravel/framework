@@ -230,6 +230,10 @@ trait QueriesRelationships
 
         $types = (array) $types;
 
+        if($types === ['*'] && $operator === '<' && $count === 1) {
+            return $this->whereMorphedTo($relation, null);
+        }
+
         if ($types === ['*']) {
             $types = $this->model->newModelQuery()->distinct()->pluck($relation->getMorphType())
                 ->filter()
@@ -313,17 +317,7 @@ trait QueriesRelationships
      */
     public function doesntHaveMorph($relation, $types = ['*'], $boolean = 'and', ?Closure $callback = null)
     {
-        if (is_string($relation)) {
-            $relation = $this->getRelationWithoutConstraints($relation);
-        }
-
-        return $this
-            ->hasMorph($relation, $types, '<', 1, $boolean, $callback)
-            ->when($types === ['*'], fn(self $query) => $query
-                ->orWhere(fn(self $query) => $query
-                    ->whereNull([$relation->getMorphType(), $relation->getForeignKeyName()])
-                ),
-            );
+        return $this->hasMorph($relation, $types, '<', 1, $boolean, $callback);
     }
 
     /**
