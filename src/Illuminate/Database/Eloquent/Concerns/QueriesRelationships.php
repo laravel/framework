@@ -310,7 +310,7 @@ trait QueriesRelationships
      * @param  string  $boolean
      * @return $this
      */
-    public function doesntHaveMorph($relation, $types = ['*'], $boolean = 'and', ?Closure $callback = null)
+    public function doesntHaveMorph($relation, $types, $boolean = 'and', ?Closure $callback = null)
     {
         return $this->hasMorph($relation, $types, '<', 1, $boolean, $callback);
     }
