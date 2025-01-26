@@ -1417,8 +1417,7 @@ class Blueprint
     {
         return $this->string($column, $length);
     }
-
-
+    
     /**
      * Create a new CUID column on the table with a foreign key constraint.
      *
