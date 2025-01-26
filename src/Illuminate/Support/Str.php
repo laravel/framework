@@ -634,7 +634,7 @@ class Str
      */
     public static function isCuid($value)
     {
-        if (!is_string($value)) {
+        if (! is_string($value)) {
             return false;
         }
 

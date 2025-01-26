@@ -1413,7 +1413,8 @@ class Blueprint
      * @param  int|null  $length
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function cuid($column = 'cuid', $length = 32) {
+    public function cuid($column = 'cuid', $length = 32)
+    {
         return $this->string($column, $length);
     }
 
