@@ -311,9 +311,19 @@ trait QueriesRelationships
      * @param  \Closure|null  $callback
      * @return $this
      */
-    public function doesntHaveMorph($relation, $types, $boolean = 'and', ?Closure $callback = null)
+    public function doesntHaveMorph($relation, $types = ['*'], $boolean = 'and', ?Closure $callback = null)
     {
-        return $this->hasMorph($relation, $types, '<', 1, $boolean, $callback);
+        if (is_string($relation)) {
+            $relation = $this->getRelationWithoutConstraints($relation);
+        }
+
+        return $this
+            ->hasMorph($relation, $types, '<', 1, $boolean, $callback)
+            ->when($types === ['*'], fn(self $query) => $query
+                ->orWhere(fn(self $query) => $query
+                    ->whereNull([$relation->getMorphType(), $relation->getForeignKeyName()])
+                ),
+            );
     }
 
     /**
