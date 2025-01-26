@@ -627,6 +627,33 @@ class Str
     }
 
     /**
+     * Determine if a given value is a valid CUID.
+     *
+     * @param  mixed  $value
+     * @return bool
+     */
+    public static function isCuid($value)
+    {
+        if (!is_string($value)) {
+            return false;
+        }
+
+        // validate length
+        $minLength = 2;
+        $maxLength = 32;
+
+        $length = strlen($value);
+        if ($length >= $minLength
+            && $length  <= $maxLength
+            && preg_match('/^[a-z][0-9a-z]+$/', $value)
+        ) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Convert a string to kebab case.
      *
      * @param  string  $value

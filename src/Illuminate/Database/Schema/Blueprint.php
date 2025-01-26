@@ -4,6 +4,7 @@ namespace Illuminate\Database\Schema;
 
 use Closure;
 use Illuminate\Database\Connection;
+use Illuminate\Database\Eloquent\Concerns\HasCuid;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Grammars\Grammar;
@@ -1053,6 +1054,12 @@ class Blueprint
                 ->referencesModelColumn($model->getKeyName());
         }
 
+        if (in_array(HasCuid::class, $modelTraits, true)) {
+            return $this->foreignCuid($column, 32)
+                ->table($model->getTable())
+                ->referencesModelColumn($model->getKeyName());
+        }
+
         return $this->foreignUuid($column)
             ->table($model->getTable())
             ->referencesModelColumn($model->getKeyName());
@@ -1400,6 +1407,34 @@ class Blueprint
     }
 
     /**
+     * Create a new CUID column on the table.
+     *
+     * @param  string  $column
+     * @param  int|null  $length
+     * @return \Illuminate\Database\Schema\ColumnDefinition
+     */
+    public function cuid($column = 'cuid', $length = 32) {
+        return $this->string($column, $length);
+    }
+
+
+    /**
+     * Create a new CUID column on the table with a foreign key constraint.
+     *
+     * @param  string  $column
+     * @param  int|null  $length
+     * @return \Illuminate\Database\Schema\ForeignIdColumnDefinition
+     */
+    public function foreignCuid($column, $length = 32)
+    {
+        return $this->addColumnDefinition(new ForeignIdColumnDefinition($this, [
+            'type' => 'string',
+            'name' => $column,
+            'length' => $length,
+        ]));
+    }
+
+    /**
      * Create a new IP address column on the table.
      *
      * @param  string  $column
@@ -1486,6 +1521,8 @@ class Blueprint
             $this->uuidMorphs($name, $indexName);
         } elseif (Builder::$defaultMorphKeyType === 'ulid') {
             $this->ulidMorphs($name, $indexName);
+        } elseif (Builder::$defaultMorphKeyType === 'cuid') {
+            $this->cuidMorphs($name, $indexName);
         } else {
             $this->numericMorphs($name, $indexName);
         }
@@ -1504,6 +1541,8 @@ class Blueprint
             $this->nullableUuidMorphs($name, $indexName);
         } elseif (Builder::$defaultMorphKeyType === 'ulid') {
             $this->nullableUlidMorphs($name, $indexName);
+        } elseif (Builder::$defaultMorphKeyType === 'cuid') {
+            $this->nullableCuidMorphs($name, $indexName);
         } else {
             $this->nullableNumericMorphs($name, $indexName);
         }
@@ -1601,6 +1640,38 @@ class Blueprint
         $this->string("{$name}_type")->nullable();
 
         $this->ulid("{$name}_id")->nullable();
+
+        $this->index(["{$name}_type", "{$name}_id"], $indexName);
+    }
+
+    /**
+     * Add the proper columns for a polymorphic table using CUIDs.
+     *
+     * @param  string  $name
+     * @param  string|null  $indexName
+     * @return void
+     */
+    public function cuidMorphs($name, $indexName = null)
+    {
+        $this->string("{$name}_type");
+
+        $this->string("{$name}_id", 32);
+
+        $this->index(["{$name}_type", "{$name}_id"], $indexName);
+    }
+
+    /**
+     * Add nullable columns for a polymorphic table using CUIDs.
+     *
+     * @param  string  $name
+     * @param  string|null  $indexName
+     * @return void
+     */
+    public function nullableCuidMorphs($name, $indexName = null)
+    {
+        $this->string("{$name}_type")->nullable();
+
+        $this->string("{$name}_id", 32)->nullable();
 
         $this->index(["{$name}_type", "{$name}_id"], $indexName);
     }
