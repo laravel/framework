@@ -165,6 +165,28 @@ class SupportNumberTest extends TestCase
         $this->assertSame('1 234,56 $US', Number::currency(1234.56, 'USD', 'fr'));
     }
 
+    #[RequiresPhpExtension('intl')]
+    public function testToCurrencyWithDifferentPrecision()
+    {
+        $this->assertSame('$0', Number::currency(0, precision: 0));
+        $this->assertSame('$1.0', Number::currency(1, precision: 1));
+        $this->assertSame('$10.00', Number::currency(10, precision: 2));
+        $this->assertSame('$10.001', Number::currency(10.0014, precision: 3));
+        $this->assertSame('$10.002', Number::currency(10.0015, precision: 3));
+
+        $this->assertSame('€0', Number::currency(0, 'EUR', precision: 0));
+        $this->assertSame('€1.0', Number::currency(1, 'EUR', precision: 1));
+        $this->assertSame('€10.00', Number::currency(10, 'EUR', precision: 2));
+        $this->assertSame('€10.001', Number::currency(10.0014, 'EUR', precision: 3));
+        $this->assertSame('€10.002', Number::currency(10.0015, 'EUR', precision: 3));
+
+        $this->assertSame('-$5', Number::currency(-5, precision: 0));
+        $this->assertSame('$5.0', Number::currency(5.00, precision: 1));
+        $this->assertSame('$5.32', Number::currency(5.325, precision: 2));
+        $this->assertSame('$5.321', Number::currency(5.3214, precision: 3));
+        $this->assertSame('$5.322', Number::currency(5.3215, precision: 3));
+    }
+
     public function testBytesToHuman()
     {
         $this->assertSame('0 B', Number::fileSize(0));
