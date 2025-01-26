@@ -2,19 +2,23 @@
 
 namespace Illuminate\Database\Eloquent\Casts;
 
+/**
+ * @template TGet
+ * @template TSet
+ */
 class Attribute
 {
     /**
      * The attribute accessor.
      *
-     * @var callable
+     * @var (callable(mixed=, array<string, mixed>=): TGet)|null
      */
     public $get;
 
     /**
      * The attribute mutator.
      *
-     * @var callable
+     * @var (callable(TSet, array<string, mixed>=): mixed)|null
      */
     public $set;
 
@@ -35,8 +39,8 @@ class Attribute
     /**
      * Create a new attribute accessor / mutator.
      *
-     * @param  callable|null  $get
-     * @param  callable|null  $set
+     * @param  (callable(mixed=, array<string, mixed>=): TGet)|null  $get
+     * @param  (callable(TSet, array<string, mixed>=): mixed)|null  $set
      * @return void
      */
     public function __construct(?callable $get = null, ?callable $set = null)
@@ -48,9 +52,12 @@ class Attribute
     /**
      * Create a new attribute accessor / mutator.
      *
-     * @param  callable|null  $get
-     * @param  callable|null  $set
-     * @return static
+     * @template TMakeGet
+     * @template TMakeSet
+     *
+     * @param  (callable(mixed=, array<string, mixed>=): TMakeGet)|null  $get
+     * @param  (callable(TMakeSet, array<string, mixed>=): mixed)|null  $set
+     * @return static<TMakeGet, TMakeSet>
      */
     public static function make(?callable $get = null, ?callable $set = null): static
     {
@@ -60,8 +67,10 @@ class Attribute
     /**
      * Create a new attribute accessor.
      *
-     * @param  callable  $get
-     * @return static
+     * @template T
+     *
+     * @param  callable(mixed=, array<string, mixed>=): T  $get
+     * @return static<T, never>
      */
     public static function get(callable $get)
     {
@@ -71,8 +80,10 @@ class Attribute
     /**
      * Create a new attribute mutator.
      *
-     * @param  callable  $set
-     * @return static
+     * @template T
+     *
+     * @param  callable(T, array<string, mixed>=): mixed $set
+     * @return static<never, T>
      */
     public static function set(callable $set)
     {
@@ -82,7 +93,7 @@ class Attribute
     /**
      * Disable object caching for the attribute.
      *
-     * @return static
+     * @return $this
      */
     public function withoutObjectCaching()
     {
@@ -94,7 +105,7 @@ class Attribute
     /**
      * Enable caching for the attribute.
      *
-     * @return static
+     * @return $this
      */
     public function shouldCache()
     {
