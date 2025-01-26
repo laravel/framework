@@ -405,17 +405,6 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     }
 
     /**
-     * Add a new JSON path to the loader.
-     *
-     * @param  string  $path
-     * @return void
-     */
-    public function addJsonPath($path)
-    {
-        $this->loader->addJsonPath($path);
-    }
-
-    /**
      * Add a new path to the loader.
      *
      * @param  string  $path
@@ -424,6 +413,17 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     public function addPath($path)
     {
         $this->loader->addPath($path);
+    }
+
+    /**
+     * Add a new JSON path to the loader.
+     *
+     * @param  string  $path
+     * @return void
+     */
+    public function addJsonPath($path)
+    {
+        $this->loader->addJsonPath($path);
     }
 
     /**
