@@ -40,6 +40,13 @@ trait HasRelationships
     protected $touches = [];
 
     /**
+     * The relationship autoload callback.
+     *
+     * @var ?Closure
+     */
+    protected $relationAutoloadCallback = null;
+
+    /**
      * The many to many relationship methods.
      *
      * @var string[]
@@ -90,6 +97,119 @@ trait HasRelationships
             static::$relationResolvers,
             [static::class => [$name => $callback]]
         );
+    }
+
+    /**
+     * Set relation autoload callback for model and its relations.
+     *
+     * @param  Closure  $callback
+     * @param  mixed  $context
+     * @return $this
+     */
+    public function usingRelationAutoloadCallback(Closure $callback, $context = null)
+    {
+        $this->relationAutoloadCallback = $callback;
+
+        foreach ($this->relations as $key => $value) {
+            $this->applyRelationAutoloadCallbackToValue($key, $value, $context);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Enable relation autoload for model and its relations if not already enabled.
+     *
+     * @return $this
+     */
+    public function withRelationAutoload()
+    {
+        if ($this->hasRelationAutoloadCallback()) {
+            return $this;
+        }
+
+        $collection = new Collection([$this]);
+
+        $this->usingRelationAutoloadCallback(
+            fn ($path) => $collection->loadMissingRelationWithTypes($path)
+        );
+
+        return $this;
+    }
+
+    /**
+     * Check if relation autoload callback is set.
+     *
+     * @return bool
+     */
+    public function hasRelationAutoloadCallback()
+    {
+        return ! is_null($this->relationAutoloadCallback);
+    }
+
+    /**
+     * Trigger relation autoload callback and check if relation is loaded.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    protected function handleRelationAutoload($key)
+    {
+        if (! $this->hasRelationAutoloadCallback()) {
+            return false;
+        }
+
+        $this->triggerRelationAutoloadCallback($key, []);
+
+        return $this->relationLoaded($key);
+    }
+
+    /**
+     * Trigger relation autoload callback.
+     *
+     * @param  string  $key
+     * @param  array  $keys
+     * @return void
+     */
+    protected function triggerRelationAutoloadCallback($key, $keys)
+    {
+        call_user_func(
+            $this->relationAutoloadCallback,
+            array_merge([[$key, get_class($this)]], $keys)
+        );
+    }
+
+    /**
+     * Apply relation autoload callback to value.
+     *
+     * @param  string  $key
+     * @param  mixed  $values
+     * @param  mixed  $context
+     * @return void
+     */
+    protected function applyRelationAutoloadCallbackToValue($key, $values, $context = null)
+    {
+        if (! $this->hasRelationAutoloadCallback() || ! $values) {
+            return;
+        }
+
+        if ($values instanceof Model) {
+            $values = [$values];
+        }
+
+        if (! is_iterable($values)) {
+            return;
+        }
+
+        $callback = fn (array $keys) => $this->triggerRelationAutoloadCallback($key, $keys);
+
+        foreach ($values as $item) {
+            // check if relation autoload contexts are different
+            // to avoid circular relation autoload
+            if (is_null($context) || $context !== $item) {
+                $item->usingRelationAutoloadCallback($callback, $context);
+            }
+        }
     }
 
     /**
@@ -918,6 +1038,8 @@ trait HasRelationships
     public function setRelation($relation, $value)
     {
         $this->relations[$relation] = $value;
+
+        $this->applyRelationAutoloadCallbackToValue($relation, $value, $this);
 
         return $this;
     }
