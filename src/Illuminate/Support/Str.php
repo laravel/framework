@@ -643,7 +643,6 @@ class Str
         $maxLength = 32;
 
         $length = strlen($value);
-        
         if ($length >= $minLength && $length  <= $maxLength && preg_match('/^[a-z][0-9a-z]+$/', $value)) {
             return true;
         }
