@@ -230,7 +230,14 @@ trait QueriesRelationships
 
         $types = (array) $types;
 
-        if($types === ['*'] && $operator === '<' && $count === 1) {
+        // 1. does this deal with the callback?
+        // 2. does this handle types properly?
+        // 3. does this handle < 2 properly?
+
+        $checkMorphNull = ($operator === '<' && $count === 1)
+            || ($operator === '=' && $count === 0);
+
+        if($types === ['*'] && $checkMorphNull) {
             return $this->whereMorphedTo($relation, null);
         }
 
