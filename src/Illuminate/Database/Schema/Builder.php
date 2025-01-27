@@ -81,8 +81,8 @@ class Builder
      */
     public static function defaultMorphKeyType(string $type)
     {
-        if (! in_array($type, ['int', 'uuid', 'ulid'])) {
-            throw new InvalidArgumentException("Morph key type must be 'int', 'uuid', or 'ulid'.");
+        if (! in_array($type, ['int', 'uuid', 'ulid', 'cuid'])) {
+            throw new InvalidArgumentException("Morph key type must be 'int', 'uuid', 'ulid', or 'cuid'.");
         }
 
         static::$defaultMorphKeyType = $type;
@@ -106,6 +106,16 @@ class Builder
     public static function morphUsingUlids()
     {
         static::defaultMorphKeyType('ulid');
+    }
+
+    /**
+     * Set the default morph key type for migrations to CUIDs.
+     *
+     * @return void
+     */
+    public static function morphUsingCuids()
+    {
+        static::defaultMorphKeyType('cuid');
     }
 
     /**

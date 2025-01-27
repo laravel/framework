@@ -1428,7 +1428,7 @@ class Blueprint
     public function foreignCuid($column, $length = 32)
     {
         return $this->addColumnDefinition(new ForeignIdColumnDefinition($this, [
-            'type' => 'string',
+            'type' => 'char',
             'name' => $column,
             'length' => $length,
         ]));
