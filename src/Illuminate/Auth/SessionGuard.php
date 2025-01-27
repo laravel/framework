@@ -261,6 +261,8 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
             return true;
         }
 
+        $this->fireFailedEvent($this->lastAttempted, $credentials);
+
         return false;
     }
 
