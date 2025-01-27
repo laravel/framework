@@ -7,13 +7,6 @@ use Stringable;
 class PotentiallyTranslatedString implements Stringable
 {
     /**
-     * The string that may be translated.
-     *
-     * @var string
-     */
-    protected $string;
-
-    /**
      * The translated string.
      *
      * @var string|null
@@ -21,24 +14,13 @@ class PotentiallyTranslatedString implements Stringable
     protected $translation;
 
     /**
-     * The validator that may perform the translation.
-     *
-     * @var \Illuminate\Contracts\Translation\Translator
-     */
-    protected $translator;
-
-    /**
      * Create a new potentially translated string.
      *
-     * @param  string  $string
-     * @param  \Illuminate\Contracts\Translation\Translator  $translator
+     * @param  string  $string The string that may be translated.
+     * @param  \Illuminate\Contracts\Translation\Translator  $translator The validator that may perform the translation.
      */
-    public function __construct($string, $translator)
-    {
-        $this->string = $string;
-
-        $this->translator = $translator;
-    }
+    public function __construct(protected $string, protected $translator)
+    {}
 
     /**
      * Translate the string.
