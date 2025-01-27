@@ -122,13 +122,13 @@ class SQLiteBuilder extends Builder
             return $this->refreshDatabaseFile();
         }
 
-        $this->connection->select($this->grammar->compileEnableWriteableSchema());
+        $this->pragma('writable_schema', 1);
 
         foreach ($this->getCurrentSchemaListing() as $schema) {
             $this->connection->select($this->grammar->compileDropAllTables($schema));
         }
 
-        $this->connection->select($this->grammar->compileDisableWriteableSchema());
+        $this->pragma('writable_schema', 0);
 
         $this->connection->select($this->grammar->compileRebuild());
     }
@@ -140,54 +140,24 @@ class SQLiteBuilder extends Builder
      */
     public function dropAllViews()
     {
-        $this->connection->select($this->grammar->compileEnableWriteableSchema());
+        $this->pragma('writable_schema', 1);
 
         foreach ($this->getCurrentSchemaListing() as $schema) {
             $this->connection->select($this->grammar->compileDropAllViews($schema));
         }
 
-        $this->connection->select($this->grammar->compileDisableWriteableSchema());
+        $this->pragma('writable_schema', 0);
 
         $this->connection->select($this->grammar->compileRebuild());
     }
 
-    /**
-     * Set the busy timeout.
-     *
-     * @param  int  $milliseconds
-     * @return bool
-     */
-    public function setBusyTimeout($milliseconds)
+    public function pragma($key, $value = null)
     {
-        return $this->connection->statement(
-            $this->grammar->compileSetBusyTimeout($milliseconds)
-        );
-    }
+        if (is_null($value)) {
+            return $this->connection->scalar($this->grammar->pragma($key));
+        }
 
-    /**
-     * Set the journal mode.
-     *
-     * @param  string  $mode
-     * @return bool
-     */
-    public function setJournalMode($mode)
-    {
-        return $this->connection->statement(
-            $this->grammar->compileSetJournalMode($mode)
-        );
-    }
-
-    /**
-     * Set the synchronous mode.
-     *
-     * @param  int  $mode
-     * @return bool
-     */
-    public function setSynchronous($mode)
-    {
-        return $this->connection->statement(
-            $this->grammar->compileSetSynchronous($mode)
-        );
+        return $this->connection->statement($this->grammar->pragma($key, $value));
     }
 
     /**
@@ -207,6 +177,6 @@ class SQLiteBuilder extends Builder
      */
     public function getCurrentSchemaListing()
     {
-        return ['main'];
+        return ['main', ...array_keys($this->connection->getConfig('schemas') ?? [])];
     }
 }
