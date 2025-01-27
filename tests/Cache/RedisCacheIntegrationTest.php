@@ -38,7 +38,7 @@ class RedisCacheIntegrationTest extends TestCase
         $this->assertGreaterThan(3500, $this->redis[$driver]->connection()->ttl('k'));
     }
 
-        /**
+    /**
      * @param  string  $driver
      */
     #[DataProvider('redisDriverProvider')]
