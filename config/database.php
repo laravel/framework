@@ -35,6 +35,10 @@ return [
             'driver' => 'sqlite',
             'url' => env('DB_URL'),
             'database' => env('DB_DATABASE', database_path('database.sqlite')),
+            'schemas' => [
+                // 'secondary' => env('DB_SECONDARY_DATABASE', database_path('secondary.sqlite')),
+                // 'tertiary' => env('DB_TERTIARY_DATABASE', ':memory:'),
+            ],
             'prefix' => '',
             'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
             'busy_timeout' => null,
