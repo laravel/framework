@@ -111,6 +111,7 @@ class ContextualAttributeBindingTest extends TestCase
         $container = new Container;
         $container->singleton('auth', function () {
             $manager = m::mock(AuthManager::class);
+            $manager->shouldReceive('userResolver')->andReturn(fn ($guard = null) => $manager->guard($guard)->user());
             $manager->shouldReceive('guard')->with('foo')->andReturnUsing(function () {
                 $guard = m::mock(GuardContract::class);
                 $guard->shouldReceive('user')->andReturn(m:mock(AuthenticatableContract::class));
