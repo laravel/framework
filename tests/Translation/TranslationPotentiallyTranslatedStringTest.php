@@ -18,6 +18,6 @@ class TranslationPotentiallyTranslatedStringTest extends TestCase
         ]), 'en');
         $translation = new PotentiallyTranslatedString('custom.hello', $translator);
         $translation->translate();
-        $this->assertSame('world', (string)$translation);
+        $this->assertSame('world', (string) $translation);
     }
 }

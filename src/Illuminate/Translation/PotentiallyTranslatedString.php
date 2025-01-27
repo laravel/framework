@@ -16,11 +16,12 @@ class PotentiallyTranslatedString implements Stringable
     /**
      * Create a new potentially translated string.
      *
-     * @param  string  $string The string that may be translated.
-     * @param  \Illuminate\Contracts\Translation\Translator  $translator The validator that may perform the translation.
+     * @param  string  $string  The string that may be translated.
+     * @param  \Illuminate\Contracts\Translation\Translator  $translator  The validator that may perform the translation.
      */
     public function __construct(protected $string, protected $translator)
-    {}
+    {
+    }
 
     /**
      * Translate the string.
