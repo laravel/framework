@@ -22,7 +22,7 @@ class ValidateUTF8Path
     {
         $decodedPath = rawurldecode($request->path());
 
-        if (! mb_check_encoding($decodedPath, "UTF-8")) {
+        if (! mb_check_encoding($decodedPath, 'UTF-8')) {
             throw new MalformedUrlException;
         }
 

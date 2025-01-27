@@ -25,7 +25,7 @@ class ValidateUTF8PathTest extends TestCase
         $symfonyRequest->server->set('REQUEST_URI', $path);
         $request = Request::createFromBase($symfonyRequest);
 
-        $response = $middleware->handle($request, fn() => new Response('OK'));
+        $response = $middleware->handle($request, fn () => new Response('OK'));
 
         $this->assertSame(200, $response->status());
         $this->assertSame('OK', $response->content());
@@ -42,13 +42,12 @@ class ValidateUTF8PathTest extends TestCase
         $request = Request::createFromBase($symfonyRequest);
 
         try {
-            $middleware->handle($request, fn() => new Response('OK'));
+            $middleware->handle($request, fn () => new Response('OK'));
             
             $this->fail('MalformedUrlExceptions should have been thrown.');
-
         } catch(MalformedUrlException $e) {
             $this->assertSame(400, $e->getStatusCode());
             $this->assertSame('Malformed URL.', $e->getMessage());
-        };
+        }
     }
 }
