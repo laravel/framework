@@ -43,7 +43,7 @@ class ValidateUTF8PathTest extends TestCase
 
         try {
             $middleware->handle($request, fn () => new Response('OK'));
-            
+
             $this->fail('MalformedUrlExceptions should have been thrown.');
         } catch(MalformedUrlException $e) {
             $this->assertSame(400, $e->getStatusCode());

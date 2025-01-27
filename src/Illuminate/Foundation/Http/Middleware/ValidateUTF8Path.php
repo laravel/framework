@@ -3,11 +3,8 @@
 namespace Illuminate\Foundation\Http\Middleware;
 
 use Closure;
-use Illuminate\Container\Container;
 use Illuminate\Foundation\Http\Exceptions\MalformedUrlException;
 use Illuminate\Http\Request;
-use Illuminate\Support\Defer\DeferredCallbackCollection;
-use Symfony\Component\HttpFoundation\Response;
 
 class ValidateUTF8Path
 {
