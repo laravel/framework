@@ -151,13 +151,18 @@ class SQLiteBuilder extends Builder
         $this->connection->select($this->grammar->compileRebuild());
     }
 
+    /**
+     * Get the value for the given pragma name or set the given value.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return mixed
+     */
     public function pragma($key, $value = null)
     {
-        if (is_null($value)) {
-            return $this->connection->scalar($this->grammar->pragma($key));
-        }
-
-        return $this->connection->statement($this->grammar->pragma($key, $value));
+        return is_null($value)
+            ? $this->connection->scalar($this->grammar->pragma($key))
+            : $this->connection->statement($this->grammar->pragma($key, $value));
     }
 
     /**
