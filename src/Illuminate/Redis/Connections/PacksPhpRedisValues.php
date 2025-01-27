@@ -138,6 +138,41 @@ trait PacksPhpRedisValues
     }
 
     /**
+     * Run a callback without serialization or compression enabled. Useful when
+     * performing operations like increment/decrement that should not be
+     * serialized or compressed on client side.
+     */
+    public function runClean(callable $callback): mixed
+    {
+        /** @var \Redis|\RedisCluster $client */
+        $client = $this->client;
+
+        $oldSerializer = null;
+        if ($this->serialized()) {
+            $oldSerializer = $client->getOption($client::OPT_SERIALIZER);
+            $client->setOption($client::OPT_SERIALIZER, $client::SERIALIZER_NONE);
+        }
+
+        $oldCompressor = null;
+        if ($this->compressed()) {
+            $oldCompressor = $client->getOption($client::OPT_COMPRESSION);
+            $client->setOption($client::OPT_COMPRESSION, $client::COMPRESSION_NONE);
+        }
+
+        try {
+            return $callback();
+        } finally {
+            if ($oldSerializer !== null) {
+                $client->setOption($client::OPT_SERIALIZER, $oldSerializer);
+            }
+
+            if ($oldCompressor !== null) {
+                $client->setOption($client::OPT_COMPRESSION, $oldCompressor);
+            }
+        }
+    }
+
+    /**
      * Determine if the current PhpRedis extension version supports packing.
      *
      * @return bool
