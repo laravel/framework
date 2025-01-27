@@ -3777,7 +3777,7 @@ class EloquentNonPrimaryUlidModelStub extends EloquentModelStub
 
 class EloquentPrimaryCuidModelStub extends EloquentModelStub
 {
-    use HasUuids;
+    use HasCuid;
 
     public $incrementing = false;
     protected $keyType = 'string';
@@ -3790,7 +3790,7 @@ class EloquentPrimaryCuidModelStub extends EloquentModelStub
 
 class EloquentNonPrimaryCuidModelStub extends EloquentModelStub
 {
-    use HasUuids;
+    use HasCuid;
 
     public function getKeyName()
     {
