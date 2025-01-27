@@ -83,6 +83,43 @@ trait PacksPhpRedisValues
     }
 
     /**
+     * Execute the given callback without serialization or compression when applicable.
+     *
+     * @param  callable  $callback
+     * @return mixed
+     */
+    public function withoutSerializationOrCompression(callable $callback)
+    {
+        $client = $this->client;
+
+        $oldSerializer = null;
+
+        if ($this->serialized()) {
+            $oldSerializer = $client->getOption($client::OPT_SERIALIZER);
+            $client->setOption($client::OPT_SERIALIZER, $client::SERIALIZER_NONE);
+        }
+
+        $oldCompressor = null;
+
+        if ($this->compressed()) {
+            $oldCompressor = $client->getOption($client::OPT_COMPRESSION);
+            $client->setOption($client::OPT_COMPRESSION, $client::COMPRESSION_NONE);
+        }
+
+        try {
+            return $callback();
+        } finally {
+            if ($oldSerializer !== null) {
+                $client->setOption($client::OPT_SERIALIZER, $oldSerializer);
+            }
+
+            if ($oldCompressor !== null) {
+                $client->setOption($client::OPT_COMPRESSION, $oldCompressor);
+            }
+        }
+    }
+
+    /**
      * Determine if serialization is enabled.
      *
      * @return bool
@@ -135,41 +172,6 @@ trait PacksPhpRedisValues
     {
         return defined('Redis::COMPRESSION_LZ4') &&
                $this->client->getOption(Redis::OPT_COMPRESSION) === Redis::COMPRESSION_LZ4;
-    }
-
-    /**
-     * Run a callback without serialization or compression enabled. Useful when
-     * performing operations like increment/decrement that should not be
-     * serialized or compressed on client side.
-     */
-    public function runClean(callable $callback): mixed
-    {
-        /** @var \Redis|\RedisCluster $client */
-        $client = $this->client;
-
-        $oldSerializer = null;
-        if ($this->serialized()) {
-            $oldSerializer = $client->getOption($client::OPT_SERIALIZER);
-            $client->setOption($client::OPT_SERIALIZER, $client::SERIALIZER_NONE);
-        }
-
-        $oldCompressor = null;
-        if ($this->compressed()) {
-            $oldCompressor = $client->getOption($client::OPT_COMPRESSION);
-            $client->setOption($client::OPT_COMPRESSION, $client::COMPRESSION_NONE);
-        }
-
-        try {
-            return $callback();
-        } finally {
-            if ($oldSerializer !== null) {
-                $client->setOption($client::OPT_SERIALIZER, $oldSerializer);
-            }
-
-            if ($oldCompressor !== null) {
-                $client->setOption($client::OPT_COMPRESSION, $oldCompressor);
-            }
-        }
     }
 
     /**

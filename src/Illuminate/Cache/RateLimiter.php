@@ -166,12 +166,16 @@ class RateLimiter
             $key.':timer', $this->availableAt($decaySeconds), $decaySeconds
         );
 
-        $added = $this->runClean(fn (): mixed => $this->cache->add($key, 0, $decaySeconds));
+        $added = $this->withoutSerializationOrCompression(
+            fn () => $this->cache->add($key, 0, $decaySeconds)
+        );
 
         $hits = (int) $this->cache->increment($key, $amount);
 
         if (! $added && $hits == 1) {
-            $this->runClean(fn (): mixed => $this->cache->put($key, 1, $decaySeconds));
+            $this->withoutSerializationOrCompression(
+                fn () => $this->cache->put($key, 1, $decaySeconds)
+            );
         }
 
         return $hits;
@@ -200,7 +204,7 @@ class RateLimiter
     {
         $key = $this->cleanRateLimiterKey($key);
 
-        return $this->runClean(fn (): mixed => $this->cache->get($key, 0));
+        return $this->withoutSerializationOrCompression(fn () => $this->cache->get($key, 0));
     }
 
     /**
@@ -284,24 +288,26 @@ class RateLimiter
     }
 
     /**
-     * Allow the rate limiter to run a callback against a clean repository.
+     * Execute the given callback without serialization or compression when applicable.
      *
-     * For example when using RedisStore, the serializer and compressor can be
-     * disabled during the callback execution.
+     * @param  callable  $callback
+     * @return mixed
      */
-    protected function runClean(callable $callback): mixed
+    protected function withoutSerializationOrCompression(callable $callback)
     {
         $store = $this->cache->getStore();
+
         if (! $store instanceof RedisStore) {
             return $callback();
         }
 
         $connection = $store->connection();
+
         if (! $connection instanceof PhpRedisConnection) {
             return $callback();
         }
 
-        return $connection->runClean($callback);
+        return $connection->withoutSerializationOrCompression($callback);
     }
 
     /**
