@@ -102,7 +102,7 @@ class View implements ArrayAccess, Htmlable, Stringable, ViewContract
     {
         return is_null($fragments)
             ? $this->allFragments()
-            : (new Collection($fragments))->map(fn ($f) => $this->fragment($f))->implode('');
+            : (new Collection($fragments))->map($this->fragment(...))->implode('');
     }
 
     /**
