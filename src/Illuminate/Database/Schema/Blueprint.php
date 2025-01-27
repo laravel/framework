@@ -1415,7 +1415,7 @@ class Blueprint
      */
     public function cuid($column = 'cuid', $length = 32)
     {
-        return $this->string($column, $length);
+        return $this->char($column, $length);
     }
 
     /**
@@ -1655,7 +1655,7 @@ class Blueprint
     {
         $this->string("{$name}_type");
 
-        $this->string("{$name}_id", 32);
+        $this->cuid("{$name}_id", 32);
 
         $this->index(["{$name}_type", "{$name}_id"], $indexName);
     }
@@ -1671,7 +1671,7 @@ class Blueprint
     {
         $this->string("{$name}_type")->nullable();
 
-        $this->string("{$name}_id", 32)->nullable();
+        $this->cuid("{$name}_id", 32)->nullable();
 
         $this->index(["{$name}_type", "{$name}_id"], $indexName);
     }
