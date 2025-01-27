@@ -3145,9 +3145,29 @@ class DatabaseEloquentModelTest extends TestCase
 
         $this->assertTrue($user->hasAttribute('name'));
         $this->assertTrue($user->hasAttribute('password'));
-        $this->assertTrue($user->hasAttribute('castedFloat'));
         $this->assertFalse($user->hasAttribute('nonexistent'));
         $this->assertFalse($user->hasAttribute('belongsToStub'));
+    }
+
+    public function testHasAttributeWithCastedValues()
+    {
+        Model::preventAccessingMissingAttributes();
+
+        $user = new EloquentModelStub;
+        $user->setDateFormat('d-m-Y H:i:s');
+        $user->exists = true;
+
+        $user->castedDateTime = '2025-01-27 15:00:00';
+
+        $this->assertTrue($user->hasAttribute('castedDateTime'));
+
+        $this->assertInstanceOf(Carbon::class, $user->castedDateTime);
+
+        $this->assertFalse($user->hasAttribute('castedFloat'));
+
+        $this->expectException(MissingAttributeException::class);
+
+        $user->castedFloat;
     }
 
     public function testModelToJsonSucceedsWithPriorErrors(): void
@@ -3253,7 +3273,10 @@ class EloquentModelStub extends Model
     public $scopesCalled = [];
     protected $table = 'stub';
     protected $guarded = [];
-    protected $casts = ['castedFloat' => 'float'];
+    protected $casts = [
+        'castedFloat' => 'float',
+        'castedDateTime' => 'datetime',
+    ];
 
     public function getListItemsAttribute($value)
     {

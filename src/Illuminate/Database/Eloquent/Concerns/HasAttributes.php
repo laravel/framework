@@ -449,7 +449,6 @@ trait HasAttributes
         }
 
         return array_key_exists($key, $this->attributes) ||
-            array_key_exists($key, $this->casts) ||
             $this->hasGetMutator($key) ||
             $this->hasAttributeMutator($key) ||
             $this->isClassCastable($key);
