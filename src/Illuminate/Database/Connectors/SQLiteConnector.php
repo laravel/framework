@@ -30,7 +30,7 @@ class SQLiteConnector extends Connector implements ConnectorInterface
     }
 
     /**
-     * @param  string $path
+     * @param  string  $path
      * @return string
      *
      * @throws \Illuminate\Database\SQLiteDatabaseDoesNotExistException
