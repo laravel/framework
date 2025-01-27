@@ -89,7 +89,7 @@ class PotentiallyTranslatedString implements Stringable
      */
     public function has($locale = null, $fallback = true)
     {
-       return $this->translator->has($this->string, $locale, $fallback);
+        return $this->translator->has($this->string, $locale, $fallback);
     }
 
     /**
