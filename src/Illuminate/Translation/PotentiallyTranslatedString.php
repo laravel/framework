@@ -28,16 +28,25 @@ class PotentiallyTranslatedString implements Stringable
     protected $translator;
 
     /**
+     * Default replacement parameters
+     * @var array<string, Stringable|string>
+     */
+    protected array $replace = [];
+
+    /**
      * Create a new potentially translated string.
      *
      * @param  string  $string
      * @param  \Illuminate\Contracts\Translation\Translator  $translator
+     * @param  array<string, Stringable|string>  $replace
      */
-    public function __construct($string, $translator)
+    public function __construct($string, $translator, array $replace = [])
     {
         $this->string = $string;
 
         $this->translator = $translator;
+
+        $this->replace = $replace;
     }
 
     /**
@@ -49,7 +58,7 @@ class PotentiallyTranslatedString implements Stringable
      */
     public function translate($replace = [], $locale = null)
     {
-        $this->translation = $this->translator->get($this->string, $replace, $locale);
+        $this->translation = $this->translator->get($this->string, array_merge($this->replace, $replace), $locale);
 
         return $this;
     }
@@ -64,7 +73,17 @@ class PotentiallyTranslatedString implements Stringable
      */
     public function translateChoice($number, array $replace = [], $locale = null)
     {
-        $this->translation = $this->translator->choice($this->string, $number, $replace, $locale);
+        $this->translation = $this->translator->choice($this->string, $number, array_merge($this->replace, $replace), $locale);
+
+        return $this;
+    }
+
+    /**
+     * @var array<string, Stringable|string>
+     */
+    public function addReplace(array $replace): self
+    {
+        $this->replace = array_merge($this->replace, $replace);
 
         return $this;
     }
