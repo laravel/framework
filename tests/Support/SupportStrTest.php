@@ -47,8 +47,8 @@ class SupportStrTest extends TestCase
         $this->assertSame('Laravel123', Str::title('laravel123'));
         $this->assertSame('Laravel123', Str::title('Laravel123'));
 
-        $longString = 'lorem ipsum ' . str_repeat('dolor sit amet ', 1000);
-        $expectedResult = 'Lorem Ipsum Dolor Sit Amet ' . str_repeat('Dolor Sit Amet ', 999);
+        $longString = 'lorem ipsum '.str_repeat('dolor sit amet ', 1000);
+        $expectedResult = 'Lorem Ipsum Dolor Sit Amet '.str_repeat('Dolor Sit Amet ', 999);
         $this->assertSame($expectedResult, Str::title($longString));
     }
 
@@ -130,7 +130,7 @@ class SupportStrTest extends TestCase
 
     public function testStringWithoutWordsDoesntProduceError(): void
     {
-        $nbsp = chr(0xC2) . chr(0xA0);
+        $nbsp = chr(0xC2).chr(0xA0);
         $this->assertSame(' ', Str::words(' '));
         $this->assertEquals($nbsp, Str::words($nbsp));
         $this->assertSame('   ', Str::words('   '));
@@ -692,7 +692,7 @@ class SupportStrTest extends TestCase
 
     public function testRandomStringFactoryCanBeSet()
     {
-        Str::createRandomStringsUsing(fn($length) => 'length:' . $length);
+        Str::createRandomStringsUsing(fn ($length) => 'length:'.$length);
 
         $this->assertSame('length:7', Str::random(7));
         $this->assertSame('length:7', Str::random(7));
@@ -724,7 +724,7 @@ class SupportStrTest extends TestCase
 
     public function testItCanSpecifyAFallbackForARandomStringSequence()
     {
-        Str::createRandomStringsUsingSequence([Str::random(), Str::random()], fn() => throw new Exception('Out of random strings.'));
+        Str::createRandomStringsUsingSequence([Str::random(), Str::random()], fn () => throw new Exception('Out of random strings.'));
         Str::random();
         Str::random();
 
@@ -760,7 +760,7 @@ class SupportStrTest extends TestCase
         $this->assertSame('foo/bar', Str::replaceArray('?', [1 => 'foo', 2 => 'bar'], '?/?'));
         $this->assertSame('foo/bar', Str::replaceArray('?', ['x' => 'foo', 'y' => 'bar'], '?/?'));
         // Test does not crash on bad input
-        $this->assertSame('?', Str::replaceArray('?', [(object)['foo' => 'bar']], '?'));
+        $this->assertSame('?', Str::replaceArray('?', [(object) ['foo' => 'bar']], '?'));
     }
 
     public function testReplaceFirst()
@@ -1270,7 +1270,7 @@ class SupportStrTest extends TestCase
         return [
             ['not a valid uuid so we can test this'],
             ['zf6f8cb0-c57d-11e1-9b21-0800200c9a66'],
-            ['145a1e72-d11d-11e8-a8d5-f2801f1b9fd1' . PHP_EOL],
+            ['145a1e72-d11d-11e8-a8d5-f2801f1b9fd1'.PHP_EOL],
             ['145a1e72-d11d-11e8-a8d5-f2801f1b9fd1 '],
             [' 145a1e72-d11d-11e8-a8d5-f2801f1b9fd1'],
             ['145a1e72-d11d-11e8-a8d5-f2z01f1b9fd1'],
