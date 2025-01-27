@@ -432,10 +432,6 @@ class RedisStore extends TaggableStore implements LockProvider
     protected function pack($value, $connection)
     {
         if ($connection instanceof PhpRedisConnection) {
-            if ($this->shouldBeStoredWithoutSerialization($value)) {
-                return $value;
-            }
-
             if ($connection->serialized()) {
                 return $connection->pack([$value])[0];
             }
