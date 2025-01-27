@@ -31,6 +31,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Concerns\HasCuid;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\JsonEncodingException;
@@ -2058,6 +2059,52 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals(['bar'], $clone->foo);
     }
 
+    public function testCloneModelMakesAFreshCopyOfTheModelWhenModelHasCuidPrimaryKey()
+    {
+        $class = new EloquentPrimaryCuidModelStub();
+        $class->cuid = 'uzmbdw1jp9yvi2nm3s8zx27p';
+        $class->exists = true;
+        $class->first = 'taylor';
+        $class->last = 'otwell';
+        $class->created_at = $class->freshTimestamp();
+        $class->updated_at = $class->freshTimestamp();
+        $class->setRelation('foo', ['bar']);
+
+        $clone = $class->replicate();
+
+        $this->assertNull($clone->cuid);
+        $this->assertFalse($clone->exists);
+        $this->assertSame('taylor', $clone->first);
+        $this->assertSame('otwell', $clone->last);
+        $this->assertArrayNotHasKey('created_at', $clone->getAttributes());
+        $this->assertArrayNotHasKey('updated_at', $clone->getAttributes());
+        $this->assertEquals(['bar'], $clone->foo);
+    }
+
+    public function testCloneModelMakesAFreshCopyOfTheModelWhenModelHasCuid()
+    {
+        $class = new EloquentNonPrimaryCuidModelStub();
+        $class->id = 1;
+        $class->cuid = 'uzmbdw1jp9yvi2nm3s8zx27p';
+        $class->exists = true;
+        $class->first = 'taylor';
+        $class->last = 'otwell';
+        $class->created_at = $class->freshTimestamp();
+        $class->updated_at = $class->freshTimestamp();
+        $class->setRelation('foo', ['bar']);
+
+        $clone = $class->replicate();
+
+        $this->assertNull($clone->id);
+        $this->assertNull($clone->cuid);
+        $this->assertFalse($clone->exists);
+        $this->assertSame('taylor', $clone->first);
+        $this->assertSame('otwell', $clone->last);
+        $this->assertArrayNotHasKey('created_at', $clone->getAttributes());
+        $this->assertArrayNotHasKey('updated_at', $clone->getAttributes());
+        $this->assertEquals(['bar'], $clone->foo);
+    }
+
     public function testModelObserversCanBeAttachedToModels()
     {
         EloquentModelStub::setEventDispatcher($events = m::mock(Dispatcher::class));
@@ -3725,6 +3772,34 @@ class EloquentNonPrimaryUlidModelStub extends EloquentModelStub
     public function uniqueIds()
     {
         return ['ulid'];
+    }
+}
+
+class EloquentPrimaryCuidModelStub extends EloquentModelStub
+{
+    use HasUuids;
+
+    public $incrementing = false;
+    protected $keyType = 'string';
+
+    public function getKeyName()
+    {
+        return 'cuid';
+    }
+}
+
+class EloquentNonPrimaryCuidModelStub extends EloquentModelStub
+{
+    use HasUuids;
+
+    public function getKeyName()
+    {
+        return 'id';
+    }
+
+    public function uniqueIds()
+    {
+        return ['cuid'];
     }
 }
 

@@ -47,8 +47,8 @@ class SupportStrTest extends TestCase
         $this->assertSame('Laravel123', Str::title('laravel123'));
         $this->assertSame('Laravel123', Str::title('Laravel123'));
 
-        $longString = 'lorem ipsum '.str_repeat('dolor sit amet ', 1000);
-        $expectedResult = 'Lorem Ipsum Dolor Sit Amet '.str_repeat('Dolor Sit Amet ', 999);
+        $longString = 'lorem ipsum ' . str_repeat('dolor sit amet ', 1000);
+        $expectedResult = 'Lorem Ipsum Dolor Sit Amet ' . str_repeat('Dolor Sit Amet ', 999);
         $this->assertSame($expectedResult, Str::title($longString));
     }
 
@@ -130,7 +130,7 @@ class SupportStrTest extends TestCase
 
     public function testStringWithoutWordsDoesntProduceError(): void
     {
-        $nbsp = chr(0xC2).chr(0xA0);
+        $nbsp = chr(0xC2) . chr(0xA0);
         $this->assertSame(' ', Str::words(' '));
         $this->assertEquals($nbsp, Str::words($nbsp));
         $this->assertSame('   ', Str::words('   '));
@@ -560,6 +560,18 @@ class SupportStrTest extends TestCase
         $this->assertFalse(Str::isUuid($uuid));
     }
 
+    #[DataProvider('validCuidList')]
+    public function testIsCuidWithValidCuid($cuid)
+    {
+        $this->assertTrue(Str::isCuid($cuid));
+    }
+
+    #[DataProvider('invalidCuidList')]
+    public function testIsCuidWithInvalidCuid($cuid)
+    {
+        $this->assertFalse(Str::isCuid($cuid));
+    }
+
     public function testIsJson()
     {
         $this->assertTrue(Str::isJson('1'));
@@ -680,7 +692,7 @@ class SupportStrTest extends TestCase
 
     public function testRandomStringFactoryCanBeSet()
     {
-        Str::createRandomStringsUsing(fn ($length) => 'length:'.$length);
+        Str::createRandomStringsUsing(fn($length) => 'length:' . $length);
 
         $this->assertSame('length:7', Str::random(7));
         $this->assertSame('length:7', Str::random(7));
@@ -712,7 +724,7 @@ class SupportStrTest extends TestCase
 
     public function testItCanSpecifyAFallbackForARandomStringSequence()
     {
-        Str::createRandomStringsUsingSequence([Str::random(), Str::random()], fn () => throw new Exception('Out of random strings.'));
+        Str::createRandomStringsUsingSequence([Str::random(), Str::random()], fn() => throw new Exception('Out of random strings.'));
         Str::random();
         Str::random();
 
@@ -748,7 +760,7 @@ class SupportStrTest extends TestCase
         $this->assertSame('foo/bar', Str::replaceArray('?', [1 => 'foo', 2 => 'bar'], '?/?'));
         $this->assertSame('foo/bar', Str::replaceArray('?', ['x' => 'foo', 'y' => 'bar'], '?/?'));
         // Test does not crash on bad input
-        $this->assertSame('?', Str::replaceArray('?', [(object) ['foo' => 'bar']], '?'));
+        $this->assertSame('?', Str::replaceArray('?', [(object)['foo' => 'bar']], '?'));
     }
 
     public function testReplaceFirst()
@@ -1258,7 +1270,7 @@ class SupportStrTest extends TestCase
         return [
             ['not a valid uuid so we can test this'],
             ['zf6f8cb0-c57d-11e1-9b21-0800200c9a66'],
-            ['145a1e72-d11d-11e8-a8d5-f2801f1b9fd1'.PHP_EOL],
+            ['145a1e72-d11d-11e8-a8d5-f2801f1b9fd1' . PHP_EOL],
             ['145a1e72-d11d-11e8-a8d5-f2801f1b9fd1 '],
             [' 145a1e72-d11d-11e8-a8d5-f2801f1b9fd1'],
             ['145a1e72-d11d-11e8-a8d5-f2z01f1b9fd1'],
@@ -1266,6 +1278,28 @@ class SupportStrTest extends TestCase
             ['af6f8cb-c57d-11e1-9b21-0800200c9a66'],
             ['af6f8cb0c57d11e19b210800200c9a66'],
             ['ff6f8cb0-c57da-51e1-9b21-0800200c9a66'],
+        ];
+    }
+
+    public static function validCuidList()
+    {
+        return [
+            ['zm2x9igk6ian853ux1iikr93'],
+            ['c0qapxb62ghwol2l8vpxryv8'],
+            ['zcodvpsaeznjd5ygsedu1il7'],
+            ['eb4nv3psuv9xqks4kca7ut74'],
+            ['xss09xjvzvulul04na8kkll0'],
+            ['xss09xjvzvulul04na8kkll0eb4v9xqk'],
+        ];
+    }
+
+    public static function invalidCuidList()
+    {
+        return [
+            ['zm2x9igk6iAn853Ux1iikr93'],
+            ['c0qApXb62ghw@l2l8vpxryv8'],
+            ['not a valid cuid so we can test this'],
+            ['eb4nv3psuv9xqVSs4kZDvedZca7ut743'],
         ];
     }
 
