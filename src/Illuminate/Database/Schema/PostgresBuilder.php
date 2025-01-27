@@ -9,6 +9,11 @@ class PostgresBuilder extends Builder
     use ParsesSearchPath;
 
     /**
+     * The default time precision for migrations.
+     */
+    public static ?int $defaultTimePrecision = 6;
+
+    /**
      * Create a database in the schema.
      *
      * @param  string  $name
