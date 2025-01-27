@@ -3151,23 +3151,29 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testHasAttributeWithCastedValues()
     {
-        Model::preventAccessingMissingAttributes();
+        $originalMode = Model::preventsAccessingMissingAttributes();
 
-        $user = new EloquentModelStub;
-        $user->setDateFormat('d-m-Y H:i:s');
-        $user->exists = true;
+        try {
+            Model::preventAccessingMissingAttributes();
 
-        $user->castedDateTime = '2025-01-27 15:00:00';
+            $user = new EloquentModelStub;
+            $user->setDateFormat('d-m-Y H:i:s');
+            $user->exists = true;
 
-        $this->assertTrue($user->hasAttribute('castedDateTime'));
+            $user->castedDateTime = '2025-01-27 15:00:00';
 
-        $this->assertInstanceOf(Carbon::class, $user->castedDateTime);
+            $this->assertTrue($user->hasAttribute('castedDateTime'));
 
-        $this->assertFalse($user->hasAttribute('castedFloat'));
+            $this->assertInstanceOf(Carbon::class, $user->castedDateTime);
 
-        $this->expectException(MissingAttributeException::class);
+            $this->assertFalse($user->hasAttribute('castedFloat'));
 
-        $user->castedFloat;
+            $this->expectException(MissingAttributeException::class);
+
+            $user->castedFloat;
+        } finally {
+            Model::preventAccessingMissingAttributes($originalMode);
+        }
     }
 
     public function testModelToJsonSucceedsWithPriorErrors(): void
