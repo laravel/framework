@@ -252,6 +252,8 @@ class RedisStoreTest extends TestCase
 
     public function testIncrementWithSerializationEnabled()
     {
+        $this->markTestSkipped('Test makes no sense anymore. Application must explicitly wrap such code in runClean() when used with serialization/compression enabled.');
+
         /** @var \Illuminate\Cache\RedisStore $store */
         $store = Cache::store('redis');
         /** @var \Redis $client */
