@@ -123,7 +123,7 @@ class SQLiteGrammar extends Grammar
     /**
      * Compile the query for legacy versions of SQLite to determine the tables.
      *
-     * @param  string|string[]|null  $schema
+     * @param  string  $schema
      * @param  bool  $withSize
      * @return string
      */
