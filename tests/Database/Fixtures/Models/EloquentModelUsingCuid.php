@@ -2,10 +2,13 @@
 
 namespace Illuminate\Tests\Database\Fixtures\Models;
 
+use Illuminate\Database\Eloquent\Concerns\HasCuid;
 use Illuminate\Database\Eloquent\Model;
 
 class EloquentModelUsingCuid extends Model
 {
+    use HasCuid;
+
     /**
      * The table associated with the model.
      *
