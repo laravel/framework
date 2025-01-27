@@ -70,6 +70,29 @@ class PotentiallyTranslatedString implements Stringable
     }
 
     /**
+     * Determine if a translation exists for a given locale.
+     *
+     * @param  string|null  $locale
+     * @return bool
+     */
+    public function hasForLocale($locale = null)
+    {
+        return $this->has($locale, false);
+    }
+
+    /**
+     * Determine if a translation exists.
+     *
+     * @param  string|null  $locale
+     * @param  bool  $fallback
+     * @return bool
+     */
+    public function has($locale = null, $fallback = true)
+    {
+       return $this->translator->has($this->string, $locale, $fallback);
+    }
+
+    /**
      * Get the original string.
      *
      * @return string
