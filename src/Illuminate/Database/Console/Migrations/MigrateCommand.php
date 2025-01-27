@@ -172,8 +172,9 @@ class MigrateCommand extends BaseCommand implements Isolatable
     }
 
     /**
-     * Attempt to create the database if it's missing.
+     * Attempt to create the database if it is missing.
      *
+     * @param  \Throwable  $e
      * @return bool
      */
     protected function handleMissingDatabase(Throwable $e)
@@ -188,14 +189,10 @@ class MigrateCommand extends BaseCommand implements Isolatable
             return false;
         }
 
-        if (
-            ($e->getCode() === 1049 && in_array($connection->getDriverName(), ['mysql', 'mariadb']))
-            || (
-                ($e->errorInfo[0] ?? null) == '08006'
-                && $connection->getDriverName() == 'pgsql'
-                && Str::contains($e->getMessage(), '"'.$connection->getDatabaseName().'"')
-            )
-        ) {
+        if (($e->getCode() === 1049 && in_array($connection->getDriverName(), ['mysql', 'mariadb'])) ||
+            (($e->errorInfo[0] ?? null) == '08006' &&
+              $connection->getDriverName() == 'pgsql' &&
+              Str::contains($e->getMessage(), '"'.$connection->getDatabaseName().'"'))) {
             return $this->createMissingMySqlOrPgsqlDatabase($connection);
         }
 
@@ -234,6 +231,7 @@ class MigrateCommand extends BaseCommand implements Isolatable
     /**
      * Create a missing MySQL or Postgres database.
      *
+     * @param  \Illuminate\Database\Connection  $connection
      * @return bool
      *
      * @throws \RuntimeException
