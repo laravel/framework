@@ -29,6 +29,7 @@ class PotentiallyTranslatedString implements Stringable
 
     /**
      * Default replacement parameters
+     *
      * @var array<string, Stringable|string>
      */
     protected array $replace = [];
