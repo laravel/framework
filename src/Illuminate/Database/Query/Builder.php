@@ -3384,7 +3384,7 @@ class Builder implements BuilderContract
         // given columns / key. Once we have the results, we will be able to take
         // the results and get the exact data that was requested for the query.
         $queryResult = $this->onceWithColumns(
-            is_null($key) ? [$column] : [$column, $key],
+            is_null($key) || $key === $column ? [$column] : [$column, $key],
             function () {
                 return $this->processor->processSelect(
                     $this, $this->runSelect()
