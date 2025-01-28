@@ -122,7 +122,7 @@ class SQLiteBuilder extends Builder
                 ! str_contains($database, '?mode=memory') &&
                 ! str_contains($database, '&mode=memory')
             ) {
-                $this->refreshDatabaseFile();
+                $this->refreshDatabaseFile($database);
             } else {
                 $this->pragma('writable_schema', 1);
 
@@ -170,11 +170,12 @@ class SQLiteBuilder extends Builder
     /**
      * Empty the database file.
      *
+     * @param  string  $path
      * @return void
      */
-    public function refreshDatabaseFile()
+    public function refreshDatabaseFile($path = null)
     {
-        file_put_contents($this->connection->getDatabaseName(), '');
+        file_put_contents($path ?? $this->connection->getDatabaseName(), '');
     }
 
     /**
