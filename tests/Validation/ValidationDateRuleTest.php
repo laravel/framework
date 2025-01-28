@@ -134,5 +134,15 @@ class ValidationDateRuleTest extends TestCase
         );
 
         $this->assertEmpty($validator->errors()->first('date'));
+
+        $rule = Rule::date()->between('2024/01/01', '2024/02/01')->format('Y/m/d');
+
+        $validator = new Validator(
+            $trans,
+            ['date' => '2024/01/15'],
+            ['date' => [$rule]]
+        );
+
+        $this->assertEmpty($validator->errors()->first('date'));
     }
 }

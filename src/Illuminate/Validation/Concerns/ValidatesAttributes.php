@@ -299,6 +299,8 @@ trait ValidatesAttributes
     {
         $firstDate = $this->getDateTimeWithOptionalFormat($format, $first);
 
+        $format = $this->getDateFormat($second) ?: $format;
+
         if (! $secondDate = $this->getDateTimeWithOptionalFormat($format, $second)) {
             if (is_null($second = $this->getValue($second))) {
                 return true;
