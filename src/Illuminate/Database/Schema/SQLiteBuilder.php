@@ -113,24 +113,26 @@ class SQLiteBuilder extends Builder
      */
     public function dropAllTables()
     {
-        $database = $this->connection->getDatabaseName();
-
-        if ($database !== ':memory:' &&
-            ! str_contains($database, '?mode=memory') &&
-            ! str_contains($database, '&mode=memory')
-        ) {
-            return $this->refreshDatabaseFile();
-        }
-
-        $this->pragma('writable_schema', 1);
-
         foreach ($this->getCurrentSchemaListing() as $schema) {
-            $this->connection->select($this->grammar->compileDropAllTables($schema));
+            $database = $schema === 'main'
+                ? $this->connection->getDatabaseName()
+                : $this->connection->getConfig('schemas')[$schema];
+
+            if ($database !== ':memory:' &&
+                ! str_contains($database, '?mode=memory') &&
+                ! str_contains($database, '&mode=memory')
+            ) {
+                $this->refreshDatabaseFile();
+            } else {
+                $this->pragma('writable_schema', 1);
+
+                $this->connection->statement($this->grammar->compileDropAllTables($schema));
+
+                $this->pragma('writable_schema', 0);
+
+                $this->connection->statement($this->grammar->compileRebuild($schema));
+            }
         }
-
-        $this->pragma('writable_schema', 0);
-
-        $this->connection->select($this->grammar->compileRebuild());
     }
 
     /**
@@ -140,15 +142,15 @@ class SQLiteBuilder extends Builder
      */
     public function dropAllViews()
     {
-        $this->pragma('writable_schema', 1);
-
         foreach ($this->getCurrentSchemaListing() as $schema) {
-            $this->connection->select($this->grammar->compileDropAllViews($schema));
+            $this->pragma('writable_schema', 1);
+
+            $this->connection->statement($this->grammar->compileDropAllViews($schema));
+
+            $this->pragma('writable_schema', 0);
+
+            $this->connection->statement($this->grammar->compileRebuild($schema));
         }
-
-        $this->pragma('writable_schema', 0);
-
-        $this->connection->select($this->grammar->compileRebuild());
     }
 
     /**

@@ -519,11 +519,14 @@ class SQLiteGrammar extends Grammar
     /**
      * Compile the SQL needed to rebuild the database.
      *
+     * @param  string|null  $schema
      * @return string
      */
-    public function compileRebuild()
+    public function compileRebuild($schema = null)
     {
-        return 'vacuum';
+        return sprintf('vacuum %s',
+            $this->wrapValue($schema ?? 'main')
+        );
     }
 
     /**
