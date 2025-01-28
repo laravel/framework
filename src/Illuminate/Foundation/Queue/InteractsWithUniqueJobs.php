@@ -3,8 +3,10 @@
 namespace Illuminate\Foundation\Queue;
 
 use Illuminate\Bus\UniqueLock;
+use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Support\Facades\Context;
+use UnexpectedValueException;
 
 trait InteractsWithUniqueJobs
 {
@@ -45,11 +47,28 @@ trait InteractsWithUniqueJobs
      *
      * @param  mixed  $job
      * @return string|null
+     *
+     * @throws UnexpectedValueException
      */
     protected function getUniqueJobCacheStore($job): ?string
     {
-        return method_exists($job, 'uniqueVia')
-            ? $job->uniqueVia()->getName()
-            : config('cache.default');
+        if(! method_exists($job, 'uniqueVia')) {
+            return config('cache.default');
+        }
+
+        /** @var Repository $repository */
+        $repository = $job->uniqueVia();
+
+        if (! $repository instanceof Repository) {
+            $message = sprintf(
+                'Method uniqueVia() of %s must return an implementation of %s interface',
+                $job::class,
+                Repository::class
+            );
+
+            throw new UnexpectedValueException($message);
+        }
+
+        return $job->uniqueVia()->getName();
     }
 }
