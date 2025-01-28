@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Foundation\Http\Middleware;
 
-use Illuminate\Foundation\Http\Exceptions\MalformedUrlException;
-use Illuminate\Foundation\Http\Middleware\ValidatePathEncoding;
+use Illuminate\Http\Exceptions\MalformedUrlException;
+use Illuminate\Http\Middleware\ValidatePathEncoding;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use PHPUnit\Framework\Attributes\TestWith;

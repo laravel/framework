@@ -1,9 +1,9 @@
 <?php
 
-namespace Illuminate\Foundation\Http\Middleware;
+namespace Illuminate\Http\Middleware;
 
 use Closure;
-use Illuminate\Foundation\Http\Exceptions\MalformedUrlException;
+use Illuminate\Http\Exceptions\MalformedUrlException;
 use Illuminate\Http\Request;
 
 class ValidatePathEncoding
