@@ -1,6 +1,19 @@
 # Release Notes for 11.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v11.40.0...11.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v11.41.0...11.x)
+
+## [v11.41.0](https://github.com/laravel/framework/compare/v11.40.0...v11.41.0) - 2025-01-28
+
+* [11.x] more pint rules by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/54332
+* [11.x] Allow `TestComponent` to be macroable by [@ziadoz](https://github.com/ziadoz) in https://github.com/laravel/framework/pull/54359
+* [11.x] Fix validator return fails if using different date formats by [@mrvipchien](https://github.com/mrvipchien) in https://github.com/laravel/framework/pull/54350
+* [11.x] fix  the method `explodeExplicitRule` to support Customizable Date Validation by [@mrvipchien](https://github.com/mrvipchien) in https://github.com/laravel/framework/pull/54353
+* [11.x] Adds the `addPath()` method to the `Lang` facade and the `Translator` class. by [@selcukcukur](https://github.com/selcukcukur) in https://github.com/laravel/framework/pull/54347
+* Improve: add fire failed event at once by [@cesarMtorres](https://github.com/cesarMtorres) in https://github.com/laravel/framework/pull/54376
+* [11.x] feat: Create missing pgsql database when running migrations by [@mathiasgrimm](https://github.com/mathiasgrimm) in https://github.com/laravel/framework/pull/54314
+* [11.x] Proper rate limiter fix with phpredis serialization/compression enabled by [@TheLevti](https://github.com/TheLevti) in https://github.com/laravel/framework/pull/54372
+* Update Stringable Rule testcases by [@mrvipchien](https://github.com/mrvipchien) in https://github.com/laravel/framework/pull/54387
+* [11.x] Use `Date` facade for storing the password confirmation timestamp by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/54383
 
 ## [v11.40.0](https://github.com/laravel/framework/compare/v11.39.1...v11.40.0) - 2025-01-24
 
