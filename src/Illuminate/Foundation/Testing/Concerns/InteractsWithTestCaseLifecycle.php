@@ -241,10 +241,12 @@ trait InteractsWithTestCaseLifecycle
      */
     public static function tearDownAfterClassUsingTestCase()
     {
-        (function () {
-            $this->classDocBlocks = [];
-            $this->methodDocBlocks = [];
-        })->call(PHPUnitRegistry::getInstance());
+        if (class_exists(PHPUnitRegistry::class)) {
+            (function () {
+                $this->classDocBlocks = [];
+                $this->methodDocBlocks = [];
+            })->call(PHPUnitRegistry::getInstance());
+        }
     }
 
     /**
