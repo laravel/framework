@@ -5,11 +5,8 @@ namespace Illuminate\Support;
 use ArrayAccess;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Traits\InteractsWithData;
 use Illuminate\Support\Traits\Macroable;
-use Illuminate\Validation\Concerns\ValidatesAttributes;
-use Illuminate\Validation\ValidatesWhenResolvedTrait;
 use JsonSerializable;
 
 /**
