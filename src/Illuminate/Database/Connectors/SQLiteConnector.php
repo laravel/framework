@@ -30,6 +30,8 @@ class SQLiteConnector extends Connector implements ConnectorInterface
     }
 
     /**
+     * Get the absolute database path.
+     * 
      * @param  string  $path
      * @return string
      *
