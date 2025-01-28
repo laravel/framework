@@ -52,7 +52,7 @@ trait InteractsWithUniqueJobs
      */
     protected function getUniqueJobCacheStore($job): ?string
     {
-        if(! method_exists($job, 'uniqueVia')) {
+        if (! method_exists($job, 'uniqueVia')) {
             return config('cache.default');
         }
 
