@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Foundation\Http\Exceptions\MalformedUrlException;
 use Illuminate\Http\Request;
 
-class ValidateUTF8Path
+class ValidatePathEncoding
 {
     /**
      * Validate that the incoming request has a valid UTF-8 encoded path.

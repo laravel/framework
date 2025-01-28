@@ -3,14 +3,14 @@
 namespace Illuminate\Tests\Foundation\Http\Middleware;
 
 use Illuminate\Foundation\Http\Exceptions\MalformedUrlException;
-use Illuminate\Foundation\Http\Middleware\ValidateUTF8Path;
+use Illuminate\Foundation\Http\Middleware\ValidatePathEncoding;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
-class ValidateUTF8PathTest extends TestCase
+class ValidatePathEncodingTest extends TestCase
 {
     #[TestWith(['/'])]
     #[TestWith(['valid-path'])]
@@ -19,7 +19,7 @@ class ValidateUTF8PathTest extends TestCase
     #[TestWith(['汉字字符集'])]
     public function testValidPathsArePassing(string $path): void
     {
-        $middleware = new ValidateUTF8Path;
+        $middleware = new ValidatePathEncoding;
         $symfonyRequest = new SymfonyRequest;
         $symfonyRequest->server->set('REQUEST_METHOD', 'GET');
         $symfonyRequest->server->set('REQUEST_URI', $path);
@@ -35,7 +35,7 @@ class ValidateUTF8PathTest extends TestCase
     #[TestWith(['%c0'])]
     public function testInvalidPathsAreFailing(string $path): void
     {
-        $middleware = new ValidateUTF8Path;
+        $middleware = new ValidatePathEncoding;
         $symfonyRequest = new SymfonyRequest;
         $symfonyRequest->server->set('REQUEST_METHOD', 'GET');
         $symfonyRequest->server->set('REQUEST_URI', $path);
