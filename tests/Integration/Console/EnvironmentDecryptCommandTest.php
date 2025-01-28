@@ -52,20 +52,44 @@ class EnvironmentDecryptCommandTest extends TestCase
 
     public function testItFailsWhenEncryptionFileCannotBeFound()
     {
-        $this->filesystem->shouldReceive('exists')->andReturn(true);
-
-        $this->artisan('env:decrypt', ['--key' => 'secret-key'])
-            ->expectsOutputToContain('Environment file already exists.')
-            ->assertExitCode(1);
-    }
-
-    public function testItFailsWhenEnvironmentFileExists()
-    {
         $this->filesystem->shouldReceive('exists')->andReturn(false);
 
         $this->artisan('env:decrypt', ['--key' => 'secret-key'])
             ->expectsOutputToContain('Encrypted environment file not found.')
             ->assertExitCode(1);
+    }
+
+    public function testItFailsWhenEnvironmentFileExists()
+    {
+        $this->filesystem->shouldReceive('exists')->andReturn(true);
+
+        $this->artisan('env:decrypt', ['--key' => 'secret-key'])
+            ->expectsConfirmation('Environment file already exists. Do you want to overwrite it?', 'no')
+            ->assertExitCode(1);
+    }
+
+    public function testItPromptsForOverwriteWhenEnvironmentFileExists()
+    {
+        $this->filesystem->shouldReceive('exists')
+            ->once()
+            ->andReturn(true)
+            ->shouldReceive('exists')
+            ->once()
+            ->andReturn(true)
+            ->shouldReceive('get')
+            ->once()
+            ->andReturn(
+                (new Encrypter('abcdefghijklmnop', 'aes-128-gcm'))
+                    ->encrypt('APP_NAME="Laravel Two"')
+            );
+
+        $this->artisan('env:decrypt', ['--cipher' => 'aes-128-gcm', '--key' => 'abcdefghijklmnop'])
+            ->expectsConfirmation('Environment file already exists. Do you want to overwrite it?', 'yes')
+            ->expectsOutputToContain('Environment successfully decrypted.')
+            ->assertExitCode(0);
+
+        $this->filesystem->shouldHaveReceived('put')
+            ->with(base_path('.env'), 'APP_NAME="Laravel Two"');
     }
 
     public function testItGeneratesTheEnvironmentFileWithGeneratedKey()

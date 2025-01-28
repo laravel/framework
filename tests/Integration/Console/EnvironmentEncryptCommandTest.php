@@ -106,8 +106,28 @@ class EnvironmentEncryptCommandTest extends TestCase
 
         $this->artisan('env:encrypt')
             ->expectsQuestion('What encryption key would you like to use?', 'generate')
-            ->expectsOutputToContain('Encrypted environment file already exists.')
+            ->expectsConfirmation('Encrypted environment file already exists. Do you want to overwrite it?', 'no')
+            ->expectsOutputToContain('Command cancelled.')
             ->assertExitCode(1);
+    }
+
+    public function testItPromptsForOverwriteWhenEncryptedFileExistsWhenNotForcing()
+    {
+        $this->filesystem->shouldReceive('exists')
+            ->once()
+            ->andReturn(true)
+            ->shouldReceive('exists')
+            ->once()
+            ->andReturn(true);
+
+        $this->artisan('env:encrypt')
+            ->expectsQuestion('What encryption key would you like to use?', 'generate')
+            ->expectsConfirmation('Encrypted environment file already exists. Do you want to overwrite it?', 'yes')
+            ->expectsOutputToContain('.env.encrypted')
+            ->assertExitCode(0);
+
+        $this->filesystem->shouldHaveReceived('put')
+            ->with(base_path('.env.encrypted'), m::any());
     }
 
     public function testItGeneratesTheEncryptionFileWhenForcing()

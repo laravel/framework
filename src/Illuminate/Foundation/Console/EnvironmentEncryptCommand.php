@@ -9,6 +9,7 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Attribute\AsCommand;
 
+use function Laravel\Prompts\confirm;
 use function Laravel\Prompts\password;
 use function Laravel\Prompts\select;
 
@@ -96,8 +97,10 @@ class EnvironmentEncryptCommand extends Command
             $this->fail('Environment file not found.');
         }
 
-        if ($this->files->exists($encryptedFile) && ! $this->option('force')) {
-            $this->fail('Encrypted environment file already exists.');
+        if ($this->files->exists($encryptedFile) &&
+            ! $this->option('force') &&
+            ! confirm('Encrypted environment file already exists. Do you want to overwrite it?', default: false)) {
+            $this->fail('Command cancelled.');
         }
 
         try {
