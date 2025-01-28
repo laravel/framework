@@ -65,6 +65,7 @@ class EnvironmentDecryptCommandTest extends TestCase
 
         $this->artisan('env:decrypt', ['--key' => 'secret-key'])
             ->expectsConfirmation('Environment file already exists. Do you want to overwrite it?', 'no')
+            ->expectsOutputToContain('Command cancelled.')
             ->assertExitCode(1);
     }
 

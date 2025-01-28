@@ -94,7 +94,7 @@ class EnvironmentDecryptCommand extends Command
         if ($this->files->exists($outputFile) &&
             ! $this->option('force') &&
             ! confirm('Environment file already exists. Do you want to overwrite it?', default: false)) {
-            $this->fail('Environment file already exists.');
+            $this->fail('Command cancelled.');
         }
 
         try {
