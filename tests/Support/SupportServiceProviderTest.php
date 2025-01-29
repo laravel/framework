@@ -169,6 +169,7 @@ class SupportServiceProviderTest extends TestCase
 
         $this->app->shouldReceive('afterResolving')->once()->with('translator', m::on(function ($callback) use ($translator) {
             $callback($translator);
+
             return true;
         }));
 
@@ -183,6 +184,7 @@ class SupportServiceProviderTest extends TestCase
 
         $this->app->shouldReceive('afterResolving')->once()->with('translator', m::on(function ($callback) use ($translator) {
             $callback($translator);
+
             return true;
         }));
 
