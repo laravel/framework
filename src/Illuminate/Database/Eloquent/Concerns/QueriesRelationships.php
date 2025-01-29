@@ -146,7 +146,7 @@ trait QueriesRelationships
      * Add a relationship count / exists condition to the query with where clauses.
      *
      * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>|string  $relation
-     * @param  \Closure|null $callback
+     * @param  \Closure|null  $callback
      * @param  string  $operator
      * @param  int  $count
      * @return $this
