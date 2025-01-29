@@ -419,7 +419,7 @@ class SupportFluentTest extends TestCase
 
     public function testFill()
     {
-        $fluent = new Fluent(['name' => 'John Doe',]);
+        $fluent = new Fluent(['name' => 'John Doe']);
 
         $fluent->fill([
             'email' => 'john.doe@example.com',
