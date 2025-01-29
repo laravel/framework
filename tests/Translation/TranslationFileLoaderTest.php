@@ -14,6 +14,69 @@ class TranslationFileLoaderTest extends TestCase
         m::close();
     }
 
+    public function testLoadMethodLoadsTranslationsFromAddedPath()
+    {
+        $files = m::mock(Filesystem::class);
+        $loader = new FileLoader($files, __DIR__);
+        $loader->addPath(__DIR__ . '/another');
+
+        $files->shouldReceive('exists')->once()->with(__DIR__ . '/en/messages.php')->andReturn(true);
+        $files->shouldReceive('getRequire')->once()->with(__DIR__ . '/en/messages.php')->andReturn(['foo' => 'bar']);
+
+        $files->shouldReceive('exists')->once()->with(__DIR__ . '/another/en/messages.php')->andReturn(true);
+        $files->shouldReceive('getRequire')->once()->with(__DIR__ . '/another/en/messages.php')->andReturn(['baz' => 'backagesplash']);
+
+        $this->assertEquals(['foo' => 'bar', 'baz' => 'backagesplash'], $loader->load('en', 'messages'));
+    }
+
+    public function testLoadMethodHandlesMissingAddedPath()
+    {
+        $files = m::mock(Filesystem::class);
+        $loader = new FileLoader($files, __DIR__);
+        $loader->addPath(__DIR__ . '/missing');
+
+        $files->shouldReceive('exists')->once()->with(__DIR__ . '/en/messages.php')->andReturn(true);
+        $files->shouldReceive('getRequire')->once()->with(__DIR__ . '/en/messages.php')->andReturn(['foo' => 'bar']);
+
+        $files->shouldReceive('exists')->once()->with(__DIR__ . '/missing/en/messages.php')->andReturn(false);
+
+        $this->assertEquals(['foo' => 'bar'], $loader->load('en', 'messages'));
+    }
+
+    public function testLoadMethodOverwritesExistingKeysFromAddedPath()
+    {
+        $files = m::mock(Filesystem::class);
+        $loader = new FileLoader($files, __DIR__);
+        $loader->addPath(__DIR__ . '/another');
+
+        $files->shouldReceive('exists')->once()->with(__DIR__ . '/en/messages.php')->andReturn(true);
+        $files->shouldReceive('getRequire')->once()->with(__DIR__ . '/en/messages.php')->andReturn(['foo' => 'bar']);
+
+        $files->shouldReceive('exists')->once()->with(__DIR__ . '/another/en/messages.php')->andReturn(true);
+        $files->shouldReceive('getRequire')->once()->with(__DIR__ . '/another/en/messages.php')->andReturn(['foo' => 'baz']);
+
+        $this->assertEquals(['foo' => 'baz'], $loader->load('en', 'messages'));
+    }
+
+    public function testLoadMethodLoadsTranslationsFromMultipleAddedPaths()
+    {
+        $files = m::mock(Filesystem::class);
+        $loader = new FileLoader($files, __DIR__);
+        $loader->addPath(__DIR__ . '/another');
+        $loader->addPath(__DIR__ . '/yet-another');
+
+        $files->shouldReceive('exists')->once()->with(__DIR__ . '/en/messages.php')->andReturn(true);
+        $files->shouldReceive('getRequire')->once()->with(__DIR__ . '/en/messages.php')->andReturn(['foo' => 'bar']);
+
+        $files->shouldReceive('exists')->once()->with(__DIR__ . '/another/en/messages.php')->andReturn(true);
+        $files->shouldReceive('getRequire')->once()->with(__DIR__ . '/another/en/messages.php')->andReturn(['baz' => 'backagesplash']);
+
+        $files->shouldReceive('exists')->once()->with(__DIR__ . '/yet-another/en/messages.php')->andReturn(true);
+        $files->shouldReceive('getRequire')->once()->with(__DIR__ . '/yet-another/en/messages.php')->andReturn(['qux' => 'quux']);
+
+        $this->assertEquals(['foo' => 'bar', 'baz' => 'backagesplash', 'qux' => 'quux'], $loader->load('en', 'messages'));
+    }
+
     public function testLoadMethodWithoutNamespacesProperlyCallsLoader()
     {
         $loader = new FileLoader($files = m::mock(Filesystem::class), __DIR__);
