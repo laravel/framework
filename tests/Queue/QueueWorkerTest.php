@@ -112,6 +112,12 @@ class QueueWorkerTest extends TestCase
         $this->assertTrue($worker->memoryExceeded(1));
     }
 
+    public function testWorkerWemoryExceededWhenMemoryIsNegative()
+    {
+        $worker = new Worker(...$this->workerDependencies());
+        $this->assertFalse($worker->memoryExceeded(-1));
+    }
+
     public function testJobCanBeFiredBasedOnPriority()
     {
         $worker = $this->getWorker('default', [
