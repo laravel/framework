@@ -28,6 +28,7 @@ trait QueriesRelationships
      * @param  string  $operator
      * @param  int  $count
      * @param  string  $boolean
+     * @param  \Closure|null  $callback
      * @return $this
      *
      * @throws \RuntimeException
@@ -122,6 +123,7 @@ trait QueriesRelationships
      *
      * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>|string  $relation
      * @param  string  $boolean
+     * @param  \Closure|null  $callback
      * @return $this
      */
     public function doesntHave($relation, $boolean = 'and', ?Closure $callback = null)
@@ -144,6 +146,7 @@ trait QueriesRelationships
      * Add a relationship count / exists condition to the query with where clauses.
      *
      * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>|string  $relation
+     * @param  \Closure|null $callback
      * @param  string  $operator
      * @param  int  $count
      * @return $this
@@ -159,6 +162,7 @@ trait QueriesRelationships
      * Also load the relationship with same condition.
      *
      * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>|string  $relation
+     * @param  \Closure|null  $callback
      * @param  string  $operator
      * @param  int  $count
      * @return $this
@@ -173,6 +177,7 @@ trait QueriesRelationships
      * Add a relationship count / exists condition to the query with where clauses and an "or".
      *
      * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>|string  $relation
+     * @param  \Closure|null  $callback
      * @param  string  $operator
      * @param  int  $count
      * @return $this
@@ -186,6 +191,7 @@ trait QueriesRelationships
      * Add a relationship count / exists condition to the query with where clauses.
      *
      * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>|string  $relation
+     * @param  \Closure|null  $callback
      * @return $this
      */
     public function whereDoesntHave($relation, ?Closure $callback = null)
@@ -197,6 +203,7 @@ trait QueriesRelationships
      * Add a relationship count / exists condition to the query with where clauses and an "or".
      *
      * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>|string  $relation
+     * @param  \Closure|null  $callback
      * @return $this
      */
     public function orWhereDoesntHave($relation, ?Closure $callback = null)
@@ -212,6 +219,7 @@ trait QueriesRelationships
      * @param  string  $operator
      * @param  int  $count
      * @param  string  $boolean
+     * @param  \Closure|null  $callback
      * @return $this
      */
     public function hasMorph($relation, $types, $operator = '>=', $count = 1, $boolean = 'and', ?Closure $callback = null)
@@ -308,6 +316,7 @@ trait QueriesRelationships
      * @param  \Illuminate\Database\Eloquent\Relations\MorphTo<*, *>|string  $relation
      * @param  string|array  $types
      * @param  string  $boolean
+     * @param  \Closure|null  $callback
      * @return $this
      */
     public function doesntHaveMorph($relation, $types, $boolean = 'and', ?Closure $callback = null)
@@ -332,6 +341,7 @@ trait QueriesRelationships
      *
      * @param  \Illuminate\Database\Eloquent\Relations\MorphTo<*, *>|string  $relation
      * @param  string|array  $types
+     * @param  \Closure|null  $callback
      * @param  string  $operator
      * @param  int  $count
      * @return $this
@@ -346,6 +356,7 @@ trait QueriesRelationships
      *
      * @param  \Illuminate\Database\Eloquent\Relations\MorphTo<*, *>|string  $relation
      * @param  string|array  $types
+     * @param  \Closure|null  $callback
      * @param  string  $operator
      * @param  int  $count
      * @return $this
@@ -360,6 +371,7 @@ trait QueriesRelationships
      *
      * @param  \Illuminate\Database\Eloquent\Relations\MorphTo<*, *>|string  $relation
      * @param  string|array  $types
+     * @param  \Closure|null  $callback
      * @return $this
      */
     public function whereDoesntHaveMorph($relation, $types, ?Closure $callback = null)
@@ -372,6 +384,7 @@ trait QueriesRelationships
      *
      * @param  \Illuminate\Database\Eloquent\Relations\MorphTo<*, *>|string  $relation
      * @param  string|array  $types
+     * @param  \Closure|null  $callback
      * @return $this
      */
     public function orWhereDoesntHaveMorph($relation, $types, ?Closure $callback = null)
@@ -925,6 +938,11 @@ trait QueriesRelationships
 
     /**
      * Updates the table name for any columns with a new qualified name.
+     *
+     * @param  array  $wheres
+     * @param  string  $from
+     * @param  string  $to
+     * @return array
      */
     protected function requalifyWhereTables(array $wheres, string $from, string $to): array
     {
@@ -940,6 +958,7 @@ trait QueriesRelationships
     /**
      * Add a sub-query count clause to this query.
      *
+     * @param  \Illuminate\Database\Query\Builder  $query
      * @param  string  $operator
      * @param  int  $count
      * @param  string  $boolean
