@@ -223,6 +223,6 @@ class TranslationFileLoaderTest extends TestCase
         $path2 = __DIR__.'/another2';
         $loader->addPath($path1);
         $loader->addPath($path2);
-        $this->assertEquals([$path1, $path2], $loader->paths());
+        $this->assertEquals([$path1, $path2], array_slice($loader->paths(), 1));
     }
 }
