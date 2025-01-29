@@ -748,7 +748,7 @@ class Worker
      */
     public function memoryExceeded($memoryLimit)
     {
-        return (memory_get_usage(true) / 1024 / 1024) >= $memoryLimit;
+        return $memoryLimit && (memory_get_usage(true) / 1024 / 1024) >= $memoryLimit;
     }
 
     /**
