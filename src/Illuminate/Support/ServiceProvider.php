@@ -244,7 +244,7 @@ abstract class ServiceProvider
      */
     protected function loadTranslationsFrom($path, $namespace = null)
     {
-        $this->callAfterResolving('translator', fn($translator) => is_null($namespace)
+        $this->callAfterResolving('translator', fn ($translator) => is_null($namespace)
             ? $translator->addPath($path)
             : $translator->addNamespace($namespace, $path));
     }
