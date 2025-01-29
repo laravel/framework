@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Database;
 
 use BadMethodCallException;
+use Carbon\Carbon;
 use Closure;
 use DateTime;
 use Illuminate\Contracts\Database\Query\ConditionExpression;
@@ -627,6 +628,368 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->select('*')->from('users')->whereTime('created_at', '>=', '22:00');
         $this->assertSame('select * from "users" where "created_at"::time >= ?', $builder->toSql());
         $this->assertEquals([0 => '22:00'], $builder->getBindings());
+    }
+
+    public function testWherePast()
+    {
+        Carbon::setTestNow('2022-04-20 23:45:06.123456');
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('posts')->wherePast('published_at');
+        $this->assertSame('select * from "posts" where "published_at" < ?', $builder->toSql());
+        $this->assertEquals([0 => '2022-04-20 23:45:06.123456'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('posts')->where('id', '=', 1)->orWherePast('published_at');
+        $this->assertSame('select * from "posts" where "id" = ? or "published_at" < ?', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => '2022-04-20 23:45:06.123456'], $builder->getBindings());
+
+        $now = Carbon::create(2021, 1, 2, 3, 4, 56);
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('posts')->wherePast('published_at', $now);
+        $this->assertSame('select * from "posts" where "published_at" < ?', $builder->toSql());
+        $this->assertEquals([0 => '2021-01-02 03:04:56.000000'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('posts')->where('id', '=', 1)->orWherePast('published_at', $now);
+        $this->assertSame('select * from "posts" where "id" = ? or "published_at" < ?', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => '2021-01-02 03:04:56.000000'], $builder->getBindings());
+    }
+
+    public function testWherePastUsesArray()
+    {
+        Carbon::setTestNow('2022-04-20 12:34:56.123456');
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('posts')->wherePast(['published_at', 'held_at']);
+        $this->assertSame('select * from "posts" where "published_at" < ? and "held_at" < ?', $builder->toSql());
+        $this->assertEquals([0 => '2022-04-20 12:34:56.123456', 1 => '2022-04-20 12:34:56.123456'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('posts')->where('id', '=', 1)->orWherePast(['published_at', 'held_at']);
+        $this->assertSame('select * from "posts" where "id" = ? or "published_at" < ? or "held_at" < ?', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => '2022-04-20 12:34:56.123456', 2 => '2022-04-20 12:34:56.123456'], $builder->getBindings());
+
+        $now = Carbon::create(2021, 12, 31, 5, 6, 7);
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('posts')->wherePast(['published_at', 'held_at'], $now);
+        $this->assertSame('select * from "posts" where "published_at" < ? and "held_at" < ?', $builder->toSql());
+        $this->assertEquals([0 => '2021-12-31 05:06:07.000000', 1 => '2021-12-31 05:06:07.000000'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('posts')->where('id', '=', 1)->orWherePast(['published_at', 'held_at'], $now);
+        $this->assertSame('select * from "posts" where "id" = ? or "published_at" < ? or "held_at" < ?', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => '2021-12-31 05:06:07.000000', 2 => '2021-12-31 05:06:07.000000'], $builder->getBindings());
+    }
+
+    public function testWhereNotPast()
+    {
+        Carbon::setTestNow('2022-04-20 12:34:56.123456');
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('posts')->whereNotPast('published_at');
+        $this->assertSame('select * from "posts" where "published_at" >= ?', $builder->toSql());
+        $this->assertEquals([0 => '2022-04-20 12:34:56.123456'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('posts')->where('id', '=', 1)->orWhereNotPast('published_at');
+        $this->assertSame('select * from "posts" where "id" = ? or "published_at" >= ?', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => '2022-04-20 12:34:56.123456'], $builder->getBindings());
+
+        $now = Carbon::create(2021, 1, 2, 3, 4, 56);
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('posts')->whereNotPast('published_at', $now);
+        $this->assertSame('select * from "posts" where "published_at" >= ?', $builder->toSql());
+        $this->assertEquals([0 => '2021-01-02 03:04:56.000000'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('posts')->where('id', '=', 1)->orWhereNotPast('published_at', $now);
+        $this->assertSame('select * from "posts" where "id" = ? or "published_at" >= ?', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => '2021-01-02 03:04:56.000000'], $builder->getBindings());
+    }
+
+    public function testWhereNotPastWithArray()
+    {
+        Carbon::setTestNow('2022-04-20 12:34:56.123456');
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('posts')->whereNotPast(['published_at', 'held_at']);
+        $this->assertSame('select * from "posts" where "published_at" >= ? and "held_at" >= ?', $builder->toSql());
+        $this->assertEquals([0 => '2022-04-20 12:34:56.123456', 1 => '2022-04-20 12:34:56.123456'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('posts')->where('id', '=', 1)->orWhereNotPast(['published_at', 'held_at']);
+        $this->assertSame('select * from "posts" where "id" = ? or "published_at" >= ? or "held_at" >= ?', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => '2022-04-20 12:34:56.123456', 2 => '2022-04-20 12:34:56.123456'], $builder->getBindings());
+
+        $now = Carbon::create(2021, 11, 22, 3, 45, 6);
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('posts')->whereNotPast(['published_at', 'held_at'], $now);
+        $this->assertSame('select * from "posts" where "published_at" >= ? and "held_at" >= ?', $builder->toSql());
+        $this->assertEquals([0 => '2021-11-22 03:45:06.000000', 1 => '2021-11-22 03:45:06.000000'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('posts')->where('id', '=', 1)->orWhereNotPast(['published_at', 'held_at'], $now);
+        $this->assertSame('select * from "posts" where "id" = ? or "published_at" >= ? or "held_at" >= ?', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => '2021-11-22 03:45:06.000000', 2 => '2021-11-22 03:45:06.000000'], $builder->getBindings());
+    }
+
+    public function testWherePastPassingNowAsString()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('posts')->wherePast('published_at', '2022-04-22');
+        $this->assertSame('select * from "posts" where "published_at" < ?', $builder->toSql());
+        $this->assertEquals(['2022-04-22'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('posts')->where('id', '=', 1)->orWherePast('published_at', 'some-point-in-time');
+        $this->assertSame('select * from "posts" where "id" = ? or "published_at" < ?', $builder->toSql());
+        $this->assertEquals([1, 'some-point-in-time'], $builder->getBindings());
+    }
+
+    public function testWhereTodayMySQL()
+    {
+        Carbon::setTestNow('2022-04-20 12:34:56.123456');
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('posts')->whereToday('published_at');
+        $this->assertSame('select * from `posts` where date(`published_at`) = ?', $builder->toSql());
+        $this->assertEquals([0 => '2022-04-20'], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('posts')->where('id', '=', 1)->orWhereToday('published_at');
+        $this->assertSame('select * from `posts` where `id` = ? or date(`published_at`) = ?', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => '2022-04-20'], $builder->getBindings());
+    }
+
+    public function testPassingArrayToWhereTodayMySQL()
+    {
+        Carbon::setTestNow('2022-04-20 12:34:56.123456');
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('posts')->whereToday(['published_at', 'held_at']);
+        $this->assertSame('select * from `posts` where date(`published_at`) = ? and date(`held_at`) = ?', $builder->toSql());
+        $this->assertEquals([0 => '2022-04-20', 1 => '2022-04-20'], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('posts')->where('id', '=', 1)->orWhereToday(['published_at', 'held_at']);
+        $this->assertSame('select * from `posts` where `id` = ? or date(`published_at`) = ? or date(`held_at`) = ?', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => '2022-04-20', 2 => '2022-04-20'], $builder->getBindings());
+    }
+
+    public function testWhereNotTodayMySQL()
+    {
+        Carbon::setTestNow('2022-04-20 12:34:56.123456');
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('posts')->whereNotToday('published_at');
+        $this->assertSame('select * from `posts` where date(`published_at`) != ?', $builder->toSql());
+        $this->assertEquals([0 => '2022-04-20'], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('posts')->where('id', '=', 1)->orWhereNotToday('published_at');
+        $this->assertSame('select * from `posts` where `id` = ? or date(`published_at`) != ?', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => '2022-04-20'], $builder->getBindings());
+    }
+
+    public function testPassingArrayToWhereNotTodayMySQL()
+    {
+        Carbon::setTestNow('2022-04-20 12:34:56.123456');
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('posts')->whereNotToday(['published_at', 'held_at']);
+        $this->assertSame('select * from `posts` where date(`published_at`) != ? and date(`held_at`) != ?', $builder->toSql());
+        $this->assertEquals([0 => '2022-04-20', 1 => '2022-04-20'], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('posts')->where('id', '=', 1)->orWhereNotToday(['published_at', 'held_at']);
+        $this->assertSame('select * from `posts` where `id` = ? or date(`published_at`) != ? or date(`held_at`) != ?', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => '2022-04-20', 2 => '2022-04-20'], $builder->getBindings());
+    }
+
+    public function testWhereTodaySqlServer()
+    {
+        Carbon::setTestNow('2022-04-20 12:34:56.123456');
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('posts')->whereToday('published_at');
+        $this->assertSame('select * from [posts] where cast([published_at] as date) = ?', $builder->toSql());
+        $this->assertEquals([0 => '2022-04-20'], $builder->getBindings());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('posts')->where('id', '=', 1)->orWhereToday('published_at');
+        $this->assertSame('select * from [posts] where [id] = ? or cast([published_at] as date) = ?', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => '2022-04-20'], $builder->getBindings());
+    }
+
+    public function testPassingArrayToWhereTodaySqlServer()
+    {
+        Carbon::setTestNow('2022-04-20 12:34:56.123456');
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('posts')->whereToday(['published_at', 'held_at']);
+        $this->assertSame('select * from [posts] where cast([published_at] as date) = ? and cast([held_at] as date) = ?', $builder->toSql());
+        $this->assertEquals([0 => '2022-04-20', 1 => '2022-04-20'], $builder->getBindings());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('posts')->where('id', '=', 1)->orWhereToday(['published_at', 'held_at']);
+        $this->assertSame('select * from [posts] where [id] = ? or cast([published_at] as date) = ? or cast([held_at] as date) = ?', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => '2022-04-20', 2 => '2022-04-20'], $builder->getBindings());
+    }
+
+    public function testWhereNotTodaySqlServer()
+    {
+        Carbon::setTestNow('2022-04-20 12:34:56.123456');
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('posts')->whereNotToday('published_at');
+        $this->assertSame('select * from [posts] where cast([published_at] as date) != ?', $builder->toSql());
+        $this->assertEquals([0 => '2022-04-20'], $builder->getBindings());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('posts')->where('id', '=', 1)->orWhereNotToday('published_at');
+        $this->assertSame('select * from [posts] where [id] = ? or cast([published_at] as date) != ?', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => '2022-04-20'], $builder->getBindings());
+    }
+
+    public function testPassingArrayToWhereNotTodaySqlServer()
+    {
+        Carbon::setTestNow('2022-04-20 12:34:56.123456');
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('posts')->whereNotToday(['published_at', 'held_at']);
+        $this->assertSame('select * from [posts] where cast([published_at] as date) != ? and cast([held_at] as date) != ?', $builder->toSql());
+        $this->assertEquals([0 => '2022-04-20', 1 => '2022-04-20'], $builder->getBindings());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('posts')->where('id', '=', 1)->orWhereNotToday(['published_at', 'held_at']);
+        $this->assertSame('select * from [posts] where [id] = ? or cast([published_at] as date) != ? or cast([held_at] as date) != ?', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => '2022-04-20', 2 => '2022-04-20'], $builder->getBindings());
+    }
+
+    public function testWhereFuture()
+    {
+        Carbon::setTestNow('2022-04-22 21:01:23.123456');
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('posts')->whereFuture('published_at');
+        $this->assertSame('select * from "posts" where "published_at" > ?', $builder->toSql());
+        $this->assertEquals([0 => '2022-04-22 21:01:23.123456'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('posts')->where('id', '=', 1)->orWhereFuture('published_at');
+        $this->assertSame('select * from "posts" where "id" = ? or "published_at" > ?', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => '2022-04-22 21:01:23.123456'], $builder->getBindings());
+
+        $now = \DateTime::createFromFormat('Y-m-d H:i:s.u', '2022-04-22 23:11:09.987654');
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('posts')->whereFuture('published_at', $now);
+        $this->assertSame('select * from "posts" where "published_at" > ?', $builder->toSql());
+        $this->assertEquals(['2022-04-22 23:11:09.987654'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('posts')->where('id', '=', 1)->orWhereFuture('published_at', $now);
+        $this->assertSame('select * from "posts" where "id" = ? or "published_at" > ?', $builder->toSql());
+        $this->assertEquals([1, '2022-04-22 23:11:09.987654'], $builder->getBindings());
+    }
+
+    public function testPassingArrayToWhereFuture()
+    {
+        Carbon::setTestNow('2022-04-22 01:23:45.123456');
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('posts')->whereFuture(['published_at', 'held_at']);
+        $this->assertSame('select * from "posts" where "published_at" > ? and "held_at" > ?', $builder->toSql());
+        $this->assertEquals([0 => '2022-04-22 01:23:45.123456', 1 => '2022-04-22 01:23:45.123456'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('posts')->where('id', '=', 1)->orWhereFuture(['published_at', 'held_at']);
+        $this->assertSame('select * from "posts" where "id" = ? or "published_at" > ? or "held_at" > ?', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => '2022-04-22 01:23:45.123456', 2 => '2022-04-22 01:23:45.123456'], $builder->getBindings());
+
+        $now = \DateTime::createFromFormat('Y-m-d H:i:s.u', '2022-04-22 23:11:09.987654');
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('posts')->whereFuture(['published_at', 'held_at'], $now);
+        $this->assertSame('select * from "posts" where "published_at" > ? and "held_at" > ?', $builder->toSql());
+        $this->assertEquals(['2022-04-22 23:11:09.987654', '2022-04-22 23:11:09.987654'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('posts')->where('id', '=', 1)->orWhereFuture(['published_at', 'held_at'], $now);
+        $this->assertSame('select * from "posts" where "id" = ? or "published_at" > ? or "held_at" > ?', $builder->toSql());
+        $this->assertEquals([1, '2022-04-22 23:11:09.987654', '2022-04-22 23:11:09.987654'], $builder->getBindings());
+    }
+
+    public function testWhereNotFuture()
+    {
+        Carbon::setTestNow('2022-04-22 01:23:45.123456');
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('posts')->whereNotFuture('published_at');
+        $this->assertSame('select * from "posts" where "published_at" <= ?', $builder->toSql());
+        $this->assertEquals([0 => '2022-04-22 01:23:45.123456'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('posts')->where('id', '=', 1)->orWhereNotFuture('published_at');
+        $this->assertSame('select * from "posts" where "id" = ? or "published_at" <= ?', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => '2022-04-22 01:23:45.123456'], $builder->getBindings());
+
+        $now = Carbon::create(2021, 2, 3, 4, 5, 6);
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('posts')->whereNotFuture('published_at', $now);
+        $this->assertSame('select * from "posts" where "published_at" <= ?', $builder->toSql());
+        $this->assertEquals([0 => '2021-02-03 04:05:06.000000'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('posts')->where('id', '=', 1)->orWhereNotFuture('published_at', $now);
+        $this->assertSame('select * from "posts" where "id" = ? or "published_at" <= ?', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => '2021-02-03 04:05:06.000000'], $builder->getBindings());
+    }
+
+    public function testPassingArrayToWhereNotFuture()
+    {
+        Carbon::setTestNow('2022-04-22 01:23:45.123456');
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('posts')->whereNotFuture(['published_at', 'held_at']);
+        $this->assertSame('select * from "posts" where "published_at" <= ? and "held_at" <= ?', $builder->toSql());
+        $this->assertEquals([0 => '2022-04-22 01:23:45.123456', 1 => '2022-04-22 01:23:45.123456'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('posts')->where('id', '=', 1)->orWhereNotFuture(['published_at', 'held_at']);
+        $this->assertSame('select * from "posts" where "id" = ? or "published_at" <= ? or "held_at" <= ?', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => '2022-04-22 01:23:45.123456', 2 => '2022-04-22 01:23:45.123456'], $builder->getBindings());
+
+        $now = Carbon::create(2021, 2, 3, 4, 5, 6);
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('posts')->whereNotFuture(['published_at', 'held_at'], $now);
+        $this->assertSame('select * from "posts" where "published_at" <= ? and "held_at" <= ?', $builder->toSql());
+        $this->assertEquals(['2021-02-03 04:05:06.000000', '2021-02-03 04:05:06.000000'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('posts')->where('id', '=', 1)->orWhereNotFuture(['published_at', 'held_at'], $now);
+        $this->assertSame('select * from "posts" where "id" = ? or "published_at" <= ? or "held_at" <= ?', $builder->toSql());
+        $this->assertEquals([1, '2021-02-03 04:05:06.000000', '2021-02-03 04:05:06.000000'], $builder->getBindings());
+    }
+
+    public function testPassingStringToWhereFuture()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('posts')->whereFuture('published_at', '2022-04-22 23:11:09');
+        $this->assertSame('select * from "posts" where "published_at" > ?', $builder->toSql());
+        $this->assertEquals(['2022-04-22 23:11:09'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('posts')->where('id', '=', 1)->orWhereFuture('published_at', 'date-string');
+        $this->assertSame('select * from "posts" where "id" = ? or "published_at" > ?', $builder->toSql());
+        $this->assertEquals([1, 'date-string'], $builder->getBindings());
     }
 
     public function testWhereLikePostgres()
