@@ -401,12 +401,12 @@ trait MakesHttpRequests
      * Visit the given URI with a POST request, expecting a JSON response.
      *
      * @param  \Illuminate\Support\Uri|string  $uri
-     * @param  array  $data
+     * @param  mixed  $data
      * @param  array  $headers
      * @param  int  $options
      * @return \Illuminate\Testing\TestResponse
      */
-    public function postJson($uri, array $data = [], array $headers = [], $options = 0)
+    public function postJson($uri, mixed $data = [], array $headers = [], $options = 0)
     {
         return $this->json('POST', $uri, $data, $headers, $options);
     }
@@ -431,12 +431,12 @@ trait MakesHttpRequests
      * Visit the given URI with a PUT request, expecting a JSON response.
      *
      * @param  \Illuminate\Support\Uri|string  $uri
-     * @param  array  $data
+     * @param  mixed  $data
      * @param  array  $headers
      * @param  int  $options
      * @return \Illuminate\Testing\TestResponse
      */
-    public function putJson($uri, array $data = [], array $headers = [], $options = 0)
+    public function putJson($uri, mixed $data = [], array $headers = [], $options = 0)
     {
         return $this->json('PUT', $uri, $data, $headers, $options);
     }
@@ -461,12 +461,12 @@ trait MakesHttpRequests
      * Visit the given URI with a PATCH request, expecting a JSON response.
      *
      * @param  \Illuminate\Support\Uri|string  $uri
-     * @param  array  $data
+     * @param  mixed  $data
      * @param  array  $headers
      * @param  int  $options
      * @return \Illuminate\Testing\TestResponse
      */
-    public function patchJson($uri, array $data = [], array $headers = [], $options = 0)
+    public function patchJson($uri, mixed $data = [], array $headers = [], $options = 0)
     {
         return $this->json('PATCH', $uri, $data, $headers, $options);
     }
@@ -491,12 +491,12 @@ trait MakesHttpRequests
      * Visit the given URI with a DELETE request, expecting a JSON response.
      *
      * @param  \Illuminate\Support\Uri|string  $uri
-     * @param  array  $data
+     * @param  mixed  $data
      * @param  array  $headers
      * @param  int  $options
      * @return \Illuminate\Testing\TestResponse
      */
-    public function deleteJson($uri, array $data = [], array $headers = [], $options = 0)
+    public function deleteJson($uri, mixed $data = [], array $headers = [], $options = 0)
     {
         return $this->json('DELETE', $uri, $data, $headers, $options);
     }
@@ -522,12 +522,12 @@ trait MakesHttpRequests
      * Visit the given URI with an OPTIONS request, expecting a JSON response.
      *
      * @param  \Illuminate\Support\Uri|string  $uri
-     * @param  array  $data
+     * @param  mixed  $data
      * @param  array  $headers
      * @param  int  $options
      * @return \Illuminate\Testing\TestResponse
      */
-    public function optionsJson($uri, array $data = [], array $headers = [], $options = 0)
+    public function optionsJson($uri, mixed $data = [], array $headers = [], $options = 0)
     {
         return $this->json('OPTIONS', $uri, $data, $headers, $options);
     }
@@ -553,14 +553,14 @@ trait MakesHttpRequests
      *
      * @param  string  $method
      * @param  \Illuminate\Support\Uri|string  $uri
-     * @param  array  $data
+     * @param  mixed  $data
      * @param  array  $headers
      * @param  int  $options
      * @return \Illuminate\Testing\TestResponse
      */
-    public function json($method, $uri, array $data = [], array $headers = [], $options = 0)
+    public function json($method, $uri, mixed $data = [], array $headers = [], $options = 0)
     {
-        $files = $this->extractFilesFromDataArray($data);
+        $files = is_array($data) ? $this->extractFilesFromDataArray($data) : [];
 
         $content = json_encode($data, $options);
 
