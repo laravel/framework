@@ -209,7 +209,7 @@ class ServiceProviderForTestingOne extends ServiceProvider
         $this->publishesMigrations(['source/tagged/multiple_two' => 'destination/tagged/multiple_two'], ['tag_four', 'tag_five']);
     }
 
-    protected function loadTranslationsFrom($path, $namespace = null)
+    public function loadTranslationsFrom($path, $namespace = null)
     {
         $this->callAfterResolving('translator', fn ($translator) => is_null($namespace)
             ? $translator->addPath($path)
