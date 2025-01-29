@@ -152,4 +152,14 @@ class TranslationFileLoaderTest extends TestCase
         $loader->addJsonPath($path2);
         $this->assertEquals([$path1, $path2], $loader->jsonPaths());
     }
+
+    public function testAllAddedPathsReturnProperly()
+    {
+        $loader = new FileLoader(m::mock(Filesystem::class), __DIR__);
+        $path1 = __DIR__.'/another';
+        $path2 = __DIR__.'/another2';
+        $loader->addPath($path1);
+        $loader->addPath($path2);
+        $this->assertEquals([$path1, $path2], $loader->paths());
+    }
 }
