@@ -18,13 +18,13 @@ class TranslationFileLoaderTest extends TestCase
     {
         $files = m::mock(Filesystem::class);
         $loader = new FileLoader($files, __DIR__);
-        $loader->addPath(__DIR__ . '/another');
+        $loader->addPath(__DIR__.'/another');
 
-        $files->shouldReceive('exists')->once()->with(__DIR__ . '/en/messages.php')->andReturn(true);
-        $files->shouldReceive('getRequire')->once()->with(__DIR__ . '/en/messages.php')->andReturn(['foo' => 'bar']);
+        $files->shouldReceive('exists')->once()->with(__DIR__.'/en/messages.php')->andReturn(true);
+        $files->shouldReceive('getRequire')->once()->with(__DIR__.'/en/messages.php')->andReturn(['foo' => 'bar']);
 
-        $files->shouldReceive('exists')->once()->with(__DIR__ . '/another/en/messages.php')->andReturn(true);
-        $files->shouldReceive('getRequire')->once()->with(__DIR__ . '/another/en/messages.php')->andReturn(['baz' => 'backagesplash']);
+        $files->shouldReceive('exists')->once()->with(__DIR__.'/another/en/messages.php')->andReturn(true);
+        $files->shouldReceive('getRequire')->once()->with(__DIR__.'/another/en/messages.php')->andReturn(['baz' => 'backagesplash']);
 
         $this->assertEquals(['foo' => 'bar', 'baz' => 'backagesplash'], $loader->load('en', 'messages'));
     }
@@ -33,12 +33,12 @@ class TranslationFileLoaderTest extends TestCase
     {
         $files = m::mock(Filesystem::class);
         $loader = new FileLoader($files, __DIR__);
-        $loader->addPath(__DIR__ . '/missing');
+        $loader->addPath(__DIR__.'/missing');
 
-        $files->shouldReceive('exists')->once()->with(__DIR__ . '/en/messages.php')->andReturn(true);
-        $files->shouldReceive('getRequire')->once()->with(__DIR__ . '/en/messages.php')->andReturn(['foo' => 'bar']);
+        $files->shouldReceive('exists')->once()->with(__DIR__.'/en/messages.php')->andReturn(true);
+        $files->shouldReceive('getRequire')->once()->with(__DIR__.'/en/messages.php')->andReturn(['foo' => 'bar']);
 
-        $files->shouldReceive('exists')->once()->with(__DIR__ . '/missing/en/messages.php')->andReturn(false);
+        $files->shouldReceive('exists')->once()->with(__DIR__.'/missing/en/messages.php')->andReturn(false);
 
         $this->assertEquals(['foo' => 'bar'], $loader->load('en', 'messages'));
     }
@@ -47,13 +47,13 @@ class TranslationFileLoaderTest extends TestCase
     {
         $files = m::mock(Filesystem::class);
         $loader = new FileLoader($files, __DIR__);
-        $loader->addPath(__DIR__ . '/another');
+        $loader->addPath(__DIR__.'/another');
 
-        $files->shouldReceive('exists')->once()->with(__DIR__ . '/en/messages.php')->andReturn(true);
-        $files->shouldReceive('getRequire')->once()->with(__DIR__ . '/en/messages.php')->andReturn(['foo' => 'bar']);
+        $files->shouldReceive('exists')->once()->with(__DIR__.'/en/messages.php')->andReturn(true);
+        $files->shouldReceive('getRequire')->once()->with(__DIR__.'/en/messages.php')->andReturn(['foo' => 'bar']);
 
-        $files->shouldReceive('exists')->once()->with(__DIR__ . '/another/en/messages.php')->andReturn(true);
-        $files->shouldReceive('getRequire')->once()->with(__DIR__ . '/another/en/messages.php')->andReturn(['foo' => 'baz']);
+        $files->shouldReceive('exists')->once()->with(__DIR__.'/another/en/messages.php')->andReturn(true);
+        $files->shouldReceive('getRequire')->once()->with(__DIR__.'/another/en/messages.php')->andReturn(['foo' => 'baz']);
 
         $this->assertEquals(['foo' => 'baz'], $loader->load('en', 'messages'));
     }
@@ -62,17 +62,17 @@ class TranslationFileLoaderTest extends TestCase
     {
         $files = m::mock(Filesystem::class);
         $loader = new FileLoader($files, __DIR__);
-        $loader->addPath(__DIR__ . '/another');
-        $loader->addPath(__DIR__ . '/yet-another');
+        $loader->addPath(__DIR__.'/another');
+        $loader->addPath(__DIR__.'/yet-another');
 
-        $files->shouldReceive('exists')->once()->with(__DIR__ . '/en/messages.php')->andReturn(true);
-        $files->shouldReceive('getRequire')->once()->with(__DIR__ . '/en/messages.php')->andReturn(['foo' => 'bar']);
+        $files->shouldReceive('exists')->once()->with(__DIR__.'/en/messages.php')->andReturn(true);
+        $files->shouldReceive('getRequire')->once()->with(__DIR__.'/en/messages.php')->andReturn(['foo' => 'bar']);
 
-        $files->shouldReceive('exists')->once()->with(__DIR__ . '/another/en/messages.php')->andReturn(true);
-        $files->shouldReceive('getRequire')->once()->with(__DIR__ . '/another/en/messages.php')->andReturn(['baz' => 'backagesplash']);
+        $files->shouldReceive('exists')->once()->with(__DIR__.'/another/en/messages.php')->andReturn(true);
+        $files->shouldReceive('getRequire')->once()->with(__DIR__.'/another/en/messages.php')->andReturn(['baz' => 'backagesplash']);
 
-        $files->shouldReceive('exists')->once()->with(__DIR__ . '/yet-another/en/messages.php')->andReturn(true);
-        $files->shouldReceive('getRequire')->once()->with(__DIR__ . '/yet-another/en/messages.php')->andReturn(['qux' => 'quux']);
+        $files->shouldReceive('exists')->once()->with(__DIR__.'/yet-another/en/messages.php')->andReturn(true);
+        $files->shouldReceive('getRequire')->once()->with(__DIR__.'/yet-another/en/messages.php')->andReturn(['qux' => 'quux']);
 
         $this->assertEquals(['foo' => 'bar', 'baz' => 'backagesplash', 'qux' => 'quux'], $loader->load('en', 'messages'));
     }
