@@ -65,7 +65,7 @@ class Cloud
             $connection = $connection ?? $app['config']->get('database.default');
 
             return $resolver->connection(
-                $connection === 'pgsql' ? 'pgsql-unpooled' : 'pgsql'
+                $connection === 'pgsql' ? 'pgsql-unpooled' : $connection
             );
         });
     }
