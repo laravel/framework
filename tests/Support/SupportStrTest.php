@@ -185,6 +185,11 @@ class SupportStrTest extends TestCase
         $this->assertFalse(Str::startsWith('你好', 'a'));
     }
 
+    public function testDoesntStartWith()
+    {
+        $this->assertTrue(Str::doesntStartWith('laravel', 'vel'));
+    }
+
     public function testEndsWith()
     {
         $this->assertTrue(Str::endsWith('jason', 'on'));
