@@ -37,7 +37,7 @@ class Cloud
     /**
      * Adjust the database configuration for pooled Laravel Postgres.
      */
-    protected static function configureUnpooledPostgresConnection(Application $app): void
+    public static function configureUnpooledPostgresConnection(Application $app): void
     {
         $host = $app['config']->get('database.connections.pgsql.host', '');
 
@@ -55,7 +55,7 @@ class Cloud
     /**
      * Ensure that migrations use the unpooled Postgres connection if applicable.
      */
-    protected static function ensureMigrationsUseUnpooledConnection(Application $app): void
+    public static function ensureMigrationsUseUnpooledConnection(Application $app): void
     {
         if (! is_array($app['config']->get('database.connections.pgsql-unpooled'))) {
             return;
@@ -73,7 +73,7 @@ class Cloud
     /**
      * Configure the Laravel Cloud log channels.
      */
-    protected static function configureCloudLogging(Application $app): void
+    public static function configureCloudLogging(Application $app): void
     {
         $app['config']->set('logging.channels.stderr.formatter_with', [
             'includeStacktraces' => true,
