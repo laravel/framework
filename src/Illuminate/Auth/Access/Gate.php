@@ -731,9 +731,7 @@ class Gate implements GateContract
         if ($attributes !== []) {
             $usePolicy = $attributes[0]->newInstance();
 
-            $policy = new $usePolicy->policyClass;
-
-            return $policy;
+            return $this->resolvePolicy($usePolicy->policyClass);
         }
 
         return null;
