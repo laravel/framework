@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Auth;
 
+use Illuminate\Auth\Access\Attributes\UsePolicy;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\Access\Gate;
 use Illuminate\Auth\Access\HandlesAuthorization;
@@ -610,6 +611,18 @@ class AuthAccessGateTest extends TestCase
         });
 
         $this->assertTrue($gate->forUser((object) ['id' => 2])->check('foo'));
+    }
+
+    public function testForUserMethodAttachesANewUserToANewGateInstanceWithTryResolvePolicyViaUsePolicyAttributeCallback()
+    {
+        $gate = $this->getBasicGate();
+
+        $policy = $gate->getPolicyFor(AccessGateTestDummyWithUsePolicyAttribute::class);
+
+        $this->assertTrue(
+            $policy instanceof AccessGateTestPolicy && 
+            get_class($policy) === AccessGateTestPolicy::class
+        );
     }
 
     public function testForUserMethodAttachesANewUserToANewGateInstanceWithGuessCallback()
@@ -1338,6 +1351,12 @@ interface AccessGateTestDummyInterface
 }
 
 class AccessGateTestDummy implements AccessGateTestDummyInterface
+{
+    //
+}
+
+#[UsePolicy(AccessGateTestPolicy::class)]
+class AccessGateTestDummyWithUsePolicyAttribute implements AccessGateTestDummyInterface
 {
     //
 }

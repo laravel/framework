@@ -4,6 +4,9 @@ namespace Illuminate\Auth\Access;
 
 use Closure;
 use Exception;
+use function Illuminate\Support\enum_value;
+
+use Illuminate\Auth\Access\Attributes\UsePolicy;
 use Illuminate\Auth\Access\Events\GateEvaluated;
 use Illuminate\Contracts\Auth\Access\Gate as GateContract;
 use Illuminate\Contracts\Container\Container;
@@ -13,9 +16,8 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use ReflectionClass;
-use ReflectionFunction;
 
-use function Illuminate\Support\enum_value;
+use ReflectionFunction;
 
 class Gate implements GateContract
 {
@@ -670,6 +672,10 @@ class Gate implements GateContract
             return $this->resolvePolicy($this->policies[$class]);
         }
 
+        if ($policy = $this->tryResolvePolicyViaUsePolicyAttribute($class)) {
+            return $policy;
+        }
+
         foreach ($this->guessPolicyName($class) as $guessedPolicy) {
             if (class_exists($guessedPolicy)) {
                 return $this->resolvePolicy($guessedPolicy);
@@ -706,6 +712,32 @@ class Gate implements GateContract
         })->reverse()->values()->first(function ($class) {
             return class_exists($class);
         }) ?: [$classDirname.'\\Policies\\'.class_basename($class).'Policy']);
+    }
+
+    /**
+     * Try to resolve the policy via the UsePolicy attribute.
+     *
+     * @param  class-string  $class
+     * @return mixed
+     */
+    protected function tryResolvePolicyViaUsePolicyAttribute($class)
+    {
+        try {
+            $attributes = (new \ReflectionClass($class))
+                ->getAttributes(UsePolicy::class);
+        } catch (Exception) {
+            return null;
+        }
+
+        if ($attributes !== []) {
+            $usePolicy = $attributes[0]->newInstance();
+
+            $policy = new $usePolicy->policyClass;
+
+            return $policy;
+        }
+
+        return null;
     }
 
     /**
