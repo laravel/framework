@@ -23,4 +23,37 @@ class CloudTest extends TestCase
             'password' => 'test-password',
         ], $this->app['config']->get('database.connections.pgsql-unpooled'));
     }
+
+    public function test_it_can_configure_disks()
+    {
+        $_SERVER['LARAVEL_CLOUD_DISK_CONFIG'] = json_encode(
+            [
+                [
+                    'disk' => 'test-disk',
+                    'access_key_id' => 'test-access-key-id',
+                    'access_key_secret' => 'test-access-key-secret',
+                    'bucket' => 'test-bucket',
+                    'url' => 'test-url',
+                    'endpoint' => 'test-endpoint',
+                    'is_default' => false,
+                ],
+                [
+                    'disk' => 'test-disk-2',
+                    'access_key_id' => 'test-access-key-id-2',
+                    'access_key_secret' => 'test-access-key-secret-2',
+                    'bucket' => 'test-bucket-2',
+                    'url' => 'test-url-2',
+                    'endpoint' => 'test-endpoint-2',
+                    'is_default' => true,
+                ],
+            ]
+        );
+
+        Cloud::configureDisks($this->app);
+
+        $this->assertEquals('test-disk-2', $this->app['config']->get('filesystems.default'));
+        $this->assertEquals('test-access-key-id', $this->app['config']->get('filesystems.disks.test-disk.key'));
+
+        unset($_SERVER['LARAVEL_CLOUD_DISK_CONFIG']);
+    }
 }
