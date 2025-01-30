@@ -96,7 +96,7 @@ class ValidationRuleParser
         }
 
         return array_map(
-            [$this, 'prepareRule'],
+            $this->prepareRule(...),
             $rule,
             array_fill((int) array_key_first($rule), count($rule), $attribute)
         );
@@ -132,11 +132,13 @@ class ValidationRuleParser
             )->rules[$attribute];
         }
 
-        if (str_contains((string) $rule, '|')) {
-            return explode('|', (string) $rule);
+        $rule = (string) $rule;
+
+        if (str_contains($rule, '|')) {
+            return explode('|', $rule);
         }
 
-        return (string) $rule;
+        return $rule;
     }
 
     /**
