@@ -1,6 +1,8 @@
 # Release Notes for 11.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v11.41.1...11.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v11.41.2...11.x)
+
+## [v11.41.2](https://github.com/laravel/framework/compare/v11.41.1...v11.41.2) - 2025-01-30
 
 ## [v11.41.1](https://github.com/laravel/framework/compare/v11.41.0...v11.41.1) - 2025-01-30
 
