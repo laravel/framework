@@ -181,6 +181,13 @@ class Handler implements ExceptionHandlerContract
     protected $reportedExceptionMap;
 
     /**
+     * The registered custom error view paths.
+     *
+     * @var string[]
+     */
+    protected $customErrorViewPath;
+
+    /**
      * Create a new exception handler instance.
      *
      * @param  \Illuminate\Contracts\Container\Container  $container
@@ -912,7 +919,9 @@ class Handler implements ExceptionHandlerContract
      */
     protected function registerErrorViewPaths()
     {
-        (new RegisterErrorViewPaths)();
+        View::replaceNamespace('errors', (new Collection(config('view.paths')))->map(function ($path) {
+            return "{$path}/errors";
+        })->push($this->customErrorViewPath ?: __DIR__.'/views')->all());
     }
 
     /**
@@ -1071,5 +1080,16 @@ class Handler implements ExceptionHandlerContract
     protected function newLogger()
     {
         return $this->container->make(LoggerInterface::class);
+    }
+
+    /**
+     * Register a new custom error view path.
+     *
+     * @param  string  $path
+     * @return void
+     */
+    public function withCustomErrorViewPath($path)
+    {
+        $this->customErrorViewPath = $path;
     }
 }
