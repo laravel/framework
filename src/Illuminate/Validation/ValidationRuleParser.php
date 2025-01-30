@@ -9,7 +9,6 @@ use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-use Illuminate\Validation\Rules\Date;
 use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\Unique;
 
@@ -96,17 +95,11 @@ class ValidationRuleParser
             return Arr::wrap($this->prepareRule($rule, $attribute));
         }
 
-        $rules = [];
-
-        foreach ($rule as $value) {
-            if ($value instanceof Date) {
-                $rules = array_merge($rules, explode('|', (string) $value));
-            } else {
-                $rules[] = $this->prepareRule($value, $attribute);
-            }
-        }
-
-        return $rules;
+        return array_map(
+            [$this, 'prepareRule'],
+            $rule,
+            array_fill((int) array_key_first($rule), count($rule), $attribute)
+        );
     }
 
     /**
@@ -137,6 +130,10 @@ class ValidationRuleParser
             return $rule->compile(
                 $attribute, $this->data[$attribute] ?? null, Arr::dot($this->data), $this->data
             )->rules[$attribute];
+        }
+
+        if (str_contains((string) $rule, '|')) {
+            return explode('|', (string) $rule);
         }
 
         return (string) $rule;
