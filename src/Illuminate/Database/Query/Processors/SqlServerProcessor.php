@@ -15,7 +15,7 @@ class SqlServerProcessor extends Processor
      * @param  string  $sql
      * @param  array  $values
      * @param  string|null  $sequence
-     * @return int
+     * @return false|int
      */
     public function processInsertGetId(Builder $query, $sql, $values, $sequence = null)
     {

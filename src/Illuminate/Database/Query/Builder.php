@@ -3786,7 +3786,7 @@ class Builder implements BuilderContract
      *
      * @param  array  $values
      * @param  string|null  $sequence
-     * @return int
+     * @return false|int
      */
     public function insertGetId(array $values, $sequence = null)
     {

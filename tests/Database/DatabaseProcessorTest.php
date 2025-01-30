@@ -29,6 +29,28 @@ class DatabaseProcessorTest extends TestCase
         $result = $processor->processInsertGetId($builder, 'sql', ['foo'], 'id');
         $this->assertSame(1, $result);
     }
+
+    public function testInsertAndSetIdHandlesFalseGracefully()
+    {
+        // Mock the Builder to return false for insertGetId
+        $builderMock = $this->createMock(\Illuminate\Database\Eloquent\Builder::class);
+        $builderMock->method('insertGetId')->willReturn(false);
+
+        // Mock the Model
+        $modelMock = $this->getMockBuilder(\Illuminate\Database\Eloquent\Model::class)
+            ->onlyMethods(['getKeyName', 'setAttribute'])
+            ->getMock();
+
+        $modelMock->method('getKeyName')->willReturn('id');
+
+        // Expect setAttribute NOT to be called since ID should not be set
+        $modelMock->expects($this->never())->method('setAttribute');
+
+        // Call the protected method using reflection
+        $reflection = new \ReflectionMethod($modelMock, 'insertAndSetId');
+        $reflection->setAccessible(true);
+        $reflection->invoke($modelMock, $builderMock, ['name' => 'Test']);
+    }
 }
 
 class ProcessorTestPDOStub extends PDO

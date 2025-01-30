@@ -1356,9 +1356,12 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     protected function insertAndSetId(Builder $query, $attributes)
     {
+        /** @var int|false $id */
         $id = $query->insertGetId($attributes, $keyName = $this->getKeyName());
 
-        $this->setAttribute($keyName, $id);
+        if ($id !== false) {
+            $this->setAttribute($keyName, $id);
+        }
     }
 
     /**
