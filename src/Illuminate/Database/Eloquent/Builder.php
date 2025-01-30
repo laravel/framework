@@ -2053,6 +2053,10 @@ class Builder implements BuilderContract
             return new HigherOrderBuilderProxy($this, $key);
         }
 
+        if ($key === 'or') {
+            return new HigherOrderBuilderProxy($this, 'orWhere');
+        }
+
         if (in_array($key, $this->propertyPassthru)) {
             return $this->toBase()->{$key};
         }
