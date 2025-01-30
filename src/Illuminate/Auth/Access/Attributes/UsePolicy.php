@@ -13,5 +13,7 @@ class UsePolicy
      * @param  class-string  $policyClass
      * @return void
      */
-    public function __construct(public string $policyClass) {}
+    public function __construct(public string $policyClass)
+    {
+    }
 }

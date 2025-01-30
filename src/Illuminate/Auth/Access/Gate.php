@@ -4,8 +4,6 @@ namespace Illuminate\Auth\Access;
 
 use Closure;
 use Exception;
-use function Illuminate\Support\enum_value;
-
 use Illuminate\Auth\Access\Attributes\UsePolicy;
 use Illuminate\Auth\Access\Events\GateEvaluated;
 use Illuminate\Contracts\Auth\Access\Gate as GateContract;
@@ -16,8 +14,9 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use ReflectionClass;
-
 use ReflectionFunction;
+
+use function Illuminate\Support\enum_value;
 
 class Gate implements GateContract
 {

@@ -620,7 +620,7 @@ class AuthAccessGateTest extends TestCase
         $policy = $gate->getPolicyFor(AccessGateTestDummyWithUsePolicyAttribute::class);
 
         $this->assertTrue(
-            $policy instanceof AccessGateTestPolicy && 
+            $policy instanceof AccessGateTestPolicy &&
             get_class($policy) === AccessGateTestPolicy::class
         );
     }
