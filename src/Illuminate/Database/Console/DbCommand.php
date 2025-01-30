@@ -54,9 +54,9 @@ class DbCommand extends Command
                 $this->output->write($buffer);
             });
         } catch (ProcessFailedException $e) {
-            // see https://tldp.org/LDP/abs/html/exitcodes.html
             throw_unless($e->getProcess()->getExitCode() === 127, $e);
-            $this->error("{$command} not found in path");
+
+            $this->error("{$command} not found in path.");
 
             return Command::FAILURE;
         }
