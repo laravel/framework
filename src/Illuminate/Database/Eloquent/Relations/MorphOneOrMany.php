@@ -4,6 +4,7 @@ namespace Illuminate\Database\Eloquent\Relations;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Schema\Builder as SchemaBuilder;
 use Illuminate\Support\Str;
 
 /**
@@ -58,7 +59,18 @@ abstract class MorphOneOrMany extends HasOneOrMany
         if (static::$constraints) {
             $this->getRelationQuery()->where($this->morphType, $this->morphClass);
 
-            parent::addConstraints();
+            if (is_null(SchemaBuilder::$defaultMorphKeyType)) {
+                parent::addConstraints();
+            } else {
+                $query = $this->getRelationQuery();
+
+                $query->where($this->foreignKey, '=', transform($this->getParentKey(), fn ($key) => match (SchemaBuilder::$defaultMorphKeyType) {
+                    'uuid', 'ulid', 'string' => (string) $key,
+                    default => $key,
+                }));
+
+                $query->whereNotNull($this->foreignKey);
+            }
         }
     }
 
