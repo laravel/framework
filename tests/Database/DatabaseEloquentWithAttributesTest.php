@@ -77,7 +77,7 @@ class DatabaseEloquentWithAttributesTest extends TestCase
         $this->assertSame(WithAttributesEnum::internal, $model->type);
 
         $this->assertEqualsCanonicalizing([
-            'id_admin' => 1,
+            'is_admin' => 1,
             'first_name' => 'first',
             'last_name' => 'last',
             'type' => 'int',
