@@ -402,7 +402,7 @@ class FoundationExceptionsHandlerTest extends TestCase
         $container->instance(ViewFactory::class, $viewFactory);
 
         $viewFactory->shouldReceive('replaceNamespace')->once()->with('errors', m::on(function ($paths) {
-            $expectedPaths = collect(config('view.paths'))->map(function ($path) {
+            $expectedPaths = collect(['/path/to/views'])->map(function ($path) {
                 return "{$path}/errors";
             })->push(__DIR__.'/custom/views')->all();
 
@@ -964,7 +964,7 @@ class CustomReporter
 
 class CustomHandler extends Handler
 {
-    public $customErrorViewPath = __DIR__ . '/custom/views';
+    public $customErrorViewPath = __DIR__.'/custom/views';
 
     public function callRegisterErrorViewPaths()
     {
