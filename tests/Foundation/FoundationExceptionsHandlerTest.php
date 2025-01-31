@@ -393,6 +393,26 @@ class FoundationExceptionsHandlerTest extends TestCase
         $this->handler->report(new RecordsNotFoundException);
     }
 
+    public function testRegisterErrorViewPathsAddsCorrectPaths()
+    {
+        $viewFactory = m::mock(ViewFactory::class);
+        $viewFactory->shouldReceive('exists')->with('errors::502')->andReturn(true);
+
+        $container = new Container();
+        $container->instance(ViewFactory::class, $viewFactory);
+
+        $viewFactory->shouldReceive('replaceNamespace')->once()->with('errors', m::on(function ($paths) {
+            $expectedPaths = collect(config('view.paths'))->map(function ($path) {
+                return "{$path}/errors";
+            })->push(__DIR__.'/custom/views')->all();
+
+            return $paths === $expectedPaths;
+        }));
+
+        $handler = new CustomHandler($container);
+        $handler->callRegisterErrorViewPaths();
+    }
+
     public function testItReturnsSpecificErrorViewIfExists()
     {
         $viewFactory = m::mock(stdClass::class);
@@ -939,6 +959,16 @@ class CustomReporter
         $this->service->send($e->getMessage());
 
         return false;
+    }
+}
+
+class CustomHandler extends Handler
+{
+    public $customErrorViewPath = __DIR__ . '/custom/views';
+
+    public function callRegisterErrorViewPaths()
+    {
+        $this->registerErrorViewPaths();
     }
 }
 
