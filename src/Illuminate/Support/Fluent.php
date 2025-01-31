@@ -71,10 +71,10 @@ class Fluent implements Arrayable, ArrayAccess, Jsonable, JsonSerializable
     /**
      * Fill the fluent instance with an array of attributes.
      *
-     * @param  iterable<TKey, TValue>  $attributes
+     * @param  array<TKey, TValue>  $attributes
      * @return $this
      */
-    public function fill($attributes)
+    public function fill(array $attributes)
     {
         foreach ($attributes as $key => $value) {
             $this->attributes[$key] = $value;
