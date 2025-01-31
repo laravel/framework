@@ -263,7 +263,7 @@ class PendingBatch
     /**
      * Specify the queue that the batched jobs should run on.
      *
-     * @param  \BackedEnum|string|null  $queue
+     * @param  \UnitEnum|string|null  $queue
      * @return $this
      */
     public function onQueue($queue)
