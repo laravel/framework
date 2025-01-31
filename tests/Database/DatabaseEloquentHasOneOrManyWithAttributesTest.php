@@ -267,9 +267,30 @@ class DatabaseEloquentHasOneOrManyWithAttributesTest extends TestCase
         $this->assertSame($parent::class, $relatedModel->relatable_type);
         $this->assertSame($value, $relatedModel->$key);
     }
+
+    public function testHasManyAddsCastedAttributes(): void
+    {
+        $parentId = 123;
+
+        $parent = new RelatedWithAttributesModel;
+        $parent->id = $parentId;
+
+        $relationship = $parent
+            ->hasMany(RelatedWithAttributesModel::class, 'parent_id')
+            ->withAttributes(['is_admin' => 1]);
+
+        $relatedModel = $relationship->make();
+
+        $this->assertSame($parentId, $relatedModel->parent_id);
+        $this->assertSame(true, $relatedModel->is_admin);
+    }
 }
 
 class RelatedWithAttributesModel extends Model
 {
     protected $guarded = [];
+
+    protected $casts = [
+        'is_admin' => 'boolean',
+    ];
 }
