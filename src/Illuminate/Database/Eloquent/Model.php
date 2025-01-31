@@ -158,6 +158,11 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     protected static $bootedCallbacks = [];
 
     /**
+     * Models currently being booted.
+     */
+    protected static array $booting = [];
+
+    /**
      * The array of trait initializers that will be called on each new instance.
      *
      * @var array
@@ -287,12 +292,15 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     {
         if (! isset(static::$booted[static::class])) {
 
+            static::$booting[static::class] = true;
+
             $this->fireModelEvent('booting', false);
 
             static::booting();
             static::boot();
 
             static::$booted[static::class] = true;
+            unset(static::$booting[static::class]);
 
             static::booted();
 
