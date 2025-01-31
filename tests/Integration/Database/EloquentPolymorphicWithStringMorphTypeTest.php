@@ -49,7 +49,7 @@ class EloquentPolymorphicWithStringMorphTypeTest extends DatabaseTestCase
         DB::table('integrations')->insert([
             'owner_type' => User::class,
             'owner_id' => $user->id,
-            'provider' => 'dummy_provider'
+            'provider' => 'dummy_provider',
         ]);
     }
 
@@ -87,4 +87,3 @@ class Integration extends Model
         return $this->morphTo('owner');
     }
 }
-
