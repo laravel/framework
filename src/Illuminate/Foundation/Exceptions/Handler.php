@@ -35,6 +35,7 @@ use Illuminate\Support\Lottery;
 use Illuminate\Support\Reflector;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ReflectsClosures;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ViewErrorBag;
 use Illuminate\Validation\ValidationException;
 use InvalidArgumentException;
