@@ -57,15 +57,15 @@ class RotateKeyCommand extends Command
         $contents = file_get_contents($envPath);
 
         // Convert array to comma-separated string and wrap in quotes
-        $quotedPreviousKeys = '"' . implode(',', $previousKeys) . '"';
+        $quotedPreviousKeys = '"'.implode(',', $previousKeys).'"';
 
         // Update APP_PREVIOUS_KEYS
         if (str_contains($contents, 'APP_PREVIOUS_KEYS=')) {
             // If APP_PREVIOUS_KEYS already exists, update its value
-            $contents = preg_replace($this->previousKeysPattern(), 'APP_PREVIOUS_KEYS=' . $quotedPreviousKeys, $contents);
+            $contents = preg_replace($this->previousKeysPattern(), 'APP_PREVIOUS_KEYS='.$quotedPreviousKeys, $contents);
         } else {
             // If APP_PREVIOUS_KEYS does not exist, insert it after APP_KEY
-            $contents = preg_replace($this->keyPattern(), "APP_KEY=\nAPP_PREVIOUS_KEYS=" . $quotedPreviousKeys, $contents);
+            $contents = preg_replace($this->keyPattern(), "APP_KEY=\nAPP_PREVIOUS_KEYS=".$quotedPreviousKeys, $contents);
         }
 
         // Clear APP_KEY
@@ -76,18 +76,18 @@ class RotateKeyCommand extends Command
     }
 
     /**
-     * Generate a regex pattern to match the current APP_KEY line
+     * Generate a regex pattern to match the current APP_KEY line.
      */
     protected function keyPattern(): string
     {
-        return '/^APP_KEY=' . preg_quote($this->laravel['config']['app.key'], '/') . '/m';
+        return '/^APP_KEY='.preg_quote($this->laravel['config']['app.key'], '/').'/m';
     }
 
     /**
-     * Generate a regex pattern to match the current APP_PREVIOUS_KEYS line
+     * Generate a regex pattern to match the current APP_PREVIOUS_KEYS line.
      */
     protected function previousKeysPattern(): string
     {
-        return '/^APP_PREVIOUS_KEYS="' . preg_quote(implode(',', (array) $this->laravel['config']['app.previous_keys']), '/') . '"/m';
+        return '/^APP_PREVIOUS_KEYS="'.preg_quote(implode(',', (array) $this->laravel['config']['app.previous_keys']), '/').'"/m';
     }
 }
