@@ -33,6 +33,7 @@ use Illuminate\Support\Testing\Fakes\ExceptionHandlerFake;
  * @method static \Illuminate\Support\Testing\Fakes\ExceptionHandlerFake throwOnReport()
  * @method static \Illuminate\Support\Testing\Fakes\ExceptionHandlerFake throwFirstReported()
  * @method static \Illuminate\Support\Testing\Fakes\ExceptionHandlerFake setHandler(\Illuminate\Contracts\Debug\ExceptionHandler $handler)
+ * @method static \Illuminate\Foundation\Exceptions\Handler withCustomErrorViewPath(string $path)
  *
  * @see \Illuminate\Foundation\Exceptions\Handler
  * @see \Illuminate\Support\Testing\Fakes\ExceptionHandlerFake
