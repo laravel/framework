@@ -3,7 +3,7 @@
 namespace Illuminate\Database\Eloquent\Relations;
 
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithDictionary;
 use Illuminate\Database\Eloquent\Relations\Concerns\SupportsInverseRelations;
@@ -119,7 +119,7 @@ abstract class HasOneOrMany extends Relation
      * @param  string  $relation
      * @return array<int, TDeclaringModel>
      */
-    public function matchOne(array $models, EloquentCollection $results, $relation)
+    public function matchOne(array $models, Collection $results, $relation)
     {
         return $this->matchOneOrMany($models, $results, $relation, 'one');
     }
@@ -132,7 +132,7 @@ abstract class HasOneOrMany extends Relation
      * @param  string  $relation
      * @return array<int, TDeclaringModel>
      */
-    public function matchMany(array $models, EloquentCollection $results, $relation)
+    public function matchMany(array $models, Collection $results, $relation)
     {
         return $this->matchOneOrMany($models, $results, $relation, 'many');
     }
@@ -146,7 +146,7 @@ abstract class HasOneOrMany extends Relation
      * @param  string  $type
      * @return array<int, TDeclaringModel>
      */
-    protected function matchOneOrMany(array $models, EloquentCollection $results, $relation, $type)
+    protected function matchOneOrMany(array $models, Collection $results, $relation, $type)
     {
         $dictionary = $this->buildDictionary($results);
 
@@ -189,7 +189,7 @@ abstract class HasOneOrMany extends Relation
      * @param  \Illuminate\Database\Eloquent\Collection<int, TRelatedModel>  $results
      * @return array<array<int, TRelatedModel>>
      */
-    protected function buildDictionary(EloquentCollection $results)
+    protected function buildDictionary(Collection $results)
     {
         $foreign = $this->getForeignKeyName();
 
@@ -448,7 +448,9 @@ abstract class HasOneOrMany extends Relation
         $model->setAttribute($this->getForeignKeyName(), $this->getParentKey());
 
         foreach ($this->getQuery()->pendingAttributes as $key => $value) {
-            if (! $model->hasAttribute($key)) {
+            $attributes ??= $model->getAttributes();
+
+            if (! array_key_exists($key, $attributes)) {
                 $model->setAttribute($key, $value);
             }
         }
