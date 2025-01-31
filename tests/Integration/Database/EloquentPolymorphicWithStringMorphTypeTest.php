@@ -47,7 +47,7 @@ class EloquentPolymorphicWithStringMorphTypeTest extends DatabaseTestCase
         ]);
 
         DB::table('integrations')->insert([
-            'owner_type' => User::class,
+            'owner_type' => EloquentPolymorphicWithStringMorphTypeTestUser::class,
             'owner_id' => $user->id,
             'provider' => 'dummy_provider'
         ]);
@@ -55,52 +55,54 @@ class EloquentPolymorphicWithStringMorphTypeTest extends DatabaseTestCase
 
     public function test_it_can_query_from_polymorphic_model()
     {
-        $user = User::first();
+        $user = EloquentPolymorphicWithStringMorphTypeTestUser::first();
 
         $user->loadMissing('integrations');
 
         Assert::assertArraySubset([
-            ['owner_type' => User::class, 'owner_id' => $user->getKey(), 'provider' => 'dummy_provider'],
-        ], Integration::where('owner_id', $user->id)->where('owner_type', User::class)->get()->toArray());
+            ['owner_type' => EloquentPolymorphicWithStringMorphTypeTestUser::class, 'owner_id' => $user->getKey(), 'provider' => 'dummy_provider'],
+        ], EloquentPolymorphicWithStringMorphTypeTestIntegration::where('owner_id', $user->id)->where('owner_type', EloquentPolymorphicWithStringMorphTypeTestUser::class)->get()->toArray());
     }
 
     public function test_it_can_query_using_relationship()
     {
-        $user = User::first();
+        $user = EloquentPolymorphicWithStringMorphTypeTestUser::first();
 
         Assert::assertArraySubset([
-            ['owner_type' => User::class, 'owner_id' => $user->getKey(), 'provider' => 'dummy_provider'],
+            ['owner_type' => EloquentPolymorphicWithStringMorphTypeTestUser::class, 'owner_id' => $user->getKey(), 'provider' => 'dummy_provider'],
         ], $user->integrations()->get()->toArray());
     }
 
     public function test_it_can_query_using_load_missing()
     {
-        $user = User::query()->where('email', 'taylor@laravel.com')->first();
+        $user = EloquentPolymorphicWithStringMorphTypeTestUser::query()->where('email', 'taylor@laravel.com')->first();
 
         $user->loadMissing('integrations');
 
         Assert::assertArraySubset([
             'name' => 'Taylor Otwell',
             'integrations' => [
-                ['owner_type' => User::class, 'owner_id' => $user->getKey(), 'provider' => 'dummy_provider'],
+                ['owner_type' => EloquentPolymorphicWithStringMorphTypeTestUser::class, 'owner_id' => $user->getKey(), 'provider' => 'dummy_provider'],
             ],
         ], $user->toArray());
     }
 }
 
-class User extends Authenticatable
+class EloquentPolymorphicWithStringMorphTypeTestUser extends Authenticatable
 {
     protected $fillable = ['*'];
+    protected $table = 'users';
 
     public function integrations()
     {
-        return $this->morphMany(Integration::class, 'owner');
+        return $this->morphMany(EloquentPolymorphicWithStringMorphTypeTestIntegration::class, 'owner');
     }
 }
 
-class Integration extends Model
+class EloquentPolymorphicWithStringMorphTypeTestIntegration extends Model
 {
     protected $fillable = ['*'];
+    protected $table = 'integrations';
 
     public function owner()
     {
