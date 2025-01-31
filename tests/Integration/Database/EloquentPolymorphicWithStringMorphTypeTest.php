@@ -43,7 +43,6 @@ class EloquentPolymorphicWithStringMorphTypeTest extends DatabaseTestCase
         $user = UserFactory::new()->create([
             'name' => 'Taylor Otwell',
             'email' => 'taylor@laravel.com',
-            'password' => bcrypt('password'),
         ]);
 
         DB::table('integrations')->insert([
