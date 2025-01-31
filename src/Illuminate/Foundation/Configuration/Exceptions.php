@@ -226,4 +226,17 @@ class Exceptions
 
         return $this;
     }
+
+    /**
+     * Register a custom error views path.
+     *
+     * @param  string  $path
+     * @return $this
+     */
+    public function withCustomErrorViewPath($path)
+    {
+        return $this->handler->withCustomErrorViewPath($path);
+
+        return $this;
+    }
 }
