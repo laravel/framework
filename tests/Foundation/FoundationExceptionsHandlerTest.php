@@ -411,6 +411,35 @@ class FoundationExceptionsHandlerTest extends TestCase
         $this->assertSame('errors::502', $handler->getErrorView(new HttpException(502)));
     }
 
+    public function testItRegistersErrorViewPaths()
+    {
+        View::shouldReceive('replaceNamespace')->once()->with('errors', m::on(function($paths) {
+            $expectedPaths = collect(config('view.paths'))->map(function ($path) {
+                return "{$path}/errors";
+            })->push(__DIR__.'/custom/views')->all();
+
+            return $paths === $expectedPaths;
+        }));
+
+        $handler = new class {
+            public $customErrorViewPath = __DIR__.'/custom/views';
+
+            protected function registerErrorViewPaths()
+            {
+                View::replaceNamespace('errors', (new Collection(config('view.paths')))->map(function ($path) {
+                    return "{$path}/errors";
+                })->push($this->customErrorViewPath ?: __DIR__.'/views')->all());
+            }
+
+            public function callRegisterErrorViewPaths()
+            {
+                $this->registerErrorViewPaths();
+            }
+        };
+
+        $handler->callRegisterErrorViewPaths();
+    }
+
     public function testItReturnsFallbackErrorViewIfExists()
     {
         $viewFactory = m::mock(stdClass::class);
