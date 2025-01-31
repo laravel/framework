@@ -38,7 +38,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      *
      * @var string
      */
-    const VERSION = '9.52.19';
+    const VERSION = '9.52.20';
 
     /**
      * The base path for the Laravel installation.
@@ -181,6 +181,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
         $this->registerBaseBindings();
         $this->registerBaseServiceProviders();
         $this->registerCoreContainerAliases();
+        $this->registerLaravelCloudServices();
     }
 
     /**
@@ -224,6 +225,28 @@ class Application extends Container implements ApplicationContract, CachesConfig
         $this->register(new EventServiceProvider($this));
         $this->register(new LogServiceProvider($this));
         $this->register(new RoutingServiceProvider($this));
+    }
+
+    /**
+     * Register any services needed for Laravel Cloud.
+     *
+     * @return void
+     */
+    protected function registerLaravelCloudServices()
+    {
+        if (! laravel_cloud()) {
+            return;
+        }
+
+        $this['events']->listen(
+            'bootstrapping: *',
+            fn ($bootstrapper) => Cloud::bootstrapperBootstrapping($this, Str::after($bootstrapper, 'bootstrapping: '))
+        );
+
+        $this['events']->listen(
+            'bootstrapped: *',
+            fn ($bootstrapper) => Cloud::bootstrapperBootstrapped($this, Str::after($bootstrapper, 'bootstrapped: '))
+        );
     }
 
     /**

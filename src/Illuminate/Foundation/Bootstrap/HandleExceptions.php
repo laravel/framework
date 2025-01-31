@@ -53,10 +53,6 @@ class HandleExceptions
         if (! $app->environment('testing')) {
             ini_set('display_errors', 'Off');
         }
-
-        if (laravel_cloud()) {
-            $this->configureCloudLogging($app);
-        }
     }
 
     /**
@@ -263,34 +259,6 @@ class HandleExceptions
     protected function fatalErrorFromPhpError(array $error, $traceOffset = null)
     {
         return new FatalError($error['message'], 0, $error, $traceOffset);
-    }
-
-    /**
-     * Configure the Laravel Cloud log channels.
-     *
-     * @param  \Illuminate\Contracts\Foundation\Application  $app
-     * @return void
-     */
-    protected function configureCloudLogging(Application $app)
-    {
-        $app['config']->set('logging.channels.stderr.formatter_with', [
-            'includeStacktraces' => true,
-        ]);
-
-        $app['config']->set('logging.channels.laravel-cloud-socket', [
-            'driver' => 'monolog',
-            'handler' => SocketHandler::class,
-            'formatter' => JsonFormatter::class,
-            'formatter_with' => [
-                'includeStacktraces' => true,
-            ],
-            'with' => [
-                'connectionString' => $_ENV['LARAVEL_CLOUD_LOG_SOCKET'] ??
-                                      $_SERVER['LARAVEL_CLOUD_LOG_SOCKET'] ??
-                                      'unix:///tmp/cloud-init.sock',
-                'persistent' => true,
-            ],
-        ]);
     }
 
     /**
