@@ -43,6 +43,7 @@ class KeyGenerateCommand extends Command
 
         if ($this->option('show')) {
             $this->line('<comment>'.$key.'</comment>');
+
             return;
         }
 
@@ -58,7 +59,6 @@ class KeyGenerateCommand extends Command
         $this->components->info('Application key set successfully.');
     }
 
-
     /**
      * Ask the user if they want to save the existing key.
      */
@@ -67,9 +67,9 @@ class KeyGenerateCommand extends Command
         $currentKey = $this->laravel['config']['app.key'];
 
         if (! empty($currentKey) && $this->confirm(
-                'There is already an app key. Do you want to store the old key before generating a new one?',
-                true
-            )) {
+            'There is already an app key. Do you want to store the old key before generating a new one?',
+            true
+        )) {
             $this->call('key:rotate');
 
             return true;
@@ -93,7 +93,7 @@ class KeyGenerateCommand extends Command
     /**
      * Set the application key in the environment file.
      *
-     * @param string $key
+     * @param  string  $key
      * @return bool
      */
     protected function setKeyInEnvironmentFile(string $key): bool
@@ -114,7 +114,7 @@ class KeyGenerateCommand extends Command
     /**
      * Write a new environment file with the given key.
      *
-     * @param string $key
+     * @param  string  $key
      * @return bool
      */
     protected function writeNewEnvironmentFileWith(string $key): bool
