@@ -53,6 +53,26 @@ class EloquentPolymorphicWithStringMorphTypeTest extends DatabaseTestCase
         ]);
     }
 
+    public function test_it_can_query_from_polymorphic_model()
+    {
+        $user = User::first();
+
+        $user->loadMissing('integrations');
+
+        Assert::assertArraySubset([
+            ['owner_type' => User::class, 'owner_id' => $user->getKey(), 'provider' => 'dummy_provider'],
+        ], Integration::where('owner_id', $user->id)->where('owner_type', User::class)->get()->toArray());
+    }
+
+    public function test_it_can_query_using_relationship()
+    {
+        $user = User::first();
+
+        Assert::assertArraySubset([
+            ['owner_type' => User::class, 'owner_id' => $user->getKey(), 'provider' => 'dummy_provider'],
+        ], $user->integrations()->get()->toArray());
+    }
+
     public function test_it_can_query_using_load_missing()
     {
         $user = User::query()->where('email', 'taylor@laravel.com')->first();
