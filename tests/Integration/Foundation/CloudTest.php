@@ -8,7 +8,7 @@ use Orchestra\Testbench\TestCase;
 
 class CloudTest extends TestCase
 {
-    #[WithConfig('database.connections.pgsql', ['host' => 'test-pooler.pg.laravel.cloud', 'username' => 'test-username', 'password' => 'test-password'])
+    #[WithConfig('database.connections.pgsql', ['host' => 'test-pooler.pg.laravel.cloud', 'username' => 'test-username', 'password' => 'test-password'])]
     public function test_it_can_resolve_core_container_aliases()
     {
         Cloud::configureUnpooledPostgresConnection($this->app);
