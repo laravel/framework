@@ -398,8 +398,12 @@ class FoundationExceptionsHandlerTest extends TestCase
         $viewFactory = m::mock(ViewFactory::class);
         $viewFactory->shouldReceive('exists')->with('errors::502')->andReturn(true);
 
+        $config = m::mock('alias:config');
+        $config->shouldReceive('get')->with('view.paths')->andReturn(['/path/to/views']);
+
         $container = new Container();
         $container->instance(ViewFactory::class, $viewFactory);
+        $container->instance('config', $config);
 
         $viewFactory->shouldReceive('replaceNamespace')->once()->with('errors', m::on(function ($paths) {
             $expectedPaths = collect(['/path/to/views'])->map(function ($path) {
@@ -409,7 +413,16 @@ class FoundationExceptionsHandlerTest extends TestCase
             return $paths === $expectedPaths;
         }));
 
-        $handler = new CustomHandler($container);
+        $handler = new class($container) extends Handler
+        {
+            public $customErrorViewPath = __DIR__.'/custom/views';
+
+            public function callRegisterErrorViewPaths()
+            {
+                $this->registerErrorViewPaths();
+            }
+        };
+
         $handler->callRegisterErrorViewPaths();
     }
 
@@ -959,16 +972,6 @@ class CustomReporter
         $this->service->send($e->getMessage());
 
         return false;
-    }
-}
-
-class CustomHandler extends Handler
-{
-    public $customErrorViewPath = __DIR__.'/custom/views';
-
-    public function callRegisterErrorViewPaths()
-    {
-        $this->registerErrorViewPaths();
     }
 }
 
