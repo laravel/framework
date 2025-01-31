@@ -286,12 +286,14 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     protected function bootIfNotBooted()
     {
         if (! isset(static::$booted[static::class])) {
-            static::$booted[static::class] = true;
 
             $this->fireModelEvent('booting', false);
 
             static::booting();
             static::boot();
+
+            static::$booted[static::class] = true;
+
             static::booted();
 
             static::$bootedCallbacks[static::class] ??= [];
