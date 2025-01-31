@@ -33,12 +33,18 @@ class KeyGenerateCommand extends Command
      *
      * @return void
      */
-    public function handle()
+    public function handle(): void
     {
+        if ($this->shouldSaveExistingKey()) {
+            return;
+        }
+
         $key = $this->generateRandomKey();
 
         if ($this->option('show')) {
-            return $this->line('<comment>'.$key.'</comment>');
+            $this->line('<comment>'.$key.'</comment>');
+
+            return;
         }
 
         // Next, we will replace the application key in the environment file so it is
@@ -54,11 +60,30 @@ class KeyGenerateCommand extends Command
     }
 
     /**
+     * Ask the user if they want to save the existing key.
+     */
+    protected function shouldSaveExistingKey(): bool
+    {
+        $currentKey = $this->laravel['config']['app.key'];
+
+        if (! empty($currentKey) && $this->confirm(
+            'There is already an app key. Do you want to store the old key before generating a new one?',
+            true
+        )) {
+            $this->call('key:rotate');
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Generate a random key for the application.
      *
      * @return string
      */
-    protected function generateRandomKey()
+    protected function generateRandomKey(): string
     {
         return 'base64:'.base64_encode(
             Encrypter::generateKey($this->laravel['config']['app.cipher'])
@@ -71,7 +96,7 @@ class KeyGenerateCommand extends Command
      * @param  string  $key
      * @return bool
      */
-    protected function setKeyInEnvironmentFile($key)
+    protected function setKeyInEnvironmentFile(string $key): bool
     {
         $currentKey = $this->laravel['config']['app.key'];
 
@@ -92,7 +117,7 @@ class KeyGenerateCommand extends Command
      * @param  string  $key
      * @return bool
      */
-    protected function writeNewEnvironmentFileWith($key)
+    protected function writeNewEnvironmentFileWith(string $key): bool
     {
         $replaced = preg_replace(
             $this->keyReplacementPattern(),
@@ -116,7 +141,7 @@ class KeyGenerateCommand extends Command
      *
      * @return string
      */
-    protected function keyReplacementPattern()
+    protected function keyReplacementPattern(): string
     {
         $escaped = preg_quote('='.$this->laravel['config']['app.key'], '/');
 
