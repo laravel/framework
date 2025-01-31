@@ -345,5 +345,4 @@ class ValidationNumericRuleTest extends TestCase
         $rule = Rule::numeric()->integer()->digits(2)->size(2);
         $this->assertEquals('numeric|integer|digits:2|size:2', (string) $rule);
     }
-
 }
