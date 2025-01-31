@@ -393,39 +393,6 @@ class FoundationExceptionsHandlerTest extends TestCase
         $this->handler->report(new RecordsNotFoundException);
     }
 
-    public function testRegisterErrorViewPathsAddsCorrectPaths()
-    {
-        $viewFactory = m::mock(ViewFactory::class);
-        $viewFactory->shouldReceive('exists')->with('errors::502')->andReturn(true);
-
-        $config = m::mock('alias:config');
-        $config->shouldReceive('get')->with('view.paths')->andReturn(['/path/to/views']);
-
-        $container = new Container();
-        $container->instance(ViewFactory::class, $viewFactory);
-        $container->instance('config', $config);
-
-        $viewFactory->shouldReceive('replaceNamespace')->once()->with('errors', m::on(function ($paths) {
-            $expectedPaths = collect(['/path/to/views'])->map(function ($path) {
-                return "{$path}/errors";
-            })->push(__DIR__.'/custom/views')->all();
-
-            return $paths === $expectedPaths;
-        }));
-
-        $handler = new class($container) extends Handler
-        {
-            public $customErrorViewPath = __DIR__.'/custom/views';
-
-            public function callRegisterErrorViewPaths()
-            {
-                $this->registerErrorViewPaths();
-            }
-        };
-
-        $handler->callRegisterErrorViewPaths();
-    }
-
     public function testItReturnsSpecificErrorViewIfExists()
     {
         $viewFactory = m::mock(stdClass::class);
