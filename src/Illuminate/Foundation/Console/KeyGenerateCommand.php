@@ -141,7 +141,7 @@ class KeyGenerateCommand extends Command
      *
      * @return string
      */
-    protected function keyReplacementPattern(): string
+    protected function keyReplacementPattern()
     {
         $escaped = preg_quote('='.$this->laravel['config']['app.key'], '/');
 
