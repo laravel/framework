@@ -230,6 +230,12 @@ trait QueriesRelationships
 
         $types = (array) $types;
 
+        $checkMorphNull = $types === ['*']
+            && (($operator === '<' && $count >= 1)
+                || ($operator === '<=' && $count >= 0)
+                || ($operator === '=' && $count === 0)
+                || ($operator === '!=' && $count >= 1));
+
         if ($types === ['*']) {
             $types = $this->model->newModelQuery()->distinct()->pluck($relation->getMorphType())
                 ->filter()
@@ -245,22 +251,24 @@ trait QueriesRelationships
             $type = Relation::getMorphedModel($type) ?? $type;
         }
 
-        return $this->where(function ($query) use ($relation, $callback, $operator, $count, $types) {
-            foreach ($types as $type) {
-                $query->orWhere(function ($query) use ($relation, $callback, $operator, $count, $type) {
-                    $belongsTo = $this->getBelongsToRelation($relation, $type);
+        return $this
+            ->where(function ($query) use ($relation, $callback, $operator, $count, $types) {
+                foreach ($types as $type) {
+                    $query->orWhere(function ($query) use ($relation, $callback, $operator, $count, $type) {
+                        $belongsTo = $this->getBelongsToRelation($relation, $type);
 
-                    if ($callback) {
-                        $callback = function ($query) use ($callback, $type) {
-                            return $callback($query, $type);
-                        };
-                    }
+                        if ($callback) {
+                            $callback = function ($query) use ($callback, $type) {
+                                return $callback($query, $type);
+                            };
+                        }
 
-                    $query->where($this->qualifyColumn($relation->getMorphType()), '=', (new $type)->getMorphClass())
-                        ->whereHas($belongsTo, $callback, $operator, $count);
-                });
-            }
-        }, null, null, $boolean);
+                        $query->where($this->qualifyColumn($relation->getMorphType()), '=', (new $type)->getMorphClass())
+                            ->whereHas($belongsTo, $callback, $operator, $count);
+                    });
+                }
+            }, null, null, $boolean)
+            ->when($checkMorphNull, fn (self $query) => $query->orWhereMorphedTo($relation, null));
     }
 
     /**
