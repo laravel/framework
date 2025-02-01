@@ -83,7 +83,7 @@ class KeyGenerateCommand extends Command
      *
      * @return string
      */
-    protected function generateRandomKey(): string
+    protected function generateRandomKey()
     {
         return 'base64:'.base64_encode(
             Encrypter::generateKey($this->laravel['config']['app.cipher'])
