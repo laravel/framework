@@ -4,6 +4,8 @@ namespace Illuminate\Database\Eloquent\Relations;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Schema\Builder as SchemaBuilder;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
 /**
@@ -53,16 +55,29 @@ abstract class MorphOneOrMany extends HasOneOrMany
      *
      * @return void
      */
+    #[\Override]
     public function addConstraints()
     {
         if (static::$constraints) {
             $this->getRelationQuery()->where($this->morphType, $this->morphClass);
 
-            parent::addConstraints();
+            if (is_null(SchemaBuilder::$defaultMorphKeyType)) {
+                parent::addConstraints();
+            } else {
+                $query = $this->getRelationQuery();
+
+                $query->where($this->foreignKey, '=', transform($this->getParentKey(), fn ($key) => match (SchemaBuilder::$defaultMorphKeyType) {
+                    'uuid', 'ulid', 'string' => (string) $key,
+                    default => $key,
+                }));
+
+                $query->whereNotNull($this->foreignKey);
+            }
         }
     }
 
     /** @inheritDoc */
+    #[\Override]
     public function addEagerConstraints(array $models)
     {
         parent::addEagerConstraints($models);
@@ -113,6 +128,7 @@ abstract class MorphOneOrMany extends HasOneOrMany
      * @param  array|null  $update
      * @return int
      */
+    #[\Override]
     public function upsert(array $values, $uniqueBy, $update = null)
     {
         if (! empty($values) && ! is_array(reset($values))) {
@@ -127,6 +143,7 @@ abstract class MorphOneOrMany extends HasOneOrMany
     }
 
     /** @inheritDoc */
+    #[\Override]
     public function getRelationExistenceQuery(Builder $query, Builder $parentQuery, $columns = ['*'])
     {
         return parent::getRelationExistenceQuery($query, $parentQuery, $columns)->where(
@@ -175,5 +192,27 @@ abstract class MorphOneOrMany extends HasOneOrMany
             Str::beforeLast($this->getMorphType(), '_type'),
             ...parent::getPossibleInverseRelations(),
         ]);
+    }
+
+    /** @inheritDoc */
+    #[\Override]
+    protected function getKeys(array $models, $key = null)
+    {
+        $castKeyToString = in_array(SchemaBuilder::$defaultMorphKeyType, ['uuid', 'ulid', 'string']);
+
+        return (new Collection(parent::getKeys($models, $key)))
+            ->transform(fn ($key) => $castKeyToString === true ? (string) $key : $key)
+            ->all();
+    }
+
+    /** @inheritDoc */
+    #[\Override]
+    protected function whereInMethod(Model $model, $key)
+    {
+        if (! in_array(SchemaBuilder::$defaultMorphKeyType, ['uuid', 'ulid', 'string'])) {
+            return parent::whereInMethod($model, $key);
+        }
+
+        return 'whereIn';
     }
 }
