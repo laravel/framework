@@ -117,7 +117,7 @@ class KeyGenerateCommand extends Command
      * @param  string  $key
      * @return bool
      */
-    protected function writeNewEnvironmentFileWith(string $key): bool
+    protected function writeNewEnvironmentFileWith($key)
     {
         $replaced = preg_replace(
             $this->keyReplacementPattern(),
