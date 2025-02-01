@@ -201,9 +201,8 @@ abstract class MorphOneOrMany extends HasOneOrMany
         $castKeyToString = in_array(SchemaBuilder::$defaultMorphKeyType, ['uuid', 'ulid', 'string']);
 
         return (new Collection(parent::getKeys($models, $key)))
-            ->transform(function ($key) use ($castKeyToString) {
-                return $castKeyToString === true ? (string) $key : $key;
-            })->all();
+            ->transform(fn ($key) => $castKeyToString === true ? (string) $key : $key)
+            ->all();
     }
 
     /** @inheritDoc */
