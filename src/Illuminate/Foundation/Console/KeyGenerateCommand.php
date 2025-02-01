@@ -96,7 +96,7 @@ class KeyGenerateCommand extends Command
      * @param  string  $key
      * @return bool
      */
-    protected function setKeyInEnvironmentFile(string $key): bool
+    protected function setKeyInEnvironmentFile($key)
     {
         $currentKey = $this->laravel['config']['app.key'];
 
