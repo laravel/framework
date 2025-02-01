@@ -33,7 +33,7 @@ class KeyGenerateCommand extends Command
      *
      * @return void
      */
-    public function handle(): void
+    public function handle()
     {
         if ($this->shouldSaveExistingKey()) {
             return;
