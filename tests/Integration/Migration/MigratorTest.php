@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Stringable;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
-use PHPUnit\Framework\Attributes\TestWith;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class MigratorTest extends TestCase
@@ -66,23 +65,22 @@ class MigratorTest extends TestCase
         $this->assertTrue(DB::getSchemaBuilder()->hasColumn('people', 'last_name'));
     }
 
-    #[TestWith(['2015_10_04_000000_modify_people_table.php'], 'filename with extension')]
-    #[TestWith(['2015_10_04_000000_modify_people_table'], 'filename without extension')]
-    public function testWithSkippedMigrations(string $filename)
+    public function testWithSkippedMigrations()
     {
         $this->app->forgetInstance('migrator');
         $this->subject = $this->app->make('migrator');
 
-        Migrator::withoutMigrations([$filename]);
+        Migrator::withoutMigrations(['2015_10_04_000000_modify_people_table.php', '2016_10_04_000000_modify_people_table']);
 
         $this->subject->run([__DIR__.'/fixtures']);
         $this->assertTrue(DB::getSchemaBuilder()->hasTable('people'));
         $this->assertFalse(DB::getSchemaBuilder()->hasColumn('people', 'first_name'));
-        $this->assertTrue(DB::getSchemaBuilder()->hasColumn('people', 'last_name'));
+        $this->assertFalse(DB::getSchemaBuilder()->hasColumn('people', 'last_name'));
 
         Migrator::withoutMigrations([]);
         $this->subject->run([__DIR__.'/fixtures']);
         $this->assertTrue(DB::getSchemaBuilder()->hasColumn('people', 'first_name'));
+        $this->assertTrue(DB::getSchemaBuilder()->hasColumn('people', 'last_name'));
     }
 
     public function testRollback()
