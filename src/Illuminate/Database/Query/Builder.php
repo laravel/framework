@@ -3407,7 +3407,7 @@ class Builder implements BuilderContract
         // Revert to original values so future queries can use the previous selection.
         [$this->columns, $this->fetchArgs] = $original;
 
-        return new Collection($this->applyAfterQueryCallbacks($queryResult));
+        return $this->applyAfterQueryCallbacks(new Collection($queryResult));
     }
 
     /**
