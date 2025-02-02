@@ -418,6 +418,7 @@ class PendingBatch
         foreach (Arr::wrap($job) as $job) {
             if ($job instanceof PendingBatch) {
                 $this->checkJobIsBatchable($job->jobs->all());
+
                 return;
             }
 
