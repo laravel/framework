@@ -6,8 +6,8 @@ use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Foundation\Testing\Attributes\WithoutMigration;
 use Illuminate\Foundation\Testing\Traits\CanConfigureMigrationCommands;
-use ReflectionMethod;
 use ReflectionAttribute;
+use ReflectionMethod;
 
 trait RefreshDatabase
 {

@@ -182,8 +182,6 @@ class Migrator
         // aren't, we will just make a note of it to the developer so they're aware
         // that all of the migrations have been run against this database system.
         if (count($migrations) === 0) {
-
-
             $this->fireMigrationEvent(new NoPendingMigrations('up'));
 
             $this->write(Info::class, 'Nothing to migrate');
