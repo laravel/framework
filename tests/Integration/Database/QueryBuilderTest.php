@@ -640,6 +640,12 @@ class QueryBuilderTest extends DatabaseTestCase
         $this->assertSame([
             'Lorem Ipsum.' => 'Bar Post',
         ], DB::table('posts')->pluck('title', 'content')->toArray());
+
+        // Test raw expressions.
+        $this->assertSame([
+            'FOO POST' => 'LOREM IPSUM.',
+            'BAR POST' => 'LOREM IPSUM.',
+        ], DB::table('posts')->pluck(DB::raw('UPPER(content)'), DB::raw('UPPER(title)'))->toArray());
     }
 
     protected function defineEnvironmentWouldThrowsPDOException($app)
