@@ -443,7 +443,7 @@ class Connection implements ConnectionInterface
             $sets = [];
 
             do {
-                $sets[] = $statement->fetchAll($fetchArgs);
+                $sets[] = $statement->fetchAll(...$fetchArgs);
             } while ($statement->nextRowset());
 
             return $sets;
