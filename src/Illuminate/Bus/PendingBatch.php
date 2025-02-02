@@ -49,14 +49,14 @@ class PendingBatch
     /**
      * Create a new pending batch instance.
      *
-     * @param  \Illuminate\Contracts\Container\Container  $container
-     * @param  \Illuminate\Support\Collection  $jobs
      * @return void
      */
     public function __construct(Container $container, Collection $jobs)
     {
         $this->container = $container;
-        $this->jobs = $jobs;
+        $this->jobs = $jobs->each(function ($job) {
+            $this->checkJobIsBatchable($job);
+        });
     }
 
     /**
@@ -70,6 +70,7 @@ class PendingBatch
         $jobs = is_iterable($jobs) ? $jobs : Arr::wrap($jobs);
 
         foreach ($jobs as $job) {
+            $this->checkJobIsBatchable($job);
             $this->jobs->push($job);
         }
 
@@ -227,7 +228,6 @@ class PendingBatch
     /**
      * Set the name for the batch.
      *
-     * @param  string  $name
      * @return $this
      */
     public function name(string $name)
@@ -240,7 +240,6 @@ class PendingBatch
     /**
      * Specify the queue connection that the batched jobs should run on.
      *
-     * @param  string  $connection
      * @return $this
      */
     public function onConnection(string $connection)
@@ -286,7 +285,6 @@ class PendingBatch
     /**
      * Add additional data into the batch's options array.
      *
-     * @param  string  $key
      * @param  mixed  $value
      * @return $this
      */
@@ -413,5 +411,12 @@ class PendingBatch
         });
 
         return $batch;
+    }
+
+    private function checkJobIsBatchable($job): void
+    {
+        if (! in_array(Batchable::class, class_uses_recursive($job))) {
+            throw new \RuntimeException(sprintf('Job %s must use Batchable trait', $job::class));
+        }
     }
 }
