@@ -2,12 +2,14 @@
 
 namespace Illuminate\Tests\Integration\Migration;
 
+use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Stringable;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\Attributes\TestWith;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class MigratorTest extends TestCase
@@ -27,6 +29,12 @@ class MigratorTest extends TestCase
         $this->subject = $this->app->make('migrator');
         $this->subject->setOutput($this->output);
         $this->subject->getRepository()->createRepository();
+    }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        Migrator::withoutMigrations([]);
     }
 
     public function testMigrate()
@@ -55,6 +63,21 @@ class MigratorTest extends TestCase
 
         $this->assertTrue(DB::getSchemaBuilder()->hasTable('people'));
         $this->assertTrue(DB::getSchemaBuilder()->hasColumn('people', 'first_name'));
+        $this->assertTrue(DB::getSchemaBuilder()->hasColumn('people', 'last_name'));
+    }
+
+    #[TestWith(['2015_10_04_000000_modify_people_table.php'], 'filename with extension')]
+    #[TestWith(['2015_10_04_000000_modify_people_table'], 'filename without extension')]
+    public function testWithSkippedMigrations(string $filename)
+    {
+        $this->app->forgetInstance('migrator');
+        $this->subject = $this->app->make('migrator');
+
+        Migrator::withoutMigrations([$filename]);
+
+        $this->subject->run([__DIR__.'/fixtures']);
+        $this->assertTrue(DB::getSchemaBuilder()->hasTable('people'));
+        $this->assertFalse(DB::getSchemaBuilder()->hasColumn('people', 'first_name'));
         $this->assertTrue(DB::getSchemaBuilder()->hasColumn('people', 'last_name'));
     }
 
