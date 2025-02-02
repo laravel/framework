@@ -3,7 +3,6 @@
 namespace Illuminate\Foundation\Testing;
 
 use Illuminate\Contracts\Console\Kernel;
-use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Foundation\Testing\Traits\CanConfigureMigrationCommands;
 
 trait RefreshDatabase
@@ -130,18 +129,6 @@ trait RefreshDatabase
     {
         return property_exists($this, 'connectionsToTransact')
                             ? $this->connectionsToTransact : [null];
-    }
-
-    /**
-     * Run all migrations that were skipped.
-     *
-     * @return void
-     */
-    protected function runSkippedMigrations()
-    {
-        Migrator::withoutMigrations([]);
-
-        $this->artisan('migrate');
     }
 
     /**
