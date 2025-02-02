@@ -51,9 +51,10 @@ interface ConnectionInterface
      * @param  string  $query
      * @param  array  $bindings
      * @param  bool  $useReadPdo
+     * @param  array  $fetchArgs
      * @return array
      */
-    public function select($query, $bindings = [], $useReadPdo = true);
+    public function select($query, $bindings = [], $useReadPdo = true, array $fetchArgs = []);
 
     /**
      * Run a select statement against the database and returns a generator.
@@ -61,9 +62,10 @@ interface ConnectionInterface
      * @param  string  $query
      * @param  array  $bindings
      * @param  bool  $useReadPdo
+     * @param  array  $fetchArgs
      * @return \Generator
      */
-    public function cursor($query, $bindings = [], $useReadPdo = true);
+    public function cursor($query, $bindings = [], $useReadPdo = true, array $fetchArgs = []);
 
     /**
      * Run an insert statement against the database.

@@ -600,6 +600,12 @@ class QueryBuilderTest extends DatabaseTestCase
 
     public function testPluck()
     {
+        // Test empty result set.
+        $this->assertSame(
+            [],
+            DB::table('posts')->whereRaw('0=1')->pluck('title')->toArray()
+        );
+
         // Test SELECT override, since pluck will take the first column.
         $this->assertSame([
             'Foo Post',

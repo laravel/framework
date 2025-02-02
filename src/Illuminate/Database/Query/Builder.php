@@ -26,6 +26,7 @@ use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use LogicException;
+use PDO;
 use RuntimeException;
 use UnitEnum;
 
@@ -3125,13 +3126,13 @@ class Builder implements BuilderContract
 
     /**
      * Run the query as a "select" statement against the connection.
-     *
+     * @param  array  $fetchArgs
      * @return array
      */
-    protected function runSelect()
+    protected function runSelect(array $fetchArgs = [])
     {
         return $this->connection->select(
-            $this->toSql(), $this->getBindings(), ! $this->useWritePdo
+            $this->toSql(), $this->getBindings(), ! $this->useWritePdo, $fetchArgs
         );
     }
 
@@ -3375,110 +3376,27 @@ class Builder implements BuilderContract
      * Get a collection instance containing the values of a given column.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
-     * @param  string|null  $key
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string|null  $key
      * @return \Illuminate\Support\Collection<array-key, mixed>
      */
     public function pluck($column, $key = null)
     {
-        // First, we will need to select the results of the query accounting for the
-        // given columns / key. Once we have the results, we will be able to take
-        // the results and get the exact data that was requested for the query.
-        $queryResult = $this->onceWithColumns(
-            is_null($key) ? [$column] : [$column, $key],
-            function () {
-                return $this->processor->processSelect(
-                    $this, $this->runSelect()
-                );
-            }
-        );
-
-        if (empty($queryResult)) {
-            return new Collection;
-        }
-
-        // If the columns are qualified with a table or have an alias, we cannot use
-        // those directly in the "pluck" operations since the results from the DB
-        // are only keyed by the column itself. We'll strip the table out here.
-        $column = $this->stripTableForPluck($column);
-
-        $key = $this->stripTableForPluck($key);
-
-        return $this->applyAfterQueryCallbacks(
-            is_array($queryResult[0])
-                    ? $this->pluckFromArrayColumn($queryResult, $column, $key)
-                    : $this->pluckFromObjectColumn($queryResult, $column, $key)
-        );
-    }
-
-    /**
-     * Strip off the table name or alias from a column identifier.
-     *
-     * @param  string  $column
-     * @return string|null
-     */
-    protected function stripTableForPluck($column)
-    {
-        if (is_null($column)) {
-            return $column;
-        }
-
-        $columnString = $column instanceof ExpressionContract
-            ? $this->grammar->getValue($column)
-            : $column;
-
-        $separator = str_contains(strtolower($columnString), ' as ') ? ' as ' : '\.';
-
-        return last(preg_split('~'.$separator.'~i', $columnString));
-    }
-
-    /**
-     * Retrieve column values from rows represented as objects.
-     *
-     * @param  array  $queryResult
-     * @param  string  $column
-     * @param  string  $key
-     * @return \Illuminate\Support\Collection
-     */
-    protected function pluckFromObjectColumn($queryResult, $column, $key)
-    {
-        $results = [];
-
-        if (is_null($key)) {
-            foreach ($queryResult as $row) {
-                $results[] = $row->$column;
-            }
+        if(is_null($key)) {
+            $columns = [$column];
+            $fetchArgs = [PDO::FETCH_COLUMN];
         } else {
-            foreach ($queryResult as $row) {
-                $results[$row->$key] = $row->$column;
-            }
+            $columns = [$key, $column];
+            $fetchArgs = [PDO::FETCH_COLUMN | PDO::FETCH_UNIQUE];
         }
 
-        return new Collection($results);
-    }
+        [$original, $this->columns] = [$this->columns, $columns];
 
-    /**
-     * Retrieve column values from rows represented as arrays.
-     *
-     * @param  array  $queryResult
-     * @param  string  $column
-     * @param  string  $key
-     * @return \Illuminate\Support\Collection
-     */
-    protected function pluckFromArrayColumn($queryResult, $column, $key)
-    {
-        $results = [];
+        $queryResult = $this->processor->processSelect($this, $this->runSelect($fetchArgs));
 
-        if (is_null($key)) {
-            foreach ($queryResult as $row) {
-                $results[] = $row[$column];
-            }
-        } else {
-            foreach ($queryResult as $row) {
-                $results[$row[$key]] = $row[$column];
-            }
-        }
+        // Revert to original columns so future queries can use the previous selection.
+        $this->columns = $original;
 
-        return new Collection($results);
+        return new Collection($queryResult);
     }
 
     /**
