@@ -6,6 +6,7 @@ use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Foundation\Testing\Attributes\WithoutMigration;
 use Illuminate\Foundation\Testing\Traits\CanConfigureMigrationCommands;
+use Illuminate\Support\Collection;
 use ReflectionAttribute;
 use ReflectionMethod;
 
@@ -154,10 +155,10 @@ trait RefreshDatabase
             return;
         }
 
-        $ignoredMigrations = array_map(
-            fn (ReflectionAttribute $reflectionAttribute) => $reflectionAttribute->newInstance()->migration,
-            $withoutMigrations
-        );
+        $ignoredMigrations = (new Collection($withoutMigrations))
+            ->map(fn (ReflectionAttribute $reflectionAttribute) => $reflectionAttribute->newInstance()->migrations)
+            ->flatten()
+            ->all();
 
         Migrator::withoutMigrations($ignoredMigrations);
     }
