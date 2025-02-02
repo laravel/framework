@@ -140,12 +140,16 @@ trait RefreshDatabase
      * Extract migrations to ignore from attributes.
      *
      * @return void
+     *
      * @throws \ReflectionException
      */
     protected function ignoreMigrationsFromAttributes()
     {
-        $reflectionMethod = new ReflectionMethod($this, $this->name());
-        $withoutMigrations = $reflectionMethod->getAttributes(WithoutMigration::class);
+        $withoutMigrations = (new ReflectionMethod(
+            $this,
+            $this->name()
+        ))->getAttributes(WithoutMigration::class);
+
         if ($withoutMigrations === []) {
             return;
         }
@@ -154,7 +158,20 @@ trait RefreshDatabase
             fn (ReflectionAttribute $reflectionAttribute) => $reflectionAttribute->newInstance()->migration,
             $withoutMigrations
         );
+
         Migrator::withoutMigrations($ignoredMigrations);
+    }
+
+    /**
+     * Run all migrations that were skipped.
+     *
+     * @return void
+     */
+    protected function runSkippedMigrations()
+    {
+        Migrator::withoutMigrations([]);
+
+        $this->artisan('migrate');
     }
 
     /**
