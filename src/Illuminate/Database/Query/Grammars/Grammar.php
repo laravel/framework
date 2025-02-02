@@ -1168,11 +1168,8 @@ class Grammar extends BaseGrammar
             return "insert into {$table} default values";
         }
 
-        if (! array_is_list($values)) {
-            $values = (new Collection(array_keys($values)))
-                ->some(fn ($key) => ! is_numeric($key))
-                    ? [$values]
-                    : array_values($values);
+        if (! is_array(reset($values))) {
+            $values = [$values];
         }
 
         $columns = $this->columnize(array_keys(reset($values)));

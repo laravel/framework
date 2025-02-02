@@ -355,6 +355,17 @@ trait InteractsWithData
     }
 
     /**
+     * Retrieve data from the instance as an array.
+     *
+     * @param  array|string|null  $key
+     * @return array
+     */
+    public function array($key = null)
+    {
+        return (array) (is_array($key) ? $this->only($key) : $this->data($key));
+    }
+
+    /**
      * Retrieve data from the instance as a collection.
      *
      * @param  array|string|null  $key

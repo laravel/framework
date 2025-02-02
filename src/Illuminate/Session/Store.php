@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Contracts\Session\Session;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
@@ -785,7 +786,7 @@ class Store implements Session
      */
     public function passwordConfirmed()
     {
-        $this->put('auth.password_confirmed_at', time());
+        $this->put('auth.password_confirmed_at', Date::now()->unix());
     }
 
     /**

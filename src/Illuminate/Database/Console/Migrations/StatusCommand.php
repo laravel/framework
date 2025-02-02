@@ -101,19 +101,19 @@ class StatusCommand extends BaseCommand
     protected function getStatusFor(array $ran, array $batches)
     {
         return (new Collection($this->getAllMigrationFiles()))
-                    ->map(function ($migration) use ($ran, $batches) {
-                        $migrationName = $this->migrator->getMigrationName($migration);
+            ->map(function ($migration) use ($ran, $batches) {
+                $migrationName = $this->migrator->getMigrationName($migration);
 
-                        $status = in_array($migrationName, $ran)
-                            ? '<fg=green;options=bold>Ran</>'
-                            : '<fg=yellow;options=bold>Pending</>';
+                $status = in_array($migrationName, $ran)
+                    ? '<fg=green;options=bold>Ran</>'
+                    : '<fg=yellow;options=bold>Pending</>';
 
-                        if (in_array($migrationName, $ran)) {
-                            $status = '['.$batches[$migrationName].'] '.$status;
-                        }
+                if (in_array($migrationName, $ran)) {
+                    $status = '['.$batches[$migrationName].'] '.$status;
+                }
 
-                        return [$migrationName, $status];
-                    });
+                return [$migrationName, $status];
+            });
     }
 
     /**

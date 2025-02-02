@@ -223,7 +223,7 @@ class RouteListCommand extends Command
     {
         if ($route->action['uses'] instanceof Closure) {
             $path = (new ReflectionFunction($route->action['uses']))
-                                ->getFileName();
+                ->getFileName();
         } elseif (is_string($route->action['uses']) &&
                   str_contains($route->action['uses'], 'SerializableClosure')) {
             return false;
@@ -233,7 +233,7 @@ class RouteListCommand extends Command
             }
 
             $path = (new ReflectionClass($route->getControllerClass()))
-                                ->getFileName();
+                ->getFileName();
         } else {
             return false;
         }
@@ -264,6 +264,7 @@ class RouteListCommand extends Command
     protected function filterRoute(array $route)
     {
         if (($this->option('name') && ! Str::contains((string) $route['name'], $this->option('name'))) ||
+            ($this->option('action') && isset($route['action']) && is_string($route['action']) && ! Str::contains($route['action'], $this->option('action'))) ||
             ($this->option('path') && ! Str::contains($route['uri'], $this->option('path'))) ||
             ($this->option('method') && ! Str::contains($route['method'], strtoupper($this->option('method')))) ||
             ($this->option('domain') && ! Str::contains((string) $route['domain'], $this->option('domain'))) ||
@@ -496,6 +497,7 @@ class RouteListCommand extends Command
         return [
             ['json', null, InputOption::VALUE_NONE, 'Output the route list as JSON'],
             ['method', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by method'],
+            ['action', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by action'],
             ['name', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by name'],
             ['domain', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by domain'],
             ['path', null, InputOption::VALUE_OPTIONAL, 'Only show routes matching the given path pattern'],

@@ -172,6 +172,7 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Support\Carbon|null date(string $key, string|null $format = null, string|null $tz = null)
  * @method static \BackedEnum|null enum(string $key, string $enumClass)
  * @method static \BackedEnum[] enums(string $key, string $enumClass)
+ * @method static array array(array|string|null $key = null)
  * @method static \Illuminate\Support\Collection collect(array|string|null $key = null)
  * @method static array only(array|mixed $keys)
  * @method static array except(array|mixed $keys)
