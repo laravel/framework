@@ -79,6 +79,10 @@ class MigratorTest extends TestCase
         $this->assertTrue(DB::getSchemaBuilder()->hasTable('people'));
         $this->assertFalse(DB::getSchemaBuilder()->hasColumn('people', 'first_name'));
         $this->assertTrue(DB::getSchemaBuilder()->hasColumn('people', 'last_name'));
+
+        Migrator::withoutMigrations([]);
+        $this->subject->run([__DIR__.'/fixtures']);
+        $this->assertTrue(DB::getSchemaBuilder()->hasColumn('people', 'first_name'));
     }
 
     public function testRollback()
