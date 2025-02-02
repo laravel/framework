@@ -3,7 +3,11 @@
 namespace Illuminate\Foundation\Testing;
 
 use Illuminate\Contracts\Console\Kernel;
+use Illuminate\Database\Migrations\Migrator;
+use Illuminate\Foundation\Testing\Attributes\WithoutMigration;
 use Illuminate\Foundation\Testing\Traits\CanConfigureMigrationCommands;
+use ReflectionMethod;
+use ReflectionAttribute;
 
 trait RefreshDatabase
 {
@@ -16,6 +20,7 @@ trait RefreshDatabase
      */
     public function refreshDatabase()
     {
+        $this->ignoreMigrationsFromAttributes();
         $this->beforeRefreshingDatabase();
 
         if ($this->usingInMemoryDatabase()) {
@@ -129,6 +134,27 @@ trait RefreshDatabase
     {
         return property_exists($this, 'connectionsToTransact')
                             ? $this->connectionsToTransact : [null];
+    }
+
+    /**
+     * Extract migrations to ignore from attributes.
+     *
+     * @return void
+     * @throws \ReflectionException
+     */
+    protected function ignoreMigrationsFromAttributes()
+    {
+        $reflectionMethod = new ReflectionMethod($this, $this->name());
+        $withoutMigrations = $reflectionMethod->getAttributes(WithoutMigration::class);
+        if ($withoutMigrations === []) {
+            return;
+        }
+
+        $ignoredMigrations = array_map(
+            fn (ReflectionAttribute $reflectionAttribute) => $reflectionAttribute->newInstance()->migration,
+            $withoutMigrations
+        );
+        Migrator::withoutMigrations($ignoredMigrations);
     }
 
     /**

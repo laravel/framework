@@ -59,6 +59,13 @@ class Migrator
     protected static $connectionResolverCallback;
 
     /**
+     * The pending migrations to skip.
+     *
+     * @var list<string>
+     */
+    protected static $withoutMigrations = [];
+
+    /**
      * The name of the default connection.
      *
      * @var string
@@ -142,9 +149,23 @@ class Migrator
      */
     protected function pendingMigrations($files, $ran)
     {
+        $migrationsToSkip = $this->migrationsToSkip();
+
         return (new Collection($files))
-            ->reject(fn ($file) => in_array($this->getMigrationName($file), $ran))
+            ->reject(fn ($file) => in_array($migrationName = $this->getMigrationName($file), $ran) || in_array($migrationName, $migrationsToSkip))
             ->values()
+            ->all();
+    }
+
+    /**
+     * Get list of pending migrations to skip.
+     *
+     * @return list<string>
+     */
+    protected function migrationsToSkip()
+    {
+        return (new Collection(self::$withoutMigrations))
+            ->map($this->getMigrationName(...))
             ->all();
     }
 
@@ -161,6 +182,8 @@ class Migrator
         // aren't, we will just make a note of it to the developer so they're aware
         // that all of the migrations have been run against this database system.
         if (count($migrations) === 0) {
+
+
             $this->fireMigrationEvent(new NoPendingMigrations('up'));
 
             $this->write(Info::class, 'Nothing to migrate');
@@ -669,6 +692,17 @@ class Migrator
     public static function resolveConnectionsUsing(Closure $callback)
     {
         static::$connectionResolverCallback = $callback;
+    }
+
+    /**
+     * Set the pending migrations to skip.
+     *
+     * @param  list<string>  $migrations
+     * @return void
+     */
+    public static function withoutMigrations($migrations)
+    {
+        static::$withoutMigrations = $migrations;
     }
 
     /**
