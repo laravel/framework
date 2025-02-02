@@ -415,7 +415,6 @@ class PendingBatch
 
     private function checkJobIsBatchable(object|array $job): void
     {
-
         foreach (Arr::wrap($job) as $job) {
             if ($job instanceof PendingBatch) {
                 $this->checkJobIsBatchable($job->jobs->all());
