@@ -54,7 +54,7 @@ class PendingBatch
     public function __construct(Container $container, Collection $jobs)
     {
         $this->container = $container;
-        $this->jobs = $jobs->each(function ($job) {
+        $this->jobs = $jobs->each(function (object|array $job) {
             $this->checkJobIsBatchable($job);
         });
     }
@@ -413,10 +413,18 @@ class PendingBatch
         return $batch;
     }
 
-    private function checkJobIsBatchable($job): void
+    private function checkJobIsBatchable(object|array $job): void
     {
-        if (! in_array(Batchable::class, class_uses_recursive($job))) {
-            throw new \RuntimeException(sprintf('Job %s must use Batchable trait', $job::class));
+
+        foreach (Arr::wrap($job) as $job) {
+            if ($job instanceof PendingBatch) {
+                $this->checkJobIsBatchable($job->jobs->all());
+                return;
+            }
+
+            if (! in_array(Batchable::class, class_uses_recursive($job))) {
+                throw new \RuntimeException(sprintf('Job %s must use Batchable trait', $job::class));
+            }
         }
     }
 }
