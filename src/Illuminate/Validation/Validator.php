@@ -266,6 +266,8 @@ class Validator implements ValidatorContract
         'PresentWithAll',
         'Prohibited',
         'ProhibitedIf',
+        'ProhibitedIfAccepted',
+        'ProhibitedIfDeclined',
         'ProhibitedUnless',
         'Prohibits',
         'MissingIf',
