@@ -330,29 +330,126 @@ class SupportNumberTest extends TestCase
         $this->assertSame('1E0', Number::scientific(1, precision: 0));
         $this->assertSame('1E0', Number::scientific(1, precision: 2));
         $this->assertSame('1.23E1', Number::scientific(12.34));
+        $this->assertSame('1.23E1', Number::scientific(12.34, locale: 'en'));
+        $this->assertSame('1,23E1', Number::scientific(12.34, locale: 'de'));
+        $this->assertSame('1,23E1', Number::scientific(12.34, locale: 'fr'));
+        $this->assertSame('1,23E1', Number::scientific(12.34, locale: 'ru'));
+        $this->assertSame('1,23×10^1', Number::scientific(12.34, locale: 'sv'));
+        $this->assertSame('1.23E1', Number::scientific(12.34, locale: 'ar'));
         $this->assertSame('1.23E1', Number::scientific(12.34, precision: 2));
         $this->assertSame('1.2346E1', Number::scientific(12.3456, precision: 4));
 
         // Large numbers
         $this->assertSame('1E6', Number::scientific(1000000));
+        $this->assertSame('1E6', Number::scientific(1000000, precision: 0));
+        $this->assertSame('1E6', Number::scientific(1000000, locale: 'en'));
+        $this->assertSame('1E6', Number::scientific(1000000, locale: 'de'));
+        $this->assertSame('1E6', Number::scientific(1000000, locale: 'fr'));
+        $this->assertSame('1E6', Number::scientific(1000000, locale: 'ru'));
+        $this->assertSame('1×10^6', Number::scientific(1000000, locale: 'sv'));
+        $this->assertSame('1E6', Number::scientific(1000000, locale: 'ar'));
+
         $this->assertSame('1.23E6', Number::scientific(1234567));
+        $this->assertSame('1.234567E6', Number::scientific(1234567, precision: 0));
+        $this->assertSame('1.2E6', Number::scientific(1234567, precision: 1));
+        $this->assertSame('1.23E6', Number::scientific(1234567, locale: 'en'));
+        $this->assertSame('1,23E6', Number::scientific(1234567, locale: 'de'));
+        $this->assertSame('1,23E6', Number::scientific(1234567, locale: 'fr'));
+        $this->assertSame('1,23E6', Number::scientific(1234567, locale: 'ru'));
+        $this->assertSame('1,23×10^6', Number::scientific(1234567, locale: 'sv'));
+        $this->assertSame('1.23E6', Number::scientific(1234567, locale: 'ar'));
+
         $this->assertSame('1.23E8', Number::scientific(123456789));
+        $this->assertSame('1.23456789E8', Number::scientific(123456789, precision: 0));
+        $this->assertSame('1.2E8', Number::scientific(123456789, precision: 1));
+        $this->assertSame('1.23E8', Number::scientific(123456789, locale: 'en'));
+        $this->assertSame('1,23E8', Number::scientific(123456789, locale: 'de'));
+        $this->assertSame('1,23E8', Number::scientific(123456789, locale: 'fr'));
+        $this->assertSame('1,23E8', Number::scientific(123456789, locale: 'ru'));
+        $this->assertSame('1,23×10^8', Number::scientific(123456789, locale: 'sv'));
+        $this->assertSame('1.23E8', Number::scientific(123456789, locale: 'ar'));
 
         // Small numbers
         $this->assertSame('1E-3', Number::scientific(0.001));
+        $this->assertSame('1E-3', Number::scientific(0.001, precision: 0));
+        $this->assertSame('1E-3', Number::scientific(0.001, precision: 1));
+        $this->assertSame('1E-3', Number::scientific(0.001, locale: 'en'));
+        $this->assertSame('1E-3', Number::scientific(0.001, locale: 'de'));
+        $this->assertSame('1E-3', Number::scientific(0.001, locale: 'fr'));
+        $this->assertSame('1E-3', Number::scientific(0.001, locale: 'ru'));
+        $this->assertSame('1×10^−3', Number::scientific(0.001, locale: 'sv'));
+        $this->assertSame("1E\u{200E}-3", Number::scientific(0.001, locale: 'ar'));
+
         $this->assertSame('1.23E-3', Number::scientific(0.00123));
         $this->assertSame('1.23E-6', Number::scientific(0.000001234));
+        $this->assertSame('1.234E-6', Number::scientific(0.000001234, precision: 0));
+        $this->assertSame('1.2E-6', Number::scientific(0.000001234, precision: 1));
+        $this->assertSame('1.23E-6', Number::scientific(0.000001234, locale: 'en'));
+        $this->assertSame('1,23E-6', Number::scientific(0.000001234, locale: 'de'));
+        $this->assertSame('1,23E-6', Number::scientific(0.000001234, locale: 'fr'));
+        $this->assertSame('1,23E-6', Number::scientific(0.000001234, locale: 'ru'));
+        $this->assertSame('1,23×10^−6', Number::scientific(0.000001234, locale: 'sv'));
+        $this->assertSame("1.23E\u{200E}-6", Number::scientific(0.000001234, locale: 'ar'));
 
         // Zero and special values
         $this->assertSame('0E0', Number::scientific(0));
+        $this->assertSame('0E0', Number::scientific(0, precision: 0));
         $this->assertSame('0E0', Number::scientific(0, precision: 1));
         $this->assertSame('0E0', Number::scientific(0, precision: 3));
+        $this->assertSame('0E0', Number::scientific(0, locale: 'en'));
+        $this->assertSame('0E0', Number::scientific(0, locale: 'de'));
+        $this->assertSame('0E0', Number::scientific(0, locale: 'fr'));
+        $this->assertSame('0E0', Number::scientific(0, locale: 'ru'));
+        $this->assertSame('0×10^0', Number::scientific(0, locale: 'sv'));
+        $this->assertSame('0E0', Number::scientific(0, locale: 'ar'));
+
         $this->assertSame('∞', Number::scientific(INF));
+        $this->assertSame('∞', Number::scientific(INF, precision: 0));
+        $this->assertSame('∞', Number::scientific(INF, precision: 1));
+        $this->assertSame('∞', Number::scientific(INF, locale: 'en'));
+        $this->assertSame('∞', Number::scientific(INF, locale: 'de'));
+        $this->assertSame('∞', Number::scientific(INF, locale: 'fr'));
+        $this->assertSame('∞', Number::scientific(INF, locale: 'ru'));
+        $this->assertSame('∞', Number::scientific(INF, locale: 'sv'));
+        $this->assertSame('∞', Number::scientific(INF, locale: 'ar'));
+
         $this->assertSame('NaN', Number::scientific(NAN));
+        $this->assertSame('NaN', Number::scientific(NAN, precision: 0));
+        $this->assertSame('NaN', Number::scientific(NAN, precision: 1));
+        $this->assertSame('NaN', Number::scientific(NAN, locale: 'en'));
+        $this->assertSame('NaN', Number::scientific(NAN, locale: 'de'));
+        $this->assertSame('NaN', Number::scientific(NAN, locale: 'fr'));
+        $this->assertSame("не\u{A0}число", Number::scientific(NAN, locale: 'ru'));
+        $this->assertSame('NaN', Number::scientific(NAN, locale: 'sv'));
+        $this->assertSame("ليس\u{A0}رقمًا", Number::scientific(NAN, locale: 'ar'));
 
         // Negative numbers
         $this->assertSame('-1E0', Number::scientific(-1));
+        $this->assertSame('-1E0', Number::scientific(-1, precision: 0));
+        $this->assertSame('-1E0', Number::scientific(-1, precision: 1));
+        $this->assertSame('-1E0', Number::scientific(-1, locale: 'en'));
+        $this->assertSame('-1E0', Number::scientific(-1, locale: 'de'));
+        $this->assertSame('-1E0', Number::scientific(-1, locale: 'fr'));
+        $this->assertSame('-1E0', Number::scientific(-1, locale: 'ru'));
+
         $this->assertSame('-1.23E1', Number::scientific(-12.34));
+        $this->assertSame('-1.234E1', Number::scientific(-12.34, precision: 0));
+        $this->assertSame('-1.2E1', Number::scientific(-12.34, precision: 1));
+        $this->assertSame('-1.23E1', Number::scientific(-12.34, locale: 'en'));
+        $this->assertSame('-1,23E1', Number::scientific(-12.34, locale: 'de'));
+        $this->assertSame('-1,23E1', Number::scientific(-12.34, locale: 'fr'));
+        $this->assertSame('-1,23E1', Number::scientific(-12.34, locale: 'ru'));
+        $this->assertSame('−1,23×10^1', Number::scientific(-12.34, locale: 'sv'));
+        $this->assertSame("\u{200E}-1.23E1", Number::scientific(-12.34, locale: 'ar'));
+
         $this->assertSame('-1.23E-3', Number::scientific(-0.00123));
+        $this->assertSame('-1.23E-3', Number::scientific(-0.00123, precision: 0));
+        $this->assertSame('-1.2E-3', Number::scientific(-0.00123, precision: 1));
+        $this->assertSame('-1.23E-3', Number::scientific(-0.00123, locale: 'en'));
+        $this->assertSame('-1,23E-3', Number::scientific(-0.00123, locale: 'de'));
+        $this->assertSame('-1,23E-3', Number::scientific(-0.00123, locale: 'fr'));
+        $this->assertSame('-1,23E-3', Number::scientific(-0.00123, locale: 'ru'));
+        $this->assertSame('−1,23×10^−3', Number::scientific(-0.00123, locale: 'sv'));
+        $this->assertSame("\u{200E}-1.23E\u{200E}-3", Number::scientific(-0.00123, locale: 'ar'));
     }
 }
