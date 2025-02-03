@@ -327,7 +327,7 @@ class Number
             }
         }
 
-        return sprintf('%sE%d', $mantissa, $exponent);
+        return $mantissa . $formatter->getSymbol(NumberFormatter::EXPONENTIAL_SYMBOL) . $formatter->format($exponent);
     }
 
     /**
