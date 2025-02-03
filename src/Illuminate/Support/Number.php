@@ -297,18 +297,37 @@ class Number
      * Format the given number in scientific notation.
      *
      * @param  int|float  $number
+     * @param  int  $exponent
      * @param  int  $precision
      * @param  string|null  $locale
      * @return string|false
      */
-    public static function scientific(int|float $number, int $precision = 2, ?string $locale = null)
+    public static function scientific(int|float $number, int $exponent = null, int $precision = 2, ?string $locale = null)
     {
         static::ensureIntlExtensionIsInstalled();
 
-        $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::SCIENTIFIC);
-        $formatter->setAttribute(NumberFormatter::MAX_FRACTION_DIGITS, $precision);
+        if (is_infinite($number) || is_nan($number)) {
+            $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::SCIENTIFIC);
 
-        return $formatter->format($number);
+            return $formatter->format($number);
+        }
+
+        $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::DECIMAL);
+        $formatter->setAttribute(NumberFormatter::MAX_FRACTION_DIGITS, $precision);
+        $formatter->setAttribute(NumberFormatter::GROUPING_USED, 0);
+
+        $exponent ??= ($number == 0 || abs($number) == 1) ? 0 : floor(log10(abs($number)));
+        $mantissa = round($number / pow(10, $exponent), $precision);
+
+        if ($precision > 0) {
+            $mantissa = $formatter->format($mantissa);
+            $decimalSeparator = $formatter->getSymbol(NumberFormatter::DECIMAL_SEPARATOR_SYMBOL);
+            if (str_contains($mantissa, $decimalSeparator)) {
+                $mantissa = rtrim(rtrim($mantissa, '0'), $decimalSeparator);
+            }
+        }
+
+        return sprintf('%sE%d', $mantissa, $exponent);
     }
 
     /**
