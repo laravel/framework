@@ -322,4 +322,37 @@ class SupportNumberTest extends TestCase
         $this->assertSame(12.3456789, Number::trim(12.3456789));
         $this->assertSame(12.3456789, Number::trim(12.34567890000));
     }
+
+    #[RequiresPhpExtension('intl')]
+    public function testScientific()
+    {
+        $this->assertSame('1E0', Number::scientific(1));
+        $this->assertSame('1E0', Number::scientific(1, precision: 0));
+        $this->assertSame('1E0', Number::scientific(1, precision: 2));
+        $this->assertSame('1.23E1', Number::scientific(12.34));
+        $this->assertSame('1.23E1', Number::scientific(12.34, precision: 2));
+        $this->assertSame('1.2346E1', Number::scientific(12.3456, precision: 4));
+
+        // Large numbers
+        $this->assertSame('1E6', Number::scientific(1000000));
+        $this->assertSame('1.23E6', Number::scientific(1234567));
+        $this->assertSame('1.23E8', Number::scientific(123456789));
+
+        // Small numbers
+        $this->assertSame('1E-3', Number::scientific(0.001));
+        $this->assertSame('1.23E-3', Number::scientific(0.00123));
+        $this->assertSame('1.23E-6', Number::scientific(0.000001234));
+
+        // Zero and special values
+        $this->assertSame('0E0', Number::scientific(0));
+        $this->assertSame('0E0', Number::scientific(0, precision: 1));
+        $this->assertSame('0E0', Number::scientific(0, precision: 3));
+        $this->assertSame('∞', Number::scientific(INF));
+        $this->assertSame('NaN', Number::scientific(NAN));
+
+        // Negative numbers
+        $this->assertSame('-1E0', Number::scientific(-1));
+        $this->assertSame('-1.23E1', Number::scientific(-12.34));
+        $this->assertSame('-1.23E-3', Number::scientific(-0.00123));
+    }
 }

@@ -294,6 +294,24 @@ class Number
     }
 
     /**
+     * Format the given number in scientific notation.
+     *
+     * @param  int|float  $number
+     * @param  int  $precision
+     * @param  string|null  $locale
+     * @return string|false
+     */
+    public static function scientific(int|float $number, int $precision = 2, ?string $locale = null)
+    {
+        static::ensureIntlExtensionIsInstalled();
+
+        $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::SCIENTIFIC);
+        $formatter->setAttribute(NumberFormatter::MAX_FRACTION_DIGITS, $precision);
+
+        return $formatter->format($number);
+    }
+
+    /**
      * Execute the given callback using the given locale.
      *
      * @param  string  $locale
