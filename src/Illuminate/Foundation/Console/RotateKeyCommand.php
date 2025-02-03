@@ -43,8 +43,8 @@ class RotateKeyCommand extends Command
         }
 
         // 4. Notify the user and generate a new key
-        $this->components->info('Current application key has been saved successfully. Running php artisan key:generate to generate a new key.');
-        $this->call('key:generate');
+        $this->components->info('Current application key has been saved successfully. Running php artisan key:generate --force to generate a new key.');
+        $this->call('key:generate', ['--force' => true]);
         $this->components->info('Application key has been rotated successfully.');
     }
 
