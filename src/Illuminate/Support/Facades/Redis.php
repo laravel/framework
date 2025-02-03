@@ -29,6 +29,7 @@ namespace Illuminate\Support\Facades;
  * @method static bool hasMacro(string $name)
  * @method static void flushMacros()
  * @method static mixed macroCall(string $method, array $parameters)
+ * @method static void publish(string $channel, string $message)
  *
  * @see \Illuminate\Redis\RedisManager
  */
