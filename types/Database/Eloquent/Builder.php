@@ -64,6 +64,9 @@ function test(
     assertType('User', $query->firstOrFail());
     assertType('User', $query->sole());
     assertType('Illuminate\Support\LazyCollection<int, User>', $query->cursor());
+    assertType('Illuminate\Support\LazyCollection<int, User>', $query->lazy());
+    assertType('Illuminate\Support\LazyCollection<int, User>', $query->lazyById());
+    assertType('Illuminate\Support\LazyCollection<int, User>', $query->lazyByIdDesc());
     assertType('Illuminate\Support\Collection<(int|string), mixed>', $query->pluck('foo'));
     assertType('Illuminate\Database\Eloquent\Relations\Relation<Illuminate\Database\Eloquent\Model, User, *>', $query->getRelation('foo'));
     assertType('Illuminate\Database\Eloquent\Builder<Illuminate\Types\Builder\Post>', $query->setModel(new Post()));

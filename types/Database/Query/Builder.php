@@ -33,6 +33,9 @@ function test(Builder $query, EloquentBuilder $userQuery): void
     assertType('Illuminate\Database\Query\Builder', $query->unionAll($userQuery));
     assertType('int', $query->insertUsing([], $userQuery));
     assertType('int', $query->insertOrIgnoreUsing([], $userQuery));
+    assertType('Illuminate\Support\LazyCollection<int, object>', $query->lazy());
+    assertType('Illuminate\Support\LazyCollection<int, object>', $query->lazyById());
+    assertType('Illuminate\Support\LazyCollection<int, object>', $query->lazyByIdDesc());
 
     $query->chunk(1, function ($users, $page) {
         assertType('Illuminate\Support\Collection<int, object>', $users);
