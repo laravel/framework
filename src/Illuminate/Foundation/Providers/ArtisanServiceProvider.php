@@ -279,7 +279,22 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         $this->commands(array_values($commands));
     }
 
-    protected function registerCommandsWithDependencies() 
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerQueueForgetCommand()
+    {
+        $this->app->singleton(ForgetFailedQueueCommand::class);
+    }
+
+    /**
+     * Register commands that require dependency injection.
+     *
+     * @return void
+     */
+    protected function registerCommandsWithDependencies()
     {
         foreach ($this->registerCommandsWithDependencies as $class => $dependencies) {
             $this->app->singleton($class, fn($app) => $this->resolveDependencies($app, $dependencies, $class));
@@ -288,6 +303,14 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         $this->commands(array_keys($this->registerCommandsWithDependencies));
     }
 
+    /**
+     * Resolve and inject dependencies for a given command class.
+     *
+     * @param  \Illuminate\Contracts\Container\Container  $app
+     * @param  array  $dependencies
+     * @param  string  $class
+     * @return object
+ */
     protected function resolveDependencies($app, $dependencies, $class)
     {
         $resolvedDependencies = [];
