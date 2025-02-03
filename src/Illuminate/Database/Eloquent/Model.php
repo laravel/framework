@@ -25,6 +25,8 @@ use JsonException;
 use JsonSerializable;
 use LogicException;
 use Stringable;
+use ReflectionMethod;
+use Illuminate\Database\Eloquent\Attributes\NamedScope;
 
 abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToString, HasBroadcastChannel, Jsonable, JsonSerializable, QueueableEntity, Stringable, UrlRoutable
 {
@@ -1631,6 +1633,22 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             : Pivot::fromAttributes($parent, $attributes, $table, $exists);
     }
 
+    public function getAttributedNamedScope(string $scope): ?string
+    {
+        if (!method_exists($this, $scope)) {
+            return null;
+        }
+
+        $method = new ReflectionMethod($this, $scope);
+        $attribute = $method->getAttributes(NamedScope::class);
+
+        if ($attribute === []) {
+            return null;
+        }
+
+        return $method->name;
+    }
+
     /**
      * Determine if the model has a given scope.
      *
@@ -1639,7 +1657,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function hasNamedScope($scope)
     {
-        return method_exists($this, 'scope'.ucfirst($scope));
+        return method_exists($this, 'scope'.ucfirst($scope)) || $this->getAttributedNamedScope($scope) !== null;
     }
 
     /**
@@ -1651,6 +1669,10 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function callNamedScope($scope, array $parameters = [])
     {
+        if (($method = $this->getAttributedNamedScope($scope)) !== null) {
+            return $this->{$method}(...$parameters);
+        }
+
         return $this->{'scope'.ucfirst($scope)}(...$parameters);
     }
 
