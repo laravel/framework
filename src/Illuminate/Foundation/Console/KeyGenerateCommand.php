@@ -36,6 +36,8 @@ class KeyGenerateCommand extends Command
     public function handle(): void
     {
         if ($this->shouldSaveExistingKey()) {
+            $this->call('key:rotate');
+
             return;
         }
 
@@ -70,8 +72,6 @@ class KeyGenerateCommand extends Command
             'There is already an app key. Do you want to store the old key before generating a new one?',
             true
         )) {
-            $this->call('key:rotate');
-
             return true;
         }
 
