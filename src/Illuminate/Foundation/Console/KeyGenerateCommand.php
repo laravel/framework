@@ -33,7 +33,7 @@ class KeyGenerateCommand extends Command
      *
      * @return void
      */
-    public function handle(): void
+    public function handle()
     {
         if ($this->shouldSaveExistingKey()) {
             $this->call('key:rotate');
@@ -83,7 +83,7 @@ class KeyGenerateCommand extends Command
      *
      * @return string
      */
-    protected function generateRandomKey(): string
+    protected function generateRandomKey()
     {
         return 'base64:'.base64_encode(
             Encrypter::generateKey($this->laravel['config']['app.cipher'])
@@ -96,7 +96,7 @@ class KeyGenerateCommand extends Command
      * @param  string  $key
      * @return bool
      */
-    protected function setKeyInEnvironmentFile(string $key): bool
+    protected function setKeyInEnvironmentFile($key)
     {
         $currentKey = $this->laravel['config']['app.key'];
 
@@ -117,7 +117,7 @@ class KeyGenerateCommand extends Command
      * @param  string  $key
      * @return bool
      */
-    protected function writeNewEnvironmentFileWith(string $key): bool
+    protected function writeNewEnvironmentFileWith($key)
     {
         $replaced = preg_replace(
             $this->keyReplacementPattern(),
@@ -141,7 +141,7 @@ class KeyGenerateCommand extends Command
      *
      * @return string
      */
-    protected function keyReplacementPattern(): string
+    protected function keyReplacementPattern()
     {
         $escaped = preg_quote('='.$this->laravel['config']['app.key'], '/');
 
