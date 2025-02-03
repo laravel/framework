@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Attributes\NamedScope;
+use Illuminate\Database\Eloquent\Model;
 
 class EloquentModelScopeTest extends DatabaseTestCase
 {
