@@ -739,6 +739,10 @@ class SupportStringableTest extends TestCase
         $this->assertSame('sometext', (string) $this->stringable('some text')->slug(''));
         $this->assertSame('', (string) $this->stringable('')->slug(''));
         $this->assertSame('', (string) $this->stringable('')->slug());
+        $this->assertSame('hello-world', (string) $this->stringable('hello world')->slug('eb'));
+        $this->assertSame('hello-world', (string) $this->stringable('hello world')->slug('e'));
+        $this->assertSame('hello-world', (string) $this->stringable('hello world')->slug('2'));
+        $this->assertSame('hello-world', (string) $this->stringable('hello world')->slug('2'));
     }
 
     public function testSquish()

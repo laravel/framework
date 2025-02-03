@@ -1464,6 +1464,7 @@ class Str
     public static function slug($title, $separator = '-', $language = 'en', $dictionary = ['@' => 'at'])
     {
         $title = $language ? static::ascii($title, $language) : $title;
+        $separator = ctype_alnum($separator) ? '-' : $separator;
 
         // Convert all dashes/underscores into separator
         $flip = $separator === '-' ? '_' : '-';
