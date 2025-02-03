@@ -330,6 +330,12 @@ class SupportNumberTest extends TestCase
         $this->assertSame('1E0', Number::scientific(1, precision: 0));
         $this->assertSame('1E0', Number::scientific(1, precision: 2));
         $this->assertSame('1.23E1', Number::scientific(12.34));
+        $this->assertSame('1.23E1', Number::scientific(12.34, exponent: 1));
+        $this->assertSame('0.12E2', Number::scientific(12.34, exponent: 2));
+        $this->assertSame('0E4', Number::scientific(12.34, exponent: 4));
+        $this->assertSame('123400E-4', Number::scientific(12.34, exponent: -4));
+        $this->assertSame('0.001E4', Number::scientific(12.34, exponent: 4, precision: 3));
+        $this->assertSame('0.0012E4', Number::scientific(12.34, exponent: 4, precision: 4));
         $this->assertSame('1.23E1', Number::scientific(12.34, locale: 'en'));
         $this->assertSame('1,23E1', Number::scientific(12.34, locale: 'de'));
         $this->assertSame('1,23E1', Number::scientific(12.34, locale: 'fr'));
