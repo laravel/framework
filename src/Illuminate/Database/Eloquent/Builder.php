@@ -317,6 +317,8 @@ class Builder implements BuilderContract
         if ($column instanceof Closure && is_null($operator)) {
             $column($query = $this->model->newQueryWithoutRelationships());
 
+            $this->eagerLoad = array_merge($this->eagerLoad, $query->getEagerLoads());
+
             $this->query->addNestedWhereQuery($query->getQuery(), $boolean);
         } else {
             $this->query->where(...func_get_args());
