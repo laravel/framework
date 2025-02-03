@@ -297,7 +297,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     protected function registerCommandsWithDependencies()
     {
         foreach ($this->registerCommandsWithDependencies as $class => $dependencies) {
-            $this->app->singleton($class, fn($app) => $this->resolveDependencies($app, $dependencies, $class));
+            $this->app->singleton($class, fn ($app) => $this->resolveDependencies($app, $dependencies, $class));
         }
 
         $this->commands(array_keys($this->registerCommandsWithDependencies));
@@ -310,7 +310,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      * @param  array  $dependencies
      * @param  string  $class
      * @return object
- */
+     */
     protected function resolveDependencies($app, $dependencies, $class)
     {
         $resolvedDependencies = [];
