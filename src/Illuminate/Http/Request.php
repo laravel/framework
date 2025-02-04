@@ -155,7 +155,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      * Get the full URL for the request without the given query string parameters.
      *
      * @param  array|string  $keys
-     * @param  int-mask $encoding_type (optional) PHP Query encoding type.
+     * @param  int-mask  $encoding_type (optional) PHP Query encoding type.
      * @return string
      */
     public function fullUrlWithoutQuery($keys, $encoding_type = PHP_QUERY_RFC3986)
