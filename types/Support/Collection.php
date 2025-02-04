@@ -1133,6 +1133,7 @@ assertType('Illuminate\Support\HigherOrderCollectionProxy<int, Animal>', $coll->
 assertType('Illuminate\Support\HigherOrderCollectionProxy<int, Animal>', $coll->flatMap);
 assertType('Illuminate\Support\HigherOrderCollectionProxy<int, Animal>', $coll->groupBy);
 assertType('Illuminate\Support\HigherOrderCollectionProxy<int, Animal>', $coll->keyBy);
+assertType('Illuminate\Support\HigherOrderCollectionProxy<int, Animal>', $coll->last);
 assertType('Illuminate\Support\HigherOrderCollectionProxy<int, Animal>', $coll->map);
 assertType('Illuminate\Support\HigherOrderCollectionProxy<int, Animal>', $coll->max);
 assertType('Illuminate\Support\HigherOrderCollectionProxy<int, Animal>', $coll->min);
