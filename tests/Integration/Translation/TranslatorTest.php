@@ -136,4 +136,30 @@ class TranslatorTest extends TestCase
         yield [0, 'Bonjour :name', 'fr'];
         yield [3, 'Bonjour :name, vous avez :count messages non lus', 'fr'];
     }
+
+    public function test_it_can_use_derived_fallback_locale()
+    {
+        $this->app->setLocale('de_CH', true);
+
+        $this->assertSame('de', $this->app['translator']->getFallback());
+
+        $this->assertSame('Grüezi', $this->app['translator']->get('Greeting'));
+
+        $this->assertSame('Welcome', $this->app['translator']->get('Welcome'));
+
+        $this->assertSame('Goodbye', $this->app['translator']->get('Goodbye'));
+    }
+
+    public function test_has_for_locale_respects_derived_fallback()
+    {
+        $this->app['translator']->addJsonPath(__DIR__.'/lang');
+
+        $this->app->setLocale('de_CH', true);
+
+        $this->assertTrue($this->app['translator']->hasForLocale('Greeting'));
+
+        $this->assertFalse($this->app['translator']->hasForLocale('Welcome'));
+
+        $this->assertFalse($this->app['translator']->hasForLocale('Nonexistent'));
+    }
 }

@@ -1573,15 +1573,24 @@ class Application extends Container implements ApplicationContract, CachesConfig
      * Set the current application locale.
      *
      * @param  string  $locale
+     * @param  bool  $useDerivedFallback
      * @return void
      */
-    public function setLocale($locale)
+    public function setLocale($locale, $useDerivedFallback = false)
     {
         $this['config']->set('app.locale', $locale);
 
         $this['translator']->setLocale($locale);
 
         $this['events']->dispatch(new LocaleUpdated($locale));
+
+        if ($useDerivedFallback) {
+            $primaryLanguage = substr($locale, 0, 2);
+
+            if ($primaryLanguage !== $locale) {
+                $this->setFallbackLocale($primaryLanguage);
+            }
+        }
     }
 
     /**
