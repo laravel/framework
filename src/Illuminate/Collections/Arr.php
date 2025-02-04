@@ -702,7 +702,7 @@ class Arr
      * Convert the array into a query string.
      *
      * @param  array  $array
-     * @param  int-mask-of<PHP_QUERY_*> $encodingType (optional) PHP Query encoding type.
+     * @param  int-mask-of<PHP_QUERY_*> $encodingType (optional) Query encoding type.
      * @return string
      */
     public static function query($array, $encodingType = PHP_QUERY_RFC3986)
