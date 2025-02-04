@@ -1461,11 +1461,11 @@ class Str
      * @param  string|null  $language
      * @param  array<string, string>  $dictionary
      * @return string
-     * 
+     *
      * @throws InvalidArgumentException
      */
     public static function slug($title, $separator = '-', $language = 'en', $dictionary = ['@' => 'at'])
-    {        
+    {
         if (ctype_alnum($separator)) {
             throw new InvalidArgumentException('The separator must not be alphanumeric.');
         }
