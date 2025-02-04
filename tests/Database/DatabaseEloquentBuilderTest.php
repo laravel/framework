@@ -1031,6 +1031,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $nestedQuery = m::mock(Builder::class);
         $nestedRawQuery = $this->getMockQueryBuilder();
         $nestedQuery->shouldReceive('getQuery')->once()->andReturn($nestedRawQuery);
+        $nestedQuery->shouldReceive('getEagerLoads')->once()->andReturn([]);
         $model = $this->getMockModel()->makePartial();
         $model->shouldReceive('newQueryWithoutRelationships')->once()->andReturn($nestedQuery);
         $builder = $this->getBuilder();
@@ -1092,6 +1093,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $nestedQuery = m::mock(Builder::class);
         $nestedRawQuery = $this->getMockQueryBuilder();
         $nestedQuery->shouldReceive('getQuery')->once()->andReturn($nestedRawQuery);
+        $nestedQuery->shouldReceive('getEagerLoads')->once()->andReturn([]);
         $model = $this->getMockModel()->makePartial();
         $model->shouldReceive('newQueryWithoutRelationships')->once()->andReturn($nestedQuery);
         $builder = $this->getBuilder();
@@ -1120,6 +1122,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $nestedQuery = m::mock(Builder::class);
         $nestedRawQuery = $this->getMockQueryBuilder();
         $nestedQuery->shouldReceive('getQuery')->once()->andReturn($nestedRawQuery);
+        $nestedQuery->shouldReceive('getEagerLoads')->once()->andReturn([]);
         $model = $this->getMockModel()->makePartial();
         $model->shouldReceive('newQueryWithoutRelationships')->once()->andReturn($nestedQuery);
         $builder = $this->getBuilder();
