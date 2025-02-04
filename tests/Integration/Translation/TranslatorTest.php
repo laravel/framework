@@ -152,8 +152,6 @@ class TranslatorTest extends TestCase
 
     public function test_has_for_locale_respects_derived_fallback()
     {
-        $this->app['translator']->addJsonPath(__DIR__.'/lang');
-
         $this->app->setLocale('de_CH', true);
 
         $this->assertTrue($this->app['translator']->hasForLocale('Greeting'));
