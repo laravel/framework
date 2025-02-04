@@ -11,6 +11,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\CanBeEscapedWhenCastToString;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
+use Illuminate\Database\Eloquent\Attributes\RoutedBy;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
@@ -24,6 +25,7 @@ use Illuminate\Support\Traits\ForwardsCalls;
 use JsonException;
 use JsonSerializable;
 use LogicException;
+use ReflectionClass;
 use Stringable;
 
 abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToString, HasBroadcastChannel, Jsonable, JsonSerializable, QueueableEntity, Stringable, UrlRoutable
@@ -2065,7 +2067,25 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function getRouteKeyName()
     {
-        return $this->getKeyName();
+        return $this->resolveRouteKeyNameFromAttribute() ?? $this->getKeyName();
+    }
+
+    /**
+     * Resolve the route key name from the RoutedBy attribute.
+     *
+     * @return string|void
+     */
+    protected function resolveRouteKeyNameFromAttribute()
+    {
+        $reflectionClass = new ReflectionClass(static::class);
+
+        $attributes = $reflectionClass->getAttributes(RoutedBy::class);
+
+        if (! isset($attributes[0]) || ! isset($attributes[0]->getArguments()[0])) {
+            return;
+        }
+
+        return $attributes[0]->getArguments()[0];
     }
 
     /**
