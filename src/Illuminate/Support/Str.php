@@ -225,6 +225,31 @@ class Str
     }
 
     /**
+     * Convert a string into Laravel style code comment lines.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public static function taylor($value)
+    {
+    	$totalLength = strlen($value);
+    	$targetLengths = [ceil($totalLength / 3) + 4, ceil($totalLength / 3), ceil($totalLength / 3) - 4];
+
+    	[$_, $lines] = static::of($value)->trim()->split('/\s+/')
+    		->reduceSpread(function ($lineNumber, $lines, $word) use ($targetLengths) {
+    			if ($lineNumber < 2 && strlen(trim("{$lines[$lineNumber]} {$word}")) >= $targetLengths[$lineNumber]) {
+    				$lineNumber++;
+    			}
+
+                $lines[$lineNumber] = trim("{$lines[$lineNumber]} {$word}");
+
+                return [$lineNumber, $lines];
+            }, 0, ['', '', '']);
+
+        return implode("\n", $lines);
+    }
+
+    /**
      * Get the character at the specified index.
      *
      * @param  string  $subject

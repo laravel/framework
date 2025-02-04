@@ -1056,6 +1056,14 @@ class SupportStrTest extends TestCase
         $this->assertSame('1FooBar', Str::camel('1 foo bar'));
     }
 
+    public function testTaylor()
+    {
+        $input = 'Split the input into exactly three lines, each as close to three chars fewer than the last.';
+        $expected = "Split the input into exactly three\nlines, each as close to three\nchars fewer than the last.";
+
+        $this->assertSame($expected, Str::taylor($input));
+    }
+
     public function testCharAt()
     {
         $this->assertEquals('р', Str::charAt('Привет, мир!', 1));
