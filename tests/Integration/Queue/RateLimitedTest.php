@@ -63,6 +63,7 @@ class RateLimitedTest extends TestCase
         $cache->shouldReceive('add')->andReturn(true, true);
         $cache->shouldReceive('increment')->andReturn(1);
         $cache->shouldReceive('has')->andReturn(true);
+        $cache->shouldReceive('getStore')->andReturn(new ArrayStore);
 
         $rateLimiter = new RateLimiter($cache);
         $this->app->instance(RateLimiter::class, $rateLimiter);

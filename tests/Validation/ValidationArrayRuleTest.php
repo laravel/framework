@@ -2,7 +2,10 @@
 
 namespace Illuminate\Tests\Validation;
 
+use Illuminate\Translation\ArrayLoader;
+use Illuminate\Translation\Translator;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Validator;
 use PHPUnit\Framework\TestCase;
 
 include_once 'Enums.php';
@@ -34,5 +37,22 @@ class ValidationArrayRuleTest extends TestCase
         $rule = Rule::array([ArrayKeysBacked::key_1, ArrayKeysBacked::key_2, ArrayKeysBacked::key_3]);
 
         $this->assertSame('array:key_1,key_2,key_3', (string) $rule);
+    }
+
+    public function testArrayValidation()
+    {
+        $trans = new Translator(new ArrayLoader, 'en');
+
+        $v = new Validator($trans, ['foo' => 'not an array'], ['foo' => Rule::array()]);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['foo' => ['bar']], ['foo' => (string) Rule::array()]);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => ['key_1' => 'bar', 'key_2' => '']], ['foo' => Rule::array(['key_1', 'key_2'])]);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => ['key_1' => 'bar', 'key_2' => '']], ['foo' => ['required', Rule::array(['key_1', 'key_2'])]]);
+        $this->assertTrue($v->passes());
     }
 }

@@ -83,6 +83,54 @@ trait PacksPhpRedisValues
     }
 
     /**
+     * Execute the given callback without serialization or compression when applicable.
+     *
+     * @param  callable  $callback
+     * @return mixed
+     */
+    public function withoutSerializationOrCompression(callable $callback)
+    {
+        $client = $this->client;
+
+        $oldSerializer = null;
+
+        if ($this->serialized()) {
+            $oldSerializer = $client->getOption($client::OPT_SERIALIZER);
+            $client->setOption($client::OPT_SERIALIZER, $client::SERIALIZER_NONE);
+        }
+
+        $oldCompressor = null;
+
+        if ($this->compressed()) {
+            $oldCompressor = $client->getOption($client::OPT_COMPRESSION);
+            $client->setOption($client::OPT_COMPRESSION, $client::COMPRESSION_NONE);
+        }
+
+        try {
+            return $callback();
+        } finally {
+            if ($oldSerializer !== null) {
+                $client->setOption($client::OPT_SERIALIZER, $oldSerializer);
+            }
+
+            if ($oldCompressor !== null) {
+                $client->setOption($client::OPT_COMPRESSION, $oldCompressor);
+            }
+        }
+    }
+
+    /**
+     * Determine if serialization is enabled.
+     *
+     * @return bool
+     */
+    public function serialized(): bool
+    {
+        return defined('Redis::OPT_SERIALIZER') &&
+               $this->client->getOption(Redis::OPT_SERIALIZER) !== Redis::SERIALIZER_NONE;
+    }
+
+    /**
      * Determine if compression is enabled.
      *
      * @return bool

@@ -73,5 +73,16 @@ class ValidationDimensionsRuleTest extends TestCase
             $trans->get('validation.dimensions', ['width' => 100, 'height' => 100, 'min_ratio' => 0.5, 'max_ratio' => 0.4]),
             $validator->errors()->first('image')
         );
+
+        $validator = new Validator(
+            $trans,
+            ['image' => $image],
+            ['image' => [$rule]]
+        );
+
+        $this->assertSame(
+            $trans->get('validation.dimensions', ['width' => 100, 'height' => 100, 'min_ratio' => 0.5, 'max_ratio' => 0.4]),
+            $validator->errors()->first('image')
+        );
     }
 }

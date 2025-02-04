@@ -183,6 +183,17 @@ class FileLoader implements Loader
     }
 
     /**
+     * Add a new path to the loader.
+     *
+     * @param  string  $path
+     * @return void
+     */
+    public function addPath($path)
+    {
+        $this->paths[] = $path;
+    }
+
+    /**
      * Add a new JSON path to the loader.
      *
      * @param  string  $path
@@ -191,6 +202,16 @@ class FileLoader implements Loader
     public function addJsonPath($path)
     {
         $this->jsonPaths[] = $path;
+    }
+
+    /**
+     * Get an array of all the registered paths to translation files.
+     *
+     * @return array
+     */
+    public function paths()
+    {
+        return $this->paths;
     }
 
     /**

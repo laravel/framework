@@ -228,7 +228,7 @@ class DatabaseManager implements ConnectionResolverInterface
         }
 
         return (new ConfigurationUrlParser)
-                    ->parseConfiguration($config);
+            ->parseConfiguration($config);
     }
 
     /**
@@ -374,8 +374,8 @@ class DatabaseManager implements ConnectionResolverInterface
         );
 
         return $this->connections[$name]
-                    ->setPdo($fresh->getRawPdo())
-                    ->setReadPdo($fresh->getRawReadPdo());
+            ->setPdo($fresh->getRawPdo())
+            ->setReadPdo($fresh->getRawReadPdo());
     }
 
     /**

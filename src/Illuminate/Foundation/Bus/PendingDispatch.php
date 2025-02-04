@@ -7,9 +7,12 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
+use Illuminate\Foundation\Queue\InteractsWithUniqueJobs;
 
 class PendingDispatch
 {
+    use InteractsWithUniqueJobs;
+
     /**
      * The job.
      *
@@ -173,13 +176,13 @@ class PendingDispatch
         }
 
         return (new UniqueLock(Container::getInstance()->make(Cache::class)))
-                    ->acquire($this->job);
+            ->acquire($this->job);
     }
 
     /**
      * Get the underlying job instance.
      *
-     * @var mixed
+     * @return mixed
      */
     public function getJob()
     {
@@ -207,12 +210,18 @@ class PendingDispatch
      */
     public function __destruct()
     {
+        $this->addUniqueJobInformationToContext($this->job);
+
         if (! $this->shouldDispatch()) {
+            $this->removeUniqueJobInformationFromContext($this->job);
+
             return;
         } elseif ($this->afterResponse) {
             app(Dispatcher::class)->dispatchAfterResponse($this->job);
         } else {
             app(Dispatcher::class)->dispatch($this->job);
         }
+
+        $this->removeUniqueJobInformationFromContext($this->job);
     }
 }
