@@ -4,9 +4,12 @@ namespace Illuminate\Support;
 
 use ArgumentCountError;
 use ArrayAccess;
+use Illuminate\Http\Request\Enums\HttpQueryEncoding;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use Random\Randomizer;
+
+use function Illuminate\Support\enum_value;
 
 class Arr
 {
@@ -702,12 +705,12 @@ class Arr
      * Convert the array into a query string.
      *
      * @param  array  $array
-     * @param  int-mask-of<PHP_QUERY_*> $encodingType (optional) Query encoding type.
+     * @param  int-mask-of<PHP_QUERY_*>|HttpQueryEncoding $encodingType (optional) Query encoding type.
      * @return string
      */
-    public static function query($array, $encodingType = PHP_QUERY_RFC3986)
+    public static function query($array, $encodingType = HttpQueryEncoding::Rfc3986)
     {
-        return http_build_query($array, '', '&', $encodingType);
+        return http_build_query($array, '', '&', enum_value($encodingType));
     }
 
     /**
