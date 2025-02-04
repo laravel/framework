@@ -920,7 +920,6 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
     public function testTransitionAttributeIsHandledCorrectly()
     {
         $this->mockViewFactory();
-        
         $result = $this->compiler(['test' => TestTransitionComponent::class])
             ->compileTags('<x-test x-transition>content</x-test>');
 
