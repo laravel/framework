@@ -378,6 +378,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
     {
         $container = new Container;
         $container->instance(Application::class, $app = m::mock(Application::class));
+        $container->instance(Factory::class, $factory = m::mock(Factory::class));
         $app->shouldReceive('getNamespace')->once()->andReturn('App\\');
         Container::setInstance($container);
 
@@ -392,6 +393,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
     {
         $container = new Container;
         $container->instance(Application::class, $app = m::mock(Application::class));
+        $container->instance(Factory::class, $factory = m::mock(Factory::class));
         $app->shouldReceive('getNamespace')->once()->andReturn('App\\');
         Container::setInstance($container);
 
@@ -570,8 +572,8 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $container = new Container;
         $container->instance(Application::class, $app = m::mock(Application::class));
         $container->instance(Factory::class, $factory = m::mock(Factory::class));
-        $app->shouldReceive('getNamespace')->andReturn('App\\');
-        $factory->shouldReceive('exists')->andReturn(true);
+        $app->shouldReceive('getNamespace')->once()->andReturn('App\\');
+        $factory->shouldReceive('exists')->once()->andReturn(true);
         Container::setInstance($container);
 
         $result = $this->compiler()->compileTags('<x-package::anonymous-component :name="\'Taylor\'" :age="31" wire:model="foo" />');
@@ -913,6 +915,19 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
         $this->assertSame($attributes->get('userId'), 'bar');
         $this->assertSame($attributes->get('other'), 'ok');
+    }
+
+    public function testTransitionAttributeIsHandledCorrectly()
+    {
+        $this->mockViewFactory();
+        
+        $result = $this->compiler(['test' => TestTransitionComponent::class])
+            ->compileTags('<x-test x-transition>content</x-test>');
+
+        $this->assertStringContainsString(
+            "'x-transition' => true",
+            $result
+        );
     }
 
     protected function mockViewFactory($existsSucceeds = true)
