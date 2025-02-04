@@ -4,6 +4,7 @@ namespace Illuminate\Support;
 
 use Closure;
 use Illuminate\Support\Traits\Macroable;
+use InvalidArgumentException;
 use JsonException;
 use League\CommonMark\Environment\Environment;
 use League\CommonMark\Extension\GithubFlavoredMarkdownExtension;
@@ -1460,11 +1461,16 @@ class Str
      * @param  string|null  $language
      * @param  array<string, string>  $dictionary
      * @return string
+     * 
+     * @throws InvalidArgumentException
      */
     public static function slug($title, $separator = '-', $language = 'en', $dictionary = ['@' => 'at'])
-    {
+    {        
+        if (ctype_alnum($separator)) {
+            throw new InvalidArgumentException('The separator must not be alphanumeric.');
+        }
+
         $title = $language ? static::ascii($title, $language) : $title;
-        $separator = ctype_alnum($separator) ? '-' : $separator;
 
         // Convert all dashes/underscores into separator
         $flip = $separator === '-' ? '_' : '-';

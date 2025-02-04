@@ -6,6 +6,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Stringable;
+use InvalidArgumentException;
 use League\CommonMark\Environment\EnvironmentBuilderInterface;
 use League\CommonMark\Extension\ExtensionInterface;
 use PHPUnit\Framework\TestCase;
@@ -739,10 +740,18 @@ class SupportStringableTest extends TestCase
         $this->assertSame('sometext', (string) $this->stringable('some text')->slug(''));
         $this->assertSame('', (string) $this->stringable('')->slug(''));
         $this->assertSame('', (string) $this->stringable('')->slug());
-        $this->assertSame('hello-world', (string) $this->stringable('hello world')->slug('eb'));
-        $this->assertSame('hello-world', (string) $this->stringable('hello world')->slug('e'));
-        $this->assertSame('hello-world', (string) $this->stringable('hello world')->slug('2'));
-        $this->assertSame('hello-world', (string) $this->stringable('hello world')->slug('2'));
+    }
+
+    public function testSlugDoesNotSupportAlphaSeparator()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->stringable('hello world')->slug('a');
+    }
+
+    public function testSlugDoesNotSupportNumericSeparator()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->stringable('hello world')->slug('2');
     }
 
     public function testSquish()
