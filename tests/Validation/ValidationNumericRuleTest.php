@@ -64,7 +64,7 @@ class ValidationNumericRuleTest extends TestCase
 
     public function testGreaterThanOrEqualRule()
     {
-        $rule = Rule::numeric()->greaterThanOrEqual('some_field');
+        $rule = Rule::numeric()->greaterThanOrEqualTo('some_field');
         $this->assertEquals('numeric|gte:some_field', (string) $rule);
     }
 
@@ -82,7 +82,7 @@ class ValidationNumericRuleTest extends TestCase
 
     public function testLessThanOrEqualRule()
     {
-        $rule = Rule::numeric()->lessThanOrEqual('some_field');
+        $rule = Rule::numeric()->lessThanOrEqualTo('some_field');
         $this->assertEquals('numeric|lte:some_field', (string) $rule);
     }
 
@@ -139,7 +139,7 @@ class ValidationNumericRuleTest extends TestCase
         $rule = Rule::numeric()
             ->integer()
             ->multipleOf(10)
-            ->lessThanOrEqual('some_field')
+            ->lessThanOrEqualTo('some_field')
             ->max(100);
         $this->assertEquals('numeric|integer|multiple_of:10|lte:some_field|max:100', (string) $rule);
 
@@ -229,7 +229,7 @@ class ValidationNumericRuleTest extends TestCase
 
         $this->assertEmpty($validator->errors()->first('numeric'));
 
-        $rule = Rule::numeric()->greaterThanOrEqual('some_field');
+        $rule = Rule::numeric()->greaterThanOrEqualTo('some_field');
 
         $validator = new Validator(
             $trans,
@@ -259,7 +259,7 @@ class ValidationNumericRuleTest extends TestCase
 
         $this->assertEmpty($validator->errors()->first('numeric'));
 
-        $rule = Rule::numeric()->lessThanOrEqual('some_field');
+        $rule = Rule::numeric()->lessThanOrEqualTo('some_field');
 
         $validator = new Validator(
             $trans,
@@ -329,7 +329,7 @@ class ValidationNumericRuleTest extends TestCase
 
         $this->assertEmpty($validator->errors()->first('numeric'));
 
-        $rule = Rule::numeric()->size(10);
+        $rule = Rule::numeric()->exactly(10);
 
         $validator = new Validator(
             $trans,
@@ -342,7 +342,7 @@ class ValidationNumericRuleTest extends TestCase
 
     public function testUniquenessValidation()
     {
-        $rule = Rule::numeric()->integer()->digits(2)->size(2);
+        $rule = Rule::numeric()->integer()->digits(2)->exactly(2);
         $this->assertEquals('numeric|integer|digits:2|size:2', (string) $rule);
     }
 }
