@@ -153,18 +153,6 @@ class Uri implements Htmlable, Responsable, Stringable
     }
 
     /**
-     * Get the URI's path without trimming it.
-     *
-     * Empty or missing paths are returned as a single "/".
-     */
-    public function pathRaw(): ?string
-    {
-        $path = $this->uri->getPath();
-
-        return $path === '' ? '/' : $path;
-    }
-
-    /**
      * Get the URI's query string.
      */
     public function query(): UriQueryString
