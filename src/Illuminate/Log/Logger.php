@@ -255,7 +255,7 @@ class Logger implements LoggerInterface
      */
     protected function formatMessage($message)
     {
-        return match(true) {
+        return match (true) {
             is_array($message) => var_export($message, true),
             $message instanceof Jsonable => $message->toJson(),
             $message instanceof Arrayable => var_export($message->toArray(), true),

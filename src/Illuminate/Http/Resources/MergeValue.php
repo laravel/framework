@@ -22,7 +22,7 @@ class MergeValue
      */
     public function __construct($data)
     {
-        $this->data = match(true) {
+        $this->data = match (true) {
             $data instanceof Collection => $data->all(),
             $data instanceof JsonSerializable => $data->jsonSerialize(),
             default => $data
