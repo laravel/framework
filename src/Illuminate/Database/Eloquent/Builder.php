@@ -2191,20 +2191,6 @@ class Builder implements BuilderContract
     }
 
     /**
-     * Invoke the "on clone" modification callbacks.
-     *
-     * @return static
-     */
-    public function applyOnCloneCallbacks()
-    {
-        foreach ($this->onCloneCallbacks as $onCloneCallback) {
-            $onCloneCallback($this);
-        }
-
-        return $this;
-    }
-
-    /**
      * Force a clone of the underlying query builder when cloning.
      *
      * @return void
@@ -2212,7 +2198,9 @@ class Builder implements BuilderContract
     public function __clone()
     {
         $this->query = clone $this->query;
-
-        $this->applyOnCloneCallbacks();
+		
+	    foreach ($this->onCloneCallbacks as $onCloneCallback) {
+		    $onCloneCallback($this);
+	    }
     }
 }
