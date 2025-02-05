@@ -224,7 +224,7 @@ trait BuildsQueries
      * Query lazily, by chunks of the given size.
      *
      * @param  int  $chunkSize
-     * @return \Illuminate\Support\LazyCollection
+     * @return \Illuminate\Support\LazyCollection<int, TValue>
      *
      * @throws \InvalidArgumentException
      */
@@ -259,7 +259,7 @@ trait BuildsQueries
      * @param  int  $chunkSize
      * @param  string|null  $column
      * @param  string|null  $alias
-     * @return \Illuminate\Support\LazyCollection
+     * @return \Illuminate\Support\LazyCollection<int, TValue>
      *
      * @throws \InvalidArgumentException
      */
@@ -274,7 +274,7 @@ trait BuildsQueries
      * @param  int  $chunkSize
      * @param  string|null  $column
      * @param  string|null  $alias
-     * @return \Illuminate\Support\LazyCollection
+     * @return \Illuminate\Support\LazyCollection<int, TValue>
      *
      * @throws \InvalidArgumentException
      */
