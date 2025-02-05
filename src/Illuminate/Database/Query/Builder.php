@@ -29,6 +29,7 @@ use InvalidArgumentException;
 use LogicException;
 use RuntimeException;
 use UnitEnum;
+
 use function Illuminate\Support\enum_value;
 
 class Builder implements BuilderContract
