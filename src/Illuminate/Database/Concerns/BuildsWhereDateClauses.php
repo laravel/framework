@@ -68,6 +68,66 @@ trait BuildsWhereDateClauses
     }
 
     /**
+     * Add a where clause to determine if a "date" column is in the future to the query.
+     *
+     * @param  array|string  $columns
+     * @param  \DateTimeInterface|string|null  $value
+     * @param  string  $boolean
+     * @param  bool  $not
+     * @return $this
+     */
+    public function whereFuture($columns, $value = null, $boolean = 'and', $not = false)
+    {
+        $type = 'Basic';
+        $operator = $not ? '<=' : '>';
+        $value = $value ?? Carbon::now();
+
+        foreach (Arr::wrap($columns) as $column) {
+            $this->wheres[] = compact('type', 'column', 'boolean', 'operator', 'value');
+
+            $this->addBinding($value);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Add an "or where" clause to determine if a "date" column is in the future to the query.
+     *
+     * @param  array|string  $columns
+     * @param  \DateTimeInterface|string|null  $value
+     * @return $this
+     */
+    public function orWhereFuture($columns, $value = null)
+    {
+        return $this->whereFuture($columns, $value, 'or');
+    }
+
+    /**
+     * Add a where clause to determine if a "date" column is not in the future to the query.
+     *
+     * @param  array|string  $columns
+     * @param  \DateTimeInterface|string|null  $value
+     * @return $this
+     */
+    public function whereNotFuture($columns, $value = null)
+    {
+        return $this->whereFuture($columns, $value, 'and', true);
+    }
+
+    /**
+     * Add an "or where" clause to determine if a "date" column is in the future to the query.
+     *
+     * @param  array|string  $columns
+     * @param  \DateTimeInterface|string|null  $value
+     * @return $this
+     */
+    public function orWhereNotFuture($columns, $value = null)
+    {
+        return $this->whereFuture($columns, $value, 'or', true);
+    }
+
+    /**
      * Add a "where date" clause to determine if a "date" column is today to the query.
      *
      * @param  array|string  $columns
@@ -225,65 +285,5 @@ trait BuildsWhereDateClauses
     public function orWhereNotToday($columns)
     {
         return $this->whereToday($columns, 'or', true);
-    }
-
-    /**
-     * Add a where clause to determine if a "date" column is in the future to the query.
-     *
-     * @param  array|string  $columns
-     * @param  \DateTimeInterface|string|null  $value
-     * @param  string  $boolean
-     * @param  bool  $not
-     * @return $this
-     */
-    public function whereFuture($columns, $value = null, $boolean = 'and', $not = false)
-    {
-        $type = 'Basic';
-        $operator = $not ? '<=' : '>';
-        $value = $value ?? Carbon::now();
-
-        foreach (Arr::wrap($columns) as $column) {
-            $this->wheres[] = compact('type', 'column', 'boolean', 'operator', 'value');
-
-            $this->addBinding($value);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Add an "or where" clause to determine if a "date" column is in the future to the query.
-     *
-     * @param  array|string  $columns
-     * @param  \DateTimeInterface|string|null  $value
-     * @return $this
-     */
-    public function orWhereFuture($columns, $value = null)
-    {
-        return $this->whereFuture($columns, $value, 'or');
-    }
-
-    /**
-     * Add a where clause to determine if a "date" column is not in the future to the query.
-     *
-     * @param  array|string  $columns
-     * @param  \DateTimeInterface|string|null  $value
-     * @return $this
-     */
-    public function whereNotFuture($columns, $value = null)
-    {
-        return $this->whereFuture($columns, $value, 'and', true);
-    }
-
-    /**
-     * Add an "or where" clause to determine if a "date" column is in the future to the query.
-     *
-     * @param  array|string  $columns
-     * @param  \DateTimeInterface|string|null  $value
-     * @return $this
-     */
-    public function orWhereNotFuture($columns, $value = null)
-    {
-        return $this->whereFuture($columns, $value, 'or', true);
     }
 }
