@@ -385,6 +385,21 @@ assertType('string|User', $collection->first(null, function () {
     return 'string';
 }));
 
+assertType('User|null', $collection->last());
+assertType('User|null', $collection->last(function ($user) {
+    assertType('User', $user);
+
+    return true;
+}));
+assertType('string|User', $collection->last(function ($user) {
+    assertType('User', $user);
+
+    return false;
+}, 'string'));
+assertType('string|User', $collection->last(null, function () {
+    return 'string';
+}));
+
 assertType('Illuminate\Support\LazyCollection<int, mixed>', $collection->flatten());
 assertType('Illuminate\Support\LazyCollection<int, mixed>', $collection::make(['string' => 'string'])->flatten(4));
 
@@ -919,6 +934,7 @@ assertType('Illuminate\Support\HigherOrderCollectionProxy<int, LazyAnimal>', $co
 assertType('Illuminate\Support\HigherOrderCollectionProxy<int, LazyAnimal>', $coll->flatMap);
 assertType('Illuminate\Support\HigherOrderCollectionProxy<int, LazyAnimal>', $coll->groupBy);
 assertType('Illuminate\Support\HigherOrderCollectionProxy<int, LazyAnimal>', $coll->keyBy);
+assertType('Illuminate\Support\HigherOrderCollectionProxy<int, LazyAnimal>', $coll->last);
 assertType('Illuminate\Support\HigherOrderCollectionProxy<int, LazyAnimal>', $coll->map);
 assertType('Illuminate\Support\HigherOrderCollectionProxy<int, LazyAnimal>', $coll->max);
 assertType('Illuminate\Support\HigherOrderCollectionProxy<int, LazyAnimal>', $coll->min);
