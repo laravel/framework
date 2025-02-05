@@ -155,6 +155,11 @@ class SupportNumberTest extends TestCase
         $this->assertSame('$0', Number::currency(0, precision: 0));
         $this->assertSame('$5', Number::currency(5.00, precision: 0));
         $this->assertSame('$10', Number::currency(10.252, precision: 0));
+
+        $this->assertSame('$0.00', Number::currency(0, isFractionUnit: true));
+        $this->assertSame('$5.00', Number::currency(500, isFractionUnit: true));
+        $this->assertSame('$10.25', Number::currency(10.252, isFractionUnit: true));
+        $this->assertSame('$10.252', Number::currency(10.252, 'LYD', isFractionUnit: true));
     }
 
     #[RequiresPhpExtension('intl')]

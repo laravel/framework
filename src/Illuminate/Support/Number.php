@@ -141,17 +141,33 @@ class Number
      * @param  int|null  $precision
      * @return string|false
      */
-    public static function currency(int|float $number, string $in = '', ?string $locale = null, ?int $precision = null)
+    public static function currency(int|float $number, string $in = '', ?string $locale = null, ?int $precision = null, bool $isFractionUnit = false)
     {
         static::ensureIntlExtensionIsInstalled();
 
         $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::CURRENCY);
+
+        if ($isFractionUnit) {
+            $number = self::fractionUnitToCurrencyDecimal($number, $in);
+        }
 
         if (! is_null($precision)) {
             $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, $precision);
         }
 
         return $formatter->formatCurrency($number, ! empty($in) ? $in : static::$currency);
+    }
+
+    private static function fractionUnitToCurrencyDecimal(int $number, string $in)
+    {
+        return $number / 10 ** (match (! empty($in) ? $in : static::$currency) {
+            'BIF', 'CLP', 'DJF', 'GNF', 'ISK', 'JPY', 'KMF', 'KRW', 'PYG', 'RWF', 'UGX', 'VND', 'VUV', 'XAF', 'XOF', 'XPF' => throw new InvalidArgumentException(sprintf(
+                'The currency %s does not have a minor unit',
+                ! empty($in) ? $in : static::$currency,
+            )),
+            'BHD', 'IQD', 'JOD', 'KWD', 'LYD', 'OMR', 'TND' => 3,
+            default => 2,
+        } - 1);
     }
 
     /**
