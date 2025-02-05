@@ -77,15 +77,7 @@ trait BuildsDateWhereClauses
      */
     public function whereToday($columns, $boolean = 'and', $not = false)
     {
-        $operator = $not ? '!=' : '=';
-
-        $value = Carbon::today()->format('Y-m-d');
-
-        foreach (Arr::wrap($columns) as $column) {
-            $this->addDateBasedWhere('Date', $column, $operator, $value, $boolean);
-        }
-
-        return $this;
+        return $this->whereTodayBeforeOrAfter($columns, $not ? '!=' : '=', $boolean);
     }
 
     /**
