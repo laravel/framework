@@ -2198,9 +2198,9 @@ class Builder implements BuilderContract
     public function __clone()
     {
         $this->query = clone $this->query;
-		
-	    foreach ($this->onCloneCallbacks as $onCloneCallback) {
-		    $onCloneCallback($this);
-	    }
+
+        foreach ($this->onCloneCallbacks as $onCloneCallback) {
+            $onCloneCallback($this);
+        }
     }
 }
