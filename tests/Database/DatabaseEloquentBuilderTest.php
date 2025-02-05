@@ -2484,6 +2484,27 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertSame('select * from "users"', $builder->toSql());
         $this->assertSame('select * from "users" where "email" = ?', $clone->toSql());
     }
+	
+	public function testCloneModelMakesAFreshCopyOfTheModel()
+	{
+		$query = new BaseBuilder(m::mock(ConnectionInterface::class), new Grammar, m::mock(Processor::class));
+		$builder = (new Builder($query))->setModel(new EloquentBuilderTestStub);
+		$builder->select('*')->from('users');
+		
+		$onCloneCallbackCalledCount = 0;
+		
+		$builder->onClone(function () use (&$onCloneCallbackCalledCount) {
+			$onCloneCallbackCalledCount++;
+		});
+		
+		$clone = $builder->clone()->where('email', 'foo');
+		
+		$this->assertNotSame($builder, $clone);
+		$this->assertSame('select * from "users"', $builder->toSql());
+		$this->assertSame('select * from "users" where "email" = ?', $clone->toSql());
+		
+		$this->assertSame(1, $onCloneCallbackCalledCount);
+	}
 
     public function testToRawSql()
     {

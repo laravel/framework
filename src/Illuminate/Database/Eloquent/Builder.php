@@ -158,6 +158,13 @@ class Builder implements BuilderContract
     protected $afterQueryCallbacks = [];
 
     /**
+     * The callbacks that should be invoked on clone.
+     *
+     * @var array
+     */
+    protected $onCloneCallbacks = [];
+
+    /**
      * Create a new Eloquent query builder instance.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
@@ -2169,6 +2176,33 @@ class Builder implements BuilderContract
     {
         return clone $this;
     }
+	
+	/**
+	 * Register a closure to be invoked on a clone.
+	 *
+	 * @param  \Closure  $callback
+	 * @return $this
+	 */
+	public function onClone(Closure $callback)
+	{
+		$this->onCloneCallbacks[] = $callback;
+		
+		return $this;
+	}
+	
+	/**
+	 * Invoke the "on clone" modification callbacks.
+	 *
+	 * @return static
+	 */
+	public function applyOnCloneCallbacks()
+	{
+		foreach ($this->onCloneCallbacks as $onCloneCallback) {
+			$onCloneCallback($this);
+		}
+		
+		return $this;
+	}
 
     /**
      * Force a clone of the underlying query builder when cloning.
@@ -2178,5 +2212,7 @@ class Builder implements BuilderContract
     public function __clone()
     {
         $this->query = clone $this->query;
+		
+		$this->applyOnCloneCallbacks();
     }
 }
