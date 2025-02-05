@@ -398,12 +398,12 @@ assertType('User|null', $collection->last(function ($user) {
 
     return true;
 }));
-assertType('string|User', $collection->last(function ($user) {
+assertType("'string'|User", $collection->last(function ($user) {
     assertType('User', $user);
 
     return false;
 }, 'string'));
-assertType('string|User', $collection->last(null, function () {
+assertType("'string'|User", $collection->last(null, function () {
     return 'string';
 }));
 
