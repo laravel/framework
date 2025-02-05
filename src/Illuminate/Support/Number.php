@@ -3,6 +3,7 @@
 namespace Illuminate\Support;
 
 use Illuminate\Support\Traits\Macroable;
+use MessageFormatter;
 use NumberFormatter;
 use RuntimeException;
 
