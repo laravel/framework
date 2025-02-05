@@ -1633,7 +1633,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             : Pivot::fromAttributes($parent, $attributes, $table, $exists);
     }
 
-    public function getAttributedNamedScope(string $scope): ?string
+    protected function getAttributedNamedScope(string $scope): ?string
     {
         if (! method_exists($this, $scope)) {
             return null;
