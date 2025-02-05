@@ -11,8 +11,6 @@ trait BuildsWhereDateClauses
      * Add a where clause to determine if a "date" column is in the past to the query.
      *
      * @param  array|string  $columns
-     * @param  string  $boolean
-     * @param  bool  $not
      * @return $this
      */
     public function wherePast($columns)
