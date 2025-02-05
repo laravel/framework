@@ -22,7 +22,7 @@ class Numeric implements Stringable
      * @param  int|float  $max
      * @return $this
      */
-    public function between(float|int $min, float|int $max): Numeric
+    public function between(int|float $min, int|float $max): Numeric
     {
         return $this->addRule('between:'.$min.','.$max);
     }
@@ -57,7 +57,7 @@ class Numeric implements Stringable
     }
 
     /**
-     * The integer under validation must have an exact length of value.
+     * The integer under validation must have an exact number of digits.
      *
      * @param  int  $length
      * @return $this
@@ -68,7 +68,7 @@ class Numeric implements Stringable
     }
 
     /**
-     * The integer under validation must have a length between the given min and max.
+     * The integer under validation must between the given min and max number of digits.
      *
      * @param  int  $min
      * @param  int  $max
@@ -96,7 +96,7 @@ class Numeric implements Stringable
      * @param  string  $field
      * @return $this
      */
-    public function greaterThanOrEqual(string $field): Numeric
+    public function greaterThanOrEqualTo(string $field): Numeric
     {
         return $this->addRule('gte:'.$field);
     }
@@ -128,7 +128,7 @@ class Numeric implements Stringable
      * @param  string  $field
      * @return $this
      */
-    public function lessThanOrEqual(string $field): Numeric
+    public function lessThanOrEqualTo(string $field): Numeric
     {
         return $this->addRule('lte:'.$field);
     }
@@ -136,16 +136,16 @@ class Numeric implements Stringable
     /**
      * The field under validation must be less than or equal to a maximum value.
      *
-     * @param  float|int  $value
+     * @param  int|float  $value
      * @return $this
      */
-    public function max(float|int $value): Numeric
+    public function max(int|float $value): Numeric
     {
         return $this->addRule('max:'.$value);
     }
 
     /**
-     * The integer under validation must have a maximum length of value.
+     * The integer under validation must have a maximum number of digits.
      *
      * @param  int  $value
      * @return $this
@@ -158,16 +158,16 @@ class Numeric implements Stringable
     /**
      * The field under validation must have a minimum value.
      *
-     * @param  float|int  $value
+     * @param  int|float  $value
      * @return $this
      */
-    public function min(float|int $value): Numeric
+    public function min(int|float $value): Numeric
     {
         return $this->addRule('min:'.$value);
     }
 
     /**
-     * The integer under validation must have a minimum length of value.
+     * The integer under validation must have a minimum number of digits.
      *
      * @param  int  $value
      * @return $this
@@ -178,12 +178,12 @@ class Numeric implements Stringable
     }
 
     /**
-     * The field under validation must be a multiple of value.
+     * The field under validation must be a multiple of the given value.
      *
-     * @param  float|int  $value
+     * @param  int|float  $value
      * @return $this
      */
-    public function multipleOf(float|int $value): Numeric
+    public function multipleOf(int|float $value): Numeric
     {
         return $this->addRule('multiple_of:'.$value);
     }
@@ -200,12 +200,12 @@ class Numeric implements Stringable
     }
 
     /**
-     * The field under validation must have a size matching the given value.
+     * The field under validation must match the given value.
      *
      * @param  int  $value
      * @return $this
      */
-    public function size(int $value): Numeric
+    public function exactly(int $value): Numeric
     {
         return $this->integer()->addRule('size:'.$value);
     }

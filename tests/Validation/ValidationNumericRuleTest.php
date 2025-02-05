@@ -130,7 +130,7 @@ class ValidationNumericRuleTest extends TestCase
 
     public function testSizeRule()
     {
-        $rule = Rule::numeric()->size(10);
+        $rule = Rule::numeric()->exactly(10);
         $this->assertEquals('numeric|integer|size:10', (string) $rule);
     }
 
