@@ -77,6 +77,14 @@ class Cloud
         if (str_contains($host, 'pg.laravel.cloud') &&
             str_contains($host, '-pooler')) {
             $app['config']->set(
+                'database.connections.pgsql.options',
+                array_merge(
+                    $app['config']->get('database.connections.pgsql.options'),
+                    [PDO::ATTR_EMULATE_PREPARES => true],
+                ),
+            );
+
+            $app['config']->set(
                 'database.connections.pgsql-unpooled',
                 array_merge($app['config']->get('database.connections.pgsql'), [
                     'host' => str_replace('-pooler', '', $host),
