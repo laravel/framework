@@ -124,7 +124,7 @@ trait BuildsWhereDateClauses
      */
     public function whereToday($columns, $boolean = 'and')
     {
-        return $this->whereTodayBeforeOrAfter($columns, $not ? '!=' : '=', $boolean);
+        return $this->whereTodayBeforeOrAfter($columns, '=', $boolean);
     }
 
     /**
