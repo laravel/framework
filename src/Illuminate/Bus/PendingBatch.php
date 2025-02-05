@@ -10,6 +10,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\Conditionable;
 use Laravel\SerializableClosure\SerializableClosure;
+use RuntimeException;
 use Throwable;
 
 use function Illuminate\Support\enum_value;
@@ -56,7 +57,10 @@ class PendingBatch
     public function __construct(Container $container, Collection $jobs)
     {
         $this->container = $container;
-        $this->jobs = $jobs;
+
+        $this->jobs = $jobs->each(function (object|array $job) {
+            $this->ensureJobIsBatchable($job);
+        });
     }
 
     /**
@@ -70,10 +74,33 @@ class PendingBatch
         $jobs = is_iterable($jobs) ? $jobs : Arr::wrap($jobs);
 
         foreach ($jobs as $job) {
+            $this->ensureJobIsBatchable($job);
+
             $this->jobs->push($job);
         }
 
         return $this;
+    }
+
+    /**
+     * Ensure the given job is batchable.
+     *
+     * @param  object|array  $job
+     * @return void
+     */
+    protected function ensureJobIsBatchable(object|array $job): void
+    {
+        foreach (Arr::wrap($job) as $job) {
+            if ($job instanceof PendingBatch) {
+                $this->ensureJobIsBatchable($job->jobs->all());
+
+                return;
+            }
+
+            if (! in_array(Batchable::class, class_uses_recursive($job))) {
+                throw new RuntimeException(sprintf('Attempted to batch job [%s], but it does not use the Batchable trait.', $job::class));
+            }
+        }
     }
 
     /**
