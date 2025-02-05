@@ -2493,8 +2493,12 @@ class DatabaseEloquentBuilderTest extends TestCase
 		
 		$onCloneCallbackCalledCount = 0;
 		
-		$builder->onClone(function () use (&$onCloneCallbackCalledCount) {
+		$onCloneQuery = null;
+		
+		$builder->onClone(function (Builder $query) use (&$onCloneCallbackCalledCount, &$onCloneQuery) {
 			$onCloneCallbackCalledCount++;
+			
+			$onCloneQuery = $query;
 		});
 		
 		$clone = $builder->clone()->where('email', 'foo');
@@ -2504,6 +2508,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 		$this->assertSame('select * from "users" where "email" = ?', $clone->toSql());
 		
 		$this->assertSame(1, $onCloneCallbackCalledCount);
+		$this->assertSame($onCloneQuery, $clone);
 	}
 
     public function testToRawSql()
