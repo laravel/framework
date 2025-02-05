@@ -8,29 +8,15 @@ use Illuminate\Http\Client\Response;
 class ResponseReceived
 {
     /**
-     * The request instance.
-     *
-     * @var \Illuminate\Http\Client\Request
-     */
-    public $request;
-
-    /**
-     * The response instance.
-     *
-     * @var \Illuminate\Http\Client\Response
-     */
-    public $response;
-
-    /**
      * Create a new event instance.
      *
-     * @param  \Illuminate\Http\Client\Request  $request
-     * @param  \Illuminate\Http\Client\Response  $response
+     * @param  \Illuminate\Http\Client\Request  $request  The request instance.
+     * @param  \Illuminate\Http\Client\Response  $response  The response instance.
      * @return void
      */
-    public function __construct(Request $request, Response $response)
-    {
-        $this->request = $request;
-        $this->response = $response;
+    public function __construct(
+        public Request $request,
+        public Response $response,
+    ) {
     }
 }
