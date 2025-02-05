@@ -99,8 +99,6 @@ class PendingBatch
     {
         foreach (Arr::wrap($job) as $job) {
             if ($job instanceof PendingBatch) {
-                $this->ensureJobIsBatchable($job->jobs->all());
-
                 return;
             }
 
