@@ -8,22 +8,15 @@ use Stringable;
 class HtmlString implements Htmlable, Stringable
 {
     /**
-     * The HTML string.
-     *
-     * @var string
-     */
-    protected $html;
-
-    /**
      * Create a new HTML string instance.
      *
      * @param  string  $html
      * @return void
      */
-    public function __construct($html = '')
-    {
-        $this->html = $html;
-    }
+    public function __construct(
+        protected string $html = ''
+    )
+    {}
 
     /**
      * Get the HTML string.

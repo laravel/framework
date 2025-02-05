@@ -13,21 +13,13 @@ class Optional implements ArrayAccess
     }
 
     /**
-     * The underlying object.
-     *
-     * @var mixed
-     */
-    protected $value;
-
-    /**
      * Create a new optional instance.
      *
      * @param  mixed  $value
      * @return void
      */
-    public function __construct($value)
+    public function __construct(protected mixed $value)
     {
-        $this->value = $value;
     }
 
     /**

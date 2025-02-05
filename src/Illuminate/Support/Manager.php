@@ -9,13 +9,6 @@ use InvalidArgumentException;
 abstract class Manager
 {
     /**
-     * The container instance.
-     *
-     * @var \Illuminate\Contracts\Container\Container
-     */
-    protected $container;
-
-    /**
      * The configuration repository instance.
      *
      * @var \Illuminate\Contracts\Config\Repository
@@ -42,9 +35,10 @@ abstract class Manager
      * @param  \Illuminate\Contracts\Container\Container  $container
      * @return void
      */
-    public function __construct(Container $container)
+    public function __construct(
+        protected Container $container
+    )
     {
-        $this->container = $container;
         $this->config = $container->make('config');
     }
 

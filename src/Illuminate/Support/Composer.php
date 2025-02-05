@@ -11,31 +11,18 @@ use Symfony\Component\Process\Process;
 class Composer
 {
     /**
-     * The filesystem instance.
-     *
-     * @var \Illuminate\Filesystem\Filesystem
-     */
-    protected $files;
-
-    /**
-     * The working path to regenerate from.
-     *
-     * @var string|null
-     */
-    protected $workingPath;
-
-    /**
      * Create a new Composer manager instance.
      *
      * @param  \Illuminate\Filesystem\Filesystem  $files
      * @param  string|null  $workingPath
      * @return void
      */
-    public function __construct(Filesystem $files, $workingPath = null)
-    {
-        $this->files = $files;
-        $this->workingPath = $workingPath;
-    }
+    public function __construct(
+        protected Filesystem $files,
+        protected string|null $workingPath = null
+    )
+    {}
+
 
     /**
      * Determine if the given Composer package is installed.
