@@ -2561,6 +2561,18 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that an attribute is nullable and remove it from data if it is empty.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function validateForgetNullable($attribute, $value)
+    {
+        return ($this->shouldForget($value) && $this->forgetAttribute($attribute)) || true;
+    }
+
+    /**
      * Get the size of an attribute.
      *
      * @param  string  $attribute
@@ -2722,5 +2734,30 @@ trait ValidatesAttributes
         }
 
         return $value;
+    }
+
+    /**
+     * Determine if the value should be forgotten.
+     *
+     * @param  mixed  $value
+     * @return bool
+     */
+    protected function shouldForget($value)
+    {
+        return is_null($value) ||
+            (is_string($value) && trim($value) === '') ||
+            (is_countable($value) && count($value) === 0) ||
+            ($this->isValidFileInstance($value) && ($value->getPath() === '' || $value->getSize() === 0));
+    }
+
+    /**
+     * Forget the attribute.
+     *
+     * @param  string  $attribute
+     * @return void
+     */
+    protected function forgetAttribute($attribute)
+    {
+        unset($this->data[$attribute]);
     }
 }

@@ -209,6 +209,7 @@ class Validator implements ValidatorContract
         'Declined',
         'DeclinedIf',
         'Filled',
+        'ForgetNullable',
         'Missing',
         'MissingIf',
         'MissingUnless',
