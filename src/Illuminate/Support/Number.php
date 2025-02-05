@@ -141,9 +141,17 @@ class Number
      * @param  int|null  $precision
      * @return string|false
      */
-    public static function currency(int|float $number, string $in = '', ?string $locale = null, ?int $precision = null)
+    public static function currency(int|float $number, string $in = '', ?string $locale = null, ?int $precision = null, bool $unitWidthNarrow = false)
     {
         static::ensureIntlExtensionIsInstalled();
+
+        if ($unitWidthNarrow) {
+            return MessageFormatter::formatMessage(
+                $locale ?? static::$locale,
+                sprintf('{0, number, :: currency/%s unit-width-narrow}', ! empty($in) ? $in : static::$currency),
+                [$number],
+            );
+        }
 
         $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::CURRENCY);
 
