@@ -49,6 +49,8 @@ class PendingBatch
     /**
      * Create a new pending batch instance.
      *
+     * @param \Illuminate\Contracts\Container\Container $container
+     * @param \Illuminate\Support\Collection $jobs
      * @return void
      */
     public function __construct(Container $container, Collection $jobs)
@@ -228,6 +230,7 @@ class PendingBatch
     /**
      * Set the name for the batch.
      *
+     * @param string $name
      * @return $this
      */
     public function name(string $name)
@@ -240,6 +243,7 @@ class PendingBatch
     /**
      * Specify the queue connection that the batched jobs should run on.
      *
+     * @param string $connection
      * @return $this
      */
     public function onConnection(string $connection)
@@ -285,6 +289,7 @@ class PendingBatch
     /**
      * Add additional data into the batch's options array.
      *
+     * @param string $key
      * @param  mixed  $value
      * @return $this
      */
