@@ -160,14 +160,14 @@ class Number
 
     private static function fractionUnitToCurrencyDecimal(int $number, string $in)
     {
-        return $number / 10 ** (match (! empty($in) ? $in : static::$currency) {
+        return $number / 10 ** match (! empty($in) ? $in : static::$currency) {
             'BIF', 'CLP', 'DJF', 'GNF', 'ISK', 'JPY', 'KMF', 'KRW', 'PYG', 'RWF', 'UGX', 'VND', 'VUV', 'XAF', 'XOF', 'XPF' => throw new InvalidArgumentException(sprintf(
                 'The currency %s does not have a minor unit',
                 ! empty($in) ? $in : static::$currency,
             )),
             'BHD', 'IQD', 'JOD', 'KWD', 'LYD', 'OMR', 'TND' => 3,
             default => 2,
-        } - 1);
+        };
     }
 
     /**
