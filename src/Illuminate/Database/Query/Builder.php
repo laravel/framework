@@ -10,8 +10,8 @@ use Illuminate\Contracts\Database\Query\Builder as BuilderContract;
 use Illuminate\Contracts\Database\Query\ConditionExpression;
 use Illuminate\Contracts\Database\Query\Expression as ExpressionContract;
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Database\Concerns\BuildsDateWhereClauses;
 use Illuminate\Database\Concerns\BuildsQueries;
+use Illuminate\Database\Concerns\BuildsWhereDateClauses;
 use Illuminate\Database\Concerns\ExplainsQueries;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
@@ -29,13 +29,12 @@ use InvalidArgumentException;
 use LogicException;
 use RuntimeException;
 use UnitEnum;
-
 use function Illuminate\Support\enum_value;
 
 class Builder implements BuilderContract
 {
     /** @use \Illuminate\Database\Concerns\BuildsQueries<object> */
-    use BuildsDateWhereClauses, BuildsQueries, ExplainsQueries, ForwardsCalls, Macroable {
+    use BuildsWhereDateClauses, BuildsQueries, ExplainsQueries, ForwardsCalls, Macroable {
         __call as macroCall;
     }
 

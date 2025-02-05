@@ -5,7 +5,7 @@ namespace Illuminate\Database\Concerns;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
 
-trait BuildsDateWhereClauses
+trait BuildsWhereDateClauses
 {
     /**
      * Add a where clause to determine if a "date" column is in the past to the query.
