@@ -5170,6 +5170,15 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
+    public function testValidateForgetNullableWithEmptyFile()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $uploadedFile = new UploadedFile(__DIR__.'/fixtures/empty.png', '', null, null, true);
+        $v = new Validator($trans, ['x' => $uploadedFile], ['x' => 'forget_nullable|file']);
+        $this->assertTrue($v->passes());
+        $this->assertEquals([], $v->validated());
+    }
+
     public function testEmptyRulesSkipped()
     {
         $trans = $this->getIlluminateArrayTranslator();

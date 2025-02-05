@@ -229,6 +229,41 @@ class FoundationFormRequestTest extends TestCase
         $request->validateResolved();
     }
 
+    public function testForgetNullableValidationWithNull()
+    {
+        $request = $this->createRequest(['name' => null], FoundationTestFormRequestForgetNullableStub::class);
+        $request->validateResolved();
+        $this->assertEquals([], $request->validated());
+    }
+
+    public function testForgetNullableValidationWithEmptyString()
+    {
+        $request = $this->createRequest(['name' => ''], FoundationTestFormRequestForgetNullableStub::class);
+        $request->validateResolved();
+        $this->assertEquals([], $request->validated());
+    }
+
+    public function testForgetNullableValidationWithEmptyArray()
+    {
+        $request = $this->createRequest(['name' => []], FoundationTestFormRequestForgetNullableStub::class);
+        $request->validateResolved();
+        $this->assertEquals([], $request->validated());
+    }
+
+    public function testForgetNullableValidationWithNotEmptyString()
+    {
+        $request = $this->createRequest(['name' => 'Taylor'], FoundationTestFormRequestForgetNullableStub::class);
+        $request->validateResolved();
+        $this->assertEquals(['name' => 'Taylor'], $request->validated());
+    }
+
+    public function testForgetNullableValidationWithNotEmptyArray()
+    {
+        $request = $this->createRequest(['name' => ['Taylor']], FoundationTestFormRequestForgetNullableStub::class);
+        $request->validateResolved();
+        $this->assertEquals(['name' => ['Taylor']], $request->validated());
+    }
+
     /**
      * Catch the given exception thrown from the executor, and return it.
      *
@@ -514,5 +549,13 @@ class FoundationTestFormRequestWithGetRules extends FormRequest
                 'a' => ['required', 'int', 'min:2'],
             ];
         }
+    }
+}
+
+class FoundationTestFormRequestForgetNullableStub extends FormRequest
+{
+    public function rules()
+    {
+        return ['name' => 'forget_nullable'];
     }
 }
