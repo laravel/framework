@@ -338,6 +338,16 @@ class ValidationNumericRuleTest extends TestCase
         );
 
         $this->assertEmpty($validator->errors()->first('numeric'));
+
+        $rule = Rule::numeric()->exactly(10);
+
+        $validator = new Validator(
+            $trans,
+            ['numeric' => 10],
+            ['numeric' => [$rule]]
+        );
+
+        $this->assertEmpty($validator->errors()->first('numeric'));
     }
 
     public function testUniquenessValidation()
