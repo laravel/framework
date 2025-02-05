@@ -29,7 +29,7 @@ class SQLiteConnector extends Connector implements ConnectorInterface
         }
 
         $path = realpath($config['database']);
-        if (!file_exists($path)) {
+        if (! file_exists($path)) {
             $path = realpath(base_path($config['database']));
         }
 
