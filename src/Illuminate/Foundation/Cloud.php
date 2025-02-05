@@ -79,7 +79,7 @@ class Cloud
             $app['config']->set(
                 'database.connections.pgsql.options',
                 array_merge(
-                    $app['config']->get('database.connections.pgsql.options'),
+                    $app['config']->get('database.connections.pgsql.options', []),
                     [PDO::ATTR_EMULATE_PREPARES => true],
                 ),
             );
