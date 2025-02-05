@@ -7,6 +7,7 @@ use Illuminate\Foundation\Bootstrap\HandleExceptions;
 use Illuminate\Foundation\Bootstrap\LoadConfiguration;
 use Monolog\Formatter\JsonFormatter;
 use Monolog\Handler\SocketHandler;
+use PDO;
 
 class Cloud
 {
