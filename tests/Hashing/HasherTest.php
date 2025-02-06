@@ -11,7 +11,7 @@ use Illuminate\Hashing\HashManager;
 use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
-
+use Illuminate\Hashing\BcryptValueTooLongException;
 class HasherTest extends TestCase
 {
     public $hashManager;
@@ -57,6 +57,13 @@ class HasherTest extends TestCase
         $this->assertSame('bcrypt', password_get_info($value)['algoName']);
         $this->assertGreaterThanOrEqual(12, password_get_info($value)['options']['cost']);
         $this->assertTrue($this->hashManager->isHashed($value));
+    }
+
+    public function testBcryptTooLongValue()
+    {
+        $this->expectException(BcryptValueTooLongException::class);
+
+        (new BcryptHasher())->make(str_repeat('a', 73));
     }
 
     public function testBasicArgon2iHashing()

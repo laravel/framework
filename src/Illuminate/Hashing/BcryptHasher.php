@@ -5,9 +5,14 @@ namespace Illuminate\Hashing;
 use Error;
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;
 use RuntimeException;
-
+use Illuminate\Hashing\BcryptValueTooLongException;
 class BcryptHasher extends AbstractHasher implements HasherContract
 {
+    /**
+     * The maximum length of the string that can be hashed by bcrypt.
+     */
+    const BCRYPT_STR_LIMIT = 72;
+
     /**
      * The default cost factor.
      *
@@ -46,6 +51,10 @@ class BcryptHasher extends AbstractHasher implements HasherContract
     public function make(#[\SensitiveParameter] $value, array $options = [])
     {
         try {
+            if (strlen($value) > self::BCRYPT_STR_LIMIT) {
+                throw new BcryptValueTooLongException;
+            }
+
             $hash = password_hash($value, PASSWORD_BCRYPT, [
                 'cost' => $this->cost($options),
             ]);
