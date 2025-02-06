@@ -152,8 +152,7 @@ class Migrator
         $migrationsToSkip = $this->migrationsToSkip();
 
         return (new Collection($files))
-            ->reject(fn ($file) =>
-                in_array($migrationName = $this->getMigrationName($file), $ran) ||
+            ->reject(fn ($file) => in_array($migrationName = $this->getMigrationName($file), $ran) ||
                 in_array($migrationName, $migrationsToSkip)
             )
             ->values()
