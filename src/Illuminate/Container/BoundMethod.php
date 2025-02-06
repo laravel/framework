@@ -6,6 +6,7 @@ use Closure;
 use ReflectionMethod;
 use ReflectionFunction;
 use InvalidArgumentException;
+use Illuminate\Support\Reflector;
 
 class BoundMethod
 {
@@ -160,7 +161,10 @@ class BoundMethod
 
             unset($parameters[$parameter->name]);
         } elseif ($parameter->getType() && array_key_exists($parameter->getType()->getName(), $parameters)) {
-            $dependencies[] = $parameters[$parameter->getClass()->getName()];
+            $className = Reflector::getParameterClassName($parameter);
+            if ($className) {
+                $dependencies[] = $parameters[$class->getName()];
+            }
 
             unset($parameters[$parameter->getType()->getName()]);
         } elseif ($parameter->getType()) {

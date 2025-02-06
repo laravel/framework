@@ -4,6 +4,7 @@ namespace Illuminate\Routing;
 
 use ReflectionMethod;
 use ReflectionFunction;
+use Illuminate\Support\Reflector;
 use Illuminate\Support\Str;
 
 class RouteSignatureParameters
@@ -18,12 +19,14 @@ class RouteSignatureParameters
     public static function fromAction(array $action, $subClass = null)
     {
         $parameters = is_string($action['uses'])
-                        ? static::fromClassMethodString($action['uses'])
-                        : (new ReflectionFunction($action['uses']))->getParameters();
+            ? static::fromClassMethodString($action['uses'])
+            : (new ReflectionFunction($action['uses']))->getParameters();
 
-        return is_null($subClass) ? $parameters : array_filter($parameters, function ($p) use ($subClass) {
-            return $p->getClass() && $p->getClass()->isSubclassOf($subClass);
-        });
+        return is_null($subClass)
+            ? $parameters
+            : array_filter($parameters, function ($p) use ($subClass) {
+                return Reflector::isParameterSubclassOf($p, $subClass);
+            });
     }
 
     /**

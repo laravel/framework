@@ -6,6 +6,7 @@ use Exception;
 use ReflectionClass;
 use ReflectionFunction;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Reflector;
 use Illuminate\Support\Str;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Routing\UrlRoutable;
@@ -204,7 +205,9 @@ abstract class Broadcaster implements BroadcasterContract
                 continue;
             }
 
-            $instance = $parameter->getClass()->newInstance();
+            $className = Reflector::getParameterClassName($parameter);
+            $class = $className ? new ReflectionClass($className) : null;
+            $instance = $class ? $class->newInstance() : null;
 
             if (! $model = $instance->resolveRouteBinding($value)) {
                 throw new AccessDeniedHttpException;
@@ -225,8 +228,7 @@ abstract class Broadcaster implements BroadcasterContract
      */
     protected function isImplicitlyBindable($key, $parameter)
     {
-        return $parameter->name === $key && $parameter->getClass() &&
-                        $parameter->getClass()->isSubclassOf(UrlRoutable::class);
+        return $parameter->name === $key && Reflector::isParameterSubclassOf($parameter, UrlRoutable::class);
     }
 
     /**

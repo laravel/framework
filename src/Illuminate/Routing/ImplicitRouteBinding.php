@@ -2,6 +2,7 @@
 
 namespace Illuminate\Routing;
 
+use Illuminate\Support\Reflector;
 use Illuminate\Support\Str;
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -32,7 +33,8 @@ class ImplicitRouteBinding
                 continue;
             }
 
-            $instance = $container->make($parameter->getClass()->name);
+            $className = Reflector::getParameterClassName($parameter);
+            $instance = $className ? $container->make($className) : null;
 
             if (! $model = $instance->resolveRouteBinding($parameterValue)) {
                 throw (new ModelNotFoundException)->setModel(get_class($instance), [$parameterValue]);
