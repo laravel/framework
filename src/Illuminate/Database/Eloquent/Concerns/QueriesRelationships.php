@@ -244,6 +244,12 @@ trait QueriesRelationships
 
         $types = (array) $types;
 
+        $checkMorphNull = $types === ['*']
+            && (($operator === '<' && $count >= 1)
+                || ($operator === '<=' && $count >= 0)
+                || ($operator === '=' && $count === 0)
+                || ($operator === '!=' && $count >= 1));
+
         if ($types === ['*']) {
             $types = $this->model->newModelQuery()->distinct()->pluck($relation->getMorphType())
                 ->filter()
@@ -274,7 +280,8 @@ trait QueriesRelationships
                         ->whereHas($belongsTo, $callback, $operator, $count);
                 });
             }
-        }, null, null, $boolean);
+        }, null, null, $boolean)
+        ->when($checkMorphNull, fn (self $query) => $query->orWhereMorphedTo($relation, null));
     }
 
     /**
