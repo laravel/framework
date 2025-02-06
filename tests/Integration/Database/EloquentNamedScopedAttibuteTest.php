@@ -6,10 +6,19 @@ use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\TestCase;
 
-#[WithConfig('database.default', 'testing')]
 #[WithMigration]
 class EloquentNamedScopedAttibuteTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->markTestSkippedUnless(
+            $this->usesSqliteInMemoryDatabaseConnection(),
+            'Requires in-memory database connection',
+        );
+    }
+
     public function test_it_can_query_named_scoped_from_the_query_builder()
     {
         $query = Fixtures\NamedScopedUser::query()->verified(true);
