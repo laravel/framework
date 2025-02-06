@@ -16,7 +16,7 @@ class StringRule implements Stringable
     protected array $constraints = ['string'];
 
     /**
-     * The field under validation must be entirely Unicode alphabetic characters
+     * The field under validation must be entirely Unicode alphabetic characters.
      *
      * @param  bool  $onlyAscii
      * @return $this

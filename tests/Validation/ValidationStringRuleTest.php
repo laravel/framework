@@ -223,7 +223,7 @@ class ValidationStringRuleTest extends TestCase
 
         $validator = new Validator(
             $trans,
-            ['foo' => [1,2,3]],
+            ['foo' => [1, 2, 3]],
             ['foo' => $rule]
         );
 
