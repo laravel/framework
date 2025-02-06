@@ -6,7 +6,9 @@ use Illuminate\Auth\Access\Events\GateEvaluated;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Tests\Integration\Auth\Fixtures\AuthenticationTestUser;
+use Illuminate\Tests\Integration\Auth\Fixtures\Models\Policies\Nested\SubTestUserPolicy;
 use Illuminate\Tests\Integration\Auth\Fixtures\Policies\AuthenticationTestUserPolicy;
+use Illuminate\Tests\Integration\Auth\Fixtures\Policies\Nested\TopTestUserPolicy;
 use Orchestra\Testbench\TestCase;
 
 class GatePolicyResolutionTest extends TestCase
@@ -34,6 +36,19 @@ class GatePolicyResolutionTest extends TestCase
 
         $this->assertNull(
             Gate::getPolicyFor(static::class)
+        );
+    }
+
+    public function testPolicyCanBeGuessedForParallelClassHierarchies()
+    {
+        $this->assertInstanceOf(
+            TopTestUserPolicy::class,
+            Gate::getPolicyFor(Fixtures\Models\Nested\TopTestUser::class)
+        );
+
+        $this->assertInstanceOf(
+            SubTestUserPolicy::class,
+            Gate::getPolicyFor(Fixtures\Models\Nested\SubTestUser::class)
         );
     }
 
