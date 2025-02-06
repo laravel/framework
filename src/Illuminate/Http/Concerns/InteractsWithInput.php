@@ -225,6 +225,27 @@ trait InteractsWithInput
     }
 
     /**
+     * Apply the callback if the instance contains the given file key.
+     *
+     * @param  string  $key
+     * @param  callable  $callback
+     * @param  callable|null  $default
+     * @return $this|mixed
+     */
+    public function whenHasFile($key, callable $callback, ?callable $default = null)
+    {
+        if ($this->hasFile($key)) {
+            return $callback($this->file($key)) ?: $this;
+        }
+
+        if ($default) {
+            return $default();
+        }
+
+        return $this;
+    }
+
+    /**
      * Check that the given file is a valid file instance.
      *
      * @param  mixed  $file

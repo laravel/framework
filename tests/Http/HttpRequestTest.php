@@ -1036,6 +1036,36 @@ class HttpRequestTest extends TestCase
         $this->assertFalse($request->hasFile('bar'));
     }
 
+    public function testWhenHasFileMethod()
+    {
+        $request = Request::create('/', 'GET', [], [], []);
+
+        $hasFile = $noFile = false;
+
+        $files = [
+            'foo' => [
+                'size' => 500,
+                'name' => 'foo.jpg',
+                'tmp_name' => __FILE__,
+                'type' => 'blah',
+                'error' => null,
+            ],
+        ];
+
+        $request = Request::create('/', 'GET', [], [], $files);
+
+        $request->whenHasFile('foo', function ($file) use (&$hasFile) {
+            $hasFile = true;
+        });
+
+        $request->whenHasFile('bar', function () use (&$noFile) {
+            $noFile = true;
+        });
+
+        $this->assertTrue($hasFile);
+        $this->assertFalse($noFile);
+    }
+
     public function testServerMethod()
     {
         $request = Request::create('/', 'GET', [], [], [], ['foo' => 'bar']);
