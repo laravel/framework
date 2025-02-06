@@ -151,7 +151,7 @@ class Factory
      * @param  array|string|null  $body
      * @param  int  $status
      * @param  array  $headers
-     * @param  int  $flags
+     * @param  int-mask-of<JSON_*>  $flags
      * @return \GuzzleHttp\Promise\PromiseInterface
      */
     public static function response($body = null, $status = 200, $headers = [], int $flags = 0)
