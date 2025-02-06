@@ -1256,6 +1256,48 @@ class AuthAccessGateTest extends TestCase
         $this->assertSame('xyz', $response->code());
         $this->assertSame(404, $response->status());
     }
+
+    public function testPoliciesOnlyUsingFallback()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicyWithFallbackOnly::class);
+
+        $this->assertTrue($gate->check('pass-me', AccessGateTestDummy::class));
+        $this->assertFalse($gate->check('fail-me', AccessGateTestDummy::class));
+        $this->assertFalse($gate->check('null-me', AccessGateTestDummy::class));
+    }
+
+    public function testPoliciesFallbackAcceptsArguments()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicyWithFallbackOnly::class);
+
+        $this->assertTrue($gate->check('with-model', [new AccessGateTestDummy, false]));
+        $this->assertTrue($gate->check('with-argument', [new AccessGateTestDummy, true]));
+        $this->assertFalse($gate->check('with-failing-additional-argument', [AccessGateTestDummy::class, false]));
+        $this->assertFalse($gate->check('with-passthru-additional-argument', [AccessGateTestDummy::class, null]));
+    }
+
+    public function testPoliciesUsingFallbackWithBeforeAndOtherMethods()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicyUsingFallback::class);
+
+        $_SERVER['__laravel.testBefore'] = false;
+        $this->assertTrue($gate->check('pass-me', AccessGateTestDummy::class));
+
+        $_SERVER['__laravel.testBefore'] = true;
+        $this->assertTrue($gate->check('update', new AccessGateTestDummy));
+
+        $_SERVER['__laravel.testBefore'] = false;
+        $this->assertFalse($gate->check('update', new AccessGateTestDummy));
+
+        $_SERVER['__laravel.testBefore'] = null;
+        $this->assertFalse($gate->check('update', new AccessGateTestDummy));
+    }
 }
 
 class AccessGateTestClassForGuest
@@ -1541,5 +1583,38 @@ class AccessGateTestPolicyThrowingAuthorizationException
     public function create()
     {
         throw new AuthorizationException('Not allowed.', 'some_code');
+    }
+}
+
+class AccessGateTestPolicyUsingFallback
+{
+    public function before($user, $ability)
+    {
+        if ($ability === 'update') {
+            return null;
+        }
+
+        return str_starts_with($ability, 'pass-');
+    }
+
+    public function update($user, $model)
+    {
+        return $_SERVER['__laravel.testBefore'];
+    }
+
+    public function fallback($user, $ability, $model, ...$arguments)
+    {
+        return false;
+    }
+}
+
+class AccessGateTestPolicyWithFallbackOnly
+{
+    public function fallback($user, $ability, $model, ...$arguments)
+    {
+        return $user->isAdmin
+            || str_starts_with($ability, 'pass-')
+            || is_object($model)
+            || (isset($arguments[0]) && $arguments[0] === true);
     }
 }

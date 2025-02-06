@@ -745,7 +745,7 @@ class Gate implements GateContract
      */
     protected function resolvePolicyCallback($user, $ability, array $arguments, $policy)
     {
-        if (! is_callable([$policy, $this->formatAbilityToMethod($ability)])) {
+        if (! is_callable([$policy, $this->formatAbilityToMethod($ability)]) && ! is_callable([$policy, 'fallback'])) {
             return false;
         }
 
@@ -766,7 +766,8 @@ class Gate implements GateContract
 
             $method = $this->formatAbilityToMethod($ability);
 
-            return $this->callPolicyMethod($policy, $method, $user, $arguments);
+            return $this->callPolicyMethod($policy, $method, $user, $arguments)
+                ?? $this->callPolicyFallback($policy, $ability, $user, $arguments);
         };
     }
 
@@ -788,6 +789,24 @@ class Gate implements GateContract
         if ($this->canBeCalledWithUser($user, $policy, 'before')) {
             return $policy->before($user, $ability, ...$arguments);
         }
+    }
+
+    /**
+     * Call the "fallback" method on the given policy, if applicable.
+     *
+     * @param  mixed  $policy
+     * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
+     * @param  string  $ability
+     * @param  array  $arguments
+     * @return mixed
+     */
+    protected function callPolicyFallback($policy, $ability, $user, $arguments)
+    {
+        if (! method_exists($policy, 'fallback')) {
+            return;
+        }
+
+        return $policy->fallback($user, $ability, array_shift($arguments), ...$arguments);
     }
 
     /**
