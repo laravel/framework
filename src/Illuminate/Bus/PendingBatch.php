@@ -48,7 +48,7 @@ class PendingBatch
     public $options = [];
 
     /**
-     * Batches that have been checked to contain the Batchable trait.
+     * Jobs that have been verified to contain the Batchable trait.
      *
      * @var array<class-string, bool>
      */
