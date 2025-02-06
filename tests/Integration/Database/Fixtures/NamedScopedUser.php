@@ -1,0 +1,38 @@
+<?php
+
+namespace Illuminate\Tests\Integration\Database\Fixtures;
+
+use Illuminate\Database\Eloquent\Attributes\NamedScoped;
+use Illuminate\Database\Eloquent\Builder;
+
+class NamedScopedUser extends User
+{
+    /** {@inheritdoc} */
+    #[\Override]
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+        ];
+    }
+
+    #[NamedScoped]
+    protected function verified(Builder $builder, bool $email = true)
+    {
+        return $builder->when(
+            $email === true,
+            fn ($query) => $query->whereNotNull('email_verified_at'),
+            fn ($query) => $queryu->whereNull('email_verified_at'),
+        );
+    }
+
+    public function scopeVerifiedUser(Builder $builder, bool $email = true)
+    {
+        return $builder->when(
+            $email === true,
+            fn ($query) => $query->whereNotNull('email_verified_at'),
+            fn ($query) => $queryu->whereNull('email_verified_at'),
+        );
+    }
+}
