@@ -4,7 +4,6 @@ namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Grammars\Grammar;
-use LogicException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
