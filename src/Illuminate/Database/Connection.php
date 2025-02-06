@@ -248,9 +248,7 @@ class Connection implements ConnectionInterface
      */
     protected function getDefaultQueryGrammar()
     {
-        ($grammar = new QueryGrammar)->setConnection($this);
-
-        return $grammar;
+        return new QueryGrammar($this);
     }
 
     /**
@@ -1626,24 +1624,7 @@ class Connection implements ConnectionInterface
     {
         $this->tablePrefix = $prefix;
 
-        $this->getQueryGrammar()->setTablePrefix($prefix);
-
         return $this;
-    }
-
-    /**
-     * Set the table prefix and return the grammar.
-     *
-     * @template TGrammar of \Illuminate\Database\Grammar
-     *
-     * @param  TGrammar  $grammar
-     * @return TGrammar
-     */
-    public function withTablePrefix(Grammar $grammar)
-    {
-        $grammar->setTablePrefix($this->tablePrefix);
-
-        return $grammar;
     }
 
     /**

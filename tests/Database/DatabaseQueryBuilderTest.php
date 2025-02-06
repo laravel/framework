@@ -6,7 +6,7 @@ use BadMethodCallException;
 use Closure;
 use DateTime;
 use Illuminate\Contracts\Database\Query\ConditionExpression;
-use Illuminate\Database\ConnectionInterface;
+use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\Expression as Raw;
@@ -120,8 +120,7 @@ class DatabaseQueryBuilderTest extends TestCase
 
     public function testBasicSelectWithPrefix()
     {
-        $builder = $this->getBuilder();
-        $builder->getGrammar()->setTablePrefix('prefix_');
+        $builder = $this->getBuilder(prefix: 'prefix_');
         $builder->select('*')->from('users');
         $this->assertSame('select * from "prefix_users"', $builder->toSql());
     }
@@ -153,16 +152,14 @@ class DatabaseQueryBuilderTest extends TestCase
 
     public function testAliasWithPrefix()
     {
-        $builder = $this->getBuilder();
-        $builder->getGrammar()->setTablePrefix('prefix_');
+        $builder = $this->getBuilder(prefix: 'prefix_');
         $builder->select('*')->from('users as people');
         $this->assertSame('select * from "prefix_users" as "prefix_people"', $builder->toSql());
     }
 
     public function testJoinAliasesWithPrefix()
     {
-        $builder = $this->getBuilder();
-        $builder->getGrammar()->setTablePrefix('prefix_');
+        $builder = $this->getBuilder(prefix: 'prefix_');
         $builder->select('*')->from('services')->join('translations AS t', 't.item_id', '=', 'services.id');
         $this->assertSame('select * from "prefix_services" inner join "prefix_translations" as "prefix_t" on "prefix_t"."item_id" = "prefix_services"."id"', $builder->toSql());
     }
@@ -3130,8 +3127,7 @@ class DatabaseQueryBuilderTest extends TestCase
 
     public function testJoinSubWithPrefix()
     {
-        $builder = $this->getBuilder();
-        $builder->getGrammar()->setTablePrefix('prefix_');
+        $builder = $this->getBuilder(prefix: 'prefix_');
         $builder->from('users')->joinSub('select * from "contacts"', 'sub', 'users.id', '=', 'sub.id');
         $this->assertSame('select * from "prefix_users" inner join (select * from "contacts") as "prefix_sub" on "prefix_users"."id" = "prefix_sub"."id"', $builder->toSql());
     }
@@ -3246,9 +3242,7 @@ class DatabaseQueryBuilderTest extends TestCase
 
     public function testJoinLateralWithPrefix()
     {
-        $builder = $this->getMySqlBuilder();
-        $builder->getConnection()->shouldReceive('getDatabaseName');
-        $builder->getGrammar()->setTablePrefix('prefix_');
+        $builder = $this->getMySqlBuilder(prefix: 'prefix_');
         $builder->from('users')->joinLateral('select * from `contacts` where `contracts`.`user_id` = `users`.`id`', 'sub');
         $this->assertSame('select * from `prefix_users` inner join lateral (select * from `contacts` where `contracts`.`user_id` = `users`.`id`) as `prefix_sub` on true', $builder->toSql());
     }
@@ -4101,8 +4095,8 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testUpdateOrInsertMethod()
     {
         $builder = m::mock(Builder::class.'[where,exists,insert]', [
-            m::mock(ConnectionInterface::class),
-            new Grammar,
+            $connection = m::mock(Connection::class),
+            new Grammar($connection),
             m::mock(Processor::class),
         ]);
 
@@ -4113,8 +4107,8 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertTrue($builder->updateOrInsert(['email' => 'foo'], ['name' => 'bar']));
 
         $builder = m::mock(Builder::class.'[where,exists,update]', [
-            m::mock(ConnectionInterface::class),
-            new Grammar,
+            $connection = m::mock(Connection::class),
+            new Grammar($connection),
             m::mock(Processor::class),
         ]);
 
@@ -4129,8 +4123,8 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testUpdateOrInsertMethodWorksWithEmptyUpdateValues()
     {
         $builder = m::spy(Builder::class.'[where,exists,update]', [
-            m::mock(ConnectionInterface::class),
-            new Grammar,
+            $connection = m::mock(Connection::class),
+            new Grammar($connection),
             m::mock(Processor::class),
         ]);
 
@@ -4257,54 +4251,47 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $connection = $builder->getConnection();
         $connection->shouldReceive('statement')->once()->with('truncate table "users"', []);
-        $connection->shouldReceive('getSchemaBuilder->parseSchemaAndTable')->andReturn([null, 'users']);
         $builder->from('users')->truncate();
 
-        $sqlite = (new SQLiteGrammar)->setConnection($connection);
-        $builder = $this->getBuilder();
+        $builder = $this->getSQLiteBuilder();
+        $builder->getConnection()->shouldReceive('getSchemaBuilder->parseSchemaAndTable')->andReturn([null, 'users']);
         $builder->from('users');
         $this->assertEquals([
             'delete from sqlite_sequence where name = ?' => ['users'],
             'delete from "users"' => [],
-        ], $sqlite->compileTruncate($builder));
+        ], $builder->getGrammar()->compileTruncate($builder));
     }
 
     public function testTruncateMethodWithPrefix()
     {
-        $builder = $this->getBuilder();
-        $builder->getGrammar()->setTablePrefix('prefix_');
+        $builder = $this->getBuilder(prefix: 'prefix_');
         $connection = $builder->getConnection();
         $connection->shouldReceive('statement')->once()->with('truncate table "prefix_users"', []);
-        $connection->shouldReceive('getSchemaBuilder->parseSchemaAndTable')->andReturn([null, 'users']);
         $builder->from('users')->truncate();
 
-        $sqlite = (new SQLiteGrammar)->setConnection($connection);
-        $sqlite->setTablePrefix('prefix_');
-        $builder = $this->getBuilder();
+        $builder = $this->getSQLiteBuilder(prefix: 'prefix_');
+        $builder->getConnection()->shouldReceive('getSchemaBuilder->parseSchemaAndTable')->andReturn([null, 'users']);
         $builder->from('users');
         $this->assertEquals([
             'delete from sqlite_sequence where name = ?' => ['prefix_users'],
             'delete from "prefix_users"' => [],
-        ], $sqlite->compileTruncate($builder));
+        ], $builder->getGrammar()->compileTruncate($builder));
     }
 
     public function testTruncateMethodWithPrefixAndSchema()
     {
-        $builder = $this->getBuilder();
-        $builder->getGrammar()->setTablePrefix('prefix_');
+        $builder = $this->getBuilder(prefix: 'prefix_');
         $connection = $builder->getConnection();
         $connection->shouldReceive('statement')->once()->with('truncate table "my_schema"."prefix_users"', []);
-        $connection->shouldReceive('getSchemaBuilder->parseSchemaAndTable')->andReturn(['my_schema', 'users']);
         $builder->from('my_schema.users')->truncate();
 
-        $sqlite = (new SQLiteGrammar)->setConnection($connection);
-        $sqlite->setTablePrefix('prefix_');
-        $builder = $this->getBuilder();
+        $builder = $this->getSQLiteBuilder(prefix: 'prefix_');
+        $builder->getConnection()->shouldReceive('getSchemaBuilder->parseSchemaAndTable')->andReturn(['my_schema', 'users']);
         $builder->from('my_schema.users');
         $this->assertEquals([
             'delete from "my_schema".sqlite_sequence where name = ?' => ['prefix_users'],
             'delete from "my_schema"."prefix_users"' => [],
-        ], $sqlite->compileTruncate($builder));
+        ], $builder->getGrammar()->compileTruncate($builder));
     }
 
     public function testPreserveAddsClosureToArray()
@@ -4445,10 +4432,10 @@ class DatabaseQueryBuilderTest extends TestCase
 
     public function testMySqlUpdateWrappingJson()
     {
-        $grammar = new MySqlGrammar;
+        $connection = $this->createMock(Connection::class);
+        $grammar = new MySqlGrammar($connection);
         $processor = m::mock(Processor::class);
 
-        $connection = $this->createMock(ConnectionInterface::class);
         $connection->expects($this->once())
             ->method('update')
             ->with(
@@ -4463,10 +4450,10 @@ class DatabaseQueryBuilderTest extends TestCase
 
     public function testMySqlUpdateWrappingNestedJson()
     {
-        $grammar = new MySqlGrammar;
+        $connection = $this->createMock(Connection::class);
+        $grammar = new MySqlGrammar($connection);
         $processor = m::mock(Processor::class);
 
-        $connection = $this->createMock(ConnectionInterface::class);
         $connection->expects($this->once())
             ->method('update')
             ->with(
@@ -4481,10 +4468,10 @@ class DatabaseQueryBuilderTest extends TestCase
 
     public function testMySqlUpdateWrappingJsonArray()
     {
-        $grammar = new MySqlGrammar;
+        $connection = $this->createMock(Connection::class);
+        $grammar = new MySqlGrammar($connection);
         $processor = m::mock(Processor::class);
 
-        $connection = $this->createMock(ConnectionInterface::class);
         $connection->expects($this->once())
             ->method('update')
             ->with(
@@ -4508,10 +4495,10 @@ class DatabaseQueryBuilderTest extends TestCase
 
     public function testMySqlUpdateWrappingJsonPathArrayIndex()
     {
-        $grammar = new MySqlGrammar;
+        $connection = $this->createMock(Connection::class);
+        $grammar = new MySqlGrammar($connection);
         $processor = m::mock(Processor::class);
 
-        $connection = $this->createMock(ConnectionInterface::class);
         $connection->expects($this->once())
             ->method('update')
             ->with(
@@ -4531,10 +4518,10 @@ class DatabaseQueryBuilderTest extends TestCase
 
     public function testMySqlUpdateWithJsonPreparesBindingsCorrectly()
     {
-        $grammar = new MySqlGrammar;
+        $connection = $this->getConnection();
+        $grammar = new MySqlGrammar($connection);
         $processor = m::mock(Processor::class);
 
-        $connection = m::mock(ConnectionInterface::class);
         $connection->shouldReceive('update')
             ->once()
             ->with(
@@ -6686,8 +6673,7 @@ SQL;
 
     public function testFromSubWithPrefix()
     {
-        $builder = $this->getBuilder();
-        $builder->getGrammar()->setTablePrefix('prefix_');
+        $builder = $this->getBuilder(prefix: 'prefix_');
         $builder->fromSub(function ($query) {
             $query->select(new Raw('max(last_seen_at) as last_seen_at'))->from('user_sessions')->where('foo', '=', '1');
         }, 'sessions')->where('bar', '<', '10');
@@ -6844,11 +6830,11 @@ SQL;
 
     public function testToRawSql()
     {
-        $connection = m::mock(ConnectionInterface::class);
+        $connection = $this->getConnection();
         $connection->shouldReceive('prepareBindings')
             ->with(['foo'])
             ->andReturn(['foo']);
-        $grammar = m::mock(Grammar::class)->makePartial();
+        $grammar = m::mock(Grammar::class, [$connection])->makePartial();
         $grammar->shouldReceive('substituteBindingsIntoRawSql')
             ->with('select * from "users" where "email" = ?', ['foo'])
             ->andReturn('select * from "users" where "email" = \'foo\'');
@@ -6858,76 +6844,85 @@ SQL;
         $this->assertSame('select * from "users" where "email" = \'foo\'', $builder->toRawSql());
     }
 
-    protected function getConnection()
+    protected function getConnection(string $prefix = '')
     {
-        $connection = m::mock(ConnectionInterface::class);
+        $connection = m::mock(Connection::class);
         $connection->shouldReceive('getDatabaseName')->andReturn('database');
+        $connection->shouldReceive('getTablePrefix')->andReturn($prefix);
 
         return $connection;
     }
 
-    protected function getBuilder()
+    protected function getBuilder(string $prefix = '')
     {
-        $grammar = new Grammar;
+        $connection = $this->getConnection(prefix: $prefix);
+        $grammar = new Grammar($connection);
         $processor = m::mock(Processor::class);
 
-        return new Builder($this->getConnection(), $grammar, $processor);
+        return new Builder($connection, $grammar, $processor);
     }
 
-    protected function getPostgresBuilder()
+    protected function getPostgresBuilder(string $prefix = '')
     {
-        $grammar = new PostgresGrammar;
+        $connection = $this->getConnection(prefix: $prefix);
+        $grammar = new PostgresGrammar($connection);
         $processor = m::mock(Processor::class);
 
-        return new Builder($this->getConnection(), $grammar, $processor);
+        return new Builder($connection, $grammar, $processor);
     }
 
-    protected function getMySqlBuilder()
+    protected function getMySqlBuilder(string $prefix = '')
     {
-        $grammar = new MySqlGrammar;
+        $connection = $this->getConnection(prefix: $prefix);
+        $grammar = new MySqlGrammar($connection);
         $processor = m::mock(Processor::class);
 
-        return new Builder(m::mock(ConnectionInterface::class), $grammar, $processor);
+        return new Builder($connection, $grammar, $processor);
     }
 
-    protected function getMariaDbBuilder()
+    protected function getMariaDbBuilder(string $prefix = '')
     {
-        $grammar = new MariaDbGrammar;
+        $connection = $this->getConnection(prefix: $prefix);
+        $grammar = new MariaDbGrammar($connection);
         $processor = m::mock(Processor::class);
 
-        return new Builder(m::mock(ConnectionInterface::class), $grammar, $processor);
+        return new Builder($connection, $grammar, $processor);
     }
 
-    protected function getSQLiteBuilder()
+    protected function getSQLiteBuilder(string $prefix = '')
     {
-        $grammar = new SQLiteGrammar;
+        $connection = $this->getConnection(prefix: $prefix);
+        $grammar = new SQLiteGrammar($connection);
         $processor = m::mock(Processor::class);
 
-        return new Builder(m::mock(ConnectionInterface::class), $grammar, $processor);
+        return new Builder($connection, $grammar, $processor);
     }
 
-    protected function getSqlServerBuilder()
+    protected function getSqlServerBuilder(string $prefix = '')
     {
-        $grammar = new SqlServerGrammar;
+        $connection = $this->getConnection(prefix: $prefix);
+        $grammar = new SqlServerGrammar($connection);
         $processor = m::mock(Processor::class);
 
-        return new Builder($this->getConnection(), $grammar, $processor);
+        return new Builder($connection, $grammar, $processor);
     }
 
-    protected function getMySqlBuilderWithProcessor()
+    protected function getMySqlBuilderWithProcessor(string $prefix = '')
     {
-        $grammar = new MySqlGrammar;
+        $connection = $this->getConnection(prefix: $prefix);
+        $grammar = new MySqlGrammar($connection);
         $processor = new MySqlProcessor;
 
-        return new Builder(m::mock(ConnectionInterface::class), $grammar, $processor);
+        return new Builder($connection, $grammar, $processor);
     }
 
-    protected function getPostgresBuilderWithProcessor()
+    protected function getPostgresBuilderWithProcessor(string $prefix = '')
     {
-        $grammar = new PostgresGrammar;
+        $connection = $this->getConnection(prefix: $prefix);
+        $grammar = new PostgresGrammar($connection);
         $processor = new PostgresProcessor;
 
-        return new Builder(m::mock(ConnectionInterface::class), $grammar, $processor);
+        return new Builder($connection, $grammar, $processor);
     }
 
     /**
@@ -6936,8 +6931,8 @@ SQL;
     protected function getMockQueryBuilder()
     {
         return m::mock(Builder::class, [
-            m::mock(ConnectionInterface::class),
-            new Grammar,
+            $connection = $this->getConnection(),
+            new Grammar($connection),
             m::mock(Processor::class),
         ])->makePartial();
     }

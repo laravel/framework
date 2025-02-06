@@ -4,7 +4,6 @@ namespace Illuminate\Database\Schema;
 
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Expression;
-use Illuminate\Database\Schema\Grammars\Grammar;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\Str;
@@ -24,13 +23,6 @@ class BlueprintState
      * @var \Illuminate\Database\Connection
      */
     protected $connection;
-
-    /**
-     * The grammar instance.
-     *
-     * @var \Illuminate\Database\Schema\Grammars\Grammar
-     */
-    protected $grammar;
 
     /**
      * The columns.
@@ -65,14 +57,12 @@ class BlueprintState
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Database\Connection  $connection
-     * @param  \Illuminate\Database\Schema\Grammars\Grammar  $grammar
      * @return void
      */
-    public function __construct(Blueprint $blueprint, Connection $connection, Grammar $grammar)
+    public function __construct(Blueprint $blueprint, Connection $connection)
     {
         $this->blueprint = $blueprint;
         $this->connection = $connection;
-        $this->grammar = $grammar;
 
         $schema = $connection->getSchemaBuilder();
         $table = $blueprint->getTable();

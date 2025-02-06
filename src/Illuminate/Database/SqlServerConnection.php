@@ -93,9 +93,7 @@ class SqlServerConnection extends Connection
      */
     protected function getDefaultQueryGrammar()
     {
-        ($grammar = new QueryGrammar)->setConnection($this);
-
-        return $this->withTablePrefix($grammar);
+        return new QueryGrammar($this);
     }
 
     /**
@@ -119,9 +117,7 @@ class SqlServerConnection extends Connection
      */
     protected function getDefaultSchemaGrammar()
     {
-        ($grammar = new SchemaGrammar)->setConnection($this);
-
-        return $this->withTablePrefix($grammar);
+        return new SchemaGrammar($this);
     }
 
     /**

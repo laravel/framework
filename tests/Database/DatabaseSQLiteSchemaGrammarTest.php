@@ -1094,7 +1094,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
 
     public function getGrammar(?Connection $connection = null)
     {
-        return (new SQLiteGrammar())->setConnection($connection ?? $this->getConnection());
+        return new SQLiteGrammar($connection ?? $this->getConnection());
     }
 
     public function getBuilder()

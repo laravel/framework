@@ -2,7 +2,6 @@
 
 namespace Illuminate\Database\Schema\Grammars;
 
-use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Fluent;
@@ -36,35 +35,6 @@ class SqlServerGrammar extends Grammar
      * @var string[]
      */
     protected $fluentCommands = ['Default'];
-
-    /**
-     * Compile a create database command.
-     *
-     * @param  string  $name
-     * @param  \Illuminate\Database\Connection  $connection
-     * @return string
-     */
-    public function compileCreateDatabase($name, $connection)
-    {
-        return sprintf(
-            'create database %s',
-            $this->wrapValue($name),
-        );
-    }
-
-    /**
-     * Compile a drop database if exists command.
-     *
-     * @param  string  $name
-     * @return string
-     */
-    public function compileDropDatabaseIfExists($name)
-    {
-        return sprintf(
-            'drop database if exists %s',
-            $this->wrapValue($name)
-        );
-    }
 
     /**
      * Compile the query to determine the schemas.
@@ -261,10 +231,9 @@ class SqlServerGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $command
-     * @param  \Illuminate\Database\Connection  $connection
      * @return array|string
      */
-    public function compileRenameColumn(Blueprint $blueprint, Fluent $command, Connection $connection)
+    public function compileRenameColumn(Blueprint $blueprint, Fluent $command)
     {
         return sprintf("sp_rename %s, %s, N'COLUMN'",
             $this->quoteString($this->wrapTable($blueprint).'.'.$this->wrap($command->from)),
@@ -277,12 +246,9 @@ class SqlServerGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $command
-     * @param  \Illuminate\Database\Connection  $connection
      * @return array|string
-     *
-     * @throws \RuntimeException
      */
-    public function compileChange(Blueprint $blueprint, Fluent $command, Connection $connection)
+    public function compileChange(Blueprint $blueprint, Fluent $command)
     {
         return [
             $this->compileDropDefaultConstraint($blueprint, $command),

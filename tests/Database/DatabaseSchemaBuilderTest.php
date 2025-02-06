@@ -22,26 +22,24 @@ class DatabaseSchemaBuilderTest extends TestCase
     {
         $connection = m::mock(Connection::class);
         $grammar = m::mock(stdClass::class);
+        $grammar->shouldReceive('compileCreateDatabase')->andReturn('sql');
         $connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
+        $connection->shouldReceive('statement')->with('sql')->andReturnTrue();
         $builder = new Builder($connection);
 
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('This database driver does not support creating databases.');
-
-        $builder->createDatabase('foo');
+        $this->assertTrue($builder->createDatabase('foo'));
     }
 
     public function testDropDatabaseIfExists()
     {
         $connection = m::mock(Connection::class);
         $grammar = m::mock(stdClass::class);
+        $grammar->shouldReceive('compileDropDatabaseIfExists')->andReturn('sql');
         $connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
+        $connection->shouldReceive('statement')->with('sql')->andReturnTrue();
         $builder = new Builder($connection);
 
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('This database driver does not support dropping databases.');
-
-        $builder->dropDatabaseIfExists('foo');
+        $this->assertTrue($builder->dropDatabaseIfExists('foo'));
     }
 
     public function testHasTableCorrectlyCallsGrammar()

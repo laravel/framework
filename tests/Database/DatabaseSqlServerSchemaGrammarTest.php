@@ -40,7 +40,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
             'alter table "users" add "email" nvarchar(255) not null',
         ], $statements);
 
-        $conn = $this->getConnection($this->getGrammar()->setTablePrefix('prefix_'));
+        $conn = $this->getConnection(prefix: 'prefix_');
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->create();
         $blueprint->increments('id');
@@ -68,8 +68,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
 
     public function testCreateTemporaryTableWithPrefix()
     {
-        $connection = $this->getConnection();
-        $connection->shouldReceive('getTablePrefix')->andReturn('prefix_');
+        $connection = $this->getConnection(prefix: 'prefix_');
         $blueprint = new Blueprint($connection, 'users');
         $blueprint->create();
         $blueprint->temporary();
@@ -90,7 +89,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertCount(1, $statements);
         $this->assertSame('drop table "users"', $statements[0]);
 
-        $conn = $this->getConnection($this->getGrammar()->setTablePrefix('prefix_'));
+        $conn = $this->getConnection(prefix: 'prefix_');
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->drop();
         $statements = $blueprint->toSql();
@@ -108,7 +107,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertCount(1, $statements);
         $this->assertSame('if object_id(N\'"users"\', \'U\') is not null drop table "users"', $statements[0]);
 
-        $conn = $this->getConnection($this->getGrammar()->setTablePrefix('prefix_'));
+        $conn = $this->getConnection(prefix: 'prefix_');
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->dropIfExists();
         $statements = $blueprint->toSql();
@@ -932,16 +931,14 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
 
     public function testCreateDatabase()
     {
-        $connection = $this->getConnection();
-
-        $statement = $this->getGrammar()->compileCreateDatabase('my_database_a', $connection);
+        $statement = $this->getGrammar()->compileCreateDatabase('my_database_a');
 
         $this->assertSame(
             'create database "my_database_a"',
             $statement
         );
 
-        $statement = $this->getGrammar()->compileCreateDatabase('my_database_b', $connection);
+        $statement = $this->getGrammar()->compileCreateDatabase('my_database_b');
 
         $this->assertSame(
             'create database "my_database_b"',
@@ -968,9 +965,14 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
 
     protected function getConnection(
         ?SqlServerGrammar $grammar = null,
-        ?SqlServerBuilder $builder = null
+        ?SqlServerBuilder $builder = null,
+        string $prefix = ''
     ) {
-        $connection = m::mock(Connection::class);
+        $connection = m::mock(Connection::class)
+            ->shouldReceive('getTablePrefix')->andReturn($prefix)
+            ->shouldReceive('getConfig')->with('prefix_indexes')->andReturn(null)
+            ->getMock();
+
         $grammar ??= $this->getGrammar($connection);
         $builder ??= $this->getBuilder();
 
@@ -982,8 +984,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
 
     public function getGrammar(?Connection $connection = null)
     {
-        return ($grammar = new SqlServerGrammar)
-            ->setConnection($connection ?? $this->getConnection(grammar: $grammar));
+        return new SqlServerGrammar($connection ?? $this->getConnection());
     }
 
     public function getBuilder()
