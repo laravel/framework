@@ -7,11 +7,12 @@ use Illuminate\Container\Container;
 use Illuminate\Hashing\Argon2IdHasher;
 use Illuminate\Hashing\ArgonHasher;
 use Illuminate\Hashing\BcryptHasher;
+use Illuminate\Hashing\BcryptValueTooLongException;
 use Illuminate\Hashing\HashManager;
 use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
-use Illuminate\Hashing\BcryptValueTooLongException;
+
 class HasherTest extends TestCase
 {
     public $hashManager;

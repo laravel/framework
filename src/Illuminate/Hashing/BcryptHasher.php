@@ -5,7 +5,7 @@ namespace Illuminate\Hashing;
 use Error;
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;
 use RuntimeException;
-use Illuminate\Hashing\BcryptValueTooLongException;
+
 class BcryptHasher extends AbstractHasher implements HasherContract
 {
     /**
