@@ -705,7 +705,7 @@ class Gate implements GateContract
             return $classDirname.'\\Policies\\'.class_basename($class).'Policy';
         })->reverse()->values()->first(function ($class) {
             return class_exists($class);
-        }) ?: [$classDirname.'\\Policies\\'.class_basename($class).'Policy']);
+        }));
     }
 
     /**
