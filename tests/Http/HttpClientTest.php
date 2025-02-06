@@ -33,6 +33,7 @@ use JsonSerializable;
 use Mockery as m;
 use OutOfBoundsException;
 use PHPUnit\Framework\AssertionFailedError;
+use PHPUnit\Framework\Constraint\IsIdentical;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -3471,6 +3472,22 @@ class HttpClientTest extends TestCase
         $factory = new Factory();
 
         $this->assertInstanceOf(PendingRequest::class, $factory->createPendingRequest());
+    }
+
+    public function testJsonResponseFactoryWithFlags()
+    {
+        $this->factory->fake([
+            '*' => $this->factory::response(['value' => 10.0], flags: JSON_PRESERVE_ZERO_FRACTION),
+        ]);
+
+        $value = $this->factory
+            ->get('https://laravel.com')
+            ->json('value');
+
+        $this->assertThat(
+            $value,
+            new IsIdentical(10.0)
+        );
     }
 }
 

@@ -151,12 +151,13 @@ class Factory
      * @param  array|string|null  $body
      * @param  int  $status
      * @param  array  $headers
+     * @param  int  $flags
      * @return \GuzzleHttp\Promise\PromiseInterface
      */
-    public static function response($body = null, $status = 200, $headers = [])
+    public static function response($body = null, $status = 200, $headers = [], int $flags = 0)
     {
         if (is_array($body)) {
-            $body = json_encode($body);
+            $body = json_encode($body, $flags);
 
             $headers['Content-Type'] = 'application/json';
         }
