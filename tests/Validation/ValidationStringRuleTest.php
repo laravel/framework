@@ -179,6 +179,12 @@ class ValidationStringRuleTest extends TestCase
         $this->assertEquals('string|same:foo', (string) $rule);
     }
 
+    public function testActiveUrlRule()
+    {
+        $rule = Rule::string()->activeUrl();
+        $this->assertEquals('string|active_url', (string) $rule);
+    }
+
     public function testUrlRule()
     {
         $rule = Rule::string()->url();

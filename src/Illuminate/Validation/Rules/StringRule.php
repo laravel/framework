@@ -253,6 +253,16 @@ class StringRule implements Stringable
     }
 
     /**
+     * The field under validation must be a valid A or AAAA record.
+     *
+     * @return $this
+     */
+    public function activeUrl(): static
+    {
+        return $this->addRule('active_url');
+    }
+
+    /**
      * The field under validation must be a valid URL.
      *
      * @param  array|mixed  $protocols
