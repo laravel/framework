@@ -21,6 +21,19 @@ class Collection extends BaseCollection implements QueueableCollection
     use InteractsWithDictionary;
 
     /**
+     * Create a collection with the given range.
+     *
+     * @param  int  $from
+     * @param  int  $to
+     * @param  int  $step
+     * @return \Illuminate\Support\Collection<int, int>
+     */
+    public static function range($from, $to, $step = 1)
+    {
+        return parent::range($from, $to, $step)->toBase();
+    }
+
+    /**
      * Find a model in the collection by key.
      *
      * @template TFindDefault
