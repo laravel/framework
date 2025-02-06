@@ -59,13 +59,6 @@ class Migrator
     protected static $connectionResolverCallback;
 
     /**
-     * The pending migrations to skip.
-     *
-     * @var list<string>
-     */
-    protected static $withoutMigrations = [];
-
-    /**
      * The name of the default connection.
      *
      * @var string
@@ -92,6 +85,13 @@ class Migrator
      * @var \Symfony\Component\Console\Output\OutputInterface
      */
     protected $output;
+
+    /**
+     * The pending migrations to skip.
+     *
+     * @var list<string>
+     */
+    protected static $withoutMigrations = [];
 
     /**
      * Create a new migrator instance.
@@ -152,7 +152,10 @@ class Migrator
         $migrationsToSkip = $this->migrationsToSkip();
 
         return (new Collection($files))
-            ->reject(fn ($file) => in_array($migrationName = $this->getMigrationName($file), $ran) || in_array($migrationName, $migrationsToSkip))
+            ->reject(fn ($file) =>
+                in_array($migrationName = $this->getMigrationName($file), $ran) ||
+                in_array($migrationName, $migrationsToSkip)
+            )
             ->values()
             ->all();
     }
@@ -620,6 +623,17 @@ class Migrator
     }
 
     /**
+     * Set the pending migrations to skip.
+     *
+     * @param  list<string>  $migrations
+     * @return void
+     */
+    public static function withoutMigrations(array $migrations)
+    {
+        static::$withoutMigrations = $migrations;
+    }
+
+    /**
      * Get the default connection name.
      *
      * @return string
@@ -690,17 +704,6 @@ class Migrator
     public static function resolveConnectionsUsing(Closure $callback)
     {
         static::$connectionResolverCallback = $callback;
-    }
-
-    /**
-     * Set the pending migrations to skip.
-     *
-     * @param  list<string>  $migrations
-     * @return void
-     */
-    public static function withoutMigrations($migrations)
-    {
-        static::$withoutMigrations = $migrations;
     }
 
     /**
