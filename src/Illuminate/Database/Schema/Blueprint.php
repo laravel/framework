@@ -1819,7 +1819,7 @@ class Blueprint
     /**
      * Get the table prefix.
      *
-     * @deprected Use DB::getTablePrefix()
+     * @deprecated Use DB::getTablePrefix()
      *
      * @return string
      */

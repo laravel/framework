@@ -287,7 +287,7 @@ abstract class Grammar
     /**
      * Get the grammar's table prefix.
      *
-     * @deprected Use DB::getTablePrefix()
+     * @deprecated Use DB::getTablePrefix()
      *
      * @return string
      */
@@ -299,7 +299,7 @@ abstract class Grammar
     /**
      * Set the grammar's table prefix.
      *
-     * @deprected DB::setTablePrefix()
+     * @deprecated DB::setTablePrefix()
      *
      * @param  string  $prefix
      * @return $this
