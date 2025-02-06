@@ -228,7 +228,7 @@ class ValidationStringRuleTest extends TestCase
         );
 
         $this->assertSame(
-            $trans->get('validation.foo'),
+            $trans->get('validation.string'),
             $validator->errors()->first('foo')
         );
 
