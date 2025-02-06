@@ -708,7 +708,7 @@ class Gate implements GateContract
                 ->concat([str_replace('\\Models\\', '\\Models\\Policies\\', $classDirname).'\\'.class_basename($class).'Policy']);
         })->reverse()->values()->first(function ($class) {
             return class_exists($class);
-        }));
+        }) ?: [$classDirname.'\\Policies\\'.class_basename($class).'Policy']);
     }
 
     /**
