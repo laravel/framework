@@ -42,7 +42,6 @@ class DatabaseMariaDbSchemaStateTest extends TestCase
                 'LARAVEL_LOAD_USER' => 'root',
                 'LARAVEL_LOAD_PASSWORD' => '',
                 'LARAVEL_LOAD_DATABASE' => 'forge',
-                'LARAVEL_LOAD_SSL_CA' => '',
             ], [
                 'username' => 'root',
                 'host' => '127.0.0.1',
