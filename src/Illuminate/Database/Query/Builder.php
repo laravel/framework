@@ -254,7 +254,7 @@ class Builder implements BuilderContract
      *
      * @var array
      */
-    public array $fetchArgs = [];
+    public array $fetchUsing = [];
 
     /**
      * Create a new query builder instance.
@@ -3143,7 +3143,7 @@ class Builder implements BuilderContract
     protected function runSelect()
     {
         return $this->connection->select(
-            $this->toSql(), $this->getBindings(), ! $this->useWritePdo, $this->fetchArgs
+            $this->toSql(), $this->getBindings(), ! $this->useWritePdo, $this->fetchUsing
         );
     }
 
@@ -3392,22 +3392,22 @@ class Builder implements BuilderContract
      */
     public function pluck($column, $key = null)
     {
-        $original = [$this->columns, $this->fetchArgs];
+        $original = [$this->columns, $this->fetchUsing];
 
         if(is_null($key)) {
             $this->columns = [$column];
-            $this->fetchArgs = [PDO::FETCH_COLUMN];
+            $this->fetchUsing = [PDO::FETCH_COLUMN];
         } else {
             $this->columns = [$key, $column];
-            $this->fetchArgs = [PDO::FETCH_KEY_PAIR];
+            $this->fetchUsing = [PDO::FETCH_KEY_PAIR];
         }
 
-        $queryResult = $this->processor->processSelect($this, $this->runSelect());
+        $items = new Collection($this->processor->processSelect($this, $this->runSelect()));
 
         // Revert to original values so future queries can use the previous selection.
-        [$this->columns, $this->fetchArgs] = $original;
+        [$this->columns, $this->fetchUsing] = $original;
 
-        return $this->applyAfterQueryCallbacks(new Collection($queryResult));
+        return $this->applyAfterQueryCallbacks($items);
     }
 
     /**
@@ -4245,12 +4245,12 @@ class Builder implements BuilderContract
 
     /**
      * Set arguments for the PDOStatement::fetchAll/fetch functions.
-     * @param  mixed  ...$fetchArgs
+     * @param  mixed  ...$fetchUsing
      * @return $this
      */
-    public function fetchArgs(...$fetchArgs): static
+    public function fetchUsing(...$fetchUsing): static
     {
-        $this->fetchArgs = $fetchArgs;
+        $this->fetchUsing = $fetchUsing;
         return $this;
     }
 
