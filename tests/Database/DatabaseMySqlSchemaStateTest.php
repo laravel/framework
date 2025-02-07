@@ -70,6 +70,24 @@ class DatabaseMySqlSchemaStateTest extends TestCase
             ],
         ];
 
+        yield 'ssl' => [
+            ' --user="${:LARAVEL_LOAD_USER}" --password="${:LARAVEL_LOAD_PASSWORD}" --host="${:LARAVEL_LOAD_HOST}" --port="${:LARAVEL_LOAD_PORT}" --ssl="${:LARAVEL_LOAD_SSL}"', [
+                'LARAVEL_LOAD_SOCKET' => '',
+                'LARAVEL_LOAD_HOST' => '',
+                'LARAVEL_LOAD_PORT' => '',
+                'LARAVEL_LOAD_USER' => 'root',
+                'LARAVEL_LOAD_PASSWORD' => '',
+                'LARAVEL_LOAD_DATABASE' => 'forge',
+                'LARAVEL_LOAD_SSL' => 'OFF',
+            ], [
+                'username' => 'root',
+                'database' => 'forge',
+                'options' => [
+                    \PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT=> 'OFF',
+                ],
+            ],
+        ];
+
         yield 'unix socket' => [
             ' --user="${:LARAVEL_LOAD_USER}" --password="${:LARAVEL_LOAD_PASSWORD}" --socket="${:LARAVEL_LOAD_SOCKET}"', [
                 'LARAVEL_LOAD_SOCKET' => '/tmp/mysql.sock',
