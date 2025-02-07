@@ -111,9 +111,7 @@ class MySqlSchemaState extends SchemaState
                         ? ' --socket="${:LARAVEL_LOAD_SOCKET}"'
                         : ' --host="${:LARAVEL_LOAD_HOST}" --port="${:LARAVEL_LOAD_PORT}"';
 
-        if (isset($config['options'][\PDO::MYSQL_ATTR_SSL_CA])) {
-            $value .= ' --ssl-ca="${:LARAVEL_LOAD_SSL_CA}"';
-        }
+        $value .= $this->getAdditionalConnectionOptions($config['options']);
 
         return $value;
     }
@@ -135,7 +133,6 @@ class MySqlSchemaState extends SchemaState
             'LARAVEL_LOAD_USER' => $config['username'],
             'LARAVEL_LOAD_PASSWORD' => $config['password'] ?? '',
             'LARAVEL_LOAD_DATABASE' => $config['database'],
-            'LARAVEL_LOAD_SSL_CA' => $config['options'][\PDO::MYSQL_ATTR_SSL_CA] ?? '',
         ];
     }
 
@@ -173,5 +170,37 @@ class MySqlSchemaState extends SchemaState
         }
 
         return $process;
+    }
+
+    /**
+     * Get allowed options with mapped mysql params
+     *
+     * @return string[]
+     */
+    private function getOptionMap(): array
+    {
+        return [
+            \PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => '--ssl',
+            \PDO::MYSQL_ATTR_SSL_CA => '--ssl-ca',
+        ];
+    }
+
+    /**
+     * Get mysql options connection string
+     *
+     * @param array $options
+     * @return string
+     */
+    private function getAdditionalConnectionOptions(array $options): string
+    {
+        $connectionString = '';
+
+        foreach ($this->getOptionMap() as $optionKey => $optionValue) {
+            if (isset($options[$optionKey])) {
+                $connectionString .= sprintf(' %s=%s', $optionValue, $options[$optionKey]);
+            }
+        }
+
+        return $connectionString;
     }
 }
