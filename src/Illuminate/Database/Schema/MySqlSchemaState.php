@@ -111,7 +111,7 @@ class MySqlSchemaState extends SchemaState
                         ? ' --socket="${:LARAVEL_LOAD_SOCKET}"'
                         : ' --host="${:LARAVEL_LOAD_HOST}" --port="${:LARAVEL_LOAD_PORT}"';
 
-        $value .= $this->getAdditionalConnectionOptions($config['options']);
+        $value .= $this->getAdditionalConnectionOptions($config['options'] ?? []);
 
         return $value;
     }
@@ -126,14 +126,14 @@ class MySqlSchemaState extends SchemaState
     {
         $config['host'] ??= '';
 
-        return [
+        return array_merge([
             'LARAVEL_LOAD_SOCKET' => $config['unix_socket'] ?? '',
             'LARAVEL_LOAD_HOST' => is_array($config['host']) ? $config['host'][0] : $config['host'],
             'LARAVEL_LOAD_PORT' => $config['port'] ?? '',
             'LARAVEL_LOAD_USER' => $config['username'],
             'LARAVEL_LOAD_PASSWORD' => $config['password'] ?? '',
             'LARAVEL_LOAD_DATABASE' => $config['database'],
-        ];
+        ], $this->getAdditionalOptionValues($config['options'] ?? []));
     }
 
     /**
@@ -173,7 +173,7 @@ class MySqlSchemaState extends SchemaState
     }
 
     /**
-     * Get allowed options with mapped mysql params
+     * Get allowed options with mapped mysql params.
      *
      * @return string[]
      */
@@ -186,9 +186,9 @@ class MySqlSchemaState extends SchemaState
     }
 
     /**
-     * Get mysql options connection string
+     * Get mysql options connection string.
      *
-     * @param array $options
+     * @param  array  $options
      * @return string
      */
     private function getAdditionalConnectionOptions(array $options): string
@@ -197,10 +197,34 @@ class MySqlSchemaState extends SchemaState
 
         foreach ($this->getOptionMap() as $optionKey => $optionValue) {
             if (isset($options[$optionKey])) {
-                $connectionString .= sprintf(' %s=%s', $optionValue, $options[$optionKey]);
+                $connectionString .= sprintf(
+                    ' %s="${:LARAVEL_LOAD_%s}"',
+                    $optionValue,
+                    Str::upper(Str::replace(['--', '-'], [null, '_'], $optionValue))
+                );
             }
         }
 
         return $connectionString;
+    }
+
+    /**
+     * Get mysql options connection values for binding.
+     *
+     * @param  array  $options
+     * @return array
+     */
+    private function getAdditionalOptionValues(array $options): array
+    {
+        $values = [];
+
+        foreach ($this->getOptionMap() as $optionKey => $optionValue) {
+            if (isset($options[$optionKey])) {
+                $valueKey = 'LARAVEL_LOAD_'.Str::upper(Str::replace(['--', '-'], [null, '_'], $optionValue));
+                $values[$valueKey] = $options[$optionKey];
+            }
+        }
+
+        return $values;
     }
 }
