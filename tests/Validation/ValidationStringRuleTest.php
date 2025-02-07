@@ -187,7 +187,7 @@ class ValidationStringRuleTest extends TestCase
 
     public function testLongerThanOrEqualToRule()
     {
-        $rule = Rule::string()->shorterThanOrEqualTo('foo');
+        $rule = Rule::string()->longerThanOrEqualTo('foo');
         $this->assertEquals('string|gte:foo', (string) $rule);
     }
 
