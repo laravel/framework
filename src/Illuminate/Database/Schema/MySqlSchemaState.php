@@ -111,7 +111,7 @@ class MySqlSchemaState extends SchemaState
                         ? ' --socket="${:LARAVEL_LOAD_SOCKET}"'
                         : ' --host="${:LARAVEL_LOAD_HOST}" --port="${:LARAVEL_LOAD_PORT}"';
 
-        $value .= $this->getAdditionalConnectionOptions($config['options']);
+        $value .= $this->getAdditionalConnectionOptions($config['options'] ?? []);
 
         return $value;
     }
@@ -133,7 +133,7 @@ class MySqlSchemaState extends SchemaState
             'LARAVEL_LOAD_USER' => $config['username'],
             'LARAVEL_LOAD_PASSWORD' => $config['password'] ?? '',
             'LARAVEL_LOAD_DATABASE' => $config['database'],
-        ], $this->getAdditionalOptionValues($config['options']));
+        ], $this->getAdditionalOptionValues($config['options'] ?? []));
     }
 
     /**
