@@ -916,7 +916,7 @@ class FactoryTestPostFactory extends Factory
     {
         return $this->state(fn ($attributes) => [
             'user_id' => -1,
-            'title' => '(draft) '.$attributes['title']
+            'title' => '(draft) '.$attributes['title'],
         ]);
     }
 }
