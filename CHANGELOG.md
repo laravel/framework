@@ -1,6 +1,50 @@
 # Release Notes for 11.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v11.39.1...11.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v11.41.3...11.x)
+
+## [v11.41.3](https://github.com/laravel/framework/compare/v11.41.2...v11.41.3) - 2025-01-30
+
+## [v11.41.2](https://github.com/laravel/framework/compare/v11.41.1...v11.41.2) - 2025-01-30
+
+## [v11.41.1](https://github.com/laravel/framework/compare/v11.41.0...v11.41.1) - 2025-01-30
+
+* [11.x] Allow secret key Updates Without Bringing the Site Up by [@rashidlaasri](https://github.com/rashidlaasri) in https://github.com/laravel/framework/pull/54389
+* [11.x] use Auth::userResolver when resolving the authenticated user by [@rodrigopedra](https://github.com/rodrigopedra) in https://github.com/laravel/framework/pull/54382
+* [11.x] Add `Macroable` and `fill()` to `Support\Fluent` by [@stevebauman](https://github.com/stevebauman) in https://github.com/laravel/framework/pull/54404
+* [11.x] Optimize pluck() to avoid redundant column selection by [@zsocakave](https://github.com/zsocakave) in https://github.com/laravel/framework/pull/54396
+* [11.x] Optimize `loadTranslationsFrom` function for simplicity and clarity by [@selcukcukur](https://github.com/selcukcukur) in https://github.com/laravel/framework/pull/54407
+* feat: gracefully handle command not found exception - avoid creds exposure by [@chinmaypurav](https://github.com/chinmaypurav) in https://github.com/laravel/framework/pull/54406
+* Handle pooled Postgres connections for Laravel Cloud by [@taylorotwell](https://github.com/taylorotwell) in https://github.com/laravel/framework/pull/54346
+
+## [v11.41.0](https://github.com/laravel/framework/compare/v11.40.0...v11.41.0) - 2025-01-28
+
+* [11.x] more pint rules by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/54332
+* [11.x] Allow `TestComponent` to be macroable by [@ziadoz](https://github.com/ziadoz) in https://github.com/laravel/framework/pull/54359
+* [11.x] Fix validator return fails if using different date formats by [@mrvipchien](https://github.com/mrvipchien) in https://github.com/laravel/framework/pull/54350
+* [11.x] fix  the method `explodeExplicitRule` to support Customizable Date Validation by [@mrvipchien](https://github.com/mrvipchien) in https://github.com/laravel/framework/pull/54353
+* [11.x] Adds the `addPath()` method to the `Lang` facade and the `Translator` class. by [@selcukcukur](https://github.com/selcukcukur) in https://github.com/laravel/framework/pull/54347
+* Improve: add fire failed event at once by [@cesarMtorres](https://github.com/cesarMtorres) in https://github.com/laravel/framework/pull/54376
+* [11.x] feat: Create missing pgsql database when running migrations by [@mathiasgrimm](https://github.com/mathiasgrimm) in https://github.com/laravel/framework/pull/54314
+* [11.x] Proper rate limiter fix with phpredis serialization/compression enabled by [@TheLevti](https://github.com/TheLevti) in https://github.com/laravel/framework/pull/54372
+* Update Stringable Rule testcases by [@mrvipchien](https://github.com/mrvipchien) in https://github.com/laravel/framework/pull/54387
+* [11.x] Use `Date` facade for storing the password confirmation timestamp by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/54383
+
+## [v11.40.0](https://github.com/laravel/framework/compare/v11.39.1...v11.40.0) - 2025-01-24
+
+* draft: fix: Don't release lock for ShouldBeUniqueUntilProcessing Job that gets released by [@mathiasgrimm](https://github.com/mathiasgrimm) in https://github.com/laravel/framework/pull/54261
+* [11.x] Add Laravel Pint by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/53835
+* Add self to HasCollection type param in Model by [@thena-seer-sfg](https://github.com/thena-seer-sfg) in https://github.com/laravel/framework/pull/54311
+* [11.x] Add pending attributes by [@tontonsb](https://github.com/tontonsb) in https://github.com/laravel/framework/pull/53720
+* fix: `schedule:test` on commands using runInBackground by [@dallyger](https://github.com/dallyger) in https://github.com/laravel/framework/pull/54321
+* [11.x] Helper methods to dump responses of the Laravel HTTP client by [@morrislaptop](https://github.com/morrislaptop) in https://github.com/laravel/framework/pull/54317
+* Add support for cursor editor in ResolvesDumpSource by [@tuxfamily](https://github.com/tuxfamily) in https://github.com/laravel/framework/pull/54318
+* [11.x] Add Customizable Date Validation Rule with Flexible Date Constraints by [@michaelnabil230](https://github.com/michaelnabil230) in https://github.com/laravel/framework/pull/53465
+* [11.x] start syncing StyleCI rules to Pint by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/54326
+* [11.x] apply our new Pint rule to the `/tests` directory by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/54325
+* fix(Collection::pop()): count < 1 by [@artumi-richard](https://github.com/artumi-richard) in https://github.com/laravel/framework/pull/54340
+* Patch CVE-2025-22145 in nesbot/carbon package by [@dennis-koster](https://github.com/dennis-koster) in https://github.com/laravel/framework/pull/54335
+* [11.x] Prevent unintended serialization and compression by [@JeppeKnockaert](https://github.com/JeppeKnockaert) in https://github.com/laravel/framework/pull/54337
+* [11.x] Pass collection of models to `whereMorphedTo` /  `whereNotMorphedTo` by [@gdebrauwer](https://github.com/gdebrauwer) in https://github.com/laravel/framework/pull/54324
 
 ## [v11.39.1](https://github.com/laravel/framework/compare/v11.39.0...v11.39.1) - 2025-01-22
 

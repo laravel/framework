@@ -452,7 +452,18 @@ class RedisStore extends TaggableStore implements LockProvider
      */
     protected function serialize($value)
     {
-        return is_numeric($value) && ! in_array($value, [INF, -INF]) && ! is_nan($value) ? $value : serialize($value);
+        return $this->shouldBeStoredWithoutSerialization($value) ? $value : serialize($value);
+    }
+
+    /**
+     * Determine if the given value should be stored as plain value.
+     *
+     * @param  mixed  $value
+     * @return bool
+     */
+    protected function shouldBeStoredWithoutSerialization($value): bool
+    {
+        return is_numeric($value) && ! in_array($value, [INF, -INF]) && ! is_nan($value);
     }
 
     /**

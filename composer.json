@@ -38,7 +38,7 @@
         "league/flysystem-local": "^3.25.1",
         "league/uri": "^7.5.1",
         "monolog/monolog": "^3.0",
-        "nesbot/carbon": "^2.72.2|^3.4",
+        "nesbot/carbon": "^2.72.6|^3.8.4",
         "nunomaduro/termwind": "^2.0",
         "psr/container": "^1.1.1|^2.0.1",
         "psr/log": "^1.0|^2.0|^3.0",
@@ -114,7 +114,7 @@
         "orchestra/testbench-core": "^9.9.3",
         "pda/pheanstalk": "^5.0.6",
         "php-http/discovery": "^1.15",
-        "phpstan/phpstan": "^1.11.5",
+        "phpstan/phpstan": "^2.0",
         "phpunit/phpunit": "^10.5.35|^11.3.6|^12.0",
         "predis/predis": "^2.3",
         "resend/resend-php": "^0.10.0",
@@ -207,6 +207,6 @@
             "php-http/discovery": false
         }
     },
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "prefer-stable": true
 }

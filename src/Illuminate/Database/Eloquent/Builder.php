@@ -158,6 +158,13 @@ class Builder implements BuilderContract
     protected $afterQueryCallbacks = [];
 
     /**
+     * The callbacks that should be invoked on clone.
+     *
+     * @var array
+     */
+    protected $onCloneCallbacks = [];
+
+    /**
      * Create a new Eloquent query builder instance.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
@@ -316,6 +323,8 @@ class Builder implements BuilderContract
     {
         if ($column instanceof Closure && is_null($operator)) {
             $column($query = $this->model->newQueryWithoutRelationships());
+
+            $this->eagerLoad = array_merge($this->eagerLoad, $query->getEagerLoads());
 
             $this->query->addNestedWhereQuery($query->getQuery(), $boolean);
         } else {
@@ -2169,6 +2178,19 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Register a closure to be invoked on a clone.
+     *
+     * @param  \Closure  $callback
+     * @return $this
+     */
+    public function onClone(Closure $callback)
+    {
+        $this->onCloneCallbacks[] = $callback;
+
+        return $this;
+    }
+
+    /**
      * Force a clone of the underlying query builder when cloning.
      *
      * @return void
@@ -2176,5 +2198,9 @@ class Builder implements BuilderContract
     public function __clone()
     {
         $this->query = clone $this->query;
+
+        foreach ($this->onCloneCallbacks as $onCloneCallback) {
+            $onCloneCallback($this);
+        }
     }
 }
