@@ -331,6 +331,21 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertCount(3, FactoryTestPost::all());
     }
 
+    public function test_belongs_to_relationship_overrides_state()
+    {
+        $posts = FactoryTestPostFactory::times(3)
+            ->draft()
+            ->for(FactoryTestUserFactory::new(['name' => 'Taylor Otwell']), 'user')
+            ->create();
+
+        $this->assertCount(3, $posts->filter(function ($post) {
+            return $post->user->name === 'Taylor Otwell';
+        }));
+
+        $this->assertCount(1, FactoryTestUser::all());
+        $this->assertCount(3, FactoryTestPost::all());
+    }
+
     public function test_morph_to_relationship()
     {
         $posts = FactoryTestCommentFactory::times(3)
@@ -895,6 +910,14 @@ class FactoryTestPostFactory extends Factory
             'user_id' => FactoryTestUserFactory::new(),
             'title' => $this->faker->name(),
         ];
+    }
+
+    public function draft()
+    {
+        return $this->state(fn ($attributes) => [
+            'user_id' => -1,
+            'title' => '(draft) '.$attributes['title']
+        ]);
     }
 }
 
