@@ -157,7 +157,7 @@ class ViewMakeCommand extends GeneratorCommand
      */
     protected function testNamespace()
     {
-        return Str::of($this->testClassFullyQualifiedName())
+        return (new Stringable($this->testClassFullyQualifiedName()))
             ->beforeLast('\\')
             ->value();
     }
@@ -169,7 +169,7 @@ class ViewMakeCommand extends GeneratorCommand
      */
     protected function testClassName()
     {
-        return Str::of($this->testClassFullyQualifiedName())
+        return (new Stringable($this->testClassFullyQualifiedName()))
             ->afterLast('\\')
             ->append('Test')
             ->value();
