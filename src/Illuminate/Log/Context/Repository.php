@@ -67,6 +67,17 @@ class Repository
     }
 
     /**
+     * Determine if the given key is missing.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function missing($key)
+    {
+        return ! $this->get($key);
+    }
+
+    /**
      * Determine if the given key exists within the hidden context data.
      *
      * @param  string  $key

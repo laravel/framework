@@ -4,6 +4,7 @@ namespace Illuminate\Support\Facades;
 
 /**
  * @method static bool has(string $key)
+ * @method static bool missing(string $key)
  * @method static bool hasHidden(string $key)
  * @method static array all()
  * @method static array allHidden()
