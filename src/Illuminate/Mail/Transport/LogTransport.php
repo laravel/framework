@@ -2,10 +2,9 @@
 
 namespace Illuminate\Mail\Transport;
 
-use Illuminate\Support\Str;
+use Illuminate\Support\Stringable as SupportStringable;
 use Psr\Log\LoggerInterface;
 use Stringable;
-use Illuminate\Support\Stringable as SupportStringable;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\TransportInterface;
