@@ -58,6 +58,10 @@ class ThrottleRequestsWithRedis extends ThrottleRequests
     {
         foreach ($limits as $limit) {
             if ($this->tooManyAttempts($limit->key, $limit->maxAttempts, $limit->decaySeconds)) {
+                if (is_callable($limit->breachCallback)) {
+                    call_user_func($limit->breachCallback);
+                }
+
                 throw $this->buildException($request, $limit->key, $limit->maxAttempts, $limit->responseCallback);
             }
         }

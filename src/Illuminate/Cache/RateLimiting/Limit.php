@@ -26,6 +26,13 @@ class Limit
     public $decaySeconds;
 
     /**
+     * The callback that should be executed when the limit is breached.
+     *
+     * @var callable
+     */
+    public $breachCallback;
+
+    /**
      * The response generator callback.
      *
      * @var callable
@@ -126,6 +133,19 @@ class Limit
     public function by($key)
     {
         $this->key = $key;
+
+        return $this;
+    }
+
+    /**
+     * Set the callback that should be executed when the limit is breached.
+     *
+     * @param  callable  $callback
+     * @return $this
+     */
+    public function onBreach(callable $callback)
+    {
+        $this->breachCallback = $callback;
 
         return $this;
     }

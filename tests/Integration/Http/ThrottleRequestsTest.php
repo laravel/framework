@@ -410,6 +410,30 @@ class ThrottleRequestsTest extends TestCase
             $this->assertEquals(Carbon::now()->addSeconds(2)->getTimestamp(), $e->getHeaders()['X-RateLimit-Reset']);
         }
     }
+
+    public function testItExecutesBreachCallbackWhenRateLimitIsBreached()
+    {
+        $lock = (object) ['locked' => false];
+
+        $rateLimiter = Container::getInstance()->make(RateLimiter::class);
+        $rateLimiter->for('test', fn () => Limit::perMinute(3, 1)->onBreach(function () use (&$lock) {
+            $lock->locked = true;
+        }));
+
+        Route::get('/', fn () => 'ok')->middleware(ThrottleRequests::using('test'));
+
+        Carbon::setTestNow('2000-01-01 00:00:00.000');
+
+        $this->withoutExceptionHandling()->get('/');
+        $this->withoutExceptionHandling()->get('/');
+        $this->withoutExceptionHandling()->get('/');
+
+        try {
+            $this->withoutExceptionHandling()->get('/');
+        } catch (Throwable $e) {
+            $this->assertTrue($lock->locked);
+        }
+    }
 }
 
 class UserWithAccessor extends User
