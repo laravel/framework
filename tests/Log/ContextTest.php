@@ -267,7 +267,7 @@ class ContextTest extends TestCase
     {
         Context::add('foo', 'bar');
 
-        $this->assertTrue(Context::missing('bar'));
+        $this->assertTrue(Context::missing('lorem'));
         $this->assertFalse(Context::missing('foo'));
     }
 
