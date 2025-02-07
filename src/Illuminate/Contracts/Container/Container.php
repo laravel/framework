@@ -149,8 +149,10 @@ interface Container extends ContainerInterface
     /**
      * Get a closure to resolve the given type from the container.
      *
-     * @param  string  $abstract
-     * @return \Closure
+     * @template TClass
+     *
+     * @param  string|class-string<TClass>  $abstract
+     * @return ($abstract is class-string<TClass> ? \Closure(): TClass : \Closure)
      */
     public function factory($abstract);
 
@@ -164,9 +166,11 @@ interface Container extends ContainerInterface
     /**
      * Resolve the given type from the container.
      *
-     * @param  string  $abstract
+     * @template TClass
+     *
+     * @param  string|class-string<TClass>  $abstract
      * @param  array  $parameters
-     * @return mixed
+     * @return ($abstract is class-string<TClass> ? TClass : mixed)
      *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
