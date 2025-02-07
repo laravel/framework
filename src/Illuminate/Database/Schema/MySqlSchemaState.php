@@ -173,7 +173,7 @@ class MySqlSchemaState extends SchemaState
     }
 
     /**
-     * Get allowed options with mapped mysql params
+     * Get allowed options with mapped mysql params.
      *
      * @return string[]
      */
@@ -186,9 +186,9 @@ class MySqlSchemaState extends SchemaState
     }
 
     /**
-     * Get mysql options connection string
+     * Get mysql options connection string.
      *
-     * @param array $options
+     * @param  array  $options
      * @return string
      */
     private function getAdditionalConnectionOptions(array $options): string
