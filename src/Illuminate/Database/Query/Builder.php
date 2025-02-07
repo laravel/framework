@@ -3138,6 +3138,7 @@ class Builder implements BuilderContract
 
     /**
      * Run the query as a "select" statement against the connection.
+     *
      * @return array
      */
     protected function runSelect()
@@ -3394,7 +3395,7 @@ class Builder implements BuilderContract
     {
         $original = [$this->columns, $this->fetchUsing];
 
-        if(is_null($key)) {
+        if (is_null($key)) {
             $this->columns = [$column];
             $this->fetchUsing = [PDO::FETCH_COLUMN];
         } else {
@@ -4245,12 +4246,14 @@ class Builder implements BuilderContract
 
     /**
      * Set arguments for the PDOStatement::fetchAll/fetch functions.
+     *
      * @param  mixed  ...$fetchUsing
      * @return $this
      */
     public function fetchUsing(...$fetchUsing): static
     {
         $this->fetchUsing = $fetchUsing;
+
         return $this;
     }
 
