@@ -167,6 +167,30 @@ class ValidationStringRuleTest extends TestCase
         $this->assertEquals('string|min:3', (string) $rule);
     }
 
+    public function testShorterThanRule()
+    {
+        $rule = Rule::string()->shorterThan('foo');
+        $this->assertEquals('string|lt:foo', (string) $rule);
+    }
+
+    public function testShorterThanOrEqualToRule()
+    {
+        $rule = Rule::string()->shorterThanOrEqualTo('foo');
+        $this->assertEquals('string|lte:foo', (string) $rule);
+    }
+
+    public function testLongerThanRule()
+    {
+        $rule = Rule::string()->longerThan('foo');
+        $this->assertEquals('string|gt:foo', (string) $rule);
+    }
+
+    public function testLongerThanOrEqualToRule()
+    {
+        $rule = Rule::string()->shorterThanOrEqualTo('foo');
+        $this->assertEquals('string|gte:foo', (string) $rule);
+    }
+
     public function testDifferentRule()
     {
         $rule = Rule::string()->different('foo');
@@ -275,6 +299,16 @@ class ValidationStringRuleTest extends TestCase
         );
 
         $this->assertEmpty($validator->errors()->first('foo'));
+
+        $rule = Rule::string()->longerThan('foo')->shorterThan('bar');
+
+        $validator = new Validator(
+            $trans,
+            ['foo' => 'bb', 'bar' => 'aaaaa', 'baz' => 'ccc'],
+            ['baz' => (string) $rule]
+        );
+
+        $this->assertEmpty($validator->errors()->first('baz'));
 
         $rule = Rule::string()->length(5)->ascii()->lowercase();
 

@@ -231,6 +231,50 @@ class StringRule implements Stringable
     }
 
     /**
+     * The field under validation must be shorter than the given field.
+     *
+     * @param  string  $field
+     * @return $this
+     */
+    public function shorterThan(string $field): static
+    {
+        return $this->addRule('lt:'.$field);
+    }
+
+    /**
+     * The field under validation must be shorter than or equal to the given field.
+     *
+     * @param  string  $field
+     * @return $this
+     */
+    public function shorterThanOrEqualTo(string $field): static
+    {
+        return $this->addRule('lte:'.$field);
+    }
+
+    /**
+     * The field under validation must be longer than the given field.
+     *
+     * @param  string  $field
+     * @return $this
+     */
+    public function longerThan(string $field): static
+    {
+        return $this->addRule('gt:'.$field);
+    }
+
+    /**
+     * The field under validation must be longer than or equal to the given field.
+     *
+     * @param  string  $field
+     * @return $this
+     */
+    public function longerThanOrEqualTo(string $field): static
+    {
+        return $this->addRule('gte:'.$field);
+    }
+
+    /**
      * The field under validation must have a different value than field.
      *
      * @param  string  $field
