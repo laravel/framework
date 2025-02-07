@@ -74,7 +74,7 @@ class Repository
      */
     public function missing($key)
     {
-        return ! $this->get($key);
+        return ! $this->has($key);
     }
 
     /**
