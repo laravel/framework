@@ -220,7 +220,7 @@ class MySqlSchemaState extends SchemaState
 
         foreach ($this->getOptionMap() as $optionKey => $optionValue) {
             if (isset($options[$optionKey])) {
-                $valueKey = 'LARAVEL_LOAD_' . Str::upper(Str::replace(['--', '-'], [null, '_'], $optionValue));
+                $valueKey = 'LARAVEL_LOAD_'.Str::upper(Str::replace(['--', '-'], [null, '_'], $optionValue));
                 $values[$valueKey] = $options[$optionKey];
             }
         }

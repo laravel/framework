@@ -83,7 +83,7 @@ class DatabaseMySqlSchemaStateTest extends TestCase
                 'username' => 'root',
                 'database' => 'forge',
                 'options' => [
-                    \PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT=> 'OFF',
+                    \PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => 'OFF',
                 ],
             ],
         ];
