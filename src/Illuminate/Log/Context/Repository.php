@@ -67,6 +67,17 @@ class Repository
     }
 
     /**
+     * Determine if the given key is missing.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function missing($key)
+    {
+        return ! $this->has($key);
+    }
+
+    /**
      * Determine if the given key exists within the hidden context data.
      *
      * @param  string  $key
@@ -75,6 +86,17 @@ class Repository
     public function hasHidden($key)
     {
         return array_key_exists($key, $this->hidden);
+    }
+
+    /**
+     * Determine if the given key is missing within the hidden context data.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function missingHidden($key)
+    {
+        return ! $this->hasHidden($key);
     }
 
     /**
