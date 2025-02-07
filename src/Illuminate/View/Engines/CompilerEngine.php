@@ -6,7 +6,7 @@ use Illuminate\Database\RecordNotFoundException;
 use Illuminate\Database\RecordsNotFoundException;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Http\Exceptions\HttpResponseException;
-use Illuminate\Support\Str;
+use Illuminate\Support\Stringable;
 use Illuminate\View\Compilers\CompilerInterface;
 use Illuminate\View\ViewException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -74,7 +74,7 @@ class CompilerEngine extends PhpEngine
         try {
             $results = $this->evaluatePath($this->compiler->getCompiledPath($path), $data);
         } catch (ViewException $e) {
-            if (! Str::of($e->getMessage())->contains(['No such file or directory', 'File does not exist at path'])) {
+            if (! (new Stringable($e->getMessage()))->contains(['No such file or directory', 'File does not exist at path'])) {
                 throw $e;
             }
 
