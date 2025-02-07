@@ -9,6 +9,13 @@ use RuntimeException;
 class BcryptHasher extends AbstractHasher implements HasherContract
 {
     /**
+     * The maximum byte length of the value to hash.
+     *
+     * @var int
+     */
+    const MAX_BYTE_LENGTH = 72;
+
+    /**
      * The default cost factor.
      *
      * @var int
@@ -23,6 +30,13 @@ class BcryptHasher extends AbstractHasher implements HasherContract
     protected $verifyAlgorithm = false;
 
     /**
+     * Impose bcrypt byte limit.
+     *
+     * @var bool
+     */
+    protected $limitLength = false;
+
+    /**
      * Create a new hasher instance.
      *
      * @param  array  $options
@@ -32,6 +46,7 @@ class BcryptHasher extends AbstractHasher implements HasherContract
     {
         $this->rounds = $options['rounds'] ?? $this->rounds;
         $this->verifyAlgorithm = $options['verify'] ?? $this->verifyAlgorithm;
+        $this->limitLength = $options['limit_length'] ?? $this->limitLength;
     }
 
     /**
@@ -46,6 +61,10 @@ class BcryptHasher extends AbstractHasher implements HasherContract
     public function make(#[\SensitiveParameter] $value, array $options = [])
     {
         try {
+            if ($this->limitLength && strlen($value) > self::MAX_BYTE_LENGTH) {
+                throw new BcryptValueTooLongException;
+            }
+
             $hash = password_hash($value, PASSWORD_BCRYPT, [
                 'cost' => $this->cost($options),
             ]);
