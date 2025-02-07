@@ -24,11 +24,13 @@ trait QueriesRelationships
     /**
      * Add a relationship count / exists condition to the query.
      *
-     * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>|string  $relation
+     * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation<TRelatedModel, *, *>|string  $relation
      * @param  string  $operator
      * @param  int  $count
      * @param  string  $boolean
-     * @param  \Closure|null  $callback
+     * @param  (\Closure(\Illuminate\Database\Eloquent\Builder<TRelatedModel>): mixed)|null  $callback
      * @return $this
      *
      * @throws \RuntimeException
@@ -79,7 +81,7 @@ trait QueriesRelationships
      * @param  string  $operator
      * @param  int  $count
      * @param  string  $boolean
-     * @param  \Closure|null  $callback
+     * @param  (\Closure(\Illuminate\Database\Eloquent\Builder<*>): mixed)|null  $callback
      * @return $this
      */
     protected function hasNested($relations, $operator = '>=', $count = 1, $boolean = 'and', $callback = null)
@@ -121,9 +123,11 @@ trait QueriesRelationships
     /**
      * Add a relationship count / exists condition to the query.
      *
-     * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>|string  $relation
+     * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation<TRelatedModel, *, *>|string  $relation
      * @param  string  $boolean
-     * @param  \Closure|null  $callback
+     * @param  (\Closure(\Illuminate\Database\Eloquent\Builder<TRelatedModel>): mixed)|null  $callback
      * @return $this
      */
     public function doesntHave($relation, $boolean = 'and', ?Closure $callback = null)
@@ -145,8 +149,10 @@ trait QueriesRelationships
     /**
      * Add a relationship count / exists condition to the query with where clauses.
      *
-     * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>|string  $relation
-     * @param  \Closure|null  $callback
+     * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation<TRelatedModel, *, *>|string  $relation
+     * @param  (\Closure(\Illuminate\Database\Eloquent\Builder<TRelatedModel>): mixed)|null  $callback
      * @param  string  $operator
      * @param  int  $count
      * @return $this
@@ -161,8 +167,8 @@ trait QueriesRelationships
      *
      * Also load the relationship with same condition.
      *
-     * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>|string  $relation
-     * @param  \Closure|null  $callback
+     * @param  string  $relation
+     * @param  (\Closure(\Illuminate\Database\Eloquent\Builder<*>|\Illuminate\Database\Eloquent\Relations\Relation<*, *, *>): mixed)|null  $callback
      * @param  string  $operator
      * @param  int  $count
      * @return $this
@@ -176,8 +182,10 @@ trait QueriesRelationships
     /**
      * Add a relationship count / exists condition to the query with where clauses and an "or".
      *
-     * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>|string  $relation
-     * @param  \Closure|null  $callback
+     * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation<TRelatedModel, *, *>|string  $relation
+     * @param  (\Closure(\Illuminate\Database\Eloquent\Builder<TRelatedModel>): mixed)|null  $callback
      * @param  string  $operator
      * @param  int  $count
      * @return $this
@@ -190,8 +198,10 @@ trait QueriesRelationships
     /**
      * Add a relationship count / exists condition to the query with where clauses.
      *
-     * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>|string  $relation
-     * @param  \Closure|null  $callback
+     * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation<TRelatedModel, *, *>|string  $relation
+     * @param  (\Closure(\Illuminate\Database\Eloquent\Builder<TRelatedModel>): mixed)|null  $callback
      * @return $this
      */
     public function whereDoesntHave($relation, ?Closure $callback = null)
@@ -202,8 +212,10 @@ trait QueriesRelationships
     /**
      * Add a relationship count / exists condition to the query with where clauses and an "or".
      *
-     * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>|string  $relation
-     * @param  \Closure|null  $callback
+     * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation<TRelatedModel, *, *>|string  $relation
+     * @param  (\Closure(\Illuminate\Database\Eloquent\Builder<TRelatedModel>): mixed)|null  $callback
      * @return $this
      */
     public function orWhereDoesntHave($relation, ?Closure $callback = null)
@@ -214,12 +226,14 @@ trait QueriesRelationships
     /**
      * Add a polymorphic relationship count / exists condition to the query.
      *
-     * @param  \Illuminate\Database\Eloquent\Relations\MorphTo<*, *>|string  $relation
-     * @param  string|array  $types
+     * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\MorphTo<TRelatedModel, *>|string  $relation
+     * @param  string|array<int, string>  $types
      * @param  string  $operator
      * @param  int  $count
      * @param  string  $boolean
-     * @param  \Closure|null  $callback
+     * @param  (\Closure(\Illuminate\Database\Eloquent\Builder<TRelatedModel>, string): mixed)|null  $callback
      * @return $this
      */
     public function hasMorph($relation, $types, $operator = '>=', $count = 1, $boolean = 'and', ?Closure $callback = null)
@@ -229,6 +243,12 @@ trait QueriesRelationships
         }
 
         $types = (array) $types;
+
+        $checkMorphNull = $types === ['*']
+            && (($operator === '<' && $count >= 1)
+                || ($operator === '<=' && $count >= 0)
+                || ($operator === '=' && $count === 0)
+                || ($operator === '!=' && $count >= 1));
 
         if ($types === ['*']) {
             $types = $this->model->newModelQuery()->distinct()->pluck($relation->getMorphType())
@@ -260,7 +280,8 @@ trait QueriesRelationships
                         ->whereHas($belongsTo, $callback, $operator, $count);
                 });
             }
-        }, null, null, $boolean);
+        }, null, null, $boolean)
+        ->when($checkMorphNull, fn (self $query) => $query->orWhereMorphedTo($relation, null));
     }
 
     /**
@@ -292,7 +313,7 @@ trait QueriesRelationships
      * Add a polymorphic relationship count / exists condition to the query with an "or".
      *
      * @param  \Illuminate\Database\Eloquent\Relations\MorphTo<*, *>|string  $relation
-     * @param  string|array  $types
+     * @param  string|array<int, string>  $types
      * @param  string  $operator
      * @param  int  $count
      * @return $this
@@ -305,10 +326,12 @@ trait QueriesRelationships
     /**
      * Add a polymorphic relationship count / exists condition to the query.
      *
-     * @param  \Illuminate\Database\Eloquent\Relations\MorphTo<*, *>|string  $relation
-     * @param  string|array  $types
+     * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\MorphTo<TRelatedModel, *>|string  $relation
+     * @param  string|array<int, string>  $types
      * @param  string  $boolean
-     * @param  \Closure|null  $callback
+     * @param  (\Closure(\Illuminate\Database\Eloquent\Builder<TRelatedModel>, string): mixed)|null  $callback
      * @return $this
      */
     public function doesntHaveMorph($relation, $types, $boolean = 'and', ?Closure $callback = null)
@@ -320,7 +343,7 @@ trait QueriesRelationships
      * Add a polymorphic relationship count / exists condition to the query with an "or".
      *
      * @param  \Illuminate\Database\Eloquent\Relations\MorphTo<*, *>|string  $relation
-     * @param  string|array  $types
+     * @param  string|array<int, string>  $types
      * @return $this
      */
     public function orDoesntHaveMorph($relation, $types)
@@ -331,9 +354,11 @@ trait QueriesRelationships
     /**
      * Add a polymorphic relationship count / exists condition to the query with where clauses.
      *
-     * @param  \Illuminate\Database\Eloquent\Relations\MorphTo<*, *>|string  $relation
-     * @param  string|array  $types
-     * @param  \Closure|null  $callback
+     * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\MorphTo<TRelatedModel, *>|string  $relation
+     * @param  string|array<int, string>  $types
+     * @param  (\Closure(\Illuminate\Database\Eloquent\Builder<TRelatedModel>, string): mixed)|null  $callback
      * @param  string  $operator
      * @param  int  $count
      * @return $this
@@ -346,9 +371,11 @@ trait QueriesRelationships
     /**
      * Add a polymorphic relationship count / exists condition to the query with where clauses and an "or".
      *
-     * @param  \Illuminate\Database\Eloquent\Relations\MorphTo<*, *>|string  $relation
-     * @param  string|array  $types
-     * @param  \Closure|null  $callback
+     * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\MorphTo<TRelatedModel, *>|string  $relation
+     * @param  string|array<int, array>  $types
+     * @param  (\Closure(\Illuminate\Database\Eloquent\Builder<TRelatedModel>, string): mixed)|null  $callback
      * @param  string  $operator
      * @param  int  $count
      * @return $this
@@ -361,9 +388,11 @@ trait QueriesRelationships
     /**
      * Add a polymorphic relationship count / exists condition to the query with where clauses.
      *
-     * @param  \Illuminate\Database\Eloquent\Relations\MorphTo<*, *>|string  $relation
-     * @param  string|array  $types
-     * @param  \Closure|null  $callback
+     * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\MorphTo<TRelatedModel, *>|string  $relation
+     * @param  string|array<int, string>  $types
+     * @param  (\Closure(\Illuminate\Database\Eloquent\Builder<TRelatedModel>, string): mixed)|null  $callback
      * @return $this
      */
     public function whereDoesntHaveMorph($relation, $types, ?Closure $callback = null)
@@ -374,9 +403,11 @@ trait QueriesRelationships
     /**
      * Add a polymorphic relationship count / exists condition to the query with where clauses and an "or".
      *
-     * @param  \Illuminate\Database\Eloquent\Relations\MorphTo<*, *>|string  $relation
-     * @param  string|array  $types
-     * @param  \Closure|null  $callback
+     * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\MorphTo<TRelatedModel, *>|string  $relation
+     * @param  string|array<int, string>  $types
+     * @param  (\Closure(\Illuminate\Database\Eloquent\Builder<TRelatedModel>, string): mixed)|null  $callback
      * @return $this
      */
     public function orWhereDoesntHaveMorph($relation, $types, ?Closure $callback = null)
@@ -387,8 +418,10 @@ trait QueriesRelationships
     /**
      * Add a basic where clause to a relationship query.
      *
-     * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>|string  $relation
-     * @param  \Closure|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation<TRelatedModel, *, *>|string  $relation
+     * @param  (\Closure(\Illuminate\Database\Eloquent\Builder<TRelatedModel>): mixed)|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
      * @param  mixed  $operator
      * @param  mixed  $value
      * @return $this
@@ -407,8 +440,10 @@ trait QueriesRelationships
     /**
      * Add an "or where" clause to a relationship query.
      *
-     * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>|string  $relation
-     * @param  \Closure|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation<TRelatedModel, *, *>|string  $relation
+     * @param  (\Closure(\Illuminate\Database\Eloquent\Builder<TRelatedModel>): mixed)|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
      * @param  mixed  $operator
      * @param  mixed  $value
      * @return $this
@@ -427,8 +462,10 @@ trait QueriesRelationships
     /**
      * Add a basic count / exists condition to a relationship query.
      *
-     * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>|string  $relation
-     * @param  \Closure|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation<TRelatedModel, *, *>|string  $relation
+     * @param  (\Closure(\Illuminate\Database\Eloquent\Builder<TRelatedModel>): mixed)|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
      * @param  mixed  $operator
      * @param  mixed  $value
      * @return $this
@@ -447,8 +484,10 @@ trait QueriesRelationships
     /**
      * Add an "or where" clause to a relationship query.
      *
-     * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>|string  $relation
-     * @param  \Closure|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation<TRelatedModel, *, *>|string  $relation
+     * @param  (\Closure(\Illuminate\Database\Eloquent\Builder<TRelatedModel>): mixed)|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
      * @param  mixed  $operator
      * @param  mixed  $value
      * @return $this
@@ -467,9 +506,11 @@ trait QueriesRelationships
     /**
      * Add a polymorphic relationship condition to the query with a where clause.
      *
-     * @param  \Illuminate\Database\Eloquent\Relations\MorphTo<*, *>|string  $relation
-     * @param  string|array  $types
-     * @param  \Closure|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\MorphTo<TRelatedModel, *>|string  $relation
+     * @param  string|array<int, string>  $types
+     * @param  (\Closure(\Illuminate\Database\Eloquent\Builder<TRelatedModel>): mixed)|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
      * @param  mixed  $operator
      * @param  mixed  $value
      * @return $this
@@ -484,9 +525,11 @@ trait QueriesRelationships
     /**
      * Add a polymorphic relationship condition to the query with an "or where" clause.
      *
-     * @param  \Illuminate\Database\Eloquent\Relations\MorphTo<*, *>|string  $relation
-     * @param  string|array  $types
-     * @param  \Closure|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\MorphTo<TRelatedModel, *>|string  $relation
+     * @param  string|array<int, string>  $types
+     * @param  (\Closure(\Illuminate\Database\Eloquent\Builder<TRelatedModel>): mixed)|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
      * @param  mixed  $operator
      * @param  mixed  $value
      * @return $this
@@ -501,9 +544,11 @@ trait QueriesRelationships
     /**
      * Add a polymorphic relationship condition to the query with a doesn't have clause.
      *
-     * @param  \Illuminate\Database\Eloquent\Relations\MorphTo<*, *>|string  $relation
-     * @param  string|array  $types
-     * @param  \Closure|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\MorphTo<TRelatedModel, *>|string  $relation
+     * @param  string|array<int, string>  $types
+     * @param  (\Closure(\Illuminate\Database\Eloquent\Builder<TRelatedModel>): mixed)|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
      * @param  mixed  $operator
      * @param  mixed  $value
      * @return $this
@@ -518,9 +563,11 @@ trait QueriesRelationships
     /**
      * Add a polymorphic relationship condition to the query with an "or doesn't have" clause.
      *
-     * @param  \Illuminate\Database\Eloquent\Relations\MorphTo<*, *>|string  $relation
-     * @param  string|array  $types
-     * @param  \Closure|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\MorphTo<TRelatedModel, *>|string  $relation
+     * @param  string|array<int, string>  $types
+     * @param  (\Closure(\Illuminate\Database\Eloquent\Builder<TRelatedModel>): mixed)|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
      * @param  mixed  $operator
      * @param  mixed  $value
      * @return $this

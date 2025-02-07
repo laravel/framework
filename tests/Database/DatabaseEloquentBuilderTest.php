@@ -1031,6 +1031,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $nestedQuery = m::mock(Builder::class);
         $nestedRawQuery = $this->getMockQueryBuilder();
         $nestedQuery->shouldReceive('getQuery')->once()->andReturn($nestedRawQuery);
+        $nestedQuery->shouldReceive('getEagerLoads')->once()->andReturn([]);
         $model = $this->getMockModel()->makePartial();
         $model->shouldReceive('newQueryWithoutRelationships')->once()->andReturn($nestedQuery);
         $builder = $this->getBuilder();
@@ -1092,6 +1093,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $nestedQuery = m::mock(Builder::class);
         $nestedRawQuery = $this->getMockQueryBuilder();
         $nestedQuery->shouldReceive('getQuery')->once()->andReturn($nestedRawQuery);
+        $nestedQuery->shouldReceive('getEagerLoads')->once()->andReturn([]);
         $model = $this->getMockModel()->makePartial();
         $model->shouldReceive('newQueryWithoutRelationships')->once()->andReturn($nestedQuery);
         $builder = $this->getBuilder();
@@ -1120,6 +1122,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $nestedQuery = m::mock(Builder::class);
         $nestedRawQuery = $this->getMockQueryBuilder();
         $nestedQuery->shouldReceive('getQuery')->once()->andReturn($nestedRawQuery);
+        $nestedQuery->shouldReceive('getEagerLoads')->once()->andReturn([]);
         $model = $this->getMockModel()->makePartial();
         $model->shouldReceive('newQueryWithoutRelationships')->once()->andReturn($nestedQuery);
         $builder = $this->getBuilder();
@@ -2480,6 +2483,32 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertNotSame($builder, $clone);
         $this->assertSame('select * from "users"', $builder->toSql());
         $this->assertSame('select * from "users" where "email" = ?', $clone->toSql());
+    }
+
+    public function testCloneModelMakesAFreshCopyOfTheModel()
+    {
+        $query = new BaseBuilder(m::mock(ConnectionInterface::class), new Grammar, m::mock(Processor::class));
+        $builder = (new Builder($query))->setModel(new EloquentBuilderTestStub);
+        $builder->select('*')->from('users');
+
+        $onCloneCallbackCalledCount = 0;
+
+        $onCloneQuery = null;
+
+        $builder->onClone(function (Builder $query) use (&$onCloneCallbackCalledCount, &$onCloneQuery) {
+            $onCloneCallbackCalledCount++;
+
+            $onCloneQuery = $query;
+        });
+
+        $clone = $builder->clone()->where('email', 'foo');
+
+        $this->assertNotSame($builder, $clone);
+        $this->assertSame('select * from "users"', $builder->toSql());
+        $this->assertSame('select * from "users" where "email" = ?', $clone->toSql());
+
+        $this->assertSame(1, $onCloneCallbackCalledCount);
+        $this->assertSame($onCloneQuery, $clone);
     }
 
     public function testToRawSql()

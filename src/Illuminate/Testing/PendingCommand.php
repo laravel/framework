@@ -354,6 +354,8 @@ class PendingCommand
         $this->verifyExpectations();
         $this->flushExpectations();
 
+        $this->app->offsetUnset(OutputStyle::class);
+
         return $exitCode;
     }
 

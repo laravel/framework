@@ -222,4 +222,31 @@ class BusPendingBatchTest extends TestCase
 
         $this->assertTrue($beforeCalled);
     }
+
+    public function test_it_throws_exception_if_batched_job_is_not_batchable(): void
+    {
+        $nonBatchableJob = new class {};
+
+        $this->expectException(RuntimeException::class);
+
+        new PendingBatch(new Container, new Collection([$nonBatchableJob]));
+    }
+
+    public function test_it_throws_an_exception_if_batched_job_contains_batch_with_nonbatchable_job(): void
+    {
+        $this->expectException(RuntimeException::class);
+
+        $container = new Container;
+        new PendingBatch(
+            $container,
+            new Collection(
+                [new PendingBatch($container, new Collection([new BatchableJob, new class {}]))]
+            )
+        );
+    }
+}
+
+class BatchableJob
+{
+    use Batchable;
 }
