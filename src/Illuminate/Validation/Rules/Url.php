@@ -5,14 +5,12 @@ namespace Illuminate\Validation\Rules;
 use Illuminate\Contracts\Support\Arrayable;
 use Stringable;
 
-use function Illuminate\Support\enum_value;
-
 class Url implements Stringable
 {
     protected bool $active = false;
-    
+
     /**
-     * @var  string[]  $protocols
+     * @var  string[]
      */
     protected array $protocols = [];
 
@@ -41,7 +39,7 @@ class Url implements Stringable
     {
         $this->protocols = match (true) {
             $keys instanceof Arrayable => $keys->toArray(),
-            !is_array($keys) => func_get_args(),
+            ! is_array($keys) => func_get_args(),
             default => $keys,
         };
 
@@ -50,7 +48,7 @@ class Url implements Stringable
 
     public function protocol(string $protocol)
     {
-        $this->protocols = array_unique([ ...$this->protocols, $protocol ]);
+        $this->protocols = array_unique([...$this->protocols, $protocol]);
 
         return $this;
     }
