@@ -20,6 +20,7 @@ use Illuminate\Validation\Rules\Numeric;
 use Illuminate\Validation\Rules\ProhibitedIf;
 use Illuminate\Validation\Rules\RequiredIf;
 use Illuminate\Validation\Rules\Unique;
+use Illuminate\Validation\Rules\Url;
 
 class Rule
 {
@@ -242,5 +243,10 @@ class Rule
     public static function numeric()
     {
         return new Numeric;
+    }
+
+    public static function url($protocols = null)
+    {
+        return new Url($protocols);
     }
 }
