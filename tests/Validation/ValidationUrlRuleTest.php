@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Validation;
 
+use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\TestWith;
 
 class ValidationUrlRuleTest extends TestCase
