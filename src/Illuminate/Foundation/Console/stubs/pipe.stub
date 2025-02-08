@@ -6,9 +6,6 @@ use Closure;
 
 class {{ class }}
 {
-    /**
-     * Handle the event.
-     */
     public function handle(object $data, Closure $next): void
     {
         $next($data);
