@@ -175,6 +175,7 @@ class SupportStrTest extends TestCase
         $this->assertTrue(Str::startsWith(7.123, '7'));
         $this->assertTrue(Str::startsWith(7.123, '7.12'));
         $this->assertFalse(Str::startsWith(7.123, '7.13'));
+        $this->assertFalse(Str::startsWith(null, "Marc"));
         // Test for multibyte string support
         $this->assertTrue(Str::startsWith('Jönköping', 'Jö'));
         $this->assertTrue(Str::startsWith('Malmö', 'Malmö'));
@@ -207,6 +208,7 @@ class SupportStrTest extends TestCase
         $this->assertTrue(Str::endsWith(0.27, '7'));
         $this->assertTrue(Str::endsWith(0.27, '0.27'));
         $this->assertFalse(Str::endsWith(0.27, '8'));
+        $this->assertFalse(Str::endsWith(null, "Marc"));
         // Test for multibyte string support
         $this->assertTrue(Str::endsWith('Jönköping', 'öping'));
         $this->assertTrue(Str::endsWith('Malmö', 'mö'));
