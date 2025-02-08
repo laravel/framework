@@ -22,7 +22,7 @@ class Url implements Stringable
      */
     public function __construct($protocols = null)
     {
-        $this->protocols($protocols);
+        $this->protocols(...func_get_args());
     }
 
     public function active(bool $active)
