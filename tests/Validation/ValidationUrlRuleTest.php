@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Validation;
 
+use Illuminate\Validation\Rule;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 
