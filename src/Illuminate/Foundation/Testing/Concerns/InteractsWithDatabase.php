@@ -84,6 +84,22 @@ trait InteractsWithDatabase
     }
 
     /**
+     * Assert that a given where condition exists in the database.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model|string  $table
+     * @param  array  $data
+     * @param  string|null  $connection
+     * @return $this
+     */
+    protected function assertDatabaseOnlyHas($table, array $data = [], $connection = null)
+    {
+        $this->assertDatabaseHas($table, $data, $connection);
+        $this->assertDatabaseCount($table, 1, $connection);
+
+        return $this;
+    }
+
+    /**
      * Assert that the given table has no entries.
      *
      * @param  \Illuminate\Database\Eloquent\Model|string  $table
