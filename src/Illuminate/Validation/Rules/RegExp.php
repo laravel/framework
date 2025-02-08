@@ -79,7 +79,7 @@ class RegExp implements Stringable
             )
             ->when($this->flags, function (SupportStringable $str) {
                 $end = $str->afterLast('/');
-                $flags = explode('', $end);
+                $flags = str_split($end);
                 $flags = array_unique([...$this->flags, $flags]);
 
                 return $str->replaceEnd('/'.$end, '/'.implode('', $flags));
