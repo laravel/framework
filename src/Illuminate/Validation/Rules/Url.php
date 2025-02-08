@@ -10,7 +10,7 @@ class Url implements Stringable
     protected bool $active = false;
 
     /**
-     * @var  string[]
+     * @var string[]
      */
     protected array $protocols = [];
 
