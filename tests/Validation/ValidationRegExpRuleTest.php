@@ -24,7 +24,7 @@ class ValidationRegExpRuleTest extends TestCase
 
     #[TestWith(['/[a-z]/', ['i'], 'regex:/[a-z]/i'])]
     #[TestWith(['/[a-z]/i', ['i'], 'regex:/[a-z]/i'])]
-    #[TestWith(['/[a-z]/g', ['i'], 'regex:/[a-z]/gi'])]
+    #[TestWith(['/[a-z]/g', ['i'], 'regex:/[a-z]/ig'])]
     public function testRegExpRuleConstructorFlagsStringification(string $input, array $flags, string $output)
     {
         $rule = Rule::regex($input, $flags);
