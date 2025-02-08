@@ -30,13 +30,6 @@ class RegExp implements Stringable
         $this->flags(...$flags);
     }
 
-    public function active(bool $active)
-    {
-        $this->active = $active;
-
-        return $this;
-    }
-
     /**
      * @param  string[]|\Illuminate\Contracts\Support\Arrayable|null  $flags
      */
