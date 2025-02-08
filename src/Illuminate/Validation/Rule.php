@@ -245,8 +245,11 @@ class Rule
         return new Numeric;
     }
 
+    /**
+     * @param  string[]|\Illuminate\Contracts\Support\Arrayable|null $protocols
+     */
     public static function url($protocols = null)
     {
-        return new Url($protocols);
+        return new Url(...func_get_args());
     }
 }

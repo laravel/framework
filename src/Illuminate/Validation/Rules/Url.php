@@ -17,7 +17,7 @@ class Url implements Stringable
     /**
      * Create a new array rule instance.
      *
-     * @param  array|null  $protocols
+     * @param  string[]|\Illuminate\Contracts\Support\Arrayable|null  $protocols
      * @return void
      */
     public function __construct($protocols = null)
@@ -33,7 +33,7 @@ class Url implements Stringable
     }
 
     /**
-     * @param  string[]|\Illuminate\Contracts\Support\Arrayable
+     * @param  string[]|\Illuminate\Contracts\Support\Arrayable|null $protocols
      */
     public function protocols($protocols = null)
     {
