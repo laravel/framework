@@ -6,7 +6,7 @@ use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\TestCase;
 
 #[WithMigration]
-class EloquentNamedScopedAttibuteTest extends TestCase
+class EloquentNamedScopeAttibuteTest extends TestCase
 {
     protected function setUp(): void
     {
@@ -20,20 +20,20 @@ class EloquentNamedScopedAttibuteTest extends TestCase
 
     public function test_it_can_query_named_scoped_from_the_query_builder()
     {
-        $query = Fixtures\NamedScopedUser::query()->verified(true);
+        $query = Fixtures\NamedScopeUser::query()->verified(true);
 
         $this->assertSame(
-            'select * from "named_scoped_users" where "email_verified_at" is not null',
+            'select * from "named_scope_users" where "email_verified_at" is not null',
             $query->toRawSql(),
         );
     }
 
     public function test_it_can_query_named_scoped_from_static_query()
     {
-        $query = Fixtures\NamedScopedUser::verified(true);
+        $query = Fixtures\NamedScopeUser::verified(true);
 
         $this->assertSame(
-            'select * from "named_scoped_users" where "email_verified_at" is not null',
+            'select * from "named_scope_users" where "email_verified_at" is not null',
             $query->toRawSql(),
         );
     }

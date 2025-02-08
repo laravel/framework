@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Integration\Database\Fixtures;
 
-use Illuminate\Database\Eloquent\Attributes\NamedScoped;
+use Illuminate\Database\Eloquent\Attributes\NamedScope;
 use Illuminate\Database\Eloquent\Builder;
 
-class NamedScopedUser extends User
+class NamedScopeUser extends User
 {
     /** {@inheritdoc} */
     #[\Override]
@@ -17,7 +17,7 @@ class NamedScopedUser extends User
         ];
     }
 
-    #[NamedScoped]
+    #[NamedScope]
     protected function verified(Builder $builder, bool $email = true)
     {
         return $builder->when(
