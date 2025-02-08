@@ -9,7 +9,7 @@ use Stringable;
 
 class RegExp implements Stringable
 {
-    protected string $regExp;
+    protected string $expression;
     protected bool $negated = false;
 
     /**
@@ -20,21 +20,21 @@ class RegExp implements Stringable
     /**
      * Create a new regex rule instance.
      *
-     * @param  string  $regExp
+     * @param  string  $expression
      * @param  string[]|\Illuminate\Contracts\Support\Arrayable  $extraFlags
      * @return void
      */
-    public function __construct(string $regExp, array|Arrayable $extraFlags = [])
+    public function __construct(string $expression, array|Arrayable $extraFlags = [])
     {
-        $this->regExp = $regExp;
-        $str = Str::of($regExp);
+        $this->expression = $expression;
+        $str = Str::of($expression);
         $currentFlags = str_split($str->afterLast('/'));
 
         if ($extraFlags instanceof Arrayable) {
             $extraFlags = $extraFlags->toArray();
         }
         
-        $this->regExp = $str->beforeLast('/')->append('/')->toString();
+        $this->expression = $str->beforeLast('/')->append('/')->toString();
         $this->flags = array_unique([...$currentFlags, ...$extraFlags]);
     }
 
@@ -76,7 +76,7 @@ class RegExp implements Stringable
         return sprintf(
             '%s:%s%s',
             $this->negated ? 'not_regex' : 'regex',
-            $this->regExp,
+            $this->expression,
             implode('', $this->flags),
         );
     }

@@ -248,11 +248,11 @@ class Rule
     /**
      * Get a regex rule builder rule instance.
      *
-     * @param  string  $regExp
+     * @param  string  $expression
      * @param  string[]|\Illuminate\Contracts\Support\Arrayable  $extraFlags
      */
-    public static function regex(string $regExp, array|Arrayable $extraFlags = [])
+    public static function regex(string $expression, array|Arrayable $extraFlags = [])
     {
-        return new RegExp($regExp, $extraFlags);
+        return new RegExp($expression, $extraFlags);
     }
 }
