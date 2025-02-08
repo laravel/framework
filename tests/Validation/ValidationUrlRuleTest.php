@@ -17,11 +17,11 @@ class ValidationUrlRuleTest extends TestCase
 
     #[TestWith([true, 'active_url'])]
     #[TestWith([false, 'url'])]
-    public function testActiveUrlRuleStringification(bool $active, string $rule)
+    public function testActiveUrlRuleStringification(bool $active, string $output)
     {
         $rule = Rule::url()->active($active);
 
-        $this->assertSame($rule, (string) $rule);
+        $this->assertSame($output, (string) $rule);
     }
 
     public function testUrlRuleConstructorProtocolsStringification()
