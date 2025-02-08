@@ -21,13 +21,21 @@ class RegExp implements Stringable
      * Create a new regex rule instance.
      *
      * @param  string  $regExp
-     * @param  string[]|\Illuminate\Contracts\Support\Arrayable|null  $flags
+     * @param  string[]|\Illuminate\Contracts\Support\Arrayable  $extraFlags
      * @return void
      */
-    public function __construct(string $regExp, $flags = null)
+    public function __construct(string $regExp, array|Arrayable $extraFlags = [])
     {
         $this->regExp = $regExp;
-        $this->flags(...$flags);
+        $str = Str::of($regExp);
+        $currentFlags = str_split($str->afterLast('/'));
+
+        if ($extraFlags instanceof Arrayable) {
+            $extraFlags = $extraFlags->toArray();
+        }
+        
+        $this->regExp = $str->beforeLast('/')->append('/')->toString();
+        $this->flags = array_unique([...$currentFlags, ...$extraFlags]);
     }
 
     /**
@@ -65,17 +73,11 @@ class RegExp implements Stringable
      */
     public function __toString()
     {
-        return (string) Str::of($this->negated ? 'not_regex' : 'regex')
-            ->append(
-                ':',
-                $this->regExp,
-            )
-            ->when($this->flags, function (SupportStringable $str) {
-                $end = $str->afterLast('/');
-                $flags = str_split($end);
-                $flags = array_unique([...$this->flags, ...$flags]);
-
-                return $str->replaceEnd('/'.$end, '/'.implode('', $flags));
-            });
+        return sprintf(
+            '%s:%s%s',
+            $this->negated ? 'not_regex' : 'regex',
+            $this->regExp,
+            implode('', $this->flags),
+        );
     }
 }

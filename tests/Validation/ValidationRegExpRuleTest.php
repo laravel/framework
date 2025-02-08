@@ -24,7 +24,7 @@ class ValidationRegExpRuleTest extends TestCase
 
     #[TestWith(['/[a-z]/', ['i'], 'regex:/[a-z]/i'])]
     #[TestWith(['/[a-z]/i', ['i'], 'regex:/[a-z]/i'])]
-    #[TestWith(['/[a-z]/g', ['i'], 'regex:/[a-z]/ig'])]
+    #[TestWith(['/[a-z]/g', ['i'], 'regex:/[a-z]/gi'])]
     public function testRegExpRuleConstructorFlagsStringification(string $input, array $flags, string $output)
     {
         $rule = Rule::regex($input, $flags);
@@ -34,10 +34,6 @@ class ValidationRegExpRuleTest extends TestCase
 
     public function tesRegExpRuleConstructorFlagDataTypesStringification()
     {
-        $rule = Rule::regex('/[a-z]/', null);
-
-        $this->assertSame('regex:/[a-z]/', (string) $rule);
-
         $rule = Rule::regex('/[a-z]/', []);
 
         $this->assertSame('regex:/[a-z]/', (string) $rule);
@@ -71,7 +67,7 @@ class ValidationRegExpRuleTest extends TestCase
     }
 
     #[TestWith(['i', 'regex:/[a-z]/i'])]
-    #[TestWith(['g', 'regex:/[a-z]/gi'])]
+    #[TestWith(['g', 'regex:/[a-z]/ig'])]
     public function testRegExpRuleFlagStringification(string $input, string $output)
     {
         $rule = Rule::regex('/[a-z]/i')->flag($input);

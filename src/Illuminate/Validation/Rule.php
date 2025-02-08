@@ -245,8 +245,14 @@ class Rule
         return new Numeric;
     }
 
-    public static function regex(string $regExp, array $flags = [])
+    /**
+     * Get a regex rule builder rule instance.
+     *
+     * @param  string  $regExp
+     * @param  string[]|\Illuminate\Contracts\Support\Arrayable  $extraFlags
+     */
+    public static function regex(string $regExp, array|Arrayable $extraFlags = [])
     {
-        return new RegExp($regExp, $flags);
+        return new RegExp($regExp, $extraFlags);
     }
 }
