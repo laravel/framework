@@ -45,6 +45,7 @@ use Illuminate\Foundation\Console\ConsoleMakeCommand;
 use Illuminate\Foundation\Console\DocsCommand;
 use Illuminate\Foundation\Console\DownCommand;
 use Illuminate\Foundation\Console\EnumMakeCommand;
+use Illuminate\Foundation\Console\EnvironmentChangeCommand;
 use Illuminate\Foundation\Console\EnvironmentCommand;
 use Illuminate\Foundation\Console\EnvironmentDecryptCommand;
 use Illuminate\Foundation\Console\EnvironmentEncryptCommand;
@@ -132,6 +133,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'DbWipe' => WipeCommand::class,
         'Down' => DownCommand::class,
         'Environment' => EnvironmentCommand::class,
+        'EnvironmentChange' => EnvironmentChangeCommand::class,
         'EnvironmentDecrypt' => EnvironmentDecryptCommand::class,
         'EnvironmentEncrypt' => EnvironmentEncryptCommand::class,
         'EventCache' => EventCacheCommand::class,
