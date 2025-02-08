@@ -18,6 +18,7 @@ use Illuminate\Validation\Rules\In;
 use Illuminate\Validation\Rules\NotIn;
 use Illuminate\Validation\Rules\Numeric;
 use Illuminate\Validation\Rules\ProhibitedIf;
+use Illuminate\Validation\Rules\RegExp;
 use Illuminate\Validation\Rules\RequiredIf;
 use Illuminate\Validation\Rules\Unique;
 
@@ -242,5 +243,10 @@ class Rule
     public static function numeric()
     {
         return new Numeric;
+    }
+
+    public static function regex(string $regExp, array $flags = [])
+    {
+        return new RegExp($regExp, $flags);
     }
 }
