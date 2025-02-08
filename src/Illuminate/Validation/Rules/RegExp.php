@@ -18,7 +18,7 @@ class RegExp implements Stringable
     protected array $flags = [];
 
     /**
-     * Create a new array rule instance.
+     * Create a new regex rule instance.
      *
      * @param  string  $regExp
      * @param  string[]|\Illuminate\Contracts\Support\Arrayable|null  $flags
