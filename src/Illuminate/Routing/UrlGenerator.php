@@ -717,6 +717,17 @@ class UrlGenerator implements UrlGeneratorContract
     }
 
     /**
+     * Set the asset URL.
+     *
+     * @param  string|null  $root
+     * @return void
+     */
+    public function setAssetUrl($root)
+    {
+        $this->assetRoot = $root ? rtrim($root, '/') : null;
+    }
+
+    /**
      * Force the scheme for URLs.
      *
      * @param  string|null  $scheme
