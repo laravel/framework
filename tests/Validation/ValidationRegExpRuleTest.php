@@ -49,7 +49,7 @@ class ValidationRegExpRuleTest extends TestCase
 
     public function testRegExpRuleFlagsStringification()
     {
-        $rule = Rule::regex('/[a-z]/')->flags(null);
+        $rule = Rule::regex('/[a-z]/')->flags();
 
         $this->assertSame('regex:/[a-z]/', (string) $rule);
 
