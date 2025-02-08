@@ -32,7 +32,7 @@ class ArrayRule implements Stringable
 
         $keys = is_array($keys) ? $keys : func_get_args();
 
-        if (empty($keys)) {
+        if ($keys === []) {
             return $this->addRule('array');
         }
 
