@@ -8,6 +8,8 @@ use Orchestra\Testbench\TestCase;
 #[WithMigration]
 class EloquentNamedScopeAttibuteTest extends TestCase
 {
+    protected $query = 'select * from "named_scope_users" where "email_verified_at" is not null';
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -22,19 +24,13 @@ class EloquentNamedScopeAttibuteTest extends TestCase
     {
         $query = Fixtures\NamedScopeUser::query()->verified(true);
 
-        $this->assertSame(
-            'select * from "named_scope_users" where "email_verified_at" is not null',
-            $query->toRawSql(),
-        );
+        $this->assertSame($this->query, $query->toRawSql());
     }
 
     public function test_it_can_query_named_scoped_from_static_query()
     {
         $query = Fixtures\NamedScopeUser::verified(true);
 
-        $this->assertSame(
-            'select * from "named_scope_users" where "email_verified_at" is not null',
-            $query->toRawSql(),
-        );
+        $this->assertSame($this->query, $query->toRawSql());
     }
 }
