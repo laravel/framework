@@ -37,11 +37,13 @@ class EnvironmentChangeCommand extends Command
 
         if (! File::exists($envExampleFile)) {
             $this->error("The environment file .env.$environment does not exist.");
+
             return 1;
         }
 
         if (! File::copy($envExampleFile, $envFile)) {
             $this->error("Failed to change environment to .env.$environment.");
+            
             return 1;
         }
 
