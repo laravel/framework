@@ -67,6 +67,7 @@ use Illuminate\Foundation\Console\ObserverMakeCommand;
 use Illuminate\Foundation\Console\OptimizeClearCommand;
 use Illuminate\Foundation\Console\OptimizeCommand;
 use Illuminate\Foundation\Console\PackageDiscoverCommand;
+use Illuminate\Foundation\Console\PipeMakeCommand;
 use Illuminate\Foundation\Console\PolicyMakeCommand;
 use Illuminate\Foundation\Console\ProviderMakeCommand;
 use Illuminate\Foundation\Console\RequestMakeCommand;
@@ -211,6 +212,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'ObserverMake' => ObserverMakeCommand::class,
         'PolicyMake' => PolicyMakeCommand::class,
         'ProviderMake' => ProviderMakeCommand::class,
+        'PipeMake' => PipeMakeCommand::class,
         'QueueFailedTable' => FailedTableCommand::class,
         'QueueTable' => TableCommand::class,
         'QueueBatchesTable' => BatchesTableCommand::class,
@@ -625,6 +627,18 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     {
         $this->app->singleton(ProviderMakeCommand::class, function ($app) {
             return new ProviderMakeCommand($app['files']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerPipeMakeCommand()
+    {
+        $this->app->singleton(PipeMakeCommand::class, function ($app) {
+            return new PipeMakeCommand($app['files']);
         });
     }
 
