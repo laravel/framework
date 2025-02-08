@@ -241,7 +241,7 @@ trait InteractsWithData
      */
     public function string($key, $default = null)
     {
-        return (new Stringable($this->data($key, $default)));
+        return new Stringable($this->data($key, $default));
     }
 
     /**
