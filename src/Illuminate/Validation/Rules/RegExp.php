@@ -4,7 +4,6 @@ namespace Illuminate\Validation\Rules;
 
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Str;
-use Illuminate\Support\Stringable as SupportStringable;
 use Stringable;
 
 class RegExp implements Stringable
