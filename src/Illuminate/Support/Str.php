@@ -379,7 +379,7 @@ class Str
             $needles = (array) $needles;
         }
 
-        if(is_null($haystack)) {
+        if (is_null($haystack)) {
             return false;
         }
 
@@ -1592,7 +1592,7 @@ class Str
             $needles = [$needles];
         }
 
-        if(is_null($haystack)) {
+        if (is_null($haystack)) {
             return false;
         }
 
