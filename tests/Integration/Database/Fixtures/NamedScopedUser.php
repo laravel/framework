@@ -23,7 +23,7 @@ class NamedScopedUser extends User
         return $builder->when(
             $email === true,
             fn ($query) => $query->whereNotNull('email_verified_at'),
-            fn ($query) => $queryu->whereNull('email_verified_at'),
+            fn ($query) => $query->whereNull('email_verified_at'),
         );
     }
 
@@ -32,7 +32,7 @@ class NamedScopedUser extends User
         return $builder->when(
             $email === true,
             fn ($query) => $query->whereNotNull('email_verified_at'),
-            fn ($query) => $queryu->whereNull('email_verified_at'),
+            fn ($query) => $query->whereNull('email_verified_at'),
         );
     }
 }
