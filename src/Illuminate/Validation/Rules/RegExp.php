@@ -40,7 +40,7 @@ class RegExp implements Stringable
     /**
      * @param  string[]|\Illuminate\Contracts\Support\Arrayable|null  $flags
      */
-    public function flags($flags)
+    public function flags($flags = null)
     {
         $this->flags = match (true) {
             $flags instanceof Arrayable => $flags->toArray(),
