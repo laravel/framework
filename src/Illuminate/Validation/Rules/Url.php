@@ -33,7 +33,7 @@ class Url implements Stringable
     }
 
     /**
-     * @param  string[]|\Illuminate\Contracts\Support\Arrayable|null $protocols
+     * @param  string[]|\Illuminate\Contracts\Support\Arrayable|null  $protocols
      */
     public function protocols($protocols = null)
     {

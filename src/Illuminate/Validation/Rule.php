@@ -246,7 +246,7 @@ class Rule
     }
 
     /**
-     * @param  string[]|\Illuminate\Contracts\Support\Arrayable|null $protocols
+     * @param  string[]|\Illuminate\Contracts\Support\Arrayable|null  $protocols
      */
     public static function url($protocols = null)
     {
