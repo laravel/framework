@@ -3,8 +3,8 @@
 namespace Illuminate\Validation\Rules;
 
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Contracts\Support\Str;
-use Illuminate\Contracts\Support\Stringable as SupportStringable;
+use Illuminate\Support\Str;
+use Illuminate\Support\Stringable as SupportStringable;
 use Stringable;
 
 class RegExp implements Stringable
