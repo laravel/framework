@@ -72,7 +72,7 @@ class RegExp implements Stringable
      */
     public function __toString()
     {
-        return (string) Str::of($this->not ? 'not_regex' : 'regex')
+        return (string) Str::of($this->negated ? 'not_regex' : 'regex')
             ->append(
                 ':',
                 $this->regExp,
