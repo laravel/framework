@@ -38,9 +38,9 @@ class Url implements Stringable
     public function protocols($protocols = null)
     {
         $this->protocols = match (true) {
-            $keys instanceof Arrayable => $keys->toArray(),
-            ! is_array($keys) => func_get_args(),
-            default => $keys,
+            $protocols instanceof Arrayable => $protocols->toArray(),
+            ! is_array($protocols) => func_get_args(),
+            default => $protocols,
         };
 
         return $this;
