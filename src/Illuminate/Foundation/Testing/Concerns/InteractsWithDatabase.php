@@ -84,7 +84,7 @@ trait InteractsWithDatabase
     }
 
     /**
-     * Assert that a given where condition exists in the database.
+     * Assert that the given record is the only one in the database.
      *
      * @param  \Illuminate\Database\Eloquent\Model|string  $table
      * @param  array  $data
