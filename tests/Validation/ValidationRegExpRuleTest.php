@@ -51,7 +51,7 @@ class ValidationRegExpRuleTest extends TestCase
         $this->assertSame('regex:/[a-z]/i', (string) $rule);
     }
 
-    public function testRegExpRuleProtocolsStringification()
+    public function testRegExpRuleFlagsStringification()
     {
         $rule = Rule::regex('/[a-z]/')->flags(null);
 
@@ -72,7 +72,7 @@ class ValidationRegExpRuleTest extends TestCase
 
     #[TestWith(['i', 'regex:/[a-z]/i'])]
     #[TestWith(['g', 'regex:/[a-z]/gi'])]
-    public function testUrlRuleProtocolStringification(string $input, string $output)
+    public function testRegExpRuleFlagStringification(string $input, string $output)
     {
         $rule = Rule::regex('/[a-z]/i')->flag($input);
 
