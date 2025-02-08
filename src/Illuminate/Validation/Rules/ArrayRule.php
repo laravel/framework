@@ -37,17 +37,17 @@ class ArrayRule implements Stringable
         }
 
         $keys = array_map(
-            static fn($key) => enum_value($key),
+            static fn ($key) => enum_value($key),
             $keys,
         );
 
-        return $this->addRule('array:' . implode(',', $keys));
+        return $this->addRule('array:'.implode(',', $keys));
     }
 
     /**
      * The field under validation must have a distinct values.
      *
-     * @param  bool $strict
+     * @param  bool  $strict
      * @return $this
      */
     public function distinct(bool $strict = false)
@@ -56,9 +56,9 @@ class ArrayRule implements Stringable
     }
 
     /**
-     * The field under validation must have size less than or equal to a maximum value
+     * The field under validation must have size less than or equal to a maximum value.
      *
-     * @param  int $max
+     * @param  int  $max
      * @return $this
      */
     public function max(int $max)
@@ -67,9 +67,9 @@ class ArrayRule implements Stringable
     }
 
     /**
-     * The field under validation must have size greater than or equal to a minimum value
+     * The field under validation must have size greater than or equal to a minimum value.
      *
-     * @param  int $min
+     * @param  int  $min
      * @return $this
      */
     public function min(int $min)
@@ -78,9 +78,9 @@ class ArrayRule implements Stringable
     }
 
     /**
-     * The field under validation must have a size matching the given value
+     * The field under validation must have a size matching the given value.
      *
-     * @param  int $size
+     * @param  int  $size
      * @return $this
      */
     public function size(int $size)
@@ -89,10 +89,10 @@ class ArrayRule implements Stringable
     }
 
     /**
-     * The field under validation must have a size between the given min and max
+     * The field under validation must have a size between the given min and max.
      *
-     * @param  int $min
-     * @param  int $max
+     * @param  int  $min
+     * @param  int  $max
      * @return $this
      */
     public function between(int $min, int $max)
@@ -114,7 +114,7 @@ class ArrayRule implements Stringable
     /**
      * The field under validation must be an array that contains all of the given parameter values.
      *
-     * @param  array|string $keys
+     * @param  array|string  $keys
      * @return $this
      */
     public function contains($keys)
@@ -126,17 +126,18 @@ class ArrayRule implements Stringable
         $keys = is_array($keys) ? $keys : func_get_args();
 
         $keys = array_map(
-            static fn($key) => enum_value($key),
+            static fn ($key) => enum_value($key),
             $keys,
         );
 
-        return $this->addRule('contains:' . implode(',', $keys));
+        return $this->addRule('contains:'.implode(',', $keys));
     }
 
     /**
      * The field under validation must exist in anotherfield's values.
      *
      * string $anotherField
+     *
      * @return $this
      */
     public function inArray(string $anotherField)
