@@ -37,9 +37,9 @@ class RegExp implements Stringable
     }
 
     /**
-     * @param  string[]|\Illuminate\Contracts\Support\Arrayable|null  $flags
+     * @param  string[]|\Illuminate\Contracts\Support\Arrayable  $flags
      */
-    public function flags($flags = null)
+    public function flags($flags = [])
     {
         $this->flags = match (true) {
             $flags instanceof Arrayable => $flags->toArray(),
