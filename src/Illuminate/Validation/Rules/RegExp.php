@@ -25,7 +25,6 @@ class RegExp implements Stringable
      */
     public function __construct(string $expression, array|Arrayable $extraFlags = [])
     {
-        $this->expression = $expression;
         $str = Str::of($expression);
         $currentFlags = str_split($str->afterLast('/'));
 
