@@ -91,7 +91,7 @@ trait InteractsWithDatabase
      * @param  string|null  $connection
      * @return $this
      */
-    protected function assertDatabaseOnlyHas($table, array $data = [], $connection = null)
+    protected function assertDatabaseHasSole($table, array $data = [], $connection = null)
     {
         $this->assertDatabaseHas($table, $data, $connection);
         $this->assertDatabaseCount($table, 1, $connection);

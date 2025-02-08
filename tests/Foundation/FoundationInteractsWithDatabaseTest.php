@@ -393,11 +393,11 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $this->assertEquals('trashed_at', $this->getDeletedAtColumn(new CustomProductStub()));
     }
 
-    public function testAssertTableOnlyHas()
+    public function testAssertTableHasSole()
     {
         $this->mockCountBuilder(true);
 
-        $this->assertDatabaseOnlyHas($this->table, $this->data);
+        $this->assertDatabaseHasSole($this->table, $this->data);
     }
 
     public function testExpectsDatabaseQueryCount()
