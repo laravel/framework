@@ -32,7 +32,7 @@ class RegExp implements Stringable
         if ($extraFlags instanceof Arrayable) {
             $extraFlags = $extraFlags->toArray();
         }
-        
+
         $this->expression = $str->beforeLast('/')->append('/')->toString();
         $this->flags = array_unique([...$currentFlags, ...$extraFlags]);
     }
