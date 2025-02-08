@@ -15,7 +15,7 @@ class Url implements Stringable
     protected array $protocols = [];
 
     /**
-     * Create a new array rule instance.
+     * Create a new url rule instance.
      *
      * @param  string[]|\Illuminate\Contracts\Support\Arrayable|null  $protocols
      * @return void
