@@ -85,7 +85,7 @@ class PipeMakeCommand extends GeneratorCommand
     protected function getOptions()
     {
         return [
-            ['force', 'f', InputOption::VALUE_NONE, 'Create the class even if the event already exists'],
+            ['force', 'f', InputOption::VALUE_NONE, 'Create the class even if the pipe already exists'],
         ];
     }
 }
