@@ -1633,13 +1633,13 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             : Pivot::fromAttributes($parent, $attributes, $table, $exists);
     }
 
-    protected function hasAttributedNamedScope(string $scope): ?string
+    protected static function hasAttributedNamedScope(string $scope): ?string
     {
-        if (! method_exists($this, $scope)) {
+        if (! method_exists(static::class, $scope)) {
             return false;
         }
 
-        $method = new ReflectionMethod($this, $scope);
+        $method = new ReflectionMethod(static::class, $scope);
         $attribute = $method->getAttributes(NamedScope::class);
 
         if ($attribute === []) {
@@ -1657,7 +1657,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function hasNamedScope($scope)
     {
-        return method_exists($this, 'scope'.ucfirst($scope)) || $this->hasAttributedNamedScope($scope);
+        return method_exists($this, 'scope'.ucfirst($scope)) || static::hasAttributedNamedScope($scope);
     }
 
     /**
@@ -2399,6 +2399,9 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public static function __callStatic($method, $parameters)
     {
+        if (static::hasAttributedNamedScope($method)) {
+            $parameters = [ static::query(), ...$parameters ];
+        }
         return (new static)->$method(...$parameters);
     }
 
