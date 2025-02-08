@@ -695,7 +695,7 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertSame('http://www.bar.com/foo/bar', $url->to('foo/bar'));
         $this->assertSame('http://www.bar.com/foo/bar', $url->asset('foo/bar'));
 
-        $url->setAssetUrl('https://www.foo.com');
+        $url->setAssetRoot('https://www.foo.com');
         $this->assertNotSame('https://www.foo.com/foo/bar', $url->to('foo/bar'));
         $this->assertSame('https://www.foo.com/foo/bar', $url->asset('foo/bar'));
         $this->assertSame('https://www.foo.com/foo/bar', $url->asset('foo/bar', true));
