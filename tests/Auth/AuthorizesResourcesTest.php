@@ -21,6 +21,14 @@ class AuthorizesResourcesTest extends TestCase
         $controller = new AuthorizesResourcesWithArrayController;
 
         $this->assertHasMiddleware($controller, 'create', 'can:create,App\User,App\Post');
+
+        $controller = new AuthorizesResourcesEnumController;
+
+        $this->assertHasMiddleware($controller, 'create', 'can:create,App\User');
+
+        $controller = new AuthorizesResourcesWithArrayEnumController;
+
+        $this->assertHasMiddleware($controller, 'create', 'can:create,App\User,App\Post');
     }
 
     public function testStoreMethod()
@@ -32,6 +40,14 @@ class AuthorizesResourcesTest extends TestCase
         $controller = new AuthorizesResourcesWithArrayController;
 
         $this->assertHasMiddleware($controller, 'store', 'can:create,App\User,App\Post');
+
+        $controller = new AuthorizesResourcesEnumController;
+
+        $this->assertHasMiddleware($controller, 'create', 'can:create,App\User');
+
+        $controller = new AuthorizesResourcesWithArrayEnumController;
+
+        $this->assertHasMiddleware($controller, 'create', 'can:create,App\User,App\Post');
     }
 
     public function testShowMethod()
@@ -41,6 +57,14 @@ class AuthorizesResourcesTest extends TestCase
         $this->assertHasMiddleware($controller, 'show', 'can:view,user');
 
         $controller = new AuthorizesResourcesWithArrayController;
+
+        $this->assertHasMiddleware($controller, 'show', 'can:view,user,post');
+
+        $controller = new AuthorizesResourcesEnumController;
+
+        $this->assertHasMiddleware($controller, 'show', 'can:view,user');
+
+        $controller = new AuthorizesResourcesWithArrayEnumController;
 
         $this->assertHasMiddleware($controller, 'show', 'can:view,user,post');
     }
@@ -54,6 +78,14 @@ class AuthorizesResourcesTest extends TestCase
         $controller = new AuthorizesResourcesWithArrayController;
 
         $this->assertHasMiddleware($controller, 'edit', 'can:update,user,post');
+
+        $controller = new AuthorizesResourcesEnumController;
+
+        $this->assertHasMiddleware($controller, 'edit', 'can:update,user');
+
+        $controller = new AuthorizesResourcesWithArrayEnumController;
+
+        $this->assertHasMiddleware($controller, 'edit', 'can:update,user,post');
     }
 
     public function testUpdateMethod()
@@ -65,6 +97,14 @@ class AuthorizesResourcesTest extends TestCase
         $controller = new AuthorizesResourcesWithArrayController;
 
         $this->assertHasMiddleware($controller, 'update', 'can:update,user,post');
+
+        $controller = new AuthorizesResourcesEnumController;
+
+        $this->assertHasMiddleware($controller, 'edit', 'can:update,user');
+
+        $controller = new AuthorizesResourcesWithArrayEnumController;
+
+        $this->assertHasMiddleware($controller, 'edit', 'can:update,user,post');
     }
 
     public function testDestroyMethod()
@@ -74,6 +114,14 @@ class AuthorizesResourcesTest extends TestCase
         $this->assertHasMiddleware($controller, 'destroy', 'can:delete,user');
 
         $controller = new AuthorizesResourcesWithArrayController;
+
+        $this->assertHasMiddleware($controller, 'destroy', 'can:delete,user,post');
+
+        $controller = new AuthorizesResourcesEnumController;
+
+        $this->assertHasMiddleware($controller, 'destroy', 'can:delete,user');
+
+        $controller = new AuthorizesResourcesWithArrayEnumController;
 
         $this->assertHasMiddleware($controller, 'destroy', 'can:delete,user,post');
     }
@@ -189,6 +237,41 @@ class AuthorizesResourcesWithArrayController extends Controller
     {
         //
     }
+}
+
+enum Ability: string
+{
+    case ViewAny = 'viewAny';
+    case View = 'view';
+    case Create = 'create';
+    case Update = 'update';
+    case Delete = 'delete';
+}
+
+trait AuthorizesResources
+{
+    protected function resourceAbilityMap()
+    {
+        return [
+            'index' => Ability::ViewAny,
+            'show' => Ability::View,
+            'create' => Ability::Create,
+            'store' => Ability::Create,
+            'edit' => Ability::Update,
+            'update' => Ability::Update,
+            'destroy' => Ability::Delete,
+        ];
+    }
+}
+
+class AuthorizesResourcesEnumController extends AuthorizesResourcesController
+{
+    use AuthorizesResources;
+}
+
+class AuthorizesResourcesWithArrayEnumController extends AuthorizesResourcesWithArrayController
+{
+    use AuthorizesResources;
 }
 
 class AuthorizesResourcesMiddleware

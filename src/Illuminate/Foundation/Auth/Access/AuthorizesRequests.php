@@ -97,6 +97,8 @@ trait AuthorizesRequests
         foreach ($this->resourceAbilityMap() as $method => $ability) {
             $modelName = in_array($method, $this->resourceMethodsWithoutModels()) ? $model : $parameter;
 
+            $ability = enum_value($ability);
+
             $middleware["can:{$ability},{$modelName}"][] = $method;
         }
 
@@ -108,7 +110,7 @@ trait AuthorizesRequests
     /**
      * Get the map of resource methods to ability names.
      *
-     * @return array
+     * @return array<string, \BackedEnum|string>
      */
     protected function resourceAbilityMap()
     {
