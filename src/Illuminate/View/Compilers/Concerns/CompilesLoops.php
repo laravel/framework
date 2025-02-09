@@ -108,7 +108,7 @@ trait CompilesLoops
 
         $iteratee = trim($matches[1]);
 
-        $iteration = trim($matches[2]) ?: '$it';
+        $iteration = trim($matches[2] ?? '') ?: '$it';
 
         $initLoop = "\$__currentLoopData = {$iteratee}; \$__env->addLoop(\$__currentLoopData);";
 
