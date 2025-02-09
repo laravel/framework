@@ -18,6 +18,7 @@ use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Database\QueryException;
 use Illuminate\Database\Schema\Builder;
+use Illuminate\Support\Facades\Log;
 use Mockery as m;
 use PDO;
 use PDOException;
@@ -334,6 +335,24 @@ class DatabaseConnectionTest extends TestCase
         $pdo->expects($this->never())->method('rollBack');
         $mock->transaction(function () {
         }, 3);
+    }
+
+    public function testTransactionAfterFailCallback()
+    {
+        $this->expectException(Exception::class);
+        $pdo = $this->getMockBuilder(DatabaseConnectionTestMockPDO::class)->onlyMethods(['inTransaction', 'beginTransaction'])->getMock();
+        $mock = $this->getMockConnection([], $pdo);
+        $messageToLog = 'Callback called';
+
+        Log::shouldReceive('info')
+            ->once()
+            ->with($messageToLog);
+
+        $mock->transaction(function () {
+            throw new Exception('foo');
+        }, 3, function () use ($messageToLog) {
+            Log::info($messageToLog);
+        });
     }
 
     public function testTransactionMethodRetriesOnDeadlock()

@@ -31,7 +31,7 @@ class SqlServerConnection extends Connection
      *
      * @throws \Throwable
      */
-    public function transaction(Closure $callback, $attempts = 1)
+    public function transaction(Closure $callback, $attempts = 1, Closure $afterFail = null)
     {
         for ($a = 1; $a <= $attempts; $a++) {
             if ($this->getDriverName() === 'sqlsrv') {
@@ -49,12 +49,12 @@ class SqlServerConnection extends Connection
                 $this->getPdo()->exec('COMMIT TRAN');
             }
 
-            // If we catch an exception, we will rollback so nothing gets messed
-            // up in the database. Then we'll re-throw the exception so it can
-            // be handled how the developer sees fit for their applications.
+                // If we catch an exception, we will rollback so nothing gets messed
+                // up in the database. Then we'll re-throw the exception so it can
+                // be handled how the developer sees fit for their applications.
             catch (Throwable $e) {
                 $this->getPdo()->exec('ROLLBACK TRAN');
-
+                $afterFail();
                 throw $e;
             }
 

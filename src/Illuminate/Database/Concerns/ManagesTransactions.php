@@ -20,7 +20,7 @@ trait ManagesTransactions
      *
      * @throws \Throwable
      */
-    public function transaction(Closure $callback, $attempts = 1)
+    public function transaction(Closure $callback, $attempts = 1, Closure $afterFail = null)
     {
         for ($currentAttempt = 1; $currentAttempt <= $attempts; $currentAttempt++) {
             $this->beginTransaction();
@@ -32,14 +32,18 @@ trait ManagesTransactions
                 $callbackResult = $callback($this);
             }
 
-            // If we catch an exception we'll rollback this transaction and try again if we
-            // are not out of attempts. If we are out of attempts we will just throw the
-            // exception back out, and let the developer handle an uncaught exception.
+                // If we catch an exception we'll rollback this transaction and try again if we
+                // are not out of attempts. If we are out of attempts we will just throw the
+                // exception back out, and let the developer handle an uncaught exception.
             catch (Throwable $e) {
-                $this->handleTransactionException(
-                    $e, $currentAttempt, $attempts
-                );
-
+                try {
+                    $this->handleTransactionException($e, $currentAttempt, $attempts);
+                } catch (Throwable $throwable) {
+                    if ($afterFail) {
+                        $afterFail();
+                    }
+                    throw $throwable;
+                }
                 continue;
             }
 
@@ -255,8 +259,8 @@ trait ManagesTransactions
         // that this given transaction level is valid before attempting to rollback to
         // that level. If it's not we will just return out and not attempt anything.
         $toLevel = is_null($toLevel)
-                    ? $this->transactions - 1
-                    : $toLevel;
+            ? $this->transactions - 1
+            : $toLevel;
 
         if ($toLevel < 0 || $toLevel >= $this->transactions) {
             return;
