@@ -54,7 +54,9 @@ class SqlServerConnection extends Connection
             // be handled how the developer sees fit for their applications.
             catch (Throwable $e) {
                 $this->getPdo()->exec('ROLLBACK TRAN');
-                $afterFail();
+                if($afterFail) {
+                    $afterFail();
+                }
                 throw $e;
             }
 
