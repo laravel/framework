@@ -103,7 +103,7 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
      * Write the migration file to disk.
      *
      * @param  string  $name
-     * @param  string  $table
+     * @param  string|null  $table
      * @param  bool  $create
      * @return void
      */

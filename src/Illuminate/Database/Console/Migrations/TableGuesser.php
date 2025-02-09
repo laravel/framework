@@ -12,13 +12,15 @@ class TableGuesser
     const CHANGE_PATTERNS = [
         '/.+_(to|from|in)_(\w+)_table$/',
         '/.+_(to|from|in)_(\w+)$/',
+        '/^(update)_(\w+)_table_?\w*$/',
+        '/^(update)_(\w+)_(add|change|remove|set|update)_?\w+$/',
     ];
 
     /**
      * Attempt to guess the table name and "creation" status of the given migration.
      *
      * @param  string  $migration
-     * @return array
+     * @return array<string|null, bool>
      */
     public static function guess($migration)
     {
@@ -33,5 +35,7 @@ class TableGuesser
                 return [$matches[2], $create = false];
             }
         }
+
+        return [null, false];
     }
 }
