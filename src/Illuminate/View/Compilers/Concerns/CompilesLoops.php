@@ -100,15 +100,15 @@ trait CompilesLoops
      */
     protected function compileForeach($expression)
     {
-        preg_match('/\( *(.+) +as +(.*)\)$/is', $expression ?? '', $matches);
+        preg_match('/\( *(.+?)(?: +as *(.*))?\)$/is', $expression ?? '', $matches);
 
-        if (count($matches) === 0) {
+        if (count($matches) === 0 || trim($matches[1]) === 'as') {
             throw new ViewCompilationException('Malformed @foreach statement.');
         }
 
         $iteratee = trim($matches[1]);
 
-        $iteration = trim($matches[2]);
+        $iteration = trim($matches[2]) ?: '$it';
 
         $initLoop = "\$__currentLoopData = {$iteratee}; \$__env->addLoop(\$__currentLoopData);";
 

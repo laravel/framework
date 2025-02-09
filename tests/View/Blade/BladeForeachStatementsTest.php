@@ -18,6 +18,39 @@ test
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
+    public function testForeachStatementsAreCompiledWithoutIteration()
+    {
+        $string = '@foreach ($this->getUsers())
+test
+@endforeach';
+        $expected = '<?php $__currentLoopData = $this->getUsers(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $it): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+test
+<?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>';
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
+
+    public function testForeachStatementsAreCompiledWithoutIterationWithAs()
+    {
+        $string = '@foreach ($this->getUsers() as)
+test
+@endforeach';
+        $expected = '<?php $__currentLoopData = $this->getUsers(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $it): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+test
+<?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>';
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
+
+    public function testForeachStatementsAreCompiledWithoutIterationWithAsAndSpace()
+    {
+        $string = '@foreach ($this->getUsers() as )
+test
+@endforeach';
+        $expected = '<?php $__currentLoopData = $this->getUsers(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $it): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+test
+<?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>';
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
+
     public function testForeachStatementsAreCompileWithUppercaseSyntax()
     {
         $string = '@foreach ($this->getUsers() AS $user)
@@ -46,6 +79,40 @@ test
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
+    public function testForeachStatementsAreCompiledWithMultipleLineWithoutIteration()
+    {
+        $string = '@foreach ([
+foo,
+bar,
+])
+test
+@endforeach';
+        $expected = '<?php $__currentLoopData = [
+foo,
+bar,
+]; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $it): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+test
+<?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>';
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
+
+    public function testForeachStatementsAreCompiledWithMultipleLineWithoutIterationWithAs()
+    {
+        $string = '@foreach ([
+foo,
+bar,
+] as)
+test
+@endforeach';
+        $expected = '<?php $__currentLoopData = [
+foo,
+bar,
+]; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $it): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+test
+<?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>';
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
+
     public function testNestedForeachStatementsAreCompiled()
     {
         $string = '@foreach ($this->getUsers() as $user)
@@ -57,6 +124,23 @@ tag info
         $expected = '<?php $__currentLoopData = $this->getUsers(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $user): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
 user info
 <?php $__currentLoopData = $user->tags; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $tag): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+tag info
+<?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+<?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>';
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
+
+    public function testNestedForeachStatementsAreCompiledWithoutIteration()
+    {
+        $string = '@foreach ($this->getUsers())
+user info
+@foreach ($it->tags as $tag)
+tag info
+@endforeach
+@endforeach';
+        $expected = '<?php $__currentLoopData = $this->getUsers(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $it): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+user info
+<?php $__currentLoopData = $it->tags; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $tag): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
 tag info
 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>';
@@ -77,8 +161,20 @@ tag info
         $expected = '<?php $__currentLoopData = range(1, 4); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $user): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>';
         $this->assertEquals($expected, $this->compiler->compileString($string));
 
+        $string = '@foreach (range(1, 4))';
+        $expected = '<?php $__currentLoopData = range(1, 4); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $it): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>';
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+
         $string = '@foreach (   $users as $user)';
         $expected = '<?php $__currentLoopData = $users; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $user): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>';
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+
+        $string = '@foreach (   $users   )';
+        $expected = '<?php $__currentLoopData = $users; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $it): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>';
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+
+        $string = '@foreach (   $users as   )';
+        $expected = '<?php $__currentLoopData = $users; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $it): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>';
         $this->assertEquals($expected, $this->compiler->compileString($string));
 
         $string = '@foreach ($tasks as $task)';
@@ -112,8 +208,6 @@ test
             ['@foreach'],
             ['@foreach()'],
             ['@foreach ()'],
-            ['@foreach($test)'],
-            ['@foreach($test as)'],
             ['@foreach(as)'],
             ['@foreach ( as )'],
         ];
