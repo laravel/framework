@@ -205,5 +205,54 @@ class ValidationArrayRuleTest extends TestCase
             ['foo' => (string) Rule::array()->contains(1)]
         );
         $this->assertTrue($v->passes());
+
+        $v = new Validator(
+            $trans,
+            ['foo' => [1, 2, 3]],
+            ['foo' => ['required', Rule::array()->list()]]
+        );
+        $this->assertTrue($v->passes());
+
+        $v = new Validator(
+            $trans,
+            ['foo' => [1, 2, 3]],
+            ['foo' => ['required', Rule::array()->max(3)]]
+        );
+        $this->assertTrue($v->passes());
+
+        $v = new Validator(
+            $trans,
+            ['foo' => [1, 2, 3]],
+            ['foo' => ['required', Rule::array()->min(3)]]
+        );
+        $this->assertTrue($v->passes());
+
+        $v = new Validator(
+            $trans,
+            ['foo' => [1, 2, 3]],
+            ['foo' => ['required', Rule::array()->between(3, 5)]]
+        );
+        $this->assertTrue($v->passes());
+
+        $v = new Validator(
+            $trans,
+            ['foo' => [1, 2, 3]],
+            ['foo' => ['required', Rule::array()->size(3)]]
+        );
+        $this->assertTrue($v->passes());
+
+        $v = new Validator(
+            $trans,
+            ['foo' => [1, 2, 3]],
+            ['foo' => ['required', Rule::array()->distinct()]]
+        );
+        $this->assertTrue($v->passes());
+
+        $v = new Validator(
+            $trans,
+            ['foo' => [1, 2, 3]],
+            ['foo' => ['required', Rule::array()->contains(1)]]
+        );
+        $this->assertTrue($v->passes());
     }
 }
