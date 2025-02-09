@@ -31,7 +31,7 @@ class SqlServerConnection extends Connection
      *
      * @throws \Throwable
      */
-    public function transaction(Closure $callback, $attempts = 1, Closure $afterFail = null)
+    public function transaction(Closure $callback, $attempts = 1, ?Closure $afterFail = null)
     {
         for ($a = 1; $a <= $attempts; $a++) {
             if ($this->getDriverName() === 'sqlsrv') {

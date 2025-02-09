@@ -20,7 +20,7 @@ trait ManagesTransactions
      *
      * @throws \Throwable
      */
-    public function transaction(Closure $callback, $attempts = 1, Closure $afterFail = null)
+    public function transaction(Closure $callback, $attempts = 1, ?Closure $afterFail = null)
     {
         for ($currentAttempt = 1; $currentAttempt <= $attempts; $currentAttempt++) {
             $this->beginTransaction();

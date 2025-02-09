@@ -135,7 +135,7 @@ interface ConnectionInterface
      *
      * @throws \Throwable
      */
-    public function transaction(Closure $callback, $attempts = 1,Closure $afterFail = null);
+    public function transaction(Closure $callback, $attempts = 1, ?Closure $afterFail = null);
 
     /**
      * Start a new database transaction.
