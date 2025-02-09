@@ -43,7 +43,7 @@ class EnvironmentChangeCommand extends Command
 
         if (! File::copy($envExampleFile, $envFile)) {
             $this->error("Failed to change environment to .env.$environment.");
-            
+
             return 1;
         }
 
