@@ -115,6 +115,10 @@ class MySqlSchemaState extends SchemaState
             $value .= ' --ssl-ca="${:LARAVEL_LOAD_SSL_CA}"';
         }
 
+        if ($config['options']['skip-ssl'] ?? false) {
+            $value .= ' --skip-ssl';
+        }
+
         return $value;
     }
 
