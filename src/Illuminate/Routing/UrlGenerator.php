@@ -759,7 +759,7 @@ class UrlGenerator implements UrlGeneratorContract
      * @param  string|null  $root
      * @return void
      *
-     * @deprecated Use useRootUrl
+     * @deprecated Use useOrigin
      */
     public function forceRootUrl($root)
     {
