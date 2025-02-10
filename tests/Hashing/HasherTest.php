@@ -62,8 +62,8 @@ class HasherTest extends TestCase
 
     public function testBcryptValueTooLong()
     {
-        $this->expectException(BcryptValueTooLongException::class);
-        $hasher = new BcryptHasher(['limit_length' => true]);
+        $this->expectException(\InvalidArgumentException::class);
+        $hasher = new BcryptHasher(['limit' => 72]);
         $hasher->make(str_repeat('a', 73));
     }
 

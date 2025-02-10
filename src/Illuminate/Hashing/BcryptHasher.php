@@ -4,17 +4,11 @@ namespace Illuminate\Hashing;
 
 use Error;
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;
+use InvalidArgumentException;
 use RuntimeException;
 
 class BcryptHasher extends AbstractHasher implements HasherContract
 {
-    /**
-     * The maximum byte length of the value to hash.
-     *
-     * @var int
-     */
-    const MAX_BYTE_LENGTH = 72;
-
     /**
      * The default cost factor.
      *
@@ -30,11 +24,11 @@ class BcryptHasher extends AbstractHasher implements HasherContract
     protected $verifyAlgorithm = false;
 
     /**
-     * Impose bcrypt byte limit.
+     * The maximum allowed length of strings that can be hashed.
      *
-     * @var bool
+     * @var int|null
      */
-    protected $limitLength = false;
+    protected $limit;
 
     /**
      * Create a new hasher instance.
@@ -46,7 +40,7 @@ class BcryptHasher extends AbstractHasher implements HasherContract
     {
         $this->rounds = $options['rounds'] ?? $this->rounds;
         $this->verifyAlgorithm = $options['verify'] ?? $this->verifyAlgorithm;
-        $this->limitLength = $options['limit_length'] ?? $this->limitLength;
+        $this->limit = $options['limit'] ?? $this->limit;
     }
 
     /**
@@ -61,8 +55,8 @@ class BcryptHasher extends AbstractHasher implements HasherContract
     public function make(#[\SensitiveParameter] $value, array $options = [])
     {
         try {
-            if ($this->limitLength && strlen($value) > self::MAX_BYTE_LENGTH) {
-                throw new BcryptValueTooLongException;
+            if ($this->limit && strlen($value) > $this->limit) {
+                throw new InvalidArgumentException('Value is too long to hash. Value must be less than '.$this->limit.' bytes.');
             }
 
             $hash = password_hash($value, PASSWORD_BCRYPT, [
