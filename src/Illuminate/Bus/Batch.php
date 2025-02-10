@@ -336,15 +336,15 @@ class Batch implements Arrayable, JsonSerializable
         }
 
         if ($this->hasProgressCallbacks() && $this->allowsFailures()) {
-            (new Collection($this->options['progress']))->each(fn($handler) => $this->invokeHandlerCallback($handler, $this->fresh(), $e));
+            (new Collection($this->options['progress']))->each(fn ($handler) => $this->invokeHandlerCallback($handler, $this->fresh(), $e));
         }
 
         if ($counts->failedJobs === 1 && $this->hasCatchCallbacks()) {
-            (new Collection($this->options['catch']))->each(fn($handler) => $this->invokeHandlerCallback($handler, $this->fresh(), $e));
+            (new Collection($this->options['catch']))->each(fn ($handler) => $this->invokeHandlerCallback($handler, $this->fresh(), $e));
         }
 
         if ($counts->allJobsHaveRanExactlyOnce() && $this->hasFinallyCallbacks()) {
-            (new Collection($this->options['finally']))->each(fn($handler) => $this->invokeHandlerCallback($handler, $this->fresh(), $e));
+            (new Collection($this->options['finally']))->each(fn ($handler) => $this->invokeHandlerCallback($handler, $this->fresh(), $e));
         }
     }
 
