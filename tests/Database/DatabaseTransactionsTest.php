@@ -186,6 +186,42 @@ class DatabaseTransactionsTest extends TestCase
         }
     }
 
+    public function testTransactionIsRolledBackAndOnRollbackBeingExecuted()
+    {
+        $transactionManager = m::mock(new DatabaseTransactionsManager);
+        $transactionManager->shouldReceive('begin')->once()->with('default', 1);
+        $transactionManager->shouldReceive('rollback')->once()->with('default', 0);
+        $transactionManager->shouldNotReceive('commit');
+
+        $rollbackCustomLogicHandled = false;
+
+        $this->connection()->setTransactionManager($transactionManager);
+
+        $this->connection()->table('users')->insert([
+            'name' => 'zain', 'value' => 1,
+        ]);
+
+        try {
+            $this->connection()->transaction(function () {
+                $this->connection()->table('users')->where(['name' => 'zain'])->update([
+                    'value' => 2,
+                ]);
+
+                throw new Exception;
+            }, onRollback: function ($e) use (&$rollbackCustomLogicHandled) {
+                // Ensure $exception object exists and is an instance of Throwable
+                self::assertTrue($e instanceof Throwable);
+
+                // Ensure custom logic is being handled
+                $rollbackCustomLogicHandled = true;
+            });
+        } catch (Throwable) {
+            // ignore
+        } finally {
+            self::assertTrue($rollbackCustomLogicHandled);
+        }
+    }
+
     public function testTransactionIsRolledBackUsingSeparateMethods()
     {
         $transactionManager = m::mock(new DatabaseTransactionsManager);

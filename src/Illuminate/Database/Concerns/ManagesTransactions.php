@@ -16,11 +16,12 @@ trait ManagesTransactions
      *
      * @param  (\Closure(static): TReturn)  $callback
      * @param  int  $attempts
+     * @param  ?\Closure  $onRollback
      * @return TReturn
      *
      * @throws \Throwable
      */
-    public function transaction(Closure $callback, $attempts = 1)
+    public function transaction(Closure $callback, $attempts = 1, Closure $onRollback = null)
     {
         for ($currentAttempt = 1; $currentAttempt <= $attempts; $currentAttempt++) {
             $this->beginTransaction();
@@ -37,7 +38,7 @@ trait ManagesTransactions
             // exception back out, and let the developer handle an uncaught exception.
             catch (Throwable $e) {
                 $this->handleTransactionException(
-                    $e, $currentAttempt, $attempts
+                    $e, $currentAttempt, $attempts, $onRollback
                 );
 
                 continue;
@@ -78,11 +79,12 @@ trait ManagesTransactions
      * @param  \Throwable  $e
      * @param  int  $currentAttempt
      * @param  int  $maxAttempts
+     * @param  ?\Closure $onRollback
      * @return void
      *
      * @throws \Throwable
      */
-    protected function handleTransactionException(Throwable $e, $currentAttempt, $maxAttempts)
+    protected function handleTransactionException(Throwable $e, $currentAttempt, $maxAttempts, Closure $onRollback = null)
     {
         // On a deadlock, MySQL rolls back the entire transaction so we can't just
         // retry the query. We have to throw this exception all the way out and
@@ -102,6 +104,12 @@ trait ManagesTransactions
         // can check if we have exceeded the maximum attempt count for this and
         // if we haven't we will return and try this query again in our loop.
         $this->rollBack();
+
+        // If a rollback callback was provided, we will call it so the developer
+        // has the chance to perform some custom, roll-back logic.
+        if ($onRollback) {
+            $onRollback($e);
+        }
 
         if ($this->causedByConcurrencyError($e) &&
             $currentAttempt < $maxAttempts) {
