@@ -92,7 +92,7 @@ trait ManagesLoops
      */
     public function getIterationData()
     {
-        if ($data = $this->getLastLoop()->data) {
+        if ($data = $this->getLastLoop()?->data) {
             return array_values($data)[$this->getLastLoop()->index];
         }
     }
