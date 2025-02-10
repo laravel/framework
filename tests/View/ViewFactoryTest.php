@@ -919,6 +919,7 @@ class ViewFactoryTest extends TestCase
         $expectedLoop = [
             'iteration' => 0,
             'index' => 0,
+            'data' => [1, 2, 3],
             'remaining' => 3,
             'count' => 3,
             'first' => true,
@@ -936,6 +937,7 @@ class ViewFactoryTest extends TestCase
         $secondExpectedLoop = [
             'iteration' => 0,
             'index' => 0,
+            'data' => [1, 2, 3, 4],
             'remaining' => 4,
             'count' => 4,
             'first' => true,
@@ -982,6 +984,7 @@ class ViewFactoryTest extends TestCase
         $expectedLoop = [
             'iteration' => 0,
             'index' => 0,
+            'data' => '',
             'remaining' => null,
             'count' => null,
             'first' => true,
@@ -1006,6 +1009,9 @@ class ViewFactoryTest extends TestCase
         $expectedLoop = [
             'iteration' => 0,
             'index' => 0,
+            'data' => new LazyCollection(function () {
+                $this->fail('LazyCollection\'s generator should not have been called');
+            }),
             'remaining' => null,
             'count' => null,
             'first' => true,
@@ -1070,6 +1076,22 @@ class ViewFactoryTest extends TestCase
         $this->assertFalse($factory->getLoopStack()[0]['first']);
         $this->assertNull($factory->getLoopStack()[0]['remaining']);
         $this->assertNull($factory->getLoopStack()[0]['last']);
+    }
+
+    public function testGettingIterationData()
+    {
+        $factory = $this->getFactory();
+
+        $factory->addLoop(['foo' => '123', 'bar' => '456']);
+
+        $factory->incrementLoopIndices();
+        $this->assertEquals('123', $factory->getIterationData());
+
+        $factory->incrementLoopIndices();
+        $this->assertEquals('456', $factory->getIterationData());
+
+        $factory->incrementLoopIndices();
+        $this->assertNull($factory->getIterationData());
     }
 
     public function testMacro()
