@@ -108,11 +108,11 @@ trait CompilesLoops
 
         $iteratee = trim($matches[1]);
 
-        $iteration = trim($matches[2] ?? '') ?: '$it';
+        $iteration = trim($matches[2] ?? '') ?: '$__currentLoop';
 
         $initLoop = "\$__currentLoopData = {$iteratee}; \$__env->addLoop(\$__currentLoopData);";
 
-        $iterateLoop = '$__env->incrementLoopIndices(); $loop = $__env->getLastLoop();';
+        $iterateLoop = '$__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $it = $__env->getIterationData();';
 
         return "<?php {$initLoop} foreach(\$__currentLoopData as {$iteration}): {$iterateLoop} ?>";
     }
@@ -168,7 +168,7 @@ trait CompilesLoops
      */
     protected function compileEndforeach()
     {
-        return '<?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>';
+        return '<?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); $it = $__env->getIterationData(); ?>';
     }
 
     /**

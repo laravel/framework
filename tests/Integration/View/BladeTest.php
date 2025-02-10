@@ -96,6 +96,20 @@ class BladeTest extends TestCase
 </span>', trim($view));
     }
 
+    public function test_rendering_a_nested_foreach_loop_without_iteration()
+    {
+        $view = View::make('foreach')->render();
+
+        $this->assertSame('First
+            foo
+            bar
+        First
+    Second
+            bar
+            baz
+        Second', trim($view));
+    }
+
     public function test_inline_link_type_attributes_dont_add_extra_spacing_at_end()
     {
         $view = View::make('uses-link')->render();

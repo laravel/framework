@@ -31,6 +31,7 @@ trait ManagesLoops
         $this->loopsStack[] = [
             'iteration' => 0,
             'index' => 0,
+            'data' => $data,
             'remaining' => $length ?? null,
             'count' => $length,
             'first' => true,
@@ -81,6 +82,18 @@ trait ManagesLoops
     {
         if ($last = Arr::last($this->loopsStack)) {
             return (object) $last;
+        }
+    }
+
+    /**
+     * Get the iteration data of the current loop.
+     *
+     * @return mixed
+     */
+    public function getIterationData()
+    {
+        if ($data = $this->getLastLoop()?->data) {
+            return array_values($data)[$this->getLastLoop()?->index];
         }
     }
 
