@@ -10,7 +10,7 @@ interface Container extends ContainerInterface
     /**
      * {@inheritdoc}
      *
-     * @template TClass
+     * @template TClass of object
      *
      * @param  string|class-string<TClass>  $id
      * @return ($id is class-string<TClass> ? TClass : mixed)
@@ -161,7 +161,7 @@ interface Container extends ContainerInterface
     /**
      * Get a closure to resolve the given type from the container.
      *
-     * @template TClass
+     * @template TClass of object
      *
      * @param  string|class-string<TClass>  $abstract
      * @return ($abstract is class-string<TClass> ? \Closure(): TClass : \Closure(): mixed)
@@ -178,7 +178,7 @@ interface Container extends ContainerInterface
     /**
      * Resolve the given type from the container.
      *
-     * @template TClass
+     * @template TClass of object
      *
      * @param  string|class-string<TClass>  $abstract
      * @param  array  $parameters

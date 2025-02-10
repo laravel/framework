@@ -1043,7 +1043,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     /**
      * Resolve the given type from the container.
      *
-     * @template TClass
+     * @template TClass of object
      *
      * @param  string|class-string<TClass>  $abstract
      * @param  array  $parameters
@@ -1061,7 +1061,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     /**
      * Resolve the given type from the container.
      *
-     * @template TClass
+     * @template TClass of object
      *
      * @param  string|class-string<TClass>|callable  $abstract
      * @param  array  $parameters
