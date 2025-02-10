@@ -2,6 +2,7 @@
 
 namespace Illuminate\View\Concerns;
 
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\LazyCollection;
 
@@ -93,6 +94,8 @@ trait ManagesLoops
     public function getIterationData()
     {
         if ($data = $this->getLastLoop()?->data) {
+            $data = $data instanceof Arrayable ? $data->toArray() : $data;
+
             return array_values($data)[$this->getLastLoop()->index];
         }
     }

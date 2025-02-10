@@ -10,6 +10,7 @@ use Illuminate\Contracts\View\Engine;
 use Illuminate\Contracts\View\View as ViewContract;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\LazyCollection;
 use Illuminate\View\Compilers\CompilerInterface;
@@ -1083,6 +1084,22 @@ class ViewFactoryTest extends TestCase
         $factory = $this->getFactory();
 
         $factory->addLoop(['foo' => '123', 'bar' => '456']);
+
+        $factory->incrementLoopIndices();
+        $this->assertEquals('123', $factory->getIterationData());
+
+        $factory->incrementLoopIndices();
+        $this->assertEquals('456', $factory->getIterationData());
+
+        $factory->incrementLoopIndices();
+        $this->assertNull($factory->getIterationData());
+    }
+
+    public function testGettingIterationDataForCollection()
+    {
+        $factory = $this->getFactory();
+
+        $factory->addLoop(new Collection(['foo' => '123', 'bar' => '456']));
 
         $factory->incrementLoopIndices();
         $this->assertEquals('123', $factory->getIterationData());
