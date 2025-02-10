@@ -28,11 +28,7 @@ class SQLiteConnector extends Connector implements ConnectorInterface
             return $this->createConnection('sqlite:'.$config['database'], $config, $options);
         }
 
-        $path = realpath($config['database']);
-
-        if (! file_exists($path)) {
-            $path = realpath(base_path($config['database']));
-        }
+        $path = realpath($config['database']) ?: realpath(base_path($config['database']));
 
         // Here we'll verify that the SQLite database exists before going any further
         // as the developer probably wants to know if the database exists and this
