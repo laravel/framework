@@ -10,7 +10,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\MultipleRecordsFoundException;
 use Illuminate\Database\Query\Expression;
+use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Collection as BaseCollection;
+
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\Macroable;
 
@@ -23,7 +25,7 @@ use Illuminate\Support\Traits\Macroable;
  */
 abstract class Relation implements BuilderContract
 {
-    use ForwardsCalls, Macroable {
+    use ForwardsCalls, Conditionable, Macroable {
         Macroable::__call as macroCall;
     }
 
