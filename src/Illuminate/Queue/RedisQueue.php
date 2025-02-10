@@ -121,6 +121,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
     public function bulk($jobs, $data = '', $queue = null)
     {
         $connection = $this->getConnection();
+
         $bulk = function () use ($jobs, $data, $queue) {
             foreach ((array) $jobs as $job) {
                 if (isset($job->delay)) {
@@ -130,11 +131,10 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
                 }
             }
         };
+
         if ($connection instanceof PhpRedisClusterConnection) {
-            // PhpRedis supports transactions, but not pipelining with Redis Cluster.
             $connection->transaction($bulk);
         } elseif ($connection instanceof PredisClusterConnection) {
-            // Predis supports pipelining, but not transactions with Redis Cluster.
             $connection->pipeline($bulk);
         } else {
             $connection->pipeline(fn () => $connection->transaction($bulk));
