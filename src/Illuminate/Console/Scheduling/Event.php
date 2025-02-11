@@ -867,6 +867,7 @@ class Event
     public function tap(Closure $callback)
     {
         $callback($this);
+
         return $this;
     }
 }
