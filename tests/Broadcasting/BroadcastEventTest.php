@@ -92,7 +92,8 @@ class BroadcastEventTest extends TestCase
 
     public function testMiddlewareProxiesMiddlewareFromUnderlyingEvent()
     {
-        $event = new class {
+        $event = new class
+        {
             public function middleware(): array
             {
                 return ['foo', 'bar'];
@@ -106,7 +107,8 @@ class BroadcastEventTest extends TestCase
 
     public function testMiddlewareProxiesFailedHandlerFromUnderlyingEvent()
     {
-        $event = new class {
+        $event = new class
+        {
             public function failed(?Throwable $e = null): void
             {
                 $e->validateCall();
