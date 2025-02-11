@@ -4762,6 +4762,7 @@ class ValidationValidatorTest extends TestCase
             ['http://illuminate.dev'],
             ['http://localhost'],
             ['https://laravel.com/?'],
+            ['https://laravel.com/?query=taylor otwell'],
             ['http://президент.рф/'],
             ['http://스타벅스코리아.com'],
             ['http://xn--d1abbgf6aiiy.xn--p1ai/'],
@@ -4793,6 +4794,7 @@ class ValidationValidatorTest extends TestCase
             ['http://[::1'],
             ['foo://bar'],
             ['javascript://test%0Aalert(321)'],
+            ['http://lara vel.com'],
         ];
     }
 
