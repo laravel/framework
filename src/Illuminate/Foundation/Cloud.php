@@ -7,6 +7,7 @@ use Illuminate\Foundation\Bootstrap\HandleExceptions;
 use Illuminate\Foundation\Bootstrap\LoadConfiguration;
 use Monolog\Formatter\JsonFormatter;
 use Monolog\Handler\SocketHandler;
+use PDO;
 
 class Cloud
 {
@@ -81,6 +82,14 @@ class Cloud
                 array_merge($app['config']->get('database.connections.pgsql'), [
                     'host' => str_replace('-pooler', '', $host),
                 ])
+            );
+
+            $app['config']->set(
+                'database.connections.pgsql.options',
+                array_merge(
+                    $app['config']->get('database.connections.pgsql.options', []),
+                    [PDO::ATTR_EMULATE_PREPARES => true],
+                ),
             );
         }
     }
