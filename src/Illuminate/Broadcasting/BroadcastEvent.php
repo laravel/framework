@@ -9,6 +9,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Arr;
 use ReflectionClass;
 use ReflectionProperty;
+use Throwable;
 
 class BroadcastEvent implements ShouldQueue
 {
@@ -178,6 +179,30 @@ class BroadcastEvent implements ShouldQueue
     public function displayName()
     {
         return get_class($this->event);
+    }
+
+    /**
+     * Get the middleware for the underlying event
+     */
+    public function middleware(): array
+    {
+        if (! method_exists($this->event, 'middleware')) {
+            return [];
+        }
+
+        return $this->event->middleware();
+    }
+
+    /**
+     * Process failure when the job has failed.
+     */
+    public function failed(?Throwable $e = null): void
+    {
+        if (! method_exists($this->event, 'failed')) {
+            return;
+        }
+
+        $this->event->failed($e);
     }
 
     /**
