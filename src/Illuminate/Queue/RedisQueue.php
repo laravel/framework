@@ -132,13 +132,11 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
             }
         };
 
-        if ($connection instanceof PhpRedisClusterConnection) {
-            $connection->transaction($bulk);
-        } elseif ($connection instanceof PredisClusterConnection) {
-            $connection->pipeline($bulk);
-        } else {
-            $connection->pipeline(fn () => $connection->transaction($bulk));
-        }
+        match (true) {
+            $connection instanceof PhpRedisClusterConnection => $connection->transaction($bulk),
+            $connection instanceof PredisClusterConnection => $connection->pipeline($bulk),
+            default => $connection->pipeline(fn () => $connection->transaction($bulk)),
+        };
     }
 
     /**
