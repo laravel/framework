@@ -263,19 +263,18 @@ class Collection extends BaseCollection implements QueueableCollection
         foreach ($relations as $key => $value) {
             $fullKey = $prefix ? "$prefix.$key" : $key;
 
-            // If the value is not an array, it must be a string or callable
-            // so we can use the relationship without any further processing
+            // If the value is not an array, it can be used as-is
             if (! is_array($value)) {
                 $preparedRelationships[$fullKey] = $value;
             } else {
-                // Check the array has a depth of 1, if not, recursively prepare the relationships
                 if (array_values($value) === $value) {
+                    // If the array has a depth of 1, we simply flatten the array
                     foreach ($value as $subValue) {
                         $preparedRelationships["$fullKey.$subValue"] = null;
                     }
                 } else {
-                    // At this point, we are working with a nested relation
-                    // so we must recursively prepare the relationships
+                    // We now know that the remaining relationships are nested arrays
+                    // so we must prepare them recursively
                     $preparedRelationships = array_merge($preparedRelationships, $this->prepareLoadMissingRelationships($value, $fullKey));
                 }
             }
