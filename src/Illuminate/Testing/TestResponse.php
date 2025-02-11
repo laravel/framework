@@ -1049,8 +1049,8 @@ class TestResponse implements ArrayAccess
      */
     public function decodeResponseJson()
     {
-        if ($this->baseResponse instanceof StreamedResponse
-            || $this->baseResponse instanceof StreamedJsonResponse) {
+        if ($this->baseResponse instanceof StreamedResponse || 
+            $this->baseResponse instanceof StreamedJsonResponse) {
             $testJson = new AssertableJsonString($this->streamedContent());
         } else {
             $testJson = new AssertableJsonString($this->getContent());
