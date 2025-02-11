@@ -54,6 +54,7 @@ use Illuminate\Foundation\Console\EventGenerateCommand;
 use Illuminate\Foundation\Console\EventListCommand;
 use Illuminate\Foundation\Console\EventMakeCommand;
 use Illuminate\Foundation\Console\ExceptionMakeCommand;
+use Illuminate\Foundation\Console\FilterMakeCommand;
 use Illuminate\Foundation\Console\InterfaceMakeCommand;
 use Illuminate\Foundation\Console\JobMakeCommand;
 use Illuminate\Foundation\Console\JobMiddlewareMakeCommand;
@@ -198,6 +199,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'EventMake' => EventMakeCommand::class,
         'ExceptionMake' => ExceptionMakeCommand::class,
         'FactoryMake' => FactoryMakeCommand::class,
+        'FilterMake' => FilterMakeCommand::class,
         'InterfaceMake' => InterfaceMakeCommand::class,
         'JobMake' => JobMakeCommand::class,
         'JobMiddlewareMake' => JobMiddlewareMakeCommand::class,
@@ -469,6 +471,18 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     {
         $this->app->singleton(FactoryMakeCommand::class, function ($app) {
             return new FactoryMakeCommand($app['files']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerFilterMakeCommand()
+    {
+        $this->app->singleton(FilterMakeCommand::class, function ($app) {
+            return new FilterMakeCommand($app['files']);
         });
     }
 

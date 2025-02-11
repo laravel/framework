@@ -1,0 +1,17 @@
+<?php
+
+namespace {{ namespace }};
+
+use Illuminate\Database\Eloquent\Builder;
+
+class {{ class }}
+{
+    /**
+     * Apply filter by $param
+     * 
+     * @param  string|int  $param
+     */
+    public static function apply(Builder $builder,$param): void {
+        
+    }
+}
