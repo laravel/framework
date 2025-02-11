@@ -104,4 +104,15 @@ class EventTest extends TestCase
 
         $this->assertSame('fancy-command-description', $event->mutexName());
     }
+
+    public function testTapMethodAllowsConditionalConfiguration()
+    {
+        $event = new Event(m::mock(EventMutex::class), 'php -i');
+
+        $event->tap(function ($event) {
+            $event->twiceDaily(1, 13);
+        });
+
+        $this->assertSame('0 1,13 * * *', $event->expression);
+    }
 }

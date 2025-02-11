@@ -857,4 +857,16 @@ class Event
             preg_replace("#['\"]#", '', Application::artisanBinary()),
         ], $command);
     }
+
+    /**
+     * Tap the event.
+     *
+     * @param  \Closure  $callback
+     * @return $this
+     */
+    public function tap(Closure $callback)
+    {
+        $callback($this);
+        return $this;
+    }
 }
