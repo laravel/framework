@@ -90,7 +90,7 @@ class BroadcastEventTest extends TestCase
         (new BroadcastEvent($event))->handle($manager);
     }
 
-    public function testMiddlewareForwardsMiddlewareFromUnderlyingEvent()
+    public function testMiddlewareProxiesMiddlewareFromUnderlyingEvent()
     {
         $event = new class {
             public function middleware(): array
@@ -104,7 +104,7 @@ class BroadcastEventTest extends TestCase
         $this->assertSame(['foo', 'bar'], $job->middleware());
     }
 
-    public function testMiddlewareForwardsFailedHandlerFromUnderlyingEvent()
+    public function testMiddlewareProxiesFailedHandlerFromUnderlyingEvent()
     {
         $event = new class {
             public function failed(?Throwable $e = null): void

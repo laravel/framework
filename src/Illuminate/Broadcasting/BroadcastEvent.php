@@ -182,7 +182,9 @@ class BroadcastEvent implements ShouldQueue
     }
 
     /**
-     * Get the middleware for the underlying event
+     * Get the middleware for the underlying event.
+     *
+     * @return array<int, object>
      */
     public function middleware(): array
     {
