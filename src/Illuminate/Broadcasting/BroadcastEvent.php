@@ -172,16 +172,6 @@ class BroadcastEvent implements ShouldQueue
     }
 
     /**
-     * Get the display name for the queued job.
-     *
-     * @return string
-     */
-    public function displayName()
-    {
-        return get_class($this->event);
-    }
-
-    /**
      * Get the middleware for the underlying event.
      *
      * @return array<int, object>
@@ -196,7 +186,10 @@ class BroadcastEvent implements ShouldQueue
     }
 
     /**
-     * Process failure when the job has failed.
+     * Handle a job failure.
+     *
+     * @param  \Throwable  $e
+     * @return void
      */
     public function failed(?Throwable $e = null): void
     {
@@ -205,6 +198,16 @@ class BroadcastEvent implements ShouldQueue
         }
 
         $this->event->failed($e);
+    }
+
+    /**
+     * Get the display name for the queued job.
+     *
+     * @return string
+     */
+    public function displayName()
+    {
+        return get_class($this->event);
     }
 
     /**
