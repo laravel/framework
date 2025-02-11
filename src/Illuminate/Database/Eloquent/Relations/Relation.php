@@ -65,7 +65,7 @@ abstract class Relation implements BuilderContract
     /**
      * An array to map class names to their morph names in the database.
      *
-     * @var array
+     * @var array<string, class-string<\Illuminate\Database\Eloquent\Model>>
      */
     public static $morphMap = [];
 
@@ -467,7 +467,7 @@ abstract class Relation implements BuilderContract
      *
      * @param  array<string, class-string<\Illuminate\Database\Eloquent\Model>>|null  $map
      * @param  bool  $merge
-     * @return array
+     * @return array<string, class-string<\Illuminate\Database\Eloquent\Model>>
      */
     public static function morphMap(?array $map = null, $merge = true)
     {
@@ -484,8 +484,8 @@ abstract class Relation implements BuilderContract
     /**
      * Builds a table-keyed array from model class names.
      *
-     * @param  string[]|null  $models
-     * @return array|null
+     * @param  list<class-string<\Illuminate\Database\Eloquent\Model>>|null  $models
+     * @return array<string, class-string<\Illuminate\Database\Eloquent\Model>>|null
      */
     protected static function buildMorphMapFromModels(?array $models = null)
     {
