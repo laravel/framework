@@ -532,7 +532,6 @@ class TestResponse implements ArrayAccess
         return $this;
     }
 
-
     /**
      * Assert that the response was streamed.
      *
