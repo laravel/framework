@@ -63,7 +63,7 @@ abstract class Relation implements BuilderContract
     protected static $constraints = true;
 
     /**
-     * An array to map class names to their morph names in the database.
+     * An array to map morph names to their class names in the database.
      *
      * @var array<string, class-string<\Illuminate\Database\Eloquent\Model>>
      */
