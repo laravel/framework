@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Eloquent;
 
+use Closure;
 use Illuminate\Contracts\Queue\QueueableCollection;
 use Illuminate\Contracts\Queue\QueueableEntity;
 use Illuminate\Contracts\Support\Arrayable;
@@ -221,7 +222,7 @@ class Collection extends BaseCollection implements QueueableCollection
             $relations = func_get_args();
         }
 
-        foreach ($relations as $key => $value) {
+        foreach ($this->prepareLoadMissingRelationships($relations) as $key => $value) {
             if (is_numeric($key)) {
                 $key = $value;
             }
@@ -246,6 +247,41 @@ class Collection extends BaseCollection implements QueueableCollection
         }
 
         return $this;
+    }
+
+    /**
+     * Prepare nested load missing relationships.
+     *
+     * @param  array  $relations
+     * @param  string  $prefix
+     * @return array
+     */
+    protected function prepareLoadMissingRelationships($relations, $prefix = '')
+    {
+        $preparedRelationships = [];
+
+        foreach ($relations as $key => $value) {
+            $fullKey = $prefix ? "$prefix.$key" : $key;
+
+            // If the value is not an array, it must be a string or callable
+            // so we can use the relationship without any further processing
+            if (! is_array($value)) {
+                $preparedRelationships[$fullKey] = $value;
+            } else {
+                // Check the array has a depth of 1, if not, recursively prepare the relationships
+                if (array_values($value) === $value) {
+                    foreach ($value as $subValue) {
+                        $preparedRelationships["$fullKey.$subValue"] = null;
+                    }
+                } else {
+                    // At this point, we are working with a nested relation
+                    // so we must recursively prepare the relationships
+                    $preparedRelationships = array_merge($preparedRelationships, $this->prepareLoadMissingRelationships($value, $fullKey));
+                }
+            }
+        }
+
+        return $preparedRelationships;
     }
 
     /**
