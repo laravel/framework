@@ -526,10 +526,10 @@ class Repository
 
         $serialize = fn ($value) => serialize($instance->getSerializedPropertyValue($value, withRelations: false));
 
-        return $instance->isEmpty() ? null : [
+        return $instance->isEmpty() ? null : array_filter([
             'data' => array_map($serialize, $instance->all()),
             'hidden' => array_map($serialize, $instance->allHidden()),
-        ];
+        ]);
     }
 
     /**
