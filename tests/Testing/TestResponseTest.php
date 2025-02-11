@@ -325,6 +325,40 @@ class TestResponseTest extends TestCase
         }
     }
 
+    public function testJsonAssertionsOnStreamedJsonContent()
+    {
+        $response = TestResponse::fromBaseResponse(
+            new StreamedJsonResponse([
+                'data' => $this->yieldTestModels(),
+            ])
+        );
+
+        $response->assertJsonPath('data', [
+            ['id' => 1],
+            ['id' => 2],
+            ['id' => 3],
+        ]);
+
+        try {
+            $response->assertJsonPath('data', [
+                ['id' => 1],
+                ['id' => 2],
+            ]);
+            $this->fail('xxxx');
+        } catch (AssertionFailedError $e) {
+            $this->assertSame('Failed asserting that two arrays are identical.', $e->getMessage());
+        }
+
+        $response->assertJsonCount(3, 'data');
+
+        try {
+            $response->assertJsonCount(2, 'data');
+            $this->fail('xxxx');
+        } catch (AssertionFailedError $e) {
+            $this->assertSame("Failed to assert that the response count matched the expected 2\nFailed asserting that actual size 3 matches expected size 2.", $e->getMessage());
+        }
+    }
+
     public function yieldTestModels()
     {
         yield new TestModel(['id' => 1]);
