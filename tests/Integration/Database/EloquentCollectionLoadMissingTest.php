@@ -148,9 +148,9 @@ class EloquentCollectionLoadMissingTest extends DatabaseTestCase
         $users->loadMissing([
             'posts' => [
                 'postRelation' => [
-                    'postSubRelations.postSubSubRelations'
-                ]
-            ]
+                    'postSubRelations.postSubSubRelations',
+                ],
+            ],
         ]);
 
         $user = $users->first();
