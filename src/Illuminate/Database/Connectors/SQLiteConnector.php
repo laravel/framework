@@ -11,8 +11,6 @@ class SQLiteConnector extends Connector implements ConnectorInterface
      *
      * @param  array  $config
      * @return \PDO
-     *
-     * @throws \Illuminate\Database\SQLiteDatabaseDoesNotExistException
      */
     public function connect(array $config)
     {
