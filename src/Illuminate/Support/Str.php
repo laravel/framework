@@ -18,6 +18,8 @@ use Symfony\Component\Uid\Ulid;
 use Throwable;
 use Traversable;
 use voku\helper\ASCII;
+use Egulias\EmailValidator\EmailValidator;
+use Egulias\EmailValidator\Validation\RFCValidation;
 
 class Str
 {
@@ -2017,15 +2019,10 @@ class Str
      * @param  mixed  $value
      * @return bool
      */
-    public static function isEmail($value)
+    public static function isEmail(string $value): bool
     {
-        if (! is_string($value) || filter_var($value, FILTER_VALIDATE_EMAIL) === false) {
-            return false;
-        }
-
-        $tld = substr(strrchr($value, '.'), 1);
-
-        return strlen($tld) >= 2;
+        $validator = new EmailValidator();
+        return $validator->isValid($value, new RFCValidation());
     }
 
     /**
