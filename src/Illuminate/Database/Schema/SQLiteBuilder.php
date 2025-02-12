@@ -111,24 +111,26 @@ class SQLiteBuilder extends Builder
      */
     public function dropAllTables()
     {
-        $database = $this->connection->getDatabaseName();
-
-        if ($database !== ':memory:' &&
-            ! str_contains($database, '?mode=memory') &&
-            ! str_contains($database, '&mode=memory')
-        ) {
-            return $this->refreshDatabaseFile();
-        }
-
-        $this->connection->select($this->grammar->compileEnableWriteableSchema());
-
         foreach ($this->getCurrentSchemaListing() as $schema) {
-            $this->connection->select($this->grammar->compileDropAllTables($schema));
+            $database = $schema === 'main'
+                ? $this->connection->getDatabaseName()
+                : (array_column($this->getSchemas(), 'path', 'name')[$schema] ?: ':memory:');
+
+            if ($database !== ':memory:' &&
+                ! str_contains($database, '?mode=memory') &&
+                ! str_contains($database, '&mode=memory')
+            ) {
+                $this->refreshDatabaseFile($database);
+            } else {
+                $this->pragma('writable_schema', 1);
+
+                $this->connection->statement($this->grammar->compileDropAllTables($schema));
+
+                $this->pragma('writable_schema', 0);
+
+                $this->connection->statement($this->grammar->compileRebuild($schema));
+            }
         }
-
-        $this->connection->select($this->grammar->compileDisableWriteableSchema());
-
-        $this->connection->select($this->grammar->compileRebuild());
     }
 
     /**
@@ -138,64 +140,40 @@ class SQLiteBuilder extends Builder
      */
     public function dropAllViews()
     {
-        $this->connection->select($this->grammar->compileEnableWriteableSchema());
-
         foreach ($this->getCurrentSchemaListing() as $schema) {
-            $this->connection->select($this->grammar->compileDropAllViews($schema));
+            $this->pragma('writable_schema', 1);
+
+            $this->connection->statement($this->grammar->compileDropAllViews($schema));
+
+            $this->pragma('writable_schema', 0);
+
+            $this->connection->statement($this->grammar->compileRebuild($schema));
         }
-
-        $this->connection->select($this->grammar->compileDisableWriteableSchema());
-
-        $this->connection->select($this->grammar->compileRebuild());
     }
 
     /**
-     * Set the busy timeout.
+     * Get the value for the given pragma name or set the given value.
      *
-     * @param  int  $milliseconds
-     * @return bool
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return mixed
      */
-    public function setBusyTimeout($milliseconds)
+    public function pragma($key, $value = null)
     {
-        return $this->connection->statement(
-            $this->grammar->compileSetBusyTimeout($milliseconds)
-        );
-    }
-
-    /**
-     * Set the journal mode.
-     *
-     * @param  string  $mode
-     * @return bool
-     */
-    public function setJournalMode($mode)
-    {
-        return $this->connection->statement(
-            $this->grammar->compileSetJournalMode($mode)
-        );
-    }
-
-    /**
-     * Set the synchronous mode.
-     *
-     * @param  int  $mode
-     * @return bool
-     */
-    public function setSynchronous($mode)
-    {
-        return $this->connection->statement(
-            $this->grammar->compileSetSynchronous($mode)
-        );
+        return is_null($value)
+            ? $this->connection->scalar($this->grammar->pragma($key))
+            : $this->connection->statement($this->grammar->pragma($key, $value));
     }
 
     /**
      * Empty the database file.
      *
+     * @param  string|null  $path
      * @return void
      */
-    public function refreshDatabaseFile()
+    public function refreshDatabaseFile($path = null)
     {
-        file_put_contents($this->connection->getDatabaseName(), '');
+        file_put_contents($path ?? $this->connection->getDatabaseName(), '');
     }
 
     /**
