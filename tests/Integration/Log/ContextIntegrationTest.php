@@ -49,6 +49,19 @@ class ContextIntegrationTest extends TestCase
         $this->assertSame([], Context::allHidden());
     }
 
+    public function test_it_does_not_serialize_empty_data(): void
+    {
+        Context::add('some-value', 'zzz');
+        $onlyPublic = Context::dehydrate();
+        $this->assertEqualsCanonicalizing(['data' => ['some-value' => 's:3:"zzz";']], $onlyPublic);
+
+        Context::flush();
+
+        Context::addHidden('some-hidden-value', null);
+        $onlyHidden = Context::dehydrate();
+        $this->assertEqualsCanonicalizing(['hidden' => ['some-hidden-value' => 'N;']], $onlyHidden);
+    }
+
     public function test_it_ignores_deleted_models_when_hydrating()
     {
         $user = UserFactory::new()->create(['name' => 'Tim']);
