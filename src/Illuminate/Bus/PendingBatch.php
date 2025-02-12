@@ -98,7 +98,7 @@ class PendingBatch
     protected function ensureJobIsBatchable(object|array $job): void
     {
         foreach (Arr::wrap($job) as $job) {
-            if ($job instanceof PendingBatch) {
+            if ($job instanceof PendingBatch || $job instanceof Closure) {
                 return;
             }
 
