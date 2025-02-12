@@ -283,14 +283,14 @@ class TestResponseTest extends TestCase
             $notStreamedResponse->assertStreamed();
             $this->fail('xxxx');
         } catch (AssertionFailedError $e) {
-            $this->assertSame("Failed assertion that the response was streamed.\nFailed asserting that false is true.", $e->getMessage());
+            $this->assertSame("Expected the response to be streamed, but it wasn't.\nFailed asserting that false is true.", $e->getMessage());
         }
 
         try {
             $streamedResponse->assertNotStreamed();
             $this->fail('xxxx');
         } catch (AssertionFailedError $e) {
-            $this->assertSame("Failed assertion that the response was not streamed.\nFailed asserting that false is true.", $e->getMessage());
+            $this->assertSame("Response was unexpectedly streamed.\nFailed asserting that false is true.", $e->getMessage());
         }
     }
 

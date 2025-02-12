@@ -541,7 +541,7 @@ class TestResponse implements ArrayAccess
     {
         PHPUnit::withResponse($this)->assertTrue(
             $this->baseResponse instanceof StreamedResponse || $this->baseResponse instanceof StreamedJsonResponse,
-            'Failed assertion that the response was streamed.'
+            'Expected the response to be streamed, but it wasn\'t.'
         );
 
         return $this;
@@ -556,7 +556,7 @@ class TestResponse implements ArrayAccess
     {
         PHPUnit::withResponse($this)->assertTrue(
             ! $this->baseResponse instanceof StreamedResponse && ! $this->baseResponse instanceof StreamedJsonResponse,
-            'Failed assertion that the response was not streamed.'
+            'Response was unexpectedly streamed.'
         );
 
         return $this;
