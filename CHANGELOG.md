@@ -1,6 +1,16 @@
 # Release Notes for 11.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v11.42.0...11.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v11.42.1...11.x)
+
+## [v11.42.1](https://github.com/laravel/framework/compare/v11.42.0...v11.42.1) - 2025-02-12
+
+* Add Taylor's inspiring quote - We must ship by [@1weiho](https://github.com/1weiho) in https://github.com/laravel/framework/pull/54579
+* Type the callback for Relation::noConstraints by [@simon-tma](https://github.com/simon-tma) in https://github.com/laravel/framework/pull/54572
+* [11.x] fix: getQualified{Created,Updated}AtColumn never returning null by [@calebdw](https://github.com/calebdw) in https://github.com/laravel/framework/pull/54568
+* [11.x] `assertStreamed` and `assertNotStreamed` by [@gdebrauwer](https://github.com/gdebrauwer) in https://github.com/laravel/framework/pull/54566
+* [11.x] Add `assertJsonFragments` assertion by [@lioneaglesolutions](https://github.com/lioneaglesolutions) in https://github.com/laravel/framework/pull/54576
+* [11.x] `doesntContain` on eloquent collection by [@gdebrauwer](https://github.com/gdebrauwer) in https://github.com/laravel/framework/pull/54567
+* [11.x] Allow batching a Closure by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/54587
 
 ## [v11.42.0](https://github.com/laravel/framework/compare/v11.41.3...v11.42.0) - 2025-02-11
 
