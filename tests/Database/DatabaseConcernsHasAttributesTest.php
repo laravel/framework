@@ -61,6 +61,25 @@ class DatabaseConcernsHasAttributesTest extends TestCase
 
         $this->assertFalse($instance->cachedAttributeIsset('cacheableProperty'));
     }
+
+    public function testSnakeCaseMutateAttributeMarkedAttribute()
+    {
+        $instance = new HasAttributesWithSnakeCaseConsistentCheck();
+        $this->assertEquals('foo1Bar', $instance->getAttribute('foo1Bar'));
+        $this->assertEquals('foo1Bar', $instance->getAttribute('foo1bar'));
+        $this->assertEquals('foo1Bar', $instance->getAttribute('foo_1_bar'));
+        $this->assertEquals('foo1Bar', $instance->getAttribute('foo1_bar'));
+        $this->assertEquals('foo1Bar', $instance->getAttribute('foo_1bar'));
+    }
+
+    public function testSnakeCaseMutateAttribute()
+    {
+        $instance = new HasAttributesWithSnakeCaseConsistentCheck();
+        $this->assertEquals('foo2Bar', $instance->getAttribute('foo2Bar'));
+        $this->assertEquals('foo2Bar', $instance->getAttribute('foo2bar'));
+        $this->assertEquals('foo2Bar', $instance->getAttribute('foo_2_bar'));
+        $this->assertEquals('foo2Bar', $instance->getAttribute('foo_2bar'));
+    }
 }
 
 class HasAttributesWithoutConstructor
@@ -117,4 +136,20 @@ class HasCacheableAttributeWithAccessor extends Model
     {
         return isset($this->attributeCastCache[$attribute]);
     }
+}
+
+class HasAttributesWithSnakeCaseConsistentCheck extends Model
+{
+    public function foo1Bar(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => 'foo1Bar'
+        );
+    }
+
+    public function getFoo2BarAttribute(): string
+    {
+        return 'foo2Bar';
+    }
+
 }
