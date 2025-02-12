@@ -2,7 +2,6 @@
 
 namespace Illuminate\Database\Schema\Grammars;
 
-use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Collection;
@@ -43,30 +42,17 @@ class PostgresGrammar extends Grammar
      * Compile a create database command.
      *
      * @param  string  $name
-     * @param  \Illuminate\Database\Connection  $connection
      * @return string
      */
-    public function compileCreateDatabase($name, $connection)
+    public function compileCreateDatabase($name)
     {
-        return sprintf(
-            'create database %s encoding %s',
-            $this->wrapValue($name),
-            $this->wrapValue($connection->getConfig('charset')),
-        );
-    }
+        $sql = parent::compileCreateDatabase($name);
 
-    /**
-     * Compile a drop database if exists command.
-     *
-     * @param  string  $name
-     * @return string
-     */
-    public function compileDropDatabaseIfExists($name)
-    {
-        return sprintf(
-            'drop database if exists %s',
-            $this->wrapValue($name)
-        );
+        if ($charset = $this->connection->getConfig('charset')) {
+            $sql .= sprintf(' encoding %s', $this->wrapValue($charset));
+        }
+
+        return $sql;
     }
 
     /**
@@ -175,7 +161,7 @@ class PostgresGrammar extends Grammar
             .'(select tc.collcollate from pg_catalog.pg_collation tc where tc.oid = a.attcollation) as collation, '
             .'not a.attnotnull as nullable, '
             .'(select pg_get_expr(adbin, adrelid) from pg_attrdef where c.oid = pg_attrdef.adrelid and pg_attrdef.adnum = a.attnum) as default, '
-            .(version_compare($this->connection?->getServerVersion(), '12.0', '<') ? "'' as generated, " : 'a.attgenerated as generated, ')
+            .(version_compare($this->connection->getServerVersion(), '12.0', '<') ? "'' as generated, " : 'a.attgenerated as generated, ')
             .'col_description(c.oid, a.attnum) as comment '
             .'from pg_attribute a, pg_class c, pg_type t, pg_namespace n '
             .'where c.relname = %s and n.nspname = %s and a.attnum > 0 and a.attrelid = c.oid and a.atttypid = t.oid and n.oid = c.relnamespace '
@@ -283,9 +269,11 @@ class PostgresGrammar extends Grammar
     {
         if ($command->column->autoIncrement
             && $value = $command->column->get('startingValue', $command->column->get('from'))) {
-            $table = last(explode('.', $blueprint->getTable()));
+            [$schema, $table] = $this->connection->getSchemaBuilder()->parseSchemaAndTable($blueprint->getTable());
 
-            return 'alter sequence '.$blueprint->getPrefix().$table.'_'.$command->column->name.'_seq restart with '.$value;
+            $table = ($schema ? $schema.'.' : '').$this->connection->getTablePrefix().$table;
+
+            return 'alter sequence '.$table.'_'.$command->column->name.'_seq restart with '.$value;
         }
     }
 
@@ -294,12 +282,9 @@ class PostgresGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $command
-     * @param  \Illuminate\Database\Connection  $connection
      * @return array|string
-     *
-     * @throws \RuntimeException
      */
-    public function compileChange(Blueprint $blueprint, Fluent $command, Connection $connection)
+    public function compileChange(Blueprint $blueprint, Fluent $command)
     {
         $column = $command->column;
 
@@ -537,8 +522,8 @@ class PostgresGrammar extends Grammar
      */
     public function compileDropPrimary(Blueprint $blueprint, Fluent $command)
     {
-        $table = last(explode('.', $blueprint->getTable()));
-        $index = $this->wrap("{$blueprint->getPrefix()}{$table}_pkey");
+        [, $table] = $this->connection->getSchemaBuilder()->parseSchemaAndTable($blueprint->getTable());
+        $index = $this->wrap("{$this->connection->getTablePrefix()}{$table}_pkey");
 
         return 'alter table '.$this->wrapTable($blueprint)." drop constraint {$index}";
     }

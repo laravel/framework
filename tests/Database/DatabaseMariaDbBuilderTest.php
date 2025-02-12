@@ -1,6 +1,6 @@
 <?php
 
-namespace Database;
+namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Grammars\MariaDbGrammar;
@@ -17,9 +17,9 @@ class DatabaseMariaDbBuilderTest extends TestCase
 
     public function testCreateDatabase()
     {
-        $grammar = new MariaDbGrammar;
-
         $connection = m::mock(Connection::class);
+        $grammar = new MariaDbGrammar($connection);
+
         $connection->shouldReceive('getConfig')->once()->with('charset')->andReturn('utf8mb4');
         $connection->shouldReceive('getConfig')->once()->with('collation')->andReturn('utf8mb4_unicode_ci');
         $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
@@ -33,9 +33,9 @@ class DatabaseMariaDbBuilderTest extends TestCase
 
     public function testDropDatabaseIfExists()
     {
-        $grammar = new MariaDbGrammar;
-
         $connection = m::mock(Connection::class);
+        $grammar = new MariaDbGrammar($connection);
+
         $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
         $connection->shouldReceive('statement')->once()->with(
             'drop database if exists `my_database_a`'

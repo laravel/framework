@@ -221,7 +221,7 @@ trait InteractsWithData
     }
 
     /**
-     * Retrieve data from the instnce as a Stringable instance.
+     * Retrieve data from the instance as a Stringable instance.
      *
      * @param  string  $key
      * @param  mixed  $default

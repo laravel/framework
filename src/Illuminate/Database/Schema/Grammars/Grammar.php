@@ -5,11 +5,9 @@ namespace Illuminate\Database\Schema\Grammars;
 use BackedEnum;
 use Illuminate\Contracts\Database\Query\Expression;
 use Illuminate\Database\Concerns\CompilesJsonPaths;
-use Illuminate\Database\Connection;
 use Illuminate\Database\Grammar as BaseGrammar;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Fluent;
-use LogicException;
 use RuntimeException;
 
 abstract class Grammar extends BaseGrammar
@@ -41,27 +39,26 @@ abstract class Grammar extends BaseGrammar
      * Compile a create database command.
      *
      * @param  string  $name
-     * @param  \Illuminate\Database\Connection  $connection
-     * @return void
-     *
-     * @throws \LogicException
+     * @return string
      */
-    public function compileCreateDatabase($name, $connection)
+    public function compileCreateDatabase($name)
     {
-        throw new LogicException('This database driver does not support creating databases.');
+        return sprintf('create database %s',
+            $this->wrapValue($name),
+        );
     }
 
     /**
      * Compile a drop database if exists command.
      *
      * @param  string  $name
-     * @return void
-     *
-     * @throws \LogicException
+     * @return string
      */
     public function compileDropDatabaseIfExists($name)
     {
-        throw new LogicException('This database driver does not support dropping databases.');
+        return sprintf('drop database if exists %s',
+            $this->wrapValue($name)
+        );
     }
 
     /**
@@ -172,10 +169,9 @@ abstract class Grammar extends BaseGrammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $command
-     * @param  \Illuminate\Database\Connection  $connection
      * @return array|string
      */
-    public function compileRenameColumn(Blueprint $blueprint, Fluent $command, Connection $connection)
+    public function compileRenameColumn(Blueprint $blueprint, Fluent $command)
     {
         return sprintf('alter table %s rename column %s to %s',
             $this->wrapTable($blueprint),
@@ -189,14 +185,13 @@ abstract class Grammar extends BaseGrammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $command
-     * @param  \Illuminate\Database\Connection  $connection
      * @return array|string
      *
      * @throws \RuntimeException
      */
-    public function compileChange(Blueprint $blueprint, Fluent $command, Connection $connection)
+    public function compileChange(Blueprint $blueprint, Fluent $command)
     {
-        throw new LogicException('This database driver does not support modifying columns.');
+        throw new RuntimeException('This database driver does not support modifying columns.');
     }
 
     /**

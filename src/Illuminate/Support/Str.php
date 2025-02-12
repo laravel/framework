@@ -381,6 +381,10 @@ class Str
             $needles = (array) $needles;
         }
 
+        if (is_null($haystack)) {
+            return false;
+        }
+
         foreach ($needles as $needle) {
             if ((string) $needle !== '' && str_ends_with($haystack, $needle)) {
                 return true;
@@ -1615,6 +1619,10 @@ class Str
     {
         if (! is_iterable($needles)) {
             $needles = [$needles];
+        }
+
+        if (is_null($haystack)) {
+            return false;
         }
 
         foreach ($needles as $needle) {

@@ -4,11 +4,6 @@ namespace Illuminate\Tests\Integration\Database\Sqlite;
 
 use Closure;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Database\Schema\Grammars\Grammar;
-use Illuminate\Database\Schema\Grammars\MySqlGrammar;
-use Illuminate\Database\Schema\Grammars\PostgresGrammar;
-use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
-use Illuminate\Database\Schema\Grammars\SqlServerGrammar;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Orchestra\Testbench\Attributes\RequiresDatabase;
@@ -37,7 +32,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
             $table->string('age');
         });
 
-        $blueprint = $this->getBlueprint(new SQLiteGrammar, 'users', function ($table) {
+        $blueprint = $this->getBlueprint('SQLite', 'users', function ($table) {
             $table->renameColumn('name', 'first_name');
             $table->integer('age')->change();
         });
@@ -76,7 +71,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
 
     public function testNativeColumnModifyingOnPostgreSql()
     {
-        $blueprint = $this->getBlueprint(new PostgresGrammar, 'users', function ($table) {
+        $blueprint = $this->getBlueprint('Postgres', 'users', function ($table) {
             $table->integer('code')->autoIncrement()->from(10)->comment('my comment')->change();
         });
 
@@ -88,7 +83,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
             'comment on column "users"."code" is \'my comment\'',
         ], $blueprint->toSql());
 
-        $blueprint = $this->getBlueprint(new PostgresGrammar, 'users', function ($table) {
+        $blueprint = $this->getBlueprint('Postgres', 'users', function ($table) {
             $table->char('name', 40)->nullable()->default('easy')->collation('unicode')->change();
         });
 
@@ -101,7 +96,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
             'comment on column "users"."name" is NULL',
         ], $blueprint->toSql());
 
-        $blueprint = $this->getBlueprint(new PostgresGrammar, 'users', function ($table) {
+        $blueprint = $this->getBlueprint('Postgres', 'users', function ($table) {
             $table->integer('foo')->generatedAs('expression')->always()->change();
         });
 
@@ -115,7 +110,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
             'comment on column "users"."foo" is NULL',
         ], $blueprint->toSql());
 
-        $blueprint = $this->getBlueprint(new PostgresGrammar, 'users', function ($table) {
+        $blueprint = $this->getBlueprint('Postgres', 'users', function ($table) {
             $table->geometry('foo', 'point', 1234)->change();
         });
 
@@ -128,7 +123,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
             'comment on column "users"."foo" is NULL',
         ], $blueprint->toSql());
 
-        $blueprint = $this->getBlueprint(new PostgresGrammar, 'users', function ($table) {
+        $blueprint = $this->getBlueprint('Postgres', 'users', function ($table) {
             $table->timestamp('added_at', 2)->useCurrent()->storedAs(null)->change();
         });
 
@@ -145,7 +140,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
 
     public function testNativeColumnModifyingOnSqlServer()
     {
-        $blueprint = $this->getBlueprint(new SqlServerGrammar, 'users', function ($table) {
+        $blueprint = $this->getBlueprint('SqlServer', 'users', function ($table) {
             $table->timestamp('added_at', 4)->nullable(false)->useCurrent()->change();
         });
 
@@ -155,7 +150,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
             'alter table "users" add default CURRENT_TIMESTAMP for "added_at"',
         ], $blueprint->toSql());
 
-        $blueprint = $this->getBlueprint(new SqlServerGrammar, 'users', function ($table) {
+        $blueprint = $this->getBlueprint('SqlServer', 'users', function ($table) {
             $table->char('name', 40)->nullable()->default('easy')->collation('unicode')->change();
         });
 
@@ -165,7 +160,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
             'alter table "users" add default \'easy\' for "name"',
         ], $blueprint->toSql());
 
-        $blueprint = $this->getBlueprint(new SqlServerGrammar, 'users', function ($table) {
+        $blueprint = $this->getBlueprint('SqlServer', 'users', function ($table) {
             $table->integer('foo')->change();
         });
 
@@ -181,11 +176,11 @@ class DatabaseSchemaBlueprintTest extends TestCase
             $table->string('age');
         });
 
-        $blueprint = $this->getBlueprint(new SQLiteGrammar, 'users', function ($table) {
+        $blueprint = $this->getBlueprint('SQLite', 'users', function ($table) {
             $table->integer('age')->collation('RTRIM')->change();
         });
 
-        $blueprint2 = $this->getBlueprint(new SQLiteGrammar, 'users', function ($table) {
+        $blueprint2 = $this->getBlueprint('SQLite', 'users', function ($table) {
             $table->integer('age')->collation('NOCASE')->change();
         });
 
@@ -231,7 +226,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
             'alter table "__temp__users" rename to "users"',
         ];
 
-        $this->assertEquals($expected, $getSql(new SQLiteGrammar));
+        $this->assertEquals($expected, $getSql('SQLite'));
     }
 
     public function testChangingPrimaryAutoincrementColumnsToNonAutoincrementColumnsWork()
@@ -253,7 +248,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
             'alter table "__temp__users" rename to "users"',
         ];
 
-        $this->assertEquals($expected, $getSql(new SQLiteGrammar));
+        $this->assertEquals($expected, $getSql('SQLite'));
     }
 
     public function testChangingDoubleColumnsWork()
@@ -275,7 +270,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
             'alter table "__temp__products" rename to "products"',
         ];
 
-        $this->assertEquals($expected, $getSql(new SQLiteGrammar));
+        $this->assertEquals($expected, $getSql('SQLite'));
     }
 
     public function testChangingColumnsWithDefaultWorks()
@@ -300,7 +295,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
             'alter table "__temp__products" rename to "products"',
         ];
 
-        $this->assertEquals($expected, $getSql(new SQLiteGrammar));
+        $this->assertEquals($expected, $getSql('SQLite'));
     }
 
     public function testRenameIndexWorks()
@@ -324,25 +319,25 @@ class DatabaseSchemaBlueprintTest extends TestCase
             'create index "index2" on "users" ("name")',
         ];
 
-        $this->assertEquals($expected, $getSql(new SQLiteGrammar));
+        $this->assertEquals($expected, $getSql('SQLite'));
 
         $expected = [
             'sp_rename N\'"users"."index1"\', "index2", N\'INDEX\'',
         ];
 
-        $this->assertEquals($expected, $getSql(new SqlServerGrammar));
+        $this->assertEquals($expected, $getSql('SqlServer'));
 
         $expected = [
             'alter table `users` rename index `index1` to `index2`',
         ];
 
-        $this->assertEquals($expected, $getSql(new MySqlGrammar));
+        $this->assertEquals($expected, $getSql('MySql'));
 
         $expected = [
             'alter index "index1" rename to "index2"',
         ];
 
-        $this->assertEquals($expected, $getSql(new PostgresGrammar));
+        $this->assertEquals($expected, $getSql('Postgres'));
     }
 
     public function testAddUniqueIndexWithoutNameWorks()
@@ -362,7 +357,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
             'alter table `users` add unique `users_name_unique`(`name`)',
         ];
 
-        $this->assertEquals($expected, $getSql(new MySqlGrammar));
+        $this->assertEquals($expected, $getSql('MySql'));
 
         $expected = [
             'alter table "users" alter column "name" type varchar(255), alter column "name" drop not null, alter column "name" drop default, alter column "name" drop identity if exists',
@@ -370,7 +365,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
             'comment on column "users"."name" is NULL',
         ];
 
-        $this->assertEquals($expected, $getSql(new PostgresGrammar));
+        $this->assertEquals($expected, $getSql('Postgres'));
 
         $expected = [
             'create table "__temp__users" ("name" varchar)',
@@ -380,7 +375,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
             'create unique index "users_name_unique" on "users" ("name")',
         ];
 
-        $this->assertEquals($expected, $getSql(new SQLiteGrammar));
+        $this->assertEquals($expected, $getSql('SQLite'));
 
         $expected = [
             "DECLARE @sql NVARCHAR(MAX) = '';SELECT @sql += 'ALTER TABLE \"users\" DROP CONSTRAINT ' + OBJECT_NAME([default_object_id]) + ';' FROM sys.columns WHERE [object_id] = OBJECT_ID(N'\"users\"') AND [name] in ('name') AND [default_object_id] <> 0;EXEC(@sql)",
@@ -388,7 +383,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
             'create unique index "users_name_unique" on "users" ("name")',
         ];
 
-        $this->assertEquals($expected, $getSql(new SqlServerGrammar));
+        $this->assertEquals($expected, $getSql('SqlServer'));
     }
 
     public function testAddUniqueIndexWithNameWorks()
@@ -408,7 +403,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
             'alter table `users` add unique `index1`(`name`)',
         ];
 
-        $this->assertEquals($expected, $getSql(new MySqlGrammar));
+        $this->assertEquals($expected, $getSql('MySql'));
 
         $expected = [
             'alter table "users" alter column "name" type integer, alter column "name" drop not null, alter column "name" drop default, alter column "name" drop identity if exists',
@@ -416,7 +411,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
             'comment on column "users"."name" is NULL',
         ];
 
-        $this->assertEquals($expected, $getSql(new PostgresGrammar));
+        $this->assertEquals($expected, $getSql('Postgres'));
 
         $expected = [
             'create table "__temp__users" ("name" integer)',
@@ -426,7 +421,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
             'create unique index "index1" on "users" ("name")',
         ];
 
-        $this->assertEquals($expected, $getSql(new SQLiteGrammar));
+        $this->assertEquals($expected, $getSql('SQLite'));
 
         $expected = [
             "DECLARE @sql NVARCHAR(MAX) = '';SELECT @sql += 'ALTER TABLE \"users\" DROP CONSTRAINT ' + OBJECT_NAME([default_object_id]) + ';' FROM sys.columns WHERE [object_id] = OBJECT_ID(N'\"users\"') AND [name] in ('name') AND [default_object_id] <> 0;EXEC(@sql)",
@@ -434,7 +429,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
             'create unique index "index1" on "users" ("name")',
         ];
 
-        $this->assertEquals($expected, $getSql(new SqlServerGrammar));
+        $this->assertEquals($expected, $getSql('SqlServer'));
     }
 
     public function testAddColumnNamedCreateWorks()
@@ -464,22 +459,22 @@ class DatabaseSchemaBlueprintTest extends TestCase
 
         $this->assertContains(
             'alter table `users` drop index `users_name_unique`',
-            $getSql(new MySqlGrammar),
+            $getSql('MySql'),
         );
 
         $this->assertContains(
             'alter table "users" drop constraint "users_name_unique"',
-            $getSql(new PostgresGrammar),
+            $getSql('Postgres'),
         );
 
         $this->assertContains(
             'drop index "users_name_unique"',
-            $getSql(new SQLiteGrammar),
+            $getSql('SQLite'),
         );
 
         $this->assertContains(
             'drop index "users_name_unique" on "users"',
-            $getSql(new SqlServerGrammar),
+            $getSql('SqlServer'),
         );
     }
 
@@ -515,12 +510,14 @@ class DatabaseSchemaBlueprintTest extends TestCase
     }
 
     protected function getBlueprint(
-        Grammar $grammar,
+        string $grammar,
         string $table,
         Closure $callback,
     ): Blueprint {
-        $connection = DB::connection()->setSchemaGrammar($grammar);
-        $grammar->setConnection($connection);
+        $grammarClass = 'Illuminate\Database\Schema\Grammars\\'.$grammar.'Grammar';
+
+        $connection = DB::connection();
+        $connection->setSchemaGrammar(new $grammarClass($connection));
 
         return new Blueprint($connection, $table, $callback);
     }
