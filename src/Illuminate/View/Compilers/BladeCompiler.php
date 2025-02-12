@@ -37,6 +37,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
         Concerns\CompilesStyles,
         Concerns\CompilesTranslations,
         Concerns\CompilesUseStatements,
+        Concerns\CompilesApplied,
         ReflectsClosures;
 
     /**
@@ -211,7 +212,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
             $contents .= ' ?>';
         }
 
-        return $contents."<?php /**PATH {$this->getPath()} ENDPATH**/ ?>";
+        return $contents . "<?php /**PATH {$this->getPath()} ENDPATH**/ ?>";
     }
 
     /**
@@ -302,7 +303,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
         return str_replace(
             ['##BEGIN-COMPONENT-CLASS##', '##END-COMPONENT-CLASS##'],
             '',
-            $result);
+            $result
+        );
     }
 
     /**
@@ -393,7 +395,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
     protected function storeVerbatimBlocks($value)
     {
         return preg_replace_callback('/(?<!@)@verbatim(\s*)(.*?)@endverbatim/s', function ($matches) {
-            return $matches[1].$this->storeRawBlock($matches[2]);
+            return $matches[1] . $this->storeRawBlock($matches[2]);
         }, $value);
     }
 
@@ -436,7 +438,9 @@ class BladeCompiler extends Compiler implements CompilerInterface
         }
 
         return (new ComponentTagCompiler(
-            $this->classComponentAliases, $this->classComponentNamespaces, $this
+            $this->classComponentAliases,
+            $this->classComponentNamespaces,
+            $this
         ))->compile($value);
     }
 
@@ -448,7 +452,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function restoreRawContent($result)
     {
-        $result = preg_replace_callback('/'.$this->getRawPlaceholder('(\d+)').'/', function ($matches) {
+        $result = preg_replace_callback('/' . $this->getRawPlaceholder('(\d+)') . '/', function ($matches) {
             return $this->rawBlocks[$matches[1]];
         }, $result);
 
@@ -477,7 +481,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
     protected function addFooters($result)
     {
         return ltrim($result, "\n")
-                ."\n".implode("\n", array_reverse($this->footer));
+            . "\n" . implode("\n", array_reverse($this->footer));
     }
 
     /**
@@ -538,23 +542,25 @@ class BladeCompiler extends Compiler implements CompilerInterface
             // Here we check to see if we have properly found the closing parenthesis by
             // regex pattern or not, and will recursively continue on to the next ")"
             // then check again until the tokenizer confirms we find the right one.
-            while (isset($match[4]) &&
-                   Str::endsWith($match[0], ')') &&
-                   ! $this->hasEvenNumberOfParentheses($match[0])) {
+            while (
+                isset($match[4]) &&
+                Str::endsWith($match[0], ')') &&
+                ! $this->hasEvenNumberOfParentheses($match[0])
+            ) {
                 if (($after = Str::after($template, $match[0])) === $template) {
                     break;
                 }
 
                 $rest = Str::before($after, ')');
 
-                if (isset($matches[0][$i + 1]) && Str::contains($rest.')', $matches[0][$i + 1])) {
+                if (isset($matches[0][$i + 1]) && Str::contains($rest . ')', $matches[0][$i + 1])) {
                     unset($matches[0][$i + 1]);
                     $i++;
                 }
 
-                $match[0] = $match[0].$rest.')';
-                $match[3] = $match[3].$rest.')';
-                $match[4] = $match[4].$rest;
+                $match[0] = $match[0] . $rest . ')';
+                $match[3] = $match[3] . $rest . ')';
+                $match[4] = $match[4] . $rest;
             }
 
             [$template, $offset] = $this->replaceFirstStatement(
@@ -605,7 +611,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function hasEvenNumberOfParentheses(string $expression)
     {
-        $tokens = token_get_all('<?php '.$expression);
+        $tokens = token_get_all('<?php ' . $expression);
 
         if (Arr::last($tokens) !== ')') {
             return false;
@@ -634,16 +640,16 @@ class BladeCompiler extends Compiler implements CompilerInterface
     protected function compileStatement($match)
     {
         if (str_contains($match[1], '@')) {
-            $match[0] = isset($match[3]) ? $match[1].$match[3] : $match[1];
+            $match[0] = isset($match[3]) ? $match[1] . $match[3] : $match[1];
         } elseif (isset($this->customDirectives[$match[1]])) {
             $match[0] = $this->callCustomDirective($match[1], Arr::get($match, 3));
-        } elseif (method_exists($this, $method = 'compile'.ucfirst($match[1]))) {
+        } elseif (method_exists($this, $method = 'compile' . ucfirst($match[1]))) {
             $match[0] = $this->$method(Arr::get($match, 3));
         } else {
             return $match[0];
         }
 
-        return isset($match[3]) ? $match[0] : $match[0].$match[2];
+        return isset($match[3]) ? $match[0] : $match[0] . $match[2];
     }
 
     /**
@@ -713,23 +719,23 @@ class BladeCompiler extends Compiler implements CompilerInterface
 
         $this->directive($name, function ($expression) use ($name) {
             return $expression !== ''
-                    ? "<?php if (\Illuminate\Support\Facades\Blade::check('{$name}', {$expression})): ?>"
-                    : "<?php if (\Illuminate\Support\Facades\Blade::check('{$name}')): ?>";
+                ? "<?php if (\Illuminate\Support\Facades\Blade::check('{$name}', {$expression})): ?>"
+                : "<?php if (\Illuminate\Support\Facades\Blade::check('{$name}')): ?>";
         });
 
-        $this->directive('unless'.$name, function ($expression) use ($name) {
+        $this->directive('unless' . $name, function ($expression) use ($name) {
             return $expression !== ''
                 ? "<?php if (! \Illuminate\Support\Facades\Blade::check('{$name}', {$expression})): ?>"
                 : "<?php if (! \Illuminate\Support\Facades\Blade::check('{$name}')): ?>";
         });
 
-        $this->directive('else'.$name, function ($expression) use ($name) {
+        $this->directive('else' . $name, function ($expression) use ($name) {
             return $expression !== ''
                 ? "<?php elseif (\Illuminate\Support\Facades\Blade::check('{$name}', {$expression})): ?>"
                 : "<?php elseif (\Illuminate\Support\Facades\Blade::check('{$name}')): ?>";
         });
 
-        $this->directive('end'.$name, function () {
+        $this->directive('end' . $name, function () {
             return '<?php endif; ?>';
         });
     }
@@ -762,14 +768,14 @@ class BladeCompiler extends Compiler implements CompilerInterface
 
         if (is_null($alias)) {
             $alias = str_contains($class, '\\View\\Components\\')
-                            ? (new Collection(explode('\\', Str::after($class, '\\View\\Components\\'))))->map(function ($segment) {
-                                return Str::kebab($segment);
-                            })->implode(':')
-                            : Str::kebab(class_basename($class));
+                ? (new Collection(explode('\\', Str::after($class, '\\View\\Components\\'))))->map(function ($segment) {
+                    return Str::kebab($segment);
+                })->implode(':')
+                : Str::kebab(class_basename($class));
         }
 
         if (! empty($prefix)) {
-            $alias = $prefix.'-'.$alias;
+            $alias = $prefix . '-' . $alias;
         }
 
         $this->classComponentAliases[$alias] = $class;
@@ -897,11 +903,11 @@ class BladeCompiler extends Compiler implements CompilerInterface
 
         $this->directive($alias, function ($expression) use ($path) {
             return $expression
-                        ? "<?php \$__env->startComponent('{$path}', {$expression}); ?>"
-                        : "<?php \$__env->startComponent('{$path}'); ?>";
+                ? "<?php \$__env->startComponent('{$path}', {$expression}); ?>"
+                : "<?php \$__env->startComponent('{$path}'); ?>";
         });
 
-        $this->directive('end'.$alias, function ($expression) {
+        $this->directive('end' . $alias, function ($expression) {
             return '<?php echo $__env->renderComponent(); ?>';
         });
     }
