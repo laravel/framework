@@ -291,12 +291,24 @@ class ApplicationBuilder
             }
 
             if ($priorityAppends = $middleware->getMiddlewarePriorityAppends()) {
+                foreach ($priorityAppends as $newMiddleware) {
+                    $kernel->appendToMiddlewarePriority($newMiddleware);
+                }
+            }
+
+            if ($priorityPrepends = $middleware->getMiddlewarePriorityPrepends()) {
+                foreach ($priorityPrepends as $newMiddleware) {
+                    $kernel->prependToMiddlewarePriority($newMiddleware);
+                }
+            }
+
+            if ($priorityAppends = $middleware->getMiddlewarePriorityRelativeAppends()) {
                 foreach ($priorityAppends as $newMiddleware => $after) {
                     $kernel->addToMiddlewarePriorityAfter($after, $newMiddleware);
                 }
             }
 
-            if ($priorityPrepends = $middleware->getMiddlewarePriorityPrepends()) {
+            if ($priorityPrepends = $middleware->getMiddlewarePriorityRelativePrepends()) {
                 foreach ($priorityPrepends as $newMiddleware => $before) {
                     $kernel->addToMiddlewarePriorityBefore($before, $newMiddleware);
                 }
