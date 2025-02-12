@@ -151,5 +151,4 @@ class HasAttributesWithSnakeCaseConsistentCheck extends Model
     {
         return 'foo2Bar';
     }
-
 }
