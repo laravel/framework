@@ -2020,8 +2020,7 @@ class Str
     public static function isEmail($value)
     {
 
-        if (!is_string($value) || filter_var($value, FILTER_VALIDATE_EMAIL) === false)
-        {
+        if (!is_string($value) || filter_var($value, FILTER_VALIDATE_EMAIL) === false){
             return false;
         }
 
