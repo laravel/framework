@@ -101,6 +101,7 @@
         "ext-gmp": "*",
         "ably/ably-php": "^1.0",
         "aws/aws-sdk-php": "^3.322.9",
+        "composer-phar/php-cs-fixer": "^3.68",
         "fakerphp/faker": "^1.24",
         "guzzlehttp/promises": "^2.0.3",
         "guzzlehttp/psr7": "^2.4",
@@ -204,7 +205,8 @@
         "sort-packages": true,
         "allow-plugins": {
             "composer/package-versions-deprecated": true,
-            "php-http/discovery": false
+            "php-http/discovery": false,
+            "pestphp/pest-plugin": false
         }
     },
     "minimum-stability": "stable",
