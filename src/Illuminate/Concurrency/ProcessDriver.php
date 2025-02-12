@@ -46,10 +46,27 @@ class ProcessDriver implements Driver
 
             $result = json_decode($result->output(), true);
 
+            $pattern = "/throw new ([\\\\\w]+)\((.+)\)/";
+
+            if (preg_match($pattern, $result['file'], $matches)) {
+                $argumentsString = $matches[2];
+
+                $arguments = eval("return [$argumentsString];");
+            } else {
+                echo "No match found.";
+            }
+
             if (! $result['successful']) {
-                throw new $result['exception'](
-                    $result['message']
-                );
+                if (isset($arguments)) {
+                    throw new $result['exception'](
+                        ...
+                        $arguments
+                    );
+                } else {
+                    throw new $result['exception'](
+                        $result['message']
+                    );
+                }
             }
 
             return unserialize($result['result']);
