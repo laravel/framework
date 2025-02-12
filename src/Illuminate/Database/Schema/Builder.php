@@ -126,12 +126,12 @@ class Builder
      *
      * @param  string  $name
      * @return bool
-     *
-     * @throws \LogicException
      */
     public function createDatabase($name)
     {
-        throw new LogicException('This database driver does not support creating databases.');
+        return $this->connection->statement(
+            $this->grammar->compileCreateDatabase($name)
+        );
     }
 
     /**
@@ -139,12 +139,12 @@ class Builder
      *
      * @param  string  $name
      * @return bool
-     *
-     * @throws \LogicException
      */
     public function dropDatabaseIfExists($name)
     {
-        throw new LogicException('This database driver does not support dropping databases.');
+        return $this->connection->statement(
+            $this->grammar->compileDropDatabaseIfExists($name)
+        );
     }
 
     /**
@@ -630,13 +630,11 @@ class Builder
     {
         $connection = $this->connection;
 
-        $prefix = $connection->getConfig('prefix_indexes') ? $connection->getConfig('prefix') : '';
-
         if (isset($this->resolver)) {
-            return call_user_func($this->resolver, $connection, $table, $callback, $prefix);
+            return call_user_func($this->resolver, $connection, $table, $callback);
         }
 
-        return Container::getInstance()->make(Blueprint::class, compact('connection', 'table', 'callback', 'prefix'));
+        return Container::getInstance()->make(Blueprint::class, compact('connection', 'table', 'callback'));
     }
 
     /**
@@ -696,19 +694,6 @@ class Builder
     public function getConnection()
     {
         return $this->connection;
-    }
-
-    /**
-     * Set the database connection instance.
-     *
-     * @param  \Illuminate\Database\Connection  $connection
-     * @return $this
-     */
-    public function setConnection(Connection $connection)
-    {
-        $this->connection = $connection;
-
-        return $this;
     }
 
     /**

@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Database;
 
 use BadMethodCallException;
 use Closure;
+use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\Eloquent\Builder;
@@ -1000,11 +1001,6 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->getQuery()->shouldReceive('raw')->once()->with('bar')->andReturn('foo');
 
         $this->assertSame('foo', $builder->raw('bar'));
-
-        $builder = $this->getBuilder();
-        $grammar = new Grammar;
-        $builder->getQuery()->shouldReceive('getGrammar')->once()->andReturn($grammar);
-        $this->assertSame($grammar, $builder->getGrammar());
     }
 
     public function testQueryScopes()
@@ -2323,7 +2319,9 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         Carbon::setTestNow($now = '2017-10-10 10:10:10');
 
-        $query = new BaseBuilder(m::mock(ConnectionInterface::class), new Grammar, m::mock(Processor::class));
+        $connection = m::mock(Connection::class);
+        $connection->shouldReceive('getTablePrefix')->andReturn('');
+        $query = new BaseBuilder($connection, new Grammar($connection), m::mock(Processor::class));
         $builder = new Builder($query);
         $model = new EloquentBuilderTestStub;
         $this->mockConnectionForModel($model, '');
@@ -2337,7 +2335,9 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     public function testUpdateWithTimestampValue()
     {
-        $query = new BaseBuilder(m::mock(ConnectionInterface::class), new Grammar, m::mock(Processor::class));
+        $connection = m::mock(Connection::class);
+        $connection->shouldReceive('getTablePrefix')->andReturn('');
+        $query = new BaseBuilder($connection, new Grammar($connection), m::mock(Processor::class));
         $builder = new Builder($query);
         $model = new EloquentBuilderTestStub;
         $this->mockConnectionForModel($model, '');
@@ -2351,7 +2351,9 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     public function testUpdateWithQualifiedTimestampValue()
     {
-        $query = new BaseBuilder(m::mock(ConnectionInterface::class), new Grammar, m::mock(Processor::class));
+        $connection = m::mock(Connection::class);
+        $connection->shouldReceive('getTablePrefix')->andReturn('');
+        $query = new BaseBuilder($connection, new Grammar($connection), m::mock(Processor::class));
         $builder = new Builder($query);
         $model = new EloquentBuilderTestStub;
         $this->mockConnectionForModel($model, '');
@@ -2365,7 +2367,9 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     public function testUpdateWithoutTimestamp()
     {
-        $query = new BaseBuilder(m::mock(ConnectionInterface::class), new Grammar, m::mock(Processor::class));
+        $connection = m::mock(Connection::class);
+        $connection->shouldReceive('getTablePrefix')->andReturn('');
+        $query = new BaseBuilder($connection, new Grammar($connection), m::mock(Processor::class));
         $builder = new Builder($query);
         $model = new EloquentBuilderTestStubWithoutTimestamp;
         $this->mockConnectionForModel($model, '');
@@ -2381,7 +2385,9 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         Carbon::setTestNow($now = '2017-10-10 10:10:10');
 
-        $query = new BaseBuilder(m::mock(ConnectionInterface::class), new Grammar, m::mock(Processor::class));
+        $connection = m::mock(Connection::class);
+        $connection->shouldReceive('getTablePrefix')->andReturn('');
+        $query = new BaseBuilder($connection, new Grammar($connection), m::mock(Processor::class));
         $builder = new Builder($query);
         $model = new EloquentBuilderTestStub;
         $this->mockConnectionForModel($model, '');
@@ -2397,7 +2403,9 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         Carbon::setTestNow($now = '2017-10-10 10:10:10');
 
-        $query = new BaseBuilder(m::mock(ConnectionInterface::class), new Grammar, m::mock(Processor::class));
+        $connection = m::mock(Connection::class);
+        $connection->shouldReceive('getTablePrefix')->andReturn('');
+        $query = new BaseBuilder($connection, new Grammar($connection), m::mock(Processor::class));
         $builder = new Builder($query);
         $model = new EloquentBuilderTestStub;
         $this->mockConnectionForModel($model, '');
@@ -2501,7 +2509,9 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     public function testClone()
     {
-        $query = new BaseBuilder(m::mock(ConnectionInterface::class), new Grammar, m::mock(Processor::class));
+        $connection = m::mock(Connection::class);
+        $connection->shouldReceive('getTablePrefix')->andReturn('');
+        $query = new BaseBuilder($connection, new Grammar($connection), m::mock(Processor::class));
         $builder = new Builder($query);
         $builder->select('*')->from('users');
         $clone = $builder->clone()->where('email', 'foo');
@@ -2594,9 +2604,11 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         $grammarClass = 'Illuminate\Database\Query\Grammars\\'.$database.'Grammar';
         $processorClass = 'Illuminate\Database\Query\Processors\\'.$database.'Processor';
-        $grammar = new $grammarClass;
         $processor = new $processorClass;
-        $connection = m::mock(ConnectionInterface::class, ['getQueryGrammar' => $grammar, 'getPostProcessor' => $processor]);
+        $connection = m::mock(Connection::class, ['getPostProcessor' => $processor]);
+        $grammar = new $grammarClass($connection);
+        $connection->shouldReceive('getQueryGrammar')->andReturn($grammar);
+        $connection->shouldReceive('getTablePrefix')->andReturn('');
         $connection->shouldReceive('query')->andReturnUsing(function () use ($connection, $grammar, $processor) {
             return new BaseBuilder($connection, $grammar, $processor);
         });

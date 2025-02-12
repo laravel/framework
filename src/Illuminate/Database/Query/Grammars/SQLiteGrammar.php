@@ -439,12 +439,12 @@ class SQLiteGrammar extends Grammar
      */
     public function compileTruncate(Builder $query)
     {
-        [$schema, $table] = $this->connection->getSchemaBuilder()->parseSchemaAndTable($query->from);
+        [$schema, $table] = $query->getConnection()->getSchemaBuilder()->parseSchemaAndTable($query->from);
 
         $schema = $schema ? $this->wrapValue($schema).'.' : '';
 
         return [
-            'delete from '.$schema.'sqlite_sequence where name = ?' => [$this->getTablePrefix().$table],
+            'delete from '.$schema.'sqlite_sequence where name = ?' => [$query->getConnection()->getTablePrefix().$table],
             'delete from '.$this->wrapTable($query->from) => [],
         ];
     }

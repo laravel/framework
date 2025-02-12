@@ -2,7 +2,6 @@
 
 namespace Illuminate\Database\Schema\Grammars;
 
-use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Fluent;
 
@@ -13,16 +12,15 @@ class MariaDbGrammar extends MySqlGrammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $command
-     * @param  \Illuminate\Database\Connection  $connection
      * @return array|string
      */
-    public function compileRenameColumn(Blueprint $blueprint, Fluent $command, Connection $connection)
+    public function compileRenameColumn(Blueprint $blueprint, Fluent $command)
     {
-        if (version_compare($connection->getServerVersion(), '10.5.2', '<')) {
-            return $this->compileLegacyRenameColumn($blueprint, $command, $connection);
+        if (version_compare($this->connection->getServerVersion(), '10.5.2', '<')) {
+            return $this->compileLegacyRenameColumn($blueprint, $command);
         }
 
-        return parent::compileRenameColumn($blueprint, $command, $connection);
+        return parent::compileRenameColumn($blueprint, $command);
     }
 
     /**
