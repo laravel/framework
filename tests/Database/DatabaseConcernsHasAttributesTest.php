@@ -51,7 +51,7 @@ class DatabaseConcernsHasAttributesTest extends TestCase
         $this->assertTrue(json_last_error() === JSON_ERROR_NONE);
     }
 
-    public function testAppendToArrayHandlesAliases()
+    public function testAppendToArrayHandlesAttributeAliases()
     {
         $instance = new HasCacheableAttributeWithAccessor();
 
