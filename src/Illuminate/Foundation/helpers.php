@@ -109,7 +109,7 @@ if (! function_exists('app')) {
     /**
      * Get the available container instance.
      *
-     * @template TClass
+     * @template TClass of object
      *
      * @param  string|class-string<TClass>|null  $abstract
      * @param  array  $parameters
@@ -793,7 +793,7 @@ if (! function_exists('resolve')) {
     /**
      * Resolve a service from the container.
      *
-     * @template TClass
+     * @template TClass of object
      *
      * @param  string|class-string<TClass>  $name
      * @param  array  $parameters

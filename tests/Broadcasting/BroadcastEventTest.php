@@ -2,12 +2,14 @@
 
 namespace Illuminate\Tests\Broadcasting;
 
+use Exception;
 use Illuminate\Broadcasting\BroadcastEvent;
 use Illuminate\Broadcasting\InteractsWithBroadcasting;
 use Illuminate\Contracts\Broadcasting\Broadcaster;
 use Illuminate\Contracts\Broadcasting\Factory as BroadcastingFactory;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Throwable;
 
 class BroadcastEventTest extends TestCase
 {
@@ -85,6 +87,39 @@ class BroadcastEventTest extends TestCase
         $event = new TestBroadcastEventWithChannelsPerConnection;
 
         (new BroadcastEvent($event))->handle($manager);
+    }
+
+    public function testMiddlewareProxiesMiddlewareFromUnderlyingEvent()
+    {
+        $event = new class
+        {
+            public function middleware(): array
+            {
+                return ['foo', 'bar'];
+            }
+        };
+
+        $job = new BroadcastEvent($event);
+
+        $this->assertSame(['foo', 'bar'], $job->middleware());
+    }
+
+    public function testMiddlewareProxiesFailedHandlerFromUnderlyingEvent()
+    {
+        $event = new class
+        {
+            public function failed(?Throwable $e = null): void
+            {
+                $e->validateCall();
+            }
+        };
+
+        $job = new BroadcastEvent($event);
+
+        $exception = m::mock(Exception::class);
+        $exception->expects('validateCall');
+
+        $job->failed($exception);
     }
 }
 

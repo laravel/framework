@@ -6,7 +6,7 @@ $collection = User::all();
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection);
 
 assertType('User|null', $collection->find(1));
-assertType('string|User', $collection->find(1, 'string'));
+assertType("'string'|User", $collection->find(1, 'string'));
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->find([1]));
 
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->load('string'));
