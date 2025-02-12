@@ -816,6 +816,21 @@ class TestResponse implements ArrayAccess
     }
 
     /**
+     * Assert that the response contains the given JSON fragments.
+     *
+     * @param  array  $data
+     * @return $this
+     */
+    public function assertJsonFragments(array $data)
+    {
+        foreach ($data as $fragment) {
+            $this->assertJsonFragment($fragment);
+        }
+
+        return $this;
+    }
+
+    /**
      * Assert that the response contains the given JSON fragment.
      *
      * @param  array  $data
