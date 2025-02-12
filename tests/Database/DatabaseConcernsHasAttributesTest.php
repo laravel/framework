@@ -51,6 +51,17 @@ class DatabaseConcernsHasAttributesTest extends TestCase
         $this->assertTrue(json_last_error() === JSON_ERROR_NONE);
     }
 
+    public function testAppendToArrayHandlesAliases()
+    {
+        $instance = new HasCacheableAttributeWithAccessor();
+
+        $instance->append('_cacheable_property');
+        $instance->append('cacheableproperty');
+        $instance->append('cacheable_property');
+
+        $this->assertEquals(['_cacheable_property' => 'foo', 'cacheableproperty' => 'foo', 'cacheable_property' => 'foo'], $instance->attributesToArray());
+    }
+
     public function testUnsettingCachedAttribute()
     {
         $instance = new HasCacheableAttributeWithAccessor();
