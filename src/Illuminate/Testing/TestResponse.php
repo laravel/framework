@@ -533,6 +533,36 @@ class TestResponse implements ArrayAccess
     }
 
     /**
+     * Assert that the response was streamed.
+     *
+     * @return $this
+     */
+    public function assertStreamed()
+    {
+        PHPUnit::withResponse($this)->assertTrue(
+            $this->baseResponse instanceof StreamedResponse || $this->baseResponse instanceof StreamedJsonResponse,
+            'Expected the response to be streamed, but it wasn\'t.'
+        );
+
+        return $this;
+    }
+
+    /**
+     * Assert that the response was not streamed.
+     *
+     * @return $this
+     */
+    public function assertNotStreamed()
+    {
+        PHPUnit::withResponse($this)->assertTrue(
+            ! $this->baseResponse instanceof StreamedResponse && ! $this->baseResponse instanceof StreamedJsonResponse,
+            'Response was unexpectedly streamed.'
+        );
+
+        return $this;
+    }
+
+    /**
      * Assert that the given string matches the streamed response content.
      *
      * @param  string  $value
