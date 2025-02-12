@@ -250,7 +250,8 @@ class BusPendingBatchTest extends TestCase
         new PendingBatch(
             new Container,
             new Collection([
-                function() {}
+                function () {
+                },
             ])
         );
         $this->expectNotToPerformAssertions();
