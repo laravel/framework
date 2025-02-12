@@ -78,6 +78,7 @@ class DatabaseConcernsHasAttributesTest extends TestCase
         $this->assertEquals('foo2Bar', $instance->getAttribute('foo2Bar'));
         $this->assertEquals('foo2Bar', $instance->getAttribute('foo2bar'));
         $this->assertEquals('foo2Bar', $instance->getAttribute('foo_2_bar'));
+        $this->assertEquals('foo2Bar', $instance->getAttribute('foo2_bar'));
         $this->assertEquals('foo2Bar', $instance->getAttribute('foo_2bar'));
     }
 }
