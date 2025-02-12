@@ -3,6 +3,8 @@
 namespace Illuminate\Support;
 
 use Closure;
+use Egulias\EmailValidator\EmailValidator;
+use Egulias\EmailValidator\Validation\RFCValidation;
 use Illuminate\Support\Traits\Macroable;
 use JsonException;
 use League\CommonMark\Environment\Environment;
@@ -18,8 +20,6 @@ use Symfony\Component\Uid\Ulid;
 use Throwable;
 use Traversable;
 use voku\helper\ASCII;
-use Egulias\EmailValidator\EmailValidator;
-use Egulias\EmailValidator\Validation\RFCValidation;
 
 class Str
 {

@@ -1678,11 +1678,7 @@ class SupportStrTest extends TestCase
         $this->assertFalse(Str::isEmail('user.@domain.com'));
         $this->assertFalse(Str::isEmail('user..name@domain.com'));
         $this->assertFalse(Str::isEmail('user@sub_domain.com'));
-        
     }
-
-
-
 }
 
 class StringableObjectStub
