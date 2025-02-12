@@ -36,7 +36,6 @@ class ContextIntegrationTest extends TestCase
                 'model' => 'O:45:"Illuminate\Contracts\Database\ModelIdentifier":5:{s:5:"class";s:31:"Illuminate\Foundation\Auth\User";s:2:"id";i:1;s:9:"relations";a:0:{}s:10:"connection";s:7:"testing";s:15:"collectionClass";N;}',
                 'number' => 'i:55;',
             ],
-            'hidden' => [],
         ], $dehydrated);
 
         Context::flush();
@@ -47,6 +46,7 @@ class ContextIntegrationTest extends TestCase
         $this->assertTrue($user->is(Context::get('model')));
         $this->assertNotSame($user, Context::get('model'));
         $this->assertSame(55, Context::get('number'));
+        $this->assertSame([], Context::allHidden());
     }
 
     public function test_it_ignores_deleted_models_when_hydrating()
