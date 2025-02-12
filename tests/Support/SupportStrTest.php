@@ -1650,7 +1650,7 @@ class SupportStrTest extends TestCase
         $this->assertTrue(Str::isEmail('user_name@domain.com'));
         $this->assertTrue(Str::isEmail('user-name@domain.io'));
         $this->assertTrue(Str::isEmail('user@localhost'));
-        $this->assertTrue(Str::isEmail('user@123.123.123.123')); 
+        $this->assertTrue(Str::isEmail('user@123.123.123.123'));
         $this->assertTrue(Str::isEmail('"user@name"@example.com'));
         $this->assertTrue(Str::isEmail('"john.doe"@example.com'));
         $this->assertTrue(Str::isEmail('very.common@example.com'));
