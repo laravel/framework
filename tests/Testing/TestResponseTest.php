@@ -1416,6 +1416,20 @@ class TestResponseTest extends TestCase
         $response->assertJsonFragment(['id' => 10]);
     }
 
+    public function testAssertJsonFragments()
+    {
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
+
+        $response->assertJsonFragments([
+            ['foo' => 'foo 0'],
+        ]);
+
+        $response->assertJsonFragments([
+            ['foo' => 'foo 0'],
+            ['foo' => 'foo 1'],
+        ]);
+    }
+
     public function testAssertJsonFragmentCanFail()
     {
         $this->expectException(AssertionFailedError::class);
