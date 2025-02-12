@@ -2022,7 +2022,7 @@ class Str
     public static function isEmail(string $value): bool
     {
         $validator = new EmailValidator();
-        
+
         return $validator->isValid($value, new RFCValidation());
     }
 
