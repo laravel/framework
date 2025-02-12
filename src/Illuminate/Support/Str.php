@@ -2012,6 +2012,24 @@ class Str
     }
 
     /**
+     * Determine if a given value is a valid Email.
+     *
+     * @param  mixed  $value
+     * @return bool
+     */
+    public static function isEmail($value)
+    {
+
+        if (!is_string($value) || filter_var($value, FILTER_VALIDATE_EMAIL) === false)
+        {
+            return false;
+        }
+
+        $tld = substr(strrchr($value, '.'), 1);
+        return strlen($tld) >= 2;
+    }
+
+    /**
      * Remove all strings from the casing caches.
      *
      * @return void

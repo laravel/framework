@@ -1637,6 +1637,34 @@ class SupportStrTest extends TestCase
             $this->assertSame($expected, Str::chopEnd($subject, $needle));
         }
     }
+
+    public function testIsEmail()
+    {
+        // Valid email cases
+        $this->assertTrue(Str::isEmail('example@laravel.com'));
+        $this->assertTrue(Str::isEmail('user.name+alias@domain.co.uk'));
+        $this->assertTrue(Str::isEmail('123456@domain.com'));
+        $this->assertTrue(Str::isEmail('user@sub.domain.com'));
+        $this->assertTrue(Str::isEmail('a@b.co'));
+        $this->assertTrue(Str::isEmail('user@domain.org'));
+
+        // Invalid email cases
+        $this->assertFalse(Str::isEmail('example.laravel.com'));
+        $this->assertFalse(Str::isEmail('example@laravel'));
+        $this->assertFalse(Str::isEmail('example@.com'));
+        $this->assertFalse(Str::isEmail('example@com.'));
+        $this->assertFalse(Str::isEmail('example@domain..com'));
+        $this->assertFalse(Str::isEmail(' example@laravel.com '));
+        $this->assertFalse(Str::isEmail('@domain.com'));
+        $this->assertFalse(Str::isEmail('example@domain.com@another.com'));
+        $this->assertFalse(Str::isEmail('example@domain.c'));
+        $this->assertFalse(Str::isEmail('example@domain.com.'));
+        $this->assertFalse(Str::isEmail('example@domain#com'));
+        $this->assertFalse(Str::isEmail('example@domain.com!'));
+        $this->assertFalse(Str::isEmail('example@domain.com@com'));
+        $this->assertFalse(Str::isEmail('user@sub.-domain.com'));
+        $this->assertFalse(Str::isEmail('user@subdomain.com.'));
+    }
 }
 
 class StringableObjectStub
