@@ -2,25 +2,25 @@
 
 namespace Illuminate\Support;
 
- use Closure;
- use Egulias\EmailValidator\EmailValidator;
- use Egulias\EmailValidator\Validation\RFCValidation;
- use Illuminate\Support\Traits\Macroable;
- use Illuminate\Validation\Rules\EmailValidation;
- use JsonException;
- use League\CommonMark\Environment\Environment;
- use League\CommonMark\Extension\GithubFlavoredMarkdownExtension;
- use League\CommonMark\Extension\InlinesOnly\InlinesOnlyExtension;
- use League\CommonMark\GithubFlavoredMarkdownConverter;
- use League\CommonMark\MarkdownConverter;
- use Ramsey\Uuid\Codec\TimestampFirstCombCodec;
- use Ramsey\Uuid\Generator\CombGenerator;
- use Ramsey\Uuid\Uuid;
- use Ramsey\Uuid\UuidFactory;
- use Symfony\Component\Uid\Ulid;
- use Throwable;
- use Traversable;
- use voku\helper\ASCII;
+use Closure;
+use Egulias\EmailValidator\EmailValidator;
+use Egulias\EmailValidator\Validation\RFCValidation;
+use Illuminate\Support\Traits\Macroable;
+use Illuminate\Validation\Rules\EmailValidation;
+use JsonException;
+use League\CommonMark\Environment\Environment;
+use League\CommonMark\Extension\GithubFlavoredMarkdownExtension;
+use League\CommonMark\Extension\InlinesOnly\InlinesOnlyExtension;
+use League\CommonMark\GithubFlavoredMarkdownConverter;
+use League\CommonMark\MarkdownConverter;
+use Ramsey\Uuid\Codec\TimestampFirstCombCodec;
+use Ramsey\Uuid\Generator\CombGenerator;
+use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidFactory;
+use Symfony\Component\Uid\Ulid;
+use Throwable;
+use Traversable;
+use voku\helper\ASCII;
 
 class Str
 {
