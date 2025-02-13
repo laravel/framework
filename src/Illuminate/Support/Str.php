@@ -2032,10 +2032,11 @@ class Str
      * @param  mixed  $value
      * @return bool
      */
-   public static function isEmail(string $value, ?EmailValidation $rule = null): bool
-   {
-       $validator = new EmailValidator();
-       $validationRule = $rule?->validation() ?? new RFCValidation();
-       return $validator->isValid($value, $validationRule);
-   }
+    public static function isEmail(string $value, ?EmailValidation $rule = null): bool
+    {
+        $validator = new EmailValidator();
+        $validationRule = $rule?->validation() ?? new RFCValidation();
+
+        return $validator->isValid($value, $validationRule);
+    }
 }
