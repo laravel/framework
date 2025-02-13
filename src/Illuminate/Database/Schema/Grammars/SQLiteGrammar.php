@@ -354,7 +354,7 @@ class SQLiteGrammar extends Grammar
         $table = $this->wrapTable($blueprint);
         $columnNames = implode(', ', $columnNames);
 
-        $foreignKeyConstraintsEnabled = $this->connection->scalar('pragma foreign_keys');
+        $foreignKeyConstraintsEnabled = $this->connection->scalar($this->pragma('foreign_keys'));
 
         return array_filter(array_merge([
             $foreignKeyConstraintsEnabled ? $this->compileDisableForeignKeyConstraints() : null,
@@ -511,11 +511,14 @@ class SQLiteGrammar extends Grammar
     /**
      * Compile the SQL needed to rebuild the database.
      *
+     * @param  string|null  $schema
      * @return string
      */
-    public function compileRebuild()
+    public function compileRebuild($schema = null)
     {
-        return 'vacuum';
+        return sprintf('vacuum %s',
+            $this->wrapValue($schema ?? 'main')
+        );
     }
 
     /**
@@ -672,7 +675,7 @@ class SQLiteGrammar extends Grammar
      */
     public function compileEnableForeignKeyConstraints()
     {
-        return $this->pragma('foreign_keys', 'ON');
+        return $this->pragma('foreign_keys', 1);
     }
 
     /**
@@ -682,72 +685,22 @@ class SQLiteGrammar extends Grammar
      */
     public function compileDisableForeignKeyConstraints()
     {
-        return $this->pragma('foreign_keys', 'OFF');
+        return $this->pragma('foreign_keys', 0);
     }
 
     /**
-     * Compile the command to set the busy timeout.
+     * Get the SQL to get or set a PRAGMA value.
      *
-     * @param  int  $milliseconds
-     * @return string
-     */
-    public function compileSetBusyTimeout($milliseconds)
-    {
-        return $this->pragma('busy_timeout', $milliseconds);
-    }
-
-    /**
-     * Compile the command to set the journal mode.
-     *
-     * @param  string  $mode
-     * @return string
-     */
-    public function compileSetJournalMode($mode)
-    {
-        return $this->pragma('journal_mode', $mode);
-    }
-
-    /**
-     * Compile the command to set the synchronous mode.
-     *
-     * @param  string  $mode
-     * @return string
-     */
-    public function compileSetSynchronous($mode)
-    {
-        return $this->pragma('synchronous', $mode);
-    }
-
-    /**
-     * Compile the SQL needed to enable a writable schema.
-     *
-     * @return string
-     */
-    public function compileEnableWriteableSchema()
-    {
-        return $this->pragma('writable_schema', 1);
-    }
-
-    /**
-     * Compile the SQL needed to disable a writable schema.
-     *
-     * @return string
-     */
-    public function compileDisableWriteableSchema()
-    {
-        return $this->pragma('writable_schema', 0);
-    }
-
-    /**
-     * Get the SQL to set a PRAGMA value.
-     *
-     * @param  string  $name
+     * @param  string  $key
      * @param  mixed  $value
      * @return string
      */
-    protected function pragma(string $name, mixed $value): string
+    public function pragma(string $key, mixed $value = null): string
     {
-        return sprintf('PRAGMA %s = %s;', $name, $value);
+        return sprintf('pragma %s%s',
+            $key,
+            is_null($value) ? '' : ' = '.$value
+        );
     }
 
     /**
