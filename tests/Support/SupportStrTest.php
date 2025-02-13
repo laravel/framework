@@ -3,12 +3,13 @@
 namespace Illuminate\Tests\Support;
 
 use Exception;
-use Illuminate\Support\Str;
-use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\TestCase;
-use Ramsey\Uuid\UuidInterface;
-use ReflectionClass;
 use ValueError;
+use ReflectionClass;
+use Illuminate\Support\Str;
+use Ramsey\Uuid\UuidInterface;
+use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use Illuminate\Validation\Rules\EmailValidation;
 
 class SupportStrTest extends TestCase
 {
@@ -1636,6 +1637,121 @@ class SupportStrTest extends TestCase
 
             $this->assertSame($expected, Str::chopEnd($subject, $needle));
         }
+    }
+
+    public function testValidEmails()
+    {
+        // Standard valid email formats according to RFC 5322
+        $this->assertTrue(Str::isEmail('example@laravel.com'));
+        $this->assertTrue(Str::isEmail('user.name+alias@domain.co.uk'));
+        $this->assertTrue(Str::isEmail('123456@domain.com'));
+        $this->assertTrue(Str::isEmail('user@sub.domain.com'));
+        $this->assertTrue(Str::isEmail('a@b.co'));
+        $this->assertTrue(Str::isEmail('user@domain.org'));
+        $this->assertTrue(Str::isEmail('user_name@domain.com'));
+        $this->assertTrue(Str::isEmail('user-name@domain.io'));
+        $this->assertTrue(Str::isEmail('user@localhost'));
+        $this->assertTrue(Str::isEmail('user@123.123.123.123'));
+        $this->assertTrue(Str::isEmail('"user@name"@example.com'));
+        $this->assertTrue(Str::isEmail('"john.doe"@example.com'));
+        $this->assertTrue(Str::isEmail('very.common@example.com'));
+        $this->assertTrue(Str::isEmail('disposable.style.email.with+symbol@example.com'));
+        $this->assertTrue(Str::isEmail('user@domain.toolongtld'));
+        $this->assertTrue(Str::isEmail('user@domain.c'));
+        $this->assertTrue(Str::isEmail('user@[192.168.1.1]'));
+
+        $this->assertFalse(Str::isEmail('plainaddress'));
+        $this->assertFalse(Str::isEmail('@missinglocal.com'));
+        $this->assertFalse(Str::isEmail('username@.com'));
+        $this->assertFalse(Str::isEmail('username@com.'));
+        $this->assertFalse(Str::isEmail('username@domain..com'));
+        $this->assertFalse(Str::isEmail('user@domain,com'));
+        $this->assertFalse(Str::isEmail('user@domain@another.com'));
+        $this->assertFalse(Str::isEmail('username@-domain.com'));
+        $this->assertFalse(Str::isEmail('username@domain-.com'));
+        $this->assertFalse(Str::isEmail('user@domain.com '));
+        $this->assertFalse(Str::isEmail(' user@domain.com'));
+        $this->assertFalse(Str::isEmail('username@domain.com#'));
+        $this->assertFalse(Str::isEmail('username@domain..com'));
+        $this->assertFalse(Str::isEmail('user@sub..domain.com'));
+        $this->assertFalse(Str::isEmail('user@.com'));
+        $this->assertFalse(Str::isEmail('"user@name"@example..com'));
+        $this->assertFalse(Str::isEmail('user.@domain.com'));
+        $this->assertFalse(Str::isEmail('user..name@domain.com'));
+        $this->assertFalse(Str::isEmail('user@sub_domain.com'));
+
+    }
+
+    public function testValidEmailsWithRfc()
+    {
+        $this->assertTrue(Str::isEmail('example@laravel.com', EmailValidation::Rfc));
+        $this->assertTrue(Str::isEmail('user.name+alias@domain.co.uk', EmailValidation::Rfc));
+        $this->assertTrue(Str::isEmail('123456@domain.com', EmailValidation::Rfc));
+        $this->assertTrue(Str::isEmail('user@sub.domain.com', EmailValidation::Rfc));
+        $this->assertTrue(Str::isEmail('a@b.co', EmailValidation::Rfc));
+
+
+        $this->assertFalse(Str::isEmail('plainaddress', EmailValidation::Rfc));
+        $this->assertFalse(Str::isEmail('@missinglocal.com', EmailValidation::Rfc));
+        $this->assertFalse(Str::isEmail('username@.com', EmailValidation::Rfc));
+        $this->assertFalse(Str::isEmail('username@com.', EmailValidation::Rfc));
+
+    }
+
+    public function testValidEmailsWithStrict()
+    {
+        $this->assertTrue(Str::isEmail('example@laravel.com', EmailValidation::Strict));
+        $this->assertTrue(Str::isEmail('user.name+alias@domain.co.uk', EmailValidation::Strict));
+        $this->assertTrue(Str::isEmail('123456@domain.com', EmailValidation::Strict));
+        $this->assertTrue(Str::isEmail('user@sub.domain.com', EmailValidation::Strict));
+        $this->assertTrue(Str::isEmail('a@b.co', EmailValidation::Strict));
+
+        $this->assertFalse(Str::isEmail('plainaddress', EmailValidation::Strict));
+        $this->assertFalse(Str::isEmail('@missinglocal.com', EmailValidation::Strict));
+        $this->assertFalse(Str::isEmail('username@.com', EmailValidation::Strict));
+        $this->assertFalse(Str::isEmail('username@com.', EmailValidation::Strict));
+        $this->assertFalse(Str::isEmail('user@sub..domain.com', EmailValidation::Strict));
+    }
+
+    public function testValidEmailsWithDns()
+    {
+        $this->assertTrue(Str::isEmail('example@gmail.com', EmailValidation::Dns));
+        $this->assertTrue(Str::isEmail('user@yahoo.com', EmailValidation::Dns));
+        $this->assertTrue(Str::isEmail('info@microsoft.com', EmailValidation::Dns));
+        $this->assertTrue(Str::isEmail('support@apple.com', EmailValidation::Dns));
+        $this->assertTrue(Str::isEmail('admin@github.io', EmailValidation::Dns));
+
+        $this->assertFalse(Str::isEmail('user@invalid-domain.xyz', EmailValidation::Dns));
+        $this->assertFalse(Str::isEmail('noreply@localhost', EmailValidation::Dns));
+        $this->assertFalse(Str::isEmail('admin@12345.6789', EmailValidation::Dns));
+        $this->assertFalse(Str::isEmail('hello@example..com', EmailValidation::Dns));
+        $this->assertFalse(Str::isEmail('contact@invalid.test', EmailValidation::Dns));
+        $this->assertFalse(Str::isEmail('admin@nonexistent.tld', EmailValidation::Dns));
+    }
+
+    public function testValidEmailsWithSpoof()
+    {
+        $this->assertTrue(Str::isEmail('user@example.com', EmailValidation::Spoof));
+        $this->assertTrue(Str::isEmail('john.doe@sub.domain.com', EmailValidation::Spoof));
+        $this->assertTrue(Str::isEmail('normal123@secure-site.net', EmailValidation::Spoof));
+        $this->assertTrue(Str::isEmail('hello@valid.co.uk', EmailValidation::Spoof));
+        $this->assertTrue(Str::isEmail('contact@trusted.org', EmailValidation::Spoof));
+    }
+
+    public function testValidEmailsWithFilter()
+    {
+        $this->assertTrue(Str::isEmail('example@laravel.com', EmailValidation::Filter));
+        $this->assertTrue(Str::isEmail('user.name+alias@domain.co.uk', EmailValidation::Filter));
+        $this->assertTrue(Str::isEmail('123456@domain.com', EmailValidation::Filter));
+        $this->assertTrue(Str::isEmail('user@sub.domain.com', EmailValidation::Filter));
+        $this->assertTrue(Str::isEmail('a@b.co', EmailValidation::Filter));
+
+        $this->assertFalse(Str::isEmail('plainaddress', EmailValidation::Filter)); // Missing @ symbol
+        $this->assertFalse(Str::isEmail('@missinglocal.com', EmailValidation::Filter)); // Missing local part
+        $this->assertFalse(Str::isEmail('username@.com', EmailValidation::Filter)); // Invalid domain part
+        $this->assertFalse(Str::isEmail('username@com.', EmailValidation::Filter)); // Invalid domain end
+        $this->assertFalse(Str::isEmail('missingdomain@.com', EmailValidation::Filter)); // Missing domain name before the dot
+        $this->assertFalse(Str::isEmail('missingatsign.com', EmailValidation::Filter)); // Missing @ symbol
     }
 }
 
