@@ -329,6 +329,15 @@ class PendingProcess
     }
 
     /**
+     * Returns whether TTY is supported on the current operating system.
+     *
+     * @return bool
+     */
+    public function isTtySupported() {
+        return Process::isTtySupported();
+    }
+
+    /**
      * Specify the fake process result handlers for the pending process.
      *
      * @param  array  $fakeHandlers
