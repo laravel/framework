@@ -3,21 +3,24 @@
 namespace Illuminate\Support;
 
 use Closure;
-use Illuminate\Support\Traits\Macroable;
-use JsonException;
-use League\CommonMark\Environment\Environment;
-use League\CommonMark\Extension\GithubFlavoredMarkdownExtension;
-use League\CommonMark\Extension\InlinesOnly\InlinesOnlyExtension;
-use League\CommonMark\GithubFlavoredMarkdownConverter;
-use League\CommonMark\MarkdownConverter;
-use Ramsey\Uuid\Codec\TimestampFirstCombCodec;
-use Ramsey\Uuid\Generator\CombGenerator;
-use Ramsey\Uuid\Uuid;
-use Ramsey\Uuid\UuidFactory;
-use Symfony\Component\Uid\Ulid;
 use Throwable;
 use Traversable;
+use JsonException;
+use Ramsey\Uuid\Uuid;
 use voku\helper\ASCII;
+use Ramsey\Uuid\UuidFactory;
+use Symfony\Component\Uid\Ulid;
+use Illuminate\Support\Traits\Macroable;
+use League\CommonMark\MarkdownConverter;
+use Ramsey\Uuid\Generator\CombGenerator;
+use Egulias\EmailValidator\EmailValidator;
+use League\CommonMark\Environment\Environment;
+use Ramsey\Uuid\Codec\TimestampFirstCombCodec;
+use Illuminate\Validation\Rules\EmailValidation;
+use Egulias\EmailValidator\Validation\RFCValidation;
+use League\CommonMark\GithubFlavoredMarkdownConverter;
+use League\CommonMark\Extension\GithubFlavoredMarkdownExtension;
+use League\CommonMark\Extension\InlinesOnly\InlinesOnlyExtension;
 
 class Str
 {
@@ -2022,4 +2025,17 @@ class Str
         static::$camelCache = [];
         static::$studlyCache = [];
     }
+
+    /**
+     * Determine if a given value is a valid Email.
+     *
+     * @param  mixed  $value
+     * @return bool
+     */
+   public static function isEmail(string $value, ?EmailValidation $rule = null): bool
+   {
+       $validator = new EmailValidator();
+       $validationRule = $rule?->validation() ?? new RFCValidation();
+       return $validator->isValid($value, $validationRule);
+   }
 }
