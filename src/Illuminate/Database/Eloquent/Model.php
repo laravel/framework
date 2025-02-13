@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Eloquent;
 
 use ArrayAccess;
+use Closure;
 use Illuminate\Contracts\Broadcasting\HasBroadcastChannel;
 use Illuminate\Contracts\Queue\QueueableCollection;
 use Illuminate\Contracts\Queue\QueueableEntity;
@@ -217,6 +218,13 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     protected static $isBroadcasting = true;
 
     /**
+     * Customizes the model after is completely booted and instanced.
+     *
+     * @var array<class-string, (\Closure(static):void)>
+     */
+    protected static $customizations = [];
+
+    /**
      * The Eloquent query builder class to use for the model.
      *
      * @var class-string<\Illuminate\Database\Eloquent\Builder<*>>
@@ -259,6 +267,10 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         $this->syncOriginal();
 
         $this->fill($attributes);
+
+        if (isset(static::$customizations[static::class])) {
+            (static::$customizations[static::class])($this);
+        }
     }
 
     /**
@@ -515,6 +527,18 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         } finally {
             static::$isBroadcasting = $isBroadcasting;
         }
+    }
+
+
+    /**
+     * Sets a callback to execute after the model is fully booted and initialized.
+     *
+     * @param  (\Closure(static):void)|null  $customization
+     * @return void
+     */
+    public static function customize($customization)
+    {
+        static::$customizations[static::class] = $customization;
     }
 
     /**

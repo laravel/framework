@@ -3217,6 +3217,21 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals(EloquentModelWithUseFactoryAttribute::class, $factory->modelName());
         $this->assertEquals('test name', $instance->name); // Small smoke test to ensure the factory is working
     }
+
+    public function testCustomizableCallback()
+    {
+        EloquentModelWithCustomization::customize(function (EloquentModelWithCustomization $model) {
+            $model->setTable('test_table');
+        });
+
+        $this->assertSame('test_table', (new EloquentModelWithCustomization)->getTable());
+        $this->assertNotSame('test_table', (new EloquentModelStub)->getTable());
+
+        EloquentModelWithCustomization::customize(null);
+
+        $this->assertNotSame('test_table', (new EloquentModelWithCustomization)->getTable());
+        $this->assertNotSame('test_table', (new EloquentModelStub)->getTable());
+    }
 }
 
 class EloquentTestObserverStub
@@ -4029,4 +4044,9 @@ class EloquentModelWithUseFactoryAttributeFactory extends Factory
 class EloquentModelWithUseFactoryAttribute extends Model
 {
     use HasFactory;
+}
+
+class EloquentModelWithCustomization extends Model
+{
+    // ...
 }
