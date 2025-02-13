@@ -2,12 +2,12 @@
 
 namespace Illuminate\Validation\Rules;
 
-use Egulias\EmailValidator\Validation\RFCValidation;
 use Egulias\EmailValidator\Validation\DNSCheckValidation;
-use Illuminate\Validation\Concerns\FilterEmailValidation;
-use Egulias\EmailValidator\Validation\NoRFCWarningsValidation;
-use Egulias\EmailValidator\Validation\Extra\SpoofCheckValidation;
 use Egulias\EmailValidator\Validation\EmailValidation as EguliasEmailValidation;
+use Egulias\EmailValidator\Validation\Extra\SpoofCheckValidation;
+use Egulias\EmailValidator\Validation\NoRFCWarningsValidation;
+use Egulias\EmailValidator\Validation\RFCValidation;
+use Illuminate\Validation\Concerns\FilterEmailValidation;
 
 enum EmailValidation
 {
@@ -17,7 +17,7 @@ enum EmailValidation
     case Filter;
     case Rfc;
 
-    public function validation() : EguliasEmailValidation
+    public function validation(): EguliasEmailValidation
     {
         return match ($this) {
             self::Strict => new NoRFCWarningsValidation(),
