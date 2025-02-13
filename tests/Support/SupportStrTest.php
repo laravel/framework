@@ -1746,12 +1746,12 @@ class SupportStrTest extends TestCase
         $this->assertTrue(Str::isEmail('user@sub.domain.com', EmailValidation::Filter));
         $this->assertTrue(Str::isEmail('a@b.co', EmailValidation::Filter));
 
-        $this->assertFalse(Str::isEmail('plainaddress', EmailValidation::Filter)); // Missing @ symbol
-        $this->assertFalse(Str::isEmail('@missinglocal.com', EmailValidation::Filter)); // Missing local part
-        $this->assertFalse(Str::isEmail('username@.com', EmailValidation::Filter)); // Invalid domain part
-        $this->assertFalse(Str::isEmail('username@com.', EmailValidation::Filter)); // Invalid domain end
-        $this->assertFalse(Str::isEmail('missingdomain@.com', EmailValidation::Filter)); // Missing domain name before the dot
-        $this->assertFalse(Str::isEmail('missingatsign.com', EmailValidation::Filter)); // Missing @ symbol
+        $this->assertFalse(Str::isEmail('plainaddress', EmailValidation::Filter));
+        $this->assertFalse(Str::isEmail('@missinglocal.com', EmailValidation::Filter));
+        $this->assertFalse(Str::isEmail('username@.com', EmailValidation::Filter));
+        $this->assertFalse(Str::isEmail('username@com.', EmailValidation::Filter));
+        $this->assertFalse(Str::isEmail('missingdomain@.com', EmailValidation::Filter));
+        $this->assertFalse(Str::isEmail('missingatsign.com', EmailValidation::Filter));
     }
 }
 
