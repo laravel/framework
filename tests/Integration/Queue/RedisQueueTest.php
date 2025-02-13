@@ -9,8 +9,6 @@ use Illuminate\Queue\Events\JobQueued;
 use Illuminate\Queue\Events\JobQueueing;
 use Illuminate\Queue\Jobs\RedisJob;
 use Illuminate\Queue\RedisQueue;
-use Illuminate\Redis\Connections\PhpRedisClusterConnection;
-use Illuminate\Redis\Connections\PredisClusterConnection;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Str;
 use Mockery as m;
@@ -517,11 +515,6 @@ class RedisQueueTest extends TestCase
     #[DataProvider('redisDriverProvider')]
     public function testBulkJobQueuedEvent($driver)
     {
-        if ($this->redis[$driver]->connection() instanceof PhpRedisClusterConnection
-            || $this->redis[$driver]->connection() instanceof PredisClusterConnection
-        ) {
-            $this->markTestSkipped('RedisQueue::bulk currently does not support cluster connections');
-        }
         $events = m::mock(Dispatcher::class);
         $events->shouldReceive('dispatch')->with(m::type(JobQueueing::class))->andReturnNull()->times(3);
         $events->shouldReceive('dispatch')->with(m::type(JobQueued::class))->andReturnNull()->times(3);

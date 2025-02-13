@@ -263,6 +263,14 @@ class ContextTest extends TestCase
         $this->assertFalse(Context::has('unset'));
     }
 
+    public function test_it_can_check_if_context_is_missing()
+    {
+        Context::add('foo', 'bar');
+
+        $this->assertTrue(Context::missing('lorem'));
+        $this->assertFalse(Context::missing('foo'));
+    }
+
     public function test_it_can_check_if_value_is_in_context_stack()
     {
         Context::push('foo', 'bar', 'lorem');

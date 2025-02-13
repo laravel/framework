@@ -533,6 +533,36 @@ class TestResponse implements ArrayAccess
     }
 
     /**
+     * Assert that the response was streamed.
+     *
+     * @return $this
+     */
+    public function assertStreamed()
+    {
+        PHPUnit::withResponse($this)->assertTrue(
+            $this->baseResponse instanceof StreamedResponse || $this->baseResponse instanceof StreamedJsonResponse,
+            'Expected the response to be streamed, but it wasn\'t.'
+        );
+
+        return $this;
+    }
+
+    /**
+     * Assert that the response was not streamed.
+     *
+     * @return $this
+     */
+    public function assertNotStreamed()
+    {
+        PHPUnit::withResponse($this)->assertTrue(
+            ! $this->baseResponse instanceof StreamedResponse && ! $this->baseResponse instanceof StreamedJsonResponse,
+            'Response was unexpectedly streamed.'
+        );
+
+        return $this;
+    }
+
+    /**
      * Assert that the given string matches the streamed response content.
      *
      * @param  string  $value
@@ -781,6 +811,21 @@ class TestResponse implements ArrayAccess
     public function assertSimilarJson(array $data)
     {
         $this->decodeResponseJson()->assertSimilar($data);
+
+        return $this;
+    }
+
+    /**
+     * Assert that the response contains the given JSON fragments.
+     *
+     * @param  array  $data
+     * @return $this
+     */
+    public function assertJsonFragments(array $data)
+    {
+        foreach ($data as $fragment) {
+            $this->assertJsonFragment($fragment);
+        }
 
         return $this;
     }
@@ -1049,7 +1094,12 @@ class TestResponse implements ArrayAccess
      */
     public function decodeResponseJson()
     {
-        $testJson = new AssertableJsonString($this->getContent());
+        if ($this->baseResponse instanceof StreamedResponse ||
+            $this->baseResponse instanceof StreamedJsonResponse) {
+            $testJson = new AssertableJsonString($this->streamedContent());
+        } else {
+            $testJson = new AssertableJsonString($this->getContent());
+        }
 
         $decodedResponse = $testJson->json();
 
