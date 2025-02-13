@@ -1641,7 +1641,6 @@ class SupportStrTest extends TestCase
 
     public function testValidEmails()
     {
-        // Standard valid email formats according to RFC 5322
         $this->assertTrue(Str::isEmail('example@laravel.com'));
         $this->assertTrue(Str::isEmail('user.name+alias@domain.co.uk'));
         $this->assertTrue(Str::isEmail('123456@domain.com'));
@@ -1679,7 +1678,6 @@ class SupportStrTest extends TestCase
         $this->assertFalse(Str::isEmail('user.@domain.com'));
         $this->assertFalse(Str::isEmail('user..name@domain.com'));
         $this->assertFalse(Str::isEmail('user@sub_domain.com'));
-
     }
 
     public function testValidEmailsWithRfc()
@@ -1690,12 +1688,10 @@ class SupportStrTest extends TestCase
         $this->assertTrue(Str::isEmail('user@sub.domain.com', EmailValidation::Rfc));
         $this->assertTrue(Str::isEmail('a@b.co', EmailValidation::Rfc));
 
-
         $this->assertFalse(Str::isEmail('plainaddress', EmailValidation::Rfc));
         $this->assertFalse(Str::isEmail('@missinglocal.com', EmailValidation::Rfc));
         $this->assertFalse(Str::isEmail('username@.com', EmailValidation::Rfc));
         $this->assertFalse(Str::isEmail('username@com.', EmailValidation::Rfc));
-
     }
 
     public function testValidEmailsWithStrict()
