@@ -22,7 +22,6 @@ use RuntimeException;
 /**
  * @template TValue
  *
- * @mixin \Illuminate\Database\Eloquent\Builder
  * @mixin \Illuminate\Database\Query\Builder
  */
 trait BuildsQueries
