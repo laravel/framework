@@ -2,6 +2,8 @@
 
 namespace Illuminate\Database\Eloquent;
 
+use Illuminate\Database\Eloquent\Attributes\WithBuilder;
+
 /**
  * @template TBuilder of \Illuminate\Database\Eloquent\Builder
  */
@@ -25,7 +27,29 @@ trait HasBuilder
      */
     public function newEloquentBuilder($query)
     {
-        return parent::newEloquentBuilder($query);
+        $builderClass = $this->getBuilderClass($query);
+
+        return $builderClass ?? parent::newEloquentBuilder($query);
+    }
+
+    /**
+     * Get builder from the UseBuilder attribute.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @return TBuilder|null
+     */
+    protected static function getBuilderClass($query)
+    {
+        $attributes = (new \ReflectionClass(static::class))
+            ->getAttributes(WithBuilder::class);
+
+        if ($attributes !== []) {
+            $withBuilder = $attributes[0]->newInstance();
+
+            return new $withBuilder->builderClass($query);
+        }
+
+        return null;
     }
 
     /**

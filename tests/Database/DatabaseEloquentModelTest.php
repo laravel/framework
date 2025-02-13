@@ -12,12 +12,14 @@ use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Contracts\Database\Eloquent\CastsInboundAttributes;
 use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Illuminate\Database\Eloquent\Attributes\CollectedBy;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
+use Illuminate\Database\Eloquent\Attributes\WithBuilder;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\ArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
@@ -33,6 +35,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\HasBuilder;
 use Illuminate\Database\Eloquent\JsonEncodingException;
 use Illuminate\Database\Eloquent\MassAssignmentException;
 use Illuminate\Database\Eloquent\MissingAttributeException;
@@ -3217,6 +3220,30 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals(EloquentModelWithUseFactoryAttribute::class, $factory->modelName());
         $this->assertEquals('test name', $instance->name); // Small smoke test to ensure the factory is working
     }
+
+    public function testWithBuilderAttribute()
+    {
+        $db = new DB;
+        $db->addConnection(['driver' => 'sqlite', 'database' => ':memory:']);
+        $db->bootEloquent();
+        $db->setAsGlobal();
+
+        $model = new EloquentWithBuilderAttributeModel;
+        $this->assertInstanceOf(EloquentModelAttributeBuilder::class, $model->newQuery());
+        $this->assertInstanceOf(EloquentModelAttributeBuilder::class, $model::query());
+    }
+
+    public function testNewEloquentBuilderMethodTakesPriorityOverWithBuilderAttribute()
+    {
+        $db = new DB;
+        $db->addConnection(['driver' => 'sqlite', 'database' => ':memory:']);
+        $db->bootEloquent();
+        $db->setAsGlobal();
+
+        $model = new EloquentModelWithNewEloquentBuilderMethod;
+        $this->assertInstanceOf(EloquentModelBuilder::class, $model->newQuery());
+        $this->assertInstanceOf(EloquentModelBuilder::class, $model::query());
+    }
 }
 
 class EloquentTestObserverStub
@@ -4029,4 +4056,29 @@ class EloquentModelWithUseFactoryAttributeFactory extends Factory
 class EloquentModelWithUseFactoryAttribute extends Model
 {
     use HasFactory;
+}
+
+#[WithBuilder(EloquentModelAttributeBuilder::class)]
+class EloquentWithBuilderAttributeModel extends Model
+{
+    use HasBuilder;
+}
+
+#[WithBuilder(EloquentModelAttributeBuilder::class)]
+class EloquentModelWithNewEloquentBuilderMethod extends Model
+{
+    use HasBuilder;
+
+    public function newEloquentBuilder($query): EloquentModelBuilder
+    {
+        return new EloquentModelBuilder($query);
+    }
+}
+
+class EloquentModelAttributeBuilder extends Builder
+{
+}
+
+class EloquentModelBuilder extends Builder
+{
 }
