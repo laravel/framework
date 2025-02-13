@@ -86,7 +86,7 @@ class SupportJsTest extends TestCase
 
             public $bar = 'not world';
 
-            public function toJson($options = 0)
+            public function toJson(int $options = 0)
             {
                 return json_encode(['foo' => 'hello', 'bar' => 'world'], $options);
             }

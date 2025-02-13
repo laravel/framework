@@ -1675,7 +1675,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      *
      * @throws \Illuminate\Database\Eloquent\JsonEncodingException
      */
-    public function toJson($options = 0)
+    public function toJson(int $options = 0)
     {
         try {
             $json = json_encode($this->jsonSerialize(), $options | JSON_THROW_ON_ERROR);

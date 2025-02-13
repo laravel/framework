@@ -554,7 +554,7 @@ class Settings
         );
     }
 
-    public function toJson($options = 0): string
+    public function toJson(int $options = 0): string
     {
         return json_encode(['foo' => $this->foo, 'bar' => $this->bar], $options);
     }

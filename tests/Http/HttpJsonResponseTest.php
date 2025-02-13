@@ -112,7 +112,7 @@ class HttpJsonResponseTest extends TestCase
 
 class JsonResponseTestJsonableObject implements Jsonable
 {
-    public function toJson($options = 0)
+    public function toJson(int $options = 0)
     {
         return '{"foo":"bar"}';
     }

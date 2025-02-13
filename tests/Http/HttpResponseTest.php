@@ -242,7 +242,7 @@ class ArrayableStub implements Arrayable
 
 class ArrayableAndJsonableStub implements Arrayable, Jsonable
 {
-    public function toJson($options = 0)
+    public function toJson(int $options = 0)
     {
         return '{"foo":"bar"}';
     }
@@ -255,7 +255,7 @@ class ArrayableAndJsonableStub implements Arrayable, Jsonable
 
 class JsonableStub implements Jsonable
 {
-    public function toJson($options = 0)
+    public function toJson(int $options = 0)
     {
         return 'foo';
     }

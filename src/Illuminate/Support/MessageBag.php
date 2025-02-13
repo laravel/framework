@@ -427,7 +427,7 @@ class MessageBag implements Jsonable, JsonSerializable, MessageBagContract, Mess
      * @param  int  $options
      * @return string
      */
-    public function toJson($options = 0)
+    public function toJson(int $options = 0)
     {
         return json_encode($this->jsonSerialize(), $options);
     }
