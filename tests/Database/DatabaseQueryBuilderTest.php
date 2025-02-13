@@ -4141,6 +4141,72 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->shouldNotHaveReceived('update');
     }
 
+    public function testFirstOrInsertMethodRecordExists()
+    {
+        $builder = m::mock(Builder::class.'[where,first,insert]', [
+            m::mock(ConnectionInterface::class),
+            new Grammar,
+            m::mock(Processor::class),
+        ]);
+
+        $existingRecord = new stdClass();
+        $existingRecord->name = 'Existing User';
+        $existingRecord->email = 'foo@example.com';
+
+        $builder->shouldReceive('where')
+            ->once()
+            ->with(['email' => 'foo@example.com'])
+            ->andReturn(m::self());
+
+        $builder->shouldReceive('first')
+            ->once()
+            ->andReturn($existingRecord);
+
+        $builder->shouldNotReceive('insert');
+
+        $result = $builder->firstOrInsert(['email' => 'foo@example.com'], ['name' => 'New Name']);
+
+        $this->assertInstanceOf(stdClass::class, $result);
+        $this->assertEquals('Existing User', $result->name);
+        $this->assertEquals('foo@example.com', $result->email);
+    }
+
+    public function testFirstOrInsertMethodRecordDoesNotExist()
+    {
+        $builder = m::mock(Builder::class.'[where,first,insert]', [
+            m::mock(ConnectionInterface::class),
+            new Grammar,
+            m::mock(Processor::class),
+        ]);
+
+        $insertedRecord = new stdClass();
+        $insertedRecord->name = 'New User';
+        $insertedRecord->email = 'bar@example.com';
+
+        $builder->shouldReceive('where')
+            ->twice()
+            ->with(['email' => 'bar@example.com'])
+            ->andReturn(m::self());
+
+        $builder->shouldReceive('first')
+            ->once()
+            ->andReturn(null);
+
+        $builder->shouldReceive('insert')
+            ->once()
+            ->with(['email' => 'bar@example.com', 'name' => 'New User'])
+            ->andReturn(true);
+
+        $builder->shouldReceive('first')
+            ->once()->andReturn($insertedRecord);
+
+        $result = $builder->firstOrInsert(['email' => 'bar@example.com'], ['name' => 'New User']);
+
+        $this->assertInstanceOf(stdClass::class, $result);
+        $this->assertEquals('New User', $result->name);
+        $this->assertEquals('bar@example.com', $result->email);
+    }
+
     public function testDeleteMethod()
     {
         $builder = $this->getBuilder();

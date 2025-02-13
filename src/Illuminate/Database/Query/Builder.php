@@ -3916,6 +3916,26 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Get the first record matching the attributes or insert it.
+     *
+     * @param array $attributes
+     * @param array $values
+     * @return object
+     */
+    public function firstOrInsert(array $attributes, array $values = []): object
+    {
+        $record = $this->where($attributes)->first();
+
+        if ($record !== null) {
+            return $record;
+        }
+
+        $this->insert(array_merge($attributes, $values));
+
+        return $this->where($attributes)->first();
+    }
+
+    /**
      * Insert new records or update the existing ones.
      *
      * @param  array  $values
