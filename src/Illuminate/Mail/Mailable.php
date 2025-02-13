@@ -1595,6 +1595,23 @@ class Mailable implements MailableContract, Renderable
     }
 
     /**
+     * Assert that the mailable has the given view.
+     *
+     * @param  string  $view
+     * @return $this
+     */
+    public function assertViewIs($view)
+    {
+        PHPUnit::assertSame(
+            $this->view,
+            $view,
+            "Expected view [{$view}] is not the same as given view [{$this->view}]."
+        );
+
+        return $this;
+    }
+
+    /**
      * Render the HTML and plain-text version of the mailable into views for assertions.
      *
      * @return array

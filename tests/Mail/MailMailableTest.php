@@ -1171,6 +1171,45 @@ class MailMailableTest extends TestCase
         });
     }
 
+    public function testAssertViewIs()
+    {
+        $this->stubMailer();
+
+        $mailable = new class() extends Mailable
+        {
+            public function build()
+            {
+                //
+            }
+        };
+
+        try {
+            $mailable->assertViewIs('test');
+            $this->fail();
+        } catch (AssertionFailedError $e) {
+            $this->assertSame("Expected view [test] is not the same as given view [].\nFailed asserting that 'test' is identical to null.", $e->getMessage());
+        }
+
+        $mailable = new class() extends Mailable
+        {
+            public $view = 'test';
+        };
+
+        try {
+            $mailable->assertViewIs('tset');
+            $this->fail();
+        } catch (AssertionFailedError $e) {
+            $this->assertSame("Expected view [tset] is not the same as given view [test].\nFailed asserting that two strings are identical.", $e->getMessage());
+        }
+
+        $mailable = new class() extends Mailable
+        {
+            public $view = 'test';
+        };
+
+        $mailable->assertViewIs('test');
+    }
+
     protected function stubMailer()
     {
         Container::getInstance()->instance('mailer', new class
