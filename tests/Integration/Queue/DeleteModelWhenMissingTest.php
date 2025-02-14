@@ -8,13 +8,11 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Schema;
 use Orchestra\Testbench\Attributes\WithMigration;
 
 #[WithMigration]
 #[WithMigration('queue')]
-//#[WithMigration('cache')]
 class DeleteModelWhenMissingTest extends QueueTestCase
 {
     protected function defineEnvironment($app)
@@ -48,12 +46,13 @@ class DeleteModelWhenMissingTest extends QueueTestCase
     public function test_deleteModelWhenMissing_and_display_name(): void
     {
         $model = MyTestModel::query()->create(['name' => 'test']);
-        $this->assertNotNull(MyTestModel::first());
 
         DeleteMissingModelJob::dispatch($model);
+
         MyTestModel::query()->where('name', 'test')->delete();
-        $this->assertFalse(DeleteMissingModelJob::$handled);
+
         $this->runQueueWorkerCommand(['--once' => '1']);
+
         $this->assertFalse(DeleteMissingModelJob::$handled);
         $this->assertNull(\DB::table('failed_jobs')->first());
     }

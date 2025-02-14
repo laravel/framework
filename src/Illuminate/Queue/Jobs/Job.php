@@ -380,8 +380,6 @@ abstract class Job
         return JobName::resolveClassName($this->getName(), $this->payload());
     }
 
-
-
     /**
      * Get the name of the connection the job belongs to.
      *
