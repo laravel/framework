@@ -99,7 +99,13 @@ class ServeCommand extends Command
      */
     public function handle()
     {
-        $this->phpCliServerWorkers = env('PHP_CLI_SERVER_WORKERS', 1);
+        $this->phpCliServerWorkers = transform(env('PHP_CLI_SERVER_WORKERS', 1), function ($workers) {
+            if (! is_int($workers) || $workers < 2) {
+                return false;
+            }
+
+            return $workers > 1 && ! $this->option('no-reload') ? false : $workers;
+        });
 
         $environmentFile = $this->option('env')
             ? base_path('.env').'.'.$this->option('env')
@@ -110,10 +116,6 @@ class ServeCommand extends Command
         $environmentLastModified = $hasEnvironment
             ? filemtime($environmentFile)
             : now()->addDays(30)->getTimestamp();
-
-        if ($this->phpCliServerWorkers > 1 && ! $this->option('no-reload')) {
-            $this->phpCliServerWorkers = false;
-        }
 
         $process = $this->startProcess($hasEnvironment);
 
