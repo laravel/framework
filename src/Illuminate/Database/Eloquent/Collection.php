@@ -336,6 +336,62 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
+     * Lock the collection model records and refresh the attributes
+     *
+     * @param bool|string $value
+     * @param bool $refresh
+     * @return $this
+     */
+    public function lock($value = true, bool $refresh = true)
+    {
+        $ids = $this->filter->exists->map->getKey();
+
+        if ($ids->isEmpty()) {
+            return $this;
+        }
+
+        $refreshedModels = $this->first()
+            ->newQueryWithoutScopes()
+            ->whereIn($this->first()->getKeyName(), $ids)
+            ->useWritePdo()
+            ->lock($value)
+            ->get();
+
+        if ($refresh) {
+            foreach ($refreshedModels as $model) {
+                $original = $this->find($model);
+
+                $original->setRawAttributes($model->getAttributes());
+                $original->syncOriginal();
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Lock the collection model records for updating and refresh the attributes
+     *
+     * @param bool $refresh
+     * @return $this
+     */
+    public function lockForUpdate(bool $refresh = true)
+    {
+        return $this->lock(true, $refresh);
+    }
+
+    /**
+     * Share lock the collection model records and refresh the attributes
+     *
+     * @param bool $refresh
+     * @return $this
+     */
+    public function sharedLock(bool $refresh = true)
+    {
+        return $this->lock(false, $refresh);
+    }
+
+    /**
      * Get the array of primary keys.
      *
      * @return array<int, array-key>

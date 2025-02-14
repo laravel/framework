@@ -1743,6 +1743,56 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
+     * Lock the current model instance record and refresh the attributes
+     *
+     * @param bool|string $value
+     * @param bool $refresh
+     * @return $this
+     */
+    public function lock($value = true, bool $refresh = true)
+    {
+        if (! $this->exists) {
+            return $this;
+        }
+
+        $refreshedAttributes = $this->setKeysForSelectQuery($this->newQueryWithoutScopes())
+            ->useWritePdo()
+            ->lock($value)
+            ->firstOrFail()
+            ->attributes;
+
+        if ($refresh) {
+            $this->setRawAttributes($refreshedAttributes);
+
+            $this->syncOriginal();
+        }
+
+        return $this;
+    }
+
+    /**
+     * Lock the current model instance record for updating and refresh the attributes
+     *
+     * @param bool $refresh
+     * @return $this
+     */
+    public function lockForUpdate(bool $refresh = true)
+    {
+        return $this->lock(true, $refresh);
+    }
+
+    /**
+     * Share lock the current model instance record and refresh the attributes
+     *
+     * @param bool $refresh
+     * @return $this
+     */
+    public function sharedLock(bool $refresh = true)
+    {
+        return $this->lock(false, $refresh);
+    }
+
+    /**
      * Clone the model into a new, non-existing instance.
      *
      * @param  array|null  $except
