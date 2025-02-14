@@ -358,10 +358,16 @@ class Collection extends BaseCollection implements QueueableCollection
             ->get();
 
         if ($refresh) {
-            foreach ($refreshedModels as $model) {
-                $original = $this->find($model);
+            $refreshList = [];
 
-                $original->setRawAttributes($model->getAttributes());
+            foreach ($this as $original) {
+                if ($original->exists) {
+                    $refreshList[] = [$original, $refreshedModels->findOrFail($original)];
+                }
+            }
+
+            foreach ($refreshList as [$original, $new]) {
+                $original->setRawAttributes($new->getAttributes());
                 $original->syncOriginal();
             }
         }

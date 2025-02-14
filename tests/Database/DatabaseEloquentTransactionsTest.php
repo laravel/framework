@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Database;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
 
@@ -79,7 +80,7 @@ class DatabaseEloquentTransactionsTest extends TestCase
         $this->assertSame(['foo'], array_keys($record->getDirty()));
     }
 
-    public function testDontLockWhenRecordIsNotExists()
+    public function testDontLockWithNotExistsRecord()
     {
         $record = new EloquentTransactionModelStub([
             'foo' => 'Baz',
@@ -91,6 +92,18 @@ class DatabaseEloquentTransactionsTest extends TestCase
 
         $this->assertSame('Changed', $record->foo);
         $this->assertFalse($record->exists);
+    }
+
+    public function testLockWithMissingRecord()
+    {
+        $record = EloquentTransactionModelStub::create([
+            'foo' => 'Baz',
+        ]);
+
+        EloquentTransactionModelStub::whereKey($record)->delete();
+
+        $this->expectException(ModelNotFoundException::class);
+        DB::connection()->transaction(fn() => $record->lockForUpdate(true));
     }
 
     public function testCollectionLockWithRefresh()
@@ -141,29 +154,51 @@ class DatabaseEloquentTransactionsTest extends TestCase
         $this->assertSame(['foo'], array_keys($collection[2]->getDirty()));
     }
 
-    public function testCollectionLockWithMissingRecords()
+    public function testCollectionLockWithNotExistsRecords()
     {
         $collection = new Collection([
-            EloquentTransactionModelStub::create(['foo' => '1']),
-            EloquentTransactionModelStub::create(['foo' => '2']),
-            new EloquentTransactionModelStub(['foo' => '3']),
+            new EloquentTransactionModelStub(['foo' => '1']),
+            new EloquentTransactionModelStub(['foo' => '2']),
         ]);
-
-        $collection[1]->delete();
 
         $collection[0]->foo = 'Changed';
         $collection[1]->foo = 'Changed';
-        $collection[2]->foo = 'Changed';
 
         DB::connection()->transaction(fn() => $collection->lockForUpdate(true));
 
-        $this->assertSame(['1', 'Changed', 'Changed'], [
+        $this->assertSame(['Changed', 'Changed'], [
             $collection[0]->foo,
             $collection[1]->foo,
-            $collection[2]->foo,
         ]);
-        $this->assertSame([], array_keys($collection[0]->getDirty()));
-        $this->assertSame(['foo'], array_keys($collection[1]->getDirty()));
+    }
+
+    public function testCollectionLockWithMissingRecords()
+    {
+        $collection = new Collection([
+            EloquentTransactionModelStub::create(['foo' => 'Baz']),
+        ]);
+
+        EloquentTransactionModelStub::whereKey($collection[0])->delete();
+
+        $this->expectException(ModelNotFoundException::class);
+        DB::connection()->transaction(fn() => $collection->lockForUpdate(true));
+    }
+
+    public function testCollectionLockWithMissingRecordsShouldNotRefreshOthers()
+    {
+        $collection = new Collection([
+            EloquentTransactionModelStub::create(['foo' => 'Baz']),
+            EloquentTransactionModelStub::create(['foo' => 'Baz']),
+        ]);
+
+        EloquentTransactionModelStub::whereKey($collection[1])->delete();
+
+        try {
+            DB::connection()->transaction(fn() => $collection->lockForUpdate(true));
+        } catch (ModelNotFoundException) {
+        }
+
+        $this->assertSame('Baz', $collection[0]->foo);
     }
 }
 
