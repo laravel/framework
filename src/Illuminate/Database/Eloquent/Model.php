@@ -528,7 +528,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         }
     }
 
-
     /**
      * Sets a callback to execute after the model is fully booted and initialized.
      *
