@@ -662,6 +662,11 @@ class WorkerFakeJob implements QueueJobContract
     {
         return time() + 60;
     }
+
+    public function resolveQueuedJobClass()
+    {
+        return 'WorkerFakeJob';
+    }
 }
 
 class LoopBreakerException extends RuntimeException
