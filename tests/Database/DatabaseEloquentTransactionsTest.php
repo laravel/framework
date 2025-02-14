@@ -191,6 +191,7 @@ class DatabaseEloquentTransactionsTest extends TestCase
             EloquentTransactionModelStub::create(['foo' => 'Baz']),
         ]);
 
+        $collection[0]->foo = 'Changed';
         EloquentTransactionModelStub::whereKey($collection[1])->delete();
 
         try {
@@ -198,7 +199,7 @@ class DatabaseEloquentTransactionsTest extends TestCase
         } catch (ModelNotFoundException) {
         }
 
-        $this->assertSame('Baz', $collection[0]->foo);
+        $this->assertSame('Changed', $collection[0]->foo);
     }
 }
 
