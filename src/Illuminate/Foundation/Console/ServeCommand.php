@@ -88,7 +88,7 @@ class ServeCommand extends Command
     /**
      * The number of PHP_CLI_SERVER_WORKERS.
      *
-     * @var int|false
+     * @var int<2, max>|false
      */
     protected $phpServerWorkers = 1;
 
