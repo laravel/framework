@@ -76,13 +76,19 @@ class ServeCommand extends Command
         'IGNITION_LOCAL_SITES_PATH',
         'LARAVEL_SAIL',
         'PATH',
-        'PHP_CLI_SERVER_WORKERS',
         'PHP_IDE_CONFIG',
         'SYSTEMROOT',
         'XDEBUG_CONFIG',
         'XDEBUG_MODE',
         'XDEBUG_SESSION',
     ];
+
+    /**
+     * The number of PHP_CLI_SERVER_WORKERS.
+     *
+     * @var int|false
+     */
+    protected $phpCliServerWorkers = 1;
 
     /**
      * Execute the console command.
@@ -93,6 +99,8 @@ class ServeCommand extends Command
      */
     public function handle()
     {
+        $this->phpCliServerWorkers = env('PHP_CLI_SERVER_WORKERS', 1);
+
         $environmentFile = $this->option('env')
             ? base_path('.env').'.'.$this->option('env')
             : base_path('.env');
@@ -103,6 +111,10 @@ class ServeCommand extends Command
             ? filemtime($environmentFile)
             : now()->addDays(30)->getTimestamp();
 
+        if ($this->phpCliServerWorkers > 1 && ! $this->option('no-reload')) {
+            $this->phpCliServerWorkers = false;
+        }
+
         $process = $this->startProcess($hasEnvironment);
 
         while ($process->isRunning()) {
@@ -110,7 +122,8 @@ class ServeCommand extends Command
                 clearstatcache(false, $environmentFile);
             }
 
-            if (! $this->option('no-reload') &&
+            if (
+                ! $this->option('no-reload') &&
                 $hasEnvironment &&
                 filemtime($environmentFile) > $environmentLastModified) {
                 $environmentLastModified = filemtime($environmentFile);
@@ -154,7 +167,7 @@ class ServeCommand extends Command
             }
 
             return in_array($key, static::$passthroughVariables) ? [$key => $value] : [$key => false];
-        })->all());
+        })->merge(['PHP_CLI_SERVER_WORKERS' => $this->phpCliServerWorkers])->all());
 
         $this->trap(fn () => [SIGTERM, SIGINT, SIGHUP, SIGUSR1, SIGUSR2, SIGQUIT], function ($signal) use ($process) {
             if ($process->isRunning()) {
@@ -360,7 +373,7 @@ class ServeCommand extends Command
      */
     protected function getDateFromLine($line)
     {
-        $regex = ! windows_os() && env('PHP_CLI_SERVER_WORKERS', 1) > 1
+        $regex = ! windows_os() && $this->phpCliServerWorkers > 1
             ? '/^\[\d+]\s\[([a-zA-Z0-9: ]+)\]/'
             : '/^\[([^\]]+)\]/';
 
