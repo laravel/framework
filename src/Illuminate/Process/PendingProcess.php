@@ -329,11 +329,12 @@ class PendingProcess
     }
 
     /**
-     * Returns whether TTY is supported on the current operating system.
+     * Determine whether TTY is supported on the current operating system.
      *
      * @return bool
      */
-    public function isTtySupported() {
+    public function supportsTty()
+    {
         return Process::isTtySupported();
     }
 
