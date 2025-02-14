@@ -122,8 +122,7 @@ class ServeCommand extends Command
                 clearstatcache(false, $environmentFile);
             }
 
-            if (
-                ! $this->option('no-reload') &&
+            if (! $this->option('no-reload') &&
                 $hasEnvironment &&
                 filemtime($environmentFile) > $environmentLastModified) {
                 $environmentLastModified = filemtime($environmentFile);
