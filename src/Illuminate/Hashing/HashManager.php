@@ -67,7 +67,7 @@ class HashManager extends Manager implements Hasher
      * Check the given plain value against a hash.
      *
      * @param  string  $value
-     * @param  string  $hashedValue
+     * @param  string|null  $hashedValue
      * @param  array  $options
      * @return bool
      */
