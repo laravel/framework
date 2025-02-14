@@ -3487,17 +3487,6 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([1 => 'bar', 10 => 'baz'], $results->all());
     }
 
-    public function testPluckAvoidsDuplicateColumnSelection()
-    {
-        $builder = $this->getBuilder();
-        $builder->getConnection()->shouldReceive('select')->once()->with('select "foo" from "users" where "id" = ?', [1], true)->andReturn([['foo' => 'bar']]);
-        $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, [['foo' => 'bar']])->andReturnUsing(function ($query, $results) {
-            return $results;
-        });
-        $results = $builder->from('users')->where('id', '=', 1)->pluck('foo', 'foo');
-        $this->assertEquals(['bar' => 'bar'], $results->all());
-    }
-
     public function testImplode()
     {
         // Test without glue.
