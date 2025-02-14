@@ -682,8 +682,6 @@ class QueryBuilderTest extends DatabaseTestCase
         $this->assertSame('Bar Post', $result[1]->title);
         $this->assertSame('Foo Post', $result2[0]->title);
         $this->assertSame('Bar Post', $result2[1]->title);
-
-
     }
 
     protected function defineEnvironmentWouldThrowsPDOException($app)
