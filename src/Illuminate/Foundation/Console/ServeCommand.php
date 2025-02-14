@@ -103,6 +103,8 @@ class ServeCommand extends Command
 
             return $workers > 1 && ! $this->option('no-reload') ? false : $workers;
         });
+
+        parent::initialize($input, $output);
     }
 
     /**
