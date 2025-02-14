@@ -88,7 +88,7 @@ class ServeCommand extends Command
      *
      * @var int|false
      */
-    protected $phpCliServerWorkers = 1;
+    protected $phpServerWorkers = 1;
 
     /**
      * Execute the console command.
@@ -99,7 +99,7 @@ class ServeCommand extends Command
      */
     public function handle()
     {
-        $this->phpCliServerWorkers = transform(env('PHP_CLI_SERVER_WORKERS', 1), function ($workers) {
+        $this->phpServerWorkers = transform(env('PHP_CLI_SERVER_WORKERS', 1), function ($workers) {
             if (! is_int($workers) || $workers < 2) {
                 return false;
             }
@@ -168,7 +168,7 @@ class ServeCommand extends Command
             }
 
             return in_array($key, static::$passthroughVariables) ? [$key => $value] : [$key => false];
-        })->merge(['PHP_CLI_SERVER_WORKERS' => $this->phpCliServerWorkers])->all());
+        })->merge(['PHP_CLI_SERVER_WORKERS' => $this->phpServerWorkers])->all());
 
         $this->trap(fn () => [SIGTERM, SIGINT, SIGHUP, SIGUSR1, SIGUSR2, SIGQUIT], function ($signal) use ($process) {
             if ($process->isRunning()) {
@@ -374,7 +374,7 @@ class ServeCommand extends Command
      */
     protected function getDateFromLine($line)
     {
-        $regex = ! windows_os() && $this->phpCliServerWorkers > 1
+        $regex = ! windows_os() && $this->phpServerWorkers > 1
             ? '/^\[\d+]\s\[([a-zA-Z0-9: ]+)\]/'
             : '/^\[([^\]]+)\]/';
 
