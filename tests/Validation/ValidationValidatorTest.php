@@ -1865,7 +1865,6 @@ class ValidationValidatorTest extends TestCase
 
     public function testValidateProhibitedAcceptedIf()
     {
-        // Accepted Values
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['foo' => 'yes', 'bar' => 'baz'], ['bar' => 'prohibited_if_accepted:foo']);
         $this->assertTrue($v->fails());
