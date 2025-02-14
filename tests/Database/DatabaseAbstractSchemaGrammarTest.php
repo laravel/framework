@@ -4,7 +4,6 @@ namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Grammars\Grammar;
-use LogicException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -17,21 +16,17 @@ class DatabaseAbstractSchemaGrammarTest extends TestCase
 
     public function testCreateDatabase()
     {
-        $grammar = new class extends Grammar {};
+        $connection = m::mock(Connection::class);
+        $grammar = new class($connection) extends Grammar {};
 
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('This database driver does not support creating databases.');
-
-        $grammar->compileCreateDatabase('foo', m::mock(Connection::class));
+        $this->assertSame('create database "foo"', $grammar->compileCreateDatabase('foo'));
     }
 
     public function testDropDatabaseIfExists()
     {
-        $grammar = new class extends Grammar {};
+        $connection = m::mock(Connection::class);
+        $grammar = new class($connection) extends Grammar {};
 
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('This database driver does not support dropping databases.');
-
-        $grammar->compileDropDatabaseIfExists('foo');
+        $this->assertSame('drop database if exists "foo"', $grammar->compileDropDatabaseIfExists('foo'));
     }
 }

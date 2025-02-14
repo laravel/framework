@@ -57,7 +57,10 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
 
     public function testCreateTableWithAutoIncrementStartingValue()
     {
-        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $connection = $this->getConnection();
+        $connection->getSchemaBuilder()->shouldReceive('parseSchemaAndTable')->andReturn([null, 'users']);
+
+        $blueprint = new Blueprint($connection, 'users');
         $blueprint->create();
         $blueprint->increments('id')->startingValue(1000);
         $blueprint->string('email');
@@ -71,7 +74,10 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
 
     public function testAddColumnsWithMultipleAutoIncrementStartingValue()
     {
-        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $builder = $this->getBuilder();
+        $builder->shouldReceive('parseSchemaAndTable')->andReturn([null, 'users']);
+
+        $blueprint = new Blueprint($this->getConnection(builder: $builder), 'users');
         $blueprint->id()->from(100);
         $blueprint->increments('code')->from(200);
         $blueprint->string('name')->from(300);
@@ -158,7 +164,10 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
 
     public function testDropPrimary()
     {
-        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $connection = $this->getConnection();
+        $connection->getSchemaBuilder()->shouldReceive('parseSchemaAndTable')->andReturn([null, 'users']);
+
+        $blueprint = new Blueprint($connection, 'users');
         $blueprint->dropPrimary();
         $statements = $blueprint->toSql();
 
@@ -1046,7 +1055,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
     {
         $connection = $this->getConnection();
         $connection->shouldReceive('getConfig')->once()->once()->with('charset')->andReturn('utf8_foo');
-        $statement = $this->getGrammar()->compileCreateDatabase('my_database_a', $connection);
+        $statement = $this->getGrammar($connection)->compileCreateDatabase('my_database_a');
 
         $this->assertSame(
             'create database "my_database_a" encoding "utf8_foo"',
@@ -1055,7 +1064,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
 
         $connection = $this->getConnection();
         $connection->shouldReceive('getConfig')->once()->once()->with('charset')->andReturn('utf8_bar');
-        $statement = $this->getGrammar()->compileCreateDatabase('my_database_b', $connection);
+        $statement = $this->getGrammar($connection)->compileCreateDatabase('my_database_b');
 
         $this->assertSame(
             'create database "my_database_b" encoding "utf8_bar"',
@@ -1104,12 +1113,9 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
     public function testCompileColumns()
     {
         $connection = $this->getConnection();
-        $grammar = $this->getGrammar();
-
         $connection->shouldReceive('getServerVersion')->once()->andReturn('12.0.0');
-        $grammar->setConnection($connection);
 
-        $statement = $grammar->compileColumns('public', 'table');
+        $statement = $connection->getSchemaGrammar()->compileColumns('public', 'table');
 
         $this->assertStringContainsString("where c.relname = 'table' and n.nspname = 'public'", $statement);
     }
@@ -1118,18 +1124,23 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         ?PostgresGrammar $grammar = null,
         ?PostgresBuilder $builder = null
     ) {
-        $grammar ??= $this->getGrammar();
+        $connection = m::mock(Connection::class)
+            ->shouldReceive('getTablePrefix')->andReturn('')
+            ->shouldReceive('getConfig')->with('prefix_indexes')->andReturn(null)
+            ->getMock();
+
+        $grammar ??= $this->getGrammar($connection);
         $builder ??= $this->getBuilder();
 
-        return m::mock(Connection::class)
+        return $connection
             ->shouldReceive('getSchemaGrammar')->andReturn($grammar)
             ->shouldReceive('getSchemaBuilder')->andReturn($builder)
             ->getMock();
     }
 
-    public function getGrammar()
+    public function getGrammar(?Connection $connection = null)
     {
-        return new PostgresGrammar;
+        return new PostgresGrammar($connection ?? $this->getConnection());
     }
 
     public function getBuilder()

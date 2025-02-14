@@ -19,11 +19,15 @@ abstract class Grammar
     protected $connection;
 
     /**
-     * The grammar table prefix.
+     * Create a new grammar instance.
      *
-     * @var string
+     * @param  \Illuminate\Database\Connection  $connection
+     * @return void
      */
-    protected $tablePrefix = '';
+    public function __construct(Connection $connection)
+    {
+        $this->connection = $connection;
+    }
 
     /**
      * Wrap an array of values.
@@ -49,14 +53,14 @@ abstract class Grammar
             return $this->getValue($table);
         }
 
+        $prefix ??= $this->connection->getTablePrefix();
+
         // If the table being wrapped has an alias we'll need to separate the pieces
         // so we can prefix the table and then wrap each of the segments on their
         // own and then join these both back together using the "as" connector.
         if (stripos($table, ' as ') !== false) {
-            return $this->wrapAliasedTable($table);
+            return $this->wrapAliasedTable($table, $prefix);
         }
-
-        $prefix ??= $this->tablePrefix;
 
         // If the table being wrapped has a custom schema name specified, we need to
         // prefix the last segment as the table name then wrap each segment alone
@@ -118,13 +122,16 @@ abstract class Grammar
      * Wrap a table that has an alias.
      *
      * @param  string  $value
+     * @param  string|null  $prefix
      * @return string
      */
-    protected function wrapAliasedTable($value)
+    protected function wrapAliasedTable($value, $prefix = null)
     {
         $segments = preg_split('/\s+as\s+/i', $value);
 
-        return $this->wrapTable($segments[0]).' as '.$this->wrapValue($this->tablePrefix.$segments[1]);
+        $prefix ??= $this->connection->getTablePrefix();
+
+        return $this->wrapTable($segments[0], $prefix).' as '.$this->wrapValue($prefix.$segments[1]);
     }
 
     /**
@@ -238,10 +245,6 @@ abstract class Grammar
      */
     public function escape($value, $binary = false)
     {
-        if (is_null($this->connection)) {
-            throw new RuntimeException("The database driver's grammar implementation does not support escaping values.");
-        }
-
         return $this->connection->escape($value, $binary);
     }
 
@@ -284,35 +287,26 @@ abstract class Grammar
     /**
      * Get the grammar's table prefix.
      *
+     * @deprecated Use DB::getTablePrefix()
+     *
      * @return string
      */
     public function getTablePrefix()
     {
-        return $this->tablePrefix;
+        return $this->connection->getTablePrefix();
     }
 
     /**
      * Set the grammar's table prefix.
+     *
+     * @deprecated Use DB::setTablePrefix()
      *
      * @param  string  $prefix
      * @return $this
      */
     public function setTablePrefix($prefix)
     {
-        $this->tablePrefix = $prefix;
-
-        return $this;
-    }
-
-    /**
-     * Set the grammar's database connection.
-     *
-     * @param  \Illuminate\Database\Connection  $connection
-     * @return $this
-     */
-    public function setConnection($connection)
-    {
-        $this->connection = $connection;
+        $this->connection->setTablePrefix($prefix);
 
         return $this;
     }

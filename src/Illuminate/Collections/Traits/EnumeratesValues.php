@@ -37,6 +37,7 @@ use function Illuminate\Support\enum_value;
  * @property-read HigherOrderCollectionProxy<TKey, TValue> $flatMap
  * @property-read HigherOrderCollectionProxy<TKey, TValue> $groupBy
  * @property-read HigherOrderCollectionProxy<TKey, TValue> $keyBy
+ * @property-read HigherOrderCollectionProxy<TKey, TValue> $last
  * @property-read HigherOrderCollectionProxy<TKey, TValue> $map
  * @property-read HigherOrderCollectionProxy<TKey, TValue> $max
  * @property-read HigherOrderCollectionProxy<TKey, TValue> $min
@@ -84,6 +85,7 @@ trait EnumeratesValues
         'flatMap',
         'groupBy',
         'keyBy',
+        'last',
         'map',
         'max',
         'min',

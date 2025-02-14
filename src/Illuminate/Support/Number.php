@@ -138,13 +138,18 @@ class Number
      * @param  int|float  $number
      * @param  string  $in
      * @param  string|null  $locale
+     * @param  int|null  $precision
      * @return string|false
      */
-    public static function currency(int|float $number, string $in = '', ?string $locale = null)
+    public static function currency(int|float $number, string $in = '', ?string $locale = null, ?int $precision = null)
     {
         static::ensureIntlExtensionIsInstalled();
 
         $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::CURRENCY);
+
+        if (! is_null($precision)) {
+            $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, $precision);
+        }
 
         return $formatter->formatCurrency($number, ! empty($in) ? $in : static::$currency);
     }

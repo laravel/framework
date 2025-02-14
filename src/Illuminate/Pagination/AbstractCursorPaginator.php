@@ -601,7 +601,7 @@ abstract class AbstractCursorPaginator implements Htmlable, Stringable
     /**
      * Determine if the given item exists.
      *
-     * @param  mixed  $key
+     * @param  TKey  $key
      * @return bool
      */
     public function offsetExists($key): bool
@@ -612,8 +612,8 @@ abstract class AbstractCursorPaginator implements Htmlable, Stringable
     /**
      * Get the item at the given offset.
      *
-     * @param  mixed  $key
-     * @return mixed
+     * @param  TKey  $key
+     * @return TValue
      */
     public function offsetGet($key): mixed
     {
@@ -623,8 +623,8 @@ abstract class AbstractCursorPaginator implements Htmlable, Stringable
     /**
      * Set the item at the given offset.
      *
-     * @param  mixed  $key
-     * @param  mixed  $value
+     * @param  TKey|null  $key
+     * @param  TValue  $value
      * @return void
      */
     public function offsetSet($key, $value): void
@@ -635,7 +635,7 @@ abstract class AbstractCursorPaginator implements Htmlable, Stringable
     /**
      * Unset the item at the given key.
      *
-     * @param  mixed  $key
+     * @param  TKey  $key
      * @return void
      */
     public function offsetUnset($key): void

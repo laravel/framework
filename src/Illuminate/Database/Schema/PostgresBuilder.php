@@ -9,32 +9,6 @@ class PostgresBuilder extends Builder
     use ParsesSearchPath;
 
     /**
-     * Create a database in the schema.
-     *
-     * @param  string  $name
-     * @return bool
-     */
-    public function createDatabase($name)
-    {
-        return $this->connection->statement(
-            $this->grammar->compileCreateDatabase($name, $this->connection)
-        );
-    }
-
-    /**
-     * Drop a database from the schema if the database exists.
-     *
-     * @param  string  $name
-     * @return bool
-     */
-    public function dropDatabaseIfExists($name)
-    {
-        return $this->connection->statement(
-            $this->grammar->compileDropDatabaseIfExists($name)
-        );
-    }
-
-    /**
      * Drop all tables from the database.
      *
      * @return void

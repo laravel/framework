@@ -59,6 +59,13 @@ class HasherTest extends TestCase
         $this->assertTrue($this->hashManager->isHashed($value));
     }
 
+    public function testBcryptValueTooLong()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $hasher = new BcryptHasher(['limit' => 72]);
+        $hasher->make(str_repeat('a', 73));
+    }
+
     public function testBasicArgon2iHashing()
     {
         $hasher = new ArgonHasher;

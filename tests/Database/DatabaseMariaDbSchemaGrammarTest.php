@@ -1,6 +1,6 @@
 <?php
 
-namespace Database;
+namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Expression;
@@ -165,10 +165,7 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
 
     public function testBasicCreateTableWithPrefix()
     {
-        $grammar = $this->getGrammar();
-        $grammar->setTablePrefix('prefix_');
-
-        $conn = $this->getConnection($grammar);
+        $conn = $this->getConnection(prefix: 'prefix_');
         $conn->shouldReceive('getConfig')->andReturn(null);
 
         $blueprint = new Blueprint($conn, 'users');
@@ -1330,7 +1327,7 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
         $connection->shouldReceive('getConfig')->once()->once()->with('charset')->andReturn('utf8mb4_foo');
         $connection->shouldReceive('getConfig')->once()->once()->with('collation')->andReturn('utf8mb4_unicode_ci_foo');
 
-        $statement = $this->getGrammar()->compileCreateDatabase('my_database_a', $connection);
+        $statement = $this->getGrammar($connection)->compileCreateDatabase('my_database_a');
 
         $this->assertSame(
             'create database `my_database_a` default character set `utf8mb4_foo` default collate `utf8mb4_unicode_ci_foo`',
@@ -1341,7 +1338,7 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
         $connection->shouldReceive('getConfig')->once()->once()->with('charset')->andReturn('utf8mb4_bar');
         $connection->shouldReceive('getConfig')->once()->once()->with('collation')->andReturn('utf8mb4_unicode_ci_bar');
 
-        $statement = $this->getGrammar()->compileCreateDatabase('my_database_b', $connection);
+        $statement = $this->getGrammar($connection)->compileCreateDatabase('my_database_b');
 
         $this->assertSame(
             'create database `my_database_b` default character set `utf8mb4_bar` default collate `utf8mb4_unicode_ci_bar`',
@@ -1471,7 +1468,8 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
 
     public function testDropAllTables()
     {
-        $statement = $this->getGrammar()->compileDropAllTables(['alpha', 'beta', 'gamma']);
+        $connection = $this->getConnection();
+        $statement = $this->getGrammar($connection)->compileDropAllTables(['alpha', 'beta', 'gamma']);
 
         $this->assertSame('drop table `alpha`,`beta`,`gamma`', $statement);
     }
@@ -1498,19 +1496,25 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
     protected function getConnection(
         ?MariaDbGrammar $grammar = null,
         ?MariaDbBuilder $builder = null,
+        string $prefix = ''
     ) {
-        $grammar ??= $this->getGrammar();
+        $connection = m::mock(Connection::class)
+            ->shouldReceive('getTablePrefix')->andReturn($prefix)
+            ->shouldReceive('getConfig')->with('prefix_indexes')->andReturn(null)
+            ->getMock();
+
+        $grammar ??= $this->getGrammar($connection);
         $builder ??= $this->getBuilder();
 
-        return m::mock(Connection::class)
+        return $connection
             ->shouldReceive('getSchemaGrammar')->andReturn($grammar)
             ->shouldReceive('getSchemaBuilder')->andReturn($builder)
             ->getMock();
     }
 
-    public function getGrammar()
+    public function getGrammar(?Connection $connection = null)
     {
-        return new MariaDbGrammar;
+        return new MariaDbGrammar($connection ?? $this->getConnection());
     }
 
     public function getBuilder()

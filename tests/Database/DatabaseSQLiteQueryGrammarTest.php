@@ -18,8 +18,7 @@ class DatabaseSQLiteQueryGrammarTest extends TestCase
     {
         $connection = m::mock(Connection::class);
         $connection->shouldReceive('escape')->with('foo', false)->andReturn("'foo'");
-        $grammar = new SQLiteGrammar;
-        $grammar->setConnection($connection);
+        $grammar = new SQLiteGrammar($connection);
 
         $query = $grammar->substituteBindingsIntoRawSql(
             'select * from "users" where \'Hello\'\'World?\' IS NOT NULL AND "email" = ?',

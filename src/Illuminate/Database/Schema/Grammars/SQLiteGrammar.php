@@ -2,7 +2,6 @@
 
 namespace Illuminate\Database\Schema\Grammars;
 
-use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\IndexDefinition;
@@ -30,14 +29,13 @@ class SQLiteGrammar extends Grammar
     /**
      * Get the commands to be compiled on the alter command.
      *
-     * @param  \Illuminate\Database\Connection  $connection
      * @return array
      */
-    public function getAlterCommands(Connection $connection)
+    public function getAlterCommands()
     {
         $alterCommands = ['change', 'primary', 'dropPrimary', 'foreign', 'dropForeign'];
 
-        if (version_compare($connection->getServerVersion(), '3.35', '<')) {
+        if (version_compare($this->connection->getServerVersion(), '3.35', '<')) {
             $alterCommands[] = 'dropColumn';
         }
 
@@ -123,7 +121,7 @@ class SQLiteGrammar extends Grammar
     /**
      * Compile the query for legacy versions of SQLite to determine the tables.
      *
-     * @param  string|string[]|null  $schema
+     * @param  string  $schema
      * @param  bool  $withSize
      * @return string
      */
@@ -321,12 +319,9 @@ class SQLiteGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $command
-     * @param  \Illuminate\Database\Connection  $connection
      * @return array|string
-     *
-     * @throws \RuntimeException
      */
-    public function compileAlter(Blueprint $blueprint, Fluent $command, Connection $connection)
+    public function compileAlter(Blueprint $blueprint, Fluent $command)
     {
         $columnNames = [];
         $autoIncrementColumn = null;
@@ -354,12 +349,12 @@ class SQLiteGrammar extends Grammar
             ->map(fn ($index) => $this->{'compile'.ucfirst($index->name)}($blueprint, $index))
             ->all();
 
-        [, $tableName] = $connection->getSchemaBuilder()->parseSchemaAndTable($blueprint->getTable());
-        $tempTable = $this->wrapTable($blueprint, '__temp__'.$connection->getTablePrefix());
+        [, $tableName] = $this->connection->getSchemaBuilder()->parseSchemaAndTable($blueprint->getTable());
+        $tempTable = $this->wrapTable($blueprint, '__temp__'.$this->connection->getTablePrefix());
         $table = $this->wrapTable($blueprint);
         $columnNames = implode(', ', $columnNames);
 
-        $foreignKeyConstraintsEnabled = $connection->scalar('pragma foreign_keys');
+        $foreignKeyConstraintsEnabled = $this->connection->scalar($this->pragma('foreign_keys'));
 
         return array_filter(array_merge([
             $foreignKeyConstraintsEnabled ? $this->compileDisableForeignKeyConstraints() : null,
@@ -380,12 +375,9 @@ class SQLiteGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $command
-     * @param  \Illuminate\Database\Connection  $connection
      * @return array|string
-     *
-     * @throws \RuntimeException
      */
-    public function compileChange(Blueprint $blueprint, Fluent $command, Connection $connection)
+    public function compileChange(Blueprint $blueprint, Fluent $command)
     {
         // Handled on table alteration...
     }
@@ -519,11 +511,14 @@ class SQLiteGrammar extends Grammar
     /**
      * Compile the SQL needed to rebuild the database.
      *
+     * @param  string|null  $schema
      * @return string
      */
-    public function compileRebuild()
+    public function compileRebuild($schema = null)
     {
-        return 'vacuum';
+        return sprintf('vacuum %s',
+            $this->wrapValue($schema ?? 'main')
+        );
     }
 
     /**
@@ -531,12 +526,11 @@ class SQLiteGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $command
-     * @param  \Illuminate\Database\Connection  $connection
      * @return array|null
      */
-    public function compileDropColumn(Blueprint $blueprint, Fluent $command, Connection $connection)
+    public function compileDropColumn(Blueprint $blueprint, Fluent $command)
     {
-        if (version_compare($connection->getServerVersion(), '3.35', '<')) {
+        if (version_compare($this->connection->getServerVersion(), '3.35', '<')) {
             // Handled on table alteration...
 
             return null;
@@ -639,14 +633,13 @@ class SQLiteGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $command
-     * @param  \Illuminate\Database\Connection  $connection
      * @return array
      *
      * @throws \RuntimeException
      */
-    public function compileRenameIndex(Blueprint $blueprint, Fluent $command, Connection $connection)
+    public function compileRenameIndex(Blueprint $blueprint, Fluent $command)
     {
-        $indexes = $connection->getSchemaBuilder()->getIndexes($blueprint->getTable());
+        $indexes = $this->connection->getSchemaBuilder()->getIndexes($blueprint->getTable());
 
         $index = Arr::first($indexes, fn ($index) => $index['name'] === $command->from);
 
@@ -682,7 +675,7 @@ class SQLiteGrammar extends Grammar
      */
     public function compileEnableForeignKeyConstraints()
     {
-        return $this->pragma('foreign_keys', 'ON');
+        return $this->pragma('foreign_keys', 1);
     }
 
     /**
@@ -692,72 +685,22 @@ class SQLiteGrammar extends Grammar
      */
     public function compileDisableForeignKeyConstraints()
     {
-        return $this->pragma('foreign_keys', 'OFF');
+        return $this->pragma('foreign_keys', 0);
     }
 
     /**
-     * Compile the command to set the busy timeout.
+     * Get the SQL to get or set a PRAGMA value.
      *
-     * @param  int  $milliseconds
-     * @return string
-     */
-    public function compileSetBusyTimeout($milliseconds)
-    {
-        return $this->pragma('busy_timeout', $milliseconds);
-    }
-
-    /**
-     * Compile the command to set the journal mode.
-     *
-     * @param  string  $mode
-     * @return string
-     */
-    public function compileSetJournalMode($mode)
-    {
-        return $this->pragma('journal_mode', $mode);
-    }
-
-    /**
-     * Compile the command to set the synchronous mode.
-     *
-     * @param  string  $mode
-     * @return string
-     */
-    public function compileSetSynchronous($mode)
-    {
-        return $this->pragma('synchronous', $mode);
-    }
-
-    /**
-     * Compile the SQL needed to enable a writable schema.
-     *
-     * @return string
-     */
-    public function compileEnableWriteableSchema()
-    {
-        return $this->pragma('writable_schema', 1);
-    }
-
-    /**
-     * Compile the SQL needed to disable a writable schema.
-     *
-     * @return string
-     */
-    public function compileDisableWriteableSchema()
-    {
-        return $this->pragma('writable_schema', 0);
-    }
-
-    /**
-     * Get the SQL to set a PRAGMA value.
-     *
-     * @param  string  $name
+     * @param  string  $key
      * @param  mixed  $value
      * @return string
      */
-    protected function pragma(string $name, mixed $value): string
+    public function pragma(string $key, mixed $value = null): string
     {
-        return sprintf('PRAGMA %s = %s;', $name, $value);
+        return sprintf('pragma %s%s',
+            $key,
+            is_null($value) ? '' : ' = '.$value
+        );
     }
 
     /**

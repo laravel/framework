@@ -2,7 +2,9 @@
 
 namespace Illuminate\Database\Events;
 
-class NoPendingMigrations
+use Illuminate\Contracts\Database\Events\MigrationEvent;
+
+class NoPendingMigrations implements MigrationEvent
 {
     /**
      * Create a new event instance.

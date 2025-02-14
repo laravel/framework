@@ -194,7 +194,7 @@ class Gate implements GateContract
     /**
      * Define a new ability.
      *
-     * @param  \BackedEnum|string  $ability
+     * @param  \UnitEnum|string  $ability
      * @param  callable|array|string  $callback
      * @return $this
      *
@@ -325,7 +325,7 @@ class Gate implements GateContract
     /**
      * Determine if all of the given abilities should be granted for the current user.
      *
-     * @param  iterable|\BackedEnum|string  $ability
+     * @param  iterable|\UnitEnum|string  $ability
      * @param  array|mixed  $arguments
      * @return bool
      */
@@ -337,7 +337,7 @@ class Gate implements GateContract
     /**
      * Determine if any of the given abilities should be denied for the current user.
      *
-     * @param  iterable|\BackedEnum|string  $ability
+     * @param  iterable|\UnitEnum|string  $ability
      * @param  array|mixed  $arguments
      * @return bool
      */
@@ -349,7 +349,7 @@ class Gate implements GateContract
     /**
      * Determine if all of the given abilities should be granted for the current user.
      *
-     * @param  iterable|\BackedEnum|string  $abilities
+     * @param  iterable|\UnitEnum|string  $abilities
      * @param  array|mixed  $arguments
      * @return bool
      */
@@ -363,7 +363,7 @@ class Gate implements GateContract
     /**
      * Determine if any one of the given abilities should be granted for the current user.
      *
-     * @param  iterable|\BackedEnum|string  $abilities
+     * @param  iterable|\UnitEnum|string  $abilities
      * @param  array|mixed  $arguments
      * @return bool
      */
@@ -375,7 +375,7 @@ class Gate implements GateContract
     /**
      * Determine if all of the given abilities should be denied for the current user.
      *
-     * @param  iterable|\BackedEnum|string  $abilities
+     * @param  iterable|\UnitEnum|string  $abilities
      * @param  array|mixed  $arguments
      * @return bool
      */
@@ -387,7 +387,7 @@ class Gate implements GateContract
     /**
      * Determine if the given ability should be granted for the current user.
      *
-     * @param  \BackedEnum|string  $ability
+     * @param  \UnitEnum|string  $ability
      * @param  array|mixed  $arguments
      * @return \Illuminate\Auth\Access\Response
      *
@@ -401,7 +401,7 @@ class Gate implements GateContract
     /**
      * Inspect the user for the given ability.
      *
-     * @param  \BackedEnum|string  $ability
+     * @param  \UnitEnum|string  $ability
      * @param  array|mixed  $arguments
      * @return \Illuminate\Auth\Access\Response
      */
@@ -703,6 +703,9 @@ class Gate implements GateContract
             $classDirname = implode('\\', array_slice($classDirnameSegments, 0, $index));
 
             return $classDirname.'\\Policies\\'.class_basename($class).'Policy';
+        })->when(str_contains($classDirname, '\\Models\\'), function ($collection) use ($class, $classDirname) {
+            return $collection->concat([str_replace('\\Models\\', '\\Policies\\', $classDirname).'\\'.class_basename($class).'Policy'])
+                ->concat([str_replace('\\Models\\', '\\Models\\Policies\\', $classDirname).'\\'.class_basename($class).'Policy']);
         })->reverse()->values()->first(function ($class) {
             return class_exists($class);
         }) ?: [$classDirname.'\\Policies\\'.class_basename($class).'Policy']);
