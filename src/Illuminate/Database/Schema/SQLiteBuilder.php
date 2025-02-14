@@ -15,7 +15,7 @@ class SQLiteBuilder extends Builder
      */
     public function createDatabase($name)
     {
-        return File::put($name, '') !== false;
+        return $name === ':memory:' || File::put($name, '') !== false;
     }
 
     /**
