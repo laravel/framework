@@ -357,7 +357,7 @@ abstract class Job
     }
 
     /**
-     * Get the resolved name of the queued job class.
+     * Get the resolved display name of the queued job class.
      *
      * Resolves the name of "wrapped" jobs such as class-based handlers.
      *
@@ -367,6 +367,20 @@ abstract class Job
     {
         return JobName::resolve($this->getName(), $this->payload());
     }
+
+    /**
+     * Get the class of the queued job.
+     *
+     * Resolves the class of "wrapped" jobs such as class-based handlers.
+     *
+     * @return string
+     */
+    public function resolveQueuedJobClass()
+    {
+        return JobName::resolveClassName($this->getName(), $this->payload());
+    }
+
+
 
     /**
      * Get the name of the connection the job belongs to.

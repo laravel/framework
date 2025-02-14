@@ -32,4 +32,37 @@ class JobName
 
         return $name;
     }
+
+    /**
+     * Get the resolved name of the queued job class.
+     *
+     * @param  string  $name
+     * @param  array<string, mixed>  $payload
+     * @return string
+     */
+    public static function resolveQueuedJobClass($name, $payload)
+    {
+        if (is_string($payload['data']['commandName'] ?? null)) {
+            return $payload['data']['commandName'];
+        }
+
+        return $name;
+    }
+
+
+    /**
+     * Get the class name for queued job class.
+     *
+     * @param  string  $name
+     * @param  array<string, mixed>  $payload
+     * @return string
+     */
+    public static function resolveClassName($name, $payload)
+    {
+        if (is_string($payload['data']['commandName'] ?? null)) {
+            return $payload['data']['commandName'];
+        }
+
+        return $name;
+    }
 }
