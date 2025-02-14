@@ -21,7 +21,7 @@ use Illuminate\Process\Factory;
  * @method static \Illuminate\Process\PendingProcess withFakeHandlers(array $fakeHandlers)
  * @method static \Illuminate\Process\PendingProcess|mixed when(\Closure|mixed|null $value = null, callable|null $callback = null, callable|null $default = null)
  * @method static \Illuminate\Process\PendingProcess|mixed unless(\Closure|mixed|null $value = null, callable|null $callback = null, callable|null $default = null)
- * @method static bool isTtySupported()
+ * @method static bool supportsTty()
  * @method static \Illuminate\Process\FakeProcessResult result(array|string $output = '', array|string $errorOutput = '', int $exitCode = 0)
  * @method static \Illuminate\Process\FakeProcessDescription describe()
  * @method static \Illuminate\Process\FakeProcessSequence sequence(array $processes = [])
