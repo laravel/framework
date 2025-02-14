@@ -9,9 +9,10 @@ use Illuminate\Support\Env;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Stringable;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
-
 use function Illuminate\Support\php_binary;
 use function Termwind\terminal;
 
@@ -90,6 +91,19 @@ class ServeCommand extends Command
      */
     protected $phpServerWorkers = 1;
 
+    /** {@inheritdoc} */
+    #[\Override]
+    protected function initialize(InputInterface $input, OutputInterface $output)
+    {
+        $this->phpServerWorkers = transform(env('PHP_CLI_SERVER_WORKERS', 1), function ($workers) {
+            if (! is_int($workers) || $workers < 2) {
+                return false;
+            }
+
+            return $workers > 1 && ! $this->option('no-reload') ? false : $workers;
+        });
+    }
+
     /**
      * Execute the console command.
      *
@@ -99,14 +113,6 @@ class ServeCommand extends Command
      */
     public function handle()
     {
-        $this->phpServerWorkers = transform(env('PHP_CLI_SERVER_WORKERS', 1), function ($workers) {
-            if (! is_int($workers) || $workers < 2) {
-                return false;
-            }
-
-            return $workers > 1 && ! $this->option('no-reload') ? false : $workers;
-        });
-
         $environmentFile = $this->option('env')
             ? base_path('.env').'.'.$this->option('env')
             : base_path('.env');
