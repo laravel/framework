@@ -2328,12 +2328,16 @@ class SupportCollectionTest extends TestCase
         $this->assertSame('taylor,dayle', $data->implode(','));
         $this->assertSame('taylor_dayle', $data->implode('_'));
 
-        $data = new $collection([new ByteString('taylor'), new ByteString('dayle')]);
-        $this->assertSame('taylordayle', $data->implode(''));
-
         $data = new $collection([['name' => 'taylor', 'email' => 'foo'], ['name' => 'dayle', 'email' => 'bar']]);
         $this->assertSame('taylor-foodayle-bar', $data->implode(fn ($user) => $user['name'].'-'.$user['email']));
         $this->assertSame('taylor-foo,dayle-bar', $data->implode(fn ($user) => $user['name'].'-'.$user['email'], ','));
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testImplodeStringable($collection)
+    {
+        $data = new $collection([new ByteString('taylor'), new ByteString('dayle')]);
+        $this->assertSame('taylordayle', $data->implode(''));
     }
 
     #[DataProvider('collectionClassProvider')]
