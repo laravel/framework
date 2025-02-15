@@ -2315,7 +2315,6 @@ class SupportCollectionTest extends TestCase
         $this->assertSame('taylordayle', $data->implode(''));
         $this->assertSame('taylor,dayle', $data->implode(','));
 
-
         $data = new $collection([
             ['name' => new Stringable('taylor'), 'email' => new Stringable('foo')],
             ['name' => new Stringable('dayle'), 'email' => new Stringable('bar')],
