@@ -1649,7 +1649,6 @@ class Str
         return static::studly($value);
     }
 
-
     /**
      * Returns the portion of the string specified by the start and length parameters.
      *
