@@ -635,6 +635,17 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
         return new static(Str::pluralStudly($this->value, $count));
     }
 
+    /** 
+     * Pluralize the last word of an English, pascal caps case string.
+     * 
+     * @param  int|array|\Countable  $count
+     * @return static
+     */
+    public function pluralPascal($count = 2)
+    {
+        return new static(Str::pluralStudly($this->value, $count));
+    }
+
     /**
      * Find the multi-byte safe position of the first occurrence of the given substring.
      *
@@ -933,7 +944,17 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
-     * Returns the portion of the string specified by the start and length parameters.
+     * Convert the string to pascal case.
+     *
+     * @return static
+     */
+    public function pascal()
+    {
+        return new static(Str::pascal($this->value));
+    }
+
+    /**
+     * Returns the portion of string specified by the start and length parameters.
      *
      * @param  int  $start
      * @param  int|null  $length
