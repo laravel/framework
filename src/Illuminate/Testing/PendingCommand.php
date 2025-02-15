@@ -430,9 +430,7 @@ class PendingCommand
                 });
         }
 
-        $this->app->bind(OutputStyle::class, function () use ($mock) {
-            return $mock;
-        });
+        $this->app->bind(OutputStyle::class, fn() => $mock);
 
         return $mock;
     }

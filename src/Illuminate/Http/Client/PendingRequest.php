@@ -406,11 +406,9 @@ class PendingRequest
      */
     public function withHeaders(array $headers)
     {
-        return tap($this, function () use ($headers) {
-            $this->options = array_merge_recursive($this->options, [
-                'headers' => $headers,
-            ]);
-        });
+        return tap($this, fn() => $this->options = array_merge_recursive($this->options, [
+            'headers' => $headers,
+        ]));
     }
 
     /**
