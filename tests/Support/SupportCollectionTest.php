@@ -2317,16 +2317,19 @@ class SupportCollectionTest extends TestCase
 
 
         $data = new $collection([
-            ['name' => new ByteString('taylor'), 'email' => new ByteString('foo')],
-            ['name' => new ByteString('dayle'), 'email' => new ByteString('bar')],
+            ['name' => new Stringable('taylor'), 'email' => new Stringable('foo')],
+            ['name' => new Stringable('dayle'), 'email' => new Stringable('bar')],
         ]);
         $this->assertSame('foobar', $data->implode('email'));
         $this->assertSame('foo,bar', $data->implode('email', ','));
 
-        $data = new $collection([new ByteString('taylor'), new ByteString('dayle')]);
+        $data = new $collection([new Stringable('taylor'), new Stringable('dayle')]);
         $this->assertSame('taylordayle', $data->implode(''));
         $this->assertSame('taylor,dayle', $data->implode(','));
         $this->assertSame('taylor_dayle', $data->implode('_'));
+
+        $data = new $collection([new ByteString('taylor'), new ByteString('dayle')]);
+        $this->assertSame('taylordayle', $data->implode(''));
 
         $data = new $collection([['name' => 'taylor', 'email' => 'foo'], ['name' => 'dayle', 'email' => 'bar']]);
         $this->assertSame('taylor-foodayle-bar', $data->implode(fn ($user) => $user['name'].'-'.$user['email']));
