@@ -9,6 +9,7 @@ use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Container\CircularDependencyException;
 use Illuminate\Contracts\Container\Container as ContainerContract;
 use Illuminate\Contracts\Container\ContextualAttribute;
+use Illuminate\Support\Collection;
 use LogicException;
 use ReflectionAttribute;
 use ReflectionClass;
@@ -268,15 +269,27 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Register a binding with the container.
      *
-     * @param  string  $abstract
+     * @param  \Closure|string  $abstract
      * @param  \Closure|string|null  $concrete
      * @param  bool  $shared
      * @return void
      *
      * @throws \TypeError
+     * @throws ReflectionException
      */
     public function bind($abstract, $concrete = null, $shared = false)
     {
+        if ($abstract instanceof Closure) {
+            $abstracts = $this->closureReturnTypes($abstract);
+            $concrete = $abstract;
+
+            foreach ($abstracts as $abstract) {
+                $this->bind($abstract, $concrete, $shared);
+            }
+
+            return;
+        }
+
         $this->dropStaleInstances($abstract);
 
         // If no concrete type was given, we will simply set the concrete type to the
@@ -381,7 +394,7 @@ class Container implements ArrayAccess, ContainerContract
      * Add a contextual binding to the container.
      *
      * @param  string  $concrete
-     * @param  string  $abstract
+     * @param  \Closure|string  $abstract
      * @param  \Closure|string  $implementation
      * @return void
      */
@@ -393,7 +406,7 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Register a binding if it hasn't already been registered.
      *
-     * @param  string  $abstract
+     * @param  \Closure|string  $abstract
      * @param  \Closure|string|null  $concrete
      * @param  bool  $shared
      * @return void
@@ -408,7 +421,7 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Register a shared binding in the container.
      *
-     * @param  string  $abstract
+     * @param  \Closure|string  $abstract
      * @param  \Closure|string|null  $concrete
      * @return void
      */
@@ -420,7 +433,7 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Register a shared binding if it hasn't already been registered.
      *
-     * @param  string  $abstract
+     * @param  \Closure|string  $abstract
      * @param  \Closure|string|null  $concrete
      * @return void
      */
@@ -434,7 +447,7 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Register a scoped binding in the container.
      *
-     * @param  string  $abstract
+     * @param  \Closure|string  $abstract
      * @param  \Closure|string|null  $concrete
      * @return void
      */
@@ -448,7 +461,7 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Register a scoped binding if it hasn't already been registered.
      *
-     * @param  string  $abstract
+     * @param  \Closure|string  $abstract
      * @param  \Closure|string|null  $concrete
      * @return void
      */
@@ -1634,5 +1647,46 @@ class Container implements ArrayAccess, ContainerContract
     public function __set($key, $value)
     {
         $this[$key] = $value;
+    }
+
+    /**
+     * Get the class names / types of the return type of the given Closure.
+     *
+     * @param  \Closure  $closure
+     * @return list<class-string>
+     *
+     * @throws \ReflectionException
+     */
+    protected function closureReturnTypes(Closure $closure)
+    {
+        $reflection = new ReflectionFunction($closure);
+
+        if (
+            $reflection->getReturnType() === null ||
+            $reflection->getReturnType() instanceof \ReflectionIntersectionType
+        ) {
+            return [];
+        }
+
+        if (
+            $reflection->getReturnType() instanceof \ReflectionUnionType
+        ) {
+            $types = $reflection->getReturnType()->getTypes();
+        } else {
+            $types = [$reflection->getReturnType()];
+        }
+
+        return (new Collection($types))
+            ->reject(function (\ReflectionNamedType $type) {
+                return $type->isBuiltin();
+            })
+            ->reject(function (\ReflectionNamedType $type) {
+                return in_array($type->getName(), ['static', 'self']);
+            })
+            ->map(function (\ReflectionNamedType $type) {
+                return $type->getName();
+            })
+            ->values()
+            ->all();
     }
 }
