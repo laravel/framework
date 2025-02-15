@@ -1124,6 +1124,17 @@ class SupportArrTest extends TestCase
         $this->assertEquals($expected, $sortedWithDotNotation);
     }
 
+    public function testSortAsIn()
+    {
+        $constant = ['a', 'e', 'i', 'o', 'u', 'b', 'c', 'd', 'f', 'g'];
+
+        $unsorted = ['a', 'b', 'c', 'z', 'e', 'k'];
+        $expected = ['a', 'e', 'b', 'c', 'z', 'k'];
+
+        $sorted = array_values(Arr::sortAsIn($unsorted, $constant));
+        $this->assertEquals($expected, $sorted);
+    }
+
     public function testSortRecursive()
     {
         $array = [

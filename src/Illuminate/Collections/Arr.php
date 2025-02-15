@@ -832,6 +832,24 @@ class Arr
     }
 
     /**
+     * Sort the array to match the order as they are in given constant.
+     *
+     * @param  array  $array
+     * @param  array  $constant
+     * @return array
+     */
+    public static function sortAsIn($array, $constant)
+    {
+        $constant = array_flip($constant);
+
+        $callback = function (string $a, string $b) use ($constant) {
+            return ($constant[$a] ?? PHP_INT_MAX) - ($constant[$b] ?? PHP_INT_MAX);
+        };
+
+        return static::sort($array, $callback);
+    }
+
+    /**
      * Recursively sort an array by keys and values.
      *
      * @param  array  $array
