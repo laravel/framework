@@ -24,6 +24,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use stdClass;
+use Symfony\Component\String\ByteString;
 use Symfony\Component\VarDumper\VarDumper;
 use Traversable;
 use UnexpectedValueException;
@@ -2314,14 +2315,15 @@ class SupportCollectionTest extends TestCase
         $this->assertSame('taylordayle', $data->implode(''));
         $this->assertSame('taylor,dayle', $data->implode(','));
 
+
         $data = new $collection([
-            ['name' => new Stringable('taylor'), 'email' => new Stringable('foo')],
-            ['name' => new Stringable('dayle'), 'email' => new Stringable('bar')],
+            ['name' => new ByteString('taylor'), 'email' => new ByteString('foo')],
+            ['name' => new ByteString('dayle'), 'email' => new ByteString('bar')],
         ]);
         $this->assertSame('foobar', $data->implode('email'));
         $this->assertSame('foo,bar', $data->implode('email', ','));
 
-        $data = new $collection([new Stringable('taylor'), new Stringable('dayle')]);
+        $data = new $collection([new ByteString('taylor'), new ByteString('dayle')]);
         $this->assertSame('taylordayle', $data->implode(''));
         $this->assertSame('taylor,dayle', $data->implode(','));
         $this->assertSame('taylor_dayle', $data->implode('_'));
