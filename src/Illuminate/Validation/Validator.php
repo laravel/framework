@@ -8,6 +8,8 @@ use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\ImplicitRule;
 use Illuminate\Contracts\Validation\Rule as RuleContract;
+use Illuminate\Contracts\Validation\StopUponFailure;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Contracts\Validation\Validator as ValidatorContract;
 use Illuminate\Contracts\Validation\ValidatorAwareRule;
 use Illuminate\Support\Arr;
@@ -482,7 +484,7 @@ class Validator implements ValidatorContract
                     break;
                 }
 
-                if ($this->shouldStopValidating($attribute)) {
+                if ($this->shouldStopValidating($attribute, $rule)) {
                     break;
                 }
             }
@@ -909,14 +911,19 @@ class Validator implements ValidatorContract
      * Check if we should stop further validations on a given attribute.
      *
      * @param  string  $attribute
+     * @param  string|ValidationRule
      * @return bool
      */
-    protected function shouldStopValidating($attribute)
+    protected function shouldStopValidating($attribute, $rule)
     {
         $cleanedAttribute = $this->replacePlaceholderInString($attribute);
 
         if ($this->hasRule($attribute, ['Bail'])) {
             return $this->messages->has($cleanedAttribute);
+        }
+
+        if ($rule instanceof InvokableValidationRule && $rule->invokable() instanceof StopUponFailure) {
+            return $rule->invokable()->shouldStop();
         }
 
         if (isset($this->failedRules[$cleanedAttribute]) &&
