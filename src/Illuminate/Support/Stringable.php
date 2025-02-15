@@ -635,9 +635,9 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
         return new static(Str::pluralStudly($this->value, $count));
     }
 
-    /** 
+    /**
      * Pluralize the last word of an English, pascal caps case string.
-     * 
+     *
      * @param  int|array|\Countable  $count
      * @return static
      */

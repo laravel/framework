@@ -981,9 +981,10 @@ class Str
 
     /**
      * Pluralize the last word of an English, pascal caps case string.
-     * 
-     * @param string $value
-     * @param int|array
+     *
+     * @param  string  $value
+     * @param  int|array|\Countable  $count
+     * @return string
      */
     public static function pluralPascal($value, $count = 2)
     {
