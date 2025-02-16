@@ -360,9 +360,8 @@ class ValidationDimensionsRuleTest extends TestCase
         $container = Container::getInstance();
 
         $container->bind('translator', function () {
-            return new Translator(
-                new ArrayLoader, 'en'
-            );
+            $loader = new ArrayLoader();
+            return new Translator($loader, 'en');
         });
 
         Facade::setFacadeApplication($container);
