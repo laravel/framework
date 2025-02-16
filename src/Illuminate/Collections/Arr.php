@@ -338,7 +338,7 @@ class Arr
             return value($default);
         }
 
-        if (is_null($key)) {
+        if ($key === null) {
             return $array;
         }
 
@@ -404,7 +404,7 @@ class Arr
      */
     public static function hasAny($array, $keys)
     {
-        if (is_null($keys)) {
+        if ($keys === null) {
             return false;
         }
 
@@ -562,7 +562,7 @@ class Arr
             // If the key is "null", we will just append the value to the array and keep
             // looping. Otherwise we will key the array using the value of the key we
             // received from the developer. Then we'll return the final array form.
-            if (is_null($key)) {
+            if ($key === null) {
                 $results[] = $itemValue;
             } else {
                 $itemKey = data_get($item, $key);
@@ -731,13 +731,13 @@ class Arr
             );
         }
 
-        if (empty($array) || (! is_null($number) && $number <= 0)) {
-            return is_null($number) ? null : [];
+        if (empty($array) || ($number !== null && $number <= 0)) {
+            return $number === null ? null : [];
         }
 
         $keys = (new Randomizer)->pickArrayKeys($array, $requested);
 
-        if (is_null($number)) {
+        if ($number === null) {
             return $array[$keys[0]];
         }
 
@@ -768,7 +768,7 @@ class Arr
      */
     public static function set(&$array, $key, $value)
     {
-        if (is_null($key)) {
+        if ($key === null) {
             return $array = $value;
         }
 
@@ -949,7 +949,7 @@ class Arr
      */
     public static function wrap($value)
     {
-        if (is_null($value)) {
+        if ($value === null) {
             return [];
         }
 
