@@ -931,6 +931,18 @@ class Arr
     }
 
     /**
+     * Alias for the "where" method.
+     *
+     * @param  array  $array
+     * @param  callable  $callback
+     * @return array
+     */
+    public static function filter($array, callable $callback)
+    {
+        return static::where($array, $callback);
+    }
+
+    /**
      * Filter items where the value is not null.
      *
      * @param  array  $array
