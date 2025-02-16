@@ -943,6 +943,20 @@ class Arr
     }
 
     /**
+     * Filter the array using the negation of the given callback.
+     *
+     * @param  array  $array
+     * @param  callable  $callback
+     * @return array
+     */
+    public static function reject($array, callable $callback)
+    {
+        $negated = fn ($value, $key) => ! $callback($value, $key);
+
+        return static::where($array, $negated);
+    }
+
+    /**
      * Filter items where the value is not null.
      *
      * @param  array  $array
