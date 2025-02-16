@@ -372,7 +372,7 @@ trait InteractsWithIO
         $length = Str::length(strip_tags($string)) + 12;
 
         $this->comment(str_repeat('*', $length), $verbosity);
-        $this->comment('*     '.$string.'     *', $verbosity);
+        $this->comment("*     {$string}     *", $verbosity);
         $this->comment(str_repeat('*', $length), $verbosity);
 
         $this->comment('', $verbosity);

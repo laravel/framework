@@ -115,7 +115,7 @@ class TagSet
      */
     public function tagKey($name)
     {
-        return 'tag:'.$name.':key';
+        return "tag:{$name}:key";
     }
 
     /**
