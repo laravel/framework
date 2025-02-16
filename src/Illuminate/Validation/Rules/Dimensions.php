@@ -144,6 +144,7 @@ class Dimensions implements Rule, DataAwareRule, ValidatorAwareRule
     public function __construct(array $constraints = [])
     {
         foreach ($constraints as $key => $value) {
+            $key = Str::camel($key);
             if (method_exists($this, $key)) {
                 $this->{$key}($value);
             }
@@ -317,19 +318,27 @@ class Dimensions implements Rule, DataAwareRule, ValidatorAwareRule
     protected function buildValidationRules()
     {
         $rules = [];
-        $conditions = ['width', 'height', 'ratio'];
 
-        foreach (get_object_vars($this) as $property => $value) {
-            if ($value !== null && Str::contains($property, $conditions, true)) {
+        $validationRules = [
+            'width', 'minWidth', 'maxWidth', 'widthBetween',
+            'height', 'minHeight', 'maxHeight', 'heightBetween',
+            'ratio', 'minRatio', 'maxRatio', 'ratioBetween',
+        ];
+
+        foreach ($validationRules as $property) {
+            if ($this->{$property} !== null) {
+                $value = $this->{$property};
+
                 if (is_array($value)) {
                     $value = implode(',', $value);
                 }
-                $rule = Str::snake($property);
-                $rules[] = "{$rule}:{$value}";
+
+                $ruleName = Str::snake($property);
+                $rules[] = "{$ruleName}:{$value}";
             }
         }
 
-        return array_merge(array_filter($rules), $this->customRules);
+        return array_merge($rules, $this->customRules);
     }
 
     /**
