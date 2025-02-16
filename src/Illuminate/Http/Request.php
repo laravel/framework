@@ -139,16 +139,19 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     /**
      * Get the full URL for the request with the added query string parameters.
      *
-     * @param  array  $query
+     * @param  array|null  $query The query string parameters to add to the URL
+     * @param  array|null  $only When specified, only the given query parameters will be returned
      * @return string
      */
-    public function fullUrlWithQuery(array $query)
+    public function fullUrlWithQuery(array $query = [], array $only = [])
     {
         $question = $this->getBaseUrl().$this->getPathInfo() === '/' ? '/?' : '?';
+        $query = array_merge($this->query(), $query);
+        $query = $only ? Arr::only($query, $only) : $query;
 
-        return count($this->query()) > 0
-            ? $this->url().$question.Arr::query(array_merge($this->query(), $query))
-            : $this->fullUrl().$question.Arr::query($query);
+        return count($query) > 0
+            ? $this->url().$question.Arr::query($query)
+            : $this->url();
     }
 
     /**

@@ -10,7 +10,7 @@ namespace Illuminate\Support\Facades;
  * @method static string root()
  * @method static string url()
  * @method static string fullUrl()
- * @method static string fullUrlWithQuery(array $query)
+ * @method static string fullUrlWithQuery(array $query = [], array $only = [])
  * @method static string fullUrlWithoutQuery(array|string $keys)
  * @method static string path()
  * @method static string decodedPath()
