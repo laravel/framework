@@ -64,7 +64,10 @@ class QueryException extends PDOException
      */
     protected function formatMessage($connectionName, $sql, $bindings, Throwable $previous)
     {
-        return $previous->getMessage().' (Connection: '.$connectionName.', SQL: '.Str::replaceArray('?', $bindings, $sql).')';
+        $errorMessage = $previous->getMessage();
+        $formattedSql = Str::replaceArray('?', $bindings, $sql);
+
+        return "{$errorMessage} (Connection: {$connectionName}, SQL: {$formattedSql})";
     }
 
     /**
