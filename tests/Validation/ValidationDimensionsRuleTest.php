@@ -268,7 +268,7 @@ class ValidationDimensionsRuleTest extends TestCase
         $this->fails(
             $rule,
             width: 190,
-            height: 210,
+            height: 200,
             message: 'validation.ratio'
         );
     }
@@ -360,8 +360,7 @@ class ValidationDimensionsRuleTest extends TestCase
         $container = Container::getInstance();
 
         $container->bind('translator', function () {
-            $loader = new ArrayLoader();
-            return new Translator($loader, 'en');
+            return new Translator(new ArrayLoader, 'en');
         });
 
         Facade::setFacadeApplication($container);
