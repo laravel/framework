@@ -51,6 +51,7 @@ class Pipeline implements PipelineContract
     /**
      * Create a new class instance.
      *
+     * @param  \Illuminate\Contracts\Container\Container|null  $container
      * @return void
      */
     public function __construct(?Container $container = null)
@@ -113,6 +114,7 @@ class Pipeline implements PipelineContract
     /**
      * Run the pipeline with a final destination callback.
      *
+     * @param  \Closure  $destination
      * @return mixed
      */
     public function then(Closure $destination)
@@ -145,6 +147,7 @@ class Pipeline implements PipelineContract
     /**
      * Set a final callback to be executed after the pipeline ends regardless of the outcome.
      *
+     * @param  \Closure  $callback
      * @return $this
      */
     public function finally(Closure $callback)
@@ -157,6 +160,7 @@ class Pipeline implements PipelineContract
     /**
      * Get the final piece of the Closure onion.
      *
+     * @param  \Closure  $destination
      * @return \Closure
      */
     protected function prepareDestination(Closure $destination)
@@ -261,6 +265,7 @@ class Pipeline implements PipelineContract
     /**
      * Set the container instance.
      *
+     * @param  \Illuminate\Contracts\Container\Container  $container
      * @return $this
      */
     public function setContainer(Container $container)
@@ -285,6 +290,7 @@ class Pipeline implements PipelineContract
      * Handle the given exception.
      *
      * @param  mixed  $passable
+     * @param  \Throwable  $e
      * @return mixed
      *
      * @throws \Throwable
