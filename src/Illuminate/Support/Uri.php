@@ -219,20 +219,10 @@ class Uri implements Htmlable, Responsable, Stringable
             }
         }
 
-        if ($merge) {
-            $mergedQuery = $this->query()->all();
+        $newQuery = $merge ? $this->query()->all() : [];
 
-            foreach ($query as $key => $value) {
-                data_set($mergedQuery, $key, $value);
-            }
-
-            $newQuery = $mergedQuery;
-        } else {
-            $newQuery = [];
-
-            foreach ($query as $key => $value) {
-                data_set($newQuery, $key, $value);
-            }
+        foreach ($query as $key => $value) {
+            data_set($newQuery, $key, $value);
         }
 
         return new static($this->uri->withQuery(Arr::query($newQuery)));
