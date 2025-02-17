@@ -968,6 +968,12 @@ trait ValidatesAttributes
 
         [$width, $height] = $dimensions;
 
+        // This is to correctly parse string representations for dimensions
+        // like so "dimensions:min_width=100,min_height=200"
+        if (! Arr::isAssoc($parameters)) {
+            $this->requireParameterCount(1, $parameters, 'dimensions');
+            $parameters = $this->parseStringParameters($parameters);
+        }
 
         return ! (
             $this->failsBasicDimensionChecks($parameters, $width, $height) ||
