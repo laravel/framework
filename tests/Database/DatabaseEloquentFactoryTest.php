@@ -836,6 +836,16 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertEquals(FactoryTestGuessModel::factory()->modelName(), FactoryTestGuessModel::class);
     }
 
+    public function test_factory_global_model_resolver()
+    {
+        \Illuminate\Database\Eloquent\Factories\Factory::guessModelNamesUsing(function ($model) {
+            return $model . 'Factory';
+        });
+
+        $this->assertEquals(FactoryTestUseFactoryAttribute::factory()->modelName(), FactoryTestUseFactoryAttribute::class);
+        $this->assertEquals(FactoryTestGuessModel::factory()->modelName(), FactoryTestGuessModel::class);
+    }
+
     /**
      * Get a database connection instance.
      *
