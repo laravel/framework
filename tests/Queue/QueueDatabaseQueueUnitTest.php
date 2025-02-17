@@ -131,27 +131,29 @@ class QueueDatabaseQueueUnitTest extends TestCase
         });
 
         $database = m::mock(Connection::class);
+        $container = m::spy(Container::class);
+
         $queue = $this->getMockBuilder(DatabaseQueue::class)->onlyMethods(['currentTime', 'availableAt'])->setConstructorArgs([$database, 'table', 'default'])->getMock();
         $queue->expects($this->any())->method('currentTime')->willReturn('created');
         $queue->expects($this->any())->method('availableAt')->willReturn('available');
+        $queue->setContainer($container);
+        
         $database->shouldReceive('table')->with('table')->andReturn($query = m::mock(stdClass::class));
-        $query->shouldReceive('insert')->once()->andReturnUsing(function ($records) use ($uuid) {
-            $this->assertEquals([[
+        $query->shouldReceive('insertGetId')->twice()->andReturn([
                 'queue' => 'queue',
                 'payload' => json_encode(['uuid' => $uuid, 'displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'maxExceptions' => null, 'failOnTimeout' => false, 'backoff' => null, 'timeout' => null, 'data' => ['data']]),
                 'attempts' => 0,
                 'reserved_at' => null,
                 'available_at' => 'available',
                 'created_at' => 'created',
-            ], [
+        ], [
                 'queue' => 'queue',
                 'payload' => json_encode(['uuid' => $uuid, 'displayName' => 'bar', 'job' => 'bar', 'maxTries' => null, 'maxExceptions' => null, 'failOnTimeout' => false, 'backoff' => null, 'timeout' => null, 'data' => ['data']]),
                 'attempts' => 0,
                 'reserved_at' => null,
                 'available_at' => 'available',
                 'created_at' => 'created',
-            ]], $records);
-        });
+        ]);
 
         $queue->bulk(['foo', 'bar'], ['data'], 'queue');
 

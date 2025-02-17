@@ -137,31 +137,6 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
     }
 
     /**
-     * Push an array of jobs onto the queue.
-     *
-     * @param  array  $jobs
-     * @param  mixed  $data
-     * @param  string|null  $queue
-     * @return mixed
-     */
-    public function bulk($jobs, $data = '', $queue = null)
-    {
-        $queue = $this->getQueue($queue);
-
-        $now = $this->availableAt();
-
-        return $this->database->table($this->table)->insert((new Collection((array) $jobs))->map(
-            function ($job) use ($queue, $data, $now) {
-                return $this->buildDatabaseRecord(
-                    $queue,
-                    $this->createPayload($job, $this->getQueue($queue), $data),
-                    isset($job->delay) ? $this->availableAt($job->delay) : $now,
-                );
-            }
-        )->all());
-    }
-
-    /**
      * Release a reserved job back onto the queue after (n) seconds.
      *
      * @param  string  $queue

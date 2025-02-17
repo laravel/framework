@@ -272,4 +272,24 @@ class QueueDatabaseQueueIntegrationTest extends TestCase
         $this->assertIsArray($jobQueuedEvent->payload());
         $this->assertSame('expected-job-uuid', $jobQueuedEvent->payload()['uuid']);
     }
+
+    public function testJobEventsAreFiredDuringBulkDispatch()
+    {
+        $jobQueueingEventsCount = 0;
+        $jobQueuedEventsCount = 0;
+        
+        $this->container['events']->listen(function (JobQueueing $e) use (&$jobQueueingEventsCount) {
+            $jobQueueingEventsCount += 1;
+        });
+        $this->container['events']->listen(function (JobQueued $e) use (&$jobQueuedEventsCount) {
+            $jobQueuedEventsCount += 1;
+        });
+
+        $this->queue->bulk(['MyJob1', 'MyJob2'], [
+            'laravel' => 'Framework',
+        ]);
+
+        $this->assertEquals(2, $jobQueueingEventsCount);
+        $this->assertEquals(2, $jobQueuedEventsCount);
+    }
 }
