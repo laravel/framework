@@ -37,6 +37,13 @@ class ServeCommand extends Command
     protected $description = 'Serve the application on the PHP development server';
 
     /**
+     * The number of PHP CLI server workers.
+     *
+     * @var int<2, max>|false
+     */
+    protected $phpServerWorkers = 1;
+
+    /**
      * The current port offset.
      *
      * @var int
@@ -84,13 +91,6 @@ class ServeCommand extends Command
         'XDEBUG_MODE',
         'XDEBUG_SESSION',
     ];
-
-    /**
-     * The number of PHP_CLI_SERVER_WORKERS.
-     *
-     * @var int<2, max>|false
-     */
-    protected $phpServerWorkers = 1;
 
     /** {@inheritdoc} */
     #[\Override]
