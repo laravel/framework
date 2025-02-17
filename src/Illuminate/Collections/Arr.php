@@ -939,9 +939,7 @@ class Arr
      */
     public static function reject($array, callable $callback)
     {
-        $negated = fn ($value, $key) => ! $callback($value, $key);
-
-        return static::where($array, $negated);
+        return static::where($array, fn ($value, $key) => ! $callback($value, $key));
     }
 
     /**
