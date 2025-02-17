@@ -28,6 +28,7 @@ class QueryDurationThresholdTest extends TestCase
     {
         $connection = new Connection(new PDO('sqlite::memory:'));
         $connection->setEventDispatcher(new Dispatcher());
+        $connection->enableQueryLog();
         $called = 0;
         $connection->whenQueryingForLongerThan(CarbonInterval::milliseconds(1.1), function () use (&$called) {
             $called++;
@@ -45,6 +46,7 @@ class QueryDurationThresholdTest extends TestCase
     {
         $connection = new Connection(new PDO('sqlite::memory:'));
         $connection->setEventDispatcher(new Dispatcher());
+        $connection->enableQueryLog();
         $called = 0;
         $connection->whenQueryingForLongerThan(CarbonInterval::milliseconds(1), function () use (&$called) {
             $called++;
@@ -63,6 +65,7 @@ class QueryDurationThresholdTest extends TestCase
 
         $connection = new Connection(new PDO('sqlite::memory:'));
         $connection->setEventDispatcher(new Dispatcher());
+        $connection->enableQueryLog();
         $called = 0;
         $connection->whenQueryingForLongerThan($this->now->addMilliseconds(1), function () use (&$called) {
             $called++;
@@ -79,6 +82,7 @@ class QueryDurationThresholdTest extends TestCase
     {
         $connection = new Connection(new PDO('sqlite::memory:'));
         $connection->setEventDispatcher(new Dispatcher());
+        $connection->enableQueryLog();
         $called = [];
         $connection->whenQueryingForLongerThan(CarbonInterval::milliseconds(1), function () use (&$called) {
             $called['a'] = true;
@@ -100,6 +104,7 @@ class QueryDurationThresholdTest extends TestCase
     {
         $connection = new Connection(new PDO('sqlite::memory:'));
         $connection->setEventDispatcher(new Dispatcher());
+        $connection->enableQueryLog();
         $called = [];
         $connection->whenQueryingForLongerThan(CarbonInterval::milliseconds(1), function () use (&$called) {
             $called['a'] = true;
@@ -125,6 +130,7 @@ class QueryDurationThresholdTest extends TestCase
     {
         $connection = new Connection(new PDO('sqlite::memory:'), '', '', ['name' => 'expected-name']);
         $connection->setEventDispatcher(new Dispatcher());
+        $connection->enableQueryLog();
         $name = null;
         $connection->whenQueryingForLongerThan(CarbonInterval::milliseconds(1), function ($connection) use (&$name) {
             $name = $connection->getName();
@@ -140,6 +146,7 @@ class QueryDurationThresholdTest extends TestCase
     {
         $connection = new Connection(new PDO('sqlite::memory:'));
         $connection->setEventDispatcher(new Dispatcher());
+        $connection->enableQueryLog();
         $called = false;
         $connection->whenQueryingForLongerThan(1.1, function () use (&$called) {
             $called = true;
@@ -156,6 +163,7 @@ class QueryDurationThresholdTest extends TestCase
     {
         $connection = new Connection(new PDO('sqlite::memory:'));
         $connection->setEventDispatcher(new Dispatcher());
+        $connection->enableQueryLog();
         $called = false;
         $connection->whenQueryingForLongerThan(2, function () use (&$called) {
             $called = true;
@@ -186,6 +194,7 @@ class QueryDurationThresholdTest extends TestCase
     {
         $connection = new Connection(new PDO('sqlite::memory:'));
         $connection->setEventDispatcher(new Dispatcher());
+        $connection->enableQueryLog();
         $called = 0;
         $connection->whenQueryingForLongerThan(CarbonInterval::milliseconds(1), function () use (&$called) {
             $called++;
@@ -217,7 +226,7 @@ class QueryDurationThresholdTest extends TestCase
         $queries = [];
         $connection->whenQueryingForLongerThan(CarbonInterval::milliseconds(2), function ($connection, $event) use (&$queries) {
             $queries = Arr::pluck($connection->getQueryLog(), 'query');
-            $queries[] = $event->sql;
+            $queries = Arr::pluck($event->queryLog, 'query');
         });
 
         $connection->logQuery('foo', [], 1);

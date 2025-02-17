@@ -7,6 +7,7 @@ use ErrorException;
 use Exception;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Connection;
+use Illuminate\Database\Events\QueriesExecuted;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Database\Events\TransactionBeginning;
 use Illuminate\Database\Events\TransactionCommitted;
@@ -468,7 +469,13 @@ class DatabaseConnectionTest extends TestCase
         $connection = $this->getMockConnection();
         $connection->logQuery('foo', [], time());
         $connection->setEventDispatcher($events = m::mock(Dispatcher::class));
+        $events->shouldNotReceive('dispatch')->once()->with(m::type(QueriesExecuted::class));
         $events->shouldReceive('dispatch')->once()->with(m::type(QueryExecuted::class));
+
+        $connection->enableQueryLog();
+        $connection->logQuery('foo', [], time());
+        $events->shouldReceive('dispatch')->once()->with(m::type(QueryExecuted::class));
+        $events->shouldReceive('dispatch')->once()->with(m::type(QueriesExecuted::class));
         $connection->logQuery('foo', [], null);
     }
 
