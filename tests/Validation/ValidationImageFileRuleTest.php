@@ -17,7 +17,6 @@ use PHPUnit\Framework\TestCase;
 
 class ValidationImageFileRuleTest extends TestCase
 {
-
     #[Test]
     public function dimensions()
     {
