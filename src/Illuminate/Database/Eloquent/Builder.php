@@ -1013,10 +1013,7 @@ class Builder implements BuilderContract
 
         $total = value($total) ?? $this->toBase()->getCountForPagination();
 
-        $perPage = ($perPage instanceof Closure
-            ? $perPage($total)
-            : $perPage
-        ) ?: $this->model->getPerPage();
+        $perPage = value($perPage, $total) ?? $this->model->getPerPage();
 
         $results = $total
             ? $this->forPage($page, $perPage)->get($columns)
