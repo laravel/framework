@@ -250,7 +250,7 @@ class Builder implements BuilderContract
     public $useWritePdo = false;
 
     /**
-     * Custom arguments for the PDOStatement::fetchAll/fetch functions.
+     * Custom arguments for the PDOStatement::fetchAll / fetch functions.
      *
      * @var array
      */
@@ -3100,7 +3100,6 @@ class Builder implements BuilderContract
 
         $items = new Collection($this->processor->processSelect($this, $this->runSelect()));
 
-        // Revert to original columns so future queries can use the previous selection.
         $this->columns = $original;
 
         return $this->applyAfterQueryCallbacks(
@@ -3369,11 +3368,12 @@ class Builder implements BuilderContract
         // First, we will need to select the results of the query accounting for the
         // given columns / key. Once we have the results, we will be able to take
         // the results and get the exact data that was requested for the query.
-        $this->columns = is_null($key) || $key === $column ? [$column] : [$column, $key];
+        $this->columns = is_null($key) || $key === $column
+            ? [$column]
+            : [$column, $key];
 
         $queryResult = $this->processor->processSelect($this, $this->runSelect());
 
-        // Revert to original columns so future queries can use the previous selection.
         $this->columns = $original;
 
         if (empty($queryResult)) {
@@ -4282,12 +4282,12 @@ class Builder implements BuilderContract
     }
 
     /**
-     * Set arguments for the PDOStatement::fetchAll/fetch functions.
+     * Specify arguments for the PDOStatement::fetchAll / fetch functions.
      *
      * @param  mixed  ...$fetchUsing
      * @return $this
      */
-    public function fetchUsing(...$fetchUsing): static
+    public function fetchUsing(...$fetchUsing)
     {
         $this->fetchUsing = $fetchUsing;
 
