@@ -114,11 +114,11 @@ abstract class Factory
     public static $namespace = 'Database\\Factories\\';
 
     /**
-     * The default model name resolvers.
+     * The default model name resolver.
      *
-     * @var array<class-string, callable(self): class-string<TModel>>
+     * @var callable(self): class-string<TModel>
      */
-    protected static $modelNameResolvers = [];
+    protected static $modelNameResolver;
 
     /**
      * The factory name resolver.
@@ -274,7 +274,7 @@ abstract class Factory
      */
     public function createManyQuietly(int|iterable|null $records = null)
     {
-        return Model::withoutEvents(fn() => $this->createMany($records));
+        return Model::withoutEvents(fn () => $this->createMany($records));
     }
 
     /**
@@ -314,7 +314,7 @@ abstract class Factory
      */
     public function createQuietly($attributes = [], ?Model $parent = null)
     {
-        return Model::withoutEvents(fn() => $this->create($attributes, $parent));
+        return Model::withoutEvents(fn () => $this->create($attributes, $parent));
     }
 
     /**
@@ -326,7 +326,7 @@ abstract class Factory
      */
     public function lazy(array $attributes = [], ?Model $parent = null)
     {
-        return fn() => $this->create($attributes, $parent);
+        return fn () => $this->create($attributes, $parent);
     }
 
     /**
@@ -469,7 +469,7 @@ abstract class Factory
     protected function parentResolvers()
     {
         return $this->for
-            ->map(fn(BelongsToRelationship $for) => $for->recycle($this->recycle)->attributesFor($this->newModel()))
+            ->map(fn (BelongsToRelationship $for) => $for->recycle($this->recycle)->attributesFor($this->newModel()))
             ->collapse()
             ->all();
     }
@@ -519,7 +519,7 @@ abstract class Factory
     {
         return $this->newInstance([
             'states' => $this->states->concat([
-                is_callable($state) ? $state : fn() => $state,
+                is_callable($state) ? $state : fn () => $state,
             ]),
         ]);
     }
@@ -580,8 +580,7 @@ abstract class Factory
     {
         return $this->newInstance([
             'has' => $this->has->concat([new Relationship(
-                $factory,
-                $relationship ?? $this->guessRelationship($factory->modelName())
+                $factory, $relationship ?? $this->guessRelationship($factory->modelName())
             )]),
         ]);
     }
@@ -654,7 +653,7 @@ abstract class Factory
                 ->merge(
                     Collection::wrap($model instanceof Model ? func_get_args() : $model)
                         ->flatten()
-                )->groupBy(fn($model) => get_class($model)),
+                )->groupBy(fn ($model) => get_class($model)),
         ]);
     }
 
@@ -811,20 +810,18 @@ abstract class Factory
             return $this->model;
         }
 
-        $resolver = static::$modelNameResolvers[static::class] ?? function (self $factory) {
+        $resolver = static::$modelNameResolver ?? function (self $factory) {
             $namespacedFactoryBasename = Str::replaceLast(
-                'Factory',
-                '',
-                Str::replaceFirst(static::$namespace, '', get_class($factory))
+                'Factory', '', Str::replaceFirst(static::$namespace, '', get_class($factory))
             );
 
             $factoryBasename = Str::replaceLast('Factory', '', class_basename($factory));
 
             $appNamespace = static::appNamespace();
 
-            return class_exists($appNamespace . 'Models\\' . $namespacedFactoryBasename)
-                ? $appNamespace . 'Models\\' . $namespacedFactoryBasename
-                : $appNamespace . $factoryBasename;
+            return class_exists($appNamespace.'Models\\'.$namespacedFactoryBasename)
+                        ? $appNamespace.'Models\\'.$namespacedFactoryBasename
+                        : $appNamespace.$factoryBasename;
         };
 
         return $resolver($this);
@@ -838,7 +835,7 @@ abstract class Factory
      */
     public static function guessModelNamesUsing(callable $callback)
     {
-        static::$modelNameResolvers[static::class] = $callback;
+        static::$modelNameResolver = $callback;
     }
 
     /**
@@ -901,11 +898,11 @@ abstract class Factory
         $resolver = static::$factoryNameResolver ?? function (string $modelName) {
             $appNamespace = static::appNamespace();
 
-            $modelName = Str::startsWith($modelName, $appNamespace . 'Models\\')
-                ? Str::after($modelName, $appNamespace . 'Models\\')
+            $modelName = Str::startsWith($modelName, $appNamespace.'Models\\')
+                ? Str::after($modelName, $appNamespace.'Models\\')
                 : Str::after($modelName, $appNamespace);
 
-            return static::$namespace . $modelName . 'Factory';
+            return static::$namespace.$modelName.'Factory';
         };
 
         return $resolver($modelName);
