@@ -114,11 +114,11 @@ abstract class Factory
     public static $namespace = 'Database\\Factories\\';
 
     /**
-     * The default model name resolver.
+     * The default model name resolvers.
      *
-     * @var callable(self): class-string<TModel>
+     * @var array<class-string, callable(self): class-string<TModel>>
      */
-    protected static $modelNameResolver;
+    protected static $modelNameResolvers = [];
 
     /**
      * The factory name resolver.
@@ -810,7 +810,7 @@ abstract class Factory
             return $this->model;
         }
 
-        $resolver = static::$modelNameResolver ?? function (self $factory) {
+        $resolver = static::$modelNameResolvers[static::class] ?? function (self $factory) {
             $namespacedFactoryBasename = Str::replaceLast(
                 'Factory', '', Str::replaceFirst(static::$namespace, '', get_class($factory))
             );
@@ -835,7 +835,7 @@ abstract class Factory
      */
     public static function guessModelNamesUsing(callable $callback)
     {
-        static::$modelNameResolver = $callback;
+        static::$modelNameResolvers[static::class] = $callback;
     }
 
     /**
