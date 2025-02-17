@@ -12,16 +12,19 @@ use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\File;
 use Illuminate\Validation\ValidationServiceProvider;
 use Illuminate\Validation\Validator;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 class ValidationImageFileRuleTest extends TestCase
 {
-    public function testDimensions()
+
+    #[Test]
+    public function dimensions()
     {
         $this->fails(
             File::image()->dimensions(Rule::dimensions()->width(100)->height(100)),
             UploadedFile::fake()->image('foo.png', 101, 101),
-            ['validation.dimensions'],
+            ['validation.width', 'validation.height'],
         );
 
         $this->passes(
@@ -30,12 +33,13 @@ class ValidationImageFileRuleTest extends TestCase
         );
     }
 
-    public function testDimensionsWithCustomImageSizeMethod()
+    #[Test]
+    public function dimensions_with_custom_image_size_method()
     {
         $this->fails(
             File::image()->dimensions(Rule::dimensions()->width(100)->height(100)),
             new UploadedFileWithCustomImageSizeMethod(stream_get_meta_data($tmpFile = tmpfile())['uri'], 'foo.png'),
-            ['validation.dimensions'],
+            ['validation.width', 'validation.height'],
         );
 
         $this->passes(
@@ -44,12 +48,13 @@ class ValidationImageFileRuleTest extends TestCase
         );
     }
 
-    public function testDimentionWithTheRatioMethod()
+    #[Test]
+    public function dimension_with_the_ratio_method()
     {
         $this->fails(
             File::image()->dimensions(Rule::dimensions()->ratio(1)),
             UploadedFile::fake()->image('foo.png', 105, 100),
-            ['validation.dimensions'],
+            ['validation.ratio'],
         );
 
         $this->passes(
@@ -58,12 +63,13 @@ class ValidationImageFileRuleTest extends TestCase
         );
     }
 
-    public function testDimentionWithTheMinRatioMethod()
+    #[Test]
+    public function dimension_with_the_min_ratio_method()
     {
         $this->fails(
             File::image()->dimensions(Rule::dimensions()->minRatio(1 / 2)),
             UploadedFile::fake()->image('foo.png', 100, 100),
-            ['validation.dimensions'],
+            ['validation.min_ratio'],
         );
 
         $this->passes(
@@ -72,12 +78,13 @@ class ValidationImageFileRuleTest extends TestCase
         );
     }
 
-    public function testDimentionWithTheMaxRatioMethod()
+    #[Test]
+    public function dimension_with_the_max_ratio_method()
     {
         $this->fails(
             File::image()->dimensions(Rule::dimensions()->maxRatio(1 / 2)),
             UploadedFile::fake()->image('foo.png', 100, 300),
-            ['validation.dimensions'],
+            ['validation.max_ratio'],
         );
 
         $this->passes(
@@ -86,12 +93,13 @@ class ValidationImageFileRuleTest extends TestCase
         );
     }
 
-    public function testDimentionWithTheRatioBetweenMethod()
+    #[Test]
+    public function dimension_with_the_ratio_between_method()
     {
         $this->fails(
             File::image()->dimensions(Rule::dimensions()->ratioBetween(1 / 2, 1 / 3)),
             UploadedFile::fake()->image('foo.png', 100, 100),
-            ['validation.dimensions'],
+            ['validation.ratio_between'],
         );
 
         $this->passes(
