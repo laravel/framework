@@ -8,4 +8,5 @@ Thumbs.db
 /.idea
 /.fleet
 /.vscode
+/.zed
 .phpunit.result.cache
