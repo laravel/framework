@@ -374,7 +374,7 @@ trait QueriesRelationships
      * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
      *
      * @param  \Illuminate\Database\Eloquent\Relations\MorphTo<TRelatedModel, *>|string  $relation
-     * @param  string|array<int, array>  $types
+     * @param  string|array<int, string>  $types
      * @param  (\Closure(\Illuminate\Database\Eloquent\Builder<TRelatedModel>, string): mixed)|null  $callback
      * @param  string  $operator
      * @param  int  $count
