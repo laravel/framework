@@ -15,7 +15,9 @@ use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionFunction;
+use ReflectionIntersectionType;
 use ReflectionParameter;
+use ReflectionUnionType;
 use TypeError;
 
 class Container implements ArrayAccess, ContainerContract
@@ -280,14 +282,9 @@ class Container implements ArrayAccess, ContainerContract
     public function bind($abstract, $concrete = null, $shared = false)
     {
         if ($abstract instanceof Closure) {
-            $abstracts = $this->closureReturnTypes($abstract);
-            $concrete = $abstract;
-
-            foreach ($abstracts as $abstract) {
-                $this->bind($abstract, $concrete, $shared);
-            }
-
-            return;
+            return $this->bindBasedOnClosureReturnTypes(
+                $abstract, $concrete, $shared
+            );
         }
 
         $this->dropStaleInstances($abstract);
@@ -470,6 +467,54 @@ class Container implements ArrayAccess, ContainerContract
         if (! $this->bound($abstract)) {
             $this->scoped($abstract, $concrete);
         }
+    }
+
+    /**
+     * Register a binding with the container based on the given Closure's return types.
+     *
+     * @param  \Closure|string  $abstract
+     * @param  \Closure|string|null  $concrete
+     * @param  bool  $shared
+     * @return void
+     */
+    protected function bindBasedOnClosureReturnTypes($abstract, $concrete = null, $shared = false)
+    {
+        $abstracts = $this->closureReturnTypes($abstract);
+
+        $concrete = $abstract;
+
+        foreach ($abstracts as $abstract) {
+            $this->bind($abstract, $concrete, $shared);
+        }
+    }
+
+    /**
+     * Get the class names / types of the return type of the given Closure.
+     *
+     * @param  \Closure  $closure
+     * @return list<class-string>
+     *
+     * @throws \ReflectionException
+     */
+    protected function closureReturnTypes(Closure $closure)
+    {
+        $reflection = new ReflectionFunction($closure);
+
+        if ($reflection->getReturnType() === null ||
+            $reflection->getReturnType() instanceof ReflectionIntersectionType) {
+            return [];
+        }
+
+        $types = $reflection->getReturnType() instanceof ReflectionUnionType
+            ? $reflection->getReturnType()->getTypes()
+            : [$reflection->getReturnType()];
+
+        return (new Collection($types))
+            ->reject(fn ($type) => $type->isBuiltin())
+            ->reject(fn ($type) => in_array($type->getName(), ['static', 'self']))
+            ->map(fn ($type) => $type->getName())
+            ->values()
+            ->all();
     }
 
     /**
@@ -1647,46 +1692,5 @@ class Container implements ArrayAccess, ContainerContract
     public function __set($key, $value)
     {
         $this[$key] = $value;
-    }
-
-    /**
-     * Get the class names / types of the return type of the given Closure.
-     *
-     * @param  \Closure  $closure
-     * @return list<class-string>
-     *
-     * @throws \ReflectionException
-     */
-    protected function closureReturnTypes(Closure $closure)
-    {
-        $reflection = new ReflectionFunction($closure);
-
-        if (
-            $reflection->getReturnType() === null ||
-            $reflection->getReturnType() instanceof \ReflectionIntersectionType
-        ) {
-            return [];
-        }
-
-        if (
-            $reflection->getReturnType() instanceof \ReflectionUnionType
-        ) {
-            $types = $reflection->getReturnType()->getTypes();
-        } else {
-            $types = [$reflection->getReturnType()];
-        }
-
-        return (new Collection($types))
-            ->reject(function (\ReflectionNamedType $type) {
-                return $type->isBuiltin();
-            })
-            ->reject(function (\ReflectionNamedType $type) {
-                return in_array($type->getName(), ['static', 'self']);
-            })
-            ->map(function (\ReflectionNamedType $type) {
-                return $type->getName();
-            })
-            ->values()
-            ->all();
     }
 }
