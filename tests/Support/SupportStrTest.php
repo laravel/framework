@@ -987,6 +987,21 @@ class SupportStrTest extends TestCase
         $this->assertSame('ÖffentlicheÜberraschungen', Str::studly('öffentliche-überraschungen'));
     }
 
+    public function testPascal()
+    {
+        $this->assertSame('LaravelPhpFramework', Str::pascal('laravel_php_framework'));
+        $this->assertSame('LaravelPhpFramework', Str::pascal('laravel-php-framework'));
+        $this->assertSame('LaravelPhpFramework', Str::pascal('laravel  -_-  php   -_-   framework   '));
+
+        $this->assertSame('FooBar', Str::pascal('fooBar'));
+        $this->assertSame('FooBar', Str::pascal('foo_bar'));
+        $this->assertSame('FooBar', Str::pascal('foo_bar')); // test cache
+        $this->assertSame('FooBarBaz', Str::pascal('foo-barBaz'));
+        $this->assertSame('FooBarBaz', Str::pascal('foo-bar_baz'));
+
+        $this->assertSame('ÖffentlicheÜberraschungen', Str::pascal('öffentliche-überraschungen'));
+    }
+
     public function testMask()
     {
         $this->assertSame('tay*************', Str::mask('taylor@email.com', '*', 3));
