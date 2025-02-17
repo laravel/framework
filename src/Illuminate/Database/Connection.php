@@ -7,6 +7,7 @@ use Closure;
 use DateTimeInterface;
 use Exception;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Database\Events\QueriesExecuted;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Database\Events\StatementPrepared;
 use Illuminate\Database\Events\TransactionBeginning;
@@ -810,9 +811,9 @@ class Connection implements ConnectionInterface
             return $callback($query, $bindings);
         }
 
-        // If an exception occurs when attempting to run a query, we'll format the error
-        // message to include the bindings with SQL, which will make this exception a
-        // lot more helpful to the developer instead of just the database's errors.
+            // If an exception occurs when attempting to run a query, we'll format the error
+            // message to include the bindings with SQL, which will make this exception a
+            // lot more helpful to the developer instead of just the database's errors.
         catch (Exception $e) {
             if ($this->isUniqueConstraintError($e)) {
                 throw new UniqueConstraintViolationException(
@@ -857,6 +858,7 @@ class Connection implements ConnectionInterface
 
         if ($this->loggingQueries) {
             $this->queryLog[] = compact('query', 'bindings', 'time');
+            $this->event(new QueriesExecuted($this->queryLog, $this));
         }
     }
 
@@ -895,7 +897,7 @@ class Connection implements ConnectionInterface
 
         $key = count($this->queryDurationHandlers) - 1;
 
-        $this->listen(function ($event) use ($threshold, $handler, $key) {
+        $this->listenForCumulatedQueries(function ($event) use ($threshold, $handler, $key) {
             if (! $this->queryDurationHandlers[$key]['has_run'] && $this->totalQueryDuration() > $threshold) {
                 $handler($this, $event);
 
@@ -1053,6 +1055,17 @@ class Connection implements ConnectionInterface
     public function listen(Closure $callback)
     {
         $this->events?->listen(Events\QueryExecuted::class, $callback);
+    }
+
+    /**
+     * Register a database query listener with the connection.
+     *
+     * @param  \Closure  $callback
+     * @return void
+     */
+    public function listenForCumulatedQueries(Closure $callback)
+    {
+        $this->events?->listen(Events\QueriesExecuted::class, $callback);
     }
 
     /**
