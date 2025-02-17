@@ -980,7 +980,7 @@ class Str
     }
 
     /**
-     * Pluralize the last word of an English, pascal caps case string.
+     * Pluralize the last word of an English, Pascal caps case string.
      *
      * @param  string  $value
      * @param  int|array|\Countable  $count
@@ -1639,7 +1639,7 @@ class Str
     }
 
     /**
-     * Convert a value to pascal case.
+     * Convert a value to Pascal case.
      *
      * @param  string  $value
      * @return string

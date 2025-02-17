@@ -636,7 +636,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
-     * Pluralize the last word of an English, pascal caps case string.
+     * Pluralize the last word of an English, Pascal caps case string.
      *
      * @param  int|array|\Countable  $count
      * @return static
@@ -944,7 +944,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
-     * Convert the string to pascal case.
+     * Convert the string to Pascal case.
      *
      * @return static
      */
