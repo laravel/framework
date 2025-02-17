@@ -839,7 +839,7 @@ class DatabaseEloquentFactoryTest extends TestCase
     public function test_factory_global_model_resolver()
     {
         \Illuminate\Database\Eloquent\Factories\Factory::guessModelNamesUsing(function ($model) {
-            return $model . 'Factory';
+            return $model.'Factory';
         });
 
         $this->assertEquals(FactoryTestUseFactoryAttribute::factory()->modelName(), FactoryTestUseFactoryAttribute::class);
@@ -1004,7 +1004,7 @@ class FactoryTestGuessModelFactory extends Factory
 {
     protected static function appNamespace()
     {
-        return __NAMESPACE__ . '\\';
+        return __NAMESPACE__.'\\';
     }
 
     public function definition()
