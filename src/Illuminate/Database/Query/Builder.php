@@ -250,7 +250,7 @@ class Builder implements BuilderContract
     public $useWritePdo = false;
 
     /**
-     * Custom arguments for the PDOStatement::fetchAll / fetch functions.
+     * The custom arguments for the PDOStatement::fetchAll / fetch functions.
      *
      * @var array
      */
