@@ -199,7 +199,6 @@ class FluentEnv
         }
 
         return null;
-
     }
 
     /**
