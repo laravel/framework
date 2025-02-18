@@ -267,6 +267,10 @@ if (! function_exists('unless')) {
      */
     function unless($condition, $value, $default = null)
     {
-        return when(! $condition, $value, $default);
+        if (! $condition) {
+            return value($value, $condition);
+        }
+
+        return value($default, $condition);
     }
 }

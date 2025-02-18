@@ -154,10 +154,10 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals('There', unless('', fn () => 'There', fn () => null));
         $this->assertEquals('There', unless(0, fn () => 'There', fn () => null));
         $this->assertEquals('True', unless([], 'True', 'False'));  // Empty Array = Falsy
-        $this->assertEquals('Default', unless(true, fn ($value) => $value, fn ($value) => 'Default')); // lazy evaluation
-        $this->assertTrue(unless(false, fn ($value) => $value, fn ($value) => 'Default')); // lazy evaluation
-        $this->assertEquals('Empty', unless(collect()->isEmpty(), 'Not Empty', 'Empty'));
-        $this->assertEquals('Not Empty', unless(collect([1])->isEmpty(), 'Not Empty', 'Empty'));
+        $this->assertFalse(unless(true, fn ($value) => $value, fn ($value) => ! $value)); // lazy evaluation
+        $this->assertFalse(unless(false, fn ($value) => $value, fn ($value) => ! $value)); // lazy evaluation
+        $this->assertEquals('Empty', unless(collect()->isEmpty(), 'Not Empty', 'Empty')); // For good measure
+        $this->assertEquals('Not Empty', unless(collect([1])->isEmpty(), 'Not Empty', 'Empty')); // For good measure
     }
 
     public function testFilled()
