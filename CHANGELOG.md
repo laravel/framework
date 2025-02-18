@@ -1,6 +1,37 @@
 # Release Notes for 11.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v11.42.1...11.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v11.43.0...11.x)
+
+## [v11.43.0](https://github.com/laravel/framework/compare/v11.42.1...v11.43.0) - 2025-02-18
+
+* Remove Incorrect [@mixin](https://github.com/mixin) Annotation in BuildsQueries Trait by [@daniel-de-wit](https://github.com/daniel-de-wit) in https://github.com/laravel/framework/pull/54596
+* make withoutScopedBindings usable on RouteRegistrar by [@ssninnni](https://github.com/ssninnni) in https://github.com/laravel/framework/pull/54592
+* [11.x] Update Broadcasting Install Command For Bun Version 1.1.39^ by [@realpoke](https://github.com/realpoke) in https://github.com/laravel/framework/pull/54605
+* [11.x] Add isTtySupported to Process facade by [@Riley19280](https://github.com/Riley19280) in https://github.com/laravel/framework/pull/54604
+* [11.x] fix: pagination generics by [@calebdw](https://github.com/calebdw) in https://github.com/laravel/framework/pull/54601
+* Convert closures to arrow functions in the Model class by [@alikhosravidev](https://github.com/alikhosravidev) in https://github.com/laravel/framework/pull/54599
+* [11.x] Document hashedValue as non-nullable by [@JurianArie](https://github.com/JurianArie) in https://github.com/laravel/framework/pull/54615
+* [11.x] Prohibited If Declined and Prohibited If Accepted validation rules  by [@osama-98](https://github.com/osama-98) in https://github.com/laravel/framework/pull/54608
+* [11.x] Fix param types for `orWhereHasMorph` method by [@simonellensohn](https://github.com/simonellensohn) in https://github.com/laravel/framework/pull/54659
+* [11.x] Add pascal alias for studly string helper by [@da-mask](https://github.com/da-mask) in https://github.com/laravel/framework/pull/54655
+* [11.x] make the Eloquent missing attribute handler more accurate by changing offsetExists by [@koenvu](https://github.com/koenvu) in https://github.com/laravel/framework/pull/54654
+* [11.x] use exec function if the symlink function is unavailable by [@aisuvro](https://github.com/aisuvro) in https://github.com/laravel/framework/pull/54651
+* [11.x] use value helper for $perPage as used for $total by [@rodrigopedra](https://github.com/rodrigopedra) in https://github.com/laravel/framework/pull/54650
+* [11.x] [cleanup] used illuminate str contains by [@daison12006013](https://github.com/daison12006013) in https://github.com/laravel/framework/pull/54647
+* [11.x] Allow can attribute on group by [@utsavsomaiya](https://github.com/utsavsomaiya) in https://github.com/laravel/framework/pull/54648
+* Test Improvements by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/54645
+* Fixes Factory Using Wrong Model Name by [@SameOldNick](https://github.com/SameOldNick) in https://github.com/laravel/framework/pull/54644
+* [11.x] fix 'parsePipeString' in pipeline helper by [@igzard](https://github.com/igzard) in https://github.com/laravel/framework/pull/54643
+* Update old() docblock by [@AJenbo](https://github.com/AJenbo) in https://github.com/laravel/framework/pull/54641
+* [11.x] Feature: Array reject by [@liamduckett](https://github.com/liamduckett) in https://github.com/laravel/framework/pull/54638
+* [11.x] Blade [@include](https://github.com/include) performance by [@AlliBalliBaba](https://github.com/AlliBalliBaba) in https://github.com/laravel/framework/pull/54633
+* Fix Collection::implode with \Stringable objects by [@timkelty](https://github.com/timkelty) in https://github.com/laravel/framework/pull/54630
+* [11.x] Fix `serve` command with `PHP_CLI_SERVER_WORKERS` by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/54606
+* [11.x] new: `ddJson` method on `TestResponse` class by [@chester-sykes](https://github.com/chester-sykes) in https://github.com/laravel/framework/pull/54673
+* [11.x] Add find sole query builder method by [@zepfietje](https://github.com/zepfietje) in https://github.com/laravel/framework/pull/54667
+* [11.x] Fix regression bug with global `Factory::guessModelNamesUsing()` by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/54665
+* [11.x] Fix routeCollection get method return value when searching by dot not… by [@abdel-aouby](https://github.com/abdel-aouby) in https://github.com/laravel/framework/pull/54672
+* [11.x] Add `withWhereRelation` method to builder by [@utsavsomaiya](https://github.com/utsavsomaiya) in https://github.com/laravel/framework/pull/54668
 
 ## [v11.42.1](https://github.com/laravel/framework/compare/v11.42.0...v11.42.1) - 2025-02-12
 
