@@ -5,6 +5,7 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Env;
+use Illuminate\Support\FluentEnv;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\HigherOrderTapProxy;
 use Illuminate\Support\Once;
@@ -150,8 +151,12 @@ if (! function_exists('env')) {
      * @param  mixed  $default
      * @return mixed
      */
-    function env($key, $default = null)
+    function env($key = null, $default = null)
     {
+        if (func_num_args() === 0) {
+            return new FluentEnv();
+        }
+
         return Env::get($key, $default);
     }
 }
