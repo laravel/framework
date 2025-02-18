@@ -91,7 +91,7 @@ class FluentEnv
          * now reading the default validation.php file for
          * propper translation.
          */
-        if(! $validator->passes()) {
+        if (! $validator->passes()) {
             $messages = require __DIR__.'/../Translation/lang/en/validation.php';
             $translator = new Translator((new ArrayLoader)->addMessages('en', 'validation', $messages), 'en');
             $validator->setTranslator($translator);
