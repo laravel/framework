@@ -27,6 +27,7 @@ class SupportFluentEnvTest extends TestCase
         // no default
         $this->assertNull(env()->key('foo')->get());
         // default
+        $this->assertSame('default', env()->key('foo', 'default')->get());
         $this->assertSame('default', env()->key('foo')->default('default')->get());
         // default as fucntion
         $this->assertSame('default', env()->key('foo')->default(fn () => 'default')->get());
@@ -36,9 +37,9 @@ class SupportFluentEnvTest extends TestCase
     {
         $_ENV['foo'] = 'var';
 
-        $this->assertSame('var', env()->key('wrong-key', 'foo')->get());
-        $this->assertSame('default', env()->key('wrong-key-1', 'wrong-key-2')->default('default')->get());
-        $this->assertNull(env()->key('wrong-key-1', 'wrong-key-2')->get());
+        $this->assertSame('var', env()->keys('wrong-key', 'foo')->get());
+        $this->assertSame('default', env()->keys('wrong-key-1', 'wrong-key-2')->default('default')->get());
+        $this->assertNull(env()->keys('wrong-key-1', 'wrong-key-2')->get());
     }
 
     public function testCasting()

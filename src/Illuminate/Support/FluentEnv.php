@@ -34,9 +34,20 @@ class FluentEnv
     }
 
     /**
+     * Set the environment variable key to look up.
+     */
+    public function key(string $key, mixed $default = null): static
+    {
+        $this->keys[] = $key;
+        $this->default = $default;
+
+        return $this;
+    }
+
+    /**
      * Set the environment variable key(s) to look up.
      */
-    public function key(string ...$keys): static
+    public function keys(string ...$keys): static
     {
         $this->keys = array_merge($this->keys, array_values($keys));
 
