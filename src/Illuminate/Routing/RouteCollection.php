@@ -170,7 +170,7 @@ class RouteCollection extends AbstractRouteCollection
      */
     public function get($method = null)
     {
-        return is_null($method) ? $this->getRoutes() : $this->routes[$method] ?? [];
+        return is_null($method) ? $this->getRoutes() : ($this->routes[$method] ?? []);
     }
 
     /**
