@@ -4,7 +4,6 @@ namespace Illuminate\Routing;
 
 use Illuminate\Container\Container;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
 
 class RouteCollection extends AbstractRouteCollection
 {
