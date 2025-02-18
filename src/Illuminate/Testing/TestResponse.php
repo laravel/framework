@@ -1595,7 +1595,7 @@ class TestResponse implements ArrayAccess
     }
 
     /**
-     * Die and dump the JSON payload for the request.
+     * Dump the JSON payload from the response and end the script.
      *
      * @param  string|null  $key
      */
