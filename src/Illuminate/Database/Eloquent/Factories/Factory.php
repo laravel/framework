@@ -810,9 +810,9 @@ abstract class Factory
             return $this->model;
         }
 
-        $resolver = static::$modelNameResolvers[static::class] ?? function (self $factory) {
+        $resolver = static::$modelNameResolvers[static::class] ?? static::$modelNameResolvers[self::class] ?? function (self $factory) {
             $namespacedFactoryBasename = Str::replaceLast(
-                'Factory', '', Str::replaceFirst(static::$namespace, '', get_class($factory))
+                'Factory', '', Str::replaceFirst(static::$namespace, '', $factory::class)
             );
 
             $factoryBasename = Str::replaceLast('Factory', '', class_basename($factory));
@@ -922,6 +922,18 @@ abstract class Factory
         } catch (Throwable) {
             return 'App\\';
         }
+    }
+
+    /**
+     * Flush the factory's global state.
+     *
+     * @return void
+     */
+    public static function flushState()
+    {
+        static::$modelNameResolvers = [];
+        static::$factoryNameResolver = null;
+        static::$namespace = 'Database\\Factories\\';
     }
 
     /**

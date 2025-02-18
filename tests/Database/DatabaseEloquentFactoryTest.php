@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Factories\Sequence;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 use Illuminate\Tests\Database\Fixtures\Models\Money\Price;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -838,12 +839,15 @@ class DatabaseEloquentFactoryTest extends TestCase
 
     public function test_factory_global_model_resolver()
     {
-        \Illuminate\Database\Eloquent\Factories\Factory::guessModelNamesUsing(function ($model) {
-            return $model.'Factory';
+        Factory::guessModelNamesUsing(function ($factory) {
+            return __NAMESPACE__.'\\'.Str::replaceLast('Factory', '', class_basename($factory::class));
         });
 
-        $this->assertEquals(FactoryTestUseFactoryAttribute::factory()->modelName(), FactoryTestUseFactoryAttribute::class);
         $this->assertEquals(FactoryTestGuessModel::factory()->modelName(), FactoryTestGuessModel::class);
+        $this->assertEquals(FactoryTestUseFactoryAttribute::factory()->modelName(), FactoryTestUseFactoryAttribute::class);
+
+        $this->assertEquals(FactoryTestUseFactoryAttributeFactory::new()->modelName(), FactoryTestUseFactoryAttribute::class);
+        $this->assertEquals(FactoryTestGuessModelFactory::new()->modelName(), FactoryTestGuessModel::class);
     }
 
     /**
