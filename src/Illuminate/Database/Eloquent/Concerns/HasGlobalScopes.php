@@ -93,7 +93,7 @@ trait HasGlobalScopes
      * Get a global scope registered with the model.
      *
      * @param  \Illuminate\Database\Eloquent\Scope|string  $scope
-     * @return \Illuminate\Database\Eloquent\Scope|\Closure|null
+     * @return \Illuminate\Database\Eloquent\Scope|(\Closure(\Illuminate\Database\Eloquent\Builder<static>): mixed)|null
      */
     public static function getGlobalScope($scope)
     {
