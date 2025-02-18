@@ -1735,6 +1735,103 @@ class TestResponseTest extends TestCase
         $testResponse->assertJsonValidationErrors('foo');
     }
 
+    public function testAssertOnlyJsonValidationErrors()
+    {
+        $data = [
+            'status' => 'ok',
+            'errors' => ['foo' => 'oops', 'bar' => 'another oops'],
+        ];
+
+        $testResponse = TestResponse::fromBaseResponse(
+            (new Response)->setContent(json_encode($data))
+        );
+
+        try {
+            $testResponse->assertOnlyJsonValidationErrors('foo');
+            $this->fail();
+        } catch (AssertionFailedError $e) {
+            $this->assertStringStartsWith('Response has unexpected validation errors: \'bar\'', $e->getMessage());
+        }
+
+        $testResponse->assertOnlyJsonValidationErrors(['foo', 'bar']);
+
+        try {
+            $testResponse->assertOnlyJsonValidationErrors(['foo' => 'oops']);
+            $this->fail();
+        } catch (AssertionFailedError $e) {
+            $this->assertStringStartsWith('Response has unexpected validation errors: \'bar\'', $e->getMessage());
+        }
+
+        $testResponse->assertOnlyJsonValidationErrors(['foo' => 'oops', 'bar' => 'another oops']);
+    }
+
+    public function testAssertJsonValidationErrorsUsingAssertOnlyInvalid()
+    {
+        $data = [
+            'status' => 'ok',
+            'errors' => ['foo' => 'oops', 'bar' => 'another oops'],
+        ];
+
+        $testResponse = TestResponse::fromBaseResponse(
+            (new Response('', 200, ['Content-Type' => 'application/json']))->setContent(json_encode($data))
+        );
+
+        try {
+            $testResponse->assertOnlyInvalid('foo');
+            $this->fail();
+        } catch (AssertionFailedError $e) {
+            $this->assertStringStartsWith('Response has unexpected validation errors: \'bar\'', $e->getMessage());
+        }
+
+        $testResponse->assertOnlyInvalid(['foo', 'bar']);
+
+        try {
+            $testResponse->assertOnlyInvalid(['foo' => 'oops']);
+            $this->fail();
+        } catch (AssertionFailedError $e) {
+            $this->assertStringStartsWith('Response has unexpected validation errors: \'bar\'', $e->getMessage());
+        }
+
+        $testResponse->assertOnlyInvalid(['foo' => 'oops', 'bar' => 'another oops']);
+    }
+
+    public function testAssertSessionOnlyValidationErrorsUsingAssertOnlyInvalid()
+    {
+        app()->instance('session.store', $store = new Store('test-session', new ArraySessionHandler(1)));
+
+        $store->put('errors', $errorBag = new ViewErrorBag);
+
+        $errorBag->put('default', new MessageBag([
+            'first_name' => [
+                'Your first name is required',
+                'Your first name must be at least 1 character',
+            ],
+            'last_name' => [
+                'Your last name is required',
+            ],
+        ]));
+
+        $testResponse = TestResponse::fromBaseResponse(new Response);
+
+        try {
+            $testResponse->assertOnlyInvalid('first_name');
+            $this->fail();
+        } catch (AssertionFailedError $e) {
+            $this->assertStringStartsWith('Response has unexpected validation errors: \'last_name\'', $e->getMessage());
+        }
+
+        $testResponse->assertOnlyInvalid(['first_name', 'last_name']);
+
+        try {
+            $testResponse->assertOnlyInvalid(['first_name' => 'required']);
+            $this->fail();
+        } catch (AssertionFailedError $e) {
+            $this->assertStringStartsWith('Response has unexpected validation errors: \'last_name\'', $e->getMessage());
+        }
+
+        $testResponse->assertOnlyInvalid(['first_name' => 'required', 'last_name' => 'required']);
+    }
+
     public function testAssertJsonValidationErrorsUsingAssertInvalid()
     {
         $data = [
