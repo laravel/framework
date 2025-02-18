@@ -114,11 +114,11 @@ abstract class Factory
     public static $namespace = 'Database\\Factories\\';
 
     /**
-     * The default model name resolver.
+     * The default model name resolvers.
      *
-     * @var callable(self): class-string<TModel>
+     * @var array<class-string, callable(self): class-string<TModel>>
      */
-    protected static $modelNameResolver;
+    protected static $modelNameResolvers = [];
 
     /**
      * The factory name resolver.
@@ -810,9 +810,9 @@ abstract class Factory
             return $this->model;
         }
 
-        $resolver = static::$modelNameResolver ?? function (self $factory) {
+        $resolver = static::$modelNameResolvers[static::class] ?? static::$modelNameResolvers[self::class] ?? function (self $factory) {
             $namespacedFactoryBasename = Str::replaceLast(
-                'Factory', '', Str::replaceFirst(static::$namespace, '', get_class($factory))
+                'Factory', '', Str::replaceFirst(static::$namespace, '', $factory::class)
             );
 
             $factoryBasename = Str::replaceLast('Factory', '', class_basename($factory));
@@ -835,7 +835,7 @@ abstract class Factory
      */
     public static function guessModelNamesUsing(callable $callback)
     {
-        static::$modelNameResolver = $callback;
+        static::$modelNameResolvers[static::class] = $callback;
     }
 
     /**
@@ -922,6 +922,18 @@ abstract class Factory
         } catch (Throwable) {
             return 'App\\';
         }
+    }
+
+    /**
+     * Flush the factory's global state.
+     *
+     * @return void
+     */
+    public static function flushState()
+    {
+        static::$modelNameResolvers = [];
+        static::$factoryNameResolver = null;
+        static::$namespace = 'Database\\Factories\\';
     }
 
     /**

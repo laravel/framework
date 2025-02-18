@@ -244,6 +244,18 @@ class BusPendingBatchTest extends TestCase
             )
         );
     }
+
+    public function test_it_can_batch_a_closure(): void
+    {
+        new PendingBatch(
+            new Container,
+            new Collection([
+                function () {
+                },
+            ])
+        );
+        $this->expectNotToPerformAssertions();
+    }
 }
 
 class BatchableJob

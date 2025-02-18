@@ -1009,6 +1009,18 @@ class Str
     }
 
     /**
+     * Pluralize the last word of an English, Pascal caps case string.
+     *
+     * @param  string  $value
+     * @param  int|array|\Countable  $count
+     * @return string
+     */
+    public static function pluralPascal($value, $count = 2)
+    {
+        return static::pluralStudly($value, $count);
+    }
+
+    /**
      * Generate a random, secure password.
      *
      * @param  int  $length
@@ -1653,6 +1665,17 @@ class Str
         $studlyWords = array_map(fn ($word) => static::ucfirst($word), $words);
 
         return static::$studlyCache[$key] = implode($studlyWords);
+    }
+
+    /**
+     * Convert a value to Pascal case.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public static function pascal($value)
+    {
+        return static::studly($value);
     }
 
     /**

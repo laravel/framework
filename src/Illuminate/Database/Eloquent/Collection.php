@@ -336,6 +336,19 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
+     * Determine if a key does not exist in the collection.
+     *
+     * @param  (callable(TModel, TKey): bool)|TModel|string|int  $key
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function doesntContain($key, $operator = null, $value = null)
+    {
+        return ! $this->contains(...func_get_args());
+    }
+
+    /**
      * Get the array of primary keys.
      *
      * @return array<int, array-key>

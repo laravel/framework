@@ -352,7 +352,11 @@ class Filesystem
     public function link($target, $link)
     {
         if (! windows_os()) {
-            return symlink($target, $link);
+            if (function_exists('symlink')) {
+                return symlink($target, $link);
+            } else {
+                return exec('ln -s '.escapeshellarg($target).' '.escapeshellarg($link)) !== false;
+            }
         }
 
         $mode = $this->isDirectory($target) ? 'J' : 'H';

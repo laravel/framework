@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Database\Eloquent\Relations\Relation;
 
 use function PHPStan\Testing\assertType;
 
@@ -123,6 +124,8 @@ function test(User $user, Post $post, Comment $comment, ChildUser $child): void
 
     assertType('Illuminate\Database\Eloquent\Relations\MorphToMany<Illuminate\Types\Relations\Tag, Illuminate\Types\Relations\Post>', $post->tags());
     assertType('Illuminate\Database\Eloquent\Collection<int, Illuminate\Types\Relations\Tag>', $post->tags()->getResults());
+
+    assertType('42', Relation::noConstraints(fn () => 42));
 }
 
 class User extends Model

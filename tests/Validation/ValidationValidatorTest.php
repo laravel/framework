@@ -1863,6 +1863,74 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame('The last field is prohibited when first is jess.', $v->messages()->first('last'));
     }
 
+    public function testValidateProhibitedAcceptedIf()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => 'yes', 'bar' => 'baz'], ['bar' => 'prohibited_if_accepted:foo']);
+        $this->assertTrue($v->fails());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => 'on', 'bar' => ''], ['bar' => 'prohibited_if_accepted:foo']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => '1', 'bar' => false], ['bar' => 'prohibited_if_accepted:foo']);
+        $this->assertTrue($v->fails());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => 1, 'bar' => null], ['bar' => 'prohibited_if_accepted:foo']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => 'true', 'bar' => ['baz']], ['bar' => 'prohibited_if_accepted:foo']);
+        $this->assertTrue($v->fails());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => true], ['bar' => 'prohibited_if_accepted:foo']);
+        $this->assertTrue($v->passes());
+
+        // error message
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.prohibited_if_accepted' => 'The :attribute field is prohibited when :other is accepted.'], 'en');
+        $v = new Validator($trans, ['foo' => 'true', 'bar' => 'baz'], ['bar' => 'prohibited_if_accepted:foo']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The bar field is prohibited when foo is accepted.', $v->messages()->first('bar'));
+    }
+
+    public function testValidateProhibitedDeclinedIf()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => 'no', 'bar' => 'baz'], ['bar' => 'prohibited_if_declined:foo']);
+        $this->assertTrue($v->fails());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => 'off', 'bar' => ''], ['bar' => 'prohibited_if_declined:foo']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => '0', 'bar' => false], ['bar' => 'prohibited_if_declined:foo']);
+        $this->assertTrue($v->fails());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => 0, 'bar' => null], ['bar' => 'prohibited_if_declined:foo']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => 'false', 'bar' => ['baz']], ['bar' => 'prohibited_if_declined:foo']);
+        $this->assertTrue($v->fails());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => false], ['bar' => 'prohibited_if_declined:foo']);
+        $this->assertTrue($v->passes());
+
+        // error message
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.prohibited_if_declined' => 'The :attribute field is prohibited when :other is declined.'], 'en');
+        $v = new Validator($trans, ['foo' => 'false', 'bar' => 'baz'], ['bar' => 'prohibited_if_declined:foo']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The bar field is prohibited when foo is declined.', $v->messages()->first('bar'));
+    }
+
     public function testProhibitedUnless()
     {
         $trans = $this->getIlluminateArrayTranslator();

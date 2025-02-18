@@ -102,8 +102,10 @@ abstract class Relation implements BuilderContract
     /**
      * Run a callback with constraints disabled on the relation.
      *
-     * @param  \Closure  $callback
-     * @return mixed
+     * @template TReturn of mixed
+     *
+     * @param  Closure(): TReturn  $callback
+     * @return TReturn
      */
     public static function noConstraints(Closure $callback)
     {

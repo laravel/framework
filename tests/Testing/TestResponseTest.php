@@ -261,6 +261,39 @@ class TestResponseTest extends TestCase
         }
     }
 
+    public function testAssertStreamedAndAssertNotStreamed()
+    {
+        $notStreamedResponse = $this->makeMockResponse([
+            'render' => 'expected response data',
+        ]);
+
+        $streamedResponse = TestResponse::fromBaseResponse(
+            new StreamedResponse(function () {
+                $stream = fopen('php://memory', 'r+');
+                fwrite($stream, 'expected response data');
+                rewind($stream);
+                fpassthru($stream);
+            })
+        );
+
+        $notStreamedResponse->assertNotStreamed();
+        $streamedResponse->assertStreamed();
+
+        try {
+            $notStreamedResponse->assertStreamed();
+            $this->fail('xxxx');
+        } catch (AssertionFailedError $e) {
+            $this->assertSame("Expected the response to be streamed, but it wasn't.\nFailed asserting that false is true.", $e->getMessage());
+        }
+
+        try {
+            $streamedResponse->assertNotStreamed();
+            $this->fail('xxxx');
+        } catch (AssertionFailedError $e) {
+            $this->assertSame("Response was unexpectedly streamed.\nFailed asserting that false is true.", $e->getMessage());
+        }
+    }
+
     public function testAssertStreamedContent()
     {
         $response = TestResponse::fromBaseResponse(
@@ -1448,6 +1481,20 @@ class TestResponseTest extends TestCase
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub));
 
         $response->assertJsonFragment(['id' => 10]);
+    }
+
+    public function testAssertJsonFragments()
+    {
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
+
+        $response->assertJsonFragments([
+            ['foo' => 'foo 0'],
+        ]);
+
+        $response->assertJsonFragments([
+            ['foo' => 'foo 0'],
+            ['foo' => 'foo 1'],
+        ]);
     }
 
     public function testAssertJsonFragmentCanFail()
