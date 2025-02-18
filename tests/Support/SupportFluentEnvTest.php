@@ -4,8 +4,8 @@ namespace Illuminate\Tests\Support;
 
 use Illuminate\Support\FluentEnv;
 use Illuminate\Validation\Rule;
-use Illuminate\Validation\ValidationException;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 class SupportFluentEnvTest extends TestCase
 {
@@ -114,20 +114,20 @@ class SupportFluentEnvTest extends TestCase
 
     public function testValidationRulesException()
     {
-        $_ENV['foo'] = 'We must ship';
+        $_ENV['FOO'] = 'We must ship';
 
-        $this->expectException(ValidationException::class);
-        $this->expectExceptionMessage('validation.min.string');
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Environment variable [FOO] is invalid: The environment variable field must be at least 20 characters');
 
-        env()->key('foo')->rules(['required', 'min:20'])->get();
+        env()->key('FOO')->rules(['required', 'min:20'])->get();
     }
 
     public function testRulesExceptionForDefaultValue()
     {
         unset($_ENV['foo']);
 
-        $this->expectException(ValidationException::class);
-        $this->expectExceptionMessage('validation.ends_with');
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Environment variable [foo] (default value) is invalid: The environment variable field must end with one of the following: eat.');
 
         env()->key('foo')->default('We must ship')->rules('ends_with:eat')->get();
     }

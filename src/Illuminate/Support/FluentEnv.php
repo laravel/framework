@@ -69,22 +69,40 @@ class FluentEnv
     }
 
     /**
-     * Create a validator instance for the environment variable.
+     * Apply validation rules.
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    private function validator(string $key, mixed $value): ?Validator
+    private function validate(string $key, mixed $value, bool $isDefault = false): void
     {
         if ($this->validationRules === '' || $this->validationRules === []) {
-            return null;
+            return;
         }
 
-        return new Validator(
+        $validator = new Validator(
             new Translator(new ArrayLoader, 'en'),
-            [$key => $value],
-            [$key => $this->validationRules],
+            ['environment variable' => $value],
+            ['environment variable' => $this->validationRules],
             $this->validationMessages,
         );
+
+        /**
+         * If the validation fails, repeat the validation, but
+         * now reading the default validation.php file for
+         * propper translation.
+         */
+        if(! $validator->passes()) {
+            $messages = require __DIR__.'/../Translation/lang/en/validation.php';
+            $translator = new Translator((new ArrayLoader)->addMessages('en', 'validation', $messages), 'en');
+            $validator->setTranslator($translator);
+
+            // Repeat validation, now with errors in english
+            $validator->passes();
+            $errors = implode(', ', $validator->errors()->all());
+            $default = $isDefault ? ' (default value)' : '';
+
+            throw new RuntimeException("Environment variable [$key]$default is invalid: {$errors}");
+        }
     }
 
     /**
@@ -96,7 +114,7 @@ class FluentEnv
     {
         foreach ($this->keys as $key) {
             if (($value = Env::get($key)) !== null) {
-                $this->validator($key, $value)?->validate();
+                $this->validate($key, $value);
 
                 return $value;
             }
@@ -104,7 +122,7 @@ class FluentEnv
 
         $default = value($this->default);
 
-        $this->validator(reset($this->keys).' (default)', $default)?->validate();
+        $this->validate(reset($this->keys), $default, isDefault: true);
 
         return $default;
     }
