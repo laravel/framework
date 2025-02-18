@@ -67,17 +67,13 @@ class SupportFluentEnvTest extends TestCase
         $_ENV['foo'] = 'cheese,wine,42';
         $this->assertSame(['cheese', 'wine', '42'], env()->key('foo')->array());
 
-        // collection with ";" as separator
+        // with ";" as separator
         $_ENV['foo'] = 'cheese;wine;42';
-        $this->assertSame(['cheese', 'wine', '42'], env()->key('foo')->collect(';')->toArray());
+        $this->assertSame(['cheese', 'wine', '42'], env()->key('foo')->array(';'));
 
         // empty values
         $this->assertSame([], env()->key('foo-invalid')->array());
         $this->assertSame([], env()->key('foo-invalid')->collect()->toArray());
-
-        // cast to integer
-        $_ENV['foo'] = '4|8|15|16|23|42';
-        $this->assertSame([4, 8, 15, 16, 23, 42], env()->key('foo')->array(separator: '|', cast: 'integer'));
     }
 
     public function testCastToEnum()

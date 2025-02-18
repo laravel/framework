@@ -230,7 +230,7 @@ class FluentEnv
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function array(string $separator = ',', string $cast = ''): array
+    public function array(string $separator = ','): array
     {
         $value = $this->get();
 
@@ -238,18 +238,6 @@ class FluentEnv
             return [];
         }
 
-        $values = explode($separator, (string) $value);
-
-        if ($cast !== '') {
-            $values = collect($values)->map(fn ($value) => match ($cast) {
-                'bool' | 'boolean' => $value === 'false' || $value === '(false)' ? false : (bool) $value,
-                'float' | 'double' => (float) $value,
-                'int' | 'integer' => (int) $value,
-                'string' => (string) $value,
-                default => throw new RuntimeException("Invalid cast type: {$cast}"),
-            })->toArray();
-        }
-
-        return $values;
+        return explode($separator, (string) $value);
     }
 }
