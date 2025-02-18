@@ -1126,6 +1126,16 @@ class TestResponse implements ArrayAccess
     }
 
     /**
+     * Die and dump the JSON payload for the request.
+     *
+     * @param  string|null  $key
+     */
+    public function ddJson($key = null)
+    {
+        dd($this->json($key));
+    }
+
+    /**
      * Get the JSON decoded body of the response as a collection.
      *
      * @param  string|null  $key
