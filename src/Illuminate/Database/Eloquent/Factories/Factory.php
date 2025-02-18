@@ -925,6 +925,18 @@ abstract class Factory
     }
 
     /**
+     * Flush the factory's global state.
+     *
+     * @return void
+     */
+    public static function flushState()
+    {
+        static::$modelNameResolvers = [];
+        static::$factoryNameResolver = null;
+        static::$namespace = 'Database\\Factories\\';
+    }
+
+    /**
      * Proxy dynamic factory methods onto their proper methods.
      *
      * @param  string  $method
@@ -967,17 +979,5 @@ abstract class Factory
                 $relationship
             );
         }
-    }
-
-    /**
-     * Flush the factory's global state.
-     *
-     * @return void
-     */
-    public static function flushState()
-    {
-        static::$namespace = 'Database\\Factories\\';
-        static::$modelNameResolvers = [];
-        static::$factoryNameResolver = null;
     }
 }
