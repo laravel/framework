@@ -180,21 +180,6 @@ trait QueriesRelationships
     }
 
     /**
-     * Add a basic where clause to a relationship query and eager-load the relationship.
-     *
-     * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>|string  $relation
-     * @param  \Closure|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
-     * @param  mixed  $operator
-     * @param  mixed  $value
-     * @return $this
-     */
-    public function withWhereRelation($relation, $column, $operator = null, $value = null)
-    {
-        return $this->whereRelation($relation, $column, $operator, $value)
-            ->with([$relation => fn ($query) => $column instanceof Closure ? $column($query) : $query->where($column, $operator, $value)]);
-    }
-
-    /**
      * Add a relationship count / exists condition to the query with where clauses and an "or".
      *
      * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
@@ -450,6 +435,25 @@ trait QueriesRelationships
                 $query->where($column, $operator, $value);
             }
         });
+    }
+
+    /**
+     * Add a basic where clause to a relationship query and eager-load the relationship with the same conditions.
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>|string  $relation
+     * @param  \Closure|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function withWhereRelation($relation, $column, $operator = null, $value = null)
+    {
+        return $this->whereRelation($relation, $column, $operator, $value)
+            ->with([
+                $relation => fn ($query) => $column instanceof Closure
+                    ? $column($query)
+                    : $query->where($column, $operator, $value)
+            ]);
     }
 
     /**
