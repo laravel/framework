@@ -166,7 +166,13 @@ class FluentEnv
      */
     public function collect(string $separator = ','): Collection
     {
-        return Str::of($this->get())->explode($separator);
+        $value = $this->get();
+
+        if ($value === null || $value === '') {
+            return collect();
+        }
+
+        return Str::of($value)->explode($separator);
     }
 
     /**
@@ -208,7 +214,13 @@ class FluentEnv
      */
     public function array(string $separator = ',', string $cast = ''): array
     {
-        $values = explode($separator, $this->string());
+        $value = $this->get();
+
+        if ($value === null || $value === '') {
+            return [];
+        }
+
+        $values = explode($separator, (string) $value);
 
         if ($cast !== '') {
             $values = collect($values)->map(fn ($value) => match ($cast) {

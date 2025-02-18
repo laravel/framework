@@ -17,7 +17,6 @@ class SupportFluentEnvTest extends TestCase
         $this->assertSame('var', env()->key('foo')->get());
         // From instance
         $this->assertSame('var', (new FluentEnv('foo'))->get());
-
     }
 
     public function testDefault()
@@ -71,6 +70,10 @@ class SupportFluentEnvTest extends TestCase
         // collection with ";" as separator
         $_ENV['foo'] = 'cheese;wine;42';
         $this->assertSame(['cheese', 'wine', '42'], env()->key('foo')->collect(';')->toArray());
+
+        // empty values
+        $this->assertSame([], env()->key('foo-invalid')->array());
+        $this->assertSame([], env()->key('foo-invalid')->collect()->toArray());
 
         // cast to integer
         $_ENV['foo'] = '4|8|15|16|23|42';
