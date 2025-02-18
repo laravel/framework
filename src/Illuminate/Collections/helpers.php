@@ -255,3 +255,18 @@ if (! function_exists('when')) {
         return value($default, $condition);
     }
 }
+
+if (! function_exists('unless')) {
+    /**
+     * Return a value unless the given condition is true.
+     *
+     * @param  mixed  $condition
+     * @param  \Closure|mixed  $value
+     * @param  \Closure|mixed  $default
+     * @return mixed
+     */
+    function unless($condition, $value, $default = null)
+    {
+        return when(! $condition, $value, $default);
+    }
+}

@@ -136,6 +136,30 @@ class SupportHelpersTest extends TestCase
         $this->assertTrue(when(false, fn ($value) => $value, fn ($value) => ! $value)); // lazy evaluation
     }
 
+    public function testUnless()
+    {
+        $this->assertEquals('Hello', unless(false, 'Hello'));
+        $this->assertNull(unless(true, 'Hello'));
+        $this->assertEquals('There', unless(1 !== 1, 'There')); // strict types
+        $this->assertEquals('There', unless(1 != '1', 'There')); // loose types
+        $this->assertNull(unless(1 == 1, 'There'));
+        $this->assertNull(unless('1', fn () => null));
+        $this->assertNull(unless(0, fn () => null));
+        $this->assertNull(unless([1, 2, 3, 4], 'True')); // Array
+        $this->assertEquals('True', unless([], 'True')); // Empty Array = Falsy
+        $this->assertNull(unless(new StdClass, fn () => 'True')); // Object
+        $this->assertEquals('Hello', unless(false, 'Hello', 'World'));
+        $this->assertEquals('Hello', unless(1 === 0, 'Hello', 'World')); // strict types
+        $this->assertEquals('Hello', unless(1 == '0', 'Hello', 'World')); // loose types
+        $this->assertEquals('There', unless('', fn () => 'There', fn () => null));
+        $this->assertEquals('There', unless(0, fn () => 'There', fn () => null));
+        $this->assertEquals('True', unless([], 'True', 'False'));  // Empty Array = Falsy
+        $this->assertEquals('Default', unless(true, fn ($value) => $value, fn ($value) => 'Default')); // lazy evaluation
+        $this->assertTrue(unless(false, fn ($value) => $value, fn ($value) => 'Default')); // lazy evaluation
+        $this->assertEquals('Empty', unless(collect()->isEmpty(), 'Not Empty', 'Empty'));
+        $this->assertEquals('Not Empty', unless(collect([1])->isEmpty(), 'Not Empty', 'Empty'));
+    }
+
     public function testFilled()
     {
         $this->assertFalse(filled(null));
