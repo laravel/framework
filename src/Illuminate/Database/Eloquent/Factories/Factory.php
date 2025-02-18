@@ -968,4 +968,16 @@ abstract class Factory
             );
         }
     }
+
+    /**
+     * Flush the factory's global state.
+     *
+     * @return void
+     */
+    public static function flushState()
+    {
+        static::$namespace = 'Database\\Factories\\';
+        static::$modelNameResolvers = [];
+        static::$factoryNameResolver = null;
+    }
 }
