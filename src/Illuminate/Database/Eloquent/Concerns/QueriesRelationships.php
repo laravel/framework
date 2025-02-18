@@ -452,7 +452,7 @@ trait QueriesRelationships
             ->with([
                 $relation => fn ($query) => $column instanceof Closure
                     ? $column($query)
-                    : $query->where($column, $operator, $value)
+                    : $query->where($column, $operator, $value),
             ]);
     }
 
