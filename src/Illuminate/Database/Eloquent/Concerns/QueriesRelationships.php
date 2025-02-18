@@ -165,7 +165,7 @@ trait QueriesRelationships
     /**
      * Add a relationship count / exists condition to the query with where clauses.
      *
-     * Also load the relationship with same condition.
+     * Also load the relationship with the same condition.
      *
      * @param  string  $relation
      * @param  (\Closure(\Illuminate\Database\Eloquent\Builder<*>|\Illuminate\Database\Eloquent\Relations\Relation<*, *, *>): mixed)|null  $callback
