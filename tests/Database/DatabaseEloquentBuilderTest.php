@@ -2293,6 +2293,44 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->oldest('foo');
     }
 
+    public function testLastWithoutColumnWithCreatedAt()
+    {
+        $builder = m::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);
+        $model = $this->getMockModel();
+        $builder->setModel($model);
+        $model->shouldReceive('getCreatedAtColumn')->andReturn('foo');
+        $builder->getQuery()->shouldReceive('latest')->once()->with('foo');
+        $builder->shouldReceive('first')->andReturn('bar');
+
+        $result = $builder->last();
+        $this->assertSame('bar', $result);
+    }
+
+    public function testLastWithoutColumnWithoutCreatedAt()
+    {
+        $builder = m::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);
+        $model = $this->getMockModel();
+        $builder->setModel($model);
+        $model->shouldReceive('getCreatedAtColumn')->andReturn(null);
+        $builder->getQuery()->shouldReceive('latest')->once()->with('created_at');
+        $builder->shouldReceive('first')->andReturn('bar');
+
+        $result = $builder->last();
+        $this->assertSame('bar', $result);
+    }
+
+    public function testLastWithColumn()
+    {
+        $builder = m::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);
+        $model = $this->getMockModel();
+        $builder->setModel($model);
+        $builder->getQuery()->shouldReceive('latest')->once()->with('foo');
+        $builder->shouldReceive('first')->andReturn('bar');
+
+        $result = $builder->last('foo');
+        $this->assertSame('bar', $result);
+    }
+
     public function testUpdate()
     {
         Carbon::setTestNow($now = '2017-10-10 10:10:10');

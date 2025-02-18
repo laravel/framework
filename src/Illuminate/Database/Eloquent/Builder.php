@@ -427,6 +427,17 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Retrieve the last record by timestamp.
+     *
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @return TModel|null
+     */
+    public function last($column = null)
+    {
+        return $this->latest($column)->first();
+    }
+
+    /**
      * Create a collection of models from plain arrays.
      *
      * @param  array  $items
