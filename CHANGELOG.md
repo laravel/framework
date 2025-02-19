@@ -1,6 +1,11 @@
 # Release Notes for 11.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v11.43.0...11.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v11.43.1...11.x)
+
+## [v11.43.1](https://github.com/laravel/framework/compare/v11.43.0...v11.43.1) - 2025-02-19
+
+* [11.x] Fix "Divide by Zero" regression bug introduced in #54650 by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/54685
+* Revert "Fix Collection::implode with \Stringable objects" by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/54691
 
 ## [v11.43.0](https://github.com/laravel/framework/compare/v11.42.1...v11.43.0) - 2025-02-18
 
