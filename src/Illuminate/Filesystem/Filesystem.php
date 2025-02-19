@@ -547,9 +547,9 @@ class Filesystem
      */
     public function hasSameHash($firstFile, $secondFile)
     {
-        $hash = @md5_file($firstFile);
+        $hash = @hash_file('xxh128', $firstFile);
 
-        return $hash && hash_equals($hash, (string) @md5_file($secondFile));
+        return $hash && hash_equals($hash, (string) @hash_file('xxh128', $secondFile));
     }
 
     /**
