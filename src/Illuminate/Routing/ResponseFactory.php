@@ -129,7 +129,7 @@ class ResponseFactory implements FactoryContract
      * @param  string|null  $endStreamWith
      * @return \Symfony\Component\HttpFoundation\StreamedResponse
      */
-    public function eventStream(Closure $callback, array $headers = [], string $as = 'update', ?string $startStreamWith = '<stream>', ?string $endStreamWith = '</stream>')
+    public function eventStream(Closure $callback, array $headers = [], string $as = 'update', ?string $startStreamWith = null, ?string $endStreamWith = '</stream>')
     {
         return $this->stream(function () use ($callback, $as, $startStreamWith, $endStreamWith) {
             if (filled($startStreamWith)) {
