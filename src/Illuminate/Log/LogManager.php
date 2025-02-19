@@ -145,29 +145,29 @@ class LogManager implements LoggerInterface
 
                 if (method_exists($loggerWithContext->getLogger(), 'pushProcessor')) {
                     $loggerWithContext->pushProcessor(
-                    /**
-                     * @param LogRecord $record
-                     */
-                        function ($record) use ($logger) {
-                        if (! $this->app->bound(ContextRepository::class)) {
-                            return $record;
-                        }
+                        /**
+                         * @param  LogRecord  $record
+                         */
+                        function ($record) {
+                            if (! $this->app->bound(ContextRepository::class)) {
+                                return $record;
+                            }
 
-                        $contextRepository = $this->app[ContextRepository::class];
+                            $contextRepository = $this->app[ContextRepository::class];
 
-                        $params = [
-                            'extra' => [
-                                ...$record->extra,
-                                ...$contextRepository->all(),
-                            ]
-                        ];
+                            $params = [
+                                'extra' => [
+                                    ...$record->extra,
+                                    ...$contextRepository->all(),
+                                ],
+                            ];
 
-                        if ($contextRepository->name() && $record->channel !== $logger->getName()) {
-                            $params['channel'] = $contextRepository->name();
-                        }
+                            if ($contextRepository->name()) {
+                                $params['channel'] = $contextRepository->name();
+                            }
 
-                        return $record->with(...$params);
-                    });
+                            return $record->with(...$params);
+                        });
                 }
 
                 return $this->channels[$name] = $loggerWithContext;
