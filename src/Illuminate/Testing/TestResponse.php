@@ -1384,9 +1384,7 @@ class TestResponse implements ArrayAccess
      * @param  string  $responseKey
      * @return $this
      */
-    public function assertOnlyInvalid($errors = null,
-                                  $errorBag = 'default',
-                                  $responseKey = 'errors')
+    public function assertOnlyInvalid($errors = null, $errorBag = 'default', $responseKey = 'errors')
     {
         if ($this->baseResponse->headers->get('Content-Type') === 'application/json') {
             return $this->assertOnlyJsonValidationErrors($errors, $responseKey);
@@ -1394,13 +1392,19 @@ class TestResponse implements ArrayAccess
 
         $this->assertSessionHas('errors');
 
-        $sessionErrors = $this->session()->get('errors')->getBag($errorBag)->getMessages();
+        $sessionErrors = $this->session()->get('errors')
+            ->getBag($errorBag)
+            ->getMessages();
 
-        $expectedErrorKeys = collect($errors)->map(fn ($value, $key) => is_int($key) ? $value : $key)->all();
+        $expectedErrorKeys = collect($errors)
+            ->map(fn ($value, $key) => is_int($key) ? $value : $key)->all();
 
         $unexpectedErrorKeys = Arr::except($sessionErrors, $expectedErrorKeys);
 
-        PHPUnit::withResponse($this)->assertTrue(count($unexpectedErrorKeys) === 0, 'Response has unexpected validation errors: '.collect($unexpectedErrorKeys)->keys()->map(fn ($key) => "'{$key}'")->join(', '));
+        PHPUnit::withResponse($this)->assertTrue(
+            count($unexpectedErrorKeys) === 0,
+            'Response has unexpected validation errors: '.collect($unexpectedErrorKeys)->keys()->map(fn ($key) => "'{$key}'")->join(', ')
+        );
     }
 
     /**
