@@ -18,6 +18,7 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogHandler;
 use Monolog\Handler\WhatFailureGroupHandler;
 use Monolog\Logger as Monolog;
+use Monolog\LogRecord;
 use Monolog\Processor\ProcessorInterface;
 use Monolog\Processor\PsrLogMessageProcessor;
 use Psr\Log\LoggerInterface;
@@ -143,15 +144,29 @@ class LogManager implements LoggerInterface
                 )->withContext($this->sharedContext);
 
                 if (method_exists($loggerWithContext->getLogger(), 'pushProcessor')) {
-                    $loggerWithContext->pushProcessor(function ($record) {
+                    $loggerWithContext->pushProcessor(
+                    /**
+                     * @param LogRecord $record
+                     */
+                        function ($record) use ($logger) {
                         if (! $this->app->bound(ContextRepository::class)) {
                             return $record;
                         }
 
-                        return $record->with(extra: [
-                            ...$record->extra,
-                            ...$this->app[ContextRepository::class]->all(),
-                        ]);
+                        $contextRepository = $this->app[ContextRepository::class];
+
+                        $params = [
+                            'extra' => [
+                                ...$record->extra,
+                                ...$contextRepository->all(),
+                            ]
+                        ];
+
+                        if ($contextRepository->name() && $record->channel !== $logger->getName()) {
+                            $params['channel'] = $contextRepository->name();
+                        }
+
+                        return $record->with(...$params);
                     });
                 }
 
