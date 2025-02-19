@@ -250,13 +250,6 @@ class Builder implements BuilderContract
     public $useWritePdo = false;
 
     /**
-     * The custom arguments for the PDOStatement::fetchAll / fetch functions.
-     *
-     * @var array
-     */
-    public array $fetchUsing = [];
-
-    /**
      * Create a new query builder instance.
      *
      * @return void
@@ -3094,13 +3087,9 @@ class Builder implements BuilderContract
      */
     public function get($columns = ['*'])
     {
-        $original = $this->columns;
-
-        $this->columns ??= Arr::wrap($columns);
-
-        $items = new Collection($this->processor->processSelect($this, $this->runSelect()));
-
-        $this->columns = $original;
+        $items = new Collection($this->onceWithColumns(Arr::wrap($columns), function () {
+            return $this->processor->processSelect($this, $this->runSelect());
+        }));
 
         return $this->applyAfterQueryCallbacks(
             isset($this->groupLimit) ? $this->withoutGroupLimitKeys($items) : $items
@@ -3115,7 +3104,7 @@ class Builder implements BuilderContract
     protected function runSelect()
     {
         return $this->connection->select(
-            $this->toSql(), $this->getBindings(), ! $this->useWritePdo, $this->fetchUsing
+            $this->toSql(), $this->getBindings(), ! $this->useWritePdo
         );
     }
 
@@ -3333,7 +3322,7 @@ class Builder implements BuilderContract
 
         return (new LazyCollection(function () {
             yield from $this->connection->cursor(
-                $this->toSql(), $this->getBindings(), ! $this->useWritePdo, $this->fetchUsing
+                $this->toSql(), $this->getBindings(), ! $this->useWritePdo
             );
         }))->map(function ($item) {
             return $this->applyAfterQueryCallbacks(new Collection([$item]))->first();
@@ -3363,18 +3352,17 @@ class Builder implements BuilderContract
      */
     public function pluck($column, $key = null)
     {
-        $original = $this->columns;
-
         // First, we will need to select the results of the query accounting for the
         // given columns / key. Once we have the results, we will be able to take
         // the results and get the exact data that was requested for the query.
-        $this->columns = is_null($key) || $key === $column
-            ? [$column]
-            : [$column, $key];
-
-        $queryResult = $this->processor->processSelect($this, $this->runSelect());
-
-        $this->columns = $original;
+        $queryResult = $this->onceWithColumns(
+            is_null($key) || $key === $column ? [$column] : [$column, $key],
+            function () {
+                return $this->processor->processSelect(
+                    $this, $this->runSelect()
+                );
+            }
+        );
 
         if (empty($queryResult)) {
             return new Collection;
@@ -3666,6 +3654,30 @@ class Builder implements BuilderContract
         }
 
         return $this;
+    }
+
+    /**
+     * Execute the given callback while selecting the given columns.
+     *
+     * After running the callback, the columns are reset to the original value.
+     *
+     * @param  array  $columns
+     * @param  callable  $callback
+     * @return mixed
+     */
+    protected function onceWithColumns($columns, $callback)
+    {
+        $original = $this->columns;
+
+        if (is_null($original)) {
+            $this->columns = $columns;
+        }
+
+        $result = $callback();
+
+        $this->columns = $original;
+
+        return $result;
     }
 
     /**
@@ -4277,19 +4289,6 @@ class Builder implements BuilderContract
     public function useWritePdo()
     {
         $this->useWritePdo = true;
-
-        return $this;
-    }
-
-    /**
-     * Specify arguments for the PDOStatement::fetchAll / fetch functions.
-     *
-     * @param  mixed  ...$fetchUsing
-     * @return $this
-     */
-    public function fetchUsing(...$fetchUsing)
-    {
-        $this->fetchUsing = $fetchUsing;
 
         return $this;
     }
