@@ -11,8 +11,8 @@ use Illuminate\Process\Pool;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Defer\DeferredCallback;
 use Laravel\SerializableClosure\SerializableClosure;
-
 use ReflectionClass;
+
 use function Illuminate\Support\defer;
 
 class ProcessDriver implements Driver
