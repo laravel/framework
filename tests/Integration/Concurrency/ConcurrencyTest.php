@@ -2,9 +2,11 @@
 
 namespace Illuminate\Tests\Integration\Concurrency;
 
+use Exception;
 use Illuminate\Concurrency\ProcessDriver;
 use Illuminate\Foundation\Application;
 use Illuminate\Process\Factory as ProcessFactory;
+use Illuminate\Support\Facades\Concurrency;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 
@@ -29,7 +31,7 @@ PHP);
         parent::setUp();
     }
 
-    public function testWorkCanBeDistributed()
+    public function test_work_can_be_distributed()
     {
         $response = $this->get('concurrency')
             ->assertOk();
@@ -40,7 +42,7 @@ PHP);
         $this->assertEquals(4, $second);
     }
 
-    public function testRunHandlerProcessErrorCode()
+    public function test_run_handler_process_error_code()
     {
         $this->expectException(\Exception::class);
         $app = new Application(__DIR__);
@@ -48,5 +50,42 @@ PHP);
         $processDriver->run([
             fn () => exit(1),
         ]);
+    }
+
+    public function test_run_handler_process_error_code_with_custom_exception_without_param()
+    {
+        $this->expectException(ExceptionWithoutParam::class);
+        $this->expectExceptionMessage('Test');
+        Concurrency::run([
+            fn () => throw new ExceptionWithoutParam('Test'),
+        ]);
+    }
+
+    public function test_run_handler_process_error_code_with_custom_exception_with_param()
+    {
+        $this->expectException(ExceptionWithParam::class);
+        $this->expectExceptionMessage('API request to https://api.example.com failed with status 400 Bad Request');
+        Concurrency::run([
+            fn () => throw new ExceptionWithParam(
+                'https://api.example.com',
+                400,
+                'Bad Request',
+                'Invalid payload'
+            ),
+        ]);
+    }
+}
+
+class ExceptionWithoutParam extends Exception {}
+
+class ExceptionWithParam extends Exception
+{
+    public function __construct(
+        public string $uri,
+        public int $statusCode,
+        public string $reason,
+        public string|array $responseBody = '',
+    ) {
+        parent::__construct("API request to {$uri} failed with status $statusCode $reason");
     }
 }
