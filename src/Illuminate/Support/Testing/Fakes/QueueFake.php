@@ -544,7 +544,7 @@ class QueueFake extends QueueManager implements Fake, Queue
     }
 
     /**
-     * Get the payloads raw pushed.
+     * Get the payloads that were pushed raw.
      *
      * @return list<RawPushType>
      */
