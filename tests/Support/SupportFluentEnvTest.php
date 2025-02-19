@@ -78,22 +78,56 @@ class SupportFluentEnvTest extends TestCase
 
     public function testCastToEnum()
     {
-        $_ENV['foo-invalid'] = 'invalid';
+        $_ENV['foo-empty'] = '';
+        $_ENV['foo-null'] = 'null';
 
         // UnitEnum
         $_ENV['foo'] = 'Taylor';
         $this->assertSame(UnitEnum::Taylor, env()->key('foo')->enum(UnitEnum::class));
-        $this->assertNull(env()->key('foo-invalid')->enum(UnitEnum::class));
+        $this->assertNull(env()->key('foo-empty')->enum(UnitEnum::class));
+        $this->assertNull(env()->key('foo-null')->enum(UnitEnum::class));
 
         // BackedEnum: string
         $_ENV['foo'] = 'cats';
         $this->assertSame(StringEnum::Cats, env()->key('foo')->enum(StringEnum::class));
-        $this->assertNull(env()->key('foo-invalid')->enum(StringEnum::class));
+        $this->assertNull(env()->key('foo-empty')->enum(StringEnum::class));
+        $this->assertNull(env()->key('foo-null')->enum(StringEnum::class));
 
         // BackedEnum: integer
         $_ENV['foo'] = '2';
         $this->assertSame(IntegerEnum::Two, env()->key('foo')->enum(IntegerEnum::class));
-        $this->assertNull(env()->key('foo-invalid')->enum(IntegerEnum::class));
+        $this->assertNull(env()->key('foo-empty')->enum(IntegerEnum::class));
+        $this->assertNull(env()->key('foo-null')->enum(IntegerEnum::class));
+    }
+
+    public function testFailedCastToUnitEnum()
+    {
+        $_ENV['NUMBER'] = 'not-a-number';
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Environment variable [NUMBER] is not a valid value for enum Illuminate\Tests\Support\UnitEnum.');
+
+        env()->key('NUMBER')->enum(UnitEnum::class);
+    }
+
+    public function testFailedCastToBackedEnum()
+    {
+        $_ENV['PET'] = 'not-a-pet';
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Environment variable [PET] is not a valid value for enum Illuminate\Tests\Support\StringEnum.');
+
+        env()->key('PET')->enum(StringEnum::class);
+    }
+
+    public function testEnumDoesntExists()
+    {
+        $_ENV['foo'] = 'bar';
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage("Environment variable [foo] error: Enum InexistantEnum doesn't exist.");
+
+        env()->key('foo')->enum('InexistantEnum');
     }
 
     public function testValidationRules()

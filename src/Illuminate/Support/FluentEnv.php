@@ -13,6 +13,7 @@ class FluentEnv
     protected mixed $default = null;
     protected string|array $validationRules = '';
     protected array $validationMessages = [];
+    private string $keyUsed = '';
 
     public function __construct(null|string|array $key = null, mixed $default = null)
     {
@@ -100,7 +101,7 @@ class FluentEnv
             $validator->passes();
             $errors = implode(', ', $validator->errors()->all());
 
-            throw new RuntimeException("Environment variable [$key] is invalid: {$errors}");
+            throw new RuntimeException("Environment variable [$key] is invalid: {$errors}.");
         }
     }
 
@@ -111,19 +112,26 @@ class FluentEnv
      */
     public function get(): mixed
     {
+        $value = null;
+        $this->keyUsed = '';
+
+        // Finds the firsh not null value
         foreach ($this->keys as $key) {
             if (($value = Env::get($key)) !== null) {
-                $this->validate($key, $value);
-
-                return $value;
+                $this->keyUsed = $key;
+                break;
             }
         }
 
-        $default = value($this->default);
+        // Defaults
+        if ($value === null) {
+            $value = value($this->default);
+            $this->keyUsed = reset($this->keys);
+        }
 
-        $this->validate(reset($this->keys), $default);
+        $this->validate($this->keyUsed, $value);
 
-        return $default;
+        return $value;
     }
 
     /**
@@ -195,25 +203,33 @@ class FluentEnv
     /**
      * Get the environment variable value as an enum.
      *
-     * @throws \Illuminate\Validation\ValidationException
+     * @template TEnum of \UnitEnum|\BackedEnum
+     *
+     * @param  class-string<TEnum>  $enumClass
+     * @return TEnum|null
+     *
+     * @throws \RuntimeException
      */
     public function enum(string $enumClass): null|\UnitEnum|\BackedEnum
     {
         $value = $this->get();
 
-        if ($value === null || ! enum_exists($enumClass)) {
+        if (blank($value)) {
             return null;
         }
 
-        $reflection = new \ReflectionEnum($enumClass);
+        if (! enum_exists($enumClass)) {
+            throw new RuntimeException("Environment variable [$this->keyUsed] error: Enum $enumClass doesn't exist.");
+        }
+
+        $invalidValueException = new RuntimeException("Environment variable [$this->keyUsed] is not a valid value for enum $enumClass.");
 
         // BackedEnum
+        $reflection = new \ReflectionEnum($enumClass);
         if ($reflection->isBacked()) {
-            if ($reflection->getBackingType()?->getName() === 'int') {
-                $value = (int) $value;
-            }
+            $value = $reflection->getBackingType()?->getName() === 'int' ? (int) $value : $value;
 
-            return $enumClass::tryFrom($value);
+            return $enumClass::tryFrom($value) ?? throw $invalidValueException;
         }
 
         // UnitEnum
@@ -221,7 +237,7 @@ class FluentEnv
             return $reflection->getCase($value)->getValue();
         }
 
-        return null;
+        throw $invalidValueException;
     }
 
     /**
@@ -233,10 +249,11 @@ class FluentEnv
     {
         $value = $this->get();
 
-        if ($value === null || $value === '') {
+        if (blank($value)) {
             return [];
         }
 
         return explode($separator, (string) $value);
     }
+
 }
