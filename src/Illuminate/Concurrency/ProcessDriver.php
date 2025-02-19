@@ -47,9 +47,31 @@ class ProcessDriver implements Driver
             $result = json_decode($result->output(), true);
 
             if (! $result['successful']) {
-                throw new $result['exception'](
-                    $result['message']
-                );
+                $exceptionClass = $result['exception'];
+                $reflection = new \ReflectionClass($exceptionClass);
+
+                $args = $result['params'] ?? [];
+
+                if (empty($args)) {
+                    throw new $result['exception'](
+                        $result['message']
+                    );
+                }
+
+                $constructor = $reflection->getConstructor();
+                if ($constructor) {
+                    $constructorParams = $constructor->getParameters();
+                    $finalArgs = [];
+
+                    foreach ($constructorParams as $param) {
+                        $paramName = $param->getName();
+                        $finalArgs[] = $args[$paramName] ?? ($param->isOptional() ? $param->getDefaultValue() : null);
+                    }
+                } else {
+                    $finalArgs = [];
+                }
+
+                throw $reflection->newInstanceArgs($finalArgs);
             }
 
             return unserialize($result['result']);
