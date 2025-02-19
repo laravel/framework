@@ -124,12 +124,22 @@ class ResponseFactory implements FactoryContract
      *
      * @param  \Closure  $callback
      * @param  array  $headers
-     * @param  string  $endStreamWith
+     * @param  string|null  $startStreamWith
+     * @param  string|null  $endStreamWith
      * @return \Symfony\Component\HttpFoundation\StreamedResponse
      */
-    public function eventStream(Closure $callback, array $headers = [], string $endStreamWith = '</stream>')
+    public function eventStream(Closure $callback, array $headers = [], ?string $startStreamWith = '<stream>', ?string $endStreamWith = '</stream>')
     {
-        return $this->stream(function () use ($callback, $endStreamWith) {
+        return $this->stream(function () use ($callback, $startStreamWith, $endStreamWith) {
+            if (filled($startStreamWith)) {
+                echo "event: update\n";
+                echo 'data: '.$startStreamWith;
+                echo "\n\n";
+
+                ob_flush();
+                flush();
+            }
+
             foreach ($callback() as $message) {
                 if (connection_aborted()) {
                     break;
@@ -147,12 +157,14 @@ class ResponseFactory implements FactoryContract
                 flush();
             }
 
-            echo "event: update\n";
-            echo 'data: '.$endStreamWith;
-            echo "\n\n";
+            if (filled($endStreamWith)) {
+                echo "event: update\n";
+                echo 'data: '.$endStreamWith;
+                echo "\n\n";
 
-            ob_flush();
-            flush();
+                ob_flush();
+                flush();
+            }
         }, 200, array_merge($headers, [
             'Content-Type' => 'text/event-stream',
             'Cache-Control' => 'no-cache',
