@@ -48,9 +48,11 @@ use Illuminate\Support\Testing\Fakes\QueueFake;
  * @method static void assertCount(int $expectedCount)
  * @method static void assertNothingPushed()
  * @method static \Illuminate\Support\Collection pushed(string $job, callable|null $callback = null)
+ * @method static \Illuminate\Support\Collection pushedRaw(null|\Closure $callback = null)
  * @method static bool hasPushed(string $job)
  * @method static bool shouldFakeJob(object $job)
  * @method static array pushedJobs()
+ * @method static array rawPushes()
  * @method static \Illuminate\Support\Testing\Fakes\QueueFake serializeAndRestore(bool $serializeAndRestore = true)
  *
  * @see \Illuminate\Queue\QueueManager
