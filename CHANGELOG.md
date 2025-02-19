@@ -1,6 +1,17 @@
 # Release Notes for 11.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v11.43.1...11.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v11.43.2...11.x)
+
+## [v11.43.2](https://github.com/laravel/framework/compare/v11.43.1...v11.43.2) - 2025-02-19
+
+* [11.x] Add missing test for `implode()` by [@nuernbergerA](https://github.com/nuernbergerA) in https://github.com/laravel/framework/pull/54704
+* [11.x] Enhance eventStream to Support Custom Events and Start Messages by [@devhammed](https://github.com/devhammed) in https://github.com/laravel/framework/pull/54695
+* Revert "[11.x] Enhance eventStream to Support Custom Events and Start Messages" by [@taylorotwell](https://github.com/taylorotwell) in https://github.com/laravel/framework/pull/54714
+* [11.x] Replace MD5 with xxh128 in File::hasSameHash() by [@vlakoff](https://github.com/vlakoff) in https://github.com/laravel/framework/pull/54690
+* [11.x] Add parameter typing for closure to addGlobalScope method by [@jnoordsij](https://github.com/jnoordsij) in https://github.com/laravel/framework/pull/54677
+* [11.x] `assertOnlyJsonValidationErrors` / `assertOnlyInvalid` by [@gdebrauwer](https://github.com/gdebrauwer) in https://github.com/laravel/framework/pull/54678
+* [11.x] Allow for assertions against `QueueFake::pushRaw()` by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/54703
+* [11.x] Fix: Handles non nested explode of multiple Date and Numeric rules in ValidationRuleParser by [@AlexandreMeledandri](https://github.com/AlexandreMeledandri) in https://github.com/laravel/framework/pull/54718
 
 ## [v11.43.1](https://github.com/laravel/framework/compare/v11.43.0...v11.43.1) - 2025-02-19
 
