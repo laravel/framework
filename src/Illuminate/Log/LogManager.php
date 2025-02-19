@@ -18,7 +18,6 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogHandler;
 use Monolog\Handler\WhatFailureGroupHandler;
 use Monolog\Logger as Monolog;
-use Monolog\LogRecord;
 use Monolog\Processor\ProcessorInterface;
 use Monolog\Processor\PsrLogMessageProcessor;
 use Psr\Log\LoggerInterface;
@@ -146,7 +145,8 @@ class LogManager implements LoggerInterface
                 if (method_exists($loggerWithContext->getLogger(), 'pushProcessor')) {
                     $loggerWithContext->pushProcessor(
                         /**
-                         * @param  LogRecord  $record
+                         * @param  \Monolog\LogRecord  $record
+                         * @return \Monolog\LogRecord
                          */
                         function ($record) {
                             if (! $this->app->bound(ContextRepository::class)) {
@@ -162,8 +162,8 @@ class LogManager implements LoggerInterface
                                 ],
                             ];
 
-                            if ($contextRepository->name()) {
-                                $params['channel'] = $contextRepository->name();
+                            if ($channelName = $contextRepository->name()) {
+                                $params['channel'] = $channelName;
                             }
 
                             return $record->with(...$params);
