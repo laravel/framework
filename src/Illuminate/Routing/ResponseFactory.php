@@ -131,7 +131,7 @@ class ResponseFactory implements FactoryContract
      */
     public function eventStream(Closure $callback, array $headers = [], string $as = 'update', ?string $startStreamWith = '<stream>', ?string $endStreamWith = '</stream>')
     {
-        return $this->stream(function () use ($callback, $startStreamWith, $endStreamWith) {
+        return $this->stream(function () use ($callback, $as, $startStreamWith, $endStreamWith) {
             if (filled($startStreamWith)) {
                 echo "event: $as\n";
                 echo 'data: '.$startStreamWith;
