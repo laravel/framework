@@ -339,7 +339,7 @@ class QueueFake extends QueueManager implements Fake, Queue
     /**
      * Get all of the raw pushes matching a truth-test callback.
      *
-     * @param null|\Closure(string, ?string, array): bool  $callback
+     * @param  null|\Closure(string, ?string, array): bool  $callback
      * @return \Illuminate\Support\Collection<int, RawPushType>
      */
     public function pushedRaw($callback = null)
