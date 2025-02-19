@@ -124,15 +124,16 @@ class ResponseFactory implements FactoryContract
      *
      * @param  \Closure  $callback
      * @param  array  $headers
+     * @param  string $as
      * @param  string|null  $startStreamWith
      * @param  string|null  $endStreamWith
      * @return \Symfony\Component\HttpFoundation\StreamedResponse
      */
-    public function eventStream(Closure $callback, array $headers = [], ?string $startStreamWith = '<stream>', ?string $endStreamWith = '</stream>')
+    public function eventStream(Closure $callback, array $headers = [], string $as = 'update', ?string $startStreamWith = '<stream>', ?string $endStreamWith = '</stream>')
     {
         return $this->stream(function () use ($callback, $startStreamWith, $endStreamWith) {
             if (filled($startStreamWith)) {
-                echo "event: update\n";
+                echo "event: $as\n";
                 echo 'data: '.$startStreamWith;
                 echo "\n\n";
 
@@ -149,7 +150,7 @@ class ResponseFactory implements FactoryContract
                     $message = Js::encode($message);
                 }
 
-                echo "event: update\n";
+                echo "event: $as\n";
                 echo 'data: '.$message;
                 echo "\n\n";
 
@@ -158,7 +159,7 @@ class ResponseFactory implements FactoryContract
             }
 
             if (filled($endStreamWith)) {
-                echo "event: update\n";
+                echo "event: $as\n";
                 echo 'data: '.$endStreamWith;
                 echo "\n\n";
 
