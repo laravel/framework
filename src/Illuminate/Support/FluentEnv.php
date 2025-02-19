@@ -255,5 +255,4 @@ class FluentEnv
 
         return explode($separator, (string) $value);
     }
-
 }
