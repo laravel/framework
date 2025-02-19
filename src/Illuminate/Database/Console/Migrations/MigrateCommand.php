@@ -124,7 +124,7 @@ class MigrateCommand extends BaseCommand implements Isolatable
             // a migration and a seed at the same time, as it is only this command.
             if ($this->option('seed') && ! $this->option('pretend')) {
                 $this->call('db:seed', [
-                    '--class' => $this->option('seeder') ?: 'Database\\Seeders\\DatabaseSeeder',
+                    '--class' => $this->option('seeder'),
                     '--force' => true,
                 ]);
             }

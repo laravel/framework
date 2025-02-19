@@ -84,10 +84,13 @@ class SeedCommand extends Command
      */
     protected function getSeeder()
     {
+        $namespace = $this->laravel->getSeederNamespace();
+
         $class = $this->input->getArgument('class') ?? $this->input->getOption('class');
+        $class = $class ?? $namespace.'DatabaseSeeder';
 
         if (! str_contains($class, '\\')) {
-            $class = 'Database\\Seeders\\'.$class;
+            $class = $namespace.$class;
         }
 
         if ($class === 'Database\\Seeders\\DatabaseSeeder' &&
@@ -132,7 +135,7 @@ class SeedCommand extends Command
     protected function getOptions()
     {
         return [
-            ['class', null, InputOption::VALUE_OPTIONAL, 'The class name of the root seeder', 'Database\\Seeders\\DatabaseSeeder'],
+            ['class', null, InputOption::VALUE_OPTIONAL, 'The class name of the root seeder'],
             ['database', null, InputOption::VALUE_OPTIONAL, 'The database connection to seed'],
             ['force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production'],
         ];

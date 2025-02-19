@@ -201,6 +201,15 @@ interface Application extends Container
     public function getNamespace();
 
     /**
+     * Get the database seeder namespace.
+     *
+     * @returns string
+     *
+     * @throws \RuntimeException
+     */
+    public function getSeederNamespace();
+
+    /**
      * Get the registered service provider instances if any exist.
      *
      * @param  \Illuminate\Support\ServiceProvider|string  $provider

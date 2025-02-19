@@ -195,6 +195,13 @@ class Application extends Container implements ApplicationContract, CachesConfig
     protected $namespace;
 
     /**
+     * The database seeder namespace.
+     *
+     * @var string
+     */
+    protected $seederNamespace;
+
+    /**
      * Indicates if the framework's base configuration should be merged.
      *
      * @var bool
@@ -1715,5 +1722,31 @@ class Application extends Container implements ApplicationContract, CachesConfig
         }
 
         throw new RuntimeException('Unable to detect application namespace.');
+    }
+
+    /**
+     * Get the database seeder namespace.
+     *
+     * @returns string
+     *
+     * @throws \RuntimeException
+     */
+    public function getSeederNamespace()
+    {
+        if (! is_null($this->seederNamespace)) {
+            return $this->seederNamespace;
+        }
+
+        $composer = json_decode(file_get_contents($this->basePath('composer.json')), true);
+
+        foreach ((array) data_get($composer, 'autoload.psr-4') as $namespace => $path) {
+            foreach ((array) $path as $pathChoice) {
+                if (realpath($this->databasePath('seeders')) === realpath($this->basePath($pathChoice))) {
+                    return $this->seederNamespace = $namespace;
+                }
+            }
+        }
+
+        throw new RuntimeException('Unable to detect seeder namespace.');
     }
 }

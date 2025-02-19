@@ -1,7 +1,8 @@
 {
     "autoload": {
         "psr-4": {
-            "Laravel\\Two\\": "app/"
+            "Laravel\\Two\\": "app/",
+            "Laravel\\Two\\Database\\Migrations\\": "database/seeders"
         }
     }
 }

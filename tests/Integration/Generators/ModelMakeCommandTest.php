@@ -194,7 +194,7 @@ class ModelMakeCommandTest extends TestCase
         $this->assertFilenameNotExists('database/seeders/FooSeeder.php');
     }
 
-    public function testItCanGenerateModelFileWithSeederption()
+    public function testItCanGenerateModelFileWithSeederOption()
     {
         $this->artisan('make:model', ['name' => 'Foo', '--seed' => true])
             ->assertExitCode(0);
