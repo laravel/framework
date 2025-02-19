@@ -31,7 +31,7 @@ PHP);
         parent::setUp();
     }
 
-    public function test_work_can_be_distributed()
+    public function testWorkCanBeDistributed()
     {
         $response = $this->get('concurrency')
             ->assertOk();
@@ -42,7 +42,7 @@ PHP);
         $this->assertEquals(4, $second);
     }
 
-    public function test_run_handler_process_error_code()
+    public function testRunHandlerProcessErrorCode()
     {
         $this->expectException(\Exception::class);
         $app = new Application(__DIR__);
@@ -52,7 +52,7 @@ PHP);
         ]);
     }
 
-    public function test_run_handler_process_error_code_with_custom_exception_without_param()
+    public function testRunHandlerProcessErrorWithCustomExceptionWithoutParam()
     {
         $this->expectException(ExceptionWithoutParam::class);
         $this->expectExceptionMessage('Test');
@@ -61,7 +61,7 @@ PHP);
         ]);
     }
 
-    public function test_run_handler_process_error_code_with_custom_exception_with_param()
+    public function testRunHandlerProcessErrorWithCustomExceptionWithParam()
     {
         $this->expectException(ExceptionWithParam::class);
         $this->expectExceptionMessage('API request to https://api.example.com failed with status 400 Bad Request');
