@@ -25,6 +25,12 @@ function test(User $user, Post $post, Comment $comment, Article $article): void
         return ['string' => 'string'];
     }));
 
+    User::addGlobalScope('ancient', function ($builder) {
+        assertType('Illuminate\Database\Eloquent\Builder<User>', $builder);
+
+        $builder->where('created_at', '<', now()->subYears(2000));
+    });
+
     assertType('Illuminate\Database\Eloquent\Builder<User>', User::query());
     assertType('Illuminate\Database\Eloquent\Builder<User>', $user->newQuery());
     assertType('Illuminate\Database\Eloquent\Builder<User>', $user->withTrashed());
