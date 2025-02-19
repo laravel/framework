@@ -73,7 +73,7 @@ class FluentEnv
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    private function validate(string $key, mixed $value, bool $isDefault = false): void
+    private function validate(string $key, mixed $value): void
     {
         if ($this->validationRules === '' || $this->validationRules === []) {
             return;
@@ -99,9 +99,8 @@ class FluentEnv
             // Repeat validation, now with errors in english
             $validator->passes();
             $errors = implode(', ', $validator->errors()->all());
-            $default = $isDefault ? ' (default value)' : '';
 
-            throw new RuntimeException("Environment variable [$key]$default is invalid: {$errors}");
+            throw new RuntimeException("Environment variable [$key] is invalid: {$errors}");
         }
     }
 
@@ -122,7 +121,7 @@ class FluentEnv
 
         $default = value($this->default);
 
-        $this->validate(reset($this->keys), $default, isDefault: true);
+        $this->validate(reset($this->keys), $default);
 
         return $default;
     }

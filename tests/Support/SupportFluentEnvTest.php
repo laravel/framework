@@ -117,16 +117,6 @@ class SupportFluentEnvTest extends TestCase
 
         env()->key('FOO')->rules(['required', 'min:20'])->get();
     }
-
-    public function testRulesExceptionForDefaultValue()
-    {
-        unset($_ENV['foo']);
-
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Environment variable [foo] (default value) is invalid: The environment variable field must end with one of the following: eat.');
-
-        env()->key('foo')->default('We must ship')->rules('ends_with:eat')->get();
-    }
 }
 
 enum UnitEnum
