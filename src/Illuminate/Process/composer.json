@@ -15,10 +15,10 @@
     ],
     "require": {
         "php": "^8.2",
-        "illuminate/collections": "^11.0",
-        "illuminate/contracts": "^11.0",
-        "illuminate/macroable": "^11.0",
-        "illuminate/support": "^11.0",
+        "illuminate/collections": "^13.0",
+        "illuminate/contracts": "^13.0",
+        "illuminate/macroable": "^13.0",
+        "illuminate/support": "^13.0",
         "symfony/process": "^7.2.0"
     },
     "autoload": {
@@ -28,7 +28,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "12.x-dev"
+            "dev-master": "13.0.x-dev"
         }
     },
     "config": {
