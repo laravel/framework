@@ -76,7 +76,8 @@ PHP);
     }
 }
 
-class ExceptionWithoutParam extends Exception {}
+class ExceptionWithoutParam extends Exception {
+}
 
 class ExceptionWithParam extends Exception
 {
