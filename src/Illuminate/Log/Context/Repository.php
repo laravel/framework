@@ -127,6 +127,8 @@ class Repository
     }
 
     /**
+     * Retrieve the log name.
+     *
      * @return string|null
      */
     public function name()
@@ -243,6 +245,8 @@ class Repository
     }
 
     /**
+     * Set the log name.
+     *
      * @param  string|null  $name
      * @return $this
      */
