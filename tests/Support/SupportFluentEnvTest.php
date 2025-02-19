@@ -9,53 +9,58 @@ use RuntimeException;
 
 class SupportFluentEnvTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        unset($_ENV['FOO'], $_ENV['FOO_EMPTY'], $_ENV['FOO_NULL']);
+    }
+
     public function testBasics()
     {
-        $_ENV['foo'] = 'var';
+        $_ENV['FOO'] = 'var';
 
         // From env()
-        $this->assertSame('var', env()->key('foo')->get());
+        $this->assertSame('var', env()->key('FOO')->get());
         // From instance
-        $this->assertSame('var', (new FluentEnv('foo'))->get());
+        $this->assertSame('var', (new FluentEnv('FOO'))->get());
     }
 
     public function testDefault()
     {
-        unset($_ENV['foo']);
+        unset($_ENV['FOO']);
 
         // no default
-        $this->assertNull(env()->key('foo')->get());
+        $this->assertNull(env()->key('FOO')->get());
         // default
-        $this->assertSame('default', env()->key('foo', 'default')->get());
-        $this->assertSame('default', env()->key('foo')->default('default')->get());
+        $this->assertSame('default', env()->key('FOO', 'default')->get());
+        $this->assertSame('default', env()->key('FOO')->default('default')->get());
         // default as fucntion
-        $this->assertSame('default', env()->key('foo')->default(fn () => 'default')->get());
+        $this->assertSame('default', env()->key('FOO')->default(fn () => 'default')->get());
     }
 
     public function testWithFallbackKeys()
     {
-        $_ENV['foo'] = 'var';
+        $_ENV['FOO'] = 'var';
 
-        $this->assertSame('var', env()->keys('wrong-key', 'foo')->get());
+        $this->assertSame('var', env()->keys('wrong-key', 'FOO')->get());
         $this->assertSame('default', env()->keys('wrong-key-1', 'wrong-key-2')->default('default')->get());
         $this->assertNull(env()->keys('wrong-key-1', 'wrong-key-2')->get());
     }
 
     public function testCasting()
     {
-        unset($_ENV['foo']);
+        unset($_ENV['FOO']);
 
         // cast
-        $this->assertSame('string', env()->key('foo')->default('string')->string());
-        $this->assertSame(123, env()->key('foo')->default('123')->integer());
-        $this->assertSame(1.23, env()->key('foo')->default('1.23')->float());
-        $this->assertSame(false, env()->key('foo')->boolean());
+        $this->assertSame('string', env()->key('FOO')->default('string')->string());
+        $this->assertSame(123, env()->key('FOO')->default('123')->integer());
+        $this->assertSame(1.23, env()->key('FOO')->default('1.23')->float());
+        $this->assertSame(false, env()->key('FOO')->boolean());
 
         // null
-        $this->assertSame('', env()->key('foo')->string());
-        $this->assertSame(0, env()->key('foo')->integer());
-        $this->assertSame(0.0, env()->key('foo')->float());
-        $this->assertSame(false, env()->key('foo')->boolean());
+        $this->assertSame('', env()->key('FOO')->string());
+        $this->assertSame(0, env()->key('FOO')->integer());
+        $this->assertSame(0.0, env()->key('FOO')->float());
+        $this->assertSame(false, env()->key('FOO')->boolean());
 
         // Stringable
         $this->assertSame('STRING', env()->default('string')->stringable()->upper()->value());
@@ -64,40 +69,40 @@ class SupportFluentEnvTest extends TestCase
     public function testCastToArray()
     {
         // array
-        $_ENV['foo'] = 'cheese,wine,42';
-        $this->assertSame(['cheese', 'wine', '42'], env()->key('foo')->array());
+        $_ENV['FOO'] = 'cheese,wine,42';
+        $this->assertSame(['cheese', 'wine', '42'], env()->key('FOO')->array());
 
         // with ";" as separator
-        $_ENV['foo'] = 'cheese;wine;42';
-        $this->assertSame(['cheese', 'wine', '42'], env()->key('foo')->array(';'));
+        $_ENV['FOO'] = 'cheese;wine;42';
+        $this->assertSame(['cheese', 'wine', '42'], env()->key('FOO')->array(';'));
 
         // empty values
-        $this->assertSame([], env()->key('foo-invalid')->array());
-        $this->assertSame([], env()->key('foo-invalid')->collect()->toArray());
+        $this->assertSame([], env()->key('FOO-invalid')->array());
+        $this->assertSame([], env()->key('FOO-invalid')->collect()->toArray());
     }
 
     public function testCastToEnum()
     {
-        $_ENV['foo-empty'] = '';
-        $_ENV['foo-null'] = 'null';
+        $_ENV['FOO_EMPTY'] = '';
+        $_ENV['FOO_NULL'] = 'null';
 
         // UnitEnum
-        $_ENV['foo'] = 'Taylor';
-        $this->assertSame(UnitEnum::Taylor, env()->key('foo')->enum(UnitEnum::class));
-        $this->assertNull(env()->key('foo-empty')->enum(UnitEnum::class));
-        $this->assertNull(env()->key('foo-null')->enum(UnitEnum::class));
+        $_ENV['FOO'] = 'Taylor';
+        $this->assertSame(UnitEnum::Taylor, env()->key('FOO')->enum(UnitEnum::class));
+        $this->assertNull(env()->key('FOO_EMPTY')->enum(UnitEnum::class));
+        $this->assertNull(env()->key('FOO_NULL')->enum(UnitEnum::class));
 
         // BackedEnum: string
-        $_ENV['foo'] = 'cats';
-        $this->assertSame(StringEnum::Cats, env()->key('foo')->enum(StringEnum::class));
-        $this->assertNull(env()->key('foo-empty')->enum(StringEnum::class));
-        $this->assertNull(env()->key('foo-null')->enum(StringEnum::class));
+        $_ENV['FOO'] = 'cats';
+        $this->assertSame(StringEnum::Cats, env()->key('FOO')->enum(StringEnum::class));
+        $this->assertNull(env()->key('FOO_EMPTY')->enum(StringEnum::class));
+        $this->assertNull(env()->key('FOO_NULL')->enum(StringEnum::class));
 
         // BackedEnum: integer
-        $_ENV['foo'] = '2';
-        $this->assertSame(IntegerEnum::Two, env()->key('foo')->enum(IntegerEnum::class));
-        $this->assertNull(env()->key('foo-empty')->enum(IntegerEnum::class));
-        $this->assertNull(env()->key('foo-null')->enum(IntegerEnum::class));
+        $_ENV['FOO'] = '2';
+        $this->assertSame(IntegerEnum::Two, env()->key('FOO')->enum(IntegerEnum::class));
+        $this->assertNull(env()->key('FOO_EMPTY')->enum(IntegerEnum::class));
+        $this->assertNull(env()->key('FOO_NULL')->enum(IntegerEnum::class));
     }
 
     public function testFailedCastToUnitEnum()
@@ -122,24 +127,24 @@ class SupportFluentEnvTest extends TestCase
 
     public function testEnumDoesntExists()
     {
-        $_ENV['foo'] = 'bar';
+        $_ENV['FOO'] = 'bar';
 
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage("Environment variable [foo] error: Enum InexistantEnum doesn't exist.");
+        $this->expectExceptionMessage("Environment variable [FOO] error: Enum InexistantEnum doesn't exist.");
 
-        env()->key('foo')->enum('InexistantEnum');
+        env()->key('FOO')->enum('InexistantEnum');
     }
 
     public function testValidationRules()
     {
-        $_ENV['foo'] = '2011-06-09';
+        $_ENV['FOO'] = '2011-06-09';
 
         // String
-        $this->assertSame('2011-06-09', env()->key('foo')->rules('required')->get());
+        $this->assertSame('2011-06-09', env()->key('FOO')->rules('required')->get());
         // Array
-        $this->assertSame('2011-06-09', env()->key('foo')->rules(['required'])->get());
+        $this->assertSame('2011-06-09', env()->key('FOO')->rules(['required'])->get());
         // Stringable
-        $this->assertSame('2011-06-09', env()->key('foo')->rules(Rule::date()->beforeToday())->get());
+        $this->assertSame('2011-06-09', env()->key('FOO')->rules(Rule::date()->beforeToday())->get());
     }
 
     public function testValidationRulesException()
