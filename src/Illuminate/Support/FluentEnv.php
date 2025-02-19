@@ -72,7 +72,7 @@ class FluentEnv
     /**
      * Apply validation rules.
      *
-     * @throws \Illuminate\Validation\ValidationException
+     * @throws \RuntimeException
      */
     private function validate(string $key, mixed $value): void
     {
@@ -108,7 +108,7 @@ class FluentEnv
     /**
      * Get the environment variable value.
      *
-     * @throws \Illuminate\Validation\ValidationException
+     * @throws \RuntimeException
      */
     public function get(): mixed
     {
@@ -137,7 +137,7 @@ class FluentEnv
     /**
      * Get the environment variable value as an integer.
      *
-     * @throws \Illuminate\Validation\ValidationException
+     * @throws \RuntimeException
      */
     public function integer(): int
     {
@@ -147,7 +147,7 @@ class FluentEnv
     /**
      * Get the environment variable value as a float.
      *
-     * @throws \Illuminate\Validation\ValidationException
+     * @throws \RuntimeException
      */
     public function float(): float
     {
@@ -157,7 +157,7 @@ class FluentEnv
     /**
      * Get the environment variable value as a boolean.
      *
-     * @throws \Illuminate\Validation\ValidationException
+     * @throws \RuntimeException
      */
     public function boolean(): bool
     {
@@ -167,7 +167,7 @@ class FluentEnv
     /**
      * Get the environment variable value as a string.
      *
-     * @throws \Illuminate\Validation\ValidationException
+     * @throws \RuntimeException
      */
     public function string(): string
     {
@@ -177,7 +177,7 @@ class FluentEnv
     /**
      * Get the environment variable value as a Stringable instance.
      *
-     * @throws \Illuminate\Validation\ValidationException
+     * @throws \RuntimeException
      */
     public function stringable(): Stringable
     {
@@ -187,7 +187,7 @@ class FluentEnv
     /**
      * Get the environment variable value as a Collection.
      *
-     * @throws \Illuminate\Validation\ValidationException
+     * @throws \RuntimeException
      */
     public function collect(string $separator = ','): Collection
     {
@@ -243,7 +243,7 @@ class FluentEnv
     /**
      * Get the environment variable value as an array.
      *
-     * @throws \Illuminate\Validation\ValidationException
+     * @throws \RuntimeException
      */
     public function array(string $separator = ','): array
     {
