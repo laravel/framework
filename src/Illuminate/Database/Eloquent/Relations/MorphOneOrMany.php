@@ -36,6 +36,7 @@ abstract class MorphOneOrMany extends HasOneOrMany
     public function morphKeyTypeString($morphKeyTypeString = true)
     {
         $this->morphKeyTypeString = $morphKeyTypeString;
+
         return $this;
     }
 
@@ -74,6 +75,7 @@ abstract class MorphOneOrMany extends HasOneOrMany
 
         if (SchemaBuilder::$defaultMorphKeyType === 'int') {
             parent::addConstraints();
+
             return;
         }
 
@@ -225,7 +227,7 @@ abstract class MorphOneOrMany extends HasOneOrMany
     #[\Override]
     protected function whereInMethod(Model $model, $key)
     {
-        if (! in_array(SchemaBuilder::$defaultMorphKeyType, ['uuid', 'ulid', 'string']) && (!isset($this->morphKeyTypeString) || $this->morphKeyTypeString === false)) {
+        if (! in_array(SchemaBuilder::$defaultMorphKeyType, ['uuid', 'ulid', 'string']) && (! isset($this->morphKeyTypeString) || $this->morphKeyTypeString === false)) {
             return parent::whereInMethod($model, $key);
         }
 
