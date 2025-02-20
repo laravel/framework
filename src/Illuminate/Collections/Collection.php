@@ -628,13 +628,11 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
         }
 
         $first = $this->first();
+        $pluck = is_array($first) || is_object($first);
 
-        $pluck = match(true) {
-            $first instanceof Model => true,
-            $first instanceof \Stringable => false,
-            is_array($first), is_object($first) => true,
-            default => false,
-        };
+        if ($first instanceof \Stringable && ! $first instanceof Model) {
+            $pluck = false;
+        }
 
         if ($pluck) {
             return implode($glue ?? '', $this->pluck($value)->all());
