@@ -643,13 +643,13 @@ class QueryBuilderTest extends DatabaseTestCase
         ], DB::table('posts')->pluck('title', 'content')->toArray());
 
         // Test custom select query before calling pluck.
-        $this->assertSame(
-            [2, 2],
-            DB::table('posts')
-                ->selectSub(DB::table('posts')->selectRaw('COUNT(*)'), 'total_posts_count')
-                ->pluck('total_posts_count')
-                ->toArray(),
-        );
+        $result = DB::table('posts')
+            ->selectSub(DB::table('posts')->selectRaw('COUNT(*)'), 'total_posts_count')
+            ->pluck('total_posts_count')
+            ->toArray();
+        // Cast for database compatibility.
+        $this->assertSame(2, (int) $result[0]);
+        $this->assertSame(2, (int) $result[1]);
     }
 
     public function testFetchUsing()
