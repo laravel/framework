@@ -54,17 +54,14 @@ class InvokeSerializedClosureCommand extends Command
 
             $reflection = new ReflectionClass($e);
             $constructor = $reflection->getConstructor();
-            $params = [];
+            $parameters = [];
 
             if ($constructor) {
                 $declaringClass = $constructor->getDeclaringClass()->getName();
 
-                // Ensure we're only getting parameters from the current class, not inherited ones
                 if ($declaringClass === $reflection->getName()) {
-                    $args = $constructor->getParameters();
-                    foreach ($args as $param) {
-                        $property = $param->name;
-                        $params[$property] = $e->{$property} ?? null;
+                    foreach ($constructor->getParameters() as $parameter) {
+                        $parameters[$parameter->name] = $e->{$parameter->name} ?? null;
                     }
                 }
             }
@@ -75,7 +72,7 @@ class InvokeSerializedClosureCommand extends Command
                 'message' => $e->getMessage(),
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),
-                'params' => $params,
+                'parameters' => $parameters,
             ]));
         }
     }
