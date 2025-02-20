@@ -97,7 +97,7 @@ class ServeCommand extends Command
     protected function initialize(InputInterface $input, OutputInterface $output)
     {
         $this->phpServerWorkers = transform((int) env('PHP_CLI_SERVER_WORKERS', 1), function (int $workers) {
-            if (! is_int($workers) || $workers < 2) {
+            if ($workers < 2) {
                 return false;
             }
 
