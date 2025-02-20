@@ -90,7 +90,7 @@ class NotificationDatabaseChannelCustomizeTypeTestNotification extends Notificat
         return 'MONTHLY';
     }
 
-    public function readAt()
+    public function initialDatabaseReadAtValue()
     {
         return Carbon::now();
     }
