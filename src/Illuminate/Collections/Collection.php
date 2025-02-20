@@ -5,6 +5,7 @@ namespace Illuminate\Support;
 use ArrayAccess;
 use ArrayIterator;
 use Illuminate\Contracts\Support\CanBeEscapedWhenCastToString;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Traits\EnumeratesValues;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
@@ -628,7 +629,14 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
 
         $first = $this->first();
 
-        if (is_array($first) || (is_object($first) && ! $first instanceof \Stringable)) {
+        $pluck = match(true) {
+            $first instanceof Model => true,
+            $first instanceof \Stringable => false,
+            is_array($first), is_object($first) => true,
+            default => false,
+        };
+
+        if ($pluck) {
             return implode($glue ?? '', $this->pluck($value)->all());
         }
 
