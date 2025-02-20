@@ -44,7 +44,7 @@ PHP);
 
     public function testRunHandlerProcessErrorCode()
     {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $app = new Application(__DIR__);
         $processDriver = new ProcessDriver($app->make(ProcessFactory::class));
         $processDriver->run([
@@ -54,7 +54,7 @@ PHP);
 
     public function testRunHandlerProcessErrorWithDefaultExceptionWithoutParam()
     {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('This is a different exception');
 
         Concurrency::run([
