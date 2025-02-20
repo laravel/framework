@@ -3,6 +3,7 @@
 namespace Illuminate\Routing;
 
 use Closure;
+use Illuminate\Contracts\Routing\EventStreamable;
 use Illuminate\Contracts\Routing\ResponseFactory as FactoryContract;
 use Illuminate\Contracts\View\Factory as ViewFactory;
 use Illuminate\Http\JsonResponse;
@@ -147,11 +148,13 @@ class ResponseFactory implements FactoryContract
                     break;
                 }
 
+                $streamAs = $message instanceof EventStreamable ? $message->streamVia() : $as;
+
                 if (! is_string($message) && ! is_numeric($message)) {
                     $message = Js::encode($message);
                 }
 
-                echo "event: update\n";
+                echo "event: $streamAs\n";
                 echo 'data: '.$message;
                 echo "\n\n";
 
