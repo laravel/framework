@@ -31,16 +31,9 @@ trait Conditionable
         }
 
         if ($value) {
-            $result = $callback($this, $value) ?? $this;
+            return $callback($this, $value) ?? $this;
         } elseif ($default) {
-            $result = $default($this, $value) ?? $this;
-        } else {
-            return $this;
-        }
-
-        if ($this instanceof \Illuminate\Database\Eloquent\Relations\BelongsToMany && $result instanceof \Illuminate\Database\Eloquent\Builder) {
-            $this->query = $result;
-            return $this;
+            return $default($this, $value) ?? $this;
         }
 
         return $this;

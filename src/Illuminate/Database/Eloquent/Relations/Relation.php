@@ -122,6 +122,37 @@ abstract class Relation implements BuilderContract
     }
 
     /**
+     * Conditionally modify the relation.
+     *
+     * Unlike the query builder's when method, we always return the relation
+     * instance so that relationship-specific methods remain available.
+     */
+    public function when($value, callable $callback, callable $default = null)
+    {
+        if ($this instanceof BelongsToMany) {
+            // For BelongsToMany, run the callback on the relation instance.
+            if ($value) {
+                $callback($this, $value);
+            } elseif ($default) {
+                $default($this, $value);
+            }
+            return $this;
+        }
+
+        if ($this instanceof MorphTo) {
+            // For MorphTo, update the underlying query builder and set it back on the relation.
+            $query = $this->getQuery()->when($value, $callback, $default);
+            $this->setQuery($query);
+            return $this;
+        }
+
+        // For all other relation types, update the underlying query builder.
+        $query = $this->getQuery()->when($value, $callback, $default);
+        $this->setQuery($query);
+        return $this;
+    }
+
+    /**
      * Set the base constraints on the relation query.
      *
      * @return void
