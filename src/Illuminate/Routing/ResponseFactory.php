@@ -148,13 +148,13 @@ class ResponseFactory implements FactoryContract
                     break;
                 }
 
-                $streamVia = $message instanceof EventStreamable ? $message->streamVia() : $as;
+                $streamAs = $message instanceof EventStreamable ? $message->streamAs() : $as;
 
                 if (! is_string($message) && ! is_numeric($message)) {
                     $message = Js::encode($message);
                 }
 
-                echo "event: $streamVia\n";
+                echo "event: $streamAs\n";
                 echo 'data: '.$message;
                 echo "\n\n";
 
