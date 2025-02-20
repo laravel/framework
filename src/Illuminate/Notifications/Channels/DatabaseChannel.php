@@ -36,8 +36,8 @@ class DatabaseChannel
                         ? $notification->databaseType($notifiable)
                         : get_class($notification),
             'data' => $this->getData($notifiable, $notification),
-            'read_at' => method_exists($notification, 'readAt')
-                        ? $notification->readAt($notifiable)
+            'read_at' => method_exists($notification, 'initialDatabaseReadAtValue')
+                        ? $notification->initialDatabaseReadAtValue($notifiable)
                         : null,
         ];
     }
