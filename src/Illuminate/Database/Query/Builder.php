@@ -3150,7 +3150,7 @@ class Builder implements BuilderContract
 
         $total = value($total) ?? $this->getCountForPagination();
 
-        $perPage = $perPage instanceof Closure ? $perPage($total) : $perPage;
+        $perPage = value($perPage, $total);
 
         $results = $total ? $this->forPage($page, $perPage)->get($columns) : new Collection;
 

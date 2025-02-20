@@ -66,6 +66,24 @@ class RouteCollectionTest extends TestCase
         $this->assertSame($action, $routeIndex->getAction());
     }
 
+    public function testRouteCollectionCanRetrieveByMethod()
+    {
+        $this->routeCollection->add($routeIndex = new Route('GET', 'foo/index', $action = [
+            'uses' => 'FooController@index',
+            'as' => 'route_name',
+        ]));
+
+        $this->assertCount(1, $this->routeCollection->get('GET'));
+        $this->assertCount(0, $this->routeCollection->get('GET.foo/index'));
+        $this->assertSame($routeIndex, $this->routeCollection->get('GET')['foo/index']);
+
+        $this->routeCollection->add($routeShow = new Route('GET', 'bar/show', [
+            'uses' => 'BarController@show',
+            'as' => 'bar_show',
+        ]));
+        $this->assertCount(2, $this->routeCollection->get('GET'));
+    }
+
     public function testRouteCollectionCanGetIterator()
     {
         $this->routeCollection->add(new Route('GET', 'foo/index', [

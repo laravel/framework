@@ -351,4 +351,122 @@ class ValidationRuleParserTest extends TestCase
             ],
         ], $results->implicitAttributes);
     }
+
+    public function testExplodeHandlesStringDateRule()
+    {
+        $parser = (new ValidationRuleParser([
+            'date' => '2021-01-01',
+        ]));
+
+        $rules = [
+            'date' => 'date|date_format:Y-m-d',
+        ];
+
+        $results = $parser->explode($rules);
+
+        $this->assertEquals([
+            'date' => [
+                'date',
+                'date_format:Y-m-d',
+            ],
+        ], $results->rules);
+    }
+
+    public function testExplodeHandlesDateRule()
+    {
+        $parser = (new ValidationRuleParser([
+            'date' => '2021-01-01',
+        ]));
+
+        $rules = [
+            'date' => Rule::date(),
+        ];
+
+        $results = $parser->explode($rules);
+
+        $this->assertEquals([
+            'date' => [
+                'date',
+            ],
+        ], $results->rules);
+    }
+
+    public function testExplodeHandlesDateRuleWithAdditionalRules()
+    {
+        $parser = (new ValidationRuleParser([
+            'date' => '2021-01-01',
+        ]));
+
+        $rules = [
+            'date' => Rule::date()->format('Y-m-d'),
+        ];
+
+        $results = $parser->explode($rules);
+
+        $this->assertEquals([
+            'date' => [
+                'date',
+                'date_format:Y-m-d',
+            ],
+        ], $results->rules);
+    }
+
+    public function testExplodeHandlesNumericStringRule()
+    {
+        $parser = (new ValidationRuleParser([
+            'number' => 42,
+        ]));
+
+        $rules = [
+            'number' => 'numeric|max:100',
+        ];
+
+        $results = $parser->explode($rules);
+
+        $this->assertEquals([
+            'number' => [
+                'numeric',
+                'max:100',
+            ],
+        ], $results->rules);
+    }
+
+    public function testExplodeHandlesNumericRule()
+    {
+        $parser = (new ValidationRuleParser([
+            'number' => 42,
+        ]));
+
+        $rules = [
+            'number' => Rule::numeric(),
+        ];
+
+        $results = $parser->explode($rules);
+
+        $this->assertEquals([
+            'number' => [
+                'numeric',
+            ],
+        ], $results->rules);
+    }
+
+    public function testExplodeHandlesNumericRuleWithAdditionalRules()
+    {
+        $parser = (new ValidationRuleParser([
+            'number' => 42,
+        ]));
+
+        $rules = [
+            'number' => Rule::numeric()->max(100),
+        ];
+
+        $results = $parser->explode($rules);
+
+        $this->assertEquals([
+            'number' => [
+                'numeric',
+                'max:100',
+            ],
+        ], $results->rules);
+    }
 }
