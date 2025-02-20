@@ -9,5 +9,5 @@ interface EventStreamable
      *
      * @return string
      */
-    public function streamVia();
+    public function streamAs();
 }
