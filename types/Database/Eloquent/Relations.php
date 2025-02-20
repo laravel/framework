@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Database\Eloquent\Relations\Relation;
 
 use function PHPStan\Testing\assertType;
 
@@ -46,16 +47,16 @@ function test(User $user, Post $post, Comment $comment, ChildUser $child): void
     assertType('Illuminate\Database\Eloquent\Collection<int, Illuminate\Types\Relations\Role>', $user->roles()->findMany([1, 2, 3]));
     assertType('Illuminate\Database\Eloquent\Collection<int, Illuminate\Types\Relations\Role>', $user->roles()->findOrNew([1]));
     assertType('Illuminate\Database\Eloquent\Collection<int, Illuminate\Types\Relations\Role>', $user->roles()->findOrFail([1]));
-    assertType('Illuminate\Database\Eloquent\Collection<int, Illuminate\Types\Relations\Role>|int', $user->roles()->findOr([1], fn () => 42));
-    assertType('Illuminate\Database\Eloquent\Collection<int, Illuminate\Types\Relations\Role>|int', $user->roles()->findOr([1], callback: fn () => 42));
+    assertType('42|Illuminate\Database\Eloquent\Collection<int, Illuminate\Types\Relations\Role>', $user->roles()->findOr([1], fn () => 42));
+    assertType('42|Illuminate\Database\Eloquent\Collection<int, Illuminate\Types\Relations\Role>', $user->roles()->findOr([1], callback: fn () => 42));
     assertType('Illuminate\Types\Relations\Role', $user->roles()->findOrNew(1));
     assertType('Illuminate\Types\Relations\Role', $user->roles()->findOrFail(1));
     assertType('Illuminate\Types\Relations\Role|null', $user->roles()->find(1));
-    assertType('Illuminate\Types\Relations\Role|int', $user->roles()->findOr(1, fn () => 42));
-    assertType('Illuminate\Types\Relations\Role|int', $user->roles()->findOr(1, callback: fn () => 42));
+    assertType('42|Illuminate\Types\Relations\Role', $user->roles()->findOr(1, fn () => 42));
+    assertType('42|Illuminate\Types\Relations\Role', $user->roles()->findOr(1, callback: fn () => 42));
     assertType('Illuminate\Types\Relations\Role|null', $user->roles()->first());
-    assertType('Illuminate\Types\Relations\Role|int', $user->roles()->firstOr(fn () => 42));
-    assertType('Illuminate\Types\Relations\Role|int', $user->roles()->firstOr(callback: fn () => 42));
+    assertType('42|Illuminate\Types\Relations\Role', $user->roles()->firstOr(fn () => 42));
+    assertType('42|Illuminate\Types\Relations\Role', $user->roles()->firstOr(callback: fn () => 42));
     assertType('Illuminate\Types\Relations\Role|null', $user->roles()->firstWhere('foo'));
     assertType('Illuminate\Types\Relations\Role', $user->roles()->firstOrNew());
     assertType('Illuminate\Types\Relations\Role', $user->roles()->firstOrFail());
@@ -81,14 +82,14 @@ function test(User $user, Post $post, Comment $comment, ChildUser $child): void
     assertType('Illuminate\Database\Eloquent\Relations\HasOneThrough<Illuminate\Types\Relations\Car, Illuminate\Types\Relations\Mechanic, Illuminate\Types\Relations\User>', $user->car());
     assertType('Illuminate\Types\Relations\Car|null', $user->car()->getResults());
     assertType('Illuminate\Database\Eloquent\Collection<int, Illuminate\Types\Relations\Car>', $user->car()->find([1]));
-    assertType('Illuminate\Database\Eloquent\Collection<int, Illuminate\Types\Relations\Car>|int', $user->car()->findOr([1], fn () => 42));
-    assertType('Illuminate\Database\Eloquent\Collection<int, Illuminate\Types\Relations\Car>|int', $user->car()->findOr([1], callback: fn () => 42));
+    assertType('42|Illuminate\Database\Eloquent\Collection<int, Illuminate\Types\Relations\Car>', $user->car()->findOr([1], fn () => 42));
+    assertType('42|Illuminate\Database\Eloquent\Collection<int, Illuminate\Types\Relations\Car>', $user->car()->findOr([1], callback: fn () => 42));
     assertType('Illuminate\Types\Relations\Car|null', $user->car()->find(1));
-    assertType('Illuminate\Types\Relations\Car|int', $user->car()->findOr(1, fn () => 42));
-    assertType('Illuminate\Types\Relations\Car|int', $user->car()->findOr(1, callback: fn () => 42));
+    assertType('42|Illuminate\Types\Relations\Car', $user->car()->findOr(1, fn () => 42));
+    assertType('42|Illuminate\Types\Relations\Car', $user->car()->findOr(1, callback: fn () => 42));
     assertType('Illuminate\Types\Relations\Car|null', $user->car()->first());
-    assertType('Illuminate\Types\Relations\Car|int', $user->car()->firstOr(fn () => 42));
-    assertType('Illuminate\Types\Relations\Car|int', $user->car()->firstOr(callback: fn () => 42));
+    assertType('42|Illuminate\Types\Relations\Car', $user->car()->firstOr(fn () => 42));
+    assertType('42|Illuminate\Types\Relations\Car', $user->car()->firstOr(callback: fn () => 42));
     assertType('Illuminate\Support\LazyCollection<int, Illuminate\Types\Relations\Car>', $user->car()->lazy());
     assertType('Illuminate\Support\LazyCollection<int, Illuminate\Types\Relations\Car>', $user->car()->lazyById());
     assertType('Illuminate\Support\LazyCollection<int, Illuminate\Types\Relations\Car>', $user->car()->cursor());
@@ -123,6 +124,8 @@ function test(User $user, Post $post, Comment $comment, ChildUser $child): void
 
     assertType('Illuminate\Database\Eloquent\Relations\MorphToMany<Illuminate\Types\Relations\Tag, Illuminate\Types\Relations\Post>', $post->tags());
     assertType('Illuminate\Database\Eloquent\Collection<int, Illuminate\Types\Relations\Tag>', $post->tags()->getResults());
+
+    assertType('42', Relation::noConstraints(fn () => 42));
 }
 
 class User extends Model

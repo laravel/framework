@@ -175,6 +175,7 @@ class SupportStrTest extends TestCase
         $this->assertTrue(Str::startsWith(7.123, '7'));
         $this->assertTrue(Str::startsWith(7.123, '7.12'));
         $this->assertFalse(Str::startsWith(7.123, '7.13'));
+        $this->assertFalse(Str::startsWith(null, 'Marc'));
         // Test for multibyte string support
         $this->assertTrue(Str::startsWith('Jönköping', 'Jö'));
         $this->assertTrue(Str::startsWith('Malmö', 'Malmö'));
@@ -207,6 +208,7 @@ class SupportStrTest extends TestCase
         $this->assertTrue(Str::endsWith(0.27, '7'));
         $this->assertTrue(Str::endsWith(0.27, '0.27'));
         $this->assertFalse(Str::endsWith(0.27, '8'));
+        $this->assertFalse(Str::endsWith(null, 'Marc'));
         // Test for multibyte string support
         $this->assertTrue(Str::endsWith('Jönköping', 'öping'));
         $this->assertTrue(Str::endsWith('Malmö', 'mö'));
@@ -983,6 +985,21 @@ class SupportStrTest extends TestCase
         $this->assertSame('FooBarBaz', Str::studly('foo-bar_baz'));
 
         $this->assertSame('ÖffentlicheÜberraschungen', Str::studly('öffentliche-überraschungen'));
+    }
+
+    public function testPascal()
+    {
+        $this->assertSame('LaravelPhpFramework', Str::pascal('laravel_php_framework'));
+        $this->assertSame('LaravelPhpFramework', Str::pascal('laravel-php-framework'));
+        $this->assertSame('LaravelPhpFramework', Str::pascal('laravel  -_-  php   -_-   framework   '));
+
+        $this->assertSame('FooBar', Str::pascal('fooBar'));
+        $this->assertSame('FooBar', Str::pascal('foo_bar'));
+        $this->assertSame('FooBar', Str::pascal('foo_bar')); // test cache
+        $this->assertSame('FooBarBaz', Str::pascal('foo-barBaz'));
+        $this->assertSame('FooBarBaz', Str::pascal('foo-bar_baz'));
+
+        $this->assertSame('ÖffentlicheÜberraschungen', Str::pascal('öffentliche-überraschungen'));
     }
 
     public function testMask()

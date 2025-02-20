@@ -63,9 +63,9 @@ abstract class Relation implements BuilderContract
     protected static $constraints = true;
 
     /**
-     * An array to map class names to their morph names in the database.
+     * An array to map morph names to their class names in the database.
      *
-     * @var array
+     * @var array<string, class-string<\Illuminate\Database\Eloquent\Model>>
      */
     public static $morphMap = [];
 
@@ -102,8 +102,10 @@ abstract class Relation implements BuilderContract
     /**
      * Run a callback with constraints disabled on the relation.
      *
-     * @param  \Closure  $callback
-     * @return mixed
+     * @template TReturn of mixed
+     *
+     * @param  Closure(): TReturn  $callback
+     * @return TReturn
      */
     public static function noConstraints(Closure $callback)
     {
@@ -451,7 +453,7 @@ abstract class Relation implements BuilderContract
     /**
      * Define the morph map for polymorphic relations and require all morphed models to be explicitly mapped.
      *
-     * @param  array  $map
+     * @param  array<string, class-string<\Illuminate\Database\Eloquent\Model>>  $map
      * @param  bool  $merge
      * @return array
      */
@@ -465,9 +467,9 @@ abstract class Relation implements BuilderContract
     /**
      * Set or get the morph map for polymorphic relations.
      *
-     * @param  array|null  $map
+     * @param  array<string, class-string<\Illuminate\Database\Eloquent\Model>>|null  $map
      * @param  bool  $merge
-     * @return array
+     * @return array<string, class-string<\Illuminate\Database\Eloquent\Model>>
      */
     public static function morphMap(?array $map = null, $merge = true)
     {
@@ -484,8 +486,8 @@ abstract class Relation implements BuilderContract
     /**
      * Builds a table-keyed array from model class names.
      *
-     * @param  string[]|null  $models
-     * @return array|null
+     * @param  list<class-string<\Illuminate\Database\Eloquent\Model>>|null  $models
+     * @return array<string, class-string<\Illuminate\Database\Eloquent\Model>>|null
      */
     protected static function buildMorphMapFromModels(?array $models = null)
     {
@@ -502,7 +504,7 @@ abstract class Relation implements BuilderContract
      * Get the model associated with a custom polymorphic type.
      *
      * @param  string  $alias
-     * @return string|null
+     * @return class-string<\Illuminate\Database\Eloquent\Model>|null
      */
     public static function getMorphedModel($alias)
     {
@@ -512,7 +514,7 @@ abstract class Relation implements BuilderContract
     /**
      * Get the alias associated with a custom polymorphic class.
      *
-     * @param  string  $className
+     * @param  class-string<\Illuminate\Database\Eloquent\Model>  $className
      * @return int|string
      */
     public static function getMorphAlias(string $className)
