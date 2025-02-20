@@ -271,7 +271,7 @@ class Collection extends BaseCollection implements QueueableCollection
             return;
         }
 
-        $models = $models->pluck($name)->whereNotNull();
+        $models = $models->pluck($name)->filter();
 
         if ($models->first() instanceof BaseCollection) {
             $models = $models->collapse();
@@ -824,7 +824,7 @@ class Collection extends BaseCollection implements QueueableCollection
 
         $class = get_class($model);
 
-        if ($this->filter(fn ($model) => ! $model instanceof $class)->isNotEmpty()) {
+        if ($this->reject(fn ($model) => $model instanceof $class)->isNotEmpty()) {
             throw new LogicException('Unable to create query for collection with mixed types.');
         }
 

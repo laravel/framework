@@ -94,8 +94,10 @@ jobs:
 
     strategy:
       fail-fast: true
+      matrix:
+        client: ['phpredis', 'predis']
 
-    name: Redis Driver
+    name: Redis (${{ matrix.client}}) Driver
 
     steps:
       - name: Checkout code
@@ -122,6 +124,7 @@ jobs:
       - name: Execute tests
         run: vendor/bin/phpunit tests/Integration/Queue
         env:
+          REDIS_CLIENT: ${{ matrix.client }}
           QUEUE_CONNECTION: redis
 
   beanstalkd:

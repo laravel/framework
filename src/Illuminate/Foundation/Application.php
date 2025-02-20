@@ -254,7 +254,10 @@ class Application extends Container implements ApplicationContract, CachesConfig
     {
         return match (true) {
             isset($_ENV['APP_BASE_PATH']) => $_ENV['APP_BASE_PATH'],
-            default => dirname(array_keys(ClassLoader::getRegisteredLoaders())[0]),
+            default => dirname(array_values(array_filter(
+                array_keys(ClassLoader::getRegisteredLoaders()),
+                fn ($path) => ! str_contains($path, '/vendor/'),
+            ))[0]),
         };
     }
 
@@ -759,7 +762,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function detectEnvironment(Closure $callback)
     {
-        $args = $this->runningInConsole() && $_SERVER['argv']
+        $args = $this->runningInConsole() && isset($_SERVER['argv'])
             ? $_SERVER['argv']
             : null;
 
@@ -836,13 +839,13 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function registerConfiguredProviders()
     {
-        $providers = Collection::make($this->make('config')->get('app.providers'))
-                        ->partition(fn ($provider) => str_starts_with($provider, 'Illuminate\\'));
+        $providers = (new Collection($this->make('config')->get('app.providers')))
+            ->partition(fn ($provider) => str_starts_with($provider, 'Illuminate\\'));
 
         $providers->splice(1, 0, [$this->make(PackageManifest::class)->providers()]);
 
         (new ProviderRepository($this, new Filesystem, $this->getCachedServicesPath()))
-                    ->load($providers->collapse()->toArray());
+            ->load($providers->collapse()->toArray());
 
         $this->fireAppCallbacks($this->registeredCallbacks);
     }

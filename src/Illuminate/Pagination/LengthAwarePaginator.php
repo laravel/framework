@@ -11,6 +11,18 @@ use Illuminate\Support\Collection;
 use IteratorAggregate;
 use JsonSerializable;
 
+/**
+ * @template TKey of array-key
+ *
+ * @template-covariant TValue
+ *
+ * @extends AbstractPaginator<TKey, TValue>
+ *
+ * @implements Arrayable<TKey, TValue>
+ * @implements ArrayAccess<TKey, TValue>
+ * @implements IteratorAggregate<TKey, TValue>
+ * @implements LengthAwarePaginatorContract<TKey, TValue>
+ */
 class LengthAwarePaginator extends AbstractPaginator implements Arrayable, ArrayAccess, Countable, IteratorAggregate, Jsonable, JsonSerializable, LengthAwarePaginatorContract
 {
     /**
@@ -30,7 +42,7 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
     /**
      * Create a new paginator instance.
      *
-     * @param  mixed  $items
+     * @param  Collection<TKey, TValue>|Arrayable<TKey, TValue>|iterable<TKey, TValue>|null  $items
      * @param  int  $total
      * @param  int  $perPage
      * @param  int|null  $currentPage
@@ -50,7 +62,7 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
         $this->lastPage = max((int) ceil($total / $perPage), 1);
         $this->path = $this->path !== '/' ? rtrim($this->path, '/') : $this->path;
         $this->currentPage = $this->setCurrentPage($currentPage, $this->pageName);
-        $this->items = $items instanceof Collection ? $items : Collection::make($items);
+        $this->items = $items instanceof Collection ? $items : new Collection($items);
     }
 
     /**
@@ -101,12 +113,12 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
      */
     public function linkCollection()
     {
-        return collect($this->elements())->flatMap(function ($item) {
+        return (new Collection($this->elements()))->flatMap(function ($item) {
             if (! is_array($item)) {
                 return [['url' => null, 'label' => '...', 'active' => false]];
             }
 
-            return collect($item)->map(function ($url, $page) {
+            return (new Collection($item))->map(function ($url, $page) {
                 return [
                     'url' => $url,
                     'label' => (string) $page,

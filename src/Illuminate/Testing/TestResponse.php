@@ -217,7 +217,7 @@ class TestResponse implements ArrayAccess
     /**
      * Assert whether the response is redirecting to a given route.
      *
-     * @param  string  $name
+     * @param  \BackedEnum|string  $name
      * @param  mixed  $parameters
      * @return $this
      */
@@ -238,7 +238,7 @@ class TestResponse implements ArrayAccess
     /**
      * Assert whether the response is redirecting to a given signed route.
      *
-     * @param  string|null  $name
+     * @param  \BackedEnum|string|null  $name
      * @param  mixed  $parameters
      * @param  bool  $absolute
      * @return $this
@@ -567,7 +567,7 @@ class TestResponse implements ArrayAccess
     {
         $value = Arr::wrap($value);
 
-        $values = $escape ? array_map('e', $value) : $value;
+        $values = $escape ? array_map(e(...), $value) : $value;
 
         foreach ($values as $value) {
             PHPUnit::withResponse($this)->assertStringContainsString((string) $value, $this->getContent());
@@ -596,7 +596,7 @@ class TestResponse implements ArrayAccess
      */
     public function assertSeeInOrder(array $values, $escape = true)
     {
-        $values = $escape ? array_map('e', $values) : $values;
+        $values = $escape ? array_map(e(...), $values) : $values;
 
         PHPUnit::withResponse($this)->assertThat($values, new SeeInOrder($this->getContent()));
 
@@ -625,7 +625,7 @@ class TestResponse implements ArrayAccess
     {
         $value = Arr::wrap($value);
 
-        $values = $escape ? array_map('e', $value) : $value;
+        $values = $escape ? array_map(e(...), $value) : $value;
 
         $content = strip_tags($this->getContent());
 
@@ -645,7 +645,7 @@ class TestResponse implements ArrayAccess
      */
     public function assertSeeTextInOrder(array $values, $escape = true)
     {
-        $values = $escape ? array_map('e', $values) : $values;
+        $values = $escape ? array_map(e(...), $values) : $values;
 
         PHPUnit::withResponse($this)->assertThat($values, new SeeInOrder(strip_tags($this->getContent())));
 
@@ -663,7 +663,7 @@ class TestResponse implements ArrayAccess
     {
         $value = Arr::wrap($value);
 
-        $values = $escape ? array_map('e', $value) : $value;
+        $values = $escape ? array_map(e(...), $value) : $value;
 
         foreach ($values as $value) {
             PHPUnit::withResponse($this)->assertStringNotContainsString((string) $value, $this->getContent());
@@ -694,7 +694,7 @@ class TestResponse implements ArrayAccess
     {
         $value = Arr::wrap($value);
 
-        $values = $escape ? array_map('e', $value) : $value;
+        $values = $escape ? array_map(e(...), $value) : $value;
 
         $content = strip_tags($this->getContent());
 
@@ -1083,7 +1083,7 @@ class TestResponse implements ArrayAccess
      */
     public function collect($key = null)
     {
-        return Collection::make($this->json($key));
+        return new Collection($this->json($key));
     }
 
     /**

@@ -22,38 +22,44 @@ use Illuminate\Contracts\Auth\PasswordBroker;
 class Password extends Facade
 {
     /**
-     * Constant representing a successfully sent reminder.
+     * Constant representing a successfully sent password reset email.
      *
      * @var string
      */
-    const RESET_LINK_SENT = PasswordBroker::RESET_LINK_SENT;
+    const ResetLinkSent = PasswordBroker::RESET_LINK_SENT;
 
     /**
      * Constant representing a successfully reset password.
      *
      * @var string
      */
+    const PasswordReset = PasswordBroker::PASSWORD_RESET;
+
+    /**
+     * Constant indicating the user could not be found when attempting a password reset.
+     *
+     * @var string
+     */
+    const InvalidUser = PasswordBroker::INVALID_USER;
+
+    /**
+     * Constant representing an invalid password reset token.
+     *
+     * @var string
+     */
+    const InvalidToken = PasswordBroker::INVALID_TOKEN;
+
+    /**
+     * Constant representing a throttled password reset attempt.
+     *
+     * @var string
+     */
+    const ResetThrottled = PasswordBroker::RESET_THROTTLED;
+
+    const RESET_LINK_SENT = PasswordBroker::RESET_LINK_SENT;
     const PASSWORD_RESET = PasswordBroker::PASSWORD_RESET;
-
-    /**
-     * Constant representing the user not found response.
-     *
-     * @var string
-     */
     const INVALID_USER = PasswordBroker::INVALID_USER;
-
-    /**
-     * Constant representing an invalid token.
-     *
-     * @var string
-     */
     const INVALID_TOKEN = PasswordBroker::INVALID_TOKEN;
-
-    /**
-     * Constant representing a throttled reset attempt.
-     *
-     * @var string
-     */
     const RESET_THROTTLED = PasswordBroker::RESET_THROTTLED;
 
     /**

@@ -24,6 +24,7 @@
             "Illuminate\\Support\\": ""
         },
         "files": [
+            "functions.php",
             "helpers.php"
         ]
     },
@@ -33,7 +34,7 @@
         }
     },
     "suggest": {
-        "symfony/var-dumper": "Required to use the dump method (^7.0)."
+        "symfony/var-dumper": "Required to use the dump method (^7.2)."
     },
     "config": {
         "sort-packages": true

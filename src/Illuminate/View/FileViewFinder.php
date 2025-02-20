@@ -53,7 +53,7 @@ class FileViewFinder implements ViewFinderInterface
     public function __construct(Filesystem $files, array $paths, ?array $extensions = null)
     {
         $this->files = $files;
-        $this->paths = array_map([$this, 'resolvePath'], $paths);
+        $this->paths = array_map($this->resolvePath(...), $paths);
 
         if (isset($extensions)) {
             $this->extensions = $extensions;

@@ -507,6 +507,15 @@ class SupportStrTest extends TestCase
         $this->assertFalse(Str::is('*FOO*', 'foo/bar/baz'));
         $this->assertFalse(Str::is('A', 'a'));
 
+        // is not case sensitive
+        $this->assertTrue(Str::is('A', 'a', true));
+        $this->assertTrue(Str::is('*BAZ*', 'foo/bar/baz', true));
+        $this->assertTrue(Str::is(['A*', 'B*'], 'a/', true));
+        $this->assertFalse(Str::is(['A*', 'B*'], 'f/', true));
+        $this->assertTrue(Str::is('FOO', 'foo', true));
+        $this->assertTrue(Str::is('*FOO*', 'foo/bar/baz', true));
+        $this->assertTrue(Str::is('foo/*', 'FOO/bar', true));
+
         // Accepts array of patterns
         $this->assertTrue(Str::is(['a*', 'b*'], 'a/'));
         $this->assertTrue(Str::is(['a*', 'b*'], 'b/'));
@@ -1696,18 +1705,18 @@ class SupportStrTest extends TestCase
     public function testChopStart()
     {
         foreach ([
-            'http://laravel.com' => ['http://', 'laravel.com'],
-            'http://-http://' => ['http://', '-http://'],
-            'http://laravel.com' => ['htp:/', 'http://laravel.com'],
-            'http://laravel.com' => ['http://www.', 'http://laravel.com'],
-            'http://laravel.com' => ['-http://', 'http://laravel.com'],
-            'http://laravel.com' => [['https://', 'http://'], 'laravel.com'],
-            'http://www.laravel.com' => [['http://', 'www.'], 'www.laravel.com'],
-            'http://http-is-fun.test' => ['http://', 'http-is-fun.test'],
-            '🌊✋' => ['🌊', '✋'],
-            '🌊✋' => ['✋', '🌊✋'],
-        ] as $subject => $value) {
-            [$needle, $expected] = $value;
+            ['http://laravel.com', 'http://', 'laravel.com'],
+            ['http://-http://', 'http://', '-http://'],
+            ['http://laravel.com', 'htp:/', 'http://laravel.com'],
+            ['http://laravel.com', 'http://www.', 'http://laravel.com'],
+            ['http://laravel.com', '-http://', 'http://laravel.com'],
+            ['http://laravel.com', ['https://', 'http://'], 'laravel.com'],
+            ['http://www.laravel.com', ['http://', 'www.'], 'www.laravel.com'],
+            ['http://http-is-fun.test', 'http://', 'http-is-fun.test'],
+            ['🌊✋', '🌊', '✋'],
+            ['🌊✋', '✋', '🌊✋'],
+        ] as $value) {
+            [$subject, $needle, $expected] = $value;
 
             $this->assertSame($expected, Str::chopStart($subject, $needle));
         }
@@ -1716,18 +1725,18 @@ class SupportStrTest extends TestCase
     public function testChopEnd()
     {
         foreach ([
-            'path/to/file.php' => ['.php', 'path/to/file'],
-            '.php-.php' => ['.php', '.php-'],
-            'path/to/file.php' => ['.ph', 'path/to/file.php'],
-            'path/to/file.php' => ['foo.php', 'path/to/file.php'],
-            'path/to/file.php' => ['.php-', 'path/to/file.php'],
-            'path/to/file.php' => [['.html', '.php'], 'path/to/file'],
-            'path/to/file.php' => [['.php', 'file'], 'path/to/file'],
-            'path/to/php.php' => ['.php', 'path/to/php'],
-            '✋🌊' => ['🌊', '✋'],
-            '✋🌊' => ['✋', '✋🌊'],
-        ] as $subject => $value) {
-            [$needle, $expected] = $value;
+            ['path/to/file.php', '.php', 'path/to/file'],
+            ['.php-.php', '.php', '.php-'],
+            ['path/to/file.php', '.ph', 'path/to/file.php'],
+            ['path/to/file.php', 'foo.php', 'path/to/file.php'],
+            ['path/to/file.php', '.php-', 'path/to/file.php'],
+            ['path/to/file.php', ['.html', '.php'], 'path/to/file'],
+            ['path/to/file.php', ['.php', 'file'], 'path/to/file'],
+            ['path/to/php.php', '.php', 'path/to/php'],
+            ['✋🌊', '🌊', '✋'],
+            ['✋🌊', '✋', '✋🌊'],
+        ] as $value) {
+            [$subject, $needle, $expected] = $value;
 
             $this->assertSame($expected, Str::chopEnd($subject, $needle));
         }

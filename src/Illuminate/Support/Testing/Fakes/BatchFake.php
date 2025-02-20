@@ -39,17 +39,18 @@ class BatchFake extends Batch
      * @param  \Carbon\CarbonImmutable|null  $finishedAt
      * @return void
      */
-    public function __construct(string $id,
-                                string $name,
-                                int $totalJobs,
-                                int $pendingJobs,
-                                int $failedJobs,
-                                array $failedJobIds,
-                                array $options,
-                                CarbonImmutable $createdAt,
-                                ?CarbonImmutable $cancelledAt = null,
-                                ?CarbonImmutable $finishedAt = null)
-    {
+    public function __construct(
+        string $id,
+        string $name,
+        int $totalJobs,
+        int $pendingJobs,
+        int $failedJobs,
+        array $failedJobIds,
+        array $options,
+        CarbonImmutable $createdAt,
+        ?CarbonImmutable $cancelledAt = null,
+        ?CarbonImmutable $finishedAt = null,
+    ) {
         $this->id = $id;
         $this->name = $name;
         $this->totalJobs = $totalJobs;

@@ -90,7 +90,9 @@ class BroadcastEvent implements ShouldQueue
 
         foreach ($connections as $connection) {
             $manager->connection($connection)->broadcast(
-                $channels, $name, $payload
+                $this->getConnectionChannels($channels, $connection),
+                $name,
+                $this->getConnectionPayload($payload, $connection)
             );
         }
     }
@@ -132,6 +134,40 @@ class BroadcastEvent implements ShouldQueue
         }
 
         return $value;
+    }
+
+    /**
+     * Get the channels for the given connection.
+     *
+     * @param  array  $channels
+     * @param  string  $connection
+     * @return array
+     */
+    protected function getConnectionChannels($channels, $connection)
+    {
+        return is_array($channels[$connection] ?? null)
+            ? $channels[$connection]
+            : $channels;
+    }
+
+    /**
+     * Get the payload for the given connection.
+     *
+     * @param  array  $payload
+     * @param  string  $connection
+     * @return array
+     */
+    protected function getConnectionPayload($payload, $connection)
+    {
+        $connectionPayload = is_array($payload[$connection] ?? null)
+            ? $payload[$connection]
+            : $payload;
+
+        if (isset($payload['socket'])) {
+            $connectionPayload['socket'] = $payload['socket'];
+        }
+
+        return $connectionPayload;
     }
 
     /**

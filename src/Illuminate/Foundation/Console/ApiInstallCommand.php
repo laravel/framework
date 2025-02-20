@@ -4,9 +4,11 @@ namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Process;
 use Symfony\Component\Console\Attribute\AsCommand;
 
+use function Illuminate\Support\artisan_binary;
 use function Illuminate\Support\php_binary;
 
 #[AsCommand(name: 'install:api')]
@@ -67,7 +69,7 @@ class ApiInstallCommand extends Command
         if ($this->option('passport')) {
             Process::run(array_filter([
                 php_binary(),
-                defined('ARTISAN_BINARY') ? ARTISAN_BINARY : 'artisan',
+                artisan_binary(),
                 'passport:install',
                 $this->confirm('Would you like to use UUIDs for all client IDs?') ? '--uuids' : null,
             ]));
@@ -125,14 +127,14 @@ class ApiInstallCommand extends Command
             'laravel/sanctum:^4.0',
         ]);
 
-        $migrationPublished = collect(scandir($this->laravel->databasePath('migrations')))->contains(function ($migration) {
+        $migrationPublished = (new Collection(scandir($this->laravel->databasePath('migrations'))))->contains(function ($migration) {
             return preg_match('/\d{4}_\d{2}_\d{2}_\d{6}_create_personal_access_tokens_table.php/', $migration);
         });
 
         if (! $migrationPublished) {
             Process::run([
                 php_binary(),
-                defined('ARTISAN_BINARY') ? ARTISAN_BINARY : 'artisan',
+                artisan_binary(),
                 'vendor:publish',
                 '--provider',
                 'Laravel\\Sanctum\\SanctumServiceProvider',

@@ -39,6 +39,10 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['developer' => ['name' => 'Ferid']], Arr::add([], 'developer.name', 'Ferid'));
         $this->assertEquals([1 => 'hAz'], Arr::add([], 1, 'hAz'));
         $this->assertEquals([1 => [1 => 'hAz']], Arr::add([], 1.1, 'hAz'));
+
+        // Case where the key already exists
+        $this->assertEquals(['type' => 'Table'], Arr::add(['type' => 'Table'], 'type', 'Chair'));
+        $this->assertEquals(['category' => ['type' => 'Table']], Arr::add(['category' => ['type' => 'Table']], 'category.type', 'Chair'));
     }
 
     public function testCollapse()
@@ -48,8 +52,8 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['foo', 'bar', 'baz'], Arr::collapse($data));
 
         // Case including numeric and string elements
-        $array = [[1], [2], [3], ['foo', 'bar'], collect(['baz', 'boom'])];
-        $this->assertEquals([1, 2, 3, 'foo', 'bar', 'baz', 'boom'], Arr::collapse($array));
+        $array = [[1], [2], [3], ['foo', 'bar']];
+        $this->assertEquals([1, 2, 3, 'foo', 'bar'], Arr::collapse($array));
 
         // Case with empty two-dimensional arrays
         $emptyArray = [[], [], []];
@@ -504,6 +508,10 @@ class SupportArrTest extends TestCase
         $this->assertSame('dayle', Arr::get($array, 'names.otherDeveloper', function () {
             return 'dayle';
         }));
+
+        // Test array has a null key
+        $this->assertSame('bar', Arr::get(['' => 'bar'], ''));
+        $this->assertSame('bar', Arr::get(['' => ['' => 'bar']], '.'));
     }
 
     public function testHas()
@@ -619,6 +627,8 @@ class SupportArrTest extends TestCase
         $this->assertTrue(Arr::isList([0 => 'foo', 'bar']));
         $this->assertTrue(Arr::isList([0 => 'foo', 1 => 'bar']));
 
+        $this->assertFalse(Arr::isList([-1 => 1]));
+        $this->assertFalse(Arr::isList([-1 => 1, 0 => 2]));
         $this->assertFalse(Arr::isList([1 => 'foo', 'bar']));
         $this->assertFalse(Arr::isList([1 => 'foo', 0 => 'bar']));
         $this->assertFalse(Arr::isList([0 => 'foo', 'bar' => 'baz']));
@@ -632,6 +642,17 @@ class SupportArrTest extends TestCase
         $array = Arr::only($array, ['name', 'price']);
         $this->assertEquals(['name' => 'Desk', 'price' => 100], $array);
         $this->assertEmpty(Arr::only($array, ['nonExistingKey']));
+
+        $this->assertEmpty(Arr::only($array, null));
+
+        // Test with array having numeric keys
+        $this->assertEquals(['foo'], Arr::only(['foo', 'bar', 'baz'], 0));
+        $this->assertEquals([1 => 'bar', 2 => 'baz'], Arr::only(['foo', 'bar', 'baz'], [1, 2]));
+        $this->assertEmpty(Arr::only(['foo', 'bar', 'baz'], [3]));
+
+        // Test with array having numeric key and string key
+        $this->assertEquals(['foo'], Arr::only(['foo', 'bar' => 'baz'], 0));
+        $this->assertEquals(['bar' => 'baz'], Arr::only(['foo', 'bar' => 'baz'], 'bar'));
     }
 
     public function testPluck()
@@ -1501,5 +1522,15 @@ class SupportArrTest extends TestCase
                 'name' => 'Abigail',
             ],
         ], Arr::select($array, 'name'));
+
+        $this->assertEquals([
+            [],
+            [],
+        ], Arr::select($array, 'nonExistingKey'));
+
+        $this->assertEquals([
+            [],
+            [],
+        ], Arr::select($array, null));
     }
 }

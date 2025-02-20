@@ -103,7 +103,7 @@ class SqlServerProcessor extends Processor
 
             return [
                 'name' => strtolower($result->name),
-                'columns' => explode(',', $result->columns),
+                'columns' => $result->columns ? explode(',', $result->columns) : [],
                 'type' => strtolower($result->type),
                 'unique' => (bool) $result->unique,
                 'primary' => (bool) $result->primary,

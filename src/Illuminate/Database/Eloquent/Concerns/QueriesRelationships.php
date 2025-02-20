@@ -5,15 +5,18 @@ namespace Illuminate\Database\Eloquent\Concerns;
 use BadMethodCallException;
 use Closure;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\RelationNotFoundException;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Query\Expression;
+use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
+
+use function Illuminate\Support\enum_value;
 
 /** @mixin \Illuminate\Database\Eloquent\Builder */
 trait QueriesRelationships
@@ -228,7 +231,10 @@ trait QueriesRelationships
         $types = (array) $types;
 
         if ($types === ['*']) {
-            $types = $this->model->newModelQuery()->distinct()->pluck($relation->getMorphType())->filter()->all();
+            $types = $this->model->newModelQuery()->distinct()->pluck($relation->getMorphType())
+                ->filter()
+                ->map(fn ($item) => enum_value($item))
+                ->all();
         }
 
         if (empty($types)) {
@@ -251,7 +257,7 @@ trait QueriesRelationships
                     }
 
                     $query->where($this->qualifyColumn($relation->getMorphType()), '=', (new $type)->getMorphClass())
-                                ->whereHas($belongsTo, $callback, $operator, $count);
+                        ->whereHas($belongsTo, $callback, $operator, $count);
                 });
             }
         }, null, null, $boolean);
@@ -419,6 +425,46 @@ trait QueriesRelationships
     }
 
     /**
+     * Add a basic count / exists condition to a relationship query.
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>|string  $relation
+     * @param  \Closure|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function whereDoesntHaveRelation($relation, $column, $operator = null, $value = null)
+    {
+        return $this->whereDoesntHave($relation, function ($query) use ($column, $operator, $value) {
+            if ($column instanceof Closure) {
+                $column($query);
+            } else {
+                $query->where($column, $operator, $value);
+            }
+        });
+    }
+
+    /**
+     * Add an "or where" clause to a relationship query.
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>|string  $relation
+     * @param  \Closure|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function orWhereDoesntHaveRelation($relation, $column, $operator = null, $value = null)
+    {
+        return $this->orWhereDoesntHave($relation, function ($query) use ($column, $operator, $value) {
+            if ($column instanceof Closure) {
+                $column($query);
+            } else {
+                $query->where($column, $operator, $value);
+            }
+        });
+    }
+
+    /**
      * Add a polymorphic relationship condition to the query with a where clause.
      *
      * @param  \Illuminate\Database\Eloquent\Relations\MorphTo<*, *>|string  $relation
@@ -448,6 +494,40 @@ trait QueriesRelationships
     public function orWhereMorphRelation($relation, $types, $column, $operator = null, $value = null)
     {
         return $this->orWhereHasMorph($relation, $types, function ($query) use ($column, $operator, $value) {
+            $query->where($column, $operator, $value);
+        });
+    }
+
+    /**
+     * Add a polymorphic relationship condition to the query with a doesn't have clause.
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\MorphTo<*, *>|string  $relation
+     * @param  string|array  $types
+     * @param  \Closure|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function whereMorphDoesntHaveRelation($relation, $types, $column, $operator = null, $value = null)
+    {
+        return $this->whereDoesntHaveMorph($relation, $types, function ($query) use ($column, $operator, $value) {
+            $query->where($column, $operator, $value);
+        });
+    }
+
+    /**
+     * Add a polymorphic relationship condition to the query with an "or doesn't have" clause.
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\MorphTo<*, *>|string  $relation
+     * @param  string|array  $types
+     * @param  \Closure|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function orWhereMorphDoesntHaveRelation($relation, $types, $column, $operator = null, $value = null)
+    {
+        return $this->orWhereDoesntHaveMorph($relation, $types, function ($query) use ($column, $operator, $value) {
             $query->where($column, $operator, $value);
         });
     }
@@ -550,7 +630,7 @@ trait QueriesRelationships
      */
     public function whereBelongsTo($related, $relationshipName = null, $boolean = 'and')
     {
-        if (! $related instanceof Collection) {
+        if (! $related instanceof EloquentCollection) {
             $relatedCollection = $related->newCollection([$related]);
         } else {
             $relatedCollection = $related;
@@ -838,8 +918,8 @@ trait QueriesRelationships
      */
     protected function requalifyWhereTables(array $wheres, string $from, string $to): array
     {
-        return collect($wheres)->map(function ($where) use ($from, $to) {
-            return collect($where)->map(function ($value) use ($from, $to) {
+        return (new BaseCollection($wheres))->map(function ($where) use ($from, $to) {
+            return (new BaseCollection($where))->map(function ($value) use ($from, $to) {
                 return is_string($value) && str_starts_with($value, $from.'.')
                     ? $to.'.'.Str::afterLast($value, '.')
                     : $value;

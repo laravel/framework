@@ -68,12 +68,16 @@ class TrustProxies
     {
         $trustedIps = $this->proxies() ?: config('trustedproxy.proxies');
 
+        if (is_null($trustedIps) && laravel_cloud()) {
+            $trustedIps = '*';
+        }
+
         if ($trustedIps === '*' || $trustedIps === '**') {
             return $this->setTrustedProxyIpAddressesToTheCallingIp($request);
         }
 
         $trustedIps = is_string($trustedIps)
-                ? array_map('trim', explode(',', $trustedIps))
+                ? array_map(trim(...), explode(',', $trustedIps))
                 : $trustedIps;
 
         if (is_array($trustedIps)) {

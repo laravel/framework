@@ -9,20 +9,13 @@ class Verified
     use SerializesModels;
 
     /**
-     * The verified user.
-     *
-     * @var \Illuminate\Contracts\Auth\MustVerifyEmail
-     */
-    public $user;
-
-    /**
      * Create a new event instance.
      *
-     * @param  \Illuminate\Contracts\Auth\MustVerifyEmail  $user
+     * @param  \Illuminate\Contracts\Auth\MustVerifyEmail  $user  The verified user.
      * @return void
      */
-    public function __construct($user)
-    {
-        $this->user = $user;
+    public function __construct(
+        public $user,
+    ) {
     }
 }

@@ -172,6 +172,17 @@ class TranslationTranslatorTest extends TestCase
         $t->choice('foo', 10, ['replace']);
     }
 
+    public function testChoiceMethodProperlyUsesCustomCountReplacement()
+    {
+        $t = $this->getMockBuilder(Translator::class)->onlyMethods(['get', 'localeForChoice'])->setConstructorArgs([$this->getLoader(), 'en'])->getMock();
+        $t->expects($this->once())->method('get')->with($this->equalTo(':count foos'), $this->equalTo([]), $this->equalTo('en'))->willReturn('{1} :count foos|[2,*] :count foos');
+        $t->expects($this->once())->method('localeForChoice')->with($this->equalTo(':count foos'), $this->equalTo(null))->willReturn('en');
+        $t->setSelector($selector = m::mock(MessageSelector::class));
+        $selector->shouldReceive('choose')->once()->with('{1} :count foos|[2,*] :count foos', 1234, 'en')->andReturn(':count foos');
+
+        $this->assertEquals('1,234 foos', $t->choice(':count foos', 1234, ['count' => '1,234']));
+    }
+
     public function testGetJson()
     {
         $t = new Translator($this->getLoader(), 'en');

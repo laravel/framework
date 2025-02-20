@@ -5,29 +5,15 @@ namespace Illuminate\Routing\Events;
 class RouteMatched
 {
     /**
-     * The route instance.
-     *
-     * @var \Illuminate\Routing\Route
-     */
-    public $route;
-
-    /**
-     * The request instance.
-     *
-     * @var \Illuminate\Http\Request
-     */
-    public $request;
-
-    /**
      * Create a new event instance.
      *
-     * @param  \Illuminate\Routing\Route  $route
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Routing\Route  $route  The route instance.
+     * @param  \Illuminate\Http\Request  $request  The request instance.
      * @return void
      */
-    public function __construct($route, $request)
-    {
-        $this->route = $route;
-        $this->request = $request;
+    public function __construct(
+        public $route,
+        public $request,
+    ) {
     }
 }

@@ -18,7 +18,7 @@ class Onceable
     public function __construct(
         public string $hash,
         public ?object $object,
-        public $callable
+        public $callable,
     ) {
         //
     }
@@ -66,10 +66,14 @@ class Onceable
             $callable instanceof Closure ? (new ReflectionClosure($callable))->getClosureUsedVariables() : [],
         );
 
+        $class = $callable instanceof Closure ? (new ReflectionClosure($callable))->getClosureCalledClass()?->getName() : null;
+
+        $class ??= isset($trace[1]['class']) ? $trace[1]['class'] : null;
+
         return hash('xxh128', sprintf(
             '%s@%s%s:%s (%s)',
             $trace[0]['file'],
-            isset($trace[1]['class']) ? ($trace[1]['class'].'@') : '',
+            $class ? $class.'@' : '',
             $trace[1]['function'],
             $trace[0]['line'],
             serialize($uses),

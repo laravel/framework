@@ -86,7 +86,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     public function median($key = null)
     {
         $values = (isset($key) ? $this->pluck($key) : $this)
-            ->filter(fn ($item) => ! is_null($item))
+            ->reject(fn ($item) => is_null($item))
             ->sort()->values();
 
         $count = $values->count();
@@ -149,6 +149,10 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function collapseWithKeys()
     {
+        if (! $this->items) {
+            return new static;
+        }
+
         $results = [];
 
         foreach ($this->items as $key => $values) {
@@ -232,7 +236,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     public function crossJoin(...$lists)
     {
         return new static(Arr::crossJoin(
-            $this->items, ...array_map([$this, 'getArrayableItems'], $lists)
+            $this->items, ...array_map($this->getArrayableItems(...), $lists)
         ));
     }
 
@@ -308,7 +312,9 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Retrieve duplicate items from the collection.
      *
-     * @param  (callable(TValue): bool)|string|null  $callback
+     * @template TMapValue
+     *
+     * @param  (callable(TValue): TMapValue)|string|null  $callback
      * @param  bool  $strict
      * @return static
      */
@@ -336,7 +342,9 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Retrieve duplicate items from the collection using strict comparison.
      *
-     * @param  (callable(TValue): bool)|string|null  $callback
+     * @template TMapValue
+     *
+     * @param  (callable(TValue): TMapValue)|string|null  $callback
      * @return static
      */
     public function duplicatesStrict($callback = null)
@@ -491,7 +499,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      *
      * @param  (callable(TValue, TKey): TGroupKey)|array|string  $groupBy
      * @param  bool  $preserveKeys
-     * @return static<($groupBy is string ? array-key : ($groupBy is array ? array-key : TGroupKey)), static<($preserveKeys is true ? TKey : int), TValue>>
+     * @return static<($groupBy is string ? array-key : ($groupBy is array ? array-key : TGroupKey)), static<($preserveKeys is true ? TKey : int), ($groupBy is array ? mixed : TValue)>>
      */
     public function groupBy($groupBy, $preserveKeys = false)
     {
@@ -586,7 +594,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Determine if any of the keys exist in the collection.
      *
-     * @param  mixed  $key
+     * @param  TKey|array<array-key, TKey>  $key
      * @return bool
      */
     public function hasAny($key)
@@ -598,7 +606,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
         $keys = is_array($key) ? $key : func_get_args();
 
         foreach ($keys as $value) {
-            if ($this->has($value)) {
+            if (array_key_exists($value, $this->items)) {
                 return true;
             }
         }
@@ -992,7 +1000,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
         $collectionCount = $this->count();
 
         foreach (range(1, min($count, $collectionCount)) as $item) {
-            array_push($results, array_pop($this->items));
+            $results[] = array_pop($this->items);
         }
 
         return new static($results);
@@ -1243,7 +1251,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
         $collectionCount = $this->count();
 
         foreach (range(1, min($count, $collectionCount)) as $item) {
-            array_push($results, array_shift($this->items));
+            $results[] = array_shift($this->items);
         }
 
         return new static($results);

@@ -165,13 +165,11 @@ trait ResolvesDumpSource
             $file = str_replace($this->basePath, $basePath, $file);
         }
 
-        $href = str_replace(
+        return str_replace(
             ['{file}', '{line}'],
             [$file, is_null($line) ? 1 : $line],
             $href,
         );
-
-        return $href;
     }
 
     /**

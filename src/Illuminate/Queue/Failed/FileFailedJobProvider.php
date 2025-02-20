@@ -4,6 +4,7 @@ namespace Illuminate\Queue\Failed;
 
 use Closure;
 use DateTimeInterface;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
 
 class FileFailedJobProvider implements CountableFailedJobProvider, FailedJobProviderInterface, PrunableFailedJobProvider
@@ -86,7 +87,7 @@ class FileFailedJobProvider implements CountableFailedJobProvider, FailedJobProv
      */
     public function ids($queue = null)
     {
-        return collect($this->all())
+        return (new Collection($this->all()))
             ->when(! is_null($queue), fn ($collect) => $collect->where('queue', $queue))
             ->pluck('id')
             ->all();
@@ -110,7 +111,7 @@ class FileFailedJobProvider implements CountableFailedJobProvider, FailedJobProv
      */
     public function find($id)
     {
-        return collect($this->read())
+        return (new Collection($this->read()))
             ->first(fn ($job) => $job->id === $id);
     }
 
@@ -123,7 +124,7 @@ class FileFailedJobProvider implements CountableFailedJobProvider, FailedJobProv
     public function forget($id)
     {
         return $this->lock(function () use ($id) {
-            $this->write($pruned = collect($jobs = $this->read())
+            $this->write($pruned = (new Collection($jobs = $this->read()))
                 ->reject(fn ($job) => $job->id === $id)
                 ->values()
                 ->all());
@@ -154,7 +155,7 @@ class FileFailedJobProvider implements CountableFailedJobProvider, FailedJobProv
         return $this->lock(function () use ($before) {
             $jobs = $this->read();
 
-            $this->write($prunedJobs = collect($jobs)->reject(function ($job) use ($before) {
+            $this->write($prunedJobs = (new Collection($jobs))->reject(function ($job) use ($before) {
                 return $job->failed_at_timestamp <= $before->getTimestamp();
             })->values()->all());
 
@@ -230,7 +231,7 @@ class FileFailedJobProvider implements CountableFailedJobProvider, FailedJobProv
             return count($this->read());
         }
 
-        return collect($this->read())
+        return (new Collection($this->read()))
             ->filter(fn ($job) => $job->connection === ($connection ?? $job->connection) && $job->queue === ($queue ?? $job->queue))
             ->count();
     }

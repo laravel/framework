@@ -86,7 +86,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
         $factory = $this->container->make(ValidationFactory::class);
 
         if (method_exists($this, 'validator')) {
-            $validator = $this->container->call([$this, 'validator'], compact('factory'));
+            $validator = $this->container->call($this->validator(...), compact('factory'));
         } else {
             $validator = $this->createDefaultValidator($factory);
         }
@@ -166,8 +166,8 @@ class FormRequest extends Request implements ValidatesWhenResolved
         $exception = $validator->getException();
 
         throw (new $exception($validator))
-                    ->errorBag($this->errorBag)
-                    ->redirectTo($this->getRedirectUrl());
+            ->errorBag($this->errorBag)
+            ->redirectTo($this->getRedirectUrl());
     }
 
     /**

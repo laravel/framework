@@ -2,7 +2,7 @@
 
 namespace Illuminate\Database\Schema;
 
-use Illuminate\Support\Str;
+use Illuminate\Support\Stringable;
 
 class ForeignIdColumnDefinition extends ColumnDefinition
 {
@@ -40,7 +40,7 @@ class ForeignIdColumnDefinition extends ColumnDefinition
         $table ??= $this->table;
         $column ??= $this->referencesModelColumn ?? 'id';
 
-        return $this->references($column, $indexName)->on($table ?? Str::of($this->name)->beforeLast('_'.$column)->plural());
+        return $this->references($column, $indexName)->on($table ?? (new Stringable($this->name))->beforeLast('_'.$column)->plural());
     }
 
     /**

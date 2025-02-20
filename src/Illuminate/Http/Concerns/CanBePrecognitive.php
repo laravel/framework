@@ -18,7 +18,7 @@ trait CanBePrecognitive
             return $rules;
         }
 
-        return Collection::make($rules)
+        return (new Collection($rules))
             ->only(explode(',', $this->header('Precognition-Validate-Only')))
             ->all();
     }

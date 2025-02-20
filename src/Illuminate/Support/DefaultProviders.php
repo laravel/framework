@@ -66,7 +66,7 @@ class DefaultProviders
      */
     public function replace(array $replacements)
     {
-        $current = collect($this->providers);
+        $current = new Collection($this->providers);
 
         foreach ($replacements as $from => $to) {
             $key = $current->search($from);
@@ -85,10 +85,10 @@ class DefaultProviders
      */
     public function except(array $providers)
     {
-        return new static(collect($this->providers)
-                ->reject(fn ($p) => in_array($p, $providers))
-                ->values()
-                ->toArray());
+        return new static((new Collection($this->providers))
+            ->reject(fn ($p) => in_array($p, $providers))
+            ->values()
+            ->toArray());
     }
 
     /**

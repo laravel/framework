@@ -3,7 +3,7 @@
 namespace Illuminate\Testing;
 
 use Closure;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Traits\Macroable;
@@ -61,10 +61,10 @@ class TestView implements Stringable
             PHPUnit::assertTrue($value(Arr::get($this->view->gatherData(), $key)));
         } elseif ($value instanceof Model) {
             PHPUnit::assertTrue($value->is(Arr::get($this->view->gatherData(), $key)));
-        } elseif ($value instanceof Collection) {
+        } elseif ($value instanceof EloquentCollection) {
             $actual = Arr::get($this->view->gatherData(), $key);
 
-            PHPUnit::assertInstanceOf(Collection::class, $actual);
+            PHPUnit::assertInstanceOf(EloquentCollection::class, $actual);
             PHPUnit::assertSameSize($value, $actual);
 
             $value->each(fn ($item, $index) => PHPUnit::assertTrue($actual->get($index)->is($item)));
@@ -144,7 +144,7 @@ class TestView implements Stringable
      */
     public function assertSeeInOrder(array $values, $escape = true)
     {
-        $values = $escape ? array_map('e', $values) : $values;
+        $values = $escape ? array_map(e(...), $values) : $values;
 
         PHPUnit::assertThat($values, new SeeInOrder($this->rendered));
 
@@ -176,7 +176,7 @@ class TestView implements Stringable
      */
     public function assertSeeTextInOrder(array $values, $escape = true)
     {
-        $values = $escape ? array_map('e', $values) : $values;
+        $values = $escape ? array_map(e(...), $values) : $values;
 
         PHPUnit::assertThat($values, new SeeInOrder(strip_tags($this->rendered)));
 

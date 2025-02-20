@@ -314,9 +314,11 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
         ];
 
         if (! empty($config['key']) && ! empty($config['secret'])) {
-            $dynamoConfig['credentials'] = Arr::only(
-                $config, ['key', 'secret', 'token']
-            );
+            $dynamoConfig['credentials'] = Arr::only($config, ['key', 'secret']);
+
+            if (! empty($config['token'])) {
+                $dynamoConfig['credentials']['token'] = $config['token'];
+            }
         }
 
         return new DynamoDbFailedJobProvider(

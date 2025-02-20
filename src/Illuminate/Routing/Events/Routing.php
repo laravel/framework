@@ -5,20 +5,13 @@ namespace Illuminate\Routing\Events;
 class Routing
 {
     /**
-     * The request instance.
-     *
-     * @var \Illuminate\Http\Request
-     */
-    public $request;
-
-    /**
      * Create a new event instance.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Http\Request  $request  The request instance.
      * @return void
      */
-    public function __construct($request)
-    {
-        $this->request = $request;
+    public function __construct(
+        public $request,
+    ) {
     }
 }

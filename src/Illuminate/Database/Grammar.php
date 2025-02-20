@@ -3,6 +3,7 @@
 namespace Illuminate\Database;
 
 use Illuminate\Contracts\Database\Query\Expression;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\Macroable;
 use RuntimeException;
 
@@ -32,16 +33,17 @@ abstract class Grammar
      */
     public function wrapArray(array $values)
     {
-        return array_map([$this, 'wrap'], $values);
+        return array_map($this->wrap(...), $values);
     }
 
     /**
      * Wrap a table in keyword identifiers.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $table
+     * @param  string|null  $prefix
      * @return string
      */
-    public function wrapTable($table)
+    public function wrapTable($table, $prefix = null)
     {
         if ($this->isExpression($table)) {
             return $this->getValue($table);
@@ -54,18 +56,20 @@ abstract class Grammar
             return $this->wrapAliasedTable($table);
         }
 
+        $prefix ??= $this->tablePrefix;
+
         // If the table being wrapped has a custom schema name specified, we need to
         // prefix the last segment as the table name then wrap each segment alone
         // and eventually join them both back together using the dot connector.
         if (str_contains($table, '.')) {
-            $table = substr_replace($table, '.'.$this->tablePrefix, strrpos($table, '.'), 1);
+            $table = substr_replace($table, '.'.$prefix, strrpos($table, '.'), 1);
 
-            return collect(explode('.', $table))
+            return (new Collection(explode('.', $table)))
                 ->map($this->wrapValue(...))
                 ->implode('.');
         }
 
-        return $this->wrapValue($this->tablePrefix.$table);
+        return $this->wrapValue($prefix.$table);
     }
 
     /**
@@ -131,7 +135,7 @@ abstract class Grammar
      */
     protected function wrapSegments($segments)
     {
-        return collect($segments)->map(function ($segment, $key) use ($segments) {
+        return (new Collection($segments))->map(function ($segment, $key) use ($segments) {
             return $key == 0 && count($segments) > 1
                             ? $this->wrapTable($segment)
                             : $this->wrapValue($segment);
@@ -185,7 +189,7 @@ abstract class Grammar
      */
     public function columnize(array $columns)
     {
-        return implode(', ', array_map([$this, 'wrap'], $columns));
+        return implode(', ', array_map($this->wrap(...), $columns));
     }
 
     /**
@@ -196,7 +200,7 @@ abstract class Grammar
      */
     public function parameterize(array $values)
     {
-        return implode(', ', array_map([$this, 'parameter'], $values));
+        return implode(', ', array_map($this->parameter(...), $values));
     }
 
     /**
