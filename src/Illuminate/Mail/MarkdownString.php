@@ -4,6 +4,9 @@ namespace Illuminate\Mail;
 
 use Illuminate\Contracts\Support\DeferringDisplayableValue;
 use Illuminate\Support\HtmlString;
+use League\CommonMark\Environment\Environment;
+use League\CommonMark\Extension\CommonMark\CommonMarkCoreExtension;
+use League\CommonMark\Extension\Table\TableExtension;
 use League\CommonMark\MarkdownConverter;
 
 class MarkdownString extends HtmlString implements DeferringDisplayableValue
@@ -19,14 +22,20 @@ class MarkdownString extends HtmlString implements DeferringDisplayableValue
      * Create a new HTML string instance.
      *
      * @param  string  $html
-     * @param  \League\CommonMark\MarkdownConverter  $converter
      * @return void
      */
-    public function __construct($html, MarkdownConverter $converter)
+    public function __construct($html = '')
     {
         parent::__construct($html);
 
-        $this->converter = $converter;
+        $environment = new Environment([
+            'allow_unsafe_links' => false,
+        ]);
+
+        $environment->addExtension(new CommonMarkCoreExtension);
+        $environment->addExtension(new TableExtension);
+
+        $this->converter = new MarkdownConverter($environment);
     }
 
     /**
