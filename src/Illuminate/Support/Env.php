@@ -29,7 +29,7 @@ class Env
      *
      * @var array<\Dotenv\Repository\Adapter\AdapterInterface>
      */
-    protected static $extraAdapters;
+    protected static $extraAdapters = [];
 
     /**
      * Enable the putenv adapter.
