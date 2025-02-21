@@ -830,4 +830,16 @@ class Collection extends BaseCollection implements QueueableCollection
 
         return $model->newModelQuery()->whereKey($this->modelKeys());
     }
+
+    /**
+     * Refresh each model in the collection.
+     *
+     * @return $this
+     */
+    public function refresh()
+    {
+        return $this->map(function (Model $model) {
+            return $model->refresh();
+        });
+    }
 }

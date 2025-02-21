@@ -302,7 +302,7 @@ abstract class Factory
             $this->callAfterCreating($results, $parent);
         }
 
-        return $results;
+        return $results->refresh();
     }
 
     /**
