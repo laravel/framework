@@ -19,6 +19,7 @@ class MarkdownString extends HtmlString implements DeferringDisplayableValue
      * Create a new HTML string instance.
      *
      * @param  string  $html
+     * @param  \League\CommonMark\MarkdownConverter  $converter
      * @return void
      */
     public function __construct($html = '', MarkdownConverter $converter)
