@@ -50,7 +50,7 @@ class MarkdownString extends HtmlString implements DeferringDisplayableValue
     protected function converter(array $config = [])
     {
         $environment = new Environment(array_merge([
-            ['allow_unsafe_links' => false],
+            'allow_unsafe_links' => false,
         ], $config));
 
         $environment->addExtension(new CommonMarkCoreExtension);
