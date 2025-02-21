@@ -12,33 +12,6 @@ use League\CommonMark\MarkdownConverter;
 class MarkdownString extends HtmlString implements DeferringDisplayableValue
 {
     /**
-     * The Markdown Converter implementation.
-     *
-     * @var \League\CommonMark\MarkdownConverter
-     */
-    protected $converter;
-
-    /**
-     * Create a new HTML string instance.
-     *
-     * @param  string  $html
-     * @return void
-     */
-    public function __construct($html = '')
-    {
-        parent::__construct($html);
-
-        $environment = new Environment([
-            'allow_unsafe_links' => false,
-        ]);
-
-        $environment->addExtension(new CommonMarkCoreExtension);
-        $environment->addExtension(new TableExtension);
-
-        $this->converter = new MarkdownConverter($environment);
-    }
-
-    /**
      * Get the HTML string.
      *
      * @return string
@@ -46,7 +19,7 @@ class MarkdownString extends HtmlString implements DeferringDisplayableValue
     #[\Override]
     public function toHtml()
     {
-        return $this->converter->convert($this->html)->getContent();
+        return $this->converter()->convert($this->html)->getContent();
     }
 
     /**
@@ -62,6 +35,26 @@ class MarkdownString extends HtmlString implements DeferringDisplayableValue
 
         $html = str_replace(array_keys($replacements), array_values($replacements), $this->html);
 
-        return $this->converter->convert($html)->getContent();
+        return new HtmlString($this->converter([
+            'html_input' => 'escape',
+        ])->convert($html)->getContent());
+    }
+
+    /**
+     * Resolve the Markdown Converter.
+     *
+     * @param  array  $config
+     * @return \League\CommonMark\MarkdownConverter
+     */
+    protected function converter(array $config = [])
+    {
+        $environment = new Environment(array_merge([
+            ['allow_unsafe_links' => false],
+        ], $config));
+
+        $environment->addExtension(new CommonMarkCoreExtension);
+        $environment->addExtension(new TableExtension);
+
+        return new MarkdownConverter($environment);
     }
 }
