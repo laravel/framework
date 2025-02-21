@@ -19,7 +19,7 @@ class MarkdownParserTest extends TestCase
             $this->assertInstanceOf(HtmlString::class, $html);
             $this->assertInstanceOf(DeferringDisplayableValue::class, $html);
 
-            $this->assertStringEqualsStringIgnoringLineEndings($expected, (string) $html);
+            $this->assertStringEqualsStringIgnoringLineEndings($expected.PHP_EOL, (string) $html);
             $this->assertSame((string) $html, $html->toHtml());
         });
     }
@@ -32,7 +32,7 @@ class MarkdownParserTest extends TestCase
             $this->assertInstanceOf(HtmlString::class, $html);
             $this->assertInstanceOf(DeferringDisplayableValue::class, $html);
 
-            $this->assertStringEqualsStringIgnoringLineEndings($expected, e($html));
+            $this->assertStringEqualsStringIgnoringLineEndings($expected.PHP_EOL, e($html));
         });
     }
 
