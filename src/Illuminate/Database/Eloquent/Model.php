@@ -1609,7 +1609,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function newEloquentBuilder($query, ?array $fetchModes = [])
     {
-        return new static::$builder($query, $fetchModes);
+        return new static::$builder($query, fetchUsing: $fetchModes);
     }
 
     /**
