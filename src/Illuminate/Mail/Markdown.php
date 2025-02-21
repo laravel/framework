@@ -101,7 +101,7 @@ class Markdown
      * Parse the given Markdown text into HTML.
      *
      * @param  string  $text
-     * @return \Illuminate\Support\HtmlString
+     * @return \Illuminate\Mail\MarkdownString
      */
     public static function parse($text)
     {
@@ -114,7 +114,7 @@ class Markdown
 
         $converter = new MarkdownConverter($environment);
 
-        return new HtmlString($converter->convert($text)->getContent());
+        return new MarkdownString($text, $converter);
     }
 
     /**
