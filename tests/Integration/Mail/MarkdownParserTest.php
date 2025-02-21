@@ -44,6 +44,7 @@ class MarkdownParserTest extends TestCase
         yield ['!\[Welcome to Laravel](https://laravel.com/assets/img/welcome/background.svg)', '<p>![Welcome to Laravel](https://laravel.com/assets/img/welcome/background.svg)</p>'];
         yield ['Visit https://laravel.com/docs to browse the documentation', '<p>Visit https://laravel.com/docs to browse the documentation</p>'];
         yield ['Visit <https://laravel.com/docs> to browse the documentation', '<p>Visit <a href="https://laravel.com/docs">https://laravel.com/docs</a> to browse the documentation</p>'];
+        yield ['Visit <span>https://laravel.com/docs</span> to browse the documentation', '<p>Visit <span>https://laravel.com/docs</span> to browse the documentation</p>'];
     }
 
     public static function markdownEncodedDataProvider()
@@ -52,5 +53,6 @@ class MarkdownParserTest extends TestCase
         yield ['![Welcome to Laravel](https://laravel.com/assets/img/welcome/background.svg)', '<p>![Welcome to Laravel](https://laravel.com/assets/img/welcome/background.svg)</p>'];
         yield ['Visit https://laravel.com/docs to browse the documentation', '<p>Visit https://laravel.com/docs to browse the documentation</p>'];
         yield ['Visit <https://laravel.com/docs> to browse the documentation', '<p>Visit <a href="https://laravel.com/docs">https://laravel.com/docs</a> to browse the documentation</p>'];
+        yield ['Visit <span>https://laravel.com/docs</span> to browse the documentation', '<p>Visit &lt;span&gt;https://laravel.com/docs&lt;/span&gt; to browse the documentation</p>'];
     }
 }
