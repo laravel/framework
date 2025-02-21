@@ -7,7 +7,7 @@
             @else
                 <a class="ui button"
                    href="{{ $paginator->previousPageUrl() }}"
-                   rel="prev"><i class="left chevron icon"></i>@lang('pagination.previous')</a>
+                   rel="prev">@lang('pagination.previous')</a>
             @endif
         </div>
 
@@ -16,7 +16,7 @@
             @if ($paginator->hasMorePages())
                 <a class="ui button"
                    href="{{ $paginator->nextPageUrl() }}"
-                   rel="next">@lang('pagination.next')<i class="right chevron icon"></i></a>
+                   rel="next">@lang('pagination.next')</a>
             @else
                 <a class="ui disabled button" aria-disabled="true"><span>@lang('pagination.next')</span></a>
             @endif
