@@ -19,7 +19,7 @@ class MarkdownParserTest extends TestCase
             $this->assertInstanceOf(HtmlString::class, $html);
             $this->assertInstanceOf(DeferringDisplayableValue::class, $html);
 
-            $this->assertSame($expected.PHP_EOL, (string) $html);
+            $this->assertSame($expected.(windows_os() ? "\r\n" : PHP_EOL), (string) $html);
             $this->assertSame((string) $html, $html->toHtml());
         });
     }
@@ -32,7 +32,7 @@ class MarkdownParserTest extends TestCase
             $this->assertInstanceOf(HtmlString::class, $html);
             $this->assertInstanceOf(DeferringDisplayableValue::class, $html);
 
-            $this->assertSame($expected.PHP_EOL, e($html));
+            $this->assertSame($expected.(windows_os() ? "\r\n" : PHP_EOL), e($html));
         });
     }
 
