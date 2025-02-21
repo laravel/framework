@@ -636,6 +636,36 @@ class SupportArrTest extends TestCase
         $this->assertFalse(Arr::isList(['foo' => 'bar', 'baz' => 'qux']));
     }
 
+    public function testIntersectMethod()
+    {
+        // Basic intersection of indexed arrays
+        $array1 = ['a', 'b', 'c'];
+        $array2 = ['b', 'c', 'd'];
+        $this->assertEquals(['1' => 'b', '2' => 'c'], Arr::intersect($array1, $array2));
+
+        // Intersection of multiple arrays
+        $array3 = ['b', 'c', 'e'];
+        $this->assertEquals(['1' => 'b', '2' => 'c'], Arr::intersect($array1, $array2, $array3));
+
+        // Test with associative arrays - keys from first array should be preserved
+        $array4 = ['id1' => 'a', 'id2' => 'b', 'id3' => 'c'];
+        $array5 = ['key1' => 'b', 'key2' => 'c', 'key3' => 'd'];
+        $this->assertEquals(['id2' => 'b', 'id3' => 'c'], Arr::intersect($array4, $array5));
+
+        // Test with numeric arrays with non-sequential keys
+        $array6 = [1 => 'a', 3 => 'b', 5 => 'c'];
+        $array7 = [0 => 'a', 2 => 'b', 4 => 'd'];
+        $this->assertEquals([1 => 'a', 3 => 'b'], Arr::intersect($array6, $array7));
+
+        // Test with empty array
+        $this->assertEquals([], Arr::intersect([], ['a', 'b', 'c']));
+        $this->assertEquals([], Arr::intersect(['a', 'b', 'c'], []));
+
+        // Test with same array (should return all elements)
+        $array8 = ['a', 'b', 'c'];
+        $this->assertEquals($array8, Arr::intersect($array8, $array8));
+    }
+
     public function testOnly()
     {
         $array = ['name' => 'Desk', 'price' => 100, 'orders' => 10];

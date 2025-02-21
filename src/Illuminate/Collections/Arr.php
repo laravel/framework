@@ -428,6 +428,18 @@ class Arr
     }
 
     /**
+     * Return the values common to all arrays.
+     *
+     * @param  array  $array
+     * @param  array  ...$arrays
+     * @return array
+     */
+    public static function intersect($array, array ...$arrays)
+    {
+        return array_intersect($array, ...$arrays);
+    }
+
+    /**
      * Determines if an array is associative.
      *
      * An array is "associative" if it doesn't have sequential numerical keys beginning with zero.
