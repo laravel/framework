@@ -114,6 +114,13 @@ abstract class Factory
     public static $namespace = 'Database\\Factories\\';
 
     /**
+     * @deprecated use $modelNameResolvers
+     *
+     * @var callable(self): class-string<TModel>
+     */
+    protected static $modelNameResolver;
+
+    /**
      * The default model name resolvers.
      *
      * @var array<class-string, callable(self): class-string<TModel>>
@@ -810,7 +817,7 @@ abstract class Factory
             return $this->model;
         }
 
-        $resolver = static::$modelNameResolvers[static::class] ?? static::$modelNameResolvers[self::class] ?? function (self $factory) {
+        $resolver = static::$modelNameResolvers[static::class] ?? static::$modelNameResolvers[self::class] ?? static::$modelNameResolver ?? function (self $factory) {
             $namespacedFactoryBasename = Str::replaceLast(
                 'Factory', '', Str::replaceFirst(static::$namespace, '', $factory::class)
             );
@@ -931,6 +938,7 @@ abstract class Factory
      */
     public static function flushState()
     {
+        static::$modelNameResolver = null;
         static::$modelNameResolvers = [];
         static::$factoryNameResolver = null;
         static::$namespace = 'Database\\Factories\\';
