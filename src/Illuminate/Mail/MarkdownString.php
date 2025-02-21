@@ -12,22 +12,23 @@ use League\CommonMark\MarkdownConverter;
 class MarkdownString extends HtmlString implements DeferringDisplayableValue
 {
     /**
-     * Get the HTML string.
+     * Convert markdown to instance of HtmlString.
      *
-     * @return string
+     * @return \Illuminate\Contracts\Support\Htmlable
      */
-    #[\Override]
-    public function toHtml()
+    public function convertMarkdownToHtml()
     {
-        return $this->converter()->convert($this->html)->getContent();
+        return new HtmlString(
+            $this->converter()->convert($this->html)->getContent()
+        );
     }
 
     /**
-     * Resolve the displayable value that the class is deferring.
+     * Convert encoded markdown to instance of HtmlString.
      *
-     * @return \Illuminate\Contracts\Support\Htmlable|string
+     * @return \Illuminate\Contracts\Support\Htmlable
      */
-    public function resolveDisplayableValue()
+    public function convertEncodedMarkdownToHtml()
     {
         $replacements = [
             '[' => '\[',
@@ -39,6 +40,27 @@ class MarkdownString extends HtmlString implements DeferringDisplayableValue
         return new HtmlString($this->converter([
             'html_input' => 'escape',
         ])->convert($html)->getContent());
+    }
+
+    /**
+     * Resolve the displayable value that the class is deferring.
+     *
+     * @return \Illuminate\Contracts\Support\Htmlable
+     */
+    public function resolveDisplayableValue()
+    {
+        return $this->convertEncodedMarkdownToHtml();
+    }
+
+    /**
+     * Get the HTML string.
+     *
+     * @return string
+     */
+    #[\Override]
+    public function toHtml()
+    {
+        return $this->convertMarkdownToHtml()->toHtml();
     }
 
     /**
