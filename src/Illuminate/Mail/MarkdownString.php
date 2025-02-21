@@ -31,6 +31,7 @@ class MarkdownString extends HtmlString implements DeferringDisplayableValue
     {
         $replacements = [
             '[' => '\[',
+            '<' => '\<',
         ];
 
         $html = str_replace(array_keys($replacements), array_values($replacements), $this->html);

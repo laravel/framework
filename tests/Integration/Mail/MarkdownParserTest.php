@@ -52,7 +52,7 @@ class MarkdownParserTest extends TestCase
         yield ['[Laravel](https://laravel.com)', '<p>[Laravel](https://laravel.com)</p>'];
         yield ['![Welcome to Laravel](https://laravel.com/assets/img/welcome/background.svg)', '<p>![Welcome to Laravel](https://laravel.com/assets/img/welcome/background.svg)</p>'];
         yield ['Visit https://laravel.com/docs to browse the documentation', '<p>Visit https://laravel.com/docs to browse the documentation</p>'];
-        yield ['Visit <https://laravel.com/docs> to browse the documentation', '<p>Visit <a href="https://laravel.com/docs">https://laravel.com/docs</a> to browse the documentation</p>'];
+        yield ['Visit <https://laravel.com/docs> to browse the documentation', '<p>Visit &lt;https://laravel.com/docs&gt; to browse the documentation</p>'];
         yield ['Visit <span>https://laravel.com/docs</span> to browse the documentation', '<p>Visit &lt;span&gt;https://laravel.com/docs&lt;/span&gt; to browse the documentation</p>'];
     }
 }
