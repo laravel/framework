@@ -250,13 +250,6 @@ class Builder implements BuilderContract
     public $useWritePdo = false;
 
     /**
-     * The custom arguments for the PDOStatement::fetchAll / fetch functions.
-     *
-     * @var array
-     */
-    public array $fetchUsing = [];
-
-    /**
      * Create a new query builder instance.
      *
      * @return void
@@ -265,6 +258,7 @@ class Builder implements BuilderContract
         ConnectionInterface $connection,
         ?Grammar $grammar = null,
         ?Processor $processor = null,
+        ?array $fetchUsing = [],
     ) {
         $this->connection = $connection;
         $this->grammar = $grammar ?: $connection->getQueryGrammar();

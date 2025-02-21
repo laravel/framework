@@ -1506,43 +1506,48 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Begin querying the model.
      *
+     * @param  array|null  $fetchModes
      * @return \Illuminate\Database\Eloquent\Builder<static>
      */
-    public static function query()
+    public static function query(?array $fetchModes = [])
     {
-        return (new static)->newQuery();
+        return (new static)->newQuery($fetchModes);
     }
 
     /**
      * Get a new query builder for the model's table.
      *
+     * @param  array|null  $fetchModes
      * @return \Illuminate\Database\Eloquent\Builder<static>
      */
-    public function newQuery()
+    public function newQuery(?array $fetchModes = [])
     {
-        return $this->registerGlobalScopes($this->newQueryWithoutScopes());
+        return $this->registerGlobalScopes($this->newQueryWithoutScopes($fetchModes));
     }
 
     /**
      * Get a new query builder that doesn't have any global scopes or eager loading.
      *
+     * @param  array|null  $fetchModes
      * @return \Illuminate\Database\Eloquent\Builder<static>
      */
-    public function newModelQuery()
+    public function newModelQuery(?array $fetchModes = [])
     {
         return $this->newEloquentBuilder(
-            $this->newBaseQueryBuilder()
+            $this->newBaseQueryBuilder(),
+            $fetchModes
         )->setModel($this);
     }
 
     /**
      * Get a new query builder with no relationships loaded.
      *
+     * @param  array|null  $fetchModes
      * @return \Illuminate\Database\Eloquent\Builder<static>
      */
-    public function newQueryWithoutRelationships()
+    public function newQueryWithoutRelationships(?array $fetchModes = [])
     {
-        return $this->registerGlobalScopes($this->newModelQuery());
+        return $this->registerGlobalScopes($this->newModelQuery($fetchModes));
     }
 
     /**
@@ -1563,11 +1568,12 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Get a new query builder that doesn't have any global scopes.
      *
+     * @param  array|null  $fetchModes
      * @return \Illuminate\Database\Eloquent\Builder<static>
      */
-    public function newQueryWithoutScopes()
+    public function newQueryWithoutScopes(?array $fetchModes = [])
     {
-        return $this->newModelQuery()
+        return $this->newModelQuery($fetchModes)
             ->with($this->with)
             ->withCount($this->withCount);
     }
@@ -1598,11 +1604,12 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * Create a new Eloquent query builder for the model.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array|null  $fetchModes
      * @return \Illuminate\Database\Eloquent\Builder<*>
      */
-    public function newEloquentBuilder($query)
+    public function newEloquentBuilder($query, ?array $fetchModes = [])
     {
-        return new static::$builder($query);
+        return new static::$builder($query, $fetchModes);
     }
 
     /**
