@@ -2,11 +2,11 @@
 
 namespace Illuminate\Support;
 
+use Closure;
 use Dotenv\Repository\Adapter\PutenvAdapter;
 use Dotenv\Repository\RepositoryBuilder;
 use PhpOption\Option;
 use RuntimeException;
-use Closure;
 
 class Env
 {
