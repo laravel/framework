@@ -1863,6 +1863,28 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Add an item to the collection if the given value is not empty.
+     *
+     * @param  TValue  $item
+     * @return $this
+     */
+    public function addWhenNotEmpty($item)
+    {
+        return ! empty($item) ? $this->add($item) : $this;
+    }
+
+    /**
+     * Add an item to the collection if the given item is not null.
+     *
+     * @param  TValue  $item
+     * @return $this
+     */
+    public function addWhenNotNull($item)
+    {
+        return ! is_null($item) ? $this->add($item) : $this;
+    }
+
+    /**
      * Get a base Support collection instance from this collection.
      *
      * @return \Illuminate\Support\Collection<TKey, TValue>
