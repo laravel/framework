@@ -20,7 +20,7 @@ trait InteractsWithDatabase
      * Assert that a given where condition exists in the database.
      *
      * @param  \Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>|string  $table
-     * @param  array  $data
+     * @param  array<string, mixed>  $data
      * @param  string|null  $connection
      * @return $this
      */
@@ -44,7 +44,7 @@ trait InteractsWithDatabase
      * Assert that a given where condition does not exist in the database.
      *
      * @param  \Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>|string  $table
-     * @param  array  $data
+     * @param  array<string, mixed>  $data
      * @param  string|null  $connection
      * @return $this
      */
@@ -103,7 +103,7 @@ trait InteractsWithDatabase
      * Assert the given record has been "soft deleted".
      *
      * @param  \Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>|string  $table
-     * @param  array  $data
+     * @param  array<string, mixed>  $data
      * @param  string|null  $connection
      * @param  string|null  $deletedAtColumn
      * @return $this
@@ -135,7 +135,7 @@ trait InteractsWithDatabase
      * Assert the given record has not been "soft deleted".
      *
      * @param  \Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>|string  $table
-     * @param  array  $data
+     * @param  array<string, mixed>  $data
      * @param  string|null  $connection
      * @param  string|null  $deletedAtColumn
      * @return $this
