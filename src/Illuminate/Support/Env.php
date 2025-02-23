@@ -2,6 +2,7 @@
 
 namespace Illuminate\Support;
 
+use Closure;
 use Dotenv\Repository\Adapter\PutenvAdapter;
 use Dotenv\Repository\RepositoryBuilder;
 use PhpOption\Option;
@@ -22,6 +23,13 @@ class Env
      * @var \Dotenv\Repository\RepositoryInterface|null
      */
     protected static $repository;
+
+    /**
+     * The list of custom adapters for environment variables loading.
+     *
+     * @var array<Closure>
+     */
+    protected static $customAdapters = [];
 
     /**
      * Enable the putenv adapter.
@@ -46,6 +54,16 @@ class Env
     }
 
     /**
+     * Register a custom adapter creator Closure.
+     *
+     * @return void
+     */
+    public static function extend($name, Closure $callback)
+    {
+        static::$customAdapters[$name] = $callback;
+    }
+
+    /**
      * Get the environment repository instance.
      *
      * @return \Dotenv\Repository\RepositoryInterface
@@ -57,6 +75,10 @@ class Env
 
             if (static::$putenv) {
                 $builder = $builder->addAdapter(PutenvAdapter::class);
+            }
+
+            foreach (static::$customAdapters as $adapter) {
+                $builder = $builder->addAdapter($adapter());
             }
 
             static::$repository = $builder->immutable()->make();
