@@ -25,7 +25,7 @@ class Env
     protected static $repository;
 
     /**
-     * The list of custom adapters for environment variables loading.
+     * The list of custom adapters for loading environment variables.
      *
      * @var array<Closure>
      */
@@ -55,12 +55,14 @@ class Env
 
     /**
      * Register a custom adapter creator Closure.
-     *
-     * @return void
      */
-    public static function extend($name, Closure $callback)
+    public static function extend(Closure $callback, ?string $name = null): void
     {
-        static::$customAdapters[$name] = $callback;
+        if (! is_null($name)) {
+            static::$customAdapters[$name] = $callback;
+        } else {
+            static::$customAdapters[] = $callback;
+        }
     }
 
     /**
