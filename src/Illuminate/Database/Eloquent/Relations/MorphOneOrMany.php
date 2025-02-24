@@ -31,6 +31,15 @@ abstract class MorphOneOrMany extends HasOneOrMany
      */
     protected $morphClass;
 
+    protected $morphKeyTypeString;
+
+    public function morphKeyTypeString($morphKeyTypeString = true)
+    {
+        $this->morphKeyTypeString = $morphKeyTypeString;
+
+        return $this;
+    }
+
     /**
      * Create a new morph one or many relationship instance.
      *
@@ -63,16 +72,18 @@ abstract class MorphOneOrMany extends HasOneOrMany
 
             if (is_null(SchemaBuilder::$defaultMorphKeyType)) {
                 parent::addConstraints();
-            } else {
-                $query = $this->getRelationQuery();
 
-                $query->where($this->foreignKey, '=', transform($this->getParentKey(), fn ($key) => match (SchemaBuilder::$defaultMorphKeyType) {
-                    'uuid', 'ulid', 'string' => (string) $key,
-                    default => $key,
-                }));
-
-                $query->whereNotNull($this->foreignKey);
+                return;
             }
+
+            $query = $this->getRelationQuery();
+
+            $query->where($this->foreignKey, '=', transform($this->getParentKey(), fn ($key) => match (SchemaBuilder::$defaultMorphKeyType) {
+                'uuid', 'ulid', 'string' => (string) $key,
+                default => $key,
+            }));
+
+            $query->whereNotNull($this->foreignKey);
         }
     }
 
@@ -198,7 +209,11 @@ abstract class MorphOneOrMany extends HasOneOrMany
     #[\Override]
     protected function getKeys(array $models, $key = null)
     {
-        $castKeyToString = in_array(SchemaBuilder::$defaultMorphKeyType, ['uuid', 'ulid', 'string']);
+        if (isset($this->morphKeyTypeString) && $this->morphKeyTypeString === true) {
+            $castKeyToString = true;
+        } else {
+            $castKeyToString = in_array(SchemaBuilder::$defaultMorphKeyType, ['uuid', 'ulid', 'string']);
+        }
 
         return (new Collection(parent::getKeys($models, $key)))
             ->transform(fn ($key) => $castKeyToString === true ? (string) $key : $key)
@@ -209,7 +224,7 @@ abstract class MorphOneOrMany extends HasOneOrMany
     #[\Override]
     protected function whereInMethod(Model $model, $key)
     {
-        if (! in_array(SchemaBuilder::$defaultMorphKeyType, ['uuid', 'ulid', 'string'])) {
+        if (! in_array(SchemaBuilder::$defaultMorphKeyType, ['uuid', 'ulid', 'string']) && (! isset($this->morphKeyTypeString) || $this->morphKeyTypeString === false)) {
             return parent::whereInMethod($model, $key);
         }
 
