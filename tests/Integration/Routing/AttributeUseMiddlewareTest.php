@@ -13,10 +13,10 @@ class AttributeUseMiddlewareTest extends TestCase
         $route = Route::get('/', [UseMiddlewareTestController::class, 'stringInput']);
         $this->assertEquals($route->methodMiddleware(), ['all']);
 
-        $route = Route::get('/', [HasMiddlewareTestController::class, 'arrayInput']);
+        $route = Route::get('/', [UseMiddlewareTestController::class, 'arrayInput']);
         $this->assertEquals($route->methodMiddleware(), ['all', 'middleware_1']);
 
-        $route = Route::get('/', [HasMiddlewareTestController::class, 'repeat']);
+        $route = Route::get('/', [UseMiddlewareTestController::class, 'repeat']);
         $this->assertEquals($route->methodMiddleware(), ['all', 'middleware_1', 'middleware_2', 'middleware_3']);
     }
 }
