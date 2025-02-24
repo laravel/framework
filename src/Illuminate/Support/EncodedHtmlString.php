@@ -15,6 +15,7 @@ class EncodedHtmlString extends HtmlString
      * Create a new Encoded HTML string instance.
      *
      * @param  string  $html
+     * @param  bool  $doubleEncode
      * @return void
      */
     public function __construct($html = '', protected bool $doubleEncode = true)
