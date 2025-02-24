@@ -38,6 +38,8 @@ class SQLiteConnector extends Connector implements ConnectorInterface
      */
     protected function parseDatabasePath(string $path): string
     {
+        $database = $path;
+
         // SQLite supports "in-memory" databases that only last as long as the owning
         // connection does. These are useful for tests or for short lifetime store
         // querying. In-memory databases shall be anonymous (:memory:) or named.
@@ -54,7 +56,7 @@ class SQLiteConnector extends Connector implements ConnectorInterface
         // as the developer probably wants to know if the database exists and this
         // SQLite driver will not throw any exception if it does not by default.
         if ($path === false) {
-            throw new SQLiteDatabaseDoesNotExistException($path);
+            throw new SQLiteDatabaseDoesNotExistException($database);
         }
 
         return $path;
