@@ -1142,12 +1142,18 @@ class Route
             return [];
         }
 
-        $method = new ReflectionMethod($this->getControllerClass(), $this->getControllerMethod());
+        [$controllerClass, $controllerMethod] = [$this->getControllerClass(), $this->getControllerMethod(),];
 
-        return (new Collection($method->getAttributes(UseMiddleware::class)))
-            ->map(fn ($attribute) => $attribute->getArguments())
-            ->flatten()
-            ->all();
+        if (method_exists($controllerClass, $controllerMethod)) {
+            $method = new ReflectionMethod($controllerClass, $controllerMethod);
+
+            return (new Collection($method->getAttributes(UseMiddleware::class)))
+                ->map(fn($attribute) => $attribute->getArguments())
+                ->flatten()
+                ->all();
+        }
+
+        return [];
     }
 
     /**

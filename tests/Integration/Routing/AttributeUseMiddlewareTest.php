@@ -8,7 +8,7 @@ use Orchestra\Testbench\TestCase;
 
 class AttributeUseMiddlewareTest extends TestCase
 {
-    public function test_has_middleware_is_respected()
+    public function test_attribute_use_middleware()
     {
         $route = Route::get('/', [UseMiddlewareTestController::class, 'stringInput']);
         $this->assertEquals($route->methodMiddleware(), ['all']);
@@ -30,7 +30,7 @@ class UseMiddlewareTestController
     }
 
     #[UseMiddleware(['all', 'middleware_1'])]
-    public function array()
+    public function arrayInput()
     {
         //
     }
