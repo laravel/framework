@@ -9,6 +9,7 @@ use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Contracts\CallableDispatcher;
 use Illuminate\Routing\Contracts\ControllerDispatcher as ControllerDispatcherContract;
+use Illuminate\Routing\Controllers\Attributes\UseMiddleware;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Routing\Matching\HostValidator;
@@ -23,6 +24,7 @@ use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use Laravel\SerializableClosure\SerializableClosure;
 use LogicException;
+use ReflectionMethod;
 use Symfony\Component\Routing\Route as SymfonyRoute;
 
 use function Illuminate\Support\enum_value;
@@ -1051,7 +1053,7 @@ class Route
         $this->computedMiddleware = [];
 
         return $this->computedMiddleware = Router::uniqueMiddleware(array_merge(
-            $this->middleware(), $this->controllerMiddleware()
+            $this->middleware(), $this->controllerMiddleware(), $this->methodMiddleware()
         ));
     }
 
@@ -1127,6 +1129,25 @@ class Route
         }
 
         return [];
+    }
+
+    /**
+     * Get the middleware for the method via its attributes.
+     *
+     * @return array
+     */
+    public function methodMiddleware()
+    {
+        if (! $this->isControllerAction()) {
+            return [];
+        }
+
+        $method = new ReflectionMethod($this->getControllerClass(), $this->getControllerMethod());
+
+        return (new Collection($method->getAttributes(UseMiddleware::class)))
+            ->map(fn ($attribute) => $attribute->getArguments())
+            ->flatten()
+            ->all();
     }
 
     /**
