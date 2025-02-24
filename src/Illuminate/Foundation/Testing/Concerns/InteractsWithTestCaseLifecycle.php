@@ -26,6 +26,7 @@ use Illuminate\Http\Middleware\TrustProxies;
 use Illuminate\Queue\Console\WorkCommand;
 use Illuminate\Queue\Queue;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\EncodedHtmlString;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\ParallelTesting;
 use Illuminate\Support\Once;
@@ -171,6 +172,7 @@ trait InteractsWithTestCaseLifecycle
         Component::forgetFactory();
         ConvertEmptyStringsToNull::flushState();
         Factory::flushState();
+        EncodedHtmlString::flushState();
         EncryptCookies::flushState();
         HandleExceptions::flushState();
         Migrator::withoutMigrations([]);
