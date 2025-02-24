@@ -119,13 +119,15 @@ class Markdown
             ])->convert($html)->getContent();
         });
 
+        $html = '';
+
         try {
             $html = static::converter()->convert($text)->getContent();
         } finally {
             EncodedHtmlString::flushState();
         }
 
-        return new HtmlString($html ?? '');
+        return new HtmlString($html);
     }
 
     /**

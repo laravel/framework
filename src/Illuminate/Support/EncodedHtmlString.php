@@ -30,7 +30,7 @@ class EncodedHtmlString extends HtmlString
     #[\Override]
     public function toHtml()
     {
-        return (static::$encodeUsingFactory ?? function (string $value, bool $doubleEncode) {
+        return (static::$encodeUsingFactory ?? function ($value, bool $doubleEncode) {
             return htmlspecialchars($value ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8', $doubleEncode);
         })($this->html, $this->doubleEncode);
     }
