@@ -195,7 +195,7 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
         }
 
         PHPUnit::assertEmpty(
-            $this->notifications[get_class($notifiable)][$notifiable->getKey()] ?? [],
+            $this->notifications[get_class($notifiable)][$this->getKeyFromNotifiable($notifiable)] ?? [],
             'Notifications were sent unexpectedly.',
         );
     }
@@ -279,7 +279,7 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
      */
     protected function notificationsFor($notifiable, $notification)
     {
-        return $this->notifications[get_class($notifiable)][$notifiable->getKey()][$notification] ?? [];
+        return $this->notifications[get_class($notifiable)][$this->getKeyFromNotifiable($notifiable)][$notification] ?? [];
     }
 
     /**
@@ -326,7 +326,7 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
                 continue;
             }
 
-            $this->notifications[get_class($notifiable)][$notifiable->getKey()][get_class($notification)][] = [
+            $this->notifications[get_class($notifiable)][$this->getKeyFromNotifiable($notifiable)][get_class($notification)][] = [
                 'notification' => $this->serializeAndRestore && $notification instanceof ShouldQueue
                     ? $this->serializeAndRestoreNotification($notification)
                     : $notification,
@@ -339,6 +339,17 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
                 }),
             ];
         }
+    }
+
+    public function getKeyFromNotifiable($notifiable): mixed
+    {
+        $key = $notifiable->getKey();
+
+        if ($key instanceof \Stringable) {
+            return (string) $key;
+        }
+
+        return $key;
     }
 
     /**

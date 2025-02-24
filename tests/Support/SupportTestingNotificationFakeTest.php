@@ -215,6 +215,17 @@ class SupportTestingNotificationFakeTest extends TestCase
         });
     }
 
+    public function testAssertSentToWhenNotifiableHasStringableKey()
+    {
+        $user = new UserWithStringableKeyStub;
+
+        $this->fake->send($user, new NotificationStub);
+
+        $this->fake->assertSentTo($user, NotificationStub::class, function ($notification, $channels, $notifiable) use ($user) {
+            return $notifiable === $user;
+        });
+    }
+
     public function testAssertSentToWhenNotifiableHasFalsyShouldSend()
     {
         $user = new LocalizedUserStub;
@@ -253,6 +264,22 @@ class NotificationWithFalsyShouldSendStub extends Notification
     public function shouldSend($notifiable, $channel)
     {
         return false;
+    }
+}
+
+class StringableKey
+{
+    public function __toString(): string
+    {
+        return 'key';
+    }
+}
+
+class UserWithStringableKeyStub extends User
+{
+    public function getKey(): StringableKey
+    {
+        return new StringableKey;
     }
 }
 
