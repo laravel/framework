@@ -67,26 +67,24 @@ abstract class MorphOneOrMany extends HasOneOrMany
     #[\Override]
     public function addConstraints()
     {
-        if (! static::$constraints) {
-            return;
+        if (static::$constraints) {
+            $this->getRelationQuery()->where($this->morphType, $this->morphClass);
+
+            if (SchemaBuilder::$defaultMorphKeyType === 'int') {
+                parent::addConstraints();
+
+                return;
+            }
+
+            $query = $this->getRelationQuery();
+
+            $query->where($this->foreignKey, '=', transform($this->getParentKey(), fn ($key) => match (SchemaBuilder::$defaultMorphKeyType) {
+                'uuid', 'ulid', 'string' => (string) $key,
+                default => $key,
+            }));
+
+            $query->whereNotNull($this->foreignKey);
         }
-
-        $this->getRelationQuery()->where($this->morphType, $this->morphClass);
-
-        if (SchemaBuilder::$defaultMorphKeyType === 'int') {
-            parent::addConstraints();
-
-            return;
-        }
-
-        $query = $this->getRelationQuery();
-
-        $query->where($this->foreignKey, '=', transform($this->getParentKey(), fn ($key) => match (SchemaBuilder::$defaultMorphKeyType) {
-            'uuid', 'ulid', 'string' => (string) $key,
-            default => $key,
-        }));
-
-        $query->whereNotNull($this->foreignKey);
     }
 
     /** @inheritDoc */
