@@ -1,3 +1,3 @@
 <div class="table">
-{{ Illuminate\Mail\Markdown::parse($slot)->convertMarkdownToHtml() }}
+{{ Illuminate\Mail\Markdown::parse($slot) }}
 </div>
