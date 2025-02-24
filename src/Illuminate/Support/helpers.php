@@ -4,6 +4,7 @@ use Illuminate\Contracts\Support\DeferringDisplayableValue;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
+use Illuminate\Support\EncodedHtmlString;
 use Illuminate\Support\Env;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\HigherOrderTapProxy;
@@ -122,7 +123,7 @@ if (! function_exists('e')) {
      *
      * @param  \Illuminate\Contracts\Support\DeferringDisplayableValue|\Illuminate\Contracts\Support\Htmlable|\BackedEnum|string|int|float|null  $value
      * @param  bool  $doubleEncode
-     * @return string
+     * @return \Illuminate\Support\EncodedHtmlString
      */
     function e($value, $doubleEncode = true)
     {
@@ -138,7 +139,7 @@ if (! function_exists('e')) {
             $value = $value->value;
         }
 
-        return htmlspecialchars($value ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8', $doubleEncode);
+        return new EncodedHtmlString($value ?? '', $doubleEncode);
     }
 }
 

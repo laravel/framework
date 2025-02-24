@@ -3,6 +3,7 @@
 namespace Illuminate\Mail;
 
 use Illuminate\Contracts\View\Factory as ViewFactory;
+use Illuminate\Support\EncodedHtmlString;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use League\CommonMark\Environment\Environment;
@@ -105,16 +106,28 @@ class Markdown
      */
     public static function parse($text)
     {
-        $environment = new Environment([
-            'allow_unsafe_links' => false,
-        ]);
+        EncodedHtmlString::encodeUsing(function ($value) {
+            $replacements = [
+                '[' => '\[',
+                '<' => '\<',
+            ];
 
-        $environment->addExtension(new CommonMarkCoreExtension);
-        $environment->addExtension(new TableExtension);
+            $html = str_replace(array_keys($replacements), array_values($replacements), $value);
 
-        $converter = new MarkdownConverter($environment);
+            return static::converter([
+                'html_input' => 'escape',
+            ])->convert($html)->getContent();
+        });
 
-        return new HtmlString($converter->convert($text)->getContent());
+        $html = '';
+
+        try {
+            $html = static::converter()->convert($text)->getContent();
+        } finally {
+            EncodedHtmlString::flushState();
+        }
+
+        return new HtmlString($html);
     }
 
     /**
@@ -185,5 +198,23 @@ class Markdown
     public function getTheme()
     {
         return $this->theme;
+    }
+
+    /**
+     * Resolve the Markdown Converter.
+     *
+     * @param  array  $config
+     * @return \League\CommonMark\MarkdownConverter
+     */
+    public static function converter(array $config = [])
+    {
+        $environment = new Environment(array_merge([
+            'allow_unsafe_links' => false,
+        ], $config));
+
+        $environment->addExtension(new CommonMarkCoreExtension);
+        $environment->addExtension(new TableExtension);
+
+        return new MarkdownConverter($environment);
     }
 }
