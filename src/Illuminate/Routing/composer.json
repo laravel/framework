@@ -14,7 +14,7 @@
         }
     ],
     "require": {
-        "php": "^8.2",
+        "php": "^8.3",
         "ext-filter": "*",
         "ext-hash": "*",
         "illuminate/collections": "^13.0",

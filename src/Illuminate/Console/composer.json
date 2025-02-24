@@ -14,7 +14,7 @@
         }
     ],
     "require": {
-        "php": "^8.2",
+        "php": "^8.3",
         "ext-mbstring": "*",
         "illuminate/collections": "^13.0",
         "illuminate/contracts": "^13.0",
@@ -24,7 +24,6 @@
         "laravel/prompts": "^0.3.0",
         "nunomaduro/termwind": "^2.0",
         "symfony/console": "^7.2.0",
-        "symfony/polyfill-php83": "^1.31",
         "symfony/process": "^7.2.0"
     },
     "autoload": {
