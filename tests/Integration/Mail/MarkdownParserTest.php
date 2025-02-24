@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Integration\Mail;
 
 use Illuminate\Mail\Markdown;
-use Illuminate\Mail\MarkdownString;
 use Illuminate\Support\HtmlString;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
