@@ -9,7 +9,7 @@ class EventStream
      *
      * @var string
      */
-    public $as;
+    public $event;
 
     /**
      * The data to stream.
@@ -19,13 +19,13 @@ class EventStream
     /**
      * Create a new event stream instance.
      *
-     * @param  string  $as
+     * @param  string  $event
      * @param  mixed  $data
      * @return void
      */
-    public function __construct($as, $data)
+    public function __construct($event, $data)
     {
-        $this->as = $as;
+        $this->event = $event;
         $this->data = $data;
     }
 }
