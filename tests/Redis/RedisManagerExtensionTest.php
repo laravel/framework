@@ -62,7 +62,7 @@ class RedisManagerExtensionTest extends TestCase
         );
     }
 
-    public function test_parse_connection_configuration_for_cluster()
+    public function testParseConnectionConfigurationForCluster()
     {
         $name = 'my-cluster';
         $config = [
