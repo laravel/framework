@@ -4,8 +4,10 @@ namespace Illuminate\Tests\Integration\Foundation\Support\Providers;
 
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Str;
+use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\TestCase;
 
+#[WithConfig('filesystems.disks.local.serve', false)]
 class RouteServiceProviderHealthTest extends TestCase
 {
     /**
