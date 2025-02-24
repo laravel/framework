@@ -41,6 +41,13 @@ class Repository
     protected $hidden = [];
 
     /**
+     * The log name.
+     *
+     * @var string|null
+     */
+    protected $name = null;
+
+    /**
      * The callback that should handle unserialize exceptions.
      *
      * @var callable|null
@@ -117,6 +124,16 @@ class Repository
     public function allHidden()
     {
         return $this->hidden;
+    }
+
+    /**
+     * Retrieve the log name.
+     *
+     * @return string|null
+     */
+    public function name()
+    {
+        return $this->name;
     }
 
     /**
@@ -228,6 +245,19 @@ class Repository
     }
 
     /**
+     * Set the log name.
+     *
+     * @param  string|null  $name
+     * @return $this
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    /**
      * Forget the given context key.
      *
      * @param  string|array<int, string>  $key
@@ -253,6 +283,18 @@ class Repository
         foreach ((array) $key as $k) {
             unset($this->hidden[$k]);
         }
+
+        return $this;
+    }
+
+    /**
+     * Forget the log name.
+     *
+     * @return $this
+     */
+    public function forgetName()
+    {
+        $this->name = null;
 
         return $this;
     }
@@ -454,7 +496,7 @@ class Repository
      */
     public function isEmpty()
     {
-        return $this->all() === [] && $this->allHidden() === [];
+        return $this->all() === [] && $this->allHidden() === [] && $this->name() === null;
     }
 
     /**
@@ -505,6 +547,7 @@ class Repository
     {
         $this->data = [];
         $this->hidden = [];
+        $this->name = null;
 
         return $this;
     }
@@ -520,7 +563,8 @@ class Repository
     {
         $instance = (new static($this->events))
             ->add($this->all())
-            ->addHidden($this->allHidden());
+            ->addHidden($this->allHidden())
+            ->setName($this->name());
 
         $instance->events->dispatch(new Dehydrating($instance));
 
@@ -529,6 +573,7 @@ class Repository
         return $instance->isEmpty() ? null : [
             'data' => array_map($serialize, $instance->all()),
             'hidden' => array_map($serialize, $instance->allHidden()),
+            ...$instance->name() !== null ? ['name' => $instance->name()] : [],
         ];
     }
 
@@ -574,7 +619,7 @@ class Repository
         ];
 
         $this->events->dispatch(new Hydrated(
-            $this->flush()->add($data)->addHidden($hidden)
+            $this->flush()->add($data)->addHidden($hidden)->setName($context['name'] ?? null)
         ));
 
         return $this;

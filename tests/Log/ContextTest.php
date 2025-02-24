@@ -20,6 +20,16 @@ class ContextTest extends TestCase
 {
     use LazilyRefreshDatabase;
 
+    private string $logPath;
+
+    #[\Override]
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->logPath = storage_path('logs/laravel.log');
+        file_put_contents($this->logPath, '');
+    }
+
     public function test_it_can_set_values()
     {
         $values = [
@@ -357,8 +367,6 @@ class ContextTest extends TestCase
 
     public function test_it_adds_context_to_logging()
     {
-        $path = storage_path('logs/laravel.log');
-        file_put_contents($path, '');
         Str::createUuidsUsingSequence(['expected-trace-id']);
 
         Context::add('trace_id', Str::uuid());
@@ -370,18 +378,15 @@ class ContextTest extends TestCase
             'name' => 'Tim',
             'framework' => 'Laravel',
         ]);
-        $log = Str::after(file_get_contents(storage_path('logs/laravel.log')), '] ');
+        $log = Str::after(file_get_contents($this->logPath), '] ');
 
         $this->assertSame('testing.INFO: My name is Tim {"name":"Tim","framework":"Laravel"} {"trace_id":"expected-trace-id","foo.bar":123,"bar.baz":[456,789]}', trim($log));
 
-        file_put_contents($path, '');
         Str::createUuidsNormally();
     }
 
     public function test_it_doesnt_override_log_instance_context()
     {
-        $path = storage_path('logs/laravel.log');
-        file_put_contents($path, '');
         Str::createUuidsUsingSequence(['expected-trace-id']);
 
         Context::add('name', 'James');
@@ -389,35 +394,29 @@ class ContextTest extends TestCase
         Log::channel('single')->info('My name is {name}', [
             'name' => 'Tim',
         ]);
-        $log = Str::after(file_get_contents($path), '] ');
+        $log = Str::after(file_get_contents($this->logPath), '] ');
 
         $this->assertSame('testing.INFO: My name is Tim {"name":"Tim"} {"name":"James"}', trim($log));
 
-        file_put_contents($path, '');
         Str::createUuidsNormally();
     }
 
     public function test_it_doesnt_allow_context_to_be_used_as_parameters()
     {
-        $path = storage_path('logs/laravel.log');
-        file_put_contents($path, '');
         Str::createUuidsUsingSequence(['expected-trace-id']);
 
         Context::add('name', 'James');
 
         Log::channel('single')->info('My name is {name}');
-        $log = Str::after(file_get_contents($path), '] ');
+        $log = Str::after(file_get_contents($this->logPath), '] ');
 
         $this->assertSame('testing.INFO: My name is {name}  {"name":"James"}', trim($log));
 
-        file_put_contents($path, '');
         Str::createUuidsNormally();
     }
 
     public function test_does_not_add_hidden_context_to_logging()
     {
-        $path = storage_path('logs/laravel.log');
-        file_put_contents($path, '');
         Str::createUuidsUsingSequence(['expected-trace-id']);
 
         Context::addHidden('hidden_data', 'hidden_data');
@@ -426,11 +425,10 @@ class ContextTest extends TestCase
             'name' => 'Tim',
             'framework' => 'Laravel',
         ]);
-        $log = Str::after(file_get_contents($path), '] ');
+        $log = Str::after(file_get_contents($this->logPath), '] ');
 
         $this->assertStringNotContainsString('hidden_data', trim($log));
 
-        file_put_contents($path, '');
         Str::createUuidsNormally();
     }
 
@@ -475,10 +473,44 @@ class ContextTest extends TestCase
         $this->assertNull(Context::getHidden('foo'));
     }
 
+    public function test_it_can_set_name()
+    {
+        $this->assertNull(Context::name());
+        Context::setName('hello');
+        $this->assertSame('hello', Context::name());
+    }
+
+    public function test_it_can_forget_name()
+    {
+        $this->assertNull(Context::name());
+        Context::setName('upload-photos');
+        $this->assertSame('upload-photos', Context::name());
+        Context::forgetName();
+        $this->assertNull(Context::name());
+    }
+
+    public function test_it_applies_name_when_set()
+    {
+        Context::setName('my-log-channel-name');
+
+        Log::channel('single')->info('Hello');
+        $log = Str::after(file_get_contents($this->logPath), '] ');
+
+        $this->assertSame('my-log-channel-name.INFO: Hello', trim($log));
+    }
+
+    public function test_it_does_not_allows_overriding_name_on_logger()
+    {
+        Context::setName('my-log-channel-name');
+
+        Log::channel('single')->withName('should-not-be-seen')->info('Hello');
+        $log = Str::after(file_get_contents($this->logPath), '] ');
+
+        $this->assertSame('my-log-channel-name.INFO: Hello', trim($log));
+    }
+
     public function test_it_adds_context_to_logged_exceptions()
     {
-        $path = storage_path('logs/laravel.log');
-        file_put_contents($path, '');
         Str::createUuidsUsingSequence(['expected-trace-id']);
 
         Context::add('trace_id', Str::uuid());
@@ -487,11 +519,10 @@ class ContextTest extends TestCase
         Context::push('bar.baz', 789);
 
         $this->app[ExceptionHandler::class]->report(new Exception('Whoops!'));
-        $log = Str::after(file_get_contents($path), '] ');
+        $log = Str::after(file_get_contents($this->logPath), '] ');
 
         $this->assertStringEndsWith(' {"trace_id":"expected-trace-id","foo.bar":123,"bar.baz":[456,789]}', trim($log));
 
-        file_put_contents($path, '');
         Str::createUuidsNormally();
     }
 }

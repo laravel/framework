@@ -143,16 +143,31 @@ class LogManager implements LoggerInterface
                 )->withContext($this->sharedContext);
 
                 if (method_exists($loggerWithContext->getLogger(), 'pushProcessor')) {
-                    $loggerWithContext->pushProcessor(function ($record) {
-                        if (! $this->app->bound(ContextRepository::class)) {
-                            return $record;
-                        }
+                    $loggerWithContext->pushProcessor(
+                        /**
+                         * @param  \Monolog\LogRecord  $record
+                         * @return \Monolog\LogRecord
+                         */
+                        function ($record) {
+                            if (! $this->app->bound(ContextRepository::class)) {
+                                return $record;
+                            }
 
-                        return $record->with(extra: [
-                            ...$record->extra,
-                            ...$this->app[ContextRepository::class]->all(),
-                        ]);
-                    });
+                            $contextRepository = $this->app[ContextRepository::class];
+
+                            $params = [
+                                'extra' => [
+                                    ...$record->extra,
+                                    ...$contextRepository->all(),
+                                ],
+                            ];
+
+                            if ($channelName = $contextRepository->name()) {
+                                $params['channel'] = $channelName;
+                            }
+
+                            return $record->with(...$params);
+                        });
                 }
 
                 return $this->channels[$name] = $loggerWithContext;
