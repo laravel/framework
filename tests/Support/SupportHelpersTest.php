@@ -45,7 +45,6 @@ class SupportHelpersTest extends TestCase
 
         $html = m::mock(Htmlable::class);
         $html->shouldReceive('toHtml')->andReturn($str);
-
         $this->assertEquals($str, e($html));
     }
 
