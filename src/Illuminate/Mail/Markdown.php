@@ -3,8 +3,13 @@
 namespace Illuminate\Mail;
 
 use Illuminate\Contracts\View\Factory as ViewFactory;
+use Illuminate\Support\EncodedHtmlString;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
+use League\CommonMark\Environment\Environment;
+use League\CommonMark\Extension\CommonMark\CommonMarkCoreExtension;
+use League\CommonMark\Extension\Table\TableExtension;
+use League\CommonMark\MarkdownConverter;
 use TijsVerkoyen\CssToInlineStyles\CssToInlineStyles;
 
 class Markdown
@@ -97,11 +102,30 @@ class Markdown
      * Parse the given Markdown text into HTML.
      *
      * @param  string  $text
-     * @return \Illuminate\Mail\MarkdownString
+     * @return \Illuminate\Support\HtmlString
      */
     public static function parse($text)
     {
-        return new MarkdownString($text);
+        EncodedHtmlString::encodeUsing(function ($value) {
+            $replacements = [
+                '[' => '\[',
+                '<' => '\<',
+            ];
+
+            $html = str_replace(array_keys($replacements), array_values($replacements), $value);
+
+            return static::converter([
+                'html_input' => 'escape',
+            ])->convert($html)->getContent();
+        });
+
+        try {
+            $html = static::converter()->convert($text)->getContent();
+        } finally {
+            EncodedHtmlString::flushState();
+        }
+
+        return new HtmlString($html ?? '');
     }
 
     /**
@@ -172,5 +196,23 @@ class Markdown
     public function getTheme()
     {
         return $this->theme;
+    }
+
+    /**
+     * Resolve the Markdown Converter.
+     *
+     * @param  array  $config
+     * @return \League\CommonMark\MarkdownConverter
+     */
+    public static function converter(array $config = [])
+    {
+        $environment = new Environment(array_merge([
+            'allow_unsafe_links' => false,
+        ], $config));
+
+        $environment->addExtension(new CommonMarkCoreExtension);
+        $environment->addExtension(new TableExtension);
+
+        return new MarkdownConverter($environment);
     }
 }
