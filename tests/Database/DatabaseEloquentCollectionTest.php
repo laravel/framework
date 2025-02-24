@@ -4,8 +4,7 @@ namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Model;
+Mockeryuse Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Collection as BaseCollection;
@@ -307,6 +306,25 @@ class DatabaseEloquentCollectionTest extends TestCase
         $three->shouldReceive('getKey')->andReturn(3);
 
         $c = new Collection([$one, $two, $three]);
+
+        $this->assertEquals([1, 2, 3], $c->modelKeys());
+    }
+
+    public function testCollectionDictionaryReturnsUniqueModelKeys()
+    {
+        $one = Mockery::mock(Model::class);
+        $one->shouldReceive('getKey')->andReturn(1);
+
+        $two = Mockery::mock(Model::class);
+        $two->shouldReceive('getKey')->andReturn(1);
+
+        $three = Mockery::mock(Model::class);
+        $three->shouldReceive('getKey')->andReturn(2);
+
+        $four = Mockery::mock(Model::class);
+        $four->shouldReceive('getKey')->andReturn(3);
+
+        $c = new Collection([$one, $two, $three, $four]);
 
         $this->assertEquals([1, 2, 3], $c->modelKeys());
     }
