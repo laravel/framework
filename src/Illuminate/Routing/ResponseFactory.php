@@ -7,6 +7,7 @@ use Illuminate\Contracts\Routing\ResponseFactory as FactoryContract;
 use Illuminate\Contracts\View\Factory as ViewFactory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
+use Illuminate\Http\EventStream;
 use Illuminate\Routing\Exceptions\StreamedResponseException;
 use Illuminate\Support\Js;
 use Illuminate\Support\Str;
@@ -147,13 +148,19 @@ class ResponseFactory implements FactoryContract
                     break;
                 }
 
-                $streamAs = $message instanceof EventStreamable ? $message->streamAs() : $as;
+                $event = $as;
+
+                if ($message instanceof EventStream) {
+                    $event = $message->event;
+
+                    $message = $message->data;
+                }
 
                 if (! is_string($message) && ! is_numeric($message)) {
                     $message = Js::encode($message);
                 }
 
-                echo "event: $streamAs\n";
+                echo "event: $event\n";
                 echo 'data: '.$message;
                 echo "\n\n";
 
