@@ -156,11 +156,9 @@ class ScheduleListCommandTest extends TestCase
 
     protected function tearDown(): void
     {
-        parent::tearDown();
-
         putenv('SHELL_VERBOSITY');
 
-        ScheduleListCommand::resolveTerminalWidthUsing(null);
+        parent::tearDown();
     }
 }
 
