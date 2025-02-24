@@ -16,9 +16,7 @@ class FilesystemServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->booted(function () {
-            $this->serveFiles();
-        });
+        $this->serveFiles();
     }
 
     /**
