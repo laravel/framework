@@ -22,8 +22,8 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use RuntimeException;
-use Traversable;
 use stdClass;
+use Traversable;
 
 class SupportHelpersTest extends TestCase
 {
@@ -37,7 +37,7 @@ class SupportHelpersTest extends TestCase
     public function testE()
     {
         $str = 'A \'quote\' is <b>bold</b>';
-        tap(e($str), function ($html) use ($str) {
+        tap(e($str), function ($html) {
             $this->assertInstanceOf(EncodedHtmlString::class, $html);
             $this->assertEquals('A &#039;quote&#039; is &lt;b&gt;bold&lt;/b&gt;', $html->toHtml());
             $this->assertEquals('A &#039;quote&#039; is &lt;b&gt;bold&lt;/b&gt;', (string) $html);
