@@ -12,7 +12,7 @@ class EventStream
     public $event;
 
     /**
-     * The data to stream.
+     * The data of the stream.
      *
      * @var mixed
      */
