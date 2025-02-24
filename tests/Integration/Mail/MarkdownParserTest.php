@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Integration\Mail;
 
-use Illuminate\Contracts\Support\DeferringDisplayableValue;
 use Illuminate\Mail\Markdown;
 use Illuminate\Mail\MarkdownString;
 use Illuminate\Support\HtmlString;
@@ -51,27 +50,27 @@ class MarkdownParserTest extends TestCase
 
         yield [
             e('![Welcome to Laravel](https://laravel.com/assets/img/welcome/background.svg)'),
-            '<p>![Welcome to Laravel](https://laravel.com/assets/img/welcome/background.svg)</p>'
+            '<p>![Welcome to Laravel](https://laravel.com/assets/img/welcome/background.svg)</p>',
         ];
 
         yield [
             e('Visit https://laravel.com/docs to browse the documentation'),
-            '<p>Visit https://laravel.com/docs to browse the documentation</p>'
+            '<p>Visit https://laravel.com/docs to browse the documentation</p>',
         ];
 
         yield [
             e('Visit <https://laravel.com/docs> to browse the documentation'),
-            '<p>Visit &lt;https://laravel.com/docs&gt; to browse the documentation</p>'
+            '<p>Visit &lt;https://laravel.com/docs&gt; to browse the documentation</p>',
         ];
 
         yield [
             e('Visit <span>https://laravel.com/docs</span> to browse the documentation'),
-            '<p>Visit &lt;span&gt;https://laravel.com/docs&lt;/span&gt; to browse the documentation</p>'
+            '<p>Visit &lt;span&gt;https://laravel.com/docs&lt;/span&gt; to browse the documentation</p>',
         ];
 
         yield [
             '![Welcome to Laravel](https://laravel.com/assets/img/welcome/background.svg)<br />'.e('Visit <span>https://laravel.com/docs</span> to browse the documentation'),
-            '<p><img src="https://laravel.com/assets/img/welcome/background.svg" alt="Welcome to Laravel" /><br />Visit &lt;span&gt;https://laravel.com/docs&lt;/span&gt; to browse the documentation</p>'
+            '<p><img src="https://laravel.com/assets/img/welcome/background.svg" alt="Welcome to Laravel" /><br />Visit &lt;span&gt;https://laravel.com/docs&lt;/span&gt; to browse the documentation</p>',
         ];
     }
 }

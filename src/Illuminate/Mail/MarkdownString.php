@@ -2,7 +2,6 @@
 
 namespace Illuminate\Mail;
 
-use Illuminate\Contracts\Support\DeferringDisplayableValue;
 use Illuminate\Support\EncodedHtmlString;
 use Illuminate\Support\HtmlString;
 use League\CommonMark\Environment\Environment;
