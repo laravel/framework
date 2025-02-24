@@ -65,7 +65,7 @@ jobs:
           REDIS_LIBS: liblz4-dev, liblzf-dev, libzstd-dev
 
       - name: Set Framework version
-        run: composer config version "12.x-dev"
+        run: composer config version "13.x-dev"
 
       - name: Set PHPUnit
         uses: nick-fields/retry@v3
@@ -132,7 +132,7 @@ jobs:
           coverage: none
 
       - name: Set Framework version
-        run: composer config version "12.x-dev"
+        run: composer config version "13.x-dev"
 
       - name: Set PHPUnit
         uses: nick-fields/retry@v3
