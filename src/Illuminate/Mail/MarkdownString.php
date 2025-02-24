@@ -3,55 +3,15 @@
 namespace Illuminate\Mail;
 
 use Illuminate\Contracts\Support\DeferringDisplayableValue;
+use Illuminate\Support\EncodedHtmlString;
 use Illuminate\Support\HtmlString;
 use League\CommonMark\Environment\Environment;
 use League\CommonMark\Extension\CommonMark\CommonMarkCoreExtension;
 use League\CommonMark\Extension\Table\TableExtension;
 use League\CommonMark\MarkdownConverter;
 
-class MarkdownString extends HtmlString implements DeferringDisplayableValue
+class MarkdownString extends HtmlString
 {
-    /**
-     * Convert markdown to instance of HtmlString.
-     *
-     * @return \Illuminate\Contracts\Support\Htmlable
-     */
-    public function convertMarkdownToHtml()
-    {
-        return new HtmlString(
-            $this->converter()->convert($this->html)->getContent()
-        );
-    }
-
-    /**
-     * Convert encoded markdown to instance of HtmlString.
-     *
-     * @return \Illuminate\Contracts\Support\Htmlable
-     */
-    public function convertEncodedMarkdownToHtml()
-    {
-        $replacements = [
-            '[' => '\[',
-            '<' => '\<',
-        ];
-
-        $html = str_replace(array_keys($replacements), array_values($replacements), $this->html);
-
-        return new HtmlString($this->converter([
-            'html_input' => 'escape',
-        ])->convert($html)->getContent());
-    }
-
-    /**
-     * Resolve the displayable value that the class is deferring.
-     *
-     * @return \Illuminate\Contracts\Support\Htmlable
-     */
-    public function resolveDisplayableValue()
-    {
-        return $this->convertEncodedMarkdownToHtml();
-    }
-
     /**
      * Get the HTML string.
      *
@@ -60,7 +20,26 @@ class MarkdownString extends HtmlString implements DeferringDisplayableValue
     #[\Override]
     public function toHtml()
     {
-        return $this->convertMarkdownToHtml()->toHtml();
+        EncodedHtmlString::encodeUsing(function ($value) {
+            $replacements = [
+                '[' => '\[',
+                '<' => '\<',
+            ];
+
+            $html = str_replace(array_keys($replacements), array_values($replacements), $value);
+
+            return $this->converter([
+                'html_input' => 'escape',
+            ])->convert($html)->getContent();
+        });
+
+        try {
+            $html = $this->converter()->convert($this->html)->getContent();
+        } finally {
+            EncodedHtmlString::flushState();
+        }
+
+        return new HtmlString($html ?? '');
     }
 
     /**

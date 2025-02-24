@@ -8,6 +8,7 @@ use Countable;
 use Error;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\EncodedHtmlString;
 use Illuminate\Support\Env;
 use Illuminate\Support\Optional;
 use Illuminate\Support\Sleep;
@@ -21,8 +22,8 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use RuntimeException;
-use stdClass;
 use Traversable;
+use stdClass;
 
 class SupportHelpersTest extends TestCase
 {
@@ -36,26 +37,31 @@ class SupportHelpersTest extends TestCase
     public function testE()
     {
         $str = 'A \'quote\' is <b>bold</b>';
-        $this->assertSame('A &#039;quote&#039; is &lt;b&gt;bold&lt;/b&gt;', e($str));
+        tap(e($str), function ($html) use ($str) {
+            $this->assertInstanceOf(EncodedHtmlString::class, $html);
+            $this->assertEquals('A &#039;quote&#039; is &lt;b&gt;bold&lt;/b&gt;', $html->toHtml());
+            $this->assertEquals('A &#039;quote&#039; is &lt;b&gt;bold&lt;/b&gt;', (string) $html);
+        });
 
         $html = m::mock(Htmlable::class);
         $html->shouldReceive('toHtml')->andReturn($str);
+
         $this->assertEquals($str, e($html));
     }
 
     public function testEWithInvalidCodePoints()
     {
         $str = mb_convert_encoding('føø bar', 'ISO-8859-1', 'UTF-8');
-        $this->assertEquals('f�� bar', e($str));
+        $this->assertEquals('f�� bar', (string) e($str));
     }
 
     public function testEWithEnums()
     {
         $enumValue = StringBackedEnum::ADMIN_LABEL;
-        $this->assertSame('I am &#039;admin&#039;', e($enumValue));
+        $this->assertSame('I am &#039;admin&#039;', (string) e($enumValue));
 
         $enumValue = IntBackedEnum::ROLE_ADMIN;
-        $this->assertSame('1', e($enumValue));
+        $this->assertSame('1', (string) e($enumValue));
     }
 
     public function testBlank()

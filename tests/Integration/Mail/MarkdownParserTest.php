@@ -17,10 +17,9 @@ class MarkdownParserTest extends TestCase
         tap(Markdown::parse($given), function ($html) use ($expected) {
             $this->assertInstanceOf(MarkdownString::class, $html);
             $this->assertInstanceOf(HtmlString::class, $html);
-            $this->assertInstanceOf(DeferringDisplayableValue::class, $html);
 
             $this->assertStringEqualsStringIgnoringLineEndings($expected.PHP_EOL, (string) $html);
-            $this->assertSame((string) $html, $html->toHtml());
+            $this->assertSame((string) $html, (string) $html->toHtml());
         });
     }
 
@@ -30,9 +29,8 @@ class MarkdownParserTest extends TestCase
         tap(Markdown::parse($given), function ($html) use ($expected) {
             $this->assertInstanceOf(MarkdownString::class, $html);
             $this->assertInstanceOf(HtmlString::class, $html);
-            $this->assertInstanceOf(DeferringDisplayableValue::class, $html);
 
-            $this->assertStringEqualsStringIgnoringLineEndings($expected.PHP_EOL, e($html));
+            $this->assertStringEqualsStringIgnoringLineEndings($expected.PHP_EOL, (string) $html);
         });
     }
 
@@ -49,10 +47,31 @@ class MarkdownParserTest extends TestCase
 
     public static function markdownEncodedDataProvider()
     {
-        yield ['[Laravel](https://laravel.com)', '<p>[Laravel](https://laravel.com)</p>'];
-        yield ['![Welcome to Laravel](https://laravel.com/assets/img/welcome/background.svg)', '<p>![Welcome to Laravel](https://laravel.com/assets/img/welcome/background.svg)</p>'];
-        yield ['Visit https://laravel.com/docs to browse the documentation', '<p>Visit https://laravel.com/docs to browse the documentation</p>'];
-        yield ['Visit <https://laravel.com/docs> to browse the documentation', '<p>Visit &lt;https://laravel.com/docs&gt; to browse the documentation</p>'];
-        yield ['Visit <span>https://laravel.com/docs</span> to browse the documentation', '<p>Visit &lt;span&gt;https://laravel.com/docs&lt;/span&gt; to browse the documentation</p>'];
+        yield [e('[Laravel](https://laravel.com)'), '<p>[Laravel](https://laravel.com)</p>'];
+
+        yield [
+            e('![Welcome to Laravel](https://laravel.com/assets/img/welcome/background.svg)'),
+            '<p>![Welcome to Laravel](https://laravel.com/assets/img/welcome/background.svg)</p>'
+        ];
+
+        yield [
+            e('Visit https://laravel.com/docs to browse the documentation'),
+            '<p>Visit https://laravel.com/docs to browse the documentation</p>'
+        ];
+
+        yield [
+            e('Visit <https://laravel.com/docs> to browse the documentation'),
+            '<p>Visit &lt;https://laravel.com/docs&gt; to browse the documentation</p>'
+        ];
+
+        yield [
+            e('Visit <span>https://laravel.com/docs</span> to browse the documentation'),
+            '<p>Visit &lt;span&gt;https://laravel.com/docs&lt;/span&gt; to browse the documentation</p>'
+        ];
+
+        yield [
+            '![Welcome to Laravel](https://laravel.com/assets/img/welcome/background.svg)<br />'.e('Visit <span>https://laravel.com/docs</span> to browse the documentation'),
+            '<p><img src="https://laravel.com/assets/img/welcome/background.svg" alt="Welcome to Laravel" /><br />Visit &lt;span&gt;https://laravel.com/docs&lt;/span&gt; to browse the documentation</p>'
+        ];
     }
 }
