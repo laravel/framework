@@ -355,7 +355,7 @@ class Collection extends BaseCollection implements QueueableCollection
      */
     public function modelKeys()
     {
-        return array_unique(array_map(fn ($model) => $model->getKey(), $this->items));
+        return array_values(array_unique(array_map(fn ($model) => $model->getKey(), $this->items)));
     }
 
     /**
