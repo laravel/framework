@@ -46,7 +46,7 @@ class Builder
      *
      * @var string|null
      */
-    public static $defaultMorphKeyType = 'int';
+    public static $defaultMorphKeyType = null;
 
     /**
      * Create a new database Schema manager.

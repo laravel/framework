@@ -70,7 +70,7 @@ abstract class MorphOneOrMany extends HasOneOrMany
         if (static::$constraints) {
             $this->getRelationQuery()->where($this->morphType, $this->morphClass);
 
-            if (SchemaBuilder::$defaultMorphKeyType === 'int') {
+            if (is_null(SchemaBuilder::$defaultMorphKeyType)) {
                 parent::addConstraints();
 
                 return;
