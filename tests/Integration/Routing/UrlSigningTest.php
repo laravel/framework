@@ -14,13 +14,6 @@ use Orchestra\Testbench\TestCase;
 
 class UrlSigningTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-
-        Carbon::setTestNow(null);
-    }
-
     protected function defineEnvironment($app): void
     {
         $app['config']->set(['app.key' => 'AckfSECXIvnK5r28GVIWUAxmbBSjTsmF']);
