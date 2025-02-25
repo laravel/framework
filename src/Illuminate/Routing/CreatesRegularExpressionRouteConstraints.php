@@ -31,6 +31,17 @@ trait CreatesRegularExpressionRouteConstraints
     }
 
     /**
+     * Specify that the given route parameters must be boolean.
+     *
+     * @param  array|string  $parameters
+     * @return $this
+     */
+    public function whereBoolean($parameters)
+    {
+        return $this->assignExpressionToParameters($parameters, 'true|false');
+    }
+
+    /**
      * Specify that the given route parameters must be numeric.
      *
      * @param  array|string  $parameters
