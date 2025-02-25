@@ -1032,6 +1032,19 @@ class RouteRegistrarTest extends TestCase
         }
     }
 
+    public function testWhereBooleanRegistration()
+    {
+        $wheres = ['foo' => 'true|false', 'bar' => 'true|false'];
+
+        $this->router->get('/{foo}/{bar}')->whereBoolean(['foo', 'bar']);
+        $this->router->get('/api/{bar}/{foo}')->whereBoolean(['bar', 'foo']);
+
+        /** @var \Illuminate\Routing\Route $route */
+        foreach ($this->router->getRoutes() as $route) {
+            $this->assertEquals($wheres, $route->wheres);
+        }
+    }
+
     public function testWhereInRegistration()
     {
         $wheres = ['foo' => 'one|two', 'bar' => 'one|two'];
