@@ -100,7 +100,7 @@ trait BuildsWhereDateClauses
      *
      * @param  array|string  $columns
      * @param  string  $operator
-     * @param  string  $boolean
+     * @param  string  $boolean 
      * @return $this
      */
     protected function wherePastOrFuture($columns, $operator, $boolean)
