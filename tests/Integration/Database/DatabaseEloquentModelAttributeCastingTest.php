@@ -335,6 +335,28 @@ class DatabaseEloquentModelAttributeCastingTest extends DatabaseTestCase
             $this->assertNotSame($previous, $previous = $model->virtualDateTimeWithoutCachingFluent);
         }
     }
+
+    public function testInconsistentAccessorAttributeNameConversion()
+    {
+        $model = new TestEloquentModelWithAttributeCast;
+
+        $model->append('foo1_bar');
+
+        $model->append('foo_1_bar');
+
+        $model->append('foo12_bar');
+
+        $model->append('foo_12_bar');
+
+        $arr = $model->toArray();
+
+        $this->assertTrue(isset($arr['foo_1_bar']));
+        $this->assertTrue(isset($arr['foo_12_bar']));
+        $this->assertTrue(isset($arr['foo1_bar']));
+        $this->assertTrue(isset($arr['foo12_bar']));
+        $this->assertEquals($arr['foo_1_bar'],'yay');
+        $this->assertEquals($arr['foo_12_bar'],'another yay');
+    }
 }
 
 class TestEloquentModelWithAttributeCast extends Model
@@ -417,6 +439,24 @@ class TestEloquentModelWithAttributeCast extends Model
         return new Attribute(
             function () {
                 return collect();
+            }
+        );
+    }
+
+    public function foo1Bar(): Attribute
+    {
+        return new Attribute(
+            function () {
+                return "yay";
+            }
+        );
+    }
+
+    public function foo12Bar(): Attribute
+    {
+        return new Attribute(
+            function () {
+                return "another yay";
             }
         );
     }

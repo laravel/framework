@@ -2327,7 +2327,16 @@ trait HasAttributes
         $class = $reflection->getName();
 
         static::$getAttributeMutatorCache[$class] = (new Collection($attributeMutatorMethods = static::getAttributeMarkedMutatorMethods($classOrInstance)))
-            ->mapWithKeys(fn ($match) => [lcfirst(static::$snakeAttributes ? Str::snake($match) : $match) => true])
+            ->mapWithKeys(function ($match) {
+                $standardSnake = lcfirst(static::$snakeAttributes ? Str::snake($match) : $match);
+                $alternativeSnake = preg_replace('/(\d+)/', '_$1_', $standardSnake);
+                $alternativeSnake = str_replace('__', '_', $alternativeSnake);
+
+                return [
+                    $standardSnake => true,
+                    $alternativeSnake => true
+                ];
+            })
             ->all();
 
         static::$mutatorCache[$class] = (new Collection(static::getMutatorMethods($class)))
