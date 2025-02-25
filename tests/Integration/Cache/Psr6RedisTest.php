@@ -21,9 +21,9 @@ class Psr6RedisTest extends TestCase
 
     protected function tearDown(): void
     {
-        parent::tearDown();
-
         $this->tearDownRedis();
+
+        parent::tearDown();
     }
 
     #[DataProvider('redisClientDataProvider')]

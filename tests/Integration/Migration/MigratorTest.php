@@ -32,8 +32,9 @@ class MigratorTest extends TestCase
 
     protected function tearDown(): void
     {
-        parent::tearDown();
         Migrator::withoutMigrations([]);
+
+        parent::tearDown();
     }
 
     public function testMigrate()
