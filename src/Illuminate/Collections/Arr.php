@@ -288,7 +288,7 @@ class Arr
      * @param  string  $divider
      * @return void
      */
-    public static function forget(&$array, $keys,string $divider='.')
+    public static function forget(&$array, $keys, string $divider = '.')
     {
         $original = &$array;
 
@@ -334,7 +334,7 @@ class Arr
      * @param  string  $divider
      * @return mixed
      */
-    public static function get($array, $key, $default = null,string $divider='.')
+    public static function get($array, $key, $default = null, string $divider = '.')
     {
         if (! static::accessible($array)) {
             return value($default);
@@ -769,7 +769,7 @@ class Arr
      * @param  string  $divider
      * @return array
      */
-    public static function set(&$array, $key, $value,$divider='.')
+    public static function set(&$array, $key, $value, $divider = '.')
     {
         if (is_null($key)) {
             return $array = $value;
