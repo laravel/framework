@@ -2082,6 +2082,6 @@ class Str
      */
     public static function initials(string $value, string $separator = ''): string
     {
-        return implode($separator, array_map(fn($word) => mb_strtoupper(mb_substr($word, 0, 1)), preg_split('/\s+/', trim($value))));
+        return implode($separator, array_map(fn ($word) => mb_strtoupper(mb_substr($word, 0, 1)), preg_split('/\s+/', trim($value))));
     }
 }
