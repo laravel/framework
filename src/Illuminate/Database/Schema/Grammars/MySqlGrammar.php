@@ -653,7 +653,7 @@ class MySqlGrammar extends Grammar
      */
     public function compileDropAllTables($tables)
     {
-        return 'drop table '.implode(',', $this->wrapArray($tables));
+        return 'drop table '.implode(', ', $this->wrapArray($tables));
     }
 
     /**
@@ -664,7 +664,7 @@ class MySqlGrammar extends Grammar
      */
     public function compileDropAllViews($views)
     {
-        return 'drop view '.implode(',', $this->wrapArray($views));
+        return 'drop view '.implode(', ', $this->wrapArray($views));
     }
 
     /**

@@ -1093,21 +1093,21 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
     {
         $statement = $this->getGrammar()->compileDropAllTables(['alpha', 'beta', 'gamma']);
 
-        $this->assertSame('drop table "alpha","beta","gamma" cascade', $statement);
+        $this->assertSame('drop table "alpha", "beta", "gamma" cascade', $statement);
     }
 
     public function testDropAllViewsEscapesTableNames()
     {
         $statement = $this->getGrammar()->compileDropAllViews(['alpha', 'beta', 'gamma']);
 
-        $this->assertSame('drop view "alpha","beta","gamma" cascade', $statement);
+        $this->assertSame('drop view "alpha", "beta", "gamma" cascade', $statement);
     }
 
     public function testDropAllTypesEscapesTableNames()
     {
         $statement = $this->getGrammar()->compileDropAllTypes(['alpha', 'beta', 'gamma']);
 
-        $this->assertSame('drop type "alpha","beta","gamma" cascade', $statement);
+        $this->assertSame('drop type "alpha", "beta", "gamma" cascade', $statement);
     }
 
     public function testCompileColumns()
