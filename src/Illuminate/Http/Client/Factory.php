@@ -17,8 +17,6 @@ use PHPUnit\Framework\Assert as PHPUnit;
 
 /**
  * @mixin \Illuminate\Http\Client\PendingRequest
- *
- * @phpstan-type RecordedRequestType array{0: \Illuminate\Http\Client\Request, 1: \Illuminate\Http\Client\Response|null}
  */
 class Factory
 {
@@ -64,7 +62,7 @@ class Factory
     /**
      * The recorded response array.
      *
-     * @var list<RecordedRequestType>
+     * @var list<array{0: \Illuminate\Http\Client\Request, 1: \Illuminate\Http\Client\Response|null}>
      */
     protected $recorded = [];
 
@@ -438,7 +436,7 @@ class Factory
      * Get a collection of the request / response pairs matching the given truth test.
      *
      * @param  (\Closure(\Illuminate\Http\Client\Request, \Illuminate\Http\Client\Response|null): bool)|callable  $callback
-     * @return \Illuminate\Support\Collection<int, RecordedRequestType>
+     * @return \Illuminate\Support\Collection<int, array{0: \Illuminate\Http\Client\Request, 1: \Illuminate\Http\Client\Response|null}>
      */
     public function recorded($callback = null)
     {
