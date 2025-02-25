@@ -236,7 +236,7 @@ class Response implements ArrayAccess, Stringable
     /**
      * Execute the given callback if there was a server or client error.
      *
-     * @param  callable  $callback
+     * @param  callable|(\Closure(\Illuminate\Http\Client\Response): mixed)  $callback
      * @return $this
      */
     public function onError(callable $callback)
@@ -305,6 +305,7 @@ class Response implements ArrayAccess, Stringable
     /**
      * Throw an exception if a server or client error occurred.
      *
+     * @param null|(\Closure(\Illuminate\Http\Client\Response, \Throwable): mixed) $callback
      * @return $this
      *
      * @throws \Illuminate\Http\Client\RequestException
@@ -340,7 +341,7 @@ class Response implements ArrayAccess, Stringable
     /**
      * Throw an exception if the response status code matches the given code.
      *
-     * @param  callable|int  $statusCode
+     * @param  int|(\Closure(int, \Illuminate\Http\Client\Response): bool)|callable  $statusCode
      * @return $this
      *
      * @throws \Illuminate\Http\Client\RequestException
@@ -358,7 +359,7 @@ class Response implements ArrayAccess, Stringable
     /**
      * Throw an exception unless the response status code matches the given code.
      *
-     * @param  callable|int  $statusCode
+     * @param  int|(\Closure(int, \Illuminate\Http\Client\Response): bool)|callable  $statusCode
      * @return $this
      *
      * @throws \Illuminate\Http\Client\RequestException
