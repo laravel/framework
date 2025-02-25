@@ -2064,6 +2064,16 @@ class Str
     }
 
     /**
+     * @param  string  $value
+     * @param  string  $separator
+     * @return string
+     */
+    public static function initials(string $value, string $separator = '')
+    {
+        return implode($separator, array_map(fn ($word) => mb_strtoupper(mb_substr($word, 0, 1)), preg_split('/\s+/', trim($value))));
+    }
+
+    /**
      * Remove all strings from the casing caches.
      *
      * @return void
@@ -2073,15 +2083,5 @@ class Str
         static::$snakeCache = [];
         static::$camelCache = [];
         static::$studlyCache = [];
-    }
-
-    /**
-     * @param  string  $value
-     * @param  string  $separator
-     * @return string
-     */
-    public static function initials(string $value, string $separator = '')
-    {
-        return implode($separator, array_map(fn ($word) => mb_strtoupper(mb_substr($word, 0, 1)), preg_split('/\s+/', trim($value))));
     }
 }

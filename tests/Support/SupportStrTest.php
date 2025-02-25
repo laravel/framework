@@ -471,36 +471,6 @@ class SupportStrTest extends TestCase
         $this->assertEmpty($property->getValue());
     }
 
-    public function testInitials()
-    {
-        // Basic tests
-        $this->assertSame('JD', Str::initials('John Doe'));
-        $this->assertSame('JD', Str::initials('  John   Doe  '));
-        $this->assertSame('J.D', Str::initials('John Doe', '.'));
-
-        // Single word name
-        $this->assertSame('J', Str::initials('John'));
-
-        // Multiple spaces and special characters
-        $this->assertSame('J-D', Str::initials(' John   Doe ', '-'));
-        $this->assertSame('A-B-C', Str::initials('Alice Bob Charlie', '-'));
-
-        // Unicode characters
-        $this->assertSame('ÇÖ', Str::initials('Çağrı Özkan'));
-        $this->assertSame('ÑG', Str::initials('Ñoño García'));
-
-        // Non-alphabetic characters should be ignored
-        $this->assertSame('J2D', Str::initials('John 2 Doe'));
-        $this->assertSame('A-B-C', Str::initials(' Alice! Bob? Charlie.', '-'));
-
-        // Empty string case
-        $this->assertSame('', Str::initials(''));
-
-        // Mixed case input
-        $this->assertSame('JD', Str::initials('john doe'));
-        $this->assertSame('JD', Str::initials('JOHN DOE'));
-    }
-
     public function testFinish()
     {
         $this->assertSame('abbc', Str::finish('ab', 'bc'));
@@ -1787,6 +1757,35 @@ class SupportStrTest extends TestCase
 
             $this->assertSame($expected, Str::chopEnd($subject, $needle));
         }
+    }
+
+    public function testInitials()
+    {
+        $this->assertSame('JD', Str::initials('John Doe'));
+        $this->assertSame('JD', Str::initials('  John   Doe  '));
+        $this->assertSame('J.D', Str::initials('John Doe', '.'));
+
+        // Single word name
+        $this->assertSame('J', Str::initials('John'));
+
+        // Multiple spaces and special characters
+        $this->assertSame('J-D', Str::initials(' John   Doe ', '-'));
+        $this->assertSame('A-B-C', Str::initials('Alice Bob Charlie', '-'));
+
+        // Unicode characters
+        $this->assertSame('ÇÖ', Str::initials('Çağrı Özkan'));
+        $this->assertSame('ÑG', Str::initials('Ñoño García'));
+
+        // Non-alphabetic characters should be ignored
+        $this->assertSame('J2D', Str::initials('John 2 Doe'));
+        $this->assertSame('A-B-C', Str::initials(' Alice! Bob? Charlie.', '-'));
+
+        // Empty string case
+        $this->assertSame('', Str::initials(''));
+
+        // Mixed case input
+        $this->assertSame('JD', Str::initials('john doe'));
+        $this->assertSame('JD', Str::initials('JOHN DOE'));
     }
 }
 
