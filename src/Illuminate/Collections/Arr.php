@@ -285,9 +285,10 @@ class Arr
      *
      * @param  array  $array
      * @param  array|string|int|float  $keys
+     * @param  string  $divider
      * @return void
      */
-    public static function forget(&$array, $keys)
+    public static function forget(&$array, $keys,string $divider='.')
     {
         $original = &$array;
 
@@ -305,7 +306,7 @@ class Arr
                 continue;
             }
 
-            $parts = explode('.', $key);
+            $parts = explode($divider, $key);
 
             // clean up before each pass
             $array = &$original;
@@ -330,9 +331,10 @@ class Arr
      * @param  \ArrayAccess|array  $array
      * @param  string|int|null  $key
      * @param  mixed  $default
+     * @param  string  $divider
      * @return mixed
      */
-    public static function get($array, $key, $default = null)
+    public static function get($array, $key, $default = null,string $divider='.')
     {
         if (! static::accessible($array)) {
             return value($default);
@@ -346,11 +348,11 @@ class Arr
             return $array[$key];
         }
 
-        if (! str_contains($key, '.')) {
+        if (! str_contains($key, $divider)) {
             return $array[$key] ?? value($default);
         }
 
-        foreach (explode('.', $key) as $segment) {
+        foreach (explode($divider, $key) as $segment) {
             if (static::accessible($array) && static::exists($array, $segment)) {
                 $array = $array[$segment];
             } else {
@@ -764,15 +766,16 @@ class Arr
      * @param  array  $array
      * @param  string|int|null  $key
      * @param  mixed  $value
+     * @param  string  $divider
      * @return array
      */
-    public static function set(&$array, $key, $value)
+    public static function set(&$array, $key, $value,$divider='.')
     {
         if (is_null($key)) {
             return $array = $value;
         }
 
-        $keys = explode('.', $key);
+        $keys = explode($divider, $key);
 
         foreach ($keys as $i => $key) {
             if (count($keys) === 1) {
