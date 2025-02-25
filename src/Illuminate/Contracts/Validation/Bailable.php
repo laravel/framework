@@ -2,4 +2,6 @@
 
 namespace Illuminate\Contracts\Validation;
 
-interface Bailable {}
+interface Bailable
+{
+}
