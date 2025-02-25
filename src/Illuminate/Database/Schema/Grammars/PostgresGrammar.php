@@ -463,7 +463,7 @@ class PostgresGrammar extends Grammar
      */
     public function compileDropAllTables($tables)
     {
-        return 'drop table '.implode(',', $this->escapeNames($tables)).' cascade';
+        return 'drop table '.implode(', ', $this->escapeNames($tables)).' cascade';
     }
 
     /**
@@ -474,7 +474,7 @@ class PostgresGrammar extends Grammar
      */
     public function compileDropAllViews($views)
     {
-        return 'drop view '.implode(',', $this->escapeNames($views)).' cascade';
+        return 'drop view '.implode(', ', $this->escapeNames($views)).' cascade';
     }
 
     /**
@@ -485,7 +485,7 @@ class PostgresGrammar extends Grammar
      */
     public function compileDropAllTypes($types)
     {
-        return 'drop type '.implode(',', $this->escapeNames($types)).' cascade';
+        return 'drop type '.implode(', ', $this->escapeNames($types)).' cascade';
     }
 
     /**
@@ -496,7 +496,7 @@ class PostgresGrammar extends Grammar
      */
     public function compileDropAllDomains($domains)
     {
-        return 'drop domain '.implode(',', $this->escapeNames($domains)).' cascade';
+        return 'drop domain '.implode(', ', $this->escapeNames($domains)).' cascade';
     }
 
     /**
