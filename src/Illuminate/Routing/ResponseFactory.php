@@ -125,7 +125,6 @@ class ResponseFactory implements FactoryContract
      *
      * @param  \Closure  $callback
      * @param  array  $headers
-     * @param  string|null  $endStreamWith
      * @param  \Illuminate\Http\StreamedEvent|string  $endStreamWith
      * @return \Symfony\Component\HttpFoundation\StreamedResponse
      */
