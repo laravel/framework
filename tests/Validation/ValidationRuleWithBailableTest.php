@@ -3,14 +3,14 @@
 namespace Illuminate\Tests\Validation;
 
 use Closure;
-use Illuminate\Contracts\Validation\StopUponFailure;
+use Illuminate\Contracts\Validation\Bailable;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator;
 use Illuminate\Validation\Validator;
 use PHPUnit\Framework\TestCase;
 
-class ValidationStopOnFailureTest extends TestCase
+class ValidationRuleWithBailableTest extends TestCase
 {
     public function testFailingStopsFurtherValidation()
     {
@@ -18,23 +18,18 @@ class ValidationStopOnFailureTest extends TestCase
         $v = new Validator(
             $trans,
             ['foo' => 'foobar'],
-            ['foo' => [new StoppingValidationRule(), 'numeric']],
+            ['foo' => [new BailableValidationRule(), 'numeric']],
         );
         $this->assertFalse($v->passes());
         $this->assertEquals(
-            ['foo' => ['Illuminate\Tests\Validation\StoppingValidationRule' => []]],
+            ['foo' => ['Illuminate\Tests\Validation\BailableValidationRule' => []]],
             $v->failed()
         );
     }
 }
 
-class StoppingValidationRule implements ValidationRule, StopUponFailure
+class BailableValidationRule implements ValidationRule, Bailable
 {
-    public function shouldStop(): bool
-    {
-        return true;
-    }
-
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         $fail('failed');

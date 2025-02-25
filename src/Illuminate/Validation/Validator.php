@@ -8,7 +8,7 @@ use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\ImplicitRule;
 use Illuminate\Contracts\Validation\Rule as RuleContract;
-use Illuminate\Contracts\Validation\StopUponFailure;
+use Illuminate\Contracts\Validation\Bailable;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Contracts\Validation\Validator as ValidatorContract;
 use Illuminate\Contracts\Validation\ValidatorAwareRule;
@@ -922,8 +922,8 @@ class Validator implements ValidatorContract
             return $this->messages->has($cleanedAttribute);
         }
 
-        if ($rule instanceof InvokableValidationRule && $rule->invokable() instanceof StopUponFailure) {
-            return $rule->invokable()->shouldStop();
+        if ($rule instanceof InvokableValidationRule && $rule->invokable() instanceof Bailable) {
+            return true;
         }
 
         if (isset($this->failedRules[$cleanedAttribute]) &&
