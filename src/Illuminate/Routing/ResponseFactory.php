@@ -5,9 +5,9 @@ namespace Illuminate\Routing;
 use Closure;
 use Illuminate\Contracts\Routing\ResponseFactory as FactoryContract;
 use Illuminate\Contracts\View\Factory as ViewFactory;
-use Illuminate\Http\EventStream;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
+use Illuminate\Http\StreamedEvent;
 use Illuminate\Routing\Exceptions\StreamedResponseException;
 use Illuminate\Support\Js;
 use Illuminate\Support\Str;
@@ -125,34 +125,22 @@ class ResponseFactory implements FactoryContract
      *
      * @param  \Closure  $callback
      * @param  array  $headers
-     * @param  string  $as
-     * @param  string|null  $startStreamWith
      * @param  string|null  $endStreamWith
-     * @param  string  $endStreamWith
+     * @param  \Illuminate\Http\StreamedEvent|string  $endStreamWith
      * @return \Symfony\Component\HttpFoundation\StreamedResponse
      */
-    public function eventStream(Closure $callback, array $headers = [], string $as = 'update', ?string $startStreamWith = null, ?string $endStreamWith = '</stream>')
+    public function eventStream(Closure $callback, array $headers = [], StreamedEvent|string|null $endStreamWith = '</stream>')
     {
-        return $this->stream(function () use ($callback, $as, $startStreamWith, $endStreamWith) {
-            if (filled($startStreamWith)) {
-                echo "event: $as\n";
-                echo 'data: '.$startStreamWith;
-                echo "\n\n";
-
-                ob_flush();
-                flush();
-            }
-
+        return $this->stream(function () use ($callback, $endStreamWith) {
             foreach ($callback() as $message) {
                 if (connection_aborted()) {
                     break;
                 }
 
-                $event = $as;
+                $event = 'update';
 
-                if ($message instanceof EventStream) {
+                if ($message instanceof StreamedEvent) {
                     $event = $message->event;
-
                     $message = $message->data;
                 }
 
@@ -169,7 +157,14 @@ class ResponseFactory implements FactoryContract
             }
 
             if (filled($endStreamWith)) {
-                echo "event: $as\n";
+                $endEvent = 'update';
+
+                if ($endStreamWith instanceof StreamedEvent) {
+                    $endEvent = $endStreamWith->event;
+                    $endStreamWith = $endStreamWith->data;
+                }
+
+                echo "event: $endEvent\n";
                 echo 'data: '.$endStreamWith;
                 echo "\n\n";
 
