@@ -2076,8 +2076,8 @@ class Str
     }
 
     /**
-     * @param string $value
-     * @param string $separator
+     * @param  string  $value
+     * @param  string  $separator
      * @return string
      */
     public static function initials(string $value, string $separator = ''): string
