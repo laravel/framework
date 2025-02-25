@@ -305,7 +305,6 @@ class Response implements ArrayAccess, Stringable
     /**
      * Throw an exception if a server or client error occurred.
      *
-     * @param null|(\Closure(\Illuminate\Http\Client\Response, \Throwable): mixed) $callback
      * @return $this
      *
      * @throws \Illuminate\Http\Client\RequestException
