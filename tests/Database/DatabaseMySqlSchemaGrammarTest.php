@@ -1480,14 +1480,14 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
     {
         $statement = $this->getGrammar()->compileDropAllTables(['alpha', 'beta', 'gamma']);
 
-        $this->assertSame('drop table `alpha`,`beta`,`gamma`', $statement);
+        $this->assertSame('drop table `alpha`, `beta`, `gamma`', $statement);
     }
 
     public function testDropAllViews()
     {
         $statement = $this->getGrammar()->compileDropAllViews(['alpha', 'beta', 'gamma']);
 
-        $this->assertSame('drop view `alpha`,`beta`,`gamma`', $statement);
+        $this->assertSame('drop view `alpha`, `beta`, `gamma`', $statement);
     }
 
     public function testGrammarsAreMacroable()
