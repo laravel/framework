@@ -501,7 +501,7 @@ class ContextTest extends TestCase
         $callback = function () use (&$contextInClosure) {
             $contextInClosure = ['data' => Context::all(), 'hidden' => Context::allHidden()];
 
-            throw new Exception("test_with_sets_keys_and_restores");
+            throw new Exception('test_with_sets_keys_and_restores');
         };
 
         Context::add('key1', 'value1');
@@ -518,8 +518,9 @@ class ContextTest extends TestCase
                 $callback
             );
 
-            $this->fail("No exception was thrown.");
-        } catch (Exception) {}
+            $this->fail('No exception was thrown.');
+        } catch (Exception) {
+        }
 
         $this->assertEqualsCanonicalizing([
             'data' => [

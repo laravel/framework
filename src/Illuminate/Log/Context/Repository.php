@@ -474,6 +474,7 @@ class Repository
             $this->hidden = $hiddenBefore;
         }
     }
+
     /**
      * Determine if the repository is empty.
      *
