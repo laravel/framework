@@ -81,6 +81,7 @@ class Fluent
 
     /**
      * Convert the rule to a validation array.
+     *
      * @return array
      */
     public function toArray()

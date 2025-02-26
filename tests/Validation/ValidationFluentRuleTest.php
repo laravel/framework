@@ -225,7 +225,7 @@ class ValidationFluentRuleTest extends TestCase
         $validation = new Validator(
             $trans,
             ['foo' => 'abc'],
-            ['foo' => Rule::fluent()->when(true, fn($rule) => $rule->required())],
+            ['foo' => Rule::fluent()->when(true, fn ($rule) => $rule->required())],
         );
 
         $this->assertTrue($validation->passes());
@@ -233,7 +233,7 @@ class ValidationFluentRuleTest extends TestCase
         $validation = new Validator(
             $trans,
             [],
-            ['foo' => Rule::fluent()->when(false, fn($rule) => $rule->required())],
+            ['foo' => Rule::fluent()->when(false, fn ($rule) => $rule->required())],
         );
 
         $this->assertTrue($validation->passes());
@@ -241,7 +241,7 @@ class ValidationFluentRuleTest extends TestCase
         $validation = new Validator(
             $trans,
             [],
-            ['foo' => Rule::fluent()->unless(true, fn($rule) => $rule->required())],
+            ['foo' => Rule::fluent()->unless(true, fn ($rule) => $rule->required())],
         );
 
         $this->assertTrue($validation->passes());
@@ -249,7 +249,7 @@ class ValidationFluentRuleTest extends TestCase
         $validation = new Validator(
             $trans,
             ['foo' => 'abc'],
-            ['foo' => Rule::fluent()->unless(false, fn($rule) => $rule->required())],
+            ['foo' => Rule::fluent()->unless(false, fn ($rule) => $rule->required())],
         );
 
         $this->assertTrue($validation->passes());
