@@ -11,6 +11,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\CanBeEscapedWhenCastToString;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
+use Illuminate\Database\Eloquent\Attributes\NamedScope;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
@@ -24,6 +25,7 @@ use Illuminate\Support\Traits\ForwardsCalls;
 use JsonException;
 use JsonSerializable;
 use LogicException;
+use ReflectionMethod;
 use Stringable;
 
 abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToString, HasBroadcastChannel, Jsonable, JsonSerializable, QueueableEntity, Stringable, UrlRoutable
@@ -1631,6 +1633,22 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             : Pivot::fromAttributes($parent, $attributes, $table, $exists);
     }
 
+    protected static function hasAttributedNamedScope(string $scope): ?string
+    {
+        if (! method_exists(static::class, $scope)) {
+            return false;
+        }
+
+        $method = new ReflectionMethod(static::class, $scope);
+        $attribute = $method->getAttributes(NamedScope::class);
+
+        if ($attribute === []) {
+            return false;
+        }
+
+        return true;
+    }
+
     /**
      * Determine if the model has a given scope.
      *
@@ -1639,7 +1657,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function hasNamedScope($scope)
     {
-        return method_exists($this, 'scope'.ucfirst($scope));
+        return method_exists($this, 'scope'.ucfirst($scope)) || static::hasAttributedNamedScope($scope);
     }
 
     /**
@@ -1651,6 +1669,10 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function callNamedScope($scope, array $parameters = [])
     {
+        if ($this->hasAttributedNamedScope($scope)) {
+            return $this->{$scope}(...$parameters);
+        }
+
         return $this->{'scope'.ucfirst($scope)}(...$parameters);
     }
 
@@ -2381,6 +2403,10 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public static function __callStatic($method, $parameters)
     {
+        if (static::hasAttributedNamedScope($method)) {
+            $parameters = [static::query(), ...$parameters];
+        }
+
         return (new static)->$method(...$parameters);
     }
 
