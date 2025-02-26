@@ -448,6 +448,33 @@ class Repository
     }
 
     /**
+     * Run the callback function with the given context values and restores to original values when complete.
+     *
+     * @param  array<string, mixed>  $data
+     * @param  array<string, mixed>  $hidden
+     * @param  callable  $callback
+     * @return mixed
+     */
+    public function with($data, $hidden, callable $callback): mixed
+    {
+        $dataBefore = $this->data;
+        $hiddenBefore = $this->hidden;
+
+        if ($data !== []) {
+            $this->add($data);
+        }
+        if ($hidden !== []) {
+            $this->addHidden($hidden);
+        }
+
+        try {
+            return $callback();
+        } finally {
+            $this->data = $dataBefore;
+            $this->hidden = $hiddenBefore;
+        }
+    }
+    /**
      * Determine if the repository is empty.
      *
      * @return bool
