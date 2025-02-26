@@ -13,9 +13,9 @@ class Attempting
      * @return void
      */
     public function __construct(
-        public $guard,
-        #[\SensitiveParameter] public $credentials,
-        public $remember,
+        public string $guard,
+        #[\SensitiveParameter] public array $credentials,
+        public bool $remember,
     ) {
     }
 }

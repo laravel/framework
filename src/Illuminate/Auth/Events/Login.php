@@ -2,6 +2,7 @@
 
 namespace Illuminate\Auth\Events;
 
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Queue\SerializesModels;
 
 class Login
@@ -17,9 +18,9 @@ class Login
      * @return void
      */
     public function __construct(
-        public $guard,
-        public $user,
-        public $remember,
+        public string $guard,
+        public Authenticatable $user,
+        public bool $remember,
     ) {
     }
 }
