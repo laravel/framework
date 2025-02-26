@@ -60,7 +60,9 @@ abstract class Grammar
     public function wrap($value, $prefixAlias = false)
     {
         if ($this->isExpression($value)) {
-            return $this->getValue($value);
+            return $this->wrapRaw(
+                (string) $this->getValue($value)
+            );
         }
 
         // If the value being wrapped has a column alias we will need to separate out
@@ -142,6 +144,21 @@ abstract class Grammar
     protected function wrapJsonSelector($value)
     {
         throw new RuntimeException('This database engine does not support JSON operations.');
+    }
+
+    /**
+     * Wrap raw string where table and columns are given. Will remove backticks.
+     *
+     * @param string $value
+     * @return string
+     */
+    public function wrapRaw(string $value): string
+    {
+        return preg_replace(
+            '/(\w+)[.](\w+)+/',
+            '`$1`.`$2`',
+            str_replace('`', '', $this->getValue($value))
+        );
     }
 
     /**
