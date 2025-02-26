@@ -1002,6 +1002,39 @@ class RoutingUrlGeneratorTest extends TestCase
 
         $this->assertSame('test-url', $url->route('foo'));
     }
+
+    public function testPassedParametersHavePrecedenceOverDefaults()
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            Request::create('https://www.foo.com/')
+        );
+
+        $url->defaults([
+            'tenant' => 'defaultTenant',
+        ]);
+
+        $route = new Route(['GET'], 'bar/{tenant}/{post}', ['as' => 'bar', fn() => '']);
+        $routes->add($route);
+
+        // Named parameters
+        $this->assertSame(
+            'https://www.foo.com/bar/concreteTenant/concretePost',
+            $url->route('bar', [
+                'tenant' => tap(new RoutableInterfaceStub, fn($x) => $x->key = 'concreteTenant'),
+                'post' => tap(new RoutableInterfaceStub, fn($x) => $x->key = 'concretePost'),
+            ]),
+        );
+
+        // Positional parameters
+        $this->assertSame(
+            'https://www.foo.com/bar/concreteTenant/concretePost',
+            $url->route('bar', [
+                tap(new RoutableInterfaceStub, fn($x) => $x->key = 'concreteTenant'),
+                tap(new RoutableInterfaceStub, fn($x) => $x->key = 'concretePost'),
+            ]),
+        );
+    }
 }
 
 class RoutableInterfaceStub implements UrlRoutable
