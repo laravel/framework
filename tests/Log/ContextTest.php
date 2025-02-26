@@ -513,9 +513,9 @@ class ContextTest extends TestCase
 
         try {
             Context::with(
+                $callback,
                 ['key1' => 'with', 'key3' => 'also-with'],
                 ['hiddenKey3' => 'foobar'],
-                $callback
             );
 
             $this->fail('No exception was thrown.');

@@ -450,12 +450,12 @@ class Repository
     /**
      * Run the callback function with the given context values and restore to original state when complete.
      *
+     * @param  callable  $callback
      * @param  array<string, mixed>  $data
      * @param  array<string, mixed>  $hidden
-     * @param  callable  $callback
      * @return mixed
      */
-    public function with($data, $hidden, callable $callback)
+    public function with(callable $callback, array $data = [], array $hidden = [])
     {
         $dataBefore = $this->data;
         $hiddenBefore = $this->hidden;
