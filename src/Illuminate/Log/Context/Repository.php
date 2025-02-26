@@ -455,7 +455,7 @@ class Repository
      * @param  callable  $callback
      * @return mixed
      */
-    public function with($data, $hidden, callable $callback): mixed
+    public function with($data, $hidden, callable $callback)
     {
         $dataBefore = $this->data;
         $hiddenBefore = $this->hidden;
