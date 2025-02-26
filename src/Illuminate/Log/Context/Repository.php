@@ -448,7 +448,7 @@ class Repository
     }
 
     /**
-     * Run the callback function with the given context values and restores to original values when complete.
+     * Run the callback function with the given context values and restore to original state when complete.
      *
      * @param  array<string, mixed>  $data
      * @param  array<string, mixed>  $hidden
