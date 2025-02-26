@@ -13,6 +13,7 @@ use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\Rules\ExcludeIf;
 use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\File;
+use Illuminate\Validation\Rules\Fluent;
 use Illuminate\Validation\Rules\ImageFile;
 use Illuminate\Validation\Rules\In;
 use Illuminate\Validation\Rules\NotIn;
@@ -243,5 +244,15 @@ class Rule
     public static function numeric()
     {
         return new Numeric;
+    }
+
+    /**
+     * Get a Fluent rule builder instance.
+     *
+     * @return \Illuminate\Validation\Rules\Fluent
+     */
+    public static function fluent()
+    {
+        return new Fluent;
     }
 }

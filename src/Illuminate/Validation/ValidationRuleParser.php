@@ -11,6 +11,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Date;
 use Illuminate\Validation\Rules\Exists;
+use Illuminate\Validation\Rules\Fluent;
 use Illuminate\Validation\Rules\Numeric;
 use Illuminate\Validation\Rules\Unique;
 
@@ -96,6 +97,10 @@ class ValidationRuleParser
         if (is_object($rule)) {
             if ($rule instanceof Date || $rule instanceof Numeric) {
                 return explode('|', (string) $rule);
+            }
+
+            if ($rule instanceof Fluent) {
+                $rule = $this->explodeExplicitRule($rule->toArray(), $attribute);
             }
 
             return Arr::wrap($this->prepareRule($rule, $attribute));
