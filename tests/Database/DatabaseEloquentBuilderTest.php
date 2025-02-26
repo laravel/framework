@@ -2642,6 +2642,38 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         return $query;
     }
+
+    public function testWhereIfAppliesConditionWhenTrue()
+    {
+        $builder = $this->getMockBuilder(Builder::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['where'])
+            ->getMock();
+
+        $builder->expects($this->once())
+            ->method('where')
+            ->with('foo', '=', 'bar')
+            ->willReturnSelf();
+
+        $result = $builder->whereIf(true, 'foo', '=', 'bar');
+
+        $this->assertSame($builder, $result);
+    }
+
+    public function testWhereIfDoesNotApplyConditionWhenFalse()
+    {
+        $builder = $this->getMockBuilder(Builder::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['where'])
+            ->getMock();
+
+        $builder->expects($this->never())
+            ->method('where');
+
+        $result = $builder->whereIf(false, 'foo', '=', 'bar');
+
+        $this->assertSame($builder, $result);
+    }
 }
 
 class EloquentBuilderTestStub extends Model

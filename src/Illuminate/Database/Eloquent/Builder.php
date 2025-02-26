@@ -335,6 +335,20 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Apply a "where" condition if the given condition is true.
+     *
+     * @param  bool  $condition
+     * @param  string  $column
+     * @param  string  $operator
+     * @param  mixed  $value
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function whereIf($condition, $column, $operator = '=', $value = null)
+    {
+        return $condition ? $this->where($column, $operator, $value) : $this;
+    }
+
+    /**
      * Add a basic where clause to the query, and return the first result.
      *
      * @param  (\Closure(static): mixed)|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
