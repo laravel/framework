@@ -56,13 +56,6 @@ class UuidUserStub extends \Illuminate\Foundation\Auth\User
     use HasUuids;
 
     protected $table = 'users';
-    public $incrementing = false;
-    protected $keyType = 'string';
-
-    public function uniqueIds(): array
-    {
-        return ['id'];
-    }
 
     #[\Override]
     public function casts()
