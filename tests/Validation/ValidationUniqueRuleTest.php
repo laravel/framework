@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Validation;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Validation\InvalidSoftDeleteQueryException;
 use Illuminate\Validation\Rules\Unique;
 use PHPUnit\Framework\TestCase;
 
@@ -103,6 +104,27 @@ class ValidationUniqueRuleTest extends TestCase
         $rule->onlyTrashed('softdeleted_at');
         $this->assertSame('unique:table,NULL,NULL,id,softdeleted_at,"NOT_NULL"', (string) $rule);
     }
+
+    public function testItThrowsExceptionWhenUsingBothWithoutTrashedAndOnlyTrashed()
+    {
+        $this->expectException(InvalidSoftDeleteQueryException::class);
+        $this->expectExceptionMessage("Cannot use 'onlyTrashed()' when 'withoutTrashed()' is already applied.");
+
+        $rule = new Unique('table');
+        $rule->withoutTrashed();
+        $rule->onlyTrashed(); // This should trigger the exception
+    }
+
+    public function testItThrowsExceptionWhenUsingBothOnlyTrashedAndWithoutTrashed()
+    {
+        $this->expectException(InvalidSoftDeleteQueryException::class);
+        $this->expectExceptionMessage("Cannot use 'withoutTrashed()' when 'onlyTrashed()' is already applied.");
+
+        $rule = new Unique('table');
+        $rule->onlyTrashed();
+        $rule->withoutTrashed(); // This should trigger the exception
+    }
+
 }
 
 class EloquentModelStub extends Model

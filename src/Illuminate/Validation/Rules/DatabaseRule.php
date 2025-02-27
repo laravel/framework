@@ -5,6 +5,7 @@ namespace Illuminate\Validation\Rules;
 use Closure;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Validation\InvalidSoftDeleteQueryException;
 use Illuminate\Support\Collection;
 
 use function Illuminate\Support\enum_value;
@@ -184,6 +185,11 @@ trait DatabaseRule
      */
     public function withoutTrashed($deletedAtColumn = 'deleted_at')
     {
+        // Prevent logical conflict
+        if ($this->hasOnlyTrashed($deletedAtColumn)) {
+            throw new InvalidSoftDeleteQueryException("Cannot use 'withoutTrashed()' when 'onlyTrashed()' is already applied.");
+        }
+
         $this->whereNull($deletedAtColumn);
 
         return $this;
@@ -197,6 +203,11 @@ trait DatabaseRule
      */
     public function onlyTrashed($deletedAtColumn = 'deleted_at')
     {
+        // Prevent logical conflict
+        if ($this->hasWithoutTrashed($deletedAtColumn)) {
+            throw new InvalidSoftDeleteQueryException("Cannot use 'onlyTrashed()' when 'withoutTrashed()' is already applied.");
+        }
+
         $this->whereNotNull($deletedAtColumn);
 
         return $this;
@@ -235,5 +246,27 @@ trait DatabaseRule
         return (new Collection($this->wheres))->map(function ($where) {
             return $where['column'].','.'"'.str_replace('"', '""', $where['value']).'"';
         })->implode(',');
+    }
+
+    /**
+     * Check if 'onlyTrashed' is applied.
+     *
+     * @param  string  $deletedAtColumn
+     * @return bool
+     */
+    protected function hasOnlyTrashed($deletedAtColumn)
+    {
+        return collect($this->wheres)->contains(fn ($where) => $where['column'] === $deletedAtColumn && $where['value'] === 'NOT_NULL');
+    }
+
+    /**
+     * Check if 'withoutTrashed' is applied.
+     *
+     * @param  string  $deletedAtColumn
+     * @return bool
+     */
+    protected function hasWithoutTrashed($deletedAtColumn)
+    {
+        return collect($this->wheres)->contains(fn ($where) => $where['column'] === $deletedAtColumn && $where['value'] === 'NULL');
     }
 }
