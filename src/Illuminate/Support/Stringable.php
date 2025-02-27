@@ -1297,8 +1297,8 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      * Encode special characters in a string as HTML entities.
      *
      * @param  int  $flags
-     * @param  string $encoding
-     * @param  bool $doubleEncode
+     * @param  string  $encoding
+     * @param  bool  $doubleEncode
      * @return static
      */
     public function encodeHtmlEntities(int $flags = ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401, string $encoding = 'UTF-8', bool $doubleEncode = true)
