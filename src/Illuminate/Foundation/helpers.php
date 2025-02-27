@@ -348,7 +348,7 @@ if (! function_exists('csrf_field')) {
      */
     function csrf_field()
     {
-        return new HtmlString('<input type="hidden" name="_token" value="'.csrf_token().'" autocomplete="off">');
+        return new HtmlString('<input type="hidden" name="_token" value="'.csrf_token().'">');
     }
 }
 
