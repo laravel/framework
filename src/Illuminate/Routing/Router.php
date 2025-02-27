@@ -835,11 +835,10 @@ class Router implements BindingRegistrar, RegistrarContract
 
         $middleware = (new Collection($middleware))->map(function ($name) {
             return (array) MiddlewareNameResolver::resolve($name, $this->middleware, $this->middlewareGroups);
-        })->flatten()->reject(function ($name) use ($excluded) {
-            if (empty($excluded)) {
-                return false;
-            }
-
+        })->flatten()
+            ->when(
+                ! empty($excluded),
+                fn ($collection) => $collection->reject(function ($name) use ($excluded) {
             if ($name instanceof Closure) {
                 return false;
             }
@@ -857,7 +856,7 @@ class Router implements BindingRegistrar, RegistrarContract
             return (new Collection($excluded))->contains(
                 fn ($exclude) => class_exists($exclude) && $reflection->isSubclassOf($exclude)
             );
-        })->values();
+        }))->values();
 
         return $this->sortMiddleware($middleware);
     }
