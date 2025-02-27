@@ -531,7 +531,7 @@ class Arr
             $result = [];
 
             foreach ($keys as $key => $alias) {
-                if (!is_string($key)) {
+                if (! is_string($key)) {
                     $key = $alias;
                 }
 
