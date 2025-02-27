@@ -3348,10 +3348,9 @@ class Builder implements BuilderContract
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
      * @param  string|null  $key
-     * @param  bool  $returnOriginal
      * @return \Illuminate\Support\Collection<array-key, mixed>
      */
-    public function pluck($column, $key = null, $returnOriginal = false)
+    public function pluck($column, $key = null)
     {
         // First, we will need to select the results of the query accounting for the
         // given columns / key. Once we have the results, we will be able to take
@@ -3378,8 +3377,8 @@ class Builder implements BuilderContract
 
         return $this->applyAfterQueryCallbacks(
             is_array($queryResult[0])
-                    ? $this->pluckFromArrayColumn($queryResult, $column, $key, $returnOriginal)
-                    : $this->pluckFromObjectColumn($queryResult, $column, $key, $returnOriginal)
+                    ? $this->pluckFromArrayColumn($queryResult, $column, $key)
+                    : $this->pluckFromObjectColumn($queryResult, $column, $key)
         );
     }
 
@@ -3410,20 +3409,19 @@ class Builder implements BuilderContract
      * @param  array  $queryResult
      * @param  string  $column
      * @param  string  $key
-     * @param  bool  $needFullObject
      * @return \Illuminate\Support\Collection
      */
-    protected function pluckFromObjectColumn($queryResult, $column, $key, $needFullObject)
+    protected function pluckFromObjectColumn($queryResult, $column, $key)
     {
         $results = [];
 
         if (is_null($key)) {
             foreach ($queryResult as $row) {
-                $results[] = $needFullObject ? $row : $row->$column;
+                $results[] = $row->$column;
             }
         } else {
             foreach ($queryResult as $row) {
-                $results[$row->$key] = $needFullObject ? $row : $row->$column;
+                $results[$row->$key] = $row->$column;
             }
         }
 
@@ -3436,20 +3434,19 @@ class Builder implements BuilderContract
      * @param  array  $queryResult
      * @param  string  $column
      * @param  string  $key
-     * @param  bool  $needFullArray
      * @return \Illuminate\Support\Collection
      */
-    protected function pluckFromArrayColumn($queryResult, $column, $key, $needFullArray)
+    protected function pluckFromArrayColumn($queryResult, $column, $key)
     {
         $results = [];
 
         if (is_null($key)) {
             foreach ($queryResult as $row) {
-                $results[] = $needFullArray ? $row : $row[$column];
+                $results[] = $row[$column];
             }
         } else {
             foreach ($queryResult as $row) {
-                $results[$row[$key]] = $needFullArray ? $row : $row[$column];
+                $results[$row[$key]] = $row[$column];
             }
         }
 

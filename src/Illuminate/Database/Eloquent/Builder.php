@@ -988,11 +988,14 @@ class Builder implements BuilderContract
      */
     public function pluck($column, $key = null)
     {
-        $results = $this->toBase()->pluck($column, $key, true);
+        $results = $this->toBase()->get(array_filter([$column, $key]));
 
-        $column = $column instanceof Expression ? $column->getValue($this->getGrammar()) : $column;
+        $columnsStripper = \Closure::bind(function ($column) {
+            return $this->stripTableForPluck($column);
+        }, $query = $this->getQuery(), $query);
 
-        $column = Str::after($column, '.');
+        $column = $columnsStripper($column);
+        $key = $columnsStripper($key);
 
         // If the model has a mutator for the requested column, we will spin through
         // the results and mutate the values so that the mutated version of these
@@ -1000,13 +1003,19 @@ class Builder implements BuilderContract
         if (! $this->model->hasAnyGetMutator($column) &&
             ! $this->model->hasCast($column) &&
             ! in_array($column, $this->model->getDates())) {
-            $results = $results->map(fn ($result) => is_array($result) ? $result[$column] : $result->$column);
-
-            return $this->applyAfterQueryCallbacks($results);
+            return $this->applyAfterQueryCallbacks(
+                $results
+                    ->when($key, fn ($results, $key) => $results->keyBy($key))
+                    ->map(fn ($model) => $model->{$column}),
+            );
         }
 
         return $this->applyAfterQueryCallbacks(
-            $results->map(fn ($value) => $this->model->newFromBuilder((array) $value)->{$column})
+            $results
+                ->when($key, fn ($results, $key) => $results->keyBy($key))
+                ->map(function ($value) use ($column) {
+                    return $this->model->newFromBuilder((array) $value)->{$column};
+                })
         );
     }
 
