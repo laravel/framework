@@ -800,11 +800,23 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
      *
      * @template TMapValue
      *
-     * @param  callable(TValue, TKey): TMapValue  $callback
+     * @param  callable(TValue, TKey)|array<TKey, TKey>: TMapValue  $callback
      * @return static<TKey, TMapValue>
      */
-    public function map(callable $callback)
+    public function map(callable|array $callback)
     {
+        if (is_array($callback)) {
+            $callback = function ($value) use ($callback) {
+                $result = [];
+
+                foreach ($callback as $key => $alias) {
+                    $result[$alias] = is_object($value) ? $value->{$key} : Arr::get($value, $key);
+                }
+
+                return $result;
+            };
+        }
+
         return new static(function () use ($callback) {
             foreach ($this as $key => $value) {
                 yield $key => $callback($value, $key);
@@ -1005,11 +1017,15 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
                 foreach ($this as $item) {
                     $result = [];
 
-                    foreach ($keys as $key) {
+                    foreach ($keys as $key => $alias) {
+                        if (!is_string($key)) {
+                            $key = $alias;
+                        }
+
                         if (Arr::accessible($item) && Arr::exists($item, $key)) {
-                            $result[$key] = $item[$key];
+                            $result[$alias] = $item[$key];
                         } elseif (is_object($item) && isset($item->{$key})) {
-                            $result[$key] = $item->{$key};
+                            $result[$alias] = $item->{$key};
                         }
                     }
 
