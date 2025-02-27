@@ -829,7 +829,7 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     public function resolveMiddleware(array $middleware, array $excluded = [])
     {
-        $excluded = (new Collection($excluded))->map(function ($name) {
+        $excluded = $excluded === [] ? $excluded : (new Collection($excluded))->map(function ($name) {
             return (array) MiddlewareNameResolver::resolve($name, $this->middleware, $this->middlewareGroups);
         })->flatten()->values()->all();
 
