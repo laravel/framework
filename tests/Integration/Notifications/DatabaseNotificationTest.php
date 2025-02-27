@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Integration\Notifications;
 
-use Illuminate\Contracts\Notifications\Dispatcher;
 use Illuminate\Database\Eloquent\Casts\AsStringable;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Schema;
 use Orchestra\Testbench\Attributes\DefineDatabase;
@@ -25,7 +25,7 @@ class DatabaseNotificationTest extends TestCase
 
         $user = UuidUserFactoryStub::new()->create();
 
-        app(Dispatcher::class)->send($user, new NotificationStub);
+        $user->notify(new NotificationStub);
 
         Notification::assertSentTo($user, NotificationStub::class, function ($notification, $channels, $notifiable) use ($user) {
             return $notifiable === $user;
@@ -53,7 +53,7 @@ class UuidUserFactoryStub extends \Orchestra\Testbench\Factories\UserFactory
 
 class UuidUserStub extends \Illuminate\Foundation\Auth\User
 {
-    use HasUuids;
+    use HasUuids, Notifiable;
 
     protected $table = 'users';
 
