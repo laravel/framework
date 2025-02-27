@@ -1284,9 +1284,9 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     /**
      * Decode HTML entities in a string.
      *
-     * @param  int  $flags  A bitmask of flags (e.g., ENT_QUOTES, ENT_HTML5) to control decoding behavior
-     * @param  string  $encoding  The character encoding to use (e.g., 'UTF-8')
-     * @return string The decoded string
+     * @param  int  $flags
+     * @param  string  $encoding
+     * @return static
      */
     public function decodeHtmlEntities(int $flags = ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401, string $encoding = 'UTF-8')
     {
@@ -1296,9 +1296,10 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     /**
      * Encode special characters in a string as HTML entities.
      *
-     * @param  int  $flags  A bitmask of flags (e.g., ENT_QUOTES, ENT_HTML5) to control decoding behavior
-     * @param  string  $encoding  The character encoding to use (e.g., 'UTF-8')
-     * @return string The decoded string
+     * @param  int  $flags
+     * @param  string $encoding
+     * @param  bool $doubleEncode
+     * @return static
      */
     public function encodeHtmlEntities(int $flags = ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401, string $encoding = 'UTF-8', bool $doubleEncode = true)
     {

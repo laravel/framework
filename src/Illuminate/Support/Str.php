@@ -1841,7 +1841,7 @@ class Str
     /**
      * Decode HTML entities in a string.
      *
-     * @param  string  $flags
+     * @param  string  $string
      * @param  int  $flags
      * @param  string  $encoding
      * @return string
@@ -1854,7 +1854,7 @@ class Str
     /**
      * Encode special characters in a string as HTML entities.
      *
-     * @param  string  $flags
+     * @param  string  $string
      * @param  int  $flags
      * @param  string  $encoding
      * @param  bool  $doubleEncode
