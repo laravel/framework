@@ -455,7 +455,7 @@ class Repository
      * @param  array<string, mixed>  $hidden
      * @return mixed
      */
-    public function with(callable $callback, array $data = [], array $hidden = [])
+    public function scope(callable $callback, array $data = [], array $hidden = [])
     {
         $dataBefore = $this->data;
         $hiddenBefore = $this->hidden;

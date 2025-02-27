@@ -495,7 +495,7 @@ class ContextTest extends TestCase
         Str::createUuidsNormally();
     }
 
-    public function test_with_sets_keys_and_restores()
+    public function test_scope_sets_keys_and_restores()
     {
         $contextInClosure = [];
         $callback = function () use (&$contextInClosure) {
@@ -512,7 +512,7 @@ class ContextTest extends TestCase
         ]);
 
         try {
-            Context::with(
+            Context::scope(
                 $callback,
                 ['key1' => 'with', 'key3' => 'also-with'],
                 ['hiddenKey3' => 'foobar'],
