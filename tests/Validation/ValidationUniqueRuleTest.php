@@ -124,7 +124,6 @@ class ValidationUniqueRuleTest extends TestCase
         $rule->onlyTrashed();
         $rule->withoutTrashed(); // This should trigger the exception
     }
-
 }
 
 class EloquentModelStub extends Model
