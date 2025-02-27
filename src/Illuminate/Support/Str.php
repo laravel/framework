@@ -1848,7 +1848,7 @@ class Str
      */
     public static function decodeHtmlEntities(string $string, int $flags = ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401, string $encoding = 'UTF-8')
     {
-        return html_entity_decode($string);
+        return html_entity_decode($string, $flags, $encoding);
     }
 
     /**
@@ -1862,7 +1862,7 @@ class Str
      */
     public static function encodeHtmlEntities(string $string, int $flags = ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401, string $encoding = 'UTF-8', bool $doubleEncode = true)
     {
-        return htmlentities($string);
+        return htmlentities($string, $flags, $encoding, $doubleEncode);
     }
 
     /**
