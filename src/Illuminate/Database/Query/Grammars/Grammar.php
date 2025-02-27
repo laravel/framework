@@ -994,7 +994,7 @@ class Grammar extends BaseGrammar
      */
     protected function compileLimit(Builder $query, $limit)
     {
-        return 'limit '. $limit;
+        return 'limit '.$limit;
     }
 
     /**
