@@ -448,7 +448,7 @@ class Repository
     }
 
     /**
-     * Run the callback function with the given context values and restore to original state when complete.
+     * Run the callback function with the given context values and restore the original context state when complete.
      *
      * @param  callable  $callback
      * @param  array<string, mixed>  $data
@@ -463,6 +463,7 @@ class Repository
         if ($data !== []) {
             $this->add($data);
         }
+
         if ($hidden !== []) {
             $this->addHidden($hidden);
         }
