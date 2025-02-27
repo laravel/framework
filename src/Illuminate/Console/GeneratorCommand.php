@@ -159,8 +159,8 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
             return false;
         }
 
-        if ($this->doesNotStartWithLetter($this->getNameInput())) {
-            $this->components->error('The name "'.$this->getNameInput().'" must start with a letter, and not a number or special character.');
+        if ($this->doesNotStartWithLetterOrUnderscore($this->getNameInput())) {
+            $this->components->error('The name "'.$this->getNameInput().'" must start with a letter or underscore, and not a number or special character.');
 
             return false;
         }
@@ -479,9 +479,9 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
      * @param  string  $name
      * @return bool
      */
-    protected function doesNotStartWithLetter($name)
+    protected function doesNotStartWithLetterOrUnderscore($name)
     {
-        return !preg_match('/^[a-zA-Z].*/', $name);
+        return !preg_match('/(?:^|\/)[_a-zA-Z]/', $name);
     }
 
     /**
