@@ -1110,6 +1110,38 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertSame('drop type "alpha", "beta", "gamma" cascade', $statement);
     }
 
+    public function testDropAllTablesWithPrefixAndSchema()
+    {
+        $connection = $this->getConnection(prefix: 'prefix_');
+        $statement = $this->getGrammar($connection)->compileDropAllTables(['schema.alpha', 'schema.beta', 'schema.gamma']);
+
+        $this->assertSame('drop table "schema"."alpha", "schema"."beta", "schema"."gamma" cascade', $statement);
+    }
+
+    public function testDropAllViewsWithPrefixAndSchema()
+    {
+        $connection = $this->getConnection(prefix: 'prefix_');
+        $statement = $this->getGrammar($connection)->compileDropAllViews(['schema.alpha', 'schema.beta', 'schema.gamma']);
+
+        $this->assertSame('drop view "schema"."alpha", "schema"."beta", "schema"."gamma" cascade', $statement);
+    }
+
+    public function testDropAllTypesWithPrefixAndSchema()
+    {
+        $connection = $this->getConnection(prefix: 'prefix_');
+        $statement = $this->getGrammar($connection)->compileDropAllTypes(['schema.alpha', 'schema.beta', 'schema.gamma']);
+
+        $this->assertSame('drop type "schema"."alpha", "schema"."beta", "schema"."gamma" cascade', $statement);
+    }
+
+    public function testDropAllDomainsWithPrefixAndSchema()
+    {
+        $connection = $this->getConnection(prefix: 'prefix_');
+        $statement = $this->getGrammar($connection)->compileDropAllDomains(['schema.alpha', 'schema.beta', 'schema.gamma']);
+
+        $this->assertSame('drop type "schema"."alpha", "schema"."beta", "schema"."gamma" cascade', $statement);
+    }
+
     public function testCompileColumns()
     {
         $connection = $this->getConnection();
@@ -1122,10 +1154,11 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
 
     protected function getConnection(
         ?PostgresGrammar $grammar = null,
-        ?PostgresBuilder $builder = null
+        ?PostgresBuilder $builder = null,
+        string $prefix = ''
     ) {
         $connection = m::mock(Connection::class)
-            ->shouldReceive('getTablePrefix')->andReturn('')
+            ->shouldReceive('getTablePrefix')->andReturn($prefix)
             ->shouldReceive('getConfig')->with('prefix_indexes')->andReturn(null)
             ->getMock();
 
