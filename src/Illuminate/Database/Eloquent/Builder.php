@@ -1595,7 +1595,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     * Set the relationships that should be eager loaded.
+     * Specify relationships that should be eager loaded.
      *
      * @param  array<array-key, array|(\Closure(\Illuminate\Database\Eloquent\Relations\Relation<*,*,*>): mixed)|string>|string  $relations
      * @param  (\Closure(\Illuminate\Database\Eloquent\Relations\Relation<*,*,*>): mixed)|string|null  $callback
