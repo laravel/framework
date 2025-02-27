@@ -1677,6 +1677,20 @@ class SupportStrTest extends TestCase
         Str::createUlidsNormally();
     }
 
+    public function testIsEmail()
+    {
+        $this->assertTrue(Str::isEmail('test@example.com'));
+        $this->assertTrue(Str::isEmail('user.name+tag+sorting@example.com'));
+        $this->assertTrue(Str::isEmail('x@example.com'));
+        $this->assertTrue(Str::isEmail('example@s.solutions'));
+        $this->assertFalse(Str::isEmail('plainaddress'));
+        $this->assertFalse(Str::isEmail('missing@domain'));
+        $this->assertFalse(Str::isEmail('@missinguser.com'));
+        $this->assertFalse(Str::isEmail('user@.com'));
+        $this->assertFalse(Str::isEmail('user@domain..com'));
+        $this->assertFalse(Str::isEmail(''));
+    }
+
     public function testItCanSpecifyAFallbackForAUlidSequence()
     {
         Str::createUlidsUsingSequence(

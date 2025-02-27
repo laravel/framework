@@ -2041,6 +2041,16 @@ class Str
     }
 
     /**
+     * @param  string  $string
+     * @return bool
+     */
+    public static function isEmail(string $string)
+    {
+        return filter_var($string, FILTER_VALIDATE_EMAIL) !== false;
+    }
+
+
+    /**
      * Always return the same ULID when generating new ULIDs.
      *
      * @param  Closure|null  $callback
