@@ -530,11 +530,15 @@ class Arr
         return static::map($array, function ($item) use ($keys) {
             $result = [];
 
-            foreach ($keys as $key) {
+            foreach ($keys as $key => $alias) {
+                if (!is_string($key)) {
+                    $key = $alias;
+                }
+
                 if (Arr::accessible($item) && Arr::exists($item, $key)) {
-                    $result[$key] = $item[$key];
+                    $result[$alias] = $item[$key];
                 } elseif (is_object($item) && isset($item->{$key})) {
-                    $result[$key] = $item->{$key};
+                    $result[$alias] = $item->{$key};
                 }
             }
 

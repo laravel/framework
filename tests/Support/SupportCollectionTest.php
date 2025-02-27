@@ -4295,6 +4295,23 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testSelectWithAlias($collection)
+    {
+        $data = new $collection([
+            ['first' => 'Taylor', 'last' => 'Otwell', 'email' => 'taylorotwell@gmail.com'],
+            ['first' => 'Jess', 'last' => 'Archer', 'email' => 'jessarcher@gmail.com'],
+        ]);
+
+        $this->assertEquals([
+            ['name' => 'Taylor', 'surname' => 'Otwell'],
+            ['name' => 'Jess', 'surname' => 'Archer'],
+        ], $data->select([
+            'first' => 'name', 
+            'last' => 'surname',
+        ])->all());
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testGettingAvgItemsFromCollection($collection)
     {
         $c = new $collection([(object) ['foo' => 10], (object) ['foo' => 20]]);
