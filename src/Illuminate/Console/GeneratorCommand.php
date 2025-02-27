@@ -481,7 +481,7 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
      */
     protected function doesNotStartWithLetterOrUnderscore($name)
     {
-        return !preg_match('/(?:^|\/)[_a-zA-Z]/', $name);
+        return ! preg_match('/(?:^|\/)[_a-zA-Z]/', $name);
     }
 
     /**
