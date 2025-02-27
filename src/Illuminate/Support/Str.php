@@ -2041,14 +2041,15 @@ class Str
     }
 
     /**
-     * @param  string  $string
+     * Determine if a given value is valid Email.
+     *
+     * @param  string  $value
      * @return bool
      */
-    public static function isEmail(string $string)
+    public static function isEmail(string $value)
     {
-        return filter_var($string, FILTER_VALIDATE_EMAIL) !== false;
+        return filter_var($value, FILTER_VALIDATE_EMAIL) !== false;
     }
-
 
     /**
      * Always return the same ULID when generating new ULIDs.
