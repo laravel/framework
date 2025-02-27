@@ -682,11 +682,10 @@ class PostgresGrammar extends Grammar
      */
     public function escapeNames($names)
     {
-        return array_map(static function ($name) {
-            return '"'.(new Collection(explode('.', $name)))
-                ->map(fn ($segment) => trim($segment, '\'"'))
-                ->implode('"."').'"';
-        }, $names);
+        return array_map(
+            fn ($name) => (new Collection(explode('.', $name)))->map($this->wrapValue(...))->implode('.'),
+            $names
+        );
     }
 
     /**
