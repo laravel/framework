@@ -103,6 +103,21 @@ class ValidationUniqueRuleTest extends TestCase
         $rule->onlyTrashed('softdeleted_at');
         $this->assertSame('unique:table,NULL,NULL,id,softdeleted_at,"NOT_NULL"', (string) $rule);
     }
+
+    public function testItHandlesNullPrimaryKeyInIgnoreModel()
+    {
+        $model = new EloquentModelStub(['id_column' => null]);
+
+        $rule = new Unique('table', 'column');
+        $rule->ignore($model);
+        $rule->where('foo', 'bar');
+        $this->assertSame('unique:table,column,NULL,id_column,foo,"bar"', (string) $rule);
+
+        $rule = new Unique('table', 'column');
+        $rule->ignore($model, 'id_column');
+        $rule->where('foo', 'bar');
+        $this->assertSame('unique:table,column,NULL,id_column,foo,"bar"', (string) $rule);
+    }
 }
 
 class EloquentModelStub extends Model
