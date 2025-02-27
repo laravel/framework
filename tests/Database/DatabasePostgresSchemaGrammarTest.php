@@ -1139,7 +1139,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $connection = $this->getConnection(prefix: 'prefix_');
         $statement = $this->getGrammar($connection)->compileDropAllDomains(['schema.alpha', 'schema.beta', 'schema.gamma']);
 
-        $this->assertSame('drop type "schema"."alpha", "schema"."beta", "schema"."gamma" cascade', $statement);
+        $this->assertSame('drop domain "schema"."alpha", "schema"."beta", "schema"."gamma" cascade', $statement);
     }
 
     public function testCompileColumns()
