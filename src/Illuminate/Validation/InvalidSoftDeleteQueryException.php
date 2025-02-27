@@ -2,9 +2,9 @@
 
 namespace Illuminate\Validation;
 
-use RuntimeException;
+use LogicException;
 
-class InvalidSoftDeleteQueryException extends RuntimeException
+class InvalidSoftDeleteQueryException extends LogicException
 {
     //
 }
