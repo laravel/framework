@@ -27,6 +27,7 @@ namespace Illuminate\Support\Facades;
  * @method static mixed popHidden(string $key)
  * @method static bool stackContains(string $key, mixed $value, bool $strict = false)
  * @method static bool hiddenStackContains(string $key, mixed $value, bool $strict = false)
+ * @method static mixed scope(callable $callback, array $data = [], array $hidden = [])
  * @method static bool isEmpty()
  * @method static \Illuminate\Log\Context\Repository dehydrating(callable $callback)
  * @method static \Illuminate\Log\Context\Repository hydrated(callable $callback)
