@@ -72,6 +72,7 @@ class Builder implements BuilderContract
         'where' => [],
         'groupBy' => [],
         'having' => [],
+        'limit' => [],
         'order' => [],
         'union' => [],
         'unionOrder' => [],
@@ -2748,6 +2749,23 @@ class Builder implements BuilderContract
         if ($value >= 0) {
             $this->$property = ! is_null($value) ? (int) $value : null;
         }
+
+        return $this;
+    }
+
+    /**
+     * Set the "limit" value of the query as a raw SQL statement.
+     *
+     * @param  string  $sql
+     * @param  array  $bindings
+     * @return $this
+     */
+    public function limitRaw($sql, $bindings = [])
+    {
+        $property = $this->unions ? 'unionLimit' : 'limit';
+
+        $this->$property = $sql;
+        $this->addBinding($bindings, $property);
 
         return $this;
     }
