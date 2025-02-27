@@ -1839,6 +1839,33 @@ class Str
     }
 
     /**
+     * Decode HTML entities in a string.
+     *
+     * @param  string  $flags
+     * @param  int  $flags
+     * @param  string  $encoding
+     * @return string
+     */
+    public static function decodeHtmlEntities(string $string, int $flags = ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401, string $encoding = 'UTF-8')
+    {
+        return html_entity_decode($string);
+    }
+
+    /**
+     * Encode special characters in a string as HTML entities.
+     *
+     * @param  string  $flags
+     * @param  int  $flags
+     * @param  string  $encoding
+     * @param  bool  $doubleEncode
+     * @return string
+     */
+    public static function encodeHtmlEntities(string $string, int $flags = ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401, string $encoding = 'UTF-8', bool $doubleEncode = true)
+    {
+        return htmlentities($string);
+    }
+
+    /**
      * Generate a UUID (version 4).
      *
      * @return \Ramsey\Uuid\UuidInterface

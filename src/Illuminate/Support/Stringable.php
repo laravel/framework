@@ -1282,6 +1282,30 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Decode HTML entities in a string.
+     *
+     * @param  int  $flags  A bitmask of flags (e.g., ENT_QUOTES, ENT_HTML5) to control decoding behavior
+     * @param  string  $encoding  The character encoding to use (e.g., 'UTF-8')
+     * @return string The decoded string
+     */
+    public function decodeHtmlEntities(int $flags = ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401, string $encoding = 'UTF-8')
+    {
+        return new static(Str::decodeHtmlEntities($this->value, $flags, $encoding));
+    }
+
+    /**
+     * Encode special characters in a string as HTML entities.
+     *
+     * @param  int  $flags  A bitmask of flags (e.g., ENT_QUOTES, ENT_HTML5) to control decoding behavior
+     * @param  string  $encoding  The character encoding to use (e.g., 'UTF-8')
+     * @return string The decoded string
+     */
+    public function encodeHtmlEntities(int $flags = ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401, string $encoding = 'UTF-8', bool $doubleEncode = true)
+    {
+        return new static(Str::encodeHtmlEntities($this->value, $flags, $encoding));
+    }
+
+    /**
      * Wrap the string with the given strings.
      *
      * @param  string  $before

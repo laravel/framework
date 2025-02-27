@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Support;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
+use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
 use League\CommonMark\Environment\EnvironmentBuilderInterface;
 use League\CommonMark\Extension\ExtensionInterface;
@@ -1280,6 +1281,20 @@ class SupportStringableTest extends TestCase
         $this->assertEquals('value', $this->stringable('"value"')->unwrap('"'));
         $this->assertEquals('bar', $this->stringable('foo-bar-baz')->unwrap('foo-', '-baz'));
         $this->assertEquals('some: "json"', $this->stringable('{some: "json"}')->unwrap('{', '}'));
+    }
+
+    public function testDecodeHtmlEntities()
+    {
+        $this->assertEquals('value & bar', $this->stringable('value &amp; bar')->decodeHtmlEntities());
+        $this->assertEquals('love & "laravel"', $this->stringable('love &amp; &quot;laravel&quot;')->decodeHtmlEntities());
+        $this->assertEquals('laravel ñ', $this->stringable('laravel &#241;')->decodeHtmlEntities());
+    }
+
+    public function testEncodeHtmlEntities()
+    {
+        $this->assertEquals('love &amp; laravel', $this->stringable('love & laravel')->encodeHtmlEntities());
+        $this->assertEquals('love &amp; &quot;laravel&quot;', $this->stringable('love & "laravel"')->encodeHtmlEntities());
+        $this->assertEquals('love &ntilde; &amp; laravel', $this->stringable('love ñ & laravel')->encodeHtmlEntities());
     }
 
     public function testToHtmlString()

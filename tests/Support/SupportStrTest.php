@@ -1306,6 +1306,21 @@ class SupportStrTest extends TestCase
         $this->assertEquals('❤Multi<br />Byte☆❤☆❤☆❤', Str::wordWrap('❤Multi Byte☆❤☆❤☆❤', 3, '<br />'));
     }
 
+    public function testDecodeHtmlEntities()
+    {
+        $this->assertEquals('Hello & World', Str::decodeHtmlEntities('Hello &amp; World'));
+        $this->assertEquals('Hello & "World"', Str::decodeHtmlEntities('Hello &amp; &quot;World&quot;', ENT_QUOTES));
+        $this->assertEquals('Hello ñ', Str::decodeHtmlEntities('Hello &#241;'));
+        $this->assertEquals('Hello ñ☆❤☆❤☆❤', Str::decodeHtmlEntities('Hello &#241;☆❤☆❤☆❤'));
+    }
+
+    public function testEncodeHtmlEntities()
+    {
+        $this->assertEquals('Hello &amp; World', Str::encodeHtmlEntities('Hello & World'));
+        $this->assertEquals('Hello &amp; &quot;World&quot;', Str::encodeHtmlEntities('Hello & "World"'));
+        $this->assertEquals('Hello &ntilde; &amp; World', Str::encodeHtmlEntities('Hello ñ & World'));
+    }
+
     public static function validUuidList()
     {
         return [
