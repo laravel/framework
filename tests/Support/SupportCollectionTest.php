@@ -2913,6 +2913,23 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testMapWithDictionary($collection)
+    {
+        $data = new $collection([
+            ['first' => 'Taylor', 'last' => 'Otwell', 'email' => 'taylorotwell@gmail.com'],
+            ['first' => 'Jess', 'last' => 'Archer', 'email' => 'jessarcher@gmail.com'],
+        ]);
+
+        $this->assertEquals([
+            ['name' => 'Taylor', 'surname' => 'Otwell'],
+            ['name' => 'Jess', 'surname' => 'Archer'],
+        ], $data->map([
+            'first' => 'name', 
+            'last' => 'surname',
+        ])->all());
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testMapSpread($collection)
     {
         $c = new $collection([[1, 'a'], [2, 'b']]);
