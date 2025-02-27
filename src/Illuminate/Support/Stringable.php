@@ -1303,7 +1303,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      */
     public function encodeHtmlEntities(int $flags = ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401, string $encoding = 'UTF-8', bool $doubleEncode = true)
     {
-        return new static(Str::encodeHtmlEntities($this->value, $flags, $encoding));
+        return new static(Str::encodeHtmlEntities($this->value, $flags, $encoding, $doubleEncode));
     }
 
     /**
