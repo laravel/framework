@@ -2924,7 +2924,7 @@ class SupportCollectionTest extends TestCase
             ['name' => 'Taylor', 'surname' => 'Otwell'],
             ['name' => 'Jess', 'surname' => 'Archer'],
         ], $data->map([
-            'first' => 'name', 
+            'first' => 'name',
             'last' => 'surname',
         ])->all());
     }
@@ -4323,7 +4323,7 @@ class SupportCollectionTest extends TestCase
             ['name' => 'Taylor', 'surname' => 'Otwell'],
             ['name' => 'Jess', 'surname' => 'Archer'],
         ], $data->select([
-            'first' => 'name', 
+            'first' => 'name',
             'last' => 'surname',
         ])->all());
     }
