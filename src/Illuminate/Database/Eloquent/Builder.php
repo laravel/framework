@@ -988,11 +988,11 @@ class Builder implements BuilderContract
      */
     public function pluck($column, $key = null)
     {
-        $results = $this->toBase()->get();
+        $results = $this->toBase()->pluck($column, $key, true);
 
         $column = $column instanceof Expression ? $column->getValue($this->getGrammar()) : $column;
 
-        $column = Str::after($column, "{$this->model->getTable()}.");
+        $column = Str::after($column, '.');
 
         // If the model has a mutator for the requested column, we will spin through
         // the results and mutate the values so that the mutated version of these
@@ -1000,22 +1000,13 @@ class Builder implements BuilderContract
         if (! $this->model->hasAnyGetMutator($column) &&
             ! $this->model->hasCast($column) &&
             ! in_array($column, $this->model->getDates())) {
-            $results = $results
-                ->when(
-                    $key === null,
-                    fn ($results) => $results->map(fn ($result) => $result->$column),
-                    fn ($results) => $results->mapWithKeys(fn ($result) => [$result->$key => $result->$column])
-                );
+            $results = $results->map(fn ($result) => is_array($result) ? $result[$column] : $result->$column);
 
             return $this->applyAfterQueryCallbacks($results);
         }
 
         return $this->applyAfterQueryCallbacks(
-            $results->when(
-                $key === null,
-                fn ($results) => $results->map(fn ($value) => $this->model->newFromBuilder((array) $value)->{$column}),
-                fn ($results) => $results->mapWithKeys(fn ($value) => [$value->$key => $this->model->newFromBuilder((array) $value)->{$column}])
-            )
+            $results->map(fn ($value) => $this->model->newFromBuilder((array) $value)->{$column})
         );
     }
 
