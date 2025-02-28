@@ -6,6 +6,7 @@ use DateTimeInterface;
 use Exception;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Model as Eloquent;
@@ -163,6 +164,14 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $this->schema($connection)->create('non_incrementing_users', function ($table) {
             $table->string('name')->nullable();
+        });
+
+        $this->schema('default')->create('user_with_attributes', function ($table) {
+            $table->increments('id');
+            $table->string('name')->nullable();
+            $table->string('first_name');
+            $table->string('last_name');
+            $table->timestamps();
         });
     }
 
@@ -936,6 +945,18 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $this->assertEquals(['taylorotwell@gmail.com', 'abigailotwell@gmail.com'], $simple);
         $this->assertEquals([1 => 'taylorotwell@gmail.com', 2 => 'abigailotwell@gmail.com'], $keyed);
+    }
+
+    public function testPluckWithAttribute()
+    {
+        EloquentTestUserWithAttribute::create(['id' => 1, 'first_name' => 'taylor', 'last_name' => 'otwell']);
+        EloquentTestUserWithAttribute::create(['id' => 2, 'first_name' => 'abigail', 'last_name' => 'otwell', 'name' => 'Abigail Otwell']);
+
+        $simpleResult = EloquentTestUserWithAttribute::select('id', 'first_name', 'last_name', 'name')->pluck('name')->all();
+        $keyedResult = EloquentTestUserWithAttribute::select('id', 'first_name', 'last_name', 'name')->pluck('name', 'id')->all();
+
+        $this->assertEquals(['taylor otwell', 'Abigail Otwell'], $simpleResult);
+        $this->assertEquals([1 => 'taylor otwell', 2 => 'Abigail Otwell'], $keyedResult);
     }
 
     public function testPluckWithJoin()
@@ -2784,5 +2805,19 @@ class EloquentTouchingCategory extends Eloquent
     public function children()
     {
         return $this->hasMany(EloquentTouchingCategory::class, 'parent_id')->chaperone();
+    }
+}
+
+class EloquentTestUserWithAttribute extends Eloquent
+{
+    protected $table = 'user_with_attributes';
+    protected $guarded = [];
+
+    protected function name(): Attribute
+    {
+        return Attribute::get(fn ($value) => match(true) {
+            filled($value) => $value,
+            default => $this->first_name.' '.$this->last_name,
+        });
     }
 }

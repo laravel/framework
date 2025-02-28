@@ -990,7 +990,7 @@ class Builder implements BuilderContract
     {
         $results = $this->toBase()->get(array_filter([$column, $key]));
 
-        $columnsStripper = \Closure::bind(function ($column) {
+        $columnsStripper = Closure::bind(function ($column) {
             return $this->stripTableForPluck($column);
         }, $query = $this->getQuery(), $query);
 
