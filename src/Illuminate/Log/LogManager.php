@@ -65,13 +65,12 @@ class LogManager implements LoggerInterface
      */
     protected $dateFormat = 'Y-m-d H:i:s';
 
-
     /**
      * Processor for adding Context variables to the log.
      *
      * @var (\Closure(\Monolog\LogRecord): \Monolog\LogRecord|null)|class-string<\Monolog\Processor\ProcessorInterface>|null
      */
-    protected $contextLogProcessor = null;
+    protected $addContextToLogProcessor = null;
 
     /**
      * Create a new Log manager instance.
@@ -151,10 +150,8 @@ class LogManager implements LoggerInterface
                 )->withContext($this->sharedContext);
 
                 if (method_exists($loggerWithContext->getLogger(), 'pushProcessor')) {
-                    $logProcessor = $this->contextLogProcessor;
-                    if ($logProcessor === null) {
-                        $logProcessor = $this->addContextToLogProcessor(...);
-                    } elseif (is_string($logProcessor) && class_exists($logProcessor)) {
+                    $logProcessor = $this->addContextToLogProcessor ?? $this->defaultAddContextToLogProcessor(...);
+                    if (is_string($logProcessor) && class_exists($logProcessor)) {
                         $logProcessor = $this->app->make($logProcessor);
                     }
 
@@ -600,12 +597,12 @@ class LogManager implements LoggerInterface
     /**
      * Set the log processor to append Context values to the log.
      *
-     * @param (\Closure(\Monolog\LogRecord): \Monolog\LogRecord|null)|class-string<\Monolog\Processor\ProcessorInterface>|null $callback
+     * @param  (\Closure(\Monolog\LogRecord): \Monolog\LogRecord|null)|class-string<\Monolog\Processor\ProcessorInterface>|null  $callback
      * @return $this
      */
-    public function setContextToLogProcessor($callback)
+    public function setAddContextToLogProcessor($callback)
     {
-        $this->contextLogProcessor = $callback;
+        $this->addContextToLogProcessor = $callback;
 
         return $this;
     }
@@ -614,7 +611,7 @@ class LogManager implements LoggerInterface
      * @param  \Monolog\LogRecord  $record
      * @return \Monolog\LogRecord|null
      */
-    protected function addContextToLogProcessor($record)
+    protected function defaultAddContextToLogProcessor($record)
     {
         if (! $this->app->bound(ContextRepository::class)) {
             return $record;
