@@ -494,6 +494,56 @@ class ContextTest extends TestCase
         file_put_contents($path, '');
         Str::createUuidsNormally();
     }
+
+    public function test_scope_sets_keys_and_restores()
+    {
+        $contextInClosure = [];
+        $callback = function () use (&$contextInClosure) {
+            $contextInClosure = ['data' => Context::all(), 'hidden' => Context::allHidden()];
+
+            throw new Exception('test_with_sets_keys_and_restores');
+        };
+
+        Context::add('key1', 'value1');
+        Context::add('key2', 123);
+        Context::addHidden([
+            'hiddenKey1' => 'hello',
+            'hiddenKey2' => 'world',
+        ]);
+
+        try {
+            Context::scope(
+                $callback,
+                ['key1' => 'with', 'key3' => 'also-with'],
+                ['hiddenKey3' => 'foobar'],
+            );
+
+            $this->fail('No exception was thrown.');
+        } catch (Exception) {
+        }
+
+        $this->assertEqualsCanonicalizing([
+            'data' => [
+                'key1' => 'with',
+                'key2' => 123,
+                'key3' => 'also-with',
+            ],
+            'hidden' => [
+                'hiddenKey1' => 'hello',
+                'hiddenKey2' => 'world',
+                'hiddenKey3' => 'foobar',
+            ],
+        ], $contextInClosure);
+
+        $this->assertEqualsCanonicalizing([
+            'key1' => 'value1',
+            'key2' => 123,
+        ], Context::all());
+        $this->assertEqualsCanonicalizing([
+            'hiddenKey1' => 'hello',
+            'hiddenKey2' => 'world',
+        ], Context::allHidden());
+    }
 }
 
 enum Suit
