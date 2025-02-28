@@ -57,6 +57,7 @@ use Illuminate\Support\Testing\Fakes\MailFake;
  * @method static bool hasSent(string $mailable)
  * @method static \Illuminate\Support\Collection queued(string|\Closure $mailable, callable|null $callback = null)
  * @method static bool hasQueued(string $mailable)
+ * @method static void queueMailsByDefault(bool $shouldQueue = true)
  *
  * @see \Illuminate\Mail\MailManager
  * @see \Illuminate\Support\Testing\Fakes\MailFake
