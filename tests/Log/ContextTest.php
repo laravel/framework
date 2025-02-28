@@ -559,7 +559,7 @@ class ContextTest extends TestCase
         $path = storage_path('logs/laravel.log');
         file_put_contents($path, '');
 
-        Log::setAddContextToLogProcessor(function(LogRecord $record): LogRecord {
+        Log::setAddContextToLogProcessor(function (LogRecord $record): LogRecord {
             $logChannel = Context::getHidden('log_channel_name');
 
             return $record->with(
@@ -573,7 +573,7 @@ class ContextTest extends TestCase
         Context::addHidden('log_channel_name', 'closure-test');
         Context::add(['value_from_context' => 'hello']);
 
-        Log::info("This is an info log.", ['value_from_log_info_context' => 'foo']);
+        Log::info('This is an info log.', ['value_from_log_info_context' => 'foo']);
 
         $log = Str::after(file_get_contents($path), '] ');
         $this->assertSame('closure-test.INFO: This is an info log. {"value_from_context":"hello","value_from_log_info_context":"foo"}', Str::trim($log));
@@ -595,6 +595,8 @@ class ContextTest extends TestCase
             'testing.INFO: This is an info log. {"value_from_log_info_context":"foo","inside of MyAddContextProcessor":true}',
             Str::trim($log)
         );
+
+        file_put_contents($path, '');
     }
 }
 
