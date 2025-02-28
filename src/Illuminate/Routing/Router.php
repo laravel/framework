@@ -829,35 +829,35 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     public function resolveMiddleware(array $middleware, array $excluded = [])
     {
-        $excluded = (new Collection($excluded))->map(function ($name) {
+        $excluded = $excluded === [] ? $excluded : (new Collection($excluded))->map(function ($name) {
             return (array) MiddlewareNameResolver::resolve($name, $this->middleware, $this->middlewareGroups);
         })->flatten()->values()->all();
 
         $middleware = (new Collection($middleware))->map(function ($name) {
             return (array) MiddlewareNameResolver::resolve($name, $this->middleware, $this->middlewareGroups);
-        })->flatten()->reject(function ($name) use ($excluded) {
-            if (empty($excluded)) {
-                return false;
-            }
+        })->flatten()
+            ->when(
+                ! empty($excluded),
+                fn ($collection) => $collection->reject(function ($name) use ($excluded) {
+                    if ($name instanceof Closure) {
+                        return false;
+                    }
 
-            if ($name instanceof Closure) {
-                return false;
-            }
+                    if (in_array($name, $excluded, true)) {
+                        return true;
+                    }
 
-            if (in_array($name, $excluded, true)) {
-                return true;
-            }
+                    if (! class_exists($name)) {
+                        return false;
+                    }
 
-            if (! class_exists($name)) {
-                return false;
-            }
+                    $reflection = new ReflectionClass($name);
 
-            $reflection = new ReflectionClass($name);
-
-            return (new Collection($excluded))->contains(
-                fn ($exclude) => class_exists($exclude) && $reflection->isSubclassOf($exclude)
-            );
-        })->values();
+                    return (new Collection($excluded))->contains(
+                        fn ($exclude) => class_exists($exclude) && $reflection->isSubclassOf($exclude)
+                    );
+                })
+            )->values();
 
         return $this->sortMiddleware($middleware);
     }
