@@ -42,5 +42,9 @@ class EmailValidationTest extends TestCase
         ]);
 
         $this->assertFalse($validator->passes());
+
+        $this->assertSame([
+            0 => __('validation.email', ['attribute' => sprintf('emails.%s', str_replace('_', ' ', $attribute))]),
+        ], $validator->messages()->all());
     }
 }

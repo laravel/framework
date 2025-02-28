@@ -42,5 +42,9 @@ class PasswordValidationTest extends TestCase
         ]);
 
         $this->assertFalse($validator->passes());
+
+        $this->assertSame([
+            0 => sprintf('The passwords.%s field must be at least 8 characters.', str_replace('_', ' ', $attribute)),
+        ], $validator->messages()->all());
     }
 }

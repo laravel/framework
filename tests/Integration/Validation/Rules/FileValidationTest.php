@@ -42,9 +42,13 @@ class FileValidationTest extends TestCase
                 $attribute => $file,
             ],
         ], [
-            'files.*' => ['required', File::types(['image/png', 'image/jpeg'])],
+            'files.*' => ['required', File::types($mimes = ['image/png', 'image/jpeg'])],
         ]);
 
         $this->assertFalse($validator->passes());
+
+        $this->assertSame([
+            0 => __('validation.mimetypes', ['attribute' => sprintf('files.%s', str_replace('_', ' ', $attribute)), 'values' => implode(', ', $mimes)]),
+        ], $validator->messages()->all());
     }
 }

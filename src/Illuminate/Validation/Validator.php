@@ -307,11 +307,11 @@ class Validator implements ValidatorContract
     protected $defaultNumericRules = ['Numeric', 'Integer', 'Decimal'];
 
     /**
-     * The current placeholder for dots in rule keys.
+     * The current random hash for the validator.
      *
      * @var string
      */
-    protected $dotPlaceholder;
+    protected $ramdomHash;
 
     /**
      * The exception to throw upon failure.
@@ -344,7 +344,7 @@ class Validator implements ValidatorContract
         array $messages = [],
         array $attributes = [],
     ) {
-        $this->dotPlaceholder = Str::random();
+        $this->ramdomHash = Str::random();
 
         $this->initialRules = $rules;
         $this->translator = $translator;
@@ -372,7 +372,7 @@ class Validator implements ValidatorContract
 
             $key = str_replace(
                 ['.', '*'],
-                [$this->dotPlaceholder, '__asterisk__'.$this->dotPlaceholder],
+                ['__dot__'.$this->ramdomHash, '__asterisk__'.$this->ramdomHash],
                 $key
             );
 
@@ -410,7 +410,7 @@ class Validator implements ValidatorContract
     protected function replacePlaceholderInString(string $value)
     {
         return str_replace(
-            [$this->dotPlaceholder, '__asterisk__'.$this->dotPlaceholder],
+            ['__dot__'.$this->ramdomHash, '__asterisk__'.$this->ramdomHash],
             ['.', '*'],
             $value
         );
@@ -425,7 +425,7 @@ class Validator implements ValidatorContract
     protected function replaceDotPlaceholderInParameters(array $parameters)
     {
         return array_map(function ($field) {
-            return str_replace($this->dotPlaceholder, '.', $field);
+            return str_replace('__dot__'.$this->ramdomHash, '.', $field);
         }, $parameters);
     }
 
@@ -746,7 +746,7 @@ class Validator implements ValidatorContract
     protected function replaceDotInParameters(array $parameters)
     {
         return array_map(function ($field) {
-            return str_replace('\.', $this->dotPlaceholder, $field);
+            return str_replace('\.', '__dot__'.$this->ramdomHash, $field);
         }, $parameters);
     }
 
@@ -884,6 +884,12 @@ class Validator implements ValidatorContract
         $value = is_array($value) ? $this->replacePlaceholders($value) : $value;
 
         if ($rule instanceof ValidatorAwareRule) {
+            if ($attribute !== $originalAttribute) {
+                $this->addCustomAttributes([
+                    $attribute => $this->customAttributes[$originalAttribute] ?? $originalAttribute,
+                ]);
+            }
+
             $rule->setValidator($this);
         }
 
@@ -1196,7 +1202,7 @@ class Validator implements ValidatorContract
     {
         return (new Collection($this->rules))
             ->mapWithKeys(fn ($value, $key) => [
-                str_replace($this->dotPlaceholder, '\\.', $key) => $value,
+                str_replace('__dot__'.$this->ramdomHash, '\\.', $key) => $value,
             ])
             ->all();
     }
@@ -1210,7 +1216,7 @@ class Validator implements ValidatorContract
     public function setRules(array $rules)
     {
         $rules = (new Collection($rules))->mapWithKeys(function ($value, $key) {
-            return [str_replace('\.', $this->dotPlaceholder, $key) => $value];
+            return [str_replace('\.', '__dot__'.$this->ramdomHash, $key) => $value];
         })->toArray();
 
         $this->initialRules = $rules;
