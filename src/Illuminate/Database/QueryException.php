@@ -89,16 +89,6 @@ class QueryException extends PDOException
     }
 
     /**
-     * Get the bindings for the query.
-     *
-     * @return array
-     */
-    public function getBindings()
-    {
-        return $this->bindings;
-    }
-
-    /**
      * Get the raw SQL representation of the query with embedded bindings.
      */
     public function getRawSql(): string
@@ -106,5 +96,15 @@ class QueryException extends PDOException
         return DB::connection($this->getConnectionName())
             ->getQueryGrammar()
             ->substituteBindingsIntoRawSql($this->getSql(), $this->getBindings());
+    }
+
+    /**
+     * Get the bindings for the query.
+     *
+     * @return array
+     */
+    public function getBindings()
+    {
+        return $this->bindings;
     }
 }
