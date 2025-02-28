@@ -203,6 +203,8 @@ class Markdown
     /**
      * Resolve the Markdown Converter.
      *
+     * @internal
+     *
      * @param  array  $config
      * @return \League\CommonMark\MarkdownConverter
      */
