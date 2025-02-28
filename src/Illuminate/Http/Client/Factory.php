@@ -322,7 +322,7 @@ class Factory
      *
      * @return $this
      */
-    protected function record()
+    public function record()
     {
         $this->recording = true;
 
