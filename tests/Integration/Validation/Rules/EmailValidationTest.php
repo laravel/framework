@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Integration\Validation\Rules;
 
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Email;
 use Orchestra\Testbench\TestCase;
