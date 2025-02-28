@@ -595,6 +595,7 @@ class ContextTest extends TestCase
             'testing.INFO: This is an info log. {"value_from_log_info_context":"foo","inside of MyAddContextProcessor":true}',
             Str::trim($log)
         );
+        $this->assertTrue(MyAddContextProcessor::$wasConstructed);
 
         file_put_contents($path, '');
     }
