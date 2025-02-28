@@ -205,7 +205,7 @@ class Markdown
      *
      * @internal
      *
-     * @param  array  $config
+     * @param  array<string, mixed>  $config
      * @return \League\CommonMark\MarkdownConverter
      */
     public static function converter(array $config = [])
