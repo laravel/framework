@@ -2815,7 +2815,7 @@ class EloquentTestUserWithAttribute extends Eloquent
 
     protected function name(): Attribute
     {
-        return Attribute::get(fn ($value) => match(true) {
+        return Attribute::get(fn ($value) => match (true) {
             filled($value) => $value,
             default => $this->first_name.' '.$this->last_name,
         });
