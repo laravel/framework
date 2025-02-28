@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Database;
 
-
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\QueryException;
