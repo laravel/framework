@@ -26,7 +26,7 @@ class EncodedHtmlString extends HtmlString
     /**
      * Convert using default encoding.
      *
-     * @param  string  $value
+     * @param  string|null  $value
      * @param  int  $flag
      * @param  string  $encoding
      * @param  bool  $doubleEncode
