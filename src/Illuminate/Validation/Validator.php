@@ -372,7 +372,7 @@ class Validator implements ValidatorContract
 
             $key = str_replace(
                 ['.', '*'],
-                [$this->dotPlaceholder, '__asterisk__'],
+                [$this->dotPlaceholder, '__asterisk__'.$this->dotPlaceholder],
                 $key
             );
 
@@ -410,7 +410,7 @@ class Validator implements ValidatorContract
     protected function replacePlaceholderInString(string $value)
     {
         return str_replace(
-            [$this->dotPlaceholder, '__asterisk__'],
+            [$this->dotPlaceholder, '__asterisk__'.$this->dotPlaceholder],
             ['.', '*'],
             $value
         );

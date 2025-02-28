@@ -4,11 +4,11 @@ namespace Illuminate\Tests\Integration\Validation\Rules;
 
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rules\File;
+use Illuminate\Validation\Rules\Password;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\TestWith;
 
-class FileValidationTest extends TestCase
+class PasswordValidationTest extends TestCase
 {
     #[TestWith(['0'])]
     #[TestWith(['.'])]
@@ -16,14 +16,12 @@ class FileValidationTest extends TestCase
     #[TestWith(['__asterisk__'])]
     public function test_it_can_validate_attribute_as_array(string $attribute)
     {
-        $file = UploadedFile::fake()->create('laravel.png', 1, 'image/png');
-
         $validator = Validator::make([
-            'files' => [
-                $attribute => $file,
+            'passwords' => [
+                $attribute => 'secret',
             ],
         ], [
-            'files.*' => ['required', File::types(['image/png', 'image/jpeg'])],
+            'passwords.*' => ['required', Password::default()->min(6)],
         ]);
 
         $this->assertTrue($validator->passes());
@@ -35,14 +33,12 @@ class FileValidationTest extends TestCase
     #[TestWith(['__asterisk__'])]
     public function test_it_can_validate_attribute_as_array_when_validation_should_fails(string $attribute)
     {
-        $file = UploadedFile::fake()->create('laravel.php', 1, 'image/php');
-
         $validator = Validator::make([
-            'files' => [
-                $attribute => $file,
+            'passwords' => [
+                $attribute => 'secret',
             ],
         ], [
-            'files.*' => ['required', File::types(['image/png', 'image/jpeg'])],
+            'passwords.*' => ['required', Password::default()->min(8)],
         ]);
 
         $this->assertFalse($validator->passes());
