@@ -2,10 +2,10 @@
 
 namespace Illuminate\Database;
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use PDOException;
 use Throwable;
-use Illuminate\Support\Facades\DB;
 
 class QueryException extends PDOException
 {
@@ -65,7 +65,7 @@ class QueryException extends PDOException
      */
     protected function formatMessage($connectionName, $sql, $bindings, Throwable $previous)
     {
-        return $previous->getMessage().' (Connection: '.$connectionName.', SQL: '.Str::replaceArray('?', $bindings, $sql).')';
+        return $previous->getMessage() . ' (Connection: ' . $connectionName . ', SQL: ' . Str::replaceArray('?', $bindings, $sql) . ')';
     }
 
     /**
