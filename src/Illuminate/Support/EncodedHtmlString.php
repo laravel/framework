@@ -24,6 +24,20 @@ class EncodedHtmlString extends HtmlString
     }
 
     /**
+     * Convert using default encoding.
+     *
+     * @param  string  $value
+     * @param  int  $flag
+     * @param  string  $encoding
+     * @param  bool  $doubleEncode
+     * @return string
+     */
+    public static function convert($value, int $flag = ENT_QUOTES | ENT_SUBSTITUTE, string $encoding = 'UTF-8', bool $doubleEncode = true)
+    {
+        return htmlspecialchars($value ?? '', $flag, $encoding, $doubleEncode);
+    }
+
+    /**
      * Get the HTML string.
      *
      * @return string
@@ -32,7 +46,7 @@ class EncodedHtmlString extends HtmlString
     public function toHtml()
     {
         return (static::$encodeUsingFactory ?? function ($value, bool $doubleEncode) {
-            return htmlspecialchars($value ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8', $doubleEncode);
+            return static::convert($value, doubleEncode: $doubleEncode);
         })($this->html, $this->doubleEncode);
     }
 
