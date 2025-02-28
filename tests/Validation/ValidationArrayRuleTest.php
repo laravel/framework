@@ -55,6 +55,18 @@ class ValidationArrayRuleTest extends TestCase
         $v = new Validator($trans, ['foo' => 'not an array'], ['foo' => Rule::array()]);
         $this->assertTrue($v->fails());
 
+        $v = new Validator($trans, ['foo' => (object) ['key_1' => 'bar']], ['foo' => Rule::array()]);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['foo' => null], ['foo' => ['nullable', Rule::array()]]);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => []], ['foo' => Rule::array()]);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => ['key_1' => []]], ['foo' => Rule::array(['key_1'])]);
+        $this->assertTrue($v->passes());
+
         $v = new Validator($trans, ['foo' => ['bar']], ['foo' => (string) Rule::array()]);
         $this->assertTrue($v->passes());
 
