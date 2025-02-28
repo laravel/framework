@@ -18,7 +18,8 @@ class MailableTest extends TestCase
 
     public function testItCanAssertMarkdownEncodedString()
     {
-        $mailable = new class extends Mailable {
+        $mailable = new class extends Mailable
+        {
             public $message = "<script ' &";
 
             public function envelope()
