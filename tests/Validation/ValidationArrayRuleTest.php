@@ -18,6 +18,9 @@ class ValidationArrayRuleTest extends TestCase
 
         $this->assertSame('array', (string) $rule);
 
+        $rule = Rule::array([]);
+        $this->assertSame('array', (string) $rule);
+
         $rule = Rule::array('key_1', 'key_2', 'key_3');
 
         $this->assertSame('array:key_1,key_2,key_3', (string) $rule);
@@ -37,6 +40,12 @@ class ValidationArrayRuleTest extends TestCase
         $rule = Rule::array([ArrayKeysBacked::key_1, ArrayKeysBacked::key_2, ArrayKeysBacked::key_3]);
 
         $this->assertSame('array:key_1,key_2,key_3', (string) $rule);
+
+        $rule = Rule::array(['key_1', 'key_1']);
+        $this->assertSame('array:key_1,key_1', (string) $rule);
+
+        $rule = Rule::array([1, 2, 3]);
+        $this->assertSame('array:1,2,3', (string) $rule);
     }
 
     public function testArrayValidation()
