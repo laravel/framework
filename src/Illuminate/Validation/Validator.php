@@ -872,7 +872,12 @@ class Validator implements ValidatorContract
      */
     protected function validateUsingCustomRule($attribute, $value, $rule)
     {
-        $attribute = $this->replacePlaceholderInString($attribute);
+        $originalAttribute = $this->replacePlaceholderInString($attribute);
+
+        $attribute = match (true) {
+            $rule instanceof Rules\File => $attribute,
+            default => $originalAttribute,
+        };
 
         $value = is_array($value) ? $this->replacePlaceholders($value) : $value;
 
@@ -889,14 +894,14 @@ class Validator implements ValidatorContract
                 get_class($rule->invokable()) :
                 get_class($rule);
 
-            $this->failedRules[$attribute][$ruleClass] = [];
+            $this->failedRules[$originalAttribute][$ruleClass] = [];
 
-            $messages = $this->getFromLocalArray($attribute, $ruleClass) ?? $rule->message();
+            $messages = $this->getFromLocalArray($originalAttribute, $ruleClass) ?? $rule->message();
 
             $messages = $messages ? (array) $messages : [$ruleClass];
 
             foreach ($messages as $key => $message) {
-                $key = is_string($key) ? $key : $attribute;
+                $key = is_string($key) ? $key : $originalAttribute;
 
                 $this->messages->add($key, $this->makeReplacements(
                     $message, $key, $ruleClass, []
