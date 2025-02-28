@@ -5,6 +5,7 @@ namespace Illuminate\Database;
 use Illuminate\Support\Str;
 use PDOException;
 use Throwable;
+use Illuminate\Support\Facades\DB;
 
 class QueryException extends PDOException
 {
@@ -95,5 +96,15 @@ class QueryException extends PDOException
     public function getBindings()
     {
         return $this->bindings;
+    }
+
+    /**
+     * Get the raw SQL representation of the query with embedded bindings.
+     */
+    public function getRawSql(): string
+    {
+        return DB::connection($this->getConnectionName())
+            ->getQueryGrammar()
+            ->substituteBindingsIntoRawSql($this->getSql(), $this->getBindings());
     }
 }
