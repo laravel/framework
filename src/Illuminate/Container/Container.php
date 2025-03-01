@@ -292,7 +292,7 @@ class Container implements ArrayAccess, ContainerContract
         // If no concrete type was given, we will simply set the concrete type to the
         // abstract type. After that, the concrete type to be registered as shared
         // without being forced to state their classes in both of the parameters.
-        if (is_null($concrete)) {
+        if ($concrete === null) {
             $concrete = $abstract;
         }
 
@@ -320,21 +320,19 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Get the Closure to be used when building a type.
      *
-     * @param  string  $abstract
+     * @template TClass of object
+     *
+     * @param  string|class-string<TClass>  $abstract
      * @param  string  $concrete
-     * @return \Closure
+     * @return ($abstract is class-string<TClass> ? \Closure(self, array): TClass :  \Closure(self, array): mixed
      */
     protected function getClosure($abstract, $concrete)
     {
-        return function ($container, $parameters = []) use ($abstract, $concrete) {
-            if ($abstract == $concrete) {
-                return $container->build($concrete);
-            }
-
-            return $container->resolve(
+        return fn ($container, $parameters = []) => $abstract == $concrete
+            ? $container->build($concrete)
+            : $container->resolve(
                 $concrete, $parameters, $raiseEvents = false
             );
-        };
     }
 
     /**
@@ -879,7 +877,7 @@ class Container implements ArrayAccess, ContainerContract
 
         $this->with[] = $parameters;
 
-        if (is_null($concrete)) {
+        if ($concrete === null) {
             $concrete = $this->getConcrete($abstract);
         }
 
@@ -1143,7 +1141,7 @@ class Container implements ArrayAccess, ContainerContract
      */
     protected function getLastParameterOverride()
     {
-        return count($this->with) ? end($this->with) : [];
+        return $this->with !== [] ? end($this->with) : [];
     }
 
     /**
