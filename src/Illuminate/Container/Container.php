@@ -475,6 +475,8 @@ class Container implements ArrayAccess, ContainerContract
      * @param  \Closure|string  $abstract
      * @param  bool  $shared
      * @return void
+     *
+     * @throws ReflectionException
      */
     protected function bindBasedOnClosureReturnTypes($abstract, $shared = false)
     {
