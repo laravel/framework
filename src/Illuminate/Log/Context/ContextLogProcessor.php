@@ -25,7 +25,7 @@ class ContextLogProcessor implements ProcessorInterface
      * @param  \Monolog\LogRecord  $record
      * @return \Monolog\LogRecord
      */
-    public function __invoke(LogRecord $record)
+    public function __invoke(LogRecord $record): LogRecord
     {
         if (! $this->app->bound(ContextRepository::class)) {
             return $record;
