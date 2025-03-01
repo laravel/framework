@@ -324,7 +324,7 @@ class Container implements ArrayAccess, ContainerContract
      *
      * @param  string|class-string<TClass>  $abstract
      * @param  string  $concrete
-     * @return ($abstract is class-string<TClass> ? \Closure(self, array): TClass : \Closure(self, array): mixed
+     * @return ($abstract is class-string<TClass> ? (\Closure(self, array): TClass) : (\Closure(self, array): mixed)
      */
     protected function getClosure($abstract, $concrete)
     {
