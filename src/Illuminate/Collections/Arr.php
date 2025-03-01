@@ -7,6 +7,7 @@ use ArrayAccess;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use Random\Randomizer;
+use Traversable;
 
 class Arr
 {
@@ -948,7 +949,7 @@ class Arr
      * @template TKey of array-key
      * @template TValue of mixed
      *
-     * @param  array<TKey, TValue>  $array
+     * @param  array<TKey, TValue>|Traversable<TKey, TValue>  $array
      * @param  callable  $callback
      * @return array<int<0, 1>, array<TKey, TValue>>
      */
