@@ -213,4 +213,31 @@ trait InteractsWithExceptionHandling
 
         return $this;
     }
+
+    /**
+     * Assert that in instance of $exceptionClass was thrown and return the exception.
+     *
+     * @template TThrowable of Throwable
+     *
+     * @param  Closure  $test
+     * @param  class-string<TThrowable>  $exceptionClass
+     * @param  string  $noExceptionThrownMessageTemplate
+     * @return TThrowable
+     */
+    protected static function assertThrown(
+        Closure $test,
+        string $exceptionClass = Throwable::class,
+        string $noExceptionThrownMessageTemplate = 'Did not throw expected exception %s'
+    )
+    {
+        try {
+            $test();
+        } catch (Throwable $t) {
+            if ($t instanceof $exceptionClass) {
+                return $t;
+            }
+        }
+
+        Assert::fail(sprintf($noExceptionThrownMessageTemplate, $exceptionClass));
+    }
 }
