@@ -10,6 +10,12 @@ use PHPUnit\Framework\TestCase;
 
 class BusBatchableTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+        Container::setInstance(null);
+    }
+
     protected function tearDown(): void
     {
         m::close();
