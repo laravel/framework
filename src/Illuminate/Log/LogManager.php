@@ -4,7 +4,6 @@ namespace Illuminate\Log;
 
 use Closure;
 use Illuminate\Log\Context\ContextLogProcessor;
-use Illuminate\Log\Context\Repository as ContextRepository;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
