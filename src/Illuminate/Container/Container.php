@@ -478,7 +478,7 @@ class Container implements ArrayAccess, ContainerContract
      *
      * @throws ReflectionException
      */
-    protected function bindBasedOnClosureReturnTypes($abstract, $shared = false)
+    protected function bindBasedOnClosureReturnTypes(Closure|string $abstract, bool $shared = false): void
     {
         $abstracts = $this->closureReturnTypes($abstract);
 
@@ -497,7 +497,7 @@ class Container implements ArrayAccess, ContainerContract
      *
      * @throws \ReflectionException
      */
-    protected function closureReturnTypes(Closure $closure)
+    protected function closureReturnTypes(Closure $closure): array
     {
         $reflection = new ReflectionFunction($closure);
 
