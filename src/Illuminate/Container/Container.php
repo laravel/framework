@@ -472,13 +472,13 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Register a binding with the container based on the given Closure's return types.
      *
-     * @param  \Closure|string  $abstract
+     * @param  \Closure  $abstract
      * @param  bool  $shared
      * @return void
      *
      * @throws ReflectionException
      */
-    protected function bindBasedOnClosureReturnTypes(Closure|string $abstract, bool $shared = false): void
+    protected function bindBasedOnClosureReturnTypes(Closure $abstract, bool $shared = false): void
     {
         $abstracts = $this->closureReturnTypes($abstract);
 
