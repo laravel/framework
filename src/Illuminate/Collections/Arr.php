@@ -948,7 +948,7 @@ class Arr
      * @template TKey of array-key
      * @template TValue of mixed
      *
-     * @param  array<TKey, TValue>|\Traversable<TKey, TValue>  $array
+     * @param  iterable<TKey, TValue>  $array
      * @param  callable  $callback
      * @return array<int<0, 1>, array<TKey, TValue>>
      */
