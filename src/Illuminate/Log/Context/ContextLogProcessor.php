@@ -2,14 +2,13 @@
 
 namespace Illuminate\Log\Context;
 
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Log\Context\Repository as ContextRepository;
 use Monolog\LogRecord;
-use Illuminate\Contracts\Foundation\Application;
 use Monolog\Processor\ProcessorInterface;
 
 class ContextLogProcessor implements ProcessorInterface
 {
-
     /**
      * Create a new ContextLogProcessor instance.
      *
@@ -21,6 +20,8 @@ class ContextLogProcessor implements ProcessorInterface
     }
 
     /**
+     * Add contextual data to the log's "extra" parameter.
+     *
      * @param  \Monolog\LogRecord  $record
      * @return \Monolog\LogRecord
      */

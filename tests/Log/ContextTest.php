@@ -6,6 +6,7 @@ use Exception;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
+use Illuminate\Log\Context\ContextLogProcessor;
 use Illuminate\Log\Context\Events\ContextDehydrating as Dehydrating;
 use Illuminate\Log\Context\Events\ContextHydrated as Hydrated;
 use Illuminate\Log\Context\Repository;
@@ -559,16 +560,19 @@ class ContextTest extends TestCase
         $path = storage_path('logs/laravel.log');
         file_put_contents($path, '');
 
-        Log::setAddContextToLogProcessor(function (LogRecord $record): LogRecord {
-            $logChannel = Context::getHidden('log_channel_name');
+        $this->app->bind(
+            ContextLogProcessor::class,
+            fn () => function (LogRecord $record): LogRecord {
+                $logChannel = Context::getHidden('log_channel_name');
 
-            return $record->with(
-                // allow overriding the context from what's been set on the log
-                context: array_merge(Context::all(), $record->context),
-                // use the log channel we've set in context, or fallback to the current channel
-                channel: $logChannel ?? $record->channel,
-            );
-        });
+                return $record->with(
+                    // allow overriding the context from what's been set on the log
+                    context: array_merge(Context::all(), $record->context),
+                    // use the log channel we've set in context, or fallback to the current channel
+                    channel: $logChannel ?? $record->channel,
+                );
+            }
+        );
 
         Context::addHidden('log_channel_name', 'closure-test');
         Context::add(['value_from_context' => 'hello']);
@@ -580,12 +584,12 @@ class ContextTest extends TestCase
         file_put_contents($path, '');
     }
 
-    public function test_from_processor_class_string()
+    public function test_can_rebind_()
     {
         $path = storage_path('logs/laravel.log');
         file_put_contents($path, '');
 
-        Log::setAddContextToLogProcessor(MyAddContextProcessor::class);
+        $this->app->bind(ContextLogProcessor::class, MyAddContextProcessor::class);
 
         Context::add(['this-will-be-included' => false]);
 

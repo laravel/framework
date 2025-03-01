@@ -3,6 +3,7 @@
 namespace Illuminate\Log;
 
 use Closure;
+use Illuminate\Log\Context\ContextLogProcessor;
 use Illuminate\Log\Context\Repository as ContextRepository;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -64,13 +65,6 @@ class LogManager implements LoggerInterface
      * @var string
      */
     protected $dateFormat = 'Y-m-d H:i:s';
-
-    /**
-     * Processor for adding Context variables to the log.
-     *
-     * @var (\Closure(\Monolog\LogRecord): \Monolog\LogRecord|null)|class-string<\Monolog\Processor\ProcessorInterface>|null
-     */
-    protected $addContextToLogProcessor = null;
 
     /**
      * Create a new Log manager instance.
@@ -150,12 +144,7 @@ class LogManager implements LoggerInterface
                 )->withContext($this->sharedContext);
 
                 if (method_exists($loggerWithContext->getLogger(), 'pushProcessor')) {
-                    $logProcessor = $this->addContextToLogProcessor ?? $this->defaultAddContextToLogProcessor(...);
-                    if (is_string($logProcessor) && class_exists($logProcessor)) {
-                        $logProcessor = $this->app->make($logProcessor);
-                    }
-
-                    $loggerWithContext->pushProcessor($logProcessor);
+                    $loggerWithContext->pushProcessor($this->app->make(ContextLogProcessor::class));
                 }
 
                 return $this->channels[$name] = $loggerWithContext;
@@ -592,35 +581,6 @@ class LogManager implements LoggerInterface
     public function setDefaultDriver($name)
     {
         $this->app['config']['logging.default'] = $name;
-    }
-
-    /**
-     * Set the log processor to append Context values to the log.
-     *
-     * @param  (\Closure(\Monolog\LogRecord): \Monolog\LogRecord|null)|class-string<\Monolog\Processor\ProcessorInterface>|null  $callback
-     * @return $this
-     */
-    public function setAddContextToLogProcessor($callback)
-    {
-        $this->addContextToLogProcessor = $callback;
-
-        return $this;
-    }
-
-    /**
-     * @param  \Monolog\LogRecord  $record
-     * @return \Monolog\LogRecord|null
-     */
-    protected function defaultAddContextToLogProcessor($record)
-    {
-        if (! $this->app->bound(ContextRepository::class)) {
-            return $record;
-        }
-
-        return $record->with(extra: [
-            ...$record->extra,
-            ...$this->app[ContextRepository::class]->all(),
-        ]);
     }
 
     /**
