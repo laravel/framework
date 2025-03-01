@@ -282,7 +282,9 @@ class Container implements ArrayAccess, ContainerContract
     public function bind($abstract, $concrete = null, $shared = false)
     {
         if ($abstract instanceof Closure) {
-            return $this->bindBasedOnClosureReturnTypes($abstract, $shared);
+            $this->bindBasedOnClosureReturnTypes($abstract, $shared);
+
+            return;
         }
 
         $this->dropStaleInstances($abstract);
