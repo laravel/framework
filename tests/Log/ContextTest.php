@@ -584,7 +584,7 @@ class ContextTest extends TestCase
         file_put_contents($path, '');
     }
 
-    public function test_can_rebind_()
+    public function test_can_rebind_to_separate_class()
     {
         $path = storage_path('logs/laravel.log');
         file_put_contents($path, '');
