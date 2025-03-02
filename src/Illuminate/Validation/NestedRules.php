@@ -2,9 +2,10 @@
 
 namespace Illuminate\Validation;
 
+use Illuminate\Contracts\Validation\CompiledRules;
 use Illuminate\Support\Arr;
 
-class NestedRules
+class NestedRules implements CompiledRules
 {
     /**
      * The callback to execute.
