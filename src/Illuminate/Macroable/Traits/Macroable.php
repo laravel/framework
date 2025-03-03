@@ -4,6 +4,7 @@ namespace Illuminate\Support\Traits;
 
 use BadMethodCallException;
 use Closure;
+use Error;
 use ReflectionClass;
 use ReflectionMethod;
 
@@ -83,14 +84,13 @@ trait Macroable
     public static function __callStatic($method, $parameters)
     {
         if (! static::hasMacro($method)) {
-            // Check if we can call parent::__callStatic() - this checks the entire inheritance chain
-            if (is_callable(['parent', '__callStatic'], true)) {
+            try {
                 return parent::__callStatic($method, $parameters);
+            } catch (Error $e) {
+                throw new BadMethodCallException(sprintf(
+                    'Method %s::%s does not exist.', static::class, $method
+                ));
             }
-
-            throw new BadMethodCallException(sprintf(
-                'Method %s::%s does not exist.', static::class, $method
-            ));
         }
 
         $macro = static::$macros[$method];
@@ -114,14 +114,14 @@ trait Macroable
     public function __call($method, $parameters)
     {
         if (! static::hasMacro($method)) {
-            // Check if we can call parent::__call() - this checks the entire inheritance chain
-            if (is_callable(['parent', '__call'], true)) {
+            try {
                 return parent::__call($method, $parameters);
+            } catch (Error $e) {
+                throw new BadMethodCallException(sprintf(
+                    'Method %s::%s does not exist.', static::class, $method
+                ));
             }
 
-            throw new BadMethodCallException(sprintf(
-                'Method %s::%s does not exist.', static::class, $method
-            ));
         }
 
         $macro = static::$macros[$method];
