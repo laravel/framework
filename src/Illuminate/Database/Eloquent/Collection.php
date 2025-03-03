@@ -380,10 +380,10 @@ class Collection extends BaseCollection implements QueueableCollection
      *
      * @template TMapValue
      *
-     * @param  callable(TModel, TKey): TMapValue  $callback
+     * @param  callable(TModel, TKey)|array<TKey, TKey>: TMapValue  $callback
      * @return \Illuminate\Support\Collection<TKey, TMapValue>|static<TKey, TMapValue>
      */
-    public function map(callable $callback)
+    public function map(callable|array $callback)
     {
         $result = parent::map($callback);
 

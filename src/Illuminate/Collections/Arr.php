@@ -530,11 +530,15 @@ class Arr
         return static::map($array, function ($item) use ($keys) {
             $result = [];
 
-            foreach ($keys as $key) {
+            foreach ($keys as $key => $alias) {
+                if (! is_string($key)) {
+                    $key = $alias;
+                }
+
                 if (Arr::accessible($item) && Arr::exists($item, $key)) {
-                    $result[$key] = $item[$key];
+                    $result[$alias] = $item[$key];
                 } elseif (is_object($item) && isset($item->{$key})) {
-                    $result[$key] = $item->{$key};
+                    $result[$alias] = $item->{$key};
                 }
             }
 
@@ -598,12 +602,24 @@ class Arr
      * Run a map over each of the items in the array.
      *
      * @param  array  $array
-     * @param  callable  $callback
+     * @param  callable|array  $callback
      * @return array
      */
-    public static function map(array $array, callable $callback)
+    public static function map(array $array, callable|array $callback)
     {
         $keys = array_keys($array);
+
+        if (is_array($callback)) {
+            $callback = function ($value) use ($callback) {
+                $result = [];
+
+                foreach ($callback as $key => $alias) {
+                    $result[$alias] = is_object($value) ? $value->{$key} : static::get($value, $key);
+                }
+
+                return $result;
+            };
+        }
 
         try {
             $items = array_map($callback, $array, $keys);

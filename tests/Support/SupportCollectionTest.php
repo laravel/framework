@@ -2913,6 +2913,23 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testMapWithDictionary($collection)
+    {
+        $data = new $collection([
+            ['first' => 'Taylor', 'last' => 'Otwell', 'email' => 'taylorotwell@gmail.com'],
+            ['first' => 'Jess', 'last' => 'Archer', 'email' => 'jessarcher@gmail.com'],
+        ]);
+
+        $this->assertEquals([
+            ['name' => 'Taylor', 'surname' => 'Otwell'],
+            ['name' => 'Jess', 'surname' => 'Archer'],
+        ], $data->map([
+            'first' => 'name',
+            'last' => 'surname',
+        ])->all());
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testMapSpread($collection)
     {
         $c = new $collection([[1, 'a'], [2, 'b']]);
@@ -4292,6 +4309,23 @@ class SupportCollectionTest extends TestCase
             ['first' => 'Taylor', 'email' => 'taylorotwell@gmail.com'],
             ['first' => 'Jess', 'email' => 'jessarcher@gmail.com'],
         ], $data->select(collect(['first', 'email']))->all());
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testSelectWithAlias($collection)
+    {
+        $data = new $collection([
+            ['first' => 'Taylor', 'last' => 'Otwell', 'email' => 'taylorotwell@gmail.com'],
+            ['first' => 'Jess', 'last' => 'Archer', 'email' => 'jessarcher@gmail.com'],
+        ]);
+
+        $this->assertEquals([
+            ['name' => 'Taylor', 'surname' => 'Otwell'],
+            ['name' => 'Jess', 'surname' => 'Archer'],
+        ], $data->select([
+            'first' => 'name',
+            'last' => 'surname',
+        ])->all());
     }
 
     #[DataProvider('collectionClassProvider')]
