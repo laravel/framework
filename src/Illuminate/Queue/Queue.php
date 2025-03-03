@@ -149,6 +149,7 @@ abstract class Queue
             'backoff' => $this->getJobBackoff($job),
             'timeout' => $job->timeout ?? null,
             'retryUntil' => $this->getJobExpiration($job),
+            'deleteWhenMissingModels' => $job->deleteWhenMissingModels ?? false,
             'data' => [
                 'commandName' => $job,
                 'command' => $job,
@@ -269,6 +270,7 @@ abstract class Queue
             'maxTries' => null,
             'maxExceptions' => null,
             'failOnTimeout' => false,
+            'deleteWhenMissingModels' => false,
             'backoff' => null,
             'timeout' => null,
             'data' => $data,
