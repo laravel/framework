@@ -259,7 +259,6 @@ class Application extends Container implements ApplicationContract, CachesConfig
                 (new Collection(ClassLoader::getRegisteredLoaders()))
                     ->keys()
                     ->reject(fn ($path) => str_starts_with($path, 'phar://'))
-                    ->tap(fn ($paths) => $paths->count() === 1 ? $paths : $paths->reject(fn ($path) => str_contains($path, '/vendor/')))
                     ->values()
                     ->first()
             ),
