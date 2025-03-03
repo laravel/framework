@@ -4,9 +4,9 @@ namespace Illuminate\Tests\Log;
 
 use Exception;
 use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Contracts\Log\ContextLogProcessor;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
-use Illuminate\Log\Context\ContextLogProcessor;
 use Illuminate\Log\Context\Events\ContextDehydrating as Dehydrating;
 use Illuminate\Log\Context\Events\ContextHydrated as Hydrated;
 use Illuminate\Log\Context\Repository;
@@ -15,7 +15,6 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Monolog\LogRecord;
-use Monolog\Processor\ProcessorInterface;
 use Orchestra\Testbench\TestCase;
 use RuntimeException;
 
@@ -626,7 +625,7 @@ class ContextModel extends Model
     //
 }
 
-class MyAddContextProcessor implements ProcessorInterface
+class MyAddContextProcessor implements ContextLogProcessor
 {
     public static bool $wasConstructed = false;
 

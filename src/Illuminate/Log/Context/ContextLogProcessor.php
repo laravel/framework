@@ -3,11 +3,11 @@
 namespace Illuminate\Log\Context;
 
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Log\ContextLogProcessor as ContextLogProcessorContract;
 use Illuminate\Log\Context\Repository as ContextRepository;
 use Monolog\LogRecord;
-use Monolog\Processor\ProcessorInterface;
 
-class ContextLogProcessor implements ProcessorInterface
+class ContextLogProcessor implements ContextLogProcessorContract
 {
     /**
      * Create a new ContextLogProcessor instance.

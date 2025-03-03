@@ -3,7 +3,7 @@
 namespace Illuminate\Log;
 
 use Closure;
-use Illuminate\Log\Context\ContextLogProcessor;
+use Illuminate\Contracts\Log\ContextLogProcessor;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
