@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Support;
+namespace Illuminate\Tests\Support;
 
 use Illuminate\Support\Collection;
 use PHPUnit\Framework\TestCase;
