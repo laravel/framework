@@ -32,7 +32,7 @@ class EloquentTransactionWithAfterCommitUsingDatabaseTransactionsTest extends Te
         }
     }
 
-    protected function getEnvironmentSetUp($app)
+    protected function defineEnvironment($app)
     {
         $connection = $app->make('config')->get('database.default');
 

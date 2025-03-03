@@ -12,7 +12,7 @@ use Orchestra\Testbench\TestCase;
 
 class SendingMarkdownMailTest extends TestCase
 {
-    protected function getEnvironmentSetUp($app)
+    protected function defineEnvironment($app)
     {
         $app['config']->set('mail.driver', 'array');
 
