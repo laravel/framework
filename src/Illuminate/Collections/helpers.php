@@ -27,7 +27,7 @@ if (! function_exists('deepCollect')) {
      * of Laravel's Collection class. It applies the transformation to all nested arrays,
      * ensuring that every level of the array structure is converted into collections.
      *
-     * @param  mixed  $value The input value, which can be an array, an iterable, or any other data type.
+     * @param  mixed  $value  The input value, which can be an array, an iterable, or any other data type.
      * @return mixed If the value is an array, a Collection instance is returned with all nested arrays
      *               converted. If the value is not an array, it is returned as-is.
      */

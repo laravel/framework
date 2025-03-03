@@ -17,8 +17,8 @@ class DeepCollectionTest extends TestCase
                 'key' => 'value',
                 'deep_nested' => [
                     'deep_key' => 'deep_value',
-                ]
-            ]
+                ],
+            ],
         ];
 
         $collection = deepCollect($array);
@@ -63,7 +63,7 @@ class DeepCollectionTest extends TestCase
             'nested' => [
                 'array' => [1, 2, 3],
                 'assoc' => ['key' => 'value'],
-            ]
+            ],
         ];
 
         $collection = deepCollect($array);
