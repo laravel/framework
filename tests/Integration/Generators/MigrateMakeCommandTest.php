@@ -24,7 +24,7 @@ class MigrateMakeCommandTest extends TestCase
         $this->assertMigrationFileContains([
             'use Illuminate\Database\Migrations\Migration;',
             'return new class extends Migration',
-            'Schema::table(\'foobar\', function (Blueprint $table) {',
+            'Schema::table(\'foobar\', static function (Blueprint $table) {',
         ], 'add_bar_to_foos_table.php');
     }
 
@@ -36,7 +36,7 @@ class MigrateMakeCommandTest extends TestCase
         $this->assertMigrationFileContains([
             'use Illuminate\Database\Migrations\Migration;',
             'return new class extends Migration',
-            'Schema::create(\'foos\', function (Blueprint $table) {',
+            'Schema::create(\'foos\', static function (Blueprint $table) {',
             'Schema::dropIfExists(\'foos\');',
         ], 'create_foos_table.php');
     }
@@ -49,7 +49,7 @@ class MigrateMakeCommandTest extends TestCase
         $this->assertMigrationFileContains([
             'use Illuminate\Database\Migrations\Migration;',
             'return new class extends Migration',
-            'Schema::create(\'foobar\', function (Blueprint $table) {',
+            'Schema::create(\'foobar\', static function (Blueprint $table) {',
             'Schema::dropIfExists(\'foobar\');',
         ], 'foos_table.php');
     }
