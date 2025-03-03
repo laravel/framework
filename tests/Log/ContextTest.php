@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Log;
 
 use Exception;
 use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Contracts\Log\ContextLogProcessor;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Log\Context\Events\ContextDehydrating as Dehydrating;
@@ -13,12 +14,20 @@ use Illuminate\Support\Facades\Context;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Monolog\LogRecord;
 use Orchestra\Testbench\TestCase;
 use RuntimeException;
 
 class ContextTest extends TestCase
 {
     use LazilyRefreshDatabase;
+
+    #[\Override]
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        MyAddContextProcessor::$wasConstructed = false;
+    }
 
     public function test_it_can_set_values()
     {
@@ -544,6 +553,55 @@ class ContextTest extends TestCase
             'hiddenKey2' => 'world',
         ], Context::allHidden());
     }
+
+    public function test_uses_closure_for_context_processor()
+    {
+        $path = storage_path('logs/laravel.log');
+        file_put_contents($path, '');
+
+        $this->app->bind(
+            ContextLogProcessor::class,
+            fn () => function (LogRecord $record): LogRecord {
+                $logChannel = Context::getHidden('log_channel_name');
+
+                return $record->with(
+                    // allow overriding the context from what's been set on the log
+                    context: array_merge(Context::all(), $record->context),
+                    // use the log channel we've set in context, or fallback to the current channel
+                    channel: $logChannel ?? $record->channel,
+                );
+            }
+        );
+
+        Context::addHidden('log_channel_name', 'closure-test');
+        Context::add(['value_from_context' => 'hello']);
+
+        Log::info('This is an info log.', ['value_from_log_info_context' => 'foo']);
+
+        $log = Str::after(file_get_contents($path), '] ');
+        $this->assertSame('closure-test.INFO: This is an info log. {"value_from_context":"hello","value_from_log_info_context":"foo"}', Str::trim($log));
+        file_put_contents($path, '');
+    }
+
+    public function test_can_rebind_to_separate_class()
+    {
+        $path = storage_path('logs/laravel.log');
+        file_put_contents($path, '');
+
+        $this->app->bind(ContextLogProcessor::class, MyAddContextProcessor::class);
+
+        Context::add(['this-will-be-included' => false]);
+
+        Log::info('This is an info log.', ['value_from_log_info_context' => 'foo']);
+        $log = Str::after(file_get_contents($path), '] ');
+        $this->assertSame(
+            'testing.INFO: This is an info log. {"value_from_log_info_context":"foo","inside of MyAddContextProcessor":true}',
+            Str::trim($log)
+        );
+        $this->assertTrue(MyAddContextProcessor::$wasConstructed);
+
+        file_put_contents($path, '');
+    }
 }
 
 enum Suit
@@ -565,4 +623,20 @@ enum StringBackedSuit: string
 class ContextModel extends Model
 {
     //
+}
+
+class MyAddContextProcessor implements ContextLogProcessor
+{
+    public static bool $wasConstructed = false;
+
+    public function __construct()
+    {
+        self::$wasConstructed = true;
+    }
+
+    #[\Override]
+    public function __invoke(LogRecord $record): LogRecord
+    {
+        return $record->with(context: array_merge($record->context, ['inside of MyAddContextProcessor' => true]));
+    }
 }

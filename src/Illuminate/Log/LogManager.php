@@ -3,7 +3,7 @@
 namespace Illuminate\Log;
 
 use Closure;
-use Illuminate\Log\Context\Repository as ContextRepository;
+use Illuminate\Contracts\Log\ContextLogProcessor;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
@@ -143,16 +143,7 @@ class LogManager implements LoggerInterface
                 )->withContext($this->sharedContext);
 
                 if (method_exists($loggerWithContext->getLogger(), 'pushProcessor')) {
-                    $loggerWithContext->pushProcessor(function ($record) {
-                        if (! $this->app->bound(ContextRepository::class)) {
-                            return $record;
-                        }
-
-                        return $record->with(extra: [
-                            ...$record->extra,
-                            ...$this->app[ContextRepository::class]->all(),
-                        ]);
-                    });
+                    $loggerWithContext->pushProcessor($this->app->make(ContextLogProcessor::class));
                 }
 
                 return $this->channels[$name] = $loggerWithContext;
