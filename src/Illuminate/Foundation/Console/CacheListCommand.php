@@ -69,7 +69,7 @@ class CacheListCommand extends Command
             Cache::store($store)->has('test');
         } catch (\Throwable $th) {
             $status = 'ERROR';
-            $error = $th->getMessage() . ' in ' . $th->getFile() . ' on line ' . $th->getLine();
+            $error = $th->getMessage().' in '.$th->getFile().' on line '.$th->getLine();
         }
 
         return $this->filterStore([
@@ -137,7 +137,7 @@ class CacheListCommand extends Command
             $spaces = str_repeat(' ', max($maxStore + 2 - mb_strlen($store['store']), 0));
 
             $dots = str_repeat('.', max(
-                $terminalWidth - mb_strlen($store['store'] . $spaces . $store['driver']) - 30,
+                $terminalWidth - mb_strlen($store['store'].$spaces.$store['driver']) - 30,
                 0
             ));
 
@@ -148,7 +148,7 @@ class CacheListCommand extends Command
             );
 
             $line = sprintf(
-                "  <fg=white;options=bold>%s</> %s<fg=#6C7280>%s</> <fg=#6C7280>%s</> ⇂ %s",
+                '  <fg=white;options=bold>%s</> %s<fg=#6C7280>%s</> <fg=#6C7280>%s</> ⇂ %s',
                 $store['store'],
                 $spaces,
                 $dots,
@@ -171,13 +171,13 @@ class CacheListCommand extends Command
 
     protected function determineStoreCountOutput($stores, $terminalWidth)
     {
-        $storeCountText = 'Showing [' . $stores->count() . '] cache stores';
+        $storeCountText = 'Showing ['.$stores->count().'] cache stores';
 
         $offset = $terminalWidth - mb_strlen($storeCountText) - 2;
 
         $spaces = str_repeat(' ', $offset);
 
-        return $spaces . '<fg=blue;options=bold>' . $storeCountText . '</>';
+        return $spaces.'<fg=blue;options=bold>'.$storeCountText.'</>';
     }
 
     public static function getTerminalWidth()
