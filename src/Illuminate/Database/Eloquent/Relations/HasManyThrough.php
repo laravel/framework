@@ -29,7 +29,7 @@ class HasManyThrough extends HasOneOrManyThrough
             $this->farParent,
             $this->throughParent,
             $this->getFirstKeyName(),
-            $this->secondKey,
+            $this->getForeignKeyName(),
             $this->getLocalKeyName(),
             $this->getSecondLocalKeyName(),
         ));
