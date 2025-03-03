@@ -17,8 +17,6 @@ class ConcurrencyTest extends TestCase
 {
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->defineCacheRoutes(<<<PHP
 <?php
 use Illuminate\Support\Facades\Concurrency;
@@ -31,6 +29,8 @@ Route::any('/concurrency', function () {
     ]);
 });
 PHP);
+
+        parent::setUp();
     }
 
     public function testWorkCanBeDistributed()
