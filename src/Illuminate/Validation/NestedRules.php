@@ -3,7 +3,6 @@
 namespace Illuminate\Validation;
 
 use Illuminate\Contracts\Validation\CompilableRules;
-use Illuminate\Support\Arr;
 
 class NestedRules implements CompilableRules
 {
