@@ -2,10 +2,10 @@
 
 namespace Illuminate\Contracts\Validation;
 
-interface CompiledRules
+interface CompilableRules
 {
     /**
-     * Compile the callback into an array of rules.
+     * Compile the object into usable rules.
      *
      * @param  string  $attribute
      * @param  mixed  $value
