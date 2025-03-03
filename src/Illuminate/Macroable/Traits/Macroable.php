@@ -90,7 +90,7 @@ trait Macroable
             if (is_callable(['parent', '__callStatic'], true)) {
                 return parent::__callStatic($method, $parameters);
             }
-            
+
             throw new BadMethodCallException(sprintf(
                 'Method %s::%s does not exist.', static::class, $method
             ));
@@ -121,7 +121,7 @@ trait Macroable
             if (is_callable(['parent', '__call'], true)) {
                 return parent::__call($method, $parameters);
             }
-            
+
             throw new BadMethodCallException(sprintf(
                 'Method %s::%s does not exist.', static::class, $method
             ));
