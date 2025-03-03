@@ -7,14 +7,18 @@ use Illuminate\Concurrency\ProcessDriver;
 use Illuminate\Foundation\Application;
 use Illuminate\Process\Factory as ProcessFactory;
 use Illuminate\Support\Facades\Concurrency;
+use Orchestra\Testbench\Attributes\UsesVendor;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 
 #[RequiresOperatingSystem('Linux|DAR')]
+#[UsesVendor]
 class ConcurrencyTest extends TestCase
 {
     protected function setUp(): void
     {
+        parent::setUp();
+
         $this->defineCacheRoutes(<<<PHP
 <?php
 use Illuminate\Support\Facades\Concurrency;
@@ -27,8 +31,6 @@ Route::any('/concurrency', function () {
     ]);
 });
 PHP);
-
-        parent::setUp();
     }
 
     public function testWorkCanBeDistributed()
