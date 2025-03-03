@@ -7,61 +7,54 @@ use PHPUnit\Framework\TestCase;
 
 class DeepCollectionTest extends TestCase
 {
-    /** @test */
-    public function it_converts_nested_arrays_into_collections()
+    public function testRecursivelyConvertsNestedArraysToCollections()
     {
         $array = [
             'id' => 1,
-            'title' => 'Sample News',
+            'title' => 'Sample',
             'nested' => [
                 'key' => 'value',
-                'deep_nested' => [
-                    'deep_key' => 'deep_value',
+                'deepNested' => [
+                    'deepKey' => 'deepValue',
                 ],
             ],
         ];
 
         $collection = deepCollect($array);
 
-        // Assert that the top-level is a Collection
+        // Ensure the top-level is a Collection
         $this->assertInstanceOf(Collection::class, $collection);
 
-        // Assert that the nested array is also converted to a Collection
+        // Ensure nested arrays are converted
         $this->assertInstanceOf(Collection::class, $collection['nested']);
+        $this->assertInstanceOf(Collection::class, $collection['nested']['deepNested']);
 
-        // Assert that the deep nested array is also a Collection
-        $this->assertInstanceOf(Collection::class, $collection['nested']['deep_nested']);
-
-        // Assert that values remain unchanged
+        // Ensure values remain the same
         $this->assertEquals('value', $collection['nested']['key']);
-        $this->assertEquals('deep_value', $collection['nested']['deep_nested']['deep_key']);
+        $this->assertEquals('deepValue', $collection['nested']['deepNested']['deepKey']);
     }
 
-    /** @test */
-    public function it_handles_non_array_values_correctly()
+    public function testReturnsNonArrayValuesUnchanged()
     {
-        $this->assertEquals(123, deepCollect(123));
-        $this->assertEquals('string', deepCollect('string'));
+        $this->assertEquals(42, deepCollect(42));
+        $this->assertEquals('Laravel', deepCollect('Laravel'));
         $this->assertEquals(null, deepCollect(null));
     }
 
-    /** @test */
-    public function it_handles_empty_arrays()
+    public function testConvertsEmptyArraysToEmptyCollections()
     {
         $collection = deepCollect([]);
         $this->assertInstanceOf(Collection::class, $collection);
-        $this->assertEmpty($collection);
+        $this->assertTrue($collection->isEmpty());
     }
 
-    /** @test */
-    public function it_handles_mixed_data_types_in_arrays()
+    public function testTransformsMixedNestedStructuresIntoCollections()
     {
         $array = [
-            'number' => 123,
-            'string' => 'hello',
-            'boolean' => true,
+            'number' => 100,
+            'boolean' => false,
             'nested' => [
-                'array' => [1, 2, 3],
+                'list' => [10, 20, 30],
                 'assoc' => ['key' => 'value'],
             ],
         ];
@@ -72,9 +65,62 @@ class DeepCollectionTest extends TestCase
         $this->assertInstanceOf(Collection::class, $collection['nested']);
         $this->assertInstanceOf(Collection::class, $collection['nested']['assoc']);
 
-        $this->assertEquals(123, $collection['number']);
-        $this->assertEquals('hello', $collection['string']);
-        $this->assertTrue($collection['boolean']);
-        $this->assertEquals([1, 2, 3], $collection['nested']['array']->toArray());
+        // Verify values remain unchanged
+        $this->assertEquals(100, $collection['number']);
+        $this->assertFalse($collection['boolean']);
+        $this->assertEquals([10, 20, 30], $collection['nested']['list']->toArray());
+    }
+
+    public function testHandlesDeeplyNestedArraysCorrectly()
+    {
+        $array = [
+            'level1' => [
+                'level2' => [
+                    'level3' => [
+                        'level4' => [
+                            'key' => 'finalValue',
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $collection = deepCollect($array);
+
+        // Assert each level is converted
+        $this->assertInstanceOf(Collection::class, $collection);
+        $this->assertInstanceOf(Collection::class, $collection['level1']);
+        $this->assertInstanceOf(Collection::class, $collection['level1']['level2']);
+        $this->assertInstanceOf(Collection::class, $collection['level1']['level2']['level3']);
+        $this->assertInstanceOf(Collection::class, $collection['level1']['level2']['level3']['level4']);
+
+        // Assert value remains correct
+        $this->assertEquals('finalValue', $collection['level1']['level2']['level3']['level4']['key']);
+    }
+
+    public function testPreservesObjectsWithoutConversion()
+    {
+        $object = (object) ['name' => 'Laravel'];
+        $array = ['framework' => $object];
+
+        $collection = deepCollect($array);
+
+        $this->assertInstanceOf(Collection::class, $collection);
+        $this->assertSame($object, $collection['framework']);
+    }
+
+    public function testDoesNotReconvertExistingCollections()
+    {
+        $original = collect([
+            'name' => 'Laravel',
+            'nested' => collect(['key' => 'value']),
+        ]);
+
+        $collection = deepCollect($original);
+
+        // Ensure the structure remains untouched
+        $this->assertSame($original, $collection);
+        $this->assertInstanceOf(Collection::class, $collection['nested']);
+        $this->assertEquals('value', $collection['nested']['key']);
     }
 }
