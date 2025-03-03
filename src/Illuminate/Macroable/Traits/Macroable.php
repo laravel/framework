@@ -4,7 +4,6 @@ namespace Illuminate\Support\Traits;
 
 use BadMethodCallException;
 use Closure;
-use Error;
 use ReflectionClass;
 use ReflectionMethod;
 
@@ -87,13 +86,16 @@ trait Macroable
     public static function __callStatic($method, $parameters)
     {
         if (! static::hasMacro($method)) {
-            try {
-                return parent::__callStatic($method, $parameters);
-            } catch (Error $e) {
-                throw new BadMethodCallException(sprintf(
-                    'Method %s::%s does not exist.', static::class, $method
-                ));
+            foreach (class_parents(static::class) as $parent) {
+                if (method_exists($parent, '__callStatic')) {
+                    /** @phpstan-ignore class.noParent, staticMethod.notFound */
+                    return parent::__callStatic($method, $parameters);
+                }
             }
+
+            throw new BadMethodCallException(sprintf(
+                'Method %s::%s does not exist.', static::class, $method
+            ));
         }
 
         $macro = static::$macros[$method];
@@ -117,14 +119,16 @@ trait Macroable
     public function __call($method, $parameters)
     {
         if (! static::hasMacro($method)) {
-            try {
-                return parent::__call($method, $parameters);
-            } catch (Error $e) {
-                throw new BadMethodCallException(sprintf(
-                    'Method %s::%s does not exist.', static::class, $method
-                ));
+            foreach (class_parents(static::class) as $parent) {
+                if (method_exists($parent, '__call')) {
+                    /** @phpstan-ignore class.noParent, staticMethod.notFound */
+                    return parent::__call($method, $parameters);
+                }
             }
 
+            throw new BadMethodCallException(sprintf(
+                'Method %s::%s does not exist.', static::class, $method
+            ));
         }
 
         $macro = static::$macros[$method];
