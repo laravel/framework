@@ -19,7 +19,7 @@ if (! function_exists('collect')) {
     }
 }
 
-if (!function_exists('deepCollect')) {
+if (! function_exists('deepCollect')) {
     /**
      * Recursively convert an array and its nested arrays into Laravel collections.
      *
@@ -27,7 +27,7 @@ if (!function_exists('deepCollect')) {
      * of Laravel's Collection class. It applies the transformation to all nested arrays,
      * ensuring that every level of the array structure is converted into collections.
      *
-     * @param mixed $value The input value, which can be an array, an iterable, or any other data type.
+     * @param  mixed  $value The input value, which can be an array, an iterable, or any other data type.
      * @return mixed If the value is an array, a Collection instance is returned with all nested arrays
      *               converted. If the value is not an array, it is returned as-is.
      */
@@ -35,7 +35,7 @@ if (!function_exists('deepCollect')) {
     {
         // If the value is an array, convert it into a Collection and apply deepCollect recursively
         if (is_array($value)) {
-            return collect($value)->map(fn($item) => deepCollect($item));
+            return collect($value)->map(fn ($item) => deepCollect($item));
         }
 
         // Return the original value if it's not an array

@@ -16,7 +16,7 @@ class DeepCollectionTest extends TestCase
             'nested' => [
                 'key' => 'value',
                 'deep_nested' => [
-                    'deep_key' => 'deep_value'
+                    'deep_key' => 'deep_value',
                 ]
             ]
         ];
@@ -62,7 +62,7 @@ class DeepCollectionTest extends TestCase
             'boolean' => true,
             'nested' => [
                 'array' => [1, 2, 3],
-                'assoc' => ['key' => 'value']
+                'assoc' => ['key' => 'value'],
             ]
         ];
 
