@@ -165,6 +165,7 @@ class AboutCommand extends Command
 
         $formatEnabledStatus = fn ($value) => $value ? '<fg=yellow;options=bold>ENABLED</>' : 'OFF';
         $formatCachedStatus = fn ($value) => $value ? '<fg=green;options=bold>CACHED</>' : '<fg=yellow;options=bold>NOT CACHED</>';
+        $formatStorageLinkedStatus = fn ($value) => $value ? '<fg=green;options=bold>LINKED</>' : '<fg=yellow;options=bold>NOT LINKED</>';
 
         static::addToSection('Environment', fn () => [
             'Application Name' => config('app.name'),
@@ -177,6 +178,7 @@ class AboutCommand extends Command
             'Maintenance Mode' => static::format($this->laravel->isDownForMaintenance(), console: $formatEnabledStatus),
             'Timezone' => config('app.timezone'),
             'Locale' => config('app.locale'),
+            'Storage Linked' => static::format(file_exists(public_path('storage')), console: $formatStorageLinkedStatus),
         ]);
 
         static::addToSection('Cache', fn () => [
@@ -213,6 +215,10 @@ class AboutCommand extends Command
             'Scout' => config('scout.driver'),
             'Session' => config('session.driver'),
         ]));
+
+        static::addToSection('Storage', fn () => [
+            ...$this->checkStoragePaths($formatStorageLinkedStatus),
+        ]);
 
         (new Collection(static::$customDataResolvers))->each->__invoke();
     }
@@ -317,5 +323,22 @@ class AboutCommand extends Command
         static::$data = [];
 
         static::$customDataResolvers = [];
+    }
+
+    /**
+     * Check storage symbolic links status.
+     *
+     * @param  callable  $formatStorageLinkedStatus  Formatter for link status
+     * @return array<string,mixed> Array of paths and their link status
+     */
+    protected function checkStoragePaths(callable $formatStorageLinkedStatus): array
+    {
+        return collect(config('filesystems.links', []))
+            ->mapWithKeys(function ($target, $link) use ($formatStorageLinkedStatus) {
+                $path = Str::replace(public_path(), '', $link);
+
+                return [public_path($path) => static::format(file_exists($link), console: $formatStorageLinkedStatus)];
+            })
+            ->toArray();
     }
 }
