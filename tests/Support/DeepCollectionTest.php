@@ -113,7 +113,7 @@ class DeepCollectionTest extends TestCase
     {
         $original = collect([
             'name' => 'Laravel',
-            'nested' => collect(['key' => 'value1']),
+            'nested' => collect(['key' => 'value']),
         ]);
 
         $collection = deepCollect($original);
