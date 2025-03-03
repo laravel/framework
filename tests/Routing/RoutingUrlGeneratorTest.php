@@ -1038,11 +1038,11 @@ class RoutingUrlGeneratorTest extends TestCase
 
         $url->defaults([
             'tenant' => 'defaultTenant',
-            // 'tenant:slug' => 'defaultTenantSlug',
+            'tenant:slug' => 'defaultTenantSlug',
             'team' => 'defaultTeam',
-            // 'team:slug' => 'defaultTeamSlug',
+            'team:slug' => 'defaultTeamSlug',
             'user' => 'defaultUser',
-            // 'user:slug' => 'defaultUserSlug',
+            'user:slug' => 'defaultUserSlug',
         ]);
 
         $keyParam = fn ($value) => tap(new RoutableInterfaceStub, fn ($routable) => $routable->key = $value);
@@ -1102,13 +1102,13 @@ class RoutingUrlGeneratorTest extends TestCase
 
         // tenantSlugPost: Tenant (with default) omitted, post passed positionally
         $this->assertSame(
-            'https://www.foo.com/tenantSlugPost/defaultTenant/concretePost', // TODO: Should be defaultTenantSlug
+            'https://www.foo.com/tenantSlugPost/defaultTenantSlug/concretePost',
             $url->route('tenantSlugPost', [$keyParam('concretePost')]),
         );
 
         // tenantSlugPost: Tenant (with default) omitted, post passed using key
         $this->assertSame(
-            'https://www.foo.com/tenantSlugPost/defaultTenant/concretePost', // TODO: Should be defaultTenantSlug
+            'https://www.foo.com/tenantSlugPost/defaultTenantSlug/concretePost',
             $url->route('tenantSlugPost', ['post' => $keyParam('concretePost')]),
         );
 
@@ -1199,13 +1199,13 @@ class RoutingUrlGeneratorTest extends TestCase
 
         // tenantSlugTeamPost: Tenant (with default) omitted, team and post passed positionally
         $this->assertSame(
-            'https://www.foo.com/tenantSlugTeamPost/defaultTenant/concreteTeam/concretePost', // TODO: Should be defaultTenantSlug
+            'https://www.foo.com/tenantSlugTeamPost/defaultTenantSlug/concreteTeam/concretePost',
             $url->route('tenantSlugTeamPost', [$keyParam('concreteTeam'), $keyParam('concretePost')]),
         );
 
         // tenantSlugTeamPost: Tenant and team (with defaults) omitted, post passed positionally
         $this->assertSame(
-            'https://www.foo.com/tenantSlugTeamPost/defaultTenant/defaultTeam/concretePost', // TODO: Should be defaultTenantSlug
+            'https://www.foo.com/tenantSlugTeamPost/defaultTenantSlug/defaultTeam/concretePost',
             $url->route('tenantSlugTeamPost', [$keyParam('concretePost')]),
         );
 
@@ -1237,13 +1237,13 @@ class RoutingUrlGeneratorTest extends TestCase
 
         // tenantTeamSlugPost: Tenant and team (with defaults) omitted, post passed positionally
         $this->assertSame(
-            'https://www.foo.com/tenantTeamSlugPost/defaultTenant/defaultTeam/concretePost', // TODO: Should be defaultTeamSlug
+            'https://www.foo.com/tenantTeamSlugPost/defaultTenant/defaultTeamSlug/concretePost',
             $url->route('tenantTeamSlugPost', [$keyParam('concretePost')]),
         );
 
         // tenantTeamSlugPost: Tenant passed by key, team (with default) omitted, post passed positionally
         $this->assertSame(
-            'https://www.foo.com/tenantTeamSlugPost/concreteTenantSlug/defaultTeam/concretePost', // TODO: Should be defaultTeamSlug
+            'https://www.foo.com/tenantTeamSlugPost/concreteTenantSlug/defaultTeamSlug/concretePost',
             $url->route('tenantTeamSlugPost', ['tenant' => $keyParam('concreteTenantSlug'), $keyParam('concretePost')]),
         );
 
@@ -1263,19 +1263,19 @@ class RoutingUrlGeneratorTest extends TestCase
 
         // tenantSlugTeamSlugPost: Tenant (with default) omitted, team and post passed positionally
         $this->assertSame(
-            'https://www.foo.com/tenantSlugTeamSlugPost/defaultTenant/concreteTeamSlug/concretePost', // TODO: Should be defaultTenantSlug
+            'https://www.foo.com/tenantSlugTeamSlugPost/defaultTenantSlug/concreteTeamSlug/concretePost',
             $url->route('tenantSlugTeamSlugPost', [$slugParam('concreteTeamSlug'), $keyParam('concretePost')]),
         );
 
         // tenantSlugTeamSlugPost: Tenant and team (with defaults) omitted, post passed positionally
         $this->assertSame(
-            'https://www.foo.com/tenantSlugTeamSlugPost/defaultTenant/defaultTeam/concretePost', // TODO: Should be defaultTenantSlug and defaultTeamSlug
+            'https://www.foo.com/tenantSlugTeamSlugPost/defaultTenantSlug/defaultTeamSlug/concretePost',
             $url->route('tenantSlugTeamSlugPost', [$keyParam('concretePost')]),
         );
 
         // tenantSlugTeamSlugPost: Tenant passed by key, team (with default) omitted, post passed positionally
         $this->assertSame(
-            'https://www.foo.com/tenantSlugTeamSlugPost/concreteTenantSlug/defaultTeam/concretePost', // TODO: Should be defaultTeamSlug
+            'https://www.foo.com/tenantSlugTeamSlugPost/concreteTenantSlug/defaultTeamSlug/concretePost',
             $url->route('tenantSlugTeamSlugPost', ['tenant' => $slugParam('concreteTenantSlug'), $keyParam('concretePost')]),
         );
 
@@ -1372,13 +1372,13 @@ class RoutingUrlGeneratorTest extends TestCase
 
         // postUserSlug: User (with default) omitted, post passed positionally
         $this->assertSame(
-            'https://www.foo.com/postUserSlug/concretePost/defaultUser', // TODO: Should be defaultUserSlug
+            'https://www.foo.com/postUserSlug/concretePost/defaultUserSlug',
             $url->route('postUserSlug', [$keyParam('concretePost')]),
         );
 
         // postUserSlug: User (with default) omitted, post passed using key
         $this->assertSame(
-            'https://www.foo.com/postUserSlug/concretePost/defaultUser', // TODO: Should be defaultUserSlug
+            'https://www.foo.com/postUserSlug/concretePost/defaultUserSlug',
             $url->route('postUserSlug', ['post' => $keyParam('concretePost')]),
         );
 
@@ -1406,13 +1406,13 @@ class RoutingUrlGeneratorTest extends TestCase
 
         // postSlugUserSlug: User (with default) omitted, post passed positionally
         $this->assertSame(
-            'https://www.foo.com/postSlugUserSlug/concretePostSlug/defaultUser', // TODO: Should be defaultUserSlug
+            'https://www.foo.com/postSlugUserSlug/concretePostSlug/defaultUserSlug',
             $url->route('postSlugUserSlug', [$slugParam('concretePostSlug')]),
         );
 
         // postSlugUserSlug: User (with default) omitted, post passed using key
         $this->assertSame(
-            'https://www.foo.com/postSlugUserSlug/concretePostSlug/defaultUser', // TODO: Should be defaultUserSlug
+            'https://www.foo.com/postSlugUserSlug/concretePostSlug/defaultUserSlug',
             $url->route('postSlugUserSlug', ['post' => $slugParam('concretePostSlug')]),
         );
 
@@ -1481,13 +1481,13 @@ class RoutingUrlGeneratorTest extends TestCase
 
         // tenantSlugPostUser: Tenant parameter omitted, post and user passed positionally
         $this->assertSame(
-            'https://www.foo.com/tenantSlugPostUser/defaultTenant/concretePost/concreteUser', // TODO: Should be defaultTenantSlug
+            'https://www.foo.com/tenantSlugPostUser/defaultTenantSlug/concretePost/concreteUser',
             $url->route('tenantSlugPostUser', [$keyParam('concretePost'), $keyParam('concreteUser')]),
         );
 
         // tenantSlugPostUser: Both tenant and user (with defaults) omitted, post passed positionally
         $this->assertSame(
-            'https://www.foo.com/tenantSlugPostUser/defaultTenant/concretePost/defaultUser', // TODO: Should be defaultTenantSlug
+            'https://www.foo.com/tenantSlugPostUser/defaultTenantSlug/concretePost/defaultUser',
             $url->route('tenantSlugPostUser', [$keyParam('concretePost')]),
         );
 
@@ -1499,13 +1499,13 @@ class RoutingUrlGeneratorTest extends TestCase
 
         // tenantSlugPostUser: Both tenant and user (with defaults) omitted, post passed using key
         $this->assertSame(
-            'https://www.foo.com/tenantSlugPostUser/defaultTenant/concretePost/defaultUser', // TODO: Should be defaultTenantSlug
+            'https://www.foo.com/tenantSlugPostUser/defaultTenantSlug/concretePost/defaultUser',
             $url->route('tenantSlugPostUser', ['post' => $keyParam('concretePost')]),
         );
 
         // tenantSlugPostUser: Tenant parameter (with default) omitted, post and user passed using key
         $this->assertSame(
-            'https://www.foo.com/tenantSlugPostUser/defaultTenant/concretePost/concreteUser', // TODO: Should be defaultTenantSlug
+            'https://www.foo.com/tenantSlugPostUser/defaultTenantSlug/concretePost/concreteUser',
             $url->route('tenantSlugPostUser', ['post' => $keyParam('concretePost'), 'user' => $keyParam('concreteUser')]),
         );
 
@@ -1538,7 +1538,7 @@ class RoutingUrlGeneratorTest extends TestCase
 
         // tenantPostUserSlug: Both tenant and user (with defaults) omitted, post passed positionally
         $this->assertSame(
-            'https://www.foo.com/tenantPostUserSlug/defaultTenant/concretePost/defaultUser', // TODO: Should be defaultUserSlug
+            'https://www.foo.com/tenantPostUserSlug/defaultTenant/concretePost/defaultUserSlug',
             $url->route('tenantPostUserSlug', [$keyParam('concretePost')]),
         );
 
@@ -1550,7 +1550,7 @@ class RoutingUrlGeneratorTest extends TestCase
 
         // tenantPostUserSlug: Both tenant and user (with defaults) omitted, post passed using key
         $this->assertSame(
-            'https://www.foo.com/tenantPostUserSlug/defaultTenant/concretePost/defaultUser', // TODO: Should be defaultUserSlug
+            'https://www.foo.com/tenantPostUserSlug/defaultTenant/concretePost/defaultUserSlug',
             $url->route('tenantPostUserSlug', ['post' => $keyParam('concretePost')]),
         );
 
@@ -1562,7 +1562,7 @@ class RoutingUrlGeneratorTest extends TestCase
 
         // tenantPostUserSlug: User parameter (with default) omitted, tenant and post passed using key
         $this->assertSame(
-            'https://www.foo.com/tenantPostUserSlug/concreteTenant/concretePost/defaultUser', // TODO: Should be defaultUserSlug
+            'https://www.foo.com/tenantPostUserSlug/concreteTenant/concretePost/defaultUserSlug',
             $url->route('tenantPostUserSlug', ['tenant' => $keyParam('concreteTenant'), 'post' => $keyParam('concretePost')]),
         );
 
@@ -1583,13 +1583,13 @@ class RoutingUrlGeneratorTest extends TestCase
 
         // tenantSlugPostUser: Tenant parameter omitted, post and user passed positionally
         $this->assertSame(
-            'https://www.foo.com/tenantSlugPostUser/defaultTenant/concretePost/concreteUser', // TODO: Should be defaultTenantSlug
+            'https://www.foo.com/tenantSlugPostUser/defaultTenantSlug/concretePost/concreteUser',
             $url->route('tenantSlugPostUser', [$keyParam('concretePost'), $keyParam('concreteUser')]),
         );
 
         // tenantSlugPostUser: Both tenant and user (with defaults) omitted, post passed positionally
         $this->assertSame(
-            'https://www.foo.com/tenantSlugPostUser/defaultTenant/concretePost/defaultUser', // TODO: Should be defaultTenantSlug
+            'https://www.foo.com/tenantSlugPostUser/defaultTenantSlug/concretePost/defaultUser',
             $url->route('tenantSlugPostUser', [$keyParam('concretePost')]),
         );
 
@@ -1601,13 +1601,13 @@ class RoutingUrlGeneratorTest extends TestCase
 
         // tenantSlugPostUser: Both tenant and user (with defaults) omitted, post passed using key
         $this->assertSame(
-            'https://www.foo.com/tenantSlugPostUser/defaultTenant/concretePost/defaultUser', // TODO: Should be defaultTenantSlug
+            'https://www.foo.com/tenantSlugPostUser/defaultTenantSlug/concretePost/defaultUser',
             $url->route('tenantSlugPostUser', ['post' => $keyParam('concretePost')]),
         );
 
         // tenantSlugPostUser: Tenant parameter (with default) omitted, post and user passed using key
         $this->assertSame(
-            'https://www.foo.com/tenantSlugPostUser/defaultTenant/concretePost/concreteUser', // TODO: Should be defaultTenantSlug
+            'https://www.foo.com/tenantSlugPostUser/defaultTenantSlug/concretePost/concreteUser',
             $url->route('tenantSlugPostUser', ['post' => $keyParam('concretePost'), 'user' => $keyParam('concreteUser')]),
         );
 
@@ -1634,13 +1634,13 @@ class RoutingUrlGeneratorTest extends TestCase
 
         // tenantSlugPostUserSlug: Tenant parameter omitted, post and user passed positionally
         $this->assertSame(
-            'https://www.foo.com/tenantSlugPostUserSlug/defaultTenant/concretePost/concreteUserSlug', // TODO: Should be defaultTenantSlug
+            'https://www.foo.com/tenantSlugPostUserSlug/defaultTenantSlug/concretePost/concreteUserSlug',
             $url->route('tenantSlugPostUserSlug', [$keyParam('concretePost'), $slugParam('concreteUserSlug')]),
         );
 
         // tenantSlugPostUserSlug: Both tenant and user (with defaults) omitted, post passed positionally
         $this->assertSame(
-            'https://www.foo.com/tenantSlugPostUserSlug/defaultTenant/concretePost/defaultUser', // TODO: Should be defaultTenantSlug and defaultUserSlug
+            'https://www.foo.com/tenantSlugPostUserSlug/defaultTenantSlug/concretePost/defaultUserSlug',
             $url->route('tenantSlugPostUserSlug', [$keyParam('concretePost')]),
         );
 
@@ -1652,19 +1652,19 @@ class RoutingUrlGeneratorTest extends TestCase
 
         // tenantSlugPostUserSlug: Both tenant and user (with defaults) omitted, post passed using key
         $this->assertSame(
-            'https://www.foo.com/tenantSlugPostUserSlug/defaultTenant/concretePost/defaultUser', // TODO: Should be defaultTenantSlug and defaultUserSlug
+            'https://www.foo.com/tenantSlugPostUserSlug/defaultTenantSlug/concretePost/defaultUserSlug',
             $url->route('tenantSlugPostUserSlug', ['post' => $keyParam('concretePost')]),
         );
 
         // tenantSlugPostUserSlug: Tenant parameter (with default) omitted, post and user passed using key
         $this->assertSame(
-            'https://www.foo.com/tenantSlugPostUserSlug/defaultTenant/concretePost/concreteUserSlug', // TODO: Should be defaultTenantSlug
+            'https://www.foo.com/tenantSlugPostUserSlug/defaultTenantSlug/concretePost/concreteUserSlug',
             $url->route('tenantSlugPostUserSlug', ['post' => $keyParam('concretePost'), 'user' => $slugParam('concreteUserSlug')]),
         );
 
         // tenantSlugPostUserSlug: User parameter (with default) omitted, tenant and post passed using key
         $this->assertSame(
-            'https://www.foo.com/tenantSlugPostUserSlug/concreteTenantSlug/concretePost/defaultUser', // TODO: Should be defaultUserSlug
+            'https://www.foo.com/tenantSlugPostUserSlug/concreteTenantSlug/concretePost/defaultUserSlug',
             $url->route('tenantSlugPostUserSlug', ['tenant' => $slugParam('concreteTenantSlug'), 'post' => $keyParam('concretePost')]),
         );
     }

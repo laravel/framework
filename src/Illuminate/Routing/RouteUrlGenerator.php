@@ -233,15 +233,15 @@ class RouteUrlGenerator
         $reverse = count($passedParameters) < count($routeParameters);
 
         foreach ($reverse ? array_reverse($namedParameters) : $namedParameters as $key => $value) {
+            $bindingField = $route->bindingFieldFor($key);
+            $defaultParameterKey = $bindingField ? "$key:$bindingField" : $key;
+
             if ($value !== '') {
                 continue;
             } else if (! empty($parameters)) {
                 $namedParameters[$key] = $reverse ? array_pop($parameters) : array_shift($parameters);
-            } else if (isset($this->defaultParameters[$key])) {
-                // todo(wip) this is where we'll handle {defaultParam:slug} cases.
-                // existing logic for default params is still relevant for generic
-                // (w/o a specific binding field) params in *URLs* rather than routes
-                $namedParameters[$key] = $this->defaultParameters[$key];
+            } else if (isset($this->defaultParameters[$defaultParameterKey])) {
+                $namedParameters[$key] = $this->defaultParameters[$defaultParameterKey];
             }
         }
 
