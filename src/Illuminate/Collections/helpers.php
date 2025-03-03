@@ -34,12 +34,9 @@ if (! function_exists('deepCollect')) {
     function deepCollect($value)
     {
         // If the value is an array, convert it into a Collection and apply deepCollect recursively
-        if (is_array($value)) {
-            return collect($value)->map(fn ($item) => deepCollect($item));
-        }
-
-        // Return the original value if it's not an array
-        return $value;
+        return is_array($value)
+            ? collect($value)->map(deepCollect(...))
+            : $value;
     }
 }
 
