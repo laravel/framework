@@ -6,7 +6,6 @@ use BackedEnum;
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Routing\Exceptions\UrlGenerationException;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
 
 class RouteUrlGenerator
 {
@@ -154,7 +153,7 @@ class RouteUrlGenerator
                 unset($parameters[$name]);
 
                 continue;
-            } else if (! isset($this->defaultParameters[$name])) {
+            } elseif (! isset($this->defaultParameters[$name])) {
                 // If there's no named parameter AND no default value
                 // we track this parameter as a parameter without a
                 // default value and try to match positional parameters
@@ -238,9 +237,9 @@ class RouteUrlGenerator
 
             if ($value !== '') {
                 continue;
-            } else if (! empty($parameters)) {
+            } elseif (! empty($parameters)) {
                 $namedParameters[$key] = $reverse ? array_pop($parameters) : array_shift($parameters);
-            } else if (isset($this->defaultParameters[$defaultParameterKey])) {
+            } elseif (isset($this->defaultParameters[$defaultParameterKey])) {
                 $namedParameters[$key] = $this->defaultParameters[$defaultParameterKey];
             }
         }

@@ -1007,15 +1007,15 @@ class RoutingUrlGeneratorTest extends TestCase
             'tenant' => 'defaultTenant',
         ]);
 
-        $route = new Route(['GET'], 'bar/{tenant}/{post}', ['as' => 'bar', fn() => '']);
+        $route = new Route(['GET'], 'bar/{tenant}/{post}', ['as' => 'bar', fn () => '']);
         $routes->add($route);
 
         // Named parameters
         $this->assertSame(
             'https://www.foo.com/bar/concreteTenant/concretePost',
             $url->route('bar', [
-                'tenant' => tap(new RoutableInterfaceStub, fn($x) => $x->key = 'concreteTenant'),
-                'post' => tap(new RoutableInterfaceStub, fn($x) => $x->key = 'concretePost'),
+                'tenant' => tap(new RoutableInterfaceStub, fn ($x) => $x->key = 'concreteTenant'),
+                'post' => tap(new RoutableInterfaceStub, fn ($x) => $x->key = 'concretePost'),
             ]),
         );
 
@@ -1023,8 +1023,8 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertSame(
             'https://www.foo.com/bar/concreteTenant/concretePost',
             $url->route('bar', [
-                tap(new RoutableInterfaceStub, fn($x) => $x->key = 'concreteTenant'),
-                tap(new RoutableInterfaceStub, fn($x) => $x->key = 'concretePost'),
+                tap(new RoutableInterfaceStub, fn ($x) => $x->key = 'concreteTenant'),
+                tap(new RoutableInterfaceStub, fn ($x) => $x->key = 'concretePost'),
             ]),
         );
     }
