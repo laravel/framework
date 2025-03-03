@@ -185,7 +185,7 @@ class ModelMakeCommandTest extends TestCase
         $this->assertMigrationFileContains([
             'use Illuminate\Database\Migrations\Migration;',
             'return new class extends Migration',
-            'Schema::create(\'foos\', function (Blueprint $table) {',
+            'Schema::create(\'foos\', static function (Blueprint $table) {',
             'Schema::dropIfExists(\'foos\');',
         ], 'create_foos_table.php');
 

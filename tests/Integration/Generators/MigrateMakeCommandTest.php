@@ -12,7 +12,7 @@ class MigrateMakeCommandTest extends TestCase
         $this->assertMigrationFileContains([
             'use Illuminate\Database\Migrations\Migration;',
             'return new class extends Migration',
-            'Schema::table(\'foos\', function (Blueprint $table) {',
+            'Schema::table(\'foos\', static function (Blueprint $table) {',
         ], 'add_bar_to_foos_table.php');
     }
 
