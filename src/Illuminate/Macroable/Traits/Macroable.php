@@ -86,14 +86,14 @@ trait Macroable
     public static function __callStatic($method, $parameters)
     {
         if (! static::hasMacro($method)) {
-            $parent = get_parent_class(static::class);
-            if ($parent && method_exists($parent, '__callStatic')) {
+            // Check if we can call parent::__callStatic() - this checks the entire inheritance chain
+            if (is_callable(['parent', '__callStatic'], true)) {
                 return parent::__callStatic($method, $parameters);
-            } else {
-                throw new BadMethodCallException(sprintf(
-                    'Method %s::%s does not exist.', static::class, $method
-                ));
             }
+            
+            throw new BadMethodCallException(sprintf(
+                'Method %s::%s does not exist.', static::class, $method
+            ));
         }
 
         $macro = static::$macros[$method];
@@ -117,13 +117,14 @@ trait Macroable
     public function __call($method, $parameters)
     {
         if (! static::hasMacro($method)) {
-            if (method_exists(get_parent_class($this), '__call')) {
+            // Check if we can call parent::__call() - this checks the entire inheritance chain
+            if (is_callable(['parent', '__call'], true)) {
                 return parent::__call($method, $parameters);
-            } else {
-                throw new BadMethodCallException(sprintf(
-                    'Method %s::%s does not exist.', static::class, $method
-                ));
             }
+            
+            throw new BadMethodCallException(sprintf(
+                'Method %s::%s does not exist.', static::class, $method
+            ));
         }
 
         $macro = static::$macros[$method];
