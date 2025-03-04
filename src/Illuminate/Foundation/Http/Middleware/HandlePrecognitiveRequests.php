@@ -60,8 +60,8 @@ class HandlePrecognitiveRequests
     {
         $request->attributes->set('precognitive', true);
 
-        $this->container->bind(CallableDispatcherContract::class, fn ($app) => new PrecognitionCallableDispatcher($app));
-        $this->container->bind(ControllerDispatcherContract::class, fn ($app) => new PrecognitionControllerDispatcher($app));
+        $this->container->bind(CallableDispatcherContract::class, PrecognitionCallableDispatcher::class);
+        $this->container->bind(ControllerDispatcherContract::class, PrecognitionControllerDispatcher::class);
     }
 
     /**
