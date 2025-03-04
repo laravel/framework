@@ -1,6 +1,33 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.0.1...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.1.0...12.x)
+
+## [v12.1.0](https://github.com/laravel/framework/compare/v12.0.1...v12.1.0) - 2025-03-04
+
+* [12.x] Test Improvements by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/54782
+* [12.x] Fix incorrect typehints in `BuildsWhereDateClauses` traits by [@mohprilaksono](https://github.com/mohprilaksono) in https://github.com/laravel/framework/pull/54784
+* [12.x] Improve queries readablility by [@hafezdivandari](https://github.com/hafezdivandari) in https://github.com/laravel/framework/pull/54791
+* [12.x] Enhance eventStream to Support Custom Events and Start Messages by [@devhammed](https://github.com/devhammed) in https://github.com/laravel/framework/pull/54776
+* [12.x] Make the PendingCommand class tappable. by [@kevinb1989](https://github.com/kevinb1989) in https://github.com/laravel/framework/pull/54801
+* [12.x] Add missing union type in event stream docblock by [@devhammed](https://github.com/devhammed) in https://github.com/laravel/framework/pull/54800
+* Change return types of `paginage()` methods to `\Illuminate\Pagination\LengthAwarePaginator` by [@carestad](https://github.com/carestad) in https://github.com/laravel/framework/pull/54826
+* [12.x] Check if internal `Hasher::verifyConfiguration()` method exists on driver before forwarding call by [@rodrigopedra](https://github.com/rodrigopedra) in https://github.com/laravel/framework/pull/54833
+* [11.x] Fix using `AsStringable` cast on Notifiable's key by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/54818
+* Add Tests for Handling Null Primary Keys and Special Values in Unique Validation Rule by [@alikhosravidev](https://github.com/alikhosravidev) in https://github.com/laravel/framework/pull/54823
+* Improve docblock for with() method to clarify it adds to existing eag… by [@igorlealantunes](https://github.com/igorlealantunes) in https://github.com/laravel/framework/pull/54838
+* [12.x] Fix dropping schema-qualified prefixed tables by [@hafezdivandari](https://github.com/hafezdivandari) in https://github.com/laravel/framework/pull/54834
+* [12.x] Add `Context::scope()` by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/54799
+* Allow Http requests to be recorded without requests being faked by [@kemp](https://github.com/kemp) in https://github.com/laravel/framework/pull/54850
+* [12.x] Adds a new method "getRawSql" (with embedded bindings) to the QueryException class by [@erickcomp](https://github.com/erickcomp) in https://github.com/laravel/framework/pull/54849
+* Update Inspiring.php by [@ju-gow](https://github.com/ju-gow) in https://github.com/laravel/framework/pull/54846
+* [12.x] Correct use of named argument in `Date` facade and fix a return type.  by [@lmottasin](https://github.com/lmottasin) in https://github.com/laravel/framework/pull/54847
+* Add additional tests for Rule::array validation scenarios by [@alikhosravidev](https://github.com/alikhosravidev) in https://github.com/laravel/framework/pull/54844
+* [12.x] Remove return statement  by [@mohprilaksono](https://github.com/mohprilaksono) in https://github.com/laravel/framework/pull/54842
+* Fix typos by [@co63oc](https://github.com/co63oc) in https://github.com/laravel/framework/pull/54839
+* [12.x] Do not loop through middleware when excluded is empty by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/54837
+* Add test for Arr::reject method in Illuminate Support by [@mohammadrasoulasghari](https://github.com/mohammadrasoulasghari) in https://github.com/laravel/framework/pull/54863
+* [12.x] Feature: Array partition by [@liamduckett](https://github.com/liamduckett) in https://github.com/laravel/framework/pull/54859
+* [12.x] Introduce `ContextLogProcessor` by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/54851
 
 ## [v12.0.1](https://github.com/laravel/framework/compare/v12.0.0...v12.0.1) - 2025-02-24
 
