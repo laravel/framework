@@ -18,6 +18,7 @@ class ContextServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->scoped(Repository::class);
+
         $this->app->bind(ContextLogProcessorContract::class, fn ($app) => new ContextLogProcessor($app));
     }
 
