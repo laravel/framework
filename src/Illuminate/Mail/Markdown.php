@@ -61,9 +61,16 @@ class Markdown
     {
         $this->view->flushFinderCache();
 
+        $bladeCompiler = $this->view->getEngineResolver()->resolve('blade')->getCompiler();
+
+        $orginalEchoFormat = $bladeCompiler->getEchoFormat();
+        $bladeCompiler->setEchoFormat('new Illuminate\Support\EncodedHtmlString(%s)');
+
         $contents = $this->view->replaceNamespace(
             'mail', $this->htmlComponentPaths()
         )->make($view, $data)->render();
+
+        $bladeCompiler->setEchoFormat($orginalEchoFormat);
 
         if ($this->view->exists($customTheme = Str::start($this->theme, 'mail.'))) {
             $theme = $customTheme;

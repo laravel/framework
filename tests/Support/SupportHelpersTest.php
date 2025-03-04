@@ -37,11 +37,7 @@ class SupportHelpersTest extends TestCase
     public function testE()
     {
         $str = 'A \'quote\' is <b>bold</b>';
-        tap(e($str), function ($html) {
-            $this->assertInstanceOf(EncodedHtmlString::class, $html);
-            $this->assertEquals('A &#039;quote&#039; is &lt;b&gt;bold&lt;/b&gt;', $html->toHtml());
-            $this->assertEquals('A &#039;quote&#039; is &lt;b&gt;bold&lt;/b&gt;', (string) $html);
-        });
+        $this->assertEquals('A &#039;quote&#039; is &lt;b&gt;bold&lt;/b&gt;', e($str));
 
         $html = m::mock(Htmlable::class);
         $html->shouldReceive('toHtml')->andReturn($str);
@@ -51,16 +47,16 @@ class SupportHelpersTest extends TestCase
     public function testEWithInvalidCodePoints()
     {
         $str = mb_convert_encoding('føø bar', 'ISO-8859-1', 'UTF-8');
-        $this->assertEquals('f�� bar', (string) e($str));
+        $this->assertEquals('f�� bar', e($str));
     }
 
     public function testEWithEnums()
     {
         $enumValue = StringBackedEnum::ADMIN_LABEL;
-        $this->assertSame('I am &#039;admin&#039;', (string) e($enumValue));
+        $this->assertSame('I am &#039;admin&#039;', e($enumValue));
 
         $enumValue = IntBackedEnum::ROLE_ADMIN;
-        $this->assertSame('1', (string) e($enumValue));
+        $this->assertSame('1', e($enumValue));
     }
 
     public function testBlank()

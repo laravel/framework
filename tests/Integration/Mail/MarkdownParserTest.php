@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Mail;
 
 use Illuminate\Mail\Markdown;
+use Illuminate\Support\EncodedHtmlString;
 use Illuminate\Support\HtmlString;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -43,30 +44,30 @@ class MarkdownParserTest extends TestCase
 
     public static function markdownEncodedDataProvider()
     {
-        yield [e('[Laravel](https://laravel.com)'), '<p>[Laravel](https://laravel.com)</p>'];
+        yield [new EncodedHtmlString('[Laravel](https://laravel.com)'), '<p>[Laravel](https://laravel.com)</p>'];
 
         yield [
-            e('![Welcome to Laravel](https://laravel.com/assets/img/welcome/background.svg)'),
+            new EncodedHtmlString('![Welcome to Laravel](https://laravel.com/assets/img/welcome/background.svg)'),
             '<p>![Welcome to Laravel](https://laravel.com/assets/img/welcome/background.svg)</p>',
         ];
 
         yield [
-            e('Visit https://laravel.com/docs to browse the documentation'),
+            new EncodedHtmlString('Visit https://laravel.com/docs to browse the documentation'),
             '<p>Visit https://laravel.com/docs to browse the documentation</p>',
         ];
 
         yield [
-            e('Visit <https://laravel.com/docs> to browse the documentation'),
+            new EncodedHtmlString('Visit <https://laravel.com/docs> to browse the documentation'),
             '<p>Visit &lt;https://laravel.com/docs&gt; to browse the documentation</p>',
         ];
 
         yield [
-            e('Visit <span>https://laravel.com/docs</span> to browse the documentation'),
+            new EncodedHtmlString('Visit <span>https://laravel.com/docs</span> to browse the documentation'),
             '<p>Visit &lt;span&gt;https://laravel.com/docs&lt;/span&gt; to browse the documentation</p>',
         ];
 
         yield [
-            '![Welcome to Laravel](https://laravel.com/assets/img/welcome/background.svg)<br />'.e('Visit <span>https://laravel.com/docs</span> to browse the documentation'),
+            '![Welcome to Laravel](https://laravel.com/assets/img/welcome/background.svg)<br />'.new EncodedHtmlString('Visit <span>https://laravel.com/docs</span> to browse the documentation'),
             '<p><img src="https://laravel.com/assets/img/welcome/background.svg" alt="Welcome to Laravel" /><br />Visit &lt;span&gt;https://laravel.com/docs&lt;/span&gt; to browse the documentation</p>',
         ];
     }

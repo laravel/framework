@@ -1004,6 +1004,16 @@ class BladeCompiler extends Compiler implements CompilerInterface
     }
 
     /**
+     * Get the echo format to be used by the compiler.
+     *
+     * @return string
+     */
+    public function getEchoFormat()
+    {
+        return $this->echoFormat;
+    }
+
+    /**
      * Set the echo format to be used by the compiler.
      *
      * @param  string  $format

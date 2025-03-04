@@ -123,7 +123,7 @@ if (! function_exists('e')) {
      *
      * @param  \Illuminate\Contracts\Support\DeferringDisplayableValue|\Illuminate\Contracts\Support\Htmlable|\BackedEnum|string|int|float|null  $value
      * @param  bool  $doubleEncode
-     * @return \Illuminate\Support\EncodedHtmlString
+     * @return string
      */
     function e($value, $doubleEncode = true)
     {
@@ -139,7 +139,7 @@ if (! function_exists('e')) {
             $value = $value->value;
         }
 
-        return new EncodedHtmlString($value ?? '', $doubleEncode);
+        return EncodedHtmlString::convert($value ?? '', doubleEncode: $doubleEncode);
     }
 }
 
