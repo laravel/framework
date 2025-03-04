@@ -3,7 +3,6 @@
 namespace Illuminate\Mail;
 
 use Illuminate\Contracts\View\Factory as ViewFactory;
-use Illuminate\Support\EncodedHtmlString;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use League\CommonMark\Environment\Environment;
@@ -64,7 +63,7 @@ class Markdown
         $bladeCompiler = $this->view->getEngineResolver()->resolve('blade')->getCompiler();
 
         $orginalEchoFormat = $bladeCompiler->getEchoFormat();
-        $bladeCompiler->setEchoFormat('new Illuminate\Support\EncodedHtmlString(%s)');
+        $bladeCompiler->setEchoFormat('new Illuminate\Mail\EncodedHtmlString(%s)');
 
         $contents = $this->view->replaceNamespace(
             'mail', $this->htmlComponentPaths()

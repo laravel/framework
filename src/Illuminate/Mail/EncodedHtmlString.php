@@ -1,6 +1,8 @@
 <?php
 
-namespace Illuminate\Support;
+namespace Illuminate\Mail;
+
+use Illuminate\Support\HtmlString;
 
 class EncodedHtmlString extends HtmlString
 {
@@ -12,31 +14,20 @@ class EncodedHtmlString extends HtmlString
     protected static $encodeUsingFactory;
 
     /**
-     * Create a new Encoded HTML string instance.
-     *
-     * @param  string  $html
-     * @param  bool  $doubleEncode
-     * @return void
-     */
-    public function __construct($html = '', protected bool $doubleEncode = true)
-    {
-        parent::__construct($html);
-    }
-
-    /**
      * Convert using default encoding.
      *
      * @internal
      *
      * @param  string|null  $value
-     * @param  int  $flag
-     * @param  string  $encoding
+     * @param  int  $withQuote
      * @param  bool  $doubleEncode
      * @return string
      */
-    public static function convert($value, int $flag = ENT_QUOTES | ENT_SUBSTITUTE, string $encoding = 'UTF-8', bool $doubleEncode = true)
+    public static function convert($value, bool $withQuote = true, bool $doubleEncode = true)
     {
-        return htmlspecialchars($value ?? '', $flag, $encoding, $doubleEncode);
+        $flag = $withQuote ? ENT_QUOTES : ENT_NOQUOTE;
+
+        return htmlspecialchars($value ?? '', $flag | ENT_SUBSTITUTE, 'UTF-8', $doubleEncode);
     }
 
     /**
@@ -47,9 +38,9 @@ class EncodedHtmlString extends HtmlString
     #[\Override]
     public function toHtml()
     {
-        return (static::$encodeUsingFactory ?? function ($value, bool $doubleEncode) {
-            return static::convert($value, doubleEncode: $doubleEncode);
-        })($this->html, $this->doubleEncode);
+        return (static::$encodeUsingFactory ?? function ($value) {
+            return static::convert($value);
+        })($this->html);
     }
 
     /**
