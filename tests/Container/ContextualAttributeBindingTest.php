@@ -7,6 +7,7 @@ use Illuminate\Auth\AuthManager;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Cache\Repository as CacheRepository;
 use Illuminate\Config\Repository;
+use Illuminate\Container\Attributes\Alias;
 use Illuminate\Container\Attributes\Auth;
 use Illuminate\Container\Attributes\Authenticated;
 use Illuminate\Container\Attributes\Cache;
@@ -299,6 +300,27 @@ class ContextualAttributeBindingTest extends TestCase
 
         $this->assertEquals([1, 2], iterator_to_array($value));
     }
+
+    public function testAliasAttribute()
+    {
+        $container = new Container;
+
+        $container->bind(ContainerTestAliasAttribute::class, fn () => new ContainerTestAliasAttribute('default'));
+        $container->bind('one', fn () => new ContainerTestAliasAttribute('one'));
+        $container->bind('two', fn () => new ContainerTestAliasAttribute('two'));
+
+        $default = $container->call(fn (ContainerTestAliasAttribute $object) => $object->name);
+
+        $this->assertEquals('default', $default);
+
+        $one = $container->call(fn (#[Alias('one')] ContainerTestAliasAttribute $object) => $object->name);
+
+        $this->assertEquals('one', $one);
+
+        $two = $container->call(fn (#[Alias('two')] ContainerTestAliasAttribute $object) => $object->name);
+
+        $this->assertEquals('two', $two);
+    }
 }
 
 #[Attribute(Attribute::TARGET_PARAMETER)]
@@ -400,6 +422,14 @@ final class ContainerTestHasConfigValueWithResolvePropertyAndAfterCallback
     public function __construct(
         #[ContainerTestConfigValueWithResolveAndAfter]
         public object $person
+    ) {
+    }
+}
+
+final class ContainerTestAliasAttribute
+{
+    public function __construct(
+        public string $name
     ) {
     }
 }
