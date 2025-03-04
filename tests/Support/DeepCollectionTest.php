@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Support;
 
-use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Collection;
 use PHPUnit\Framework\TestCase;
 
 class DeepCollectionTest extends TestCase
@@ -111,7 +111,8 @@ class DeepCollectionTest extends TestCase
     public function testHandlesEloquentRelationResults()
     {
         // Simulating an Eloquent relation returning an array
-        $model = new class extends Model {
+        $model = new class extends Model
+        {
             public function comments(): HasMany
             {
                 return $this->hasMany(Comment::class);
