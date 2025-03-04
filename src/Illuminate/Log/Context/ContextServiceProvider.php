@@ -2,6 +2,7 @@
 
 namespace Illuminate\Log\Context;
 
+use Illuminate\Contracts\Log\ContextLogProcessor as ContextLogProcessorContract;
 use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Queue\Queue;
 use Illuminate\Support\Facades\Context;
@@ -17,6 +18,8 @@ class ContextServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->scoped(Repository::class);
+
+        $this->app->bind(ContextLogProcessorContract::class, fn ($app) => new ContextLogProcessor($app));
     }
 
     /**
