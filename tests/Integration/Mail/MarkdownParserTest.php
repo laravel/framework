@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Integration\Mail;
 
-use Illuminate\Mail\EncodedHtmlString;
 use Illuminate\Mail\Markdown;
+use Illuminate\Support\EncodedHtmlString;
 use Illuminate\Support\HtmlString;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
