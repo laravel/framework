@@ -6,6 +6,7 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class MailableTest extends TestCase
 {
@@ -16,11 +17,15 @@ class MailableTest extends TestCase
         $app['view']->addLocation(__DIR__.'/Fixtures');
     }
 
-    public function testItCanAssertMarkdownEncodedString()
+    #[DataProvider('markdownEncodedDataProvider')]
+    public function testItCanAssertMarkdownEncodedString($given, $expected)
     {
-        $mailable = new class extends Mailable
+        $mailable = new class($given) extends Mailable
         {
-            public $message = "<script ' &";
+            public function __construct(public string $message)
+            {
+                //
+            }
 
             public function envelope()
             {
@@ -37,8 +42,31 @@ class MailableTest extends TestCase
             }
         };
 
-        $mailable
-            ->assertSeeInText("My message is: <script ' &.")
-            ->assertSeeInHtml("My message is: <script ' &.");
+        $mailable->assertSeeInHtml($expected, false);
+    }
+
+    public static function markdownEncodedDataProvider()
+    {
+        yield ['[Laravel](https://laravel.com)', 'My message is: [Laravel](https://laravel.com)'];
+
+        yield [
+            '![Welcome to Laravel](https://laravel.com/assets/img/welcome/background.svg)',
+            'My message is: ![Welcome to Laravel](https://laravel.com/assets/img/welcome/background.svg)',
+        ];
+
+        yield [
+            'Visit https://laravel.com/docs to browse the documentation',
+            'My message is: Visit https://laravel.com/docs to browse the documentation',
+        ];
+
+        yield [
+            'Visit <https://laravel.com/docs> to browse the documentation',
+            'My message is: Visit &lt;https://laravel.com/docs&gt; to browse the documentation',
+        ];
+
+        yield [
+            'Visit <span>https://laravel.com/docs</span> to browse the documentation',
+            'My message is: Visit &lt;span&gt;https://laravel.com/docs&lt;/span&gt; to browse the documentation',
+        ];
     }
 }
