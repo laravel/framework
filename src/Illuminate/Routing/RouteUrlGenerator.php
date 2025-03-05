@@ -111,28 +111,20 @@ class RouteUrlGenerator
         return $uri;
     }
 
-    // note(wip) this is now used when formatting parameters for URLs
-    // *to routes* (matches the purpose of this class) vs the formatParameters
-    // method in UrlGenerator that is used for url()->to()
-    //
-    // the goal of this method is to match every *provided parameter*
-    // to every *route parameter*, making parameters significantly
-    // less ambiguous and easier to handle in other parts of code
-    //
-    // extra parameters (query strings) are included in the produced array
-    // just like before and the final call to $this->url->formatParameters()
-    // handles turning model instances & similar into route keys even for
-    // query strings -- just like before
+    /**
+     * Format the array of route parameters.
+     *
+     * @param  Route  $route
+     * @param  mixed  $parameters
+     * @return array
+     */
     protected function formatParameters(Route $route, $parameters): array
     {
         // Passed parameters
         $parameters = Arr::wrap($parameters);
 
-        // todo(wip) all count($passedParameters) comparisons
-        // also work with count($parameters), there should be
-        // a test case added that makes it clear which one
-        // should be used
-        $passedParameters = $parameters;
+        // Number of parameters originally passed by the user
+        $passedParameterCount = count($parameters);
 
         // Parameters that have a string key
         $namedParameters = [];
@@ -141,8 +133,8 @@ class RouteUrlGenerator
         $namedQueryParameters = [];
 
         // Names of parameters in the route definition that don't have
-        // a default value in $this->defaultParameters
-        $routeParametersWithoutDefaults = [];
+        // a default value or a value specified using a string key.
+        $routeParametersWithoutDefaultsOrNamedParameters = [];
 
         $routeParameters = $route->parameterNames();
 
@@ -154,21 +146,20 @@ class RouteUrlGenerator
 
                 continue;
             } elseif (! isset($this->defaultParameters[$name])) {
-                // If there's no named parameter AND no default value
+                // If there's no named parameter and no default value,
                 // we track this parameter as a parameter without a
-                // default value and try to match positional parameters
-                // to it in the code below.
-                array_push($routeParametersWithoutDefaults, $name);
+                // default value and then try to match positional
+                // parameters to it in the logic below.
+                array_push($routeParametersWithoutDefaultsOrNamedParameters, $name);
             }
 
-            // Empty value to be filled later or ignored
             $namedParameters[$name] = '';
         }
 
-        // Named parameters that don't have an associated route parameter
-        // will be used for query strings and therefore shouldn't
-        // be used in the following logic for matching provided
-        // parameters with route parameters. They're only
+        // Named parameters that don't have associated route parameters
+        // will be used for query strings and therefore shouldn't be
+        // used in the following logic for matching provided
+        // parameters to route parameters. They're only
         // transformed at the end of the function.
         foreach ($parameters as $key => $value) {
             if (is_string($key)) {
@@ -177,28 +168,16 @@ class RouteUrlGenerator
             }
         }
 
-        // todo(wip) remove, just for debugging convenience.
-        // by this point we want to be sure we're working
-        // with a regular indexed array, so our array_pop() calls
-        // will not mess up anything related to named parameters
-        foreach (array_keys($parameters) as $k) {
-            assert(! is_string($k));
-        }
-
-        // note(wip) if the passed parameter count matches the count of
-        // parameters without defaults, we use the last passed parameter
-        // for the last route parameter without a default value and so on
-        // (handling cases where e..g a parameter with a default follows
-        // one without a default)
-        //
-        // if the passed count is lower, we already know we'll run into a
-        // "missing required parameter" situation. (note: if we used
-        // count($parameters) here instead the check WOULD have to be <=
-        // because we unset *named* parameters above)
-        //
-        // if the passed count is higher, we skip this step
-        if (count($passedParameters) == count($routeParametersWithoutDefaults)) {
-            foreach (array_reverse($routeParametersWithoutDefaults) as $name) {
+        // If the number of positional parameters matches the number
+        // of route parameters that don't have a default value or
+        // a named parameter, we prioritize matching positional
+        // parameters to these route parameters. This covers
+        // cases where a required parameter may be "wrapped"
+        // by parameters that have default values and are
+        // therefore optional, or their values have been
+        // provided as key-value pairs by the developer.
+        if (count($parameters) == count($routeParametersWithoutDefaultsOrNamedParameters)) {
+            foreach (array_reverse($routeParametersWithoutDefaultsOrNamedParameters) as $name) {
                 if (count($parameters) === 0) {
                     break;
                 }
@@ -207,48 +186,32 @@ class RouteUrlGenerator
             }
         }
 
-        // If the number of provided parameters is equal
-        // to the number of total parameters, the user
-        // specified all positional parameters.
+        // If the developer passed more parameters than the route requires,
+        // we know some of those parameters are query string parameters.
+        // This means we can simply assign the passed parameters from
+        // left to right to route parameters.
         //
-        // If the number is greater, the user specified
-        // additonal query parameters.
-        //
-        // In either of these cases, we don't have to do
-        // the reverse matching below.
-        //
-        // Defaults also play no role here -- if the user
-        // provided an equal or greater than number of
-        // parameters than required, but still intends
-        // to use some defaults, with the named query parameters
-        // being for the query string, we don't have any way
-        // of recognizing that intent.
-        //
-        // We still make use of the other logic however,
-        // since parameters formatted into an actual key-value
-        // pair are more accurately handled by the rest of the
-        // routing system -- namely, *other* places that insert
-        // defaults would override positional arguments.
-        $reverse = count($passedParameters) < count($routeParameters);
+        // If fewer parameters were passed, we map the last provided
+        // parameter to the last route parameter repeatedly until
+        // one list runs out of parameters. The remaining route
+        // parameters get filled with defaults if available.
+        $extraParameters = $passedParameterCount > count($routeParameters);
 
-        foreach ($reverse ? array_reverse($namedParameters) : $namedParameters as $key => $value) {
+        foreach ($extraParameters ? $namedParameters : array_reverse($namedParameters) as $key => $value) {
             $bindingField = $route->bindingFieldFor($key);
             $defaultParameterKey = $bindingField ? "$key:$bindingField" : $key;
 
             if ($value !== '') {
                 continue;
             } elseif (! empty($parameters)) {
-                $namedParameters[$key] = $reverse ? array_pop($parameters) : array_shift($parameters);
+                $namedParameters[$key] = $extraParameters ? array_shift($parameters) : array_pop($parameters);
             } elseif (isset($this->defaultParameters[$defaultParameterKey])) {
                 $namedParameters[$key] = $this->defaultParameters[$defaultParameterKey];
             }
         }
 
-        // note(wip) here we could unset $namedParameters items with '' values
-        // but replaceNamedParameters() should be ignoring those just fine
-
-        // note(wip) any remaining values in $parameters by this point are
-        // (unnamed) query string params rather than route params.
+        // Any remaining values in $parameters by this point are unnamed
+        // query string parameters rather than route parameters.
 
         $parameters = array_merge($namedParameters, $namedQueryParameters, $parameters);
 
