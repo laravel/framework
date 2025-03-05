@@ -25,9 +25,7 @@ class MailMarkdownTest extends TestCase
         $engineResolver->shouldReceive('resolve->getCompiler')->andReturn($bladeCompiler);
         $bladeCompiler->shouldReceive('usingEchoFormat')
             ->with('new \Illuminate\Support\EncodedHtmlString(%s)', m::type('Closure'))
-            ->andReturnUsing(function ($echoFormat, $callback) {
-                return $callback();
-            });
+            ->andReturnUsing(fn ($echoFormat, $callback) => $callback());
 
         $markdown = new Markdown($viewFactory);
         $viewFactory->shouldReceive('flushFinderCache')->once();
@@ -51,9 +49,7 @@ class MailMarkdownTest extends TestCase
         $engineResolver->shouldReceive('resolve->getCompiler')->andReturn($bladeCompiler);
         $bladeCompiler->shouldReceive('usingEchoFormat')
             ->with('new \Illuminate\Support\EncodedHtmlString(%s)', m::type('Closure'))
-            ->andReturnUsing(function ($echoFormat, $callback) {
-                return $callback();
-            });
+            ->andReturnUsing(fn ($echoFormat, $callback) => $callback());
 
         $markdown = new Markdown($viewFactory);
         $markdown->theme('yaz');
@@ -78,9 +74,7 @@ class MailMarkdownTest extends TestCase
         $engineResolver->shouldReceive('resolve->getCompiler')->andReturn($bladeCompiler);
         $bladeCompiler->shouldReceive('usingEchoFormat')
             ->with('new \Illuminate\Support\EncodedHtmlString(%s)', m::type('Closure'))
-            ->andReturnUsing(function ($echoFormat, $callback) {
-                return $callback();
-            });
+            ->andReturnUsing(fn ($echoFormat, $callback) => $callback());
 
         $markdown = new Markdown($viewFactory);
         $markdown->theme('mail.yaz');
