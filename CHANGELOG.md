@@ -1,6 +1,13 @@
 # Release Notes for 11.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v11.44.0...11.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v11.44.1...11.x)
+
+## [v11.44.1](https://github.com/laravel/framework/compare/v11.44.0...v11.44.1) - 2025-03-05
+
+* [11.x] Add valid values to ensure method by [@lancepioch](https://github.com/lancepioch) in https://github.com/laravel/framework/pull/54840
+* Fix attribute name used on `Validator` instance within certain rule classes by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/54845
+* [11.x] Fix `Application::interBasePath()` fails to resolve application when project name is "vendor" by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/54871
+* [11.x] Test improvements by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/54879
 
 ## [v11.44.0](https://github.com/laravel/framework/compare/v11.43.2...v11.44.0) - 2025-02-24
 
