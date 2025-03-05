@@ -2400,8 +2400,8 @@ class Builder implements BuilderContract
      * Add a "having" clause to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|\Closure|string  $column
-     * @param  string|int|float|null  $operator
-     * @param  string|int|float|null  $value
+     * @param  \DateTimeInterface|string|int|float|null  $operator
+     * @param  \DateTimeInterface|string|int|float|null  $value
      * @param  string  $boolean
      * @return $this
      */
@@ -2452,8 +2452,8 @@ class Builder implements BuilderContract
      * Add an "or having" clause to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|\Closure|string  $column
-     * @param  string|int|float|null  $operator
-     * @param  string|int|float|null  $value
+     * @param  \DateTimeInterface|string|int|float|null  $operator
+     * @param  \DateTimeInterface|string|int|float|null  $value
      * @return $this
      */
     public function orHaving($column, $operator = null, $value = null)
