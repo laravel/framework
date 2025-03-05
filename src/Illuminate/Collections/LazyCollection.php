@@ -937,14 +937,10 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     public function nth($step, $offset = 0)
     {
         return new static(function () use ($step, $offset) {
-            $position = 0;
-
-            foreach ($this->slice($offset) as $item) {
+            foreach ($this->slice($offset) as $position => $item) {
                 if ($position % $step === 0) {
                     yield $item;
                 }
-
-                $position++;
             }
         });
     }
