@@ -89,28 +89,34 @@ class EventFake implements Dispatcher, Fake
             $actualListener = (new ReflectionFunction($listenerClosure))
                 ->getStaticVariables()['listener'];
 
-            $normalizedListener = $expectedListener;
-
-            if (is_string($actualListener) && Str::contains($actualListener, '@')) {
-                $actualListener = Str::parseCallback($actualListener);
-
-                if (is_string($expectedListener)) {
-                    if (Str::contains($expectedListener, '@')) {
-                        $normalizedListener = Str::parseCallback($expectedListener);
-                    } else {
-                        $normalizedListener = [
-                            $expectedListener,
-                            method_exists($expectedListener, 'handle') ? 'handle' : '__invoke',
-                        ];
-                    }
+            // Normalize expected listener
+            if (is_string($expectedListener)) {
+                if (Str::contains($expectedListener, '@')) {
+                    $expectedListener = Str::parseCallback($expectedListener);
+                } else {
+                    $expectedListener = [
+                        $expectedListener,
+                        method_exists($expectedListener, 'handle') ? 'handle' : '__invoke',
+                    ];
                 }
             }
 
-            if ($actualListener === $normalizedListener ||
-                ($actualListener instanceof Closure &&
-                $normalizedListener === Closure::class)) {
-                PHPUnit::assertTrue(true);
+            // Normalize actual listener
+            if (is_string($actualListener)) {
+                if (Str::contains($actualListener, '@')) {
+                    $actualListener = Str::parseCallback($actualListener);
+                } else {
+                    $actualListener = [
+                        $actualListener,
+                        method_exists($actualListener, 'handle') ? 'handle' : '__invoke',
+                    ];
+                }
+            }
 
+            // Compare
+            if ($actualListener === $expectedListener ||
+                ($actualListener instanceof Closure && $expectedListener === Closure::class)) {
+                PHPUnit::assertTrue(true);
                 return;
             }
         }

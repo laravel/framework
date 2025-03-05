@@ -177,6 +177,8 @@ class EventFakeTest extends TestCase
         Event::assertListening('eloquent.saving: '.Post::class, PostObserver::class.'@saving');
         Event::assertListening('eloquent.saving: '.Post::class, [PostObserver::class, 'saving']);
         Event::assertListening('event', InvokableEventSubscriber::class);
+        Event::assertListening('post-created', PostEventSubscriber::class.'@handlePostCreated');
+        Event::assertListening('post-deleted', PostEventSubscriber::class.'@handlePostDeleted');
     }
 
     public function testMissingMethodsAreForwarded()
