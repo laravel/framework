@@ -26,6 +26,7 @@ use Illuminate\Database\Eloquent\Casts\AsEncryptedArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsEncryptedCollection;
 use Illuminate\Database\Eloquent\Casts\AsEnumArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsEnumCollection;
+use Illuminate\Database\Eloquent\Casts\AsFluentObject;
 use Illuminate\Database\Eloquent\Casts\AsStringable;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Collection;
@@ -45,6 +46,7 @@ use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Fluent as BaseFluent;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Stringable;
 use InvalidArgumentException;
@@ -3123,6 +3125,44 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals(['bar' => 'foo'], $model->getAttribute('singleElementInArrayAttribute')->toArray());
     }
 
+    public function testsCastAsFluentObject()
+    {
+        $model = new EloquentModelCastingStub;
+        $model->setRawAttributes([
+            'asFluentObjectAttribute' => '{"bar": "foo"}',
+        ]);
+        $model->syncOriginal();
+
+        $this->assertInstanceOf(CustomFluent::class, $model->asFluentObjectAttribute);
+        $this->assertEquals(['bar' => 'foo'], $model->asFluentObjectAttribute->toArray());
+        $this->assertEquals(['bar' => 'foo'], $model->getAttribute('asFluentObjectAttribute')->toArray());
+    }
+
+    public function testDirtyOnCastAsFluentObject()
+    {
+        $model = new EloquentModelCastingStub;
+        $model->setRawAttributes([
+            'asFluentObjectAttribute' => '{"bar": "foo"}',
+        ]);
+        $model->syncOriginal();
+
+        $this->assertInstanceOf(CustomFluent::class, $model->asFluentObjectAttribute);
+        $this->assertFalse($model->isDirty('asFluentObjectAttribute'));
+
+        $model->asFluentObjectAttribute = ["bar" => "foo"];
+        $this->assertFalse($model->isDirty('asFluentObjectAttribute'));
+
+        $model->asFluentObjectAttribute = ["bar" => "baz"];
+        $this->assertTrue($model->isDirty('asFluentObjectAttribute'));
+
+        $model->syncOriginal();
+        $this->assertFalse($model->isDirty('asFluentObjectAttribute'));
+
+        $model->asFluentObjectAttribute->bar = 'bat';
+        $this->assertTrue($model->isDirty('asFluentObjectAttribute'));
+    }
+
+
     public function testUnsavedModel()
     {
         $user = new UnsavedModel;
@@ -3599,6 +3639,7 @@ class EloquentModelCastingStub extends Model
         'dateAttribute' => 'date',
         'timestampAttribute' => 'timestamp',
         'ascollectionAttribute' => AsCollection::class,
+        'asFluentObjectAttribute' => AsFluentObject::class.':'.CustomFluent::class,
         'asCustomCollectionAsArrayAttribute' => [AsCollection::class, CustomCollection::class],
         'asEncryptedCollectionAttribute' => AsEncryptedCollection::class,
         'asEnumCollectionAttribute' => AsEnumCollection::class.':'.StringStatus::class,
@@ -3807,6 +3848,11 @@ class Uppercase implements CastsInboundAttributes
 }
 
 class CustomCollection extends BaseCollection
+{
+    //
+}
+
+class CustomFluent extends BaseFluent
 {
     //
 }
