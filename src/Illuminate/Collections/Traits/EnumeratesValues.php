@@ -342,7 +342,7 @@ trait EnumeratesValues
      *
      * @template TEnsureOfType
      *
-     * @param  class-string<TEnsureOfType>|array<array-key, class-string<TEnsureOfType>>  $type
+     * @param  class-string<TEnsureOfType>|array<array-key, class-string<TEnsureOfType>>|scalar|'array'|'null'  $type
      * @return static<TKey, TEnsureOfType>
      *
      * @throws \UnexpectedValueException
