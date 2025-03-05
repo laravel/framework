@@ -1,6 +1,16 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.1.0...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.1.1...12.x)
+
+## [v12.1.1](https://github.com/laravel/framework/compare/v12.1.0...v12.1.1) - 2025-03-05
+
+* [11.x] Add valid values to ensure method by [@lancepioch](https://github.com/lancepioch) in https://github.com/laravel/framework/pull/54840
+* Fix attribute name used on `Validator` instance within certain rule classes by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/54845
+* [11.x] Fix `Application::interBasePath()` fails to resolve application when project name is "vendor" by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/54871
+* [11.x] Test improvements by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/54879
+* [12.x] DocBlock: Changed typehint for `Arr::partition` method by [@AndrewMast](https://github.com/AndrewMast) in https://github.com/laravel/framework/pull/54896
+* Enhance Email and Image Dimensions Validation Tests by [@alikhosravidev](https://github.com/alikhosravidev) in https://github.com/laravel/framework/pull/54897
+* [12.x] Apply default styling rules to the notification stub by [@ahinkle](https://github.com/ahinkle) in https://github.com/laravel/framework/pull/54895
 
 ## [v12.1.0](https://github.com/laravel/framework/compare/v12.0.1...v12.1.0) - 2025-03-04
 
