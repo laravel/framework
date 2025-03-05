@@ -16,7 +16,9 @@ class AsFluentObject implements Castable
     {
         return new class($arguments) implements CastsAttributes
         {
-            public function __construct(protected array $arguments) {}
+            public function __construct(protected array $arguments)
+            {
+            }
 
             public function get($model, $key, $value, $attributes)
             {

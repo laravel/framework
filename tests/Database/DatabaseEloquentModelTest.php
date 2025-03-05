@@ -3149,10 +3149,10 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertInstanceOf(CustomFluent::class, $model->asFluentObjectAttribute);
         $this->assertFalse($model->isDirty('asFluentObjectAttribute'));
 
-        $model->asFluentObjectAttribute = ["bar" => "foo"];
+        $model->asFluentObjectAttribute = ['bar' => 'foo'];
         $this->assertFalse($model->isDirty('asFluentObjectAttribute'));
 
-        $model->asFluentObjectAttribute = ["bar" => "baz"];
+        $model->asFluentObjectAttribute = ['bar' => 'baz'];
         $this->assertTrue($model->isDirty('asFluentObjectAttribute'));
 
         $model->syncOriginal();
