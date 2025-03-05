@@ -3162,7 +3162,6 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertTrue($model->isDirty('asFluentObjectAttribute'));
     }
 
-
     public function testUnsavedModel()
     {
         $user = new UnsavedModel;
