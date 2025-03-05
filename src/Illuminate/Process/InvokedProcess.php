@@ -66,9 +66,17 @@ class InvokedProcess implements InvokedProcessContract
      * Determine if the process is still running.
      *
      * @return bool
+     *
+     * @throws \Illuminate\Process\Exceptions\ProcessTimedOutException
      */
     public function running()
     {
+        try {
+            $this->process->checkTimeout();
+        } catch (SymfonyTimeoutException $e) {
+            throw new ProcessTimedOutException($e, new ProcessResult($this->process));
+        }
+
         return $this->process->isRunning();
     }
 
