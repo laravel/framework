@@ -113,6 +113,22 @@ class InvokedProcess implements InvokedProcessContract
     }
 
     /**
+     * Check if the process has timed out.
+     *
+     * @return void
+     *
+     * @throws \Illuminate\Process\Exceptions\ProcessTimedOutException
+     */
+    public function checkTimeout()
+    {
+        try {
+            $this->process->checkTimeout();
+        } catch (SymfonyTimeoutException $e) {
+            throw new ProcessTimedOutException($e, new ProcessResult($this->process));
+        }
+    }
+
+    /**
      * Wait for the process to finish.
      *
      * @param  callable|null  $output
