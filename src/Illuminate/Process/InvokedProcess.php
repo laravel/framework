@@ -113,13 +113,13 @@ class InvokedProcess implements InvokedProcessContract
     }
 
     /**
-     * Check if the process has timed out.
+     * Ensure that the process has not timed out.
      *
      * @return void
      *
      * @throws \Illuminate\Process\Exceptions\ProcessTimedOutException
      */
-    public function checkTimeout()
+    public function ensureNotTimedOut()
     {
         try {
             $this->process->checkTimeout();
