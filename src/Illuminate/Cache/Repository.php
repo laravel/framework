@@ -432,6 +432,40 @@ class Repository implements ArrayAccess, CacheContract
     }
 
     /**
+     * Get an item from the cache, or execute the given Closure and store the result, if the given "value" is (or resolves to) truthy.
+     *
+     * @template TCacheValue
+     *
+     * @param  (\Closure($this): TWhenParameter)|TWhenParameter|null  $value
+     * @param  \Closure|\DateTimeInterface|\DateInterval|int|null  $ttl
+     * @param  \Closure(): TCacheValue  $callback
+     * @return TCacheValue
+     */
+    public function rememberWhen($value, $key, $ttl, Closure $callback)
+    {
+        $value = $value instanceof Closure ? $value($this) : $value;
+        
+        return $value ? $this->remember($key, $ttl, $callback) : $callback();
+    }
+
+    /**
+     * Get an item from the cache, or execute the given Closure and store the result, if the given "value" is (or resolves to) falsy.
+     *
+     * @template TCacheValue
+     *
+     * @param  (\Closure($this): TWhenParameter)|TWhenParameter|null  $value
+     * @param  \Closure|\DateTimeInterface|\DateInterval|int|null  $ttl
+     * @param  \Closure(): TCacheValue  $callback
+     * @return TCacheValue
+     */
+    public function rememberUnless($value, $key, $ttl, Closure $callback)
+    {
+        $value = $value instanceof Closure ? $value($this) : $value;
+        
+        return ! $value ? $this->remember($key, $ttl, $callback) : $callback();
+    }
+
+    /**
      * Get an item from the cache, or execute the given Closure and store the result forever.
      *
      * @template TCacheValue
@@ -468,6 +502,38 @@ class Repository implements ArrayAccess, CacheContract
         $this->forever($key, $value = $callback());
 
         return $value;
+    }
+
+    /**
+     * Get an item from the cache, or execute the given Closure and store the result forever, if the given "value" is (or resolves to) truthy.
+     *
+     * @template TCacheValue
+     *
+     * @param  (\Closure($this): TWhenParameter)|TWhenParameter|null  $value
+     * @param  \Closure(): TCacheValue  $callback
+     * @return TCacheValue
+     */
+    public function rememberForeverWhen($value, $key, Closure $callback)
+    {
+        $value = $value instanceof Closure ? $value($this) : $value;
+        
+        return $value ? $this->rememberForever($key, $callback) : $callback();
+    }
+
+    /**
+     * Get an item from the cache, or execute the given Closure and store the result forever, if the given "value" is (or resolves to) falsy.
+     *
+     * @template TCacheValue
+     *
+     * @param  (\Closure($this): TWhenParameter)|TWhenParameter|null  $value
+     * @param  \Closure(): TCacheValue  $callback
+     * @return TCacheValue
+     */
+    public function rememberForeverUnless($value, $key, Closure $callback)
+    {
+        $value = $value instanceof Closure ? $value($this) : $value;
+        
+        return ! $value ? $this->rememberForever($key, $callback) : $callback();
     }
 
     /**

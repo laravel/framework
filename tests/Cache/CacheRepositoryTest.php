@@ -142,12 +142,82 @@ class CacheRepositoryTest extends TestCase
         $this->assertSame('bar', $result);
     }
 
+    public function testRememberWhenUnless()
+    {
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('get')->once()->andReturn(null);
+        $repo->getStore()->shouldReceive('put')->once()->with('foo', 'bar', 10);
+        $result = $repo->rememberWhen(true, 'foo', 10, function () {
+            return 'bar';
+        });
+        $this->assertSame('bar', $result);
+
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('get')->never();
+        $repo->getStore()->shouldReceive('put')->never();
+        $result = $repo->rememberWhen(false, 'foo', 10, function () {
+            return 'bar';
+        });
+        $this->assertSame('bar', $result);
+
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('get')->once()->andReturn(null);
+        $repo->getStore()->shouldReceive('put')->once()->with('foo', 'bar', 10);
+        $result = $repo->rememberUnless(false, 'foo', 10, function () {
+            return 'bar';
+        });
+        $this->assertSame('bar', $result);
+
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('get')->never();
+        $repo->getStore()->shouldReceive('put')->never();
+        $result = $repo->rememberUnless(true, 'foo', 10, function () {
+            return 'bar';
+        });
+        $this->assertSame('bar', $result);
+    }
+
     public function testRememberForeverMethodCallsForeverAndReturnsDefault()
     {
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('get')->once()->andReturn(null);
         $repo->getStore()->shouldReceive('forever')->once()->with('foo', 'bar');
         $result = $repo->rememberForever('foo', function () {
+            return 'bar';
+        });
+        $this->assertSame('bar', $result);
+    }
+
+    public function testRememberForeverWhenUnless()
+    {
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('get')->once()->andReturn(null);
+        $repo->getStore()->shouldReceive('forever')->once()->with('foo', 'bar');
+        $result = $repo->rememberForeverWhen(true, 'foo', function () {
+            return 'bar';
+        });
+        $this->assertSame('bar', $result);
+
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('get')->never();
+        $repo->getStore()->shouldReceive('forever')->never();
+        $result = $repo->rememberForeverWhen(false, 'foo', function () {
+            return 'bar';
+        });
+        $this->assertSame('bar', $result);
+
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('get')->once()->andReturn(null);
+        $repo->getStore()->shouldReceive('forever')->once()->with('foo', 'bar');
+        $result = $repo->rememberForeverUnless(false, 'foo', function () {
+            return 'bar';
+        });
+        $this->assertSame('bar', $result);
+
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('get')->never();
+        $repo->getStore()->shouldReceive('forever')->never();
+        $result = $repo->rememberForeverUnless(true, 'foo', function () {
             return 'bar';
         });
         $this->assertSame('bar', $result);
