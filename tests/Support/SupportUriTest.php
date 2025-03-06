@@ -138,5 +138,22 @@ class SupportUriTest extends TestCase
         ]);
 
         $this->assertEquals('existing=value&new=parameter', $uri->query()->decode());
+
+        // Test adding complex nested arrays to empty query string
+        $uri = Uri::of('https://laravel.com');
+
+        $uri = $uri->withQueryIfMissing([
+            'name' => 'Taylor',
+            'role' => [
+                'title' => 'Developer',
+                'focus' => 'PHP',
+            ],
+            'tags' => [
+                'person',
+                'employee',
+            ]
+        ]);
+
+        $this->assertEquals('name=Taylor&role[title]=Developer&role[focus]=PHP&tags[0]=person&tags[1]=employee', $uri->query()->decode());
     }
 }
