@@ -134,7 +134,7 @@ class SupportUriTest extends TestCase
 
         $uri = $uri->withQueryIfMissing([
             'new' => 'parameter',
-            'existing' => 'new_value'
+            'existing' => 'new_value',
         ]);
 
         $this->assertEquals('existing=value&new=parameter', $uri->query()->decode());
@@ -151,9 +151,41 @@ class SupportUriTest extends TestCase
             'tags' => [
                 'person',
                 'employee',
-            ]
+            ],
         ]);
 
         $this->assertEquals('name=Taylor&role[title]=Developer&role[focus]=PHP&tags[0]=person&tags[1]=employee', $uri->query()->decode());
+
+        // Test partial array merging and preserving indexed arrays
+        $uri = Uri::of('https://laravel.com?name=Taylor&tags[0]=person');
+
+        $uri = $uri->withQueryIfMissing([
+            'name' => 'Changed',
+            'age' => 38,
+            'tags' => ['should', 'not', 'change'],
+        ]);
+
+        $this->assertEquals('name=Taylor&tags[0]=person&age=38', $uri->query()->decode());
+        $this->assertEquals(['name' => 'Taylor', 'tags' => ['person'], 'age' => 38], $uri->query()->all());
+
+        $uri = Uri::of('https://laravel.com?user[name]=Taylor');
+
+        $uri = $uri->withQueryIfMissing([
+            'user' => [
+                'name' => 'Should Not Change',
+                'age' => 38,
+            ],
+            'settings' => [
+                'theme' => 'dark',
+            ],
+        ]);
+        $this->assertEquals([
+            'user' => [
+                'name' => 'Taylor',
+            ],
+            'settings' => [
+                'theme' => 'dark',
+            ],
+        ], $uri->query()->all());
     }
 }
