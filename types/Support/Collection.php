@@ -30,7 +30,7 @@ class Invokable
         return 'Taylor';
     }
 }
-$invokable = new Invokable();
+$invokable = new Invokable;
 
 assertType('Illuminate\Support\Collection<int, User>', $collection);
 
