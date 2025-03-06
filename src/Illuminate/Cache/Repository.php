@@ -444,7 +444,7 @@ class Repository implements ArrayAccess, CacheContract
     public function rememberWhen($value, $key, $ttl, Closure $callback)
     {
         $value = $value instanceof Closure ? $value($this) : $value;
-        
+
         return $value ? $this->remember($key, $ttl, $callback) : $callback();
     }
 
@@ -461,7 +461,7 @@ class Repository implements ArrayAccess, CacheContract
     public function rememberUnless($value, $key, $ttl, Closure $callback)
     {
         $value = $value instanceof Closure ? $value($this) : $value;
-        
+
         return ! $value ? $this->remember($key, $ttl, $callback) : $callback();
     }
 
@@ -516,7 +516,7 @@ class Repository implements ArrayAccess, CacheContract
     public function rememberForeverWhen($value, $key, Closure $callback)
     {
         $value = $value instanceof Closure ? $value($this) : $value;
-        
+
         return $value ? $this->rememberForever($key, $callback) : $callback();
     }
 
@@ -532,7 +532,7 @@ class Repository implements ArrayAccess, CacheContract
     public function rememberForeverUnless($value, $key, Closure $callback)
     {
         $value = $value instanceof Closure ? $value($this) : $value;
-        
+
         return ! $value ? $this->rememberForever($key, $callback) : $callback();
     }
 
