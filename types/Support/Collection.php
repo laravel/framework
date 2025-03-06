@@ -10,7 +10,7 @@ class Users implements Arrayable
 {
     public function toArray(): array
     {
-        return [new User()];
+        return [new User];
     }
 }
 
@@ -20,6 +20,8 @@ $arrayable = new Users;
 $iterable = [1];
 /** @var Traversable<int, string> $traversable */
 $traversable = new ArrayIterator(['string']);
+
+$associativeCollection = collect(['John' => new User]);
 
 class Invokable
 {
@@ -806,6 +808,8 @@ assertType('User', $collection->firstOrFail(function ($user, $int) {
 
 assertType('Illuminate\Support\Collection<int, Illuminate\Support\Collection<int, string>>', $collection::make(['string'])->chunk(1));
 assertType('Illuminate\Support\Collection<int, Illuminate\Support\Collection<int, User>>', $collection->chunk(2));
+assertType('Illuminate\Support\Collection<int, Illuminate\Support\Collection<string, User>>', $associativeCollection->chunk(2));
+assertType('Illuminate\Support\Collection<int, Illuminate\Support\Collection<int, User>>', $associativeCollection->chunk(2, false));
 
 assertType('Illuminate\Support\Collection<int, Illuminate\Support\Collection<int, User>>', $collection->chunkWhile(function ($user, $int, $collection) {
     assertType('User', $user);
