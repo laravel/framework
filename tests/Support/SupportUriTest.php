@@ -126,4 +126,17 @@ class SupportUriTest extends TestCase
 
         $this->assertEquals('https://laravel.com/docs/11.x/installation?tags[0]=first&tags[1]=second', $uri->decode());
     }
+
+    public function test_with_query_if_missing()
+    {
+        // Test adding new parameters while preserving existing ones
+        $uri = Uri::of('https://laravel.com?existing=value');
+
+        $uri = $uri->withQueryIfMissing([
+            'new' => 'parameter',
+            'existing' => 'new_value'
+        ]);
+
+        $this->assertEquals('existing=value&new=parameter', $uri->query()->decode());
+    }
 }
