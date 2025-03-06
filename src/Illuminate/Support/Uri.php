@@ -240,6 +240,9 @@ class Uri implements Htmlable, Responsable, Stringable
 
     /**
      * Merge new query parameters into the URI if they are not already in the query string.
+     *
+     * @param  array  $query
+     * @return static
      */
     public function withQueryIfMissing(array $query): static
     {
