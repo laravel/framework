@@ -20,6 +20,7 @@ use Illuminate\Validation\Rules\NotIn;
 use Illuminate\Validation\Rules\Numeric;
 use Illuminate\Validation\Rules\ProhibitedIf;
 use Illuminate\Validation\Rules\RequiredIf;
+use Illuminate\Validation\Rules\TypeRule;
 use Illuminate\Validation\Rules\Unique;
 
 class Rule
@@ -73,6 +74,16 @@ class Rule
     public static function array($keys = null)
     {
         return new ArrayRule(...func_get_args());
+    }
+
+    /**
+     * Get a type rule builder instance.
+     *
+     * @return \Illuminate\Validation\Rules\TypeRule
+     */
+    public static function type()
+    {
+        return new TypeRule;
     }
 
     /**
