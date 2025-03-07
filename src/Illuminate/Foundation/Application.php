@@ -1589,6 +1589,25 @@ class Application extends Container implements ApplicationContract, CachesConfig
     }
 
     /**
+     * Execute the callback with the given locale.
+     *
+     * @param callable(string): void $callback  The function that will be executed. Will receive the current locale.
+     */
+    public function withLocale(string $locale, callable $callback): void
+    {
+        $currentLocale = $this->getLocale();
+
+        try {
+            $this['config']->set('app.locale', $locale);
+            $this['translator']->setLocale($locale);
+            $callback($currentLocale);
+        } finally {
+            $this['config']->set('app.locale', $currentLocale);
+            $this['translator']->setLocale($currentLocale);
+        }
+    }
+
+    /**
      * Set the current application fallback locale.
      *
      * @param  string  $fallbackLocale

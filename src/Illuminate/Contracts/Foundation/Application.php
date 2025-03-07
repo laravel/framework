@@ -231,6 +231,13 @@ interface Application extends Container
     public function setLocale($locale);
 
     /**
+     * Execute the callback with the given locale.
+     *
+     * @param callable(string): void $callback  The function that will be executed. Will receive the current locale.
+     */
+    public function withLocale(string $locale, callable $callback): void;
+
+    /**
      * Determine if middleware has been disabled for the application.
      *
      * @return bool
