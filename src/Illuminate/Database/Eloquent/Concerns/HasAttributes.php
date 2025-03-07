@@ -787,7 +787,7 @@ trait HasAttributes
 
                     return $cast.':'.implode(',', $arguments);
                 }),
-                default => $cast,
+                default => (string) $cast,
             };
         }
 
