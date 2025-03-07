@@ -1758,6 +1758,17 @@ class SupportStrTest extends TestCase
             $this->assertSame($expected, Str::chopEnd($subject, $needle));
         }
     }
+
+    public function testReplaceMatches()
+    {
+        // Test basic string replacement
+        $this->assertSame('foo bar bar', Str::replaceMatches('/baz/', 'bar', 'foo baz bar'));
+        $this->assertSame('foo BBB baz', Str::replaceMatches('/bar/', 'BBB', 'foo bar baz'));
+        $this->assertSame('foo baz baz', Str::replaceMatches('/404/', 'found', 'foo baz baz'));
+
+        // Test with array of patterns
+        $this->assertSame('foo XXX YYY', Str::replaceMatches(['/bar/', '/baz/'], ['XXX', 'YYY'], 'foo bar baz'));
+    }
 }
 
 class StringableObjectStub
