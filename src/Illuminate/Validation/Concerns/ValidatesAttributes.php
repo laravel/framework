@@ -21,6 +21,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Exceptions\MathException;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\NativeType;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\Unique;
@@ -2566,6 +2567,32 @@ trait ValidatesAttributes
             constant(DateTimeZone::class.'::'.Str::upper($parameters[0] ?? 'ALL')),
             isset($parameters[1]) ? Str::upper($parameters[1]) : null,
         ), true);
+    }
+
+    /**
+     * Strictly validate that an attribute is of expected type
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<string, null|string>  $parameters
+     * @return bool
+     */
+    public function validateType($attribute, $value, $parameters = [])
+    {
+        $this->requireParameterCount(1, $parameters, 'type');
+
+        $expectedType = NativeType::from($parameters[0]);
+
+        return match ($expectedType) {
+            NativeType::Array => is_array($value),
+            NativeType::Bool => is_bool($value),
+            NativeType::Float => is_float($value),
+            NativeType::Int => is_int($value),
+            NativeType::Numeric => is_numeric($value),
+            NativeType::Scalar => is_scalar($value),
+            NativeType::String => is_string($value),
+            default => false,
+        };
     }
 
     /**
