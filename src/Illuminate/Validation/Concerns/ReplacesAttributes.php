@@ -748,6 +748,20 @@ trait ReplacesAttributes
     }
 
     /**
+     * Replace all place-holders for the date_format rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array<int,string>  $parameters
+     * @return string
+     */
+    protected function replaceType($message, $attribute, $rule, $parameters)
+    {
+        return str_replace(':type', $parameters[0], $message);
+    }
+
+    /**
      * Replace all place-holders for the before rule.
      *
      * @param  string  $message
