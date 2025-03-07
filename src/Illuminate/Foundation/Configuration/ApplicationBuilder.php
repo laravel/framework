@@ -44,6 +44,13 @@ class ApplicationBuilder
     protected array $pageMiddleware = [];
 
     /**
+     * An optional callback that is invoked right before the app is returned by the create method.
+     *
+     * @var \Closure|null
+     */
+    protected ?Closure $createCallback = null;
+
+    /**
      * Create a new application builder instance.
      */
     public function __construct(protected Application $app)
@@ -418,6 +425,19 @@ class ApplicationBuilder
     }
 
     /**
+     * Register a callback to be invoked before the application is returned by the create method.
+     *
+     * @param  \Closure $callback
+     * @return $this
+     */
+    public function with(Closure $callback)
+    {
+        $this->createCallback = $callback;
+
+        return $this;
+    }
+
+    /**
      * Register a callback to be invoked when the application's service providers are registered.
      *
      * @param  callable  $callback
@@ -463,6 +483,10 @@ class ApplicationBuilder
      */
     public function create()
     {
+        if ($this->createCallback !== null) {
+            call_user_func($this->createCallback,  $this->app);
+        }
+
         return $this->app;
     }
 }
