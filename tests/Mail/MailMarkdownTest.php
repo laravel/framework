@@ -3,6 +3,8 @@
 namespace Illuminate\Tests\Mail;
 
 use Illuminate\Mail\Markdown;
+use Illuminate\View\Compilers\BladeCompiler;
+use Illuminate\View\Engines\EngineResolver;
 use Illuminate\View\Factory;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -17,6 +19,14 @@ class MailMarkdownTest extends TestCase
     public function testRenderFunctionReturnsHtml()
     {
         $viewFactory = m::mock(Factory::class);
+        $engineResolver = m::mock(EngineResolver::class);
+        $bladeCompiler = m::mock(BladeCompiler::class);
+        $viewFactory->shouldReceive('getEngineResolver')->andReturn($engineResolver);
+        $engineResolver->shouldReceive('resolve->getCompiler')->andReturn($bladeCompiler);
+        $bladeCompiler->shouldReceive('usingEchoFormat')
+            ->with('new \Illuminate\Support\EncodedHtmlString(%s)', m::type('Closure'))
+            ->andReturnUsing(fn ($echoFormat, $callback) => $callback());
+
         $markdown = new Markdown($viewFactory);
         $viewFactory->shouldReceive('flushFinderCache')->once();
         $viewFactory->shouldReceive('replaceNamespace')->once()->with('mail', $markdown->htmlComponentPaths())->andReturnSelf();
@@ -33,6 +43,14 @@ class MailMarkdownTest extends TestCase
     public function testRenderFunctionReturnsHtmlWithCustomTheme()
     {
         $viewFactory = m::mock(Factory::class);
+        $engineResolver = m::mock(EngineResolver::class);
+        $bladeCompiler = m::mock(BladeCompiler::class);
+        $viewFactory->shouldReceive('getEngineResolver')->andReturn($engineResolver);
+        $engineResolver->shouldReceive('resolve->getCompiler')->andReturn($bladeCompiler);
+        $bladeCompiler->shouldReceive('usingEchoFormat')
+            ->with('new \Illuminate\Support\EncodedHtmlString(%s)', m::type('Closure'))
+            ->andReturnUsing(fn ($echoFormat, $callback) => $callback());
+
         $markdown = new Markdown($viewFactory);
         $markdown->theme('yaz');
         $viewFactory->shouldReceive('flushFinderCache')->once();
@@ -50,6 +68,14 @@ class MailMarkdownTest extends TestCase
     public function testRenderFunctionReturnsHtmlWithCustomThemeWithMailPrefix()
     {
         $viewFactory = m::mock(Factory::class);
+        $engineResolver = m::mock(EngineResolver::class);
+        $bladeCompiler = m::mock(BladeCompiler::class);
+        $viewFactory->shouldReceive('getEngineResolver')->andReturn($engineResolver);
+        $engineResolver->shouldReceive('resolve->getCompiler')->andReturn($bladeCompiler);
+        $bladeCompiler->shouldReceive('usingEchoFormat')
+            ->with('new \Illuminate\Support\EncodedHtmlString(%s)', m::type('Closure'))
+            ->andReturnUsing(fn ($echoFormat, $callback) => $callback());
+
         $markdown = new Markdown($viewFactory);
         $markdown->theme('mail.yaz');
         $viewFactory->shouldReceive('flushFinderCache')->once();
