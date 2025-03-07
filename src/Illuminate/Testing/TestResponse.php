@@ -1656,6 +1656,23 @@ class TestResponse implements ArrayAccess
     }
 
     /**
+     * Dump the payload from the response and end the script.
+     *
+     * @param  string|null  $key
+     * @return never
+     */
+    public function ddBody($key = null)
+    {
+        $content = $this->content();
+
+        if (json_validate($content)) {
+            $this->ddJson($key);
+        }
+
+        dd($content);
+    }
+
+    /**
      * Dump the session from the response and end the script.
      *
      * @param  string|array  $keys
