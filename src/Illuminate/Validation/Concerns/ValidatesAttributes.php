@@ -2570,7 +2570,7 @@ trait ValidatesAttributes
     }
 
     /**
-     * Strictly validate that an attribute is of expected type
+     * Strictly validate that an attribute is of expected type.
      *
      * @param  string  $attribute
      * @param  mixed  $value
