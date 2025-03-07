@@ -2148,18 +2148,18 @@ class SupportCollectionTest extends TestCase
     #[DataProvider('collectionClassProvider')]
     public function testChunkPreservingKeys($collection)
     {
-        $data = new $collection([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+        $data = new $collection(['a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5]);
 
         $this->assertEquals(
-            [[0 => 1, 1 => 2, 2 => 3], [3 => 4, 4 => 5, 5 => 6], [6 => 7, 7 => 8, 8 => 9], [9 => 10]],
-            $data->chunk(3)->toArray()
+            [['a' => 1, 'b' => 2], ['c' => 3, 'd' => 4], ['e' => 5]],
+            $data->chunk(2)->toArray()
         );
 
-        $data = new $collection([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+        $data = new $collection([1, 2, 3, 4, 5]);
 
         $this->assertEquals(
-            [[1, 2, 3], [4, 5, 6], [7, 8, 9], [10]],
-            $data->chunk(3, false)->toArray()
+            [[0 => 1, 1 => 2], [0 => 3, 1 => 4], [0 => 5]],
+            $data->chunk(2, false)->toArray()
         );
     }
 

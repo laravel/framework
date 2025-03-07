@@ -1377,7 +1377,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
      *
      * @param  int  $size
      * @param  bool  $preserveKeys
-     * @return static<int, static>
+     * @return ($preserveKeys is true ? static<int, static> : static<int, static<int, TValue>>)
      */
     public function chunk($size, $preserveKeys = true)
     {
