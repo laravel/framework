@@ -1655,7 +1655,7 @@ class TestResponse implements ArrayAccess
     {
         $content = $this->content();
 
-        if (json_validate($content)) {
+        if (function_exists('json_validate') && json_validate($content)) {
             $this->ddJson($key);
         }
 
