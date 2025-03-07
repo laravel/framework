@@ -1646,17 +1646,7 @@ class TestResponse implements ArrayAccess
     }
 
     /**
-     * Dump the JSON payload from the response and end the script.
-     *
-     * @param  string|null  $key
-     */
-    public function ddJson($key = null)
-    {
-        dd($this->json($key));
-    }
-
-    /**
-     * Dump the payload from the response and end the script.
+     * Dump the body of the response and end the script.
      *
      * @param  string|null  $key
      * @return never
@@ -1670,6 +1660,16 @@ class TestResponse implements ArrayAccess
         }
 
         dd($content);
+    }
+
+    /**
+     * Dump the JSON payload from the response and end the script.
+     *
+     * @param  string|null  $key
+     */
+    public function ddJson($key = null)
+    {
+        dd($this->json($key));
     }
 
     /**
