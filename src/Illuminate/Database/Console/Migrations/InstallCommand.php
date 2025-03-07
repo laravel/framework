@@ -53,7 +53,7 @@ class InstallCommand extends Command
     {
         $this->repository->setSource($this->input->getOption('database'));
 
-        if (!$this->repository->repositoryExists()) {
+        if (! $this->repository->repositoryExists()) {
             $this->repository->createRepository();
         }
 
