@@ -427,7 +427,7 @@ class ApplicationBuilder
     /**
      * Register a callback to be invoked before the application is returned by the create method.
      *
-     * @param  \Closure $callback
+     * @param  \Closure  $callback
      * @return $this
      */
     public function with(Closure $callback)
@@ -484,7 +484,7 @@ class ApplicationBuilder
     public function create()
     {
         if ($this->createCallback !== null) {
-            call_user_func($this->createCallback,  $this->app);
+            call_user_func($this->createCallback, $this->app);
         }
 
         return $this->app;
