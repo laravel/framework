@@ -951,7 +951,7 @@ class Arr
      * @param  iterable<TKey, TValue>  $array
      * @param  callable(TValue, TKey): bool  $callback
      * @param  bool  $preserveKeys
-     * @return array<int<0, 1>, array<TKey, TValue>>
+     * @return ($preserveKeys is true ? array<int<0, 1>, array<TKey, TValue>> : array<int<0, 1>, list<TValue>>)
      */
     public static function partition($array, callable $callback, bool $preserveKeys = true)
     {
