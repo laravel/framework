@@ -4,11 +4,14 @@ use Illuminate\Support\Arr;
 
 use function PHPStan\Testing\assertType;
 
+/** @var array<int, User> $array */
 $array = [new User];
 /** @var iterable<int, User> $iterable */
 $iterable = [];
 /** @var Traversable<int, User> $traversable */
 $traversable = new ArrayIterator([new User]);
+/** @var array<string, User> $associativeArray */
+$associativeArray = ['John' => new User];
 
 assertType('User|null', Arr::first($array));
 assertType('User|null', Arr::first($array, function ($user) {
@@ -99,3 +102,6 @@ assertType("'string'|User", Arr::last($traversable, function ($user) {
 assertType("'string'|User", Arr::last($traversable, null, function () {
     return 'string';
 }));
+
+assertType('array<int<0, 1>, array<string, User>>', Arr::partition($associativeArray, fn($user) => true));
+assertType('array<int<0, 1>, array<int, User>>', Arr::partition($associativeArray, fn($user) => true, false));
