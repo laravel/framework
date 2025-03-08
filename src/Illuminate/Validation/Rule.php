@@ -18,6 +18,7 @@ use Illuminate\Validation\Rules\ImageFile;
 use Illuminate\Validation\Rules\In;
 use Illuminate\Validation\Rules\NotIn;
 use Illuminate\Validation\Rules\Numeric;
+use Illuminate\Validation\Rules\OneOf;
 use Illuminate\Validation\Rules\ProhibitedIf;
 use Illuminate\Validation\Rules\RequiredIf;
 use Illuminate\Validation\Rules\Unique;
@@ -244,6 +245,17 @@ class Rule
     public static function numeric()
     {
         return new Numeric;
+    }
+
+    /**
+     * Get a oneof rule builder instance.
+     *
+     * @param \Illuminate\Contracts\Validation\ValidationRule[] $values
+     * @return \Illuminate\Validation\Rules\OneOf
+     */
+    public static function oneOf($rules)
+    {
+        return new OneOf($rules);
     }
 
     /**
