@@ -950,18 +950,24 @@ class Arr
      *
      * @param  iterable<TKey, TValue>  $array
      * @param  callable(TValue, TKey): bool  $callback
+     * @param  bool  $preserveKeys
      * @return array<int<0, 1>, array<TKey, TValue>>
      */
-    public static function partition($array, callable $callback)
+    public static function partition($array, callable $callback, bool $preserveKeys = true)
     {
         $passed = [];
         $failed = [];
 
+        $add = match ($preserveKeys) {
+            true => fn (array &$array, mixed $value, int|string $key) => $array[$key] = $value,
+            false => fn (array &$array, mixed $value, int|string $key) => $array[] = $value,
+        };
+
         foreach ($array as $key => $item) {
             if ($callback($item, $key)) {
-                $passed[$key] = $item;
+                $add($passed, $item, $key);
             } else {
-                $failed[$key] = $item;
+                $add($failed, $item, $key);
             }
         }
 
