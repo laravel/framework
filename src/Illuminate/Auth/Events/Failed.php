@@ -2,6 +2,8 @@
 
 namespace Illuminate\Auth\Events;
 
+use Illuminate\Contracts\Auth\Authenticatable;
+
 class Failed
 {
     /**
@@ -13,9 +15,9 @@ class Failed
      * @return void
      */
     public function __construct(
-        public $guard,
-        public $user,
-        #[\SensitiveParameter] public $credentials,
+        public string $guard,
+        public ?Authenticatable $user,
+        #[\SensitiveParameter] public array $credentials,
     ) {
     }
 }

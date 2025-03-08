@@ -2,6 +2,7 @@
 
 namespace Illuminate\Auth\Events;
 
+use Illuminate\Contracts\Auth\CanResetPassword;
 use Illuminate\Queue\SerializesModels;
 
 class PasswordResetLinkSent
@@ -15,7 +16,7 @@ class PasswordResetLinkSent
      * @return void
      */
     public function __construct(
-        public $user,
+        public CanResetPassword $user,
     ) {
     }
 }
