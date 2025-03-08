@@ -45,7 +45,7 @@ class InvokeSerializedClosureCommand extends Command
                 'successful' => true,
                 'result' => serialize($this->laravel->call(match (true) {
                     ! is_null($this->argument('code')) => unserialize($this->argument('code')),
-                    isset($_SERVER['LARAVEL_INVOKABLE_CLOSURE']) => unserialize($_SERVER['LARAVEL_INVOKABLE_CLOSURE']),
+                    isset($_SERVER['LARAVEL_INVOKABLE_CLOSURE']) => str_starts_with($_SERVER['LARAVEL_INVOKABLE_CLOSURE'], 'O:47:"Laravel\SerializableClosure\SerializableClosure"') ? unserialize($_SERVER['LARAVEL_INVOKABLE_CLOSURE']) : json_decode($_SERVER['LARAVEL_INVOKABLE_CLOSURE'], true),
                     default => fn () => null,
                 })),
             ]));

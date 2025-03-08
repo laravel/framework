@@ -33,8 +33,17 @@ class ProcessDriver implements Driver
 
         $results = $this->processFactory->pool(function (Pool $pool) use ($tasks, $command) {
             foreach (Arr::wrap($tasks) as $key => $task) {
+
+                // Check if the task is a closure
+                if ($task instanceof Closure) {
+                    $serializedTask = serialize(new SerializableClosure($task));
+                } else {
+                    // Serialize arrays or other data as JSON
+                    $serializedTask = json_encode($task);
+                }
+
                 $pool->as($key)->path(base_path())->env([
-                    'LARAVEL_INVOKABLE_CLOSURE' => serialize(new SerializableClosure($task)),
+                    'LARAVEL_INVOKABLE_CLOSURE' => serialize($serializedTask),
                 ])->command($command);
             }
         })->start()->wait();
@@ -67,8 +76,17 @@ class ProcessDriver implements Driver
 
         return defer(function () use ($tasks, $command) {
             foreach (Arr::wrap($tasks) as $task) {
+
+                // Check if the task is a closure
+                if ($task instanceof Closure) {
+                    $serializedTask = serialize(new SerializableClosure($task));
+                } else {
+                    // Serialize arrays or other data as JSON
+                    $serializedTask = json_encode($task);
+                }
+
                 $this->processFactory->path(base_path())->env([
-                    'LARAVEL_INVOKABLE_CLOSURE' => serialize(new SerializableClosure($task)),
+                    'LARAVEL_INVOKABLE_CLOSURE' => serialize($serializedTask),
                 ])->run($command.' 2>&1 &');
             }
         });
