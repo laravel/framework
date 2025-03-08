@@ -1565,9 +1565,11 @@ class SupportArrTest extends TestCase
     public function testPartition()
     {
         $array = ['John', 'Jane', 'Greg'];
-
         $result = Arr::partition($array, fn (string $value) => str_contains($value, 'J'));
-
         $this->assertEquals([[0 => 'John', 1 => 'Jane'], [2 => 'Greg']], $result);
+
+        $assocArray = ['John', 'Jane', 'Greg'];
+        $result = Arr::partition($assocArray, fn (string $value) => str_contains($value, 'J'), false);
+        $this->assertEquals([[0 => 'John', 1 => 'Jane'], [0 => 'Greg']], $result);
     }
 }
