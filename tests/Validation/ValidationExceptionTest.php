@@ -7,6 +7,7 @@ use Illuminate\Translation\Translator;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\Response;
 
 class ValidationExceptionTest extends TestCase
 {
@@ -124,28 +125,43 @@ class ValidationExceptionTest extends TestCase
         $this->assertSame(['foo' => ['validation.required']], $exception->errors());
     }
 
-    public function testExceptionStatusOneError()
+    public function testExceptionHasDefaultStatusAndCanBeUpdated()
     {
         $exception = $this->getException([], ['foo' => 'required']);
-        $exception->status(500);
 
+        $this->assertEquals(422, $exception->status);
+
+        $exception->status(500);
         $this->assertEquals(500, $exception->status);
+
+        $exception->status(400);
+        $this->assertEquals(400, $exception->status);
+
+        $exception->status(403);
+        $this->assertEquals(403, $exception->status);
     }
 
-    public function testExceptionErrorBagOneError()
+    public function testExceptionHasDefaultErrorBagAndCanBeUpdated()
     {
         $exception = $this->getException([], ['foo' => 'required']);
-        $exception->errorBag('milwad');
 
+        $this->assertEquals('default', $exception->errorBag);
+
+        $exception->errorBag('milwad');
         $this->assertEquals('milwad', $exception->errorBag);
     }
 
     public function testExceptionRedirectToOneError()
     {
         $exception = $this->getException([], ['foo' => 'required']);
-        $exception->redirectTo('https://google.com');
 
+        $this->assertNull($exception->redirectTo);
+
+        $exception->redirectTo('https://google.com');
         $this->assertEquals('https://google.com', $exception->redirectTo);
+
+        $exception->redirectTo('/dashboard');
+        $this->assertEquals('/dashboard', $exception->redirectTo);
     }
 
     public function testExceptionGetResponseOneError()
@@ -162,6 +178,16 @@ class ValidationExceptionTest extends TestCase
         $exception = $validator->getException();
 
         $this->assertEquals(ValidationException::class, $exception);
+    }
+
+    public function testExceptionSetAndGetResponse()
+    {
+        $exception = $this->getException([], ['foo' => 'required']);
+
+        $responseMock = $this->createMock(Response::class);
+        $exception->response = $responseMock;
+
+        $this->assertSame($responseMock, $exception->getResponse());
     }
 
     protected function getException($data = [], $rules = [], $translator = null)
