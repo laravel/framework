@@ -60,7 +60,7 @@ class ValidationOneOfRuleTest extends TestCase
                         'p3' => ['required', Rule::oneOf([[
                             'p4' => ['nullable', 'string'],
                         ]])],
-                    ]
+                    ],
                 ])],
             ],
         ];
@@ -79,9 +79,9 @@ class ValidationOneOfRuleTest extends TestCase
             'p1' => [
                 'p2' => 'a_string',
                 'p3' => [
-                    'p4' => 'a_string'
-                ]
-            ]
+                    'p4' => 'a_string',
+                ],
+            ],
         ]], ['foo' => Rule::oneOf($this->nestedRules)]);
         $this->assertTrue($validator->passes());
     }
