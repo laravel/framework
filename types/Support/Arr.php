@@ -103,5 +103,5 @@ assertType("'string'|User", Arr::last($traversable, null, function () {
     return 'string';
 }));
 
-assertType('array<int<0, 1>, array<string, User>>', Arr::partition($associativeArray, fn($user) => true));
-assertType('array<int<0, 1>, list<User>>', Arr::partition($associativeArray, fn($user) => true, false));
+assertType('array<int<0, 1>, array<string, User>>', Arr::partition($associativeArray, fn ($user) => true));
+assertType('array<int<0, 1>, list<User>>', Arr::partition($associativeArray, fn ($user) => true, false));
