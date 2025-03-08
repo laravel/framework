@@ -221,7 +221,7 @@ class Collection extends BaseCollection implements QueueableCollection
             $relations = func_get_args();
         }
 
-        foreach ($relations as $key => $value) {
+        foreach ($this->prepareLoadMissingRelationships($relations) as $key => $value) {
             if (is_numeric($key)) {
                 $key = $value;
             }
@@ -246,6 +246,40 @@ class Collection extends BaseCollection implements QueueableCollection
         }
 
         return $this;
+    }
+
+    /**
+     * Prepare nested load missing relationships.
+     *
+     * @param  array  $relations
+     * @param  string  $prefix
+     * @return array
+     */
+    protected function prepareLoadMissingRelationships($relations, $prefix = '')
+    {
+        $preparedRelationships = [];
+
+        foreach ($relations as $key => $value) {
+            $fullKey = $prefix ? "$prefix.$key" : $key;
+
+            // If the value is not an array, it can be used as-is
+            if (! is_array($value)) {
+                $preparedRelationships[$fullKey] = $value;
+            } else {
+                if (array_values($value) === $value) {
+                    // If the array has a depth of 1, we simply flatten the array
+                    foreach ($value as $subValue) {
+                        $preparedRelationships["$fullKey.$subValue"] = null;
+                    }
+                } else {
+                    // We now know that the remaining relationships are nested arrays
+                    // so we must prepare them recursively
+                    $preparedRelationships = array_merge($preparedRelationships, $this->prepareLoadMissingRelationships($value, $fullKey));
+                }
+            }
+        }
+
+        return $preparedRelationships;
     }
 
     /**
