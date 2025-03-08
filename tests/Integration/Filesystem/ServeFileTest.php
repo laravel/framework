@@ -3,8 +3,10 @@
 namespace Illuminate\Tests\Integration\Filesystem;
 
 use Illuminate\Support\Facades\Storage;
+use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\TestCase;
 
+#[WithConfig('filesystems.disks.local.serve', true)]
 class ServeFileTest extends TestCase
 {
     protected function setUp(): void
@@ -47,12 +49,5 @@ class ServeFileTest extends TestCase
         $response = $this->get($url);
 
         $response->assertForbidden();
-    }
-
-    protected function getEnvironmentSetup($app)
-    {
-        tap($app['config'], function ($config) {
-            $config->set('filesystems.disks.local.serve', true);
-        });
     }
 }
