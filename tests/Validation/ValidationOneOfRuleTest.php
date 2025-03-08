@@ -17,6 +17,7 @@ class ValidationOneOfRuleTest extends TestCase
     use CreatesApplication;
 
     private array $rules;
+    private array $nestedRules;
     private Translator $translator;
 
     protected function setUp(): void
@@ -50,6 +51,19 @@ class ValidationOneOfRuleTest extends TestCase
                 'p3' => ['nullable', 'alpha'],
             ],
         ];
+
+        $this->nestedRules = [
+            [
+                'p1' => ['required', Rule::oneOf([
+                    [
+                        'p2' => ['required', 'string'],
+                        'p3' => ['required', Rule::oneOf([[
+                            'p4' => ['nullable', 'string'],
+                        ]])],
+                    ]
+                ])],
+            ],
+        ];
     }
 
     public function testThrowsTypeErrorForInvalidInput()
@@ -57,6 +71,19 @@ class ValidationOneOfRuleTest extends TestCase
         $this->expectException(TypeError::class);
         $v = new Validator($this->translator, ['foo' => 'not an array'], ['foo' => Rule::oneOf($this->rules)]);
         $v->validate();
+    }
+
+    public function testValidatesPossibleNesting()
+    {
+        $validator = new Validator($this->translator, ['foo' => [
+            'p1' => [
+                'p2' => 'a_string',
+                'p3' => [
+                    'p4' => 'a_string'
+                ]
+            ]
+        ]], ['foo' => Rule::oneOf($this->nestedRules)]);
+        $this->assertTrue($validator->passes());
     }
 
     public function testValidatesSuccessfullyWithKey2AndValidP2()
