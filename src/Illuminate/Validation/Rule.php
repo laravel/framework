@@ -250,7 +250,7 @@ class Rule
     /**
      * Get a oneof rule builder instance.
      *
-     * @param \Illuminate\Contracts\Validation\ValidationRule[] $values
+     * @param  \Illuminate\Contracts\Validation\ValidationRule[]  $values
      * @return \Illuminate\Validation\Rules\OneOf
      */
     public static function oneOf($rules)
