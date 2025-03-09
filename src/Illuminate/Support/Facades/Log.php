@@ -2,6 +2,9 @@
 
 namespace Illuminate\Support\Facades;
 
+use Illuminate\Support\Testing\Fakes\LogFake;
+use Illuminate\Support\Testing\Fakes\QueueFake;
+
 /**
  * @method static \Psr\Log\LoggerInterface build(array $config)
  * @method static \Psr\Log\LoggerInterface stack(array $channels, string|null $channel = null)
@@ -39,6 +42,16 @@ namespace Illuminate\Support\Facades;
  */
 class Log extends Facade
 {
+    public static function fake()
+    {
+        $actualLogManager = static::isFake()
+            ? static::getFacadeRoot()->logManager
+            : static::getFacadeRoot();
+        return tap(new LogFake(static::getFacadeApplication(), $actualLogManager), function ($fake) {
+            static::swap($fake);
+        });
+    }
+
     /**
      * Get the registered name of the component.
      *
