@@ -89,6 +89,22 @@ class LogFakeTest extends TestCase
         ], $logs[0]);
     }
 
+    public function test_it_respects_config_level_of_underlying_channel()
+    {
+        config(['logging.channels.single.level' => 'warning']);
+        Log::fake();
+
+        Log::channel('single')->debug('you will not see me');
+        Log::channel('single')->info('not visible');
+        Log::channel('single')->warning('i should be visible');
+        Log::channel('single')->critical('also visible');
+
+        $logs = Log::logged(channel: 'single');
+        $this->assertCount(2, $logs);
+
+        $this->assertEqualsCanonicalizing(['i should be visible', 'also visible'], $logs->pluck('message')->all());
+    }
+
     private function assertLogRecordArrayMatches(array $expected, array $actual)
     {
         $this->assertEqualsCanonicalizing(

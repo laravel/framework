@@ -40,6 +40,7 @@ class LogFake extends LogManager implements Fake
     protected function resolve($name, ?array $config = null)
     {
         return parent::resolve($name, [
+            ...($config ?? $this->configurationFor($name)),
             ...$this->getTestingConfig(),
             ...['name' => $name],
         ])->pushProcessor($this->useAppTimeForLogRecord(...));
@@ -75,7 +76,7 @@ class LogFake extends LogManager implements Fake
      * Convert LogRecord to an array.
      *
      * @param  LogRecord  $logRecord
-     * @return array{"message": string, "context": array<array-key, mixed>, "level_int": 100|200|250|300|400|500|550|600, "level": "emergency"|"alert"|"critical"|"error"|"warning"|"notice"|"info"|"debug", "channel": string, "datetime": \DateTimeInterface, "extra": array<array-key, mixed>}
+     * @return array{"message": string, "context": array<array-key, mixed>, "level_int": 100|200|250|300|400|500|550|600, "level": "debug"|"info"|"notice"|"warning"|"error"|"critical"|"alert"|"emergency", "channel": string, "datetime": \DateTimeInterface, "extra": array<array-key, mixed>}
      */
     protected function mapLogRecordToArray(LogRecord $logRecord): array
     {
@@ -85,7 +86,7 @@ class LogFake extends LogManager implements Fake
             'level_int' => $logRecord->level->value,
             'level' => strtolower($logRecord->level->name),
             'channel' => $logRecord->channel,
-            'datetime' => Date::from($logRecord->datetime),
+            'datetime' => Date::make($logRecord->datetime),
             'extra' => $logRecord->extra,
         ];
     }
