@@ -85,26 +85,11 @@ class EventFake implements Dispatcher, Fake
      */
     public function assertListening($expectedEvent, $expectedListener)
     {
+        $normalizedListener = $this->parseListener($expectedListener);
+
         foreach ($this->dispatcher->getListeners($expectedEvent) as $listenerClosure) {
-            $actualListener = (new ReflectionFunction($listenerClosure))
-                        ->getStaticVariables()['listener'];
-
-            $normalizedListener = $expectedListener;
-
-            if (is_string($actualListener) && Str::contains($actualListener, '@')) {
-                $actualListener = Str::parseCallback($actualListener);
-
-                if (is_string($expectedListener)) {
-                    if (Str::contains($expectedListener, '@')) {
-                        $normalizedListener = Str::parseCallback($expectedListener);
-                    } else {
-                        $normalizedListener = [
-                            $expectedListener,
-                            method_exists($expectedListener, 'handle') ? 'handle' : '__invoke',
-                        ];
-                    }
-                }
-            }
+            $actualListener = $this->parseListener((new ReflectionFunction($listenerClosure))
+                ->getStaticVariables()['listener']);
 
             if ($actualListener === $normalizedListener ||
                 ($actualListener instanceof Closure &&
@@ -123,6 +108,22 @@ class EventFake implements Dispatcher, Fake
                 print_r($expectedListener, true)
             )
         );
+    }
+
+    protected function parseListener($listener)
+    {
+        if (is_string($listener)) {
+            if (Str::contains($listener, '@')) {
+                $listener = Str::parseCallback($listener);
+            } elseif ($listener !== Closure::class) {
+                $listener = [
+                    $listener,
+                    method_exists($listener, 'handle') ? 'handle' : '__invoke',
+                ];
+            }
+        }
+
+        return $listener;
     }
 
     /**
