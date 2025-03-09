@@ -38,6 +38,7 @@ use Illuminate\Support\Testing\Fakes\LogFake;
  * @method static \Illuminate\Log\Logger|mixed unless(\Closure|mixed|null $value = null, callable|null $callback = null, callable|null $default = null)
  *
  * @see \Illuminate\Log\LogManager
+ * @see \Illuminate\Support\Testing\Fakes\LogFake
  */
 class Log extends Facade
 {
