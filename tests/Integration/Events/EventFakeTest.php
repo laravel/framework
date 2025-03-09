@@ -174,7 +174,7 @@ class EventFakeTest extends TestCase
         Event::assertListening('event', [PostEventSubscriber::class, 'foo']);
         Event::assertListening('event', PostEventSubscriber::class.'@foo');
         Event::assertListening('event', [PostEventSubscriber::class, 'bar']);
-        Event::assertListening('event', PostEventSubscriber::class.'@bar');
+        Event::assertListening('event', PostEventSubscriber::class . '@bar');
         Event::assertListening('post-created', [PostEventSubscriber::class, 'handlePostCreated']);
         Event::assertListening('post-deleted', [PostEventSubscriber::class, 'handlePostDeleted']);
         Event::assertListening(NonImportantEvent::class, Closure::class);
