@@ -39,11 +39,11 @@ class LogFake extends LogManager implements Fake
     #[\Override]
     protected function resolve($name, ?array $config = null)
     {
-        return parent::resolve($name, [
-            ...($config ?? $this->configurationFor($name)),
-            ...$this->getTestingConfig(),
-            ...['name' => $name],
-        ])->pushProcessor($this->useAppTimeForLogRecord(...));
+        return parent::resolve($name, array_merge(
+            ($config ?? $this->configurationFor($name) ?? []),
+            $this->getTestingConfig(),
+            ['name' => $name],
+        ))->pushProcessor($this->useAppTimeForLogRecord(...));
     }
 
     /**

@@ -22,7 +22,7 @@ class LogFakeTest extends TestCase
         Log::channel('single')->info('all clear', ['value' => 'foo']);
 
         Log::channel('not-in-config')->alert('hi', ['contextual' => true]);
-        Log::channel('slack')->debug('some slack message', ['album' => 'Marquee Moon']);
+        Log::channel('slack')->critical('some slack message', ['album' => 'Marquee Moon']);
 
         $logsWrittenToDefault = Log::logged();
         $this->assertCount(1, $logsWrittenToDefault);
@@ -70,7 +70,7 @@ class LogFakeTest extends TestCase
         $this->assertLogRecordArrayMatches([
             'message' => 'some slack message',
             'context' => ['album' => 'Marquee Moon'],
-            'level' => 'debug',
+            'level' => 'critical',
             'datetime' => CarbonImmutable::parse('2025-03-09 11:12:10Z'),
         ], $logsWrittenToSlack[0]);
     }

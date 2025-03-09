@@ -554,7 +554,7 @@ class LogManager implements LoggerInterface
      * Get the log connection configuration.
      *
      * @param  string  $name
-     * @return array
+     * @return array|null
      */
     protected function configurationFor($name)
     {
