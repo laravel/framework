@@ -413,9 +413,8 @@ class LogManager implements LoggerInterface
             $config['handler_with'] ?? []
         );
 
-        // ???
         $handler = $this->prepareHandler(
-            $this->makeMonologDriver($config['handler'], $with), $config // @todo move make handler to its own protected method so it can be overridden by LogFake
+            $this->app->make($config['handler'], $with), $config
         );
 
         $processors = (new Collection($config['processors'] ?? []))
@@ -427,16 +426,6 @@ class LogManager implements LoggerInterface
             [$handler],
             $processors,
         );
-    }
-
-    /**
-     * @param  class-string<\Monolog\Handler\HandlerInterface>  $handler
-     * @param  array<string, mixed>  $with
-     * @return \Monolog\Handler\HandlerInterface
-     */
-    protected function makeMonologDriver($handler, $with)
-    {
-        return $this->app->make($handler, $with);
     }
 
     /**

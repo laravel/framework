@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Support;
 
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Context;
 use Illuminate\Support\Facades\Log;
 use Orchestra\Testbench\TestCase;
@@ -11,16 +12,26 @@ class LogFakeTest extends TestCase
     public function test_all_channels_write_to_test_handler()
     {
         Log::fake();
+
+        $this->travelTo('2025-03-09 11:11:00Z');
         Log::debug('hello');
+
+        $this->travelTo('2025-03-09 11:11:10Z');
         Log::channel('single')->warning('Danger Will Robinson');
+        $this->travelTo('2025-03-09 11:12:10Z');
         Log::channel('single')->info('all clear', ['value' => 'foo']);
+
         Log::channel('not-in-config')->alert('hi', ['contextual' => true]);
         Log::channel('slack')->debug('some slack message', ['album' => 'Marquee Moon']);
 
         $logsWrittenToDefault = Log::logged();
         $this->assertCount(1, $logsWrittenToDefault);
-        $this->assertSame('hello', $logsWrittenToDefault[0]['message']);
-        $this->assertSame('debug', $logsWrittenToDefault[0]['level_name']);
+        $this->assertLogRecordArrayMatches([
+            'message' => 'hello',
+            'level' => 'debug',
+            'channel' => 'stack',
+            'datetime' => CarbonImmutable::parse('2025-03-09 11:11:00Z'),
+        ], $logsWrittenToDefault[0]);
 
         $logsWrittenToSingle = Log::logged(channel: 'single');
         $this->assertCount(2, $logsWrittenToSingle);
@@ -28,17 +39,19 @@ class LogFakeTest extends TestCase
         $this->assertLogRecordArrayMatches([
             'message' => 'Danger Will Robinson',
             'channel' => 'single',
-            'level_name' => 'warning',
+            'level' => 'warning',
             'context' => [],
             'extra' => [],
+            'datetime' => CarbonImmutable::parse('2025-03-09 11:11:10Z'),
         ], $logsWrittenToSingle[0]);
 
         $this->assertLogRecordArrayMatches([
             'message' => 'all clear',
             'channel' => 'single',
-            'level_name' => 'info',
+            'level' => 'info',
             'context' => ['value' => 'foo'],
             'extra' => [],
+            'datetime' => CarbonImmutable::parse('2025-03-09 11:12:10Z'),
         ], $logsWrittenToSingle[1]);
 
         $logsWrittenToNotInConfig = Log::logged(channel: 'not-in-config');
@@ -46,9 +59,10 @@ class LogFakeTest extends TestCase
         $this->assertLogRecordArrayMatches([
             'message' => 'hi',
             'channel' => 'not-in-config',
-            'level_name' => 'alert',
+            'level' => 'alert',
             'context' => ['contextual' => true],
             'extra' => [],
+            'datetime' => CarbonImmutable::parse('2025-03-09 11:12:10Z'),
         ], $logsWrittenToNotInConfig[0]);
 
         $logsWrittenToSlack = Log::logged(channel: 'slack');
@@ -56,6 +70,8 @@ class LogFakeTest extends TestCase
         $this->assertLogRecordArrayMatches([
             'message' => 'some slack message',
             'context' => ['album' => 'Marquee Moon'],
+            'level' => 'debug',
+            'datetime' => CarbonImmutable::parse('2025-03-09 11:12:10Z'),
         ], $logsWrittenToSlack[0]);
     }
 
@@ -69,12 +85,15 @@ class LogFakeTest extends TestCase
         $this->assertLogRecordArrayMatches([
             'channel' => 'ondemand',
             'extra' => ['artist' => 'Television'],
-            'level_name' => 'critical',
+            'level' => 'critical',
         ], $logs[0]);
     }
 
     private function assertLogRecordArrayMatches(array $expected, array $actual)
     {
-        $this->assertEqualsCanonicalizing($expected, collect($actual)->only(array_keys($expected))->all());
+        $this->assertEqualsCanonicalizing(
+            $expected,
+            collect($actual)->only(array_keys($expected))->all()
+        );
     }
 }
