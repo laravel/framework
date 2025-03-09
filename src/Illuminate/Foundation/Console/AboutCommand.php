@@ -325,7 +325,7 @@ class AboutCommand extends Command
     }
 
     /**
-     * Check storage symbolic links status
+     * Check storage symbolic links status.
      *
      * @param  callable  $formatStorageLinkedStatus  Formatter for link status
      * @return array<string,mixed> Array of paths and their link status
