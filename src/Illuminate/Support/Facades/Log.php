@@ -3,7 +3,6 @@
 namespace Illuminate\Support\Facades;
 
 use Illuminate\Support\Testing\Fakes\LogFake;
-use Illuminate\Support\Testing\Fakes\QueueFake;
 
 /**
  * @method static \Psr\Log\LoggerInterface build(array $config)
@@ -47,6 +46,7 @@ class Log extends Facade
         $actualLogManager = static::isFake()
             ? static::getFacadeRoot()->logManager
             : static::getFacadeRoot();
+
         return tap(new LogFake(static::getFacadeApplication(), $actualLogManager), function ($fake) {
             static::swap($fake);
         });
