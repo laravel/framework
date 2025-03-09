@@ -18,7 +18,7 @@ class DatabaseFailedJobProviderTest extends TestCase
 
     protected $provider;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
         $this->createDatabaseWithFailedJobTable()
