@@ -30,21 +30,24 @@ class LogFake extends LogManager implements Fake
      */
     protected function getTestingConfig(): array
     {
-        return $this->app->make(Repository::class)->get('logging.channels.testing', [
-            'driver' => 'monolog',
-            'handler' => TestHandler::class,
-        ]);
+        return $this->app->make(Repository::class)->get('logging.channels.testing', []);
     }
 
+    /**
+     * @param  string  $name
+     * @param  array|null  $config
+     * @return \Monolog\Logger
+     */
     #[\Override]
     protected function resolve($name, ?array $config = null)
     {
         return parent::resolve($name, array_merge(
-            ($config ?? $this->configurationFor($name) ?? []),
+            $config ?? $this->configurationFor($name) ?? [],
             $this->getTestingConfig(),
             [
                 'name' => $name,
-                'level' => 'debug',
+                'driver' => 'monolog',
+                'handler' => TestHandler::class,
             ],
         ))->pushProcessor($this->useAppTimeForLogRecord(...));
     }
