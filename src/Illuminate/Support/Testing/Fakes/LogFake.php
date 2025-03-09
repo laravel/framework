@@ -42,7 +42,10 @@ class LogFake extends LogManager implements Fake
         return parent::resolve($name, array_merge(
             ($config ?? $this->configurationFor($name) ?? []),
             $this->getTestingConfig(),
-            ['name' => $name],
+            [
+                'name' => $name,
+                'level' => 'debug',
+            ],
         ))->pushProcessor($this->useAppTimeForLogRecord(...));
     }
 
