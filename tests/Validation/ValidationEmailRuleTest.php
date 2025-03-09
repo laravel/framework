@@ -11,6 +11,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Email;
 use Illuminate\Validation\ValidationServiceProvider;
 use Illuminate\Validation\Validator;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 
@@ -143,6 +144,7 @@ class ValidationEmailRuleTest extends TestCase
         );
     }
 
+    #[RequiresPhpExtension('intl')]
     public function testValidateMxRecord()
     {
         $this->fails(
@@ -674,6 +676,7 @@ class ValidationEmailRuleTest extends TestCase
         );
     }
 
+    #[RequiresPhpExtension('intl')]
     public function testCombiningRules()
     {
         $this->passes(
