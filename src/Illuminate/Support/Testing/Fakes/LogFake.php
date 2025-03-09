@@ -6,7 +6,6 @@ use Illuminate\Config\Repository;
 use Illuminate\Log\LogManager;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
-use Illuminate\Tests\Integration\Foundation\FakeHandler;
 use Monolog\Handler\TestHandler;
 use Monolog\LogRecord;
 
@@ -24,6 +23,11 @@ class LogFake extends LogManager implements Fake
         parent::__construct($app);
     }
 
+    /**
+     * Get the testing config set by the user, or default to using monolog's TestHandler.
+     *
+     * @return array<array-key, mixed>
+     */
     protected function getTestingConfig(): array
     {
         return $this->app->make(Repository::class)->get('logging.channels.testing', [
@@ -35,11 +39,21 @@ class LogFake extends LogManager implements Fake
     #[\Override]
     protected function resolve($name, ?array $config = null)
     {
-        return parent::resolve($name, [...$this->getTestingConfig(), ...['name' => $name]])
-            ->pushProcessor(function(LogRecord $logRecord): LogRecord {
-                return $logRecord->with(datetime: Date::now()->toImmutable());
-            }
-        );
+        return parent::resolve($name, [
+            ...$this->getTestingConfig(),
+            ...['name' => $name],
+        ])->pushProcessor($this->useAppTimeForLogRecord(...));
+    }
+
+    /**
+     * Use app's "now" for the LogRecord's datetime.
+     *
+     * @param  LogRecord  $logRecord
+     * @return LogRecord
+     */
+    protected function useAppTimeForLogRecord(LogRecord $logRecord): LogRecord
+    {
+        return $logRecord->with(datetime: Date::now()->toImmutable());
     }
 
     /**
@@ -52,25 +66,27 @@ class LogFake extends LogManager implements Fake
         /** @var \Monolog\Handler\TestHandler $testHandler */
         $testHandler = $this->driver($channel)->getHandlers()[0];
 
-        $callback ??= fn () => true;
-
         return (new Collection($testHandler->getRecords()))
-            ->filter($callback)
+            ->when($callback, fn ($collection) => $collection->filter($callback))
             ->map($this->mapLogRecordToArray(...));
     }
 
     /**
+     * Convert LogRecord to an array.
+     *
      * @param  LogRecord  $logRecord
      * @return array{"message": string, "context": array<array-key, mixed>, "level_int": 100|200|250|300|400|500|550|600, "level": "emergency"|"alert"|"critical"|"error"|"warning"|"notice"|"info"|"debug", "channel": string, "datetime": \DateTimeInterface, "extra": array<array-key, mixed>}
      */
     protected function mapLogRecordToArray(LogRecord $logRecord): array
     {
-        $arr = $logRecord->toArray();
-        $arr['level_int'] = $arr['level'];
-        $arr['level'] = strtolower($arr['level_name']);
-        unset($arr['level_name']);
-        $arr['datetime'] = Date::make($arr['datetime']);
-
-        return $arr;
+        return [
+            'message' => $logRecord->message,
+            'context' => $logRecord->context,
+            'level_int' => $logRecord->level->value,
+            'level' => strtolower($logRecord->level->name),
+            'channel' => $logRecord->channel,
+            'datetime' => Date::from($logRecord->datetime),
+            'extra' => $logRecord->extra,
+        ];
     }
 }
