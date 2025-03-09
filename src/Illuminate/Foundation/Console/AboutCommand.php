@@ -52,7 +52,6 @@ class AboutCommand extends Command
     /**
      * Create a new command instance.
      *
-     * @param  \Illuminate\Support\Composer  $composer
      * @return void
      */
     public function __construct(Composer $composer)
@@ -178,7 +177,6 @@ class AboutCommand extends Command
             'Maintenance Mode' => static::format($this->laravel->isDownForMaintenance(), console: $formatEnabledStatus),
             'Timezone' => config('app.timezone'),
             'Locale' => config('app.locale'),
-            'Storage Linked' => static::format(file_exists(public_path('storage')), console: $formatStorageLinkedStatus),
         ]);
 
         static::addToSection('Cache', fn () => [
@@ -225,9 +223,6 @@ class AboutCommand extends Command
 
     /**
      * Determine whether the given directory has PHP files.
-     *
-     * @param  string  $path
-     * @return bool
      */
     protected function hasPhpFiles(string $path): bool
     {
@@ -237,9 +232,7 @@ class AboutCommand extends Command
     /**
      * Add additional data to the output of the "about" command.
      *
-     * @param  string  $section
      * @param  callable|string|array  $data
-     * @param  string|null  $value
      * @return void
      */
     public static function add(string $section, $data, ?string $value = null)
@@ -250,9 +243,7 @@ class AboutCommand extends Command
     /**
      * Add additional data to the output of the "about" command.
      *
-     * @param  string  $section
      * @param  callable|string|array  $data
-     * @param  string|null  $value
      * @return void
      */
     protected static function addToSection(string $section, $data, ?string $value = null)
@@ -305,7 +296,6 @@ class AboutCommand extends Command
     /**
      * Format the given string for searching.
      *
-     * @param  string  $value
      * @return string
      */
     protected function toSearchKeyword(string $value)
