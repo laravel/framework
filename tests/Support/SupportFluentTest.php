@@ -243,6 +243,33 @@ class SupportFluentTest extends TestCase
         $this->assertSame(0.0, $fluent->float('null', 123.456));
     }
 
+    public function testArrayMethod()
+    {
+        $fluent = new Fluent(['users' => [1, 2, 3]]);
+
+        $this->assertIsArray($fluent->array('users'));
+        $this->assertEquals([1, 2, 3], $fluent->array('users'));
+        $this->assertEquals(['users' => [1, 2, 3]], $fluent->array());
+
+        $fluent = new Fluent(['text-payload']);
+        $this->assertEquals(['text-payload'], $fluent->array());
+
+        $fluent = new Fluent(['email' => 'test@example.com']);
+        $this->assertEquals(['test@example.com'], $fluent->array('email'));
+
+        $fluent = new Fluent([]);
+        $this->assertIsArray($fluent->array());
+        $this->assertEmpty($fluent->array());
+
+        $fluent = new Fluent(['users' => [1, 2, 3], 'roles' => [4, 5, 6], 'foo' => ['bar', 'baz'], 'email' => 'test@example.com']);
+        $this->assertEmpty($fluent->array(['developers']));
+        $this->assertNotEmpty($fluent->array(['roles']));
+        $this->assertEquals(['roles' => [4, 5, 6]], $fluent->array(['roles']));
+        $this->assertEquals(['users' => [1, 2, 3], 'email' => 'test@example.com'], $fluent->array(['users', 'email']));
+        $this->assertEquals(['roles' => [4, 5, 6], 'foo' => ['bar', 'baz']], $fluent->array(['roles', 'foo']));
+        $this->assertEquals(['users' => [1, 2, 3], 'roles' => [4, 5, 6], 'foo' => ['bar', 'baz'], 'email' => 'test@example.com'], $fluent->array());
+    }
+
     public function testCollectMethod()
     {
         $fluent = new Fluent(['users' => [1, 2, 3]]);
@@ -388,6 +415,42 @@ class SupportFluentTest extends TestCase
         $this->assertEquals([TestBackedEnum::A, TestBackedEnum::B], $fluent->enums('int.a', TestBackedEnum::class));
         $this->assertEquals([TestBackedEnum::B], $fluent->enums('int.b', TestBackedEnum::class));
         $this->assertEmpty($fluent->enums('int.doesnt_exist', TestBackedEnum::class));
+    }
+
+    public function testFill()
+    {
+        $fluent = new Fluent(['name' => 'John Doe']);
+
+        $fluent->fill([
+            'email' => 'john.doe@example.com',
+            'age' => 30,
+        ]);
+
+        $this->assertEquals([
+            'name' => 'John Doe',
+            'email' => 'john.doe@example.com',
+            'age' => 30,
+        ], $fluent->getAttributes());
+    }
+
+    public function testMacroable()
+    {
+        Fluent::macro('foo', function () {
+            return $this->fill([
+                'foo' => 'bar',
+                'baz' => 'zal',
+            ]);
+        });
+
+        $fluent = new Fluent([
+            'bee' => 'ser',
+        ]);
+
+        $this->assertSame([
+            'bee' => 'ser',
+            'foo' => 'bar',
+            'baz' => 'zal',
+        ], $fluent->foo()->all());
     }
 }
 

@@ -527,7 +527,37 @@ class TestResponse implements ArrayAccess
      */
     public function assertContent($value)
     {
-        PHPUnit::withResponse($this)->assertSame($value, $this->content());
+        PHPUnit::withResponse($this)->assertSame($value, $this->getContent());
+
+        return $this;
+    }
+
+    /**
+     * Assert that the response was streamed.
+     *
+     * @return $this
+     */
+    public function assertStreamed()
+    {
+        PHPUnit::withResponse($this)->assertTrue(
+            $this->baseResponse instanceof StreamedResponse || $this->baseResponse instanceof StreamedJsonResponse,
+            'Expected the response to be streamed, but it wasn\'t.'
+        );
+
+        return $this;
+    }
+
+    /**
+     * Assert that the response was not streamed.
+     *
+     * @return $this
+     */
+    public function assertNotStreamed()
+    {
+        PHPUnit::withResponse($this)->assertTrue(
+            ! $this->baseResponse instanceof StreamedResponse && ! $this->baseResponse instanceof StreamedJsonResponse,
+            'Response was unexpectedly streamed.'
+        );
 
         return $this;
     }
@@ -786,6 +816,21 @@ class TestResponse implements ArrayAccess
     }
 
     /**
+     * Assert that the response contains the given JSON fragments.
+     *
+     * @param  array  $data
+     * @return $this
+     */
+    public function assertJsonFragments(array $data)
+    {
+        foreach ($data as $fragment) {
+            $this->assertJsonFragment($fragment);
+        }
+
+        return $this;
+    }
+
+    /**
      * Assert that the response contains the given JSON fragment.
      *
      * @param  array  $data
@@ -932,6 +977,26 @@ class TestResponse implements ArrayAccess
     }
 
     /**
+     * Assert that the response has the given JSON validation errors but does not have any other JSON validation errors.
+     *
+     * @param  string|array  $errors
+     * @param  string  $responseKey
+     * @return $this
+     */
+    public function assertOnlyJsonValidationErrors($errors, $responseKey = 'errors')
+    {
+        $this->assertJsonValidationErrors($errors, $responseKey);
+
+        $jsonErrors = Arr::get($this->json(), $responseKey) ?? [];
+
+        $expectedErrorKeys = collect($errors)->map(fn ($value, $key) => is_int($key) ? $value : $key)->all();
+
+        $unexpectedErrorKeys = Arr::except($jsonErrors, $expectedErrorKeys);
+
+        PHPUnit::withResponse($this)->assertTrue(count($unexpectedErrorKeys) === 0, 'Response has unexpected validation errors: '.collect($unexpectedErrorKeys)->keys()->map(fn ($key) => "'{$key}'")->join(', '));
+    }
+
+    /**
      * Assert the response has any JSON validation errors for the given key.
      *
      * @param  string  $key
@@ -1049,7 +1114,12 @@ class TestResponse implements ArrayAccess
      */
     public function decodeResponseJson()
     {
-        $testJson = new AssertableJsonString($this->getContent());
+        if ($this->baseResponse instanceof StreamedResponse ||
+            $this->baseResponse instanceof StreamedJsonResponse) {
+            $testJson = new AssertableJsonString($this->streamedContent());
+        } else {
+            $testJson = new AssertableJsonString($this->getContent());
+        }
 
         $decodedResponse = $testJson->json();
 
@@ -1307,6 +1377,37 @@ class TestResponse implements ArrayAccess
     }
 
     /**
+     * Assert that the response has the given validation errors but does not have any other validation errors.
+     *
+     * @param  string|array|null  $errors
+     * @param  string  $errorBag
+     * @param  string  $responseKey
+     * @return $this
+     */
+    public function assertOnlyInvalid($errors = null, $errorBag = 'default', $responseKey = 'errors')
+    {
+        if ($this->baseResponse->headers->get('Content-Type') === 'application/json') {
+            return $this->assertOnlyJsonValidationErrors($errors, $responseKey);
+        }
+
+        $this->assertSessionHas('errors');
+
+        $sessionErrors = $this->session()->get('errors')
+            ->getBag($errorBag)
+            ->getMessages();
+
+        $expectedErrorKeys = collect($errors)
+            ->map(fn ($value, $key) => is_int($key) ? $value : $key)->all();
+
+        $unexpectedErrorKeys = Arr::except($sessionErrors, $expectedErrorKeys);
+
+        PHPUnit::withResponse($this)->assertTrue(
+            count($unexpectedErrorKeys) === 0,
+            'Response has unexpected validation errors: '.collect($unexpectedErrorKeys)->keys()->map(fn ($key) => "'{$key}'")->join(', ')
+        );
+    }
+
+    /**
      * Assert that the session has a given value.
      *
      * @param  string|array  $key
@@ -1542,6 +1643,16 @@ class TestResponse implements ArrayAccess
         $this->dumpHeaders();
 
         exit(1);
+    }
+
+    /**
+     * Dump the JSON payload from the response and end the script.
+     *
+     * @param  string|null  $key
+     */
+    public function ddJson($key = null)
+    {
+        dd($this->json($key));
     }
 
     /**

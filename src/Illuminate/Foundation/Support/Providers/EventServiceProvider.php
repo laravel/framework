@@ -146,18 +146,18 @@ class EventServiceProvider extends ServiceProvider
     public function discoverEvents()
     {
         return (new Collection($this->discoverEventsWithin()))
-                    ->flatMap(function ($directory) {
-                        return glob($directory, GLOB_ONLYDIR);
-                    })
-                    ->reject(function ($directory) {
-                        return ! is_dir($directory);
-                    })
-                    ->reduce(function ($discovered, $directory) {
-                        return array_merge_recursive(
-                            $discovered,
-                            DiscoverEvents::within($directory, $this->eventDiscoveryBasePath())
-                        );
-                    }, []);
+            ->flatMap(function ($directory) {
+                return glob($directory, GLOB_ONLYDIR);
+            })
+            ->reject(function ($directory) {
+                return ! is_dir($directory);
+            })
+            ->reduce(function ($discovered, $directory) {
+                return array_merge_recursive(
+                    $discovered,
+                    DiscoverEvents::within($directory, $this->eventDiscoveryBasePath())
+                );
+            }, []);
     }
 
     /**

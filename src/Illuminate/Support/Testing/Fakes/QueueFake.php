@@ -11,6 +11,9 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\ReflectsClosures;
 use PHPUnit\Framework\Assert as PHPUnit;
 
+/**
+ * @phpstan-type RawPushType array{"payload": string, "queue": string|null, "options": array<array-key, mixed>}
+ */
 class QueueFake extends QueueManager implements Fake, Queue
 {
     use ReflectsClosures;
@@ -42,6 +45,13 @@ class QueueFake extends QueueManager implements Fake, Queue
      * @var array
      */
     protected $jobs = [];
+
+    /**
+     * All of the payloads that have been raw pushed.
+     *
+     * @var list<RawPushType>
+     */
+    protected $rawPushes = [];
 
     /**
      * Indicates if items should be serialized and restored when pushed to the queue.
@@ -327,6 +337,19 @@ class QueueFake extends QueueManager implements Fake, Queue
     }
 
     /**
+     * Get all of the raw pushes matching a truth-test callback.
+     *
+     * @param  null|\Closure(string, ?string, array): bool  $callback
+     * @return \Illuminate\Support\Collection<int, RawPushType>
+     */
+    public function pushedRaw($callback = null)
+    {
+        $callback ??= static fn () => true;
+
+        return (new Collection($this->rawPushes))->filter(fn ($data) => $callback($data['payload'], $data['queue'], $data['options']));
+    }
+
+    /**
      * Determine if there are any stored jobs for a given class.
      *
      * @param  string  $job
@@ -436,7 +459,11 @@ class QueueFake extends QueueManager implements Fake, Queue
      */
     public function pushRaw($payload, $queue = null, array $options = [])
     {
-        //
+        $this->rawPushes[] = [
+            'payload' => $payload,
+            'queue' => $queue,
+            'options' => $options,
+        ];
     }
 
     /**
@@ -514,6 +541,16 @@ class QueueFake extends QueueManager implements Fake, Queue
     public function pushedJobs()
     {
         return $this->jobs;
+    }
+
+    /**
+     * Get the payloads that were pushed raw.
+     *
+     * @return list<RawPushType>
+     */
+    public function rawPushes()
+    {
+        return $this->rawPushes;
     }
 
     /**

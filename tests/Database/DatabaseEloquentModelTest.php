@@ -17,6 +17,7 @@ use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Illuminate\Database\Eloquent\Attributes\CollectedBy;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\ArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
@@ -30,6 +31,8 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\JsonEncodingException;
 use Illuminate\Database\Eloquent\MassAssignmentException;
 use Illuminate\Database\Eloquent\MissingAttributeException;
@@ -707,6 +710,17 @@ class DatabaseEloquentModelTest extends TestCase
     {
         $model = new EloquentModelWithWhereHasStub;
         $instance = $model->newInstance()->newQuery()->withWhereHas('foo:diaa,fares');
+        $builder = m::mock(Builder::class);
+        $builder->shouldReceive('select')->once()->with(['diaa', 'fares']);
+        $this->assertNotNull($instance->getEagerLoads()['foo']);
+        $closure = $instance->getEagerLoads()['foo'];
+        $closure($builder);
+    }
+
+    public function testWithWhereHasWorksInNestedQuery()
+    {
+        $model = new EloquentModelWithWhereHasStub;
+        $instance = $model->newInstance()->newQuery()->where(fn (Builder $q) => $q->withWhereHas('foo:diaa,fares'));
         $builder = m::mock(Builder::class);
         $builder->shouldReceive('select')->once()->with(['diaa', 'fares']);
         $this->assertNotNull($instance->getEagerLoads()['foo']);
@@ -3191,6 +3205,18 @@ class DatabaseEloquentModelTest extends TestCase
 
         $this->assertInstanceOf(CustomEloquentCollection::class, $collection);
     }
+
+    public function testUseFactoryAttribute()
+    {
+        $model = new EloquentModelWithUseFactoryAttribute;
+        $instance = EloquentModelWithUseFactoryAttribute::factory()->make(['name' => 'test name']);
+        $factory = EloquentModelWithUseFactoryAttribute::factory();
+        $this->assertInstanceOf(EloquentModelWithUseFactoryAttribute::class, $instance);
+        $this->assertInstanceOf(EloquentModelWithUseFactoryAttributeFactory::class, $model::factory());
+        $this->assertInstanceOf(EloquentModelWithUseFactoryAttributeFactory::class, $model::newFactory());
+        $this->assertEquals(EloquentModelWithUseFactoryAttribute::class, $factory->modelName());
+        $this->assertEquals('test name', $instance->name); // Small smoke test to ensure the factory is working
+    }
 }
 
 class EloquentTestObserverStub
@@ -3989,4 +4015,18 @@ class EloquentModelWithCollectedByAttribute extends Model
 
 class CustomEloquentCollection extends Collection
 {
+}
+
+class EloquentModelWithUseFactoryAttributeFactory extends Factory
+{
+    public function definition()
+    {
+        return [];
+    }
+}
+
+#[UseFactory(EloquentModelWithUseFactoryAttributeFactory::class)]
+class EloquentModelWithUseFactoryAttribute extends Model
+{
+    use HasFactory;
 }

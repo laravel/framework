@@ -221,7 +221,7 @@ trait InteractsWithData
     }
 
     /**
-     * Retrieve data from the instnce as a Stringable instance.
+     * Retrieve data from the instance as a Stringable instance.
      *
      * @param  string  $key
      * @param  mixed  $default
@@ -352,6 +352,17 @@ trait InteractsWithData
     protected function isBackedEnum($enumClass)
     {
         return enum_exists($enumClass) && method_exists($enumClass, 'tryFrom');
+    }
+
+    /**
+     * Retrieve data from the instance as an array.
+     *
+     * @param  array|string|null  $key
+     * @return array
+     */
+    public function array($key = null)
+    {
+        return (array) (is_array($key) ? $this->only($key) : $this->data($key));
     }
 
     /**

@@ -6,6 +6,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
 use UnexpectedValueException;
 
+/** @implements Arrayable<array-key, mixed> */
 class Cursor implements Arrayable
 {
     /**

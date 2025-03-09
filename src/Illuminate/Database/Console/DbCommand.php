@@ -5,6 +5,7 @@ namespace Illuminate\Database\Console;
 use Illuminate\Console\Command;
 use Illuminate\Support\ConfigurationUrlParser;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 use UnexpectedValueException;
 
@@ -44,13 +45,21 @@ class DbCommand extends Command
             return Command::FAILURE;
         }
 
-        (new Process(
-            array_merge([$this->getCommand($connection)], $this->commandArguments($connection)),
-            null,
-            $this->commandEnvironment($connection)
-        ))->setTimeout(null)->setTty(true)->mustRun(function ($type, $buffer) {
-            $this->output->write($buffer);
-        });
+        try {
+            (new Process(
+                array_merge([$command = $this->getCommand($connection)], $this->commandArguments($connection)),
+                null,
+                $this->commandEnvironment($connection)
+            ))->setTimeout(null)->setTty(true)->mustRun(function ($type, $buffer) {
+                $this->output->write($buffer);
+            });
+        } catch (ProcessFailedException $e) {
+            throw_unless($e->getProcess()->getExitCode() === 127, $e);
+
+            $this->error("{$command} not found in path.");
+
+            return Command::FAILURE;
+        }
 
         return 0;
     }

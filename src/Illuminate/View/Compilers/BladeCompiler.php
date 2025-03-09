@@ -331,8 +331,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
         };
 
         $view = Container::getInstance()
-                    ->make(ViewFactory::class)
-                    ->make($component->resolveView(), $data);
+            ->make(ViewFactory::class)
+            ->make($component->resolveView(), $data);
 
         return tap($view->render(), function () use ($view, $deleteCachedView) {
             if ($deleteCachedView) {
@@ -821,8 +821,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
         ];
 
         Container::getInstance()
-                ->make(ViewFactory::class)
-                ->addNamespace($prefixHash, $path);
+            ->make(ViewFactory::class)
+            ->addNamespace($prefixHash, $path);
     }
 
     /**
@@ -837,9 +837,9 @@ class BladeCompiler extends Compiler implements CompilerInterface
         $prefix ??= $directory;
 
         $this->anonymousComponentNamespaces[$prefix] = (new Stringable($directory))
-                ->replace('/', '.')
-                ->trim('. ')
-                ->toString();
+            ->replace('/', '.')
+            ->trim('. ')
+            ->toString();
     }
 
     /**
@@ -932,7 +932,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
         $this->directive($alias, function ($expression) use ($path) {
             $expression = $this->stripParentheses($expression) ?: '[]';
 
-            return "<?php echo \$__env->make('{$path}', {$expression}, \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>";
+            return "<?php echo \$__env->make('{$path}', {$expression}, array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>";
         });
     }
 

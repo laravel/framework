@@ -354,6 +354,8 @@ class PendingCommand
         $this->verifyExpectations();
         $this->flushExpectations();
 
+        $this->app->offsetUnset(OutputStyle::class);
+
         return $exitCode;
     }
 
@@ -443,8 +445,8 @@ class PendingCommand
     private function createABufferedOutputMock()
     {
         $mock = Mockery::mock(BufferedOutput::class.'[doWrite]')
-                ->shouldAllowMockingProtectedMethods()
-                ->shouldIgnoreMissing();
+            ->shouldAllowMockingProtectedMethods()
+            ->shouldIgnoreMissing();
 
         if ($this->test->expectsOutput === false) {
             $mock->shouldReceive('doWrite')->never();
@@ -491,12 +493,12 @@ class PendingCommand
 
         foreach ($this->test->unexpectedOutputSubstrings as $text => $displayed) {
             $mock->shouldReceive('doWrite')
-                 ->atLeast()
-                 ->times(0)
-                 ->withArgs(fn ($output) => str_contains($output, $text))
-                 ->andReturnUsing(function () use ($text) {
-                     $this->test->unexpectedOutputSubstrings[$text] = true;
-                 });
+                ->atLeast()
+                ->times(0)
+                ->withArgs(fn ($output) => str_contains($output, $text))
+                ->andReturnUsing(function () use ($text) {
+                    $this->test->unexpectedOutputSubstrings[$text] = true;
+                });
         }
 
         return $mock;

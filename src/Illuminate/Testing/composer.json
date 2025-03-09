@@ -37,7 +37,7 @@
         "illuminate/database": "Required to assert databases (^11.0).",
         "illuminate/http": "Required to assert responses (^11.0).",
         "mockery/mockery": "Required to use mocking (^1.6).",
-        "phpunit/phpunit": "Required to use assertions and run tests (^10.5|^11.0)."
+        "phpunit/phpunit": "Required to use assertions and run tests (^10.5.35|^11.3.6|^12.0.1)."
     },
     "config": {
         "sort-packages": true

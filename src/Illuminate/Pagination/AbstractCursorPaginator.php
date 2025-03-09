@@ -568,7 +568,7 @@ abstract class AbstractCursorPaginator implements Htmlable, Stringable
     /**
      * Get the paginator's underlying collection.
      *
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Support\Collection<TKey, TValue>
      */
     public function getCollection()
     {
@@ -578,8 +578,13 @@ abstract class AbstractCursorPaginator implements Htmlable, Stringable
     /**
      * Set the paginator's underlying collection.
      *
-     * @param  \Illuminate\Support\Collection  $collection
+     * @template TSetKey of array-key
+     * @template TSetValue
+     *
+     * @param  \Illuminate\Support\Collection<TSetKey, TSetValue>  $collection
      * @return $this
+     *
+     * @phpstan-this-out static<TSetKey, TSetValue>
      */
     public function setCollection(Collection $collection)
     {
@@ -601,7 +606,7 @@ abstract class AbstractCursorPaginator implements Htmlable, Stringable
     /**
      * Determine if the given item exists.
      *
-     * @param  mixed  $key
+     * @param  TKey  $key
      * @return bool
      */
     public function offsetExists($key): bool
@@ -612,8 +617,8 @@ abstract class AbstractCursorPaginator implements Htmlable, Stringable
     /**
      * Get the item at the given offset.
      *
-     * @param  mixed  $key
-     * @return mixed
+     * @param  TKey  $key
+     * @return TValue|null
      */
     public function offsetGet($key): mixed
     {
@@ -623,8 +628,8 @@ abstract class AbstractCursorPaginator implements Htmlable, Stringable
     /**
      * Set the item at the given offset.
      *
-     * @param  mixed  $key
-     * @param  mixed  $value
+     * @param  TKey|null  $key
+     * @param  TValue  $value
      * @return void
      */
     public function offsetSet($key, $value): void
@@ -635,7 +640,7 @@ abstract class AbstractCursorPaginator implements Htmlable, Stringable
     /**
      * Unset the item at the given key.
      *
-     * @param  mixed  $key
+     * @param  TKey  $key
      * @return void
      */
     public function offsetUnset($key): void

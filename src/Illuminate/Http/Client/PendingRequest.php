@@ -941,7 +941,7 @@ class PendingRequest
                 $exception = new ConnectionException($e->getMessage(), 0, $e);
                 $request = new Request($e->getRequest());
 
-                $this->factory->recordRequestResponsePair($request, null);
+                $this->factory?->recordRequestResponsePair($request, null);
 
                 $this->dispatchConnectionFailedEvent($request, $exception);
 
@@ -1326,10 +1326,10 @@ class PendingRequest
         return function ($handler) {
             return function ($request, $options) use ($handler) {
                 $response = ($this->stubCallbacks ?? new Collection)
-                     ->map
-                     ->__invoke((new Request($request))->withData($options['laravel_data']), $options)
-                     ->filter()
-                     ->first();
+                    ->map
+                    ->__invoke((new Request($request))->withData($options['laravel_data']), $options)
+                    ->filter()
+                    ->first();
 
                 if (is_null($response)) {
                     if ($this->preventStrayRequests) {

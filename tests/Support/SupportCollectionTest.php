@@ -9,6 +9,7 @@ use CachingIterator;
 use Exception;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\ItemNotFoundException;
@@ -2329,6 +2330,19 @@ class SupportCollectionTest extends TestCase
         $data = new $collection([['name' => 'taylor', 'email' => 'foo'], ['name' => 'dayle', 'email' => 'bar']]);
         $this->assertSame('taylor-foodayle-bar', $data->implode(fn ($user) => $user['name'].'-'.$user['email']));
         $this->assertSame('taylor-foo,dayle-bar', $data->implode(fn ($user) => $user['name'].'-'.$user['email'], ','));
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testImplodeModels($collection)
+    {
+        $model = new class extends Model {};
+        $model->setAttribute('email', 'foo');
+        $modelTwo = new class extends Model {};
+        $modelTwo->setAttribute('email', 'bar');
+        $data = new $collection([$model, $modelTwo]);
+
+        $this->assertSame('foobar', $data->implode('email'));
+        $this->assertSame('foo,bar', $data->implode('email', ','));
     }
 
     #[DataProvider('collectionClassProvider')]
