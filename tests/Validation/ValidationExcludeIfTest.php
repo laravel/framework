@@ -34,6 +34,10 @@ class ValidationExcludeIfTest extends TestCase
         $rule = new ExcludeIf(false);
 
         $this->assertSame('', (string) $rule);
+
+        $rule = new ExcludeIf(fn () => date('H') >= 12);
+
+        $this->assertContains((string) $rule, ['exclude', '']);
     }
 
     public function testItValidatesCallableAndBooleanAreAcceptableArguments()
