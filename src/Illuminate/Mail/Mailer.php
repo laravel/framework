@@ -89,6 +89,13 @@ class Mailer implements MailerContract, MailQueueContract
     protected $queue;
 
     /**
+     * Indicates if mails should be queued by default.
+     * 
+     * @var bool
+     */
+    protected $queueMailsByDefault = false;
+
+    /**
      * Create a new Mailer instance.
      *
      * @param  string  $name
@@ -349,7 +356,7 @@ class Mailer implements MailerContract, MailQueueContract
      */
     protected function sendMailable(MailableContract $mailable)
     {
-        return $mailable instanceof ShouldQueue
+        return ($mailable instanceof ShouldQueue || $this->queueMailsByDefault)
                         ? $mailable->mailer($this->name)->queue($this->queue)
                         : $mailable->mailer($this->name)->send($this);
     }
@@ -459,6 +466,17 @@ class Mailer implements MailerContract, MailQueueContract
 
         $message->forgetCc();
         $message->forgetBcc();
+    }
+
+    /**
+     * Indicate that all mailables should be queued by default.
+     * 
+     * @param  bool  $queue
+     * @return void
+     */
+    public function queueMailsByDefault(bool $shouldQueue = true)
+    {
+        $this->queueMailsByDefault = $shouldQueue;
     }
 
     /**
