@@ -1790,6 +1790,30 @@ class SupportStrTest extends TestCase
 
         $this->assertSame('foo baZ baz bar', $result);
     }
+
+    public function testPluralPascal(): void
+    {
+        // Test basic functionality with default count
+        $this->assertSame('UserGroups', Str::pluralPascal('UserGroup'));
+        $this->assertSame('ProductCategories', Str::pluralPascal('ProductCategory'));
+
+        // Test with different count values and array
+        $this->assertSame('UserGroups', Str::pluralPascal('UserGroup', 0)); // plural
+        $this->assertSame('UserGroup', Str::pluralPascal('UserGroup', 1));  // singular
+        $this->assertSame('UserGroups', Str::pluralPascal('UserGroup', 2)); // plural
+        $this->assertSame('UserGroups', Str::pluralPascal('UserGroup', []));   // plural (empty array count is 0)
+
+        // Test with Countable
+        $countable = new class implements \Countable
+        {
+            public function count(): int
+            {
+                return 3;
+            }
+        };
+
+        $this->assertSame('UserGroups', Str::pluralPascal('UserGroup', $countable));
+    }
 }
 
 class StringableObjectStub
