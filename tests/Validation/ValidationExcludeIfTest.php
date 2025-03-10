@@ -49,7 +49,7 @@ class ValidationExcludeIfTest extends TestCase
 
     public function testInvalidConditionsThrowException()
     {
-        $invalidConditions = [1, 1.1, 'phpinfo', new stdClass];
+        $invalidConditions = [1, 1.1, 'phpinfo', new stdClass, null];
 
         foreach ($invalidConditions as $condition) {
             $this->expectException(InvalidArgumentException::class);
