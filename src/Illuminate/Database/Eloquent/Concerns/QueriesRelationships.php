@@ -428,6 +428,14 @@ trait QueriesRelationships
      */
     public function whereRelation($relation, $column, $operator = null, $value = null)
     {
+        if (! ($column instanceof Closure) && $operator == null && $value == null) {
+            $relationKeys = explode('.', $relation);
+            
+            $value = $column;
+            $column = array_pop($relationKeys);
+            $relation = implode('.', $relationKeys);
+        }
+
         return $this->whereHas($relation, function ($query) use ($column, $operator, $value) {
             if ($column instanceof Closure) {
                 $column($query);
