@@ -25,11 +25,11 @@ class ExcludeIf implements Stringable
      */
     public function __construct($condition)
     {
-        if ($condition instanceof Closure || is_bool($condition)) {
-            $this->condition = $condition;
-        } else {
+        if (! $condition instanceof Closure && ! is_bool($condition)) {
             throw new InvalidArgumentException('The provided condition must be a callable or boolean.');
         }
+
+        $this->condition = $condition;
     }
 
     /**
