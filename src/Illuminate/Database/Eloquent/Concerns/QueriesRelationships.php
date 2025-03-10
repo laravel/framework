@@ -421,13 +421,21 @@ trait QueriesRelationships
      * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
      *
      * @param  \Illuminate\Database\Eloquent\Relations\Relation<TRelatedModel, *, *>|string  $relation
-     * @param  (\Closure(\Illuminate\Database\Eloquent\Builder<TRelatedModel>): mixed)|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @param  (\Closure(\Illuminate\Database\Eloquent\Builder<TRelatedModel>): mixed)|string|array|\Illuminate\Contracts\Database\Query\Expression  $columnOrValue
      * @param  mixed  $operator
      * @param  mixed  $value
      * @return $this
      */
-    public function whereRelation($relation, $column, $operator = null, $value = null)
+    public function whereRelation($relation, $columnOrValue, $operator = null, $value = null)
     {
+        $column = $columnOrValue;
+
+        if (! ($columnOrValue instanceof Closure) && $operator == null && $value == null) {
+            $relationKeys = explode('.', $relation);
+            $column = array_pop($relationKeys);
+            $relation = implode('.', $relationKeys);
+        }
+
         return $this->whereHas($relation, function ($query) use ($column, $operator, $value) {
             if ($column instanceof Closure) {
                 $column($query);
