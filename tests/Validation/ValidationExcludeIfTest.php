@@ -92,5 +92,10 @@ class ValidationExcludeIfTest extends TestCase
         $v = new Validator($trans, $data, ['foo' => $ruleFalse, 'bar' => 'nullable']);
         $this->assertTrue($v->passes());
         $this->assertSame($data, $v->validated());
+
+        $data = ['foo' => null, 'bar' => 'BAR'];
+        $v = new Validator($trans, $data, ['foo' => new ExcludeIf(true), 'bar' => 'nullable']);
+        $this->assertTrue($v->passes());
+        $this->assertSame(['bar' => 'BAR'], $v->validated());
     }
 }
