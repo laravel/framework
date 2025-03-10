@@ -1173,6 +1173,14 @@ class SupportCollectionTest extends TestCase
         ]);
 
         $this->assertSame('', $c->value('description'));
+
+        // Skip values that do not have the key
+        $c = new $collection([
+            ['id' => 1],
+            ['id' => 2, 'description' => ''],
+        ]);
+
+        $this->assertSame('', $c->value('description'));
     }
 
     #[DataProvider('collectionClassProvider')]
