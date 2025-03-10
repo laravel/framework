@@ -1790,6 +1790,16 @@ class SupportStrTest extends TestCase
 
         $this->assertSame('foo baZ baz bar', $result);
     }
+
+    public function testPluralPascal(): void
+    {
+        // Test basic functionality with default count
+        $this->assertSame('UserGroups', Str::pluralPascal('UserGroup'));
+        $this->assertSame('ProductCategories', Str::pluralPascal('ProductCategory'));
+
+
+
+    }
 }
 
 class StringableObjectStub
