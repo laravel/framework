@@ -623,7 +623,7 @@ class Str
 
         try {
             $factoryUuid = $factory->fromString($value);
-        } catch (InvalidUuidStringException $ex) {
+        } catch (InvalidUuidStringException) {
             return false;
         }
 
