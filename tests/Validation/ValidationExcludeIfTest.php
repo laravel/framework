@@ -40,19 +40,21 @@ class ValidationExcludeIfTest extends TestCase
         $this->assertContains((string) $rule, ['exclude', '']);
     }
 
-    public function testItValidatesCallableAndBooleanAreAcceptableArguments()
+    public function testValidConditionsAreAccepted()
     {
-        new ExcludeIf(false);
-        new ExcludeIf(true);
-        new ExcludeIf(fn () => true);
+        $this->assertInstanceOf(ExcludeIf::class, new ExcludeIf(false));
+        $this->assertInstanceOf(ExcludeIf::class, new ExcludeIf(true));
+        $this->assertInstanceOf(ExcludeIf::class, new ExcludeIf(fn () => true));
+    }
 
-        foreach ([1, 1.1, 'phpinfo', new stdClass] as $condition) {
-            try {
-                new ExcludeIf($condition);
-                $this->fail('The ExcludeIf constructor must not accept '.gettype($condition));
-            } catch (InvalidArgumentException $exception) {
-                $this->assertEquals('The provided condition must be a callable or boolean.', $exception->getMessage());
-            }
+    public function testInvalidConditionsThrowException()
+    {
+        $invalidConditions = [1, 1.1, 'phpinfo', new stdClass];
+
+        foreach ($invalidConditions as $condition) {
+            $this->expectException(InvalidArgumentException::class);
+            $this->expectExceptionMessage('The provided condition must be a callable or boolean.');
+            new ExcludeIf($condition);
         }
     }
 
