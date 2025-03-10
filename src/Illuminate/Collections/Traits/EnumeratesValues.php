@@ -330,7 +330,7 @@ trait EnumeratesValues
      */
     public function value($key, $default = null)
     {
-        if ($value = $this->firstWhere($key)) {
+        if ($value = $this->firstWhere($key, '!==', null)) {
             return data_get($value, $key, $default);
         }
 

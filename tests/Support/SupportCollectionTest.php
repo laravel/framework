@@ -1144,6 +1144,43 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['value' => 'foo'], $c->value('pivot'));
         $this->assertEquals('foo', $c->value('pivot.value'));
         $this->assertEquals('bar', $c->where('id', 2)->value('pivot.value'));
+
+        // Test falsy values
+        $c = new $collection([
+            ['id' => 1, 'score' => 0],
+            ['id' => 2, 'score' => 100],
+        ]);
+
+        $this->assertSame(0, $c->value('score'));
+
+        $c = new $collection([
+            ['id' => 1, 'active' => false],
+            ['id' => 2, 'active' => true],
+        ]);
+
+        $this->assertSame(false, $c->value('active'));
+
+        $c = new $collection([
+            ['id' => 1, 'code' => '0'],
+            ['id' => 2, 'code' => '123'],
+        ]);
+
+        $this->assertSame('0', $c->value('code'));
+
+        $c = new $collection([
+            ['id' => 1, 'description' => ''],
+            ['id' => 2, 'description' => 'Some description'],
+        ]);
+
+        $this->assertSame('', $c->value('description'));
+
+        // Skip values that do not have the key
+        $c = new $collection([
+            ['id' => 1],
+            ['id' => 2, 'description' => ''],
+        ]);
+
+        $this->assertSame('', $c->value('description'));
     }
 
     #[DataProvider('collectionClassProvider')]
