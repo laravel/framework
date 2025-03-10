@@ -306,6 +306,6 @@ class Logger implements LoggerInterface
      */
     public function __call($method, $parameters)
     {
-        return $this->logger->{$method}(...$parameters);
+        return $this->logger->$method(...$parameters);
     }
 }
