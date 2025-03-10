@@ -64,7 +64,7 @@ class LogFake extends LogManager implements Fake
     }
 
     /**
-     * Get logs written to any channel that pass an optional truth-test callback.
+     * Get logs written to any configuration channel that pass an optional truth-test callback.
      *
      * @param  (\Closure(array<string, mixed>): bool)|null  $callback
      * @return Collection<int, array>
@@ -83,6 +83,8 @@ class LogFake extends LogManager implements Fake
     }
 
     /**
+     * Get logs written a specified configuration channel which pass an optional truth-test callback.
+     *
      * @param  (\Closure(array<string, mixed>): bool)|null  $callback
      * @param  string|null  $channel
      * @return Collection<int, array<string, mixed>>
