@@ -454,7 +454,7 @@ class Str
      */
     public static function wrap($value, $before, $after = null)
     {
-        return $before.$value.($after ??= $before);
+        return $before.$value.($after ?? $before);
     }
 
     /**
@@ -623,7 +623,7 @@ class Str
 
         try {
             $factoryUuid = $factory->fromString($value);
-        } catch (InvalidUuidStringException $ex) {
+        } catch (InvalidUuidStringException) {
             return false;
         }
 
