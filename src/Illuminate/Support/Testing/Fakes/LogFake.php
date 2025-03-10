@@ -24,7 +24,7 @@ class LogFake extends LogManager implements Fake
     }
 
     /**
-     * Get the testing config set by the user, or default to using monolog's TestHandler.
+     * Get the testing config set by the app's configuration.
      *
      * @return array<array-key, mixed>
      */
