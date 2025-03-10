@@ -297,6 +297,28 @@ class ComponentAttributeBag implements ArrayAccess, IteratorAggregate, JsonSeria
     }
 
     /**
+     * Filter the attributes and return only the ones
+     * that start with the specified scope prefix.
+     *
+     * @param  string  $scope
+     * @return static
+     */
+    public function scope(string $scope)
+    {
+        $prefix = $scope . ':';
+        $prefixLength = strlen($prefix);
+
+        $scopedAttributes = [];
+        foreach ($this->getAttributes() as $key => $value) {
+            if (str_starts_with($key, $prefix)) {
+                $scopedAttributes[substr($key, $prefixLength)] = $value;
+            }
+        }
+
+        return new static($scopedAttributes);
+    }
+
+    /**
      * Determine if the specific attribute value should be escaped.
      *
      * @param  bool  $escape
