@@ -31,9 +31,7 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertSame('https://www.foo.com/foo/bar/baz/boom', $url->to('foo/bar', ['baz', 'boom'], true));
         $this->assertSame('https://www.foo.com/foo/bar/baz?foo=bar', $url->to('foo/bar?foo=bar', ['baz'], true));
 
-        /*
-         * Test HTTPS request URL generation...
-         */
+        // Test HTTPS request URL generation...
         $url = new UrlGenerator(
             new RouteCollection,
             Request::create('https://www.foo.com/')
@@ -204,78 +202,54 @@ class RoutingUrlGeneratorTest extends TestCase
             Request::create('http://www.foo.com/')
         );
 
-        /*
-         * Empty Named Route
-         */
+        // Empty Named Route
         $route = new Route(['GET'], '/', ['as' => 'plain']);
         $routes->add($route);
 
-        /*
-         * Named Routes
-         */
+        // Named Routes
         $route = new Route(['GET'], 'foo/bar', ['as' => 'foo']);
         $routes->add($route);
 
-        /*
-         * Parameters...
-         */
+        // Parameters...
         $route = new Route(['GET'], 'foo/bar/{baz}/breeze/{boom}', ['as' => 'bar']);
         $routes->add($route);
 
-        /*
-         * Single Parameter...
-         */
+        // Single Parameter...
         $route = new Route(['GET'], 'foo/bar/{baz}', ['as' => 'foobar']);
         $routes->add($route);
 
-        /*
-         * Optional parameter
-         */
+        // Optional parameter
         $route = new Route(['GET'], 'foo/bar/{baz?}', ['as' => 'optional']);
         $routes->add($route);
 
-        /*
-         * HTTPS...
-         */
+        // HTTPS...
         $route = new Route(['GET'], 'foo/baz', ['as' => 'baz', 'https']);
         $routes->add($route);
 
-        /*
-         * Controller Route Route
-         */
+        // Controller Route Route
         $route = new Route(['GET'], 'foo/bam', ['controller' => 'foo@bar']);
         $routes->add($route);
 
-        /*
-         * Non ASCII routes
-         */
+        // Non ASCII routes
         $route = new Route(['GET'], 'foo/bar/åαф/{baz}', ['as' => 'foobarbaz']);
         $routes->add($route);
 
-        /*
-         * Fragments
-         */
+        // Fragments
         $route = new Route(['GET'], 'foo/bar#derp', ['as' => 'fragment']);
         $routes->add($route);
 
-        /*
-         * Invoke action
-         */
+        // Invoke action
         $route = new Route(['GET'], 'foo/invoke', ['controller' => 'InvokableActionStub']);
         $routes->add($route);
 
-        /*
-         * With Default Parameter
-         */
+        // With Default Parameter
         $url->defaults(['locale' => 'en']);
         $route = new Route(['GET'], 'foo', ['as' => 'defaults', 'domain' => '{locale}.example.com', function () {
             //
         }]);
         $routes->add($route);
 
-        /*
-         * With backed enum name and domain
-         */
+        // With backed enum name and domain
         $route = (new Route(['GET'], 'backed-enum', ['as' => 'prefixed.']))->name(RouteNameEnum::UserIndex)->domain(RouteDomainEnum::DashboardDomain);
         $routes->add($route);
 
@@ -321,9 +295,7 @@ class RoutingUrlGeneratorTest extends TestCase
             Request::create('http://www.foo.com/')
         );
 
-        /*
-         * Named Routes
-         */
+        // Named Routes
         $route = new Route(['GET'], 'foo/bar', []);
         $route->name('foo');
         $routes->add($route);
@@ -341,9 +313,7 @@ class RoutingUrlGeneratorTest extends TestCase
 
         $url->setRootControllerNamespace('namespace');
 
-        /*
-         * Controller Route Route
-         */
+        // Controller Route Route
         $route = new Route(['GET'], 'foo/bar', ['controller' => 'namespace\foo@bar']);
         $routes->add($route);
 
@@ -478,9 +448,7 @@ class RoutingUrlGeneratorTest extends TestCase
             Request::create('https://www.foo.com/')
         );
 
-        /*
-         * Named Routes
-         */
+        // Named Routes
         $route = new Route(['GET'], 'foo/bar', ['as' => 'foo']);
         $routes->add($route);
 
@@ -494,9 +462,7 @@ class RoutingUrlGeneratorTest extends TestCase
             Request::create('https://www.foo.com/')
         );
 
-        /*
-         * Named Routes
-         */
+        // Named Routes
         $route = new Route(['GET'], 'foo/bar', ['as' => 'foo', 'http']);
         $routes->add($route);
 
@@ -513,9 +479,7 @@ class RoutingUrlGeneratorTest extends TestCase
         $route = new Route(['GET'], 'foo/bar', ['as' => 'foo', 'domain' => 'sub.foo.com']);
         $routes->add($route);
 
-        /*
-         * Wildcards & Domains...
-         */
+        // Wildcards & Domains...
         $route = new Route(['GET'], 'foo/bar/{baz}', ['as' => 'bar', 'domain' => 'sub.{foo}.com']);
         $routes->add($route);
 
@@ -534,9 +498,7 @@ class RoutingUrlGeneratorTest extends TestCase
         $route = new Route(['GET'], 'foo/bar', ['as' => 'foo', 'domain' => 'sub.foo.com']);
         $routes->add($route);
 
-        /*
-         * Wildcards & Domains...
-         */
+        // Wildcards & Domains...
         $route = new Route(['GET'], 'foo/bar/{baz}', ['as' => 'bar', 'domain' => 'sub.{foo}.com']);
         $routes->add($route);
 
@@ -546,9 +508,7 @@ class RoutingUrlGeneratorTest extends TestCase
 
     public function testRoutesWithDomainsStripsProtocols()
     {
-        /*
-         * http:// Route
-         */
+        // http:// Route
         $url = new UrlGenerator(
             $routes = new RouteCollection,
             Request::create('http://www.foo.com/')
@@ -559,9 +519,7 @@ class RoutingUrlGeneratorTest extends TestCase
 
         $this->assertSame('http://sub.foo.com/foo/bar', $url->route('foo'));
 
-        /*
-         * https:// Route
-         */
+        // https:// Route
         $url = new UrlGenerator(
             $routes = new RouteCollection,
             Request::create('https://www.foo.com/')
@@ -580,9 +538,7 @@ class RoutingUrlGeneratorTest extends TestCase
             Request::create('https://foo.com/')
         );
 
-        /*
-         * When on HTTPS, no need to specify 443
-         */
+        // When on HTTPS, no need to specify 443
         $route = new Route(['GET'], 'foo/bar', ['as' => 'baz', 'domain' => 'sub.foo.com']);
         $routes->add($route);
 
@@ -716,9 +672,7 @@ class RoutingUrlGeneratorTest extends TestCase
         $url->useOrigin('http://www.foo.com/');
         $this->assertSame('http://www.foo.com/bar', $url->to('/bar'));
 
-        /*
-         * Route Based...
-         */
+        // Route Based...
         $url = new UrlGenerator(
             $routes = new RouteCollection,
             Request::create('http://www.foo.com/')
