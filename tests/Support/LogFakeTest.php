@@ -36,6 +36,16 @@ class LogFakeTest extends TestCase
         $logsWithCallback = Log::loggedToChannel(fn ($arr) => $arr['message'] === 'hello');
         $this->assertCount(3, $logsWithCallback);
     }
+
+    public function test_logged_to_channel_still_returns_log_when_using_different_name()
+    {
+        Log::fake();
+
+        Log::withName('zzz')->debug('hello');
+        $this->assertCount(1, $logs = Log::loggedToChannel());
+        $this->assertSame('zzz', $logs[0]['channel']);
+    }
+
     public function test_all_channels_write_to_test_handler()
     {
         Log::fake();

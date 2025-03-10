@@ -55,8 +55,8 @@ class LogFake extends LogManager implements Fake
     /**
      * Use app's "now" for the LogRecord's datetime.
      *
-     * @param  MonologLogRecord  $logRecord
-     * @return MonologLogRecord
+     * @param  \Monolog\LogRecord  $logRecord
+     * @return \Monolog\LogRecord
      */
     protected function useAppTimeForLogRecord(MonologLogRecord $logRecord): MonologLogRecord
     {
@@ -107,7 +107,7 @@ class LogFake extends LogManager implements Fake
     /**
      * Convert LogRecord to an array.
      *
-     * @param  MonologLogRecord  $logRecord
+     * @param  \Monolog\LogRecord  $logRecord
      * @return array{"message": string, "context": array<array-key, mixed>, "level_int": 100|200|250|300|400|500|550|600, "level": "debug"|"info"|"notice"|"warning"|"error"|"critical"|"alert"|"emergency", "channel": string, "datetime": \DateTimeInterface, "extra": array<array-key, mixed>}
      */
     protected function mapLogRecordToArray(MonologLogRecord $logRecord): array
