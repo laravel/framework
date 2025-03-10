@@ -7,7 +7,7 @@ use Illuminate\Log\LogManager;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
 use Monolog\Handler\TestHandler;
-use Monolog\LogRecord;
+use Monolog\LogRecord as MonologLogRecord;
 
 class LogFake extends LogManager implements Fake
 {
@@ -55,36 +55,60 @@ class LogFake extends LogManager implements Fake
     /**
      * Use app's "now" for the LogRecord's datetime.
      *
-     * @param  LogRecord  $logRecord
-     * @return LogRecord
+     * @param  MonologLogRecord  $logRecord
+     * @return MonologLogRecord
      */
-    protected function useAppTimeForLogRecord(LogRecord $logRecord): LogRecord
+    protected function useAppTimeForLogRecord(MonologLogRecord $logRecord): MonologLogRecord
     {
         return $logRecord->with(datetime: Date::now()->toImmutable());
     }
 
     /**
-     * @param  (\Closure(\Monolog\LogRecord): bool)|null  $callback
-     * @param  string|null  $channel
-     * @return Collection<int, LogRecord>
+     * Get logs written to any channel that pass an optional truth-test callback.
+     *
+     * @param  (\Closure(array<string, mixed>): bool)|null  $callback
+     * @return Collection<int, array>
      */
-    public function logged(?\Closure $callback = null, ?string $channel = null): Collection
+    public function logged(?\Closure $callback = null): Collection
     {
-        /** @var \Monolog\Handler\TestHandler $testHandler */
-        $testHandler = $this->driver($channel)->getHandlers()[0];
-
-        return (new Collection($testHandler->getRecords()))
-            ->when($callback, fn ($collection) => $collection->filter($callback))
+        $logs = (new Collection($this->channels))
+            ->flatMap(fn ($logger) => $logger->getHandlers()[0]->getRecords())
             ->map($this->mapLogRecordToArray(...));
+
+        if ($callback === null) {
+            return $logs;
+        }
+
+        return $logs->filter($callback);
+    }
+
+    /**
+     * @param  (\Closure(array<string, mixed>): bool)|null  $callback
+     * @param  string|null  $channel
+     * @return Collection<int, array<string, mixed>>
+     */
+    public function loggedToChannel(?\Closure $callback = null, ?string $channel = null): Collection
+    {
+        $logs = (new Collection(
+            $this->driver($channel)
+                ->getHandlers()[0]
+                ->getRecords()
+        ))->map($this->mapLogRecordToArray(...));
+
+        if ($callback === null) {
+            return $logs;
+        }
+
+        return $logs->filter($callback);
     }
 
     /**
      * Convert LogRecord to an array.
      *
-     * @param  LogRecord  $logRecord
+     * @param  MonologLogRecord  $logRecord
      * @return array{"message": string, "context": array<array-key, mixed>, "level_int": 100|200|250|300|400|500|550|600, "level": "debug"|"info"|"notice"|"warning"|"error"|"critical"|"alert"|"emergency", "channel": string, "datetime": \DateTimeInterface, "extra": array<array-key, mixed>}
      */
-    protected function mapLogRecordToArray(LogRecord $logRecord): array
+    protected function mapLogRecordToArray(MonologLogRecord $logRecord): array
     {
         return [
             'message' => $logRecord->message,

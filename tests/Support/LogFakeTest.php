@@ -9,6 +9,33 @@ use Orchestra\Testbench\TestCase;
 
 class LogFakeTest extends TestCase
 {
+    public function test_logged_checks_all_channels()
+    {
+        Log::fake();
+
+        Log::debug('hello');
+        Log::channel('slack')->critical('oh no');
+        Log::channel('stack')->info('hello');
+
+        $loggedWithoutCallback = Log::logged();
+        $this->assertCount(3, $loggedWithoutCallback);
+
+        $loggedWithCallback = Log::logged(fn ($logRecord) => $logRecord['message'] === 'hello');
+
+        $this->assertCount(2, $loggedWithCallback);
+    }
+
+    public function test_logged_to_channel_respects_callback()
+    {
+        Log::fake();
+        Log::debug('hello');
+        Log::debug('hello');
+        Log::debug('goodbye');
+        Log::debug('hello');
+
+        $logsWithCallback = Log::loggedToChannel(fn ($arr) => $arr['message'] === 'hello');
+        $this->assertCount(3, $logsWithCallback);
+    }
     public function test_all_channels_write_to_test_handler()
     {
         Log::fake();
@@ -24,7 +51,7 @@ class LogFakeTest extends TestCase
         Log::channel('not-in-config')->alert('hi', ['contextual' => true]);
         Log::channel('slack')->critical('some slack message', ['album' => 'Marquee Moon']);
 
-        $logsWrittenToDefault = Log::logged();
+        $logsWrittenToDefault = Log::loggedToChannel();
         $this->assertCount(1, $logsWrittenToDefault);
         $this->assertLogRecordArrayMatches([
             'message' => 'hello',
@@ -33,7 +60,7 @@ class LogFakeTest extends TestCase
             'datetime' => CarbonImmutable::parse('2025-03-09 11:11:00Z'),
         ], $logsWrittenToDefault[0]);
 
-        $logsWrittenToSingle = Log::logged(channel: 'single');
+        $logsWrittenToSingle = Log::loggedToChannel(channel: 'single');
         $this->assertCount(2, $logsWrittenToSingle);
 
         $this->assertLogRecordArrayMatches([
@@ -54,7 +81,7 @@ class LogFakeTest extends TestCase
             'datetime' => CarbonImmutable::parse('2025-03-09 11:12:10Z'),
         ], $logsWrittenToSingle[1]);
 
-        $logsWrittenToNotInConfig = Log::logged(channel: 'not-in-config');
+        $logsWrittenToNotInConfig = Log::loggedToChannel(channel: 'not-in-config');
         $this->assertCount(1, $logsWrittenToNotInConfig);
         $this->assertLogRecordArrayMatches([
             'message' => 'hi',
@@ -65,7 +92,7 @@ class LogFakeTest extends TestCase
             'datetime' => CarbonImmutable::parse('2025-03-09 11:12:10Z'),
         ], $logsWrittenToNotInConfig[0]);
 
-        $logsWrittenToSlack = Log::logged(channel: 'slack');
+        $logsWrittenToSlack = Log::loggedToChannel(channel: 'slack');
         $this->assertCount(1, $logsWrittenToSlack);
         $this->assertLogRecordArrayMatches([
             'message' => 'some slack message',
@@ -81,7 +108,7 @@ class LogFakeTest extends TestCase
         Context::add('artist', 'Television');
         Log::build([])->critical('Friction');
 
-        $logs = Log::logged(channel: 'ondemand');
+        $logs = Log::loggedToChannel(channel: 'ondemand');
         $this->assertLogRecordArrayMatches([
             'channel' => 'ondemand',
             'extra' => ['artist' => 'Television'],
@@ -99,7 +126,7 @@ class LogFakeTest extends TestCase
         Log::channel('single')->warning('i should be visible');
         Log::channel('single')->critical('also visible');
 
-        $logs = Log::logged(channel: 'single');
+        $logs = Log::loggedToChannel(channel: 'single');
         $this->assertCount(2, $logs);
 
         $this->assertEqualsCanonicalizing(['i should be visible', 'also visible'], $logs->pluck('message')->all());
