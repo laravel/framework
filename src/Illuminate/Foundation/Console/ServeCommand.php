@@ -112,7 +112,7 @@ class ServeCommand extends Command
                 clearstatcache(false, $environmentFile);
             }
 
-            if (! $this->option('no-reload') &&
+            if ($this->shouldAutoReload() &&
                 $hasEnvironment &&
                 filemtime($environmentFile) > $environmentLastModified) {
                 $environmentLastModified = filemtime($environmentFile);
@@ -151,7 +151,7 @@ class ServeCommand extends Command
     protected function startProcess($hasEnvironment)
     {
         $process = new Process($this->serverCommand(), public_path(), (new Collection($_ENV))->mapWithKeys(function ($value, $key) use ($hasEnvironment) {
-            if ($this->option('no-reload') || ! $hasEnvironment) {
+            if (! $this->shouldAutoReload() || ! $hasEnvironment) {
                 return [$key => $value];
             }
 
@@ -210,6 +210,7 @@ class ServeCommand extends Command
     protected function port()
     {
         $port = $this->input->getOption('port');
+
 
         if (is_null($port)) {
             [, $port] = $this->getHostAndPort();
@@ -403,5 +404,17 @@ class ServeCommand extends Command
             ['tries', null, InputOption::VALUE_OPTIONAL, 'The max number of ports to attempt to serve from', 10],
             ['no-reload', null, InputOption::VALUE_NONE, 'Do not reload the development server on .env file changes'],
         ];
+    }
+
+    /**
+     * Determines if the processes should autoreload.
+     */
+    protected function shouldAutoReload(): bool
+    {
+        if (env('PHP_CLI_SERVER_WORKERS', 1) > 1) {
+            return false;
+        }
+
+        return ! $this->option('no-reload');
     }
 }
