@@ -2,7 +2,6 @@
 
 namespace Illuminate\Support\Testing\Fakes;
 
-use Closure;
 use Illuminate\Config\Repository;
 use Illuminate\Log\LogManager;
 use Illuminate\Log\LogRecord;
@@ -37,6 +36,8 @@ class LogFake extends LogManager implements Fake
     }
 
     /**
+     * Resolve the given log instance by name.
+     *
      * @param  string  $name
      * @param  array|null  $config
      * @return \Monolog\Logger
@@ -59,7 +60,7 @@ class LogFake extends LogManager implements Fake
     }
 
     /**
-     * Assert at least one log was written which passing a truth-test callback.
+     * Assert at least one log was written which passes a truth-test callback.
      *
      * @param  string|(\Closure(LogRecord): bool)  $callback
      * @return void
