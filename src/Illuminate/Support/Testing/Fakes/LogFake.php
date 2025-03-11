@@ -2,12 +2,15 @@
 
 namespace Illuminate\Support\Testing\Fakes;
 
+use Closure;
 use Illuminate\Config\Repository;
 use Illuminate\Log\LogManager;
+use Illuminate\Log\LogRecord;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
 use Monolog\Handler\TestHandler;
 use Monolog\LogRecord as MonologLogRecord;
+use PHPUnit\Framework\Assert as PHPUnit;
 
 class LogFake extends LogManager implements Fake
 {
@@ -49,77 +52,44 @@ class LogFake extends LogManager implements Fake
                 'driver' => 'monolog',
                 'handler' => TestHandler::class,
             ],
-        ))->pushProcessor($this->useAppTimeForLogRecord(...));
+        ))->pushProcessor(fn (MonologLogRecord $logRecord) => $logRecord->with(
+            datetime: Date::now()->toImmutable(),
+            extra: array_merge($logRecord->extra, ['__configuration_channel' => $name])
+        ));
     }
 
     /**
-     * Use app's "now" for the LogRecord's datetime.
+     * Assert if a log was written, passing a truth-test callback.
      *
-     * @param  \Monolog\LogRecord  $logRecord
-     * @return \Monolog\LogRecord
+     * @param  string|(\Closure(LogRecord): bool)  $callback
+     * @return void
      */
-    protected function useAppTimeForLogRecord(MonologLogRecord $logRecord): MonologLogRecord
+    public function assertLogged($callback)
     {
-        return $logRecord->with(datetime: Date::now()->toImmutable());
+        $callback = is_string($callback) ? (fn ($logRecord) => $logRecord->message === $callback) : $callback;
+
+        PHPUnit::assertTrue(
+            $this->logged($callback)->count() > 0,
+            "The expected log was not recorded."
+        );
     }
 
     /**
      * Get logs written to any configuration channel that pass an optional truth-test callback.
      *
-     * @param  (\Closure(array<string, mixed>): bool)|null  $callback
-     * @return Collection<int, array>
+     * @param  (\Closure(\Illuminate\Log\LogRecord): bool)|null  $callback
+     * @return Collection<int, \Illuminate\Log\LogRecord>
      */
-    public function logged(?\Closure $callback = null): Collection
+    public function logged(?Closure $callback = null): Collection
     {
         $logs = (new Collection($this->channels))
             ->flatMap(fn ($logger) => $logger->getHandlers()[0]->getRecords())
-            ->map($this->mapLogRecordToArray(...));
+            ->map(LogRecord::fromMonolog(...));
 
-        if ($callback === null) {
-            return $logs;
+        if ($callback !== null) {
+            $logs = $logs->filter($callback);
         }
 
-        return $logs->filter($callback);
-    }
-
-    /**
-     * Get logs written a specified configuration channel which pass an optional truth-test callback.
-     *
-     * @param  (\Closure(array<string, mixed>): bool)|null  $callback
-     * @param  string|null  $channel
-     * @return Collection<int, array<string, mixed>>
-     */
-    public function loggedToChannel(?\Closure $callback = null, ?string $channel = null): Collection
-    {
-        $logs = (new Collection(
-            $this->driver($channel)
-                ->getHandlers()[0]
-                ->getRecords()
-        ))->map($this->mapLogRecordToArray(...));
-
-        if ($callback === null) {
-            return $logs;
-        }
-
-        return $logs->filter($callback);
-    }
-
-    /**
-     * Convert LogRecord to an array.
-     *
-     * @param  \Monolog\LogRecord  $logRecord
-     * @return array{"message": string, "context": array<array-key, mixed>, "level_int": 100|200|250|300|400|500|550|600, "level": "debug"|"info"|"notice"|"warning"|"error"|"critical"|"alert"|"emergency", "channel": string, "datetime": \DateTimeInterface, "extra": array<array-key, mixed>}
-     */
-    protected function mapLogRecordToArray(MonologLogRecord $logRecord): array
-    {
-        return [
-            'message' => $logRecord->message,
-            'context' => $logRecord->context,
-            'level_int' => $logRecord->level->value,
-            'level' => strtolower($logRecord->level->name),
-            'channel' => $logRecord->channel,
-            'datetime' => Date::make($logRecord->datetime),
-            'extra' => $logRecord->extra,
-        ];
+        return $logs->values();
     }
 }
