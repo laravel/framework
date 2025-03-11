@@ -13,7 +13,7 @@ use Monolog\LogRecord as MonologLogRecord;
 class LogRecord implements ArrayAccess, Arrayable
 {
     /**
-     * Create the LogRecord instance.
+     * Create a new LogRecord instance.
      *
      * @param  string  $message  The message written.
      * @param  array<array-key, mixed>  $context  The context data written for the log.
