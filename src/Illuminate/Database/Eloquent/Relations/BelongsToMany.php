@@ -868,8 +868,8 @@ class BelongsToMany extends Relation
     public function getResults()
     {
         return ! is_null($this->parent->{$this->parentKey})
-                ? $this->get()
-                : $this->related->newCollection();
+            ? $this->get()
+            : $this->related->newCollection();
     }
 
     /** @inheritDoc */
@@ -1651,7 +1651,7 @@ class BelongsToMany extends Relation
         }
 
         return str_contains($column, '.')
-                    ? $column
-                    : $this->table.'.'.$column;
+            ? $column
+            : $this->table.'.'.$column;
     }
 }

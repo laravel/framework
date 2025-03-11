@@ -32,8 +32,8 @@ class Json
     public static function decode(mixed $value, ?bool $associative = true): mixed
     {
         return isset(static::$decoder)
-                ? (static::$decoder)($value, $associative)
-                : json_decode($value, $associative);
+            ? (static::$decoder)($value, $associative)
+            : json_decode($value, $associative);
     }
 
     /**

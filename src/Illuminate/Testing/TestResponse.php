@@ -941,9 +941,9 @@ class TestResponse implements ArrayAccess
         $jsonErrors = Arr::get($this->json(), $responseKey) ?? [];
 
         $errorMessage = $jsonErrors
-                ? 'Response has the following JSON validation errors:'.
-                        PHP_EOL.PHP_EOL.json_encode($jsonErrors, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE).PHP_EOL
-                : 'Response does not have JSON validation errors.';
+            ? 'Response has the following JSON validation errors:'.
+                    PHP_EOL.PHP_EOL.json_encode($jsonErrors, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE).PHP_EOL
+            : 'Response does not have JSON validation errors.';
 
         foreach ($errors as $key => $value) {
             if (is_int($key)) {
@@ -1341,9 +1341,9 @@ class TestResponse implements ArrayAccess
         $sessionErrors = $this->session()->get('errors')->getBag($errorBag)->getMessages();
 
         $errorMessage = $sessionErrors
-                ? 'Response has the following validation errors in the session:'.
-                        PHP_EOL.PHP_EOL.json_encode($sessionErrors, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE).PHP_EOL
-                : 'Response does not have validation errors in the session.';
+            ? 'Response has the following validation errors in the session:'.
+                    PHP_EOL.PHP_EOL.json_encode($sessionErrors, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE).PHP_EOL
+            : 'Response does not have validation errors in the session.';
 
         foreach (Arr::wrap($errors) as $key => $value) {
             PHPUnit::withResponse($this)->assertArrayHasKey(
@@ -1816,8 +1816,8 @@ class TestResponse implements ArrayAccess
     public function offsetExists($offset): bool
     {
         return $this->responseHasView()
-                    ? isset($this->original->gatherData()[$offset])
-                    : isset($this->json()[$offset]);
+            ? isset($this->original->gatherData()[$offset])
+            : isset($this->json()[$offset]);
     }
 
     /**
@@ -1829,8 +1829,8 @@ class TestResponse implements ArrayAccess
     public function offsetGet($offset): mixed
     {
         return $this->responseHasView()
-                    ? $this->viewData($offset)
-                    : $this->json()[$offset];
+            ? $this->viewData($offset)
+            : $this->json()[$offset];
     }
 
     /**

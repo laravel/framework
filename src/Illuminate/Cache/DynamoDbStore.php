@@ -470,8 +470,8 @@ class DynamoDbStore implements LockProvider, Store
     protected function toTimestamp($seconds)
     {
         return $seconds > 0
-                    ? $this->availableAt($seconds)
-                    : $this->currentTime();
+            ? $this->availableAt($seconds)
+            : $this->currentTime();
     }
 
     /**
