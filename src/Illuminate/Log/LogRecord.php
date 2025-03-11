@@ -77,7 +77,7 @@ class LogRecord implements ArrayAccess, Arrayable
     /**
      * Get an array representation of the LogRecord.
      *
-     * @return array{"message": string, "context": array<array-key, mixed>, "level_int": 100|200|250|300|400|500|550|600, "level": "debug"|"info"|"notice"|"warning"|"error"|"critical"|"alert"|"emergency", "channel": string, "datetime": \DateTimeInterface, "extra": array<array-key, mixed>, "configurationChannel": ?string}
+     * @return array{"message": string, "context": array<array-key, mixed>, "level": "debug"|"info"|"notice"|"warning"|"error"|"critical"|"alert"|"emergency", "channel": string, "datetime": \DateTimeInterface, "extra": array<array-key, mixed>, "configurationChannel": string|null}
      */
     public function toArray()
     {
