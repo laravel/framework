@@ -160,7 +160,16 @@ class DatabaseEloquentMorphOneOfManyTest extends TestCase
         $exists = MorphOneOfManyTestProduct::withWhereRelation('current_state', 'state', 'active')->exists();
         $this->assertTrue($exists);
 
+        $exists = MorphOneOfManyTestProduct::withWhereRelation('current_state.state', 'active')->exists();
+        $this->assertTrue($exists);
+
         $exists = MorphOneOfManyTestProduct::withWhereRelation('current_state', 'state', 'active')->get();
+
+        $this->assertCount(1, $exists);
+        $this->assertTrue($exists->first()->relationLoaded('current_state'));
+        $this->assertSame($exists->first()->current_state->state, $currentState->state);
+
+        $exists = MorphOneOfManyTestProduct::withWhereRelation('current_state.state', 'active')->get();
 
         $this->assertCount(1, $exists);
         $this->assertTrue($exists->first()->relationLoaded('current_state'));

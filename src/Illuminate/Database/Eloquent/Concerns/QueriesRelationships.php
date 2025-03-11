@@ -416,6 +416,33 @@ trait QueriesRelationships
     }
 
     /**
+     * Adds a where like structure functionality to the Eloquent
+     * whereRelation, withWhereRelation, orWhereRelation, whereDoesntHaveRelation
+     * orWhereDoesntHaveRelation, whereMorphRelation, orWhereMorphRelation,
+     * whereMorphDoesntHaveRelation, orWhereMorphDoesntHaveRelation functions.
+     *
+     * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation<TRelatedModel, *, *>|string  $relation
+     * @param  (\Closure(\Illuminate\Database\Eloquent\Builder<TRelatedModel>): mixed)|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return $this
+     */
+    protected function addDotNotationToWhereRelation(&$relation, &$column, &$operator = null, &$value = null)
+    {
+        if (! $column instanceof Closure && $operator === null && $value === null) {
+            $relationKeys = explode('.', $relation);
+
+            $operator = $column;
+            $column = array_pop($relationKeys);
+            $relation = implode('.', $relationKeys);
+        }
+
+        return $this;
+    }
+
+    /**
      * Add a basic where clause to a relationship query.
      *
      * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
@@ -428,6 +455,8 @@ trait QueriesRelationships
      */
     public function whereRelation($relation, $column, $operator = null, $value = null)
     {
+        $this->addDotNotationToWhereRelation($relation, $column, $operator, $value);
+
         return $this->whereHas($relation, function ($query) use ($column, $operator, $value) {
             if ($column instanceof Closure) {
                 $column($query);
@@ -448,6 +477,8 @@ trait QueriesRelationships
      */
     public function withWhereRelation($relation, $column, $operator = null, $value = null)
     {
+        $this->addDotNotationToWhereRelation($relation, $column, $operator, $value);
+
         return $this->whereRelation($relation, $column, $operator, $value)
             ->with([
                 $relation => fn ($query) => $column instanceof Closure
@@ -469,6 +500,8 @@ trait QueriesRelationships
      */
     public function orWhereRelation($relation, $column, $operator = null, $value = null)
     {
+        $this->addDotNotationToWhereRelation($relation, $column, $operator, $value);
+
         return $this->orWhereHas($relation, function ($query) use ($column, $operator, $value) {
             if ($column instanceof Closure) {
                 $column($query);
@@ -491,6 +524,8 @@ trait QueriesRelationships
      */
     public function whereDoesntHaveRelation($relation, $column, $operator = null, $value = null)
     {
+        $this->addDotNotationToWhereRelation($relation, $column, $operator, $value);
+
         return $this->whereDoesntHave($relation, function ($query) use ($column, $operator, $value) {
             if ($column instanceof Closure) {
                 $column($query);
@@ -513,6 +548,8 @@ trait QueriesRelationships
      */
     public function orWhereDoesntHaveRelation($relation, $column, $operator = null, $value = null)
     {
+        $this->addDotNotationToWhereRelation($relation, $column, $operator, $value);
+
         return $this->orWhereDoesntHave($relation, function ($query) use ($column, $operator, $value) {
             if ($column instanceof Closure) {
                 $column($query);
@@ -536,6 +573,8 @@ trait QueriesRelationships
      */
     public function whereMorphRelation($relation, $types, $column, $operator = null, $value = null)
     {
+        $this->addDotNotationToWhereRelation($relation, $column, $operator, $value);
+
         return $this->whereHasMorph($relation, $types, function ($query) use ($column, $operator, $value) {
             $query->where($column, $operator, $value);
         });
@@ -555,6 +594,8 @@ trait QueriesRelationships
      */
     public function orWhereMorphRelation($relation, $types, $column, $operator = null, $value = null)
     {
+        $this->addDotNotationToWhereRelation($relation, $column, $operator, $value);
+
         return $this->orWhereHasMorph($relation, $types, function ($query) use ($column, $operator, $value) {
             $query->where($column, $operator, $value);
         });
@@ -574,6 +615,8 @@ trait QueriesRelationships
      */
     public function whereMorphDoesntHaveRelation($relation, $types, $column, $operator = null, $value = null)
     {
+        $this->addDotNotationToWhereRelation($relation, $column, $operator, $value);
+
         return $this->whereDoesntHaveMorph($relation, $types, function ($query) use ($column, $operator, $value) {
             $query->where($column, $operator, $value);
         });
@@ -593,6 +636,8 @@ trait QueriesRelationships
      */
     public function orWhereMorphDoesntHaveRelation($relation, $types, $column, $operator = null, $value = null)
     {
+        $this->addDotNotationToWhereRelation($relation, $column, $operator, $value);
+
         return $this->orWhereDoesntHaveMorph($relation, $types, function ($query) use ($column, $operator, $value) {
             $query->where($column, $operator, $value);
         });
