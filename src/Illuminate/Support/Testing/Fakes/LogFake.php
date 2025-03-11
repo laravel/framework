@@ -17,8 +17,8 @@ class LogFake extends LogManager implements Fake
     /**
      * Create a new LogFake instance.
      *
-     * @param  \Illuminate\Contracts\Foundation\Application  $app
-     * @param  \Illuminate\Log\LogManager  $logManager  The original LogManager instance
+     * @param  \Illuminate\Contracts\Foundation\Application  $app  The application instance.
+     * @param  \Illuminate\Log\LogManager  $logManager  The original LogManager instance.
      * @return void
      */
     public function __construct($app, public LogManager $logManager)
@@ -31,7 +31,7 @@ class LogFake extends LogManager implements Fake
      *
      * @return array<array-key, mixed>
      */
-    protected function getTestingConfig(): array
+    protected function getTestingConfig()
     {
         return $this->app->make(Repository::class)->get('logging.channels.testing', []);
     }
@@ -59,7 +59,7 @@ class LogFake extends LogManager implements Fake
     }
 
     /**
-     * Assert if a log was written, passing a truth-test callback.
+     * Assert at least one log was written which passing a truth-test callback.
      *
      * @param  string|(\Closure(LogRecord): bool)  $callback
      * @return void
@@ -70,7 +70,7 @@ class LogFake extends LogManager implements Fake
 
         PHPUnit::assertTrue(
             $this->logged($callback)->count() > 0,
-            "The expected log was not recorded."
+            'The expected log was not recorded.'
         );
     }
 
@@ -80,7 +80,7 @@ class LogFake extends LogManager implements Fake
      * @param  (\Closure(\Illuminate\Log\LogRecord): bool)|null  $callback
      * @return Collection<int, \Illuminate\Log\LogRecord>
      */
-    public function logged(?Closure $callback = null): Collection
+    public function logged($callback = null)
     {
         $logs = (new Collection($this->channels))
             ->flatMap(fn ($logger) => $logger->getHandlers()[0]->getRecords())

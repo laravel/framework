@@ -136,9 +136,9 @@ class LogFakeTest extends TestCase
 
         try {
             Log::assertLogged(fn ($logRecord) => $logRecord->level === 'info');
-            $this->fail("No ExpectationFailedException was was thrown");
+            $this->fail('No ExpectationFailedException was was thrown');
         } catch (ExpectationFailedException $e) {
-            $this->assertStringContainsString("The expected log was not recorded.", $e->getMessage());
+            $this->assertStringContainsString('The expected log was not recorded.', $e->getMessage());
         }
     }
 
