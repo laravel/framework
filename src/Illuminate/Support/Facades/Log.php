@@ -42,6 +42,11 @@ use Illuminate\Support\Testing\Fakes\LogFake;
  */
 class Log extends Facade
 {
+    /**
+     * Replace the bound instance with a fake.
+     *
+     * @return \Illuminate\Support\Testing\Fakes\LogFake
+     */
     public static function fake()
     {
         $actualLogManager = static::isFake()
