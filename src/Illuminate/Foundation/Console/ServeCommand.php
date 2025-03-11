@@ -8,6 +8,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Env;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Stringable;
+use RuntimeException;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Process\Process;
@@ -122,6 +123,8 @@ class ServeCommand extends Command
                 $process->stop(5);
 
                 $this->serverRunningHasBeenDisplayed = false;
+
+                $this->waitUntilPortIsAvailableOrFail($this->host(), $this->port());
 
                 $process = $this->startProcess($hasEnvironment);
             }
@@ -408,10 +411,31 @@ class ServeCommand extends Command
      */
     protected function shouldAutoReload(): bool
     {
-        if (env('PHP_CLI_SERVER_WORKERS', 1) > 1) {
-            return false;
+        return ! $this->option('no-reload');
+    }
+
+    /**
+     * Waits for the ports to become available and throws an exception if it never does.
+     */
+    protected function waitUntilPortIsAvailableOrFail(string $host, string $port): void
+    {
+        for ($i = 1; $i <= 3; $i++) {
+            // To check if the port is available, we'll attempt to open a socket connection to it.
+            // Note that the logic here is flipped: successfully opening the socket connection
+            // means something is using it. If it fails to open, that port is likely unused.
+
+            $socket = @fsockopen($host, $port, $errorCode, $errorMessage, timeout: 5);
+
+            if (! $socket) {
+                return;
+            }
+
+            fclose($socket);
+
+            // Gradually increase the waiting time between attempts...
+            usleep(1_000_000 * $i);
         }
 
-        return ! $this->option('no-reload');
+        throw new RuntimeException("Port {$port} was not released.");
     }
 }
