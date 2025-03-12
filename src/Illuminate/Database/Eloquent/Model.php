@@ -1739,6 +1739,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
         $this->syncOriginal();
 
+        $this->wasRecentlyCreated = false;
+
         return $this;
     }
 
