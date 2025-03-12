@@ -421,8 +421,8 @@ class Validator implements ValidatorContract
     /**
      * Replace each field parameter dot placeholder with dot.
      *
-     * @param  string  $value
-     * @return string
+     * @param  array  $parameters
+     * @return array
      */
     protected function replaceDotPlaceholderInParameters(array $parameters)
     {
