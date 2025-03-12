@@ -117,6 +117,7 @@ trait HasAttributes
         'int',
         'integer',
         'json',
+        'json:unicode',
         'object',
         'real',
         'string',
@@ -837,6 +838,7 @@ trait HasAttributes
                 return $this->fromJson($value, true);
             case 'array':
             case 'json':
+            case 'json:unicode':
                 return $this->fromJson($value);
             case 'collection':
                 return new BaseCollection($this->fromJson($value));
@@ -1178,7 +1180,7 @@ trait HasAttributes
 
         $value = $this->asJson($this->getArrayAttributeWithValue(
             $path, $key, $value
-        ));
+        ), $this->hasCast($key, ['json:unicode']));
 
         $this->attributes[$key] = $this->isEncryptedCastable($key)
             ? $this->castAttributeAsEncryptedString($key, $value)
@@ -1313,7 +1315,7 @@ trait HasAttributes
      */
     protected function castAttributeAsJson($key, $value)
     {
-        $value = $this->asJson($value);
+        $value = $this->asJson($value, $this->hasCast($key, ['json:unicode']));
 
         if ($value === false) {
             throw JsonEncodingException::forAttribute(
@@ -1328,10 +1330,15 @@ trait HasAttributes
      * Encode the given value as JSON.
      *
      * @param  mixed  $value
+     * @param  bool  $isUnicode
      * @return string
      */
-    protected function asJson($value)
+    protected function asJson($value, $isUnicode = false)
     {
+        if ($isUnicode) {
+            return Json::encode($value, JSON_UNESCAPED_UNICODE);
+        }
+
         return Json::encode($value);
     }
 
@@ -1669,7 +1676,7 @@ trait HasAttributes
      */
     protected function isJsonCastable($key)
     {
-        return $this->hasCast($key, ['array', 'json', 'object', 'collection', 'encrypted:array', 'encrypted:collection', 'encrypted:json', 'encrypted:object']);
+        return $this->hasCast($key, ['array', 'json', 'json:unicode', 'object', 'collection', 'encrypted:array', 'encrypted:collection', 'encrypted:json', 'encrypted:object']);
     }
 
     /**
