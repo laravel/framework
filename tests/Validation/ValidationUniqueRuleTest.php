@@ -80,6 +80,10 @@ class ValidationUniqueRuleTest extends TestCase
         $rule = new Unique('table');
         $rule->where('foo', '"bar"');
         $this->assertSame('unique:table,NULL,NULL,id,foo,"""bar"""', (string) $rule);
+
+        $rule = new Unique(EloquentModelWithConnection::class, 'column');
+        $rule->where('foo', 'bar');
+        $this->assertSame('unique:mysql.table,column,NULL,id,foo,"bar"', (string) $rule);
     }
 
     public function testItIgnoresSoftDeletes()
@@ -169,4 +173,9 @@ class ClassWithNonEmptyConstructor
         $this->bar = $bar;
         $this->baz = $baz;
     }
+}
+
+class EloquentModelWithConnection extends EloquentModelStub
+{
+    protected $connection = 'mysql';
 }
