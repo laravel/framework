@@ -1484,7 +1484,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * This method protects developers from running forceDestroy when the trait is missing.
      *
      * @param  \Illuminate\Support\Collection|array|int|string  $ids
-     * @return bool|null
+     * @return int
      */
     public static function forceDestroy($ids)
     {
