@@ -172,8 +172,8 @@ abstract class Relation implements BuilderContract
     public function getEager()
     {
         return $this->eagerKeysWereEmpty
-                    ? $this->query->getModel()->newCollection()
-                    : $this->get();
+            ? $this->query->getModel()->newCollection()
+            : $this->get();
     }
 
     /**
@@ -424,9 +424,9 @@ abstract class Relation implements BuilderContract
     protected function whereInMethod(Model $model, $key)
     {
         return $model->getKeyName() === last(explode('.', $key))
-                    && in_array($model->getKeyType(), ['int', 'integer'])
-                        ? 'whereIntegerInRaw'
-                        : 'whereIn';
+            && in_array($model->getKeyType(), ['int', 'integer'])
+                ? 'whereIntegerInRaw'
+                : 'whereIn';
     }
 
     /**
@@ -477,7 +477,8 @@ abstract class Relation implements BuilderContract
 
         if (is_array($map)) {
             static::$morphMap = $merge && static::$morphMap
-                            ? $map + static::$morphMap : $map;
+                ? $map + static::$morphMap
+                : $map;
         }
 
         return static::$morphMap;

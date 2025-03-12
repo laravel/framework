@@ -630,7 +630,7 @@ class Router implements BindingRegistrar, RegistrarContract
         $group = end($this->groupStack);
 
         return isset($group['namespace']) && ! str_starts_with($class, '\\') && ! str_starts_with($class, $group['namespace'])
-                ? $group['namespace'].'\\'.$class : $class;
+            ? $group['namespace'].'\\'.$class : $class;
     }
 
     /**

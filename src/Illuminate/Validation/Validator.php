@@ -396,8 +396,8 @@ class Validator implements ValidatorContract
 
         foreach ($data as $key => $value) {
             $originalData[$this->replacePlaceholderInString($key)] = is_array($value)
-                        ? $this->replacePlaceholders($value)
-                        : $value;
+                ? $this->replacePlaceholders($value)
+                : $value;
         }
 
         return $originalData;
@@ -588,8 +588,8 @@ class Validator implements ValidatorContract
     public function safe(?array $keys = null)
     {
         return is_array($keys)
-                ? (new ValidatedInput($this->validated()))->only($keys)
-                : new ValidatedInput($this->validated());
+            ? (new ValidatedInput($this->validated()))->only($keys)
+            : new ValidatedInput($this->validated());
     }
 
     /**
@@ -675,8 +675,8 @@ class Validator implements ValidatorContract
 
         if ($rule instanceof RuleContract) {
             return $validatable
-                    ? $this->validateUsingCustomRule($attribute, $value, $rule)
-                    : null;
+                ? $this->validateUsingCustomRule($attribute, $value, $rule)
+                : null;
         }
 
         $method = "validate{$rule}";
@@ -1291,8 +1291,8 @@ class Validator implements ValidatorContract
         $lastSegmentOfAttribute = strrchr($attribute, '.');
 
         $attribute = $lastSegmentOfAttribute && $removeLastSegmentOfAttribute
-                    ? Str::replaceLast($lastSegmentOfAttribute, '', $attribute)
-                    : $attribute;
+            ? Str::replaceLast($lastSegmentOfAttribute, '', $attribute)
+            : $attribute;
 
         return is_array($data = data_get($this->data, $attribute))
             ? new Fluent($data)

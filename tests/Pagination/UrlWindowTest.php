@@ -37,9 +37,7 @@ class UrlWindowTest extends TestCase
 
         $this->assertEquals(['first' => [1 => '/?page=1', 2 => '/?page=2'], 'slider' => $slider, 'last' => [19 => '/?page=19', 20 => '/?page=20']], $window->get());
 
-        /*
-         * Test Being Near The End Of The List
-         */
+        // Test Being Near The End Of The List
         $array = [];
         for ($i = 1; $i <= 20; $i++) {
             $array[$i] = 'item'.$i;

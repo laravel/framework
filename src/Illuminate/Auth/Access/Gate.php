@@ -180,8 +180,8 @@ class Gate implements GateContract
 
         if ($condition instanceof Closure) {
             $response = $this->canBeCalledWithUser($user, $condition)
-                            ? $condition($user)
-                            : new Response(false, $message, $code);
+                ? $condition($user)
+                : new Response(false, $message, $code);
         } else {
             $response = $condition;
         }
@@ -277,8 +277,8 @@ class Gate implements GateContract
             }
 
             return isset($method)
-                    ? $policy->{$method}(...func_get_args())
-                    : $policy(...func_get_args());
+                ? $policy->{$method}(...func_get_args())
+                : $policy(...func_get_args());
         };
     }
 

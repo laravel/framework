@@ -265,8 +265,8 @@ abstract class AbstractCursorPaginator implements Htmlable, Stringable
     protected function ensureParameterIsPrimitive($parameter)
     {
         return is_object($parameter) && method_exists($parameter, '__toString')
-                        ? (string) $parameter
-                        : $parameter;
+            ? (string) $parameter
+            : $parameter;
     }
 
     /**

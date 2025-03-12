@@ -246,8 +246,8 @@ class Factory implements FactoryContract
         // with "raw|" for convenience and to let this know that it is a string.
         else {
             $result = str_starts_with($empty, 'raw|')
-                        ? substr($empty, 4)
-                        : $this->make($empty)->render();
+                ? substr($empty, 4)
+                : $this->make($empty)->render();
         }
 
         return $result;

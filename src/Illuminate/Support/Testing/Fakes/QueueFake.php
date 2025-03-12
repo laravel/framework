@@ -174,8 +174,8 @@ class QueueFake extends QueueManager implements Fake, Queue
         );
 
         $this->isChainOfObjects($expectedChain)
-                ? $this->assertPushedWithChainOfObjects($job, $expectedChain, $callback)
-                : $this->assertPushedWithChainOfClasses($job, $expectedChain, $callback);
+            ? $this->assertPushedWithChainOfObjects($job, $expectedChain, $callback)
+            : $this->assertPushedWithChainOfClasses($job, $expectedChain, $callback);
     }
 
     /**

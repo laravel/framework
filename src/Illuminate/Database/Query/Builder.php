@@ -2852,7 +2852,8 @@ class Builder implements BuilderContract
         return (new Collection($this->orders))
             ->reject(function ($order) use ($column) {
                 return isset($order['column'])
-                       ? $order['column'] === $column : false;
+                    ? $order['column'] === $column
+                    : false;
             })->values()->all();
     }
 
@@ -3305,7 +3306,7 @@ class Builder implements BuilderContract
     {
         return array_map(function ($column) {
             return is_string($column) && ($aliasPosition = stripos($column, ' as ')) !== false
-                    ? substr($column, 0, $aliasPosition) : $column;
+                ? substr($column, 0, $aliasPosition) : $column;
         }, $columns);
     }
 
@@ -3377,8 +3378,8 @@ class Builder implements BuilderContract
 
         return $this->applyAfterQueryCallbacks(
             is_array($queryResult[0])
-                    ? $this->pluckFromArrayColumn($queryResult, $column, $key)
-                    : $this->pluckFromObjectColumn($queryResult, $column, $key)
+                ? $this->pluckFromArrayColumn($queryResult, $column, $key)
+                : $this->pluckFromObjectColumn($queryResult, $column, $key)
         );
     }
 
@@ -3633,7 +3634,7 @@ class Builder implements BuilderContract
         // cast it to one. When it does we will cast it to a float since it needs to be
         // cast to the expected data type for the developers out of pure convenience.
         return ! str_contains((string) $result, '.')
-                ? (int) $result : (float) $result;
+            ? (int) $result : (float) $result;
     }
 
     /**
@@ -4070,8 +4071,8 @@ class Builder implements BuilderContract
     public function getColumns()
     {
         return ! is_null($this->columns)
-                ? array_map(fn ($column) => $this->grammar->getValue($column), $this->columns)
-                : [];
+            ? array_map(fn ($column) => $this->grammar->getValue($column), $this->columns)
+            : [];
     }
 
     /**

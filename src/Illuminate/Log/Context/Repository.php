@@ -370,6 +370,35 @@ class Repository
     }
 
     /**
+     * Increment a context counter.
+     *
+     * @param  string  $key
+     * @param  int  $amount
+     * @return $this
+     */
+    public function increment(string $key, int $amount = 1)
+    {
+        $this->add(
+            $key,
+            (int) $this->get($key, 0) + $amount,
+        );
+
+        return $this;
+    }
+
+    /**
+     * Decrement a context counter.
+     *
+     * @param  string  $key
+     * @param  int  $amount
+     * @return $this
+     */
+    public function decrement(string $key, int $amount = 1)
+    {
+        return $this->increment($key, $amount * -1);
+    }
+
+    /**
      * Determine if the given value is in the given stack.
      *
      * @param  string  $key

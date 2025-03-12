@@ -198,8 +198,8 @@ trait InteractsWithInput
             }
 
             return is_array($file)
-                        ? $this->convertUploadedFiles($file)
-                        : UploadedFile::createFromBase($file);
+                ? $this->convertUploadedFiles($file)
+                : UploadedFile::createFromBase($file);
         }, $files);
     }
 

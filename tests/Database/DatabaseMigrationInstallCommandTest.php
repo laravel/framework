@@ -23,6 +23,17 @@ class DatabaseMigrationInstallCommandTest extends TestCase
         $command->setLaravel(new Application);
         $repo->shouldReceive('setSource')->once()->with('foo');
         $repo->shouldReceive('createRepository')->once();
+        $repo->shouldReceive('repositoryExists')->once()->andReturn(false);
+
+        $this->runCommand($command, ['--database' => 'foo']);
+    }
+
+    public function testFireCallsRepositoryToInstallExists()
+    {
+        $command = new InstallCommand($repo = m::mock(MigrationRepositoryInterface::class));
+        $command->setLaravel(new Application);
+        $repo->shouldReceive('setSource')->once()->with('foo');
+        $repo->shouldReceive('repositoryExists')->once()->andReturn(true);
 
         $this->runCommand($command, ['--database' => 'foo']);
     }

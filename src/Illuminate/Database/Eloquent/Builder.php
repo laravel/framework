@@ -1505,7 +1505,8 @@ class Builder implements BuilderContract
         // scope so that we can properly group the added scope constraints in the
         // query as their own isolated nested where statement and avoid issues.
         $originalWhereCount = is_null($query->wheres)
-                    ? 0 : count($query->wheres);
+            ? 0
+            : count($query->wheres);
 
         $result = $scope(...$parameters) ?? $this;
 
@@ -1779,8 +1780,8 @@ class Builder implements BuilderContract
         return [explode(':', $name)[0], static function ($query) use ($name) {
             $query->select(array_map(static function ($column) use ($query) {
                 return $query instanceof BelongsToMany
-                        ? $query->getRelated()->qualifyColumn($column)
-                        : $column;
+                    ? $query->getRelated()->qualifyColumn($column)
+                    : $column;
             }, explode(',', explode(':', $name)[1])));
         }];
     }

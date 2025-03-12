@@ -50,8 +50,8 @@ class Event extends Facade
     public static function fake($eventsToFake = [])
     {
         $actualDispatcher = static::isFake()
-                ? static::getFacadeRoot()->dispatcher
-                : static::getFacadeRoot();
+            ? static::getFacadeRoot()->dispatcher
+            : static::getFacadeRoot();
 
         return tap(new EventFake($actualDispatcher, $eventsToFake), function ($fake) {
             static::swap($fake);
