@@ -1,6 +1,42 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.1.1...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.2.0...12.x)
+
+## [v12.2.0](https://github.com/laravel/framework/compare/v12.1.1...v12.2.0) - 2025-03-12
+
+* Add dates to allowed PHPDoc types of Builder::having() by [@miken32](https://github.com/miken32) in https://github.com/laravel/framework/pull/54899
+* [11.x] Fix double negative in `whereNotMorphedTo()` query by [@owenvoke](https://github.com/owenvoke) in https://github.com/laravel/framework/pull/54902
+* Add test for Arr::partition by [@liamduckett](https://github.com/liamduckett) in https://github.com/laravel/framework/pull/54913
+* [11.x] Expose process checkTimeout method by [@mattmcdev](https://github.com/mattmcdev) in https://github.com/laravel/framework/pull/54912
+* [12.x] Compilable for Validation Contract by [@peterfox](https://github.com/peterfox) in https://github.com/laravel/framework/pull/54882
+* [11.x] Backport "Change `paginate()` method return types to `\Illuminate\Pagination\LengthAwarePaginator`" by [@carestad](https://github.com/carestad) in https://github.com/laravel/framework/pull/54917
+* [11.x] Revert faulty change to `EnumeratesValues::ensure()` doc block by [@axlon](https://github.com/axlon) in https://github.com/laravel/framework/pull/54919
+* Ensure ValidationEmailRuleTest skips tests requiring the intl extension when unavailable by [@alikhosravidev](https://github.com/alikhosravidev) in https://github.com/laravel/framework/pull/54918
+* ✅ Ensure Enum validation is case-sensitive by adding a new test case. by [@alikhosravidev](https://github.com/alikhosravidev) in https://github.com/laravel/framework/pull/54922
+* [12.x] Feature: Collection chunk without preserving keys by [@liamduckett](https://github.com/liamduckett) in https://github.com/laravel/framework/pull/54916
+* [12.x] Add test coverage for Uri::withQueryIfMissing method by [@mohammadrasoulasghari](https://github.com/mohammadrasoulasghari) in https://github.com/laravel/framework/pull/54923
+* Fix issue with using RedisCluster with compression or serialization by [@rzv-me](https://github.com/rzv-me) in https://github.com/laravel/framework/pull/54934
+* [12.x] Add test coverage for Str::replaceMatches method  by [@mohammadrasoulasghari](https://github.com/mohammadrasoulasghari) in https://github.com/laravel/framework/pull/54930
+* [12.x] Types: Collection chunk without preserving keys  by [@liamduckett](https://github.com/liamduckett) in https://github.com/laravel/framework/pull/54924
+* [12.x] Add `ddBody` method to TestResponse for dumping various response payloads by [@Sammyjo20](https://github.com/Sammyjo20) in https://github.com/laravel/framework/pull/54933
+* [11.x] Backport "Fix issue with using `RedisCluster` with compression or serialization" by [@rzv-me](https://github.com/rzv-me) in https://github.com/laravel/framework/pull/54935
+* [12.x] feat: add `CanBeOneOfMany` support to `HasOneThrough` by [@calebdw](https://github.com/calebdw) in https://github.com/laravel/framework/pull/54759
+* [12.x] Hotfix - Add function_exists check to ddBody in TestResponse by [@Sammyjo20](https://github.com/Sammyjo20) in https://github.com/laravel/framework/pull/54937
+* [12.x] Refactor: Remove unnecessary variables in Str class methods by [@mohammadrasoulasghari](https://github.com/mohammadrasoulasghari) in https://github.com/laravel/framework/pull/54963
+* Add Tests for Str::pluralPascal Method by [@mohammadrasoulasghari](https://github.com/mohammadrasoulasghari) in https://github.com/laravel/framework/pull/54957
+* [12.x] Fix visibility of setUp and tearDown in tests by [@naopusyu](https://github.com/naopusyu) in https://github.com/laravel/framework/pull/54950
+* [12.x] Test Improvements by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/54944
+* Fix missing return in `assertOnlyInvalid` by [@parth391](https://github.com/parth391) in https://github.com/laravel/framework/pull/54941
+* Handle case when migrate:install command is called and table exists by [@joe-tito](https://github.com/joe-tito) in https://github.com/laravel/framework/pull/54938
+* [11.x] Fix callOnce in Seeder so it handles arrays properly by [@lbovit](https://github.com/lbovit) in https://github.com/laravel/framework/pull/54985
+* Change "exceptoin" spelling mistake to "exception" by [@hvlucas](https://github.com/hvlucas) in https://github.com/laravel/framework/pull/54979
+* [12.x] Add test for after method in LazyCollection by [@mohammadrasoulasghari](https://github.com/mohammadrasoulasghari) in https://github.com/laravel/framework/pull/54978
+* [12.x] Add `increment` and `decrement` methods to `Context` by [@mattmcdev](https://github.com/mattmcdev) in https://github.com/laravel/framework/pull/54976
+* Ensure ExcludeIf correctly rejects a null value as an invalid condition by [@alikhosravidev](https://github.com/alikhosravidev) in https://github.com/laravel/framework/pull/54973
+* [12.x] apply Pint rule "no_spaces_around_offset" by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/54970
+* [12.x] apply Pint rule "single_line_comment_style" by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/54969
+* [12.x] do not use mix of newline and inline formatting by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/54967
+* [12.x] use single indent for multiline ternaries by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/54971
 
 ## [v12.1.1](https://github.com/laravel/framework/compare/v12.1.0...v12.1.1) - 2025-03-05
 
