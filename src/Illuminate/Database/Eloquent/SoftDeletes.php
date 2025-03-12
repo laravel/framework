@@ -15,17 +15,6 @@ use Illuminate\Support\Collection as BaseCollection;
 trait SoftDeletes
 {
     /**
-     * User exposed observable events.
-     *
-     * These are extra user-defined events observers may subscribe to.
-     *
-     * @var array
-     */
-    protected $observables = [
-        'trashed',
-    ];
-    
-    /**
      * Indicates if the model is currently force deleting.
      *
      * @var bool
@@ -52,6 +41,9 @@ trait SoftDeletes
         if (! isset($this->casts[$this->getDeletedAtColumn()])) {
             $this->casts[$this->getDeletedAtColumn()] = 'datetime';
         }
+
+        // Include Soft Delete Event in $observables array
+        $this->addObservableEvents('trashed');
     }
 
     /**
