@@ -12,9 +12,7 @@ class Auth implements ContextualAttribute
     /**
      * Create a new class instance.
      */
-    public function __construct(public ?string $guard = null)
-    {
-    }
+    public function __construct(public ?string $guard = null) {}
 
     /**
      * Resolve the authentication guard.

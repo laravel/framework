@@ -1064,9 +1064,7 @@ assertType('Illuminate\Support\Collection<int, User>', $collection->add(new User
  *
  * @extends \Illuminate\Support\Collection<TKey, TValue>
  */
-class CustomCollection extends Collection
-{
-}
+class CustomCollection extends Collection {}
 
 // assertType('CustomCollection<int, User>', CustomCollection::make([new User]));
 assertType('Illuminate\Support\Collection<int, User>', CustomCollection::make([new User])->toBase());
@@ -1091,18 +1089,10 @@ foreach ($collection as $int => $user) {
     assertType('User', $user);
 }
 
-class Animal
-{
-}
-class Tiger extends Animal
-{
-}
-class Lion extends Animal
-{
-}
-class Zebra extends Animal
-{
-}
+class Animal {}
+class Tiger extends Animal {}
+class Lion extends Animal {}
+class Zebra extends Animal {}
 
 class Zoo
 {

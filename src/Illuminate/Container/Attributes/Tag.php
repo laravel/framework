@@ -13,8 +13,7 @@ final class Tag implements ContextualAttribute
 {
     public function __construct(
         public string $tag,
-    ) {
-    }
+    ) {}
 
     /**
      * Resolve the tag.

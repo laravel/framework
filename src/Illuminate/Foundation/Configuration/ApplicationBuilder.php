@@ -46,9 +46,7 @@ class ApplicationBuilder
     /**
      * Create a new application builder instance.
      */
-    public function __construct(protected Application $app)
-    {
-    }
+    public function __construct(protected Application $app) {}
 
     /**
      * Register the standard kernel classes for the application.

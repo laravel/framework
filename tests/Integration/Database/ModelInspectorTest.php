@@ -204,15 +204,9 @@ class ParentTestModel extends Model
 
 class ModelInspectorTestModelObserver
 {
-    public function created()
-    {
-    }
+    public function created() {}
 }
 
-class ModelInspectorTestModelEloquentCollection extends Collection
-{
-}
+class ModelInspectorTestModelEloquentCollection extends Collection {}
 
-class ModelInspectorTestModelBuilder extends Builder
-{
-}
+class ModelInspectorTestModelBuilder extends Builder {}

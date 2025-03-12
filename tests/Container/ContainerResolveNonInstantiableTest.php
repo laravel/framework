@@ -33,9 +33,7 @@ class ContainerResolveNonInstantiableTest extends TestCase
     }
 }
 
-interface TestInterface
-{
-}
+interface TestInterface {}
 
 class ParentClass
 {

@@ -16,6 +16,5 @@ class JobFailed
         public $connectionName,
         public $job,
         public $exception,
-    ) {
-    }
+    ) {}
 }

@@ -61,7 +61,5 @@ class BladeBoolTest extends AbstractBladeTestCase
 
 class SomeClass
 {
-    public function someMethod()
-    {
-    }
+    public function someMethod() {}
 }

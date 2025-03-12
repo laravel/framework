@@ -236,22 +236,18 @@ class ContainerLazyExtendStub
     }
 }
 
-interface ContainerExtendInterfaceStub
-{
-}
+interface ContainerExtendInterfaceStub {}
 
 class ContainerExtendInterfaceImplementationStub implements ContainerExtendInterfaceStub
 {
     public function __construct(
         public string $value,
-    ) {
-    }
+    ) {}
 }
 
 class ContainerExtendConsumesInterfaceStub
 {
     public function __construct(
         public ContainerExtendInterfaceStub $stub,
-    ) {
-    }
+    ) {}
 }

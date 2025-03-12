@@ -580,9 +580,7 @@ class JobWithSerialization
 {
     use Queueable;
 
-    public function __construct(public $value)
-    {
-    }
+    public function __construct(public $value) {}
 
     public function __serialize(): array
     {

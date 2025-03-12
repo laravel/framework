@@ -257,13 +257,9 @@ class NonImportantEvent
 
 class PostEventSubscriber
 {
-    public function handlePostCreated($event)
-    {
-    }
+    public function handlePostCreated($event) {}
 
-    public function handlePostDeleted($event)
-    {
-    }
+    public function handlePostDeleted($event) {}
 
     public function subscribe($events)
     {

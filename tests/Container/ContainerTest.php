@@ -800,8 +800,7 @@ class ContainerClassWithDefaultValueStub
     public function __construct(
         public ?ContainerConcreteStub $noDefault,
         public ?ContainerConcreteStub $default = null,
-    ) {
-    }
+    ) {}
 }
 
 class ContainerMixedPrimitiveStub
@@ -840,9 +839,7 @@ class ContainerInjectVariableStubWithInterfaceImplementation implements IContain
 
 class ContainerContextualBindingCallTarget
 {
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
     public function work(IContainerContractStub $stub)
     {

@@ -606,9 +606,7 @@ class DateObjectCaster implements CastsAttributes
 
 class DateTimezoneCasterWithObjectCaching implements CastsAttributes
 {
-    public function __construct(private string $timezone = 'UTC')
-    {
-    }
+    public function __construct(private string $timezone = 'UTC') {}
 
     public function get($model, $key, $value, $attributes)
     {

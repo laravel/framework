@@ -12,9 +12,7 @@ class RouteParameter implements ContextualAttribute
     /**
      * Create a new class instance.
      */
-    public function __construct(public string $parameter)
-    {
-    }
+    public function __construct(public string $parameter) {}
 
     /**
      * Resolve the route parameter.

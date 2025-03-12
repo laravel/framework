@@ -144,9 +144,7 @@ class OnceTest extends TestCase
 
         $instance = new class($invokable)
         {
-            public function __construct(protected $invokable)
-            {
-            }
+            public function __construct(protected $invokable) {}
 
             public function call()
             {
@@ -401,6 +399,4 @@ class MyClass
     }
 }
 
-class MyExtendedClass extends MyClass
-{
-}
+class MyExtendedClass extends MyClass {}

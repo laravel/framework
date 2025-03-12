@@ -78,18 +78,12 @@ class ExampleSubscriber
         ];
     }
 
-    public function a()
-    {
-    }
+    public function a() {}
 
-    public function b()
-    {
-    }
+    public function b() {}
 }
 
-class ExampleEvent
-{
-}
+class ExampleEvent {}
 
 class ExampleBroadcastEvent implements ShouldBroadcast
 {
@@ -101,16 +95,12 @@ class ExampleBroadcastEvent implements ShouldBroadcast
 
 class ExampleListener
 {
-    public function handle()
-    {
-    }
+    public function handle() {}
 }
 
 class ExampleQueueListener implements ShouldQueue
 {
-    public function handle()
-    {
-    }
+    public function handle() {}
 }
 
 class ExampleBroadcastListener

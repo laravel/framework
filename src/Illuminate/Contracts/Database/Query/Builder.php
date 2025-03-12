@@ -7,6 +7,4 @@ namespace Illuminate\Contracts\Database\Query;
  *
  * @mixin \Illuminate\Database\Query\Builder
  */
-interface Builder
-{
-}
+interface Builder {}

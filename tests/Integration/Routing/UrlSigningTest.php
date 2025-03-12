@@ -263,8 +263,7 @@ class UrlSigningTest extends TestCase
 
     public function testSignedMiddlewareIgnoringParameter()
     {
-        Route::get('/foo/{id}', function (Request $request, $id) {
-        })->name('foo')->middleware('signed:relative');
+        Route::get('/foo/{id}', function (Request $request, $id) {})->name('foo')->middleware('signed:relative');
 
         $this->assertIsString($url = URL::signedRoute('foo', ['id' => 1]).'&ignore=me');
         $request = Request::create($url);
@@ -281,8 +280,7 @@ class UrlSigningTest extends TestCase
 
     public function testSignedMiddlewareIgnoringParameterViaArgumentsWithRelative()
     {
-        Route::get('/foo/{id}', function (Request $request, $id) {
-        })->name('foo')->middleware('signed:relative,ignore');
+        Route::get('/foo/{id}', function (Request $request, $id) {})->name('foo')->middleware('signed:relative,ignore');
 
         $this->assertIsString('https://fake.test'.URL::signedRoute('foo', ['id' => 1, 'ignore' => 'me'], null, false));
 
@@ -294,8 +292,7 @@ class UrlSigningTest extends TestCase
     {
         ValidateSignature::except(['globally_ignore']);
 
-        Route::get('/foo/{id}', function (Request $request, $id) {
-        })->name('foo')->middleware('signed:relative');
+        Route::get('/foo/{id}', function (Request $request, $id) {})->name('foo')->middleware('signed:relative');
 
         $this->assertIsString($url = URL::signedRoute('foo', ['id' => 1]).'&globally_ignore=me');
         $request = Request::create($url);
@@ -312,8 +309,7 @@ class UrlSigningTest extends TestCase
 
     public function testSignedMiddlewareIgnoringParameterViaArgumentsWithoutRelative()
     {
-        Route::get('/foo/{id}', function (Request $request, $id) {
-        })->name('foo')->middleware('signed:ignore');
+        Route::get('/foo/{id}', function (Request $request, $id) {})->name('foo')->middleware('signed:ignore');
 
         $this->assertIsString($url = 'https://fake.test'.URL::signedRoute('foo', ['id' => 1, 'ignore' => 'me'], null, false));
 
@@ -323,8 +319,7 @@ class UrlSigningTest extends TestCase
 
     public function testSignedMiddlewareIgnoringParameterViaClassAndArguments()
     {
-        Route::get('/foo/{id}', function (Request $request, $id) {
-        })->name('foo')->middleware(IgnoreParameterMiddleware::relative('test'));
+        Route::get('/foo/{id}', function (Request $request, $id) {})->name('foo')->middleware(IgnoreParameterMiddleware::relative('test'));
 
         $this->assertIsString($url = 'https://fake.test'.URL::signedRoute('foo', ['id' => 1, 'ignore' => 'me', 'test' => 'bar'], null, false));
 

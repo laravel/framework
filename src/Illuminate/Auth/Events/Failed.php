@@ -16,6 +16,5 @@ class Failed
         public $guard,
         public $user,
         #[\SensitiveParameter] public $credentials,
-    ) {
-    }
+    ) {}
 }

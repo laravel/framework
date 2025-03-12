@@ -12,9 +12,7 @@ class Config implements ContextualAttribute
     /**
      * Create a new class instance.
      */
-    public function __construct(public string $key, public mixed $default = null)
-    {
-    }
+    public function __construct(public string $key, public mixed $default = null) {}
 
     /**
      * Resolve the configuration value.

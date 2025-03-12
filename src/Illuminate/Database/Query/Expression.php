@@ -18,8 +18,7 @@ class Expression implements ExpressionContract
      */
     public function __construct(
         protected $value
-    ) {
-    }
+    ) {}
 
     /**
      * Get the value of the expression.

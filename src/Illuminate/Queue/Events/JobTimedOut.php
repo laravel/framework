@@ -14,6 +14,5 @@ class JobTimedOut
     public function __construct(
         public $connectionName,
         public $job,
-    ) {
-    }
+    ) {}
 }

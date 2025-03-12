@@ -135,8 +135,7 @@ class ShouldDispatchAfterCommitEventTest extends TestCase
         Event::listen(ShouldDispatchAfterCommitTestEvent::class, ShouldDispatchAfterCommitListener::class);
 
         DB::transaction(function () {
-            DB::transaction(function () {
-            });
+            DB::transaction(function () {});
 
             Event::dispatch(new ShouldDispatchAfterCommitTestEvent);
 

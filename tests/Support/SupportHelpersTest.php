@@ -1300,9 +1300,7 @@ class SupportTestClassThree extends SupportTestClassTwo
 
 trait SupportTestTraitArrayAccess
 {
-    public function __construct(protected array $items = [])
-    {
-    }
+    public function __construct(protected array $items = []) {}
 
     public function offsetExists($offset): bool
     {
@@ -1327,9 +1325,7 @@ trait SupportTestTraitArrayAccess
 
 trait SupportTestTraitArrayIterable
 {
-    public function __construct(protected array $items = [])
-    {
-    }
+    public function __construct(protected array $items = []) {}
 
     public function getIterator(): Traversable
     {

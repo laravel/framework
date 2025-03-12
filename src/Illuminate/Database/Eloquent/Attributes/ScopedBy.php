@@ -13,7 +13,5 @@ class ScopedBy
      * @param  array|string  $classes
      * @return void
      */
-    public function __construct(public array|string $classes)
-    {
-    }
+    public function __construct(public array|string $classes) {}
 }

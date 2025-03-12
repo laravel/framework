@@ -12,9 +12,7 @@ class Cache implements ContextualAttribute
     /**
      * Create a new class instance.
      */
-    public function __construct(public ?string $store = null)
-    {
-    }
+    public function __construct(public ?string $store = null) {}
 
     /**
      * Resolve the cache store.

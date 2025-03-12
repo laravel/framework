@@ -460,9 +460,7 @@ class FoundationTestFormRequestPassesWithResponseStub extends FormRequest
 
 class InvokableAfterValidationRule
 {
-    public function __construct(private $value)
-    {
-    }
+    public function __construct(private $value) {}
 
     public function __invoke($validator)
     {

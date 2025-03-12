@@ -387,8 +387,7 @@ trait TraitBootsAndInitializersTest
 
     public static function bootTraitBootsAndInitializersTest()
     {
-        static::addGlobalScope('foo_bar', function () {
-        });
+        static::addGlobalScope('foo_bar', function () {});
     }
 }
 
@@ -562,9 +561,7 @@ class ModelSerializationAttributeTargetsClassTestClass
 {
     use SerializesModels;
 
-    public function __construct(public User $user, public DataValueObject $value)
-    {
-    }
+    public function __construct(public User $user, public DataValueObject $value) {}
 }
 
 class ModelRelationSerializationTestClass
@@ -593,7 +590,5 @@ class CollectionSerializationTestClass
 
 class DataValueObject
 {
-    public function __construct(public $value = 1)
-    {
-    }
+    public function __construct(public $value = 1) {}
 }

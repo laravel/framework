@@ -12,6 +12,5 @@ class JobPopping
      */
     public function __construct(
         public $connectionName,
-    ) {
-    }
+    ) {}
 }

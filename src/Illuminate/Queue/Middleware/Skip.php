@@ -6,9 +6,7 @@ use Closure;
 
 class Skip
 {
-    public function __construct(protected bool $skip = false)
-    {
-    }
+    public function __construct(protected bool $skip = false) {}
 
     /**
      * Apply the middleware if the given condition is truthy.

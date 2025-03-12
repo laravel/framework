@@ -14,6 +14,5 @@ class BatchDispatched
      */
     public function __construct(
         public Batch $batch,
-    ) {
-    }
+    ) {}
 }

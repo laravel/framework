@@ -68,9 +68,7 @@ class DeleteMissingModelJob implements ShouldQueue
 
     public $deleteWhenMissingModels = true;
 
-    public function __construct(public MyTestModel $model)
-    {
-    }
+    public function __construct(public MyTestModel $model) {}
 
     public function displayName(): string
     {

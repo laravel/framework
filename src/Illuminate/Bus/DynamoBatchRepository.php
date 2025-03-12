@@ -390,9 +390,7 @@ class DynamoBatchRepository implements BatchRepository
      *
      * @return void
      */
-    public function rollBack()
-    {
-    }
+    public function rollBack() {}
 
     /**
      * Convert the given raw batch to a Batch object.

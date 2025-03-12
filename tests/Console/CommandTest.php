@@ -26,9 +26,7 @@ class CommandTest extends TestCase
     {
         $command = new class extends Command
         {
-            public function handle()
-            {
-            }
+            public function handle() {}
         };
 
         $application = m::mock(Application::class);
@@ -60,9 +58,7 @@ class CommandTest extends TestCase
     {
         $command = new class extends Command
         {
-            public function handle()
-            {
-            }
+            public function handle() {}
 
             protected function getArguments()
             {

@@ -77,10 +77,6 @@ class DatabaseEloquentStrictMorphsTest extends TestCase
     }
 }
 
-class TestModel extends Model
-{
-}
+class TestModel extends Model {}
 
-class TestPivotModel extends Pivot
-{
-}
+class TestPivotModel extends Pivot {}

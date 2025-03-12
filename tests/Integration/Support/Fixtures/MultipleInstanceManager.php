@@ -38,9 +38,7 @@ class MultipleInstanceManager extends BaseMultipleInstanceManager
     {
         return new class($config)
         {
-            public function __construct(public $config)
-            {
-            }
+            public function __construct(public $config) {}
         };
     }
 

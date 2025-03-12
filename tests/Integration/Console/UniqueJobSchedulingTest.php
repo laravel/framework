@@ -58,6 +58,4 @@ class TestJob implements ShouldQueue
     use InteractsWithQueue, Queueable, Dispatchable;
 }
 
-class UniqueTestJob extends TestJob implements ShouldBeUnique
-{
-}
+class UniqueTestJob extends TestJob implements ShouldBeUnique {}

@@ -105,8 +105,7 @@ class EventsDispatcherTest extends TestCase
         $d->listen('foo', function () {
             return '';
         });
-        $d->listen('foo', function () {
-        });
+        $d->listen('foo', function () {});
 
         $response = $d->dispatch('foo', ['bar']);
 

@@ -343,21 +343,9 @@ class Mechanic extends Model
     }
 }
 
-class ChildUser extends User
-{
-}
-class Address extends Model
-{
-}
-class Role extends Model
-{
-}
-class Car extends Model
-{
-}
-class Part extends Model
-{
-}
-class Image extends Model
-{
-}
+class ChildUser extends User {}
+class Address extends Model {}
+class Role extends Model {}
+class Car extends Model {}
+class Part extends Model {}
+class Image extends Model {}

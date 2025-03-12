@@ -13,9 +13,7 @@ class Middleware
      * @param  \Closure|string|array  $middleware
      * @return void
      */
-    public function __construct(public Closure|string|array $middleware, public ?array $only = null, public ?array $except = null)
-    {
-    }
+    public function __construct(public Closure|string|array $middleware, public ?array $only = null, public ?array $except = null) {}
 
     /**
      * Specify the only controller methods the middleware should apply to.

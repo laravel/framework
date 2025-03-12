@@ -64,8 +64,7 @@ class SupportReflectorTest extends TestCase
 
     public function testIsCallable()
     {
-        $this->assertTrue(Reflector::isCallable(function () {
-        }));
+        $this->assertTrue(Reflector::isCallable(function () {}));
         $this->assertTrue(Reflector::isCallable([B::class, 'f']));
         $this->assertFalse(Reflector::isCallable([TestClassWithCall::class, 'f']));
         $this->assertTrue(Reflector::isCallable([new TestClassWithCall, 'f']));
@@ -77,9 +76,7 @@ class SupportReflectorTest extends TestCase
     }
 }
 
-class A
-{
-}
+class A {}
 
 class B extends A
 {
@@ -113,13 +110,9 @@ class TestClassWithCallStatic
     }
 }
 
-interface IA
-{
-}
+interface IA {}
 
-interface IB extends IA
-{
-}
+interface IB extends IA {}
 
 class TestClassWithInterfaceSubclassParameter
 {

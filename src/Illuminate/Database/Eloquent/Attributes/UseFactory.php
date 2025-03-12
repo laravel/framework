@@ -13,7 +13,5 @@ class UseFactory
      * @param  class-string<\Illuminate\Database\Eloquent\Factories\Factory>  $factoryClass
      * @return void
      */
-    public function __construct(public string $factoryClass)
-    {
-    }
+    public function __construct(public string $factoryClass) {}
 }

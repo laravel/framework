@@ -14,6 +14,5 @@ class ScheduledTaskStarting
      */
     public function __construct(
         public Event $task,
-    ) {
-    }
+    ) {}
 }

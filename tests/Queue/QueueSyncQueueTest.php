@@ -169,16 +169,12 @@ class SyncQueueAfterCommitJob
 
     public $afterCommit = true;
 
-    public function handle()
-    {
-    }
+    public function handle() {}
 }
 
 class SyncQueueAfterCommitInterfaceJob implements ShouldQueueAfterCommit
 {
     use InteractsWithQueue;
 
-    public function handle()
-    {
-    }
+    public function handle() {}
 }

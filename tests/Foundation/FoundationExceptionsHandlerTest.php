@@ -458,9 +458,7 @@ class FoundationExceptionsHandlerTest extends TestCase
 
         $handler = new class($this->container) extends Handler
         {
-            protected function registerErrorViewPaths()
-            {
-            }
+            protected function registerErrorViewPaths() {}
 
             public function getErrorView($e)
             {
@@ -879,9 +877,7 @@ class FoundationExceptionsHandlerTest extends TestCase
     }
 }
 
-class CustomException extends Exception
-{
-}
+class CustomException extends Exception {}
 
 class ResponsableException extends Exception implements Responsable
 {

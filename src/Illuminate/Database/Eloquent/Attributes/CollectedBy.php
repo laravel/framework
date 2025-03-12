@@ -13,7 +13,5 @@ class CollectedBy
      * @param  class-string<\Illuminate\Database\Eloquent\Collection<*, *>>  $collectionClass
      * @return void
      */
-    public function __construct(public string $collectionClass)
-    {
-    }
+    public function __construct(public string $collectionClass) {}
 }

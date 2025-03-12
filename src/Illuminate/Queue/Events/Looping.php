@@ -14,6 +14,5 @@ class Looping
     public function __construct(
         public $connectionName,
         public $queue,
-    ) {
-    }
+    ) {}
 }

@@ -44,12 +44,10 @@ class UtilTest extends TestCase
 
     public function testGetParameterClassName()
     {
-        $parameter = new ReflectionParameter(function (stdClass $foo) {
-        }, 0);
+        $parameter = new ReflectionParameter(function (stdClass $foo) {}, 0);
         $this->assertSame('stdClass', Util::getParameterClassName($parameter));
 
-        $parameter = new ReflectionParameter(function (string $foo) {
-        }, 0);
+        $parameter = new ReflectionParameter(function (string $foo) {}, 0);
         $this->assertNull(Util::getParameterClassName($parameter));
     }
 }

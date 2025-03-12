@@ -15,9 +15,7 @@ class ContextLogProcessor implements ContextLogProcessorContract
      * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @return void
      */
-    public function __construct(protected Application $app)
-    {
-    }
+    public function __construct(protected Application $app) {}
 
     /**
      * Add contextual data to the log's "extra" parameter.

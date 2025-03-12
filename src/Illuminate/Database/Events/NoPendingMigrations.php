@@ -14,6 +14,5 @@ class NoPendingMigrations implements MigrationEvent
      */
     public function __construct(
         public $method,
-    ) {
-    }
+    ) {}
 }

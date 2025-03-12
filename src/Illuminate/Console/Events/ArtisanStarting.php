@@ -14,6 +14,5 @@ class ArtisanStarting
      */
     public function __construct(
         public Application $artisan,
-    ) {
-    }
+    ) {}
 }

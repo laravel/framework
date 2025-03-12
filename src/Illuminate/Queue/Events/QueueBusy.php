@@ -16,6 +16,5 @@ class QueueBusy
         public $connection,
         public $queue,
         public $size,
-    ) {
-    }
+    ) {}
 }

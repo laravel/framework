@@ -14,6 +14,5 @@ class JobReleasedAfterException
     public function __construct(
         public $connectionName,
         public $job,
-    ) {
-    }
+    ) {}
 }

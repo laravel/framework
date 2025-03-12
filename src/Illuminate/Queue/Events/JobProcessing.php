@@ -14,6 +14,5 @@ class JobProcessing
     public function __construct(
         public $connectionName,
         public $job,
-    ) {
-    }
+    ) {}
 }

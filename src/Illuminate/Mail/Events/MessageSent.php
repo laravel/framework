@@ -21,8 +21,7 @@ class MessageSent
     public function __construct(
         public SentMessage $sent,
         public array $data = [],
-    ) {
-    }
+    ) {}
 
     /**
      * Get the serializable representation of the object.

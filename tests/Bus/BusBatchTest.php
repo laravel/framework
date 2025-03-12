@@ -97,8 +97,7 @@ class BusBatchTest extends TestCase
             use Batchable;
         };
 
-        $thirdJob = function () {
-        };
+        $thirdJob = function () {};
 
         $queue->shouldReceive('connection')->once()
             ->with('test-connection')

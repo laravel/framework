@@ -20,8 +20,7 @@ class JobQueueing
         public $job,
         public $payload,
         public $delay,
-    ) {
-    }
+    ) {}
 
     /**
      * Get the decoded job payload.

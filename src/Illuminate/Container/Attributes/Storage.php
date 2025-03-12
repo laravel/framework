@@ -12,9 +12,7 @@ class Storage implements ContextualAttribute
     /**
      * Create a new class instance.
      */
-    public function __construct(public ?string $disk = null)
-    {
-    }
+    public function __construct(public ?string $disk = null) {}
 
     /**
      * Resolve the storage disk.

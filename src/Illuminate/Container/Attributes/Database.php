@@ -12,9 +12,7 @@ class Database implements ContextualAttribute
     /**
      * Create a new class instance.
      */
-    public function __construct(public ?string $connection = null)
-    {
-    }
+    public function __construct(public ?string $connection = null) {}
 
     /**
      * Resolve the database connection.

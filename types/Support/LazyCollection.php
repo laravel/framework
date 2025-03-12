@@ -875,9 +875,7 @@ assertType(
  *
  * @extends \Illuminate\Support\LazyCollection<TKey, TValue>
  */
-class CustomLazyCollection extends LazyCollection
-{
-}
+class CustomLazyCollection extends LazyCollection {}
 
 // assertType('CustomLazyCollection<int, User>', CustomLazyCollection::make([new User]));
 
@@ -891,18 +889,10 @@ foreach ($collection as $int => $user) {
     assertType('User', $user);
 }
 
-class LazyAnimal
-{
-}
-class LazyTiger extends LazyAnimal
-{
-}
-class LazyLion extends LazyAnimal
-{
-}
-class LazyZebra extends LazyAnimal
-{
-}
+class LazyAnimal {}
+class LazyTiger extends LazyAnimal {}
+class LazyLion extends LazyAnimal {}
+class LazyZebra extends LazyAnimal {}
 
 class LazyZoo
 {

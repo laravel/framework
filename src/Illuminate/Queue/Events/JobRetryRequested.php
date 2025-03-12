@@ -19,8 +19,7 @@ class JobRetryRequested
      */
     public function __construct(
         public $job,
-    ) {
-    }
+    ) {}
 
     /**
      * The job payload.

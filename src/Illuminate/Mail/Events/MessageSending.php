@@ -16,6 +16,5 @@ class MessageSending
     public function __construct(
         public Email $message,
         public array $data = [],
-    ) {
-    }
+    ) {}
 }

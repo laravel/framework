@@ -109,8 +109,7 @@ class SkipTestJob
     public function __construct(
         protected bool|SerializableClosure $skip,
         protected bool $useUnless = false,
-    ) {
-    }
+    ) {}
 
     public function handle(): void
     {

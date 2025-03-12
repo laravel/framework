@@ -16,8 +16,7 @@ class JobAttempted
         public $connectionName,
         public $job,
         public $exceptionOccurred = false,
-    ) {
-    }
+    ) {}
 
     /**
      * Determine if the job completed with failing or an unhandled exception occurring.

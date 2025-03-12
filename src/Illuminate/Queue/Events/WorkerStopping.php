@@ -14,6 +14,5 @@ class WorkerStopping
     public function __construct(
         public $status = 0,
         public $workerOptions = null
-    ) {
-    }
+    ) {}
 }

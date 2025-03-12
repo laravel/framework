@@ -23,6 +23,5 @@ class NotificationSent
         public $notification,
         public $channel,
         public $response = null,
-    ) {
-    }
+    ) {}
 }

@@ -19,6 +19,5 @@ class CommandStarting
         public string $command,
         public InputInterface $input,
         public OutputInterface $output,
-    ) {
-    }
+    ) {}
 }

@@ -25,8 +25,7 @@ class CacheTokenRepository implements TokenRepositoryInterface
         protected int $expires = 3600,
         protected int $throttle = 60,
         protected string $prefix = '',
-    ) {
-    }
+    ) {}
 
     /**
      * Create a new token.
@@ -122,7 +121,5 @@ class CacheTokenRepository implements TokenRepositoryInterface
      *
      * @return void
      */
-    public function deleteExpired()
-    {
-    }
+    public function deleteExpired() {}
 }

@@ -6,6 +6,4 @@ namespace Illuminate\Tests\Console\Fixtures;
 
 use Illuminate\Contracts\Queue\ShouldQueue;
 
-final class JobToTestWithSchedule implements ShouldQueue
-{
-}
+final class JobToTestWithSchedule implements ShouldQueue {}

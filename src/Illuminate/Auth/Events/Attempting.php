@@ -16,6 +16,5 @@ class Attempting
         public $guard,
         #[\SensitiveParameter] public $credentials,
         public $remember,
-    ) {
-    }
+    ) {}
 }

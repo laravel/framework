@@ -21,6 +21,5 @@ class CommandFinished
         public InputInterface $input,
         public OutputInterface $output,
         public int $exitCode,
-    ) {
-    }
+    ) {}
 }

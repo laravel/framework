@@ -3488,6 +3488,4 @@ class CustomFactory extends Factory
     }
 }
 
-class TestResponse extends Response
-{
-}
+class TestResponse extends Response {}

@@ -14,6 +14,5 @@ class ScheduledTaskSkipped
      */
     public function __construct(
         public Event $task,
-    ) {
-    }
+    ) {}
 }

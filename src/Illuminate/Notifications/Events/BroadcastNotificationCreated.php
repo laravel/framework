@@ -26,8 +26,7 @@ class BroadcastNotificationCreated implements ShouldBroadcast
         public $notifiable,
         public $notification,
         public $data = [],
-    ) {
-    }
+    ) {}
 
     /**
      * Get the channels the event should broadcast on.

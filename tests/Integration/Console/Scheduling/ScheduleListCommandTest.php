@@ -132,8 +132,7 @@ class ScheduleListCommandTest extends TestCase
 
     public function testClosureCommandsMayBeScheduled()
     {
-        $closure = function () {
-        };
+        $closure = function () {};
 
         Artisan::command('one', $closure)->weekly()->everySecond();
         Artisan::command('two', $closure)->everyTwoSeconds();
@@ -169,24 +168,16 @@ class FooCommand extends Command
     protected $description = 'This is the description of the command.';
 }
 
-class FooJob
-{
-}
+class FooJob {}
 
 class FooParamJob
 {
-    public function __construct($param)
-    {
-    }
+    public function __construct($param) {}
 }
 
 class FooCall
 {
-    public function __invoke(): void
-    {
-    }
+    public function __invoke(): void {}
 
-    public function fooFunction(): void
-    {
-    }
+    public function fooFunction(): void {}
 }

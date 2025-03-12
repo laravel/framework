@@ -20,6 +20,5 @@ class Login
         public $guard,
         public $user,
         public $remember,
-    ) {
-    }
+    ) {}
 }

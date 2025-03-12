@@ -62,9 +62,7 @@ class Post extends Model
  * @template TModel of Post
  *
  * @extends Collection<TKey, TModel> */
-class Posts extends Collection
-{
-}
+class Posts extends Collection {}
 
 final class Comment extends Model
 {
@@ -79,9 +77,7 @@ final class Comment extends Model
 }
 
 /** @extends Collection<array-key, Comment> */
-final class Comments extends Collection
-{
-}
+final class Comments extends Collection {}
 
 #[CollectedBy(Articles::class)]
 class Article extends Model
@@ -95,6 +91,4 @@ class Article extends Model
  * @template TModel of Article
  *
  * @extends Collection<TKey, TModel> */
-class Articles extends Collection
-{
-}
+class Articles extends Collection {}

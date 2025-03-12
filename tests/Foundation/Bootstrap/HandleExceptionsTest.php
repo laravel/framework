@@ -415,6 +415,4 @@ class HandleExceptionsTest extends TestCase
     }
 }
 
-class CustomNullHandler extends NullHandler
-{
-}
+class CustomNullHandler extends NullHandler {}

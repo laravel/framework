@@ -30,10 +30,6 @@ class UserFactory extends Factory
     }
 }
 
-class Post extends Model
-{
-}
+class Post extends Model {}
 
-enum UserType
-{
-}
+enum UserType {}

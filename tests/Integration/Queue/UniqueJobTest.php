@@ -227,9 +227,7 @@ class UniqueTestSerializesModelsJob extends UniqueTestJob
 
     public $deleteWhenMissingModels = true;
 
-    public function __construct(public User $user)
-    {
-    }
+    public function __construct(public User $user) {}
 }
 
 class UniqueViaJob extends UniqueTestJob

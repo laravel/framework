@@ -16,6 +16,5 @@ class JobExceptionOccurred
         public $connectionName,
         public $job,
         public $exception,
-    ) {
-    }
+    ) {}
 }

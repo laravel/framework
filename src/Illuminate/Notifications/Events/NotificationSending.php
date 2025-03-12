@@ -21,6 +21,5 @@ class NotificationSending
         public $notifiable,
         public $notification,
         public $channel,
-    ) {
-    }
+    ) {}
 }

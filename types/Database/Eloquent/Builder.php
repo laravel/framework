@@ -253,9 +253,7 @@ class Post extends Model
     }
 }
 
-class ChildPost extends Post
-{
-}
+class ChildPost extends Post {}
 
 class Comment extends Model
 {
@@ -280,6 +278,4 @@ class CommonBuilder extends Builder
 }
 
 /** @extends CommonBuilder<Comment> */
-class CommentBuilder extends CommonBuilder
-{
-}
+class CommentBuilder extends CommonBuilder {}

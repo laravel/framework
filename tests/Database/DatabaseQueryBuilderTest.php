@@ -4401,8 +4401,7 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testPreserveAddsClosureToArray()
     {
         $builder = $this->getBuilder();
-        $builder->beforeQuery(function () {
-        });
+        $builder->beforeQuery(function () {});
         $this->assertCount(1, $builder->beforeQueryCallbacks);
         $this->assertInstanceOf(Closure::class, $builder->beforeQueryCallbacks[0]);
     }
@@ -4410,8 +4409,7 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testApplyPreserveCleansArray()
     {
         $builder = $this->getBuilder();
-        $builder->beforeQuery(function () {
-        });
+        $builder->beforeQuery(function () {});
         $this->assertCount(1, $builder->beforeQueryCallbacks);
         $builder->applyBeforeQueryCallbacks();
         $this->assertCount(0, $builder->beforeQueryCallbacks);

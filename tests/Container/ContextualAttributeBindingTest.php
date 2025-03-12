@@ -306,29 +306,21 @@ class ContainerTestAttributeThatResolvesContractImpl implements ContextualAttrib
 {
     public function __construct(
         public readonly string $name
-    ) {
-    }
+    ) {}
 }
 
-interface ContainerTestContract
-{
-}
+interface ContainerTestContract {}
 
-final class ContainerTestImplA implements ContainerTestContract
-{
-}
+final class ContainerTestImplA implements ContainerTestContract {}
 
-final class ContainerTestImplB implements ContainerTestContract
-{
-}
+final class ContainerTestImplB implements ContainerTestContract {}
 
 final class ContainerTestHasAttributeThatResolvesToImplA
 {
     public function __construct(
         #[ContainerTestAttributeThatResolvesContractImpl('A')]
         public readonly ContainerTestContract $property
-    ) {
-    }
+    ) {}
 }
 
 final class ContainerTestHasAttributeThatResolvesToImplB
@@ -336,8 +328,7 @@ final class ContainerTestHasAttributeThatResolvesToImplB
     public function __construct(
         #[ContainerTestAttributeThatResolvesContractImpl('B')]
         public readonly ContainerTestContract $property
-    ) {
-    }
+    ) {}
 }
 
 #[Attribute(Attribute::TARGET_PARAMETER)]
@@ -345,8 +336,7 @@ final class ContainerTestConfigValue implements ContextualAttribute
 {
     public function __construct(
         public readonly string $key
-    ) {
-    }
+    ) {}
 }
 
 final class ContainerTestHasConfigValueProperty
@@ -354,8 +344,7 @@ final class ContainerTestHasConfigValueProperty
     public function __construct(
         #[ContainerTestConfigValue('app.timezone')]
         public string $timezone
-    ) {
-    }
+    ) {}
 }
 
 #[Attribute(Attribute::TARGET_PARAMETER)]
@@ -363,8 +352,7 @@ final class ContainerTestConfigValueWithResolve implements ContextualAttribute
 {
     public function __construct(
         public readonly string $key
-    ) {
-    }
+    ) {}
 
     public function resolve(self $attribute, Container $container): string
     {
@@ -377,8 +365,7 @@ final class ContainerTestHasConfigValueWithResolveProperty
     public function __construct(
         #[ContainerTestConfigValueWithResolve('app.env')]
         public string $env
-    ) {
-    }
+    ) {}
 }
 
 #[Attribute(Attribute::TARGET_PARAMETER)]
@@ -400,64 +387,47 @@ final class ContainerTestHasConfigValueWithResolvePropertyAndAfterCallback
     public function __construct(
         #[ContainerTestConfigValueWithResolveAndAfter]
         public object $person
-    ) {
-    }
+    ) {}
 }
 
 final class AuthedTest
 {
-    public function __construct(#[Authenticated('foo')] AuthenticatableContract $foo, #[CurrentUser('bar')] AuthenticatableContract $bar)
-    {
-    }
+    public function __construct(#[Authenticated('foo')] AuthenticatableContract $foo, #[CurrentUser('bar')] AuthenticatableContract $bar) {}
 }
 
 final class CacheTest
 {
-    public function __construct(#[Cache('foo')] CacheRepository $foo, #[Cache('bar')] CacheRepository $bar)
-    {
-    }
+    public function __construct(#[Cache('foo')] CacheRepository $foo, #[Cache('bar')] CacheRepository $bar) {}
 }
 
 final class ConfigTest
 {
-    public function __construct(#[Config('foo')] string $foo, #[Config('bar')] string $bar)
-    {
-    }
+    public function __construct(#[Config('foo')] string $foo, #[Config('bar')] string $bar) {}
 }
 
 final class DatabaseTest
 {
-    public function __construct(#[Database('foo')] Connection $foo, #[Database('bar')] Connection $bar)
-    {
-    }
+    public function __construct(#[Database('foo')] Connection $foo, #[Database('bar')] Connection $bar) {}
 }
 
 final class GuardTest
 {
-    public function __construct(#[Auth('foo')] GuardContract $foo, #[Auth('bar')] GuardContract $bar)
-    {
-    }
+    public function __construct(#[Auth('foo')] GuardContract $foo, #[Auth('bar')] GuardContract $bar) {}
 }
 
 final class LogTest
 {
-    public function __construct(#[Log('foo')] LoggerInterface $foo, #[Log('bar')] LoggerInterface $bar)
-    {
-    }
+    public function __construct(#[Log('foo')] LoggerInterface $foo, #[Log('bar')] LoggerInterface $bar) {}
 }
 
 final class RouteParameterTest
 {
-    public function __construct(#[RouteParameter('foo')] Model $foo, #[RouteParameter('bar')] string $bar)
-    {
-    }
+    public function __construct(#[RouteParameter('foo')] Model $foo, #[RouteParameter('bar')] string $bar) {}
 }
 
 final class StorageTest
 {
-    public function __construct(#[Storage('foo')] Filesystem $foo, #[Storage('bar')] Filesystem $bar)
-    {
-    }
+    public function __construct(#[Storage('foo')] Filesystem $foo, #[Storage('bar')] Filesystem $bar) {}
 }
 
 final class TimezoneObject

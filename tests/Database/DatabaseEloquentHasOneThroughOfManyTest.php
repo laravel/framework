@@ -128,8 +128,7 @@ class DatabaseEloquentHasOneThroughOfManyTest extends TestCase
         $relation->addEagerConstraints([$user]);
         $this->assertSame('select "logins".* from "logins" inner join "intermediates" on "intermediates"."id" = "logins"."intermediate_id" inner join (select MAX("logins"."id") as "id_aggregate", "intermediates"."user_id" from "logins" inner join "intermediates" on "intermediates"."id" = "logins"."intermediate_id" where "intermediates"."user_id" in (1) group by "intermediates"."user_id") as "latestOfMany" on "latestOfMany"."id_aggregate" = "logins"."id" and "latestOfMany"."user_id" = "intermediates"."user_id" where "intermediates"."user_id" = ?', $relation->getQuery()->toSql());
 
-        HasOneThroughOfManyTestLogin::addGlobalScope('test', function ($query) {
-        });
+        HasOneThroughOfManyTestLogin::addGlobalScope('test', function ($query) {});
     }
 
     public function testGlobalScopeIsNotAppliedWhenRelationIsDefinedWithoutGlobalScopeWithComplexQuery(): void
@@ -142,8 +141,7 @@ class DatabaseEloquentHasOneThroughOfManyTest extends TestCase
         $relation = $user->price_without_global_scope();
         $this->assertSame('select "prices".* from "prices" inner join "intermediates" on "intermediates"."id" = "prices"."intermediate_id" inner join (select max("prices"."id") as "id_aggregate", min("prices"."published_at") as "published_at_aggregate", "intermediates"."user_id" from "prices" inner join "intermediates" on "intermediates"."id" = "prices"."intermediate_id" inner join (select max("prices"."published_at") as "published_at_aggregate", "intermediates"."user_id" from "prices" inner join "intermediates" on "intermediates"."id" = "prices"."intermediate_id" where "published_at" < ? group by "intermediates"."user_id") as "price_without_global_scope" on "price_without_global_scope"."published_at_aggregate" = "prices"."published_at" and "price_without_global_scope"."user_id" = "intermediates"."user_id" where "published_at" < ? group by "intermediates"."user_id") as "price_without_global_scope" on "price_without_global_scope"."id_aggregate" = "prices"."id" and "price_without_global_scope"."published_at_aggregate" = "prices"."published_at" and "price_without_global_scope"."user_id" = "intermediates"."user_id" where "intermediates"."user_id" = ?', $relation->getQuery()->toSql());
 
-        HasOneThroughOfManyTestPrice::addGlobalScope('test', function ($query) {
-        });
+        HasOneThroughOfManyTestPrice::addGlobalScope('test', function ($query) {});
     }
 
     public function testQualifyingSubSelectColumn(): void

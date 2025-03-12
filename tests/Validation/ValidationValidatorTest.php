@@ -9734,6 +9734,4 @@ class ExplicitTableAndConnectionModel extends Model
     public $timestamps = false;
 }
 
-class NonEloquentModel
-{
-}
+class NonEloquentModel {}

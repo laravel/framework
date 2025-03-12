@@ -16,8 +16,7 @@ class RouteBindingTest extends TestCase
     {
         $container = Container::getInstance();
 
-        $route = new Route('GET', '/users/{user}', function () {
-        });
+        $route = new Route('GET', '/users/{user}', function () {});
 
         $callback = RouteBinding::forModel($container, ExplicitRouteBindingUser::class);
         $this->assertInstanceOf(ExplicitRouteBindingUser::class, $callback(1, $route));
@@ -27,8 +26,7 @@ class RouteBindingTest extends TestCase
     {
         $container = Container::getInstance();
 
-        $route = new Route('GET', '/users/{user}', function () {
-        });
+        $route = new Route('GET', '/users/{user}', function () {});
 
         $callback = RouteBinding::forModel($container, ExplicitRouteBindingSoftDeletableUser::class);
 
@@ -40,8 +38,7 @@ class RouteBindingTest extends TestCase
     {
         $container = Container::getInstance();
 
-        $route = (new Route('GET', '/users/{user}', function () {
-        }))->withTrashed();
+        $route = (new Route('GET', '/users/{user}', function () {}))->withTrashed();
 
         $callback = RouteBinding::forModel($container, ExplicitRouteBindingSoftDeletableUser::class);
         $this->assertInstanceOf(ExplicitRouteBindingSoftDeletableUser::class, $callback(1, $route));

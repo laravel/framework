@@ -15,9 +15,7 @@ class Exceptions
      * @param  \Illuminate\Foundation\Exceptions\Handler  $handler
      * @return void
      */
-    public function __construct(public Handler $handler)
-    {
-    }
+    public function __construct(public Handler $handler) {}
 
     /**
      * Register a reportable callback.

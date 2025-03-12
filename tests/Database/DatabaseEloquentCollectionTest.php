@@ -808,9 +808,7 @@ class EloquentTestCommentModel extends Model
 
 class EloquentTestKey
 {
-    public function __construct(private readonly string $key)
-    {
-    }
+    public function __construct(private readonly string $key) {}
 
     public function __toString()
     {

@@ -69,16 +69,13 @@ class HasAttributesWithoutConstructor
 
     public function someAttribute(): Attribute
     {
-        return new Attribute(function () {
-        });
+        return new Attribute(function () {});
     }
 }
 
 class HasAttributesWithConstructorArguments extends HasAttributesWithoutConstructor
 {
-    public function __construct($someValue)
-    {
-    }
+    public function __construct($someValue) {}
 }
 
 class HasAttributesWithArrayCast
