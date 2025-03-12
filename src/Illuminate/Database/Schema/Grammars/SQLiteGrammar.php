@@ -891,6 +891,13 @@ class SQLiteGrammar extends Grammar
      */
     protected function typeJson(Fluent $column)
     {
+        $useNativeJson = $this->connection->getConfig('schema.use_native_json');
+
+        var_dump($useNativeJson);
+        if ($useNativeJson) {
+            return 'json';
+        }
+
         return 'text';
     }
 
@@ -902,6 +909,12 @@ class SQLiteGrammar extends Grammar
      */
     protected function typeJsonb(Fluent $column)
     {
+        $useNativeJson = $this->connection->getConfig('schema.use_native_jsonb');
+
+        if ($useNativeJson) {
+            return 'jsonb';
+        }
+
         return 'text';
     }
 
