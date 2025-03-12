@@ -286,4 +286,30 @@ class SupportLazyCollectionTest extends TestCase
 
         $this->assertSame([1, 2], $data->all());
     }
+
+    public function testAfter()
+    {
+        $data = new LazyCollection([1, '2', 3, 4]);
+
+        // Test finding item after value with non-strict comparison
+        $result = $data->after(1);
+        $this->assertSame('2', $result);
+
+        // Test with strict comparison
+        $result = $data->after('2', true);
+        $this->assertSame(3, $result);
+
+        $users = new LazyCollection([
+            ['name' => 'Taylor', 'age' => 35],
+            ['name' => 'Jeffrey', 'age' => 45],
+            ['name' => 'Mohamed', 'age' => 35],
+        ]);
+
+        // Test finding item after the one that matches a condition
+        $result = $users->after(function ($user) {
+            return $user['name'] === 'Jeffrey';
+        });
+
+        $this->assertSame(['name' => 'Mohamed', 'age' => 35], $result);
+    }
 }
