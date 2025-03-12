@@ -1,6 +1,15 @@
 # Release Notes for 11.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v11.44.1...11.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v11.44.2...11.x)
+
+## [v11.44.2](https://github.com/laravel/framework/compare/v11.44.1...v11.44.2) - 2025-03-12
+
+* [11.x] Fix double negative in `whereNotMorphedTo()` query by [@owenvoke](https://github.com/owenvoke) in https://github.com/laravel/framework/pull/54902
+* [11.x] Backport "Change `paginate()` method return types to `\Illuminate\Pagination\LengthAwarePaginator`" by [@carestad](https://github.com/carestad) in https://github.com/laravel/framework/pull/54917
+* [11.x] Revert faulty change to `EnumeratesValues::ensure()` doc block by [@axlon](https://github.com/axlon) in https://github.com/laravel/framework/pull/54919
+* Ensure ValidationEmailRuleTest skips tests requiring the intl extension when unavailable by [@alikhosravidev](https://github.com/alikhosravidev) in https://github.com/laravel/framework/pull/54918
+* [11.x] Backport "Fix issue with using `RedisCluster` with compression or serialization" by [@rzv-me](https://github.com/rzv-me) in https://github.com/laravel/framework/pull/54935
+* [11.x] Fix callOnce in Seeder so it handles arrays properly by [@lbovit](https://github.com/lbovit) in https://github.com/laravel/framework/pull/54985
 
 ## [v11.44.1](https://github.com/laravel/framework/compare/v11.44.0...v11.44.1) - 2025-03-05
 
