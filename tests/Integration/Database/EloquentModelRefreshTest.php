@@ -71,6 +71,17 @@ class EloquentModelRefreshTest extends DatabaseTestCase
 
         $post->children->first()->refresh();
     }
+
+    public function testItResetsWasRecentlyCreatedProperty()
+    {
+        $post = Post::create(['title' => 'laravel']);
+
+        $this->assertTrue($post->wasRecentlyCreated);
+
+        $post->refresh();
+
+        $this->assertFalse($post->wasRecentlyCreated);
+    }
 }
 
 class Post extends Model
