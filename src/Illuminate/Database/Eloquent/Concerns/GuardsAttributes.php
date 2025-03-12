@@ -76,8 +76,8 @@ trait GuardsAttributes
     public function getGuarded()
     {
         return $this->guarded === false
-                    ? []
-                    : $this->guarded;
+            ? []
+            : $this->guarded;
     }
 
     /**

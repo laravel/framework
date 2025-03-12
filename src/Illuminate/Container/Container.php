@@ -1097,8 +1097,8 @@ class Container implements ArrayAccess, ContainerContract
             // primitive type which we can not resolve since it is not a class and
             // we will just bomb out with an error since we have no-where to go.
             $result ??= is_null(Util::getParameterClassName($dependency))
-                            ? $this->resolvePrimitive($dependency)
-                            : $this->resolveClass($dependency);
+                ? $this->resolvePrimitive($dependency)
+                : $this->resolveClass($dependency);
 
             $this->fireAfterResolvingAttributeCallbacks($dependency->getAttributes(), $result);
 
@@ -1203,8 +1203,8 @@ class Container implements ArrayAccess, ContainerContract
 
         try {
             return $parameter->isVariadic()
-                        ? $this->resolveVariadicClass($parameter)
-                        : $this->make($className);
+                ? $this->resolveVariadicClass($parameter)
+                : $this->make($className);
         }
 
         // If we can not resolve the class instance, we will check to see if the value
@@ -1520,8 +1520,8 @@ class Container implements ArrayAccess, ContainerContract
     public function getAlias($abstract)
     {
         return isset($this->aliases[$abstract])
-                    ? $this->getAlias($this->aliases[$abstract])
-                    : $abstract;
+            ? $this->getAlias($this->aliases[$abstract])
+            : $abstract;
     }
 
     /**

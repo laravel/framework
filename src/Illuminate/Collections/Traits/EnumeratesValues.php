@@ -505,8 +505,8 @@ trait EnumeratesValues
     public function partition($key, $operator = null, $value = null)
     {
         $callback = func_num_args() === 1
-                ? $this->valueRetriever($key)
-                : $this->operatorForWhere(...func_get_args());
+            ? $this->valueRetriever($key)
+            : $this->operatorForWhere(...func_get_args());
 
         [$passed, $failed] = Arr::partition($this->getIterator(), $callback);
 
@@ -991,8 +991,8 @@ trait EnumeratesValues
     public function __toString()
     {
         return $this->escapeWhenCastingToString
-                    ? e($this->toJson())
-                    : $this->toJson();
+            ? e($this->toJson())
+            : $this->toJson();
     }
 
     /**

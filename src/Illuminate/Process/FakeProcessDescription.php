@@ -205,8 +205,8 @@ class FakeProcessDescription
             ->filter(fn ($output) => $output['type'] === 'out');
 
         return $output->isNotEmpty()
-                    ? rtrim($output->map->buffer->implode(''), "\n")."\n"
-                    : '';
+            ? rtrim($output->map->buffer->implode(''), "\n")."\n"
+            : '';
     }
 
     /**
@@ -220,7 +220,7 @@ class FakeProcessDescription
             ->filter(fn ($output) => $output['type'] === 'err');
 
         return $output->isNotEmpty()
-                    ? rtrim($output->map->buffer->implode(''), "\n")."\n"
-                    : '';
+            ? rtrim($output->map->buffer->implode(''), "\n")."\n"
+            : '';
     }
 }

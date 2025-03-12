@@ -51,8 +51,8 @@ trait Prunable
         $this->pruning();
 
         return in_array(SoftDeletes::class, class_uses_recursive(static::class))
-                ? $this->forceDelete()
-                : $this->delete();
+            ? $this->forceDelete()
+            : $this->delete();
     }
 
     /**
