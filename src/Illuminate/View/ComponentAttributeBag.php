@@ -508,7 +508,7 @@ class ComponentAttributeBag implements ArrayAccess, IteratorAggregate, JsonSeria
         $string = '';
 
         foreach ($this->attributes as $key => $value) {
-            if ($value === false || is_null($value)) {
+            if ($value === false || is_null($value) || is_array($value)) {
                 continue;
             }
 
@@ -516,7 +516,7 @@ class ComponentAttributeBag implements ArrayAccess, IteratorAggregate, JsonSeria
                 $value = $key === 'x-data' || str_starts_with($key, 'wire:') ? '' : $key;
             }
 
-            $string .= ' '.$key.'="'.str_replace('"', '\\"', trim($value)).'"';
+            $string .= ' '.$key.'="'.str_replace('"', '\\"', trim((string) $value)).'"';
         }
 
         return trim($string);
