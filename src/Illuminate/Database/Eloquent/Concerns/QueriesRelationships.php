@@ -281,7 +281,7 @@ trait QueriesRelationships
                 });
             }
         }, null, null, $boolean)
-        ->when($checkMorphNull, fn (self $query) => $query->orWhereMorphedTo($relation, null));
+            ->when($checkMorphNull, fn (self $query) => $query->orWhereMorphedTo($relation, null));
     }
 
     /**
