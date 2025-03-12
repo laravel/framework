@@ -316,7 +316,7 @@ class SupportLazyCollectionTest extends TestCase
     public function testBefore()
     {
         // Test finding item before value with non-strict comparison
-        $data = new LazyCollection([1, 2, "3", 4]);
+        $data = new LazyCollection([1, 2, '3', 4]);
         $result = $data->before(2);
         $this->assertSame(1, $result);
 
@@ -334,5 +334,25 @@ class SupportLazyCollectionTest extends TestCase
             return $user['name'] === 'Jeffrey';
         });
         $this->assertSame(['name' => 'Taylor', 'age' => 35], $result);
+    }
+
+    public function testShuffle()
+    {
+        $data = new LazyCollection([1, 2, 3, 4, 5]);
+        $shuffled = $data->shuffle();
+
+        $this->assertCount(5, $shuffled);
+        $this->assertEquals([1, 2, 3, 4, 5], $shuffled->sort()->values()->all());
+
+        // Test shuffling associative array maintains key-value pairs
+        $users = new LazyCollection([
+            'first' => ['name' => 'Taylor'],
+            'second' => ['name' => 'Jeffrey'],
+        ]);
+        $shuffled = $users->shuffle();
+
+        $this->assertCount(2, $shuffled);
+        $this->assertTrue($shuffled->contains('name', 'Taylor'));
+        $this->assertTrue($shuffled->contains('name', 'Jeffrey'));
     }
 }
