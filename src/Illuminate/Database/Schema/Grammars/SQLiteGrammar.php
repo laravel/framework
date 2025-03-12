@@ -893,7 +893,6 @@ class SQLiteGrammar extends Grammar
     {
         $useNativeJson = $this->connection->getConfig('schema.use_native_json');
 
-        var_dump($useNativeJson);
         if ($useNativeJson) {
             return 'json';
         }
