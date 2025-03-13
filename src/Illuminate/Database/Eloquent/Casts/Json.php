@@ -21,9 +21,9 @@ class Json
     /**
      * Encode the given value.
      */
-    public static function encode(mixed $value): mixed
+    public static function encode(mixed $value, int $flags = 0): mixed
     {
-        return isset(static::$encoder) ? (static::$encoder)($value) : json_encode($value);
+        return isset(static::$encoder) ? (static::$encoder)($value) : json_encode($value, $flags);
     }
 
     /**

@@ -2472,6 +2472,7 @@ class DatabaseEloquentModelTest extends TestCase
         $obj->foo = 'bar';
         $model->arrayAttribute = $obj;
         $model->jsonAttribute = ['foo' => 'bar'];
+        $model->jsonAttributeWithUnicode = ['こんにちは' => '世界'];
         $model->dateAttribute = '1969-07-20';
         $model->datetimeAttribute = '1969-07-20 22:56:00';
         $model->timestampAttribute = '1969-07-20 22:56:00';
@@ -2486,12 +2487,15 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertIsObject($model->objectAttribute);
         $this->assertIsArray($model->arrayAttribute);
         $this->assertIsArray($model->jsonAttribute);
+        $this->assertIsArray($model->jsonAttributeWithUnicode);
         $this->assertTrue($model->boolAttribute);
         $this->assertFalse($model->booleanAttribute);
         $this->assertEquals($obj, $model->objectAttribute);
         $this->assertEquals(['foo' => 'bar'], $model->arrayAttribute);
         $this->assertEquals(['foo' => 'bar'], $model->jsonAttribute);
         $this->assertSame('{"foo":"bar"}', $model->jsonAttributeValue());
+        $this->assertEquals(['こんにちは' => '世界'], $model->jsonAttributeWithUnicode);
+        $this->assertSame('{"こんにちは":"世界"}', $model->jsonAttributeWithUnicodeValue());
         $this->assertInstanceOf(Carbon::class, $model->dateAttribute);
         $this->assertInstanceOf(Carbon::class, $model->datetimeAttribute);
         $this->assertInstanceOf(BaseCollection::class, $model->collectionAttribute);
@@ -2510,12 +2514,14 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertIsObject($arr['objectAttribute']);
         $this->assertIsArray($arr['arrayAttribute']);
         $this->assertIsArray($arr['jsonAttribute']);
+        $this->assertIsArray($arr['jsonAttributeWithUnicode']);
         $this->assertIsArray($arr['collectionAttribute']);
         $this->assertTrue($arr['boolAttribute']);
         $this->assertFalse($arr['booleanAttribute']);
         $this->assertEquals($obj, $arr['objectAttribute']);
         $this->assertEquals(['foo' => 'bar'], $arr['arrayAttribute']);
         $this->assertEquals(['foo' => 'bar'], $arr['jsonAttribute']);
+        $this->assertEquals(['こんにちは' => '世界'], $arr['jsonAttributeWithUnicode']);
         $this->assertSame('1969-07-20 00:00:00', $arr['dateAttribute']);
         $this->assertSame('1969-07-20 22:56:00', $arr['datetimeAttribute']);
         $this->assertEquals(-14173440, $arr['timestampAttribute']);
@@ -2544,6 +2550,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->objectAttribute = null;
         $model->arrayAttribute = null;
         $model->jsonAttribute = null;
+        $model->jsonAttributeWithUnicode = null;
         $model->dateAttribute = null;
         $model->datetimeAttribute = null;
         $model->timestampAttribute = null;
@@ -2559,6 +2566,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertNull($attributes['objectAttribute']);
         $this->assertNull($attributes['arrayAttribute']);
         $this->assertNull($attributes['jsonAttribute']);
+        $this->assertNull($attributes['jsonAttributeWithUnicode']);
         $this->assertNull($attributes['dateAttribute']);
         $this->assertNull($attributes['datetimeAttribute']);
         $this->assertNull($attributes['timestampAttribute']);
@@ -2572,6 +2580,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertNull($model->objectAttribute);
         $this->assertNull($model->arrayAttribute);
         $this->assertNull($model->jsonAttribute);
+        $this->assertNull($model->jsonAttributeWithUnicode);
         $this->assertNull($model->dateAttribute);
         $this->assertNull($model->datetimeAttribute);
         $this->assertNull($model->timestampAttribute);
@@ -2587,6 +2596,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertNull($array['objectAttribute']);
         $this->assertNull($array['arrayAttribute']);
         $this->assertNull($array['jsonAttribute']);
+        $this->assertNull($array['jsonAttributeWithUnicode']);
         $this->assertNull($array['dateAttribute']);
         $this->assertNull($array['datetimeAttribute']);
         $this->assertNull($array['timestampAttribute']);
@@ -2603,9 +2613,43 @@ class DatabaseEloquentModelTest extends TestCase
         $obj = new stdClass;
         $obj->foo = "b\xF8r";
         $model->arrayAttribute = $obj;
+
+        $model->getAttributes();
+    }
+
+    public function testModelJsonCastingFailsOnUnencodableData()
+    {
+        $this->expectException(JsonEncodingException::class);
+        $this->expectExceptionMessage('Unable to encode attribute [jsonAttribute] for model [Illuminate\Tests\Database\EloquentModelCastingStub] to JSON: Malformed UTF-8 characters, possibly incorrectly encoded.');
+
+        $model = new EloquentModelCastingStub;
         $model->jsonAttribute = ['foo' => "b\xF8r"];
 
         $model->getAttributes();
+    }
+
+    public function testModelAttributeCastingFailsOnUnencodableDataWithUnicode()
+    {
+        $this->expectException(JsonEncodingException::class);
+        $this->expectExceptionMessage('Unable to encode attribute [jsonAttributeWithUnicode] for model [Illuminate\Tests\Database\EloquentModelCastingStub] to JSON: Malformed UTF-8 characters, possibly incorrectly encoded.');
+
+        $model = new EloquentModelCastingStub;
+        $model->jsonAttributeWithUnicode = ['foo' => "b\xF8r"];
+
+        $model->getAttributes();
+    }
+
+    public function testJsonCastingRespectsUnicodeOption()
+    {
+        $data = ['こんにちは' => '世界'];
+        $model = new EloquentModelCastingStub;
+        $model->jsonAttribute = $data;
+        $model->jsonAttributeWithUnicode = $data;
+
+        $this->assertSame('{"\u3053\u3093\u306b\u3061\u306f":"\u4e16\u754c"}', $model->jsonAttributeValue());
+        $this->assertSame('{"こんにちは":"世界"}', $model->jsonAttributeWithUnicodeValue());
+        $this->assertSame(['こんにちは' => '世界'], $model->jsonAttribute);
+        $this->assertSame(['こんにちは' => '世界'], $model->jsonAttributeWithUnicode);
     }
 
     public function testModelAttributeCastingWithFloats()
@@ -3028,6 +3072,7 @@ class DatabaseEloquentModelTest extends TestCase
         $collection = collect($array);
         $model->arrayAttribute = $array;
         $model->jsonAttribute = $array;
+        $model->jsonAttributeWithUnicode = $array;
         $model->collectionAttribute = $collection;
 
         $model->syncOriginal();
@@ -3042,6 +3087,9 @@ class DatabaseEloquentModelTest extends TestCase
             'foo' => 'bar2',
         ];
         $model->jsonAttribute = [
+            'foo' => 'bar2',
+        ];
+        $model->jsonAttributeWithUnicode = [
             'foo' => 'bar2',
         ];
         $model->collectionAttribute = collect([
@@ -3079,6 +3127,10 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals($array, $model->getOriginal('jsonAttribute'));
         $this->assertEquals(['foo' => 'bar'], $model->getOriginal('jsonAttribute'));
         $this->assertEquals(['foo' => 'bar2'], $model->getAttribute('jsonAttribute'));
+
+        $this->assertEquals($array, $model->getOriginal('jsonAttributeWithUnicode'));
+        $this->assertEquals(['foo' => 'bar'], $model->getOriginal('jsonAttributeWithUnicode'));
+        $this->assertEquals(['foo' => 'bar2'], $model->getAttribute('jsonAttributeWithUnicode'));
 
         $this->assertEquals(['foo' => 'bar'], $model->getOriginal('collectionAttribute')->toArray());
         $this->assertEquals(['foo' => 'bar2'], $model->getAttribute('collectionAttribute')->toArray());
@@ -3596,6 +3648,7 @@ class EloquentModelCastingStub extends Model
         'boolAttribute' => 'bool',
         'objectAttribute' => 'object',
         'jsonAttribute' => 'json',
+        'jsonAttributeWithUnicode' => 'json:unicode',
         'dateAttribute' => 'date',
         'timestampAttribute' => 'timestamp',
         'ascollectionAttribute' => AsCollection::class,
@@ -3631,6 +3684,11 @@ class EloquentModelCastingStub extends Model
     public function jsonAttributeValue()
     {
         return $this->attributes['jsonAttribute'];
+    }
+
+    public function jsonAttributeWithUnicodeValue()
+    {
+        return $this->attributes['jsonAttributeWithUnicode'];
     }
 
     protected function serializeDate(DateTimeInterface $date)
