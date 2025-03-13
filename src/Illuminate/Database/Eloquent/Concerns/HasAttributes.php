@@ -1327,7 +1327,7 @@ trait HasAttributes
     }
 
     /**
-     * Get JSON casting flags for the specified attribute.
+     * Get the JSON casting flags for the given attribute.
      *
      * @param  string  $key
      * @return int
