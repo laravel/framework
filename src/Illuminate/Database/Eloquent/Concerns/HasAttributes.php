@@ -1315,7 +1315,7 @@ trait HasAttributes
      */
     protected function castAttributeAsJson($key, $value)
     {
-        $value = $this->asJson($value, $this->hasCast($key, ['json:unicode']));
+        $value = $this->asJson($value, $this->getJsonCastFlags($key));
 
         if ($value === false) {
             throw JsonEncodingException::forAttribute(
@@ -1327,19 +1327,32 @@ trait HasAttributes
     }
 
     /**
+     * Get JSON casting flags for the specified attribute.
+     *
+     * @param  string  $key
+     * @return int
+     */
+    protected function getJsonCastFlags($key)
+    {
+        $flags = 0;
+
+        if ($this->hasCast($key, ['json:unicode'])) {
+            $flags |= JSON_UNESCAPED_UNICODE;
+        }
+
+        return $flags;
+    }
+
+    /**
      * Encode the given value as JSON.
      *
      * @param  mixed  $value
-     * @param  bool  $isUnicode
+     * @param  int  $flags
      * @return string
      */
-    protected function asJson($value, $isUnicode = false)
+    protected function asJson($value, $flags = 0)
     {
-        if ($isUnicode) {
-            return Json::encode($value, JSON_UNESCAPED_UNICODE);
-        }
-
-        return Json::encode($value);
+        return Json::encode($value, $flags);
     }
 
     /**
