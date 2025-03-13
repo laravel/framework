@@ -4,18 +4,11 @@ namespace Illuminate\Validation\Rules;
 
 use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Contracts\Validation\ValidatorAwareRule;
-use Illuminate\Validation\Validator;
+use Illuminate\Support\Facades\Validator;
 use InvalidArgumentException;
 
-class OneOf implements Rule, ValidatorAwareRule
+class AnyOf implements Rule, ValidatorAwareRule
 {
-    /**
-     * The name of the rule.
-     *
-     * @var string
-     */
-    protected $rule = 'oneof';
-
     /**
      * The validator performing the validation.
      *
@@ -64,14 +57,19 @@ class OneOf implements Rule, ValidatorAwareRule
         $this->messages = [];
 
         foreach ($this->ruleSets as $ruleSet) {
-            $this->validator->setRules($ruleSet);
-            $this->validator->setData($value);
-            if ($this->validator->passes()) {
+            $validator = Validator::make(
+                $value,
+                $ruleSet,
+                $this->validator->customMessages,
+                $this->validator->customAttributes
+            );
+
+            if ($validator->passes()) {
                 return true;
             }
         }
 
-        array_push($this->messages, "The {$attribute} field does not match any of the allowed rule sets.");
+        $this->validator->addFailure($attribute, 'oneof');
 
         return false;
     }

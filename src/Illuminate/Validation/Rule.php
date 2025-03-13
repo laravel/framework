@@ -18,7 +18,7 @@ use Illuminate\Validation\Rules\ImageFile;
 use Illuminate\Validation\Rules\In;
 use Illuminate\Validation\Rules\NotIn;
 use Illuminate\Validation\Rules\Numeric;
-use Illuminate\Validation\Rules\OneOf;
+use Illuminate\Validation\Rules\AnyOf;
 use Illuminate\Validation\Rules\ProhibitedIf;
 use Illuminate\Validation\Rules\RequiredIf;
 use Illuminate\Validation\Rules\Unique;
@@ -248,14 +248,14 @@ class Rule
     }
 
     /**
-     * Get a oneof rule builder instance.
+     * Get a anyof rule builder instance.
      *
      * @param  \Illuminate\Contracts\Validation\ValidationRule[]  $values
-     * @return \Illuminate\Validation\Rules\OneOf
+     * @return \Illuminate\Validation\Rules\AnyOf
      */
-    public static function oneOf($rules)
+    public static function anyOf($rules)
     {
-        return new OneOf($rules);
+        return new AnyOf($rules);
     }
 
     /**
