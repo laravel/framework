@@ -22,7 +22,6 @@ class ContextLogProcessor implements ContextLogProcessorContract
             return $record;
         }
 
-
         return $record->with(extra: [
             ...$record->extra,
             ...$app->get(ContextRepository::class)->all(),
