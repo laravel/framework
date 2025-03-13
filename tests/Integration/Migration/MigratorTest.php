@@ -52,6 +52,7 @@ class MigratorTest extends TestCase
         $this->assertTrue(DB::getSchemaBuilder()->hasTable('people'));
         $this->assertTrue(DB::getSchemaBuilder()->hasColumn('people', 'first_name'));
         $this->assertTrue(DB::getSchemaBuilder()->hasColumn('people', 'last_name'));
+        $this->assertFalse(DB::getSchemaBuilder()->hasColumn('people', 'age'));
     }
 
     public function testMigrateWithoutOutput()
@@ -64,6 +65,7 @@ class MigratorTest extends TestCase
         $this->assertTrue(DB::getSchemaBuilder()->hasTable('people'));
         $this->assertTrue(DB::getSchemaBuilder()->hasColumn('people', 'first_name'));
         $this->assertTrue(DB::getSchemaBuilder()->hasColumn('people', 'last_name'));
+        $this->assertFalse(DB::getSchemaBuilder()->hasColumn('people', 'age'));
     }
 
     public function testWithSkippedMigrations()
