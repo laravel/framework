@@ -1570,4 +1570,39 @@ class SupportArrTest extends TestCase
 
         $this->assertEquals([[0 => 'John', 1 => 'Jane'], [2 => 'Greg']], $result);
     }
+
+    public function testInsertAt()
+    {
+        // Insert in the middle
+        $array = Arr::insertAt(['a', 'b', 'c'], 1, 'x');
+        $this->assertSame(['a', 'x', 'b', 'c'], $array);
+
+        // Insert at the beginning
+        $array = Arr::insertAt(['b', 'c'], 0, 'a');
+        $this->assertSame(['a', 'b', 'c'], $array);
+
+        // Insert at the end
+        $array = Arr::insertAt(['a', 'b'], 2, 'c');
+        $this->assertSame(['a', 'b', 'c'], $array);
+
+        // Insert into an empty array
+        $array = Arr::insertAt([], 0, 'a');
+        $this->assertSame(['a'], $array);
+
+        // Insert with numeric values
+        $array = Arr::insertAt([1, 2, 4], 2, 3);
+        $this->assertSame([1, 2, 3, 4], $array);
+
+        // Insert with associative array
+        $array = Arr::insertAt(['name' => 'John', 'age' => 30], 1, ['gender' => 'male']);
+        $this->assertSame(['name' => 'John', ['gender' => 'male'], 'age' => 30], $array);
+
+        // Insert at invalid position (negative index)
+        $this->expectException(InvalidArgumentException::class);
+        Arr::insertAt(['a', 'b', 'c'], -1, 'x');
+
+        // Insert at invalid position (out of bounds)
+        $this->expectException(InvalidArgumentException::class);
+        Arr::insertAt(['a', 'b', 'c'], 4, 'x');
+    }
 }

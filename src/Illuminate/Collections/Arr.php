@@ -214,6 +214,29 @@ class Arr
     }
 
     /**
+     * Insert a value at a specific position in an array.
+     *
+     * @param  array  $array
+     * @param  int  $position
+     * @param  mixed  $value
+     * @return array
+     *
+     * @throws InvalidArgumentException
+     */
+    public static function insertAt(array $array, int $position, mixed $value)
+    {
+        if ($position < 0 || $position > count($array)) {
+            throw new InvalidArgumentException("Invalid position: {$position}");
+        }
+
+        return array_merge(
+            array_slice($array, 0, $position),
+            [$value],
+            array_slice($array, $position)
+        );
+    }
+
+    /**
      * Return the last element in an array passing a given truth test.
      *
      * @template TKey
