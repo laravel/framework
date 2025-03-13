@@ -911,7 +911,7 @@ class PendingRequest
 
                     if (! $response->successful()) {
                         try {
-                            $shouldRetry = $this->retryWhenCallback ? call_user_func($this->retryWhenCallback, $response->toException(), $this) : true;
+                            $shouldRetry = $this->retryWhenCallback ? call_user_func($this->retryWhenCallback, $response->toException(), $this, $this->request->toPsrRequest()->getMethod()) : true;
                         } catch (Exception $exception) {
                             $shouldRetry = false;
 
@@ -948,7 +948,7 @@ class PendingRequest
                 throw $exception;
             }
         }, $this->retryDelay ?? 100, function ($exception) use (&$shouldRetry) {
-            $result = $shouldRetry ?? ($this->retryWhenCallback ? call_user_func($this->retryWhenCallback, $exception, $this) : true);
+            $result = $shouldRetry ?? ($this->retryWhenCallback ? call_user_func($this->retryWhenCallback, $exception, $this, $this->request->toPsrRequest()->getMethod()) : true);
 
             $shouldRetry = null;
 
