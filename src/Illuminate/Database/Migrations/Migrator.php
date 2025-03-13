@@ -149,6 +149,7 @@ class Migrator
     public function shouldMigrationBeRan($file)
     {
         $instance = $this->resolvePath($file);
+        
         return $instance instanceof Migration ? $instance->shouldRun() : false;
     }
 
