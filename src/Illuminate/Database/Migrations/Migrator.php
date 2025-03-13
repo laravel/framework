@@ -140,7 +140,7 @@ class Migrator
         return $migrations;
     }
 
-     /**
+    /**
      * Determine if the migration should be ran.
      *
      * @param  string  $file
@@ -149,7 +149,7 @@ class Migrator
     public function shouldMigrationBeRan($file)
     {
         $instance = $this->resolvePath($file);
-        
+
         return $instance instanceof Migration ? $instance->shouldRun() : false;
     }
 
