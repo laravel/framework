@@ -216,10 +216,27 @@ class AboutCommand extends Command
         ]));
 
         static::addToSection('Storage', fn () => [
-            ...$this->checkStoragePaths($formatStorageLinkedStatus),
+            ...$this->determineStoragePathLinkStatus($formatStorageLinkedStatus),
         ]);
 
         (new Collection(static::$customDataResolvers))->each->__invoke();
+    }
+
+    /**
+     * Determine storage symbolic links status.
+     *
+     * @param  callable  $formatStorageLinkedStatus
+     * @return array<string,mixed>
+     */
+    protected function determineStoragePathLinkStatus(callable $formatStorageLinkedStatus): array
+    {
+        return collect(config('filesystems.links', []))
+            ->mapWithKeys(function ($target, $link) use ($formatStorageLinkedStatus) {
+                $path = Str::replace(public_path(), '', $link);
+
+                return [public_path($path) => static::format(file_exists($link), console: $formatStorageLinkedStatus)];
+            })
+            ->toArray();
     }
 
     /**
@@ -322,22 +339,5 @@ class AboutCommand extends Command
         static::$data = [];
 
         static::$customDataResolvers = [];
-    }
-
-    /**
-     * Check storage symbolic links status.
-     *
-     * @param  callable  $formatStorageLinkedStatus  Formatter for link status
-     * @return array<string,mixed> Array of paths and their link status
-     */
-    protected function checkStoragePaths(callable $formatStorageLinkedStatus): array
-    {
-        return collect(config('filesystems.links', []))
-            ->mapWithKeys(function ($target, $link) use ($formatStorageLinkedStatus) {
-                $path = Str::replace(public_path(), '', $link);
-
-                return [public_path($path) => static::format(file_exists($link), console: $formatStorageLinkedStatus)];
-            })
-            ->toArray();
     }
 }
