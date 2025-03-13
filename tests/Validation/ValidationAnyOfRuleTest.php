@@ -14,46 +14,150 @@ use TypeError;
 
 include_once 'Enums.php';
 
+enum Validators: string
+{
+    case EMAIL = 'email';
+    case URL = 'url';
+    case IN = 'in';
+}
+
 class ValidationAnyOfRuleTest extends TestCase
 {
-    private array $ruleSet1;
+    private array $ruleSets;
     private array $nestedRules;
 
     public function testThrowsTypeErrorForInvalidInput()
     {
         $this->expectException(TypeError::class);
-        $v = new Validator(resolve('translator'), ['foo' => 'not an array'], ['foo' => Rule::anyOf($this->ruleSet1)]);
-        $v->validate();
+        $validator = new Validator(resolve('translator'), [
+            'foo' => 'not an array'
+        ], ['foo' => Rule::anyOf([[]])]);
+
+        $validator->validate();
     }
 
-    public function testValidatesPossibleNesting()
+    public function testValidEmailValidation()
     {
         $validator = new Validator(resolve('translator'), ['foo' => [
-            'p1' => [
-                'p2' => 'a_string',
-                'p3' => [
-                    'p4' => 'a_string',
+            'type' => 'email',
+            'email' => 'test@example.com',
+        ]], ['foo' => Rule::anyOf($this->ruleSets)]);
+
+        $this->assertTrue($validator->passes());
+    }
+
+    public function testInvalidEmailValidation()
+    {
+        $validator = new Validator(resolve('translator'), ['foo' => [
+            'type' => 'email',
+            'email' => 'invalid-email',
+        ]], ['foo' => Rule::anyOf($this->ruleSets)]);
+
+        $this->assertFalse($validator->passes());
+    }
+
+    public function testValidUrlValidation()
+    {
+        $validator = new Validator(resolve('translator'), ['foo' => [
+            'type' => 'url',
+            'url' => 'https://example.com',
+        ]], ['foo' => Rule::anyOf($this->ruleSets)]);
+
+        $this->assertTrue($validator->passes());
+    }
+
+    public function testInvalidUrlValidation()
+    {
+        $validator = new Validator(resolve('translator'), ['foo' => [
+            'type' => 'url',
+            'url' => 'not-a-url',
+        ]], ['foo' => Rule::anyOf($this->ruleSets)]);
+
+        $this->assertFalse($validator->passes());
+    }
+
+    public function testValidInValidation()
+    {
+        $validator = new Validator(resolve('translator'), ['foo' => [
+            'type' => 'in',
+            'in' => 'key_1',
+        ]], ['foo' => Rule::anyOf($this->ruleSets)]);
+
+        $this->assertTrue($validator->passes());
+    }
+
+    public function testInvalidInValidation()
+    {
+        $validator = new Validator(resolve('translator'), ['foo' => [
+            'type' => 'in',
+            'in' => 'unexpected_value',
+        ]], ['foo' => Rule::anyOf($this->ruleSets)]);
+
+        $this->assertFalse($validator->passes());
+    }
+
+    public function testValidNestedValidation()
+    {
+        $validator = new Validator(resolve('translator'), [
+            'foo' => [
+                'p1' => [
+                    'p2' => 'a_valid_string',
+                    'p3' => [
+                        'p4' => 'another_valid_string',
+                    ],
                 ],
             ],
-        ]], ['foo' => Rule::anyOf($this->nestedRules)]);
+        ], ['foo' => Rule::anyOf($this->nestedRules)]);
+
         $this->assertTrue($validator->passes());
     }
 
-    public function testValidatesSuccessfullyWithKey2AndValidP2()
+    public function testInvalidNestedValidation()
     {
-        $validator = new Validator(resolve('translator'), ['foo' => [
-            'p1' => ArrayKeysBacked::key_2->value,
-            'p2' => 'http://localhost:8000/v1',
-        ]], ['foo' => Rule::anyOf($this->ruleSet1)]);
-        $this->assertTrue($validator->passes());
-    }
+        $validator = new Validator(resolve('translator'), [
+            'foo' => [
+                'p1' => [
+                    'p2' => '', // required field left empty
+                    'p3' => [
+                        'p4' => 'valid_string',
+                    ],
+                ],
+            ],
+        ], ['foo' => Rule::anyOf($this->nestedRules)]);
 
-    public function testFailsOnMissingP1()
-    {
-        $validator = new Validator(resolve('translator'), ['foo' => [
-            'p2' => 'http://localhost:8000/v1',
-        ]], ['foo' => Rule::anyOf($this->ruleSet1)]);
         $this->assertFalse($validator->passes());
+    }
+
+
+    protected function setUpRuleSets()
+    {
+        $this->ruleSets = [
+            [
+                'type' => ['required', Rule::in([Validators::EMAIL])],
+                'email' => ['required', 'email:rfc'],
+            ],
+            [
+                'type' => ['required', Rule::in([Validators::URL])],
+                'url' => ['required', 'url:http,https'],
+            ],
+            [
+                'type' => ['required', Rule::in([Validators::IN])],
+                'in' => ['required', Rule::enum(ArrayKeysBacked::class)],
+            ]
+        ];
+
+        $this->nestedRules = [
+            [
+                'p1' => ['required', Rule::anyOf([
+                    [
+                        'p2' => ['required', 'string'],
+                        'p3' => ['required', Rule::anyOf([[
+                            'p4' => ['nullable', 'string'],
+                        ]])],
+                    ],
+                ])],
+            ],
+        ];
     }
 
     protected function setUp(): void
@@ -71,45 +175,7 @@ class ValidationAnyOfRuleTest extends TestCase
         Facade::setFacadeApplication($container);
         (new ValidationServiceProvider($container))->register();
 
-        $this->ruleSet1 = [
-            [
-                'p1' => ['required', Rule::in([ArrayKeysBacked::key_1])],
-                'p2' => ['required'],
-                'p3' => ['required', 'url:http,https'],
-                'p4' => ['sometimes', 'required'],
-            ],
-            [
-                'p1' => ['required', Rule::in([ArrayKeysBacked::key_2])],
-                'p2' => ['required', 'url:http,https'],
-            ],
-            [
-                'p1' => ['required', Rule::in([ArrayKeysBacked::key_3])],
-                'p2' => ['required'],
-            ],
-            [
-                'p1' => ['required', Rule::in([StringStatus::pending])],
-                'p2' => ['required', 'numeric'],
-                'p3' => ['nullable', 'string'],
-            ],
-            [
-                'p1' => ['required', Rule::in([StringStatus::done])],
-                'p2' => ['required', 'email'],
-                'p3' => ['nullable', 'alpha'],
-            ],
-        ];
-
-        $this->nestedRules = [
-            [
-                'p1' => ['required', Rule::anyOf([
-                    [
-                        'p2' => ['required', 'string'],
-                        'p3' => ['required', Rule::anyOf([[
-                            'p4' => ['nullable', 'string'],
-                        ]])],
-                    ],
-                ])],
-            ],
-        ];
+        $this->setUpRuleSets();
     }
 
     protected function tearDown(): void

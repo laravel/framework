@@ -252,6 +252,7 @@ class Rule
      *
      * @param  \Illuminate\Contracts\Validation\ValidationRule[]  $values
      * @return \Illuminate\Validation\Rules\AnyOf
+     * @throws \InvalidArgumentException
      */
     public static function anyOf($rules)
     {
