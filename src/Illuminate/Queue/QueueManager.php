@@ -186,6 +186,7 @@ class QueueManager implements FactoryContract, MonitorContract
      *
      * @param  string  $driver
      * @param  \Closure  $resolver
+     * @param-closure-this  $this  $resolver
      * @return void
      */
     public function extend($driver, Closure $resolver)
@@ -198,6 +199,7 @@ class QueueManager implements FactoryContract, MonitorContract
      *
      * @param  string  $driver
      * @param  \Closure  $resolver
+     * @param-closure-this  $this  $resolver
      * @return void
      */
     public function addConnector($driver, Closure $resolver)

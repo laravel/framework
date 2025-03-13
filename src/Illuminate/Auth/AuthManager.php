@@ -255,6 +255,7 @@ class AuthManager implements FactoryContract
      * Set the callback to be used to resolve users.
      *
      * @param  \Closure  $userResolver
+     * @param-closure-this  $this  $userResolver
      * @return $this
      */
     public function resolveUsersUsing(Closure $userResolver)
@@ -269,6 +270,7 @@ class AuthManager implements FactoryContract
      *
      * @param  string  $driver
      * @param  \Closure  $callback
+     * @param-closure-this  $this  $callback
      * @return $this
      */
     public function extend($driver, Closure $callback)
@@ -283,6 +285,7 @@ class AuthManager implements FactoryContract
      *
      * @param  string  $name
      * @param  \Closure  $callback
+     * @param-closure-this  $this  $callback
      * @return $this
      */
     public function provider($name, Closure $callback)
