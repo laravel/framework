@@ -794,7 +794,7 @@ class PendingRequest
      * Issue a POST request to the given URL.
      *
      * @param  string  $url
-     * @param  array  $data
+     * @param  array|\JsonSerializable|\Illuminate\Contracts\Support\Arrayable  $data
      * @return \Illuminate\Http\Client\Response
      *
      * @throws \Illuminate\Http\Client\ConnectionException
@@ -810,7 +810,7 @@ class PendingRequest
      * Issue a PATCH request to the given URL.
      *
      * @param  string  $url
-     * @param  array  $data
+     * @param  array|\JsonSerializable|\Illuminate\Contracts\Support\Arrayable  $data
      * @return \Illuminate\Http\Client\Response
      *
      * @throws \Illuminate\Http\Client\ConnectionException
@@ -826,7 +826,7 @@ class PendingRequest
      * Issue a PUT request to the given URL.
      *
      * @param  string  $url
-     * @param  array  $data
+     * @param  array|\JsonSerializable|\Illuminate\Contracts\Support\Arrayable  $data
      * @return \Illuminate\Http\Client\Response
      *
      * @throws \Illuminate\Http\Client\ConnectionException
@@ -842,7 +842,7 @@ class PendingRequest
      * Issue a DELETE request to the given URL.
      *
      * @param  string  $url
-     * @param  array  $data
+     * @param  array|\JsonSerializable|\Illuminate\Contracts\Support\Arrayable  $data
      * @return \Illuminate\Http\Client\Response
      *
      * @throws \Illuminate\Http\Client\ConnectionException
