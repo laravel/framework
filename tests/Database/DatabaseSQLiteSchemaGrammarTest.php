@@ -587,7 +587,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $connection = m::mock(Connection::class);
         $connection
             ->shouldReceive('getTablePrefix')->andReturn('')
-            ->shouldReceive('getConfig')->once()->with('schema.use_native_json')->andReturn(true)
+            ->shouldReceive('getConfig')->once()->with('use_native_json')->andReturn(true)
             ->shouldReceive('getSchemaGrammar')->andReturn($this->getGrammar($connection))
             ->shouldReceive('getSchemaBuilder')->andReturn($this->getBuilder())
             ->shouldReceive('getServerVersion')->andReturn('3.35')
@@ -616,7 +616,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $connection = m::mock(Connection::class);
         $connection
             ->shouldReceive('getTablePrefix')->andReturn('')
-            ->shouldReceive('getConfig')->once()->with('schema.use_native_jsonb')->andReturn(true)
+            ->shouldReceive('getConfig')->once()->with('use_native_jsonb')->andReturn(true)
             ->shouldReceive('getSchemaGrammar')->andReturn($this->getGrammar($connection))
             ->shouldReceive('getSchemaBuilder')->andReturn($this->getBuilder())
             ->shouldReceive('getServerVersion')->andReturn('3.35')
