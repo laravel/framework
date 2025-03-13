@@ -5,6 +5,7 @@ namespace Illuminate\Foundation;
 use Closure;
 use Composer\Autoload\ClassLoader;
 use Illuminate\Container\Container;
+use Illuminate\Container\Util;
 use Illuminate\Contracts\Console\Kernel as ConsoleKernelContract;
 use Illuminate\Contracts\Foundation\Application as ApplicationContract;
 use Illuminate\Contracts\Foundation\CachesConfiguration;
@@ -224,6 +225,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
         $this->registerBaseServiceProviders();
         $this->registerCoreContainerAliases();
         $this->registerLaravelCloudServices();
+        $this->registerAutoConfigurableServices();
     }
 
     /**
@@ -1715,5 +1717,20 @@ class Application extends Container implements ApplicationContract, CachesConfig
         }
 
         throw new RuntimeException('Unable to detect application namespace.');
+    }
+
+    protected function registerAutoConfigurableServices(): void
+    {
+        $classes = Util::getReflectionClassesFromDirectory(app_path());
+        foreach ($this->autoconfigure as $interface) {
+            $services = [];
+            foreach ($classes as $className => $refl) {
+                if ($refl->implementsInterface($interface)) {
+                    $services[] = $className;
+                }
+            }
+
+            $this->app->tag($services, $interface);
+        }
     }
 }
