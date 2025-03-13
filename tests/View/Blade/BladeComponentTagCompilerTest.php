@@ -796,8 +796,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
             }
         };
 
-        $model = new class extends Model
-        {
+        $model = new class extends Model {
         };
 
         $this->assertEquals(e('<hi>'), BladeCompiler::sanitizeComponentAttribute('<hi>'));
