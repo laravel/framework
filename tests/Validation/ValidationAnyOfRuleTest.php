@@ -3,9 +3,9 @@
 namespace Illuminate\Tests\Validation;
 
 use Illuminate\Container\Container;
+use Illuminate\Support\Facades\Facade;
 use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator;
-use Illuminate\Support\Facades\Facade;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationServiceProvider;
 use Illuminate\Validation\Validator;
@@ -30,7 +30,7 @@ class ValidationAnyOfRuleTest extends TestCase
     {
         $this->expectException(TypeError::class);
         $validator = new Validator(resolve('translator'), [
-            'foo' => 'not an array'
+            'foo' => 'not an array',
         ], ['foo' => Rule::anyOf([[]])]);
 
         $validator->validate();
@@ -138,7 +138,6 @@ class ValidationAnyOfRuleTest extends TestCase
         $this->assertFalse($validator->passes());
     }
 
-
     protected function setUpRuleSets()
     {
         $this->ruleSets = [
@@ -153,7 +152,7 @@ class ValidationAnyOfRuleTest extends TestCase
             [
                 'type' => ['required', Rule::in([Validators::IN])],
                 'in' => ['required', Rule::enum(ArrayKeysBacked::class)],
-            ]
+            ],
         ];
 
         $this->nestedRules = [
