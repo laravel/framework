@@ -69,7 +69,7 @@ class AnyOf implements Rule, ValidatorAwareRule
             }
         }
 
-        $this->validator->addFailure($attribute, 'oneof');
+        $this->validator->addFailure($attribute, 'anyof');
 
         return false;
     }
