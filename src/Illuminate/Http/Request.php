@@ -413,6 +413,34 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
+     * Retrieve an input value conditionally from the request.
+     *
+     * If the provided condition evaluates to true, the value associated with the
+     * specified key will be returned from the request. Otherwise, the default value is returned.
+     *
+     * @param bool|Closure $condition Condition or a callback returning a boolean value determining if the input should be retrieved.
+     * @param string $key The key of the input parameter to retrieve.
+     * @param mixed $default The default value returned if condition is false or key is not present.
+     *
+     * @return mixed
+     *
+     * @see \Illuminate\Http\Request::get()
+     */
+    #[\Override]
+    public function getIf(bool|Closure $condition, string $key, mixed $default = null): mixed
+    {
+        if ($condition instanceof Closure) {
+            $condition = $condition();
+        }
+
+        if (! $condition) {
+            return $default;
+        }
+
+        return parent::get($key, $default);
+    }
+
+    /**
      * Get the JSON payload for the request.
      *
      * @param  string|null  $key
