@@ -76,6 +76,16 @@ class ValidationAnyOfRuleTest extends TestCase
         $this->assertFalse($validator->passes());
     }
 
+    public function testErroneousEmailValidationOnUrlRule()
+    {
+        $validator = new Validator(resolve('translator'), ['foo' => [
+            'type' => 'url',
+            'email' => 'test@example.com',
+        ]], ['foo' => Rule::anyOf($this->ruleSets)]);
+
+        $this->assertFalse($validator->passes());
+    }
+
     public function testValidInValidation()
     {
         $validator = new Validator(resolve('translator'), ['foo' => [
