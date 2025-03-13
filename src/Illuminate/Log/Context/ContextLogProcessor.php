@@ -18,7 +18,7 @@ class ContextLogProcessor implements ContextLogProcessorContract
     public function __invoke(LogRecord $record): LogRecord
     {
         $app = Container::getInstance();
-        if (!$app->bound(ContextRepository::class)) {
+        if (! $app->bound(ContextRepository::class)) {
             return $record;
         }
 
