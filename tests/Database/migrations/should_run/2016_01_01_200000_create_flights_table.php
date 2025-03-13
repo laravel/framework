@@ -6,7 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateFlightsTable extends Migration
 {
-
     public function shouldRun(): bool
     {
         return false;
