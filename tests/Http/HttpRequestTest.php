@@ -987,13 +987,13 @@ class HttpRequestTest extends TestCase
     public function testGetIfMethod()
     {
         $request = Request::create('/', 'GET', ['name' => 'Test']);
-        $this->assertEquals('Test', $request->getIf(true,'name'));
-        $this->assertNull($request->getIf(false,'name'));
-        $this->assertEquals('default', $request->getIf(false,'name', 'default'));
+        $this->assertEquals('Test', $request->getIf(true, 'name'));
+        $this->assertNull($request->getIf(false, 'name'));
+        $this->assertEquals('default', $request->getIf(false, 'name', 'default'));
 
-        $this->assertEquals('Test', $request->getIf(fn() => true,'name'));
-        $this->assertNull($request->getIf(fn() => false,'name'));
-        $this->assertEquals('default', $request->getIf(fn() => false,'name', 'default'));
+        $this->assertEquals('Test', $request->getIf(fn () => true, 'name'));
+        $this->assertNull($request->getIf(fn () => false, 'name'));
+        $this->assertEquals('default', $request->getIf(fn () => false, 'name', 'default'));
     }
 
     public function testCookieMethod()
