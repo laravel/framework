@@ -398,18 +398,16 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
-     * This method belongs to Symfony HttpFoundation and is not usually needed when using Laravel.
+     * Retrieve a query payload item from the request.
      *
-     * Instead, you may use the "input" method.
-     *
-     * @param  string  $key
+     * @param  string|null  $key
      * @param  mixed  $default
      * @return mixed
      */
     #[\Override]
     public function get(string $key, mixed $default = null): mixed
     {
-        return parent::get($key, $default);
+        return data_get($this->getInputSource()->all(), $key, $default);
     }
 
     /**
