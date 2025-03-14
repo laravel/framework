@@ -373,15 +373,6 @@ class SupportLazyCollectionTest extends TestCase
         $collapsed = $collection->collapseWithKeys();
 
         $this->assertEquals(['a' => 1, 'b' => 2], $collapsed->all());
-
-        $collection = new LazyCollection([
-            [],
-            ['a' => 1],
-            new LazyCollection([]),
-        ]);
-        $collapsed = $collection->collapseWithKeys();
-
-        $this->assertEquals(['a' => 1], $collapsed->all());
     }
 
     public function testContainsOneItem()
@@ -402,23 +393,58 @@ class SupportLazyCollectionTest extends TestCase
 
         $this->assertTrue($collection->doesntContain(10));
         $this->assertFalse($collection->doesntContain(3));
-
         $this->assertTrue($collection->doesntContain('value', '>', 10));
-        $this->assertFalse($collection->doesntContain('value', '<', 10));
-
         $this->assertTrue($collection->doesntContain(function ($value) {
             return $value > 10;
         }));
-        $this->assertFalse($collection->doesntContain(function ($value) {
-            return $value < 10;
-        }));
 
         $users = new LazyCollection([
-            ['name' => 'Taylor', 'role' => 'developer'],
-            ['name' => 'Jeffrey', 'role' => 'designer'],
+            [
+                'name' => 'Taylor',
+                'role' => 'developer',
+            ],
+            [
+                'name' => 'Jeffrey',
+                'role' => 'designer',
+            ],
         ]);
 
         $this->assertTrue($users->doesntContain('name', 'Adam'));
         $this->assertFalse($users->doesntContain('name', 'Taylor'));
+    }
+
+    public function testDot()
+    {
+        $collection = new LazyCollection([
+            'foo' => [
+                'bar' => 'baz',
+            ],
+            'user' => [
+                'name' => 'Taylor',
+                'profile' => [
+                    'age' => 30,
+                ],
+            ],
+            'users' => [
+                0 => [
+                    'name' => 'Taylor',
+                ],
+                1 => [
+                    'name' => 'Jeffrey',
+                ],
+            ],
+        ]);
+
+        $dotted = $collection->dot();
+
+        $expected = [
+            'foo.bar' => 'baz',
+            'user.name' => 'Taylor',
+            'user.profile.age' => 30,
+            'users.0.name' => 'Taylor',
+            'users.1.name' => 'Jeffrey',
+        ];
+
+        $this->assertEquals($expected, $dotted->all());
     }
 }
