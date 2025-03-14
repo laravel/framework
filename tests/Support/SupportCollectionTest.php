@@ -5592,6 +5592,41 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testThrowIfEmpty($collection)
+    {
+        $data = $collection::empty();
+        $this->expectException(UnexpectedValueException::class);
+        $data->throwIfEmpty();
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testThrowIfEmptyForInstanceThrowable($collection)
+    {
+        $data = $collection::empty();
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Collection should be not empty.');
+        $data->throwIfEmpty(new InvalidArgumentException('Collection should be not empty.'));
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testThrowIfEmptyForStringThrowable($collection)
+    {
+        $data = $collection::empty();
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Collection should be not empty.');
+        $data->throwIfEmpty('InvalidArgumentException', 'Collection should be not empty.');
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testThrowIfEmptyForString($collection)
+    {
+        $data = $collection::empty();
+        $this->expectException(UnexpectedValueException::class);
+        $this->expectExceptionMessage('Collection should be not empty.');
+        $data->throwIfEmpty('Collection should be not empty.');
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testPercentageWithFlatCollection($collection)
     {
         $collection = new $collection([1, 1, 2, 2, 2, 3]);

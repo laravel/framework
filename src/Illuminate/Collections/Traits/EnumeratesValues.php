@@ -367,6 +367,28 @@ trait EnumeratesValues
     }
 
     /**
+     * Throw an exception if the collection is empty.
+     *
+     * @template TException of \Throwable
+     *
+     * @param  TException|class-string<TException>|string  $exception
+     * @param  mixed  ...$parameters
+     * @return static<TKey, TValue>
+     *
+     * @throws TException
+     */
+    public function throwIfEmpty($exception = 'UnexpectedValueException', ...$parameters)
+    {
+        return $this->whenEmpty(function () use ($exception, $parameters): never {
+            if (is_string($exception) && class_exists($exception)) {
+                $exception = new $exception(...$parameters);
+            }
+
+            throw is_string($exception) ? new UnexpectedValueException($exception) : $exception;
+        });
+    }
+
+    /**
      * Determine if the collection is not empty.
      *
      * @phpstan-assert-if-true TValue $this->first()
