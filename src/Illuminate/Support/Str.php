@@ -1177,9 +1177,7 @@ class Str
      */
     public static function replaceArray($search, $replace, $subject)
     {
-        if ($replace instanceof Traversable) {
-            $replace = (new Collection($replace))->all();
-        }
+        $replace = self::toArrayIfTraversable($replace);
 
         $segments = explode($search, $subject);
 
@@ -1219,21 +1217,28 @@ class Str
      */
     public static function replace($search, $replace, $subject, $caseSensitive = true)
     {
-        if ($search instanceof Traversable) {
-            $search = (new Collection($search))->all();
-        }
-
-        if ($replace instanceof Traversable) {
-            $replace = (new Collection($replace))->all();
-        }
-
-        if ($subject instanceof Traversable) {
-            $subject = (new Collection($subject))->all();
-        }
+        $search = self::toArrayIfTraversable($search);
+        $replace = self::toArrayIfTraversable($replace);
+        $subject = self::toArrayIfTraversable($subject);
 
         return $caseSensitive
             ? str_replace($search, $replace, $subject)
             : str_ireplace($search, $replace, $subject);
+    }
+
+    /**
+     * Convert a Traversable to an array, or return the original value if not Traversable.
+     *
+     * @param  mixed  $value
+     * @return mixed
+     */
+    private static function toArrayIfTraversable($value)
+    {
+        if ($value instanceof Traversable) {
+            return (new Collection($value))->all();
+        }
+
+        return $value;
     }
 
     /**
@@ -1360,9 +1365,7 @@ class Str
      */
     public static function remove($search, $subject, $caseSensitive = true)
     {
-        if ($search instanceof Traversable) {
-            $search = (new Collection($search))->all();
-        }
+        $search = self::toArrayIfTraversable($search);
 
         return $caseSensitive
             ? str_replace($search, '', $subject)
