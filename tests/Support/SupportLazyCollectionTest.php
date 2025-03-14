@@ -355,4 +355,96 @@ class SupportLazyCollectionTest extends TestCase
         $this->assertTrue($shuffled->contains('name', 'Taylor'));
         $this->assertTrue($shuffled->contains('name', 'Jeffrey'));
     }
+
+    public function testCollapseWithKeys()
+    {
+        $collection = new LazyCollection([
+            ['a' => 1, 'b' => 2],
+            ['c' => 3, 'd' => 4],
+        ]);
+        $collapsed = $collection->collapseWithKeys();
+
+        $this->assertEquals(['a' => 1, 'b' => 2, 'c' => 3, 'd' => 4], $collapsed->all());
+
+        $collection = new LazyCollection([
+            ['a' => 1],
+            new LazyCollection(['b' => 2]),
+        ]);
+        $collapsed = $collection->collapseWithKeys();
+
+        $this->assertEquals(['a' => 1, 'b' => 2], $collapsed->all());
+    }
+
+    public function testContainsOneItem()
+    {
+        $collection = new LazyCollection([5]);
+        $this->assertTrue($collection->containsOneItem());
+
+        $emptyCollection = new LazyCollection([]);
+        $this->assertFalse($emptyCollection->containsOneItem());
+
+        $multipleCollection = new LazyCollection([1, 2, 3]);
+        $this->assertFalse($multipleCollection->containsOneItem());
+    }
+
+    public function testDoesntContain()
+    {
+        $collection = new LazyCollection([1, 2, 3, 4, 5]);
+
+        $this->assertTrue($collection->doesntContain(10));
+        $this->assertFalse($collection->doesntContain(3));
+        $this->assertTrue($collection->doesntContain('value', '>', 10));
+        $this->assertTrue($collection->doesntContain(function ($value) {
+            return $value > 10;
+        }));
+
+        $users = new LazyCollection([
+            [
+                'name' => 'Taylor',
+                'role' => 'developer',
+            ],
+            [
+                'name' => 'Jeffrey',
+                'role' => 'designer',
+            ],
+        ]);
+
+        $this->assertTrue($users->doesntContain('name', 'Adam'));
+        $this->assertFalse($users->doesntContain('name', 'Taylor'));
+    }
+
+    public function testDot()
+    {
+        $collection = new LazyCollection([
+            'foo' => [
+                'bar' => 'baz',
+            ],
+            'user' => [
+                'name' => 'Taylor',
+                'profile' => [
+                    'age' => 30,
+                ],
+            ],
+            'users' => [
+                0 => [
+                    'name' => 'Taylor',
+                ],
+                1 => [
+                    'name' => 'Jeffrey',
+                ],
+            ],
+        ]);
+
+        $dotted = $collection->dot();
+
+        $expected = [
+            'foo.bar' => 'baz',
+            'user.name' => 'Taylor',
+            'user.profile.age' => 30,
+            'users.0.name' => 'Taylor',
+            'users.1.name' => 'Jeffrey',
+        ];
+
+        $this->assertEquals($expected, $dotted->all());
+    }
 }
