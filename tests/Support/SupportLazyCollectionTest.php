@@ -355,4 +355,35 @@ class SupportLazyCollectionTest extends TestCase
         $this->assertTrue($shuffled->contains('name', 'Taylor'));
         $this->assertTrue($shuffled->contains('name', 'Jeffrey'));
     }
+
+    public function testCollapseWithKeys()
+    {
+        // Test with nested arrays
+        $collection = new LazyCollection([
+            ['a' => 1, 'b' => 2],
+            ['c' => 3, 'd' => 4],
+        ]);
+        $collapsed = $collection->collapseWithKeys();
+
+        $this->assertEquals(['a' => 1, 'b' => 2, 'c' => 3, 'd' => 4], $collapsed->all());
+
+        // Test with mixed arrays and collections
+        $collection = new LazyCollection([
+            ['a' => 1],
+            new LazyCollection(['b' => 2]),
+        ]);
+        $collapsed = $collection->collapseWithKeys();
+
+        $this->assertEquals(['a' => 1, 'b' => 2], $collapsed->all());
+
+        // Test with empty items
+        $collection = new LazyCollection([
+            [],
+            ['a' => 1],
+            new LazyCollection([]),
+        ]);
+        $collapsed = $collection->collapseWithKeys();
+
+        $this->assertEquals(['a' => 1], $collapsed->all());
+    }
 }
