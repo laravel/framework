@@ -447,4 +447,41 @@ class SupportLazyCollectionTest extends TestCase
 
         $this->assertEquals($expected, $dotted->all());
     }
+
+    public function testDiff()
+    {
+        $collection = new LazyCollection(
+            [
+                'Taylor Otwell',
+                'Jeffrey Way',
+                'Adam Wathan',
+                'Caleb Porzio',
+                'Mohamed Said'
+            ]);
+
+        $diff = $collection->diff(
+            [
+                'Jeffrey Way',
+                'Caleb Porzio',
+                'Nuno Maduro'
+            ]);
+
+        $this->assertEquals([0 => 'Taylor Otwell', 2 => 'Adam Wathan', 4 => 'Mohamed Said'], $diff->all());
+        $this->assertInstanceOf(LazyCollection::class, $diff);
+    }
+
+    public function testDiffUsing()
+    {
+        $collection = new LazyCollection(['Taylor', 'Jeffrey', 'Adam']);
+
+        $diff1 = $collection->diffUsing(['TAYLOR', 'JEFFREY'], 'strcasecmp');
+        $this->assertEquals([2 => 'Adam'], $diff1->all());
+
+        $numbers = new LazyCollection([10, 20, 30, 40]);
+        $diff2 = $numbers->diffUsing([5, 10, 15], function ($a, $b) {
+            return ($a / 10) <=> ($b / 10);
+        });
+
+        $this->assertEquals([1 => 20, 2 => 30, 3 => 40], $diff2->all());
+    }
 }
