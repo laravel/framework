@@ -1180,7 +1180,7 @@ trait HasAttributes
 
         $value = $this->asJson($this->getArrayAttributeWithValue(
             $path, $key, $value
-        ), $this->hasCast($key, ['json:unicode']));
+        ), $this->getJsonCastFlags($key));
 
         $this->attributes[$key] = $this->isEncryptedCastable($key)
             ? $this->castAttributeAsEncryptedString($key, $value)
