@@ -456,14 +456,14 @@ class SupportLazyCollectionTest extends TestCase
                 'Jeffrey Way',
                 'Adam Wathan',
                 'Caleb Porzio',
-                'Mohamed Said'
+                'Mohamed Said',
             ]);
 
         $diff = $collection->diff(
             [
                 'Jeffrey Way',
                 'Caleb Porzio',
-                'Nuno Maduro'
+                'Nuno Maduro',
             ]);
 
         $this->assertEquals([0 => 'Taylor Otwell', 2 => 'Adam Wathan', 4 => 'Mohamed Said'], $diff->all());
@@ -483,5 +483,83 @@ class SupportLazyCollectionTest extends TestCase
         });
 
         $this->assertEquals([1 => 20, 2 => 30, 3 => 40], $diff2->all());
+    }
+
+    public function testDiffAssoc()
+    {
+        $collection = new LazyCollection([
+            'name' => 'Laravel',
+            'version' => '10.0',
+            'type' => 'framework',
+            'license' => 'MIT',
+            'features' => 'Eloquent',
+        ]);
+
+        $diff = $collection->diffAssoc([
+            'name' => 'Laravel',
+            'version' => '9.0',
+            'type' => 'framework',
+            'author' => 'Taylor Otwell',
+            'features' => 'Blade',
+        ]);
+
+        $this->assertEquals(
+            [
+                'version' => '10.0',
+                'license' => 'MIT',
+                'features' => 'Eloquent',
+            ],
+            $diff->all()
+        );
+
+        $this->assertInstanceOf(LazyCollection::class, $diff);
+    }
+
+    public function testDiffKeys()
+    {
+        $collection = new LazyCollection([
+            'one' => 'Laravel',
+            'two' => 'Livewire',
+            'three' => 'Blade',
+            'four' => 'Eloquent',
+            'five' => 'Forge',
+        ]);
+
+        $diff = $collection->diffKeys([
+            'two' => 'Something else',
+            'four' => 'Completely different value',
+            'six' => 'Nova',
+        ]);
+
+        $this->assertEquals(
+            [
+                'one' => 'Laravel',
+                'three' => 'Blade',
+                'five' => 'Forge',
+            ],
+            $diff->all()
+        );
+        $this->assertInstanceOf(LazyCollection::class, $diff);
+    }
+
+    public function testDiffKeysUsing()
+    {
+        $collection = new LazyCollection([
+            100 => 'Route definition',
+            200 => 'Middleware',
+            300 => 'Controller',
+            400 => 'Model',
+        ]);
+
+        $diff = $collection->diffKeysUsing([
+            150 => 'Something',
+            250 => 'Something else',
+            350 => 'Another thing',
+        ], function ($a, $b) {
+            return (int) ($a / 100) - (int) ($b / 100);
+        });
+
+        $this->assertEquals([400 => 'Model'], $diff->all());
+        $this->assertInstanceOf(LazyCollection::class, $diff);
     }
 }
