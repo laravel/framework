@@ -1230,7 +1230,7 @@ class Str
      * Convert a Traversable to an array, or return the original value if not Traversable.
      *
      * @param  mixed  $value
-     * @return mixed
+     * @return ($value is \Traversable ? array : mixed)
      */
     private static function toArrayIfTraversable($value)
     {
