@@ -418,6 +418,27 @@ class ValidationFileRuleTest extends TestCase
         );
     }
 
+    public function testFileSizeConversionWithDifferentUnits()
+    {
+        $this->passes(
+            File::image()->size('5MB'),
+            UploadedFile::fake()->create('foo.png', 5000)
+        );
+
+        $this->passes(
+            File::image()->size(' 2gb '),
+            UploadedFile::fake()->create('foo.png', 2 * 1000000)
+        );
+
+        $this->passes(
+            File::image()->size('1Tb'),
+            UploadedFile::fake()->create('foo.png', 1000000000)
+        );
+
+        $this->expectException(\InvalidArgumentException::class);
+        File::image()->size('10xyz');
+    }
+
     protected function setUp(): void
     {
         $container = Container::getInstance();
