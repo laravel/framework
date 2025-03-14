@@ -395,4 +395,30 @@ class SupportLazyCollectionTest extends TestCase
         $multipleCollection = new LazyCollection([1, 2, 3]);
         $this->assertFalse($multipleCollection->containsOneItem());
     }
+
+    public function testDoesntContain()
+    {
+        $collection = new LazyCollection([1, 2, 3, 4, 5]);
+
+        $this->assertTrue($collection->doesntContain(10));
+        $this->assertFalse($collection->doesntContain(3));
+
+        $this->assertTrue($collection->doesntContain('value', '>', 10));
+        $this->assertFalse($collection->doesntContain('value', '<', 10));
+
+        $this->assertTrue($collection->doesntContain(function ($value) {
+            return $value > 10;
+        }));
+        $this->assertFalse($collection->doesntContain(function ($value) {
+            return $value < 10;
+        }));
+
+        $users = new LazyCollection([
+            ['name' => 'Taylor', 'role' => 'developer'],
+            ['name' => 'Jeffrey', 'role' => 'designer'],
+        ]);
+
+        $this->assertTrue($users->doesntContain('name', 'Adam'));
+        $this->assertFalse($users->doesntContain('name', 'Taylor'));
+    }
 }
