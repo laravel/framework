@@ -588,7 +588,14 @@ class Builder implements BuilderContract
         return $callback();
     }
 
-    public function insertWithCasts(array $values)
+    /**
+     * Insert a number of records, merging in default attributes,
+     * adding timestamps, and converting casts to raw values.
+     *
+     * @param  list<array<string, mixed>>  $values
+     * @return bool
+     */
+    public function insertWithCasts($values)
     {
         if (empty($values)) {
             return true;
