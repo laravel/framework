@@ -7,6 +7,7 @@ use Exception;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -16,6 +17,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Database\QueryException;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Pagination\AbstractPaginator as Paginator;
 use Illuminate\Pagination\Cursor;
@@ -23,6 +25,7 @@ use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Str;
 use Illuminate\Tests\Integration\Database\Fixtures\Post;
 use Illuminate\Tests\Integration\Database\Fixtures\User;
 use PHPUnit\Framework\TestCase;
@@ -78,6 +81,14 @@ class DatabaseEloquentIntegrationTest extends TestCase
             $table->string('name')->nullable();
             $table->string('email address');
             $table->timestamps();
+        });
+
+        $this->schema()->create('users_with_uuid', function (Blueprint $table) {
+            $table->id();
+            $table->uuid();
+            $table->string('name');
+            $table->tinyInteger('role');
+            $table->string('role_string');
         });
 
         foreach (['default', 'second_connection'] as $connection) {
@@ -2461,6 +2472,99 @@ class DatabaseEloquentIntegrationTest extends TestCase
         }
     }
 
+    public function testCanInsertWithCasts()
+    {
+        DB::enableQueryLog();
+        Carbon::setTestNow('2025-03-15T07:32:00Z');
+
+        $this->assertTrue(EloquentTestUser::insertWithCasts([
+            ['email' => 'taylor@laravel.com', 'birthday' => null],
+            ['email' => 'nuno@laravel.com', 'birthday' => new Carbon('1980-01-01')],
+            ['email' => 'tim@laravel.com', 'birthday' => '1987-11-01', 'created_at' => '2025-01-02T02:00:55', 'updated_at' => Carbon::parse('2025-02-19T11:41:13')],
+        ]));
+
+        $this->assertCount(1, DB::getQueryLog());
+
+        $this->assertCount(3, $users = EloquentTestUser::get());
+
+        $users->take(2)->each(function (EloquentTestUser $user) {
+            $this->assertEquals(Carbon::parse('2025-03-15T07:32:00Z'), $user->created_at);
+            $this->assertEquals(Carbon::parse('2025-03-15T07:32:00Z'), $user->updated_at);
+        });
+
+        $tim = $users->firstWhere('email', 'tim@laravel.com');
+        $this->assertEquals(Carbon::parse('2025-01-02T02:00:55'), $tim->created_at);
+        $this->assertEquals(Carbon::parse('2025-02-19T11:41:13'), $tim->updated_at);
+
+        $this->assertNull($users[0]->birthday);
+        $this->assertInstanceOf(\DateTime::class, $users[1]->birthday);
+        $this->assertInstanceOf(\DateTime::class, $users[2]->birthday);
+        $this->assertEquals('1987-11-01', $users[2]->birthday->format('Y-m-d'));
+
+        DB::flushQueryLog();
+
+        $this->assertTrue(EloquentTestWithJSON::insertWithCasts([
+            ['id' => 1, 'json' => ['album' => 'Keep It Like a Secret', 'release_date' => '1999-02-02']],
+            ['id' => 2, 'json' => (object) ['album' => 'You In Reverse', 'release_date' => '2006-04-11']],
+        ]));
+
+        $this->assertCount(1, DB::getQueryLog());
+
+        $this->assertCount(2, $testsWithJson = EloquentTestWithJSON::get());
+
+        $testsWithJson->each(function (EloquentTestWithJSON $testWithJson) {
+            $this->assertIsArray($testWithJson->json);
+            $this->assertArrayHasKey('album', $testWithJson->json);
+        });
+    }
+
+    public function testCanInsertWithCastsWithUniqueStringIds()
+    {
+        Str::createUuidsUsingSequence([
+            '00000000-0000-7000-0000-000000000000',
+            '11111111-0000-7000-0000-000000000000',
+            '22222222-0000-7000-0000-000000000000',
+        ]);
+
+        $this->assertTrue(ModelWithUniqueStringIds::insertWithCasts([
+            [
+                'name' => 'Taylor', 'role' => IntBackedRole::Admin, 'role_string' => StringBackedRole::Admin,
+            ],
+            [
+                'name' => 'Nuno', 'role' => 3, 'role_string' => 'admin',
+            ],
+            [
+                'name' => 'Dries', 'uuid' => 'bbbb0000-0000-7000-0000-000000000000',
+            ],
+            [
+                'name' => 'Chris',
+            ],
+        ]));
+
+        $models = ModelWithUniqueStringIds::get();
+
+        $taylor = $models->firstWhere('name', 'Taylor');
+        $nuno = $models->firstWhere('name', 'Nuno');
+        $dries = $models->firstWhere('name', 'Dries');
+        $chris = $models->firstWhere('name', 'Chris');
+
+        $this->assertEquals(IntBackedRole::Admin, $taylor->role);
+        $this->assertEquals(StringBackedRole::Admin, $taylor->role_string);
+        $this->assertSame('00000000-0000-7000-0000-000000000000', $taylor->uuid);
+
+        $this->assertEquals(IntBackedRole::Admin, $nuno->role);
+        $this->assertEquals(StringBackedRole::Admin, $nuno->role_string);
+        $this->assertSame('11111111-0000-7000-0000-000000000000', $nuno->uuid);
+
+        $this->assertEquals(IntBackedRole::User, $dries->role);
+        $this->assertEquals(StringBackedRole::User, $dries->role_string);
+        $this->assertSame('bbbb0000-0000-7000-0000-000000000000', $dries->uuid);
+
+        $this->assertEquals(IntBackedRole::User, $chris->role);
+        $this->assertEquals(StringBackedRole::User, $chris->role_string);
+        $this->assertSame('22222222-0000-7000-0000-000000000000', $chris->uuid);
+    }
+
     /**
      * Helpers...
      */
@@ -2785,4 +2889,43 @@ class EloquentTouchingCategory extends Eloquent
     {
         return $this->hasMany(EloquentTouchingCategory::class, 'parent_id')->chaperone();
     }
+}
+
+class ModelWithUniqueStringIds extends Eloquent
+{
+    use HasUuids;
+
+    public $timestamps = false;
+
+    protected $table = 'users_with_uuid';
+
+    protected function casts()
+    {
+        return [
+            'role' => IntBackedRole::class,
+            'role_string' => StringBackedRole::class,
+        ];
+    }
+
+    protected $attributes = [
+        'role' => IntBackedRole::User,
+        'role_string' => StringBackedRole::User,
+    ];
+
+    public function uniqueIds()
+    {
+        return ['uuid'];
+    }
+}
+
+enum IntBackedRole: int
+{
+    case User = 1;
+    case Admin = 3;
+}
+
+enum StringBackedRole: string
+{
+    case User = 'user';
+    case Admin = 'admin';
 }
