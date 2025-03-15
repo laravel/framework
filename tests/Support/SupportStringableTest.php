@@ -1419,4 +1419,31 @@ class SupportStringableTest extends TestCase
         $this->assertSame('foobar', (string) $this->stringable(base64_encode('foobar'))->fromBase64(true));
         $this->assertSame('foobarbaz', (string) $this->stringable(base64_encode('foobarbaz'))->fromBase64());
     }
+
+    public function testSingular()
+    {
+        $this->assertSame('book', (string) $this->stringable('books')->singular());
+        $this->assertSame('category', (string) $this->stringable('categories')->singular());
+        $this->assertSame('criterion', (string) $this->stringable('criteria')->singular());
+        $this->assertSame('', (string) $this->stringable('')->singular());
+    }
+
+    public function testWordWrap()
+    {
+        $string = str_repeat('a ', 38);
+        $this->assertSame(str_repeat('a ', 37)."a\n", (string) $this->stringable($string)->wordWrap());
+
+        $this->assertSame('Hello<br>world', (string) $this->stringable('Hello world')->wordWrap(5, '<br>'));
+
+        $this->assertSame("Hel\nlo", (string) $this->stringable('Hello')->wordWrap(3, "\n", true));
+    }
+
+    public function testHeadline()
+    {
+        $this->assertSame('User Auth Config', (string) $this->stringable('user_auth_config')->headline());
+
+        $this->assertSame('Post Create Form', (string) $this->stringable('post-create-form')->headline());
+
+        $this->assertSame('Json Http Request', (string) $this->stringable('jsonHttpRequest')->headline());
+    }
 }
