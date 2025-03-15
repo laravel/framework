@@ -90,6 +90,21 @@ class ValidationFileRuleTest extends TestCase
         );
     }
 
+    public function testValidMimeTypeButInvalidExtension()
+    {
+        $this->fails(
+            File::types(['image/png']),
+            UploadedFile::fake()->createWithContent('foo.txt', file_get_contents(__DIR__.'/fixtures/image.png')),
+            ['validation.mimetypes']
+        );
+
+        $this->fails(
+            File::types(['image/svg']),
+            UploadedFile::fake()->createWithContent('foo.jpeg', file_get_contents(__DIR__.'/fixtures/image.svg')),
+            ['validation.mimetypes']
+        );
+    }
+
     public function testSingleMime()
     {
         $this->fails(
@@ -118,6 +133,21 @@ class ValidationFileRuleTest extends TestCase
                 UploadedFile::fake()->createWithContent('foo.png', file_get_contents(__DIR__.'/fixtures/image.png')),
                 UploadedFile::fake()->createWithContent('foo.svg', file_get_contents(__DIR__.'/fixtures/image.svg')),
             ]
+        );
+    }
+
+    public function testValidMimeButInvalidExtension()
+    {
+        $this->fails(
+            File::types('png'),
+            UploadedFile::fake()->createWithContent('foo.txt', file_get_contents(__DIR__.'/fixtures/image.png')),
+            ['validation.mimes']
+        );
+
+        $this->fails(
+            File::types('svg'),
+            UploadedFile::fake()->createWithContent('foo.jpeg', file_get_contents(__DIR__.'/fixtures/image.svg')),
+            ['validation.mimes']
         );
     }
 
@@ -178,6 +208,21 @@ class ValidationFileRuleTest extends TestCase
         $this->passes(
             File::default()->extensions(['png', 'jpeg', 'jpg']),
             UploadedFile::fake()->createWithContent('foo.png', file_get_contents(__DIR__.'/fixtures/image.png')),
+        );
+    }
+
+    public function testFileWithValidExtensionButInvalidMimeType()
+    {
+        $this->fails(
+            File::types(['image/png'])->extensions(['png']),
+            UploadedFile::fake()->create('foo.png', 100)->mimeType('text/plain'),
+            ['validation.mimetypes']
+        );
+
+        $this->fails(
+            File::types(['application/pdf'])->extensions(['pdf']),
+            UploadedFile::fake()->create('document.pdf', 200)->mimeType('image/jpeg'),
+            ['validation.mimetypes']
         );
     }
 
