@@ -45,6 +45,20 @@ class ValidationDateRuleTest extends TestCase
         $this->assertEquals('date|before_or_equal:today', (string) $rule);
     }
 
+    public function testMacro()
+    {
+        Date::macro('dateBetween', function () {
+            return (new static)->between(
+                Carbon::parse('2024-01-01'),
+                Carbon::parse('2024-02-01')
+            );
+        });
+
+        $rule = Date::dateBetween();
+
+        $this->assertEquals('date|after:2024-01-01|before:2024-02-01', (string) $rule);
+    }
+
     public function testAfterSpecificDateRule()
     {
         $rule = Rule::date()->after(Carbon::parse('2024-01-01'));
