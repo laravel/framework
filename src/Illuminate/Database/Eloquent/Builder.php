@@ -588,6 +588,43 @@ class Builder implements BuilderContract
         return $callback();
     }
 
+    public function insertWithCasts(array $values)
+    {
+        if (empty($values)) {
+            return true;
+        }
+
+        if (! is_array(reset($values))) {
+            $values = [$values];
+        }
+
+        $modelInstance = $this->newModelInstance();
+        $timestampColumns = [];
+
+        if ($modelInstance->usesTimestamps()) {
+            $now = $modelInstance->freshTimestamp();
+
+            if ($createdAtColumn = $modelInstance->getCreatedAtColumn()) {
+                $timestampColumns[$createdAtColumn] ??= $now;
+            }
+            if ($updatedAtColumn = $modelInstance->getUpdatedAtColumn()) {
+                $timestampColumns[$updatedAtColumn] ??= $now;
+            }
+        }
+
+        $this->model->unguarded(function () use (&$values, $timestampColumns) {
+            foreach ($values as $key => $value) {
+                $newModelInstance = tap(
+                    $this->newModelInstance(array_merge($timestampColumns, $value)),
+                    fn (Model $model) => $model->setUniqueIds()
+                );
+                $values[$key] = $newModelInstance->getAttributes();
+            }
+        });
+
+        return $this->toBase()->insert($values);
+    }
+
     /**
      * Get the first record matching the attributes or instantiate it.
      *
