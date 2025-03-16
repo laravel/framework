@@ -535,8 +535,10 @@ trait EnumeratesValues
     /**
      * Get the sum of the given values.
      *
-     * @param  (callable(TValue): mixed)|string|null  $callback
-     * @return mixed
+     * @template TReturnType
+     *
+     * @param  (callable(TValue): TReturnType)|string|null  $callback
+     * @return ($callback is callable ? TReturnType : mixed)
      */
     public function sum($callback = null)
     {
