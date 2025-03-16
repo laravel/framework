@@ -22,6 +22,8 @@ class Date implements Stringable
      */
     public function format(string $format): static
     {
+        array_shift($this->constraints);
+
         return $this->addRule('date_format:'.$format);
     }
 
