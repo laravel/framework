@@ -155,9 +155,11 @@ class FileFailedJobProvider implements CountableFailedJobProvider, FailedJobProv
         return $this->lock(function () use ($before) {
             $jobs = $this->read();
 
-            $this->write($prunedJobs = (new Collection($jobs))->reject(function ($job) use ($before) {
-                return $job->failed_at_timestamp <= $before->getTimestamp();
-            })->values()->all());
+            $this->write($prunedJobs = (new Collection($jobs))
+                ->reject(fn ($job) => $job->failed_at_timestamp <= $before->getTimestamp())
+                ->values()
+                ->all()
+            );
 
             return count($jobs) - count($prunedJobs);
         });

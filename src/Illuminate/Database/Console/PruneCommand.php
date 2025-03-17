@@ -138,15 +138,11 @@ class PruneCommand extends Command
                     ['\\', ''],
                     Str::after($model->getRealPath(), realpath(app_path()).DIRECTORY_SEPARATOR)
                 );
-            })->when(! empty($except), function ($models) use ($except) {
-                return $models->reject(function ($model) use ($except) {
-                    return in_array($model, $except);
-                });
-            })->filter(function ($model) {
-                return class_exists($model);
-            })->filter(function ($model) {
-                return $this->isPrunable($model);
-            })->values();
+            })
+            ->when(! empty($except), fn ($models) => $models->reject(fn ($model) => in_array($model, $except)))
+            ->filter(fn ($model) => class_exists($model))
+            ->filter(fn ($model) => $this->isPrunable($model))
+            ->values();
     }
 
     /**
