@@ -13,7 +13,7 @@ class Date implements Stringable
     use Conditionable, Macroable;
 
     /**
-     * The format for the date rule.
+     * The format of the date.
      */
     protected ?string $format = null;
 
