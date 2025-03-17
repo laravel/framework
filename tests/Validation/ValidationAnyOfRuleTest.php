@@ -46,6 +46,24 @@ class ValidationAnyOfRuleTest extends TestCase
         $this->assertTrue($validator->passes());
     }
 
+    public function testBasicValidation()
+    {
+        $validator = new Validator(
+            resolve('translator'),
+            [
+                'email' => 'test@example.com'
+            ],
+            [
+                'email' => Rule::anyOf([
+                    ['required', 'min:20'],
+                    ['required', 'email'],
+                ])
+            ],
+        );
+
+        $this->assertTrue($validator->passes());
+    }
+
     public function testInvalidEmailValidation()
     {
         $validator = new Validator(resolve('translator'), ['foo' => [

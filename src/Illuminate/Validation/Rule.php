@@ -248,9 +248,9 @@ class Rule
     }
 
     /**
-     * Get a anyof rule builder instance.
+     * Get an "any of" rule builder instance.
      *
-     * @param  \Illuminate\Contracts\Validation\ValidationRule[]  $values
+     * @param  array
      * @return \Illuminate\Validation\Rules\AnyOf
      *
      * @throws \InvalidArgumentException

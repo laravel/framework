@@ -10,11 +10,11 @@ use InvalidArgumentException;
 class AnyOf implements Rule, ValidatorAwareRule
 {
     /**
-     * The validator performing the validation.
+     * The rules to match against.
      *
-     * @var \Illuminate\Validation\Validator
+     * @var array
      */
-    protected $validator;
+    protected array $ruleSets = [];
 
     /**
      * The error message after validation, if any.
@@ -24,11 +24,11 @@ class AnyOf implements Rule, ValidatorAwareRule
     protected $messages = [];
 
     /**
-     * The rules to match against.
+     * The validator performing the validation.
      *
-     * @var Illuminate\Contracts\Validation\ValidationRule[][]
+     * @var \Illuminate\Validation\Validator
      */
-    private array $ruleSets = [];
+    protected $validator;
 
     /**
      * Sets the validation rules to match against.
@@ -42,6 +42,7 @@ class AnyOf implements Rule, ValidatorAwareRule
         if (! is_array($ruleSets)) {
             throw new InvalidArgumentException('The provided value must be an array of validation rules.');
         }
+
         $this->ruleSets = $ruleSets;
     }
 
@@ -69,13 +70,13 @@ class AnyOf implements Rule, ValidatorAwareRule
             }
         }
 
-        $this->validator->addFailure($attribute, 'anyof');
+        $this->validator->addFailure($attribute, 'any_of');
 
         return false;
     }
 
     /**
-     * Get the validation error message.
+     * Get the validation error messages.
      *
      * @return array
      */
