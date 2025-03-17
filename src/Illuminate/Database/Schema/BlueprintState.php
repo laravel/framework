@@ -77,9 +77,11 @@ class BlueprintState
             'collation' => $column['collation'],
             'comment' => $column['comment'],
             'virtualAs' => ! is_null($column['generation']) && $column['generation']['type'] === 'virtual'
-                ? $column['generation']['expression'] : null,
+                ? $column['generation']['expression']
+                : null,
             'storedAs' => ! is_null($column['generation']) && $column['generation']['type'] === 'stored'
-                ? $column['generation']['expression'] : null,
+                ? $column['generation']['expression']
+                : null,
         ]))->all();
 
         [$primary, $indexes] = (new Collection($schema->getIndexes($table)))->map(fn ($index) => new IndexDefinition([

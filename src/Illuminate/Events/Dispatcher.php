@@ -344,7 +344,8 @@ class Dispatcher implements DispatcherContract
     protected function broadcastWhen($event)
     {
         return method_exists($event, 'broadcastWhen')
-            ? $event->broadcastWhen() : true;
+            ? $event->broadcastWhen()
+            : true;
     }
 
     /**

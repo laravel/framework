@@ -1119,7 +1119,8 @@ trait ValidatesAttributes
     public function getQueryColumn($parameters, $attribute)
     {
         return isset($parameters[1]) && $parameters[1] !== 'NULL'
-            ? $parameters[1] : $this->guessColumnForQuery($attribute);
+            ? $parameters[1]
+            : $this->guessColumnForQuery($attribute);
     }
 
     /**
