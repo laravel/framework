@@ -20,7 +20,7 @@ use InvalidArgumentException;
 /**
  * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
  * @template TDeclaringModel of \Illuminate\Database\Eloquent\Model
- * @template TPivotModel of \Illuminate\Database\Eloquent\Relations\Concerns\AsPivot
+ * @template TPivotModel of \Illuminate\Database\Eloquent\Relations\Pivot
  *
  * @extends \Illuminate\Database\Eloquent\Relations\Relation<TRelatedModel, TDeclaringModel, \Illuminate\Database\Eloquent\Collection<int, TRelatedModel>>
  */
