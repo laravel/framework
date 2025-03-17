@@ -230,7 +230,7 @@ class AboutCommand extends Command
      */
     protected function determineStoragePathLinkStatus(callable $formatStorageLinkedStatus): array
     {
-        return collect(config('filesystems.links', []))
+        return (new Collection(config('filesystems.links', [])))
             ->mapWithKeys(function ($target, $link) use ($formatStorageLinkedStatus) {
                 $path = Str::replace(public_path(), '', $link);
 
