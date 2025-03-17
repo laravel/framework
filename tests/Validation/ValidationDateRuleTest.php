@@ -24,7 +24,7 @@ class ValidationDateRuleTest extends TestCase
     public function testDateFormatRule()
     {
         $rule = Rule::date()->format('d/m/Y');
-        $this->assertEquals('date|date_format:d/m/Y', (string) $rule);
+        $this->assertEquals('date_format:d/m/Y', (string) $rule);
     }
 
     public function testAfterTodayRule()
@@ -87,7 +87,7 @@ class ValidationDateRuleTest extends TestCase
             ->format('Y-m-d')
             ->after('2024-01-01 00:00:00')
             ->before('2025-01-01 00:00:00');
-        $this->assertEquals('date|date_format:Y-m-d|after:2024-01-01 00:00:00|before:2025-01-01 00:00:00', (string) $rule);
+        $this->assertEquals('date_format:Y-m-d|after:2024-01-01 00:00:00|before:2025-01-01 00:00:00', (string) $rule);
 
         $rule = Rule::date()
             ->format('Y-m-d')
@@ -97,7 +97,7 @@ class ValidationDateRuleTest extends TestCase
             ->unless(true, function ($rule) {
                 $rule->before('2025-01-01');
             });
-        $this->assertSame('date|date_format:Y-m-d|after:2024-01-01', (string) $rule);
+        $this->assertSame('date_format:Y-m-d|after:2024-01-01', (string) $rule);
     }
 
     public function testDateValidation()
