@@ -28,7 +28,7 @@ class Date implements Stringable
     public function format(string $format): static
     {
         $this->format = $format;
-        
+
         return $this;
     }
 
