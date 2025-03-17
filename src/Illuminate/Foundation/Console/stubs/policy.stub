@@ -2,7 +2,6 @@
 
 namespace {{ namespace }};
 
-use Illuminate\Auth\Access\Response;
 use {{ namespacedModel }};
 use {{ namespacedUserModel }};
 
