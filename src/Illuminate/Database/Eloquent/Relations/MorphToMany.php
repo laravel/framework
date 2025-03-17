@@ -157,8 +157,9 @@ class MorphToMany extends BelongsToMany
 
         $attributes = array_merge([$this->morphType => $this->morphClass], $attributes);
 
-        $pivot = $using ? $using::fromRawAttributes($this->parent, $attributes, $this->table, $exists)
-                        : MorphPivot::fromAttributes($this->parent, $attributes, $this->table, $exists);
+        $pivot = $using
+            ? $using::fromRawAttributes($this->parent, $attributes, $this->table, $exists)
+            : MorphPivot::fromAttributes($this->parent, $attributes, $this->table, $exists);
 
         $pivot->setPivotKeys($this->foreignPivotKey, $this->relatedPivotKey)
             ->setRelatedModel($this->related)
