@@ -6,6 +6,7 @@ use BackedEnum;
 use CachingIterator;
 use Closure;
 use Exception;
+use Illuminate\Collections\CollectionIsEmptyException;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Arr;
@@ -367,7 +368,7 @@ trait EnumeratesValues
     }
 
     /**
-     * Throw an exception if the collection is empty.
+     * Ensure the collection not empty.
      *
      * @template TException of \Throwable
      *
@@ -377,14 +378,18 @@ trait EnumeratesValues
      *
      * @throws TException
      */
-    public function throwIfEmpty($exception = 'UnexpectedValueException', ...$parameters)
+    public function ensureNotEmpty($exception = 'CollectionIsEmptyException', ...$parameters)
     {
         return $this->whenEmpty(function () use ($exception, $parameters): never {
             if (is_string($exception) && class_exists($exception)) {
                 $exception = new $exception(...$parameters);
             }
 
-            throw is_string($exception) ? new UnexpectedValueException($exception) : $exception;
+            throw match (true) {
+                is_string($exception) => new CollectionIsEmptyException($exception),
+                $exception instanceof \Throwable => $exception,
+                default => new CollectionIsEmptyException('Collection should be not empty.'),
+            };
         });
     }
 

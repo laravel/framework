@@ -7,6 +7,7 @@ use ArrayIterator;
 use ArrayObject;
 use CachingIterator;
 use Exception;
+use Illuminate\Collections\CollectionIsEmptyException;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Database\Eloquent\Model;
@@ -5592,38 +5593,38 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
-    public function testThrowIfEmpty($collection)
+    public function testEnsureNotEmpty($collection)
     {
         $data = $collection::empty();
-        $this->expectException(UnexpectedValueException::class);
-        $data->throwIfEmpty();
+        $this->expectException(CollectionIsEmptyException::class);
+        $data->ensureNotEmpty();
     }
 
     #[DataProvider('collectionClassProvider')]
-    public function testThrowIfEmptyForInstanceThrowable($collection)
+    public function testEnsureNotEmptyForInstanceThrowable($collection)
     {
         $data = $collection::empty();
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Collection should be not empty.');
-        $data->throwIfEmpty(new InvalidArgumentException('Collection should be not empty.'));
+        $data->ensureNotEmpty(new InvalidArgumentException('Collection should be not empty.'));
     }
 
     #[DataProvider('collectionClassProvider')]
-    public function testThrowIfEmptyForStringThrowable($collection)
+    public function testEnsureNotEmptyForStringThrowable($collection)
     {
         $data = $collection::empty();
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Collection should be not empty.');
-        $data->throwIfEmpty('InvalidArgumentException', 'Collection should be not empty.');
+        $data->ensureNotEmpty('InvalidArgumentException', 'Collection should be not empty.');
     }
 
     #[DataProvider('collectionClassProvider')]
-    public function testThrowIfEmptyForString($collection)
+    public function testEnsureNotEmptyForString($collection)
     {
         $data = $collection::empty();
-        $this->expectException(UnexpectedValueException::class);
+        $this->expectException(CollectionIsEmptyException::class);
         $this->expectExceptionMessage('Collection should be not empty.');
-        $data->throwIfEmpty('Collection should be not empty.');
+        $data->ensureNotEmpty('Collection should be not empty.');
     }
 
     #[DataProvider('collectionClassProvider')]
