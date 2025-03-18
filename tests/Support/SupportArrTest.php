@@ -6,6 +6,8 @@ use ArrayObject;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\ItemNotFoundException;
+use Illuminate\Support\MultipleItemsFoundException;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use stdClass;
@@ -1065,6 +1067,35 @@ class SupportArrTest extends TestCase
         sort($shuffled);
 
         $this->assertEquals($input, $shuffled);
+    }
+
+    public function testSoleReturnsFirstItemInCollectionIfOnlyOneExists()
+    {
+        $this->assertSame('foo', Arr::sole(['foo']));
+
+        $array = [
+            ['name' => 'foo'],
+            ['name' => 'bar'],
+        ];
+
+        $this->assertSame(
+            ['name' => 'foo'],
+            Arr::sole($array, fn (array $value) => $value['name'] === 'foo')
+        );
+    }
+
+    public function testSoleThrowsExceptionIfNoItemsExist()
+    {
+        $this->expectException(ItemNotFoundException::class);
+
+        Arr::sole(['foo'], fn (string $value) => $value === 'baz');
+    }
+
+    public function testSoleThrowsExceptionIfMoreThanOneItemExists()
+    {
+        $this->expectExceptionObject(new MultipleItemsFoundException(2));
+
+        Arr::sole(['baz', 'foo', 'baz'], fn (string $value) => $value === 'baz');
     }
 
     public function testEmptyShuffle()
