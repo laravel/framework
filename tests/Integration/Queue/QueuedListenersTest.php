@@ -25,9 +25,19 @@ class QueuedListenersTest extends TestCase
             return $job->class == QueuedListenersTestListenerShouldQueue::class;
         });
 
+        $this->assertCount(1, Queue::listenersPushed(QueuedListenersTestListenerShouldQueue::class));
+        $this->assertCount(
+            0,
+            Queue::listenersPushed(
+                QueuedListenersTestListenerShouldQueue::class,
+                fn ($handler, $queue, $data) => $queue === 'not-a-real-queue'
+            )
+        );
+
         Queue::assertNotPushed(CallQueuedListener::class, function ($job) {
             return $job->class == QueuedListenersTestListenerShouldNotQueue::class;
         });
+        $this->assertCount(0, Queue::listenersPushed(QueuedListenersTestListenerShouldNotQueue::class));
     }
 }
 
