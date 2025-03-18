@@ -999,6 +999,8 @@ class TestResponse implements ArrayAccess
             count($unexpectedErrorKeys) === 0,
             'Response has unexpected validation errors: '.(new Collection($unexpectedErrorKeys))->keys()->map(fn ($key) => "'{$key}'")->join(', ')
         );
+
+        return $this;
     }
 
     /**
