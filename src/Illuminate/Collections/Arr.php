@@ -808,18 +808,6 @@ class Arr
     }
 
     /**
-     * Sort the array using the given callback or "dot" notation.
-     *
-     * @param  array  $array
-     * @param  callable|array|string|null  $callback
-     * @return array
-     */
-    public static function sort($array, $callback = null)
-    {
-        return (new Collection($array))->sortBy($callback)->all();
-    }
-
-    /**
      * Get the first item in the collection, but only if exactly one item exists. Otherwise, throw an exception.
      *
      * @param  array  $array
@@ -845,6 +833,18 @@ class Arr
         }
 
         return static::first($array);
+    }
+
+    /**
+     * Sort the array using the given callback or "dot" notation.
+     *
+     * @param  array  $array
+     * @param  callable|array|string|null  $callback
+     * @return array
+     */
+    public static function sort($array, $callback = null)
+    {
+        return (new Collection($array))->sortBy($callback)->all();
     }
 
     /**
