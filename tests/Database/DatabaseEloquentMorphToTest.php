@@ -391,17 +391,17 @@ class DatabaseEloquentMorphToTest extends TestCase
     public function testMorphWithExists()
     {
         $relation = $this->getRelation();
-        
+
         $relation->morphWithExists([
             'Post' => ['comments'],
             'Video' => ['tags'],
         ]);
-        
+
         // Create a reflection to access the protected property
         $reflection = new \ReflectionObject($relation);
         $property = $reflection->getProperty('morphableEagerLoadExists');
         $property->setAccessible(true);
-        
+
         $this->assertEquals([
             'Post' => ['comments'],
             'Video' => ['tags'],
