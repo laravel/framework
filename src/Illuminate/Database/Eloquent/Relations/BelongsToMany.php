@@ -20,6 +20,7 @@ use InvalidArgumentException;
 /**
  * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
  * @template TDeclaringModel of \Illuminate\Database\Eloquent\Model
+ * @template TPivotModel of \Illuminate\Database\Eloquent\Relations\Pivot
  *
  * @extends \Illuminate\Database\Eloquent\Relations\Relation<TRelatedModel, TDeclaringModel, \Illuminate\Database\Eloquent\Collection<int, TRelatedModel>>
  */
@@ -128,7 +129,7 @@ class BelongsToMany extends Relation
     /**
      * The class name of the custom pivot model to use for the relationship.
      *
-     * @var string
+     * @var class-string<TPivotModel>
      */
     protected $using;
 
@@ -316,7 +317,7 @@ class BelongsToMany extends Relation
     /**
      * Get the class being used for pivot models.
      *
-     * @return string
+     * @return class-string<TPivotModel>
      */
     public function getPivotClass()
     {
@@ -326,7 +327,7 @@ class BelongsToMany extends Relation
     /**
      * Specify the custom pivot model to use for the relationship.
      *
-     * @param  string  $class
+     * @param  class-string<TPivotModel>  $class
      * @return $this
      */
     public function using($class)

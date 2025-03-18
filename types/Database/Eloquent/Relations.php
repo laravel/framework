@@ -41,7 +41,7 @@ function test(User $user, Post $post, Comment $comment, ChildUser $child): void
     assertType('Illuminate\Types\Relations\Post|false', $user->posts()->save(new Post()));
     assertType('Illuminate\Types\Relations\Post|false', $user->posts()->saveQuietly(new Post()));
 
-    assertType('Illuminate\Database\Eloquent\Relations\BelongsToMany<Illuminate\Types\Relations\Role, Illuminate\Types\Relations\User>', $user->roles());
+    assertType('Illuminate\Database\Eloquent\Relations\BelongsToMany<Illuminate\Types\Relations\Role, Illuminate\Types\Relations\User, Illuminate\Database\Eloquent\Relations\Pivot>', $user->roles());
     assertType('Illuminate\Database\Eloquent\Collection<int, Illuminate\Types\Relations\Role>', $user->roles()->getResults());
     assertType('Illuminate\Database\Eloquent\Collection<int, Illuminate\Types\Relations\Role>', $user->roles()->find([1]));
     assertType('Illuminate\Database\Eloquent\Collection<int, Illuminate\Types\Relations\Role>', $user->roles()->findMany([1, 2, 3]));
@@ -157,11 +157,11 @@ class User extends Model
         return $post;
     }
 
-    /** @return BelongsToMany<Role, $this> */
+    /** @return BelongsToMany<Role, $this, \Illuminate\Database\Eloquent\Relations\Pivot> */
     public function roles(): BelongsToMany
     {
         $belongsToMany = $this->belongsToMany(Role::class);
-        assertType('Illuminate\Database\Eloquent\Relations\BelongsToMany<Illuminate\Types\Relations\Role, $this(Illuminate\Types\Relations\User)>', $belongsToMany);
+        assertType('Illuminate\Database\Eloquent\Relations\BelongsToMany<Illuminate\Types\Relations\Role, $this(Illuminate\Types\Relations\User), Illuminate\Database\Eloquent\Relations\Pivot>', $belongsToMany);
 
         return $belongsToMany;
     }
