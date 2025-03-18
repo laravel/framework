@@ -354,8 +354,8 @@ class QueueFake extends QueueManager implements Fake, Queue
      * Get all of the jobs by listener class, passing an optional truth-test callback.
      *
      * @param  class-string  $listenerClass
-     * @param  (\Closure(CallQueuedListener, string|null, mixed): bool)|null  $callback
-     * @return \Illuminate\Support\Collection<int, object>
+     * @param  (\Closure(\Illuminate\Events\CallQueuedListener, string|null, mixed): bool)|null  $callback
+     * @return \Illuminate\Support\Collection<int, \Illuminate\Events\CallQueuedListener>
      */
     public function listenersPushed($listenerClass, $callback = null)
     {
