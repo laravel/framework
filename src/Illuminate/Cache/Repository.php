@@ -142,9 +142,11 @@ class Repository implements ArrayAccess, CacheContract
     {
         $this->event(new RetrievingManyKeys($this->getName(), $keys));
 
-        $values = $this->store->many((new Collection($keys))->map(function ($value, $key) {
-            return is_string($key) ? $key : $value;
-        })->values()->all());
+        $values = $this->store->many((new Collection($keys))
+            ->map(fn ($value, $key) => is_string($key) ? $key : $value)
+            ->values()
+            ->all()
+        );
 
         return (new Collection($values))
             ->map(fn ($value, $key) => $this->handleManyResult($keys, $key, $value))

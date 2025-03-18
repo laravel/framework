@@ -1139,15 +1139,22 @@ class Route
      */
     protected function staticallyProvidedControllerMiddleware(string $class, string $method)
     {
-        return (new Collection($class::middleware()))->map(function ($middleware) {
-            return $middleware instanceof Middleware
-                ? $middleware
-                : new Middleware($middleware);
-        })->reject(function ($middleware) use ($method) {
-            return static::methodExcludedByOptions(
-                $method, ['only' => $middleware->only, 'except' => $middleware->except]
-            );
-        })->map->middleware->flatten()->values()->all();
+        return (new Collection($class::middleware()))
+            ->map(function ($middleware) {
+                return $middleware instanceof Middleware
+                    ? $middleware
+                    : new Middleware($middleware);
+            })
+            ->reject(function ($middleware) use ($method) {
+                return static::methodExcludedByOptions(
+                    $method, ['only' => $middleware->only, 'except' => $middleware->except],
+                );
+            })
+            ->map
+            ->middleware
+            ->flatten()
+            ->values()
+            ->all();
     }
 
     /**

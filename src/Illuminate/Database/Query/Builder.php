@@ -2850,11 +2850,9 @@ class Builder implements BuilderContract
     protected function removeExistingOrdersFor($column)
     {
         return (new Collection($this->orders))
-            ->reject(function ($order) use ($column) {
-                return isset($order['column'])
-                    ? $order['column'] === $column
-                    : false;
-            })->values()->all();
+            ->reject(fn ($order) => isset($order['column']) && $order['column'] === $column)
+            ->values()
+            ->all();
     }
 
     /**

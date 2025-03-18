@@ -379,9 +379,10 @@ class QueueFake extends QueueManager implements Fake, Queue
      */
     public function size($queue = null)
     {
-        return (new Collection($this->jobs))->flatten(1)->filter(
-            fn ($job) => $job['queue'] === $queue
-        )->count();
+        return (new Collection($this->jobs))
+            ->flatten(1)
+            ->filter(fn ($job) => $job['queue'] === $queue)
+            ->count();
     }
 
     /**
