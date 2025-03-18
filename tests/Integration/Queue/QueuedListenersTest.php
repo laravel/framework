@@ -30,7 +30,14 @@ class QueuedListenersTest extends TestCase
             0,
             Queue::listenersPushed(
                 QueuedListenersTestListenerShouldQueue::class,
-                fn ($handler, $queue, $data) => $queue === 'not-a-real-queue'
+                fn ($event, $handler, $queue, $data) => $queue === 'not-a-real-queue'
+            )
+        );
+        $this->assertCount(
+            1,
+            Queue::listenersPushed(
+                QueuedListenersTestListenerShouldQueue::class,
+                fn (QueuedListenersTestEvent $event) => $event->value === 100
             )
         );
 
@@ -43,7 +50,7 @@ class QueuedListenersTest extends TestCase
 
 class QueuedListenersTestEvent
 {
-    //
+    public int $value = 100;
 }
 
 class QueuedListenersTestListenerShouldQueue implements ShouldQueue

@@ -354,7 +354,7 @@ class QueueFake extends QueueManager implements Fake, Queue
      * Get all of the jobs by listener class, passing an optional truth-test callback.
      *
      * @param  class-string  $listenerClass
-     * @param  (\Closure(\Illuminate\Events\CallQueuedListener, string|null, mixed): bool)|null  $callback
+     * @param  (\Closure(mixed, \Illuminate\Events\CallQueuedListener, string|null, mixed): bool)|null  $callback
      * @return \Illuminate\Support\Collection<int, \Illuminate\Events\CallQueuedListener>
      */
     public function listenersPushed($listenerClass, $callback = null)
@@ -367,7 +367,7 @@ class QueueFake extends QueueManager implements Fake, Queue
             ->filter(fn ($data) => $data['job']->class === $listenerClass);
 
         if ($callback) {
-            $collection = $collection->filter(fn ($data) => $callback($data['job'], $data['queue'], $data['data']));
+            $collection = $collection->filter(fn ($data) => $callback($data['job']->data[0] ?? null, $data['job'], $data['queue'], $data['data']));
         }
 
         return $collection->pluck('job');
