@@ -10,7 +10,6 @@ use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationServiceProvider;
 use Illuminate\Validation\Validator;
 use PHPUnit\Framework\TestCase;
-use TypeError;
 
 include_once 'Enums.php';
 
@@ -25,16 +24,6 @@ class ValidationAnyOfRuleTest extends TestCase
 {
     private array $ruleSets;
     private array $nestedRules;
-
-    public function testThrowsTypeErrorForInvalidInput()
-    {
-        $this->expectException(TypeError::class);
-        $validator = new Validator(resolve('translator'), [
-            'foo' => 'not an array',
-        ], ['foo' => Rule::anyOf([[]])]);
-
-        $validator->validate();
-    }
 
     public function testValidEmailValidation()
     {
@@ -51,13 +40,31 @@ class ValidationAnyOfRuleTest extends TestCase
         $validator = new Validator(
             resolve('translator'),
             [
-                'email' => 'test@example.com'
+                'email' => 'test@example.com',
             ],
             [
                 'email' => Rule::anyOf([
                     ['required', 'min:20'],
                     ['required', 'email'],
-                ])
+                ]),
+            ],
+        );
+
+        $this->assertTrue($validator->passes());
+    }
+
+    public function testBasicStringRuleValidation()
+    {
+        $validator = new Validator(
+            resolve('translator'),
+            [
+                'email' => '20charstringtestvalidation',
+            ],
+            [
+                'email' => Rule::anyOf([
+                    'required|min:20',
+                    'required|email',
+                ]),
             ],
         );
 

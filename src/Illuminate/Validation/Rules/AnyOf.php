@@ -4,6 +4,7 @@ namespace Illuminate\Validation\Rules;
 
 use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Contracts\Validation\ValidatorAwareRule;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator;
 use InvalidArgumentException;
 
@@ -59,8 +60,8 @@ class AnyOf implements Rule, ValidatorAwareRule
 
         foreach ($this->ruleSets as $ruleSet) {
             $validator = Validator::make(
-                $value,
-                $ruleSet,
+                Arr::wrap($value),
+                Arr::wrap($ruleSet),
                 $this->validator->customMessages,
                 $this->validator->customAttributes
             );
