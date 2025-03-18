@@ -1391,7 +1391,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function sole($key = null, $operator = null, $value = null)
     {
-        $filter = (func_num_args() > 1 && $key && $operator && $value)
+        $filter = func_num_args() > 1
             ? $this->operatorForWhere(...func_get_args())
             : $key;
 
