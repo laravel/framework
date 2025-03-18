@@ -5,7 +5,6 @@ namespace Illuminate\Database\Eloquent\Casts;
 use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Support\HtmlString;
-use Illuminate\Support\Stringable;
 
 class AsHtmlString implements Castable
 {

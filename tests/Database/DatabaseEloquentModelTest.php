@@ -265,7 +265,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->asStringableAttribute = new Stringable('foo baz');
         $this->assertTrue($model->isDirty('asStringableAttribute'));
     }
-	
+
     public function testDirtyOnCastedHtmlString()
     {
         $model = new EloquentModelCastingStub;
