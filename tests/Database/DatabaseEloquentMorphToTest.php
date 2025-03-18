@@ -387,6 +387,26 @@ class DatabaseEloquentMorphToTest extends TestCase
 
         return m::mock(MorphTo::class.'[createModelByType]', [$this->builder, $parent, 'foreign_key', 'id', 'morph_type', 'relation']);
     }
+
+    public function testMorphWithExists()
+    {
+        $relation = $this->getRelation();
+        
+        $relation->morphWithExists([
+            'Post' => ['comments'],
+            'Video' => ['tags'],
+        ]);
+        
+        // Create a reflection to access the protected property
+        $reflection = new \ReflectionObject($relation);
+        $property = $reflection->getProperty('morphableEagerLoadExists');
+        $property->setAccessible(true);
+        
+        $this->assertEquals([
+            'Post' => ['comments'],
+            'Video' => ['tags'],
+        ], $property->getValue($relation));
+    }
 }
 
 class EloquentMorphToModelStub extends Model
