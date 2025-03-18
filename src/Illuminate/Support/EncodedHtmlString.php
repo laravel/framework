@@ -24,7 +24,7 @@ class EncodedHtmlString extends HtmlString
     }
 
     /**
-     * Convert the special characters in teh given value.
+     * Convert the special characters in the given value.
      *
      * @internal
      *
@@ -54,7 +54,7 @@ class EncodedHtmlString extends HtmlString
     }
 
     /**
-     * Set the callable that will be used to encode the html strings.
+     * Set the callable that will be used to encode the HTML strings.
      *
      * @param  callable|null  $factory
      * @return void
