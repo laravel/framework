@@ -1004,6 +1004,28 @@ class BladeCompiler extends Compiler implements CompilerInterface
     }
 
     /**
+     * Execute the given callback using a custom echo format.
+     *
+     * @param  string  $format
+     * @param  callable  $callback
+     * @return string
+     */
+    public function usingEchoFormat($format, callable $callback)
+    {
+        $originalEchoFormat = $this->echoFormat;
+
+        $this->setEchoFormat($format);
+
+        try {
+            $output = call_user_func($callback);
+        } finally {
+            $this->setEchoFormat($originalEchoFormat);
+        }
+
+        return $output;
+    }
+
+    /**
      * Set the echo format to be used by the compiler.
      *
      * @param  string  $format
