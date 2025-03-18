@@ -5,14 +5,14 @@ namespace Illuminate\Support;
 class EncodedHtmlString extends HtmlString
 {
     /**
-     * The callback that should be used to encode the html strings.
+     * The callback that should be used to encode the HTML strings.
      *
      * @var callable|null
      */
     protected static $encodeUsingFactory;
 
     /**
-     * Create a new Encoded HTML string instance.
+     * Create a new encoded HTML string instance.
      *
      * @param  string  $html
      * @param  bool  $doubleEncode
@@ -24,7 +24,7 @@ class EncodedHtmlString extends HtmlString
     }
 
     /**
-     * Convert using default encoding.
+     * Convert the special characters in teh given value.
      *
      * @internal
      *

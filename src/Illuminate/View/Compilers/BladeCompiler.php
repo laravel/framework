@@ -1004,7 +1004,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
     }
 
     /**
-     * Execute the callback using custom echo format.
+     * Execute the given callback using a custom echo format.
      *
      * @param  string  $format
      * @param  callable  $callback

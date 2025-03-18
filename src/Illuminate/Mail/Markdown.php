@@ -61,7 +61,10 @@ class Markdown
     {
         $this->view->flushFinderCache();
 
-        $bladeCompiler = $this->view->getEngineResolver()->resolve('blade')->getCompiler();
+        $bladeCompiler = $this->view
+            ->getEngineResolver()
+            ->resolve('blade')
+            ->getCompiler();
 
         $contents = $bladeCompiler->usingEchoFormat(
             'new \Illuminate\Support\EncodedHtmlString(%s)',
@@ -138,6 +141,26 @@ class Markdown
     }
 
     /**
+     * Get a Markdown converter instance.
+     *
+     * @internal
+     *
+     * @param  array<string, mixed>  $config
+     * @return \League\CommonMark\MarkdownConverter
+     */
+    public static function converter(array $config = [])
+    {
+        $environment = new Environment(array_merge([
+            'allow_unsafe_links' => false,
+        ], $config));
+
+        $environment->addExtension(new CommonMarkCoreExtension);
+        $environment->addExtension(new TableExtension);
+
+        return new MarkdownConverter($environment);
+    }
+
+    /**
      * Get the HTML component paths.
      *
      * @return array
@@ -205,25 +228,5 @@ class Markdown
     public function getTheme()
     {
         return $this->theme;
-    }
-
-    /**
-     * Resolve the Markdown Converter.
-     *
-     * @internal
-     *
-     * @param  array<string, mixed>  $config
-     * @return \League\CommonMark\MarkdownConverter
-     */
-    public static function converter(array $config = [])
-    {
-        $environment = new Environment(array_merge([
-            'allow_unsafe_links' => false,
-        ], $config));
-
-        $environment->addExtension(new CommonMarkCoreExtension);
-        $environment->addExtension(new TableExtension);
-
-        return new MarkdownConverter($environment);
     }
 }
