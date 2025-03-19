@@ -68,7 +68,7 @@ class ValidationAnyOfRuleTest extends TestCase
         $rule = [
             'p1' => Rule::anyOf([
                 ['p2' => 'required|min:20'],
-                'required|min:20'
+                'required|min:20',
             ]),
         ];
 
