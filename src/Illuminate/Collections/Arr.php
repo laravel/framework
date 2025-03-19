@@ -808,6 +808,34 @@ class Arr
     }
 
     /**
+     * Get the first item in the collection, but only if exactly one item exists. Otherwise, throw an exception.
+     *
+     * @param  array  $array
+     * @param  callable  $callback
+     *
+     * @throws \Illuminate\Support\ItemNotFoundException
+     * @throws \Illuminate\Support\MultipleItemsFoundException
+     */
+    public static function sole($array, ?callable $callback = null)
+    {
+        if ($callback) {
+            $array = static::where($array, $callback);
+        }
+
+        $count = count($array);
+
+        if ($count === 0) {
+            throw new ItemNotFoundException;
+        }
+
+        if ($count > 1) {
+            throw new MultipleItemsFoundException($count);
+        }
+
+        return static::first($array);
+    }
+
+    /**
      * Sort the array using the given callback or "dot" notation.
      *
      * @param  array  $array

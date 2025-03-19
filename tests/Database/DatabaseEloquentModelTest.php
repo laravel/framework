@@ -26,6 +26,7 @@ use Illuminate\Database\Eloquent\Casts\AsEncryptedArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsEncryptedCollection;
 use Illuminate\Database\Eloquent\Casts\AsEnumArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsEnumCollection;
+use Illuminate\Database\Eloquent\Casts\AsHtmlString;
 use Illuminate\Database\Eloquent\Casts\AsStringable;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Collection;
@@ -45,6 +46,7 @@ use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\HtmlString;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Stringable;
 use InvalidArgumentException;
@@ -262,6 +264,24 @@ class DatabaseEloquentModelTest extends TestCase
 
         $model->asStringableAttribute = new Stringable('foo baz');
         $this->assertTrue($model->isDirty('asStringableAttribute'));
+    }
+
+    public function testDirtyOnCastedHtmlString()
+    {
+        $model = new EloquentModelCastingStub;
+        $model->setRawAttributes([
+            'asHtmlStringAttribute' => '<div>foo bar</div>',
+        ]);
+        $model->syncOriginal();
+
+        $this->assertInstanceOf(HtmlString::class, $model->asHtmlStringAttribute);
+        $this->assertFalse($model->isDirty('asHtmlStringAttribute'));
+
+        $model->asHtmlStringAttribute = new HtmlString('<div>foo bar</div>');
+        $this->assertFalse($model->isDirty('asHtmlStringAttribute'));
+
+        $model->asHtmlStringAttribute = new Stringable('<div>foo baz</div>');
+        $this->assertTrue($model->isDirty('asHtmlStringAttribute'));
     }
 
     // public function testDirtyOnCastedEncryptedCollection()
@@ -3682,6 +3702,7 @@ class EloquentModelCastingStub extends Model
             'datetimeAttribute' => 'datetime',
             'asarrayobjectAttribute' => AsArrayObject::class,
             'asStringableAttribute' => AsStringable::class,
+            'asHtmlStringAttribute' => AsHtmlString::class,
             'asCustomCollectionAttribute' => AsCollection::using(CustomCollection::class),
             'asEncryptedArrayObjectAttribute' => AsEncryptedArrayObject::class,
             'asEncryptedCustomCollectionAttribute' => AsEncryptedCollection::using(CustomCollection::class),
