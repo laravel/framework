@@ -172,7 +172,7 @@ abstract class Relation implements BuilderContract
     public function getEager()
     {
         return $this->eagerKeysWereEmpty
-            ? $this->query->getModel()->newCollection()
+            ? $this->related->newCollection()
             : $this->get();
     }
 
