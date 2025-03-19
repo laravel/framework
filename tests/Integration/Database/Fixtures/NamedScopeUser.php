@@ -2,7 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Database\Fixtures;
 
-use Illuminate\Database\Eloquent\Attributes\NamedScope;
+use Illuminate\Database\Eloquent\Attributes\Scope as NamedScope;
 use Illuminate\Database\Eloquent\Builder;
 
 class NamedScopeUser extends User

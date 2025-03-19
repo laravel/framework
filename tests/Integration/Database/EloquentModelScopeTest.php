@@ -3,7 +3,7 @@
 namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Contracts\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Attributes\NamedScope;
+use Illuminate\Database\Eloquent\Attributes\Scope as NamedScope;
 use Illuminate\Database\Eloquent\Model;
 
 class EloquentModelScopeTest extends DatabaseTestCase
