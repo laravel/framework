@@ -46,7 +46,6 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
      * @param  string  $prefix
      * @param  string  $suffix
      * @param  bool  $dispatchAfterCommit
-     * @return void
      */
     public function __construct(
         SqsClient $sqs,

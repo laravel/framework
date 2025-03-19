@@ -67,7 +67,6 @@ class DynamoDbStore implements LockProvider, Store
      * @param  string  $valueAttribute
      * @param  string  $expirationAttribute
      * @param  string  $prefix
-     * @return void
      */
     public function __construct(
         DynamoDbClient $dynamo,

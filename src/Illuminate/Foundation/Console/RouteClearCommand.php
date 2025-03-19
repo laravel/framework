@@ -34,7 +34,6 @@ class RouteClearCommand extends Command
      * Create a new route clear command instance.
      *
      * @param  \Illuminate\Filesystem\Filesystem  $files
-     * @return void
      */
     public function __construct(Filesystem $files)
     {

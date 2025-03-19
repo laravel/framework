@@ -45,7 +45,6 @@ class EncryptCookies
      * Create a new CookieGuard instance.
      *
      * @param  \Illuminate\Contracts\Encryption\Encrypter  $encrypter
-     * @return void
      */
     public function __construct(EncrypterContract $encrypter)
     {

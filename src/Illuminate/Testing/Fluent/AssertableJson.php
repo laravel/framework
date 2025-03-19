@@ -40,7 +40,6 @@ class AssertableJson implements Arrayable
      *
      * @param  array  $props
      * @param  string|null  $path
-     * @return void
      */
     protected function __construct(array $props, ?string $path = null)
     {

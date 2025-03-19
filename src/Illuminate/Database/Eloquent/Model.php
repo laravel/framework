@@ -248,7 +248,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * Create a new Eloquent model instance.
      *
      * @param  array  $attributes
-     * @return void
      */
     public function __construct(array $attributes = [])
     {

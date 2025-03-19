@@ -52,7 +52,6 @@ class FilesystemManager implements FactoryContract
      * Create a new filesystem manager instance.
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
-     * @return void
      */
     public function __construct($app)
     {

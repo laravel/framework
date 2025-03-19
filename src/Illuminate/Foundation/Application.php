@@ -212,7 +212,6 @@ class Application extends Container implements ApplicationContract, CachesConfig
      * Create a new Illuminate application instance.
      *
      * @param  string|null  $basePath
-     * @return void
      */
     public function __construct($basePath = null)
     {

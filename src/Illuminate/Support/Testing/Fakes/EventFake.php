@@ -51,7 +51,6 @@ class EventFake implements Dispatcher, Fake
      *
      * @param  \Illuminate\Contracts\Events\Dispatcher  $dispatcher
      * @param  array|string  $eventsToFake
-     * @return void
      */
     public function __construct(Dispatcher $dispatcher, $eventsToFake = [])
     {

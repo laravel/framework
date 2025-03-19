@@ -37,7 +37,6 @@ class Attachment
      * Create a mail attachment.
      *
      * @param  \Closure  $resolver
-     * @return void
      */
     private function __construct(Closure $resolver)
     {

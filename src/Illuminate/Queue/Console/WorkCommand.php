@@ -89,7 +89,6 @@ class WorkCommand extends Command
      *
      * @param  \Illuminate\Queue\Worker  $worker
      * @param  \Illuminate\Contracts\Cache\Repository  $cache
-     * @return void
      */
     public function __construct(Worker $worker, Cache $cache)
     {

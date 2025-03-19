@@ -88,7 +88,6 @@ abstract class Relation implements BuilderContract
      *
      * @param  \Illuminate\Database\Eloquent\Builder<TRelatedModel>  $query
      * @param  TDeclaringModel  $parent
-     * @return void
      */
     public function __construct(Builder $query, Model $parent)
     {

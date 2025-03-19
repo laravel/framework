@@ -14,7 +14,6 @@ class DefaultProviders
     /**
      * Create a new default provider collection.
      *
-     * @return void
      */
     public function __construct(?array $providers = null)
     {

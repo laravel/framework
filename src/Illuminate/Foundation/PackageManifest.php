@@ -50,7 +50,6 @@ class PackageManifest
      * @param  \Illuminate\Filesystem\Filesystem  $files
      * @param  string  $basePath
      * @param  string  $manifestPath
-     * @return void
      */
     public function __construct(Filesystem $files, $basePath, $manifestPath)
     {

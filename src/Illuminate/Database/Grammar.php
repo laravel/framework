@@ -22,7 +22,6 @@ abstract class Grammar
      * Create a new grammar instance.
      *
      * @param  \Illuminate\Database\Connection  $connection
-     * @return void
      */
     public function __construct(Connection $connection)
     {

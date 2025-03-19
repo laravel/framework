@@ -121,7 +121,6 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
      * Create a new generator command instance.
      *
      * @param  \Illuminate\Filesystem\Filesystem  $files
-     * @return void
      */
     public function __construct(Filesystem $files)
     {

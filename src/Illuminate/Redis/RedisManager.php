@@ -64,7 +64,6 @@ class RedisManager implements Factory
      * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @param  string  $driver
      * @param  array  $config
-     * @return void
      */
     public function __construct($app, $driver, array $config)
     {

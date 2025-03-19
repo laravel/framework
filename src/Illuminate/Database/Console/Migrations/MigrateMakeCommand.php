@@ -51,7 +51,6 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
      *
      * @param  \Illuminate\Database\Migrations\MigrationCreator  $creator
      * @param  \Illuminate\Support\Composer  $composer
-     * @return void
      */
     public function __construct(MigrationCreator $creator, Composer $composer)
     {

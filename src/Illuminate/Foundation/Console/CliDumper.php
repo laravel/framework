@@ -48,7 +48,6 @@ class CliDumper extends BaseCliDumper
      * @param  \Symfony\Component\Console\Output\OutputInterface  $output
      * @param  string  $basePath
      * @param  string  $compiledViewPath
-     * @return void
      */
     public function __construct($output, $basePath, $compiledViewPath)
     {

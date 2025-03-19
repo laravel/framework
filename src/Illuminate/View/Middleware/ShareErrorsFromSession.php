@@ -19,7 +19,6 @@ class ShareErrorsFromSession
      * Create a new error binder instance.
      *
      * @param  \Illuminate\Contracts\View\Factory  $view
-     * @return void
      */
     public function __construct(ViewFactory $view)
     {

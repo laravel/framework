@@ -59,7 +59,6 @@ class MailManager implements FactoryContract
      * Create a new Mail manager instance.
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
-     * @return void
      */
     public function __construct($app)
     {

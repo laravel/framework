@@ -33,7 +33,6 @@ class ConditionalRules
      * @param  callable|bool  $condition
      * @param  \Illuminate\Contracts\Validation\ValidationRule|\Illuminate\Contracts\Validation\InvokableRule|\Illuminate\Contracts\Validation\Rule|\Closure|array|string  $rules
      * @param  \Illuminate\Contracts\Validation\ValidationRule|\Illuminate\Contracts\Validation\InvokableRule|\Illuminate\Contracts\Validation\Rule|\Closure|array|string  $defaultRules
-     * @return void
      */
     public function __construct($condition, $rules, $defaultRules = [])
     {

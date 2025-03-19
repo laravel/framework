@@ -95,7 +95,6 @@ class Mailer implements MailerContract, MailQueueContract
      * @param  \Illuminate\Contracts\View\Factory  $views
      * @param  \Symfony\Component\Mailer\Transport\TransportInterface  $transport
      * @param  \Illuminate\Contracts\Events\Dispatcher|null  $events
-     * @return void
      */
     public function __construct(string $name, Factory $views, TransportInterface $transport, ?Dispatcher $events = null)
     {

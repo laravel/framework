@@ -66,7 +66,6 @@ class QueueFake extends QueueManager implements Fake, Queue
      * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @param  array  $jobsToFake
      * @param  \Illuminate\Queue\QueueManager|null  $queue
-     * @return void
      */
     public function __construct($app, $jobsToFake = [], $queue = null)
     {

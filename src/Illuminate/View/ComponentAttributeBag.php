@@ -31,7 +31,6 @@ class ComponentAttributeBag implements ArrayAccess, IteratorAggregate, JsonSeria
      * Create a new component attribute bag instance.
      *
      * @param  array  $attributes
-     * @return void
      */
     public function __construct(array $attributes = [])
     {
