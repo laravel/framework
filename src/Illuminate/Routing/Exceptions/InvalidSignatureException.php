@@ -8,7 +8,6 @@ class InvalidSignatureException extends HttpException
 {
     /**
      * Create a new exception instance.
-     *
      */
     public function __construct()
     {

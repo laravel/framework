@@ -29,7 +29,6 @@ class DatabaseTransactionsManager
 
     /**
      * Create a new database transactions manager instance.
-     *
      */
     public function __construct()
     {

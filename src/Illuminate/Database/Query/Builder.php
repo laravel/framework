@@ -251,7 +251,6 @@ class Builder implements BuilderContract
 
     /**
      * Create a new query builder instance.
-     *
      */
     public function __construct(
         ConnectionInterface $connection,

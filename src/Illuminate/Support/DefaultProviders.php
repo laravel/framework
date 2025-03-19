@@ -13,7 +13,6 @@ class DefaultProviders
 
     /**
      * Create a new default provider collection.
-     *
      */
     public function __construct(?array $providers = null)
     {

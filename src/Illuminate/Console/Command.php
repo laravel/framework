@@ -86,7 +86,6 @@ class Command extends SymfonyCommand
 
     /**
      * Create a new console command instance.
-     *
      */
     public function __construct()
     {

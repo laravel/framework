@@ -39,7 +39,6 @@ class AnonymousEvent implements ShouldBroadcast
 
     /**
      * Create a new anonymous broadcastable event instance.
-     *
      */
     public function __construct(protected Channel|array|string $channels)
     {
