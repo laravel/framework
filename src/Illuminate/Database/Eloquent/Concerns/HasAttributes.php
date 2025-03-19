@@ -2020,7 +2020,7 @@ trait HasAttributes
         $results = [];
 
         foreach ($this->getAttributes() as $key => $value) {
-            if (!in_array($key, $attributes)) {
+            if (! in_array($key, $attributes)) {
                 $results[$key] = $value;
             }
         }
