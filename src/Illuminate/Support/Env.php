@@ -115,6 +115,24 @@ class Env
     }
 
     /**
+     * Get the value of a boolean environment variable.
+     *
+     * @throws \RuntimeException
+     */
+    public static function getBoolean(string $key, ?bool $default = null): bool
+    {
+        $value = ($default === null)
+            ? self::getOrFail($key)
+            : self::get($key, $default);
+
+        if (! is_bool($value)) {
+            throw new RuntimeException("Environment variable [$key] is not boolean.");
+        }
+
+        return $value;
+    }
+
+    /**
      * Get the possible option for this environment variable.
      *
      * @param  string  $key

@@ -1232,6 +1232,32 @@ class SupportHelpersTest extends TestCase
         $this->assertSame('some-value', Env::getOrFail('required-exists'));
     }
 
+    public function testBooleanEnvReturnsValue(): void
+    {
+        $_SERVER['foo'] = 'true';
+        $this->assertSame(true, Env::getBoolean('foo'));
+    }
+
+    public function testBooleanEnvReturnsDefaultValue(): void
+    {
+        $this->assertSame(true, Env::getBoolean('boolean-does-not-exist', true));
+    }
+
+    public function testBooleanEnvVariableThrowsAnExceptionWhenNotFound(): void
+    {
+        $this->expectExceptionObject(new RuntimeException('[boolean-does-not-exist] has no value'));
+
+        Env::getBoolean('boolean-does-not-exist');
+    }
+
+    public function testBooleanEnvVariableThrowsAnExceptionWhenNotBoolean(): void
+    {
+        $_SERVER['foo'] = 'bar';
+        $this->expectExceptionObject(new RuntimeException('Environment variable [foo] is not boolean.'));
+
+        Env::getBoolean('foo');
+    }
+
     public function testLiteral(): void
     {
         $this->assertEquals(1, literal(1));
