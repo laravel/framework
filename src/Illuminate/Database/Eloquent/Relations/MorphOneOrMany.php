@@ -25,7 +25,7 @@ abstract class MorphOneOrMany extends HasOneOrMany
     /**
      * The class name of the parent model.
      *
-     * @var string
+     * @var class-string<TRelatedModel>
      */
     protected $morphClass;
 
@@ -159,7 +159,7 @@ abstract class MorphOneOrMany extends HasOneOrMany
     /**
      * Get the class name of the parent model.
      *
-     * @return string
+     * @return class-string<TRelatedModel>
      */
     public function getMorphClass()
     {
