@@ -2015,13 +2015,7 @@ trait HasAttributes
      */
     public function except($attributes)
     {
-        $results = $this->attributesToArray();
-
-        foreach (is_array($attributes) ? $attributes : func_get_args() as $attribute) {
-            unset($results[$attribute]);
-        }
-
-        return $results;
+        return Arr::except($this->attributesToArray(), is_array($attributes) ? $attributes : func_get_args());
     }
 
     /**
