@@ -14,6 +14,7 @@ use Illuminate\Console\View\Components\Error;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Debug\ExceptionHandler as ExceptionHandlerContract;
 use Illuminate\Contracts\Debug\ShouldntReport;
+use Illuminate\Contracts\Debug\ShouldntReportOnRequest;
 use Illuminate\Contracts\Foundation\ExceptionRenderer;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -405,6 +406,12 @@ class Handler implements ExceptionHandlerContract
         }
 
         if ($e instanceof ShouldntReport) {
+            return true;
+        }
+
+        $isRunningInConsole = app()->runningInConsole();
+
+        if (! $isRunningInConsole && $e instanceof ShouldntReportOnRequest) {
             return true;
         }
 
