@@ -38,6 +38,7 @@ class StubPublishCommand extends Command
         }
 
         $stubs = [
+            __DIR__.'/stubs/action.stub' => 'action.stub',
             __DIR__.'/stubs/cast.inbound.stub' => 'cast.inbound.stub',
             __DIR__.'/stubs/cast.stub' => 'cast.stub',
             __DIR__.'/stubs/class.stub' => 'class.stub',

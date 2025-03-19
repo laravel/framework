@@ -29,6 +29,7 @@ use Illuminate\Database\Console\ShowModelCommand;
 use Illuminate\Database\Console\TableCommand as DatabaseTableCommand;
 use Illuminate\Database\Console\WipeCommand;
 use Illuminate\Foundation\Console\AboutCommand;
+use Illuminate\Foundation\Console\ActionMakeCommand;
 use Illuminate\Foundation\Console\ApiInstallCommand;
 use Illuminate\Foundation\Console\BroadcastingInstallCommand;
 use Illuminate\Foundation\Console\CastMakeCommand;
@@ -181,6 +182,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      * @var array
      */
     protected $devCommands = [
+        'ActionMake' => ActionMakeCommand::class,
         'ApiInstall' => ApiInstallCommand::class,
         'BroadcastingInstall' => BroadcastingInstallCommand::class,
         'CacheTable' => CacheTableCommand::class,

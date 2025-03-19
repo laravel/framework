@@ -1,0 +1,28 @@
+<?php
+
+namespace {{ namespace }};
+
+use Illuminate\Support\Facades\DB;
+
+class {{ class }}
+{
+
+    /**
+     * Create a new class instance.
+     */
+    public function __construct()
+    {
+        //
+    }
+    
+    /**
+     * Execute the action.
+     * @param array<string, mixed> $attributes
+     */
+    public function execute(array $attributes)
+    {
+        return DB::transaction(function () use ($attributes) {
+            
+        });
+    }
+} 
