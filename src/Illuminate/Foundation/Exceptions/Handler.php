@@ -408,6 +408,12 @@ class Handler implements ExceptionHandlerContract
             return true;
         }
 
+        $isRunningInConsole = app()->runningInConsole();
+
+        if (!$isRunningInConsole && $e instanceof ShouldntReportOnRequest) {
+            return true;
+        }
+
         $dontReport = array_merge($this->dontReport, $this->internalDontReport);
 
         if (! is_null(Arr::first($dontReport, fn ($type) => $e instanceof $type))) {
