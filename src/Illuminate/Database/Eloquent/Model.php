@@ -11,7 +11,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\CanBeEscapedWhenCastToString;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
-use Illuminate\Database\Eloquent\Attributes\NamedScope;
+use Illuminate\Database\Eloquent\Attributes\Scope as LocalScope;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
@@ -1633,22 +1633,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             : Pivot::fromAttributes($parent, $attributes, $table, $exists);
     }
 
-    protected static function hasAttributedNamedScope(string $scope): ?string
-    {
-        if (! method_exists(static::class, $scope)) {
-            return false;
-        }
-
-        $method = new ReflectionMethod(static::class, $scope);
-        $attribute = $method->getAttributes(NamedScope::class);
-
-        if ($attribute === []) {
-            return false;
-        }
-
-        return true;
-    }
-
     /**
      * Determine if the model has a given scope.
      *
@@ -1657,7 +1641,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function hasNamedScope($scope)
     {
-        return method_exists($this, 'scope'.ucfirst($scope)) || static::hasAttributedNamedScope($scope);
+        return method_exists($this, 'scope'.ucfirst($scope)) ||
+            static::isScopeMethodWithAttribute($scope);
     }
 
     /**
@@ -1669,11 +1654,24 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function callNamedScope($scope, array $parameters = [])
     {
-        if ($this->hasAttributedNamedScope($scope)) {
+        if ($this->isScopeMethodWithAttribute($scope)) {
             return $this->{$scope}(...$parameters);
         }
 
         return $this->{'scope'.ucfirst($scope)}(...$parameters);
+    }
+
+    /**
+     * Determine if the given method has a scope attribute.
+     *
+     * @param  string  $method
+     * @return bool
+     */
+    protected static function isScopeMethodWithAttribute(string $method)
+    {
+        return method_exists(static::class, $method) &&
+            (new ReflectionMethod(static::class, $method))
+                ->getAttributes(LocalScope::class) !== [];
     }
 
     /**
@@ -2399,7 +2397,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public static function __callStatic($method, $parameters)
     {
-        if (static::hasAttributedNamedScope($method)) {
+        if (static::isScopeMethodWithAttribute($method)) {
             $parameters = [static::query(), ...$parameters];
         }
 
