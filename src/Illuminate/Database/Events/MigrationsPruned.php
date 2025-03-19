@@ -32,7 +32,6 @@ class MigrationsPruned
      *
      * @param  \Illuminate\Database\Connection  $connection
      * @param  string  $path
-     * @return void
      */
     public function __construct(Connection $connection, string $path)
     {

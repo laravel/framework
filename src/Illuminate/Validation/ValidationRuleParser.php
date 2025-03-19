@@ -35,7 +35,6 @@ class ValidationRuleParser
      * Create a new validation rule parser.
      *
      * @param  array  $data
-     * @return void
      */
     public function __construct(array $data)
     {

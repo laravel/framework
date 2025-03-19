@@ -44,7 +44,6 @@ class ConcurrencyLimiter
      * @param  string  $name
      * @param  int  $maxLocks
      * @param  int  $releaseAfter
-     * @return void
      */
     public function __construct($redis, $name, $maxLocks, $releaseAfter)
     {

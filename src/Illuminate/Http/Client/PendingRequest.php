@@ -220,7 +220,6 @@ class PendingRequest
      *
      * @param  \Illuminate\Http\Client\Factory|null  $factory
      * @param  array  $middleware
-     * @return void
      */
     public function __construct(?Factory $factory = null, $middleware = [])
     {

@@ -22,7 +22,6 @@ class TaggedCache extends Repository
      *
      * @param  \Illuminate\Contracts\Cache\Store  $store
      * @param  \Illuminate\Cache\TagSet  $tags
-     * @return void
      */
     public function __construct(Store $store, TagSet $tags)
     {

@@ -33,7 +33,6 @@ class StartSession
      *
      * @param  \Illuminate\Session\SessionManager  $manager
      * @param  callable|null  $cacheFactoryResolver
-     * @return void
      */
     public function __construct(SessionManager $manager, ?callable $cacheFactoryResolver = null)
     {

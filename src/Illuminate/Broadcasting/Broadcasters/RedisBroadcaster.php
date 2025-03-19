@@ -40,7 +40,6 @@ class RedisBroadcaster extends Broadcaster
      * @param  \Illuminate\Contracts\Redis\Factory  $redis
      * @param  string|null  $connection
      * @param  string  $prefix
-     * @return void
      */
     public function __construct(Redis $redis, $connection = null, $prefix = '')
     {

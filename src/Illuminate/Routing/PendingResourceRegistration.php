@@ -51,7 +51,6 @@ class PendingResourceRegistration
      * @param  string  $name
      * @param  string  $controller
      * @param  array  $options
-     * @return void
      */
     public function __construct(ResourceRegistrar $registrar, $name, $controller, array $options)
     {

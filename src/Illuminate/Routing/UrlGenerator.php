@@ -124,7 +124,6 @@ class UrlGenerator implements UrlGeneratorContract
      * @param  \Illuminate\Routing\RouteCollectionInterface  $routes
      * @param  \Illuminate\Http\Request  $request
      * @param  string|null  $assetRoot
-     * @return void
      */
     public function __construct(RouteCollectionInterface $routes, Request $request, $assetRoot = null)
     {

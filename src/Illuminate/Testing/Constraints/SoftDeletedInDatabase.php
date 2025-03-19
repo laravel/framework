@@ -41,7 +41,6 @@ class SoftDeletedInDatabase extends Constraint
      * @param  \Illuminate\Database\Connection  $database
      * @param  array  $data
      * @param  string  $deletedAtColumn
-     * @return void
      */
     public function __construct(Connection $database, array $data, string $deletedAtColumn)
     {

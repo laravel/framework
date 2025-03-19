@@ -53,7 +53,6 @@ class MorphToMany extends BelongsToMany
      * @param  string  $relatedKey
      * @param  string|null  $relationName
      * @param  bool  $inverse
-     * @return void
      */
     public function __construct(
         Builder $query,

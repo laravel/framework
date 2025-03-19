@@ -40,7 +40,6 @@ abstract class Manager
      * Create a new manager instance.
      *
      * @param  \Illuminate\Contracts\Container\Container  $container
-     * @return void
      */
     public function __construct(Container $container)
     {

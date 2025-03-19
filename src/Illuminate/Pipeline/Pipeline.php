@@ -52,7 +52,6 @@ class Pipeline implements PipelineContract
      * Create a new class instance.
      *
      * @param  \Illuminate\Contracts\Container\Container|null  $container
-     * @return void
      */
     public function __construct(?Container $container = null)
     {

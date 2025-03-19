@@ -27,7 +27,6 @@ class NotPwnedVerifier implements UncompromisedVerifier
      *
      * @param  \Illuminate\Http\Client\Factory  $factory
      * @param  int|null  $timeout
-     * @return void
      */
     public function __construct($factory, $timeout = null)
     {

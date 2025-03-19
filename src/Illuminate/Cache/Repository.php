@@ -69,7 +69,6 @@ class Repository implements ArrayAccess, CacheContract
      *
      * @param  \Illuminate\Contracts\Cache\Store  $store
      * @param  array  $config
-     * @return void
      */
     public function __construct(Store $store, array $config = [])
     {

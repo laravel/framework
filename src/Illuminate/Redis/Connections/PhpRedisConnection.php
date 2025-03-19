@@ -35,7 +35,6 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      * @param  \Redis  $client
      * @param  callable|null  $connector
      * @param  array  $config
-     * @return void
      */
     public function __construct($client, ?callable $connector = null, array $config = [])
     {

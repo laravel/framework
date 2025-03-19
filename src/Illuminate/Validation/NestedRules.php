@@ -17,7 +17,6 @@ class NestedRules implements CompilableRules
      * Create a new nested rule instance.
      *
      * @param  callable  $callback
-     * @return void
      */
     public function __construct(callable $callback)
     {

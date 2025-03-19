@@ -36,7 +36,6 @@ class AliasLoader
      * Create a new AliasLoader instance.
      *
      * @param  array  $aliases
-     * @return void
      */
     private function __construct($aliases)
     {

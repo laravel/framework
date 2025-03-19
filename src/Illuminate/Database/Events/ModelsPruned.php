@@ -9,7 +9,6 @@ class ModelsPruned
      *
      * @param  string  $model  The class name of the model that was pruned.
      * @param  int  $count  The number of pruned records.
-     * @return void
      */
     public function __construct(
         public $model,

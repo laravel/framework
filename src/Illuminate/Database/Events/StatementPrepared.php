@@ -9,7 +9,6 @@ class StatementPrepared
      *
      * @param  \Illuminate\Database\Connection  $connection  The database connection instance.
      * @param  \PDOStatement  $statement  The PDO statement.
-     * @return void
      */
     public function __construct(
         public $connection,

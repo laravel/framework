@@ -76,7 +76,6 @@ class RouteListCommand extends Command
      * Create a new route command instance.
      *
      * @param  \Illuminate\Routing\Router  $router
-     * @return void
      */
     public function __construct(Router $router)
     {

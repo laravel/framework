@@ -41,7 +41,6 @@ class CacheManager implements FactoryContract
      * Create a new Cache manager instance.
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
-     * @return void
      */
     public function __construct($app)
     {

@@ -335,7 +335,6 @@ class Validator implements ValidatorContract
      * @param  array  $rules
      * @param  array  $messages
      * @param  array  $attributes
-     * @return void
      */
     public function __construct(
         Translator $translator,

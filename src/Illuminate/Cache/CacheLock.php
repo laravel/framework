@@ -18,7 +18,6 @@ class CacheLock extends Lock
      * @param  string  $name
      * @param  int  $seconds
      * @param  string|null  $owner
-     * @return void
      */
     public function __construct($store, $name, $seconds, $owner = null)
     {

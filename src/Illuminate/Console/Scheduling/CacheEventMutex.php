@@ -26,7 +26,6 @@ class CacheEventMutex implements EventMutex, CacheAware
      * Create a new overlapping strategy.
      *
      * @param  \Illuminate\Contracts\Cache\Factory  $cache
-     * @return void
      */
     public function __construct(Cache $cache)
     {

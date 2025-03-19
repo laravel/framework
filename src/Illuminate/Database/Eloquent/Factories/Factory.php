@@ -146,7 +146,6 @@ abstract class Factory
      * @param  string|null  $connection
      * @param  \Illuminate\Support\Collection|null  $recycle
      * @param  bool  $expandRelationships
-     * @return void
      */
     public function __construct(
         $count = null,
