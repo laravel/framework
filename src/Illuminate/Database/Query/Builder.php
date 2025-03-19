@@ -250,13 +250,6 @@ class Builder implements BuilderContract
     public $useWritePdo = false;
 
     /**
-     * The custom arguments for the PDOStatement::fetchAll / fetch functions.
-     *
-     * @var array
-     */
-    public array $fetchUsing = [];
-
-    /**
      * Create a new query builder instance.
      *
      * @return void
@@ -2407,8 +2400,8 @@ class Builder implements BuilderContract
      * Add a "having" clause to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|\Closure|string  $column
-     * @param  string|int|float|null  $operator
-     * @param  string|int|float|null  $value
+     * @param  \DateTimeInterface|string|int|float|null  $operator
+     * @param  \DateTimeInterface|string|int|float|null  $value
      * @param  string  $boolean
      * @return $this
      */
@@ -2459,8 +2452,8 @@ class Builder implements BuilderContract
      * Add an "or having" clause to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|\Closure|string  $column
-     * @param  string|int|float|null  $operator
-     * @param  string|int|float|null  $value
+     * @param  \DateTimeInterface|string|int|float|null  $operator
+     * @param  \DateTimeInterface|string|int|float|null  $value
      * @return $this
      */
     public function orHaving($column, $operator = null, $value = null)
@@ -2857,10 +2850,9 @@ class Builder implements BuilderContract
     protected function removeExistingOrdersFor($column)
     {
         return (new Collection($this->orders))
-            ->reject(function ($order) use ($column) {
-                return isset($order['column'])
-                       ? $order['column'] === $column : false;
-            })->values()->all();
+            ->reject(fn ($order) => isset($order['column']) && $order['column'] === $column)
+            ->values()
+            ->all();
     }
 
     /**
@@ -3094,13 +3086,9 @@ class Builder implements BuilderContract
      */
     public function get($columns = ['*'])
     {
-        $original = $this->columns;
-
-        $this->columns ??= Arr::wrap($columns);
-
-        $items = new Collection($this->processor->processSelect($this, $this->runSelect()));
-
-        $this->columns = $original;
+        $items = new Collection($this->onceWithColumns(Arr::wrap($columns), function () {
+            return $this->processor->processSelect($this, $this->runSelect());
+        }));
 
         return $this->applyAfterQueryCallbacks(
             isset($this->groupLimit) ? $this->withoutGroupLimitKeys($items) : $items
@@ -3115,7 +3103,7 @@ class Builder implements BuilderContract
     protected function runSelect()
     {
         return $this->connection->select(
-            $this->toSql(), $this->getBindings(), ! $this->useWritePdo, $this->fetchUsing
+            $this->toSql(), $this->getBindings(), ! $this->useWritePdo
         );
     }
 
@@ -3153,7 +3141,7 @@ class Builder implements BuilderContract
      * @param  string  $pageName
      * @param  int|null  $page
      * @param  \Closure|int|null  $total
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     * @return \Illuminate\Pagination\LengthAwarePaginator
      */
     public function paginate($perPage = 15, $columns = ['*'], $pageName = 'page', $page = null, $total = null)
     {
@@ -3316,7 +3304,8 @@ class Builder implements BuilderContract
     {
         return array_map(function ($column) {
             return is_string($column) && ($aliasPosition = stripos($column, ' as ')) !== false
-                    ? substr($column, 0, $aliasPosition) : $column;
+                ? substr($column, 0, $aliasPosition)
+                : $column;
         }, $columns);
     }
 
@@ -3333,7 +3322,7 @@ class Builder implements BuilderContract
 
         return (new LazyCollection(function () {
             yield from $this->connection->cursor(
-                $this->toSql(), $this->getBindings(), ! $this->useWritePdo, $this->fetchUsing
+                $this->toSql(), $this->getBindings(), ! $this->useWritePdo
             );
         }))->map(function ($item) {
             return $this->applyAfterQueryCallbacks(new Collection([$item]))->first();
@@ -3363,8 +3352,6 @@ class Builder implements BuilderContract
      */
     public function pluck($column, $key = null)
     {
-        $original = $this->columns;
-
         // First, we will need to select the results of the query accounting for the
         // given columns / key. Once we have the results, we will be able to take
         // the results and get the exact data that was requested for the query.
@@ -3389,8 +3376,8 @@ class Builder implements BuilderContract
 
         return $this->applyAfterQueryCallbacks(
             is_array($queryResult[0])
-                    ? $this->pluckFromArrayColumn($queryResult, $column, $key)
-                    : $this->pluckFromObjectColumn($queryResult, $column, $key)
+                ? $this->pluckFromArrayColumn($queryResult, $column, $key)
+                : $this->pluckFromObjectColumn($queryResult, $column, $key)
         );
     }
 
@@ -3645,7 +3632,8 @@ class Builder implements BuilderContract
         // cast it to one. When it does we will cast it to a float since it needs to be
         // cast to the expected data type for the developers out of pure convenience.
         return ! str_contains((string) $result, '.')
-                ? (int) $result : (float) $result;
+            ? (int) $result
+            : (float) $result;
     }
 
     /**
@@ -3666,6 +3654,30 @@ class Builder implements BuilderContract
         }
 
         return $this;
+    }
+
+    /**
+     * Execute the given callback while selecting the given columns.
+     *
+     * After running the callback, the columns are reset to the original value.
+     *
+     * @param  array  $columns
+     * @param  callable  $callback
+     * @return mixed
+     */
+    protected function onceWithColumns($columns, $callback)
+    {
+        $original = $this->columns;
+
+        if (is_null($original)) {
+            $this->columns = $columns;
+        }
+
+        $result = $callback();
+
+        $this->columns = $original;
+
+        return $result;
     }
 
     /**
@@ -4058,8 +4070,8 @@ class Builder implements BuilderContract
     public function getColumns()
     {
         return ! is_null($this->columns)
-                ? array_map(fn ($column) => $this->grammar->getValue($column), $this->columns)
-                : [];
+            ? array_map(fn ($column) => $this->grammar->getValue($column), $this->columns)
+            : [];
     }
 
     /**
@@ -4277,19 +4289,6 @@ class Builder implements BuilderContract
     public function useWritePdo()
     {
         $this->useWritePdo = true;
-
-        return $this;
-    }
-
-    /**
-     * Specify arguments for the PDOStatement::fetchAll / fetch functions.
-     *
-     * @param  mixed  ...$fetchUsing
-     * @return $this
-     */
-    public function fetchUsing(...$fetchUsing)
-    {
-        $this->fetchUsing = $fetchUsing;
 
         return $this;
     }

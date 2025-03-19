@@ -257,7 +257,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
             isset($_ENV['APP_BASE_PATH']) => $_ENV['APP_BASE_PATH'],
             default => dirname(array_values(array_filter(
                 array_keys(ClassLoader::getRegisteredLoaders()),
-                fn ($path) => ! str_contains($path, '/vendor/'),
+                fn ($path) => ! str_starts_with($path, 'phar://'),
             ))[0]),
         };
     }
@@ -424,14 +424,14 @@ class Application extends Container implements ApplicationContract, CachesConfig
 
         $this->useBootstrapPath(value(function () {
             return is_dir($directory = $this->basePath('.laravel'))
-                        ? $directory
-                        : $this->basePath('bootstrap');
+                ? $directory
+                : $this->basePath('bootstrap');
         }));
 
         $this->useLangPath(value(function () {
             return is_dir($directory = $this->resourcePath('lang'))
-                        ? $directory
-                        : $this->basePath('lang');
+                ? $directory
+                : $this->basePath('lang');
         }));
     }
 
@@ -1369,8 +1369,8 @@ class Application extends Container implements ApplicationContract, CachesConfig
         }
 
         return Str::startsWith($env, $this->absoluteCachePathPrefixes)
-                ? $env
-                : $this->basePath($env);
+            ? $env
+            : $this->basePath($env);
     }
 
     /**

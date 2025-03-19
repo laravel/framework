@@ -333,9 +333,16 @@ class PostgresGrammar extends Grammar
      */
     public function compileUnique(Blueprint $blueprint, Fluent $command)
     {
-        $sql = sprintf('alter table %s add constraint %s unique (%s)',
+        $uniqueStatement = 'unique';
+
+        if (! is_null($command->nullsNotDistinct)) {
+            $uniqueStatement .= ' nulls '.($command->nullsNotDistinct ? 'not distinct' : 'distinct');
+        }
+
+        $sql = sprintf('alter table %s add constraint %s %s (%s)',
             $this->wrapTable($blueprint),
             $this->wrap($command->index),
+            $uniqueStatement,
             $this->columnize($command->columns)
         );
 
@@ -463,7 +470,7 @@ class PostgresGrammar extends Grammar
      */
     public function compileDropAllTables($tables)
     {
-        return 'drop table '.implode(',', $this->escapeNames($tables)).' cascade';
+        return 'drop table '.implode(', ', $this->escapeNames($tables)).' cascade';
     }
 
     /**
@@ -474,7 +481,7 @@ class PostgresGrammar extends Grammar
      */
     public function compileDropAllViews($views)
     {
-        return 'drop view '.implode(',', $this->escapeNames($views)).' cascade';
+        return 'drop view '.implode(', ', $this->escapeNames($views)).' cascade';
     }
 
     /**
@@ -485,7 +492,7 @@ class PostgresGrammar extends Grammar
      */
     public function compileDropAllTypes($types)
     {
-        return 'drop type '.implode(',', $this->escapeNames($types)).' cascade';
+        return 'drop type '.implode(', ', $this->escapeNames($types)).' cascade';
     }
 
     /**
@@ -496,7 +503,7 @@ class PostgresGrammar extends Grammar
      */
     public function compileDropAllDomains($domains)
     {
-        return 'drop domain '.implode(',', $this->escapeNames($domains)).' cascade';
+        return 'drop domain '.implode(', ', $this->escapeNames($domains)).' cascade';
     }
 
     /**
@@ -682,11 +689,10 @@ class PostgresGrammar extends Grammar
      */
     public function escapeNames($names)
     {
-        return array_map(static function ($name) {
-            return '"'.(new Collection(explode('.', $name)))
-                ->map(fn ($segment) => trim($segment, '\'"'))
-                ->implode('"."').'"';
-        }, $names);
+        return array_map(
+            fn ($name) => (new Collection(explode('.', $name)))->map($this->wrapValue(...))->implode('.'),
+            $names
+        );
     }
 
     /**

@@ -547,8 +547,8 @@ class ResourceRegistrar
     protected function getShallowName($name, $options)
     {
         return isset($options['shallow']) && $options['shallow']
-                    ? last(explode('.', $name))
-                    : $name;
+            ? last(explode('.', $name))
+            : $name;
     }
 
     /**

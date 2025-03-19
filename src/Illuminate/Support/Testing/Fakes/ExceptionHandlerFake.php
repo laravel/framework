@@ -23,7 +23,7 @@ class ExceptionHandlerFake implements ExceptionHandler, Fake
     /**
      * All of the exceptions that have been reported.
      *
-     * @var array<int, \Throwable>
+     * @var list<\Throwable>
      */
     protected $reported = [];
 
@@ -38,7 +38,7 @@ class ExceptionHandlerFake implements ExceptionHandler, Fake
      * Create a new exception handler fake.
      *
      * @param  \Illuminate\Contracts\Debug\ExceptionHandler  $handler
-     * @param  array<int, class-string<\Throwable>>  $exceptions
+     * @param  list<class-string<\Throwable>>  $exceptions
      * @return void
      */
     public function __construct(
@@ -61,7 +61,7 @@ class ExceptionHandlerFake implements ExceptionHandler, Fake
     /**
      * Assert if an exception of the given type has been reported.
      *
-     * @param  \Closure|string  $exception
+     * @param  (\Closure(\Throwable): bool)|class-string<\Throwable>  $exception
      * @return void
      */
     public function assertReported(Closure|string $exception)
@@ -107,7 +107,7 @@ class ExceptionHandlerFake implements ExceptionHandler, Fake
     /**
      * Assert if an exception of the given type has not been reported.
      *
-     * @param  \Closure|string  $exception
+     * @param  (\Closure(\Throwable): bool)|class-string<\Throwable>  $exception
      * @return void
      */
     public function assertNotReported(Closure|string $exception)
@@ -263,7 +263,7 @@ class ExceptionHandlerFake implements ExceptionHandler, Fake
     }
 
     /**
-     * Handle dynamic method calls to the mailer.
+     * Handle dynamic method calls to the handler.
      *
      * @param  string  $method
      * @param  array<string, mixed>  $parameters

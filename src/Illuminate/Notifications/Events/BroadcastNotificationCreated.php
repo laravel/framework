@@ -97,8 +97,8 @@ class BroadcastNotificationCreated implements ShouldBroadcast
     public function broadcastType()
     {
         return method_exists($this->notification, 'broadcastType')
-                    ? $this->notification->broadcastType()
-                    : get_class($this->notification);
+            ? $this->notification->broadcastType()
+            : get_class($this->notification);
     }
 
     /**
@@ -109,7 +109,7 @@ class BroadcastNotificationCreated implements ShouldBroadcast
     public function broadcastAs()
     {
         return method_exists($this->notification, 'broadcastAs')
-                ? $this->notification->broadcastAs()
-                : __CLASS__;
+            ? $this->notification->broadcastAs()
+            : __CLASS__;
     }
 }

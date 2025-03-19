@@ -424,8 +424,8 @@ if (! function_exists('dispatch')) {
     function dispatch($job)
     {
         return $job instanceof Closure
-                ? new PendingClosureDispatch(CallQueuedClosure::create($job))
-                : new PendingDispatch($job);
+            ? new PendingClosureDispatch(CallQueuedClosure::create($job))
+            : new PendingDispatch($job);
     }
 }
 

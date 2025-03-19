@@ -80,6 +80,10 @@ class ValidationUniqueRuleTest extends TestCase
         $rule = new Unique('table');
         $rule->where('foo', '"bar"');
         $this->assertSame('unique:table,NULL,NULL,id,foo,"""bar"""', (string) $rule);
+
+        $rule = new Unique(EloquentModelWithConnection::class, 'column');
+        $rule->where('foo', 'bar');
+        $this->assertSame('unique:mysql.table,column,NULL,id,foo,"bar"', (string) $rule);
     }
 
     public function testItIgnoresSoftDeletes()
@@ -102,6 +106,40 @@ class ValidationUniqueRuleTest extends TestCase
         $rule = new Unique('table');
         $rule->onlyTrashed('softdeleted_at');
         $this->assertSame('unique:table,NULL,NULL,id,softdeleted_at,"NOT_NULL"', (string) $rule);
+    }
+
+    public function testItHandlesNullPrimaryKeyInIgnoreModel()
+    {
+        $model = new EloquentModelStub(['id_column' => null]);
+
+        $rule = new Unique('table', 'column');
+        $rule->ignore($model);
+        $rule->where('foo', 'bar');
+        $this->assertSame('unique:table,column,NULL,id_column,foo,"bar"', (string) $rule);
+
+        $rule = new Unique('table', 'column');
+        $rule->ignore($model, 'id_column');
+        $rule->where('foo', 'bar');
+        $this->assertSame('unique:table,column,NULL,id_column,foo,"bar"', (string) $rule);
+    }
+
+    public function testItHandlesWhereWithSpecialValues()
+    {
+        $rule = new Unique('table', 'column');
+        $rule->where('foo', null);
+        $this->assertSame('unique:table,column,NULL,id,foo,"NULL"', (string) $rule);
+
+        $rule = new Unique('table', 'column');
+        $rule->whereNull('foo');
+        $this->assertSame('unique:table,column,NULL,id,foo,"NULL"', (string) $rule);
+
+        $rule = new Unique('table', 'column');
+        $rule->whereNotNull('foo');
+        $this->assertSame('unique:table,column,NULL,id,foo,"NOT_NULL"', (string) $rule);
+
+        $rule = new Unique('table', 'column');
+        $rule->where('foo', 0);
+        $this->assertSame('unique:table,column,NULL,id,foo,"0"', (string) $rule);
     }
 }
 
@@ -135,4 +173,9 @@ class ClassWithNonEmptyConstructor
         $this->bar = $bar;
         $this->baz = $baz;
     }
+}
+
+class EloquentModelWithConnection extends EloquentModelStub
+{
+    protected $connection = 'mysql';
 }

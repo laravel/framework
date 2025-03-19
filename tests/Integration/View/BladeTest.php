@@ -210,7 +210,7 @@ class BladeTest extends TestCase
         $this->artisan('view:clear');
     }
 
-    protected function getEnvironmentSetUp($app)
+    protected function defineEnvironment($app)
     {
         $app['config']->set('view.paths', [__DIR__.'/templates']);
     }

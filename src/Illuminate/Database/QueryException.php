@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database;
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use PDOException;
 use Throwable;
@@ -85,6 +86,16 @@ class QueryException extends PDOException
     public function getSql()
     {
         return $this->sql;
+    }
+
+    /**
+     * Get the raw SQL representation of the query with embedded bindings.
+     */
+    public function getRawSql(): string
+    {
+        return DB::connection($this->getConnectionName())
+            ->getQueryGrammar()
+            ->substituteBindingsIntoRawSql($this->getSql(), $this->getBindings());
     }
 
     /**

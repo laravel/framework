@@ -103,7 +103,7 @@ class RepositoryTest extends TestCase
         $this->assertSame(3, $cache->get('foo'));
         $this->assertSame(946684832, $cache->get('illuminate:cache:flexible:created:foo'));
 
-        // Now we will execute the deferred callback but we will first aquire
+        // Now we will execute the deferred callback but we will first acquire
         // our own lock. This means that the value should not be refreshed by
         // deferred callback.
         /** @var Lock */
@@ -118,7 +118,7 @@ class RepositoryTest extends TestCase
         $this->assertTrue($lock->release());
 
         // Now we have cleared the lock we will, one last time, confirm that
-        // the deferred callack does refresh the value when the lock is not active.
+        // the deferred callback does refresh the value when the lock is not active.
         defer()->invoke();
         $this->assertCount(0, defer());
         $this->assertSame(4, $cache->get('foo'));

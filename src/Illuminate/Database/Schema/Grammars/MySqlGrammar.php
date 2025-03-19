@@ -381,9 +381,11 @@ class MySqlGrammar extends Grammar
             'collation' => $column['collation'],
             'comment' => $column['comment'],
             'virtualAs' => ! is_null($column['generation']) && $column['generation']['type'] === 'virtual'
-                ? $column['generation']['expression'] : null,
+                ? $column['generation']['expression']
+                : null,
             'storedAs' => ! is_null($column['generation']) && $column['generation']['type'] === 'stored'
-                ? $column['generation']['expression'] : null,
+                ? $column['generation']['expression']
+                : null,
         ]));
 
         return sprintf('alter table %s change %s %s %s',
@@ -653,7 +655,7 @@ class MySqlGrammar extends Grammar
      */
     public function compileDropAllTables($tables)
     {
-        return 'drop table '.implode(',', $this->wrapArray($tables));
+        return 'drop table '.implode(', ', $this->escapeNames($tables));
     }
 
     /**
@@ -664,7 +666,7 @@ class MySqlGrammar extends Grammar
      */
     public function compileDropAllViews($views)
     {
-        return 'drop view '.implode(',', $this->wrapArray($views));
+        return 'drop view '.implode(', ', $this->escapeNames($views));
     }
 
     /**
@@ -699,6 +701,20 @@ class MySqlGrammar extends Grammar
         return sprintf('alter table %s comment = %s',
             $this->wrapTable($blueprint),
             "'".str_replace("'", "''", $command->comment)."'"
+        );
+    }
+
+    /**
+     * Quote-escape the given tables, views, or types.
+     *
+     * @param  array  $names
+     * @return array
+     */
+    public function escapeNames($names)
+    {
+        return array_map(
+            fn ($name) => (new Collection(explode('.', $name)))->map($this->wrapValue(...))->implode('.'),
+            $names
         );
     }
 

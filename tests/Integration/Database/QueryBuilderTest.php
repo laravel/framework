@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Testing\Assert as PHPUnit;
 use Orchestra\Testbench\Attributes\DefineEnvironment;
-use PDO;
 use PDOException;
 
 class QueryBuilderTest extends DatabaseTestCase
@@ -601,12 +600,6 @@ class QueryBuilderTest extends DatabaseTestCase
 
     public function testPluck()
     {
-        // Test empty result set.
-        $this->assertSame(
-            [],
-            DB::table('posts')->whereRaw('0=1')->pluck('title')->toArray()
-        );
-
         // Test SELECT override, since pluck will take the first column.
         $this->assertSame([
             'Foo Post',
@@ -650,47 +643,6 @@ class QueryBuilderTest extends DatabaseTestCase
         // Cast for database compatibility.
         $this->assertSame(2, (int) $result[0]);
         $this->assertSame(2, (int) $result[1]);
-    }
-
-    public function testFetchUsing()
-    {
-        // Fetch column as a list.
-        $this->assertSame([
-            'Foo Post',
-            'Bar Post',
-        ], DB::table('posts')->select(['title'])->fetchUsing(PDO::FETCH_COLUMN)->get()->toArray());
-
-        // Fetch the second column as a list (zero-indexed).
-        $this->assertSame([
-            'Lorem Ipsum.',
-            'Lorem Ipsum.',
-        ], DB::table('posts')->select(['title', 'content'])->fetchUsing(PDO::FETCH_COLUMN, 1)->get()->toArray());
-
-        // Fetch two columns as key value pairs.
-        $this->assertSame([
-            1 => 'Foo Post',
-            2 => 'Bar Post',
-        ], DB::table('posts')->select(['id', 'title'])->fetchUsing(PDO::FETCH_KEY_PAIR)->get()->toArray());
-
-        // Fetch data as associative array with custom key.
-        $result = DB::table('posts')->select(['id', 'title'])->fetchUsing(PDO::FETCH_UNIQUE)->get()->toArray();
-        // Note: results are keyed by their post id here.
-        $this->assertSame('Foo Post', $result[1]->title);
-        $this->assertSame('Bar Post', $result[2]->title);
-
-        // Use a cursor.
-        $this->assertSame([
-            'Foo Post',
-            'Bar Post',
-        ], DB::table('posts')->select(['title'])->fetchUsing(PDO::FETCH_COLUMN)->cursor()->collect()->toArray());
-
-        // Test the default 'object' fetch mode.
-        $result = DB::table('posts')->select(['title'])->fetchUsing(PDO::FETCH_OBJ)->get()->toArray();
-        $result2 = DB::table('posts')->select(['title'])->fetchUsing()->get()->toArray();
-        $this->assertSame('Foo Post', $result[0]->title);
-        $this->assertSame('Bar Post', $result[1]->title);
-        $this->assertSame('Foo Post', $result2[0]->title);
-        $this->assertSame('Bar Post', $result2[1]->title);
     }
 
     protected function defineEnvironmentWouldThrowsPDOException($app)

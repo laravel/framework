@@ -59,8 +59,8 @@ trait SerializesAndRestoresModelIdentifiers
         }
 
         return is_array($value->id)
-                ? $this->restoreCollection($value)
-                : $this->restoreModel($value);
+            ? $this->restoreCollection($value)
+            : $this->restoreModel($value);
     }
 
     /**

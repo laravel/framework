@@ -141,11 +141,11 @@ abstract class Broadcaster implements BroadcasterContract
     {
         $callbackParameters = $this->extractParameters($callback);
 
-        return (new Collection($this->extractChannelKeys($pattern, $channel)))->reject(function ($value, $key) {
-            return is_numeric($key);
-        })->map(function ($value, $key) use ($callbackParameters) {
-            return $this->resolveBinding($key, $value, $callbackParameters);
-        })->values()->all();
+        return (new Collection($this->extractChannelKeys($pattern, $channel)))
+            ->reject(fn ($value, $key) => is_numeric($key))
+            ->map(fn ($value, $key) => $this->resolveBinding($key, $value, $callbackParameters))
+            ->values()
+            ->all();
     }
 
     /**
@@ -299,7 +299,8 @@ abstract class Broadcaster implements BroadcasterContract
     {
         if (! $this->bindingRegistrar) {
             $this->bindingRegistrar = Container::getInstance()->bound(BindingRegistrar::class)
-                        ? Container::getInstance()->make(BindingRegistrar::class) : null;
+                ? Container::getInstance()->make(BindingRegistrar::class)
+                : null;
         }
 
         return $this->bindingRegistrar;

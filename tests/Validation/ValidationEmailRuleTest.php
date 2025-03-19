@@ -11,6 +11,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Email;
 use Illuminate\Validation\ValidationServiceProvider;
 use Illuminate\Validation\Validator;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 
@@ -33,6 +34,18 @@ class ValidationEmailRuleTest extends TestCase
             ['The '.self::ATTRIBUTE_REPLACED.' must be a valid email address.']
         );
 
+        $this->fails(
+            Email::default(),
+            12345,
+            [Email::class]
+        );
+
+        $this->fails(
+            Rule::email(),
+            12345,
+            [Email::class]
+        );
+
         $this->passes(
             Email::default(),
             'taylor@laravel.com'
@@ -41,6 +54,16 @@ class ValidationEmailRuleTest extends TestCase
         $this->passes(
             Rule::email(),
             'taylor@laravel.com'
+        );
+
+        $this->passes(
+            Rule::email(),
+            ['taylor@laravel.com'],
+        );
+
+        $this->passes(
+            Email::default(),
+            ['taylor@laravel.com'],
         );
 
         $this->passes(Email::default(), null);
@@ -143,6 +166,7 @@ class ValidationEmailRuleTest extends TestCase
         );
     }
 
+    #[RequiresPhpExtension('intl')]
     public function testValidateMxRecord()
     {
         $this->fails(
@@ -674,6 +698,7 @@ class ValidationEmailRuleTest extends TestCase
         );
     }
 
+    #[RequiresPhpExtension('intl')]
     public function testCombiningRules()
     {
         $this->passes(
