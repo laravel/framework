@@ -37,38 +37,59 @@ class ValidationAnyOfRuleTest extends TestCase
 
     public function testBasicValidation()
     {
-        $validator = new Validator(
+        $rule = [
+            'email' => Rule::anyOf([
+                ['required', 'min:20'],
+                ['required', 'email'],
+            ]),
+        ];
+
+        $validatorEmail = new Validator(
             resolve('translator'),
             [
                 'email' => 'test@example.com',
             ],
-            [
-                'email' => Rule::anyOf([
-                    ['required', 'min:20'],
-                    ['required', 'email'],
-                ]),
-            ],
+            $rule
         );
+        $this->assertTrue($validatorEmail->passes());
 
-        $this->assertTrue($validator->passes());
-    }
-
-    public function testBasicStringRuleValidation()
-    {
-        $validator = new Validator(
+        $validatorString = new Validator(
             resolve('translator'),
             [
                 'email' => '20charstringtestvalidation',
             ],
+            $rule
+        );
+        $this->assertTrue($validatorString->passes());
+    }
+
+    public function testBareBasicStringRuleValidation()
+    {
+        $rule = [
+            'p1' => Rule::anyOf([
+                ['p2' => 'required|min:20'],
+                'required|min:20'
+            ]),
+        ];
+
+        $validatorNested = new Validator(
+            resolve('translator'),
             [
-                'email' => Rule::anyOf([
-                    'required|min:20',
-                    'required|email',
-                ]),
+                'p1' => ['p2' => '20charstringtestvalidation'],
             ],
+            $rule
         );
 
-        $this->assertTrue($validator->passes());
+        $validatorFlat = new Validator(
+            resolve('translator'),
+            [
+                'p1' => '20charstringtestvalidation',
+            ],
+            $rule
+        );
+
+        $this->assertTrue($validatorNested->passes());
+        $this->assertTrue($validatorFlat->passes());
     }
 
     public function testInvalidEmailValidation()
@@ -182,14 +203,14 @@ class ValidationAnyOfRuleTest extends TestCase
 
         $this->nestedRules = [
             [
-                'p1' => ['required', Rule::anyOf([
+                'p1' => Rule::anyOf([
                     [
-                        'p2' => ['required', 'string'],
-                        'p3' => ['required', Rule::anyOf([[
-                            'p4' => ['nullable', 'string'],
-                        ]])],
+                        'p2' => 'required',
+                        'p3' => Rule::anyOf([[
+                            'p4' => ['nullable'],
+                        ]]),
                     ],
-                ])],
+                ]),
             ],
         ];
     }
