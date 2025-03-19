@@ -106,7 +106,6 @@ class Worker
      * @param  \Illuminate\Contracts\Debug\ExceptionHandler  $exceptions
      * @param  callable  $isDownForMaintenance
      * @param  callable|null  $resetScope
-     * @return void
      */
     public function __construct(
         QueueManager $manager,

@@ -56,7 +56,6 @@ class Dispatcher implements QueueingDispatcher
      *
      * @param  \Illuminate\Contracts\Container\Container  $container
      * @param  \Closure|null  $queueResolver
-     * @return void
      */
     public function __construct(Container $container, ?Closure $queueResolver = null)
     {

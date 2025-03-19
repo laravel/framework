@@ -46,7 +46,6 @@ class Lottery
      *
      * @param  int|float  $chances
      * @param  int|null  $outOf
-     * @return void
      */
     public function __construct($chances, $outOf = null)
     {

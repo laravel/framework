@@ -40,7 +40,6 @@ class ResponseFactory implements FactoryContract
      *
      * @param  \Illuminate\Contracts\View\Factory  $view
      * @param  \Illuminate\Routing\Redirector  $redirector
-     * @return void
      */
     public function __construct(ViewFactory $view, Redirector $redirector)
     {

@@ -42,7 +42,6 @@ class FileLoader implements Loader
      *
      * @param  \Illuminate\Filesystem\Filesystem  $files
      * @param  array|string  $path
-     * @return void
      */
     public function __construct(Filesystem $files, array|string $path)
     {

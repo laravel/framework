@@ -40,7 +40,6 @@ class CallQueuedClosure implements ShouldQueue
      * Create a new job instance.
      *
      * @param  \Laravel\SerializableClosure\SerializableClosure  $closure
-     * @return void
      */
     public function __construct($closure)
     {

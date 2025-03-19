@@ -14,7 +14,6 @@ class Login
      * @param  string  $guard  The authentication guard name.
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user  The authenticated user.
      * @param  bool  $remember  Indicates if the user should be "remembered".
-     * @return void
      */
     public function __construct(
         public $guard,

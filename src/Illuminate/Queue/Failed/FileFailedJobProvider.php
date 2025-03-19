@@ -36,7 +36,6 @@ class FileFailedJobProvider implements CountableFailedJobProvider, FailedJobProv
      * @param  string  $path
      * @param  int  $limit
      * @param  \Closure|null  $lockProviderResolver
-     * @return void
      */
     public function __construct($path, $limit = 100, ?Closure $lockProviderResolver = null)
     {

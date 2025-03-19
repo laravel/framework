@@ -100,7 +100,6 @@ class Migrator
      * @param  \Illuminate\Database\ConnectionResolverInterface  $resolver
      * @param  \Illuminate\Filesystem\Filesystem  $files
      * @param  \Illuminate\Contracts\Events\Dispatcher|null  $dispatcher
-     * @return void
      */
     public function __construct(
         MigrationRepositoryInterface $repository,

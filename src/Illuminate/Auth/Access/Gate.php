@@ -94,7 +94,6 @@ class Gate implements GateContract
      * @param  array  $beforeCallbacks
      * @param  array  $afterCallbacks
      * @param  callable|null  $guessPolicyNamesUsingCallback
-     * @return void
      */
     public function __construct(
         Container $container,

@@ -57,7 +57,6 @@ class BlueprintState
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Database\Connection  $connection
-     * @return void
      */
     public function __construct(Blueprint $blueprint, Connection $connection)
     {

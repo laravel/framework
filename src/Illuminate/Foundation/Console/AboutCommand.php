@@ -53,7 +53,6 @@ class AboutCommand extends Command
      * Create a new command instance.
      *
      * @param  \Illuminate\Support\Composer  $composer
-     * @return void
      */
     public function __construct(Composer $composer)
     {

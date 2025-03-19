@@ -45,7 +45,6 @@ class EnvironmentEncryptCommand extends Command
      * Create a new command instance.
      *
      * @param  \Illuminate\Filesystem\Filesystem  $files
-     * @return void
      */
     public function __construct(Filesystem $files)
     {

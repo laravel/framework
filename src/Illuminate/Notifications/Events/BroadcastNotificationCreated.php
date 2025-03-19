@@ -20,7 +20,6 @@ class BroadcastNotificationCreated implements ShouldBroadcast
      * @param  mixed  $notifiable  The notifiable entity who received the notification.
      * @param  \Illuminate\Notifications\Notification  $notification  The notification instance.
      * @param  array  $data  The notification data.
-     * @return void
      */
     public function __construct(
         public $notifiable,

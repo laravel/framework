@@ -154,7 +154,6 @@ class BelongsToMany extends Relation
      * @param  string  $parentKey
      * @param  string  $relatedKey
      * @param  string|null  $relationName
-     * @return void
      */
     public function __construct(
         Builder $query,

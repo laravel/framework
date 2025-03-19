@@ -69,7 +69,6 @@ class DatabaseManager implements ConnectionResolverInterface
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @param  \Illuminate\Database\Connectors\ConnectionFactory  $factory
-     * @return void
      */
     public function __construct($app, ConnectionFactory $factory)
     {

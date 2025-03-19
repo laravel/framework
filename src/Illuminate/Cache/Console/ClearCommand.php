@@ -45,7 +45,6 @@ class ClearCommand extends Command
      *
      * @param  \Illuminate\Cache\CacheManager  $cache
      * @param  \Illuminate\Filesystem\Filesystem  $files
-     * @return void
      */
     public function __construct(CacheManager $cache, Filesystem $files)
     {

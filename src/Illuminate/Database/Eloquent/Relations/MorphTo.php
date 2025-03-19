@@ -83,7 +83,6 @@ class MorphTo extends BelongsTo
      * @param  string|null  $ownerKey
      * @param  string  $type
      * @param  string  $relation
-     * @return void
      */
     public function __construct(Builder $query, Model $parent, $foreignKey, $ownerKey, $type, $relation)
     {

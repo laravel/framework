@@ -40,7 +40,6 @@ class PasswordBroker implements PasswordBrokerContract
      * @param  \Illuminate\Auth\Passwords\TokenRepositoryInterface  $tokens
      * @param  \Illuminate\Contracts\Auth\UserProvider  $users
      * @param  \Illuminate\Contracts\Events\Dispatcher|null  $dispatcher
-     * @return void
      */
     public function __construct(#[\SensitiveParameter] TokenRepositoryInterface $tokens, UserProvider $users, ?Dispatcher $dispatcher = null)
     {

@@ -59,7 +59,6 @@ class PendingBatch
      *
      * @param  \Illuminate\Contracts\Container\Container  $container
      * @param  \Illuminate\Support\Collection  $jobs
-     * @return void
      */
     public function __construct(Container $container, Collection $jobs)
     {

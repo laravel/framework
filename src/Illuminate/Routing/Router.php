@@ -140,7 +140,6 @@ class Router implements BindingRegistrar, RegistrarContract
      *
      * @param  \Illuminate\Contracts\Events\Dispatcher  $events
      * @param  \Illuminate\Container\Container|null  $container
-     * @return void
      */
     public function __construct(Dispatcher $events, ?Container $container = null)
     {
