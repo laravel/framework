@@ -5,6 +5,7 @@ namespace Illuminate\Support\Testing\Fakes;
 use BadMethodCallException;
 use Closure;
 use Illuminate\Contracts\Queue\Queue;
+use Illuminate\Events\CallQueuedListener;
 use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Support\Collection;
@@ -347,6 +348,29 @@ class QueueFake extends QueueManager implements Fake, Queue
         $callback ??= static fn () => true;
 
         return (new Collection($this->rawPushes))->filter(fn ($data) => $callback($data['payload'], $data['queue'], $data['options']));
+    }
+
+    /**
+     * Get all of the jobs by listener class, passing an optional truth-test callback.
+     *
+     * @param  class-string  $listenerClass
+     * @param  (\Closure(mixed, \Illuminate\Events\CallQueuedListener, string|null, mixed): bool)|null  $callback
+     * @return \Illuminate\Support\Collection<int, \Illuminate\Events\CallQueuedListener>
+     */
+    public function listenersPushed($listenerClass, $callback = null)
+    {
+        if (! $this->hasPushed(CallQueuedListener::class)) {
+            return new Collection;
+        }
+
+        $collection = (new Collection($this->jobs[CallQueuedListener::class]))
+            ->filter(fn ($data) => $data['job']->class === $listenerClass);
+
+        if ($callback) {
+            $collection = $collection->filter(fn ($data) => $callback($data['job']->data[0] ?? null, $data['job'], $data['queue'], $data['data']));
+        }
+
+        return $collection->pluck('job');
     }
 
     /**
