@@ -2008,6 +2008,27 @@ trait HasAttributes
     }
 
     /**
+     * Get all attributes except the given ones.
+     *
+     * @param  array|mixed  $attributes
+     * @return array
+     */
+    public function except($attributes)
+    {
+        $attributes = is_array($attributes) ? $attributes : func_get_args();
+
+        $results = [];
+
+        foreach ($this->getAttributes() as $key => $value) {
+            if (! in_array($key, $attributes)) {
+                $results[$key] = $value;
+            }
+        }
+
+        return $results;
+    }
+
+    /**
      * Sync the original attributes with the current.
      *
      * @return $this
