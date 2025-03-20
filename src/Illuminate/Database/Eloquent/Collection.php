@@ -846,7 +846,6 @@ class Collection extends BaseCollection implements QueueableCollection
         return $model->newModelQuery()->whereKey($this->modelKeys());
     }
 
-
     /**
      * Create a new resource collection instance for the given resource.
      *
