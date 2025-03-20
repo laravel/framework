@@ -83,7 +83,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
             $table->timestamps();
         });
 
-        $this->schema()->create('users_with_uuid', function (Blueprint $table) {
+        $this->schema()->create('users_having_uuids', function (Blueprint $table) {
             $table->id();
             $table->uuid();
             $table->string('name');
@@ -2477,7 +2477,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         DB::enableQueryLog();
         Carbon::setTestNow('2025-03-15T07:32:00Z');
 
-        $this->assertTrue(EloquentTestUser::insertWithCasts([
+        $this->assertTrue(EloquentTestUser::mergeAttributesBeforeInsert()->insert([
             ['email' => 'taylor@laravel.com', 'birthday' => null],
             ['email' => 'nuno@laravel.com', 'birthday' => new Carbon('1980-01-01')],
             ['email' => 'tim@laravel.com', 'birthday' => '1987-11-01', 'created_at' => '2025-01-02T02:00:55', 'updated_at' => Carbon::parse('2025-02-19T11:41:13')],
@@ -2503,7 +2503,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         DB::flushQueryLog();
 
-        $this->assertTrue(EloquentTestWithJSON::insertWithCasts([
+        $this->assertTrue(EloquentTestWithJSON::mergeAttributesBeforeInsert()->insert([
             ['id' => 1, 'json' => ['album' => 'Keep It Like a Secret', 'release_date' => '1999-02-02']],
             ['id' => 2, 'json' => (object) ['album' => 'You In Reverse', 'release_date' => '2006-04-11']],
         ]));
@@ -2526,7 +2526,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
             '22222222-0000-7000-0000-000000000000',
         ]);
 
-        $this->assertTrue(ModelWithUniqueStringIds::insertWithCasts([
+        $this->assertTrue(ModelWithUniqueStringIds::mergeAttributesBeforeInsert()->insert([
             [
                 'name' => 'Taylor', 'role' => IntBackedRole::Admin, 'role_string' => StringBackedRole::Admin,
             ],
@@ -2563,6 +2563,26 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertEquals(IntBackedRole::User, $chris->role);
         $this->assertEquals(StringBackedRole::User, $chris->role_string);
         $this->assertSame('22222222-0000-7000-0000-000000000000', $chris->uuid);
+    }
+
+    public function testMergeBeforeInsertGetId()
+    {
+        Str::createUuidsUsingSequence([
+            '00000000-0000-7000-0000-000000000000',
+        ]);
+
+        DB::enableQueryLog();
+        try {
+            $this->assertSame(1, ModelWithUniqueStringIds::mergeAttributesBeforeInsert()->insertGetId([
+                'name' => 'Taylor',
+                'role' => IntBackedRole::Admin,
+                'role_string' => StringBackedRole::Admin,
+            ]));
+        } catch (\Throwable $t) {
+            dd($t);
+            echo "error";
+        }
+        //dd(DB::getRawQueryLog());
     }
 
     /**
@@ -2897,7 +2917,7 @@ class ModelWithUniqueStringIds extends Eloquent
 
     public $timestamps = false;
 
-    protected $table = 'users_with_uuid';
+    protected $table = 'users_having_uuids';
 
     protected function casts()
     {

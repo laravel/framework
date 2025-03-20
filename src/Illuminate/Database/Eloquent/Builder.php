@@ -61,6 +61,13 @@ class Builder implements BuilderContract
     public $pendingAttributes = [];
 
     /**
+     * Indicates if attributes, timestamps, and unique IDs should be merged before insert.
+     *
+     * @var bool
+     */
+    public $mergeAttributesBeforeInsert = false;
+
+    /**
      * The relationships that should be eager loaded.
      *
      * @var array
@@ -134,6 +141,19 @@ class Builder implements BuilderContract
         'sum',
         'tosql',
         'torawsql',
+    ];
+
+    /**
+     * The pass-thru methods that can have attributes merged before insert.
+     *
+     * @var string[]
+     */
+    protected $mergeBeforeInsertPassThru = [
+        'insert',
+        'insertgetid',
+        'insertorignore',
+        'insertusing',
+        'insertorignoreusing',
     ];
 
     /**
@@ -588,17 +608,47 @@ class Builder implements BuilderContract
         return $callback();
     }
 
+    /*
+     * 'insert',
+        'insertgetid',
+        'insertorignore',
+        'insertusing',
+        'insertorignoreusing',
+     */
+    public function insert(array $values)
+    {
+        if ($this->mergeAttributesBeforeInsert) {
+            $values = $this->castBeforeInsert($values);
+        }
+
+        return $this->forwardCallTo($this->query, 'insert', [$values]);
+    }
+
+    /**
+     * @param  array  $values
+     * @param $sequence
+     * @return int|mixed
+     */
+    public function insertGetId(array $values, $sequence = null)
+    {
+        if ($this->mergeAttributesBeforeInsert) {
+            $values = $this->castBeforeInsert([$values])[0];
+        }
+
+        return $this->forwardCallTo($this->query, 'insertGetId', [$values, $sequence]);
+    }
+
     /**
      * Insert a number of records, merging in default attributes,
      * adding timestamps, and converting casts to raw values.
      *
      * @param  list<array<string, mixed>>  $values
-     * @return bool
+     * @return array
      */
-    public function insertWithCasts($values)
+    public function castBeforeInsert($values)
     {
         if (empty($values)) {
-            return true;
+            [];
         }
 
         if (! is_array(reset($values))) {
@@ -629,7 +679,7 @@ class Builder implements BuilderContract
             }
         });
 
-        return $this->toBase()->insert($values);
+        return $values;
     }
 
     /**
@@ -1881,6 +1931,20 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Indicate if insert methods should merge in default attributes,
+     * add timestamps, and converting casts to raw values.
+     *
+     * @param  bool  $merge
+     * @return $this|Builder
+     */
+    public function mergeAttributesBeforeInsert($merge = true)
+    {
+        $this->mergeAttributesBeforeInsert = $merge;
+
+        return $this;
+    }
+
+    /**
      * Apply query-time casts to the model instance.
      *
      * @param  array  $casts
@@ -2180,7 +2244,10 @@ class Builder implements BuilderContract
             return $this->callNamedScope($method, $parameters);
         }
 
-        if (in_array(strtolower($method), $this->passthru)) {
+        if (in_array($lowerCaseMethod = strtolower($method), $this->passthru)) {
+            if ($this->mergeAttributesBeforeInsert && in_array($lowerCaseMethod, $this->mergeBeforeInsertPassThru)) {
+                $parameters[0] = $this->castBeforeInsert($parameters[0])[0];
+            }
             return $this->toBase()->{$method}(...$parameters);
         }
 
