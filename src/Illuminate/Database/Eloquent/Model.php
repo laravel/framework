@@ -2464,7 +2464,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Create a new resource object for the given resource.
      *
-     * @param class-string<JsonResource> $resourceClass
+     * @param  class-string<JsonResource>  $resourceClass
      * @return JsonResource
      */
     public function toResource(string $resourceClass): JsonResource

@@ -850,7 +850,7 @@ class Collection extends BaseCollection implements QueueableCollection
     /**
      * Create a new resource collection instance for the given resource.
      *
-     * @param class-string<JsonResource> $resourceClass
+     * @param  class-string<JsonResource>  $resourceClass
      * @return ResourceCollection
      */
     public function toResourceCollection(string $resourceClass): ResourceCollection

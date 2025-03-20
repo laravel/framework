@@ -805,7 +805,7 @@ abstract class AbstractPaginator implements Htmlable, Stringable
     /**
      * Create a paginated resource collection.
      *
-     * @param class-string<JsonResource> $resourceClass
+     * @param  class-string<JsonResource>  $resourceClass
      * @return ResourceCollection
      */
     public function toResourceCollection(string $resourceClass): ResourceCollection
