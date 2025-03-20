@@ -2257,6 +2257,10 @@ class Builder implements BuilderContract
             return $this->callNamedScope($method, $parameters);
         }
 
+        if (in_array(strtolower($method), $this->passthru)) {
+            return $this->toBase()->{$method}(...$parameters);
+        }
+
         $this->forwardCallTo($this->query, $method, $parameters);
 
         return $this;
