@@ -144,19 +144,6 @@ class Builder implements BuilderContract
     ];
 
     /**
-     * The pass-thru methods that can have attributes merged before insert.
-     *
-     * @var string[]
-     */
-    protected $mergeBeforeInsertPassThru = [
-        'insert',
-        'insertgetid',
-        'insertorignore',
-        'insertusing',
-        'insertorignoreusing',
-    ];
-
-    /**
      * Applied global scopes.
      *
      * @var array
