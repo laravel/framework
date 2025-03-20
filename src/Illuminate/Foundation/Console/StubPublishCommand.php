@@ -5,7 +5,10 @@ namespace Illuminate\Foundation\Console;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Events\PublishingStubs;
+use Illuminate\Support\Str;
 use Symfony\Component\Console\Attribute\AsCommand;
+
+use function Laravel\Prompts\multisearch;
 
 #[AsCommand(name: 'stub:publish')]
 class StubPublishCommand extends Command
@@ -17,7 +20,8 @@ class StubPublishCommand extends Command
      */
     protected $signature = 'stub:publish
                     {--existing : Publish and overwrite only the files that have already been published}
-                    {--force : Overwrite any existing files}';
+                    {--force : Overwrite any existing files}
+                    {--all : Publish all stubs that are available for customization}';
 
     /**
      * The console command description.
@@ -94,7 +98,7 @@ class StubPublishCommand extends Command
             realpath(__DIR__.'/../../Routing/Console/stubs/middleware.stub') => 'middleware.stub',
         ];
 
-        $this->laravel['events']->dispatch($event = new PublishingStubs($stubs));
+        $this->laravel['events']->dispatch($event = new PublishingStubs($this->determineStubsToPublish($stubs)));
 
         foreach ($event->stubs as $from => $to) {
             $to = $stubsPath.DIRECTORY_SEPARATOR.ltrim($to, DIRECTORY_SEPARATOR);
@@ -106,5 +110,74 @@ class StubPublishCommand extends Command
         }
 
         $this->components->info('Stubs published successfully.');
+    }
+
+    /**
+     * Determine the stubs that should be published.
+     */
+    protected function determineStubsToPublish(array $stubs): array
+    {
+        if ($this->option('all')) {
+            return $stubs;
+        }
+
+        $commonStubs = collect($stubs)
+            ->filter(fn ($to, $from) => Str::contains($from, [
+                'model',
+                'controller',
+                'migration',
+                'seeder',
+                'factory',
+                'test',
+                'pest',
+                'resource',
+                'notification',
+                'mail',
+                'job',
+            ]))
+            ->all();
+
+        return collect($commonStubs)
+            ->only(
+                multisearch(
+                    'Which stubs would you like to publish?',
+                    options: fn ($search) => collect($commonStubs)
+                        ->filter(fn ($to) => str_contains($to, $search))
+                        ->mapWithKeys(fn ($to, $from) => [
+                            $from => $this->forHumans($to),
+                        ])
+                        ->sort()
+                        ->all(),
+                    scroll: 10,
+                )
+            )
+            ->all();
+    }
+
+    /**
+     * Get a human-readable name for the given stub.
+     */
+    private function forHumans(string $stub): string
+    {
+        $parts = Str::of($stub)
+            ->before('.stub')
+            ->replace('-', ' ')
+            ->explode('.')
+            ->map(fn ($part) => Str::of($part)
+                ->title()
+                ->replace('Api', 'API')
+            );
+
+        if ($parts->count() <= 1) {
+            return $parts->first();
+        }
+
+        // Set the second segment as the prefix and join the remaining segments.
+        return $parts
+            ->splice(1, 1)
+            ->pipe(fn ($lead) => collect([
+                $lead->first(),
+                $parts->join(' '),
+            ])->filter()->join(' '));
     }
 }
