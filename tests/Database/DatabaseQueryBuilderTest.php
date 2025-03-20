@@ -155,14 +155,14 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $builder = $this->getBuilder(prefix: 'prefix_');
         $builder->select('*')->from('users as people');
-        $this->assertSame('select * from "prefix_users" as "prefix_people"', $builder->toSql());
+        $this->assertSame('select * from "prefix_users" as "people"', $builder->toSql());
     }
 
     public function testJoinAliasesWithPrefix()
     {
         $builder = $this->getBuilder(prefix: 'prefix_');
         $builder->select('*')->from('services')->join('translations AS t', 't.item_id', '=', 'services.id');
-        $this->assertSame('select * from "prefix_services" inner join "prefix_translations" as "prefix_t" on "prefix_t"."item_id" = "prefix_services"."id"', $builder->toSql());
+        $this->assertSame('select * from "prefix_services" inner join "prefix_translations" as "t" on "prefix_t"."item_id" = "prefix_services"."id"', $builder->toSql());
     }
 
     public function testBasicTableWrapping()
