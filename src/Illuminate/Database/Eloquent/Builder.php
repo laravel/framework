@@ -648,7 +648,7 @@ class Builder implements BuilderContract
             $values = $this->castBeforeInsert($values);
         }
 
-        return $this->forwardCallTo($this->query, 'insertGetId', [$values]);
+        return $this->forwardCallTo($this->query, 'insertOrIgnore', [$values]);
     }
 
     /**
@@ -1947,12 +1947,12 @@ class Builder implements BuilderContract
      * Indicate if insert methods should merge in default attributes,
      * add timestamps, and converting casts to raw values.
      *
-     * @param  bool  $merge
-     * @return $this|Builder
+     * @param  bool  $mergeBeforeInsert
+     * @return $this
      */
-    public function mergeAttributesBeforeInsert($merge = true)
+    public function mergeAttributesBeforeInsert($mergeBeforeInsert = true)
     {
-        $this->mergeAttributesBeforeInsert = $merge;
+        $this->mergeAttributesBeforeInsert = $mergeBeforeInsert;
 
         return $this;
     }
