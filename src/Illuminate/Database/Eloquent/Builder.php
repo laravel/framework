@@ -658,7 +658,7 @@ class Builder implements BuilderContract
      * @param  array<int, <array<string, mixed>>  $values
      * @return array
      */
-    public function castBeforeInsert($values)
+    public function castBeforeInsert(array $values)
     {
         if (empty($values)) {
             return [];

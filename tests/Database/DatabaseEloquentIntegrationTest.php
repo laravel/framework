@@ -198,6 +198,8 @@ class DatabaseEloquentIntegrationTest extends TestCase
         Eloquent::unsetConnectionResolver();
 
         Carbon::setTestNow(null);
+        Str::createUuidsNormally();
+        DB::flushQueryLog();
     }
 
     /**
@@ -2573,11 +2575,11 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         DB::enableQueryLog();
 
-        $newId = ModelWithUniqueStringIds::mergeAttributesBeforeInsert()->insertGetId([
+        $this->assertIsInt($newId = ModelWithUniqueStringIds::mergeAttributesBeforeInsert()->insertGetId([
             'name' => 'Taylor',
             'role' => IntBackedRole::Admin,
             'role_string' => StringBackedRole::Admin,
-        ]);
+        ]));
         $this->assertCount(1, DB::getRawQueryLog());
         $this->assertSame($newId, ModelWithUniqueStringIds::sole()->id);
     }
