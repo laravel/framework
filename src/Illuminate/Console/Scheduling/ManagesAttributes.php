@@ -49,6 +49,13 @@ trait ManagesAttributes
     public $evenInMaintenanceMode = false;
 
     /**
+     * Indicates if the command should run only in maintenance mode.
+     *
+     * @var bool
+     */
+    public $onlyInMaintenanceMode = false;
+
+    /**
      * Indicates if the command should not overlap itself.
      *
      * @var bool
@@ -131,6 +138,18 @@ trait ManagesAttributes
     public function evenInMaintenanceMode()
     {
         $this->evenInMaintenanceMode = true;
+
+        return $this;
+    }
+
+    /**
+     * State that the command should run only in maintenance mode.
+     *
+     * @return $this
+     */
+    public function onlyInMaintenanceMode()
+    {
+        $this->onlyInMaintenanceMode = true;
 
         return $this;
     }

@@ -268,8 +268,14 @@ class Event
      */
     public function isDue($app)
     {
-        if (! $this->runsInMaintenanceMode() && $app->isDownForMaintenance()) {
-            return false;
+        if ($app->isDownForMaintenance()) {
+            if (! $this->runsInMaintenanceMode()) {
+                return false;
+            }
+        } else {
+            if (! $this->runsInLiveMode()) {
+                return false;
+            }
         }
 
         return $this->expressionPasses() &&
@@ -283,7 +289,17 @@ class Event
      */
     public function runsInMaintenanceMode()
     {
-        return $this->evenInMaintenanceMode;
+        return $this->evenInMaintenanceMode || $this->onlyInMaintenanceMode;
+    }
+
+    /**
+     * Determine if the event can run when the application is in live mode.
+     *
+     * @return bool
+     */
+    public function runsInLiveMode()
+    {
+        return ! $this->onlyInMaintenanceMode;
     }
 
     /**

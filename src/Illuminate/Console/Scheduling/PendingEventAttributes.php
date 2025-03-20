@@ -62,6 +62,10 @@ class PendingEventAttributes
             $event->evenInMaintenanceMode();
         }
 
+        if ($this->onlyInMaintenanceMode) {
+            $event->onlyInMaintenanceMode();
+        }
+
         if ($this->withoutOverlapping) {
             $event->withoutOverlapping($this->expiresAt);
         }

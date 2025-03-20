@@ -174,6 +174,50 @@ class SubMinuteSchedulingTest extends TestCase
         $this->assertEquals(60, $runs);
     }
 
+    public function test_sub_minute_events_dont_run_in_live_mode_with_onlyInMaintenanceMode()
+    {
+        $runs = 0;
+        $this->schedule->call(function () use (&$runs) {
+            $runs++;
+        })->everySecond()->onlyInMaintenanceMode();
+
+        Config::set('app.maintenance.driver', 'cache');
+        Config::set('app.maintenance.store', 'array');
+        Carbon::setTestNow(now()->startOfMinute());
+        Sleep::fake();
+        Sleep::whenFakingSleep(function ($duration)  {
+            Carbon::setTestNow(now()->add($duration));
+        });
+        $this->artisan('up');
+
+        $this->artisan('schedule:run')
+            ->doesntExpectOutputToContain('Running [Callback]');
+
+        $this->assertEquals(0, $runs);
+    }
+
+    public function test_sub_minute_events_run_in_maintenance_mode_with_onlyInMaintenanceMode()
+    {
+        $runs = 0;
+        $this->schedule->call(function () use (&$runs) {
+            $runs++;
+        })->everySecond()->onlyInMaintenanceMode();
+
+        Config::set('app.maintenance.driver', 'cache');
+        Config::set('app.maintenance.store', 'array');
+        Carbon::setTestNow(now()->startOfMinute());
+        Sleep::fake();
+        Sleep::whenFakingSleep(function ($duration)  {
+            Carbon::setTestNow(now()->add($duration));
+        });
+        $this->artisan('down');
+
+        $this->artisan('schedule:run')
+            ->expectsOutputToContain('Running [Callback]');
+
+        $this->assertEquals(60, $runs);
+    }
+
     public function test_sub_minute_scheduling_respects_filters()
     {
         $runs = 0;
