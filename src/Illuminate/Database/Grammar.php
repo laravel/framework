@@ -130,7 +130,7 @@ abstract class Grammar
 
         $prefix ??= $this->connection->getTablePrefix();
 
-        return $this->wrapTable($segments[0], $prefix).' as '.$this->wrapValue($prefix.$segments[1]);
+        return $this->wrapTable($segments[0], $prefix).' as '.$this->wrapValue($segments[1]);
     }
 
     /**
