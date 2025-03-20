@@ -615,6 +615,11 @@ class Builder implements BuilderContract
         'insertusing',
         'insertorignoreusing',
      */
+    /**
+     * Insert new records into the database.
+     *
+     * @return bool
+     */
     public function insert(array $values)
     {
         if ($this->mergeAttributesBeforeInsert) {
@@ -625,9 +630,10 @@ class Builder implements BuilderContract
     }
 
     /**
-     * @param  array  $values
-     * @param $sequence
-     * @return int|mixed
+     * Insert a new record and get the value of the primary key.
+     *
+     * @param  string|null  $sequence
+     * @return int
      */
     public function insertGetId(array $values, $sequence = null)
     {
@@ -639,16 +645,30 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Insert new records into the database while ignoring errors.
+     *
+     * @return int
+     */
+    public function insertOrIgnore(array $values)
+    {
+        if ($this->mergeAttributesBeforeInsert) {
+            $values = $this->castBeforeInsert($values);
+        }
+
+        return $this->forwardCallTo($this->query, 'insertGetId', [$values]);
+    }
+
+    /**
      * Insert a number of records, merging in default attributes,
      * adding timestamps, and converting casts to raw values.
      *
-     * @param  list<array<string, mixed>>  $values
+     * @param  array<int, <array<string, mixed>>  $values
      * @return array
      */
     public function castBeforeInsert($values)
     {
         if (empty($values)) {
-            [];
+            return [];
         }
 
         if (! is_array(reset($values))) {
@@ -2242,13 +2262,6 @@ class Builder implements BuilderContract
 
         if ($this->hasNamedScope($method)) {
             return $this->callNamedScope($method, $parameters);
-        }
-
-        if (in_array($lowerCaseMethod = strtolower($method), $this->passthru)) {
-            if ($this->mergeAttributesBeforeInsert && in_array($lowerCaseMethod, $this->mergeBeforeInsertPassThru)) {
-                $parameters[0] = $this->castBeforeInsert($parameters[0])[0];
-            }
-            return $this->toBase()->{$method}(...$parameters);
         }
 
         $this->forwardCallTo($this->query, $method, $parameters);
