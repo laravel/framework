@@ -4,6 +4,8 @@ namespace Illuminate\Pagination;
 
 use Closure;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\ForwardsCalls;
@@ -798,5 +800,16 @@ abstract class AbstractPaginator implements Htmlable, Stringable
     public function __toString()
     {
         return (string) $this->render();
+    }
+
+    /**
+     * Create a paginated resource collection.
+     *
+     * @param class-string<JsonResource> $resourceClass
+     * @return ResourceCollection
+     */
+    public function toResourceCollection(string $resourceClass): ResourceCollection
+    {
+        return $resourceClass::collection($this);
     }
 }

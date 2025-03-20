@@ -6,6 +6,8 @@ use Illuminate\Contracts\Queue\QueueableCollection;
 use Illuminate\Contracts\Queue\QueueableEntity;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithDictionary;
+use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as BaseCollection;
 use LogicException;
@@ -842,5 +844,17 @@ class Collection extends BaseCollection implements QueueableCollection
         }
 
         return $model->newModelQuery()->whereKey($this->modelKeys());
+    }
+
+
+    /**
+     * Create a new resource collection instance for the given resource.
+     *
+     * @param class-string<JsonResource> $resourceClass
+     * @return ResourceCollection
+     */
+    public function toResourceCollection(string $resourceClass): ResourceCollection
+    {
+        return $resourceClass::collection($this);
     }
 }
