@@ -185,7 +185,7 @@ class SubMinuteSchedulingTest extends TestCase
         Config::set('app.maintenance.store', 'array');
         Carbon::setTestNow(now()->startOfMinute());
         Sleep::fake();
-        Sleep::whenFakingSleep(function ($duration)  {
+        Sleep::whenFakingSleep(function ($duration) {
             Carbon::setTestNow(now()->add($duration));
         });
         $this->artisan('up');
@@ -207,7 +207,7 @@ class SubMinuteSchedulingTest extends TestCase
         Config::set('app.maintenance.store', 'array');
         Carbon::setTestNow(now()->startOfMinute());
         Sleep::fake();
-        Sleep::whenFakingSleep(function ($duration)  {
+        Sleep::whenFakingSleep(function ($duration) {
             Carbon::setTestNow(now()->add($duration));
         });
         $this->artisan('down');
