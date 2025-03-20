@@ -2572,17 +2572,14 @@ class DatabaseEloquentIntegrationTest extends TestCase
         ]);
 
         DB::enableQueryLog();
-        try {
-            $this->assertSame(1, ModelWithUniqueStringIds::mergeAttributesBeforeInsert()->insertGetId([
-                'name' => 'Taylor',
-                'role' => IntBackedRole::Admin,
-                'role_string' => StringBackedRole::Admin,
-            ]));
-        } catch (\Throwable $t) {
-            dd($t);
-            echo "error";
-        }
-        //dd(DB::getRawQueryLog());
+
+        $newId = ModelWithUniqueStringIds::mergeAttributesBeforeInsert()->insertGetId([
+            'name' => 'Taylor',
+            'role' => IntBackedRole::Admin,
+            'role_string' => StringBackedRole::Admin,
+        ]);
+        $this->assertCount(1, DB::getRawQueryLog());
+        $this->assertSame($newId, ModelWithUniqueStringIds::sole()->id);
     }
 
     /**
