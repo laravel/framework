@@ -608,13 +608,6 @@ class Builder implements BuilderContract
         return $callback();
     }
 
-    /*
-     * 'insert',
-        'insertgetid',
-        'insertorignore',
-        'insertusing',
-        'insertorignoreusing',
-     */
     /**
      * Insert new records into the database.
      *
