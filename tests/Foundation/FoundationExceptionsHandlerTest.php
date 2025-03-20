@@ -571,6 +571,35 @@ class FoundationExceptionsHandlerTest extends TestCase
         }
     }
 
+    public function testAssertNoExceptionIsThrown()
+    {
+        try {
+            $this->assertThrowsNothing(function () {
+                throw new Exception;
+            });
+
+            $testFailed = true;
+        } catch (AssertionFailedError) {
+            $testFailed = false;
+        }
+
+        if ($testFailed) {
+            Assert::fail('assertThrowsNothing failed: thrown exception was not detected.');
+        }
+
+        try {
+            $this->assertThrowsNothing(function () { });
+
+            $testFailed = false;
+        } catch (AssertionFailedError) {
+            $testFailed = true;
+        }
+
+        if ($testFailed) {
+            Assert::fail('assertThrowsNothing failed: exception was detected while no exception was thrown.');
+        }
+    }
+
     public function testItReportsDuplicateExceptions()
     {
         $reported = [];
