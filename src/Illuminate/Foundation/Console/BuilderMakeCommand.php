@@ -107,7 +107,7 @@ class BuilderMakeCommand extends GeneratorCommand
 
             $replacements['{{ modelGenericPhpdoc }}'] = <<<EOT
             /**
-             * @template TModelClass of $modelNamespace
+             * @template TModel of $modelNamespace
              *
              * @extends Builder<$modelNamespace>
              */
