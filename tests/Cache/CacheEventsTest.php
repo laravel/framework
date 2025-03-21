@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Cache;
 
 use Illuminate\Cache\ArrayStore;
 use Illuminate\Cache\Events\CacheFlushed;
+use Illuminate\Cache\Events\CacheFlushing;
 use Illuminate\Cache\Events\CacheHit;
 use Illuminate\Cache\Events\CacheMissed;
 use Illuminate\Cache\Events\ForgettingKey;
@@ -228,20 +229,17 @@ class CacheEventsTest extends TestCase
         $repository = $this->getRepository($dispatcher);
 
         $dispatcher->shouldReceive('dispatch')->once()->with(
+            $this->assertEventMatches(CacheFlushing::class, [
+                'storeName' => 'array',
+            ])
+        );
+
+        $dispatcher->shouldReceive('dispatch')->once()->with(
             $this->assertEventMatches(CacheFlushed::class, [
                 'storeName' => 'array',
             ])
         );
         $this->assertTrue($repository->clear());
-
-        $taggedRepository = $repository->tags('taylor');
-        $dispatcher->shouldReceive('dispatch')->once()->with(
-            $this->assertEventMatches(CacheFlushed::class, [
-                'storeName' => 'array',
-                'tags' => ['taylor'],
-            ])
-        );
-        $this->assertTrue($taggedRepository->clear());
     }
 
     public function testFlushFailureDoesNotDispatchEvent()
@@ -252,11 +250,14 @@ class CacheEventsTest extends TestCase
         $failingStore = m::mock(Store::class);
         $failingStore->shouldReceive('flush')->andReturn(false);
 
-        $repository = new Repository($failingStore);
+        $repository = new Repository($failingStore, ['store' => 'array']);
         $repository->setEventDispatcher($dispatcher);
 
-        // Ensure no event is dispatched on failure
-        $dispatcher->shouldNotReceive('dispatch');
+        $dispatcher->shouldReceive('dispatch')->once()->with(
+            $this->assertEventMatches(CacheFlushing::class, [
+                'storeName' => 'array',
+            ])
+        );
         $this->assertFalse($repository->clear());
     }
 

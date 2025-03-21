@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Support;
 
 use Illuminate\Cache\CacheManager;
 use Illuminate\Cache\Events\CacheFlushed;
+use Illuminate\Cache\Events\CacheFlushing;
 use Illuminate\Cache\Events\CacheMissed;
 use Illuminate\Cache\Events\RetrievingKey;
 use Illuminate\Config\Repository as ConfigRepository;
@@ -95,6 +96,7 @@ class SupportFacadesEventTest extends TestCase
 
         $arrayRepository->clear();
 
+        Event::assertDispatched(CacheFlushing::class);
         Event::assertDispatched(CacheFlushed::class);
     }
 
