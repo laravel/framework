@@ -199,27 +199,24 @@ class BroadcastingInstallCommand extends Command
 
         $this->components->info('Installing and building Node dependencies.');
 
-        // Node dependencies are the same regardless of whether --react flag is set
-        $packages = 'laravel-echo pusher-js';
-
         if (file_exists(base_path('pnpm-lock.yaml'))) {
             $commands = [
-                "pnpm add --save-dev {$packages}",
+                'pnpm add --save-dev laravel-echo pusher-js',
                 'pnpm run build',
             ];
         } elseif (file_exists(base_path('yarn.lock'))) {
             $commands = [
-                "yarn add --dev {$packages}",
+                'yarn add --dev laravel-echo pusher-js',
                 'yarn run build',
             ];
         } elseif (file_exists(base_path('bun.lock')) || file_exists(base_path('bun.lockb'))) {
             $commands = [
-                "bun add --dev {$packages}",
+                'bun add --dev laravel-echo pusher-js',
                 'bun run build',
             ];
         } else {
             $commands = [
-                "npm install --save-dev {$packages}",
+                'npm install --save-dev laravel-echo pusher-js',
                 'npm run build',
             ];
         }
