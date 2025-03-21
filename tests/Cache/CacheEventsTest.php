@@ -229,7 +229,7 @@ class CacheEventsTest extends TestCase
 
         $dispatcher->shouldReceive('dispatch')->once()->with(
             $this->assertEventMatches(CacheFlushed::class, [
-                'storeName' => 'array'
+                'storeName' => 'array',
             ])
         );
         $this->assertTrue($repository->clear());
@@ -238,7 +238,7 @@ class CacheEventsTest extends TestCase
         $dispatcher->shouldReceive('dispatch')->once()->with(
             $this->assertEventMatches(CacheFlushed::class, [
                 'storeName' => 'array',
-                'tags' => ['taylor']
+                'tags' => ['taylor'],
             ])
         );
         $this->assertTrue($taggedRepository->clear());

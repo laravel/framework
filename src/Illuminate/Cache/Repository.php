@@ -581,6 +581,7 @@ class Repository implements ArrayAccess, CacheContract
         if ($result) {
             $this->event(new CacheFlushed($this->getName()));
         }
+
         return $result;
     }
 
