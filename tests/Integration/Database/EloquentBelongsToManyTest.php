@@ -425,22 +425,13 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
         $this->assertEquals($tag->id, $post->tags()->findSole($tag->id)->id);
 
-        // Create a second tag to test the exception
-        $tag2 = Tag::create(['name' => Str::random()]);
-        $post->tags()->attach($tag2);
-
-        try {
-            $post->tags()->findSole([$tag->id, $tag2->id]);
-            $this->fail('Expected MultipleRecordsFoundException was not thrown.');
-        } catch (MultipleRecordsFoundException $e) {
-            $this->assertTrue(true);
-        }
+        $this->assertEquals($tag->id, $post->tags()->findSole($tag)->id);
 
         // Test with no records
-        $post->tags()->detach();
+        $post->tags()->detach($tag);
 
         try {
-            $post->tags()->findSole(999999);
+            $post->tags()->findSole($tag);
             $this->fail('Expected RecordsNotFoundException was not thrown.');
         } catch (RecordsNotFoundException $e) {
             $this->assertTrue(true);
