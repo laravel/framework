@@ -14,7 +14,7 @@ abstract class CacheEvent
     /**
      * The key of the event.
      *
-     * @var string|null
+     * @var string
      */
     public $key;
 
@@ -29,11 +29,11 @@ abstract class CacheEvent
      * Create a new event instance.
      *
      * @param  string|null  $storeName
-     * @param  string|null  $key
+     * @param  string  $key
      * @param  array  $tags
      * @return void
      */
-    public function __construct($storeName, $key = null, array $tags = [])
+    public function __construct($storeName, $key, array $tags = [])
     {
         $this->storeName = $storeName;
         $this->key = $key;
