@@ -2255,6 +2255,25 @@ class RoutingRouteTest extends TestCase
         $this->assertSame($response, $prepared[1]->response);
     }
 
+    public function testRequestUpdateInContainerAfterMiddlewarePipeline(): void
+    {
+        $router = $this->getRouter();
+        $immutableRequest = Request::create('immutable/request', 'POST');
+        $middleware = function ($request, $next) use ($immutableRequest) {
+            return $next($immutableRequest);
+        };
+        $router->get('foo/bar', ['middleware' => $middleware, function () {
+            return 'response';
+        }]);
+
+        $router->dispatch(Request::create('foo/bar', 'GET'));
+
+        $reflection = new \ReflectionClass($router);
+        $container = $reflection->getProperty('container')->getValue($router);
+
+        $this->assertSame($immutableRequest, $container->get('request'));
+    }
+
     protected function getRouter($container = null)
     {
         $container ??= new Container;
