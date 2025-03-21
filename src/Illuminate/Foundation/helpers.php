@@ -825,7 +825,7 @@ if (! function_exists('response')) {
      * @param  \Illuminate\Contracts\View\View|string|array|null  $content
      * @param  int  $status
      * @param  array  $headers
-     * @return ($content is null ? \Illuminate\Contracts\Routing\ResponseFactory : \Illuminate\Http\Response)
+     * @return \Illuminate\Http\Response|\Illuminate\Contracts\Routing\ResponseFactory
      */
     function response($content = null, $status = 200, array $headers = [])
     {
