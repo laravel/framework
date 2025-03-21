@@ -159,6 +159,19 @@ class Migrator
             ->all();
     }
 
+     /**
+     * Determine if the migration should be ran.
+     *
+     * @param  object  $migration
+     * @return bool
+     */
+    public function shouldSkipMigration($migration)
+    {
+        return $migration instanceof Migration
+            ? ! $migration->shouldRun()
+            : false;
+    }
+
     /**
      * Determine if the migration should be ran.
      *
