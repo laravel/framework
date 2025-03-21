@@ -175,7 +175,7 @@ class MorphToMany extends BelongsToMany
      *
      * "pivot_" is prefixed at each column for easy removal later.
      *
-     * @return array
+     * @return list<string>
      */
     protected function aliasedPivotColumns()
     {

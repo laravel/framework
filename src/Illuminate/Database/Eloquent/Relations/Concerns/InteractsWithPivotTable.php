@@ -600,6 +600,31 @@ trait InteractsWithPivotTable
     }
 
     /**
+     * Retrieve all the pivot columns.
+     *
+     * @return $this
+     */
+    public function withAllPivots(): static
+    {
+        $columns = static::$pivotColumnsCache[$this->table] ?? null;
+
+        if ($columns === null) {
+            $columns = $this->getConnection()
+                ->getSchemaBuilder()
+                ->getColumnListing($this->table);
+            static::$pivotColumnsCache[$this->table] = $columns;
+        }
+
+        $this->pivotColumns = [...$this->pivotColumns, ...$columns];
+
+        if (in_array($this->createdAt(), $columns, true)) {
+            $this->withTimestamps = true;
+        }
+
+        return $this;
+    }
+
+    /**
      * Get all of the IDs from the given mixed value.
      *
      * @param  mixed  $value

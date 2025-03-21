@@ -37,9 +37,11 @@ class EloquentPivotTest extends DatabaseTestCase
         });
 
         Schema::create('subscriptions', function (Blueprint $table) {
+            $table->id();
             $table->integer('user_id');
             $table->integer('project_id');
             $table->string('status');
+            $table->timestamps();
         });
     }
 
@@ -82,26 +84,42 @@ class EloquentPivotTest extends DatabaseTestCase
         $this->assertSame('active', $user->activeSubscriptions->first()->pivot->status);
         $this->assertSame('inactive', $user->inactiveSubscriptions->first()->pivot->status);
     }
+
+    public function testPivotsCanBeLoadedWithAllColumns()
+    {
+        $user = PivotTestUser::forceCreate(['email' => 'taylor@laravel.com']);
+        $active = PivotTestProject::forceCreate(['name' => 'Active Project']);
+
+        $user->subscriptions()->attach($active);
+
+        $this->assertNotNull($user->subscriptionsAllPivots->first()->pivot->id);
+        $this->assertTrue($user->subscriptionsAllPivots()->withTimestamps);
+    }
 }
 
 class PivotTestUser extends Model
 {
     public $table = 'users';
 
-    public function activeSubscriptions()
+    public function subscriptions()
     {
         return $this->belongsToMany(PivotTestProject::class, 'subscriptions', 'user_id', 'project_id')
-            ->withPivotValue('status', 'active')
-            ->withPivot('status')
             ->using(PivotTestSubscription::class);
+    }
+
+    public function activeSubscriptions()
+    {
+        return $this->subscriptions()->withPivotValue('status', 'active');
     }
 
     public function inactiveSubscriptions()
     {
-        return $this->belongsToMany(PivotTestProject::class, 'subscriptions', 'user_id', 'project_id')
-            ->withPivotValue('status', 'inactive')
-            ->withPivot('status')
-            ->using(PivotTestSubscription::class);
+        return $this->subscriptions()->withPivotValue('status', 'inactive');
+    }
+
+    public function subscriptionsAllPivots()
+    {
+        return $this->subscriptions()->withAllPivots();
     }
 }
 
@@ -152,8 +170,6 @@ class PivotTestContributor extends Pivot
 class PivotTestSubscription extends Pivot
 {
     public $table = 'subscriptions';
-
-    public $timestamps = false;
 
     protected $attributes = [
         'status' => 'active',

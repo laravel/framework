@@ -76,7 +76,7 @@ class BelongsToMany extends Relation
     /**
      * The pivot table columns to retrieve.
      *
-     * @var array<string|\Illuminate\Contracts\Database\Query\Expression>
+     * @var list<string|\Illuminate\Contracts\Database\Query\Expression>
      */
     protected $pivotColumns = [];
 
@@ -142,6 +142,13 @@ class BelongsToMany extends Relation
      * @var TAccessor
      */
     protected $accessor = 'pivot';
+
+    /**
+     * The cache of the pivot columns in the pivot table.
+     *
+     * @var array<string, list<string>>
+     */
+    protected static array $pivotColumnsCache = [];
 
     /**
      * Create a new belongs to many relationship instance.
@@ -926,8 +933,8 @@ class BelongsToMany extends Relation
     /**
      * Get the select columns for the relation query.
      *
-     * @param  array  $columns
-     * @return array
+     * @param  list<string>  $columns
+     * @return list<string>
      */
     protected function shouldSelect(array $columns = ['*'])
     {
@@ -943,7 +950,7 @@ class BelongsToMany extends Relation
      *
      * "pivot_" is prefixed at each column for easy removal later.
      *
-     * @return array
+     * @return list<string>
      */
     protected function aliasedPivotColumns()
     {
@@ -1657,7 +1664,7 @@ class BelongsToMany extends Relation
     /**
      * Get the pivot columns for this relationship.
      *
-     * @return array
+     * @return list<string|\Illuminate\Contracts\Database\Query\Expression>
      */
     public function getPivotColumns()
     {
@@ -1668,7 +1675,7 @@ class BelongsToMany extends Relation
      * Qualify the given column name by the pivot table.
      *
      * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
-     * @return string|\Illuminate\Contracts\Database\Query\Expression
+     * @return ($column is string ? string : \Illuminate\Contracts\Database\Query\Expression)
      */
     public function qualifyPivotColumn($column)
     {
