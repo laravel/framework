@@ -76,7 +76,7 @@ class BuilderMakeCommand extends GeneratorCommand
         return $rootNamespace.'\Models\Builders';
     }
 
-     /**
+    /**
      * Build the class with the given name.
      *
      * @param  string  $name
@@ -93,7 +93,7 @@ class BuilderMakeCommand extends GeneratorCommand
         );
     }
 
-     /**
+    /**
      * Build the replacements for a model.
      *
      * @return array<string, string>
@@ -105,7 +105,7 @@ class BuilderMakeCommand extends GeneratorCommand
         if ($this->option('model')) {
             $modelNamespace = $this->option('model');
 
-            $replacements["{{ modelGenericPhpdoc }}"] = <<<EOT
+            $replacements['{{ modelGenericPhpdoc }}'] = <<<EOT
             /**
              * @template TModelClass of $modelNamespace
              *
