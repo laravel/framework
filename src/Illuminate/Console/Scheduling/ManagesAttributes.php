@@ -226,7 +226,7 @@ trait ManagesAttributes
      */
     public function description($description)
     {
-        $this->description = config('scheduler_prefix', '') . $description;
+        $this->description = config('app.scheduler_prefix', '').$description;
 
         return $this;
     }
