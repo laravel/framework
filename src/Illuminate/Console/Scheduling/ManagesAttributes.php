@@ -226,7 +226,7 @@ trait ManagesAttributes
      */
     public function description($description)
     {
-        $this->description = $description;
+        $this->description = env("APP_SCHEDULER_PREFIX", "") . $description;
 
         return $this;
     }
