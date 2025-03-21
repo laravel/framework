@@ -159,7 +159,7 @@ class Migrator
             ->all();
     }
 
-     /**
+    /**
      * Determine if the migration should be ran.
      *
      * @param  object  $migration
@@ -264,9 +264,6 @@ class Migrator
             // in the application. A migration repository keeps the migrate order.
             $this->repository->log($name, $batch);
         }
-
-
-
     }
 
     /**
@@ -441,15 +438,12 @@ class Migrator
      */
     protected function runMigration($migration, $method)
     {
-
         $connection = $this->resolveConnection(
             $migration->getConnection()
         );
 
         $callback = function () use ($connection, $migration, $method) {
-
             if (method_exists($migration, $method)) {
-
                 $this->fireMigrationEvent(new MigrationStarted($migration, $method));
 
                 $this->runMethod($connection, $migration, $method);
@@ -557,7 +551,6 @@ class Migrator
         $class = $this->getMigrationClass($this->getMigrationName($path));
 //        dd($class, $this->getMigrationName($path));
         if (class_exists($class) && realpath($path) == (new ReflectionClass($class))->getFileName()) {
-
             return new $class;
         }
 
@@ -568,6 +561,7 @@ class Migrator
                 ? $this->files->getRequire($path)
                 : clone $migration;
         }
+
         return new $class;
     }
 

@@ -54,7 +54,7 @@ class Task extends Component
             $this->output->write("<fg=gray>$runTime</>", false, $verbosity);
 
             $this->output->writeln(
-                match($result) {
+                match ($result) {
                     MigrationResult::Failure => ' <fg=red;options=bold>FAIL</>',
                     MigrationResult::Skipped => ' <fg=yellow;options=bold>SKIPPED</>',
                     default => ' <fg=green;options=bold>DONE</>'
