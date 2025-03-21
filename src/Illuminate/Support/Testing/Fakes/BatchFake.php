@@ -37,7 +37,6 @@ class BatchFake extends Batch
      * @param  \Carbon\CarbonImmutable  $createdAt
      * @param  \Carbon\CarbonImmutable|null  $cancelledAt
      * @param  \Carbon\CarbonImmutable|null  $finishedAt
-     * @return void
      */
     public function __construct(
         string $id,

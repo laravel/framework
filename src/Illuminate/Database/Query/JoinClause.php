@@ -54,7 +54,6 @@ class JoinClause extends Builder
      * @param  \Illuminate\Database\Query\Builder  $parentQuery
      * @param  string  $type
      * @param  string  $table
-     * @return void
      */
     public function __construct(Builder $parentQuery, $type, $table)
     {

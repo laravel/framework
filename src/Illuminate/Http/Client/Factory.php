@@ -84,7 +84,6 @@ class Factory
      * Create a new factory instance.
      *
      * @param  \Illuminate\Contracts\Events\Dispatcher|null  $dispatcher
-     * @return void
      */
     public function __construct(?Dispatcher $dispatcher = null)
     {
@@ -322,7 +321,7 @@ class Factory
      *
      * @return $this
      */
-    protected function record()
+    public function record()
     {
         $this->recording = true;
 

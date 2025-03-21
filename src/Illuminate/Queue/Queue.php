@@ -126,8 +126,8 @@ abstract class Queue
     protected function createPayloadArray($job, $queue, $data = '')
     {
         return is_object($job)
-                    ? $this->createObjectPayload($job, $queue)
-                    : $this->createStringPayload($job, $queue, $data);
+            ? $this->createObjectPayload($job, $queue)
+            : $this->createStringPayload($job, $queue, $data);
     }
 
     /**
@@ -156,8 +156,8 @@ abstract class Queue
         ]);
 
         $command = $this->jobShouldBeEncrypted($job) && $this->container->bound(Encrypter::class)
-                    ? $this->container[Encrypter::class]->encrypt(serialize(clone $job))
-                    : serialize(clone $job);
+            ? $this->container[Encrypter::class]->encrypt(serialize(clone $job))
+            : serialize(clone $job);
 
         return array_merge($payload, [
             'data' => array_merge($payload['data'], [
@@ -176,7 +176,8 @@ abstract class Queue
     protected function getDisplayName($job)
     {
         return method_exists($job, 'displayName')
-                        ? $job->displayName() : get_class($job);
+            ? $job->displayName()
+            : get_class($job);
     }
 
     /**
@@ -234,7 +235,8 @@ abstract class Queue
         $expiration = $job->retryUntil ?? $job->retryUntil();
 
         return $expiration instanceof DateTimeInterface
-                        ? $expiration->getTimestamp() : $expiration;
+            ? $expiration->getTimestamp()
+            : $expiration;
     }
 
     /**

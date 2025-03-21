@@ -52,7 +52,6 @@ class Pipeline implements PipelineContract
      * Create a new class instance.
      *
      * @param  \Illuminate\Contracts\Container\Container|null  $container
-     * @return void
      */
     public function __construct(?Container $container = null)
     {
@@ -206,8 +205,8 @@ class Pipeline implements PipelineContract
                     }
 
                     $carry = method_exists($pipe, $this->method)
-                                    ? $pipe->{$this->method}(...$parameters)
-                                    : $pipe(...$parameters);
+                        ? $pipe->{$this->method}(...$parameters)
+                        : $pipe(...$parameters);
 
                     return $this->handleCarry($carry);
                 } catch (Throwable $e) {

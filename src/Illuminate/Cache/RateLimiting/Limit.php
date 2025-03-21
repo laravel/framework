@@ -38,7 +38,6 @@ class Limit
      * @param  mixed  $key
      * @param  int  $maxAttempts
      * @param  int  $decaySeconds
-     * @return void
      */
     public function __construct($key = '', int $maxAttempts = 60, int $decaySeconds = 60)
     {

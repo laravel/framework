@@ -6,6 +6,9 @@
 *.md diff=markdown
 *.php diff=php
 
+*.stub linguist-language=php
+*.neon.dist linguist-language=neon
+
 /.github export-ignore
 /bin export-ignore
 /tests export-ignore

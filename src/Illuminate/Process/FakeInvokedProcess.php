@@ -60,7 +60,6 @@ class FakeInvokedProcess implements InvokedProcessContract
      *
      * @param  string  $command
      * @param  \Illuminate\Process\FakeProcessDescription  $process
-     * @return void
      */
     public function __construct(string $command, FakeProcessDescription $process)
     {
@@ -116,8 +115,8 @@ class FakeInvokedProcess implements InvokedProcessContract
         $this->invokeOutputHandlerWithNextLineOfOutput();
 
         $this->remainingRunIterations = is_null($this->remainingRunIterations)
-                ? $this->process->runIterations
-                : $this->remainingRunIterations;
+            ? $this->process->runIterations
+            : $this->remainingRunIterations;
 
         if ($this->remainingRunIterations === 0) {
             while ($this->invokeOutputHandlerWithNextLineOfOutput()) {

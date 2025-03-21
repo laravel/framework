@@ -97,7 +97,6 @@ class FilesystemAdapter implements CloudFilesystemContract
      * @param  \League\Flysystem\FilesystemOperator  $driver
      * @param  \League\Flysystem\FilesystemAdapter  $adapter
      * @param  array  $config
-     * @return void
      */
     public function __construct(FilesystemOperator $driver, FlysystemAdapter $adapter, array $config = [])
     {
@@ -398,8 +397,8 @@ class FilesystemAdapter implements CloudFilesystemContract
     public function put($path, $contents, $options = [])
     {
         $options = is_string($options)
-                     ? ['visibility' => $options]
-                     : (array) $options;
+            ? ['visibility' => $options]
+            : (array) $options;
 
         // If the given contents is actually a file or uploaded file instance than we will
         // automatically store the file using a stream. This provides a convenient path
@@ -753,8 +752,8 @@ class FilesystemAdapter implements CloudFilesystemContract
     protected function getFtpUrl($path)
     {
         return isset($this->config['url'])
-                ? $this->concatPathToUrl($this->config['url'], $path)
-                : $path;
+            ? $this->concatPathToUrl($this->config['url'], $path)
+            : $path;
     }
 
     /**

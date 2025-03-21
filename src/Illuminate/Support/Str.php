@@ -454,7 +454,7 @@ class Str
      */
     public static function wrap($value, $before, $after = null)
     {
-        return $before.$value.($after ??= $before);
+        return $before.$value.($after ?? $before);
     }
 
     /**
@@ -623,7 +623,7 @@ class Str
 
         try {
             $factoryUuid = $factory->fromString($value);
-        } catch (InvalidUuidStringException $ex) {
+        } catch (InvalidUuidStringException) {
             return false;
         }
 
@@ -1051,8 +1051,10 @@ class Str
                 ']', '|', ':', ';',
             ] : null,
             'spaces' => $spaces === true ? [' '] : null,
-        ]))->filter()->each(fn ($c) => $password->push($c[random_int(0, count($c) - 1)])
-        )->flatten();
+        ]))
+            ->filter()
+            ->each(fn ($c) => $password->push($c[random_int(0, count($c) - 1)]))
+            ->flatten();
 
         $length = $length - $password->count();
 
@@ -1232,8 +1234,8 @@ class Str
         }
 
         return $caseSensitive
-                ? str_replace($search, $replace, $subject)
-                : str_ireplace($search, $replace, $subject);
+            ? str_replace($search, $replace, $subject)
+            : str_ireplace($search, $replace, $subject);
     }
 
     /**
@@ -1365,8 +1367,8 @@ class Str
         }
 
         return $caseSensitive
-                    ? str_replace($search, '', $subject)
-                    : str_ireplace($search, '', $subject);
+            ? str_replace($search, '', $subject)
+            : str_ireplace($search, '', $subject);
     }
 
     /**
@@ -1846,8 +1848,8 @@ class Str
     public static function uuid()
     {
         return static::$uuidFactory
-                    ? call_user_func(static::$uuidFactory)
-                    : Uuid::uuid4();
+            ? call_user_func(static::$uuidFactory)
+            : Uuid::uuid4();
     }
 
     /**
@@ -1859,8 +1861,8 @@ class Str
     public static function uuid7($time = null)
     {
         return static::$uuidFactory
-                    ? call_user_func(static::$uuidFactory)
-                    : Uuid::uuid7($time);
+            ? call_user_func(static::$uuidFactory)
+            : Uuid::uuid7($time);
     }
 
     /**

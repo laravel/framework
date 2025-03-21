@@ -1490,6 +1490,22 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertSame('drop view `alpha`, `beta`, `gamma`', $statement);
     }
 
+    public function testDropAllTablesWithPrefixAndSchema()
+    {
+        $connection = $this->getConnection(prefix: 'prefix_');
+        $statement = $this->getGrammar($connection)->compileDropAllTables(['schema.alpha', 'schema.beta', 'schema.gamma']);
+
+        $this->assertSame('drop table `schema`.`alpha`, `schema`.`beta`, `schema`.`gamma`', $statement);
+    }
+
+    public function testDropAllViewsWithPrefixAndSchema()
+    {
+        $connection = $this->getConnection(prefix: 'prefix_');
+        $statement = $this->getGrammar($connection)->compileDropAllViews(['schema.alpha', 'schema.beta', 'schema.gamma']);
+
+        $this->assertSame('drop view `schema`.`alpha`, `schema`.`beta`, `schema`.`gamma`', $statement);
+    }
+
     public function testGrammarsAreMacroable()
     {
         // compileReplace macro.

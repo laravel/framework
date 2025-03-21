@@ -124,7 +124,6 @@ class UrlGenerator implements UrlGeneratorContract
      * @param  \Illuminate\Routing\RouteCollectionInterface  $routes
      * @param  \Illuminate\Http\Request  $request
      * @param  string|null  $assetRoot
-     * @return void
      */
     public function __construct(RouteCollectionInterface $routes, Request $request, $assetRoot = null)
     {
@@ -541,8 +540,8 @@ class UrlGenerator implements UrlGeneratorContract
     {
         $parameters = Collection::wrap($parameters)->map(function ($value, $key) use ($route) {
             return $value instanceof UrlRoutable && $route->bindingFieldFor($key)
-                    ? $value->{$route->bindingFieldFor($key)}
-                    : $value;
+                ? $value->{$route->bindingFieldFor($key)}
+                : $value;
         })->all();
 
         array_walk_recursive($parameters, function (&$item) {

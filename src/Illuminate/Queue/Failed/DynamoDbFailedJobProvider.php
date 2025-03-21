@@ -38,7 +38,6 @@ class DynamoDbFailedJobProvider implements FailedJobProviderInterface
      * @param  \Aws\DynamoDb\DynamoDbClient  $dynamo
      * @param  string  $applicationName
      * @param  string  $table
-     * @return void
      */
     public function __construct(DynamoDbClient $dynamo, $applicationName, $table)
     {
