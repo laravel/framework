@@ -2,8 +2,10 @@
 
 namespace Illuminate\Tests\Console\Scheduling;
 
+use Illuminate\Config\Repository as Config;
 use Illuminate\Console\Scheduling\Event;
 use Illuminate\Console\Scheduling\EventMutex;
+use Illuminate\Container\Container;
 use Illuminate\Support\Str;
 use Mockery as m;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
@@ -13,6 +15,21 @@ use function Illuminate\Support\php_binary;
 
 class EventTest extends TestCase
 {
+    /**
+     * @var \Illuminate\Console\Scheduling\Schedule
+     */
+    private $schedule;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $container = Container::getInstance();
+        $container->singleton('config', function () {
+            return $this->createConfig();
+        });
+    }
+
     protected function tearDown(): void
     {
         m::close();
@@ -103,5 +120,19 @@ class EventTest extends TestCase
         });
 
         $this->assertSame('fancy-command-description', $event->mutexName());
+    }
+
+    /**
+     * Create a new config repository instance.
+     *
+     * @return \Illuminate\Config\Repository
+     */
+    protected function createConfig()
+    {
+        return new Config([
+            'app' => [
+                'scheduler_prefix' => env('SCHEDULER_PREFIX', ''),
+            ],
+        ]);
     }
 }

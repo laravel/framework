@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Console;
 
+use Illuminate\Config\Repository as Config;
 use Illuminate\Console\Application;
 use Illuminate\Console\Command;
 use Illuminate\Console\Scheduling\CacheEventMutex;
@@ -31,6 +32,10 @@ class ConsoleEventSchedulerTest extends TestCase
         $container->instance(SchedulingMutex::class, m::mock(CacheSchedulingMutex::class));
 
         $container->instance(Schedule::class, $this->schedule = new Schedule(m::mock(EventMutex::class)));
+
+        $container->singleton('config', function () {
+            return $this->createConfig();
+        });
     }
 
     protected function tearDown(): void
@@ -143,6 +148,20 @@ class ConsoleEventSchedulerTest extends TestCase
         $schedule->call('path/to/command');
         $events = $schedule->events();
         $this->assertSame('Asia/Tokyo', $events[0]->timezone);
+    }
+
+    /**
+     * Create a new config repository instance.
+     *
+     * @return \Illuminate\Config\Repository
+     */
+    protected function createConfig()
+    {
+        return new Config([
+            'app' => [
+                'scheduler_prefix' => env('SCHEDULER_PREFIX', ''),
+            ],
+        ]);
     }
 }
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Illuminate\Tests\Console\Scheduling;
 
+use Illuminate\Config\Repository as Config;
 use Illuminate\Console\Scheduling\EventMutex;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Console\Scheduling\SchedulingMutex;
@@ -33,6 +34,9 @@ final class ScheduleTest extends TestCase
         $this->container->instance(EventMutex::class, $this->eventMutex);
         $this->schedulingMutex = m::mock(SchedulingMutex::class);
         $this->container->instance(SchedulingMutex::class, $this->schedulingMutex);
+        $this->container->singleton('config', function () {
+            return $this->createConfig();
+        });
     }
 
     #[DataProvider('jobHonoursDisplayNameIfMethodExistsProvider')]
@@ -66,5 +70,19 @@ final class ScheduleTest extends TestCase
         $scheduledJob = $schedule->job(JobToTestWithSchedule::class);
         self::assertSame(JobToTestWithSchedule::class, $scheduledJob->description);
         self::assertFalse($this->container->resolved(JobToTestWithSchedule::class));
+    }
+
+    /**
+     * Create a new config repository instance.
+     *
+     * @return \Illuminate\Config\Repository
+     */
+    protected function createConfig()
+    {
+        return new Config([
+            'app' => [
+                'scheduler_prefix' => env('SCHEDULER_PREFIX', ''),
+            ],
+        ]);
     }
 }
