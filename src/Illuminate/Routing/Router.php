@@ -804,9 +804,13 @@ class Router implements BindingRegistrar, RegistrarContract
         return (new Pipeline($this->container))
             ->send($request)
             ->through($middleware)
-            ->then(fn ($request) => $this->prepareResponse(
-                $request, $route->run()
-            ));
+            ->then(function ($request) use ($route) {
+                $this->container->instance('request', $request);
+
+                return $this->prepareResponse(
+                    $request, $route->run()
+                );
+            });
     }
 
     /**
