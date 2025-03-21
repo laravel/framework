@@ -173,19 +173,6 @@ class Migrator
     }
 
     /**
-     * Determine if the migration should be ran.
-     *
-     * @param  string  $file
-     * @return bool
-     */
-    protected function shouldMigrationBeRan($file)
-    {
-        $instance = $this->resolvePath($file);
-
-        return $instance instanceof Migration ? $instance->shouldRun() : false;
-    }
-
-    /**
      * Get list of pending migrations to skip.
      *
      * @return list<string>
