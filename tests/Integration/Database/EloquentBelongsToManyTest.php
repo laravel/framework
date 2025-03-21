@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Database\MultipleRecordsFoundException;
+use Illuminate\Database\RecordsNotFoundException;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -411,6 +413,38 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $this->assertCount(2, $post->tags()->findMany([$tag->id, $tag2->id]));
         $this->assertCount(0, $post->tags()->findMany(new Collection));
         $this->assertCount(2, $post->tags()->findMany(new Collection([$tag->id, $tag2->id])));
+    }
+
+    public function testFindSoleMethod()
+    {
+        $post = Post::create(['title' => Str::random()]);
+
+        $tag = Tag::create(['name' => Str::random()]);
+
+        $post->tags()->attach($tag);
+
+        $this->assertEquals($tag->id, $post->tags()->findSole()->id);
+
+        // Create a second tag to test the exception
+        $tag2 = Tag::create(['name' => Str::random()]);
+        $post->tags()->attach($tag2);
+
+        try {
+            $post->tags()->findSole();
+            $this->fail('Expected MultipleRecordsFoundException was not thrown.');
+        } catch (MultipleRecordsFoundException $e) {
+            $this->assertTrue(true);
+        }
+
+        // Test with no records
+        $post->tags()->detach();
+
+        try {
+            $post->tags()->findSole();
+            $this->fail('Expected RecordsNotFoundException was not thrown.');
+        } catch (RecordsNotFoundException $e) {
+            $this->assertTrue(true);
+        }
     }
 
     public function testFindOrFailMethod()
