@@ -181,6 +181,14 @@ trait HasAttributes
     protected static $castTypeCache = [];
 
     /**
+     * The cache of date formats by connection
+     *
+     * @var array
+     */
+    protected static $dateFormatByConnectionCache = [];
+
+
+    /**
      * The encrypter instance that is used to encrypt attributes.
      *
      * @var \Illuminate\Contracts\Encryption\Encrypter|null
@@ -1603,7 +1611,17 @@ trait HasAttributes
      */
     public function getDateFormat()
     {
-        return $this->dateFormat ?: $this->getConnection()->getQueryGrammar()->getDateFormat();
+        if ($this->dateFormat) {
+            return $this->dateFormat;
+        }
+
+        $connectionName = $this->getConnectionName();
+
+        if (! isset(self::$dateFormatByConnectionCache[$connectionName])) {
+            self::$dateFormatByConnectionCache[$connectionName] = $this->getConnection()->getQueryGrammar()->getDateFormat();
+        }
+
+        return self::$dateFormatByConnectionCache[$connectionName];
     }
 
     /**
