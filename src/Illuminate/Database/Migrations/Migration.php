@@ -29,7 +29,7 @@ abstract class Migration
     }
 
     /**
-     * Should this migration run or not.
+     * Determine if this migration should run.
      *
      * @return bool
      */

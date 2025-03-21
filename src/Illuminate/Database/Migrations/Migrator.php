@@ -141,19 +141,6 @@ class Migrator
     }
 
     /**
-     * Determine if the migration should be ran.
-     *
-     * @param  object  $migration
-     * @return bool
-     */
-    public function shouldSkipMigration($migration)
-    {
-        return $migration instanceof Migration
-            ? ! $migration->shouldRun()
-            : false;
-    }
-
-    /**
      * Get the migration files that have not yet run.
      *
      * @param  string[]  $files
@@ -170,6 +157,19 @@ class Migrator
             )
             ->values()
             ->all();
+    }
+
+    /**
+     * Determine if the migration should be ran.
+     *
+     * @param  string  $file
+     * @return bool
+     */
+    protected function shouldMigrationBeRan($file)
+    {
+        $instance = $this->resolvePath($file);
+
+        return $instance instanceof Migration ? $instance->shouldRun() : false;
     }
 
     /**
