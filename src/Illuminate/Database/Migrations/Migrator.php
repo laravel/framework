@@ -143,14 +143,14 @@ class Migrator
     /**
      * Determine if the migration should be ran.
      *
-     * @param  string  $file
+     * @param  object  $migration
      * @return bool
      */
-    public function shouldMigrationBeRan($file)
+    public function shouldSkipMigration($migration)
     {
-        $instance = $this->resolvePath($file);
-
-        return $instance instanceof Migration ? $instance->shouldRun() : false;
+        return $migration instanceof Migration
+            ? ! $migration->shouldRun()
+            : false;
     }
 
     /**
@@ -168,7 +168,6 @@ class Migrator
             ->reject(fn ($file) => in_array($migrationName = $this->getMigrationName($file), $ran) ||
                 in_array($migrationName, $migrationsToSkip)
             )
-            ->filter(fn ($file) => $this->shouldMigrationBeRan($file))
             ->values()
             ->all();
     }
@@ -255,12 +254,19 @@ class Migrator
             return $this->pretendToRun($migration, 'up');
         }
 
-        $this->write(Task::class, $name, fn () => $this->runMigration($migration, 'up'));
+        if ($this->shouldSkipMigration($migration)) {
+            $this->write(Task::class, $name, fn () => MigrationResult::Skipped);
+        } else {
+            $this->write(Task::class, $name, fn () => $this->runMigration($migration, 'up'));
 
-        // Once we have run a migrations class, we will log that it was run in this
-        // repository so that we don't try to run it next time we do a migration
-        // in the application. A migration repository keeps the migrate order.
-        $this->repository->log($name, $batch);
+            // Once we have run a migrations class, we will log that it was run in this
+            // repository so that we don't try to run it next time we do a migration
+            // in the application. A migration repository keeps the migrate order.
+            $this->repository->log($name, $batch);
+        }
+
+
+
     }
 
     /**
@@ -435,12 +441,15 @@ class Migrator
      */
     protected function runMigration($migration, $method)
     {
+
         $connection = $this->resolveConnection(
             $migration->getConnection()
         );
 
         $callback = function () use ($connection, $migration, $method) {
+
             if (method_exists($migration, $method)) {
+
                 $this->fireMigrationEvent(new MigrationStarted($migration, $method));
 
                 $this->runMethod($connection, $migration, $method);
@@ -546,8 +555,9 @@ class Migrator
     protected function resolvePath(string $path)
     {
         $class = $this->getMigrationClass($this->getMigrationName($path));
-
+//        dd($class, $this->getMigrationName($path));
         if (class_exists($class) && realpath($path) == (new ReflectionClass($class))->getFileName()) {
+
             return new $class;
         }
 
@@ -558,7 +568,6 @@ class Migrator
                 ? $this->files->getRequire($path)
                 : clone $migration;
         }
-
         return new $class;
     }
 

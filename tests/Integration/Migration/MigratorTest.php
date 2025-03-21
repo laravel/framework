@@ -44,6 +44,7 @@ class MigratorTest extends TestCase
         $this->expectTask('2014_10_12_000000_create_people_table', 'DONE');
         $this->expectTask('2015_10_04_000000_modify_people_table', 'DONE');
         $this->expectTask('2016_10_04_000000_modify_people_table', 'DONE');
+        $this->expectTask('2017_10_04_000000_add_age_to_people', 'SKIPPED');
 
         $this->output->shouldReceive('writeln')->once();
 
