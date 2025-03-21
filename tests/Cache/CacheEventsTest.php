@@ -260,7 +260,6 @@ class CacheEventsTest extends TestCase
         $this->assertFalse($repository->clear());
     }
 
-
     protected function assertEventMatches($eventClass, $properties = [])
     {
         return m::on(function ($event) use ($eventClass, $properties) {
