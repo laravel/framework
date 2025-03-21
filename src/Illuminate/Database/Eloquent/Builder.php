@@ -647,6 +647,7 @@ class Builder implements BuilderContract
      */
     public function castBeforeInsert(array $values)
     {
+        /*
         if (empty($values)) {
             return [];
         }
@@ -679,7 +680,25 @@ class Builder implements BuilderContract
             }
         });
 
+        dd($values);
         return $values;
+        */
+
+        if (empty($values)) {
+            return [];
+        }
+
+        if (! is_array(reset($values))) {
+            $values = [$values];
+        }
+
+        $this->model->unguard(function () use (&$values) {
+            foreach($values as $key => $rowValues) {
+                $values[$key] = $this->newModelInstance($rowValues)->getAttributes();
+            }
+        });
+
+        return dd($this->addTimestampsToUpsertValues($this->addUniqueIdsToUpsertValues($values)));
     }
 
     /**

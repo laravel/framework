@@ -2476,6 +2476,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
     public function testCanInsertWithCasts()
     {
+
         DB::enableQueryLog();
         Carbon::setTestNow('2025-03-15T07:32:00Z');
 
