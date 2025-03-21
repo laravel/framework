@@ -549,7 +549,7 @@ class Migrator
     protected function resolvePath(string $path)
     {
         $class = $this->getMigrationClass($this->getMigrationName($path));
-//        dd($class, $this->getMigrationName($path));
+
         if (class_exists($class) && realpath($path) == (new ReflectionClass($class))->getFileName()) {
             return new $class;
         }
