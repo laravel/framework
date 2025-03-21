@@ -26,7 +26,8 @@ class BroadcastingInstallCommand extends Command
                     {--composer=global : Absolute path to the Composer binary which should be used to install packages}
                     {--force : Overwrite any existing broadcasting routes file}
                     {--without-reverb : Do not prompt to install Laravel Reverb}
-                    {--without-node : Do not prompt to install Node dependencies}';
+                    {--without-node : Do not prompt to install Node dependencies}
+                    {--react : Use React TypeScript Echo implementation instead of JavaScript}';
 
     /**
      * The console command description.
@@ -55,24 +56,45 @@ class BroadcastingInstallCommand extends Command
         $this->enableBroadcastServiceProvider();
 
         // Install bootstrapping...
-        if (! file_exists($echoScriptPath = $this->laravel->resourcePath('js/echo.js'))) {
-            if (! is_dir($directory = $this->laravel->resourcePath('js'))) {
-                mkdir($directory, 0755, true);
+        if ($this->option('react')) {
+            // For React, use the TypeScript implementation
+            $hooksDirectory = $this->laravel->resourcePath('js/hooks');
+            $echoScriptPath = $hooksDirectory.'/use-echo.ts';
+            
+            if (! file_exists($echoScriptPath)) {
+                // Create the hooks directory if it doesn't exist
+                if (! is_dir($hooksDirectory)) {
+                    if (! is_dir($this->laravel->resourcePath('js'))) {
+                        mkdir($this->laravel->resourcePath('js'), 0755, true);
+                    }
+                    mkdir($hooksDirectory, 0755, true);
+                }
+
+                copy(__DIR__.'/stubs/use-echo-ts.stub', $echoScriptPath);
+                $this->components->info("Created React TypeScript Echo implementation at [resources/js/hooks/use-echo.ts].");
+            }
+        } else {
+            // Standard JavaScript implementation
+            if (! file_exists($echoScriptPath = $this->laravel->resourcePath('js/echo.js'))) {
+                if (! is_dir($directory = $this->laravel->resourcePath('js'))) {
+                    mkdir($directory, 0755, true);
+                }
+
+                copy(__DIR__.'/stubs/echo-js.stub', $echoScriptPath);
             }
 
-            copy(__DIR__.'/stubs/echo-js.stub', $echoScriptPath);
-        }
-
-        if (file_exists($bootstrapScriptPath = $this->laravel->resourcePath('js/bootstrap.js'))) {
-            $bootstrapScript = file_get_contents(
-                $bootstrapScriptPath
-            );
-
-            if (! str_contains($bootstrapScript, './echo')) {
-                file_put_contents(
-                    $bootstrapScriptPath,
-                    trim($bootstrapScript.PHP_EOL.file_get_contents(__DIR__.'/stubs/echo-bootstrap-js.stub')).PHP_EOL,
+            // Only add the bootstrap import for the standard JS implementation
+            if (file_exists($bootstrapScriptPath = $this->laravel->resourcePath('js/bootstrap.js'))) {
+                $bootstrapScript = file_get_contents(
+                    $bootstrapScriptPath
                 );
+
+                if (! str_contains($bootstrapScript, './echo')) {
+                    file_put_contents(
+                        $bootstrapScriptPath,
+                        trim($bootstrapScript.PHP_EOL.file_get_contents(__DIR__.'/stubs/echo-bootstrap-js.stub')).PHP_EOL,
+                    );
+                }
             }
         }
 
@@ -177,24 +199,27 @@ class BroadcastingInstallCommand extends Command
 
         $this->components->info('Installing and building Node dependencies.');
 
+        // Node dependencies are the same regardless of whether --react flag is set
+        $packages = 'laravel-echo pusher-js';
+
         if (file_exists(base_path('pnpm-lock.yaml'))) {
             $commands = [
-                'pnpm add --save-dev laravel-echo pusher-js',
+                "pnpm add --save-dev {$packages}",
                 'pnpm run build',
             ];
         } elseif (file_exists(base_path('yarn.lock'))) {
             $commands = [
-                'yarn add --dev laravel-echo pusher-js',
+                "yarn add --dev {$packages}",
                 'yarn run build',
             ];
         } elseif (file_exists(base_path('bun.lock')) || file_exists(base_path('bun.lockb'))) {
             $commands = [
-                'bun add --dev laravel-echo pusher-js',
+                "bun add --dev {$packages}",
                 'bun run build',
             ];
         } else {
             $commands = [
-                'npm install --save-dev laravel-echo pusher-js',
+                "npm install --save-dev {$packages}",
                 'npm run build',
             ];
         }
