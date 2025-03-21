@@ -99,7 +99,7 @@ class EloquentCollectionLoadCountTest extends DatabaseTestCase
         $post = Post::first();
         $post->some_default_value = 200;
 
-        Collection::make([$post])->loadCount('comments');
+        (new Collection([$post]))->loadCount('comments');
 
         $this->assertSame(200, $post->some_default_value);
         $this->assertSame('2', (string) $post->comments_count);

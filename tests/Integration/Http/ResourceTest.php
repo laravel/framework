@@ -1448,7 +1448,7 @@ class ResourceTest extends TestCase
 
     public function testKeysArePreservedInAnAnonymousCollectionIfTheResourceIsFlaggedToPreserveKeys()
     {
-        $data = Collection::make([
+        $data = (new Collection([
             [
                 'id' => 1,
                 'authorId' => 5,
@@ -1464,7 +1464,7 @@ class ResourceTest extends TestCase
                 'authorId' => 42,
                 'bookId' => 12,
             ],
-        ])->keyBy->id;
+        ]))->keyBy->id;
 
         Route::get('/', function () use ($data) {
             return ResourceWithPreservedKeys::collection($data);

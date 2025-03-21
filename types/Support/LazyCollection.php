@@ -36,12 +36,12 @@ assertType('Illuminate\Support\LazyCollection<int, int>', new LazyCollection($it
 assertType('Illuminate\Support\LazyCollection<int, string>', new LazyCollection($traversable));
 assertType('Illuminate\Support\LazyCollection<int, User>', new LazyCollection($generator));
 
-assertType('Illuminate\Support\LazyCollection<int, string>', LazyCollection::make(['string']));
-assertType('Illuminate\Support\LazyCollection<string, User>', LazyCollection::make(['string' => new User]));
-assertType('Illuminate\Support\LazyCollection<int, User>', LazyCollection::make($arrayable));
-assertType('Illuminate\Support\LazyCollection<int, int>', LazyCollection::make($iterable));
-assertType('Illuminate\Support\LazyCollection<int, string>', LazyCollection::make($traversable));
-assertType('Illuminate\Support\LazyCollection<int, User>', LazyCollection::make($generator));
+assertType('Illuminate\Support\LazyCollection<int, string>', new LazyCollection(['string']));
+assertType('Illuminate\Support\LazyCollection<string, User>', new LazyCollection(['string' => new User]));
+assertType('Illuminate\Support\LazyCollection<int, User>', new LazyCollection($arrayable));
+assertType('Illuminate\Support\LazyCollection<int, int>', new LazyCollection($iterable));
+assertType('Illuminate\Support\LazyCollection<int, string>', new LazyCollection($traversable));
+assertType('Illuminate\Support\LazyCollection<int, User>', new LazyCollection($generator));
 
 assertType('Illuminate\Support\LazyCollection<int, User>', $collection::times(10, function ($int) {
     // assertType('int', $int);
@@ -879,11 +879,11 @@ class CustomLazyCollection extends LazyCollection
 {
 }
 
-// assertType('CustomLazyCollection<int, User>', CustomLazyCollection::make([new User]));
+// assertType('CustomLazyCollection<int, User>', new CustomLazyCollection([new User]));
 
 assertType('array<int, mixed>', $collection->toArray());
-assertType('array<string, mixed>', LazyCollection::make(['string' => 'string'])->toArray());
-assertType('array<int, mixed>', LazyCollection::make([1, 2])->toArray());
+assertType('array<string, mixed>', (new LazyCollection(['string' => 'string']))->toArray());
+assertType('array<int, mixed>', (new LazyCollection([1, 2]))->toArray());
 
 assertType('Traversable<int, User>', $collection->getIterator());
 foreach ($collection as $int => $user) {

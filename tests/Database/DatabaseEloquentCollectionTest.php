@@ -416,10 +416,10 @@ class DatabaseEloquentCollectionTest extends TestCase
         $four->id = 2;
         $four->someAttribute = '4';
 
-        $duplicates = Collection::make([$one, $two, $three, $four])->duplicates()->all();
+        $duplicates = (new Collection([$one, $two, $three, $four]))->duplicates()->all();
         $this->assertSame([1 => $two, 2 => $three], $duplicates);
 
-        $duplicates = Collection::make([$one, $two, $three, $four])->duplicatesStrict()->all();
+        $duplicates = (new Collection([$one, $two, $three, $four]))->duplicatesStrict()->all();
         $this->assertSame([1 => $two, 2 => $three], $duplicates);
     }
 
@@ -484,10 +484,10 @@ class DatabaseEloquentCollectionTest extends TestCase
         $four->id = 2;
         $four->someAttribute = '4';
 
-        $uniques = Collection::make([$one, $two, $three, $four])->unique()->all();
+        $uniques = (new Collection([$one, $two, $three, $four]))->unique()->all();
         $this->assertSame([$three, $four], $uniques);
 
-        $uniques = Collection::make([$one, $two, $three, $four])->unique(null, true)->all();
+        $uniques = (new Collection([$one, $two, $three, $four]))->unique(null, true)->all();
         $this->assertSame([$three, $four], $uniques);
     }
 

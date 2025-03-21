@@ -20,7 +20,7 @@ class SupportLazyCollectionIsLazyTest extends TestCase
     {
         [$closure, $recorder] = $this->makeGeneratorFunctionWithRecorder();
 
-        LazyCollection::make($closure);
+        new LazyCollection($closure);
 
         $this->assertEquals([], $recorder->all());
     }
@@ -28,7 +28,7 @@ class SupportLazyCollectionIsLazyTest extends TestCase
     public function testMakeWithLazyCollectionIsLazy()
     {
         $this->assertDoesNotEnumerate(function ($collection) {
-            LazyCollection::make($collection);
+            new LazyCollection($collection);
         });
     }
 
@@ -55,7 +55,7 @@ class SupportLazyCollectionIsLazyTest extends TestCase
 
     public function testChunkWhileIsLazy()
     {
-        $collection = LazyCollection::make(['A', 'A', 'B', 'B', 'C', 'C', 'C']);
+        $collection = new LazyCollection(['A', 'A', 'B', 'B', 'C', 'C', 'C']);
 
         $this->assertDoesNotEnumerateCollection($collection, function ($collection) {
             $collection->chunkWhile(function ($current, $key, $chunk) {
@@ -78,7 +78,7 @@ class SupportLazyCollectionIsLazyTest extends TestCase
 
     public function testCollapseIsLazy()
     {
-        $collection = LazyCollection::make([
+        $collection = new LazyCollection([
             [1, 2, 3],
             [4, 5, 6],
             [7, 8, 9],

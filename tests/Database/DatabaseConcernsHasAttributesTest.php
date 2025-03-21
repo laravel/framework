@@ -31,7 +31,7 @@ class DatabaseConcernsHasAttributesTest extends TestCase
             ->makePartial()
             ->shouldAllowMockingProtectedMethods()
             ->shouldReceive('getArrayableRelations')->andReturn([
-                'arrayable_relation' => Collection::make(['foo' => 'bar']),
+                'arrayable_relation' => new Collection(['foo' => 'bar']),
                 'invalid_relation' => 'invalid',
                 'null_relation' => null,
             ])

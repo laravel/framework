@@ -16,7 +16,7 @@ class SupportLazyCollectionTest extends TestCase
 {
     public function testCanCreateEmptyCollection()
     {
-        $this->assertSame([], LazyCollection::make()->all());
+        $this->assertSame([], (new LazyCollection())->all());
         $this->assertSame([], LazyCollection::empty()->all());
     }
 
@@ -24,13 +24,13 @@ class SupportLazyCollectionTest extends TestCase
     {
         $array = [1, 2, 3];
 
-        $data = LazyCollection::make($array);
+        $data = new LazyCollection($array);
 
         $this->assertSame($array, $data->all());
 
         $array = ['a' => 1, 'b' => 2, 'c' => 3];
 
-        $data = LazyCollection::make($array);
+        $data = new LazyCollection($array);
 
         $this->assertSame($array, $data->all());
     }
@@ -39,20 +39,20 @@ class SupportLazyCollectionTest extends TestCase
     {
         $array = [1, 2, 3];
 
-        $data = LazyCollection::make(Collection::make($array));
+        $data = new LazyCollection(new Collection($array));
 
         $this->assertSame($array, $data->all());
 
         $array = ['a' => 1, 'b' => 2, 'c' => 3];
 
-        $data = LazyCollection::make(Collection::make($array));
+        $data = new LazyCollection(new Collection($array));
 
         $this->assertSame($array, $data->all());
     }
 
     public function testCanCreateCollectionFromGeneratorFunction()
     {
-        $data = LazyCollection::make(function () {
+        $data = new LazyCollection(function () {
             yield 1;
             yield 2;
             yield 3;
@@ -60,7 +60,7 @@ class SupportLazyCollectionTest extends TestCase
 
         $this->assertSame([1, 2, 3], $data->all());
 
-        $data = LazyCollection::make(function () {
+        $data = new LazyCollection(function () {
             yield 'a' => 1;
             yield 'b' => 2;
             yield 'c' => 3;
@@ -75,7 +75,7 @@ class SupportLazyCollectionTest extends TestCase
 
     public function testCanCreateCollectionFromNonGeneratorFunction()
     {
-        $data = LazyCollection::make(function () {
+        $data = new LazyCollection(function () {
             return 'laravel';
         });
 
@@ -90,16 +90,16 @@ class SupportLazyCollectionTest extends TestCase
             yield 1;
         };
 
-        LazyCollection::make($generateNumber());
+        new LazyCollection($generateNumber());
     }
 
     public function testEager()
     {
         $source = [1, 2, 3, 4, 5];
 
-        $data = LazyCollection::make(function () use (&$source) {
+        $data = (new LazyCollection(function () use (&$source) {
             yield from $source;
-        })->eager();
+        }))->eager();
 
         $source[] = 6;
 
@@ -110,9 +110,9 @@ class SupportLazyCollectionTest extends TestCase
     {
         $source = [1, 2, 3, 4];
 
-        $collection = LazyCollection::make(function () use (&$source) {
+        $collection = (new LazyCollection(function () use (&$source) {
             yield from $source;
-        })->remember();
+        }))->remember();
 
         $this->assertSame([1, 2, 3, 4], $collection->all());
 
@@ -125,9 +125,9 @@ class SupportLazyCollectionTest extends TestCase
     {
         $source = [1, 2, 3, 4];
 
-        $collection = LazyCollection::make(function () use (&$source) {
+        $collection = (new LazyCollection(function () use (&$source) {
             yield from $source;
-        })->remember();
+        }))->remember();
 
         $a = $collection->getIterator();
         $b = $collection->getIterator();
@@ -168,10 +168,10 @@ class SupportLazyCollectionTest extends TestCase
 
     public function testRememberWithDuplicateKeys()
     {
-        $collection = LazyCollection::make(function () {
+        $collection = (new LazyCollection(function () {
             yield 'key' => 1;
             yield 'key' => 2;
-        })->remember();
+        }))->remember();
 
         $results = $collection->map(function ($value, $key) {
             return [$key, $value];

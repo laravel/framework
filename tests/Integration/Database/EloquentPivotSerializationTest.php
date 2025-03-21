@@ -90,7 +90,7 @@ class EloquentPivotSerializationTest extends DatabaseTestCase
 
         $project = $project->fresh();
 
-        $class = new PivotSerializationTestCollectionClass(DatabaseCollection::make($project->collaborators->map->pivot));
+        $class = new PivotSerializationTestCollectionClass(new DatabaseCollection($project->collaborators->map->pivot));
         $class = unserialize(serialize($class));
 
         $this->assertEquals($project->collaborators[0]->pivot->user_id, $class->pivots[0]->user_id);
@@ -108,7 +108,7 @@ class EloquentPivotSerializationTest extends DatabaseTestCase
 
         $project = $project->fresh();
 
-        $class = new PivotSerializationTestCollectionClass(DatabaseCollection::make($project->tags->map->pivot));
+        $class = new PivotSerializationTestCollectionClass(new DatabaseCollection($project->tags->map->pivot));
         $class = unserialize(serialize($class));
 
         $this->assertEquals($project->tags[0]->pivot->tag_id, $class->pivots[0]->tag_id);

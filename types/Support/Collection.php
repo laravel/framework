@@ -1068,8 +1068,8 @@ class CustomCollection extends Collection
 {
 }
 
-// assertType('CustomCollection<int, User>', CustomCollection::make([new User]));
-assertType('Illuminate\Support\Collection<int, User>', CustomCollection::make([new User])->toBase());
+// assertType('CustomCollection<int, User>', new CustomCollection([new User]));
+assertType('Illuminate\Support\Collection<int, User>', (new CustomCollection([new User]))->toBase());
 
 assertType('bool', $collection->offsetExists(0));
 assertType('bool', isset($collection[0]));
