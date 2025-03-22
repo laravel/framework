@@ -596,7 +596,7 @@ class AssertTest extends TestCase
         ]);
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Property [bar] does not match the expected value.');
+        $this->expectExceptionMessage('Property [bar] should be null.');
 
         $assert->whereNull('bar');
     }
@@ -629,7 +629,7 @@ class AssertTest extends TestCase
         ]);
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Property [bar] should not be null');
+        $this->expectExceptionMessage('Property [bar] should not be null.');
 
         $assert->whereNotNull('bar');
     }

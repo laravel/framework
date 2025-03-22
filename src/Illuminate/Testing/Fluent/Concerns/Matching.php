@@ -100,7 +100,19 @@ trait Matching
      */
     public function whereNull(string $key): self
     {
-        return $this->where($key, null);
+        $this->has($key);
+
+        $actual = $this->prop($key);
+
+        PHPUnit::assertNull(
+            $actual,
+            sprintf(
+                'Property [%s] should be null.',
+                $this->dotPath($key),
+            )
+        );
+
+        return $this;
     }
 
     /**
@@ -118,7 +130,7 @@ trait Matching
         PHPUnit::assertNotNull(
             $actual,
             sprintf(
-                'Property [%s] should not be null',
+                'Property [%s] should not be null.',
                 $this->dotPath($key),
             )
         );
