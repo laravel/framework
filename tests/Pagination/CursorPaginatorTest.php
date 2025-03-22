@@ -101,7 +101,7 @@ class CursorPaginatorTest extends TestCase
     {
         $cursor = new Cursor(['id' => 25], true);
 
-        $p = new CursorPaginator(Collection::make(), 25, $cursor, [
+        $p = new CursorPaginator(new Collection, 25, $cursor, [
             'path' => 'http://website.com/test',
             'cursorName' => 'cursor',
             'parameters' => ['id'],

@@ -93,6 +93,52 @@ trait Matching
     }
 
     /**
+     * Asserts that the property is null.
+     *
+     * @param  string  $key
+     * @return $this
+     */
+    public function whereNull(string $key): self
+    {
+        $this->has($key);
+
+        $actual = $this->prop($key);
+
+        PHPUnit::assertNull(
+            $actual,
+            sprintf(
+                'Property [%s] should be null.',
+                $this->dotPath($key),
+            )
+        );
+
+        return $this;
+    }
+
+    /**
+     * Asserts that the property is not null.
+     *
+     * @param  string  $key
+     * @return $this
+     */
+    public function whereNotNull(string $key): self
+    {
+        $this->has($key);
+
+        $actual = $this->prop($key);
+
+        PHPUnit::assertNotNull(
+            $actual,
+            sprintf(
+                'Property [%s] should not be null.',
+                $this->dotPath($key),
+            )
+        );
+
+        return $this;
+    }
+
+    /**
      * Asserts that all properties match their expected values.
      *
      * @param  array  $bindings

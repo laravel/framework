@@ -58,7 +58,6 @@ class RouteUrlGenerator
      *
      * @param  \Illuminate\Routing\UrlGenerator  $url
      * @param  \Illuminate\Http\Request  $request
-     * @return void
      */
     public function __construct($url, $request)
     {
@@ -169,7 +168,8 @@ class RouteUrlGenerator
         $port = (int) $this->request->getPort();
 
         return ($secure && $port === 443) || (! $secure && $port === 80)
-                    ? $domain : $domain.':'.$port;
+            ? $domain
+            : $domain.':'.$port;
     }
 
     /**
@@ -294,8 +294,8 @@ class RouteUrlGenerator
             $parameters = array_merge($parameters);
 
             return (! isset($parameters[0]) && ! str_ends_with($match[0], '?}'))
-                        ? $match[0]
-                        : Arr::pull($parameters, 0);
+                ? $match[0]
+                : Arr::pull($parameters, 0);
         }, $path);
 
         return trim(preg_replace('/\{.*?\?\}/', '', $path), '/');

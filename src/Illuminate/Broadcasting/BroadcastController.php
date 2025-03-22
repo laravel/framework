@@ -41,6 +41,6 @@ class BroadcastController extends Controller
         }
 
         return Broadcast::resolveAuthenticatedUser($request)
-                    ?? throw new AccessDeniedHttpException;
+            ?? throw new AccessDeniedHttpException;
     }
 }

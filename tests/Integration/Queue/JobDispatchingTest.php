@@ -7,7 +7,10 @@ use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\Events\JobQueued;
+use Illuminate\Queue\Events\JobQueueing;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Facades\Config;
 use Orchestra\Testbench\Attributes\WithMigration;
 
 #[WithMigration]
@@ -135,6 +138,33 @@ class JobDispatchingTest extends QueueTestCase
         $this->assertFalse(UniqueJob::$ran);
     }
 
+    public function testQueueMayBeNullForJobQueueingAndJobQueuedEvent()
+    {
+        Config::set('queue.default', 'database');
+        $events = [];
+        $this->app['events']->listen(function (JobQueueing $e) use (&$events) {
+            $events[] = $e;
+        });
+        $this->app['events']->listen(function (JobQueued $e) use (&$events) {
+            $events[] = $e;
+        });
+
+        MyTestDispatchableJob::dispatch();
+        dispatch(function () {
+            //
+        });
+
+        $this->assertCount(4, $events);
+        $this->assertInstanceOf(JobQueueing::class, $events[0]);
+        $this->assertNull($events[0]->queue);
+        $this->assertInstanceOf(JobQueued::class, $events[1]);
+        $this->assertNull($events[1]->queue);
+        $this->assertInstanceOf(JobQueueing::class, $events[2]);
+        $this->assertNull($events[2]->queue);
+        $this->assertInstanceOf(JobQueued::class, $events[3]);
+        $this->assertNull($events[3]->queue);
+    }
+
     /**
      * Helpers.
      */
@@ -177,4 +207,9 @@ class UniqueJob extends Job implements ShouldBeUnique
     {
         return self::$value;
     }
+}
+
+class MyTestDispatchableJob implements ShouldQueue
+{
+    use Dispatchable;
 }

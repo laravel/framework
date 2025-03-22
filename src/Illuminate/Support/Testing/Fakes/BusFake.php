@@ -86,7 +86,6 @@ class BusFake implements Fake, QueueingDispatcher
      * @param  \Illuminate\Contracts\Bus\QueueingDispatcher  $dispatcher
      * @param  array|string  $jobsToFake
      * @param  \Illuminate\Bus\BatchRepository|null  $batchRepository
-     * @return void
      */
     public function __construct(QueueingDispatcher $dispatcher, $jobsToFake = [], ?BatchRepository $batchRepository = null)
     {
@@ -785,8 +784,8 @@ class BusFake implements Fake, QueueingDispatcher
         return (new Collection($this->jobsToFake))
             ->filter(function ($job) use ($command) {
                 return $job instanceof Closure
-                            ? $job($command)
-                            : $job === get_class($command);
+                    ? $job($command)
+                    : $job === get_class($command);
             })->isNotEmpty();
     }
 

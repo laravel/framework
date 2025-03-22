@@ -10,6 +10,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Support\Traits\Tappable;
 use Mockery;
 use Mockery\Exception\NoMatchingExpectationException;
 use PHPUnit\Framework\TestCase as PHPUnitTestCase;
@@ -21,8 +22,7 @@ use Symfony\Component\Console\Question\ChoiceQuestion;
 
 class PendingCommand
 {
-    use Conditionable;
-    use Macroable;
+    use Conditionable, Macroable, Tappable;
 
     /**
      * The test being run.
@@ -80,7 +80,6 @@ class PendingCommand
      * @param  \Illuminate\Contracts\Container\Container  $app
      * @param  string  $command
      * @param  array  $parameters
-     * @return void
      */
     public function __construct(PHPUnitTestCase $test, Container $app, $command, $parameters)
     {

@@ -40,7 +40,6 @@ class ResponseFactory implements FactoryContract
      *
      * @param  \Illuminate\Contracts\View\Factory  $view
      * @param  \Illuminate\Routing\Redirector  $redirector
-     * @return void
      */
     public function __construct(ViewFactory $view, Redirector $redirector)
     {
@@ -125,7 +124,7 @@ class ResponseFactory implements FactoryContract
      *
      * @param  \Closure  $callback
      * @param  array  $headers
-     * @param  \Illuminate\Http\StreamedEvent|string  $endStreamWith
+     * @param  \Illuminate\Http\StreamedEvent|string|null  $endStreamWith
      * @return \Symfony\Component\HttpFoundation\StreamedResponse
      */
     public function eventStream(Closure $callback, array $headers = [], StreamedEvent|string|null $endStreamWith = '</stream>')

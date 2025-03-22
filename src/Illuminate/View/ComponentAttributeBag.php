@@ -31,7 +31,6 @@ class ComponentAttributeBag implements ArrayAccess, IteratorAggregate, JsonSeria
      * Create a new component attribute bag instance.
      *
      * @param  array  $attributes
-     * @return void
      */
     public function __construct(array $attributes = [])
     {
@@ -269,8 +268,8 @@ class ComponentAttributeBag implements ArrayAccess, IteratorAggregate, JsonSeria
     {
         $attributeDefaults = array_map(function ($value) use ($escape) {
             return $this->shouldEscapeAttributeValue($escape, $value)
-                        ? e($value)
-                        : $value;
+                ? e($value)
+                : $value;
         }, $attributeDefaults);
 
         [$appendableAttributes, $nonAppendableAttributes] = (new Collection($this->attributes))
@@ -283,8 +282,8 @@ class ComponentAttributeBag implements ArrayAccess, IteratorAggregate, JsonSeria
 
         $attributes = $appendableAttributes->mapWithKeys(function ($value, $key) use ($attributeDefaults, $escape) {
             $defaultsValue = isset($attributeDefaults[$key]) && $attributeDefaults[$key] instanceof AppendableAttributeValue
-                        ? $this->resolveAppendableAttributeDefault($attributeDefaults, $key, $escape)
-                        : ($attributeDefaults[$key] ?? '');
+                ? $this->resolveAppendableAttributeDefault($attributeDefaults, $key, $escape)
+                : ($attributeDefaults[$key] ?? '');
 
             if ($key === 'style') {
                 $value = Str::finish($value, ';');

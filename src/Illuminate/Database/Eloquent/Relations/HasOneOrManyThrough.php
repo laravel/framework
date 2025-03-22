@@ -77,7 +77,6 @@ abstract class HasOneOrManyThrough extends Relation
      * @param  string  $secondKey
      * @param  string  $localKey
      * @param  string  $secondLocalKey
-     * @return void
      */
     public function __construct(Builder $query, Model $farParent, Model $throughParent, $firstKey, $secondKey, $localKey, $secondLocalKey)
     {
@@ -168,7 +167,8 @@ abstract class HasOneOrManyThrough extends Relation
         $this->whereInEager(
             $whereIn,
             $this->getQualifiedFirstKeyName(),
-            $this->getKeys($models, $this->localKey)
+            $this->getKeys($models, $this->localKey),
+            $this->getRelationQuery(),
         );
     }
 
@@ -468,7 +468,7 @@ abstract class HasOneOrManyThrough extends Relation
      * @param  array  $columns
      * @param  string  $pageName
      * @param  int  $page
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     * @return \Illuminate\Pagination\LengthAwarePaginator
      */
     public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
     {

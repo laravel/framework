@@ -11,7 +11,6 @@ class ScheduledTaskFinished
      *
      * @param  \Illuminate\Console\Scheduling\Event  $task  The scheduled event that ran.
      * @param  float  $runtime  The runtime of the scheduled event.
-     * @return void
      */
     public function __construct(
         public Event $task,

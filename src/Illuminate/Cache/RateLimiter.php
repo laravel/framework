@@ -32,7 +32,6 @@ class RateLimiter
      * Create a new rate limiter instance.
      *
      * @param  \Illuminate\Contracts\Cache\Repository  $cache
-     * @return void
      */
     public function __construct(Cache $cache)
     {

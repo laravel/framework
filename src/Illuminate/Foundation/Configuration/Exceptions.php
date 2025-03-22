@@ -13,7 +13,6 @@ class Exceptions
      * Create a new exception handling configuration instance.
      *
      * @param  \Illuminate\Foundation\Exceptions\Handler  $handler
-     * @return void
      */
     public function __construct(public Handler $handler)
     {

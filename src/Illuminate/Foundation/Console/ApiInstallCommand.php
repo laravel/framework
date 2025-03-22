@@ -110,7 +110,7 @@ class ApiInstallCommand extends Command
                 $appBootstrapPath,
             );
         } else {
-            $this->components->warn('Unable to automatically add API route definition to bootstrap file. API route file should be registered manually.');
+            $this->components->warn("Unable to automatically add API route definition to [{$appBootstrapPath}]. API route file should be registered manually.");
 
             return;
         }

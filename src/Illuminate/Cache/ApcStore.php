@@ -25,7 +25,6 @@ class ApcStore extends TaggableStore
      *
      * @param  \Illuminate\Cache\ApcWrapper  $apc
      * @param  string  $prefix
-     * @return void
      */
     public function __construct(ApcWrapper $apc, $prefix = '')
     {

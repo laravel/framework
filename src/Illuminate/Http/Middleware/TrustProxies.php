@@ -77,8 +77,8 @@ class TrustProxies
         }
 
         $trustedIps = is_string($trustedIps)
-                ? array_map(trim(...), explode(',', $trustedIps))
-                : $trustedIps;
+            ? array_map(trim(...), explode(',', $trustedIps))
+            : $trustedIps;
 
         if (is_array($trustedIps)) {
             return $this->setTrustedProxyIpAddressesToSpecificIps($request, $trustedIps);

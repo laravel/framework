@@ -22,8 +22,8 @@ trait InteractsWithBroadcasting
     public function broadcastVia($connection = null)
     {
         $this->broadcastConnection = is_null($connection)
-                        ? [null]
-                        : Arr::wrap($connection);
+            ? [null]
+            : Arr::wrap($connection);
 
         return $this;
     }

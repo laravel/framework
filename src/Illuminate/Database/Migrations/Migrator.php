@@ -100,7 +100,6 @@ class Migrator
      * @param  \Illuminate\Database\ConnectionResolverInterface  $resolver
      * @param  \Illuminate\Filesystem\Filesystem  $files
      * @param  \Illuminate\Contracts\Events\Dispatcher|null  $dispatcher
-     * @return void
      */
     public function __construct(
         MigrationRepositoryInterface $repository,
@@ -437,8 +436,8 @@ class Migrator
 
         $this->getSchemaGrammar($connection)->supportsSchemaTransactions()
             && $migration->withinTransaction
-                    ? $connection->transaction($callback)
-                    : $callback();
+                ? $connection->transaction($callback)
+                : $callback();
     }
 
     /**
@@ -541,8 +540,8 @@ class Migrator
 
         if (is_object($migration)) {
             return method_exists($migration, '__construct')
-                    ? $this->files->getRequire($path)
-                    : clone $migration;
+                ? $this->files->getRequire($path)
+                : clone $migration;
         }
 
         return new $class;

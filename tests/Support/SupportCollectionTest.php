@@ -2146,6 +2146,24 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testChunkPreservingKeys($collection)
+    {
+        $data = new $collection(['a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5]);
+
+        $this->assertEquals(
+            [['a' => 1, 'b' => 2], ['c' => 3, 'd' => 4], ['e' => 5]],
+            $data->chunk(2)->toArray()
+        );
+
+        $data = new $collection([1, 2, 3, 4, 5]);
+
+        $this->assertEquals(
+            [[0 => 1, 1 => 2], [0 => 3, 1 => 4], [0 => 5]],
+            $data->chunk(2, false)->toArray()
+        );
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testSplitIn($collection)
     {
         $data = new $collection([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
@@ -2353,9 +2371,11 @@ class SupportCollectionTest extends TestCase
     #[DataProvider('collectionClassProvider')]
     public function testImplodeModels($collection)
     {
-        $model = new class extends Model {};
+        $model = new class extends Model {
+        };
         $model->setAttribute('email', 'foo');
-        $modelTwo = new class extends Model {};
+        $modelTwo = new class extends Model {
+        };
         $modelTwo->setAttribute('email', 'bar');
         $data = new $collection([$model, $modelTwo]);
 
