@@ -116,7 +116,7 @@ trait Matching
     }
 
     /**
-     * Asserts that the property is null.
+     * Asserts that the property is not null.
      *
      * @param  string  $key
      * @return $this
