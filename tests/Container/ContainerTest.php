@@ -319,6 +319,17 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf(ContainerConcreteStub::class, $instance->default);
     }
 
+    public function testResolutionOfClassWithDefaultParametersAndContextualBindings()
+    {
+        $container = new Container;
+
+        $container->when(ContainerClassWithDefaultValueStub::class)
+            ->needs(ContainerConcreteStub::class)
+            ->give(fn () => new ContainerConcreteStub);
+        $instance = $container->make(ContainerClassWithDefaultValueStub::class);
+        $this->assertInstanceOf(ContainerConcreteStub::class, $instance->default);
+    }
+
     public function testBound()
     {
         $container = new Container;
