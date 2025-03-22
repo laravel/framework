@@ -588,7 +588,8 @@ class FoundationExceptionsHandlerTest extends TestCase
         }
 
         try {
-            $this->assertDoesntThrow(function () { });
+            $this->assertDoesntThrow(function () {
+            });
 
             $testFailed = false;
         } catch (AssertionFailedError) {
