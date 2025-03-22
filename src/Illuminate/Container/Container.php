@@ -177,6 +177,13 @@ class Container implements ArrayAccess, ContainerContract
     protected $afterResolvingAttributeCallbacks = [];
 
     /**
+     * An array of the interfaces to AutoConfigure
+     *
+     * @var class-string[]
+     */
+    protected $autoconfigure = [];
+
+    /**
      * Define a contextual binding.
      *
      * @param  array|string  $concrete
@@ -1692,5 +1699,13 @@ class Container implements ArrayAccess, ContainerContract
     public function __set($key, $value)
     {
         $this[$key] = $value;
+    }
+
+    /**
+     * @param class-string $interface
+     */
+    public function autoconfigure(string $interface): void
+    {
+        $this->autoconfigure[] = $interface;
     }
 }
