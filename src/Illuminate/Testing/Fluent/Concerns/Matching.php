@@ -93,6 +93,17 @@ trait Matching
     }
 
     /**
+     * Asserts that the property is null.
+     *
+     * @param  string  $key
+     * @return $this
+     */
+    public function whereNull(string $key): self
+    {
+        return $this->where($key, null);
+    }
+
+    /**
      * Asserts that all properties match their expected values.
      *
      * @param  array  $bindings

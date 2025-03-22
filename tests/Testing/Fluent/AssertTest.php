@@ -580,6 +580,39 @@ class AssertTest extends TestCase
         $assert->where('bar', BackedEnum::test_empty);
     }
 
+    public function testAssertWhereNullMatchesValue()
+    {
+        $assert = AssertableJson::fromArray([
+            'bar' => null,
+        ]);
+
+        $assert->whereNull('bar');
+    }
+
+    public function testAssertWhereNullFailsWhenDoesNotMatchValue()
+    {
+        $assert = AssertableJson::fromArray([
+            'bar' => 'value',
+        ]);
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Property [bar] does not match the expected value.');
+
+        $assert->whereNull('bar');
+    }
+
+    public function testAssertWhereNullFailsWhenMissing()
+    {
+        $assert = AssertableJson::fromArray([
+            'bar' => 'value',
+        ]);
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Property [baz] does not exist.');
+
+        $assert->whereNull('baz');
+    }
+
     public function testAssertWhereContainsFailsWithEmptyValue()
     {
         $assert = AssertableJson::fromArray([]);
