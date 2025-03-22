@@ -63,6 +63,7 @@ function test(
     assertType('Illuminate\Types\Builder\User', $query->forceCreate(['name' => 'John']));
     assertType('Illuminate\Types\Builder\User', $query->updateOrCreate(['id' => 1], ['name' => 'John']));
     assertType('Illuminate\Types\Builder\User', $query->firstOrFail());
+    assertType('Illuminate\Types\Builder\User', $query->findSole(1));
     assertType('Illuminate\Types\Builder\User', $query->sole());
     assertType('Illuminate\Support\LazyCollection<int, Illuminate\Types\Builder\User>', $query->cursor());
     assertType('Illuminate\Support\LazyCollection<int, Illuminate\Types\Builder\User>', $query->cursor());
