@@ -61,6 +61,15 @@ class ValidationAnyOfRuleTest extends TestCase
             $rule
         );
         $this->assertTrue($validatorString->passes());
+
+        $validatorString = new Validator(
+            resolve('translator'),
+            [
+                'email' => 'abc',
+            ],
+            $rule
+        );
+        $this->assertFalse($validatorString->passes());
     }
 
     public function testBareBasicStringRuleValidation()
