@@ -1190,11 +1190,9 @@ class Container implements ArrayAccess, ContainerContract
         // First we will check if a default value has been defined for the parameter.
         // If it has, and no explicit binding exists, we should return it to avoid
         // overriding any of the developer specified defaults for the parameters.
-        if (
-            $parameter->isDefaultValueAvailable()
-            && ! $this->bound($className)
-            && $this->findInContextualBindings($className) === null
-        ) {
+        if ($parameter->isDefaultValueAvailable() &&
+            ! $this->bound($className) &&
+            $this->findInContextualBindings($className) === null) {
             return $parameter->getDefaultValue();
         }
 
