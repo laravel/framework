@@ -642,12 +642,11 @@ class Builder implements BuilderContract
      * Insert a number of records, merging in default attributes,
      * adding timestamps, and converting casts to raw values.
      *
-     * @param  array<int, <array<string, mixed>>  $values
-     * @return array
+     * @param  array<int, array<string, mixed>>  $values
+     * @return array<int, array<string, mixed>>
      */
     public function castBeforeInsert(array $values)
     {
-        /*
         if (empty($values)) {
             return [];
         }
@@ -656,49 +655,16 @@ class Builder implements BuilderContract
             $values = [$values];
         }
 
-        $modelInstance = $this->newModelInstance();
-        $timestampColumns = [];
-
-        if ($modelInstance->usesTimestamps()) {
-            $now = $modelInstance->freshTimestamp();
-
-            if ($createdAtColumn = $modelInstance->getCreatedAtColumn()) {
-                $timestampColumns[$createdAtColumn] ??= $now;
-            }
-            if ($updatedAtColumn = $modelInstance->getUpdatedAtColumn()) {
-                $timestampColumns[$updatedAtColumn] ??= $now;
-            }
-        }
-
-        $this->model->unguarded(function () use (&$values, $timestampColumns) {
-            foreach ($values as $key => $value) {
-                $newModelInstance = tap(
-                    $this->newModelInstance(array_merge($timestampColumns, $value)),
-                    fn (Model $model) => $model->setUniqueIds()
-                );
-                $values[$key] = $newModelInstance->getAttributes();
-            }
-        });
-
-        dd($values);
-        return $values;
-        */
-
-        if (empty($values)) {
-            return [];
-        }
-
-        if (! is_array(reset($values))) {
-            $values = [$values];
-        }
-
-        $this->model->unguard(function () use (&$values) {
+        $this->model->unguarded(function () use (&$values) {
             foreach($values as $key => $rowValues) {
-                $values[$key] = $this->newModelInstance($rowValues)->getAttributes();
+                $values[$key] = tap(
+                    $this->newModelInstance($rowValues),
+                    fn ($model) => $model->setUniqueIds()
+                )->getAttributes();
             }
         });
 
-        return dd($this->addTimestampsToUpsertValues($this->addUniqueIdsToUpsertValues($values)));
+        return $this->addTimestampsToUpsertValues($values);
     }
 
     /**
