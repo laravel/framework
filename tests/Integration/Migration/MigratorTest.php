@@ -44,6 +44,7 @@ class MigratorTest extends TestCase
         $this->expectTask('2014_10_12_000000_create_people_table', 'DONE');
         $this->expectTask('2015_10_04_000000_modify_people_table', 'DONE');
         $this->expectTask('2016_10_04_000000_modify_people_table', 'DONE');
+        $this->expectTask('2017_10_04_000000_add_age_to_people', 'SKIPPED');
 
         $this->output->shouldReceive('writeln')->once();
 
@@ -52,6 +53,7 @@ class MigratorTest extends TestCase
         $this->assertTrue(DB::getSchemaBuilder()->hasTable('people'));
         $this->assertTrue(DB::getSchemaBuilder()->hasColumn('people', 'first_name'));
         $this->assertTrue(DB::getSchemaBuilder()->hasColumn('people', 'last_name'));
+        $this->assertFalse(DB::getSchemaBuilder()->hasColumn('people', 'age'));
     }
 
     public function testMigrateWithoutOutput()
@@ -64,6 +66,7 @@ class MigratorTest extends TestCase
         $this->assertTrue(DB::getSchemaBuilder()->hasTable('people'));
         $this->assertTrue(DB::getSchemaBuilder()->hasColumn('people', 'first_name'));
         $this->assertTrue(DB::getSchemaBuilder()->hasColumn('people', 'last_name'));
+        $this->assertFalse(DB::getSchemaBuilder()->hasColumn('people', 'age'));
     }
 
     public function testWithSkippedMigrations()
@@ -120,7 +123,7 @@ class MigratorTest extends TestCase
         $this->expectTwoColumnDetail('2016_10_04_000000_modify_people_table');
         $this->expectBulletList(['alter table "people" add column "last_name" varchar']);
 
-        $this->output->shouldReceive('writeln')->once();
+        $this->output->shouldReceive('writeln')->times(3);
 
         $this->subject->run([__DIR__.'/fixtures'], ['pretend' => true]);
 

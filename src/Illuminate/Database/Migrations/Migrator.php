@@ -159,6 +159,19 @@ class Migrator
     }
 
     /**
+     * Determine if the migration should be ran.
+     *
+     * @param  object  $migration
+     * @return bool
+     */
+    public function shouldSkipMigration($migration)
+    {
+        return $migration instanceof Migration
+            ? ! $migration->shouldRun()
+            : false;
+    }
+
+    /**
      * Get list of pending migrations to skip.
      *
      * @return list<string>
@@ -240,12 +253,16 @@ class Migrator
             return $this->pretendToRun($migration, 'up');
         }
 
-        $this->write(Task::class, $name, fn () => $this->runMigration($migration, 'up'));
+        if ($this->shouldSkipMigration($migration)) {
+            $this->write(Task::class, $name, fn () => MigrationResult::Skipped);
+        } else {
+            $this->write(Task::class, $name, fn () => $this->runMigration($migration, 'up'));
 
-        // Once we have run a migrations class, we will log that it was run in this
-        // repository so that we don't try to run it next time we do a migration
-        // in the application. A migration repository keeps the migrate order.
-        $this->repository->log($name, $batch);
+            // Once we have run a migrations class, we will log that it was run in this
+            // repository so that we don't try to run it next time we do a migration
+            // in the application. A migration repository keeps the migrate order.
+            $this->repository->log($name, $batch);
+        }
     }
 
     /**
