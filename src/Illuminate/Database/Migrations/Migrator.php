@@ -160,19 +160,6 @@ class Migrator
     }
 
     /**
-     * Determine if the migration should be ran.
-     *
-     * @param  object  $migration
-     * @return bool
-     */
-    public function shouldSkipMigration($migration)
-    {
-        return $migration instanceof Migration
-            ? ! $migration->shouldRun()
-            : false;
-    }
-
-    /**
      * Get list of pending migrations to skip.
      *
      * @return list<string>
@@ -254,7 +241,11 @@ class Migrator
             return $this->pretendToRun($migration, 'up');
         }
 
-        if ($this->shouldSkipMigration($migration)) {
+        $shouldRunMigration = $migration instanceof Migration
+            ? $migration->shouldRun()
+            : true;
+
+        if (! $shouldRunMigration) {
             $this->write(Task::class, $name, fn () => MigrationResult::Skipped);
         } else {
             $this->write(Task::class, $name, fn () => $this->runMigration($migration, 'up'));
