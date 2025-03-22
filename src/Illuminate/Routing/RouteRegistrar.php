@@ -204,6 +204,23 @@ class RouteRegistrar
      */
     public function group($callback)
     {
+        if (isset($this->attributes['can'])) {
+            $canParams = $this->attributes['can'];
+            $ability = $canParams[0];
+
+            if(is_array($canParams)) {
+                $models = array_slice($canParams, 1);
+
+                $middleware = 'can:' . implode(',', array_merge([$ability], $models));
+
+                if (!isset($this->attributes['middleware'])) {
+                    $this->attributes['middleware'] = [];
+                }
+
+                $this->attributes['middleware'][] = $middleware;
+            }
+        }
+
         $this->router->group($this->attributes, $callback);
 
         return $this;
@@ -288,6 +305,10 @@ class RouteRegistrar
         if (in_array($method, $this->allowedAttributes)) {
             if ($method === 'middleware') {
                 return $this->attribute($method, is_array($parameters[0]) ? $parameters[0] : $parameters);
+            }
+
+            if ($method === 'can') {
+                return $this->attribute($method, $parameters);
             }
 
             return $this->attribute($method, array_key_exists(0, $parameters) ? $parameters[0] : true);

@@ -1213,6 +1213,35 @@ class RoutingRouteTest extends TestCase
         );
     }
 
+    public function testCanMiddlewareAppliedToGroup()
+    {
+        $router = $this->getRouter();
+
+        // Apply 'can' outside the group
+        $router->prefix('blog')
+            ->can('access', 'blog')
+            ->group(function () use ($router) {
+                $router->get('/', function () {
+                    return 'Blog Home';
+                });
+
+                $router->get('/dashboard', function () {
+                    return 'Dashboard';
+                });
+            });
+
+        $routes = $router->getRoutes()->getRoutes();
+
+        foreach ($routes as $route) {
+            $this->assertContains(
+                'can:access,blog',
+                $route->getAction('middleware') ?? []
+            );
+        }
+
+        $this->assertSame('blog', $routes[0]->getPrefix());
+    }
+
     public function testCurrentRouteUses()
     {
         $router = $this->getRouter();
