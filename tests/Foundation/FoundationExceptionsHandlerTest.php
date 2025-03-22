@@ -574,7 +574,7 @@ class FoundationExceptionsHandlerTest extends TestCase
     public function testAssertNoExceptionIsThrown()
     {
         try {
-            $this->assertThrowsNothing(function () {
+            $this->assertDoesntThrow(function () {
                 throw new Exception;
             });
 
@@ -584,11 +584,11 @@ class FoundationExceptionsHandlerTest extends TestCase
         }
 
         if ($testFailed) {
-            Assert::fail('assertThrowsNothing failed: thrown exception was not detected.');
+            Assert::fail('assertDoesntThrow failed: thrown exception was not detected.');
         }
 
         try {
-            $this->assertThrowsNothing(function () { });
+            $this->assertDoesntThrow(function () { });
 
             $testFailed = false;
         } catch (AssertionFailedError) {
@@ -596,7 +596,7 @@ class FoundationExceptionsHandlerTest extends TestCase
         }
 
         if ($testFailed) {
-            Assert::fail('assertThrowsNothing failed: exception was detected while no exception was thrown.');
+            Assert::fail('assertDoesntThrow failed: exception was detected while no exception was thrown.');
         }
     }
 

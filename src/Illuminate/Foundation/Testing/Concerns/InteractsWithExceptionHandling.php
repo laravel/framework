@@ -220,7 +220,7 @@ trait InteractsWithExceptionHandling
      * @param  \Closure  $test
      * @return $this
      */
-    protected function assertThrowsNothing(Closure $test)
+    protected function assertDoesntThrow(Closure $test)
     {
         try {
             $test();
@@ -235,7 +235,7 @@ trait InteractsWithExceptionHandling
 
         Assert::assertTrue(
             ! $thrown,
-            sprintf('Failed asserting that no exception was thrown as exception of type %s with message %s was thrown.', $exceptionClass ?? null, $exceptionMessage ?? null)
+            sprintf('Unexpected exception of type %s with message %s was thrown.', $exceptionClass ?? null, $exceptionMessage ?? null)
         );
 
         return $this;
