@@ -208,12 +208,12 @@ class RouteRegistrar
             $canParams = $this->attributes['can'];
             $ability = $canParams[0];
 
-            if(is_array($canParams)) {
+            if (is_array($canParams)) {
                 $models = array_slice($canParams, 1);
 
-                $middleware = 'can:' . implode(',', array_merge([$ability], $models));
+                $middleware = 'can:'.implode(',', array_merge([$ability], $models));
 
-                if (!isset($this->attributes['middleware'])) {
+                if (! isset($this->attributes['middleware'])) {
                     $this->attributes['middleware'] = [];
                 }
 
