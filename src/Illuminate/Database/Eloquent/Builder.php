@@ -61,6 +61,13 @@ class Builder implements BuilderContract
     public $pendingAttributes = [];
 
     /**
+     * Indicates if attributes, timestamps, and unique IDs should be merged before insert.
+     *
+     * @var bool
+     */
+    public $mergeAttributesBeforeInsert = false;
+
+    /**
      * The relationships that should be eager loaded.
      *
      * @var array
@@ -586,6 +593,78 @@ class Builder implements BuilderContract
         }
 
         return $callback();
+    }
+
+    /**
+     * Insert new records into the database.
+     *
+     * @return bool
+     */
+    public function insert(array $values)
+    {
+        if ($this->mergeAttributesBeforeInsert) {
+            $values = $this->castBeforeInsert($values);
+        }
+
+        return $this->forwardCallTo($this->query, 'insert', [$values]);
+    }
+
+    /**
+     * Insert a new record and get the value of the primary key.
+     *
+     * @param  string|null  $sequence
+     * @return int
+     */
+    public function insertGetId(array $values, $sequence = null)
+    {
+        if ($this->mergeAttributesBeforeInsert) {
+            $values = $this->castBeforeInsert([$values])[0];
+        }
+
+        return $this->forwardCallTo($this->query, 'insertGetId', [$values, $sequence]);
+    }
+
+    /**
+     * Insert new records into the database while ignoring errors.
+     *
+     * @return int
+     */
+    public function insertOrIgnore(array $values)
+    {
+        if ($this->mergeAttributesBeforeInsert) {
+            $values = $this->castBeforeInsert($values);
+        }
+
+        return $this->forwardCallTo($this->query, 'insertOrIgnore', [$values]);
+    }
+
+    /**
+     * Insert a number of records, merging in default attributes,
+     * adding timestamps, and converting casts to raw values.
+     *
+     * @param  array<int, array<string, mixed>>  $values
+     * @return array<int, array<string, mixed>>
+     */
+    public function castBeforeInsert(array $values)
+    {
+        if (empty($values)) {
+            return [];
+        }
+
+        if (! is_array(reset($values))) {
+            $values = [$values];
+        }
+
+        $this->model->unguarded(function () use (&$values) {
+            foreach($values as $key => $rowValues) {
+                $values[$key] = tap(
+                    $this->newModelInstance($rowValues),
+                    fn ($model) => $model->setUniqueIds()
+                )->getAttributes();
+            }
+        });
+
+        return $this->addTimestampsToUpsertValues($values);
     }
 
     /**
@@ -1832,6 +1911,20 @@ class Builder implements BuilderContract
         }
 
         $this->pendingAttributes = array_merge($this->pendingAttributes, $attributes);
+
+        return $this;
+    }
+
+    /**
+     * Indicate if insert methods should merge in default attributes,
+     * add timestamps, and converting casts to raw values.
+     *
+     * @param  bool  $mergeBeforeInsert
+     * @return $this
+     */
+    public function mergeAttributesBeforeInsert($mergeBeforeInsert = true)
+    {
+        $this->mergeAttributesBeforeInsert = $mergeBeforeInsert;
 
         return $this;
     }
