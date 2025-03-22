@@ -91,7 +91,7 @@ class PasswordBroker implements PasswordBrokerContract
      *
      * @param  array  $credentials
      * @param  \Closure  $callback
-     * @return mixed
+     * @return string
      */
     public function reset(#[\SensitiveParameter] array $credentials, Closure $callback)
     {
