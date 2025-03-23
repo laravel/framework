@@ -46,7 +46,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
             $source instanceof Closure,
             $source instanceof self => $source,
 
-            is_null($source) => static::empty(),
+            $source === null => static::empty(),
 
             $source instanceof Generator => throw new InvalidArgumentException(
                 'Generators should not be passed directly to LazyCollection. Instead, pass a generator function.'
