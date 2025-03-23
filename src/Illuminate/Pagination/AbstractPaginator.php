@@ -805,11 +805,42 @@ abstract class AbstractPaginator implements Htmlable, Stringable
     /**
      * Create a paginated resource collection.
      *
-     * @param  class-string<JsonResource>  $resourceClass
+     * @param  class-string<JsonResource>|null  $resourceClass
      * @return ResourceCollection
      */
-    public function toResourceCollection(string $resourceClass): ResourceCollection
+    public function toResourceCollection(?string $resourceClass = null): ResourceCollection
     {
+        if ($resourceClass === null) {
+            return $this->guessResourceCollection();
+        }
+
+        return $resourceClass::collection($this);
+    }
+
+    /**
+     * Guess the resource collection for the items.
+     *
+     * @return ResourceCollection
+     */
+    protected function guessResourceCollection(): ResourceCollection
+    {
+        $collection = $this->getCollection();
+
+        if ($collection->isEmpty()) {
+            return new ResourceCollection($collection);
+        }
+
+        $model = $collection->first();
+
+        assert(is_object($model), 'Resource collection guesser expects the collection to contain objects.');
+
+        $className = get_class($model);
+        $basename = class_basename($className);
+
+        $resourceClass = sprintf('App\Http\Resources\%sResource', $basename);
+
+        assert(class_exists($resourceClass), sprintf('Failed to find resource class for model [%s].', $className));
+
         return $resourceClass::collection($this);
     }
 }

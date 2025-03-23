@@ -849,11 +849,40 @@ class Collection extends BaseCollection implements QueueableCollection
     /**
      * Create a new resource collection instance for the given resource.
      *
-     * @param  class-string<JsonResource>  $resourceClass
+     * @param  class-string<JsonResource>|null  $resourceClass
      * @return ResourceCollection
      */
-    public function toResourceCollection(string $resourceClass): ResourceCollection
+    public function toResourceCollection(?string $resourceClass = null): ResourceCollection
     {
+        if ($resourceClass === null) {
+            return $this->guessResourceCollection();
+        }
+
+        return $resourceClass::collection($this);
+    }
+
+    /**
+     * Guess the resource collection for the items.
+     *
+     * @return ResourceCollection
+     */
+    protected function guessResourceCollection(): ResourceCollection
+    {
+        if ($this->isEmpty()) {
+            return new ResourceCollection($this);
+        }
+
+        $model = $this->first();
+
+        assert(is_object($model), 'Resource collection guesser expects the collection to contain objects.');
+
+        $className = get_class($model);
+        $basename = class_basename($className);
+
+        $resourceClass = sprintf('App\Http\Resources\%sResource', $basename);
+
+        assert(class_exists($resourceClass), sprintf('Failed to find resource class for model [%s].', $className));
+
         return $resourceClass::collection($this);
     }
 }
