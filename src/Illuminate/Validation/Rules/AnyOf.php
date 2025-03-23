@@ -15,7 +15,7 @@ class AnyOf implements Rule, ValidatorAwareRule
      *
      * @var array
      */
-    protected array $ruleSets = [];
+    protected array $rules = [];
 
     /**
      * The error message after validation, if any.
@@ -34,17 +34,17 @@ class AnyOf implements Rule, ValidatorAwareRule
     /**
      * Sets the validation rules to match against.
      *
-     * @param  Illuminate\Contracts\Validation\ValidationRule[][]  $ruleSets
+     * @param  Illuminate\Contracts\Validation\ValidationRule[][]  $rules
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct($ruleSets)
+    public function __construct($rules)
     {
-        if (! is_array($ruleSets)) {
+        if (! is_array($rules)) {
             throw new InvalidArgumentException('The provided value must be an array of validation rules.');
         }
 
-        $this->ruleSets = $ruleSets;
+        $this->rules = $rules;
     }
 
     /**
@@ -58,10 +58,10 @@ class AnyOf implements Rule, ValidatorAwareRule
     {
         $this->messages = [];
 
-        foreach ($this->ruleSets as $ruleSet) {
+        foreach ($this->rules as $rule) {
             $validator = Validator::make(
                 Arr::wrap($value),
-                Arr::wrap($ruleSet),
+                Arr::isAssoc(Arr::wrap($rule)) ? $rule : [$rule],
                 $this->validator->customMessages,
                 $this->validator->customAttributes
             );
