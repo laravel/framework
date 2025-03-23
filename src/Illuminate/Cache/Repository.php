@@ -577,12 +577,12 @@ class Repository implements ArrayAccess, CacheContract
      */
     public function clear(): bool
     {
-        $this->event(new CacheFlushing($this->getName(), ''));
+        $this->event(new CacheFlushing($this->getName()));
 
         $result = $this->store->flush();
 
         if ($result) {
-            $this->event(new CacheFlushed($this->getName(), ''));
+            $this->event(new CacheFlushed($this->getName()));
         }
 
         return $result;
