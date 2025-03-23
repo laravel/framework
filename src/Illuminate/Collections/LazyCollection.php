@@ -42,17 +42,18 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
      */
     public function __construct($source = null)
     {
-        if ($source instanceof Closure || $source instanceof self) {
-            $this->source = $source;
-        } elseif (is_null($source)) {
-            $this->source = static::empty();
-        } elseif ($source instanceof Generator) {
-            throw new InvalidArgumentException(
+        $this->source = match (true) {
+            $source instanceof Closure,
+            $source instanceof self => $source,
+
+            is_null($source) => static::empty(),
+
+            $source instanceof Generator => throw new InvalidArgumentException(
                 'Generators should not be passed directly to LazyCollection. Instead, pass a generator function.'
-            );
-        } else {
-            $this->source = $this->getArrayableItems($source);
-        }
+            ),
+
+            default => $this->getArrayableItems($source),
+        };
     }
 
     /**
