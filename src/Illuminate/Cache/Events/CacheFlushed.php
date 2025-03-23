@@ -2,7 +2,7 @@
 
 namespace Illuminate\Cache\Events;
 
-class CacheFlushed extends CacheEvent
+class CacheFlushed extends CacheFlushEvent
 {
     //
 }
