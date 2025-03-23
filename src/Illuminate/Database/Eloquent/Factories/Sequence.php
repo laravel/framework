@@ -9,7 +9,7 @@ class Sequence implements Countable
     /**
      * The sequence of return values.
      *
-     * @var array
+     * @var array<int, callable|array>
      */
     protected $sequence;
 
@@ -30,7 +30,7 @@ class Sequence implements Countable
     /**
      * Create a new sequence instance.
      *
-     * @param  mixed  ...$sequence
+     * @param  array|callable  ...$sequence
      */
     public function __construct(...$sequence)
     {
