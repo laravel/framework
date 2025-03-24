@@ -86,6 +86,8 @@ class MailableTest extends TestCase
 
         $mailable = new class($user) extends Mailable
         {
+            public $theme = 'taylor';
+
             public function __construct(public User $user)
             {
                 //
@@ -102,28 +104,26 @@ class MailableTest extends TestCase
 
     public static function markdownEncodedTemplateDataProvider()
     {
-        $hi = '<em style="box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, Helvetica, Arial, sans-serif, \'Apple Color Emoji\', \'Segoe UI Emoji\', \'Segoe UI Symbol\'; position: relative;">Hi</em>';
-
-        yield ['[Laravel](https://laravel.com)', "{$hi} [Laravel](https://laravel.com)"];
+        yield ['[Laravel](https://laravel.com)', '<em>Hi</em> [Laravel](https://laravel.com)'];
 
         yield [
             '![Welcome to Laravel](https://laravel.com/assets/img/welcome/background.svg)',
-            "{$hi} ![Welcome to Laravel](https://laravel.com/assets/img/welcome/background.svg)",
+            '<em>Hi</em> ![Welcome to Laravel](https://laravel.com/assets/img/welcome/background.svg)',
         ];
 
         yield [
             'Visit https://laravel.com/docs to browse the documentation',
-            "{$hi} Visit https://laravel.com/docs to browse the documentation",
+            '<em>Hi</em> Visit https://laravel.com/docs to browse the documentation',
         ];
 
         yield [
             'Visit <https://laravel.com/docs> to browse the documentation',
-            "{$hi} Visit &lt;https://laravel.com/docs&gt; to browse the documentation",
+            '<em>Hi</em> Visit &lt;https://laravel.com/docs&gt; to browse the documentation',
         ];
 
         yield [
             'Visit <span>https://laravel.com/docs</span> to browse the documentation',
-            "{$hi} Visit &lt;span&gt;https://laravel.com/docs&lt;/span&gt; to browse the documentation",
+            '<em>Hi</em> Visit &lt;span&gt;https://laravel.com/docs&lt;/span&gt; to browse the documentation',
         ];
     }
 }
