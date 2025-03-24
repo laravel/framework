@@ -256,6 +256,7 @@ class Builder implements BuilderContract
         ConnectionInterface $connection,
         ?Grammar $grammar = null,
         ?Processor $processor = null,
+        public ?array $fetchUsing = [],
     ) {
         $this->connection = $connection;
         $this->grammar = $grammar ?: $connection->getQueryGrammar();
