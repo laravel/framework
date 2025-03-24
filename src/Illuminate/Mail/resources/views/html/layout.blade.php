@@ -23,7 +23,7 @@ width: 100% !important;
 }
 }
 </style>
-{{ $head ?? '' }}
+{!! $head ?? '' !!}
 </head>
 <body>
 
@@ -40,7 +40,7 @@ width: 100% !important;
 <!-- Body content -->
 <tr>
 <td class="content-cell">
-{{ Illuminate\Mail\Markdown::parse($slot) }}
+{!! Illuminate\Mail\Markdown::parse($slot) !!}
 
 {!! $subcopy ?? '' !!}
 </td>

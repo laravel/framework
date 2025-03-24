@@ -2,14 +2,20 @@
 
 namespace Illuminate\Tests\Integration\Mail;
 
+use Illuminate\Foundation\Auth\User;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
+use Orchestra\Testbench\Attributes\WithMigration;
+use Orchestra\Testbench\Factories\UserFactory;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 class MailableTest extends TestCase
 {
+    use LazilyRefreshDatabase;
+
     /** {@inheritdoc} */
     #[\Override]
     protected function defineEnvironment($app)
@@ -67,6 +73,57 @@ class MailableTest extends TestCase
         yield [
             'Visit <span>https://laravel.com/docs</span> to browse the documentation',
             'My message is: Visit &lt;span&gt;https://laravel.com/docs&lt;/span&gt; to browse the documentation',
+        ];
+    }
+
+    #[WithMigration]
+    #[DataProvider('markdownEncodedTemplateDataProvider')]
+    public function testItCanAssertMarkdownEncodedStringUsingTemplate($given, $expected)
+    {
+        $user = UserFactory::new()->create([
+            'name' => $given,
+        ]);
+
+        $mailable = new class($user) extends Mailable
+        {
+            public function __construct(public User $user)
+            {
+                //
+            }
+
+            public function build()
+            {
+                return $this->markdown('message-with-template');
+            }
+        };
+
+        $mailable->assertSeeInHtml($expected, false);
+    }
+
+    public static function markdownEncodedTemplateDataProvider()
+    {
+        $hi = '<em style="box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, Helvetica, Arial, sans-serif, \'Apple Color Emoji\', \'Segoe UI Emoji\', \'Segoe UI Symbol\'; position: relative;">Hi</em>';
+
+        yield ['[Laravel](https://laravel.com)', "{$hi} [Laravel](https://laravel.com)"];
+
+        yield [
+            '![Welcome to Laravel](https://laravel.com/assets/img/welcome/background.svg)',
+            "{$hi} ![Welcome to Laravel](https://laravel.com/assets/img/welcome/background.svg)",
+        ];
+
+        yield [
+            'Visit https://laravel.com/docs to browse the documentation',
+            "{$hi} Visit https://laravel.com/docs to browse the documentation",
+        ];
+
+        yield [
+            'Visit <https://laravel.com/docs> to browse the documentation',
+            "{$hi} Visit &lt;https://laravel.com/docs&gt; to browse the documentation",
+        ];
+
+        yield [
+            'Visit <span>https://laravel.com/docs</span> to browse the documentation',
+            "{$hi} Visit &lt;span&gt;https://laravel.com/docs&lt;/span&gt; to browse the documentation",
         ];
     }
 }

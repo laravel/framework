@@ -69,9 +69,27 @@ class Markdown
         $contents = $bladeCompiler->usingEchoFormat(
             'new \Illuminate\Support\EncodedHtmlString(%s)',
             function () use ($view, $data) {
-                return $this->view->replaceNamespace(
-                    'mail', $this->htmlComponentPaths()
-                )->make($view, $data)->render();
+                EncodedHtmlString::encodeUsing(function ($value) {
+                    $replacements = [
+                        '[' => '\[',
+                        '<' => '&lt;',
+                        '>' => '&gt;',
+                    ];
+
+                    $html = str_replace(array_keys($replacements), array_values($replacements), $value);
+
+                    return $html;
+                });
+
+                try {
+                    $contents = $this->view->replaceNamespace(
+                        'mail', $this->htmlComponentPaths()
+                    )->make($view, $data)->render();
+                } finally {
+                    EncodedHtmlString::flushState();
+                }
+
+                return $contents;
             }
         );
 
@@ -84,7 +102,7 @@ class Markdown
         }
 
         return new HtmlString(($inliner ?: new CssToInlineStyles)->convert(
-            $contents, $this->view->make($theme, $data)->render()
+            str_replace('\[', '[', $contents), $this->view->make($theme, $data)->render()
         ));
     }
 
