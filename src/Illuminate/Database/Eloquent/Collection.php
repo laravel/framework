@@ -881,12 +881,21 @@ class Collection extends BaseCollection implements QueueableCollection
         throw_unless(is_object($model), \Exception::class,'Resource collection guesser expects the collection to contain objects.');
 
         $className = get_class($model);
-        $basename = class_basename($className);
-
-        $resourceClass = sprintf('App\Http\Resources\%sResource', $basename);
+        $resourceClass = $this->guessResourceClassName($model);
 
         throw_unless(class_exists($resourceClass), \Exception::class, sprintf('Failed to find resource class for model [%s].', $className));
 
         return $resourceClass::collection($this);
+    }
+
+    /**
+     * Guess the resource class name for the given model.
+     *
+     * @param  object  $model
+     * @return class-string<JsonResource>
+     */
+    protected function guessResourceClassName(object $model): string
+    {
+        return sprintf('App\Http\Resources\%sResource', class_basename($model));
     }
 }
