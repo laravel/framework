@@ -24,7 +24,7 @@ class MarkdownParserTest extends TestCase
     #[DataProvider('markdownEncodedDataProvider')]
     public function testItCanParseMarkdownEncodedString($given, $expected)
     {
-        tap(Markdown::parse($given), function ($html) use ($expected) {
+        tap(Markdown::parse($given, encoded: true), function ($html) use ($expected) {
             $this->assertInstanceOf(HtmlString::class, $html);
 
             $this->assertStringEqualsStringIgnoringLineEndings($expected.PHP_EOL, (string) $html);

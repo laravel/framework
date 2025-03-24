@@ -69,9 +69,25 @@ class Markdown
         $contents = $bladeCompiler->usingEchoFormat(
             'new \Illuminate\Support\EncodedHtmlString(%s)',
             function () use ($view, $data) {
-                return $this->view->replaceNamespace(
-                    'mail', $this->htmlComponentPaths()
-                )->make($view, $data)->render();
+                EncodedHtmlString::encodeUsing(function ($value) {
+                    $replacements = [
+                        '[' => '\[',
+                        '<' => '&lt;',
+                        '>' => '&gt;',
+                    ];
+
+                    return str_replace(array_keys($replacements), array_values($replacements), $value);
+                });
+
+                try {
+                    $contents = $this->view->replaceNamespace(
+                        'mail', $this->htmlComponentPaths()
+                    )->make($view, $data)->render();
+                } finally {
+                    EncodedHtmlString::flushState();
+                }
+
+                return $contents;
             }
         );
 
@@ -84,7 +100,7 @@ class Markdown
         }
 
         return new HtmlString(($inliner ?: new CssToInlineStyles)->convert(
-            $contents, $this->view->make($theme, $data)->render()
+            str_replace('\[', '[', $contents), $this->view->make($theme, $data)->render()
         ));
     }
 
@@ -112,10 +128,15 @@ class Markdown
      * Parse the given Markdown text into HTML.
      *
      * @param  string  $text
+     * @param  bool  $encoded
      * @return \Illuminate\Support\HtmlString
      */
-    public static function parse($text)
+    public static function parse($text, bool $encoded = false)
     {
+        if ($encoded === false) {
+            return new HtmlString(static::converter()->convert($text)->getContent());
+        }
+
         EncodedHtmlString::encodeUsing(function ($value) {
             $replacements = [
                 '[' => '\[',
