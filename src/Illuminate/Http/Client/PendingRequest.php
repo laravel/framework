@@ -170,7 +170,7 @@ class PendingRequest
      * @param  \Illuminate\Http\Client\Factory|null  $factory
      * @return void
      */
-    public function __construct(Factory $factory = null)
+    public function __construct(?Factory $factory = null)
     {
         $this->factory = $factory;
         $this->middleware = new Collection;

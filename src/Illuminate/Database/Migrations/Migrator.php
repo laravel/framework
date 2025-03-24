@@ -80,7 +80,7 @@ class Migrator
     public function __construct(MigrationRepositoryInterface $repository,
                                 Resolver $resolver,
                                 Filesystem $files,
-                                Dispatcher $dispatcher = null)
+                                ?Dispatcher $dispatcher = null)
     {
         $this->files = $files;
         $this->events = $dispatcher;

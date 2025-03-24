@@ -60,7 +60,7 @@ class BroadcastManager implements FactoryContract
      * @param  array|null  $attributes
      * @return void
      */
-    public function routes(array $attributes = null)
+    public function routes(?array $attributes = null)
     {
         if ($this->app instanceof CachesRoutes && $this->app->routesAreCached()) {
             return;

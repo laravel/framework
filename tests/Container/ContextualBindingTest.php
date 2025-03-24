@@ -559,7 +559,7 @@ class ContainerTestContextWithOptionalInnerDependency
 {
     public $inner;
 
-    public function __construct(ContainerTestContextInjectOne $inner = null)
+    public function __construct(?ContainerTestContextInjectOne $inner = null)
     {
         $this->inner = $inner;
     }

@@ -102,7 +102,7 @@ class HasManyThrough extends Relation
      * @param  \Illuminate\Database\Eloquent\Builder|null  $query
      * @return void
      */
-    protected function performJoin(Builder $query = null)
+    protected function performJoin(?Builder $query = null)
     {
         $query = $query ?: $this->query;
 

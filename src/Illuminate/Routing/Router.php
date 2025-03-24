@@ -128,7 +128,7 @@ class Router implements BindingRegistrar, RegistrarContract
      * @param  \Illuminate\Container\Container|null  $container
      * @return void
      */
-    public function __construct(Dispatcher $events, Container $container = null)
+    public function __construct(Dispatcher $events, ?Container $container = null)
     {
         $this->events = $events;
         $this->routes = new RouteCollection;
@@ -1018,7 +1018,7 @@ class Router implements BindingRegistrar, RegistrarContract
      * @param  \Closure|null  $callback
      * @return void
      */
-    public function model($key, $class, Closure $callback = null)
+    public function model($key, $class, ?Closure $callback = null)
     {
         $this->bind($key, RouteBinding::forModel($this->container, $class, $callback));
     }

@@ -87,7 +87,7 @@ class NotificationSender
      * @param  array|null  $channels
      * @return void
      */
-    public function sendNow($notifiables, $notification, array $channels = null)
+    public function sendNow($notifiables, $notification, ?array $channels = null)
     {
         $notifiables = $this->formatNotifiables($notifiables);
 

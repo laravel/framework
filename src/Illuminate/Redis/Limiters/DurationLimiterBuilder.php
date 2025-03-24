@@ -105,7 +105,7 @@ class DurationLimiterBuilder
      *
      * @throws \Illuminate\Contracts\Redis\LimiterTimeoutException
      */
-    public function then(callable $callback, callable $failure = null)
+    public function then(callable $callback, ?callable $failure = null)
     {
         try {
             return (new DurationLimiter(

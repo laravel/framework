@@ -43,7 +43,7 @@ class MaintenanceModeException extends ServiceUnavailableHttpException
      * @param  int  $code
      * @return void
      */
-    public function __construct($time, $retryAfter = null, $message = null, Throwable $previous = null, $code = 0)
+    public function __construct($time, $retryAfter = null, $message = null, ?Throwable $previous = null, $code = 0)
     {
         parent::__construct($retryAfter, $message, $previous, $code);
 
