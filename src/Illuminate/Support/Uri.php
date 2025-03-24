@@ -195,7 +195,7 @@ class Uri implements Htmlable, Responsable, Stringable
     /**
      * Specify the port of the URI.
      */
-    public function withPort(int|null $port): static
+    public function withPort(?int $port): static
     {
         return new static($this->uri->withPort($port));
     }
