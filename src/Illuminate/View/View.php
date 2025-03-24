@@ -141,7 +141,7 @@ class View implements ArrayAccess, Htmlable, ViewContract
      *
      * @throws \Throwable
      */
-    public function render(callable $callback = null)
+    public function render(?callable $callback = null)
     {
         try {
             $contents = $this->renderContents();

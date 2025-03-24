@@ -41,7 +41,7 @@ class SupportCarbonTest extends TestCase
 
     public function testCarbonIsMacroableWhenNotCalledStatically()
     {
-        Carbon::macro('diffInDecades', function (Carbon $dt = null, $abs = true) {
+        Carbon::macro('diffInDecades', function (?Carbon $dt = null, $abs = true) {
             return (int) ($this->diffInYears($dt, $abs) / 10);
         });
 

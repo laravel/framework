@@ -62,7 +62,7 @@ class Dispatcher implements DispatcherContract
      * @param  \Illuminate\Contracts\Container\Container|null  $container
      * @return void
      */
-    public function __construct(ContainerContract $container = null)
+    public function __construct(?ContainerContract $container = null)
     {
         $this->container = $container ?: new Container;
     }

@@ -87,7 +87,7 @@ class Application extends SymfonyApplication implements ApplicationContract
      *
      * @return int
      */
-    public function run(InputInterface $input = null, OutputInterface $output = null): int
+    public function run(?InputInterface $input = null, ?OutputInterface $output = null): int
     {
         $commandName = $this->getCommandName(
             $input = $input ?: new ArgvInput
