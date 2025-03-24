@@ -447,4 +447,77 @@ class SupportLazyCollectionTest extends TestCase
 
         $this->assertEquals($expected, $dotted->all());
     }
+
+    public function testSkipLastWithLazyCollection()
+    {
+        // Test with basic array-based LazyCollection
+        $collection = new LazyCollection([1, 2, 3, 4, 5]);
+        $this->assertSame([1, 2, 3], $collection->skipLast(2)->values()->all());
+
+        // Test with generator function to ensure lazy evaluation
+        $data = LazyCollection::make(function () {
+            yield 1;
+            yield 2;
+            yield 3;
+            yield 4;
+            yield 5;
+        });
+
+        $result = $data->skipLast(2);
+
+        // The generator shouldn't be consumed yet
+        $this->assertInstanceOf(LazyCollection::class, $result);
+
+        // Now consume the collection and check the result
+        $this->assertSame([1, 2, 3], $result->values()->all());
+
+        // Test skipping with 0 (should return the entire collection)
+        $zeroSkip = LazyCollection::make(function () {
+            yield 1;
+            yield 2;
+            yield 3;
+        });
+        $this->assertSame([1, 2, 3], $zeroSkip->skipLast(0)->all());
+
+        // Test skipping with negative value (should behave like skipLast(0))
+        $negativeSkip = LazyCollection::make(function () {
+            yield 1;
+            yield 2;
+            yield 3;
+        });
+        $this->assertSame([1, 2, 3], $negativeSkip->skipLast(-5)->all());
+
+        // Test with infinite collection that's limited by take
+        $infinite = LazyCollection::make(function () {
+            $i = 1;
+            while (true) {
+                yield $i++;
+            }
+        });
+
+        // Even with an infinite collection, skipLast should work when combined with take
+        $this->assertSame([1, 2, 3], $infinite->take(5)->skipLast(2)->values()->all());
+
+        // Test that creating the skipLast instance doesn't trigger evaluation
+        $evaluated = [];
+        $collection = LazyCollection::make(function () use (&$evaluated) {
+            for ($i = 1; $i <= 5; $i++) {
+                $evaluated[] = $i;
+                yield $i;
+            }
+        });
+
+        $skipped = $collection->skipLast(2);
+        $this->assertEmpty($evaluated);
+
+        // Test with associative keys
+        $collection = LazyCollection::make(function () {
+            yield 'a' => 1;
+            yield 'b' => 2;
+            yield 'c' => 3;
+            yield 'd' => 4;
+        });
+
+        $this->assertEquals(['a' => 1, 'b' => 2], $collection->skipLast(2)->all());
+    }
 }

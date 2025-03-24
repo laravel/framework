@@ -2371,10 +2371,12 @@ class SupportCollectionTest extends TestCase
     #[DataProvider('collectionClassProvider')]
     public function testImplodeModels($collection)
     {
-        $model = new class extends Model {
+        $model = new class extends Model
+        {
         };
         $model->setAttribute('email', 'foo');
-        $modelTwo = new class extends Model {
+        $modelTwo = new class extends Model
+        {
         };
         $modelTwo->setAttribute('email', 'bar');
         $data = new $collection([$model, $modelTwo]);
@@ -5637,6 +5639,44 @@ class SupportCollectionTest extends TestCase
         $collection = new $collection([]);
 
         $this->assertNull($collection->percentage(fn ($value) => $value === 1));
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testSkipLast($collection)
+    {
+        $data = new $collection([1, 2, 3, 4, 5]);
+
+        // Test basic skipping of last N items
+        $this->assertEquals([1, 2, 3], $data->skipLast(2)->values()->all());
+
+        // Test skipping with 0 (should return the entire collection)
+        $this->assertEquals([1, 2, 3, 4, 5], $data->skipLast(0)->values()->all());
+
+        // Test skipping with negative value (should behave like skipLast(0))
+        $this->assertEquals([1, 2, 3, 4, 5], $data->skipLast(-2)->values()->all());
+
+        // Test skipping more items than the collection has (should return empty collection)
+        $this->assertEquals([], $data->skipLast(10)->values()->all());
+
+        // Test preserving keys
+        $associative = new $collection(['a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5]);
+        $this->assertEquals(['a' => 1, 'b' => 2, 'c' => 3], $associative->skipLast(2)->all());
+
+        // Test with string keys and numeric values
+        $data = new $collection(['first' => 'Taylor', 'second' => 'Otwell', 'third' => 'Laravel']);
+        $this->assertEquals(['first' => 'Taylor', 'second' => 'Otwell'], $data->skipLast(1)->all());
+
+        // Check that the original collection is not modified
+        $data = new $collection([1, 2, 3, 4, 5]);
+        $data->skipLast(2);
+        $this->assertEquals([1, 2, 3, 4, 5], $data->all());
+
+        // Test chaining with other collection methods
+        $data = new $collection([1, 2, 3, 4, 5]);
+        $result = $data->skipLast(2)->map(function ($item) {
+            return $item * 2;
+        });
+        $this->assertEquals([2, 4, 6], $result->values()->all());
     }
 
     /**

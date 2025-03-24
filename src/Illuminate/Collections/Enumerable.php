@@ -937,6 +937,14 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public function skip($count);
 
     /**
+     * Skip the last {$count} items.
+     *
+     * @param  int  $count
+     * @return static
+     */
+    public function skipLast($count);
+
+    /**
      * Skip items in the collection until the given condition is met.
      *
      * @param  TValue|callable(TValue,TKey): bool  $value

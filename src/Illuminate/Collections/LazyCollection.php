@@ -1256,6 +1256,39 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     }
 
     /**
+     * Skip the last {$count} items.
+     *
+     * @param  int  $count
+     * @return static
+     */
+    public function skipLast($count)
+    {
+        if ($count <= 0) {
+            return new static(function () {
+                yield from $this;
+            });
+        }
+
+        return new static(function () use ($count) {
+            // Use a ring buffer to track the last $count items
+            $ringBuffer = [];
+            $position = 0;
+
+            // We need to maintain a buffer of $count items
+            foreach ($this as $key => $value) {
+                // If buffer is full, yield the oldest item
+                if (count($ringBuffer) === $count) {
+                    yield $ringBuffer[$position][0] => $ringBuffer[$position][1];
+                }
+
+                // Store current item in the buffer
+                $ringBuffer[$position] = [$key, $value];
+                $position = ($position + 1) % $count;
+            }
+        });
+    }
+
+    /**
      * Skip items in the collection until the given condition is met.
      *
      * @param  TValue|callable(TValue,TKey): bool  $value

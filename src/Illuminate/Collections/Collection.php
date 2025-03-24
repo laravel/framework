@@ -1296,6 +1296,21 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Skip the last {$count} items.
+     *
+     * @param  int  $count
+     * @return static
+     */
+    public function skipLast($count)
+    {
+        if ($count <= 0) {
+            return new static($this->items);
+        }
+
+        return $this->slice(0, -$count);
+    }
+
+    /**
      * Skip items in the collection until the given condition is met.
      *
      * @param  TValue|callable(TValue,TKey): bool  $value
