@@ -61,13 +61,6 @@ class Builder implements BuilderContract
     public $pendingAttributes = [];
 
     /**
-     * Indicates if attributes, timestamps, and unique IDs should be merged before insert.
-     *
-     * @var bool
-     */
-    public $mergeAttributesBeforeInsert = false;
-
-    /**
      * The relationships that should be eager loaded.
      *
      * @var array
@@ -596,56 +589,51 @@ class Builder implements BuilderContract
     }
 
     /**
-     * Insert new records into the database.
+     * Merge in Model's default attributes, set timestamps,
+     * cast any values, and then insert into the database.
      *
+     * @param  array<int, array<string, mixed>>  $values
      * @return bool
      */
-    public function insert(array $values)
+    public function hydrateAndInsert(array $values)
     {
-        if ($this->mergeAttributesBeforeInsert) {
-            $values = $this->castBeforeInsert($values);
-        }
-
-        return $this->forwardCallTo($this->query, 'insert', [$values]);
+        return $this->insert($this->hydrateForInsert($values));
     }
 
     /**
-     * Insert a new record and get the value of the primary key.
+     * Merge in Model's default attributes, set timestamps,
+     * cast any values, and then insert into the database,
+     * ignoring errors.
      *
-     * @param  string|null  $sequence
+     * @param  array<int, array<string, mixed>>  $values
      * @return int
      */
-    public function insertGetId(array $values, $sequence = null)
+    public function hydrateAndInsertOrIgnore(array $values)
     {
-        if ($this->mergeAttributesBeforeInsert) {
-            $values = $this->castBeforeInsert([$values])[0];
-        }
-
-        return $this->forwardCallTo($this->query, 'insertGetId', [$values, $sequence]);
+        return $this->insertOrIgnore($this->hydrateForInsert($values));
     }
 
     /**
-     * Insert new records into the database while ignoring errors.
+     * Merge in Model's default attributes, set timestamps,
+     * cast any values, and then insert into the database,
+     * returning the ID of the new record.
      *
+     * @param  array<string, mixed>  $values
      * @return int
      */
-    public function insertOrIgnore(array $values)
+    public function hydrateAndInsertGetId(array $values)
     {
-        if ($this->mergeAttributesBeforeInsert) {
-            $values = $this->castBeforeInsert($values);
-        }
-
-        return $this->forwardCallTo($this->query, 'insertOrIgnore', [$values]);
+        return $this->insertGetId($this->hydrateForInsert([$values])[0]);
     }
 
     /**
-     * Insert a number of records, merging in default attributes,
+     * Enrich values by merging in the Model's default attributes,
      * adding timestamps, and converting casts to raw values.
      *
      * @param  array<int, array<string, mixed>>  $values
      * @return array<int, array<string, mixed>>
      */
-    public function castBeforeInsert(array $values)
+    public function hydrateForInsert(array $values)
     {
         if (empty($values)) {
             return [];
@@ -1911,20 +1899,6 @@ class Builder implements BuilderContract
         }
 
         $this->pendingAttributes = array_merge($this->pendingAttributes, $attributes);
-
-        return $this;
-    }
-
-    /**
-     * Indicate if insert methods should merge in default attributes,
-     * add timestamps, and converting casts to raw values.
-     *
-     * @param  bool  $mergeBeforeInsert
-     * @return $this
-     */
-    public function mergeAttributesBeforeInsert($mergeBeforeInsert = true)
-    {
-        $this->mergeAttributesBeforeInsert = $mergeBeforeInsert;
 
         return $this;
     }
