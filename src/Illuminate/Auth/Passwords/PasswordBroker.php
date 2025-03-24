@@ -30,7 +30,7 @@ class PasswordBroker implements PasswordBrokerContract
     /**
      * The event dispatcher instance.
      *
-     * @var \Illuminate\Contracts\Events\Dispatcher
+     * @var \Illuminate\Contracts\Events\Dispatcher|null
      */
     protected $events;
 
@@ -91,7 +91,7 @@ class PasswordBroker implements PasswordBrokerContract
      *
      * @param  array  $credentials
      * @param  \Closure  $callback
-     * @return mixed
+     * @return string
      */
     public function reset(#[\SensitiveParameter] array $credentials, Closure $callback)
     {

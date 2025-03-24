@@ -106,7 +106,7 @@ class BatchFake extends Batch
      * Decrement the pending jobs for the batch.
      *
      * @param  string  $jobId
-     * @return \Illuminate\Bus\UpdatedBatchJobCounts
+     * @return void
      */
     public function decrementPendingJobs(string $jobId)
     {

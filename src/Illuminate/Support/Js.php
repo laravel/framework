@@ -31,7 +31,6 @@ class Js implements Htmlable, Stringable
      * @param  mixed  $data
      * @param  int|null  $flags
      * @param  int  $depth
-     * @return void
      *
      * @throws \JsonException
      */

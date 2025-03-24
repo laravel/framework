@@ -48,6 +48,19 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertSame('baz', $result);
     }
 
+    public function testFindSoleMethod()
+    {
+        $builder = m::mock(Builder::class.'[sole]', [$this->getMockQueryBuilder()]);
+        $model = $this->getMockModel();
+        $builder->setModel($model);
+        $model->shouldReceive('getKeyType')->once()->andReturn('int');
+        $builder->getQuery()->shouldReceive('where')->once()->with('foo_table.foo', '=', 'bar');
+        $builder->shouldReceive('sole')->with(['column'])->andReturn('baz');
+
+        $result = $builder->findSole('bar', ['column']);
+        $this->assertSame('baz', $result);
+    }
+
     public function testFindManyMethod()
     {
         // ids are not empty
