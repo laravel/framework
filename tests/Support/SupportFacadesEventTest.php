@@ -116,7 +116,7 @@ class SupportFacadesEventTest extends TestCase
 
 class FakeForStub
 {
-public function dispatch()
+    public function dispatch()
     {
         Event::dispatch(EventStub::class);
     }
