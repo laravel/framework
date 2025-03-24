@@ -2466,6 +2466,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      *
      * @param  class-string<JsonResource>|null  $resourceClass
      * @return JsonResource
+     *
+     * @throws \Throwable
      */
     public function toResource(?string $resourceClass = null): JsonResource
     {
@@ -2480,6 +2482,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * Guess the resource class for the model.
      *
      * @return JsonResource
+     *
+     * @throws \Throwable
      */
     protected function guessResource(): JsonResource
     {
@@ -2488,7 +2492,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
         $resourceClass = sprintf('App\Http\Resources\%sResource', $basename);
 
-        assert(class_exists($resourceClass), sprintf('Failed to find resource class for model [%s].', $className));
+        throw_unless(class_exists($resourceClass), \Exception::class, sprintf('Failed to find resource class for model [%s].', $className));
 
         return $resourceClass::make($this);
     }

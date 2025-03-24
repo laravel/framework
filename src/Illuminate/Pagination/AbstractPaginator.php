@@ -807,6 +807,8 @@ abstract class AbstractPaginator implements Htmlable, Stringable
      *
      * @param  class-string<JsonResource>|null  $resourceClass
      * @return ResourceCollection
+     *
+     * @throws \Throwable
      */
     public function toResourceCollection(?string $resourceClass = null): ResourceCollection
     {
@@ -821,6 +823,8 @@ abstract class AbstractPaginator implements Htmlable, Stringable
      * Guess the resource collection for the items.
      *
      * @return ResourceCollection
+     *
+     * @throws \Throwable
      */
     protected function guessResourceCollection(): ResourceCollection
     {
@@ -832,14 +836,14 @@ abstract class AbstractPaginator implements Htmlable, Stringable
 
         $model = $collection->first();
 
-        assert(is_object($model), 'Resource collection guesser expects the collection to contain objects.');
+        throw_unless(is_object($model), \Exception::class,'Resource collection guesser expects the collection to contain objects.');
 
         $className = get_class($model);
         $basename = class_basename($className);
 
         $resourceClass = sprintf('App\Http\Resources\%sResource', $basename);
 
-        assert(class_exists($resourceClass), sprintf('Failed to find resource class for model [%s].', $className));
+        throw_unless(class_exists($resourceClass), \Exception::class, sprintf('Failed to find resource class for model [%s].', $className));
 
         return $resourceClass::collection($this);
     }
