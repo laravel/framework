@@ -235,7 +235,7 @@ class Uri implements Htmlable, Responsable, Stringable
             }
         }
 
-        return new static($this->uri->withQuery(Arr::query($newQuery)));
+        return new static($this->uri->withQuery(Arr::query($newQuery) ?: null));
     }
 
     /**
