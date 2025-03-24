@@ -2,23 +2,19 @@
 
 namespace Illuminate\Cache\Events;
 
-class CacheFlushed
+class CacheFlushed extends CacheEvent
 {
-    /**
-     * The name of the cache store.
-     *
-     * @var string|null
-     */
-    public $storeName;
-
     /**
      * Create a new event instance.
      *
      * @param  string|null  $storeName
+     * @param  array  $tags
      * @return void
      */
-    public function __construct($storeName)
+    public function __construct($storeName, array $tags = [])
     {
         $this->storeName = $storeName;
+        $this->tags = $tags;
+        $this->key = '';
     }
 }

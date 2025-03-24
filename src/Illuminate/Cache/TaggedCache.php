@@ -2,6 +2,7 @@
 
 namespace Illuminate\Cache;
 
+use Illuminate\Cache\Events\CacheFlushed;
 use Illuminate\Contracts\Cache\Store;
 
 class TaggedCache extends Repository
@@ -78,6 +79,7 @@ class TaggedCache extends Repository
     public function flush()
     {
         $this->tags->reset();
+        $this->event(new CacheFlushed($this->getName()));
 
         return true;
     }
