@@ -878,12 +878,12 @@ class Collection extends BaseCollection implements QueueableCollection
 
         $model = $this->first();
 
-        throw_unless(is_object($model), \Exception::class, 'Resource collection guesser expects the collection to contain objects.');
+        throw_unless(is_object($model), \LogicException::class, 'Resource collection guesser expects the collection to contain objects.');
 
         $className = get_class($model);
         $resourceClass = $this->guessResourceClassName($model);
 
-        throw_unless(class_exists($resourceClass), \Exception::class, sprintf('Failed to find resource class for model [%s].', $className));
+        throw_unless(class_exists($resourceClass), \LogicException::class, sprintf('Failed to find resource class for model [%s].', $className));
 
         return $resourceClass::collection($this);
     }

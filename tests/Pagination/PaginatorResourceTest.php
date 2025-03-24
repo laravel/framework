@@ -31,7 +31,7 @@ class PaginatorResourceTest extends TestCase
 
     public function testItThrowsExceptionWhenResourceCannotBeFound()
     {
-        $this->expectException(\Exception::class);
+        $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Failed to find resource class for model [Illuminate\Tests\Pagination\PaginatorResourceTestModel].');
 
         $paginator = new PaginatorResourceTestPaginator([
