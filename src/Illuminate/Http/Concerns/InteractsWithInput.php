@@ -240,7 +240,7 @@ trait InteractsWithInput
      *
      * @param  string|null  $key
      * @param  mixed  $default
-     * @return ($key is null ? array<int, \Illuminate\Http\UploadedFile|array<int, \Illuminate\Http\UploadedFile>> : \Illuminate\Http\UploadedFile|\Illuminate\Http\UploadedFile[]|null)
+     * @return ($key is null ? array<int, \Illuminate\Http\UploadedFile|\Illuminate\Http\UploadedFile[]> : \Illuminate\Http\UploadedFile|\Illuminate\Http\UploadedFile[]|null)
      */
     public function file($key = null, $default = null)
     {
