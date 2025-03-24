@@ -76,9 +76,7 @@ class Markdown
                         '>' => '&gt;',
                     ];
 
-                    $html = str_replace(array_keys($replacements), array_values($replacements), $value);
-
-                    return $html;
+                    return str_replace(array_keys($replacements), array_values($replacements), $value);
                 });
 
                 try {
