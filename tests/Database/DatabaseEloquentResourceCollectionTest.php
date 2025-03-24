@@ -11,19 +11,19 @@ class DatabaseEloquentResourceCollectionTest extends TestCase
 {
     public function testItGuessesTheResourceName()
     {
-        $collection = new TestCollection([
-            new TestModel(),
+        $collection = new EloquentResourceCollectionTestCollection([
+            new EloquentResourceCollectionTestModel(),
         ]);
-        $this->assertEquals('App\Http\Resources\TestModelResource', $collection->getGuessedResourceName(new TestModel()));
+        $this->assertEquals('App\Http\Resources\EloquentResourceCollectionTestModelResource', $collection->getGuessedResourceName(new EloquentResourceCollectionTestModel()));
     }
 
     public function testItCanTransformToExplicitResource()
     {
         $collection = new Collection([
-            new TestModel(),
+            new EloquentResourceCollectionTestModel(),
         ]);
 
-        $resource = $collection->toResourceCollection(TestResource::class);
+        $resource = $collection->toResourceCollection(EloquentResourceCollectionTestResource::class);
 
         $this->assertInstanceOf(JsonResource::class, $resource);
     }
@@ -31,10 +31,10 @@ class DatabaseEloquentResourceCollectionTest extends TestCase
     public function testItThrowsExceptionWhenResourceCannotBeFound()
     {
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Failed to find resource class for model [Illuminate\Tests\Database\TestModel].');
+        $this->expectExceptionMessage('Failed to find resource class for model [Illuminate\Tests\Database\EloquentResourceCollectionTestModel].');
 
         $collection = new Collection([
-            new TestModel(),
+            new EloquentResourceCollectionTestModel(),
         ]);
         $collection->toResourceCollection();
     }
@@ -42,10 +42,10 @@ class DatabaseEloquentResourceCollectionTest extends TestCase
     public function testItCanGuessResourceWhenNotProvided()
     {
         $collection = new Collection([
-            new TestModel(),
+            new EloquentResourceCollectionTestModel(),
         ]);
 
-        class_alias(TestResource::class, 'App\Http\Resources\TestModelResource');
+        class_alias(EloquentResourceCollectionTestResource::class, 'App\Http\Resources\EloquentResourceCollectionTestModelResource');
 
         $resource = $collection->toResourceCollection();
 
@@ -53,17 +53,17 @@ class DatabaseEloquentResourceCollectionTest extends TestCase
     }
 }
 
-class TestModel extends Model
+class EloquentResourceCollectionTestModel extends Model
 {
     //
 }
 
-class TestResource extends JsonResource
+class EloquentResourceCollectionTestResource extends JsonResource
 {
     //
 }
 
-class TestCollection extends Collection
+class EloquentResourceCollectionTestCollection extends Collection
 {
     public function getGuessedResourceName(object $model): string
     {

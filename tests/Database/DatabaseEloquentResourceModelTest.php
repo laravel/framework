@@ -10,43 +10,42 @@ class DatabaseEloquentResourceModelTest extends TestCase
 {
     public function testItCanTransformToExplicitResource()
     {
-        $model = new TestResourceModel();
-        $resource = $model->toResource(TestJsonResource::class);
+        $model = new EloquentResourceTestResourceModel();
+        $resource = $model->toResource(EloquentResourceTestJsonResource::class);
 
-        $this->assertInstanceOf(TestJsonResource::class, $resource);
+        $this->assertInstanceOf(EloquentResourceTestJsonResource::class, $resource);
         $this->assertSame($model, $resource->resource);
     }
 
     public function testItThrowsExceptionWhenResourceCannotBeFound()
     {
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Failed to find resource class for model [Illuminate\Tests\Database\TestResourceModel].');
+        $this->expectExceptionMessage('Failed to find resource class for model [Illuminate\Tests\Database\EloquentResourceTestResourceModel].');
 
-        $model = new TestResourceModel();
+        $model = new EloquentResourceTestResourceModel();
         $model->toResource();
     }
 
     public function testItCanGuessResourceWhenNotProvided()
     {
-        $model = new TestResourceModelWithGuessableResource();
+        $model = new EloquentResourceTestResourceModelWithGuessableResource();
 
-        class_alias(TestJsonResource::class, 'App\Http\Resources\TestResourceModelWithGuessableResourceResource');
+        class_alias(EloquentResourceTestJsonResource::class, 'App\Http\Resources\EloquentResourceTestResourceModelWithGuessableResourceResource');
 
         $resource = $model->toResource();
 
-        $this->assertInstanceOf(TestJsonResource::class, $resource);
+        $this->assertInstanceOf(EloquentResourceTestJsonResource::class, $resource);
         $this->assertSame($model, $resource->resource);
     }
 
     public function testItCanGuessResourceName()
     {
-        $model = new TestResourceModel();
-        $this->assertEquals('App\Http\Resources\TestResourceModelResource', $model->getGuessedResourceName());
+        $model = new EloquentResourceTestResourceModel();
+        $this->assertEquals('App\Http\Resources\EloquentResourceTestResourceModelResource', $model->getGuessedResourceName());
     }
-
 }
 
-class TestResourceModel extends Model
+class EloquentResourceTestResourceModel extends Model
 {
     public function getGuessedResourceName(): string
     {
@@ -54,10 +53,12 @@ class TestResourceModel extends Model
     }
 }
 
-class TestResourceModelWithGuessableResource extends Model
+class EloquentResourceTestResourceModelWithGuessableResource extends Model
 {
+    //
 }
 
-class TestJsonResource extends JsonResource
+class EloquentResourceTestJsonResource extends JsonResource
 {
+    //
 }

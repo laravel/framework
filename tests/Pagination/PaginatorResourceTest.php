@@ -11,20 +11,20 @@ class PaginatorResourceTest extends TestCase
 {
     public function testItGuessesTheResourceName()
     {
-        $paginator = new TestPaginator([
-            new TestModel(),
-        ], 1, 1);
+        $paginator = new PaginatorResourceTestPaginator([
+            new PaginatorResourceTestModel(),
+        ], 1, 1, 1);
 
-        $this->assertEquals('App\Http\Resources\TestModelResource', $paginator->getGuessedResourceName(new TestModel()));
+        $this->assertEquals('App\Http\Resources\PaginatorResourceTestModelResource', $paginator->getGuessedResourceName(new PaginatorResourceTestModel()));
     }
 
     public function testItCanTransformToExplicitResource()
     {
-        $paginator = new TestPaginator([
-            new TestModel(),
-        ], 1, 1);
+        $paginator = new PaginatorResourceTestPaginator([
+            new PaginatorResourceTestModel(),
+        ], 1, 1, 1);
 
-        $resource = $paginator->toResourceCollection(TestResource::class);
+        $resource = $paginator->toResourceCollection(PaginatorResourceTestResource::class);
 
         $this->assertInstanceOf(JsonResource::class, $resource);
     }
@@ -32,22 +32,22 @@ class PaginatorResourceTest extends TestCase
     public function testItThrowsExceptionWhenResourceCannotBeFound()
     {
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Failed to find resource class for model [Illuminate\Tests\Pagination\TestModel].');
+        $this->expectExceptionMessage('Failed to find resource class for model [Illuminate\Tests\Pagination\PaginatorResourceTestModel].');
 
-        $paginator = new TestPaginator([
-            new TestModel(),
-        ], 1, 1);
+        $paginator = new PaginatorResourceTestPaginator([
+            new PaginatorResourceTestModel(),
+        ], 1, 1, 1);
 
         $paginator->toResourceCollection();
     }
 
     public function testItCanGuessResourceWhenNotProvided()
     {
-        $paginator = new TestPaginator([
-            new TestModel(),
-        ], 1, 1);
+        $paginator = new PaginatorResourceTestPaginator([
+            new PaginatorResourceTestModel(),
+        ], 1, 1, 1);
 
-        class_alias(TestResource::class, 'App\Http\Resources\TestModelResource');
+        class_alias(PaginatorResourceTestResource::class, 'App\Http\Resources\PaginatorResourceTestModelResource');
 
         $resource = $paginator->toResourceCollection();
 
@@ -55,17 +55,17 @@ class PaginatorResourceTest extends TestCase
     }
 }
 
-class TestModel extends Model
+class PaginatorResourceTestModel extends Model
 {
     //
 }
 
-class TestResource extends JsonResource
+class PaginatorResourceTestResource extends JsonResource
 {
     //
 }
 
-class TestPaginator extends LengthAwarePaginator
+class PaginatorResourceTestPaginator extends LengthAwarePaginator
 {
     public function getGuessedResourceName(object $model): string
     {
