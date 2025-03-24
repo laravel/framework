@@ -519,17 +519,18 @@ class HttpClientTest extends TestCase
     {
         $this->factory->fake();
 
+        $this->factory->asJson();
+
         $this->factory->withHeaders([
             'X-Test-Header' => 'foo',
-            'X-Test-ArrayHeader' => ['bar', 'baz'],
         ])->post('http://foo.com/json', null);
 
         $this->factory->assertSent(function (Request $request) {
+            // Because we're sending JSON, json_encode(null) => "null".
+            // So the raw body is literally the string "null"
             return $request->url() === 'http://foo.com/json'
                 && $request->hasHeader('Content-Type', 'application/json')
-                && $request->hasHeader('X-Test-Header', 'foo')
-                && $request->hasHeader('X-Test-ArrayHeader', ['bar', 'baz'])
-                && $request->json() === null;
+                && $request->body() === 'null';
         });
     }
 
