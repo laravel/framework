@@ -24,7 +24,6 @@ class ValidationAnyOfRuleTest extends TestCase
 {
     private array $ruleSets;
     private array $nestedRules;
-    private array $nestedRules2;
 
     public function testBasicValidation()
     {
