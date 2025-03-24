@@ -547,7 +547,7 @@ class HttpClientTest extends TestCase
                 && $request->hasHeader('Content-Type', 'application/json')
                 && $request->hasHeader('X-Test-Header', 'foo')
                 && $request->hasHeader('X-Test-ArrayHeader', ['bar', 'baz'])
-                && $request->json() == (object)[]; // or compare to `new \stdClass()`
+                && $request->body() === '{}';
         });
     }
 
