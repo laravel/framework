@@ -253,11 +253,11 @@ class ValidationAnyOfRuleTest extends TestCase
         $this->assertFalse($validator->passes());
 
         $validator = new Validator(resolve('translator'), [
-            'p3_shouldnt_be_a_string' => ['p1' => [
+            'p3_is_required_whatever_it_may_be' => ['p1' => [
                 'p2' => 'a_valid_string',
-                'p3' => 'shouldnt_be_a_string',
+                'p3' => 'is_required_whatever_it_may_be',
             ]],
-        ], ['p3_shouldnt_be_a_string' => Rule::anyOf($this->nestedRules)]);
+        ], ['p3_is_required_whatever_it_may_be' => Rule::anyOf($this->nestedRules)]);
         $this->assertTrue($validator->passes());
 
         $validator = new Validator(resolve('translator'), [
