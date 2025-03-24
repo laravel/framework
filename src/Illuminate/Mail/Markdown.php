@@ -130,10 +130,15 @@ class Markdown
      * Parse the given Markdown text into HTML.
      *
      * @param  string  $text
+     * @param  bool  $encoded
      * @return \Illuminate\Support\HtmlString
      */
-    public static function parse($text)
+    public static function parse($text, bool $encoded = false)
     {
+        if ($encoded === false) {
+            return new HtmlString(static::converter()->convert($text)->getContent());
+        }
+
         EncodedHtmlString::encodeUsing(function ($value) {
             $replacements = [
                 '[' => '\[',
