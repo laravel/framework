@@ -515,6 +515,42 @@ class HttpClientTest extends TestCase
         });
     }
 
+    public function testCanSendNullData()
+    {
+        $this->factory->fake();
+
+        $this->factory->withHeaders([
+            'X-Test-Header' => 'foo',
+            'X-Test-ArrayHeader' => ['bar', 'baz'],
+        ])->post('http://foo.com/json', null);
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/json'
+                && $request->hasHeader('Content-Type', 'application/json')
+                && $request->hasHeader('X-Test-Header', 'foo')
+                && $request->hasHeader('X-Test-ArrayHeader', ['bar', 'baz'])
+                && $request->json() === null;
+        });
+    }
+
+    public function testCanSendEmptyObjectData()
+    {
+        $this->factory->fake();
+
+        $this->factory->withHeaders([
+            'X-Test-Header' => 'foo',
+            'X-Test-ArrayHeader' => ['bar', 'baz'],
+        ])->post('http://foo.com/json', (object)[]);
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/json'
+                && $request->hasHeader('Content-Type', 'application/json')
+                && $request->hasHeader('X-Test-Header', 'foo')
+                && $request->hasHeader('X-Test-ArrayHeader', ['bar', 'baz'])
+                && $request->json() == (object)[]; // or compare to `new \stdClass()`
+        });
+    }
+
     public function testCanSendFormData()
     {
         $this->factory->fake();

@@ -793,7 +793,7 @@ class PendingRequest
      * Issue a POST request to the given URL.
      *
      * @param  string  $url
-     * @param  array|\JsonSerializable|\Illuminate\Contracts\Support\Arrayable  $data
+     * @param  array|object|\JsonSerializable|\Illuminate\Contracts\Support\Arrayable|null  $data
      * @return \Illuminate\Http\Client\Response
      *
      * @throws \Illuminate\Http\Client\ConnectionException
