@@ -163,7 +163,7 @@ trait QueriesRelationships
      * @param  int  $count
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
-    public function withWhereHas($relation, Closure $callback = null, $operator = '>=', $count = 1)
+    public function withWhereHas($relation, ?Closure $callback = null, $operator = '>=', $count = 1)
     {
         return $this->whereHas(Str::before($relation, ':'), $callback, $operator, $count)
             ->with($callback ? [$relation => fn ($query) => $callback($query)] : $relation);

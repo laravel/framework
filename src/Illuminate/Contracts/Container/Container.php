@@ -188,7 +188,7 @@ interface Container extends ContainerInterface
      * @param  \Closure|null  $callback
      * @return void
      */
-    public function beforeResolving($abstract, Closure $callback = null);
+    public function beforeResolving($abstract, ?Closure $callback = null);
 
     /**
      * Register a new resolving callback.

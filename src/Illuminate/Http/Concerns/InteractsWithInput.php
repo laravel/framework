@@ -232,7 +232,7 @@ trait InteractsWithInput
      * @param  callable|null  $default
      * @return $this|mixed
      */
-    public function whenMissing($key, callable $callback, callable $default = null)
+    public function whenMissing($key, callable $callback, ?callable $default = null)
     {
         if ($this->missing($key)) {
             return $callback(data_get($this->all(), $key)) ?: $this;

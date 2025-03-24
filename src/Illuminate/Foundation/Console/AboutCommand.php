@@ -228,7 +228,7 @@ class AboutCommand extends Command
      * @param  string|null  $value
      * @return void
      */
-    public static function add(string $section, $data, string $value = null)
+    public static function add(string $section, $data, ?string $value = null)
     {
         static::$customDataResolvers[] = fn () => static::addToSection($section, $data, $value);
     }
@@ -241,7 +241,7 @@ class AboutCommand extends Command
      * @param  string|null  $value
      * @return void
      */
-    protected static function addToSection(string $section, $data, string $value = null)
+    protected static function addToSection(string $section, $data, ?string $value = null)
     {
         if (is_array($data)) {
             foreach ($data as $key => $value) {

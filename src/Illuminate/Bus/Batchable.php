@@ -86,7 +86,7 @@ trait Batchable
                                   int $failedJobs = 0,
                                   array $failedJobIds = [],
                                   array $options = [],
-                                  CarbonImmutable $createdAt = null,
+                                  ?CarbonImmutable $createdAt = null,
                                   ?CarbonImmutable $cancelledAt = null,
                                   ?CarbonImmutable $finishedAt = null)
     {
