@@ -3,6 +3,8 @@
 namespace Illuminate\Tests\Support;
 
 use Illuminate\Cache\CacheManager;
+use Illuminate\Cache\Events\CacheFlushed;
+use Illuminate\Cache\Events\CacheFlushing;
 use Illuminate\Cache\Events\CacheMissed;
 use Illuminate\Cache\Events\RetrievingKey;
 use Illuminate\Config\Repository as ConfigRepository;
@@ -87,6 +89,17 @@ class SupportFacadesEventTest extends TestCase
         Event::assertDispatched(CacheMissed::class);
     }
 
+    public function testCacheFlushDispatchesEvent()
+    {
+        $arrayRepository = Cache::store('array');
+        Event::fake();
+
+        $arrayRepository->clear();
+
+        Event::assertDispatched(CacheFlushing::class);
+        Event::assertDispatched(CacheFlushed::class);
+    }
+
     protected function getCacheConfig()
     {
         return [
@@ -103,7 +116,7 @@ class SupportFacadesEventTest extends TestCase
 
 class FakeForStub
 {
-    public function dispatch()
+public function dispatch()
     {
         Event::dispatch(EventStub::class);
     }
