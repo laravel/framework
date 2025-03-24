@@ -836,7 +836,7 @@ abstract class AbstractPaginator implements Htmlable, Stringable
 
         $model = $collection->first();
 
-        throw_unless(is_object($model), \Exception::class,'Resource collection guesser expects the collection to contain objects.');
+        throw_unless(is_object($model), \Exception::class, 'Resource collection guesser expects the collection to contain objects.');
 
         $className = get_class($model);
 

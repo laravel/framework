@@ -878,7 +878,7 @@ class Collection extends BaseCollection implements QueueableCollection
 
         $model = $this->first();
 
-        throw_unless(is_object($model), \Exception::class,'Resource collection guesser expects the collection to contain objects.');
+        throw_unless(is_object($model), \Exception::class, 'Resource collection guesser expects the collection to contain objects.');
 
         $className = get_class($model);
         $resourceClass = $this->guessResourceClassName($model);
