@@ -28,7 +28,7 @@ trait Macroable
      */
     public static function macro($name, $macro)
     {
-        static::$macros[$name] = $macro;
+        static::$macros[static::class][$name] = $macro;
     }
 
     /**
@@ -61,7 +61,18 @@ trait Macroable
      */
     public static function hasMacro($name)
     {
-        return isset(static::$macros[$name]);
+        return isset(static::$macros[static::class][$name]) || (($parent = get_parent_class(static::class)) && $parent::hasMacro($name));
+    }
+
+    /**
+     * Get a registered macro.
+     * 
+     * @param  string  $name
+     * @return object|callable|null
+     */
+    public static function getMacro($method)
+    {
+        return static::$macros[static::class][$method] ?? (($parent = get_parent_class(static::class)) ? $parent::getMacro($method) : null);
     }
 
     /**
@@ -69,9 +80,13 @@ trait Macroable
      *
      * @return void
      */
-    public static function flushMacros()
+    public static function flushMacros($all = true)
     {
-        static::$macros = [];
+        if ($all) {
+            static::$macros = [];
+        } else {
+            static::$macros[static::class] = [];
+        }
     }
 
     /**
@@ -91,7 +106,7 @@ trait Macroable
             ));
         }
 
-        $macro = static::$macros[$method];
+        $macro = static::getMacro($method);
 
         if ($macro instanceof Closure) {
             $macro = $macro->bindTo(null, static::class);
@@ -117,7 +132,7 @@ trait Macroable
             ));
         }
 
-        $macro = static::$macros[$method];
+        $macro = static::getMacro($method);
 
         if ($macro instanceof Closure) {
             $macro = $macro->bindTo($this, static::class);
