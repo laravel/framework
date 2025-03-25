@@ -125,9 +125,10 @@ abstract class Relation implements BuilderContract
     /**
      * Set the base constraints on the relation query.
      *
+     * @param  \Illuminate\Database\Eloquent\Builder<TRelatedModel>|null  $query
      * @return void
      */
-    abstract public function addConstraints();
+    abstract public function addConstraints(?Builder $query = null);
 
     /**
      * Set the constraints for an eager load of the relation.

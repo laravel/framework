@@ -76,16 +76,14 @@ class MorphToMany extends BelongsToMany
         );
     }
 
-    /**
-     * Set the where clause for the relation query.
-     *
-     * @return $this
-     */
-    protected function addWhereConstraints()
+    /** @inheritDoc */
+    protected function addWhereConstraints(?Builder $query = null)
     {
-        parent::addWhereConstraints();
+        $query ??= $this->query;
 
-        $this->query->where($this->qualifyPivotColumn($this->morphType), $this->morphClass);
+        parent::addWhereConstraints($query);
+
+        $query->where($this->qualifyPivotColumn($this->morphType), $this->morphClass);
 
         return $this;
     }

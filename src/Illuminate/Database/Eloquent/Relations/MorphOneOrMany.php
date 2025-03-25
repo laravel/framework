@@ -47,17 +47,15 @@ abstract class MorphOneOrMany extends HasOneOrMany
         parent::__construct($query, $parent, $id, $localKey);
     }
 
-    /**
-     * Set the base constraints on the relation query.
-     *
-     * @return void
-     */
-    public function addConstraints()
+    /** @inheritDoc */
+    public function addConstraints(?Builder $query = null)
     {
-        if (static::$constraints) {
-            $this->getRelationQuery()->where($this->morphType, $this->morphClass);
+        $query ??= $this->getRelationQuery();
 
-            parent::addConstraints();
+        if (static::$constraints) {
+            $query->where($this->morphType, $this->morphClass);
+
+            parent::addConstraints($query);
         }
     }
 

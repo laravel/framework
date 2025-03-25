@@ -300,7 +300,7 @@ class EloquentRelationResetModelStub extends Model
 
 class EloquentRelationStub extends Relation
 {
-    public function addConstraints()
+    public function addConstraints(?Builder $query = null)
     {
         //
     }

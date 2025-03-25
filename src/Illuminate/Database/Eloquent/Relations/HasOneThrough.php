@@ -77,8 +77,6 @@ class HasOneThrough extends HasOneOrManyThrough implements SupportsPartialRelati
     public function addOneOfManySubQueryConstraints(Builder $query, $column = null, $aggregate = null)
     {
         $query->addSelect([$this->getQualifiedFirstKeyName()]);
-
-        $this->performJoin($query);
     }
 
     /** @inheritDoc */

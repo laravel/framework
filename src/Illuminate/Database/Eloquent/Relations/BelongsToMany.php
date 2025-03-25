@@ -200,17 +200,13 @@ class BelongsToMany extends Relation
         return $model->getTable();
     }
 
-    /**
-     * Set the base constraints on the relation query.
-     *
-     * @return void
-     */
-    public function addConstraints()
+    /** @inheritDoc */
+    public function addConstraints(?Builder $query = null)
     {
-        $this->performJoin();
+        $this->performJoin($query);
 
         if (static::$constraints) {
-            $this->addWhereConstraints();
+            $this->addWhereConstraints($query);
         }
     }
 
@@ -222,7 +218,7 @@ class BelongsToMany extends Relation
      */
     protected function performJoin($query = null)
     {
-        $query = $query ?: $this->query;
+        $query ??= $this->query;
 
         // We need to join to the intermediate table on the related model's primary
         // key column with the intermediate table's foreign key for the related
@@ -240,11 +236,14 @@ class BelongsToMany extends Relation
     /**
      * Set the where clause for the relation query.
      *
+     * @param  \Illuminate\Database\Eloquent\Builder<TRelatedModel>|null  $query
      * @return $this
      */
-    protected function addWhereConstraints()
+    protected function addWhereConstraints(?Builder $query = null)
     {
-        $this->query->where(
+        $query ??= $this->query;
+
+        $query->where(
             $this->getQualifiedForeignPivotKeyName(), '=', $this->parent->{$this->parentKey}
         );
 

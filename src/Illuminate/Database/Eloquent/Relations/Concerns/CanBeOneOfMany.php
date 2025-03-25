@@ -213,6 +213,8 @@ trait CanBeOneOfMany
             }
         }
 
+        $this->addConstraints($subQuery);
+
         $this->addOneOfManySubQueryConstraints($subQuery, column: null, aggregate: $aggregate);
 
         return $subQuery;
