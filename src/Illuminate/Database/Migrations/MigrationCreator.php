@@ -170,6 +170,14 @@ class MigrationCreator
      */
     protected function getPath($name, $path)
     {
+        // given a path like '/path/to/laravel/database/migrations' and a name like 'subdir/create_users_table'
+        // the full path to the migration file should be something like:
+        // '/path/to/laravel/database/migrations/subdir/2017_01_01_000000_create_users_table.php'
+        $parts = explode( '/', $name );
+        $name = array_pop( $parts );
+        array_unshift( $parts, $path );
+        $path = implode( '/', $parts );
+
         return $path.'/'.$this->getDatePrefix().'_'.$name.'.php';
     }
 
