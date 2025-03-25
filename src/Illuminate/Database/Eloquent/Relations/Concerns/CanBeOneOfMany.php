@@ -131,6 +131,8 @@ trait CanBeOneOfMany
             ];
         }
 
+        $this->addConstraints();
+
         $columns = $this->query->getQuery()->columns;
 
         if (is_null($columns) || $columns === ['*']) {
@@ -212,8 +214,6 @@ trait CanBeOneOfMany
                 $subQuery->selectRaw($aggregatedColumn.' as '.$subQuery->getQuery()->grammar->wrap($column.'_aggregate'));
             }
         }
-
-        $this->addConstraints($subQuery);
 
         $this->addOneOfManySubQueryConstraints($subQuery, column: null, aggregate: $aggregate);
 

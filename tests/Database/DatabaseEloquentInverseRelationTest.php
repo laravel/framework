@@ -363,7 +363,7 @@ class HasInverseRelationStub extends Relation
         return $this->query->get();
     }
 
-    public function addConstraints(?Builder $query = null)
+    public function addConstraints()
     {
         //
     }

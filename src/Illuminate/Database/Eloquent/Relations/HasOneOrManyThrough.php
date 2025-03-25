@@ -90,10 +90,14 @@ abstract class HasOneOrManyThrough extends Relation
         parent::__construct($query, $throughParent);
     }
 
-    /** @inheritDoc */
-    public function addConstraints(?Builder $query = null)
+    /**
+     * Set the base constraints on the relation query.
+     *
+     * @return void
+     */
+    public function addConstraints()
     {
-        $query ??= $this->getRelationQuery();
+        $query = $this->getRelationQuery();
         $localValue = $this->farParent[$this->localKey];
 
         $this->performJoin($query);

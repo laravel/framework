@@ -84,18 +84,20 @@ class BelongsTo extends Relation
         return $this->query->first() ?: $this->getDefaultFor($this->parent);
     }
 
-    /** @inheritDoc */
-    public function addConstraints(?Builder $query = null)
+    /**
+     * Set the base constraints on the relation query.
+     *
+     * @return void
+     */
+    public function addConstraints()
     {
-        $query ??= $this->query;
-
         if (static::$constraints) {
             // For belongs to relationships, which are essentially the inverse of has one
             // or has many relationships, we need to actually query on the primary key
             // of the related models matching on the foreign key that's on a parent.
             $key = $this->getQualifiedOwnerKeyName();
 
-            $query->where($key, '=', $this->getForeignKeyFrom($this->child));
+            $this->query->where($key, '=', $this->getForeignKeyFrom($this->child));
         }
     }
 
