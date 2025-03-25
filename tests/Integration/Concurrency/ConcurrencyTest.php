@@ -121,7 +121,7 @@ PHP);
         ]);
     }
 
-    public static function getConcurrencyDrivers() : array
+    public static function getConcurrencyDrivers(): array
     {
         return [
             ['sync'],
