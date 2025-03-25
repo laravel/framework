@@ -13,8 +13,6 @@ class CacheFlushing extends CacheEvent
      */
     public function __construct($storeName, array $tags = [])
     {
-        $this->storeName = $storeName;
-        $this->tags = $tags;
-        $this->key = '';
+        parent::__construct($storeName, '', $tags);
     }
 }
