@@ -221,8 +221,8 @@ trait HasEvents
             return false;
         }
 
-        if (in_array($event, ['retrieved', 'created', 'updated', 'saved',  'deleted', 'restored', 'replicating'])) {            
-            $this->fireModelEvent('any');
+        if (in_array($event, ['retrieved', 'updated', 'saved',  'deleted', 'restored', 'replicating'])) {            
+            $this->fireModelEvent('any', $halt);
         }
 
         return ! empty($result) ? $result : static::$dispatcher->{$method}(
