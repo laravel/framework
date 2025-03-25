@@ -137,6 +137,7 @@ class StatusCommand extends BaseCommand
             ['pending', null, InputOption::VALUE_OPTIONAL, 'Only list pending migrations', false],
             ['path', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'The path(s) to the migrations files to use'],
             ['realpath', null, InputOption::VALUE_NONE, 'Indicate any provided migration file paths are pre-resolved absolute paths'],
+            ['recursive', 'r', InputOption::VALUE_NONE, 'Should search for migration files in the given path(s) recursively ?'],
         ];
     }
 }

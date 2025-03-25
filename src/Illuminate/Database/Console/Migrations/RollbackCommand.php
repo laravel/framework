@@ -65,6 +65,7 @@ class RollbackCommand extends BaseCommand
                     'pretend' => $this->option('pretend'),
                     'step' => (int) $this->option('step'),
                     'batch' => (int) $this->option('batch'),
+                    'recurisve' => $this->option('recursive'),
                 ]
             );
         });
@@ -85,6 +86,7 @@ class RollbackCommand extends BaseCommand
             ['path', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'The path(s) to the migrations files to be executed'],
             ['realpath', null, InputOption::VALUE_NONE, 'Indicate any provided migration file paths are pre-resolved absolute paths'],
             ['pretend', null, InputOption::VALUE_NONE, 'Dump the SQL queries that would be run'],
+            ['recursive', 'r', InputOption::VALUE_NONE, 'Should search for migration files in the given path(s) recursively ?'],
             ['step', null, InputOption::VALUE_OPTIONAL, 'The number of migrations to be reverted'],
             ['batch', null, InputOption::VALUE_REQUIRED, 'The batch of migrations (identified by their batch number) to be reverted'],
         ];

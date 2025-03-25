@@ -89,6 +89,8 @@ class ResetCommand extends BaseCommand
 
             ['realpath', null, InputOption::VALUE_NONE, 'Indicate any provided migration file paths are pre-resolved absolute paths'],
 
+            ['recursive', 'r', InputOption::VALUE_NONE, 'Should search for migration files in the given path(s) recursively ?'],
+
             ['pretend', null, InputOption::VALUE_NONE, 'Dump the SQL queries that would be run'],
         ];
     }

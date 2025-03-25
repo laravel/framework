@@ -31,6 +31,7 @@ class MigrateCommand extends BaseCommand implements Isolatable
                 {--force : Force the operation to run when in production}
                 {--path=* : The path(s) to the migrations files to be executed}
                 {--realpath : Indicate any provided migration file paths are pre-resolved absolute paths}
+                {--r|recursive : Indicates if we should recurse through path}
                 {--schema-path= : The path to a schema dump file}
                 {--pretend : Dump the SQL queries that would be run}
                 {--seed : Indicates if the seed task should be re-run}
