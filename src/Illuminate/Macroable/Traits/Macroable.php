@@ -66,7 +66,7 @@ trait Macroable
 
     /**
      * Get a registered macro.
-     * 
+     *
      * @param  string  $name
      * @return object|callable|null
      */
