@@ -221,6 +221,10 @@ trait HasEvents
             return false;
         }
 
+        if (in_array($event, ['retrieved', 'created', 'updated', 'saved',  'deleted', 'restored', 'replicating'])) {            
+            $this->fireModelEvent('any');
+        }
+
         return ! empty($result) ? $result : static::$dispatcher->{$method}(
             "eloquent.{$event}: ".static::class, $this
         );
