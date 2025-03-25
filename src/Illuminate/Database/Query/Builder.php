@@ -251,8 +251,6 @@ class Builder implements BuilderContract
 
     /**
      * Create a new query builder instance.
-     *
-     * @return void
      */
     public function __construct(
         ConnectionInterface $connection,
@@ -2400,8 +2398,8 @@ class Builder implements BuilderContract
      * Add a "having" clause to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|\Closure|string  $column
-     * @param  string|int|float|null  $operator
-     * @param  string|int|float|null  $value
+     * @param  \DateTimeInterface|string|int|float|null  $operator
+     * @param  \DateTimeInterface|string|int|float|null  $value
      * @param  string  $boolean
      * @return $this
      */
@@ -2452,8 +2450,8 @@ class Builder implements BuilderContract
      * Add an "or having" clause to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|\Closure|string  $column
-     * @param  string|int|float|null  $operator
-     * @param  string|int|float|null  $value
+     * @param  \DateTimeInterface|string|int|float|null  $operator
+     * @param  \DateTimeInterface|string|int|float|null  $value
      * @return $this
      */
     public function orHaving($column, $operator = null, $value = null)
@@ -2850,10 +2848,9 @@ class Builder implements BuilderContract
     protected function removeExistingOrdersFor($column)
     {
         return (new Collection($this->orders))
-            ->reject(function ($order) use ($column) {
-                return isset($order['column'])
-                       ? $order['column'] === $column : false;
-            })->values()->all();
+            ->reject(fn ($order) => isset($order['column']) && $order['column'] === $column)
+            ->values()
+            ->all();
     }
 
     /**
@@ -3305,7 +3302,8 @@ class Builder implements BuilderContract
     {
         return array_map(function ($column) {
             return is_string($column) && ($aliasPosition = stripos($column, ' as ')) !== false
-                    ? substr($column, 0, $aliasPosition) : $column;
+                ? substr($column, 0, $aliasPosition)
+                : $column;
         }, $columns);
     }
 
@@ -3377,8 +3375,8 @@ class Builder implements BuilderContract
 
         return $this->applyAfterQueryCallbacks(
             is_array($queryResult[0])
-                    ? $this->pluckFromArrayColumn($queryResult, $column, $key)
-                    : $this->pluckFromObjectColumn($queryResult, $column, $key)
+                ? $this->pluckFromArrayColumn($queryResult, $column, $key)
+                : $this->pluckFromObjectColumn($queryResult, $column, $key)
         );
     }
 
@@ -3633,7 +3631,8 @@ class Builder implements BuilderContract
         // cast it to one. When it does we will cast it to a float since it needs to be
         // cast to the expected data type for the developers out of pure convenience.
         return ! str_contains((string) $result, '.')
-                ? (int) $result : (float) $result;
+            ? (int) $result
+            : (float) $result;
     }
 
     /**
@@ -4070,8 +4069,8 @@ class Builder implements BuilderContract
     public function getColumns()
     {
         return ! is_null($this->columns)
-                ? array_map(fn ($column) => $this->grammar->getValue($column), $this->columns)
-                : [];
+            ? array_map(fn ($column) => $this->grammar->getValue($column), $this->columns)
+            : [];
     }
 
     /**

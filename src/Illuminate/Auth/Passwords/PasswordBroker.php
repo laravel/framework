@@ -30,7 +30,7 @@ class PasswordBroker implements PasswordBrokerContract
     /**
      * The event dispatcher instance.
      *
-     * @var \Illuminate\Contracts\Events\Dispatcher
+     * @var \Illuminate\Contracts\Events\Dispatcher|null
      */
     protected $events;
 
@@ -40,7 +40,6 @@ class PasswordBroker implements PasswordBrokerContract
      * @param  \Illuminate\Auth\Passwords\TokenRepositoryInterface  $tokens
      * @param  \Illuminate\Contracts\Auth\UserProvider  $users
      * @param  \Illuminate\Contracts\Events\Dispatcher|null  $dispatcher
-     * @return void
      */
     public function __construct(#[\SensitiveParameter] TokenRepositoryInterface $tokens, UserProvider $users, ?Dispatcher $dispatcher = null)
     {
@@ -92,7 +91,7 @@ class PasswordBroker implements PasswordBrokerContract
      *
      * @param  array  $credentials
      * @param  \Closure  $callback
-     * @return mixed
+     * @return string
      */
     public function reset(#[\SensitiveParameter] array $credentials, Closure $callback)
     {

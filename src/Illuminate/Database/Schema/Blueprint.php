@@ -96,7 +96,6 @@ class Blueprint
      * @param  \Illuminate\Database\Connection  $connection
      * @param  string  $table
      * @param  \Closure|null  $callback
-     * @return void
      */
     public function __construct(Connection $connection, $table, ?Closure $callback = null)
     {

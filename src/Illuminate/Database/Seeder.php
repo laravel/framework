@@ -110,11 +110,15 @@ abstract class Seeder
      */
     public function callOnce($class, $silent = false, array $parameters = [])
     {
-        if (in_array($class, static::$called)) {
-            return;
-        }
+        $classes = Arr::wrap($class);
 
-        $this->call($class, $silent, $parameters);
+        foreach ($classes as $class) {
+            if (in_array($class, static::$called)) {
+                continue;
+            }
+
+            $this->call($class, $silent, $parameters);
+        }
     }
 
     /**

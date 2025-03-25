@@ -88,7 +88,6 @@ class CallQueuedListener implements ShouldQueue
      * @param  class-string  $class
      * @param  string  $method
      * @param  array  $data
-     * @return void
      */
     public function __construct($class, $method, $data)
     {

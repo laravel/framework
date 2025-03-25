@@ -37,7 +37,6 @@ class MemcachedStore extends TaggableStore implements LockProvider
      *
      * @param  \Memcached  $memcached
      * @param  string  $prefix
-     * @return void
      */
     public function __construct($memcached, $prefix = '')
     {

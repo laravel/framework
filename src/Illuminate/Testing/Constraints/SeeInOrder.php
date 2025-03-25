@@ -25,7 +25,6 @@ class SeeInOrder extends Constraint
      * Create a new constraint instance.
      *
      * @param  string  $content
-     * @return void
      */
     public function __construct($content)
     {

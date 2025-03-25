@@ -286,6 +286,26 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertSame('alter table "users" add constraint "bar" unique ("foo")', $statements[0]);
     }
 
+    public function testAddingUniqueKeyWithNullsNotDistinct()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->unique('foo', 'bar')->nullsNotDistinct();
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table "users" add constraint "bar" unique nulls not distinct ("foo")', $statements[0]);
+    }
+
+    public function testAddingUniqueKeyWithNullsDistinct()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->unique('foo', 'bar')->nullsNotDistinct(false);
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table "users" add constraint "bar" unique nulls distinct ("foo")', $statements[0]);
+    }
+
     public function testAddingIndex()
     {
         $blueprint = new Blueprint($this->getConnection(), 'users');

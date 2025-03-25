@@ -25,6 +25,8 @@ namespace Illuminate\Support\Facades;
  * @method static mixed pop(string $key)
  * @method static \Illuminate\Log\Context\Repository pushHidden(string $key, mixed ...$values)
  * @method static mixed popHidden(string $key)
+ * @method static \Illuminate\Log\Context\Repository increment(string $key, int $amount = 1)
+ * @method static \Illuminate\Log\Context\Repository decrement(string $key, int $amount = 1)
  * @method static bool stackContains(string $key, mixed $value, bool $strict = false)
  * @method static bool hiddenStackContains(string $key, mixed $value, bool $strict = false)
  * @method static mixed scope(callable $callback, array $data = [], array $hidden = [])

@@ -51,7 +51,6 @@ class Response implements ArrayAccess, Stringable
      * Create a new response instance.
      *
      * @param  \Psr\Http\Message\MessageInterface  $response
-     * @return void
      */
     public function __construct($response)
     {
@@ -527,7 +526,7 @@ class Response implements ArrayAccess, Stringable
     public function __call($method, $parameters)
     {
         return static::hasMacro($method)
-                    ? $this->macroCall($method, $parameters)
-                    : $this->response->{$method}(...$parameters);
+            ? $this->macroCall($method, $parameters)
+            : $this->response->{$method}(...$parameters);
     }
 }

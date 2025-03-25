@@ -27,7 +27,6 @@ class ComponentSlot implements Htmlable, Stringable
      *
      * @param  string  $contents
      * @param  array  $attributes
-     * @return void
      */
     public function __construct($contents = '', $attributes = [])
     {

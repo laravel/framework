@@ -44,7 +44,6 @@ trait DatabaseRule
      *
      * @param  string  $table
      * @param  string  $column
-     * @return void
      */
     public function __construct($table, $column = 'NULL')
     {

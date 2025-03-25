@@ -59,7 +59,6 @@ class BroadcastableModelEventOccurred implements ShouldBroadcast
      *
      * @param  \Illuminate\Database\Eloquent\Model  $model
      * @param  string  $event
-     * @return void
      */
     public function __construct($model, $event)
     {
@@ -75,8 +74,8 @@ class BroadcastableModelEventOccurred implements ShouldBroadcast
     public function broadcastOn()
     {
         $channels = empty($this->channels)
-                ? ($this->model->broadcastOn($this->event) ?: [])
-                : $this->channels;
+            ? ($this->model->broadcastOn($this->event) ?: [])
+            : $this->channels;
 
         return (new BaseCollection($channels))
             ->map(fn ($channel) => $channel instanceof Model ? new PrivateChannel($channel) : $channel)
@@ -93,8 +92,8 @@ class BroadcastableModelEventOccurred implements ShouldBroadcast
         $default = class_basename($this->model).ucfirst($this->event);
 
         return method_exists($this->model, 'broadcastAs')
-                ? ($this->model->broadcastAs($this->event) ?: $default)
-                : $default;
+            ? ($this->model->broadcastAs($this->event) ?: $default)
+            : $default;
     }
 
     /**

@@ -49,6 +49,7 @@ use Illuminate\Support\Testing\Fakes\QueueFake;
  * @method static void assertNothingPushed()
  * @method static \Illuminate\Support\Collection pushed(string $job, callable|null $callback = null)
  * @method static \Illuminate\Support\Collection pushedRaw(null|\Closure $callback = null)
+ * @method static \Illuminate\Support\Collection listenersPushed(string $listenerClass, \Closure|null $callback = null)
  * @method static bool hasPushed(string $job)
  * @method static bool shouldFakeJob(object $job)
  * @method static array pushedJobs()
@@ -82,8 +83,8 @@ class Queue extends Facade
     public static function fake($jobsToFake = [])
     {
         $actualQueueManager = static::isFake()
-                ? static::getFacadeRoot()->queue
-                : static::getFacadeRoot();
+            ? static::getFacadeRoot()->queue
+            : static::getFacadeRoot();
 
         return tap(new QueueFake(static::getFacadeApplication(), $jobsToFake, $actualQueueManager), function ($fake) {
             static::swap($fake);
