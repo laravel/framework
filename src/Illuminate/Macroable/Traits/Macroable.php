@@ -61,7 +61,7 @@ trait Macroable
      */
     public static function hasMacro($name)
     {
-        return isset(static::$macros[static::class][$name]) || (($parent = get_parent_class(static::class)) && $parent::hasMacro($name));
+        return isset(static::$macros[static::class][$name]) || (($parent = get_parent_class(static::class)) && method_exists($parent, 'macro') && $parent::hasMacro($name));
     }
 
     /**
@@ -72,7 +72,7 @@ trait Macroable
      */
     public static function getMacro($method)
     {
-        return static::$macros[static::class][$method] ?? (($parent = get_parent_class(static::class)) ? $parent::getMacro($method) : null);
+        return static::$macros[static::class][$method] ?? (($parent = get_parent_class(static::class)) && method_exists($parent, 'macro') ? $parent::getMacro($method) : null);
     }
 
     /**

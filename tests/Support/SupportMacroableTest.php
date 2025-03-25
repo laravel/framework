@@ -162,18 +162,18 @@ class SupportMacroableTest extends TestCase
 
     public function testMacroInheritance()
     {
-        EmptyMacroable::macro('inherit', function () {
+        MacroableParent::macro('inherit', function () {
             return 'original';
         });
-        EmptyMacroable::macro('override', function () {
+        MacroableParent::macro('override', function () {
             return 'original';
         });
-        EmptyMacroableChild::macro('override', function () {
+        MacroableChild::macro('override', function () {
             return 'overridden';
         });
 
-        $parent = new EmptyMacroable;
-        $child = new EmptyMacroableChild;
+        $parent = new MacroableParent;
+        $child = new MacroableChild;
 
         $this->assertSame('original', $parent->inherit());
         $this->assertSame('original', $child->inherit());
@@ -185,11 +185,6 @@ class SupportMacroableTest extends TestCase
 class EmptyMacroable
 {
     use Macroable;
-}
-
-class EmptyMacroableChild extends EmptyMacroable
-{
-    //
 }
 
 class TestMacroable
@@ -226,4 +221,17 @@ class TestMixin
             return 'foo';
         };
     }
+}
+
+class EmptyClass
+{
+}
+
+class MacroableParent extends EmptyClass
+{
+    use Macroable;
+}
+
+class MacroableChild extends MacroableParent
+{
 }
