@@ -2,7 +2,7 @@
 
 namespace Illuminate\Cache\Events;
 
-abstract class CacheEvent
+abstract class CacheEvent implements TaggedCacheEvent
 {
     /**
      * The name of the cache store.

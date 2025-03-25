@@ -2,7 +2,7 @@
 
 namespace Illuminate\Cache\Events;
 
-class CacheFlushed
+class CacheFlushed implements TaggedCacheEvent
 {
     /**
      * The name of the cache store.
@@ -12,13 +12,34 @@ class CacheFlushed
     public $storeName;
 
     /**
+     * The tags that were assigned to the cache event.
+     *
+     * @var array
+     */
+    public $tags;
+
+    /**
      * Create a new event instance.
      *
      * @param  string|null  $storeName
-     * @return void
+     * @param  array  $tags
      */
-    public function __construct($storeName)
+    public function __construct($storeName, array $tags = [])
     {
         $this->storeName = $storeName;
+        $this->tags = $tags;
+    }
+
+    /**
+     * Set the tags for the cache event.
+     *
+     * @param  array  $tags
+     * @return $this
+     */
+    public function setTags($tags)
+    {
+        $this->tags = $tags;
+
+        return $this;
     }
 }
