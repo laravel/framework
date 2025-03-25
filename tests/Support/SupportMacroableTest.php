@@ -159,11 +159,37 @@ class SupportMacroableTest extends TestCase
 
         $this->assertSame('newMethod', $this->macroable::existingMethod());
     }
+
+    public function testMacroInheritance()
+    {
+        EmptyMacroable::macro('inherit', function () {
+            return 'original';
+        });
+        EmptyMacroable::macro('override', function () {
+            return 'original';
+        });
+        EmptyMacroableChild::macro('override', function () {
+            return 'overridden';
+        });
+
+        $parent = new EmptyMacroable;
+        $child = new EmptyMacroableChild;
+
+        $this->assertSame('original', $parent->inherit());
+        $this->assertSame('original', $child->inherit());
+        $this->assertSame('original', $parent->override());
+        $this->assertSame('overridden', $child->override());
+    }
 }
 
 class EmptyMacroable
 {
     use Macroable;
+}
+
+class EmptyMacroableChild extends EmptyMacroable
+{
+    //
 }
 
 class TestMacroable
