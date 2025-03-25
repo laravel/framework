@@ -26,8 +26,7 @@ class BroadcastingInstallCommand extends Command
                     {--composer=global : Absolute path to the Composer binary which should be used to install packages}
                     {--force : Overwrite any existing broadcasting routes file}
                     {--without-reverb : Do not prompt to install Laravel Reverb}
-                    {--without-node : Do not prompt to install Node dependencies}
-                    {--react : Use React TypeScript Echo implementation instead of JavaScript}';
+                    {--without-node : Do not prompt to install Node dependencies}';
 
     /**
      * The console command description.
@@ -48,30 +47,19 @@ class BroadcastingInstallCommand extends Command
         // Install channel routes file...
         if (! file_exists($broadcastingRoutesPath = $this->laravel->basePath('routes/channels.php')) || $this->option('force')) {
             $this->components->info("Published 'channels' route file.");
-
             copy(__DIR__.'/stubs/broadcasting-routes.stub', $broadcastingRoutesPath);
         }
 
         $this->uncommentChannelsRoutesFile();
         $this->enableBroadcastServiceProvider();
 
-        // Install bootstrapping...
-        if ($this->option('react')) {
-            // For React, use the TypeScript implementation
-            $hooksDirectory = $this->laravel->resourcePath('js/hooks');
-            $echoScriptPath = $hooksDirectory.'/use-echo.ts';
-            
-            if (! file_exists($echoScriptPath)) {
-                // Create the hooks directory if it doesn't exist
-                if (! is_dir($hooksDirectory)) {
-                    if (! is_dir($this->laravel->resourcePath('js'))) {
-                        mkdir($this->laravel->resourcePath('js'), 0755, true);
-                    }
-                    mkdir($hooksDirectory, 0755, true);
-                }
-
-                copy(__DIR__.'/stubs/use-echo-ts.stub', $echoScriptPath);
-                $this->components->info("Created React TypeScript Echo implementation at [resources/js/hooks/use-echo.ts].");
+        // We have a specific echo version for React and Vue with Typescript,
+        // so check if this app contains React or Vue with Typescript
+        if ($reactOrVue = $this->appContainsReactOrVueWithTypescript()) {
+            if($reactOrVue === 'react') {
+                $this->installReactTypescriptEcho();
+            } elseif($reactOrVue === 'vue') {
+                $this->installVueTypescriptEcho();
             }
         } else {
             // Standard JavaScript implementation
@@ -101,6 +89,27 @@ class BroadcastingInstallCommand extends Command
         $this->installReverb();
 
         $this->installNodeDependencies();
+    }
+
+    /**
+     * Detect if the user is using React or Vue with Typescript and then install the corresponding Echo implementation
+     *
+     * @return null | 'react' | 'vue'
+     */
+    protected function appContainsReactOrVueWithTypescript()
+    {
+        $packageJsonPath = $this->laravel->basePath('package.json');
+        if (!file_exists($packageJsonPath)) {
+            return null;
+        }
+        $packageJson = json_decode(file_get_contents($packageJsonPath), true);
+        if (isset($packageJson['dependencies']['react']) || isset($packageJson['dependencies']['vue'])) {
+            // Check if dependencies also contains typescript
+            if (isset($packageJson['dependencies']['typescript'])) {
+                return isset($packageJson['dependencies']['react']) ? 'react' : 'vue';
+            }
+        }
+        return null;
     }
 
     /**
@@ -153,6 +162,54 @@ class BroadcastingInstallCommand extends Command
                 'App\Providers\BroadcastServiceProvider::class',
                 app()->configPath('app.php'),
             );
+        }
+    }
+
+    /**
+     * Install the React TypeScript Echo implementation.
+     *
+     * @return void
+     */
+    protected function installReactTypescriptEcho()
+    {
+        $hooksDirectory = $this->laravel->resourcePath('js/hooks');
+        $echoScriptPath = $hooksDirectory.'/use-echo.ts';
+            
+        if (! file_exists($echoScriptPath)) {
+            // Create the hooks directory if it doesn't exist
+            if (! is_dir($hooksDirectory)) {
+                if (! is_dir($this->laravel->resourcePath('js'))) {
+                    mkdir($this->laravel->resourcePath('js'), 0755, true);
+                }
+                mkdir($hooksDirectory, 0755, true);
+            }
+
+            copy(__DIR__.'/stubs/use-echo-ts.stub', $echoScriptPath);
+            $this->components->info("Created React TypeScript Echo implementation at [resources/js/hooks/use-echo.ts].");
+        }   
+    }
+
+    /**
+     * Install the Vue TypeScript Echo implementation.
+     *
+     * @return void
+     */
+    protected function installVueTypescriptEcho()
+    {
+        $echoScriptPath = $this->laravel->resourcePath('js/composables/useEcho.ts');
+    
+        if (! file_exists($echoScriptPath)) {
+            $composablesDirectory = $this->laravel->resourcePath('js/composables');
+    
+            if (! is_dir($composablesDirectory)) {
+                if (! is_dir($this->laravel->resourcePath('js'))) {
+                    mkdir($this->laravel->resourcePath('js'), 0755, true);
+                }
+                mkdir($composablesDirectory, 0755, true);
+            }
+    
+            copy(__DIR__.'/stubs/useEcho-ts.stub', $echoScriptPath);
+            $this->components->info("Created Vue TypeScript Echo implementation at [resources/js/composables/useEcho.ts].");
         }
     }
 
