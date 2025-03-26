@@ -1837,6 +1837,24 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Specify attributes that should be added to any new models created by this builder.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|array|string  $attributes
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function pendingAttributes(Expression|array|string $attributes, $value = null)
+    {
+        if (! is_array($attributes)) {
+            $attributes = [$attributes => $value];
+        }
+
+        $this->pendingAttributes = array_merge($this->pendingAttributes, $attributes);
+
+        return $this;
+    }
+
+    /**
      * Apply query-time casts to the model instance.
      *
      * @param  array  $casts
