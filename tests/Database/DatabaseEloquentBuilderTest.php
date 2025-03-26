@@ -21,6 +21,7 @@ use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection as BaseCollection;
 use Mockery as m;
+use PDO;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
@@ -2613,6 +2614,31 @@ class DatabaseEloquentBuilderTest extends TestCase
                     'If you are adding a new method to the $passthru array, make sure the name is lowercased.'
             );
         }
+    }
+
+    public function testPipeCallback()
+    {
+        $query = new Builder(new BaseBuilder(
+            $connection = new Connection(new PDO('sqlite::memory:')),
+            new Grammar($connection),
+            new Processor,
+        ));
+
+        $result = $query->pipe(fn (Builder $query) => 5);
+        $this->assertSame(5, $result);
+
+        $result = $query->pipe(fn (Builder $query) => null);
+        $this->assertSame($query, $result);
+
+        $result = $query->pipe(function (Builder $query) {
+            //
+        });
+        $this->assertSame($query, $result);
+
+        $this->assertCount(0, $query->getQuery()->wheres);
+        $result = $query->pipe(fn (Builder $query) => $query->where('foo', 'bar'));
+        $this->assertSame($query, $result);
+        $this->assertCount(1, $query->getQuery()->wheres);
     }
 
     protected function mockConnectionForModel($model, $database)
