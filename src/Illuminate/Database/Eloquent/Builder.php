@@ -1956,6 +1956,25 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Exclude all appends from the model's array attributes.
+     *
+     * @param  string|array<array-key,string>  $excepts
+     * @return $this
+     */
+    public function withoutAppends(string|array $excepts = []): static
+    {
+        $this->model::$withoutAppends = true;
+
+        if (! is_array($excepts)) {
+            $excepts = func_get_args();
+        }
+
+        $this->model::$exceptAppends = array_merge($this->model::$exceptAppends ?? [], $excepts);
+
+        return $this;
+    }
+
+    /**
      * Get the "limit" value from the query or null if it's not set.
      *
      * @return mixed

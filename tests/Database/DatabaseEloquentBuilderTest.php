@@ -857,6 +857,17 @@ class DatabaseEloquentBuilderTest extends TestCase
         unset($_SERVER['__eloquent.constrain']);
     }
 
+    public function testWithoutAppends()
+    {
+        $model = new EloquentBuilderTestWithoutAppendsStub;
+        $this->mockConnectionForModel($model, '');
+        $builder = $model->query();
+        $this->assertEquals(['foo' => 'foo', 'bar' => 'bar'], $builder->getModel()->toArray());
+        $this->assertEquals([], $builder->withoutAppends()->getModel()->toArray());
+        $this->assertEquals(['foo' => 'foo', 'bar' => 'bar'], $builder->getModel()->resetOriginalAppends()->toArray());
+        $this->assertEquals(['foo' => 'foo'], $builder->withoutAppends(['foo'])->getModel()->toArray());
+    }
+
     public function testRelationshipEagerLoadProcessForImplicitlyEmpty()
     {
         $queryBuilder = $this->getMockQueryBuilder();
@@ -2856,5 +2867,22 @@ class EloquentBuilderTestWhereBelongsToStub extends Model
     public function parent()
     {
         return $this->belongsTo(self::class, 'parent_id', 'id', 'parent');
+    }
+}
+
+class EloquentBuilderTestWithoutAppendsStub extends Model
+{
+    protected $table = 'table';
+
+    protected $appends = ['foo', 'bar'];
+
+    public function getFooAttribute()
+    {
+        return 'foo';
+    }
+
+    public function getBarAttribute()
+    {
+        return 'bar';
     }
 }

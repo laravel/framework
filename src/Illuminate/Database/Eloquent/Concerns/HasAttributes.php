@@ -139,6 +139,27 @@ trait HasAttributes
     protected $appends = [];
 
     /**
+     * The attributes of appends that should be hidden for arrays.
+     *
+     * @var bool
+     */
+    public static $withoutAppends = false;
+
+    /**
+     * The appends that should be included despite withoutAppends being true.
+     *
+     * @var array
+     */
+    public static $exceptAppends = [];
+
+    /**
+     * The attributes that save original value of $appends when withoutAppends being true.
+     *
+     * @var array
+     */
+    protected static $originalTempAppends = [];
+
+    /**
      * Indicates whether attributes are snake cased on arrays.
      *
      * @var bool
@@ -355,6 +376,11 @@ trait HasAttributes
      */
     protected function getArrayableAppends()
     {
+        if (static::$withoutAppends) {
+            static::$originalTempAppends = $this->appends;
+            $this->appends = static::$exceptAppends;
+        }
+
         if (! count($this->appends)) {
             return [];
         }
@@ -2339,6 +2365,20 @@ trait HasAttributes
     public function hasAppended($attribute)
     {
         return in_array($attribute, $this->appends);
+    }
+
+    /**
+     * Reset the original appends state.
+     *
+     * @return $this
+     */
+    public function resetOriginalAppends()
+    {
+        static::$withoutAppends = false;
+        static::$exceptAppends = [];
+        $this->appends = static::$originalTempAppends;
+
+        return $this;
     }
 
     /**
