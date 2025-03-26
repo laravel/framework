@@ -5030,6 +5030,10 @@ SQL;
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->where('foo', '<>', null);
         $this->assertSame('select * from "users" where "foo" is not null', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('foo', '<=>', null);
+        $this->assertSame('select * from "users" where "foo" is null', $builder->toSql());
     }
 
     public function testDynamicWhere()
