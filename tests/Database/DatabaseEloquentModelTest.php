@@ -544,7 +544,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertTrue($model->hasCast('bcmath_number', Number::class));
     }
 
-    public function testBcMathNumber()
+    public function testBcMathNumberAttribute()
     {
         if (!$this->isBcMathNumberSupported()) {
             $this->markTestSkipped('Requires BcMath\Number class.');
