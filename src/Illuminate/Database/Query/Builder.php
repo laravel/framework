@@ -866,7 +866,7 @@ class Builder implements BuilderContract
         // where null clause to the query. So, we will allow a short-cut here to
         // that method for convenience so the developer doesn't have to check.
         if (is_null($value)) {
-            return $this->whereNull($column, $boolean, $operator !== '=');
+            return $this->whereNull($column, $boolean, ! in_array($operator, ['=', '<=>'], true));
         }
 
         $type = 'Basic';
@@ -958,7 +958,7 @@ class Builder implements BuilderContract
     protected function invalidOperatorAndValue($operator, $value)
     {
         return is_null($value) && in_array($operator, $this->operators) &&
-             ! in_array($operator, ['=', '<>', '!=']);
+             ! in_array($operator, ['=', '<=>', '<>', '!=']);
     }
 
     /**
