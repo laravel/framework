@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use BcMath\Number;
 use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
@@ -531,6 +532,35 @@ class DatabaseEloquentModelTest extends TestCase
     {
         $model = new EloquentModelEnumCastingStub();
         $this->assertTrue($model->hasCast('enumAttribute', StringStatus::class));
+    }
+
+    public function testHasCastsOnBcmathNumber()
+    {
+        if(!$this->isBcMathNumberSupported()) {
+            $this->markTestSkipped('Requires BcMath\Number class.');
+        }
+
+        $model = new EloquentModelWithBCMathNumberCasts();
+        $this->assertTrue($model->hasCast('bcmath_number', Number::class));
+    }
+
+    public function testBcMathNumber()
+    {
+        if(!$this->isBcMathNumberSupported()) {
+            $this->markTestSkipped('Requires BcMath\Number class.');
+        }
+
+        $model = new EloquentModelWithBCMathNumberCasts(['id' => 1, 'bcmath_number' => '1.23']);
+        $this->assertInstanceOf(Number::class, $model->bcmath_number);
+        $this->assertSame('1.23', $model->bcmath_number->value);
+
+        $model->bcmath_number = '9.87';
+        $this->assertInstanceOf(Number::class, $model->bcmath_number);
+        $this->assertSame('9.87', (string)$model->bcmath_number);
+
+        $model->bcmath_number = new Number('0.100');
+        $this->assertInstanceOf(Number::class, $model->bcmath_number);
+        $this->assertSame(3, $model->bcmath_number->scale);
     }
 
     public function testCleanAttributes()
@@ -3301,6 +3331,11 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals(EloquentModelWithUseFactoryAttribute::class, $factory->modelName());
         $this->assertEquals('test name', $instance->name); // Small smoke test to ensure the factory is working
     }
+
+    private function isBcMathNumberSupported(): bool
+    {
+        return class_exists(Number::class);
+    }
 }
 
 class EloquentTestObserverStub
@@ -3943,6 +3978,13 @@ class EloquentModelWithPrimitiveCasts extends Model
     {
         return Attribute::get(fn () => 'ok');
     }
+}
+
+class EloquentModelWithBCMathNumberCasts extends Model
+{
+    public $fillable = ['id', 'bcmath_number'];
+
+    protected $casts = ['bcmath_number' => Number::class];
 }
 
 enum CastableBackedEnum: string

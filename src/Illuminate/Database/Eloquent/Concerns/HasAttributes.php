@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Eloquent\Concerns;
 
 use BackedEnum;
+use BcMath\Number;
 use Brick\Math\BigDecimal;
 use Brick\Math\Exception\MathException as BrickMathException;
 use Brick\Math\RoundingMode;
@@ -856,6 +857,10 @@ trait HasAttributes
                 return $this->asTimestamp($value);
         }
 
+        if($this->isBcMathNumberCastable($key)) {
+            return new Number($value);
+        }
+
         if ($this->isEnumCastable($key)) {
             return $this->getEnumCastableAttributeValue($key, $value);
         }
@@ -1041,6 +1046,12 @@ trait HasAttributes
 
         if ($this->isEnumCastable($key)) {
             $this->setEnumCastableAttribute($key, $value);
+
+            return $this;
+        }
+
+        if($this->isBcMathNumberCastable($key)) {
+            $this->attributes[$key] = $value === null ? null : new Number($value);
 
             return $this;
         }
@@ -1753,6 +1764,29 @@ trait HasAttributes
         }
 
         return enum_exists($castType);
+    }
+
+    /**
+     * Determine if the given key is cast using a BcMath\Number.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    protected function isBcMathNumberCastable($key)
+    {
+        $casts = $this->getCasts();
+
+        if (! array_key_exists($key, $casts)) {
+            return false;
+        }
+
+        $castType = $casts[$key];
+
+        if (in_array($castType, static::$primitiveCastTypes)) {
+            return false;
+        }
+
+        return is_a($castType, Number::class, true);
     }
 
     /**
