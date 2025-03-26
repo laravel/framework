@@ -4,8 +4,7 @@ namespace Illuminate\Pagination;
 
 use Closure;
 use Illuminate\Contracts\Support\Htmlable;
-use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Http\Resources\Json\ResourceCollection;
+use Illuminate\Http\Resources\TransformsToResourceCollection;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\ForwardsCalls;
@@ -22,7 +21,7 @@ use Traversable;
  */
 abstract class AbstractPaginator implements Htmlable, Stringable
 {
-    use ForwardsCalls, Tappable;
+    use ForwardsCalls, Tappable, TransformsToResourceCollection;
 
     /**
      * All of the items being paginated.
@@ -800,61 +799,5 @@ abstract class AbstractPaginator implements Htmlable, Stringable
     public function __toString()
     {
         return (string) $this->render();
-    }
-
-    /**
-     * Create a paginated resource collection.
-     *
-     * @param  class-string<JsonResource>|null  $resourceClass
-     * @return ResourceCollection
-     *
-     * @throws \Throwable
-     */
-    public function toResourceCollection(?string $resourceClass = null): ResourceCollection
-    {
-        if ($resourceClass === null) {
-            return $this->guessResourceCollection();
-        }
-
-        return $resourceClass::collection($this);
-    }
-
-    /**
-     * Guess the resource collection for the items.
-     *
-     * @return ResourceCollection
-     *
-     * @throws \Throwable
-     */
-    protected function guessResourceCollection(): ResourceCollection
-    {
-        $collection = $this->getCollection();
-
-        if ($collection->isEmpty()) {
-            return new ResourceCollection($collection);
-        }
-
-        $model = $collection->first();
-
-        throw_unless(is_object($model), \LogicException::class, 'Resource collection guesser expects the collection to contain objects.');
-
-        $className = get_class($model);
-
-        $resourceClass = $this->guessResourceClassName($model);
-
-        throw_unless(class_exists($resourceClass), \LogicException::class, sprintf('Failed to find resource class for model [%s].', $className));
-
-        return $resourceClass::collection($this);
-    }
-
-    /**
-     * Guess the resource class name for the model.
-     *
-     * @param  object  $model
-     * @return string
-     */
-    protected function guessResourceClassName(object $model): string
-    {
-        return sprintf('App\Http\Resources\%sResource', class_basename($model));
     }
 }

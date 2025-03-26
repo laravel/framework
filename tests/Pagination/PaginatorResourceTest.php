@@ -9,15 +9,6 @@ use PHPUnit\Framework\TestCase;
 
 class PaginatorResourceTest extends TestCase
 {
-    public function testItGuessesTheResourceName()
-    {
-        $paginator = new PaginatorResourceTestPaginator([
-            new PaginatorResourceTestModel(),
-        ], 1, 1, 1);
-
-        $this->assertEquals('App\Http\Resources\PaginatorResourceTestModelResource', $paginator->getGuessedResourceName(new PaginatorResourceTestModel()));
-    }
-
     public function testItCanTransformToExplicitResource()
     {
         $paginator = new PaginatorResourceTestPaginator([
@@ -67,8 +58,5 @@ class PaginatorResourceTestResource extends JsonResource
 
 class PaginatorResourceTestPaginator extends LengthAwarePaginator
 {
-    public function getGuessedResourceName(object $model): string
-    {
-        return $this->guessResourceClassName($model);
-    }
+    //
 }

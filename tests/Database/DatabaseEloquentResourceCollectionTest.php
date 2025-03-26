@@ -9,14 +9,6 @@ use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentResourceCollectionTest extends TestCase
 {
-    public function testItGuessesTheResourceName()
-    {
-        $collection = new EloquentResourceCollectionTestCollection([
-            new EloquentResourceCollectionTestModel(),
-        ]);
-        $this->assertEquals('App\Http\Resources\EloquentResourceCollectionTestModelResource', $collection->getGuessedResourceName(new EloquentResourceCollectionTestModel()));
-    }
-
     public function testItCanTransformToExplicitResource()
     {
         $collection = new Collection([
@@ -61,12 +53,4 @@ class EloquentResourceCollectionTestModel extends Model
 class EloquentResourceCollectionTestResource extends JsonResource
 {
     //
-}
-
-class EloquentResourceCollectionTestCollection extends Collection
-{
-    public function getGuessedResourceName(object $model): string
-    {
-        return $this->guessResourceClassName($model);
-    }
 }

@@ -17,7 +17,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\Pivot;
-use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Resources\TransformsToResource;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Str;
@@ -40,7 +40,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         Concerns\HidesAttributes,
         Concerns\GuardsAttributes,
         Concerns\PreventsCircularRecursion,
-        ForwardsCalls;
+        ForwardsCalls,
+        TransformsToResource;
     /** @use HasCollection<\Illuminate\Database\Eloquent\Collection<array-key, static & self>> */
     use HasCollection;
 
@@ -2459,50 +2460,5 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         $this->bootIfNotBooted();
 
         $this->initializeTraits();
-    }
-
-    /**
-     * Create a new resource object for the given resource.
-     *
-     * @param  class-string<JsonResource>|null  $resourceClass
-     * @return JsonResource
-     *
-     * @throws \Throwable
-     */
-    public function toResource(?string $resourceClass = null): JsonResource
-    {
-        if ($resourceClass === null) {
-            return $this->guessResource();
-        }
-
-        return $resourceClass::make($this);
-    }
-
-    /**
-     * Guess the resource class for the model.
-     *
-     * @return JsonResource
-     *
-     * @throws \Throwable
-     */
-    protected function guessResource(): JsonResource
-    {
-        $className = get_class($this);
-
-        $resourceClass = $this->guessResourceName();
-
-        throw_unless(class_exists($resourceClass), \LogicException::class, sprintf('Failed to find resource class for model [%s].', $className));
-
-        return $resourceClass::make($this);
-    }
-
-    /**
-     * Guess the resource class name for the model.
-     *
-     * @return class-string<JsonResource>
-     */
-    protected function guessResourceName(): string
-    {
-        return sprintf('App\Http\Resources\%sResource', class_basename($this));
     }
 }

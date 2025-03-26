@@ -6,8 +6,6 @@ use Illuminate\Contracts\Queue\QueueableCollection;
 use Illuminate\Contracts\Queue\QueueableEntity;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithDictionary;
-use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as BaseCollection;
 use LogicException;
@@ -844,58 +842,5 @@ class Collection extends BaseCollection implements QueueableCollection
         }
 
         return $model->newModelQuery()->whereKey($this->modelKeys());
-    }
-
-    /**
-     * Create a new resource collection instance for the given resource.
-     *
-     * @param  class-string<JsonResource>|null  $resourceClass
-     * @return ResourceCollection
-     *
-     * @throws \Throwable
-     */
-    public function toResourceCollection(?string $resourceClass = null): ResourceCollection
-    {
-        if ($resourceClass === null) {
-            return $this->guessResourceCollection();
-        }
-
-        return $resourceClass::collection($this);
-    }
-
-    /**
-     * Guess the resource collection for the items.
-     *
-     * @return ResourceCollection
-     *
-     * @throws \Throwable
-     */
-    protected function guessResourceCollection(): ResourceCollection
-    {
-        if ($this->isEmpty()) {
-            return new ResourceCollection($this);
-        }
-
-        $model = $this->first();
-
-        throw_unless(is_object($model), \LogicException::class, 'Resource collection guesser expects the collection to contain objects.');
-
-        $className = get_class($model);
-        $resourceClass = $this->guessResourceClassName($model);
-
-        throw_unless(class_exists($resourceClass), \LogicException::class, sprintf('Failed to find resource class for model [%s].', $className));
-
-        return $resourceClass::collection($this);
-    }
-
-    /**
-     * Guess the resource class name for the given model.
-     *
-     * @param  object  $model
-     * @return class-string<JsonResource>
-     */
-    protected function guessResourceClassName(object $model): string
-    {
-        return sprintf('App\Http\Resources\%sResource', class_basename($model));
     }
 }

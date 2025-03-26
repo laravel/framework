@@ -41,16 +41,13 @@ class DatabaseEloquentResourceModelTest extends TestCase
     public function testItCanGuessResourceName()
     {
         $model = new EloquentResourceTestResourceModel();
-        $this->assertEquals('App\Http\Resources\EloquentResourceTestResourceModelResource', $model->getGuessedResourceName());
+        $this->assertEquals('App\Http\Resources\EloquentResourceTestResourceModelResource', $model::guessResourceName());
     }
 }
 
 class EloquentResourceTestResourceModel extends Model
 {
-    public function getGuessedResourceName(): string
-    {
-        return $this->guessResourceName();
-    }
+    //
 }
 
 class EloquentResourceTestResourceModelWithGuessableResource extends Model

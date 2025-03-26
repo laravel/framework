@@ -5,6 +5,7 @@ namespace Illuminate\Support;
 use ArrayAccess;
 use ArrayIterator;
 use Illuminate\Contracts\Support\CanBeEscapedWhenCastToString;
+use Illuminate\Http\Resources\TransformsToResourceCollection;
 use Illuminate\Support\Traits\EnumeratesValues;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
@@ -24,7 +25,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * @use \Illuminate\Support\Traits\EnumeratesValues<TKey, TValue>
      */
-    use EnumeratesValues, Macroable;
+    use EnumeratesValues, Macroable, TransformsToResourceCollection;
 
     /**
      * The items contained in the collection.
