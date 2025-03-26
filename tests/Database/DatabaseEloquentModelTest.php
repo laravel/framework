@@ -536,7 +536,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testHasCastsOnBcmathNumber()
     {
-        if(!$this->isBcMathNumberSupported()) {
+        if (!$this->isBcMathNumberSupported()) {
             $this->markTestSkipped('Requires BcMath\Number class.');
         }
 
@@ -546,7 +546,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testBcMathNumber()
     {
-        if(!$this->isBcMathNumberSupported()) {
+        if (!$this->isBcMathNumberSupported()) {
             $this->markTestSkipped('Requires BcMath\Number class.');
         }
 
@@ -556,7 +556,7 @@ class DatabaseEloquentModelTest extends TestCase
 
         $model->bcmath_number = '9.87';
         $this->assertInstanceOf(Number::class, $model->bcmath_number);
-        $this->assertSame('9.87', (string)$model->bcmath_number);
+        $this->assertSame('9.87', (string) $model->bcmath_number);
 
         $model->bcmath_number = new Number('0.100');
         $this->assertInstanceOf(Number::class, $model->bcmath_number);

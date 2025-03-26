@@ -857,7 +857,7 @@ trait HasAttributes
                 return $this->asTimestamp($value);
         }
 
-        if($this->isBcMathNumberCastable($key)) {
+        if ($this->isBcMathNumberCastable($key)) {
             return new Number($value);
         }
 
@@ -1050,7 +1050,7 @@ trait HasAttributes
             return $this;
         }
 
-        if($this->isBcMathNumberCastable($key)) {
+        if ($this->isBcMathNumberCastable($key)) {
             $this->attributes[$key] = $value === null ? null : new Number($value);
 
             return $this;
