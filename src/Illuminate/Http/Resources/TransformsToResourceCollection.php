@@ -44,6 +44,9 @@ trait TransformsToResourceCollection
 
         /** @var class-string<Model> $className */
         $className = get_class($model);
+
+        throw_unless(method_exists($className, 'guessResourceName'), \LogicException::class, sprintf('Expected class %s to implement guessResourceName method. Make sure the model uses the TransformsToResource trait.', $className));
+
         $resourceClass = $className::guessResourceName();
 
         throw_unless(class_exists($resourceClass), \LogicException::class, sprintf('Failed to find resource class for model [%s].', $className));
