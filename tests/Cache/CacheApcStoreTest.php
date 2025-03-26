@@ -151,6 +151,68 @@ class CacheApcStoreTest extends TestCase
         $this->assertTrue($result);
     }
 
+    #[DataProvider('resolveKeyNameDataProvider')]
+    public function testCanGetWithEnum(mixed $key, string $expected)
+    {
+        $apc = $this->getMockBuilder(ApcWrapper::class)->onlyMethods(['get'])->getMock();
+        $apc->expects($this->once())->method('get')->with($this->equalTo($expected))->willReturn('bar');
+        $store = new ApcStore($apc);
+        $this->assertSame('bar', $store->get($key));
+    }
+
+    #[DataProvider('resolveKeyNameDataProvider')]
+    public function testCanPutWithEnum(mixed $key, string $expected)
+    {
+        $apc = $this->getMockBuilder(ApcWrapper::class)->onlyMethods(['put'])->getMock();
+        $apc->expects($this->once())
+            ->method('put')->with($this->equalTo($expected), $this->equalTo('bar'), $this->equalTo(60))
+            ->willReturn(true);
+        $store = new ApcStore($apc);
+        $result = $store->put($key, 'bar', 60);
+        $this->assertTrue($result);
+    }
+
+    #[DataProvider('resolveKeyNameDataProvider')]
+    public function testCanIncrementWithEnum(mixed $key, string $expected)
+    {
+        $apc = $this->getMockBuilder(ApcWrapper::class)->onlyMethods(['increment'])->getMock();
+        $apc->expects($this->once())->method('increment')->with($this->equalTo($expected), $this->equalTo(5));
+        $store = new ApcStore($apc);
+        $store->increment($key, 5);
+    }
+
+    #[DataProvider('resolveKeyNameDataProvider')]
+    public function testCanDecrementWithEnum(mixed $key, string $expected)
+    {
+        $apc = $this->getMockBuilder(ApcWrapper::class)->onlyMethods(['decrement'])->getMock();
+        $apc->expects($this->once())->method('decrement')->with($this->equalTo($expected), $this->equalTo(5));
+        $store = new ApcStore($apc);
+        $store->decrement($key, 5);
+    }
+
+    #[DataProvider('resolveKeyNameDataProvider')]
+    public function testCanStoreItemForeverWithEnum(mixed $key, string $expected)
+    {
+        $apc = $this->getMockBuilder(ApcWrapper::class)->onlyMethods(['put'])->getMock();
+        $apc->expects($this->once())
+            ->method('put')->with($this->equalTo($expected), $this->equalTo('bar'), $this->equalTo(0))
+            ->willReturn(true);
+        $store = new ApcStore($apc);
+        $result = $store->forever($key, 'bar');
+        $this->assertTrue($result);
+    }
+
+    #[DataProvider('resolveKeyNameDataProvider')]
+    public function testCanForgetItemWithEnum(mixed $key, string $expected)
+    {
+        $apc = $this->getMockBuilder(ApcWrapper::class)->onlyMethods(['delete'])->getMock();
+        $apc->expects($this->once())->method('delete')->with($this->equalTo($expected))->willReturn(true);
+        $store = new ApcStore($apc);
+        $result = $store->forget($key);
+        $this->assertTrue($result);
+    }
+}
+
 enum UnitCacheKey
 {
     case Foo;
