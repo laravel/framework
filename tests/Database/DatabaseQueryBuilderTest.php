@@ -301,6 +301,27 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertSame('select * from "users" where "id" = ? and "email" = ?', $builder->toSql());
     }
 
+    public function testPipeCallback()
+    {
+        $query = $this->getBuilder();
+
+        $result = $query->pipe(fn (Builder $query) => 5);
+        $this->assertSame(5, $result);
+
+        $result = $query->pipe(fn (Builder $query) => null);
+        $this->assertSame($query, $result);
+
+        $result = $query->pipe(function (Builder $query) {
+            //
+        });
+        $this->assertSame($query, $result);
+
+        $this->assertCount(0, $query->wheres);
+        $result = $query->pipe(fn (Builder $query) => $query->where('foo', 'bar'));
+        $this->assertSame($query, $result);
+        $this->assertCount(1, $query->wheres);
+    }
+
     public function testBasicWheres()
     {
         $builder = $this->getBuilder();

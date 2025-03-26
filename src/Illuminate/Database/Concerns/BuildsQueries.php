@@ -598,4 +598,17 @@ trait BuildsQueries
 
         return $this;
     }
+
+    /**
+     * Pass the query to a given callback and return the result.
+     *
+     * @template TReturn
+     *
+     * @param  (callable($this): TReturn)  $callback
+     * @return (TReturn is null ? $this : TReturn
+     */
+    public function pipe($callback)
+    {
+        return $callback($this) ?? $this;
+    }
 }
