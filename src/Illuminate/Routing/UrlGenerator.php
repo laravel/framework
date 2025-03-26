@@ -200,7 +200,7 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * Generate an absolute URL to the given path.
      *
-     * @param  string  $path
+     * @param  string|null  $path
      * @param  mixed  $extra
      * @param  bool|null  $secure
      * @return string
@@ -265,7 +265,7 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * Generate the URL to an application asset.
      *
-     * @param  string  $path
+     * @param  string|null  $path
      * @param  bool|null  $secure
      * @return string
      */
