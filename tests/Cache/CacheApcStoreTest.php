@@ -5,10 +5,21 @@ namespace Illuminate\Tests\Cache;
 use Illuminate\Cache\ApcStore;
 use Illuminate\Cache\ApcWrapper;
 use Mockery;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class CacheApcStoreTest extends TestCase
 {
+    public static function resolveKeyNameDataProvider(): array
+    {
+        return [
+            'uses BackedEnum' => [BackedCacheKey::Foo, 'foo'],
+            'uses UnitEnum' => [UnitCacheKey::Foo, 'Foo'],
+            'uses normal string' => ['foo', 'foo'],
+            'uses int' => [100, '100'],
+        ];
+    }
+
     public function testGetReturnsNullWhenNotFound()
     {
         $apc = $this->getMockBuilder(ApcWrapper::class)->onlyMethods(['get'])->getMock();
@@ -132,4 +143,13 @@ class CacheApcStoreTest extends TestCase
         $result = $store->flush();
         $this->assertTrue($result);
     }
+
+enum UnitCacheKey
+{
+    case Foo;
+}
+
+enum BackedCacheKey: string
+{
+    case Foo = 'foo';
 }
