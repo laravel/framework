@@ -587,7 +587,7 @@ trait BuildsQueries
     }
 
     /**
-     * Pass the query to a given callback.
+     * Pass the query to a given callback and then return it.
      *
      * @param  callable($this): mixed  $callback
      * @return $this
