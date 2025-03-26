@@ -61,6 +61,9 @@ class BroadcastingInstallCommand extends Command
             } elseif($reactOrVue === 'vue') {
                 $this->installVueTypescriptEcho();
             }
+            
+            // Inject Echo configuration for both React and Vue applications
+            $this->injectEchoConfigurationInApp($reactOrVue);
         } else {
             // Standard JavaScript implementation
             if (! file_exists($echoScriptPath = $this->laravel->resourcePath('js/echo.js'))) {
@@ -212,6 +215,74 @@ class BroadcastingInstallCommand extends Command
             $this->components->info("Created Vue TypeScript Echo implementation at [resources/js/composables/useEcho.ts].");
         }
     }
+
+    /**
+     * Inject Echo configuration into the application's main file.
+     *
+     * @param  string|null  $appType  The application type ('react', 'vue', or null)
+     * @return void
+     */
+    protected function injectEchoConfigurationInApp(?string $appType = null)
+    {
+        // If app type is not provided, detect it
+        if ($appType === null) {
+            $appType = $this->appContainsReactOrVueWithTypescript();
+        }
+        
+        // Determine file path and import path based on app type
+        if ($appType === 'vue') {
+            $filePath = resource_path('js/app.ts');
+            $importPath = './composables/useEcho';
+            $fileExtension = 'ts';
+        } else { // Default to React
+            $filePath = resource_path('js/app.tsx');
+            $importPath = './hooks/use-echo';
+            $fileExtension = 'tsx';
+        }
+        
+        // Check if file exists
+        if (!file_exists($filePath)) {
+            $this->components->warn("Could not find {$filePath}. Echo configuration not added.");
+            return;
+        }
+        
+        $contents = file_get_contents($filePath);
+
+        // Prepare Echo configuration code
+        $echoCode = <<<JS
+        import { configureEcho } from '{$importPath}';
+
+        configureEcho({
+            broadcaster: 'reverb',
+            key: import.meta.env.VITE_REVERB_APP_KEY,
+            wsHost: import.meta.env.VITE_REVERB_HOST,
+            wsPort: import.meta.env.VITE_REVERB_PORT ?? 80,
+            wssPort: import.meta.env.VITE_REVERB_PORT ?? 443,
+            forceTLS: (import.meta.env.VITE_REVERB_SCHEME ?? 'https') === 'https',
+            enabledTransports: ['ws', 'wss'],
+        });
+        JS;
+
+        // Match all imports
+        preg_match_all('/^import .+;$/m', $contents, $matches);
+
+        if (!empty($matches[0])) {
+            $lastImport = end($matches[0]);
+            $pos = strrpos($contents, $lastImport);
+            if ($pos !== false) {
+                $insertPos = $pos + strlen($lastImport);
+                $newContents = substr($contents, 0, $insertPos) . "\n" . $echoCode . substr($contents, $insertPos);
+                file_put_contents($filePath, $newContents);
+                $this->components->info("Echo configuration added to app.{$fileExtension} after imports.");
+            }
+        } else {
+            // Add the Echo configuration to the top of the file if no import statements are found
+            $newContents = $echoCode . "\n" . $contents;
+            file_put_contents($filePath, $newContents);
+            $this->components->info("Echo configuration added to the top of app.{$fileExtension}.");
+        }
+    }
+    
 
     /**
      * Install Laravel Reverb into the application if desired.
