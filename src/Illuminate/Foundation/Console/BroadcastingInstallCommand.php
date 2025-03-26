@@ -222,7 +222,7 @@ class BroadcastingInstallCommand extends Command
      * @param  string|null  $appType  The application type ('react', 'vue', or null)
      * @return void
      */
-    protected function injectEchoConfigurationInApp(?string $appType = null)
+    protected function injectEchoConfigurationInApp(string $appType = null)
     {
         // If app type is not provided, detect it
         if ($appType === null) {
