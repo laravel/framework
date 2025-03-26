@@ -202,13 +202,18 @@ class Logger implements LoggerInterface
     }
 
     /**
-     * Flush the existing context array.
+     * Remove all or passed context keys for future logs.
      *
+     * @param  string[]|null  $keys
      * @return $this
      */
-    public function withoutContext()
+    public function withoutContext($keys = null)
     {
-        $this->context = [];
+        if (is_array($keys)) {
+            $this->context = array_diff_key($this->context, array_flip($keys));
+        } else {
+            $this->context = [];
+        }
 
         return $this;
     }

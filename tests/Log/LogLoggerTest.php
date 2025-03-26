@@ -47,6 +47,17 @@ class LogLoggerTest extends TestCase
         $writer->error('foo');
     }
 
+    public function testContextKeysCanBeRemovedForSubsequentLogs()
+    {
+        $writer = new Logger($monolog = m::mock(Monolog::class));
+        $writer->withContext(['bar' => 'baz', 'forget' => 'me']);
+        $writer->withoutContext(['forget']);
+
+        $monolog->shouldReceive('error')->once()->with('foo', ['bar' => 'baz']);
+
+        $writer->error('foo');
+    }
+
     public function testLoggerFiresEventsDispatcher()
     {
         $writer = new Logger($monolog = m::mock(Monolog::class), $events = new Dispatcher);
