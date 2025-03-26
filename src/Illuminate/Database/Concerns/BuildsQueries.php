@@ -605,7 +605,7 @@ trait BuildsQueries
      * @template TReturn
      *
      * @param  (callable($this): TReturn)  $callback
-     * @return (TReturn is null ? $this : TReturn
+     * @return TReturn is null ? $this : TReturn
      */
     public function pipe($callback)
     {
