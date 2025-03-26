@@ -671,6 +671,10 @@ class UrlGenerator implements UrlGeneratorContract
      */
     public function isValidUrl($path)
     {
+        if($path === null){
+            return false;
+        }
+        
         if (is_string($path) && ! preg_match('~^(#|//|https?://|(mailto|tel|sms):)~', $path)) {
             return filter_var($path, FILTER_VALIDATE_URL) !== false;
         }
