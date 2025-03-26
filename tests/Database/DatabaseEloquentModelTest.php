@@ -53,6 +53,7 @@ use Illuminate\Support\Stringable;
 use InvalidArgumentException;
 use LogicException;
 use Mockery as m;
+use PHPUnit\Framework\Attributes\RequiresMethod;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use stdClass;
@@ -534,22 +535,16 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertTrue($model->hasCast('enumAttribute', StringStatus::class));
     }
 
+    #[RequiresMethod(Number::class, '__construct')]
     public function testHasCastsOnBcmathNumber()
     {
-        if (! $this->isBcMathNumberSupported()) {
-            $this->markTestSkipped('Requires BcMath\Number class.');
-        }
-
         $model = new EloquentModelWithBCMathNumberCasts();
         $this->assertTrue($model->hasCast('bcmath_number', Number::class));
     }
 
+    #[RequiresMethod(Number::class, '__construct')]
     public function testBcMathNumberAttribute()
     {
-        if (! $this->isBcMathNumberSupported()) {
-            $this->markTestSkipped('Requires BcMath\Number class.');
-        }
-
         $model = new EloquentModelWithBCMathNumberCasts(['id' => 1, 'bcmath_number' => '1.23']);
         $this->assertInstanceOf(Number::class, $model->bcmath_number);
         $this->assertSame('1.23', $model->bcmath_number->value);
@@ -3330,11 +3325,6 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertInstanceOf(EloquentModelWithUseFactoryAttributeFactory::class, $model::newFactory());
         $this->assertEquals(EloquentModelWithUseFactoryAttribute::class, $factory->modelName());
         $this->assertEquals('test name', $instance->name); // Small smoke test to ensure the factory is working
-    }
-
-    private function isBcMathNumberSupported(): bool
-    {
-        return class_exists(Number::class);
     }
 }
 
