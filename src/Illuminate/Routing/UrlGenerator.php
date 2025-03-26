@@ -666,7 +666,7 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * Determine if the given path is a valid URL.
      *
-     * @param  string  $path
+     * @param  string|null  $path
      * @return bool
      */
     public function isValidUrl($path)
