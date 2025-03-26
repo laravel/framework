@@ -183,7 +183,7 @@ class AboutCommand extends Command
             'Config' => static::format($this->laravel->configurationIsCached(), console: $formatCachedStatus),
             'Events' => static::format($this->laravel->eventsAreCached(), console: $formatCachedStatus),
             'Routes' => static::format($this->laravel->routesAreCached(), console: $formatCachedStatus),
-            'Views' => static::format($this->hasPhpFiles($this->laravel->storagePath('framework/views')), console: $formatCachedStatus),
+            'Views' => static::format($this->hasPhpFiles(config('view.compiled')), console: $formatCachedStatus),
         ]);
 
         static::addToSection('Drivers', fn () => array_filter([
