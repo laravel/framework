@@ -2790,7 +2790,9 @@ class Builder implements BuilderContract
     {
         $this->orders = $this->removeExistingOrdersFor($column);
 
-        if (! is_null($lastId)) {
+        if (is_null($lastId)) {
+            $this->whereNotNull($column);
+        } else {
             $this->where($column, '<', $lastId);
         }
 
@@ -2810,7 +2812,9 @@ class Builder implements BuilderContract
     {
         $this->orders = $this->removeExistingOrdersFor($column);
 
-        if (! is_null($lastId)) {
+        if (is_null($lastId)) {
+            $this->whereNotNull($column);
+        } else {
             $this->where($column, '>', $lastId);
         }
 
