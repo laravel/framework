@@ -108,8 +108,8 @@ class PostgresGrammar extends Grammar
      */
     protected function whereDate(Builder $query, $where)
     {
-        $value = $this->parameter($where['value']);
         $column = $this->wrap($where['column']);
+        $value = $this->parameter($where['value']);
 
         if ($this->isJsonSelector($where['column'])) {
             $column = '('.$column.')';
@@ -127,8 +127,8 @@ class PostgresGrammar extends Grammar
      */
     protected function whereTime(Builder $query, $where)
     {
-        $value = $this->parameter($where['value']);
         $column = $this->wrap($where['column']);
+        $value = $this->parameter($where['value']);
 
         if ($this->isJsonSelector($where['column'])) {
             $column = '('.$column.')';
