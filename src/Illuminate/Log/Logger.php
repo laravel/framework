@@ -202,12 +202,12 @@ class Logger implements LoggerInterface
     }
 
     /**
-     * Remove all or passed context keys for future logs.
+     * Flush the log context on all currently resolved channels.
      *
      * @param  string[]|null  $keys
      * @return $this
      */
-    public function withoutContext($keys = null)
+    public function withoutContext(?array $keys = null)
     {
         if (is_array($keys)) {
             $this->context = array_diff_key($this->context, array_flip($keys));

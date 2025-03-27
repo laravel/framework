@@ -512,12 +512,12 @@ class LogManager implements LoggerInterface
     }
 
     /**
-     * Remove all or passed context keys on all currently resolved channels.
+     * Flush the log context on all currently resolved channels.
      *
      * @param  string[]|null  $keys
      * @return $this
      */
-    public function withoutContext($keys = null)
+    public function withoutContext(?array $keys = null)
     {
         foreach ($this->channels as $channel) {
             if (method_exists($channel, 'withoutContext')) {
