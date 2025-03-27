@@ -6,17 +6,15 @@ use Illuminate\Contracts\Database\Query\Builder as BuilderContract;
 
 /**
  * Class CteClause
- * Handles a Common Table Expression
- *
- * @package Illuminate\Database\Query
+ * Handles a Common Table Expression.
  */
 class CteClause extends Builder
 {
     /**
-     * @param Builder $parentQuery
-     * @param string $aliasName
-     * @param array $aliasColumns
-     * @param bool $recursive
+     * @param  Builder  $parentQuery
+     * @param  string  $aliasName
+     * @param  array  $aliasColumns
+     * @param  bool  $recursive
      */
     public function __construct(
         protected BuilderContract $parentQuery,

@@ -531,15 +531,15 @@ class Builder implements BuilderContract
     /**
      * Add a common table expression clause to the query.
      *
-     * @param string|array $cteAliasName Table alias as a string or an array of the table alias and columns
-     * @param Closure $callback
-     * @param Closure|null $recursiveCallback
-     * @param bool $unionAll
+     * @param  string|array  $cteAliasName  Table alias as a string or an array of the table alias and columns
+     * @param  Closure  $callback
+     * @param  Closure|null  $recursiveCallback
+     * @param  bool  $unionAll
      * @return $this
      */
-    public function commonTableExpression(string|array $cteAliasName, \Closure $callback, \Closure|null $recursiveCallback = null, bool $unionAll = false)
+    public function commonTableExpression(string|array $cteAliasName, \Closure $callback, ?\Closure $recursiveCallback = null, bool $unionAll = false)
     {
-        if (!is_array($this->commonTableExpressions)) {
+        if (! is_array($this->commonTableExpressions)) {
             $this->commonTableExpressions = [];
         }
 
@@ -577,10 +577,10 @@ class Builder implements BuilderContract
     /**
      * Get a new common table expression clause.
      *
-     * @param Builder $parentQuery
-     * @param string $cteName
-     * @param array $cteColumns
-     * @param bool $recursive
+     * @param  Builder  $parentQuery
+     * @param  string  $cteName
+     * @param  array  $cteColumns
+     * @param  bool  $recursive
      * @return CteClause
      */
     protected function newCteClause(self $parentQuery, string $cteName, array $cteColumns, bool $recursive): CteClause

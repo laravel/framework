@@ -143,7 +143,7 @@ class Grammar extends BaseGrammar
             $cteSqlBlocks[] = sprintf(
                 '%s%s AS (%s)',
                 $cteClause->aliasName,
-                !empty($cteClause->aliasColumns) ? '(' . implode(', ', $cteClause->aliasColumns) . ')' : '',
+                ! empty($cteClause->aliasColumns) ? '('.implode(', ', $cteClause->aliasColumns).')' : '',
                 $cteClause->toSql()
             );
         }
