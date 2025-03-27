@@ -6,6 +6,7 @@ use Illuminate\Contracts\Database\Query\Expression;
 use Illuminate\Database\Concerns\CompilesJsonPaths;
 use Illuminate\Database\Grammar as BaseGrammar;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Query\CteClause;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Database\Query\JoinLateralClause;
 use Illuminate\Support\Arr;
@@ -36,6 +37,7 @@ class Grammar extends BaseGrammar
      * @var string[]
      */
     protected $selectComponents = [
+        'commonTableExpressions',
         'aggregate',
         'columns',
         'from',
@@ -117,6 +119,40 @@ class Grammar extends BaseGrammar
         }
 
         return $sql;
+    }
+
+    /**
+     * Compile the common table expression clauses.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $commonTableExpressions
+     * @return string
+     */
+    protected function compileCommonTableExpressions(Builder $query, array $commonTableExpressions): string
+    {
+        $recursive = false;
+        $cteSqlBlocks = [];
+
+        /**
+         * @var string $alias
+         * @var CteClause $cteClause
+         */
+        foreach ($commonTableExpressions as $cteClause) {
+            $recursive |= $cteClause->recursive;
+
+            $cteSqlBlocks[] = sprintf(
+                '%s%s AS (%s)',
+                $cteClause->aliasName,
+                !empty($cteClause->aliasColumns) ? '(' . implode(', ', $cteClause->aliasColumns) . ')' : '',
+                $cteClause->toSql()
+            );
+        }
+
+        return sprintf(
+            'with %s%s',
+            $recursive ? 'recursive ' : '',
+            implode(', ', $cteSqlBlocks)
+        );
     }
 
     /**

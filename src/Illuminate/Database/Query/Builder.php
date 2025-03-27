@@ -66,6 +66,7 @@ class Builder implements BuilderContract
      * @var array
      */
     public $bindings = [
+        'commonTableExpressions' => [],
         'select' => [],
         'from' => [],
         'join' => [],
@@ -90,6 +91,13 @@ class Builder implements BuilderContract
      * @var array|null
      */
     public $columns;
+
+    /**
+     * The common table expressions that should be returned.
+     *
+     * @var array|null
+     */
+    public $commonTableExpressions;
 
     /**
      * Indicates if the query returns distinct results.
@@ -518,6 +526,66 @@ class Builder implements BuilderContract
         $this->indexHint = new IndexHint('ignore', $index);
 
         return $this;
+    }
+
+    /**
+     * Add a common table expression clause to the query.
+     *
+     * @param string|array $cteAliasName Table alias as a string or an array of the table alias and columns
+     * @param Closure $callback
+     * @param Closure|null $recursiveCallback
+     * @param bool $unionAll
+     * @return $this
+     */
+    public function commonTableExpression(string|array $cteAliasName, \Closure $callback, \Closure|null $recursiveCallback = null, bool $unionAll = false)
+    {
+        if (!is_array($this->commonTableExpressions)) {
+            $this->commonTableExpressions = [];
+        }
+
+        $aliasName = $cteAliasName;
+        $aliasColumns = [];
+
+        if (is_array($cteAliasName)) {
+            $aliasName = array_shift($cteAliasName);
+            $aliasColumns = is_array($cteAliasName[0]) ? $cteAliasName[0] : $cteAliasName;
+        }
+
+        $cteClause = $this->newCteClause(
+            $this->newQuery(),
+            $aliasName,
+            $aliasColumns,
+            isset($recursiveCallback)
+        );
+
+        $callback($cteClause);
+
+        if ($recursiveCallback instanceof \Closure) {
+            $cteClause->union(
+                $recursiveCallback,
+                $unionAll
+            );
+        }
+
+        $this->addBinding($cteClause->getBindings(), 'commonTableExpressions');
+
+        $this->commonTableExpressions[] = $cteClause;
+
+        return $this;
+    }
+
+    /**
+     * Get a new common table expression clause.
+     *
+     * @param Builder $parentQuery
+     * @param string $cteName
+     * @param array $cteColumns
+     * @param bool $recursive
+     * @return CteClause
+     */
+    protected function newCteClause(self $parentQuery, string $cteName, array $cteColumns, bool $recursive): CteClause
+    {
+        return new CteClause($parentQuery, $cteName, $cteColumns, $recursive);
     }
 
     /**

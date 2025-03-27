@@ -6798,6 +6798,51 @@ SQL;
         $builder->fromSub(['invalid'], 'sessions');
     }
 
+    public function testBasicCommonTableExpression()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users');
+
+        $builder->commonTableExpression(
+            'sessions',
+            function (Builder $builder) {
+                $builder->select(['id', 'name'])
+                    ->from('user_sessions')
+                    ->whereRaw('user_sessions.user_id = users.id');
+            }
+        );
+
+        $this->assertSame(
+            'with sessions AS (select "id", "name" from "user_sessions" where user_sessions.user_id = users.id) select * from "users"',
+            $builder->toSql()
+        );
+    }
+
+    public function testRecursiveCommonTableExpression()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users');
+
+        $builder->commonTableExpression(
+            'sessions',
+            function ($builder) {
+                $builder->select(['id', 'name'])
+                    ->from('user_sessions')
+                    ->whereRaw('user_sessions.user_id = users.id');
+            },
+            function ($builder) {
+                $builder->select(['id', 'name'])
+                    ->from('sessions')
+                    ->whereRaw('user_sessions.parent_id = sessions.id');
+            }
+        );
+
+        $this->assertSame(
+            'with recursive sessions AS ((select "id", "name" from "user_sessions" where user_sessions.user_id = users.id) union (select "id", "name" from "sessions" where user_sessions.parent_id = sessions.id)) select * from "users"',
+            $builder->toSql()
+        );
+    }
+
     public function testFromRaw()
     {
         $builder = $this->getBuilder();
