@@ -98,6 +98,7 @@ abstract class HasOneOrManyThrough extends Relation
     public function addConstraints()
     {
         $query = $this->getRelationQuery();
+
         $localValue = $this->farParent[$this->localKey];
 
         $this->performJoin($query);
