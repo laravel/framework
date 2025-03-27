@@ -614,6 +614,10 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getPostgresBuilder();
         $builder->select('*')->from('users')->whereDate('created_at', new Raw('NOW()'));
         $this->assertSame('select * from "users" where "created_at"::date = NOW()', $builder->toSql());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->whereDate('result->created_at', new Raw('NOW()'));
+        $this->assertSame('select * from "users" where ("result"->>\'created_at\')::date = NOW()', $builder->toSql());
     }
 
     public function testWhereDayPostgres()
@@ -645,6 +649,11 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getPostgresBuilder();
         $builder->select('*')->from('users')->whereTime('created_at', '>=', '22:00');
         $this->assertSame('select * from "users" where "created_at"::time >= ?', $builder->toSql());
+        $this->assertEquals([0 => '22:00'], $builder->getBindings());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->whereTime('result->created_at', '>=', '22:00');
+        $this->assertSame('select * from "users" where ("result"->>\'created_at\')::time >= ?', $builder->toSql());
         $this->assertEquals([0 => '22:00'], $builder->getBindings());
     }
 

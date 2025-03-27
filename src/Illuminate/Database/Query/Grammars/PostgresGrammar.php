@@ -109,8 +109,13 @@ class PostgresGrammar extends Grammar
     protected function whereDate(Builder $query, $where)
     {
         $value = $this->parameter($where['value']);
+        $column = $this->wrap($where['column']);
 
-        return $this->wrap($where['column']).'::date '.$where['operator'].' '.$value;
+        if ($this->isJsonSelector($where['column'])) {
+            $column = '('.$column.')';
+        }
+
+        return $column.'::date '.$where['operator'].' '.$value;
     }
 
     /**
@@ -123,8 +128,13 @@ class PostgresGrammar extends Grammar
     protected function whereTime(Builder $query, $where)
     {
         $value = $this->parameter($where['value']);
+        $column = $this->wrap($where['column']);
 
-        return $this->wrap($where['column']).'::time '.$where['operator'].' '.$value;
+        if ($this->isJsonSelector($where['column'])) {
+            $column = '('.$column.')';
+        }
+
+        return $column.'::time '.$where['operator'].' '.$value;
     }
 
     /**
