@@ -15,7 +15,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Str;
 
-class DatabaseStore implements LockProvider, Store
+class DatabaseStore extends TaggableStore implements LockProvider, Store
 {
     use InteractsWithTime;
 
@@ -60,6 +60,13 @@ class DatabaseStore implements LockProvider, Store
      * @var array
      */
     protected $lockLottery;
+
+    /**
+     * The default number of seconds to forever items.
+     *
+     * @var int
+     */
+    protected $foreverTime = 315360000;
 
     /**
      * The default number of seconds that a lock should be held.
@@ -314,7 +321,7 @@ class DatabaseStore implements LockProvider, Store
      */
     public function forever($key, $value)
     {
-        return $this->put($key, $value, 315360000);
+        return $this->put($key, $value, $this->foreverTime);
     }
 
     /**
@@ -424,6 +431,19 @@ class DatabaseStore implements LockProvider, Store
     }
 
     /**
+     * Begin executing a new tags operation.
+     *
+     * @param  array|mixed  $names
+     * @return \Illuminate\Cache\TaggedCache
+     */
+    public function tags($names)
+    {
+        $store = (clone $this)->setForeverTime(604800);
+
+        return new TaggedCache($store, new TagSet($store, is_array($names) ? $names : func_get_args()));
+    }
+
+    /**
      * Get a query builder for the cache table.
      *
      * @return \Illuminate\Database\Query\Builder
@@ -475,6 +495,29 @@ class DatabaseStore implements LockProvider, Store
     public function setPrefix($prefix)
     {
         $this->prefix = $prefix;
+    }
+
+    /**
+     * Get the default forever timeout.
+     *
+     * @return int|null
+     */
+    public function getForeverTime()
+    {
+        return $this->foreverTime;
+    }
+
+    /**
+     * Set the default forever timeout in seconds.
+     *
+     * @param  int  $seconds
+     * @return $this
+     */
+    public function setForeverTime($seconds)
+    {
+        $this->foreverTime = $seconds;
+
+        return $this;
     }
 
     /**
