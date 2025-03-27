@@ -24,6 +24,7 @@ class ValidationAnyOfRuleTest extends TestCase
 {
     private array $ruleSets;
     private array $nestedRules;
+    private array $nestedRulesRequired;
 
     public function testBasicValidation()
     {
@@ -230,6 +231,16 @@ class ValidationAnyOfRuleTest extends TestCase
         $this->assertTrue($validator->passes());
 
         $validator = new Validator(resolve('translator'), [
+            'p1_is_empty' => [],
+        ], ['p1_is_empty' => Rule::anyOf($this->nestedRules)]);
+        $this->assertTrue($validator->passes());
+
+        $validator = new Validator(resolve('translator'), [
+            'p1_is_empty' => [],
+        ], ['p1_is_empty' => Rule::anyOf($this->nestedRulesRequired)]);
+        $this->assertFalse($validator->passes());
+
+        $validator = new Validator(resolve('translator'), [
             'p2_is_missing' => ['p1' => [
                 'p3' => ['p4' => 'valid_string'],
             ]],
@@ -266,6 +277,107 @@ class ValidationAnyOfRuleTest extends TestCase
             ]],
         ], ['p4_is_nullable' => Rule::anyOf($this->nestedRules)]);
         $this->assertTrue($validator->passes());
+
+        $validator = new Validator(resolve('translator'), [
+            'extra_key_is_present' => ['p1' => [
+                'p2' => 'a_valid_string',
+                'p3' => [
+                    'p4' => 'another_valid_string',
+                    'extra_key' => 'unexpected_value',
+                ],
+            ]],
+        ], ['extra_key_is_present' => Rule::anyOf($this->nestedRules)]);
+        $this->assertTrue($validator->passes());
+    }
+
+    public function testEmptyInputs()
+    {
+        $rule = ['email' => Rule::anyOf([
+            'email',
+        ])];
+
+        $validator = new Validator(resolve('translator'), [], $rule);
+        $this->assertTrue($validator->passes());
+
+        $validator = new Validator(resolve('translator'), ['email' => ''], $rule);
+        $this->assertTrue($validator->passes());
+
+        $validator = new Validator(resolve('translator'), ['email' => 'not-an-email'], $rule);
+        $this->assertFalse($validator->passes());
+
+        $validator = new Validator(resolve('translator'), ['email' => 'test@example.com'], $rule);
+        $this->assertTrue($validator->passes());
+
+        $requiredRule = ['email' => ['required', Rule::anyOf([
+            'email',
+        ])]];
+
+        $validator = new Validator(resolve('translator'), [], $requiredRule);
+        $this->assertFalse($validator->passes());
+
+        $validator = new Validator(resolve('translator'), ['email' => ''], $requiredRule);
+        $this->assertFalse($validator->passes());
+
+        $validator = new Validator(resolve('translator'), ['email' => 'not-an-email'], $rule);
+        $this->assertFalse($validator->passes());
+
+        $validator = new Validator(resolve('translator'), ['email' => 'test@example.com'], $requiredRule);
+        $this->assertTrue($validator->passes());
+    }
+
+    public function testUnexpectedInputType()
+    {
+        $rule = ['email' => ['required', Rule::anyOf([
+            'email:rfc',
+        ])]];
+
+        $validator = new Validator(resolve('translator'), [
+            'email' => ['not', 'an', 'email'],
+        ], $rule);
+        $this->assertFalse($validator->passes());
+
+        $validator = new Validator(resolve('translator'), [
+            'email' => [],
+        ], $rule);
+        $this->assertFalse($validator->passes());
+
+        $validator = new Validator(resolve('translator'), [
+            'email' => 123,
+        ], $rule);
+        $this->assertFalse($validator->passes());
+
+        $validator = new Validator(resolve('translator'), [
+            'email' => '',
+        ], $rule);
+        $this->assertFalse($validator->passes());
+
+        $validator = new Validator(resolve('translator'), [
+            'email' => null,
+        ], $rule);
+        $this->assertFalse($validator->passes());
+
+        $validator = new Validator(resolve('translator'), [
+            'email' => 'test@example.com',
+        ], $rule);
+        $this->assertTrue($validator->passes());
+    }
+
+    public function testConflictingRules()
+    {
+        $rule = ['field' => Rule::anyOf([
+            ['required', 'min:10'],
+            ['required', 'max:5'],
+        ])];
+
+        $validator = new Validator(resolve('translator'), [
+            'field' => 'short',
+        ], $rule);
+        $this->assertTrue($validator->passes());
+
+        $validator = new Validator(resolve('translator'), [
+            'field' => 'toolongfieldstring',
+        ], $rule);
+        $this->assertTrue($validator->passes());
     }
 
     protected function setUpRuleSets()
@@ -285,15 +397,21 @@ class ValidationAnyOfRuleTest extends TestCase
             ],
         ];
 
+        $oneOfNestedRule = Rule::anyOf([
+            [
+                'p2' => 'required',
+                'p3' => ['required', Rule::anyOf([[
+                    'p4' => ['nullable'],
+                ]])],
+            ],
+        ]);
+
         $this->nestedRules = [
-            ['p1' => Rule::anyOf([
-                [
-                    'p2' => 'required',
-                    'p3' => ['required', Rule::anyOf([[
-                        'p4' => ['nullable'],
-                    ]])],
-                ],
-            ])],
+            ['p1' => $oneOfNestedRule],
+        ];
+
+        $this->nestedRulesRequired = [
+            ['p1' => ['required', $oneOfNestedRule]],
         ];
     }
 
