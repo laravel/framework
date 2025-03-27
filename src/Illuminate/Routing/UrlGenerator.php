@@ -200,7 +200,7 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * Generate an absolute URL to the given path.
      *
-     * @param  string|null  $path
+     * @param  string  $path
      * @param  mixed  $extra
      * @param  bool|null  $secure
      * @return string
@@ -265,7 +265,7 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * Generate the URL to an application asset.
      *
-     * @param  string|null  $path
+     * @param  string  $path
      * @param  bool|null  $secure
      * @return string
      */
@@ -666,16 +666,12 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * Determine if the given path is a valid URL.
      *
-     * @param  string|null  $path
+     * @param  string  $path
      * @return bool
      */
     public function isValidUrl($path)
     {
-        if ($path === null) {
-            return false;
-        }
-
-        if (is_string($path) && ! preg_match('~^(#|//|https?://|(mailto|tel|sms):)~', $path)) {
+        if (! preg_match('~^(#|//|https?://|(mailto|tel|sms):)~', (string) $path)) {
             return filter_var($path, FILTER_VALIDATE_URL) !== false;
         }
 
