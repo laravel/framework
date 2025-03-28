@@ -2457,7 +2457,7 @@ class Builder implements BuilderContract
      */
     public function notHaving($column, $operator = null, $value = null, $boolean = 'and')
     {
-        return $this->having($column, $operator, $value, $boolean . ' not');
+        return $this->having($column, $operator, $value, $boolean.' not');
     }
 
     /**
