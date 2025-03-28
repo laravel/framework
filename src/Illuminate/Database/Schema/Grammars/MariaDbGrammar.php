@@ -31,6 +31,10 @@ class MariaDbGrammar extends MySqlGrammar
      */
     protected function typeUuid(Fluent $column)
     {
+        if (version_compare($this->connection->getServerVersion(), '10.7.0', '<')) {
+            return 'char(36)';
+        }
+
         return 'uuid';
     }
 
