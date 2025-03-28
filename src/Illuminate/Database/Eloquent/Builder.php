@@ -1819,9 +1819,10 @@ class Builder implements BuilderContract
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|array|string  $attributes
      * @param  mixed  $value
+     * @param  array  $pending
      * @return $this
      */
-    public function withAttributes(Expression|array|string $attributes, $value = null)
+    public function withAttributes(Expression|array|string $attributes, $value = null, array $pending = [])
     {
         if (! is_array($attributes)) {
             $attributes = [$attributes => $value];
@@ -1831,7 +1832,7 @@ class Builder implements BuilderContract
             $this->where($this->qualifyColumn($column), $value);
         }
 
-        $this->pendingAttributes = array_merge($this->pendingAttributes, $attributes);
+        $this->pendingAttributes = array_merge($this->pendingAttributes, $attributes, $pending);
 
         return $this;
     }
