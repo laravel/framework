@@ -33,7 +33,7 @@ class DatabaseEloquentWithAttributesPendingTest extends TestCase
         $value = 'the value';
 
         $query = PendingAttributesModel::query()
-            ->withAttributes([], pending: [$key => $value]);
+            ->withAttributes([$key => $value], addWheres: false);
 
         $model = $query->make();
 
@@ -46,7 +46,7 @@ class DatabaseEloquentWithAttributesPendingTest extends TestCase
         $value = 'the value';
 
         $query = PendingAttributesModel::query()
-            ->withAttributes([], pending: [$key => $value]);
+            ->withAttributes([$key => $value], addWheres: false);
 
         $wheres = $query->toBase()->wheres;
 
@@ -57,12 +57,12 @@ class DatabaseEloquentWithAttributesPendingTest extends TestCase
     public function testAddsWithCasts(): void
     {
         $query = PendingAttributesModel::query()
-            ->withAttributes([], pending: [
+            ->withAttributes([
                 'is_admin' => 1,
                 'first_name' => 'FIRST',
                 'last_name' => 'LAST',
                 'type' => PendingAttributesEnum::internal,
-            ]);
+            ], addWheres: false);
 
         $model = $query->make();
 
@@ -84,12 +84,12 @@ class DatabaseEloquentWithAttributesPendingTest extends TestCase
         $this->bootTable();
 
         $query = PendingAttributesModel::query()
-            ->withAttributes([], pending: [
+            ->withAttributes([
                 'is_admin' => 1,
                 'first_name' => 'FIRST',
                 'last_name' => 'LAST',
                 'type' => PendingAttributesEnum::internal,
-            ]);
+            ], addWheres: false);
 
         $query->create();
 

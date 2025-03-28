@@ -1819,20 +1819,22 @@ class Builder implements BuilderContract
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|array|string  $attributes
      * @param  mixed  $value
-     * @param  array  $pending
+     * @param  bool  $addWheres
      * @return $this
      */
-    public function withAttributes(Expression|array|string $attributes, $value = null, array $pending = [])
+    public function withAttributes(Expression|array|string $attributes, $value = null, $addWheres = true)
     {
         if (! is_array($attributes)) {
             $attributes = [$attributes => $value];
         }
 
-        foreach ($attributes as $column => $value) {
-            $this->where($this->qualifyColumn($column), $value);
+        if ($addWheres) {
+            foreach ($attributes as $column => $value) {
+                $this->where($this->qualifyColumn($column), $value);
+            }
         }
 
-        $this->pendingAttributes = array_merge($this->pendingAttributes, $attributes, $pending);
+        $this->pendingAttributes = array_merge($this->pendingAttributes, $attributes);
 
         return $this;
     }
