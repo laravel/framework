@@ -2447,6 +2447,20 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add a "having not" clause to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|\Closure|string  $column
+     * @param  \DateTimeInterface|string|int|float|null  $operator
+     * @param  \DateTimeInterface|string|int|float|null  $value
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function notHaving($column, $operator = null, $value = null, $boolean = 'and')
+    {
+        return $this->having($column, $operator, $value, $boolean . ' not');
+    }
+
+    /**
      * Add an "or having" clause to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|\Closure|string  $column
@@ -2461,6 +2475,23 @@ class Builder implements BuilderContract
         );
 
         return $this->having($column, $operator, $value, 'or');
+    }
+
+    /**
+     * Add an "or having not" clause to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|\Closure|string  $column
+     * @param  \DateTimeInterface|string|int|float|null  $operator
+     * @param  \DateTimeInterface|string|int|float|null  $value
+     * @return $this
+     */
+    public function orNotHaving($column, $operator = null, $value = null)
+    {
+        [$value, $operator] = $this->prepareValueAndOperator(
+            $value, $operator, func_num_args() === 2
+        );
+
+        return $this->notHaving($column, $operator, $value, 'or');
     }
 
     /**

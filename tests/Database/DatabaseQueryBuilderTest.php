@@ -2183,6 +2183,64 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => 'foo', 1 => 'bar'], $builder->getBindings());
     }
 
+    public function testNestedNotHavings()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->notHaving('email', '=', 'foo')->orNotHaving(function ($q) {
+            $q->notHaving('name', '=', 'bar')->notHaving('age', '=', 25);
+        });
+        $this->assertSame('select * from "users" having not "email" = ? or not (not "name" = ? and not "age" = ?)', $builder->toSql());
+        $this->assertEquals([0 => 'foo', 1 => 'bar', 2 => 25], $builder->getBindings());
+    }
+
+    public function testNestedNotHavingsWithHavings()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->notHaving('email', '=', 'foo')->orNotHaving(function ($q) {
+            $q->having('name', '=', 'bar')->notHaving('age', '=', 25);
+        });
+        $this->assertSame('select * from "users" having not "email" = ? or not ("name" = ? and not "age" = ?)', $builder->toSql());
+        $this->assertEquals([0 => 'foo', 1 => 'bar', 2 => 25], $builder->getBindings());
+    }
+
+    public function testNotHavings()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->notHaving('email', '>', 1);
+        $this->assertSame('select * from "users" having not "email" > ?', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')
+            ->orNotHaving('email', '=', 'test@example.com')
+            ->orNotHaving('email', '=', 'test2@example.com');
+        $this->assertSame('select * from "users" having not "email" = ? or not "email" = ?', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->groupBy('email')->notHaving('email', '>', 1);
+        $this->assertSame('select * from "users" group by "email" having not "email" > ?', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('email as foo_email')->from('users')->notHaving('foo_email', '>', 1);
+        $this->assertSame('select "email" as "foo_email" from "users" having not "foo_email" > ?', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select(['category', new Raw('count(*) as "total"')])->from('item')->where('department', '=', 'popular')->groupBy('category')->notHaving('total', '>', new Raw('3'));
+        $this->assertSame('select "category", count(*) as "total" from "item" where "department" = ? group by "category" having not "total" > 3', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select(['category', new Raw('count(*) as "total"')])->from('item')->where('department', '=', 'popular')->groupBy('category')->notHaving('total', '>', 3);
+        $this->assertSame('select "category", count(*) as "total" from "item" where "department" = ? group by "category" having not "total" > ?', $builder->toSql());
+    }
+
+    public function testNestedNotHavingBindings()
+    {
+        $builder = $this->getBuilder();
+        $builder->notHaving('email', '=', 'foo')->notHaving(function ($q) {
+            $q->selectRaw('?', ['ignore'])->notHaving('name', '=', 'bar');
+        });
+        $this->assertEquals([0 => 'foo', 1 => 'bar'], $builder->getBindings());
+    }
+
     public function testHavingBetweens()
     {
         $builder = $this->getBuilder();
