@@ -1819,16 +1819,16 @@ class Builder implements BuilderContract
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|array|string  $attributes
      * @param  mixed  $value
-     * @param  bool  $addWheres
+     * @param  bool  $asConditions
      * @return $this
      */
-    public function withAttributes(Expression|array|string $attributes, $value = null, $addWheres = true)
+    public function withAttributes(Expression|array|string $attributes, $value = null, $asConditions = true)
     {
         if (! is_array($attributes)) {
             $attributes = [$attributes => $value];
         }
 
-        if ($addWheres) {
+        if ($asConditions) {
             foreach ($attributes as $column => $value) {
                 $this->where($this->qualifyColumn($column), $value);
             }

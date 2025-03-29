@@ -218,7 +218,7 @@ class ManyToManyPendingAttributesPost extends Model
     public function metaTags(): BelongsToMany
     {
         return $this->tags()
-            ->withAttributes('visible', true, addWheres: false)
+            ->withAttributes('visible', true, asConditions: false)
             ->withPivotValue('type', 'meta');
     }
 
@@ -231,7 +231,7 @@ class ManyToManyPendingAttributesPost extends Model
                 'pending_attributes_taggables',
                 relatedPivotKey: 'tag_id'
             )
-            ->withAttributes('visible', true, addWheres: false)
+            ->withAttributes('visible', true, asConditions: false)
             ->withPivotValue('type', 'meta');
     }
 }
@@ -250,7 +250,7 @@ class ManyToManyPendingAttributesTag extends Model
                 'pending_attributes_taggables',
                 'tag_id',
             )
-            ->withAttributes('title', 'Title!', addWheres: false)
+            ->withAttributes('title', 'Title!', asConditions: false)
             ->withPivotValue('type', 'meta');
     }
 }
