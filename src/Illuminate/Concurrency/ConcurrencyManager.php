@@ -67,6 +67,24 @@ class ConcurrencyManager extends MultipleInstanceManager
     }
 
     /**
+     * Create an instance of the Redis concurrency driver.
+     *
+     * @param  array  $config
+     * @return \Illuminate\Concurrency\RedisDriver
+     */
+    public function createRedisDriver(array $config)
+    {
+        $connection = $config['connection'] ?? 'default';
+        $queuePrefix = $config['queue_prefix'] ?? 'laravel:concurrency:';
+
+        return new RedisDriver(
+            $this->app->make('redis'),
+            $connection,
+            $queuePrefix
+        );
+    }
+
+    /**
      * Get the default instance name.
      *
      * @return string
