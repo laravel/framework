@@ -589,6 +589,73 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Merge in Model's default attributes, set timestamps,
+     * cast any values, and then insert into the database.
+     *
+     * @param  array<int, array<string, mixed>>  $values
+     * @return bool
+     */
+    public function hydrateAndInsert(array $values)
+    {
+        return $this->insert($this->hydrateForInsert($values));
+    }
+
+    /**
+     * Merge in Model's default attributes, set timestamps,
+     * cast any values, and then insert into the database,
+     * ignoring errors.
+     *
+     * @param  array<int, array<string, mixed>>  $values
+     * @return int
+     */
+    public function hydrateAndInsertOrIgnore(array $values)
+    {
+        return $this->insertOrIgnore($this->hydrateForInsert($values));
+    }
+
+    /**
+     * Merge in Model's default attributes, set timestamps,
+     * cast any values, and then insert into the database,
+     * returning the ID of the new record.
+     *
+     * @param  array<string, mixed>  $values
+     * @return int
+     */
+    public function hydrateAndInsertGetId(array $values)
+    {
+        return $this->insertGetId($this->hydrateForInsert([$values])[0]);
+    }
+
+    /**
+     * Enrich values by merging in the Model's default attributes,
+     * adding timestamps, and converting casts to raw values.
+     *
+     * @param  array<int, array<string, mixed>>  $values
+     * @return array<int, array<string, mixed>>
+     */
+    public function hydrateForInsert(array $values)
+    {
+        if (empty($values)) {
+            return [];
+        }
+
+        if (! is_array(reset($values))) {
+            $values = [$values];
+        }
+
+        $this->model->unguarded(function () use (&$values) {
+            foreach($values as $key => $rowValues) {
+                $values[$key] = tap(
+                    $this->newModelInstance($rowValues),
+                    fn ($model) => $model->setUniqueIds()
+                )->getAttributes();
+            }
+        });
+
+        return $this->addTimestampsToUpsertValues($values);
+    }
+
+    /**
      * Get the first record matching the attributes or instantiate it.
      *
      * @param  array  $attributes
