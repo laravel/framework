@@ -122,4 +122,4 @@ class RedisProcessorCommand extends Command
             $this->error("Task {$taskId} failed: ".$e->getMessage());
         }
     }
-} 
+}

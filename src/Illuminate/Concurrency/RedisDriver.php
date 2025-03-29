@@ -40,7 +40,7 @@ class RedisDriver implements Driver
         foreach ($tasks as $key => $task) {
             $taskId = $this->queuePrefix.Str::uuid()->toString();
             $taskIds[$key] = $taskId;
-            
+
             // Serialize and queue the task
             $client->set(
                 $taskId.':task',
@@ -48,7 +48,7 @@ class RedisDriver implements Driver
                 'EX',
                 3600 // Expire in 1 hour
             );
-            
+
             // Add to processing queue
             $client->rpush($this->queuePrefix.'queue', $taskId);
         }
@@ -56,41 +56,41 @@ class RedisDriver implements Driver
         // Execute tasks and collect results
         $startTime = microtime(true);
         $timeout = 60; // Timeout in seconds
-        
+
         // Wait for results
         while (count($results) < count($tasks) && (microtime(true) - $startTime) < $timeout) {
             foreach ($taskIds as $key => $taskId) {
                 if (isset($results[$key])) {
                     continue;
                 }
-                
+
                 // Check if result is available
                 $resultData = $client->get($taskId.':result');
-                
+
                 if ($resultData) {
                     $resultArray = unserialize($resultData);
-                    
+
                     // If task has error, throw exception
                     if (isset($resultArray['error'])) {
                         throw new Exception($resultArray['error']);
                     }
-                    
+
                     $results[$key] = $resultArray['result'];
-                    
+
                     // Clean up
                     $client->del($taskId.':task', $taskId.':result');
                 }
             }
-            
+
             // Small delay to prevent CPU spinning
             usleep(50000); // 50ms
         }
-        
+
         // Check for timeout
         if (count($results) < count($tasks)) {
             throw new Exception('Timed out while waiting for concurrent tasks to complete');
         }
-        
+
         return $results;
     }
 
@@ -101,11 +101,11 @@ class RedisDriver implements Driver
     {
         $client = $this->redis->connection($this->connection);
         $tasks = Arr::wrap($tasks);
-        
+
         return defer(function () use ($tasks, $client) {
             foreach ($tasks as $task) {
                 $taskId = $this->queuePrefix.Str::uuid()->toString();
-                
+
                 // Serialize and queue the task
                 $client->set(
                     $taskId.':task',
@@ -113,7 +113,7 @@ class RedisDriver implements Driver
                     'EX',
                     3600 // Expire in 1 hour
                 );
-                
+
                 // Add to deferred queue
                 $client->rpush($this->queuePrefix.'deferred', $taskId);
             }
@@ -129,4 +129,4 @@ class RedisDriver implements Driver
     {
         return $this->redis->connection($this->connection);
     }
-} 
+}

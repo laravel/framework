@@ -135,4 +135,4 @@ class RedisDriverTest extends TestCase
             throw new Exception('Test exception');
         });
     }
-} 
+}
