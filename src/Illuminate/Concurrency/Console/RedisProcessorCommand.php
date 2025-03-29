@@ -6,7 +6,6 @@ use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Redis\Factory as RedisFactory;
 use Illuminate\Support\InteractsWithTime;
-use Laravel\SerializableClosure\SerializableClosure;
 
 class RedisProcessorCommand extends Command
 {
@@ -58,7 +57,7 @@ class RedisProcessorCommand extends Command
             } else {
                 // Process deferred tasks if there are no immediate tasks
                 $deferredTaskId = $redis->lpop($queuePrefix.'deferred');
-                
+
                 if ($deferredTaskId) {
                     $this->processTask($redis, $deferredTaskId);
                 } else {
@@ -87,20 +86,21 @@ class RedisProcessorCommand extends Command
     protected function processTask($redis, $taskId)
     {
         $this->info("Processing task: {$taskId}");
-        
+
         // Get the task from Redis
         $serializedTask = $redis->get($taskId.':task');
-        
-        if (!$serializedTask) {
+
+        if (! $serializedTask) {
             $this->error("Task {$taskId} not found");
+
             return;
         }
-        
+
         try {
             // Unserialize and execute the task
             $task = unserialize($serializedTask)->getClosure();
             $result = $task();
-            
+
             // Store the result
             $redis->set(
                 $taskId.':result',
@@ -108,7 +108,7 @@ class RedisProcessorCommand extends Command
                 'EX',
                 3600 // Expire in 1 hour
             );
-            
+
             $this->info("Task {$taskId} completed successfully");
         } catch (Exception $e) {
             // Store the error
@@ -118,7 +118,7 @@ class RedisProcessorCommand extends Command
                 'EX',
                 3600 // Expire in 1 hour
             );
-            
+
             $this->error("Task {$taskId} failed: ".$e->getMessage());
         }
     }

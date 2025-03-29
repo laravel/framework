@@ -4,13 +4,10 @@ namespace Illuminate\Tests\Integration\Concurrency;
 
 use Exception;
 use Illuminate\Concurrency\RedisDriver;
-use Illuminate\Contracts\Redis\Factory;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Redis\RedisManager;
-use Illuminate\Support\Facades\Redis;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
-use Redis as PhpRedis;
 
 class RedisDriverTest extends TestCase
 {

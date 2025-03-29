@@ -10,7 +10,6 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Defer\DeferredCallback;
 use Illuminate\Support\Str;
 use Laravel\SerializableClosure\SerializableClosure;
-use Throwable;
 
 use function Illuminate\Support\defer;
 
