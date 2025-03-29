@@ -12,7 +12,6 @@ use Laravel\SerializableClosure\SerializableClosure;
 use RdKafka\Conf;
 use RdKafka\KafkaConsumer;
 use RdKafka\Producer;
-use RdKafka\TopicConf;
 
 use function Illuminate\Support\defer;
 
@@ -223,4 +222,4 @@ class KafkaDriver implements Driver
         $kafkaTopic->produce(RD_KAFKA_PARTITION_UA, 0, $payload, $taskId);
         $this->producer->poll(0);
     }
-} 
+}

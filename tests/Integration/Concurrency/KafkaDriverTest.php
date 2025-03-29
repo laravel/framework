@@ -115,4 +115,4 @@ class KafkaDriverTest extends TestCase
 
         $this->assertIsObject($deferred);
     }
-} 
+}

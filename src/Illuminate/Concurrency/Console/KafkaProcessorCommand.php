@@ -3,8 +3,6 @@
 namespace Illuminate\Concurrency\Console;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Str;
-use Laravel\SerializableClosure\SerializableClosure;
 use RdKafka\Conf;
 use RdKafka\KafkaConsumer;
 use RdKafka\Producer;
@@ -100,6 +98,7 @@ class KafkaProcessorCommand extends Command
 
         if (! isset($payload['task_id']) || ! isset($payload['task'])) {
             $this->warn('Invalid task message format');
+
             return;
         }
 
@@ -180,4 +179,4 @@ class KafkaProcessorCommand extends Command
 
         return $consumer;
     }
-} 
+}
