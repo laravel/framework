@@ -4,6 +4,7 @@ namespace Illuminate\Pagination;
 
 use Closure;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Http\Resources\TransformsToResourceCollection;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\ForwardsCalls;
@@ -20,7 +21,7 @@ use Traversable;
  */
 abstract class AbstractPaginator implements Htmlable, Stringable
 {
-    use ForwardsCalls, Tappable;
+    use ForwardsCalls, Tappable, TransformsToResourceCollection;
 
     /**
      * All of the items being paginated.
