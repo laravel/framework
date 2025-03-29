@@ -2451,7 +2451,7 @@ class Builder implements BuilderContract
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|\Closure|string  $column
      * @param  \DateTimeInterface|string|int|float|null  $operator
-     * @param  \DateTimeInterface|string|int|float|null  $value
+     * @param  \Illuminate\Contracts\Database\Query\Expression|\DateTimeInterface|string|int|float|null  $value
      * @return $this
      */
     public function orHaving($column, $operator = null, $value = null)
