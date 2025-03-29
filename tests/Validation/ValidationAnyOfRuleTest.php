@@ -20,6 +20,7 @@ enum TaggedUnionDiscriminatorType: string
 class ValidationAnyOfRuleTest extends TestCase
 {
     private array $taggedUnionRules;
+    private array $dotNotationNestedRules;
     private array $nestedRules;
 
     public function testBasicValidation()
@@ -177,6 +178,8 @@ class ValidationAnyOfRuleTest extends TestCase
             ],
         ], $this->nestedRules);
         $this->assertTrue($validator->passes());
+        $validator->setRules($this->dotNotationNestedRules);
+        $this->assertTrue($validator->passes());
 
         $validator = new Validator(resolve('translator'), [
             'user' => [
@@ -189,6 +192,8 @@ class ValidationAnyOfRuleTest extends TestCase
             ],
         ], $this->nestedRules);
         $this->assertTrue($validator->passes());
+        $validator->setRules($this->dotNotationNestedRules);
+        $this->assertTrue($validator->passes());
 
         $validator = new Validator(resolve('translator'), [
             'user' => [
@@ -200,6 +205,8 @@ class ValidationAnyOfRuleTest extends TestCase
             ],
         ], $this->nestedRules);
         $this->assertFalse($validator->passes());
+        $validator->setRules($this->dotNotationNestedRules);
+        $this->assertFalse($validator->passes());
 
         $validator = new Validator(resolve('translator'), [
             'user' => [
@@ -209,6 +216,8 @@ class ValidationAnyOfRuleTest extends TestCase
                 ],
             ],
         ], $this->nestedRules);
+        $this->assertFalse($validator->passes());
+        $validator->setRules($this->dotNotationNestedRules);
         $this->assertFalse($validator->passes());
     }
 
@@ -242,6 +251,16 @@ class ValidationAnyOfRuleTest extends TestCase
                     ])],
                 ],
             ]),
+        ];
+
+        $this->dotNotationNestedRules = [
+            'user.identifier' => ['required', Rule::anyOf([
+                'email:rfc',
+                'integer',
+            ])],
+            'user.properties.bio' => 'nullable',
+            'user.properties.name' => 'required',
+            'user.properties.surname' => 'required',
         ];
     }
 
