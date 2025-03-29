@@ -31,7 +31,7 @@ class DatabaseEloquentHasOneOrManyWithAttributesPendingTest extends TestCase
 
         $relationship = $parent
             ->hasMany(RelatedPendingAttributesModel::class, 'parent_id')
-            ->withAttributes([$key => $value], addWheres: false);
+            ->withAttributes([$key => $value], asConditions: false);
 
         $relatedModel = $relationship->make();
 
@@ -50,7 +50,7 @@ class DatabaseEloquentHasOneOrManyWithAttributesPendingTest extends TestCase
 
         $relationship = $parent
             ->hasOne(RelatedPendingAttributesModel::class, 'parent_id')
-            ->withAttributes([$key => $value], addWheres: false);
+            ->withAttributes([$key => $value], asConditions: false);
 
         $relatedModel = $relationship->make();
 
@@ -69,7 +69,7 @@ class DatabaseEloquentHasOneOrManyWithAttributesPendingTest extends TestCase
 
         $relationship = $parent
             ->morphMany(RelatedPendingAttributesModel::class, 'relatable')
-            ->withAttributes([$key => $value], addWheres: false);
+            ->withAttributes([$key => $value], asConditions: false);
 
         $relatedModel = $relationship->make();
 
@@ -89,7 +89,7 @@ class DatabaseEloquentHasOneOrManyWithAttributesPendingTest extends TestCase
 
         $relationship = $parent
             ->morphOne(RelatedPendingAttributesModel::class, 'relatable')
-            ->withAttributes([$key => $value], addWheres: false);
+            ->withAttributes([$key => $value], asConditions: false);
 
         $relatedModel = $relationship->make();
 
@@ -108,7 +108,7 @@ class DatabaseEloquentHasOneOrManyWithAttributesPendingTest extends TestCase
 
         $relationship = $parent
             ->hasMany(RelatedPendingAttributesModel::class, 'relatable')
-            ->withAttributes([$key => $defaultValue], addWheres: false);
+            ->withAttributes([$key => $defaultValue], asConditions: false);
 
         $relatedModel = $relationship->make([$key => $value]);
 
@@ -127,7 +127,7 @@ class DatabaseEloquentHasOneOrManyWithAttributesPendingTest extends TestCase
         $relationship = $parent
             ->hasMany(RelatedPendingAttributesModel::class, 'parent_id')
             ->where($key, $value)
-            ->withAttributes([$key => $value], addWheres: false);
+            ->withAttributes([$key => $value], asConditions: false);
 
         $relatedModel = $relationship->make();
 
@@ -141,9 +141,9 @@ class DatabaseEloquentHasOneOrManyWithAttributesPendingTest extends TestCase
 
         $relationship = $parent
             ->hasMany(RelatedPendingAttributesModel::class, 'parent_id')
-            ->withAttributes(['a' => 'A'], addWheres: false)
-            ->withAttributes(['b' => 'B'], addWheres: false)
-            ->withAttributes(['a' => 'AA'], addWheres: false);
+            ->withAttributes(['a' => 'A'], asConditions: false)
+            ->withAttributes(['b' => 'B'], asConditions: false)
+            ->withAttributes(['a' => 'AA'], asConditions: false);
 
         $relatedModel = $relationship->make([
             'b' => 'BB',
@@ -163,7 +163,7 @@ class DatabaseEloquentHasOneOrManyWithAttributesPendingTest extends TestCase
 
         $relationship = $parent
             ->hasMany(RelatedPendingAttributesModel::class, 'parent_id')
-            ->withAttributes($key, $value, addWheres: false);
+            ->withAttributes($key, $value, asConditions: false);
 
         $relatedModel = $relationship->make();
 
@@ -181,7 +181,7 @@ class DatabaseEloquentHasOneOrManyWithAttributesPendingTest extends TestCase
 
         $relationship = $parent
             ->hasMany(RelatedPendingAttributesModel::class, 'parent_id')
-            ->withAttributes([$key => $value], addWheres: false);
+            ->withAttributes([$key => $value], asConditions: false);
 
         $wheres = $relationship->toBase()->wheres;
 
@@ -213,7 +213,7 @@ class DatabaseEloquentHasOneOrManyWithAttributesPendingTest extends TestCase
 
         $relationship = $parent
             ->hasMany(RelatedPendingAttributesModel::class, 'parent_id')
-            ->withAttributes([$key => null], addWheres: false);
+            ->withAttributes([$key => null], asConditions: false);
 
         $wheres = $relationship->toBase()->wheres;
         $relatedModel = $relationship->make();
@@ -249,7 +249,7 @@ class DatabaseEloquentHasOneOrManyWithAttributesPendingTest extends TestCase
 
         $relationship = $parent
             ->hasMany(RelatedPendingAttributesModel::class, 'parent_id')
-            ->withAttributes([$key => $value], addWheres: false)
+            ->withAttributes([$key => $value], asConditions: false)
             ->one();
 
         $relatedModel = $relationship->make();
@@ -269,7 +269,7 @@ class DatabaseEloquentHasOneOrManyWithAttributesPendingTest extends TestCase
 
         $relationship = $parent
             ->morphMany(RelatedPendingAttributesModel::class, 'relatable')
-            ->withAttributes([$key => $value], addWheres: false)
+            ->withAttributes([$key => $value], asConditions: false)
             ->one();
 
         $relatedModel = $relationship->make();
@@ -288,7 +288,7 @@ class DatabaseEloquentHasOneOrManyWithAttributesPendingTest extends TestCase
 
         $relationship = $parent
             ->hasMany(RelatedPendingAttributesModel::class, 'parent_id')
-            ->withAttributes(['is_admin' => 1], addWheres: false);
+            ->withAttributes(['is_admin' => 1], asConditions: false);
 
         $relatedModel = $relationship->make();
 

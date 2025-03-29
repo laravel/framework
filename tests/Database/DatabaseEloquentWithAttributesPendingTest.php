@@ -33,7 +33,7 @@ class DatabaseEloquentWithAttributesPendingTest extends TestCase
         $value = 'the value';
 
         $query = PendingAttributesModel::query()
-            ->withAttributes([$key => $value], addWheres: false);
+            ->withAttributes([$key => $value], asConditions: false);
 
         $model = $query->make();
 
@@ -46,7 +46,7 @@ class DatabaseEloquentWithAttributesPendingTest extends TestCase
         $value = 'the value';
 
         $query = PendingAttributesModel::query()
-            ->withAttributes([$key => $value], addWheres: false);
+            ->withAttributes([$key => $value], asConditions: false);
 
         $wheres = $query->toBase()->wheres;
 
@@ -62,7 +62,7 @@ class DatabaseEloquentWithAttributesPendingTest extends TestCase
                 'first_name' => 'FIRST',
                 'last_name' => 'LAST',
                 'type' => PendingAttributesEnum::internal,
-            ], addWheres: false);
+            ], asConditions: false);
 
         $model = $query->make();
 
@@ -89,7 +89,7 @@ class DatabaseEloquentWithAttributesPendingTest extends TestCase
                 'first_name' => 'FIRST',
                 'last_name' => 'LAST',
                 'type' => PendingAttributesEnum::internal,
-            ], addWheres: false);
+            ], asConditions: false);
 
         $query->create();
 
