@@ -2,9 +2,11 @@
 
 ## [Unreleased](https://github.com/laravel/framework/compare/v12.4.0...12.x)
 
+* [12.x] Add Redis driver for concurrency by [@amirhossainfalah](https://github.com/amirhossainfalah) in https://github.com/laravel/framework/pull/????
+
 ## [v12.4.0](https://github.com/laravel/framework/compare/v12.3.0...v12.4.0) - 2025-03-29
 
-* [12.x] Reset PHP’s peak memory usage when resetting scope for queue worker by [@TimWolla](https://github.com/TimWolla) in https://github.com/laravel/framework/pull/55069
+* [12.x] Reset PHP's peak memory usage when resetting scope for queue worker by [@TimWolla](https://github.com/TimWolla) in https://github.com/laravel/framework/pull/55069
 * [12.x] Add `AsHtmlString` cast by [@ralphjsmit](https://github.com/ralphjsmit) in https://github.com/laravel/framework/pull/55071
 * [12.x] Add `Arr::sole()` method by [@ralphjsmit](https://github.com/ralphjsmit) in https://github.com/laravel/framework/pull/55070
 * Improve warning message in `ApiInstallCommand` by [@sajjadhossainshohag](https://github.com/sajjadhossainshohag) in https://github.com/laravel/framework/pull/55081
@@ -58,7 +60,7 @@
 * [12.x] apply final Pint fixes by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/55014
 * Enhance validation tests: Add test for connection name detection in Unique rule by [@alikhosravidev](https://github.com/alikhosravidev) in https://github.com/laravel/framework/pull/54993
 * [12.x] Add json:unicode cast to support JSON_UNESCAPED_UNICODE encoding by [@fuwasegu](https://github.com/fuwasegu) in https://github.com/laravel/framework/pull/54992
-* [12.x] Add “Storage Linked” to the `about` command by [@adampatterson](https://github.com/adampatterson) in https://github.com/laravel/framework/pull/54949
+* [12.x] Add "Storage Linked" to the `about` command by [@adampatterson](https://github.com/adampatterson) in https://github.com/laravel/framework/pull/54949
 * [12.x] Add support for native JSON/JSONB column types in SQLite Schema builder by [@fuwasegu](https://github.com/fuwasegu) in https://github.com/laravel/framework/pull/54991
 * [12.x] Fix `LogManager::configurationFor()` typehint by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/55016
 * [12.x] Add missing tests for LazyCollection methods by [@mohammadrasoulasghari](https://github.com/mohammadrasoulasghari) in https://github.com/laravel/framework/pull/55022

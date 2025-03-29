@@ -2,6 +2,7 @@
 
 namespace Illuminate\Concurrency;
 
+use Illuminate\Concurrency\Console\RedisProcessorCommand;
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Support\ServiceProvider;
 
@@ -14,9 +15,23 @@ class ConcurrencyServiceProvider extends ServiceProvider implements DeferrablePr
      */
     public function register()
     {
-        $this->app->singleton(ConcurrencyManager::class, function ($app) {
+        $this->app->singleton('concurrency', function ($app) {
             return new ConcurrencyManager($app);
         });
+    }
+
+    /**
+     * Bootstrap any application services.
+     *
+     * @return void
+     */
+    public function boot()
+    {
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                RedisProcessorCommand::class,
+            ]);
+        }
     }
 
     /**
@@ -26,8 +41,6 @@ class ConcurrencyServiceProvider extends ServiceProvider implements DeferrablePr
      */
     public function provides()
     {
-        return [
-            ConcurrencyManager::class,
-        ];
+        return ['concurrency'];
     }
 }
