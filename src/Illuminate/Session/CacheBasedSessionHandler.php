@@ -26,7 +26,6 @@ class CacheBasedSessionHandler implements SessionHandlerInterface
      *
      * @param  \Illuminate\Contracts\Cache\Repository  $cache
      * @param  int  $minutes
-     * @return void
      */
     public function __construct(CacheContract $cache, $minutes)
     {

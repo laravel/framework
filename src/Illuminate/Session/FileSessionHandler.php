@@ -36,7 +36,6 @@ class FileSessionHandler implements SessionHandlerInterface
      * @param  \Illuminate\Filesystem\Filesystem  $files
      * @param  string  $path
      * @param  int  $minutes
-     * @return void
      */
     public function __construct(Filesystem $files, $path, $minutes)
     {

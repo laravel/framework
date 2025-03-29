@@ -140,7 +140,6 @@ class Router implements BindingRegistrar, RegistrarContract
      *
      * @param  \Illuminate\Contracts\Events\Dispatcher  $events
      * @param  \Illuminate\Container\Container|null  $container
-     * @return void
      */
     public function __construct(Dispatcher $events, ?Container $container = null)
     {
@@ -630,7 +629,8 @@ class Router implements BindingRegistrar, RegistrarContract
         $group = end($this->groupStack);
 
         return isset($group['namespace']) && ! str_starts_with($class, '\\') && ! str_starts_with($class, $group['namespace'])
-                ? $group['namespace'].'\\'.$class : $class;
+            ? $group['namespace'].'\\'.$class
+            : $class;
     }
 
     /**
@@ -829,9 +829,13 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     public function resolveMiddleware(array $middleware, array $excluded = [])
     {
-        $excluded = $excluded === [] ? $excluded : (new Collection($excluded))->map(function ($name) {
-            return (array) MiddlewareNameResolver::resolve($name, $this->middleware, $this->middlewareGroups);
-        })->flatten()->values()->all();
+        $excluded = $excluded === []
+            ? $excluded
+            : (new Collection($excluded))
+                ->map(fn ($name) => (array) MiddlewareNameResolver::resolve($name, $this->middleware, $this->middlewareGroups))
+                ->flatten()
+                ->values()
+                ->all();
 
         $middleware = (new Collection($middleware))->map(function ($name) {
             return (array) MiddlewareNameResolver::resolve($name, $this->middleware, $this->middlewareGroups);

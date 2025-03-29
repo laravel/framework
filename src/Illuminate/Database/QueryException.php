@@ -37,7 +37,6 @@ class QueryException extends PDOException
      * @param  string  $sql
      * @param  array  $bindings
      * @param  \Throwable  $previous
-     * @return void
      */
     public function __construct($connectionName, $sql, array $bindings, Throwable $previous)
     {

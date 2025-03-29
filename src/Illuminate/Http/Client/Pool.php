@@ -34,7 +34,6 @@ class Pool
      * Create a new requests pool.
      *
      * @param  \Illuminate\Http\Client\Factory|null  $factory
-     * @return void
      */
     public function __construct(?Factory $factory = null)
     {

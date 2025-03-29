@@ -602,6 +602,38 @@ class ContextTest extends TestCase
 
         file_put_contents($path, '');
     }
+
+    public function test_it_increments_a_counter()
+    {
+        Context::increment('foo');
+        $this->assertSame(1, Context::get('foo'));
+
+        Context::increment('foo');
+        $this->assertSame(2, Context::get('foo'));
+    }
+
+    public function test_it_custom_increments_a_counter()
+    {
+        Context::increment('foo', 2);
+        $this->assertSame(2, Context::get('foo'));
+
+        Context::increment('foo', 3);
+        $this->assertSame(5, Context::get('foo'));
+    }
+
+    public function test_it_decrements_a_counter()
+    {
+        Context::increment('foo');
+        Context::decrement('foo');
+        $this->assertSame(0, Context::get('foo'));
+    }
+
+    public function test_it_custom_decrements_a_counter()
+    {
+        Context::increment('foo', 2);
+        Context::decrement('foo', 2);
+        $this->assertSame(0, Context::get('foo'));
+    }
 }
 
 enum Suit

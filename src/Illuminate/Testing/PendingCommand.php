@@ -80,7 +80,6 @@ class PendingCommand
      * @param  \Illuminate\Contracts\Container\Container  $app
      * @param  string  $command
      * @param  array  $parameters
-     * @return void
      */
     public function __construct(PHPUnitTestCase $test, Container $app, $command, $parameters)
     {

@@ -17,7 +17,6 @@ class ViewController extends Controller
      * Create a new controller instance.
      *
      * @param  \Illuminate\Contracts\Routing\ResponseFactory  $response
-     * @return void
      */
     public function __construct(ResponseFactory $response)
     {

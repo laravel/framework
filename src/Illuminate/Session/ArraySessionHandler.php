@@ -27,7 +27,6 @@ class ArraySessionHandler implements SessionHandlerInterface
      * Create a new array driven handler instance.
      *
      * @param  int  $minutes
-     * @return void
      */
     public function __construct($minutes)
     {

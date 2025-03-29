@@ -54,7 +54,6 @@ class BroadcastEvent implements ShouldQueue
      * Create a new job handler instance.
      *
      * @param  mixed  $event
-     * @return void
      */
     public function __construct($event)
     {
@@ -75,7 +74,8 @@ class BroadcastEvent implements ShouldQueue
     public function handle(BroadcastingFactory $manager)
     {
         $name = method_exists($this->event, 'broadcastAs')
-                ? $this->event->broadcastAs() : get_class($this->event);
+            ? $this->event->broadcastAs()
+            : get_class($this->event);
 
         $channels = Arr::wrap($this->event->broadcastOn());
 
@@ -84,8 +84,8 @@ class BroadcastEvent implements ShouldQueue
         }
 
         $connections = method_exists($this->event, 'broadcastConnections')
-                            ? $this->event->broadcastConnections()
-                            : [null];
+            ? $this->event->broadcastConnections()
+            : [null];
 
         $payload = $this->getPayloadFromEvent($this->event);
 

@@ -188,4 +188,12 @@ class SupportUriTest extends TestCase
             ],
         ], $uri->query()->all());
     }
+
+    public function test_with_query_prevents_empty_query_string()
+    {
+        $uri = Uri::of('https://laravel.com');
+
+        $this->assertEquals('https://laravel.com', (string) $uri);
+        $this->assertEquals('https://laravel.com', (string) $uri->withQuery([]));
+    }
 }

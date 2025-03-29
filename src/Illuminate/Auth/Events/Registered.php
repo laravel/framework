@@ -12,7 +12,6 @@ class Registered
      * Create a new event instance.
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user  The authenticated user.
-     * @return void
      */
     public function __construct(
         public $user,

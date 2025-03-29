@@ -40,7 +40,6 @@ class CallQueuedClosure implements ShouldQueue
      * Create a new job instance.
      *
      * @param  \Laravel\SerializableClosure\SerializableClosure  $closure
-     * @return void
      */
     public function __construct($closure)
     {
@@ -78,8 +77,8 @@ class CallQueuedClosure implements ShouldQueue
     public function onFailure($callback)
     {
         $this->failureCallbacks[] = $callback instanceof Closure
-                        ? new SerializableClosure($callback)
-                        : $callback;
+            ? new SerializableClosure($callback)
+            : $callback;
 
         return $this;
     }

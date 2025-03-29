@@ -9,7 +9,6 @@ class JobPopped
      *
      * @param  string  $connectionName  The connection name.
      * @param  \Illuminate\Contracts\Queue\Job|null  $job  The job instance.
-     * @return void
      */
     public function __construct(
         public $connectionName,

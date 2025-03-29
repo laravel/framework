@@ -35,7 +35,6 @@ class ValidationRuleParser
      * Create a new validation rule parser.
      *
      * @param  array  $data
-     * @return void
      */
     public function __construct(array $data)
     {
@@ -342,8 +341,8 @@ class ValidationRuleParser
 
             if ($attributeRules instanceof ConditionalRules) {
                 return [$attribute => $attributeRules->passes($data)
-                                ? array_filter($attributeRules->rules($data))
-                                : array_filter($attributeRules->defaultRules($data)), ];
+                    ? array_filter($attributeRules->rules($data))
+                    : array_filter($attributeRules->defaultRules($data)), ];
             }
 
             return [$attribute => (new Collection($attributeRules))->map(function ($rule) use ($data) {

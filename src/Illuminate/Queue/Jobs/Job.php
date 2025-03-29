@@ -67,7 +67,7 @@ abstract class Job
     /**
      * Get the job identifier.
      *
-     * @return string
+     * @return string|int|null
      */
     abstract public function getJobId();
 
