@@ -44,9 +44,9 @@ class Builder
     /**
      * The default relationship morph key type.
      *
-     * @var string
+     * @var string|null
      */
-    public static $defaultMorphKeyType = 'int';
+    public static $defaultMorphKeyType = null;
 
     /**
      * Create a new database Schema manager.
@@ -81,8 +81,8 @@ class Builder
      */
     public static function defaultMorphKeyType(string $type)
     {
-        if (! in_array($type, ['int', 'uuid', 'ulid'])) {
-            throw new InvalidArgumentException("Morph key type must be 'int', 'uuid', or 'ulid'.");
+        if (! in_array($type, ['int', 'uuid', 'ulid', 'string'])) {
+            throw new InvalidArgumentException("Morph key type must be 'int', 'uuid', 'ulid', or 'string'.");
         }
 
         static::$defaultMorphKeyType = $type;
@@ -106,6 +106,16 @@ class Builder
     public static function morphUsingUlids()
     {
         static::defaultMorphKeyType('ulid');
+    }
+
+    /**
+     * Set the default morph key type for migrations to string as IDs (mixed of UUID/ULID & incremental integer).
+     *
+     * @return void
+     */
+    public static function morphUsingString()
+    {
+        static::defaultMorphKeyType('string');
     }
 
     /**
