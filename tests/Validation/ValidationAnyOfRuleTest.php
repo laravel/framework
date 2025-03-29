@@ -120,7 +120,7 @@ class ValidationAnyOfRuleTest extends TestCase
             'data' => [
                 'type' => TaggedUnionDiscriminatorType::EMAIL->value,
                 'email' => 'taylor@laravel.com',
-            ]
+            ],
         ], ['data' => Rule::anyOf($this->taggedUnionRules)]);
         $this->assertTrue($validator->passes());
 
@@ -128,7 +128,7 @@ class ValidationAnyOfRuleTest extends TestCase
             'data' => [
                 'type' => TaggedUnionDiscriminatorType::EMAIL->value,
                 'email' => 'invalid-email',
-            ]
+            ],
         ], ['data' => Rule::anyOf($this->taggedUnionRules)]);
         $this->assertFalse($validator->passes());
 
@@ -136,7 +136,7 @@ class ValidationAnyOfRuleTest extends TestCase
             'data' => [
                 'type' => TaggedUnionDiscriminatorType::URL->value,
                 'url' => 'http://laravel.com',
-            ]
+            ],
         ], ['data' => Rule::anyOf($this->taggedUnionRules)]);
         $this->assertTrue($validator->passes());
 
@@ -144,7 +144,7 @@ class ValidationAnyOfRuleTest extends TestCase
             'data' => [
                 'type' => TaggedUnionDiscriminatorType::URL->value,
                 'url' => 'not-a-url',
-            ]
+            ],
         ], ['data' => Rule::anyOf($this->taggedUnionRules)]);
         $this->assertFalse($validator->passes());
 
@@ -152,7 +152,7 @@ class ValidationAnyOfRuleTest extends TestCase
             'data' => [
                 'type' => TaggedUnionDiscriminatorType::EMAIL->value,
                 'url' => 'url-should-not-be-present-with-email-discriminator',
-            ]
+            ],
         ], ['data' => Rule::anyOf($this->taggedUnionRules)]);
         $this->assertFalse($validator->passes());
 
@@ -160,7 +160,7 @@ class ValidationAnyOfRuleTest extends TestCase
             'data' => [
                 'type' => 'doesnt-exist',
                 'email' => 'taylor@laravel.com',
-            ]
+            ],
         ], ['data' => Rule::anyOf($this->taggedUnionRules)]);
         $this->assertFalse($validator->passes());
     }
@@ -173,8 +173,8 @@ class ValidationAnyOfRuleTest extends TestCase
                 'properties' => [
                     'name' => 'Taylor',
                     'surname' => 'Otwell',
-                ]
-            ]
+                ],
+            ],
         ], $this->nestedRules);
         $this->assertTrue($validator->passes());
 
@@ -185,8 +185,8 @@ class ValidationAnyOfRuleTest extends TestCase
                     'bio' => 'biography',
                     'name' => 'Taylor',
                     'surname' => 'Otwell',
-                ]
-            ]
+                ],
+            ],
         ], $this->nestedRules);
         $this->assertTrue($validator->passes());
 
@@ -196,8 +196,8 @@ class ValidationAnyOfRuleTest extends TestCase
                 'properties' => [
                     'name' => null,
                     'surname' => 'Otwell',
-                ]
-            ]
+                ],
+            ],
         ], $this->nestedRules);
         $this->assertFalse($validator->passes());
 
@@ -206,8 +206,8 @@ class ValidationAnyOfRuleTest extends TestCase
                 'properties' => [
                     'name' => 'Taylor',
                     'surname' => 'Otwell',
-                ]
-            ]
+                ],
+            ],
         ], $this->nestedRules);
         $this->assertFalse($validator->passes());
     }
@@ -238,10 +238,10 @@ class ValidationAnyOfRuleTest extends TestCase
                             'bio' => 'nullable',
                             'name' => 'required',
                             'surname' => 'required',
-                        ]
+                        ],
                     ])],
-                ]
-            ])
+                ],
+            ]),
         ];
     }
 
