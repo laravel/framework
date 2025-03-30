@@ -4,7 +4,6 @@ namespace Illuminate\Tests\Security;
 
 use Illuminate\Container\Container;
 use Illuminate\Http\Request;
-use Illuminate\Security\Events\ThreatDetected;
 use Illuminate\Security\IdsManager;
 use Illuminate\Security\IdsSensor;
 use PHPUnit\Framework\TestCase;
