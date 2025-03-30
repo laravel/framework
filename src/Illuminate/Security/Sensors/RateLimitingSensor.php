@@ -127,4 +127,4 @@ class RateLimitingSensor extends IdsSensor
 
         return $this;
     }
-} 
+}

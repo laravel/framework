@@ -53,22 +53,22 @@ class SqlInjectionSensor extends IdsSensor
     public function detect(Request $request): bool
     {
         $params = $this->getAllParameters($request);
-        
+
         foreach ($params as $param) {
-            if (!is_string($param)) {
+            if (! is_string($param)) {
                 continue;
             }
-            
+
             foreach ($this->patterns as $pattern) {
                 if (preg_match($pattern, $param)) {
                     return true;
                 }
             }
         }
-        
+
         return false;
     }
-    
+
     /**
      * Get all request parameters.
      *
@@ -85,4 +85,4 @@ class SqlInjectionSensor extends IdsSensor
             $request->route()?->parameters() ?? []
         );
     }
-} 
+}

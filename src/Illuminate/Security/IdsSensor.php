@@ -57,4 +57,4 @@ abstract class IdsSensor
     {
         return class_basename($this);
     }
-} 
+}

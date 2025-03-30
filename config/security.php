@@ -19,7 +19,7 @@ return [
             Illuminate\Security\Sensors\XssSensor::class,
             Illuminate\Security\Sensors\RateLimitingSensor::class,
         ],
-        
+
         // Paths to exclude from analysis
         'except' => [
             'horizon/*',
@@ -59,4 +59,4 @@ return [
         // CSRF token expiration time in minutes
         'expiration' => 120,
     ],
-]; 
+];

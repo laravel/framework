@@ -135,4 +135,4 @@ class IdsManager
     {
         return $this->sensors;
     }
-} 
+}

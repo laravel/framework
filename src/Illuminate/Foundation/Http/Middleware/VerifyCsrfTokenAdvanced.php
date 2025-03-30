@@ -4,7 +4,6 @@ namespace Illuminate\Foundation\Http\Middleware;
 
 use Carbon\Carbon;
 use Closure;
-use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Session\TokenMismatchException;
@@ -112,7 +111,7 @@ class VerifyCsrfTokenAdvanced extends VerifyCsrfToken
 
         // Check token expiration
         if (Str::contains($token, '|')) {
-            list($tokenValue, $expirationTimestamp) = explode('|', $token, 2);
+            [$tokenValue, $expirationTimestamp] = explode('|', $token, 2);
 
             if (! is_numeric($expirationTimestamp)) {
                 return false;
@@ -147,7 +146,7 @@ class VerifyCsrfTokenAdvanced extends VerifyCsrfToken
         $response->headers->setCookie(
             new Cookie(
                 'XSRF-TOKEN',
-                $request->session()->token() . '|' . $this->availableAt($this->tokenExpiration * 60),
+                $request->session()->token().'|'.$this->availableAt($this->tokenExpiration * 60),
                 $this->availableAt(60 * $config['lifetime']),
                 $config['path'],
                 $config['domain'],
@@ -163,7 +162,7 @@ class VerifyCsrfTokenAdvanced extends VerifyCsrfToken
             $response->headers->setCookie(
                 new Cookie(
                     'csrf_token',
-                    $request->session()->token() . '|' . $this->availableAt($this->tokenExpiration * 60),
+                    $request->session()->token().'|'.$this->availableAt($this->tokenExpiration * 60),
                     $this->availableAt(60 * $config['lifetime']),
                     $config['path'],
                     $config['domain'],
@@ -175,4 +174,4 @@ class VerifyCsrfTokenAdvanced extends VerifyCsrfToken
             );
         }
     }
-} 
+}

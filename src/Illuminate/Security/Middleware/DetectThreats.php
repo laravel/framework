@@ -38,7 +38,7 @@ class DetectThreats
      * @param  \Illuminate\Contracts\Events\Dispatcher|null  $events
      * @return void
      */
-    public function __construct(IdsManager $ids, Dispatcher $events = null)
+    public function __construct(IdsManager $ids, ?Dispatcher $events = null)
     {
         $this->ids = $ids;
         $this->events = $events;
@@ -117,4 +117,4 @@ class DetectThreats
         // You can customize the response, e.g. a 403 error or custom error page
         return new Response('Forbidden: Security threat detected', 403);
     }
-} 
+}

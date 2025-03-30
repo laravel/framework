@@ -40,4 +40,4 @@ class SecurityServiceProvider extends ServiceProvider
             __DIR__.'/../../config/security.php' => config_path('security.php'),
         ], 'laravel-security');
     }
-} 
+}

@@ -32,4 +32,4 @@ class ThreatDetected
         $this->threat = $threat;
         $this->request = $request;
     }
-} 
+}
