@@ -3,8 +3,8 @@
 namespace Illuminate\Tests\Foundation\Http\Middleware;
 
 use Illuminate\Config\Repository;
-use Illuminate\Container\Container;
 use Illuminate\Contracts\Encryption\Encrypter;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfTokenAdvanced;
 use Illuminate\Http\Request;
 use Illuminate\Session\ArraySessionHandler;
@@ -19,15 +19,13 @@ class VerifyCsrfTokenAdvancedTest extends TestCase
     protected $middleware;
     protected $request;
     protected $session;
+    protected $config;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->app = new Container;
-        $this->encrypter = $this->createMock(Encrypter::class);
-
-        $this->app->instance('config', new Repository([
+        $this->config = new Repository([
             'session' => [
                 'lifetime' => 120,
                 'path' => '/',
@@ -39,8 +37,19 @@ class VerifyCsrfTokenAdvancedTest extends TestCase
                     'expiration' => 60,
                 ],
             ],
-        ]));
+        ]);
 
+        // Create application mock with all required methods
+        $this->app = $this->createMock(Application::class);
+        
+        // Configure the config method to return our predefined config
+        $this->app->method('make')->with('config')->willReturn($this->config);
+        
+        // Configure the offsetGet method which is used by the config() helper
+        $this->app->method('offsetGet')->with('config')->willReturn($this->config);
+
+        $this->encrypter = $this->createMock(Encrypter::class);
+        
         $this->middleware = new VerifyCsrfTokenAdvanced($this->app, $this->encrypter);
 
         $this->request = new Request();
