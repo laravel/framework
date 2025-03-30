@@ -2238,4 +2238,121 @@ class Builder implements BuilderContract
             $onCloneCallback($this);
         }
     }
+
+    /**
+     * Eager load relations with a limit on each relation to reduce memory usage.
+     *
+     * @param  mixed  $relations  The relations to eager load
+     * @param  array  $limits  Array with relation names as keys and their limits as values
+     * @return $this
+     */
+    public function withLimited($relations, array $limits = [])
+    {
+        if (is_string($relations)) {
+            $relations = func_get_args();
+            // Remove the limits array if it exists
+            $relations = is_array(end($relations)) ? array_slice($relations, 0, -1) : $relations;
+        }
+
+        $eagerLoad = $this->parseWithRelations($relations);
+        $limitedEagerLoad = [];
+
+        foreach ($eagerLoad as $name => $constraints) {
+            $segments = explode('.', $name);
+            $baseRelation = array_shift($segments);
+
+            // Store the original constraints
+            $limitedEagerLoad[$name] = $constraints;
+
+            // Apply limit if specified
+            if (isset($limits[$name]) && is_numeric($limits[$name])) {
+                $limitValue = (int) $limits[$name];
+
+                $originalConstraint = $constraints;
+                $limitedEagerLoad[$name] = function ($builder) use ($originalConstraint, $limitValue) {
+                    // Apply the original constraints first
+                    if ($originalConstraint instanceof Closure) {
+                        $originalConstraint($builder);
+                    }
+
+                    // Then apply the limit
+                    return $builder->limit($limitValue);
+                };
+            }
+        }
+
+        return $this->with($limitedEagerLoad);
+    }
+
+    /**
+     * Eagerly load the relationship on a set of models with chunking support.
+     *
+     * @param  array  $models
+     * @param  string  $name
+     * @param  int  $chunkSize
+     * @return array
+     */
+    protected function eagerLoadRelationChunked(array $models, $name, $chunkSize = 500)
+    {
+        $relation = $this->getRelation($name);
+
+        // Find all related model IDs
+        $keys = $relation->getKeys($models);
+
+        if (count($keys) === 0) {
+            return $models;
+        }
+
+        // Process related models in chunks to avoid memory issues
+        $chunkedKeys = array_chunk($keys, $chunkSize);
+        $relatedModels = [];
+
+        foreach ($chunkedKeys as $chunk) {
+            // Load a chunk of related models
+            $tempModels = $relation->getEager($relation->whereIn(
+                $relation->getRelated()->getQualifiedKeyName(), $chunk
+            ));
+
+            // Merge with the existing results
+            $relatedModels = array_merge($relatedModels, $tempModels->all());
+
+            // Clean up memory
+            unset($tempModels);
+
+            // Force garbage collection
+            if (function_exists('gc_collect_cycles')) {
+                gc_collect_cycles();
+            }
+        }
+
+        // Match the related models to their parents
+        return $relation->match($models, new Collection($relatedModels), $name);
+    }
+
+    /**
+     * Eager load relation with low memory footprint.
+     *
+     * @param  array  $models
+     * @param  string  $name
+     * @param  \Closure  $constraints
+     * @param  bool  $useChunking
+     * @param  int  $chunkSize
+     * @return array
+     */
+    protected function eagerLoadLowMemory(array $models, $name, \Closure $constraints, $useChunking = true, $chunkSize = 500)
+    {
+        if ($useChunking && count($models) > $chunkSize) {
+            return $this->eagerLoadRelationChunked($models, $name, $chunkSize);
+        }
+
+        $relation = $this->getRelation($name);
+
+        $relation->addEagerConstraints($models);
+
+        call_user_func($constraints, $relation);
+
+        return $relation->match(
+            $models, $relation->initRelation($models, $name), $name
+        );
+    }
 }

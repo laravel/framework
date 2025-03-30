@@ -2459,4 +2459,87 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
         $this->initializeTraits();
     }
+
+    /**
+     * Optimize memory usage by unloading unused relationships and attributes.
+     *
+     * @param  array|string|null  $relations  Relations to keep, others will be unloaded
+     * @param  array|string|null  $attributes  Attributes to keep, others will be unloaded
+     * @return $this
+     */
+    public function optimizeMemory($relations = null, $attributes = null)
+    {
+        // Keep only specific relations if requested
+        if ($relations !== null) {
+            $relations = is_array($relations) ? $relations : [$relations];
+            $currentRelations = array_keys($this->relations);
+
+            foreach ($currentRelations as $relation) {
+                if (! in_array($relation, $relations)) {
+                    unset($this->relations[$relation]);
+                }
+            }
+        }
+
+        // Keep only specific attributes if requested
+        if ($attributes !== null) {
+            $attributes = is_array($attributes) ? $attributes : [$attributes];
+            // Always keep primary key
+            $attributes[] = $this->getKeyName();
+
+            $currentAttributes = array_keys($this->attributes);
+            foreach ($currentAttributes as $attribute) {
+                if (! in_array($attribute, $attributes)) {
+                    unset($this->attributes[$attribute]);
+                }
+            }
+        }
+
+        // Force garbage collection
+        if (function_exists('gc_collect_cycles')) {
+            gc_collect_cycles();
+        }
+
+        return $this;
+    }
+
+    /**
+     * Create a collection of models with memory optimization after loading.
+     *
+     * @param  array  $models
+     * @param  array|string|null  $keepRelations  Relations to keep, others will be unloaded
+     * @param  array|string|null  $keepAttributes  Attributes to keep, others will be unloaded
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public static function optimizedCollection(array $models, $keepRelations = null, $keepAttributes = null)
+    {
+        $collection = static::newCollection($models);
+
+        // Apply memory optimization to each model
+        return $collection->each(function ($model) use ($keepRelations, $keepAttributes) {
+            $model->optimizeMemory($keepRelations, $keepAttributes);
+        });
+    }
+
+    /**
+     * Cleanup model to free memory.
+     *
+     * @return $this
+     */
+    public function cleanup()
+    {
+        $this->relations = [];
+        $this->hidden = [];
+        $this->visible = [];
+        $this->appends = [];
+        $this->touches = [];
+        $this->observables = [];
+
+        // Force garbage collection
+        if (function_exists('gc_collect_cycles')) {
+            gc_collect_cycles();
+        }
+
+        return $this;
+    }
 }
