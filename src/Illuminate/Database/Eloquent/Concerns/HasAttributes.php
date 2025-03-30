@@ -2386,7 +2386,7 @@ trait HasAttributes
         if (isset(static::$customCastAliasRegistry[$alias]) || in_array($alias, static::$primitiveCastTypes)) {
             throw new \InvalidArgumentException("Custom cast alias '{$alias}' already registered.");
         }
-    
+
         static::$customCastAliasRegistry[$alias] = $class;
     }
 
