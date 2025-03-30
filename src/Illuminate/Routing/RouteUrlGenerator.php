@@ -227,10 +227,9 @@ class RouteUrlGenerator
 
         $offset = 0;
         $emptyParameters = array_filter($namedParameters, static fn ($val) => $val === '');
-        if (
-            count($requiredRouteParametersWithoutDefaultsOrNamedParameters) !== 0 &&
-            count($parameters) !== count($emptyParameters)
-        ) {
+
+        if (count($requiredRouteParametersWithoutDefaultsOrNamedParameters) !== 0 &&
+            count($parameters) !== count($emptyParameters)) {
             // Find the index of the first required parameter...
             $offset = array_search($requiredRouteParametersWithoutDefaultsOrNamedParameters[0], array_keys($namedParameters));
 
@@ -238,7 +237,7 @@ class RouteUrlGenerator
             $remaining = count($emptyParameters) - $offset - count($parameters);
 
             if ($remaining < 0) {
-                // Effectively subtract the remaining count since it's negative
+                // Effectively subtract the remaining count since it's negative...
                 $offset += $remaining;
             }
 
@@ -257,7 +256,7 @@ class RouteUrlGenerator
                     $remainingCount--;
 
                     if ($remainingCount === 0) {
-                        // If there are no more passed parameters, we stop here
+                        // If there are no more passed parameters, we stop here...
                         break;
                     }
                 }
