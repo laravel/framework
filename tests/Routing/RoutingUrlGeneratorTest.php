@@ -1821,6 +1821,167 @@ class RoutingUrlGeneratorTest extends TestCase
             $url->route('tenantPostUser', ['concretePost', 'extra' => 'query']),
         );
     }
+
+    public function testUrlGenerationWithOptionalParameters(): void
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            Request::create('https://www.foo.com/')
+        );
+
+        $url->defaults([
+            'tenant' => 'defaultTenant',
+            'user' => 'defaultUser',
+        ]);
+
+        /**
+         * Route with one required parameter and one optional parameter.
+         */
+        $route = new Route(['GET'], 'postOptionalMethod/{post}/{method?}', ['as' => 'postOptionalMethod', fn() => '']);
+        $routes->add($route);
+
+        $this->assertSame(
+            'https://www.foo.com/postOptionalMethod/1',
+            $url->route('postOptionalMethod', 1),
+        );
+
+        $this->assertSame(
+            'https://www.foo.com/postOptionalMethod/1/2',
+            $url->route('postOptionalMethod', [1, 2]),
+        );
+
+        /**
+         * Route with two optional parameters.
+         */
+        $route = new Route(['GET'], 'optionalPostOptionalMethod/{post}/{method?}', ['as' => 'optionalPostOptionalMethod', fn() => '']);
+        $routes->add($route);
+
+        $this->assertSame(
+            'https://www.foo.com/optionalPostOptionalMethod/1',
+            $url->route('optionalPostOptionalMethod', 1),
+        );
+
+        $this->assertSame(
+            'https://www.foo.com/optionalPostOptionalMethod/1/2',
+            $url->route('optionalPostOptionalMethod', [1, 2]),
+        );
+
+        /**
+         * Route with one default parameter, one required parameter, and one optional parameter.
+         */
+        $route = new Route(['GET'], 'tenantPostOptionalMethod/{tenant}/{post}/{method?}', ['as' => 'tenantPostOptionalMethod', fn() => '']);
+        $routes->add($route);
+
+        // Passing one parameter
+        $this->assertSame(
+            'https://www.foo.com/tenantPostOptionalMethod/defaultTenant/concretePost',
+            $url->route('tenantPostOptionalMethod', ['concretePost']),
+        );
+
+        // Passing two parameters: optional parameter is prioritized over parameter with a default value
+        $this->assertSame(
+            'https://www.foo.com/tenantPostOptionalMethod/defaultTenant/concretePost/concreteMethod',
+            $url->route('tenantPostOptionalMethod', ['concretePost', 'concreteMethod']),
+        );
+
+        // Passing all three parameters
+        $this->assertSame(
+            'https://www.foo.com/tenantPostOptionalMethod/concreteTenant/concretePost/concreteMethod',
+            $url->route('tenantPostOptionalMethod', ['concreteTenant', 'concretePost', 'concreteMethod']),
+        );
+
+        /**
+         * Route with two default parameters, one required parameter, and one optional parameter.
+         */
+        $route = new Route(['GET'], 'tenantUserPostOptionalMethod/{tenant}/{user}/{post}/{method?}', ['as' => 'tenantUserPostOptionalMethod', fn() => '']);
+        $routes->add($route);
+
+        // Passing one parameter
+        $this->assertSame(
+            'https://www.foo.com/tenantUserPostOptionalMethod/defaultTenant/defaultUser/concretePost',
+            $url->route('tenantUserPostOptionalMethod', ['concretePost']),
+        );
+
+        // Passing two parameters: optional parameter is prioritized over parameters with default values
+        $this->assertSame(
+            'https://www.foo.com/tenantUserPostOptionalMethod/defaultTenant/defaultUser/concretePost/concreteMethod',
+            $url->route('tenantUserPostOptionalMethod', ['concretePost', 'concreteMethod']),
+        );
+
+        // Passing three parameters: only the leftmost parameter with a default value uses its default value
+        $this->assertSame(
+            'https://www.foo.com/tenantUserPostOptionalMethod/defaultTenant/concreteUser/concretePost/concreteMethod',
+            $url->route('tenantUserPostOptionalMethod', ['concreteUser', 'concretePost', 'concreteMethod']),
+        );
+
+        // Same as the assertion above, but using some named parameters
+        $this->assertSame(
+            'https://www.foo.com/tenantUserPostOptionalMethod/defaultTenant/concreteUser/concretePost/concreteMethod',
+            $url->route('tenantUserPostOptionalMethod', ['user' => 'concreteUser', 'concretePost', 'concreteMethod']),
+        );
+
+        // Also using a named parameter, but this time for the post parameter
+        $this->assertSame(
+            'https://www.foo.com/tenantUserPostOptionalMethod/defaultTenant/concreteUser/concretePost/concreteMethod',
+            $url->route('tenantUserPostOptionalMethod', ['concreteUser', 'post' => 'concretePost', 'concreteMethod']),
+        );
+
+        // Also using a named parameter, but this time for the optional method parameter
+        $this->assertSame(
+            'https://www.foo.com/tenantUserPostOptionalMethod/defaultTenant/concreteUser/concretePost/concreteMethod',
+            $url->route('tenantUserPostOptionalMethod', ['concreteUser', 'concretePost', 'method' => 'concreteMethod']),
+        );
+
+        // Passing all four parameters
+        $this->assertSame(
+            'https://www.foo.com/tenantUserPostOptionalMethod/concreteTenant/concreteUser/concretePost/concreteMethod',
+            $url->route('tenantUserPostOptionalMethod', ['concreteTenant', 'concreteUser', 'concretePost', 'concreteMethod']),
+        );
+
+        /**
+         * Route with a default parameter, a required parameter, another default parameter, and finally an optional parameter.
+         *
+         * This tests interleaved default parameters when combined with optional parameters.
+         */
+        $route = new Route(['GET'], 'tenantPostUserOptionalMethod/{tenant}/{post}/{user}/{method?}', ['as' => 'tenantPostUserOptionalMethod', fn() => '']);
+        $routes->add($route);
+
+        // Passing one parameter
+        $this->assertSame(
+            'https://www.foo.com/tenantPostUserOptionalMethod/defaultTenant/concretePost/defaultUser',
+            $url->route('tenantPostUserOptionalMethod', ['concretePost']),
+        );
+
+        // Passing two parameters: optional parameter is prioritized over parameters with default values
+        $this->assertSame(
+            'https://www.foo.com/tenantPostUserOptionalMethod/defaultTenant/concretePost/defaultUser/concreteMethod',
+            $url->route('tenantPostUserOptionalMethod', ['concretePost', 'concreteMethod']),
+        );
+
+        // Same as the assertion above, but using some named parameters
+        $this->assertSame(
+            'https://www.foo.com/tenantPostUserOptionalMethod/defaultTenant/concretePost/defaultUser/concreteMethod',
+            $url->route('tenantPostUserOptionalMethod', ['post' => 'concretePost', 'concreteMethod']),
+        );
+
+        // Also using a named parameter, but this time for the optional parameter
+        $this->assertSame(
+            'https://www.foo.com/tenantPostUserOptionalMethod/defaultTenant/concretePost/defaultUser/concreteMethod',
+            $url->route('tenantPostUserOptionalMethod', ['concretePost', 'method' => 'concreteMethod']),
+        );
+
+        // Passing three parameters: only the leftmost parameter with a default value uses its default value
+        $this->assertSame(
+            'https://www.foo.com/tenantPostUserOptionalMethod/defaultTenant/concretePost/concreteUser/concreteMethod',
+            $url->route('tenantPostUserOptionalMethod', ['concretePost', 'concreteUser', 'concreteMethod']),
+        );
+
+        // Passing all four parameters
+        $this->assertSame(
+            'https://www.foo.com/tenantPostUserOptionalMethod/concreteTenant/concretePost/concreteUser/concreteMethod',
+            $url->route('tenantPostUserOptionalMethod', ['concreteTenant', 'concretePost', 'concreteUser', 'concreteMethod']),
+        );
+    }
 }
 
 class RoutableInterfaceStub implements UrlRoutable
