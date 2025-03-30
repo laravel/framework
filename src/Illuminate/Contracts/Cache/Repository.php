@@ -86,17 +86,6 @@ interface Repository extends CacheInterface
      * @param  \Closure(): TCacheValue  $callback
      * @return TCacheValue
      */
-    public function sear($key, Closure $callback);
-
-    /**
-     * Get an item from the cache, or execute the given Closure and store the result forever.
-     *
-     * @template TCacheValue
-     *
-     * @param  string  $key
-     * @param  \Closure(): TCacheValue  $callback
-     * @return TCacheValue
-     */
     public function rememberForever($key, Closure $callback);
 
     /**
