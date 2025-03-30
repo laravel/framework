@@ -216,13 +216,13 @@ class RouteUrlGenerator
         }
 
         // Match positional parameters to the route parameters that didn't have a value in order...
-        if (count($parameters) == count($routeParametersWithoutDefaultsOrNamedParameters)) {
-            foreach (array_reverse($routeParametersWithoutDefaultsOrNamedParameters) as $name) {
+        if (count($parameters) > 0 && count($routeParametersWithoutDefaultsOrNamedParameters) > 0) {
+            foreach ($routeParametersWithoutDefaultsOrNamedParameters as $name) {
                 if (count($parameters) === 0) {
                     break;
                 }
 
-                $namedParameters[$name] = array_pop($parameters);
+                $namedParameters[$name] = array_shift($parameters);
             }
         }
 
