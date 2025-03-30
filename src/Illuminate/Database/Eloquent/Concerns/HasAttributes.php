@@ -125,6 +125,13 @@ trait HasAttributes
     ];
 
     /**
+     * Cast types registered by custom casts.
+     *
+     * @var array
+     */
+    protected static $customCastAliasRegistry = [];
+
+    /**
      * The storage format of the model's date columns.
      *
      * @var string|null
@@ -1725,6 +1732,10 @@ trait HasAttributes
             return false;
         }
 
+        if (isset(static::$customCastAliasRegistry[$castType])) {
+            $castType = static::$customCastAliasRegistry[$castType];
+        }
+
         if (class_exists($castType)) {
             return true;
         }
@@ -1806,6 +1817,10 @@ trait HasAttributes
 
             $castType = $segments[0];
             $arguments = explode(',', $segments[1]);
+        }
+
+        if (isset(static::$customCastAliasRegistry[$castType])) {
+            $castType = static::$customCastAliasRegistry[$castType];
         }
 
         if (is_subclass_of($castType, Castable::class)) {
@@ -2353,6 +2368,26 @@ trait HasAttributes
         }
 
         return static::$mutatorCache[static::class];
+    }
+
+    /**
+     * Register a custom cast type.
+     *
+     * @param  string  $alias
+     * @param  string  $class
+     * @return void
+     */
+    public static function registerCustomCast(string $alias, string $class)
+    {
+        if (! class_exists($class)) {
+            throw new \InvalidArgumentException("Custom cast class '{$class}' not found.");
+        }
+
+        if (isset(static::$customCastAliasRegistry[$alias]) || in_array($alias, static::$primitiveCastTypes)) {
+            throw new \InvalidArgumentException("Custom cast alias '{$alias}' already registered.");
+        }
+    
+        static::$customCastAliasRegistry[$alias] = $class;
     }
 
     /**
