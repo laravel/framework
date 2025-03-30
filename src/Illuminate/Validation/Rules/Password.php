@@ -381,7 +381,7 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
     }
 
     /**
-     * Get the validation rules that should be applied to the password.
+     * Get the validation rules that are defined for validation.
      *
      * @return array
      */
