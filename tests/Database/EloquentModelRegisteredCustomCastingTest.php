@@ -33,7 +33,7 @@ class EloquentModelRegisteredCustomCastingTest extends TestCase
 
     public function testBasicCustomCasting()
     {
-        $model = new TestModel;
+        $model = new TestRegisteredCustomCastModel;
         $model->uppercase = 'vinicius de santana';
 
         $this->assertSame('VINICIUS DE SANTANA', $model->uppercase);
@@ -49,7 +49,7 @@ class EloquentModelRegisteredCustomCastingTest extends TestCase
 
     public function testCustomCastingWithoutArgument()
     {
-        $model = new TestModel;
+        $model = new TestRegisteredCustomCastModel;
         $model->uppercase_without_argument = 'vinicius de santana';
 
         $this->assertSame('VINICIUS DE SANTANA', $model->uppercase_without_argument);
@@ -65,7 +65,7 @@ class EloquentModelRegisteredCustomCastingTest extends TestCase
 
     public function testCustomCastingWithArgument()
     {
-        $model = new TestModel;
+        $model = new TestRegisteredCustomCastModel;
         $model->uppercase_with_argument = 'vinicius de santana';
 
         $this->assertSame('argument', $model->uppercase_with_argument);
@@ -80,7 +80,7 @@ class EloquentModelRegisteredCustomCastingTest extends TestCase
     }
 }
 
-class TestModel extends Model
+class TestRegisteredCustomCastModel extends Model
 {
     protected $table = 'test_model';
     public $timestamps = false;
