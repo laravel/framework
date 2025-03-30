@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Foundation\Http\Middleware;
 
 use Illuminate\Config\Repository;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfTokenAdvanced;
@@ -12,6 +13,234 @@ use Illuminate\Session\Store;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * A simple Application implementation for testing
+ */
+class TestApplication extends Container implements Application
+{
+    /**
+     * The config repository instance.
+     */
+    protected $config;
+
+    /**
+     * Create a new TestApplication instance.
+     */
+    public function __construct(Repository $config)
+    {
+        parent::__construct();
+        $this->config = $config;
+        $this->instance('config', $config);
+    }
+
+    /**
+     * Get the version number of the application.
+     */
+    public function version()
+    {
+        return '9.x-testing';
+    }
+
+    /**
+     * Get the base path of the Laravel installation.
+     */
+    public function basePath($path = '')
+    {
+        return '/tmp' . ($path ? '/' . $path : '');
+    }
+
+    /**
+     * Get the path to the bootstrap directory.
+     */
+    public function bootstrapPath($path = '')
+    {
+        return $this->basePath('bootstrap') . ($path ? '/' . $path : '');
+    }
+
+    /**
+     * Get the path to the application configuration files.
+     */
+    public function configPath($path = '')
+    {
+        return $this->basePath('config') . ($path ? '/' . $path : '');
+    }
+
+    /**
+     * Get the path to the database directory.
+     */
+    public function databasePath($path = '')
+    {
+        return $this->basePath('database') . ($path ? '/' . $path : '');
+    }
+
+    /**
+     * Get the path to the language files.
+     */
+    public function langPath($path = '')
+    {
+        return $this->basePath('lang') . ($path ? '/' . $path : '');
+    }
+
+    /**
+     * Get the path to the public directory.
+     */
+    public function publicPath($path = '')
+    {
+        return $this->basePath('public') . ($path ? '/' . $path : '');
+    }
+
+    /**
+     * Get the path to the storage directory.
+     */
+    public function storagePath($path = '')
+    {
+        return $this->basePath('storage') . ($path ? '/' . $path : '');
+    }
+
+    /**
+     * Get the path to the resources directory.
+     */
+    public function resourcePath($path = '')
+    {
+        return $this->basePath('resources') . ($path ? '/' . $path : '');
+    }
+
+    /**
+     * Get or check the current application environment.
+     */
+    public function environment(...$environments)
+    {
+        return 'testing';
+    }
+
+    /**
+     * Determine if the application is running in the console.
+     */
+    public function runningInConsole()
+    {
+        return false;
+    }
+
+    /**
+     * Determine if the application is running unit tests.
+     */
+    public function runningUnitTests()
+    {
+        return true;
+    }
+
+    /**
+     * Determine if the application is currently down for maintenance.
+     */
+    public function isDownForMaintenance()
+    {
+        return false;
+    }
+
+    /**
+     * Register all of the configured providers.
+     */
+    public function registerConfiguredProviders()
+    {
+    }
+
+    /**
+     * Register a service provider with the application.
+     */
+    public function register($provider, $force = false)
+    {
+        return $provider;
+    }
+
+    /**
+     * Register a deferred provider and service.
+     */
+    public function registerDeferredProvider($provider, $service = null)
+    {
+    }
+
+    /**
+     * Resolve a service provider instance from the class name.
+     */
+    public function resolveProvider($provider)
+    {
+        return new $provider($this);
+    }
+
+    /**
+     * Boot the application's service providers.
+     */
+    public function boot()
+    {
+    }
+
+    /**
+     * Register a new boot listener.
+     */
+    public function booting($callback)
+    {
+    }
+
+    /**
+     * Register a new "booted" listener.
+     */
+    public function booted($callback)
+    {
+    }
+
+    /**
+     * Run the given array of bootstrap classes.
+     */
+    public function bootstrapWith(array $bootstrappers)
+    {
+    }
+
+    /**
+     * Get the service providers that have been loaded.
+     */
+    public function getProviders($provider)
+    {
+        return [];
+    }
+
+    /**
+     * Determine if the application has been bootstrapped before.
+     */
+    public function hasBeenBootstrapped()
+    {
+        return true;
+    }
+
+    /**
+     * Load and boot all of the remaining deferred providers.
+     */
+    public function loadDeferredProviders()
+    {
+    }
+
+    /**
+     * Register a terminating callback with the application.
+     */
+    public function terminating($callback)
+    {
+    }
+
+    /**
+     * Terminate the application.
+     */
+    public function terminate()
+    {
+    }
+
+    /**
+     * Determine if the given configuration is in debug/local mode.
+     */
+    public function hasDebugModeEnabled()
+    {
+        return false;
+    }
+}
+
 class VerifyCsrfTokenAdvancedTest extends TestCase
 {
     protected $app;
@@ -19,13 +248,12 @@ class VerifyCsrfTokenAdvancedTest extends TestCase
     protected $middleware;
     protected $request;
     protected $session;
-    protected $config;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->config = new Repository([
+        $config = new Repository([
             'session' => [
                 'lifetime' => 120,
                 'path' => '/',
@@ -39,14 +267,8 @@ class VerifyCsrfTokenAdvancedTest extends TestCase
             ],
         ]);
 
-        // Create application mock with all required methods
-        $this->app = $this->createMock(Application::class);
-        
-        // Configure the config method to return our predefined config
-        $this->app->method('make')->with('config')->willReturn($this->config);
-        
-        // Configure the offsetGet method which is used by the config() helper
-        $this->app->method('offsetGet')->with('config')->willReturn($this->config);
+        // Create a real application instance for testing
+        $this->app = new TestApplication($config);
 
         $this->encrypter = $this->createMock(Encrypter::class);
         
