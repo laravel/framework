@@ -34,11 +34,6 @@ class RedisDriverTest extends TestCase
             $this->markTestSkipped('Redis extension is not loaded');
         }
 
-        // Skip test in CI environment where Redis processor might not be running
-        if (getenv('CI') || getenv('GITHUB_ACTIONS')) {
-            $this->markTestSkipped('Skipping Redis driver test in CI environment');
-        }
-
         $factory = new RedisManager($this->app, 'phpredis', [
             'default' => [
                 'host' => env('REDIS_HOST', '127.0.0.1'),
@@ -62,11 +57,6 @@ class RedisDriverTest extends TestCase
     {
         if (! extension_loaded('redis')) {
             $this->markTestSkipped('Redis extension is not loaded');
-        }
-
-        // Skip test in CI environment where Redis processor might not be running
-        if (getenv('CI') || getenv('GITHUB_ACTIONS')) {
-            $this->markTestSkipped('Skipping Redis driver test in CI environment');
         }
 
         $factory = new RedisManager($this->app, 'phpredis', [
@@ -125,11 +115,6 @@ class RedisDriverTest extends TestCase
     {
         if (! extension_loaded('redis')) {
             $this->markTestSkipped('Redis extension is not loaded');
-        }
-
-        // Skip test in CI environment where Redis processor might not be running
-        if (getenv('CI') || getenv('GITHUB_ACTIONS')) {
-            $this->markTestSkipped('Skipping Redis driver test in CI environment');
         }
 
         $factory = new RedisManager($this->app, 'phpredis', [
