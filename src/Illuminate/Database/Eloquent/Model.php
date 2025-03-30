@@ -2513,7 +2513,9 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public static function optimizedCollection(array $models, $keepRelations = null, $keepAttributes = null)
     {
-        $collection = static::newCollection($models);
+        // Use the same pattern as the model's make method for consistency
+        $model = new static;
+        $collection = $model->newCollection($models);
 
         // Apply memory optimization to each model
         return $collection->each(function ($model) use ($keepRelations, $keepAttributes) {

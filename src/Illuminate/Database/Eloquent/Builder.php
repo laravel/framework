@@ -854,8 +854,77 @@ class Builder implements BuilderContract
         // using the relationship instance. Then we just return the finished arrays
         // of models which have been eagerly hydrated and are readied for return.
         return $relation->match(
+            $models,
             $relation->initRelation($models, $name),
             $relation->getEager(), $name
+        );
+    }
+
+    /**
+     * Eagerly load the relationship on a set of models with chunking support.
+     *
+     * @param  array  $models
+     * @param  string  $name
+     * @param  int  $chunkSize
+     * @return array
+     */
+    protected function eagerLoadRelationChunked(array $models, $name, $chunkSize = 500)
+    {
+        $relation = $this->getRelation($name);
+
+        // Instead of calling protected method directly, use addEagerConstraints
+        $relation->addEagerConstraints($models);
+
+        // Get the query builder from the relation
+        $query = $relation->getQuery();
+
+        // Execute the query with chunking
+        $relatedModels = collect();
+        $query->chunk($chunkSize, function ($chunk) use (&$relatedModels) {
+            $relatedModels = $relatedModels->merge($chunk);
+
+            // Clean up memory
+            if (function_exists('gc_collect_cycles')) {
+                gc_collect_cycles();
+            }
+        });
+
+        // Match the related models to their parents using public API
+        return $relation->match(
+            $models,
+            $relation->initRelation($models, $name),
+            $relatedModels,
+            $name
+        );
+    }
+
+    /**
+     * Eager load relation with low memory footprint.
+     *
+     * @param  array  $models
+     * @param  string  $name
+     * @param  \Closure  $constraints
+     * @param  bool  $useChunking
+     * @param  int  $chunkSize
+     * @return array
+     */
+    protected function eagerLoadLowMemory(array $models, $name, \Closure $constraints, $useChunking = true, $chunkSize = 500)
+    {
+        if ($useChunking && count($models) > $chunkSize) {
+            return $this->eagerLoadRelationChunked($models, $name, $chunkSize);
+        }
+
+        $relation = $this->getRelation($name);
+
+        $relation->addEagerConstraints($models);
+
+        call_user_func($constraints, $relation);
+
+        return $relation->match(
+            $models,
+            $relation->initRelation($models, $name),
+            $relation->getEager(),
+            $name
         );
     }
 
@@ -2282,77 +2351,5 @@ class Builder implements BuilderContract
         }
 
         return $this->with($limitedEagerLoad);
-    }
-
-    /**
-     * Eagerly load the relationship on a set of models with chunking support.
-     *
-     * @param  array  $models
-     * @param  string  $name
-     * @param  int  $chunkSize
-     * @return array
-     */
-    protected function eagerLoadRelationChunked(array $models, $name, $chunkSize = 500)
-    {
-        $relation = $this->getRelation($name);
-
-        // Find all related model IDs
-        $keys = $relation->getKeys($models);
-
-        if (count($keys) === 0) {
-            return $models;
-        }
-
-        // Process related models in chunks to avoid memory issues
-        $chunkedKeys = array_chunk($keys, $chunkSize);
-        $relatedModels = [];
-
-        foreach ($chunkedKeys as $chunk) {
-            // Load a chunk of related models
-            $tempModels = $relation->getEager($relation->whereIn(
-                $relation->getRelated()->getQualifiedKeyName(), $chunk
-            ));
-
-            // Merge with the existing results
-            $relatedModels = array_merge($relatedModels, $tempModels->all());
-
-            // Clean up memory
-            unset($tempModels);
-
-            // Force garbage collection
-            if (function_exists('gc_collect_cycles')) {
-                gc_collect_cycles();
-            }
-        }
-
-        // Match the related models to their parents
-        return $relation->match($models, new Collection($relatedModels), $name);
-    }
-
-    /**
-     * Eager load relation with low memory footprint.
-     *
-     * @param  array  $models
-     * @param  string  $name
-     * @param  \Closure  $constraints
-     * @param  bool  $useChunking
-     * @param  int  $chunkSize
-     * @return array
-     */
-    protected function eagerLoadLowMemory(array $models, $name, \Closure $constraints, $useChunking = true, $chunkSize = 500)
-    {
-        if ($useChunking && count($models) > $chunkSize) {
-            return $this->eagerLoadRelationChunked($models, $name, $chunkSize);
-        }
-
-        $relation = $this->getRelation($name);
-
-        $relation->addEagerConstraints($models);
-
-        call_user_func($constraints, $relation);
-
-        return $relation->match(
-            $models, $relation->initRelation($models, $name), $name
-        );
     }
 }
