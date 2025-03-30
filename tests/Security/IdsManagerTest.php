@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Security;
 
 use Illuminate\Container\Container;
 use Illuminate\Http\Request;
+use Illuminate\Security\Events\ThreatDetected;
 use Illuminate\Security\IdsManager;
 use Illuminate\Security\IdsSensor;
 use PHPUnit\Framework\TestCase;
@@ -16,12 +17,13 @@ class IdsManagerTest extends TestCase
         $manager = new IdsManager($container);
 
         // Create a mock sensor
-        $sensor = $this->getMockForAbstractClass(IdsSensor::class);
+        $sensor = $this->createMock(IdsSensor::class);
+        $sensor->method('getName')->willReturn('test-sensor');
 
         $manager->addSensor($sensor);
 
         $this->assertCount(1, $manager->getSensors());
-        $this->assertArrayHasKey($sensor->getName(), $manager->getSensors());
+        $this->assertArrayHasKey('test-sensor', $manager->getSensors());
     }
 
     public function testCanAnalyzeRequest()
@@ -30,7 +32,7 @@ class IdsManagerTest extends TestCase
         $manager = new IdsManager($container);
 
         // Create a sensor that always detects a threat
-        $sensor = $this->getMockForAbstractClass(IdsSensor::class);
+        $sensor = $this->createMock(IdsSensor::class);
         $sensor->method('detect')->willReturn(true);
         $sensor->method('getWeight')->willReturn(5);
         $sensor->method('getName')->willReturn('TestSensor');
@@ -51,8 +53,9 @@ class IdsManagerTest extends TestCase
         $manager = new IdsManager($container);
 
         // Create a sensor that doesn't detect threats
-        $sensor = $this->getMockForAbstractClass(IdsSensor::class);
+        $sensor = $this->createMock(IdsSensor::class);
         $sensor->method('detect')->willReturn(false);
+        $sensor->method('getName')->willReturn('test-sensor');
 
         $manager->addSensor($sensor);
 
@@ -69,9 +72,10 @@ class IdsManagerTest extends TestCase
         $manager = new IdsManager($container);
 
         // Create a sensor with weight 1
-        $sensor = $this->getMockForAbstractClass(IdsSensor::class);
+        $sensor = $this->createMock(IdsSensor::class);
         $sensor->method('detect')->willReturn(true);
         $sensor->method('getWeight')->willReturn(1);
+        $sensor->method('getName')->willReturn('test-sensor');
 
         $manager->addSensor($sensor);
 
