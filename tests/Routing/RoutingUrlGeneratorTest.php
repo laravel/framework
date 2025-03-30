@@ -1837,7 +1837,7 @@ class RoutingUrlGeneratorTest extends TestCase
         /**
          * Route with one required parameter and one optional parameter.
          */
-        $route = new Route(['GET'], 'postOptionalMethod/{post}/{method?}', ['as' => 'postOptionalMethod', fn() => '']);
+        $route = new Route(['GET'], 'postOptionalMethod/{post}/{method?}', ['as' => 'postOptionalMethod', fn () => '']);
         $routes->add($route);
 
         $this->assertSame(
@@ -1853,7 +1853,7 @@ class RoutingUrlGeneratorTest extends TestCase
         /**
          * Route with two optional parameters.
          */
-        $route = new Route(['GET'], 'optionalPostOptionalMethod/{post}/{method?}', ['as' => 'optionalPostOptionalMethod', fn() => '']);
+        $route = new Route(['GET'], 'optionalPostOptionalMethod/{post}/{method?}', ['as' => 'optionalPostOptionalMethod', fn () => '']);
         $routes->add($route);
 
         $this->assertSame(
@@ -1869,7 +1869,7 @@ class RoutingUrlGeneratorTest extends TestCase
         /**
          * Route with one default parameter, one required parameter, and one optional parameter.
          */
-        $route = new Route(['GET'], 'tenantPostOptionalMethod/{tenant}/{post}/{method?}', ['as' => 'tenantPostOptionalMethod', fn() => '']);
+        $route = new Route(['GET'], 'tenantPostOptionalMethod/{tenant}/{post}/{method?}', ['as' => 'tenantPostOptionalMethod', fn () => '']);
         $routes->add($route);
 
         // Passing one parameter
@@ -1893,7 +1893,7 @@ class RoutingUrlGeneratorTest extends TestCase
         /**
          * Route with two default parameters, one required parameter, and one optional parameter.
          */
-        $route = new Route(['GET'], 'tenantUserPostOptionalMethod/{tenant}/{user}/{post}/{method?}', ['as' => 'tenantUserPostOptionalMethod', fn() => '']);
+        $route = new Route(['GET'], 'tenantUserPostOptionalMethod/{tenant}/{user}/{post}/{method?}', ['as' => 'tenantUserPostOptionalMethod', fn () => '']);
         $routes->add($route);
 
         // Passing one parameter
@@ -1943,7 +1943,7 @@ class RoutingUrlGeneratorTest extends TestCase
          *
          * This tests interleaved default parameters when combined with optional parameters.
          */
-        $route = new Route(['GET'], 'tenantPostUserOptionalMethod/{tenant}/{post}/{user}/{method?}', ['as' => 'tenantPostUserOptionalMethod', fn() => '']);
+        $route = new Route(['GET'], 'tenantPostUserOptionalMethod/{tenant}/{post}/{user}/{method?}', ['as' => 'tenantPostUserOptionalMethod', fn () => '']);
         $routes->add($route);
 
         // Passing one parameter

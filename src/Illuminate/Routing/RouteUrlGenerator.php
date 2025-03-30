@@ -246,7 +246,7 @@ class RouteUrlGenerator
             if ($offset < 0) {
                 $offset = 0;
             }
-        } else if (count($requiredRouteParametersWithoutDefaultsOrNamedParameters) === 0 && count($parameters) !== 0) {
+        } elseif (count($requiredRouteParametersWithoutDefaultsOrNamedParameters) === 0 && count($parameters) !== 0) {
             // Handle the case where all passed parameters are for parameters that have default values...
             $remainingCount = count($parameters);
 
