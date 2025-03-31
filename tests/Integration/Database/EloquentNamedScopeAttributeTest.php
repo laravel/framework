@@ -6,7 +6,7 @@ use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\TestCase;
 
 #[WithMigration]
-class EloquentNamedScopeAttibuteTest extends TestCase
+class EloquentNamedScopeAttributeTest extends TestCase
 {
     protected $query = 'select * from "named_scope_users" where "email_verified_at" is not null';
 
