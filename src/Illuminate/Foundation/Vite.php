@@ -1023,4 +1023,14 @@ class Vite implements Htmlable
     {
         return $this->__invoke($this->entryPoints)->toHtml();
     }
+
+    /**
+     * Flush state.
+     *
+     * @return void
+     */
+    public function flush()
+    {
+        $this->preloadedAssets = [];
+    }
 }
