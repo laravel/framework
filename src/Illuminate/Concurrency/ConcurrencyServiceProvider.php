@@ -15,9 +15,11 @@ class ConcurrencyServiceProvider extends ServiceProvider implements DeferrablePr
      */
     public function register()
     {
-        $this->app->singleton('concurrency', function ($app) {
+        $this->app->singleton(ConcurrencyManager::class, function ($app) {
             return new ConcurrencyManager($app);
         });
+
+        $this->app->alias(ConcurrencyManager::class, 'concurrency');
     }
 
     /**
