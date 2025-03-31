@@ -164,10 +164,12 @@ trait InteractsWithQueue
             'Job failed but no exception was recorded.'
         );
 
+        $actualClass = get_class($this->job->failedWith);
+
         PHPUnit::assertInstanceOf(
             $expectedExceptionClass,
             $this->job->failedWith,
-            "Job was expected to fail with an instance of {$expectedExceptionClass}, but got " . get_class($this->job->failedWith)
+            "Job was expected to fail with an instance of {$expectedExceptionClass}, but got {$actualClass}"
         );
 
         return $this;
