@@ -427,7 +427,7 @@ class MailManager implements FactoryContract
                 : $this->createSymfonyTransport($config);
         }
 
-        return new $class($transports);
+        return new $class($transports, $config['retry_period'] ?? 60);
     }
 
     /**
