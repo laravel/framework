@@ -2,8 +2,6 @@
 
 ## [Unreleased](https://github.com/laravel/framework/compare/v12.4.0...12.x)
 
-* [12.x] Add Redis driver for concurrency by [@amirhossainfalah](https://github.com/amirhossainfalah) in https://github.com/laravel/framework/pull/????
-
 ## [v12.4.0](https://github.com/laravel/framework/compare/v12.3.0...v12.4.0) - 2025-03-29
 
 * [12.x] Reset PHP's peak memory usage when resetting scope for queue worker by [@TimWolla](https://github.com/TimWolla) in https://github.com/laravel/framework/pull/55069

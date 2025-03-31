@@ -24,6 +24,18 @@ return [
     |
     */
     'driver' => [
+        'process' => [
+            // Configuration for process driver
+        ],
+        
+        'fork' => [
+            // Configuration for fork driver
+        ],
+        
+        'sync' => [
+            // Configuration for sync driver
+        ],
+        
         'redis' => [
             'connection' => env('CONCURRENCY_REDIS_CONNECTION', 'default'),
             'queue_prefix' => env('CONCURRENCY_REDIS_PREFIX', 'laravel:concurrency:'),
