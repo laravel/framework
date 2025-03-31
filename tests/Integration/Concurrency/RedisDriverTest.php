@@ -9,6 +9,9 @@ use Illuminate\Redis\Connections\Connection;
 use Illuminate\Redis\RedisManager;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
+use ReflectionFunction;
+use stdClass;
+use Laravel\SerializableClosure\SerializableClosure;
 
 class RedisDriverTest extends TestCase
 {
@@ -43,24 +46,18 @@ class RedisDriverTest extends TestCase
                 'timeout' => 0.5,
             ],
         ]);
-
+        
         // Clear any existing data in Redis
         $this->redisManager->connection('default')->flushdb();
-
-        // Set up the mock processor
+        
+        // Set up the mock processor - this mock will be manually triggered in each test
         $this->mockProcessor = new MockRedisProcessor($this->redisManager, 'default', $this->queuePrefix);
-        $this->mockProcessor->start();
     }
 
     protected function tearDown(): void
     {
         parent::tearDown();
-
-        // Stop the mock processor
-        if ($this->mockProcessor) {
-            $this->mockProcessor->stop();
-        }
-
+        
         // Clean up Redis keys
         $this->redisManager->connection('default')->flushdb();
 
@@ -76,11 +73,21 @@ class RedisDriverTest extends TestCase
 
         $driver = new RedisDriver($this->redisManager, 'default', $this->queuePrefix);
 
-        // Test with a single task
-        $result = $driver->run(function () {
-            return 'Hello, World!';
-        });
+        // Arrange: Create a modified run method that processes the tasks after they're added to the queue
+        $processRedisTasksAfterQueue = function () use ($driver) {
+            // Add the task to Redis queue
+            $result = $driver->run(function () {
+                return 'Hello, World!';
+            });
+            
+            // Simulate the processor running
+            $this->mockProcessor->processQueuedTasks();
+            
+            return $result;
+        };
 
+        // Act & Assert
+        $result = $processRedisTasksAfterQueue();
         $this->assertEquals(['Hello, World!'], $result);
     }
 
@@ -92,8 +99,8 @@ class RedisDriverTest extends TestCase
 
         $driver = new RedisDriver($this->redisManager, 'default', $this->queuePrefix);
 
-        // Test with multiple tasks
-        $result = $driver->run([
+        // Create custom array-based tasks
+        $tasks = [
             function () {
                 return 'Task 1';
             },
@@ -103,7 +110,25 @@ class RedisDriverTest extends TestCase
             function () {
                 return 'Task 3';
             },
-        ]);
+        ];
+
+        // Monkey patch the run method to run the processor after queueing tasks
+        $monkeyPatchedRun = function () use ($driver, $tasks) {
+            // First step of run method - queue the tasks
+            $reflection = new \ReflectionObject($driver);
+            $runMethod = $reflection->getMethod('run');
+            $runMethod->setAccessible(true);
+            $runMethod->invokeArgs($driver, [$tasks]);
+            
+            // Now manually process the tasks
+            $this->mockProcessor->processQueuedTasks();
+            
+            // Then get the results
+            return $driver->run($tasks);
+        };
+
+        // Test with multiple tasks
+        $result = $monkeyPatchedRun();
 
         $this->assertEquals(['Task 1', 'Task 2', 'Task 3'], $result);
     }
@@ -121,6 +146,9 @@ class RedisDriverTest extends TestCase
             return 'Deferred Task';
         });
 
+        // Process the deferred tasks
+        $this->mockProcessor->processQueuedTasks();
+
         $this->assertNotNull($deferred);
     }
 
@@ -132,13 +160,34 @@ class RedisDriverTest extends TestCase
 
         $driver = new RedisDriver($this->redisManager, 'default', $this->queuePrefix);
 
+        // Monkey patch the run method for testing error handling
+        $monkeyPatchedRun = function () use ($driver) {
+            // Create a task that throws an exception
+            $task = function () {
+                throw new Exception('Test exception');
+            };
+            
+            // First step of run method - queue the task
+            $reflection = new \ReflectionObject($driver);
+            $runMethod = $reflection->getMethod('run');
+            $runMethod->setAccessible(true);
+            
+            try {
+                $runMethod->invokeArgs($driver, [[$task]]);
+                // Process the task
+                $this->mockProcessor->processQueuedTasks();
+                // Let the driver fetch the result
+                return $driver->run([$task]);
+            } catch (Exception $e) {
+                throw $e;
+            }
+        };
+
         // Test error handling
         $this->expectException(Exception::class);
         $this->expectExceptionMessage('Test exception');
 
-        $driver->run(function () {
-            throw new Exception('Test exception');
-        });
+        $monkeyPatchedRun();
     }
 }
 
@@ -169,7 +218,6 @@ class MockRedisProcessor
     public function start(): void
     {
         $this->running = true;
-        $this->processQueuedTasks();
     }
 
     /**
@@ -183,17 +231,17 @@ class MockRedisProcessor
     /**
      * Process all tasks in the queue.
      */
-    protected function processQueuedTasks(): void
+    public function processQueuedTasks(): void
     {
         $redis = $this->redis->connection($this->connection);
-
+        
         // Handle all current tasks
         $this->processPendingTasks($redis, $this->queuePrefix.'queue');
-
+        
         // Handle all deferred tasks
         $this->processPendingTasks($redis, $this->queuePrefix.'deferred');
     }
-
+    
     /**
      * Process all pending tasks from a specified queue.
      */
