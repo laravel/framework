@@ -9,9 +9,6 @@ use Illuminate\Redis\Connections\Connection;
 use Illuminate\Redis\RedisManager;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
-use ReflectionFunction;
-use stdClass;
-use Laravel\SerializableClosure\SerializableClosure;
 
 class RedisDriverTest extends TestCase
 {
@@ -46,10 +43,10 @@ class RedisDriverTest extends TestCase
                 'timeout' => 0.5,
             ],
         ]);
-        
+
         // Clear any existing data in Redis
         $this->redisManager->connection('default')->flushdb();
-        
+
         // Set up the mock processor
         $this->mockProcessor = new MockRedisProcessor($this->redisManager, 'default', $this->queuePrefix);
         $this->mockProcessor->start();
@@ -58,12 +55,12 @@ class RedisDriverTest extends TestCase
     protected function tearDown(): void
     {
         parent::tearDown();
-        
+
         // Stop the mock processor
         if ($this->mockProcessor) {
             $this->mockProcessor->stop();
         }
-        
+
         // Clean up Redis keys
         $this->redisManager->connection('default')->flushdb();
 
@@ -189,14 +186,14 @@ class MockRedisProcessor
     protected function processQueuedTasks(): void
     {
         $redis = $this->redis->connection($this->connection);
-        
+
         // Handle all current tasks
         $this->processPendingTasks($redis, $this->queuePrefix.'queue');
-        
+
         // Handle all deferred tasks
         $this->processPendingTasks($redis, $this->queuePrefix.'deferred');
     }
-    
+
     /**
      * Process all pending tasks from a specified queue.
      */
