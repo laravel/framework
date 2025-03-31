@@ -831,7 +831,7 @@ class PostgresGrammar extends Grammar
      * @param  bool  $value
      * @return void
      */
-    public static function cascadeOnTrucate(bool $value = true)
+    public static function cascadeOnTruncate(bool $value = true)
     {
         static::$cascadeTruncate = $value;
     }
