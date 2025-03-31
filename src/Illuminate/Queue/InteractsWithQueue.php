@@ -148,6 +148,34 @@ trait InteractsWithQueue
     /**
      * Assert that the job was manually failed with a specific exception.
      *
+     * @return $this
+     */
+    public function assertFailedWith(string $expectedExceptionClass)
+    {
+        $this->ensureQueueInteractionsHaveBeenFaked();
+
+        PHPUnit::assertTrue(
+            $this->job->hasFailed(),
+            'Job was expected to be manually failed, but was not.'
+        );
+
+        PHPUnit::assertNotNull(
+            $this->job->failedWith,
+            'Job failed but no exception was recorded.'
+        );
+
+        PHPUnit::assertInstanceOf(
+            $expectedExceptionClass,
+            $this->job->failedWith,
+            "Job was expected to fail with an instance of {$expectedExceptionClass}, but got " . get_class($this->job->failedWith)
+        );
+
+        return $this;
+    }
+
+    /**
+     * Assert that the job was manually failed with a specific exception.
+     *
      * @param  \Throwable|string  $exception
      * @return $this
      */
