@@ -483,10 +483,10 @@ class BelongsToMany extends Relation
 
         $this->pivotValues[] = compact('column', 'value');
 
-        // Add where clause for filtering but track it separately so it doesn't 
+        // Add where clause for filtering but track it separately so it doesn't
         // prevent the pivot model observers from working
         $this->wherePivot($column, '=', $value);
-        
+
         // Mark this where clause as coming from withPivotValue
         $this->pivotWheres[count($this->pivotWheres) - 1]['from_pivot_value'] = true;
 

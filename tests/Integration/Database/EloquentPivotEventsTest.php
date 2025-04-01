@@ -166,7 +166,7 @@ class EloquentPivotEventsTest extends DatabaseTestCase
         $adminRelation = $project->belongsToMany(
             PivotEventsTestUser::class, 'project_users', 'project_id', 'user_id'
         )->using(PivotEventsTestCollaborator::class)
-        ->withPivotValue('role', 'admin');
+            ->withPivotValue('role', 'admin');
 
         // Update through the relation with withPivotValue
         $adminRelation->updateExistingPivot($user->id, ['permissions' => ['manage']]);

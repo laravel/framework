@@ -572,12 +572,12 @@ trait InteractsWithPivotTable
         foreach ($this->pivotWheres as $arguments) {
             // Clone the arguments to avoid modifying the original array
             $argumentsToApply = $arguments;
-            
+
             // Remove the from_pivot_value flag before applying to the query
             if (isset($argumentsToApply['from_pivot_value'])) {
                 unset($argumentsToApply['from_pivot_value']);
             }
-            
+
             $query->where(...$argumentsToApply);
         }
 
