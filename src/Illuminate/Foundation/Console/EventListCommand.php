@@ -55,17 +55,6 @@ class EventListCommand extends Command
             return;
         }
 
-        $this->displayEvents($events);
-    }
-
-    /**
-     * Dispatch to either JSON output or CLI output.
-     *
-     * @param  \Illuminate\Support\Collection  $events
-     * @return void
-     */
-    protected function displayEvents(Collection $events)
-    {
         if ($this->option('json')) {
             $this->displayJson($events);
         } else {
@@ -92,7 +81,7 @@ class EventListCommand extends Command
     }
 
     /**
-     * Display the events and their listeners in the standard CLI format.
+     * Display the events and their listeners for the CLI.
      *
      * @param  \Illuminate\Support\Collection  $events
      * @return void
