@@ -122,18 +122,18 @@ class DB extends Facade
     /**
      * Indicate if destructive Artisan commands should be prohibited.
      *
-     * Prohibits: db:wipe, migrate:fresh, migrate:refresh, and migrate:reset
+     * Prohibits: db:wipe, migrate:fresh, migrate:refresh, migrate:reset, migrate:rollback
      *
      * @param  bool  $prohibit
      * @return void
      */
     public static function prohibitDestructiveCommands(bool $prohibit = true)
     {
+        WipeCommand::prohibit($prohibit);
         FreshCommand::prohibit($prohibit);
         RefreshCommand::prohibit($prohibit);
         ResetCommand::prohibit($prohibit);
         RollbackCommand::prohibit($prohibit);
-        WipeCommand::prohibit($prohibit);
     }
 
     /**
