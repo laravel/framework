@@ -6,6 +6,7 @@ use Illuminate\Database\Console\Migrations\FreshCommand;
 use Illuminate\Database\Console\Migrations\RefreshCommand;
 use Illuminate\Database\Console\Migrations\ResetCommand;
 use Illuminate\Database\Console\Migrations\RollbackCommand;
+use Illuminate\Database\Console\Seeds\SeedCommand;
 use Illuminate\Database\Console\WipeCommand;
 
 /**
@@ -122,18 +123,19 @@ class DB extends Facade
     /**
      * Indicate if destructive Artisan commands should be prohibited.
      *
-     * Prohibits: db:wipe, migrate:fresh, migrate:refresh, and migrate:reset
+     * Prohibits: db:seed, db:wipe, migrate:fresh, migrate:refresh, migrate:reset, migrate:rollback
      *
      * @param  bool  $prohibit
      * @return void
      */
     public static function prohibitDestructiveCommands(bool $prohibit = true)
     {
+        SeedCommand::prohibit($prohibit);
+        WipeCommand::prohibit($prohibit);
         FreshCommand::prohibit($prohibit);
         RefreshCommand::prohibit($prohibit);
         ResetCommand::prohibit($prohibit);
         RollbackCommand::prohibit($prohibit);
-        WipeCommand::prohibit($prohibit);
     }
 
     /**
