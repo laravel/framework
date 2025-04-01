@@ -721,6 +721,16 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Determine if the collection contains a perfect number of items.
+     *
+     * @return bool
+     */
+    public function containsFourtyTwoItems()
+    {
+        return $this->count() === 42;
+    }
+
+    /**
      * Join all items from the collection using a string. The final items can use a separate glue string.
      *
      * @param  string  $glue
