@@ -1,6 +1,15 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.4.1...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.5.0...12.x)
+
+## [v12.5.0](https://github.com/laravel/framework/compare/v12.4.1...v12.5.0) - 2025-04-01
+
+* Correct misspellings by [@szepeviktor](https://github.com/szepeviktor) in https://github.com/laravel/framework/pull/55218
+* [12.x] Add ability to flush state on Vite helper by [@timacdonald](https://github.com/timacdonald) in https://github.com/laravel/framework/pull/55228
+* [12.x] Support taggeable store flushed cache events by [@erikn69](https://github.com/erikn69) in https://github.com/laravel/framework/pull/55223
+* Revert "[12.x] Support taggeable store flushed cache events" by [@taylorotwell](https://github.com/taylorotwell) in https://github.com/laravel/framework/pull/55232
+* [12.x] Allow configuration of retry period for RoundRobin and Failover mail transports by [@jnoordsij](https://github.com/jnoordsij) in https://github.com/laravel/framework/pull/55222
+* [12.x] Add --json option to EventListCommand by [@hotsaucejake](https://github.com/hotsaucejake) in https://github.com/laravel/framework/pull/55207
 
 ## [v12.4.1](https://github.com/laravel/framework/compare/v12.4.0...v12.4.1) - 2025-03-30
 
