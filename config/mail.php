@@ -85,7 +85,7 @@ return [
                 'smtp',
                 'log',
             ],
-            'retry_period' => 60,
+            'retry_after' => 60,
         ],
 
         'roundrobin' => [
@@ -94,7 +94,7 @@ return [
                 'ses',
                 'postmark',
             ],
-            'retry_period' => 60,
+            'retry_after' => 60,
         ],
 
     ],
