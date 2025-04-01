@@ -1087,11 +1087,10 @@ trait EnumeratesValues
 
             $operator = '=';
         }
-
+        $value = enum_value($value);
         return function ($item) use ($key, $operator, $value) {
             $retrieved = enum_value(data_get($item, $key));
-            $value = enum_value($value);
-
+            
             $strings = array_filter([$retrieved, $value], function ($value) {
                 return match (true) {
                     is_string($value) => true,
