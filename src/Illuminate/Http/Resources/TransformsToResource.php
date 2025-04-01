@@ -2,6 +2,7 @@
 
 namespace Illuminate\Http\Resources;
 
+use LogicException;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 trait TransformsToResource
@@ -32,11 +33,10 @@ trait TransformsToResource
      */
     protected function guessResource(): JsonResource
     {
-        $className = get_class($this);
-
-        $resourceClass = static::guessResourceName();
-
-        throw_unless(class_exists($resourceClass), \LogicException::class, sprintf('Failed to find resource class for model [%s].', $className));
+        throw_unless(
+            class_exists($resourceClass = static::guessResourceName()),
+            LogicException::class, sprintf('Failed to find resource class for model [%s].', get_class($this))
+        );
 
         return $resourceClass::make($this);
     }
@@ -48,6 +48,15 @@ trait TransformsToResource
      */
     public static function guessResourceName(): string
     {
-        return sprintf('App\Http\Resources\%sResource', class_basename(static::class));
+        $modelClass = static::class;
+
+        $modelNamespace = str_replace('App\\Models\\', '', $modelClass);
+        $modelNamespace = str_replace('\\'.class_basename($modelClass), '', $modelNamespace);
+
+        return sprintf(
+            'App\\Http\\Resources\\%s%sResource',
+            $modelNamespace ? $modelNamespace.'\\' : '',
+            class_basename($modelClass)
+        );
     }
 }

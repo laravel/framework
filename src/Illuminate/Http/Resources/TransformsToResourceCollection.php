@@ -5,6 +5,7 @@ namespace Illuminate\Http\Resources;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
+use LogicException;
 
 trait TransformsToResourceCollection
 {
@@ -40,16 +41,16 @@ trait TransformsToResourceCollection
 
         $model = $this->items[0] ?? null;
 
-        throw_unless(is_object($model), \LogicException::class, 'Resource collection guesser expects the collection to contain objects.');
+        throw_unless(is_object($model), LogicException::class, 'Resource collection guesser expects the collection to contain objects.');
 
         /** @var class-string<Model> $className */
         $className = get_class($model);
 
-        throw_unless(method_exists($className, 'guessResourceName'), \LogicException::class, sprintf('Expected class %s to implement guessResourceName method. Make sure the model uses the TransformsToResource trait.', $className));
+        throw_unless(method_exists($className, 'guessResourceName'), LogicException::class, sprintf('Expected class %s to implement guessResourceName method. Make sure the model uses the TransformsToResource trait.', $className));
 
         $resourceClass = $className::guessResourceName();
 
-        throw_unless(class_exists($resourceClass), \LogicException::class, sprintf('Failed to find resource class for model [%s].', $className));
+        throw_unless(class_exists($resourceClass), LogicException::class, sprintf('Failed to find resource class for model [%s].', $className));
 
         return $resourceClass::collection($this);
     }
