@@ -51,8 +51,8 @@ class AnyOf implements Rule, ValidatorAwareRule
     {
         foreach ($this->rules as $rule) {
             $validator = Validator::make(
-                Arr::isAssoc(Arr::wrap($value)) ? $value : [$attribute => $value],
-                Arr::isAssoc(Arr::wrap($rule)) ? $rule : [$attribute => $rule],
+                Arr::isAssoc(Arr::wrap($value)) ? $value : [$value],
+                Arr::isAssoc(Arr::wrap($rule)) ? $rule : [$rule],
                 $this->validator->customMessages,
                 $this->validator->customAttributes
             );

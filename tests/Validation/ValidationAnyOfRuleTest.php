@@ -221,6 +221,34 @@ class ValidationAnyOfRuleTest extends TestCase
         $this->assertFalse($validator->passes());
     }
 
+    public function testStarRuleSimple()
+    {
+        $rule = [
+            'persons.*.age' => ['required', Rule::anyOf([
+                ['min:10'],
+                ['integer'],
+            ])],
+        ];
+
+        $validator = new Validator(resolve('translator'), [
+            'persons' => [
+                ['age' => 12],
+                ['age' => 'foobar'],
+            ],
+        ], $rule);
+
+        $this->assertFalse($validator->passes());
+
+        $validator = new Validator(resolve('translator'), [
+            'persons' => [
+                ['age' => 12],
+                ['age' => 'foobarbazqux'],
+            ],
+        ], $rule);
+
+        $this->assertTrue($validator->passes());
+    }
+
     protected function setUpRuleSets()
     {
         $this->taggedUnionRules = [
