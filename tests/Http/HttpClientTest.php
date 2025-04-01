@@ -2362,6 +2362,16 @@ class HttpClientTest extends TestCase
         ]);
     }
 
+    public function testRequestException()
+    {
+        $requestException = $this->factory->requestException(['code' => 'not_found'], 404, ['X-RateLimit-Remaining' => 199]);
+
+        $this->assertInstanceOf(RequestException::class, $requestException);
+        $this->assertEqualsCanonicalizing(['code' => 'not_found'], $requestException->response->json());
+        $this->assertEquals(404, $requestException->response->status());
+        $this->assertEquals(199, $requestException->response->header('X-RateLimit-Remaining'));
+    }
+
     public function testFakeConnectionException()
     {
         $this->factory->fake($this->factory->failedConnection('Fake'));

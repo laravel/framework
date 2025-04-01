@@ -167,7 +167,7 @@ class Factory
      * @param  array<string, mixed>  $headers
      * @return \GuzzleHttp\Psr7\Response
      */
-    protected static function psr7Response($body = null, $status = 200, $headers = [])
+    public static function psr7Response($body = null, $status = 200, $headers = [])
     {
         if (is_array($body)) {
             $body = json_encode($body);
