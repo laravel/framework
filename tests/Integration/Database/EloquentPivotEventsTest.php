@@ -152,6 +152,31 @@ class EloquentPivotEventsTest extends DatabaseTestCase
         $project->equipments()->save($equipment);
         $equipment->projects()->sync([]);
     }
+
+    public function testPivotWithPivotValueTriggerEvents()
+    {
+        $user = PivotEventsTestUser::forceCreate(['email' => 'taylor@laravel.com']);
+        $project = PivotEventsTestProject::forceCreate(['name' => 'Test Project']);
+
+        // Attach with a specific role
+        $project->collaborators()->attach($user, ['role' => 'admin']);
+        PivotEventsTestCollaborator::$eventsCalled = [];
+
+        // Get the relation with withPivotValue
+        $adminRelation = $project->belongsToMany(
+            PivotEventsTestUser::class, 'project_users', 'project_id', 'user_id'
+        )->using(PivotEventsTestCollaborator::class)
+        ->withPivotValue('role', 'admin');
+
+        // Update through the relation with withPivotValue
+        $adminRelation->updateExistingPivot($user->id, ['permissions' => ['manage']]);
+        $this->assertEquals(['saving', 'updating', 'updated', 'saved'], PivotEventsTestCollaborator::$eventsCalled, 'Observer events should fire on updateExistingPivot with withPivotValue');
+
+        // Detach through the relation with withPivotValue
+        PivotEventsTestCollaborator::$eventsCalled = [];
+        $adminRelation->detach($user->id);
+        $this->assertEquals(['deleting', 'deleted'], PivotEventsTestCollaborator::$eventsCalled, 'Observer events should fire on detach with withPivotValue');
+    }
 }
 
 class PivotEventsTestUser extends Model

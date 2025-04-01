@@ -208,7 +208,7 @@ trait InteractsWithPivotTable
     public function updateExistingPivot($id, array $attributes, $touch = true)
     {
         if ($this->using &&
-            empty($this->pivotWheres) &&
+            empty($this->getNonPivotValueWhereClauses()) &&
             empty($this->pivotWhereIns) &&
             empty($this->pivotWhereNulls)) {
             return $this->updateExistingPivotUsingCustomClass($id, $attributes, $touch);
@@ -437,7 +437,7 @@ trait InteractsWithPivotTable
     {
         if ($this->using &&
             ! empty($ids) &&
-            empty($this->pivotWheres) &&
+            empty($this->getNonPivotValueWhereClauses()) &&
             empty($this->pivotWhereIns) &&
             empty($this->pivotWhereNulls)) {
             $results = $this->detachUsingCustomClass($ids);
@@ -570,7 +570,15 @@ trait InteractsWithPivotTable
         $query = $this->newPivotStatement();
 
         foreach ($this->pivotWheres as $arguments) {
-            $query->where(...$arguments);
+            // Clone the arguments to avoid modifying the original array
+            $argumentsToApply = $arguments;
+            
+            // Remove the from_pivot_value flag before applying to the query
+            if (isset($argumentsToApply['from_pivot_value'])) {
+                unset($argumentsToApply['from_pivot_value']);
+            }
+            
+            $query->where(...$argumentsToApply);
         }
 
         foreach ($this->pivotWhereIns as $arguments) {
@@ -690,5 +698,19 @@ trait InteractsWithPivotTable
             'string' => (string) $value,
             default => $value,
         };
+    }
+
+    /**
+     * Get the pivot where clauses that are not from withPivotValue.
+     *
+     * @return array
+     */
+    protected function getNonPivotValueWhereClauses()
+    {
+        return collect($this->pivotWheres)
+            ->filter(function ($where) {
+                return empty($where['from_pivot_value'] ?? false);
+            })
+            ->all();
     }
 }
