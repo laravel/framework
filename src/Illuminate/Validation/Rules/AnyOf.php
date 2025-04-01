@@ -18,13 +18,6 @@ class AnyOf implements Rule, ValidatorAwareRule
     protected array $rules = [];
 
     /**
-     * The error message after validation, if any.
-     *
-     * @var array
-     */
-    protected $messages = [];
-
-    /**
      * The validator performing the validation.
      *
      * @var \Illuminate\Validation\Validator
@@ -71,8 +64,6 @@ class AnyOf implements Rule, ValidatorAwareRule
             }
         }
 
-        $this->validator->addFailure($attribute, 'any_of');
-
         return false;
     }
 
@@ -83,7 +74,11 @@ class AnyOf implements Rule, ValidatorAwareRule
      */
     public function message()
     {
-        return $this->messages;
+        $message = $this->validator->getTranslator()->get('validation.any_of');
+
+        return $message === 'validation.any_of'
+            ? ['The :attribute field is invalid.']
+            : $message;
     }
 
     /**
