@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use Illuminate\Console\Command;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Console\View\Components\Factory;
 use Illuminate\Container\Container;
@@ -103,8 +104,39 @@ class SeedCommandTest extends TestCase
         $container->shouldHaveReceived('call')->with([$command, 'handle']);
     }
 
+    public function testProhibitable()
+    {
+        $input = new ArrayInput([]);
+        $output = new NullOutput;
+        $outputStyle = new OutputStyle($input, $output);
+
+        $resolver = m::mock(ConnectionResolverInterface::class);
+
+        $container = m::mock(Container::class);
+        $container->shouldReceive('call');
+        $container->shouldReceive('runningUnitTests')->andReturn('true');
+        $container->shouldReceive('make')->with(OutputStyle::class, m::any())->andReturn(
+            $outputStyle
+        );
+        $container->shouldReceive('make')->with(Factory::class, m::any())->andReturn(
+            new Factory($outputStyle)
+        );
+
+        $command = new SeedCommand($resolver);
+        $command->setLaravel($container);
+
+        // call run to set up IO, then fire manually.
+        $command->run($input, $output);
+
+        SeedCommand::prohibit();
+
+        Assert::assertSame(Command::FAILURE, $command->handle());
+    }
+
     protected function tearDown(): void
     {
+        SeedCommand::prohibit(false);
+
         Model::unsetEventDispatcher();
 
         m::close();
