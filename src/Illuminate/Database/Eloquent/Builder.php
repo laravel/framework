@@ -595,9 +595,9 @@ class Builder implements BuilderContract
      * @param  array<int, array<string, mixed>>  $values
      * @return bool
      */
-    public function hydrateAndInsert(array $values)
+    public function fillAndInsert(array $values)
     {
-        return $this->insert($this->hydrateForInsert($values));
+        return $this->insert($this->fillForInsert($values));
     }
 
     /**
@@ -608,9 +608,9 @@ class Builder implements BuilderContract
      * @param  array<int, array<string, mixed>>  $values
      * @return int
      */
-    public function hydrateAndInsertOrIgnore(array $values)
+    public function fillAndInsertOrIgnore(array $values)
     {
-        return $this->insertOrIgnore($this->hydrateForInsert($values));
+        return $this->insertOrIgnore($this->fillForInsert($values));
     }
 
     /**
@@ -621,9 +621,9 @@ class Builder implements BuilderContract
      * @param  array<string, mixed>  $values
      * @return int
      */
-    public function hydrateAndInsertGetId(array $values)
+    public function fillAndInsertGetId(array $values)
     {
-        return $this->insertGetId($this->hydrateForInsert([$values])[0]);
+        return $this->insertGetId($this->fillForInsert([$values])[0]);
     }
 
     /**
@@ -633,7 +633,7 @@ class Builder implements BuilderContract
      * @param  array<int, array<string, mixed>>  $values
      * @return array<int, array<string, mixed>>
      */
-    public function hydrateForInsert(array $values)
+    public function fillForInsert(array $values)
     {
         if (empty($values)) {
             return [];
@@ -644,7 +644,7 @@ class Builder implements BuilderContract
         }
 
         $this->model->unguarded(function () use (&$values) {
-            foreach($values as $key => $rowValues) {
+            foreach ($values as $key => $rowValues) {
                 $values[$key] = tap(
                     $this->newModelInstance($rowValues),
                     fn ($model) => $model->setUniqueIds()

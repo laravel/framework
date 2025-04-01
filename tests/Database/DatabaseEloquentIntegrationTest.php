@@ -2474,12 +2474,12 @@ class DatabaseEloquentIntegrationTest extends TestCase
         }
     }
 
-    public function testCanEnrichAndInsert()
+    public function testCanFillAndInsert()
     {
         DB::enableQueryLog();
         Carbon::setTestNow('2025-03-15T07:32:00Z');
 
-        $this->assertTrue(EloquentTestUser::hydrateAndInsert([
+        $this->assertTrue(EloquentTestUser::fillAndInsert([
             ['email' => 'taylor@laravel.com', 'birthday' => null],
             ['email' => 'nuno@laravel.com', 'birthday' => new Carbon('1980-01-01')],
             ['email' => 'tim@laravel.com', 'birthday' => '1987-11-01', 'created_at' => '2025-01-02T02:00:55', 'updated_at' => Carbon::parse('2025-02-19T11:41:13')],
@@ -2505,7 +2505,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         DB::flushQueryLog();
 
-        $this->assertTrue(EloquentTestWithJSON::hydrateAndInsert([
+        $this->assertTrue(EloquentTestWithJSON::fillAndInsert([
             ['id' => 1, 'json' => ['album' => 'Keep It Like a Secret', 'release_date' => '1999-02-02']],
             ['id' => 2, 'json' => (object) ['album' => 'You In Reverse', 'release_date' => '2006-04-11']],
         ]));
@@ -2520,7 +2520,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         });
     }
 
-    public function testCanHydrateAndInsertWithUniqueStringIds()
+    public function testCanFillAndInsertWithUniqueStringIds()
     {
         Str::createUuidsUsingSequence([
             '00000000-0000-7000-0000-000000000000',
@@ -2528,7 +2528,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
             '22222222-0000-7000-0000-000000000000',
         ]);
 
-        $this->assertTrue(ModelWithUniqueStringIds::hydrateAndInsert([
+        $this->assertTrue(ModelWithUniqueStringIds::fillAndInsert([
             [
                 'name' => 'Taylor', 'role' => IntBackedRole::Admin, 'role_string' => StringBackedRole::Admin,
             ],
@@ -2567,7 +2567,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertSame('22222222-0000-7000-0000-000000000000', $chris->uuid);
     }
 
-    public function testHydrateAndInsertOrIgnore()
+    public function testFillAndInsertOrIgnore()
     {
         Str::createUuidsUsingSequence([
             '00000000-0000-7000-0000-000000000000',
@@ -2575,13 +2575,13 @@ class DatabaseEloquentIntegrationTest extends TestCase
             '22222222-0000-7000-0000-000000000000',
         ]);
 
-        $this->assertEquals(1, ModelWithUniqueStringIds::hydrateAndInsertOrIgnore([
+        $this->assertEquals(1, ModelWithUniqueStringIds::fillAndInsertOrIgnore([
             [
                 'id' => 1, 'name' => 'Taylor', 'role' => IntBackedRole::Admin, 'role_string' => StringBackedRole::Admin,
             ],
         ]));
 
-        $this->assertSame(1, ModelWithUniqueStringIds::hydrateAndInsertOrIgnore([
+        $this->assertSame(1, ModelWithUniqueStringIds::fillAndInsertOrIgnore([
             [
                 'id' => 1, 'name' => 'Taylor', 'role' => IntBackedRole::Admin, 'role_string' => StringBackedRole::Admin,
             ],
@@ -2598,7 +2598,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         );
     }
 
-    public function testMergeBeforeInsertGetId()
+    public function testFillAndInsertGetId()
     {
         Str::createUuidsUsingSequence([
             '00000000-0000-7000-0000-000000000000',
@@ -2606,7 +2606,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         DB::enableQueryLog();
 
-        $this->assertIsInt($newId = ModelWithUniqueStringIds::hydrateAndinsertGetId([
+        $this->assertIsInt($newId = ModelWithUniqueStringIds::fillAndInsertGetId([
             'name' => 'Taylor',
             'role' => IntBackedRole::Admin,
             'role_string' => StringBackedRole::Admin,
