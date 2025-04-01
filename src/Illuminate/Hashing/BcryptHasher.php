@@ -85,7 +85,7 @@ class BcryptHasher extends AbstractHasher implements HasherContract
         }
 
         if ($this->verifyAlgorithm && ! $this->isUsingCorrectAlgorithm($hashedValue)) {
-            throw new RuntimeException('This password does not use the Bcrypt algorithm.');
+            throw new RuntimeException('Authentication failed: The stored password is either missing, not hashed, or the database column is incorrect. Ensure your database has a "password" column with properly hashed values.');
         }
 
         return parent::check($value, $hashedValue, $options);
