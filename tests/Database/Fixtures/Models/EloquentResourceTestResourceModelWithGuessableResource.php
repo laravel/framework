@@ -1,0 +1,11 @@
+<?php
+
+namespace Illuminate\Tests\Database\Fixtures\Models;
+
+use Illuminate\Database\Eloquent\Concerns\HasUlids;
+use Illuminate\Database\Eloquent\Model;
+
+class EloquentResourceTestResourceModelWithGuessableResource extends Model
+{
+    //
+}

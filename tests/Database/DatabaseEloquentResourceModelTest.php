@@ -4,6 +4,8 @@ namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Tests\Database\Fixtures\Models\EloquentResourceTestResourceModel;
+use Illuminate\Tests\Database\Fixtures\Models\EloquentResourceTestResourceModelWithGuessableResource;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentResourceModelTest extends TestCase
@@ -20,7 +22,7 @@ class DatabaseEloquentResourceModelTest extends TestCase
     public function testItThrowsExceptionWhenResourceCannotBeFound()
     {
         $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('Failed to find resource class for model [Illuminate\Tests\Database\EloquentResourceTestResourceModel].');
+        $this->expectExceptionMessage('Failed to find resource class for model [Illuminate\Tests\Database\Fixtures\Models\EloquentResourceTestResourceModel].');
 
         $model = new EloquentResourceTestResourceModel();
         $model->toResource();
@@ -30,7 +32,7 @@ class DatabaseEloquentResourceModelTest extends TestCase
     {
         $model = new EloquentResourceTestResourceModelWithGuessableResource();
 
-        class_alias(EloquentResourceTestJsonResource::class, 'App\Http\Resources\EloquentResourceTestResourceModelWithGuessableResourceResource');
+        class_alias(EloquentResourceTestJsonResource::class, 'Illuminate\Tests\Database\Fixtures\Http\Resources\EloquentResourceTestResourceModelWithGuessableResourceResource');
 
         $resource = $model->toResource();
 
@@ -41,18 +43,8 @@ class DatabaseEloquentResourceModelTest extends TestCase
     public function testItCanGuessResourceName()
     {
         $model = new EloquentResourceTestResourceModel();
-        $this->assertEquals('App\Http\Resources\EloquentResourceTestResourceModelResource', $model::guessResourceName());
+        $this->assertEquals('Illuminate\Tests\Database\Fixtures\Http\Resources\EloquentResourceTestResourceModelResource', $model::guessResourceName());
     }
-}
-
-class EloquentResourceTestResourceModel extends Model
-{
-    //
-}
-
-class EloquentResourceTestResourceModelWithGuessableResource extends Model
-{
-    //
 }
 
 class EloquentResourceTestJsonResource extends JsonResource

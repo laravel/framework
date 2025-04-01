@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Database;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Tests\Database\Fixtures\Models\EloquentResourceCollectionTestModel;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentResourceCollectionTest extends TestCase
@@ -23,7 +24,7 @@ class DatabaseEloquentResourceCollectionTest extends TestCase
     public function testItThrowsExceptionWhenResourceCannotBeFound()
     {
         $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('Failed to find resource class for model [Illuminate\Tests\Database\EloquentResourceCollectionTestModel].');
+        $this->expectExceptionMessage('Failed to find resource class for model [Illuminate\Tests\Database\Fixtures\Models\EloquentResourceCollectionTestModel].');
 
         $collection = new Collection([
             new EloquentResourceCollectionTestModel(),
@@ -37,17 +38,12 @@ class DatabaseEloquentResourceCollectionTest extends TestCase
             new EloquentResourceCollectionTestModel(),
         ]);
 
-        class_alias(EloquentResourceCollectionTestResource::class, 'App\Http\Resources\EloquentResourceCollectionTestModelResource');
+        class_alias(EloquentResourceCollectionTestResource::class, 'Illuminate\Tests\Database\Fixtures\Http\Resources\EloquentResourceCollectionTestModelResource');
 
         $resource = $collection->toResourceCollection();
 
         $this->assertInstanceOf(JsonResource::class, $resource);
     }
-}
-
-class EloquentResourceCollectionTestModel extends Model
-{
-    //
 }
 
 class EloquentResourceCollectionTestResource extends JsonResource

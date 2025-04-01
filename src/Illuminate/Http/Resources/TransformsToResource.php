@@ -2,8 +2,9 @@
 
 namespace Illuminate\Http\Resources;
 
-use LogicException;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Str;
+use LogicException;
 
 trait TransformsToResource
 {
@@ -33,8 +34,10 @@ trait TransformsToResource
      */
     protected function guessResource(): JsonResource
     {
+        $resourceClass = static::guessResourceName();
+
         throw_unless(
-            class_exists($resourceClass = static::guessResourceName()),
+            is_string($resourceClass) && class_exists($resourceClass),
             LogicException::class, sprintf('Failed to find resource class for model [%s].', get_class($this))
         );
 
@@ -50,12 +53,25 @@ trait TransformsToResource
     {
         $modelClass = static::class;
 
-        $modelNamespace = str_replace('App\\Models\\', '', $modelClass);
-        $modelNamespace = str_replace('\\'.class_basename($modelClass), '', $modelNamespace);
+        if (! Str::contains($modelClass, '\\Models\\')) {
+            return false;
+        }
+
+        // Get everything after the "Models" namespace...
+        $relativeNamespace = Str::after($modelClass, '\\Models\\');
+        $relativeNamespace = str_replace('\\'.class_basename($modelClass), '', $relativeNamespace);
+
+        if ($relativeNamespace === class_basename($modelClass)) {
+            $relativeNamespace = '';
+        }
+
+        // Get the root namespace (everything before "Models")...
+        $rootNamespace = Str::before($modelClass, '\\Models');
 
         return sprintf(
-            'App\\Http\\Resources\\%s%sResource',
-            $modelNamespace ? $modelNamespace.'\\' : '',
+            '%s\\Http\\Resources\\%s%sResource',
+            $rootNamespace,
+            $relativeNamespace ? $relativeNamespace.'\\' : '',
             class_basename($modelClass)
         );
     }
