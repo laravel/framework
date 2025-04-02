@@ -154,15 +154,41 @@ class Factory
      */
     public static function response($body = null, $status = 200, $headers = [])
     {
+        return Create::promiseFor(
+            static::psr7Response($body, $status, $headers)
+        );
+    }
+
+    /**
+     * Create a new PSR-7 response instance for use during stubbing.
+     *
+     * @param  array|string|null  $body
+     * @param  int  $status
+     * @param  array<string, mixed>  $headers
+     * @return \GuzzleHttp\Psr7\Response
+     */
+    public static function psr7Response($body = null, $status = 200, $headers = [])
+    {
         if (is_array($body)) {
             $body = json_encode($body);
 
             $headers['Content-Type'] = 'application/json';
         }
 
-        $response = new Psr7Response($status, $headers, $body);
+        return new Psr7Response($status, $headers, $body);
+    }
 
-        return Create::promiseFor($response);
+    /**
+     * Create a new RequestException instance for use during stubbing.
+     *
+     * @param  array|string|null  $body
+     * @param  int  $status
+     * @param  array<string, mixed>  $headers
+     * @return \Illuminate\Http\Client\RequestException
+     */
+    public static function requestException($body = null, $status = 200, $headers = [])
+    {
+        return new RequestException(new Response(static::psr7Response($body, $status, $headers)));
     }
 
     /**
