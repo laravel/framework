@@ -249,28 +249,32 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
-     * Load a relationship path with types if it is not already eager loaded.
+     * Load a relationship path for models of the given type if it is not already eager loaded.
      *
+     * @param  array  $tuples
      * @return void
      */
-    public function loadMissingRelationWithTypes(array $path)
+    public function loadMissingRelationsViaRelationAndClassTuples(array $tuples)
     {
-        [$name, $class] = array_shift($path);
+        [$relation, $class] = array_shift($tuples);
 
-        $this->filter(fn ($model) => ! is_null($model) && ! $model->relationLoaded($name) && $model::class === $class)
-            ->load($name);
+        $this->filter(function ($model) use ($relation, $class) {
+            return ! is_null($model) &&
+                ! $model->relationLoaded($relation) &&
+                $model::class === $class;
+        })->load($relation);
 
-        if (empty($path)) {
+        if (empty($tuples)) {
             return;
         }
 
-        $models = $this->pluck($name)->whereNotNull();
+        $models = $this->pluck($relation)->whereNotNull();
 
         if ($models->first() instanceof BaseCollection) {
             $models = $models->collapse();
         }
 
-        (new static($models))->loadMissingRelationWithTypes($path);
+        (new static($models))->loadMissingRelationsViaRelationAndClassTuples($tuples);
     }
 
     /**
@@ -335,21 +339,6 @@ class Collection extends BaseCollection implements QueueableCollection
             ->filter()
             ->groupBy(fn ($model) => get_class($model))
             ->each(fn ($models, $className) => static::make($models)->loadCount($relations[$className] ?? []));
-
-        return $this;
-    }
-
-    /**
-     * Enable relation autoload for the collection.
-     *
-     * @return $this
-     */
-    public function withRelationAutoload()
-    {
-        $callback = fn ($path) => $this->loadMissingRelationWithTypes($path);
-
-        $this->each(fn ($model) => $model->hasRelationAutoloadCallback()
-            || $model->usingRelationAutoloadCallback($callback));
 
         return $this;
     }
@@ -759,6 +748,24 @@ class Collection extends BaseCollection implements QueueableCollection
     protected function duplicateComparator($strict)
     {
         return fn ($a, $b) => $a->is($b);
+    }
+
+    /**
+     * Enable relationship autoloading for all models in this collection.
+     *
+     * @return $this
+     */
+    public function primeRelationshipAutoloading()
+    {
+        $callback = fn ($tuples) => $this->loadMissingRelationsViaRelationAndClassTuples($tuples);
+
+        foreach ($this as $model) {
+            if (! $model->hasRelationAutoloadCallback()) {
+                $model->autoloadRelationsUsing($callback);
+            }
+        }
+
+        return $this;
     }
 
     /**

@@ -551,7 +551,7 @@ trait HasAttributes
             return;
         }
 
-        if ($this->handleRelationAutoload($key)) {
+        if ($this->attemptToAutoloadRelation($key)) {
             return $this->relations[$key];
         }
 
