@@ -755,7 +755,7 @@ class Collection extends BaseCollection implements QueueableCollection
      *
      * @return $this
      */
-    public function primeRelationshipAutoloading()
+    public function withRelationshipAutoloading()
     {
         $callback = fn ($tuples) => $this->loadMissingRelationsViaRelationAndClassTuples($tuples);
 

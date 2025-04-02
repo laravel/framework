@@ -50,7 +50,7 @@ class EloquentModelRelationAutoloadTest extends DatabaseTestCase
 
         $likes = [];
 
-        $posts->primeRelationshipAutoloading();
+        $posts->withRelationshipAutoloading();
 
         foreach ($posts as $post) {
             foreach ($post->comments as $comment) {
@@ -100,7 +100,7 @@ class EloquentModelRelationAutoloadTest extends DatabaseTestCase
         $videos = [];
         $videoLike = null;
 
-        $likes->primeRelationshipAutoloading();
+        $likes->withRelationshipAutoloading();
 
         foreach ($likes as $like) {
             $likeable = $like->likeable;
