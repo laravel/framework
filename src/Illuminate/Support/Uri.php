@@ -152,6 +152,13 @@ class Uri implements Htmlable, Responsable, Stringable
         return $path === '' ? '/' : $path;
     }
 
+    public function pathSegments(): array
+    {
+        $path = $this->path();
+
+        return $path === '/' ? [] : explode('/', $path);
+    }
+
     /**
      * Get the URI's query string.
      */

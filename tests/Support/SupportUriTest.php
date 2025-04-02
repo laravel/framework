@@ -196,4 +196,15 @@ class SupportUriTest extends TestCase
         $this->assertEquals('https://laravel.com', (string) $uri);
         $this->assertEquals('https://laravel.com', (string) $uri->withQuery([]));
     }
+
+    public function test_path_segments()
+    {
+        $uri = Uri::of('https://laravel.com');
+
+        $this->assertEquals([], $uri->pathSegments());
+
+        $uri = Uri::of('https://laravel.com/one/two/three');
+
+        $this->assertEquals(['one', 'two', 'three'],$uri->pathSegments());
+    }
 }
