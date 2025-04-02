@@ -152,6 +152,11 @@ class Uri implements Htmlable, Responsable, Stringable
         return $path === '' ? '/' : $path;
     }
 
+    /**
+     * Get the URI's path segments.
+     *
+     * Empty or missing paths are returned as an empty array.
+     */
     public function pathSegments(): array
     {
         $path = $this->path();
