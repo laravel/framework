@@ -19,7 +19,7 @@ use Traversable;
  *
  * @mixin \Illuminate\Support\Collection<TKey, TValue>
  */
-abstract class AbstractPaginator implements Htmlable, Stringable, CanBeEscapedWhenCastToString
+abstract class AbstractPaginator implements CanBeEscapedWhenCastToString, Htmlable, Stringable
 {
     use ForwardsCalls, Tappable;
 
