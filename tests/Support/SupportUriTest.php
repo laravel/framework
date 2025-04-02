@@ -229,6 +229,6 @@ class SupportUriTest extends TestCase
 
         $uri = new Uri('https://laravel.com/');
 
-        $this->assertSame('https://laravel.com/foobar', $uri->myMacro());
+        $this->assertSame('https://laravel.com/foobar', (string) $uri->myMacro());
     }
 }
