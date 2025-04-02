@@ -223,12 +223,12 @@ class SupportUriTest extends TestCase
 
     public function test_macroable()
     {
-        Uri::macro('firstSegmentMacro', function () {
-            return $this->pathSegments()->first();
+        Uri::macro('myMacro', function () {
+            return $this->withPath('foobar');
         });
 
-        $uri = new Uri('https://laravel.com/first-segment');
+        $uri = new Uri('https://laravel.com/');
 
-        $this->assertSame('first-segment', $uri->firstSegmentMacro());
+        $this->assertSame('https://laravel.com/foobar', $uri->myMacro());
     }
 }
