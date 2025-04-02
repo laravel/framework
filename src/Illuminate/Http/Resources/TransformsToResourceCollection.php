@@ -48,10 +48,12 @@ trait TransformsToResourceCollection
 
         throw_unless(method_exists($className, 'guessResourceName'), LogicException::class, sprintf('Expected class %s to implement guessResourceName method. Make sure the model uses the TransformsToResource trait.', $className));
 
-        $resourceClass = $className::guessResourceName();
+        foreach ($className::guessResourceName() as $resourceClass) {
+            if (is_string($resourceClass) && class_exists($resourceClass)) {
+                return $resourceClass::collection($this);
+            }
+        }
 
-        throw_unless(class_exists($resourceClass), LogicException::class, sprintf('Failed to find resource class for model [%s].', $className));
-
-        return $resourceClass::collection($this);
+        throw new LogicException(sprintf('Failed to find resource class for model [%s].', $className));
     }
 }
