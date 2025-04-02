@@ -10,6 +10,8 @@ use Illuminate\Http\Client\Factory;
  * @method static \Illuminate\Http\Client\Factory globalResponseMiddleware(callable $middleware)
  * @method static \Illuminate\Http\Client\Factory globalOptions(\Closure|array $options)
  * @method static \GuzzleHttp\Promise\PromiseInterface response(array|string|null $body = null, int $status = 200, array $headers = [])
+ * @method static \GuzzleHttp\Psr7\Response psr7Response(array|string|null $body = null, int $status = 200, array $headers = [])
+ * @method static \Illuminate\Http\Client\RequestException requestException(array|string|null $body = null, int $status = 200, array $headers = [])
  * @method static \GuzzleHttp\Promise\PromiseInterface failedConnection(string|null $message = null)
  * @method static \Illuminate\Http\Client\ResponseSequence sequence(array $responses = [])
  * @method static bool preventingStrayRequests()
