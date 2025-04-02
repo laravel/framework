@@ -170,6 +170,15 @@ class DatabaseEloquentIntegrationTest extends TestCase
                 $table->integer('parent_id')->nullable();
                 $table->timestamps();
             });
+
+            $this->schema($connection)->create('achievements', function ($table) {
+                $table->increments('id');
+            });
+
+            $this->schema($connection)->create('eloquent_test_achievement_eloquent_test_user', function ($table) {
+                $table->integer('eloquent_test_achievement_id');
+                $table->integer('eloquent_test_user_id');
+            });
         }
 
         $this->schema($connection)->create('non_incrementing_users', function ($table) {
@@ -1483,6 +1492,34 @@ class DatabaseEloquentIntegrationTest extends TestCase
         }
     }
 
+    public function testWhereAttachedTo()
+    {
+        $user1 = EloquentTestUser::create(['email' => 'user1@gmail.com']);
+        $user2 = EloquentTestUser::create(['email' => 'user2@gmail.com']);
+        $user3 = EloquentTestUser::create(['email' => 'user3@gmail.com']);
+        $achievement1 = EloquentTestAchievement::create();
+        $achievement2 = EloquentTestAchievement::create();
+        $achievement3 = EloquentTestAchievement::create();
+
+        $user1->eloquentTestAchievements()->attach([$achievement1]);
+        $user2->eloquentTestAchievements()->attach([$achievement1, $achievement3]);
+        $user3->eloquentTestAchievements()->attach([$achievement2, $achievement3]);
+
+        $achievedAchievement1 = EloquentTestUser::whereAttachedTo($achievement1)->get();
+
+        $this->assertSame(2, $achievedAchievement1->count());
+        $this->assertTrue($achievedAchievement1->contains($user1));
+        $this->assertTrue($achievedAchievement1->contains($user2));
+
+        $achievedByUser1or2 = EloquentTestAchievement::whereAttachedTo(
+            new Collection([$user1, $user2])
+        )->get();
+
+        $this->assertSame(2, $achievedByUser1or2->count());
+        $this->assertTrue($achievedByUser1or2->contains($achievement1));
+        $this->assertTrue($achievedByUser1or2->contains($achievement3));
+    }
+
     public function testBasicHasManyEagerLoading()
     {
         $user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
@@ -2686,6 +2723,11 @@ class EloquentTestUser extends Eloquent
             $join->where('photo.imageable_type', 'EloquentTestPost');
         });
     }
+
+    public function eloquentTestAchievements()
+    {
+        return $this->belongsToMany(EloquentTestAchievement::class);
+    }
 }
 
 class EloquentTestUserWithCustomFriendPivot extends EloquentTestUser
@@ -2938,6 +2980,18 @@ class EloquentTouchingCategory extends Eloquent
     public function children()
     {
         return $this->hasMany(EloquentTouchingCategory::class, 'parent_id')->chaperone();
+    }
+}
+
+class EloquentTestAchievement extends Eloquent
+{
+    public $timestamps = false;
+
+    protected $table = 'achievements';
+
+    public function eloquentTestUsers()
+    {
+        return $this->belongsToMany(EloquentTestUser::class);
     }
 }
 

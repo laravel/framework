@@ -1278,6 +1278,29 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals($result, $builder);
     }
 
+    public function testWhereAttachedTo()
+    {
+        $related = new EloquentBuilderTestModelFarRelatedStub;
+        $related->id = 49;
+
+        $builder = EloquentBuilderTestModelParentStub::whereAttachedTo($related, 'roles');
+
+        $this->assertSame('select * from "eloquent_builder_test_model_parent_stubs" where exists (select * from "eloquent_builder_test_model_far_related_stubs" inner join "user_role" on "eloquent_builder_test_model_far_related_stubs"."id" = "user_role"."related_id" where "eloquent_builder_test_model_parent_stubs"."id" = "user_role"."self_id" and "eloquent_builder_test_model_far_related_stubs"."id" in (49))', $builder->toSql());
+    }
+
+    public function testWhereAttachedToCollection()
+    {
+        $model1 = new EloquentBuilderTestModelParentStub;
+        $model1->id = 3;
+
+        $model2 = new EloquentBuilderTestModelParentStub;
+        $model2->id = 4;
+
+        $builder = EloquentBuilderTestModelFarRelatedStub::whereAttachedTo(new Collection([$model1, $model2]), 'roles');
+
+        $this->assertSame('select * from "eloquent_builder_test_model_far_related_stubs" where exists (select * from "eloquent_builder_test_model_parent_stubs" inner join "user_role" on "eloquent_builder_test_model_parent_stubs"."id" = "user_role"."self_id" where "eloquent_builder_test_model_far_related_stubs"."id" = "user_role"."related_id" and "eloquent_builder_test_model_parent_stubs"."id" in (3, 4))', $builder->toSql());
+    }
+
     public function testDeleteOverride()
     {
         $builder = $this->getBuilder();
@@ -2813,7 +2836,15 @@ class EloquentBuilderTestModelCloseRelatedStub extends Model
 
 class EloquentBuilderTestModelFarRelatedStub extends Model
 {
-    //
+    public function roles()
+    {
+        return $this->belongsToMany(
+            EloquentBuilderTestModelParentStub::class,
+            'user_role',
+            'related_id',
+            'self_id',
+        );
+    }
 }
 
 class EloquentBuilderTestModelSelfRelatedStub extends Model
