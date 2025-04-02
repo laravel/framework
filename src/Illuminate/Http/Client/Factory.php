@@ -188,11 +188,7 @@ class Factory
      */
     public static function requestException($body = null, $status = 200, $headers = [])
     {
-        return new RequestException(
-            new Response(
-                static::psr7Response($body, $status, $headers)
-            )
-        );
+        return new RequestException(new Response(static::psr7Response($body, $status, $headers)));
     }
 
     /**
