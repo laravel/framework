@@ -56,7 +56,6 @@ trait TransformsToResource
             return [];
         }
 
-        // Get everything after the "Models" namespace...
         $relativeNamespace = Str::after($modelClass, '\\Models\\');
 
         $relativeNamespace = Str::contains($relativeNamespace, '\\')
