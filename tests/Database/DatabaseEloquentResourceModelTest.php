@@ -40,6 +40,18 @@ class DatabaseEloquentResourceModelTest extends TestCase
         $this->assertSame($model, $resource->resource);
     }
 
+    public function testItCanGuessResourceWhenNotProvidedWithNonResourceSuffix()
+    {
+        $model = new EloquentResourceTestResourceModelWithGuessableResource();
+
+        class_alias(EloquentResourceTestJsonResource::class, 'Illuminate\Tests\Database\Fixtures\Http\Resources\EloquentResourceTestResourceModelWithGuessableResource');
+
+        $resource = $model->toResource();
+
+        $this->assertInstanceOf(EloquentResourceTestJsonResource::class, $resource);
+        $this->assertSame($model, $resource->resource);
+    }
+
     public function testItCanGuessResourceName()
     {
         $model = new EloquentResourceTestResourceModel();
