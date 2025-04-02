@@ -9,6 +9,7 @@ use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Dumpable;
+use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\Tappable;
 use League\Uri\Contracts\UriInterface;
 use League\Uri\Uri as LeagueUri;
@@ -17,7 +18,7 @@ use Stringable;
 
 class Uri implements Htmlable, Responsable, Stringable
 {
-    use Conditionable, Dumpable, Tappable;
+    use Conditionable, Dumpable, Macroable, Tappable;
 
     /**
      * The URI instance.
