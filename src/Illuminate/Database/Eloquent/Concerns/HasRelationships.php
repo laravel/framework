@@ -100,6 +100,16 @@ trait HasRelationships
     }
 
     /**
+     * Determine if a relationship autoloader callback has been defined.
+     *
+     * @return bool
+     */
+    public function hasRelationAutoloadCallback()
+    {
+        return ! is_null($this->relationAutoloadCallback);
+    }
+
+    /**
      * Define an automatic relationship autoloader callback for this model and its relations.
      *
      * @param  \Closure  $callback
@@ -115,16 +125,6 @@ trait HasRelationships
         }
 
         return $this;
-    }
-
-    /**
-     * Determine if a relationship autoloader callback has been defined.
-     *
-     * @return bool
-     */
-    public function hasRelationAutoloadCallback()
-    {
-        return ! is_null($this->relationAutoloadCallback);
     }
 
     /**
