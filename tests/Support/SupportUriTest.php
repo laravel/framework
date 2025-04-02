@@ -220,4 +220,15 @@ class SupportUriTest extends TestCase
 
         $this->assertEquals(3, $uri->pathSegments()->count());
     }
+
+    public function test_macroable()
+    {
+        Uri::macro('myMacro', function () {
+            return $this->withPath('foobar');
+        });
+
+        $uri = new Uri('https://laravel.com/');
+
+        $this->assertSame('https://laravel.com/foobar', (string) $uri->myMacro());
+    }
 }
