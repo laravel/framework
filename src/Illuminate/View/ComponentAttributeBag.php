@@ -45,7 +45,7 @@ class ComponentAttributeBag implements ArrayAccess, IteratorAggregate, JsonSeria
      */
     public function all()
     {
-        return $this->toArray();
+        return $this->attributes;
     }
 
     /**
@@ -505,7 +505,7 @@ class ComponentAttributeBag implements ArrayAccess, IteratorAggregate, JsonSeria
      */
     public function toArray()
     {
-        return $this->attributes;
+        return $this->all();
     }
 
     /**
