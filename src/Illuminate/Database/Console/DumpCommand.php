@@ -23,8 +23,8 @@ class DumpCommand extends Command
     protected $signature = 'schema:dump
                 {--database= : The database connection to use}
                 {--path= : The path where the schema dump file should be stored}
-                {--prune : Delete all existing migration files}';
-
+                {--prune : Delete all existing migration files}
+                {--prune-completed : Delete only migration files that have already been run}';
     /**
      * The console command description.
      *
@@ -61,6 +61,25 @@ class DumpCommand extends Command
             $dispatcher->dispatch(new MigrationsPruned($connection, $path));
         }
 
+        if ($this->option('prune-completed')) {
+
+            $migrations = $connection->table($this->migrationTable())->get();
+
+            $count = 0;
+
+            foreach($migrations as $migration) {
+               $count += (new Filesystem)->delete(
+                    database_path('migrations/'.$migration->migration.'.php')
+                );
+            }
+
+            $info .= " and pruned {$count} completed migration files";
+
+            $dispatcher->dispatch(new MigrationsPruned($connection, $path));
+
+        }
+
+
         $this->components->info($info.' successfully.');
     }
 
@@ -72,12 +91,8 @@ class DumpCommand extends Command
      */
     protected function schemaState(Connection $connection)
     {
-        $migrations = Config::get('database.migrations', 'migrations');
-
-        $migrationTable = is_array($migrations) ? ($migrations['table'] ?? 'migrations') : $migrations;
-
         return $connection->getSchemaState()
-            ->withMigrationTable($migrationTable)
+            ->withMigrationTable($this->migrationTable())
             ->handleOutputUsing(function ($type, $buffer) {
                 $this->output->write($buffer);
             });
@@ -93,5 +108,17 @@ class DumpCommand extends Command
         return tap($this->option('path') ?: database_path('schema/'.$connection->getName().'-schema.sql'), function ($path) {
             (new Filesystem)->ensureDirectoryExists(dirname($path));
         });
+    }
+
+    /**
+     * Get the migration table name.
+     *
+     * @return string
+     */
+    protected function migrationTable()
+    {
+        $migrations = Config::get('database.migrations', 'migrations');
+        
+        return is_array($migrations) ? ($migrations['table'] ?? 'migrations') : $migrations;
     }
 }
