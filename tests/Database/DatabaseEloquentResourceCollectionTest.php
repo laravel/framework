@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Tests\Database\Fixtures\Models\EloquentResourceCollectionTestModel;
 use PHPUnit\Framework\TestCase;

@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Database;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Tests\Database\Fixtures\Models\EloquentResourceTestResourceModel;
 use Illuminate\Tests\Database\Fixtures\Models\EloquentResourceTestResourceModelWithGuessableResource;
@@ -57,7 +56,7 @@ class DatabaseEloquentResourceModelTest extends TestCase
         $model = new EloquentResourceTestResourceModel();
         $this->assertEquals([
             'Illuminate\Tests\Database\Fixtures\Http\Resources\EloquentResourceTestResourceModelResource',
-            'Illuminate\Tests\Database\Fixtures\Http\Resources\EloquentResourceTestResourceModel'
+            'Illuminate\Tests\Database\Fixtures\Http\Resources\EloquentResourceTestResourceModel',
         ], $model::guessResourceName());
     }
 }

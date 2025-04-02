@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Pagination;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Tests\Pagination\Fixtures\Models\PaginatorResourceTestModel;
