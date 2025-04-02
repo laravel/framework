@@ -2402,9 +2402,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     public static function __callStatic($method, $parameters)
     {
         if (static::isScopeMethodWithAttribute($method)) {
-            $parameters = [$query = static::query(), ...$parameters];
-
-            return (new static)->$method(...$parameters) ?? $query;
+            return (new static)->query()->$method(...$parameters);
         }
 
         return (new static)->$method(...$parameters);
