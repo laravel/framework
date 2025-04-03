@@ -9,8 +9,8 @@ use Illuminate\Support\Traits\EnumeratesValues;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\TransformsToResourceCollection;
 use InvalidArgumentException;
-use Traversable;
 use stdClass;
+use Traversable;
 
 /**
  * @template TKey of array-key
