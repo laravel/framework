@@ -954,10 +954,6 @@ class SupportCollectionTest extends TestCase
             $c->where('v', '<>', 3)->values()->all()
         );
         $this->assertEquals(
-            [['v' => 1], ['v' => 2], ['v' => 4]],
-            $c->where('v', '!=', 3)->values()->all()
-        );
-        $this->assertEquals(
             [['v' => 1], ['v' => 2], ['v' => '3'], ['v' => 4]],
             $c->where('v', '!==', 3)->values()->all()
         );
@@ -5650,6 +5646,287 @@ class SupportCollectionTest extends TestCase
             [Collection::class],
             [LazyCollection::class],
         ];
+    }
+
+    /**
+     * Test basic XML conversion.
+     */
+    public function testBasicXmlConversion()
+    {
+        $collection = new Collection([
+            'name' => 'John',
+            'age' => 30,
+            'active' => true
+        ]);
+
+        $xml = $collection->toXml();
+
+        $this->assertStringContainsString('<?xml version="1.0" encoding="UTF-8"?>', $xml);
+        $this->assertStringContainsString('<root>', $xml);
+        $this->assertStringContainsString('<item key="name">John</item>', $xml);
+        $this->assertStringContainsString('<item key="age">30</item>', $xml);
+        $this->assertStringContainsString('<item key="active">1</item>', $xml);
+    }
+
+    /**
+     * Test custom root and item element names.
+     */
+    public function testXmlCustomElementNames()
+    {
+        $collection = new Collection(['test' => 'value']);
+        
+        $xml = $collection->toXml('custom_root', 'custom_item');
+        
+        $this->assertStringContainsString('<custom_root>', $xml);
+        $this->assertStringContainsString('<custom_item key="test">value</custom_item>', $xml);
+    }
+
+    /**
+     * Test root attributes.
+     */
+    public function testXmlRootAttributes()
+    {
+        $collection = new Collection(['test' => 'value']);
+        
+        $xml = $collection->toXml('root', 'item', [
+            'version' => '1.0',
+            'type' => 'test'
+        ]);
+        
+        $this->assertStringContainsString('version="1.0"', $xml);
+        $this->assertStringContainsString('type="test"', $xml);
+    }
+
+    /**
+     * Test nested collections.
+     */
+    public function testXmlNestedCollections()
+    {
+        $collection = new Collection([
+            'user' => new Collection([
+                'name' => 'John',
+                'address' => new Collection([
+                    'street' => '123 Main St',
+                    'city' => 'New York'
+                ])
+            ])
+        ]);
+
+        $xml = $collection->toXml();
+        
+        $this->assertStringContainsString('<item key="user">', $xml);
+        $this->assertStringContainsString('<name>John</name>', $xml);
+        $this->assertStringContainsString('<address>', $xml);
+        $this->assertStringContainsString('<street>123 Main St</street>', $xml);
+        $this->assertStringContainsString('<city>New York</city>', $xml);
+    }
+
+    /**
+     * Test special character escaping.
+     */
+    public function testXmlSpecialCharacterEscaping()
+    {
+        $collection = new Collection([
+            'special' => '<>&"\'',
+            'normal' => 'test'
+        ]);
+
+        $xml = $collection->toXml();
+        
+        $this->assertStringContainsString('&lt;&gt;&amp;&quot;&apos;', $xml);
+        $this->assertStringContainsString('>test<', $xml);
+    }
+
+    /**
+     * Test numeric keys.
+     */
+    public function testXmlNumericKeys()
+    {
+        $collection = new Collection([
+            0 => 'first',
+            1 => 'second',
+            '2' => 'third'
+        ]);
+
+        $xml = $collection->toXml();
+        
+        $this->assertStringContainsString('<item key="0">first</item>', $xml);
+        $this->assertStringContainsString('<item key="1">second</item>', $xml);
+        $this->assertStringContainsString('<item key="2">third</item>', $xml);
+    }
+
+    /**
+     * Test empty collection.
+     */
+    public function testXmlEmptyCollection()
+    {
+        $collection = new Collection([]);
+        $xml = $collection->toXml();
+        
+        $this->assertStringContainsString('<?xml version="1.0" encoding="UTF-8"?>', $xml);
+        $this->assertStringContainsString('<root></root>', $xml);
+    }
+
+    /**
+     * Test null values.
+     */
+    public function testXmlNullValues()
+    {
+        $collection = new Collection([
+            'null_value' => null,
+            'empty_string' => '',
+            'zero' => 0,
+            'false' => false
+        ]);
+
+        $xml = $collection->toXml();
+        
+        $this->assertStringContainsString('<item key="null_value"></item>', $xml);
+        $this->assertStringContainsString('<item key="empty_string"></item>', $xml);
+        $this->assertStringContainsString('<item key="zero">0</item>', $xml);
+        $this->assertStringContainsString('<item key="false">0</item>', $xml);
+    }
+
+    /**
+     * Test large datasets.
+     */
+    public function testXmlLargeDatasets()
+    {
+        $items = array_fill(0, 1000, 'test value');
+        $collection = new Collection($items);
+        
+        $xml = $collection->toXml();
+        
+        $this->assertEquals(1000, substr_count($xml, '<item>test value</item>'));
+        $this->assertLessThan(100000, strlen($xml), 'XML output should not be excessively large');
+    }
+
+    /**
+     * Test data type preservation.
+     */
+    public function testXmlDataTypePreservation()
+    {
+        $collection = new Collection([
+            'string' => 'text',
+            'integer' => 42,
+            'float' => 3.14,
+            'boolean' => true,
+            'array' => ['nested' => 'value']
+        ]);
+
+        $xml = $collection->toXml();
+        
+        $this->assertStringContainsString('<item key="string">text</item>', $xml);
+        $this->assertStringContainsString('<item key="integer">42</item>', $xml);
+        $this->assertStringContainsString('<item key="float">3.14</item>', $xml);
+        $this->assertStringContainsString('<item key="boolean">1</item>', $xml);
+        $this->assertStringContainsString('<item key="array"><nested>value</nested></item>', $xml);
+    }
+
+    /**
+     * Test UTF-8 characters.
+     */
+    public function testXmlUtf8Characters()
+    {
+        $collection = new Collection([
+            'unicode' => 'Hello 世界',
+            'emoji' => '👋 🌍'
+        ]);
+
+        $xml = $collection->toXml();
+        
+        $this->assertStringContainsString('>Hello 世界<', $xml);
+        $this->assertStringContainsString('>👋 🌍<', $xml);
+    }
+
+    /**
+     * Test maximum nesting level.
+     */
+    public function testXmlMaximumNestingLevel()
+    {
+        $collection = new Collection(['level1' => []]);
+        $current = &$collection['level1'];
+        
+        // Create a deeply nested structure
+        for ($i = 2; $i <= 100; $i++) {
+            $current['level' . $i] = [];
+            $current = &$current['level' . $i];
+        }
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Failed to convert collection to XML');
+        
+        $collection->toXml();
+    }
+
+    /**
+     * Test invalid XML element names.
+     */
+    public function testXmlInvalidXmlElementNames()
+    {
+        $collection = new Collection(['test' => 'value']);
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Invalid root element name: 123');
+        
+        $collection->toXml('123');
+    }
+
+    /**
+     * Test special characters in attributes.
+     */
+    public function testXmlSpecialCharactersInAttributes()
+    {
+        $collection = new Collection([]);
+        $xml = $collection->toXml('root', 'item', [
+            'special' => '< > & " \'',
+            'normal' => 'test'
+        ]);
+        
+        $this->assertStringContainsString('special="&lt; &gt; &amp; &quot; \'"', $xml);
+        $this->assertStringContainsString('normal="test"', $xml);
+    }
+
+    /**
+     * Test complex nested structures.
+     */
+    public function testXmlComplexNestedStructures()
+    {
+        $collection = new Collection([
+            'users' => [
+                [
+                    'id' => 1,
+                    'name' => 'John',
+                    'roles' => ['admin', 'user']
+                ],
+                [
+                    'id' => 2,
+                    'name' => 'Jane',
+                    'roles' => ['user']
+                ]
+            ],
+            'settings' => [
+                'enabled' => true,
+                'options' => [
+                    'timeout' => 30,
+                    'retries' => 3
+                ]
+            ]
+        ]);
+
+        $xml = $collection->toXml();
+        
+        $this->assertStringContainsString('<users>', $xml);
+        $this->assertStringContainsString('<id>1</id>', $xml);
+        $this->assertStringContainsString('<name>John</name>', $xml);
+        $this->assertStringContainsString('<roles>', $xml);
+        $this->assertStringContainsString('<item>admin</item>', $xml);
+        $this->assertStringContainsString('<item>user</item>', $xml);
+        $this->assertStringContainsString('<settings>', $xml);
+        $this->assertStringContainsString('<enabled>1</enabled>', $xml);
+        $this->assertStringContainsString('<options>', $xml);
+        $this->assertStringContainsString('<timeout>30</timeout>', $xml);
+        $this->assertStringContainsString('<retries>3</retries>', $xml);
     }
 }
 

@@ -1922,4 +1922,78 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     {
         unset($this->items[$key]);
     }
+
+    /**
+     * Convert the collection to XML.
+     *
+     * @param  string  $rootElement  The name of the root element
+     * @param  string  $itemElement  The name of the item elements
+     * @param  array  $attributes  Additional attributes for the root element
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    public function toXml(string $rootElement = 'root', string $itemElement = 'item', array $attributes = []): string
+    {
+        try {
+            // Validate element names
+            if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_\-\.]*$/', $rootElement)) {
+                throw new \RuntimeException('Invalid root element name: ' . $rootElement);
+            }
+            if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_\-\.]*$/', $itemElement)) {
+                throw new \RuntimeException('Invalid item element name: ' . $itemElement);
+            }
+
+            $xml = new \SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><' . $rootElement . '></' . $rootElement . '>');
+            
+            foreach ($attributes as $key => $value) {
+                $xml->addAttribute($key, (string) $value);
+            }
+            
+            foreach ($this->items as $key => $value) {
+                if (is_array($value) || $value instanceof \Illuminate\Support\Collection) {
+                    $item = $xml->addChild($itemElement);
+                    $item->addAttribute('key', (string) $key);
+                    $this->addXmlChildren($item, $value);
+                } else {
+                    $item = $xml->addChild($itemElement, htmlspecialchars((string) $value, ENT_XML1));
+                    $item->addAttribute('key', (string) $key);
+                }
+            }
+            
+            return $xml->asXML();
+        } catch (\Exception $e) {
+            throw new \RuntimeException('Failed to convert collection to XML: ' . $e->getMessage(), 0, $e);
+        }
+    }
+
+    /**
+     * Recursively add children to XML element.
+     *
+     * @param  \SimpleXMLElement  $xml
+     * @param  mixed  $value
+     * @return void
+     */
+    private function addXmlChildren(\SimpleXMLElement $xml, $value): void
+    {
+        if ($value instanceof \Illuminate\Support\Collection) {
+            $value = $value->all();
+        }
+        
+        foreach ($value as $key => $val) {
+            $elementName = is_numeric($key) ? 'item' : $key;
+            
+            // Validate element name
+            if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_\-\.]*$/', $elementName)) {
+                throw new \RuntimeException('Invalid element name: ' . $elementName);
+            }
+
+            if (is_array($val) || $val instanceof \Illuminate\Support\Collection) {
+                $child = $xml->addChild($elementName);
+                $this->addXmlChildren($child, $val);
+            } else {
+                $xml->addChild($elementName, htmlspecialchars((string) $val, ENT_XML1));
+            }
+        }
+    }
 }
