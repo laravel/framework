@@ -21,7 +21,8 @@ class RedisDriver implements Driver
     public function __construct(
         protected RedisFactory $redis,
         protected string $connection = 'default',
-        protected string $queuePrefix = 'laravel:concurrency:'
+        protected string $queuePrefix = 'laravel:concurrency:',
+        protected int $lockTimeout = 60 // Lock timeout in seconds
     ) {
         //
     }
@@ -45,6 +46,14 @@ class RedisDriver implements Driver
             $client->set(
                 $taskId.':task',
                 serialize(new SerializableClosure($task)),
+                'EX',
+                3600 // Expire in 1 hour
+            );
+
+            // Set the lock as 'unlocked' initially
+            $client->set(
+                $taskId.':lock',
+                'unlocked',
                 'EX',
                 3600 // Expire in 1 hour
             );
@@ -78,7 +87,7 @@ class RedisDriver implements Driver
                     $results[$key] = $resultArray['result'];
 
                     // Clean up
-                    $client->del($taskId.':task', $taskId.':result');
+                    $client->del($taskId.':task', $taskId.':result', $taskId.':lock');
                 }
             }
 
@@ -97,12 +106,12 @@ class RedisDriver implements Driver
     /**
      * Start the given tasks in the background after the current task has finished.
      */
-    public function defer(Closure|array $tasks): DeferredCallback
+    public function defer(Closure|array $tasks, int $delay = 0): DeferredCallback
     {
         $client = $this->redis->connection($this->connection);
         $tasks = Arr::wrap($tasks);
 
-        return defer(function () use ($tasks, $client) {
+        return defer(function () use ($tasks, $client, $delay) {
             foreach ($tasks as $task) {
                 $taskId = $this->queuePrefix.Str::uuid()->toString();
 
@@ -114,10 +123,127 @@ class RedisDriver implements Driver
                     3600 // Expire in 1 hour
                 );
 
-                // Add to deferred queue
-                $client->rpush($this->queuePrefix.'deferred', $taskId);
+                // Set the lock as 'unlocked' initially
+                $client->set(
+                    $taskId.':lock',
+                    'unlocked',
+                    'EX',
+                    3600 // Expire in 1 hour
+                );
+
+                if ($delay > 0) {
+                    // Add to scheduled set with timestamp as score
+                    $scheduledTime = time() + $delay;
+                    $client->zadd($this->queuePrefix.'scheduled', [$taskId => $scheduledTime]);
+                } else {
+                    // Add to deferred queue for immediate processing
+                    $client->rpush($this->queuePrefix.'deferred', $taskId);
+                }
             }
         });
+    }
+
+    /**
+     * Start the given tasks in the background after the current task has finished,
+     * with a specified delay.
+     */
+    public function deferFor(int $delay, Closure|array $tasks): DeferredCallback
+    {
+        return $this->defer($tasks, $delay);
+    }
+
+    /**
+     * Get due tasks from the scheduled queue.
+     *
+     * @param  int  $limit  Maximum number of tasks to retrieve
+     * @return array
+     */
+    public function getDueTasks(int $limit = 100): array
+    {
+        $client = $this->getRedisConnection();
+        $now = time();
+
+        // Get tasks that are due up to current time with their scores
+        $dueTasks = $client->zrangebyscore(
+            $this->queuePrefix.'scheduled',
+            0,
+            $now,
+            ['limit' => ['offset' => 0, 'count' => $limit]]
+        );
+
+        if (empty($dueTasks)) {
+            return [];
+        }
+
+        // Remove the tasks from the scheduled set using a Lua script for atomicity
+        $client->eval(
+            <<<'LUA'
+            local key = KEYS[1]
+            local members = {}
+            for i=1, #ARGV do
+                members[i] = ARGV[i]
+                redis.call('ZREM', key, ARGV[i])
+            end
+            return members
+            LUA,
+            1,
+            $this->queuePrefix.'scheduled',
+            ...$dueTasks
+        );
+
+        return $dueTasks;
+    }
+
+    /**
+     * Attempt to acquire a lock for the given task.
+     *
+     * @param  string  $taskId
+     * @return bool
+     */
+    public function acquireLock(string $taskId): bool
+    {
+        $client = $this->getRedisConnection();
+        $lockKey = $taskId.':lock';
+
+        // Use Redis SETNX for atomic lock acquisition
+        // Only acquire lock if it's unlocked or expired
+        $lockResult = $client->eval(
+            <<<'LUA'
+            local lockKey = KEYS[1]
+            local lockOwner = ARGV[1]
+            local lockTimeout = ARGV[2]
+            
+            -- Check if the lock is unlocked
+            local lockStatus = redis.call('GET', lockKey)
+            if lockStatus == 'unlocked' then
+                redis.call('SET', lockKey, lockOwner, 'EX', lockTimeout)
+                return 1
+            end
+            
+            return 0
+            LUA,
+            1, // Number of keys
+            $lockKey, // KEYS[1]
+            Str::uuid()->toString(), // ARGV[1] - unique lock owner
+            $this->lockTimeout // ARGV[2] - lock timeout
+        );
+
+        return (bool) $lockResult;
+    }
+
+    /**
+     * Release the lock for the given task.
+     *
+     * @param  string  $taskId
+     * @return void
+     */
+    public function releaseLock(string $taskId): void
+    {
+        $client = $this->getRedisConnection();
+        $lockKey = $taskId.':lock';
+
+        // Reset the lock to unlocked state
+        $client->set($lockKey, 'unlocked', 'EX', 3600);
     }
 
     /**

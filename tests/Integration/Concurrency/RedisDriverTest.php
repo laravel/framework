@@ -4,15 +4,13 @@ namespace Illuminate\Tests\Integration\Concurrency;
 
 use Exception;
 use Illuminate\Concurrency\RedisDriver;
-use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Redis\RedisManager;
+use Illuminate\Support\Str;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
 
 class RedisDriverTest extends TestCase
 {
-    use InteractsWithRedis;
-
     /**
      * The Redis manager instance.
      */
@@ -32,8 +30,6 @@ class RedisDriverTest extends TestCase
     {
         parent::setUp();
 
-        $this->setUpRedis();
-
         // Setup mock Redis connection to avoid actual Redis calls
         $this->redisManager = m::mock(RedisManager::class);
         $this->mockRedisConnection = m::mock(\Illuminate\Redis\Connections\Connection::class);
@@ -47,8 +43,6 @@ class RedisDriverTest extends TestCase
     protected function tearDown(): void
     {
         parent::tearDown();
-
-        $this->tearDownRedis();
         m::close();
     }
 
@@ -69,6 +63,11 @@ class RedisDriverTest extends TestCase
                 return true;
             });
 
+        // Mock lock setting
+        $this->mockRedisConnection->shouldReceive('set')
+            ->with(m::pattern('/^testing:concurrency:.*:lock$/'), 'unlocked', 'EX', 3600)
+            ->andReturn(true);
+
         $this->mockRedisConnection->shouldReceive('rpush')
             ->with($this->queuePrefix.'queue', m::pattern('/^testing:concurrency:.*$/'))
             ->andReturn(1);
@@ -85,8 +84,8 @@ class RedisDriverTest extends TestCase
             });
 
         $this->mockRedisConnection->shouldReceive('del')
-            ->with(m::pattern('/^testing:concurrency:.*:task$/'), m::pattern('/^testing:concurrency:.*:result$/'))
-            ->andReturn(2);
+            ->with(m::pattern('/^testing:concurrency:.*:task$/'), m::pattern('/^testing:concurrency:.*:result$/'), m::pattern('/^testing:concurrency:.*:lock$/'))
+            ->andReturn(3);
 
         // Create and test the driver
         $driver = new RedisDriver($this->redisManager, 'default', $this->queuePrefix);
@@ -125,6 +124,12 @@ class RedisDriverTest extends TestCase
             })
             ->times(3);
 
+        // Mock lock setting
+        $this->mockRedisConnection->shouldReceive('set')
+            ->with(m::pattern('/^testing:concurrency:.*:lock$/'), 'unlocked', 'EX', 3600)
+            ->andReturn(true)
+            ->times(3);
+
         $this->mockRedisConnection->shouldReceive('rpush')
             ->with($this->queuePrefix.'queue', m::pattern('/^testing:concurrency:.*$/'))
             ->andReturn(1)
@@ -151,8 +156,8 @@ class RedisDriverTest extends TestCase
             });
 
         $this->mockRedisConnection->shouldReceive('del')
-            ->with(m::pattern('/^testing:concurrency:.*:task$/'), m::pattern('/^testing:concurrency:.*:result$/'))
-            ->andReturn(2)
+            ->with(m::pattern('/^testing:concurrency:.*:task$/'), m::pattern('/^testing:concurrency:.*:result$/'), m::pattern('/^testing:concurrency:.*:lock$/'))
+            ->andReturn(3)
             ->times(3);
 
         // Create and test the driver
@@ -168,6 +173,11 @@ class RedisDriverTest extends TestCase
         // Mock Redis calls
         $this->mockRedisConnection->shouldReceive('set')
             ->with(m::pattern('/^testing:concurrency:.*:task$/'), m::type('string'), 'EX', 3600)
+            ->andReturn(true);
+
+        // Mock lock setting
+        $this->mockRedisConnection->shouldReceive('set')
+            ->with(m::pattern('/^testing:concurrency:.*:lock$/'), 'unlocked', 'EX', 3600)
             ->andReturn(true);
 
         $this->mockRedisConnection->shouldReceive('rpush')
@@ -201,6 +211,11 @@ class RedisDriverTest extends TestCase
                 return true;
             });
 
+        // Mock lock setting
+        $this->mockRedisConnection->shouldReceive('set')
+            ->with(m::pattern('/^testing:concurrency:.*:lock$/'), 'unlocked', 'EX', 3600)
+            ->andReturn(true);
+
         $this->mockRedisConnection->shouldReceive('rpush')
             ->with($this->queuePrefix.'queue', m::pattern('/^testing:concurrency:.*$/'))
             ->andReturn(1);
@@ -224,5 +239,86 @@ class RedisDriverTest extends TestCase
         $this->expectExceptionMessage('Test exception');
 
         $driver->run($task);
+    }
+
+    public function testDeferForMethod()
+    {
+        // Mock Redis calls
+        $this->mockRedisConnection->shouldReceive('set')
+            ->with(m::pattern('/^testing:concurrency:.*:task$/'), m::type('string'), 'EX', 3600)
+            ->andReturn(true);
+
+        // Mock lock setting
+        $this->mockRedisConnection->shouldReceive('set')
+            ->with(m::pattern('/^testing:concurrency:.*:lock$/'), 'unlocked', 'EX', 3600)
+            ->andReturn(true);
+
+        // Mock sorted set for scheduled tasks
+        $this->mockRedisConnection->shouldReceive('zadd')
+            ->with($this->queuePrefix.'scheduled', m::type('array'))
+            ->andReturn(1);
+
+        // Create and test the driver
+        $driver = new RedisDriver($this->redisManager, 'default', $this->queuePrefix);
+        $deferred = $driver->deferFor(60, function () {
+            return 'Scheduled Task';
+        });
+
+        // Assert we got a deferred callback
+        $this->assertNotNull($deferred);
+    }
+
+    public function testAcquireLock()
+    {
+        // Mock for eval method used in lock acquisition
+        $this->mockRedisConnection->shouldReceive('eval')
+            ->with(m::type('string'), 1, m::pattern('/^testing:concurrency:.*:lock$/'), m::type('string'), 60)
+            ->andReturn(1);
+
+        // Create and test the driver
+        $driver = new RedisDriver($this->redisManager, 'default', $this->queuePrefix);
+
+        $taskId = $this->queuePrefix.Str::uuid()->toString();
+        $result = $driver->acquireLock($taskId);
+
+        $this->assertTrue($result);
+    }
+
+    public function testReleaseLock()
+    {
+        // Mock for set method used in lock release
+        $this->mockRedisConnection->shouldReceive('set')
+            ->with(m::pattern('/^testing:concurrency:.*:lock$/'), 'unlocked', 'EX', 3600)
+            ->andReturn(true);
+
+        // Create and test the driver
+        $driver = new RedisDriver($this->redisManager, 'default', $this->queuePrefix);
+
+        $taskId = $this->queuePrefix.Str::uuid()->toString();
+        $driver->releaseLock($taskId);
+
+        // No assertions needed as we're just testing the method doesn't throw
+    }
+
+    public function testGetDueTasks()
+    {
+        $now = time();
+        $dueTasks = [$this->queuePrefix.'task1', $this->queuePrefix.'task2'];
+
+        // Mock zrangebyscore to return due tasks
+        $this->mockRedisConnection->shouldReceive('zrangebyscore')
+            ->with($this->queuePrefix.'scheduled', 0, m::type('integer'), ['limit' => ['offset' => 0, 'count' => 100]])
+            ->andReturn($dueTasks);
+
+        // Mock eval to remove tasks from the sorted set
+        $this->mockRedisConnection->shouldReceive('eval')
+            ->with(m::type('string'), 1, $this->queuePrefix.'scheduled', $this->queuePrefix.'task1', $this->queuePrefix.'task2')
+            ->andReturn($dueTasks);
+
+        // Create and test the driver
+        $driver = new RedisDriver($this->redisManager, 'default', $this->queuePrefix);
+        $result = $driver->getDueTasks();
+
+        $this->assertEquals($dueTasks, $result);
     }
 }
