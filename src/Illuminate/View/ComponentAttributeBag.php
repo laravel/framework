@@ -17,7 +17,7 @@ use JsonSerializable;
 use Stringable;
 use Traversable;
 
-class ComponentAttributeBag implements ArrayAccess, IteratorAggregate, JsonSerializable, Htmlable, Stringable, Arrayable
+class ComponentAttributeBag implements Arrayable, ArrayAccess, IteratorAggregate, JsonSerializable, Htmlable, Stringable
 {
     use Conditionable, Macroable;
 
