@@ -20,6 +20,20 @@ class ConcurrencyServiceProvider extends ServiceProvider implements DeferrablePr
         });
 
         $this->app->alias(ConcurrencyManager::class, 'concurrency');
+
+        // Register the driver resolver for Redis concurrency driver
+        $this->app->resolving(ConcurrencyManager::class, function ($manager, $app) {
+            $manager->extend('redis', function ($app) {
+                $config = $app['config']['concurrency.driver.redis'] ?? [];
+
+                return new RedisDriver(
+                    $app['redis'],
+                    $config['connection'] ?? 'default',
+                    $config['queue_prefix'] ?? 'laravel:concurrency:',
+                    $config['lock_timeout'] ?? 60
+                );
+            });
+        });
     }
 
     /**
