@@ -8,6 +8,7 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -677,6 +678,19 @@ abstract class Factory
     }
 
     /**
+     * Retrieve a random collection of models based on the count amount of a given type from previously provided models to recycle.
+     *
+     * @template TClass of \Illuminate\Database\Eloquent\Model
+     *
+     * @param  class-string<TClass>  $modelClassName
+     * @return \Illuminate\Support\Collection<int, TClass>|null
+     */
+    public function getRandomRecycledModelsForCount($modelClassName)
+    {
+        return $this->recycle->get($modelClassName)?->random($this->count);
+    }
+
+    /**
      * Add a new "after making" callback to the model definition.
      *
      * @param  \Closure(TModel): mixed  $callback
@@ -979,12 +993,16 @@ abstract class Factory
         if (str_starts_with($method, 'for')) {
             return $this->for($factory->state($parameters[0] ?? []), $relationship);
         } elseif (str_starts_with($method, 'has')) {
-            return $this->has(
-                $factory
-                    ->count(is_numeric($parameters[0] ?? null) ? $parameters[0] : 1)
-                    ->state((is_callable($parameters[0] ?? null) || is_array($parameters[0] ?? null)) ? $parameters[0] : ($parameters[1] ?? [])),
-                $relationship
-            );
+            $factory = $factory
+                ->count(is_numeric($parameters[0] ?? null) ? $parameters[0] : 1)
+                ->state((is_callable($parameters[0] ?? null) || is_array($parameters[0] ?? null)) ? $parameters[0] : ($parameters[1] ?? []));
+
+            $relationshipType = $this->newModel()->{$relationship}();
+            if ($relationshipType instanceof BelongsToMany) {
+                return $this->hasAttached($factory, [], $relationship);
+            }
+
+            return $this->has($factory, $relationship);
         }
     }
 }
