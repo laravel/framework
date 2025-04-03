@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Collections\Traits;
+namespace Illuminate\Support\Traits;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Resources\Json\JsonResource;
