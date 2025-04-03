@@ -455,7 +455,7 @@ abstract class HasOneOrMany extends Relation
 
     /**
      * Create a Collection of new instances of the related model with mass-assignment
-     * and without raising any events to the parent model
+     * and without raising any events to the parent model.
      *
      * @param  iterable  $records
      * @return \Illuminate\Database\Eloquent\Collection<int, TRelatedModel>
