@@ -9,8 +9,8 @@ use Illuminate\Contracts\Support\CanBeEscapedWhenCastToString;
 use Illuminate\Support\Traits\EnumeratesValues;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
-use Traversable;
 use stdClass;
+use Traversable;
 
 /**
  * @template TKey of array-key
