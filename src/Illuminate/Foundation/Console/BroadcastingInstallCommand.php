@@ -56,13 +56,7 @@ class BroadcastingInstallCommand extends Command
         // We have a specific echo version for React and Vue with Typescript,
         // so check if this app contains React or Vue with Typescript
         if ($reactOrVue = $this->appContainsReactOrVueWithTypescript()) {
-            if($reactOrVue === 'react') {
-                $this->installReactTypescriptEcho();
-            } elseif($reactOrVue === 'vue') {
-                $this->installVueTypescriptEcho();
-            }
-            
-            // Inject Echo configuration for both React and Vue applications
+            // Inject Echo configuration for both React or Vue typescript applications
             $this->injectEchoConfigurationInApp($reactOrVue);
         } else {
             // Standard JavaScript implementation
@@ -165,54 +159,6 @@ class BroadcastingInstallCommand extends Command
                 'App\Providers\BroadcastServiceProvider::class',
                 app()->configPath('app.php'),
             );
-        }
-    }
-
-    /**
-     * Install the React TypeScript Echo implementation.
-     *
-     * @return void
-     */
-    protected function installReactTypescriptEcho()
-    {
-        $hooksDirectory = $this->laravel->resourcePath('js/hooks');
-        $echoScriptPath = $hooksDirectory.'/use-echo.ts';
-            
-        if (! file_exists($echoScriptPath)) {
-            // Create the hooks directory if it doesn't exist
-            if (! is_dir($hooksDirectory)) {
-                if (! is_dir($this->laravel->resourcePath('js'))) {
-                    mkdir($this->laravel->resourcePath('js'), 0755, true);
-                }
-                mkdir($hooksDirectory, 0755, true);
-            }
-
-            copy(__DIR__.'/stubs/use-echo-ts.stub', $echoScriptPath);
-            $this->components->info("Created React TypeScript Echo implementation at [resources/js/hooks/use-echo.ts].");
-        }   
-    }
-
-    /**
-     * Install the Vue TypeScript Echo implementation.
-     *
-     * @return void
-     */
-    protected function installVueTypescriptEcho()
-    {
-        $echoScriptPath = $this->laravel->resourcePath('js/composables/useEcho.ts');
-    
-        if (! file_exists($echoScriptPath)) {
-            $composablesDirectory = $this->laravel->resourcePath('js/composables');
-    
-            if (! is_dir($composablesDirectory)) {
-                if (! is_dir($this->laravel->resourcePath('js'))) {
-                    mkdir($this->laravel->resourcePath('js'), 0755, true);
-                }
-                mkdir($composablesDirectory, 0755, true);
-            }
-    
-            copy(__DIR__.'/stubs/useEcho-ts.stub', $echoScriptPath);
-            $this->components->info("Created Vue TypeScript Echo implementation at [resources/js/composables/useEcho.ts].");
         }
     }
 
