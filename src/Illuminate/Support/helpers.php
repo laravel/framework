@@ -74,6 +74,10 @@ if (! function_exists('blank')) {
             return trim((string) $value) === '';
         }
 
+        if ($value instanceof Closure) {
+            $value = value($value);
+        }
+
         return empty($value);
     }
 }
