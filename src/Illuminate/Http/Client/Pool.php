@@ -26,7 +26,7 @@ class Pool
     /**
      * The pool of requests.
      *
-     * @var array
+     * @var array<array-key, \Illuminate\Http\Client\PendingRequest>
      */
     protected $pool = [];
 
@@ -65,7 +65,7 @@ class Pool
     /**
      * Retrieve the requests in the pool.
      *
-     * @return array
+     * @return array<array-key, \Illuminate\Http\Client\PendingRequest>
      */
     public function getRequests()
     {
