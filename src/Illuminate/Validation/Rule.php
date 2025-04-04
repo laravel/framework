@@ -5,6 +5,7 @@ namespace Illuminate\Validation;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Validation\Rules\AnyOf;
 use Illuminate\Validation\Rules\ArrayRule;
 use Illuminate\Validation\Rules\Can;
 use Illuminate\Validation\Rules\Date;
@@ -244,6 +245,19 @@ class Rule
     public static function numeric()
     {
         return new Numeric;
+    }
+
+    /**
+     * Get an "any of" rule builder instance.
+     *
+     * @param  array
+     * @return \Illuminate\Validation\Rules\AnyOf
+     *
+     * @throws \InvalidArgumentException
+     */
+    public static function anyOf($rules)
+    {
+        return new AnyOf($rules);
     }
 
     /**
