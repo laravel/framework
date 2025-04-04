@@ -216,9 +216,10 @@ class BroadcastingInstallCommand extends Command
         });
         JS;
 
-        // Match all imports
+        // Find all imports
         preg_match_all('/^import .+;$/m', $contents, $matches);
 
+        // Add Echo configuration after the last import
         if (!empty($matches[0])) {
             $lastImport = end($matches[0]);
             $pos = strrpos($contents, $lastImport);
