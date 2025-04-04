@@ -50,6 +50,10 @@ if (! function_exists('blank')) {
      */
     function blank($value)
     {
+        if ($value instanceof Closure) {
+            $value = value($value);
+        }
+
         if (is_null($value)) {
             return true;
         }
@@ -72,10 +76,6 @@ if (! function_exists('blank')) {
 
         if ($value instanceof Stringable) {
             return trim((string) $value) === '';
-        }
-
-        if ($value instanceof Closure) {
-            $value = value($value);
         }
 
         return empty($value);
