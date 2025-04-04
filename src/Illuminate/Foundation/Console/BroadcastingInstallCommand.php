@@ -98,7 +98,7 @@ class BroadcastingInstallCommand extends Command
     {
         $packageJsonPath = $this->laravel->basePath('package.json');
         if (!file_exists($packageJsonPath)) {
-            return null;
+            return;
         }
         $packageJson = json_decode(file_get_contents($packageJsonPath), true);
         if (isset($packageJson['dependencies']['react']) || isset($packageJson['dependencies']['vue'])) {
@@ -107,7 +107,7 @@ class BroadcastingInstallCommand extends Command
                 return isset($packageJson['dependencies']['react']) ? 'react' : 'vue';
             }
         }
-        return null;
+        return;
     }
 
     /**
@@ -166,24 +166,19 @@ class BroadcastingInstallCommand extends Command
     /**
      * Inject Echo configuration into the application's main file.
      *
-     * @param  string|null  $appType  The application type ('react', 'vue', or null)
+     * @param  string  $appType The application type ('react' or 'vue')
      * @return void
      */
-    protected function injectEchoConfigurationInApp(string $appType = null)
-    {
-        // If app type is not provided, detect it
-        if ($appType === null) {
-            $appType = $this->appContainsReactOrVueWithTypescript();
-        }
-        
+    protected function injectEchoConfigurationInApp(string $appType = 'react')
+    {   
         // Determine file path and import path based on app type
         if ($appType === 'vue') {
             $filePath = resource_path('js/app.ts');
-            $importPath = './composables/useEcho';
+            $importPath = 'laravel-echo/vue';
             $fileExtension = 'ts';
         } else { // Default to React
             $filePath = resource_path('js/app.tsx');
-            $importPath = './hooks/use-echo';
+            $importPath = 'laravel-echo/react';
             $fileExtension = 'tsx';
         }
         
