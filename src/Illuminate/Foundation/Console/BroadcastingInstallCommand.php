@@ -56,9 +56,9 @@ class BroadcastingInstallCommand extends Command
 
         // We have a specific echo version for React and Vue with Typescript,
         // so check if this app contains React or Vue with Typescript
-        if ($reactOrVue = $this->appContainsReactOrVueWithTypescript()) {
-            // Inject Echo configuration for both React or Vue typescript applications
-            $this->injectEchoConfigurationInApp($reactOrVue);
+        if ($this->appContainsReactWithTypescript() || $this->appContainsVueWithTypescript()) {
+            // If this is a React/Vue app with typescript, inject the Echo configuration in the app.tsx or app.ts file
+            $this->injectEchoConfigurationInApp();
         } else {
             // Standard JavaScript implementation
             if (! file_exists($echoScriptPath = $this->laravel->resourcePath('js/echo.js'))) {
@@ -90,24 +90,35 @@ class BroadcastingInstallCommand extends Command
     }
 
     /**
-     * Detect if the user is using React or Vue with Typescript and then install the corresponding Echo implementation
+     * Detect if the user is using React with TypeScript
      *
-     * @return null | 'react' | 'vue'
+     * @return bool
      */
-    protected function appContainsReactOrVueWithTypescript()
+    protected function appContainsReactWithTypescript(): bool
     {
         $packageJsonPath = $this->laravel->basePath('package.json');
         if (!file_exists($packageJsonPath)) {
-            return;
+            return false;
         }
         $packageJson = json_decode(file_get_contents($packageJsonPath), true);
-        if (isset($packageJson['dependencies']['react']) || isset($packageJson['dependencies']['vue'])) {
-            // Check if dependencies also contains typescript
-            if (isset($packageJson['dependencies']['typescript'])) {
-                return isset($packageJson['dependencies']['react']) ? 'react' : 'vue';
-            }
+        return isset($packageJson['dependencies']['react']) && 
+               isset($packageJson['dependencies']['typescript']);
+    }
+
+    /**
+     * Detect if the user is using Vue with TypeScript
+     *
+     * @return bool
+     */
+    protected function appContainsVueWithTypescript(): bool
+    {
+        $packageJsonPath = $this->laravel->basePath('package.json');
+        if (!file_exists($packageJsonPath)) {
+            return false;
         }
-        return;
+        $packageJson = json_decode(file_get_contents($packageJsonPath), true);
+        return isset($packageJson['dependencies']['vue']) && 
+               isset($packageJson['dependencies']['typescript']);
     }
 
     /**
@@ -166,17 +177,17 @@ class BroadcastingInstallCommand extends Command
     /**
      * Inject Echo configuration into the application's main file.
      *
-     * @param  string  $appType The application type ('react' or 'vue')
      * @return void
      */
-    protected function injectEchoConfigurationInApp(string $appType = 'react')
-    {   
-        // Determine file path and import path based on app type
-        if ($appType === 'vue') {
+    protected function injectEchoConfigurationInApp()
+    {
+        // Detect which stack we are using and set appropriate configuration
+        if ($this->appContainsVueWithTypescript()) {
             $filePath = resource_path('js/app.ts');
             $importPath = 'laravel-echo/vue';
             $fileExtension = 'ts';
-        } else { // Default to React
+        } else {
+            // Default to React
             $filePath = resource_path('js/app.tsx');
             $importPath = 'laravel-echo/react';
             $fileExtension = 'tsx';
@@ -215,7 +226,7 @@ class BroadcastingInstallCommand extends Command
                 $insertPos = $pos + strlen($lastImport);
                 $newContents = substr($contents, 0, $insertPos) . "\n" . $echoCode . substr($contents, $insertPos);
                 file_put_contents($filePath, $newContents);
-                $this->components->info("Echo configuration added to app.{$fileExtension} after imports.");
+                $this->components->info("Echo configuration added to app.{$fileExtension}.");
             }
         } else {
             // Add the Echo configuration to the top of the file if no import statements are found
