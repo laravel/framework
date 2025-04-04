@@ -50,6 +50,10 @@ if (! function_exists('blank')) {
      */
     function blank($value)
     {
+        if ($value instanceof Closure) {
+            $value = value($value);
+        }
+
         if (is_null($value)) {
             return true;
         }
