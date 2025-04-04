@@ -65,12 +65,16 @@ class SupportHelpersTest extends TestCase
         $this->assertTrue(blank('  '));
         $this->assertTrue(blank(new Stringable('')));
         $this->assertTrue(blank(new Stringable('  ')));
+        $this->assertTrue(blank(fn () => null));
+        $this->assertTrue(blank(fn () => ''));
         $this->assertFalse(blank(10));
         $this->assertFalse(blank(true));
         $this->assertFalse(blank(false));
         $this->assertFalse(blank(0));
         $this->assertFalse(blank(0.0));
         $this->assertFalse(blank(new Stringable(' FooBar ')));
+        $this->assertFalse(blank(fn () => 0));
+        $this->assertFalse(blank(fn () => 'FooBar'));
 
         $object = new SupportTestCountable();
         $this->assertTrue(blank($object));
