@@ -67,6 +67,29 @@ class ConcurrencyManager extends MultipleInstanceManager
     }
 
     /**
+     * Create an instance of the Kafka concurrency driver.
+     *
+     * @param  array  $config
+     * @return \Illuminate\Concurrency\KafkaDriver
+     *
+     * @throws \RuntimeException
+     */
+    public function createKafkaDriver(array $config)
+    {
+        if (! extension_loaded('rdkafka')) {
+            throw new RuntimeException('Please install the "rdkafka" PHP extension in order to utilize the "kafka" driver.');
+        }
+
+        return new KafkaDriver(
+            $config['brokers'] ?? 'localhost:9092',
+            $config['task_topic'] ?? 'laravel-concurrency-tasks',
+            $config['result_topic'] ?? 'laravel-concurrency-results',
+            $config['deferred_topic'] ?? 'laravel-concurrency-deferred',
+            $config['group_id'] ?? 'laravel-concurrency-group'
+        );
+    }
+
+    /**
      * Get the default instance name.
      *
      * @return string
