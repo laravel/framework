@@ -47,6 +47,7 @@ class BroadcastingInstallCommand extends Command
         // Install channel routes file...
         if (! file_exists($broadcastingRoutesPath = $this->laravel->basePath('routes/channels.php')) || $this->option('force')) {
             $this->components->info("Published 'channels' route file.");
+            
             copy(__DIR__.'/stubs/broadcasting-routes.stub', $broadcastingRoutesPath);
         }
 
