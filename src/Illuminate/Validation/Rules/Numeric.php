@@ -211,6 +211,26 @@ class Numeric implements Stringable
     }
 
     /**
+     * The field under validation must be an even number.
+     *
+     * @return $this
+     */
+    public function even(): Numeric
+    {
+        return $this->addRule('even');
+    }
+
+    /**
+     * The field under validation must be an odd number.
+     *
+     * @return $this
+     */
+    public function odd(): Numeric
+    {
+        return $this->addRule('odd');
+    }
+
+    /**
      * Convert the rule to a validation string.
      */
     public function __toString(): string

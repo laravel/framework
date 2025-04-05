@@ -355,4 +355,16 @@ class ValidationNumericRuleTest extends TestCase
         $rule = Rule::numeric()->integer()->digits(2)->exactly(2);
         $this->assertEquals('numeric|integer|digits:2|size:2', (string) $rule);
     }
+
+    public function testEvenRule()
+    {
+        $rule = Rule::numeric()->even();
+        $this->assertEquals('numeric|even', (string) $rule);
+    }
+
+    public function testOddRule()
+    {
+        $rule = Rule::numeric()->odd();
+        $this->assertEquals('numeric|odd', (string) $rule);
+    }
 }

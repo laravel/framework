@@ -50,6 +50,7 @@ return [
     'doesnt_end_with' => 'The :attribute field must not end with one of the following: :values.',
     'doesnt_start_with' => 'The :attribute field must not start with one of the following: :values.',
     'email' => 'The :attribute field must be a valid email address.',
+    'even' => 'The :attribute field must be an even number.',
     'ends_with' => 'The :attribute field must end with one of the following: :values.',
     'enum' => 'The selected :attribute is invalid.',
     'exists' => 'The selected :attribute is invalid.',
@@ -117,6 +118,7 @@ return [
     'not_in' => 'The selected :attribute is invalid.',
     'not_regex' => 'The :attribute field format is invalid.',
     'numeric' => 'The :attribute field must be a number.',
+    'odd' => 'The :attribute field must be an odd number.',
     'password' => [
         'letters' => 'The :attribute field must contain at least one letter.',
         'mixed' => 'The :attribute field must contain at least one uppercase and one lowercase letter.',

@@ -9616,6 +9616,66 @@ class ValidationValidatorTest extends TestCase
         ], $validator->messages()->keys());
     }
 
+    public function testValidationPassesWithEvenNumber()
+    {
+        $v = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            [
+                'number' => 2,
+            ],
+            [
+                'number' => 'even',
+            ]
+        );
+
+        $this->assertFalse($v->fails());
+    }
+
+    public function testValidationFailsWithEvenNumber()
+    {
+        $v = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            [
+                'number' => 3,
+            ],
+            [
+                'number' => 'even',
+            ]
+        );
+
+        $this->assertTrue($v->fails());
+    }
+
+    public function testValidationPassWithOddNumber()
+    {
+        $v = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            [
+                'number' => 3,
+            ],
+            [
+                'number' => 'odd',
+            ]
+        );
+
+        $this->assertFalse($v->fails());
+    }
+
+    public function testValidationFailsWithOddNumber()
+    {
+        $v = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            [
+                'number' => 4,
+            ],
+            [
+                'number' => 'odd',
+            ]
+        );
+
+        $this->assertTrue($v->fails());
+    }
+
     #[DataProvider('outsideRangeExponents')]
     public function testItLimitsLengthOfScientificNotationExponent($value)
     {

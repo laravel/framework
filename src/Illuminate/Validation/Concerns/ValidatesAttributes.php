@@ -2478,6 +2478,30 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that a numeric attribute is even.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function validateEven($attribute, $value)
+    {
+        return $this->validateNumeric($attribute, $value) && BigNumber::of($this->trim($value))->isEven();
+    }
+
+    /**
+     * Validate that a numeric attribute is odd.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function validateOdd($attribute, $value)
+    {
+        return $this->validateNumeric($attribute, $value) && BigNumber::of($this->trim($value))->isOdd();
+    }
+
+    /**
      * "Validate" optional attributes.
      *
      * Always returns true, just lets us put sometimes in rules.
