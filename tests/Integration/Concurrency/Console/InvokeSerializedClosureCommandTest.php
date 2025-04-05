@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Artisan;
 use Laravel\SerializableClosure\SerializableClosure;
 use Orchestra\Testbench\TestCase;
 use RuntimeException;
-use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 
 class CustomParameterException extends RuntimeException
@@ -139,4 +138,4 @@ class InvokeSerializedClosureCommandTest extends TestCase
         $this->assertArrayHasKey('parameters', $result);
         $this->assertEquals('Test param', $result['parameters']['customParam'] ?? null);
     }
-} 
+}
