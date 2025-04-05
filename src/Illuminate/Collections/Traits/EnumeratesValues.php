@@ -926,7 +926,7 @@ trait EnumeratesValues
     /**
      * Collect the values into a collection.
      *
-     * @param string|null $key
+     * @param  string|null  $key
      * @return \Illuminate\Support\Collection<TKey, TValue>
      */
     public function collect($key = null)
