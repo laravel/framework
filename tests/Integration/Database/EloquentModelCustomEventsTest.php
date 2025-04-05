@@ -64,7 +64,6 @@ class EloquentModelCustomEventsTest extends DatabaseTestCase
         $this->assertTrue($model->custom_attribute);
         $this->assertTrue($model->observer_attribute);
     }
-
 }
 
 class TestModel1 extends Model
@@ -106,7 +105,8 @@ class CustomObserver
 }
 
 #[ObservedBy(CustomObserver::class)]
-class EloquentModelStubWithCustomEventFromTrait extends Model {
+class EloquentModelStubWithCustomEventFromTrait extends Model
+{
     use CustomEventTrait;
 
     public $timestamps = false;
