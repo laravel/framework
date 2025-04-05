@@ -5471,6 +5471,23 @@ class SupportCollectionTest extends TestCase
             'b' => 2,
             'c' => 3,
         ], $data->all());
+		
+		$data = $collection::make([
+			'foos' => [
+				'foo',
+				'bar',
+				'baz',
+			],
+			'a' =>  1,
+		])->collect('foos');
+	    
+	    $this->assertInstanceOf(Collection::class, $data);
+		
+	    $this->assertSame([
+			'foo',
+			'bar',
+			'baz',
+		], $data->all());
     }
 
     #[DataProvider('collectionClassProvider')]
