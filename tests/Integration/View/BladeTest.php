@@ -30,23 +30,18 @@ class BladeTest extends TestCase
     #[RunInSeparateProcess]
     public function test_rendering_blade_long_maxpathlen_string_with_exact_length()
     {
-        // Skip this test when open_basedir is already set
-        // as it can't be modified in restricted environments like GitHub Actions
-        if (ini_get('open_basedir') !== '') {
-            $this->markTestSkipped('This test is skipped when open_basedir is set.');
-            return;
-        }
-
         // The PHP_MAXPATHLEN restriction is only active, if
         // open_basedir is set and active. Otherwise, the check
         // for the PHP_MAXPATHLEN is not active.
-        $openBaseDir = windows_os() ? explode('\\', __DIR__)[0].'\\'.';'.sys_get_temp_dir() : '/';
-        $iniSet = ini_set(
-            'open_basedir',
-            $openBaseDir
-        );
+        if (ini_get('open_basedir') === '') {
+            $openBaseDir = windows_os() ? explode('\\', __DIR__)[0].'\\'.';'.sys_get_temp_dir() : '/';
+            $iniSet = ini_set(
+                'open_basedir',
+                $openBaseDir
+            );
 
-        $this->assertNotFalse($iniSet, 'Could not set config for open_basedir.');
+            $this->assertNotFalse($iniSet, 'Could not set config for open_basedir.');
+        }
 
         for ($i = PHP_MAXPATHLEN - 200; $i <= PHP_MAXPATHLEN + 1; $i++) {
             $longString = str_repeat('x', $i);
