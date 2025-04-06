@@ -320,6 +320,27 @@ trait EnumeratesValues
     }
 
     /**
+     * Returns the first value that is not null from the given callback.
+     *
+     * @template TCallbackValue
+     * @template TValueDefault
+     *
+     * @param  callable(TValue, TKey): TCallbackValue|null  $callback
+     * @param  TValueDefault|(\Closure(): TValueDefault)  $default
+     * @return TCallbackValue|TValueDefault
+     */
+    public function firstValue($callback, $default = null)
+    {
+        $value = null;
+
+        $this->each(function ($item, $key) use (&$value, $callback) {
+            return is_null($value = $callback($item, $key));
+        });
+
+        return $value ?? value($default);
+    }
+
+    /**
      * Get a single key's value from the first matching item in the collection.
      *
      * @template TValueDefault

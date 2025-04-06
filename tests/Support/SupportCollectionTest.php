@@ -74,6 +74,58 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testFirstValueReturnsValue($collection)
+    {
+        $data = new $collection([
+            ['index' => 1, 'value' => 'foo'],
+            ['index' => 2, 'value' => 'bar'],
+            ['index' => 3, 'value' => 'baz'],
+        ]);
+
+        $result = $data->firstValue(function ($item) {
+            if ($item['index'] === 3) {
+                return $item['value'];
+            }
+        });
+
+        $this->assertSame('baz', $result);
+
+        $result = $data->firstValue(function ($item) {
+            if ($item['index'] === 4) {
+                return $item['value'];
+            }
+        });
+
+        $this->assertNull($result);
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testFirstValueWithDefaultReturnsValue($collection)
+    {
+        $data = new $collection([
+            ['index' => 1, 'value' => 'foo'],
+            ['index' => 2, 'value' => 'bar'],
+            ['index' => 3, 'value' => 'baz'],
+        ]);
+
+        $result = $data->firstValue(function ($item) {
+            if ($item['index'] === 3) {
+                return $item['value'];
+            }
+        }, 'default');
+
+        $this->assertSame('baz', $result);
+
+        $result = $data->firstValue(function ($item) {
+            if ($item['index'] === 4) {
+                return $item['value'];
+            }
+        }, 'default');
+
+        $this->assertSame('default', $result);
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testSoleReturnsFirstItemInCollectionIfOnlyOneExists($collection)
     {
         $collection = new $collection([
