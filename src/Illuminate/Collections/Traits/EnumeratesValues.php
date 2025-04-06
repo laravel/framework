@@ -334,7 +334,13 @@ trait EnumeratesValues
         $value = null;
 
         $this->each(function ($item, $key) use (&$value, $callback) {
-            return is_null($value = $callback($item, $key));
+            $result = $callback($item, $key);
+
+            if (! is_null($result)) {
+                $value = $result;
+
+                return false;
+            }
         });
 
         return $value ?? value($default);
