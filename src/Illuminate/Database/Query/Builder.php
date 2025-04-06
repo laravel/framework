@@ -2335,7 +2335,61 @@ class Builder implements BuilderContract
     }
 
     /**
-     * Add a "where not" clause to the query for multiple columns where none of the conditions should be true.
+     * Add a "where not" clause to the query for multiple columns with "or" conditions between them.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression[]|\Closure[]|string[]  $columns
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereNotAny($columns, $operator = null, $value = null, $boolean = 'and')
+    {
+        return $this->whereAny($columns, $operator, $value, $boolean.' not');
+    }
+
+    /**
+     * Add an "or where not" clause to the query for multiple columns with "or" conditions between them.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression[]|\Closure[]|string[]  $columns
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function orWhereNotAny($columns, $operator = null, $value = null)
+    {
+        return $this->whereNotAny($columns, $operator, $value, 'or');
+    }
+
+    /**
+     * Add a "where not" clause to the query for multiple columns with "and" conditions between them.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression[]|\Closure[]|string[]  $columns
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereNotAll($columns, $operator = null, $value = null, $boolean = 'and')
+    {
+        return $this->whereAll($columns, $operator, $value, $boolean.' not');
+    }
+
+    /**
+     * Add an "or where not" clause to the query for multiple columns with "and" conditions between them.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression[]|\Closure[]|string[]  $columns
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function orWhereNotAll($columns, $operator = null, $value = null)
+    {
+        return $this->whereNotAll($columns, $operator, $value, 'or');
+    }
+
+    /**
+     * Alias for the "whereNotAny" method.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression[]|\Closure[]|string[]  $columns
      * @param  mixed  $operator
@@ -2345,11 +2399,11 @@ class Builder implements BuilderContract
      */
     public function whereNone($columns, $operator = null, $value = null, $boolean = 'and')
     {
-        return $this->whereAny($columns, $operator, $value, $boolean.' not');
+        return $this->whereNotAny(...func_get_args());
     }
 
     /**
-     * Add an "or where not" clause to the query for multiple columns where none of the conditions should be true.
+     * Alias for the "orWhereNotAny" method.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression[]|\Closure[]|string[]  $columns
      * @param  mixed  $operator
@@ -2358,7 +2412,7 @@ class Builder implements BuilderContract
      */
     public function orWhereNone($columns, $operator = null, $value = null)
     {
-        return $this->whereNone($columns, $operator, $value, 'or');
+        return $this->orWhereNotAny(...func_get_args());
     }
 
     /**
