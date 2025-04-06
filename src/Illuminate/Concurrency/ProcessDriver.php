@@ -33,7 +33,7 @@ class ProcessDriver implements Driver
 
         $results = $this->processFactory->pool(function (Pool $pool) use ($tasks, $command) {
             foreach (Arr::wrap($tasks) as $key => $task) {
-                $pool->as($key)->path(base_path())->env([
+                $pool->as($key)->path($this->getBasePath())->env([
                     'LARAVEL_INVOKABLE_CLOSURE' => serialize(new SerializableClosure($task)),
                 ])->command($command);
             }
@@ -67,10 +67,18 @@ class ProcessDriver implements Driver
 
         return defer(function () use ($tasks, $command) {
             foreach (Arr::wrap($tasks) as $task) {
-                $this->processFactory->path(base_path())->env([
+                $this->processFactory->path($this->getBasePath())->env([
                     'LARAVEL_INVOKABLE_CLOSURE' => serialize(new SerializableClosure($task)),
                 ])->run($command.' 2>&1 &');
             }
         });
+    }
+
+    /**
+     * Get the base path for process execution.
+     */
+    protected function getBasePath(): string
+    {
+        return base_path();
     }
 }
