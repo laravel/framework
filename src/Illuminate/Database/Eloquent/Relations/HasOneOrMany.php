@@ -384,6 +384,28 @@ abstract class HasOneOrMany extends Relation
         return $this->query->fillAndInsert($this->fillForInsert($values));
     }
 
+    /**
+     * Insert (ignoring errors) into the database after merging the model's default attributes, setting timestamps, and casting values.
+     *
+     * @param  array<int, array<string, mixed>>  $values
+     * @return int
+     */
+    public function fillAndInsertOrIgnore(array $values)
+    {
+        return $this->query->fillAndInsertOrIgnore($this->fillForInsert($values));
+    }
+
+    /**
+     * Insert a record into the database and get its ID after merging the model's default attributes, setting timestamps, and casting values.
+     *
+     * @param  array<string, mixed>  $values
+     * @return int
+     */
+    public function fillAndInsertGetId(array $values)
+    {
+        return $this->query->fillAndInsertGetId($this->fillForInsert($values)[0]);
+    }
+
     protected function fillForInsert(array $values)
     {
         if (empty($values)) {

@@ -2718,6 +2718,45 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertEquals(Carbon::parse('2025-02-24T15:16:55.000Z'), $user->posts->find(3)->published_at);
     }
 
+    public function testFillAndInsertOrIgnoreIntoHasManyRelationship()
+    {
+        Str::createUuidsUsingSequence([
+            '00000000-0000-7000-0000-000000000000', // user
+            '11111111-1111-1111-1111-111111111111', // post id=1
+            '22222222-2222-2222-2222-222222222222', // post id=1 ignored
+            '33333333-3333-3333-3333-333333333333', // post id=3
+        ]);
+
+        $user = tap(new UserWithUniqueStringIds(), function ($user) {
+            $user->forceFill(['name' => 'Taylor Otwell'])->save();
+        });
+
+        $attributes = [
+            ['id' => 1, 'published_at' => now(), 'name' => 'ship of die'],
+            ['id' => 3, 'published_at' => now(), 'name' => 'Welcome to the future of Laravel'],
+        ];
+
+        $this->assertSame(1, $user->posts()->fillAndInsertOrIgnore(array_slice($attributes, 0, 1)));
+        $this->assertSame(1, $user->posts()->fillAndInsertOrIgnore(array_slice($attributes, 0, 2)));
+
+        $this->assertSame('11111111-1111-1111-1111-111111111111', $user->posts->find(1)->uuid);
+        $this->assertSame('33333333-3333-3333-3333-333333333333', $user->posts->find(3)->uuid);
+    }
+
+    public function testfillAndInsertGetIdIntoHasManyRelationship()
+    {
+        $user = tap(new UserWithUniqueStringIds(), function ($user) {
+            $user->forceFill(['name' => 'Taylor Otwell'])->save();
+        });
+
+        $id = $user->posts()->fillAndInsertGetId([
+            'name' => 'We must ship.',
+            'published_at' => now(),
+        ]);
+
+        $this->assertSame(1, $id);
+    }
+
     /**
      * Helpers...
      */
