@@ -450,6 +450,67 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Insert into the database after merging the model's default attributes, setting timestamps, and casting values.
+     *
+     * @param  array<int, array<string, mixed>>  $values
+     * @return bool
+     */
+    public function fillAndInsert(array $values)
+    {
+        return $this->insert($this->fillForInsert($values));
+    }
+
+    /**
+     * Insert (ignoring errors) into the database after merging the model's default attributes, setting timestamps, and casting values.
+     *
+     * @param  array<int, array<string, mixed>>  $values
+     * @return int
+     */
+    public function fillAndInsertOrIgnore(array $values)
+    {
+        return $this->insertOrIgnore($this->fillForInsert($values));
+    }
+
+    /**
+     * Insert a record into the database and get its ID after merging the model's default attributes, setting timestamps, and casting values.
+     *
+     * @param  array<string, mixed>  $values
+     * @return int
+     */
+    public function fillAndInsertGetId(array $values)
+    {
+        return $this->insertGetId($this->fillForInsert([$values])[0]);
+    }
+
+    /**
+     * Enrich the given values by merging in the model's default attributes, adding timestamps, and casting values.
+     *
+     * @param  array<int, array<string, mixed>>  $values
+     * @return array<int, array<string, mixed>>
+     */
+    public function fillForInsert(array $values)
+    {
+        if (empty($values)) {
+            return [];
+        }
+
+        if (! is_array(reset($values))) {
+            $values = [$values];
+        }
+
+        $this->model->unguarded(function () use (&$values) {
+            foreach ($values as $key => $rowValues) {
+                $values[$key] = tap(
+                    $this->newModelInstance($rowValues),
+                    fn ($model) => $model->setUniqueIds()
+                )->getAttributes();
+            }
+        });
+
+        return $this->addTimestampsToUpsertValues($values);
+    }
+
+    /**
      * Create a collection of models from a raw query.
      *
      * @param  string  $query
@@ -1822,16 +1883,19 @@ class Builder implements BuilderContract
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|array|string  $attributes
      * @param  mixed  $value
+     * @param  bool  $asConditions
      * @return $this
      */
-    public function withAttributes(Expression|array|string $attributes, $value = null)
+    public function withAttributes(Expression|array|string $attributes, $value = null, $asConditions = true)
     {
         if (! is_array($attributes)) {
             $attributes = [$attributes => $value];
         }
 
-        foreach ($attributes as $column => $value) {
-            $this->where($this->qualifyColumn($column), $value);
+        if ($asConditions) {
+            foreach ($attributes as $column => $value) {
+                $this->where($this->qualifyColumn($column), $value);
+            }
         }
 
         $this->pendingAttributes = array_merge($this->pendingAttributes, $attributes);

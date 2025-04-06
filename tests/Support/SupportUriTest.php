@@ -196,4 +196,39 @@ class SupportUriTest extends TestCase
         $this->assertEquals('https://laravel.com', (string) $uri);
         $this->assertEquals('https://laravel.com', (string) $uri->withQuery([]));
     }
+
+    public function test_path_segments()
+    {
+        $uri = Uri::of('https://laravel.com');
+
+        $this->assertEquals([], $uri->pathSegments()->toArray());
+
+        $uri = Uri::of('https://laravel.com/one/two/three');
+
+        $this->assertEquals(['one', 'two', 'three'], $uri->pathSegments()->toArray());
+        $this->assertEquals('one', $uri->pathSegments()->first());
+
+        $uri = Uri::of('https://laravel.com/one/two/three?foo=bar');
+
+        $this->assertEquals(3, $uri->pathSegments()->count());
+
+        $uri = Uri::of('https://laravel.com/one/two/three/?foo=bar');
+
+        $this->assertEquals(3, $uri->pathSegments()->count());
+
+        $uri = Uri::of('https://laravel.com/one/two/three/#foo=bar');
+
+        $this->assertEquals(3, $uri->pathSegments()->count());
+    }
+
+    public function test_macroable()
+    {
+        Uri::macro('myMacro', function () {
+            return $this->withPath('foobar');
+        });
+
+        $uri = new Uri('https://laravel.com/');
+
+        $this->assertSame('https://laravel.com/foobar', (string) $uri->myMacro());
+    }
 }

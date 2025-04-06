@@ -21,6 +21,7 @@ use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection as BaseCollection;
 use Mockery as m;
+use PDO;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
@@ -1278,6 +1279,29 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $result = $builder->whereBelongsTo($parents, 'parent');
         $this->assertEquals($result, $builder);
+    }
+
+    public function testWhereAttachedTo()
+    {
+        $related = new EloquentBuilderTestModelFarRelatedStub;
+        $related->id = 49;
+
+        $builder = EloquentBuilderTestModelParentStub::whereAttachedTo($related, 'roles');
+
+        $this->assertSame('select * from "eloquent_builder_test_model_parent_stubs" where exists (select * from "eloquent_builder_test_model_far_related_stubs" inner join "user_role" on "eloquent_builder_test_model_far_related_stubs"."id" = "user_role"."related_id" where "eloquent_builder_test_model_parent_stubs"."id" = "user_role"."self_id" and "eloquent_builder_test_model_far_related_stubs"."id" in (49))', $builder->toSql());
+    }
+
+    public function testWhereAttachedToCollection()
+    {
+        $model1 = new EloquentBuilderTestModelParentStub;
+        $model1->id = 3;
+
+        $model2 = new EloquentBuilderTestModelParentStub;
+        $model2->id = 4;
+
+        $builder = EloquentBuilderTestModelFarRelatedStub::whereAttachedTo(new Collection([$model1, $model2]), 'roles');
+
+        $this->assertSame('select * from "eloquent_builder_test_model_far_related_stubs" where exists (select * from "eloquent_builder_test_model_parent_stubs" inner join "user_role" on "eloquent_builder_test_model_parent_stubs"."id" = "user_role"."self_id" where "eloquent_builder_test_model_far_related_stubs"."id" = "user_role"."related_id" and "eloquent_builder_test_model_parent_stubs"."id" in (3, 4))', $builder->toSql());
     }
 
     public function testDeleteOverride()
@@ -2618,6 +2642,31 @@ class DatabaseEloquentBuilderTest extends TestCase
         }
     }
 
+    public function testPipeCallback()
+    {
+        $query = new Builder(new BaseBuilder(
+            $connection = new Connection(new PDO('sqlite::memory:')),
+            new Grammar($connection),
+            new Processor,
+        ));
+
+        $result = $query->pipe(fn (Builder $query) => 5);
+        $this->assertSame(5, $result);
+
+        $result = $query->pipe(fn (Builder $query) => null);
+        $this->assertSame($query, $result);
+
+        $result = $query->pipe(function (Builder $query) {
+            //
+        });
+        $this->assertSame($query, $result);
+
+        $this->assertCount(0, $query->getQuery()->wheres);
+        $result = $query->pipe(fn (Builder $query) => $query->where('foo', 'bar'));
+        $this->assertSame($query, $result);
+        $this->assertCount(1, $query->getQuery()->wheres);
+    }
+
     protected function mockConnectionForModel($model, $database)
     {
         $grammarClass = 'Illuminate\Database\Query\Grammars\\'.$database.'Grammar';
@@ -2790,7 +2839,15 @@ class EloquentBuilderTestModelCloseRelatedStub extends Model
 
 class EloquentBuilderTestModelFarRelatedStub extends Model
 {
-    //
+    public function roles()
+    {
+        return $this->belongsToMany(
+            EloquentBuilderTestModelParentStub::class,
+            'user_role',
+            'related_id',
+            'self_id',
+        );
+    }
 }
 
 class EloquentBuilderTestModelSelfRelatedStub extends Model

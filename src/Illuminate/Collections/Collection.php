@@ -7,6 +7,7 @@ use ArrayIterator;
 use Illuminate\Contracts\Support\CanBeEscapedWhenCastToString;
 use Illuminate\Support\Traits\EnumeratesValues;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Support\Traits\TransformsToResourceCollection;
 use InvalidArgumentException;
 use stdClass;
 use Traversable;
@@ -24,7 +25,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * @use \Illuminate\Support\Traits\EnumeratesValues<TKey, TValue>
      */
-    use EnumeratesValues, Macroable;
+    use EnumeratesValues, Macroable, TransformsToResourceCollection;
 
     /**
      * The items contained in the collection.

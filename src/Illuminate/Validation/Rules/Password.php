@@ -379,4 +379,24 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
 
         return false;
     }
+
+    /**
+     * Get information about the current state of the password validation rules.
+     *
+     * @return array
+     */
+    public function appliedRules()
+    {
+        return [
+            'min' => $this->min,
+            'max' => $this->max,
+            'mixedCase' => $this->mixedCase,
+            'letters' => $this->letters,
+            'numbers' => $this->numbers,
+            'symbols' => $this->symbols,
+            'uncompromised' => $this->uncompromised,
+            'compromisedThreshold' => $this->compromisedThreshold,
+            'customRules' => $this->customRules,
+        ];
+    }
 }

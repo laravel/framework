@@ -183,13 +183,12 @@ class RouteUrlGenerator
     {
         $parameters = Arr::wrap($parameters);
 
-        $passedParameterCount = count($parameters);
-
         $namedParameters = [];
         $namedQueryParameters = [];
-        $routeParametersWithoutDefaultsOrNamedParameters = [];
+        $requiredRouteParametersWithoutDefaultsOrNamedParameters = [];
 
         $routeParameters = $route->parameterNames();
+        $optionalParameters = $route->getOptionalParameterNames();
 
         foreach ($routeParameters as $name) {
             if (isset($parameters[$name])) {
@@ -198,9 +197,9 @@ class RouteUrlGenerator
                 unset($parameters[$name]);
 
                 continue;
-            } elseif (! isset($this->defaultParameters[$name])) {
-                // No named parameter or default value, try to match to positional parameter below...
-                array_push($routeParametersWithoutDefaultsOrNamedParameters, $name);
+            } elseif (! isset($this->defaultParameters[$name]) && ! isset($optionalParameters[$name])) {
+                // No named parameter or default value for a required parameter, try to match to positional parameter below...
+                array_push($requiredRouteParametersWithoutDefaultsOrNamedParameters, $name);
             }
 
             $namedParameters[$name] = '';
@@ -216,8 +215,8 @@ class RouteUrlGenerator
         }
 
         // Match positional parameters to the route parameters that didn't have a value in order...
-        if (count($parameters) == count($routeParametersWithoutDefaultsOrNamedParameters)) {
-            foreach (array_reverse($routeParametersWithoutDefaultsOrNamedParameters) as $name) {
+        if (count($parameters) == count($requiredRouteParametersWithoutDefaultsOrNamedParameters)) {
+            foreach (array_reverse($requiredRouteParametersWithoutDefaultsOrNamedParameters) as $name) {
                 if (count($parameters) === 0) {
                     break;
                 }
@@ -226,19 +225,61 @@ class RouteUrlGenerator
             }
         }
 
-        // If there are extra parameters, just fill left to right... if not, fill right to left and try to use defaults...
-        $extraParameters = $passedParameterCount > count($routeParameters);
+        $offset = 0;
+        $emptyParameters = array_filter($namedParameters, static fn ($val) => $val === '');
 
-        foreach ($extraParameters ? $namedParameters : array_reverse($namedParameters) as $key => $value) {
-            $bindingField = $route->bindingFieldFor($key);
+        if (count($requiredRouteParametersWithoutDefaultsOrNamedParameters) !== 0 &&
+            count($parameters) !== count($emptyParameters)) {
+            // Find the index of the first required parameter...
+            $offset = array_search($requiredRouteParametersWithoutDefaultsOrNamedParameters[0], array_keys($namedParameters));
 
-            $defaultParameterKey = $bindingField ? "$key:$bindingField" : $key;
+            // If more empty parameters remain, adjust the offset...
+            $remaining = count($emptyParameters) - $offset - count($parameters);
 
-            if ($value !== '') {
+            if ($remaining < 0) {
+                // Effectively subtract the remaining count since it's negative...
+                $offset += $remaining;
+            }
+
+            // Correct offset if it goes below zero...
+            if ($offset < 0) {
+                $offset = 0;
+            }
+        } elseif (count($requiredRouteParametersWithoutDefaultsOrNamedParameters) === 0 && count($parameters) !== 0) {
+            // Handle the case where all passed parameters are for parameters that have default values...
+            $remainingCount = count($parameters);
+
+            // Loop over empty parameters backwards and stop when we run out of passed parameters...
+            for ($i = count($namedParameters) - 1; $i >= 0; $i--) {
+                if ($namedParameters[array_keys($namedParameters)[$i]] === '') {
+                    $offset = $i;
+                    $remainingCount--;
+
+                    if ($remainingCount === 0) {
+                        // If there are no more passed parameters, we stop here...
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Starting from the offset, match any passed parameters from left to right...
+        for ($i = $offset; $i < count($namedParameters); $i++) {
+            $key = array_keys($namedParameters)[$i];
+
+            if ($namedParameters[$key] !== '') {
                 continue;
             } elseif (! empty($parameters)) {
-                $namedParameters[$key] = $extraParameters ? array_shift($parameters) : array_pop($parameters);
-            } elseif (isset($this->defaultParameters[$defaultParameterKey])) {
+                $namedParameters[$key] = array_shift($parameters);
+            }
+        }
+
+        // Fill leftmost parameters with defaults if the loop above was offset...
+        foreach ($namedParameters as $key => $value) {
+            $bindingField = $route->bindingFieldFor($key);
+            $defaultParameterKey = $bindingField ? "$key:$bindingField" : $key;
+
+            if ($value === '' && isset($this->defaultParameters[$defaultParameterKey])) {
                 $namedParameters[$key] = $this->defaultParameters[$defaultParameterKey];
             }
         }

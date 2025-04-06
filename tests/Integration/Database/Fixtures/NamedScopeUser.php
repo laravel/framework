@@ -27,6 +27,12 @@ class NamedScopeUser extends User
         );
     }
 
+    #[NamedScope]
+    protected function verifiedWithoutReturn(Builder $builder, bool $email = true)
+    {
+        $this->verified($builder, $email);
+    }
+
     public function scopeVerifiedUser(Builder $builder, bool $email = true)
     {
         return $builder->when(
