@@ -2686,7 +2686,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
                 'name' => 'ship or die',
                 'published_at' => '2025-01-31T22:18:21.000Z',
                 'status' => 3,
-                'status_string' => StringBackedStatus::Published
+                'status_string' => StringBackedStatus::Published,
             ],
             [
                 'id' => 3,
