@@ -417,28 +417,6 @@ trait QueriesRelationships
     }
 
     /**
-     * Add a basic where clause to a relationship query.
-     *
-     * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
-     *
-     * @param  \Illuminate\Database\Eloquent\Relations\Relation<TRelatedModel, *, *>|string  $relation
-     * @param  (\Closure(\Illuminate\Database\Eloquent\Builder<TRelatedModel>): mixed)|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
-     * @param  mixed  $operator
-     * @param  mixed  $value
-     * @return $this
-     */
-    public function whereRelation($relation, $column, $operator = null, $value = null)
-    {
-        return $this->whereHas($relation, function ($query) use ($column, $operator, $value) {
-            if ($column instanceof Closure) {
-                $column($query);
-            } else {
-                $query->where($column, $operator, $value);
-            }
-        });
-    }
-
-    /**
      * Add a basic where clause to a relationship query and eager-load the relationship with the same conditions.
      *
      * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>|string  $relation
@@ -451,10 +429,24 @@ trait QueriesRelationships
     {
         return $this->whereRelation($relation, $column, $operator, $value)
             ->with([
-                $relation => fn ($query) => $column instanceof Closure
-                    ? $column($query)
-                    : $query->where($column, $operator, $value),
+                $relation => $this->addWhereRelationCallback($column, $operator, $value),
             ]);
+    }
+
+    /**
+     * Add a basic where clause to a relationship query.
+     *
+     * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation<TRelatedModel, *, *>|string  $relation
+     * @param  (\Closure(\Illuminate\Database\Eloquent\Builder<TRelatedModel>): mixed)|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function whereRelation($relation, $column, $operator = null, $value = null)
+    {
+        return $this->whereHas($relation, $this->addWhereRelationCallback($column, $operator, $value));
     }
 
     /**
@@ -470,13 +462,7 @@ trait QueriesRelationships
      */
     public function orWhereRelation($relation, $column, $operator = null, $value = null)
     {
-        return $this->orWhereHas($relation, function ($query) use ($column, $operator, $value) {
-            if ($column instanceof Closure) {
-                $column($query);
-            } else {
-                $query->where($column, $operator, $value);
-            }
-        });
+        return $this->orWhereHas($relation, $this->addWhereRelationCallback($column, $operator, $value));
     }
 
     /**
@@ -492,13 +478,7 @@ trait QueriesRelationships
      */
     public function whereDoesntHaveRelation($relation, $column, $operator = null, $value = null)
     {
-        return $this->whereDoesntHave($relation, function ($query) use ($column, $operator, $value) {
-            if ($column instanceof Closure) {
-                $column($query);
-            } else {
-                $query->where($column, $operator, $value);
-            }
-        });
+        return $this->whereDoesntHave($relation, $this->addWhereRelationCallback($column, $operator, $value));
     }
 
     /**
@@ -514,13 +494,7 @@ trait QueriesRelationships
      */
     public function orWhereDoesntHaveRelation($relation, $column, $operator = null, $value = null)
     {
-        return $this->orWhereDoesntHave($relation, function ($query) use ($column, $operator, $value) {
-            if ($column instanceof Closure) {
-                $column($query);
-            } else {
-                $query->where($column, $operator, $value);
-            }
-        });
+        return $this->orWhereDoesntHave($relation, $this->addWhereRelationCallback($column, $operator, $value));
     }
 
     /**
@@ -1027,6 +1001,23 @@ trait QueriesRelationships
         return $this->canUseExistsForExistenceCheck($operator, $count)
             ? $this->addWhereExistsQuery($hasQuery->toBase(), $boolean, $operator === '<' && $count === 1)
             : $this->addWhereCountQuery($hasQuery->toBase(), $operator, $count, $boolean);
+    }
+
+    /**
+     * Add the condition where relation clause to the query.
+     *
+     * @param  (\Closure(\Illuminate\Database\Eloquent\Builder<TRelatedModel>): mixed)|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return (\Closure(\Illuminate\Database\Eloquent\Builder<TRelatedModel>): mixed)|null
+     */
+    protected function addWhereRelationCallback($column, $operator = null, $value = null)
+    {
+        if ($column instanceof Closure) {
+            return fn ($query) => $column($query);
+        }
+
+        return fn ($query) => $query->where($column, $operator, $value);
     }
 
     /**
