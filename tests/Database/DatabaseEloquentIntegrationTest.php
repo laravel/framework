@@ -2663,6 +2663,61 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertSame($newId, UserWithUniqueStringIds::sole()->id);
     }
 
+    public function testCanFillAndInsertIntoHasManyRelationship()
+    {
+        $now = Carbon::now()->startOfSecond();
+        Carbon::setTestNow($now);
+
+        Str::createUuidsUsingSequence([
+            '00000000-0000-7000-0000-000000000000', // user
+            '11111111-1111-1111-1111-111111111111', // post id=1
+            '33333333-3333-3333-3333-333333333333', // post id=3
+        ]);
+
+        $user = tap(new UserWithUniqueStringIds(), function ($user) {
+            $user->forceFill(['name' => 'Taylor Otwell'])->save();
+        });
+
+        DB::enableQueryLog();
+
+        $this->assertTrue($user->posts()->fillAndInsert([
+            [
+                'id' => 1,
+                'name' => 'ship or die',
+                'published_at' => '2025-01-31T22:18:21.000Z',
+                'status' => 3,
+                'status_string' => StringBackedStatus::Published
+            ],
+            [
+                'id' => 3,
+                'name' => 'Welcome to the future of Laravel.',
+                'published_at' => new Carbon('2025-02-24T15:16:55.000Z'),
+                // status is default
+                // status_string is default
+            ],
+        ]));
+
+        $this->assertCount(1, DB::getQueryLog());
+
+        $this->assertCount(2, $user->posts);
+
+        $this->assertSame('ship or die', $user->posts->find(1)->name);
+        $this->assertSame('11111111-1111-1111-1111-111111111111', $user->posts->find(1)->uuid);
+        $this->assertEquals($now, $user->posts->find(1)->created_at);
+        $this->assertEquals($now, $user->posts->find(1)->updated_at);
+        $this->assertSame(IntBackedStatus::Published, $user->posts->find(1)->status);
+        $this->assertSame(StringBackedStatus::Published, $user->posts->find(1)->status_string);
+        $this->assertEquals(Carbon::parse('2025-01-31T22:18:21.000Z'), $user->posts->find(1)->published_at);
+
+        $this->assertSame('Welcome to the future of Laravel.', $user->posts->find(3)->name);
+        $this->assertSame('33333333-3333-3333-3333-333333333333', $user->posts->find(3)->uuid);
+        $this->assertEquals($now, $user->posts->find(3)->created_at);
+        $this->assertEquals($now, $user->posts->find(3)->updated_at);
+        $this->assertSame(IntBackedStatus::Draft, $user->posts->find(3)->status);
+        $this->assertSame(StringBackedStatus::Draft, $user->posts->find(3)->status_string);
+        $this->assertEquals(Carbon::parse('2025-02-24T15:16:55.000Z'), $user->posts->find(3)->published_at);
+    }
+
     /**
      * Helpers...
      */

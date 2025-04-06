@@ -374,6 +374,33 @@ abstract class HasOneOrMany extends Relation
     }
 
     /**
+     * Insert into the database after merging the model's default attributes, setting timestamps, and casting values.
+     *
+     * @param  array<int, array<string, mixed>>  $values
+     * @return bool
+     */
+    public function fillAndInsert(array $values)
+    {
+        return $this->query->fillAndInsert($this->fillForInsert($values));
+    }
+
+    protected function fillForInsert(array $values)
+    {
+        if (empty($values)) {
+            return [];
+        }
+
+        if (! is_array(reset($values))) {
+            $values = [$values];
+        }
+
+        return $this->related->unguarded(fn () => array_map(
+            fn ($value) => $this->make($value)->getAttributes(),
+            $values
+        ));
+    }
+
+    /**
      * Create a new instance of the related model without raising any events to the parent model.
      *
      * @param  array  $attributes
