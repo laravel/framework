@@ -50,7 +50,6 @@ class ProcessDriverTest extends TestCase
 
     protected function tearDown(): void
     {
-        Mockery::close();
         parent::tearDown();
     }
 
@@ -177,10 +176,7 @@ class ProcessDriverTest extends TestCase
         $this->assertInstanceOf(DeferredCallback::class, $deferred);
     }
 
-    /**
-     * @test
-     */
-    public function deferWithMultipleTasksCreatesMultipleBackgroundProcesses()
+    public function testDeferWithMultipleTasksCreatesMultipleBackgroundProcesses()
     {
         // تنظیم انتظارات برای دو فراخوانی متوالی processFactory->path و غیره
         $this->processFactory->shouldReceive('path')
@@ -212,10 +208,7 @@ class ProcessDriverTest extends TestCase
         $callback();
     }
 
-    /**
-     * @test
-     */
-    public function theGetBasePathMethodReturnsTheCorrectPath()
+    public function testTheGetBasePathMethodReturnsTheCorrectPath()
     {
         $reflection = new \ReflectionClass($this->driver);
         $method = $reflection->getMethod('getBasePath');
@@ -226,10 +219,7 @@ class ProcessDriverTest extends TestCase
         $this->assertEquals('/path/to/base', $result);
     }
 
-    /**
-     * @test
-     */
-    public function runHandlesResultsCorrectly()
+    public function testRunHandlesResultsCorrectly()
     {
         $this->pool->shouldReceive('as')
             ->with(0)

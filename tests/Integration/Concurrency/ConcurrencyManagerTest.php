@@ -17,17 +17,14 @@ class ConcurrencyManagerTest extends TestCase
 {
     protected function tearDown(): void
     {
-        Mockery::close();
         parent::tearDown();
     }
 
-    protected function setUp(): void
+    protected function defineEnvironment($app)
     {
-        parent::setUp();
-
         // Set up the config for concurrency
-        $this->app['config']->set('concurrency.default', 'sync');
-        $this->app['config']->set('concurrency.driver.process', ['driver' => 'process']);
+        $app['config']->set('concurrency.default', 'sync');
+        $app['config']->set('concurrency.driver.process', ['driver' => 'process']);
     }
 
     public function testDriverReturnsTheDefaultDriver()
@@ -125,10 +122,7 @@ class ConcurrencyManagerTest extends TestCase
         $this->assertEquals(['driver' => 'custom'], $config);
     }
 
-    /**
-     * @test
-     */
-    public function itCanBeUsedAsAConcurrencyDriver()
+    public function testItCanBeUsedAsAConcurrencyDriver()
     {
         $manager = new ConcurrencyManager($this->app);
 
@@ -138,10 +132,7 @@ class ConcurrencyManagerTest extends TestCase
         $this->assertEquals([0 => 5], $result);
     }
 
-    /**
-     * @test
-     */
-    public function itCreatesRealForkDriverWhenPackageIsAvailable()
+    public function testItCreatesRealForkDriverWhenPackageIsAvailable()
     {
         // No need for "runningInConsole" check in a real test - since TestCase always returns runningInConsole
 
