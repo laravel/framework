@@ -905,6 +905,25 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add a "where" clause for multiple columns using "or" or "and" conditions between them.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression[]|\Closure[]|string[]  $columns
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @param  string  $boolean
+     * @param  string  $booleanNested
+     * @return $this
+     */
+    protected function addNestedWhereGroup($columns, $operator = null, $value = null, $boolean = 'and', $booleanNested = 'and')
+    {
+        $callback = fn($query) => array_walk($columns,
+            fn($column) => $query->where($column, $operator, $value, $boolean)
+        );
+
+        return $this->whereNested($callback, $booleanNested);
+    }
+
+    /**
      * Add an array of where clauses to the query.
      *
      * @param  array  $column
@@ -2275,13 +2294,7 @@ class Builder implements BuilderContract
             $value, $operator, func_num_args() === 2
         );
 
-        $this->whereNested(function ($query) use ($columns, $operator, $value) {
-            foreach ($columns as $column) {
-                $query->where($column, $operator, $value, 'and');
-            }
-        }, $boolean);
-
-        return $this;
+        return $this->addNestedWhereGroup($columns, $operator, $value, 'and', $boolean);
     }
 
     /**
@@ -2312,13 +2325,7 @@ class Builder implements BuilderContract
             $value, $operator, func_num_args() === 2
         );
 
-        $this->whereNested(function ($query) use ($columns, $operator, $value) {
-            foreach ($columns as $column) {
-                $query->where($column, $operator, $value, 'or');
-            }
-        }, $boolean);
-
-        return $this;
+        return $this->addNestedWhereGroup($columns, $operator, $value, 'or', $boolean);
     }
 
     /**
