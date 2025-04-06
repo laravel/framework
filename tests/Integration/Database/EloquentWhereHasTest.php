@@ -22,6 +22,8 @@ class EloquentWhereHasTest extends DatabaseTestCase
         Schema::create('posts', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('user_id');
+            $table->text('title');
+            $table->text('slug');
             $table->boolean('public');
         });
 
@@ -29,6 +31,7 @@ class EloquentWhereHasTest extends DatabaseTestCase
             $table->increments('id');
             $table->unsignedInteger('post_id');
             $table->text('content');
+            $table->text('author_name');
         });
 
         Schema::create('comments', function (Blueprint $table) {
@@ -38,14 +41,18 @@ class EloquentWhereHasTest extends DatabaseTestCase
         });
 
         $user = User::create();
-        $post = tap((new Post(['public' => true]))->user()->associate($user))->save();
+        $post = tap((
+            new Post(['public' => true, 'title' => 'Taylor', 'slug' => 'Taylor'])
+            )->user()->associate($user))->save();
         (new Comment)->commentable()->associate($post)->save();
-        (new Text(['content' => 'test']))->post()->associate($post)->save();
+        (new Text(['content' => 'test', 'author_name' => 'test']))->post()->associate($post)->save();
 
         $user = User::create();
-        $post = tap((new Post(['public' => false]))->user()->associate($user))->save();
+        $post = tap((
+            new Post(['public' => false, 'title' => 'Taylor', 'slug' => 'Taylor'])
+            )->user()->associate($user))->save();
         (new Comment)->commentable()->associate($post)->save();
-        (new Text(['content' => 'test2']))->post()->associate($post)->save();
+        (new Text(['content' => 'test2', 'author_name' => 'test2']))->post()->associate($post)->save();
     }
 
     /**
@@ -176,6 +183,66 @@ class EloquentWhereHasTest extends DatabaseTestCase
     public function testNestedOrWhereRelation()
     {
         $texts = User::whereRelation('posts.texts', 'content', 'test')->orWhereRelation('posts.texts', 'content', 'test2')->get();
+
+        $this->assertEquals([1, 2], $texts->pluck('id')->all());
+    }
+
+    public function testWhereRelationAny()
+    {
+        $users = User::whereRelationAny('posts', ['title', 'slug'], 'Taylor')->get();
+
+        $this->assertEquals([1, 2], $users->pluck('id')->all());
+    }
+
+    public function testOrWhereRelationAny()
+    {
+        $users = User::whereRelationAny('posts', ['title'], 'Taylor')->orWhereRelationAny('posts', ['slug'], 'Taylor')->get();
+
+        $this->assertEquals([1, 2], $users->pluck('id')->all());
+    }
+
+    public function testNestedWhereRelationAny()
+    {
+        $texts = User::whereRelationAny('posts.texts', ['content', 'author_name'], 'test')->get();
+
+        $this->assertEquals([1], $texts->pluck('id')->all());
+    }
+
+    public function testNestedOrWhereRelationAny()
+    {
+        $texts = User::whereRelationAny('posts.texts', ['content', 'author_name'], 'test')
+            ->orWhereRelationAny('posts.texts', ['content', 'author_name'], 'test2')
+            ->get();
+
+        $this->assertEquals([1, 2], $texts->pluck('id')->all());
+    }
+
+    public function testWhereRelationAll()
+    {
+        $users = User::whereRelationAll('posts', ['title', 'slug'], 'Taylor')->get();
+
+        $this->assertEquals([1, 2], $users->pluck('id')->all());
+    }
+
+    public function testOrWhereRelationAll()
+    {
+        $users = User::whereRelationAll('posts', ['title'], 'Taylor')->orWhereRelationAll('posts', ['slug'], 'Taylor')->get();
+
+        $this->assertEquals([1, 2], $users->pluck('id')->all());
+    }
+
+    public function testNestedWhereRelationAll()
+    {
+        $texts = User::whereRelationAll('posts.texts', ['content', 'author_name'], 'test')->get();
+
+        $this->assertEquals([1], $texts->pluck('id')->all());
+    }
+
+    public function testNestedOrWhereRelationAll()
+    {
+        $texts = User::whereRelationAll('posts.texts', ['content', 'author_name'], 'test')
+            ->orWhereRelationAll('posts.texts', ['content', 'author_name'], 'test2')
+            ->get();
 
         $this->assertEquals([1, 2], $texts->pluck('id')->all());
     }

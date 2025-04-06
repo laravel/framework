@@ -524,6 +524,70 @@ trait QueriesRelationships
     }
 
     /**
+     * Add a "whereAny" condition within a relationship query.
+     *
+     * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation<TRelatedModel, *, *>|string  $relation
+     * @param  \Illuminate\Contracts\Database\Query\Expression[]|\Closure[]|string[]  $columns
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function whereRelationAny($relation, $columns, $operator = null, $value = null)
+    {
+        return $this->whereHas($relation, fn ($query) => $query->whereAny($columns, $operator, $value));
+    }
+
+    /**
+     * Add an "orWhereHas" with "whereAny" on a relationship query.
+     *
+     * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation<TRelatedModel, *, *>|string  $relation
+     * @param  \Illuminate\Contracts\Database\Query\Expression[]|\Closure[]|string[]  $columns
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function orWhereRelationAny($relation, $columns, $operator = null, $value = null)
+    {
+        return $this->orWhereHas($relation, fn ($query) => $query->whereAny($columns, $operator, $value));
+    }
+
+    /**
+     * Add a "whereAll" condition within a relationship query.
+     *
+     * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation<TRelatedModel, *, *>|string  $relation
+     * @param  \Illuminate\Contracts\Database\Query\Expression[]|\Closure[]|string[]  $columns
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function whereRelationAll($relation, $columns, $operator = null, $value = null)
+    {
+        return $this->whereHas($relation, fn ($query) => $query->whereAll($columns, $operator, $value));
+    }
+
+    /**
+     * Add an "orWhereHas" with "whereAll" on a relationship query.
+     *
+     * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation<TRelatedModel, *, *>|string  $relation
+     * @param  \Illuminate\Contracts\Database\Query\Expression[]|\Closure[]|string[]  $columns
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function orWhereRelationAll($relation, $columns, $operator = null, $value = null)
+    {
+        return $this->orWhereHas($relation, fn ($query) => $query->whereAll($columns, $operator, $value));
+    }
+
+    /**
      * Add a polymorphic relationship condition to the query with a where clause.
      *
      * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
