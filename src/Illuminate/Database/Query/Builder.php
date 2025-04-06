@@ -916,8 +916,8 @@ class Builder implements BuilderContract
      */
     protected function addNestedWhereGroup($columns, $operator = null, $value = null, $boolean = 'and', $booleanNested = 'and')
     {
-        $callback = fn($query) => array_walk($columns,
-            fn($column) => $query->where($column, $operator, $value, $boolean)
+        $callback = fn ($query) => array_walk($columns,
+            fn ($column) => $query->where($column, $operator, $value, $boolean)
         );
 
         return $this->whereNested($callback, $booleanNested);
