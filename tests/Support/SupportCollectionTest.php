@@ -2815,6 +2815,35 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testFromJson($collection)
+    {
+        $json = json_encode($array = ['foo' => 'bar', 'baz' => 'quz']);
+
+        $instance = $collection::fromJson($json);
+
+        $this->assertSame($array, $instance->toArray());
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testFromJsonWithDepth($collection)
+    {
+        $json = json_encode(['foo' => ['baz' => ['quz']], 'bar' => 'baz']);
+
+        $instance = $collection::fromJson($json, 1);
+
+        $this->assertEmpty($instance->toArray());
+        $this->assertSame(JSON_ERROR_DEPTH, json_last_error());
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testFromJsonWithFlags($collection)
+    {
+        $instance = $collection::fromJson('{"int":99999999999999999999999}', 512, JSON_BIGINT_AS_STRING);
+
+        $this->assertSame(['int' => '99999999999999999999999'], $instance->toArray());
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testConstructMakeFromObject($collection)
     {
         $object = new stdClass;

@@ -277,13 +277,7 @@ class PostgresGrammar extends Grammar
         }
     }
 
-    /**
-     * Compile a change column command into a series of SQL statements.
-     *
-     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Illuminate\Support\Fluent  $command
-     * @return array|string
-     */
+    /** @inheritDoc */
     public function compileChange(Blueprint $blueprint, Fluent $command)
     {
         $column = $command->column;
@@ -465,7 +459,7 @@ class PostgresGrammar extends Grammar
     /**
      * Compile the SQL needed to drop all tables.
      *
-     * @param  array  $tables
+     * @param  array<string>  $tables
      * @return string
      */
     public function compileDropAllTables($tables)
@@ -476,7 +470,7 @@ class PostgresGrammar extends Grammar
     /**
      * Compile the SQL needed to drop all views.
      *
-     * @param  array  $views
+     * @param  array<string>  $views
      * @return string
      */
     public function compileDropAllViews($views)
@@ -487,7 +481,7 @@ class PostgresGrammar extends Grammar
     /**
      * Compile the SQL needed to drop all types.
      *
-     * @param  array  $types
+     * @param  array<string>  $types
      * @return string
      */
     public function compileDropAllTypes($types)
@@ -498,7 +492,7 @@ class PostgresGrammar extends Grammar
     /**
      * Compile the SQL needed to drop all domains.
      *
-     * @param  array  $domains
+     * @param  array<string>  $domains
      * @return string
      */
     public function compileDropAllDomains($domains)
@@ -684,8 +678,8 @@ class PostgresGrammar extends Grammar
     /**
      * Quote-escape the given tables, views, or types.
      *
-     * @param  array  $names
-     * @return array
+     * @param  array<string>  $names
+     * @return array<string>
      */
     public function escapeNames($names)
     {
@@ -1231,7 +1225,7 @@ class PostgresGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $column
-     * @return string|array|null
+     * @return string|list<string>|null
      */
     protected function modifyGeneratedAs(Blueprint $blueprint, Fluent $column)
     {

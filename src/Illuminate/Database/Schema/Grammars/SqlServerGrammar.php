@@ -226,13 +226,7 @@ class SqlServerGrammar extends Grammar
         );
     }
 
-    /**
-     * Compile a rename column command.
-     *
-     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Illuminate\Support\Fluent  $command
-     * @return array|string
-     */
+    /** @inheritDoc */
     public function compileRenameColumn(Blueprint $blueprint, Fluent $command)
     {
         return sprintf("sp_rename %s, %s, N'COLUMN'",
@@ -241,13 +235,7 @@ class SqlServerGrammar extends Grammar
         );
     }
 
-    /**
-     * Compile a change column command into a series of SQL statements.
-     *
-     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Illuminate\Support\Fluent  $command
-     * @return array|string
-     */
+    /** @inheritDoc */
     public function compileChange(Blueprint $blueprint, Fluent $command)
     {
         return [
@@ -1033,7 +1021,7 @@ class SqlServerGrammar extends Grammar
     /**
      * Quote the given string literal.
      *
-     * @param  string|array  $value
+     * @param  string|array<string>  $value
      * @return string
      */
     public function quoteString($value)

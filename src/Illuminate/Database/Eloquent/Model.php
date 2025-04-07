@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Eloquent;
 
 use ArrayAccess;
+use Closure;
 use Illuminate\Contracts\Broadcasting\HasBroadcastChannel;
 use Illuminate\Contracts\Queue\QueueableCollection;
 use Illuminate\Contracts\Queue\QueueableEntity;
@@ -39,6 +40,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         Concerns\HidesAttributes,
         Concerns\GuardsAttributes,
         Concerns\PreventsCircularRecursion,
+        Concerns\TransformsToResource,
         ForwardsCalls;
     /** @use HasCollection<\Illuminate\Database\Eloquent\Collection<array-key, static & self>> */
     use HasCollection;
@@ -147,6 +149,13 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * @var array
      */
     protected static $booted = [];
+
+    /**
+     * The callbacks that should be executed after the model has booted.
+     *
+     * @var array
+     */
+    protected static $bootedCallbacks = [];
 
     /**
      * The array of trait initializers that will be called on each new instance.
@@ -278,6 +287,12 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             static::boot();
             static::booted();
 
+            static::$bootedCallbacks[static::class] ??= [];
+
+            foreach (static::$bootedCallbacks[static::class] as $callback) {
+                $callback();
+            }
+
             $this->fireModelEvent('booted', false);
         }
     }
@@ -357,6 +372,19 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
+     * Register a closure to be executed after the model has booted.
+     *
+     * @param  \Closure  $callback
+     * @return void
+     */
+    protected static function whenBooted(Closure $callback)
+    {
+        static::$bootedCallbacks[static::class] ??= [];
+
+        static::$bootedCallbacks[static::class][] = $callback;
+    }
+
+    /**
      * Clear the list of booted models so they will be re-booted.
      *
      * @return void
@@ -364,6 +392,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     public static function clearBootedModels()
     {
         static::$booted = [];
+        static::$bootedCallbacks = [];
 
         static::$globalScopes = [];
     }
@@ -2402,7 +2431,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     public static function __callStatic($method, $parameters)
     {
         if (static::isScopeMethodWithAttribute($method)) {
-            $parameters = [static::query(), ...$parameters];
+            return static::query()->$method(...$parameters);
         }
 
         return (new static)->$method(...$parameters);

@@ -6,8 +6,7 @@ class BladeExtendsTest extends AbstractBladeTestCase
 {
     public function testExtendsAreCompiled()
     {
-        $string = '@extends(\'foo\')
-test';
+        $string = "@extends('foo')\ntest";
         $expected = "test\n".'<?php echo $__env->make(\'foo\', array_diff_key(get_defined_vars(), [\'__data\' => 1, \'__path\' => 1]))->render(); ?>';
         $this->assertEquals($expected, $this->compiler->compileString($string));
 
@@ -18,8 +17,7 @@ test';
 
     public function testSequentialCompileStringCalls()
     {
-        $string = '@extends(\'foo\')
-test';
+        $string = "@extends('foo')\ntest";
         $expected = "test\n".'<?php echo $__env->make(\'foo\', array_diff_key(get_defined_vars(), [\'__data\' => 1, \'__path\' => 1]))->render(); ?>';
         $this->assertEquals($expected, $this->compiler->compileString($string));
 
@@ -31,8 +29,7 @@ test';
 
     public function testExtendsFirstAreCompiled()
     {
-        $string = '@extendsFirst([\'foo\', \'milwad\'])
-test';
+        $string = "@extendsFirst(['foo', 'milwad'])\ntest";
         $expected = "test\n".'<?php echo $__env->first([\'foo\', \'milwad\'], array_diff_key(get_defined_vars(), [\'__data\' => 1, \'__path\' => 1]))->render(); ?>';
         $this->assertEquals($expected, $this->compiler->compileString($string));
 
