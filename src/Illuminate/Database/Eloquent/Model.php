@@ -381,6 +381,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     public static function clearBootedModels()
     {
         static::$booted = [];
+        static::$bootedCallbacks = [];
 
         static::$globalScopes = [];
     }
