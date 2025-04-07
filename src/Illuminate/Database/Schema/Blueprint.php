@@ -4,7 +4,6 @@ namespace Illuminate\Database\Schema;
 
 use Closure;
 use Illuminate\Database\Connection;
-use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Grammars\Grammar;
 use Illuminate\Database\Schema\Grammars\MySqlGrammar;

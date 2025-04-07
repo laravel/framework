@@ -1948,7 +1948,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         return $this->keyType;
     }
 
-
     /**
      * Get the schema key type.
      *
