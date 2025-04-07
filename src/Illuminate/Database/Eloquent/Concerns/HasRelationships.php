@@ -333,7 +333,7 @@ trait HasRelationships
      * @param  string|null  $morphKeyType
      * @return \Illuminate\Database\Eloquent\Relations\MorphTo<\Illuminate\Database\Eloquent\Model, $this>
      */
-    protected function morphInstanceTo($target, $name, $type, $id, $ownerKey, $morphKeyType)
+    protected function morphInstanceTo($target, $name, $type, $id, $ownerKey, $morphKeyType = null)
     {
         $instance = $this->newRelatedInstance(
             static::getActualClassNameForMorph($target)
@@ -359,7 +359,7 @@ trait HasRelationships
      * @param  string|null  $morphKeyType
      * @return \Illuminate\Database\Eloquent\Relations\MorphTo<TRelatedModel, TDeclaringModel>
      */
-    protected function newMorphTo(Builder $query, Model $parent, $foreignKey, $ownerKey, $type, $relation, $morphKeyType)
+    protected function newMorphTo(Builder $query, Model $parent, $foreignKey, $ownerKey, $type, $relation, $morphKeyType = null)
     {
         return new MorphTo($query, $parent, $foreignKey, $ownerKey, $type, $relation, $morphKeyType);
     }
