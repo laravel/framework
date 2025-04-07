@@ -158,6 +158,13 @@ class Builder implements BuilderContract
     protected $afterQueryCallbacks = [];
 
     /**
+     * The callbacks that should be invoked on clone.
+     *
+     * @var array
+     */
+    protected $onCloneCallbacks = [];
+
+    /**
      * Create a new Eloquent query builder instance.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
@@ -317,6 +324,8 @@ class Builder implements BuilderContract
         if ($column instanceof Closure && is_null($operator)) {
             $column($query = $this->model->newQueryWithoutRelationships());
 
+            $this->eagerLoad = array_merge($this->eagerLoad, $query->getEagerLoads());
+
             $this->query->addNestedWhereQuery($query->getQuery(), $boolean);
         } else {
             $this->query->where(...func_get_args());
@@ -466,6 +475,21 @@ class Builder implements BuilderContract
         }
 
         return $this->whereKey($id)->first($columns);
+    }
+
+    /**
+     * Find a sole model by its primary key.
+     *
+     * @param  mixed  $id
+     * @param  array|string  $columns
+     * @return TModel
+     *
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<TModel>
+     * @throws \Illuminate\Database\MultipleRecordsFoundException
+     */
+    public function findSole($id, $columns = ['*'])
+    {
+        return $this->whereKey($id)->sole($columns);
     }
 
     /**
@@ -994,7 +1018,7 @@ class Builder implements BuilderContract
      * @param  string  $pageName
      * @param  int|null  $page
      * @param  \Closure|int|null  $total
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     * @return \Illuminate\Pagination\LengthAwarePaginator
      *
      * @throws \InvalidArgumentException
      */
@@ -1004,10 +1028,7 @@ class Builder implements BuilderContract
 
         $total = value($total) ?? $this->toBase()->getCountForPagination();
 
-        $perPage = ($perPage instanceof Closure
-            ? $perPage($total)
-            : $perPage
-        ) ?: $this->model->getPerPage();
+        $perPage = value($perPage, $total) ?: $this->model->getPerPage();
 
         $results = $total
             ? $this->forPage($page, $perPage)->get($columns)
@@ -2169,6 +2190,19 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Register a closure to be invoked on a clone.
+     *
+     * @param  \Closure  $callback
+     * @return $this
+     */
+    public function onClone(Closure $callback)
+    {
+        $this->onCloneCallbacks[] = $callback;
+
+        return $this;
+    }
+
+    /**
      * Force a clone of the underlying query builder when cloning.
      *
      * @return void
@@ -2176,5 +2210,9 @@ class Builder implements BuilderContract
     public function __clone()
     {
         $this->query = clone $this->query;
+
+        foreach ($this->onCloneCallbacks as $onCloneCallback) {
+            $onCloneCallback($this);
+        }
     }
 }

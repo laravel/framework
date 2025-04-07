@@ -717,6 +717,17 @@ class DatabaseEloquentModelTest extends TestCase
         $closure($builder);
     }
 
+    public function testWithWhereHasWorksInNestedQuery()
+    {
+        $model = new EloquentModelWithWhereHasStub;
+        $instance = $model->newInstance()->newQuery()->where(fn (Builder $q) => $q->withWhereHas('foo:diaa,fares'));
+        $builder = m::mock(Builder::class);
+        $builder->shouldReceive('select')->once()->with(['diaa', 'fares']);
+        $this->assertNotNull($instance->getEagerLoads()['foo']);
+        $closure = $instance->getEagerLoads()['foo'];
+        $closure($builder);
+    }
+
     public function testWithMethodCallsQueryBuilderCorrectlyWithArray()
     {
         $result = EloquentModelWithStub::with(['foo', 'bar']);

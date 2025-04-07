@@ -161,7 +161,9 @@ abstract class MorphOneOrMany extends HasOneOrMany
         $model->{$this->getMorphType()} = $this->morphClass;
 
         foreach ($this->getQuery()->pendingAttributes as $key => $value) {
-            if (! $model->hasAttribute($key)) {
+            $attributes ??= $model->getAttributes();
+
+            if (! array_key_exists($key, $attributes)) {
                 $model->setAttribute($key, $value);
             }
         }

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Migration;
 
+use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -29,6 +30,12 @@ class MigratorTest extends TestCase
         $this->subject->getRepository()->createRepository();
     }
 
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        Migrator::withoutMigrations([]);
+    }
+
     public function testMigrate()
     {
         $this->expectInfo('Running migrations.');
@@ -54,6 +61,24 @@ class MigratorTest extends TestCase
         $this->subject->run([__DIR__.'/fixtures']);
 
         $this->assertTrue(DB::getSchemaBuilder()->hasTable('people'));
+        $this->assertTrue(DB::getSchemaBuilder()->hasColumn('people', 'first_name'));
+        $this->assertTrue(DB::getSchemaBuilder()->hasColumn('people', 'last_name'));
+    }
+
+    public function testWithSkippedMigrations()
+    {
+        $this->app->forgetInstance('migrator');
+        $this->subject = $this->app->make('migrator');
+
+        Migrator::withoutMigrations(['2015_10_04_000000_modify_people_table.php', '2016_10_04_000000_modify_people_table']);
+
+        $this->subject->run([__DIR__.'/fixtures']);
+        $this->assertTrue(DB::getSchemaBuilder()->hasTable('people'));
+        $this->assertFalse(DB::getSchemaBuilder()->hasColumn('people', 'first_name'));
+        $this->assertFalse(DB::getSchemaBuilder()->hasColumn('people', 'last_name'));
+
+        Migrator::withoutMigrations([]);
+        $this->subject->run([__DIR__.'/fixtures']);
         $this->assertTrue(DB::getSchemaBuilder()->hasColumn('people', 'first_name'));
         $this->assertTrue(DB::getSchemaBuilder()->hasColumn('people', 'last_name'));
     }

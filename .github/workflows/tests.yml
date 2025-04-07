@@ -40,8 +40,13 @@ jobs:
       fail-fast: true
       matrix:
         php: [8.2, 8.3, 8.4]
-        phpunit: ['10.5.12', '11.3.2']
+        phpunit: ['10.5.35', '11.3.2', '12.0.0', '12.1.0']
         stability: [prefer-lowest, prefer-stable]
+        exclude:
+          - php: 8.2
+            phpunit: '12.0.0'
+          - php: 8.2
+            phpunit: '12.1.0'
 
     name: PHP ${{ matrix.php }} - PHPUnit ${{ matrix.phpunit }} - ${{ matrix.stability }}
 
@@ -73,19 +78,12 @@ jobs:
           shell: bash
         if: matrix.php >= 8.4
 
-      - name: Set PHPUnit
-        uses: nick-fields/retry@v3
-        with:
-          timeout_minutes: 5
-          max_attempts: 5
-          command: composer require phpunit/phpunit:^${{ matrix.phpunit }} --dev --no-interaction --no-update
-
       - name: Install dependencies
         uses: nick-fields/retry@v3
         with:
           timeout_minutes: 5
           max_attempts: 5
-          command: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress
+          command: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress --with="phpunit/phpunit:~${{ matrix.phpunit }}"
 
       - name: Execute tests
         run: vendor/bin/phpunit --display-deprecation ${{ matrix.stability == 'prefer-stable' && '--fail-on-deprecation' || '' }}
@@ -112,11 +110,13 @@ jobs:
       fail-fast: true
       matrix:
         php: [8.2, 8.3, 8.4]
-        phpunit: ['10.5', '11.0.1']
+        phpunit: ['10.5.35', '11.3.2', '12.0.0', '12.1.0']
         stability: [prefer-lowest, prefer-stable]
         exclude:
-          - php: 8.4
-            stability: prefer-lowest
+          - php: 8.2
+            phpunit: '12.0.0'
+          - php: 8.2
+            phpunit: '12.1.0'
 
     name: PHP ${{ matrix.php }} - PHPUnit ${{ matrix.phpunit }} - ${{ matrix.stability }} - Windows
 
@@ -140,20 +140,12 @@ jobs:
       - name: Set Framework version
         run: composer config version "11.x-dev"
 
-      - name: Set PHPUnit
-        uses: nick-fields/retry@v3
-        with:
-          timeout_minutes: 5
-          max_attempts: 5
-          command: composer require phpunit/phpunit:^${{ matrix.phpunit }} --dev --no-interaction --no-update
-          shell: bash
-
       - name: Install dependencies
         uses: nick-fields/retry@v3
         with:
           timeout_minutes: 5
           max_attempts: 5
-          command: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress
+          command: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress --with="phpunit/phpunit:~${{ matrix.phpunit }}"
 
       - name: Execute tests
         run: vendor/bin/phpunit

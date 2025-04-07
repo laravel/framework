@@ -416,6 +416,42 @@ class SupportFluentTest extends TestCase
         $this->assertEquals([TestBackedEnum::B], $fluent->enums('int.b', TestBackedEnum::class));
         $this->assertEmpty($fluent->enums('int.doesnt_exist', TestBackedEnum::class));
     }
+
+    public function testFill()
+    {
+        $fluent = new Fluent(['name' => 'John Doe']);
+
+        $fluent->fill([
+            'email' => 'john.doe@example.com',
+            'age' => 30,
+        ]);
+
+        $this->assertEquals([
+            'name' => 'John Doe',
+            'email' => 'john.doe@example.com',
+            'age' => 30,
+        ], $fluent->getAttributes());
+    }
+
+    public function testMacroable()
+    {
+        Fluent::macro('foo', function () {
+            return $this->fill([
+                'foo' => 'bar',
+                'baz' => 'zal',
+            ]);
+        });
+
+        $fluent = new Fluent([
+            'bee' => 'ser',
+        ]);
+
+        $this->assertSame([
+            'bee' => 'ser',
+            'foo' => 'bar',
+            'baz' => 'zal',
+        ], $fluent->foo()->all());
+    }
 }
 
 class FluentArrayIteratorStub implements IteratorAggregate

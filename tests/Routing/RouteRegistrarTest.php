@@ -516,6 +516,50 @@ class RouteRegistrarTest extends TestCase
         });
     }
 
+    public function testCanSetWithoutScopedBindings()
+    {
+        $route = $this->router->withoutScopedBindings()->get('users', function () {
+            return 'all-users';
+        });
+
+        $this->assertTrue($route->preventsScopedBindings());
+    }
+
+    public function testCanSetWithoutScopedBindingsOnGroup()
+    {
+        $this->router->withoutScopedBindings()->group(function ($router) {
+            $router->get('foo', function () {
+                return 'hello';
+            });
+        });
+
+        $route = $this->router->getRoutes()->getRoutes()[0];
+
+        $this->assertTrue($route->preventsScopedBindings());
+    }
+
+    public function testCanSetScopeBindings()
+    {
+        $route = $this->router->scopeBindings()->get('users', function () {
+            return 'all-users';
+        });
+
+        $this->assertTrue($route->enforcesScopedBindings());
+    }
+
+    public function testCanSetScopeBindingsOnGroup()
+    {
+        $this->router->scopeBindings()->group(function ($router) {
+            $router->get('foo', function () {
+                return 'hello';
+            });
+        });
+
+        $route = $this->router->getRoutes()->getRoutes()[0];
+
+        $this->assertTrue($route->enforcesScopedBindings());
+    }
+
     public function testCanRegisterResource()
     {
         $this->router->middleware('resource-middleware')
