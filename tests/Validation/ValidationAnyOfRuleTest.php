@@ -280,7 +280,7 @@ class ValidationAnyOfRuleTest extends TestCase
 
         $validator = new Validator(resolve('translator'), [
             'persons' => [
-                ['birth' => ['year' => 12]]
+                ['birth' => ['year' => 12]],
             ],
         ], $rule);
         $this->assertTrue($validator->passes());
