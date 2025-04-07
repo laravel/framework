@@ -3,7 +3,6 @@
 namespace Illuminate\Support\Traits;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use LogicException;
 
@@ -12,8 +11,8 @@ trait TransformsToResourceCollection
     /**
      * Create a new resource collection instance for the given resource.
      *
-     * @param  class-string<JsonResource>|null  $resourceClass
-     * @return ResourceCollection
+     * @param  class-string<\Illuminate\Http\Resources\Json\JsonResource>|null  $resourceClass
+     * @return \Illuminate\Http\Resources\Json\ResourceCollection
      *
      * @throws \Throwable
      */
@@ -29,7 +28,7 @@ trait TransformsToResourceCollection
     /**
      * Guess the resource collection for the items.
      *
-     * @return ResourceCollection
+     * @return \Illuminate\Http\Resources\Json\ResourceCollection
      *
      * @throws \Throwable
      */
