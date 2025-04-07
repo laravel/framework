@@ -151,7 +151,12 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     protected static $booted = [];
 
-    protected static array $bootedCallbacks = [];
+    /**
+     * The callbacks that should be executed after the model has booted.
+     *
+     * @var array
+     */
+    protected static $bootedCallbacks = [];
 
     /**
      * The array of trait initializers that will be called on each new instance.
@@ -288,6 +293,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             foreach (static::$bootedCallbacks[static::class] as $callback) {
                 $callback();
             }
+
             $this->fireModelEvent('booted', false);
         }
     }
@@ -344,13 +350,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         }
     }
 
-    protected static function whenBooted(Closure $callback): void
-    {
-        static::$bootedCallbacks[static::class] ??= [];
-
-        static::$bootedCallbacks[static::class][] = $callback;
-    }
-
     /**
      * Initialize any initializable traits on the model.
      *
@@ -371,6 +370,19 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     protected static function booted()
     {
         //
+    }
+
+    /**
+     * Register a closure to be executed after the model has booted.
+     *
+     * @param  \Closure  $callback
+     * @return void
+     */
+    protected static function whenBooted(Closure $callback)
+    {
+        static::$bootedCallbacks[static::class] ??= [];
+
+        static::$bootedCallbacks[static::class][] = $callback;
     }
 
     /**
