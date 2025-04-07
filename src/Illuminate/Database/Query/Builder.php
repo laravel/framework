@@ -3354,6 +3354,8 @@ class Builder implements BuilderContract
      */
     public function pluck($column, $key = null)
     {
+        $original = $this->columns;
+
         // First, we will need to select the results of the query accounting for the
         // given columns / key. Once we have the results, we will be able to take
         // the results and get the exact data that was requested for the query.
