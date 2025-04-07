@@ -14,6 +14,8 @@ use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
+use function Orchestra\Testbench\phpunit_version_compare;
+
 class DatabaseEloquentCollectionTest extends TestCase
 {
     /**
@@ -702,7 +704,12 @@ class DatabaseEloquentCollectionTest extends TestCase
         $user = EloquentTestUserModel::with('articles')->first();
         $user->articles->loadExists('comments');
         $commentsExists = $user->articles->pluck('comments_exists')->toArray();
-        $this->assertContainsOnly('bool', $commentsExists);
+
+        if (phpunit_version_compare('11.5.0', '<')) {
+            $this->assertContainsOnly('bool', $commentsExists);
+        } else {
+            $this->assertContainsOnlyBool($commentsExists);
+        }
     }
 
     public function testWithNonScalarKey()

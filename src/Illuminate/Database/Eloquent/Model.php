@@ -17,7 +17,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\Pivot;
-use Illuminate\Http\Resources\TransformsToResource;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Str;
@@ -40,8 +39,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         Concerns\HidesAttributes,
         Concerns\GuardsAttributes,
         Concerns\PreventsCircularRecursion,
-        ForwardsCalls,
-        TransformsToResource;
+        Concerns\TransformsToResource,
+        ForwardsCalls;
     /** @use HasCollection<\Illuminate\Database\Eloquent\Collection<array-key, static & self>> */
     use HasCollection;
 
