@@ -16,22 +16,6 @@ use Orchestra\Testbench\Factories\UserFactory;
 class EloquentPolymorphicWithStringMorphTypeTest extends DatabaseTestCase
 {
     /** @inheritDoc */
-    protected function setUp(): void
-    {
-        SchemaBuilder::morphUsingString();
-
-        parent::setUp();
-    }
-
-    /** @inheritDoc */
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-
-        SchemaBuilder::$defaultMorphKeyType = null;
-    }
-
-    /** @inheritDoc */
     protected function afterRefreshingDatabase()
     {
         Schema::create('integrations', function (Blueprint $table) {
@@ -94,7 +78,7 @@ class EloquentPolymorphicWithStringMorphTypeTestUser extends Authenticatable
 
     public function integrations()
     {
-        return $this->morphMany(EloquentPolymorphicWithStringMorphTypeTestIntegration::class, 'owner');
+        return $this->morphMany(EloquentPolymorphicWithStringMorphTypeTestIntegration::class, 'owner', morphKeyType: 'string');
     }
 }
 

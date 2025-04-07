@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Builder as SchemaBuilder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use InvalidArgumentException;
 
 /**
  * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
@@ -31,11 +32,46 @@ abstract class MorphOneOrMany extends HasOneOrMany
      */
     protected $morphClass;
 
-    protected $morphKeyTypeString;
+    /**
+     * The morph key type.
+     *
+     * @var string|null
+     */
+    protected $morphKeyType = null;
 
-    public function morphKeyTypeString($morphKeyTypeString = true)
+
+    /**
+     * Create a new morph one or many relationship instance.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder<TRelatedModel>  $query
+     * @param  TDeclaringModel  $parent
+     * @param  string  $foreignKey
+     * @param  string  $localKey
+     * @param  string|null  $morphKeyType
+     * @return void
+     */
+    public function __construct(Builder $query, Model $parent, $foreignKey, $localKey, $morphKeyType = null)
     {
-        $this->morphKeyTypeString = $morphKeyTypeString;
+        parent::__construct($query, $parent, $foreignKey, $localKey);
+
+        if (! is_null($morphKeyType)) {
+            $this->morphKeyType($morphKeyType);
+        }
+    }
+
+    /**
+     * Define the morph key type.
+     *
+     * @param  string  $type
+     * @return $this
+     */
+    public function morphKeyType(string $type)
+    {
+        if (! in_array($type, ['int', 'uuid', 'ulid', 'string'])) {
+            throw new InvalidArgumentException("Morph key type must be 'int', 'uuid', 'ulid', or 'string'.");
+        }
+
+        $this->morphKeyType = $type;
 
         return $this;
     }
@@ -78,7 +114,9 @@ abstract class MorphOneOrMany extends HasOneOrMany
 
             $query = $this->getRelationQuery();
 
-            $query->where($this->foreignKey, '=', transform($this->getParentKey(), fn ($key) => match (SchemaBuilder::$defaultMorphKeyType) {
+            $morphKeyType = $this->morphKeyType ?? SchemaBuilder::$defaultMorphKeyType;
+
+            $query->where($this->foreignKey, '=', transform($this->getParentKey(), fn ($key) => match ($morphKeyType) {
                 'uuid', 'ulid', 'string' => (string) $key,
                 default => $key,
             }));
@@ -209,11 +247,9 @@ abstract class MorphOneOrMany extends HasOneOrMany
     #[\Override]
     protected function getKeys(array $models, $key = null)
     {
-        if (isset($this->morphKeyTypeString) && $this->morphKeyTypeString === true) {
-            $castKeyToString = true;
-        } else {
-            $castKeyToString = in_array(SchemaBuilder::$defaultMorphKeyType, ['uuid', 'ulid', 'string']);
-        }
+        $morphKeyType = $this->morphKeyType ?? SchemaBuilder::$defaultMorphKeyType;
+
+        $castKeyToString = in_array($morphKeyType, ['uuid', 'ulid', 'string']);
 
         return (new Collection(parent::getKeys($models, $key)))
             ->transform(fn ($key) => $castKeyToString === true ? (string) $key : $key)
@@ -224,7 +260,9 @@ abstract class MorphOneOrMany extends HasOneOrMany
     #[\Override]
     protected function whereInMethod(Model $model, $key)
     {
-        if (! in_array(SchemaBuilder::$defaultMorphKeyType, ['uuid', 'ulid', 'string']) && (! isset($this->morphKeyTypeString) || $this->morphKeyTypeString === false)) {
+        $morphKeyType = $this->morphKeyType ?? SchemaBuilder::$defaultMorphKeyType;
+
+        if (! in_array($morphKeyType, ['uuid', 'ulid', 'string'])) {
             return parent::whereInMethod($model, $key);
         }
 
