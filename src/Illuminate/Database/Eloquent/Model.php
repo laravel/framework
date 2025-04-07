@@ -1967,7 +1967,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             return 'uuid';
         }
 
-        return 'string';
+        return $this->getKeyType();
     }
 
     /**
