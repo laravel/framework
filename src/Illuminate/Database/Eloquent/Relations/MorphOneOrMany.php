@@ -39,7 +39,6 @@ abstract class MorphOneOrMany extends HasOneOrMany
      */
     protected $morphKeyType = null;
 
-
     /**
      * Create a new morph one or many relationship instance.
      *
