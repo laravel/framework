@@ -44,18 +44,23 @@ abstract class MorphOneOrMany extends HasOneOrMany
      *
      * @param  \Illuminate\Database\Eloquent\Builder<TRelatedModel>  $query
      * @param  TDeclaringModel  $parent
-     * @param  string  $foreignKey
+     * @param  string  $type
+     * @param  string  $id
      * @param  string  $localKey
      * @param  string|null  $morphKeyType
      * @return void
      */
     public function __construct(Builder $query, Model $parent, $foreignKey, $localKey, $morphKeyType = null)
     {
-        parent::__construct($query, $parent, $foreignKey, $localKey);
+        $this->morphType = $type;
+
+        $this->morphClass = $parent->getMorphClass();
 
         if (! is_null($morphKeyType)) {
             $this->morphKeyType($morphKeyType);
         }
+
+        parent::__construct($query, $parent, $id, $localKey);
     }
 
     /**
@@ -73,25 +78,6 @@ abstract class MorphOneOrMany extends HasOneOrMany
         $this->morphKeyType = $type;
 
         return $this;
-    }
-
-    /**
-     * Create a new morph one or many relationship instance.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder<TRelatedModel>  $query
-     * @param  TDeclaringModel  $parent
-     * @param  string  $type
-     * @param  string  $id
-     * @param  string  $localKey
-     * @return void
-     */
-    public function __construct(Builder $query, Model $parent, $type, $id, $localKey)
-    {
-        $this->morphType = $type;
-
-        $this->morphClass = $parent->getMorphClass();
-
-        parent::__construct($query, $parent, $id, $localKey);
     }
 
     /**
