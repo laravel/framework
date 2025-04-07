@@ -39,6 +39,7 @@ abstract class MorphOneOrMany extends HasOneOrMany
      */
     protected $morphKeyType = null;
 
+
     /**
      * Create a new morph one or many relationship instance.
      *
@@ -50,7 +51,7 @@ abstract class MorphOneOrMany extends HasOneOrMany
      * @param  string|null  $morphKeyType
      * @return void
      */
-    public function __construct(Builder $query, Model $parent, $foreignKey, $localKey, $morphKeyType = null)
+    public function __construct(Builder $query, Model $parent, $type, $id, $localKey, $morphKeyType = null)
     {
         $this->morphType = $type;
 
