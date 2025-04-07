@@ -190,9 +190,10 @@ trait HasRelationships
      * @param  string|null  $type
      * @param  string|null  $id
      * @param  string|null  $localKey
+     * @param  string|null  $morphKeyType
      * @return \Illuminate\Database\Eloquent\Relations\MorphOne<TRelatedModel, $this>
      */
-    public function morphOne($related, $name, $type = null, $id = null, $localKey = null)
+    public function morphOne($related, $name, $type = null, $id = null, $localKey = null, $morphKeyType = null)
     {
         $instance = $this->newRelatedInstance($related);
 
@@ -200,7 +201,7 @@ trait HasRelationships
 
         $localKey = $localKey ?: $this->getKeyName();
 
-        return $this->newMorphOne($instance->newQuery(), $this, $instance->qualifyColumn($type), $instance->qualifyColumn($id), $localKey);
+        return $this->newMorphOne($instance->newQuery(), $this, $instance->qualifyColumn($type), $instance->qualifyColumn($id), $localKey, $morphKeyType);
     }
 
     /**
@@ -214,11 +215,12 @@ trait HasRelationships
      * @param  string  $type
      * @param  string  $id
      * @param  string  $localKey
+     * @param  string|null  $morphKeyType
      * @return \Illuminate\Database\Eloquent\Relations\MorphOne<TRelatedModel, TDeclaringModel>
      */
-    protected function newMorphOne(Builder $query, Model $parent, $type, $id, $localKey)
+    protected function newMorphOne(Builder $query, Model $parent, $type, $id, $localKey, $morphKeyType = null)
     {
-        return new MorphOne($query, $parent, $type, $id, $localKey);
+        return new MorphOne($query, $parent, $type, $id, $localKey, $morphKeyType);
     }
 
     /**
@@ -330,17 +332,16 @@ trait HasRelationships
      * @param  string  $type
      * @param  string  $id
      * @param  string|null  $ownerKey
-     * @param  string|null  $morphKeyType
      * @return \Illuminate\Database\Eloquent\Relations\MorphTo<\Illuminate\Database\Eloquent\Model, $this>
      */
-    protected function morphInstanceTo($target, $name, $type, $id, $ownerKey, $morphKeyType = null)
+    protected function morphInstanceTo($target, $name, $type, $id, $ownerKey)
     {
         $instance = $this->newRelatedInstance(
             static::getActualClassNameForMorph($target)
         );
 
         return $this->newMorphTo(
-            $instance->newQuery(), $this, $id, $ownerKey ?? $instance->getKeyName(), $type, $name, $morphKeyType
+            $instance->newQuery(), $this, $id, $ownerKey ?? $instance->getKeyName(), $type, $name
         );
     }
 
@@ -356,12 +357,11 @@ trait HasRelationships
      * @param  string|null  $ownerKey
      * @param  string  $type
      * @param  string  $relation
-     * @param  string|null  $morphKeyType
      * @return \Illuminate\Database\Eloquent\Relations\MorphTo<TRelatedModel, TDeclaringModel>
      */
-    protected function newMorphTo(Builder $query, Model $parent, $foreignKey, $ownerKey, $type, $relation, $morphKeyType = null)
+    protected function newMorphTo(Builder $query, Model $parent, $foreignKey, $ownerKey, $type, $relation)
     {
-        return new MorphTo($query, $parent, $foreignKey, $ownerKey, $type, $relation, $morphKeyType);
+        return new MorphTo($query, $parent, $foreignKey, $ownerKey, $type, $relation);
     }
 
     /**
