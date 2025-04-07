@@ -526,3 +526,28 @@ if (! function_exists('with')) {
         return is_null($callback) ? $value : $callback($value);
     }
 }
+
+if (!function_exists('safe_call')) {
+    /**
+     * Execute a callback, returning a default value if an exception occurs.
+     *
+     * @param  callable  $callback
+     * @param  mixed  $default
+     * @param  string[]  $exceptions
+     * @return mixed
+     */
+    function safe_call(callable $callback, $default = null, array $exceptions = [\Throwable::class])
+    {
+        try {
+            return $callback();
+        } catch (\Throwable $e) {
+            foreach ($exceptions as $exception) {
+                if ($e instanceof $exception) {
+                    return $default;
+                }
+            }
+
+            throw $e;
+        }
+    }
+}
