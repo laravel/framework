@@ -335,14 +335,14 @@ class CustomPost extends Post
         return new CustomHasOne($query, $parent, $foreignKey, $localKey);
     }
 
-    protected function newMorphOne(Builder $query, Model $parent, $type, $id, $localKey)
+    protected function newMorphOne(Builder $query, Model $parent, $type, $id, $localKey, $morphKeyType = null)
     {
-        return new CustomMorphOne($query, $parent, $type, $id, $localKey);
+        return new CustomMorphOne($query, $parent, $type, $id, $localKey, $morphKeyType);
     }
 
-    protected function newMorphMany(Builder $query, Model $parent, $type, $id, $localKey)
+    protected function newMorphMany(Builder $query, Model $parent, $type, $id, $localKey, $morphKeyType = null)
     {
-        return new CustomMorphMany($query, $parent, $type, $id, $localKey);
+        return new CustomMorphMany($query, $parent, $type, $id, $localKey, $morphKeyType);
     }
 
     protected function newBelongsToMany(Builder $query, Model $parent, $table, $foreignPivotKey, $relatedPivotKey,
