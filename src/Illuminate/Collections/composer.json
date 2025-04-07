@@ -34,6 +34,7 @@
         }
     },
     "suggest": {
+        "illuminate/http": "Required to convert collection to resource (^12.0).",
         "symfony/var-dumper": "Required to use the dump method (^7.2)."
     },
     "config": {
