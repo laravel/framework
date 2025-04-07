@@ -1266,6 +1266,27 @@ class SupportHelpersTest extends TestCase
             preg_replace_array($pattern, $replacements, $subject)
         );
     }
+
+    public function testSafeCallReturnsValue()
+    {
+        $result = safe_call(fn () => 'success', 'default');
+    
+        $this->assertEquals('success', $result);
+    }
+    
+    public function testSafeCallReturnsDefaultOnException()
+    {
+        $result = safe_call(fn () => throw new Exception('Test exception'), 'default');
+    
+        $this->assertEquals('default', $result);
+    }
+    
+    public function testSafeCallDoesNotCatchUnspecifiedExceptions()
+    {
+        $this->expectException(InvalidArgumentException::class);
+    
+        safe_call(fn () => throw new InvalidArgumentException('Invalid argument'), 'default', [RuntimeException::class]);
+    }
 }
 
 trait SupportTestTraitOne
