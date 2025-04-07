@@ -1041,7 +1041,7 @@ class Blueprint
         $definition = match ($model->getKeySchemaType()) {
             'int' => $this->foreignId($column),
             'ulid' => $this->foreignUlid($column, 26),
-            default => $this->foreignUuid($column, 26),
+            default => $this->foreignUuid($column),
         };
 
         return $definition->table($model->getTable())->referencesModelColumn($model->getKeyName());
