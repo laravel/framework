@@ -562,6 +562,18 @@ class SupportStrTest extends TestCase
         $this->assertFalse(Str::isUuid($uuid));
     }
 
+    #[DataProvider('validCuidList')]
+    public function testIsCuidWithValidCuid($cuid)
+    {
+        $this->assertTrue(Str::isCuid($cuid));
+    }
+
+    #[DataProvider('invalidCuidList')]
+    public function testIsCuidWithInvalidCuid($cuid)
+    {
+        $this->assertFalse(Str::isCuid($cuid));
+    }
+
     public function testIsJson()
     {
         $this->assertTrue(Str::isJson('1'));
@@ -1283,6 +1295,28 @@ class SupportStrTest extends TestCase
             ['af6f8cb-c57d-11e1-9b21-0800200c9a66'],
             ['af6f8cb0c57d11e19b210800200c9a66'],
             ['ff6f8cb0-c57da-51e1-9b21-0800200c9a66'],
+        ];
+    }
+
+    public static function validCuidList()
+    {
+        return [
+            ['zm2x9igk6ian853ux1iikr93'],
+            ['c0qapxb62ghwol2l8vpxryv8'],
+            ['zcodvpsaeznjd5ygsedu1il7'],
+            ['eb4nv3psuv9xqks4kca7ut74'],
+            ['xss09xjvzvulul04na8kkll0'],
+            ['xss09xjvzvulul04na8kkll0eb4v9xqk'],
+        ];
+    }
+
+    public static function invalidCuidList()
+    {
+        return [
+            ['zm2x9igk6iAn853Ux1iikr93'],
+            ['c0qApXb62ghw@l2l8vpxryv8'],
+            ['not a valid cuid so we can test this'],
+            ['eb4nv3psuv9xqVSs4kZDvedZca7ut743'],
         ];
     }
 
