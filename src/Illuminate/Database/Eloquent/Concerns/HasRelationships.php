@@ -217,10 +217,10 @@ trait HasRelationships
      * @param  string  $type
      * @param  string  $id
      * @param  string  $localKey
-     * @param  string|null  $morphKeyType
+     * @param  string  $morphKeyType
      * @return \Illuminate\Database\Eloquent\Relations\MorphOne<TRelatedModel, TDeclaringModel>
      */
-    protected function newMorphOne(Builder $query, Model $parent, $type, $id, $localKey, $morphKeyType = null)
+    protected function newMorphOne(Builder $query, Model $parent, $type, $id, $localKey, $morphKeyType)
     {
         return new MorphOne($query, $parent, $type, $id, $localKey, $morphKeyType);
     }
@@ -548,10 +548,10 @@ trait HasRelationships
      * @param  string  $type
      * @param  string  $id
      * @param  string  $localKey
-     * @param  string|null  $morphKeyType
+     * @param  string  $morphKeyType
      * @return \Illuminate\Database\Eloquent\Relations\MorphMany<TRelatedModel, TDeclaringModel>
      */
-    protected function newMorphMany(Builder $query, Model $parent, $type, $id, $localKey, $morphKeyType = null)
+    protected function newMorphMany(Builder $query, Model $parent, $type, $id, $localKey, $morphKeyType)
     {
         return new MorphMany($query, $parent, $type, $id, $localKey, $morphKeyType);
     }
