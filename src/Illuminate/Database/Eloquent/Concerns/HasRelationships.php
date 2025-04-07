@@ -201,6 +201,8 @@ trait HasRelationships
 
         $localKey = $localKey ?: $this->getKeyName();
 
+        $morphKeyType ??= $this->getKeySchemaType();
+
         return $this->newMorphOne($instance->newQuery(), $this, $instance->qualifyColumn($type), $instance->qualifyColumn($id), $localKey, $morphKeyType);
     }
 
@@ -529,6 +531,8 @@ trait HasRelationships
         [$type, $id] = $this->getMorphs($name, $type, $id);
 
         $localKey = $localKey ?: $this->getKeyName();
+
+        $morphKeyType ??= $this->getKeySchemaType();
 
         return $this->newMorphMany($instance->newQuery(), $this, $instance->qualifyColumn($type), $instance->qualifyColumn($id), $localKey, $morphKeyType);
     }

@@ -1948,6 +1948,29 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         return $this->keyType;
     }
 
+
+    /**
+     * Get the schema key type.
+     *
+     * @return string
+     */
+    public function getKeySchemaType()
+    {
+        if ($this->getKeyType() === 'int') {
+            return 'int';
+        }
+
+        $uses = class_uses_recursive($this);
+
+        if (in_array(Concerns\HasUlids::class, $uses, true)) {
+            return 'ulid';
+        } elseif (in_array(Concerns\HasUuids::class, $uses, true)) {
+            return 'uuid';
+        }
+
+        return 'string';
+    }
+
     /**
      * Set the data type for the primary key.
      *

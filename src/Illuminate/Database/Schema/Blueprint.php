@@ -1039,23 +1039,13 @@ class Blueprint
 
         $column = $column ?: $model->getForeignKey();
 
-        if ($model->getKeyType() === 'int') {
-            return $this->foreignId($column)
-                ->table($model->getTable())
-                ->referencesModelColumn($model->getKeyName());
-        }
+        $definition = match ($model->getKeySchemaType()) {
+            'int' => $this->foreignId($column),
+            'ulid' => $this->foreignUlid($column, 26),
+            default => $this->foreignUuid($column, 26),
+        };
 
-        $modelTraits = class_uses_recursive($model);
-
-        if (in_array(HasUlids::class, $modelTraits, true)) {
-            return $this->foreignUlid($column, 26)
-                ->table($model->getTable())
-                ->referencesModelColumn($model->getKeyName());
-        }
-
-        return $this->foreignUuid($column)
-            ->table($model->getTable())
-            ->referencesModelColumn($model->getKeyName());
+        return $definition->table($model->getTable())->referencesModelColumn($model->getKeyName());
     }
 
     /**
