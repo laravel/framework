@@ -4,6 +4,7 @@ namespace Illuminate\Support\Traits;
 
 use Closure;
 use Illuminate\Support\HigherOrderWhenProxy;
+use Illuminate\Support\MissingConditionalCallbackException;
 
 trait Conditionable
 {
@@ -31,6 +32,10 @@ trait Conditionable
         }
 
         if ($value) {
+            if ($callback === null) {
+                throw new MissingConditionalCallbackException;
+            }
+
             return $callback($this, $value) ?? $this;
         } elseif ($default) {
             return $default($this, $value) ?? $this;
@@ -63,6 +68,10 @@ trait Conditionable
         }
 
         if (! $value) {
+            if ($callback === null) {
+                throw new MissingConditionalCallbackException;
+            }
+
             return $callback($this, $value) ?? $this;
         } elseif ($default) {
             return $default($this, $value) ?? $this;

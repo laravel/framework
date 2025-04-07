@@ -6,6 +6,7 @@ use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\HigherOrderWhenProxy;
+use Illuminate\Support\MissingConditionalCallbackException;
 use PHPUnit\Framework\TestCase;
 
 class ConditionableTest extends TestCase
@@ -31,6 +32,8 @@ class ConditionableTest extends TestCase
         $this->assertInstanceOf(Builder::class, TestConditionableModel::query()->when(false, null));
         $this->assertInstanceOf(Builder::class, TestConditionableModel::query()->when(true, function () {
         }));
+        $this->expectException(MissingConditionalCallbackException::class);
+        TestConditionableModel::query()->when(true, null);
     }
 
     public function testUnless(): void
@@ -41,6 +44,8 @@ class ConditionableTest extends TestCase
         $this->assertInstanceOf(Builder::class, TestConditionableModel::query()->unless(true, null));
         $this->assertInstanceOf(Builder::class, TestConditionableModel::query()->unless(false, function () {
         }));
+        $this->expectException(MissingConditionalCallbackException::class);
+        TestConditionableModel::query()->unless(null, null);
     }
 }
 
