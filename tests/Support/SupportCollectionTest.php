@@ -2316,6 +2316,72 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testPluckOrDefaultWithExistingKeys($collection)
+    {
+        $data = new $collection([(object) ['name' => 'John', 'age' => 25], ['name' => 'Jane', 'age' => 30]]);
+        $result = $data->pluckOrDefault('age', 0);
+        $this->assertInstanceOf($collection, $result);
+        $this->assertEquals([25, 30], $result->all());
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testPluckOrDefaultWithMissingKeysAndNullValues($collection)
+    {
+        $data = new $collection([(object) ['name' => 'John', 'age' => 25], ['name' => 'Jane'], ['name' => 'Bob', 'age' => null]]);
+        $result = $data->pluckOrDefault('age', 0);
+        $this->assertInstanceOf($collection, $result);
+        $this->assertEquals([25, 0, 0], $result->all());
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testPluckOrDefaultWithDotNotation($collection)
+    {
+        $data = new $collection([(object) ['user' => ['age' => 25]], ['user' => ['name' => 'Jane']], ['user' => ['age' => 30]]]);
+        $result = $data->pluckOrDefault('user.age', 18);
+        $this->assertInstanceOf($collection, $result);
+        $this->assertEquals([25, 18, 30], $result->all());
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testPluckOrDefaultWithEmptyCollection($collection)
+    {
+        $data = new $collection([]);
+        $result = $data->pluckOrDefault('name', 'Unknown');
+        $this->assertInstanceOf($collection, $result);
+        $this->assertEquals([], $result->all());
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testPluckOrDefaultWithNullItems($collection)
+    {
+        $data = new $collection([(object) ['name' => 'John'], null, ['name' => 'Bob']]);
+        $result = $data->pluckOrDefault('name', 'N/A');
+        $this->assertInstanceOf($collection, $result);
+        $this->assertEquals(['John', 'N/A', 'Bob'], $result->all());
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testPluckOrDefaultWithDifferentDefaultTypes($collection)
+    {
+        $data = new $collection([(object) ['score' => 100], ['score' => null], []]);
+        $resultA = $data->pluckOrDefault('score', 'N/A');
+        $this->assertEquals([100, 'N/A', 'N/A'], $resultA->all());
+        $resultB = $data->pluckOrDefault('score', 0);
+        $this->assertEquals([100, 0, 0], $resultB->all());
+        $resultC = $data->pluckOrDefault('score', []);
+        $this->assertEquals([100, [], []], $resultC->all());
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testPluckOrDefaultWithoutDefault($collection)
+    {
+        $data = new $collection([(object) ['name' => 'John'], []]);
+        $result = $data->pluckOrDefault('name');
+        $this->assertInstanceOf($collection, $result);
+        $this->assertEquals(['John', null], $result->all());
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testHas($collection)
     {
         $data = new $collection(['id' => 1, 'first' => 'Hello', 'second' => 'World']);

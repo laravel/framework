@@ -788,6 +788,26 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Extract values for a given key from the collection, returning a default value if the key is missing or its value is null.
+     *
+     * This method retrieves the values associated with the specified key from each item in the collection.
+     * If the key does not exist in an item or its value is null, the provided default value is returned instead.
+     * The key can be a simple key or use dot notation for nested structures.
+     *
+     * @param  string|int  $value  The key to extract from each item (supports dot notation for nested data)
+     * @param  mixed  $default  The default value to return if the key is not found or its value is null (optional, defaults to null)
+     * @return static<int|string, mixed> A new collection containing the extracted values
+     */
+    public function pluckOrDefault($value, $default = null)
+    {
+        return $this->map(function ($item) use ($value, $default) {
+            $result = data_get($item, $value);
+
+            return $result === null ? $default : $result;
+        });
+    }
+
+    /**
      * Run a map over each of the items.
      *
      * @template TMapValue

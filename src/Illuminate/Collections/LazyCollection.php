@@ -795,6 +795,27 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     }
 
     /**
+     * Extract values for a given key from the collection, returning a default value if the key is missing or its value is null.
+     *
+     * This method retrieves the values associated with the specified key from each item in the collection,
+     * yielding them lazily. If the key does not exist in an item or its value is null, the provided default
+     * value is returned instead. The key can use dot notation for nested structures.
+     *
+     * @param  string|int  $value  The key to extract from each item (supports dot notation for nested data)
+     * @param  mixed  $default  The default value to return if the key is not found or its value is null (optional, defaults to null)
+     * @return static<int|string, mixed> A new lazy collection containing the extracted or default values
+     */
+    public function pluckOrDefault($value, $default = null)
+    {
+        return new static(function () use ($value, $default) {
+            foreach ($this as $item) {
+                $itemValue = data_get($item, $value);
+                yield $itemValue === null ? $default : $itemValue;
+            }
+        });
+    }
+
+    /**
      * Run a map over each of the items.
      *
      * @template TMapValue
