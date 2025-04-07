@@ -19,7 +19,7 @@ class EloquentPolymorphicWithStringMorphTypeTest extends DatabaseTestCase
     {
         Schema::create('integrations', function (Blueprint $table) {
             $table->id();
-            $table->nullableMorphs('owner');
+            $table->nullableStringableMorphs('owner');
             $table->string('provider');
         });
 
