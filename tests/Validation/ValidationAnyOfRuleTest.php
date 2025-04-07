@@ -236,7 +236,14 @@ class ValidationAnyOfRuleTest extends TestCase
                 ['age' => 'foobar'],
             ],
         ], $rule);
+        $this->assertFalse($validator->passes());
 
+        $validator = new Validator(resolve('translator'), [
+            'persons' => [
+                ['age' => 'foobarbazqux'],
+                ['month' => 12],
+            ],
+        ], $rule);
         $this->assertFalse($validator->passes());
 
         $validator = new Validator(resolve('translator'), [
@@ -245,8 +252,58 @@ class ValidationAnyOfRuleTest extends TestCase
                 ['age' => 'foobarbazqux'],
             ],
         ], $rule);
-
         $this->assertTrue($validator->passes());
+    }
+
+    public function testStarRuleNested()
+    {
+        $rule = [
+            'persons.*.birth' => ['required', Rule::anyOf([
+                ['year' => 'required|integer'],
+                'required|min:10',
+            ])],
+        ];
+
+        $validator = new Validator(resolve('translator'), [
+            'persons' => [
+                ['age' => ['year' => 12]],
+            ],
+        ], $rule);
+        $this->assertFalse($validator->passes());
+
+        $validator = new Validator(resolve('translator'), [
+            'persons' => [
+                ['birth' => ['month' => 12]],
+            ],
+        ], $rule);
+        $this->assertFalse($validator->passes());
+
+        $validator = new Validator(resolve('translator'), [
+            'persons' => [
+                ['birth' => ['year' => 12]]
+            ],
+        ], $rule);
+        $this->assertTrue($validator->passes());
+
+        $validator = new Validator(resolve('translator'), [
+            'persons' => [
+                ['birth' => 'foobarbazqux'],
+                ['birth' => [
+                    'year' => 12,
+                ]],
+            ],
+        ], $rule);
+        $this->assertTrue($validator->passes());
+
+        $validator = new Validator(resolve('translator'), [
+            'persons' => [
+                ['birth' => 'foobar'],
+                ['birth' => [
+                    'year' => 12,
+                ]],
+            ],
+        ], $rule);
+        $this->assertFalse($validator->passes());
     }
 
     protected function setUpRuleSets()
