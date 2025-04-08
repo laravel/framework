@@ -251,10 +251,10 @@ class Collection extends BaseCollection implements QueueableCollection
     /**
      * Load a relationship path for models of the given type if it is not already eager loaded.
      *
-     * @param  array  $tuples
+     * @param  array<int, <string, class-string>>  $tuples
      * @return void
      */
-    public function loadMissingRelationsViaRelationAndClassTuples(array $tuples)
+    public function loadMissingRelationshipChain(array $tuples)
     {
         [$relation, $class] = array_shift($tuples);
 
@@ -274,7 +274,7 @@ class Collection extends BaseCollection implements QueueableCollection
             $models = $models->collapse();
         }
 
-        (new static($models))->loadMissingRelationsViaRelationAndClassTuples($tuples);
+        (new static($models))->loadMissingRelationshipChain($tuples);
     }
 
     /**
@@ -757,7 +757,7 @@ class Collection extends BaseCollection implements QueueableCollection
      */
     public function withRelationshipAutoloading()
     {
-        $callback = fn ($tuples) => $this->loadMissingRelationsViaRelationAndClassTuples($tuples);
+        $callback = fn ($tuples) => $this->loadMissingRelationshipChain($tuples);
 
         foreach ($this as $model) {
             if (! $model->hasRelationAutoloadCallback()) {

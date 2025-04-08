@@ -179,11 +179,11 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     protected static $modelsShouldPreventLazyLoading = false;
 
     /**
-     * Indicates whether relations should be automatically loaded on all models.
+     * Indicates whether relations should be automatically loaded on all models when they are accessed.
      *
      * @var bool
      */
-    protected static $modelsShouldGlobalAutoloadRelations = false;
+    protected static $modelsShouldAutomaticallyEagerLoadRelationships = false;
 
     /**
      * The callback that is responsible for handling lazy loading violations.
@@ -454,14 +454,14 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
-     * Determine if model relationships should be automatically loaded.
+     * Determine if model relationships should be automatically eager loaded when accessed.
      *
      * @param  bool  $value
      * @return void
      */
-    public static function globalAutoloadRelations($value = true)
+    public static function automaticallyEagerLoadRelationships($value = true)
     {
-        static::$modelsShouldGlobalAutoloadRelations = $value;
+        static::$modelsShouldAutomaticallyEagerLoadRelationships = $value;
     }
 
     /**
@@ -2250,13 +2250,13 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
-     * Determine if relations autoload is enabled.
+     * Determine if relationships are being automatically eager loaded when accessed.
      *
      * @return bool
      */
-    public static function isAutoloadingRelationsGlobally()
+    public static function isAutomaticallyEagerLoadingRelationships()
     {
-        return static::$modelsShouldGlobalAutoloadRelations;
+        return static::$modelsShouldAutomaticallyEagerLoadRelationships;
     }
 
     /**
