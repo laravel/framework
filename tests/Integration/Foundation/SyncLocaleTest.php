@@ -7,6 +7,14 @@ use Orchestra\Testbench\TestCase;
 
 class SyncLocaleTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        $this->app->setLocale('en');
+        $this->app->shouldSyncLocale(false);
+
+        parent::tearDown();
+    }
+
     public function testItShouldSyncLocale()
     {
         $this->app->shouldSyncLocale();
