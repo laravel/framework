@@ -10,6 +10,13 @@ class FoundationInteractsWithTimeTest extends TestCase
 {
     use InteractsWithTime;
 
+    public function tearDown(): void
+    {
+        parent::tearDown();
+
+        Carbon::setTestNow();
+    }
+
     public function testFreezeTimeReturnsFrozenTime()
     {
         $actual = $this->freezeTime();
