@@ -93,6 +93,7 @@ namespace Illuminate\Support\Facades;
  * @method static void setLocale(string $locale)
  * @method static void setFallbackLocale(string $fallbackLocale)
  * @method static bool isLocale(string $locale)
+ * @method static void shouldSyncLocale(bool $shouldSyncLocale = true)
  * @method static void registerCoreContainerAliases()
  * @method static void flush()
  * @method static string getNamespace()

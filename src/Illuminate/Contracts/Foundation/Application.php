@@ -231,6 +231,14 @@ interface Application extends Container
     public function setLocale($locale);
 
     /**
+     * Indicate that the app should sync locale changes to the helpers.
+     *
+     * @param  bool  $shouldSyncLocale
+     * @return void
+     */
+    public function shouldSyncLocale($shouldSyncLocale);
+
+    /**
      * Determine if middleware has been disabled for the application.
      *
      * @return bool

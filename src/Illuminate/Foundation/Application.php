@@ -22,6 +22,7 @@ use Illuminate\Routing\RoutingServiceProvider;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Env;
+use Illuminate\Support\Number;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
@@ -207,6 +208,13 @@ class Application extends Container implements ApplicationContract, CachesConfig
      * @var string[]
      */
     protected $absoluteCachePathPrefixes = ['/', '\\'];
+
+    /**
+     * Indicates if the application's locale should be propagated to helpers.
+     *
+     * @var bool
+     */
+    protected $shouldSyncLocale = false;
 
     /**
      * Create a new Illuminate application instance.
@@ -1584,6 +1592,10 @@ class Application extends Container implements ApplicationContract, CachesConfig
 
         $this['translator']->setLocale($locale);
 
+        if ($this->shouldSyncLocale) {
+            Number::useLocale($locale);
+        }
+
         $this['events']->dispatch(new LocaleUpdated($locale));
     }
 
@@ -1609,6 +1621,17 @@ class Application extends Container implements ApplicationContract, CachesConfig
     public function isLocale($locale)
     {
         return $this->getLocale() == $locale;
+    }
+
+    /**
+     * Indicate that the app should sync locale changes to the helpers.
+     *
+     * @param  bool  $shouldSyncLocale
+     * @return void
+     */
+    public function shouldSyncLocale($shouldSyncLocale = true)
+    {
+        $this->shouldSyncLocale = $shouldSyncLocale;
     }
 
     /**
