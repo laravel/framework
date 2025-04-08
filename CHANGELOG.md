@@ -1,6 +1,26 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.7.2...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.8.0...12.x)
+
+## [v12.8.0](https://github.com/laravel/framework/compare/v12.7.2...v12.8.0) - 2025-04-08
+
+* [12.x] only check for soft deletes once when mass-pruning by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/55274
+* [12.x] Add createMany mass-assignment variants to `HasOneOrMany` relation by [@onlime](https://github.com/onlime) in https://github.com/laravel/framework/pull/55262
+* cosmetic: include is_array() case in match construct of getArrayableItems by [@epic-64](https://github.com/epic-64) in https://github.com/laravel/framework/pull/55275
+* Add tests for InvokeSerializedClosureCommand by [@Amirhf1](https://github.com/Amirhf1) in https://github.com/laravel/framework/pull/55281
+* [12.x] Temporarily prevents PHPUnit 12.1 by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/55297
+* [12.x] Test Improvements by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/55306
+* Bump vite from 5.4.12 to 5.4.17 in /src/Illuminate/Foundation/resources/exceptions/renderer by [@dependabot](https://github.com/dependabot) in https://github.com/laravel/framework/pull/55301
+* [12.x] Test Improvements by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/55307
+* [12.x] add generics to array types for Schema Grammars by [@taka-oyama](https://github.com/taka-oyama) in https://github.com/laravel/framework/pull/55314
+* [12.x] fix missing nullable for Query/Grammar::compileInsertGetId by [@taka-oyama](https://github.com/taka-oyama) in https://github.com/laravel/framework/pull/55311
+* [12.x] Adds `fromJson()` to Collection by [@DarkGhostHunter](https://github.com/DarkGhostHunter) in https://github.com/laravel/framework/pull/55310
+* [12.x] Fix `illuminate/database` usage as standalone package by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/55309
+* Correct array key in InteractsWithInput by [@AJenbo](https://github.com/AJenbo) in https://github.com/laravel/framework/pull/55287
+* [12.x] Fix support for adding custom observable events from traits by [@willrowe](https://github.com/willrowe) in https://github.com/laravel/framework/pull/55286
+* [12.x] Added Automatic Relation Loading (Eager Loading) Feature by [@litvinchuk](https://github.com/litvinchuk) in https://github.com/laravel/framework/pull/53655
+* [12.x] Modify PHPDoc for Collection::chunkWhile functions to support preserving keys by [@jsvdvis](https://github.com/jsvdvis) in https://github.com/laravel/framework/pull/55324
+* [12.x] Introduce Rule::anyOf() for Validating Against Multiple Rule Sets by [@brianferri](https://github.com/brianferri) in https://github.com/laravel/framework/pull/55191
 
 ## [v12.7.2](https://github.com/laravel/framework/compare/v12.7.1...v12.7.2) - 2025-04-03
 
