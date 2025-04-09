@@ -133,6 +133,28 @@ class Number
     }
 
     /**
+     * Get the percentage difference between two numbers.
+     *
+     * @param int|float $firstNumber
+     * @param int|float $secondNumber
+     * @param int $precision
+     * @param int|null $maxPrecision
+     * @param string|null $locale
+     * @return false|string
+     */
+    public static function percentageDifference(int|float $firstNumber, int|float $secondNumber, int $precision = 0, ?int $maxPrecision = null, ?string $locale = null): false|string
+    {
+        $denominator = ($firstNumber + $secondNumber) / 2;
+
+        if ($denominator === 0) {
+            return static::percentage(0, $precision, $maxPrecision, $locale);
+        }
+
+        $difference = abs($firstNumber - $secondNumber) / $denominator * 100;
+        return static::percentage(round($difference, $precision), $precision, $maxPrecision, $locale);
+    }
+
+    /**
      * Convert the given number to its currency equivalent.
      *
      * @param  int|float  $number

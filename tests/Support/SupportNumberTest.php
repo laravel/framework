@@ -138,6 +138,21 @@ class SupportNumberTest extends TestCase
     }
 
     #[RequiresPhpExtension('intl')]
+    public function testToPercentDifference()
+    {
+        $this->assertSame('0%', Number::percentageDifference(0, 0));
+        $this->assertSame('200%', Number::percentageDifference(0, 1));
+        $this->assertSame('200.00%', Number::percentageDifference(1, 0, precision: 2));
+
+        $this->assertSame('67%', Number::percentageDifference(2, 1));
+        $this->assertSame('66.67%', Number::percentageDifference(1, 2, precision: 2));
+
+        $this->assertSame('22%', Number::percentageDifference(1, 1.25));
+        $this->assertSame('22.22%', Number::percentageDifference(1, 1.25, precision: 2));
+        $this->assertSame('22.222%', Number::percentageDifference(1, 1.25, precision: 3));
+    }
+
+    #[RequiresPhpExtension('intl')]
     public function testToCurrency()
     {
         $this->assertSame('$0.00', Number::currency(0));
