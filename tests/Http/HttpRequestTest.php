@@ -976,6 +976,11 @@ class HttpRequestTest extends TestCase
         $this->assertSame(['from' => '2025-04-09', 'to' => '2025-04-10'], $request->query('date'));
         $this->assertSame('2025-04-09', $request->query('date.from'));
         $this->assertSame('2025-04-10', $request->query('date.to'));
+
+        // PHP replaces dots in query parameters witih underscores.
+        $request = Request::create('/?date.from=2025-04-09', 'GET');
+        $this->assertSame(['date_from' => '2025-04-09'], $request->query());
+        $this->assertSame('2025-04-09', $request->query('date_from'));
     }
 
     public function testPostMethod()
@@ -992,6 +997,10 @@ class HttpRequestTest extends TestCase
         $this->assertSame(['from' => '2025-04-09', 'to' => '2025-04-10'], $request->post('date'));
         $this->assertSame('2025-04-09', $request->post('date.from'));
         $this->assertSame('2025-04-10', $request->post('date.to'));
+
+        $request = Request::create('/', 'POST', ['date.from' => '2025-04-09']);
+        $this->assertSame(['date.from' => '2025-04-09'], $request->post());
+        $this->assertSame('2025-04-09', $request->post('date.from'));
     }
 
     public function testCookieMethod()

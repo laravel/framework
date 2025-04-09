@@ -5,6 +5,7 @@ namespace Illuminate\Http\Concerns;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Fluent;
+use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Dumpable;
 use Illuminate\Support\Traits\InteractsWithData;
 use SplFileInfo;
@@ -146,7 +147,17 @@ trait InteractsWithInput
      */
     public function post($key = null, $default = null)
     {
-        return data_get($this->retrieveItem('request', null, $default), $key, $default);
+        $postValues = $this->retrieveItem('request', null, $default);
+
+        if (is_null($key)) {
+            return $postValues;
+        }
+
+        if (Str::contains($key, '.')) {
+            return $postValues[$key] ?? data_get($postValues, $key, $default);
+        }
+
+        return $postValues[$key] ?? $default;
     }
 
     /**
