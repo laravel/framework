@@ -149,7 +149,7 @@ class Builder
     /**
      * Get the schemas that belong to the connection.
      *
-     * @return list<array{name: string, path?: string, default?: bool}>
+     * @return list<array{name: string, path: string|null, default: bool}>
      */
     public function getSchemas()
     {

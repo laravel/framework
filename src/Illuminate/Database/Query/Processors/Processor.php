@@ -40,7 +40,7 @@ class Processor
      * Process the results of a schemas query.
      *
      * @param  list<array<string, mixed>>  $results
-     * @return list<array{name: string, path?: string, default?: bool}>
+     * @return list<array{name: string, path: string|null, default: bool}>
      */
     public function processSchemas($results)
     {
