@@ -86,6 +86,29 @@ class EloquentModelRelationAutoloadTest extends DatabaseTestCase
         $this->assertTrue($post->comments[0]->relationLoaded('likes'));
     }
 
+    public function testRelationAutoloadWithSerialization()
+    {
+        Model::automaticallyEagerLoadRelationships();
+
+        $post = Post::create();
+        $comment1 = $post->comments()->create(['parent_id' => null]);
+        $comment2 = $post->comments()->create(['parent_id' => $comment1->id]);
+        $comment2->likes()->create();
+
+        DB::enableQueryLog();
+
+        $likes = [];
+
+        $post = serialize($post);
+        $post = unserialize($post);
+
+        foreach ($post->comments as $comment) {
+            $likes = array_merge($likes, $comment->likes->all());
+        }
+
+        $this->assertCount(2, DB::getQueryLog());
+    }
+
     public function testRelationAutoloadVariousNestedMorphRelations()
     {
         tap(Post::create(), function ($post) {
