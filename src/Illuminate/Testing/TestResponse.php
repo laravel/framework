@@ -67,6 +67,20 @@ class TestResponse implements ArrayAccess
     protected $streamedContent;
 
     /**
+     * The response generation start time in microseconds.
+     *
+     * @var float|null
+     */
+    protected $startTime;
+
+    /**
+     * The response generation end time in microseconds.
+     *
+     * @var float|null
+     */
+    protected $endTime;
+    
+    /**
      * Create a new test response instance.
      *
      * @param  TResponse  $response
@@ -77,6 +91,8 @@ class TestResponse implements ArrayAccess
         $this->baseResponse = $response;
         $this->baseRequest = $request;
         $this->exceptions = new Collection;
+        $this->startTime = defined('LARAVEL_START') ? LARAVEL_START : null;
+        $this->endTime = microtime(true);
     }
 
     /**
@@ -1881,5 +1897,67 @@ class TestResponse implements ArrayAccess
         }
 
         return $this->baseResponse->{$method}(...$args);
+    }
+
+     /**
+     * Assert that the response time is less than or equal to a given threshold in milliseconds.
+     *
+     * @param  int  $milliseconds
+     * @return $this
+     */
+    public function assertResponseTimeUnderOrEqual($milliseconds)
+    {
+        PHPUnit::withResponse($this)->assertNotNull(
+            $this->startTime,
+            'Response timing assertion requires LARAVEL_START to be defined.'
+        );
+
+        $actualMs = ($this->endTime - $this->startTime) * 1000;
+
+        PHPUnit::withResponse($this)->assertLessThanOrEqual(
+            $milliseconds,
+            $actualMs,
+            sprintf('Response time of %.2fms exceeds threshold of %dms.', $actualMs, $milliseconds)
+        );
+
+        return $this;
+    }
+
+    /**
+     * Assert that the response time is less than a given threshold in milliseconds.
+     *
+     * @param  int  $milliseconds
+     * @return $this
+     */
+    public function assertResponseTimeUnder($milliseconds)
+    {
+        PHPUnit::withResponse($this)->assertNotNull(
+            $this->startTime,
+            'Response timing assertion requires LARAVEL_START to be defined.'
+        );
+
+        $actualMs = ($this->endTime - $this->startTime) * 1000;
+
+        PHPUnit::withResponse($this)->assertLessThan(
+            $milliseconds,
+            $actualMs,
+            sprintf('Response time of %.2fms is not under threshold of %dms.', $actualMs, $milliseconds)
+        );
+
+        return $this;
+    }
+
+    /**
+     * Get the response generation time in milliseconds.
+     *
+     * @return float|null
+     */
+    public function getResponseTimeInMs()
+    {
+        if (is_null($this->startTime)) {
+            return null;
+        }
+
+        return ($this->endTime - $this->startTime) * 1000;
     }
 }
