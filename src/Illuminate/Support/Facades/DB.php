@@ -108,7 +108,7 @@ use Illuminate\Database\Console\WipeCommand;
  * @method static string getServerVersion()
  * @method static void resolverFor(string $driver, \Closure $callback)
  * @method static \Closure|null getResolver(string $driver)
- * @method static mixed transaction(\Closure $callback, int $attempts = 1)
+ * @method static mixed transaction(\Closure $callback, int $attempts = 1, \Closure|null $onFailure = null)
  * @method static void beginTransaction()
  * @method static void commit()
  * @method static void rollBack(int|null $toLevel = null)
@@ -122,7 +122,7 @@ class DB extends Facade
     /**
      * Indicate if destructive Artisan commands should be prohibited.
      *
-     * Prohibits: db:wipe, migrate:fresh, migrate:refresh, and migrate:reset
+     * Prohibits: db:wipe, migrate:fresh, migrate:refresh, migrate:reset, and migrate:rollback
      *
      * @param  bool  $prohibit
      * @return void

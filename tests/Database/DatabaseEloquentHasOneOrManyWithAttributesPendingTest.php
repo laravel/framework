@@ -98,7 +98,7 @@ class DatabaseEloquentHasOneOrManyWithAttributesPendingTest extends TestCase
         $this->assertSame($value, $relatedModel->$key);
     }
 
-    public function testPendingAttributesCanBeOverriden(): void
+    public function testPendingAttributesCanBeOverridden(): void
     {
         $key = 'a key';
         $defaultValue = 'a value';

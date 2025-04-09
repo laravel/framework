@@ -27,15 +27,16 @@ class SqlServerConnection extends Connection
      *
      * @param  \Closure  $callback
      * @param  int  $attempts
+     * @param  Closure|null  $onFailure
      * @return mixed
      *
      * @throws \Throwable
      */
-    public function transaction(Closure $callback, $attempts = 1)
+    public function transaction(Closure $callback, $attempts = 1, ?Closure $onFailure = null)
     {
         for ($a = 1; $a <= $attempts; $a++) {
             if ($this->getDriverName() === 'sqlsrv') {
-                return parent::transaction($callback, $attempts);
+                return parent::transaction($callback, $attempts, $onFailure);
             }
 
             $this->getPdo()->exec('BEGIN TRAN');
@@ -54,6 +55,10 @@ class SqlServerConnection extends Connection
             // be handled how the developer sees fit for their applications.
             catch (Throwable $e) {
                 $this->getPdo()->exec('ROLLBACK TRAN');
+
+                if ($a === $attempts && $onFailure !== null) {
+                    $onFailure($e);
+                }
 
                 throw $e;
             }

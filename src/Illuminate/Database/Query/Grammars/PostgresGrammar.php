@@ -383,7 +383,7 @@ class PostgresGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Query\Builder  $query
      * @param  array  $values
-     * @param  string  $sequence
+     * @param  string|null  $sequence
      * @return string
      */
     public function compileInsertGetId(Builder $query, $values, $sequence)
@@ -831,8 +831,16 @@ class PostgresGrammar extends Grammar
      * @param  bool  $value
      * @return void
      */
-    public static function cascadeOnTrucate(bool $value = true)
+    public static function cascadeOnTruncate(bool $value = true)
     {
         static::$cascadeTruncate = $value;
+    }
+
+    /**
+     * @deprecated use cascadeOnTruncate
+     */
+    public static function cascadeOnTrucate(bool $value = true)
+    {
+        self::cascadeOnTruncate($value);
     }
 }

@@ -16,11 +16,12 @@ trait ManagesTransactions
      *
      * @param  (\Closure(static): TReturn)  $callback
      * @param  int  $attempts
+     * @param  Closure|null  $onFailure
      * @return TReturn
      *
      * @throws \Throwable
      */
-    public function transaction(Closure $callback, $attempts = 1)
+    public function transaction(Closure $callback, $attempts = 1, ?Closure $onFailure = null)
     {
         for ($currentAttempt = 1; $currentAttempt <= $attempts; $currentAttempt++) {
             $this->beginTransaction();
@@ -37,7 +38,7 @@ trait ManagesTransactions
             // exception back out, and let the developer handle an uncaught exception.
             catch (Throwable $e) {
                 $this->handleTransactionException(
-                    $e, $currentAttempt, $attempts
+                    $e, $currentAttempt, $attempts, $onFailure
                 );
 
                 continue;
@@ -78,11 +79,12 @@ trait ManagesTransactions
      * @param  \Throwable  $e
      * @param  int  $currentAttempt
      * @param  int  $maxAttempts
+     * @param  Closure|null  $onFailure
      * @return void
      *
      * @throws \Throwable
      */
-    protected function handleTransactionException(Throwable $e, $currentAttempt, $maxAttempts)
+    protected function handleTransactionException(Throwable $e, $currentAttempt, $maxAttempts, ?Closure $onFailure)
     {
         // On a deadlock, MySQL rolls back the entire transaction so we can't just
         // retry the query. We have to throw this exception all the way out and
@@ -106,6 +108,10 @@ trait ManagesTransactions
         if ($this->causedByConcurrencyError($e) &&
             $currentAttempt < $maxAttempts) {
             return;
+        }
+
+        if ($onFailure !== null) {
+            $onFailure($e);
         }
 
         throw $e;
