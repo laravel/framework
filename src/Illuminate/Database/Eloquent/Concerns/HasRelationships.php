@@ -1118,7 +1118,7 @@ trait HasRelationships
     }
 
     /**
-     * Enable relationship autoloading.
+     * Enable relationship autoloading for this model.
      *
      * @return $this
      */
