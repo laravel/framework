@@ -971,6 +971,11 @@ class HttpRequestTest extends TestCase
         $request = Request::create('/?hello=world&user[]=Taylor&user[]=Mohamed%20Said', 'GET', []);
         $this->assertSame(['Taylor', 'Mohamed Said'], $request->query('user'));
         $this->assertSame(['hello' => 'world', 'user' => ['Taylor', 'Mohamed Said']], $request->query->all());
+
+        $request = Request::create('/?date[from]=2025-04-09&date[to]=2025-04-10', 'GET', []);
+        $this->assertSame(['from' => '2025-04-09', 'to' => '2025-04-10'], $request->query('date'));
+        $this->assertSame('2025-04-09', $request->query('date.from'));
+        $this->assertSame('2025-04-10', $request->query('date.to'));
     }
 
     public function testPostMethod()
@@ -982,6 +987,11 @@ class HttpRequestTest extends TestCase
         $this->assertSame('Bob', $request->post('foo', 'Bob'));
         $all = $request->post(null);
         $this->assertSame('Taylor', $all['name']);
+
+        $request = Request::create('/', 'POST', ['date' => ['from' => '2025-04-09', 'to' => '2025-04-10']]);
+        $this->assertSame(['from' => '2025-04-09', 'to' => '2025-04-10'], $request->post('date'));
+        $this->assertSame('2025-04-09', $request->post('date.from'));
+        $this->assertSame('2025-04-10', $request->post('date.to'));
     }
 
     public function testCookieMethod()

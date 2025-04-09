@@ -134,7 +134,7 @@ trait InteractsWithInput
      */
     public function query($key = null, $default = null)
     {
-        return $this->retrieveItem('query', $key, $default);
+        return data_get($this->retrieveItem('query', null, $default), $key, $default);
     }
 
     /**
@@ -146,7 +146,7 @@ trait InteractsWithInput
      */
     public function post($key = null, $default = null)
     {
-        return $this->retrieveItem('request', $key, $default);
+        return data_get($this->retrieveItem('request', null, $default), $key, $default);
     }
 
     /**
