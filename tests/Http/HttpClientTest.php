@@ -2364,7 +2364,7 @@ class HttpClientTest extends TestCase
 
     public function testRequestException()
     {
-        $requestException = $this->factory->requestException(['code' => 'not_found'], 404, ['X-RateLimit-Remaining' => 199]);
+        $requestException = $this->factory->failedRequest(['code' => 'not_found'], 404, ['X-RateLimit-Remaining' => 199]);
 
         $this->assertInstanceOf(RequestException::class, $requestException);
         $this->assertEqualsCanonicalizing(['code' => 'not_found'], $requestException->response->json());

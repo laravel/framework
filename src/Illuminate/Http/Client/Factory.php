@@ -186,7 +186,7 @@ class Factory
      * @param  array<string, mixed>  $headers
      * @return \Illuminate\Http\Client\RequestException
      */
-    public static function requestException($body = null, $status = 200, $headers = [])
+    public static function failedRequest($body = null, $status = 200, $headers = [])
     {
         return new RequestException(new Response(static::psr7Response($body, $status, $headers)));
     }

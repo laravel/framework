@@ -180,6 +180,19 @@ trait EnumeratesValues
     }
 
     /**
+     * Create a new collection by decoding a JSON string.
+     *
+     * @param  string  $json
+     * @param  int  $depth
+     * @param  int  $flags
+     * @return static<TKey, TValue>
+     */
+    public static function fromJson($json, $depth = 512, $flags = 0)
+    {
+        return new static(json_decode($json, true, $depth, $flags));
+    }
+
+    /**
      * Get the average value of a given key.
      *
      * @param  (callable(TValue): float|int)|string|null  $callback

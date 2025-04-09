@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Http\Resources;
+namespace Illuminate\Database\Eloquent\Concerns;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Str;
@@ -11,8 +11,8 @@ trait TransformsToResource
     /**
      * Create a new resource object for the given resource.
      *
-     * @param  class-string<JsonResource>|null  $resourceClass
-     * @return JsonResource
+     * @param  class-string<\Illuminate\Http\Resources\Json\JsonResource>|null  $resourceClass
+     * @return \Illuminate\Http\Resources\Json\JsonResource
      *
      * @throws \Throwable
      */
@@ -28,7 +28,7 @@ trait TransformsToResource
     /**
      * Guess the resource class for the model.
      *
-     * @return JsonResource
+     * @return \Illuminate\Http\Resources\Json\JsonResource
      *
      * @throws \Throwable
      */
@@ -46,7 +46,7 @@ trait TransformsToResource
     /**
      * Guess the resource class name for the model.
      *
-     * @return array<class-string<JsonResource>>
+     * @return array<class-string<\Illuminate\Http\Resources\Json\JsonResource>>
      */
     public static function guessResourceName(): array
     {
