@@ -830,7 +830,9 @@ class ResourceTest extends TestCase
             return (new PostResourceWithExtraData(new Post([
                 'id' => 5,
                 'title' => 'Test Title',
-            ])))->additional(['baz' => 'qux']);
+            ])))->additional([
+                'baz.qux' => 'quux',
+            ]);
         });
 
         $response = $this->withoutExceptionHandling()->get(
@@ -844,6 +846,9 @@ class ResourceTest extends TestCase
             ],
             'foo' => 'bar',
             'baz' => 'qux',
+            'baz' => [
+                'qux' => 'quux'
+            ]
         ]);
     }
 

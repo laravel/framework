@@ -12,6 +12,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\ConditionallyLoadsAttributes;
 use Illuminate\Http\Resources\DelegatesToResource;
+use Illuminate\Support\Arr;
 use JsonException;
 use JsonSerializable;
 
@@ -172,7 +173,9 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
      */
     public function additional(array $data)
     {
-        $this->additional = $data;
+        foreach ($data as $key => $value) {
+            Arr::set($this->additional, $key, $value);
+        }
 
         return $this;
     }
