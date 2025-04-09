@@ -2362,7 +2362,7 @@ class HttpClientTest extends TestCase
         ]);
     }
 
-    public function testRequestException()
+    public function testFailedRequest()
     {
         $requestException = $this->factory->failedRequest(['code' => 'not_found'], 404, ['X-RateLimit-Remaining' => 199]);
 
