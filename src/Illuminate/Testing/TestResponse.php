@@ -79,7 +79,7 @@ class TestResponse implements ArrayAccess
      * @var float|null
      */
     protected $endTime;
-    
+
     /**
      * Create a new test response instance.
      *
@@ -1899,7 +1899,7 @@ class TestResponse implements ArrayAccess
         return $this->baseResponse->{$method}(...$args);
     }
 
-     /**
+    /**
      * Assert that the response time is less than or equal to a given threshold in milliseconds.
      *
      * @param  int  $milliseconds
