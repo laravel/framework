@@ -123,7 +123,7 @@ class Processor
     /**
      * Process the results of an indexes query.
      *
-     * @param  list<array<string, mixed>> $results
+     * @param  list<array<string, mixed>>  $results
      * @return list<array{name: string, columns: list<string>, type: string, unique: bool, primary: bool}>
      */
     public function processIndexes($results)
