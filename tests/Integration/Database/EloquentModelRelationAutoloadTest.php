@@ -32,7 +32,7 @@ class EloquentModelRelationAutoloadTest extends DatabaseTestCase
         });
     }
 
-    public function testRelationAutoload()
+    public function testRelationAutoloadForCollection()
     {
         $post1 = Post::create();
         $comment1 = $post1->comments()->create(['parent_id' => null]);
@@ -61,6 +61,29 @@ class EloquentModelRelationAutoloadTest extends DatabaseTestCase
         $this->assertCount(2, DB::getQueryLog());
         $this->assertCount(3, $likes);
         $this->assertTrue($posts[0]->comments[0]->relationLoaded('likes'));
+    }
+
+    public function testRelationAutoloadForSingleModel()
+    {
+        $post = Post::create();
+        $comment1 = $post->comments()->create(['parent_id' => null]);
+        $comment2 = $post->comments()->create(['parent_id' => $comment1->id]);
+        $comment2->likes()->create();
+        $comment2->likes()->create();
+
+        DB::enableQueryLog();
+
+        $likes = [];
+
+        $post->withRelationshipAutoloading();
+
+        foreach ($post->comments as $comment) {
+            $likes = array_merge($likes, $comment->likes->all());
+        }
+
+        $this->assertCount(2, DB::getQueryLog());
+        $this->assertCount(2, $likes);
+        $this->assertTrue($post->comments[0]->relationLoaded('likes'));
     }
 
     public function testRelationAutoloadVariousNestedMorphRelations()

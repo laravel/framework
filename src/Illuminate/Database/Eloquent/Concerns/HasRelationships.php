@@ -1118,6 +1118,18 @@ trait HasRelationships
     }
 
     /**
+     * Enable relationship autoloading for this model.
+     *
+     * @return $this
+     */
+    public function withRelationshipAutoloading()
+    {
+        $this->newCollection([$this])->withRelationshipAutoloading();
+
+        return $this;
+    }
+
+    /**
      * Duplicate the instance and unset all the loaded relations.
      *
      * @return $this
