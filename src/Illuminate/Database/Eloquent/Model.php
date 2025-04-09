@@ -44,6 +44,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         ForwardsCalls;
     /** @use HasCollection<\Illuminate\Database\Eloquent\Collection<array-key, static & self>> */
     use HasCollection;
+    /** @use HasBuilder<\Illuminate\Database\Eloquent\Builder<static>> */
+    use HasBuilder;
 
     /**
      * The connection name for the model.
@@ -1651,7 +1653,9 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function newEloquentBuilder($query)
     {
-        return new static::$builder($query);
+        static::$resolvedBuilderClasses[static::class] ??= ($this->resolveBuilderFromAttribute() ?? static::$builder);
+
+        return new static::$resolvedBuilderClasses[static::class]($query);
     }
 
     /**

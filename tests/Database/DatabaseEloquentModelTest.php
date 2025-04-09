@@ -17,6 +17,7 @@ use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Illuminate\Database\Eloquent\Attributes\CollectedBy;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Attributes\QueriedBy;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\ArrayObject;
@@ -3319,6 +3320,14 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertInstanceOf(CustomEloquentCollection::class, $collection);
     }
 
+    public function testQueriedByAttribute()
+    {
+        $model = new EloquentModelWithQueriedByAttribute;
+        $builder = $model->newQuery();
+
+        $this->assertInstanceOf(CustomEloquentBuilder::class, $builder);
+    }
+
     public function testUseFactoryAttribute()
     {
         $model = new EloquentModelWithUseFactoryAttribute;
@@ -4177,4 +4186,17 @@ class EloquentModelBootingCallbackTestStub extends Model
 class EloquentChildModelBootingCallbackTestStub extends EloquentModelBootingCallbackTestStub
 {
     public static bool $bootHasFinished = false;
+}
+
+#[QueriedBy(CustomEloquentBuilder::class)]
+class EloquentModelWithQueriedByAttribute extends Model
+{
+    public function newQuery()
+    {
+        return $this->newEloquentBuilder(m::mock(BaseBuilder::class));
+    }
+}
+
+class CustomEloquentBuilder extends Builder
+{
 }
