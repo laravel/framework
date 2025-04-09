@@ -107,6 +107,8 @@ class EloquentModelRelationAutoloadTest extends DatabaseTestCase
         }
 
         $this->assertCount(2, DB::getQueryLog());
+
+        Model::automaticallyEagerLoadRelationships(false);
     }
 
     public function testRelationAutoloadVariousNestedMorphRelations()
