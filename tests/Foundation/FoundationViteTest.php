@@ -1697,35 +1697,33 @@ class FoundationViteTest extends TestCase
     {
         $buildDir = Str::random();
         $this->makeViteManifest([
-            "resources/js/app.js"     => [
-                "file"    => "assets/app.js?v=a42ae7b4",
-                "isEntry" => true,
-                "src"     => "resources/js/app.js",
+            'resources/js/app.js' => [
+                'file' => 'assets/app.js?v=a42ae7b4',
+                'isEntry' => true,
+                'src' => 'resources/js/app.js',
             ],
-            "resources/sass/app.scss" => [
-                "file"    => "assets/app.css?v=2b2b9de9",
-                "isEntry" => true,
-                "src"     => "resources/sass/app.scss",
+            'resources/sass/app.scss' => [
+                'file' => 'assets/app.css?v=2b2b9de9',
+                'isEntry' => true,
+                'src' => 'resources/sass/app.scss',
             ],
         ], $buildDir);
 
-        $result = app(Vite::class)
-            ->useBuildDirectory($buildDir)
-            ->withEntryPoints(['resources/js/app.js', 'resources/sass/app.scss']);
+        $result = $this->someMethodThatGeneratesHtml();
 
         $this->assertStringContainsString(
-            '<link rel="stylesheet" href="https://example.com/' . $buildDir . '/assets/app.css?v=2b2b9de9" />',
+            '<link rel="stylesheet" href="https://example.com/'.$buildDir.'/assets/app.css?v=2b2b9de9" />',
             $result->toHtml()
         );
 
         $this->assertStringContainsString(
-            '<script type="module" src="https://example.com/' . $buildDir . '/assets/app.js?v=a42ae7b4"></script>',
+            '<script type="module" src="https://example.com/'.$buildDir.'/assets/app.js?v=a42ae7b4"></script>',
             $result->toHtml()
         );
 
         $this->cleanViteManifest($buildDir);
     }
-      
+
     public function testItCanFlushState()
     {
         $this->makeViteManifest();
