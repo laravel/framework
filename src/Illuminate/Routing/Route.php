@@ -7,6 +7,7 @@ use Closure;
 use Illuminate\Container\Container;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Attributes\Middleware as MiddlewareAttribute;
 use Illuminate\Routing\Contracts\CallableDispatcher;
 use Illuminate\Routing\Contracts\ControllerDispatcher as ControllerDispatcherContract;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -23,6 +24,8 @@ use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use Laravel\SerializableClosure\SerializableClosure;
 use LogicException;
+use ReflectionClass;
+use ReflectionMethod;
 use Symfony\Component\Routing\Route as SymfonyRoute;
 
 use function Illuminate\Support\enum_value;
@@ -1051,7 +1054,9 @@ class Route
         $this->computedMiddleware = [];
 
         return $this->computedMiddleware = Router::uniqueMiddleware(array_merge(
-            $this->middleware(), $this->controllerMiddleware()
+            $this->middleware(),
+            $this->controllerMiddleware(),
+            $this->resolveMiddlewareFromAttributes()
         ));
     }
 
@@ -1401,5 +1406,60 @@ class Route
     public function __get($key)
     {
         return $this->parameter($key);
+    }
+
+    /**
+     * Resolves the middleware for the route from the middleware
+     * attributes on the controller class and method.
+     *
+     * @return array<string>
+     */
+    public function resolveMiddlewareFromAttributes(): array
+    {
+        if (! $this->isControllerAction()) {
+            return [];
+        }
+
+        return array_merge(
+            $this->getClassLevelMiddlewaresFromAttribute(),
+            $this->getMethodLevelMiddlewaresFromAttribute()
+        );
+    }
+
+    /**
+     * Retrieves the middleware from the controller class level.
+     *
+     * @return array<string>
+     */
+    public function getClassLevelMiddlewaresFromAttribute(): array
+    {
+        $reflectionClass = new ReflectionClass($this->getControllerClass());
+
+        return array_map(
+            fn ($attr) => $attr->newInstance()->toMiddlewareString(),
+            $reflectionClass->getAttributes(MiddlewareAttribute::class)
+        );
+    }
+
+    /**
+     * Gets the middleware from the controller method attributes.
+     *
+     * @return array<string>
+     */
+    public function getMethodLevelMiddlewaresFromAttribute(): array
+    {
+        $controllerClass = $this->getControllerClass();
+        $controllerMethod = $this->getControllerMethod();
+
+        if (! method_exists($controllerClass, $controllerMethod)) {
+            return [];
+        }
+
+        $reflectionMethod = new ReflectionMethod($controllerClass, $controllerMethod);
+
+        return array_map(
+            fn ($attr) => $attr->newInstance()->toMiddlewareString(),
+            $reflectionMethod->getAttributes(MiddlewareAttribute::class)
+        );
     }
 }
