@@ -2864,6 +2864,77 @@ class TestResponseTest extends TestCase
         $response->assertStatus(200);
     }
 
+    public function testCanGetResponseTime()
+    {
+        define('LARAVEL_START', microtime(true) - 0.1);
+        
+        $baseResponse = new Response([
+            'data' => ['foo' => 'bar'],
+        ]);
+        $response = new TestResponse($baseResponse);
+        
+        $responseTime = $response->getResponseTimeInMs();
+        
+        $this->assertIsFloat($responseTime);
+        $this->assertGreaterThan(0, $responseTime);
+        $this->assertLessThan(200, $responseTime);
+    }
+
+    public function testCanAssertResponseTimeUnder()
+    {
+        define('LARAVEL_START', microtime(true) - 0.1);
+        
+        $baseResponse = new Response([
+            'data' => ['foo' => 'bar'],
+        ]);
+        $response = new TestResponse($baseResponse);
+        
+        $response->assertResponseTimeUnder(200);
+        
+        try {
+            $response->assertResponseTimeUnder(50);
+            $this->fail('Expected assertion to fail');
+        } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
+            $this->assertStringContainsString('Response time of', $e->getMessage());
+        }
+    }
+
+    public function testCanAssertResponseTimeUnderOrEqual()
+    {
+        define('LARAVEL_START', microtime(true) - 0.1);
+        
+        $baseResponse = new Response([
+            'data' => ['foo' => 'bar'],
+        ]);
+        $response = new TestResponse($baseResponse);
+        
+        $response->assertResponseTimeUnderOrEqual(200);
+        
+        try {
+            $response->assertResponseTimeUnderOrEqual(50);
+            $this->fail('Expected assertion to fail');
+        } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
+            $this->assertStringContainsString('Response time of', $e->getMessage());
+        }
+    }
+
+    public function testResponseTimeRequiresLaravelStart()
+    {
+        $baseResponse = new Response([
+            'data' => ['foo' => 'bar'],
+        ]);
+        $response = new TestResponse($baseResponse);
+        
+        $this->assertNull($response->getResponseTimeInMs());
+        
+        try {
+            $response->assertResponseTimeUnder(100);
+            $this->fail('Expected assertion to fail');
+        } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
+            $this->assertStringContainsString('LARAVEL_START', $e->getMessage());
+        }
+    }
+
     private function makeMockResponse($content)
     {
         $baseResponse = tap(new Response, function ($response) use ($content) {
