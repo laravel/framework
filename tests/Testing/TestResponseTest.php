@@ -2867,14 +2867,14 @@ class TestResponseTest extends TestCase
     public function testCanGetResponseTime()
     {
         define('LARAVEL_START', microtime(true) - 0.1);
-        
+
         $baseResponse = new Response([
             'data' => ['foo' => 'bar'],
         ]);
         $response = new TestResponse($baseResponse);
-        
+
         $responseTime = $response->getResponseTimeInMs();
-        
+
         $this->assertIsFloat($responseTime);
         $this->assertGreaterThan(0, $responseTime);
         $this->assertLessThan(200, $responseTime);
@@ -2883,14 +2883,14 @@ class TestResponseTest extends TestCase
     public function testCanAssertResponseTimeUnder()
     {
         define('LARAVEL_START', microtime(true) - 0.1);
-        
+
         $baseResponse = new Response([
             'data' => ['foo' => 'bar'],
         ]);
         $response = new TestResponse($baseResponse);
-        
+
         $response->assertResponseTimeUnder(200);
-        
+
         try {
             $response->assertResponseTimeUnder(50);
             $this->fail('Expected assertion to fail');
@@ -2902,14 +2902,14 @@ class TestResponseTest extends TestCase
     public function testCanAssertResponseTimeUnderOrEqual()
     {
         define('LARAVEL_START', microtime(true) - 0.1);
-        
+
         $baseResponse = new Response([
             'data' => ['foo' => 'bar'],
         ]);
         $response = new TestResponse($baseResponse);
-        
+
         $response->assertResponseTimeUnderOrEqual(200);
-        
+
         try {
             $response->assertResponseTimeUnderOrEqual(50);
             $this->fail('Expected assertion to fail');
@@ -2924,9 +2924,9 @@ class TestResponseTest extends TestCase
             'data' => ['foo' => 'bar'],
         ]);
         $response = new TestResponse($baseResponse);
-        
+
         $this->assertNull($response->getResponseTimeInMs());
-        
+
         try {
             $response->assertResponseTimeUnder(100);
             $this->fail('Expected assertion to fail');
