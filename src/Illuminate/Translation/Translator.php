@@ -219,6 +219,50 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     }
 
     /**
+     * Get the specified string translation value for the given key.
+     *
+     * @param  string  $key
+     * @param  array  $replace
+     * @param  string|null  $locale
+     * @param  bool  $fallback
+     * @return string
+     */
+    public function string($key, array $replace = [], $locale = null, $fallback = true)
+    {
+        $value = $this->get($key, $replace, $locale, $fallback);
+
+        if (! is_string($value)) {
+            throw new InvalidArgumentException(
+                sprintf('Translation value for key [%s] for locale [%s] must be a string, %s given.', $key, $locale, gettype($value))
+            );
+        }
+
+        return $value;
+    }
+
+    /**
+     * Get the specified array translation value for the given key.
+     *
+     * @param  string  $key
+     * @param  array  $replace
+     * @param  string|null  $locale
+     * @param  bool  $fallback
+     * @return array
+     */
+    public function array($key, array $replace = [], $locale = null, $fallback = true)
+    {
+        $value = $this->get($key, $replace, $locale, $fallback);
+
+        if (! is_array($value)) {
+            throw new InvalidArgumentException(
+                sprintf('Translation value for key [%s] for locale [%s] must be an array, %s given.', $key, $locale, gettype($value))
+            );
+        }
+
+        return $value;
+    }
+
+    /**
      * Get the proper locale for a choice operation.
      *
      * @param  string  $key

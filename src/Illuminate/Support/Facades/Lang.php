@@ -7,6 +7,8 @@ namespace Illuminate\Support\Facades;
  * @method static bool has(string $key, string|null $locale = null, bool $fallback = true)
  * @method static string|array get(string $key, array $replace = [], string|null $locale = null, bool $fallback = true)
  * @method static string choice(string $key, \Countable|int|float|array $number, array $replace = [], string|null $locale = null)
+ * @method static string string(string $key, array $replace = [], string|null $locale = null, bool $fallback = true)
+ * @method static array array(string $key, array $replace = [], string|null $locale = null, bool $fallback = true)
  * @method static void addLines(array $lines, string $locale, string $namespace = '*')
  * @method static void load(string $namespace, string $group, string $locale)
  * @method static \Illuminate\Translation\Translator handleMissingKeysUsing(callable|null $callback)

@@ -333,6 +333,48 @@ class TranslationTranslatorTest extends TestCase
         $this->assertSame('foo', $t->get('foo'));
     }
 
+    public function testItGetsAsString(): void
+    {
+        $t = new Translator($this->getLoader(), 'en');
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->once()->with('en', 'foo', '*')->andReturn(['bar' => 'foo']);
+
+        $this->assertSame('foo', $t->string('foo.bar', [], 'en'));
+    }
+
+    public function testItThrowsAnExceptionWhenTryingToGetNonStringValueAsString(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('#^Translation value for key \[foo.bar\] for locale \[en\] must be a string, (.*) given.#');
+
+        $t = new Translator($this->getLoader(), 'en');
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->once()->with('en', 'foo', '*')->andReturn(['bar' => ['foo' => 'foo']]);
+
+        $t->string('foo.bar', [], 'en');
+    }
+
+    public function testItGetsAsArray(): void
+    {
+        $t = new Translator($this->getLoader(), 'en');
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->once()->with('en', 'foo', '*')->andReturn(['bar' => ['foo' => 'foo']]);
+
+        $this->assertSame(['foo' => 'foo'], $t->array('foo.bar', [], 'en'));
+    }
+
+    public function testItThrowsAnExceptionWhenTryingToGetNonArrayValueAsArray(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('#^Translation value for key \[foo.bar\] for locale \[en\] must be an array, (.*) given.#');
+
+        $t = new Translator($this->getLoader(), 'en');
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->once()->with('en', 'foo', '*')->andReturn(['bar' => 'foo']);
+
+        $t->array('foo.bar', [], 'en');
+    }
+
     protected function getLoader()
     {
         return m::mock(Loader::class);
