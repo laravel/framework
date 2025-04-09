@@ -131,11 +131,12 @@ interface ConnectionInterface
      *
      * @param  \Closure  $callback
      * @param  int  $attempts
+     * @param  Closure|null  $onFailureCallback
      * @return mixed
      *
      * @throws \Throwable
      */
-    public function transaction(Closure $callback, $attempts = 1);
+    public function transaction(Closure $callback, $attempts = 1, ?Closure $onFailureCallback = null);
 
     /**
      * Start a new database transaction.
