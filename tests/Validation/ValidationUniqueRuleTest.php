@@ -17,14 +17,12 @@ class ValidationUniqueRuleTest extends TestCase
     protected function setUp(): void
     {
         $db = new DB;
-
         $db->addConnection([
             'driver' => 'sqlite',
             'database' => ':memory:',
         ]);
-        $db->bootEloquent();
-        $db->setAsGlobal();
 
+        $db->bootEloquent();
         $this->createSchema();
     }
 
@@ -168,40 +166,40 @@ class ValidationUniqueRuleTest extends TestCase
 
     public function testItValidatesUniqueRuleWithWhereInAndWhereNotIn()
     {
-        User::create(['id' => 1, 'type' => 'admin']);
-        User::create(['id' => 2, 'type' => 'moderator']);
-        User::create(['id' => 3, 'type' => 'editor']);
-        User::create(['id' => 4, 'type' => 'user']);
+        EloquentModelStub::create(['id_column' => 1, 'type' => 'admin']);
+        EloquentModelStub::create(['id_column' => 2, 'type' => 'moderator']);
+        EloquentModelStub::create(['id_column' => 3, 'type' => 'editor']);
+        EloquentModelStub::create(['id_column' => 4, 'type' => 'user']);
 
-        $rule = new Unique(table: 'users', column: 'id');
+        $rule = new Unique(table: 'table', column: 'id_column');
         $rule->whereIn(column: 'type', values: ['admin', 'moderator', 'editor'])
             ->whereNotIn(column: 'type', values: ['editor']);
 
         $trans = $this->getIlluminateArrayTranslator();
-        $v = new Validator($trans, [], ['id' => $rule]);
+        $v = new Validator($trans, [], ['id_column' => $rule]);
         $v->setPresenceVerifier(new DatabasePresenceVerifier(Model::getConnectionResolver()));
 
-        $v->setData(['id' => 1]);
+        $v->setData(['id_column' => 1]);
         $this->assertFalse($v->passes());
 
-        $v->setData(['id' => 2]);
+        $v->setData(['id_column' => 2]);
         $this->assertFalse($v->passes());
 
-        $v->setData(['id' => 3]);
+        $v->setData(['id_column' => 3]);
         $this->assertTrue($v->passes());
 
-        $v->setData(['id' => 4]);
+        $v->setData(['id_column' => 4]);
         $this->assertTrue($v->passes());
 
-        $v->setData(['id' => 5]);
+        $v->setData(['id_column' => 5]);
         $this->assertTrue($v->passes());
     }
-
     protected function createSchema(): void
     {
-        $this->connection()->getSchemaBuilder()->create('users', function ($table) {
-            $table->unsignedInteger('id');
+        $this->connection()->getSchemaBuilder()->create('table', function ($table) {
+            $table->unsignedInteger('id_column');
             $table->string('type');
+            $table->timestamps();
         });
     }
 
@@ -253,15 +251,4 @@ class ClassWithNonEmptyConstructor
 class EloquentModelWithConnection extends EloquentModelStub
 {
     protected $connection = 'mysql';
-}
-
-/**
- * Eloquent Models.
- */
-class User extends Model
-{
-    protected $table = 'users';
-    protected $guarded = [];
-    public $timestamps = false;
-    protected $connection = 'default';
 }
