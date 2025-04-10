@@ -3,6 +3,7 @@
 namespace Illuminate\Cache;
 
 use Illuminate\Contracts\Cache\LockProvider;
+use Illuminate\Contracts\Cache\RetrievesTTL;
 use Illuminate\Contracts\Redis\Factory as Redis;
 use Illuminate\Redis\Connections\PhpRedisClusterConnection;
 use Illuminate\Redis\Connections\PhpRedisConnection;
@@ -11,7 +12,7 @@ use Illuminate\Redis\Connections\PredisConnection;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Str;
 
-class RedisStore extends TaggableStore implements LockProvider
+class RedisStore extends TaggableStore implements LockProvider, RetrievesTTL
 {
     use RetrievesMultipleKeys {
         putMany as private putManyAlias;
@@ -294,6 +295,17 @@ class RedisStore extends TaggableStore implements LockProvider
         return new RedisTaggedCache(
             $this, new RedisTagSet($this, is_array($names) ? $names : func_get_args())
         );
+    }
+
+    public function ttlInSeconds(string $key): ?int
+    {
+        $ttl = $this->connection()->ttl($this->prefix.$key);
+
+        if ($ttl >= 0) {
+            return $ttl;
+        }
+
+        return null;
     }
 
     /**

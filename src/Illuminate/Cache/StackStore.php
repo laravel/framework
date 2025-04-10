@@ -2,15 +2,27 @@
 
 namespace Illuminate\Cache;
 
+use Illuminate\Contracts\Cache\RetrievesTTL;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
+use RuntimeException;
 
 class StackStore implements Store
 {
+    /**
+     * @param  Collection<int, Repository>  $stack
+     */
     public function __construct(
         protected Collection $stack
     ) {
-        //
+        $supported = $this->stack->every(
+            fn ($repository) => $repository->getStore() instanceof RetrievesTTL
+        );
+
+        if (! $supported) {
+            throw new RuntimeException('All stores in the stack must support retrieving TTLs.');
+        }
     }
     /**
      * Retrieve an item from the cache by key.
@@ -20,7 +32,28 @@ class StackStore implements Store
      */
     public function get($key)
     {
-        //
+        foreach ($this->stack as $index => $repository) {
+            $timestamp = now()->getTimestamp();
+            $value = $repository->get($key);
+
+            if ($value === null) {
+                continue;
+            }
+
+            $ttl = $repository->ttlInSeconds($key);
+
+            break;
+        }
+
+        if ($value === null) {
+            return null;
+        }
+
+        foreach ($this->stack->take($index) as $repository) {
+            $repository->put($key, $value, $ttl);
+        }
+
+        return $value;
     }
 
     /**
@@ -32,7 +65,9 @@ class StackStore implements Store
      * @return array
      */
     public function many(array $keys)
-    {}
+    {
+        //
+    }
 
     /**
      * Store an item in the cache for a given number of seconds.
@@ -43,7 +78,9 @@ class StackStore implements Store
      * @return bool
      */
     public function put($key, $value, $seconds)
-    {}
+    {
+        //
+    }
 
     /**
      * Store multiple items in the cache for a given number of seconds.
@@ -53,7 +90,9 @@ class StackStore implements Store
      * @return bool
      */
     public function putMany(array $values, $seconds)
-    {}
+    {
+        //
+    }
 
     /**
      * Increment the value of an item in the cache.
@@ -64,7 +103,7 @@ class StackStore implements Store
      */
     public function increment($key, $value = 1)
     {
-
+        //
     }
 
     /**
@@ -76,7 +115,7 @@ class StackStore implements Store
      */
     public function decrement($key, $value = 1)
     {
-
+        //
     }
 
     /**
@@ -88,7 +127,7 @@ class StackStore implements Store
      */
     public function forever($key, $value)
     {
-
+        //
     }
 
     /**
@@ -99,7 +138,7 @@ class StackStore implements Store
      */
     public function forget($key)
     {
-
+        //
     }
 
     /**
@@ -109,7 +148,7 @@ class StackStore implements Store
      */
     public function flush()
     {
-
+        //
     }
 
     /**
@@ -119,6 +158,6 @@ class StackStore implements Store
      */
     public function getPrefix()
     {
-
+        //
     }
 }

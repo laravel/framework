@@ -4,6 +4,7 @@ namespace Illuminate\Cache;
 
 use Closure;
 use Illuminate\Contracts\Cache\LockProvider;
+use Illuminate\Contracts\Cache\RetrievesTTL;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\PostgresConnection;
@@ -15,7 +16,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Str;
 
-class DatabaseStore implements LockProvider, Store
+class DatabaseStore implements LockProvider, Store, RetrievesTTL
 {
     use InteractsWithTime;
 
@@ -421,6 +422,17 @@ class DatabaseStore implements LockProvider, Store
         $this->table()->delete();
 
         return true;
+    }
+
+    public function ttlInSeconds(string $key): ?int
+    {
+        $expiration =  $this->table()->where('key', $this->prefix.$key)->value('expiration');
+
+        if ($expiration !== null) {
+            return $expiration - now()->getTimestamp();
+        }
+
+        return null;
     }
 
     /**
