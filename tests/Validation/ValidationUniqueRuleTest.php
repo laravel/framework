@@ -2,12 +2,28 @@
 
 namespace Illuminate\Tests\Validation;
 
+use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Validation\Rules\Unique;
 use PHPUnit\Framework\TestCase;
 
 class ValidationUniqueRuleTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        $db = new DB;
+
+        $db->addConnection([
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+        ]);
+        $db->bootEloquent();
+        $db->setAsGlobal();
+
+        $this->createSchema();
+    }
+
     public function testItCorrectlyFormatsAStringVersionOfTheRule()
     {
         $rule = new Unique('table');
@@ -130,6 +146,10 @@ class ValidationUniqueRuleTest extends TestCase
         $this->assertSame('unique:table,column,NULL,id,foo,"NULL"', (string) $rule);
 
         $rule = new Unique('table', 'column');
+        $rule->whereNot('foo', 'bar');
+        $this->assertSame('unique:table,column,NULL,id,foo,"!bar"', (string) $rule);
+
+        $rule = new Unique('table', 'column');
         $rule->whereNull('foo');
         $this->assertSame('unique:table,column,NULL,id,foo,"NULL"', (string) $rule);
 
@@ -140,6 +160,20 @@ class ValidationUniqueRuleTest extends TestCase
         $rule = new Unique('table', 'column');
         $rule->where('foo', 0);
         $this->assertSame('unique:table,column,NULL,id,foo,"0"', (string) $rule);
+    }
+
+
+    protected function createSchema(): void
+    {
+        $this->connection()->getSchemaBuilder()->create('users', function ($table) {
+            $table->unsignedInteger('id');
+            $table->string('type');
+        });
+    }
+
+    protected function connection(): ConnectionInterface
+    {
+        return Model::getConnectionResolver()->connection();
     }
 }
 
@@ -178,4 +212,15 @@ class ClassWithNonEmptyConstructor
 class EloquentModelWithConnection extends EloquentModelStub
 {
     protected $connection = 'mysql';
+}
+
+/**
+ * Eloquent Models.
+ */
+class User extends Model
+{
+    protected $table = 'users';
+    protected $guarded = [];
+    public $timestamps = false;
+    protected $connection = 'default';
 }
