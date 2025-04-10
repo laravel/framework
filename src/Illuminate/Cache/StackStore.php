@@ -3,9 +3,15 @@
 namespace Illuminate\Cache;
 
 use Illuminate\Contracts\Cache\Store;
+use Illuminate\Support\Collection;
 
 class StackStore implements Store
 {
+    public function __construct(
+        protected Collection $stack
+    ) {
+        //
+    }
     /**
      * Retrieve an item from the cache by key.
      *

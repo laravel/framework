@@ -7,7 +7,9 @@ use Illuminate\Cache\RedisStore;
 use Illuminate\Cache\StackStore;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Redis\Connections\PhpRedisClusterConnection;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Sleep;
 use Mockery as m;
@@ -34,11 +36,17 @@ class StackStoreTest extends TestCase
 
     public function test_get()
     {
-        Cache::extend('stack:redis,database', function () {
-            return new StackStore;
+        Config::set('cache.stores.stack', [
+            'driver' => 'stack',
+        ]);
+        Cache::extend('stack', function () {
+            return new StackStore(new Collection([
+                Cache::store('redis'),
+                Cache::store('database'),
+            ]));
         });
-        $cache = Cache::store('stack');
 
-            dd($cache);
+        $cache = Cache::store('stack');
+        dd($cache);
     }
 }
