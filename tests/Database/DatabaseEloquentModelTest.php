@@ -3330,6 +3330,236 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals(EloquentModelWithUseFactoryAttribute::class, $factory->modelName());
         $this->assertEquals('test name', $instance->name); // Small smoke test to ensure the factory is working
     }
+
+    public function testFillsConditionallyWhenTruthy()
+    {
+        $model = (new EloquentModelStub())->fillable(['name']);
+
+        $this->assertEmpty(
+            (clone $model)->fillWhen(false, ['name' => 'foo', 'unfillable' => true])->getAttributes()
+        );
+
+        $this->assertEmpty(
+            (clone $model)->fillWhen(fn() => 0, ['name' => 'foo', 'unfillable' => true])->getAttributes()
+        );
+
+        $this->assertSame(
+            ['name' => 'foo'],
+            (clone $model)->fillWhen(true, ['name' => 'foo', 'unfillable' => true])->getAttributes()
+        );
+
+        $this->assertSame(
+            ['name' => 'foo'],
+            (clone $model)->fillWhen(fn() => 1, ['name' => 'foo', 'unfillable' => true])->getAttributes()
+        );
+    }
+
+    public function testFillsConditionallyWhenFalsy()
+    {
+        $model = (new EloquentModelStub())->fillable(['name']);
+
+        $this->assertEmpty(
+            (clone $model)->fillUnless(true, ['name' => 'foo', 'unfillable' => true])->getAttributes()
+        );
+
+        $this->assertEmpty(
+            (clone $model)->fillUnless(fn() => 1, ['name' => 'foo', 'unfillable' => true])->getAttributes()
+        );
+
+        $this->assertSame(
+            ['name' => 'foo'],
+            (clone $model)->fillUnless(false, ['name' => 'foo', 'unfillable' => true])->getAttributes()
+        );
+
+        $this->assertSame(
+            ['name' => 'foo'],
+            (clone $model)->fillUnless(fn() => 0, ['name' => 'foo', 'unfillable' => true])->getAttributes()
+        );
+    }
+
+    public function testForceFillsConditionallyWhenTruthy()
+    {
+        $model = (new EloquentModelStub())->fillable(['name']);
+
+        $this->assertEmpty(
+            (clone $model)->forceFillWhen(false, ['name' => 'foo', 'unfillable' => true])->getAttributes()
+        );
+
+        $this->assertEmpty(
+            (clone $model)->forceFillWhen(fn() => 0, ['name' => 'foo', 'unfillable' => true])->getAttributes()
+        );
+
+        $this->assertSame(
+            ['name' => 'foo', 'unfillable' => true],
+            (clone $model)->forceFillWhen(true, ['name' => 'foo', 'unfillable' => true])->getAttributes()
+        );
+
+        $this->assertSame(
+            ['name' => 'foo', 'unfillable' => true],
+            (clone $model)->forceFillWhen(fn() => 1, ['name' => 'foo', 'unfillable' => true])->getAttributes()
+        );
+    }
+
+    public function testForceFillsConditionallyWhenFalsy()
+    {
+        $model = (new EloquentModelStub())->fillable(['name']);
+
+        $this->assertEmpty(
+            (clone $model)->forceFillUnless(true, ['name' => 'foo', 'unfillable' => true])->getAttributes()
+        );
+
+        $this->assertEmpty(
+            (clone $model)->forceFillUnless(fn() => 1, ['name' => 'foo', 'unfillable' => true])->getAttributes()
+        );
+
+        $this->assertSame(
+            ['name' => 'foo', 'unfillable' => true],
+            (clone $model)->forceFillUnless(false, ['name' => 'foo', 'unfillable' => true])->getAttributes()
+        );
+
+        $this->assertSame(
+            ['name' => 'foo', 'unfillable' => true],
+            (clone $model)->forceFillUnless(fn() => 0, ['name' => 'foo', 'unfillable' => true])->getAttributes()
+        );
+    }
+
+    public function testSavesConditionallyWhenTruthy()
+    {
+        $model = $this->getMockBuilder(EloquentModelStub::class)->onlyMethods([
+            'newModelQuery', 'updateTimestamps'
+        ])->getMock();
+
+        $this->assertNotTrue($model->saveWhen(false));
+        $this->assertNotTrue($model->saveWhen(fn() => 0));
+
+        $query = m::mock(Builder::class);
+        $query->shouldReceive('insertGetId')->once()->with([], 'id')->andReturn(1);
+        $query->shouldReceive('getConnection')->once();
+        $model->expects($this->once())->method('newModelQuery')->willReturn($query);
+
+        $this->assertTrue($model->saveWhen(1));
+    }
+
+    public function testSavesConditionallyUnlessFalsy()
+    {
+        $model = $this->getMockBuilder(EloquentModelStub::class)->onlyMethods([
+            'newModelQuery', 'updateTimestamps'
+        ])->getMock();
+
+        $this->assertNotTrue($model->saveUnless(true));
+        $this->assertNotTrue($model->saveUnless(fn() => 1));
+
+        $query = m::mock(Builder::class);
+        $query->shouldReceive('insertGetId')->once()->with([], 'id')->andReturn(1);
+        $query->shouldReceive('getConnection')->once();
+        $model->expects($this->once())->method('newModelQuery')->willReturn($query);
+
+        $this->assertTrue($model->saveUnless(0));
+    }
+
+    public function testUpdatesConditionallyWhenTruthy()
+    {
+        $model = $this->getMockBuilder(EloquentModelStub::class)->onlyMethods(['newModelQuery'])->getMock();
+        $model->id = 1;
+        $model->exists = true;
+        $model->syncChanges();
+
+        $this->assertNotTrue($model->updateWhen(false, ['name' => 'Taylor']));
+        $this->assertNotTrue($model->updateWhen(fn() => 0, ['name' => 'Taylor']));
+
+        $query = m::mock(Builder::class);
+        $query->shouldReceive('where')->with('id', '=', 1)->andReturnSelf();
+        $query->shouldReceive('update')->andReturnSelf();
+        $model->expects($this->once())->method('newModelQuery')->willReturn($query);
+
+        $this->assertTrue($model->updateWhen(1, ['name' => 'Taylor']));
+    }
+
+    public function testUpdatesConditionallyUnlessFalsy()
+    {
+        $model = $this->getMockBuilder(EloquentModelStub::class)->onlyMethods(['newModelQuery'])->getMock();
+        $model->id = 1;
+        $model->exists = true;
+        $model->syncChanges();
+
+        $this->assertNotTrue($model->updateUnless(true, ['name' => 'Taylor']));
+        $this->assertNotTrue($model->updateUnless(fn() => 1, ['name' => 'Taylor']));
+
+        $query = m::mock(Builder::class);
+        $query->shouldReceive('where')->with('id', '=', 1)->andReturnSelf();
+        $query->shouldReceive('update')->andReturnSelf();
+        $model->expects($this->once())->method('newModelQuery')->willReturn($query);
+
+        $this->assertTrue($model->updateUnless(0, ['name' => 'Taylor']));
+    }
+
+    public function testDeletesConditionallyWhenTruthy()
+    {
+        $model = $this->getMockBuilder(EloquentModelStub::class)->onlyMethods(['newModelQuery'])->getMock();
+        $model->id = 1;
+        $model->exists = true;
+
+        $this->assertNotTrue($model->deleteWhen(false));
+        $this->assertNotTrue($model->deleteWhen(fn() => 0));
+
+        $query = m::mock(Builder::class);
+        $query->shouldReceive('where')->with('id', '=', 1)->andReturnSelf();
+        $query->shouldReceive('delete')->andReturnSelf();
+        $model->expects($this->once())->method('newModelQuery')->willReturn($query);
+
+        $this->assertTrue($model->deleteWhen(1));
+    }
+
+    public function testDeletesConditionallyUnlessFalsy()
+    {
+        $model = $this->getMockBuilder(EloquentModelStub::class)->onlyMethods(['newModelQuery'])->getMock();
+        $model->id = 1;
+        $model->exists = true;
+
+        $this->assertNotTrue($model->deleteUnless(true));
+        $this->assertNotTrue($model->deleteUnless(fn() => 1));
+
+        $query = m::mock(Builder::class);
+        $query->shouldReceive('where')->with('id', '=', 1)->andReturnSelf();
+        $query->shouldReceive('delete')->andReturnSelf();
+        $model->expects($this->once())->method('newModelQuery')->willReturn($query);
+
+        $this->assertTrue($model->deleteUnless(0));
+    }
+
+    public function testForceDeletesConditionallyWhenTruthy()
+    {
+        $model = $this->getMockBuilder(EloquentModelStub::class)->onlyMethods(['newModelQuery'])->getMock();
+        $model->id = 1;
+        $model->exists = true;
+
+        $this->assertNotTrue($model->forceDeleteWhen(false));
+        $this->assertNotTrue($model->forceDeleteWhen(fn() => 0));
+
+        $query = m::mock(Builder::class);
+        $query->shouldReceive('where')->with('id', '=', 1)->andReturnSelf();
+        $query->shouldReceive('delete')->andReturnSelf();
+        $model->expects($this->once())->method('newModelQuery')->willReturn($query);
+
+        $this->assertTrue($model->forceDeleteWhen(1));
+    }
+
+    public function testForceDeletesConditionallyUnlessFalsy()
+    {
+        $model = $this->getMockBuilder(EloquentModelStub::class)->onlyMethods(['newModelQuery'])->getMock();
+        $model->id = 1;
+        $model->exists = true;
+
+        $this->assertNotTrue($model->forceDeleteUnless(true));
+        $this->assertNotTrue($model->forceDeleteUnless(fn() => 1));
+
+        $query = m::mock(Builder::class);
+        $query->shouldReceive('where')->with('id', '=', 1)->andReturnSelf();
+        $query->shouldReceive('delete')->andReturnSelf();
+        $model->expects($this->once())->method('newModelQuery')->willReturn($query);
+
+        $this->assertTrue($model->forceDeleteUnless(0));
+    }
 }
 
 class EloquentTestObserverStub

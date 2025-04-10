@@ -41,6 +41,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         Concerns\GuardsAttributes,
         Concerns\PreventsCircularRecursion,
         Concerns\TransformsToResource,
+        Concerns\HasConditions,
         ForwardsCalls;
     /** @use HasCollection<\Illuminate\Database\Eloquent\Collection<array-key, static & self>> */
     use HasCollection;
