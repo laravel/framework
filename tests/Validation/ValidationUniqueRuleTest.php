@@ -194,6 +194,7 @@ class ValidationUniqueRuleTest extends TestCase
         $v->setData(['id_column' => 5]);
         $this->assertTrue($v->passes());
     }
+
     protected function createSchema(): void
     {
         $this->connection()->getSchemaBuilder()->create('table', function ($table) {
