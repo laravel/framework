@@ -5,7 +5,11 @@ namespace Illuminate\Tests\Validation;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Translation\ArrayLoader;
+use Illuminate\Translation\Translator;
+use Illuminate\Validation\DatabasePresenceVerifier;
 use Illuminate\Validation\Rules\Unique;
+use Illuminate\Validation\Validator;
 use PHPUnit\Framework\TestCase;
 
 class ValidationUniqueRuleTest extends TestCase
@@ -162,6 +166,36 @@ class ValidationUniqueRuleTest extends TestCase
         $this->assertSame('unique:table,column,NULL,id,foo,"0"', (string) $rule);
     }
 
+    public function testItValidatesUniqueRuleWithWhereInAndWhereNotIn()
+    {
+        User::create(['id' => 1, 'type' => 'admin']);
+        User::create(['id' => 2, 'type' => 'moderator']);
+        User::create(['id' => 3, 'type' => 'editor']);
+        User::create(['id' => 4, 'type' => 'user']);
+
+        $rule = new Unique(table: 'users', column: 'id');
+        $rule->whereIn(column: 'type', values: ['admin', 'moderator', 'editor'])
+            ->whereNotIn(column: 'type', values: ['editor']);
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, [], ['id' => $rule]);
+        $v->setPresenceVerifier(new DatabasePresenceVerifier(Model::getConnectionResolver()));
+
+        $v->setData(['id' => 1]);
+        $this->assertFalse($v->passes());
+
+        $v->setData(['id' => 2]);
+        $this->assertFalse($v->passes());
+
+        $v->setData(['id' => 3]);
+        $this->assertTrue($v->passes());
+
+        $v->setData(['id' => 4]);
+        $this->assertTrue($v->passes());
+
+        $v->setData(['id' => 5]);
+        $this->assertTrue($v->passes());
+    }
 
     protected function createSchema(): void
     {
@@ -174,6 +208,13 @@ class ValidationUniqueRuleTest extends TestCase
     protected function connection(): ConnectionInterface
     {
         return Model::getConnectionResolver()->connection();
+    }
+
+    protected function getIlluminateArrayTranslator(): Translator
+    {
+        return new Translator(
+            new ArrayLoader, locale: 'en'
+        );
     }
 }
 
