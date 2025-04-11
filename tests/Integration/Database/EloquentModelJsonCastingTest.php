@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Fluent;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 use stdClass;
 
@@ -69,6 +70,40 @@ class EloquentModelJsonCastingTest extends DatabaseTestCase
         $this->assertInstanceOf(Collection::class, $user->collection_as_json_field);
         $this->assertSame('value1', $user->collection_as_json_field->get('key1'));
     }
+
+    public function testCollectionMapInto()
+    {
+        /** @var \Illuminate\Tests\Integration\Database\EloquentModelJsonCastingTest\JsonCast $user */
+        $user = JsonCast::create([
+            'collection_as_json_field' => ['key1' => ['subkey1' => 'value1']],
+        ]);
+
+        $user->mergeCasts([
+            'collection_as_json_field' => 'collection:\Illuminate\Support\Fluent',
+        ]);
+
+        $fluent = $user->collection_as_json_field->get('key1');
+
+        $this->assertInstanceOf(Fluent::class, $fluent);
+        $this->assertSame('value1', $fluent->value('subkey1'));
+    }
+
+    public function testCollectionMapCallback()
+    {
+        /** @var \Illuminate\Tests\Integration\Database\EloquentModelJsonCastingTest\JsonCast $user */
+        $user = JsonCast::create([
+            'collection_as_json_field' => ['key1' => ['subkey1' => 'value1']],
+        ]);
+
+        $user->mergeCasts([
+            'collection_as_json_field' => 'collection:' . FluentWithMethod::class . '@toFluent',
+        ]);
+
+        $fluent = $user->collection_as_json_field->get('key1');
+
+        $this->assertInstanceOf(FluentWithMethod::class, $fluent);
+        $this->assertSame('value1', $fluent->value('subkey1'));
+    }
 }
 
 /**
@@ -91,4 +126,12 @@ class JsonCast extends Model
         'object_as_json_field' => 'object',
         'collection_as_json_field' => 'collection',
     ];
+}
+
+class FluentWithMethod extends Fluent
+{
+    public static function toFluent($data)
+    {
+        return new static($data);
+    }
 }
