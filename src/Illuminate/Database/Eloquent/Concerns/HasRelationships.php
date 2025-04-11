@@ -162,7 +162,7 @@ trait HasRelationships
      * Propagate the relationship autoloader callback to the given related models.
      *
      * @param  string  $key
-     * @param  mixed  $values
+     * @param  mixed  $models
      * @param  mixed  $context
      * @return void
      */
