@@ -52,9 +52,7 @@ class MemoizedStore implements Store
      */
     public function many(array $keys)
     {
-        $memoized = [];
-        $retrieved = [];
-        $missing = [];
+        [$memoized, $retrieved, $missing] = [[], [], []];
 
         foreach ($keys as $key) {
             $prefixedKey = $this->prefix($key);
