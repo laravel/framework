@@ -823,6 +823,13 @@ trait HasAttributes
             $castType = Str::after($castType, 'encrypted:');
         }
 
+        // If the key is a collection, we'll transform the value into a Collection.
+        // Then, we'll check if the items should be mapped into a class instance,
+        // or be mapped through a callback by parsing the "class@method" param.
+        if ($this->isCollectionCastable($castType)) {
+            return $this->asCollection($value, $key);
+        }
+
         switch ($castType) {
             case 'int':
             case 'integer':
@@ -844,8 +851,6 @@ trait HasAttributes
             case 'json':
             case 'json:unicode':
                 return $this->fromJson($value);
-            case 'collection':
-                return new BaseCollection($this->fromJson($value));
             case 'date':
                 return $this->asDate($value);
             case 'datetime':
@@ -1540,6 +1545,30 @@ trait HasAttributes
     }
 
     /**
+     * Return a JSON string as Collection object.
+     *
+     * @param  string  $value
+     * @param  string  $key
+     * @return \Illuminate\Support\Collection
+     */
+    protected function asCollection($value, $key)
+    {
+        $collection = new BaseCollection($this->fromJson($value));
+
+        [$class, $method] = Str::parseCallback(Str::after($this->getCastType($key), ':'));
+
+        if ($method) {
+            return $collection->map([$class, $method]);
+        }
+
+        if (strtolower($class) !== 'collection') {
+            return $collection->mapInto($class);
+        }
+
+        return $collection;
+    }
+
+    /**
      * Determine if the given value is a standard date format.
      *
      * @param  string  $value
@@ -1791,6 +1820,17 @@ trait HasAttributes
         return ! $this->isEnumCastable($key) &&
             $this->isClassCastable($key) &&
             method_exists($this->resolveCasterClass($key), 'serialize');
+    }
+
+    /**
+     * Determine if the key cast uses a collection.
+     *
+     * @param  string  $castType
+     * @return bool
+     */
+    protected function isCollectionCastable($castType)
+    {
+        return str_starts_with($castType, 'collection');
     }
 
     /**
