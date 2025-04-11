@@ -972,11 +972,11 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         [$taylor, $abigail] = $this->createUsers();
 
         $this->assertNotTrue($taylor->deleteWhen(false));
-        $this->assertNotTrue($taylor->deleteWhen(fn() => 0));
+        $this->assertNotTrue($taylor->deleteWhen(fn () => 0));
         $this->assertTrue($taylor->deleteWhen(1));
 
         $this->assertNotTrue($abigail->forceDeleteWhen(false));
-        $this->assertNotTrue($abigail->forceDeleteWhen(fn() => 0));
+        $this->assertNotTrue($abigail->forceDeleteWhen(fn () => 0));
         $this->assertTrue($abigail->forceDeleteWhen(1));
 
         $this->assertCount(1, $taylor->newQuery()->withoutGlobalScopes()->get());
@@ -988,11 +988,11 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         [$taylor, $abigail] = $this->createUsers();
 
         $this->assertNotTrue($taylor->deleteUnless(true));
-        $this->assertNotTrue($taylor->deleteUnless(fn() => 1));
+        $this->assertNotTrue($taylor->deleteUnless(fn () => 1));
         $this->assertTrue($taylor->deleteUnless(0));
 
         $this->assertNotTrue($abigail->forceDeleteUnless(true));
-        $this->assertNotTrue($abigail->forceDeleteUnless(fn() => 1));
+        $this->assertNotTrue($abigail->forceDeleteUnless(fn () => 1));
         $this->assertTrue($abigail->forceDeleteUnless(0));
 
         $this->assertCount(1, $taylor->newQuery()->withoutGlobalScopes()->get());

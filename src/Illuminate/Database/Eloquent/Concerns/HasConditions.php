@@ -2,8 +2,6 @@
 
 namespace Illuminate\Database\Eloquent\Concerns;
 
-use function value;
-
 trait HasConditions
 {
     /**
@@ -55,75 +53,181 @@ trait HasConditions
     }
 
     /**
-     * Save the model to the database if the condition is true
+     * Save the model to the database if the condition is true.
+     *
+     * @param  (\Closure($this):mixed)|mixed  $condition
+     * @param  array  $options
+     * @param  bool  $quietly
+     * @return bool
+     */
+    public function saveWhen($condition, array $options = [], $quietly = false)
+    {
+        if (value($condition, $this)) {
+            return $quietly ? $this->saveQuietly($options) : $this->save($options);
+        }
+
+        return false;
+    }
+
+    /**
+     * Save the model to the database if the condition is true.
+     *
+     * @param  (\Closure($this):mixed)|mixed  $condition
+     * @param  array  $options
+     * @param  bool  $quietly
+     * @return bool
+     */
+    public function saveUnless($condition, array $options = [], $quietly = false)
+    {
+        if (! value($condition, $this)) {
+            return $quietly ? $this->saveQuietly($options) : $this->save($options);
+        }
+
+        return false;
+    }
+
+    /**
+     * Save the model to the database if the condition is true.
      *
      * @param  (\Closure($this):mixed)|mixed  $condition
      * @param  array  $options
      * @return bool
      */
-    public function saveWhen($condition, array $options = [])
+    public function saveQuietlyWhen($condition, array $options = [])
     {
-        return value($condition, $this) ? $this->save($options) : false;
+        return $this->saveWhen($condition, $options, true);
     }
 
     /**
-     * Save the model to the database if the condition is true
+     * Save the model to the database if the condition is true.
      *
      * @param  (\Closure($this):mixed)|mixed  $condition
      * @param  array  $options
      * @return bool
      */
-    public function saveUnless($condition, array $options = [])
+    public function saveQuietlyUnless($condition, array $options = [])
     {
-        return !value($condition, $this) ? $this->save($options) : false;
+        return $this->saveUnless($condition, $options, true);
     }
 
     /**
-     * Save the model to the database if the condition is true
+     * Save the model to the database if the condition is true.
+     *
+     * @param  (\Closure($this):mixed)|mixed  $condition
+     * @param  (\Closure($this):array)|array  $attributes
+     * @param  array  $options
+     * @param  bool  $quietly
+     * @return bool
+     */
+    public function updateWhen($condition, $attributes = [], array $options = [], $quietly = false)
+    {
+        if (value($condition, $this)) {
+            return $quietly
+                ? $this->updateQuietly(value($attributes, $this), $options)
+                : $this->update(value($attributes, $this), $options);
+        }
+
+        return false;
+    }
+
+    /**
+     * Save the model to the database if the condition is true.
+     *
+     * @param  (\Closure($this):mixed)|mixed  $condition
+     * @param  (\Closure($this):array)|array  $attributes
+     * @param  array  $options
+     * @param  bool  $quietly
+     * @return bool
+     */
+    public function updateUnless($condition, $attributes = [], array $options = [], $quietly = false)
+    {
+        if (! value($condition, $this)) {
+            return $quietly
+                ? $this->updateQuietly(value($attributes, $this), $options)
+                : $this->update(value($attributes, $this), $options);
+        }
+
+        return false;
+    }
+
+    /**
+     * Save the model to the database if the condition is true, without raising any events.
      *
      * @param  (\Closure($this):mixed)|mixed  $condition
      * @param  (\Closure($this):array)|array  $attributes
      * @param  array  $options
      * @return bool
      */
-    public function updateWhen($condition, $attributes = [], array $options = [])
+    public function updateQuietlyWhen($condition, $attributes = [], array $options = [])
     {
-        return value($condition, $this) ? $this->update(value($attributes, $this), $options) : false;
+        return $this->updateWhen($condition, $attributes, $options, true);
     }
 
     /**
-     * Save the model to the database if the condition is true
+     * Save the model to the database if the condition is true, without raising any events.
      *
      * @param  (\Closure($this):mixed)|mixed  $condition
      * @param  (\Closure($this):array)|array  $attributes
      * @param  array  $options
      * @return bool
      */
-    public function updateUnless($condition, $attributes = [], array $options = [])
+    public function updateQuietlyUnless($condition, $attributes = [], array $options = [])
     {
-        return !value($condition, $this) ? $this->update(value($attributes, $this), $options) : false;
+        return $this->updateUnless($condition, $attributes, $options, true);
     }
 
     /**
      * Delete the model to the database if the condition is truthy.
      *
      * @param  (\Closure($this):mixed)|mixed  $condition
+     * @param  bool  $quietly
      * @return bool
      */
-    public function deleteWhen($condition)
+    public function deleteWhen($condition, $quietly = false)
     {
-        return value($condition, $this) ? $this->delete() : false;
+        if (value($condition, $this)) {
+            return $quietly ? $this->deleteQuietly() : $this->delete();
+        }
+
+        return false;
     }
 
     /**
      * Delete the model to the database if the condition is falsy.
      *
      * @param  (\Closure($this):mixed)|mixed  $condition
+     * @param  bool  $quietly
      * @return bool
      */
-    public function deleteUnless($condition)
+    public function deleteUnless($condition, $quietly = false)
     {
-        return !value($condition, $this) ? $this->delete() : false;
+        if (! value($condition, $this)) {
+            return $quietly ? $this->deleteQuietly() : $this->delete();
+        }
+
+        return false;
+    }
+
+    /**
+     * Delete the model to the database if the condition is truthy, without raising any events.
+     *
+     * @param  (\Closure($this):mixed)|mixed  $condition
+     * @return bool
+     */
+    public function deleteQuietlyWhen($condition)
+    {
+        return $this->deleteWhen($condition, true);
+    }
+
+    /**
+     * Delete the model to the database if the condition is falsy, without raising any events.
+     *
+     * @param  (\Closure($this):mixed)|mixed  $condition
+     * @return bool
+     */
+    public function deleteQuietlyUnless($condition)
+    {
+        return $this->deleteUnless($condition, true);
     }
 
     /**
@@ -145,6 +249,6 @@ trait HasConditions
      */
     public function forceDeleteUnless($condition)
     {
-        return !value($condition, $this) ? $this->forceDelete() : false;
+        return ! value($condition, $this) ? $this->forceDelete() : false;
     }
 }
