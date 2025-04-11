@@ -470,11 +470,9 @@ trait InteractsWithPivotTable
     {
         $results = 0;
 
-        if (
-            ! empty($this->pivotWheres) ||
+        if (! empty($this->pivotWheres) ||
             ! empty($this->pivotWhereIns) ||
-            ! empty($this->pivotWhereNulls)
-        ) {
+            ! empty($this->pivotWhereNulls)) {
             $records = $this->getCurrentlyAttachedPivotsForIds($ids);
 
             foreach ($records as $record) {
@@ -493,6 +491,16 @@ trait InteractsWithPivotTable
     }
 
     /**
+     * Get the pivot models that are currently attached.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    protected function getCurrentlyAttachedPivots()
+    {
+        return $this->getCurrentlyAttachedPivotsForIds();
+    }
+
+    /**
      * Get the pivot models that are currently attached, filtered by related model keys.
      *
      * @param  mixed  $ids
@@ -501,7 +509,9 @@ trait InteractsWithPivotTable
     protected function getCurrentlyAttachedPivotsForIds($ids = null)
     {
         return $this->newPivotQuery()
-            ->when(! is_null($ids), fn ($query) => $query->whereIn($this->getQualifiedRelatedPivotKeyName(), $this->parseIds($ids)))
+            ->when(! is_null($ids), fn ($query) => $query->whereIn(
+                $this->getQualifiedRelatedPivotKeyName(), $this->parseIds($ids)
+            ))
             ->get()
             ->map(function ($record) {
                 $class = $this->using ?: Pivot::class;
@@ -512,16 +522,6 @@ trait InteractsWithPivotTable
                     ->setPivotKeys($this->foreignPivotKey, $this->relatedPivotKey)
                     ->setRelatedModel($this->related);
             });
-    }
-
-    /**
-     * Get the pivot models that are currently attached.
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    protected function getCurrentlyAttachedPivots()
-    {
-        return $this->getCurrentlyAttachedPivotsForIds();
     }
 
     /**
