@@ -1010,7 +1010,7 @@ if (! function_exists('uri')) {
     function uri(UriInterface|Stringable|array|string $uri, mixed $parameters = [], bool $absolute = true): Uri
     {
         return match (true) {
-            is_array($uri) => Uri::action($uri, $parameters, $absolute),
+            is_array($uri) || str_contains($uri, '\\') => Uri::action($uri, $parameters, $absolute),
             default => Uri::of($uri),
         };
     }
