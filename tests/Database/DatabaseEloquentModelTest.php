@@ -3670,7 +3670,8 @@ class DatabaseEloquentModelTest extends TestCase
     {
         $model = $this->getMockBuilder(EloquentModelStub::class)->onlyMethods(['newModelQuery'])->getMock();
         $model->id = 1;
-        $model->exists = true;$model->setEventDispatcher($events = m::mock(Dispatcher::class));
+        $model->exists = true;
+        $model->setEventDispatcher($events = m::mock(Dispatcher::class));
         $events->shouldNotReceive('dispatch');
 
         $this->assertNotTrue($model->deleteWhen(false, true));
@@ -3688,7 +3689,8 @@ class DatabaseEloquentModelTest extends TestCase
     {
         $model = $this->getMockBuilder(EloquentModelStub::class)->onlyMethods(['newModelQuery'])->getMock();
         $model->id = 1;
-        $model->exists = true;$model->setEventDispatcher($events = m::mock(Dispatcher::class));
+        $model->exists = true;
+        $model->setEventDispatcher($events = m::mock(Dispatcher::class));
         $events->shouldNotReceive('dispatch');
 
         $this->assertNotTrue($model->deleteQuietlyWhen(false));
