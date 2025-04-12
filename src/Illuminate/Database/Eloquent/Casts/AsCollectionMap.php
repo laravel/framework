@@ -33,12 +33,9 @@ class AsCollectionMap implements Castable
                     throw new InvalidArgumentException('No class or callable has been set to map the Collection.');
                 }
 
-                if (isset($arguments[1]) && ! is_array($arguments[0])) {
-                    $arguments = [$arguments[0], $arguments[1]];
-                    unset($arguments[1]);
-                }
-
-                $this->callable = $arguments[0];
+                $this->callable = isset($arguments[1]) && ! is_array($arguments[0])
+                    ? [$arguments[0], $arguments[1]]
+                    : $arguments[0];
             }
 
             public function get($model, $key, $value, $attributes)
