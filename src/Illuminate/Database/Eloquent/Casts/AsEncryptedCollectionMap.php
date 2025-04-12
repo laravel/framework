@@ -68,4 +68,37 @@ class AsEncryptedCollectionMap extends AsCollectionMap
             }
         };
     }
+
+    /**
+     * Specify the class to map into each item in the Collection cast.
+     *
+     * @param  class-string  $class
+     * @return string
+     */
+    public static function into($class)
+    {
+        return static::class.':'.$class;
+    }
+
+    /**
+     * Specify the callable to map each item in the Collection cast.
+     *
+     * @param  callable-string|array{0: class-string, 1: string}  $callback
+     * @param  string|null  $method
+     * @return string
+     */
+    public static function using($callback, $method = null)
+    {
+        if ($callback instanceof Closure) {
+            throw new InvalidArgumentException('The provided callback should be a callable array or string.');
+        }
+
+        if (is_array($callback) && is_callable($callback)) {
+            [$callback, $method] = [$callback[0], $callback[1]];
+        }
+
+        return $method === null
+            ? static::class.':'.$callback
+            : static::class.':'.$callback.'@'.$method;
+    }
 }
