@@ -870,7 +870,7 @@ class FilesystemAdapter implements CloudFilesystemContract
             throw new RuntimeException("The stream wrapper [{$wrapper}] is not available.");
         }
 
-        return $wrapper . '://' . ltrim($this->path($path), '\\/');
+        return $wrapper.'://'.ltrim($this->path($path), '\\/');
     }
 
     /**
