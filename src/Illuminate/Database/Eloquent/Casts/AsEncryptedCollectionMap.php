@@ -34,7 +34,7 @@ class AsEncryptedCollectionMap extends AsCollectionMap
 
                 $data = Json::decode(Crypt::decryptString($attributes[$key]));
 
-                if (!is_array($data)) {
+                if (! is_array($data)) {
                     return null;
                 }
 

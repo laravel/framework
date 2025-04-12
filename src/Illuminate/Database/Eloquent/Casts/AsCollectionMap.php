@@ -35,7 +35,7 @@ class AsCollectionMap implements Castable
 
                 $data = Json::decode($attributes[$key]);
 
-                if (!is_array($data)) {
+                if (! is_array($data)) {
                     return null;
                 }
 
@@ -79,8 +79,8 @@ class AsCollectionMap implements Castable
     /**
      * Specify the callable to map each item in the Collection cast.
      *
-     * @param  callable-string|array{0: class-string, 1: string} $callback
-     * @param  string|null $method
+     * @param  callable-string|array{0: class-string, 1: string}  $callback
+     * @param  string|null  $method
      * @return string
      */
     public static function using($callback, $method = null)
@@ -96,6 +96,5 @@ class AsCollectionMap implements Castable
         return $method === null
             ? static::class.':'.$callback
             : static::class.':'.$callback.'@'.$method;
-
     }
 }

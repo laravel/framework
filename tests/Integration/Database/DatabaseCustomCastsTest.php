@@ -162,8 +162,8 @@ class DatabaseCustomCastsTest extends DatabaseTestCase
         $model->mergeCasts(['collection' => AsCollectionMap::into(Fluent::class)]);
         $model->fill([
             'collection' => [
-                ['name' => 'Taylor']
-            ]
+                ['name' => 'Taylor'],
+            ],
         ]);
 
         $fluent = $model->collection->first();
@@ -177,7 +177,7 @@ class DatabaseCustomCastsTest extends DatabaseTestCase
         return [
             [TestCollectionMapCallable::class],
             [TestCollectionMapCallable::class, 'make'],
-            [TestCollectionMapCallable::class . '@' .'make'],
+            [TestCollectionMapCallable::class.'@'.'make'],
         ];
     }
 
@@ -188,8 +188,8 @@ class DatabaseCustomCastsTest extends DatabaseTestCase
         $model->mergeCasts(['collection' => AsCollectionMap::using($class, $method)]);
         $model->fill([
             'collection' => [
-                ['name' => 'Taylor']
-            ]
+                ['name' => 'Taylor'],
+            ],
         ]);
 
         $result = $model->collection->first();
@@ -204,8 +204,8 @@ class DatabaseCustomCastsTest extends DatabaseTestCase
         $model->mergeCasts(['collection' => AsCollectionMap::class]);
         $model->fill([
             'collection' => [
-                ['name' => 'Taylor']
-            ]
+                ['name' => 'Taylor'],
+            ],
         ]);
 
         $this->expectException(InvalidArgumentException::class);
