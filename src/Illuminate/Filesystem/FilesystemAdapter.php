@@ -794,6 +794,16 @@ class FilesystemAdapter implements CloudFilesystemContract
     }
 
     /**
+     * Determine if streamable URIs can be generated.
+     *
+     * @return bool
+     */
+    public function providesStreamableUris()
+    {
+        return isset($this->config['stream_wrapper']);
+    }
+
+    /**
      * Get a temporary URL for the file at the given path.
      *
      * @param  string  $path
@@ -835,6 +845,32 @@ class FilesystemAdapter implements CloudFilesystemContract
         }
 
         throw new RuntimeException('This driver does not support creating temporary upload URLs.');
+    }
+
+    /**
+     * Get a stream URI for the file at the given path.
+     *
+     * @param  string  $path
+     * @param  array  $options
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    public function streamableUri($path, array $options = [])
+    {
+        if (! $this->providesStreamableUris()) {
+            throw new RuntimeException('This driver does not support creating stream URIs.');
+        }
+
+        $wrapper = $this->config['stream_wrapper'];
+
+        $availableWrappers = stream_get_wrappers();
+
+        if (! in_array($wrapper, $availableWrappers)) {
+            throw new RuntimeException("The stream wrapper [{$wrapper}] is not available.");
+        }
+
+        return $wrapper . '://' . ltrim($this->path($path), '\\/');
     }
 
     /**

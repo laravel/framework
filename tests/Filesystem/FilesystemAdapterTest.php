@@ -21,6 +21,7 @@ use League\Flysystem\UnableToWriteFile;
 use Mockery as m;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class FilesystemAdapterTest extends TestCase
@@ -736,5 +737,72 @@ class FilesystemAdapterTest extends TestCase
 
         $this->assertEquals('730bed78bccf58c2cfe44c29b71e5e6b', $filesystemAdapter->checksum('path.txt'));
         $this->assertEquals('a5c3556d', $filesystemAdapter->checksum('path.txt', ['checksum_algo' => 'crc32']));
+    }
+
+    public function testProvidesStreamableUris()
+    {
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter, [
+            'stream_wrapper' => 'file',
+        ]);
+
+        $this->assertTrue($filesystemAdapter->providesStreamableUris());
+    }
+
+    public function testDoesNotProvideStreamableUrisWhenConfigurationIsMissing()
+    {
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
+
+        $this->assertFalse($filesystemAdapter->providesStreamableUris());
+    }
+
+    public function testStreamableUri()
+    {
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter, [
+            'root' => $this->tempDir.DIRECTORY_SEPARATOR,
+            'stream_wrapper' => 'file',
+        ]);
+
+        $filesystemAdapter->write('file.txt', 'contents of file');
+
+        $this->assertEquals('file://'.ltrim($this->tempDir, '/').DIRECTORY_SEPARATOR.'file.txt', $filesystemAdapter->streamableUri('file.txt'));
+    }
+
+    public function testStreamableUriWithPrefix()
+    {
+        $prefix = 'images'.DIRECTORY_SEPARATOR;
+
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter, [
+            'stream_wrapper' => 'file',
+            'root' => $this->tempDir.DIRECTORY_SEPARATOR,
+            'prefix' => $prefix,
+        ]);
+
+        $filesystemAdapter->write('file.txt', 'contents of file');
+
+        $this->assertEquals('file://'.ltrim($this->tempDir, '/').DIRECTORY_SEPARATOR.$prefix.'file.txt', $filesystemAdapter->streamableUri('file.txt'));
+    }
+
+    public function testThrowExceptionsForStramableUri()
+    {
+        $this->expectException(RuntimeException::class);
+
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
+
+        $filesystemAdapter->write('file.txt', 'contents of file');
+
+        $filesystemAdapter->streamableUri('file.txt');
+    }
+
+    public function testThrowExceptionsWhenStreamWrapperIsNotSupported()
+    {
+        $this->expectException(RuntimeException::class);
+
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter, [
+            'stream_wrapper' => 'wrapper_that_does_not_exist',
+        ]);
+
+        $filesystemAdapter->write('file.txt', 'contents of file');
+
+        $filesystemAdapter->streamableUri('file.txt');
     }
 }
