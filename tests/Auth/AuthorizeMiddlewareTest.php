@@ -106,6 +106,100 @@ class AuthorizeMiddlewareTest extends TestCase
         $this->assertSame('success', $response->content());
     }
 
+    public function testRouteCanHandleMultiplePermissionsInGroup()
+    {
+        $this->gate()->define('manage-company', function ($user) {
+            return true;
+        });
+
+        $this->gate()->define('manage-users', function ($user) {
+            return true;
+        });
+
+        $this->router->can('manage-company')->group(function () {
+            $this->router->get('company', [
+                'uses' => function () {
+                    return 'Company Access Granted';
+                },
+            ]);
+
+            $this->router->can('manage-users')->group(function () {
+                $this->router->get('users', [
+                    'uses' => function () {
+                        if (! app(GateContract::class)->allows('manage-company')) {
+                            return 'Forbidden';
+                        }
+
+                        return 'Users Access Granted';
+                    },
+                ]);
+            });
+        });
+
+        $response = $this->router->dispatch(Request::create('company', 'GET'));
+        $this->assertSame('Company Access Granted', $response->content());
+
+        $response = $this->router->dispatch(Request::create('users', 'GET'));
+        $this->assertSame('Users Access Granted', $response->content());
+    }
+
+    public function testRouteCanOverrideMiddlewareInsideGroup()
+    {
+        $this->gate()->define('manage-company', function ($user) {
+            return true;
+        });
+
+        $this->gate()->define('manage-users', function ($user) {
+            return true;
+        });
+
+        $this->router->can('manage-company')->group(function () {
+            $this->router->can('manage-users')->get('overridden-resource', [
+                'uses' => function () {
+                    return 'Overridden Access Granted';
+                },
+            ]);
+        });
+
+        $response = $this->router->dispatch(Request::create('overridden-resource', 'GET'));
+        $this->assertSame('Overridden Access Granted', $response->content());
+    }
+
+    public function testRouteCanHandleMultiplePermissionsInGroupWithExcludeCan()
+    {
+        $this->gate()->define('manage-company', function ($user) {
+            return false;
+        });
+
+        $this->gate()->define('manage-users', function ($user) {
+            return true;
+        });
+
+        $this->router->can('manage-company')->group(function () {
+            $this->router->get('company', [
+                'uses' => function () {
+                    return 'Company Access Denied';
+                },
+            ]);
+
+            $this->router->excludeCan('manage-company')->can('manage-users')->get('users', [
+                'uses' => function () {
+                    if (app(GateContract::class)->allows('manage-company')) {
+                        return 'Forbidden';
+                    }
+
+                    return 'Users Access Granted Without Manage-Company';
+                },
+            ]);
+        });
+
+        $response = $this->router->dispatch(Request::create('company', 'GET'));
+        $this->assertSame('Company Access Denied', $response->content());
+
+        $response = $this->router->dispatch(Request::create('users', 'GET'));
+        $this->assertSame('Users Access Granted Without Manage-Company', $response->content());
+    }
+
     public function testSimpleAbilityWithStringParameter()
     {
         $this->gate()->define('view-dashboard', function ($user, $param) {

@@ -1101,6 +1101,22 @@ class Route
     }
 
     /**
+     * Specify that the "can" middleware for a specific ability should be removed from the route.
+     *
+     * @param  \UnitEnum|string  $ability
+     * @param  array|string  $models
+     * @return $this
+     */
+    public function excludeCan($ability, $models = [])
+    {
+        $ability = enum_value($ability);
+
+        return empty($models)
+            ? $this->withoutMiddleware(['can:'.$ability])
+            : $this->withoutMiddleware(['can:'.$ability.','.implode(',', Arr::wrap($models))]);
+    }
+
+    /**
      * Get the middleware for the route's controller.
      *
      * @return array
