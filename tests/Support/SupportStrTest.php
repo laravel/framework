@@ -40,6 +40,7 @@ class SupportStrTest extends TestCase
         $this->assertSame('Jefferson Costella', Str::title('jefferson costella'));
         $this->assertSame('Jefferson Costella', Str::title('jefFErson coSTella'));
 
+        $this->assertSame('', Str::title(null));
         $this->assertSame('', Str::title(''));
         $this->assertSame('123 Laravel', Str::title('123 laravel'));
         $this->assertSame('❤Laravel', Str::title('❤laravel'));
