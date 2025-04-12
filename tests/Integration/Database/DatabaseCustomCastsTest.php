@@ -202,16 +202,15 @@ class DatabaseCustomCastsTest extends DatabaseTestCase
     {
         $model = new TestEloquentModelWithCustomCastsNullable();
         $model->mergeCasts(['collection' => AsCollectionMap::class]);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('No class or callable has been set to map the Collection.');
+
         $model->fill([
             'collection' => [
                 ['name' => 'Taylor'],
             ],
         ]);
-
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('No class or callable has been set to map the Collection.');
-
-        $model->collection->first();
     }
 
     public function test_custom_casting_map_collection_throw_when_using_closure(): void
