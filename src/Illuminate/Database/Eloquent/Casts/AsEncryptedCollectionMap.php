@@ -22,14 +22,28 @@ class AsEncryptedCollectionMap extends AsCollectionMap
     {
         return new class($arguments) implements CastsAttributes
         {
-            public function __construct(protected array $arguments)
+            protected $callable;
+
+            public function __construct(array $arguments)
             {
+                $arguments = array_values($arguments);
+
+                if (empty($arguments) || empty($arguments[0])) {
+                    throw new InvalidArgumentException('No class or callable has been set to map the Collection.');
+                }
+
+                if (isset($arguments[1]) && ! is_array($arguments[1])) {
+                    $arguments = [$arguments[0], $arguments[1]];
+                    unset($arguments[1]);
+                }
+
+                $this->callable = $arguments[0];
             }
 
             public function get($model, $key, $value, $attributes)
             {
                 if (! isset($attributes[$key])) {
-                    return;
+                    return null;
                 }
 
                 $data = Json::decode(Crypt::decryptString($attributes[$key]));
@@ -38,32 +52,22 @@ class AsEncryptedCollectionMap extends AsCollectionMap
                     return null;
                 }
 
-                $this->arguments[0] ??= '';
-
-                if (is_callable($this->arguments[0])) {
-                    return Collection::make($data)->map($this->arguments[0]);
+                if (is_callable($this->callable)) {
+                    return Collection::make($data)->map($this->callable);
                 }
 
-                [$class, $method] = Str::parseCallback($this->arguments[0]);
+                [$class, $method] = Str::parseCallback($this->callable);
 
-                if ($method) {
-                    return Collection::make($data)->map([$class, $method]);
-                }
-
-                if ($class) {
-                    return Collection::make($data)->mapInto($class);
-                }
-
-                throw new InvalidArgumentException('No class or callable has been set to map the Collection.');
+                return $method
+                    ? Collection::make($data)->map([$class, $method])
+                    : Collection::make($data)->mapInto($class);
             }
 
             public function set($model, $key, $value, $attributes)
             {
-                if (! is_null($value)) {
-                    return [$key => Crypt::encryptString(Json::encode($value))];
-                }
-
-                return null;
+                return is_null($value)
+                    ? null
+                    : [$key => Crypt::encryptString(Json::encode($value))];
             }
         };
     }
