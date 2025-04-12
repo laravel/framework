@@ -256,7 +256,7 @@ trait ConditionallyLoadsAttributes
      * @param  mixed  $default
      * @return \Illuminate\Http\Resources\MissingValue|mixed
      */
-    protected function whenLoaded($relationship, $value = null, $default = null)
+    protected function whenLoaded($relationship, $value = '__UNSET__', $default = null)
     {
         if (func_num_args() < 3) {
             $default = new MissingValue;
@@ -276,7 +276,7 @@ trait ConditionallyLoadsAttributes
             return;
         }
 
-        if ($value === null) {
+        if ($value === '__UNSET__') {
             $value = value(...);
         }
 
@@ -291,7 +291,7 @@ trait ConditionallyLoadsAttributes
      * @param  mixed  $default
      * @return \Illuminate\Http\Resources\MissingValue|mixed
      */
-    public function whenCounted($relationship, $value = null, $default = null)
+    public function whenCounted($relationship, $value = '__UNSET__', $default = null)
     {
         if (func_num_args() < 3) {
             $default = new MissingValue;
@@ -311,7 +311,7 @@ trait ConditionallyLoadsAttributes
             return;
         }
 
-        if ($value === null) {
+        if ($value === '__UNSET__') {
             $value = value(...);
         }
 
@@ -328,7 +328,7 @@ trait ConditionallyLoadsAttributes
      * @param  mixed  $default
      * @return \Illuminate\Http\Resources\MissingValue|mixed
      */
-    public function whenAggregated($relationship, $column, $aggregate, $value = null, $default = null)
+    public function whenAggregated($relationship, $column, $aggregate, $value = '__UNSET__', $default = null)
     {
         if (func_num_args() < 5) {
             $default = new MissingValue;
@@ -348,7 +348,7 @@ trait ConditionallyLoadsAttributes
             return;
         }
 
-        if ($value === null) {
+        if ($value === '__UNSET__') {
             $value = value(...);
         }
 
