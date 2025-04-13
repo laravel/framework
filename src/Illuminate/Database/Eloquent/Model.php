@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Eloquent;
 
 use ArrayAccess;
+use Closure;
 use Illuminate\Contracts\Broadcasting\HasBroadcastChannel;
 use Illuminate\Contracts\Queue\QueueableCollection;
 use Illuminate\Contracts\Queue\QueueableEntity;
@@ -17,7 +18,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\Pivot;
-use Illuminate\Http\Resources\TransformsToResource;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Str;
@@ -40,8 +40,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         Concerns\HidesAttributes,
         Concerns\GuardsAttributes,
         Concerns\PreventsCircularRecursion,
-        ForwardsCalls,
-        TransformsToResource;
+        Concerns\TransformsToResource,
+        ForwardsCalls;
     /** @use HasCollection<\Illuminate\Database\Eloquent\Collection<array-key, static & self>> */
     use HasCollection;
 
@@ -151,6 +151,13 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     protected static $booted = [];
 
     /**
+     * The callbacks that should be executed after the model has booted.
+     *
+     * @var array
+     */
+    protected static $bootedCallbacks = [];
+
+    /**
      * The array of trait initializers that will be called on each new instance.
      *
      * @var array
@@ -177,6 +184,13 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * @var bool
      */
     protected static $modelsShouldPreventLazyLoading = false;
+
+    /**
+     * Indicates whether relations should be automatically loaded on all models when they are accessed.
+     *
+     * @var bool
+     */
+    protected static $modelsShouldAutomaticallyEagerLoadRelationships = false;
 
     /**
      * The callback that is responsible for handling lazy loading violations.
@@ -280,6 +294,12 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             static::boot();
             static::booted();
 
+            static::$bootedCallbacks[static::class] ??= [];
+
+            foreach (static::$bootedCallbacks[static::class] as $callback) {
+                $callback();
+            }
+
             $this->fireModelEvent('booted', false);
         }
     }
@@ -359,6 +379,19 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
+     * Register a closure to be executed after the model has booted.
+     *
+     * @param  \Closure  $callback
+     * @return void
+     */
+    protected static function whenBooted(Closure $callback)
+    {
+        static::$bootedCallbacks[static::class] ??= [];
+
+        static::$bootedCallbacks[static::class][] = $callback;
+    }
+
+    /**
      * Clear the list of booted models so they will be re-booted.
      *
      * @return void
@@ -366,6 +399,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     public static function clearBootedModels()
     {
         static::$booted = [];
+        static::$bootedCallbacks = [];
 
         static::$globalScopes = [];
     }
@@ -444,6 +478,17 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     public static function preventLazyLoading($value = true)
     {
         static::$modelsShouldPreventLazyLoading = $value;
+    }
+
+    /**
+     * Determine if model relationships should be automatically eager loaded when accessed.
+     *
+     * @param  bool  $value
+     * @return void
+     */
+    public static function automaticallyEagerLoadRelationships($value = true)
+    {
+        static::$modelsShouldAutomaticallyEagerLoadRelationships = $value;
     }
 
     /**
@@ -2232,6 +2277,16 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
+     * Determine if relationships are being automatically eager loaded when accessed.
+     *
+     * @return bool
+     */
+    public static function isAutomaticallyEagerLoadingRelationships()
+    {
+        return static::$modelsShouldAutomaticallyEagerLoadRelationships;
+    }
+
+    /**
      * Determine if discarding guarded attribute fills is disabled.
      *
      * @return bool
@@ -2446,6 +2501,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
         $this->classCastCache = [];
         $this->attributeCastCache = [];
+        $this->relationAutoloadCallback = null;
 
         return array_keys(get_object_vars($this));
     }
@@ -2460,5 +2516,9 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         $this->bootIfNotBooted();
 
         $this->initializeTraits();
+
+        if (static::isAutomaticallyEagerLoadingRelationships()) {
+            $this->withRelationshipAutoloading();
+        }
     }
 }

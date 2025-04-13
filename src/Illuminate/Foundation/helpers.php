@@ -21,6 +21,8 @@ use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\HtmlString;
+use Illuminate\Support\Uri;
+use League\Uri\Contracts\UriInterface;
 use Symfony\Component\HttpFoundation\Response;
 
 if (! function_exists('abort')) {
@@ -1001,9 +1003,22 @@ if (! function_exists('__')) {
     }
 }
 
+if (! function_exists('uri')) {
+    /**
+     * Generate a URI for the application.
+     */
+    function uri(UriInterface|Stringable|array|string $uri, mixed $parameters = [], bool $absolute = true): Uri
+    {
+        return match (true) {
+            is_array($uri) || str_contains($uri, '\\') => Uri::action($uri, $parameters, $absolute),
+            default => Uri::of($uri),
+        };
+    }
+}
+
 if (! function_exists('url')) {
     /**
-     * Generate a url for the application.
+     * Generate a URL for the application.
      *
      * @param  string|null  $path
      * @param  mixed  $parameters

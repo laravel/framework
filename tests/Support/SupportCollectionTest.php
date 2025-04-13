@@ -2210,6 +2210,21 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testChunkWhilePreservingStringKeys($collection)
+    {
+        $data = (new $collection(['a' => 1, 'b' => 1, 'c' => 2, 'd' => 2, 'e' => 3, 'f' => 3, 'g' => 3]))
+            ->chunkWhile(function ($current, $key, $chunk) {
+                return $chunk->last() === $current;
+            });
+
+        $this->assertInstanceOf($collection, $data);
+        $this->assertInstanceOf($collection, $data->first());
+        $this->assertEquals(['a' => 1, 'b' => 1], $data->first()->toArray());
+        $this->assertEquals(['c' => 2, 'd' => 2], $data->get(1)->toArray());
+        $this->assertEquals(['e' => 3, 'f' => 3, 'g' => 3], $data->last()->toArray());
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testEvery($collection)
     {
         $c = new $collection([]);
@@ -2812,6 +2827,35 @@ class SupportCollectionTest extends TestCase
             [-2, -3, -4],
             $collection::range(-2, -4)->all()
         );
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testFromJson($collection)
+    {
+        $json = json_encode($array = ['foo' => 'bar', 'baz' => 'quz']);
+
+        $instance = $collection::fromJson($json);
+
+        $this->assertSame($array, $instance->toArray());
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testFromJsonWithDepth($collection)
+    {
+        $json = json_encode(['foo' => ['baz' => ['quz']], 'bar' => 'baz']);
+
+        $instance = $collection::fromJson($json, 1);
+
+        $this->assertEmpty($instance->toArray());
+        $this->assertSame(JSON_ERROR_DEPTH, json_last_error());
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testFromJsonWithFlags($collection)
+    {
+        $instance = $collection::fromJson('{"int":99999999999999999999999}', 512, JSON_BIGINT_AS_STRING);
+
+        $this->assertSame(['int' => '99999999999999999999999'], $instance->toArray());
     }
 
     #[DataProvider('collectionClassProvider')]
