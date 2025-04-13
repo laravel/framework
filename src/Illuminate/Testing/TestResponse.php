@@ -1193,7 +1193,7 @@ class TestResponse implements ArrayAccess
         $this->ensureResponseHasView();
 
         if (is_null($value)) {
-            PHPUnit::withResponse($this)->assertTrue(Arr::has($this->original->gatherData(), $key), "Failed asserting that the view data contains the key '$key'");
+            PHPUnit::withResponse($this)->assertTrue(Arr::has($this->original->gatherData(), $key), "Failed asserting that the view data contains the key '$key'.");
         } elseif ($value instanceof Closure) {
             PHPUnit::withResponse($this)->assertTrue($value(Arr::get($this->original->gatherData(), $key)), "Failed asserting that the value at '$key' fulfils the closure.");
         } elseif ($value instanceof Model) {
