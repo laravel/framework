@@ -53,8 +53,8 @@ trait QueriesRelationships
         // the subquery to only run a "where exists" clause instead of this full "count"
         // clause. This will make these queries run much faster compared with a count.
         $method = $this->canUseExistsForExistenceCheck($operator, $count)
-                        ? 'getRelationExistenceQuery'
-                        : 'getRelationExistenceCountQuery';
+            ? 'getRelationExistenceQuery'
+            : 'getRelationExistenceCountQuery';
 
         $hasQuery = $relation->{$method}(
             $relation->getRelated()->newQueryWithoutRelationships(), $this
@@ -165,7 +165,7 @@ trait QueriesRelationships
     /**
      * Add a relationship count / exists condition to the query with where clauses.
      *
-     * Also load the relationship with same condition.
+     * Also load the relationship with the same condition.
      *
      * @param  string  $relation
      * @param  (\Closure(\Illuminate\Database\Eloquent\Builder<*>|\Illuminate\Database\Eloquent\Relations\Relation<*, *, *>): mixed)|null  $callback
@@ -281,7 +281,7 @@ trait QueriesRelationships
                 });
             }
         }, null, null, $boolean)
-        ->when($checkMorphNull, fn (self $query) => $query->orWhereMorphedTo($relation, null));
+            ->when($checkMorphNull, fn (self $query) => $query->orWhereMorphedTo($relation, null));
     }
 
     /**
@@ -374,7 +374,7 @@ trait QueriesRelationships
      * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
      *
      * @param  \Illuminate\Database\Eloquent\Relations\MorphTo<TRelatedModel, *>|string  $relation
-     * @param  string|array<int, array>  $types
+     * @param  string|array<int, string>  $types
      * @param  (\Closure(\Illuminate\Database\Eloquent\Builder<TRelatedModel>, string): mixed)|null  $callback
      * @param  string  $operator
      * @param  int  $count
@@ -435,6 +435,25 @@ trait QueriesRelationships
                 $query->where($column, $operator, $value);
             }
         });
+    }
+
+    /**
+     * Add a basic where clause to a relationship query and eager-load the relationship with the same conditions.
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>|string  $relation
+     * @param  \Closure|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function withWhereRelation($relation, $column, $operator = null, $value = null)
+    {
+        return $this->whereRelation($relation, $column, $operator, $value)
+            ->with([
+                $relation => fn ($query) => $column instanceof Closure
+                    ? $column($query)
+                    : $query->where($column, $operator, $value),
+            ]);
     }
 
     /**
@@ -655,7 +674,7 @@ trait QueriesRelationships
             $models->groupBy(fn ($model) => $model->getMorphClass())->each(function ($models) use ($query, $relation) {
                 $query->orWhere(function ($query) use ($relation, $models) {
                     $query->where($relation->qualifyColumn($relation->getMorphType()), '<=>', $models->first()->getMorphClass())
-                        ->whereNotIn($relation->qualifyColumn($relation->getForeignKeyName()), $models->map->getKey());
+                        ->whereIn($relation->qualifyColumn($relation->getForeignKeyName()), $models->map->getKey());
                 });
             });
         }, null, null, $boolean);
@@ -948,8 +967,8 @@ trait QueriesRelationships
         $hasQuery->mergeConstraintsFrom($relation->getQuery());
 
         return $this->canUseExistsForExistenceCheck($operator, $count)
-                ? $this->addWhereExistsQuery($hasQuery->toBase(), $boolean, $operator === '<' && $count === 1)
-                : $this->addWhereCountQuery($hasQuery->toBase(), $operator, $count, $boolean);
+            ? $this->addWhereExistsQuery($hasQuery->toBase(), $boolean, $operator === '<' && $count === 1)
+            : $this->addWhereCountQuery($hasQuery->toBase(), $operator, $count, $boolean);
     }
 
     /**

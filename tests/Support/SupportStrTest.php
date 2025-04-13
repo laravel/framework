@@ -1039,6 +1039,21 @@ class SupportStrTest extends TestCase
         $this->assertSame('ÖffentlicheÜberraschungen', Str::studly('öffentliche-überraschungen'));
     }
 
+    public function testPascal()
+    {
+        $this->assertSame('LaravelPhpFramework', Str::pascal('laravel_php_framework'));
+        $this->assertSame('LaravelPhpFramework', Str::pascal('laravel-php-framework'));
+        $this->assertSame('LaravelPhpFramework', Str::pascal('laravel  -_-  php   -_-   framework   '));
+
+        $this->assertSame('FooBar', Str::pascal('fooBar'));
+        $this->assertSame('FooBar', Str::pascal('foo_bar'));
+        $this->assertSame('FooBar', Str::pascal('foo_bar')); // test cache
+        $this->assertSame('FooBarBaz', Str::pascal('foo-barBaz'));
+        $this->assertSame('FooBarBaz', Str::pascal('foo-bar_baz'));
+
+        $this->assertSame('ÖffentlicheÜberraschungen', Str::pascal('öffentliche-überraschungen'));
+    }
+
     public function testMask()
     {
         $this->assertSame('tay*************', Str::mask('taylor@email.com', '*', 3));
@@ -1742,6 +1757,62 @@ class SupportStrTest extends TestCase
 
             $this->assertSame($expected, Str::chopEnd($subject, $needle));
         }
+    }
+
+    public function testReplaceMatches()
+    {
+        // Test basic string replacement
+        $this->assertSame('foo bar bar', Str::replaceMatches('/baz/', 'bar', 'foo baz bar'));
+        $this->assertSame('foo baz baz', Str::replaceMatches('/404/', 'found', 'foo baz baz'));
+
+        // Test with array of patterns
+        $this->assertSame('foo XXX YYY', Str::replaceMatches(['/bar/', '/baz/'], ['XXX', 'YYY'], 'foo bar baz'));
+
+        // Test with callback
+        $result = Str::replaceMatches('/ba(.)/', function ($match) {
+            return 'ba'.strtoupper($match[1]);
+        }, 'foo baz bar');
+
+        $this->assertSame('foo baZ baR', $result);
+
+        $result = Str::replaceMatches('/(\d+)/', function ($match) {
+            return $match[1] * 2;
+        }, 'foo 123 bar 456');
+
+        $this->assertSame('foo 246 bar 912', $result);
+
+        // Test with limit parameter
+        $this->assertSame('foo baz baz', Str::replaceMatches('/ba(.)/', 'ba$1', 'foo baz baz', 1));
+
+        $result = Str::replaceMatches('/ba(.)/', function ($match) {
+            return 'ba'.strtoupper($match[1]);
+        }, 'foo baz baz bar', 1);
+
+        $this->assertSame('foo baZ baz bar', $result);
+    }
+
+    public function testPluralPascal(): void
+    {
+        // Test basic functionality with default count
+        $this->assertSame('UserGroups', Str::pluralPascal('UserGroup'));
+        $this->assertSame('ProductCategories', Str::pluralPascal('ProductCategory'));
+
+        // Test with different count values and array
+        $this->assertSame('UserGroups', Str::pluralPascal('UserGroup', 0)); // plural
+        $this->assertSame('UserGroup', Str::pluralPascal('UserGroup', 1));  // singular
+        $this->assertSame('UserGroups', Str::pluralPascal('UserGroup', 2)); // plural
+        $this->assertSame('UserGroups', Str::pluralPascal('UserGroup', []));   // plural (empty array count is 0)
+
+        // Test with Countable
+        $countable = new class implements \Countable
+        {
+            public function count(): int
+            {
+                return 3;
+            }
+        };
+
+        $this->assertSame('UserGroups', Str::pluralPascal('UserGroup', $countable));
     }
 }
 

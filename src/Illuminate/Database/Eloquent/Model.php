@@ -11,6 +11,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\CanBeEscapedWhenCastToString;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
+use Illuminate\Database\Eloquent\Attributes\Scope as LocalScope;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
@@ -24,6 +25,7 @@ use Illuminate\Support\Traits\ForwardsCalls;
 use JsonException;
 use JsonSerializable;
 use LogicException;
+use ReflectionMethod;
 use Stringable;
 
 abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToString, HasBroadcastChannel, Jsonable, JsonSerializable, QueueableEntity, Stringable, UrlRoutable
@@ -248,7 +250,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * Create a new Eloquent model instance.
      *
      * @param  array  $attributes
-     * @return void
      */
     public function __construct(array $attributes = [])
     {
@@ -1058,9 +1059,9 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     protected function incrementQuietly($column, $amount = 1, array $extra = [])
     {
-        return static::withoutEvents(function () use ($column, $amount, $extra) {
-            return $this->incrementOrDecrement($column, $amount, $extra, 'increment');
-        });
+        return static::withoutEvents(
+            fn () => $this->incrementOrDecrement($column, $amount, $extra, 'increment')
+        );
     }
 
     /**
@@ -1073,9 +1074,9 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     protected function decrementQuietly($column, $amount = 1, array $extra = [])
     {
-        return static::withoutEvents(function () use ($column, $amount, $extra) {
-            return $this->incrementOrDecrement($column, $amount, $extra, 'decrement');
-        });
+        return static::withoutEvents(
+            fn () => $this->incrementOrDecrement($column, $amount, $extra, 'decrement')
+        );
     }
 
     /**
@@ -1095,7 +1096,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             // us to recurse into all of these nested relations for the model instance.
             foreach ($this->relations as $models) {
                 $models = $models instanceof Collection
-                    ? $models->all() : [$models];
+                    ? $models->all()
+                    : [$models];
 
                 foreach (array_filter($models) as $model) {
                     if (! $model->push()) {
@@ -1639,7 +1641,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function hasNamedScope($scope)
     {
-        return method_exists($this, 'scope'.ucfirst($scope));
+        return method_exists($this, 'scope'.ucfirst($scope)) ||
+            static::isScopeMethodWithAttribute($scope);
     }
 
     /**
@@ -1651,7 +1654,24 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function callNamedScope($scope, array $parameters = [])
     {
+        if ($this->isScopeMethodWithAttribute($scope)) {
+            return $this->{$scope}(...$parameters);
+        }
+
         return $this->{'scope'.ucfirst($scope)}(...$parameters);
+    }
+
+    /**
+     * Determine if the given method has a scope attribute.
+     *
+     * @param  string  $method
+     * @return bool
+     */
+    protected static function isScopeMethodWithAttribute(string $method)
+    {
+        return method_exists(static::class, $method) &&
+            (new ReflectionMethod(static::class, $method))
+                ->getAttributes(LocalScope::class) !== [];
     }
 
     /**
@@ -1732,10 +1752,10 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
                 ->attributes
         );
 
-        $this->load((new BaseCollection($this->relations))->reject(function ($relation) {
-            return $relation instanceof Pivot
-                || (is_object($relation) && in_array(AsPivot::class, class_uses_recursive($relation), true));
-        })->keys()->all());
+        $this->load((new BaseCollection($this->relations))->reject(
+            fn ($relation) => $relation instanceof Pivot
+                || (is_object($relation) && in_array(AsPivot::class, class_uses_recursive($relation), true))
+        )->keys()->all());
 
         $this->syncOriginal();
 
@@ -2280,11 +2300,15 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function offsetExists($offset): bool
     {
-        try {
-            return ! is_null($this->getAttribute($offset));
-        } catch (MissingAttributeException) {
-            return false;
-        }
+        $shouldPrevent = static::$modelsShouldPreventAccessingMissingAttributes;
+
+        static::$modelsShouldPreventAccessingMissingAttributes = false;
+
+        $result = ! is_null($this->getAttribute($offset));
+
+        static::$modelsShouldPreventAccessingMissingAttributes = $shouldPrevent;
+
+        return $result;
     }
 
     /**
@@ -2377,6 +2401,10 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public static function __callStatic($method, $parameters)
     {
+        if (static::isScopeMethodWithAttribute($method)) {
+            $parameters = [static::query(), ...$parameters];
+        }
+
         return (new static)->$method(...$parameters);
     }
 

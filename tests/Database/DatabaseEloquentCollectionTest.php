@@ -90,6 +90,10 @@ class DatabaseEloquentCollectionTest extends TestCase
         $this->assertTrue($c->contains('id', 1));
         $this->assertTrue($c->contains('id', '>=', 2));
         $this->assertFalse($c->contains('id', '>', 2));
+
+        $this->assertFalse($c->doesntContain('id', 1));
+        $this->assertFalse($c->doesntContain('id', '>=', 2));
+        $this->assertTrue($c->doesntContain('id', '>', 2));
     }
 
     public function testContainsIndicatesIfModelInArray()
@@ -108,6 +112,10 @@ class DatabaseEloquentCollectionTest extends TestCase
         $this->assertTrue($c->contains($mockModel));
         $this->assertTrue($c->contains($mockModel2));
         $this->assertFalse($c->contains($mockModel3));
+
+        $this->assertFalse($c->doesntContain($mockModel));
+        $this->assertFalse($c->doesntContain($mockModel2));
+        $this->assertTrue($c->doesntContain($mockModel3));
     }
 
     public function testContainsIndicatesIfDifferentModelInArray()
@@ -122,6 +130,9 @@ class DatabaseEloquentCollectionTest extends TestCase
 
         $this->assertTrue($c->contains($mockModelFoo));
         $this->assertFalse($c->contains($mockModelBar));
+
+        $this->assertFalse($c->doesntContain($mockModelFoo));
+        $this->assertTrue($c->doesntContain($mockModelBar));
     }
 
     public function testContainsIndicatesIfKeyedModelInArray()
@@ -136,6 +147,10 @@ class DatabaseEloquentCollectionTest extends TestCase
         $this->assertTrue($c->contains(1));
         $this->assertTrue($c->contains(2));
         $this->assertFalse($c->contains(3));
+
+        $this->assertFalse($c->doesntContain(1));
+        $this->assertFalse($c->doesntContain(2));
+        $this->assertTrue($c->doesntContain(3));
     }
 
     public function testContainsKeyAndValueIndicatesIfModelInArray()
@@ -151,6 +166,10 @@ class DatabaseEloquentCollectionTest extends TestCase
         $this->assertTrue($c->contains('name', 'Taylor'));
         $this->assertTrue($c->contains('name', 'Abigail'));
         $this->assertFalse($c->contains('name', 'Dayle'));
+
+        $this->assertFalse($c->doesntContain('name', 'Taylor'));
+        $this->assertFalse($c->doesntContain('name', 'Abigail'));
+        $this->assertTrue($c->doesntContain('name', 'Dayle'));
     }
 
     public function testContainsClosureIndicatesIfModelInArray()
@@ -165,6 +184,13 @@ class DatabaseEloquentCollectionTest extends TestCase
             return $model->getKey() < 2;
         }));
         $this->assertFalse($c->contains(function ($model) {
+            return $model->getKey() > 2;
+        }));
+
+        $this->assertFalse($c->doesntContain(function ($model) {
+            return $model->getKey() < 2;
+        }));
+        $this->assertTrue($c->doesntContain(function ($model) {
             return $model->getKey() > 2;
         }));
     }

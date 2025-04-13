@@ -8,6 +8,7 @@ use Faker\Generator;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\CrossJoinSequence;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -15,6 +16,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Factories\Sequence;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 use Illuminate\Tests\Database\Fixtures\Models\Money\Price;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -829,6 +831,25 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertNull($post->user_id);
     }
 
+    public function test_factory_model_names_correct()
+    {
+        $this->assertEquals(FactoryTestUseFactoryAttribute::factory()->modelName(), FactoryTestUseFactoryAttribute::class);
+        $this->assertEquals(FactoryTestGuessModel::factory()->modelName(), FactoryTestGuessModel::class);
+    }
+
+    public function test_factory_global_model_resolver()
+    {
+        Factory::guessModelNamesUsing(function ($factory) {
+            return __NAMESPACE__.'\\'.Str::replaceLast('Factory', '', class_basename($factory::class));
+        });
+
+        $this->assertEquals(FactoryTestGuessModel::factory()->modelName(), FactoryTestGuessModel::class);
+        $this->assertEquals(FactoryTestUseFactoryAttribute::factory()->modelName(), FactoryTestUseFactoryAttribute::class);
+
+        $this->assertEquals(FactoryTestUseFactoryAttributeFactory::new()->modelName(), FactoryTestUseFactoryAttribute::class);
+        $this->assertEquals(FactoryTestGuessModelFactory::new()->modelName(), FactoryTestGuessModel::class);
+    }
+
     /**
      * Get a database connection instance.
      *
@@ -981,4 +1002,42 @@ class FactoryTestRole extends Eloquent
     {
         return $this->belongsToMany(FactoryTestUser::class, 'role_user', 'role_id', 'user_id')->withPivot('admin');
     }
+}
+
+class FactoryTestGuessModelFactory extends Factory
+{
+    protected static function appNamespace()
+    {
+        return __NAMESPACE__.'\\';
+    }
+
+    public function definition()
+    {
+        return [
+            'name' => $this->faker->name(),
+        ];
+    }
+}
+
+class FactoryTestGuessModel extends Eloquent
+{
+    use HasFactory;
+
+    protected static $factory = FactoryTestGuessModelFactory::class;
+}
+
+class FactoryTestUseFactoryAttributeFactory extends Factory
+{
+    public function definition()
+    {
+        return [
+            'name' => $this->faker->name(),
+        ];
+    }
+}
+
+#[UseFactory(FactoryTestUseFactoryAttributeFactory::class)]
+class FactoryTestUseFactoryAttribute extends Eloquent
+{
+    use HasFactory;
 }

@@ -50,7 +50,6 @@ class PendingMail
      * Create a new mailable mailer instance.
      *
      * @param  \Illuminate\Contracts\Mail\Mailer  $mailer
-     * @return void
      */
     public function __construct(MailerContract $mailer)
     {

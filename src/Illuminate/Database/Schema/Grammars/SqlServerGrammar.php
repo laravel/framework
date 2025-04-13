@@ -405,7 +405,7 @@ class SqlServerGrammar extends Grammar
     {
         $columns = $command->name === 'change'
             ? "'".$command->column->name."'"
-            : "'".implode("','", $command->columns)."'";
+            : "'".implode("', '", $command->columns)."'";
 
         $table = $this->wrapTable($blueprint);
         $tableName = $this->quoteString($this->wrapTable($blueprint));

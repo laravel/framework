@@ -27,7 +27,6 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      * Create a new instance of the class.
      *
      * @param  string  $value
-     * @return void
      */
     public function __construct($value = '')
     {
@@ -636,6 +635,17 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Pluralize the last word of an English, Pascal caps case string.
+     *
+     * @param  int|array|\Countable  $count
+     * @return static
+     */
+    public function pluralPascal($count = 2)
+    {
+        return new static(Str::pluralStudly($this->value, $count));
+    }
+
+    /**
      * Find the multi-byte safe position of the first occurrence of the given substring.
      *
      * @param  string  $needle
@@ -930,6 +940,16 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     public function studly()
     {
         return new static(Str::studly($this->value));
+    }
+
+    /**
+     * Convert the string to Pascal case.
+     *
+     * @return static
+     */
+    public function pascal()
+    {
+        return new static(Str::pascal($this->value));
     }
 
     /**

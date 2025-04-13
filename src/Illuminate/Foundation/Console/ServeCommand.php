@@ -9,7 +9,9 @@ use Illuminate\Support\Env;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Stringable;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
 
 use function Illuminate\Support\php_binary;
@@ -33,6 +35,13 @@ class ServeCommand extends Command
      * @var string
      */
     protected $description = 'Serve the application on the PHP development server';
+
+    /**
+     * The number of PHP CLI server workers.
+     *
+     * @var int<2, max>|false
+     */
+    protected $phpServerWorkers = 1;
 
     /**
      * The current port offset.
@@ -76,13 +85,27 @@ class ServeCommand extends Command
         'IGNITION_LOCAL_SITES_PATH',
         'LARAVEL_SAIL',
         'PATH',
-        'PHP_CLI_SERVER_WORKERS',
         'PHP_IDE_CONFIG',
         'SYSTEMROOT',
         'XDEBUG_CONFIG',
         'XDEBUG_MODE',
         'XDEBUG_SESSION',
     ];
+
+    /** {@inheritdoc} */
+    #[\Override]
+    protected function initialize(InputInterface $input, OutputInterface $output)
+    {
+        $this->phpServerWorkers = transform((int) env('PHP_CLI_SERVER_WORKERS', 1), function (int $workers) {
+            if ($workers < 2) {
+                return false;
+            }
+
+            return $workers > 1 && ! $this->option('no-reload') ? false : $workers;
+        });
+
+        parent::initialize($input, $output);
+    }
 
     /**
      * Execute the console command.
@@ -154,7 +177,7 @@ class ServeCommand extends Command
             }
 
             return in_array($key, static::$passthroughVariables) ? [$key => $value] : [$key => false];
-        })->all());
+        })->merge(['PHP_CLI_SERVER_WORKERS' => $this->phpServerWorkers])->all());
 
         $this->trap(fn () => [SIGTERM, SIGINT, SIGHUP, SIGUSR1, SIGUSR2, SIGQUIT], function ($signal) use ($process) {
             if ($process->isRunning()) {
@@ -360,7 +383,7 @@ class ServeCommand extends Command
      */
     protected function getDateFromLine($line)
     {
-        $regex = ! windows_os() && env('PHP_CLI_SERVER_WORKERS', 1) > 1
+        $regex = ! windows_os() && is_int($this->phpServerWorkers)
             ? '/^\[\d+]\s\[([a-zA-Z0-9: ]+)\]/'
             : '/^\[([^\]]+)\]/';
 

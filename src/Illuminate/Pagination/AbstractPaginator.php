@@ -738,7 +738,7 @@ abstract class AbstractPaginator implements Htmlable, Stringable
      * Get the item at the given offset.
      *
      * @param  TKey  $key
-     * @return TValue
+     * @return TValue|null
      */
     public function offsetGet($key): mixed
     {

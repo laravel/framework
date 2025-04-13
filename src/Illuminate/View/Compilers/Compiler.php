@@ -52,7 +52,6 @@ abstract class Compiler
      * @param  string  $basePath
      * @param  bool  $shouldCache
      * @param  string  $compiledExtension
-     * @return void
      *
      * @throws \InvalidArgumentException
      */

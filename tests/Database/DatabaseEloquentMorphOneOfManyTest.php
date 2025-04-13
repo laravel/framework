@@ -58,7 +58,7 @@ class DatabaseEloquentMorphOneOfManyTest extends TestCase
         $product = MorphOneOfManyTestProduct::create();
         $relation = $product->current_state();
         $relation->addEagerConstraints([$product]);
-        $this->assertSame('select MAX("states"."id") as "id_aggregate", "states"."stateful_id", "states"."stateful_type" from "states" where "states"."stateful_type" = ? and "states"."stateful_id" = ? and "states"."stateful_id" is not null and "states"."stateful_id" in (1) and "states"."stateful_type" = ? group by "states"."stateful_id", "states"."stateful_type"', $relation->getOneOfManySubQuery()->toSql());
+        $this->assertSame('select MAX("states"."id") as "id_aggregate", "states"."stateful_id", "states"."stateful_type" from "states" where "states"."stateful_id" in (1) and "states"."stateful_type" = ? group by "states"."stateful_id", "states"."stateful_type"', $relation->getOneOfManySubQuery()->toSql());
     }
 
     public function testReceivingModel()
@@ -144,6 +144,23 @@ class DatabaseEloquentMorphOneOfManyTest extends TestCase
         $exists = MorphOneOfManyTestProduct::withWhereHas('current_state', function ($q) use ($currentState) {
             $q->whereKey($currentState->getKey());
         })->get();
+
+        $this->assertCount(1, $exists);
+        $this->assertTrue($exists->first()->relationLoaded('current_state'));
+        $this->assertSame($exists->first()->current_state->state, $currentState->state);
+    }
+
+    public function testWithWhereRelation()
+    {
+        $product = MorphOneOfManyTestProduct::create();
+        $currentState = $product->states()->create([
+            'state' => 'active',
+        ]);
+
+        $exists = MorphOneOfManyTestProduct::withWhereRelation('current_state', 'state', 'active')->exists();
+        $this->assertTrue($exists);
+
+        $exists = MorphOneOfManyTestProduct::withWhereRelation('current_state', 'state', 'active')->get();
 
         $this->assertCount(1, $exists);
         $this->assertTrue($exists->first()->relationLoaded('current_state'));

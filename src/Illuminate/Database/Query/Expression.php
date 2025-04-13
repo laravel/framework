@@ -14,7 +14,6 @@ class Expression implements ExpressionContract
      * Create a new raw query expression.
      *
      * @param  TValue  $value
-     * @return void
      */
     public function __construct(
         protected $value

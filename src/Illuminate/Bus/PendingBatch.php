@@ -59,7 +59,6 @@ class PendingBatch
      *
      * @param  \Illuminate\Contracts\Container\Container  $container
      * @param  \Illuminate\Support\Collection  $jobs
-     * @return void
      */
     public function __construct(Container $container, Collection $jobs)
     {
@@ -98,7 +97,7 @@ class PendingBatch
     protected function ensureJobIsBatchable(object|array $job): void
     {
         foreach (Arr::wrap($job) as $job) {
-            if ($job instanceof PendingBatch) {
+            if ($job instanceof PendingBatch || $job instanceof Closure) {
                 return;
             }
 
@@ -171,8 +170,8 @@ class PendingBatch
     public function then($callback)
     {
         $this->options['then'][] = $callback instanceof Closure
-                        ? new SerializableClosure($callback)
-                        : $callback;
+            ? new SerializableClosure($callback)
+            : $callback;
 
         return $this;
     }
@@ -196,8 +195,8 @@ class PendingBatch
     public function catch($callback)
     {
         $this->options['catch'][] = $callback instanceof Closure
-                    ? new SerializableClosure($callback)
-                    : $callback;
+            ? new SerializableClosure($callback)
+            : $callback;
 
         return $this;
     }
@@ -221,8 +220,8 @@ class PendingBatch
     public function finally($callback)
     {
         $this->options['finally'][] = $callback instanceof Closure
-                    ? new SerializableClosure($callback)
-                    : $callback;
+            ? new SerializableClosure($callback)
+            : $callback;
 
         return $this;
     }

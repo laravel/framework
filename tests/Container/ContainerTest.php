@@ -40,6 +40,24 @@ class ContainerTest extends TestCase
         $this->assertSame('Taylor', $container->make('name'));
     }
 
+    public function testAbstractCanBeBoundFromConcreteReturnType()
+    {
+        $container = new Container;
+        $container->bind(function (): IContainerContractStub|ContainerImplementationStub {
+            return new ContainerImplementationStub;
+        });
+        $container->singleton(function (): ContainerConcreteStub {
+            return new ContainerConcreteStub;
+        });
+
+        $this->assertInstanceOf(
+            IContainerContractStub::class,
+            $container->make(IContainerContractStub::class)
+        );
+
+        $this->assertTrue($container->isShared(ContainerConcreteStub::class));
+    }
+
     public function testBindIfDoesntRegisterIfServiceAlreadyRegistered()
     {
         $container = new Container;
@@ -297,6 +315,17 @@ class ContainerTest extends TestCase
         $this->assertSame(null, $instance->default);
 
         $container->bind(ContainerConcreteStub::class, fn () => new ContainerConcreteStub);
+        $instance = $container->make(ContainerClassWithDefaultValueStub::class);
+        $this->assertInstanceOf(ContainerConcreteStub::class, $instance->default);
+    }
+
+    public function testResolutionOfClassWithDefaultParametersAndContextualBindings()
+    {
+        $container = new Container;
+
+        $container->when(ContainerClassWithDefaultValueStub::class)
+            ->needs(ContainerConcreteStub::class)
+            ->give(fn () => new ContainerConcreteStub);
         $instance = $container->make(ContainerClassWithDefaultValueStub::class);
         $this->assertInstanceOf(ContainerConcreteStub::class, $instance->default);
     }

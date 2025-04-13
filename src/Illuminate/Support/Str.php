@@ -4,7 +4,6 @@ namespace Illuminate\Support;
 
 use Closure;
 use Illuminate\Support\Traits\Macroable;
-use JsonException;
 use League\CommonMark\Environment\Environment;
 use League\CommonMark\Extension\GithubFlavoredMarkdownExtension;
 use League\CommonMark\Extension\InlinesOnly\InlinesOnlyExtension;
@@ -454,7 +453,7 @@ class Str
      */
     public static function wrap($value, $before, $after = null)
     {
-        return $before.$value.($after ??= $before);
+        return $before.$value.($after ?? $before);
     }
 
     /**
@@ -546,17 +545,7 @@ class Str
             return false;
         }
 
-        if (function_exists('json_validate')) {
-            return json_validate($value, 512);
-        }
-
-        try {
-            json_decode($value, true, 512, JSON_THROW_ON_ERROR);
-        } catch (JsonException) {
-            return false;
-        }
-
-        return true;
+        return json_validate($value);
     }
 
     /**
@@ -623,7 +612,7 @@ class Str
 
         try {
             $factoryUuid = $factory->fromString($value);
-        } catch (InvalidUuidStringException $ex) {
+        } catch (InvalidUuidStringException) {
             return false;
         }
 
@@ -906,17 +895,7 @@ class Str
      */
     public static function padBoth($value, $length, $pad = ' ')
     {
-        if (function_exists('mb_str_pad')) {
-            return mb_str_pad($value, $length, $pad, STR_PAD_BOTH);
-        }
-
-        $short = max(0, $length - mb_strlen($value));
-        $shortLeft = floor($short / 2);
-        $shortRight = ceil($short / 2);
-
-        return mb_substr(str_repeat($pad, $shortLeft), 0, $shortLeft).
-               $value.
-               mb_substr(str_repeat($pad, $shortRight), 0, $shortRight);
+        return mb_str_pad($value, $length, $pad, STR_PAD_BOTH);
     }
 
     /**
@@ -929,13 +908,7 @@ class Str
      */
     public static function padLeft($value, $length, $pad = ' ')
     {
-        if (function_exists('mb_str_pad')) {
-            return mb_str_pad($value, $length, $pad, STR_PAD_LEFT);
-        }
-
-        $short = max(0, $length - mb_strlen($value));
-
-        return mb_substr(str_repeat($pad, $short), 0, $short).$value;
+        return mb_str_pad($value, $length, $pad, STR_PAD_LEFT);
     }
 
     /**
@@ -948,13 +921,7 @@ class Str
      */
     public static function padRight($value, $length, $pad = ' ')
     {
-        if (function_exists('mb_str_pad')) {
-            return mb_str_pad($value, $length, $pad, STR_PAD_RIGHT);
-        }
-
-        $short = max(0, $length - mb_strlen($value));
-
-        return $value.mb_substr(str_repeat($pad, $short), 0, $short);
+        return mb_str_pad($value, $length, $pad, STR_PAD_RIGHT);
     }
 
     /**
@@ -1009,6 +976,18 @@ class Str
     }
 
     /**
+     * Pluralize the last word of an English, Pascal caps case string.
+     *
+     * @param  string  $value
+     * @param  int|array|\Countable  $count
+     * @return string
+     */
+    public static function pluralPascal($value, $count = 2)
+    {
+        return static::pluralStudly($value, $count);
+    }
+
+    /**
      * Generate a random, secure password.
      *
      * @param  int  $length
@@ -1039,8 +1018,10 @@ class Str
                 ']', '|', ':', ';',
             ] : null,
             'spaces' => $spaces === true ? [' '] : null,
-        ]))->filter()->each(fn ($c) => $password->push($c[random_int(0, count($c) - 1)])
-        )->flatten();
+        ]))
+            ->filter()
+            ->each(fn ($c) => $password->push($c[random_int(0, count($c) - 1)]))
+            ->flatten();
 
         $length = $length - $password->count();
 
@@ -1220,8 +1201,8 @@ class Str
         }
 
         return $caseSensitive
-                ? str_replace($search, $replace, $subject)
-                : str_ireplace($search, $replace, $subject);
+            ? str_replace($search, $replace, $subject)
+            : str_ireplace($search, $replace, $subject);
     }
 
     /**
@@ -1353,8 +1334,8 @@ class Str
         }
 
         return $caseSensitive
-                    ? str_replace($search, '', $subject)
-                    : str_ireplace($search, '', $subject);
+            ? str_replace($search, '', $subject)
+            : str_ireplace($search, '', $subject);
     }
 
     /**
@@ -1656,6 +1637,17 @@ class Str
     }
 
     /**
+     * Convert a value to Pascal case.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public static function pascal($value)
+    {
+        return static::studly($value);
+    }
+
+    /**
      * Returns the portion of the string specified by the start and length parameters.
      *
      * @param  string  $string
@@ -1823,8 +1815,8 @@ class Str
     public static function uuid()
     {
         return static::$uuidFactory
-                    ? call_user_func(static::$uuidFactory)
-                    : Uuid::uuid4();
+            ? call_user_func(static::$uuidFactory)
+            : Uuid::uuid4();
     }
 
     /**
@@ -1836,8 +1828,8 @@ class Str
     public static function uuid7($time = null)
     {
         return static::$uuidFactory
-                    ? call_user_func(static::$uuidFactory)
-                    : Uuid::uuid7($time);
+            ? call_user_func(static::$uuidFactory)
+            : Uuid::uuid7($time);
     }
 
     /**

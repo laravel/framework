@@ -265,8 +265,8 @@ abstract class AbstractCursorPaginator implements Htmlable, Stringable
     protected function ensureParameterIsPrimitive($parameter)
     {
         return is_object($parameter) && method_exists($parameter, '__toString')
-                        ? (string) $parameter
-                        : $parameter;
+            ? (string) $parameter
+            : $parameter;
     }
 
     /**
@@ -568,7 +568,7 @@ abstract class AbstractCursorPaginator implements Htmlable, Stringable
     /**
      * Get the paginator's underlying collection.
      *
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Support\Collection<TKey, TValue>
      */
     public function getCollection()
     {
@@ -578,8 +578,13 @@ abstract class AbstractCursorPaginator implements Htmlable, Stringable
     /**
      * Set the paginator's underlying collection.
      *
-     * @param  \Illuminate\Support\Collection  $collection
+     * @template TSetKey of array-key
+     * @template TSetValue
+     *
+     * @param  \Illuminate\Support\Collection<TSetKey, TSetValue>  $collection
      * @return $this
+     *
+     * @phpstan-this-out static<TSetKey, TSetValue>
      */
     public function setCollection(Collection $collection)
     {
@@ -613,7 +618,7 @@ abstract class AbstractCursorPaginator implements Htmlable, Stringable
      * Get the item at the given offset.
      *
      * @param  TKey  $key
-     * @return TValue
+     * @return TValue|null
      */
     public function offsetGet($key): mixed
     {

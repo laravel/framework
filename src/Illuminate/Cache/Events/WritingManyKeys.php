@@ -33,7 +33,6 @@ class WritingManyKeys extends CacheEvent
      * @param  array  $values
      * @param  int|null  $seconds
      * @param  array  $tags
-     * @return void
      */
     public function __construct($storeName, $keys, $values, $seconds = null, $tags = [])
     {

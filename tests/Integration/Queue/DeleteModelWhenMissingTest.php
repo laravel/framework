@@ -38,9 +38,9 @@ class DeleteModelWhenMissingTest extends QueueTestCase
     #[\Override]
     protected function tearDown(): void
     {
-        parent::tearDown();
-
         DeleteMissingModelJob::$handled = false;
+
+        parent::tearDown();
     }
 
     public function test_deleteModelWhenMissing_and_display_name(): void

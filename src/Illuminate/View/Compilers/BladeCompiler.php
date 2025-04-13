@@ -713,8 +713,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
 
         $this->directive($name, function ($expression) use ($name) {
             return $expression !== ''
-                    ? "<?php if (\Illuminate\Support\Facades\Blade::check('{$name}', {$expression})): ?>"
-                    : "<?php if (\Illuminate\Support\Facades\Blade::check('{$name}')): ?>";
+                ? "<?php if (\Illuminate\Support\Facades\Blade::check('{$name}', {$expression})): ?>"
+                : "<?php if (\Illuminate\Support\Facades\Blade::check('{$name}')): ?>";
         });
 
         $this->directive('unless'.$name, function ($expression) use ($name) {
@@ -762,10 +762,10 @@ class BladeCompiler extends Compiler implements CompilerInterface
 
         if (is_null($alias)) {
             $alias = str_contains($class, '\\View\\Components\\')
-                            ? (new Collection(explode('\\', Str::after($class, '\\View\\Components\\'))))->map(function ($segment) {
-                                return Str::kebab($segment);
-                            })->implode(':')
-                            : Str::kebab(class_basename($class));
+                ? (new Collection(explode('\\', Str::after($class, '\\View\\Components\\'))))->map(function ($segment) {
+                    return Str::kebab($segment);
+                })->implode(':')
+                : Str::kebab(class_basename($class));
         }
 
         if (! empty($prefix)) {
@@ -897,8 +897,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
 
         $this->directive($alias, function ($expression) use ($path) {
             return $expression
-                        ? "<?php \$__env->startComponent('{$path}', {$expression}); ?>"
-                        : "<?php \$__env->startComponent('{$path}'); ?>";
+                ? "<?php \$__env->startComponent('{$path}', {$expression}); ?>"
+                : "<?php \$__env->startComponent('{$path}'); ?>";
         });
 
         $this->directive('end'.$alias, function ($expression) {
@@ -932,7 +932,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
         $this->directive($alias, function ($expression) use ($path) {
             $expression = $this->stripParentheses($expression) ?: '[]';
 
-            return "<?php echo \$__env->make('{$path}', {$expression}, \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>";
+            return "<?php echo \$__env->make('{$path}', {$expression}, array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>";
         });
     }
 
