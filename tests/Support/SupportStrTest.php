@@ -1814,6 +1814,63 @@ class SupportStrTest extends TestCase
 
         $this->assertSame('UserGroups', Str::pluralPascal('UserGroup', $countable));
     }
+
+    public function testToArrayWithCommaSeparator(): void
+    {
+        $this->assertEquals(
+            ['1', '2', '3'],
+            Str::toArray('1,2,3')
+        );
+    }
+
+    public function testToArrayWithDashSeparator(): void
+    {
+        $this->assertEquals(
+            ['10', '20', '30'],
+            Str::toArray('10-20-30')
+        );
+    }
+
+    public function testToArrayWithPipeSeparator(): void
+    {
+        $this->assertEquals(
+            ['a', 'b', 'c'],
+            Str::toArray('a|b|c')
+        );
+    }
+
+    public function testToArrayWithSlashSeparator(): void
+    {
+        $this->assertEquals(
+            ['apple', 'banana', 'cherry'],
+            Str::toArray('apple/banana/cherry')
+        );
+    }
+
+    public function testToArrayWithCustomSeparators(): void
+    {
+        $this->assertEquals(
+            ['1', '2', '3'],
+            Str::toArray('1*2*3', ['*'])
+        );
+    }
+
+    public function testToArrayWithNoSeparatorReturnsSingleElementArray(): void
+    {
+        $this->assertEquals(
+            ['single'],
+            Str::toArray('single')
+        );
+    }
+
+    public function testToArrayWithEmptyStringReturnsEmptyStringArray(): void
+    {
+        $this->assertEquals(
+            [],
+            Str::toArray('')
+        );
+    }
+
 }
 
 class StringableObjectStub

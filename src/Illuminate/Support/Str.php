@@ -2066,6 +2066,31 @@ class Str
     }
 
     /**
+     * Converts a string to array using the first found separator from the provided list.
+     *
+     * @param  string  $string  The input string to convert
+     * @param  array  $separators  List of possible separators to check
+     */
+    public static function toArray(string $string, array $separators = [',', '-', '|', ';', ':', '/', '\\']): array
+    {
+        // If string is empty, return empty array early
+        if ($string === '') {
+            return [];
+        }
+
+        $result = [$string];
+        foreach ($separators as $separator) {
+            if (str_contains($string, $separator)) {
+                $result = explode($separator, $string);
+                break; // Exit once we find the first separator
+            }
+        }
+
+        return $result;
+    }
+
+
+    /**
      * Remove all strings from the casing caches.
      *
      * @return void
