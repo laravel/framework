@@ -648,6 +648,19 @@ class FilesystemTest extends TestCase
         $this->assertSame('76d3bc41c9f588f7fcd0d5bf4718f8f84b1c41b20882703100b9eb9413807c01', $filesystem->hash(self::$tempDir.'/foo.txt', 'sha3-256'));
     }
 
+    public function testLastModifiedReturnsTimestamp()
+    {
+        $path = self::$tempDir.'/timestamp.txt';
+        file_put_contents($path, 'test content');
+
+        $filesystem = new Filesystem;
+        $timestamp = $filesystem->lastModified($path);
+
+        $this->assertIsInt($timestamp);
+        $this->assertGreaterThan(0, $timestamp);
+        $this->assertEquals(filemtime($path), $timestamp);
+    }
+
     /**
      * @param  string  $file
      * @return int
