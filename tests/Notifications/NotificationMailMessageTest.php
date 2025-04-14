@@ -91,7 +91,7 @@ class NotificationMailMessageTest extends TestCase
         $this->assertSame([
             ['test@example.com', 'Test'],
             ['test@example.com', null],
-            ['test2@example.com', null]
+            ['test2@example.com', null],
         ], $message->cc);
     }
 
@@ -120,7 +120,7 @@ class NotificationMailMessageTest extends TestCase
         $this->assertSame([
             ['test@example.com', 'Test'],
             ['test@example.com', null],
-            ['test2@example.com', null]
+            ['test2@example.com', null],
         ], $message->bcc);
     }
 
@@ -149,7 +149,7 @@ class NotificationMailMessageTest extends TestCase
         $this->assertSame([
             ['test@example.com', 'Test'],
             ['test@example.com', null],
-            ['test2@example.com', null]
+            ['test2@example.com', null],
         ], $message->replyTo);
     }
 
