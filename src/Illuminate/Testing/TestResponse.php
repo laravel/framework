@@ -1195,18 +1195,18 @@ class TestResponse implements ArrayAccess
         $actual = Arr::get($this->original->gatherData(), $key);
 
         if (is_null($value)) {
-            PHPUnit::withResponse($this)->assertTrue(Arr::has($this->original->gatherData(), $key), "Failed asserting that the data contains the key '$key'.");
+            PHPUnit::withResponse($this)->assertTrue(Arr::has($this->original->gatherData(), $key), "Failed asserting that the data contains the key [{$key}].");
         } elseif ($value instanceof Closure) {
-            PHPUnit::withResponse($this)->assertTrue($value($actual), "Failed asserting that the value at '$key' fulfills the closure.");
+            PHPUnit::withResponse($this)->assertTrue($value($actual), "Failed asserting that the value at [{$key}] fulfills the expectations defined by the closure.");
         } elseif ($value instanceof Model) {
-            PHPUnit::withResponse($this)->assertTrue($value->is($actual), "Failed asserting that the model at '$key' equals the given model.");
+            PHPUnit::withResponse($this)->assertTrue($value->is($actual), "Failed asserting that the model at [{$key}] matches the given model.");
         } elseif ($value instanceof EloquentCollection) {
             PHPUnit::withResponse($this)->assertInstanceOf(EloquentCollection::class, $actual);
             PHPUnit::withResponse($this)->assertSameSize($value, $actual);
 
-            $value->each(fn($item, $index) => PHPUnit::withResponse($this)->assertTrue($actual->get($index)->is($item), "Failed asserting that the collection at '$key.[$index]' matches the given collection."));
+            $value->each(fn ($item, $index) => PHPUnit::withResponse($this)->assertTrue($actual->get($index)->is($item), "Failed asserting that the collection at [{$key}.[{$index}]]' matches the given collection."));
         } else {
-            PHPUnit::withResponse($this)->assertEquals($value, $actual, "Failed asserting that '$key' matches the expected value.");
+            PHPUnit::withResponse($this)->assertEquals($value, $actual, "Failed asserting that [{$key}] matches the expected value.");
         }
 
         return $this;
