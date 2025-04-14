@@ -1193,6 +1193,21 @@ class Builder implements BuilderContract
         });
     }
 
+    public function createMany(array $records, bool $quiet = false): Collection
+    {
+        $collection = $this->model->newCollection();
+
+        foreach ($records as $record) {
+            $model = $quiet
+                ? $this->createQuietly($record)
+                : $this->create($record);
+
+            $collection->push($model);
+        }
+
+        return $collection;
+    }
+
     /**
      * Save a new model and return the instance without raising model events.
      *
