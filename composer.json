@@ -112,7 +112,7 @@
         "league/flysystem-sftp-v3": "^3.25.1",
         "mockery/mockery": "^1.6.10",
         "orchestra/testbench-core": "^10.0.0",
-        "pda/pheanstalk": "^5.0.6",
+        "pda/pheanstalk": "^5.0.6|^7.0.0",
         "php-http/discovery": "^1.15",
         "phpstan/phpstan": "^2.0",
         "phpunit/phpunit": "^10.5.35|^11.5.3|^12.0.1",
