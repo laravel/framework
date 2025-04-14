@@ -45,7 +45,7 @@
         "ext-posix": "Required to use all features of the queue worker.",
         "aws/aws-sdk-php": "Required to use the SQS queue driver and DynamoDb failed job storage (^3.322.9).",
         "illuminate/redis": "Required to use the Redis queue driver (^12.0).",
-        "pda/pheanstalk": "Required to use the Beanstalk queue driver (^5.0)."
+        "pda/pheanstalk": "Required to use the Beanstalk queue driver (^5.0.6|^7.0.0)."
     },
     "config": {
         "sort-packages": true
