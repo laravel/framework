@@ -672,4 +672,42 @@ class FilesystemTest extends TestCase
 
         return (int) base_convert($filePerms, 8, 10);
     }
+
+    public function testFileCreationAndContentVerification()
+    {
+        $files = new Filesystem;
+
+        $testContent = 'This is a test file content';
+        $filePath = self::$tempDir.'/test.txt';
+
+        $files->put($filePath, $testContent);
+
+        $this->assertTrue($files->exists($filePath));
+        $this->assertSame($testContent, $files->get($filePath));
+        $this->assertEquals(strlen($testContent), $files->size($filePath));
+    }
+
+    public function testDirectoryOperationsWithSubdirectories()
+    {
+        $files = new Filesystem;
+
+        $dirPath = self::$tempDir.'/test_dir';
+        $subDirPath = $dirPath.'/sub_dir';
+
+        $this->assertTrue($files->makeDirectory($dirPath));
+        $this->assertTrue($files->isDirectory($dirPath));
+
+        $this->assertTrue($files->makeDirectory($subDirPath));
+        $this->assertTrue($files->isDirectory($subDirPath));
+
+        $filePath = $subDirPath.'/test.txt';
+        $files->put($filePath, 'test content');
+
+        $this->assertTrue($files->exists($filePath));
+
+        $allFiles = $files->allFiles($dirPath);
+
+        $this->assertCount(1, $allFiles);
+        $this->assertEquals('test.txt', $allFiles[0]->getFilename());
+    }
 }
