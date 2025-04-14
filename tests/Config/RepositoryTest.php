@@ -390,7 +390,7 @@ class RepositoryTest extends TestCase
         $this->assertSame(2, $this->repository->get('nested.level1.b.y'));
         $this->assertSame(4, $this->repository->get('nested.level1.b.z'));
         $this->assertSame('new', $this->repository->get('nested.level1.c'));
-        
+
         $expected = [
             'level1' => [
                 'a' => 'updated',
