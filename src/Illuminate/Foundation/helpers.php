@@ -20,6 +20,7 @@ use Illuminate\Log\Context\Repository as ContextRepository;
 use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Uri;
 use League\Uri\Contracts\UriInterface;
@@ -1011,6 +1012,7 @@ if (! function_exists('uri')) {
     {
         return match (true) {
             is_array($uri) || str_contains($uri, '\\') => Uri::action($uri, $parameters, $absolute),
+            str_contains($uri, '.') && Route::has($uri) => Uri::route($uri, $parameters, $absolute),
             default => Uri::of($uri),
         };
     }
