@@ -363,4 +363,46 @@ class RepositoryTest extends TestCase
 
         $this->repository->float('a.b');
     }
+
+    public function testSetNestedArrayMerging()
+    {
+        $this->repository->set('nested', [
+            'level1' => [
+                'a' => 'original',
+                'b' => [
+                    'x' => 1,
+                    'y' => 2
+                ]
+            ]
+        ]);
+
+        $this->repository->set('nested.level1', [
+            'a' => 'updated',
+            'b' => [
+                'x' => 3,
+                'z' => 4
+            ],
+            'c' => 'new'
+        ]);
+
+        $this->assertSame('updated', $this->repository->get('nested.level1.a'));
+        $this->assertSame(3, $this->repository->get('nested.level1.b.x'));
+        $this->assertSame(2, $this->repository->get('nested.level1.b.y'));
+        $this->assertSame(4, $this->repository->get('nested.level1.b.z'));
+        $this->assertSame('new', $this->repository->get('nested.level1.c'));
+        
+        $expected = [
+            'level1' => [
+                'a' => 'updated',
+                'b' => [
+                    'x' => 3,
+                    'y' => 2,
+                    'z' => 4
+                ],
+                'c' => 'new'
+            ]
+        ];
+
+        $this->assertSame($expected, $this->repository->get('nested'));
+    }
 }
