@@ -807,7 +807,7 @@ class ProcessTest extends TestCase
 
         $result = $factory->env([
             'TEST_VAR' => 'test_value',
-            'OTHER_VAR' => 'other_value'
+            'OTHER_VAR' => 'other_value',
         ])->run('printenv TEST_VAR OTHER_VAR');
 
         $this->assertTrue($result->successful());
@@ -815,7 +815,7 @@ class ProcessTest extends TestCase
 
         $result = $factory->env([
             'TEST_VAR' => 'new_test_value',
-            'OTHER_VAR' => 'new_other_value'
+            'OTHER_VAR' => 'new_other_value',
         ])->run('printenv TEST_VAR OTHER_VAR');
 
         $this->assertTrue($result->successful());
