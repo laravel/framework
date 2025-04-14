@@ -371,7 +371,7 @@ class RepositoryTest extends TestCase
                 'a' => 'original',
                 'b' => [
                     'x' => 1,
-                    'y' => 2
+                    'y' => 2,
                 ]
             ]
         ]);
@@ -380,9 +380,9 @@ class RepositoryTest extends TestCase
             'a' => 'updated',
             'b' => [
                 'x' => 3,
-                'z' => 4
+                'z' => 4,
             ],
-            'c' => 'new'
+            'c' => 'new',
         ]);
 
         $this->assertSame('updated', $this->repository->get('nested.level1.a'));
@@ -397,9 +397,9 @@ class RepositoryTest extends TestCase
                 'b' => [
                     'x' => 3,
                     'y' => 2,
-                    'z' => 4
+                    'z' => 4,
                 ],
-                'c' => 'new'
+                'c' => 'new',
             ]
         ];
 
