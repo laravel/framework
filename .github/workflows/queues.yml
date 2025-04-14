@@ -179,12 +179,12 @@ jobs:
     runs-on: ubuntu-24.04
 
     strategy:
+      fail-fast: true
       matrix:
-        include:
-          - php: 8.2
-            pheanstalk: 5
-          - php: 8.3
-            pheanstalk: 7
+        - php: 8.2
+          pheanstalk: 5
+        - php: 8.3
+          pheanstalk: 7
 
     name: Beanstalkd Driver (pda/pheanstalk:^${{ matrix.pheanstalk }})
 
