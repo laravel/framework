@@ -689,19 +689,32 @@ class Str
      * @param  int  $limit
      * @param  string  $end
      * @param  bool  $preserveWords
+     * @param  bool  $limitIncludesEnd
      * @return string
      */
-    public static function limit($value, $limit = 100, $end = '...', $preserveWords = false)
+    public static function limit($value, $limit = 100, $end = '...', $preserveWords = false, $limitIncludesEnd = false)
     {
-        if (mb_strwidth($value, 'UTF-8') <= $limit) {
+        $valueWidth = mb_strwidth($value, 'UTF-8');
+
+        if ($valueWidth <= $limit) {
             return $value;
         }
 
+        $endWidth = mb_strwidth($end, 'UTF-8');
+
         if (! $preserveWords) {
+            if ($limitIncludesEnd && $valueWidth + $endWidth > $limit) {
+                $limit = max(0, $limit - $endWidth);
+            }
+
             return rtrim(mb_strimwidth($value, 0, $limit, '', 'UTF-8')).$end;
         }
 
         $value = trim(preg_replace('/[\n\r]+/', ' ', strip_tags($value)));
+
+        if ($limitIncludesEnd) {
+            $limit = max(0, $limit - $endWidth);
+        }
 
         $trimmed = rtrim(mb_strimwidth($value, 0, $limit, '', 'UTF-8'));
 
