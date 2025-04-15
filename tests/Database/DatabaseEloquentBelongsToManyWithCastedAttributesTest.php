@@ -25,6 +25,7 @@ class DatabaseEloquentBelongsToManyWithCastedAttributesTest extends TestCase
         $model1->shouldReceive('hasAttribute')->passthru();
         $model1->shouldReceive('getAttribute')->with('parent_key')->andReturn(1);
         $model1->shouldReceive('getAttribute')->with('foo')->passthru();
+        $model1->shouldReceive('hasPropertyHookGetter')->andReturn(false);
         $model1->shouldReceive('hasGetMutator')->andReturn(false);
         $model1->shouldReceive('hasAttributeMutator')->andReturn(false);
         $model1->shouldReceive('hasRelationAutoloadCallback')->andReturn(false);
@@ -35,6 +36,7 @@ class DatabaseEloquentBelongsToManyWithCastedAttributesTest extends TestCase
         $model2->shouldReceive('hasAttribute')->passthru();
         $model2->shouldReceive('getAttribute')->with('parent_key')->andReturn(2);
         $model2->shouldReceive('getAttribute')->with('foo')->passthru();
+        $model2->shouldReceive('hasPropertyHookGetter')->andReturn(false);
         $model2->shouldReceive('hasGetMutator')->andReturn(false);
         $model2->shouldReceive('hasAttributeMutator')->andReturn(false);
         $model2->shouldReceive('hasRelationAutoloadCallback')->andReturn(false);
