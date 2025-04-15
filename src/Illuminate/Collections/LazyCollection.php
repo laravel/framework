@@ -56,20 +56,6 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     }
 
     /**
-     * Create a new collection instance if the value isn't one already.
-     *
-     * @template TMakeKey of array-key
-     * @template TMakeValue
-     *
-     * @param  \Illuminate\Contracts\Support\Arrayable<TMakeKey, TMakeValue>|iterable<TMakeKey, TMakeValue>|(Closure(): \Generator<TMakeKey, TMakeValue, mixed, void>)|self<TMakeKey, TMakeValue>|array<TMakeKey, TMakeValue>|null  $items
-     * @return static<TMakeKey, TMakeValue>
-     */
-    public static function make($items = [])
-    {
-        return new static($items);
-    }
-
-    /**
      * Create a collection with the given range.
      *
      * @param  int  $from
