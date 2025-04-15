@@ -43,7 +43,6 @@ use ReflectionMethod;
 use ReflectionNamedType;
 use ReflectionProperty;
 use RuntimeException;
-use SensitiveParameter;
 use ValueError;
 
 use function Illuminate\Support\enum_value;
@@ -469,8 +468,8 @@ trait HasAttributes
 
         return array_key_exists($key, $this->attributes) ||
             array_key_exists($key, $this->casts) ||
-            $this->hasPropertyHookGetter($key) ||
             $this->hasGetMutator($key) ||
+            $this->hasPropertyHookGetter($key) ||
             $this->hasAttributeMutator($key) ||
             $this->isClassCastable($key);
     }
@@ -1114,10 +1113,10 @@ trait HasAttributes
         // First we will check for the presence of a mutator for the set operation
         // which simply lets the developers tweak the attribute as it is set on
         // this model, such as "json_encoding" a listing of data for storage.
-        if ($this->hasPropertyHookSetter($key)) {
-            return $this->setPropertyHookValue($key, $value);
-        } elseif ($this->hasSetMutator($key)) {
+        if ($this->hasSetMutator($key)) {
             return $this->setMutatedAttributeValue($key, $value);
+        } elseif($this->hasPropertyHookSetter($key)) {
+            return $this->setPropertyHookValue($key, $value);
         } elseif ($this->hasAttributeSetMutator($key)) {
             return $this->setAttributeMarkedMutatedAttributeValue($key, $value);
         }
@@ -1499,7 +1498,7 @@ trait HasAttributes
      * @param  mixed  $value
      * @return string
      */
-    protected function castAttributeAsEncryptedString($key, #[SensitiveParameter] $value)
+    protected function castAttributeAsEncryptedString($key, #[\SensitiveParameter] $value)
     {
         return static::currentEncrypter()->encrypt($value, false);
     }
@@ -1532,7 +1531,7 @@ trait HasAttributes
      * @param  mixed  $value
      * @return string
      */
-    protected function castAttributeAsHashedString($key, #[SensitiveParameter] $value)
+    protected function castAttributeAsHashedString($key, #[\SensitiveParameter] $value)
     {
         if ($value === null) {
             return null;
@@ -2371,10 +2370,10 @@ trait HasAttributes
         // If the attribute has a get mutator, we will call that then return what
         // it returns as the value, which is useful for transforming values on
         // retrieval from the model to a form that is more useful for usage.
-        if ($this->hasPropertyHookGetter($key)) {
-            return $this->getPropertyHookValue($key);
-        } elseif ($this->hasGetMutator($key)) {
+        if ($this->hasGetMutator($key)) {
             return $this->mutateAttribute($key, $value);
+        } elseif ($this->hasPropertyHookGetter($key)) {
+            return $this->getPropertyHookValue($key);
         } elseif ($this->hasAttributeGetMutator($key)) {
             return $this->mutateAttributeMarkedAttribute($key, $value);
         }
@@ -2544,7 +2543,8 @@ trait HasAttributes
 
         $instance = is_object($class) ? $class : new $class;
 
-        return (new Collection((new ReflectionClass($instance))->getProperties()))
+        return (new Collection((new ReflectionClass($instance))
+            ->getProperties(ReflectionProperty::IS_PROTECTED | ReflectionProperty::IS_PRIVATE)))
             ->filter->hasHook(PropertyHookType::Get)->map->name->values()->all();
     }
 }
