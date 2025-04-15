@@ -46,7 +46,6 @@ use RuntimeException;
 use ValueError;
 
 use function Illuminate\Support\enum_value;
-use function in_array;
 
 trait HasAttributes
 {
