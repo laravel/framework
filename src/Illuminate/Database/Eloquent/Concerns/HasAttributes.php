@@ -665,7 +665,7 @@ trait HasAttributes
      */
     public function hasPropertyHookGetter($key)
     {
-        if (!method_exists(ReflectionProperty::class, 'hasHook')) {
+        if (PHP_VERSION_ID < 80400) {
             return false;
         }
 
@@ -689,7 +689,7 @@ trait HasAttributes
      */
     public function hasPropertyHookSetter($key)
     {
-        if (!method_exists(ReflectionProperty::class, 'hasHook')) {
+        if (PHP_VERSION_ID < 80400) {
             return false;
         }
 
@@ -2536,7 +2536,7 @@ trait HasAttributes
      */
     protected static function getPropertyHookGetters($class)
     {
-        if (!method_exists(ReflectionProperty::class, 'hasHook')) {
+        if (PHP_VERSION_ID < 80400) {
             return [];
         }
 
