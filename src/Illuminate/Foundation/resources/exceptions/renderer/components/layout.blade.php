@@ -1,4 +1,13 @@
 @use('Illuminate\Foundation\Exceptions\Renderer\Renderer')
+<!--
+    {{ $exception->class() }} - {{ $exception->title() }}
+
+    {{ $exception->message() }}
+
+@foreach($exception->frames() as $frame)
+    {{ $frame->file() }}:{{ $frame->line() }}
+@endforeach
+-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
