@@ -2542,8 +2542,7 @@ trait HasAttributes
 
         $instance = is_object($class) ? $class : new $class;
 
-        return (new Collection((new ReflectionClass($instance))
-            ->getProperties(ReflectionProperty::IS_PROTECTED | ReflectionProperty::IS_PRIVATE)))
+        return (new Collection((new ReflectionClass($instance))->getProperties()))
             ->filter->hasHook(PropertyHookType::Get)->map->name->values()->all();
     }
 }

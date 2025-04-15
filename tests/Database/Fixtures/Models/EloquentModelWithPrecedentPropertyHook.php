@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Database\Fixtures\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class EloquentModelWithPrecedentPropertyHook extends Model
 {
