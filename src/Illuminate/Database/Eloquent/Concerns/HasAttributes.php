@@ -37,13 +37,17 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use LogicException;
+use PropertyHookType;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionNamedType;
+use ReflectionProperty;
 use RuntimeException;
+use SensitiveParameter;
 use ValueError;
 
 use function Illuminate\Support\enum_value;
+use function in_array;
 
 trait HasAttributes
 {
@@ -172,6 +176,20 @@ trait HasAttributes
      * @var array
      */
     protected static $setAttributeMutatorCache = [];
+
+    /**
+     * The cache of the "Attribute" property hooks getters for each class.
+     *
+     * @var array
+     */
+    protected static $attributePropertyHookGetterCache = [];
+
+    /**
+     * The cache of the "Attribute" property hooks setters for each class.
+     *
+     * @var array
+     */
+    protected static $attributePropertyHookSetterCache = [];
 
     /**
      * The cache of the converted cast types.
@@ -451,6 +469,7 @@ trait HasAttributes
 
         return array_key_exists($key, $this->attributes) ||
             array_key_exists($key, $this->casts) ||
+            $this->hasPropertyHookGetter($key) ||
             $this->hasGetMutator($key) ||
             $this->hasAttributeMutator($key) ||
             $this->isClassCastable($key);
@@ -641,6 +660,54 @@ trait HasAttributes
     }
 
     /**
+     * Determine if a "get" property hook exists for an attribute.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function hasPropertyHookGetter($key)
+    {
+        if (PHP_VERSION_ID < 80400) {
+            return false;
+        }
+
+        $class = get_class($this);
+
+        if (isset(static::$attributePropertyHookGetterCache[$class][$key])) {
+            return static::$attributePropertyHookGetterCache[$class][$key];
+        }
+
+        $name = Str::camel($key);
+
+        return static::$attributePropertyHookGetterCache[$class][$key] = property_exists($this, $name)
+            && (new ReflectionProperty($this, $name))->hasHook(PropertyHookType::Get);
+    }
+
+    /**
+     * Determine if a "get" property hook exists for an attribute.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function hasPropertyHookSetter($key)
+    {
+        if (PHP_VERSION_ID < 80400) {
+            return false;
+        }
+
+        $class = get_class($this);
+
+        if (isset(static::$attributePropertyHookSetterCache[$class][$key])) {
+            return static::$attributePropertyHookSetterCache[$class][$key];
+        }
+
+        $name = Str::camel($key);
+
+        return static::$attributePropertyHookSetterCache[$class][$key] = property_exists($this, $name)
+            && (new ReflectionProperty($this, $name))->hasHook(PropertyHookType::Set);
+    }
+
+    /**
      * Determine if a "Attribute" return type marked mutator exists for an attribute.
      *
      * @param  string  $key
@@ -706,6 +773,17 @@ trait HasAttributes
     }
 
     /**
+     * Get the value of an attribute using its "get" property hook.
+     *
+     * @param  string  $key
+     * @return mixed
+     */
+    protected function getPropertyHookValue($key)
+    {
+        return $this->{Str::camel($key)};
+    }
+
+    /**
      * Get the value of an "Attribute" return type marked attribute using its mutator.
      *
      * @param  string  $key
@@ -747,6 +825,12 @@ trait HasAttributes
         } elseif (isset(static::$getAttributeMutatorCache[get_class($this)][$key]) &&
                   static::$getAttributeMutatorCache[get_class($this)][$key] === true) {
             $value = $this->mutateAttributeMarkedAttribute($key, $value);
+
+            $value = $value instanceof DateTimeInterface
+                ? $this->serializeDate($value)
+                : $value;
+        } elseif (static::$attributePropertyHookGetterCache[get_class($this)][$key] ?? false) {
+            $value = $this->getPropertyHookValue($key);
 
             $value = $value instanceof DateTimeInterface
                 ? $this->serializeDate($value)
@@ -1030,7 +1114,9 @@ trait HasAttributes
         // First we will check for the presence of a mutator for the set operation
         // which simply lets the developers tweak the attribute as it is set on
         // this model, such as "json_encoding" a listing of data for storage.
-        if ($this->hasSetMutator($key)) {
+        if ($this->hasPropertyHookSetter($key)) {
+            return $this->setPropertyHookValue($key, $value);
+        } elseif ($this->hasSetMutator($key)) {
             return $this->setMutatedAttributeValue($key, $value);
         } elseif ($this->hasAttributeSetMutator($key)) {
             return $this->setAttributeMarkedMutatedAttributeValue($key, $value);
@@ -1129,6 +1215,18 @@ trait HasAttributes
     }
 
     /**
+     * Set the value of an attribute using its "set" property hook.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return mixed
+     */
+    protected function setPropertyHookValue($key, $value)
+    {
+        return $this->{Str::camel($key)} = $value;
+    }
+
+    /**
      * Set the value of a "Attribute" return type marked attribute using its mutator.
      *
      * @param  string  $key
@@ -1137,7 +1235,15 @@ trait HasAttributes
      */
     protected function setAttributeMarkedMutatedAttributeValue($key, $value)
     {
-        $attribute = $this->{Str::camel($key)}();
+        $setter = Str::camel($key);
+
+        if (property_exists($this, $setter)) {
+            $this->{$setter} = $value;
+
+            return $this;
+        }
+
+        $attribute = $this->{$setter}();
 
         $callback = $attribute->set ?: function ($value) use ($key) {
             $this->attributes[$key] = $value;
@@ -1393,7 +1499,7 @@ trait HasAttributes
      * @param  mixed  $value
      * @return string
      */
-    protected function castAttributeAsEncryptedString($key, #[\SensitiveParameter] $value)
+    protected function castAttributeAsEncryptedString($key, #[SensitiveParameter] $value)
     {
         return static::currentEncrypter()->encrypt($value, false);
     }
@@ -1426,7 +1532,7 @@ trait HasAttributes
      * @param  mixed  $value
      * @return string
      */
-    protected function castAttributeAsHashedString($key, #[\SensitiveParameter] $value)
+    protected function castAttributeAsHashedString($key, #[SensitiveParameter] $value)
     {
         if ($value === null) {
             return null;
@@ -2265,7 +2371,9 @@ trait HasAttributes
         // If the attribute has a get mutator, we will call that then return what
         // it returns as the value, which is useful for transforming values on
         // retrieval from the model to a form that is more useful for usage.
-        if ($this->hasGetMutator($key)) {
+        if ($this->hasPropertyHookGetter($key)) {
+            return $this->getPropertyHookValue($key);
+        } elseif ($this->hasGetMutator($key)) {
             return $this->mutateAttribute($key, $value);
         } elseif ($this->hasAttributeGetMutator($key)) {
             return $this->mutateAttributeMarkedAttribute($key, $value);
@@ -2289,7 +2397,7 @@ trait HasAttributes
         // instance on retrieval, which makes it quite convenient to work with
         // date fields without having to create a mutator for each property.
         if ($value !== null
-            && \in_array($key, $this->getDates(), false)) {
+            && in_array($key, $this->getDates(), false)) {
             return $this->asDateTime($value);
         }
 
@@ -2375,8 +2483,12 @@ trait HasAttributes
             ->mapWithKeys(fn ($match) => [lcfirst(static::$snakeAttributes ? Str::snake($match) : $match) => true])
             ->all();
 
+        static::$attributePropertyHookGetterCache[$class] = (new Collection($attributePropertyHooks = static::getPropertyHookGetters($classOrInstance)))
+            ->mapWithKeys(fn ($match) => [lcfirst(static::$snakeAttributes ? Str::snake($match) : $match) => true])
+            ->all();
+
         static::$mutatorCache[$class] = (new Collection(static::getMutatorMethods($class)))
-            ->merge($attributeMutatorMethods)
+            ->merge($attributeMutatorMethods)->merge($attributePropertyHooks)
             ->map(fn ($match) => lcfirst(static::$snakeAttributes ? Str::snake($match) : $match))
             ->all();
     }
@@ -2416,5 +2528,23 @@ trait HasAttributes
 
             return false;
         })->map->name->values()->all();
+    }
+
+    /**
+     * Get all of the "set" Property Hooks named attributes.
+     *
+     * @param  mixed  $class
+     * @return array
+     */
+    protected static function getPropertyHookGetters($class)
+    {
+        if (PHP_VERSION_ID < 80400) {
+            return [];
+        }
+
+        $instance = is_object($class) ? $class : new $class;
+
+        return (new Collection((new ReflectionClass($instance))->getProperties()))
+            ->filter->hasHook(PropertyHookType::Get)->map->name->values()->all();
     }
 }
