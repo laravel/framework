@@ -6,18 +6,20 @@ use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use PHPUnit\Framework\TestCase;
+use ReflectionProperty;
+use function method_exists;
 
 class DatabaseEloquentWithPropertyHooksTest extends TestCase
 {
     protected function setUp(): void
     {
-        if (PHP_VERSION_ID < 80400) {
-            static::markTestSkipped(
+        parent::setUp();
+
+        if (!method_exists(ReflectionProperty::class, 'hasHook')) {
+            $this->markTestSkipped(
                 'Property Hooks are not available to test in PHP ' . PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION
             );
         }
-
-        parent::setUp();
 
         $db = new DB;
 
