@@ -9,4 +9,3 @@ Thumbs.db
 /.fleet
 /.vscode
 .phpunit.result.cache
-!/phpunit.xml
