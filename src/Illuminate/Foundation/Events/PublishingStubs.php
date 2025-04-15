@@ -7,20 +7,13 @@ class PublishingStubs
     use Dispatchable;
 
     /**
-     * The stubs being published.
-     *
-     * @var array
-     */
-    public $stubs = [];
-
-    /**
      * Create a new event instance.
      *
-     * @param  array  $stubs
+     * @param  array  $stubs  The stubs being published.
      */
-    public function __construct(array $stubs)
-    {
-        $this->stubs = $stubs;
+    public function __construct(
+        public array $stubs = []
+    ) {
     }
 
     /**
