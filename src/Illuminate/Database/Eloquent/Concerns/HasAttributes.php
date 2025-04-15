@@ -467,8 +467,8 @@ trait HasAttributes
 
         return array_key_exists($key, $this->attributes) ||
             array_key_exists($key, $this->casts) ||
-            $this->hasGetMutator($key) ||
             $this->hasPropertyHookGetter($key) ||
+            $this->hasGetMutator($key) ||
             $this->hasAttributeMutator($key) ||
             $this->isClassCastable($key);
     }
@@ -1112,10 +1112,10 @@ trait HasAttributes
         // First we will check for the presence of a mutator for the set operation
         // which simply lets the developers tweak the attribute as it is set on
         // this model, such as "json_encoding" a listing of data for storage.
-        if ($this->hasSetMutator($key)) {
-            return $this->setMutatedAttributeValue($key, $value);
-        } elseif($this->hasPropertyHookSetter($key)) {
+        if ($this->hasPropertyHookSetter($key)) {
             return $this->setPropertyHookValue($key, $value);
+        } elseif ($this->hasSetMutator($key)) {
+            return $this->setMutatedAttributeValue($key, $value);
         } elseif ($this->hasAttributeSetMutator($key)) {
             return $this->setAttributeMarkedMutatedAttributeValue($key, $value);
         }
@@ -2369,10 +2369,10 @@ trait HasAttributes
         // If the attribute has a get mutator, we will call that then return what
         // it returns as the value, which is useful for transforming values on
         // retrieval from the model to a form that is more useful for usage.
-        if ($this->hasGetMutator($key)) {
-            return $this->mutateAttribute($key, $value);
-        } elseif ($this->hasPropertyHookGetter($key)) {
+        if ($this->hasPropertyHookGetter($key)) {
             return $this->getPropertyHookValue($key);
+        } elseif ($this->hasGetMutator($key)) {
+            return $this->mutateAttribute($key, $value);
         } elseif ($this->hasAttributeGetMutator($key)) {
             return $this->mutateAttributeMarkedAttribute($key, $value);
         }

@@ -5,9 +5,13 @@ namespace Illuminate\Tests\Database;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Tests\Database\Fixtures\Models\EloquentModelWithAllPropertyHooks;
+use Illuminate\Tests\Database\Fixtures\Models\EloquentModelWithAppendedPropertyHooks;
+use Illuminate\Tests\Database\Fixtures\Models\EloquentModelWithGetterPropertyHook;
+use Illuminate\Tests\Database\Fixtures\Models\EloquentModelWithPrecedentPropertyHook;
+use Illuminate\Tests\Database\Fixtures\Models\EloquentModelWithPropertyHooks;
+use Illuminate\Tests\Database\Fixtures\Models\EloquentModelWithSetterPropertyHook;
 use PHPUnit\Framework\TestCase;
-use ReflectionProperty;
-use function method_exists;
 
 class DatabaseEloquentWithPropertyHooksTest extends TestCase
 {
@@ -15,7 +19,7 @@ class DatabaseEloquentWithPropertyHooksTest extends TestCase
     {
         parent::setUp();
 
-        if (!method_exists(ReflectionProperty::class, 'hasHook')) {
+        if (PHP_VERSION_ID < 80400) {
             $this->markTestSkipped(
                 'Property Hooks are not available to test in PHP ' . PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION
             );
@@ -63,40 +67,9 @@ class DatabaseEloquentWithPropertyHooksTest extends TestCase
         return Model::getConnectionResolver()->connection();
     }
 
-    public function test_collects_setter_hooks(): void
+    public function test_detects_property_hooks(): void
     {
-        $model = new class extends Model {
-            protected $table = 'test';
-
-            public $fooFoo {
-                get => true;
-            }
-
-            public $barBar {
-                set {
-                    //
-                }
-            }
-
-            public $bazBaz {
-                get => true;
-                set {
-                    //
-                }
-            }
-
-            public $quzQuz;
-
-            public function getCache()
-            {
-                return static::$attributePropertyHookGetterCache[get_class($this)];
-            }
-
-            public function setCache()
-            {
-                return static::$attributePropertyHookSetterCache[get_class($this)];
-            }
-        };
+        $model = new EloquentModelWithAllPropertyHooks();
 
         $this->assertTrue($model->hasPropertyHookGetter('fooFoo'));
         $this->assertFalse($model->hasPropertyHookSetter('fooFoo'));
@@ -128,16 +101,7 @@ class DatabaseEloquentWithPropertyHooksTest extends TestCase
 
     public function test_casts_with_property_hooks(): void
     {
-        $model = new class extends Model {
-            protected $table = 'test';
-
-            protected $fooBar {
-                get => isset($this->attributes['foo_bar']) ? strtoupper($this->attributes['foo_bar']) : null;
-                set {
-                    $this->attributes['foo_bar'] = strtolower($value);
-                }
-            }
-        };
+        $model = new EloquentModelWithPropertyHooks();
 
         $this->assertNull($model->foo_bar);
 
@@ -156,13 +120,7 @@ class DatabaseEloquentWithPropertyHooksTest extends TestCase
 
     public function test_cast_with_property_hook_get(): void
     {
-        $model = new class extends Model {
-            protected $table = 'test';
-
-            protected $fooBar {
-                get => isset($this->attributes['foo_bar']) ? strtoupper($this->attributes['foo_bar']) : null;
-            }
-        };
+        $model = new EloquentModelWithGetterPropertyHook();
 
         $this->assertNull($model->foo_bar);
 
@@ -182,15 +140,7 @@ class DatabaseEloquentWithPropertyHooksTest extends TestCase
 
     public function test_cast_with_property_hook_set(): void
     {
-        $model = new class extends Model {
-            protected $table = 'test';
-
-            protected $fooBar {
-                set {
-                    $this->attributes['foo_bar'] = strtolower($value);
-                }
-            }
-        };
+        $model = new EloquentModelWithSetterPropertyHook();
 
         $this->assertNull($model->foo_bar);
 
@@ -209,17 +159,7 @@ class DatabaseEloquentWithPropertyHooksTest extends TestCase
 
     public function test_property_hook_get_is_appended_using_getters(): void
     {
-        $model = new class extends Model {
-            protected $table = 'test';
-
-            protected $appends = [
-                'baz_quz',
-            ];
-
-            protected $bazQuz {
-                get => 'baz_QUZ';
-            }
-        };
+        $model = new EloquentModelWithAppendedPropertyHooks();
 
         $model->foo_bar = 'bAz';
 
@@ -228,31 +168,7 @@ class DatabaseEloquentWithPropertyHooksTest extends TestCase
 
     public function test_property_hook_takes_precedence_over_mutator_and_attribute(): void
     {
-        $model = new class extends Model {
-            protected $table = 'test';
-
-            protected $bazQuz {
-                get => $this->attributes['foo_bar'];
-                set {
-                    $this->attributes['foo_bar'] = $value;
-                }
-            }
-
-            protected function getBazQuzAttribute()
-            {
-                return 'invalid';
-            }
-
-            protected function setBazQuzAttribute()
-            {
-                return $this->attributes['foo_bar'] = 'invalid';
-            }
-
-            protected function bazQuz(): Attribute
-            {
-                return Attribute::make(fn () => 'invalid', fn() => ['foo_bar' => 'invalid']);
-            }
-        };
+        $model = new EloquentModelWithPrecedentPropertyHook();
 
         $model->baz_quz = 'valid';
 
