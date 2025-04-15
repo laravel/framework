@@ -755,7 +755,9 @@ trait HasAttributes
      */
     public function hasAnyGetMutator($key)
     {
-        return $this->hasGetMutator($key) || $this->hasAttributeGetMutator($key);
+        return $this->hasGetMutator($key)
+            || $this->hasPropertyHookGetter($key)
+            || $this->hasAttributeGetMutator($key);
     }
 
     /**
@@ -2540,9 +2542,7 @@ trait HasAttributes
             return [];
         }
 
-        $instance = is_object($class) ? $class : new $class;
-
-        return (new Collection((new ReflectionClass($instance))->getProperties()))
+        return (new Collection((new ReflectionClass($class))->getProperties()))
             ->filter->hasHook(PropertyHookType::Get)->map->name->values()->all();
     }
 }

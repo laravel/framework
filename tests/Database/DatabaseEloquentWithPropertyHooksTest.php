@@ -20,7 +20,7 @@ class DatabaseEloquentWithPropertyHooksTest extends TestCase
 
         if (PHP_VERSION_ID < 80400) {
             $this->markTestSkipped(
-                'Property Hooks are not available to test in PHP ' . PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION
+                'Property Hooks are not available to test in PHP '.PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION,
             );
         }
 
@@ -35,6 +35,8 @@ class DatabaseEloquentWithPropertyHooksTest extends TestCase
         $db->setAsGlobal();
 
         $this->createSchema();
+
+        Model::$snakeAttributes = true;
     }
 
     protected function createSchema()
@@ -156,7 +158,7 @@ class DatabaseEloquentWithPropertyHooksTest extends TestCase
         $this->assertSame('baz', $model->getAttributes()['foo_bar']);
     }
 
-    public function test_property_hook_get_is_appended_using_getters(): void
+    public function test_appends_property_hook_get(): void
     {
         $model = new EloquentModelWithAppendedPropertyHooks();
 
