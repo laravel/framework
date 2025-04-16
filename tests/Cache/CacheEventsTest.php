@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Cache;
 
 use Illuminate\Cache\ArrayStore;
 use Illuminate\Cache\Events\CacheFlushed;
+use Illuminate\Cache\Events\CacheFlushFailed;
 use Illuminate\Cache\Events\CacheFlushing;
 use Illuminate\Cache\Events\CacheHit;
 use Illuminate\Cache\Events\CacheMissed;
@@ -242,7 +243,7 @@ class CacheEventsTest extends TestCase
         $this->assertTrue($repository->clear());
     }
 
-    public function testFlushFailureDoesNotDispatchEvent()
+    public function testFlushFailureDoesDispatchEvent()
     {
         $dispatcher = $this->getDispatcher();
 
@@ -255,6 +256,12 @@ class CacheEventsTest extends TestCase
 
         $dispatcher->shouldReceive('dispatch')->once()->with(
             $this->assertEventMatches(CacheFlushing::class, [
+                'storeName' => 'array',
+            ])
+        );
+
+        $dispatcher->shouldReceive('dispatch')->once()->with(
+            $this->assertEventMatches(CacheFlushFailed::class, [
                 'storeName' => 'array',
             ])
         );
