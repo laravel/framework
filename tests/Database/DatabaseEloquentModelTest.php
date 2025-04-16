@@ -2195,6 +2195,57 @@ class DatabaseEloquentModelTest extends TestCase
         EloquentModelSaveStub::flushEventListeners();
     }
 
+    public function testNestedModelSaveShouldFireEventsEvenWhenOuterIsWithoutEvents()
+    {
+        $outer = new EloquentModelSaveStub;
+        $inner = new EloquentAnotherModelSaveStub;
+
+        $events = m::mock(Dispatcher::class);
+
+        // Stub listen calls so observer registration doesn't fail
+        $events->shouldReceive('listen')->atLeast()->once();
+        $events->shouldNotReceive('until');
+        $events->shouldNotReceive('dispatch');
+        $events->shouldReceive('forget');
+
+        // Now define what we *actually* care about
+        $events->shouldReceive('until')->once()->with('eloquent.saving: Illuminate\Tests\Database\EloquentAnotherModelSaveStub', $inner);
+        $events->shouldReceive('dispatch')->once()->with('eloquent.saved: Illuminate\Tests\Database\EloquentAnotherModelSaveStub', $inner);
+
+        // Set dispatcher and observer
+        EloquentModelSaveStub::setEventDispatcher($events, false);
+        EloquentModelSaveStub::observe(EloquentTestObserverStub::class);
+
+        EloquentAnotherModelSaveStub::setEventDispatcher($events, false);
+        EloquentModelSaveStub::observe(EloquentTestObserverStub::class);
+
+        EloquentModelSaveStub::withoutEvents(function () use ($outer, $inner) {
+            $outer->save(); // Should not fire events
+
+            $inner->save(); // Should fire events
+        });
+
+        EloquentModelSaveStub::flushEventListeners();
+        EloquentAnotherModelSaveStub::flushEventListeners();
+    }
+
+    public function testCorrectEventDispatcherReplacement()
+    {
+        $dispatcher = m::mock(Dispatcher::class);
+        $secondDispatcher = m::mock(Dispatcher::class);
+
+        EloquentModelSaveStub::setEventDispatcher($dispatcher, false);
+        EloquentAnotherModelSaveStub::setEventDispatcher($secondDispatcher, false);
+
+        EloquentModelSaveStub::withoutEvents(fn() => true);
+
+        $this->assertSame($dispatcher, EloquentModelSaveStub::getEventDispatcher());
+        $this->assertSame($secondDispatcher, EloquentAnotherModelSaveStub::getEventDispatcher());
+
+        EloquentModelSaveStub::unsetEventDispatcher();
+        EloquentModelStub::unsetEventDispatcher();
+    }
+
     public function testSetObservableEvents()
     {
         $class = new EloquentModelStub;
@@ -3430,6 +3481,11 @@ class EloquentModelSaveStub extends Model
 
         return $mock;
     }
+}
+
+class EloquentAnotherModelSaveStub extends EloquentModelSaveStub
+{
+    protected $table = 'another_save_stub';
 }
 
 class EloquentKeyTypeModelStub extends EloquentModelStub
