@@ -105,42 +105,6 @@ class DatabaseTransactionsTest extends DatabaseTestCase
         $this->assertTrue($secondObject->ran);
         $this->assertFalse($thirdObject->ran);
     }
-
-    public function testOnErrorCallbackIsCalled()
-    {
-        $executed = false;
-        try {
-            DB::transaction(function () {
-                throw new \Exception;
-            }, 1, function () use (&$executed) {
-                $executed = true;
-            });
-        } catch (\Throwable) {
-            // Ignore the exception
-        }
-
-        $this->assertTrue($executed);
-    }
-
-    public function testOnErrorCallbackIsCalledWithDeadlockRetry()
-    {
-        $executed = false;
-        $attempts = 0;
-
-        try {
-            DB::transaction(function () use (&$attempts) {
-                $attempts += 1;
-                throw new \Exception('has been chosen as the deadlock victim');
-            }, 3, function () use (&$executed) {
-                $executed = true;
-            });
-        } catch (\Throwable) {
-            // Ignore the exception
-        }
-
-        $this->assertSame(3, $attempts);
-        $this->assertTrue($executed);
-    }
 }
 
 class TestObjectForTransactions
