@@ -163,6 +163,27 @@ class DatabaseFailedJobProviderTest extends TestCase
         $this->assertSame(2, $this->provider->count('connection-2', 'queue-1'));
     }
 
+    public function testCanRetrieveFailedJobsByConnectionAndQueue()
+    {
+        $this->provider->log('email-conn', 'notifications', json_encode(['uuid' => (string) Str::uuid()]), new RuntimeException('Email error'));
+        $this->provider->log('email-conn', 'notifications', json_encode(['uuid' => (string) Str::uuid()]), new RuntimeException('Email error 2'));
+        $this->provider->log('email-conn', 'general', json_encode(['uuid' => (string) Str::uuid()]), new RuntimeException('Other error'));
+        $this->provider->log('sms-conn', 'notifications', json_encode(['uuid' => (string) Str::uuid()]), new RuntimeException('SMS error'));
+
+        $emailNotificationJobs = $this->failedJobsTable()
+            ->where('connection', 'email-conn')
+            ->where('queue', 'notifications')
+            ->get();
+
+        $this->assertCount(2, $emailNotificationJobs);
+
+        foreach ($emailNotificationJobs as $job) {
+            $this->assertEquals('email-conn', $job->connection);
+            $this->assertEquals('notifications', $job->queue);
+            $this->assertStringContainsString('Email error', $job->exception);
+        }
+    }
+
     protected function createSimpleDatabaseWithFailedJobTable()
     {
         $db = new DB;
