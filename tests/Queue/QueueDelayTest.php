@@ -41,6 +41,62 @@ class QueueDelayTest extends TestCase
 
         $this->assertEquals(0, $job->delay);
     }
+
+    public function test_queue_with_custom_delay()
+    {
+        Queue::fake();
+
+        $job = new TestJob;
+        $customDelay = 120;
+
+        dispatch($job->delay($customDelay));
+
+        $this->assertEquals($customDelay, $job->delay);
+    }
+
+    public function test_queue_with_zero_delay()
+    {
+        Queue::fake();
+
+        $job = new TestJob;
+
+        dispatch($job->delay(0));
+
+        $this->assertEquals(0, $job->delay);
+    }
+
+    public function test_queue_with_negative_delay()
+    {
+        Queue::fake();
+
+        $job = new TestJob;
+
+        dispatch($job->delay(-30));
+
+        $this->assertEquals(0, $job->delay);
+    }
+
+    public function test_chaining_multiple_delay_calls()
+    {
+        Queue::fake();
+
+        $job = new TestJob;
+
+        dispatch($job->delay(30)->delay(90));
+
+        $this->assertEquals(90, $job->delay);
+    }
+
+    public function test_delay_after_without_delay()
+    {
+        Queue::fake();
+
+        $job = new TestJob;
+
+        dispatch($job->withoutDelay()->delay(45));
+
+        $this->assertEquals(45, $job->delay);
+    }
 }
 
 class TestJob implements ShouldQueue
