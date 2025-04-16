@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Console\Enums;
+namespace Illuminate\Console\View;
 
 enum TaskResult: int
 {

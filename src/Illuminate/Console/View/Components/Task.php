@@ -2,7 +2,7 @@
 
 namespace Illuminate\Console\View\Components;
 
-use Illuminate\Console\Enums\TaskResult;
+use Illuminate\Console\View\TaskResult;
 use Illuminate\Support\InteractsWithTime;
 use Symfony\Component\Console\Output\OutputInterface;
 use Throwable;
