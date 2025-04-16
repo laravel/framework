@@ -1,6 +1,14 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.9.0...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.9.1...12.x)
+
+## [v12.9.1](https://github.com/laravel/framework/compare/v12.9.0...v12.9.1) - 2025-04-16
+
+* [12.x] Forward only passed arguments into Illuminate\Database\Eloquent\Collection::partition method by [@MarekVikartovsky](https://github.com/MarekVikartovsky) in https://github.com/laravel/framework/pull/55422
+* [12.x] Add test for complex context manipulation in Logger by [@roshandelpoor](https://github.com/roshandelpoor) in https://github.com/laravel/framework/pull/55423
+* [12.x] Remove unused var from `DumpCommand` by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/55431
+* [12.x] Fix the serve command sometimes fails to destructure the request pool array by [@tonysm](https://github.com/tonysm) in https://github.com/laravel/framework/pull/55427
+* [12.x] Changes to `package-lock.json` should trigger `npm run build` by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/55426
 
 ## [v12.9.0](https://github.com/laravel/framework/compare/v12.8.1...v12.9.0) - 2025-04-15
 
