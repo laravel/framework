@@ -1,6 +1,11 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.9.1...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.9.2...12.x)
+
+## [v12.9.2](https://github.com/laravel/framework/compare/v12.9.1...v12.9.2) - 2025-04-16
+
+* [12.x] Fixed a bug in using `illuminate/console` in external apps by [@andrey-helldar](https://github.com/andrey-helldar) in https://github.com/laravel/framework/pull/55430
+* Disable SQLServer 2017 CI as `ubuntu-20.24` has been removed by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/55425
 
 ## [v12.9.1](https://github.com/laravel/framework/compare/v12.9.0...v12.9.1) - 2025-04-16
 
