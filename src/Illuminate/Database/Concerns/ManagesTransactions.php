@@ -16,12 +16,11 @@ trait ManagesTransactions
      *
      * @param  (\Closure(static): TReturn)  $callback
      * @param  int  $attempts
-     * @param  Closure|null  $onFailure
      * @return TReturn
      *
      * @throws \Throwable
      */
-    public function transaction(Closure $callback, $attempts = 1, ?Closure $onFailure = null)
+    public function transaction(Closure $callback, $attempts = 1)
     {
         for ($currentAttempt = 1; $currentAttempt <= $attempts; $currentAttempt++) {
             $this->beginTransaction();
