@@ -420,6 +420,10 @@ trait HasEvents
      */
     public static function getEventDispatcher()
     {
+        if (array_key_exists(Model::class, static::$modelDispatchers)) {
+            return static::$modelDispatchers[Model::class];
+        }
+
         if (array_key_exists(static::class, static::$modelDispatchers)) {
             return static::$modelDispatchers[static::class];
         }

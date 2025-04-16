@@ -2229,6 +2229,46 @@ class DatabaseEloquentModelTest extends TestCase
         EloquentAnotherModelSaveStub::flushEventListeners();
     }
 
+    public function testWithoutEventsForAnyModel()
+    {
+        $outer = new EloquentModelSaveStub;
+        $inner = new EloquentAnotherModelSaveStub;
+
+        $events = m::mock(Dispatcher::class);
+
+        // Stub listen calls so observer registration doesn't fail
+        $events->shouldReceive('listen')->atLeast()->once();
+        $events->shouldNotReceive('until');
+        $events->shouldNotReceive('dispatch');
+        $events->shouldReceive('forget');
+
+        // Now define what we *actually* care about
+        $events->shouldNotReceive('until');
+        $events->shouldNotReceive('dispatch');
+
+        Model::setEventDispatcher($events);
+        EloquentModelSaveStub::setEventDispatcher($events, false);
+        EloquentAnotherModelSaveStub::setEventDispatcher($events, false);
+
+        // Set observers
+        EloquentModelSaveStub::observe(EloquentTestObserverStub::class);
+        EloquentAnotherModelSaveStub::observe(EloquentTestObserverStub::class);
+
+        Model::withoutEvents(function () use ($outer, $inner) {
+            $outer->save(); // Should not fire events
+
+            $inner->save(); // Should not fire events
+        });
+
+        Model::unsetEventDispatcher();
+        EloquentModelSaveStub::unsetEventDispatcher();
+        EloquentAnotherModelSaveStub::unsetEventDispatcher();
+
+        Model::flushEventListeners();
+        EloquentModelSaveStub::flushEventListeners();
+        EloquentAnotherModelSaveStub::flushEventListeners();
+    }
+
     public function testCorrectEventDispatcherReplacement()
     {
         $dispatcher = m::mock(Dispatcher::class);
