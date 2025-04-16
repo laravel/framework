@@ -24,6 +24,50 @@ class QueueExceptionTest extends TestCase
         $this->assertSame('App\\Jobs\\UnderlyingJob has been attempted too many times.', $e->getMessage());
         $this->assertSame($job, $e->job);
     }
+
+    public function test_timeout_exception_can_be_converted_to_string()
+    {
+        $e = TimeoutExceededException::forJob($job = new MyFakeRedisJob());
+
+        $this->assertIsString((string) $e);
+        $this->assertStringContainsString('timed out', (string) $e);
+    }
+
+    public function test_max_attempts_exception_can_be_converted_to_string()
+    {
+        $e = MaxAttemptsExceededException::forJob($job = new MyFakeRedisJob());
+
+        $this->assertIsString((string) $e);
+        $this->assertStringContainsString('attempted too many times', (string) $e);
+    }
+
+    public function test_exceptions_preserve_job_instance()
+    {
+        $job = new MyFakeRedisJob();
+
+        $timeoutException = TimeoutExceededException::forJob($job);
+        $maxAttemptsException = MaxAttemptsExceededException::forJob($job);
+
+        $this->assertSame($job, $timeoutException->job);
+        $this->assertSame($job, $maxAttemptsException->job);
+        $this->assertInstanceOf(RedisJob::class, $timeoutException->job);
+        $this->assertInstanceOf(RedisJob::class, $maxAttemptsException->job);
+    }
+
+    public function test_custom_job_name_resolution()
+    {
+        $job = new class extends MyFakeRedisJob
+        {
+            public function resolveName()
+            {
+                return 'Custom\\Job\\Name';
+            }
+        };
+
+        $e = TimeoutExceededException::forJob($job);
+
+        $this->assertStringContainsString('Custom\\Job\\Name', $e->getMessage());
+    }
 }
 
 class MyFakeRedisJob extends RedisJob
