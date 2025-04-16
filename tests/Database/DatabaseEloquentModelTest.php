@@ -2277,7 +2277,7 @@ class DatabaseEloquentModelTest extends TestCase
         EloquentModelSaveStub::setEventDispatcher($dispatcher, false);
         EloquentAnotherModelSaveStub::setEventDispatcher($secondDispatcher, false);
 
-        EloquentModelSaveStub::withoutEvents(fn() => true);
+        EloquentModelSaveStub::withoutEvents(fn () => true);
 
         $this->assertSame($dispatcher, EloquentModelSaveStub::getEventDispatcher());
         $this->assertSame($secondDispatcher, EloquentAnotherModelSaveStub::getEventDispatcher());
