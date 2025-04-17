@@ -62,6 +62,32 @@ class FluentRoutingTest extends TestCase
 
         $this->assertSame('Hello World', $this->get('public')->content());
     }
+
+    public function test_route_when_executes_callback_when_condition_is_true()
+    {
+        Route::when(true, function () {
+            Route::get('test-when-true', function () {
+                return 'success';
+            });
+        });
+
+        $this->assertSame('success', $this->get('test-when-true')->content());
+        $this->get('test-when-true')->assertStatus(200)->isOk();
+
+    }
+
+    public function test_route_when_does_not_execute_callback_when_condition_is_false()
+    {
+        Route::when(false, function () {
+            Route::get('test-when-false', function () {
+                return 'success';
+            });
+        });
+
+        $this->assertNotSame('success', $this->get('test-when-false')->content());
+        $this->get('test-when-false')->assertNotFound();
+
+    }
 }
 
 class Middleware

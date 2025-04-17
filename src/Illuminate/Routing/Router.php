@@ -472,6 +472,22 @@ class Router implements BindingRegistrar, RegistrarContract
     }
 
     /**
+     * Create a route with conditional Callback.
+     *
+     * @param bool $condition
+     * @param Closure $callback
+     * @return $this
+     */
+    public function when(bool $condition, Closure $callback)
+    {
+        if ($condition) {
+            $callback($this);
+        }
+
+        return $this;
+    }
+
+    /**
      * Update the group stack with the given attributes.
      *
      * @param  array  $attributes
