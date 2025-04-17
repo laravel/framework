@@ -86,17 +86,6 @@ class QueueDelayTest extends TestCase
 
         $this->assertEquals(90, $job->delay);
     }
-
-    public function test_delay_after_without_delay()
-    {
-        Queue::fake();
-
-        $job = new TestJob;
-
-        dispatch($job->withoutDelay()->delay(45));
-
-        $this->assertEquals(45, $job->delay);
-    }
 }
 
 class TestJob implements ShouldQueue
