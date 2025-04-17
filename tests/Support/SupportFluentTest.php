@@ -91,7 +91,7 @@ class SupportFluentTest extends TestCase
         $fluent->forget('posts');
         $fluent->forget('computer');
 
-        $this->assertTrue(empty($fluent->toArray()));
+        $this->assertEmpty($fluent->toArray());
     }
 
     public function testArrayAccessToAttributes()
