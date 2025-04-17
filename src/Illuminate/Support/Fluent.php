@@ -8,6 +8,7 @@ use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Traits\InteractsWithData;
 use Illuminate\Support\Traits\Macroable;
 use JsonSerializable;
+use Traversable;
 
 /**
  * @template TKey of array-key
@@ -36,7 +37,11 @@ class Fluent implements Arrayable, ArrayAccess, Jsonable, JsonSerializable
      */
     public function __construct($attributes = [])
     {
-        $this->fill($attributes);
+        if (! $attributes instanceof Traversable) {
+            $attributes = is_object($attributes) ? get_object_vars($attributes) : $attributes;
+        }
+
+        $this->attributes = is_array($attributes) ? $attributes : iterator_to_array($attributes);
     }
 
     /**
