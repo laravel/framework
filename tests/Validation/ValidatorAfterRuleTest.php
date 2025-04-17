@@ -9,17 +9,23 @@ use PHPUnit\Framework\TestCase;
 
 class ValidatorAfterRuleTest extends TestCase
 {
+    protected $validator;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->validator = new Validator(new Translator(new ArrayLoader, 'en'), [], []);
+    }
+
     public function testAfterAcceptsArrayOfRules()
     {
-        $validator = new Validator(new Translator(new ArrayLoader, 'en'), [], []);
-
-        $validator->after([
+        $this->validator->after([
             fn ($validator) => $validator->errors()->add('closure', 'true'),
             new InvokableAfterRule,
             new AfterMethodRule,
         ])->messages()->messages();
 
-        $this->assertSame($validator->messages()->messages(), [
+        $this->assertSame($this->validator->messages()->messages(), [
             'closure' => ['true'],
             'invokableAfterRule' => ['true'],
             'afterMethodRule' => ['true'],
