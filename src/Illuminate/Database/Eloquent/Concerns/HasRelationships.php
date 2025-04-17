@@ -1076,6 +1076,34 @@ trait HasRelationships
     }
 
     /**
+     * Determine if the given nested relations are loaded.
+     *
+     * @param  string  $relationPath
+     * @return bool
+     */
+    public function nestedRelationLoaded(string $relationPath): bool
+    {
+        [$relation, $childRelation] = array_replace(
+            [null, null],
+            explode('.', $relationPath, 2),
+        );
+
+        if (! $this->relationLoaded($relation)) {
+            return false;
+        }
+
+        if ($childRelation) {
+            foreach ($this->$relation as $related) {
+                if (! $related->nestedRelationLoaded($childRelation)) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Set the given relationship on the model.
      *
      * @param  string  $relation
