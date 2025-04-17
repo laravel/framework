@@ -193,7 +193,17 @@ class BladeCompiler extends Compiler implements CompilerInterface
                 $compiledPath = $this->getCompiledPath($this->getPath())
             );
 
-            $this->files->put($compiledPath, $contents);
+            if (! $this->files->exists($compiledPath)) {
+                $this->files->put($compiledPath, $contents);
+
+                return;
+            }
+
+            $contentHash = hash('sha256', $contents);
+            $compiledHash = $this->files->hash($compiledPath, 'sha256');
+            if ($compiledHash !== $contentHash) {
+                $this->files->put($compiledPath, $contents);
+            }
         }
     }
 
