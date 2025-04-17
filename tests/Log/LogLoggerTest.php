@@ -103,4 +103,21 @@ class LogLoggerTest extends TestCase
 
         $writer->listen($callback);
     }
+
+    public function testComplexContextManipulation()
+    {
+        $writer = new Logger($monolog = m::mock(Monolog::class));
+
+        $writer->withContext(['user_id' => 123, 'action' => 'login']);
+        $writer->withContext(['ip' => '127.0.0.1', 'timestamp' => '1986-10-29']);
+        $writer->withoutContext(['timestamp']);
+
+        $monolog->shouldReceive('info')->once()->with('User action', [
+            'user_id' => 123,
+            'action' => 'login',
+            'ip' => '127.0.0.1',
+        ]);
+
+        $writer->info('User action');
+    }
 }
