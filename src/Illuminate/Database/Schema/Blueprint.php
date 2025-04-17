@@ -1014,6 +1014,21 @@ class Blueprint
     }
 
     /**
+     * Create a new string (8-bit) column on the table.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Database\Schema\ForeignIdColumnDefinition
+     */
+    public function foreignString($column)
+    {
+        return $this->addColumnDefinition(new ForeignIdColumnDefinition($this, [
+            'type' => 'char',
+            'name' => $column,
+            'length' => Builder::$defaultStringLength,
+        ]));
+    }
+
+    /**
      * Create a foreign ID column for the given model.
      *
      * @param  \Illuminate\Database\Eloquent\Model|string  $model
