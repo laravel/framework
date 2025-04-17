@@ -19,7 +19,7 @@ use JsonSerializable;
  */
 class Fluent implements Arrayable, ArrayAccess, Jsonable, JsonSerializable
 {
-    use InteractsWithData, Conditionable,Macroable {
+    use InteractsWithData, Conditionable, Macroable {
         __call as macroCall;
     }
 
