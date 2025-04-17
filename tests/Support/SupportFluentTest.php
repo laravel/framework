@@ -123,6 +123,16 @@ class SupportFluentTest extends TestCase
         $this->assertEquals($array, $fluent->toArray());
     }
 
+    public function testIsEmptyAttribute()
+    {
+        $fluent = new Fluent(['name' => 'Michael', 'age' => 25]);
+
+        unset($fluent->name);
+        unset($fluent->age);
+
+        $this->assertTrue($fluent->isEmpty());
+    }
+
     public function testToJsonEncodesTheToArrayResult()
     {
         $fluent = $this->getMockBuilder(Fluent::class)->onlyMethods(['toArray'])->getMock();
