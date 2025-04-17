@@ -77,6 +77,23 @@ class SupportFluentTest extends TestCase
         $this->assertSame(['color' => 'silver'], $fluent->computer);
     }
 
+    public function testForgetMethod()
+    {
+        $fluent = new Fluent([
+            'name' => 'Michael',
+            'developer' => true,
+            'posts' => 25,
+            'computer' => ['color' => 'silver'],
+        ]);
+
+        $fluent->forget('name');
+        $fluent->forget('developer');
+        $fluent->forget('posts');
+        $fluent->forget('computer');
+
+        $this->assertTrue(empty($fluent->toArray()));
+    }
+
     public function testArrayAccessToAttributes()
     {
         $fluent = new Fluent(['attributes' => '1']);
