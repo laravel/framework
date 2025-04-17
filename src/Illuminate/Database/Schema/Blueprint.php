@@ -5,6 +5,7 @@ namespace Illuminate\Database\Schema;
 use Closure;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Grammars\Grammar;
 use Illuminate\Database\Schema\Grammars\MySqlGrammar;
@@ -1057,7 +1058,13 @@ class Blueprint
                 ->referencesModelColumn($model->getKeyName());
         }
 
-        return $this->foreignUuid($column)
+        if (in_array(HasUuids::class, $modelTraits, true)) {
+            return $this->foreignUuid($column)
+                ->table($model->getTable())
+                ->referencesModelColumn($model->getKeyName());
+        }
+
+        return $this->foreignString($column)
             ->table($model->getTable())
             ->referencesModelColumn($model->getKeyName());
     }
