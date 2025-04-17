@@ -109,17 +109,17 @@ class ComponentsTest extends TestCase
     {
         $output = new BufferedOutput();
 
-        with(new Components\Task($output))->render('My task', fn () => MigrationResult::Success);
+        with(new Components\Task($output))->render('My task', fn () => MigrationResult::Success->value);
         $result = $output->fetch();
         $this->assertStringContainsString('My task', $result);
         $this->assertStringContainsString('DONE', $result);
 
-        with(new Components\Task($output))->render('My task', fn () => MigrationResult::Failure);
+        with(new Components\Task($output))->render('My task', fn () => MigrationResult::Failure->value);
         $result = $output->fetch();
         $this->assertStringContainsString('My task', $result);
         $this->assertStringContainsString('FAIL', $result);
 
-        with(new Components\Task($output))->render('My task', fn () => MigrationResult::Skipped);
+        with(new Components\Task($output))->render('My task', fn () => MigrationResult::Skipped->value);
         $result = $output->fetch();
         $this->assertStringContainsString('My task', $result);
         $this->assertStringContainsString('SKIPPED', $result);
