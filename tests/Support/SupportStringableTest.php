@@ -1298,6 +1298,12 @@ class SupportStringableTest extends TestCase
         $this->assertSame('<strong>before</strong><br>after', (string) $this->stringable('<strong>before</strong><br>after')->stripTags('<br><strong>'));
     }
 
+    public function testSurround()
+    {
+        $this->assertSame('beforetextafter', (string) $this->stringable('text')->surround('before', 'after'));
+        $this->assertSame('before*text*after', (string) $this->stringable('text')->surround('before', 'after', '*'));
+    }
+
     public function testReplaceMatches()
     {
         $stringable = $this->stringable('Hello world!');

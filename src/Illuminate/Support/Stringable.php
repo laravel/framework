@@ -836,6 +836,19 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Surround the string with the given values.
+     *
+     * @param  string  $before
+     * @param  string  $after
+     * @param  string  $separator
+     * @return static
+     */
+    public function surround($before, $after, $separator = '')
+    {
+        return new static($before.$separator.$this->value.$separator.$after);
+    }
+
+    /**
      * Convert the given string to upper-case.
      *
      * @return static
