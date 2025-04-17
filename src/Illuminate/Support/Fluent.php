@@ -79,6 +79,19 @@ class Fluent implements Arrayable, ArrayAccess, Jsonable, JsonSerializable
     }
 
     /**
+     * Remove / unset the attribute on the fluent or object using "dot" notation.
+     *
+     * @param  string|array|int|null  $key
+     * @return $this
+     */
+    public function forget($key)
+    {
+        data_forget($this->attributes, $key);
+
+        return $this;
+    }
+
+    /**
      * Fill the fluent instance with an array of attributes.
      *
      * @param  iterable<TKey, TValue>  $attributes
