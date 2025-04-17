@@ -90,6 +90,24 @@ class ValidationRuleCanTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
+    public function testValidationWithNullableArguments()
+    {
+        $this->gate()->define('process-order', function ($user, $value, $additionalFlag = null) {
+            $this->assertEquals('123', $value);
+            $this->assertNull($additionalFlag);
+
+            return true;
+        });
+
+        $v = new Validator(
+            resolve('translator'),
+            ['order' => '123'],
+            ['order' => new Can('process-order', [null])]
+        );
+
+        $this->assertTrue($v->passes());
+    }
+
     /**
      * Get the Gate instance from the container.
      *
