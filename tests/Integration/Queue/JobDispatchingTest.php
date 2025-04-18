@@ -10,6 +10,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\Events\JobQueued;
 use Illuminate\Queue\Events\JobQueueing;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Config;
 use Orchestra\Testbench\Attributes\WithMigration;
 
@@ -163,6 +164,37 @@ class JobDispatchingTest extends QueueTestCase
         $this->assertNull($events[2]->queue);
         $this->assertInstanceOf(JobQueued::class, $events[3]);
         $this->assertNull($events[3]->queue);
+    }
+
+    public function testCanDisableDispatchingAfterResponse()
+    {
+        Job::dispatchAfterResponse('test');
+
+        $this->assertFalse(Job::$ran);
+
+        $this->app->terminate();
+
+        $this->assertTrue(Job::$ran);
+
+        Bus::disableDispatchingAfterResponse();
+
+        Job::$ran = false;
+        Job::dispatchAfterResponse('test');
+
+        $this->assertTrue(Job::$ran);
+
+        $this->app->terminate();
+
+        Bus::enableDispatchingAfterResponse();
+
+        Job::$ran = false;
+        Job::dispatchAfterResponse('test');
+
+        $this->assertFalse(Job::$ran);
+
+        $this->app->terminate();
+
+        $this->assertTrue(Job::$ran);
     }
 
     /**

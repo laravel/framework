@@ -52,6 +52,13 @@ class Dispatcher implements QueueingDispatcher
     protected $queueResolver;
 
     /**
+     * Indicates if dispatching after response is disabled.
+     *
+     * @var bool
+     */
+    protected $afterResponseDisabled = false;
+
+    /**
      * Create a new command dispatcher instance.
      *
      * @param  \Illuminate\Contracts\Container\Container  $container
@@ -252,9 +259,39 @@ class Dispatcher implements QueueingDispatcher
      */
     public function dispatchAfterResponse($command, $handler = null)
     {
+        if ($this->afterResponseDisabled) {
+            $this->dispatchSync($command);
+
+            return;
+        }
+
         $this->container->terminating(function () use ($command, $handler) {
             $this->dispatchSync($command, $handler);
         });
+    }
+
+    /**
+     * Disable dispatching after response.
+     *
+     * @return $this
+     */
+    public function disableDispatchingAfterResponse()
+    {
+        $this->afterResponseDisabled = true;
+
+        return $this;
+    }
+
+    /**
+     * Enable dispatching after response.
+     *
+     * @return $this
+     */
+    public function enableDispatchingAfterResponse()
+    {
+        $this->afterResponseDisabled = false;
+
+        return $this;
     }
 
     /**
