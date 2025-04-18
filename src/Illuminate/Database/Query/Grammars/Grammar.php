@@ -456,6 +456,24 @@ class Grammar extends BaseGrammar
     }
 
     /**
+     * Compile a "between" where clause for an arbitrary value.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereValueBetweenColumns(Builder $query, $where)
+    {
+        $between = $where['not'] ? 'not between' : 'between';
+
+        $min = $this->wrap(is_array($where['columns']) ? reset($where['columns']) : $where['columns'][0]);
+
+        $max = $this->wrap(is_array($where['columns']) ? end($where['columns']) : $where['columns'][1]);
+
+        return $this->parameter($where['value']).' '.$between.' '.$min.' and '.$max;
+    }
+
+    /**
      * Compile a "where date" clause.
      *
      * @param  \Illuminate\Database\Query\Builder  $query

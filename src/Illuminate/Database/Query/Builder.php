@@ -1409,6 +1409,25 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add a where between statement using columns to the query for an arbitrary value.
+     *
+     * @param  mixed  $value
+     * @param  string  $boolean
+     * @param  bool  $not
+     * @return $this
+     */
+    public function whereValueBetweenColumns($value, array $columns, $boolean = 'and', $not = false)
+    {
+        $type = 'valueBetweenColumns';
+
+        $this->wheres[] = compact('type', 'value', 'columns', 'boolean', 'not');
+
+        $this->addBinding($value,'where');
+
+        return $this;
+    }
+
+    /**
      * Add an or where between statement to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
@@ -1428,6 +1447,17 @@ class Builder implements BuilderContract
     public function orWhereBetweenColumns($column, array $values)
     {
         return $this->whereBetweenColumns($column, $values, 'or');
+    }
+
+    /**
+     * Add an or where between statement using columns to the query for an arbitrary value.
+     *
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function orWhereValueBetweenColumns($value, array $columns)
+    {
+        return $this->whereValueBetweenColumns($value, $columns, 'or');
     }
 
     /**
@@ -1455,6 +1485,18 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add a where not between statement using columns to the query for an arbitrary value.
+     *
+     * @param  mixed  $value
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereValueNotBetweenColumns($value, array $columns, $boolean = 'and')
+    {
+        return $this->whereValueBetweenColumns($value, $columns, $boolean, true);
+    }
+
+    /**
      * Add an or where not between statement to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
@@ -1474,6 +1516,17 @@ class Builder implements BuilderContract
     public function orWhereNotBetweenColumns($column, array $values)
     {
         return $this->whereNotBetweenColumns($column, $values, 'or');
+    }
+
+    /**
+     * Add an or where not between statement using columns to the query for an arbitrary value.
+     *
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function orWhereValueNotBetweenColumns($value, array $columns)
+    {
+        return $this->whereValueNotBetweenColumns($value, $columns, 'or');
     }
 
     /**

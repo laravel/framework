@@ -1189,6 +1189,78 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => 2], $builder->getBindings());
     }
 
+    public function testWhereValueBetweenColumns()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('brackets')->whereValueBetweenColumns(5, ['brackets.min_amount', 'brackets.max_amount']);
+        $this->assertSame('select * from "brackets" where ? between "brackets"."min_amount" and "brackets"."max_amount"', $builder->toSql());
+        $this->assertEquals([0 => 5], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('brackets')->whereValueBetweenColumns('id', ['min_amount', 'max_amount']);
+        $this->assertSame('select * from "brackets" where ? between "min_amount" and "max_amount"', $builder->toSql());
+        $this->assertEquals([0 => 5], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('brackets')->whereValueBetweenColumns(5, [new Raw(1), new Raw(2)]);
+        $this->assertSame('select * from "brackets" where ? between 1 and 2', $builder->toSql());
+        $this->assertEquals([0 => 5], $builder->getBindings());
+    }
+
+    public function testOrWhereValueBetweenColumns()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('brackets')->where('id', 2)->orWhereValueBetweenColumns(5, ['brackets.min_amount', 'brackets.max_amount']);
+        $this->assertSame('select * from "brackets" where "id" = ? or ? between "brackets"."min_amount" and "brackets"."max_amount"', $builder->toSql());
+        $this->assertEquals([0 => 2, 1 => 5], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('brackets')->where('id', 2)->orWhereValueBetweenColumns(5, ['min_amount', 'max_amount']);
+        $this->assertSame('select * from "brackets" where "id" = ? or ? between "min_amount" and "max_amount"', $builder->toSql());
+        $this->assertEquals([0 => 2, 1 => 5], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('brackets')->where('id', 2)->orWhereValueBetweenColumns(5, [new Raw(1), new Raw(2)]);
+        $this->assertSame('select * from "brackets" where "id" = ? or ? between 1 and 2', $builder->toSql());
+        $this->assertEquals([0 => 2, 1 => 5], $builder->getBindings());
+    }
+
+    public function testWhereValueNotBetweenColumns()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('brackets')->whereValueNotBetweenColumns(5, ['brackets.min_amount', 'brackets.max_amount']);
+        $this->assertSame('select * from "brackets" where ? not between "brackets"."min_amount" and "brackets"."max_amount"', $builder->toSql());
+        $this->assertEquals([0 => 5], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('brackets')->whereValueNotBetweenColumns('id', ['min_amount', 'max_amount']);
+        $this->assertSame('select * from "brackets" where ? not between "min_amount" and "max_amount"', $builder->toSql());
+        $this->assertEquals([0 => 5], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('brackets')->whereValueNotBetweenColumns(5, [new Raw(1), new Raw(2)]);
+        $this->assertSame('select * from "brackets" where ? not between 1 and 2', $builder->toSql());
+        $this->assertEquals([0 => 5], $builder->getBindings());
+    }
+
+    public function testOrWhereValueNotBetweenColumns()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('brackets')->where('id', 2)->orWhereValueNotBetweenColumns(5, ['brackets.min_amount', 'brackets.max_amount']);
+        $this->assertSame('select * from "brackets" where "id" = ? or ? not between "brackets"."min_amount" and "brackets"."max_amount"', $builder->toSql());
+        $this->assertEquals([0 => 2, 1 => 5], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('brackets')->where('id', 2)->orWhereValueNotBetweenColumns(5, ['min_amount', 'max_amount']);
+        $this->assertSame('select * from "brackets" where "id" = ? or ? not between "min_amount" and "max_amount"', $builder->toSql());
+        $this->assertEquals([0 => 2, 1 => 5], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('brackets')->where('id', 2)->orWhereValueNotBetweenColumns(5, [new Raw(1), new Raw(2)]);
+        $this->assertSame('select * from "brackets" where "id" = ? or ? not between 1 and 2', $builder->toSql());
+        $this->assertEquals([0 => 2, 1 => 5], $builder->getBindings());
+    }
+
     public function testBasicOrWheres()
     {
         $builder = $this->getBuilder();
