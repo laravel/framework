@@ -14,7 +14,7 @@ trait CompilesUseStatements
     {
         $expression = preg_replace('/[()]/', '', $expression);
 
-        // Preserve grouped imports as-is.
+        // Preserve grouped imports as-is...
         if (str_contains($expression, '{')) {
             $use = ltrim(trim($expression, " '\""), '\\');
 
