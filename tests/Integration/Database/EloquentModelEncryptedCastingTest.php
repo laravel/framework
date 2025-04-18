@@ -249,7 +249,7 @@ class EloquentModelEncryptedCastingTest extends DatabaseTestCase
 
         $subject = new EncryptedCast;
 
-        $subject->mergeCasts(['secret_collection' => AsEncryptedCollection::map(Fluent::class)]);
+        $subject->mergeCasts(['secret_collection' => AsEncryptedCollection::of(Fluent::class)]);
 
         $subject->secret_collection = new Collection([new Fluent(['key1' => 'value1'])]);
         $subject->secret_collection->push(new Fluent(['key2' => 'value2']));

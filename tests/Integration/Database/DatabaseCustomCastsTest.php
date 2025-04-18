@@ -158,7 +158,7 @@ class DatabaseCustomCastsTest extends DatabaseTestCase
     {
         $model = new TestEloquentModelWithCustomCasts();
         $model->mergeCasts([
-            'collection' => AsCollection::map(Fluent::class),
+            'collection' => AsCollection::of(Fluent::class),
         ]);
 
         $model->setRawAttributes([
@@ -189,7 +189,7 @@ class DatabaseCustomCastsTest extends DatabaseTestCase
     {
         $model = new TestEloquentModelWithCustomCasts();
         $model->mergeCasts([
-            'collection' => AsCollection::map([FluentWithCallback::class, 'make']),
+            'collection' => AsCollection::of([FluentWithCallback::class, 'make']),
         ]);
 
         $model->setRawAttributes([

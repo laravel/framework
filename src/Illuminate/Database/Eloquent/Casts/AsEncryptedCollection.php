@@ -40,11 +40,7 @@ class AsEncryptedCollection implements Castable
 
                 $instance = new $collectionClass(Json::decode(Crypt::decryptString($attributes[$key])));
 
-                if (! $this->arguments[1]) {
-                    return $instance;
-                }
-
-                if (! $this->arguments[1]) {
+                if (! isset($this->arguments[1]) || ! $this->arguments[1]) {
                     return $instance;
                 }
 
@@ -69,6 +65,17 @@ class AsEncryptedCollection implements Castable
     }
 
     /**
+     * Specify the type of object each item in the collection should be mapped to.
+     *
+     * @param  array{class-string, string}|class-string  $map
+     * @return string
+     */
+    public static function of($map)
+    {
+        return static::using('', $map);
+    }
+
+    /**
      * Specify the collection for the cast.
      *
      * @param  class-string  $class
@@ -82,16 +89,5 @@ class AsEncryptedCollection implements Castable
         }
 
         return static::class.':'.implode(',', [$class, $map]);
-    }
-
-    /**
-     * Specify the callback to map each item.
-     *
-     * @param  array{class-string, string}|class-string  $map
-     * @return string
-     */
-    public static function map($map)
-    {
-        return static::using('', $map);
     }
 }
