@@ -47,4 +47,26 @@ class BladeUseTest extends AbstractBladeTestCase
         $string = "Foo @use(\SomeNamespace\SomeClass, Foo) bar";
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
+
+    public function testUseStatementsWithBracesAreCompiledCorrectly()
+    {
+        $expected = "Foo <?php use \SomeNamespace\{Foo, Bar}; ?> bar";
+
+        $string = "Foo @use('SomeNamespace\{Foo, Bar}') bar";
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+
+        $string = "Foo @use(SomeNamespace\{Foo, Bar}) bar";
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
+
+    public function testUseStatementWithBracesAndBackslashAreCompiledCorrectly()
+    {
+        $expected = "Foo <?php use \SomeNamespace\{Foo, Bar}; ?> bar";
+
+        $string = "Foo @use('\SomeNamespace\{Foo, Bar}') bar";
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+
+        $string = "Foo @use(\SomeNamespace\{Foo, Bar}) bar";
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
 }
