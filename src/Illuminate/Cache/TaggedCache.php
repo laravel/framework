@@ -2,6 +2,8 @@
 
 namespace Illuminate\Cache;
 
+use Illuminate\Cache\Events\CacheFlushed;
+use Illuminate\Cache\Events\CacheFlushing;
 use Illuminate\Contracts\Cache\Store;
 
 class TaggedCache extends Repository
@@ -77,7 +79,11 @@ class TaggedCache extends Repository
      */
     public function flush()
     {
+        $this->event(new CacheFlushing($this->getName()));
+
         $this->tags->reset();
+
+        $this->event(new CacheFlushed($this->getName()));
 
         return true;
     }
@@ -104,7 +110,7 @@ class TaggedCache extends Repository
     /**
      * Fire an event for this cache instance.
      *
-     * @param  \Illuminate\Cache\Events\CacheEvent  $event
+     * @param  object  $event
      * @return void
      */
     protected function event($event)
