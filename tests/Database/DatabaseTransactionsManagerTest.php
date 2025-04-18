@@ -177,6 +177,96 @@ class DatabaseTransactionsManagerTest extends TestCase
         $this->assertEquals(['default', 1], $callbacks[0]);
     }
 
+    public function testCallbacksForRollbackAreAddedToTheCurrentTransaction()
+    {
+        $callbacks = [];
+
+        $manager = (new DatabaseTransactionsManager);
+
+        $manager->begin('default', 1);
+
+        $manager->addCallbackForRollback(function () use (&$callbacks) {
+        });
+
+        $manager->begin('default', 2);
+
+        $manager->begin('admin', 1);
+
+        $manager->addCallbackForRollback(function () use (&$callbacks) {
+        });
+
+        $this->assertCount(1, $manager->getPendingTransactions()[0]->getCallbacksForRollback());
+        $this->assertCount(0, $manager->getPendingTransactions()[1]->getCallbacksForRollback());
+        $this->assertCount(1, $manager->getPendingTransactions()[2]->getCallbacksForRollback());
+    }
+
+    public function testRollbackTransactionsExecutesCallbacks()
+    {
+        $callbacks = [];
+
+        $manager = (new DatabaseTransactionsManager);
+
+        $manager->begin('default', 1);
+
+        $manager->addCallbackForRollback(function () use (&$callbacks) {
+            $callbacks[] = ['default', 1];
+        });
+
+        $manager->begin('default', 2);
+
+        $manager->addCallbackForRollback(function () use (&$callbacks) {
+            $callbacks[] = ['default', 2];
+        });
+
+        $manager->begin('admin', 1);
+
+        $manager->rollback('default', 1);
+        $manager->rollback('default', 0);
+
+        $this->assertCount(2, $callbacks);
+        $this->assertEquals(['default', 2], $callbacks[0]);
+        $this->assertEquals(['default', 1], $callbacks[1]);
+    }
+
+    public function testRollbackExecutesOnlyCallbacksOfTheConnection()
+    {
+        $callbacks = [];
+
+        $manager = (new DatabaseTransactionsManager);
+
+        $manager->begin('default', 1);
+
+        $manager->addCallbackForRollback(function () use (&$callbacks) {
+            $callbacks[] = ['default', 1];
+        });
+
+        $manager->begin('default', 2);
+        $manager->begin('admin', 1);
+
+        $manager->addCallbackForRollback(function () use (&$callbacks) {
+            $callbacks[] = ['admin', 1];
+        });
+
+        $manager->rollback('default', 1);
+        $manager->rollback('default', 0);
+
+        $this->assertCount(1, $callbacks);
+        $this->assertEquals(['default', 1], $callbacks[0]);
+    }
+
+    public function testCallbackForRollbackIsNotExecutedIfNoTransactions()
+    {
+        $callbacks = [];
+
+        $manager = (new DatabaseTransactionsManager);
+
+        $manager->addCallbackForRollback(function () use (&$callbacks) {
+            $callbacks[] = ['default', 1];
+        });
+
+        $this->assertCount(0, $callbacks);
+    }
+
     public function testStageTransactions()
     {
         $manager = (new DatabaseTransactionsManager);
