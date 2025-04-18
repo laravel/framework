@@ -1070,9 +1070,26 @@ trait HasRelationships
      * @param  string  $key
      * @return bool
      */
-    public function relationLoaded($key)
+    public function relationLoaded(string $key): bool
     {
-        return array_key_exists($key, $this->relations);
+        [$relation, $childRelation] = array_replace(
+            [null, null],
+            explode('.', $key, 2),
+        );
+
+        if (! array_key_exists($relation, $this->relations)) {
+            return false;
+        }
+
+        if ($childRelation) {
+            foreach ($this->$relation as $related) {
+                if (! $related->relationLoaded($childRelation)) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     /**
