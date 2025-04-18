@@ -740,6 +740,22 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertSame(1, FactoryTestUser::count());
     }
 
+    public function test_has_method_recycles_models()
+    {
+        Factory::guessFactoryNamesUsing(function ($model) {
+            return $model.'Factory';
+        });
+
+        $roles = FactoryTestRoleFactory::new()->count(2)->create();
+        $user = FactoryTestUserFactory::new()
+            ->recycle($roles)
+            ->hasRoles(2)
+            ->create();
+
+        $this->assertTrue($roles->pluck('id')->contains($user->roles[0]->id));
+        $this->assertTrue($roles->pluck('id')->contains($user->roles[1]->id));
+    }
+
     public function test_has_method_does_not_reassign_the_parent()
     {
         Factory::guessFactoryNamesUsing(function ($model) {
