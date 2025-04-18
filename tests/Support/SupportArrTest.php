@@ -1601,4 +1601,84 @@ class SupportArrTest extends TestCase
 
         $this->assertEquals([[0 => 'John', 1 => 'Jane'], [2 => 'Greg']], $result);
     }
+
+    public function testGroupBy()
+    {
+        $products = [
+            [
+                'id' => 1,
+                'type' => 'Electronics',
+                'name' => 'Laptop',
+            ],
+            [
+                'id' => 2,
+                'type' => 'Clothing',
+                'name' => 'T-shirt',
+            ],
+            [
+                'id' => 3,
+                'type' => 'Electronics',
+                'name' => 'Smartphone',
+            ],
+        ];
+
+        // Basic grouping
+        $grouped = Arr::groupBy($products, 'type');
+
+        $this->assertEquals([
+            'Electronics' => [
+                [
+                    'id' => 1,
+                    'type' => 'Electronics',
+                    'name' => 'Laptop',
+                ],
+                [
+                    'id' => 3,
+                    'type' => 'Electronics',
+                    'name' => 'Smartphone',
+                ],
+            ],
+            'Clothing' => [
+                [
+                    'id' => 2,
+                    'type' => 'Clothing',
+                    'name' => 'T-shirt',
+                ],
+            ],
+        ], $grouped);
+
+        // With preserved keys
+        $grouped = Arr::groupBy($products, 'type', true);
+
+        $this->assertEquals([
+            'Electronics' => [
+                0 => [
+                    'id' => 1,
+                    'type' => 'Electronics',
+                    'name' => 'Laptop',
+                ],
+                2 => [
+                    'id' => 3,
+                    'type' => 'Electronics',
+                    'name' => 'Smartphone',
+                ],
+            ],
+            'Clothing' => [
+                1 => [
+                    'id' => 2,
+                    'type' => 'Clothing',
+                    'name' => 'T-shirt',
+                ],
+            ],
+        ], $grouped);
+
+        // With callback
+        $grouped = Arr::groupBy($products, function ($item) {
+            return strtolower($item['type']);
+        });
+
+        $this->assertArrayHasKey('electronics', $grouped);
+
+        $this->assertArrayHasKey('clothing', $grouped);
+    }
 }

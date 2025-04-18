@@ -1021,4 +1021,29 @@ class Arr
 
         return is_array($value) ? $value : [$value];
     }
+
+    /**
+     * Group an associative array by a key or callback.
+     *
+     * @param  array  $array
+     * @param  string|int|callable  $groupBy
+     * @param  bool  $preserveKeys
+     * @return array
+     */
+    public static function groupBy($array, $groupBy, $preserveKeys = false)
+    {
+        $result = [];
+
+        foreach ($array as $key => $item) {
+            $groupKey = is_callable($groupBy) ? $groupBy($item, $key) : static::get($item, $groupBy);
+
+            if ($preserveKeys) {
+                $result[$groupKey][$key] = $item;
+            } else {
+                $result[$groupKey][] = $item;
+            }
+        }
+
+        return $result;
+    }
 }
