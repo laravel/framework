@@ -250,6 +250,13 @@ class Builder implements BuilderContract
     public $useWritePdo = false;
 
     /**
+     * The custom arguments for the PDOStatement::fetchAll / fetch functions.
+     *
+     * @var array
+     */
+    public array $fetchUsing = [];
+
+    /**
      * Create a new query builder instance.
      */
     public function __construct(
@@ -3088,9 +3095,13 @@ class Builder implements BuilderContract
      */
     public function get($columns = ['*'])
     {
-        $items = new Collection($this->onceWithColumns(Arr::wrap($columns), function () {
-            return $this->processor->processSelect($this, $this->runSelect());
-        }));
+        $original = $this->columns;
+
+        $this->columns ??= Arr::wrap($columns);
+
+        $items = new Collection($this->processor->processSelect($this, $this->runSelect()));
+
+        $this->columns = $original;
 
         return $this->applyAfterQueryCallbacks(
             isset($this->groupLimit) ? $this->withoutGroupLimitKeys($items) : $items
@@ -3105,7 +3116,7 @@ class Builder implements BuilderContract
     protected function runSelect()
     {
         return $this->connection->select(
-            $this->toSql(), $this->getBindings(), ! $this->useWritePdo
+            $this->toSql(), $this->getBindings(), ! $this->useWritePdo, $this->fetchUsing
         );
     }
 
@@ -3324,7 +3335,7 @@ class Builder implements BuilderContract
 
         return (new LazyCollection(function () {
             yield from $this->connection->cursor(
-                $this->toSql(), $this->getBindings(), ! $this->useWritePdo
+                $this->toSql(), $this->getBindings(), ! $this->useWritePdo, $this->fetchUsing
             );
         }))->map(function ($item) {
             return $this->applyAfterQueryCallbacks(new Collection([$item]))->first();
@@ -3658,30 +3669,6 @@ class Builder implements BuilderContract
         }
 
         return $this;
-    }
-
-    /**
-     * Execute the given callback while selecting the given columns.
-     *
-     * After running the callback, the columns are reset to the original value.
-     *
-     * @param  array  $columns
-     * @param  callable  $callback
-     * @return mixed
-     */
-    protected function onceWithColumns($columns, $callback)
-    {
-        $original = $this->columns;
-
-        if (is_null($original)) {
-            $this->columns = $columns;
-        }
-
-        $result = $callback();
-
-        $this->columns = $original;
-
-        return $result;
     }
 
     /**
@@ -4293,6 +4280,19 @@ class Builder implements BuilderContract
     public function useWritePdo()
     {
         $this->useWritePdo = true;
+
+        return $this;
+    }
+
+    /**
+     * Specify arguments for the PDOStatement::fetchAll / fetch functions.
+     *
+     * @param  mixed  ...$fetchUsing
+     * @return $this
+     */
+    public function fetchUsing(...$fetchUsing)
+    {
+        $this->fetchUsing = $fetchUsing;
 
         return $this;
     }
