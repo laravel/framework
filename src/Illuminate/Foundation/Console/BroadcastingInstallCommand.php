@@ -54,31 +54,71 @@ class BroadcastingInstallCommand extends Command
         $this->uncommentChannelsRoutesFile();
         $this->enableBroadcastServiceProvider();
 
-        // Install bootstrapping...
-        if (! file_exists($echoScriptPath = $this->laravel->resourcePath('js/echo.js'))) {
-            if (! is_dir($directory = $this->laravel->resourcePath('js'))) {
-                mkdir($directory, 0755, true);
+        // We have a specific echo version for React and Vue with Typescript,
+        // so check if this app contains React or Vue with Typescript
+        if ($this->appContainsReactWithTypescript() || $this->appContainsVueWithTypescript()) {
+            // If this is a React/Vue app with typescript, inject the Echo configuration in the app.tsx or app.ts file
+            $this->injectEchoConfigurationInApp();
+        } else {
+            // Standard JavaScript implementation
+            if (! file_exists($echoScriptPath = $this->laravel->resourcePath('js/echo.js'))) {
+                if (! is_dir($directory = $this->laravel->resourcePath('js'))) {
+                    mkdir($directory, 0755, true);
+                }
+
+                copy(__DIR__.'/stubs/echo-js.stub', $echoScriptPath);
             }
 
-            copy(__DIR__.'/stubs/echo-js.stub', $echoScriptPath);
-        }
-
-        if (file_exists($bootstrapScriptPath = $this->laravel->resourcePath('js/bootstrap.js'))) {
-            $bootstrapScript = file_get_contents(
-                $bootstrapScriptPath
-            );
-
-            if (! str_contains($bootstrapScript, './echo')) {
-                file_put_contents(
-                    $bootstrapScriptPath,
-                    trim($bootstrapScript.PHP_EOL.file_get_contents(__DIR__.'/stubs/echo-bootstrap-js.stub')).PHP_EOL,
+            // Only add the bootstrap import for the standard JS implementation
+            if (file_exists($bootstrapScriptPath = $this->laravel->resourcePath('js/bootstrap.js'))) {
+                $bootstrapScript = file_get_contents(
+                    $bootstrapScriptPath
                 );
+
+                if (! str_contains($bootstrapScript, './echo')) {
+                    file_put_contents(
+                        $bootstrapScriptPath,
+                        trim($bootstrapScript.PHP_EOL.file_get_contents(__DIR__.'/stubs/echo-bootstrap-js.stub')).PHP_EOL,
+                    );
+                }
             }
         }
 
         $this->installReverb();
 
         $this->installNodeDependencies();
+    }
+
+    /**
+     * Detect if the user is using React with TypeScript
+     *
+     * @return bool
+     */
+    protected function appContainsReactWithTypescript(): bool
+    {
+        $packageJsonPath = $this->laravel->basePath('package.json');
+        if (!file_exists($packageJsonPath)) {
+            return false;
+        }
+        $packageJson = json_decode(file_get_contents($packageJsonPath), true);
+        return isset($packageJson['dependencies']['react']) && 
+               isset($packageJson['dependencies']['typescript']);
+    }
+
+    /**
+     * Detect if the user is using Vue with TypeScript
+     *
+     * @return bool
+     */
+    protected function appContainsVueWithTypescript(): bool
+    {
+        $packageJsonPath = $this->laravel->basePath('package.json');
+        if (!file_exists($packageJsonPath)) {
+            return false;
+        }
+        $packageJson = json_decode(file_get_contents($packageJsonPath), true);
+        return isset($packageJson['dependencies']['vue']) && 
+               isset($packageJson['dependencies']['typescript']);
     }
 
     /**
@@ -133,6 +173,70 @@ class BroadcastingInstallCommand extends Command
             );
         }
     }
+
+    /**
+     * Inject Echo configuration into the application's main file.
+     *
+     * @return void
+     */
+    protected function injectEchoConfigurationInApp()
+    {
+        // Detect which stack we are using and set appropriate configuration
+        if ($this->appContainsVueWithTypescript()) {
+            $filePath = resource_path('js/app.ts');
+            $importPath = 'laravel-echo/vue';
+            $fileExtension = 'ts';
+        } else {
+            // Default to React
+            $filePath = resource_path('js/app.tsx');
+            $importPath = 'laravel-echo/react';
+            $fileExtension = 'tsx';
+        }
+        
+        // Check if file exists
+        if (!file_exists($filePath)) {
+            $this->components->warn("Could not find {$filePath}. Echo configuration not added.");
+            return;
+        }
+        
+        $contents = file_get_contents($filePath);
+
+        // Prepare Echo configuration code
+        $echoCode = <<<JS
+        import { configureEcho } from '{$importPath}';
+
+        configureEcho({
+            broadcaster: 'reverb',
+            key: import.meta.env.VITE_REVERB_APP_KEY,
+            wsHost: import.meta.env.VITE_REVERB_HOST,
+            wsPort: import.meta.env.VITE_REVERB_PORT ?? 80,
+            wssPort: import.meta.env.VITE_REVERB_PORT ?? 443,
+            forceTLS: (import.meta.env.VITE_REVERB_SCHEME ?? 'https') === 'https',
+            enabledTransports: ['ws', 'wss'],
+        });
+        JS;
+
+        // Find all imports
+        preg_match_all('/^import .+;$/m', $contents, $matches);
+
+        // Add Echo configuration after the last import
+        if (!empty($matches[0])) {
+            $lastImport = end($matches[0]);
+            $pos = strrpos($contents, $lastImport);
+            if ($pos !== false) {
+                $insertPos = $pos + strlen($lastImport);
+                $newContents = substr($contents, 0, $insertPos) . "\n" . $echoCode . substr($contents, $insertPos);
+                file_put_contents($filePath, $newContents);
+                $this->components->info("Echo configuration added to app.{$fileExtension}.");
+            }
+        } else {
+            // Add the Echo configuration to the top of the file if no import statements are found
+            $newContents = $echoCode . "\n" . $contents;
+            file_put_contents($filePath, $newContents);
+            $this->components->info("Echo configuration added to the top of app.{$fileExtension}.");
+        }
+    }
+    
 
     /**
      * Install Laravel Reverb into the application if desired.
