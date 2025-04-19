@@ -194,6 +194,8 @@ trait MakesHttpRequests
             return $this;
         }
 
+        unset($this->app['middleware.disable']);
+
         foreach ((array) $middleware as $abstract) {
             $this->app->instance($abstract, new class
             {
