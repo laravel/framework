@@ -1422,7 +1422,7 @@ class Builder implements BuilderContract
 
         $this->wheres[] = compact('type', 'value', 'columns', 'boolean', 'not');
 
-        $this->addBinding($value,'where');
+        $this->addBinding($value, 'where');
 
         return $this;
     }
