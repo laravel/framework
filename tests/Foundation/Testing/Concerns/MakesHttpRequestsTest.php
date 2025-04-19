@@ -132,6 +132,18 @@ class MakesHttpRequestsTest extends TestCase
         );
     }
 
+    public function testWithoutThenWithoutMiddlewareWithParameter()
+    {
+        $this->assertFalse($this->app->has('middleware.disable'));
+
+        $this->withoutMiddleware();
+        $this->assertTrue($this->app->has('middleware.disable'));
+        $this->assertTrue($this->app->make('middleware.disable'));
+
+        $this->withoutMiddleware(MyMiddleware::class);
+        $this->assertFalse($this->app->has('middleware.disable'));
+    }
+
     public function testWithCookieSetCookie()
     {
         $this->withCookie('foo', 'bar');
