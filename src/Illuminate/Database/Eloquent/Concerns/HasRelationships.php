@@ -1072,6 +1072,10 @@ trait HasRelationships
      */
     public function relationLoaded($key)
     {
+        if (array_key_exists($key, $this->relations)) {
+            return true;
+        }
+
         [$relation, $nestedRelation] = array_replace(
             [null, null],
             explode('.', $key, 2),
