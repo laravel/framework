@@ -1070,7 +1070,7 @@ trait HasRelationships
      * @param  string  $key
      * @return bool
      */
-    public function relationLoaded(string $key): bool
+    public function relationLoaded($key)
     {
         [$relation, $childRelation] = array_replace(
             [null, null],
