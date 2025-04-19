@@ -7,6 +7,8 @@ use ArrayAccess;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use Random\Randomizer;
+use Carbon\Carbon;
+use Carbon\Exceptions\InvalidFormatException;
 
 class Arr
 {
@@ -425,6 +427,46 @@ class Arr
         }
 
         return false;
+    }
+
+    /**
+     * Get a Carbon instance from an array using "dot" notation.
+     * 
+     * It will return null values when dates cannot be parsed or keys don't exist.
+     *
+     * @param  \ArrayAccess|array  $array
+     * @param  string|int|null  $key
+     * @param  ?Carbon $default
+     * 
+     * @return Carbon|null
+     */
+    public static function date($array, $key, $default = null): Carbon|null|array
+    {
+        $value = static::get($array, $key, $default);
+
+        if (is_array($value)) { 
+            return array_map(function ($segment) {
+                try {
+                    return Carbon::parse($segment);
+                } catch (InvalidFormatException) {
+                    return null;
+                }
+            }, $value);
+        }
+
+        if (is_null($value)) { 
+            return null;
+        }
+
+        if ($value instanceof Carbon) {
+            return $value;
+        }
+
+        try {
+            return Carbon::parse($value);
+        } catch (InvalidFormatException) {
+            return null;
+        }
     }
 
     /**
