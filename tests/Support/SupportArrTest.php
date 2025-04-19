@@ -3,9 +3,9 @@
 namespace Illuminate\Tests\Support;
 
 use ArrayObject;
-use Illuminate\Support\Carbon;
 use Carbon\Carbon as BaseCarbon;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\ItemNotFoundException;
 use Illuminate\Support\MultipleItemsFoundException;
@@ -610,7 +610,6 @@ class SupportArrTest extends TestCase
       $this->assertInstanceOf(BaseCarbon::class, Arr::date($array, 'date'));
       $this->assertEquals('2018-09-01 00:00:00.000000', Arr::date($array, 'date')->format('Y-m-d H:i:s.u'));
 
-
       $array = Arr::date(['2018-09-01 00:00:00', '2018-09-02 00:00:00', '2222-22-22 99:99:99'], null);
       $this->assertInstanceOf(BaseCarbon::class, $array[0]);
       $this->assertEquals('2018-09-01 00:00:00.000000', $array[0]->format('Y-m-d H:i:s.u'));
@@ -618,15 +617,15 @@ class SupportArrTest extends TestCase
       $this->assertEquals('2018-09-02 00:00:00.000000', $array[1]->format('Y-m-d H:i:s.u'));
       $this->assertNull($array[2]);
 
-      $array = []; 
+      $array = [];
       $this->assertNull(Arr::date($array, 'date', null));
 
       $this->assertEquals(
-        '2018-09-01 00:00:00.000000', 
+        '2018-09-01 00:00:00.000000',
         Arr::date($array, 'date', now())->format('Y-m-d H:i:s.u')
       );
 
-      $array = ['date' => '2222-22-22']; 
+      $array = ['date' => '2222-22-22'];
       $this->assertNull(Arr::date($array, 'date', null));
 
       Carbon::setTestNow();
