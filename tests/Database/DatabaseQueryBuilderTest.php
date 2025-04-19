@@ -1197,7 +1197,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => 5], $builder->getBindings());
 
         $builder = $this->getBuilder();
-        $builder->select('*')->from('brackets')->whereValueBetweenColumns('id', ['min_amount', 'max_amount']);
+        $builder->select('*')->from('brackets')->whereValueBetweenColumns(5, ['min_amount', 'max_amount']);
         $this->assertSame('select * from "brackets" where ? between "min_amount" and "max_amount"', $builder->toSql());
         $this->assertEquals([0 => 5], $builder->getBindings());
 
@@ -1233,7 +1233,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => 5], $builder->getBindings());
 
         $builder = $this->getBuilder();
-        $builder->select('*')->from('brackets')->whereValueNotBetweenColumns('id', ['min_amount', 'max_amount']);
+        $builder->select('*')->from('brackets')->whereValueNotBetweenColumns(5, ['min_amount', 'max_amount']);
         $this->assertSame('select * from "brackets" where ? not between "min_amount" and "max_amount"', $builder->toSql());
         $this->assertEquals([0 => 5], $builder->getBindings());
 
