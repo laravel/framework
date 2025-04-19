@@ -2179,7 +2179,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Get the number of models to return per page.
      *
-     * @param int|null $total
+     * @param  int|null  $total
      * @return int
      */
     public function getPerPage($total = null)
