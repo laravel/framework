@@ -252,12 +252,12 @@ class Kernel implements KernelContract
                 continue;
             }
 
-            [$name] = $this->parseMiddleware($middleware);
+            [$name, $parameters] = $this->parseMiddleware($middleware);
 
             $instance = $this->app->make($name);
 
             if (method_exists($instance, 'terminate')) {
-                $instance->terminate($request, $response);
+                $instance->terminate($request, $response, ...$parameters);
             }
         }
     }

@@ -145,6 +145,46 @@ class KernelTest extends TestCase
         ], $called);
     }
 
+    public function testItTriggersTerminatingEventWithParameters()
+    {
+        $called = [];
+        $app = $this->getApplication();
+        $events = new Dispatcher($app);
+        $app->instance('events', $events);
+        $kernel = new Kernel($app, $this->getRouter());
+        $app->instance('terminating-middleware', new class($called)
+        {
+            public function __construct(private &$called)
+            {
+                //
+            }
+
+            public function terminate($request, $response, ...$parameters)
+            {
+                $this->called[] = $parameters;
+                $this->called[] = 'terminating middleware with parameters';
+            }
+        });
+        $kernel->setGlobalMiddleware([
+            'terminating-middleware:foo,bar',
+        ]);
+        $events->listen(function (Terminating $terminating) use (&$called) {
+            $called[] = 'terminating event';
+        });
+        $app->terminating(function () use (&$called) {
+            $called[] = 'terminating callback';
+        });
+
+        $kernel->terminate(new Request(), new Response());
+
+        $this->assertSame([
+            'terminating event',
+            ['foo', 'bar'],
+            'terminating middleware with parameters',
+            'terminating callback',
+        ], $called);
+    }
+
     /**
      * @return \Illuminate\Contracts\Foundation\Application
      */
