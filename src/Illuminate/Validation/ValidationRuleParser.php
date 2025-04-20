@@ -103,6 +103,12 @@ class ValidationRuleParser
 
         $rules = [];
 
+        if (!array_is_list($rule)) {
+            foreach ($rule as $key => $value) {
+                $rules = array_merge($rules, $this->explodeExplicitRule($value, $key));
+            }
+        }
+
         foreach ($rule as $value) {
             if ($value instanceof Date || $value instanceof Numeric) {
                 $rules = array_merge($rules, explode('|', (string) $value));
