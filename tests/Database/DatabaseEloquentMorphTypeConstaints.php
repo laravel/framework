@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Database;
 
-use PHPUnit\Framework\TestCase;
+use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Database\Capsule\Manager as DB;
+use PHPUnit\Framework\TestCase;
 
 // ==================== Interfaces and Abstract Classes ====================
 
@@ -37,7 +37,7 @@ class Bird extends Model implements Flyable, Identifiable
 
     public function getIdentifier()
     {
-        return 'bird-' . $this->id;
+        return 'bird-'.$this->id;
     }
 }
 
@@ -97,7 +97,7 @@ class Feature extends Model implements Identifiable
 
     public function getIdentifier()
     {
-        return 'feature-' . $this->id;
+        return 'feature-'.$this->id;
     }
 
     public function featureable()
@@ -251,7 +251,8 @@ class MorphTypeConstraintsTest extends TestCase
     public function testMorphToMultipleInterfaces()
     {
         // Redefine the relationship to require multiple interfaces
-        $animal = new class extends Animal {
+        $animal = new class extends Animal
+        {
             public function flyable()
             {
                 return $this->morphTo()->mustImplement([Flyable::class, Identifiable::class]);
@@ -421,7 +422,8 @@ class MorphTypeConstraintsTest extends TestCase
     public function testCustomMorphClass()
     {
         // Create a class with a custom morph class name
-        $customBird = new class extends Bird {
+        $customBird = new class extends Bird
+        {
             public function getMorphClass()
             {
                 return 'custom_bird';
