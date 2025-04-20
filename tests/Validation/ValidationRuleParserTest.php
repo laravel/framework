@@ -469,4 +469,52 @@ class ValidationRuleParserTest extends TestCase
             ],
         ], $results->rules);
     }
+
+    public function testNestedValidationRulesObject()
+    {
+        $parser = (new ValidationRuleParser([
+            'numbers' => [
+                'favorite' => 42,
+            ],
+        ]));
+
+        $rules = [
+            'number' => [
+                'favorite' => Rule::numeric()->max(100),
+            ],
+        ];
+
+        $results = $parser->explode($rules);
+
+        $this->assertEquals([
+            'number.favorite' => [
+                'numeric',
+                'max:100',
+            ],
+        ], $results->rules);
+    }
+
+    public function testNestedValidationRulesArray()
+    {
+        $parser = (new ValidationRuleParser([
+            'numbers' => [
+                ['favorite' => 42],
+            ],
+        ]));
+
+        $rules = [
+            'number' => [
+                'favorite' => Rule::numeric()->max(100),
+            ],
+        ];
+
+        $results = $parser->explode($rules);
+
+        $this->assertEquals([
+            'number.*.favorite' => [
+                'numeric',
+                'max:100',
+            ],
+        ], $results->rules);
+    }
 }
