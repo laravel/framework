@@ -1044,12 +1044,12 @@ class SupportArrTest extends TestCase
     {
         // key does not exist, nothing is set
         $array = ['products' => ['desk' => ['price' => 100]]];
-        Arr::set($array, 'products.desk.currency', 'USD');
+        Arr::setIfExists($array, 'products.desk.currency', 'USD');
         $this->assertEquals(['products' => ['desk' => ['price' => 100]]], $array);
 
         // key exists
         $array = ['products' => ['desk' => ['price' => 100]]];
-        Arr::set($array, 'products.desk.price', 200);
+        Arr::setIfExists($array, 'products.desk.price', 200);
         $this->assertEquals(['products' => ['desk' => ['price' => 200]]], $array);
     }
 
