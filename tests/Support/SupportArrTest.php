@@ -1040,6 +1040,19 @@ class SupportArrTest extends TestCase
         $this->assertEquals([1 => 'hAz'], Arr::set($array, 1, 'hAz'));
     }
 
+    public function testSetIfExists()
+    {
+        // key does not exist, nothing is set
+        $array = ['products' => ['desk' => ['price' => 100]]];
+        Arr::set($array, 'products.desk.currency', 'USD');
+        $this->assertEquals(['products' => ['desk' => ['price' => 100]]], $array);
+
+        // key exists
+        $array = ['products' => ['desk' => ['price' => 100]]];
+        Arr::set($array, 'products.desk.price', 200);
+        $this->assertEquals(['products' => ['desk' => ['price' => 200]]], $array);
+    }
+
     public function testShuffleProducesDifferentShuffles()
     {
         $input = range('a', 'z');

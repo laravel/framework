@@ -797,6 +797,23 @@ class Arr
     }
 
     /**
+     * Set an array item to a given value using "dot" notation only if the array key exists
+     *
+     * @param  array  $array
+     * @param  string|int|null  $key
+     * @param  mixed  $value
+     * @return array
+     */
+    public static function setIfExists(&$array, $key, $value)
+    {
+        if (! static::exists($array, $key))) {
+            return $array;
+        }
+
+        return static::set($array, $key, $value);
+    }
+
+    /**
      * Shuffle the given array and return the result.
      *
      * @param  array  $array
