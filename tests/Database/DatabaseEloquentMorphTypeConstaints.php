@@ -303,7 +303,8 @@ class MorphTypeConstraintsTest extends TestCase
     public function testMorphToWithAbstractClass()
     {
         // Redefine the relationship to require an abstract class
-        $animal = new class extends Animal {
+        $animal = new class extends Animal
+        {
             public function flyable()
             {
                 return $this->morphTo()->mustExtend(Vehicle::class);

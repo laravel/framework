@@ -19,7 +19,6 @@ class MorphTo extends BelongsTo
 {
     use InteractsWithDictionary,MorphTypeConstraints;
 
-
     /**
      * The type of the polymorphic relation.
      *
