@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithDictionary;
+use Illuminate\Database\Eloquent\Relations\Concerns\MorphTypeConstraints;
 
 /**
  * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
@@ -16,7 +17,8 @@ use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithDictionary;
  */
 class MorphTo extends BelongsTo
 {
-    use InteractsWithDictionary;
+    use InteractsWithDictionary,MorphTypeConstraints;
+
 
     /**
      * The type of the polymorphic relation.
@@ -215,8 +217,10 @@ class MorphTo extends BelongsTo
     protected function matchToMorphParents($type, EloquentCollection $results)
     {
         foreach ($results as $result) {
+            if (!empty($this->requiredInterfaces) || !empty($this->requiredAbstractClasses)) {
+                $this->validateRelatedModel($result);
+            }
             $ownerKey = ! is_null($this->ownerKey) ? $this->getDictionaryKey($result->{$this->ownerKey}) : $result->getKey();
-
             if (isset($this->dictionary[$type][$ownerKey])) {
                 foreach ($this->dictionary[$type][$ownerKey] as $model) {
                     $model->setRelation($this->relationName, $result);
