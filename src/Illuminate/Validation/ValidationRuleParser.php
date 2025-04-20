@@ -72,12 +72,38 @@ class ValidationRuleParser
                 $rules = $this->explodeWildcardRules($rules, $key, [$rule]);
 
                 unset($rules[$key]);
+            } else if (is_array($rule) && !array_is_list($rule)) {
+                $rules = $this->explodeNestedRule($rules, $rule, $key);
+
+                unset($rules[$key]);
             } else {
                 $rules[$key] = $this->explodeExplicitRule($rule, $key);
             }
         }
 
         return $rules;
+    }
+
+    /**
+     * Explode the nested rule into multiple rules using dot notation.
+     *
+     * @param  array  $results
+     * @param  mixed  $rule
+     * @param  string  $attribute
+     * @return array
+     */
+    protected function explodeNestedRule($results, $rule, $attribute)
+    {
+        $input = $this->data[$attribute];
+        $prefix = (is_array($input) && !array_is_list($input)) || is_object($input)
+            ? $attribute.'.'
+            : $attribute.'.*.';
+        foreach ($rule as $key => $value) {
+            $dotKey = $prefix.$key;
+            $results = $this->mergeRules($results, $dotKey, $this->explodeExplicitRule($value, $dotKey));
+        }
+
+        return $results;
     }
 
     /**
@@ -102,12 +128,6 @@ class ValidationRuleParser
         }
 
         $rules = [];
-
-        if (!array_is_list($rule)) {
-            foreach ($rule as $key => $value) {
-                $rules = array_merge($rules, $this->explodeExplicitRule($value, $key));
-            }
-        }
 
         foreach ($rule as $value) {
             if ($value instanceof Date || $value instanceof Numeric) {
