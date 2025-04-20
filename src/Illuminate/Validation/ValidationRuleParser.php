@@ -72,7 +72,7 @@ class ValidationRuleParser
                 $rules = $this->explodeWildcardRules($rules, $key, [$rule]);
 
                 unset($rules[$key]);
-            } else if (is_array($rule) && !array_is_list($rule)) {
+            } elseif (is_array($rule) && ! array_is_list($rule)) {
                 $rules = $this->explodeNestedRule($rules, $rule, $key);
 
                 unset($rules[$key]);
@@ -95,7 +95,7 @@ class ValidationRuleParser
     protected function explodeNestedRule($results, $rule, $attribute)
     {
         $input = $this->data[$attribute];
-        $prefix = (is_array($input) && !array_is_list($input)) || is_object($input)
+        $prefix = (is_array($input) && ! array_is_list($input)) || is_object($input)
             ? $attribute.'.'
             : $attribute.'.*.';
         foreach ($rule as $key => $value) {

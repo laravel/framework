@@ -473,7 +473,7 @@ class ValidationRuleParserTest extends TestCase
     public function testNestedValidationRulesObject()
     {
         $parser = (new ValidationRuleParser([
-            'number' => (object)[
+            'number' => (object) [
                 'favorite' => 42,
             ],
         ]));
