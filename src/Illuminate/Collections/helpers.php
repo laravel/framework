@@ -49,6 +49,17 @@ if (! function_exists('data_get')) {
             return $target;
         }
 
+        // Fast path for simple string keys (no dots)
+        if (is_string($key) && ! str_contains($key, '.')) {
+            if (Arr::accessible($target) && Arr::exists($target, $key)) {
+                return $target[$key];
+            } elseif (is_object($target) && isset($target->{$key})) {
+                return $target->{$key};
+            } else {
+                return value($default);
+            }
+        }
+
         $key = is_array($key) ? $key : explode('.', $key);
 
         foreach ($key as $i => $segment) {

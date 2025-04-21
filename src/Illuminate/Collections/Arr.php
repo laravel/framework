@@ -140,7 +140,24 @@ class Arr
         $results = [];
 
         foreach ($array as $key => $value) {
-            static::set($results, $key, $value);
+            $current = &$results;
+            $segment = strtok($key, '.');
+
+            while (true) {
+                $nextSegment = strtok('.');
+
+                if ($nextSegment === false) {
+                    $current[$segment] = $value;
+                    break;
+                } else {
+                    if (! isset($current[$segment]) || ! is_array($current[$segment])) {
+                        $current[$segment] = [];
+                    }
+                    $current = &$current[$segment];
+                    $segment = $nextSegment;
+                }
+            }
+            unset($current);
         }
 
         return $results;
@@ -237,7 +254,15 @@ class Arr
             return empty($array) ? value($default) : end($array);
         }
 
-        return static::first(array_reverse($array, true), $callback, $default);
+        for (end($array); ($key = key($array)) !== null; prev($array)) {
+            $value = current($array);
+
+            if ($callback($value, $key)) {
+                return $value;
+            }
+        }
+
+        return value($default);
     }
 
     /**
@@ -559,6 +584,21 @@ class Arr
     public static function pluck($array, $value, $key = null)
     {
         $results = [];
+
+        // Fast path for simple value keys (no dots)
+        if (is_string($value) && ! str_contains($value, '.') && is_null($key)) {
+            foreach ($array as $item) {
+                if (is_array($item) && array_key_exists($value, $item)) {
+                    $results[] = $item[$value];
+                } elseif (is_object($item) && isset($item->{$value})) {
+                    $results[] = $item->{$value};
+                } else {
+                    $results[] = data_get($item, $value);
+                }
+            }
+
+            return $results;
+        }
 
         [$value, $key] = static::explodePluckParameters($value, $key);
 

@@ -555,18 +555,36 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function keyBy($keyBy)
     {
-        $keyBy = $this->valueRetriever($keyBy);
-
         $results = [];
 
-        foreach ($this->items as $key => $item) {
-            $resolvedKey = $keyBy($item, $key);
+        if ($this->useAsCallable($keyBy)) {
+            $getter = $keyBy;
+        } elseif (is_string($keyBy) && ! str_contains($keyBy, '.')) {
+            $prop = $keyBy;
+            $getter = function ($item) use ($prop) {
+                if (is_array($item) && isset($item[$prop])) {
+                    return $item[$prop];
+                }
+                if (is_object($item) && isset($item->{$prop})) {
+                    return $item->{$prop};
+                }
+
+                return data_get($item, $prop);
+            };
+        } else {
+            $getter = fn ($item) => data_get($item, $keyBy);
+        }
+
+        foreach ($this->items as $index => $item) {
+            $resolvedKey = $getter($item, $index);
 
             if (is_object($resolvedKey)) {
                 $resolvedKey = (string) $resolvedKey;
             }
 
-            $results[$resolvedKey] = $item;
+            if ($resolvedKey !== null) {
+                $results[$resolvedKey] = $item;
+            }
         }
 
         return new static($results);
@@ -778,12 +796,25 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Get the values of a given key.
      *
-     * @param  string|int|array<array-key, string>|null  $value
-     * @param  string|null  $key
-     * @return static<array-key, mixed>
+     * @param  string|array|int|null  $value
+     * @param  string|array|null  $key
+     * @return static
      */
     public function pluck($value, $key = null)
     {
+        // Fast path for simple value keys (no dots)
+        if (is_string($value) && ! str_contains($value, '.') && is_null($key)) {
+            return new static(array_map(function ($item) use ($value) {
+                if (is_array($item) && array_key_exists($value, $item)) {
+                    return $item[$value];
+                } elseif (is_object($item) && isset($item->{$value})) {
+                    return $item->{$value};
+                }
+
+                return data_get($item, $value);
+            }, $this->items));
+        }
+
         return new static(Arr::pluck($this->items, $value, $key));
     }
 
