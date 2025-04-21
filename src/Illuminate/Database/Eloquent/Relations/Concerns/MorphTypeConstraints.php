@@ -16,7 +16,7 @@ trait MorphTypeConstraints
      *
      * @var array
      */
-    protected $requiredAbstractClasses = [];
+    protected $requiredClasses = [];
 
     /**
      * Require that all morph-related models implement a specific interface.
@@ -28,43 +28,21 @@ trait MorphTypeConstraints
      */
     public function mustImplement($interface)
     {
-        $interfaces = is_array($interface) ? $interface : [$interface];
-
-        foreach ($interfaces as $interface) {
-            if (! interface_exists($interface)) {
-                throw new \InvalidArgumentException("Interface [{$interface}] does not exist.");
-            }
-
-            $this->requiredInterfaces[] = $interface;
-        }
-
+        $this->requiredInterfaces[] = $interface;
         return $this;
     }
 
     /**
      * Require that all morph-related models extend a specific abstract class.
      *
-     * @param  string|array  $abstractClass
+     * @param  string|array  $class
      * @return $this
      *
      * @throws \InvalidArgumentException
      */
-    public function mustExtend($abstractClass)
+    public function mustExtend($class)
     {
-        $classes = is_array($abstractClass) ? $abstractClass : [$abstractClass];
-
-        foreach ($classes as $class) {
-            if (! class_exists($class)) {
-                throw new \InvalidArgumentException("Class [{$class}] does not exist.");
-            }
-
-            if (! (new \ReflectionClass($class))->isAbstract()) {
-                throw new \InvalidArgumentException("Class [{$class}] is not abstract.");
-            }
-
-            $this->requiredAbstractClasses[] = $class;
-        }
-
+        $this->requiredClasses[] = $class;
         return $this;
     }
 
@@ -94,13 +72,13 @@ trait MorphTypeConstraints
             }
         }
 
-        foreach ($this->requiredAbstractClasses as $abstractClass) {
-            if (! is_a($model, $abstractClass)) {
+        foreach ($this->requiredClasses as $class) {
+            if (! is_a($model, $class)) {
                 throw new \RuntimeException(
                     sprintf(
-                        'Related model [%s] must extend abstract class [%s].',
+                        'Related model [%s] must extend class [%s].',
                         get_class($model),
-                        $abstractClass
+                        $class
                     )
                 );
             }
