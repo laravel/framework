@@ -63,6 +63,10 @@ trait MorphTypeConstraints
         }
 
         foreach ($this->requiredInterfaces as $interface) {
+            if (! interface_exists($interface)) {
+                throw new \RuntimeException("Interface [$interface] does not exist.");
+            }
+
             if (! ($model instanceof $interface)) {
                 throw new \RuntimeException(
                     sprintf(
@@ -75,6 +79,9 @@ trait MorphTypeConstraints
         }
 
         foreach ($this->requiredClasses as $class) {
+            if (! class_exists($class)) {
+                throw new \RuntimeException("Class [$class] does not exist.");
+            }
             if (! is_a($model, $class)) {
                 throw new \RuntimeException(
                     sprintf(
