@@ -16,6 +16,7 @@ use Illuminate\Database\Migrations\DatabaseMigrationRepository;
 use Illuminate\Database\Migrations\MigrationCreator;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class MigrationServiceProvider extends ServiceProvider implements DeferrableProvider
 {
@@ -77,12 +78,12 @@ class MigrationServiceProvider extends ServiceProvider implements DeferrableProv
         // The migrator is responsible for actually running and rollback the migration
         // files in the application. We'll pass in our database connection resolver
         // so the migrator can resolve any of these connections when it needs to.
-        $this->app->singleton(Migrator::class, function ($app) {
+        $this->app->singleton('migrator', function ($app) {
             $repository = $app['migration.repository'];
 
             return new Migrator($repository, $app['db'], $app['files'], $app['events']);
         });
-        $this->app->alias(Migrator::class, 'migrator');
+        $this->app->bind(Migrator::class, fn ($app) => $app['migrator']);
     }
 
     /**

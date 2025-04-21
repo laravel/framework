@@ -59,6 +59,7 @@ class MigratorTest extends TestCase
     public function testMigrateWithoutOutput()
     {
         $this->app->forgetInstance('migrator');
+        $this->app->forgetInstance(Migrator::class);
         $this->subject = $this->app->make('migrator');
 
         $this->subject->run([__DIR__.'/fixtures']);
