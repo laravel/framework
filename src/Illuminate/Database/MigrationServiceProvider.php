@@ -77,11 +77,12 @@ class MigrationServiceProvider extends ServiceProvider implements DeferrableProv
         // The migrator is responsible for actually running and rollback the migration
         // files in the application. We'll pass in our database connection resolver
         // so the migrator can resolve any of these connections when it needs to.
-        $this->app->singleton('migrator', function ($app) {
+        $this->app->singleton(Migrator::class, function ($app) {
             $repository = $app['migration.repository'];
 
             return new Migrator($repository, $app['db'], $app['files'], $app['events']);
         });
+        $this->app->alias(Migrator::class, 'migrator');
     }
 
     /**
@@ -220,7 +221,7 @@ class MigrationServiceProvider extends ServiceProvider implements DeferrableProv
     public function provides()
     {
         return array_merge([
-            'migrator', 'migration.repository', 'migration.creator',
+            'migrator', 'migration.repository', 'migration.creator', Migrator::class,
         ], array_values($this->commands));
     }
 }
