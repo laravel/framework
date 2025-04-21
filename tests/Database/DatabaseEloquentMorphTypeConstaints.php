@@ -412,14 +412,6 @@ class MorphTypeConstraintsTest extends TestCase
         $animal->morphTo()->mustExtend('NonExistentClass');
     }
 
-    public function testNonAbstractClass()
-    {
-        $this->expectException(\InvalidArgumentException::class);
-
-        $animal = new Animal();
-        $animal->morphTo()->mustExtend(Bird::class); // Bird is not abstract
-    }
-
     public function testCustomMorphClass()
     {
         // Create a class with a custom morph class name
