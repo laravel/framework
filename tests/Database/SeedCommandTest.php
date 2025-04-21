@@ -13,9 +13,11 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Seeder;
 use Illuminate\Events\NullDispatcher;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Testing\Assert;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
 
@@ -31,6 +33,7 @@ class SeedCommandTest extends TestCase
         $seeder->shouldReceive('setContainer')->once()->andReturnSelf();
         $seeder->shouldReceive('setCommand')->once()->andReturnSelf();
         $seeder->shouldReceive('__invoke')->once();
+        $seeder->shouldReceive('useTransactions')->andReturnTrue();
 
         $resolver = m::mock(ConnectionResolverInterface::class);
         $resolver->shouldReceive('getDefaultConnection')->once();
@@ -41,12 +44,10 @@ class SeedCommandTest extends TestCase
         $container->shouldReceive('environment')->once()->andReturn('testing');
         $container->shouldReceive('runningUnitTests')->andReturn('true');
         $container->shouldReceive('make')->with('DatabaseSeeder')->andReturn($seeder);
-        $container->shouldReceive('make')->with(OutputStyle::class, m::any())->andReturn(
-            $outputStyle
-        );
-        $container->shouldReceive('make')->with(Factory::class, m::any())->andReturn(
-            new Factory($outputStyle)
-        );
+        $container->shouldReceive('make')->with(OutputStyle::class, m::any())->andReturn($outputStyle);
+        $container->shouldReceive('make')->with(Factory::class, m::any())->andReturn(new Factory($outputStyle));
+        $container->shouldReceive('storagePath')->andReturn('test_path');
+        $container->shouldReceive('bound')->with(Filesystem::class)->andReturn(false);
 
         $command = new SeedCommand($resolver);
         $command->setLaravel($container);
@@ -83,12 +84,10 @@ class SeedCommandTest extends TestCase
         $container->shouldReceive('environment')->once()->andReturn('testing');
         $container->shouldReceive('runningUnitTests')->andReturn('true');
         $container->shouldReceive('make')->with(UserWithoutModelEventsSeeder::class)->andReturn($seeder);
-        $container->shouldReceive('make')->with(OutputStyle::class, m::any())->andReturn(
-            $outputStyle
-        );
-        $container->shouldReceive('make')->with(Factory::class, m::any())->andReturn(
-            new Factory($outputStyle)
-        );
+        $container->shouldReceive('make')->with(OutputStyle::class, m::any())->andReturn($outputStyle);
+        $container->shouldReceive('make')->with(Factory::class, m::any())->andReturn(new Factory($outputStyle));
+        $container->shouldReceive('storagePath')->andReturn('test_path');
+        $container->shouldReceive('bound')->with(Filesystem::class)->andReturn(false);
 
         $command = new SeedCommand($resolver);
         $command->setLaravel($container);
@@ -115,12 +114,9 @@ class SeedCommandTest extends TestCase
         $container = m::mock(Container::class);
         $container->shouldReceive('call');
         $container->shouldReceive('runningUnitTests')->andReturn('true');
-        $container->shouldReceive('make')->with(OutputStyle::class, m::any())->andReturn(
-            $outputStyle
-        );
-        $container->shouldReceive('make')->with(Factory::class, m::any())->andReturn(
-            new Factory($outputStyle)
-        );
+        $container->shouldReceive('make')->with(OutputStyle::class, m::any())->andReturn($outputStyle);
+        $container->shouldReceive('make')->with(Factory::class, m::any())->andReturn(new Factory($outputStyle));
+        $container->shouldReceive('bound')->with(Filesystem::class)->andReturn(false);
 
         $command = new SeedCommand($resolver);
         $command->setLaravel($container);
@@ -131,6 +127,131 @@ class SeedCommandTest extends TestCase
         SeedCommand::prohibit();
 
         Assert::assertSame(Command::FAILURE, $command->handle());
+    }
+
+    public function testContinueableThrowsWithoutFileSystem()
+    {
+        $input = new ArrayInput(['--continue' => true, '--database' => 'sqlite']);
+        $output = new NullOutput;
+        $outputStyle = new OutputStyle($input, $output);
+
+        $seeder = m::mock(Seeder::class);
+        $seeder->shouldReceive('setContainer')->once()->andReturnSelf();
+        $seeder->shouldReceive('setCommand')->once()->andReturnSelf();
+        $seeder->shouldReceive('__invoke')->never();
+        $seeder->shouldReceive('useTransactions')->andReturnTrue();
+
+        $resolver = m::mock(ConnectionResolverInterface::class);
+        $resolver->shouldReceive('getDefaultConnection')->once();
+        $resolver->shouldReceive('setDefaultConnection')->once()->with('sqlite');
+
+        $container = m::mock(Container::class);
+        $container->shouldReceive('call');
+        $container->shouldReceive('environment')->once()->andReturn('testing');
+        $container->shouldReceive('runningUnitTests')->andReturn('true');
+        $container->shouldReceive('make')->with('DatabaseSeeder')->andReturn($seeder);
+        $container->shouldReceive('make')->with(OutputStyle::class, m::any())->andReturn($outputStyle);
+        $container->shouldReceive('make')->with(Factory::class, m::any())->andReturn(new Factory($outputStyle));
+        $container->shouldReceive('storagePath')->andReturn('test_path');
+        $container->shouldReceive('bound')->with(Filesystem::class)->andReturn(false);
+
+        $command = new SeedCommand($resolver);
+        $command->setLaravel($container);
+
+        // call run to set up IO, then fire manually.
+        $command->run($input, $output);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Unable to retrieve continue data. Please install the "illuminate/filesystem" package to use the --continue option.');
+
+        Assert::assertSame(Command::FAILURE, $command->handle());
+    }
+
+    public function testContinueable()
+    {
+        $input = new ArrayInput(['--continue' => true, '--database' => 'sqlite']);
+        $output = new NullOutput;
+        $outputStyle = new OutputStyle($input, $output);
+
+        $seeder = m::mock(Seeder::class);
+        $seeder->shouldReceive('setContainer')->once()->andReturnSelf();
+        $seeder->shouldReceive('setCommand')->once()->andReturnSelf();
+        $seeder->shouldReceive('__invoke')->once();
+        $seeder->shouldReceive('useTransactions')->andReturnTrue();
+        $seeder->shouldReceive('setContinue')->with(['test' => 'class']);
+
+        $resolver = m::mock(ConnectionResolverInterface::class);
+        $resolver->shouldReceive('getDefaultConnection')->once();
+        $resolver->shouldReceive('setDefaultConnection')->once()->with('sqlite');
+
+        $filesystem = m::mock(Filesystem::class);
+        $filesystem->shouldReceive('exists')->with('test_path')->andReturn(true);
+        $filesystem->shouldReceive('json')->with('test_path')->andReturn(['test' => 'class']);
+        $filesystem->shouldReceive('delete')->with('test_path');
+
+        $container = m::mock(Container::class);
+        $container->shouldReceive('call');
+        $container->shouldReceive('environment')->once()->andReturn('testing');
+        $container->shouldReceive('runningUnitTests')->andReturn('true');
+        $container->shouldReceive('make')->with('DatabaseSeeder')->andReturn($seeder);
+        $container->shouldReceive('make')->with(OutputStyle::class, m::any())->andReturn($outputStyle);
+        $container->shouldReceive('make')->with(Factory::class, m::any())->andReturn(new Factory($outputStyle));
+        $container->shouldReceive('storagePath')->andReturn('test_path');
+        $container->shouldReceive('bound')->with(Filesystem::class)->andReturn(true);
+        $container->shouldReceive('make')->with(Filesystem::class)->andReturn($filesystem);
+
+        $command = new SeedCommand($resolver);
+        $command->setLaravel($container);
+
+        // call run to set up IO, then fire manually.
+        $command->run($input, $output);
+        $command->handle();
+
+        $container->shouldHaveReceived('call')->with([$command, 'handle']);
+    }
+
+    public function testStoresIncompleteSeedData()
+    {
+        $input = new ArrayInput(['--database' => 'sqlite']);
+        $output = new NullOutput;
+        $outputStyle = new OutputStyle($input, $output);
+
+        $seeder = m::mock(Seeder::class);
+        $seeder->shouldReceive('setContainer')->once()->andReturnSelf();
+        $seeder->shouldReceive('setCommand')->once()->andReturnSelf();
+        $seeder->shouldReceive('__invoke')->once()->andThrow(new RuntimeException());
+        $seeder->shouldReceive('useTransactions')->andReturnTrue();
+        $seeder->shouldReceive('getContinue')->andReturn(['test' => 'class']);
+
+        $resolver = m::mock(ConnectionResolverInterface::class);
+        $resolver->shouldReceive('getDefaultConnection')->once();
+        $resolver->shouldReceive('setDefaultConnection')->once()->with('sqlite');
+
+        $filesystem = m::mock(Filesystem::class);
+        $filesystem->shouldReceive('ensureDirectoryExists')->with('test_path')->andReturn(true);
+        $filesystem->shouldReceive('put')->with('test_path', ['test' => 'class'])->andReturn(true);
+        $filesystem->shouldReceive('delete')->never();
+
+        $container = m::mock(Container::class);
+        $container->shouldReceive('call');
+        $container->shouldReceive('environment')->once()->andReturn('testing');
+        $container->shouldReceive('runningUnitTests')->andReturn('true');
+        $container->shouldReceive('make')->with('DatabaseSeeder')->andReturn($seeder);
+        $container->shouldReceive('make')->with(OutputStyle::class, m::any())->andReturn($outputStyle);
+        $container->shouldReceive('make')->with(Factory::class, m::any())->andReturn(new Factory($outputStyle));
+        $container->shouldReceive('storagePath')->andReturn('test_path');
+        $container->shouldReceive('bound')->with(Filesystem::class)->andReturn(true);
+        $container->shouldReceive('make')->with(Filesystem::class)->andReturn($filesystem);
+
+        $command = new SeedCommand($resolver);
+        $command->setLaravel($container);
+
+        // call run to set up IO, then fire manually.
+        $command->run($input, $output);
+
+        $this->expectException(RuntimeException::class);
+
+        $command->handle();
     }
 
     protected function tearDown(): void
