@@ -199,9 +199,9 @@ class BladeCompiler extends Compiler implements CompilerInterface
                 return;
             }
 
-            $contentHash = hash('sha256', $contents);
             $compiledHash = $this->files->hash($compiledPath, 'sha256');
-            if ($compiledHash !== $contentHash) {
+
+            if ($compiledHash !== hash('sha256', $contents)) {
                 $this->files->put($compiledPath, $contents);
             }
         }
