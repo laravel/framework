@@ -288,7 +288,7 @@ class DatabaseSeederTest extends TestCase
         $seeder->setCommand($command);
 
         $connection = m::mock(ConnectionInterface::class);
-        $connection->shouldReceive('getConnection->transaction')->andReturnUsing(fn ($callback)  => $callback());
+        $connection->shouldReceive('getConnection->transaction')->andReturnUsing(fn ($callback) => $callback());
 
         $container = m::mock(Container::class);
 
@@ -318,7 +318,7 @@ class DatabaseSeederTest extends TestCase
         $seeder = new TestSeedTaskSeederWithBeforeAndAfter();
 
         $connection = m::mock(ConnectionInterface::class);
-        $connection->shouldReceive('getConnection->transaction')->andReturnUsing(fn ($callback)  => $callback());
+        $connection->shouldReceive('getConnection->transaction')->andReturnUsing(fn ($callback) => $callback());
 
         $container = m::mock(Container::class);
         $container->shouldReceive('make')->with('db.connection')->andReturn($connection);
