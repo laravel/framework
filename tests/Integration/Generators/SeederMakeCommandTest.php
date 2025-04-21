@@ -17,7 +17,7 @@ class SeederMakeCommandTest extends TestCase
             'namespace Database\Seeders;',
             'use Illuminate\Database\Seeder;',
             'class FooSeeder extends Seeder',
-            'public function run()',
+            'public function seed()',
         ], 'database/seeders/FooSeeder.php');
     }
 }
