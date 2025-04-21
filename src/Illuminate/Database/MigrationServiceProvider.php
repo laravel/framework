@@ -16,7 +16,6 @@ use Illuminate\Database\Migrations\DatabaseMigrationRepository;
 use Illuminate\Database\Migrations\MigrationCreator;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class MigrationServiceProvider extends ServiceProvider implements DeferrableProvider
 {
