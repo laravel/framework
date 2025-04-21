@@ -1103,6 +1103,30 @@ class Str
     }
 
     /**
+     * Generate a random string containing only lowercase alphabetic characters.
+     *
+     * @param  int  $length
+     * @return string
+     */
+    public static function randomLetters($length = 16)
+    {
+        return (static::$randomStringFactory ?? function ($length) {
+            $characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            $string = '';
+
+            while (($len = strlen($string)) < $length) {
+                $size = $length - $len;
+                $bytesSize = (int) ceil($size / 3) * 3;
+                $bytes = random_bytes($bytesSize);
+
+                $string .= substr(str_replace(['/', '+', '='], '', base64_encode($bytes)), 0, $size);
+            }
+
+            return substr(str_shuffle(str_repeat($characters, ceil($length / strlen($characters)))), 0, $length);
+        })($length);
+    }
+
+    /**
      * Set the callable that will be used to generate random strings.
      *
      * @param  callable|null  $factory

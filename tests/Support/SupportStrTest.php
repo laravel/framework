@@ -779,6 +779,15 @@ class SupportStrTest extends TestCase
         }
     }
 
+    public function testRandomLetters()
+    {
+        $this->assertEquals(16, strlen(Str::randomLetters()));
+        $randomInteger = random_int(1, 100);
+        $this->assertEquals($randomInteger, strlen(Str::randomLetters($randomInteger)));
+        $this->assertIsString(Str::randomLetters());
+        $this->assertMatchesRegularExpression('/^[a-zA-Z]+$/', Str::randomLetters());
+    }
+
     public function testReplace()
     {
         $this->assertSame('foo bar laravel', Str::replace('baz', 'laravel', 'foo bar baz'));
