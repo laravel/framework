@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Support;
 
 use ArrayObject;
-use Carbon\Carbon as BaseCarbon;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -607,26 +606,28 @@ class SupportArrTest extends TestCase
         Carbon::setTestNow('2018-09-01 00:00:00.000000');
 
         $array = ['date' => '2018-09-01 00:00:00.000000'];
-        $this->assertInstanceOf(BaseCarbon::class, Arr::date($array, 'date'));
+        $this->assertInstanceOf(Carbon::class, Arr::date($array, 'date'));
         $this->assertEquals('2018-09-01 00:00:00.000000', Arr::date($array, 'date')->format('Y-m-d H:i:s.u'));
 
         $array = Arr::date(['2018-09-01 00:00:00', '2018-09-02 00:00:00', '2222-22-22 99:99:99'], null);
-        $this->assertInstanceOf(BaseCarbon::class, $array[0]);
+        $this->assertInstanceOf(Carbon::class, $array[0]);
         $this->assertEquals('2018-09-01 00:00:00.000000', $array[0]->format('Y-m-d H:i:s.u'));
-        $this->assertInstanceOf(BaseCarbon::class, $array[1]);
+        $this->assertInstanceOf(Carbon::class, $array[1]);
         $this->assertEquals('2018-09-02 00:00:00.000000', $array[1]->format('Y-m-d H:i:s.u'));
         $this->assertNull($array[2]);
 
         $array = [];
-        $this->assertNull(Arr::date($array, 'date', null));
-
-        $this->assertEquals(
-            '2018-09-01 00:00:00.000000',
-            Arr::date($array, 'date', now())->format('Y-m-d H:i:s.u')
-        );
+        $this->assertNull(Arr::date($array, 'date'));
 
         $array = ['date' => '2222-22-22'];
-        $this->assertNull(Arr::date($array, 'date', null));
+        $this->assertNull(Arr::date($array, 'date'));
+
+        $array = ['date' => '2025-01-22 00:00:00'];
+        $this->assertEquals('CAT', Arr::date($array, 'date', 'CAT')->timezone);
+
+        $array = Arr::date(['2018-09-01 00:00:00', '2018-09-02 00:00:00', '2222-22-22 99:99:99'], null, 'CAT');
+        $this->assertInstanceOf(Carbon::class, $array[0]);
+        $this->assertEquals('CAT', $array[0]->timezone);
 
         Carbon::setTestNow();
     }

@@ -4,8 +4,8 @@ namespace Illuminate\Support;
 
 use ArgumentCountError;
 use ArrayAccess;
-use Carbon\Carbon;
 use Carbon\Exceptions\InvalidFormatException;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use Random\Randomizer;
@@ -430,39 +430,35 @@ class Arr
     }
 
     /**
-     * Get a Carbon instance from an array using "dot" notation.
+     * Retrieve an item from an array as a Carbon instance.
      *
      * It will return null values when dates cannot be parsed or keys don't exist.
      *
      * @param  \ArrayAccess|array  $array
      * @param  string|int|null  $key
-     * @param  ?Carbon  $default
-     * @return Carbon|null
+     * @param  string|null  $tz
+     * @return \Illuminate\Support\Carbon|null
      */
-    public static function date($array, $key, $default = null): Carbon|null|array
+    public static function date($array, $key, $tz = null)
     {
-        $value = static::get($array, $key, $default);
+        $value = static::get($array, $key);
+
+        if (is_null($value)) {
+            return null;
+        }
 
         if (is_array($value)) {
-            return array_map(function ($segment) {
+            return array_map(function ($segment) use ($tz) {
                 try {
-                    return Carbon::parse($segment);
+                    return Date::parse($segment, $tz);
                 } catch (InvalidFormatException) {
                     return null;
                 }
             }, $value);
         }
 
-        if (is_null($value)) {
-            return null;
-        }
-
-        if ($value instanceof Carbon) {
-            return $value;
-        }
-
         try {
-            return Carbon::parse($value);
+            return Date::parse($value, $tz);
         } catch (InvalidFormatException) {
             return null;
         }
