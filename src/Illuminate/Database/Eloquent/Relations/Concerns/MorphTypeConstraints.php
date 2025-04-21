@@ -29,6 +29,7 @@ trait MorphTypeConstraints
     public function mustImplement($interface)
     {
         $this->requiredInterfaces[] = $interface;
+
         return $this;
     }
 
@@ -43,6 +44,7 @@ trait MorphTypeConstraints
     public function mustExtend($class)
     {
         $this->requiredClasses[] = $class;
+
         return $this;
     }
 
