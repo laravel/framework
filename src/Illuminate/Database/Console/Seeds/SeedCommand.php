@@ -14,6 +14,7 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Throwable;
+
 use function json_encode;
 
 #[AsCommand(name: 'db:seed')]
@@ -153,13 +154,13 @@ class SeedCommand extends Command
     /**
      * Returns the "continue" file path for the invoked seeder.
      *
-     * @param \Illuminate\Database\Seeder $seeder
+     * @param  \Illuminate\Database\Seeder  $seeder
      * @return string
      */
     protected function continueFilePath($seeder)
     {
         return $this->getLaravel()->storagePath(
-            'framework/database/seeder.' . str_replace('\\', '_', get_class($seeder)) . '.json'
+            'framework/database/seeder.'.str_replace('\\', '_', get_class($seeder)).'.json'
         );
     }
 

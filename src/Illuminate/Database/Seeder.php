@@ -62,12 +62,11 @@ abstract class Seeder
      */
     public function __invoke(array $parameters = [])
     {
-        $method = match(true) {
+        $method = match (true) {
             method_exists($this, 'run') => 'run',
             method_exists($this, 'runSeedTasks') => 'runSeedTasks',
             default => throw new InvalidArgumentException('Method [run] missing from '.get_class($this))
         };
-
 
         $callback = fn () => isset($this->container)
             ? $this->container->call([$this, $method], $parameters)
@@ -149,8 +148,8 @@ abstract class Seeder
 
                 return $this;
             } catch (Throwable $e) {
-                if (method_exists($seeder, 'finally')) {
-                    $seeder->finally($e);
+                if (method_exists($seeder, 'onError')) {
+                    $seeder->onError($e);
                 }
 
                 throw $e;
@@ -233,7 +232,7 @@ abstract class Seeder
         Collection::make((new ReflectionObject($this))->getMethods())
             ->filter(function (ReflectionMethod $method) {
                 return Str::startsWith($method->name, 'seed')
-                    || !empty($method->getAttributes(Attributes\SeedTask::class));
+                    || ! empty($method->getAttributes(Attributes\SeedTask::class));
             })
             ->map(fn (ReflectionMethod $method) => function () use ($method, $parameters) {
                 $name = $method->getAttributes(Attributes\SeedTask::class)[0]?->newInstance()->as
@@ -369,7 +368,7 @@ abstract class Seeder
      */
     protected function printTwoColumns($first, $second = null)
     {
-        if ($this->silent || !$this->command) {
+        if ($this->silent || ! $this->command) {
             return;
         }
 
@@ -384,7 +383,7 @@ abstract class Seeder
      */
     public function setSilent($silent)
     {
-        $this->silent = $silent || !isset($this->command);
+        $this->silent = $silent || ! isset($this->command);
     }
 
     /**

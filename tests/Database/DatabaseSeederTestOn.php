@@ -59,17 +59,17 @@ class TestSeedTaskSeederWithBeforeAndAfter extends Seeder
 {
     public function before()
     {
-
+        //
     }
 
     public function seed()
     {
-
+        //
     }
 
     public function after()
     {
-
+        //
     }
 }
 
@@ -82,7 +82,7 @@ class TestSeederSkipsCompletely extends Seeder
 
     public function seed()
     {
-
+        //
     }
 }
 
@@ -90,12 +90,12 @@ class TestSeederSkipsSingleSeedTask extends Seeder
 {
     public function before()
     {
-
+        //
     }
 
     public function seedFirst()
     {
-
+        //
     }
 
     public function seedSecond()
@@ -107,7 +107,7 @@ class TestSeederSkipsSingleSeedTask extends Seeder
 
     public function seedThird()
     {
-
+        //
     }
 }
 
@@ -115,7 +115,7 @@ class TestSeedTaskSeederWithError extends Seeder
 {
     public function seedFirst()
     {
-
+        //
     }
 
     public function seedSecond()
@@ -125,7 +125,7 @@ class TestSeedTaskSeederWithError extends Seeder
 
     public function seedThird()
     {
-
+        //
     }
 }
 
@@ -133,7 +133,7 @@ class TestSeedTaskSeederWithoutTransactions extends Seeder
 {
     public function seedFirst()
     {
-
+        //
     }
 
     public function useTransactions()
@@ -154,11 +154,11 @@ class TestSeederCallsFailingSeedTask extends Seeder
 {
     public function run()
     {
-        $this->call(TestSeedTaskSeederRunsFinally::class);
+        $this->call(TestSeedTaskSeederRunsOnErrorMethod::class);
     }
 }
 
-class TestSeedTaskSeederRunsFinally extends Seeder
+class TestSeedTaskSeederRunsOnErrorMethod extends Seeder
 {
     public function seedFirst()
     {
@@ -170,7 +170,7 @@ class TestSeedTaskSeederRunsFinally extends Seeder
         //
     }
 
-    public function finally($throwable)
+    public function onError($throwable)
     {
         throw new Exception('finally called', 0, $throwable);
     }
@@ -288,11 +288,7 @@ class DatabaseSeederTest extends TestCase
         $seeder->setCommand($command);
 
         $connection = m::mock(ConnectionInterface::class);
-        $connection->shouldReceive('getConnection->transaction')->withArgs(function ($callback) {
-            $callback();
-
-            return true;
-        });
+        $connection->shouldReceive('getConnection->transaction')->andReturnUsing(fn ($callback)  => $callback());
 
         $container = m::mock(Container::class);
 
@@ -322,11 +318,7 @@ class DatabaseSeederTest extends TestCase
         $seeder = new TestSeedTaskSeederWithBeforeAndAfter();
 
         $connection = m::mock(ConnectionInterface::class);
-        $connection->shouldReceive('getConnection->transaction')->andReturnUsing(function ($callback) {
-            $callback();
-
-            return true;
-        });
+        $connection->shouldReceive('getConnection->transaction')->andReturnUsing(fn ($callback)  => $callback());
 
         $container = m::mock(Container::class);
         $container->shouldReceive('make')->with('db.connection')->andReturn($connection);
@@ -413,13 +405,13 @@ class DatabaseSeederTest extends TestCase
         $seeder->setCommand($command);
 
         $connection = m::mock(ConnectionInterface::class);
-        $connection->shouldReceive('getConnection->transaction')->andReturnUsing(fn ($callback) =>  $callback());
+        $connection->shouldReceive('getConnection->transaction')->andReturnUsing(fn ($callback) => $callback());
 
         $container = m::mock(Container::class);
         $container->shouldReceive('make')->with('db.connection')->andReturn($connection);
         $container->shouldReceive('call')->once()->with([$seeder, 'before']);
         $container->shouldReceive('call')->once()->with([$seeder, 'seedFirst'], []);
-        $container->shouldReceive('call')->once()->with([$seeder, 'seedSecond'], [])->andReturnUsing(fn ($callback) =>  $callback());
+        $container->shouldReceive('call')->once()->with([$seeder, 'seedSecond'], [])->andReturnUsing(fn ($callback) => $callback());
         $container->shouldReceive('call')->once()->with([$seeder, 'seedThird'], []);
         $container->shouldReceive('call')->with([$seeder, 'runSeedTasks'], [])->andReturnUsing(fn ($callback) => $callback());
 
@@ -448,12 +440,12 @@ class DatabaseSeederTest extends TestCase
         $seeder->setCommand($command);
 
         $connection = m::mock(ConnectionInterface::class);
-        $connection->shouldReceive('getConnection->transaction')->andReturnUsing(fn ($callback) =>  $callback());
+        $connection->shouldReceive('getConnection->transaction')->andReturnUsing(fn ($callback) => $callback());
 
         $container = m::mock(Container::class);
         $container->shouldReceive('make')->with('db.connection')->andReturn($connection);
         $container->shouldReceive('call')->once()->with([$seeder, 'seedFirst'], []);
-        $container->shouldReceive('call')->once()->with([$seeder, 'seedSecond'], [])->andReturnUsing(fn ($callback) =>  $callback());
+        $container->shouldReceive('call')->once()->with([$seeder, 'seedSecond'], [])->andReturnUsing(fn ($callback) => $callback());
         $container->shouldReceive('call')->never()->with([$seeder, 'seedThird'], []);
         $container->shouldReceive('call')->with([$seeder, 'runSeedTasks'], [])->andReturnUsing(fn ($callback) => $callback());
 
@@ -504,7 +496,7 @@ class DatabaseSeederTest extends TestCase
         $seeder->setCommand($command);
 
         $connection = m::mock(ConnectionInterface::class);
-        $connection->shouldReceive('getConnection->transaction')->andReturnUsing(fn ($callback) =>  $callback());
+        $connection->shouldReceive('getConnection->transaction')->andReturnUsing(fn ($callback) => $callback());
 
         $container = m::mock(Container::class);
         $container->shouldReceive('make')->with('db.connection')->andReturn($connection);
@@ -551,7 +543,7 @@ class DatabaseSeederTest extends TestCase
 
     public function testSeedTaskSeederCallsFinally()
     {
-        $seeder = new TestSeedTaskSeederRunsFinally();
+        $seeder = new TestSeedTaskSeederRunsOnErrorMethod();
 
         $output = m::mock(OutputInterface::class);
         $output->shouldReceive('writeln')->with(
@@ -572,7 +564,7 @@ class DatabaseSeederTest extends TestCase
         $connection->shouldReceive('getConnection->transaction')->andReturnUsing(fn ($callback) => $callback());
 
         $container = m::mock(Container::class);
-        $container->shouldReceive('make')->with(TestSeedTaskSeederRunsFinally::class)->andReturn($seeder);
+        $container->shouldReceive('make')->with(TestSeedTaskSeederRunsOnErrorMethod::class)->andReturn($seeder);
         $container->shouldReceive('make')->with('db.connection')->andReturn($connection);
         $container->shouldReceive('call')->once()->with([$seeder, 'seedFirst'], [])->andReturnUsing(fn ($callback) => $callback());
         $container->shouldReceive('call')->with([$seeder, 'runSeedTasks'], [])->andReturnUsing(fn ($callback) => $callback());
