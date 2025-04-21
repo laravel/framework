@@ -83,7 +83,7 @@ class MemoizedStore implements Store
                 $result[$key] = $retrieved[$key];
             }
         }
-    
+
         return $result;
     }
 
