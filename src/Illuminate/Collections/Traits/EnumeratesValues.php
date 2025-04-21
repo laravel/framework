@@ -351,6 +351,36 @@ trait EnumeratesValues
     }
 
     /**
+     * Get the value of a given key from the first item in the collection,
+     * even if the value is a falsy one like 0, false, or an empty string.
+     *
+     * This method avoids treating falsy values as null or non-existent.
+     *
+     * @param  string|int  $key     The key to retrieve from the first matching item.
+     * @param  mixed|null  $default Default value if key not found.
+     * @return mixed
+     */
+    public function valuePreservingFalsy($key, $default = null)
+    {
+        $item = $this->first();
+
+        if ($item === null) {
+            return value($default);
+        }
+
+        if (is_array($item) && array_key_exists($key, $item)) {
+            return $item[$key];
+        }
+
+        if (is_object($item) && property_exists($item, $key)) {
+            return $item->{$key};
+        }
+
+        // Fallback to dot notation
+        return data_get($item, $key, $default);
+    }
+
+    /**
      * Ensure that every item in the collection is of the expected type.
      *
      * @template TEnsureOfType
