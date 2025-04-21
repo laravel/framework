@@ -56,14 +56,14 @@ class MemoizedStore implements Store
 
         foreach ($keys as $key) {
             $prefixedKey = $this->prefix($key);
-    
+
             if (array_key_exists($prefixedKey, $this->cache)) {
                 $memoized[$key] = $this->cache[$prefixedKey];
             } else {
                 $missing[] = $key;
             }
         }
-    
+
         if (count($missing) > 0) {
             $retrieved = tap($this->repository->many($missing), function ($values) {
                 $this->cache = [
