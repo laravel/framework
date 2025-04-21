@@ -436,10 +436,11 @@ class Arr
      *
      * @param  \ArrayAccess|array  $array
      * @param  string|int|null  $key
+     * @param  string|null  $format
      * @param  string|null  $tz
      * @return \Illuminate\Support\Carbon|null
      */
-    public static function date($array, $key, $tz = null)
+    public static function date($array, $key, $format = null, $tz = null)
     {
         $value = static::get($array, $key);
 
@@ -448,9 +449,11 @@ class Arr
         }
 
         if (is_array($value)) {
-            return array_map(function ($segment) use ($tz) {
+            return array_map(function ($segment) use ($format, $tz) {
                 try {
-                    return Date::parse($segment, $tz);
+                    return $format
+                        ? Date::createFromFormat($format, $segment, $tz)
+                        : Date::parse($segment, $tz);
                 } catch (InvalidFormatException) {
                     return null;
                 }
@@ -458,7 +461,9 @@ class Arr
         }
 
         try {
-            return Date::parse($value, $tz);
+            return $format
+                ? Date::createFromFormat($format, $value, $tz)
+                : Date::parse($value, $tz);
         } catch (InvalidFormatException) {
             return null;
         }

@@ -622,10 +622,13 @@ class SupportArrTest extends TestCase
         $array = ['date' => '2222-22-22'];
         $this->assertNull(Arr::date($array, 'date'));
 
-        $array = ['date' => '2025-01-22 00:00:00'];
-        $this->assertEquals('CAT', Arr::date($array, 'date', 'CAT')->timezone);
+        $array = ['date' => '01/22/2025 00:00:00'];
+        $this->assertEquals('2025-01-22 00:00:00', Arr::date($array, 'date', 'm/d/Y H:i:s')->format('Y-m-d H:i:s'));
 
-        $array = Arr::date(['2018-09-01 00:00:00', '2018-09-02 00:00:00', '2222-22-22 99:99:99'], null, 'CAT');
+        $array = ['date' => '2025-01-22 00:00:00'];
+        $this->assertEquals('CAT', Arr::date($array, 'date', null, 'CAT')->timezone);
+
+        $array = Arr::date(['2018-09-01 00:00:00', '2018-09-02 00:00:00', '2222-22-22 99:99:99'], null, null, 'CAT');
         $this->assertInstanceOf(Carbon::class, $array[0]);
         $this->assertEquals('CAT', $array[0]->timezone);
 
