@@ -89,6 +89,22 @@ class MemoizedStoreTest extends TestCase
         $this->assertSame(['name.0' => 'Tim', 'name.1' => 'Taylor'], $memoized);
     }
 
+    public function test_it_uses_correct_keys_for_getMultiple()
+    {
+        $data = [
+            'a' => 'string-value',
+            '1.1' => 'float-value',
+            '1' => 'integer-value-as-string',
+            2 => 'integer-value'
+        ];
+        Cache::putMany($data);
+
+        $memoValue = Cache::memo()->many(['a', '1.1', '1', 2]);
+        $cacheValue = Cache::many(['a', '1.1', '1', 2]);
+
+        $this->assertSame($cacheValue, $memoValue);
+    }
+
     public function test_null_values_are_memoized_when_retrieving_mulitple_values()
     {
         $live = Cache::getMultiple(['name.0', 'name.1']);
