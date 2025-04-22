@@ -76,6 +76,7 @@ class MemoizedStore implements Store
         }
 
         $result = [];
+
         foreach ($keys as $key) {
             if (array_key_exists($key, $memoized)) {
                 $result[$key] = $memoized[$key];
