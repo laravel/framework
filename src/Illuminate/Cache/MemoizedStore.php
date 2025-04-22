@@ -2,9 +2,7 @@
 
 namespace Illuminate\Cache;
 
-use Illuminate\Contracts\Cache\Store;
-
-class MemoizedStore implements Store
+class MemoizedStore extends TaggableStore
 {
     /**
      * The memoized cache values.
@@ -12,6 +10,8 @@ class MemoizedStore implements Store
      * @var array<string, mixed>
      */
     protected $cache = [];
+
+    protected ?MemoizedTaggedCache $taggedCache = null;
 
     /**
      * Create a new memoized cache instance.
@@ -204,5 +204,24 @@ class MemoizedStore implements Store
     protected function prefix($key)
     {
         return $this->getPrefix().$key;
+    }
+
+    /**
+     * Begin executing a new tags operation.
+     *
+     * @param  array|mixed  $names
+     * @return \Illuminate\Cache\TaggedCache
+     * 
+     * @throws \BadMethodCallException
+     */
+    public function tags($names)
+    {
+        if (!is_null($this->taggedCache)) {
+            return $this->taggedCache;
+        }
+
+        $taggedCache = $this->repository->tags($names);
+
+        return $this->taggedCache = new MemoizedTaggedCache($taggedCache->getStore(), $taggedCache->getTags());
     }
 }
