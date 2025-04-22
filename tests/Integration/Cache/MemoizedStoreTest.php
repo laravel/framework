@@ -95,12 +95,23 @@ class MemoizedStoreTest extends TestCase
             'a' => 'string-value',
             '1.1' => 'float-value',
             '1' => 'integer-value-as-string',
-            2 => 'integer-value'
+            2 => 'integer-value',
         ];
         Cache::putMany($data);
 
         $memoValue = Cache::memo()->many(['a', '1.1', '1', 2]);
         $cacheValue = Cache::many(['a', '1.1', '1', 2]);
+
+        $this->assertSame([
+            'a' => 'string-value',
+            '1.1' => 'float-value',
+            '1' => 'integer-value-as-string',
+            2 => 'integer-value',
+        ], $cacheValue);
+        $this->assertSame($cacheValue, $memoValue);
+
+        // ensure correct on the seconds memoized retrieval 
+        $memoValue = Cache::memo()->many(['a', '1.1', '1', 2]);
 
         $this->assertSame($cacheValue, $memoValue);
     }
