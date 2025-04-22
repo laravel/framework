@@ -49,7 +49,6 @@ if (! function_exists('data_get')) {
             return $target;
         }
 
-        // Special case for '*' as key
         if ($key === '*') {
             if ($target instanceof Collection) {
                 $target = $target->all();
