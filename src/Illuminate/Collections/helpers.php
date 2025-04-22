@@ -49,6 +49,28 @@ if (! function_exists('data_get')) {
             return $target;
         }
 
+        // Special case for '*' as key
+        if ($key === '*') {
+            if ($target instanceof Collection) {
+                $target = $target->all();
+            }
+
+            if (is_array($target)) {
+                return array_values($target);
+            }
+
+            if (is_iterable($target)) {
+                $result = [];
+                foreach ($target as $item) {
+                    $result[] = $item;
+                }
+
+                return $result;
+            }
+
+            return value($default);
+        }
+
         // Fast path for simple string keys (no dots)
         if (is_string($key) && ! str_contains($key, '.')) {
             if (Arr::accessible($target) && Arr::exists($target, $key)) {
@@ -79,7 +101,7 @@ if (! function_exists('data_get')) {
                 $result = [];
 
                 foreach ($target as $item) {
-                    $result[] = data_get($item, $key);
+                    $result[] = empty($key) ? $item : data_get($item, $key);
                 }
 
                 return in_array('*', $key) ? Arr::collapse($result) : $result;
