@@ -14,7 +14,7 @@ class ValuePreservingFalsyTest extends TestCase
             ['name' => 'John', 'balance' => 200],
         ]);
 
-        $this->assertSame(0, $collection->value('balance', preserveFalsy: true));
+        $this->assertSame(0, $collection->valuePreservingFalsy('balance'));
     }
 
     // Test when the value is 0.0 (float)
@@ -25,7 +25,7 @@ class ValuePreservingFalsyTest extends TestCase
             ['name' => 'John', 'balance' => 200.5],
         ]);
 
-        $this->assertSame(0.0, $collection->value('balance', preserveFalsy: true));
+        $this->assertSame(0.0, $collection->valuePreservingFalsy('balance'));
     }
 
     // Test when the value is false (boolean)
@@ -36,7 +36,7 @@ class ValuePreservingFalsyTest extends TestCase
             ['name' => 'Tim', 'vegetarian' => false],
         ]);
 
-        $this->assertFalse($collection->where('name', 'Tim')->value('vegetarian', preserveFalsy: true));
+        $this->assertFalse($collection->where('name', 'Tim')->valuePreservingFalsy('vegetarian'));
     }
 
     // Test when the value is an empty string
@@ -47,7 +47,7 @@ class ValuePreservingFalsyTest extends TestCase
             ['name' => 'John', 'status' => 'active'],
         ]);
 
-        $this->assertSame('', $collection->value('status', preserveFalsy: true));
+        $this->assertSame('', $collection->valuePreservingFalsy('status'));
     }
 
     // Test when the value is null
@@ -58,7 +58,7 @@ class ValuePreservingFalsyTest extends TestCase
             ['name' => 'John', 'age' => 30],
         ]);
 
-        $this->assertNull($collection->value('age', preserveFalsy: true));
+        $this->assertNull($collection->valuePreservingFalsy('age'));
     }
 
     // Test when the value is an empty array
@@ -69,7 +69,7 @@ class ValuePreservingFalsyTest extends TestCase
             ['name' => 'John', 'tags' => ['admin']],
         ]);
 
-        $this->assertSame([], $collection->value('tags', preserveFalsy: true));
+        $this->assertSame([], $collection->valuePreservingFalsy('tags'));
     }
 
     // Test when the value is '0' (string zero)
@@ -80,7 +80,7 @@ class ValuePreservingFalsyTest extends TestCase
             ['name' => 'John', 'balance' => '100'],
         ]);
 
-        $this->assertSame('0', $collection->value('balance', preserveFalsy: true));
+        $this->assertSame('0', $collection->valuePreservingFalsy('balance'));
     }
 
     // Test when a missing key is provided
@@ -91,7 +91,7 @@ class ValuePreservingFalsyTest extends TestCase
             ['name' => 'John', 'balance' => 200],
         ]);
 
-        $this->assertSame('default_value', $collection->value('missing_key', 'default_value', preserveFalsy: true));
+        $this->assertSame('default_value', $collection->valuePreservingFalsy('missing_key', 'default_value'));
     }
 
     // Test when a falsy value in a subsequent item is returned (e.g. first item is falsy, second is not)
@@ -102,7 +102,7 @@ class ValuePreservingFalsyTest extends TestCase
             ['name' => 'John', 'status' => 'active'],
         ]);
 
-        $this->assertSame(0, $collection->value('status', preserveFalsy: true));
+        $this->assertSame(0, $collection->valuePreservingFalsy('status'));
     }
 
     // Test when a falsy value in a subsequent item is returned (string '0' case)
@@ -113,6 +113,6 @@ class ValuePreservingFalsyTest extends TestCase
             ['name' => 'John', 'status' => 'active'],
         ]);
 
-        $this->assertSame('0', $collection->value('status', preserveFalsy: true));
+        $this->assertSame('0', $collection->valuePreservingFalsy('status'));
     }
 }
