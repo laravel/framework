@@ -79,7 +79,7 @@ class MemoizedStore implements Store
         foreach ($keys as $key) {
             if (array_key_exists($key, $memoized)) {
                 $result[$key] = $memoized[$key];
-            } elseif (array_key_exists($key, $retrieved)) {
+            } else {
                 $result[$key] = $retrieved[$key];
             }
         }
