@@ -1086,7 +1086,11 @@ trait HasRelationships
         }
 
         if ($nestedRelation !== null) {
-            foreach ($this->$relation as $related) {
+            $relatedModels = is_iterable($relatedModels = $this->$relation)
+                ? $relatedModels
+                : [$relatedModels];
+
+            foreach ($relatedModels as $related) {
                 if (! $related->relationLoaded($nestedRelation)) {
                     return false;
                 }
