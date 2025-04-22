@@ -184,7 +184,7 @@ trait HasRelationships
 
         foreach ($models as $model) {
             // Check if relation autoload contexts are different to avoid circular relation autoload...
-            if (is_null($context) || $context !== $model) {
+            if ((is_null($context) || $context !== $model) && is_object($model) && method_exists($model, 'autoloadRelationsUsing')) {
                 $model->autoloadRelationsUsing($callback, $context);
             }
         }
@@ -1072,7 +1072,28 @@ trait HasRelationships
      */
     public function relationLoaded($key)
     {
-        return array_key_exists($key, $this->relations);
+        if (array_key_exists($key, $this->relations)) {
+            return true;
+        }
+
+        [$relation, $nestedRelation] = array_replace(
+            [null, null],
+            explode('.', $key, 2),
+        );
+
+        if (! array_key_exists($relation, $this->relations)) {
+            return false;
+        }
+
+        if ($nestedRelation !== null) {
+            foreach ($this->$relation as $related) {
+                if (! $related->relationLoaded($nestedRelation)) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     /**

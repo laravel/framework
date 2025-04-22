@@ -280,7 +280,7 @@ class RepositoryTest extends TestCase
         $this->assertNull($this->repository->get('associate'));
     }
 
-    public function testsItIsMacroable()
+    public function testItIsMacroable()
     {
         $this->repository->macro('foo', function () {
             return 'macroable';

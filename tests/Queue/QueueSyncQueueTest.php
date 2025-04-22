@@ -6,6 +6,7 @@ use Exception;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Queue\QueueableEntity;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
 use Illuminate\Database\DatabaseTransactionsManager;
@@ -87,6 +88,7 @@ class QueueSyncQueueTest extends TestCase
         $container->bind(\Illuminate\Contracts\Container\Container::class, \Illuminate\Container\Container::class);
         $transactionManager = m::mock(DatabaseTransactionsManager::class);
         $transactionManager->shouldReceive('addCallback')->once()->andReturn(null);
+        $transactionManager->shouldNotReceive('addCallbackForRollback');
         $container->instance('db.transactions', $transactionManager);
 
         $sync->setContainer($container);
@@ -100,10 +102,39 @@ class QueueSyncQueueTest extends TestCase
         $container->bind(\Illuminate\Contracts\Container\Container::class, \Illuminate\Container\Container::class);
         $transactionManager = m::mock(DatabaseTransactionsManager::class);
         $transactionManager->shouldReceive('addCallback')->once()->andReturn(null);
+        $transactionManager->shouldNotReceive('addCallbackForRollback');
         $container->instance('db.transactions', $transactionManager);
 
         $sync->setContainer($container);
         $sync->push(new SyncQueueAfterCommitInterfaceJob());
+    }
+
+    public function testItAddsATransactionCallbackForAfterCommitUniqueJobs()
+    {
+        $sync = new SyncQueue;
+        $container = new Container;
+        $container->bind(\Illuminate\Contracts\Container\Container::class, \Illuminate\Container\Container::class);
+        $transactionManager = m::mock(DatabaseTransactionsManager::class);
+        $transactionManager->shouldReceive('addCallback')->once()->andReturn(null);
+        $transactionManager->shouldReceive('addCallbackForRollback')->once()->andReturn(null);
+        $container->instance('db.transactions', $transactionManager);
+
+        $sync->setContainer($container);
+        $sync->push(new SyncQueueAfterCommitUniqueJob());
+    }
+
+    public function testItAddsATransactionCallbackForInterfaceBasedAfterCommitUniqueJobs()
+    {
+        $sync = new SyncQueue;
+        $container = new Container;
+        $container->bind(\Illuminate\Contracts\Container\Container::class, \Illuminate\Container\Container::class);
+        $transactionManager = m::mock(DatabaseTransactionsManager::class);
+        $transactionManager->shouldReceive('addCallback')->once()->andReturn(null);
+        $transactionManager->shouldReceive('addCallbackForRollback')->once()->andReturn(null);
+        $container->instance('db.transactions', $transactionManager);
+
+        $sync->setContainer($container);
+        $sync->push(new SyncQueueAfterCommitInterfaceUniqueJob());
     }
 }
 
@@ -175,6 +206,26 @@ class SyncQueueAfterCommitJob
 }
 
 class SyncQueueAfterCommitInterfaceJob implements ShouldQueueAfterCommit
+{
+    use InteractsWithQueue;
+
+    public function handle()
+    {
+    }
+}
+
+class SyncQueueAfterCommitUniqueJob implements ShouldBeUnique
+{
+    use InteractsWithQueue;
+
+    public $afterCommit = true;
+
+    public function handle()
+    {
+    }
+}
+
+class SyncQueueAfterCommitInterfaceUniqueJob implements ShouldBeUnique, ShouldQueueAfterCommit
 {
     use InteractsWithQueue;
 

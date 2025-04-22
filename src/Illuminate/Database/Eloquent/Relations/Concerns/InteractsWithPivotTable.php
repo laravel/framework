@@ -470,21 +470,10 @@ trait InteractsWithPivotTable
     {
         $results = 0;
 
-        if (! empty($this->pivotWheres) ||
-            ! empty($this->pivotWhereIns) ||
-            ! empty($this->pivotWhereNulls)) {
-            $records = $this->getCurrentlyAttachedPivotsForIds($ids);
+        $records = $this->getCurrentlyAttachedPivotsForIds($ids);
 
-            foreach ($records as $record) {
-                $results += $record->delete();
-            }
-        } else {
-            foreach ($this->parseIds($ids) as $id) {
-                $results += $this->newPivot([
-                    $this->foreignPivotKey => $this->parent->{$this->parentKey},
-                    $this->relatedPivotKey => $id,
-                ], true)->delete();
-            }
+        foreach ($records as $record) {
+            $results += $record->delete();
         }
 
         return $results;
