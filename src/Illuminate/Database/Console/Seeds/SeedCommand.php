@@ -9,6 +9,7 @@ use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Seeder;
 use Illuminate\Filesystem\Filesystem;
+use InvalidArgumentException;
 use RuntimeException;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputArgument;
@@ -129,7 +130,7 @@ class SeedCommand extends Command
             return $files->exists($path) ? $files->json($path) : [];
         }
 
-        throw new RuntimeException('Unable to retrieve continue data. Please install the "illuminate/filesystem" package to use the --continue option.');
+        throw new InvalidArgumentException('Unable to retrieve continue data. Install the "illuminate/filesystem" package to use the --continue option.');
     }
 
     /**

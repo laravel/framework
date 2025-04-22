@@ -15,6 +15,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Events\NullDispatcher;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Testing\Assert;
+use InvalidArgumentException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -161,8 +162,8 @@ class SeedCommandTest extends TestCase
         // call run to set up IO, then fire manually.
         $command->run($input, $output);
 
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Unable to retrieve continue data. Please install the "illuminate/filesystem" package to use the --continue option.');
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unable to retrieve continue data. Install the "illuminate/filesystem" package to use the --continue option.');
 
         Assert::assertSame(Command::FAILURE, $command->handle());
     }
