@@ -6,7 +6,7 @@ use Closure;
 
 class Skip
 {
-    public function __construct(protected bool $skip = false)
+    public function __construct(protected Closure|bool $skip = false)
     {
     }
 
@@ -17,7 +17,7 @@ class Skip
      */
     public static function when(Closure|bool $condition): self
     {
-        return new self(value($condition));
+        return new self($condition);
     }
 
     /**
@@ -27,7 +27,7 @@ class Skip
      */
     public static function unless(Closure|bool $condition): self
     {
-        return new self(! value($condition));
+        return new self(fn() =>! value($condition));
     }
 
     /**
@@ -35,7 +35,7 @@ class Skip
      */
     public function handle(mixed $job, callable $next): mixed
     {
-        if ($this->skip) {
+        if (value($this->skip)) {
             return false;
         }
 
