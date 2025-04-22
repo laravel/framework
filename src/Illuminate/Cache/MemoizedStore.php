@@ -290,12 +290,12 @@ class MemoizedStore implements CanFlushLocks, LockProvider, Store
      *
      * @param  array|mixed  $names
      * @return \Illuminate\Cache\TaggedCache
-     * 
+     *
      * @throws \BadMethodCallException
      */
     public function tags($names)
     {
-        if (!is_null($this->taggedCache)) {
+        if (! is_null($this->taggedCache)) {
             return $this->taggedCache;
         }
 

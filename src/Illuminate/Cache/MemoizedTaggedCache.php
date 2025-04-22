@@ -29,7 +29,7 @@ class MemoizedTaggedCache extends TaggedCache
      * Retrieve an item from the cache by key.
      *
      * @param  string  $key
-     * @param  mixed   $default
+     * @param  mixed  $default
      * @return mixed
      */
     public function get($key, $default = null): mixed
@@ -66,7 +66,7 @@ class MemoizedTaggedCache extends TaggedCache
         }
 
         // Fetch missing keys from the parent TaggedCache
-        if (!empty($missing)) {
+        if (! empty($missing)) {
             $retrieved = $this->taggedCache->many($missing);
 
             // Memoize the retrieved values
@@ -90,8 +90,8 @@ class MemoizedTaggedCache extends TaggedCache
      * Store an item in the cache for a given number of seconds.
      *
      * @param  string  $key
-     * @param  mixed   $value
-     * @param  int     $ttl
+     * @param  mixed  $value
+     * @param  int  $ttl
      * @return bool
      */
     public function put($key, $value, $ttl = null)
@@ -145,7 +145,7 @@ class MemoizedTaggedCache extends TaggedCache
      * Increment the value of an item in the cache.
      *
      * @param  string  $key
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @return int|bool
      */
     public function increment($key, $value = 1)
@@ -159,7 +159,7 @@ class MemoizedTaggedCache extends TaggedCache
      * Decrement the value of an item in the cache.
      *
      * @param  string  $key
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @return int|bool
      */
     public function decrement($key, $value = 1)
