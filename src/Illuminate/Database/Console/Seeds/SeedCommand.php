@@ -233,7 +233,7 @@ class SeedCommand extends Command
         return [
             ['class', null, InputOption::VALUE_OPTIONAL, 'The class name of the root seeder', 'Database\\Seeders\\DatabaseSeeder'],
             ['database', null, InputOption::VALUE_OPTIONAL, 'The database connection to seed'],
-            ['continue', null, InputOption::VALUE_OPTIONAL, 'Continue from a previous seed operation'],
+            ['continue', null, InputOption::VALUE_OPTIONAL, 'Continue from a previous incomplete seed operation'],
             ['force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production'],
         ];
     }
