@@ -15,8 +15,6 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Throwable;
 
-use function json_encode;
-
 #[AsCommand(name: 'db:seed')]
 class SeedCommand extends Command
 {
