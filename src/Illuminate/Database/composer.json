@@ -40,7 +40,7 @@
         "fakerphp/faker": "Required to use the eloquent factory builder (^1.24).",
         "illuminate/console": "Required to use the database commands (^12.0).",
         "illuminate/events": "Required to use the observers with Eloquent (^12.0).",
-        "illuminate/filesystem": "Required to use the migrations and continue failed seeding (^12.0).",
+        "illuminate/filesystem": "Required to use the migrations and continue incomplete seeding (^12.0).",
         "illuminate/http": "Required to convert Eloquent models to API resources (^12.0).",
         "illuminate/pagination": "Required to paginate the result set (^12.0).",
         "symfony/finder": "Required to use Eloquent model factories (^7.2)."
