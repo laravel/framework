@@ -255,6 +255,42 @@ class SeedCommandTest extends TestCase
         $command->handle();
     }
 
+    public function testDoesntCallUseTransactionsIfSeederUsesRunMethod()
+    {
+        $input = new ArrayInput(['--database' => 'sqlite']);
+        $output = new NullOutput;
+        $outputStyle = new OutputStyle($input, $output);
+
+        $seeder = m::mock(ClassicUserSeeder::class);
+        $seeder->shouldReceive('setContainer')->once()->andReturnSelf();
+        $seeder->shouldReceive('setCommand')->once()->andReturnSelf();
+        $seeder->shouldReceive('__invoke')->once();
+        $seeder->shouldReceive('useTransactions')->never();
+
+        $resolver = m::mock(ConnectionResolverInterface::class);
+        $resolver->shouldReceive('getDefaultConnection')->once();
+        $resolver->shouldReceive('setDefaultConnection')->once()->with('sqlite');
+
+        $container = m::mock(Container::class);
+        $container->shouldReceive('call');
+        $container->shouldReceive('environment')->once()->andReturn('testing');
+        $container->shouldReceive('runningUnitTests')->andReturn('true');
+        $container->shouldReceive('make')->with('DatabaseSeeder')->andReturn($seeder);
+        $container->shouldReceive('make')->with(OutputStyle::class, m::any())->andReturn($outputStyle);
+        $container->shouldReceive('make')->with(Factory::class, m::any())->andReturn(new Factory($outputStyle));
+        $container->shouldReceive('storagePath')->andReturn('test_path');
+        $container->shouldReceive('bound')->with(Filesystem::class)->andReturn(false);
+
+        $command = new SeedCommand($resolver);
+        $command->setLaravel($container);
+
+        // call run to set up IO, then fire manually.
+        $command->run($input, $output);
+        $command->handle();
+
+        $container->shouldHaveReceived('call')->with([$command, 'handle']);
+    }
+
     protected function tearDown(): void
     {
         SeedCommand::prohibit(false);
@@ -272,5 +308,14 @@ class UserWithoutModelEventsSeeder extends Seeder
     public function run()
     {
         Assert::assertInstanceOf(NullDispatcher::class, Model::getEventDispatcher());
+    }
+}
+
+
+class ClassicUserSeeder extends Seeder
+{
+    public function run()
+    {
+
     }
 }

@@ -101,7 +101,7 @@ class SeedCommand extends Command
             }
         }
 
-        if (! $seeder->useTransactions()) {
+        if (! method_exists($seeder, 'run') && ! $seeder->useTransactions()) {
             $this->components->warn('Transactions are disabled. Errors may yield incomplete records.');
         }
 
