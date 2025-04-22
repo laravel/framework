@@ -562,7 +562,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
         } elseif (is_string($keyBy) && ! str_contains($keyBy, '.')) {
             $prop = $keyBy;
             $getter = function ($item) use ($prop) {
-                if (is_array($item) && isset($item[$prop])) {
+                if (Arr::accessible($item) && Arr::exists($item, $prop)) {
                     return $item[$prop];
                 }
                 if (is_object($item) && isset($item->{$prop})) {
