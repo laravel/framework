@@ -1437,6 +1437,27 @@ class TestResponseTest extends TestCase
         $response->assertJsonPath('data.foo', fn ($value) => $value === null);
     }
 
+    public function testAssertJsonPathWithEnum()
+    {
+        $response = TestResponse::fromBaseResponse(new Response([
+            'data' => ['status' => 'booked'],
+        ]));
+
+        $response->assertJsonPath('data.status', TestStatus::Booked);
+    }
+
+    public function testAssertJsonPathWithEnumCanFail()
+    {
+        $response = TestResponse::fromBaseResponse(new Response([
+            'data' => ['status' => 'failed'],
+        ]));
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Failed asserting that two strings are identical.');
+
+        $response->assertJsonPath('data.status', TestStatus::Booked);
+    }
+
     public function testAssertJsonPathCanonicalizing()
     {
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
@@ -2953,4 +2974,9 @@ class TestModel extends Model
 class AnotherTestModel extends Model
 {
     protected $guarded = [];
+}
+
+enum TestStatus: string
+{
+    case Booked = 'booked';
 }
