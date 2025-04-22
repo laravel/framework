@@ -27,7 +27,7 @@ class Skip
      */
     public static function unless(Closure|bool $condition): self
     {
-        return new self(fn() =>! value($condition));
+        return new self(fn () => ! value($condition));
     }
 
     /**
