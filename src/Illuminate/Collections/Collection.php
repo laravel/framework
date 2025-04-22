@@ -796,9 +796,9 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Get the values of a given key.
      *
-     * @param  string|array|int|null  $value
-     * @param  string|array|null  $key
-     * @return static
+     * @param  string|int|array<array-key, string>|null  $value
+     * @param  string|null  $key
+     * @return static<array-key, mixed>
      */
     public function pluck($value, $key = null)
     {
