@@ -110,7 +110,7 @@ class MemoizedStoreTest extends TestCase
         ], $cacheValue);
         $this->assertSame($cacheValue, $memoValue);
 
-        // ensure correct on the seconds memoized retrieval
+        // ensure correct on the second memoized retrieval
         $memoValue = Cache::memo()->many(['a', '1.1', '1', 2]);
 
         $this->assertSame($cacheValue, $memoValue);
