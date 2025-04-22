@@ -588,7 +588,7 @@ class Arr
         // Fast path for simple value keys (no dots)
         if (is_string($value) && ! str_contains($value, '.') && is_null($key)) {
             foreach ($array as $item) {
-                if (is_array($item) && array_key_exists($value, $item)) {
+                if (Arr::accessible($item) && Arr::exists($item, $value)) {
                     $results[] = $item[$value];
                 } elseif (is_object($item) && isset($item->{$value})) {
                     $results[] = $item->{$value};

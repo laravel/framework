@@ -805,7 +805,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
         // Fast path for simple value keys (no dots)
         if (is_string($value) && ! str_contains($value, '.') && is_null($key)) {
             return new static(array_map(function ($item) use ($value) {
-                if (is_array($item) && array_key_exists($value, $item)) {
+                if (Arr::accessible($item) && Arr::exists($item, $value)) {
                     return $item[$value];
                 } elseif (is_object($item) && isset($item->{$value})) {
                     return $item->{$value};
