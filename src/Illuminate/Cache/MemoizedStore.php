@@ -70,7 +70,7 @@ class MemoizedStore implements Store
                     ...$this->cache,
                     ...collect($values)->mapWithKeys(fn ($value, $key) => [
                         $this->prefix($key) => $value,
-                    ])->all(),
+                    ]),
                 ];
             });
         }
