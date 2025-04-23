@@ -6,6 +6,9 @@ use Closure;
 
 class Skip
 {
+    /**
+     * @param  bool|Closure(): bool  $skip
+     */
     public function __construct(protected Closure|bool $skip = false)
     {
     }
