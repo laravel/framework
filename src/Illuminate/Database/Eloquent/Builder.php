@@ -1920,6 +1920,8 @@ class Builder implements BuilderContract
      *
      * @param  \Closure(): TModelValue  $scope
      * @return TModelValue
+     *
+     * @throws \Throwable
      */
     public function withSavepointIfNeeded(Closure $scope): mixed
     {
@@ -2249,6 +2251,8 @@ class Builder implements BuilderContract
      * @param  string  $mixin
      * @param  bool  $replace
      * @return void
+     *
+     * @throws \ReflectionException
      */
     protected static function registerMixin($mixin, $replace)
     {
