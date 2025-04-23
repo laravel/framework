@@ -98,7 +98,7 @@ abstract class Queue
      * @param  \Closure|string|object  $job
      * @param  string  $queue
      * @param  mixed  $data
-     * @param  \DateTimeInterface|\DateInterval|int  $delay
+     * @param  \DateTimeInterface|\DateInterval|int|null  $delay
      * @return string
      *
      * @throws \Illuminate\Queue\InvalidPayloadException
