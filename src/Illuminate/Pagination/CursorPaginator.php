@@ -33,6 +33,13 @@ class CursorPaginator extends AbstractCursorPaginator implements Arrayable, Arra
     protected $hasMore;
 
     /**
+     * The function that transforms before rendering.
+     *
+     * @var \Closure(TValue): mixed
+     */
+    protected $transformer;
+
+    /**
      * Create a new paginator instance.
      *
      * @param  Collection<TKey, TValue>|Arrayable<TKey, TValue>|iterable<TKey, TValue>|null  $items
@@ -143,6 +150,29 @@ class CursorPaginator extends AbstractCursorPaginator implements Arrayable, Arra
     }
 
     /**
+     * Set how data is transformed before rendering to JSON.
+     *
+     * @param  \Closure(TValue): mixed  $tranformer
+     * @return $this
+     */
+    public function setTransformer($tranformer)
+    {
+        $this->transformer = $tranformer;
+
+        return $this;
+    }
+
+    /**
+     * Prepare data for rendering.
+     *
+     * @return array
+     */
+    protected function transformedData()
+    {
+        return $this->transformer ? $this->items->map($this->transformer)->toArray() : $this->items->toArray();
+    }
+
+    /**
      * Get the instance as an array.
      *
      * @return array
@@ -150,7 +180,7 @@ class CursorPaginator extends AbstractCursorPaginator implements Arrayable, Arra
     public function toArray()
     {
         return [
-            'data' => $this->items->toArray(),
+            'data' => $this->transformedData(),
             'path' => $this->path(),
             'per_page' => $this->perPage(),
             'next_cursor' => $this->nextCursor()?->encode(),

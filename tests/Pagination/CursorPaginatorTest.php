@@ -70,13 +70,14 @@ class CursorPaginatorTest extends TestCase
             $options = ['path' => 'http://website.com/test', 'parameters' => ['id']]);
 
         $p->through(function ($item) {
-            $item['id'] = $item['id'] + 2;
+            $item['zid'] = $item['id'] + 2;
+            unset($item['id']);
 
             return $item;
         });
 
         $this->assertInstanceOf(CursorPaginator::class, $p);
-        $this->assertSame([['id' => 6], ['id' => 7]], $p->items());
+        $this->assertSame([['zid' => 6], ['zid' => 7]], $p->items());
     }
 
     public function testCursorPaginatorOnFirstAndLastPage()
@@ -118,6 +119,32 @@ class CursorPaginatorTest extends TestCase
             'prev_cursor' => null,
             'prev_page_url' => null,
         ], $p->toArray());
+    }
+
+    public function testCanTransformOutput()
+    {
+        $p = new CursorPaginator([['id' => 4], ['id' => 5], ['id' => 6]], 2, null,
+            ['path' => 'http://website.com/test', 'parameters' => ['id']]
+        );
+
+        $p->setTransformer(function ($item) {
+            return [
+                'slug' => 'slug-'.$item['id'],
+                'name' => 'Test '.$item['id'],
+            ];
+        });
+
+        $this->assertInstanceOf(CursorPaginator::class, $p);
+        $this->assertEquals([
+            'data' => [['slug' => 'slug-4', 'name' => 'Test 4'], ['slug' => 'slug-5', 'name' => 'Test 5']],
+            'path' => 'http://website.com/test',
+            'per_page' => 2,
+            'next_cursor' => 'eyJpZCI6NSwiX3BvaW50c1RvTmV4dEl0ZW1zIjp0cnVlfQ',
+            'next_page_url' => 'http://website.com/test?cursor=eyJpZCI6NSwiX3BvaW50c1RvTmV4dEl0ZW1zIjp0cnVlfQ',
+            'prev_cursor' => null,
+            'prev_page_url' => null,
+        ], $p->toArray());
+        $this->assertEquals([ ['id' => 4], ['id' => 5]], $p->items());
     }
 
     protected function getCursor($params, $isNext = true)
