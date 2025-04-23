@@ -12,6 +12,8 @@ use Illuminate\Support\Str;
 use Illuminate\Testing\Assert as PHPUnit;
 use JsonSerializable;
 
+use function Illuminate\Support\enum_value;
+
 class AssertableJsonString implements ArrayAccess, Countable
 {
     /**
