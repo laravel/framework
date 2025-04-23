@@ -1,6 +1,19 @@
 # Release Notes for 11.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v11.44.2...11.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v11.44.3...11.x)
+
+## [v11.44.3](https://github.com/laravel/framework/compare/v11.44.2...v11.44.3) - 2025-04-23
+
+* [10.x] Refine error messages for detecting lost connections (Debian bookworm compatibility) by [@mfn](https://github.com/mfn) in https://github.com/laravel/framework/pull/53794
+* [10.x] Bump minimum `league/commonmark` by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/53829
+* [10.x] Backport 11.x PHP 8.4 fix for str_getcsv deprecation by [@aka-tpayne](https://github.com/aka-tpayne) in https://github.com/laravel/framework/pull/54074
+* [10.x] Fix attribute name used on `Validator` instance within certain rule classes by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/54943
+* Add `Illuminate\Support\EncodedHtmlString` by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/54737
+* [11.x] Fix missing `return $this` for `assertOnlyJsonValidationErrors` by [@LeTamanoir](https://github.com/LeTamanoir) in https://github.com/laravel/framework/pull/55099
+* [11.x] Fix `Illuminate\Support\EncodedHtmlString` from causing breaking change by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/55149
+* [11.x] Respect custom path for cached views by the `AboutCommand` by [@alies-dev](https://github.com/alies-dev) in https://github.com/laravel/framework/pull/55179
+* [11.x] Include all invisible characters in Str::trim by [@laserhybiz](https://github.com/laserhybiz) in https://github.com/laravel/framework/pull/54281
+* [11.x] Test Improvements by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/55302
 
 ## [v11.44.2](https://github.com/laravel/framework/compare/v11.44.1...v11.44.2) - 2025-03-12
 
