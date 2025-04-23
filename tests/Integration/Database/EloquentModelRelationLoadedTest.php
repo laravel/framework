@@ -119,6 +119,22 @@ class EloquentModelRelationLoadedTest extends DatabaseTestCase
         $this->assertTrue($model->relationLoaded('twos.threes'));
         $this->assertTrue($model->relationLoaded('twos.threes.one'));
     }
+
+    public function testWhenParentRelationIsASingleInstance()
+    {
+        $one = One::query()->create();
+        $two = $one->twos()->create();
+        $three = $two->threes()->create();
+
+        $model = Three::query()
+            ->with('two.one')
+            ->find($three->id);
+
+        $this->assertTrue($model->relationLoaded('two'));
+        $this->assertTrue($model->two->is($two));
+        $this->assertTrue($model->relationLoaded('two.one'));
+        $this->assertTrue($model->two->one->is($one));
+    }
 }
 
 class One extends Model
