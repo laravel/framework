@@ -36,6 +36,13 @@ class Markdown
     protected $componentPaths = [];
 
     /**
+     * Determine if secure encoding should be enabled if needed.
+     *
+     * @var bool
+     */
+    protected static $withSecuredEncoding = true;
+
+    /**
      * Create a new Markdown renderer instance.
      *
      * @param  \Illuminate\Contracts\View\Factory  $view
@@ -125,6 +132,26 @@ class Markdown
     }
 
     /**
+     * Disable secured encoding when parsing Markdown for Mail.
+     *
+     * @return void
+     */
+    public static function withoutSecuredEncoding()
+    {
+        static::$withSecuredEncoding = false;
+    }
+
+    /**
+     * Enable secured encoding when parsing Markdown for Mail.
+     *
+     * @return void
+     */
+    public static function withSecuredEncoding()
+    {
+        static::$withSecuredEncoding = true;
+    }
+
+    /**
      * Parse the given Markdown text into HTML.
      *
      * @param  string  $text
@@ -137,18 +164,20 @@ class Markdown
             return new HtmlString(static::converter()->convert($text)->getContent());
         }
 
-        EncodedHtmlString::encodeUsing(function ($value) {
-            $replacements = [
-                '[' => '\[',
-                '<' => '\<',
-            ];
+        if (static::$withSecuredEncoding === true) {
+            EncodedHtmlString::encodeUsing(function ($value) {
+                $replacements = [
+                    '[' => '\[',
+                    '<' => '\<',
+                ];
 
-            $html = str_replace(array_keys($replacements), array_values($replacements), $value);
+                $html = str_replace(array_keys($replacements), array_values($replacements), $value);
 
-            return static::converter([
-                'html_input' => 'escape',
-            ])->convert($html)->getContent();
-        });
+                return static::converter([
+                    'html_input' => 'escape',
+                ])->convert($html)->getContent();
+            });
+        }
 
         $html = '';
 
