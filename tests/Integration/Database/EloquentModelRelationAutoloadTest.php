@@ -122,6 +122,7 @@ class EloquentModelRelationAutoloadTest extends DatabaseTestCase
         $post = Post::create();
         $comment1 = $post->comments()->create(['parent_id' => null]);
         $comment2 = $post->comments()->create(['parent_id' => $comment1->id]);
+        $post->likes()->create();
 
         DB::enableQueryLog();
 
@@ -129,7 +130,9 @@ class EloquentModelRelationAutoloadTest extends DatabaseTestCase
         $comment = $post->comments->first();
         $comment->setRelation('post', $post);
 
-        $this->assertCount(1, DB::getQueryLog());
+        $this->assertCount(1, $post->likes);
+
+        $this->assertCount(2, DB::getQueryLog());
 
         DB::disableQueryLog();
     }
