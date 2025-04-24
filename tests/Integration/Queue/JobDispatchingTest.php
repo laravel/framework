@@ -176,7 +176,7 @@ class JobDispatchingTest extends QueueTestCase
 
         $this->assertTrue(Job::$ran);
 
-        Bus::disableDispatchingAfterResponse();
+        Bus::withoutDispatchingAfterResponses();
 
         Job::$ran = false;
         Job::dispatchAfterResponse('test');
@@ -185,7 +185,7 @@ class JobDispatchingTest extends QueueTestCase
 
         $this->app->terminate();
 
-        Bus::enableDispatchingAfterResponse();
+        Bus::withDispatchingAfterResponses();
 
         Job::$ran = false;
         Job::dispatchAfterResponse('test');

@@ -56,7 +56,7 @@ class Dispatcher implements QueueingDispatcher
      *
      * @var bool
      */
-    protected $afterResponseDisabled = false;
+    protected $allowsDispatchingAfterResponses = true;
 
     /**
      * Create a new command dispatcher instance.
@@ -259,7 +259,7 @@ class Dispatcher implements QueueingDispatcher
      */
     public function dispatchAfterResponse($command, $handler = null)
     {
-        if ($this->afterResponseDisabled) {
+        if (! $this->allowsDispatchingAfterResponses) {
             $this->dispatchSync($command);
 
             return;
@@ -268,30 +268,6 @@ class Dispatcher implements QueueingDispatcher
         $this->container->terminating(function () use ($command, $handler) {
             $this->dispatchSync($command, $handler);
         });
-    }
-
-    /**
-     * Disable dispatching after response.
-     *
-     * @return $this
-     */
-    public function disableDispatchingAfterResponse()
-    {
-        $this->afterResponseDisabled = true;
-
-        return $this;
-    }
-
-    /**
-     * Enable dispatching after response.
-     *
-     * @return $this
-     */
-    public function enableDispatchingAfterResponse()
-    {
-        $this->afterResponseDisabled = false;
-
-        return $this;
     }
 
     /**
@@ -316,6 +292,30 @@ class Dispatcher implements QueueingDispatcher
     public function map(array $map)
     {
         $this->handlers = array_merge($this->handlers, $map);
+
+        return $this;
+    }
+
+    /**
+     * Allow dispatching after responses.
+     *
+     * @return $this
+     */
+    public function withDispatchingAfterResponses()
+    {
+        $this->allowsDispatchingAfterResponses = true;
+
+        return $this;
+    }
+
+    /**
+     * Disable dispatching after responses.
+     *
+     * @return $this
+     */
+    public function withoutDispatchingAfterResponses()
+    {
+        $this->allowsDispatchingAfterResponses = false;
 
         return $this;
     }
