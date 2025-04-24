@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\View;
 
+use Error;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\View\Engines\PhpEngine;
 use PHPUnit\Framework\TestCase;
