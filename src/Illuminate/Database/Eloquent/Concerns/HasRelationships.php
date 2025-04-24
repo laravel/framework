@@ -1090,6 +1090,10 @@ trait HasRelationships
                 ? $relatedModels
                 : array_filter([$relatedModels]);
 
+            if (count($relatedModels) === 0) {
+                return false;
+            }
+
             foreach ($relatedModels as $related) {
                 if (! $related->relationLoaded($nestedRelation)) {
                     return false;
