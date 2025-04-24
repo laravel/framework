@@ -543,7 +543,7 @@ trait HasAttributes
         // If the key already exists in the relationships array, it just means the
         // relationship has already been loaded, so we'll just return it out of
         // here because there is no need to query within the relations twice.
-        if ($this->relationLoaded($key)) {
+        if (array_key_exists($key, $this->relations)) {
             return $this->relations[$key];
         }
 

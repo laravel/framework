@@ -154,7 +154,7 @@ trait HasRelationships
 
         $this->invokeRelationAutoloadCallbackFor($key, []);
 
-        return $this->relationLoaded($key);
+        return array_key_exists($key, $this->relations);
     }
 
     /**
@@ -1081,7 +1081,30 @@ trait HasRelationships
      */
     public function relationLoaded($key)
     {
-        return array_key_exists($key, $this->relations);
+        if (! str_contains($key, '.')) {
+            return array_key_exists($key, $this->relations);
+        }
+
+        $relations = explode('.', $key, 2);
+        $childRelation = $relations[0];
+        $nestedRelation = $relations[1];
+
+        // A relation may contain a single Model or collection of Models.
+        // So we prepare for both scenarios.
+        $relationValue = $this->getRelationValue($childRelation);
+        $relationValues = is_iterable($relationValue) ? $relationValue : [$relationValue];
+
+        foreach ($relationValues as $related) {
+            if (! $related instanceof Model) {
+                return false;
+            }
+
+            if (! $related->relationLoaded($nestedRelation)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
