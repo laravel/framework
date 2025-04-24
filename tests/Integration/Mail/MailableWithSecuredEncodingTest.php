@@ -5,89 +5,22 @@ namespace Illuminate\Tests\Integration\Mail;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Mail\Mailable;
-use Illuminate\Mail\Mailables\Content;
-use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Mail\Markdown;
-use Illuminate\Support\EncodedHtmlString;
 use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\Factories\UserFactory;
-use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-class MailableWithSecuredEncodingTest extends TestCase
+class MailableWithSecuredEncodingTest extends MailableTestCase
 {
     use LazilyRefreshDatabase;
 
     /** {@inheritdoc} */
     #[\Override]
-    protected function tearDown(): void
-    {
-        Markdown::flushState();
-        EncodedHtmlString::flushState();
-
-        parent::tearDown();
-    }
-
-    /** {@inheritdoc} */
-    #[\Override]
     protected function defineEnvironment($app)
     {
-        $app['view']->addLocation(__DIR__.'/Fixtures');
+        parent::defineEnvironment($app);
 
         Markdown::withSecuredEncoding();
-    }
-
-    #[DataProvider('markdownEncodedDataProvider')]
-    public function testItCanAssertMarkdownEncodedString($given, $expected)
-    {
-        $mailable = new class($given) extends Mailable
-        {
-            public function __construct(public string $message)
-            {
-                //
-            }
-
-            public function envelope()
-            {
-                return new Envelope(
-                    subject: 'My basic title',
-                );
-            }
-
-            public function content()
-            {
-                return new Content(
-                    markdown: 'message',
-                );
-            }
-        };
-
-        $mailable->assertSeeInHtml($expected, false);
-    }
-
-    public static function markdownEncodedDataProvider()
-    {
-        yield ['[Laravel](https://laravel.com)', 'My message is: [Laravel](https://laravel.com)'];
-
-        yield [
-            '![Welcome to Laravel](https://laravel.com/assets/img/welcome/background.svg)',
-            'My message is: ![Welcome to Laravel](https://laravel.com/assets/img/welcome/background.svg)',
-        ];
-
-        yield [
-            'Visit https://laravel.com/docs to browse the documentation',
-            'My message is: Visit https://laravel.com/docs to browse the documentation',
-        ];
-
-        yield [
-            'Visit <https://laravel.com/docs> to browse the documentation',
-            'My message is: Visit &lt;https://laravel.com/docs&gt; to browse the documentation',
-        ];
-
-        yield [
-            'Visit <span>https://laravel.com/docs</span> to browse the documentation',
-            'My message is: Visit &lt;span&gt;https://laravel.com/docs&lt;/span&gt; to browse the documentation',
-        ];
     }
 
     #[WithMigration]
