@@ -51,7 +51,7 @@ class ViewBladeCompilerTest extends TestCase
 
     public function testIsExpiredReturnsTrueWhenUseCacheIsFalse()
     {
-        $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__, $basePath = '', $useCache = false);
+        $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__, shouldCache: false);
         $this->assertTrue($compiler->isExpired('foo'));
     }
 
