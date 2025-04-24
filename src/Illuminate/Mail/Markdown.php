@@ -36,6 +36,13 @@ class Markdown
     protected $componentPaths = [];
 
     /**
+     * Indicates if secure encoding should be enabled.
+     *
+     * @var bool
+     */
+    protected static $withSecuredEncoding = false;
+
+    /**
      * Create a new Markdown renderer instance.
      *
      * @param  \Illuminate\Contracts\View\Factory  $view
@@ -69,15 +76,17 @@ class Markdown
         $contents = $bladeCompiler->usingEchoFormat(
             'new \Illuminate\Support\EncodedHtmlString(%s)',
             function () use ($view, $data) {
-                EncodedHtmlString::encodeUsing(function ($value) {
-                    $replacements = [
-                        '[' => '\[',
-                        '<' => '&lt;',
-                        '>' => '&gt;',
-                    ];
+                if (static::$withSecuredEncoding === true) {
+                    EncodedHtmlString::encodeUsing(function ($value) {
+                        $replacements = [
+                            '[' => '\[',
+                            '<' => '&lt;',
+                            '>' => '&gt;',
+                        ];
 
-                    return str_replace(array_keys($replacements), array_values($replacements), $value);
-                });
+                        return str_replace(array_keys($replacements), array_values($replacements), $value);
+                    });
+                }
 
                 try {
                     $contents = $this->view->replaceNamespace(
@@ -137,18 +146,20 @@ class Markdown
             return new HtmlString(static::converter()->convert($text)->getContent());
         }
 
-        EncodedHtmlString::encodeUsing(function ($value) {
-            $replacements = [
-                '[' => '\[',
-                '<' => '\<',
-            ];
+        if (static::$withSecuredEncoding === true || $encoded === true) {
+            EncodedHtmlString::encodeUsing(function ($value) {
+                $replacements = [
+                    '[' => '\[',
+                    '<' => '\<',
+                ];
 
-            $html = str_replace(array_keys($replacements), array_values($replacements), $value);
+                $html = str_replace(array_keys($replacements), array_values($replacements), $value);
 
-            return static::converter([
-                'html_input' => 'escape',
-            ])->convert($html)->getContent();
-        });
+                return static::converter([
+                    'html_input' => 'escape',
+                ])->convert($html)->getContent();
+            });
+        }
 
         $html = '';
 
@@ -249,5 +260,35 @@ class Markdown
     public function getTheme()
     {
         return $this->theme;
+    }
+
+    /**
+     * Enable secured encoding when parsing Markdown.
+     *
+     * @return void
+     */
+    public static function withSecuredEncoding()
+    {
+        static::$withSecuredEncoding = true;
+    }
+
+    /**
+     * Disable secured encoding when parsing Markdown.
+     *
+     * @return void
+     */
+    public static function withoutSecuredEncoding()
+    {
+        static::$withSecuredEncoding = false;
+    }
+
+    /**
+     * Flush the class's global state.
+     *
+     * @return void
+     */
+    public static function flushState()
+    {
+        static::$withSecuredEncoding = false;
     }
 }

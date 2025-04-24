@@ -7,20 +7,34 @@ use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
+use Illuminate\Mail\Markdown;
+use Illuminate\Support\EncodedHtmlString;
 use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\Factories\UserFactory;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-class MailableTest extends TestCase
+class MailableWithoutSecuredEncodingTest extends TestCase
 {
     use LazilyRefreshDatabase;
+
+    /** {@inheritdoc} */
+    #[\Override]
+    protected function tearDown(): void
+    {
+        Markdown::flushState();
+        EncodedHtmlString::flushState();
+
+        parent::tearDown();
+    }
 
     /** {@inheritdoc} */
     #[\Override]
     protected function defineEnvironment($app)
     {
         $app['view']->addLocation(__DIR__.'/Fixtures');
+
+        Markdown::withoutSecuredEncoding();
     }
 
     #[DataProvider('markdownEncodedDataProvider')]
@@ -104,11 +118,11 @@ class MailableTest extends TestCase
 
     public static function markdownEncodedTemplateDataProvider()
     {
-        yield ['[Laravel](https://laravel.com)', '<em>Hi</em> [Laravel](https://laravel.com)'];
+        yield ['[Laravel](https://laravel.com)', '<p><em>Hi</em> <a href="https://laravel.com">Laravel</a></p>'];
 
         yield [
             '![Welcome to Laravel](https://laravel.com/assets/img/welcome/background.svg)',
-            '<em>Hi</em> ![Welcome to Laravel](https://laravel.com/assets/img/welcome/background.svg)',
+            '<p><em>Hi</em> <img src="https://laravel.com/assets/img/welcome/background.svg" alt="Welcome to Laravel"></p>',
         ];
 
         yield [
