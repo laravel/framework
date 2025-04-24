@@ -14,4 +14,13 @@ class ViewPhpEngineTest extends TestCase
         $this->assertSame('Hello World
 ', $engine->get(__DIR__.'/fixtures/basic.php'));
     }
+
+    public function testErrorInViewThrowsException()
+    {
+        $this->expectException(Error::class);
+        $this->expectExceptionMessage('Call to undefined function undefinedFunction()');
+
+        $engine = new PhpEngine(new Filesystem);
+        $engine->get(__DIR__.'/fixtures/error.php');
+    }
 }
