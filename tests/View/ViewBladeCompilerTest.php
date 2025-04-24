@@ -57,7 +57,8 @@ class ViewBladeCompilerTest extends TestCase
 
     public function testIsExpiredReturnsFalseWhenIgnoreCacheTimestampsIsTrue()
     {
-        $compiler = new BladeCompiler($this->getFiles(), __DIR__, ignoreCacheTimestamps: true);
+        $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__, shouldCheckTimestamps: false);
+        $files->shouldReceive('exists')->once()->with(__DIR__.'/'.hash('xxh128', 'v2foo').'.php')->andReturn(true);
         $this->assertFalse($compiler->isExpired('foo'));
     }
 
