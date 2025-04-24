@@ -1922,4 +1922,16 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     {
         unset($this->items[$key]);
     }
+
+    /**
+     * Filter the collection by matching values against a regular expression.
+     *
+     * @param  string  $regex
+     * @param  string|int|null  $key
+     * @return static
+     */
+    public function filterByRegex($regex, $key = null)
+    {
+        return $this->filter(fn ($item) => preg_match($regex, data_get($item, $key)) === 1);
+    }
 }

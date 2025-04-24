@@ -5683,6 +5683,47 @@ class SupportCollectionTest extends TestCase
         $this->assertNull($collection->percentage(fn ($value) => $value === 1));
     }
 
+    public function testFilterByRegex()
+    {
+        $data = new Collection(['php', 'laravel', 'python', 'pascal']);
+        $result = $data->filterByRegex('/^p/');
+        $this->assertSame(['php', 'python', 'pascal'], array_values($result->toArray()));
+
+        $data = new Collection([
+            ['email' => 'foo@gmail.com'],
+            ['email' => 'bar@yahoo.com'],
+            ['email' => 'baz@gmail.com'],
+        ]);
+        $result = $data->filterByRegex('/@gmail\.com$/', 'email');
+        $this->assertSame([
+            ['email' => 'foo@gmail.com'],
+            ['email' => 'baz@gmail.com'],
+        ], array_values($result->toArray()));
+
+        $data = new Collection([
+            ['user' => ['profile' => ['bio' => 'I love PHP']]],
+            ['user' => ['profile' => ['bio' => 'I prefer JS']]],
+            ['user' => ['profile' => ['bio' => 'PHP developer']]],
+        ]);
+        $result = $data->filterByRegex('/PHP/', 'user.profile.bio');
+        $this->assertSame([
+            ['user' => ['profile' => ['bio' => 'I love PHP']]],
+            ['user' => ['profile' => ['bio' => 'PHP developer']]],
+        ], array_values($result->toArray()));
+
+        $data = new Collection([
+            ['email' => 'admin@example.com', 'role' => 'admin', 'status' => 'active'],
+            ['email' => 'user@example.com', 'role' => 'user', 'status' => 'inactive'],
+            ['email' => 'manager@example.com', 'role' => 'manager', 'status' => 'active'],
+        ]);
+        $result = $data->filterByRegex('/^ad/', 'role')->filterByRegex('/^active$/', 'status');
+
+        $this->assertSame([
+            ['email' => 'admin@example.com', 'role' => 'admin', 'status' => 'active'],
+        ], array_values($result->toArray()));
+    }
+
+
     /**
      * Provides each collection class, respectively.
      *
