@@ -711,7 +711,7 @@ class Collection extends BaseCollection implements QueueableCollection
      */
     public function partition($key, $operator = null, $value = null)
     {
-        return parent::partition($key, $operator, $value)->toBase();
+        return parent::partition(...func_get_args())->toBase();
     }
 
     /**

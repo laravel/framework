@@ -3223,7 +3223,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals(1, $model->getAttribute('duplicatedAttribute'));
     }
 
-    public function testsCastOnArrayFormatWithOneElement()
+    public function testCastOnArrayFormatWithOneElement()
     {
         $model = new EloquentModelCastingStub;
         $model->setRawAttributes([

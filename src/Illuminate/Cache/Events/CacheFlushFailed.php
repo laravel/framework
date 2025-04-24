@@ -2,7 +2,7 @@
 
 namespace Illuminate\Cache\Events;
 
-class CacheFlushed
+class CacheFlushFailed
 {
     /**
      * The name of the cache store.

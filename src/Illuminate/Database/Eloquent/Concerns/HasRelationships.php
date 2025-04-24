@@ -162,7 +162,7 @@ trait HasRelationships
      * Propagate the relationship autoloader callback to the given related models.
      *
      * @param  string  $key
-     * @param  mixed  $values
+     * @param  mixed  $models
      * @param  mixed  $context
      * @return void
      */
@@ -184,7 +184,7 @@ trait HasRelationships
 
         foreach ($models as $model) {
             // Check if relation autoload contexts are different to avoid circular relation autoload...
-            if (is_null($context) || $context !== $model) {
+            if ((is_null($context) || $context !== $model) && is_object($model) && method_exists($model, 'autoloadRelationsUsing')) {
                 $model->autoloadRelationsUsing($callback, $context);
             }
         }

@@ -1,6 +1,83 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.8.1...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.10.2...12.x)
+
+## [v12.10.2](https://github.com/laravel/framework/compare/v12.10.1...v12.10.2) - 2025-04-24
+
+* [12.x] Address Model@relationLoaded when relation is null by [@rodrigopedra](https://github.com/rodrigopedra) in https://github.com/laravel/framework/pull/55531
+
+## [v12.10.1](https://github.com/laravel/framework/compare/v12.10.0...v12.10.1) - 2025-04-23
+
+* Revert "Use value() helper in 'when' method to simplify code" #55465 by [@mohammadrasoulasghari](https://github.com/mohammadrasoulasghari) in https://github.com/laravel/framework/pull/55514
+* [12.x] Use xxh128 when comparing views for changes by [@shawnlindstrom](https://github.com/shawnlindstrom) in https://github.com/laravel/framework/pull/55517
+* [12.x] Ensure related models is iterable on `HasRelationships@relationLoaded()` by [@rodrigopedra](https://github.com/rodrigopedra) in https://github.com/laravel/framework/pull/55519
+* [12.x] Add Enum support for assertJsonPath in AssertableJsonString.php by [@azim-kordpour](https://github.com/azim-kordpour) in https://github.com/laravel/framework/pull/55516
+
+## [v12.10.0](https://github.com/laravel/framework/compare/v12.9.2...v12.10.0) - 2025-04-22
+
+* Use value() helper in 'when' method by [@mohammadrasoulasghari](https://github.com/mohammadrasoulasghari) in https://github.com/laravel/framework/pull/55465
+* [12.x] Test `@use` directive without quotes by [@osbre](https://github.com/osbre) in https://github.com/laravel/framework/pull/55462
+* [12.x] Enhance Broadcast Events Test Coverage by [@roshandelpoor](https://github.com/roshandelpoor) in https://github.com/laravel/framework/pull/55458
+* [12.x] Add `Conditionable` Trait to `Fluent`  by [@michaelnabil230](https://github.com/michaelnabil230) in https://github.com/laravel/framework/pull/55455
+* [12.x] Fix relation auto loading with manually set relations by [@patrickweh](https://github.com/patrickweh) in https://github.com/laravel/framework/pull/55452
+* Add missing types to RateLimiter by [@ClaudioEyzaguirre](https://github.com/ClaudioEyzaguirre) in https://github.com/laravel/framework/pull/55445
+* [12.x] Fix for global autoload relationships not working  in certain cases by [@litvinchuk](https://github.com/litvinchuk) in https://github.com/laravel/framework/pull/55443
+* [12.x] Fix adding `setTags` method on new cache flush events by [@erikn69](https://github.com/erikn69) in https://github.com/laravel/framework/pull/55405
+* Fix: Unique lock not being released after transaction rollback in ShouldBeUnique jobs with afterCommit() by [@toshitsuna-otsuka](https://github.com/toshitsuna-otsuka) in https://github.com/laravel/framework/pull/55420
+* [12.x] Extends `AsCollection` to map items into objects or other values by [@DarkGhostHunter](https://github.com/DarkGhostHunter) in https://github.com/laravel/framework/pull/55383
+* [12.x] Fix group imports in Blade `@use` directive by [@osbre](https://github.com/osbre) in https://github.com/laravel/framework/pull/55461
+* chore(tests): align test names with idiomatic naming style by [@kauffinger](https://github.com/kauffinger) in https://github.com/laravel/framework/pull/55496
+* Update compiled views only if they actually changed by [@pizkaz](https://github.com/pizkaz) in https://github.com/laravel/framework/pull/55450
+* Improve performance of Arr::dot method - 300x in some cases by [@cyppe](https://github.com/cyppe) in https://github.com/laravel/framework/pull/55495
+* [12.x] Add tests for `CacheBasedSessionHandler` by [@imanghafoori1](https://github.com/imanghafoori1) in https://github.com/laravel/framework/pull/55487
+* [12.x] Add tests for `FileSessionHandler` by [@imanghafoori1](https://github.com/imanghafoori1) in https://github.com/laravel/framework/pull/55484
+* [12.x] Add tests for `DatabaseSessionHandler` by [@imanghafoori1](https://github.com/imanghafoori1) in https://github.com/laravel/framework/pull/55485
+* [12.x] Fix many to many detach without IDs broken with custom pivot class by [@amir9480](https://github.com/amir9480) in https://github.com/laravel/framework/pull/55490
+* [12.x] Support nested relations on `relationLoaded` method by [@tmsperera](https://github.com/tmsperera) in https://github.com/laravel/framework/pull/55471
+* Bugfix for Cache::memo()->many() returning the wrong value with an integer key type by [@bmckay959](https://github.com/bmckay959) in https://github.com/laravel/framework/pull/55503
+* [12.x] Allow Container to build `Migrator` from class name by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/55501
+
+## [v12.9.2](https://github.com/laravel/framework/compare/v12.9.1...v12.9.2) - 2025-04-16
+
+* [12.x] Fixed a bug in using `illuminate/console` in external apps by [@andrey-helldar](https://github.com/andrey-helldar) in https://github.com/laravel/framework/pull/55430
+* Disable SQLServer 2017 CI as `ubuntu-20.24` has been removed by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/55425
+
+## [v12.9.1](https://github.com/laravel/framework/compare/v12.9.0...v12.9.1) - 2025-04-16
+
+* [12.x] Forward only passed arguments into Illuminate\Database\Eloquent\Collection::partition method by [@MarekVikartovsky](https://github.com/MarekVikartovsky) in https://github.com/laravel/framework/pull/55422
+* [12.x] Add test for complex context manipulation in Logger by [@roshandelpoor](https://github.com/roshandelpoor) in https://github.com/laravel/framework/pull/55423
+* [12.x] Remove unused var from `DumpCommand` by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/55431
+* [12.x] Fix the serve command sometimes fails to destructure the request pool array by [@tonysm](https://github.com/tonysm) in https://github.com/laravel/framework/pull/55427
+* [12.x] Changes to `package-lock.json` should trigger `npm run build` by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/55426
+
+## [v12.9.0](https://github.com/laravel/framework/compare/v12.8.1...v12.9.0) - 2025-04-15
+
+* Add types to ViewErrorBag by [@AJenbo](https://github.com/AJenbo) in https://github.com/laravel/framework/pull/55329
+* Add types to MessageBag by [@AJenbo](https://github.com/AJenbo) in https://github.com/laravel/framework/pull/55327
+* [12.x] add generics to commonly used methods in Schema/Builder by [@taka-oyama](https://github.com/taka-oyama) in https://github.com/laravel/framework/pull/55330
+* Return frozen time for easier testing by [@jasonmccreary](https://github.com/jasonmccreary) in https://github.com/laravel/framework/pull/55323
+* Enhance DetectsLostConnections to Support AWS Aurora Credential Rotation Scenario by [@msaifmfz](https://github.com/msaifmfz) in https://github.com/laravel/framework/pull/55331
+* [12.x] Rename test method of failedRequest() by [@LKaemmerling](https://github.com/LKaemmerling) in https://github.com/laravel/framework/pull/55332
+* feat: Add a callback to be called on transaction failure by [@dshafik](https://github.com/dshafik) in https://github.com/laravel/framework/pull/55338
+* [12.x]  Add withRelationshipAutoloading method to model by [@litvinchuk](https://github.com/litvinchuk) in https://github.com/laravel/framework/pull/55344
+* [12.x] Enable HTTP client retries when middleware throws an exception by [@27pchrisl](https://github.com/27pchrisl) in https://github.com/laravel/framework/pull/55343
+* [12.x] Fix Closure serialization error in automatic relation loading by [@litvinchuk](https://github.com/litvinchuk) in https://github.com/laravel/framework/pull/55345
+* Add test for Unique validation rule with WhereIn constraints by [@mohammadrasoulasghari](https://github.com/mohammadrasoulasghari) in https://github.com/laravel/framework/pull/55351
+* Add [@throws](https://github.com/throws) in doc-blocks by [@mohammadrasoulasghari](https://github.com/mohammadrasoulasghari) in https://github.com/laravel/framework/pull/55361
+* [12.x] Update `propagateRelationAutoloadCallbackToRelation` method doc-block by [@derian-all-win-software](https://github.com/derian-all-win-software) in https://github.com/laravel/framework/pull/55363
+* [12.x]  - Redis - Establish connection first, before set the options by [@alexmontoanelli](https://github.com/alexmontoanelli) in https://github.com/laravel/framework/pull/55370
+* [12.x] Fix translation FileLoader overrides with a missing key by [@fabio-ivona](https://github.com/fabio-ivona) in https://github.com/laravel/framework/pull/55342
+* [12.x] Fix pivot model events not working when using the `withPivotValue` by [@amir9480](https://github.com/amir9480) in https://github.com/laravel/framework/pull/55280
+* [12.x] Introduce memoized cache driver by [@timacdonald](https://github.com/timacdonald) in https://github.com/laravel/framework/pull/55304
+* [12.x] Add test for Filesystem::lastModified() method by [@roshandelpoor](https://github.com/roshandelpoor) in https://github.com/laravel/framework/pull/55389
+* [12.x] Supports `pda/pheanstalk` 7 by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/55397
+* [12.x] Add comprehensive filesystem operation tests to FilesystemTest by [@roshandelpoor](https://github.com/roshandelpoor) in https://github.com/laravel/framework/pull/55399
+* Bump vite from 5.4.17 to 5.4.18 in /src/Illuminate/Foundation/resources/exceptions/renderer by [@dependabot](https://github.com/dependabot) in https://github.com/laravel/framework/pull/55402
+* Add descriptive error messages to assertViewHas() by [@3Descape](https://github.com/3Descape) in https://github.com/laravel/framework/pull/55392
+* Use Generic Types Annotations for LazyCollection Methods by [@mohammadrasoulasghari](https://github.com/mohammadrasoulasghari) in https://github.com/laravel/framework/pull/55380
+* [12.x] Add test coverage for Process sequence with multiple env variables by [@roshandelpoor](https://github.com/roshandelpoor) in https://github.com/laravel/framework/pull/55406
+* [12.x] Fix cc/bcc/replyTo address merging in `MailMessage` by [@onlime](https://github.com/onlime) in https://github.com/laravel/framework/pull/55404
+* [12.x] Add a `make` function in the `Fluent` by [@michaelnabil230](https://github.com/michaelnabil230) in https://github.com/laravel/framework/pull/55417
 
 ## [v12.8.1](https://github.com/laravel/framework/compare/v12.8.0...v12.8.1) - 2025-04-08
 

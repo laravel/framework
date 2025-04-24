@@ -12,6 +12,8 @@ use Illuminate\Support\Str;
 use Illuminate\Testing\Assert as PHPUnit;
 use JsonSerializable;
 
+use function Illuminate\Support\enum_value;
+
 class AssertableJsonString implements ArrayAccess, Countable
 {
     /**
@@ -238,7 +240,7 @@ class AssertableJsonString implements ArrayAccess, Countable
         if ($expect instanceof Closure) {
             PHPUnit::assertTrue($expect($this->json($path)));
         } else {
-            PHPUnit::assertSame($expect, $this->json($path));
+            PHPUnit::assertSame(enum_value($expect), $this->json($path));
         }
 
         return $this;
