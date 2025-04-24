@@ -1120,7 +1120,7 @@ trait HasRelationships
     {
         $this->relations[$relation] = $value;
 
-        $this->propagateRelationAutoloadCallbackToRelation($relation, $value, $this);
+        $this->propagateRelationAutoloadCallbackToRelation($relation, $value);
 
         return $this;
     }
