@@ -70,4 +70,3 @@ trait EnforcesJsonObjectSerialization
         return $this;
     }
 }
-

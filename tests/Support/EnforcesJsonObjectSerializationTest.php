@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Support;
 
-use PHPUnit\Framework\TestCase;
 use Illuminate\Support\Traits\EnforcesJsonObjectSerialization;
+use PHPUnit\Framework\TestCase;
 
 class EnforcesJsonObjectSerializationTest extends TestCase
 {

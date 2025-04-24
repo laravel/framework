@@ -55,7 +55,8 @@ class JsonResourceTest extends TestCase
         app()->instance('request', $request);
 
         // Create a test model with empty array attributes
-        $model = new class extends Model {
+        $model = new class extends Model
+        {
             protected $attributes = [
                 'settings' => [],
                 'options' => [],
@@ -64,7 +65,8 @@ class JsonResourceTest extends TestCase
         };
 
         // Create a resource and specify which attribute should be serialized as an object
-        $resource = new class($model) extends JsonResource {
+        $resource = new class($model) extends JsonResource
+        {
             public function toArray($request)
             {
                 return [
@@ -95,7 +97,8 @@ class JsonResourceTest extends TestCase
         app()->instance('request', $request);
 
         // Create an empty resource
-        $resource = new class([]) extends JsonResource {
+        $resource = new class([]) extends JsonResource
+        {
             public function toArray($request)
             {
                 return [];
