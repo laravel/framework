@@ -5723,7 +5723,6 @@ class SupportCollectionTest extends TestCase
         ], array_values($result->toArray()));
     }
 
-
     /**
      * Provides each collection class, respectively.
      *
