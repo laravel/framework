@@ -139,7 +139,6 @@ class MailableWithoutSecuredEncodingTest extends TestCase
             }
         };
 
-
         $mailable->assertSeeInHtml($expected, false);
         $mailable->assertSeeInHtml('<p>This is a subcopy</p>', false);
         $mailable->assertSeeInHtml(<<<'TABLE'
