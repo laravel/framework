@@ -67,6 +67,7 @@ class NotificationSender
         $this->events = $events;
         $this->locale = $locale;
         $this->manager = $manager;
+
         $this->events->listen(NotificationFailed::class, fn () => $this->failedEventWasDispatched = true);
     }
 
