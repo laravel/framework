@@ -59,7 +59,7 @@ use function Illuminate\Support\enum_value;
  */
 trait EnumeratesValues
 {
-    use Conditionable;
+    use Conditionable, EnforcesJsonObjectSerialization;
 
     /**
      * Indicates that the object's string representation should be escaped when __toString is invoked.
@@ -959,11 +959,11 @@ trait EnumeratesValues
     /**
      * Convert the object into something JSON serializable.
      *
-     * @return array<TKey, mixed>
+     * @return array<TKey, mixed>|object
      */
-    public function jsonSerialize(): array
+    public function jsonSerialize(): array|object
     {
-        return array_map(function ($value) {
+        $items = array_map(function ($value) {
             if ($value instanceof JsonSerializable) {
                 return $value->jsonSerialize();
             } elseif ($value instanceof Jsonable) {
@@ -974,6 +974,8 @@ trait EnumeratesValues
 
             return $value;
         }, $this->all());
+
+        return $this->enforceJsonObjectSerialization($items);
     }
 
     /**

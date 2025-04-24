@@ -22,6 +22,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Stringable as SupportStringable;
+use Illuminate\Support\Traits\EnforcesJsonObjectSerialization;
 use Illuminate\Support\Traits\ForwardsCalls;
 use JsonException;
 use JsonSerializable;
@@ -41,7 +42,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         Concerns\GuardsAttributes,
         Concerns\PreventsCircularRecursion,
         Concerns\TransformsToResource,
-        ForwardsCalls;
+        ForwardsCalls,
+        EnforcesJsonObjectSerialization;
     /** @use HasCollection<\Illuminate\Database\Eloquent\Collection<array-key, static & self>> */
     use HasCollection;
 
@@ -1760,7 +1762,9 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function jsonSerialize(): mixed
     {
-        return $this->toArray();
+        $data = $this->toArray();
+
+        return $this->enforceJsonObjectSerialization($data);
     }
 
     /**

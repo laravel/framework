@@ -3285,6 +3285,40 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertSame('{"name":"Mateus"}', $user->toJson(JSON_THROW_ON_ERROR));
     }
 
+    public function testJsonSerialization()
+    {
+        // Create a custom model stub
+        $model = new class extends Model {};
+
+        // Set test data - use a property without a mutator
+        $model->name = 'foo';
+        $model->empty_array = [];
+
+        // First check normal serialization
+        $json = $model->toJson();
+        $decoded = json_decode($json);
+        $this->assertIsArray($decoded->empty_array);
+
+        // Apply our trait functionality
+        $model->serializeAttributesAsObjects(['empty_array']);
+
+        // Re-serialize and verify transformation
+        $json = $model->toJson();
+        $decoded = json_decode($json);
+        $this->assertIsObject($decoded->empty_array);
+
+        // Test empty model serialization
+        $emptyModel = new class extends Model {};
+
+        // Default behavior should be empty array
+        $emptyJson = $emptyModel->toJson();
+        $this->assertSame('[]', $emptyJson);
+
+        // Configure for empty object
+        $emptyModel->serializeEmptyAsObject();
+        $this->assertSame('{}', $emptyModel->toJson());
+    }
+
     public function testFillableWithMutators()
     {
         $model = new EloquentModelWithMutators;

@@ -664,6 +664,29 @@ class SupportCollectionTest extends TestCase
         $this->assertJsonStringEqualsJsonString(json_encode(['foo']), (string) $c);
     }
 
+    public function testEmptyCollectionSerializedAsObject()
+    {
+        $collection = new Collection([]);
+
+        // Default behavior should serialize empty collection as array
+        $this->assertSame('[]', $collection->toJson());
+
+        // Configure to serialize as an object
+        $collection->serializeEmptyAsObject();
+
+        // Now it should serialize as an object
+        $this->assertSame('{}', $collection->toJson());
+
+        // Test that method is fluent
+        $this->assertSame(
+            $collection,
+            $collection->serializeEmptyAsObject(false)
+        );
+
+        // Test that it returns to default behavior when disabled
+        $this->assertSame('[]', $collection->toJson());
+    }
+
     public function testOffsetAccess()
     {
         $c = new Collection(['name' => 'taylor']);

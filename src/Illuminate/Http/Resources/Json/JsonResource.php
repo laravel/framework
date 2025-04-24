@@ -12,12 +12,13 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\ConditionallyLoadsAttributes;
 use Illuminate\Http\Resources\DelegatesToResource;
+use Illuminate\Support\Traits\EnforcesJsonObjectSerialization;
 use JsonException;
 use JsonSerializable;
 
 class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutable
 {
-    use ConditionallyLoadsAttributes, DelegatesToResource;
+    use ConditionallyLoadsAttributes, DelegatesToResource, EnforcesJsonObjectSerialization;
 
     /**
      * The resource instance.
@@ -247,10 +248,12 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     /**
      * Prepare the resource for JSON serialization.
      *
-     * @return array
+     * @return array|object
      */
-    public function jsonSerialize(): array
+    public function jsonSerialize(): array|object
     {
-        return $this->resolve(Container::getInstance()->make('request'));
+        $data = $this->resolve(Container::getInstance()->make('request'));
+
+        return $this->enforceJsonObjectSerialization($data);
     }
 }
