@@ -1,6 +1,10 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.10.1...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.10.2...12.x)
+
+## [v12.10.2](https://github.com/laravel/framework/compare/v12.10.1...v12.10.2) - 2025-04-24
+
+* [12.x] Address Model@relationLoaded when relation is null by [@rodrigopedra](https://github.com/rodrigopedra) in https://github.com/laravel/framework/pull/55531
 
 ## [v12.10.1](https://github.com/laravel/framework/compare/v12.10.0...v12.10.1) - 2025-04-23
 
