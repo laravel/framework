@@ -42,7 +42,14 @@ abstract class Compiler
      *
      * @var string
      */
-    protected $compiledExtension = 'php';
+    protected $compiledExtension;
+
+    /**
+     * Determines if view cache timestamps should be ignored.
+     *
+     * @var bool
+     */
+    protected $ignoreCacheTimestamps;
 
     /**
      * Create a new compiler instance.
@@ -61,6 +68,7 @@ abstract class Compiler
         $basePath = '',
         $shouldCache = true,
         $compiledExtension = 'php',
+        $ignoreCacheTimestamps = false,
     ) {
         if (! $cachePath) {
             throw new InvalidArgumentException('Please provide a valid cache path.');
@@ -71,6 +79,7 @@ abstract class Compiler
         $this->basePath = $basePath;
         $this->shouldCache = $shouldCache;
         $this->compiledExtension = $compiledExtension;
+        $this->ignoreCacheTimestamps = $ignoreCacheTimestamps;
     }
 
     /**
@@ -94,6 +103,10 @@ abstract class Compiler
      */
     public function isExpired($path)
     {
+        if ($this->ignoreCacheTimestamps) {
+            return false;
+        }
+
         if (! $this->shouldCache) {
             return true;
         }

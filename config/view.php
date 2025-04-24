@@ -33,4 +33,21 @@ return [
         realpath(storage_path('framework/views'))
     ),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Ignore view cache timestamps
+    |--------------------------------------------------------------------------
+    |
+    | This option determines whether timestamps of cached views should be
+    | ignored. You should only enable this if you have pre-compiled all views
+    | with `artisan view:cache`. Whenever a view templates changes, you must
+    | run this command again to update the view cache.
+    |
+    */
+
+    'ignore_cache_timestamps' => env(
+        'VIEW_CACHE_IGNORE_TIMESTAMPS',
+        false
+    ),
+
 ];
