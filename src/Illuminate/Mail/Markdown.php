@@ -166,7 +166,7 @@ class Markdown
             return new HtmlString(static::converter()->convert($text)->getContent());
         }
 
-        if (static::$withSecuredEncoding === true) {
+        if (static::$withSecuredEncoding === true || $encoded === true) {
             EncodedHtmlString::encodeUsing(function ($value) {
                 $replacements = [
                     '[' => '\[',

@@ -7,12 +7,13 @@ use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
+use Illuminate\Mail\Markdown;
 use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\Factories\UserFactory;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-class MailableTest extends TestCase
+class MailableWithSecuredEncodingTest extends TestCase
 {
     use LazilyRefreshDatabase;
 
@@ -21,6 +22,8 @@ class MailableTest extends TestCase
     protected function defineEnvironment($app)
     {
         $app['view']->addLocation(__DIR__.'/Fixtures');
+
+        Markdown::withSecuredEncoding();
     }
 
     #[DataProvider('markdownEncodedDataProvider')]
