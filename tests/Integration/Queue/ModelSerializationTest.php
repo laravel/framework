@@ -31,6 +31,8 @@ class ModelSerializationTest extends TestCase
     {
         parent::setUp();
 
+        Model::preventLazyLoading(false);
+
         Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
             $table->string('email');
