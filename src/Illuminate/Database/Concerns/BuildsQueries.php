@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Concerns;
 
 use Illuminate\Container\Container;
+use Illuminate\Database\Eloquent\Attributes\PaginatedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\MultipleRecordsFoundException;
 use Illuminate\Database\Query\Expression;
@@ -546,7 +547,7 @@ trait BuildsQueries
      * @param  int  $perPage
      * @param  int  $currentPage
      * @param  array  $options
-     * @return \Illuminate\Pagination\LengthAwarePaginator
+     * @return LengthAwarePaginator
      */
     protected function paginator($items, $total, $perPage, $currentPage, $options)
     {
@@ -564,7 +565,7 @@ trait BuildsQueries
      * @param  int  $perPage
      * @param  int  $currentPage
      * @param  array  $options
-     * @return \Illuminate\Pagination\Paginator
+     * @return Paginator
      */
     protected function simplePaginator($items, $perPage, $currentPage, $options)
     {
@@ -582,7 +583,7 @@ trait BuildsQueries
      * @param  int  $perPage
      * @param  \Illuminate\Pagination\Cursor  $cursor
      * @param  array  $options
-     * @return \Illuminate\Pagination\CursorPaginator
+     * @return CursorPaginator
      */
     protected function cursorPaginator($items, $perPage, $cursor, $options)
     {
@@ -594,7 +595,7 @@ trait BuildsQueries
     }
 
     /**
-     * Get paginator class from #[PaginatedBy] attribute or fallback.
+     * Get paginator class from `#[PaginatedBy]` attribute or fallback.
      *
      * @template TPaginator of \Illuminate\Pagination\AbstractPaginator
      *
@@ -609,19 +610,19 @@ trait BuildsQueries
 
         $modelClass = get_class($this->getModel());
         $reflectionClass = new ReflectionClass($modelClass);
-        $attributes = $reflectionClass->getAttributes(\Illuminate\Database\Eloquent\Attributes\PaginatedBy::class);
+        $attributes = $reflectionClass->getAttributes(PaginatedBy::class);
 
-        if (empty($attributes)) {
+        if ($attributes === []) {
             return $default;
         }
 
-        /** @var \Illuminate\Database\Eloquent\Attributes\PaginatedBy $instance */
+        /** @var PaginatedBy $instance */
         $instance = $attributes[0]->newInstance();
 
         return match ($default) {
-            \Illuminate\Pagination\LengthAwarePaginator::class => $this->validatePaginatorClass($instance->lengthAware, $default),
-            \Illuminate\Pagination\Paginator::class => $this->validatePaginatorClass($instance->simple, $default),
-            \Illuminate\Pagination\CursorPaginator::class => $this->validatePaginatorClass($instance->cursor, $default),
+            LengthAwarePaginator::class => $this->validatePaginatorClass($instance->lengthAware, $default),
+            Paginator::class => $this->validatePaginatorClass($instance->simple, $default),
+            CursorPaginator::class => $this->validatePaginatorClass($instance->cursor, $default),
             default => $default,
         };
     }
