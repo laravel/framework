@@ -107,7 +107,7 @@ trait BuildsQueries
      * @param  int  $count
      * @return bool
      *
-     * @throws RuntimeException
+     * @throws \RuntimeException
      */
     public function each(callable $callback, $count = 1000)
     {
@@ -158,7 +158,7 @@ trait BuildsQueries
      * @param  bool  $descending
      * @return bool
      *
-     * @throws RuntimeException
+     * @throws \RuntimeException
      */
     public function orderedChunkById($count, callable $callback, $column = null, $alias = null, $descending = false)
     {
