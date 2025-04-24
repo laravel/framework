@@ -6,6 +6,8 @@ use DateTime;
 use Illuminate\Cache\RedisStore;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Redis\Connections\PhpRedisClusterConnection;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Sleep;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
