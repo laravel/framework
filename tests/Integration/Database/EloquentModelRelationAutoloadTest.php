@@ -83,7 +83,6 @@ class EloquentModelRelationAutoloadTest extends DatabaseTestCase
             $likes = array_merge($likes, $comment->likes->all());
         }
 
-
         $this->assertCount(2, DB::getQueryLog());
         $this->assertCount(2, $likes);
         $this->assertTrue($post->comments[0]->relationLoaded('likes'));
@@ -110,7 +109,6 @@ class EloquentModelRelationAutoloadTest extends DatabaseTestCase
         foreach ($post->comments as $comment) {
             $likes = array_merge($likes, $comment->likes->all());
         }
-
 
         $this->assertCount(2, DB::getQueryLog());
 
