@@ -76,15 +76,17 @@ class Markdown
         $contents = $bladeCompiler->usingEchoFormat(
             'new \Illuminate\Support\EncodedHtmlString(%s)',
             function () use ($view, $data) {
-                EncodedHtmlString::encodeUsing(function ($value) {
-                    $replacements = [
-                        '[' => '\[',
-                        '<' => '&lt;',
-                        '>' => '&gt;',
-                    ];
+                if (static::$withSecuredEncoding === true) {
+                    EncodedHtmlString::encodeUsing(function ($value) {
+                        $replacements = [
+                            '[' => '\[',
+                            '<' => '&lt;',
+                            '>' => '&gt;',
+                        ];
 
-                    return str_replace(array_keys($replacements), array_values($replacements), $value);
-                });
+                        return str_replace(array_keys($replacements), array_values($replacements), $value);
+                    });
+                }
 
                 try {
                     $contents = $this->view->replaceNamespace(
