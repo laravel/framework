@@ -8,6 +8,7 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Mail\Markdown;
+use Illuminate\Support\EncodedHtmlString;
 use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\Factories\UserFactory;
 use Orchestra\Testbench\TestCase;
@@ -16,6 +17,16 @@ use PHPUnit\Framework\Attributes\DataProvider;
 class MailableWithoutSecuredEncodingTest extends TestCase
 {
     use LazilyRefreshDatabase;
+
+    /** {@inheritdoc} */
+    #[\Override]
+    protected function tearDown(): void
+    {
+        Markdown::flushState();
+        EncodedHtmlString::flushState();
+
+        parent::tearDown();
+    }
 
     /** {@inheritdoc} */
     #[\Override]
