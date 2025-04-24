@@ -61,6 +61,8 @@ class EloquentModelRelationAutoloadTest extends DatabaseTestCase
         $this->assertCount(2, DB::getQueryLog());
         $this->assertCount(3, $likes);
         $this->assertTrue($posts[0]->comments[0]->relationLoaded('likes'));
+
+        DB::disableQueryLog();
     }
 
     public function testRelationAutoloadForSingleModel()
@@ -81,9 +83,12 @@ class EloquentModelRelationAutoloadTest extends DatabaseTestCase
             $likes = array_merge($likes, $comment->likes->all());
         }
 
+
         $this->assertCount(2, DB::getQueryLog());
         $this->assertCount(2, $likes);
         $this->assertTrue($post->comments[0]->relationLoaded('likes'));
+
+        DB::disableQueryLog();
     }
 
     public function testRelationAutoloadWithSerialization()
@@ -106,9 +111,29 @@ class EloquentModelRelationAutoloadTest extends DatabaseTestCase
             $likes = array_merge($likes, $comment->likes->all());
         }
 
+
         $this->assertCount(2, DB::getQueryLog());
 
         Model::automaticallyEagerLoadRelationships(false);
+
+        DB::disableQueryLog();
+    }
+
+    public function testRelationAutoloadWithCircularRelations()
+    {
+        $post = Post::create();
+        $comment1 = $post->comments()->create(['parent_id' => null]);
+        $comment2 = $post->comments()->create(['parent_id' => $comment1->id]);
+
+        DB::enableQueryLog();
+
+        $post->withRelationshipAutoloading();
+        $comment = $post->comments->first();
+        $comment->setRelation('post', $post);
+
+        $this->assertCount(1, DB::getQueryLog());
+
+        DB::disableQueryLog();
     }
 
     public function testRelationAutoloadWithChaperoneRelations()
@@ -129,6 +154,8 @@ class EloquentModelRelationAutoloadTest extends DatabaseTestCase
         $this->assertCount(2, DB::getQueryLog());
 
         Model::automaticallyEagerLoadRelationships(false);
+
+        DB::disableQueryLog();
     }
 
     public function testRelationAutoloadVariousNestedMorphRelations()
@@ -183,6 +210,8 @@ class EloquentModelRelationAutoloadTest extends DatabaseTestCase
         $this->assertCount(2, $videos);
         $this->assertTrue($videoLike->relationLoaded('likeable'));
         $this->assertTrue($videoLike->likeable->relationLoaded('commentable'));
+
+        DB::disableQueryLog();
     }
 }
 
