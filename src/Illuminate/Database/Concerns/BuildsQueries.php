@@ -541,18 +541,15 @@ trait BuildsQueries
     /**
      * Create a new length-aware paginator instance.
      *
-     * @template TLengthPaginator of \Illuminate\Pagination\LengthAwarePaginator
-     *
      * @param  \Illuminate\Support\Collection  $items
      * @param  int  $total
      * @param  int  $perPage
      * @param  int  $currentPage
      * @param  array  $options
-     * @return TLengthPaginator
+     * @return \Illuminate\Pagination\LengthAwarePaginator
      */
     protected function paginator($items, $total, $perPage, $currentPage, $options)
     {
-        /** @var class-string<TLengthPaginator> $paginatorClass */
         $paginatorClass = $this->getPaginatorClassForModel(LengthAwarePaginator::class);
 
         return Container::getInstance()->makeWith($paginatorClass, compact(
@@ -563,17 +560,14 @@ trait BuildsQueries
     /**
      * Create a new simple paginator instance.
      *
-     * @template TSimplePaginator of \Illuminate\Pagination\Paginator
-     *
      * @param  \Illuminate\Support\Collection  $items
      * @param  int  $perPage
      * @param  int  $currentPage
      * @param  array  $options
-     * @return TSimplePaginator
+     * @return \Illuminate\Pagination\Paginator
      */
     protected function simplePaginator($items, $perPage, $currentPage, $options)
     {
-        /** @var class-string<TSimplePaginator> $paginatorClass */
         $paginatorClass = $this->getPaginatorClassForModel(Paginator::class);
 
         return Container::getInstance()->makeWith($paginatorClass, compact(
@@ -584,17 +578,14 @@ trait BuildsQueries
     /**
      * Create a new cursor paginator instance.
      *
-     * @template TCursorPaginator of \Illuminate\Pagination\CursorPaginator
-     *
      * @param  \Illuminate\Support\Collection  $items
      * @param  int  $perPage
      * @param  \Illuminate\Pagination\Cursor  $cursor
      * @param  array  $options
-     * @return TCursorPaginator
+     * @return \Illuminate\Pagination\CursorPaginator
      */
     protected function cursorPaginator($items, $perPage, $cursor, $options)
     {
-        /** @var class-string<TCursorPaginator> $paginatorClass */
         $paginatorClass = $this->getPaginatorClassForModel(CursorPaginator::class);
 
         return Container::getInstance()->makeWith($paginatorClass, compact(
@@ -605,10 +596,10 @@ trait BuildsQueries
     /**
      * Get paginator class from #[PaginatedBy] attribute or fallback.
      *
-     * @template T of \Illuminate\Pagination\AbstractPaginator
+     * @template TPaginator of \Illuminate\Pagination\AbstractPaginator
      *
-     * @param  class-string<T>  $default
-     * @return class-string<T>
+     * @param  class-string<TPaginator>  $default
+     * @return class-string<TPaginator>
      */
     protected function getPaginatorClassForModel(string $default): string
     {
@@ -632,11 +623,11 @@ trait BuildsQueries
     }
 
     /**
-     * @template T of \Illuminate\Pagination\AbstractPaginator
+     * @template TPaginator of \Illuminate\Pagination\AbstractPaginator
      *
-     * @param  class-string<T>|null  $custom
-     * @param  class-string<T>  $expectedBase
-     * @return class-string<T>
+     * @param  class-string<TPaginator>|null  $custom
+     * @param  class-string<TPaginator>  $expectedBase
+     * @return class-string<TPaginator>
      */
     protected function validatePaginatorClass(?string $custom, string $expectedBase): string
     {
