@@ -182,9 +182,15 @@ trait HasRelationships
 
         $callback = fn (array $tuples) => $this->invokeRelationAutoloadCallbackFor($key, $tuples);
 
+        if (! is_array($context)) {
+            $context = $context ? [$context] : [];
+        }
+
+        $context[] = $this;
+
         foreach ($models as $model) {
             // Check if relation autoload contexts are different to avoid circular relation autoload...
-            if ((is_null($context) || $context !== $model) && is_object($model) && method_exists($model, 'autoloadRelationsUsing')) {
+            if (array_search($model, $context, true) !== false) {
                 $model->autoloadRelationsUsing($callback, $context);
             }
         }

@@ -111,6 +111,26 @@ class EloquentModelRelationAutoloadTest extends DatabaseTestCase
         Model::automaticallyEagerLoadRelationships(false);
     }
 
+    public function testRelationAutoloadWithChaperoneRelations()
+    {
+        Model::automaticallyEagerLoadRelationships();
+
+        $post = Post::create();
+        $comment1 = $post->comments()->create(['parent_id' => null]);
+        $comment2 = $post->comments()->create(['parent_id' => $comment1->id]);
+        $post->likes()->create();
+
+        DB::enableQueryLog();
+
+        $post->load('commentsWithChaperone');
+
+        $this->assertCount(1, $post->likes);
+
+        $this->assertCount(2, DB::getQueryLog());
+
+        Model::automaticallyEagerLoadRelationships(false);
+    }
+
     public function testRelationAutoloadVariousNestedMorphRelations()
     {
         tap(Post::create(), function ($post) {
@@ -195,6 +215,11 @@ class Post extends Model
     public function comments()
     {
         return $this->morphMany(Comment::class, 'commentable');
+    }
+
+    public function commentsWithChaperone()
+    {
+        return $this->morphMany(Comment::class, 'commentable')->chaperone();
     }
 
     public function likes()
