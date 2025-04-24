@@ -40,7 +40,7 @@ class Markdown
      *
      * @var bool
      */
-    protected static $withSecuredEncoding = true;
+    protected static $withSecuredEncoding = false;
 
     /**
      * Create a new Markdown renderer instance.
