@@ -23,6 +23,7 @@ use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Illuminate\Http\Middleware\TrustHosts;
 use Illuminate\Http\Middleware\TrustProxies;
+use Illuminate\Mail\Markdown;
 use Illuminate\Queue\Console\WorkCommand;
 use Illuminate\Queue\Queue;
 use Illuminate\Support\Carbon;
@@ -175,6 +176,7 @@ trait InteractsWithTestCaseLifecycle
         EncodedHtmlString::flushState();
         EncryptCookies::flushState();
         HandleExceptions::flushState();
+        Markdown::flushState();
         Migrator::withoutMigrations([]);
         Once::flush();
         PreventRequestsDuringMaintenance::flushState();

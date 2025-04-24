@@ -281,4 +281,14 @@ class Markdown
     {
         return $this->theme;
     }
+
+    /**
+     * Flush the class's global state.
+     *
+     * @return void
+     */
+    public static function flushState()
+    {
+        static::$withSecuredEncoding = false;
+    }
 }
