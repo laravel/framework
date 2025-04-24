@@ -1072,36 +1072,7 @@ trait HasRelationships
      */
     public function relationLoaded($key)
     {
-        if (array_key_exists($key, $this->relations)) {
-            return true;
-        }
-
-        [$relation, $nestedRelation] = array_replace(
-            [null, null],
-            explode('.', $key, 2),
-        );
-
-        if (! array_key_exists($relation, $this->relations)) {
-            return false;
-        }
-
-        if ($nestedRelation !== null) {
-            $relatedModels = is_iterable($relatedModels = $this->$relation)
-                ? $relatedModels
-                : array_filter([$relatedModels]);
-
-            if (count($relatedModels) === 0) {
-                return false;
-            }
-
-            foreach ($relatedModels as $related) {
-                if (! $related->relationLoaded($nestedRelation)) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
+        return array_key_exists($key, $this->relations);
     }
 
     /**
