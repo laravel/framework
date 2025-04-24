@@ -17,6 +17,7 @@ use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Conditionable;
 use InvalidArgumentException;
+use ReflectionClass;
 use RuntimeException;
 
 /**
@@ -106,7 +107,7 @@ trait BuildsQueries
      * @param  int  $count
      * @return bool
      *
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     public function each(callable $callback, $count = 1000)
     {
@@ -157,7 +158,7 @@ trait BuildsQueries
      * @param  bool  $descending
      * @return bool
      *
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     public function orderedChunkById($count, callable $callback, $column = null, $alias = null, $descending = false)
     {
@@ -540,16 +541,21 @@ trait BuildsQueries
     /**
      * Create a new length-aware paginator instance.
      *
+     * @template TLengthPaginator of \Illuminate\Pagination\LengthAwarePaginator
+     *
      * @param  \Illuminate\Support\Collection  $items
      * @param  int  $total
      * @param  int  $perPage
      * @param  int  $currentPage
      * @param  array  $options
-     * @return \Illuminate\Pagination\LengthAwarePaginator
+     * @return TLengthPaginator
      */
     protected function paginator($items, $total, $perPage, $currentPage, $options)
     {
-        return Container::getInstance()->makeWith(LengthAwarePaginator::class, compact(
+        /** @var class-string<TLengthPaginator> $paginatorClass */
+        $paginatorClass = $this->getPaginatorClassForModel(LengthAwarePaginator::class);
+
+        return Container::getInstance()->makeWith($paginatorClass, compact(
             'items', 'total', 'perPage', 'currentPage', 'options'
         ));
     }
@@ -557,15 +563,20 @@ trait BuildsQueries
     /**
      * Create a new simple paginator instance.
      *
+     * @template TSimplePaginator of \Illuminate\Pagination\Paginator
+     *
      * @param  \Illuminate\Support\Collection  $items
      * @param  int  $perPage
      * @param  int  $currentPage
      * @param  array  $options
-     * @return \Illuminate\Pagination\Paginator
+     * @return TSimplePaginator
      */
     protected function simplePaginator($items, $perPage, $currentPage, $options)
     {
-        return Container::getInstance()->makeWith(Paginator::class, compact(
+        /** @var class-string<TSimplePaginator> $paginatorClass */
+        $paginatorClass = $this->getPaginatorClassForModel(Paginator::class);
+
+        return Container::getInstance()->makeWith($paginatorClass, compact(
             'items', 'perPage', 'currentPage', 'options'
         ));
     }
@@ -573,17 +584,71 @@ trait BuildsQueries
     /**
      * Create a new cursor paginator instance.
      *
+     * @template TCursorPaginator of \Illuminate\Pagination\CursorPaginator
+     *
      * @param  \Illuminate\Support\Collection  $items
      * @param  int  $perPage
      * @param  \Illuminate\Pagination\Cursor  $cursor
      * @param  array  $options
-     * @return \Illuminate\Pagination\CursorPaginator
+     * @return TCursorPaginator
      */
     protected function cursorPaginator($items, $perPage, $cursor, $options)
     {
-        return Container::getInstance()->makeWith(CursorPaginator::class, compact(
+        /** @var class-string<TCursorPaginator> $paginatorClass */
+        $paginatorClass = $this->getPaginatorClassForModel(CursorPaginator::class);
+
+        return Container::getInstance()->makeWith($paginatorClass, compact(
             'items', 'perPage', 'cursor', 'options'
         ));
+    }
+
+    /**
+     * Get paginator class from #[PaginatedBy] attribute or fallback.
+     *
+     * @template T of \Illuminate\Pagination\AbstractPaginator
+     *
+     * @param  class-string<T>  $default
+     * @return class-string<T>
+     */
+    protected function getPaginatorClassForModel(string $default): string
+    {
+        $modelClass = get_class($this->getModel());
+        $reflectionClass = new ReflectionClass($modelClass);
+        $attributes = $reflectionClass->getAttributes(\Illuminate\Database\Eloquent\Attributes\PaginatedBy::class);
+
+        if (empty($attributes)) {
+            return $default;
+        }
+
+        /** @var \Illuminate\Database\Eloquent\Attributes\PaginatedBy $instance */
+        $instance = $attributes[0]->newInstance();
+
+        return match ($default) {
+            \Illuminate\Pagination\LengthAwarePaginator::class => $this->validatePaginatorClass($instance->lengthAware, $default),
+            \Illuminate\Pagination\Paginator::class => $this->validatePaginatorClass($instance->simple, $default),
+            \Illuminate\Pagination\CursorPaginator::class => $this->validatePaginatorClass($instance->cursor, $default),
+            default => $default,
+        };
+    }
+
+    /**
+     * @template T of \Illuminate\Pagination\AbstractPaginator
+     *
+     * @param  class-string<T>|null  $custom
+     * @param  class-string<T>  $expectedBase
+     * @return class-string<T>
+     */
+    protected function validatePaginatorClass(?string $custom, string $expectedBase): string
+    {
+        if (is_null($custom)) {
+            return $expectedBase;
+        }
+
+        if (! is_subclass_of($custom, $expectedBase)) {
+            throw new RuntimeException("Paginator class [{$custom}] must be instance of [{$expectedBase}].");
+        }
+
+        return $custom;
     }
 
     /**

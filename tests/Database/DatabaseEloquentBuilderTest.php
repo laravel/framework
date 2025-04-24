@@ -7,6 +7,7 @@ use Closure;
 use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\ConnectionResolverInterface;
+use Illuminate\Database\Eloquent\Attributes\PaginatedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -18,11 +19,15 @@ use Illuminate\Database\Query\Builder as BaseBuilder;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
+use Illuminate\Pagination\CursorPaginator;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection as BaseCollection;
 use Mockery as m;
 use PDO;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 use stdClass;
 
 class DatabaseEloquentBuilderTest extends TestCase
@@ -2664,6 +2669,46 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertCount(1, $query->getQuery()->wheres);
     }
 
+    public function testWithoutPaginatedByAttribute()
+    {
+        $model = new EloquentModelWithoutPaginatedByAttributeFor;
+        $this->mockConnectionForModel($model, 'SQLite');
+
+        $query = $model->newQuery()->paginate(perPage: 1);
+        $this->assertInstanceOf(LengthAwarePaginator::class, $query);
+
+        $query = $model->newQuery()->simplePaginate(perPage: 1);
+        $this->assertInstanceOf(Paginator::class, $query);
+
+        $query = $model->newQuery()->cursorPaginate(perPage: 1);
+        $this->assertInstanceOf(CursorPaginator::class, $query);
+    }
+
+    public function testPaginatedByAttribute()
+    {
+        $model = new EloquentModelWithPaginatedByAttributeFor;
+        $this->mockConnectionForModel($model, 'SQLite');
+
+        $query = $model->newQuery()->paginate(perPage: 1);
+        $this->assertInstanceOf(CustomEloquentLengthAwarePaginator::class, $query);
+
+        $query = $model->newQuery()->simplePaginate(perPage: 1);
+        $this->assertInstanceOf(CustomEloquentSimplePaginator::class, $query);
+
+        $query = $model->newQuery()->cursorPaginate(perPage: 1);
+        $this->assertInstanceOf(CustomEloquentCursorPaginator::class, $query);
+    }
+
+    public function testWrongPaginatedByAttribute()
+    {
+        $this->expectException(RuntimeException::class);
+
+        $model = new EloquentModelWithWrongPaginatedByAttributeFor;
+        $this->mockConnectionForModel($model, 'SQLite');
+
+        $model->newQuery()->paginate(perPage: 1);
+    }
+
     protected function mockConnectionForModel($model, $database)
     {
         $grammarClass = 'Illuminate\Database\Query\Grammars\\'.$database.'Grammar';
@@ -2671,12 +2716,14 @@ class DatabaseEloquentBuilderTest extends TestCase
         $processor = new $processorClass;
         $connection = m::mock(Connection::class, ['getPostProcessor' => $processor]);
         $grammar = new $grammarClass($connection);
+        $connection->shouldReceive('getName')->andReturn($database);
         $connection->shouldReceive('getQueryGrammar')->andReturn($grammar);
         $connection->shouldReceive('getTablePrefix')->andReturn('');
         $connection->shouldReceive('query')->andReturnUsing(function () use ($connection, $grammar, $processor) {
             return new BaseBuilder($connection, $grammar, $processor);
         });
         $connection->shouldReceive('getDatabaseName')->andReturn('database');
+        $connection->shouldReceive('select')->andReturn([['aggregate' => 1]]);
         $resolver = m::mock(ConnectionResolverInterface::class, ['connection' => $connection]);
         $class = get_class($model);
         $class::setConnectionResolver($resolver);
@@ -2914,4 +2961,40 @@ class EloquentBuilderTestWhereBelongsToStub extends Model
     {
         return $this->belongsTo(self::class, 'parent_id', 'id', 'parent');
     }
+}
+
+class EloquentModelWithoutPaginatedByAttributeFor extends Model
+{
+}
+
+#[PaginatedBy(
+    lengthAware: CustomEloquentLengthAwarePaginator::class,
+    simple: CustomEloquentSimplePaginator::class,
+    cursor: CustomEloquentCursorPaginator::class,
+)]
+class EloquentModelWithPaginatedByAttributeFor extends Model
+{
+}
+
+#[PaginatedBy(
+    lengthAware: CustomEloquentWrongLengthAwarePaginator::class,
+)]
+class EloquentModelWithWrongPaginatedByAttributeFor extends Model
+{
+}
+
+class CustomEloquentLengthAwarePaginator extends \Illuminate\Pagination\LengthAwarePaginator
+{
+}
+
+class CustomEloquentSimplePaginator extends \Illuminate\Pagination\Paginator
+{
+}
+
+class CustomEloquentCursorPaginator extends \Illuminate\Pagination\CursorPaginator
+{
+}
+
+class CustomEloquentWrongLengthAwarePaginator extends \Illuminate\Pagination\CursorPaginator
+{
 }

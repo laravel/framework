@@ -1073,12 +1073,14 @@ class Builder implements BuilderContract
     /**
      * Paginate the given query.
      *
+     * @template TLengthPaginator of \Illuminate\Pagination\LengthAwarePaginator
+     *
      * @param  int|null|\Closure  $perPage
      * @param  array|string  $columns
      * @param  string  $pageName
      * @param  int|null  $page
      * @param  \Closure|int|null  $total
-     * @return \Illuminate\Pagination\LengthAwarePaginator
+     * @return TLengthPaginator
      *
      * @throws \InvalidArgumentException
      */
@@ -1103,11 +1105,13 @@ class Builder implements BuilderContract
     /**
      * Paginate the given query into a simple paginator.
      *
+     * @template TSimplePaginator of \Illuminate\Contracts\Pagination\Paginator
+     *
      * @param  int|null  $perPage
      * @param  array|string  $columns
      * @param  string  $pageName
      * @param  int|null  $page
-     * @return \Illuminate\Contracts\Pagination\Paginator
+     * @return TSimplePaginator
      */
     public function simplePaginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
     {
@@ -1129,11 +1133,13 @@ class Builder implements BuilderContract
     /**
      * Paginate the given query into a cursor paginator.
      *
+     * @template TCursorPaginator of \Illuminate\Contracts\Pagination\CursorPaginator
+     *
      * @param  int|null  $perPage
      * @param  array|string  $columns
      * @param  string  $cursorName
      * @param  \Illuminate\Pagination\Cursor|string|null  $cursor
-     * @return \Illuminate\Contracts\Pagination\CursorPaginator
+     * @return TCursorPaginator
      */
     public function cursorPaginate($perPage = null, $columns = ['*'], $cursorName = 'cursor', $cursor = null)
     {
