@@ -165,29 +165,6 @@ class MailableWithoutSecuredEncodingTest extends TestCase
 </tbody>
 </table>
 TABLE, false);
-        /**
-         *
-<thead>\n
-<tr>\n
-<th>Laravel</th>\n
-<th align="center">Table</th>\n
-<th align="right">Example</th>\n
-</tr>\n
-</thead>\n
-<tbody>\n
-<tr>\n
-<td>Col 2 is</td>\n
-<td align="center">Centered</td>\n
-<td align="right">$10</td>\n
-</tr>\n
-<tr>\n
-<td>Col 3 is</td>\n
-<td align="center">Right-Aligned</td>\n
-<td align="right">$20</td>\n
-</tr>\n
-</tbody>\n
-</table>\n
-         */
     }
 
     public static function markdownEncodedTemplateDataProvider()
