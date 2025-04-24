@@ -603,6 +603,10 @@ trait BuildsQueries
      */
     protected function getPaginatorClassForModel(string $default): string
     {
+        if (! method_exists($this, 'getModel')) {
+            return $default;
+        }
+
         $modelClass = get_class($this->getModel());
         $reflectionClass = new ReflectionClass($modelClass);
         $attributes = $reflectionClass->getAttributes(\Illuminate\Database\Eloquent\Attributes\PaginatedBy::class);
