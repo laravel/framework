@@ -47,6 +47,13 @@ trait HasRelationships
     protected $relationAutoloadCallback = null;
 
     /**
+     * The relationship autoloader callback context.
+     *
+     * @var mixed
+     */
+    protected $relationAutoloadContext = null;
+
+    /**
      * The many to many relationship methods.
      *
      * @var string[]
@@ -118,10 +125,16 @@ trait HasRelationships
      */
     public function autoloadRelationsUsing(Closure $callback, $context = null)
     {
+        // prevent circular relation autoloading
+        if ($context && $this->relationAutoloadContext === $context) {
+            return $this;
+        }
+
         $this->relationAutoloadCallback = $callback;
+        $this->relationAutoloadContext = $context;
 
         foreach ($this->relations as $key => $value) {
-            $this->propagateRelationAutoloadCallbackToRelation($key, $value, $context);
+            $this->propagateRelationAutoloadCallbackToRelation($key, $value);
         }
 
         return $this;
@@ -163,10 +176,9 @@ trait HasRelationships
      *
      * @param  string  $key
      * @param  mixed  $models
-     * @param  mixed  $context
      * @return void
      */
-    protected function propagateRelationAutoloadCallbackToRelation($key, $models, $context = null)
+    protected function propagateRelationAutoloadCallbackToRelation($key, $models)
     {
         if (! $this->hasRelationAutoloadCallback() || ! $models) {
             return;
@@ -182,17 +194,8 @@ trait HasRelationships
 
         $callback = fn (array $tuples) => $this->invokeRelationAutoloadCallbackFor($key, $tuples);
 
-        if (! is_array($context)) {
-            $context = $context ? [$context] : [];
-        }
-
-        $context[] = $this;
-
         foreach ($models as $model) {
-            // Check if relation autoload contexts are different to avoid circular relation autoload...
-            if (array_search($model, $context, true) !== false) {
-                $model->autoloadRelationsUsing($callback, $context);
-            }
+            $model->autoloadRelationsUsing($callback, $this->relationAutoloadContext);
         }
     }
 
