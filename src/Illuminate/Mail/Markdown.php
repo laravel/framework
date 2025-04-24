@@ -36,7 +36,7 @@ class Markdown
     protected $componentPaths = [];
 
     /**
-     * Determine if secure encoding should be enabled if needed.
+     * Indicates if secure encoding should be enabled.
      *
      * @var bool
      */
@@ -131,26 +131,6 @@ class Markdown
         return new HtmlString(
             html_entity_decode(preg_replace("/[\r\n]{2,}/", "\n\n", $contents), ENT_QUOTES, 'UTF-8')
         );
-    }
-
-    /**
-     * Disable secured encoding when parsing Markdown for Mail.
-     *
-     * @return void
-     */
-    public static function withoutSecuredEncoding()
-    {
-        static::$withSecuredEncoding = false;
-    }
-
-    /**
-     * Enable secured encoding when parsing Markdown for Mail.
-     *
-     * @return void
-     */
-    public static function withSecuredEncoding()
-    {
-        static::$withSecuredEncoding = true;
     }
 
     /**
@@ -280,6 +260,26 @@ class Markdown
     public function getTheme()
     {
         return $this->theme;
+    }
+
+    /**
+     * Enable secured encoding when parsing Markdown.
+     *
+     * @return void
+     */
+    public static function withSecuredEncoding()
+    {
+        static::$withSecuredEncoding = true;
+    }
+
+    /**
+     * Disable secured encoding when parsing Markdown.
+     *
+     * @return void
+     */
+    public static function withoutSecuredEncoding()
+    {
+        static::$withSecuredEncoding = false;
     }
 
     /**
