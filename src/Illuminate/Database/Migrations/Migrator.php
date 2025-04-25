@@ -610,7 +610,7 @@ class Migrator
     /**
      * Get the status of the migration.
      *
-     * @param $path
+     * @param  $path
      * @return MigrationStatus
      */
     public function getMigrationStatus($path)
