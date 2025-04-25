@@ -7,10 +7,10 @@ use Illuminate\Tests\Integration\Generators\TestCase;
 class EnumMakeCommandTest extends TestCase
 {
     protected $files = [
-        'app/IntEnum.php',
-        'app/StatusEnum.php',
-        'app/StringEnum.php',
-        'app/*/OrderStatusEnum.php',
+        'app/Enums/IntEnum.php',
+        'app/Enums/StatusEnum.php',
+        'app/Enums/StringEnum.php',
+        'app/Enums/*/OrderStatusEnum.php',
     ];
 
     public function testItCanGenerateEnumFile()
@@ -19,9 +19,9 @@ class EnumMakeCommandTest extends TestCase
             ->assertExitCode(0);
 
         $this->assertFileContains([
-            'namespace App;',
+            'namespace App\Enums;',
             'enum StatusEnum',
-        ], 'app/StatusEnum.php');
+        ], 'app/Enums/StatusEnum.php');
     }
 
     public function testItCanGenerateEnumFileWithString()
@@ -30,9 +30,9 @@ class EnumMakeCommandTest extends TestCase
             ->assertExitCode(0);
 
         $this->assertFileContains([
-            'namespace App;',
+            'namespace App\Enums;',
             'enum StringEnum: string',
-        ], 'app/StringEnum.php');
+        ], 'app/Enums/StringEnum.php');
     }
 
     public function testItCanGenerateEnumFileWithInt()
@@ -41,9 +41,9 @@ class EnumMakeCommandTest extends TestCase
             ->assertExitCode(0);
 
         $this->assertFileContains([
-            'namespace App;',
+            'namespace App\Enums;',
             'enum IntEnum: int',
-        ], 'app/IntEnum.php');
+        ], 'app/Enums/IntEnum.php');
     }
 
     public function testItCanGenerateEnumFileInEnumsFolder()
@@ -64,25 +64,5 @@ class EnumMakeCommandTest extends TestCase
         ], 'app/Enums/OrderStatusEnum.php');
 
         $files->deleteDirectory($enumsFolderPath);
-    }
-
-    public function testItCanGenerateEnumFileInEnumerationsFolder()
-    {
-        $enumerationsFolderPath = app_path('Enumerations');
-
-        /** @var \Illuminate\Filesystem\Filesystem $files */
-        $files = $this->app['files'];
-
-        $files->ensureDirectoryExists($enumerationsFolderPath);
-
-        $this->artisan('make:enum', ['name' => 'OrderStatusEnum'])
-            ->assertExitCode(0);
-
-        $this->assertFileContains([
-            'namespace App\Enumerations;',
-            'enum OrderStatusEnum',
-        ], 'app/Enumerations/OrderStatusEnum.php');
-
-        $files->deleteDirectory($enumerationsFolderPath);
     }
 }
