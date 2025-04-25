@@ -196,7 +196,7 @@ class ScheduleRunCommand extends Command
                     round(microtime(true) - $start, 2)
                 ));
 
-                if ($event->exitCode !== 0) {
+                if ($event->exitCode != 0) {
                     $exception = new \Exception("Command {$event->command} failed with exit code {$event->exitCode}");
 
                     $this->dispatcher->dispatch(new ScheduledTaskFailed($event, $exception));
