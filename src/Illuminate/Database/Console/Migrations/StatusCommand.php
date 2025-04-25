@@ -108,16 +108,6 @@ class StatusCommand extends BaseCommand
     }
 
     /**
-     * Get an array of all of the migration files.
-     *
-     * @return array
-     */
-    protected function getAllMigrationFiles()
-    {
-        return $this->migrator->getMigrationFiles($this->getMigrationPaths());
-    }
-
-    /**
      * Get the migration's status.
      *
      * @param  string  $path
@@ -146,6 +136,16 @@ class StatusCommand extends BaseCommand
     public function getMigrationBatch(string $path, array $batches): ?int
     {
         return $batches[$this->migrator->getMigrationName($path)] ?? null;
+    }
+
+    /**
+     * Get an array of all of the migration files.
+     *
+     * @return array
+     */
+    protected function getAllMigrationFiles()
+    {
+        return $this->migrator->getMigrationFiles($this->getMigrationPaths());
     }
 
     /**
