@@ -761,7 +761,7 @@ class Collection extends BaseCollection implements QueueableCollection
 
         foreach ($this as $model) {
             if (! $model->hasRelationAutoloadCallback()) {
-                $model->autoloadRelationsUsing($callback);
+                $model->autoloadRelationsUsing($callback, $this);
             }
         }
 
