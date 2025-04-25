@@ -2,7 +2,6 @@
 
 namespace Illuminate\Database\Console\Migrations;
 
-use Illuminate\Database\Migrations\MigrationStatus;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Support\Collection;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -60,17 +59,20 @@ class StatusCommand extends BaseCommand
 
             $statuses = collect($this->option('status'))
                 ->map(fn (string $status): string => ucfirst(strtolower($status)))
-                ->filter(fn (string $status): bool => collect(MigrationStatus::cases())->map->value->contains($status))
-                ->mapInto(MigrationStatus::class)
-                ->when($this->option('pending') !== false, fn ($statuses) => $statuses->push(MigrationStatus::Pending, MigrationStatus::Skipped))
+                ->filter(fn (string $status): bool => in_array($status, ['Ran', 'Pending', 'Skipped']))
+                ->when($this->option('pending') !== false, fn ($statuses) => $statuses->push('Pending', 'Skipped'))
                 ->unique();
 
+            $ran = $this->migrator->getRepository()->getRan();
+
+            $batches = $this->migrator->getRepository()->getMigrationBatches();
+
             $migrations = (new Collection($this->getAllMigrationFiles()))
-                ->map(function ($migration): array {
+                ->map(function ($migration) use ($ran, $batches): array {
                     return [
                         'name' => $this->migrator->getMigrationName($migration),
-                        'batch' => $this->migrator->getMigrationBatch($migration),
-                        'status' => $this->migrator->getMigrationStatus($migration),
+                        'batch' => $this->getMigrationBatch($migration, $batches),
+                        'status' => $this->getMigrationStatus($migration, $ran),
                     ];
                 })
                 ->when($statuses->isNotEmpty(), function ($migrations) use ($statuses) {
@@ -87,9 +89,9 @@ class StatusCommand extends BaseCommand
                         $migration['name'],
                         ($migration['batch'] ? '['.$migration['batch'].'] ' : ' ').
                         match ($migration['status']) {
-                            MigrationStatus::Ran => '<fg=green;options=bold>Ran</>',
-                            MigrationStatus::Pending => '<fg=yellow;options=bold>Pending</>',
-                            MigrationStatus::Skipped => '<fg=blue;options=bold>Skipped</>',
+                            'Ran' => '<fg=green;options=bold>Ran</>',
+                            'Pending' => '<fg=yellow;options=bold>Pending</>',
+                            'Skipped' => '<fg=blue;options=bold>Skipped</>',
                         },
                     );
                 });
@@ -113,6 +115,37 @@ class StatusCommand extends BaseCommand
     protected function getAllMigrationFiles()
     {
         return $this->migrator->getMigrationFiles($this->getMigrationPaths());
+    }
+
+    /**
+     * Get the migration's status.
+     *
+     * @param  string  $path
+     * @param  array  $ran
+     * @return string
+     */
+    protected function getMigrationStatus(string $path, array $ran): string
+    {
+        if (in_array($this->migrator->getMigrationName($path), $ran)) {
+            return 'Ran';
+        }
+
+        $migration = $this->migrator->resolvePath($path);
+
+        return method_exists($migration, 'shouldRun') && ! $migration->shouldRun()
+            ? 'Skipped'
+            : 'Pending';
+    }
+
+    /**
+     * Get the migration's batch.
+     *
+     * @param  $path
+     * @return int|null
+     */
+    public function getMigrationBatch(string $path, array $batches): ?int
+    {
+        return $batches[$this->migrator->getMigrationName($path)] ?? null;
     }
 
     /**

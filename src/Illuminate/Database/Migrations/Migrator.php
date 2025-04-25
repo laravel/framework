@@ -536,7 +536,7 @@ class Migrator
      * @param  string  $path
      * @return object
      */
-    protected function resolvePath(string $path)
+    public function resolvePath(string $path)
     {
         $class = $this->getMigrationClass($this->getMigrationName($path));
 
@@ -605,36 +605,6 @@ class Migrator
     public function getMigrationName($path)
     {
         return str_replace('.php', '', basename($path));
-    }
-
-    /**
-     * Get the status of the migration.
-     *
-     * @param  $path
-     * @return MigrationStatus
-     */
-    public function getMigrationStatus($path)
-    {
-        if (in_array($this->getMigrationName($path), $this->getRepository()->getRan())) {
-            return MigrationStatus::Ran;
-        }
-
-        $migration = $this->resolvePath($path);
-
-        return method_exists($migration, 'shouldRun') && ! $migration->shouldRun()
-            ? MigrationStatus::Skipped
-            : MigrationStatus::Pending;
-    }
-
-    /**
-     * Get the batch of the migration.
-     *
-     * @param  $path
-     * @return int|null
-     */
-    public function getMigrationBatch($path)
-    {
-        return $this->getRepository()->getMigrationBatches()[$this->getMigrationName($path)] ?? null;
     }
 
     /**
