@@ -163,6 +163,28 @@ class ModelSerializationTest extends TestCase
         $this->assertEquals($unSerialized->order->getRelations(), $order->getRelations());
     }
 
+    public function testItReloadsRelationshipsOnlyOnce()
+    {
+        $order = tap(ModelSerializationTestCustomOrder::create(), function (ModelSerializationTestCustomOrder $order) {
+            $order->wasRecentlyCreated = false;
+        });
+
+        $product1 = Product::create();
+        $product2 = Product::create();
+
+        Line::create(['order_id' => $order->id, 'product_id' => $product1->id]);
+        Line::create(['order_id' => $order->id, 'product_id' => $product2->id]);
+
+        $order->load('line', 'lines', 'products');
+
+        $this->expectsDatabaseQueryCount(4);
+
+        $serialized = serialize(new ModelRelationSerializationTestClass($order));
+        $unSerialized = unserialize($serialized);
+
+        $this->assertEquals($unSerialized->order->getRelations(), $order->getRelations());
+    }
+
     public function testItReloadsNestedRelationships()
     {
         $order = tap(Order::create(), function (Order $order) {
@@ -432,6 +454,29 @@ class ModelSerializationTestCustomUser extends Model
     public function newCollection(array $models = [])
     {
         return new ModelSerializationTestCustomUserCollection($models);
+    }
+}
+
+class ModelSerializationTestCustomOrder extends Model
+{
+    public $table = 'orders';
+    public $guarded = [];
+    public $timestamps = false;
+    public $with = ['line', 'lines', 'products'];
+
+    public function line()
+    {
+        return $this->hasOne(Line::class, 'order_id');
+    }
+
+    public function lines()
+    {
+        return $this->hasMany(Line::class, 'order_id');
+    }
+
+    public function products()
+    {
+        return $this->belongsToMany(Product::class, 'lines', 'order_id');
     }
 }
 
