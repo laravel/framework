@@ -125,7 +125,7 @@ trait HasRelationships
      */
     public function autoloadRelationsUsing(Closure $callback, $context = null)
     {
-        // prevent circular relation autoloading
+        // Prevent circular relation autoloading...
         if ($context && $this->relationAutoloadContext === $context) {
             return $this;
         }
