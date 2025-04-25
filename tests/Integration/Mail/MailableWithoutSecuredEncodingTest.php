@@ -135,7 +135,7 @@ class MailableWithoutSecuredEncodingTest extends TestCase
 
             public function build()
             {
-                return $this->markdown('message-table-with-template');
+                return $this->markdown('table-with-template');
             }
         };
 
