@@ -99,9 +99,7 @@ class StatusCommand extends BaseCommand
                 $this->components->info('No migrations found');
             }
 
-            if (count($statuses) > 0 && count($migrations) > 0) {
-                return null;
-            }
+            return count($statuses) > 0 && count($migrations) > 0 ? self::FAILURE : self::SUCCESS;
         });
     }
 
