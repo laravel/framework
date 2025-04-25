@@ -199,11 +199,7 @@ class ScheduleRunCommand extends Command
                 ));
 
                 if ($event->exitCode != 0) {
-                    $exception = new \Exception("Command {$event->command} failed with exit code {$event->exitCode}");
-
-                    $this->dispatcher->dispatch(new ScheduledTaskFailed($event, $exception));
-
-                    $this->handler->report($exception);
+                    throw new \Exception("Command {$event->command} failed with exit code {$event->exitCode}");
                 }
 
                 $this->eventsRan = true;
