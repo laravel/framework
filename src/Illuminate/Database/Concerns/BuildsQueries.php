@@ -611,4 +611,120 @@ trait BuildsQueries
     {
         return $callback($this) ?? $this;
     }
+
+    /**
+     * Chunk the results of the query based on available memory usage.
+     *
+     * @param  int  $maxMemoryUsage  Maximum memory usage in megabytes
+     * @param  callable(\Illuminate\Support\Collection<int, TValue>, int): mixed  $callback
+     * @return bool
+     */
+    public function chunkByMemory($maxMemoryUsage, callable $callback)
+    {
+        $maxMemoryBytes = $maxMemoryUsage * 1024 * 1024; // Convert MB to bytes
+        $initialMemory = memory_get_usage();
+
+        // Start with a reasonable chunk size
+        $chunkSize = 1000;
+        $page = 1;
+
+        do {
+            // Clone the query to avoid modifying the original
+            $clone = clone $this;
+
+            // Get a chunk of results
+            $results = $clone->forPage($page, $chunkSize)->get();
+
+            $countResults = $results->count();
+
+            if ($countResults == 0) {
+                break;
+            }
+
+            // Process the results
+            if ($callback($results, $page) === false) {
+                return false;
+            }
+
+            // Check memory usage after processing
+            $currentMemory = memory_get_usage();
+            $memoryDelta = $currentMemory - $initialMemory;
+
+            // Adjust chunk size based on memory usage
+            if ($memoryDelta > $maxMemoryBytes) {
+                // If we're using too much memory, reduce chunk size
+                $chunkSize = max(10, (int) ($chunkSize * 0.75));
+            } elseif ($memoryDelta < ($maxMemoryBytes * 0.5)) {
+                // If we're using less than half the allowed memory, increase chunk size
+                $chunkSize = min(10000, (int) ($chunkSize * 1.25));
+            }
+
+            // Force garbage collection to free memory
+            if (function_exists('gc_collect_cycles')) {
+                gc_collect_cycles();
+            }
+
+            unset($results);
+
+            $page++;
+        } while ($countResults > 0);
+
+        return true;
+    }
+
+    /**
+     * Create a lazy collection from the query with automatic memory management.
+     *
+     * @param  int  $maxMemoryUsage  Maximum memory usage in megabytes
+     * @return \Illuminate\Support\LazyCollection<int, TValue>
+     */
+    public function lazyByMemory($maxMemoryUsage = 100)
+    {
+        return new LazyCollection(function () use ($maxMemoryUsage) {
+            $page = 1;
+
+            // Start with a reasonable chunk size
+            $chunkSize = 1000;
+            $maxMemoryBytes = $maxMemoryUsage * 1024 * 1024; // Convert MB to bytes
+            $initialMemory = memory_get_usage();
+
+            while (true) {
+                // Clone the query to avoid modifying the original
+                $clone = clone $this;
+
+                // Get a chunk of results
+                $results = $clone->forPage($page, $chunkSize)->get();
+
+                if ($results->isEmpty()) {
+                    break;
+                }
+
+                foreach ($results as $item) {
+                    yield $item;
+                }
+
+                // Check memory usage after processing
+                $currentMemory = memory_get_usage();
+                $memoryDelta = $currentMemory - $initialMemory;
+
+                // Adjust chunk size based on memory usage
+                if ($memoryDelta > $maxMemoryBytes) {
+                    // If we're using too much memory, reduce chunk size
+                    $chunkSize = max(10, (int) ($chunkSize * 0.75));
+                } elseif ($memoryDelta < ($maxMemoryBytes * 0.5)) {
+                    // If we're using less than half the allowed memory, increase chunk size
+                    $chunkSize = min(10000, (int) ($chunkSize * 1.25));
+                }
+
+                // Force garbage collection to free memory
+                if (function_exists('gc_collect_cycles')) {
+                    gc_collect_cycles();
+                }
+
+                unset($results);
+
+                $page++;
+            }
+        });
+    }
 }
