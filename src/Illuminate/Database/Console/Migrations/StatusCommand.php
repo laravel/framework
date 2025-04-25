@@ -67,14 +67,7 @@ class StatusCommand extends BaseCommand
 
             $batches = $this->migrator->getRepository()->getMigrationBatches();
 
-            $migrations = (new Collection($this->getAllMigrationFiles()))
-                ->map(function ($migration) use ($ran, $batches): array {
-                    return [
-                        'name' => $this->migrator->getMigrationName($migration),
-                        'batch' => $this->getMigrationBatch($migration, $batches),
-                        'status' => $this->getMigrationStatus($migration, $ran),
-                    ];
-                })
+            $migrations = $this->getStatusFor($ran, $batches)
                 ->when($statuses->isNotEmpty(), function ($migrations) use ($statuses) {
                     return $migrations->filter(fn ($migration) => $statuses->contains($migration['status']));
                 });
@@ -98,13 +91,34 @@ class StatusCommand extends BaseCommand
 
                 $this->newLine();
             } elseif (count($statuses) > 0) {
-                $this->components->info('No '.$statuses->map(fn ($status) => strtolower($status->value))->join(', ', ' or ').' migrations');
+                $this->components->info('No '.$statuses->map(fn ($status) => strtolower($status))->join(', ', ' or ').' migrations');
             } else {
                 $this->components->info('No migrations found');
             }
 
             return count($statuses) > 0 && count($migrations) > 0 ? self::FAILURE : self::SUCCESS;
         });
+    }
+
+    /**
+     * Get the status for the given run migrations.
+     *
+     * @param  array  $ran
+     * @param  array  $batches
+     * @return \Illuminate\Support\Collection
+     */
+    protected function getStatusFor(array $ran, array $batches)
+    {
+        return (new Collection($this->getAllMigrationFiles()))
+            ->map(function ($migration) use ($ran, $batches): array {
+                $migrationName = $this->migrator->getMigrationName($migration);
+
+                return [
+                    'name' => $migrationName,
+                    'batch' => $batches[$migrationName] ?? null,
+                    'status' => $this->getMigrationStatus($migration, $ran),
+                ];
+            });
     }
 
     /**
@@ -125,17 +139,6 @@ class StatusCommand extends BaseCommand
         return method_exists($migration, 'shouldRun') && ! $migration->shouldRun()
             ? 'Skipped'
             : 'Pending';
-    }
-
-    /**
-     * Get the migration's batch.
-     *
-     * @param  $path
-     * @return int|null
-     */
-    public function getMigrationBatch(string $path, array $batches): ?int
-    {
-        return $batches[$this->migrator->getMigrationName($path)] ?? null;
     }
 
     /**
