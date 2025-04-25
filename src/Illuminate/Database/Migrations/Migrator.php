@@ -627,6 +627,17 @@ class Migrator
     }
 
     /**
+     * Get the batch of the migration.
+     *
+     * @param  $path
+     * @return int|null
+     */
+    public function getMigrationBatch($path)
+    {
+        return $this->getRepository()->getMigrationBatches()[$this->getMigrationName($path)] ?? null;
+    }
+
+    /**
      * Register a custom migration path.
      *
      * @param  string  $path

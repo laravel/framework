@@ -68,12 +68,13 @@ class StatusCommand extends BaseCommand
             $migrations = (new Collection($this->getAllMigrationFiles()))
                 ->map(function ($migration): array {
                     return [
-                        $this->migrator->getMigrationName($migration),
-                        $this->migrator->getMigrationStatus($migration),
+                        'name' => $this->migrator->getMigrationName($migration),
+                        'batch' => $this->migrator->getMigrationBatch($migration),
+                        'status' => $this->migrator->getMigrationStatus($migration),
                     ];
                 })
                 ->when($statuses->isNotEmpty(), function ($migrations) use ($statuses) {
-                    return $migrations->filter(fn ($migration) => $statuses->contains($migration[1]));
+                    return $migrations->filter(fn ($migration) => $statuses->contains($migration['status']));
                 });
 
             if (count($migrations) > 0) {
@@ -83,12 +84,14 @@ class StatusCommand extends BaseCommand
 
                 $migrations->each(function ($migration) {
                     $this->components->twoColumnDetail(
-                        $migration[0],
-                        match ($migration[1]) {
-                            MigrationStatus::Ran => '<fg=green;options=bold>Ran</>',
-                            MigrationStatus::Pending => '<fg=yellow;options=bold>Pending</>',
-                            MigrationStatus::Skipped => '<fg=blue;options=bold>Skipped</>',
-                        },
+                        $migration['name'],
+                        collect($migration['batch'])
+                            ->push(match ($migration['status']) {
+                                MigrationStatus::Ran => '<fg=green;options=bold>Ran</>',
+                                MigrationStatus::Pending => '<fg=yellow;options=bold>Pending</>',
+                                MigrationStatus::Skipped => '<fg=blue;options=bold>Skipped</>',
+                            })
+                            ->join(' / '),
                     );
                 });
 
