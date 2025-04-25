@@ -619,7 +619,9 @@ class Migrator
             return MigrationStatus::Ran;
         }
 
-        return $this->resolvePath($path)?->shouldRun() !== true
+        $migration = $this->resolvePath($path);
+
+        return method_exists($migration, 'shouldRun') && ! $migration->shouldRun()
             ? MigrationStatus::Skipped
             : MigrationStatus::Pending;
     }
