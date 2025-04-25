@@ -134,11 +134,7 @@ class StatusCommand extends BaseCommand
             return 'Ran';
         }
 
-        $migration = $this->migrator->resolvePath($path);
-
-        return method_exists($migration, 'shouldRun') && ! $migration->shouldRun()
-            ? 'Skipped'
-            : 'Pending';
+        return $this->migrator->resolvePath($path)?->shouldRun() !== true ? 'Skipped' : 'Pending';
     }
 
     /**
