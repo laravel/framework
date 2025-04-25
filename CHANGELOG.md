@@ -1,6 +1,10 @@
 # Release Notes for 11.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v11.44.5...11.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v11.44.6...11.x)
+
+## [v11.44.6](https://github.com/laravel/framework/compare/v11.44.5...v11.44.6) - 2025-04-25
+
+* [11.x] Fix `EncodedHtmlString` to ignore instance of `HtmlString` by [@jbraband](https://github.com/jbraband) in https://github.com/laravel/framework/pull/55543
 
 ## [v11.44.5](https://github.com/laravel/framework/compare/v11.44.4...v11.44.5) - 2025-04-24
 
