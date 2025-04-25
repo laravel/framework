@@ -2,9 +2,9 @@
 
 namespace Illuminate\Database\Console\Migrations;
 
+use Illuminate\Database\Migrations\MigrationStatus;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Stringable;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -58,61 +58,51 @@ class StatusCommand extends BaseCommand
                 return 1;
             }
 
-            $ran = $this->migrator->getRepository()->getRan();
+            $statuses = collect($this->option('status'))
+                ->map(fn (string $status): string => ucfirst(strtolower($status)))
+                ->filter(fn (string $status): bool => collect(MigrationStatus::cases())->map->value->contains($status))
+                ->mapInto(MigrationStatus::class)
+                ->when($this->option('pending') !== false, fn ($statuses) => $statuses->push(MigrationStatus::Pending, MigrationStatus::Skipped))
+                ->unique();
 
-            $batches = $this->migrator->getRepository()->getMigrationBatches();
-
-            $migrations = $this->getStatusFor($ran, $batches)
-                ->when($this->option('pending') !== false, fn ($collection) => $collection->filter(function ($migration) {
-                    return (new Stringable($migration[1]))->contains('Pending');
-                }));
+            $migrations = (new Collection($this->getAllMigrationFiles()))
+                ->map(function ($migration): array {
+                    return [
+                        $this->migrator->getMigrationName($migration),
+                        $this->migrator->getMigrationStatus($migration),
+                    ];
+                })
+                ->when($statuses->isNotEmpty(), function ($migrations) use ($statuses) {
+                    return $migrations->filter(fn ($migration) => $statuses->contains($migration[1]));
+                });
 
             if (count($migrations) > 0) {
                 $this->newLine();
 
                 $this->components->twoColumnDetail('<fg=gray>Migration name</>', '<fg=gray>Batch / Status</>');
 
-                $migrations
-                    ->each(
-                        fn ($migration) => $this->components->twoColumnDetail($migration[0], $migration[1])
+                $migrations->each(function ($migration) {
+                    $this->components->twoColumnDetail(
+                        $migration[0],
+                        match ($migration[1]) {
+                            MigrationStatus::Ran => '<fg=green;options=bold>Ran</>',
+                            MigrationStatus::Pending => '<fg=yellow;options=bold>Pending</>',
+                            MigrationStatus::Skipped => '<fg=blue;options=bold>Skipped</>',
+                        },
                     );
+                });
 
                 $this->newLine();
-            } elseif ($this->option('pending') !== false) {
-                $this->components->info('No pending migrations');
+            } elseif (count($statuses) > 0) {
+                $this->components->info('No '.$statuses->map(fn ($status) => strtolower($status->value))->join(', ', ' or ').' migrations');
             } else {
                 $this->components->info('No migrations found');
             }
 
-            if ($this->option('pending') && $migrations->some(fn ($m) => (new Stringable($m[1]))->contains('Pending'))) {
-                return $this->option('pending');
+            if (count($statuses) > 0 && count($migrations) > 0) {
+                return null;
             }
         });
-    }
-
-    /**
-     * Get the status for the given run migrations.
-     *
-     * @param  array  $ran
-     * @param  array  $batches
-     * @return \Illuminate\Support\Collection
-     */
-    protected function getStatusFor(array $ran, array $batches)
-    {
-        return (new Collection($this->getAllMigrationFiles()))
-            ->map(function ($migration) use ($ran, $batches) {
-                $migrationName = $this->migrator->getMigrationName($migration);
-
-                $status = in_array($migrationName, $ran)
-                    ? '<fg=green;options=bold>Ran</>'
-                    : '<fg=yellow;options=bold>Pending</>';
-
-                if (in_array($migrationName, $ran)) {
-                    $status = '['.$batches[$migrationName].'] '.$status;
-                }
-
-                return [$migrationName, $status];
-            });
     }
 
     /**
@@ -134,7 +124,8 @@ class StatusCommand extends BaseCommand
     {
         return [
             ['database', null, InputOption::VALUE_OPTIONAL, 'The database connection to use'],
-            ['pending', null, InputOption::VALUE_OPTIONAL, 'Only list pending migrations', false],
+            ['pending', null, InputOption::VALUE_OPTIONAL, 'Only list pending migrations (Deprecated)', false],
+            ['status', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'The statuses to filter migrations by (Ran, Pending, Skipped)'],
             ['path', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'The path(s) to the migrations files to use'],
             ['realpath', null, InputOption::VALUE_NONE, 'Indicate any provided migration file paths are pre-resolved absolute paths'],
         ];

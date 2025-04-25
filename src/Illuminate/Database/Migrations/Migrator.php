@@ -608,6 +608,23 @@ class Migrator
     }
 
     /**
+     * Get the status of the migration.
+     *
+     * @param $path
+     * @return MigrationStatus
+     */
+    public function getMigrationStatus($path)
+    {
+        if (in_array($this->getMigrationName($path), $this->getRepository()->getRan())) {
+            return MigrationStatus::Ran;
+        }
+
+        return $this->resolvePath($path)?->shouldRun() !== true
+            ? MigrationStatus::Skipped
+            : MigrationStatus::Pending;
+    }
+
+    /**
      * Register a custom migration path.
      *
      * @param  string  $path
