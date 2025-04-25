@@ -85,7 +85,7 @@ class StatusCommand extends BaseCommand
                 $migrations->each(function ($migration) {
                     $this->components->twoColumnDetail(
                         $migration['name'],
-                        ($migration['batch'] ? '['.$migration.'] ' : ' ').
+                        ($migration['batch'] ? '['.$migration['batch'].'] ' : ' ').
                         match ($migration['status']) {
                             MigrationStatus::Ran => '<fg=green;options=bold>Ran</>',
                             MigrationStatus::Pending => '<fg=yellow;options=bold>Pending</>',
