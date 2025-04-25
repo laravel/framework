@@ -2,8 +2,19 @@
 
 namespace Illuminate\Support;
 
+use BackedEnum;
+use Illuminate\Contracts\Support\DeferringDisplayableValue;
+use Illuminate\Contracts\Support\Htmlable;
+
 class EncodedHtmlString extends HtmlString
 {
+    /**
+     * The HTML string.
+     *
+     * @var \Illuminate\Contracts\Support\DeferringDisplayableValue|\Illuminate\Contracts\Support\Htmlable|\BackedEnum|string|int|float|null
+     */
+    protected $html;
+
     /**
      * The callback that should be used to encode the HTML strings.
      *
@@ -14,7 +25,7 @@ class EncodedHtmlString extends HtmlString
     /**
      * Create a new encoded HTML string instance.
      *
-     * @param  string  $html
+     * @param  \Illuminate\Contracts\Support\DeferringDisplayableValue|\Illuminate\Contracts\Support\Htmlable|\BackedEnum|string|int|float|null  $html
      * @param  bool  $doubleEncode
      * @return void
      */
@@ -48,9 +59,23 @@ class EncodedHtmlString extends HtmlString
     #[\Override]
     public function toHtml()
     {
+        $value = $this->html;
+
+        if ($value instanceof DeferringDisplayableValue) {
+            $value = $value->resolveDisplayableValue();
+        }
+
+        if ($value instanceof Htmlable) {
+            return $value->toHtml();
+        }
+
+        if ($value instanceof BackedEnum) {
+            $value = $value->value;
+        }
+
         return (static::$encodeUsingFactory ?? function ($value, $doubleEncode) {
             return static::convert($value, doubleEncode: $doubleEncode);
-        })($this->html, $this->doubleEncode);
+        })($value, $this->doubleEncode);
     }
 
     /**

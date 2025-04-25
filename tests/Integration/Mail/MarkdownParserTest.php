@@ -77,6 +77,11 @@ class MarkdownParserTest extends TestCase
         ];
 
         yield [
+            new EncodedHtmlString(new HtmlString('Visit <span>https://laravel.com/docs</span> to browse the documentation')),
+            '<p>Visit <span>https://laravel.com/docs</span> to browse the documentation</p>',
+        ];
+
+        yield [
             '![Welcome to Laravel](https://laravel.com/assets/img/welcome/background.svg)<br />'.new EncodedHtmlString('Visit <span>https://laravel.com/docs</span> to browse the documentation'),
             '<p><img src="https://laravel.com/assets/img/welcome/background.svg" alt="Welcome to Laravel" /><br />Visit &lt;span&gt;https://laravel.com/docs&lt;/span&gt; to browse the documentation</p>',
         ];

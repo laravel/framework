@@ -116,6 +116,56 @@ class MailableWithoutSecuredEncodingTest extends TestCase
         $mailable->assertSeeInHtml($expected, false);
     }
 
+    #[WithMigration]
+    #[DataProvider('markdownEncodedTemplateDataProvider')]
+    public function testItCanAssertMarkdownEncodedStringUsingTemplateWithTable($given, $expected)
+    {
+        $user = UserFactory::new()->create([
+            'name' => $given,
+        ]);
+
+        $mailable = new class($user) extends Mailable
+        {
+            public $theme = 'taylor';
+
+            public function __construct(public User $user)
+            {
+                //
+            }
+
+            public function build()
+            {
+                return $this->markdown('table-with-template');
+            }
+        };
+
+        $mailable->assertSeeInHtml($expected, false);
+        $mailable->assertSeeInHtml('<p>This is a subcopy</p>', false);
+        $mailable->assertSeeInHtml(<<<'TABLE'
+<table>
+<thead>
+<tr>
+<th>Laravel</th>
+<th align="center">Table</th>
+<th align="right">Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Col 2 is</td>
+<td align="center">Centered</td>
+<td align="right">$10</td>
+</tr>
+<tr>
+<td>Col 3 is</td>
+<td align="center">Right-Aligned</td>
+<td align="right">$20</td>
+</tr>
+</tbody>
+</table>
+TABLE, false);
+    }
+
     public static function markdownEncodedTemplateDataProvider()
     {
         yield ['[Laravel](https://laravel.com)', '<p><em>Hi</em> <a href="https://laravel.com">Laravel</a></p>'];
