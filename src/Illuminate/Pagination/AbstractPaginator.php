@@ -187,7 +187,7 @@ abstract class AbstractPaginator implements CanBeEscapedWhenCastToString, Htmlab
 
         // If we have any extra query string key / value pairs that need to be added
         // onto the URL, we will put them in query string form and then attach it
-        // to the URL. This allows for extra information like sortings storage.
+        // to the URL. This allows for extra information like sorting storage.
         $parameters = [$this->pageName => $page];
 
         if (count($this->query) > 0) {
