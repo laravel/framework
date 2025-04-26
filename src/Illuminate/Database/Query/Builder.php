@@ -905,7 +905,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     * Add an "and/or where" clause to the query for multiple columns with "and/or" conditions between them
+     * Add an "and/or where" clause to the query for multiple columns with "and/or" conditions between them.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression[]|\Closure[]|string[]  $columns
      * @param  mixed  $operator

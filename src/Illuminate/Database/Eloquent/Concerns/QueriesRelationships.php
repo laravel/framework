@@ -227,7 +227,7 @@ trait QueriesRelationships
     /**
      * Add a "whereHas" condition with OR between columns inside relationships.
      *
-     * @param  array<string,\Illuminate\Contracts\Database\Query\Expression[]|\Closure[]|string[]> $tuples [relation => [columns]]
+     * @param  array<string,\Illuminate\Contracts\Database\Query\Expression[]|\Closure[]|string[]>  $tuples  [relation => [columns]]
      * @param  mixed  $operator
      * @param  mixed  $value
      * @return $this
@@ -240,7 +240,7 @@ trait QueriesRelationships
     /**
      * Add an "orWhereHas" condition with OR between columns inside relationships.
      *
-     * @param  array<string,\Illuminate\Contracts\Database\Query\Expression[]|\Closure[]|string[]> $tuples [relation => [columns]]
+     * @param  array<string,\Illuminate\Contracts\Database\Query\Expression[]|\Closure[]|string[]>  $tuples  [relation => [columns]]
      * @param  mixed  $operator
      * @param  mixed  $value
      * @return $this
@@ -254,7 +254,7 @@ trait QueriesRelationships
      * Internal method to build "has" conditions for relationships,
      * combining multiple columns with given boolean logic.
      *
-     * @param  array<string,\Illuminate\Contracts\Database\Query\Expression[]|\Closure[]|string[]> $tuples [relation => [columns]]
+     * @param  array<string,\Illuminate\Contracts\Database\Query\Expression[]|\Closure[]|string[]>  $tuples  [relation => [columns]]
      * @param  mixed  $operator
      * @param  mixed  $value
      * @param  string  $innerBoolean
@@ -271,8 +271,8 @@ trait QueriesRelationships
     /**
      * Add nested where conditions for relationship queries.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder $query
-     * @param  array<string,\Illuminate\Contracts\Database\Query\Expression[]|\Closure[]|string[]> $tuples [relation => [columns]]
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  array<string,\Illuminate\Contracts\Database\Query\Expression[]|\Closure[]|string[]>  $tuples  [relation => [columns]]
      * @param  mixed  $operator
      * @param  mixed  $value
      * @param  string  $innerBoolean
