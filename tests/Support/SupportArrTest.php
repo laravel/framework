@@ -599,7 +599,7 @@ class SupportArrTest extends TestCase
     public function testItGetsAnArray()
     {
         $test_array = ['string' => 'foo bar', 'array' => ['foo', 'bar']];
-        
+
         // Test array values are returned as arrays
         $this->assertSame(
             ['foo', 'bar'], Arr::array($test_array, 'array')
