@@ -43,7 +43,7 @@ class Arr
     /**
      * Get an array item from an array using "dot" notation.
      */
-    public static function array(ArrayAccess|array $array, string|int|null $key, ?array $default = null): ?array
+    public static function array(ArrayAccess|array $array, string|int|null $key, ?array $default = null): array
     {
         $value = Arr::get($array, $key, $default);
 
@@ -59,7 +59,7 @@ class Arr
     /**
      * Get a boolean item from an array using "dot" notation.
      */
-    public static function boolean(ArrayAccess|array $array, string|int|null $key, ?bool $default = null): ?bool
+    public static function boolean(ArrayAccess|array $array, string|int|null $key, ?bool $default = null): bool
     {
         $value = Arr::get($array, $key, $default);
 
@@ -321,7 +321,7 @@ class Arr
     /**
      * Get a float item from an array using "dot" notation.
      */
-    public static function float(ArrayAccess|array $array, string|int|null $key, ?float $default = null): ?float
+    public static function float(ArrayAccess|array $array, string|int|null $key, ?float $default = null): float
     {
         $value = Arr::get($array, $key, $default);
 
@@ -484,7 +484,7 @@ class Arr
     /**
      * Get an integer item from an array using "dot" notation.
      */
-    public static function integer(ArrayAccess|array $array, string|int|null $key, ?int $default = null): ?int
+    public static function integer(ArrayAccess|array $array, string|int|null $key, ?int $default = null): int
     {
         $value = Arr::get($array, $key, $default);
 
@@ -973,7 +973,7 @@ class Arr
     /**
      * Get a string item from an array using "dot" notation.
      */
-    public static function string(ArrayAccess|array $array, string|int|null $key, ?string $default = null): ?string
+    public static function string(ArrayAccess|array $array, string|int|null $key, ?string $default = null): string
     {
         $value = Arr::get($array, $key, $default);
 
