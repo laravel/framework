@@ -511,6 +511,18 @@ class Arr
     }
 
     /**
+     * Append the key names of an associative array.
+     *
+     * @param  array  $array
+     * @param  string  $appendWith
+     * @return array
+     */
+    public static function appendKeysWith($array, $appendWith)
+    {
+        return static::mapWithKeys($array, fn ($item, $key) => [$key.$appendWith => $item]);
+    }
+
+    /**
      * Get a subset of the items from the given array.
      *
      * @param  array  $array
