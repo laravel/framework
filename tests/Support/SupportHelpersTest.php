@@ -91,7 +91,7 @@ class SupportHelpersTest extends TestCase
 
     public function testClassAttributes()
     {
-        require __DIR__.'/Fixtures/ClassesWithAttributes.php';
+        require_once __DIR__.'/Fixtures/ClassesWithAttributes.php';
 
         $this->assertSame([], class_attributes(Fixtures\ChildClass::class, Fixtures\UnusedAttr::class)->toArray());
 
@@ -133,7 +133,7 @@ class SupportHelpersTest extends TestCase
 
     public function testClassAttribute()
     {
-        require __DIR__.'/Fixtures/ClassesWithAttributes.php';
+        require_once __DIR__.'/Fixtures/ClassesWithAttributes.php';
 
         $this->assertNull(class_attribute(Fixtures\ChildClass::class, Fixtures\UnusedAttr::class));
         $this->assertNull(class_attribute(Fixtures\ChildClass::class, Fixtures\UnusedAttr::class, true));
