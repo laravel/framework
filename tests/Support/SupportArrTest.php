@@ -1499,6 +1499,27 @@ class SupportArrTest extends TestCase
         ], Arr::prependKeysWith($array, 'test.'));
     }
 
+    public function testAppendKeysWith()
+    {
+        $array = [
+            'id' => 1,
+            'name' => 'Lennart',
+            'skills' => ['php', 'mysql', 'laravel'],
+            'meta' => [
+                'prs' => 1,
+            ],
+        ];
+
+        $this->assertEquals([
+            'id_user' => 1,
+            'name_user' => 'Lennart',
+            'skills_user' => ['php', 'mysql', 'laravel'],
+            'meta_user' => [
+                'prs' => 1,
+            ],
+        ], Arr::appendKeysWith($array, appendWith: '_user'));
+    }
+
     public function testTake(): void
     {
         $array = [1, 2, 3, 4, 5, 6];
