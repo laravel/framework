@@ -225,6 +225,76 @@ trait QueriesRelationships
     }
 
     /**
+     * Add a "whereHas" condition with OR between columns inside relationships.
+     *
+     * @param  array<string,\Illuminate\Contracts\Database\Query\Expression[]|\Closure[]|string[]> $tuples [relation => [columns]]
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function whereHasAny(array $tuples, $operator = null, $value = null)
+    {
+        return $this->addWhereHasAnyOrAll($tuples, $operator, $value, 'or', 'and');
+    }
+
+    /**
+     * Add an "orWhereHas" condition with OR between columns inside relationships.
+     *
+     * @param  array<string,\Illuminate\Contracts\Database\Query\Expression[]|\Closure[]|string[]> $tuples [relation => [columns]]
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function orWhereHasAny(array $tuples, $operator = null, $value = null)
+    {
+        return $this->addWhereHasAnyOrAll($tuples, $operator, $value, 'or', 'or');
+    }
+
+    /**
+     * Internal method to build "has" conditions for relationships,
+     * combining multiple columns with given boolean logic.
+     *
+     * @param  array<string,\Illuminate\Contracts\Database\Query\Expression[]|\Closure[]|string[]> $tuples [relation => [columns]]
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @param  string  $innerBoolean
+     * @param  string  $outerBoolean
+     * @return $this
+     */
+    protected function addWhereHasAnyOrAll($tuples, $operator, $value, $innerBoolean = 'or', $outerBoolean = 'and')
+    {
+        $callback = fn ($query) => $this->addWhereHasNestedGroup($query, $tuples, $operator, $value, $innerBoolean, $outerBoolean);
+
+        return $this->where($callback, boolean: $outerBoolean);
+    }
+
+    /**
+     * Add nested where conditions for relationship queries.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder $query
+     * @param  array<string,\Illuminate\Contracts\Database\Query\Expression[]|\Closure[]|string[]> $tuples [relation => [columns]]
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @param  string  $innerBoolean
+     * @param  string  $outerBoolean
+     * @return $this
+     */
+    protected function addWhereHasNestedGroup($query, $tuples, $operator, $value, $innerBoolean, $outerBoolean)
+    {
+        foreach ($tuples as $relation => $columns) {
+            $callback = fn (Builder $builder) => $builder->query->addWhereNestedGroup($columns, $operator, $value, $innerBoolean, $outerBoolean);
+
+            $query->has(
+                $relation,
+                boolean: $innerBoolean,
+                callback: $callback,
+            );
+        }
+
+        return $this;
+    }
+
+    /**
      * Add a polymorphic relationship count / exists condition to the query.
      *
      * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
