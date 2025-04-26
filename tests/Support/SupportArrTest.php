@@ -518,7 +518,7 @@ class SupportArrTest extends TestCase
 
     public function testItGetsAString()
     {
-        $test_array = ['string' => 'foo bar','integer' => 1234];
+        $test_array = ['string' => 'foo bar', 'integer' => 1234];
 
         // Test string values are returned as strings
         $this->assertSame(
