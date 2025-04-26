@@ -199,7 +199,7 @@ class Filesystem
      * @param  bool  $lock
      * @return int|bool
      */
-    public function put($path, $contents, $lock = false)
+    public function put($path, $contents = '', $lock = false)
     {
         return file_put_contents($path, $contents, $lock ? LOCK_EX : 0);
     }
