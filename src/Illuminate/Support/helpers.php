@@ -4,7 +4,6 @@ use Illuminate\Contracts\Support\DeferringDisplayableValue;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Env;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\HigherOrderTapProxy;
@@ -76,49 +75,6 @@ if (! function_exists('blank')) {
         }
 
         return empty($value);
-    }
-}
-
-if (! function_exists('class_attributes')) {
-    /**
-     * Get specified class attribute(s), optionally following an inheritance chain.
-     *
-     * @template TTarget of object
-     * @template TAttribute of object
-     *
-     * @param  TTarget|class-string<TTarget>  $objectOrClass
-     * @param  class-string<TAttribute>  $attribute
-     * @return ($ascend is true ? Collection<class-string<contravariant TTarget>, Collection<int, TAttribute>> : Collection<int, TAttribute>)
-     */
-    function class_attributes($objectOrClass, $attribute, $ascend = false)
-    {
-        $refClass = new ReflectionClass($objectOrClass);
-        $attributes = [];
-
-        do {
-            $attributes[$refClass->name] = new Collection(array_map(
-                fn (ReflectionAttribute $refAttr) => $refAttr->newInstance(),
-                $refClass->getAttributes($attribute)
-            ));
-        } while ($ascend && false !== $refClass = $refClass->getParentClass());
-
-        return $ascend ? new Collection($attributes) : reset($attributes);
-    }
-}
-
-if (! function_exists('class_attribute')) {
-    /**
-     * Get a specified class attribute, optionally following an inheritance chain.
-     *
-     * @template TAttribute of object
-     *
-     * @param  object|class-string  $objectOrClass
-     * @param  class-string<TAttribute>  $attribute
-     * @return TAttribute|null
-     */
-    function class_attribute($objectOrClass, $attribute, $ascend = false)
-    {
-        return class_attributes($objectOrClass, $attribute, $ascend)->flatten()->first();
     }
 }
 

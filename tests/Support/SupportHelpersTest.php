@@ -89,63 +89,6 @@ class SupportHelpersTest extends TestCase
         $this->assertFalse(blank($model));
     }
 
-    public function testClassAttributes()
-    {
-        require_once __DIR__.'/Fixtures/ClassesWithAttributes.php';
-
-        $this->assertSame([], class_attributes(Fixtures\ChildClass::class, Fixtures\UnusedAttr::class)->toArray());
-
-        $this->assertSame(
-            [Fixtures\ChildClass::class => [], Fixtures\ParentClass::class => []],
-            class_attributes(Fixtures\ChildClass::class, Fixtures\UnusedAttr::class, true)->toArray()
-        );
-
-        $this->assertSame(
-            ['quick', 'brown', 'fox'],
-            class_attributes(Fixtures\ChildClass::class, Fixtures\StrAttr::class)->map->string->all()
-        );
-
-        $this->assertSame(
-            ['quick', 'brown', 'fox', 'lazy', 'dog'],
-            class_attributes(Fixtures\ChildClass::class, Fixtures\StrAttr::class, true)->flatten()->map->string->all()
-        );
-
-        $this->assertSame(7, class_attributes(Fixtures\ChildClass::class, Fixtures\NumAttr::class)->sum->number);
-        $this->assertSame(12, class_attributes(Fixtures\ChildClass::class, Fixtures\NumAttr::class, true)->flatten()->sum->number);
-        $this->assertSame(5, class_attributes(Fixtures\ParentClass::class, Fixtures\NumAttr::class)->sum->number);
-        $this->assertSame(5, class_attributes(Fixtures\ParentClass::class, Fixtures\NumAttr::class, true)->flatten()->sum->number);
-
-        $this->assertSame(
-            [Fixtures\ChildClass::class, Fixtures\ParentClass::class],
-            class_attributes(Fixtures\ChildClass::class, Fixtures\StrAttr::class, true)->keys()->all()
-        );
-
-        $this->assertContainsOnlyInstancesOf(
-            Fixtures\StrAttr::class,
-            class_attributes(Fixtures\ChildClass::class, Fixtures\StrAttr::class)->all()
-        );
-
-        $this->assertContainsOnlyInstancesOf(
-            Fixtures\StrAttr::class,
-            class_attributes(Fixtures\ChildClass::class, Fixtures\StrAttr::class, true)->flatten()->all()
-        );
-    }
-
-    public function testClassAttribute()
-    {
-        require_once __DIR__.'/Fixtures/ClassesWithAttributes.php';
-
-        $this->assertNull(class_attribute(Fixtures\ChildClass::class, Fixtures\UnusedAttr::class));
-        $this->assertNull(class_attribute(Fixtures\ChildClass::class, Fixtures\UnusedAttr::class, true));
-        $this->assertNull(class_attribute(Fixtures\ChildClass::class, Fixtures\ParentOnlyAttr::class));
-        $this->assertInstanceOf(Fixtures\ParentOnlyAttr::class, class_attribute(Fixtures\ChildClass::class, Fixtures\ParentOnlyAttr::class, true));
-        $this->assertInstanceOf(Fixtures\StrAttr::class, class_attribute(Fixtures\ChildClass::class, Fixtures\StrAttr::class));
-        $this->assertInstanceOf(Fixtures\StrAttr::class, class_attribute(Fixtures\ChildClass::class, Fixtures\StrAttr::class, true));
-        $this->assertSame('quick', class_attribute(Fixtures\ChildClass::class, Fixtures\StrAttr::class)->string);
-        $this->assertSame('quick', class_attribute(Fixtures\ChildClass::class, Fixtures\StrAttr::class, true)->string);
-        $this->assertSame('lazy', class_attribute(Fixtures\ParentClass::class, Fixtures\StrAttr::class)->string);
-    }
-
     public function testClassBasename()
     {
         $this->assertSame('Baz', class_basename('Foo\Bar\Baz'));

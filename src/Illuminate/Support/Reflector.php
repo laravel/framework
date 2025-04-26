@@ -2,6 +2,7 @@
 
 namespace Illuminate\Support;
 
+use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionEnum;
 use ReflectionMethod;
@@ -122,6 +123,45 @@ class Reflector
         }
 
         return $name;
+    }
+
+    /**
+     * Get specified class attribute(s), optionally following an inheritance chain.
+     *
+     * @template TTarget of object
+     * @template TAttribute of object
+     *
+     * @param  TTarget|class-string<TTarget>  $objectOrClass
+     * @param  class-string<TAttribute>  $attribute
+     * @return ($ascend is true ? Collection<class-string<contravariant TTarget>, Collection<int, TAttribute>> : Collection<int, TAttribute>)
+     */
+    public static function getAttributes($objectOrClass, $attribute, $ascend = false)
+    {
+        $refClass = new ReflectionClass($objectOrClass);
+        $attributes = [];
+
+        do {
+            $attributes[$refClass->name] = new Collection(array_map(
+                fn (ReflectionAttribute $refAttr) => $refAttr->newInstance(),
+                $refClass->getAttributes($attribute)
+            ));
+        } while ($ascend && false !== $refClass = $refClass->getParentClass());
+
+        return $ascend ? new Collection($attributes) : reset($attributes);
+    }
+
+    /**
+     * Get a specified class attribute, optionally following an inheritance chain.
+     *
+     * @template TAttribute of object
+     *
+     * @param  object|class-string  $objectOrClass
+     * @param  class-string<TAttribute>  $attribute
+     * @return TAttribute|null
+     */
+    public static function getAttribute($objectOrClass, $attribute, $ascend = false)
+    {
+        return static::getAttributes($objectOrClass, $attribute, $ascend)->flatten()->first();
     }
 
     /**
