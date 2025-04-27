@@ -135,7 +135,7 @@ class Reflector
      * @param  class-string<TAttribute>  $attribute
      * @return ($ascend is true ? Collection<class-string<contravariant TTarget>, Collection<int, TAttribute>> : Collection<int, TAttribute>)
      */
-    public static function getAttributes($objectOrClass, $attribute, $ascend = false)
+    public static function getClassAttributes($objectOrClass, $attribute, $ascend = false)
     {
         $refClass = new ReflectionClass($objectOrClass);
         $attributes = [];
@@ -159,9 +159,9 @@ class Reflector
      * @param  class-string<TAttribute>  $attribute
      * @return TAttribute|null
      */
-    public static function getAttribute($objectOrClass, $attribute, $ascend = false)
+    public static function getClassAttribute($objectOrClass, $attribute, $ascend = false)
     {
-        return static::getAttributes($objectOrClass, $attribute, $ascend)->flatten()->first();
+        return static::getClassAttributes($objectOrClass, $attribute, $ascend)->flatten()->first();
     }
 
     /**
