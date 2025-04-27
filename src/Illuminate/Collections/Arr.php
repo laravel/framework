@@ -842,6 +842,25 @@ class Arr
     }
 
     /**
+     * Get a single value from the first element matching the given callback or from the only element in the array.
+     *
+     * @template TKey
+     * @template TValue
+     * 
+     * @param  iterable<TKey, TValue>  $array
+     * @param  string|int|callable  $key
+     * @param  callable|null  $callback
+     * @return mixed
+     * 
+     * @throws \Illuminate\Support\ItemNotFoundException
+     * @throws \Illuminate\Support\MultipleItemsFoundException
+     */
+    public static function soleValue($array, $key, ?callable $callback = null)
+    {
+        return static::get(static::sole($array, $callback), $key);
+    }
+
+    /**
      * Sort the array using the given callback or "dot" notation.
      *
      * @param  array  $array
