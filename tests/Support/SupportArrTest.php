@@ -1098,6 +1098,41 @@ class SupportArrTest extends TestCase
         Arr::sole(['baz', 'foo', 'baz'], fn (string $value) => $value === 'baz');
     }
 
+    public function testSoleValueReturnsValueFromSingleElement()
+    {
+        $array = [
+            ['name' => 'foo', 'age' => 25],
+        ];
+
+        $this->assertSame('foo', Arr::soleValue($array, 'name'));
+        $this->assertSame(25, Arr::soleValue($array, 'age'));
+    }
+
+    public function testSoleValueReturnsValueFromCallbackFilteredElement()
+    {
+        $array = [
+            ['name' => 'foo', 'age' => 25],
+            ['name' => 'bar', 'age' => 30],
+        ];
+
+        $this->assertSame('foo', Arr::soleValue($array, 'name', fn (array $value) => $value['age'] === 25));
+        $this->assertSame(30, Arr::soleValue($array, 'age', fn (array $value) => $value['name'] === 'bar'));
+    }
+
+    public function testSoleValueThrowsExceptionIfNoItemsExist()
+    {
+        $this->expectException(ItemNotFoundException::class);
+
+        Arr::soleValue([], 'id');
+    }
+
+    public function testSoleValueThrowsExceptionIfMoreThanOneItemExists()
+    {
+        $this->expectExceptionObject(new MultipleItemsFoundException(2));
+
+        Arr::soleValue([['id' => 1], ['id' => 2]], 'id');
+    }
+
     public function testEmptyShuffle()
     {
         $this->assertEquals([], Arr::shuffle([]));
