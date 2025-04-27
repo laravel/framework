@@ -197,7 +197,7 @@ class ScheduleRunCommand extends Command
                 ));
 
                 if ($event->exitCode != 0) {
-                    throw new \Exception("Command {$event->command} failed with exit code {$event->exitCode}");
+                    throw new \Exception("Command {$event->command} failed with exit code {$event->exitCode}.");
                 }
 
                 $this->eventsRan = true;
