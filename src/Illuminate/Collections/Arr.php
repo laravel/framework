@@ -846,12 +846,12 @@ class Arr
      *
      * @template TKey
      * @template TValue
-     * 
+     *
      * @param  iterable<TKey, TValue>  $array
      * @param  string|int|callable  $key
      * @param  callable|null  $callback
      * @return mixed
-     * 
+     *
      * @throws \Illuminate\Support\ItemNotFoundException
      * @throws \Illuminate\Support\MultipleItemsFoundException
      */
