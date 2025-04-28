@@ -25,7 +25,7 @@ trait CompilesUseStatements
             $segments = explode(',', $expression);
             $pathWithOptionalModifier = trim($segments[0], " '\"");
             $aliasWithLeadingSpace = isset($segments[1])
-                ? ' as ' . trim($segments[1], " '\"")
+                ? ' as '.trim($segments[1], " '\"")
                 : '';
         }
 
