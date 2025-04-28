@@ -367,7 +367,7 @@ class SupportStringableTest extends TestCase
 
     public function testWhenNotJson()
     {
-        $this->assertSame('[1,2,3]', (string) $this->stringable()->whenNotJson(function ($stringable) {
+        $this->assertSame('[1,2,3]', (string) $this->stringable('[1,2,3]')->whenNotJson(function ($stringable) {
             return $stringable.' JSON';
         }));
 
