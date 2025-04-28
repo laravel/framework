@@ -40,7 +40,7 @@ namespace Illuminate\Support\Facades;
  * @method static mixed withoutForeignKeyConstraints(\Closure $callback)
  * @method static \Illuminate\Database\Connection getConnection()
  * @method static \Illuminate\Database\Schema\Builder setConnection(\Illuminate\Database\Connection $connection)
- * @method static void blueprintResolver(null|\Closure $resolver)
+ * @method static void blueprintResolver(\Closure $resolver)
  * @method static void macro(string $name, object|callable $macro)
  * @method static void mixin(object $mixin, bool $replace = true)
  * @method static bool hasMacro(string $name)
