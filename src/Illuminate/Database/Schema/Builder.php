@@ -30,9 +30,9 @@ class Builder
     /**
      * The Blueprint resolver callback.
      *
-     * @var \Closure
+     * @var \Closure|null
      */
-    protected $resolver;
+    protected static $resolver = null;
 
     /**
      * The default string length for migrations.
@@ -577,8 +577,8 @@ class Builder
                     ? $this->connection->getConfig('prefix')
                     : '';
 
-        if (isset($this->resolver)) {
-            return call_user_func($this->resolver, $table, $callback, $prefix);
+        if (static::$resolver !== null) {
+            return call_user_func(static::$resolver, $table, $callback, $prefix);
         }
 
         return Container::getInstance()->make(Blueprint::class, compact('table', 'callback', 'prefix'));
@@ -610,11 +610,11 @@ class Builder
     /**
      * Set the Schema Blueprint resolver callback.
      *
-     * @param  \Closure  $resolver
+     * @param null|\Closure(string, \Closure, string): \Illuminate\Database\Schema\Blueprint $resolver
      * @return void
      */
-    public function blueprintResolver(Closure $resolver)
+    public function blueprintResolver(?Closure $resolver)
     {
-        $this->resolver = $resolver;
+        static::$resolver = $resolver;
     }
 }
