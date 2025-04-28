@@ -339,30 +339,14 @@ trait EnumeratesValues
      *
      * @param  string  $key
      * @param  TValueDefault|(\Closure(): TValueDefault)  $default
+     * @param  bool  $allowFalsy
      * @return TValue|TValueDefault
      */
-    public function value($key, $default = null)
+    public function value($key, $default = null, $allowFalsy = false)
     {
-        if ($value = $this->firstWhere($key)) {
-            return data_get($value, $key, $default);
-        }
+        $value = $allowFalsy ? $this->first() : $this->firstWhere($key);
 
-        return value($default);
-    }
-
-    /**
-     * Get the value of a given key from the first item in the collection,
-     * even if the value is a falsy one like 0, false, or an empty string.
-     *
-     * This method avoids treating falsy values as null or non-existent.
-     *
-     * @param  string|int  $key     The key to retrieve from the first matching item.
-     * @param  mixed|null  $default Default value if key not found.
-     * @return mixed
-     */
-    public function valuePreservingFalsy($key, $default = null)
-    {
-        if ($value = $this->first()) {
+        if ($value) {
             return data_get($value, $key, $default);
         }
 
