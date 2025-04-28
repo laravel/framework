@@ -27,7 +27,7 @@ class AnyOf implements Rule, ValidatorAwareRule
     /**
      * Sets the validation rules to match against.
      *
-     * @param  Illuminate\Contracts\Validation\ValidationRule[][]  $rules
+     * @param  array  $rules
      *
      * @throws \InvalidArgumentException
      */
