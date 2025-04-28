@@ -9,7 +9,7 @@ use Illuminate\Contracts\Auth\PasswordBroker;
  * @method static string getDefaultDriver()
  * @method static void setDefaultDriver(string $name)
  * @method static string sendResetLink(array $credentials, \Closure|null $callback = null)
- * @method static string reset(array $credentials, \Closure $callback)
+ * @method static mixed reset(array $credentials, \Closure $callback)
  * @method static \Illuminate\Contracts\Auth\CanResetPassword|null getUser(array $credentials)
  * @method static string createToken(\Illuminate\Contracts\Auth\CanResetPassword $user)
  * @method static void deleteToken(\Illuminate\Contracts\Auth\CanResetPassword $user)
