@@ -907,6 +907,28 @@ class Arr
     }
 
     /**
+     * Swap places of items in an array.
+     *
+     * @param  array  $array
+     * @param  string|int  $keyOne
+     * @param  string|int  $keyTwo
+     * @return void
+     */
+    public static function swap(&$array, $keyOne, $keyTwo)
+    {
+        if (! static::exists($array, $keyOne) || ! static::exists($array, $keyTwo)) {
+            throw new InvalidArgumentException('One or both keys do not exist in the array.');
+        }
+
+        // Short-circuit the method if both keys are the same.
+        if ($keyOne === $keyTwo) {
+            return;
+        }
+
+        [$array[$keyOne], $array[$keyTwo]] = [$array[$keyTwo], $array[$keyOne]];
+    }
+
+    /**
      * Conditionally compile classes from an array into a CSS class list.
      *
      * @param  array  $array
