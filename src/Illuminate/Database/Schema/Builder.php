@@ -610,7 +610,7 @@ class Builder
     /**
      * Set the Schema Blueprint resolver callback.
      *
-     * @param null|\Closure(string, \Closure, string): \Illuminate\Database\Schema\Blueprint $resolver
+     * @param  null|\Closure(string, \Closure, string): \Illuminate\Database\Schema\Blueprint  $resolver
      * @return void
      */
     public function blueprintResolver(?Closure $resolver)
