@@ -1201,7 +1201,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      * @param  callable|null  $default
      * @return static
      */
-    public function whenIsJson($callback, $default = null)
+    public function whenJson($callback, $default = null)
     {
         return $this->when($this->isJson(), $callback, $default);
     }
