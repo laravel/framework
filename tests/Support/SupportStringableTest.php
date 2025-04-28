@@ -350,6 +350,32 @@ class SupportStringableTest extends TestCase
         }));
     }
 
+    public function testWhenJson()
+    {
+        $this->assertSame('JSON: 1', (string) $this->stringable('1')->whenJson(function ($stringable) {
+            return $stringable->prepend('JSON: ');
+        }, function ($stringable) {
+            return $stringable->prepend('Not JSON: ');
+        }));
+
+        $this->assertSame('Not JSON: 1,', (string) $this->stringable('1,')->whenJson(function ($stringable) {
+            return $stringable->prepend('JSON: ');
+        }, function ($stringable) {
+            return $stringable->prepend('Not JSON: ');
+        }));
+    }
+
+    public function testWhenNotJson()
+    {
+        $this->assertSame('[1,2,3]', (string) $this->stringable()->whenNotJson(function ($stringable) {
+            return $stringable.' JSON';
+        }));
+
+        $this->assertSame('Not JSON', (string) $this->stringable('Not')->whenNotJson(function ($stringable) {
+            return $stringable.' JSON';
+        }));
+    }
+
     public function testWhenIsUuid()
     {
         $this->assertSame('Uuid: 2cdc7039-65a6-4ac7-8e5d-d554a98e7b15', (string) $this->stringable('2cdc7039-65a6-4ac7-8e5d-d554a98e7b15')->whenIsUuid(function ($stringable) {
