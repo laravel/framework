@@ -4,8 +4,8 @@ namespace Illuminate\View\Compilers\Concerns;
 
 trait CompilesUseStatements
 {
-    private const string FUNCTION_MODIFIER_WITH_TRAILING_SPACE = 'function ';
-    private const string CONST_MODIFIER_WITH_TRAILING_SPACE = 'const ';
+    private const FUNCTION_MODIFIER_WITH_TRAILING_SPACE = 'function ';
+    private const CONST_MODIFIER_WITH_TRAILING_SPACE = 'const ';
 
     /**
      * Compile the use statements into valid PHP.
