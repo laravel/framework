@@ -4229,7 +4229,7 @@ class Builder implements BuilderContract
     /**
      * Merge an array of bindings into our bindings.
      *
-     * @param self $query
+     * @param  self  $query
      * @return $this
      */
     public function mergeBindings(self $query)
@@ -4242,7 +4242,7 @@ class Builder implements BuilderContract
     /**
      * Remove all of the expressions from a list of bindings.
      *
-     * @param  array<mixed> $bindings
+     * @param  array<mixed>  $bindings
      * @return list<mixed>
      */
     public function cleanBindings(array $bindings)
