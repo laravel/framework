@@ -41,6 +41,38 @@ class Arr
     }
 
     /**
+     * Get an array item from an array using "dot" notation.
+     */
+    public static function array(ArrayAccess|array $array, string|int|null $key, ?array $default = null): array
+    {
+        $value = Arr::get($array, $key, $default);
+
+        if (! is_array($value)) {
+            throw new InvalidArgumentException(
+                sprintf('Array value for key [%s] must be an array, %s found.', $key, gettype($value))
+            );
+        }
+
+        return $value;
+    }
+
+    /**
+     * Get a boolean item from an array using "dot" notation.
+     */
+    public static function boolean(ArrayAccess|array $array, string|int|null $key, ?bool $default = null): bool
+    {
+        $value = Arr::get($array, $key, $default);
+
+        if (! is_bool($value)) {
+            throw new InvalidArgumentException(
+                sprintf('Array value for key [%s] must be a boolean, %s found.', $key, gettype($value))
+            );
+        }
+
+        return $value;
+    }
+
+    /**
      * Collapse an array of arrays into a single array.
      *
      * @param  iterable  $array
@@ -287,6 +319,22 @@ class Arr
     }
 
     /**
+     * Get a float item from an array using "dot" notation.
+     */
+    public static function float(ArrayAccess|array $array, string|int|null $key, ?float $default = null): float
+    {
+        $value = Arr::get($array, $key, $default);
+
+        if (! is_float($value)) {
+            throw new InvalidArgumentException(
+                sprintf('Array value for key [%s] must be a float, %s found.', $key, gettype($value))
+            );
+        }
+
+        return $value;
+    }
+
+    /**
      * Remove one or many array items from a given array using "dot" notation.
      *
      * @param  array  $array
@@ -431,6 +479,22 @@ class Arr
         }
 
         return false;
+    }
+
+    /**
+     * Get an integer item from an array using "dot" notation.
+     */
+    public static function integer(ArrayAccess|array $array, string|int|null $key, ?int $default = null): int
+    {
+        $value = Arr::get($array, $key, $default);
+
+        if (! is_integer($value)) {
+            throw new InvalidArgumentException(
+                sprintf('Array value for key [%s] must be an integer, %s found.', $key, gettype($value))
+            );
+        }
+
+        return $value;
     }
 
     /**
@@ -904,6 +968,22 @@ class Arr
     public static function sortRecursiveDesc($array, $options = SORT_REGULAR)
     {
         return static::sortRecursive($array, $options, true);
+    }
+
+    /**
+     * Get a string item from an array using "dot" notation.
+     */
+    public static function string(ArrayAccess|array $array, string|int|null $key, ?string $default = null): string
+    {
+        $value = Arr::get($array, $key, $default);
+
+        if (! is_string($value)) {
+            throw new InvalidArgumentException(
+                sprintf('Array value for key [%s] must be a string, %s found.', $key, gettype($value))
+            );
+        }
+
+        return $value;
     }
 
     /**
