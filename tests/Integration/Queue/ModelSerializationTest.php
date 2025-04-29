@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Queue\Attributes\WithRelations;
+use Illuminate\Queue\Attributes\LoadRelationships;
 use Illuminate\Queue\Attributes\WithoutRelations;
 use Illuminate\Queue\SerializesModels;
 use LogicException;
@@ -612,7 +612,7 @@ class ModelSerializationWithRelations
     use SerializesModels;
 
     public function __construct(
-        #[WithRelations(['roles'])]
+        #[LoadRelationships(['roles'])]
         public $property
     ) {
         //
