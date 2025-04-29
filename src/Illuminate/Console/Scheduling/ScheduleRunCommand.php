@@ -2,6 +2,7 @@
 
 namespace Illuminate\Console\Scheduling;
 
+use Exception;
 use Illuminate\Console\Application;
 use Illuminate\Console\Command;
 use Illuminate\Console\Events\ScheduledTaskFailed;
@@ -196,8 +197,8 @@ class ScheduleRunCommand extends Command
                     round(microtime(true) - $start, 2)
                 ));
 
-                if ($event->exitCode != 0) {
-                    throw new \Exception("Command {$event->command} failed with exit code {$event->exitCode}.");
+                if ($event->exitCode !== 0) {
+                    throw new Exception("Scheduled command [{$event->command}] failed with exit code [{$event->exitCode}].");
                 }
 
                 $this->eventsRan = true;
