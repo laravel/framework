@@ -57,6 +57,9 @@ jobs:
           script: |
               core.setFailed('Workflow failed. Release version does not match with selected target branch. Did you select the correct branch?')
 
+      - name: Sync any changes to Illuminate components
+        run: ./bin/split.sh
+
       - name: Update Application.php version
         run: sed -i "s/const VERSION = '.*';/const VERSION = '${{ steps.version.outputs.version }}';/g" src/Illuminate/Foundation/Application.php
 
