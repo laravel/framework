@@ -49,7 +49,7 @@ class Arr
 
         if (! is_array($value)) {
             throw new InvalidArgumentException(
-                sprintf('Array value for key [%s] must be an array, %s given.', $key, gettype($value))
+                sprintf('Array value for key [%s] must be an array, %s found.', $key, gettype($value))
             );
         }
 
@@ -65,7 +65,7 @@ class Arr
 
         if (! is_bool($value)) {
             throw new InvalidArgumentException(
-                sprintf('Array value for key [%s] must be a boolean, %s given.', $key, gettype($value))
+                sprintf('Array value for key [%s] must be a boolean, %s found.', $key, gettype($value))
             );
         }
 
@@ -327,7 +327,7 @@ class Arr
 
         if (! is_float($value)) {
             throw new InvalidArgumentException(
-                sprintf('Array value for key [%s] must be a float, %s given.', $key, gettype($value))
+                sprintf('Array value for key [%s] must be a float, %s found.', $key, gettype($value))
             );
         }
 
@@ -490,7 +490,7 @@ class Arr
 
         if (! is_integer($value)) {
             throw new InvalidArgumentException(
-                sprintf('Array value for key [%s] must be an integer, %s given.', $key, gettype($value))
+                sprintf('Array value for key [%s] must be an integer, %s found.', $key, gettype($value))
             );
         }
 
@@ -979,7 +979,7 @@ class Arr
 
         if (! is_string($value)) {
             throw new InvalidArgumentException(
-                sprintf('Array value for key [%s] must be a string, %s given.', $key, gettype($value))
+                sprintf('Array value for key [%s] must be a string, %s found.', $key, gettype($value))
             );
         }
 

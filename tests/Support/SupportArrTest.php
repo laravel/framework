@@ -532,7 +532,7 @@ class SupportArrTest extends TestCase
 
         // Test that an exception is raised if the value is not a string
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageMatches('#^Array value for key \[integer\] must be a string, (.*) given.#');
+        $this->expectExceptionMessageMatches('#^Array value for key \[integer\] must be a string, (.*) found.#');
         Arr::string($test_array, 'integer');
     }
 
@@ -552,7 +552,7 @@ class SupportArrTest extends TestCase
 
         // Test that an exception is raised if the value is not an integer
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageMatches('#^Array value for key \[string\] must be an integer, (.*) given.#');
+        $this->expectExceptionMessageMatches('#^Array value for key \[string\] must be an integer, (.*) found.#');
         Arr::integer($test_array, 'string');
     }
 
@@ -572,7 +572,7 @@ class SupportArrTest extends TestCase
 
         // Test that an exception is raised if the value is not a float
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageMatches('#^Array value for key \[string\] must be a float, (.*) given.#');
+        $this->expectExceptionMessageMatches('#^Array value for key \[string\] must be a float, (.*) found.#');
         Arr::float($test_array, 'string');
     }
 
@@ -592,7 +592,7 @@ class SupportArrTest extends TestCase
 
         // Test that an exception is raised if the value is not a boolean
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageMatches('#^Array value for key \[string\] must be a boolean, (.*) given.#');
+        $this->expectExceptionMessageMatches('#^Array value for key \[string\] must be a boolean, (.*) found.#');
         Arr::boolean($test_array, 'string');
     }
 
@@ -612,7 +612,7 @@ class SupportArrTest extends TestCase
 
         // Test that an exception is raised if the value is not an array
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageMatches('#^Array value for key \[string\] must be an array, (.*) given.#');
+        $this->expectExceptionMessageMatches('#^Array value for key \[string\] must be an array, (.*) found.#');
         Arr::array($test_array, 'string');
     }
 
