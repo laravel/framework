@@ -436,6 +436,16 @@ class ModelSerializationTest extends TestCase
         $this->assertCount(2, $queries);
         $this->assertTrue($unserialized->property->relationLoaded('roles'));
     }
+
+    public function test_it_can_mix_both_without_relations_and_load_relationships()
+    {
+        $this->markTestIncomplete('TODO');
+    }
+
+    public function test_it_can_use_generic_boot_method()
+    {
+        $this->markTestIncomplete('TODO');
+    }
 }
 
 trait TraitBootsAndInitializersTest

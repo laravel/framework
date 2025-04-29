@@ -102,6 +102,10 @@ trait SerializesModels
                 $value->loadMissing($relations);
             }
         }
+
+        if (method_exists($this, 'bootOnQueue')) {
+            $this->bootOnQueue();
+        }
     }
 
     /**
