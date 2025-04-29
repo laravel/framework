@@ -458,7 +458,21 @@ class ModelSerializationTest extends TestCase
 
     public function test_it_can_use_generic_boot_method()
     {
-        $this->markTestIncomplete('TODO');
+        $order = Order::create();
+
+        $serialized = serialize(new ModelSerializationWithBootOnQueueHook($order));
+
+        $queries = [];
+        DB::listen(function (QueryExecuted $query) use (&$queries) {
+            $queries[] = $query;
+        });
+
+        /** @var ModelSerializationWithoutRelationsLoadRelationships $unserialized */
+        $unserialized = unserialize($serialized);
+
+        $this->assertCount(2, $queries);
+        $this->assertTrue($unserialized->property->relationLoaded('lines'));
+        $this->assertTrue(! $unserialized->property->relationLoaded('products'));
     }
 }
 
@@ -675,6 +689,22 @@ class ModelSerializationWithoutRelationsLoadRelationships
         public $property
     ) {
         //
+    }
+}
+
+class ModelSerializationWithBootOnQueueHook
+{
+    use SerializesModels;
+
+    public function __construct(
+        public $property,
+    ) {
+        //
+    }
+
+    protected function bootOnQueue()
+    {
+        $this->property->load('lines');
     }
 }
 
