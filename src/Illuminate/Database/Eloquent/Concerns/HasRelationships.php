@@ -1090,7 +1090,7 @@ trait HasRelationships
         $nestedRelation = $relations[1];
 
         // A relation may contain a single Model or collection of Models.
-        // So we prepare for both scenarios.
+        // So we prepare for both scenarios
         $relationValue = $this->getRelationValue($childRelation);
         $relationValues = is_iterable($relationValue) ? $relationValue : [$relationValue];
 
