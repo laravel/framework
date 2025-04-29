@@ -106,7 +106,7 @@ class StatusCommand extends BaseCommand
                 if (in_array($migrationName, $ran)) {
                     $status = '['.$batches[$migrationName].'] '.'<fg=green;options=bold>Ran</>';
                 } else {
-                    $status = $this->migrator->resolvePath($migration)?->shouldRun() === false
+                    $status = $this->migrator->resolvePath($migration)?->shouldRun() !== true
                         ? '<fg=yellow;options=bold>Pending</>'
                         : '<fg=blue;options=bold>Skipped</>';
                 }
