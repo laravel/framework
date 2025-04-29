@@ -79,7 +79,7 @@ trait ManagesTransactions
      * @param  \Throwable  $e
      * @param  int  $currentAttempt
      * @param  int  $maxAttempts
-     * @param Closure|null $onFailure
+     * @param  Closure|null  $onFailure
      * @return void
      *
      * @throws \Throwable
