@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Queue\Attributes\WithRelations;
 use Illuminate\Queue\Attributes\WithoutRelations;
 use Illuminate\Queue\SerializesModels;
 use LogicException;
@@ -374,6 +375,45 @@ class ModelSerializationTest extends TestCase
 
         $this->assertTrue(true);
     }
+
+    public function test_it_respects_with_relations_attribute_for_models()
+    {
+        $user = User::create([
+            'email' => 'taylor@laravel.com',
+        ]);
+
+        $serialized = serialize(new ModelSerializationWithRelations($user));
+        $this->assertSame(
+            'O:66:"Illuminate\Tests\Integration\Queue\ModelSerializationWithRelations":1:{s:8:"property";O:45:"Illuminate\Contracts\Database\ModelIdentifier":5:{s:5:"class";s:39:"Illuminate\Tests\Integration\Queue\User";s:2:"id";i:1;s:9:"relations";a:0:{}s:10:"connection";s:7:"testing";s:15:"collectionClass";N;}}',
+            $serialized
+        );
+
+        /** @var ModelSerializationWithRelations $unserialized */
+        $unserialized = unserialize($serialized);
+
+        $this->assertTrue($unserialized->property->relationLoaded('roles'));
+    }
+
+    public function test_it_respects_with_relations_attribute_for_collections()
+    {
+        $taylor = User::create([
+            'email' => 'taylor@laravel.com',
+        ]);
+        $tim = User::create([
+            'email' => 'tim@laravel.com',
+        ]);
+
+        $serialized = serialize(new ModelSerializationWithRelations(new Collection([$taylor, $tim])));
+        $this->assertSame(
+            'O:66:"Illuminate\Tests\Integration\Queue\ModelSerializationWithRelations":1:{s:8:"property";O:45:"Illuminate\Contracts\Database\ModelIdentifier":5:{s:5:"class";s:39:"Illuminate\Tests\Integration\Queue\User";s:2:"id";a:2:{i:0;i:1;i:1;i:2;}s:9:"relations";a:0:{}s:10:"connection";s:7:"testing";s:15:"collectionClass";N;}}',
+            $serialized,
+        );
+
+        /** @var ModelSerializationWithRelations $unserialized */
+        $unserialized = unserialize($serialized);
+
+        $this->assertTrue($unserialized->property->every->relationLoaded('roles'));
+    }
 }
 
 trait TraitBootsAndInitializersTest
@@ -564,6 +604,18 @@ class ModelSerializationAttributeTargetsClassTestClass
 
     public function __construct(public User $user, public DataValueObject $value)
     {
+    }
+}
+
+class ModelSerializationWithRelations
+{
+    use SerializesModels;
+
+    public function __construct(
+        #[WithRelations(['roles'])]
+        public $property
+    ) {
+        //
     }
 }
 

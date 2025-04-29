@@ -2,6 +2,9 @@
 
 namespace Illuminate\Queue;
 
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Queue\Attributes\WithRelations;
 use Illuminate\Queue\Attributes\WithoutRelations;
 use ReflectionClass;
 use ReflectionProperty;
@@ -89,9 +92,15 @@ trait SerializesModels
                 continue;
             }
 
-            $property->setValue(
-                $this, $this->getRestoredPropertyValue($values[$name])
-            );
+            $value = $this->getRestoredPropertyValue($values[$name]);
+
+            $property->setValue($this, $value);
+
+            if (($value instanceof Model || $value instanceof Collection) && ($attributes = $property->getAttributes(WithRelations::class))) {
+                $relations = $attributes[0]->getArguments()[0];
+
+                $value->load($relations);
+            }
         }
     }
 
