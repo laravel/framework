@@ -63,7 +63,17 @@ class Builder implements BuilderContract
     /**
      * The current query value bindings.
      *
-     * @var array
+     * @var array{
+     *     select: list<mixed>,
+     *     from: list<mixed>,
+     *     join: list<mixed>,
+     *     where: list<mixed>,
+     *     groupBy: list<mixed>,
+     *     having: list<mixed>,
+     *     order: list<mixed>,
+     *     union: list<mixed>,
+     *     unionOrder: list<mixed>,
+     * }
      */
     public $bindings = [
         'select' => [],
@@ -4127,7 +4137,7 @@ class Builder implements BuilderContract
     /**
      * Get the current query value bindings in a flattened array.
      *
-     * @return array
+     * @return list<mixed>
      */
     public function getBindings()
     {
@@ -4137,7 +4147,17 @@ class Builder implements BuilderContract
     /**
      * Get the raw array of bindings.
      *
-     * @return array
+     * @return array{
+     *      select: list<mixed>,
+     *      from: list<mixed>,
+     *      join: list<mixed>,
+     *      where: list<mixed>,
+     *      groupBy: list<mixed>,
+     *      having: list<mixed>,
+     *      order: list<mixed>,
+     *      union: list<mixed>,
+     *      unionOrder: list<mixed>,
+     * }
      */
     public function getRawBindings()
     {
@@ -4147,6 +4167,7 @@ class Builder implements BuilderContract
     /**
      * Set the bindings on the query builder.
      *
+     * @param  list<mixed>  $bindings
      * @param  string  $type
      * @return $this
      *
@@ -4208,6 +4229,7 @@ class Builder implements BuilderContract
     /**
      * Merge an array of bindings into our bindings.
      *
+     * @param  self  $query
      * @return $this
      */
     public function mergeBindings(self $query)
@@ -4220,7 +4242,8 @@ class Builder implements BuilderContract
     /**
      * Remove all of the expressions from a list of bindings.
      *
-     * @return array
+     * @param  array<mixed>  $bindings
+     * @return list<mixed>
      */
     public function cleanBindings(array $bindings)
     {
