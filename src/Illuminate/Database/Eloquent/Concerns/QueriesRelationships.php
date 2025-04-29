@@ -227,72 +227,72 @@ trait QueriesRelationships
     /**
      * Add a "whereHas" condition with OR between columns inside relationships.
      *
-     * @param  array<string,\Illuminate\Contracts\Database\Query\Expression[]|\Closure[]|string[]>  $tuples
+     * @param  array<string,(\Illuminate\Contracts\Database\Query\Expression|string|\Closure)[]|\Closure>  $tuples
      * @param  mixed  $operator
      * @param  mixed  $value
      * @return $this
      */
     public function whereHasAny(array $tuples, $operator = null, $value = null)
     {
-        return $this->addWhereHasAnyOrAll($tuples, $operator, $value, 'or', 'and');
+        return $this->hasNestedColumnsGroup($tuples, $operator, $value, 'or', 'and');
     }
 
     /**
      * Add an "orWhereHas" condition with OR between columns inside relationships.
      *
-     * @param  array<string,\Illuminate\Contracts\Database\Query\Expression[]|\Closure[]|string[]>  $tuples
+     * @param  array<string,(\Illuminate\Contracts\Database\Query\Expression|string|\Closure)[]|\Closure>  $tuples
      * @param  mixed  $operator
      * @param  mixed  $value
      * @return $this
      */
     public function orWhereHasAny(array $tuples, $operator = null, $value = null)
     {
-        return $this->addWhereHasAnyOrAll($tuples, $operator, $value, 'or', 'or');
+        return $this->hasNestedColumnsGroup($tuples, $operator, $value, 'or', 'or');
     }
 
     /**
      * Add a "whereHas" condition with AND between columns inside relationships.
      *
-     * @param  array<string,\Illuminate\Contracts\Database\Query\Expression[]|\Closure[]|string[]>  $tuples
+     * @param  array<string,(\Illuminate\Contracts\Database\Query\Expression|string|\Closure)[]|\Closure>  $tuples
      * @param  mixed  $operator
      * @param  mixed  $value
      * @return $this
      */
     public function whereHasAll(array $tuples, $operator = null, $value = null)
     {
-        return $this->addWhereHasAnyOrAll($tuples, $operator, $value, 'and', 'and');
+        return $this->hasNestedColumnsGroup($tuples, $operator, $value, 'and', 'and');
     }
 
     /**
      * Add an "orWhereHas" condition with AND between columns inside relationships.
      *
-     * @param  array<string,\Illuminate\Contracts\Database\Query\Expression[]|\Closure[]|string[]>  $tuples
+     * @param  array<string,(\Illuminate\Contracts\Database\Query\Expression|string|\Closure)[]|\Closure>  $tuples
      * @param  mixed  $operator
      * @param  mixed  $value
      * @return $this
      */
     public function orWhereHasAll(array $tuples, $operator = null, $value = null)
     {
-        return $this->addWhereHasAnyOrAll($tuples, $operator, $value, 'and', 'or');
+        return $this->hasNestedColumnsGroup($tuples, $operator, $value, 'and', 'or');
     }
 
     /**
      * Method to build "has" conditions for relationships,
      * combining multiple columns with given boolean logic.
      *
-     * @param  array<string,\Illuminate\Contracts\Database\Query\Expression[]|\Closure[]|string[]>  $tuples
+     * @param  array<string,(\Illuminate\Contracts\Database\Query\Expression|string|\Closure)[]|\Closure>  $tuples
      * @param  mixed  $operator
      * @param  mixed  $value
      * @param  string  $innerBoolean
      * @param  string  $outerBoolean
      * @return $this
      */
-    protected function addWhereHasAnyOrAll($tuples, $operator, $value, $innerBoolean, $outerBoolean)
+    protected function hasNestedColumnsGroup($tuples, $operator, $value, $innerBoolean, $outerBoolean)
     {
-        $callback = function (Builder $query) use ($tuples, $operator, $value, $innerBoolean, $outerBoolean) {
+        $callback = function (Builder $query) use ($tuples, $operator, $value, $innerBoolean) {
             foreach ($tuples as $relation => $columns) {
-                $this->addWhereHasNestedOfColumns(
-                    $query, $relation, $columns, $operator, $value, $innerBoolean, $outerBoolean
+                $this->hasNestedColumns(
+                    $query, $relation, $columns, $operator, $value, $innerBoolean, 'and'
                 );
             }
         };
@@ -305,22 +305,26 @@ trait QueriesRelationships
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @param  string  $relation
-     * @param  \Illuminate\Contracts\Database\Query\Expression[]|\Closure[]|string[]  $columns
+     * @param  (\Illuminate\Contracts\Database\Query\Expression|string|\Closure)[]|\Closure  $columns
      * @param  mixed  $operator
      * @param  mixed  $value
      * @param  string  $innerBoolean
      * @param  string  $outerBoolean
      * @return $this
      */
-    protected function addWhereHasNestedOfColumns($query, $relation, $columns, $operator, $value, $innerBoolean, $outerBoolean)
+    protected function hasNestedColumns($query, $relation, $columns, $operator, $value, $innerBoolean, $outerBoolean)
     {
-        $callback = fn (Builder $builder) => $builder->query->addWhereNestedOfColumns(
-            $columns, $operator, $value, $innerBoolean, $outerBoolean
+        $callback = fn (Builder $builder) => $builder->query->addNestedWhereColumns(
+            $columns, $operator, $value, $innerBoolean, 'and'
         );
+
+        if ($columns instanceof Closure) {
+            $callback = $columns;
+        }
 
         return $query->has(
             $relation,
-            boolean: $innerBoolean,
+            boolean: $outerBoolean,
             callback: $callback,
         );
     }

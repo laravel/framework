@@ -914,7 +914,7 @@ class Builder implements BuilderContract
      * @param  string  $outerBoolean
      * @return $this
      */
-    protected function addWhereNestedOfColumns($columns, $operator, $value, $innerBoolean, $outerBoolean)
+    protected function addNestedWhereColumns($columns, $operator, $value, $innerBoolean, $outerBoolean)
     {
         return $this->whereNested(function ($query) use ($columns, $operator, $value, $innerBoolean) {
             foreach ($columns as $column) {
@@ -2294,7 +2294,7 @@ class Builder implements BuilderContract
             $value, $operator, func_num_args() === 2
         );
 
-        return $this->addWhereNestedOfColumns($columns, $operator, $value, 'and', $boolean);
+        return $this->addNestedWhereColumns($columns, $operator, $value, 'and', $boolean);
     }
 
     /**
@@ -2325,7 +2325,7 @@ class Builder implements BuilderContract
             $value, $operator, func_num_args() === 2
         );
 
-        return $this->addWhereNestedOfColumns($columns, $operator, $value, 'or', $boolean);
+        return $this->addNestedWhereColumns($columns, $operator, $value, 'or', $boolean);
     }
 
     /**
