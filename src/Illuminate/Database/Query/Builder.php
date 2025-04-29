@@ -3857,7 +3857,7 @@ class Builder implements BuilderContract
      *
      * @return bool
      */
-    public function updateOrInsert(array $attributes, array|callable $values = [])
+    public function updateOrInsert(array $attributes, array|callable $values = [],array $onlyInsert = [])
     {
         $exists = $this->where($attributes)->exists();
 
@@ -3866,7 +3866,7 @@ class Builder implements BuilderContract
         }
 
         if (! $exists) {
-            return $this->insert(array_merge($attributes, $values));
+            return $this->insert(array_merge($attributes, $values, $onlyInsert));
         }
 
         if (empty($values)) {
