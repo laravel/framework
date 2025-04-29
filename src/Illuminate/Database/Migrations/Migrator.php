@@ -536,7 +536,7 @@ class Migrator
      * @param  string  $path
      * @return object
      */
-    protected function resolvePath(string $path)
+    public function resolvePath(string $path)
     {
         $class = $this->getMigrationClass($this->getMigrationName($path));
 
