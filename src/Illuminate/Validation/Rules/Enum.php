@@ -68,6 +68,37 @@ class Enum implements Rule, ValidatorAwareRule
             return false;
         }
 
+        if (is_array($value)) {
+            return $this->isValidEnums($value);
+        }
+
+        return $this->isValidEnum($value);
+    }
+
+    /**
+     * Determine if the given values is a valid.
+     *
+     * @param  array  $values
+     * @return bool
+     */
+    protected function isValidEnums($values)
+    {
+        return collect($values)
+            ->every($this->isValidEnum(...));
+    }
+
+    /**
+     * Determine if the given value is a valid.
+     *
+     * @param  mixed  $value
+     * @return bool
+     */
+    protected function isValidEnum($value)
+    {
+        if ($value instanceof $this->type) {
+            return $this->isDesirable($value);
+        }
+
         try {
             $value = $this->type::tryFrom($value);
 
