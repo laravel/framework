@@ -437,7 +437,7 @@ class RouteUrlGenerator
     /**
      * Fill in default values for any empty parameters.
      *
-     * @param  array  $namedParameters
+     * @param  array<string, mixed>  $namedParameters
      * @param  \Illuminate\Routing\Route  $route
      * @return array
      */
@@ -458,7 +458,7 @@ class RouteUrlGenerator
     /**
      * Format the final parameters collection.
      *
-     * @param  array  $parameters
+     * @param  array<string, mixed>  $parameters
      * @param  \Illuminate\Routing\Route  $route
      * @return array
      */
