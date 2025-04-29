@@ -3,10 +3,11 @@
 namespace Illuminate\Auth\Events;
 
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Foundation\Events\Dispatchable;
 
 class PasswordResetLinkSent
 {
-    use SerializesModels;
+    use Dispatchable, SerializesModels;
 
     /**
      * Create a new event instance.
