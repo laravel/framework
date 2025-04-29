@@ -416,6 +416,26 @@ class ModelSerializationTest extends TestCase
 
         $this->assertTrue($unserialized->property->every->relationLoaded('roles'));
     }
+
+    public function test_it_only_loads_missing_relationships()
+    {
+        $user = User::create([
+            'email' => 'taylor@laravel.com',
+        ])->load('roles');
+
+        $serialized = serialize(new ModelSerializationLoadRelationships($user));
+
+        $queries = [];
+        DB::listen(function (QueryExecuted $query) use (&$queries) {
+            $queries[] = $query;
+        });
+
+        /** @var ModelSerializationLoadRelationships $unserialized */
+        $unserialized = unserialize($serialized);
+
+        $this->assertCount(2, $queries);
+        $this->assertTrue($unserialized->property->relationLoaded('roles'));
+    }
 }
 
 trait TraitBootsAndInitializersTest
