@@ -99,7 +99,7 @@ trait SerializesModels
             if (($value instanceof Model || $value instanceof Collection) && ($attributes = $property->getAttributes(LoadRelationships::class))) {
                 $relations = $attributes[0]->getArguments()[0];
 
-                $value->load($relations);
+                $value->loadMissing($relations);
             }
         }
     }
