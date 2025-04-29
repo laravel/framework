@@ -275,31 +275,12 @@ class RouteUrlGenerator
         }
 
         // Fill leftmost parameters with defaults if the loop above was offset...
-        foreach ($namedParameters as $key => $value) {
-            $bindingField = $route->bindingFieldFor($key);
-            $defaultParameterKey = $bindingField ? "$key:$bindingField" : $key;
-
-            if ($value === '' && isset($this->defaultParameters[$defaultParameterKey])) {
-                $namedParameters[$key] = $this->defaultParameters[$defaultParameterKey];
-            }
-        }
+        $namedParameters = $this->fillDefaultValues($namedParameters, $route);
 
         // Any remaining values in $parameters are unnamed query string parameters...
         $parameters = array_merge($namedParameters, $namedQueryParameters, $parameters);
 
-        $parameters = Collection::wrap($parameters)->map(function ($value, $key) use ($route) {
-            return $value instanceof UrlRoutable && $route->bindingFieldFor($key)
-                    ? $value->{$route->bindingFieldFor($key)}
-                    : $value;
-        })->all();
-
-        array_walk_recursive($parameters, function (&$item) {
-            if ($item instanceof BackedEnum) {
-                $item = $item->value;
-            }
-        });
-
-        return $this->url->formatParameters($parameters);
+        return $this->formatFinalParameters($parameters, $route);
     }
 
     /**
@@ -451,5 +432,50 @@ class RouteUrlGenerator
         $this->defaultParameters = array_merge(
             $this->defaultParameters, $defaults
         );
+    }
+
+    /**
+     * Fill in default values for any empty parameters.
+     *
+     * @param  array  $namedParameters
+     * @param  \Illuminate\Routing\Route  $route
+     * @return array
+     */
+    private function fillDefaultValues(array $namedParameters, Route $route)
+    {
+        foreach ($namedParameters as $key => $value) {
+            $bindingField = $route->bindingFieldFor($key);
+            $defaultParameterKey = $bindingField ? "$key:$bindingField" : $key;
+
+            if ($value === '' && isset($this->defaultParameters[$defaultParameterKey])) {
+                $namedParameters[$key] = $this->defaultParameters[$defaultParameterKey];
+            }
+        }
+
+        return $namedParameters;
+    }
+
+    /**
+     * Format the final parameters collection.
+     *
+     * @param  array  $parameters
+     * @param  \Illuminate\Routing\Route  $route
+     * @return array
+     */
+    private function formatFinalParameters(array $parameters, Route $route)
+    {
+        $parameters = Collection::wrap($parameters)->map(function ($value, $key) use ($route) {
+            return $value instanceof UrlRoutable && $route->bindingFieldFor($key)
+                ? $value->{$route->bindingFieldFor($key)}
+                : $value;
+        })->all();
+
+        array_walk_recursive($parameters, function (&$item) {
+            if ($item instanceof BackedEnum) {
+                $item = $item->value;
+            }
+        });
+
+        return $this->url->formatParameters($parameters);
     }
 }
