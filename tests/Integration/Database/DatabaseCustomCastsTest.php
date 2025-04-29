@@ -215,6 +215,37 @@ class DatabaseCustomCastsTest extends DatabaseTestCase
         $this->assertInstanceOf(FluentWithCallback::class, $model->collection->first());
         $this->assertSame('bar', $model->collection->first()->foo);
     }
+
+    public function test_as_collection_with_map_using_closure()
+    {
+        $model = new TestEloquentModelWithCustomCasts();
+        $model->mergeCasts([
+            'collection' => AsCollection::of(fn ($data) => new Fluent($data)),
+        ]);
+
+        $model->setRawAttributes([
+            'collection' => json_encode([['foo' => 'bar']]),
+        ]);
+
+        $this->assertInstanceOf(Fluent::class, $model->collection->first());
+        $this->assertSame('bar', $model->collection->first()->foo);
+    }
+
+    public function test_as_custom_collection_with_map_using_closure()
+    {
+        $model = new TestEloquentModelWithCustomCasts();
+        $model->mergeCasts([
+            'collection' => AsCollection::using(CustomCollection::class, fn ($data) => new Fluent($data)),
+        ]);
+
+        $model->setRawAttributes([
+            'collection' => json_encode([['foo' => 'bar']]),
+        ]);
+
+        $this->assertInstanceOf(CustomCollection::class, $model->collection);
+        $this->assertInstanceOf(Fluent::class, $model->collection->first());
+        $this->assertSame('bar', $model->collection->first()->foo);
+    }
 }
 
 class TestEloquentModelWithCustomCasts extends Model

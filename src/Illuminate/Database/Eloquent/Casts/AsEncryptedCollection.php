@@ -2,12 +2,14 @@
 
 namespace Illuminate\Database\Eloquent\Casts;
 
+use Closure;
 use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
+use Laravel\SerializableClosure\SerializableClosure;
 
 class AsEncryptedCollection implements Castable
 {
@@ -46,6 +48,10 @@ class AsEncryptedCollection implements Castable
 
                 if (is_string($this->arguments[1])) {
                     $this->arguments[1] = Str::parseCallback($this->arguments[1]);
+
+                    if (! class_exists($this->arguments[1][0])) {
+                        $this->arguments[1] = @unserialize($this->arguments[1][0])->getClosure();
+                    }
                 }
 
                 return is_callable($this->arguments[1])
@@ -67,7 +73,7 @@ class AsEncryptedCollection implements Castable
     /**
      * Specify the type of object each item in the collection should be mapped to.
      *
-     * @param  array{class-string, string}|class-string  $map
+     * @param  array{class-string, string}|class-string|Closure  $map
      * @return string
      */
     public static function of($map)
@@ -79,13 +85,15 @@ class AsEncryptedCollection implements Castable
      * Specify the collection for the cast.
      *
      * @param  class-string  $class
-     * @param  array{class-string, string}|class-string  $map
+     * @param  array{class-string, string}|class-string|Closure|null  $map
      * @return string
      */
     public static function using($class, $map = null)
     {
         if (is_array($map) && is_callable($map)) {
             $map = $map[0].'@'.$map[1];
+        } elseif ($map instanceof Closure) {
+            $map = serialize(new SerializableClosure($map));
         }
 
         return static::class.':'.implode(',', [$class, $map]);
