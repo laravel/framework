@@ -439,7 +439,21 @@ class ModelSerializationTest extends TestCase
 
     public function test_it_can_mix_both_without_relations_and_load_relationships()
     {
-        $this->markTestIncomplete('TODO');
+        $order = Order::create()->load('products');
+
+        $serialized = serialize(new ModelSerializationWithoutRelationsLoadRelationships($order));
+
+        $queries = [];
+        DB::listen(function (QueryExecuted $query) use (&$queries) {
+            $queries[] = $query;
+        });
+
+        /** @var ModelSerializationWithoutRelationsLoadRelationships $unserialized */
+        $unserialized = unserialize($serialized);
+
+        $this->assertCount(2, $queries);
+        $this->assertTrue($unserialized->property->relationLoaded('lines'));
+        $this->assertTrue(! $unserialized->property->relationLoaded('products'));
     }
 
     public function test_it_can_use_generic_boot_method()
@@ -657,7 +671,7 @@ class ModelSerializationWithoutRelationsLoadRelationships
     use SerializesModels;
 
     public function __construct(
-        #[LoadRelationships(['roles'])]
+        #[LoadRelationships(['lines'])]
         public $property
     ) {
         //
