@@ -265,6 +265,37 @@ class ValidationEnumRuleTest extends TestCase
         $this->assertEquals(['The selected status is invalid.'], $v->messages()->get('status'));
     }
 
+    public function testValidationFailsForDifferentCaseEnumArray()
+    {
+        $v = new Validator(
+            resolve('translator'),
+            [
+                'status' => ['DONE', 'PENDING'],
+            ],
+            [
+                'status' => new Enum(StringStatus::class),
+            ]
+        );
+
+        $this->assertTrue($v->fails());
+        $this->assertEquals(['The selected status is invalid.'], $v->messages()->get('status'));
+    }
+
+    public function testValidationForDifferentCaseEnumArray()
+    {
+        $v = new Validator(
+            resolve('translator'),
+            [
+                'status' => ['pending', 'done'],
+            ],
+            [
+                'status' => new Enum(StringStatus::class),
+            ]
+        );
+
+        $this->assertTrue($v->passes());
+    }
+
     public static function conditionalCasesDataProvider(): array
     {
         return [
@@ -283,7 +314,8 @@ class ValidationEnumRuleTest extends TestCase
 
         $container->bind('translator', function () {
             return new Translator(
-                new ArrayLoader, 'en'
+                new ArrayLoader,
+                'en'
             );
         });
 
