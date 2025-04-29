@@ -5,11 +5,13 @@ namespace Illuminate\Tests\Integration\Queue;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Queue\Attributes\LoadRelationships;
 use Illuminate\Queue\Attributes\WithoutRelations;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\DB;
 use LogicException;
 use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\TestCase;
@@ -382,13 +384,13 @@ class ModelSerializationTest extends TestCase
             'email' => 'taylor@laravel.com',
         ]);
 
-        $serialized = serialize(new ModelSerializationWithRelations($user));
+        $serialized = serialize(new ModelSerializationLoadRelationships($user));
         $this->assertSame(
-            'O:66:"Illuminate\Tests\Integration\Queue\ModelSerializationWithRelations":1:{s:8:"property";O:45:"Illuminate\Contracts\Database\ModelIdentifier":5:{s:5:"class";s:39:"Illuminate\Tests\Integration\Queue\User";s:2:"id";i:1;s:9:"relations";a:0:{}s:10:"connection";s:7:"testing";s:15:"collectionClass";N;}}',
+            'O:70:"Illuminate\Tests\Integration\Queue\ModelSerializationLoadRelationships":1:{s:8:"property";O:45:"Illuminate\Contracts\Database\ModelIdentifier":5:{s:5:"class";s:39:"Illuminate\Tests\Integration\Queue\User";s:2:"id";i:1;s:9:"relations";a:0:{}s:10:"connection";s:7:"testing";s:15:"collectionClass";N;}}',
             $serialized
         );
 
-        /** @var ModelSerializationWithRelations $unserialized */
+        /** @var ModelSerializationLoadRelationships $unserialized */
         $unserialized = unserialize($serialized);
 
         $this->assertTrue($unserialized->property->relationLoaded('roles'));
@@ -403,13 +405,13 @@ class ModelSerializationTest extends TestCase
             'email' => 'tim@laravel.com',
         ]);
 
-        $serialized = serialize(new ModelSerializationWithRelations(new Collection([$taylor, $tim])));
+        $serialized = serialize(new ModelSerializationLoadRelationships(new Collection([$taylor, $tim])));
         $this->assertSame(
-            'O:66:"Illuminate\Tests\Integration\Queue\ModelSerializationWithRelations":1:{s:8:"property";O:45:"Illuminate\Contracts\Database\ModelIdentifier":5:{s:5:"class";s:39:"Illuminate\Tests\Integration\Queue\User";s:2:"id";a:2:{i:0;i:1;i:1;i:2;}s:9:"relations";a:0:{}s:10:"connection";s:7:"testing";s:15:"collectionClass";N;}}',
+            'O:70:"Illuminate\Tests\Integration\Queue\ModelSerializationLoadRelationships":1:{s:8:"property";O:45:"Illuminate\Contracts\Database\ModelIdentifier":5:{s:5:"class";s:39:"Illuminate\Tests\Integration\Queue\User";s:2:"id";a:2:{i:0;i:1;i:1;i:2;}s:9:"relations";a:0:{}s:10:"connection";s:7:"testing";s:15:"collectionClass";N;}}',
             $serialized,
         );
 
-        /** @var ModelSerializationWithRelations $unserialized */
+        /** @var ModelSerializationLoadRelationships $unserialized */
         $unserialized = unserialize($serialized);
 
         $this->assertTrue($unserialized->property->every->relationLoaded('roles'));
@@ -607,7 +609,20 @@ class ModelSerializationAttributeTargetsClassTestClass
     }
 }
 
-class ModelSerializationWithRelations
+class ModelSerializationLoadRelationships
+{
+    use SerializesModels;
+
+    public function __construct(
+        #[LoadRelationships(['roles'])]
+        public $property
+    ) {
+        //
+    }
+}
+
+#[WithoutRelations]
+class ModelSerializationWithoutRelationsLoadRelationships
 {
     use SerializesModels;
 
