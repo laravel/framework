@@ -2,9 +2,9 @@
 
 namespace Illuminate\Queue;
 
+use Illuminate\Bus\Queueable;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Queue\Attributes\EagerLoad;
 use Illuminate\Queue\Attributes\WithoutRelations;
 use ReflectionClass;
@@ -107,10 +107,8 @@ trait SerializesModels
             }
         }
 
-        if (
-            in_array(Queueable::class, class_uses_recursive($this)) &&
-            method_exists($this, 'initializeOnQueue')
-        ) {
+
+        if (in_array(Queueable::class, class_uses_recursive($this)) && method_exists($this, 'initializeOnQueue')) {
             $this->initializeOnQueue();
         }
     }
