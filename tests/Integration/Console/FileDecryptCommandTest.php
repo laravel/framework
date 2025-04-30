@@ -21,4 +21,266 @@ class FileDecryptCommandTest extends TestCase
             ->andReturn(true);
         File::swap($this->filesystem);
     }
+
+    public function testItFailsWhenFilenameIsNotProvided()
+    {
+        $this->artisan('file:decrypt')
+            ->expectsQuestion('What is the filename to decrypt?', '')
+            ->expectsOutputToContain('A filename is required.')
+            ->assertExitCode(1);
+    }
+
+    public function testItFailsWithInvalidCipherFails()
+    {
+        $this->filesystem->shouldReceive('exists')
+            ->once()
+            ->andReturn(true)
+            ->shouldReceive('exists')
+            ->once()
+            ->andReturn(false);
+
+        $this->artisan('file:decrypt', ['--cipher' => 'invalid', '--key' => 'abcdefghijklmnop'])
+            ->expectsQuestion('What is the filename to decrypt?', '.npmrc.encrypted')
+            ->expectsOutputToContain('Unsupported cipher')
+            ->assertExitCode(1);
+    }
+
+    public function testItFailsUsingCipherWithInvalidKey()
+    {
+        $this->filesystem->shouldReceive('exists')
+            ->once()
+            ->andReturn(true)
+            ->shouldReceive('exists')
+            ->once()
+            ->andReturn(false);
+
+        $this->artisan('file:decrypt', ['--key' => 'invalid', '--cipher' => 'aes-128-cbc'])
+            ->expectsQuestion('What is the filename to decrypt?', '.npmrc.encrypted')
+            ->expectsOutputToContain('incorrect key length')
+            ->assertExitCode(1);
+    }
+
+    public function testItFailsWhenEncryptionFileCannotBeFound()
+    {
+        $this->filesystem->shouldReceive('exists')->andReturn(true);
+
+        $this->artisan('file:decrypt', ['--key' => 'secret-key'])
+            ->expectsQuestion('What is the filename to decrypt?', '.npmrc.encrypted')
+            ->expectsOutputToContain('File already exists.')
+            ->assertExitCode(1);
+    }
+
+    public function testItFailsWhenFileExists()
+    {
+        $this->filesystem->shouldReceive('exists')->andReturn(false);
+
+        $this->artisan('file:decrypt', ['--key' => 'secret-key'])
+            ->expectsQuestion('What is the filename to decrypt?', '.npmrc.encrypted')
+            ->expectsOutputToContain('Encrypted file not found.')
+            ->assertExitCode(1);
+    }
+
+    public function testItGeneratesTheFileWithGeneratedKey()
+    {
+        $this->filesystem->shouldReceive('exists')
+            ->once()
+            ->andReturn(true)
+            ->shouldReceive('exists')
+            ->once()
+            ->andReturn(true)
+            ->shouldReceive('get')
+            ->once()
+            ->andReturn(
+                (new Encrypter($key = Encrypter::generateKey('AES-256-CBC'), 'AES-256-CBC'))
+                    ->encrypt('APP_NAME=Laravel')
+            );
+
+        $this->artisan('file:decrypt', ['--force' => true, '--key' => 'base64:'.base64_encode($key)])
+            ->expectsQuestion('What is the filename to decrypt?', '.npmrc.encrypted')
+            ->expectsOutputToContain('File successfully decrypted.')
+            ->assertExitCode(0);
+
+        $this->filesystem->shouldHaveReceived('put')
+            ->with(base_path('.npmrc'), 'APP_NAME=Laravel');
+    }
+
+    public function testItGeneratesTheFileWithUserProvidedKey()
+    {
+        $this->filesystem->shouldReceive('exists')
+            ->once()
+            ->andReturn(true)
+            ->shouldReceive('exists')
+            ->once()
+            ->andReturn(false)
+            ->shouldReceive('get')
+            ->once()
+            ->andReturn(
+                (new Encrypter('abcdefghijklmnop', 'aes-128-gcm'))
+                    ->encrypt('APP_NAME="Laravel Two"')
+            );
+
+        $this->artisan('file:decrypt', ['--cipher' => 'aes-128-gcm', '--key' => 'abcdefghijklmnop'])
+            ->expectsQuestion('What is the filename to decrypt?', '.npmrc.encrypted')
+            ->expectsOutputToContain('File successfully decrypted.')
+            ->assertExitCode(0);
+
+        $this->filesystem->shouldHaveReceived('put')
+            ->with(base_path('.npmrc'), 'APP_NAME="Laravel Two"');
+    }
+
+    public function testItGeneratesTheFileWithKeyFromEnvironment()
+    {
+        $_SERVER['LARAVEL_ENV_ENCRYPTION_KEY'] = 'ponmlkjihgfedcbaponmlkjihgfedcba';
+
+        $this->filesystem->shouldReceive('exists')
+            ->once()
+            ->andReturn(true)
+            ->shouldReceive('exists')
+            ->once()
+            ->andReturn(false)
+            ->shouldReceive('get')
+            ->once()
+            ->andReturn(
+                (new Encrypter('ponmlkjihgfedcbaponmlkjihgfedcba', 'AES-256-CBC'))
+                    ->encrypt('APP_NAME="Laravel Three"')
+            );
+
+        $this->artisan('file:decrypt')
+            ->expectsQuestion('What is the filename to decrypt?', '.npmrc.encrypted')
+            ->expectsOutputToContain('File successfully decrypted.')
+            ->assertExitCode(0);
+
+        $this->filesystem->shouldHaveReceived('put')
+            ->with(base_path('.npmrc'), 'APP_NAME="Laravel Three"');
+
+        unset($_SERVER['LARAVEL_ENV_ENCRYPTION_KEY']);
+    }
+
+    public function testItGeneratesTheFileWhenForcing()
+    {
+        $this->filesystem->shouldReceive('exists')
+            ->once()
+            ->andReturn(true)
+            ->shouldReceive('exists')
+            ->once()
+            ->andReturn(true)
+            ->shouldReceive('get')
+            ->once()
+            ->andReturn(
+                (new Encrypter('abcdefghijklmnop', 'aes-128-gcm'))
+                    ->encrypt('APP_NAME="Laravel Two"')
+            );
+
+        $this->artisan('file:decrypt', ['--force' => true, '--key' => 'abcdefghijklmnop', '--cipher' => 'aes-128-gcm'])
+            ->expectsQuestion('What is the filename to decrypt?', '.npmrc.encrypted')
+            ->expectsOutputToContain('File successfully decrypted.')
+            ->assertExitCode(0);
+
+        $this->filesystem->shouldHaveReceived('put')
+            ->with(base_path('.npmrc'), 'APP_NAME="Laravel Two"');
+    }
+
+    public function testItDecryptsMultiLineFileCorrectly()
+    {
+        $contents = <<<'Text'
+        APP_NAME=Laravel
+        APP_ENV=local
+        APP_DEBUG=true
+        APP_URL=http://localhost
+
+        LOG_CHANNEL=stack
+        LOG_DEPRECATIONS_CHANNEL=null
+        LOG_LEVEL=debug
+
+        DB_CONNECTION=mysql
+        DB_HOST=127.0.0.1
+        DB_PORT=3306
+        DB_DATABASE=laravel
+        DB_USERNAME=root
+        DB_PASSWORD=
+        Text;
+
+        $this->filesystem->shouldReceive('exists')
+            ->once()
+            ->andReturn(true)
+            ->shouldReceive('exists')
+            ->once()
+            ->andReturn(true)
+            ->shouldReceive('get')
+            ->once()
+            ->andReturn(
+                (new Encrypter('abcdefghijklmnop', 'aes-128-gcm'))
+                    ->encrypt($contents)
+            );
+
+        $this->artisan('file:decrypt', ['--force' => true, '--key' => 'abcdefghijklmnop', '--cipher' => 'aes-128-gcm'])
+            ->expectsQuestion('What is the filename to decrypt?', '.npmrc.encrypted')
+            ->expectsOutputToContain('File successfully decrypted.')
+            ->assertExitCode(0);
+
+        $this->filesystem->shouldHaveReceived('put')
+            ->with(base_path('.npmrc'), $contents);
+    }
+
+    public function testItWritesTheFileCustomPath()
+    {
+        $this->filesystem->shouldReceive('exists')
+            ->once()
+            ->andReturn(true)
+            ->shouldReceive('exists')
+            ->once()
+            ->andReturn(false)
+            ->shouldReceive('get')
+            ->once()
+            ->andReturn(
+                (new Encrypter('abcdefghijklmnopabcdefghijklmnop', 'AES-256-CBC'))
+                    ->encrypt('APP_NAME="Laravel Two"')
+            );
+
+        $this->artisan('file:decrypt', ['--key' => 'abcdefghijklmnopabcdefghijklmnop', '--path' => '/tmp'])
+            ->expectsQuestion('What is the filename to decrypt?', '.npmrc.production.encrypted')
+            ->expectsOutputToContain('File successfully decrypted.')
+            ->assertExitCode(0);
+
+        $this->filesystem->shouldHaveReceived('put')
+            ->with('/tmp'.DIRECTORY_SEPARATOR.'.npmrc.production', 'APP_NAME="Laravel Two"');
+    }
+
+    public function testItCannotOverwriteEncryptedFiles()
+    {
+        $this->artisan('file:decrypt', ['--key' => 'abcdefghijklmnop'])
+            ->expectsQuestion('What is the filename to decrypt?', '.npmrc.production')
+            ->expectsOutputToContain('Invalid filename.')
+            ->assertExitCode(1);
+
+        $this->artisan('file:decrypt', ['--key' => 'abcdefghijklmnop'])
+            ->expectsQuestion('What is the filename to decrypt?', '.npmrc.staging')
+            ->expectsOutputToContain('Invalid filename.')
+            ->assertExitCode(1);
+    }
+
+    public function testItGeneratesTheFileWithInteractivelyUserProvidedKey()
+    {
+        $this->filesystem->shouldReceive('exists')
+            ->once()
+            ->andReturn(true)
+            ->shouldReceive('exists')
+            ->once()
+            ->andReturn(false)
+            ->shouldReceive('get')
+            ->once()
+            ->andReturn(
+                (new Encrypter($key = 'abcdefghijklmnop', 'aes-128-gcm'))
+                    ->encrypt('APP_NAME="Laravel Two"')
+            );
+
+        $this->artisan('file:decrypt', ['--cipher' => 'aes-128-gcm'])
+            ->expectsQuestion('What is the filename to decrypt?', '.npmrc.encrypted')
+            ->expectsQuestion('What is the decryption key?', $key)
+            ->expectsOutputToContain('File successfully decrypted.')
+            ->assertExitCode(0);
+
+        $this->filesystem->shouldHaveReceived('put')
+            ->with(base_path('.npmrc'), 'APP_NAME="Laravel Two"');
+    }
 }

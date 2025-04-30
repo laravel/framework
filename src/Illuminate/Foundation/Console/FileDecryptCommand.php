@@ -28,7 +28,6 @@ class FileDecryptCommand extends Command
                     {--filename= : Filename of the decrypted file}
                     {--force : Overwrite the existing file}';
 
-
     /**
      * The console command description.
      *
@@ -67,7 +66,7 @@ class FileDecryptCommand extends Command
         $key = $this->option('key') ?: Env::get('LARAVEL_ENV_ENCRYPTION_KEY');
 
         if (! $filename && $this->input->isInteractive()) {
-            $filename = text('What is the filename to encrypt?');
+            $filename = text('What is the filename to decrypt?');
         }
 
         if (! $filename) {
@@ -86,11 +85,11 @@ class FileDecryptCommand extends Command
 
         $cipher = $this->option('cipher') ?: 'AES-256-CBC';
 
-        $mainFile = Str::finish($this->option('path') ?: $this->laravel->basePath(), DIRECTORY_SEPARATOR).$filename;
+        $encryptedFile = Str::finish($this->option('path') ?: $this->laravel->basePath(), DIRECTORY_SEPARATOR).$filename;
 
-        $encryptedFile = $mainFile.'.encrypted';
+        $mainFile = Str::remove('.encrypted', $encryptedFile);
 
-        if (Str::endsWith($mainFile, '.encrypted')) {
+        if (!Str::endsWith($encryptedFile, '.encrypted')) {
             $this->fail('Invalid filename.');
         }
 
