@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Queue\Attributes\LoadRelationships;
+use Illuminate\Queue\Attributes\EagerLoad;
 use Illuminate\Queue\Attributes\WithoutRelations;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
@@ -672,7 +672,7 @@ class ModelSerializationLoadRelationships
     use SerializesModels;
 
     public function __construct(
-        #[LoadRelationships(['roles'])]
+        #[EagerLoad(['roles'])]
         public $property
     ) {
         //
@@ -685,7 +685,7 @@ class ModelSerializationWithoutRelationsLoadRelationships
     use SerializesModels;
 
     public function __construct(
-        #[LoadRelationships(['lines'])]
+        #[EagerLoad(['lines'])]
         public $property
     ) {
         //

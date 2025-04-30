@@ -5,7 +5,7 @@ namespace Illuminate\Queue\Attributes;
 use Attribute;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class LoadRelationships
+class EagerLoad
 {
     public function __construct(public array $relations)
     {
