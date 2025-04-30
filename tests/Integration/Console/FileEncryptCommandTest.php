@@ -20,7 +20,7 @@ class FileEncryptCommandTest extends TestCase
         $this->filesystem->shouldReceive('get')
             ->andReturn(true)
             ->shouldReceive('put')
-            ->andReturn('APP_NAME=Laravel');
+            ->andReturn('//registry.npmjs.org/:_authToken=NPM_TOKEN');
         File::swap($this->filesystem);
     }
 

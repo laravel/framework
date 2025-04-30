@@ -92,7 +92,7 @@ class FileDecryptCommandTest extends TestCase
             ->once()
             ->andReturn(
                 (new Encrypter($key = Encrypter::generateKey('AES-256-CBC'), 'AES-256-CBC'))
-                    ->encrypt('APP_NAME=Laravel')
+                    ->encrypt('//registry.npmjs.org/:_authToken=123_ABC')
             );
 
         $this->artisan('file:decrypt', ['--force' => true, '--key' => 'base64:'.base64_encode($key)])
@@ -101,7 +101,7 @@ class FileDecryptCommandTest extends TestCase
             ->assertExitCode(0);
 
         $this->filesystem->shouldHaveReceived('put')
-            ->with(base_path('.npmrc'), 'APP_NAME=Laravel');
+            ->with(base_path('.npmrc'), '//registry.npmjs.org/:_authToken=123_ABC');
     }
 
     public function testItGeneratesTheFileWithUserProvidedKey()
@@ -116,7 +116,7 @@ class FileDecryptCommandTest extends TestCase
             ->once()
             ->andReturn(
                 (new Encrypter('abcdefghijklmnop', 'aes-128-gcm'))
-                    ->encrypt('APP_NAME="Laravel Two"')
+                    ->encrypt('//registry.npmjs.org/:_authToken=ABC_123')
             );
 
         $this->artisan('file:decrypt', ['--cipher' => 'aes-128-gcm', '--key' => 'abcdefghijklmnop'])
@@ -125,7 +125,7 @@ class FileDecryptCommandTest extends TestCase
             ->assertExitCode(0);
 
         $this->filesystem->shouldHaveReceived('put')
-            ->with(base_path('.npmrc'), 'APP_NAME="Laravel Two"');
+            ->with(base_path('.npmrc'), '//registry.npmjs.org/:_authToken=ABC_123');
     }
 
     public function testItGeneratesTheFileWithKeyFromEnvironment()
@@ -142,7 +142,7 @@ class FileDecryptCommandTest extends TestCase
             ->once()
             ->andReturn(
                 (new Encrypter('ponmlkjihgfedcbaponmlkjihgfedcba', 'AES-256-CBC'))
-                    ->encrypt('APP_NAME="Laravel Three"')
+                    ->encrypt('//registry.npmjs.org/:_authToken=1A_2B_3C')
             );
 
         $this->artisan('file:decrypt')
@@ -151,7 +151,7 @@ class FileDecryptCommandTest extends TestCase
             ->assertExitCode(0);
 
         $this->filesystem->shouldHaveReceived('put')
-            ->with(base_path('.npmrc'), 'APP_NAME="Laravel Three"');
+            ->with(base_path('.npmrc'), '//registry.npmjs.org/:_authToken=1A_2B_3C');
 
         unset($_SERVER['LARAVEL_ENV_ENCRYPTION_KEY']);
     }
@@ -168,7 +168,7 @@ class FileDecryptCommandTest extends TestCase
             ->once()
             ->andReturn(
                 (new Encrypter('abcdefghijklmnop', 'aes-128-gcm'))
-                    ->encrypt('APP_NAME="Laravel Two"')
+                    ->encrypt('//registry.npmjs.org/:_authToken=ABC_123')
             );
 
         $this->artisan('file:decrypt', ['--force' => true, '--key' => 'abcdefghijklmnop', '--cipher' => 'aes-128-gcm'])
@@ -177,27 +177,15 @@ class FileDecryptCommandTest extends TestCase
             ->assertExitCode(0);
 
         $this->filesystem->shouldHaveReceived('put')
-            ->with(base_path('.npmrc'), 'APP_NAME="Laravel Two"');
+            ->with(base_path('.npmrc'), '//registry.npmjs.org/:_authToken=ABC_123');
     }
 
     public function testItDecryptsMultiLineFileCorrectly()
     {
         $contents = <<<'Text'
-        APP_NAME=Laravel
-        APP_ENV=local
-        APP_DEBUG=true
-        APP_URL=http://localhost
-
-        LOG_CHANNEL=stack
-        LOG_DEPRECATIONS_CHANNEL=null
-        LOG_LEVEL=debug
-
-        DB_CONNECTION=mysql
-        DB_HOST=127.0.0.1
-        DB_PORT=3306
-        DB_DATABASE=laravel
-        DB_USERNAME=root
-        DB_PASSWORD=
+        //registry.npmjs.org/:_authToken=ABC_123
+        //registry.npmjs.org/:_authToken=123_ABC
+        //registry.npmjs.org/:_authToken=1A_2B_3C
         Text;
 
         $this->filesystem->shouldReceive('exists')
@@ -234,7 +222,7 @@ class FileDecryptCommandTest extends TestCase
             ->once()
             ->andReturn(
                 (new Encrypter('abcdefghijklmnopabcdefghijklmnop', 'AES-256-CBC'))
-                    ->encrypt('APP_NAME="Laravel Two"')
+                    ->encrypt('//registry.npmjs.org/:_authToken=123_ABC')
             );
 
         $this->artisan('file:decrypt', ['--key' => 'abcdefghijklmnopabcdefghijklmnop', '--path' => '/tmp'])
@@ -243,7 +231,7 @@ class FileDecryptCommandTest extends TestCase
             ->assertExitCode(0);
 
         $this->filesystem->shouldHaveReceived('put')
-            ->with('/tmp'.DIRECTORY_SEPARATOR.'.npmrc.production', 'APP_NAME="Laravel Two"');
+            ->with('/tmp'.DIRECTORY_SEPARATOR.'.npmrc.production', '//registry.npmjs.org/:_authToken=123_ABC');
     }
 
     public function testItCannotOverwriteEncryptedFiles()
@@ -271,7 +259,7 @@ class FileDecryptCommandTest extends TestCase
             ->once()
             ->andReturn(
                 (new Encrypter($key = 'abcdefghijklmnop', 'aes-128-gcm'))
-                    ->encrypt('APP_NAME="Laravel Two"')
+                    ->encrypt('//registry.npmjs.org/:_authToken=B2_C3_A1')
             );
 
         $this->artisan('file:decrypt', ['--cipher' => 'aes-128-gcm'])
@@ -281,6 +269,6 @@ class FileDecryptCommandTest extends TestCase
             ->assertExitCode(0);
 
         $this->filesystem->shouldHaveReceived('put')
-            ->with(base_path('.npmrc'), 'APP_NAME="Laravel Two"');
+            ->with(base_path('.npmrc'), '//registry.npmjs.org/:_authToken=B2_C3_A1');
     }
 }
