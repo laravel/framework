@@ -89,7 +89,7 @@ class FileDecryptCommand extends Command
 
         $mainFile = Str::remove('.encrypted', $encryptedFile);
 
-        if (!Str::endsWith($encryptedFile, '.encrypted')) {
+        if (! Str::endsWith($encryptedFile, '.encrypted')) {
             $this->fail('Invalid filename.');
         }
 
