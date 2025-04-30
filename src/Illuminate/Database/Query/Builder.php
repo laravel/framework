@@ -2277,13 +2277,7 @@ class Builder implements BuilderContract
             $value, $operator, func_num_args() === 2
         );
 
-        $this->whereNested(function ($query) use ($columns, $operator, $value) {
-            foreach ($columns as $column) {
-                $query->where($column, $operator, $value, 'and');
-            }
-        }, $boolean);
-
-        return $this;
+        return $this->addNestedWhereColumns($columns, $operator, $value, 'and', $boolean);
     }
 
     /**
@@ -2314,13 +2308,7 @@ class Builder implements BuilderContract
             $value, $operator, func_num_args() === 2
         );
 
-        $this->whereNested(function ($query) use ($columns, $operator, $value) {
-            foreach ($columns as $column) {
-                $query->where($column, $operator, $value, 'or');
-            }
-        }, $boolean);
-
-        return $this;
+        return $this->addNestedWhereColumns($columns, $operator, $value, 'or', $boolean);
     }
 
     /**
@@ -2361,6 +2349,27 @@ class Builder implements BuilderContract
     public function orWhereNone($columns, $operator = null, $value = null)
     {
         return $this->whereNone($columns, $operator, $value, 'or');
+    }
+
+    /**
+     * Add an "and/or where" clause to the query for multiple columns with "and/or" conditions between them.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression[]|\Closure[]|string[]  $columns
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @param  string  $innerBoolean
+     * @param  string  $outerBoolean
+     * @return $this
+     */
+    protected function addNestedWhereColumns($columns, $operator, $value, $innerBoolean, $outerBoolean)
+    {
+        return $this->whereNested(function ($query) use ($columns, $operator, $value, $innerBoolean) {
+            foreach ($columns as $column) {
+                $column instanceof Closure
+                    ? $query->where($column, boolean: $innerBoolean)
+                    : $query->where($column, $operator, $value, $innerBoolean);
+            }
+        }, $outerBoolean);
     }
 
     /**
