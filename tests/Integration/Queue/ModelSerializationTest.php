@@ -417,7 +417,7 @@ class ModelSerializationTest extends TestCase
         $this->assertTrue($unserialized->property->every->relationLoaded('roles'));
     }
 
-    public function test_it_only_loads_missing_relationships()
+    public function test_it_reloads_already_loaded_relationships()
     {
         $user = User::create([
             'email' => 'taylor@laravel.com',
@@ -433,7 +433,7 @@ class ModelSerializationTest extends TestCase
         /** @var ModelSerializationLoadRelationships $unserialized */
         $unserialized = unserialize($serialized);
 
-        $this->assertCount(2, $queries);
+        $this->assertCount(3, $queries);
         $this->assertTrue($unserialized->property->relationLoaded('roles'));
     }
 
