@@ -133,7 +133,7 @@ class Event
         $this->exitCode = $this->start($container);
 
         if (! $this->runInBackground) {
-            $this->finish($container);
+            $this->finish($container, $this->exitCode);
         }
     }
 
@@ -210,10 +210,13 @@ class Event
      * Mark the command process as finished and run callbacks/cleanup.
      *
      * @param  \Illuminate\Contracts\Container\Container  $container
+     * @param  int  $exitCode
      * @return void
      */
-    public function finish(Container $container)
+    public function finish(Container $container, $exitCode)
     {
+        $this->exitCode = (int) $exitCode;
+
         try {
             $this->callAfterCallbacks($container);
         } finally {
