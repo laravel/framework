@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Queue\Attributes\EagerLoad;
 use Illuminate\Queue\Attributes\WithoutRelations;
@@ -463,23 +464,22 @@ class ModelSerializationTest extends TestCase
         $this->assertCount(2, $queries);
     }
 
-    public function test_it_can_use_generic_boot_method()
+    public function test_it_initilize_on_the_queue()
     {
         $order = Order::create();
 
-        $serialized = serialize(new ModelSerializationWithBootOnQueueHook($order));
+        $serialized = serialize(new ModelSerializationWithInitilizeOnQueueHook($order));
 
         $queries = [];
         DB::listen(function (QueryExecuted $query) use (&$queries) {
             $queries[] = $query;
         });
 
-        /** @var ModelSerializationWithoutRelationsAndEagerLoadLines $unserialized */
         $unserialized = unserialize($serialized);
 
+        $this->assertTrue($unserialized->value->relationLoaded('lines'));
+        $this->assertTrue(! $unserialized->value->relationLoaded('products'));
         $this->assertCount(2, $queries);
-        $this->assertTrue($unserialized->property->relationLoaded('lines'));
-        $this->assertTrue(! $unserialized->property->relationLoaded('products'));
     }
 }
 
@@ -699,19 +699,21 @@ class ModelSerializationWithoutRelationsAndEagerLoadLines
     }
 }
 
-class ModelSerializationWithBootOnQueueHook
+class ModelSerializationWithInitilizeOnQueueHook
 {
-    use SerializesModels;
+    use Queueable;
 
     public function __construct(
-        public $property,
+        public $value,
     ) {
         //
     }
 
     protected function initializeOnQueue()
     {
-        $this->property->load('lines');
+        $this->value->load([
+            'lines' => fn ($q) => $q->where('product_id', 5),
+        ]);
     }
 }
 
