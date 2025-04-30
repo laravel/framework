@@ -103,8 +103,8 @@ trait SerializesModels
             }
         }
 
-        if (method_exists($this, 'bootOnQueue')) {
-            $this->bootOnQueue();
+        if (method_exists($this, 'initializeOnQueue')) {
+            $this->initializeOnQueue();
         }
     }
 

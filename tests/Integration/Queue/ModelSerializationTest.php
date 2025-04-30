@@ -702,7 +702,7 @@ class ModelSerializationWithBootOnQueueHook
         //
     }
 
-    protected function bootOnQueue()
+    protected function initializeOnQueue()
     {
         $this->property->load('lines');
     }
