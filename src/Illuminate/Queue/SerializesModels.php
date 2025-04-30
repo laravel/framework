@@ -107,7 +107,6 @@ trait SerializesModels
             }
         }
 
-
         if (in_array(Queueable::class, class_uses_recursive($this)) && method_exists($this, 'initializeOnQueue')) {
             $this->initializeOnQueue();
         }
