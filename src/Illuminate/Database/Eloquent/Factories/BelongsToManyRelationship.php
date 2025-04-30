@@ -52,7 +52,7 @@ class BelongsToManyRelationship
     {
         $factoryInstance = $this->factory instanceof Factory;
 
-        if($factoryInstance) {
+        if ($factoryInstance) {
             $relationship = $model->{$this->relationship}();
         }
 
