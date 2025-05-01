@@ -274,6 +274,7 @@ class CallQueuedHandler
      * @param  array  $data
      * @param  \Throwable|null  $e
      * @param  string  $uuid
+     * @param  \Illuminate\Contracts\Queue\Job|null  $job
      * @return void
      */
     public function failed(array $data, $e, string $uuid, ?Job $job = null)
