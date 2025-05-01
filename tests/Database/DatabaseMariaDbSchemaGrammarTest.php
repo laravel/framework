@@ -873,7 +873,11 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
 
     public function testAddingDate()
     {
-        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $conn = $this->getConnection();
+        $conn->shouldReceive('isMaria')->andReturn(true);
+        $conn->shouldReceive('getServerVersion')->andReturn('10.3.0');
+
+        $blueprint = new Blueprint($conn, 'users');
         $blueprint->date('foo');
         $statements = $blueprint->toSql();
 
@@ -881,13 +885,45 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
         $this->assertSame('alter table `users` add `foo` date not null', $statements[0]);
     }
 
+    public function testAddingDateWithDefaultCurrent()
+    {
+        $conn = $this->getConnection();
+        $conn->shouldReceive('isMaria')->andReturn(true);
+        $conn->shouldReceive('getServerVersion')->andReturn('10.3.0');
+
+        $blueprint = new Blueprint($conn, 'users');
+        $blueprint->date('foo')->useCurrent();
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add `foo` date not null default (CURDATE())', $statements[0]);
+    }
+
     public function testAddingYear()
     {
-        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $conn = $this->getConnection();
+        $conn->shouldReceive('isMaria')->andReturn(true);
+        $conn->shouldReceive('getServerVersion')->andReturn('10.3.0');
+
+        $blueprint = new Blueprint($conn, 'users');
         $blueprint->year('birth_year');
         $statements = $blueprint->toSql();
         $this->assertCount(1, $statements);
         $this->assertSame('alter table `users` add `birth_year` year not null', $statements[0]);
+    }
+
+    public function testAddingYearWithDefaultCurrent()
+    {
+        $conn = $this->getConnection();
+        $conn->shouldReceive('isMaria')->andReturn(true);
+        $conn->shouldReceive('getServerVersion')->andReturn('10.3.0');
+
+        $blueprint = new Blueprint($conn, 'users');
+        $blueprint->year('birth_year')->useCurrent();
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add `birth_year` year not null default (YEAR(CURDATE()))', $statements[0]);
     }
 
     public function testAddingDateTime()

@@ -922,6 +922,10 @@ class PostgresGrammar extends Grammar
      */
     protected function typeDate(Fluent $column)
     {
+        if ($column->useCurrent) {
+            $column->default(new Expression('CURRENT_DATE'));
+        }
+
         return 'date';
     }
 
@@ -1007,6 +1011,10 @@ class PostgresGrammar extends Grammar
      */
     protected function typeYear(Fluent $column)
     {
+        if ($column->useCurrent) {
+            $column->default(new Expression('EXTRACT(YEAR FROM CURRENT_DATE)'));
+        }
+
         return $this->typeInteger($column);
     }
 

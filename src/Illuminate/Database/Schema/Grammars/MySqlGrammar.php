@@ -922,11 +922,23 @@ class MySqlGrammar extends Grammar
     /**
      * Create the column definition for a date type.
      *
+     * Note: "useCurrent requires MariaDB or MySQL 8.0.13+."
+     *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
      */
     protected function typeDate(Fluent $column)
     {
+        $isMaria = $this->connection->isMaria();
+        $version = $this->connection->getServerVersion();
+
+        if ($isMaria ||
+            (! $isMaria && version_compare($version, '8.0.13', '>='))) {
+            if ($column->useCurrent) {
+                $column->default(new Expression('(CURDATE())'));
+            }
+        }
+
         return 'date';
     }
 
@@ -1019,11 +1031,23 @@ class MySqlGrammar extends Grammar
     /**
      * Create the column definition for a year type.
      *
+     * Note: "useCurrent requires MariaDB or MySQL 8.0.13+."
+     *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
      */
     protected function typeYear(Fluent $column)
     {
+        $isMaria = $this->connection->isMaria();
+        $version = $this->connection->getServerVersion();
+
+        if ($isMaria ||
+            (! $isMaria && version_compare($version, '8.0.13', '>='))) {
+            if ($column->useCurrent) {
+                $column->default(new Expression('(YEAR(CURDATE()))'));
+            }
+        }
+
         return 'year';
     }
 
