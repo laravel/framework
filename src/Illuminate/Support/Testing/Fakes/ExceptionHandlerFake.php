@@ -5,6 +5,7 @@ namespace Illuminate\Support\Testing\Fakes;
 use Closure;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Foundation\Testing\Concerns\WithoutExceptionHandlingHandler;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\ReflectsClosures;
 use Illuminate\Testing\Assert;
@@ -22,7 +23,7 @@ class ExceptionHandlerFake implements ExceptionHandler, Fake
     /**
      * All of the exceptions that have been reported.
      *
-     * @var array<int, \Throwable>
+     * @var list<\Throwable>
      */
     protected $reported = [];
 
@@ -37,7 +38,7 @@ class ExceptionHandlerFake implements ExceptionHandler, Fake
      * Create a new exception handler fake.
      *
      * @param  \Illuminate\Contracts\Debug\ExceptionHandler  $handler
-     * @param  array<int, class-string<\Throwable>>  $exceptions
+     * @param  list<class-string<\Throwable>>  $exceptions
      * @return void
      */
     public function __construct(
@@ -60,7 +61,7 @@ class ExceptionHandlerFake implements ExceptionHandler, Fake
     /**
      * Assert if an exception of the given type has been reported.
      *
-     * @param  \Closure|string  $exception
+     * @param  (\Closure(\Throwable): bool)|class-string<\Throwable>  $exception
      * @return void
      */
     public function assertReported(Closure|string $exception)
@@ -80,7 +81,7 @@ class ExceptionHandlerFake implements ExceptionHandler, Fake
         }
 
         Assert::assertTrue(
-            collect($this->reported)->contains(
+            (new Collection($this->reported))->contains(
                 fn (Throwable $e) => $this->firstClosureParameterType($exception) === get_class($e)
                     && $exception($e) === true,
             ), $message,
@@ -95,7 +96,7 @@ class ExceptionHandlerFake implements ExceptionHandler, Fake
      */
     public function assertReportedCount(int $count)
     {
-        $total = collect($this->reported)->count();
+        $total = (new Collection($this->reported))->count();
 
         PHPUnit::assertSame(
             $count, $total,
@@ -106,7 +107,7 @@ class ExceptionHandlerFake implements ExceptionHandler, Fake
     /**
      * Assert if an exception of the given type has not been reported.
      *
-     * @param  \Closure|string  $exception
+     * @param  (\Closure(\Throwable): bool)|class-string<\Throwable>  $exception
      * @return void
      */
     public function assertNotReported(Closure|string $exception)
@@ -262,7 +263,7 @@ class ExceptionHandlerFake implements ExceptionHandler, Fake
     }
 
     /**
-     * Handle dynamic method calls to the mailer.
+     * Handle dynamic method calls to the handler.
      *
      * @param  string  $method
      * @param  array<string, mixed>  $parameters

@@ -109,6 +109,14 @@ class SupportStringableTest extends TestCase
         $this->assertSame('LaraCons', (string) $this->stringable('LaraCon')->pluralStudly(-2));
     }
 
+    public function testPluralPascal()
+    {
+        $this->assertSame('LaraCons', (string) $this->stringable('LaraCon')->pluralPascal(2));
+        $this->assertSame('LaraCon', (string) $this->stringable('LaraCon')->pluralPascal(1));
+        $this->assertSame('LaraCons', (string) $this->stringable('LaraCon')->pluralPascal(-2));
+        $this->assertSame('LaraCon', (string) $this->stringable('LaraCon')->pluralPascal(-1));
+    }
+
     public function testMatch()
     {
         $stringable = $this->stringable('foo bar');
@@ -789,6 +797,15 @@ class SupportStringableTest extends TestCase
         $this->assertFalse($this->stringable('foo/bar/baz')->is('*FOO*'));
         $this->assertFalse($this->stringable('a')->is('A'));
 
+        // is not case sensitive
+        $this->assertTrue($this->stringable('a')->is('A', true));
+        $this->assertTrue($this->stringable('foo/bar/baz')->is('*BAZ*', true));
+        $this->assertTrue($this->stringable('a/')->is(['A*', 'B*'], true));
+        $this->assertFalse($this->stringable('f/')->is(['A*', 'B*'], true));
+        $this->assertTrue($this->stringable('foo')->is('FOO', true));
+        $this->assertTrue($this->stringable('foo/bar/baz')->is('*FOO*', true));
+        $this->assertTrue($this->stringable('FOO/bar')->is('foo/*', true));
+
         // Accepts array of patterns
         $this->assertTrue($this->stringable('a/')->is(['a*', 'b*']));
         $this->assertTrue($this->stringable('b/')->is(['a*', 'b*']));
@@ -977,6 +994,20 @@ class SupportStringableTest extends TestCase
         $this->assertSame('FooBar', (string) $this->stringable('foo_bar')->studly()); // test cache
         $this->assertSame('FooBarBaz', (string) $this->stringable('foo-barBaz')->studly());
         $this->assertSame('FooBarBaz', (string) $this->stringable('foo-bar_baz')->studly());
+    }
+
+    public function testPascal()
+    {
+        $this->assertSame('LaravelPHPFramework', (string) $this->stringable('laravel_p_h_p_framework')->pascal());
+        $this->assertSame('LaravelPhpFramework', (string) $this->stringable('laravel_php_framework')->pascal());
+        $this->assertSame('LaravelPhPFramework', (string) $this->stringable('laravel-phP-framework')->pascal());
+        $this->assertSame('LaravelPhpFramework', (string) $this->stringable('laravel  -_-  php   -_-   framework   ')->pascal());
+
+        $this->assertSame('FooBar', (string) $this->stringable('fooBar')->pascal());
+        $this->assertSame('FooBar', (string) $this->stringable('foo_bar')->pascal());
+        $this->assertSame('FooBar', (string) $this->stringable('foo_bar')->pascal()); // test cache
+        $this->assertSame('FooBarBaz', (string) $this->stringable('foo-barBaz')->pascal());
+        $this->assertSame('FooBarBaz', (string) $this->stringable('foo-bar_baz')->pascal());
     }
 
     public function testCamel()

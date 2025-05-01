@@ -7,6 +7,7 @@ use Illuminate\Support\Testing\Fakes\MailFake;
 /**
  * @method static \Illuminate\Contracts\Mail\Mailer mailer(string|null $name = null)
  * @method static \Illuminate\Mail\Mailer driver(string|null $driver = null)
+ * @method static \Illuminate\Mail\Mailer build(array $config)
  * @method static \Symfony\Component\Mailer\Transport\TransportInterface createSymfonyTransport(array $config)
  * @method static string getDefaultDriver()
  * @method static void setDefaultDriver(string $name)
@@ -28,8 +29,8 @@ use Illuminate\Support\Testing\Fakes\MailFake;
  * @method static string render(string|array $view, array $data = [])
  * @method static \Illuminate\Mail\SentMessage|null send(\Illuminate\Contracts\Mail\Mailable|string|array $view, array $data = [], \Closure|string|null $callback = null)
  * @method static \Illuminate\Mail\SentMessage|null sendNow(\Illuminate\Contracts\Mail\Mailable|string|array $mailable, array $data = [], \Closure|string|null $callback = null)
- * @method static mixed queue(\Illuminate\Contracts\Mail\Mailable|string|array $view, string|null $queue = null)
- * @method static mixed onQueue(string $queue, \Illuminate\Contracts\Mail\Mailable $view)
+ * @method static mixed queue(\Illuminate\Contracts\Mail\Mailable|string|array $view, \BackedEnum|string|null $queue = null)
+ * @method static mixed onQueue(\BackedEnum|string|null $queue, \Illuminate\Contracts\Mail\Mailable $view)
  * @method static mixed queueOn(string $queue, \Illuminate\Contracts\Mail\Mailable $view)
  * @method static mixed later(\DateTimeInterface|\DateInterval|int $delay, \Illuminate\Contracts\Mail\Mailable $view, string|null $queue = null)
  * @method static mixed laterOn(string $queue, \DateTimeInterface|\DateInterval|int $delay, \Illuminate\Contracts\Mail\Mailable $view)

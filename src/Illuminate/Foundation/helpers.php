@@ -109,7 +109,7 @@ if (! function_exists('app')) {
     /**
      * Get the available container instance.
      *
-     * @template TClass
+     * @template TClass of object
      *
      * @param  string|class-string<TClass>|null  $abstract
      * @param  array  $parameters
@@ -604,8 +604,8 @@ if (! function_exists('old')) {
      * Retrieve an old input item.
      *
      * @param  string|null  $key
-     * @param  mixed  $default
-     * @return mixed
+     * @param  \Illuminate\Database\Eloquent\Model|string|array|null  $default
+     * @return string|array|null
      */
     function old($key = null, $default = null)
     {
@@ -793,7 +793,7 @@ if (! function_exists('resolve')) {
     /**
      * Resolve a service from the container.
      *
-     * @template TClass
+     * @template TClass of object
      *
      * @param  string|class-string<TClass>  $name
      * @param  array  $parameters

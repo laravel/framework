@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Configuration;
 
 use Closure;
 use Illuminate\Foundation\Exceptions\Handler;
+use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Arr;
 
 class Exceptions
@@ -197,6 +198,31 @@ class Exceptions
     public function stopIgnoring(array|string $class)
     {
         $this->handler->stopIgnoring($class);
+
+        return $this;
+    }
+
+    /**
+     * Set the truncation length for request exception messages.
+     *
+     * @param  int  $length
+     * @return $this
+     */
+    public function truncateRequestExceptionsAt(int $length)
+    {
+        RequestException::truncateAt($length);
+
+        return $this;
+    }
+
+    /**
+     * Disable truncation of request exception messages.
+     *
+     * @return $this
+     */
+    public function dontTruncateRequestExceptions()
+    {
+        RequestException::dontTruncate();
 
         return $this;
     }

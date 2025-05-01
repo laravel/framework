@@ -4,6 +4,7 @@ namespace Illuminate\Testing\Concerns;
 
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Foundation\Application;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\ParallelTesting;
 use Illuminate\Testing\ParallelConsoleOutput;
 use PHPUnit\TextUI\Configuration\PhpHandler;
@@ -146,7 +147,7 @@ trait RunsInParallel
             ? $this->options->processes
             : $this->options->processes();
 
-        collect(range(1, $processes))->each(function ($token) use ($callback) {
+        Collection::range(1, $processes)->each(function ($token) use ($callback) {
             tap($this->createApplication(), function ($app) use ($callback, $token) {
                 ParallelTesting::resolveTokenUsing(fn () => $token);
 

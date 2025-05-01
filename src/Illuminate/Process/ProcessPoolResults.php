@@ -26,6 +26,26 @@ class ProcessPoolResults implements ArrayAccess
     }
 
     /**
+     * Determine if all of the processes in the pool were successful.
+     *
+     * @return bool
+     */
+    public function successful()
+    {
+        return $this->collect()->every(fn ($p) => $p->successful());
+    }
+
+    /**
+     * Determine if any of the processes in the pool failed.
+     *
+     * @return bool
+     */
+    public function failed()
+    {
+        return ! $this->successful();
+    }
+
+    /**
      * Get the results as a collection.
      *
      * @return \Illuminate\Support\Collection

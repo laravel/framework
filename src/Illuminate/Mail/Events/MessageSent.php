@@ -4,6 +4,7 @@ namespace Illuminate\Mail\Events;
 
 use Exception;
 use Illuminate\Mail\SentMessage;
+use Illuminate\Support\Collection;
 
 /**
  * @property \Symfony\Component\Mime\Email $message
@@ -44,7 +45,7 @@ class MessageSent
      */
     public function __serialize()
     {
-        $hasAttachments = collect($this->message->getAttachments())->isNotEmpty();
+        $hasAttachments = (new Collection($this->message->getAttachments()))->isNotEmpty();
 
         return [
             'sent' => $this->sent,

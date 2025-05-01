@@ -91,6 +91,24 @@ class Number
     }
 
     /**
+     * Spell out the given number in the given locale in ordinal form.
+     *
+     * @param  int|float  $number
+     * @param  string|null  $locale
+     * @return string
+     */
+    public static function spellOrdinal(int|float $number, ?string $locale = null)
+    {
+        static::ensureIntlExtensionIsInstalled();
+
+        $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::SPELLOUT);
+
+        $formatter->setTextAttribute(NumberFormatter::DEFAULT_RULESET, '%spellout-ordinal');
+
+        return $formatter->format($number);
+    }
+
+    /**
      * Convert the given number to its percentage equivalent.
      *
      * @param  int|float  $number
@@ -120,13 +138,18 @@ class Number
      * @param  int|float  $number
      * @param  string  $in
      * @param  string|null  $locale
+     * @param  int|null  $precision
      * @return string|false
      */
-    public static function currency(int|float $number, string $in = '', ?string $locale = null)
+    public static function currency(int|float $number, string $in = '', ?string $locale = null, ?int $precision = null)
     {
         static::ensureIntlExtensionIsInstalled();
 
         $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::CURRENCY);
+
+        if (! is_null($precision)) {
+            $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, $precision);
+        }
 
         return $formatter->formatCurrency($number, ! empty($in) ? $in : static::$currency);
     }
@@ -170,7 +193,7 @@ class Number
      * @param  int  $precision
      * @param  int|null  $maxPrecision
      * @param  bool  $abbreviate
-     * @return bool|string
+     * @return false|string
      */
     public static function forHumans(int|float $number, int $precision = 0, ?int $maxPrecision = null, bool $abbreviate = false)
     {
@@ -300,11 +323,11 @@ class Number
      */
     public static function withCurrency(string $currency, callable $callback)
     {
-        $previousLCurrency = static::$currency;
+        $previousCurrency = static::$currency;
 
         static::useCurrency($currency);
 
-        return tap($callback(), fn () => static::useCurrency($previousLCurrency));
+        return tap($callback(), fn () => static::useCurrency($previousCurrency));
     }
 
     /**

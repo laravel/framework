@@ -47,6 +47,31 @@ class ProcessTest extends TestCase
 
         $this->assertTrue(str_contains($results[0]->output(), 'ProcessTest.php'));
         $this->assertTrue(str_contains($results[1]->output(), 'ProcessTest.php'));
+
+        $this->assertTrue($results->successful());
+    }
+
+    public function testProcessPoolFailed()
+    {
+        $factory = new Factory;
+
+        $factory->fake([
+            'cat *' => $factory->result(exitCode: 1),
+        ]);
+
+        $pool = $factory->pool(function ($pool) {
+            return [
+                $pool->path(__DIR__)->command($this->ls()),
+                $pool->path(__DIR__)->command('cat test'),
+            ];
+        });
+
+        $results = $pool->start()->wait();
+
+        $this->assertTrue($results[0]->successful());
+        $this->assertTrue($results[1]->failed());
+
+        $this->assertTrue($results->failed());
     }
 
     public function testInvokedProcessPoolCount()
@@ -294,8 +319,8 @@ class ProcessTest extends TestCase
 
         $factory->fake([
             'ls *' => $factory->sequence()
-                        ->push('ls command 1')
-                        ->push('ls command 2'),
+                ->push('ls command 1')
+                ->push('ls command 2'),
             'cat *' => 'cat command',
         ]);
 
@@ -315,9 +340,9 @@ class ProcessTest extends TestCase
 
         $factory->fake([
             'ls *' => $factory->sequence()
-                        ->push('ls command 1')
-                        ->push('ls command 2')
-                        ->dontFailWhenEmpty(),
+                ->push('ls command 1')
+                ->push('ls command 2')
+                ->dontFailWhenEmpty(),
         ]);
 
         $result = $factory->run('ls -la');
@@ -338,8 +363,8 @@ class ProcessTest extends TestCase
 
         $factory->fake([
             'ls *' => $factory->sequence()
-                        ->push('ls command 1')
-                        ->push('ls command 2'),
+                ->push('ls command 1')
+                ->push('ls command 2'),
         ]);
 
         $result = $factory->run('ls -la');
@@ -691,10 +716,10 @@ class ProcessTest extends TestCase
 
         $factory->fake(function () use ($factory) {
             return $factory->describe()
-                    ->output('ONE')
-                    ->output('TWO')
-                    ->output('THREE')
-                    ->runsFor(iterations: 3);
+                ->output('ONE')
+                ->output('TWO')
+                ->output('THREE')
+                ->runsFor(iterations: 3);
         });
 
         $process = $factory->start('echo "ONE"; sleep 1; echo "TWO"; sleep 1; echo "THREE"; sleep 1;');

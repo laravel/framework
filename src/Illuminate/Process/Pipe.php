@@ -2,6 +2,7 @@
 
 namespace Illuminate\Process;
 
+use Illuminate\Support\Collection;
 use InvalidArgumentException;
 
 /**
@@ -67,23 +68,23 @@ class Pipe
     {
         call_user_func($this->callback, $this);
 
-        return collect($this->pendingProcesses)
-                ->reduce(function ($previousProcessResult, $pendingProcess, $key) use ($output) {
-                    if (! $pendingProcess instanceof PendingProcess) {
-                        throw new InvalidArgumentException('Process pipe must only contain pending processes.');
-                    }
+        return (new Collection($this->pendingProcesses))
+            ->reduce(function ($previousProcessResult, $pendingProcess, $key) use ($output) {
+                if (! $pendingProcess instanceof PendingProcess) {
+                    throw new InvalidArgumentException('Process pipe must only contain pending processes.');
+                }
 
-                    if ($previousProcessResult && $previousProcessResult->failed()) {
-                        return $previousProcessResult;
-                    }
+                if ($previousProcessResult && $previousProcessResult->failed()) {
+                    return $previousProcessResult;
+                }
 
-                    return $pendingProcess->when(
-                        $previousProcessResult,
-                        fn () => $pendingProcess->input($previousProcessResult->output())
-                    )->run(output: $output ? function ($type, $buffer) use ($key, $output) {
-                        $output($type, $buffer, $key);
-                    } : null);
-                });
+                return $pendingProcess->when(
+                    $previousProcessResult,
+                    fn () => $pendingProcess->input($previousProcessResult->output())
+                )->run(output: $output ? function ($type, $buffer) use ($key, $output) {
+                    $output($type, $buffer, $key);
+                } : null);
+            });
     }
 
     /**

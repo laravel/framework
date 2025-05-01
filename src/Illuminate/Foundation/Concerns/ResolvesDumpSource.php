@@ -13,6 +13,7 @@ trait ResolvesDumpSource
      */
     protected $editorHrefs = [
         'atom' => 'atom://core/open/file?filename={file}&line={line}',
+        'cursor' => 'cursor://file/{file}:{line}',
         'emacs' => 'emacs://open?url=file://{file}&line={line}',
         'idea' => 'idea://open?file={file}&line={line}',
         'macvim' => 'mvim://open/?url=file://{file}&line={line}',
@@ -165,13 +166,11 @@ trait ResolvesDumpSource
             $file = str_replace($this->basePath, $basePath, $file);
         }
 
-        $href = str_replace(
+        return str_replace(
             ['{file}', '{line}'],
             [$file, is_null($line) ? 1 : $line],
             $href,
         );
-
-        return $href;
     }
 
     /**

@@ -8,6 +8,8 @@ use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Support\Traits\Conditionable;
 use Laravel\SerializableClosure\SerializableClosure;
 
+use function Illuminate\Support\enum_value;
+
 class PendingChain
 {
     use Conditionable;
@@ -70,12 +72,12 @@ class PendingChain
     /**
      * Set the desired connection for the job.
      *
-     * @param  string|null  $connection
+     * @param  \UnitEnum|string|null  $connection
      * @return $this
      */
     public function onConnection($connection)
     {
-        $this->connection = $connection;
+        $this->connection = enum_value($connection);
 
         return $this;
     }
@@ -83,12 +85,12 @@ class PendingChain
     /**
      * Set the desired queue for the job.
      *
-     * @param  string|null  $queue
+     * @param  \UnitEnum|string|null  $queue
      * @return $this
      */
     public function onQueue($queue)
     {
-        $this->queue = $queue;
+        $this->queue = enum_value($queue);
 
         return $this;
     }

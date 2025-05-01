@@ -9,6 +9,9 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Attribute\AsCommand;
 
+use function Laravel\Prompts\password;
+use function Laravel\Prompts\select;
+
 #[AsCommand(name: 'env:encrypt')]
 class EnvironmentEncryptCommand extends Command
 {
@@ -61,6 +64,21 @@ class EnvironmentEncryptCommand extends Command
         $cipher = $this->option('cipher') ?: 'AES-256-CBC';
 
         $key = $this->option('key');
+
+        if (! $key && $this->input->isInteractive()) {
+            $ask = select(
+                label: 'What encryption key would you like to use?',
+                options: [
+                    'generate' => 'Generate a random encryption key',
+                    'ask' => 'Provide an encryption key',
+                ],
+                default: 'generate'
+            );
+
+            if ($ask == 'ask') {
+                $key = password('What is the encryption key?');
+            }
+        }
 
         $keyPassed = $key !== null;
 

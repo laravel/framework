@@ -54,8 +54,8 @@ class VitePreloadingTest extends TestCase
         });
 
         $this->assertSame(
+            '<https://laravel.com/app.js>; rel="modulepreload"; foo="bar"',
             $response->headers->get('Link'),
-            '<https://laravel.com/app.js>; rel="modulepreload"; foo="bar"'
         );
     }
 
@@ -78,5 +78,32 @@ class VitePreloadingTest extends TestCase
         });
 
         $this->assertNull($response->headers->get('Link'));
+    }
+
+    public function testItDoesNotOverwriteOtherLinkHeaders()
+    {
+        $app = new Container;
+        $app->instance(Vite::class, new class extends Vite
+        {
+            protected $preloadedAssets = [
+                'https://laravel.com/app.js' => [
+                    'rel="modulepreload"',
+                    'foo="bar"',
+                ],
+            ];
+        });
+        Facade::setFacadeApplication($app);
+
+        $response = (new AddLinkHeadersForPreloadedAssets)->handle(new Request, function () {
+            return new Response('Hello Laravel', headers: ['Link' => '<https://laravel.com/logo.png>; rel="preload"; as="image"']);
+        });
+
+        $this->assertSame(
+            [
+                '<https://laravel.com/logo.png>; rel="preload"; as="image"',
+                '<https://laravel.com/app.js>; rel="modulepreload"; foo="bar"',
+            ],
+            $response->headers->all('Link'),
+        );
     }
 }

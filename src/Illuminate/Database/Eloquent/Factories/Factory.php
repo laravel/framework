@@ -86,6 +86,13 @@ abstract class Factory
     protected $afterCreating;
 
     /**
+     * Whether relationships should not be automatically created.
+     *
+     * @var bool
+     */
+    protected $expandRelationships = true;
+
+    /**
      * The name of the database connection that will be used to create the models.
      *
      * @var string|null
@@ -107,11 +114,18 @@ abstract class Factory
     public static $namespace = 'Database\\Factories\\';
 
     /**
-     * The default model name resolver.
+     * @deprecated use $modelNameResolvers
      *
      * @var callable(self): class-string<TModel>
      */
     protected static $modelNameResolver;
+
+    /**
+     * The default model name resolvers.
+     *
+     * @var array<class-string, callable(self): class-string<TModel>>
+     */
+    protected static $modelNameResolvers = [];
 
     /**
      * The factory name resolver.
@@ -131,17 +145,20 @@ abstract class Factory
      * @param  \Illuminate\Support\Collection|null  $afterCreating
      * @param  string|null  $connection
      * @param  \Illuminate\Support\Collection|null  $recycle
+     * @param  bool  $expandRelationships
      * @return void
      */
-    public function __construct($count = null,
-                                ?Collection $states = null,
-                                ?Collection $has = null,
-                                ?Collection $for = null,
-                                ?Collection $afterMaking = null,
-                                ?Collection $afterCreating = null,
-                                $connection = null,
-                                ?Collection $recycle = null)
-    {
+    public function __construct(
+        $count = null,
+        ?Collection $states = null,
+        ?Collection $has = null,
+        ?Collection $for = null,
+        ?Collection $afterMaking = null,
+        ?Collection $afterCreating = null,
+        $connection = null,
+        ?Collection $recycle = null,
+        bool $expandRelationships = true
+    ) {
         $this->count = $count;
         $this->states = $states ?? new Collection;
         $this->has = $has ?? new Collection;
@@ -151,6 +168,7 @@ abstract class Factory
         $this->connection = $connection;
         $this->recycle = $recycle ?? new Collection;
         $this->faker = $this->withFaker();
+        $this->expandRelationships = $expandRelationships;
     }
 
     /**
@@ -249,7 +267,7 @@ abstract class Factory
         }
 
         return new EloquentCollection(
-            collect($records)->map(function ($record) {
+            (new Collection($records))->map(function ($record) {
                 return $this->state($record)->create();
             })
         );
@@ -263,9 +281,7 @@ abstract class Factory
      */
     public function createManyQuietly(int|iterable|null $records = null)
     {
-        return Model::withoutEvents(function () use ($records) {
-            return $this->createMany($records);
-        });
+        return Model::withoutEvents(fn () => $this->createMany($records));
     }
 
     /**
@@ -284,9 +300,9 @@ abstract class Factory
         $results = $this->make($attributes, $parent);
 
         if ($results instanceof Model) {
-            $this->store(collect([$results]));
+            $this->store(new Collection([$results]));
 
-            $this->callAfterCreating(collect([$results]), $parent);
+            $this->callAfterCreating(new Collection([$results]), $parent);
         } else {
             $this->store($results);
 
@@ -305,9 +321,7 @@ abstract class Factory
      */
     public function createQuietly($attributes = [], ?Model $parent = null)
     {
-        return Model::withoutEvents(function () use ($attributes, $parent) {
-            return $this->create($attributes, $parent);
-        });
+        return Model::withoutEvents(fn () => $this->create($attributes, $parent));
     }
 
     /**
@@ -388,7 +402,7 @@ abstract class Factory
 
         if ($this->count === null) {
             return tap($this->makeInstance($parent), function ($instance) {
-                $this->callAfterMaking(collect([$instance]));
+                $this->callAfterMaking(new Collection([$instance]));
             });
         }
 
@@ -461,11 +475,10 @@ abstract class Factory
      */
     protected function parentResolvers()
     {
-        $model = $this->newModel();
-
-        return $this->for->map(function (BelongsToRelationship $for) use ($model) {
-            return $for->recycle($this->recycle)->attributesFor($model);
-        })->collapse()->all();
+        return $this->for
+            ->map(fn (BelongsToRelationship $for) => $for->recycle($this->recycle)->attributesFor($this->newModel()))
+            ->collapse()
+            ->all();
     }
 
     /**
@@ -476,9 +489,11 @@ abstract class Factory
      */
     protected function expandAttributes(array $definition)
     {
-        return collect($definition)
+        return (new Collection($definition))
             ->map($evaluateRelations = function ($attribute) {
-                if ($attribute instanceof self) {
+                if (! $this->expandRelationships && $attribute instanceof self) {
+                    $attribute = null;
+                } elseif ($attribute instanceof self) {
                     $attribute = $this->getRandomRecycledModel($attribute->modelName())?->getKey()
                         ?? $attribute->recycle($this->recycle)->create()->getKey();
                 } elseif ($attribute instanceof Model) {
@@ -511,9 +526,7 @@ abstract class Factory
     {
         return $this->newInstance([
             'states' => $this->states->concat([
-                is_callable($state) ? $state : function () use ($state) {
-                    return $state;
-                },
+                is_callable($state) ? $state : fn () => $state,
             ]),
         ]);
     }
@@ -729,6 +742,26 @@ abstract class Factory
     }
 
     /**
+     * Indicate that related parent models should not be created.
+     *
+     * @return static
+     */
+    public function withoutParents()
+    {
+        return $this->newInstance(['expandRelationships' => false]);
+    }
+
+    /**
+     * Get the name of the database connection that is used to generate models.
+     *
+     * @return string
+     */
+    public function getConnectionName()
+    {
+        return $this->connection;
+    }
+
+    /**
      * Specify the database connection that should be used to generate models.
      *
      * @param  string  $connection
@@ -756,6 +789,7 @@ abstract class Factory
             'afterCreating' => $this->afterCreating,
             'connection' => $this->connection,
             'recycle' => $this->recycle,
+            'expandRelationships' => $this->expandRelationships,
         ], $arguments)));
     }
 
@@ -779,9 +813,13 @@ abstract class Factory
      */
     public function modelName()
     {
-        $resolver = static::$modelNameResolver ?? function (self $factory) {
+        if ($this->model !== null) {
+            return $this->model;
+        }
+
+        $resolver = static::$modelNameResolvers[static::class] ?? static::$modelNameResolvers[self::class] ?? static::$modelNameResolver ?? function (self $factory) {
             $namespacedFactoryBasename = Str::replaceLast(
-                'Factory', '', Str::replaceFirst(static::$namespace, '', get_class($factory))
+                'Factory', '', Str::replaceFirst(static::$namespace, '', $factory::class)
             );
 
             $factoryBasename = Str::replaceLast('Factory', '', class_basename($factory));
@@ -793,7 +831,7 @@ abstract class Factory
                         : $appNamespace.$factoryBasename;
         };
 
-        return $this->model ?? $resolver($this);
+        return $resolver($this);
     }
 
     /**
@@ -804,7 +842,7 @@ abstract class Factory
      */
     public static function guessModelNamesUsing(callable $callback)
     {
-        static::$modelNameResolver = $callback;
+        static::$modelNameResolvers[static::class] = $callback;
     }
 
     /**
@@ -891,6 +929,19 @@ abstract class Factory
         } catch (Throwable) {
             return 'App\\';
         }
+    }
+
+    /**
+     * Flush the factory's global state.
+     *
+     * @return void
+     */
+    public static function flushState()
+    {
+        static::$modelNameResolver = null;
+        static::$modelNameResolvers = [];
+        static::$factoryNameResolver = null;
+        static::$namespace = 'Database\\Factories\\';
     }
 
     /**

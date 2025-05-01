@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Foundation\Testing\Concerns;
 
 use Illuminate\Foundation\Mix;
 use Illuminate\Foundation\Vite;
+use Illuminate\Support\Defer\DeferredCallbackCollection;
 use Orchestra\Testbench\TestCase;
 use stdClass;
 
@@ -71,6 +72,27 @@ class InteractsWithContainerTest extends TestCase
 
         $this->assertSame($handler, resolve(Mix::class));
         $this->assertSame($this, $instance);
+    }
+
+    public function testWithoutDefer()
+    {
+        $called = [];
+        defer(function () use (&$called) {
+            $called[] = 1;
+        });
+        $this->assertSame([], $called);
+
+        $instance = $this->withoutDefer();
+        defer(function () use (&$called) {
+            $called[] = 2;
+        });
+        $this->assertSame([2], $called);
+        $this->assertSame($this, $instance);
+
+        $this->withDefer();
+        $this->assertSame([2], $called);
+        $this->app[DeferredCallbackCollection::class]->invoke();
+        $this->assertSame([2, 1], $called);
     }
 
     public function testForgetMock()

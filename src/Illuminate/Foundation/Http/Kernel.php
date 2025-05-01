@@ -171,9 +171,9 @@ class Kernel implements KernelContract
         $this->bootstrap();
 
         return (new Pipeline($this->app))
-                    ->send($request)
-                    ->through($this->app->shouldSkipMiddleware() ? [] : $this->middleware)
-                    ->then($this->dispatchToRouter());
+            ->send($request)
+            ->through($this->app->shouldSkipMiddleware() ? [] : $this->middleware)
+            ->then($this->dispatchToRouter());
     }
 
     /**
@@ -478,8 +478,8 @@ class Kernel implements KernelContract
     /**
      * Add the given middleware to the middleware priority list relative to other middleware.
      *
-     * @param  string  $middleware
      * @param  string|array  $existing
+     * @param  string  $middleware
      * @param  bool  $after
      * @return $this
      */

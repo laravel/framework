@@ -61,9 +61,9 @@ class SoftDeletedInDatabase extends Constraint
     public function matches($table): bool
     {
         return $this->database->table($table)
-                ->where($this->data)
-                ->whereNotNull($this->deletedAtColumn)
-                ->count() > 0;
+            ->where($this->data)
+            ->whereNotNull($this->deletedAtColumn)
+            ->exists();
     }
 
     /**

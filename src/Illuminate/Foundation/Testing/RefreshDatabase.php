@@ -82,9 +82,11 @@ trait RefreshDatabase
     {
         $database = $this->app->make('db');
 
-        $this->app->instance('db.transactions', $transactionsManager = new DatabaseTransactionsManager);
+        $connections = $this->connectionsToTransact();
 
-        foreach ($this->connectionsToTransact() as $name) {
+        $this->app->instance('db.transactions', $transactionsManager = new DatabaseTransactionsManager($connections));
+
+        foreach ($connections as $name) {
             $connection = $database->connection($name);
 
             $connection->setTransactionManager($transactionsManager);
@@ -106,6 +108,11 @@ trait RefreshDatabase
                 $dispatcher = $connection->getEventDispatcher();
 
                 $connection->unsetEventDispatcher();
+
+                if ($connection->getPdo() && ! $connection->getPdo()->inTransaction()) {
+                    RefreshDatabaseState::$migrated = false;
+                }
+
                 $connection->rollBack();
                 $connection->setEventDispatcher($dispatcher);
                 $connection->disconnect();

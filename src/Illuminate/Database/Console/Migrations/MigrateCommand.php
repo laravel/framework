@@ -9,6 +9,7 @@ use Illuminate\Database\Events\SchemaLoaded;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Database\SQLiteDatabaseDoesNotExistException;
 use Illuminate\Database\SqlServerConnection;
+use Illuminate\Support\Str;
 use PDOException;
 use RuntimeException;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -163,24 +164,39 @@ class MigrateCommand extends BaseCommand implements Isolatable
     {
         return retry(2, fn () => $this->migrator->repositoryExists(), 0, function ($e) {
             try {
-                if ($e->getPrevious() instanceof SQLiteDatabaseDoesNotExistException) {
-                    return $this->createMissingSqliteDatabase($e->getPrevious()->path);
-                }
-
-                $connection = $this->migrator->resolveConnection($this->option('database'));
-
-                if (
-                    $e->getPrevious() instanceof PDOException &&
-                    $e->getPrevious()->getCode() === 1049 &&
-                    in_array($connection->getDriverName(), ['mysql', 'mariadb'])) {
-                    return $this->createMissingMysqlDatabase($connection);
-                }
-
-                return false;
+                return $this->handleMissingDatabase($e->getPrevious());
             } catch (Throwable) {
                 return false;
             }
         });
+    }
+
+    /**
+     * Attempt to create the database if it is missing.
+     *
+     * @param  \Throwable  $e
+     * @return bool
+     */
+    protected function handleMissingDatabase(Throwable $e)
+    {
+        if ($e instanceof SQLiteDatabaseDoesNotExistException) {
+            return $this->createMissingSqliteDatabase($e->path);
+        }
+
+        $connection = $this->migrator->resolveConnection($this->option('database'));
+
+        if (! $e instanceof PDOException) {
+            return false;
+        }
+
+        if (($e->getCode() === 1049 && in_array($connection->getDriverName(), ['mysql', 'mariadb'])) ||
+            (($e->errorInfo[0] ?? null) == '08006' &&
+              $connection->getDriverName() == 'pgsql' &&
+              Str::contains($e->getMessage(), '"'.$connection->getDatabaseName().'"'))) {
+            return $this->createMissingMySqlOrPgsqlDatabase($connection);
+        }
+
+        return false;
     }
 
     /**
@@ -213,13 +229,14 @@ class MigrateCommand extends BaseCommand implements Isolatable
     }
 
     /**
-     * Create a missing MySQL database.
+     * Create a missing MySQL or Postgres database.
      *
+     * @param  \Illuminate\Database\Connection  $connection
      * @return bool
      *
      * @throws \RuntimeException
      */
-    protected function createMissingMysqlDatabase($connection)
+    protected function createMissingMySqlOrPgsqlDatabase($connection)
     {
         if ($this->laravel['config']->get("database.connections.{$connection->getName()}.database") !== $connection->getDatabaseName()) {
             return false;
@@ -238,15 +255,25 @@ class MigrateCommand extends BaseCommand implements Isolatable
                 throw new RuntimeException('Database was not created. Aborting migration.');
             }
         }
-
         try {
-            $this->laravel['config']->set("database.connections.{$connection->getName()}.database", null);
+            $this->laravel['config']->set(
+                "database.connections.{$connection->getName()}.database",
+                match ($connection->getDriverName()) {
+                    'mysql', 'mariadb' => null,
+                    'pgsql' => 'postgres',
+                },
+            );
 
             $this->laravel['db']->purge();
 
             $freshConnection = $this->migrator->resolveConnection($this->option('database'));
 
-            return tap($freshConnection->unprepared("CREATE DATABASE IF NOT EXISTS `{$connection->getDatabaseName()}`"), function () {
+            return tap($freshConnection->unprepared(
+                match ($connection->getDriverName()) {
+                    'mysql', 'mariadb' => "CREATE DATABASE IF NOT EXISTS `{$connection->getDatabaseName()}`",
+                    'pgsql' => 'CREATE DATABASE "'.$connection->getDatabaseName().'"',
+                }
+            ), function () {
                 $this->laravel['db']->purge();
             });
         } finally {

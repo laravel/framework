@@ -119,6 +119,27 @@ class RouteListCommandTest extends TestCase
             ->expectsOutput('');
     }
 
+    public function testRouteCanBeFilteredByAction()
+    {
+        $this->withoutDeprecationHandling();
+
+        $this->router->get('/', function () {
+            //
+        });
+        $this->router->get('foo/{user}', [FooController::class, 'show']);
+
+        $this->artisan(RouteListCommand::class, ['--action' => 'FooController'])
+            ->assertSuccessful()
+            ->expectsOutput('')
+            ->expectsOutput(
+                '  GET|HEAD       foo/{user} Illuminate\Tests\Testing\Console\FooController@show'
+            )->expectsOutput('')
+            ->expectsOutput(
+                '                                                  Showing [1] routes'
+            )
+            ->expectsOutput('');
+    }
+
     public function testDisplayRoutesExceptVendor()
     {
         $this->router->get('foo/{user}', [FooController::class, 'show']);

@@ -242,6 +242,85 @@ class ThrottleRequestsTest extends TestCase
         $response->assertOk();
     }
 
+    public function testItCanCombineRateLimitsWithoutSpecifyingUniqueKeys()
+    {
+        $rateLimiter = Container::getInstance()->make(RateLimiter::class);
+        $rateLimiter->for('test', fn () => [
+            Limit::perSecond(3),
+            Limit::perMinute(5),
+        ]);
+        Route::get('/', fn () => 'ok')->middleware(ThrottleRequests::using('test'));
+
+        Carbon::setTestNow('2000-01-01 00:00:00.000');
+
+        // Make 3 requests, each a 100ms apart, that should all be successful.
+
+        for ($i = 0; $i < 3; $i++) {
+            match ($i) {
+                0 => $this->assertSame('2000-01-01 00:00:00.000', now()->toDateTimeString('m')),
+                1 => $this->assertSame('2000-01-01 00:00:00.100', now()->toDateTimeString('m')),
+                2 => $this->assertSame('2000-01-01 00:00:00.200', now()->toDateTimeString('m')),
+            };
+
+            $response = $this->get('/');
+            $response->assertOk();
+            $response->assertContent('ok');
+
+            Carbon::setTestNow(now()->addMilliseconds(100));
+        }
+
+        // It is now 300 milliseconds past and we will make another request
+        // that should be rate limited.
+
+        $this->assertSame('2000-01-01 00:00:00.300', now()->toDateTimeString('m'));
+
+        $response = $this->get('/');
+        $response->assertStatus(429);
+        $response->assertHeader('Retry-After', 1);
+        $response->assertHeader('X-RateLimit-Reset', now()->addSecond()->timestamp);
+        $response->assertHeader('X-RateLimit-Limit', 3);
+        $response->assertHeader('X-RateLimit-Remaining', 0);
+
+        // We will now make it the very end of the second, to check boundaries,
+        // and make another request that should be rate limited and tell us to
+        // try again in 1 second.
+        Carbon::setTestNow('2000-01-01 00:00:00.999');
+
+        $response = $this->get('/');
+        $response->assertHeader('Retry-After', 1);
+        $response->assertHeader('X-RateLimit-Reset', now()->addSecond()->timestamp);
+        $response->assertHeader('X-RateLimit-Limit', 3);
+        $response->assertHeader('X-RateLimit-Remaining', 0);
+
+        // We now tick over into the next second. We should now be able to make
+        // another two requests before the per minute rate limit kicks in.
+        Carbon::setTestNow('2000-01-01 00:00:01.000');
+
+        for ($i = 0; $i < 2; $i++) {
+            match ($i) {
+                0 => $this->assertSame('2000-01-01 00:00:01.000', now()->toDateTimeString('m')),
+                1 => $this->assertSame('2000-01-01 00:00:01.100', now()->toDateTimeString('m')),
+            };
+
+            $response = $this->get('/');
+            $response->assertOk();
+            $response->assertContent('ok');
+
+            Carbon::setTestNow(now()->addMilliseconds(100));
+        }
+
+        // The per minute rate limiter should now fail.
+
+        $this->assertSame('2000-01-01 00:00:01.200', now()->toDateTimeString('m'));
+
+        $response = $this->get('/');
+        $response->assertStatus(429);
+        $response->assertHeader('Retry-After', 59);
+        $response->assertHeader('X-RateLimit-Reset', now()->addSeconds(59)->timestamp);
+        $response->assertHeader('X-RateLimit-Limit', 5);
+        $response->assertHeader('X-RateLimit-Remaining', 0);
+    }
+
     public function testItFailsIfNamedLimiterDoesNotExist()
     {
         $this->expectException(MissingRateLimiterException::class);

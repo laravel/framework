@@ -216,10 +216,14 @@ class Arr
     /**
      * Return the last element in an array passing a given truth test.
      *
-     * @param  array  $array
-     * @param  callable|null  $callback
-     * @param  mixed  $default
-     * @return mixed
+     * @template TKey
+     * @template TValue
+     * @template TLastDefault
+     *
+     * @param  iterable<TKey, TValue>  $array
+     * @param  (callable(TValue, TKey): bool)|null  $callback
+     * @param  TLastDefault|(\Closure(): TLastDefault)  $default
+     * @return TValue|TLastDefault
      */
     public static function last($array, ?callable $callback = null, $default = null)
     {
@@ -485,7 +489,7 @@ class Arr
      */
     public static function keyBy($array, $keyBy)
     {
-        return Collection::make($array)->keyBy($keyBy)->all();
+        return (new Collection($array))->keyBy($keyBy)->all();
     }
 
     /**
@@ -812,7 +816,7 @@ class Arr
      */
     public static function sort($array, $callback = null)
     {
-        return Collection::make($array)->sortBy($callback)->all();
+        return (new Collection($array))->sortBy($callback)->all();
     }
 
     /**
@@ -824,7 +828,7 @@ class Arr
      */
     public static function sortDesc($array, $callback = null)
     {
-        return Collection::make($array)->sortByDesc($callback)->all();
+        return (new Collection($array))->sortByDesc($callback)->all();
     }
 
     /**
@@ -924,6 +928,18 @@ class Arr
     public static function where($array, callable $callback)
     {
         return array_filter($array, $callback, ARRAY_FILTER_USE_BOTH);
+    }
+
+    /**
+     * Filter the array using the negation of the given callback.
+     *
+     * @param  array  $array
+     * @param  callable  $callback
+     * @return array
+     */
+    public static function reject($array, callable $callback)
+    {
+        return static::where($array, fn ($value, $key) => ! $callback($value, $key));
     }
 
     /**

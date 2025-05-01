@@ -2,10 +2,10 @@
 
 namespace Illuminate\Validation\Rules;
 
-use BackedEnum;
 use Illuminate\Contracts\Support\Arrayable;
 use Stringable;
-use UnitEnum;
+
+use function Illuminate\Support\enum_value;
 
 class ArrayRule implements Stringable
 {
@@ -43,11 +43,7 @@ class ArrayRule implements Stringable
         }
 
         $keys = array_map(
-            static fn ($key) => match (true) {
-                $key instanceof BackedEnum => $key->value,
-                $key instanceof UnitEnum => $key->name,
-                default => $key,
-            },
+            static fn ($key) => enum_value($key),
             $this->keys,
         );
 

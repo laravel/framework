@@ -130,4 +130,23 @@ class InvokedProcess implements InvokedProcessContract
             throw new ProcessTimedOutException($e, new ProcessResult($this->process));
         }
     }
+
+    /**
+     * Wait until the given callback returns true.
+     *
+     * @param  callable|null  $output
+     * @return \Illuminate\Process\ProcessResult
+     *
+     * @throws \Illuminate\Process\Exceptions\ProcessTimedOutException
+     */
+    public function waitUntil(?callable $output = null)
+    {
+        try {
+            $this->process->waitUntil($output);
+
+            return new ProcessResult($this->process);
+        } catch (SymfonyTimeoutException $e) {
+            throw new ProcessTimedOutException($e, new ProcessResult($this->process));
+        }
+    }
 }

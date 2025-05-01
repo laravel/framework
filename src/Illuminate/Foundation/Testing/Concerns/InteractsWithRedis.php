@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Testing\Concerns;
 
 use Exception;
+use Illuminate\Contracts\Redis\Factory as Redis;
 use Illuminate\Foundation\Application;
 use Illuminate\Redis\RedisManager;
 use Illuminate\Support\Env;
@@ -43,23 +44,49 @@ trait InteractsWithRedis
         $port = Env::get('REDIS_PORT', 6379);
 
         foreach (static::redisDriverProvider() as $driver) {
-            $this->redis[$driver[0]] = new RedisManager($app, $driver[0], [
-                'cluster' => false,
-                'options' => [
-                    'prefix' => 'test_',
-                ],
-                'default' => [
-                    'host' => $host,
-                    'port' => $port,
-                    'database' => 5,
-                    'timeout' => 0.5,
-                    'name' => 'default',
-                ],
-            ]);
+            if (Env::get('REDIS_CLUSTER_HOSTS_AND_PORTS')) {
+                $config = [
+                    'options' => [
+                        'cluster' => 'redis',
+                        'prefix' => 'test_',
+                    ],
+                    'clusters' => [
+                        'default' => array_map(
+                            static fn ($hostAndPort) => [
+                                'host' => explode(':', $hostAndPort)[0],
+                                'port' => explode(':', $hostAndPort)[1],
+                            ],
+                            explode(',', Env::get('REDIS_CLUSTER_HOSTS_AND_PORTS')),
+                        ),
+                    ],
+                ];
+            } else {
+                $config = [
+                    'options' => [
+                        'prefix' => 'test_',
+                    ],
+                    'default' => [
+                        'host' => $host,
+                        'port' => $port,
+                        'database' => 5,
+                        'timeout' => 0.5,
+                        'name' => 'default',
+                    ],
+                    'cache' => [
+                        'host' => $host,
+                        'port' => $port,
+                        'database' => 6,
+                        'timeout' => 0.5,
+                    ],
+                ];
+            }
+            $this->redis[$driver[0]] = new RedisManager($app, $driver[0], $config);
         }
 
+        $defaultDriver = Env::get('REDIS_CLIENT', 'phpredis');
+
         try {
-            $this->redis['phpredis']->connection()->flushdb();
+            $this->redis[$defaultDriver]->connection()->flushdb();
         } catch (Exception) {
             if ($host === '127.0.0.1' && $port === 6379 && Env::get('REDIS_HOST') === null) {
                 static::$connectionFailedOnceWithDefaultsSkip = true;
@@ -67,6 +94,8 @@ trait InteractsWithRedis
                 $this->markTestSkipped('Trying default host/port failed, please set environment variable REDIS_HOST & REDIS_PORT to enable '.__CLASS__);
             }
         }
+
+        $app->instance('redis', $this->redis[$defaultDriver]);
     }
 
     /**

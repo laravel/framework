@@ -120,8 +120,28 @@ class MailManager implements FactoryContract
         // Once we have created the mailer instance we will set a container instance
         // on the mailer. This allows us to resolve mailer classes via containers
         // for maximum testability on said classes instead of passing Closures.
+        $mailer = $this->build(['name' => $name, ...$config]);
+
+        // Next we will set all of the global addresses on this mailer, which allows
+        // for easy unification of all "from" addresses as well as easy debugging
+        // of sent messages since these will be sent to a single email address.
+        foreach (['from', 'reply_to', 'to', 'return_path'] as $type) {
+            $this->setGlobalAddress($mailer, $config, $type);
+        }
+
+        return $mailer;
+    }
+
+    /**
+     * Build a new mailer instance.
+     *
+     * @param  array  $config
+     * @return \Illuminate\Mail\Mailer
+     */
+    public function build($config)
+    {
         $mailer = new Mailer(
-            $name,
+            $config['name'] ?? 'ondemand',
             $this->app['view'],
             $this->createSymfonyTransport($config),
             $this->app['events']
@@ -129,13 +149,6 @@ class MailManager implements FactoryContract
 
         if ($this->app->bound('queue')) {
             $mailer->setQueue($this->app['queue']);
-        }
-
-        // Next we will set all of the global addresses on this mailer, which allows
-        // for easy unification of all "from" addresses as well as easy debugging
-        // of sent messages since these will be sent to a single email address.
-        foreach (['from', 'reply_to', 'to', 'return_path'] as $type) {
-            $this->setGlobalAddress($mailer, $config, $type);
         }
 
         return $mailer;
@@ -181,9 +194,7 @@ class MailManager implements FactoryContract
         $scheme = $config['scheme'] ?? null;
 
         if (! $scheme) {
-            $scheme = ! empty($config['encryption']) && $config['encryption'] === 'tls'
-                ? (($config['port'] == 465) ? 'smtps' : 'smtp')
-                : '';
+            $scheme = ($config['port'] == 465) ? 'smtps' : 'smtp';
         }
 
         $transport = $factory->create(new Dsn(
@@ -288,7 +299,11 @@ class MailManager implements FactoryContract
     protected function addSesCredentials(array $config)
     {
         if (! empty($config['key']) && ! empty($config['secret'])) {
-            $config['credentials'] = Arr::only($config, ['key', 'secret', 'token']);
+            $config['credentials'] = Arr::only($config, ['key', 'secret']);
+
+            if (! empty($config['token'])) {
+                $config['credentials']['token'] = $config['token'];
+            }
         }
 
         return Arr::except($config, ['token']);

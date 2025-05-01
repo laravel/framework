@@ -13,6 +13,7 @@ use Illuminate\Queue\Worker;
 use Illuminate\Queue\WorkerOptions;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\InteractsWithTime;
+use Illuminate\Support\Stringable;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Terminal;
 use Throwable;
@@ -77,6 +78,13 @@ class WorkCommand extends Command
     protected $latestStartedAt;
 
     /**
+     * Indicates if the worker's event listeners have been registered.
+     *
+     * @var bool
+     */
+    private static $hasRegisteredListeners = false;
+
+    /**
      * Create a new queue work command.
      *
      * @param  \Illuminate\Queue\Worker  $worker
@@ -117,7 +125,7 @@ class WorkCommand extends Command
 
         if (! $this->outputUsingJson() && Terminal::hasSttyAvailable()) {
             $this->components->info(
-                sprintf('Processing jobs from the [%s] %s.', $queue, str('queue')->plural(explode(',', $queue)))
+                sprintf('Processing jobs from the [%s] %s.', $queue, (new Stringable('queue'))->plural(explode(',', $queue)))
             );
         }
 
@@ -172,6 +180,10 @@ class WorkCommand extends Command
      */
     protected function listenForEvents()
     {
+        if (static::$hasRegisteredListeners) {
+            return;
+        }
+
         $this->laravel['events']->listen(JobProcessing::class, function ($event) {
             $this->writeOutput($event->job, 'starting');
         });
@@ -189,6 +201,8 @@ class WorkCommand extends Command
 
             $this->logFailedJob($event);
         });
+
+        static::$hasRegisteredListeners = true;
     }
 
     /**
@@ -199,7 +213,7 @@ class WorkCommand extends Command
      * @param  Throwable|null  $exception
      * @return void
      */
-    protected function writeOutput(Job $job, $status, Throwable $exception = null)
+    protected function writeOutput(Job $job, $status, ?Throwable $exception = null)
     {
         $this->outputUsingJson()
             ? $this->writeOutputAsJson($job, $status, $exception)
@@ -260,7 +274,7 @@ class WorkCommand extends Command
      * @param  Throwable|null  $exception
      * @return void
      */
-    protected function writeOutputAsJson(Job $job, $status, Throwable $exception = null)
+    protected function writeOutputAsJson(Job $job, $status, ?Throwable $exception = null)
     {
         $log = array_filter([
             'level' => $status === 'starting' || $status === 'success' ? 'info' : 'warning',
@@ -359,5 +373,15 @@ class WorkCommand extends Command
         }
 
         return $this->option('json');
+    }
+
+    /**
+     * Reset static variables.
+     *
+     * @return void
+     */
+    public static function flushState()
+    {
+        static::$hasRegisteredListeners = false;
     }
 }

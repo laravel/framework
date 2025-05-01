@@ -5,6 +5,8 @@ namespace Illuminate\Support;
 use ArrayAccess;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Support\Traits\InteractsWithData;
+use Illuminate\Support\Traits\Macroable;
 use JsonSerializable;
 
 /**
@@ -16,6 +18,10 @@ use JsonSerializable;
  */
 class Fluent implements Arrayable, ArrayAccess, Jsonable, JsonSerializable
 {
+    use InteractsWithData, Macroable {
+        __call as macroCall;
+    }
+
     /**
      * All of the attributes set on the fluent instance.
      *
@@ -31,9 +37,7 @@ class Fluent implements Arrayable, ArrayAccess, Jsonable, JsonSerializable
      */
     public function __construct($attributes = [])
     {
-        foreach ($attributes as $key => $value) {
-            $this->attributes[$key] = $value;
-        }
+        $this->fill($attributes);
     }
 
     /**
@@ -48,6 +52,35 @@ class Fluent implements Arrayable, ArrayAccess, Jsonable, JsonSerializable
     public function get($key, $default = null)
     {
         return data_get($this->attributes, $key, $default);
+    }
+
+    /**
+     * Set an attribute on the fluent instance using "dot" notation.
+     *
+     * @param  TKey  $key
+     * @param  TValue  $value
+     * @return $this
+     */
+    public function set($key, $value)
+    {
+        data_set($this->attributes, $key, $value);
+
+        return $this;
+    }
+
+    /**
+     * Fill the fluent instance with an array of attributes.
+     *
+     * @param  iterable<TKey, TValue>  $attributes
+     * @return $this
+     */
+    public function fill($attributes)
+    {
+        foreach ($attributes as $key => $value) {
+            $this->attributes[$key] = $value;
+        }
+
+        return $this;
     }
 
     /**
@@ -81,6 +114,41 @@ class Fluent implements Arrayable, ArrayAccess, Jsonable, JsonSerializable
     }
 
     /**
+     * Get all of the attributes from the fluent instance.
+     *
+     * @param  array|mixed|null  $keys
+     * @return array
+     */
+    public function all($keys = null)
+    {
+        $data = $this->data();
+
+        if (! $keys) {
+            return $data;
+        }
+
+        $results = [];
+
+        foreach (is_array($keys) ? $keys : func_get_args() as $key) {
+            Arr::set($results, $key, Arr::get($data, $key));
+        }
+
+        return $results;
+    }
+
+    /**
+     * Get data from the fluent instance.
+     *
+     * @param  string  $key
+     * @param  mixed  $default
+     * @return mixed
+     */
+    protected function data($key = null, $default = null)
+    {
+        return $this->get($key, $default);
+    }
+
+    /**
      * Get the attributes from the fluent instance.
      *
      * @return array<TKey, TValue>
@@ -98,17 +166,6 @@ class Fluent implements Arrayable, ArrayAccess, Jsonable, JsonSerializable
     public function toArray()
     {
         return $this->attributes;
-    }
-
-    /**
-     * Convert the fluent instance to a Collection.
-     *
-     * @param  string|null  $key
-     * @return \Illuminate\Support\Collection
-     */
-    public function collect($key = null)
-    {
-        return new Collection($this->get($key));
     }
 
     /**
@@ -186,6 +243,10 @@ class Fluent implements Arrayable, ArrayAccess, Jsonable, JsonSerializable
      */
     public function __call($method, $parameters)
     {
+        if (static::hasMacro($method)) {
+            return $this->macroCall($method, $parameters);
+        }
+
         $this->attributes[$method] = count($parameters) > 0 ? reset($parameters) : true;
 
         return $this;

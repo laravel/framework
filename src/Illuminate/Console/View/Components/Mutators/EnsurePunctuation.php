@@ -2,6 +2,8 @@
 
 namespace Illuminate\Console\View\Components\Mutators;
 
+use Illuminate\Support\Stringable;
+
 class EnsurePunctuation
 {
     /**
@@ -12,7 +14,7 @@ class EnsurePunctuation
      */
     public function __invoke($string)
     {
-        if (! str($string)->endsWith(['.', '?', '!', ':'])) {
+        if (! (new Stringable($string))->endsWith(['.', '?', '!', ':'])) {
             return "$string.";
         }
 

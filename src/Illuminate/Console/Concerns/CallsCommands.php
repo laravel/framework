@@ -2,6 +2,7 @@
 
 namespace Illuminate\Console\Concerns;
 
+use Illuminate\Support\Collection;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -53,7 +54,7 @@ trait CallsCommands
     }
 
     /**
-     * Run the given the console command.
+     * Run the given console command.
      *
      * @param  \Symfony\Component\Console\Command\Command|string  $command
      * @param  array  $arguments
@@ -95,14 +96,16 @@ trait CallsCommands
      */
     protected function context()
     {
-        return collect($this->option())->only([
-            'ansi',
-            'no-ansi',
-            'no-interaction',
-            'quiet',
-            'verbose',
-        ])->filter()->mapWithKeys(function ($value, $key) {
-            return ["--{$key}" => $value];
-        })->all();
+        return (new Collection($this->option()))
+            ->only([
+                'ansi',
+                'no-ansi',
+                'no-interaction',
+                'quiet',
+                'verbose',
+            ])
+            ->filter()
+            ->mapWithKeys(fn ($value, $key) => ["--{$key}" => $value])
+            ->all();
     }
 }

@@ -27,7 +27,7 @@ class Collection extends BaseCollection implements QueueableCollection
      *
      * @param  mixed  $key
      * @param  TFindDefault  $default
-     * @return static<TKey, TModel>|TModel|TFindDefault
+     * @return ($key is (\Illuminate\Contracts\Support\Arrayable<array-key, mixed>|array<mixed>) ? static : TModel|TFindDefault)
      */
     public function find($key, $default = null)
     {
@@ -271,7 +271,7 @@ class Collection extends BaseCollection implements QueueableCollection
             return;
         }
 
-        $models = $models->pluck($name)->whereNotNull();
+        $models = $models->pluck($name)->filter();
 
         if ($models->first() instanceof BaseCollection) {
             $models = $models->collapse();
@@ -333,6 +333,19 @@ class Collection extends BaseCollection implements QueueableCollection
         }
 
         return parent::contains(fn ($model) => $model->getKey() == $key);
+    }
+
+    /**
+     * Determine if a key does not exist in the collection.
+     *
+     * @param  (callable(TModel, TKey): bool)|TModel|string|int  $key
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function doesntContain($key, $operator = null, $value = null)
+    {
+        return ! $this->contains(...func_get_args());
     }
 
     /**
@@ -470,7 +483,7 @@ class Collection extends BaseCollection implements QueueableCollection
      *
      * @param  (callable(TModel, TKey): mixed)|string|null  $key
      * @param  bool  $strict
-     * @return static<int, TModel>
+     * @return static
      */
     public function unique($key = null, $strict = false)
     {
@@ -485,7 +498,7 @@ class Collection extends BaseCollection implements QueueableCollection
      * Returns only the models from the collection with the specified keys.
      *
      * @param  array<array-key, mixed>|null  $keys
-     * @return static<int, TModel>
+     * @return static
      */
     public function only($keys)
     {
@@ -502,7 +515,7 @@ class Collection extends BaseCollection implements QueueableCollection
      * Returns all models in the collection except the models with specified keys.
      *
      * @param  array<array-key, mixed>|null  $keys
-     * @return static<int, TModel>
+     * @return static
      */
     public function except($keys)
     {

@@ -84,7 +84,7 @@ class MySqlProcessor extends Processor
 
             return [
                 'name' => $name = strtolower($result->name),
-                'columns' => explode(',', $result->columns),
+                'columns' => $result->columns ? explode(',', $result->columns) : [],
                 'type' => strtolower($result->type),
                 'unique' => (bool) $result->unique,
                 'primary' => $name === 'primary',

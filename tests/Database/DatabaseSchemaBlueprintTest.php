@@ -10,6 +10,7 @@ use Illuminate\Database\Schema\Grammars\MySqlGrammar;
 use Illuminate\Database\Schema\Grammars\PostgresGrammar;
 use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
 use Illuminate\Database\Schema\Grammars\SqlServerGrammar;
+use Illuminate\Tests\Database\Fixtures\Models\User;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -404,12 +405,10 @@ class DatabaseSchemaBlueprintTest extends TestCase
         ], $blueprint->toSql($connection, new MySqlGrammar));
     }
 
-    public function testGenerateRelationshipColumnWithUuidModel()
+    public function testGenerateRelationshipColumnWithNonIncrementalModel()
     {
-        require_once __DIR__.'/stubs/EloquentModelUuidStub.php';
-
         $base = new Blueprint('posts', function ($table) {
-            $table->foreignIdFor('EloquentModelUuidStub');
+            $table->foreignIdFor(Fixtures\Models\EloquentModelUsingNonIncrementedInt::class);
         });
 
         $connection = m::mock(Connection::class);
@@ -417,16 +416,29 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $blueprint = clone $base;
 
         $this->assertEquals([
-            'alter table `posts` add `eloquent_model_uuid_stub_id` char(36) not null',
+            'alter table `posts` add `model_using_non_incremented_int_id` bigint unsigned not null',
+        ], $blueprint->toSql($connection, new MySqlGrammar));
+    }
+
+    public function testGenerateRelationshipColumnWithUuidModel()
+    {
+        $base = new Blueprint('posts', function ($table) {
+            $table->foreignIdFor(Fixtures\Models\EloquentModelUsingUuid::class);
+        });
+
+        $connection = m::mock(Connection::class);
+
+        $blueprint = clone $base;
+
+        $this->assertEquals([
+            'alter table `posts` add `model_using_uuid_id` char(36) not null',
         ], $blueprint->toSql($connection, new MySqlGrammar));
     }
 
     public function testGenerateRelationshipColumnWithUlidModel()
     {
-        require_once __DIR__.'/stubs/EloquentModelUlidStub.php';
-
         $base = new Blueprint('posts', function (Blueprint $table) {
-            $table->foreignIdFor('EloquentModelUlidStub');
+            $table->foreignIdFor(Fixtures\Models\EloquentModelUsingUlid::class);
         });
 
         $connection = m::mock(Connection::class);
@@ -434,14 +446,46 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $blueprint = clone $base;
 
         $this->assertEquals([
-            'alter table "posts" add column "eloquent_model_ulid_stub_id" char(26) not null',
+            'alter table "posts" add column "model_using_ulid_id" char(26) not null',
         ], $blueprint->toSql($connection, new PostgresGrammar));
 
         $blueprint = clone $base;
 
         $this->assertEquals([
-            'alter table `posts` add `eloquent_model_ulid_stub_id` char(26) not null',
+            'alter table `posts` add `model_using_ulid_id` char(26) not null',
         ], $blueprint->toSql($connection, new MySqlGrammar()));
+    }
+
+    public function testGenerateRelationshipConstrainedColumn()
+    {
+        $base = new Blueprint('posts', function ($table) {
+            $table->foreignIdFor('Illuminate\Foundation\Auth\User')->constrained();
+        });
+
+        $connection = m::mock(Connection::class);
+
+        $blueprint = clone $base;
+
+        $this->assertEquals([
+            'alter table `posts` add `user_id` bigint unsigned not null',
+            'alter table `posts` add constraint `posts_user_id_foreign` foreign key (`user_id`) references `users` (`id`)',
+        ], $blueprint->toSql($connection, new MySqlGrammar));
+    }
+
+    public function testGenerateRelationshipForModelWithNonStandardPrimaryKeyName()
+    {
+        $base = new Blueprint('posts', function ($table) {
+            $table->foreignIdFor(User::class)->constrained();
+        });
+
+        $connection = m::mock(Connection::class);
+
+        $blueprint = clone $base;
+
+        $this->assertEquals([
+            'alter table `posts` add `user_internal_id` bigint unsigned not null',
+            'alter table `posts` add constraint `posts_user_internal_id_foreign` foreign key (`user_internal_id`) references `users` (`internal_id`)',
+        ], $blueprint->toSql($connection, new MySqlGrammar));
     }
 
     public function testDropRelationshipColumnWithIncrementalModel()
@@ -461,10 +505,8 @@ class DatabaseSchemaBlueprintTest extends TestCase
 
     public function testDropRelationshipColumnWithUuidModel()
     {
-        require_once __DIR__.'/stubs/EloquentModelUuidStub.php';
-
         $base = new Blueprint('posts', function ($table) {
-            $table->dropForeignIdFor('EloquentModelUuidStub');
+            $table->dropForeignIdFor(Fixtures\Models\EloquentModelUsingUuid::class);
         });
 
         $connection = m::mock(Connection::class);
@@ -472,7 +514,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $blueprint = clone $base;
 
         $this->assertEquals([
-            'alter table `posts` drop foreign key `posts_eloquent_model_uuid_stub_id_foreign`',
+            'alter table `posts` drop foreign key `posts_model_using_uuid_id_foreign`',
         ], $blueprint->toSql($connection, new MySqlGrammar));
     }
 
@@ -494,10 +536,8 @@ class DatabaseSchemaBlueprintTest extends TestCase
 
     public function testDropConstrainedRelationshipColumnWithUuidModel()
     {
-        require_once __DIR__.'/stubs/EloquentModelUuidStub.php';
-
         $base = new Blueprint('posts', function ($table) {
-            $table->dropConstrainedForeignIdFor('EloquentModelUuidStub');
+            $table->dropConstrainedForeignIdFor(Fixtures\Models\EloquentModelUsingUuid::class);
         });
 
         $connection = m::mock(Connection::class);
@@ -505,8 +545,8 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $blueprint = clone $base;
 
         $this->assertEquals([
-            'alter table `posts` drop foreign key `posts_eloquent_model_uuid_stub_id_foreign`',
-            'alter table `posts` drop `eloquent_model_uuid_stub_id`',
+            'alter table `posts` drop foreign key `posts_model_using_uuid_id_foreign`',
+            'alter table `posts` drop `model_using_uuid_id`',
         ], $blueprint->toSql($connection, new MySqlGrammar));
     }
 
@@ -567,6 +607,36 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $blueprint = clone $base;
         $this->assertEquals([
             'alter table "posts" add "note" nvarchar(255) null',
+        ], $blueprint->toSql($connection, new SqlServerGrammar));
+    }
+
+    public function testRawColumn()
+    {
+        $base = new Blueprint('posts', function ($table) {
+            $table->rawColumn('legacy_boolean', 'INT(1)')->nullable();
+        });
+
+        $connection = m::mock(Connection::class);
+
+        $blueprint = clone $base;
+        $this->assertEquals([
+            'alter table `posts` add `legacy_boolean` INT(1) null',
+        ], $blueprint->toSql($connection, new MySqlGrammar));
+
+        $blueprint = clone $base;
+        $connection->shouldReceive('getServerVersion')->andReturn('3.35');
+        $this->assertEquals([
+            'alter table "posts" add column "legacy_boolean" INT(1)',
+        ], $blueprint->toSql($connection, new SQLiteGrammar));
+
+        $blueprint = clone $base;
+        $this->assertEquals([
+            'alter table "posts" add column "legacy_boolean" INT(1) null',
+        ], $blueprint->toSql($connection, new PostgresGrammar));
+
+        $blueprint = clone $base;
+        $this->assertEquals([
+            'alter table "posts" add "legacy_boolean" INT(1) null',
         ], $blueprint->toSql($connection, new SqlServerGrammar));
     }
 

@@ -789,6 +789,44 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $this->assertSame('mohamed', $post->tags[1]->pivot->flag);
     }
 
+    public function testSyncMethodWithModels()
+    {
+        $post = Post::create(['title' => Str::random()]);
+
+        $tag = Tag::create(['name' => Str::random()]);
+        $tag2 = Tag::create(['name' => Str::random()]);
+        $tag3 = Tag::create(['name' => Str::random()]);
+        $tag4 = Tag::create(['name' => Str::random()]);
+
+        // Test syncing with an array of models
+        $post->tags()->sync([$tag, $tag2]);
+
+        $this->assertEquals(
+            Tag::whereIn('id', [$tag->id, $tag2->id])->pluck('name'),
+            $post->load('tags')->tags->pluck('name')
+        );
+
+        // Test syncing with a BaseCollection of models
+        $tagCollection = collect([$tag3, $tag4]);
+
+        $post->tags()->sync($tagCollection);
+
+        $this->assertEquals(
+            Tag::whereIn('id', [$tag3->id, $tag4->id])->pluck('name'),
+            $post->load('tags')->tags->pluck('name')
+        );
+
+        // Test syncing with EloquentCollection of models
+        $tagCollection = Tag::limit(2)->get();
+
+        $post->tags()->sync($tagCollection);
+
+        $this->assertEquals(
+            Tag::whereIn('id', [$tag->id, $tag2->id])->pluck('name'),
+            $post->load('tags')->tags->pluck('name')
+        );
+    }
+
     public function testSyncWithoutDetachingMethod()
     {
         $post = Post::create(['title' => Str::random()]);

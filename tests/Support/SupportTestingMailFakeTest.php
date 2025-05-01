@@ -396,7 +396,7 @@ class MailableStub extends Mailable
     public function build()
     {
         $this->with('first_name', 'Taylor')
-             ->withLastName('Otwell');
+            ->withLastName('Otwell');
     }
 }
 
@@ -414,7 +414,7 @@ class QueueableMailableStub extends Mailable implements ShouldQueue
     public function build()
     {
         $this->with('first_name', 'Taylor')
-             ->withLastName('Otwell');
+            ->withLastName('Otwell');
     }
 }
 

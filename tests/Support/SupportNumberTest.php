@@ -107,6 +107,14 @@ class SupportNumberTest extends TestCase
     }
 
     #[RequiresPhpExtension('intl')]
+    public function testSpellOrdinal()
+    {
+        $this->assertSame('first', Number::spellOrdinal(1));
+        $this->assertSame('second', Number::spellOrdinal(2));
+        $this->assertSame('third', Number::spellOrdinal(3));
+    }
+
+    #[RequiresPhpExtension('intl')]
     public function testToPercent()
     {
         $this->assertSame('0%', Number::percentage(0, precision: 0));
@@ -143,6 +151,10 @@ class SupportNumberTest extends TestCase
         $this->assertSame('-$5.00', Number::currency(-5));
         $this->assertSame('$5.00', Number::currency(5.00));
         $this->assertSame('$5.32', Number::currency(5.325));
+
+        $this->assertSame('$0', Number::currency(0, precision: 0));
+        $this->assertSame('$5', Number::currency(5.00, precision: 0));
+        $this->assertSame('$10', Number::currency(10.252, precision: 0));
     }
 
     #[RequiresPhpExtension('intl')]

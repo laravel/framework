@@ -149,15 +149,15 @@ class InteractsWithDatabaseTest extends TestCase
 
         $connection->shouldReceive('getQueryGrammar')->andReturn($grammar);
 
+        $connection->shouldReceive('raw')->andReturnUsing(function ($value) {
+            return new Expression($value);
+        });
+
         $connection->shouldReceive('getPdo->quote')->andReturnUsing(function ($value) {
             return "'".$value."'";
         });
 
-        DB::shouldReceive('connection')->andReturn($connection);
-
-        DB::shouldReceive('raw')->andReturnUsing(function ($value) {
-            return new Expression($value);
-        });
+        DB::shouldReceive('connection')->with(null)->andReturn($connection);
 
         $instance = new class
         {

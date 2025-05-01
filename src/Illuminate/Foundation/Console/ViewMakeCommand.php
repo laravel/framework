@@ -7,6 +7,7 @@ use Illuminate\Console\GeneratorCommand;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
+use Illuminate\Support\Stringable;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -77,7 +78,7 @@ class ViewMakeCommand extends GeneratorCommand
     {
         $name = trim($this->argument('name'));
 
-        $name = str_replace(['\\', '.'], '/', $this->argument('name'));
+        $name = str_replace(['\\', '.'], '/', $name);
 
         return $name;
     }
@@ -184,15 +185,15 @@ class ViewMakeCommand extends GeneratorCommand
         $name = Str::of(Str::lower($this->getNameInput()))->replace('.'.$this->option('extension'), '');
 
         $namespacedName = Str::of(
-            Str::of($name)
+            (new Stringable($name))
                 ->replace('/', ' ')
                 ->explode(' ')
-                ->map(fn ($part) => Str::of($part)->ucfirst())
+                ->map(fn ($part) => (new Stringable($part))->ucfirst())
                 ->implode('\\')
         )
             ->replace(['-', '_'], ' ')
             ->explode(' ')
-            ->map(fn ($part) => Str::of($part)->ucfirst())
+            ->map(fn ($part) => (new Stringable($part))->ucfirst())
             ->implode('');
 
         return 'Tests\\Feature\\View\\'.$namespacedName;

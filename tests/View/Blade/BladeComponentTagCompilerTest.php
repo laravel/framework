@@ -21,7 +21,10 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $result = $this->compiler()->compileSlots('<x-slot name="foo">
 </x-slot>');
 
-        $this->assertSame("@slot('foo', null, []) \n".' @endslot', trim($result));
+        $this->assertSame(
+            "@slot('foo', null, []) \n".' @endslot',
+            str_replace("\r\n", "\n", trim($result))
+        );
     }
 
     public function testInlineSlotsCanBeCompiled()
@@ -30,7 +33,10 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $result = $this->compiler()->compileSlots('<x-slot:foo>
 </x-slot>');
 
-        $this->assertSame("@slot('foo', null, []) \n".' @endslot', trim($result));
+        $this->assertSame(
+            "@slot('foo', null, []) \n".' @endslot',
+            str_replace("\r\n", "\n", trim($result))
+        );
     }
 
     public function testDynamicSlotsCanBeCompiled()
@@ -39,7 +45,10 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $result = $this->compiler()->compileSlots('<x-slot :name="$foo">
 </x-slot>');
 
-        $this->assertSame("@slot(\$foo, null, []) \n".' @endslot', trim($result));
+        $this->assertSame(
+            "@slot(\$foo, null, []) \n".' @endslot',
+            str_replace("\r\n", "\n", trim($result))
+        );
     }
 
     public function testDynamicSlotsCanBeCompiledWithKeyOfObjects()
@@ -48,7 +57,10 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $result = $this->compiler()->compileSlots('<x-slot :name="$foo->name">
 </x-slot>');
 
-        $this->assertSame("@slot(\$foo->name, null, []) \n".' @endslot', trim($result));
+        $this->assertSame(
+            "@slot(\$foo->name, null, []) \n".' @endslot',
+            str_replace("\r\n", "\n", trim($result))
+        );
     }
 
     public function testSlotsWithAttributesCanBeCompiled()
@@ -57,7 +69,10 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $result = $this->compiler()->compileSlots('<x-slot name="foo" class="font-bold">
 </x-slot>');
 
-        $this->assertSame("@slot('foo', null, ['class' => 'font-bold']) \n".' @endslot', trim($result));
+        $this->assertSame(
+            "@slot('foo', null, ['class' => 'font-bold']) \n".' @endslot',
+            str_replace("\r\n", "\n", trim($result))
+        );
     }
 
     public function testInlineSlotsWithAttributesCanBeCompiled()
@@ -66,7 +81,10 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $result = $this->compiler()->compileSlots('<x-slot:foo class="font-bold">
 </x-slot>');
 
-        $this->assertSame("@slot('foo', null, ['class' => 'font-bold']) \n".' @endslot', trim($result));
+        $this->assertSame(
+            "@slot('foo', null, ['class' => 'font-bold']) \n".' @endslot',
+            str_replace("\r\n", "\n", trim($result))
+        );
     }
 
     public function testSlotsWithDynamicAttributesCanBeCompiled()
@@ -75,7 +93,10 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $result = $this->compiler()->compileSlots('<x-slot name="foo" :class="$classes">
 </x-slot>');
 
-        $this->assertSame("@slot('foo', null, ['class' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(\$classes)]) \n".' @endslot', trim($result));
+        $this->assertSame(
+            "@slot('foo', null, ['class' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(\$classes)]) \n".' @endslot',
+            str_replace("\r\n", "\n", trim($result))
+        );
     }
 
     public function testSlotsWithClassDirectiveCanBeCompiled()
@@ -84,7 +105,10 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $result = $this->compiler()->compileSlots('<x-slot name="foo" @class($classes)>
 </x-slot>');
 
-        $this->assertSame("@slot('foo', null, ['class' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(\Illuminate\Support\Arr::toCssClasses(\$classes))]) \n".' @endslot', trim($result));
+        $this->assertSame(
+            "@slot('foo', null, ['class' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(\Illuminate\Support\Arr::toCssClasses(\$classes))]) \n".' @endslot',
+            str_replace("\r\n", "\n", trim($result))
+        );
     }
 
     public function testSlotsWithStyleDirectiveCanBeCompiled()
@@ -93,7 +117,10 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $result = $this->compiler()->compileSlots('<x-slot name="foo" @style($styles)>
 </x-slot>');
 
-        $this->assertSame("@slot('foo', null, ['style' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(\Illuminate\Support\Arr::toCssStyles(\$styles))]) \n".' @endslot', trim($result));
+        $this->assertSame(
+            "@slot('foo', null, ['style' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(\Illuminate\Support\Arr::toCssStyles(\$styles))]) \n".' @endslot',
+            str_replace("\r\n", "\n", trim($result))
+        );
     }
 
     public function testBasicComponentParsing()
@@ -113,6 +140,24 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 <?php endif; ?>
 <?php \$component->withAttributes([]); ?>\n".
 '@endComponentClass##END-COMPONENT-CLASS##</div>', trim($result));
+    }
+
+    public function testNestedDefaultComponentParsing()
+    {
+        $container = new Container;
+        $container->instance(Application::class, $app = m::mock(Application::class));
+        $container->instance(Factory::class, $factory = m::mock(Factory::class));
+        $app->shouldReceive('getNamespace')->once()->andReturn('App\\');
+        Container::setInstance($container);
+
+        $result = $this->compiler()->compileTags('<div><x-card /></div>');
+
+        $this->assertSame("<div>##BEGIN-COMPONENT-CLASS##@component('App\View\Components\Card\Card', 'card', [])
+<?php if (isset(\$attributes) && \$attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php \$attributes = \$attributes->except(\App\View\Components\Card\Card::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php \$component->withAttributes([]); ?>\n".
+            '@endComponentClass##END-COMPONENT-CLASS##</div>', trim($result));
     }
 
     public function testBasicComponentWithEmptyAttributesParsing()
@@ -501,6 +546,25 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 '@endComponentClass##END-COMPONENT-CLASS##', trim($result));
     }
 
+    public function testClasslessComponentsWithComponentView()
+    {
+        $container = new Container;
+        $container->instance(Application::class, $app = m::mock(Application::class));
+        $container->instance(Factory::class, $factory = m::mock(Factory::class));
+        $app->shouldReceive('getNamespace')->andReturn('App\\');
+        $factory->shouldReceive('exists')->andReturn(false, false, true);
+        Container::setInstance($container);
+
+        $result = $this->compiler()->compileTags('<x-anonymous-component :name="\'Taylor\'" :age="31" wire:model="foo" />');
+
+        $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\View\AnonymousComponent', 'anonymous-component', ['view' => 'components.anonymous-component.anonymous-component','data' => ['name' => 'Taylor','age' => 31,'wire:model' => 'foo']])
+<?php if (isset(\$attributes) && \$attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php \$attributes = \$attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php \$component->withAttributes(['name' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute('Taylor'),'age' => 31,'wire:model' => 'foo']); ?>\n".
+            '@endComponentClass##END-COMPONENT-CLASS##', trim($result));
+    }
+
     public function testPackagesClasslessComponents()
     {
         $container = new Container;
@@ -528,7 +592,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $container->instance(Factory::class, $factory = m::mock(Factory::class));
 
         $app->shouldReceive('getNamespace')->once()->andReturn('App\\');
-        $factory->shouldReceive('exists')->times(3)->andReturnUsing(function ($arg) {
+        $factory->shouldReceive('exists')->times(4)->andReturnUsing(function ($arg) {
             // In our test, we'll do as if the 'public.frontend.anonymous-component'
             // view exists and not the others.
             return $arg === 'public.frontend.anonymous-component';
@@ -562,7 +626,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $container->instance(Factory::class, $factory = m::mock(Factory::class));
 
         $app->shouldReceive('getNamespace')->once()->andReturn('App\\');
-        $factory->shouldReceive('exists')->times(4)->andReturnUsing(function (string $viewNameBeingCheckedForExistence) {
+        $factory->shouldReceive('exists')->times(5)->andReturnUsing(function (string $viewNameBeingCheckedForExistence) {
             // In our test, we'll do as if the 'public.frontend.anonymous-component'
             // view exists and not the others.
             return $viewNameBeingCheckedForExistence === 'admin.auth.components.anonymous-component.index';
@@ -581,6 +645,40 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $result = $compiler->compileTags('<x-admin.auth::anonymous-component :name="\'Taylor\'" :age="31" wire:model="foo" />');
 
         $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\View\AnonymousComponent', 'admin.auth::anonymous-component', ['view' => 'admin.auth.components.anonymous-component.index','data' => ['name' => 'Taylor','age' => 31,'wire:model' => 'foo']])
+<?php if (isset(\$attributes) && \$attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php \$attributes = \$attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php \$component->withAttributes(['name' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute('Taylor'),'age' => 31,'wire:model' => 'foo']); ?>\n".
+            '@endComponentClass##END-COMPONENT-CLASS##', trim($result));
+    }
+
+    public function testClasslessComponentsWithAnonymousComponentNamespaceWithComponentView()
+    {
+        $container = new Container;
+
+        $container->instance(Application::class, $app = m::mock(Application::class));
+        $container->instance(Factory::class, $factory = m::mock(Factory::class));
+
+        $app->shouldReceive('getNamespace')->once()->andReturn('App\\');
+        $factory->shouldReceive('exists')->times(6)->andReturnUsing(function (string $viewNameBeingCheckedForExistence) {
+            // In our test, we'll do as if the 'public.frontend.anonymous-component'
+            // view exists and not the others.
+            return $viewNameBeingCheckedForExistence === 'admin.auth.components.anonymous-component.anonymous-component';
+        });
+
+        Container::setInstance($container);
+
+        $blade = m::mock(BladeCompiler::class)->makePartial();
+
+        $blade->shouldReceive('getAnonymousComponentNamespaces')->once()->andReturn([
+            'admin.auth' => 'admin.auth.components',
+        ]);
+
+        $compiler = $this->compiler([], [], $blade);
+
+        $result = $compiler->compileTags('<x-admin.auth::anonymous-component :name="\'Taylor\'" :age="31" wire:model="foo" />');
+
+        $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\View\AnonymousComponent', 'admin.auth::anonymous-component', ['view' => 'admin.auth.components.anonymous-component.anonymous-component','data' => ['name' => 'Taylor','age' => 31,'wire:model' => 'foo']])
 <?php if (isset(\$attributes) && \$attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php \$attributes = \$attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
@@ -614,6 +712,39 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $result = $compiler->compileTags('<x-panel />');
 
         $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\View\AnonymousComponent', 'panel', ['view' => '".md5('test-directory')."::panel.index','data' => []])
+<?php if (isset(\$attributes) && \$attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php \$attributes = \$attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php \$component->withAttributes([]); ?>\n".
+            '@endComponentClass##END-COMPONENT-CLASS##', trim($result));
+    }
+
+    public function testClasslessComponentsWithAnonymousComponentPathComponentName()
+    {
+        $container = new Container;
+
+        $container->instance(Application::class, $app = m::mock(Application::class));
+        $container->instance(Factory::class, $factory = m::mock(Factory::class));
+
+        $app->shouldReceive('getNamespace')->once()->andReturn('App\\');
+
+        $factory->shouldReceive('exists')->andReturnUsing(function ($arg) {
+            return $arg === md5('test-directory').'::panel.panel';
+        });
+
+        Container::setInstance($container);
+
+        $blade = m::mock(BladeCompiler::class)->makePartial();
+
+        $blade->shouldReceive('getAnonymousComponentPaths')->once()->andReturn([
+            ['path' => 'test-directory', 'prefix' => null, 'prefixHash' => md5('test-directory')],
+        ]);
+
+        $compiler = $this->compiler([], [], $blade);
+
+        $result = $compiler->compileTags('<x-panel />');
+
+        $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\View\AnonymousComponent', 'panel', ['view' => '".md5('test-directory')."::panel.panel','data' => []])
 <?php if (isset(\$attributes) && \$attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php \$attributes = \$attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
@@ -689,7 +820,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $container->instance(Application::class, $app = m::mock(Application::class));
         $container->instance(Factory::class, $factory = m::mock(Factory::class));
         $app->shouldReceive('getNamespace')->once()->andReturn('App\\');
-        $factory->shouldReceive('exists')->twice()->andReturn(false);
+        $factory->shouldReceive('exists')->times(3)->andReturn(false);
         Container::setInstance($container);
 
         $this->expectException(InvalidArgumentException::class);
@@ -853,5 +984,17 @@ class TestContainerComponent extends Component
     public function render()
     {
         return 'container';
+    }
+}
+
+namespace App\View\Components\Card;
+
+use Illuminate\View\Component;
+
+class Card extends Component
+{
+    public function render()
+    {
+        return 'card';
     }
 }

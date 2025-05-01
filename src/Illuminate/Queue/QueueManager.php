@@ -160,8 +160,8 @@ class QueueManager implements FactoryContract, MonitorContract
         }
 
         return $this->getConnector($config['driver'])
-                        ->connect($config)
-                        ->setConnectionName($name);
+            ->connect($config)
+            ->setConnectionName($name);
     }
 
     /**
@@ -190,7 +190,7 @@ class QueueManager implements FactoryContract, MonitorContract
      */
     public function extend($driver, Closure $resolver)
     {
-        return $this->addConnector($driver, $resolver);
+        $this->addConnector($driver, $resolver);
     }
 
     /**

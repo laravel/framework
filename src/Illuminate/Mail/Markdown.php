@@ -3,6 +3,7 @@
 namespace Illuminate\Mail;
 
 use Illuminate\Contracts\View\Factory as ViewFactory;
+use Illuminate\Support\EncodedHtmlString;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use League\CommonMark\Environment\Environment;
@@ -35,6 +36,13 @@ class Markdown
     protected $componentPaths = [];
 
     /**
+     * Indicates if secure encoding should be enabled.
+     *
+     * @var bool
+     */
+    protected static $withSecuredEncoding = false;
+
+    /**
      * Create a new Markdown renderer instance.
      *
      * @param  \Illuminate\Contracts\View\Factory  $view
@@ -60,9 +68,37 @@ class Markdown
     {
         $this->view->flushFinderCache();
 
-        $contents = $this->view->replaceNamespace(
-            'mail', $this->htmlComponentPaths()
-        )->make($view, $data)->render();
+        $bladeCompiler = $this->view
+            ->getEngineResolver()
+            ->resolve('blade')
+            ->getCompiler();
+
+        $contents = $bladeCompiler->usingEchoFormat(
+            'new \Illuminate\Support\EncodedHtmlString(%s)',
+            function () use ($view, $data) {
+                if (static::$withSecuredEncoding === true) {
+                    EncodedHtmlString::encodeUsing(function ($value) {
+                        $replacements = [
+                            '[' => '\[',
+                            '<' => '&lt;',
+                            '>' => '&gt;',
+                        ];
+
+                        return str_replace(array_keys($replacements), array_values($replacements), $value);
+                    });
+                }
+
+                try {
+                    $contents = $this->view->replaceNamespace(
+                        'mail', $this->htmlComponentPaths()
+                    )->make($view, $data)->render();
+                } finally {
+                    EncodedHtmlString::flushState();
+                }
+
+                return $contents;
+            }
+        );
 
         if ($this->view->exists($customTheme = Str::start($this->theme, 'mail.'))) {
             $theme = $customTheme;
@@ -73,7 +109,7 @@ class Markdown
         }
 
         return new HtmlString(($inliner ?: new CssToInlineStyles)->convert(
-            $contents, $this->view->make($theme, $data)->render()
+            str_replace('\[', '[', $contents), $this->view->make($theme, $data)->render()
         ));
     }
 
@@ -101,20 +137,59 @@ class Markdown
      * Parse the given Markdown text into HTML.
      *
      * @param  string  $text
+     * @param  bool  $encoded
      * @return \Illuminate\Support\HtmlString
      */
-    public static function parse($text)
+    public static function parse($text, bool $encoded = false)
     {
-        $environment = new Environment([
+        if ($encoded === false) {
+            return new HtmlString(static::converter()->convert($text)->getContent());
+        }
+
+        if (static::$withSecuredEncoding === true || $encoded === true) {
+            EncodedHtmlString::encodeUsing(function ($value) {
+                $replacements = [
+                    '[' => '\[',
+                    '<' => '\<',
+                ];
+
+                $html = str_replace(array_keys($replacements), array_values($replacements), $value);
+
+                return static::converter([
+                    'html_input' => 'escape',
+                ])->convert($html)->getContent();
+            });
+        }
+
+        $html = '';
+
+        try {
+            $html = static::converter()->convert($text)->getContent();
+        } finally {
+            EncodedHtmlString::flushState();
+        }
+
+        return new HtmlString($html);
+    }
+
+    /**
+     * Get a Markdown converter instance.
+     *
+     * @internal
+     *
+     * @param  array<string, mixed>  $config
+     * @return \League\CommonMark\MarkdownConverter
+     */
+    public static function converter(array $config = [])
+    {
+        $environment = new Environment(array_merge([
             'allow_unsafe_links' => false,
-        ]);
+        ], $config));
 
         $environment->addExtension(new CommonMarkCoreExtension);
         $environment->addExtension(new TableExtension);
 
-        $converter = new MarkdownConverter($environment);
-
-        return new HtmlString($converter->convert($text)->getContent());
+        return new MarkdownConverter($environment);
     }
 
     /**
@@ -185,5 +260,35 @@ class Markdown
     public function getTheme()
     {
         return $this->theme;
+    }
+
+    /**
+     * Enable secured encoding when parsing Markdown.
+     *
+     * @return void
+     */
+    public static function withSecuredEncoding()
+    {
+        static::$withSecuredEncoding = true;
+    }
+
+    /**
+     * Disable secured encoding when parsing Markdown.
+     *
+     * @return void
+     */
+    public static function withoutSecuredEncoding()
+    {
+        static::$withSecuredEncoding = false;
+    }
+
+    /**
+     * Flush the class's global state.
+     *
+     * @return void
+     */
+    public static function flushState()
+    {
+        static::$withSecuredEncoding = false;
     }
 }

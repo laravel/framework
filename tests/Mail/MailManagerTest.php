@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Mail;
 use InvalidArgumentException;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
 
 class MailManagerTest extends TestCase
@@ -27,13 +28,108 @@ class MailManagerTest extends TestCase
         $this->app['mail.manager']->mailer('custom_smtp');
     }
 
-    public function testMailUrlConfig()
+    #[TestWith([null, 5876])]
+    #[TestWith([null, 465])]
+    #[TestWith(['smtp', 25])]
+    #[TestWith(['smtp', 2525])]
+    #[TestWith(['smtps', 465])]
+    #[TestWith(['smtp', 465])]
+    public function testMailUrlConfig($scheme, $port)
     {
         $this->app['config']->set('mail.mailers.smtp_url', [
-            'url' => 'smtp://usr:pwd@127.0.0.2:5876',
+            'scheme' => $scheme,
+            'url' => "smtp://usr:pwd@127.0.0.2:{$port}",
         ]);
 
         $mailer = $this->app['mail.manager']->mailer('smtp_url');
+        $transport = $mailer->getSymfonyTransport();
+
+        $this->assertInstanceOf(EsmtpTransport::class, $transport);
+        $this->assertSame('usr', $transport->getUsername());
+        $this->assertSame('pwd', $transport->getPassword());
+        $this->assertSame('127.0.0.2', $transport->getStream()->getHost());
+        $this->assertSame($port, $transport->getStream()->getPort());
+        $this->assertSame($port === 465, $transport->getStream()->isTLS());
+
+        if (method_exists($transport, 'isAutoTls')) {
+            // Only available from Symfony Mailer 7.1
+            $this->assertTrue($transport->isAutoTls());
+        }
+    }
+
+    #[TestWith([null, 5876])]
+    #[TestWith([null, 465])]
+    #[TestWith(['smtp', 25])]
+    #[TestWith(['smtp', 2525])]
+    #[TestWith(['smtps', 465])]
+    #[TestWith(['smtp', 465])]
+    public function testMailUrlConfigWithAutoTls($scheme, $port)
+    {
+        $this->app['config']->set('mail.mailers.smtp_url', [
+            'scheme' => $scheme,
+            'url' => "smtp://usr:pwd@127.0.0.2:{$port}?auto_tls=true",
+        ]);
+
+        $mailer = $this->app['mail.manager']->mailer('smtp_url');
+        $transport = $mailer->getSymfonyTransport();
+
+        $this->assertInstanceOf(EsmtpTransport::class, $transport);
+        $this->assertSame('usr', $transport->getUsername());
+        $this->assertSame('pwd', $transport->getPassword());
+        $this->assertSame('127.0.0.2', $transport->getStream()->getHost());
+        $this->assertSame($port, $transport->getStream()->getPort());
+        $this->assertSame($port === 465, $transport->getStream()->isTLS());
+
+        if (method_exists($transport, 'isAutoTls')) {
+            // Only available from Symfony Mailer 7.1
+            $this->assertTrue($transport->isAutoTls());
+        }
+    }
+
+    #[TestWith([null, 5876])]
+    #[TestWith([null, 465])]
+    #[TestWith(['smtp', 25])]
+    #[TestWith(['smtp', 2525])]
+    #[TestWith(['smtps', 465])]
+    #[TestWith(['smtp', 465])]
+    public function testMailUrlConfigWithAutoTlsDisabled($scheme, $port)
+    {
+        $this->app['config']->set('mail.mailers.smtp_url', [
+            'scheme' => $scheme,
+            'url' => "smtp://usr:pwd@127.0.0.2:{$port}?auto_tls=false",
+        ]);
+
+        $mailer = $this->app['mail.manager']->mailer('smtp_url');
+        $transport = $mailer->getSymfonyTransport();
+
+        $this->assertInstanceOf(EsmtpTransport::class, $transport);
+        $this->assertSame('usr', $transport->getUsername());
+        $this->assertSame('pwd', $transport->getPassword());
+        $this->assertSame('127.0.0.2', $transport->getStream()->getHost());
+        $this->assertSame($port, $transport->getStream()->getPort());
+
+        if (method_exists($transport, 'isAutoTls')) {
+            // Only available from Symfony Mailer 7.1
+            $this->assertFalse($transport->isAutoTls());
+            $this->assertSame($port === 465 && $scheme !== 'smtp', $transport->getStream()->isTLS());
+        } else {
+            $this->assertSame($port === 465, $transport->getStream()->isTLS());
+        }
+    }
+
+    public function testBuild()
+    {
+        $config = [
+            'transport' => 'smtp',
+            'host' => '127.0.0.2',
+            'port' => 5876,
+            'encryption' => 'tls',
+            'username' => 'usr',
+            'password' => 'pwd',
+            'timeout' => 5,
+        ];
+
+        $mailer = $this->app['mail.manager']->build($config);
         $transport = $mailer->getSymfonyTransport();
 
         $this->assertInstanceOf(EsmtpTransport::class, $transport);

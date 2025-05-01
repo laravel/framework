@@ -17,6 +17,7 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Foundation\Events\Terminating;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Env;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Str;
@@ -512,9 +513,9 @@ class Kernel implements KernelContract
     public function bootstrapWithoutBootingProviders()
     {
         $this->app->bootstrapWith(
-            collect($this->bootstrappers())->reject(function ($bootstrapper) {
-                return $bootstrapper === \Illuminate\Foundation\Bootstrap\BootProviders::class;
-            })->all()
+            (new Collection($this->bootstrappers()))
+                ->reject(fn ($bootstrapper) => $bootstrapper === \Illuminate\Foundation\Bootstrap\BootProviders::class)
+                ->all()
         );
     }
 
@@ -537,8 +538,8 @@ class Kernel implements KernelContract
     {
         if (is_null($this->artisan)) {
             $this->artisan = (new Artisan($this->app, $this->events, $this->app->version()))
-                                    ->resolveCommands($this->commands)
-                                    ->setContainerCommandLoader();
+                ->resolveCommands($this->commands)
+                ->setContainerCommandLoader();
 
             if ($this->symfonyDispatcher instanceof EventDispatcher) {
                 $this->artisan->setDispatcher($this->symfonyDispatcher);
