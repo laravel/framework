@@ -120,4 +120,35 @@ class ScheduleRunCommandTest extends TestCase
         Event::assertDispatched(ScheduledTaskFinished::class);
         Event::assertNotDispatched(ScheduledTaskFailed::class);
     }
+
+    /**
+     * @throws BindingResolutionException
+     */
+    public function test_command_with_no_explicit_return_does_not_trigger_event()
+    {
+        Event::fake([
+            ScheduledTaskStarting::class,
+            ScheduledTaskFinished::class,
+            ScheduledTaskFailed::class,
+        ]);
+
+        // Create a schedule and add the command that just performs an action without explicit exit
+        $schedule = $this->app->make(Schedule::class);
+        $task = $schedule->exec('true')
+            ->everyMinute()
+            ->withoutOverlapping();
+
+        // Make sure it will run regardless of schedule
+        $task->when(function () {
+            return true;
+        });
+
+        // Execute the scheduler
+        $this->artisan('schedule:run');
+
+        // Verify the event sequence
+        Event::assertDispatched(ScheduledTaskStarting::class);
+        Event::assertDispatched(ScheduledTaskFinished::class);
+        Event::assertNotDispatched(ScheduledTaskFailed::class);
+    }
 }
