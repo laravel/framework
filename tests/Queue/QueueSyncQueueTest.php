@@ -61,6 +61,28 @@ class QueueSyncQueueTest extends TestCase
         Container::setInstance();
     }
 
+    public function testFailedJobHasAccessToJobInstance()
+    {
+        unset($_SERVER['__sync.failed']);
+
+        $sync = new SyncQueue;
+        $container = new Container;
+        $container->bind(\Illuminate\Contracts\Events\Dispatcher::class, \Illuminate\Events\Dispatcher::class);
+        $container->bind(\Illuminate\Contracts\Bus\Dispatcher::class, \Illuminate\Bus\Dispatcher::class);
+        $container->bind(\Illuminate\Contracts\Container\Container::class, \Illuminate\Container\Container::class);
+        $sync->setContainer($container);
+
+        SyncQueue::createPayloadUsing(function ($connection, $queue, $payload) {
+            return ['data' => ['extra' => 'extraValue']];
+        });
+
+        try {
+            $sync->push(new FailingSyncQueueJob());
+        } catch (LogicException $e) {
+            $this->assertSame('extraValue', $_SERVER['__sync.failed']);
+        }
+    }
+
     public function testCreatesPayloadObject()
     {
         $sync = new SyncQueue;
@@ -174,6 +196,23 @@ class FailingSyncQueueTestHandler
     public function failed()
     {
         $_SERVER['__sync.failed'] = true;
+    }
+}
+
+class FailingSyncQueueJob implements ShouldQueue
+{
+    use InteractsWithQueue;
+
+    public function handle()
+    {
+        throw new LogicException();
+    }
+
+    public function failed()
+    {
+        $payload = $this->job->payload();
+
+        $_SERVER['__sync.failed'] = $payload['data']['extra'];
     }
 }
 
