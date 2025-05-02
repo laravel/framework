@@ -712,7 +712,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
-     * Determine if the collection contains exactly one item. If a callback is provided, it checks if exactly one item matches the condition.
+     * Determine if the collection contains exactly one item. If a callback is provided, determine if exactly one item matches the condition.
      *
      * @param  (callable(TValue, TKey): bool)|null  $callback
      * @return bool
