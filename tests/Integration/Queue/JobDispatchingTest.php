@@ -166,6 +166,24 @@ class JobDispatchingTest extends QueueTestCase
         $this->assertNull($events[3]->queue);
     }
 
+    public function testQueuedClosureCanBeNamed()
+    {
+        Config::set('queue.default', 'database');
+        $events = [];
+        $this->app['events']->listen(function (JobQueued $e) use (&$events) {
+            $events[] = $e;
+        });
+
+        dispatch(function () {
+            //
+        })->name('custom name');
+
+        $this->assertCount(1, $events);
+        $this->assertInstanceOf(JobQueued::class, $events[0]);
+        $this->assertSame('custom name', $events[0]->job->name);
+        $this->assertStringContainsString('custom name', $events[0]->job->displayName());
+    }
+
     public function testCanDisableDispatchingAfterResponse()
     {
         Job::dispatchAfterResponse('test');
