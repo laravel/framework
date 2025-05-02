@@ -97,10 +97,6 @@ class ScheduleRunCommand extends Command
     /**
      * Execute the console command.
      *
-     * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
-     * @param  \Illuminate\Contracts\Events\Dispatcher  $dispatcher
-     * @param  \Illuminate\Contracts\Cache\Repository  $cache
-     * @param  \Illuminate\Contracts\Debug\ExceptionHandler  $handler
      * @return void
      */
     public function handle(Schedule $schedule, Dispatcher $dispatcher, Cache $cache, ExceptionHandler $handler)
@@ -197,11 +193,11 @@ class ScheduleRunCommand extends Command
                     round(microtime(true) - $start, 2)
                 ));
 
+                $this->eventsRan = true;
+
                 if ($event->exitCode != 0 && ! $event->runInBackground) {
                     throw new Exception("Scheduled command [{$event->command}] failed with exit code [{$event->exitCode}].");
                 }
-
-                $this->eventsRan = true;
             } catch (Throwable $e) {
                 $this->dispatcher->dispatch(new ScheduledTaskFailed($event, $e));
 

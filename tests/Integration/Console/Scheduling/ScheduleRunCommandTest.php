@@ -39,8 +39,7 @@ class ScheduleRunCommandTest extends TestCase
         // Create a schedule and add the command
         $schedule = $this->app->make(Schedule::class);
         $task = $schedule->exec('exit 1')
-            ->everyMinute()
-            ->withoutOverlapping();
+            ->everyMinute();
 
         // Make sure it will run regardless of schedule
         $task->when(function () {
@@ -104,8 +103,7 @@ class ScheduleRunCommandTest extends TestCase
         // Create a schedule and add the command
         $schedule = $this->app->make(Schedule::class);
         $task = $schedule->exec('exit 0')
-            ->everyMinute()
-            ->withoutOverlapping();
+            ->everyMinute();
 
         // Make sure it will run regardless of schedule
         $task->when(function () {
@@ -135,8 +133,7 @@ class ScheduleRunCommandTest extends TestCase
         // Create a schedule and add the command that just performs an action without explicit exit
         $schedule = $this->app->make(Schedule::class);
         $task = $schedule->exec('true')
-            ->everyMinute()
-            ->withoutOverlapping();
+            ->everyMinute();
 
         // Make sure it will run regardless of schedule
         $task->when(function () {
