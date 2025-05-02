@@ -37,6 +37,13 @@ class CallQueuedClosure implements ShouldQueue
     public $deleteWhenMissingModels = true;
 
     /**
+     * Custom name for the job.
+     *
+     * @var string|null
+     */
+    public $name = null;
+
+    /**
      * Create a new job instance.
      *
      * @param  \Laravel\SerializableClosure\SerializableClosure  $closure
@@ -103,8 +110,26 @@ class CallQueuedClosure implements ShouldQueue
      */
     public function displayName()
     {
+        $prefix = '';
         $reflection = new ReflectionFunction($this->closure->getClosure());
 
-        return 'Closure ('.basename($reflection->getFileName()).':'.$reflection->getStartLine().')';
+        if (! is_null($this->name)) {
+            $prefix = "{$this->name} - ";
+        }
+
+        return $prefix.'Closure ('.basename($reflection->getFileName()).':'.$reflection->getStartLine().')';
+    }
+
+    /**
+     * Set a custom name for the job.
+     *
+     * @param  string  $name
+     * @return $this
+     */
+    public function name($name)
+    {
+        $this->name = $name;
+
+        return $this;
     }
 }
