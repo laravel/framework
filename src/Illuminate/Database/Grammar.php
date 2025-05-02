@@ -190,7 +190,7 @@ abstract class Grammar
     /**
      * Convert an array of column names into a delimited string.
      *
-     * @param  array<\Illuminate\Contracts\Database\Query\Expression|string>  $columns
+     * @param  array  $columns
      * @return string
      */
     public function columnize(array $columns)
