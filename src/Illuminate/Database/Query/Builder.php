@@ -90,7 +90,10 @@ class Builder implements BuilderContract
     /**
      * An aggregate function and column to be run.
      *
-     * @var array|null
+     * @var array{
+     *     function: string,
+     *     columns: array<\Illuminate\Contracts\Database\Query\Expression|string>
+     * }|null
      */
     public $aggregate;
 
@@ -3653,7 +3656,7 @@ class Builder implements BuilderContract
      * Set the aggregate property without running the query.
      *
      * @param  string  $function
-     * @param  array  $columns
+     * @param  array<\Illuminate\Contracts\Database\Query\Expression|string>  $columns
      * @return $this
      */
     protected function setAggregate($function, $columns)
