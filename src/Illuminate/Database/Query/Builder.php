@@ -100,7 +100,7 @@ class Builder implements BuilderContract
     /**
      * The columns that should be returned.
      *
-     * @var array|null
+     * @var array<string|\Illuminate\Contracts\Database\Query\Expression>|null
      */
     public $columns;
 
@@ -278,7 +278,7 @@ class Builder implements BuilderContract
     /**
      * Set the columns to be selected.
      *
-     * @param  array|mixed  $columns
+     * @param  array<mixed>|mixed  $columns
      * @return $this
      */
     public function select($columns = ['*'])
@@ -432,7 +432,7 @@ class Builder implements BuilderContract
     /**
      * Add a new select column to the query.
      *
-     * @param  array|mixed  $column
+     * @param  array<mixed>|mixed  $column
      * @return $this
      */
     public function addSelect($column)
@@ -3019,7 +3019,7 @@ class Builder implements BuilderContract
      * Execute a query for a single record by ID.
      *
      * @param  int|string  $id
-     * @param  array|string  $columns
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression|array<string|\Illuminate\Contracts\Database\Query\Expression> $columns
      * @return object|null
      */
     public function find($id, $columns = ['*'])
@@ -3096,7 +3096,7 @@ class Builder implements BuilderContract
     /**
      * Execute the query as a "select" statement.
      *
-     * @param  array|string  $columns
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression|array<string|\Illuminate\Contracts\Database\Query\Expression>  $columns
      * @return \Illuminate\Support\Collection<int, \stdClass>
      */
     public function get($columns = ['*'])
@@ -3113,7 +3113,7 @@ class Builder implements BuilderContract
     /**
      * Run the query as a "select" statement against the connection.
      *
-     * @return array
+     * @return array<int, \stdClass>
      */
     protected function runSelect()
     {
@@ -3125,8 +3125,8 @@ class Builder implements BuilderContract
     /**
      * Remove the group limit keys from the results in the collection.
      *
-     * @param  \Illuminate\Support\Collection  $items
-     * @return \Illuminate\Support\Collection
+     * @param  \Illuminate\Support\Collection<int, \stdClass>  $items
+     * @return \Illuminate\Support\Collection<int, \stdClass>
      */
     protected function withoutGroupLimitKeys($items)
     {
@@ -3152,7 +3152,7 @@ class Builder implements BuilderContract
      * Paginate the given query into a simple paginator.
      *
      * @param  int|\Closure  $perPage
-     * @param  array|string  $columns
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression|array<string|\Illuminate\Contracts\Database\Query\Expression> $columns
      * @param  string  $pageName
      * @param  int|null  $page
      * @param  \Closure|int|null  $total
@@ -3180,7 +3180,7 @@ class Builder implements BuilderContract
      * This is more efficient on larger data-sets, etc.
      *
      * @param  int  $perPage
-     * @param  array|string  $columns
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression|array<string|\Illuminate\Contracts\Database\Query\Expression> $columns
      * @param  string  $pageName
      * @param  int|null  $page
      * @return \Illuminate\Contracts\Pagination\Paginator
@@ -3203,7 +3203,7 @@ class Builder implements BuilderContract
      * This is more efficient on larger data-sets, etc.
      *
      * @param  int|null  $perPage
-     * @param  array|string  $columns
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression|array<string|\Illuminate\Contracts\Database\Query\Expression> $columns
      * @param  string  $cursorName
      * @param  \Illuminate\Pagination\Cursor|string|null  $cursor
      * @return \Illuminate\Contracts\Pagination\CursorPaginator
@@ -3250,7 +3250,7 @@ class Builder implements BuilderContract
     /**
      * Get the count of the total records for the paginator.
      *
-     * @param  array  $columns
+     * @param  array<string|\Illuminate\Contracts\Database\Query\Expression> $columns
      * @return int
      */
     public function getCountForPagination($columns = ['*'])
@@ -3272,8 +3272,8 @@ class Builder implements BuilderContract
     /**
      * Run a pagination count query.
      *
-     * @param  array  $columns
-     * @return array
+     * @param  array<string|\Illuminate\Contracts\Database\Query\Expression> $columns
+     * @return array<mixed>
      */
     protected function runPaginationCountQuery($columns = ['*'])
     {
@@ -3313,7 +3313,8 @@ class Builder implements BuilderContract
     /**
      * Remove the column aliases since they will break count queries.
      *
-     * @return array
+     * @param  array<string|\Illuminate\Contracts\Database\Query\Expression>  $columns
+     * @return array<string|\Illuminate\Contracts\Database\Query\Expression>
      */
     protected function withoutSelectAliases(array $columns)
     {
@@ -3677,8 +3678,8 @@ class Builder implements BuilderContract
      *
      * After running the callback, the columns are reset to the original value.
      *
-     * @param  array  $columns
-     * @param  callable  $callback
+     * @param  array<string|\Illuminate\Contracts\Database\Query\Expression>  $columns
+     * @param  callable(): mixed  $callback
      * @return mixed
      */
     protected function onceWithColumns($columns, $callback)
@@ -4081,7 +4082,7 @@ class Builder implements BuilderContract
     /**
      * Get all of the query builder's columns in a text-only array with all expressions evaluated.
      *
-     * @return array
+     * @return list<string>
      */
     public function getColumns()
     {
