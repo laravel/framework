@@ -44,7 +44,7 @@ namespace Illuminate\Support\Facades;
  * @method static void setRequestLocale(string $locale)
  * @method static void setDefaultRequestLocale(string $locale)
  * @method static mixed user(string|null $guard = null)
- * @method static \Illuminate\Routing\Route|(object|string|null route(string|null $param = null, mixed $default = null)
+ * @method static \Illuminate\Routing\Route|object|string|null route(string|null $param = null, mixed $default = null)
  * @method static string fingerprint()
  * @method static \Illuminate\Http\Request setJson(\Symfony\Component\HttpFoundation\InputBag $json)
  * @method static \Closure getUserResolver()
