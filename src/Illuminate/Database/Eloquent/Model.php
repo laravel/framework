@@ -2243,9 +2243,12 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         if ($callback = static::$fieldResolvers[static::class][$field] ?? null) {
             $result = $callback($value, $field, $query);
 
-            return $result instanceof Builder || $result instanceof QueryBuilder
-                ? $result
-                : $query->where($field, $result);
+            return match (true) {
+                $result instanceof Builder,
+                $result instanceof QueryBuilder => $result,
+                $result === null => $query,
+                default => $query->where($field, $result),
+            };
         }
 
         return $query->where($field, $value);
