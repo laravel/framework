@@ -5,6 +5,7 @@ namespace Illuminate\Container;
 use ArrayAccess;
 use Closure;
 use Exception;
+use Illuminate\Container\Attributes\Lazy;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Container\CircularDependencyException;
 use Illuminate\Contracts\Container\Container as ContainerContract;
@@ -1058,8 +1059,16 @@ class Container implements ArrayAccess, ContainerContract
 
         array_pop($this->buildStack);
 
+        if (!empty($reflector->getAttributes(Lazy::class))) {
+            $instance = $reflector->newLazyProxy(function () use ($concrete, $instances) {
+                return new $concrete(...$instances);
+            });
+        } else {
+            $instance = $reflector->newInstanceArgs($instances);
+        }
+
         $this->fireAfterResolvingAttributeCallbacks(
-            $reflector->getAttributes(), $instance = $reflector->newInstanceArgs($instances)
+            $reflector->getAttributes(), $instance
         );
 
         return $instance;
