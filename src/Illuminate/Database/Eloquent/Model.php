@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Str;
@@ -177,6 +178,13 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * @var array
      */
     protected static $ignoreOnTouch = [];
+
+    /**
+     * The array of field resolvers on the model.
+     *
+     * @var array<class-string<\Illuminate\Database\Eloquent\Model>, (callable(mixed, string, \Illuminate\Database\Eloquent\Builder<static>):mixed)>
+     */
+    protected static $fieldResolvers = [];
 
     /**
      * Indicates whether lazy loading should be restricted on all models.
@@ -2230,7 +2238,17 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function resolveRouteBindingQuery($query, $value, $field = null)
     {
-        return $query->where($field ?? $this->getRouteKeyName(), $value);
+        $field ??= $this->getRouteKeyName();
+
+        if ($callback = static::$fieldResolvers[static::class][$field] ?? null) {
+            $result = $callback($value, $field, $query);
+
+            return $result instanceof Builder || $result instanceof QueryBuilder
+                ? $result
+                : $query->where($field, $result);
+        }
+
+        return $query->where($field, $value);
     }
 
     /**
@@ -2284,6 +2302,18 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     public static function isAutomaticallyEagerLoadingRelationships()
     {
         return static::$modelsShouldAutomaticallyEagerLoadRelationships;
+    }
+
+    /**
+     * Register a field resolver for the current Model.
+     *
+     * @param  string $field
+     * @param  (callable(mixed, string, \Illuminate\Database\Eloquent\Builder):mixed)|null  $callback
+     * @return void
+     */
+    public static function resolveField($field, ?callable $callback)
+    {
+        static::$fieldResolvers[static::class][$field] = $callback;
     }
 
     /**

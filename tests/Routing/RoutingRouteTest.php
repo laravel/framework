@@ -13,6 +13,7 @@ use Illuminate\Container\Attributes\Config;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Routing\Registrar;
 use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Events\Dispatcher;
@@ -39,6 +40,7 @@ use Illuminate\Routing\Router;
 use Illuminate\Routing\UrlGenerator;
 use Illuminate\Support\Str;
 use LogicException;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
@@ -49,6 +51,11 @@ include_once __DIR__.'/Enums.php';
 
 class RoutingRouteTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        RoutingTestUserModel::resolveField('test_field', null);
+    }
+
     public function testBasicDispatchingOfRoutes()
     {
         $router = $this->getRouter();
@@ -1969,6 +1976,63 @@ class RoutingRouteTest extends TestCase
         $response = $router->dispatch($request);
         $this->assertTrue($response->isRedirect('/'));
         $this->assertEquals(302, $response->getStatusCode());
+    }
+
+    public function testImplicitBindingsWithCustomFieldResolver()
+    {
+        RoutingTestUserModel::resolveField('test_field', function ($value, $field, $query) {
+            $this->assertSame('something-else', $value);
+            $this->assertSame('test_field', $field);
+            $this->assertInstanceOf(RoutingTestUserModel::class, $query);
+
+            return 'taylor';
+        });
+
+        $router = $this->getRouter();
+        $router->get('foo/{bar:test_field}', [
+            'middleware' => SubstituteBindings::class,
+            'uses' => function (?RoutingTestUserModel $bar = null) {
+                $this->assertInstanceOf(RoutingTestUserModel::class, $bar);
+
+                return $bar->first();
+            },
+        ]);
+
+        $request = Request::create('foo/something-else', 'GET');
+
+        $response = $router->dispatch($request);
+        $this->assertEquals(200, $response->getStatusCode());
+    }
+
+    public function testImplicitBindingsWithCustomFieldResolverHijacksQuery()
+    {
+        $mockQuery = Mockery::mock(Builder::class);
+        $mockQuery->expects('where')->with('foo', 'bar')->andReturnSelf();
+        $mockQuery->expects('first')->andReturn((new RoutingTestUserModel)->forceFill(['value' => 'taylor']));
+
+        RoutingTestUserModel::resolveField('test_field', function ($value, $field, $query) use ($mockQuery) {
+            $this->assertSame('something-else', $value);
+            $this->assertSame('test_field', $field);
+            $this->assertInstanceOf(RoutingTestUserModel::class, $query);
+
+            return $mockQuery->where('foo', 'bar');
+        });
+
+        $router = $this->getRouter();
+        $router->get('foo/{bar:test_field}', [
+            'middleware' => SubstituteBindings::class,
+            'uses' => function (?RoutingTestUserModel $bar = null) {
+                $this->assertInstanceOf(RoutingTestUserModel::class, $bar);
+                $this->assertSame('taylor', $bar->value);
+
+                return $bar;
+            },
+        ]);
+
+        $request = Request::create('foo/something-else', 'GET');
+
+        $response = $router->dispatch($request);
+        $this->assertEquals(200, $response->getStatusCode());
     }
 
     public function testImplicitBindingsWithOptionalParameterWithNoKeyInUri()
