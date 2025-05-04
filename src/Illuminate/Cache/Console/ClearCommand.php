@@ -3,15 +3,20 @@
 namespace Illuminate\Cache\Console;
 
 use Illuminate\Cache\CacheManager;
+use Illuminate\Cache\DatabaseStore;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
+use TypeError;
 
 #[AsCommand(name: 'cache:clear')]
 class ClearCommand extends Command
 {
+    private const MSG_EXPIRED_SUCCESS = 'Expired cache items cleared successfully.';
+    private const MSG_APP_SUCCESS = 'Application cache cleared successfully.';
+
     /**
      * The console command name.
      *
@@ -43,8 +48,8 @@ class ClearCommand extends Command
     /**
      * Create a new cache clear command instance.
      *
-     * @param  \Illuminate\Cache\CacheManager  $cache
-     * @param  \Illuminate\Filesystem\Filesystem  $files
+     * @param \Illuminate\Cache\CacheManager $cache
+     * @param \Illuminate\Filesystem\Filesystem $files
      */
     public function __construct(CacheManager $cache, Filesystem $files)
     {
@@ -65,11 +70,23 @@ class ClearCommand extends Command
             'cache:clearing', [$this->argument('store'), $this->tags()]
         );
 
-        $successful = $this->cache()->flush();
+        if($this->option('expired')) {
+            $store = $this->cache()->getStore();
+            if ($store instanceof DatabaseStore) {
+                $successful = $store->flushExpired();
+                $message = self::MSG_EXPIRED_SUCCESS;
+            } else {
+                $successful = $this->cache()->flush();
+                $message = self::MSG_APP_SUCCESS;
+            }
+        } else {
+            $successful = $this->cache()->flush();
+            $message = self::MSG_APP_SUCCESS;
+        }
 
         $this->flushFacades();
 
-        if (! $successful) {
+        if (!$successful) {
             return $this->components->error('Failed to clear cache. Make sure you have the appropriate permissions.');
         }
 
@@ -77,7 +94,7 @@ class ClearCommand extends Command
             'cache:cleared', [$this->argument('store'), $this->tags()]
         );
 
-        $this->components->info('Application cache cleared successfully.');
+        $this->components->info($message);
     }
 
     /**
@@ -87,7 +104,7 @@ class ClearCommand extends Command
      */
     public function flushFacades()
     {
-        if (! $this->files->exists($storagePath = storage_path('framework/cache'))) {
+        if (!$this->files->exists($storagePath = storage_path('framework/cache'))) {
             return;
         }
 
@@ -141,6 +158,7 @@ class ClearCommand extends Command
     {
         return [
             ['tags', null, InputOption::VALUE_OPTIONAL, 'The cache tags you would like to clear', null],
+            ['expired', null, InputOption::VALUE_NONE, 'Only remove expired items from the cache', null],
         ];
     }
 }

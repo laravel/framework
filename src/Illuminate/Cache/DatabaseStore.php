@@ -424,6 +424,20 @@ class DatabaseStore implements LockProvider, Store
     }
 
     /**
+     * Remove all expired items from the cache.
+     *
+     * @return bool
+     */
+    public function flushExpired()
+    {
+        $this->table()
+            ->where('expiration', '<=', $this->getTime())
+            ->delete();
+
+        return true;
+    }
+
+    /**
      * Get a query builder for the cache table.
      *
      * @return \Illuminate\Database\Query\Builder

@@ -4,7 +4,9 @@ namespace Illuminate\Tests\Cache;
 
 use Illuminate\Cache\CacheManager;
 use Illuminate\Cache\Console\ClearCommand;
+use Illuminate\Cache\DatabaseStore;
 use Illuminate\Contracts\Cache\Repository;
+use Illuminate\Contracts\Cache\Store;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Application;
 use InvalidArgumentException;
@@ -138,6 +140,34 @@ class ClearCommandTest extends TestCase
         $this->files->shouldNotReceive('delete');
 
         $this->runCommand($this->command);
+    }
+
+    public function testClearWithExpiredOptionForDatabaseStore()
+    {
+        $this->files->shouldReceive('exists')->andReturn(true);
+        $this->files->shouldReceive('files')->andReturn([]);
+
+        $databaseStore = m::mock(DatabaseStore::class);
+        $databaseStore->shouldReceive('flushExpired')->once()->andReturn(true);
+
+        $this->cacheManager->shouldReceive('store')->once()->with(null)->andReturn($this->cacheRepository);
+        $this->cacheRepository->shouldReceive('getStore')->once()->andReturn($databaseStore);
+
+        $this->runCommand($this->command, ['--expired' => true]);
+    }
+
+    public function testClearWithExpiredOptionForNonDatabaseStore()
+    {
+        $this->files->shouldReceive('exists')->andReturn(true);
+        $this->files->shouldReceive('files')->andReturn([]);
+
+        $nonDatabaseStore = m::mock(Store::class);
+
+        $this->cacheManager->shouldReceive('store')->with(null)->andReturn($this->cacheRepository);
+        $this->cacheRepository->shouldReceive('getStore')->once()->andReturn($nonDatabaseStore);
+        $this->cacheRepository->shouldReceive('flush')->once()->andReturn(true);
+
+        $this->runCommand($this->command, ['--expired' => true]);
     }
 
     protected function runCommand($command, $input = [])
