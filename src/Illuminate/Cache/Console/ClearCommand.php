@@ -69,18 +69,16 @@ class ClearCommand extends Command
             'cache:clearing', [$this->argument('store'), $this->tags()]
         );
 
+        $message = self::MSG_APP_SUCCESS;
+
         if ($this->option('expired')) {
             $store = $this->cache()->getStore();
-            if ($store instanceof DatabaseStore) {
-                $successful = $store->flushExpired();
-                $message = self::MSG_EXPIRED_SUCCESS;
-            } else {
-                $successful = $this->cache()->flush();
-                $message = self::MSG_APP_SUCCESS;
-            }
+
+            $successful = $store instanceof DatabaseStore
+                ? ($message = self::MSG_EXPIRED_SUCCESS) && $store->flushExpired()
+                : $this->cache()->flush();
         } else {
             $successful = $this->cache()->flush();
-            $message = self::MSG_APP_SUCCESS;
         }
 
         $this->flushFacades();
