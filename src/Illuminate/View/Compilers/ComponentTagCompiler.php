@@ -128,6 +128,19 @@ class ComponentTagCompiler
                             )
                             |
                             (?:
+                                (\:\?\\\$)(\w+)(?:
+                                    =
+                                    (?:
+                                        \\\"([^\\\"]*)\\\"
+                                        |
+                                        \'([^\']*)\'
+                                        |
+                                        ([^\'\\\"=<>]+)
+                                    )
+                                )?
+                            )
+                            |
+                            (?:
                                 [\w\-:.@%]+
                                 (
                                     =
@@ -593,6 +606,7 @@ class ComponentTagCompiler
     protected function getAttributesFromAttributeString(string $attributeString)
     {
         $attributeString = $this->parseShortAttributeSyntax($attributeString);
+        $attributeString = $this->parseOptionalShortAttributeSyntax($attributeString);
         $attributeString = $this->parseAttributeBag($attributeString);
         $attributeString = $this->parseComponentTagClassStatements($attributeString);
         $attributeString = $this->parseComponentTagStyleStatements($attributeString);
@@ -658,6 +672,35 @@ class ComponentTagCompiler
 
         return preg_replace_callback($pattern, function (array $matches) {
             return " :{$matches[1]}=\"\${$matches[1]}\"";
+        }, $value);
+    }
+
+    /**
+     * Parses an optional short attribute syntax like :?$foo into a fully-qualified syntax like :foo="$foo ?? null".
+     *
+     * Advanced usage:
+     * Supports default fallbacks, e.g. :?$foo="$fallback" becomes :foo="$foo ?? $fallback".
+     *
+     * @param  string  $value
+     * @return string
+     */
+    protected function parseOptionalShortAttributeSyntax(string $value)
+    {
+        $pattern = "/\s\:\?\\\$(\w+)(?:
+            =
+            (?:
+                \\\"([^\\\"]*)\\\"
+                |
+                \'([^\']*)\'
+                |
+                ([^\'\\\"=<>]+)
+            )
+        )?/x";
+
+        return preg_replace_callback($pattern, function (array $matches) {
+            $fallback = $matches[2] ?? 'null';
+
+            return " :{$matches[1]}=\"\${$matches[1]} ?? {$fallback}\"";
         }, $value);
     }
 
