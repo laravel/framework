@@ -2,6 +2,8 @@
 
 namespace Illuminate\Database\Eloquent\Concerns;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
 trait GuardsAttributes
 {
     /**
@@ -31,6 +33,20 @@ trait GuardsAttributes
      * @var array<string>
      */
     protected static $guardableColumns = [];
+
+    /**
+     * Indicates if filling an attribute named as a Belongs-To relation should be fillable.
+     *
+     * @var bool
+     */
+    public static $fillBelongsToRelations = false;
+
+    /**
+     * The cache for fillable Belongs To Relations methods.
+     *
+     * @var array<class-string<static>,bool>
+     */
+    protected static $fillableBelongsToRelationsCache = [];
 
     /**
      * Get the fillable attributes for the model.
@@ -256,5 +272,20 @@ trait GuardsAttributes
         }
 
         return $attributes;
+    }
+
+    /**
+     * Check if the relation is fillable.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    protected function isBelongsToFillable($key)
+    {
+        return static::$fillBelongsToRelations
+            && (
+            static::$fillableBelongsToRelationsCache[static::class][$key]
+                ??= $this->isRelation($key) && $this->{$key}() instanceof BelongsTo
+            );
     }
 }

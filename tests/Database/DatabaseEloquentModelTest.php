@@ -68,6 +68,9 @@ class DatabaseEloquentModelTest extends TestCase
     {
         parent::tearDown();
 
+        Model::$fillBelongsToRelations = false;
+        EloquentModelStub::$fillBelongsToRelations = false;
+
         m::close();
         Carbon::setTestNow(null);
 
@@ -3329,6 +3332,89 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertInstanceOf(EloquentModelWithUseFactoryAttributeFactory::class, $model::newFactory());
         $this->assertEquals(EloquentModelWithUseFactoryAttribute::class, $factory->modelName());
         $this->assertEquals('test name', $instance->name); // Small smoke test to ensure the factory is working
+    }
+
+    public function testFillableWithBelongsToRelationDoesntWorkIfDisabledByDefault()
+    {
+        $model = new EloquentModelStub;
+        $this->addMockConnection($model);
+
+        $model->fillable(['name', 'age']);
+        $relation = new EloquentModelSaveStub();
+        $relation->id = 10;
+
+        $model->fill(['name' => 'foo', 'age' => 'bar', 'belongsToStub' => $relation, 'morphToStub' => $relation]);
+
+        $this->assertNull($model->belongs_to_stub_id);
+        $this->assertNull($model->morph_to_stub_id);
+
+        $model->fillable(['name', 'age', 'belongsToStub', 'morphToStub']);
+        $model->fill(['name' => 'foo', 'age' => 'bar', 'belongsToStub' => $relation, 'morphToStub' => $relation]);
+
+        $this->assertSame('foo', $model->name);
+        $this->assertSame('bar', $model->age);
+        $this->assertNull($model->belongs_to_stub_id);
+        $this->assertNull($model->morph_to_stub_id);
+        $this->assertNull($model->morph_to_stub_type);
+        $this->assertFalse($model->relationLoaded('belongsToStub'));
+        $this->assertFalse($model->relationLoaded('morphToStub'));
+    }
+
+    public function testFillableWithBelongsToRelation()
+    {
+        EloquentModelStub::$fillBelongsToRelations = true;
+
+        $model = new EloquentModelStub;
+        $this->addMockConnection($model);
+
+        $model->fillable(['name', 'age']);
+        $relation = new EloquentModelSaveStub();
+        $relation->id = 10;
+
+        $model->fill(['name' => 'foo', 'age' => 'bar', 'belongsToStub' => $relation, 'morphToStub' => $relation]);
+
+        $this->assertNull($model->belongs_to_stub_id);
+        $this->assertNull($model->morph_to_stub_id);
+
+        $model->fillable(['name', 'age', 'belongsToStub', 'morphToStub']);
+        $model->fill(['name' => 'foo', 'age' => 'bar', 'belongsToStub' => $relation, 'morphToStub' => $relation]);
+
+        $this->assertSame('foo', $model->name);
+        $this->assertSame('bar', $model->age);
+        $this->assertSame(10, $model->belongs_to_stub_id);
+        $this->assertSame(10, $model->morph_to_stub_id);
+        $this->assertSame(EloquentModelSaveStub::class, $model->morph_to_stub_type);
+        $this->assertSAme($relation, $model->getRelation('belongsToStub'));
+        $this->assertSAme($relation, $model->getRelation('morphToStub'));
+    }
+
+    public function testFillableWithBelongsToRelationNotFillableIfDoesntExist()
+    {
+        EloquentModelStub::$fillBelongsToRelations = true;
+
+        $model = new EloquentModelStub;
+        $this->addMockConnection($model);
+        $model->fillable(['name', 'foo']);
+
+        $relation = new EloquentModelSaveStub();
+
+        $model->fill(['foo' => $relation]);
+
+        $this->assertNull($model->getRelation('foo'));
+        $this->assertSame($relation, $model->getAttribute('foo'));
+    }
+
+    public function testFillableWithBelongsToRelationNotModelIsSetAsAttribute()
+    {
+        EloquentModelStub::$fillBelongsToRelations = true;
+
+        $model = new EloquentModelStub;
+        $model->fillable(['name', 'age', 'belongsToStub']);
+
+        $model->fill(['belongsToStub' => 'foo']);
+
+        $this->assertNull($model->getRelation('belongsToStub'));
+        $this->assertSame('foo', $model->getAttribute('belongsToStub'));
     }
 }
 

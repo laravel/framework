@@ -1053,6 +1053,22 @@ trait HasRelationships
     }
 
     /**
+     * Fills a Belongs To relation like it was an attribute value.
+     *
+     * @param  string  $key
+     * @param  \Illuminate\Database\Eloquent\Model $value
+     * @return $this
+     */
+    protected function fillBelongsToRelation($key, $value)
+    {
+        if (!$value->exists) {
+            $value->save();
+        }
+
+        return $this->{$key}()->associate($value);
+    }
+
+    /**
      * Get all the loaded relations for the instance.
      *
      * @return array

@@ -584,7 +584,11 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             // which means only those attributes may be set through mass assignment to
             // the model, and all others will just get ignored for security reasons.
             if ($this->isFillable($key)) {
-                $this->setAttribute($key, $value);
+                if ($value instanceof Model && $this->isBelongsToFillable($key)) {
+                    $this->fillBelongsToRelation($key, $value);
+                } else {
+                    $this->setAttribute($key, $value);
+                }
             } elseif ($totallyGuarded || static::preventsSilentlyDiscardingAttributes()) {
                 if (isset(static::$discardedAttributeViolationCallback)) {
                     call_user_func(static::$discardedAttributeViolationCallback, $this, [$key]);
