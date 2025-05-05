@@ -215,7 +215,7 @@ class TestResponse implements ArrayAccess
 
     /**
      * Assert whether the response is redirecting back to the previous location.
-     * 
+     *
      * @return $this
      */
     public function assertRedirectBack()
