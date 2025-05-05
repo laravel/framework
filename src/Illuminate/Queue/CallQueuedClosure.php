@@ -23,6 +23,13 @@ class CallQueuedClosure implements ShouldQueue
     public $closure;
 
     /**
+     * The name assigned to the job.
+     *
+     * @var string|null
+     */
+    public $name = null;
+
+    /**
      * The callbacks that should be executed on failure.
      *
      * @var array
@@ -35,13 +42,6 @@ class CallQueuedClosure implements ShouldQueue
      * @var bool
      */
     public $deleteWhenMissingModels = true;
-
-    /**
-     * Custom name for the job.
-     *
-     * @var string|null
-     */
-    public $name = null;
 
     /**
      * Create a new job instance.
@@ -110,18 +110,15 @@ class CallQueuedClosure implements ShouldQueue
      */
     public function displayName()
     {
-        $prefix = '';
         $reflection = new ReflectionFunction($this->closure->getClosure());
 
-        if (! is_null($this->name)) {
-            $prefix = "{$this->name} - ";
-        }
+        $prefix = is_null($this->name) ? '' : "{$this->name} - ";
 
         return $prefix.'Closure ('.basename($reflection->getFileName()).':'.$reflection->getStartLine().')';
     }
 
     /**
-     * Set a custom name for the job.
+     * Assign a name to the job.
      *
      * @param  string  $name
      * @return $this
