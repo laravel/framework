@@ -192,15 +192,11 @@ class Env
     {
         $value = Env::get($key, $default);
 
-        if ($value === null) {
-            return [];
-        }
-
-        if (is_string($value)) {
-            return array_map('trim', explode(',', $value));
-        }
-
-        return check_type($value, 'array', $key, 'Environment');
+        return match (true) {
+            $value === null => [],
+            is_string($value) => array_map('trim', explode(',', $value)),
+            default => check_type($value, 'array', $key, 'Environment'),
+        };
     }
 
     /**
