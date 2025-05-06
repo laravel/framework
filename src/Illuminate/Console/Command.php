@@ -98,6 +98,10 @@ class Command extends SymfonyCommand
         if (isset($this->signature)) {
             $this->configureUsingFluentDefinition();
         } else {
+            if (! is_null($this->description)) {
+                $this->setDescription($this->description);
+            }
+
             parent::__construct($this->name);
         }
 
