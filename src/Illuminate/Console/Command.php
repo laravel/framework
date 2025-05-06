@@ -5,6 +5,8 @@ namespace Illuminate\Console;
 use Illuminate\Console\View\Components\Factory;
 use Illuminate\Contracts\Console\Isolatable;
 use Illuminate\Support\Traits\Macroable;
+use ReflectionClass;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -122,6 +124,28 @@ class Command extends SymfonyCommand
         if ($this instanceof Isolatable) {
             $this->configureIsolation();
         }
+    }
+
+    /** {@inheritdoc} */
+    #[\Override]
+    public static function getDefaultName(): ?string
+    {
+        if ($attribute = (new ReflectionClass(static::class))->getAttributes(AsCommand::class)) {
+            return $attribute[0]->newInstance()->name;
+        }
+
+        return null;
+    }
+
+    /** {@inheritdoc} */
+    #[\Override]
+    public static function getDefaultDescription(): ?string
+    {
+        if ($attribute = (new ReflectionClass(static::class))->getAttributes(AsCommand::class)) {
+            return $attribute[0]->newInstance()->description;
+        }
+
+        return null;
     }
 
     /**
