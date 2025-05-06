@@ -20,6 +20,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\ReflectsClosures;
 use ReflectionClass;
+
 use function Illuminate\Support\enum_value;
 
 class Dispatcher implements DispatcherContract

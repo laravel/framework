@@ -9,7 +9,6 @@ use Illuminate\Events\CallQueuedListener;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Support\Testing\Fakes\QueueFake;
-use Illuminate\Tests\Integration\Console\Events\ExampleQueueListener;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
