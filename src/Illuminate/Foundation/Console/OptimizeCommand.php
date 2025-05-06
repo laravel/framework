@@ -8,7 +8,7 @@ use Illuminate\Support\ServiceProvider;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputOption;
 
-#[AsCommand(name: 'optimize')]
+#[AsCommand(name: 'optimize', description: 'Cache framework bootstrap, configuration, and metadata to increase performance')]
 class OptimizeCommand extends Command
 {
     /**
