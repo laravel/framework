@@ -32,7 +32,7 @@ class CommandMutexTest extends TestCase
         {
             public $ran = 0;
 
-            public function handle()
+            public function __invoke()
             {
                 $this->ran++;
             }
