@@ -128,9 +128,7 @@ class Env
     {
         $value = Env::get($key, $default);
 
-        check_type($value, 'string', $key, 'Environment');
-
-        return $value;
+        return check_type($value, 'string', $key, 'Environment');
     }
 
     /**
@@ -146,9 +144,7 @@ class Env
     {
         $value = Env::get($key, $default);
 
-        check_type($value, 'int', $key, 'Environment');
-
-        return $value;
+        return check_type($value, 'int', $key, 'Environment');
     }
 
     /**
@@ -164,9 +160,7 @@ class Env
     {
         $value = Env::get($key, $default);
 
-        check_type($value, 'float', $key, 'Environment');
-
-        return $value;
+        return check_type($value, 'float', $key, 'Environment');
     }
 
     /**
@@ -182,9 +176,7 @@ class Env
     {
         $value = Env::get($key, $default);
 
-        check_type($value, 'bool', $key, 'Environment');
-
-        return $value;
+        return check_type($value, 'bool', $key, 'Environment');
     }
 
     /**
@@ -200,7 +192,7 @@ class Env
     {
         $value = Env::get($key, $default);
 
-        if (is_null($value)) {
+        if ($value === null) {
             return [];
         }
 
@@ -208,9 +200,7 @@ class Env
             return array_map('trim', explode(',', $value));
         }
 
-        check_type($value, 'array', $key, 'Environment');
-
-        return $value;
+        return check_type($value, 'array', $key, 'Environment');
     }
 
     /**
