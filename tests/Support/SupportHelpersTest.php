@@ -14,6 +14,7 @@ use Illuminate\Support\Sleep;
 use Illuminate\Support\Stringable;
 use Illuminate\Tests\Support\Fixtures\IntBackedEnum;
 use Illuminate\Tests\Support\Fixtures\StringBackedEnum;
+use InvalidArgumentException;
 use IteratorAggregate;
 use LogicException;
 use Mockery as m;
@@ -1210,6 +1211,73 @@ class SupportHelpersTest extends TestCase
 
         $_SERVER['foo'] = 'x"null"x'; // this should not be unquoted
         $this->assertSame('x"null"x', env('foo'));
+    }
+
+    public function testEnvString()
+    {
+        $_ENV['string'] = 'foo bar';
+        $this->assertSame('foo bar', Env::string('string'));
+        $this->assertSame('default', Env::string('missing_key', 'default'));
+    }
+
+    public function testEnvInteger()
+    {
+        $_SERVER['integer_key'] = '12345';
+
+        $this->assertSame(12345, Env::integer('integer_key'));
+        $this->assertSame(999, Env::integer('missing_key', 999));
+
+        $_SERVER['not_integer_key'] = 'foo';
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('#Environment value for key \[not_integer_key\] must be an integer#');
+
+        Env::integer('not_integer_key');
+    }
+
+    public function testEnvFloat()
+    {
+        $_SERVER['float_key'] = '12.34';
+
+        $this->assertSame(12.34, Env::float('float_key'));
+        $this->assertSame(0.5, Env::float('missing_key', 0.5));
+
+        $_SERVER['not_float_key'] = 'foo';
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('#Environment value for key \[not_float_key\] must be a float#');
+
+        Env::float('not_float_key');
+    }
+
+    public function testEnvBoolean()
+    {
+        $_SERVER['bool_true_key'] = 'true';
+        $_SERVER['bool_false_key'] = 'false';
+
+        $this->assertTrue(Env::boolean('bool_true_key'));
+        $this->assertFalse(Env::boolean('bool_false_key'));
+        $this->assertTrue(Env::boolean('missing_key', true));
+
+        $_SERVER['not_bool_key'] = 'yes';
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('#Environment value for key \[not_bool_key\] must be a boolean#');
+
+        Env::boolean('not_bool_key');
+    }
+
+    public function testEnvArray()
+    {
+        $_SERVER['array_key'] = 'one,two,three';
+
+        $this->assertSame(['one', 'two', 'three'], Env::array('array_key'));
+        $this->assertSame(['default'], Env::array('missing_key', ['default']));
+
+        $_SERVER['not_array_key'] = 'foo';
+
+        // still returns array with one element
+        $this->assertSame(['foo'], Env::array('not_array_key'));
     }
 
     public function testGetFromSERVERFirst()
