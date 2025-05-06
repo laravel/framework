@@ -32,7 +32,7 @@ class CommandMutexTest extends TestCase
         {
             public $ran = 0;
 
-            public function __invoke()
+            public function handle()
             {
                 $this->ran++;
             }
@@ -48,6 +48,8 @@ class CommandMutexTest extends TestCase
     protected function tearDown(): void
     {
         $this->tearDownTheTestEnvironmentUsingMockery();
+
+        unset($this->command, $this->commandMutex);
     }
 
     public function testCanRunIsolatedCommandIfNotBlocked()
