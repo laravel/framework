@@ -48,8 +48,6 @@ class CommandMutexTest extends TestCase
     protected function tearDown(): void
     {
         $this->tearDownTheTestEnvironmentUsingMockery();
-
-        unset($this->command, $this->commandMutex);
     }
 
     public function testCanRunIsolatedCommandIfNotBlocked()
