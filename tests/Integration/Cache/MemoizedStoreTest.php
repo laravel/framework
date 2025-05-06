@@ -70,7 +70,7 @@ class MemoizedStoreTest extends TestCase
         $this->assertNull($memoized);
     }
 
-    public function test_it_can_memoize_when_retrieving_mulitple_values()
+    public function test_it_can_memoize_when_retrieving_multiple_values()
     {
         Cache::put('name.0', 'Tim', 60);
         Cache::put('name.1', 'Taylor', 60);
@@ -116,7 +116,7 @@ class MemoizedStoreTest extends TestCase
         $this->assertSame($cacheValue, $memoValue);
     }
 
-    public function test_null_values_are_memoized_when_retrieving_mulitple_values()
+    public function test_null_values_are_memoized_when_retrieving_multiple_values()
     {
         $live = Cache::getMultiple(['name.0', 'name.1']);
         $memoized = Cache::memo()->getMultiple(['name.0', 'name.1']);
@@ -132,7 +132,7 @@ class MemoizedStoreTest extends TestCase
         $this->assertSame($memoized, ['name.0' => null, 'name.1' => null]);
     }
 
-    public function test_it_can_retrieve_already_memoized_and_not_yet_memoized_values_when_retrieving_mulitple_values()
+    public function test_it_can_retrieve_already_memoized_and_not_yet_memoized_values_when_retrieving_multiple_values()
     {
         Cache::put('name.0', 'Tim', 60);
         Cache::put('name.1', 'Taylor', 60);
