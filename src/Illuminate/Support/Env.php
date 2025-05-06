@@ -128,11 +128,7 @@ class Env
     {
         $value = Env::get($key, $default);
 
-        if (! is_string($value)) {
-            throw new InvalidArgumentException(
-                sprintf('Environment value for key [%s] must be a string, %s given.', $key, gettype($value))
-            );
-        }
+        check_type($value, 'string', $key, 'Environment');
 
         return $value;
     }
@@ -150,11 +146,7 @@ class Env
     {
         $value = Env::get($key, $default);
 
-        if (filter_var($value, FILTER_VALIDATE_INT) === false) {
-            throw new InvalidArgumentException(
-                sprintf('Environment value for key [%s] must be an integer, %s given.', $key, gettype($value))
-            );
-        }
+        check_type($value, 'int', $key, 'Environment');
 
         return $value;
     }
@@ -172,11 +164,7 @@ class Env
     {
         $value = Env::get($key, $default);
 
-        if (filter_var($value, FILTER_VALIDATE_FLOAT) === false) {
-            throw new InvalidArgumentException(
-                sprintf('Environment value for key [%s] must be a float, %s given.', $key, gettype($value))
-            );
-        }
+        check_type($value, 'float', $key, 'Environment');
 
         return $value;
     }
@@ -194,11 +182,7 @@ class Env
     {
         $value = Env::get($key, $default);
 
-        if (! is_bool($value)) {
-            throw new InvalidArgumentException(
-                sprintf('Environment value for key [%s] must be a boolean, %s given.', $key, gettype($value))
-            );
-        }
+        check_type($value, 'bool', $key, 'Environment');
 
         return $value;
     }
@@ -216,7 +200,7 @@ class Env
     {
         $value = Env::get($key, $default);
 
-        if ($value === null) {
+        if (is_null($value)) {
             return [];
         }
 
@@ -224,11 +208,7 @@ class Env
             return array_map('trim', explode(',', $value));
         }
 
-        if (! is_array($value)) {
-            throw new InvalidArgumentException(
-                sprintf('Environment value for key [%s] must be an array or comma-separated string, %s given.', $key, gettype($value))
-            );
-        }
+        check_type($value, 'array', $key, 'Environment');
 
         return $value;
     }

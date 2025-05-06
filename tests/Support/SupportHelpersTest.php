@@ -1230,7 +1230,7 @@ class SupportHelpersTest extends TestCase
         $_SERVER['not_integer_key'] = 'foo';
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageMatches('#Environment value for key \[not_integer_key\] must be an integer#');
+        $this->expectExceptionMessageMatches('#^Environment value for key \[not_integer_key\] must be a (int|integer|long), (.*) given.#');
 
         Env::integer('not_integer_key');
     }
@@ -1245,7 +1245,7 @@ class SupportHelpersTest extends TestCase
         $_SERVER['not_float_key'] = 'foo';
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageMatches('#Environment value for key \[not_float_key\] must be a float#');
+        $this->expectExceptionMessageMatches('#^Environment value for key \[not_float_key\] must be a (float|double|real), (.*) given.#');
 
         Env::float('not_float_key');
     }
@@ -1262,7 +1262,7 @@ class SupportHelpersTest extends TestCase
         $_SERVER['not_bool_key'] = 'yes';
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageMatches('#Environment value for key \[not_bool_key\] must be a boolean#');
+        $this->expectExceptionMessageMatches('#^Environment value for key \[not_bool_key\] must be a (bool|boolean), (.*) given.#');
 
         Env::boolean('not_bool_key');
     }
