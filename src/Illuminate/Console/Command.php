@@ -8,6 +8,7 @@ use Illuminate\Support\Traits\Macroable;
 use ReflectionClass;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
+use Symfony\Component\Console\Command\InvokableCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -98,6 +99,13 @@ class Command extends SymfonyCommand
             $this->configureUsingFluentDefinition();
         } else {
             parent::__construct($this->name);
+
+            // Handle breaking changes made in Symfony 7.3 where using `__invoke()` method
+            // to handle the command will be handled via `InvokableCommand` and
+            // skip any logic available via `$this->execute()` method.
+            if (is_callable($this) && $this->code instanceof InvokableCommand) {
+                $this->code = null;
+            }
         }
 
         // Once we have constructed the command, we'll set the description and other
