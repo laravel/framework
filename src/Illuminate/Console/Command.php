@@ -99,13 +99,6 @@ class Command extends SymfonyCommand
             $this->configureUsingFluentDefinition();
         } else {
             parent::__construct($this->name);
-
-            // Handle breaking changes made in Symfony 7.3 where using `__invoke()` method
-            // to handle the command will be handled via `InvokableCommand` and
-            // skip any logic available via `$this->execute()` method.
-            if (is_callable($this) && $this->code instanceof InvokableCommand) {
-                $this->code = null;
-            }
         }
 
         // Once we have constructed the command, we'll set the description and other
