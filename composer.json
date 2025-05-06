@@ -54,6 +54,7 @@
         "symfony/polyfill-php83": "^1.31",
         "symfony/process": "7.3.x-dev",
         "symfony/routing": "7.3.x-dev",
+        "symfony/symfony": "7.3.x-dev",
         "symfony/uid": "7.3.x-dev",
         "symfony/var-dumper": "7.3.x-dev",
         "tijsverkoyen/css-to-inline-styles": "^2.2.5",
