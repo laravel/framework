@@ -20,7 +20,7 @@
         "illuminate/contracts": "^11.0",
         "illuminate/macroable": "^11.0",
         "illuminate/support": "^11.0",
-        "league/commonmark": "^2.6",
+        "league/commonmark": "^2.7",
         "psr/log": "^1.0|^2.0|^3.0",
         "symfony/mailer": "^7.0.3",
         "tijsverkoyen/css-to-inline-styles": "^2.2.5"
