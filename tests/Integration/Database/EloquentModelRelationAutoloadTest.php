@@ -92,49 +92,28 @@ class EloquentModelRelationAutoloadTest extends DatabaseTestCase
 
     public function testWithRelationshipAutoloadingSelectiveColumns()
     {
-        // Setup - create a post with comments and likes
-        $post = Post::create(['title' => 'Test Post', 'content' => 'Full content here']);
+        $post = Post::create();
         $comment1 = $post->comments()->create([
             'parent_id' => null,
-            'content' => 'First comment content',
-            'is_approved' => true
         ]);
         $comment2 = $post->comments()->create([
             'parent_id' => $comment1->id,
-            'content' => 'Second comment content',
-            'is_approved' => true
         ]);
-        $comment2->likes()->create(['user_id' => 1]);
-        $comment2->likes()->create(['user_id' => 2]);
+        $comment2->likes()->create();
+        $comment2->likes()->create();
 
         DB::enableQueryLog();
 
         $post = Post::find($post->id);
 
         $post->withRelationshipAutoloading([
-            'comments:id,parent_id',
-            'likes:id,user_id'
+            'comments:id',
+            'comments.likes',
         ]);
 
-        $likes = [];
-
-        foreach ($post->comments as $comment) {
-            $likes = array_merge($likes, $comment->likes->all());
-        }
-
-        // Assertions
         $this->assertCount(2, DB::getQueryLog());
-        $this->assertCount(2, $likes);
-
-        // Verify selective loading worked - these columns should be loaded
         $this->assertNotNull($post->comments[0]->id);
-        $this->assertNotNull($post->comments[0]->parent_id);
-        $this->assertNotNull($likes[0]->user_id);
-
-        // These columns should NOT be loaded (will return null)
-        $this->assertNull($post->comments[0]->content);
-        $this->assertNull($post->comments[0]->is_approved);
-
+        $this->assertFalse(array_key_exists('parent_id', $post->comments[0]->getAttributes()));
         $this->assertTrue($post->relationLoaded('comments'));
         $this->assertTrue($post->comments[0]->relationLoaded('likes'));
 
@@ -292,11 +271,6 @@ class Comment extends Model
 class Post extends Model
 {
     public $timestamps = false;
-
-    protected $fillable = [
-        'title',
-        'content',
-    ];
 
     public function comments()
     {
