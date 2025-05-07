@@ -769,7 +769,7 @@ class Collection extends BaseCollection implements QueueableCollection
     /**
      * Enable relationship autoloading for all models in this collection.
      *
-     * @param array|string|null  $relations
+     * @param  array|string|null  $relations
      * @return $this
      */
     public function withRelationshipAutoloading($relations = null)
