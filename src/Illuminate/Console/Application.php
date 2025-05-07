@@ -241,7 +241,7 @@ class Application extends SymfonyApplication implements ApplicationContract
     public function resolve($command)
     {
         if (is_subclass_of($command, SymfonyCommand::class)) {
-            $attribute = (new ReflectionClass($command::class))->getAttributes(AsCommand::class);
+            $attribute = (new ReflectionClass($command))->getAttributes(AsCommand::class);
 
             $commandName = ! empty($attribute) ? $attribute[0]->newInstance()->name : null;
 
@@ -249,9 +249,9 @@ class Application extends SymfonyApplication implements ApplicationContract
                 foreach (explode('|', $commandName) as $name) {
                     $this->commandMap[$name] = $command;
                 }
-            }
 
-            return null;
+                return null;
+            }
         }
 
         if ($command instanceof Command) {
