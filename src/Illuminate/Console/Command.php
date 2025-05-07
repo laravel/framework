@@ -137,17 +137,6 @@ class Command extends SymfonyCommand
         return null;
     }
 
-    /** {@inheritdoc} */
-    #[\Override]
-    public static function getDefaultDescription(): ?string
-    {
-        if ($attribute = (new ReflectionClass(static::class))->getAttributes(AsCommand::class)) {
-            return $attribute[0]->newInstance()->description;
-        }
-
-        return null;
-    }
-
     /**
      * Configure the console command using a fluent definition.
      *
