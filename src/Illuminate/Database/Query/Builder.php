@@ -432,7 +432,7 @@ class Builder implements BuilderContract
     /**
      * Add a new select column to the query.
      *
-     * @param  array<mixed>|mixed  $column
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression|self|\Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>|\Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model, \Illuminate\Database\Eloquent\Model, mixed>|\Closure(\Illuminate\Database\Query\Builder): mixed|array<string|\Illuminate\Contracts\Database\Query\Expression|self|\Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>|\Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model, \Illuminate\Database\Eloquent\Model, mixed>|\Closure(\Illuminate\Database\Query\Builder): mixed>  $column
      * @return $this
      */
     public function addSelect($column)
