@@ -30,6 +30,22 @@ class Arr
     }
 
     /**
+     * Determine whether the given value is arrayable.
+     *
+     * @param  mixed  $value
+     * @return bool
+     */
+    public static function arrayable($value)
+    {
+        return is_array($value)
+            || $value instanceof Arrayable
+            || $value instanceof Traversable
+            || $value instanceof Jsonable
+            || $value instanceof JsonSerializable
+            || $value instanceof UnitEnum;
+    }
+
+    /**
      * Add an element to an array using "dot" notation if it doesn't exist.
      *
      * @param  array  $array

@@ -45,7 +45,7 @@ class TestTraversableAndJsonSerializableObject implements IteratorAggregate, Jso
 {
     public $items;
 
-    public function __construct($items)
+    public function __construct($items = [])
     {
         $this->items = $items;
     }
