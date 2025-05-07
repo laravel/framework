@@ -90,6 +90,57 @@ class EloquentModelRelationAutoloadTest extends DatabaseTestCase
         DB::disableQueryLog();
     }
 
+    public function testWithRelationshipAutoloadingSelectiveColumns()
+    {
+        // Setup - create a post with comments and likes
+        $post = Post::create(['title' => 'Test Post', 'content' => 'Full content here']);
+        $comment1 = $post->comments()->create([
+            'parent_id' => null,
+            'content' => 'First comment content',
+            'is_approved' => true
+        ]);
+        $comment2 = $post->comments()->create([
+            'parent_id' => $comment1->id,
+            'content' => 'Second comment content',
+            'is_approved' => true
+        ]);
+        $comment2->likes()->create(['user_id' => 1]);
+        $comment2->likes()->create(['user_id' => 2]);
+
+        DB::enableQueryLog();
+
+        $post = Post::find($post->id);
+
+        $post->withRelationshipAutoloading([
+            'comments:id,parent_id',
+            'likes:id,user_id'
+        ]);
+
+        $likes = [];
+
+        foreach ($post->comments as $comment) {
+            $likes = array_merge($likes, $comment->likes->all());
+        }
+
+        // Assertions
+        $this->assertCount(2, DB::getQueryLog());
+        $this->assertCount(2, $likes);
+
+        // Verify selective loading worked - these columns should be loaded
+        $this->assertNotNull($post->comments[0]->id);
+        $this->assertNotNull($post->comments[0]->parent_id);
+        $this->assertNotNull($likes[0]->user_id);
+
+        // These columns should NOT be loaded (will return null)
+        $this->assertNull($post->comments[0]->content);
+        $this->assertNull($post->comments[0]->is_approved);
+
+        $this->assertTrue($post->relationLoaded('comments'));
+        $this->assertTrue($post->comments[0]->relationLoaded('likes'));
+
+        DB::disableQueryLog();
+    }
+
     public function testRelationAutoloadWithSerialization()
     {
         Model::automaticallyEagerLoadRelationships();

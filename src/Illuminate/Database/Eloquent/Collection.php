@@ -256,13 +256,29 @@ class Collection extends BaseCollection implements QueueableCollection
      */
     public function loadMissingRelationshipChain(array $tuples)
     {
-        [$relation, $class] = array_shift($tuples);
+        [$relationData, $class] = array_shift($tuples);
 
-        $this->filter(function ($model) use ($relation, $class) {
+        $relation = $relationData;
+        $columns = null;
+
+        if (is_string($relation) && str_contains($relation, ':')) {
+            [$relation, $columnString] = explode(':', $relationData, 2);
+            $columns = explode(',', $columnString);
+        }
+
+        $filtered = $this->filter(function ($model) use ($relation, $class) {
             return ! is_null($model) &&
                 ! $model->relationLoaded($relation) &&
                 $model::class === $class;
-        })->load($relation);
+        });
+
+        if ($columns) {
+            $filtered->load([$relation => function ($query) use ($columns) {
+                $query->select($columns);
+            }]);
+        } else {
+            $filtered->load($relation);
+        }
 
         if (empty($tuples)) {
             return;
@@ -753,15 +769,39 @@ class Collection extends BaseCollection implements QueueableCollection
     /**
      * Enable relationship autoloading for all models in this collection.
      *
+     * @param array|string|null $relations Optional array or string defining which relations to autoload with optional column selection
      * @return $this
      */
-    public function withRelationshipAutoloading()
+    public function withRelationshipAutoloading($relations = null)
     {
-        $callback = fn ($tuples) => $this->loadMissingRelationshipChain($tuples);
+        $relationMap = [];
+
+        if (! is_null($relations)) {
+            if (is_string($relations)) {
+                $relations = [$relations];
+            }
+
+            foreach ($relations as $relation) {
+                $baseName = explode(':', $relation)[0];
+                $relationMap[$baseName] = $relation;
+            }
+        }
+
+        $callback = function ($tuples) use ($relationMap) {
+            if (! empty($relationMap)) {
+                $relationName = explode(':', $tuples[0][0])[0];
+
+                if (isset($relationMap[$relationName])) {
+                    $tuples[0][0] = $relationMap[$relationName];
+                }
+            }
+
+            $this->loadMissingRelationshipChain($tuples);
+        };
 
         foreach ($this as $model) {
             if (! $model->hasRelationAutoloadCallback()) {
-                $model->autoloadRelationsUsing($callback, $this);
+                $model->autoloadRelationsUsing($callback);
             }
         }
 
