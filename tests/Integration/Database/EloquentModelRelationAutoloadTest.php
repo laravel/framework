@@ -93,20 +93,19 @@ class EloquentModelRelationAutoloadTest extends DatabaseTestCase
     public function testWithRelationshipAutoloadingSelectiveColumnsLoadsOnlySpecifiedColumns()
     {
         $post = Post::create();
-        $comment = $post->comments()->create([
+        $post->comments()->create([
             'parent_id' => 123,
         ]);
 
         DB::enableQueryLog();
 
-        $post = Post::find($post->id);
         $post->withRelationshipAutoloading([
-            'comments:id',
+            'comments:id,commentable_id',
         ]);
 
-        $this->assertTrue($post->relationLoaded('comments'));
         $this->assertNotNull($post->comments[0]->id);
         $this->assertFalse(array_key_exists('parent_id', $post->comments[0]->getAttributes()));
+        $this->assertTrue($post->relationLoaded('comments'));
 
         DB::disableQueryLog();
     }
@@ -123,20 +122,65 @@ class EloquentModelRelationAutoloadTest extends DatabaseTestCase
         $comment2->likes()->create();
         $comment2->likes()->create();
 
+        $likes = [];
+
         DB::enableQueryLog();
 
-        $post = Post::find($post->id);
-
         $post->withRelationshipAutoloading([
-            'comments:id',
-            'comments.likes',
+            'comments:id,commentable_id',
         ]);
 
-        $this->assertCount(1, DB::getQueryLog());
+        foreach ($post->comments as $comment) {
+            $likes = array_merge($likes, $comment->likes->all());
+        }
+
+        $this->assertCount(2, DB::getQueryLog());
         $this->assertNotNull($post->comments[0]->id);
         $this->assertFalse(array_key_exists('parent_id', $post->comments[0]->getAttributes()));
         $this->assertTrue($post->relationLoaded('comments'));
+        $this->assertCount(2, $likes);
         $this->assertTrue($post->comments[0]->relationLoaded('likes'));
+
+        DB::disableQueryLog();
+    }
+
+    public function testWithRelationshipAutoloadingSelectiveColumnsAcrossPolymorphicTypes()
+    {
+        $post = Post::create();
+        $video = Video::create();
+
+        $postComment = $post->comments()->create([
+            'parent_id' => 11,
+        ]);
+
+        $videoComment = $video->comments()->create([
+            'parent_id' => 22,
+        ]);
+
+        $postComment->likes()->create();
+        $videoComment->likes()->create();
+
+        DB::enableQueryLog();
+
+        $post->withRelationshipAutoloading([
+            'comments:id,commentable_id,commentable_type',
+        ]);
+        $video->withRelationshipAutoloading([
+            'comments:id,commentable_id,commentable_type',
+        ]);
+
+        $this->assertNotNull($post->comments[0]->id);
+        $this->assertNotNull($video->comments[0]->id);
+        $this->assertFalse(array_key_exists('parent_id', $post->comments[0]->getAttributes()));
+        $this->assertSame(Post::class, $post->comments[0]->commentable_type);
+        $this->assertSame($post->id, $post->comments[0]->commentable_id);
+        $this->assertTrue($post->relationLoaded('comments'));
+        $this->assertTrue($video->relationLoaded('comments'));
+        $this->assertFalse(array_key_exists('parent_id', $video->comments[0]->getAttributes()));
+        $this->assertSame(Video::class, $video->comments[0]->commentable_type);
+        $this->assertSame($video->id, $video->comments[0]->commentable_id);
+        $this->assertInstanceOf(Post::class, $post->comments[0]->commentable);
+        $this->assertInstanceOf(Video::class, $video->comments[0]->commentable);
 
         DB::disableQueryLog();
     }
