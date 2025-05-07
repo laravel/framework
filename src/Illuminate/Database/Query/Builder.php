@@ -370,7 +370,7 @@ class Builder implements BuilderContract
      * Creates a subquery and parse it.
      *
      * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|string  $query
-     * @return array{0: string, 1: list<mixed>}
+     * @return array
      */
     protected function createSub($query)
     {
@@ -390,7 +390,7 @@ class Builder implements BuilderContract
      * Parse the subquery into SQL and bindings.
      *
      * @param  mixed  $query
-     * @return array{0: string, 1: list<mixed>}
+     * @return array
      *
      * @throws \InvalidArgumentException
      */
