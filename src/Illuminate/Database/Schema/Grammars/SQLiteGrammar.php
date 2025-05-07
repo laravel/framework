@@ -907,6 +907,10 @@ class SQLiteGrammar extends Grammar
      */
     protected function typeDate(Fluent $column)
     {
+        if ($column->useCurrent) {
+            $column->default(new Expression('CURRENT_DATE'));
+        }
+
         return 'date';
     }
 
@@ -992,6 +996,10 @@ class SQLiteGrammar extends Grammar
      */
     protected function typeYear(Fluent $column)
     {
+        if ($column->useCurrent) {
+            $column->default(new Expression("(CAST(strftime('%Y', 'now') AS INTEGER))"));
+        }
+
         return $this->typeInteger($column);
     }
 

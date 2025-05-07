@@ -614,6 +614,16 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertSame('alter table "users" add "foo" date not null', $statements[0]);
     }
 
+    public function testAddingDateWithDefaultCurrent()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->date('foo')->useCurrent();
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table "users" add "foo" date not null default CAST(GETDATE() AS DATE)', $statements[0]);
+    }
+
     public function testAddingYear()
     {
         $blueprint = new Blueprint($this->getConnection(), 'users');
@@ -621,6 +631,15 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql();
         $this->assertCount(1, $statements);
         $this->assertSame('alter table "users" add "birth_year" int not null', $statements[0]);
+    }
+
+    public function testAddingYearWithDefaultCurrent()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->year('birth_year')->useCurrent();
+        $statements = $blueprint->toSql();
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table "users" add "birth_year" int not null default CAST(YEAR(GETDATE()) AS INTEGER)', $statements[0]);
     }
 
     public function testAddingDateTime()
