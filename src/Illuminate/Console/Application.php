@@ -242,7 +242,7 @@ class Application extends SymfonyApplication implements ApplicationContract
         if (is_subclass_of($command, SymfonyCommand::class)) {
             $attribute = (new ReflectionClass($command))->getAttributes(AsCommand::class);
 
-            $commandName = ! empty($attribute) ? $attribute[0]->newInstance()->name ? null;
+            $commandName = ! empty($attribute) ? $attribute[0]->newInstance()->name : null;
 
             if (! is_null($commandName)) {
                 foreach (explode('|', $commandName) as $name) {
