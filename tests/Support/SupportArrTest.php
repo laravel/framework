@@ -11,6 +11,9 @@ use Illuminate\Support\MultipleItemsFoundException;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use stdClass;
+use WeakMap;
+
+include_once 'Common.php';
 
 class SupportArrTest extends TestCase
 {
@@ -1483,6 +1486,23 @@ class SupportArrTest extends TestCase
         $array = [2 => [1 => 'products', 3 => 'users']];
         Arr::forget($array, 2.3);
         $this->assertEquals([2 => [1 => 'products']], $array);
+    }
+
+    public function testFrom()
+    {
+        $this->assertSame(['foo' => 'bar'], Arr::from(['foo' => 'bar']));
+        $this->assertSame(['foo' => 'bar'], Arr::from(new TestArrayableObject));
+        $this->assertSame(['foo' => 'bar'], Arr::from(new TestJsonableObject));
+        $this->assertSame(['foo' => 'bar'], Arr::from(new TestJsonSerializeObject));
+        $this->assertSame(['foo'], Arr::from(new TestJsonSerializeWithScalarValueObject));
+
+        $subject = [new stdClass, new stdClass];
+        $items = new TestTraversableAndJsonSerializableObject($subject);
+        $this->assertSame($subject, Arr::from($items));
+
+        $items = new WeakMap;
+        $items[$temp = new class {}] = 'bar';
+        $this->assertSame(['bar'], Arr::from($items));
     }
 
     public function testWrap()
