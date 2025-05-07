@@ -369,7 +369,7 @@ class Builder implements BuilderContract
     /**
      * Creates a subquery and parse it.
      *
-     * @param  string|\Illuminate\Contracts\Database\Query\Expression|self|\Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>|\Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model, \Illuminate\Database\Eloquent\Model, mixed>|\Closure(\Illuminate\Database\Query\Builder): mixed  $query
+     * @param  string|self|\Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>|\Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model, \Illuminate\Database\Eloquent\Model, mixed>|\Closure(\Illuminate\Database\Query\Builder): mixed  $query
      * @return array{0: string, 1: list<mixed>}
      */
     protected function createSub($query)
@@ -389,7 +389,7 @@ class Builder implements BuilderContract
     /**
      * Parse the subquery into SQL and bindings.
      *
-     * @param  mixed  $query
+     * @param  string|self|\Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>|\Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model, \Illuminate\Database\Eloquent\Model, mixed>  $query
      * @return array{0: string, 1: list<mixed>}
      *
      * @throws \InvalidArgumentException
