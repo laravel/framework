@@ -283,7 +283,7 @@ class Builder implements BuilderContract
     /**
      * Set the columns to be selected.
      *
-     * @param ColumnTypes|SubQueryTypes|array<ColumnTypes|SubQueryTypes> $column
+     * @param ColumnTypes|SubQueryTypes|array<ColumnTypes|SubQueryTypes>  $column
      * @return $this
      */
     public function select($columns = ['*'])
