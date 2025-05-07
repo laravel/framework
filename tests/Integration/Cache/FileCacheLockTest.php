@@ -10,10 +10,16 @@ use Orchestra\Testbench\TestCase;
 #[WithConfig('cache.default', 'file')]
 class FileCacheLockTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        // flush lock from previous tests
+        Cache::lock('foo')->forceRelease();
+    }
+
     public function testLocksCanBeAcquiredAndReleased()
     {
-        Cache::lock('foo')->forceRelease();
-
         $lock = Cache::lock('foo', 10);
         $this->assertTrue($lock->get());
         $this->assertFalse(Cache::lock('foo', 10)->get());
@@ -27,7 +33,6 @@ class FileCacheLockTest extends TestCase
 
     public function testLocksCanBlockForSeconds()
     {
-        Cache::lock('foo')->forceRelease();
         $this->assertSame('taylor', Cache::lock('foo', 10)->block(1, function () {
             return 'taylor';
         }));
@@ -38,7 +43,6 @@ class FileCacheLockTest extends TestCase
 
     public function testConcurrentLocksAreReleasedSafely()
     {
-        Cache::lock('foo')->forceRelease();
 
         $firstLock = Cache::lock('foo', 1);
         $this->assertTrue($firstLock->get());
@@ -54,8 +58,6 @@ class FileCacheLockTest extends TestCase
 
     public function testLocksWithFailedBlockCallbackAreReleased()
     {
-        Cache::lock('foo')->forceRelease();
-
         $firstLock = Cache::lock('foo', 10);
 
         try {
@@ -75,8 +77,6 @@ class FileCacheLockTest extends TestCase
 
     public function testLocksCanBeReleasedUsingOwnerToken()
     {
-        Cache::lock('foo')->forceRelease();
-
         $firstLock = Cache::lock('foo', 10);
         $this->assertTrue($firstLock->get());
         $owner = $firstLock->owner();
@@ -89,8 +89,6 @@ class FileCacheLockTest extends TestCase
 
     public function testOwnerStatusCanBeCheckedAfterRestoringLock()
     {
-        Cache::lock('foo')->forceRelease();
-
         $firstLock = Cache::lock('foo', 10);
         $this->assertTrue($firstLock->get());
         $owner = $firstLock->owner();
@@ -101,8 +99,6 @@ class FileCacheLockTest extends TestCase
 
     public function testOtherOwnerDoesNotOwnLockAfterRestore()
     {
-        Cache::lock('foo')->forceRelease();
-
         $firstLock = Cache::lock('foo', 10);
         $this->assertTrue($firstLock->isOwnedBy(null));
         $this->assertTrue($firstLock->get());
