@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Cache;
 
 use Exception;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Sleep;
 use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\TestCase;
 
@@ -43,10 +44,11 @@ class FileCacheLockTest extends TestCase
 
     public function testConcurrentLocksAreReleasedSafely()
     {
+        Sleep::fake(syncWithCarbon: true);
 
         $firstLock = Cache::lock('foo', 1);
         $this->assertTrue($firstLock->get());
-        sleep(2);
+        Sleep::for(2)->seconds();
 
         $secondLock = Cache::lock('foo', 10);
         $this->assertTrue($secondLock->get());
