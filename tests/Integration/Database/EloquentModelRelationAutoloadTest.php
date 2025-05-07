@@ -90,6 +90,27 @@ class EloquentModelRelationAutoloadTest extends DatabaseTestCase
         DB::disableQueryLog();
     }
 
+    public function testWithRelationshipAutoloadingSelectiveColumnsLoadsOnlySpecifiedColumns()
+    {
+        $post = Post::create();
+        $comment = $post->comments()->create([
+            'parent_id' => 123,
+        ]);
+
+        DB::enableQueryLog();
+
+        $post = Post::find($post->id);
+        $post->withRelationshipAutoloading([
+            'comments:id',
+        ]);
+
+        $this->assertTrue($post->relationLoaded('comments'));
+        $this->assertNotNull($post->comments[0]->id);
+        $this->assertFalse(array_key_exists('parent_id', $post->comments[0]->getAttributes()));
+
+        DB::disableQueryLog();
+    }
+
     public function testWithRelationshipAutoloadingSelectiveColumns()
     {
         $post = Post::create();
@@ -111,7 +132,7 @@ class EloquentModelRelationAutoloadTest extends DatabaseTestCase
             'comments.likes',
         ]);
 
-        $this->assertCount(2, DB::getQueryLog());
+        $this->assertCount(1, DB::getQueryLog());
         $this->assertNotNull($post->comments[0]->id);
         $this->assertFalse(array_key_exists('parent_id', $post->comments[0]->getAttributes()));
         $this->assertTrue($post->relationLoaded('comments'));
