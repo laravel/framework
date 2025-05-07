@@ -278,7 +278,7 @@ class Builder implements BuilderContract
     /**
      * Set the columns to be selected.
      *
-     * @param  array<mixed>|mixed  $columns
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression|self|\Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>|\Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model, \Illuminate\Database\Eloquent\Model, mixed>|\Closure(\Illuminate\Database\Query\Builder): mixed|array<string|\Illuminate\Contracts\Database\Query\Expression|self|\Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>|\Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model, \Illuminate\Database\Eloquent\Model, mixed>|\Closure(\Illuminate\Database\Query\Builder): mixed>  $columns
      * @return $this
      */
     public function select($columns = ['*'])
@@ -302,7 +302,7 @@ class Builder implements BuilderContract
     /**
      * Add a subselect expression to the query.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|string  $query
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression|self|\Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>|\Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model, \Illuminate\Database\Eloquent\Model, mixed>|\Closure(\Illuminate\Database\Query\Builder): mixed  $query
      * @param  string  $as
      * @return $this
      *
@@ -337,7 +337,7 @@ class Builder implements BuilderContract
     /**
      * Makes "from" fetch from a subquery.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|string  $query
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression|self|\Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>|\Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model, \Illuminate\Database\Eloquent\Model, mixed>|\Closure(\Illuminate\Database\Query\Builder): mixed  $query
      * @param  string  $as
      * @return $this
      *
@@ -369,8 +369,8 @@ class Builder implements BuilderContract
     /**
      * Creates a subquery and parse it.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|string  $query
-     * @return array
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression|self|\Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>|\Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model, \Illuminate\Database\Eloquent\Model, mixed>|\Closure(\Illuminate\Database\Query\Builder): mixed  $query
+     * @return array{0: string, 1: list<mixed>}
      */
     protected function createSub($query)
     {
@@ -390,7 +390,7 @@ class Builder implements BuilderContract
      * Parse the subquery into SQL and bindings.
      *
      * @param  mixed  $query
-     * @return array
+     * @return array{0: string, 1: list<mixed>}
      *
      * @throws \InvalidArgumentException
      */
