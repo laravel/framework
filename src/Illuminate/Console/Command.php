@@ -126,9 +126,12 @@ class Command extends SymfonyCommand
         }
     }
 
-    /** {@inheritdoc} */
-    #[\Override]
-    public static function getDefaultName(): ?string
+    /**
+     * Get the default name from attribute.
+     *
+     * @return string|null
+     */
+    public static function getDefaultNameFromAttribute(): ?string
     {
         if ($attribute = (new ReflectionClass(static::class))->getAttributes(AsCommand::class)) {
             return $attribute[0]->newInstance()->name;
