@@ -3024,7 +3024,7 @@ class Builder implements BuilderContract
      * Execute a query for a single record by ID.
      *
      * @param  int|string  $id
-     * @param  string|\Illuminate\Contracts\Database\Query\Expression|array<string|\Illuminate\Contracts\Database\Query\Expression>  $columns
+     * @param  ColumnTypes|array<ColumnTypes>  $columns
      * @return object|null
      */
     public function find($id, $columns = ['*'])
@@ -3038,7 +3038,7 @@ class Builder implements BuilderContract
      * @template TValue
      *
      * @param  mixed  $id
-     * @param  (\Closure(): TValue)|list<string>|string  $columns
+     * @param  (\Closure(): TValue)|ColumnTypes  $columns
      * @param  (\Closure(): TValue)|null  $callback
      * @return object|TValue
      */
@@ -3101,7 +3101,7 @@ class Builder implements BuilderContract
     /**
      * Execute the query as a "select" statement.
      *
-     * @param  string|\Illuminate\Contracts\Database\Query\Expression|array<string|\Illuminate\Contracts\Database\Query\Expression>  $columns
+     * @param  ColumnTypes|array<ColumnTypes>  $columns
      * @return \Illuminate\Support\Collection<int, \stdClass>
      */
     public function get($columns = ['*'])
@@ -3157,7 +3157,7 @@ class Builder implements BuilderContract
      * Paginate the given query into a simple paginator.
      *
      * @param  int|\Closure  $perPage
-     * @param  string|\Illuminate\Contracts\Database\Query\Expression|array<string|\Illuminate\Contracts\Database\Query\Expression>  $columns
+     * @param  ColumnTypes|array<ColumnTypes>  $columns
      * @param  string  $pageName
      * @param  int|null  $page
      * @param  \Closure|int|null  $total
@@ -3185,7 +3185,7 @@ class Builder implements BuilderContract
      * This is more efficient on larger data-sets, etc.
      *
      * @param  int  $perPage
-     * @param  string|\Illuminate\Contracts\Database\Query\Expression|array<string|\Illuminate\Contracts\Database\Query\Expression>  $columns
+     * @param  ColumnTypes|array<ColumnTypes>  $columns
      * @param  string  $pageName
      * @param  int|null  $page
      * @return \Illuminate\Contracts\Pagination\Paginator
@@ -3208,7 +3208,7 @@ class Builder implements BuilderContract
      * This is more efficient on larger data-sets, etc.
      *
      * @param  int|null  $perPage
-     * @param  string|\Illuminate\Contracts\Database\Query\Expression|array<string|\Illuminate\Contracts\Database\Query\Expression>  $columns
+     * @param  ColumnTypes|array<ColumnTypes>  $columns
      * @param  string  $cursorName
      * @param  \Illuminate\Pagination\Cursor|string|null  $cursor
      * @return \Illuminate\Contracts\Pagination\CursorPaginator
@@ -3255,7 +3255,7 @@ class Builder implements BuilderContract
     /**
      * Get the count of the total records for the paginator.
      *
-     * @param  array<string|\Illuminate\Contracts\Database\Query\Expression>  $columns
+     * @param  array<ColumnTypes>  $columns
      * @return int
      */
     public function getCountForPagination($columns = ['*'])
@@ -3277,7 +3277,7 @@ class Builder implements BuilderContract
     /**
      * Run a pagination count query.
      *
-     * @param  array<string|\Illuminate\Contracts\Database\Query\Expression>  $columns
+     * @param  array<ColumnTypes>  $columns
      * @return array<mixed>
      */
     protected function runPaginationCountQuery($columns = ['*'])
@@ -3318,8 +3318,8 @@ class Builder implements BuilderContract
     /**
      * Remove the column aliases since they will break count queries.
      *
-     * @param  array<string|\Illuminate\Contracts\Database\Query\Expression>  $columns
-     * @return array<string|\Illuminate\Contracts\Database\Query\Expression>
+     * @param  array<ColumnTypes>  $columns
+     * @return array<ColumnTypes>
      */
     protected function withoutSelectAliases(array $columns)
     {
@@ -3367,7 +3367,7 @@ class Builder implements BuilderContract
     /**
      * Get a collection instance containing the values of a given column.
      *
-     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  ColumnTypes  $column
      * @param  string|null  $key
      * @return \Illuminate\Support\Collection<array-key, mixed>
      */
@@ -3683,7 +3683,7 @@ class Builder implements BuilderContract
      *
      * After running the callback, the columns are reset to the original value.
      *
-     * @param  array<string|\Illuminate\Contracts\Database\Query\Expression>  $columns
+     * @param  array<ColumnTypes>  $columns
      * @param  callable(): mixed  $callback
      * @return mixed
      */
