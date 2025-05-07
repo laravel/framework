@@ -1129,11 +1129,12 @@ trait HasRelationships
     /**
      * Enable relationship autoloading for this model.
      *
+     * @param  array|string|null  $relations
      * @return $this
      */
-    public function withRelationshipAutoloading()
+    public function withRelationshipAutoloading($relations = null)
     {
-        $this->newCollection([$this])->withRelationshipAutoloading();
+        $this->newCollection([$this])->withRelationshipAutoloading($relations);
 
         return $this;
     }
