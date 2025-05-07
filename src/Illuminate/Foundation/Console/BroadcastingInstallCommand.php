@@ -35,6 +35,11 @@ class BroadcastingInstallCommand extends Command
      */
     protected $description = 'Create a broadcasting channel routes file';
 
+    protected $frameworkPackages = [
+        'vue' => '@laravel/echo-vue',
+        'react' => '@laravel/echo-react',
+    ];
+
     /**
      * Execute the console command.
      *
@@ -48,17 +53,15 @@ class BroadcastingInstallCommand extends Command
         if (! file_exists($broadcastingRoutesPath = $this->laravel->basePath('routes/channels.php')) || $this->option('force')) {
             $this->components->info("Published 'channels' route file.");
 
-            copy(__DIR__.'/stubs/broadcasting-routes.stub', $broadcastingRoutesPath);
+            copy(__DIR__ . '/stubs/broadcasting-routes.stub', $broadcastingRoutesPath);
         }
 
         $this->uncommentChannelsRoutesFile();
         $this->enableBroadcastServiceProvider();
 
-        // We have a specific echo version for React and Vue with Typescript,
-        // so check if this app contains React or Vue with Typescript
-        if ($this->appContainsReactWithTypescript() || $this->appContainsVueWithTypescript()) {
-            // If this is a React/Vue app with typescript, inject the Echo configuration in the app.tsx or app.ts file
-            $this->injectEchoConfigurationInApp();
+        if ($this->isUsingSupportedFramework()) {
+            // If this is a supported framework, we will use the framework-specific Echo helpers
+            $this->injectFrameworkSpecificConfiguration();
         } else {
             // Standard JavaScript implementation
             if (! file_exists($echoScriptPath = $this->laravel->resourcePath('js/echo.js'))) {
@@ -66,7 +69,7 @@ class BroadcastingInstallCommand extends Command
                     mkdir($directory, 0755, true);
                 }
 
-                copy(__DIR__.'/stubs/echo-js.stub', $echoScriptPath);
+                copy(__DIR__ . '/stubs/echo-js.stub', $echoScriptPath);
             }
 
             // Only add the bootstrap import for the standard JS implementation
@@ -78,7 +81,7 @@ class BroadcastingInstallCommand extends Command
                 if (! str_contains($bootstrapScript, './echo')) {
                     file_put_contents(
                         $bootstrapScriptPath,
-                        trim($bootstrapScript.PHP_EOL.file_get_contents(__DIR__.'/stubs/echo-bootstrap-js.stub')).PHP_EOL,
+                        trim($bootstrapScript . PHP_EOL . file_get_contents(__DIR__ . '/stubs/echo-bootstrap-js.stub')) . PHP_EOL,
                     );
                 }
             }
@@ -90,35 +93,52 @@ class BroadcastingInstallCommand extends Command
     }
 
     /**
-     * Detect if the user is using React with TypeScript
+     * Detect if the user is using a supported framework (React or Vue)
      *
      * @return bool
      */
-    protected function appContainsReactWithTypescript(): bool
+    protected function isUsingSupportedFramework(): bool
     {
-        $packageJsonPath = $this->laravel->basePath('package.json');
-        if (!file_exists($packageJsonPath)) {
-            return false;
-        }
-        $packageJson = json_decode(file_get_contents($packageJsonPath), true);
-        return isset($packageJson['dependencies']['react']) && 
-               isset($packageJson['dependencies']['typescript']);
+        return $this->appUsesReact() || $this->appUsesVue();
     }
 
     /**
-     * Detect if the user is using Vue with TypeScript
+     * Detect if the user is using React
      *
      * @return bool
      */
-    protected function appContainsVueWithTypescript(): bool
+    protected function appUsesReact(): bool
+    {
+        return $this->packageDependenciesInclude('react');
+    }
+
+    /**
+     * Detect if the user is using Vue
+     *
+     * @return bool
+     */
+    protected function appUsesVue(): bool
+    {
+        return $this->packageDependenciesInclude('vue');
+    }
+
+    /**
+     * Detect if the package is installed
+     *
+     * @return bool
+     */
+    protected function packageDependenciesInclude(string $package): bool
     {
         $packageJsonPath = $this->laravel->basePath('package.json');
+
         if (!file_exists($packageJsonPath)) {
             return false;
         }
+
         $packageJson = json_decode(file_get_contents($packageJsonPath), true);
-        return isset($packageJson['dependencies']['vue']) && 
-               isset($packageJson['dependencies']['typescript']);
+
+        return isset($packageJson['dependencies'][$package]) ||
+            isset($packageJson['devDependencies'][$package]);
     }
 
     /**
@@ -143,7 +163,7 @@ class BroadcastingInstallCommand extends Command
         } elseif (str_contains($content, 'commands: __DIR__.\'/../routes/console.php\',')) {
             (new Filesystem)->replaceInFile(
                 'commands: __DIR__.\'/../routes/console.php\',',
-                'commands: __DIR__.\'/../routes/console.php\','.PHP_EOL.'        channels: __DIR__.\'/../routes/channels.php\',',
+                'commands: __DIR__.\'/../routes/console.php\',' . PHP_EOL . '        channels: __DIR__.\'/../routes/channels.php\',',
                 $appBootstrapPath,
             );
         }
@@ -158,8 +178,10 @@ class BroadcastingInstallCommand extends Command
     {
         $filesystem = new Filesystem;
 
-        if (! $filesystem->exists(app()->configPath('app.php')) ||
-            ! $filesystem->exists('app/Providers/BroadcastServiceProvider.php')) {
+        if (
+            ! $filesystem->exists(app()->configPath('app.php')) ||
+            ! $filesystem->exists('app/Providers/BroadcastServiceProvider.php')
+        ) {
             return;
         }
 
@@ -179,64 +201,63 @@ class BroadcastingInstallCommand extends Command
      *
      * @return void
      */
-    protected function injectEchoConfigurationInApp()
+    protected function injectFrameworkSpecificConfiguration()
     {
-        // Detect which stack we are using and set appropriate configuration
-        if ($this->appContainsVueWithTypescript()) {
-            $filePath = resource_path('js/app.ts');
-            $importPath = 'laravel-echo/vue';
-            $fileExtension = 'ts';
+        if ($this->appUsesVue()) {
+            $importPath = $this->frameworkPackages['vue'];
+            $filePaths = [
+                $this->laravel->resourcePath('js/app.ts'),
+                $this->laravel->resourcePath('js/app.js'),
+            ];
         } else {
-            // Default to React
-            $filePath = resource_path('js/app.tsx');
-            $importPath = 'laravel-echo/react';
-            $fileExtension = 'tsx';
+            $importPath = $this->frameworkPackages['react'];
+            $filePaths = [
+                $this->laravel->resourcePath('js/app.tsx'),
+                $this->laravel->resourcePath('js/app.jsx'),
+            ];
         }
-        
+
+        $filePath = array_filter($filePaths, function ($path) {
+            return file_exists($path);
+        })[0] ?? null;
+
         // Check if file exists
-        if (!file_exists($filePath)) {
-            $this->components->warn("Could not find {$filePath}. Echo configuration not added.");
+        if (!$filePath) {
+            $this->components->warn("Could not find {$filePaths[0]}. Echo configuration not added.");
             return;
         }
-        
+
         $contents = file_get_contents($filePath);
 
-        // Prepare Echo configuration code
         $echoCode = <<<JS
         import { configureEcho } from '{$importPath}';
 
         configureEcho({
             broadcaster: 'reverb',
-            key: import.meta.env.VITE_REVERB_APP_KEY,
-            wsHost: import.meta.env.VITE_REVERB_HOST,
-            wsPort: import.meta.env.VITE_REVERB_PORT ?? 80,
-            wssPort: import.meta.env.VITE_REVERB_PORT ?? 443,
-            forceTLS: (import.meta.env.VITE_REVERB_SCHEME ?? 'https') === 'https',
-            enabledTransports: ['ws', 'wss'],
         });
         JS;
 
-        // Find all imports
         preg_match_all('/^import .+;$/m', $contents, $matches);
 
-        // Add Echo configuration after the last import
-        if (!empty($matches[0])) {
+        if (empty($matches[0])) {
+            // Add the Echo configuration to the top of the file if no import statements are found
+            $newContents = $echoCode . PHP_EOL . $contents;
+            file_put_contents($filePath, $newContents);
+        } else {
+            // Add Echo configuration after the last import
             $lastImport = end($matches[0]);
             $pos = strrpos($contents, $lastImport);
+
             if ($pos !== false) {
                 $insertPos = $pos + strlen($lastImport);
-                $newContents = substr($contents, 0, $insertPos) . "\n" . $echoCode . substr($contents, $insertPos);
+                $newContents = substr($contents, 0, $insertPos) . PHP_EOL . $echoCode . substr($contents, $insertPos);
                 file_put_contents($filePath, $newContents);
-                $this->components->info("Echo configuration added to app.{$fileExtension}.");
             }
-        } else {
-            // Add the Echo configuration to the top of the file if no import statements are found
-            $newContents = $echoCode . "\n" . $contents;
-            file_put_contents($filePath, $newContents);
-            $this->components->info("Echo configuration added to the top of app.{$fileExtension}.");
         }
+
+        $this->components->info('Echo configuration added to ' . basename($filePath) . '.');
     }
-    
+
 
     /**
      * Install Laravel Reverb into the application if desired.
@@ -281,24 +302,32 @@ class BroadcastingInstallCommand extends Command
 
         $this->components->info('Installing and building Node dependencies.');
 
+        $additionalPackage = '';
+
+        if ($this->appUsesVue()) {
+            $additionalPackage = $this->frameworkPackages['vue'];
+        } elseif ($this->appUsesReact()) {
+            $additionalPackage = $this->frameworkPackages['react'];
+        }
+
         if (file_exists(base_path('pnpm-lock.yaml'))) {
             $commands = [
-                'pnpm add --save-dev laravel-echo pusher-js',
+                trim('pnpm add --save-dev laravel-echo pusher-js ' . $additionalPackage),
                 'pnpm run build',
             ];
         } elseif (file_exists(base_path('yarn.lock'))) {
             $commands = [
-                'yarn add --dev laravel-echo pusher-js',
+                trim('yarn add --dev laravel-echo pusher-js ' . $additionalPackage),
                 'yarn run build',
             ];
         } elseif (file_exists(base_path('bun.lock')) || file_exists(base_path('bun.lockb'))) {
             $commands = [
-                'bun add --dev laravel-echo pusher-js',
+                trim('bun add --dev laravel-echo pusher-js ' . $additionalPackage),
                 'bun run build',
             ];
         } else {
             $commands = [
-                'npm install --save-dev laravel-echo pusher-js',
+                trim('npm install --save-dev laravel-echo pusher-js ' . $additionalPackage),
                 'npm run build',
             ];
         }
@@ -311,7 +340,7 @@ class BroadcastingInstallCommand extends Command
         }
 
         if ($command->run()->failed()) {
-            $this->components->warn("Node dependency installation failed. Please run the following commands manually: \n\n".implode(' && ', $commands));
+            $this->components->warn("Node dependency installation failed. Please run the following commands manually: \n\n" . implode(' && ', $commands));
         } else {
             $this->components->info('Node dependencies installed successfully.');
         }
