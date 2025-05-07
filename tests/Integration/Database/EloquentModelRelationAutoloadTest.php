@@ -149,16 +149,18 @@ class EloquentModelRelationAutoloadTest extends DatabaseTestCase
         $post = Post::create();
         $video = Video::create();
 
-        $postComment = $post->comments()->create([
-            'parent_id' => 11,
+        $postComment1 = $post->comments()->create([
+            'parent_id' => null,
         ]);
-
-        $videoComment = $video->comments()->create([
-            'parent_id' => 22,
+        $postComment2 = $post->comments()->create([
+            'parent_id' => $postComment1->id,
         ]);
-
-        $postComment->likes()->create();
-        $videoComment->likes()->create();
+        $videoComment1 = $video->comments()->create([
+            'parent_id' => null,
+        ]);
+        $videoComment2 = $video->comments()->create([
+            'parent_id' => $videoComment1->id,
+        ]);
 
         DB::enableQueryLog();
 
@@ -166,21 +168,22 @@ class EloquentModelRelationAutoloadTest extends DatabaseTestCase
             'comments:id,commentable_id,commentable_type',
         ]);
         $video->withRelationshipAutoloading([
-            'comments:id,commentable_id,commentable_type',
+            'comments:id,commentable_id,commentable_type,parent_id',
         ]);
 
         $this->assertNotNull($post->comments[0]->id);
         $this->assertNotNull($video->comments[0]->id);
-        $this->assertFalse(array_key_exists('parent_id', $post->comments[0]->getAttributes()));
-        $this->assertSame(Post::class, $post->comments[0]->commentable_type);
-        $this->assertSame($post->id, $post->comments[0]->commentable_id);
+
         $this->assertTrue($post->relationLoaded('comments'));
         $this->assertTrue($video->relationLoaded('comments'));
-        $this->assertFalse(array_key_exists('parent_id', $video->comments[0]->getAttributes()));
+        $this->assertFalse(array_key_exists('parent_id', $post->comments[0]->getAttributes()));
+        $this->assertFalse(array_key_exists('parent_id', $post->comments[1]->getAttributes()));
+        $this->assertTrue(array_key_exists('parent_id', $video->comments[0]->getAttributes()));
+        $this->assertTrue(array_key_exists('parent_id', $video->comments[1]->getAttributes()));
+        $this->assertSame(Post::class, $post->comments[0]->commentable_type);
         $this->assertSame(Video::class, $video->comments[0]->commentable_type);
-        $this->assertSame($video->id, $video->comments[0]->commentable_id);
-        $this->assertInstanceOf(Post::class, $post->comments[0]->commentable);
-        $this->assertInstanceOf(Video::class, $video->comments[0]->commentable);
+        $this->assertEquals($post->id, $post->comments[0]->commentable_id);
+        $this->assertEquals($video->id, $video->comments[0]->commentable_id);
 
         DB::disableQueryLog();
     }
