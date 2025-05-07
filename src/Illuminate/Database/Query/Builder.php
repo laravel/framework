@@ -278,7 +278,7 @@ class Builder implements BuilderContract
     /**
      * Set the columns to be selected.
      *
-     * @param  mixed  $column
+     * @param  mixed  $columns
      * @return $this
      */
     public function select($columns = ['*'])
