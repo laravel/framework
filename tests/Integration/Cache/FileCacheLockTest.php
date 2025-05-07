@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Cache;
 
 use Exception;
+use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Sleep;
 use Orchestra\Testbench\Attributes\WithConfig;
@@ -109,5 +110,17 @@ class FileCacheLockTest extends TestCase
         $secondLock = Cache::store('file')->restoreLock('foo', 'other_owner');
         $this->assertTrue($secondLock->isOwnedBy($firstLock->owner()));
         $this->assertFalse($secondLock->isOwnedByCurrentProcess());
+    }
+
+    public function testExceptionIfBlockCanNotAcquireLock()
+    {
+        Sleep::fake(syncWithCarbon: true);
+
+        // acquire and not release lock
+        Cache::lock('foo', 10)->get();
+
+        // try to get lock and hit block timeout
+        $this->expectException(LockTimeoutException::class);
+        Cache::lock('foo', 10)->block(5);
     }
 }
