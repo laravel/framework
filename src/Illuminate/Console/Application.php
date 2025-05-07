@@ -241,7 +241,7 @@ class Application extends SymfonyApplication implements ApplicationContract
     public function resolve($command)
     {
         if (is_subclass_of($command, SymfonyCommand::class)) {
-            $attribute = (new ReflectionClass($command))->getAttributes(AsCommand::class);
+            $attribute = (new ReflectionClass($command::class))->getAttributes(AsCommand::class);
 
             $commandName = ! empty($attribute) ? $attribute[0]->newInstance()->name : null;
 
