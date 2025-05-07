@@ -12,6 +12,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
 use Illuminate\Support\HigherOrderCollectionProxy;
+use InvalidArgumentException;
 use JsonSerializable;
 use UnexpectedValueException;
 
@@ -1055,7 +1056,11 @@ trait EnumeratesValues
      */
     protected function getArrayableItems($items)
     {
-        return Arr::from($items);
+        try {
+            return Arr::from($items);
+        } catch (InvalidArgumentException) {
+            return (array) $items;
+        }
     }
 
     /**

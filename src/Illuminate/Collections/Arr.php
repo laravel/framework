@@ -392,6 +392,8 @@ class Arr
      *
      * @param  array<TKey, TValue>|Enumerable<TKey, TValue>|Arrayable<TKey, TValue>|WeakMap<object, TValue>|Traversable<TKey, TValue>|Jsonable|JsonSerializable|UnitEnum  $items
      * @return ($items is WeakMap ? list<TValue> : array<TKey, TValue>)
+     *
+     * @throws \InvalidArgumentException
      */
     public static function from($items)
     {
@@ -404,7 +406,7 @@ class Arr
             $items instanceof Jsonable => json_decode($items->toJson(), true),
             $items instanceof JsonSerializable => (array) $items->jsonSerialize(),
             $items instanceof UnitEnum => [$items],
-            default => (array) $items,
+            default => throw new InvalidArgumentException('Items cannot be represented by a scalar value.'),
         };
     }
 

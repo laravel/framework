@@ -1503,6 +1503,10 @@ class SupportArrTest extends TestCase
         $items = new WeakMap;
         $items[$temp = new class {}] = 'bar';
         $this->assertSame(['bar'], Arr::from($items));
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Items cannot be represented by a scalar value.');
+        Arr::from(123);
     }
 
     public function testWrap()
