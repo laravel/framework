@@ -293,6 +293,11 @@ class Post extends Model
 {
     public $timestamps = false;
 
+    protected $fillable = [
+        'title',
+        'content',
+    ];
+
     public function comments()
     {
         return $this->morphMany(Comment::class, 'commentable');
