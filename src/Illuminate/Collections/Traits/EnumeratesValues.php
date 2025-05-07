@@ -1059,7 +1059,7 @@ trait EnumeratesValues
         try {
             return Arr::from($items);
         } catch (InvalidArgumentException) {
-            return (array) $items;
+            return Arr::wrap($items);
         }
     }
 

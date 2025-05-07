@@ -41,8 +41,7 @@ class Arr
             || $value instanceof Arrayable
             || $value instanceof Traversable
             || $value instanceof Jsonable
-            || $value instanceof JsonSerializable
-            || $value instanceof UnitEnum;
+            || $value instanceof JsonSerializable;
     }
 
     /**
@@ -406,7 +405,7 @@ class Arr
      * @template TKey of array-key = array-key
      * @template TValue = mixed
      *
-     * @param  array<TKey, TValue>|Enumerable<TKey, TValue>|Arrayable<TKey, TValue>|WeakMap<object, TValue>|Traversable<TKey, TValue>|Jsonable|JsonSerializable|UnitEnum  $items
+     * @param  array<TKey, TValue>|Enumerable<TKey, TValue>|Arrayable<TKey, TValue>|WeakMap<object, TValue>|Traversable<TKey, TValue>|Jsonable|JsonSerializable|object  $items
      * @return ($items is WeakMap ? list<TValue> : array<TKey, TValue>)
      *
      * @throws \InvalidArgumentException
@@ -421,7 +420,7 @@ class Arr
             $items instanceof Traversable => iterator_to_array($items),
             $items instanceof Jsonable => json_decode($items->toJson(), true),
             $items instanceof JsonSerializable => (array) $items->jsonSerialize(),
-            $items instanceof UnitEnum => [$items],
+            is_object($items) && ! $items instanceof UnitEnum => (array) $items,
             default => throw new InvalidArgumentException('Items cannot be represented by a scalar value.'),
         };
     }
