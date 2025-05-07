@@ -32,11 +32,6 @@ use UnitEnum;
 
 use function Illuminate\Support\enum_value;
 
-/**
- * @phpstan-type ColumnTypes = string|\Illuminate\Contracts\Database\Query\Expression
- * @phpstan-type SubQueryTypes = string|SubQueryBuilderTypes|\Closure(\Illuminate\Database\Query\Builder): mixed
- * @phpstan-type SubQueryBuilderTypes = self|\Illuminate\Database\Eloquent\Builder<covariant \Illuminate\Database\Eloquent\Model>|\Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model, \Illuminate\Database\Eloquent\Model, mixed>
- */
 class Builder implements BuilderContract
 {
     /** @use \Illuminate\Database\Concerns\BuildsQueries<object> */
@@ -97,7 +92,7 @@ class Builder implements BuilderContract
      *
      * @var array{
      *     function: string,
-     *     columns: array<ColumnTypes>
+     *     columns: array<\Illuminate\Contracts\Database\Query\Expression|string>
      * }|null
      */
     public $aggregate;
@@ -105,7 +100,7 @@ class Builder implements BuilderContract
     /**
      * The columns that should be returned.
      *
-     * @var array<ColumnTypes>|null
+     * @var array<string|\Illuminate\Contracts\Database\Query\Expression>|null
      */
     public $columns;
 
@@ -283,7 +278,7 @@ class Builder implements BuilderContract
     /**
      * Set the columns to be selected.
      *
-     * @param  ColumnTypes|SubQueryTypes|array<ColumnTypes|SubQueryTypes>  $column
+     * @param  mixed  $column
      * @return $this
      */
     public function select($columns = ['*'])
@@ -307,7 +302,7 @@ class Builder implements BuilderContract
     /**
      * Add a subselect expression to the query.
      *
-     * @param  SubQueryTypes  $query
+     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|string  $query
      * @param  string  $as
      * @return $this
      *
@@ -374,7 +369,7 @@ class Builder implements BuilderContract
     /**
      * Creates a subquery and parse it.
      *
-     * @param  SubQueryTypes  $query
+     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|string  $query
      * @return array{0: string, 1: list<mixed>}
      */
     protected function createSub($query)
@@ -394,7 +389,7 @@ class Builder implements BuilderContract
     /**
      * Parse the subquery into SQL and bindings.
      *
-     * @param  string|SubQueryBuilderTypes  $query
+     * @param  mixed  $query
      * @return array{0: string, 1: list<mixed>}
      *
      * @throws \InvalidArgumentException
@@ -437,7 +432,7 @@ class Builder implements BuilderContract
     /**
      * Add a new select column to the query.
      *
-     * @param  ColumnTypes|SubQueryTypes|array<ColumnTypes|SubQueryTypes>  $column
+     * @param  mixed  $column
      * @return $this
      */
     public function addSelect($column)
@@ -3024,7 +3019,7 @@ class Builder implements BuilderContract
      * Execute a query for a single record by ID.
      *
      * @param  int|string  $id
-     * @param  ColumnTypes|array<ColumnTypes>  $columns
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression|array<string|\Illuminate\Contracts\Database\Query\Expression>  $columns
      * @return object|null
      */
     public function find($id, $columns = ['*'])
@@ -3038,7 +3033,7 @@ class Builder implements BuilderContract
      * @template TValue
      *
      * @param  mixed  $id
-     * @param  (\Closure(): TValue)|ColumnTypes  $columns
+     * @param  (\Closure(): TValue)|string|\Illuminate\Contracts\Database\Query\Expression|array<string|\Illuminate\Contracts\Database\Query\Expression>  $columns
      * @param  (\Closure(): TValue)|null  $callback
      * @return object|TValue
      */
@@ -3101,7 +3096,7 @@ class Builder implements BuilderContract
     /**
      * Execute the query as a "select" statement.
      *
-     * @param  ColumnTypes|array<ColumnTypes>  $columns
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression|array<string|\Illuminate\Contracts\Database\Query\Expression>  $columns
      * @return \Illuminate\Support\Collection<int, \stdClass>
      */
     public function get($columns = ['*'])
