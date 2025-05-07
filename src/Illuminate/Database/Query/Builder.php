@@ -34,7 +34,7 @@ use function Illuminate\Support\enum_value;
 
 /**
  * @phpstan-type ColumnTypes = string|\Illuminate\Contracts\Database\Query\Expression
- * @phpstan-type SubQueryBuilderTypes = string|self|\Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>|\Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model, \Illuminate\Database\Eloquent\Model, mixed>
+ * @phpstan-type SubQueryBuilderTypes = string|self|\Illuminate\Database\Eloquent\Builder<covariant \Illuminate\Database\Eloquent\Model>|\Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model, \Illuminate\Database\Eloquent\Model, mixed>
  * @phpstan-type SubQueryTypes = string|SubQueryBuilderTypes|\Closure(\Illuminate\Database\Query\Builder): mixed
  */
 class Builder implements BuilderContract
