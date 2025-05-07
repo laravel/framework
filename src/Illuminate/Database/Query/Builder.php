@@ -3683,9 +3683,10 @@ class Builder implements BuilderContract
      *
      * After running the callback, the columns are reset to the original value.
      *
+     * @template TResult
      * @param  array<ColumnTypes>  $columns
-     * @param  callable(): mixed  $callback
-     * @return mixed
+     * @param  callable(): TResult  $callback
+     * @return TResult
      */
     protected function onceWithColumns($columns, $callback)
     {
