@@ -922,8 +922,6 @@ class MySqlGrammar extends Grammar
     /**
      * Create the column definition for a date type.
      *
-     * Note: "useCurrent requires MariaDB or MySQL 8.0.13+."
-     *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
      */
@@ -1030,8 +1028,6 @@ class MySqlGrammar extends Grammar
 
     /**
      * Create the column definition for a year type.
-     *
-     * Note: "useCurrent requires MariaDB or MySQL 8.0.13+."
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
