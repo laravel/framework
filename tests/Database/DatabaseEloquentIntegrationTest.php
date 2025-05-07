@@ -173,6 +173,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
             $this->schema($connection)->create('achievements', function ($table) {
                 $table->increments('id');
+                $table->integer('status')->nullable();
             });
 
             $this->schema($connection)->create('eloquent_test_achievement_eloquent_test_user', function ($table) {
@@ -1497,7 +1498,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $user1 = EloquentTestUser::create(['email' => 'user1@gmail.com']);
         $user2 = EloquentTestUser::create(['email' => 'user2@gmail.com']);
         $user3 = EloquentTestUser::create(['email' => 'user3@gmail.com']);
-        $achievement1 = EloquentTestAchievement::create();
+        $achievement1 = EloquentTestAchievement::create(['status' => 3]);
         $achievement2 = EloquentTestAchievement::create();
         $achievement3 = EloquentTestAchievement::create();
 
@@ -2988,6 +2989,7 @@ class EloquentTestAchievement extends Eloquent
     public $timestamps = false;
 
     protected $table = 'achievements';
+    protected $guarded = [];
 
     public function eloquentTestUsers()
     {
