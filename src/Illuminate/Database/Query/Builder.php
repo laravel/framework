@@ -3125,8 +3125,8 @@ class Builder implements BuilderContract
     /**
      * Remove the group limit keys from the results in the collection.
      *
-     * @param  \Illuminate\Support\Collection<int, \stdClass>  $items
-     * @return \Illuminate\Support\Collection<int, \stdClass>
+     * @param  \Illuminate\Support\Collection  $items
+     * @return \Illuminate\Support\Collection
      */
     protected function withoutGroupLimitKeys($items)
     {
