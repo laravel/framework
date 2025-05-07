@@ -32,6 +32,11 @@ use UnitEnum;
 
 use function Illuminate\Support\enum_value;
 
+/**
+ * @phpstan-type ColumnTypes = string|\Illuminate\Contracts\Database\Query\Expression
+ * @phpstan-type SubQueryBuilderTypes = string|self|\Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>|\Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model, \Illuminate\Database\Eloquent\Model, mixed>
+ * @phpstan-type SubQueryTypes = string|SubQueryBuilderTypes|\Closure(\Illuminate\Database\Query\Builder): mixed
+ */
 class Builder implements BuilderContract
 {
     /** @use \Illuminate\Database\Concerns\BuildsQueries<object> */
@@ -92,7 +97,7 @@ class Builder implements BuilderContract
      *
      * @var array{
      *     function: string,
-     *     columns: array<\Illuminate\Contracts\Database\Query\Expression|string>
+     *     columns: array<ColumnTypes>
      * }|null
      */
     public $aggregate;
@@ -100,7 +105,7 @@ class Builder implements BuilderContract
     /**
      * The columns that should be returned.
      *
-     * @var array<string|\Illuminate\Contracts\Database\Query\Expression>|null
+     * @var array<ColumnTypes>|null
      */
     public $columns;
 
@@ -278,7 +283,7 @@ class Builder implements BuilderContract
     /**
      * Set the columns to be selected.
      *
-     * @param  string|\Illuminate\Contracts\Database\Query\Expression|self|\Illuminate\Database\Eloquent\Builder<covariant \Illuminate\Database\Eloquent\Model>|\Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model, \Illuminate\Database\Eloquent\Model, mixed>|\Closure(\Illuminate\Database\Query\Builder): mixed|array<string|\Illuminate\Contracts\Database\Query\Expression|self|\Illuminate\Database\Eloquent\Builder<covariant \Illuminate\Database\Eloquent\Model>|\Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model, \Illuminate\Database\Eloquent\Model, mixed>|\Closure(\Illuminate\Database\Query\Builder): mixed>  $columns
+     * @param ColumnTypes|SubQueryTypes|array<ColumnTypes|SubQueryTypes> $column
      * @return $this
      */
     public function select($columns = ['*'])
@@ -302,7 +307,7 @@ class Builder implements BuilderContract
     /**
      * Add a subselect expression to the query.
      *
-     * @param  string|\Illuminate\Contracts\Database\Query\Expression|self|\Illuminate\Database\Eloquent\Builder<covariant \Illuminate\Database\Eloquent\Model>|\Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model, \Illuminate\Database\Eloquent\Model, mixed>|\Closure(\Illuminate\Database\Query\Builder): mixed  $query
+     * @param  SubQueryTypes  $query
      * @param  string  $as
      * @return $this
      *
@@ -337,7 +342,7 @@ class Builder implements BuilderContract
     /**
      * Makes "from" fetch from a subquery.
      *
-     * @param  string|\Illuminate\Contracts\Database\Query\Expression|self|\Illuminate\Database\Eloquent\Builder<covariant \Illuminate\Database\Eloquent\Model>|\Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model, \Illuminate\Database\Eloquent\Model, mixed>|\Closure(\Illuminate\Database\Query\Builder): mixed  $query
+     * @param \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|string  $query
      * @param  string  $as
      * @return $this
      *
@@ -369,7 +374,7 @@ class Builder implements BuilderContract
     /**
      * Creates a subquery and parse it.
      *
-     * @param  string|self|\Illuminate\Database\Eloquent\Builder<covariant \Illuminate\Database\Eloquent\Model>|\Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model, \Illuminate\Database\Eloquent\Model, mixed>|\Closure(\Illuminate\Database\Query\Builder): mixed  $query
+     * @param  SubQueryTypes  $query
      * @return array{0: string, 1: list<mixed>}
      */
     protected function createSub($query)
@@ -389,7 +394,7 @@ class Builder implements BuilderContract
     /**
      * Parse the subquery into SQL and bindings.
      *
-     * @param  string|self|\Illuminate\Database\Eloquent\Builder<covariant \Illuminate\Database\Eloquent\Model>|\Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model, \Illuminate\Database\Eloquent\Model, mixed>  $query
+     * @param  string|SubQueryBuilderTypes  $query
      * @return array{0: string, 1: list<mixed>}
      *
      * @throws \InvalidArgumentException
@@ -432,7 +437,7 @@ class Builder implements BuilderContract
     /**
      * Add a new select column to the query.
      *
-     * @param  string|\Illuminate\Contracts\Database\Query\Expression|self|\Illuminate\Database\Eloquent\Builder<covariant \Illuminate\Database\Eloquent\Model>|\Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model, \Illuminate\Database\Eloquent\Model, mixed>|\Closure(\Illuminate\Database\Query\Builder): mixed|array<string|\Illuminate\Contracts\Database\Query\Expression|self|\Illuminate\Database\Eloquent\Builder<covariant \Illuminate\Database\Eloquent\Model>|\Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model, \Illuminate\Database\Eloquent\Model, mixed>|\Closure(\Illuminate\Database\Query\Builder): mixed>  $column
+     * @param  ColumnTypes|SubQueryTypes|array<ColumnTypes|SubQueryTypes>  $column
      * @return $this
      */
     public function addSelect($column)
@@ -3113,7 +3118,7 @@ class Builder implements BuilderContract
     /**
      * Run the query as a "select" statement against the connection.
      *
-     * @return array<int, \stdClass>
+     * @return array
      */
     protected function runSelect()
     {
