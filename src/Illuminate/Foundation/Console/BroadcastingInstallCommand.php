@@ -48,6 +48,11 @@ class BroadcastingInstallCommand extends Command
      */
     protected $driver = null;
 
+    /**
+     * The framework packages to install.
+     *
+     * @var array
+     */
     protected $frameworkPackages = [
         'vue' => '@laravel/echo-vue',
         'react' => '@laravel/echo-react',
