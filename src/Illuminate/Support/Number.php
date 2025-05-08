@@ -160,7 +160,7 @@ class Number
      * @param  int|float  $bytes
      * @param  int  $precision
      * @param  int|null  $maxPrecision
-     * @param  bool $useBinaryPrefix
+     * @param  bool  $useBinaryPrefix
      * @return string
      */
     public static function fileSize(int|float $bytes, int $precision = 0, ?int $maxPrecision = null, bool $useBinaryPrefix = false)
