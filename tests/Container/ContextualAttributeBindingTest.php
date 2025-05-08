@@ -63,6 +63,19 @@ class ContextualAttributeBindingTest extends TestCase
         $this->assertInstanceOf(ContainerTestImplB::class, $classB->property);
     }
 
+    public function testTargetIsProvidedWhenResolvingDependencyFromAttributeBinding()
+    {
+        $container = new Container;
+
+        $container->whenHasAttribute(ContainerTestAttributeThatReceivesTarget::class, function (ContainerTestAttributeThatReceivesTarget $attribute, Container $container, $target) {
+            return $target;
+        });
+
+        $class = $container->make(ContainerTestHasAttributeThatReceivesTarget::class);
+
+        $this->assertEquals(ContainerTestHasAttributeThatReceivesTarget::class, $class->property);
+    }
+
     public function testScalarDependencyCanBeResolvedFromAttributeBinding()
     {
         $container = new Container;
@@ -310,6 +323,15 @@ class ContainerTestAttributeThatResolvesContractImpl implements ContextualAttrib
     }
 }
 
+#[Attribute(Attribute::TARGET_PARAMETER)]
+class ContainerTestAttributeThatReceivesTarget implements ContextualAttribute
+{
+    public function resolve(self $attribute, Container $container, $target): string
+    {
+        return $target;
+    }
+}
+
 interface ContainerTestContract
 {
 }
@@ -336,6 +358,15 @@ final class ContainerTestHasAttributeThatResolvesToImplB
     public function __construct(
         #[ContainerTestAttributeThatResolvesContractImpl('B')]
         public readonly ContainerTestContract $property
+    ) {
+    }
+}
+
+final class ContainerTestHasAttributeThatReceivesTarget
+{
+    public function __construct(
+        #[ContainerTestAttributeThatReceivesTarget]
+        public string $property
     ) {
     }
 }
