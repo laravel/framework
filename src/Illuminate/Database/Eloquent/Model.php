@@ -4,6 +4,7 @@ namespace Illuminate\Database\Eloquent;
 
 use ArrayAccess;
 use Closure;
+use Exception;
 use Illuminate\Contracts\Broadcasting\HasBroadcastChannel;
 use Illuminate\Contracts\Queue\QueueableCollection;
 use Illuminate\Contracts\Queue\QueueableEntity;
@@ -291,6 +292,9 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     protected function bootIfNotBooted()
     {
         if (! isset(static::$booted[static::class])) {
+            if (isset(static::$booting[static::class])) {
+                throw new Exception('"'.__METHOD__.'" cannot be called on the "'.static::class.'" class while it is already being booted.');
+            }
 
             static::$booting[static::class] = true;
 
