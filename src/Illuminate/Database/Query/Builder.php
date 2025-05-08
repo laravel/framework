@@ -1101,7 +1101,7 @@ class Builder implements BuilderContract
     /**
      * Add a raw where clause to the query.
      *
-     * @param  string  $sql
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $sql
      * @param  mixed  $bindings
      * @param  string  $boolean
      * @return $this
