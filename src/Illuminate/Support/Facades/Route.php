@@ -99,7 +99,7 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Routing\RouteRegistrar prefix(string $prefix)
  * @method static \Illuminate\Routing\RouteRegistrar scopeBindings()
  * @method static \Illuminate\Routing\RouteRegistrar where(array $where)
- * @method static \Illuminate\Routing\RouteRegistrar withoutMiddleware(array|string $middleware)
+ * @method static \Illuminate\Routing\RouteRegistrar withoutMiddleware(array|string|null $middleware)
  * @method static \Illuminate\Routing\RouteRegistrar withoutScopedBindings()
  *
  * @see \Illuminate\Routing\Router
