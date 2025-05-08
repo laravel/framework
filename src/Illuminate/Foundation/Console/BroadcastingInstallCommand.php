@@ -71,7 +71,7 @@ class BroadcastingInstallCommand extends Command
         if (! file_exists($broadcastingRoutesPath = $this->laravel->basePath('routes/channels.php')) || $this->option('force')) {
             $this->components->info("Published 'channels' route file.");
 
-            copy(__DIR__ . '/stubs/broadcasting-routes.stub', $broadcastingRoutesPath);
+            copy(__DIR__.'/stubs/broadcasting-routes.stub', $broadcastingRoutesPath);
         }
 
         $this->uncommentChannelsRoutesFile();
@@ -91,7 +91,7 @@ class BroadcastingInstallCommand extends Command
                     mkdir($directory, 0755, true);
                 }
 
-                copy(__DIR__ . '/stubs/echo-js.stub', $echoScriptPath);
+                copy(__DIR__.'/stubs/echo-js.stub', $echoScriptPath);
             }
 
             // Only add the bootstrap import for the standard JS implementation
@@ -103,7 +103,7 @@ class BroadcastingInstallCommand extends Command
                 if (! str_contains($bootstrapScript, './echo')) {
                     file_put_contents(
                         $bootstrapScriptPath,
-                        trim($bootstrapScript . PHP_EOL . file_get_contents(__DIR__ . '/stubs/echo-bootstrap-js.stub')) . PHP_EOL,
+                        trim($bootstrapScript.PHP_EOL.file_get_contents(__DIR__.'/stubs/echo-bootstrap-js.stub')).PHP_EOL,
                     );
                 }
             }
@@ -219,9 +219,8 @@ class BroadcastingInstallCommand extends Command
     /**
      * Add key-value pairs to the .env file.
      *
-     * @param array $values Key-value pairs to add to the .env file
-     * @param bool $addViteEnvs Also add the corresponding Vite environment variables
-     *
+     * @param  array  $values  Key-value pairs to add to the .env file
+     * @param  bool  $addViteEnvs  Also add the corresponding Vite environment variables
      * @return void
      */
     protected function addToEnv(array $values, $addViteEnvs = true)
@@ -232,10 +231,9 @@ class BroadcastingInstallCommand extends Command
             return;
         }
 
-
         if ($addViteEnvs) {
             foreach ($values as $key => $value) {
-                $values["VITE_{$key}"] = '"${' . $key . '}"';
+                $values["VITE_{$key}"] = '"${'.$key.'}"';
             }
         }
 
@@ -253,16 +251,16 @@ class BroadcastingInstallCommand extends Command
 
             $envContent = $filesystem->get($envPath);
 
-            $newLine = $key . '=' . $value;
+            $newLine = $key.'='.$value;
 
-            preg_match('/^' . preg_quote($newLine, '/') . '$/m', $envContent, $existingLine);
+            preg_match('/^'.preg_quote($newLine, '/').'$/m', $envContent, $existingLine);
 
             if (count($existingLine)) {
                 continue;
             }
 
-            preg_match('/^' . $key . '=$/m', $envContent, $emptyKeyMatches, PREG_OFFSET_CAPTURE);
-            preg_match('/^' . $key . '=/m', $envContent, $keyMatches, PREG_OFFSET_CAPTURE);
+            preg_match('/^'.$key.'=$/m', $envContent, $emptyKeyMatches, PREG_OFFSET_CAPTURE);
+            preg_match('/^'.$key.'=/m', $envContent, $keyMatches, PREG_OFFSET_CAPTURE);
 
             if (count($emptyKeyMatches) > 0) {
                 $filesystem->put(
@@ -284,7 +282,7 @@ class BroadcastingInstallCommand extends Command
     }
 
     /**
-     * Detect if the user is using a supported framework (React or Vue)
+     * Detect if the user is using a supported framework (React or Vue).
      *
      * @return bool
      */
@@ -294,7 +292,7 @@ class BroadcastingInstallCommand extends Command
     }
 
     /**
-     * Detect if the user is using React
+     * Detect if the user is using React.
      *
      * @return bool
      */
@@ -304,7 +302,7 @@ class BroadcastingInstallCommand extends Command
     }
 
     /**
-     * Detect if the user is using Vue
+     * Detect if the user is using Vue.
      *
      * @return bool
      */
@@ -314,7 +312,7 @@ class BroadcastingInstallCommand extends Command
     }
 
     /**
-     * Detect if the package is installed
+     * Detect if the package is installed.
      *
      * @return bool
      */
@@ -322,7 +320,7 @@ class BroadcastingInstallCommand extends Command
     {
         $packageJsonPath = $this->laravel->basePath('package.json');
 
-        if (!file_exists($packageJsonPath)) {
+        if (! file_exists($packageJsonPath)) {
             return false;
         }
 
@@ -354,7 +352,7 @@ class BroadcastingInstallCommand extends Command
         } elseif (str_contains($content, 'commands: __DIR__.\'/../routes/console.php\',')) {
             (new Filesystem)->replaceInFile(
                 'commands: __DIR__.\'/../routes/console.php\',',
-                'commands: __DIR__.\'/../routes/console.php\',' . PHP_EOL . '        channels: __DIR__.\'/../routes/channels.php\',',
+                'commands: __DIR__.\'/../routes/console.php\','.PHP_EOL.'        channels: __DIR__.\'/../routes/channels.php\',',
                 $appBootstrapPath,
             );
         }
@@ -413,8 +411,9 @@ class BroadcastingInstallCommand extends Command
         })[0] ?? null;
 
         // Check if file exists
-        if (!$filePath) {
+        if (! $filePath) {
             $this->components->warn("Could not find {$filePaths[0]}. Echo configuration not added.");
+
             return;
         }
 
@@ -432,7 +431,7 @@ class BroadcastingInstallCommand extends Command
 
         if (empty($matches[0])) {
             // Add the Echo configuration to the top of the file if no import statements are found
-            $newContents = $echoCode . PHP_EOL . $contents;
+            $newContents = $echoCode.PHP_EOL.$contents;
             file_put_contents($filePath, $newContents);
         } else {
             // Add Echo configuration after the last import
@@ -441,14 +440,13 @@ class BroadcastingInstallCommand extends Command
 
             if ($pos !== false) {
                 $insertPos = $pos + strlen($lastImport);
-                $newContents = substr($contents, 0, $insertPos) . PHP_EOL . $echoCode . substr($contents, $insertPos);
+                $newContents = substr($contents, 0, $insertPos).PHP_EOL.$echoCode.substr($contents, $insertPos);
                 file_put_contents($filePath, $newContents);
             }
         }
 
-        $this->components->info('Echo configuration added to ' . basename($filePath) . '.');
+        $this->components->info('Echo configuration added to '.basename($filePath).'.');
     }
-
 
     /**
      * Install Laravel Reverb into the application if desired.
@@ -493,7 +491,6 @@ class BroadcastingInstallCommand extends Command
 
         $this->components->info('Installing and building Node dependencies.');
 
-
         if (file_exists(base_path('pnpm-lock.yaml'))) {
             $commands = [
                 'pnpm add --save-dev laravel-echo pusher-js',
@@ -517,9 +514,9 @@ class BroadcastingInstallCommand extends Command
         }
 
         if ($this->appUsesVue()) {
-            $commands[0] .= ' ' . $this->frameworkPackages['vue'];
+            $commands[0] .= ' '.$this->frameworkPackages['vue'];
         } elseif ($this->appUsesReact()) {
-            $commands[0] .= ' ' . $this->frameworkPackages['react'];
+            $commands[0] .= ' '.$this->frameworkPackages['react'];
         }
 
         $command = Process::command(implode(' && ', $commands))
@@ -530,7 +527,7 @@ class BroadcastingInstallCommand extends Command
         }
 
         if ($command->run()->failed()) {
-            $this->components->warn("Node dependency installation failed. Please run the following commands manually: \n\n" . implode(' && ', $commands));
+            $this->components->warn("Node dependency installation failed. Please run the following commands manually: \n\n".implode(' && ', $commands));
         } else {
             $this->components->info('Node dependencies installed successfully.');
         }
