@@ -4,7 +4,6 @@ namespace Illuminate\Foundation\Console;
 
 use Composer\InstalledVersions;
 use Illuminate\Console\Command;
-use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Process;
 use Symfony\Component\Console\Attribute\AsCommand;
