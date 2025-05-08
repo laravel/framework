@@ -138,6 +138,17 @@ class RouteRegistrarTest extends TestCase
         $this->assertEquals(['one'], $this->getRoute()->excludedMiddleware());
     }
 
+    public function testWithoutMiddlewareWithNullArgument() 
+    {
+        $this->router->middleware(['one', 'two', 'three'])->get('users', function () {
+            return 'all-users';
+        })->withoutMiddleware();
+
+        $this->seeResponse('all-users', Request::create('users', 'GET'));
+
+        $this->assertEquals(['one', 'two', 'three'], $this->getRoute()->excludedMiddleware());
+    }
+
     public function testGetRouteWithTrashed()
     {
         $route = $this->router->get('users', [RouteRegistrarControllerStub::class, 'index'])->withTrashed();

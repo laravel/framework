@@ -1161,11 +1161,19 @@ class Route
     /**
      * Specify middleware that should be removed from the given route.
      *
-     * @param  array|string  $middleware
+     * @param  array|string|null  $middleware
      * @return $this
      */
-    public function withoutMiddleware($middleware)
+    public function withoutMiddleware($middleware = null)
     {
+        if (is_null($middleware) || $middleware === []) {
+            $middleware = array_values(
+                array_diff(
+                    $this->action['middleware'],
+                    ['web']
+                 )
+            );
+        }
         $this->action['excluded_middleware'] = array_merge(
             (array) ($this->action['excluded_middleware'] ?? []), Arr::wrap($middleware)
         );
