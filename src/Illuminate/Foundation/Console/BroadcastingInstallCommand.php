@@ -410,7 +410,6 @@ class BroadcastingInstallCommand extends Command
             return file_exists($path);
         })[0] ?? null;
 
-        // Check if file exists
         if (! $filePath) {
             $this->components->warn("Could not find {$filePaths[0]}. Echo configuration not added.");
 
