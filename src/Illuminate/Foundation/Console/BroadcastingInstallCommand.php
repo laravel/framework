@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Console;
 
 use Composer\InstalledVersions;
 use Illuminate\Console\Command;
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Process;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -211,6 +212,14 @@ class BroadcastingInstallCommand extends Command
         ]);
     }
 
+    /**
+     * Add key-value pairs to the .env file.
+     *
+     * @param array $values Key-value pairs to add to the .env file
+     * @param bool $addViteEnvs Also add the corresponding Vite environment variables
+     *
+     * @return void
+     */
     protected function addToEnv(array $values, $addViteEnvs = true)
     {
         $envPath = $this->laravel->basePath('.env');
