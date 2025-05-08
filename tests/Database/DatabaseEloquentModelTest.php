@@ -3330,6 +3330,21 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals(EloquentModelWithUseFactoryAttribute::class, $factory->modelName());
         $this->assertEquals('test name', $instance->name); // Small smoke test to ensure the factory is working
     }
+
+    public function testNestedModelBootingIsDisallowed()
+    {
+        $this->expectExceptionMessageMatches('/".+" cannot be called on the ".+" class while it is already being booted\./');
+
+        $model = new class extends Model
+        {
+            protected static function boot()
+            {
+                parent::boot();
+
+                $tableName = (new static())->getTable();
+            }
+        };
+    }
 }
 
 class EloquentTestObserverStub
