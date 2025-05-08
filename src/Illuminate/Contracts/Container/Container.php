@@ -207,6 +207,13 @@ interface Container extends ContainerInterface
     public function resolved($abstract);
 
     /**
+     * Get currently resolving.
+     *
+     * @return class-string|string|null
+     */
+    public function currentlyResolving();
+
+    /**
      * Register a new before resolving callback.
      *
      * @param  \Closure|string  $abstract

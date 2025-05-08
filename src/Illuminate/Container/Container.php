@@ -1295,6 +1295,16 @@ class Container implements ArrayAccess, ContainerContract
     }
 
     /**
+     * Get currently resolving.
+     *
+     * @return class-string|string|null
+     */
+    public function currentlyResolving()
+    {
+        return end($this->buildStack) ?: null;
+    }
+
+    /**
      * Register a new before resolving callback for all types.
      *
      * @param  \Closure|string  $abstract
