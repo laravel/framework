@@ -199,13 +199,13 @@ class SupportNumberTest extends TestCase
         $this->assertSame('1.234 KiB', Number::fileSize(1264.12345, maxPrecision: 3, useBinaryPrefix: true));
         $this->assertSame('1.234 KiB', Number::fileSize(1264, 3, useBinaryPrefix: true));
         $this->assertSame('5 GiB', Number::fileSize(1024 * 1024 * 1024 * 5, useBinaryPrefix: true));
-        $this->assertSame('10 TiB', Number::fileSize((1024 ** 4) * 10), useBinaryPrefix: true);
-        $this->assertSame('10 PiB', Number::fileSize((1024 ** 5) * 10), useBinaryPrefix: true);
-        $this->assertSame('1 ZiB', Number::fileSize(1024 ** 7), useBinaryPrefix: true);
-        $this->assertSame('1 YiB', Number::fileSize(1024 ** 8), useBinaryPrefix: true);
-        $this->assertSame('1 RiB', Number::fileSize(1024 ** 9), useBinaryPrefix: true);
-        $this->assertSame('1 QiB', Number::fileSize(1024 ** 10), useBinaryPrefix: true);
-        $this->assertSame('1,024 QiB', Number::fileSize(1024 ** 11), useBinaryPrefix: true);
+        $this->assertSame('10 TiB', Number::fileSize((1024 ** 4) * 10, useBinaryPrefix: true));
+        $this->assertSame('10 PiB', Number::fileSize((1024 ** 5) * 10, useBinaryPrefix: true));
+        $this->assertSame('1 ZiB', Number::fileSize(1024 ** 7, useBinaryPrefix: true));
+        $this->assertSame('1 YiB', Number::fileSize(1024 ** 8, useBinaryPrefix: true));
+        $this->assertSame('1 RiB', Number::fileSize(1024 ** 9, useBinaryPrefix: true));
+        $this->assertSame('1 QiB', Number::fileSize(1024 ** 10, useBinaryPrefix: true));
+        $this->assertSame('1,024 QiB', Number::fileSize(1024 ** 11, useBinaryPrefix: true));
     }
 
     public function testClamp()
