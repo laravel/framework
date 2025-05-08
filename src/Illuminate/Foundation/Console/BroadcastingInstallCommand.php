@@ -219,15 +219,14 @@ class BroadcastingInstallCommand extends Command
             return;
         }
 
-        $filesystem = new Filesystem();
-
-        $envContent = $filesystem->get($envPath);
 
         if ($addViteEnvs) {
             foreach ($values as $key => $value) {
                 $values["VITE_{$key}"] = '"${' . $key . '}"';
             }
         }
+
+        $filesystem = new Filesystem;
 
         $currentPrefix = null;
 
@@ -239,17 +238,34 @@ class BroadcastingInstallCommand extends Command
                 $currentPrefix = $prefix;
             }
 
-            if (str_contains($envContent, "{$key}=" . PHP_EOL)) {
-                $filesystem->replaceInFile(
-                    "{$key}=" . PHP_EOL,
-                    "{$key}={$value}" . PHP_EOL,
+            $envContent = $filesystem->get($envPath);
+
+            $newLine = $key . '=' . $value;
+
+            preg_match('/^' . preg_quote($newLine, '/') . '$/m', $envContent, $existingLine);
+
+            if (count($existingLine)) {
+                continue;
+            }
+
+            preg_match('/^' . $key . '=$/m', $envContent, $emptyKeyMatches, PREG_OFFSET_CAPTURE);
+            preg_match('/^' . $key . '=/m', $envContent, $keyMatches, PREG_OFFSET_CAPTURE);
+
+            if (count($emptyKeyMatches) > 0) {
+                $filesystem->put(
                     $envPath,
+                    substr_replace(
+                        $envContent,
+                        $newLine,
+                        $emptyKeyMatches[0][1],
+                        strlen($emptyKeyMatches[0][0])
+                    ),
                 );
-            } elseif (str_contains($envContent, "{$key}=")) {
+            } elseif (count($keyMatches) > 0) {
                 $this->components->warn("The {$key} environment variable already exists in your .env file. Please update it manually.");
-                $this->components->warn("{$key}={$value}");
+                $this->components->warn($newLine);
             } else {
-                $filesystem->append($envPath, "{$key}={$value}\n");
+                $filesystem->append($envPath, "{$newLine}\n");
             }
         }
     }
