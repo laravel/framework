@@ -194,6 +194,28 @@ class Repository
     }
 
     /**
+     * Retrieve all values except those with the given keys.
+     *
+     * @param  array<int, string>  $keys
+     * @return array<string, mixed>
+     */
+    public function except($keys)
+    {
+        return array_diff_key($this->data, array_flip($keys));
+    }
+
+    /**
+     * Retrieve all hidden values except those with the given keys.
+     *
+     * @param  array<int, string>  $keys
+     * @return array<string, mixed>
+     */
+    public function exceptHidden($keys)
+    {
+        return array_diff_key($this->hidden, array_flip($keys));
+    }
+
+    /**
      * Add a context value.
      *
      * @param  string|array<string, mixed>  $key
