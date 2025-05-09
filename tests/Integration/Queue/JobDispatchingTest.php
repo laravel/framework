@@ -10,6 +10,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\Events\JobQueued;
 use Illuminate\Queue\Events\JobQueueing;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Config;
 use Orchestra\Testbench\Attributes\WithMigration;
 
@@ -163,6 +164,55 @@ class JobDispatchingTest extends QueueTestCase
         $this->assertNull($events[2]->queue);
         $this->assertInstanceOf(JobQueued::class, $events[3]);
         $this->assertNull($events[3]->queue);
+    }
+
+    public function testQueuedClosureCanBeNamed()
+    {
+        Config::set('queue.default', 'database');
+        $events = [];
+        $this->app['events']->listen(function (JobQueued $e) use (&$events) {
+            $events[] = $e;
+        });
+
+        dispatch(function () {
+            //
+        })->name('custom name');
+
+        $this->assertCount(1, $events);
+        $this->assertInstanceOf(JobQueued::class, $events[0]);
+        $this->assertSame('custom name', $events[0]->job->name);
+        $this->assertStringContainsString('custom name', $events[0]->job->displayName());
+    }
+
+    public function testCanDisableDispatchingAfterResponse()
+    {
+        Job::dispatchAfterResponse('test');
+
+        $this->assertFalse(Job::$ran);
+
+        $this->app->terminate();
+
+        $this->assertTrue(Job::$ran);
+
+        Bus::withoutDispatchingAfterResponses();
+
+        Job::$ran = false;
+        Job::dispatchAfterResponse('test');
+
+        $this->assertTrue(Job::$ran);
+
+        $this->app->terminate();
+
+        Bus::withDispatchingAfterResponses();
+
+        Job::$ran = false;
+        Job::dispatchAfterResponse('test');
+
+        $this->assertFalse(Job::$ran);
+
+        $this->app->terminate();
+
+        $this->assertTrue(Job::$ran);
     }
 
     /**

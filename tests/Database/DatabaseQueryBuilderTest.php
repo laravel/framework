@@ -301,6 +301,27 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertSame('select * from "users" where "id" = ? and "email" = ?', $builder->toSql());
     }
 
+    public function testPipeCallback()
+    {
+        $query = $this->getBuilder();
+
+        $result = $query->pipe(fn (Builder $query) => 5);
+        $this->assertSame(5, $result);
+
+        $result = $query->pipe(fn (Builder $query) => null);
+        $this->assertSame($query, $result);
+
+        $result = $query->pipe(function (Builder $query) {
+            //
+        });
+        $this->assertSame($query, $result);
+
+        $this->assertCount(0, $query->wheres);
+        $result = $query->pipe(fn (Builder $query) => $query->where('foo', 'bar'));
+        $this->assertSame($query, $result);
+        $this->assertCount(1, $query->wheres);
+    }
+
     public function testBasicWheres()
     {
         $builder = $this->getBuilder();
@@ -593,6 +614,10 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getPostgresBuilder();
         $builder->select('*')->from('users')->whereDate('created_at', new Raw('NOW()'));
         $this->assertSame('select * from "users" where "created_at"::date = NOW()', $builder->toSql());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->whereDate('result->created_at', new Raw('NOW()'));
+        $this->assertSame('select * from "users" where ("result"->>\'created_at\')::date = NOW()', $builder->toSql());
     }
 
     public function testWhereDayPostgres()
@@ -624,6 +649,11 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getPostgresBuilder();
         $builder->select('*')->from('users')->whereTime('created_at', '>=', '22:00');
         $this->assertSame('select * from "users" where "created_at"::time >= ?', $builder->toSql());
+        $this->assertEquals([0 => '22:00'], $builder->getBindings());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->whereTime('result->created_at', '>=', '22:00');
+        $this->assertSame('select * from "users" where ("result"->>\'created_at\')::time >= ?', $builder->toSql());
         $this->assertEquals([0 => '22:00'], $builder->getBindings());
     }
 
@@ -2358,6 +2388,28 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->forPage(-2, 0);
         $this->assertSame('select * from "users" limit 0 offset 0', $builder->toSql());
+    }
+
+    public function testForPageBeforeId()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->forPageBeforeId(15, null);
+        $this->assertSame('select * from "users" where "id" is not null order by "id" desc limit 15', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->forPageBeforeId(15, 0);
+        $this->assertSame('select * from "users" where "id" < ? order by "id" desc limit 15', $builder->toSql());
+    }
+
+    public function testForPageAfterId()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->forPageAfterId(15, null);
+        $this->assertSame('select * from "users" where "id" is not null order by "id" asc limit 15', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->forPageAfterId(15, 0);
+        $this->assertSame('select * from "users" where "id" > ? order by "id" asc limit 15', $builder->toSql());
     }
 
     public function testGetCountForPaginationWithBindings()
@@ -5030,6 +5082,10 @@ SQL;
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->where('foo', '<>', null);
         $this->assertSame('select * from "users" where "foo" is not null', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('foo', '<=>', null);
+        $this->assertSame('select * from "users" where "foo" is null', $builder->toSql());
     }
 
     public function testDynamicWhere()

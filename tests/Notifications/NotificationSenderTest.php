@@ -30,6 +30,7 @@ class NotificationSenderTest extends TestCase
         $bus = m::mock(BusDispatcher::class);
         $bus->shouldReceive('dispatch');
         $events = m::mock(EventDispatcher::class);
+        $events->shouldReceive('listen')->once();
 
         $sender = new NotificationSender($manager, $bus, $events);
 
@@ -43,6 +44,7 @@ class NotificationSenderTest extends TestCase
         $bus = m::mock(BusDispatcher::class);
         $bus->shouldNotReceive('dispatch');
         $events = m::mock(EventDispatcher::class);
+        $events->shouldReceive('listen')->once();
 
         $sender = new NotificationSender($manager, $bus, $events);
 
@@ -56,6 +58,7 @@ class NotificationSenderTest extends TestCase
         $bus = m::mock(BusDispatcher::class);
         $bus->shouldNotReceive('dispatch');
         $events = m::mock(EventDispatcher::class);
+        $events->shouldReceive('listen')->once();
 
         $sender = new NotificationSender($manager, $bus, $events);
 
@@ -72,6 +75,7 @@ class NotificationSenderTest extends TestCase
                 return $job->middleware[0] instanceof TestNotificationMiddleware;
             });
         $events = m::mock(EventDispatcher::class);
+        $events->shouldReceive('listen')->once();
 
         $sender = new NotificationSender($manager, $bus, $events);
 
@@ -99,6 +103,7 @@ class NotificationSenderTest extends TestCase
                 return empty($job->middleware);
             });
         $events = m::mock(EventDispatcher::class);
+        $events->shouldReceive('listen')->once();
 
         $sender = new NotificationSender($manager, $bus, $events);
 
@@ -122,6 +127,7 @@ class NotificationSenderTest extends TestCase
             });
 
         $events = m::mock(EventDispatcher::class);
+        $events->shouldReceive('listen')->once();
 
         $sender = new NotificationSender($manager, $bus, $events);
 

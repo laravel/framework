@@ -379,7 +379,7 @@ class HasInverseRelationStub extends Relation
         return $this->getPossibleInverseRelations();
     }
 
-    public function exposeGuessInverseRelation(): string|null
+    public function exposeGuessInverseRelation(): ?string
     {
         return $this->guessInverseRelation();
     }

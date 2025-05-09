@@ -850,6 +850,62 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertEquals(FactoryTestGuessModelFactory::new()->modelName(), FactoryTestGuessModel::class);
     }
 
+    public function test_factory_model_has_many_relationship_has_pending_attributes()
+    {
+        FactoryTestUser::factory()->has(new FactoryTestPostFactory(), 'postsWithFooBarBazAsTitle')->create();
+
+        $this->assertEquals('foo bar baz', FactoryTestPost::first()->title);
+    }
+
+    public function test_factory_model_has_many_relationship_has_pending_attributes_override()
+    {
+        FactoryTestUser::factory()->has((new FactoryTestPostFactory())->state(['title' => 'other title']), 'postsWithFooBarBazAsTitle')->create();
+
+        $this->assertEquals('other title', FactoryTestPost::first()->title);
+    }
+
+    public function test_factory_model_has_one_relationship_has_pending_attributes()
+    {
+        FactoryTestUser::factory()->has(new FactoryTestPostFactory(), 'postWithFooBarBazAsTitle')->create();
+
+        $this->assertEquals('foo bar baz', FactoryTestPost::first()->title);
+    }
+
+    public function test_factory_model_has_one_relationship_has_pending_attributes_override()
+    {
+        FactoryTestUser::factory()->has((new FactoryTestPostFactory())->state(['title' => 'other title']), 'postWithFooBarBazAsTitle')->create();
+
+        $this->assertEquals('other title', FactoryTestPost::first()->title);
+    }
+
+    public function test_factory_model_belongs_to_many_relationship_has_pending_attributes()
+    {
+        FactoryTestUser::factory()->has(new FactoryTestRoleFactory(), 'rolesWithFooBarBazAsName')->create();
+
+        $this->assertEquals('foo bar baz', FactoryTestRole::first()->name);
+    }
+
+    public function test_factory_model_belongs_to_many_relationship_has_pending_attributes_override()
+    {
+        FactoryTestUser::factory()->has((new FactoryTestRoleFactory())->state(['name' => 'other name']), 'rolesWithFooBarBazAsName')->create();
+
+        $this->assertEquals('other name', FactoryTestRole::first()->name);
+    }
+
+    public function test_factory_model_morph_many_relationship_has_pending_attributes()
+    {
+        (new FactoryTestPostFactory())->has(new FactoryTestCommentFactory(), 'commentsWithFooBarBazAsBody')->create();
+
+        $this->assertEquals('foo bar baz', FactoryTestComment::first()->body);
+    }
+
+    public function test_factory_model_morph_many_relationship_has_pending_attributes_override()
+    {
+        (new FactoryTestPostFactory())->has((new FactoryTestCommentFactory())->state(['body' => 'other body']), 'commentsWithFooBarBazAsBody')->create();
+
+        $this->assertEquals('other body', FactoryTestComment::first()->body);
+    }
+
     /**
      * Get a database connection instance.
      *
@@ -895,9 +951,24 @@ class FactoryTestUser extends Eloquent
         return $this->hasMany(FactoryTestPost::class, 'user_id');
     }
 
+    public function postsWithFooBarBazAsTitle()
+    {
+        return $this->hasMany(FactoryTestPost::class, 'user_id')->withAttributes(['title' => 'foo bar baz']);
+    }
+
+    public function postWithFooBarBazAsTitle()
+    {
+        return $this->hasOne(FactoryTestPost::class, 'user_id')->withAttributes(['title' => 'foo bar baz']);
+    }
+
     public function roles()
     {
         return $this->belongsToMany(FactoryTestRole::class, 'role_user', 'user_id', 'role_id')->withPivot('admin');
+    }
+
+    public function rolesWithFooBarBazAsName()
+    {
+        return $this->belongsToMany(FactoryTestRole::class, 'role_user', 'user_id', 'role_id')->withPivot('admin')->withAttributes(['name' => 'foo bar baz']);
     }
 
     public function factoryTestRoles()
@@ -943,6 +1014,11 @@ class FactoryTestPost extends Eloquent
     public function comments()
     {
         return $this->morphMany(FactoryTestComment::class, 'commentable');
+    }
+
+    public function commentsWithFooBarBazAsBody()
+    {
+        return $this->morphMany(FactoryTestComment::class, 'commentable')->withAttributes(['body' => 'foo bar baz']);
     }
 }
 

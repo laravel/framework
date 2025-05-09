@@ -551,6 +551,10 @@ trait HasAttributes
             return;
         }
 
+        if ($this->attemptToAutoloadRelation($key)) {
+            return $this->relations[$key];
+        }
+
         if ($this->preventsLazyLoading) {
             $this->handleLazyLoadingViolation($key);
         }
@@ -2021,7 +2025,7 @@ trait HasAttributes
 
         foreach ($this->getAttributes() as $key => $value) {
             if (! in_array($key, $attributes)) {
-                $results[$key] = $value;
+                $results[$key] = $this->getAttribute($key);
             }
         }
 

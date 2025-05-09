@@ -99,12 +99,19 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $this->assertSame('baz', $relation->getRelationName());
     }
 
+    public function testCorrectLatestOfManyQuery(): void
+    {
+        $user = HasOneOfManyTestUser::create();
+        $relation = $user->latest_login();
+        $this->assertSame('select "logins".* from "logins" inner join (select MAX("logins"."id") as "id_aggregate", "logins"."user_id" from "logins" where "logins"."user_id" = ? and "logins"."user_id" is not null group by "logins"."user_id") as "latest_login" on "latest_login"."id_aggregate" = "logins"."id" and "latest_login"."user_id" = "logins"."user_id" where "logins"."user_id" = ? and "logins"."user_id" is not null', $relation->getQuery()->toSql());
+    }
+
     public function testEagerLoadingAppliesConstraintsToInnerJoinSubQuery()
     {
         $user = HasOneOfManyTestUser::create();
         $relation = $user->latest_login();
         $relation->addEagerConstraints([$user]);
-        $this->assertSame('select MAX("logins"."id") as "id_aggregate", "logins"."user_id" from "logins" where "logins"."user_id" in (1) group by "logins"."user_id"', $relation->getOneOfManySubQuery()->toSql());
+        $this->assertSame('select MAX("logins"."id") as "id_aggregate", "logins"."user_id" from "logins" where "logins"."user_id" = ? and "logins"."user_id" is not null and "logins"."user_id" in (1) group by "logins"."user_id"', $relation->getOneOfManySubQuery()->toSql());
     }
 
     public function testGlobalScopeIsNotAppliedWhenRelationIsDefinedWithoutGlobalScope()
@@ -116,7 +123,7 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $user = HasOneOfManyTestUser::create();
         $relation = $user->latest_login_without_global_scope();
         $relation->addEagerConstraints([$user]);
-        $this->assertSame('select "logins".* from "logins" inner join (select MAX("logins"."id") as "id_aggregate", "logins"."user_id" from "logins" where "logins"."user_id" in (1) group by "logins"."user_id") as "latestOfMany" on "latestOfMany"."id_aggregate" = "logins"."id" and "latestOfMany"."user_id" = "logins"."user_id" where "logins"."user_id" = ? and "logins"."user_id" is not null', $relation->getQuery()->toSql());
+        $this->assertSame('select "logins".* from "logins" inner join (select MAX("logins"."id") as "id_aggregate", "logins"."user_id" from "logins" where "logins"."user_id" = ? and "logins"."user_id" is not null and "logins"."user_id" in (1) group by "logins"."user_id") as "latestOfMany" on "latestOfMany"."id_aggregate" = "logins"."id" and "latestOfMany"."user_id" = "logins"."user_id" where "logins"."user_id" = ? and "logins"."user_id" is not null', $relation->getQuery()->toSql());
 
         HasOneOfManyTestLogin::addGlobalScope('test', function ($query) {
         });
@@ -130,7 +137,7 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
 
         $user = HasOneOfManyTestUser::create();
         $relation = $user->price_without_global_scope();
-        $this->assertSame('select "prices".* from "prices" inner join (select max("prices"."id") as "id_aggregate", min("prices"."published_at") as "published_at_aggregate", "prices"."user_id" from "prices" inner join (select max("prices"."published_at") as "published_at_aggregate", "prices"."user_id" from "prices" where "published_at" < ? group by "prices"."user_id") as "price_without_global_scope" on "price_without_global_scope"."published_at_aggregate" = "prices"."published_at" and "price_without_global_scope"."user_id" = "prices"."user_id" where "published_at" < ? group by "prices"."user_id") as "price_without_global_scope" on "price_without_global_scope"."id_aggregate" = "prices"."id" and "price_without_global_scope"."published_at_aggregate" = "prices"."published_at" and "price_without_global_scope"."user_id" = "prices"."user_id" where "prices"."user_id" = ? and "prices"."user_id" is not null', $relation->getQuery()->toSql());
+        $this->assertSame('select "prices".* from "prices" inner join (select max("prices"."id") as "id_aggregate", min("prices"."published_at") as "published_at_aggregate", "prices"."user_id" from "prices" inner join (select max("prices"."published_at") as "published_at_aggregate", "prices"."user_id" from "prices" where "published_at" < ? and "prices"."user_id" = ? and "prices"."user_id" is not null group by "prices"."user_id") as "price_without_global_scope" on "price_without_global_scope"."published_at_aggregate" = "prices"."published_at" and "price_without_global_scope"."user_id" = "prices"."user_id" where "published_at" < ? group by "prices"."user_id") as "price_without_global_scope" on "price_without_global_scope"."id_aggregate" = "prices"."id" and "price_without_global_scope"."published_at_aggregate" = "prices"."published_at" and "price_without_global_scope"."user_id" = "prices"."user_id" where "prices"."user_id" = ? and "prices"."user_id" is not null', $relation->getQuery()->toSql());
 
         HasOneOfManyTestPrice::addGlobalScope('test', function ($query) {
         });
@@ -591,7 +598,7 @@ class HasOneOfManyTestUser extends Eloquent
     public function foo_state()
     {
         return $this->hasOne(HasOneOfManyTestState::class, 'user_id')->ofMany(
-            ['id' => 'max'],
+            [], // should automatically add 'id' => 'max'
             function ($q) {
                 $q->where('type', 'foo');
             }

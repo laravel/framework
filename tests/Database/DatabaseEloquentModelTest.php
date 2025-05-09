@@ -2293,6 +2293,35 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertTrue(EloquentModelBootingTestStub::isBooted());
     }
 
+    public function testCallbacksCanBeRunAfterBootingHasFinished()
+    {
+        $this->assertFalse(EloquentModelBootingCallbackTestStub::$bootHasFinished);
+
+        $model = new EloquentModelBootingCallbackTestStub();
+
+        $this->assertTrue($model::$bootHasFinished);
+
+        EloquentModelBootingCallbackTestStub::unboot();
+    }
+
+    public function testBootedCallbacksAreSeparatedByClass()
+    {
+        $this->assertFalse(EloquentModelBootingCallbackTestStub::$bootHasFinished);
+
+        $model = new EloquentModelBootingCallbackTestStub();
+
+        $this->assertTrue($model::$bootHasFinished);
+
+        $this->assertFalse(EloquentChildModelBootingCallbackTestStub::$bootHasFinished);
+
+        $model = new EloquentChildModelBootingCallbackTestStub();
+
+        $this->assertTrue($model::$bootHasFinished);
+
+        EloquentModelBootingCallbackTestStub::unboot();
+        EloquentChildModelBootingCallbackTestStub::unboot();
+    }
+
     public function testModelsTraitIsInitialized()
     {
         $model = new EloquentModelStubWithTrait;
@@ -3194,7 +3223,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals(1, $model->getAttribute('duplicatedAttribute'));
     }
 
-    public function testsCastOnArrayFormatWithOneElement()
+    public function testCastOnArrayFormatWithOneElement()
     {
         $model = new EloquentModelCastingStub;
         $model->setRawAttributes([
@@ -3602,6 +3631,7 @@ class EloquentModelBootingTestStub extends Model
     public static function unboot()
     {
         unset(static::$booted[static::class]);
+        unset(static::$bootedCallbacks[static::class]);
     }
 
     public static function isBooted()
@@ -4120,4 +4150,31 @@ class EloquentModelWithUseFactoryAttributeFactory extends Factory
 class EloquentModelWithUseFactoryAttribute extends Model
 {
     use HasFactory;
+}
+
+trait EloquentTraitBootingCallbackTestStub
+{
+    public static function bootEloquentTraitBootingCallbackTestStub()
+    {
+        static::whenBooted(fn () => static::$bootHasFinished = true);
+    }
+}
+
+class EloquentModelBootingCallbackTestStub extends Model
+{
+    use EloquentTraitBootingCallbackTestStub;
+
+    public static bool $bootHasFinished = false;
+
+    public static function unboot()
+    {
+        unset(static::$booted[static::class]);
+        unset(static::$bootedCallbacks[static::class]);
+        static::$bootHasFinished = false;
+    }
+}
+
+class EloquentChildModelBootingCallbackTestStub extends EloquentModelBootingCallbackTestStub
+{
+    public static bool $bootHasFinished = false;
 }

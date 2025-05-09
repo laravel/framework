@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Console\View;
 
 use Illuminate\Console\OutputStyle;
 use Illuminate\Console\View\Components;
+use Illuminate\Database\Migrations\MigrationResult;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -108,15 +109,20 @@ class ComponentsTest extends TestCase
     {
         $output = new BufferedOutput();
 
-        with(new Components\Task($output))->render('My task', fn () => true);
+        with(new Components\Task($output))->render('My task', fn () => MigrationResult::Success->value);
         $result = $output->fetch();
         $this->assertStringContainsString('My task', $result);
         $this->assertStringContainsString('DONE', $result);
 
-        with(new Components\Task($output))->render('My task', fn () => false);
+        with(new Components\Task($output))->render('My task', fn () => MigrationResult::Failure->value);
         $result = $output->fetch();
         $this->assertStringContainsString('My task', $result);
         $this->assertStringContainsString('FAIL', $result);
+
+        with(new Components\Task($output))->render('My task', fn () => MigrationResult::Skipped->value);
+        $result = $output->fetch();
+        $this->assertStringContainsString('My task', $result);
+        $this->assertStringContainsString('SKIPPED', $result);
     }
 
     public function testTwoColumnDetail()

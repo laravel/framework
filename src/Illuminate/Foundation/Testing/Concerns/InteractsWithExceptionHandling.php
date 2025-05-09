@@ -213,4 +213,31 @@ trait InteractsWithExceptionHandling
 
         return $this;
     }
+
+    /**
+     * Assert that the given callback does not throw an exception.
+     *
+     * @param  \Closure  $test
+     * @return $this
+     */
+    protected function assertDoesntThrow(Closure $test)
+    {
+        try {
+            $test();
+
+            $thrown = false;
+        } catch (Throwable $exception) {
+            $thrown = true;
+
+            $exceptionClass = get_class($exception);
+            $exceptionMessage = $exception->getMessage();
+        }
+
+        Assert::assertTrue(
+            ! $thrown,
+            sprintf('Unexpected exception of type %s with message %s was thrown.', $exceptionClass ?? null, $exceptionMessage ?? null)
+        );
+
+        return $this;
+    }
 }

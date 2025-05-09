@@ -9,6 +9,9 @@ use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use LogicException;
 
+/**
+ * @template TResolver of \Closure(string, \Closure, string): \Illuminate\Database\Schema\Blueprint
+ */
 class Builder
 {
     use Macroable;
@@ -30,9 +33,9 @@ class Builder
     /**
      * The Blueprint resolver callback.
      *
-     * @var \Closure
+     * @var TResolver|null
      */
-    protected $resolver;
+    protected static $resolver = null;
 
     /**
      * The default string length for migrations.
@@ -149,7 +152,7 @@ class Builder
     /**
      * Get the schemas that belong to the connection.
      *
-     * @return array
+     * @return list<array{name: string, path: string|null, default: bool}>
      */
     public function getSchemas()
     {
@@ -208,7 +211,7 @@ class Builder
      * Get the tables that belong to the connection.
      *
      * @param  string|string[]|null  $schema
-     * @return array
+     * @return list<array{name: string, schema: string|null, schema_qualified_name: string, size: int|null, comment: string|null, collation: string|null, engine: string|null}>
      */
     public function getTables($schema = null)
     {
@@ -222,7 +225,7 @@ class Builder
      *
      * @param  string|string[]|null  $schema
      * @param  bool  $schemaQualified
-     * @return array
+     * @return list<string>
      */
     public function getTableListing($schema = null, $schemaQualified = true)
     {
@@ -236,7 +239,7 @@ class Builder
      * Get the views that belong to the connection.
      *
      * @param  string|string[]|null  $schema
-     * @return array
+     * @return list<array{name: string, schema: string|null, schema_qualified_name: string, definition: string}>
      */
     public function getViews($schema = null)
     {
@@ -249,7 +252,7 @@ class Builder
      * Get the user-defined types that belong to the connection.
      *
      * @param  string|string[]|null  $schema
-     * @return array
+     * @return list<array{name: string, schema: string, type: string, type: string, category: string, implicit: bool}>
      */
     public function getTypes($schema = null)
     {
@@ -276,7 +279,7 @@ class Builder
      * Determine if the given table has given columns.
      *
      * @param  string  $table
-     * @param  array  $columns
+     * @param  array<string>  $columns
      * @return bool
      */
     public function hasColumns($table, array $columns)
@@ -347,7 +350,7 @@ class Builder
      * Get the column listing for a given table.
      *
      * @param  string  $table
-     * @return array
+     * @return list<string>
      */
     public function getColumnListing($table)
     {
@@ -358,7 +361,7 @@ class Builder
      * Get the columns for a given table.
      *
      * @param  string  $table
-     * @return array
+     * @return list<array{name: string, type: string, type_name: string, nullable: bool, default: mixed, auto_increment: bool, comment: string|null, generation: array{type: string, expression: string|null}|null}>
      */
     public function getColumns($table)
     {
@@ -377,7 +380,7 @@ class Builder
      * Get the indexes for a given table.
      *
      * @param  string  $table
-     * @return array
+     * @return list<array{name: string, columns: list<string>, type: string, unique: bool, primary: bool}>
      */
     public function getIndexes($table)
     {
@@ -396,7 +399,7 @@ class Builder
      * Get the names of the indexes for a given table.
      *
      * @param  string  $table
-     * @return array
+     * @return list<string>
      */
     public function getIndexListing($table)
     {
@@ -506,7 +509,7 @@ class Builder
      * Drop columns from a table schema.
      *
      * @param  string  $table
-     * @param  string|array  $columns
+     * @param  string|array<string>  $columns
      * @return void
      */
     public function dropColumns($table, $columns)
@@ -629,8 +632,8 @@ class Builder
     {
         $connection = $this->connection;
 
-        if (isset($this->resolver)) {
-            return call_user_func($this->resolver, $connection, $table, $callback);
+        if (static::$resolver !== null) {
+            return call_user_func(static::$resolver, $connection, $table, $callback);
         }
 
         return Container::getInstance()->make(Blueprint::class, compact('connection', 'table', 'callback'));
@@ -698,11 +701,11 @@ class Builder
     /**
      * Set the Schema Blueprint resolver callback.
      *
-     * @param  \Closure  $resolver
+     * @param  TResolver|null  $resolver
      * @return void
      */
-    public function blueprintResolver(Closure $resolver)
+    public function blueprintResolver(?Closure $resolver)
     {
-        $this->resolver = $resolver;
+        static::$resolver = $resolver;
     }
 }

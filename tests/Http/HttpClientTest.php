@@ -2334,6 +2334,22 @@ class HttpClientTest extends TestCase
         $this->factory->assertSentCount(1);
     }
 
+    public function testExceptionThrowInMiddlewareAllowsRetry()
+    {
+        $middleware = Middleware::mapRequest(function (RequestInterface $request) {
+            throw new RuntimeException;
+        });
+
+        $this->expectException(RuntimeException::class);
+
+        $this->factory->fake(function (Request $request) {
+            return $this->factory->response('Fake');
+        })->withMiddleware($middleware)
+            ->retry(3, 1, function (Exception $exception, PendingRequest $request) {
+                return true;
+            })->post('https://example.com');
+    }
+
     public function testRequestsWillBeWaitingSleepMillisecondsReceivedInBackoffArray()
     {
         Sleep::fake();
@@ -2360,6 +2376,16 @@ class HttpClientTest extends TestCase
             Sleep::usleep(100_000),
             Sleep::usleep(200_000),
         ]);
+    }
+
+    public function testFailedRequest()
+    {
+        $requestException = $this->factory->failedRequest(['code' => 'not_found'], 404, ['X-RateLimit-Remaining' => 199]);
+
+        $this->assertInstanceOf(RequestException::class, $requestException);
+        $this->assertEqualsCanonicalizing(['code' => 'not_found'], $requestException->response->json());
+        $this->assertEquals(404, $requestException->response->status());
+        $this->assertEquals(199, $requestException->response->header('X-RateLimit-Remaining'));
     }
 
     public function testFakeConnectionException()

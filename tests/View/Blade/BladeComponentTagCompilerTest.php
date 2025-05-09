@@ -6,6 +6,7 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\View\Compilers\BladeCompiler;
 use Illuminate\View\Compilers\ComponentTagCompiler;
 use Illuminate\View\Component;
@@ -799,11 +800,15 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $model = new class extends Model {
         };
 
+        $paginator = new class extends AbstractPaginator {
+        };
+
         $this->assertEquals(e('<hi>'), BladeCompiler::sanitizeComponentAttribute('<hi>'));
         $this->assertEquals(e('1'), BladeCompiler::sanitizeComponentAttribute('1'));
         $this->assertEquals(1, BladeCompiler::sanitizeComponentAttribute(1));
         $this->assertEquals(e('<hi>'), BladeCompiler::sanitizeComponentAttribute($class));
         $this->assertSame($model, BladeCompiler::sanitizeComponentAttribute($model));
+        $this->assertSame($paginator, BladeCompiler::sanitizeComponentAttribute($paginator));
     }
 
     public function testItThrowsAnExceptionForNonExistingAliases()
