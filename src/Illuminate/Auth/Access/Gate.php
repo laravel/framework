@@ -680,8 +680,6 @@ class Gate implements GateContract
                 return $this->resolvePolicy($policy);
             }
         }
-
-        return false;
     }
 
     /**
