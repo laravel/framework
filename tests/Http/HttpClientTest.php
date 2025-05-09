@@ -3158,7 +3158,7 @@ class HttpClientTest extends TestCase
         $this->factory->get('https://laravel.com');
     }
 
-    public function testItCanEnforceFakingWithPooledRequests()
+    public function testItCanEnforceFakingInThePool()
     {
         $this->factory->preventStrayRequests();
         $this->factory->fake(['https://vapor.laravel.com' => Factory::response('ok', 200)]);
@@ -3171,7 +3171,8 @@ class HttpClientTest extends TestCase
             ];
         });
 
-        $this->assertSame(['ok', 'ok'], $responses);
+        $this->assertSame(200, $responses[0]->getStatus());
+        $this->assertSame(200, $responses[1]->getStatus());
 
         $this->expectException(StrayRequestException::class);
         $this->expectExceptionMessage('Attempted request to [https://laravel.com] without a matching fake.');
