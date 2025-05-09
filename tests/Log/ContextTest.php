@@ -364,6 +364,34 @@ class ContextTest extends TestCase
         ]));
     }
 
+    public function test_it_can_exclude_subset_of_context()
+    {
+        Context::add('parent.child.1', 5);
+        Context::add('parent.child.2', 6);
+        Context::add('another', 7);
+
+        $this->assertSame([
+            'another' => 7,
+        ], Context::except([
+            'parent.child.1',
+            'parent.child.2',
+        ]));
+    }
+
+    public function test_it_can_exclude_subset_of_hidden_context()
+    {
+        Context::addHidden('parent.child.1', 5);
+        Context::addHidden('parent.child.2', 6);
+        Context::addHidden('another', 7);
+
+        $this->assertSame([
+            'another' => 7,
+        ], Context::exceptHidden([
+            'parent.child.1',
+            'parent.child.2',
+        ]));
+    }
+
     public function test_it_adds_context_to_logging()
     {
         $path = storage_path('logs/laravel.log');
