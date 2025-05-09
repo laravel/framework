@@ -7,6 +7,7 @@ use Illuminate\Auth\Access\Gate;
 use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Container\Container;
+use Illuminate\Support\Collection;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -1256,6 +1257,37 @@ class AuthAccessGateTest extends TestCase
         $this->assertSame('xyz', $response->code());
         $this->assertSame(404, $response->status());
     }
+
+    public function testCanUseCollectionsInPolicy()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicy::class);
+
+        $this->assertTrue($gate->check([AbilitiesEnum::UPDATE_MULTIPLE], collect([new AccessGateTestDummy(), new AccessGateTestDummy()])));
+        $this->assertFalse($gate->check([AbilitiesEnum::UPDATE_MULTIPLE], collect([new AccessGateTestDummy()])));
+    }
+
+    public function testCanUseEloquentcollectionsInPolicy()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicy::class);
+
+        $this->assertTrue(
+            $gate->check([AbilitiesEnum::UPDATE_MULTIPLE],
+            new \Illuminate\Database\Eloquent\Collection([new AccessGateTestDummy(), new AccessGateTestDummy()]))
+        );
+    }
+
+    public function testCollectionsInPoliciesExpectsSameObjectType()
+    {
+        $gate = $this->getBasicGate();
+        $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicy::class);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->assertFalse($gate->check([AbilitiesEnum::UPDATE_MULTIPLE], collect([new AccessGateTestDummy(), new stdClass()])));
+    }
 }
 
 class AccessGateTestClassForGuest
@@ -1364,6 +1396,11 @@ class AccessGateTestPolicy
     public function updateAny($user, AccessGateTestDummy $dummy)
     {
         return ! $user->isAdmin;
+    }
+
+    public function updateMultiple($user, Collection $dummies)
+    {
+        return $dummies->count() === 2;
     }
 
     public function update($user, AccessGateTestDummy $dummy)

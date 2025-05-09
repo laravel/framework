@@ -658,7 +658,7 @@ class Gate implements GateContract
     public function getPolicyFor($class)
     {
         if (is_object($class)) {
-            $class = get_class($class);
+            $class = $this->getPolicyClass($class);
         }
 
         if (! is_string($class)) {
@@ -680,6 +680,30 @@ class Gate implements GateContract
                 return $this->resolvePolicy($policy);
             }
         }
+
+        return false;
+    }
+
+    /**
+     * Get policy class from object
+     *
+     * @param object $obj
+     * @return string
+     */
+    protected function getPolicyClass($obj)
+    {
+        if ($obj instanceof Collection) {
+            $classes = $obj->map(fn ($obj) => get_class($obj))
+                ->unique();
+
+            if ($classes->count() > 1) {
+                throw new InvalidArgumentException('Collection must not contain different object types');
+            }
+
+            return $classes->first();
+        }
+
+        return get_class($obj);
     }
 
     /**
