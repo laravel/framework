@@ -1295,16 +1295,6 @@ class Container implements ArrayAccess, ContainerContract
     }
 
     /**
-     * Get currently resolving.
-     *
-     * @return class-string|string|null
-     */
-    public function currentlyResolving()
-    {
-        return end($this->buildStack) ?: null;
-    }
-
-    /**
      * Register a new before resolving callback for all types.
      *
      * @param  \Closure|string  $abstract
@@ -1504,6 +1494,16 @@ class Container implements ArrayAccess, ContainerContract
         foreach ($callbacks as $callback) {
             $callback($object, $this);
         }
+    }
+
+    /**
+     * Get the name of the binding the container is currently resolving.
+     *
+     * @return class-string|string|null
+     */
+    public function currentlyResolving()
+    {
+        return end($this->buildStack) ?: null;
     }
 
     /**
