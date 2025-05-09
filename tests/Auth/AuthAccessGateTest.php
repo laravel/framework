@@ -1276,7 +1276,7 @@ class AuthAccessGateTest extends TestCase
 
         $this->assertTrue(
             $gate->check([AbilitiesEnum::UPDATE_MULTIPLE],
-            new \Illuminate\Database\Eloquent\Collection([new AccessGateTestDummy(), new AccessGateTestDummy()]))
+                new \Illuminate\Database\Eloquent\Collection([new AccessGateTestDummy(), new AccessGateTestDummy()]))
         );
     }
 

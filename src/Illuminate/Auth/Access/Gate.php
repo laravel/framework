@@ -683,9 +683,9 @@ class Gate implements GateContract
     }
 
     /**
-     * Get policy class from object
+     * Get policy class from object.
      *
-     * @param object $obj
+     * @param  object  $obj
      * @return string
      */
     protected function getPolicyClass($obj)
