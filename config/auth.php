@@ -112,4 +112,17 @@ return [
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Timebox Duration
+    |--------------------------------------------------------------------------
+    |
+    | The number of microseconds the Timebox will wait during authentication
+    | and password reset requests, to prevent response times from leaking
+    | existence of user accounts, to prevent user enumeration attempts.
+    |
+    */
+
+    'timebox_duration' => env('AUTH_TIMEBOX_DURATION', 200000),
+
 ];

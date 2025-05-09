@@ -101,7 +101,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      *
      * @var int
      */
-    protected $timeboxDuration = 200000;
+    protected $timeboxDuration;
 
     /**
      * Indicates if passwords should be rehashed on login if needed.
@@ -133,6 +133,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * @param  \Symfony\Component\HttpFoundation\Request|null  $request
      * @param  \Illuminate\Support\Timebox|null  $timebox
      * @param  bool  $rehashOnLogin
+     * @param  int  $timeboxDuration
      * @return void
      */
     public function __construct(
@@ -142,6 +143,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
         ?Request $request = null,
         ?Timebox $timebox = null,
         bool $rehashOnLogin = true,
+        int $timeboxDuration = 200000,
     ) {
         $this->name = $name;
         $this->session = $session;
@@ -149,6 +151,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
         $this->provider = $provider;
         $this->timebox = $timebox ?: new Timebox;
         $this->rehashOnLogin = $rehashOnLogin;
+        $this->timeboxDuration = $timeboxDuration;
     }
 
     /**
