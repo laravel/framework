@@ -1288,6 +1288,15 @@ class AuthAccessGateTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->assertFalse($gate->check([AbilitiesEnum::UPDATE_MULTIPLE], collect([new AccessGateTestDummy(), new stdClass()])));
     }
+
+    public function testPolicyCollectionsFailsIfEmpty()
+    {
+        $gate = $this->getBasicGate();
+        $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicy::class);
+
+        $this->assertFalse($gate->check([AbilitiesEnum::UPDATE_MULTIPLE], collect([])));
+        $this->assertFalse($gate->check([AbilitiesEnum::UPDATE_MULTIPLE], new \Illuminate\Database\Eloquent\Collection([])));
+    }
 }
 
 class AccessGateTestClassForGuest

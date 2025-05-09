@@ -691,14 +691,14 @@ class Gate implements GateContract
     protected function getPolicyClass($obj)
     {
         if ($obj instanceof Collection) {
-            $classes = $obj->map(fn ($obj) => get_class($obj))
+            $classes = $obj->map(fn ($value) => get_class($value))
                 ->unique();
 
             if ($classes->count() > 1) {
                 throw new InvalidArgumentException('Collection must not contain different object types');
             }
 
-            return $classes->first();
+            return $classes->first() ?? get_class($obj);
         }
 
         return get_class($obj);
