@@ -653,40 +653,55 @@ class Gate implements GateContract
     /**
      * Get a policy instance for a given class.
      *
-     * @param  object|string  $class
+     * @param  object|class-string<*>  $class
      * @return mixed
      */
     public function getPolicyFor($class)
     {
+        $policy = $this->getPolicyClassFor($class);
+
+        return $policy ? $this->resolvePolicy($policy) : null;
+    }
+
+    /**
+     * Get a policy class for a given class.
+     *
+     * @param  object|class-string<*>  $class
+     * @return class-string<*>|null
+     */
+    public function getPolicyClassFor($class): ?string
+    {
         if (is_object($class)) {
-            $class = get_class($class);
+            $class = $class::class;
         }
 
         if (! is_string($class)) {
-            return;
+            return null;
         }
 
         if (isset($this->policies[$class])) {
-            return $this->resolvePolicy($this->policies[$class]);
+            return $this->policies[$class];
         }
 
         $policy = $this->getPolicedByAttribute($class);
 
         if ($policy !== null) {
-            return $this->resolvePolicy($policy);
+            return $policy;
         }
 
         foreach ($this->guessPolicyName($class) as $guessedPolicy) {
             if (class_exists($guessedPolicy)) {
-                return $this->resolvePolicy($guessedPolicy);
+                return $guessedPolicy;
             }
         }
 
         foreach ($this->policies as $expected => $policy) {
             if (is_subclass_of($class, $expected)) {
-                return $this->resolvePolicy($policy);
+                return $policy;
             }
         }
+
+        return null;
     }
 
     /**
@@ -713,8 +728,8 @@ class Gate implements GateContract
     /**
      * Guess the policy name for the given class.
      *
-     * @param  string  $class
-     * @return array
+     * @param  class-string<*>  $class
+     * @return array<int, class-string<*>>
      */
     protected function guessPolicyName($class)
     {
@@ -754,8 +769,10 @@ class Gate implements GateContract
     /**
      * Build a policy class instance of the given type.
      *
-     * @param  object|string  $class
-     * @return mixed
+     * @template TPolicy
+     *
+     * @param  class-string<TPolicy>  $class
+     * @return TPolicy
      *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */

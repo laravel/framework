@@ -11,6 +11,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Bootstrap\RegisterProviders;
 use Illuminate\Foundation\Events\DiagnosingHealth;
 use Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance;
+use Illuminate\Foundation\Support\Providers\AuthServiceProvider as AppAuthServiceProvider;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as AppEventServiceProvider;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as AppRouteServiceProvider;
 use Illuminate\Support\Collection;
@@ -112,6 +113,33 @@ class ApplicationBuilder
         }
 
         $this->pendingProviders[AppEventServiceProvider::class] = true;
+
+        return $this;
+    }
+
+    /**
+     * Register the core auth service provider for the application.
+     *
+     * @param  iterable<int, string>|bool  $discover
+     * @return $this
+     */
+    public function withPolicies(iterable|bool $discover = true)
+    {
+        if (is_iterable($discover)) {
+            AppAuthServiceProvider::setClassDiscoveryPaths($discover);
+        }
+
+        if ($discover === false) {
+            AppAuthServiceProvider::disablePolicyDiscovery();
+        }
+
+        if (! isset($this->pendingProviders[AppAuthServiceProvider::class])) {
+            $this->app->booting(function () {
+                $this->app->register(AppAuthServiceProvider::class);
+            });
+        }
+
+        $this->pendingProviders[AppAuthServiceProvider::class] = true;
 
         return $this;
     }

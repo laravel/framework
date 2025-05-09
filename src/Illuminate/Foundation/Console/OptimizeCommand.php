@@ -61,6 +61,7 @@ class OptimizeCommand extends Command
         return [
             'config' => 'config:cache',
             'events' => 'event:cache',
+            'policies' => 'policy:cache',
             'routes' => 'route:cache',
             'views' => 'view:cache',
             ...ServiceProvider::$optimizeCommands,
