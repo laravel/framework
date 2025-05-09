@@ -1032,7 +1032,11 @@ class PendingRequest
                     $this->dispatchResponseReceivedEvent($response);
                 });
             })
-            ->otherwise(function (OutOfBoundsException|TransferException $e) {
+            ->otherwise(function (OutOfBoundsException|TransferException|StrayRequestException $e) {
+                if ($e instanceof StrayRequestException) {
+                    throw $e;
+                }
+
                 if ($e instanceof ConnectException || ($e instanceof RequestException && ! $e->hasResponse())) {
                     $exception = new ConnectionException($e->getMessage(), 0, $e);
 
