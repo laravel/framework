@@ -526,20 +526,20 @@ class ContainerTest extends TestCase
 
     public function testCurrentlyResolving()
     {
-    $container = new Container;
+        $container = new Container;
 
-    $container->afterResolvingAttribute(ContainerCurrentResolvingAttribute::class, function ($attr, $instance, $container) {
-        $this->assertEquals(ContainerCurrentResolvingConcrete::class, $container->currentlyResolving());
-    });
+        $container->afterResolvingAttribute(ContainerCurrentResolvingAttribute::class, function ($attr, $instance, $container) {
+            $this->assertEquals(ContainerCurrentResolvingConcrete::class, $container->currentlyResolving());
+        });
 
-    $container->when(ContainerCurrentResolvingConcrete::class)
-        ->needs('$currentlyResolving')
-        ->give(fn ($container) => $container->currentlyResolving());
+        $container->when(ContainerCurrentResolvingConcrete::class)
+            ->needs('$currentlyResolving')
+            ->give(fn ($container) => $container->currentlyResolving());
 
-    $resolved = $container->make(ContainerCurrentResolvingConcrete::class);
+        $resolved = $container->make(ContainerCurrentResolvingConcrete::class);
 
-    $this->assertEquals(ContainerCurrentResolvingConcrete::class, $resolved->currentlyResolving);
-}
+        $this->assertEquals(ContainerCurrentResolvingConcrete::class, $resolved->currentlyResolving);
+    }
 
     public function testGetAliasRecursive()
     {
