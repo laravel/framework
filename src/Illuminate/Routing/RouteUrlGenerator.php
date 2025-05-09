@@ -197,9 +197,14 @@ class RouteUrlGenerator
                 unset($parameters[$name]);
 
                 continue;
-            } elseif (! isset($this->defaultParameters[$name]) && ! isset($optionalParameters[$name])) {
-                // No named parameter or default value for a required parameter, try to match to positional parameter below...
-                array_push($requiredRouteParametersWithoutDefaultsOrNamedParameters, $name);
+            } else {
+                $bindingField = $route->bindingFieldFor($name);
+                $defaultParameterKey = $bindingField ? "$name:$bindingField" : $name;
+
+                if (! isset($this->defaultParameters[$defaultParameterKey]) && ! isset($optionalParameters[$name])) {
+                    // No named parameter or default value for a required parameter, try to match to positional parameter below...
+                    array_push($requiredRouteParametersWithoutDefaultsOrNamedParameters, $name);
+                }
             }
 
             $namedParameters[$name] = '';
