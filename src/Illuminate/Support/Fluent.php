@@ -66,6 +66,20 @@ class Fluent implements Arrayable, ArrayAccess, Jsonable, JsonSerializable
     }
 
     /**
+     * Get the value of a given key and then forget it.
+     *
+     * @template TPullDefault
+     *
+     * @param  TKey  $key
+     * @param  TPullDefault|(\Closure(): TPullDefault)  $default
+     * @return TValue|TPullDefault
+     */
+    public function pull($key, $default = null)
+    {
+        return Arr::pull($this->attributes, $key, $default);
+    }
+
+    /**
      * Set an attribute on the fluent instance using "dot" notation.
      *
      * @param  TKey  $key
