@@ -1066,6 +1066,24 @@ class RoutingUrlGeneratorTest extends TestCase
             $url->route('tenantSlugPost', ['post' => $keyParam('concretePost')]),
         );
 
+        // Repeat the two assertions above without the 'tenant' default (without slug)
+        $url->defaults(['tenant' => null]);
+
+        // tenantSlugPost: Tenant (with default) omitted, post passed positionally, with the default value for 'tenant' (without slug) removed
+        $this->assertSame(
+            'https://www.foo.com/tenantSlugPost/defaultTenantSlug/concretePost',
+            $url->route('tenantSlugPost', [$keyParam('concretePost')]),
+        );
+
+        // tenantSlugPost: Tenant (with default) omitted, post passed using key, with the default value for 'tenant' (without slug) removed
+        $this->assertSame(
+            'https://www.foo.com/tenantSlugPost/defaultTenantSlug/concretePost',
+            $url->route('tenantSlugPost', ['post' => $keyParam('concretePost')]),
+        );
+
+        // Revert the default value for the tenant parameter back
+        $url->defaults(['tenant' => 'defaultTenant']);
+
         /**
          * One parameter with a default value, one without a default value.
          *
