@@ -77,6 +77,28 @@ class SupportFluentTest extends TestCase
         $this->assertSame(['color' => 'silver'], $fluent->computer);
     }
 
+    public function testPull()
+    {
+        $fluent = new Fluent;
+
+        $fluent->set('name', 'Taylor');
+        $fluent->set('developer', true);
+        $fluent->set('posts', 25);
+        $fluent->set('computer.color', 'silver');
+
+        $name = $fluent->pull('name');
+        $this->assertSame('Taylor', $name);
+
+        $color = $fluent->pull('computer.color');
+        $this->assertSame('silver', $color);
+
+        $this->assertSame([
+            'developer' => true,
+            'posts' => 25,
+            'computer' => [],
+        ], $fluent->toArray());
+    }
+
     public function testArrayAccessToAttributes()
     {
         $fluent = new Fluent(['attributes' => '1']);
