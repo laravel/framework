@@ -212,7 +212,9 @@ class BroadcastingInstallCommand extends Command
      */
     protected function collectPusherConfig()
     {
+        $appId = text('Pusher App ID', 'Enter your Pusher app ID');
         $key = password('Pusher App Key', 'Enter your Pusher app key');
+        $secret = password('Pusher App Secret', 'Enter your Pusher app secret');
 
         $cluster = select('Pusher App Cluster', [
             'mt1',
@@ -227,9 +229,18 @@ class BroadcastingInstallCommand extends Command
         ]);
 
         $this->addToEnv([
+            'PUSHER_APP_ID' => $appId,
             'PUSHER_APP_KEY' => $key,
+            'PUSHER_APP_SECRET' => $secret,
             'PUSHER_APP_CLUSTER' => $cluster,
-        ]);
+            'PUSHER_PORT' => 443,
+            'PUSHER_SCHEME' => 'https',
+            'VITE_PUSHER_APP_KEY' => '${PUSHER_APP_KEY}',
+            'VITE_PUSHER_APP_CLUSTER' => '${PUSHER_APP_CLUSTER}',
+            'VITE_PUSHER_HOST' => '${PUSHER_HOST}',
+            'VITE_PUSHER_PORT' => '${PUSHER_PORT}',
+            'VITE_PUSHER_SCHEME' => '${PUSHER_SCHEME}',
+        ], false);
     }
 
     /**
@@ -263,7 +274,7 @@ class BroadcastingInstallCommand extends Command
 
         if ($addViteEnvs) {
             foreach ($values as $key => $value) {
-                $values["VITE_{$key}"] = '"${'.$key.'}"';
+                $values["VITE_{$key}"] = '${'.$key.'}';
             }
         }
 
@@ -281,7 +292,7 @@ class BroadcastingInstallCommand extends Command
 
             $envContent = $filesystem->get($envPath);
 
-            $newLine = $key.'='.$value;
+            $newLine = $key.'='.(is_string($value) ? '"'.$value.'"' : $value);
 
             preg_match('/^'.preg_quote($newLine, '/').'$/m', $envContent, $existingLine);
 
