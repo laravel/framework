@@ -141,6 +141,8 @@ class PasswordBroker implements PasswordBrokerContract
 
             $this->tokens->delete($user);
 
+            $timebox->returnEarly();
+
             return static::PASSWORD_RESET;
         }, $this->timeboxDuration);
     }
