@@ -3333,7 +3333,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testNestedModelBootingIsDisallowed()
     {
-        $this->expectExceptionMessageMatches('/".+" cannot be called on the ".+" class while it is already being booted\./');
+        $this->expectExceptionMessageMatches('/The \[(.+)] method may not be called on model \[(.+)\] while it is being booted\./');
 
         $model = new class extends Model
         {

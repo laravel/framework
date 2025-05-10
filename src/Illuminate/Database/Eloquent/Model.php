@@ -293,7 +293,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     {
         if (! isset(static::$booted[static::class])) {
             if (isset(static::$booting[static::class])) {
-                throw new Exception('"'.__METHOD__.'" cannot be called on the "'.static::class.'" class while it is already being booted.');
+                throw new LogicException('The ['.__METHOD__.'] method may not be called on model ['.static::class.'] while it is being booted.');
             }
 
             static::$booting[static::class] = true;
