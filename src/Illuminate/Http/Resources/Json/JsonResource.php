@@ -43,6 +43,15 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     public $additional = [];
 
     /**
+     * The extra data that should be added directly to the top-level resource array.
+     *
+     * Added during response construction by the developer for runtime data or resource extensions.
+     *
+     * @var array
+     */
+    public $extra = [];
+
+    /**
      * The "data" wrapper that should be applied.
      *
      * @var string|null
@@ -114,7 +123,7 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
             $data = $data->jsonSerialize();
         }
 
-        return $this->filter((array) $data);
+        return $this->filter((array) $data + $this->extra);
     }
 
     /**
@@ -173,6 +182,19 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     public function additional(array $data)
     {
         $this->additional = $data;
+
+        return $this;
+    }
+
+    /**
+     * Add extra data to the top-level resource response.
+     *
+     * @param  array  $extra
+     * @return $this
+     */
+    public function withExtra(array $extra): static
+    {
+        $this->extra = array_merge($this->extra, $extra);
 
         return $this;
     }

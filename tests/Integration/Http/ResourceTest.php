@@ -1853,6 +1853,90 @@ class ResourceTest extends TestCase
         }
     }
 
+    public function testResourcesCanBeEnrichedWithExtraData()
+    {
+        Route::get('/', function () {
+            return (new PostResource(new Post([
+                'id' => 5,
+                'title' => 'Test Title',
+            ])))->withExtra([
+                'token' => 'abc123',
+                'permissions' => ['read', 'write'],
+            ]);
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertJson([
+            'data' => [
+                'id' => 5,
+                'title' => 'Test Title',
+                'custom' => true,
+                'token' => 'abc123',
+                'permissions' => ['read', 'write'],
+            ],
+        ]);
+    }
+
+    public function testResourcesPreserveKeysWhenUsingWithExtra()
+    {
+        Route::get('/', function () {
+            return (new JsonResource([
+                5 => 'John',
+                6 => 'Hank',
+                'a' => 'Bill',
+            ]))->withExtra(['key' => 'value']);
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertExactJson([
+            'data' => [
+                '5' => 'John',
+                '6' => 'Hank',
+                'a' => 'Bill',
+                'key' => 'value',
+            ],
+        ]);
+    }
+
+    public function testResourcesCanBeEnrichedWithMultipleWithExtraCalls()
+    {
+        Route::get('/', function () {
+            return (new JsonResource([
+                5 => 'John',
+                6 => 'Hank',
+                'a' => 'Bill',
+            ]))
+                ->withExtra(['key1' => 'value1'])
+                ->withExtra(['key2' => 'value2']);
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertExactJson([
+            'data' => [
+                '5' => 'John',
+                '6' => 'Hank',
+                'a' => 'Bill',
+                'key1' => 'value1',
+                'key2' => 'value2',
+            ],
+        ]);
+    }
+
     private function assertJsonResourceResponse($data, $expectedJson)
     {
         Route::get('/', function () use ($data) {
