@@ -54,8 +54,8 @@ class BroadcastingInstallCommand extends Command
      * @var array
      */
     protected $frameworkPackages = [
-        'vue' => '@laravel/echo-vue',
         'react' => '@laravel/echo-react',
+        'vue' => '@laravel/echo-vue',
     ];
 
     /**
@@ -82,10 +82,10 @@ class BroadcastingInstallCommand extends Command
         $this->collectDriverConfig();
 
         if ($this->isUsingSupportedFramework()) {
-            // If this is a supported framework, we will use the framework-specific Echo helpers
+            // If this is a supported framework, we will use the framework-specific Echo helpers...
             $this->injectFrameworkSpecificConfiguration();
         } else {
-            // Standard JavaScript implementation
+            // Standard JavaScript implementation...
             if (! file_exists($echoScriptPath = $this->laravel->resourcePath('js/echo.js'))) {
                 if (! is_dir($directory = $this->laravel->resourcePath('js'))) {
                     mkdir($directory, 0755, true);
@@ -94,7 +94,7 @@ class BroadcastingInstallCommand extends Command
                 copy(__DIR__.'/stubs/echo-js.stub', $echoScriptPath);
             }
 
-            // Only add the bootstrap import for the standard JS implementation
+            // Only add the bootstrap import for the standard JS implementation...
             if (file_exists($bootstrapScriptPath = $this->laravel->resourcePath('js/bootstrap.js'))) {
                 $bootstrapScript = file_get_contents(
                     $bootstrapScriptPath
@@ -112,222 +112,6 @@ class BroadcastingInstallCommand extends Command
         $this->installReverb();
 
         $this->installNodeDependencies();
-    }
-
-    /**
-     * Resolve the provider to use based on the user's choice.
-     *
-     * @return string
-     */
-    protected function resolveDriver(): string
-    {
-        if ($this->option('reverb')) {
-            return 'reverb';
-        }
-
-        if ($this->option('pusher')) {
-            return 'pusher';
-        }
-
-        if ($this->option('ably')) {
-            return 'ably';
-        }
-
-        return select('Which broadcasting driver would you like to use?', [
-            'reverb' => 'Laravel Reverb',
-            'pusher' => 'Pusher',
-            'ably' => 'Ably',
-        ]);
-    }
-
-    /**
-     * Collect the driver configuration.
-     *
-     * @return void
-     */
-    protected function collectDriverConfig()
-    {
-        $envPath = $this->laravel->basePath('.env');
-
-        if (! file_exists($envPath)) {
-            return;
-        }
-
-        match ($this->driver) {
-            'reverb' => $this->collectReverbConfig(),
-            'pusher' => $this->collectPusherConfig(),
-            'ably' => $this->collectAblyConfig(),
-        };
-    }
-
-    /**
-     * Collect the Reverb configuration.
-     *
-     * @return void
-     */
-    protected function collectReverbConfig()
-    {
-        $appKey = password('Reverb App Key', 'Enter your Reverb app key');
-        $appSecret = text('Reverb Host', 'Enter your Reverb host');
-
-        $this->addToEnv([
-            'REVERB_APP_KEY' => $appKey,
-            'REVERB_APP_SECRET' => $appSecret,
-        ]);
-    }
-
-    /**
-     * Collect the Pusher configuration.
-     *
-     * @return void
-     */
-    protected function collectPusherConfig()
-    {
-        $key = password('Pusher App Key', 'Enter your Pusher app key');
-        $cluster = select('Pusher App Cluster', [
-            'mt1',
-            'us2',
-            'us3',
-            'eu',
-            'ap1',
-            'ap2',
-            'ap3',
-            'ap4',
-            'sa1',
-        ]);
-
-        $this->addToEnv([
-            'PUSHER_APP_KEY' => $key,
-            'PUSHER_APP_CLUSTER' => $cluster,
-        ]);
-    }
-
-    /**
-     * Collect the Ably configuration.
-     *
-     * @return void
-     */
-    protected function collectAblyConfig()
-    {
-        $key = password('Ably Public Key', 'Enter your Ably public key');
-
-        $this->addToEnv([
-            'ABLY_PUBLIC_KEY' => $key,
-        ]);
-    }
-
-    /**
-     * Add key-value pairs to the .env file.
-     *
-     * @param  array  $values  Key-value pairs to add to the .env file
-     * @param  bool  $addViteEnvs  Also add the corresponding Vite environment variables
-     * @return void
-     */
-    protected function addToEnv(array $values, $addViteEnvs = true)
-    {
-        $envPath = $this->laravel->basePath('.env');
-
-        if (! file_exists($envPath)) {
-            return;
-        }
-
-        if ($addViteEnvs) {
-            foreach ($values as $key => $value) {
-                $values["VITE_{$key}"] = '"${'.$key.'}"';
-            }
-        }
-
-        $filesystem = new Filesystem;
-
-        $currentPrefix = null;
-
-        foreach ($values as $key => $value) {
-            $prefix = explode('_', $key)[0];
-
-            if ($currentPrefix !== $prefix) {
-                $filesystem->append($envPath, PHP_EOL);
-                $currentPrefix = $prefix;
-            }
-
-            $envContent = $filesystem->get($envPath);
-
-            $newLine = $key.'='.$value;
-
-            preg_match('/^'.preg_quote($newLine, '/').'$/m', $envContent, $existingLine);
-
-            if (count($existingLine)) {
-                continue;
-            }
-
-            preg_match('/^'.$key.'=$/m', $envContent, $emptyKeyMatches, PREG_OFFSET_CAPTURE);
-            preg_match('/^'.$key.'=/m', $envContent, $keyMatches, PREG_OFFSET_CAPTURE);
-
-            if (count($emptyKeyMatches) > 0) {
-                $filesystem->put(
-                    $envPath,
-                    substr_replace(
-                        $envContent,
-                        $newLine,
-                        $emptyKeyMatches[0][1],
-                        strlen($emptyKeyMatches[0][0])
-                    ),
-                );
-            } elseif (count($keyMatches) > 0) {
-                $this->components->warn("The {$key} environment variable already exists in your .env file. Please update it manually.");
-                $this->components->warn($newLine);
-            } else {
-                $filesystem->append($envPath, "{$newLine}\n");
-            }
-        }
-    }
-
-    /**
-     * Detect if the user is using a supported framework (React or Vue).
-     *
-     * @return bool
-     */
-    protected function isUsingSupportedFramework(): bool
-    {
-        return $this->appUsesReact() || $this->appUsesVue();
-    }
-
-    /**
-     * Detect if the user is using React.
-     *
-     * @return bool
-     */
-    protected function appUsesReact(): bool
-    {
-        return $this->packageDependenciesInclude('react');
-    }
-
-    /**
-     * Detect if the user is using Vue.
-     *
-     * @return bool
-     */
-    protected function appUsesVue(): bool
-    {
-        return $this->packageDependenciesInclude('vue');
-    }
-
-    /**
-     * Detect if the package is installed.
-     *
-     * @return bool
-     */
-    protected function packageDependenciesInclude(string $package): bool
-    {
-        $packageJsonPath = $this->laravel->basePath('package.json');
-
-        if (! file_exists($packageJsonPath)) {
-            return false;
-        }
-
-        $packageJson = json_decode(file_get_contents($packageJsonPath), true);
-
-        return isset($packageJson['dependencies'][$package]) ||
-            isset($packageJson['devDependencies'][$package]);
     }
 
     /**
@@ -382,6 +166,148 @@ class BroadcastingInstallCommand extends Command
                 'App\Providers\BroadcastServiceProvider::class',
                 app()->configPath('app.php'),
             );
+        }
+    }
+
+    /**
+     * Collect the driver configuration.
+     *
+     * @return void
+     */
+    protected function collectDriverConfig()
+    {
+        $envPath = $this->laravel->basePath('.env');
+
+        if (! file_exists($envPath)) {
+            return;
+        }
+
+        match ($this->driver) {
+            'reverb' => $this->collectReverbConfig(),
+            'pusher' => $this->collectPusherConfig(),
+            'ably' => $this->collectAblyConfig(),
+        };
+    }
+
+    /**
+     * Collect the Reverb configuration.
+     *
+     * @return void
+     */
+    protected function collectReverbConfig()
+    {
+        // $appKey = text('Reverb App Key', 'Enter your Reverb app key', default: 'my-app-key');
+        // $appSecret = text('Reverb Secret', 'Enter your Reverb secret', default: 'my-app-secret');
+
+        // $this->addToEnv([
+        //     'REVERB_APP_KEY' => $appKey,
+        //     'REVERB_APP_SECRET' => $appSecret,
+        // ]);
+    }
+
+    /**
+     * Collect the Pusher configuration.
+     *
+     * @return void
+     */
+    protected function collectPusherConfig()
+    {
+        $key = password('Pusher App Key', 'Enter your Pusher app key');
+
+        $cluster = select('Pusher App Cluster', [
+            'mt1',
+            'us2',
+            'us3',
+            'eu',
+            'ap1',
+            'ap2',
+            'ap3',
+            'ap4',
+            'sa1',
+        ]);
+
+        $this->addToEnv([
+            'PUSHER_APP_KEY' => $key,
+            'PUSHER_APP_CLUSTER' => $cluster,
+        ]);
+    }
+
+    /**
+     * Collect the Ably configuration.
+     *
+     * @return void
+     */
+    protected function collectAblyConfig()
+    {
+        $key = password('Ably Public Key', 'Enter your Ably public key');
+
+        $this->addToEnv([
+            'ABLY_PUBLIC_KEY' => $key,
+        ]);
+    }
+
+    /**
+     * Add key-value pairs to the .env file.
+     *
+     * @param  array  $values
+     * @param  bool  $addViteEnvs
+     * @return void
+     */
+    protected function addToEnv(array $values, $addViteEnvs = true)
+    {
+        $envPath = $this->laravel->basePath('.env');
+
+        if (! file_exists($envPath)) {
+            return;
+        }
+
+        if ($addViteEnvs) {
+            foreach ($values as $key => $value) {
+                $values["VITE_{$key}"] = '"${'.$key.'}"';
+            }
+        }
+
+        $filesystem = new Filesystem;
+
+        $currentPrefix = null;
+
+        foreach ($values as $key => $value) {
+            $prefix = explode('_', $key)[0];
+
+            if ($currentPrefix !== $prefix) {
+                $filesystem->append($envPath, PHP_EOL);
+                $currentPrefix = $prefix;
+            }
+
+            $envContent = $filesystem->get($envPath);
+
+            $newLine = $key.'='.$value;
+
+            preg_match('/^'.preg_quote($newLine, '/').'$/m', $envContent, $existingLine);
+
+            if (count($existingLine)) {
+                continue;
+            }
+
+            preg_match('/^'.$key.'=$/m', $envContent, $emptyKeyMatches, PREG_OFFSET_CAPTURE);
+            preg_match('/^'.$key.'=/m', $envContent, $keyMatches, PREG_OFFSET_CAPTURE);
+
+            if (count($emptyKeyMatches) > 0) {
+                $filesystem->put(
+                    $envPath,
+                    substr_replace(
+                        $envContent,
+                        $newLine,
+                        $emptyKeyMatches[0][1],
+                        strlen($emptyKeyMatches[0][0])
+                    ),
+                );
+            } elseif (count($keyMatches) > 0) {
+                $this->components->warn("The [{$key}] environment variable already exists in your .env file. Please update this value manually.");
+                $this->components->warn($newLine);
+            } else {
+                $filesystem->append($envPath, "{$newLine}\n");
+            }
         }
     }
 
@@ -530,5 +456,80 @@ class BroadcastingInstallCommand extends Command
         } else {
             $this->components->info('Node dependencies installed successfully.');
         }
+    }
+
+    /**
+     * Resolve the provider to use based on the user's choice.
+     *
+     * @return string
+     */
+    protected function resolveDriver(): string
+    {
+        if ($this->option('reverb')) {
+            return 'reverb';
+        }
+
+        if ($this->option('pusher')) {
+            return 'pusher';
+        }
+
+        if ($this->option('ably')) {
+            return 'ably';
+        }
+
+        return select('Which broadcasting driver would you like to use?', [
+            'reverb' => 'Laravel Reverb',
+            'pusher' => 'Pusher',
+            'ably' => 'Ably',
+        ]);
+    }
+
+    /**
+     * Detect if the user is using a supported framework (React or Vue).
+     *
+     * @return bool
+     */
+    protected function isUsingSupportedFramework(): bool
+    {
+        return $this->appUsesReact() || $this->appUsesVue();
+    }
+
+    /**
+     * Detect if the user is using React.
+     *
+     * @return bool
+     */
+    protected function appUsesReact(): bool
+    {
+        return $this->packageDependenciesInclude('react');
+    }
+
+    /**
+     * Detect if the user is using Vue.
+     *
+     * @return bool
+     */
+    protected function appUsesVue(): bool
+    {
+        return $this->packageDependenciesInclude('vue');
+    }
+
+    /**
+     * Detect if the package is installed.
+     *
+     * @return bool
+     */
+    protected function packageDependenciesInclude(string $package): bool
+    {
+        $packageJsonPath = $this->laravel->basePath('package.json');
+
+        if (! file_exists($packageJsonPath)) {
+            return false;
+        }
+
+        $packageJson = json_decode(file_get_contents($packageJsonPath), true);
+
+        return isset($packageJson['dependencies'][$package]) ||
+            isset($packageJson['devDependencies'][$package]);
     }
 }
