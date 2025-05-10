@@ -238,6 +238,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
                 $tokens[] = $token[0];
             }
         }
+
         return new Collection($tokens);
     }
 
