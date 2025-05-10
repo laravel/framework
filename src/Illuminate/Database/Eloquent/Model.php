@@ -145,6 +145,13 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     protected static $dispatcher;
 
     /**
+     * The models that are currently being booted.
+     *
+     * @var array
+     */
+    protected static $booting = [];
+
+    /**
      * The array of booted models.
      *
      * @var array
@@ -157,11 +164,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * @var array
      */
     protected static $bootedCallbacks = [];
-
-    /**
-     * Models currently being booted.
-     */
-    protected static array $booting = [];
 
     /**
      * The array of trait initializers that will be called on each new instance.
