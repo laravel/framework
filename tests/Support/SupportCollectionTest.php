@@ -838,6 +838,10 @@ class SupportCollectionTest extends TestCase
         $this->assertFalse((new $collection([]))->containsOneItem());
         $this->assertTrue((new $collection([1]))->containsOneItem());
         $this->assertFalse((new $collection([1, 2]))->containsOneItem());
+
+        $this->assertFalse(collect([1, 2, 2])->containsOneItem(fn ($number) => $number === 2));
+        $this->assertTrue(collect(['ant', 'bear', 'cat'])->containsOneItem(fn ($word) => strlen($word) === 4));
+        $this->assertFalse(collect(['ant', 'bear', 'cat'])->containsOneItem(fn ($word) => strlen($word) > 4));
     }
 
     public function testIterable()

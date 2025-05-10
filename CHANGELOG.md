@@ -1,6 +1,97 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.9.2...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.13.0...12.x)
+
+## [v12.13.0](https://github.com/laravel/framework/compare/v12.12.0...v12.13.0) - 2025-05-07
+
+* [12.x] fix no arguments return type in request class by [@olivernybroe](https://github.com/olivernybroe) in https://github.com/laravel/framework/pull/55631
+* [12.x] Add support for callback evaluation in containsOneItem method by [@fernandokbs](https://github.com/fernandokbs) in https://github.com/laravel/framework/pull/55622
+* [12.x] add generics to aggregate related methods and properties by [@taka-oyama](https://github.com/taka-oyama) in https://github.com/laravel/framework/pull/55628
+* [12.x] Fix typo in PHPDoc by [@AhmedAlaa4611](https://github.com/AhmedAlaa4611) in https://github.com/laravel/framework/pull/55636
+* [12.x] Allow naming queued closures by [@willrowe](https://github.com/willrowe) in https://github.com/laravel/framework/pull/55634
+* [12.x] Add `assertRedirectBack` assertion method by [@ryangjchandler](https://github.com/ryangjchandler) in https://github.com/laravel/framework/pull/55635
+* [12.x] Typehints for bindings by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/55633
+* [12.x] add PHP Doc types to arrays for methods in Database\Grammar by [@taka-oyama](https://github.com/taka-oyama) in https://github.com/laravel/framework/pull/55629
+* fix trim null arg deprecation by [@apreiml](https://github.com/apreiml) in https://github.com/laravel/framework/pull/55649
+* [12.x] Support predis/predis 3.x by [@gabrielrbarbosa](https://github.com/gabrielrbarbosa) in https://github.com/laravel/framework/pull/55641
+* Bump vite from 5.4.18 to 5.4.19 in /src/Illuminate/Foundation/resources/exceptions/renderer by [@dependabot](https://github.com/dependabot) in https://github.com/laravel/framework/pull/55655
+* [12.x] Fix predis versions by [@GrahamCampbell](https://github.com/GrahamCampbell) in https://github.com/laravel/framework/pull/55654
+* [12.x] Bump minimum league/commonmark by [@szepeviktor](https://github.com/szepeviktor) in https://github.com/laravel/framework/pull/55659
+* [12.x] Fix typo in MemoizedStoreTest by [@szepeviktor](https://github.com/szepeviktor) in https://github.com/laravel/framework/pull/55662
+* [12.x] Queue event listeners with enum values by [@wgriffioen](https://github.com/wgriffioen) in https://github.com/laravel/framework/pull/55656
+* [12.x] Implement releaseAfter method in RateLimited middleware by [@adamjgriffith](https://github.com/adamjgriffith) in https://github.com/laravel/framework/pull/55671
+* [12.x] Improve Cache Tests by [@nuernbergerA](https://github.com/nuernbergerA) in https://github.com/laravel/framework/pull/55670
+* [12.x] Only pass model IDs to Eloquent `whereAttachedTo` method by [@ashleyshenton](https://github.com/ashleyshenton) in https://github.com/laravel/framework/pull/55666
+* feat(bus): allow adding multiple jobs to chain by [@dallyger](https://github.com/dallyger) in https://github.com/laravel/framework/pull/55668
+* [12.x] add generics to QueryBuilder’s column related methods by [@taka-oyama](https://github.com/taka-oyama) in https://github.com/laravel/framework/pull/55663
+
+## [v12.12.0](https://github.com/laravel/framework/compare/v12.11.1...v12.12.0) - 2025-05-01
+
+* [12.x] Make Blueprint Resolver Statically by [@finagin](https://github.com/finagin) in https://github.com/laravel/framework/pull/55607
+* [12.x] Allow limiting number of assets to preload by [@timacdonald](https://github.com/timacdonald) in https://github.com/laravel/framework/pull/55618
+* [12.x] Set job instance on "failed" command instance by [@willrowe](https://github.com/willrowe) in https://github.com/laravel/framework/pull/55617
+
+## [v12.11.1](https://github.com/laravel/framework/compare/v12.11.0...v12.11.1) - 2025-04-30
+
+* Revert "[12.x]`ScheduledTaskFailed` not dispatched on scheduled task failing" by [@taylorotwell](https://github.com/taylorotwell) in https://github.com/laravel/framework/pull/55612
+* [12.x] Resolve issue with BelongsToManyRelationship factory by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/55608
+
+## [v12.11.0](https://github.com/laravel/framework/compare/v12.10.2...v12.11.0) - 2025-04-29
+
+* Add payload creation and original delay info to job payload by [@taylorotwell](https://github.com/taylorotwell) in https://github.com/laravel/framework/pull/55529
+* Add config option to ignore view cache timestamps by [@pizkaz](https://github.com/pizkaz) in https://github.com/laravel/framework/pull/55536
+* [12.x] Dispatch NotificationFailed when sending fails by [@rodrigopedra](https://github.com/rodrigopedra) in https://github.com/laravel/framework/pull/55507
+* [12.x] Option to disable dispatchAfterResponse in a test by [@gdebrauwer](https://github.com/gdebrauwer) in https://github.com/laravel/framework/pull/55456
+* [12.x] Pass flags to custom Json::$encoder by [@rodrigopedra](https://github.com/rodrigopedra) in https://github.com/laravel/framework/pull/55548
+* [12.x] Use pendingAttributes of relationships when creating relationship models via model factories by [@gdebrauwer](https://github.com/gdebrauwer) in https://github.com/laravel/framework/pull/55558
+* [12.x] Fix double query in model relation serialization by [@AndrewMast](https://github.com/AndrewMast) in https://github.com/laravel/framework/pull/55547
+* [12.x] Improve circular relation check in Automatic Relation Loading by [@litvinchuk](https://github.com/litvinchuk) in https://github.com/laravel/framework/pull/55542
+* [12.x] Prevent relation autoload context from being serialized by [@litvinchuk](https://github.com/litvinchuk) in https://github.com/laravel/framework/pull/55582
+* Remove `@internal` Annotation from `$components` Property in `InteractsWithIO` by [@michaelnabil230](https://github.com/michaelnabil230) in https://github.com/laravel/framework/pull/55580
+* Ensure fake job implements job contract by [@timacdonald](https://github.com/timacdonald) in https://github.com/laravel/framework/pull/55574
+* [12.x] Fix `AnyOf` constructor parameter type by [@axlon](https://github.com/axlon) in https://github.com/laravel/framework/pull/55577
+* Sync changes to Illuminate components before release by [@driesvints](https://github.com/driesvints) in https://github.com/laravel/framework/pull/55591
+* [12.x] Set class-string generics on `Enum` rule by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/55588
+* [12.x] added detailed doc types to bindings related methods by [@taka-oyama](https://github.com/taka-oyama) in https://github.com/laravel/framework/pull/55576
+* [12.x] Improve [@use](https://github.com/use) directive to support function and const modifiers by [@rodolfosrg](https://github.com/rodolfosrg) in https://github.com/laravel/framework/pull/55583
+* 12.x scheduled task failed not dispatched on scheduled task failing by [@achrafAa](https://github.com/achrafAa) in https://github.com/laravel/framework/pull/55572
+* [12.x] Introduce Reflector methods for accessing class attributes by [@daniser](https://github.com/daniser) in https://github.com/laravel/framework/pull/55568
+* [12.x] Typed getters for Arr helper by [@tibbsa](https://github.com/tibbsa) in https://github.com/laravel/framework/pull/55567
+
+## [v12.10.2](https://github.com/laravel/framework/compare/v12.10.1...v12.10.2) - 2025-04-24
+
+* [12.x] Address Model@relationLoaded when relation is null by [@rodrigopedra](https://github.com/rodrigopedra) in https://github.com/laravel/framework/pull/55531
+
+## [v12.10.1](https://github.com/laravel/framework/compare/v12.10.0...v12.10.1) - 2025-04-23
+
+* Revert "Use value() helper in 'when' method to simplify code" #55465 by [@mohammadrasoulasghari](https://github.com/mohammadrasoulasghari) in https://github.com/laravel/framework/pull/55514
+* [12.x] Use xxh128 when comparing views for changes by [@shawnlindstrom](https://github.com/shawnlindstrom) in https://github.com/laravel/framework/pull/55517
+* [12.x] Ensure related models is iterable on `HasRelationships@relationLoaded()` by [@rodrigopedra](https://github.com/rodrigopedra) in https://github.com/laravel/framework/pull/55519
+* [12.x] Add Enum support for assertJsonPath in AssertableJsonString.php by [@azim-kordpour](https://github.com/azim-kordpour) in https://github.com/laravel/framework/pull/55516
+
+## [v12.10.0](https://github.com/laravel/framework/compare/v12.9.2...v12.10.0) - 2025-04-22
+
+* Use value() helper in 'when' method by [@mohammadrasoulasghari](https://github.com/mohammadrasoulasghari) in https://github.com/laravel/framework/pull/55465
+* [12.x] Test `@use` directive without quotes by [@osbre](https://github.com/osbre) in https://github.com/laravel/framework/pull/55462
+* [12.x] Enhance Broadcast Events Test Coverage by [@roshandelpoor](https://github.com/roshandelpoor) in https://github.com/laravel/framework/pull/55458
+* [12.x] Add `Conditionable` Trait to `Fluent`  by [@michaelnabil230](https://github.com/michaelnabil230) in https://github.com/laravel/framework/pull/55455
+* [12.x] Fix relation auto loading with manually set relations by [@patrickweh](https://github.com/patrickweh) in https://github.com/laravel/framework/pull/55452
+* Add missing types to RateLimiter by [@ClaudioEyzaguirre](https://github.com/ClaudioEyzaguirre) in https://github.com/laravel/framework/pull/55445
+* [12.x] Fix for global autoload relationships not working  in certain cases by [@litvinchuk](https://github.com/litvinchuk) in https://github.com/laravel/framework/pull/55443
+* [12.x] Fix adding `setTags` method on new cache flush events by [@erikn69](https://github.com/erikn69) in https://github.com/laravel/framework/pull/55405
+* Fix: Unique lock not being released after transaction rollback in ShouldBeUnique jobs with afterCommit() by [@toshitsuna-otsuka](https://github.com/toshitsuna-otsuka) in https://github.com/laravel/framework/pull/55420
+* [12.x] Extends `AsCollection` to map items into objects or other values by [@DarkGhostHunter](https://github.com/DarkGhostHunter) in https://github.com/laravel/framework/pull/55383
+* [12.x] Fix group imports in Blade `@use` directive by [@osbre](https://github.com/osbre) in https://github.com/laravel/framework/pull/55461
+* chore(tests): align test names with idiomatic naming style by [@kauffinger](https://github.com/kauffinger) in https://github.com/laravel/framework/pull/55496
+* Update compiled views only if they actually changed by [@pizkaz](https://github.com/pizkaz) in https://github.com/laravel/framework/pull/55450
+* Improve performance of Arr::dot method - 300x in some cases by [@cyppe](https://github.com/cyppe) in https://github.com/laravel/framework/pull/55495
+* [12.x] Add tests for `CacheBasedSessionHandler` by [@imanghafoori1](https://github.com/imanghafoori1) in https://github.com/laravel/framework/pull/55487
+* [12.x] Add tests for `FileSessionHandler` by [@imanghafoori1](https://github.com/imanghafoori1) in https://github.com/laravel/framework/pull/55484
+* [12.x] Add tests for `DatabaseSessionHandler` by [@imanghafoori1](https://github.com/imanghafoori1) in https://github.com/laravel/framework/pull/55485
+* [12.x] Fix many to many detach without IDs broken with custom pivot class by [@amir9480](https://github.com/amir9480) in https://github.com/laravel/framework/pull/55490
+* [12.x] Support nested relations on `relationLoaded` method by [@tmsperera](https://github.com/tmsperera) in https://github.com/laravel/framework/pull/55471
+* Bugfix for Cache::memo()->many() returning the wrong value with an integer key type by [@bmckay959](https://github.com/bmckay959) in https://github.com/laravel/framework/pull/55503
+* [12.x] Allow Container to build `Migrator` from class name by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/55501
 
 ## [v12.9.2](https://github.com/laravel/framework/compare/v12.9.1...v12.9.2) - 2025-04-16
 

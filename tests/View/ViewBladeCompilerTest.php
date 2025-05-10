@@ -51,8 +51,15 @@ class ViewBladeCompilerTest extends TestCase
 
     public function testIsExpiredReturnsTrueWhenUseCacheIsFalse()
     {
-        $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__, $basePath = '', $useCache = false);
+        $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__, shouldCache: false);
         $this->assertTrue($compiler->isExpired('foo'));
+    }
+
+    public function testIsExpiredReturnsFalseWhenIgnoreCacheTimestampsIsTrue()
+    {
+        $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__, shouldCheckTimestamps: false);
+        $files->shouldReceive('exists')->once()->with(__DIR__.'/'.hash('xxh128', 'v2foo').'.php')->andReturn(true);
+        $this->assertFalse($compiler->isExpired('foo'));
     }
 
     public function testCompilePathIsProperlyCreated()
@@ -88,7 +95,7 @@ class ViewBladeCompilerTest extends TestCase
         $files->shouldReceive('get')->once()->with('foo')->andReturn('Hello World');
         $files->shouldReceive('exists')->once()->with(__DIR__)->andReturn(true);
         $files->shouldReceive('exists')->once()->with($compiledPath)->andReturn(true);
-        $files->shouldReceive('hash')->once()->with($compiledPath, 'sha256')->andReturn(hash('sha256', 'outdated content'));
+        $files->shouldReceive('hash')->once()->with($compiledPath, 'xxh128')->andReturn(hash('xxh128', 'outdated content'));
         $files->shouldReceive('put')->once()->with($compiledPath, 'Hello World<?php /**PATH foo ENDPATH**/ ?>');
         $compiler->compile('foo');
     }
@@ -101,7 +108,7 @@ class ViewBladeCompilerTest extends TestCase
         $files->shouldReceive('exists')->once()->with(__DIR__)->andReturn(false);
         $files->shouldReceive('makeDirectory')->once()->with(__DIR__, 0777, true, true);
         $files->shouldReceive('exists')->once()->with($compiledPath)->andReturn(true);
-        $files->shouldReceive('hash')->once()->with($compiledPath, 'sha256')->andReturn(hash('sha256', 'Hello World<?php /**PATH foo ENDPATH**/ ?>'));
+        $files->shouldReceive('hash')->once()->with($compiledPath, 'xxh128')->andReturn(hash('xxh128', 'Hello World<?php /**PATH foo ENDPATH**/ ?>'));
         $compiler->compile('foo');
     }
 

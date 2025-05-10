@@ -128,7 +128,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
     {
         return $this->enqueueUsing(
             $job,
-            $this->createPayload($job, $queue ?: $this->default, $data),
+            $this->createPayload($job, $queue ?: $this->default, $data, $delay),
             $queue,
             $delay,
             function ($payload, $queue, $delay) {

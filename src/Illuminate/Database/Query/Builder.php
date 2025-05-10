@@ -63,7 +63,17 @@ class Builder implements BuilderContract
     /**
      * The current query value bindings.
      *
-     * @var array
+     * @var array{
+     *     select: list<mixed>,
+     *     from: list<mixed>,
+     *     join: list<mixed>,
+     *     where: list<mixed>,
+     *     groupBy: list<mixed>,
+     *     having: list<mixed>,
+     *     order: list<mixed>,
+     *     union: list<mixed>,
+     *     unionOrder: list<mixed>,
+     * }
      */
     public $bindings = [
         'select' => [],
@@ -80,14 +90,17 @@ class Builder implements BuilderContract
     /**
      * An aggregate function and column to be run.
      *
-     * @var array|null
+     * @var array{
+     *     function: string,
+     *     columns: array<\Illuminate\Contracts\Database\Query\Expression|string>
+     * }|null
      */
     public $aggregate;
 
     /**
      * The columns that should be returned.
      *
-     * @var array|null
+     * @var array<string|\Illuminate\Contracts\Database\Query\Expression>|null
      */
     public $columns;
 
@@ -272,7 +285,7 @@ class Builder implements BuilderContract
     /**
      * Set the columns to be selected.
      *
-     * @param  array|mixed  $columns
+     * @param  mixed  $columns
      * @return $this
      */
     public function select($columns = ['*'])
@@ -426,7 +439,7 @@ class Builder implements BuilderContract
     /**
      * Add a new select column to the query.
      *
-     * @param  array|mixed  $column
+     * @param  mixed  $column
      * @return $this
      */
     public function addSelect($column)
@@ -1095,7 +1108,7 @@ class Builder implements BuilderContract
     /**
      * Add a raw where clause to the query.
      *
-     * @param  string  $sql
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $sql
      * @param  mixed  $bindings
      * @param  string  $boolean
      * @return $this
@@ -3013,7 +3026,7 @@ class Builder implements BuilderContract
      * Execute a query for a single record by ID.
      *
      * @param  int|string  $id
-     * @param  array|string  $columns
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression|array<string|\Illuminate\Contracts\Database\Query\Expression>  $columns
      * @return object|null
      */
     public function find($id, $columns = ['*'])
@@ -3027,7 +3040,7 @@ class Builder implements BuilderContract
      * @template TValue
      *
      * @param  mixed  $id
-     * @param  (\Closure(): TValue)|list<string>|string  $columns
+     * @param  (\Closure(): TValue)|string|\Illuminate\Contracts\Database\Query\Expression|array<string|\Illuminate\Contracts\Database\Query\Expression>  $columns
      * @param  (\Closure(): TValue)|null  $callback
      * @return object|TValue
      */
@@ -3090,7 +3103,7 @@ class Builder implements BuilderContract
     /**
      * Execute the query as a "select" statement.
      *
-     * @param  array|string  $columns
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression|array<string|\Illuminate\Contracts\Database\Query\Expression>  $columns
      * @return \Illuminate\Support\Collection<int, \stdClass>
      */
     public function get($columns = ['*'])
@@ -3150,7 +3163,7 @@ class Builder implements BuilderContract
      * Paginate the given query into a simple paginator.
      *
      * @param  int|\Closure  $perPage
-     * @param  array|string  $columns
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression|array<string|\Illuminate\Contracts\Database\Query\Expression>  $columns
      * @param  string  $pageName
      * @param  int|null  $page
      * @param  \Closure|int|null  $total
@@ -3178,7 +3191,7 @@ class Builder implements BuilderContract
      * This is more efficient on larger data-sets, etc.
      *
      * @param  int  $perPage
-     * @param  array|string  $columns
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression|array<string|\Illuminate\Contracts\Database\Query\Expression>  $columns
      * @param  string  $pageName
      * @param  int|null  $page
      * @return \Illuminate\Contracts\Pagination\Paginator
@@ -3201,7 +3214,7 @@ class Builder implements BuilderContract
      * This is more efficient on larger data-sets, etc.
      *
      * @param  int|null  $perPage
-     * @param  array|string  $columns
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression|array<string|\Illuminate\Contracts\Database\Query\Expression>  $columns
      * @param  string  $cursorName
      * @param  \Illuminate\Pagination\Cursor|string|null  $cursor
      * @return \Illuminate\Contracts\Pagination\CursorPaginator
@@ -3248,7 +3261,7 @@ class Builder implements BuilderContract
     /**
      * Get the count of the total records for the paginator.
      *
-     * @param  array  $columns
+     * @param  array<string|\Illuminate\Contracts\Database\Query\Expression>  $columns
      * @return int
      */
     public function getCountForPagination($columns = ['*'])
@@ -3270,8 +3283,8 @@ class Builder implements BuilderContract
     /**
      * Run a pagination count query.
      *
-     * @param  array  $columns
-     * @return array
+     * @param  array<string|\Illuminate\Contracts\Database\Query\Expression>  $columns
+     * @return array<mixed>
      */
     protected function runPaginationCountQuery($columns = ['*'])
     {
@@ -3311,7 +3324,8 @@ class Builder implements BuilderContract
     /**
      * Remove the column aliases since they will break count queries.
      *
-     * @return array
+     * @param  array<string|\Illuminate\Contracts\Database\Query\Expression>  $columns
+     * @return array<string|\Illuminate\Contracts\Database\Query\Expression>
      */
     protected function withoutSelectAliases(array $columns)
     {
@@ -3655,7 +3669,7 @@ class Builder implements BuilderContract
      * Set the aggregate property without running the query.
      *
      * @param  string  $function
-     * @param  array  $columns
+     * @param  array<\Illuminate\Contracts\Database\Query\Expression|string>  $columns
      * @return $this
      */
     protected function setAggregate($function, $columns)
@@ -4056,7 +4070,7 @@ class Builder implements BuilderContract
     /**
      * Get all of the query builder's columns in a text-only array with all expressions evaluated.
      *
-     * @return array
+     * @return list<string>
      */
     public function getColumns()
     {
@@ -4115,7 +4129,7 @@ class Builder implements BuilderContract
     /**
      * Get the current query value bindings in a flattened array.
      *
-     * @return array
+     * @return list<mixed>
      */
     public function getBindings()
     {
@@ -4125,7 +4139,17 @@ class Builder implements BuilderContract
     /**
      * Get the raw array of bindings.
      *
-     * @return array
+     * @return array{
+     *      select: list<mixed>,
+     *      from: list<mixed>,
+     *      join: list<mixed>,
+     *      where: list<mixed>,
+     *      groupBy: list<mixed>,
+     *      having: list<mixed>,
+     *      order: list<mixed>,
+     *      union: list<mixed>,
+     *      unionOrder: list<mixed>,
+     * }
      */
     public function getRawBindings()
     {
@@ -4135,7 +4159,8 @@ class Builder implements BuilderContract
     /**
      * Set the bindings on the query builder.
      *
-     * @param  string  $type
+     * @param  list<mixed>  $bindings
+     * @param  "select"|"from"|"join"|"where"|"groupBy"|"having"|"order"|"union"|"unionOrder"  $type
      * @return $this
      *
      * @throws \InvalidArgumentException
@@ -4155,7 +4180,7 @@ class Builder implements BuilderContract
      * Add a binding to the query.
      *
      * @param  mixed  $value
-     * @param  string  $type
+     * @param  "select"|"from"|"join"|"where"|"groupBy"|"having"|"order"|"union"|"unionOrder"  $type
      * @return $this
      *
      * @throws \InvalidArgumentException
@@ -4196,6 +4221,7 @@ class Builder implements BuilderContract
     /**
      * Merge an array of bindings into our bindings.
      *
+     * @param  self  $query
      * @return $this
      */
     public function mergeBindings(self $query)
@@ -4208,7 +4234,8 @@ class Builder implements BuilderContract
     /**
      * Remove all of the expressions from a list of bindings.
      *
-     * @return array
+     * @param  array<mixed>  $bindings
+     * @return list<mixed>
      */
     public function cleanBindings(array $bindings)
     {

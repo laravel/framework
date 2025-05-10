@@ -531,6 +531,21 @@ abstract class Factory
     }
 
     /**
+     * Prepend a new state transformation to the model definition.
+     *
+     * @param  (callable(array<string, mixed>, TModel|null): array<string, mixed>)|array<string, mixed>  $state
+     * @return static
+     */
+    public function prependState($state)
+    {
+        return $this->newInstance([
+            'states' => $this->states->prepend(
+                is_callable($state) ? $state : fn () => $state,
+            ),
+        ]);
+    }
+
+    /**
      * Set a single model attribute.
      *
      * @param  string|int  $key

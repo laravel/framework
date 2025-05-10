@@ -20,7 +20,7 @@ trait Conditionable
      */
     public function when($value = null, ?callable $callback = null, ?callable $default = null)
     {
-        $value = value($value, $this);
+        $value = $value instanceof Closure ? $value($this) : $value;
 
         if (func_num_args() === 0) {
             return new HigherOrderWhenProxy($this);

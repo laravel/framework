@@ -45,12 +45,20 @@ abstract class Compiler
     protected $compiledExtension = 'php';
 
     /**
+     * Indicates if view cache timestamps should be checked.
+     *
+     * @var bool
+     */
+    protected $shouldCheckTimestamps;
+
+    /**
      * Create a new compiler instance.
      *
      * @param  \Illuminate\Filesystem\Filesystem  $files
      * @param  string  $cachePath
      * @param  string  $basePath
      * @param  bool  $shouldCache
+     * @param  bool  $shouldCheckTimestamps
      * @param  string  $compiledExtension
      *
      * @throws \InvalidArgumentException
@@ -61,6 +69,7 @@ abstract class Compiler
         $basePath = '',
         $shouldCache = true,
         $compiledExtension = 'php',
+        $shouldCheckTimestamps = true,
     ) {
         if (! $cachePath) {
             throw new InvalidArgumentException('Please provide a valid cache path.');
@@ -71,6 +80,7 @@ abstract class Compiler
         $this->basePath = $basePath;
         $this->shouldCache = $shouldCache;
         $this->compiledExtension = $compiledExtension;
+        $this->shouldCheckTimestamps = $shouldCheckTimestamps;
     }
 
     /**
@@ -105,6 +115,10 @@ abstract class Compiler
         // of the views is less than the modification times of the compiled views.
         if (! $this->files->exists($compiled)) {
             return true;
+        }
+
+        if (! $this->shouldCheckTimestamps) {
+            return false;
         }
 
         try {

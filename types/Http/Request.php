@@ -14,3 +14,9 @@ $request = Request::create('/', 'GET', [
 ]);
 
 assertType('TestEnum|null', $request->enum('key', TestEnum::class));
+
+assertType('Illuminate\Routing\Route', $request->route());
+assertType('object|string|null', $request->route('key'));
+
+assertType('Symfony\Component\HttpFoundation\InputBag', $request->json());
+assertType('mixed', $request->json('key'));

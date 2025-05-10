@@ -61,6 +61,8 @@ class EloquentModelRelationAutoloadTest extends DatabaseTestCase
         $this->assertCount(2, DB::getQueryLog());
         $this->assertCount(3, $likes);
         $this->assertTrue($posts[0]->comments[0]->relationLoaded('likes'));
+
+        DB::disableQueryLog();
     }
 
     public function testRelationAutoloadForSingleModel()
@@ -84,6 +86,8 @@ class EloquentModelRelationAutoloadTest extends DatabaseTestCase
         $this->assertCount(2, DB::getQueryLog());
         $this->assertCount(2, $likes);
         $this->assertTrue($post->comments[0]->relationLoaded('likes'));
+
+        DB::disableQueryLog();
     }
 
     public function testRelationAutoloadWithSerialization()
@@ -109,6 +113,50 @@ class EloquentModelRelationAutoloadTest extends DatabaseTestCase
         $this->assertCount(2, DB::getQueryLog());
 
         Model::automaticallyEagerLoadRelationships(false);
+
+        DB::disableQueryLog();
+    }
+
+    public function testRelationAutoloadWithCircularRelations()
+    {
+        $post = Post::create();
+        $comment1 = $post->comments()->create(['parent_id' => null]);
+        $comment2 = $post->comments()->create(['parent_id' => $comment1->id]);
+        $post->likes()->create();
+
+        DB::enableQueryLog();
+
+        $post->withRelationshipAutoloading();
+        $comment = $post->comments->first();
+        $comment->setRelation('post', $post);
+
+        $this->assertCount(1, $post->likes);
+
+        $this->assertCount(2, DB::getQueryLog());
+
+        DB::disableQueryLog();
+    }
+
+    public function testRelationAutoloadWithChaperoneRelations()
+    {
+        Model::automaticallyEagerLoadRelationships();
+
+        $post = Post::create();
+        $comment1 = $post->comments()->create(['parent_id' => null]);
+        $comment2 = $post->comments()->create(['parent_id' => $comment1->id]);
+        $post->likes()->create();
+
+        DB::enableQueryLog();
+
+        $post->load('commentsWithChaperone');
+
+        $this->assertCount(1, $post->likes);
+
+        $this->assertCount(2, DB::getQueryLog());
+
+        Model::automaticallyEagerLoadRelationships(false);
+
+        DB::disableQueryLog();
     }
 
     public function testRelationAutoloadVariousNestedMorphRelations()
@@ -163,6 +211,8 @@ class EloquentModelRelationAutoloadTest extends DatabaseTestCase
         $this->assertCount(2, $videos);
         $this->assertTrue($videoLike->relationLoaded('likeable'));
         $this->assertTrue($videoLike->likeable->relationLoaded('commentable'));
+
+        DB::disableQueryLog();
     }
 }
 
@@ -195,6 +245,11 @@ class Post extends Model
     public function comments()
     {
         return $this->morphMany(Comment::class, 'commentable');
+    }
+
+    public function commentsWithChaperone()
+    {
+        return $this->morphMany(Comment::class, 'commentable')->chaperone();
     }
 
     public function likes()
