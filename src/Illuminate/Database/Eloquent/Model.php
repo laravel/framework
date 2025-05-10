@@ -4,6 +4,7 @@ namespace Illuminate\Database\Eloquent;
 
 use ArrayAccess;
 use Closure;
+use Exception;
 use Illuminate\Contracts\Broadcasting\HasBroadcastChannel;
 use Illuminate\Contracts\Queue\QueueableCollection;
 use Illuminate\Contracts\Queue\QueueableEntity;
@@ -142,6 +143,13 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * @var \Illuminate\Contracts\Events\Dispatcher|null
      */
     protected static $dispatcher;
+
+    /**
+     * The models that are currently being booted.
+     *
+     * @var array
+     */
+    protected static $booting = [];
 
     /**
      * The array of booted models.
@@ -286,12 +294,20 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     protected function bootIfNotBooted()
     {
         if (! isset(static::$booted[static::class])) {
-            static::$booted[static::class] = true;
+            if (isset(static::$booting[static::class])) {
+                throw new LogicException('The ['.__METHOD__.'] method may not be called on model ['.static::class.'] while it is being booted.');
+            }
+
+            static::$booting[static::class] = true;
 
             $this->fireModelEvent('booting', false);
 
             static::booting();
             static::boot();
+
+            static::$booted[static::class] = true;
+            unset(static::$booting[static::class]);
+
             static::booted();
 
             static::$bootedCallbacks[static::class] ??= [];
