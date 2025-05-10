@@ -97,7 +97,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     protected $timebox;
 
     /**
-     * The number of microseconds that the Timebox should wait for.
+     * The number of microseconds that the timebox should wait for.
      *
      * @var int
      */
