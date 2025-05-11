@@ -9,6 +9,7 @@ use Illuminate\Contracts\Auth\PasswordBroker as PasswordBrokerContract;
 use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Timebox;
 use UnexpectedValueException;
 
 class PasswordBroker implements PasswordBrokerContract
@@ -35,18 +36,41 @@ class PasswordBroker implements PasswordBrokerContract
     protected $events;
 
     /**
+     * The timebox instance.
+     *
+     * @var \Illuminate\Support\Timebox
+     */
+    protected $timebox;
+
+    /**
+     * The number of microseconds that the timebox should wait for.
+     *
+     * @var int
+     */
+    protected $timeboxDuration;
+
+    /**
      * Create a new password broker instance.
      *
      * @param  \Illuminate\Auth\Passwords\TokenRepositoryInterface  $tokens
      * @param  \Illuminate\Contracts\Auth\UserProvider  $users
      * @param  \Illuminate\Contracts\Events\Dispatcher|null  $dispatcher
+     * @param  \Illuminate\Support\Timebox|null  $timebox
+     * @param  int  $timeboxDuration
      * @return void
      */
-    public function __construct(#[\SensitiveParameter] TokenRepositoryInterface $tokens, UserProvider $users, ?Dispatcher $dispatcher = null)
-    {
+    public function __construct(
+        #[\SensitiveParameter] TokenRepositoryInterface $tokens,
+        UserProvider $users,
+        ?Dispatcher $dispatcher = null,
+        ?Timebox $timebox = null,
+        int $timeboxDuration = 200000,
+    ) {
         $this->users = $users;
         $this->tokens = $tokens;
         $this->events = $dispatcher;
+        $this->timebox = $timebox ?: new Timebox;
+        $this->timeboxDuration = $timeboxDuration;
     }
 
     /**
@@ -58,33 +82,35 @@ class PasswordBroker implements PasswordBrokerContract
      */
     public function sendResetLink(#[\SensitiveParameter] array $credentials, ?Closure $callback = null)
     {
-        // First we will check to see if we found a user at the given credentials and
-        // if we did not we will redirect back to this current URI with a piece of
-        // "flash" data in the session to indicate to the developers the errors.
-        $user = $this->getUser($credentials);
+        return $this->timebox->call(function () use ($credentials, $callback) {
+            // First we will check to see if we found a user at the given credentials and
+            // if we did not we will redirect back to this current URI with a piece of
+            // "flash" data in the session to indicate to the developers the errors.
+            $user = $this->getUser($credentials);
 
-        if (is_null($user)) {
-            return static::INVALID_USER;
-        }
+            if (is_null($user)) {
+                return static::INVALID_USER;
+            }
 
-        if ($this->tokens->recentlyCreatedToken($user)) {
-            return static::RESET_THROTTLED;
-        }
+            if ($this->tokens->recentlyCreatedToken($user)) {
+                return static::RESET_THROTTLED;
+            }
 
-        $token = $this->tokens->create($user);
+            $token = $this->tokens->create($user);
 
-        if ($callback) {
-            return $callback($user, $token) ?? static::RESET_LINK_SENT;
-        }
+            if ($callback) {
+                return $callback($user, $token) ?? static::RESET_LINK_SENT;
+            }
 
-        // Once we have the reset token, we are ready to send the message out to this
-        // user with a link to reset their password. We will then redirect back to
-        // the current URI having nothing set in the session to indicate errors.
-        $user->sendPasswordResetNotification($token);
+            // Once we have the reset token, we are ready to send the message out to this
+            // user with a link to reset their password. We will then redirect back to
+            // the current URI having nothing set in the session to indicate errors.
+            $user->sendPasswordResetNotification($token);
 
-        $this->events?->dispatch(new PasswordResetLinkSent($user));
+            $this->events?->dispatch(new PasswordResetLinkSent($user));
 
-        return static::RESET_LINK_SENT;
+            return static::RESET_LINK_SENT;
+        }, $this->timeboxDuration);
     }
 
     /**
@@ -96,25 +122,29 @@ class PasswordBroker implements PasswordBrokerContract
      */
     public function reset(#[\SensitiveParameter] array $credentials, Closure $callback)
     {
-        $user = $this->validateReset($credentials);
+        return $this->timebox->call(function ($timebox) use ($credentials, $callback) {
+            $user = $this->validateReset($credentials);
 
-        // If the responses from the validate method is not a user instance, we will
-        // assume that it is a redirect and simply return it from this method and
-        // the user is properly redirected having an error message on the post.
-        if (! $user instanceof CanResetPasswordContract) {
-            return $user;
-        }
+            // If the responses from the validate method is not a user instance, we will
+            // assume that it is a redirect and simply return it from this method and
+            // the user is properly redirected having an error message on the post.
+            if (! $user instanceof CanResetPasswordContract) {
+                return $user;
+            }
 
-        $password = $credentials['password'];
+            $password = $credentials['password'];
 
-        // Once the reset has been validated, we'll call the given callback with the
-        // new password. This gives the user an opportunity to store the password
-        // in their persistent storage. Then we'll delete the token and return.
-        $callback($user, $password);
+            // Once the reset has been validated, we'll call the given callback with the
+            // new password. This gives the user an opportunity to store the password
+            // in their persistent storage. Then we'll delete the token and return.
+            $callback($user, $password);
 
-        $this->tokens->delete($user);
+            $this->tokens->delete($user);
 
-        return static::PASSWORD_RESET;
+            $timebox->returnEarly();
+
+            return static::PASSWORD_RESET;
+        }, $this->timeboxDuration);
     }
 
     /**
@@ -199,5 +229,15 @@ class PasswordBroker implements PasswordBrokerContract
     public function getRepository()
     {
         return $this->tokens;
+    }
+
+    /**
+     * Get the timebox instance used by the guard.
+     *
+     * @return \Illuminate\Support\Timebox
+     */
+    public function getTimebox()
+    {
+        return $this->timebox;
     }
 }
