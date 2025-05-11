@@ -114,6 +114,7 @@ use Illuminate\Database\Console\WipeCommand;
  * @method static void rollBack(int|null $toLevel = null)
  * @method static int transactionLevel()
  * @method static void afterCommit(callable $callback)
+ * @method static string sanitizeSqlLike(string $string, string $escapeChar = '\\')
  *
  * @see \Illuminate\Database\DatabaseManager
  */
