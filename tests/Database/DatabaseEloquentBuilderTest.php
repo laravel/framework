@@ -1301,6 +1301,50 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertSame('select * from "eloquent_builder_test_model_far_related_stubs" where exists (select * from "eloquent_builder_test_model_parent_stubs" inner join "user_role" on "eloquent_builder_test_model_parent_stubs"."id" = "user_role"."self_id" where "eloquent_builder_test_model_far_related_stubs"."id" = "user_role"."related_id" and "eloquent_builder_test_model_parent_stubs"."id" in (3, 4))', $builder->toSql());
     }
 
+    public function testWhereAny()
+    {
+        $builder = EloquentBuilderTestModelParentStub::whereHasAny([
+            'address' => ['zipcode', 'street'],
+            'foo' => ['bar'],
+        ], '90210');
+
+        $this->assertSame('select * from "eloquent_builder_test_model_parent_stubs" where (exists (select * from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" and ("zipcode" = ? or "street" = ?)) or exists (select * from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" and ("bar" = ?)))', $builder->toSql());
+        $this->assertEquals(['90210', '90210', '90210'], $builder->getBindings());
+    }
+
+    public function testOrWhereAny()
+    {
+        $builder = EloquentBuilderTestModelParentStub::where('name', 'larry')->orWhereHasAny([
+            'address' => ['zipcode', 'street'],
+            'foo' => ['bar'],
+        ], '90210');
+
+        $this->assertSame('select * from "eloquent_builder_test_model_parent_stubs" where "name" = ? or (exists (select * from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" and ("zipcode" = ? or "street" = ?)) or exists (select * from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" and ("bar" = ?)))', $builder->toSql());
+        $this->assertEquals(['larry', '90210', '90210', '90210'], $builder->getBindings());
+    }
+
+    public function testWhereAll()
+    {
+        $builder = EloquentBuilderTestModelParentStub::whereHasAll([
+            'address' => ['zipcode', 'street'],
+            'foo' => ['bar'],
+        ], '90210');
+
+        $this->assertSame('select * from "eloquent_builder_test_model_parent_stubs" where (exists (select * from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" and ("zipcode" = ? and "street" = ?)) and exists (select * from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" and ("bar" = ?)))', $builder->toSql());
+        $this->assertEquals(['90210', '90210', '90210'], $builder->getBindings());
+    }
+
+    public function testOrWhereAll()
+    {
+        $builder = EloquentBuilderTestModelParentStub::where('name', 'larry')->orWhereHasAll([
+            'address' => ['zipcode', 'street'],
+            'foo' => ['bar'],
+        ], '90210');
+
+        $this->assertSame('select * from "eloquent_builder_test_model_parent_stubs" where "name" = ? or (exists (select * from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" and ("zipcode" = ? and "street" = ?)) and exists (select * from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" and ("bar" = ?)))', $builder->toSql());
+        $this->assertEquals(['larry', '90210', '90210', '90210'], $builder->getBindings());
+    }
+
     public function testDeleteOverride()
     {
         $builder = $this->getBuilder();

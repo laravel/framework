@@ -292,7 +292,7 @@ trait QueriesRelationships
         $callback = function (Builder $query) use ($tuples, $operator, $value, $innerBoolean) {
             foreach ($tuples as $relation => $columns) {
                 $this->hasNestedColumns(
-                    $query, $relation, $columns, $operator, $value, $innerBoolean, 'and'
+                    $query, $relation, $columns, $operator, $value, $innerBoolean, $innerBoolean
                 );
             }
         };

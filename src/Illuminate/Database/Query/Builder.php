@@ -914,7 +914,7 @@ class Builder implements BuilderContract
      * @param  string  $outerBoolean
      * @return $this
      */
-    protected function addNestedWhereColumns($columns, $operator, $value, $innerBoolean, $outerBoolean)
+    public function addNestedWhereColumns($columns, $operator, $value, $innerBoolean, $outerBoolean)
     {
         return $this->whereNested(function ($query) use ($columns, $operator, $value, $innerBoolean) {
             foreach ($columns as $column) {
