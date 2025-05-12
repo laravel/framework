@@ -58,6 +58,13 @@ class ThrottlesExceptions
     protected $whenCallback;
 
     /**
+     * The callbacks that determine if the job should be deleted.
+     *
+     * @var callable[]
+     */
+    protected array $deleteWhenCallbacks = [];
+
+    /**
      * The prefix of the rate limiter key.
      *
      * @var string
@@ -112,6 +119,10 @@ class ThrottlesExceptions
                 report($throwable);
             }
 
+            if ($this->shouldDelete($throwable)) {
+                return $job->delete();
+            }
+
             $this->limiter->hit($jobKey, $this->decaySeconds);
 
             return $job->release($this->retryAfterMinutes * 60);
@@ -129,6 +140,40 @@ class ThrottlesExceptions
         $this->whenCallback = $callback;
 
         return $this;
+    }
+
+    /**
+     * Add a callback that should determine if the job should be deleted.
+     *
+     * @param  callable|string  $callback
+     * @return $this
+     */
+    public function deleteWhen(callable|string $callback)
+    {
+        if (is_string($callback)) {
+            $this->deleteWhenCallbacks[] = fn (Throwable $e) => $e instanceof $callback;
+        } else {
+            $this->deleteWhenCallbacks[] = $callback;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Run the delete callbacks to see if the job should be deleted for the given exception.
+     *
+     * @param  Throwable  $throwable
+     * @return bool
+     */
+    protected function shouldDelete(Throwable $throwable): bool
+    {
+        foreach ($this->deleteWhenCallbacks as $callback) {
+            if (call_user_func($callback, $throwable)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

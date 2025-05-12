@@ -40,6 +40,11 @@ class ThrottlesExceptionsTest extends TestCase
         $this->assertJobWasReleasedWithDelay(CircuitBreakerTestJob::class);
     }
 
+    public function testJobIsDeleted()
+    {
+        $this->assertJobWasDeleted(CircuitBreakerTestJob::class);
+    }
+
     protected function assertJobWasReleasedImmediately($class)
     {
         $class::$handled = false;
@@ -80,6 +85,26 @@ class ThrottlesExceptionsTest extends TestCase
         ]);
 
         $this->assertFalse($class::$handled);
+    }
+
+    protected function assertJobWasDeleted($class)
+    {
+        $class::$handled = false;
+        $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
+
+        $job = m::mock(Job::class);
+
+        $job->shouldReceive('hasFailed')->once()->andReturn(false);
+        $job->shouldReceive('delete')->once();
+        $job->shouldReceive('isDeleted')->andReturn(true);
+        $job->shouldReceive('isDeletedOrReleased')->once()->andReturn(true);
+        $job->shouldReceive('uuid')->andReturn('simple-test-uuid');
+
+        $instance->call($job, [
+            'command' => serialize($command = new $class),
+        ]);
+
+        $this->assertTrue($class::$handled);
     }
 
     protected function assertJobRanSuccessfully($class)
