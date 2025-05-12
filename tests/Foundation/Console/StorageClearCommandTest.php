@@ -32,8 +32,8 @@ class StorageClearCommandTest extends TestCase
         Storage::disk('local')->put('folder2/keep.txt', 'test');
 
         $this->artisan('storage:clear', [
-            'disk'   => 'local',
-            'folder' => 'folder1',
+            '--disk'   => 'local',
+            '--folder' => 'folder1',
         ])
         ->assertExitCode(0)
         ->expectsOutput('Cleared folder [folder1] on disk [local].');
@@ -49,7 +49,7 @@ class StorageClearCommandTest extends TestCase
         $availableDisks = implode(', ', array_keys(config('filesystems.disks', [])));
 
         $this->artisan('storage:clear', [
-            'disk' => $invalidDisk,
+            '--disk' => $invalidDisk,
         ])
         ->assertExitCode(0)
         ->expectsOutput("Disk [{$invalidDisk}] is not configured. Available disks: {$availableDisks}");
@@ -62,7 +62,7 @@ class StorageClearCommandTest extends TestCase
         Storage::disk('local')->put('file.txt', 'test');
 
         $this->artisan('storage:clear', [
-            'disk' => 'local',
+            '--disk' => 'local',
         ])
         ->expectsConfirmation('Are you sure you want to run this command?', 'no')
         ->assertExitCode(0);
@@ -78,7 +78,7 @@ class StorageClearCommandTest extends TestCase
         Storage::disk('local')->put('file.txt', 'test');
 
         $this->artisan('storage:clear', [
-            'disk'    => 'local',
+            '--disk'    => 'local',
             '--force' => true,
         ])
         ->assertExitCode(0)
@@ -94,7 +94,7 @@ class StorageClearCommandTest extends TestCase
         Storage::disk('local')->put('delete-me.txt', 'content');
 
         $this->artisan('storage:clear', [
-            'disk' => 'local',
+            '--disk' => 'local',
         ])
         ->assertExitCode(0)
         ->expectsOutput('Skipping [.gitignore] on [local] disk.')
@@ -109,8 +109,8 @@ class StorageClearCommandTest extends TestCase
         Storage::fake('local');
 
         $this->artisan('storage:clear', [
-            'disk'    => 'local',
-            'folder'  => 'nonexistent',
+            '--disk'    => 'local',
+            '--folder'  => 'nonexistent',
         ])
         ->assertExitCode(0)
         ->expectsOutput('The folder [nonexistent] does not exist on the [local] disk.');

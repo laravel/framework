@@ -19,9 +19,10 @@ class StorageClearCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'storage:clear {disk=local : The storage disk to clear}
-                                        {folder? : The specific folder within the disk}
-                                        {--force : Force the operation to run when in production}';
+    protected $signature = 'storage:clear 
+                            {--disk=local : The storage disk to clear}
+                            {--folder= : The specific folder within the disk}
+                            {--force : Force the operation to run when in production}';
 
     /**
      * The console command description.
@@ -41,8 +42,8 @@ class StorageClearCommand extends Command
             return;
         }
 
-        $diskName = $this->argument('disk');
-        $folder = $this->argument('folder');
+        $diskName = $this->option('disk');
+        $folder = $this->option('folder');
         $folder = $folder ? trim($folder, '/') : null;
 
         try {
