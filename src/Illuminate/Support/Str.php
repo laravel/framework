@@ -958,6 +958,45 @@ class Str
     }
 
     /**
+     * Repeat a string a given number of times, padding it on both sides.
+     * 
+     * @param  string  $value
+     * @param  int  $times
+     * @param  string  $pad
+     * @return string
+     */
+    public static function padRepeatBoth($value, $times, $pad = ' ')
+    {
+        return static::padBoth($value, strlen($value) + $times * 2, str_repeat($pad, $times));
+    }
+
+    /**
+     * Repeat a string a given number of times, padding it on the left side.
+     * 
+     * @param  string  $value
+     * @param  int  $times
+     * @param  string  $pad
+     * @return string
+     */
+    public static function padRepeatLeft($value, $times, $pad = ' ')
+    {
+        return static::padLeft($value, strlen($value) + $times, str_repeat($pad, $times));
+    }
+
+    /**
+     * Repeat a string a given number of times, padding it on the right side.
+     * 
+     * @param  string  $value
+     * @param  int  $times
+     * @param  string  $pad
+     * @return string
+     */
+    public static function padRepeatRight($value, $times, $pad = ' ')
+    {
+        return static::padRight($value, strlen($value) + $times, str_repeat($pad, $times));
+    }
+
+    /**
      * Parse a Class[@]method style callback into class and method.
      *
      * @param  string  $callback

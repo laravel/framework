@@ -1265,6 +1265,27 @@ class SupportStrTest extends TestCase
         $this->assertSame('❤MultiByte☆❤☆❤☆❤', Str::padRight('❤MultiByte☆', 16, '❤☆'));
     }
 
+    public function testPadRepeatBoth()
+    {
+        $this->assertSame('   Laravel   ', Str::padRepeatBoth('Laravel', 3, ' '));
+        $this->assertSame('----Laravel----', Str::padRepeatBoth('Laravel', 4, '-'));
+        $this->assertSame('❤❤Laravel❤❤', Str::padRepeatBoth('Laravel', 2, '❤'));
+    }
+
+    public function testPadRepeatLeft()
+    {
+        $this->assertSame('   Laravel', Str::padRepeatLeft('Laravel', 3, ' '));
+        $this->assertSame('----Laravel', Str::padRepeatLeft('Laravel', 4, '-'));
+        $this->assertSame('❤❤Laravel', Str::padRepeatLeft('Laravel', 2, '❤'));
+    }
+
+    public function testPadRepeatRight()
+    {
+        $this->assertSame('Laravel   ', Str::padRepeatRight('Laravel', 3, ' '));
+        $this->assertSame('Laravel----', Str::padRepeatRight('Laravel', 4, '-'));
+        $this->assertSame('Laravel❤❤', Str::padRepeatRight('Laravel', 2, '❤'));
+    }
+
     public function testSwapKeywords(): void
     {
         $this->assertSame(
