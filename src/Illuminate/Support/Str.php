@@ -1178,9 +1178,7 @@ class Str
      */
     public static function replaceArray($search, $replace, $subject)
     {
-        if (Arr::arrayable($replace)) {
-            $replace = Arr::from($replace);
-        }
+        $replace = Arr::from($replace);
 
         $segments = explode($search, $subject);
 
@@ -1220,17 +1218,9 @@ class Str
      */
     public static function replace($search, $replace, $subject, $caseSensitive = true)
     {
-        if (Arr::arrayable($search)) {
-            $search = Arr::from($search);
-        }
-
-        if (Arr::arrayable($replace)) {
-            $replace = Arr::from($replace);
-        }
-
-        if (Arr::arrayable($subject)) {
-            $subject = Arr::from($subject);
-        }
+        $search = Arr::from($search);
+        $replace = Arr::from($replace);
+        $subject = Arr::from($subject);
 
         return $caseSensitive
             ? str_replace($search, $replace, $subject)
@@ -1361,9 +1351,7 @@ class Str
      */
     public static function remove($search, $subject, $caseSensitive = true)
     {
-        if (Arr::arrayable($search)) {
-            $search = Arr::from($search);
-        }
+        $search = Arr::from($search);
 
         return $caseSensitive
             ? str_replace($search, '', $subject)
