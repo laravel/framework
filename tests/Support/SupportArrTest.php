@@ -14,6 +14,7 @@ use stdClass;
 use WeakMap;
 
 include_once 'Common.php';
+include_once 'Enums.php';
 
 class SupportArrTest extends TestCase
 {
@@ -1510,6 +1511,7 @@ class SupportArrTest extends TestCase
     public function testFrom()
     {
         $this->assertSame(['foo' => 'bar'], Arr::from(['foo' => 'bar']));
+        $this->assertSame(['foo' => 'bar'], Arr::from((object) ['foo' => 'bar']));
         $this->assertSame(['foo' => 'bar'], Arr::from(new TestArrayableObject));
         $this->assertSame(['foo' => 'bar'], Arr::from(new TestJsonableObject));
         $this->assertSame(['foo' => 'bar'], Arr::from(new TestJsonSerializeObject));
@@ -1526,6 +1528,10 @@ class SupportArrTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Items cannot be represented by a scalar value.');
         Arr::from(123);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Items cannot be represented by a scalar value.');
+        Arr::from(TestEnum::A);
     }
 
     public function testWrap()
