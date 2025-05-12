@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Console;
 use Composer\InstalledVersions;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Env;
 use Illuminate\Support\Facades\Process;
 use Symfony\Component\Console\Attribute\AsCommand;
 
@@ -79,7 +80,10 @@ class BroadcastingInstallCommand extends Command
 
         $this->driver = $this->resolveDriver();
 
+        Env::writeVariable('BROADCAST_CONNECTION', $this->driver, $this->laravel->basePath('.env'), true);
+
         $this->collectDriverConfig();
+        $this->installDriverPackages();
 
         if ($this->isUsingSupportedFramework()) {
             // If this is a supported framework, we will use the framework-specific Echo helpers...
@@ -189,6 +193,26 @@ class BroadcastingInstallCommand extends Command
     }
 
     /**
+     * Install the driver packages.
+     *
+     * @return void
+     */
+    protected function installDriverPackages()
+    {
+        $package = match ($this->driver) {
+            'pusher' => 'pusher/pusher-php-server',
+            'ably' => 'ably/ably-php',
+            default => null,
+        };
+
+        if (! $package || InstalledVersions::isInstalled($package)) {
+            return;
+        }
+
+        $this->requireComposerPackages($this->option('composer'), [$package]);
+    }
+
+    /**
      * Collect the Pusher configuration.
      *
      * @return void
@@ -211,7 +235,7 @@ class BroadcastingInstallCommand extends Command
             'sa1',
         ]);
 
-        $this->addToEnv([
+        Env::writeVariables([
             'PUSHER_APP_ID' => $appId,
             'PUSHER_APP_KEY' => $key,
             'PUSHER_APP_SECRET' => $secret,
@@ -223,7 +247,7 @@ class BroadcastingInstallCommand extends Command
             'VITE_PUSHER_HOST' => '${PUSHER_HOST}',
             'VITE_PUSHER_PORT' => '${PUSHER_PORT}',
             'VITE_PUSHER_SCHEME' => '${PUSHER_SCHEME}',
-        ], false);
+        ], $this->laravel->basePath('.env'));
     }
 
     /**
@@ -233,76 +257,16 @@ class BroadcastingInstallCommand extends Command
      */
     protected function collectAblyConfig()
     {
-        $key = password('Ably Public Key', 'Enter your Ably public key');
+        $key = password('Ably Key', 'Enter your Ably key');
+        $publicKey = password('Ably Public Key', 'Enter your Ably public key');
 
-        $this->addToEnv([
-            'ABLY_PUBLIC_KEY' => $key,
-        ]);
-    }
+        $publicKey = explode(':', $publicKey)[0] ?? $publicKey;
 
-    /**
-     * Add key-value pairs to the .env file.
-     *
-     * @param  array  $values
-     * @param  bool  $addViteEnvs
-     * @return void
-     */
-    protected function addToEnv(array $values, $addViteEnvs = true)
-    {
-        $envPath = $this->laravel->basePath('.env');
-
-        if (! file_exists($envPath)) {
-            return;
-        }
-
-        if ($addViteEnvs) {
-            foreach ($values as $key => $value) {
-                $values["VITE_{$key}"] = '${'.$key.'}';
-            }
-        }
-
-        $filesystem = new Filesystem;
-
-        $currentPrefix = null;
-
-        foreach ($values as $key => $value) {
-            $prefix = explode('_', $key)[0];
-
-            if ($currentPrefix !== $prefix) {
-                $filesystem->append($envPath, PHP_EOL);
-                $currentPrefix = $prefix;
-            }
-
-            $envContent = $filesystem->get($envPath);
-
-            $newLine = $key.'='.(is_string($value) ? '"'.$value.'"' : $value);
-
-            preg_match('/^'.preg_quote($newLine, '/').'$/m', $envContent, $existingLine);
-
-            if (count($existingLine)) {
-                continue;
-            }
-
-            preg_match('/^'.$key.'=$/m', $envContent, $emptyKeyMatches, PREG_OFFSET_CAPTURE);
-            preg_match('/^'.$key.'=/m', $envContent, $keyMatches, PREG_OFFSET_CAPTURE);
-
-            if (count($emptyKeyMatches) > 0) {
-                $filesystem->put(
-                    $envPath,
-                    substr_replace(
-                        $envContent,
-                        $newLine,
-                        $emptyKeyMatches[0][1],
-                        strlen($emptyKeyMatches[0][0])
-                    ),
-                );
-            } elseif (count($keyMatches) > 0) {
-                $this->components->warn("The [{$key}] environment variable already exists in your .env file. Please update this value manually.");
-                $this->components->warn($newLine);
-            } else {
-                $filesystem->append($envPath, "{$newLine}\n");
-            }
-        }
+        Env::writeVariables([
+            'ABLY_KEY' => $key,
+            'ABLY_PUBLIC_KEY' => $publicKey,
+            'VITE_ABLY_PUBLIC_KEY' => '${ABLY_PUBLIC_KEY}',
+        ], $this->laravel->basePath('.env'));
     }
 
     /**
