@@ -179,6 +179,16 @@ class EloquentPivotEventsTest extends DatabaseTestCase
 
         $project->equipments()->save($equipment);
         $equipment->projects()->sync([]);
+
+        $this->assertEquals(
+            [PivotEventsTestProject::class, PivotEventsTestProject::class, PivotEventsTestProject::class, PivotEventsTestProject::class, PivotEventsTestProject::class, PivotEventsTestProject::class],
+            PivotEventsTestModelEquipment::$eventsMorphClasses
+        );
+
+        $this->assertEquals(
+            ['equipmentable_type', 'equipmentable_type', 'equipmentable_type', 'equipmentable_type', 'equipmentable_type', 'equipmentable_type'],
+            PivotEventsTestModelEquipment::$eventsMorphTypes
+        );
     }
 }
 
@@ -236,6 +246,55 @@ class PivotEventsTestProject extends Model
 class PivotEventsTestModelEquipment extends MorphPivot
 {
     public $table = 'equipmentables';
+
+    public static $eventsMorphClasses = [];
+
+    public static $eventsMorphTypes = [];
+
+    public static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            static::$eventsMorphClasses[] = $model->morphClass;
+            static::$eventsMorphTypes[] = $model->morphType;
+        });
+
+        static::created(function ($model) {
+            static::$eventsMorphClasses[] = $model->morphClass;
+            static::$eventsMorphTypes[] = $model->morphType;
+        });
+
+        static::updating(function ($model) {
+            static::$eventsMorphClasses[] = $model->morphClass;
+            static::$eventsMorphTypes[] = $model->morphType;
+        });
+
+        static::updated(function ($model) {
+            static::$eventsMorphClasses[] = $model->morphClass;
+            static::$eventsMorphTypes[] = $model->morphType;
+        });
+
+        static::saving(function ($model) {
+            static::$eventsMorphClasses[] = $model->morphClass;
+            static::$eventsMorphTypes[] = $model->morphType;
+        });
+
+        static::saved(function ($model) {
+            static::$eventsMorphClasses[] = $model->morphClass;
+            static::$eventsMorphTypes[] = $model->morphType;
+        });
+
+        static::deleting(function ($model) {
+            static::$eventsMorphClasses[] = $model->morphClass;
+            static::$eventsMorphTypes[] = $model->morphType;
+        });
+
+        static::deleted(function ($model) {
+            static::$eventsMorphClasses[] = $model->morphClass;
+            static::$eventsMorphTypes[] = $model->morphType;
+        });
+    }
 
     public function equipment()
     {
