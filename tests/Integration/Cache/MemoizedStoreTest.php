@@ -18,7 +18,6 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Exceptions;
 use Illuminate\Support\Facades\Redis;
-use Illuminate\Support\Facades\Route;
 use Orchestra\Testbench\TestCase;
 use Throwable;
 
@@ -420,50 +419,55 @@ class MemoizedStoreTest extends TestCase
             $exceptions[] = $e;
         });
         Config::set('cache.stores.no-lock', ['driver' => 'no-lock']);
-        Cache::extend('no-lock', fn () => Cache::repository(new class implements Store {
+        Cache::extend('no-lock', fn () => Cache::repository(new class implements Store
+        {
             public function get($key)
             {
                 return Cache::get(...func_get_args());
             }
 
-            public function many(array $keys) 
+            public function many(array $keys)
             {
                 return Cache::many(...func_get_args());
             }
 
-            public function put($key, $value, $seconds) {
-
+            public function put($key, $value, $seconds)
+            {
                 return Cache::put(...func_get_args());
             }
 
-            public function putMany(array $values, $seconds) {
+            public function putMany(array $values, $seconds)
+            {
                 return Cache::putMany(...func_get_args());
             }
 
-            public function increment($key, $value = 1) {
-
+            public function increment($key, $value = 1)
+            {
                 return Cache::increment(...func_get_args());
             }
 
-            public function decrement($key, $value = 1) {
+            public function decrement($key, $value = 1)
+            {
                 return Cache::decrement(...func_get_args());
             }
 
-            public function forever($key, $value) {
+            public function forever($key, $value)
+            {
                 return Cache::forever(...func_get_args());
-
             }
 
-            public function forget($key) {
+            public function forget($key)
+            {
                 return Cache::forget(...func_get_args());
             }
 
-            public function flush() {
+            public function flush()
+            {
                 return Cache::flush(...func_get_args());
-
             }
 
-            public function getPrefix() {
+            public function getPrefix()
+            {
                 return Cache::getPrefix(...func_get_args());
             }
         }));
