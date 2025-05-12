@@ -259,9 +259,8 @@ class BroadcastingInstallCommand extends Command
     protected function collectAblyConfig()
     {
         $key = password('Ably Key', 'Enter your Ably key');
-        $publicKey = password('Ably Public Key', 'Enter your Ably public key');
-
-        $publicKey = explode(':', $publicKey)[0] ?? $publicKey;
+        
+        $publicKey = explode(':', $key)[0] ?? $key;
 
         Env::writeVariables([
             'ABLY_KEY' => $key,
