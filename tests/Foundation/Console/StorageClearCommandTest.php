@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Foundation\Console;
 
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
 use Orchestra\Testbench\TestCase;
 
@@ -32,7 +31,7 @@ class StorageClearCommandTest extends TestCase
         Storage::disk('local')->put('folder2/keep.txt', 'test');
 
         $this->artisan('storage:clear', [
-            '--disk'   => 'local',
+            '--disk' => 'local',
             '--folder' => 'folder1',
         ])
         ->assertExitCode(0)
@@ -78,7 +77,7 @@ class StorageClearCommandTest extends TestCase
         Storage::disk('local')->put('file.txt', 'test');
 
         $this->artisan('storage:clear', [
-            '--disk'    => 'local',
+            '--disk' => 'local',
             '--force' => true,
         ])
         ->assertExitCode(0)
@@ -109,8 +108,8 @@ class StorageClearCommandTest extends TestCase
         Storage::fake('local');
 
         $this->artisan('storage:clear', [
-            '--disk'    => 'local',
-            '--folder'  => 'nonexistent',
+            '--disk' => 'local',
+            '--folder' => 'nonexistent',
         ])
         ->assertExitCode(0)
         ->expectsOutput('The folder [nonexistent] does not exist on the [local] disk.');

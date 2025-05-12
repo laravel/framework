@@ -2,8 +2,8 @@
 
 namespace Illuminate\Foundation\Console;
 
-use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Console\Command;
+use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Contracts\Filesystem\Factory as FilesystemFactory;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use InvalidArgumentException;
@@ -51,6 +51,7 @@ class StorageClearCommand extends Command
         } catch (InvalidArgumentException $e) {
             $availableDisks = implode(', ', array_keys(config('filesystems.disks')));
             $this->error("Disk [{$diskName}] is not configured. Available disks: {$availableDisks}");
+
             return;
         }
 
@@ -58,6 +59,7 @@ class StorageClearCommand extends Command
             if ($folder) {
                 if (! $disk->exists($folder)) {
                     $this->error("The folder [{$folder}] does not exist on the [{$diskName}] disk.");
+
                     return;
                 }
 
