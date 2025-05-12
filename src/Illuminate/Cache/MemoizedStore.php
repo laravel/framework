@@ -6,7 +6,7 @@ use BadMethodCallException;
 use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Cache\Store;
 
-class MemoizedStore implements Store, LockProvider
+class MemoizedStore implements LockProvider, Store
 {
     /**
      * The memoized cache values.
