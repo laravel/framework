@@ -42,7 +42,7 @@ class ThrottlesExceptionsTest extends TestCase
 
     public function testJobIsDeleted()
     {
-        $this->assertJobWasDeleted(CircuitBreakerTestJob::class);
+        $this->assertJobWasDeleted(CircuitBreakerTestDeleteWhenJob::class);
     }
 
     protected function assertJobWasReleasedImmediately($class)
@@ -336,6 +336,25 @@ class CircuitBreakerTestJob
     public function middleware()
     {
         return [(new ThrottlesExceptions(2, 10 * 60))->by('test')];
+    }
+}
+
+class CircuitBreakerTestDeleteWhenJob
+{
+    use InteractsWithQueue, Queueable;
+
+    public static $handled = false;
+
+    public function handle()
+    {
+        static::$handled = true;
+
+        throw new Exception;
+    }
+
+    public function middleware()
+    {
+        return [(new ThrottlesExceptions(2, 10 * 60))->deleteWhen(Exception::class)];
     }
 }
 
