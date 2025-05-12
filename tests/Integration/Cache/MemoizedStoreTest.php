@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Cache;
 
+use BadMethodCallException;
 use Illuminate\Cache\Events\CacheEvent;
 use Illuminate\Cache\Events\CacheMissed;
 use Illuminate\Cache\Events\ForgettingKey;
@@ -10,12 +11,16 @@ use Illuminate\Cache\Events\KeyWritten;
 use Illuminate\Cache\Events\RetrievingKey;
 use Illuminate\Cache\Events\RetrievingManyKeys;
 use Illuminate\Cache\Events\WritingKey;
+use Illuminate\Contracts\Cache\Store;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Exceptions;
 use Illuminate\Support\Facades\Redis;
+use Illuminate\Support\Facades\Route;
 use Orchestra\Testbench\TestCase;
+use Throwable;
 
 class MemoizedStoreTest extends TestCase
 {
@@ -405,5 +410,85 @@ class MemoizedStoreTest extends TestCase
         $memoized = Cache::memo()->get('name');
         $this->assertSame('Taylor', $live);
         $this->assertSame('Taylor', $memoized);
+    }
+
+    public function test_it_throws_when_underlying_store_does_not_support_locks()
+    {
+        $this->freezeTime();
+        $exceptions = [];
+        Exceptions::reportable(function (Throwable $e) use (&$exceptions) {
+            $exceptions[] = $e;
+        });
+        Config::set('cache.stores.no-lock', ['driver' => 'no-lock']);
+        Cache::extend('no-lock', fn () => Cache::repository(new class implements Store {
+            public function get($key)
+            {
+                return Cache::get(...func_get_args());
+            }
+
+            public function many(array $keys) 
+            {
+                return Cache::many(...func_get_args());
+            }
+
+            public function put($key, $value, $seconds) {
+
+                return Cache::put(...func_get_args());
+            }
+
+            public function putMany(array $values, $seconds) {
+                return Cache::putMany(...func_get_args());
+            }
+
+            public function increment($key, $value = 1) {
+
+                return Cache::increment(...func_get_args());
+            }
+
+            public function decrement($key, $value = 1) {
+                return Cache::decrement(...func_get_args());
+            }
+
+            public function forever($key, $value) {
+                return Cache::forever(...func_get_args());
+
+            }
+
+            public function forget($key) {
+                return Cache::forget(...func_get_args());
+            }
+
+            public function flush() {
+                return Cache::flush(...func_get_args());
+
+            }
+
+            public function getPrefix() {
+                return Cache::getPrefix(...func_get_args());
+            }
+        }));
+        Cache::flexible('key', [10, 20], 'value-1');
+
+        $this->travel(11)->seconds();
+        Cache::memo('no-lock')->flexible('key', [10, 20], 'value-2');
+        defer()->invoke();
+        $value = Cache::get('key');
+
+        $this->assertCount(1, $exceptions);
+        $this->assertInstanceOf(BadMethodCallException::class, $exceptions[0]);
+        $this->assertSame('This cache store does not support locks.', $exceptions[0]->getMessage());
+    }
+
+    public function test_it_supports_with_flexible()
+    {
+        $this->freezeTime();
+        Cache::flexible('key', [10, 20], 'value-1');
+
+        $this->travel(11)->seconds();
+        Cache::memo()->flexible('key', [10, 20], 'value-2');
+        defer()->invoke();
+        $value = Cache::get('key');
+
+        $this->assertSame('value-2', $value);
     }
 }
