@@ -958,40 +958,40 @@ class Str
     }
 
     /**
-     * Repeat a string a given number of times, padding it on both sides.
+     * Repeat a string a given number of times, concatenate it on both sides.
      *
      * @param  string  $value
-     * @param  int  $times
      * @param  string  $pad
+     * @param  int  $times
      * @return string
      */
-    public static function padRepeatBoth($value, $times, $pad = ' ')
+    public static function wrapWith($value, $pad, $times = 1)
     {
         return static::padBoth($value, strlen($value) + $times * 2, str_repeat($pad, $times));
     }
 
     /**
-     * Repeat a string a given number of times, padding it on the left side.
+     * Repeat a string a given number of times, concatenate it on the left side.
      *
      * @param  string  $value
-     * @param  int  $times
      * @param  string  $pad
+     * @param  int  $times
      * @return string
      */
-    public static function padRepeatLeft($value, $times, $pad = ' ')
+    public static function prefixWith($value, $pad, $times = 1)
     {
         return static::padLeft($value, strlen($value) + $times, str_repeat($pad, $times));
     }
 
     /**
-     * Repeat a string a given number of times, padding it on the right side.
+     * Repeat a string a given number of times, concatenate it on the right side.
      *
      * @param  string  $value
-     * @param  int  $times
      * @param  string  $pad
+     * @param  int  $times
      * @return string
      */
-    public static function padRepeatRight($value, $times, $pad = ' ')
+    public static function suffixWith($value, $pad, $times)
     {
         return static::padRight($value, strlen($value) + $times, str_repeat($pad, $times));
     }

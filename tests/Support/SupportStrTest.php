@@ -1265,25 +1265,25 @@ class SupportStrTest extends TestCase
         $this->assertSame('❤MultiByte☆❤☆❤☆❤', Str::padRight('❤MultiByte☆', 16, '❤☆'));
     }
 
-    public function testPadRepeatBoth()
+    public function testWrapWith()
     {
-        $this->assertSame('   Laravel   ', Str::padRepeatBoth('Laravel', 3, ' '));
-        $this->assertSame('----Laravel----', Str::padRepeatBoth('Laravel', 4, '-'));
-        $this->assertSame('❤❤Laravel❤❤', Str::padRepeatBoth('Laravel', 2, '❤'));
+        $this->assertSame('   Laravel   ', Str::wrapWith('Laravel', ' ', 3));
+        $this->assertSame('----Laravel----', Str::wrapWith('Laravel','-' , 4));
+        $this->assertSame('❤❤Laravel❤❤', Str::wrapWith('Laravel', '❤', 2));
     }
 
-    public function testPadRepeatLeft()
+    public function testPrefixWith()
     {
-        $this->assertSame('   Laravel', Str::padRepeatLeft('Laravel', 3, ' '));
-        $this->assertSame('----Laravel', Str::padRepeatLeft('Laravel', 4, '-'));
-        $this->assertSame('❤❤Laravel', Str::padRepeatLeft('Laravel', 2, '❤'));
+        $this->assertSame('   Laravel', Str::prefixWith('Laravel', ' ', 3));
+        $this->assertSame('----Laravel', Str::prefixWith('Laravel', '-', 4));
+        $this->assertSame('❤❤Laravel', Str::prefixWith('Laravel', '❤', 2));
     }
 
-    public function testPadRepeatRight()
+    public function testSuffixWith()
     {
-        $this->assertSame('Laravel   ', Str::padRepeatRight('Laravel', 3, ' '));
-        $this->assertSame('Laravel----', Str::padRepeatRight('Laravel', 4, '-'));
-        $this->assertSame('Laravel❤❤', Str::padRepeatRight('Laravel', 2, '❤'));
+        $this->assertSame('Laravel   ', Str::suffixWith('Laravel', ' ', 3));
+        $this->assertSame('Laravel----', Str::suffixWith('Laravel', '-', 4));
+        $this->assertSame('Laravel❤❤', Str::suffixWith('Laravel', '❤', 2));
     }
 
     public function testSwapKeywords(): void
