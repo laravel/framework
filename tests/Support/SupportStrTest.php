@@ -1268,7 +1268,7 @@ class SupportStrTest extends TestCase
     public function testWrapWith()
     {
         $this->assertSame('   Laravel   ', Str::wrapWith('Laravel', ' ', 3));
-        $this->assertSame('----Laravel----', Str::wrapWith('Laravel','-' , 4));
+        $this->assertSame('----Laravel----', Str::wrapWith('Laravel', '-', 4));
         $this->assertSame('❤❤Laravel❤❤', Str::wrapWith('Laravel', '❤', 2));
     }
 
