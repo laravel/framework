@@ -189,6 +189,7 @@ class BroadcastingInstallCommand extends Command
         match ($this->driver) {
             'pusher' => $this->collectPusherConfig(),
             'ably' => $this->collectAblyConfig(),
+            default => null,
         };
     }
 
