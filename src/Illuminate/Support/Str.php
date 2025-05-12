@@ -18,7 +18,6 @@ use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidFactory;
 use Symfony\Component\Uid\Ulid;
 use Throwable;
-use Traversable;
 use voku\helper\ASCII;
 
 class Str
@@ -1179,8 +1178,8 @@ class Str
      */
     public static function replaceArray($search, $replace, $subject)
     {
-        if ($replace instanceof Traversable) {
-            $replace = (new Collection($replace))->all();
+        if (Arr::arrayable($replace)) {
+            $replace = Arr::from($replace);
         }
 
         $segments = explode($search, $subject);
@@ -1221,16 +1220,16 @@ class Str
      */
     public static function replace($search, $replace, $subject, $caseSensitive = true)
     {
-        if ($search instanceof Traversable) {
-            $search = (new Collection($search))->all();
+        if (Arr::arrayable($search)) {
+            $search = Arr::from($search);
         }
 
-        if ($replace instanceof Traversable) {
-            $replace = (new Collection($replace))->all();
+        if (Arr::arrayable($replace)) {
+            $replace = Arr::from($replace);
         }
 
-        if ($subject instanceof Traversable) {
-            $subject = (new Collection($subject))->all();
+        if (Arr::arrayable($subject)) {
+            $subject = Arr::from($subject);
         }
 
         return $caseSensitive
@@ -1362,8 +1361,8 @@ class Str
      */
     public static function remove($search, $subject, $caseSensitive = true)
     {
-        if ($search instanceof Traversable) {
-            $search = (new Collection($search))->all();
+        if (Arr::arrayable($search)) {
+            $search = Arr::from($search);
         }
 
         return $caseSensitive
