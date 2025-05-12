@@ -1517,6 +1517,10 @@ class SupportArrTest extends TestCase
         $this->assertSame(['foo' => 'bar'], Arr::from(new TestJsonSerializeObject));
         $this->assertSame(['foo'], Arr::from(new TestJsonSerializeWithScalarValueObject));
 
+        $this->assertSame(['name' => 'A'], Arr::from(TestEnum::A));
+        $this->assertSame(['name' => 'A', 'value' => 1], Arr::from(TestBackedEnum::A));
+        $this->assertSame(['name' => 'A', 'value' => 'A'], Arr::from(TestStringBackedEnum::A));
+
         $subject = [new stdClass, new stdClass];
         $items = new TestTraversableAndJsonSerializableObject($subject);
         $this->assertSame($subject, Arr::from($items));
@@ -1528,10 +1532,6 @@ class SupportArrTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Items cannot be represented by a scalar value.');
         Arr::from(123);
-
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Items cannot be represented by a scalar value.');
-        Arr::from(TestEnum::A);
     }
 
     public function testWrap()

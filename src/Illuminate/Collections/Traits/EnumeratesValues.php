@@ -12,9 +12,9 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
 use Illuminate\Support\HigherOrderCollectionProxy;
-use InvalidArgumentException;
 use JsonSerializable;
 use UnexpectedValueException;
+use UnitEnum;
 
 use function Illuminate\Support\enum_value;
 
@@ -1056,11 +1056,9 @@ trait EnumeratesValues
      */
     protected function getArrayableItems($items)
     {
-        try {
-            return Arr::from($items);
-        } catch (InvalidArgumentException) {
-            return Arr::wrap($items);
-        }
+        return is_null($items) || is_scalar($items) || $items instanceof UnitEnum
+            ? Arr::wrap($items)
+            : Arr::from($items);
     }
 
     /**

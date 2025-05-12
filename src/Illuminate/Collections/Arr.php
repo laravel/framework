@@ -11,7 +11,6 @@ use InvalidArgumentException;
 use JsonSerializable;
 use Random\Randomizer;
 use Traversable;
-use UnitEnum;
 use WeakMap;
 
 class Arr
@@ -420,7 +419,7 @@ class Arr
             $items instanceof Traversable => iterator_to_array($items),
             $items instanceof Jsonable => json_decode($items->toJson(), true),
             $items instanceof JsonSerializable => (array) $items->jsonSerialize(),
-            is_object($items) && ! $items instanceof UnitEnum => (array) $items,
+            is_object($items) => (array) $items,
             default => throw new InvalidArgumentException('Items cannot be represented by a scalar value.'),
         };
     }
