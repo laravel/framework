@@ -57,6 +57,33 @@ class DiscoverEventsTest extends TestCase
         ], $events);
     }
 
+    public function testMultipleDirectoriesCanBeDiscovered(): void
+    {
+        $events = DiscoverEvents::within([
+            __DIR__.'/Fixtures/EventDiscovery/Listeners',
+            __DIR__.'/Fixtures/EventDiscovery/UnionListeners',
+        ], getcwd());
+
+        $this->assertEquals([
+            EventOne::class => [
+                Listener::class.'@handle',
+                Listener::class.'@handleEventOne',
+                UnionListener::class.'@handle',
+            ],
+            EventTwo::class => [
+                Listener::class.'@handleEventTwo',
+                UnionListener::class.'@handle',
+            ],
+        ], $events);
+    }
+
+    public function testNoExceptionForEmptyDirectories(): void
+    {
+        $events = DiscoverEvents::within([], getcwd());
+
+        $this->assertEquals([], $events);
+    }
+
     public function testEventsCanBeDiscoveredUsingCustomClassNameGuessing()
     {
         DiscoverEvents::guessClassNamesUsing(function (SplFileInfo $file, $basePath) {

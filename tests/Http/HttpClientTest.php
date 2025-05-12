@@ -21,6 +21,7 @@ use Illuminate\Http\Client\Request;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Client\Response;
 use Illuminate\Http\Client\ResponseSequence;
+use Illuminate\Http\Client\StrayRequestException;
 use Illuminate\Http\Response as HttpResponse;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
@@ -3178,10 +3179,36 @@ class HttpClientTest extends TestCase
         $responses[] = $this->factory->get('https://forge.laravel.com')->body();
         $this->assertSame(['ok', 'ok'], $responses);
 
-        $this->expectException(RuntimeException::class);
+        $this->expectException(StrayRequestException::class);
         $this->expectExceptionMessage('Attempted request to [https://laravel.com] without a matching fake.');
 
         $this->factory->get('https://laravel.com');
+    }
+
+    public function testItCanEnforceFakingInThePool()
+    {
+        $this->factory->preventStrayRequests();
+        $this->factory->fake(['https://vapor.laravel.com' => Factory::response('ok', 200)]);
+        $this->factory->fake(['https://forge.laravel.com' => Factory::response('ok', 200)]);
+
+        $responses = $this->factory->pool(function (Pool $pool) {
+            return [
+                $pool->get('https://vapor.laravel.com'),
+                $pool->get('https://forge.laravel.com'),
+            ];
+        });
+
+        $this->assertSame(200, $responses[0]->status());
+        $this->assertSame(200, $responses[1]->status());
+
+        $this->expectException(StrayRequestException::class);
+        $this->expectExceptionMessage('Attempted request to [https://laravel.com] without a matching fake.');
+
+        $this->factory->pool(function (Pool $pool) {
+            return [
+                $pool->get('https://laravel.com'),
+            ];
+        });
     }
 
     public function testPreventingStrayRequests()

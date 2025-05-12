@@ -640,6 +640,16 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertSame('alter table "users" add column "foo" date not null', $statements[0]);
     }
 
+    public function testAddingDateWithDefaultCurrent()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->date('foo')->useCurrent();
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table "users" add column "foo" date not null default CURRENT_DATE', $statements[0]);
+    }
+
     public function testAddingYear()
     {
         $blueprint = new Blueprint($this->getConnection(), 'users');
@@ -647,6 +657,15 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql();
         $this->assertCount(1, $statements);
         $this->assertSame('alter table "users" add column "birth_year" integer not null', $statements[0]);
+    }
+
+    public function testAddingYearWithDefaultCurrent()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->year('birth_year')->useCurrent();
+        $statements = $blueprint->toSql();
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table "users" add column "birth_year" integer not null default (CAST(strftime(\'%Y\', \'now\') AS INTEGER))', $statements[0]);
     }
 
     public function testAddingDateTime()

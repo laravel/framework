@@ -1497,6 +1497,16 @@ class Container implements ArrayAccess, ContainerContract
     }
 
     /**
+     * Get the name of the binding the container is currently resolving.
+     *
+     * @return class-string|string|null
+     */
+    public function currentlyResolving()
+    {
+        return end($this->buildStack) ?: null;
+    }
+
+    /**
      * Get the container's bindings.
      *
      * @return array
