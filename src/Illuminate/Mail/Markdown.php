@@ -39,7 +39,6 @@ class Markdown
      *
      * @param  \Illuminate\Contracts\View\Factory  $view
      * @param  array  $options
-     * @return void
      */
     public function __construct(ViewFactory $view, array $options = [])
     {

@@ -28,7 +28,6 @@ class Relationship
      *
      * @param  \Illuminate\Database\Eloquent\Factories\Factory  $factory
      * @param  string  $relationship
-     * @return void
      */
     public function __construct(Factory $factory, $relationship)
     {
@@ -50,13 +49,15 @@ class Relationship
             $this->factory->state([
                 $relationship->getMorphType() => $relationship->getMorphClass(),
                 $relationship->getForeignKeyName() => $relationship->getParentKey(),
-            ])->create([], $parent);
+            ])->prependState($relationship->getQuery()->pendingAttributes)->create([], $parent);
         } elseif ($relationship instanceof HasOneOrMany) {
             $this->factory->state([
                 $relationship->getForeignKeyName() => $relationship->getParentKey(),
-            ])->create([], $parent);
+            ])->prependState($relationship->getQuery()->pendingAttributes)->create([], $parent);
         } elseif ($relationship instanceof BelongsToMany) {
-            $relationship->attach($this->factory->create([], $parent));
+            $relationship->attach(
+                $this->factory->prependState($relationship->getQuery()->pendingAttributes)->create([], $parent)
+            );
         }
     }
 

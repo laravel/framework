@@ -162,7 +162,7 @@ class AuthDatabaseUserProviderTest extends TestCase
         $this->assertTrue($result);
     }
 
-    public function testCredentialValidationFailed()
+    public function testCredentialValidationFails()
     {
         $conn = m::mock(Connection::class);
         $hasher = m::mock(Hasher::class);
@@ -170,6 +170,19 @@ class AuthDatabaseUserProviderTest extends TestCase
         $provider = new DatabaseUserProvider($conn, $hasher, 'foo');
         $user = m::mock(Authenticatable::class);
         $user->shouldReceive('getAuthPassword')->once()->andReturn('hash');
+        $result = $provider->validateCredentials($user, ['password' => 'plain']);
+
+        $this->assertFalse($result);
+    }
+
+    public function testCredentialValidationFailsGracefullyWithNullPassword()
+    {
+        $conn = m::mock(Connection::class);
+        $hasher = m::mock(Hasher::class);
+        $hasher->shouldReceive('check')->never();
+        $provider = new DatabaseUserProvider($conn, $hasher, 'foo');
+        $user = m::mock(Authenticatable::class);
+        $user->shouldReceive('getAuthPassword')->once()->andReturn(null);
         $result = $provider->validateCredentials($user, ['password' => 'plain']);
 
         $this->assertFalse($result);

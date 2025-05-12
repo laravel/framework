@@ -42,10 +42,16 @@ class Pipeline implements PipelineContract
     protected $method = 'handle';
 
     /**
+     * The final callback to be executed after the pipeline ends regardless of the outcome.
+     *
+     * @var \Closure|null
+     */
+    protected $finally;
+
+    /**
      * Create a new class instance.
      *
      * @param  \Illuminate\Contracts\Container\Container|null  $container
-     * @return void
      */
     public function __construct(?Container $container = null)
     {
@@ -116,7 +122,13 @@ class Pipeline implements PipelineContract
             array_reverse($this->pipes()), $this->carry(), $this->prepareDestination($destination)
         );
 
-        return $pipeline($this->passable);
+        try {
+            return $pipeline($this->passable);
+        } finally {
+            if ($this->finally) {
+                ($this->finally)($this->passable);
+            }
+        }
     }
 
     /**
@@ -129,6 +141,19 @@ class Pipeline implements PipelineContract
         return $this->then(function ($passable) {
             return $passable;
         });
+    }
+
+    /**
+     * Set a final callback to be executed after the pipeline ends regardless of the outcome.
+     *
+     * @param  \Closure  $callback
+     * @return $this
+     */
+    public function finally(Closure $callback)
+    {
+        $this->finally = $callback;
+
+        return $this;
     }
 
     /**
@@ -180,8 +205,8 @@ class Pipeline implements PipelineContract
                     }
 
                     $carry = method_exists($pipe, $this->method)
-                                    ? $pipe->{$this->method}(...$parameters)
-                                    : $pipe(...$parameters);
+                        ? $pipe->{$this->method}(...$parameters)
+                        : $pipe(...$parameters);
 
                     return $this->handleCarry($carry);
                 } catch (Throwable $e) {
@@ -199,10 +224,12 @@ class Pipeline implements PipelineContract
      */
     protected function parsePipeString($pipe)
     {
-        [$name, $parameters] = array_pad(explode(':', $pipe, 2), 2, []);
+        [$name, $parameters] = array_pad(explode(':', $pipe, 2), 2, null);
 
-        if (is_string($parameters)) {
+        if (! is_null($parameters)) {
             $parameters = explode(',', $parameters);
+        } else {
+            $parameters = [];
         }
 
         return [$name, $parameters];

@@ -9,6 +9,9 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Attribute\AsCommand;
 
+use function Laravel\Prompts\password;
+use function Laravel\Prompts\select;
+
 #[AsCommand(name: 'env:encrypt')]
 class EnvironmentEncryptCommand extends Command
 {
@@ -42,7 +45,6 @@ class EnvironmentEncryptCommand extends Command
      * Create a new command instance.
      *
      * @param  \Illuminate\Filesystem\Filesystem  $files
-     * @return void
      */
     public function __construct(Filesystem $files)
     {
@@ -62,11 +64,26 @@ class EnvironmentEncryptCommand extends Command
 
         $key = $this->option('key');
 
+        if (! $key && $this->input->isInteractive()) {
+            $ask = select(
+                label: 'What encryption key would you like to use?',
+                options: [
+                    'generate' => 'Generate a random encryption key',
+                    'ask' => 'Provide an encryption key',
+                ],
+                default: 'generate'
+            );
+
+            if ($ask == 'ask') {
+                $key = password('What is the encryption key?');
+            }
+        }
+
         $keyPassed = $key !== null;
 
         $environmentFile = $this->option('env')
-                            ? Str::finish(dirname($this->laravel->environmentFilePath()), DIRECTORY_SEPARATOR).'.env.'.$this->option('env')
-                            : $this->laravel->environmentFilePath();
+            ? Str::finish(dirname($this->laravel->environmentFilePath()), DIRECTORY_SEPARATOR).'.env.'.$this->option('env')
+            : $this->laravel->environmentFilePath();
 
         $encryptedFile = $environmentFile.'.encrypted';
 

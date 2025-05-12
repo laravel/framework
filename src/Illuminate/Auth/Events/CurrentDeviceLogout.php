@@ -9,29 +9,14 @@ class CurrentDeviceLogout
     use SerializesModels;
 
     /**
-     * The authentication guard name.
-     *
-     * @var string
-     */
-    public $guard;
-
-    /**
-     * The authenticated user.
-     *
-     * @var \Illuminate\Contracts\Auth\Authenticatable
-     */
-    public $user;
-
-    /**
      * Create a new event instance.
      *
-     * @param  string  $guard
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
-     * @return void
+     * @param  string  $guard  The authentication guard name.
+     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user  The authenticated user.
      */
-    public function __construct($guard, $user)
-    {
-        $this->user = $user;
-        $this->guard = $guard;
+    public function __construct(
+        public $guard,
+        public $user,
+    ) {
     }
 }

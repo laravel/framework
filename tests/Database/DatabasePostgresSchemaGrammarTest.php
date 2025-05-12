@@ -57,7 +57,10 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
 
     public function testCreateTableWithAutoIncrementStartingValue()
     {
-        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $connection = $this->getConnection();
+        $connection->getSchemaBuilder()->shouldReceive('parseSchemaAndTable')->andReturn([null, 'users']);
+
+        $blueprint = new Blueprint($connection, 'users');
         $blueprint->create();
         $blueprint->increments('id')->startingValue(1000);
         $blueprint->string('email');
@@ -71,7 +74,10 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
 
     public function testAddColumnsWithMultipleAutoIncrementStartingValue()
     {
-        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $builder = $this->getBuilder();
+        $builder->shouldReceive('parseSchemaAndTable')->andReturn([null, 'users']);
+
+        $blueprint = new Blueprint($this->getConnection(builder: $builder), 'users');
         $blueprint->id()->from(100);
         $blueprint->increments('code')->from(200);
         $blueprint->string('name')->from(300);
@@ -158,7 +164,10 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
 
     public function testDropPrimary()
     {
-        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $connection = $this->getConnection();
+        $connection->getSchemaBuilder()->shouldReceive('parseSchemaAndTable')->andReturn([null, 'users']);
+
+        $blueprint = new Blueprint($connection, 'users');
         $blueprint->dropPrimary();
         $statements = $blueprint->toSql();
 
@@ -275,6 +284,26 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertSame('alter table "users" add constraint "bar" unique ("foo")', $statements[0]);
+    }
+
+    public function testAddingUniqueKeyWithNullsNotDistinct()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->unique('foo', 'bar')->nullsNotDistinct();
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table "users" add constraint "bar" unique nulls not distinct ("foo")', $statements[0]);
+    }
+
+    public function testAddingUniqueKeyWithNullsDistinct()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->unique('foo', 'bar')->nullsNotDistinct(false);
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table "users" add constraint "bar" unique nulls distinct ("foo")', $statements[0]);
     }
 
     public function testAddingIndex()
@@ -685,6 +714,16 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertSame('alter table "users" add column "foo" date not null', $statements[0]);
     }
 
+    public function testAddingDateWithDefaultCurrent()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->date('foo')->useCurrent();
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table "users" add column "foo" date not null default CURRENT_DATE', $statements[0]);
+    }
+
     public function testAddingYear()
     {
         $blueprint = new Blueprint($this->getConnection(), 'users');
@@ -692,6 +731,15 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql();
         $this->assertCount(1, $statements);
         $this->assertSame('alter table "users" add column "birth_year" integer not null', $statements[0]);
+    }
+
+    public function testAddingYearWithDefaultCurrent()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->year('birth_year')->useCurrent();
+        $statements = $blueprint->toSql();
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table "users" add column "birth_year" integer not null default EXTRACT(YEAR FROM CURRENT_DATE)', $statements[0]);
     }
 
     public function testAddingJson()
@@ -1046,7 +1094,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
     {
         $connection = $this->getConnection();
         $connection->shouldReceive('getConfig')->once()->once()->with('charset')->andReturn('utf8_foo');
-        $statement = $this->getGrammar()->compileCreateDatabase('my_database_a', $connection);
+        $statement = $this->getGrammar($connection)->compileCreateDatabase('my_database_a');
 
         $this->assertSame(
             'create database "my_database_a" encoding "utf8_foo"',
@@ -1055,7 +1103,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
 
         $connection = $this->getConnection();
         $connection->shouldReceive('getConfig')->once()->once()->with('charset')->andReturn('utf8_bar');
-        $statement = $this->getGrammar()->compileCreateDatabase('my_database_b', $connection);
+        $statement = $this->getGrammar($connection)->compileCreateDatabase('my_database_b');
 
         $this->assertSame(
             'create database "my_database_b" encoding "utf8_bar"',
@@ -1084,52 +1132,87 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
     {
         $statement = $this->getGrammar()->compileDropAllTables(['alpha', 'beta', 'gamma']);
 
-        $this->assertSame('drop table "alpha","beta","gamma" cascade', $statement);
+        $this->assertSame('drop table "alpha", "beta", "gamma" cascade', $statement);
     }
 
     public function testDropAllViewsEscapesTableNames()
     {
         $statement = $this->getGrammar()->compileDropAllViews(['alpha', 'beta', 'gamma']);
 
-        $this->assertSame('drop view "alpha","beta","gamma" cascade', $statement);
+        $this->assertSame('drop view "alpha", "beta", "gamma" cascade', $statement);
     }
 
     public function testDropAllTypesEscapesTableNames()
     {
         $statement = $this->getGrammar()->compileDropAllTypes(['alpha', 'beta', 'gamma']);
 
-        $this->assertSame('drop type "alpha","beta","gamma" cascade', $statement);
+        $this->assertSame('drop type "alpha", "beta", "gamma" cascade', $statement);
+    }
+
+    public function testDropAllTablesWithPrefixAndSchema()
+    {
+        $connection = $this->getConnection(prefix: 'prefix_');
+        $statement = $this->getGrammar($connection)->compileDropAllTables(['schema.alpha', 'schema.beta', 'schema.gamma']);
+
+        $this->assertSame('drop table "schema"."alpha", "schema"."beta", "schema"."gamma" cascade', $statement);
+    }
+
+    public function testDropAllViewsWithPrefixAndSchema()
+    {
+        $connection = $this->getConnection(prefix: 'prefix_');
+        $statement = $this->getGrammar($connection)->compileDropAllViews(['schema.alpha', 'schema.beta', 'schema.gamma']);
+
+        $this->assertSame('drop view "schema"."alpha", "schema"."beta", "schema"."gamma" cascade', $statement);
+    }
+
+    public function testDropAllTypesWithPrefixAndSchema()
+    {
+        $connection = $this->getConnection(prefix: 'prefix_');
+        $statement = $this->getGrammar($connection)->compileDropAllTypes(['schema.alpha', 'schema.beta', 'schema.gamma']);
+
+        $this->assertSame('drop type "schema"."alpha", "schema"."beta", "schema"."gamma" cascade', $statement);
+    }
+
+    public function testDropAllDomainsWithPrefixAndSchema()
+    {
+        $connection = $this->getConnection(prefix: 'prefix_');
+        $statement = $this->getGrammar($connection)->compileDropAllDomains(['schema.alpha', 'schema.beta', 'schema.gamma']);
+
+        $this->assertSame('drop domain "schema"."alpha", "schema"."beta", "schema"."gamma" cascade', $statement);
     }
 
     public function testCompileColumns()
     {
         $connection = $this->getConnection();
-        $grammar = $this->getGrammar();
-
         $connection->shouldReceive('getServerVersion')->once()->andReturn('12.0.0');
-        $grammar->setConnection($connection);
 
-        $statement = $grammar->compileColumns('public', 'table');
+        $statement = $connection->getSchemaGrammar()->compileColumns('public', 'table');
 
         $this->assertStringContainsString("where c.relname = 'table' and n.nspname = 'public'", $statement);
     }
 
     protected function getConnection(
         ?PostgresGrammar $grammar = null,
-        ?PostgresBuilder $builder = null
+        ?PostgresBuilder $builder = null,
+        string $prefix = ''
     ) {
-        $grammar ??= $this->getGrammar();
+        $connection = m::mock(Connection::class)
+            ->shouldReceive('getTablePrefix')->andReturn($prefix)
+            ->shouldReceive('getConfig')->with('prefix_indexes')->andReturn(null)
+            ->getMock();
+
+        $grammar ??= $this->getGrammar($connection);
         $builder ??= $this->getBuilder();
 
-        return m::mock(Connection::class)
+        return $connection
             ->shouldReceive('getSchemaGrammar')->andReturn($grammar)
             ->shouldReceive('getSchemaBuilder')->andReturn($builder)
             ->getMock();
     }
 
-    public function getGrammar()
+    public function getGrammar(?Connection $connection = null)
     {
-        return new PostgresGrammar;
+        return new PostgresGrammar($connection ?? $this->getConnection());
     }
 
     public function getBuilder()

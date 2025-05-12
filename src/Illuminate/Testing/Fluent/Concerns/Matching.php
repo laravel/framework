@@ -2,11 +2,12 @@
 
 namespace Illuminate\Testing\Fluent\Concerns;
 
-use BackedEnum;
 use Closure;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
 use PHPUnit\Framework\Assert as PHPUnit;
+
+use function Illuminate\Support\enum_value;
 
 trait Matching
 {
@@ -25,20 +26,16 @@ trait Matching
 
         if ($expected instanceof Closure) {
             PHPUnit::assertTrue(
-                $expected(is_array($actual) ? Collection::make($actual) : $actual),
+                $expected(is_array($actual) ? new Collection($actual) : $actual),
                 sprintf('Property [%s] was marked as invalid using a closure.', $this->dotPath($key))
             );
 
             return $this;
         }
 
-        if ($expected instanceof Arrayable) {
-            $expected = $expected->toArray();
-        }
-
-        if ($expected instanceof BackedEnum) {
-            $expected = $expected->value;
-        }
+        $expected = $expected instanceof Arrayable
+            ? $expected->toArray()
+            : enum_value($expected);
 
         $this->ensureSorted($expected);
         $this->ensureSorted($actual);
@@ -67,20 +64,16 @@ trait Matching
 
         if ($expected instanceof Closure) {
             PHPUnit::assertFalse(
-                $expected(is_array($actual) ? Collection::make($actual) : $actual),
+                $expected(is_array($actual) ? new Collection($actual) : $actual),
                 sprintf('Property [%s] was marked as invalid using a closure.', $this->dotPath($key))
             );
 
             return $this;
         }
 
-        if ($expected instanceof Arrayable) {
-            $expected = $expected->toArray();
-        }
-
-        if ($expected instanceof BackedEnum) {
-            $expected = $expected->value;
-        }
+        $expected = $expected instanceof Arrayable
+            ? $expected->toArray()
+            : enum_value($expected);
 
         $this->ensureSorted($expected);
         $this->ensureSorted($actual);
@@ -93,6 +86,52 @@ trait Matching
                 $this->dotPath($key),
                 $key,
                 $expected
+            )
+        );
+
+        return $this;
+    }
+
+    /**
+     * Asserts that the property is null.
+     *
+     * @param  string  $key
+     * @return $this
+     */
+    public function whereNull(string $key): self
+    {
+        $this->has($key);
+
+        $actual = $this->prop($key);
+
+        PHPUnit::assertNull(
+            $actual,
+            sprintf(
+                'Property [%s] should be null.',
+                $this->dotPath($key),
+            )
+        );
+
+        return $this;
+    }
+
+    /**
+     * Asserts that the property is not null.
+     *
+     * @param  string  $key
+     * @return $this
+     */
+    public function whereNotNull(string $key): self
+    {
+        $this->has($key);
+
+        $actual = $this->prop($key);
+
+        PHPUnit::assertNotNull(
+            $actual,
+            sprintf(
+                'Property [%s] should not be null.',
+                $this->dotPath($key),
             )
         );
 
@@ -164,12 +203,12 @@ trait Matching
      */
     public function whereContains(string $key, $expected)
     {
-        $actual = Collection::make(
+        $actual = new Collection(
             $this->prop($key) ?? $this->prop()
         );
 
-        $missing = Collection::make($expected)
-            ->map(fn ($search) => $search instanceof BackedEnum ? $search->value : $search)
+        $missing = (new Collection($expected))
+            ->map(fn ($search) => enum_value($search))
             ->reject(function ($search) use ($key, $actual) {
                 if ($actual->containsStrict($key, $search)) {
                     return true;

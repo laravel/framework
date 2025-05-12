@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\RelationNotFoundException;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\Concerns\SupportsInverseRelations;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Support\Str;
+use Illuminate\Support\Stringable;
 use Mockery as m;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -288,7 +288,8 @@ class DatabaseEloquentInverseRelationTest extends TestCase
             [],
             new HasInverseRelationRelatedStub(),
             'foo',
-            new class() {},
+            new class() {
+            },
             new HasInverseRelationRelatedStub(),
         ]);
     }
@@ -338,7 +339,7 @@ class HasInverseRelationStub extends Relation
         protected ?string $foreignKey = null,
     ) {
         parent::__construct($query, $parent);
-        $this->foreignKey ??= Str::of(class_basename($parent))->snake()->finish('_id')->toString();
+        $this->foreignKey ??= (new Stringable(class_basename($parent)))->snake()->finish('_id')->toString();
     }
 
     public function getForeignKeyName()
@@ -378,7 +379,7 @@ class HasInverseRelationStub extends Relation
         return $this->getPossibleInverseRelations();
     }
 
-    public function exposeGuessInverseRelation(): string|null
+    public function exposeGuessInverseRelation(): ?string
     {
         return $this->guessInverseRelation();
     }

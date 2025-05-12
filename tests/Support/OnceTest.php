@@ -343,6 +343,34 @@ class OnceTest extends TestCase
 
         $this->assertNotSame($first, $third);
     }
+
+    public function testMemoizationNullValues()
+    {
+        $instance = new class
+        {
+            public $i = 0;
+
+            public function null()
+            {
+                return once(function () {
+                    $this->i++;
+
+                    return null;
+                });
+            }
+        };
+
+        $this->assertSame($instance->null(), $instance->null());
+        $this->assertSame(1, $instance->i);
+    }
+
+    public function testExtendedStaticClassOnceCalls()
+    {
+        $first = MyClass::staticRand();
+        $second = MyExtendedClass::staticRand();
+
+        $this->assertNotSame($first, $second);
+    }
 }
 
 $letter = 'a';
@@ -371,4 +399,8 @@ class MyClass
     {
         return once(fn () => $this->rand());
     }
+}
+
+class MyExtendedClass extends MyClass
+{
 }

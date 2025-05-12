@@ -36,6 +36,10 @@ trait SerializesModels
                 continue;
             }
 
+            if (method_exists($property, 'isVirtual') && $property->isVirtual()) {
+                continue;
+            }
+
             $value = $this->getPropertyValue($property);
 
             if ($property->hasDefaultValue() && $value === $property->getDefaultValue()) {

@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Log\Context\Events\ContextDehydrating as Dehydrating;
 use Illuminate\Log\Context\Events\ContextHydrated as Hydrated;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
 use RuntimeException;
@@ -21,7 +22,7 @@ class Repository
     /**
      * The event dispatcher instance.
      *
-     * @var \Illuminate\Events\Dispatcher
+     * @var \Illuminate\Contracts\Events\Dispatcher
      */
     protected $events;
 
@@ -66,6 +67,17 @@ class Repository
     }
 
     /**
+     * Determine if the given key is missing.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function missing($key)
+    {
+        return ! $this->has($key);
+    }
+
+    /**
      * Determine if the given key exists within the hidden context data.
      *
      * @param  string  $key
@@ -74,6 +86,17 @@ class Repository
     public function hasHidden($key)
     {
         return array_key_exists($key, $this->hidden);
+    }
+
+    /**
+     * Determine if the given key is missing within the hidden context data.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function missingHidden($key)
+    {
+        return ! $this->hasHidden($key);
     }
 
     /**
@@ -168,6 +191,28 @@ class Repository
     public function onlyHidden($keys)
     {
         return array_intersect_key($this->hidden, array_flip($keys));
+    }
+
+    /**
+     * Retrieve all values except those with the given keys.
+     *
+     * @param  array<int, string>  $keys
+     * @return array<string, mixed>
+     */
+    public function except($keys)
+    {
+        return array_diff_key($this->data, array_flip($keys));
+    }
+
+    /**
+     * Retrieve all hidden values except those with the given keys.
+     *
+     * @param  array<int, string>  $keys
+     * @return array<string, mixed>
+     */
+    public function exceptHidden($keys)
+    {
+        return array_diff_key($this->hidden, array_flip($keys));
     }
 
     /**
@@ -290,6 +335,23 @@ class Repository
     }
 
     /**
+     * Pop the latest value from the key's stack.
+     *
+     * @param  string  $key
+     * @return mixed
+     *
+     * @throws \RuntimeException
+     */
+    public function pop($key)
+    {
+        if (! $this->isStackable($key) || ! count($this->data[$key])) {
+            throw new RuntimeException("Unable to pop value from context stack for key [{$key}].");
+        }
+
+        return array_pop($this->data[$key]);
+    }
+
+    /**
      * Push the given hidden values onto the key's stack.
      *
      * @param  string  $key
@@ -313,6 +375,52 @@ class Repository
     }
 
     /**
+     * Pop the latest hidden value from the key's stack.
+     *
+     * @param  string  $key
+     * @return mixed
+     *
+     * @throws \RuntimeException
+     */
+    public function popHidden($key)
+    {
+        if (! $this->isHiddenStackable($key) || ! count($this->hidden[$key])) {
+            throw new RuntimeException("Unable to pop value from hidden context stack for key [{$key}].");
+        }
+
+        return array_pop($this->hidden[$key]);
+    }
+
+    /**
+     * Increment a context counter.
+     *
+     * @param  string  $key
+     * @param  int  $amount
+     * @return $this
+     */
+    public function increment(string $key, int $amount = 1)
+    {
+        $this->add(
+            $key,
+            (int) $this->get($key, 0) + $amount,
+        );
+
+        return $this;
+    }
+
+    /**
+     * Decrement a context counter.
+     *
+     * @param  string  $key
+     * @param  int  $amount
+     * @return $this
+     */
+    public function decrement(string $key, int $amount = 1)
+    {
+        return $this->increment($key, $amount * -1);
+    }
+
+    /**
      * Determine if the given value is in the given stack.
      *
      * @param  string  $key
@@ -333,7 +441,7 @@ class Repository
         }
 
         if ($value instanceof Closure) {
-            return collect($this->data[$key])->contains($value);
+            return (new Collection($this->data[$key]))->contains($value);
         }
 
         return in_array($value, $this->data[$key], $strict);
@@ -360,7 +468,7 @@ class Repository
         }
 
         if ($value instanceof Closure) {
-            return collect($this->hidden[$key])->contains($value);
+            return (new Collection($this->hidden[$key]))->contains($value);
         }
 
         return in_array($value, $this->hidden[$key], $strict);
@@ -388,6 +496,35 @@ class Repository
     {
         return ! $this->hasHidden($key) ||
             (is_array($this->hidden[$key]) && array_is_list($this->hidden[$key]));
+    }
+
+    /**
+     * Run the callback function with the given context values and restore the original context state when complete.
+     *
+     * @param  callable  $callback
+     * @param  array<string, mixed>  $data
+     * @param  array<string, mixed>  $hidden
+     * @return mixed
+     */
+    public function scope(callable $callback, array $data = [], array $hidden = [])
+    {
+        $dataBefore = $this->data;
+        $hiddenBefore = $this->hidden;
+
+        if ($data !== []) {
+            $this->add($data);
+        }
+
+        if ($hidden !== []) {
+            $this->addHidden($hidden);
+        }
+
+        try {
+            return $callback();
+        } finally {
+            $this->data = $dataBefore;
+            $this->hidden = $hiddenBefore;
+        }
     }
 
     /**
@@ -512,8 +649,8 @@ class Repository
         };
 
         [$data, $hidden] = [
-            collect($context['data'] ?? [])->map(fn ($value, $key) => $unserialize($value, $key, false))->all(),
-            collect($context['hidden'] ?? [])->map(fn ($value, $key) => $unserialize($value, $key, true))->all(),
+            (new Collection($context['data'] ?? []))->map(fn ($value, $key) => $unserialize($value, $key, false))->all(),
+            (new Collection($context['hidden'] ?? []))->map(fn ($value, $key) => $unserialize($value, $key, true))->all(),
         ];
 
         $this->events->dispatch(new Hydrated(

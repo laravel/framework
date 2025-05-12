@@ -9,9 +9,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
+use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\Concerns\InteractsWithPublishedFiles;
 use Orchestra\Testbench\TestCase;
 
+#[WithConfig('app.key', 'AckfSECXIvnK5r28GVIWUAxmbBSjTsmF')]
 class ImplicitModelRouteBindingTest extends TestCase
 {
     use InteractsWithPublishedFiles;
@@ -19,18 +21,6 @@ class ImplicitModelRouteBindingTest extends TestCase
     protected $files = [
         'routes/testbench.php',
     ];
-
-    protected function tearDown(): void
-    {
-        $this->tearDownInteractsWithPublishedFiles();
-
-        parent::tearDown();
-    }
-
-    protected function defineEnvironment($app): void
-    {
-        $app['config']->set(['app.key' => 'AckfSECXIvnK5r28GVIWUAxmbBSjTsmF']);
-    }
 
     protected function defineDatabaseMigrations(): void
     {

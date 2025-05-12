@@ -1359,7 +1359,7 @@ class FoundationViteTest extends TestCase
 
                         if (assets.length) {
                             link.onload = () => loadNext(assets, 1)
-                            link.error = () => loadNext(assets, 1)
+                            link.onerror = () => loadNext(assets, 1)
                         }
                     }
 
@@ -1484,7 +1484,7 @@ class FoundationViteTest extends TestCase
                     return link
                 }
 
-                const fragment = new DocumentFragment
+                const fragment = new DocumentFragment;
                 {$expectedAssets}.forEach((asset) => fragment.append(makeLink(asset)))
                 document.head.append(fragment)
              }))
@@ -1637,7 +1637,7 @@ class FoundationViteTest extends TestCase
 
                         if (assets.length) {
                             link.onload = () => loadNext(assets, 1)
-                            link.error = () => loadNext(assets, 1)
+                            link.onerror = () => loadNext(assets, 1)
                         }
                     }
 
@@ -1691,6 +1691,18 @@ class FoundationViteTest extends TestCase
         $this->assertStringContainsString("window.addEventListener('vite:prefetch', ", $html);
 
         $this->cleanViteManifest($buildDir);
+    }
+
+    public function testItCanFlushState()
+    {
+        $this->makeViteManifest();
+
+        app(Vite::class)('resources/js/app.js');
+        app()->forgetScopedInstances();
+        $this->assertCount(1, app(Vite::class)->preloadedAssets());
+
+        app(Vite::class)->flush();
+        $this->assertCount(0, app(Vite::class)->preloadedAssets());
     }
 
     protected function cleanViteManifest($path = 'build')

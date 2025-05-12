@@ -3,10 +3,14 @@
 namespace Illuminate\Validation;
 
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Validation\Rules\AnyOf;
 use Illuminate\Validation\Rules\ArrayRule;
 use Illuminate\Validation\Rules\Can;
+use Illuminate\Validation\Rules\Date;
 use Illuminate\Validation\Rules\Dimensions;
+use Illuminate\Validation\Rules\Email;
 use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\Rules\ExcludeIf;
 use Illuminate\Validation\Rules\Exists;
@@ -14,6 +18,7 @@ use Illuminate\Validation\Rules\File;
 use Illuminate\Validation\Rules\ImageFile;
 use Illuminate\Validation\Rules\In;
 use Illuminate\Validation\Rules\NotIn;
+use Illuminate\Validation\Rules\Numeric;
 use Illuminate\Validation\Rules\ProhibitedIf;
 use Illuminate\Validation\Rules\RequiredIf;
 use Illuminate\Validation\Rules\Unique;
@@ -170,6 +175,26 @@ class Rule
     }
 
     /**
+     * Get a date rule builder instance.
+     *
+     * @return \Illuminate\Validation\Rules\Date
+     */
+    public static function date()
+    {
+        return new Date;
+    }
+
+    /**
+     * Get an email rule builder instance.
+     *
+     * @return \Illuminate\Validation\Rules\Email
+     */
+    public static function email()
+    {
+        return new Email;
+    }
+
+    /**
      * Get an enum rule builder instance.
      *
      * @param  class-string  $type
@@ -193,11 +218,12 @@ class Rule
     /**
      * Get an image file rule builder instance.
      *
+     * @param  bool  $allowSvg
      * @return \Illuminate\Validation\Rules\ImageFile
      */
-    public static function imageFile()
+    public static function imageFile($allowSvg = false)
     {
-        return new ImageFile;
+        return new ImageFile($allowSvg);
     }
 
     /**
@@ -209,5 +235,57 @@ class Rule
     public static function dimensions(array $constraints = [])
     {
         return new Dimensions($constraints);
+    }
+
+    /**
+     * Get a numeric rule builder instance.
+     *
+     * @return \Illuminate\Validation\Rules\Numeric
+     */
+    public static function numeric()
+    {
+        return new Numeric;
+    }
+
+    /**
+     * Get an "any of" rule builder instance.
+     *
+     * @param  array
+     * @return \Illuminate\Validation\Rules\AnyOf
+     *
+     * @throws \InvalidArgumentException
+     */
+    public static function anyOf($rules)
+    {
+        return new AnyOf($rules);
+    }
+
+    /**
+     * Compile a set of rules for an attribute.
+     *
+     * @param  string  $attribute
+     * @param  array  $rules
+     * @param  array|null  $data
+     * @return object|\stdClass
+     */
+    public static function compile($attribute, $rules, $data = null)
+    {
+        $parser = new ValidationRuleParser(
+            Arr::undot(Arr::wrap($data))
+        );
+
+        if (is_array($rules) && ! array_is_list($rules)) {
+            $nested = [];
+
+            foreach ($rules as $key => $rule) {
+                $nested[$attribute.'.'.$key] = $rule;
+            }
+
+            $rules = $nested;
+        } else {
+            $rules = [$attribute => $rules];
+        }
+
+        return $parser->explode(ValidationRuleParser::filterConditionalRules($rules, $data));
     }
 }

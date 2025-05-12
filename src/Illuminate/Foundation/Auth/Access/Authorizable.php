@@ -9,7 +9,7 @@ trait Authorizable
     /**
      * Determine if the entity has the given abilities.
      *
-     * @param  iterable|string  $abilities
+     * @param  iterable|\BackedEnum|string  $abilities
      * @param  array|mixed  $arguments
      * @return bool
      */
@@ -21,7 +21,7 @@ trait Authorizable
     /**
      * Determine if the entity has any of the given abilities.
      *
-     * @param  iterable|string  $abilities
+     * @param  iterable|\BackedEnum|string  $abilities
      * @param  array|mixed  $arguments
      * @return bool
      */
@@ -33,7 +33,7 @@ trait Authorizable
     /**
      * Determine if the entity does not have the given abilities.
      *
-     * @param  iterable|string  $abilities
+     * @param  iterable|\BackedEnum|string  $abilities
      * @param  array|mixed  $arguments
      * @return bool
      */
@@ -45,7 +45,7 @@ trait Authorizable
     /**
      * Determine if the entity does not have the given abilities.
      *
-     * @param  iterable|string  $abilities
+     * @param  iterable|\BackedEnum|string  $abilities
      * @param  array|mixed  $arguments
      * @return bool
      */

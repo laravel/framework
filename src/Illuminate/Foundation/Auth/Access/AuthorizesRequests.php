@@ -5,6 +5,8 @@ namespace Illuminate\Foundation\Auth\Access;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Support\Str;
 
+use function Illuminate\Support\enum_value;
+
 trait AuthorizesRequests
 {
     /**
@@ -49,6 +51,8 @@ trait AuthorizesRequests
      */
     protected function parseAbilityAndArguments($ability, $arguments)
     {
+        $ability = enum_value($ability);
+
         if (is_string($ability) && ! str_contains($ability, '\\')) {
             return [$ability, $arguments];
         }
@@ -104,7 +108,7 @@ trait AuthorizesRequests
     /**
      * Get the map of resource methods to ability names.
      *
-     * @return array
+     * @return array<string, string>
      */
     protected function resourceAbilityMap()
     {
@@ -122,7 +126,7 @@ trait AuthorizesRequests
     /**
      * Get the list of resource methods which do not have model parameters.
      *
-     * @return array
+     * @return list<string>
      */
     protected function resourceMethodsWithoutModels()
     {

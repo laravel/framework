@@ -216,6 +216,8 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
                 $app->forgetScopedInstances();
 
                 Facade::clearResolvedInstances();
+
+                memory_reset_peak_usage();
             };
 
             return new Worker(
@@ -314,9 +316,11 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
         ];
 
         if (! empty($config['key']) && ! empty($config['secret'])) {
-            $dynamoConfig['credentials'] = Arr::only(
-                $config, ['key', 'secret', 'token']
-            );
+            $dynamoConfig['credentials'] = Arr::only($config, ['key', 'secret']);
+
+            if (! empty($config['token'])) {
+                $dynamoConfig['credentials']['token'] = $config['token'];
+            }
         }
 
         return new DynamoDbFailedJobProvider(

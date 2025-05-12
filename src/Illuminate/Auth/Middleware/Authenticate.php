@@ -28,7 +28,6 @@ class Authenticate implements AuthenticatesRequests
      * Create a new middleware instance.
      *
      * @param  \Illuminate\Contracts\Auth\Factory  $auth
-     * @return void
      */
     public function __construct(Auth $auth)
     {
@@ -93,7 +92,7 @@ class Authenticate implements AuthenticatesRequests
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  array  $guards
-     * @return void
+     * @return never
      *
      * @throws \Illuminate\Auth\AuthenticationException
      */

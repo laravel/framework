@@ -95,7 +95,6 @@ class Mailer implements MailerContract, MailQueueContract
      * @param  \Illuminate\Contracts\View\Factory  $views
      * @param  \Symfony\Component\Mailer\Transport\TransportInterface  $transport
      * @param  \Illuminate\Contracts\Events\Dispatcher|null  $events
-     * @return void
      */
     public function __construct(string $name, Factory $views, TransportInterface $transport, ?Dispatcher $events = null)
     {
@@ -350,8 +349,8 @@ class Mailer implements MailerContract, MailQueueContract
     protected function sendMailable(MailableContract $mailable)
     {
         return $mailable instanceof ShouldQueue
-                        ? $mailable->mailer($this->name)->queue($this->queue)
-                        : $mailable->mailer($this->name)->send($this);
+            ? $mailable->mailer($this->name)->queue($this->queue)
+            : $mailable->mailer($this->name)->send($this);
     }
 
     /**
@@ -441,8 +440,8 @@ class Mailer implements MailerContract, MailQueueContract
         $view = value($view, $data);
 
         return $view instanceof Htmlable
-                        ? $view->toHtml()
-                        : $this->views->make($view, $data)->render();
+            ? $view->toHtml()
+            : $this->views->make($view, $data)->render();
     }
 
     /**
@@ -465,7 +464,7 @@ class Mailer implements MailerContract, MailQueueContract
      * Queue a new mail message for sending.
      *
      * @param  \Illuminate\Contracts\Mail\Mailable|string|array  $view
-     * @param  string|null  $queue
+     * @param  \BackedEnum|string|null  $queue
      * @return mixed
      *
      * @throws \InvalidArgumentException
@@ -486,7 +485,7 @@ class Mailer implements MailerContract, MailQueueContract
     /**
      * Queue a new mail message for sending on the given queue.
      *
-     * @param  string  $queue
+     * @param  \BackedEnum|string|null  $queue
      * @param  \Illuminate\Contracts\Mail\Mailable  $view
      * @return mixed
      */

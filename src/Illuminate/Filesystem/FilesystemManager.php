@@ -52,7 +52,6 @@ class FilesystemManager implements FactoryContract
      * Create a new filesystem manager instance.
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
-     * @return void
      */
     public function __construct($app)
     {
@@ -272,10 +271,10 @@ class FilesystemManager implements FactoryContract
 
         if (! empty($config['key']) && ! empty($config['secret'])) {
             $config['credentials'] = Arr::only($config, ['key', 'secret']);
-        }
 
-        if (! empty($config['token'])) {
-            $config['credentials']['token'] = $config['token'];
+            if (! empty($config['token'])) {
+                $config['credentials']['token'] = $config['token'];
+            }
         }
 
         return Arr::except($config, ['token']);
@@ -298,7 +297,16 @@ class FilesystemManager implements FactoryContract
         return $this->build(tap(
             is_string($config['disk']) ? $this->getConfig($config['disk']) : $config['disk'],
             function (&$parent) use ($config) {
-                $parent['prefix'] = $config['prefix'];
+                if (empty($parent['prefix'])) {
+                    $parent['prefix'] = $config['prefix'];
+                } else {
+                    $separator = $parent['directory_separator'] ?? DIRECTORY_SEPARATOR;
+
+                    $parentPrefix = rtrim($parent['prefix'], $separator);
+                    $scopedPrefix = ltrim($config['prefix'], $separator);
+
+                    $parent['prefix'] = "{$parentPrefix}{$separator}{$scopedPrefix}";
+                }
 
                 if (isset($config['visibility'])) {
                     $parent['visibility'] = $config['visibility'];
@@ -322,6 +330,10 @@ class FilesystemManager implements FactoryContract
 
         if (! empty($config['prefix'])) {
             $adapter = new PathPrefixedAdapter($adapter, $config['prefix']);
+        }
+
+        if (str_contains($config['endpoint'] ?? '', 'r2.cloudflarestorage.com')) {
+            $config['retain_visibility'] = false;
         }
 
         return new Flysystem($adapter, Arr::only($config, [

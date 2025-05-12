@@ -4,7 +4,7 @@ namespace Illuminate\Validation;
 
 use Exception;
 use Illuminate\Contracts\Validation\UncompromisedVerifier;
-use Illuminate\Support\Str;
+use Illuminate\Support\Stringable;
 
 class NotPwnedVerifier implements UncompromisedVerifier
 {
@@ -27,7 +27,6 @@ class NotPwnedVerifier implements UncompromisedVerifier
      *
      * @param  \Illuminate\Http\Client\Factory  $factory
      * @param  int|null  $timeout
-     * @return void
      */
     public function __construct($factory, $timeout = null)
     {
@@ -97,7 +96,7 @@ class NotPwnedVerifier implements UncompromisedVerifier
             ? $response->body()
             : '';
 
-        return Str::of($body)->trim()->explode("\n")->filter(function ($line) {
+        return (new Stringable($body))->trim()->explode("\n")->filter(function ($line) {
             return str_contains($line, ':');
         });
     }

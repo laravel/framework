@@ -10,11 +10,13 @@ use Throwable;
 trait ManagesTransactions
 {
     /**
+     * @template TReturn of mixed
+     *
      * Execute a Closure within a transaction.
      *
-     * @param  \Closure  $callback
+     * @param  (\Closure(static): TReturn)  $callback
      * @param  int  $attempts
-     * @return mixed
+     * @return TReturn
      *
      * @throws \Throwable
      */
@@ -253,8 +255,8 @@ trait ManagesTransactions
         // that this given transaction level is valid before attempting to rollback to
         // that level. If it's not we will just return out and not attempt anything.
         $toLevel = is_null($toLevel)
-                    ? $this->transactions - 1
-                    : $toLevel;
+            ? $this->transactions - 1
+            : $toLevel;
 
         if ($toLevel < 0 || $toLevel >= $this->transactions) {
             return;

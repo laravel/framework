@@ -32,7 +32,6 @@ class Signals
      * Create a new signal registrar instance.
      *
      * @param  \Symfony\Component\Console\SignalRegistry\SignalRegistry  $registry
-     * @return void
      */
     public function __construct($registry)
     {
@@ -72,7 +71,7 @@ class Signals
     /**
      * Gets the signal's existing handler in array format.
      *
-     * @return array<int, callable(int $signal): void>
+     * @return array<int, callable(int $signal): void>|null
      */
     protected function initializeSignal($signal)
     {

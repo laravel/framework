@@ -3,7 +3,7 @@
 namespace Illuminate\Tests\Database;
 
 use Exception;
-use Illuminate\Database\ConnectionInterface;
+use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder;
@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
 {
-    public function setUp(): void
+    protected function setUp(): void
     {
         Carbon::setTestNow('2023-01-01 00:00:00');
     }
@@ -300,13 +300,184 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
         ], $result->toArray());
     }
 
+    public function testIncrementOrCreateMethodIncrementsExistingRecord(): void
+    {
+        $model = new EloquentBuilderCreateOrFirstTestModel();
+        $this->mockConnectionForModel($model, 'SQLite');
+        $model->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
+        $model->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+
+        $model->getConnection()
+            ->expects('select')
+            ->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true)
+            ->andReturn([[
+                'id' => 123,
+                'attr' => 'foo',
+                'count' => 1,
+                'created_at' => '2023-01-01 00:00:00',
+                'updated_at' => '2023-01-01 00:00:00',
+            ]]);
+
+        $model->getConnection()
+            ->expects('raw')
+            ->with('"count" + 1')
+            ->andReturn('2');
+
+        $model->getConnection()
+            ->expects('update')
+            ->with(
+                'update "table" set "count" = ?, "updated_at" = ? where "id" = ?',
+                ['2', '2023-01-01 00:00:00', 123],
+            )
+            ->andReturn(1);
+
+        $result = $model->newQuery()->incrementOrCreate(['attr' => 'foo'], 'count');
+        $this->assertFalse($result->wasRecentlyCreated);
+        $this->assertEquals([
+            'id' => 123,
+            'attr' => 'foo',
+            'count' => 2,
+            'created_at' => '2023-01-01T00:00:00.000000Z',
+            'updated_at' => '2023-01-01T00:00:00.000000Z',
+        ], $result->toArray());
+    }
+
+    public function testIncrementOrCreateMethodCreatesNewRecord(): void
+    {
+        $model = new EloquentBuilderCreateOrFirstTestModel();
+        $this->mockConnectionForModel($model, 'SQLite', [123]);
+        $model->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
+        $model->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+
+        $model->getConnection()
+            ->expects('select')
+            ->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true)
+            ->andReturn([]);
+
+        $model->getConnection()->expects('insert')->with(
+            'insert into "table" ("attr", "count", "updated_at", "created_at") values (?, ?, ?, ?)',
+            ['foo', '1', '2023-01-01 00:00:00', '2023-01-01 00:00:00'],
+        )->andReturnTrue();
+
+        $result = $model->newQuery()->incrementOrCreate(['attr' => 'foo']);
+        $this->assertTrue($result->wasRecentlyCreated);
+        $this->assertEquals([
+            'id' => 123,
+            'attr' => 'foo',
+            'count' => 1,
+            'created_at' => '2023-01-01T00:00:00.000000Z',
+            'updated_at' => '2023-01-01T00:00:00.000000Z',
+        ], $result->toArray());
+    }
+
+    public function testIncrementOrCreateMethodIncrementParametersArePassed(): void
+    {
+        $model = new EloquentBuilderCreateOrFirstTestModel();
+        $this->mockConnectionForModel($model, 'SQLite');
+        $model->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
+        $model->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+
+        $model->getConnection()
+            ->expects('select')
+            ->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true)
+            ->andReturn([[
+                'id' => 123,
+                'attr' => 'foo',
+                'val' => 'bar',
+                'count' => 1,
+                'created_at' => '2023-01-01 00:00:00',
+                'updated_at' => '2023-01-01 00:00:00',
+            ]]);
+
+        $model->getConnection()
+            ->expects('raw')
+            ->with('"count" + 2')
+            ->andReturn('3');
+
+        $model->getConnection()
+            ->expects('update')
+            ->with(
+                'update "table" set "count" = ?, "val" = ?, "updated_at" = ? where "id" = ?',
+                ['3', 'baz', '2023-01-01 00:00:00', 123],
+            )
+            ->andReturn(1);
+
+        $result = $model->newQuery()->incrementOrCreate(['attr' => 'foo'], step: 2, extra: ['val' => 'baz']);
+        $this->assertFalse($result->wasRecentlyCreated);
+        $this->assertEquals([
+            'id' => 123,
+            'attr' => 'foo',
+            'count' => 3,
+            'val' => 'baz',
+            'created_at' => '2023-01-01T00:00:00.000000Z',
+            'updated_at' => '2023-01-01T00:00:00.000000Z',
+        ], $result->toArray());
+    }
+
+    public function testIncrementOrCreateMethodRetrievesRecordCreatedJustNow(): void
+    {
+        $model = new EloquentBuilderCreateOrFirstTestModel();
+        $this->mockConnectionForModel($model, 'SQLite');
+        $model->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
+        $model->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+
+        $model->getConnection()
+            ->expects('select')
+            ->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true)
+            ->andReturn([]);
+
+        $sql = 'insert into "table" ("attr", "count", "updated_at", "created_at") values (?, ?, ?, ?)';
+        $bindings = ['foo', '1', '2023-01-01 00:00:00', '2023-01-01 00:00:00'];
+
+        $model->getConnection()
+            ->expects('insert')
+            ->with($sql, $bindings)
+            ->andThrow(new UniqueConstraintViolationException('sqlite', $sql, $bindings, new Exception()));
+
+        $model->getConnection()
+            ->expects('select')
+            ->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], false)
+            ->andReturn([[
+                'id' => 123,
+                'attr' => 'foo',
+                'count' => 1,
+                'created_at' => '2023-01-01 00:00:00',
+                'updated_at' => '2023-01-01 00:00:00',
+            ]]);
+
+        $model->getConnection()
+            ->expects('raw')
+            ->with('"count" + 1')
+            ->andReturn('2');
+
+        $model->getConnection()
+            ->expects('update')
+            ->with(
+                'update "table" set "count" = ?, "updated_at" = ? where "id" = ?',
+                ['2', '2023-01-01 00:00:00', 123],
+            )
+            ->andReturn(1);
+
+        $result = $model->newQuery()->incrementOrCreate(['attr' => 'foo']);
+        $this->assertFalse($result->wasRecentlyCreated);
+        $this->assertEquals([
+            'id' => 123,
+            'attr' => 'foo',
+            'count' => 2,
+            'created_at' => '2023-01-01T00:00:00.000000Z',
+            'updated_at' => '2023-01-01T00:00:00.000000Z',
+        ], $result->toArray());
+    }
+
     protected function mockConnectionForModel(Model $model, string $database, array $lastInsertIds = []): void
     {
         $grammarClass = 'Illuminate\Database\Query\Grammars\\'.$database.'Grammar';
         $processorClass = 'Illuminate\Database\Query\Processors\\'.$database.'Processor';
-        $grammar = new $grammarClass;
         $processor = new $processorClass;
-        $connection = Mockery::mock(ConnectionInterface::class, ['getQueryGrammar' => $grammar, 'getPostProcessor' => $processor]);
+        $connection = Mockery::mock(Connection::class, ['getPostProcessor' => $processor]);
+        $grammar = new $grammarClass($connection);
+        $connection->shouldReceive('getQueryGrammar')->andReturn($grammar);
+        $connection->shouldReceive('getTablePrefix')->andReturn('');
         $connection->shouldReceive('query')->andReturnUsing(function () use ($connection, $grammar, $processor) {
             return new Builder($connection, $grammar, $processor);
         });

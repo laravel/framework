@@ -85,8 +85,6 @@ class ScheduleRunCommand extends Command
 
     /**
      * Create a new command instance.
-     *
-     * @return void
      */
     public function __construct()
     {
@@ -112,11 +110,13 @@ class ScheduleRunCommand extends Command
         $this->handler = $handler;
         $this->phpBinary = Application::phpBinary();
 
-        $this->clearInterruptSignal();
-
         $this->newLine();
 
         $events = $this->schedule->dueEvents($this->laravel);
+
+        if ($events->contains->isRepeatable()) {
+            $this->clearInterruptSignal();
+        }
 
         foreach ($events as $event) {
             if (! $event->filtersPass($this->laravel)) {

@@ -21,8 +21,8 @@
         "illuminate/contracts": "^12.0",
         "illuminate/filesystem": "^12.0",
         "illuminate/support": "^12.0",
-        "symfony/finder": "^7.0",
-        "symfony/http-foundation": "^7.0"
+        "symfony/finder": "^7.2.0",
+        "symfony/http-foundation": "^7.2.0"
     },
     "autoload": {
         "psr-4": {

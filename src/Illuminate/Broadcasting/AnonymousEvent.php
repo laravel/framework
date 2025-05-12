@@ -6,6 +6,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 
 class AnonymousEvent implements ShouldBroadcast
 {
@@ -38,8 +39,6 @@ class AnonymousEvent implements ShouldBroadcast
 
     /**
      * Create a new anonymous broadcastable event instance.
-     *
-     * @return void
      */
     public function __construct(protected Channel|array|string $channels)
     {
@@ -73,7 +72,7 @@ class AnonymousEvent implements ShouldBroadcast
     {
         $this->payload = $payload instanceof Arrayable
             ? $payload->toArray()
-            : collect($payload)->map(
+            : (new Collection($payload))->map(
                 fn ($p) => $p instanceof Arrayable ? $p->toArray() : $p
             )->all();
 

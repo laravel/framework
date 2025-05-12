@@ -10,6 +10,8 @@ use Illuminate\Support\Env;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Attribute\AsCommand;
 
+use function Laravel\Prompts\password;
+
 #[AsCommand(name: 'env:decrypt')]
 class EnvironmentDecryptCommand extends Command
 {
@@ -44,7 +46,6 @@ class EnvironmentDecryptCommand extends Command
      * Create a new command instance.
      *
      * @param  \Illuminate\Filesystem\Filesystem  $files
-     * @return void
      */
     public function __construct(Filesystem $files)
     {
@@ -62,6 +63,10 @@ class EnvironmentDecryptCommand extends Command
     {
         $key = $this->option('key') ?: Env::get('LARAVEL_ENV_ENCRYPTION_KEY');
 
+        if (! $key && $this->input->isInteractive()) {
+            $key = password('What is the decryption key?');
+        }
+
         if (! $key) {
             $this->fail('A decryption key is required.');
         }
@@ -71,8 +76,8 @@ class EnvironmentDecryptCommand extends Command
         $key = $this->parseKey($key);
 
         $encryptedFile = ($this->option('env')
-                    ? Str::finish(dirname($this->laravel->environmentFilePath()), DIRECTORY_SEPARATOR).'.env.'.$this->option('env')
-                    : $this->laravel->environmentFilePath()).'.encrypted';
+            ? Str::finish(dirname($this->laravel->environmentFilePath()), DIRECTORY_SEPARATOR).'.env.'.$this->option('env')
+            : $this->laravel->environmentFilePath()).'.encrypted';
 
         $outputFile = $this->outputFilePath();
 

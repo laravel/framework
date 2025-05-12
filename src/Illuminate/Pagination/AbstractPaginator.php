@@ -3,25 +3,31 @@
 namespace Illuminate\Pagination;
 
 use Closure;
+use Illuminate\Contracts\Support\CanBeEscapedWhenCastToString;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\Tappable;
+use Illuminate\Support\Traits\TransformsToResourceCollection;
 use Stringable;
 use Traversable;
 
 /**
- * @mixin \Illuminate\Support\Collection
+ * @template TKey of array-key
+ *
+ * @template-covariant TValue
+ *
+ * @mixin \Illuminate\Support\Collection<TKey, TValue>
  */
-abstract class AbstractPaginator implements Htmlable, Stringable
+abstract class AbstractPaginator implements CanBeEscapedWhenCastToString, Htmlable, Stringable
 {
-    use ForwardsCalls, Tappable;
+    use ForwardsCalls, Tappable, TransformsToResourceCollection;
 
     /**
      * All of the items being paginated.
      *
-     * @var \Illuminate\Support\Collection
+     * @var \Illuminate\Support\Collection<TKey, TValue>
      */
     protected $items;
 
@@ -66,6 +72,13 @@ abstract class AbstractPaginator implements Htmlable, Stringable
      * @var string
      */
     protected $pageName = 'page';
+
+    /**
+     * Indicates that the paginator's string representation should be escaped when __toString is invoked.
+     *
+     * @var bool
+     */
+    protected $escapeWhenCastingToString = false;
 
     /**
      * The number of links to display on each side of current page link.
@@ -155,9 +168,9 @@ abstract class AbstractPaginator implements Htmlable, Stringable
      */
     public function getUrlRange($start, $end)
     {
-        return collect(range($start, $end))->mapWithKeys(function ($page) {
-            return [$page => $this->url($page)];
-        })->all();
+        return Collection::range($start, $end)
+            ->mapWithKeys(fn ($page) => [$page => $this->url($page)])
+            ->all();
     }
 
     /**
@@ -310,7 +323,7 @@ abstract class AbstractPaginator implements Htmlable, Stringable
     /**
      * Get the slice of items being paginated.
      *
-     * @return array
+     * @return array<TKey, TValue>
      */
     public function items()
     {
@@ -649,7 +662,7 @@ abstract class AbstractPaginator implements Htmlable, Stringable
     /**
      * Get an iterator for the items.
      *
-     * @return \ArrayIterator
+     * @return \ArrayIterator<TKey, TValue>
      */
     public function getIterator(): Traversable
     {
@@ -689,7 +702,7 @@ abstract class AbstractPaginator implements Htmlable, Stringable
     /**
      * Get the paginator's underlying collection.
      *
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Support\Collection<TKey, TValue>
      */
     public function getCollection()
     {
@@ -699,7 +712,7 @@ abstract class AbstractPaginator implements Htmlable, Stringable
     /**
      * Set the paginator's underlying collection.
      *
-     * @param  \Illuminate\Support\Collection  $collection
+     * @param  \Illuminate\Support\Collection<TKey, TValue>  $collection
      * @return $this
      */
     public function setCollection(Collection $collection)
@@ -722,7 +735,7 @@ abstract class AbstractPaginator implements Htmlable, Stringable
     /**
      * Determine if the given item exists.
      *
-     * @param  mixed  $key
+     * @param  TKey  $key
      * @return bool
      */
     public function offsetExists($key): bool
@@ -733,8 +746,8 @@ abstract class AbstractPaginator implements Htmlable, Stringable
     /**
      * Get the item at the given offset.
      *
-     * @param  mixed  $key
-     * @return mixed
+     * @param  TKey  $key
+     * @return TValue|null
      */
     public function offsetGet($key): mixed
     {
@@ -744,8 +757,8 @@ abstract class AbstractPaginator implements Htmlable, Stringable
     /**
      * Set the item at the given offset.
      *
-     * @param  mixed  $key
-     * @param  mixed  $value
+     * @param  TKey|null  $key
+     * @param  TValue  $value
      * @return void
      */
     public function offsetSet($key, $value): void
@@ -756,7 +769,7 @@ abstract class AbstractPaginator implements Htmlable, Stringable
     /**
      * Unset the item at the given key.
      *
-     * @param  mixed  $key
+     * @param  TKey  $key
      * @return void
      */
     public function offsetUnset($key): void
@@ -793,6 +806,21 @@ abstract class AbstractPaginator implements Htmlable, Stringable
      */
     public function __toString()
     {
-        return (string) $this->render();
+        return $this->escapeWhenCastingToString
+            ? e((string) $this->render())
+            : (string) $this->render();
+    }
+
+    /**
+     * Indicate that the paginator's string representation should be escaped when __toString is invoked.
+     *
+     * @param  bool  $escape
+     * @return $this
+     */
+    public function escapeWhenCastingToString($escape = true)
+    {
+        $this->escapeWhenCastingToString = $escape;
+
+        return $this;
     }
 }

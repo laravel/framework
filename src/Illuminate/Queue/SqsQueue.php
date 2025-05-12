@@ -46,14 +46,14 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
      * @param  string  $prefix
      * @param  string  $suffix
      * @param  bool  $dispatchAfterCommit
-     * @return void
      */
-    public function __construct(SqsClient $sqs,
-                                $default,
-                                $prefix = '',
-                                $suffix = '',
-                                $dispatchAfterCommit = false)
-    {
+    public function __construct(
+        SqsClient $sqs,
+        $default,
+        $prefix = '',
+        $suffix = '',
+        $dispatchAfterCommit = false,
+    ) {
         $this->sqs = $sqs;
         $this->prefix = $prefix;
         $this->default = $default;
@@ -111,7 +111,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
     public function pushRaw($payload, $queue = null, array $options = [])
     {
         return $this->sqs->sendMessage([
-            'QueueUrl' => $this->getQueue($queue), 'MessageBody' => $payload,
+            'QueueUrl' => $this->getQueue($queue), 'MessageBody' => $payload, ...$options,
         ])->get('MessageId');
     }
 
@@ -128,7 +128,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
     {
         return $this->enqueueUsing(
             $job,
-            $this->createPayload($job, $queue ?: $this->default, $data),
+            $this->createPayload($job, $queue ?: $this->default, $data, $delay),
             $queue,
             $delay,
             function ($payload, $queue, $delay) {

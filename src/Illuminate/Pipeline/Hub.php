@@ -26,7 +26,6 @@ class Hub implements HubContract
      * Create a new Hub instance.
      *
      * @param  \Illuminate\Contracts\Container\Container|null  $container
-     * @return void
      */
     public function __construct(?Container $container = null)
     {
@@ -41,7 +40,7 @@ class Hub implements HubContract
      */
     public function defaults(Closure $callback)
     {
-        return $this->pipeline('default', $callback);
+        $this->pipeline('default', $callback);
     }
 
     /**

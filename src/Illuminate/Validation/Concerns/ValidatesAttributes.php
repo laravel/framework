@@ -18,6 +18,7 @@ use Exception;
 use Illuminate\Container\Container;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Exceptions\MathException;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Str;
@@ -297,6 +298,8 @@ trait ValidatesAttributes
     protected function checkDateTimeOrder($format, $first, $second, $operator)
     {
         $firstDate = $this->getDateTimeWithOptionalFormat($format, $first);
+
+        $format = $this->getDateFormat($second) ?: $format;
 
         if (! $secondDate = $this->getDateTimeWithOptionalFormat($format, $second)) {
             if (is_null($second = $this->getValue($second))) {
@@ -728,8 +731,8 @@ trait ValidatesAttributes
         }
 
         $dimensions = method_exists($value, 'dimensions')
-                ? $value->dimensions()
-                : @getimagesize($value->getRealPath());
+            ? $value->dimensions()
+            : @getimagesize($value->getRealPath());
 
         if (! $dimensions) {
             return false;
@@ -905,7 +908,7 @@ trait ValidatesAttributes
             return false;
         }
 
-        $validations = collect($parameters)
+        $validations = (new Collection($parameters))
             ->unique()
             ->map(fn ($validation) => match (true) {
                 $validation === 'strict' => new NoRFCWarningsValidation(),
@@ -977,8 +980,8 @@ trait ValidatesAttributes
         }
 
         return is_array($value)
-                ? $verifier->getMultiCount($table, $column, $value, $extra)
-                : $verifier->getCount($table, $column, $value, null, null, $extra);
+            ? $verifier->getMultiCount($table, $column, $value, $extra)
+            : $verifier->getCount($table, $column, $value, null, null, $extra);
     }
 
     /**
@@ -1116,7 +1119,8 @@ trait ValidatesAttributes
     public function getQueryColumn($parameters, $attribute)
     {
         return isset($parameters[1]) && $parameters[1] !== 'NULL'
-                    ? $parameters[1] : $this->guessColumnForQuery($attribute);
+            ? $parameters[1]
+            : $this->guessColumnForQuery($attribute);
     }
 
     /**
@@ -1386,11 +1390,18 @@ trait ValidatesAttributes
      *
      * @param  string  $attribute
      * @param  mixed  $value
+     * @param  array<int, string>  $parameters
      * @return bool
      */
-    public function validateImage($attribute, $value)
+    public function validateImage($attribute, $value, $parameters = [])
     {
-        return $this->validateMimes($attribute, $value, ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp']);
+        $mimes = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'];
+
+        if (is_array($parameters) && in_array('allow_svg', $parameters)) {
+            $mimes[] = 'svg';
+        }
+
+        return $this->validateMimes($attribute, $value, $mimes);
     }
 
     /**
@@ -1627,8 +1638,8 @@ trait ValidatesAttributes
         ];
 
         return ($value instanceof UploadedFile)
-           ? in_array(trim(strtolower($value->getClientOriginalExtension())), $phpExtensions)
-           : in_array(trim(strtolower($value->getExtension())), $phpExtensions);
+            ? in_array(trim(strtolower($value->getClientOriginalExtension())), $phpExtensions)
+            : in_array(trim(strtolower($value->getExtension())), $phpExtensions);
     }
 
     /**
@@ -2074,6 +2085,44 @@ trait ValidatesAttributes
 
         if (in_array($other, $values, is_bool($other) || is_null($other))) {
             return ! $this->validateRequired($attribute, $value);
+        }
+
+        return true;
+    }
+
+    /**
+     * Validate that an attribute does not exist when another attribute was "accepted".
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  mixed  $parameters
+     * @return bool
+     */
+    public function validateProhibitedIfAccepted($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(1, $parameters, 'prohibited_if_accepted');
+
+        if ($this->validateAccepted($parameters[0], $this->getValue($parameters[0]))) {
+            return $this->validateProhibited($attribute, $value);
+        }
+
+        return true;
+    }
+
+    /**
+     * Validate that an attribute does not exist when another attribute was "declined".
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  mixed  $parameters
+     * @return bool
+     */
+    public function validateProhibitedIfDeclined($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(1, $parameters, 'prohibited_if_declined');
+
+        if ($this->validateDeclined($parameters[0], $this->getValue($parameters[0]))) {
+            return $this->validateProhibited($attribute, $value);
         }
 
         return true;
@@ -2550,11 +2599,22 @@ trait ValidatesAttributes
      *
      * @param  string  $attribute
      * @param  mixed  $value
+     * @param  array<int, int<0, 8>|'max'>  $parameters
      * @return bool
      */
-    public function validateUuid($attribute, $value)
+    public function validateUuid($attribute, $value, $parameters)
     {
-        return Str::isUuid($value);
+        $version = null;
+
+        if ($parameters !== null && count($parameters) === 1) {
+            $version = $parameters[0];
+
+            if ($version !== 'max') {
+                $version = (int) $parameters[0];
+            }
+        }
+
+        return Str::isUuid($value, $version);
     }
 
     /**

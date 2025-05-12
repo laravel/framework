@@ -23,7 +23,9 @@ class MySqlConnector extends Connector implements ConnectorInterface
         // connection's behavior, and some might be specified by the developers.
         $connection = $this->createConnection($dsn, $config, $options);
 
-        if (! empty($config['database'])) {
+        if (! empty($config['database']) &&
+            (! isset($config['use_db_after_connecting']) ||
+             $config['use_db_after_connecting'])) {
             $connection->exec("use `{$config['database']}`;");
         }
 
@@ -43,8 +45,8 @@ class MySqlConnector extends Connector implements ConnectorInterface
     protected function getDsn(array $config)
     {
         return $this->hasSocket($config)
-                            ? $this->getSocketDsn($config)
-                            : $this->getHostDsn($config);
+            ? $this->getSocketDsn($config)
+            : $this->getHostDsn($config);
     }
 
     /**
@@ -78,8 +80,8 @@ class MySqlConnector extends Connector implements ConnectorInterface
     protected function getHostDsn(array $config)
     {
         return isset($config['port'])
-                    ? "mysql:host={$config['host']};port={$config['port']};dbname={$config['database']}"
-                    : "mysql:host={$config['host']};dbname={$config['database']}";
+            ? "mysql:host={$config['host']};port={$config['port']};dbname={$config['database']}"
+            : "mysql:host={$config['host']};dbname={$config['database']}";
     }
 
     /**

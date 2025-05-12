@@ -48,7 +48,6 @@ class AuthManager implements FactoryContract
      * Create a new Auth manager instance.
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
-     * @return void
      */
     public function __construct($app)
     {
@@ -122,13 +121,12 @@ class AuthManager implements FactoryContract
      */
     public function createSessionDriver($name, $config)
     {
-        $provider = $this->createUserProvider($config['provider'] ?? null);
-
         $guard = new SessionGuard(
             $name,
-            $provider,
+            $this->createUserProvider($config['provider'] ?? null),
             $this->app['session.store'],
             rehashOnLogin: $this->app['config']->get('hashing.rehash_on_login', true),
+            timeboxDuration: $this->app['config']->get('auth.timebox_duration', 200000),
         );
 
         // When using the remember me functionality of the authentication services we

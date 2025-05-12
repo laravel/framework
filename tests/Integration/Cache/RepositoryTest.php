@@ -2,9 +2,11 @@
 
 namespace Illuminate\Tests\Integration\Cache;
 
+use Illuminate\Cache\Events\KeyWritten;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Event;
 use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\TestCase;
 
@@ -101,7 +103,7 @@ class RepositoryTest extends TestCase
         $this->assertSame(3, $cache->get('foo'));
         $this->assertSame(946684832, $cache->get('illuminate:cache:flexible:created:foo'));
 
-        // Now we will execute the deferred callback but we will first aquire
+        // Now we will execute the deferred callback but we will first acquire
         // our own lock. This means that the value should not be refreshed by
         // deferred callback.
         /** @var Lock */
@@ -116,7 +118,7 @@ class RepositoryTest extends TestCase
         $this->assertTrue($lock->release());
 
         // Now we have cleared the lock we will, one last time, confirm that
-        // the deferred callack does refresh the value when the lock is not active.
+        // the deferred callback does refresh the value when the lock is not active.
         defer()->invoke();
         $this->assertCount(0, defer());
         $this->assertSame(4, $cache->get('foo'));
@@ -234,5 +236,22 @@ class RepositoryTest extends TestCase
         $this->assertFalse($cache->getFilesystem()->exists($cache->path('count')));
         $this->assertFalse($cache->getFilesystem()->exists($cache->path('illuminate:cache:flexible:created:count')));
         $this->assertTrue($cache->missing('illuminate:cache:flexible:created:count'));
+    }
+
+    public function testItRoundsDateTimeValuesToAccountForTimePassedDuringScriptExecution()
+    {
+        // do not freeze time as this test depends on time progressing duration execution.
+        $cache = Cache::driver('array');
+        $events = [];
+        Event::listen(function (KeyWritten $event) use (&$events) {
+            $events[] = $event;
+        });
+
+        $result = $cache->put('foo', 'bar', now()->addSecond());
+
+        $this->assertTrue($result);
+        $this->assertCount(1, $events);
+        $this->assertSame('foo', $events[0]->key);
+        $this->assertSame(1, $events[0]->seconds);
     }
 }

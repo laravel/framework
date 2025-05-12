@@ -32,7 +32,6 @@ class LockableFile
      *
      * @param  string  $path
      * @param  string  $mode
-     * @return void
      */
     public function __construct($path, $mode)
     {

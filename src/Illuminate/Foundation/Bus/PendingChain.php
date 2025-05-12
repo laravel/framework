@@ -8,6 +8,8 @@ use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Support\Traits\Conditionable;
 use Laravel\SerializableClosure\SerializableClosure;
 
+use function Illuminate\Support\enum_value;
+
 class PendingChain
 {
     use Conditionable;
@@ -59,7 +61,6 @@ class PendingChain
      *
      * @param  mixed  $job
      * @param  array  $chain
-     * @return void
      */
     public function __construct($job, $chain)
     {
@@ -70,12 +71,12 @@ class PendingChain
     /**
      * Set the desired connection for the job.
      *
-     * @param  string|null  $connection
+     * @param  \UnitEnum|string|null  $connection
      * @return $this
      */
     public function onConnection($connection)
     {
-        $this->connection = $connection;
+        $this->connection = enum_value($connection);
 
         return $this;
     }
@@ -83,12 +84,12 @@ class PendingChain
     /**
      * Set the desired queue for the job.
      *
-     * @param  string|null  $queue
+     * @param  \UnitEnum|string|null  $queue
      * @return $this
      */
     public function onQueue($queue)
     {
-        $this->queue = $queue;
+        $this->queue = enum_value($queue);
 
         return $this;
     }
@@ -115,8 +116,8 @@ class PendingChain
     public function catch($callback)
     {
         $this->catchCallbacks[] = $callback instanceof Closure
-                        ? new SerializableClosure($callback)
-                        : $callback;
+            ? new SerializableClosure($callback)
+            : $callback;
 
         return $this;
     }

@@ -91,6 +91,24 @@ class Number
     }
 
     /**
+     * Spell out the given number in the given locale in ordinal form.
+     *
+     * @param  int|float  $number
+     * @param  string|null  $locale
+     * @return string
+     */
+    public static function spellOrdinal(int|float $number, ?string $locale = null)
+    {
+        static::ensureIntlExtensionIsInstalled();
+
+        $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::SPELLOUT);
+
+        $formatter->setTextAttribute(NumberFormatter::DEFAULT_RULESET, '%spellout-ordinal');
+
+        return $formatter->format($number);
+    }
+
+    /**
      * Convert the given number to its percentage equivalent.
      *
      * @param  int|float  $number
@@ -120,13 +138,18 @@ class Number
      * @param  int|float  $number
      * @param  string  $in
      * @param  string|null  $locale
+     * @param  int|null  $precision
      * @return string|false
      */
-    public static function currency(int|float $number, string $in = '', ?string $locale = null)
+    public static function currency(int|float $number, string $in = '', ?string $locale = null, ?int $precision = null)
     {
         static::ensureIntlExtensionIsInstalled();
 
         $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::CURRENCY);
+
+        if (! is_null($precision)) {
+            $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, $precision);
+        }
 
         return $formatter->formatCurrency($number, ! empty($in) ? $in : static::$currency);
     }
@@ -137,14 +160,19 @@ class Number
      * @param  int|float  $bytes
      * @param  int  $precision
      * @param  int|null  $maxPrecision
+     * @param  bool  $useBinaryPrefix
      * @return string
      */
-    public static function fileSize(int|float $bytes, int $precision = 0, ?int $maxPrecision = null)
+    public static function fileSize(int|float $bytes, int $precision = 0, ?int $maxPrecision = null, bool $useBinaryPrefix = false)
     {
-        $units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+        $base = $useBinaryPrefix ? 1024 : 1000;
 
-        for ($i = 0; ($bytes / 1024) > 0.9 && ($i < count($units) - 1); $i++) {
-            $bytes /= 1024;
+        $units = $useBinaryPrefix
+            ? ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB', 'RiB', 'QiB']
+            : ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB', 'RB', 'QB'];
+
+        for ($i = 0; ($bytes / $base) > 0.9 && ($i < count($units) - 1); $i++) {
+            $bytes /= $base;
         }
 
         return sprintf('%s %s', static::format($bytes, $precision, $maxPrecision), $units[$i]);
@@ -170,7 +198,7 @@ class Number
      * @param  int  $precision
      * @param  int|null  $maxPrecision
      * @param  bool  $abbreviate
-     * @return bool|string
+     * @return false|string
      */
     public static function forHumans(int|float $number, int $precision = 0, ?int $maxPrecision = null, bool $abbreviate = false)
     {
@@ -301,11 +329,11 @@ class Number
      */
     public static function withCurrency(string $currency, callable $callback)
     {
-        $previousLCurrency = static::$currency;
+        $previousCurrency = static::$currency;
 
         static::useCurrency($currency);
 
-        return tap($callback(), fn () => static::useCurrency($previousLCurrency));
+        return tap($callback(), fn () => static::useCurrency($previousCurrency));
     }
 
     /**
@@ -328,6 +356,26 @@ class Number
     public static function useCurrency(string $currency)
     {
         static::$currency = $currency;
+    }
+
+    /**
+     * Get the default locale.
+     *
+     * @return string
+     */
+    public static function defaultLocale()
+    {
+        return static::$locale;
+    }
+
+    /**
+     * Get the default currency.
+     *
+     * @return string
+     */
+    public static function defaultCurrency()
+    {
+        return static::$currency;
     }
 
     /**

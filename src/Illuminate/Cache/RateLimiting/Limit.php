@@ -38,7 +38,6 @@ class Limit
      * @param  mixed  $key
      * @param  int  $maxAttempts
      * @param  int  $decaySeconds
-     * @return void
      */
     public function __construct($key = '', int $maxAttempts = 60, int $decaySeconds = 60)
     {
@@ -141,5 +140,17 @@ class Limit
         $this->responseCallback = $callback;
 
         return $this;
+    }
+
+    /**
+     * Get a potential fallback key for the limit.
+     *
+     * @return string
+     */
+    public function fallbackKey()
+    {
+        $prefix = $this->key ? "{$this->key}:" : '';
+
+        return "{$prefix}attempts:{$this->maxAttempts}:decay:{$this->decaySeconds}";
     }
 }

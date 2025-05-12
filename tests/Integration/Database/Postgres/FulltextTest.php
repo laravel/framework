@@ -44,7 +44,7 @@ class FulltextTest extends PostgresTestCase
 
     public function testWhereFulltext()
     {
-        $articles = DB::table('articles')->whereFulltext(['title', 'body'], 'database')->orderBy('id')->get();
+        $articles = DB::table('articles')->whereFullText(['title', 'body'], 'database')->orderBy('id')->get();
 
         $this->assertCount(2, $articles);
         $this->assertSame('PostgreSQL Tutorial', $articles[0]->title);
@@ -54,21 +54,21 @@ class FulltextTest extends PostgresTestCase
     #[RequiresDatabase('pgsql', '>=11.0')]
     public function testWhereFulltextWithWebsearch()
     {
-        $articles = DB::table('articles')->whereFulltext(['title', 'body'], '+PostgreSQL -YourSQL', ['mode' => 'websearch'])->get();
+        $articles = DB::table('articles')->whereFullText(['title', 'body'], '+PostgreSQL -YourSQL', ['mode' => 'websearch'])->get();
 
         $this->assertCount(5, $articles);
     }
 
     public function testWhereFulltextWithPlain()
     {
-        $articles = DB::table('articles')->whereFulltext(['title', 'body'], 'PostgreSQL tutorial', ['mode' => 'plain'])->get();
+        $articles = DB::table('articles')->whereFullText(['title', 'body'], 'PostgreSQL tutorial', ['mode' => 'plain'])->get();
 
         $this->assertCount(2, $articles);
     }
 
     public function testWhereFulltextWithPhrase()
     {
-        $articles = DB::table('articles')->whereFulltext(['title', 'body'], 'PostgreSQL tutorial', ['mode' => 'phrase'])->get();
+        $articles = DB::table('articles')->whereFullText(['title', 'body'], 'PostgreSQL tutorial', ['mode' => 'phrase'])->get();
 
         $this->assertCount(1, $articles);
     }

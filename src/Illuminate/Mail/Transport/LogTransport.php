@@ -23,7 +23,6 @@ class LogTransport implements Stringable, TransportInterface
      * Create a new log transport instance.
      *
      * @param  \Psr\Log\LoggerInterface  $logger
-     * @return void
      */
     public function __construct(LoggerInterface $logger)
     {

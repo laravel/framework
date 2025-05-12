@@ -76,7 +76,6 @@ abstract class ServiceProvider
      * Create a new service provider instance.
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
-     * @return void
      */
     public function __construct($app)
     {
@@ -236,17 +235,17 @@ abstract class ServiceProvider
     }
 
     /**
-     * Register a translation file namespace.
+     * Register a translation file namespace or path.
      *
      * @param  string  $path
-     * @param  string  $namespace
+     * @param  string|null  $namespace
      * @return void
      */
-    protected function loadTranslationsFrom($path, $namespace)
+    protected function loadTranslationsFrom($path, $namespace = null)
     {
-        $this->callAfterResolving('translator', function ($translator) use ($path, $namespace) {
-            $translator->addNamespace($namespace, $path);
-        });
+        $this->callAfterResolving('translator', fn ($translator) => is_null($namespace)
+            ? $translator->addPath($path)
+            : $translator->addNamespace($namespace, $path));
     }
 
     /**
@@ -388,7 +387,7 @@ abstract class ServiceProvider
             return $paths;
         }
 
-        return collect(static::$publishes)->reduce(function ($paths, $p) {
+        return (new Collection(static::$publishes))->reduce(function ($paths, $p) {
             return array_merge($paths, $p);
         }, []);
     }
@@ -563,7 +562,7 @@ abstract class ServiceProvider
             opcache_invalidate($path, true);
         }
 
-        $providers = collect(require $path)
+        $providers = (new Collection(require $path))
             ->merge([$provider])
             ->unique()
             ->sort()

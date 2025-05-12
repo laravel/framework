@@ -44,7 +44,6 @@ class DatabaseLock extends Lock
      * @param  int  $seconds
      * @param  string|null  $owner
      * @param  array  $lottery
-     * @return void
      */
     public function __construct(Connection $connection, $table, $name, $seconds, $owner = null, $lottery = [2, 100], $defaultTimeoutInSeconds = 86400)
     {
@@ -112,9 +111,9 @@ class DatabaseLock extends Lock
     {
         if ($this->isOwnedByCurrentProcess()) {
             $this->connection->table($this->table)
-                        ->where('key', $this->name)
-                        ->where('owner', $this->owner)
-                        ->delete();
+                ->where('key', $this->name)
+                ->where('owner', $this->owner)
+                ->delete();
 
             return true;
         }
@@ -130,8 +129,8 @@ class DatabaseLock extends Lock
     public function forceRelease()
     {
         $this->connection->table($this->table)
-                    ->where('key', $this->name)
-                    ->delete();
+            ->where('key', $this->name)
+            ->delete();
     }
 
     /**

@@ -60,7 +60,7 @@ class Connector
      * @param  array  $options
      * @return \PDO
      */
-    protected function createPdoConnection($dsn, $username, $password, $options)
+    protected function createPdoConnection($dsn, $username, #[\SensitiveParameter] $password, $options)
     {
         return version_compare(phpversion(), '8.4.0', '<')
             ? new PDO($dsn, $username, $password, $options)
@@ -79,7 +79,7 @@ class Connector
      *
      * @throws \Throwable
      */
-    protected function tryAgainIfCausedByLostConnection(Throwable $e, $dsn, $username, $password, $options)
+    protected function tryAgainIfCausedByLostConnection(Throwable $e, $dsn, $username, #[\SensitiveParameter] $password, $options)
     {
         if ($this->causedByLostConnection($e)) {
             return $this->createPdoConnection($dsn, $username, $password, $options);

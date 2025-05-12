@@ -10,47 +10,18 @@ class NotificationSent
     use Queueable, SerializesModels;
 
     /**
-     * The notifiable entity who received the notification.
-     *
-     * @var mixed
-     */
-    public $notifiable;
-
-    /**
-     * The notification instance.
-     *
-     * @var \Illuminate\Notifications\Notification
-     */
-    public $notification;
-
-    /**
-     * The channel name.
-     *
-     * @var string
-     */
-    public $channel;
-
-    /**
-     * The channel's response.
-     *
-     * @var mixed
-     */
-    public $response;
-
-    /**
      * Create a new event instance.
      *
-     * @param  mixed  $notifiable
-     * @param  \Illuminate\Notifications\Notification  $notification
-     * @param  string  $channel
-     * @param  mixed  $response
-     * @return void
+     * @param  mixed  $notifiable  The notifiable entity who received the notification.
+     * @param  \Illuminate\Notifications\Notification  $notification  The notification instance.
+     * @param  string  $channel  The channel name.
+     * @param  mixed  $response  The channel's response.
      */
-    public function __construct($notifiable, $notification, $channel, $response = null)
-    {
-        $this->channel = $channel;
-        $this->response = $response;
-        $this->notifiable = $notifiable;
-        $this->notification = $notification;
+    public function __construct(
+        public $notifiable,
+        public $notification,
+        public $channel,
+        public $response = null,
+    ) {
     }
 }

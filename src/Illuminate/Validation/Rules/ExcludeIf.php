@@ -19,7 +19,6 @@ class ExcludeIf implements Stringable
      * Create a new exclude validation rule based on a condition.
      *
      * @param  \Closure|bool  $condition
-     * @return void
      *
      * @throws \InvalidArgumentException
      */

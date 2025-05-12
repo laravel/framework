@@ -5,6 +5,7 @@ namespace Illuminate\Queue\Console;
 use Illuminate\Console\Command;
 use Illuminate\Queue\Listener;
 use Illuminate\Queue\ListenerOptions;
+use Illuminate\Support\Stringable;
 use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'queue:listen')]
@@ -46,7 +47,6 @@ class ListenCommand extends Command
      * Create a new queue listen command.
      *
      * @param  \Illuminate\Queue\Listener  $listener
-     * @return void
      */
     public function __construct(Listener $listener)
     {
@@ -69,7 +69,7 @@ class ListenCommand extends Command
             $connection = $this->input->getArgument('connection')
         );
 
-        $this->components->info(sprintf('Processing jobs from the [%s] %s.', $queue, str('queue')->plural(explode(',', $queue))));
+        $this->components->info(sprintf('Processing jobs from the [%s] %s.', $queue, (new Stringable('queue'))->plural(explode(',', $queue))));
 
         $this->listener->listen(
             $connection, $queue, $this->gatherOptions()
@@ -99,8 +99,8 @@ class ListenCommand extends Command
     protected function gatherOptions()
     {
         $backoff = $this->hasOption('backoff')
-                ? $this->option('backoff')
-                : $this->option('delay');
+            ? $this->option('backoff')
+            : $this->option('delay');
 
         return new ListenerOptions(
             name: $this->option('name'),

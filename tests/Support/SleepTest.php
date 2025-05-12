@@ -152,7 +152,7 @@ class SleepTest extends TestCase
         Sleep::fake();
 
         $sleep = Sleep::for(1)->second()
-                      ->and(500)->microseconds();
+            ->and(500)->microseconds();
 
         $this->assertSame((float) $sleep->duration->totalMicroseconds, 1000500.0);
     }

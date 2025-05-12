@@ -10,7 +10,6 @@ class DeferredCallback
      * Create a new deferred callback instance.
      *
      * @param  callable  $callback
-     * @return void
      */
     public function __construct(public $callback, public ?string $name = null, public bool $always = false)
     {

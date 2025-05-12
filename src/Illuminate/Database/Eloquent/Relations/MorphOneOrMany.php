@@ -25,7 +25,7 @@ abstract class MorphOneOrMany extends HasOneOrMany
     /**
      * The class name of the parent model.
      *
-     * @var string
+     * @var class-string<TRelatedModel>
      */
     protected $morphClass;
 
@@ -37,7 +37,6 @@ abstract class MorphOneOrMany extends HasOneOrMany
      * @param  string  $type
      * @param  string  $id
      * @param  string  $localKey
-     * @return void
      */
     public function __construct(Builder $query, Model $parent, $type, $id, $localKey)
     {
@@ -96,6 +95,14 @@ abstract class MorphOneOrMany extends HasOneOrMany
 
         $model->{$this->getMorphType()} = $this->morphClass;
 
+        foreach ($this->getQuery()->pendingAttributes as $key => $value) {
+            $attributes ??= $model->getAttributes();
+
+            if (! array_key_exists($key, $attributes)) {
+                $model->setAttribute($key, $value);
+            }
+        }
+
         $this->applyInverseRelationToModel($model);
     }
 
@@ -151,7 +158,7 @@ abstract class MorphOneOrMany extends HasOneOrMany
     /**
      * Get the class name of the parent model.
      *
-     * @return string
+     * @return class-string<TRelatedModel>
      */
     public function getMorphClass()
     {

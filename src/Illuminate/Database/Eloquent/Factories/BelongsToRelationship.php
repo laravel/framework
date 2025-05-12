@@ -33,7 +33,6 @@ class BelongsToRelationship
      *
      * @param  \Illuminate\Database\Eloquent\Factories\Factory|\Illuminate\Database\Eloquent\Model  $factory
      * @param  string  $relationship
-     * @return void
      */
     public function __construct($factory, $relationship)
     {

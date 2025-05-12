@@ -100,6 +100,24 @@ class QueueWorkerTest extends TestCase
         $this->events->shouldHaveReceived('dispatch')->with(m::type(JobProcessed::class))->once();
     }
 
+    public function testWorkerMemoryExceededWhenMemoryIsZero()
+    {
+        $worker = new Worker(...$this->workerDependencies());
+        $this->assertFalse($worker->memoryExceeded(0));
+    }
+
+    public function testWorkerMemoryExceededWhenMemoryGreaterThanZero()
+    {
+        $worker = new Worker(...$this->workerDependencies());
+        $this->assertTrue($worker->memoryExceeded(1));
+    }
+
+    public function testWorkerMemoryExceededWhenMemoryIsNegative()
+    {
+        $worker = new Worker(...$this->workerDependencies());
+        $this->assertFalse($worker->memoryExceeded(-1));
+    }
+
     public function testJobCanBeFiredBasedOnPriority()
     {
         $worker = $this->getWorker('default', [
@@ -643,6 +661,11 @@ class WorkerFakeJob implements QueueJobContract
     public function timeout()
     {
         return time() + 60;
+    }
+
+    public function resolveQueuedJobClass()
+    {
+        return 'WorkerFakeJob';
     }
 }
 

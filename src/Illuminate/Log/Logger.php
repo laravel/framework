@@ -41,7 +41,6 @@ class Logger implements LoggerInterface
      *
      * @param  \Psr\Log\LoggerInterface  $logger
      * @param  \Illuminate\Contracts\Events\Dispatcher|null  $dispatcher
-     * @return void
      */
     public function __construct(LoggerInterface $logger, ?Dispatcher $dispatcher = null)
     {
@@ -203,13 +202,18 @@ class Logger implements LoggerInterface
     }
 
     /**
-     * Flush the existing context array.
+     * Flush the log context on all currently resolved channels.
      *
+     * @param  string[]|null  $keys
      * @return $this
      */
-    public function withoutContext()
+    public function withoutContext(?array $keys = null)
     {
-        $this->context = [];
+        if (is_array($keys)) {
+            $this->context = array_diff_key($this->context, array_flip($keys));
+        } else {
+            $this->context = [];
+        }
 
         return $this;
     }

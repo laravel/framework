@@ -46,7 +46,6 @@ class Lottery
      *
      * @param  int|float  $chances
      * @param  int|null  $outOf
-     * @return void
      */
     public function __construct($chances, $outOf = null)
     {
@@ -211,7 +210,7 @@ class Lottery
      */
     public static function fix($sequence, $whenMissing = null)
     {
-        return static::forceResultWithSequence($sequence, $whenMissing);
+        static::forceResultWithSequence($sequence, $whenMissing);
     }
 
     /**
@@ -255,7 +254,7 @@ class Lottery
      */
     public static function determineResultsNormally()
     {
-        return static::determineResultNormally();
+        static::determineResultNormally();
     }
 
     /**

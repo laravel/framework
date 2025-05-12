@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Console\Migrations;
 
+use Illuminate\Console\Command;
 use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Console\Prohibitable;
 use Illuminate\Database\Migrations\Migrator;
@@ -38,7 +39,6 @@ class ResetCommand extends BaseCommand
      * Create a new migration rollback command instance.
      *
      * @param  \Illuminate\Database\Migrations\Migrator  $migrator
-     * @return void
      */
     public function __construct(Migrator $migrator)
     {
@@ -56,7 +56,7 @@ class ResetCommand extends BaseCommand
     {
         if ($this->isProhibited() ||
             ! $this->confirmToProceed()) {
-            return 1;
+            return Command::FAILURE;
         }
 
         return $this->migrator->usingConnection($this->option('database'), function () {
