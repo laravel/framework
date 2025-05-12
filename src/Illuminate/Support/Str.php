@@ -959,7 +959,7 @@ class Str
 
     /**
      * Repeat a string a given number of times, padding it on both sides.
-     * 
+     *
      * @param  string  $value
      * @param  int  $times
      * @param  string  $pad
@@ -972,7 +972,7 @@ class Str
 
     /**
      * Repeat a string a given number of times, padding it on the left side.
-     * 
+     *
      * @param  string  $value
      * @param  int  $times
      * @param  string  $pad
@@ -985,7 +985,7 @@ class Str
 
     /**
      * Repeat a string a given number of times, padding it on the right side.
-     * 
+     *
      * @param  string  $value
      * @param  int  $times
      * @param  string  $pad
