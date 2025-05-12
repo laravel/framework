@@ -183,26 +183,9 @@ class BroadcastingInstallCommand extends Command
         }
 
         match ($this->driver) {
-            'reverb' => $this->collectReverbConfig(),
             'pusher' => $this->collectPusherConfig(),
             'ably' => $this->collectAblyConfig(),
         };
-    }
-
-    /**
-     * Collect the Reverb configuration.
-     *
-     * @return void
-     */
-    protected function collectReverbConfig()
-    {
-        // $appKey = text('Reverb App Key', 'Enter your Reverb app key', default: 'my-app-key');
-        // $appSecret = text('Reverb Secret', 'Enter your Reverb secret', default: 'my-app-secret');
-
-        // $this->addToEnv([
-        //     'REVERB_APP_KEY' => $appKey,
-        //     'REVERB_APP_SECRET' => $appSecret,
-        // ]);
     }
 
     /**
@@ -331,12 +314,14 @@ class BroadcastingInstallCommand extends Command
     {
         if ($this->appUsesVue()) {
             $importPath = $this->frameworkPackages['vue'];
+
             $filePaths = [
                 $this->laravel->resourcePath('js/app.ts'),
                 $this->laravel->resourcePath('js/app.js'),
             ];
         } else {
             $importPath = $this->frameworkPackages['react'];
+
             $filePaths = [
                 $this->laravel->resourcePath('js/app.tsx'),
                 $this->laravel->resourcePath('js/app.jsx'),
@@ -348,7 +333,7 @@ class BroadcastingInstallCommand extends Command
         })[0] ?? null;
 
         if (! $filePath) {
-            $this->components->warn("Could not find {$filePaths[0]}. Echo configuration not added.");
+            $this->components->warn("Could not find file [{$filePaths[0]}]. Skipping automatic Echo configuration.");
 
             return;
         }
@@ -366,22 +351,25 @@ class BroadcastingInstallCommand extends Command
         preg_match_all('/^import .+;$/m', $contents, $matches);
 
         if (empty($matches[0])) {
-            // Add the Echo configuration to the top of the file if no import statements are found
+            // Add the Echo configuration to the top of the file if no import statements are found...
             $newContents = $echoCode.PHP_EOL.$contents;
+
             file_put_contents($filePath, $newContents);
         } else {
-            // Add Echo configuration after the last import
+            // Add Echo configuration after the last import...
             $lastImport = end($matches[0]);
-            $pos = strrpos($contents, $lastImport);
 
-            if ($pos !== false) {
-                $insertPos = $pos + strlen($lastImport);
-                $newContents = substr($contents, 0, $insertPos).PHP_EOL.$echoCode.substr($contents, $insertPos);
+            $positionOfLastImport = strrpos($contents, $lastImport);
+
+            if ($positionOfLastImport !== false) {
+                $insertPosition = $positionOfLastImport + strlen($lastImport);
+                $newContents = substr($contents, 0, $insertPosition).PHP_EOL.$echoCode.substr($contents, $insertPosition);
+
                 file_put_contents($filePath, $newContents);
             }
         }
 
-        $this->components->info('Echo configuration added to '.basename($filePath).'.');
+        $this->components->info('Echo configuration added to ['.basename($filePath).'].');
     }
 
     /**
