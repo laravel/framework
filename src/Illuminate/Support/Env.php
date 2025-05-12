@@ -196,6 +196,10 @@ class Env
 
         $lineToAdd = $shouldQuote ? $lineToAddVariations[0] : $lineToAddVariations[2];
 
+        if ($value === '') {
+            $lineToAdd = $key.'=';
+        }
+
         foreach ($envLines as $index => $line) {
             if (str_starts_with($line, $prefix)) {
                 $lastPrefixIndex = $index;
