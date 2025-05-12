@@ -991,7 +991,7 @@ class Str
      * @param  int  $times
      * @return string
      */
-    public static function suffixWith($value, $pad, $times)
+    public static function suffixWith($value, $pad, $times = 1)
     {
         return static::padRight($value, strlen($value) + $times, str_repeat($pad, $times));
     }
