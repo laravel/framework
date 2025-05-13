@@ -38,6 +38,21 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Maintenance Bypass Cookie Lifetime
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify the number of minutes the maintenance mode
+    | bypass cookie should remain valid. This cookie is issued when a
+    | user accesses the application using the secret bypass URL. Once
+    | set, it allows temporary access to the application while it is
+    | in maintenance mode. The default duration is 12 hours.
+    |
+    */
+
+    'maintenance_bypass_cookie_lifetime' => (int) env('SESSION_MAINTENANCE_BYPASS_COOKIE_LIFETIME', 7720),
+
+    /*
+    |--------------------------------------------------------------------------
     | Session Encryption
     |--------------------------------------------------------------------------
     |
@@ -129,7 +144,7 @@ return [
 
     'cookie' => env(
         'SESSION_COOKIE',
-        Str::slug(env('APP_NAME', 'laravel'), '_').'_session'
+        Str::slug(env('APP_NAME', 'laravel'), '_') . '_session'
     ),
 
     /*
