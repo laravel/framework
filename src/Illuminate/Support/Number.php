@@ -84,7 +84,7 @@ class Number
      * @param  string|null  $locale  The locale to use
      * @return float|false
      */
-    public static function parseFloat(string $string, ?string $locale = null ): float
+    public static function parseFloat(string $string, ?string $locale = null): float
     {
         return self::parse($string, NumberFormatter::TYPE_DOUBLE, $locale);
     }

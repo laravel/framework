@@ -363,7 +363,7 @@ class SupportNumberTest extends TestCase
         $this->assertSame(1234.5, Number::parse('1,234.5'));
         $this->assertSame(1234.56, Number::parse('1,234.56'));
         $this->assertSame(-1234.56, Number::parse('-1,234.56'));
-        
+
         $this->assertSame(1234.56, Number::parse('1.234,56', locale: 'de'));
         $this->assertSame(1234.56, Number::parse('1 234,56', locale: 'fr'));
     }
@@ -374,7 +374,7 @@ class SupportNumberTest extends TestCase
         $this->assertSame(1234, Number::parseInt('1,234'));
         $this->assertSame(1234, Number::parseInt('1,234.5'));
         $this->assertSame(-1234, Number::parseInt('-1,234.56'));
-        
+
         $this->assertSame(1234, Number::parseInt('1.234', locale: 'de'));
         $this->assertSame(1234, Number::parseInt('1 234', locale: 'fr'));
     }
@@ -386,7 +386,7 @@ class SupportNumberTest extends TestCase
         $this->assertSame(1234.5, Number::parseFloat('1,234.5'));
         $this->assertSame(1234.56, Number::parseFloat('1,234.56'));
         $this->assertSame(-1234.56, Number::parseFloat('-1,234.56'));
-        
+
         $this->assertSame(1234.56, Number::parseFloat('1.234,56', locale: 'de'));
         $this->assertSame(1234.56, Number::parseFloat('1 234,56', locale: 'fr'));
     }
