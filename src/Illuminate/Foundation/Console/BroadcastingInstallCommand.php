@@ -258,6 +258,8 @@ class BroadcastingInstallCommand extends Command
      */
     protected function collectAblyConfig()
     {
+        $this->components->warn('Make sure to check off "Pusher protocol support" in your Ably app settings.');
+
         $key = password('Ably Key', 'Enter your Ably key');
 
         $publicKey = explode(':', $key)[0] ?? $key;
@@ -267,8 +269,6 @@ class BroadcastingInstallCommand extends Command
             'ABLY_PUBLIC_KEY' => $publicKey,
             'VITE_ABLY_PUBLIC_KEY' => '${ABLY_PUBLIC_KEY}',
         ], $this->laravel->basePath('.env'));
-
-        $this->components->warn('Make sure to check off "Pusher protocol support" in your Ably app settings.');
     }
 
     /**
