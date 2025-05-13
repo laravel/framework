@@ -8,7 +8,7 @@ use Illuminate\Support\ServiceProvider;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputOption;
 
-#[AsCommand(name: 'optimize:clear', description: 'Remove the cached bootstrap files')]
+#[AsCommand(name: 'optimize:clear')]
 class OptimizeClearCommand extends Command
 {
     /**
