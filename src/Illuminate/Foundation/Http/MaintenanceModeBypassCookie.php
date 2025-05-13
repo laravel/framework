@@ -15,7 +15,7 @@ class MaintenanceModeBypassCookie
      */
     public static function create(string $key)
     {
-        $expiresAt = Carbon::now()->addHours(config('session.maintenance_bypass_cookie_lifetime'));
+        $expiresAt = Carbon::now()->addMinutes(config('session.maintenance_bypass_cookie_lifetime_minutes'));
 
         return new Cookie('laravel_maintenance', base64_encode(json_encode([
             'expires_at' => $expiresAt->getTimestamp(),

@@ -49,7 +49,7 @@ return [
     |
     */
 
-    'maintenance_bypass_cookie_lifetime' => (int) env('SESSION_MAINTENANCE_BYPASS_COOKIE_LIFETIME', 7720),
+    'maintenance_bypass_cookie_lifetime_minutes' => (int) env('SESSION_MAINTENANCE_BYPASS_COOKIE_LIFETIME_MINUTES', 720),
 
     /*
     |--------------------------------------------------------------------------
