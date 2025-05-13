@@ -1230,16 +1230,16 @@ class SupportHelpersTest extends TestCase
     {
         $filesystem = new Filesystem;
         $path = __DIR__.'/tmp/env-test-file';
-        $filesystem->put($path, <<<'ENV'
-        APP_NAME=Laravel
-        APP_ENV=local
-        APP_KEY=base64:randomkey
-        APP_DEBUG=true
-        APP_URL=http://localhost
-
-        DB_CONNECTION=mysql
-        DB_HOST=
-        ENV);
+        $filesystem->put($path, implode(PHP_EOL, [
+            'APP_NAME=Laravel',
+            'APP_ENV=local',
+            'APP_KEY=base64:randomkey',
+            'APP_DEBUG=true',
+            'APP_URL=http://localhost',
+            '',
+            'DB_CONNECTION=mysql',
+            'DB_HOST=',
+        ]));
 
         Env::writeVariables([
             'APP_VIBE' => 'chill',
@@ -1249,20 +1249,20 @@ class SupportHelpersTest extends TestCase
         ], $path);
 
         $this->assertSame(
-            <<<'ENV'
-        APP_NAME=Laravel
-        APP_ENV=local
-        APP_KEY=base64:randomkey
-        APP_DEBUG=true
-        APP_URL=http://localhost
-        APP_VIBE=chill
-
-        DB_CONNECTION=mysql
-        DB_HOST="127:0:0:1"
-        DB_PORT=3306
-
-        BRAND_NEW_PREFIX="fresh value"
-        ENV,
+            implode(PHP_EOL, [
+                'APP_NAME=Laravel',
+                'APP_ENV=local',
+                'APP_KEY=base64:randomkey',
+                'APP_DEBUG=true',
+                'APP_URL=http://localhost',
+                'APP_VIBE=chill',
+                '',
+                'DB_CONNECTION=mysql',
+                'DB_HOST="127:0:0:1"',
+                'DB_PORT=3306',
+                '',
+                'BRAND_NEW_PREFIX="fresh value"',
+            ]),
             $filesystem->get($path)
         );
     }
@@ -1271,16 +1271,16 @@ class SupportHelpersTest extends TestCase
     {
         $filesystem = new Filesystem;
         $path = __DIR__.'/tmp/env-test-file';
-        $filesystem->put($path, <<<'ENV'
-        APP_NAME=Laravel
-        APP_ENV=local
-        APP_KEY=base64:randomkey
-        APP_DEBUG=true
-        APP_URL=http://localhost
-
-        DB_CONNECTION=mysql
-        DB_HOST=
-        ENV);
+        $filesystem->put($path, implode(PHP_EOL, [
+            'APP_NAME=Laravel',
+            'APP_ENV=local',
+            'APP_KEY=base64:randomkey',
+            'APP_DEBUG=true',
+            'APP_URL=http://localhost',
+            '',
+            'DB_CONNECTION=mysql',
+            'DB_HOST=',
+        ]));
 
         Env::writeVariables([
             'APP_VIBE' => 'chill',
@@ -1289,17 +1289,17 @@ class SupportHelpersTest extends TestCase
         ], $path, true);
 
         $this->assertSame(
-            <<<'ENV'
-        APP_NAME=Laravel
-        APP_ENV=local
-        APP_KEY=base64:randomkey
-        APP_DEBUG=true
-        APP_URL=http://localhost
-        APP_VIBE=chill
-
-        DB_CONNECTION=sqlite
-        DB_HOST="127:0:0:1"
-        ENV,
+            implode(PHP_EOL, [
+                'APP_NAME=Laravel',
+                'APP_ENV=local',
+                'APP_KEY=base64:randomkey',
+                'APP_DEBUG=true',
+                'APP_URL=http://localhost',
+                'APP_VIBE=chill',
+                '',
+                'DB_CONNECTION=sqlite',
+                'DB_HOST="127:0:0:1"',
+            ]),
             $filesystem->get($path)
         );
     }
@@ -1308,17 +1308,17 @@ class SupportHelpersTest extends TestCase
     {
         $filesystem = new Filesystem;
         $path = __DIR__.'/tmp/env-test-file';
-        $filesystem->put($path, <<<'ENV'
-        APP_NAME=Laravel
-        APP_ENV=local
-        APP_KEY=base64:randomkey
-        APP_DEBUG=true
-        APP_URL=http://localhost
-        APP_VIBE=odd
-
-        DB_CONNECTION=mysql
-        DB_HOST=
-        ENV);
+        $filesystem->put($path, implode(PHP_EOL, [
+            'APP_NAME=Laravel',
+            'APP_ENV=local',
+            'APP_KEY=base64:randomkey',
+            'APP_DEBUG=true',
+            'APP_URL=http://localhost',
+            'APP_VIBE=odd',
+            '',
+            'DB_CONNECTION=mysql',
+            'DB_HOST=',
+        ]));
 
         Env::writeVariables([
             'APP_VIBE' => 'chill',
@@ -1326,17 +1326,17 @@ class SupportHelpersTest extends TestCase
         ], $path);
 
         $this->assertSame(
-            <<<'ENV'
-        APP_NAME=Laravel
-        APP_ENV=local
-        APP_KEY=base64:randomkey
-        APP_DEBUG=true
-        APP_URL=http://localhost
-        APP_VIBE=odd
-
-        DB_CONNECTION=mysql
-        DB_HOST="127:0:0:1"
-        ENV,
+            implode(PHP_EOL, [
+                'APP_NAME=Laravel',
+                'APP_ENV=local',
+                'APP_KEY=base64:randomkey',
+                'APP_DEBUG=true',
+                'APP_URL=http://localhost',
+                'APP_VIBE=odd',
+                '',
+                'DB_CONNECTION=mysql',
+                'DB_HOST="127:0:0:1"',
+            ]),
             $filesystem->get($path)
         );
     }
@@ -1345,31 +1345,31 @@ class SupportHelpersTest extends TestCase
     {
         $filesystem = new Filesystem;
         $path = __DIR__.'/tmp/env-test-file';
-        $filesystem->put($path, <<<'ENV'
-        APP_NAME=Laravel
-        APP_ENV=local
-        APP_KEY=base64:randomkey
-        APP_DEBUG=true
-        APP_URL=http://localhost
-
-        DB_CONNECTION=mysql
-        DB_HOST=
-        ENV);
+        $filesystem->put($path, implode(PHP_EOL, [
+            'APP_NAME=Laravel',
+            'APP_ENV=local',
+            'APP_KEY=base64:randomkey',
+            'APP_DEBUG=true',
+            'APP_URL=http://localhost',
+            '',
+            'DB_CONNECTION=mysql',
+            'DB_HOST=',
+        ]));
 
         Env::writeVariable('APP_VIBE', 'chill', $path);
 
         $this->assertSame(
-            <<<'ENV'
-        APP_NAME=Laravel
-        APP_ENV=local
-        APP_KEY=base64:randomkey
-        APP_DEBUG=true
-        APP_URL=http://localhost
-        APP_VIBE=chill
-
-        DB_CONNECTION=mysql
-        DB_HOST=
-        ENV,
+            implode(PHP_EOL, [
+                'APP_NAME=Laravel',
+                'APP_ENV=local',
+                'APP_KEY=base64:randomkey',
+                'APP_DEBUG=true',
+                'APP_URL=http://localhost',
+                'APP_VIBE=chill',
+                '',
+                'DB_CONNECTION=mysql',
+                'DB_HOST=',
+            ]),
             $filesystem->get($path)
         );
     }
@@ -1378,32 +1378,32 @@ class SupportHelpersTest extends TestCase
     {
         $filesystem = new Filesystem;
         $path = __DIR__.'/tmp/env-test-file';
-        $filesystem->put($path, <<<'ENV'
-        APP_NAME=Laravel
-        APP_ENV=local
-        APP_KEY=base64:randomkey
-        APP_DEBUG=true
-        APP_URL=http://localhost
-        APP_VIBE=odd
-
-        DB_CONNECTION=mysql
-        DB_HOST=
-        ENV);
+        $filesystem->put($path, implode(PHP_EOL, [
+            'APP_NAME=Laravel',
+            'APP_ENV=local',
+            'APP_KEY=base64:randomkey',
+            'APP_DEBUG=true',
+            'APP_URL=http://localhost',
+            'APP_VIBE=odd',
+            '',
+            'DB_CONNECTION=mysql',
+            'DB_HOST=',
+        ]));
 
         Env::writeVariable('APP_VIBE', 'chill', $path);
 
         $this->assertSame(
-            <<<'ENV'
-        APP_NAME=Laravel
-        APP_ENV=local
-        APP_KEY=base64:randomkey
-        APP_DEBUG=true
-        APP_URL=http://localhost
-        APP_VIBE=odd
-
-        DB_CONNECTION=mysql
-        DB_HOST=
-        ENV,
+            implode(PHP_EOL, [
+                'APP_NAME=Laravel',
+                'APP_ENV=local',
+                'APP_KEY=base64:randomkey',
+                'APP_DEBUG=true',
+                'APP_URL=http://localhost',
+                'APP_VIBE=odd',
+                '',
+                'DB_CONNECTION=mysql',
+                'DB_HOST=',
+            ]),
             $filesystem->get($path)
         );
     }
@@ -1412,32 +1412,32 @@ class SupportHelpersTest extends TestCase
     {
         $filesystem = new Filesystem;
         $path = __DIR__.'/tmp/env-test-file';
-        $filesystem->put($path, <<<'ENV'
-        APP_NAME=Laravel
-        APP_ENV=local
-        APP_KEY=base64:randomkey
-        APP_DEBUG=true
-        APP_URL=http://localhost
-        APP_VIBE=odd
-
-        DB_CONNECTION=mysql
-        DB_HOST=
-        ENV);
+        $filesystem->put($path, implode(PHP_EOL, [
+            'APP_NAME=Laravel',
+            'APP_ENV=local',
+            'APP_KEY=base64:randomkey',
+            'APP_DEBUG=true',
+            'APP_URL=http://localhost',
+            'APP_VIBE=odd',
+            '',
+            'DB_CONNECTION=mysql',
+            'DB_HOST=',
+        ]));
 
         Env::writeVariable('APP_VIBE', 'chill', $path, true);
 
         $this->assertSame(
-            <<<'ENV'
-        APP_NAME=Laravel
-        APP_ENV=local
-        APP_KEY=base64:randomkey
-        APP_DEBUG=true
-        APP_URL=http://localhost
-        APP_VIBE=chill
-
-        DB_CONNECTION=mysql
-        DB_HOST=
-        ENV,
+            implode(PHP_EOL, [
+                'APP_NAME=Laravel',
+                'APP_ENV=local',
+                'APP_KEY=base64:randomkey',
+                'APP_DEBUG=true',
+                'APP_URL=http://localhost',
+                'APP_VIBE=chill',
+                '',
+                'DB_CONNECTION=mysql',
+                'DB_HOST=',
+            ]),
             $filesystem->get($path)
         );
     }
