@@ -58,7 +58,7 @@ class ThrottlesExceptionsWithRedis extends ThrottlesExceptions
                 report($throwable);
             }
 
-            if ($this->shouldSkip($throwable)) {
+            if ($this->shouldDelete($throwable)) {
                 return $job->delete();
             }
 

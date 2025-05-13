@@ -58,11 +58,11 @@ class ThrottlesExceptions
     protected $whenCallback;
 
     /**
-     * The callbacks that determine if the job should be skipped / deleted.
+     * The callbacks that determine if the job should be deleted.
      *
      * @var callable[]
      */
-    protected array $skipWhenCallbacks = [];
+    protected array $deleteWhenCallbacks = [];
 
     /**
      * The prefix of the rate limiter key.
@@ -118,7 +118,7 @@ class ThrottlesExceptions
                 report($throwable);
             }
 
-            if ($this->shouldSkip($throwable)) {
+            if ($this->shouldDelete($throwable)) {
                 return $job->delete();
             }
 
@@ -142,31 +142,29 @@ class ThrottlesExceptions
     }
 
     /**
-     * Add a callback that should determine if the job should be skipped / deleted.
+     * Add a callback that should determine if the job should be deleted.
      *
      * @param  callable|string  $callback
      * @return $this
      */
-    public function skipWhen(callable|string $callback)
+    public function deleteWhen(callable|string $callback)
     {
-        if (is_string($callback)) {
-            $this->skipWhenCallbacks[] = fn (Throwable $e) => $e instanceof $callback;
-        } else {
-            $this->skipWhenCallbacks[] = $callback;
-        }
+        $this->deleteWhenCallbacks[] = is_string($callback)
+            ? fn (Throwable $e) => $e instanceof $callback
+            : $callback;
 
         return $this;
     }
 
     /**
-     * Run the skip / delete callbacks to see if the job should be deleted for the given exception.
+     * Run the skip / delete callbacks to determine if the job should be deleted for the given exception.
      *
      * @param  Throwable  $throwable
      * @return bool
      */
-    protected function shouldSkip(Throwable $throwable): bool
+    protected function shouldDelete(Throwable $throwable): bool
     {
-        foreach ($this->skipWhenCallbacks as $callback) {
+        foreach ($this->deleteWhenCallbacks as $callback) {
             if (call_user_func($callback, $throwable)) {
                 return true;
             }

@@ -355,7 +355,7 @@ class CircuitBreakerSkipJob
 
     public function middleware()
     {
-        return [(new ThrottlesExceptions(2, 10 * 60))->skipWhen(Exception::class)];
+        return [(new ThrottlesExceptions(2, 10 * 60))->deleteWhen(Exception::class)];
     }
 }
 
