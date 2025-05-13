@@ -40,9 +40,9 @@ class ThrottlesExceptionsTest extends TestCase
         $this->assertJobWasReleasedWithDelay(CircuitBreakerTestJob::class);
     }
 
-    public function testJobIsDeleted()
+    public function testCircuitCanSkipJob()
     {
-        $this->assertJobWasDeleted(CircuitBreakerTestDeleteWhenJob::class);
+        $this->assertJobWasDeleted(CircuitBreakerSkipJob::class);
     }
 
     protected function assertJobWasReleasedImmediately($class)
@@ -340,7 +340,7 @@ class CircuitBreakerTestJob
     }
 }
 
-class CircuitBreakerTestDeleteWhenJob
+class CircuitBreakerSkipJob
 {
     use InteractsWithQueue, Queueable;
 
@@ -355,7 +355,7 @@ class CircuitBreakerTestDeleteWhenJob
 
     public function middleware()
     {
-        return [(new ThrottlesExceptions(2, 10 * 60))->deleteWhen(Exception::class)];
+        return [(new ThrottlesExceptions(2, 10 * 60))->skipWhen(Exception::class)];
     }
 }
 
