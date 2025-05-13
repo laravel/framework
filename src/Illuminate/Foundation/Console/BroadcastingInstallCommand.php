@@ -95,7 +95,13 @@ class BroadcastingInstallCommand extends Command
                     mkdir($directory, 0755, true);
                 }
 
-                copy(__DIR__.'/stubs/echo-js.stub', $echoScriptPath);
+                $stubPath = __DIR__.'/stubs/echo-js-'.$this->driver.'.stub';
+
+                if (! file_exists($stubPath)) {
+                    $stubPath = __DIR__.'/stubs/echo-js-reverb.stub';
+                }
+
+                copy($stubPath, $echoScriptPath);
             }
 
             // Only add the bootstrap import for the standard JS implementation...
