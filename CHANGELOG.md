@@ -1,6 +1,53 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.12.0...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.14.0...12.x)
+
+## [v12.14.0](https://github.com/laravel/framework/compare/v12.13.0...v12.14.0) - 2025-05-13
+
+* [12.x] Support `useCurrent` on date and year column types by [@nicholasbrantley](https://github.com/nicholasbrantley) in https://github.com/laravel/framework/pull/55619
+* [12.x] Update "Number::fileSize" to use correct prefix and add prefix param by [@Boy132](https://github.com/Boy132) in https://github.com/laravel/framework/pull/55678
+* [12.x] Update PHPDoc for whereRaw to allow Expression as $sql by [@mitoop](https://github.com/mitoop) in https://github.com/laravel/framework/pull/55674
+* Revert "[12.x] Make Blueprint Resolver Statically" by [@taylorotwell](https://github.com/taylorotwell) in https://github.com/laravel/framework/pull/55690
+* [12.x] Support Virtual Properties When Serializing Models by [@beschoenen](https://github.com/beschoenen) in https://github.com/laravel/framework/pull/55691
+* [12.X] Fix `Http::preventStrayRequests` error propagation when using `Http::pool` by [@LeTamanoir](https://github.com/LeTamanoir) in https://github.com/laravel/framework/pull/55689
+* [12.x] incorrect use of generics in Schema\Builder by [@taka-oyama](https://github.com/taka-oyama) in https://github.com/laravel/framework/pull/55687
+* [12.x] Add option to disable MySQL ssl when restoring or squashing migrations by [@andersonls](https://github.com/andersonls) in https://github.com/laravel/framework/pull/55683
+* [12.x] Add `except` and `exceptHidden` methods to `Context` class by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/55692
+* [12.x] Container `currentlyResolving` utility by [@jrseliga](https://github.com/jrseliga) in https://github.com/laravel/framework/pull/55684
+* [12.x] Container `currentlyResolving` test by [@jrseliga](https://github.com/jrseliga) in https://github.com/laravel/framework/pull/55694
+* [12.x] Fix handling of default values for route parameters with a binding field by [@stancl](https://github.com/stancl) in https://github.com/laravel/framework/pull/55697
+* Move Timebox for Authentication and add to password resets by [@valorin](https://github.com/valorin) in https://github.com/laravel/framework/pull/55701
+* [12.x] perf: Optimize BladeCompiler by [@rzv-me](https://github.com/rzv-me) in https://github.com/laravel/framework/pull/55703
+* [12.x] perf: support iterables for event discovery paths by [@calebdw](https://github.com/calebdw) in https://github.com/laravel/framework/pull/55699
+* [12.x] Types: AuthorizesRequests::resourceAbilityMap by [@liamduckett](https://github.com/liamduckett) in https://github.com/laravel/framework/pull/55706
+* [12.x] Add flexible support to memoized cache store by [@timacdonald](https://github.com/timacdonald) in https://github.com/laravel/framework/pull/55709
+* [12.x] Introduce Arr::from() by [@daniser](https://github.com/daniser) in https://github.com/laravel/framework/pull/55715
+* [12.x] Fix the `getCurrentlyAttachedPivots` wrong `morphClass` for morph to many relationships by [@amir9480](https://github.com/amir9480) in https://github.com/laravel/framework/pull/55721
+* [12.x] Improve typehints for Http classes by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/54783
+* Add deleteWhen for throttle exceptions job middleware by [@moshe-autoleadstar](https://github.com/moshe-autoleadstar) in https://github.com/laravel/framework/pull/55718
+
+## [v12.13.0](https://github.com/laravel/framework/compare/v12.12.0...v12.13.0) - 2025-05-07
+
+* [12.x] fix no arguments return type in request class by [@olivernybroe](https://github.com/olivernybroe) in https://github.com/laravel/framework/pull/55631
+* [12.x] Add support for callback evaluation in containsOneItem method by [@fernandokbs](https://github.com/fernandokbs) in https://github.com/laravel/framework/pull/55622
+* [12.x] add generics to aggregate related methods and properties by [@taka-oyama](https://github.com/taka-oyama) in https://github.com/laravel/framework/pull/55628
+* [12.x] Fix typo in PHPDoc by [@AhmedAlaa4611](https://github.com/AhmedAlaa4611) in https://github.com/laravel/framework/pull/55636
+* [12.x] Allow naming queued closures by [@willrowe](https://github.com/willrowe) in https://github.com/laravel/framework/pull/55634
+* [12.x] Add `assertRedirectBack` assertion method by [@ryangjchandler](https://github.com/ryangjchandler) in https://github.com/laravel/framework/pull/55635
+* [12.x] Typehints for bindings by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/55633
+* [12.x] add PHP Doc types to arrays for methods in Database\Grammar by [@taka-oyama](https://github.com/taka-oyama) in https://github.com/laravel/framework/pull/55629
+* fix trim null arg deprecation by [@apreiml](https://github.com/apreiml) in https://github.com/laravel/framework/pull/55649
+* [12.x] Support predis/predis 3.x by [@gabrielrbarbosa](https://github.com/gabrielrbarbosa) in https://github.com/laravel/framework/pull/55641
+* Bump vite from 5.4.18 to 5.4.19 in /src/Illuminate/Foundation/resources/exceptions/renderer by [@dependabot](https://github.com/dependabot) in https://github.com/laravel/framework/pull/55655
+* [12.x] Fix predis versions by [@GrahamCampbell](https://github.com/GrahamCampbell) in https://github.com/laravel/framework/pull/55654
+* [12.x] Bump minimum league/commonmark by [@szepeviktor](https://github.com/szepeviktor) in https://github.com/laravel/framework/pull/55659
+* [12.x] Fix typo in MemoizedStoreTest by [@szepeviktor](https://github.com/szepeviktor) in https://github.com/laravel/framework/pull/55662
+* [12.x] Queue event listeners with enum values by [@wgriffioen](https://github.com/wgriffioen) in https://github.com/laravel/framework/pull/55656
+* [12.x] Implement releaseAfter method in RateLimited middleware by [@adamjgriffith](https://github.com/adamjgriffith) in https://github.com/laravel/framework/pull/55671
+* [12.x] Improve Cache Tests by [@nuernbergerA](https://github.com/nuernbergerA) in https://github.com/laravel/framework/pull/55670
+* [12.x] Only pass model IDs to Eloquent `whereAttachedTo` method by [@ashleyshenton](https://github.com/ashleyshenton) in https://github.com/laravel/framework/pull/55666
+* feat(bus): allow adding multiple jobs to chain by [@dallyger](https://github.com/dallyger) in https://github.com/laravel/framework/pull/55668
+* [12.x] add generics to QueryBuilder’s column related methods by [@taka-oyama](https://github.com/taka-oyama) in https://github.com/laravel/framework/pull/55663
 
 ## [v12.12.0](https://github.com/laravel/framework/compare/v12.11.1...v12.12.0) - 2025-05-01
 

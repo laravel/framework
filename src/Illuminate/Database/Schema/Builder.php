@@ -9,9 +9,6 @@ use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use LogicException;
 
-/**
- * @template TResolver of \Closure(string, \Closure, string): \Illuminate\Database\Schema\Blueprint
- */
 class Builder
 {
     use Macroable;
@@ -33,9 +30,9 @@ class Builder
     /**
      * The Blueprint resolver callback.
      *
-     * @var TResolver|null
+     * @var \Closure(string, \Closure, string): \Illuminate\Database\Schema\Blueprint|null
      */
-    protected static $resolver = null;
+    protected $resolver;
 
     /**
      * The default string length for migrations.
@@ -632,8 +629,8 @@ class Builder
     {
         $connection = $this->connection;
 
-        if (static::$resolver !== null) {
-            return call_user_func(static::$resolver, $connection, $table, $callback);
+        if (isset($this->resolver)) {
+            return call_user_func($this->resolver, $connection, $table, $callback);
         }
 
         return Container::getInstance()->make(Blueprint::class, compact('connection', 'table', 'callback'));
@@ -701,11 +698,11 @@ class Builder
     /**
      * Set the Schema Blueprint resolver callback.
      *
-     * @param  TResolver|null  $resolver
+     * @param  \Closure(string, \Closure, string): \Illuminate\Database\Schema\Blueprint|null  $resolver
      * @return void
      */
-    public function blueprintResolver(?Closure $resolver)
+    public function blueprintResolver(Closure $resolver)
     {
-        static::$resolver = $resolver;
+        $this->resolver = $resolver;
     }
 }

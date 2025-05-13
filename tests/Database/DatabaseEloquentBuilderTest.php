@@ -1282,6 +1282,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         $related = new EloquentBuilderTestModelFarRelatedStub;
         $related->id = 49;
+        $related->name = 'test';
 
         $builder = EloquentBuilderTestModelParentStub::whereAttachedTo($related, 'roles');
 
@@ -1292,9 +1293,11 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         $model1 = new EloquentBuilderTestModelParentStub;
         $model1->id = 3;
+        $model1->name = 'test3';
 
         $model2 = new EloquentBuilderTestModelParentStub;
         $model2->id = 4;
+        $model2->name = 'test4';
 
         $builder = EloquentBuilderTestModelFarRelatedStub::whereAttachedTo(new Collection([$model1, $model2]), 'roles');
 
