@@ -264,7 +264,7 @@ class BroadcastingInstallCommand extends Command
      */
     protected function collectAblyConfig()
     {
-        $this->components->warn('Make sure to check off "Pusher protocol support" in your Ably app settings.');
+        $this->components->warn('Make sure to enable "Pusher protocol support" in your Ably app settings.');
 
         $key = password('Ably Key', 'Enter your Ably key');
 
