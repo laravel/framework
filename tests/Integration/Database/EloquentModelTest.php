@@ -7,7 +7,6 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
-use Illuminate\Testing\Assert;
 
 class EloquentModelTest extends DatabaseTestCase
 {
@@ -42,8 +41,8 @@ class EloquentModelTest extends DatabaseTestCase
 
     public function testAttributeChanges()
     {
-        $user = TestModel2::create($originalAttributes = [
-            'name' => Str::random(), 'title' => Str::random(),
+        $user = TestModel2::create([
+            'name' => $originalName = Str::random(), 'title' => Str::random(),
         ]);
 
         $this->assertEmpty($user->getDirty());
@@ -64,7 +63,7 @@ class EloquentModelTest extends DatabaseTestCase
 
         $this->assertEmpty($user->getDirty());
         $this->assertEquals(['name' => $overrideName], $user->getChanges());
-        Assert::assertArraySubset($originalAttributes, $user->getPrevious());
+        $this->assertEquals(['name' => $originalName], $user->getPrevious());
         $this->assertTrue($user->wasChanged());
         $this->assertTrue($user->wasChanged('name'));
     }

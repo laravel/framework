@@ -2088,11 +2088,8 @@ trait HasAttributes
      */
     public function syncChanges()
     {
-        if ($this->isDirty()) {
-            $this->previous = $this->getRawOriginal();
-        }
-
         $this->changes = $this->getDirty();
+        $this->previous = array_intersect_key($this->getRawOriginal(), $this->changes);
 
         return $this;
     }

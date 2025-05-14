@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
-use Illuminate\Testing\Assert;
 
 class EloquentUpdateTest extends DatabaseTestCase
 {
@@ -149,7 +148,8 @@ class EloquentUpdateTest extends DatabaseTestCase
 
         $this->assertSame('Dr.', $model->title);
         $this->assertSame('Dr.', $model->getOriginal('title'));
-        Assert::assertArraySubset(['name' => $model->name, 'title' => 'Ms.'], $model->getPrevious());
+        $this->assertSame(['title' => 'Dr.'], $model->getChanges());
+        $this->assertSame(['title' => 'Ms.'], $model->getPrevious());
     }
 
     public function testSaveSyncsPrevious()
@@ -164,7 +164,8 @@ class EloquentUpdateTest extends DatabaseTestCase
 
         $this->assertSame('Dr.', $model->title);
         $this->assertSame('Dr.', $model->getOriginal('title'));
-        Assert::assertArraySubset(['name' => $model->name, 'title' => 'Ms.'], $model->getPrevious());
+        $this->assertSame(['title' => 'Dr.'], $model->getChanges());
+        $this->assertSame(['title' => 'Ms.'], $model->getPrevious());
     }
 
     public function testIncrementSyncsPrevious()
@@ -176,7 +177,8 @@ class EloquentUpdateTest extends DatabaseTestCase
         $model->increment('counter');
 
         $this->assertEquals(1, $model->counter);
-        Assert::assertArraySubset(['counter' => 0], $model->getPrevious());
+        $this->assertSame(['counter' => 1], $model->getChanges());
+        $this->assertSame(['counter' => 0], $model->getPrevious());
     }
 }
 
