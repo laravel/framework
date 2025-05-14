@@ -318,10 +318,10 @@ trait InteractsWithData
     public function enum($key, $enumClass, $default = null)
     {
         if ($this->isNotFilled($key) || ! $this->isBackedEnum($enumClass)) {
-            return $default;
+            return value($default);
         }
 
-        return $enumClass::tryFrom($this->data($key)) ?: $default;
+        return $enumClass::tryFrom($this->data($key)) ?: value($default);
     }
 
     /**
