@@ -54,6 +54,16 @@ class EloquentModelRefreshTest extends DatabaseTestCase
         $this->assertSame('patrick', $post->getOriginal('title'));
     }
 
+    public function testItDoesNotSyncPreviousOnRefresh()
+    {
+        $post = Post::create(['title' => 'pat']);
+
+        Post::find($post->id)->update(['title' => 'patrick']);
+
+        $this->assertEmpty($post->getDirty());
+        $this->assertEmpty($post->getPrevious());
+    }
+
     public function testAsPivot()
     {
         Schema::create('post_posts', function (Blueprint $table) {

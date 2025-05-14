@@ -62,6 +62,13 @@ trait HasAttributes
     protected $original = [];
 
     /**
+     * The previous model attributes after synchronizing original state.
+     *
+     * @var array
+     */
+    protected $previous = [];
+
+    /**
      * The changed model attributes.
      *
      * @var array
@@ -2081,6 +2088,10 @@ trait HasAttributes
      */
     public function syncChanges()
     {
+        if ($this->isDirty()) {
+            $this->previous = $this->getRawOriginal();
+        }
+
         $this->changes = $this->getDirty();
 
         return $this;
@@ -2117,7 +2128,7 @@ trait HasAttributes
      */
     public function discardChanges()
     {
-        [$this->attributes, $this->changes] = [$this->original, []];
+        [$this->attributes, $this->changes, $this->previous] = [$this->original, [], []];
 
         return $this;
     }
@@ -2199,6 +2210,16 @@ trait HasAttributes
     public function getChanges()
     {
         return $this->changes;
+    }
+
+    /**
+     * Get the attributes that were previously original when the model was last saved.
+     *
+     * @return array
+     */
+    public function getPrevious()
+    {
+        return $this->previous;
     }
 
     /**

@@ -7,6 +7,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use Illuminate\Testing\Assert;
 
 class EloquentModelTest extends DatabaseTestCase
 {
@@ -41,26 +42,29 @@ class EloquentModelTest extends DatabaseTestCase
 
     public function testAttributeChanges()
     {
-        $user = TestModel2::create([
+        $user = TestModel2::create($originalAttributes = [
             'name' => Str::random(), 'title' => Str::random(),
         ]);
 
         $this->assertEmpty($user->getDirty());
         $this->assertEmpty($user->getChanges());
+        $this->assertEmpty($user->getPrevious());
         $this->assertFalse($user->isDirty());
         $this->assertFalse($user->wasChanged());
 
-        $user->name = $name = Str::random();
+        $user->name = $overrideName = Str::random();
 
-        $this->assertEquals(['name' => $name], $user->getDirty());
+        $this->assertEquals(['name' => $overrideName], $user->getDirty());
         $this->assertEmpty($user->getChanges());
+        $this->assertEmpty($user->getPrevious());
         $this->assertTrue($user->isDirty());
         $this->assertFalse($user->wasChanged());
 
         $user->save();
 
         $this->assertEmpty($user->getDirty());
-        $this->assertEquals(['name' => $name], $user->getChanges());
+        $this->assertEquals(['name' => $overrideName], $user->getChanges());
+        Assert::assertArraySubset($originalAttributes, $user->getPrevious());
         $this->assertTrue($user->wasChanged());
         $this->assertTrue($user->wasChanged('name'));
     }
@@ -73,6 +77,7 @@ class EloquentModelTest extends DatabaseTestCase
 
         $this->assertEmpty($user->getDirty());
         $this->assertEmpty($user->getChanges());
+        $this->assertEmpty($user->getPrevious());
         $this->assertFalse($user->isDirty());
         $this->assertFalse($user->wasChanged());
 
@@ -80,6 +85,7 @@ class EloquentModelTest extends DatabaseTestCase
 
         $this->assertEquals(['name' => $overrideName], $user->getDirty());
         $this->assertEmpty($user->getChanges());
+        $this->assertEmpty($user->getPrevious());
         $this->assertTrue($user->isDirty());
         $this->assertFalse($user->wasChanged());
         $this->assertSame($originalName, $user->getOriginal('name'));
@@ -88,11 +94,15 @@ class EloquentModelTest extends DatabaseTestCase
         $user->discardChanges();
 
         $this->assertEmpty($user->getDirty());
+        $this->assertEmpty($user->getChanges());
+        $this->assertEmpty($user->getPrevious());
         $this->assertSame($originalName, $user->getOriginal('name'));
         $this->assertSame($originalName, $user->getAttribute('name'));
 
         $user->save();
         $this->assertFalse($user->wasChanged());
+        $this->assertEmpty($user->getChanges());
+        $this->assertEmpty($user->getPrevious());
     }
 
     public function testInsertRecordWithReservedWordFieldName()

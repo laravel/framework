@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use Illuminate\Testing\Assert;
 
 class EloquentUpdateTest extends DatabaseTestCase
 {
@@ -135,6 +136,47 @@ class EloquentUpdateTest extends DatabaseTestCase
 
         $deletedModel->decrement('counter');
         $this->assertEquals(0, $deletedModel->fresh()->counter);
+    }
+
+    public function testUpdateSyncsPrevious()
+    {
+        $model = TestUpdateModel1::create([
+            'name' => Str::random(),
+            'title' => 'Ms.',
+        ]);
+
+        $model->update(['title' => 'Dr.']);
+
+        $this->assertSame('Dr.', $model->title);
+        $this->assertSame('Dr.', $model->getOriginal('title'));
+        Assert::assertArraySubset(['name' => $model->name, 'title' => 'Ms.'], $model->getPrevious());
+    }
+
+    public function testSaveSyncsPrevious()
+    {
+        $model = TestUpdateModel1::create([
+            'name' => Str::random(),
+            'title' => 'Ms.',
+        ]);
+
+        $model->title = 'Dr.';
+        $model->save();
+
+        $this->assertSame('Dr.', $model->title);
+        $this->assertSame('Dr.', $model->getOriginal('title'));
+        Assert::assertArraySubset(['name' => $model->name, 'title' => 'Ms.'], $model->getPrevious());
+    }
+
+    public function testIncrementSyncsPrevious()
+    {
+        $model = TestUpdateModel3::create([
+            'counter' => 0,
+        ]);
+
+        $model->increment('counter');
+
+        $this->assertEquals(1, $model->counter);
+        Assert::assertArraySubset(['counter' => 0], $model->getPrevious());
     }
 }
 
