@@ -60,6 +60,8 @@ class EloquentModelRefreshTest extends DatabaseTestCase
 
         Post::find($post->id)->update(['title' => 'patrick']);
 
+        $post->refresh();
+
         $this->assertEmpty($post->getDirty());
         $this->assertEmpty($post->getPrevious());
     }
