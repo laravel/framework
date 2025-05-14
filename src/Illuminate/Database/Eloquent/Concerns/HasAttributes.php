@@ -62,18 +62,18 @@ trait HasAttributes
     protected $original = [];
 
     /**
-     * The previous model attributes after synchronizing original state.
-     *
-     * @var array
-     */
-    protected $previous = [];
-
-    /**
      * The changed model attributes.
      *
      * @var array
      */
     protected $changes = [];
+
+    /**
+     * The previous state of changed model attributes.
+     *
+     * @var array
+     */
+    protected $previous = [];
 
     /**
      * The attributes that should be cast.
