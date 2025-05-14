@@ -170,7 +170,7 @@ namespace Illuminate\Support\Facades;
  * @method static int integer(string $key, int $default = 0)
  * @method static float float(string $key, float $default = 0)
  * @method static \Illuminate\Support\Carbon|null date(string $key, string|null $format = null, string|null $tz = null)
- * @method static \BackedEnum|null enum(string $key, string $enumClass)
+ * @method static \BackedEnum|null enum(string $key, string $enumClass, \BackedEnum|null $default = null)
  * @method static \BackedEnum[] enums(string $key, string $enumClass)
  * @method static array array(array|string|null $key = null)
  * @method static \Illuminate\Support\Collection collect(array|string|null $key = null)
