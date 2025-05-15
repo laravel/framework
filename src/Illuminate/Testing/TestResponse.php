@@ -906,7 +906,7 @@ class TestResponse implements ArrayAccess
      * @param  array|null  $responseData
      * @return $this
      */
-    public function assertJsonStructure(?array $structure = null, $responseData = null)
+    public function assertJsonStructure(?array $structure = null, ?array $responseData = null)
     {
         $this->decodeResponseJson()->assertStructure($structure, $responseData);
 
@@ -920,7 +920,7 @@ class TestResponse implements ArrayAccess
      * @param  array|null  $responseData
      * @return $this
      */
-    public function assertExactJsonStructure(?array $structure = null, $responseData = null)
+    public function assertExactJsonStructure(?array $structure = null, ?array $responseData = null)
     {
         $this->decodeResponseJson()->assertStructure($structure, $responseData, true);
 
