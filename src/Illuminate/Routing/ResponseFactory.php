@@ -150,7 +150,10 @@ class ResponseFactory implements FactoryContract
                 echo 'data: '.$message;
                 echo "\n\n";
 
-                ob_flush();
+                if (ob_get_level() > 0) {
+                    ob_flush();
+                }
+
                 flush();
             }
 
@@ -166,7 +169,10 @@ class ResponseFactory implements FactoryContract
                 echo 'data: '.$endStreamWith;
                 echo "\n\n";
 
-                ob_flush();
+                if (ob_get_level() > 0) {
+                    ob_flush();
+                }
+
                 flush();
             }
         }, 200, array_merge($headers, [

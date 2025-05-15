@@ -8,6 +8,7 @@ use Countable;
 use Error;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Env;
 use Illuminate\Support\Optional;
 use Illuminate\Support\Sleep;
@@ -26,9 +27,20 @@ use Traversable;
 
 class SupportHelpersTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        mkdir(__DIR__.'/tmp');
+
+        parent::setUp();
+    }
+
     protected function tearDown(): void
     {
         m::close();
+
+        if (is_dir(__DIR__.'/tmp')) {
+            (new Filesystem)->deleteDirectory(__DIR__.'/tmp');
+        }
 
         parent::tearDown();
     }
@@ -747,11 +759,13 @@ class SupportHelpersTest extends TestCase
 
     public function testTraitUsesRecursive()
     {
-        $this->assertSame([
-            'Illuminate\Tests\Support\SupportTestTraitTwo' => 'Illuminate\Tests\Support\SupportTestTraitTwo',
-            'Illuminate\Tests\Support\SupportTestTraitOne' => 'Illuminate\Tests\Support\SupportTestTraitOne',
-        ],
-            trait_uses_recursive(SupportTestClassOne::class));
+        $this->assertSame(
+            [
+                'Illuminate\Tests\Support\SupportTestTraitTwo' => 'Illuminate\Tests\Support\SupportTestTraitTwo',
+                'Illuminate\Tests\Support\SupportTestTraitOne' => 'Illuminate\Tests\Support\SupportTestTraitOne',
+            ],
+            trait_uses_recursive(SupportTestClassOne::class)
+        );
 
         $this->assertSame([], trait_uses_recursive(SupportTestClassTwo::class));
     }
@@ -1210,6 +1224,232 @@ class SupportHelpersTest extends TestCase
 
         $_SERVER['foo'] = 'x"null"x'; // this should not be unquoted
         $this->assertSame('x"null"x', env('foo'));
+    }
+
+    public function testWriteArrayOfEnvVariablesToFile()
+    {
+        $filesystem = new Filesystem;
+        $path = __DIR__.'/tmp/env-test-file';
+        $filesystem->put($path, implode(PHP_EOL, [
+            'APP_NAME=Laravel',
+            'APP_ENV=local',
+            'APP_KEY=base64:randomkey',
+            'APP_DEBUG=true',
+            'APP_URL=http://localhost',
+            '',
+            'DB_CONNECTION=mysql',
+            'DB_HOST=',
+        ]));
+
+        Env::writeVariables([
+            'APP_VIBE' => 'chill',
+            'DB_HOST' => '127:0:0:1',
+            'DB_PORT' => 3306,
+            'BRAND_NEW_PREFIX' => 'fresh value',
+        ], $path);
+
+        $this->assertSame(
+            implode(PHP_EOL, [
+                'APP_NAME=Laravel',
+                'APP_ENV=local',
+                'APP_KEY=base64:randomkey',
+                'APP_DEBUG=true',
+                'APP_URL=http://localhost',
+                'APP_VIBE=chill',
+                '',
+                'DB_CONNECTION=mysql',
+                'DB_HOST="127:0:0:1"',
+                'DB_PORT=3306',
+                '',
+                'BRAND_NEW_PREFIX="fresh value"',
+            ]),
+            $filesystem->get($path)
+        );
+    }
+
+    public function testWriteArrayOfEnvVariablesToFileAndOverwrite()
+    {
+        $filesystem = new Filesystem;
+        $path = __DIR__.'/tmp/env-test-file';
+        $filesystem->put($path, implode(PHP_EOL, [
+            'APP_NAME=Laravel',
+            'APP_ENV=local',
+            'APP_KEY=base64:randomkey',
+            'APP_DEBUG=true',
+            'APP_URL=http://localhost',
+            '',
+            'DB_CONNECTION=mysql',
+            'DB_HOST=',
+        ]));
+
+        Env::writeVariables([
+            'APP_VIBE' => 'chill',
+            'DB_HOST' => '127:0:0:1',
+            'DB_CONNECTION' => 'sqlite',
+        ], $path, true);
+
+        $this->assertSame(
+            implode(PHP_EOL, [
+                'APP_NAME=Laravel',
+                'APP_ENV=local',
+                'APP_KEY=base64:randomkey',
+                'APP_DEBUG=true',
+                'APP_URL=http://localhost',
+                'APP_VIBE=chill',
+                '',
+                'DB_CONNECTION=sqlite',
+                'DB_HOST="127:0:0:1"',
+            ]),
+            $filesystem->get($path)
+        );
+    }
+
+    public function testWillNotOverwriteArrayOfVariables()
+    {
+        $filesystem = new Filesystem;
+        $path = __DIR__.'/tmp/env-test-file';
+        $filesystem->put($path, implode(PHP_EOL, [
+            'APP_NAME=Laravel',
+            'APP_ENV=local',
+            'APP_KEY=base64:randomkey',
+            'APP_DEBUG=true',
+            'APP_URL=http://localhost',
+            'APP_VIBE=odd',
+            '',
+            'DB_CONNECTION=mysql',
+            'DB_HOST=',
+        ]));
+
+        Env::writeVariables([
+            'APP_VIBE' => 'chill',
+            'DB_HOST' => '127:0:0:1',
+        ], $path);
+
+        $this->assertSame(
+            implode(PHP_EOL, [
+                'APP_NAME=Laravel',
+                'APP_ENV=local',
+                'APP_KEY=base64:randomkey',
+                'APP_DEBUG=true',
+                'APP_URL=http://localhost',
+                'APP_VIBE=odd',
+                '',
+                'DB_CONNECTION=mysql',
+                'DB_HOST="127:0:0:1"',
+            ]),
+            $filesystem->get($path)
+        );
+    }
+
+    public function testWriteVariableToFile()
+    {
+        $filesystem = new Filesystem;
+        $path = __DIR__.'/tmp/env-test-file';
+        $filesystem->put($path, implode(PHP_EOL, [
+            'APP_NAME=Laravel',
+            'APP_ENV=local',
+            'APP_KEY=base64:randomkey',
+            'APP_DEBUG=true',
+            'APP_URL=http://localhost',
+            '',
+            'DB_CONNECTION=mysql',
+            'DB_HOST=',
+        ]));
+
+        Env::writeVariable('APP_VIBE', 'chill', $path);
+
+        $this->assertSame(
+            implode(PHP_EOL, [
+                'APP_NAME=Laravel',
+                'APP_ENV=local',
+                'APP_KEY=base64:randomkey',
+                'APP_DEBUG=true',
+                'APP_URL=http://localhost',
+                'APP_VIBE=chill',
+                '',
+                'DB_CONNECTION=mysql',
+                'DB_HOST=',
+            ]),
+            $filesystem->get($path)
+        );
+    }
+
+    public function testWillNotOverwriteVariable()
+    {
+        $filesystem = new Filesystem;
+        $path = __DIR__.'/tmp/env-test-file';
+        $filesystem->put($path, implode(PHP_EOL, [
+            'APP_NAME=Laravel',
+            'APP_ENV=local',
+            'APP_KEY=base64:randomkey',
+            'APP_DEBUG=true',
+            'APP_URL=http://localhost',
+            'APP_VIBE=odd',
+            '',
+            'DB_CONNECTION=mysql',
+            'DB_HOST=',
+        ]));
+
+        Env::writeVariable('APP_VIBE', 'chill', $path);
+
+        $this->assertSame(
+            implode(PHP_EOL, [
+                'APP_NAME=Laravel',
+                'APP_ENV=local',
+                'APP_KEY=base64:randomkey',
+                'APP_DEBUG=true',
+                'APP_URL=http://localhost',
+                'APP_VIBE=odd',
+                '',
+                'DB_CONNECTION=mysql',
+                'DB_HOST=',
+            ]),
+            $filesystem->get($path)
+        );
+    }
+
+    public function testWriteVariableToFileAndOverwrite()
+    {
+        $filesystem = new Filesystem;
+        $path = __DIR__.'/tmp/env-test-file';
+        $filesystem->put($path, implode(PHP_EOL, [
+            'APP_NAME=Laravel',
+            'APP_ENV=local',
+            'APP_KEY=base64:randomkey',
+            'APP_DEBUG=true',
+            'APP_URL=http://localhost',
+            'APP_VIBE=odd',
+            '',
+            'DB_CONNECTION=mysql',
+            'DB_HOST=',
+        ]));
+
+        Env::writeVariable('APP_VIBE', 'chill', $path, true);
+
+        $this->assertSame(
+            implode(PHP_EOL, [
+                'APP_NAME=Laravel',
+                'APP_ENV=local',
+                'APP_KEY=base64:randomkey',
+                'APP_DEBUG=true',
+                'APP_URL=http://localhost',
+                'APP_VIBE=chill',
+                '',
+                'DB_CONNECTION=mysql',
+                'DB_HOST=',
+            ]),
+            $filesystem->get($path)
+        );
+    }
+
+    public function testWillThrowAnExceptionIfFileIsMissingWhenTryingToWriteVariables(): void
+    {
+        $this->expectExceptionObject(new RuntimeException('The file [missing-file] does not exist.'));
+
+        Env::writeVariables([
+            'APP_VIBE' => 'chill',
+            'DB_HOST' => '127:0:0:1',
+        ], 'missing-file');
     }
 
     public function testGetFromSERVERFirst()

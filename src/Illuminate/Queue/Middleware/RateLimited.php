@@ -26,6 +26,13 @@ class RateLimited
     protected $limiterName;
 
     /**
+     * The number of seconds before a job should be available again if the limit is exceeded.
+     *
+     * @var \DateTimeInterface|int|null
+     */
+    public $releaseAfter;
+
+    /**
      * Indicates if the job should be released if the limit is exceeded.
      *
      * @var bool
@@ -89,7 +96,7 @@ class RateLimited
         foreach ($limits as $limit) {
             if ($this->limiter->tooManyAttempts($limit->key, $limit->maxAttempts)) {
                 return $this->shouldRelease
-                    ? $job->release($this->getTimeUntilNextRetry($limit->key))
+                    ? $job->release($this->releaseAfter ?: $this->getTimeUntilNextRetry($limit->key))
                     : false;
             }
 
@@ -97,6 +104,19 @@ class RateLimited
         }
 
         return $next($job);
+    }
+
+    /**
+     * Set the delay (in seconds) to release the job back to the queue.
+     *
+     * @param  \DateTimeInterface|int  $releaseAfter
+     * @return $this
+     */
+    public function releaseAfter($releaseAfter)
+    {
+        $this->releaseAfter = $releaseAfter;
+
+        return $this;
     }
 
     /**

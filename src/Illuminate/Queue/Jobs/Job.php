@@ -67,7 +67,7 @@ abstract class Job
     /**
      * Get the job identifier.
      *
-     * @return string
+     * @return string|int|null
      */
     abstract public function getJobId();
 
@@ -251,7 +251,7 @@ abstract class Job
         [$class, $method] = JobName::parse($payload['job']);
 
         if (method_exists($this->instance = $this->resolve($class), 'failed')) {
-            $this->instance->failed($payload['data'], $e, $payload['uuid'] ?? '');
+            $this->instance->failed($payload['data'], $e, $payload['uuid'] ?? '', $this);
         }
     }
 

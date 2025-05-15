@@ -214,6 +214,23 @@ class TestResponse implements ArrayAccess
     }
 
     /**
+     * Assert whether the response is redirecting back to the previous location.
+     *
+     * @return $this
+     */
+    public function assertRedirectBack()
+    {
+        PHPUnit::withResponse($this)->assertTrue(
+            $this->isRedirect(),
+            $this->statusMessageWithDetails('201, 301, 302, 303, 307, 308', $this->getStatusCode()),
+        );
+
+        $this->assertLocation(app('url')->previous());
+
+        return $this;
+    }
+
+    /**
      * Assert whether the response is redirecting to a given route.
      *
      * @param  \BackedEnum|string  $name
@@ -1192,21 +1209,21 @@ class TestResponse implements ArrayAccess
 
         $this->ensureResponseHasView();
 
-        if (is_null($value)) {
-            PHPUnit::withResponse($this)->assertTrue(Arr::has($this->original->gatherData(), $key));
-        } elseif ($value instanceof Closure) {
-            PHPUnit::withResponse($this)->assertTrue($value(Arr::get($this->original->gatherData(), $key)));
-        } elseif ($value instanceof Model) {
-            PHPUnit::withResponse($this)->assertTrue($value->is(Arr::get($this->original->gatherData(), $key)));
-        } elseif ($value instanceof EloquentCollection) {
-            $actual = Arr::get($this->original->gatherData(), $key);
+        $actual = Arr::get($this->original->gatherData(), $key);
 
+        if (is_null($value)) {
+            PHPUnit::withResponse($this)->assertTrue(Arr::has($this->original->gatherData(), $key), "Failed asserting that the data contains the key [{$key}].");
+        } elseif ($value instanceof Closure) {
+            PHPUnit::withResponse($this)->assertTrue($value($actual), "Failed asserting that the value at [{$key}] fulfills the expectations defined by the closure.");
+        } elseif ($value instanceof Model) {
+            PHPUnit::withResponse($this)->assertTrue($value->is($actual), "Failed asserting that the model at [{$key}] matches the given model.");
+        } elseif ($value instanceof EloquentCollection) {
             PHPUnit::withResponse($this)->assertInstanceOf(EloquentCollection::class, $actual);
             PHPUnit::withResponse($this)->assertSameSize($value, $actual);
 
-            $value->each(fn ($item, $index) => PHPUnit::withResponse($this)->assertTrue($actual->get($index)->is($item)));
+            $value->each(fn ($item, $index) => PHPUnit::withResponse($this)->assertTrue($actual->get($index)->is($item), "Failed asserting that the collection at [{$key}.[{$index}]]' matches the given collection."));
         } else {
-            PHPUnit::withResponse($this)->assertEquals($value, Arr::get($this->original->gatherData(), $key));
+            PHPUnit::withResponse($this)->assertEquals($value, $actual, "Failed asserting that [{$key}] matches the expected value.");
         }
 
         return $this;

@@ -55,12 +55,7 @@ class SqlServerProcessor extends Processor
         return is_object($row) ? $row->insertid : $row['insertid'];
     }
 
-    /**
-     * Process the results of a columns query.
-     *
-     * @param  array  $results
-     * @return array
-     */
+    /** @inheritDoc */
     public function processColumns($results)
     {
         return array_map(function ($result) {
@@ -90,12 +85,7 @@ class SqlServerProcessor extends Processor
         }, $results);
     }
 
-    /**
-     * Process the results of an indexes query.
-     *
-     * @param  array  $results
-     * @return array
-     */
+    /** @inheritDoc */
     public function processIndexes($results)
     {
         return array_map(function ($result) {
@@ -111,12 +101,7 @@ class SqlServerProcessor extends Processor
         }, $results);
     }
 
-    /**
-     * Process the results of a foreign keys query.
-     *
-     * @param  array  $results
-     * @return array
-     */
+    /** @inheritDoc */
     public function processForeignKeys($results)
     {
         return array_map(function ($result) {

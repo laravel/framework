@@ -9,6 +9,7 @@ use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Dumpable;
+use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\Tappable;
 use League\Uri\Contracts\UriInterface;
 use League\Uri\Uri as LeagueUri;
@@ -17,7 +18,7 @@ use Stringable;
 
 class Uri implements Htmlable, Responsable, Stringable
 {
-    use Conditionable, Dumpable, Tappable;
+    use Conditionable, Dumpable, Macroable, Tappable;
 
     /**
      * The URI instance.
@@ -99,6 +100,21 @@ class Uri implements Htmlable, Responsable, Stringable
     }
 
     /**
+     * Get a URI instance for a controller action.
+     *
+     * @param  string|array  $action
+     * @param  mixed  $parameters
+     * @param  bool  $absolute
+     * @return static
+     *
+     * @throws \InvalidArgumentException
+     */
+    public static function action($action, $parameters = [], $absolute = true): static
+    {
+        return new static(call_user_func(static::$urlGeneratorResolver)->action($action, $parameters, $absolute));
+    }
+
+    /**
      * Get the URI's scheme.
      */
     public function scheme(): ?string
@@ -153,6 +169,18 @@ class Uri implements Htmlable, Responsable, Stringable
     }
 
     /**
+     * Get the URI's path segments.
+     *
+     * Empty or missing paths are returned as an empty collection.
+     */
+    public function pathSegments(): Collection
+    {
+        $path = $this->path();
+
+        return $path === '/' ? new Collection : new Collection(explode('/', $path));
+    }
+
+    /**
      * Get the URI's query string.
      */
     public function query(): UriQueryString
@@ -195,7 +223,7 @@ class Uri implements Htmlable, Responsable, Stringable
     /**
      * Specify the port of the URI.
      */
-    public function withPort(int|null $port): static
+    public function withPort(?int $port): static
     {
         return new static($this->uri->withPort($port));
     }
@@ -235,7 +263,7 @@ class Uri implements Htmlable, Responsable, Stringable
             }
         }
 
-        return new static($this->uri->withQuery(Arr::query($newQuery)));
+        return new static($this->uri->withQuery(Arr::query($newQuery) ?: null));
     }
 
     /**

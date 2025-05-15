@@ -56,7 +56,7 @@ abstract class Component
      *
      * @param  string  $view
      * @param  array  $data
-     * @return void
+     * @return string
      */
     protected function compile($view, $data)
     {

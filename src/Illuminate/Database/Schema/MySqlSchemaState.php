@@ -115,6 +115,11 @@ class MySqlSchemaState extends SchemaState
             $value .= ' --ssl-ca="${:LARAVEL_LOAD_SSL_CA}"';
         }
 
+        if (isset($config['options'][\PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT]) &&
+            $config['options'][\PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] === false) {
+            $value .= ' --ssl=off';
+        }
+
         return $value;
     }
 

@@ -331,13 +331,7 @@ class MySqlGrammar extends Grammar
         }
     }
 
-    /**
-     * Compile a rename column command.
-     *
-     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Illuminate\Support\Fluent  $command
-     * @return array|string
-     */
+    /** @inheritDoc */
     public function compileRenameColumn(Blueprint $blueprint, Fluent $command)
     {
         $isMaria = $this->connection->isMaria();
@@ -396,13 +390,7 @@ class MySqlGrammar extends Grammar
         );
     }
 
-    /**
-     * Compile a change column command into a series of SQL statements.
-     *
-     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Illuminate\Support\Fluent  $command
-     * @return array|string
-     */
+    /** @inheritDoc */
     public function compileChange(Blueprint $blueprint, Fluent $command)
     {
         $column = $command->column;
@@ -650,7 +638,7 @@ class MySqlGrammar extends Grammar
     /**
      * Compile the SQL needed to drop all tables.
      *
-     * @param  array  $tables
+     * @param  array<string>  $tables
      * @return string
      */
     public function compileDropAllTables($tables)
@@ -661,7 +649,7 @@ class MySqlGrammar extends Grammar
     /**
      * Compile the SQL needed to drop all views.
      *
-     * @param  array  $views
+     * @param  array<string>  $views
      * @return string
      */
     public function compileDropAllViews($views)
@@ -707,8 +695,8 @@ class MySqlGrammar extends Grammar
     /**
      * Quote-escape the given tables, views, or types.
      *
-     * @param  array  $names
-     * @return array
+     * @param  array<string>  $names
+     * @return array<string>
      */
     public function escapeNames($names)
     {
@@ -939,6 +927,16 @@ class MySqlGrammar extends Grammar
      */
     protected function typeDate(Fluent $column)
     {
+        $isMaria = $this->connection->isMaria();
+        $version = $this->connection->getServerVersion();
+
+        if ($isMaria ||
+            (! $isMaria && version_compare($version, '8.0.13', '>='))) {
+            if ($column->useCurrent) {
+                $column->default(new Expression('(CURDATE())'));
+            }
+        }
+
         return 'date';
     }
 
@@ -1036,6 +1034,16 @@ class MySqlGrammar extends Grammar
      */
     protected function typeYear(Fluent $column)
     {
+        $isMaria = $this->connection->isMaria();
+        $version = $this->connection->getServerVersion();
+
+        if ($isMaria ||
+            (! $isMaria && version_compare($version, '8.0.13', '>='))) {
+            if ($column->useCurrent) {
+                $column->default(new Expression('(YEAR(CURDATE()))'));
+            }
+        }
+
         return 'year';
     }
 

@@ -1187,17 +1187,12 @@ class Container implements ArrayAccess, ContainerContract
     {
         $className = Util::getParameterClassName($parameter);
 
-        // First, we check if the dependency has been explicitly bound in the container
-        // and if so, we will resolve it directly from there to respect any explicit
-        // bindings the developer has defined rather than using any default value.
-        if ($this->bound($className)) {
-            return $this->make($className);
-        }
-
-        // If no binding exists, we will check if a default value has been defined for
-        // the parameter. If it has, we should return it to avoid overriding any of
-        // the developer specified default values for the constructor parameters.
-        if ($parameter->isDefaultValueAvailable()) {
+        // First we will check if a default value has been defined for the parameter.
+        // If it has, and no explicit binding exists, we should return it to avoid
+        // overriding any of the developer specified defaults for the parameters.
+        if ($parameter->isDefaultValueAvailable() &&
+            ! $this->bound($className) &&
+            $this->findInContextualBindings($className) === null) {
             return $parameter->getDefaultValue();
         }
 
@@ -1499,6 +1494,16 @@ class Container implements ArrayAccess, ContainerContract
         foreach ($callbacks as $callback) {
             $callback($object, $this);
         }
+    }
+
+    /**
+     * Get the name of the binding the container is currently resolving.
+     *
+     * @return class-string|string|null
+     */
+    public function currentlyResolving()
+    {
+        return end($this->buildStack) ?: null;
     }
 
     /**
