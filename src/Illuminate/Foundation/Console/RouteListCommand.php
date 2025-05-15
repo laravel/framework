@@ -87,23 +87,26 @@ class RouteListCommand extends Command
     /**
      * Execute the console command.
      *
-     * @return void
+     * @return int
      */
-    public function handle()
+    public function handle(): int
     {
         if (! $this->output->isVeryVerbose()) {
             $this->router->flushMiddlewareGroups();
         }
 
         if (! $this->router->getRoutes()->count()) {
-            return $this->components->error("Your application doesn't have any routes.");
+            $this->components->error("Your application doesn't have any routes.");
+            return static::FAILURE;
         }
 
         if (empty($routes = $this->getRoutes())) {
-            return $this->components->error("Your application doesn't have any routes matching the given criteria.");
+            $this->components->error("Your application doesn't have any routes matching the given criteria.");
+            return static::FAILURE;
         }
 
         $this->displayRoutes($routes);
+        return static::SUCCESS;
     }
 
     /**
