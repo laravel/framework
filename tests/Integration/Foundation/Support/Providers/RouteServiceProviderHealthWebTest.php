@@ -34,4 +34,4 @@ class RouteServiceProviderHealthWebTest extends TestCase
         $this->get('/up')->assertOk();
         $this->get('/up')->assertSee('Application up');
     }
-} 
+}
