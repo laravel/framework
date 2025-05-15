@@ -18,7 +18,7 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Terminal;
 
-#[AsCommand(name: 'route:list', description: 'List all registered routes')]
+#[AsCommand(name: 'route:list')]
 class RouteListCommand extends Command
 {
     /**
