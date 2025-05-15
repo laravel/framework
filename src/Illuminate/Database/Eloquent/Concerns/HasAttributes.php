@@ -69,7 +69,7 @@ trait HasAttributes
     protected $changes = [];
 
     /**
-     * The previous state of changed model attributes.
+     * The previous state of the changed model attributes.
      *
      * @var array
      */
