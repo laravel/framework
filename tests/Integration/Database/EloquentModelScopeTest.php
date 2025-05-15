@@ -28,6 +28,27 @@ class EloquentModelScopeTest extends DatabaseTestCase
 
         $this->assertTrue($model->hasNamedScope('existsAsWell'));
     }
+
+    public function testModelHasNegateScope()
+    {
+        $model = new TestScopeModel1;
+
+        $this->assertTrue($model->hasNamedScopeIgnoringNot('notExists'));
+    }
+
+    public function testModelDoesNotHaveNegateScope()
+    {
+        $model = new TestScopeModel1;
+
+        $this->assertFalse($model->hasNamedScopeIgnoringNot('notDoesNotExist'));
+    }
+
+    public function testModelHasAttributedNegateScope()
+    {
+        $model = new TestScopeModel1;
+
+        $this->assertTrue($model->hasNamedScopeIgnoringNot('notExistsAsWell'));
+    }
 }
 
 class TestScopeModel1 extends Model

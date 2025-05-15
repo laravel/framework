@@ -1482,6 +1482,17 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Determine if the given model has a negate scope.
+     *
+     * @param  string  $scope
+     * @return bool
+     */
+    public function hasNamedScopeIgnoringNot($scope)
+    {
+        return $this->model && $this->model->hasNamedScopeIgnoringNot($scope);
+    }
+
+    /**
      * Call the given local model scopes.
      *
      * @param  array|string  $scopes
@@ -2198,6 +2209,10 @@ class Builder implements BuilderContract
 
         if ($this->hasNamedScope($method)) {
             return $this->callNamedScope($method, $parameters);
+        }
+
+        if ($this->hasNamedScopeIgnoringNot($method)) {
+            return $this->whereNot(fn($query) => $query->callNamedScope(substr($method, 3), $parameters));
         }
 
         if (in_array(strtolower($method), $this->passthru)) {

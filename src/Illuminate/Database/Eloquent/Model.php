@@ -1693,6 +1693,22 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
+     * Determine if the model has a Negate given scope.
+     *
+     * @param  string  $scope
+     * @return bool
+     */
+    public function hasNamedScopeIgnoringNot($scope)
+    {
+        if (str_starts_with(ucfirst($scope), 'Not')) {
+            return method_exists($this, 'scope' . ucfirst(substr($scope, 3))) ||
+                static::isScopeMethodWithAttribute(substr($scope, 3));
+        }
+
+        return false;
+    }
+
+    /**
      * Apply the given named scope if possible.
      *
      * @param  string  $scope

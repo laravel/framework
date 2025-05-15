@@ -30,9 +30,13 @@ class DatabaseEloquentLocalScopesTest extends TestCase
         $model = new EloquentLocalScopesTestModel;
 
         $this->assertTrue($model->hasNamedScope('active'));
+        $this->assertTrue($model->hasNamedScopeIgnoringNot('notActive'));
+
         $this->assertTrue($model->hasNamedScope('type'));
+        $this->assertTrue($model->hasNamedScopeIgnoringNot('notType'));
 
         $this->assertFalse($model->hasNamedScope('nonExistentLocalScope'));
+        $this->assertFalse($model->hasNamedScopeIgnoringNot('notNonExistentLocalScope'));
     }
 
     public function testLocalScopeIsApplied()
@@ -41,6 +45,11 @@ class DatabaseEloquentLocalScopesTest extends TestCase
         $query = $model->newQuery()->active();
 
         $this->assertSame('select * from "table" where "active" = ?', $query->toSql());
+        $this->assertEquals([true], $query->getBindings());
+
+        $query = $model->newQuery()->notActive();
+
+        $this->assertSame('select * from "table" where not ("active" = ?)', $query->toSql());
         $this->assertEquals([true], $query->getBindings());
     }
 
@@ -51,6 +60,11 @@ class DatabaseEloquentLocalScopesTest extends TestCase
 
         $this->assertSame('select * from "table" where "type" = ?', $query->toSql());
         $this->assertEquals(['foo'], $query->getBindings());
+
+        $query = $model->newQuery()->notType('foo');
+
+        $this->assertSame('select * from "table" where not ("type" = ?)', $query->toSql());
+        $this->assertEquals(['foo'], $query->getBindings());
     }
 
     public function testLocalScopesCanChained()
@@ -59,6 +73,11 @@ class DatabaseEloquentLocalScopesTest extends TestCase
         $query = $model->newQuery()->active()->type('foo');
 
         $this->assertSame('select * from "table" where "active" = ? and "type" = ?', $query->toSql());
+        $this->assertEquals([true, 'foo'], $query->getBindings());
+
+        $query = $model->newQuery()->notActive()->notType('foo');
+
+        $this->assertSame('select * from "table" where not ("active" = ?) and not ("type" = ?)', $query->toSql());
         $this->assertEquals([true, 'foo'], $query->getBindings());
     }
 
