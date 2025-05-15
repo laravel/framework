@@ -159,12 +159,17 @@ class ApplicationBuilder
         string $apiPrefix = 'api',
         ?callable $then = null)
     {
-        if (is_null($using) && (is_string($web) || is_array($web) || is_string($api) || is_array($api) || is_string($pages) || is_string($health)) || is_callable($then)) {
-            $using = $this->buildRoutingCallback($web, $api, $pages, $health, $apiPrefix, $then);
+        if (is_null($using) && (is_string($web) || is_array($web) || is_string($api) || is_array($api) || is_string($pages)) || is_callable($then)) {
+            $using = $this->buildRoutingCallback($web, $api, $pages, $apiPrefix, $then);
+        }
 
-            if (is_string($health)) {
-                PreventRequestsDuringMaintenance::except($health);
-            }
+        if (is_string($health)) {
+            $using = function () use ($health, $using) {
+                $this->buildHealthCheckRoute($health);
+                call_user_func($using, $this->app);
+            };
+
+            PreventRequestsDuringMaintenance::except($health);
         }
 
         AppRouteServiceProvider::loadRoutesUsing($using);
@@ -184,13 +189,35 @@ class ApplicationBuilder
         return $this;
     }
 
+    protected function buildHealthCheckRoute(string $health): void
+    {
+        Route::get($health, function () {
+            $exception = null;
+
+            try {
+                Event::dispatch(new DiagnosingHealth);
+            } catch (\Throwable $e) {
+                if (app()->hasDebugModeEnabled()) {
+                    throw $e;
+                }
+
+                report($e);
+
+                $exception = $e->getMessage();
+            }
+
+            return response(View::file(__DIR__.'/../resources/health-up.blade.php', [
+                'exception' => $exception,
+            ]), status: $exception ? 500 : 200);
+        });
+    }
+
     /**
      * Create the routing callback for the application.
      *
      * @param  array|string|null  $web
      * @param  array|string|null  $api
      * @param  string|null  $pages
-     * @param  string|null  $health
      * @param  string  $apiPrefix
      * @param  callable|null  $then
      * @return \Closure
@@ -198,11 +225,10 @@ class ApplicationBuilder
     protected function buildRoutingCallback(array|string|null $web,
         array|string|null $api,
         ?string $pages,
-        ?string $health,
         string $apiPrefix,
         ?callable $then)
     {
-        return function () use ($web, $api, $pages, $health, $apiPrefix, $then) {
+        return function () use ($web, $api, $pages, $apiPrefix, $then) {
             if (is_string($api) || is_array($api)) {
                 if (is_array($api)) {
                     foreach ($api as $apiRoute) {
@@ -213,28 +239,6 @@ class ApplicationBuilder
                 } else {
                     Route::middleware('api')->prefix($apiPrefix)->group($api);
                 }
-            }
-
-            if (is_string($health)) {
-                Route::get($health, function () {
-                    $exception = null;
-
-                    try {
-                        Event::dispatch(new DiagnosingHealth);
-                    } catch (\Throwable $e) {
-                        if (app()->hasDebugModeEnabled()) {
-                            throw $e;
-                        }
-
-                        report($e);
-
-                        $exception = $e->getMessage();
-                    }
-
-                    return response(View::file(__DIR__.'/../resources/health-up.blade.php', [
-                        'exception' => $exception,
-                    ]), status: $exception ? 500 : 200);
-                });
             }
 
             if (is_string($web) || is_array($web)) {

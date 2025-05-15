@@ -8,7 +8,7 @@ use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\TestCase;
 
 #[WithConfig('filesystems.disks.local.serve', false)]
-class RouteServiceProviderHealthTest extends TestCase
+class RouteServiceProviderHealthWebTest extends TestCase
 {
     /**
      * Resolve application implementation.
@@ -19,13 +19,7 @@ class RouteServiceProviderHealthTest extends TestCase
     {
         return Application::configure(static::applicationBasePath())
             ->withRouting(
-                using: function () {
-                    // Register the health route first
-                    \Illuminate\Support\Facades\Route::get('/up', function () {
-                        return response('OK', 200);
-                    });
-                    require __DIR__.'/fixtures/web.php';
-                },
+                web: __DIR__.'/fixtures/web.php',
                 health: '/up',
             )->create();
     }
@@ -35,15 +29,9 @@ class RouteServiceProviderHealthTest extends TestCase
         $app['config']->set('app.key', Str::random(32));
     }
 
-    public function test_it_can_load_health_page()
+    public function test_health_route_works_with_web_parameter()
     {
         $this->get('/up')->assertOk();
+        $this->get('/up')->assertSee('Application up');
     }
-
-    public function test_health_route_takes_precedence_over_catch_all()
-    {
-        $response = $this->get('/up');
-        $response->assertStatus(200);
-        $response->assertSee('OK');
-    }
-}
+} 
