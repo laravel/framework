@@ -2210,7 +2210,7 @@ trait HasAttributes
     }
 
     /**
-     * Get the attributes that were previously original when the model was last saved.
+     * Get the attributes that were previously original before the model was last saved.
      *
      * @return array
      */
