@@ -1700,8 +1700,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function hasNamedScopeIgnoringNot($scope)
     {
-        if (str_starts_with(ucfirst($scope), 'Not')) {
-            return method_exists($this, 'scope' . ucfirst(substr($scope, 3))) ||
+        if (str_starts_with($scope, 'not')) {
+            return method_exists($this, 'scope'.ucfirst(substr($scope, 3))) ||
                 static::isScopeMethodWithAttribute(substr($scope, 3));
         }
 
