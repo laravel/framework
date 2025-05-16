@@ -6,7 +6,6 @@ use Exception;
 use Generator;
 use Illuminate\Database\MySqlConnection;
 use Illuminate\Database\Schema\MySqlSchemaState;
-use PDO;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
@@ -17,8 +16,8 @@ class DatabaseMySqlSchemaStateTest extends TestCase
     #[DataProvider('provider')]
     public function testConnectionString(string $expectedConnectionString, array $expectedVariables, array $dbConfig): void
     {
-        $pdo = $this->createMock(PDO::class);
-        $pdo->method('getAttribute')->with(PDO::ATTR_SERVER_VERSION)->willReturn('8.0.40');
+        $pdo = $this->createMock(\PDO::class);
+        $pdo->method('getAttribute')->with(\PDO::ATTR_SERVER_VERSION)->willReturn('8.0.40');
 
         $connection = $this->createMock(MySqlConnection::class);
         $connection->method('getConfig')->willReturn($dbConfig);
@@ -70,7 +69,7 @@ class DatabaseMySqlSchemaStateTest extends TestCase
                 'username' => 'root',
                 'database' => 'forge',
                 'options' => [
-                    PDO::MYSQL_ATTR_SSL_CA => 'ssl.ca',
+                    \PDO::MYSQL_ATTR_SSL_CA => 'ssl.ca',
                 ],
             ],
         ];
@@ -88,7 +87,7 @@ class DatabaseMySqlSchemaStateTest extends TestCase
                 'username' => 'root',
                 'database' => 'forge',
                 'options' => [
-                    PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => false,
+                    \PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => false,
                 ],
             ],
         ];

@@ -5,7 +5,6 @@ namespace Illuminate\Database\Schema;
 use Exception;
 use Illuminate\Database\Connection;
 use Illuminate\Support\Str;
-use PDO;
 use Symfony\Component\Process\Process;
 
 class MySqlSchemaState extends SchemaState
@@ -118,7 +117,7 @@ class MySqlSchemaState extends SchemaState
 
         if (isset($config['options'][\PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT]) &&
             $config['options'][\PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] === false) {
-            $version = $this->connection->getPdo()->getAttribute(PDO::ATTR_SERVER_VERSION);
+            $version = $this->connection->getPdo()->getAttribute(\PDO::ATTR_SERVER_VERSION);
 
             $value .= version_compare($version, '8.0.40', '<')
                 ? ' --ssl=off'
