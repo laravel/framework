@@ -156,17 +156,24 @@ class Request implements ArrayAccess
     /**
      * Get the request's data (form parameters or JSON).
      *
-     * @return array
+     * @param  string|null  $key
+     * @return ($key is null ? array : mixed)
      */
-    public function data()
+    public function data($key = null)
     {
         if ($this->isForm()) {
-            return $this->parameters();
+            $data = $this->parameters();
         } elseif ($this->isJson()) {
-            return $this->json();
+            $data = $this->json();
+        } else {
+            $data = $this->data ?? [];
         }
 
-        return $this->data ?? [];
+        if (is_null($key)) {
+            return $data;
+        }
+
+        return Arr::get($data, $key);
     }
 
     /**
