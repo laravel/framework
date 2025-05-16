@@ -18,7 +18,7 @@ class DatabaseMySqlSchemaStateTest extends TestCase
     public function testConnectionString(string $expectedConnectionString, array $expectedVariables, array $dbConfig): void
     {
         $pdo = $this->createMock(PDO::class);
-        $pdo->method('getAttribute')->with(PDO::ATTR_CLIENT_VERSION)->willReturn('8.0.40');
+        $pdo->method('getAttribute')->with(PDO::ATTR_SERVER_VERSION)->willReturn('8.0.40');
 
         $connection = $this->createMock(MySqlConnection::class);
         $connection->method('getConfig')->willReturn($dbConfig);
