@@ -1086,6 +1086,18 @@ class TestResponseTest extends TestCase
         $response->assertUnprocessable();
     }
 
+    public function testAssertClientError()
+    {
+        $statusCode = 400;
+
+        $baseResponse = tap(new Response, function ($response) use ($statusCode) {
+            $response->setStatusCode($statusCode);
+        });
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+        $response->assertClientError();
+    }
+
     public function testAssertServerError()
     {
         $statusCode = 500;
