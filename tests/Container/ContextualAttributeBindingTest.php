@@ -11,6 +11,7 @@ use Illuminate\Container\Attributes\Auth;
 use Illuminate\Container\Attributes\Authenticated;
 use Illuminate\Container\Attributes\Cache;
 use Illuminate\Container\Attributes\Config;
+use Illuminate\Container\Attributes\Context;
 use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Container\Attributes\Database;
 use Illuminate\Container\Attributes\Log;
@@ -28,6 +29,7 @@ use Illuminate\Database\DatabaseManager;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Filesystem\FilesystemManager;
 use Illuminate\Http\Request;
+use Illuminate\Log\Context\Repository as ContextRepository;
 use Illuminate\Log\LogManager;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -213,6 +215,20 @@ class ContextualAttributeBindingTest extends TestCase
         });
 
         $container->make(RouteParameterTest::class);
+    }
+
+    public function testContextAttribute(): void
+    {
+        $container = new Container;
+
+        $container->singleton(ContextRepository::class, function () {
+            $context = m::mock(ContextRepository::class);
+            $context->shouldReceive('get')->once()->with('foo', null)->andReturn('foo');
+
+            return $context;
+        });
+
+        $container->make(ContextTest::class);
     }
 
     public function testStorageAttribute()
@@ -421,6 +437,13 @@ final class CacheTest
 final class ConfigTest
 {
     public function __construct(#[Config('foo')] string $foo, #[Config('bar')] string $bar)
+    {
+    }
+}
+
+final class ContextTest
+{
+    public function __construct(#[Context('foo')] string $foo)
     {
     }
 }
