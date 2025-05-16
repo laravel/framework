@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Mail;
 
+use AssertionError;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Mail\Attachable;
 use Illuminate\Contracts\View\Factory;
@@ -10,6 +11,7 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Mail\Mailables\Headers;
 use Illuminate\Mail\Mailer;
+use Illuminate\Mail\MissingSubjectException;
 use Illuminate\Mail\Transport\ArrayTransport;
 use Mockery as m;
 use PHPUnit\Framework\AssertionFailedError;
@@ -1169,6 +1171,28 @@ class MailMailableTest extends TestCase
             $mailable->assertTo('taylor@laravel.com')
                 ->assertHasSubject('Test Subject!');
         });
+    }
+
+    public function testMailablesNeedSubject()
+    {
+        $view = m::mock(Factory::class);
+
+        $mailer = new Mailer('array', $view, new ArrayTransport);
+
+        Mailable::requiresExplicitSubject();
+        $mailable = new WelcomeMailableStub;
+        $mailable->to('hello@laravel.com');
+        $mailable->from('taylor@laravel.com');
+        $mailable->html('test content');
+
+        try {
+            $mailer->send($mailable);
+            throw new AssertionError('Missing subject should have thrown an exception.');
+        } catch (MissingSubjectException) {
+            $this->assertTrue(true);
+        }
+
+        Mailable::requiresExplicitSubject(false);
     }
 
     protected function stubMailer()

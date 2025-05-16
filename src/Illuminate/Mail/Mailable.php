@@ -190,6 +190,13 @@ class Mailable implements MailableContract, Renderable
     public static $viewDataCallback;
 
     /**
+     * Defines whether the mailable requires an explicit subject.
+     *
+     * @var bool
+     */
+    public static $requiresExplicitSubject = false;
+
+    /**
      * Send the message using the given mailer.
      *
      * @param  \Illuminate\Contracts\Mail\Factory|\Illuminate\Contracts\Mail\Mailer  $mailer
@@ -462,6 +469,7 @@ class Mailable implements MailableContract, Renderable
         if ($this->subject) {
             $message->subject($this->subject);
         } else {
+            throw_if(static::$requiresExplicitSubject, new MissingSubjectException($this));
             $message->subject(Str::title(Str::snake(class_basename($this), ' ')));
         }
 
@@ -1810,6 +1818,16 @@ class Mailable implements MailableContract, Renderable
     public static function buildViewDataUsing(callable $callback)
     {
         static::$viewDataCallback = $callback;
+    }
+
+    /**
+     * Indicate that the subject for all mailables must be explicitly set.
+     *
+     * @return void
+     */
+    public static function requiresExplicitSubject(bool $requiresExplicitSubject = true)
+    {
+        static::$requiresExplicitSubject = $requiresExplicitSubject;
     }
 
     /**
