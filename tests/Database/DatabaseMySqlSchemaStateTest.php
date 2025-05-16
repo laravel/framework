@@ -16,8 +16,12 @@ class DatabaseMySqlSchemaStateTest extends TestCase
     #[DataProvider('provider')]
     public function testConnectionString(string $expectedConnectionString, array $expectedVariables, array $dbConfig): void
     {
+        $pdo = $this->createMock(\PDO::class);
+        $pdo->method('getAttribute')->with(\PDO::ATTR_SERVER_VERSION)->willReturn('8.0.40');
+
         $connection = $this->createMock(MySqlConnection::class);
         $connection->method('getConfig')->willReturn($dbConfig);
+        $connection->method('getPdo')->willReturn($pdo);
 
         $schemaState = new MySqlSchemaState($connection);
 
@@ -71,7 +75,7 @@ class DatabaseMySqlSchemaStateTest extends TestCase
         ];
 
         yield 'no_ssl' => [
-            ' --user="${:LARAVEL_LOAD_USER}" --password="${:LARAVEL_LOAD_PASSWORD}" --host="${:LARAVEL_LOAD_HOST}" --port="${:LARAVEL_LOAD_PORT}" --ssl=off', [
+            ' --user="${:LARAVEL_LOAD_USER}" --password="${:LARAVEL_LOAD_PASSWORD}" --host="${:LARAVEL_LOAD_HOST}" --port="${:LARAVEL_LOAD_PORT}" --ssl-mode=DISABLED', [
                 'LARAVEL_LOAD_SOCKET' => '',
                 'LARAVEL_LOAD_HOST' => '',
                 'LARAVEL_LOAD_PORT' => '',
