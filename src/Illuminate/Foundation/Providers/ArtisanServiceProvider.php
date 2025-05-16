@@ -77,6 +77,7 @@ use Illuminate\Foundation\Console\RouteListCommand;
 use Illuminate\Foundation\Console\RuleMakeCommand;
 use Illuminate\Foundation\Console\ScopeMakeCommand;
 use Illuminate\Foundation\Console\ServeCommand;
+use Illuminate\Foundation\Console\StorageClearCommand;
 use Illuminate\Foundation\Console\StorageLinkCommand;
 use Illuminate\Foundation\Console\StorageUnlinkCommand;
 use Illuminate\Foundation\Console\StubPublishCommand;
@@ -169,6 +170,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'ScheduleInterrupt' => ScheduleInterruptCommand::class,
         'ShowModel' => ShowModelCommand::class,
         'StorageLink' => StorageLinkCommand::class,
+        'StorageClear' => StorageClearCommand::class,
         'StorageUnlink' => StorageUnlinkCommand::class,
         'Up' => UpCommand::class,
         'ViewCache' => ViewCacheCommand::class,
