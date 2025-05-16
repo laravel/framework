@@ -1,0 +1,8 @@
+<?php
+
+namespace $NAMESPACE$;
+
+interface $CLASS_NAME$RepositoryInterface
+{
+    
+}

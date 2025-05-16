@@ -61,6 +61,7 @@ use Illuminate\Foundation\Console\KeyGenerateCommand;
 use Illuminate\Foundation\Console\LangPublishCommand;
 use Illuminate\Foundation\Console\ListenerMakeCommand;
 use Illuminate\Foundation\Console\MailMakeCommand;
+use Illuminate\Foundation\Console\MakeRepositoryCommand;
 use Illuminate\Foundation\Console\ModelMakeCommand;
 use Illuminate\Foundation\Console\NotificationMakeCommand;
 use Illuminate\Foundation\Console\ObserverMakeCommand;
@@ -217,6 +218,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'RequestMake' => RequestMakeCommand::class,
         'ResourceMake' => ResourceMakeCommand::class,
         'RuleMake' => RuleMakeCommand::class,
+        'RepositoryMake' => MakeRepositoryCommand::class,
         'ScopeMake' => ScopeMakeCommand::class,
         'SeederMake' => SeederMakeCommand::class,
         'SessionTable' => SessionTableCommand::class,
@@ -839,6 +841,18 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     {
         $this->app->singleton(RouteClearCommand::class, function ($app) {
             return new RouteClearCommand($app['files']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerMakeRepositoryCommand()
+    {
+        $this->app->singleton(MakeRepositoryCommand::class, function ($app) {
+            return new MakeRepositoryCommand($app['files']);
         });
     }
 

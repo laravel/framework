@@ -1,0 +1,10 @@
+<?php
+
+namespace $NAMESPACE$;
+
+use App\Repositories\Interface\$CLASS_NAME$RepositoryInterface;
+
+class $CLASS_NAME$Repository implements $CLASS_NAME$RepositoryInterface
+{
+    
+}
