@@ -422,6 +422,22 @@ class HttpClientTest extends TestCase
         $this->assertEquals(new Fluent([]), $response->fluent('missing_key'));
     }
 
+    public function testCanAccessDataOfRequestUsingDotNotation()
+    {
+        $this->factory->fake();
+
+        $this->factory->post('http://foo.com/json', [
+            'parent' => ['name' => 'Taylor'],
+        ]);
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->data() === ['parent' => ['name' => 'Taylor']] &&
+                $request->data('parent') === ['name' => 'Taylor'] &&
+                $request->data('parent.name') === 'Taylor' &&
+                $request->data('data.missing.key') === null;
+        });
+    }
+
     public function testSendRequestBodyAsJsonByDefault()
     {
         $body = '{"test":"phpunit"}';
