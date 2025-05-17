@@ -6,6 +6,7 @@ use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Database\Eloquent\Casts\ArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsEncryptedArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsEncryptedCollection;
+use Illuminate\Database\Eloquent\Casts\AsEncryptedInstance;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Collection;
@@ -37,6 +38,7 @@ class EloquentModelEncryptedCastingTest extends DatabaseTestCase
             $table->text('secret_json')->nullable();
             $table->text('secret_object')->nullable();
             $table->text('secret_collection')->nullable();
+            $table->text('secret_instance')->nullable();
         });
     }
 
@@ -284,6 +286,53 @@ class EloquentModelEncryptedCastingTest extends DatabaseTestCase
         $this->assertNull($subject->fresh()->secret_collection);
     }
 
+    public function testAsEncryptedInstance()
+    {
+        $this->encrypter->expects('encryptString')
+            ->twice()
+            ->with('{"key1":"value1"}')
+            ->andReturn('encrypted-secret-collection-string-1');
+        $this->encrypter->expects('encryptString')
+            ->times(7)
+            ->with('{"key1":"value1"}')
+            ->andReturn('encrypted-secret-collection-string-2');
+        $this->encrypter->expects('decryptString')
+            ->once()
+            ->with('encrypted-secret-collection-string-2')
+            ->andReturn('{"key1":"value1"}');
+
+        $subject = new EncryptedCast;
+
+        $subject->mergeCasts(['secret_instance' => AsEncryptedInstance::of(Fluent::class)]);
+
+        $subject->secret_instance = new Fluent(['key1' => 'value1']);
+
+        $subject->save();
+
+        $this->assertInstanceOf(Fluent::class, $subject->secret_instance);
+        $this->assertSame('value1', $subject->secret_instance->key1);
+        $this->assertDatabaseHas('encrypted_casts', [
+            'id' => $subject->id,
+            'secret_instance' => 'encrypted-secret-collection-string-2',
+        ]);
+
+        $subject = $subject->fresh();
+
+        $this->assertInstanceOf(Fluent::class, $subject->secret_instance);
+        $this->assertSame('value1', $subject->secret_instance->key1);
+
+        $subject->secret_instance = null;
+        $subject->save();
+
+        $this->assertNull($subject->secret_instance);
+        $this->assertDatabaseHas('encrypted_casts', [
+            'id' => $subject->id,
+            'secret_instance' => null,
+        ]);
+
+        $this->assertNull($subject->fresh()->secret_instance);
+    }
+
     public function testAsEncryptedArrayObject()
     {
         $this->encrypter->expects('encryptString')
@@ -378,6 +427,7 @@ class EloquentModelEncryptedCastingTest extends DatabaseTestCase
  * @property $secret_json
  * @property $secret_object
  * @property $secret_collection
+ * @property $secret_instance
  */
 class EncryptedCast extends Model
 {
