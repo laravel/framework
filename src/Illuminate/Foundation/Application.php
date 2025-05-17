@@ -241,6 +241,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
         return (new Configuration\ApplicationBuilder(new static($basePath)))
             ->withKernels()
             ->withEvents()
+            ->withPolicies()
             ->withCommands()
             ->withProviders();
     }
@@ -1352,6 +1353,22 @@ class Application extends Container implements ApplicationContract, CachesConfig
     public function getCachedEventsPath()
     {
         return $this->normalizeCachePath('APP_EVENTS_CACHE', 'cache/events.php');
+    }
+
+    /**
+     * Determine if the policies are cached.
+     */
+    public function policiesAreCached(): bool
+    {
+        return $this['files']->exists($this->getCachedPoliciesPath());
+    }
+
+    /**
+     * Get the path to the policies cache file.
+     */
+    public function getCachedPoliciesPath(): string
+    {
+        return $this->normalizeCachePath('APP_POLICIES_CACHE', 'cache/policies.php');
     }
 
     /**
