@@ -1640,19 +1640,26 @@ class TestResponse implements ArrayAccess
      * Assert that the session does not have a given key.
      *
      * @param  string|array  $key
+     * @param  mixed  $value
      * @return $this
      */
-    public function assertSessionMissing($key)
+    public function assertSessionMissing($key, $value = null)
     {
         if (is_array($key)) {
             foreach ($key as $value) {
                 $this->assertSessionMissing($value);
             }
-        } else {
+        }
+
+        if (is_null($value)) {
             PHPUnit::withResponse($this)->assertFalse(
                 $this->session()->has($key),
                 "Session has unexpected key [{$key}]."
             );
+        } elseif ($value instanceof Closure) {
+            PHPUnit::withResponse($this)->assertTrue($value($this->session()->get($key)));
+        } else {
+            PHPUnit::withResponse($this)->assertEquals($value, $this->session()->get($key));
         }
 
         return $this;
