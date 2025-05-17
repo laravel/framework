@@ -2,8 +2,11 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsCollection;
+use Illuminate\Database\Eloquent\Casts\AsInstance;
 use Illuminate\Database\Eloquent\Casts\AsStringable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
@@ -12,6 +15,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\Stringable;
+use InvalidArgumentException;
+use ValueError;
 
 class DatabaseCustomCastsTest extends DatabaseTestCase
 {
@@ -73,7 +78,7 @@ class DatabaseCustomCastsTest extends DatabaseTestCase
                 'age' => 34,
                 'meta' => ['title' => 'Developer'],
             ],
-            $model->array_object->toArray()
+            $model->array_object->toArray(),
         );
 
         $this->assertEquals(
@@ -82,7 +87,7 @@ class DatabaseCustomCastsTest extends DatabaseTestCase
                 'age' => 34,
                 'meta' => ['title' => 'Developer'],
             ],
-            $model->array_object_json->toArray()
+            $model->array_object_json->toArray(),
         );
     }
 
@@ -142,7 +147,7 @@ class DatabaseCustomCastsTest extends DatabaseTestCase
                 'name' => 'Taylor',
                 'meta' => ['title' => 'Developer'],
             ],
-            $model->array_object->toArray()
+            $model->array_object->toArray(),
         );
 
         $this->assertEquals(
@@ -150,7 +155,7 @@ class DatabaseCustomCastsTest extends DatabaseTestCase
                 'name' => 'Taylor',
                 'meta' => ['title' => 'Developer'],
             ],
-            $model->array_object_json->toArray()
+            $model->array_object_json->toArray(),
         );
     }
 
@@ -215,6 +220,112 @@ class DatabaseCustomCastsTest extends DatabaseTestCase
         $this->assertInstanceOf(FluentWithCallback::class, $model->collection->first());
         $this->assertSame('bar', $model->collection->first()->foo);
     }
+
+    public function test_as_instance_of_class(): void
+    {
+        $model = new TestEloquentModelWithCustomCasts();
+        $model->mergeCasts([
+            'instance' => AsInstance::of(InstanceAttribute::class),
+        ]);
+
+        $model->setRawAttributes([
+            'instance' => json_encode(['foo' => 'bar']),
+        ]);
+
+        $this->assertInstanceOf(InstanceAttribute::class, $model->instance);
+        $this->assertSame(['foo' => 'bar'], $model->instance->foo);
+        $this->assertNull($model->instance->bar);
+
+        $model->instance->bar = '2';
+        $this->assertSame('2', $model->instance->bar);
+    }
+
+    public function test_as_instance_of_class_with_from_array(): void
+    {
+        $model = new TestEloquentModelWithCustomCasts();
+        $model->mergeCasts([
+            'instance' => AsInstance::of(InstanceAttributeWithFromArray::class),
+        ]);
+
+        $model->setRawAttributes([
+            'instance' => json_encode(['foo' => 1, 'bar' => 2]),
+        ]);
+
+        $this->assertInstanceOf(InstanceAttribute::class, $model->instance);
+        $this->assertSame(1, $model->instance->foo);
+        $this->assertSame(2, $model->instance->bar);
+
+        $model->instance->bar = '2';
+        $this->assertSame('2', $model->instance->bar);
+    }
+
+    public function test_as_instance_of_class_fails_without_argument(): void
+    {
+        $model = new TestEloquentModelWithCustomCasts();
+        $model->mergeCasts([
+            'instance' => AsInstance::class,
+        ]);
+
+        $model->setRawAttributes([
+            'instance' => json_encode(['foo' => 1, 'bar' => 2]),
+        ]);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('A class name must be provided to cast as an instance.');
+
+        $model->instance;
+    }
+
+    public function test_as_instance_of_class_fails_if_not_arrayable_nor_jsonable(): void
+    {
+        $model = new TestEloquentModelWithCustomCasts();
+        $model->mergeCasts([
+            'instance' => AsInstance::of(InstanceAttributeWithoutContracts::class),
+        ]);
+
+        $model->setRawAttributes([
+            'instance' => json_encode(['foo' => 1, 'bar' => 2]),
+        ]);
+
+        $this->expectException(ValueError::class);
+        $this->expectExceptionMessage(
+            'The ' . InstanceAttributeWithoutContracts::class . ' class should implement Jsonable or Arrayable contract.'
+        );
+
+        $model->instance = new InstanceAttributeWithoutContracts('foo');
+    }
+
+    public function test_as_instance_of_class_uses_jsonable_contract(): void
+    {
+        $model = new TestEloquentModelWithCustomCasts();
+        $model->mergeCasts([
+            'instance' => AsInstance::of(InstanceAttributeWithOnlyJsonable::class),
+        ]);
+
+        $model->setRawAttributes([
+            'instance' => json_encode(['foo' => 'bar']),
+        ]);
+
+        $this->assertInstanceOf(InstanceAttributeWithOnlyJsonable::class, $model->instance);
+        $this->assertSame(['foo' => 'bar'], $model->instance->foo);
+        $this->assertNull($model->instance->bar);
+    }
+
+    public function test_as_instance_of_class_uses_arrayable_contract(): void
+    {
+        $model = new TestEloquentModelWithCustomCasts();
+        $model->mergeCasts([
+            'instance' => AsInstance::of(InstanceAttributeWithOnlyArrayable::class),
+        ]);
+
+        $model->setRawAttributes([
+            'instance' => json_encode(['foo' => 'bar']),
+        ]);
+
+        $this->assertInstanceOf(InstanceAttributeWithOnlyArrayable::class, $model->instance);
+        $this->assertSame(['foo' => 'bar'], $model->instance->foo);
+        $this->assertNull($model->instance->bar);
+    }
 }
 
 class TestEloquentModelWithCustomCasts extends Model
@@ -272,4 +383,74 @@ class FluentWithCallback extends Fluent
 
 class CustomCollection extends Collection
 {
+}
+
+
+class InstanceAttribute implements Jsonable, Arrayable
+{
+    public function __construct(public $foo, public $bar = null)
+    {
+        //
+    }
+
+    public function toJson($options = 0)
+    {
+        return json_encode($this->toArray());
+    }
+
+    public function toArray()
+    {
+        return [
+            'foo' => $this->foo,
+            'bar' => $this->bar,
+        ];
+    }
+}
+
+class InstanceAttributeWithFromArray extends InstanceAttribute
+{
+    public static function fromArray($array)
+    {
+        return new static($array['foo'], $array['bar']);
+    }
+}
+
+class InstanceAttributeWithOnlyJsonable implements Jsonable
+{
+    public function __construct(public $foo, public $bar = null)
+    {
+        //
+    }
+
+    public function toJson($options = 0)
+    {
+        return json_encode([
+            'foo' => $this->foo,
+            'bar' => $this->bar,
+        ]);
+    }
+}
+
+class InstanceAttributeWithOnlyArrayable implements Arrayable
+{
+    public function __construct(public $foo, public $bar = null)
+    {
+        //
+    }
+
+    public function toArray()
+    {
+        return [
+            'foo' => $this->foo,
+            'bar' => $this->bar,
+        ];
+    }
+}
+
+class InstanceAttributeWithoutContracts
+{
+    public function __construct(public $foo, public $bar = null)
+    {
+        //
+    }
 }
