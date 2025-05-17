@@ -50,19 +50,19 @@ class AsInstance implements Castable
 
             public function set($model, $key, $value, $attributes)
             {
-                if (! isset($attributes[$key])) {
-                    return;
+                if (! is_null($value)) {
+                    return [
+                        $key => match(true) {
+                            $value instanceof Jsonable => $value->toJson(),
+                            $value instanceof Arrayable => Json::encode($value->toArray()),
+                            default => throw new ValueError(sprintf(
+                                    'The %s class should implement Jsonable or Arrayable contract.', $this->class)
+                            )
+                        }
+                    ];
                 }
 
-                return [
-                    $key => match(true) {
-                        $value instanceof Jsonable => $value->toJson(),
-                        $value instanceof Arrayable => Json::encode($value->toArray()),
-                        default => throw new ValueError(sprintf(
-                            'The %s class should implement Jsonable or Arrayable contract.', $this->class)
-                        )
-                    }
-                ];
+                return null;
             }
         };
     }
