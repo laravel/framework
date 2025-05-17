@@ -78,7 +78,7 @@ class DatabaseCustomCastsTest extends DatabaseTestCase
                 'age' => 34,
                 'meta' => ['title' => 'Developer'],
             ],
-            $model->array_object->toArray(),
+            $model->array_object->toArray()
         );
 
         $this->assertEquals(
@@ -87,7 +87,7 @@ class DatabaseCustomCastsTest extends DatabaseTestCase
                 'age' => 34,
                 'meta' => ['title' => 'Developer'],
             ],
-            $model->array_object_json->toArray(),
+            $model->array_object_json->toArray()
         );
     }
 
@@ -147,7 +147,7 @@ class DatabaseCustomCastsTest extends DatabaseTestCase
                 'name' => 'Taylor',
                 'meta' => ['title' => 'Developer'],
             ],
-            $model->array_object->toArray(),
+            $model->array_object->toArray()
         );
 
         $this->assertEquals(
@@ -155,7 +155,7 @@ class DatabaseCustomCastsTest extends DatabaseTestCase
                 'name' => 'Taylor',
                 'meta' => ['title' => 'Developer'],
             ],
-            $model->array_object_json->toArray(),
+            $model->array_object_json->toArray()
         );
     }
 
@@ -240,11 +240,11 @@ class DatabaseCustomCastsTest extends DatabaseTestCase
         $this->assertSame('2', $model->instance->bar);
     }
 
-    public function test_as_instance_of_class_with_from_array(): void
+    public function test_as_instance_of_class_with_callable(): void
     {
         $model = new TestEloquentModelWithCustomCasts();
         $model->mergeCasts([
-            'instance' => AsInstance::of(InstanceAttributeWithFromArray::class),
+            'instance' => AsInstance::of([InstanceAttributeWithFromArray::class, 'fromArray']),
         ]);
 
         $model->setRawAttributes([
