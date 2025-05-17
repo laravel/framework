@@ -21,12 +21,13 @@ class AsInstance implements Castable
     {
         return new class($arguments) implements CastsAttributes
         {
-            protected string $class;
-
-            public function __construct(array $arguments)
+            public function __construct(protected array $arguments)
             {
-                $this->class = $arguments[0]
-                    ?? throw new InvalidArgumentException('A class name must be provided to cast as an instance.');
+                $this->arguments = array_pad(array_values($this->arguments), 2, '');
+
+                if (!$this->arguments[0]) {
+                    throw new InvalidArgumentException('A class name must be provided to cast as an instance.');
+                }
             }
 
             public function get($model, $key, $value, $attributes)
@@ -41,11 +42,11 @@ class AsInstance implements Castable
                     return null;
                 }
 
-                if (method_exists($this->class, 'fromArray')) {
-                    return $this->class::fromArray($data);
+                if ($this->arguments[1]) {
+                    return $this->arguments[0]::{$this->arguments[1]}($data);
                 }
 
-                return new $this->class($data);
+                return new $this->arguments[0]($data);
             }
 
             public function set($model, $key, $value, $attributes)
@@ -56,7 +57,7 @@ class AsInstance implements Castable
                             $value instanceof Jsonable => $value->toJson(),
                             $value instanceof Arrayable => Json::encode($value->toArray()),
                             default => throw new ValueError(sprintf(
-                                    'The %s class should implement Jsonable or Arrayable contract.', $this->class)
+                                    'The %s class should implement Jsonable or Arrayable contract.', $this->arguments[0])
                             )
                         }
                     ];
@@ -70,11 +71,15 @@ class AsInstance implements Castable
     /**
      * Specify the class to make an instance from.
      *
-     * @param  class-string  $class
+     * @param  class-string|array<class-string, string>  $class
      * @return string
      */
     public static function of($class)
     {
+        if (is_array($class)) {
+            $class = $class[0] .','. $class[1];
+        }
+
         return static::class . ':' . $class;
     }
 }
