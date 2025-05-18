@@ -622,7 +622,7 @@ trait InteractsWithPivotTable
 
         if ($value instanceof BaseCollection || is_array($value)) {
             return (new BaseCollection($value))
-                ->map(fn ($item) => $item instanceof Model ? $item->{$this->relatedKey} : $item)
+                ->map($this->parseId(...))
                 ->all();
         }
 
