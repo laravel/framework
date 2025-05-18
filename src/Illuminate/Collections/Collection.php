@@ -615,6 +615,27 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Determine if all keys exist in the collection.
+     *
+     * @param  TKey|array<array-key, TKey>  $keys
+     * @return bool
+     */
+    public function hasAll($keys)
+    {
+        $keys = is_array($keys) ? $keys : func_get_args();
+
+        if (empty($keys)) {
+            throw new InvalidArgumentException('Keys must be provided.');
+        }
+
+        if ($this->isEmpty()) {
+            return false;
+        }
+
+        return empty(array_diff($keys, array_keys($this->all())));
+    }
+
+    /**
      * Concatenate values of a given key as a string.
      *
      * @param  (callable(TValue, TKey): mixed)|string|null  $value

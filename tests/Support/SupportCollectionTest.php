@@ -2358,6 +2358,25 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testHasAll($collection)
+    {
+        $data = new $collection(['id' => 1, 'first' => 'Hello', 'second' => 'World']);
+
+        $this->assertTrue($data->hasAll('id'));
+        $this->assertTrue($data->hasAll('id', 'first', 'second'));
+        $this->assertFalse($data->hasAll('id', 'first', 'second', 'third'));
+        $this->assertTrue($data->hasAll(['id', 'first']));
+        $this->assertTrue($data->hasAll(['first', 'second']));
+        $this->assertFalse($data->hasAll(['third', 'fourth']));
+        $this->assertFalse($data->hasAll('third', 'fourth'));
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Keys must be provided.');
+
+        $data->hasAll([]);
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testImplode($collection)
     {
         $data = new $collection([['name' => 'taylor', 'email' => 'foo'], ['name' => 'dayle', 'email' => 'bar']]);
