@@ -619,6 +619,8 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      *
      * @param  TKey|array<array-key, TKey>  $keys
      * @return bool
+     *
+     * @throws \InvalidArgumentException
      */
     public function hasAll($keys)
     {
@@ -736,7 +738,6 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      * Determine if the collection contains exactly one item. If a callback is provided, determine if exactly one item matches the condition.
      *
      * @param  (callable(TValue, TKey): bool)|null  $callback
-     * @return bool
      */
     public function containsOneItem(?callable $callback = null): bool
     {
@@ -901,7 +902,6 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Multiply the items in the collection by the multiplier.
      *
-     * @param  int  $multiplier
      * @return static
      */
     public function multiply(int $multiplier)
@@ -1452,7 +1452,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
             ? $this->operatorForWhere(...func_get_args())
             : $key;
 
-        $placeholder = new stdClass();
+        $placeholder = new stdClass;
 
         $item = $this->first($filter, $placeholder);
 
@@ -1572,7 +1572,6 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      * Sort the collection using multiple comparisons.
      *
      * @param  array<array-key, (callable(TValue, TValue): mixed)|(callable(TValue, TKey): mixed)|string|array{string, string}>  $comparisons
-     * @param  int  $options
      * @return static
      */
     protected function sortByMany(array $comparisons = [], int $options = SORT_REGULAR)
@@ -1858,8 +1857,6 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
 
     /**
      * Count the number of items in the collection.
-     *
-     * @return int
      */
     public function count(): int
     {
@@ -1904,7 +1901,6 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      * Determine if an item exists at an offset.
      *
      * @param  TKey  $key
-     * @return bool
      */
     public function offsetExists($key): bool
     {
@@ -1927,7 +1923,6 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      *
      * @param  TKey|null  $key
      * @param  TValue  $value
-     * @return void
      */
     public function offsetSet($key, $value): void
     {
@@ -1942,7 +1937,6 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      * Unset the item at a given offset.
      *
      * @param  TKey  $key
-     * @return void
      */
     public function offsetUnset($key): void
     {
