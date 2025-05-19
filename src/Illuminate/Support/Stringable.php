@@ -1336,14 +1336,14 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
-     * Return the hash of the string using the given algorithm.
+     * Hash the string using the given algorithm.
      *
-     * @param  string  $algo
+     * @param  string  $algorithm
      * @return static
      */
-    public function hash(string $algo)
+    public function hash(string $algorithm)
     {
-        return new static(hash($algo, $this->value));
+        return new static(hash($algorithm, $this->value));
     }
 
     /**
