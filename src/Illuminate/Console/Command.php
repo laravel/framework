@@ -263,7 +263,7 @@ class Command extends SymfonyCommand
      * Fail the command manually.
      *
      * @param  \Throwable|string|null  $exception
-     * @return void
+     * @return never
      *
      * @throws \Illuminate\Console\ManuallyFailedException|\Throwable
      */
