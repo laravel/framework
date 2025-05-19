@@ -215,6 +215,23 @@ class TestResponse implements ArrayAccess
     }
 
     /**
+     * Assert whether the response is redirecting back to the previous location.
+     *
+     * @return $this
+     */
+    public function assertRedirectBack()
+    {
+        PHPUnit::withResponse($this)->assertTrue(
+            $this->isRedirect(),
+            $this->statusMessageWithDetails('201, 301, 302, 303, 307, 308', $this->getStatusCode()),
+        );
+
+        $this->assertLocation(app('url')->previous());
+
+        return $this;
+    }
+
+    /**
      * Assert whether the response is redirecting to a given route.
      *
      * @param  \BackedEnum|string  $name
