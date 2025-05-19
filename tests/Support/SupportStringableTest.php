@@ -1419,4 +1419,11 @@ class SupportStringableTest extends TestCase
         $this->assertSame('foobar', (string) $this->stringable(base64_encode('foobar'))->fromBase64(true));
         $this->assertSame('foobarbaz', (string) $this->stringable(base64_encode('foobarbaz'))->fromBase64());
     }
+
+    public function testHash()
+    {
+        $this->assertSame(hash('xxh3', 'foo'), (string) $this->stringable('foo')->hash('xxh3'));
+        $this->assertSame(hash('xxh3', 'foobar'), (string) $this->stringable('foobar')->hash('xxh3'));
+        $this->assertSame(hash('sha256', 'foobarbaz'), (string) $this->stringable('foobarbaz')->hash('sha256'));
+    }
 }
