@@ -116,6 +116,18 @@ class BroadcastingInstallCommand extends Command
                         trim($bootstrapScript.PHP_EOL.file_get_contents(__DIR__.'/stubs/echo-bootstrap-js.stub')).PHP_EOL,
                     );
                 }
+            } elseif (file_exists($appScriptPath = $this->laravel->resourcePath('js/app.js'))) {
+                // If no bootstrap.js, try app.js...
+                $appScript = file_get_contents(
+                    $appScriptPath
+                );
+
+                if (! str_contains($appScript, './echo')) {
+                    file_put_contents(
+                        $appScriptPath,
+                        trim($appScript.PHP_EOL.file_get_contents(__DIR__.'/stubs/echo-bootstrap-js.stub')).PHP_EOL,
+                    );
+                }
             }
         }
 
