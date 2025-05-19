@@ -427,4 +427,45 @@ class Number
             throw new RuntimeException('The "intl" PHP extension is required to use the ['.$method.'] method.');
         }
     }
+
+    /**
+     * Convert an integer into its Roman numeral representation.
+     *
+     * @param  int  $number  The number to convert (must be between 1 and 3999)
+     * @return string  The Roman numeral representation
+     * @throws \InvalidArgumentException  If the number is not between 1 and 3999
+     */
+    public static function roman(int $number): string
+    {
+        if ($number <= 0 || $number > 3999) {
+            throw new \InvalidArgumentException('Number must be between 1 and 3999.');
+        }
+
+        $map = [
+            'M'  => 1000,
+            'CM' => 900,
+            'D'  => 500,
+            'CD' => 400,
+            'C'  => 100,
+            'XC' => 90,
+            'L'  => 50,
+            'XL' => 40,
+            'X'  => 10,
+            'IX' => 9,
+            'V'  => 5,
+            'IV' => 4,
+            'I'  => 1,
+        ];
+
+        $result = '';
+
+        foreach ($map as $roman => $value) {
+            while ($number >= $value) {
+                $result .= $roman;
+                $number -= $value;
+            }
+        }
+
+        return $result;
+    }
 }
