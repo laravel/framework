@@ -107,7 +107,7 @@ class BroadcastingInstallCommand extends Command
             // Only add the bootstrap import for the standard JS implementation...
             if (file_exists($bootstrapScriptPath = $this->laravel->resourcePath('js/bootstrap.js'))) {
                 $bootstrapScript = file_get_contents(
-                    $bootstrapScriptPath,
+                    $bootstrapScriptPath
                 );
 
                 if (! str_contains($bootstrapScript, './echo')) {
@@ -119,12 +119,14 @@ class BroadcastingInstallCommand extends Command
             }
             // Fallback: if no bootstrap.js, try app.js
             elseif (file_exists($appScriptPath = $this->laravel->resourcePath('js/app.js'))) {
-                $appScript = file_get_contents($appScriptPath);
+                $appScript = file_get_contents(
+                    $appScriptPath
+                );
 
                 if (! str_contains($appScript, './echo')) {
                     file_put_contents(
                         $appScriptPath,
-                        trim($appScript.PHP_EOL.file_get_contents(__DIR__.'/stubs/echo-bootstrap-js.stub')).PHP_EOL
+                        trim($appScript.PHP_EOL.file_get_contents(__DIR__.'/stubs/echo-bootstrap-js.stub')).PHP_EOL,
                     );
                 }
             }
