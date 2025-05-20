@@ -18,7 +18,7 @@ class Context implements ContextualAttribute
     }
 
     /**
-     * Resolve the configuration value.
+     * Resolve the context value.
      *
      * @param  self  $attribute
      * @param  \Illuminate\Contracts\Container\Container  $container
