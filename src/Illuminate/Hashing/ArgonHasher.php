@@ -99,6 +99,10 @@ class ArgonHasher extends AbstractHasher implements HasherContract
             return false;
         }
 
+        if (isset($options['verify'])) {
+            $this->verifyAlgorithm = $options['verify'];
+        }
+
         if ($this->verifyAlgorithm && ! $this->isUsingCorrectAlgorithm($hashedValue)) {
             throw new RuntimeException('This password does not use the Argon2i algorithm.');
         }

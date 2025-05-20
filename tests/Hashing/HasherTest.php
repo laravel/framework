@@ -57,6 +57,9 @@ class HasherTest extends TestCase
         $this->assertSame('bcrypt', password_get_info($value)['algoName']);
         $this->assertGreaterThanOrEqual(12, password_get_info($value)['options']['cost']);
         $this->assertTrue($this->hashManager->isHashed($value));
+
+        $value = str_replace('$2y$', '$2a$', $hasher->make('password'));
+        $this->assertTrue($hasher->check('password', $value, ['verify' => false]));
     }
 
     public function testBcryptValueTooLong()
