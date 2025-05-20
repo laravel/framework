@@ -3323,6 +3323,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->expectException(RuntimeException::class);
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->straightJoin('contacts', 'users.id', 'contacts.id');
+        $builder->toSql();
     }
 
     public function testStraightJoinSub()
