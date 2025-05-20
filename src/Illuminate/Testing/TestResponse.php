@@ -267,27 +267,6 @@ class TestResponse implements ArrayAccess
     }
 
     /**
-     * Assert whether the response is redirecting to a given controller action.
-     *
-     * @param  string|array  $name
-     * @param  array  $parameters
-     * @return $this
-     */
-    public function assertRedirectToAction($name, $parameters = [])
-    {
-        $uri = action($name, $parameters);
-
-        PHPUnit::withResponse($this)->assertTrue(
-            $this->isRedirect(),
-            $this->statusMessageWithDetails('201, 301, 302, 303, 307, 308', $this->getStatusCode()),
-        );
-
-        $this->assertLocation($uri);
-
-        return $this;
-    }
-
-    /**
      * Assert whether the response is redirecting to a given signed route.
      *
      * @param  \BackedEnum|string|null  $name
@@ -322,6 +301,27 @@ class TestResponse implements ArrayAccess
                 app('url')->to($uri), $expectedUri
             );
         }
+
+        return $this;
+    }
+
+    /**
+     * Assert whether the response is redirecting to a given controller action.
+     *
+     * @param  string|array  $name
+     * @param  array  $parameters
+     * @return $this
+     */
+    public function assertRedirectToAction($name, $parameters = [])
+    {
+        $uri = action($name, $parameters);
+
+        PHPUnit::withResponse($this)->assertTrue(
+            $this->isRedirect(),
+            $this->statusMessageWithDetails('201, 301, 302, 303, 307, 308', $this->getStatusCode()),
+        );
+
+        $this->assertLocation($uri);
 
         return $this;
     }
