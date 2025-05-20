@@ -376,6 +376,14 @@ class MySqlGrammar extends Grammar
     }
 
     /**
+     * @return bool
+     */
+    protected function supportStraightJoin(): bool
+    {
+        return true;
+    }
+
+    /**
      * Compile a "lateral join" clause.
      *
      * @param  \Illuminate\Database\Query\JoinLateralClause  $join
