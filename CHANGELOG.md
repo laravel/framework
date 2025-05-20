@@ -1,6 +1,30 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.14.1...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.15.0...12.x)
+
+## [v12.15.0](https://github.com/laravel/framework/compare/v12.14.1...v12.15.0) - 2025-05-20
+
+* [12.x] Add locale-aware number parsing methods to Number class by [@informagenie](https://github.com/informagenie) in https://github.com/laravel/framework/pull/55725
+* [12.x] Add a default option when retrieving an enum from data by [@elbojoloco](https://github.com/elbojoloco) in https://github.com/laravel/framework/pull/55735
+* Revert "[12.x] Update "Number::fileSize" to use correct prefix and add prefix param" by [@ziadoz](https://github.com/ziadoz) in https://github.com/laravel/framework/pull/55741
+* [12.x] Remove apc by [@AhmedAlaa4611](https://github.com/AhmedAlaa4611) in https://github.com/laravel/framework/pull/55745
+* [12.x] Add param type for `assertJsonStructure` & `assertExactJsonStructure` methods by [@milwad-dev](https://github.com/milwad-dev) in https://github.com/laravel/framework/pull/55743
+* [12.x] Fix type casting for environment variables in config files by [@adamwhp](https://github.com/adamwhp) in https://github.com/laravel/framework/pull/55737
+* [12.x] Preserve "previous" model state by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/55729
+* [12.x] Passthru `getCountForPagination` on an Eloquent\Builder by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/55752
+* [12.x] Add `assertClientError` method to `TestResponse` by [@shane-zeng](https://github.com/shane-zeng) in https://github.com/laravel/framework/pull/55750
+* Install Broadcasting Command Fix for Livewire Starter Kit by [@joshcirre](https://github.com/joshcirre) in https://github.com/laravel/framework/pull/55774
+* Clarify units for benchmark value for IDE accessibility by [@mike-healy](https://github.com/mike-healy) in https://github.com/laravel/framework/pull/55781
+* Improved PHPDoc Return Types for Eloquent's Original Attribute Methods by [@clementbirkle](https://github.com/clementbirkle) in https://github.com/laravel/framework/pull/55779
+* [12.x] Prevent `preventsLazyLoading` exception when using `automaticallyEagerLoadRelationships` by [@devajmeireles](https://github.com/devajmeireles) in https://github.com/laravel/framework/pull/55771
+* [12.x] Add `hash` string helper by [@istiak-tridip](https://github.com/istiak-tridip) in https://github.com/laravel/framework/pull/55767
+* [12.x] Update `assertSessionMissing()` signature to match `assertSessionHas()` by [@nexxai](https://github.com/nexxai) in https://github.com/laravel/framework/pull/55763
+* Fix: php artisan db command if no password by [@mr-chetan](https://github.com/mr-chetan) in https://github.com/laravel/framework/pull/55761
+* [12.x] Types: InteractsWithPivotTable::sync by [@liamduckett](https://github.com/liamduckett) in https://github.com/laravel/framework/pull/55762
+* [12.x] feat: Add `current_page_url` to Paginator by [@mariomka](https://github.com/mariomka) in https://github.com/laravel/framework/pull/55789
+* Correct return type in PhpDoc for command fail method by [@Muetze42](https://github.com/Muetze42) in https://github.com/laravel/framework/pull/55783
+* [12.x] Add `assertRedirectToAction` method to test redirection to controller actions by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/55788
+* [12.x] Add Context contextual attribute by [@martinbean](https://github.com/martinbean) in https://github.com/laravel/framework/pull/55760
 
 ## [v12.14.1](https://github.com/laravel/framework/compare/v12.14.0...v12.14.1) - 2025-05-13
 
