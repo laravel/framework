@@ -483,9 +483,10 @@ class Repository implements ArrayAccess, CacheContract
      * @param  array{ 0: \DateTimeInterface|\DateInterval|int, 1: \DateTimeInterface|\DateInterval|int }  $ttl
      * @param  (callable(): TCacheValue)  $callback
      * @param  array{ seconds?: int, owner?: string }|null  $lock
+     * @param  bool  $alwaysDefer
      * @return TCacheValue
      */
-    public function flexible($key, $ttl, $callback, $lock = null)
+    public function flexible($key, $ttl, $callback, $lock = null, $alwaysDefer = false)
     {
         [
             $key => $value,
@@ -520,7 +521,7 @@ class Repository implements ArrayAccess, CacheContract
             });
         };
 
-        defer($refresh, "illuminate:cache:flexible:{$key}");
+        defer($refresh, "illuminate:cache:flexible:{$key}", $alwaysDefer);
 
         return $value;
     }
