@@ -3322,7 +3322,6 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $this->expectException(RuntimeException::class);
         $builder = $this->getBuilder();
-        $builder->getConnection()->shouldReceive('getDatabaseName');
         $builder->select('*')->from('users')->straightJoin('contacts', 'users.id', 'contacts.id');
     }
 
