@@ -22,6 +22,7 @@ use Illuminate\Validation\Rules\Numeric;
 use Illuminate\Validation\Rules\ProhibitedIf;
 use Illuminate\Validation\Rules\RequiredIf;
 use Illuminate\Validation\Rules\Unique;
+use Illuminate\Validation\Rules\DateRangeDoesNotOverlap;
 
 class Rule
 {
@@ -258,6 +259,26 @@ class Rule
     public static function anyOf($rules)
     {
         return new AnyOf($rules);
+    }
+
+    /**
+     * Create a new "date range does not overlap" rule instance.
+     *
+     * @param  string  $table
+     * @param  string  $startColumn
+     * @param  string  $endColumn
+     * @param  mixed  $excludeId
+     * @param  string  $idColumn
+     * @return \Illuminate\Validation\Rules\DateRangeDoesNotOverlap
+     */
+    public static function dateRangeDoesNotOverlap(
+        string $table,
+        string $startColumn = 'start_date',
+        string $endColumn = 'end_date',
+        $excludeId = null,
+        string $idColumn = 'id'
+    ) {
+        return new DateRangeDoesNotOverlap($table, $startColumn, $endColumn, $excludeId, $idColumn);
     }
 
     /**
