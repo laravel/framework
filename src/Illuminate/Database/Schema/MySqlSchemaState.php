@@ -117,7 +117,6 @@ class MySqlSchemaState extends SchemaState
 
         if (isset($config['options'][\PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT]) &&
             $config['options'][\PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] === false) {
-
             // Connecting to the MySQL server via the MariaDB client requires different SSL options.
             $value .= str_contains($this->makeProcess('mysql --version')->mustRun()->getOutput(), '-MariaDB')
                 ? ' --ssl=off'
