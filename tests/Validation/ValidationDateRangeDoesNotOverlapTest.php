@@ -1,18 +1,18 @@
 <?php
 
-namespace Illuminate\Validation\Rules;
+namespace Illuminate\Tests\Validation;
 
-use PHPUnit\Framework\TestCase;
+use Illuminate\Validation\Rules\DateRangeDoesNotOverlap;
+use Orchestra\Testbench\TestCase;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Translation\ArrayLoader;
-use Illuminate\Translation\Translator;
 use Mockery as m;
 
-class DateRangeDoesNotOverlapTest extends TestCase
+class ValidationDateRangeDoesNotOverlapTest extends TestCase
 {
     protected function tearDown(): void
     {
+        parent::tearDown();
         m::close();
     }
 
@@ -53,10 +53,7 @@ class DateRangeDoesNotOverlapTest extends TestCase
         $failed = false;
         $failCallback = function () use (&$failed) {
             $failed = true;
-            return m::mock('Illuminate\Contracts\Validation\ValidationRule\Failed')
-                ->shouldReceive('translate')
-                ->once()
-                ->getMock();
+            return m::mock()->shouldReceive('translate')->once()->getMock();
         };
 
         $rule->validate('start_date', '2025-06-01', $failCallback);
@@ -108,9 +105,7 @@ class DateRangeDoesNotOverlapTest extends TestCase
     protected function validateRule($rule, $attribute, $value)
     {
         $rule->validate($attribute, $value, function () {
-            return m::mock('Illuminate\Contracts\Validation\Failed')
-                ->shouldReceive('translate')
-                ->getMock();
+            return m::mock()->shouldReceive('translate')->getMock();
         });
     }
 
