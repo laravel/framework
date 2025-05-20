@@ -199,9 +199,9 @@ class Grammar extends BaseGrammar
                 return $this->compileJoinLateral($join, $tableAndNestedJoins);
             }
 
-            $joinWord = ($join->type === 'straight_join' && $this->supportStraightJoin()) ? '' : 'join';
+            $joinWord = ($join->type === 'straight_join' && $this->supportStraightJoin()) ? '' : ' join';
 
-            return trim("{$join->type} {$joinWord} {$tableAndNestedJoins} {$this->compileWheres($join)}");
+            return trim("{$join->type}{$joinWord} {$tableAndNestedJoins} {$this->compileWheres($join)}");
         })->implode(' ');
     }
 
