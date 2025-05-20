@@ -3299,6 +3299,53 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->from('users')->rightJoinSub(['foo'], 'sub', 'users.id', '=', 'sub.id');
     }
 
+    public function testStraightJoin()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->getConnection()->shouldReceive('getDatabaseName');
+        $builder->select('*')->from('users')->straightJoin('contacts', 'users.id', 'contacts.id');
+        $this->assertSame('select * from "users" straight_join "contacts" on "users"."id" = "contacts"."id"', $builder->toSql());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->getConnection()->shouldReceive('getDatabaseName');
+        $builder->select('*')->from('users')->join('contacts', 'users.id', '=', 'contacts.id')->straightJoin('photos', 'users.id', '=', 'photos.id');
+        $this->assertSame('select * from "users" inner join "contacts" on "users"."id" = "contacts"."id" straight_join "photos" on "users"."id" = "photos"."id"', $builder->toSql());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->getConnection()->shouldReceive('getDatabaseName');
+        $builder->select('*')->from('users')->straightJoinWhere('photos', 'users.id', '=', 'bar')->joinWhere('photos', 'users.id', '=', 'foo');
+        $this->assertSame('select * from "users" straight_join "photos" on "users"."id" = ? inner join "photos" on "users"."id" = ?', $builder->toSql());
+        $this->assertEquals(['bar', 'foo'], $builder->getBindings());
+    }
+
+    public function testStraightJoinNoSupport()
+    {
+        $this->expectException(RuntimeException::class);
+        $builder = $this->getMySqlBuilder();
+        $builder->getConnection()->shouldReceive('getDatabaseName');
+        $builder->select('*')->from('users')->straightJoin('contacts', 'users.id', 'contacts.id');
+    }
+
+    public function testStraightJoinSub()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->getConnection()->shouldReceive('getDatabaseName');
+        $builder->from('users')->straightJoinSub($this->getBuilder()->from('contacts'), 'sub', 'users.id', '=', 'sub.id');
+        $this->assertSame('select * from "users" straight_join (select * from "contacts") as "sub" on "users"."id" = "sub"."id"', $builder->toSql());
+
+        $this->expectException(InvalidArgumentException::class);
+        $builder = $this->getBuilder();
+        $builder->from('users')->straightJoinSub(['foo'], 'sub', 'users.id', '=', 'sub.id');
+    }
+
+    public function testStraightJoinSubNoSupport()
+    {
+        $this->expectException(RuntimeException::class);
+        $builder = $this->getBuilder();
+        $builder->from('users')->straightJoinSub($this->getBuilder()->from('contacts'), 'sub', 'users.id', '=', 'sub.id');
+        $builder->toSql();
+    }
+
     public function testJoinLateral()
     {
         $builder = $this->getMySqlBuilder();
