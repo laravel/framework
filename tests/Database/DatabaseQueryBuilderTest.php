@@ -3321,7 +3321,7 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testStraightJoinNoSupport()
     {
         $this->expectException(RuntimeException::class);
-        $builder = $this->getMySqlBuilder();
+        $builder = $this->getBuilder();
         $builder->getConnection()->shouldReceive('getDatabaseName');
         $builder->select('*')->from('users')->straightJoin('contacts', 'users.id', 'contacts.id');
     }
@@ -3331,7 +3331,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getMySqlBuilder();
         $builder->getConnection()->shouldReceive('getDatabaseName');
         $builder->from('users')->straightJoinSub($this->getBuilder()->from('contacts'), 'sub', 'users.id', '=', 'sub.id');
-        $this->assertSame('select * from `users` straight_join (select * from `contacts`) as `sub` on `users`.`id` = `sub`.`id`', $builder->toSql());
+        $this->assertSame('select * from `users` straight_join (select * from "contacts") as `sub` on `users`.`id` = `sub`.`id`', $builder->toSql());
 
         $this->expectException(InvalidArgumentException::class);
         $builder = $this->getBuilder();
