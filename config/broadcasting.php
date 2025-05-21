@@ -65,7 +65,7 @@ return [
         ],
 
         'sockudo' => [
-            'driver' => 'sockudo',
+            'driver' => 'pusher',
             'key' => env('SOCKUDO_APP_KEY'),
             'secret' => env('SOCKUDO_APP_SECRET'),
             'app_id' => env('SOCKUDO_APP_ID'),
