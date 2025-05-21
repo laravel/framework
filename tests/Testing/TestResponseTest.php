@@ -2808,9 +2808,9 @@ class TestResponseTest extends TestCase
         $response->assertSessionMissing('foo');
     }
 
-    #[TestWith(['foo', 'badvalue'])]
+    #[aTestWith(['foo', 'badvalue'])]
     #[TestWith(['foo', null])]
-    #[TestWith([['foo'], null])]
+    #[aTestWith([['foo', 'bar'], null])]
     public function testAssertSessionMissingValue(array|string $key, mixed $value)
     {
         $this->expectException(AssertionFailedError::class);
