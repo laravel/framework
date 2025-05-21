@@ -231,6 +231,21 @@ class ContextualAttributeBindingTest extends TestCase
         $container->make(ContextTest::class);
     }
 
+    public function testContextAttributeInteractingWithHidden(): void
+    {
+        $container = new Container;
+
+        $container->singleton(ContextRepository::class, function () {
+            $context = m::mock(ContextRepository::class);
+            $context->shouldReceive('getHidden')->once()->with('bar', null)->andReturn('bar');
+            $context->shouldNotReceive('get');
+
+            return $context;
+        });
+
+        $container->make(ContextHiddenTest::class);
+    }
+
     public function testStorageAttribute()
     {
         $container = new Container;
@@ -444,6 +459,13 @@ final class ConfigTest
 final class ContextTest
 {
     public function __construct(#[Context('foo')] string $foo)
+    {
+    }
+}
+
+final class ContextHiddenTest
+{
+    public function __construct(#[Context('bar', hidden: true)] string $foo)
     {
     }
 }
