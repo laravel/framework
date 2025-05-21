@@ -76,7 +76,7 @@ class ResendTransport extends AbstractTransport
 
                 $filename = $attachmentHeaders->getHeaderParameter('Content-Disposition', 'filename');
 
-                if($contentType == 'text/calendar') {
+                if ($contentType == 'text/calendar') {
                     $content = $attachment->getBody();
                 } else {
                     $content = str_replace("\r\n", '', $attachment->bodyToString());
