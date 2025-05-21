@@ -528,6 +528,46 @@ class Arr
     }
 
     /**
+     * Check if an item or items are missing in an array using "dot" notation.
+     *
+     * @param  \ArrayAccess|array  $array
+     * @param  string|array  $keys
+     * @return bool
+     */
+    public static function missing($array, $keys)
+    {
+        return ! static::has($array, $keys);
+    }
+
+    /**
+     * Determine if any of the keys are missing in an array using "dot" notation.
+     *
+     * @param  \ArrayAccess|array  $array
+     * @param  string|array  $keys
+     * @return bool
+     */
+    public static function missingAny($array, $keys)
+    {
+        if (is_null($keys)) {
+            return false;
+        }
+
+        $keys = (array) $keys;
+
+        if (! $array || $keys === []) {
+            return false;
+        }
+
+        foreach ($keys as $key) {
+            if (static::missing($array, $key)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Get an integer item from an array using "dot" notation.
      */
     public static function integer(ArrayAccess|array $array, string|int|null $key, ?int $default = null): int
