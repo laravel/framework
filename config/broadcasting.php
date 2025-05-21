@@ -65,7 +65,7 @@ return [
         ],
 
         'sockudo' => [
-            'driver' => 'reverb',
+            'driver' => 'sockudo',
             'key' => env('SOCKUDO_APP_KEY'),
             'secret' => env('SOCKUDO_APP_SECRET'),
             'app_id' => env('SOCKUDO_APP_ID'),
