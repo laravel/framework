@@ -1,0 +1,14 @@
+import Echo from 'laravel-echo';
+
+import Pusher from 'pusher-js';
+window.Pusher = Pusher;
+
+window.Echo = new Echo({
+    broadcaster: 'sockudo',
+    key: import.meta.env.VITE_SOCKUDO_APP_KEY,
+    wsHost: import.meta.env.VITE_SOCKUDO_HOST,
+    wsPort: import.meta.env.VITE_SOCKUDO_PORT ?? 80,
+    wssPort: import.meta.env.VITE_SOCKUDO_PORT ?? 443,
+    forceTLS: (import.meta.env.VITE_SOCKUDO_SCHEME ?? 'https') === 'https',
+    enabledTransports: ['ws', 'wss'],
+});

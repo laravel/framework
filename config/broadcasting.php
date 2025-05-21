@@ -64,6 +64,22 @@ return [
             ],
         ],
 
+        'sockudo' => [
+            'driver' => 'reverb',
+            'key' => env('SOCKUDO_APP_KEY'),
+            'secret' => env('SOCKUDO_APP_SECRET'),
+            'app_id' => env('SOCKUDO_APP_ID'),
+            'options' => [
+                'host' => env('SOCKUDO_HOST'),
+                'port' => env('SOCKUDO_PORT', 443),
+                'scheme' => env('SOCKUDO_SCHEME', 'https'),
+                'useTLS' => env('SOCKUDO_SCHEME', 'https') === 'https',
+            ],
+            'client_options' => [
+                // Guzzle client options: https://docs.guzzlephp.org/en/stable/request-options.html
+            ],
+        ],
+
         'ably' => [
             'driver' => 'ably',
             'key' => env('ABLY_KEY'),
