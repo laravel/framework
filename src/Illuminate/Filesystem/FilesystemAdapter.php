@@ -725,7 +725,7 @@ class FilesystemAdapter implements CloudFilesystemContract
      */
     public function url($path)
     {
-        if (isset($this->config['prefix']) && ! empty($this->config['prefix'])) {
+        if (isset($this->config['prefix'])) {
             $path = $this->concatPathToUrl($this->config['prefix'], $path);
         }
 
@@ -847,6 +847,14 @@ class FilesystemAdapter implements CloudFilesystemContract
      */
     protected function concatPathToUrl($url, $path)
     {
+        if (empty($url)) {
+            return trim($path, '/');
+        }
+
+        if (empty($path)) {
+            return trim($url, '/');
+        }
+
         return rtrim($url, '/').'/'.ltrim($path, '/');
     }
 
