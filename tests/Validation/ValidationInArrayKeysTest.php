@@ -52,7 +52,7 @@ class ValidationInArrayKeysTest extends TestCase
             'foo' => [
                 'first' => [
                     'nested_key' => 'value',
-                ]
+                ],
             ],
         ], ['foo.first' => 'in_array_keys:nested_key']);
         $this->assertTrue($v->passes());
