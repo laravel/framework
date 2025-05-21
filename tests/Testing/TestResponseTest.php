@@ -27,6 +27,7 @@ use Illuminate\Testing\TestResponse;
 use JsonSerializable;
 use Mockery as m;
 use PHPUnit\Framework\AssertionFailedError;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -2807,7 +2808,10 @@ class TestResponseTest extends TestCase
         $response->assertSessionMissing('foo');
     }
 
-    public function testAssertSessionMissingValue()
+    #[TestWith(['foo', 'badvalue'])]
+    #[TestWith(['foo', null])]
+    #[TestWith([['foo', 'bar'], null])]
+    public function testAssertSessionMissingValue(array|string $key, mixed $value)
     {
         $this->expectException(AssertionFailedError::class);
 
@@ -2816,7 +2820,7 @@ class TestResponseTest extends TestCase
         $store->put('foo', 'goodvalue');
 
         $response = TestResponse::fromBaseResponse(new Response());
-        $response->assertSessionMissing('foo', 'badvalue');
+        $response->assertSessionMissing($key, $value);
     }
 
     public function testAssertSessionHasInput()
