@@ -33,7 +33,6 @@ class BroadcastingInstallCommand extends Command
                     {--reverb : Install Laravel Reverb as the default broadcaster}
                     {--pusher : Install Pusher as the default broadcaster}
                     {--ably : Install Ably as the default broadcaster}
-                    {--sockudo: Install Sockudo as the default broadcaster}
                     {--without-node : Do not prompt to install Node dependencies}';
 
     /**
@@ -208,7 +207,6 @@ class BroadcastingInstallCommand extends Command
         match ($this->driver) {
             'pusher' => $this->collectPusherConfig(),
             'ably' => $this->collectAblyConfig(),
-            'sockudo' => $this->collectSockudoConfig(),
             default => null,
         };
     }
@@ -288,30 +286,6 @@ class BroadcastingInstallCommand extends Command
             'ABLY_KEY' => $key,
             'ABLY_PUBLIC_KEY' => $publicKey,
             'VITE_ABLY_PUBLIC_KEY' => '${ABLY_PUBLIC_KEY}',
-        ], $this->laravel->basePath('.env'));
-    }
-
-    /**
-     * Collect the Sockudo configuration.
-     *
-     * @return void
-     */
-    protected function collectSockudoConfig()
-    {
-        $appId = text('Sockudo App ID', 'Enter your Pusher app ID');
-        $key = password('Sockudo App Key', 'Enter your Pusher app key');
-        $secret = password('Sockudo App Secret', 'Enter your Pusher app secret');
-
-        Env::writeVariables([
-            'SOCKUDO_APP_ID' => $appId,
-            'SOCKUDO_APP_KEY' => $key,
-            'SOCKUDO_APP_SECRET' => $secret,
-            'SOCKUDO_PORT' => 443,
-            'SOCKUDO_SCHEME' => 'https',
-            'VITE_SOCKUDO_APP_KEY' => '${SOCKUDO_APP_KEY}',
-            'VITE_SOCKUDO_HOST' => '${SOCKUDO_HOST}',
-            'VITE_SOCKUDO' => '${SOCKUDO_PORT}',
-            'VITE_SOCKUDO_SCHEME' => '${SOCKUDO_SCHEME}',
         ], $this->laravel->basePath('.env'));
     }
 
@@ -486,15 +460,10 @@ class BroadcastingInstallCommand extends Command
             return 'ably';
         }
 
-        if ($this->option('sockudo')) {
-            return 'sockudo';
-        }
-
         return select('Which broadcasting driver would you like to use?', [
             'reverb' => 'Laravel Reverb',
             'pusher' => 'Pusher',
             'ably' => 'Ably',
-            'sockudo' => 'Sockudo',
         ]);
     }
 
