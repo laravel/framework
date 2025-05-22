@@ -52,6 +52,7 @@ use Illuminate\Support\Stringable;
 use InvalidArgumentException;
 use LogicException;
 use Mockery as m;
+use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use stdClass;
@@ -591,6 +592,17 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertFalse(isset($model['table']));
         $this->assertEquals(null, $model['table']);
         $this->assertFalse(isset($model['with']));
+    }
+
+    #[RequiresPhp('>= 8.4.0')]
+    public function testArrayAccessReturnsValueFromPropertyHook()
+    {
+        $class = require __DIR__.'/stubs/EloquentModelWithPropertyHook.php';
+        $class->first_name = 'John';
+        $class->last_name = 'Doe';
+
+        $this->assertTrue(isset($class['full_name']));
+        $this->assertSame('John Doe', $class['full_name']);
     }
 
     public function testOnly()

@@ -2304,6 +2304,8 @@ trait HasAttributes
             return $this->mutateAttribute($key, $value);
         } elseif ($this->hasAttributeGetMutator($key)) {
             return $this->mutateAttributeMarkedAttribute($key, $value);
+        } elseif ($this->hasPropertyHook($key)) {
+            return $this->{$key};
         }
 
         // If the attribute exists within the cast array, we will convert it to
