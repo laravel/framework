@@ -125,6 +125,16 @@ class Fluent implements Arrayable, ArrayAccess, Jsonable, JsonSerializable
     }
 
     /**
+     * Flip the items in the instance.
+     *
+     * @return static
+     */
+    public function flip()
+    {
+        return new static(array_flip($this->attributes));
+    }
+
+    /**
      * Get all of the attributes from the fluent instance.
      *
      * @param  array|mixed|null  $keys
