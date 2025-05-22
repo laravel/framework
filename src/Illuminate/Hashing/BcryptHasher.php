@@ -84,6 +84,16 @@ class BcryptHasher extends AbstractHasher implements HasherContract
             return false;
         }
 
+        $verifyOption = isset($options['verify']) ? (bool) $options['verify'] : null;
+
+        if ($verifyOption === false) {
+            return parent::check($value, $hashedValue, $options);
+        }
+
+        if ($verifyOption === true && $this->isUsingCorrectAlgorithm($hashedValue)) {
+            throw new RuntimeException('This password does not use the Bcrypt algorithm.');
+        }
+
         if ($this->verifyAlgorithm && ! $this->isUsingCorrectAlgorithm($hashedValue)) {
             throw new RuntimeException('This password does not use the Bcrypt algorithm.');
         }
