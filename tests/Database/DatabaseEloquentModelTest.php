@@ -618,6 +618,16 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertSame('John Doe', $class['full_name']);
     }
 
+    #[RequiresPhp('>= 8.4.0')]
+    public function testPropertyHookedAttributeCanBeSetViaArrayAccess()
+    {
+        $class = require __DIR__.'/stubs/EloquentModelWithPropertyHook.php';
+        $class['full_name'] = 'John Doe';
+
+        $this->assertSame('John', $class->first_name);
+        $this->assertSame('Doe', $class->last_name);
+    }
+
     public function testOnly()
     {
         $model = new EloquentModelStub;
