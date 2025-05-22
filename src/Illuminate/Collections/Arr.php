@@ -510,15 +510,13 @@ class Arr
             return false;
         }
 
-        $result = true;
-
         foreach ($keys as $key) {
             if (! static::has($array, $key)) {
-                $result = false;
+                return false;
             }
         }
 
-        return $result;
+        return true;
     }
 
     /**
