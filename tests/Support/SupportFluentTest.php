@@ -146,6 +146,28 @@ class SupportFluentTest extends TestCase
         $this->assertEquals(['forge', 'vapour', 'spark'], $fluent->scope('authors.taylor.products')->toArray());
     }
 
+    public function testFlip()
+    {
+        $fluent = new Fluent(['name' => 'taylor', 'framework' => 'laravel']);
+        $flipped = $fluent->flip();
+
+        $this->assertEquals(['taylor' => 'name', 'laravel' => 'framework'], $flipped->toArray());
+        $this->assertInstanceOf(Fluent::class, $flipped);
+
+        // Test with numeric keys
+        $fluent = new Fluent(['a', 'b', 'c']);
+        $flipped = $fluent->flip();
+
+        $this->assertEquals(['a' => 0, 'b' => 1, 'c' => 2], $flipped->toArray());
+
+        // Test that original fluent is unchanged
+        $original = new Fluent(['foo' => 'bar']);
+        $flipped = $original->flip();
+
+        $this->assertEquals(['foo' => 'bar'], $original->toArray());
+        $this->assertEquals(['bar' => 'foo'], $flipped->toArray());
+    }
+
     public function testToCollection()
     {
         $fluent = new Fluent(['forge', 'vapour', 'spark']);
