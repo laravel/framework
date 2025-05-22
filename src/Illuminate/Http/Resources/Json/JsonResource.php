@@ -50,6 +50,20 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     public static $wrap = 'data';
 
     /**
+     * Should pagination 'links' and 'meta' should be included in the response body.
+     *
+     * @var bool
+     */
+    public static $withPagination = true;
+
+    /**
+     * Should pagination 'links' and 'meta' should be included in the response header.
+     *
+     * @var bool
+     */
+    public static $withPaginationHeaders = false;
+
+    /**
      * Create a new resource instance.
      *
      * @param  mixed  $resource
@@ -218,6 +232,47 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     public static function withoutWrapping()
     {
         static::$wrap = null;
+    }
+
+    /**
+     * Enable pagination within the resource array.
+     *
+     * @return void
+     */
+    public static function paginate($value)
+    {
+        static::$withPagination = $value;
+    }
+
+    /**
+     * Disable pagination within the resource array.
+     *
+     * @return void
+     */
+    public static function withoutPagination()
+    {
+        static::$withPagination = false;
+    }
+
+    /**
+     * Include pagination headers in the response
+     *
+     * @param bool $value
+     * @return void
+     */
+    public static function withPaginationHeaders($value = true)
+    {
+        static::$withPaginationHeaders = $value;
+    }
+
+    /**
+     * Disable pagination headers in the response
+     *
+     * @return void
+     */
+    public static function withoutPaginationHeaders()
+    {
+        static::$withPaginationHeaders = false;
     }
 
     /**

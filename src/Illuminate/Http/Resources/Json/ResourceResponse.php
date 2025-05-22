@@ -109,6 +109,26 @@ class ResourceResponse implements Responsable
     }
 
     /**
+     * Get whether the resource has enabled pagination headers.
+     *
+     * @return bool
+     */
+    protected function paginationEnabled()
+    {
+        return get_class($this->resource)::$withPagination;
+    }
+
+    /**
+     * Get whether the resource has enabled pagination headers.
+     *
+     * @return bool
+     */
+    protected function paginationHeadersEnabled()
+    {
+        return get_class($this->resource)::$withPaginationHeaders;
+    }
+
+    /**
      * Calculate the appropriate status code for the response.
      *
      * @return int
