@@ -242,7 +242,7 @@ class ResourceTest extends TestCase
         $response->assertHeader('X-Pagination-Links-Last', '/?page=10');
         $response->assertHeader('X-Pagination-Links-Next', '/?page=2');
     }
-    
+
     public function testResourcesMayHaveOptionalValues()
     {
         Route::get('/', function () {
