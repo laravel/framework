@@ -22,13 +22,13 @@ class Argon2IdHasher extends ArgonHasher
             return false;
         }
 
-        $verifyOption = isset($options['verify']) ? (bool)$options['verify'] : null;
+        $verifyOption = isset($options['verify']) ? (bool) $options['verify'] : null;
 
-        if($verifyOption === false) {
+        if ($verifyOption === false) {
             return password_verify($value, $hashedValue);
         }
 
-        if($verifyOption === true && ! $this->isUsingCorrectAlgorithm($hashedValue)) {
+        if ($verifyOption === true && ! $this->isUsingCorrectAlgorithm($hashedValue)) {
             throw new RuntimeException('This password does not use the Bcrypt algorithm.');
         }
 
