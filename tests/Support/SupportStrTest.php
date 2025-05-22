@@ -1823,7 +1823,6 @@ class SupportStrTest extends TestCase
         $this->assertSame(explode(',', ''), Str::split(',', ''));
         $this->assertSame(explode(',', 'no-separator'), Str::split(',', 'no-separator'));
     }
-
 }
 
 class StringableObjectStub
