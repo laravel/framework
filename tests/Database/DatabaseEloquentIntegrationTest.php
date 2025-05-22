@@ -177,8 +177,8 @@ class DatabaseEloquentIntegrationTest extends TestCase
             });
 
             $this->schema($connection)->create('eloquent_test_achievement_eloquent_test_user', function ($table) {
-                $table->integer('eloquent_test_achievement_id');
-                $table->integer('eloquent_test_user_id');
+                $table->integer('achievement_id');
+                $table->integer('user_id');
             });
         }
 
@@ -2918,7 +2918,7 @@ class EloquentTestFriendPivot extends Pivot
 
     public function friend()
     {
-        return $this->belongsTo(EloquentTestUser::class);
+        return $this->belongsTo(EloquentTestUser::class, 'friend_id');
     }
 
     public function level()

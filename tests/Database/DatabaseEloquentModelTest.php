@@ -1742,7 +1742,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model = new EloquentModelStub;
         $this->addMockConnection($model);
         $relation = $model->hasOne(EloquentModelSaveStub::class);
-        $this->assertSame('save_stub.eloquent_model_stub_id', $relation->getQualifiedForeignKeyName());
+        $this->assertSame('save_stub.stub_id', $relation->getQualifiedForeignKeyName());
 
         $model = new EloquentModelStub;
         $this->addMockConnection($model);
@@ -1779,7 +1779,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model = new EloquentModelStub;
         $this->addMockConnection($model);
         $relation = $model->hasMany(EloquentModelSaveStub::class);
-        $this->assertSame('save_stub.eloquent_model_stub_id', $relation->getQualifiedForeignKeyName());
+        $this->assertSame('save_stub.stub_id', $relation->getQualifiedForeignKeyName());
 
         $model = new EloquentModelStub;
         $this->addMockConnection($model);
@@ -1805,7 +1805,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model = new EloquentModelStub;
         $this->addMockConnection($model);
         $relation = $model->belongsToStub();
-        $this->assertSame('belongs_to_stub_id', $relation->getForeignKeyName());
+        $this->assertSame('save_stub_id', $relation->getForeignKeyName());
         $this->assertSame($model, $relation->getParent());
         $this->assertInstanceOf(EloquentModelSaveStub::class, $relation->getQuery()->getModel());
 
@@ -1854,8 +1854,8 @@ class DatabaseEloquentModelTest extends TestCase
         $this->addMockConnection($model);
 
         $relation = $model->belongsToMany(EloquentModelSaveStub::class);
-        $this->assertSame('eloquent_model_save_stub_eloquent_model_stub.eloquent_model_stub_id', $relation->getQualifiedForeignPivotKeyName());
-        $this->assertSame('eloquent_model_save_stub_eloquent_model_stub.eloquent_model_save_stub_id', $relation->getQualifiedRelatedPivotKeyName());
+        $this->assertSame('eloquent_model_save_stub_eloquent_model_stub.stub_id', $relation->getQualifiedForeignPivotKeyName());
+        $this->assertSame('eloquent_model_save_stub_eloquent_model_stub.save_stub_id', $relation->getQualifiedRelatedPivotKeyName());
         $this->assertSame($model, $relation->getParent());
         $this->assertInstanceOf(EloquentModelSaveStub::class, $relation->getQuery()->getModel());
         $this->assertEquals(__FUNCTION__, $relation->getRelationName());
