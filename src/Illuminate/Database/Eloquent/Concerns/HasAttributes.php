@@ -562,7 +562,7 @@ trait HasAttributes
             return $this->relations[$key];
         }
 
-        if ($this->preventsLazyLoading && ! self::isAutomaticallyEagerLoadingRelationships()) {
+        if ($this->preventsLazyLoading) {
             $this->handleLazyLoadingViolation($key);
         }
 
