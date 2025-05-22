@@ -460,6 +460,7 @@ trait HasAttributes
             array_key_exists($key, $this->casts) ||
             $this->hasGetMutator($key) ||
             $this->hasAttributeMutator($key) ||
+            $this->hasPropertyHook($key) ||
             $this->isClassCastable($key);
     }
 
@@ -668,6 +669,22 @@ trait HasAttributes
         return static::$attributeMutatorCache[get_class($this)][$key] =
                     $returnType instanceof ReflectionNamedType &&
                     $returnType->getName() === Attribute::class;
+    }
+
+    protected function hasPropertyHook(string $key): bool
+    {
+        if (version_compare(phpversion(), '8.4.0', '<')) {
+            return false;
+        }
+
+        try {
+            $property = (new ReflectionClass($this))->getProperty($key);
+        } catch (\ReflectionException) {
+            // Property doesn't exist.
+            return false;
+        }
+
+        return $property->getHooks() !== [];
     }
 
     /**

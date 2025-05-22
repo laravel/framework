@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Concerns\HasAttributes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Mockery as m;
+use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseConcernsHasAttributesTest extends TestCase
@@ -60,6 +61,24 @@ class DatabaseConcernsHasAttributesTest extends TestCase
         unset($instance->cacheableProperty);
 
         $this->assertFalse($instance->cachedAttributeIsset('cacheableProperty'));
+    }
+
+    #[RequiresPhp('>= 8.4.0')]
+    public function testCanCastAttributeWithGetPropertyHook()
+    {
+        $class = require __DIR__.'/stubs/EloquentModelWithPropertyHook.php';
+        $class->first_name = 'John';
+        $class->last_name = 'Doe';
+        $this->assertSame('John Doe', $class->full_name);
+    }
+
+    #[RequiresPhp('>= 8.4.0')]
+    public function testCanCastAttributeWithSetPropertyHook()
+    {
+        $class = require __DIR__.'/stubs/EloquentModelWithPropertyHook.php';
+        $class->full_name = 'John Doe';
+        $this->assertEquals('John', $class->first_name);
+        $this->assertEquals('Doe', $class->last_name);
     }
 }
 
