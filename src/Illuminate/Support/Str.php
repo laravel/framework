@@ -2083,4 +2083,17 @@ class Str
         static::$camelCache = [];
         static::$studlyCache = [];
     }
+
+    /**
+     * Split a string by a given separator.
+     *
+     * @param  string  $separator
+     * @param  string  $string
+     * @param  int  $limit
+     * @return array
+     */
+    public static function split(string $separator, string $string, int $limit = PHP_INT_MAX)
+    {
+        return explode($separator, $string, $limit);
+    }
 }
