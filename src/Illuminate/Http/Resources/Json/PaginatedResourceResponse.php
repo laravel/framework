@@ -3,7 +3,6 @@
 namespace Illuminate\Http\Resources\Json;
 
 use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 
 class PaginatedResourceResponse extends ResourceResponse
 {

@@ -12,7 +12,8 @@ class PostCollectionResourceWithoutWrapAndExtraData extends ResourceCollection
 
     public $collects = PostResource::class;
 
-    public function with($request) {
+    public function with($request)
+    {
         return [
             'extra_data' => 'extra_value',
         ];
