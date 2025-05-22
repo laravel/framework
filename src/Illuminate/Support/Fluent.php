@@ -125,7 +125,7 @@ class Fluent implements Arrayable, ArrayAccess, Jsonable, JsonSerializable
     }
 
     /**
-     * Flip the items in the instance.
+     * Flip the attributes in the instance.
      *
      * @return static
      */
