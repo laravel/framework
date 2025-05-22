@@ -1869,6 +1869,7 @@ trait HasAttributes
     {
         $this->mergeAttributesFromClassCasts();
         $this->mergeAttributesFromAttributeCasts();
+        $this->mergeAttributesFromPropertyHooks();
     }
 
     /**
@@ -1914,6 +1915,27 @@ trait HasAttributes
                     $key, $callback($value, $this->attributes)
                 )
             );
+        }
+    }
+
+    /**
+     * Merge the property hooked attributes back into the model.
+     *
+     * @return void
+     */
+    protected function mergeAttributesFromPropertyHooks()
+    {
+        if (version_compare(phpversion(), '8.4.0', '<')) {
+            return;
+        }
+
+        foreach ((new ReflectionClass($this))->getProperties() as $property) {
+            if (! $property->hasHook(\PropertyHookType::Get)) {
+                continue;
+            }
+
+            $name = $property->getName();
+            $this->attributes[$name] = $this->{$name};
         }
     }
 

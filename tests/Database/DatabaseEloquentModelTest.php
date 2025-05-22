@@ -580,6 +580,19 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals($hash, $model->password_hash);
     }
 
+    #[RequiresPhp('>= 8.4.0')]
+    public function testPropertyHookedAttributeIsInTheAttributesArray()
+    {
+        $class = require __DIR__.'/stubs/EloquentModelWithPropertyHook.php';
+        $class->first_name = 'John';
+        $class->last_name = 'Doe';
+
+        $attributes = $class->getAttributes();
+        $this->assertArrayHasKey('full_name', $attributes);
+        $this->assertSame('John Doe', $attributes['full_name']);
+        $this->assertSame('John Doe', $class->getAttribute('full_name'));
+    }
+
     public function testArrayAccessToAttributes()
     {
         $model = new EloquentModelStub(['attributes' => 1, 'connection' => 2, 'table' => 3]);
