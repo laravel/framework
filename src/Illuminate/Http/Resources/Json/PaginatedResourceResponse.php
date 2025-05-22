@@ -20,7 +20,7 @@ class PaginatedResourceResponse extends ResourceResponse
             $this->wrap(
                 $this->resource->resolve($request),
                 array_merge_recursive(
-                    $this->paginationEnabled() ? $paginationInformation: [],
+                    $this->paginationEnabled() ? $paginationInformation : [],
                     $this->resource->with($request),
                     $this->resource->additional
                 )

@@ -255,9 +255,9 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     }
 
     /**
-     * Include pagination headers in the response
+     * Include pagination headers in the response.
      *
-     * @param bool $value
+     * @param  bool  $value
      * @return void
      */
     public static function withPaginationHeaders($value = true)
@@ -266,7 +266,7 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     }
 
     /**
-     * Disable pagination headers in the response
+     * Disable pagination headers in the response.
      *
      * @return void
      */
