@@ -24,4 +24,14 @@ class PostCollectionResourceWithPaginationInformation extends ResourceCollection
             'total_page' => $paginated['last_page'],
         ];
     }
+
+    public function responseHeaders($request, $pagination, $default)
+    {
+        return array_filter([
+            'X-Pagination-Current-Page' => $pagination['current_page'] ?? null,
+            'X-Pagination-Per-Page' => $pagination['per_page'] ?? null,
+            'X-Pagination-Total' => $pagination['total'] ?? null,
+            'X-Pagination-Total-Page' => $pagination['total_page'] ?? null,
+        ]);
+    }
 }

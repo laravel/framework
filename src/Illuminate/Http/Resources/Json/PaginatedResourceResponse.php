@@ -3,6 +3,7 @@
 namespace Illuminate\Http\Resources\Json;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 
 class PaginatedResourceResponse extends ResourceResponse
 {
@@ -26,7 +27,7 @@ class PaginatedResourceResponse extends ResourceResponse
                 )
             ),
             $this->calculateStatus(),
-            $this->paginationHeadersEnabled() ? $this->responseHeaders($paginationInformation) : [],
+            $this->paginationHeadersEnabled() ? $this->responseHeaders($request, $paginationInformation) : [],
             $this->resource->jsonOptions()
         ), function ($response) use ($request) {
             $response->original = $this->resource->resource->map(function ($item) {
@@ -96,12 +97,13 @@ class PaginatedResourceResponse extends ResourceResponse
     /**
      * Get the response headers for the given pagination information.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @param  array  $pagination
      * @return array
      */
-    protected function responseHeaders($pagination)
+    protected function responseHeaders($request, $pagination)
     {
-        return array_filter([
+        $default = array_filter([
             'X-Pagination-Current-Page' => $pagination['meta']['current_page'] ?? null,
             'X-Pagination-From' => $pagination['meta']['from'] ?? null,
             'X-Pagination-Last-Page' => $pagination['meta']['last_page'] ?? null,
@@ -114,5 +116,12 @@ class PaginatedResourceResponse extends ResourceResponse
             'X-Pagination-Links-Prev' => $pagination['links']['prev'] ?? null,
             'X-Pagination-Links-Next' => $pagination['links']['next'] ?? null,
         ]);
+
+        if (method_exists($this->resource, 'responseHeaders') ||
+            $this->resource->hasMacro('responseHeaders')) {
+            return $this->resource->responseHeaders($request, $pagination, $default);
+        }
+
+        return $default;
     }
 }

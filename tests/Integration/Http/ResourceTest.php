@@ -21,6 +21,10 @@ use Illuminate\Tests\Integration\Http\Fixtures\EmptyPostCollectionResource;
 use Illuminate\Tests\Integration\Http\Fixtures\ObjectResource;
 use Illuminate\Tests\Integration\Http\Fixtures\Post;
 use Illuminate\Tests\Integration\Http\Fixtures\PostCollectionResource;
+use Illuminate\Tests\Integration\Http\Fixtures\PostCollectionResourceWithHeaderPagination;
+use Illuminate\Tests\Integration\Http\Fixtures\PostCollectionResourceWithoutPagination;
+use Illuminate\Tests\Integration\Http\Fixtures\PostCollectionResourceWithoutWrap;
+use Illuminate\Tests\Integration\Http\Fixtures\PostCollectionResourceWithoutWrapAndExtraData;
 use Illuminate\Tests\Integration\Http\Fixtures\PostCollectionResourceWithPaginationInformation;
 use Illuminate\Tests\Integration\Http\Fixtures\PostModelCollectionResource;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResource;
@@ -144,6 +148,101 @@ class ResourceTest extends TestCase
             'title' => 'Test Title',
         ]);
     }
+
+    public function testResourceCollectionsMayHaveNoPagination()
+    {
+        Route::get('/', function () {
+            $posts = collect([
+                new Post(['id' => 1, 'title' => 'Test title 1']),
+                new Post(['id' => 2, 'title' => 'Test title 2']),
+            ]);
+
+            return new PostCollectionResourceWithoutPagination($posts);
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+        $response->assertJsonIsArray('data');
+        $response->assertJsonMissingPath('links');
+        $response->assertJsonMissingPath('meta');
+    }
+
+    public function testResourceCollectionsMayHaveNoWrap()
+    {
+        Route::get('/', function () {
+            $posts = collect([
+                new Post(['id' => 1, 'title' => 'Test title 1']),
+                new Post(['id' => 2, 'title' => 'Test title 2']),
+            ]);
+
+            return new PostCollectionResourceWithoutWrap($posts);
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+        $response->assertJsonMissingPath('data');
+        $response->assertJsonIsArray();
+    }
+
+    public function testResourceCollectionsAddWrapWithExtraData()
+    {
+        Route::get('/', function () {
+            $posts = collect([
+                new Post(['id' => 1, 'title' => 'Test title 1']),
+                new Post(['id' => 2, 'title' => 'Test title 2']),
+            ]);
+
+            return new PostCollectionResourceWithoutWrapAndExtraData($posts);
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('extra_data', 'extra_value');
+        $response->assertJsonIsArray('data');
+    }
+
+    public function testResourceCollectionsPaginationInHeader()
+    {
+        Route::get('/', function () {
+            $posts = collect([
+                new Post(['id' => 1, 'title' => 'Test title 1']),
+                new Post(['id' => 2, 'title' => 'Test title 2']),
+            ]);
+
+            return new PostCollectionResourceWithHeaderPagination(new LengthAwarePaginator($posts, 10, 1, 1));
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertJsonIsArray();
+        $response->assertJsonMissingPath('links');
+        $response->assertJsonMissingPath('meta');
+
+        $response->assertHeader('X-Pagination-Current-Page', 1);
+        $response->assertHeader('X-Pagination-From', 1);
+        $response->assertHeader('X-Pagination-Last-Page', 10);
+        $response->assertHeader('X-Pagination-Path', '/');
+        $response->assertHeader('X-Pagination-Per-Page', 1);
+        $response->assertHeader('X-Pagination-To', 2);
+        $response->assertHeader('X-Pagination-Total', 10);
+        $response->assertHeader('X-Pagination-Links-First', '/?page=1');
+        $response->assertHeader('X-Pagination-Links-Last', '/?page=10');
+        $response->assertHeader('X-Pagination-Links-Next', '/?page=2');
+    }
+
 
     public function testResourcesMayHaveOptionalValues()
     {
@@ -1349,6 +1448,31 @@ class ResourceTest extends TestCase
             'total_page' => 10,
             'total' => 10,
         ]);
+    }
+
+    public function testCollectionResourceWithPaginationInformationHeaders()
+    {
+        $posts = collect([
+            new Post(['id' => 5, 'title' => 'Test Title']),
+        ]);
+
+        PostCollectionResourceWithPaginationInformation::withPaginationHeaders();
+
+        Route::get('/', function () use ($posts) {
+            return new PostCollectionResourceWithPaginationInformation(new LengthAwarePaginator($posts, 10, 1, 1));
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/',
+            ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertHeader('X-Pagination-Total', 10);
+        $response->assertHeader('X-Pagination-Per-Page', 1);
+        $response->assertHeader('X-Pagination-Current-Page', 1);
+        $response->assertHeader('X-Pagination-Total-Page', 10);
     }
 
     public function testResourceWithPaginationInformation()
