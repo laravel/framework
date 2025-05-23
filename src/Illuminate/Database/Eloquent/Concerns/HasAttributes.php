@@ -382,9 +382,10 @@ trait HasAttributes
         $attributes = [];
 
         foreach ($this->getArrayableRelations() as $key => $value) {
-            // If the values implement the JsonSerializable interface we can just call this
-            // jsonSerialize method on the instances which will convert both models and
-            // collections to their proper array form and we'll set the values.
+            // If $useJsonSerialize is true (which happens when called from jsonSerialize
+            // or toJson methods) and the values implement the JsonSerializable interface,
+            // we can just call this jsonSerialize method on the instances which will convert
+            // both models and collections to their proper array form and we'll set the values.
             if ($useJsonSerialize && $value instanceof JsonSerializable) {
                 $relation = $value->jsonSerialize();
             }
