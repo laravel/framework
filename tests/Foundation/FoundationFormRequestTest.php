@@ -110,6 +110,16 @@ class FoundationFormRequestTest extends TestCase
         $this->createRequest([], FoundationTestFormRequestForbiddenWithResponseStub::class)->validateResolved();
     }
 
+    public function testValidateThrowsNoAuthorizationExceptionIfValidationFails()
+    {
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('error');
+
+        $request = $this->createRequest([], FoundationTestFormRequestAuthorizeAfterValidation::class);
+
+        $request->validateResolved();
+    }
+
     public function testValidateDoesntThrowExceptionFromResponseAllowed()
     {
         $this->createRequest([], FoundationTestFormRequestPassesWithResponseStub::class)->validateResolved();
@@ -434,6 +444,24 @@ class FoundationTestFormRequestHooks extends FormRequest
     public function passedValidation()
     {
         $this->replace(['name' => 'Adam']);
+    }
+}
+
+class FoundationTestFormRequestAuthorizeAfterValidation extends FormRequest
+{
+    public function authorize()
+    {
+        return Response::deny('foo');
+    }
+
+    public function rules()
+    {
+        return ['name' => 'required'];
+    }
+
+    protected function authorizeAfterValidation()
+    {
+        return true;
     }
 }
 

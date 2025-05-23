@@ -18,7 +18,9 @@ trait ValidatesWhenResolvedTrait
     {
         $this->prepareForValidation();
 
-        if (! $this->passesAuthorization()) {
+        $authorizeAfterValidation = $this->authorizeAfterValidation();
+
+        if (! $authorizeAfterValidation && ! $this->passesAuthorization()) {
             $this->failedAuthorization();
         }
 
@@ -30,6 +32,10 @@ trait ValidatesWhenResolvedTrait
 
         if ($instance->fails()) {
             $this->failedValidation($instance);
+        }
+
+        if ($authorizeAfterValidation && ! $this->passesAuthorization()) {
+            $this->failedAuthorization();
         }
 
         $this->passedValidation();
@@ -104,5 +110,15 @@ trait ValidatesWhenResolvedTrait
     protected function failedAuthorization()
     {
         throw new UnauthorizedException;
+    }
+
+    /**
+     * Determine if the request should verify the authorization only after validation.
+     *
+     * @return bool
+     */
+    protected function authorizeAfterValidation()
+    {
+        return false;
     }
 }
