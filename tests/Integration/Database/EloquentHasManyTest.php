@@ -231,7 +231,7 @@ class EloquentHasManyTestUser2 extends Model
 
     public function articles(): BelongsToMany
     {
-        return $this->authorship()->toMany(EloquentHasManyTestArticle::class/*, localKey: 'author_id'*/);
+        return $this->authorship()->toMany(EloquentHasManyTestArticle::class);
     }
 }
 
