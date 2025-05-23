@@ -1345,7 +1345,8 @@ class DatabaseEloquentModelTest extends TestCase
     public function testJsonSerializeUsesJsonSerializeParameter()
     {
         // Create a model that implements both JsonSerializable and Arrayable
-        $jsonSerializableRelation = new class implements \JsonSerializable, \Illuminate\Contracts\Support\Arrayable {
+        $jsonSerializableRelation = new class implements \JsonSerializable, \Illuminate\Contracts\Support\Arrayable
+        {
             public function jsonSerialize(): array
             {
                 return ['json_serialized' => 'value'];

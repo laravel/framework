@@ -48,7 +48,8 @@ class DatabaseConcernsHasAttributesTest extends TestCase
     public function testRelationsToArrayWithJsonSerialize()
     {
         // Create an object that implements both JsonSerializable and Arrayable
-        $jsonSerializableRelation = new class implements JsonSerializable, Arrayable {
+        $jsonSerializableRelation = new class implements JsonSerializable, Arrayable
+        {
             public function jsonSerialize(): array
             {
                 return ['json_serialized' => 'value'];
