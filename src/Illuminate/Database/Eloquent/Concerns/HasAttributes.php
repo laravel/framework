@@ -36,6 +36,7 @@ use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
+use JsonSerializable;
 use LogicException;
 use ReflectionClass;
 use ReflectionMethod;
@@ -376,15 +377,22 @@ trait HasAttributes
      *
      * @return array
      */
-    public function relationsToArray()
+    public function relationsToArray(bool $useJsonSerialize = false)
     {
         $attributes = [];
 
         foreach ($this->getArrayableRelations() as $key => $value) {
+            // If the values implement the JsonSerializable interface we can just call this
+            // jsonSerialize method on the instances which will convert both models and
+            // collections to their proper array form and we'll set the values.
+            if ($useJsonSerialize && $value instanceof JsonSerializable) {
+                $relation = $value->jsonSerialize();
+            }
+
             // If the values implement the Arrayable interface we can just call this
             // toArray method on the instances which will convert both models and
             // collections to their proper array form and we'll set the values.
-            if ($value instanceof Arrayable) {
+            elseif ($value instanceof Arrayable) {
                 $relation = $value->toArray();
             }
 

@@ -2,10 +2,12 @@
 
 namespace Illuminate\Tests\Database;
 
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasAttributes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
+use JsonSerializable;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -39,6 +41,43 @@ class DatabaseConcernsHasAttributesTest extends TestCase
 
         $this->assertEquals([
             'arrayable_relation' => ['foo' => 'bar'],
+            'null_relation' => null,
+        ], $mock->relationsToArray());
+    }
+
+    public function testRelationsToArrayWithJsonSerialize()
+    {
+        // Create an object that implements both JsonSerializable and Arrayable
+        $jsonSerializableRelation = new class implements JsonSerializable, Arrayable {
+            public function jsonSerialize(): array
+            {
+                return ['json_serialized' => 'value'];
+            }
+
+            public function toArray(): array
+            {
+                return ['array_method' => 'value'];
+            }
+        };
+
+        $mock = m::mock(HasAttributesWithoutConstructor::class)
+            ->makePartial()
+            ->shouldAllowMockingProtectedMethods()
+            ->shouldReceive('getArrayableRelations')->andReturn([
+                'relation' => $jsonSerializableRelation,
+                'null_relation' => null,
+            ])
+            ->getMock();
+
+        // Test with useJsonSerialize = true (should use jsonSerialize method)
+        $this->assertEquals([
+            'relation' => ['json_serialized' => 'value'],
+            'null_relation' => null,
+        ], $mock->relationsToArray(true));
+
+        // Test with default parameter (useJsonSerialize = false - should use toArray method)
+        $this->assertEquals([
+            'relation' => ['array_method' => 'value'],
             'null_relation' => null,
         ], $mock->relationsToArray());
     }

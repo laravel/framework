@@ -1342,6 +1342,40 @@ class DatabaseEloquentModelTest extends TestCase
         }
     }
 
+    public function testJsonSerializeUsesJsonSerializeParameter()
+    {
+        // Create a model that implements both JsonSerializable and Arrayable
+        $jsonSerializableRelation = new class implements \JsonSerializable, \Illuminate\Contracts\Support\Arrayable {
+            public function jsonSerialize(): array
+            {
+                return ['json_serialized' => 'value'];
+            }
+
+            public function toArray()
+            {
+                return ['array_method' => 'value'];
+            }
+        };
+
+        $model = new EloquentModelStub;
+        $model->setRelation('relation', $jsonSerializableRelation);
+
+        // Test that jsonSerialize passes true to toArray
+        $jsonSerialized = $model->jsonSerialize();
+        $this->assertArrayHasKey('relation', $jsonSerialized);
+        $this->assertEquals(['json_serialized' => 'value'], $jsonSerialized['relation']);
+
+        // Test that toArray with useJsonSerialize=false uses toArray method
+        $array = $model->toArray(false);
+        $this->assertArrayHasKey('relation', $array);
+        $this->assertEquals(['array_method' => 'value'], $array['relation']);
+
+        // Test that toArray with useJsonSerialize=true uses jsonSerialize method
+        $arrayWithJsonSerialize = $model->toArray(true);
+        $this->assertArrayHasKey('relation', $arrayWithJsonSerialize);
+        $this->assertEquals(['json_serialized' => 'value'], $arrayWithJsonSerialize['relation']);
+    }
+
     public function testGetQueueableRelationsWithCircularRelations()
     {
         $parent = new EloquentModelWithRecursiveRelationshipsStub(['id' => 1, 'parent_id' => null]);
@@ -4038,12 +4072,12 @@ class EloquentModelWithRecursiveRelationshipsStub extends Model
         return true;
     }
 
-    public function relationsToArray()
+    public function relationsToArray(bool $useJsonSerialize = false)
     {
         try {
             $this->stepIn();
 
-            return parent::relationsToArray();
+            return parent::relationsToArray(useJsonSerialize: $useJsonSerialize);
         } finally {
             $this->stepOut();
         }
