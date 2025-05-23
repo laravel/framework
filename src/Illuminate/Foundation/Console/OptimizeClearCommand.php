@@ -63,6 +63,7 @@ class OptimizeClearCommand extends Command
             'cache' => 'cache:clear',
             'compiled' => 'clear-compiled',
             'events' => 'event:clear',
+            'policies' => 'policy:clear',
             'routes' => 'route:clear',
             'views' => 'view:clear',
             ...ServiceProvider::$optimizeClearCommands,

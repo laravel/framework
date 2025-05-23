@@ -217,9 +217,7 @@ class ModelInspector
      */
     protected function getPolicy($model)
     {
-        $policy = Gate::getPolicyFor($model::class);
-
-        return $policy ? $policy::class : null;
+        return Gate::getPolicyClassFor($model::class);
     }
 
     /**
