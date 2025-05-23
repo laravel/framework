@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Database\Query\Builder as BaseBuilder;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
+use Illuminate\Support\Carbon;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use stdClass;
@@ -22,11 +23,23 @@ class DatabaseSoftDeletingScopeTest extends TestCase
 
     public function testApplyingScopeToABuilder()
     {
+        Carbon::setTestNow($now = now());
         $scope = m::mock(SoftDeletingScope::class.'[extend]');
         $builder = m::mock(EloquentBuilder::class);
         $model = m::mock(Model::class);
-        $model->shouldReceive('getQualifiedDeletedAtColumn')->once()->andReturn('table.deleted_at');
-        $builder->shouldReceive('whereNull')->once()->with('table.deleted_at');
+        $model->shouldReceive('getQualifiedDeletedAtColumn')->twice()->andReturn('table.deleted_at');
+        $builder->shouldReceive('whereNull')->once()->with('table.deleted_at')->andReturn($builder);
+        $builder->shouldReceive('orWhere')->once()->with('table.deleted_at', '>', m::on(function ($arg) use ($now) {
+            return $arg->timestamp === $now->timestamp;
+        }))->andReturn($builder);
+        $builder->shouldReceive('where')
+            ->once()
+            ->with(m::any(\Closure::class))
+            ->andReturnUsing(function ($closure) use ($builder) {
+                $closure($builder);
+
+                return $builder;
+            });
 
         $scope->apply($builder, $model);
     }
