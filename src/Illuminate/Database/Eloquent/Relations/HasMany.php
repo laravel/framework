@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Eloquent\Relations;
 
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Support\Str;
 
 /**
  * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
@@ -32,6 +33,50 @@ class HasMany extends HasOneOrMany
                 }
             }
         ));
+    }
+
+    /**
+     * Create a new model instance for a related model.
+     *
+     * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
+     *
+     * @param  class-string<TRelatedModel>  $class
+     * @return TRelatedModel
+     */
+    protected function newRelatedInstance($class)
+    {
+        return tap(new $class, function ($instance) {
+            if (! $instance->getConnectionName()) {
+                $instance->setConnection($this->parent->connection);
+            }
+        });
+    }
+
+    /**
+     * Convert the relationship to a "belongs to many" relationship.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<TPivotModel>
+     */
+    public function toMany($parent, $foreignKey = null, $localKey = null)
+    {
+        // First, we'll need to determine the foreign key and "other key" for the
+        // relationship. Once we have determined the keys we'll make the query
+        // instances as well as the relationship instances we need for this.
+        $instance = $this->newRelatedInstance($parent);
+
+        $foreignKey ??= $this->parent->getForeignKey();
+
+        $localKey ??= $instance->getForeignKey();
+
+        return new BelongsToMany(
+            $this->getQuery(),
+            $this->parent,
+            $this->related->getTable(),
+            $this->getForeignKeyName(),
+            $localKey,
+            $instance->getKeyName(),
+            $this->localKey,
+        );
     }
 
     /** @inheritDoc */
