@@ -671,7 +671,7 @@ trait HasAttributes
                     $returnType->getName() === Attribute::class;
     }
 
-    protected function hasPropertyHook(string $key): bool
+    protected function hasPropertyHook(string $key, ?string $propertyHookType = null): bool
     {
         if (version_compare(phpversion(), '8.4.0', '<')) {
             return false;
@@ -682,6 +682,10 @@ trait HasAttributes
         } catch (\ReflectionException) {
             // Property doesn't exist.
             return false;
+        }
+
+        if ($propertyHookType) {
+            return $property->hasHook(\PropertyHookType::from($propertyHookType));
         }
 
         return $property->getHooks() !== [];
@@ -1058,6 +1062,9 @@ trait HasAttributes
             return $this->setMutatedAttributeValue($key, $value);
         } elseif ($this->hasAttributeSetMutator($key)) {
             return $this->setAttributeMarkedMutatedAttributeValue($key, $value);
+        } elseif ($this->hasPropertyHook($key, 'set')) {
+            $this->{$key} = $value;
+            return;
         }
 
         // If an attribute is listed as a "date", we'll convert it from a DateTime

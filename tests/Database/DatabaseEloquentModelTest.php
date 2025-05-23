@@ -1600,6 +1600,30 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertSame('bar', $model->age);
     }
 
+    #[RequiresPhp('>= 8.4.0')]
+    public function testPropertyHookedAttributeIsFillable()
+    {
+        $class = require __DIR__.'/stubs/EloquentModelWithPropertyHook.php';
+        $class->fill([
+            'full_name' => 'John Doe',
+        ]);
+
+        $this->assertSame('John', $class->first_name);
+        $this->assertSame('Doe', $class->last_name);
+    }
+
+    #[RequiresPhp('>= 8.4.0')]
+    public function testPropertyHookedAttributeIsFillableViaConstructor()
+    {
+        $class = require __DIR__.'/stubs/EloquentModelWithPropertyHook.php';
+        $class = new $class([
+            'full_name' => 'John Doe',
+        ]);
+
+        $this->assertSame('John', $class->first_name);
+        $this->assertSame('Doe', $class->last_name);
+    }
+
     public function testQualifyColumn()
     {
         $model = new EloquentModelStub;

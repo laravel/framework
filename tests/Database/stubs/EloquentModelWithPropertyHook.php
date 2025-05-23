@@ -4,6 +4,10 @@ use Illuminate\Database\Eloquent\Model;
 
 return new class extends Model
 {
+    protected $fillable = [
+        'full_name',
+    ];
+
     public $attributes = [
         'first_name' => null,
         'last_name' => null,
