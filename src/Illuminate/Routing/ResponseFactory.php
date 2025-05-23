@@ -186,14 +186,14 @@ class ResponseFactory implements FactoryContract
     /**
      * Create a new streamed response instance.
      *
-     * @param  callable  $callback
+     * @param  callable|null  $callback
      * @param  int  $status
      * @param  array  $headers
      * @return \Symfony\Component\HttpFoundation\StreamedResponse
      */
     public function stream($callback, $status = 200, array $headers = [])
     {
-        if ((new ReflectionFunction($callback))->isGenerator()) {
+        if (! is_null($callback) && (new ReflectionFunction($callback))->isGenerator()) {
             return new StreamedResponse(function () use ($callback) {
                 foreach ($callback() as $chunk) {
                     echo $chunk;
