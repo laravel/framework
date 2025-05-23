@@ -14,17 +14,19 @@ class PaginatedResourceResponse extends ResourceResponse
      */
     public function toResponse($request)
     {
+        $paginationInformation = $this->paginationInformation($request);
+
         return tap(response()->json(
             $this->wrap(
                 $this->resource->resolve($request),
                 array_merge_recursive(
-                    $this->paginationInformation($request),
+                    $this->paginationEnabled() ? $paginationInformation : [],
                     $this->resource->with($request),
                     $this->resource->additional
                 )
             ),
             $this->calculateStatus(),
-            [],
+            $this->paginationHeadersEnabled() ? $this->responseHeaders($request, $paginationInformation) : [],
             $this->resource->jsonOptions()
         ), function ($response) use ($request) {
             $response->original = $this->resource->resource->map(function ($item) {
@@ -89,5 +91,36 @@ class PaginatedResourceResponse extends ResourceResponse
             'prev_page_url',
             'next_page_url',
         ]);
+    }
+
+    /**
+     * Get the response headers for the given pagination information.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  array  $pagination
+     * @return array
+     */
+    protected function responseHeaders($request, $pagination)
+    {
+        $default = array_filter([
+            'X-Pagination-Current-Page' => $pagination['meta']['current_page'] ?? null,
+            'X-Pagination-From' => $pagination['meta']['from'] ?? null,
+            'X-Pagination-Last-Page' => $pagination['meta']['last_page'] ?? null,
+            'X-Pagination-Path' => $pagination['meta']['path'] ?? null,
+            'X-Pagination-Per-Page' => $pagination['meta']['per_page'] ?? null,
+            'X-Pagination-To' => $pagination['meta']['to'] ?? null,
+            'X-Pagination-Total' => $pagination['meta']['total'] ?? null,
+            'X-Pagination-Links-First' => $pagination['links']['first'] ?? null,
+            'X-Pagination-Links-Last' => $pagination['links']['last'] ?? null,
+            'X-Pagination-Links-Prev' => $pagination['links']['prev'] ?? null,
+            'X-Pagination-Links-Next' => $pagination['links']['next'] ?? null,
+        ]);
+
+        if (method_exists($this->resource, 'responseHeaders') ||
+            $this->resource->hasMacro('responseHeaders')) {
+            return $this->resource->responseHeaders($request, $pagination, $default);
+        }
+
+        return $default;
     }
 }
