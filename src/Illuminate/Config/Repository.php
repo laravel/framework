@@ -4,6 +4,7 @@ namespace Illuminate\Config;
 
 use ArrayAccess;
 use Illuminate\Contracts\Config\Repository as ConfigContract;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
@@ -15,14 +16,43 @@ class Repository implements ArrayAccess, ConfigContract
     /**
      * All of the configuration items.
      *
-     * @var array<string,mixed>
+     * @var array<string, mixed>
      */
     protected $items = [];
+
+    /**
+     * The configuration type casts.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [];
+
+    /**
+     * Environment variable overrides.
+     *
+     * @var array<string, string>
+     */
+    protected $envOverrides = [];
+
+    /**
+     * Configuration validators.
+     *
+     * @var array<string, callable>
+     */
+    protected $validators = [];
+
+    /**
+     * The event dispatcher instance.
+     *
+     * @var \Illuminate\Contracts\Events\Dispatcher|null
+     */
+    protected $dispatcher;
 
     /**
      * Create a new configuration repository.
      *
      * @param  array  $items
+     * @return void
      */
     public function __construct(array $items = [])
     {
@@ -35,7 +65,7 @@ class Repository implements ArrayAccess, ConfigContract
      * @param  string  $key
      * @return bool
      */
-    public function has($key)
+    public function has($key): bool
     {
         return Arr::has($this->items, $key);
     }
@@ -53,128 +83,32 @@ class Repository implements ArrayAccess, ConfigContract
             return $this->getMany($key);
         }
 
-        return Arr::get($this->items, $key, $default);
+        $value = $this->getWithEnvOverride($key, Arr::get($this->items, $key, $default));
+        $value = $this->castValue($key, $value);
+        $this->validateValue($key, $value);
+
+        return $value;
     }
 
     /**
      * Get many configuration values.
      *
-     * @param  array<string|int,mixed>  $keys
-     * @return array<string,mixed>
+     * @param  array<string|int, mixed>  $keys
+     * @return array<string, mixed>
      */
-    public function getMany($keys)
+    public function getMany($keys): array
     {
-        $config = [];
+        $results = [];
 
         foreach ($keys as $key => $default) {
             if (is_numeric($key)) {
                 [$key, $default] = [$default, null];
             }
 
-            $config[$key] = Arr::get($this->items, $key, $default);
+            $results[$key] = $this->get($key, $default);
         }
 
-        return $config;
-    }
-
-    /**
-     * Get the specified string configuration value.
-     *
-     * @param  string  $key
-     * @param  (\Closure():(string|null))|string|null  $default
-     * @return string
-     */
-    public function string(string $key, $default = null): string
-    {
-        $value = $this->get($key, $default);
-
-        if (! is_string($value)) {
-            throw new InvalidArgumentException(
-                sprintf('Configuration value for key [%s] must be a string, %s given.', $key, gettype($value))
-            );
-        }
-
-        return $value;
-    }
-
-    /**
-     * Get the specified integer configuration value.
-     *
-     * @param  string  $key
-     * @param  (\Closure():(int|null))|int|null  $default
-     * @return int
-     */
-    public function integer(string $key, $default = null): int
-    {
-        $value = $this->get($key, $default);
-
-        if (! is_int($value)) {
-            throw new InvalidArgumentException(
-                sprintf('Configuration value for key [%s] must be an integer, %s given.', $key, gettype($value))
-            );
-        }
-
-        return $value;
-    }
-
-    /**
-     * Get the specified float configuration value.
-     *
-     * @param  string  $key
-     * @param  (\Closure():(float|null))|float|null  $default
-     * @return float
-     */
-    public function float(string $key, $default = null): float
-    {
-        $value = $this->get($key, $default);
-
-        if (! is_float($value)) {
-            throw new InvalidArgumentException(
-                sprintf('Configuration value for key [%s] must be a float, %s given.', $key, gettype($value))
-            );
-        }
-
-        return $value;
-    }
-
-    /**
-     * Get the specified boolean configuration value.
-     *
-     * @param  string  $key
-     * @param  (\Closure():(bool|null))|bool|null  $default
-     * @return bool
-     */
-    public function boolean(string $key, $default = null): bool
-    {
-        $value = $this->get($key, $default);
-
-        if (! is_bool($value)) {
-            throw new InvalidArgumentException(
-                sprintf('Configuration value for key [%s] must be a boolean, %s given.', $key, gettype($value))
-            );
-        }
-
-        return $value;
-    }
-
-    /**
-     * Get the specified array configuration value.
-     *
-     * @param  string  $key
-     * @param  (\Closure():(array<array-key, mixed>|null))|array<array-key, mixed>|null  $default
-     * @return array<array-key, mixed>
-     */
-    public function array(string $key, $default = null): array
-    {
-        $value = $this->get($key, $default);
-
-        if (! is_array($value)) {
-            throw new InvalidArgumentException(
-                sprintf('Configuration value for key [%s] must be an array, %s given.', $key, gettype($value))
-            );
-        }
-
-        return $value;
+        return $results;
     }
 
     /**
@@ -184,12 +118,14 @@ class Repository implements ArrayAccess, ConfigContract
      * @param  mixed  $value
      * @return void
      */
-    public function set($key, $value = null)
+    public function set($key, $value = null): void
     {
-        $keys = is_array($key) ? $key : [$key => $value];
+        $items = is_array($key) ? $key : [$key => $value];
 
-        foreach ($keys as $key => $value) {
+        foreach ($items as $key => $value) {
+            $this->validateValue($key, $value);
             Arr::set($this->items, $key, $value);
+            $this->fireEvent('set', $key, $value);
         }
     }
 
@@ -200,12 +136,10 @@ class Repository implements ArrayAccess, ConfigContract
      * @param  mixed  $value
      * @return void
      */
-    public function prepend($key, $value)
+    public function prepend($key, $value): void
     {
         $array = $this->get($key, []);
-
         array_unshift($array, $value);
-
         $this->set($key, $array);
     }
 
@@ -216,21 +150,19 @@ class Repository implements ArrayAccess, ConfigContract
      * @param  mixed  $value
      * @return void
      */
-    public function push($key, $value)
+    public function push($key, $value): void
     {
         $array = $this->get($key, []);
-
         $array[] = $value;
-
         $this->set($key, $array);
     }
 
     /**
-     * Get all of the configuration items for the application.
+     * Get all of the configuration items.
      *
-     * @return array
+     * @return array<string, mixed>
      */
-    public function all()
+    public function all(): array
     {
         return $this->items;
     }
@@ -238,45 +170,181 @@ class Repository implements ArrayAccess, ConfigContract
     /**
      * Determine if the given configuration option exists.
      *
-     * @param  string  $key
+     * @param  mixed  $offset
      * @return bool
      */
-    public function offsetExists($key): bool
+    public function offsetExists(mixed $offset): bool
     {
-        return $this->has($key);
+        return $this->has($offset);
     }
 
     /**
      * Get a configuration option.
      *
-     * @param  string  $key
+     * @param  mixed  $offset
      * @return mixed
      */
-    public function offsetGet($key): mixed
+    public function offsetGet(mixed $offset): mixed
     {
-        return $this->get($key);
+        return $this->get($offset);
     }
 
     /**
      * Set a configuration option.
      *
-     * @param  string  $key
+     * @param  mixed  $offset
      * @param  mixed  $value
      * @return void
      */
-    public function offsetSet($key, $value): void
+    public function offsetSet(mixed $offset, mixed $value): void
     {
-        $this->set($key, $value);
+        $this->set($offset, $value);
     }
 
     /**
      * Unset a configuration option.
      *
-     * @param  string  $key
+     * @param  mixed  $offset
      * @return void
      */
-    public function offsetUnset($key): void
+    public function offsetUnset(mixed $offset): void
     {
-        $this->set($key, null);
+        $this->set($offset, null);
+    }
+
+    /**
+     * Register a type cast for configuration items.
+     *
+     * @param  string  $key
+     * @param  string  $type
+     * @return void
+     */
+    public function cast(string $key, string $type): void
+    {
+        $this->casts[$key] = $type;
+    }
+
+    /**
+     * Cast the configuration value.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return mixed
+     */
+    protected function castValue(string $key, $value): mixed
+    {
+        if (!isset($this->casts[$key])) {
+            return $value;
+        }
+
+        switch ($this->casts[$key]) {
+            case 'string':
+                return (string) $value;
+            case 'int':
+                return (int) $value;
+            case 'float':
+                return (float) $value;
+            case 'bool':
+                return (bool) $value;
+            case 'array':
+                return (array) $value;
+            case 'object':
+                return (object) $value;
+            case 'json':
+                return json_decode($value, true);
+            case 'collection':
+                return collect($value);
+            default:
+                return $value;
+        }
+    }
+
+    /**
+     * Set environment variable override for configuration.
+     *
+     * @param  string  $key
+     * @param  string  $envVar
+     * @return void
+     */
+    public function setEnvOverride(string $key, string $envVar): void
+    {
+        $this->envOverrides[$key] = $envVar;
+    }
+
+    /**
+     * Get value with environment override.
+     *
+     * @param  string  $key
+     * @param  mixed  $default
+     * @return mixed
+     */
+    protected function getWithEnvOverride(string $key, $default = null): mixed
+    {
+        if (isset($this->envOverrides[$key])) {
+            $envValue = env($this->envOverrides[$key]);
+            if ($envValue !== null) {
+                return $envValue;
+            }
+        }
+
+        return $default;
+    }
+
+    /**
+     * Register a validator for a configuration key.
+     *
+     * @param  string    $key
+     * @param  callable  $validator
+     * @return void
+     */
+    public function validate(string $key, callable $validator): void
+    {
+        $this->validators[$key] = $validator;
+    }
+
+    /**
+     * Validate a configuration value.
+     *
+     * @param  string  $key
+     * @param  mixed   $value
+     * @return void
+     *
+     * @throws \InvalidArgumentException
+     */
+    protected function validateValue(string $key, $value): void
+    {
+        if (isset($this->validators[$key])) {
+            $isValid = call_user_func($this->validators[$key], $value);
+
+            if (!$isValid) {
+                throw new InvalidArgumentException("Configuration value for [{$key}] is invalid.");
+            }
+        }
+    }
+
+    /**
+     * Set the event dispatcher instance.
+     *
+     * @param  \Illuminate\Contracts\Events\Dispatcher  $dispatcher
+     * @return void
+     */
+    public function setEventDispatcher(Dispatcher $dispatcher): void
+    {
+        $this->dispatcher = $dispatcher;
+    }
+
+    /**
+     * Fire a configuration event.
+     *
+     * @param  string  $event
+     * @param  string  $key
+     * @param  mixed   $value
+     * @return void
+     */
+    protected function fireEvent(string $event, string $key, $value = null): void
+    {
+        if ($this->dispatcher) {
+            $this->dispatcher->dispatch("config.{$event}: {$key}", [$key, $value, $this]);
+        }
     }
 }
