@@ -37,4 +37,38 @@ class HttpClientTest extends TestCase
 
         $this->assertCount(2, Http::getGlobalMiddleware());
     }
+
+    public function testMultipartRequestWithMultipleArrayValues(): void
+    {
+        Http::fake();
+
+        Http::attach(
+            'attachment', 'image-bytes', 'photo.jpg', ['Content-Type' => 'image/jpeg']
+        )->post('http://example.com/users', [
+            'name' => 'Steve',
+            'roles' => ['Network Administrator', 'Janitor'],
+        ]);
+
+        $matched = false;
+
+        Http::assertSent(function ($request) use (&$matched) {
+            $matched = true;
+
+            $body = $request->toPsrRequest()->getBody()->getContents();
+
+            echo "\n--- BEGIN MULTIPART DUMP ---\n";
+            echo $body;
+            echo "\n--- END MULTIPART DUMP ---\n";
+
+            return str_contains($body, 'name="name"') &&
+                   str_contains($body, 'Steve') &&
+                   substr_count($body, 'name="roles"') >= 2 &&
+                   str_contains($body, 'Network Administrator') &&
+                   str_contains($body, 'Janitor');
+        });
+
+        if (! $matched) {
+            $this->fail('Expected multipart request was not matched.');
+        }
+    }
 }

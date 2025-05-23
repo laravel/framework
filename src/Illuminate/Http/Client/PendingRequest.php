@@ -964,41 +964,43 @@ class PendingRequest
     {
         return UriTemplate::expand($url, $this->urlParameters);
     }
+	
+/**
+ * Parse the given HTTP options and set the appropriate additional options.
+ *
+ * @param  array  $options
+ * @return array
+ */
+protected function parseHttpOptions(array $options)
+{
+	if (isset($options[$this->bodyFormat])) {
+		if ($this->bodyFormat === 'multipart') {
+			$options[$this->bodyFormat] = $this->parseMultipartBodyFormat($options[$this->bodyFormat]);
+		} elseif ($this->bodyFormat === 'body') {
+			$options[$this->bodyFormat] = $this->pendingBody;
+			}
 
-    /**
-     * Parse the given HTTP options and set the appropriate additional options.
-     *
-     * @param  array  $options
-     * @return array
-     */
-    protected function parseHttpOptions(array $options)
-    {
-        if (isset($options[$this->bodyFormat])) {
-            if ($this->bodyFormat === 'multipart') {
-                $options[$this->bodyFormat] = $this->parseMultipartBodyFormat($options[$this->bodyFormat]);
-            } elseif ($this->bodyFormat === 'body') {
-                $options[$this->bodyFormat] = $this->pendingBody;
-            }
+		if (is_array($options[$this->bodyFormat])) {
+			$options[$this->bodyFormat] = array_merge(
+				$options[$this->bodyFormat], $this->pendingFiles
+			);
+		}
+	} else {
+		$options[$this->bodyFormat] = $this->pendingBody;
+	}
 
-            if (is_array($options[$this->bodyFormat])) {
-                $options[$this->bodyFormat] = array_merge(
-                    $options[$this->bodyFormat], $this->pendingFiles
-                );
-            }
-        } else {
-            $options[$this->bodyFormat] = $this->pendingBody;
-        }
+	return (new \Illuminate\Support\Collection($options))
+		->map(function ($value, $key) {
+			if ($key === 'json' && $value instanceof \JsonSerializable) {
+				return $value;
+			}
 
-        return (new Collection($options))
-            ->map(function ($value, $key) {
-                if ($key === 'json' && $value instanceof JsonSerializable) {
-                    return $value;
-                }
-
-                return $value instanceof Arrayable ? $value->toArray() : $value;
-            })
-            ->all();
-    }
+			return $value instanceof \Illuminate\Contracts\Support\Arrayable
+				? $value->toArray()
+				: $value;
+		})
+		->all();
+	}
 
     /**
      * Parse multi-part form data.
@@ -1007,12 +1009,23 @@ class PendingRequest
      * @return array|array[]
      */
     protected function parseMultipartBodyFormat(array $data)
-    {
-        return (new Collection($data))
-            ->map(fn ($value, $key) => is_array($value) ? $value : ['name' => $key, 'contents' => $value])
-            ->values()
-            ->all();
-    }
+	{
+		$normalized = [];
+
+		foreach ($data as $key => $value) {
+			if (is_array($value) && ! Arr::isAssoc($value)) {
+				foreach ($value as $subValue) {
+					$normalized[] = ['name' => $key, 'contents' => $subValue];
+				}
+			} elseif (is_array($value) && Arr::isAssoc($value)) {
+				$normalized[] = $value;
+			} else {
+				$normalized[] = ['name' => $key, 'contents' => $value];
+			}
+		}
+
+		return $normalized;
+	}
 
     /**
      * Send an asynchronous request to the given URL.
