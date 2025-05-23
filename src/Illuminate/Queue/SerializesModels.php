@@ -2,6 +2,10 @@
 
 namespace Illuminate\Queue;
 
+use Illuminate\Bus\Queueable;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Queue\Attributes\EagerLoad;
 use Illuminate\Queue\Attributes\WithoutRelations;
 use ReflectionClass;
 use ReflectionProperty;
@@ -93,9 +97,22 @@ trait SerializesModels
                 continue;
             }
 
-            $property->setValue(
-                $this, $this->getRestoredPropertyValue($values[$name])
-            );
+            $value = $this->getRestoredPropertyValue($values[$name]);
+
+            $property->setValue($this, $value);
+
+            if (
+                ($value instanceof Model || $value instanceof Collection) &&
+                ($attribute = $property->getAttributes(EagerLoad::class)[0] ?? null)
+            ) {
+                $relations = $attribute->getArguments()[0];
+
+                $value->load($relations);
+            }
+        }
+
+        if (in_array(Queueable::class, class_uses_recursive($this)) && method_exists($this, 'initializeOnQueue')) {
+            $this->initializeOnQueue();
         }
     }
 
