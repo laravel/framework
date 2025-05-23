@@ -6,7 +6,6 @@ use BackedEnum;
 use Carbon\CarbonPeriod;
 use Closure;
 use DateTimeInterface;
-use function Illuminate\Support\enum_value;
 use Illuminate\Contracts\Database\Query\Builder as BuilderContract;
 use Illuminate\Contracts\Database\Query\ConditionExpression;
 use Illuminate\Contracts\Database\Query\Expression as ExpressionContract;
@@ -29,8 +28,9 @@ use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use LogicException;
 use RuntimeException;
-
 use UnitEnum;
+
+use function Illuminate\Support\enum_value;
 
 class Builder implements BuilderContract
 {
