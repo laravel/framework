@@ -176,6 +176,16 @@ class BelongsToMany extends Relation
     }
 
     /**
+     * Convert the relationship to a "has many" relationship.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<TPivotModel>
+     */
+    public function pivot()
+    {
+        return new HasMany($this->getQuery(), $this->parent, $this->foreignPivotKey, $this->relatedPivotKey);
+    }
+
+    /**
      * Attempt to resolve the intermediate table name from the given string.
      *
      * @param  string  $table
