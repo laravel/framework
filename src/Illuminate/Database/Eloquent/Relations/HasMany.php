@@ -3,7 +3,6 @@
 namespace Illuminate\Database\Eloquent\Relations;
 
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
-use Illuminate\Support\Str;
 
 /**
  * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
