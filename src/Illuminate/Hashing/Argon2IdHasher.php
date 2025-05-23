@@ -29,7 +29,7 @@ class Argon2IdHasher extends ArgonHasher
         }
 
         if ($verifyOption === true && ! $this->isUsingCorrectAlgorithm($hashedValue)) {
-            throw new RuntimeException('This password does not use the Bcrypt algorithm.');
+            throw new RuntimeException('This password does not use the Argon2id algorithm.');
         }
 
         if ($this->verifyAlgorithm && ! $this->isUsingCorrectAlgorithm($hashedValue)) {
