@@ -527,15 +527,14 @@ if (! function_exists('with')) {
     }
 }
 
-
-if(!function_exists('json')){
-    /** 
-     *  A shortcut for response()->json()
-     * @param $data
-     * @param int $status
-     * @param array $headers
-     * @param int $options
-     * @return \Illuminate\Http\JsonResponse
+if(! function_exists('json')) {
+    /**
+     * A shortcut for response()->json()
+     * @param  $data
+     * @param  int  $status
+     * @param  array  $headers
+     * @param  int  $options
+     * @return  \Illuminate\Http\JsonResponse
      */
     function json(
         $data = [],
@@ -546,4 +545,3 @@ if(!function_exists('json')){
         return response()->json($data, $status, $headers, $options);
     }
 }
-
