@@ -204,26 +204,6 @@ class EloquentHasManyTestUser2 extends Model
         return 'eloquent_has_many_test_user_id';
     }
 
-    public function logins(): HasMany
-    {
-        return $this->hasMany(EloquentHasManyTestLogin::class);
-    }
-
-    public function latestLogin(): HasOne
-    {
-        return $this->logins()->one()->latestOfMany('login_time');
-    }
-
-    public function oldestLogin(): HasOne
-    {
-        return $this->logins()->one()->oldestOfMany('login_time');
-    }
-
-    public function posts(): HasMany
-    {
-        return $this->hasMany(EloquentHasManyTestPost::class);
-    }
-
     public function authorship(): HasMany
     {
         return $this->hasMany(EloquentHasManyTestArticleAuthor::class);
