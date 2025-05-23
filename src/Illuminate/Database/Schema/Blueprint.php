@@ -4,7 +4,6 @@ namespace Illuminate\Database\Schema;
 
 use Closure;
 use Illuminate\Database\Connection;
-use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Grammars\Grammar;
 use Illuminate\Database\Schema\Grammars\MySqlGrammar;
@@ -1039,23 +1038,13 @@ class Blueprint
 
         $column = $column ?: $model->getForeignKey();
 
-        if ($model->getKeyType() === 'int') {
-            return $this->foreignId($column)
-                ->table($model->getTable())
-                ->referencesModelColumn($model->getKeyName());
-        }
+        $definition = match ($model->getKeySchemaType()) {
+            'int' => $this->foreignId($column),
+            'ulid' => $this->foreignUlid($column, 26),
+            default => $this->foreignUuid($column),
+        };
 
-        $modelTraits = class_uses_recursive($model);
-
-        if (in_array(HasUlids::class, $modelTraits, true)) {
-            return $this->foreignUlid($column, 26)
-                ->table($model->getTable())
-                ->referencesModelColumn($model->getKeyName());
-        }
-
-        return $this->foreignUuid($column)
-            ->table($model->getTable())
-            ->referencesModelColumn($model->getKeyName());
+        return $definition->table($model->getTable())->referencesModelColumn($model->getKeyName());
     }
 
     /**
@@ -1486,6 +1475,8 @@ class Blueprint
             $this->uuidMorphs($name, $indexName);
         } elseif (Builder::$defaultMorphKeyType === 'ulid') {
             $this->ulidMorphs($name, $indexName);
+        } elseif (Builder::$defaultMorphKeyType === 'string') {
+            $this->stringableMorphs($name, $indexName);
         } else {
             $this->numericMorphs($name, $indexName);
         }
@@ -1504,9 +1495,43 @@ class Blueprint
             $this->nullableUuidMorphs($name, $indexName);
         } elseif (Builder::$defaultMorphKeyType === 'ulid') {
             $this->nullableUlidMorphs($name, $indexName);
+        } elseif (Builder::$defaultMorphKeyType === 'string') {
+            $this->nullableStringableMorphs($name, $indexName);
         } else {
             $this->nullableNumericMorphs($name, $indexName);
         }
+    }
+
+    /**
+     * Add the proper columns for a polymorphic table using string as IDs (mixed of UUID/ULID & incremental integer).
+     *
+     * @param  string  $name
+     * @param  string|null  $indexName
+     * @return void
+     */
+    public function stringableMorphs($name, $indexName = null)
+    {
+        $this->string("{$name}_type");
+
+        $this->string("{$name}_id");
+
+        $this->index(["{$name}_type", "{$name}_id"], $indexName);
+    }
+
+    /**
+     * Add nullable columns for a polymorphic table using string as IDs (mixed of UUID/ULID & incremental integer).
+     *
+     * @param  string  $name
+     * @param  string|null  $indexName
+     * @return void
+     */
+    public function nullableStringableMorphs($name, $indexName = null)
+    {
+        $this->string("{$name}_type")->nullable();
+
+        $this->string("{$name}_id")->nullable();
+
+        $this->index(["{$name}_type", "{$name}_id"], $indexName);
     }
 
     /**
