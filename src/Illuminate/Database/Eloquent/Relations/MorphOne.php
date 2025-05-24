@@ -28,7 +28,23 @@ class MorphOne extends MorphOneOrMany implements SupportsPartialRelations
             return $this->getDefaultFor($this->parent);
         }
 
-        return $this->query->first() ?: $this->getDefaultFor($this->parent);
+        $result = $this->query->first();
+
+        if ($result) {
+            return $result;
+        }
+
+        return tap($this->getDefaultFor($this->parent), function ($instance) {
+            // Always set morph type
+            $instance->setAttribute($this->getMorphType(), $this->parent->getMorphClass());
+
+            // Only set foreign key if parent has key
+            $key = $this->parent->getKey();
+
+            if (! is_null($key)) {
+                $instance->setAttribute($this->getForeignKeyName(), $key);
+            }
+        });
     }
 
     /** @inheritDoc */
@@ -103,7 +119,7 @@ class MorphOne extends MorphOneOrMany implements SupportsPartialRelations
     {
         return tap($this->related->newInstance(), function ($instance) use ($parent) {
             $instance->setAttribute($this->getForeignKeyName(), $parent->{$this->localKey})
-                ->setAttribute($this->getMorphType(), $this->morphClass);
+                     ->setAttribute($this->getMorphType(), $this->morphClass);
 
             $this->applyInverseRelationToModel($instance, $parent);
         });
