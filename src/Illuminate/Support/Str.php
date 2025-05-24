@@ -1818,7 +1818,7 @@ class Str
      */
     public static function ucwords($string)
     {
-        return (new Collection(explode($string, ' ')))
+        return (new Collection(explode(' ', $string)))
             ->map(fn ($word) => static::ucfirst($word))
             ->join(' ');
     }
