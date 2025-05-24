@@ -558,7 +558,7 @@ class Arr
     {
         $value = Arr::get($array, $key, $default);
 
-        if (! is_integer($value)) {
+        if (! is_int($value)) {
             throw new InvalidArgumentException(
                 sprintf('Array value for key [%s] must be an integer, %s found.', $key, gettype($value))
             );
