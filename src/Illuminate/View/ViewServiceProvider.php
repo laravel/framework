@@ -103,7 +103,7 @@ class ViewServiceProvider extends ServiceProvider
                 $app['config']->get('view.check_cache_timestamps', true),
             ), function ($blade) {
                 $blade->component('dynamic-component', DynamicComponent::class);
-                $blade->directive('jdd', fn($expression) => "<?php echo jdd($expression); ?>");
+                $blade->directive('jdd', fn ($expression) => "<?php echo jdd($expression); ?>");
             });
         });
     }
