@@ -1811,6 +1811,19 @@ class Str
     }
 
     /**
+     * Make each word's first character uppercase in a string.
+     *
+     * @param  string  $string
+     * @return string
+     */
+    public static function ucwords($string)
+    {
+        return (new Collection(explode($string, ' ')))
+            ->map(fn ($word) => static::ucfirst($word))
+            ->join(' ');
+    }
+
+    /**
      * Split a string into pieces by uppercase characters.
      *
      * @param  string  $string
