@@ -121,6 +121,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
                 $table->integer('user_id');
                 $table->integer('parent_id')->nullable();
                 $table->string('name');
+                $table->string('content')->nullable();
                 $table->timestamps();
             });
 
@@ -1518,6 +1519,148 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertSame(2, $achievedByUser1or2->count());
         $this->assertTrue($achievedByUser1or2->contains($achievement1));
         $this->assertTrue($achievedByUser1or2->contains($achievement3));
+    }
+
+    public function testWhereHasAnyFiltersBasedOnAnyColumnAcrossRelationships()
+    {
+        $user = EloquentTestUser::create(['email' => 'foo@example.com']);
+        $user->posts()->createMany([
+            ['name' => 'Match Title', 'content' => 'Match Title', 'user_id' => $user->id],
+            ['name' => 'Other', 'content' => 'Other', 'user_id' => $user->id],
+        ]);
+
+        $user->photos()->createMany([
+            ['name' => 'Match Photo'],
+            ['name' => 'Ignore Photo'],
+        ]);
+
+        $results = EloquentTestUser::query()
+            ->whereHasAny([
+                'posts.user' => ['email'],
+                'posts' => ['name', 'content'],
+                'photos' => ['name'],
+            ], 'like', '%Match%')
+            ->get();
+
+        $this->assertCount(1, $results);
+        $this->assertTrue($results->first()->is($user));
+    }
+
+    public function testOrWhereHasAnyCombinesWithPreviousConditions()
+    {
+        $u1 = EloquentTestUser::create(['email' => 'a@example.com']);
+        $u2 = EloquentTestUser::create(['email' => 'b@example.com']);
+
+        $u1->posts()->create(['name' => 'Foo', 'content' => 'Foo', 'user_id' => $u1->id]);
+        $u2->posts()->create(['name' => 'Bar', 'content' => 'Bar', 'user_id' => $u2->id]);
+
+        $u1->photos()->create(['name' => 'PhotoFoo']);
+        $u2->photos()->create(['name' => 'PhotoBar']);
+
+        $results = EloquentTestUser::query()
+            ->whereHasAny([
+                'posts' => ['name', 'content'],
+                'photos' => ['name'],
+            ], 'like', '%Foo%')
+            ->orWhereHasAny([
+                'posts' => ['name', 'content'],
+                'photos' => ['name'],
+            ], 'like', '%Bar%')
+            ->get();
+
+        $this->assertCount(2, $results);
+        $this->assertTrue($results->contains($u1));
+        $this->assertTrue($results->contains($u2));
+    }
+
+    public function testWhereHasAllRequiresAllColumnsToMatch()
+    {
+        $user = EloquentTestUser::create(['email' => 'c@example.com']);
+
+        $user->posts()->createMany([
+            ['name' => 'Same', 'content' => 'Same', 'user_id' => $user->id],
+            ['name' => 'Same', 'content' => 'Diff',  'user_id' => $user->id],
+        ]);
+
+        $user->photos()->create(['name' => 'Same', 'imageable_id' => $user->id, 'imageable_type' => EloquentTestUser::class]);
+        $user->photos()->create(['name' => 'Other', 'imageable_id' => $user->id, 'imageable_type' => EloquentTestUser::class]);
+
+        $results = EloquentTestUser::query()
+            ->whereHasAll([
+                'posts' => ['name', 'content'],
+                'photos' => ['name'],
+            ], 'like', 'Same')
+            ->get();
+
+        $this->assertCount(1, $results);
+        $this->assertTrue($results->first()->is($user));
+    }
+
+    public function testOrWhereHasAllCombinesAndOrLogic()
+    {
+        $u1 = EloquentTestUser::create(['email' => 'd1@example.com']);
+        $u2 = EloquentTestUser::create(['email' => 'd2@example.com']);
+
+        $u1->posts()->create(['name' => 'X', 'content' => 'X',  'user_id' => $u1->id]);
+        $u1->photos()->create(['name' => 'PicX', 'imageable_id' => $u1->id, 'imageable_type' => EloquentTestUser::class]);
+
+        $u2->posts()->create(['name' => 'X',    'content' => 'No', 'user_id' => $u2->id]);
+        $u2->photos()->create(['name' => 'PicNo', 'imageable_id' => $u2->id, 'imageable_type' => EloquentTestUser::class]);
+
+        $results = EloquentTestUser::query()
+            ->whereHasAll(
+                ['posts' => ['name', 'content'], 'photos' => ['name']],
+                'like', '%X%'
+            )
+            ->orWhereHasAll(
+                ['photos' => ['name']],
+                'like', '%No%'
+            )
+            ->get();
+
+        $this->assertCount(2, $results);
+        $this->assertTrue($results->contains($u1));
+        $this->assertTrue($results->contains($u2));
+    }
+
+    public function testWhereHasAnyAcceptsClosureOnRelationship()
+    {
+        $user = EloquentTestUser::create(['email' => 'closure@example.com']);
+
+        $user->posts()->create(['name' => 'MatchMe',  'user_id' => $user->id]);
+        $user->photos()->create(['name' => 'PhotoMe']);
+
+        $results = EloquentTestUser::query()
+            ->whereHasAny([
+                'posts' => fn ($q) => $q->where('name', 'MatchMe'),
+                'photos' => fn ($q) => $q->where('name', 'PhotoMe'),
+            ])
+            ->get();
+
+        $this->assertCount(1, $results);
+        $this->assertTrue($results->first()->is($user));
+    }
+
+    public function testWhereHasAllAcceptsClosureOnRelationship()
+    {
+        $userWith = EloquentTestUser::create(['email' => 'closure_all@example.com']);
+        $userWithout = EloquentTestUser::create(['email' => 'no_closure@example.com']);
+
+        $userWith->posts()->create(['name' => 'OnlyMatch', 'user_id' => $userWith->id]);
+        $userWith->photos()->create(['name' => 'OnlyPic']);
+
+        $userWithout->posts()->create(['name' => 'Other',     'user_id' => $userWithout->id]);
+        $userWithout->photos()->create(['name' => 'OtherPic']);
+
+        $results = EloquentTestUser::query()
+            ->whereHasAll([
+                'posts' => fn ($q) => $q->where('name', 'OnlyMatch'),
+                'photos' => fn ($q) => $q->where('name', 'OnlyPic'),
+            ])
+            ->get();
+
+        $this->assertCount(1, $results);
+        $this->assertTrue($results->first()->is($userWith));
     }
 
     public function testBasicHasManyEagerLoading()
