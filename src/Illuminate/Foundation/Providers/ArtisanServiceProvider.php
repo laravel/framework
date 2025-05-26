@@ -9,6 +9,7 @@ use Illuminate\Cache\Console\ForgetCommand as CacheForgetCommand;
 use Illuminate\Cache\Console\PruneStaleTagsCommand;
 use Illuminate\Concurrency\Console\InvokeSerializedClosureCommand;
 use Illuminate\Console\Scheduling\ScheduleClearCacheCommand;
+use Illuminate\Console\Scheduling\ScheduleDisplayCacheCommand;
 use Illuminate\Console\Scheduling\ScheduleFinishCommand;
 use Illuminate\Console\Scheduling\ScheduleInterruptCommand;
 use Illuminate\Console\Scheduling\ScheduleListCommand;
@@ -164,6 +165,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'ScheduleList' => ScheduleListCommand::class,
         'ScheduleRun' => ScheduleRunCommand::class,
         'ScheduleClearCache' => ScheduleClearCacheCommand::class,
+        'ScheduleDisplayCache' => ScheduleDisplayCacheCommand::class,
         'ScheduleTest' => ScheduleTestCommand::class,
         'ScheduleWork' => ScheduleWorkCommand::class,
         'ScheduleInterrupt' => ScheduleInterruptCommand::class,
