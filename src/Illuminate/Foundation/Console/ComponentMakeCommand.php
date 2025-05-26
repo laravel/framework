@@ -44,7 +44,7 @@ class ComponentMakeCommand extends GeneratorCommand
     public function handle()
     {
         if ($this->option('view')) {
-            if($this->option('viewless')) {
+            if ($this->option('viewless')) {
                 $this->components->error('The --viewless option cannot be used with the --view option.');
 
                 return false;
