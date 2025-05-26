@@ -1431,6 +1431,16 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Get the underlying string value as a Uri instance.
+     *
+     * @return \Illuminate\Support\Uri
+     */
+    public function toUri()
+    {
+        return Uri::of($this->value);
+    }
+
+    /**
      * Convert the object to a string when JSON encoded.
      *
      * @return string

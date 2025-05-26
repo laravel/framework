@@ -6,6 +6,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Stringable;
+use Illuminate\Support\Uri;
 use League\CommonMark\Environment\EnvironmentBuilderInterface;
 use League\CommonMark\Extension\ExtensionInterface;
 use PHPUnit\Framework\TestCase;
@@ -1395,6 +1396,17 @@ class SupportStringableTest extends TestCase
         $this->expectException(\Carbon\Exceptions\InvalidFormatException::class);
 
         $this->stringable('not a date')->toDate();
+    }
+
+    public function testToUri()
+    {
+        $sentence = 'Laravel is a PHP framework. You can access the docs in: {https://laravel.com/docs}';
+
+        $uri = $this->stringable($sentence)->between('{', '}')->toUri();
+
+        $this->assertInstanceOf(Uri::class, $uri);
+        $this->assertSame('https://laravel.com/docs', (string) $uri);
+        $this->assertSame('https://laravel.com/docs', $uri->toHtml());
     }
 
     public function testArrayAccess()
