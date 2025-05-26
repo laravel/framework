@@ -65,7 +65,7 @@ class StorageClearCommand extends Command
             if ($folder) {
                 $this->clearFolder($disk, $folder);
                 $this->line("Cleared folder [{$folder}] on disk [{$diskName}].");
-                
+
                 return;
             }
 
