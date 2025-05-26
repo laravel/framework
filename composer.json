@@ -15,7 +15,7 @@
         }
     ],
     "require": {
-        "php": "^8.2",
+        "php": "^8.3",
         "ext-ctype": "*",
         "ext-filter": "*",
         "ext-hash": "*",
@@ -51,7 +51,6 @@
         "symfony/http-kernel": "^7.2.0",
         "symfony/mailer": "^7.2.0",
         "symfony/mime": "^7.2.0",
-        "symfony/polyfill-php83": "^1.31",
         "symfony/process": "^7.2.0",
         "symfony/routing": "^7.2.0",
         "symfony/uid": "^7.2.0",
@@ -111,7 +110,7 @@
         "league/flysystem-read-only": "^3.25.1",
         "league/flysystem-sftp-v3": "^3.25.1",
         "mockery/mockery": "^1.6.10",
-        "orchestra/testbench-core": "^10.0.0",
+        "orchestra/testbench-core": "^11.0.0",
         "pda/pheanstalk": "^5.0.6|^7.0.0",
         "php-http/discovery": "^1.15",
         "phpstan/phpstan": "^2.0",
@@ -161,7 +160,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "12.x-dev"
+            "dev-master": "13.0.x-dev"
         }
     },
     "suggest": {
