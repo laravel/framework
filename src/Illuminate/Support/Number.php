@@ -49,6 +49,47 @@ class Number
     }
 
     /**
+     * Parse the given string according to the specified format type.
+     *
+     * @param  string  $string
+     * @param  int|null  $type
+     * @param  string|null  $locale
+     * @return int|float|false
+     */
+    public static function parse(string $string, ?int $type = NumberFormatter::TYPE_DOUBLE, ?string $locale = null): int|float
+    {
+        static::ensureIntlExtensionIsInstalled();
+
+        $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::DECIMAL);
+
+        return $formatter->parse($string, $type);
+    }
+
+    /**
+     * Parse a string into an integer according to the specified locale.
+     *
+     * @param  string  $string
+     * @param  string|null  $locale
+     * @return int|false
+     */
+    public static function parseInt(string $string, ?string $locale = null): int
+    {
+        return self::parse($string, NumberFormatter::TYPE_INT32, $locale);
+    }
+
+    /**
+     * Parse a string into a float according to the specified locale.
+     *
+     * @param  string  $string  The string to parse
+     * @param  string|null  $locale  The locale to use
+     * @return float|false
+     */
+    public static function parseFloat(string $string, ?string $locale = null): float
+    {
+        return self::parse($string, NumberFormatter::TYPE_DOUBLE, $locale);
+    }
+
+    /**
      * Spell out the given number in the given locale.
      *
      * @param  int|float  $number
@@ -160,19 +201,14 @@ class Number
      * @param  int|float  $bytes
      * @param  int  $precision
      * @param  int|null  $maxPrecision
-     * @param  bool  $useBinaryPrefix
      * @return string
      */
-    public static function fileSize(int|float $bytes, int $precision = 0, ?int $maxPrecision = null, bool $useBinaryPrefix = false)
+    public static function fileSize(int|float $bytes, int $precision = 0, ?int $maxPrecision = null)
     {
-        $base = $useBinaryPrefix ? 1024 : 1000;
+        $units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
 
-        $units = $useBinaryPrefix
-            ? ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB', 'RiB', 'QiB']
-            : ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB', 'RB', 'QB'];
-
-        for ($i = 0; ($bytes / $base) > 0.9 && ($i < count($units) - 1); $i++) {
-            $bytes /= $base;
+        for ($i = 0; ($bytes / 1024) > 0.9 && ($i < count($units) - 1); $i++) {
+            $bytes /= 1024;
         }
 
         return sprintf('%s %s', static::format($bytes, $precision, $maxPrecision), $units[$i]);

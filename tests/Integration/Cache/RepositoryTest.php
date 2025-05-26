@@ -238,6 +238,31 @@ class RepositoryTest extends TestCase
         $this->assertTrue($cache->missing('illuminate:cache:flexible:created:count'));
     }
 
+    public function testItCanAlwaysDefer()
+    {
+        $this->freezeTime();
+        $cache = Cache::driver('array');
+        $count = 0;
+
+        // Cache is empty. The value should be populated...
+        $cache->flexible('foo', [10, 20], function () use (&$count) {
+            return ++$count;
+        }, alwaysDefer: true);
+
+        // First call to flexible() should not defer
+        $this->assertCount(0, defer());
+
+        Carbon::setTestNow(now()->addSeconds(11));
+
+        // Second callback should defer with always now true
+        $cache->flexible('foo', [10, 20], function () use (&$count) {
+            return ++$count;
+        }, alwaysDefer: true);
+
+        $this->assertCount(1, defer());
+        $this->assertTrue(defer()->first()->always);
+    }
+
     public function testItRoundsDateTimeValuesToAccountForTimePassedDuringScriptExecution()
     {
         // do not freeze time as this test depends on time progressing duration execution.
