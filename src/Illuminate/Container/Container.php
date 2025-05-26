@@ -813,13 +813,14 @@ class Container implements ArrayAccess, ContainerContract
      *
      * @param  string|class-string<TClass>  $abstract
      * @param  array  $parameters
+     * @param ReflectionAttribute<TClass>[]  $attributes
      * @return ($abstract is class-string<TClass> ? TClass : mixed)
      *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
-    public function make($abstract, array $parameters = [])
+    public function make($abstract, array $parameters = [], array $attributes = [])
     {
-        return $this->resolve($abstract, $parameters);
+        return $this->resolve($abstract, $parameters, attributes: $attributes);
     }
 
     /**
@@ -851,12 +852,14 @@ class Container implements ArrayAccess, ContainerContract
      * @param  string|class-string<TClass>|callable  $abstract
      * @param  array  $parameters
      * @param  bool  $raiseEvents
+     * @param ReflectionAttribute<TClass>[]  $attributes
+     *
      * @return ($abstract is class-string<TClass> ? TClass : mixed)
      *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      * @throws \Illuminate\Contracts\Container\CircularDependencyException
      */
-    protected function resolve($abstract, $parameters = [], $raiseEvents = true)
+    protected function resolve($abstract, $parameters = [], $raiseEvents = true, array $attributes = [])
     {
         $abstract = $this->getAlias($abstract);
 
@@ -888,7 +891,7 @@ class Container implements ArrayAccess, ContainerContract
         // the binding. This will instantiate the types, as well as resolve any of
         // its "nested" dependencies recursively until all have gotten resolved.
         $object = $this->isBuildable($concrete, $abstract)
-            ? $this->build($concrete)
+            ? $this->build($concrete, $attributes)
             : $this->make($concrete);
 
         // If we defined any extenders for this type, we'll need to spin through them
@@ -994,12 +997,13 @@ class Container implements ArrayAccess, ContainerContract
      * @template TClass of object
      *
      * @param  \Closure(static, array): TClass|class-string<TClass>  $concrete
+     * @param ReflectionAttribute<TClass>[] $attributes
      * @return TClass
      *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      * @throws \Illuminate\Contracts\Container\CircularDependencyException
      */
-    public function build($concrete)
+    public function build($concrete, array $attributes = [])
     {
         // If the concrete type is actually a Closure, we will just execute it and
         // hand back the results of the functions, which allows functions to be
@@ -1059,7 +1063,9 @@ class Container implements ArrayAccess, ContainerContract
 
         array_pop($this->buildStack);
 
-        if (!empty($reflector->getAttributes(Lazy::class))) {
+        $isLazy = $this->isLazy(array_merge($attributes, $reflector->getAttributes(Lazy::class)));
+
+        if ($isLazy) {
             $instance = $reflector->newLazyProxy(function () use ($concrete, $instances) {
                 return new $concrete(...$instances);
             });
@@ -1072,6 +1078,22 @@ class Container implements ArrayAccess, ContainerContract
         );
 
         return $instance;
+    }
+
+    /**
+     * @template TClass of object
+     *
+     * @param ReflectionAttribute<TClass>[] $attributes
+     *
+     * @return bool
+     */
+    protected function isLazy(array $attributes): bool
+    {
+        if (empty($attributes)) {
+            return false;
+        }
+
+        return array_any($attributes, static fn($attribute) => $attribute->getName() === Lazy::class);
     }
 
     /**
@@ -1208,7 +1230,7 @@ class Container implements ArrayAccess, ContainerContract
         try {
             return $parameter->isVariadic()
                 ? $this->resolveVariadicClass($parameter)
-                : $this->make($className);
+                : $this->make($className, $parameter->getAttributes(), $parameter->getAttributes());
         }
 
         // If we can not resolve the class instance, we will check to see if the value

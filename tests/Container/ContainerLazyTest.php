@@ -90,6 +90,19 @@ class LazyWithAttributeStub
     }
 }
 
+class LazyWithTestRenameAttributeStub
+{
+    public function __construct()
+    {
+        throw new \RuntimeException('Lazy call');
+    }
+
+    public function work()
+    {
+        return 'work';
+    }
+}
+
 #[Lazy]
 class LazyWithAttributeLogicStub
 {
@@ -118,7 +131,7 @@ class LazyWithoutAttributeStub
 
 class LazyDependencyWithAttributeStub
 {
-    public function __construct(LazyWithAttributeStub $stub)
+    public function __construct(#[Lazy] LazyWithTestRenameAttributeStub $stub)
     {
         throw new \RuntimeException('Parent call');
     }
