@@ -46,9 +46,12 @@ class ComponentMakeCommand extends GeneratorCommand
         if ($this->option('view')) {
 
             if($this->option('viewless')) {
+
                 $this->components->error('The --viewless option cannot be used with the --view option.');
+
                 return false;
             }
+
             return $this->writeView();
         }
 
@@ -111,7 +114,7 @@ class ComponentMakeCommand extends GeneratorCommand
         if ($this->option('viewless')) {
             return str_replace(
                 ['DummyView', '{{ view }}'],
-        " ''; /*\n    This component is viewless. Implement the render method to return content directly.\n    Example: return '<div>My custom content</div>';\n    If you don't, it will render an empty string.\n    */", //
+                " ''; /*\n    This component is viewless. Implement the render method to return content directly.\n    Example: return '<div>My custom content</div>';\n    If you don't, it will render an empty string.\n    */", //
                 parent::buildClass($name)
             );
         }

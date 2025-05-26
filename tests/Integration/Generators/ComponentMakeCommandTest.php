@@ -104,6 +104,7 @@ class ComponentMakeCommandTest extends TestCase
         $this->assertFilenameExists('resources/views/custom/path/foo.blade.php');
         $this->assertFilenameNotExists('tests/Feature/View/Components/Nested/FooTest.php');
     }
+
     public function testItCanGenerateViewlessComponentFileWithoutView()
     {
         $this->artisan('make:component', [
@@ -122,6 +123,7 @@ class ComponentMakeCommandTest extends TestCase
 
         $this->assertFilenameNotExists('resources/views/components/my-viewless-component.blade.php');
     }
+
     public function testItCanGenerateViewlessInlineComponent()
     {
         $this->artisan('make:component', [
