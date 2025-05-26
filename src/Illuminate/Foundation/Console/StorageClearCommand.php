@@ -57,18 +57,18 @@ class StorageClearCommand extends Command
 
         try {
             if ($folder && ! $disk->exists($folder)) {
-               $this->error("The folder [{$folder}] does not exist on the [{$diskName}] disk.");
+                $this->error("The folder [{$folder}] does not exist on the [{$diskName}] disk.");
 
                 return;
             }
-            
+
             if ($folder) {
-               $this->clearFolder($disk, $folder);
+                $this->clearFolder($disk, $folder);
                 $this->line("Cleared folder [{$folder}] on disk [{$diskName}].");
                 
                 return;
             }
-                
+
             $this->clearDisk($disk, $diskName);
             $this->line("Cleared all contents on disk [{$diskName}].");
         } catch (\Throwable $e) {
