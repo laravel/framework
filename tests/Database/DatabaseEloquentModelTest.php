@@ -12,6 +12,7 @@ use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Contracts\Database\Eloquent\CastsInboundAttributes;
 use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
@@ -50,6 +51,7 @@ use Illuminate\Support\HtmlString;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Stringable;
 use InvalidArgumentException;
+use JsonSerializable;
 use LogicException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -1342,39 +1344,148 @@ class DatabaseEloquentModelTest extends TestCase
         }
     }
 
-    public function testJsonSerializeUsesJsonSerializeParameter()
+    public function testJsonSerializeWithCircularRelations()
     {
-        // Create a model that implements both JsonSerializable and Arrayable
-        $jsonSerializableRelation = new class implements \JsonSerializable, \Illuminate\Contracts\Support\Arrayable
+        $parent = new EloquentModelWithRecursiveRelationshipsStub(['id' => 1, 'parent_id' => null]);
+        $lastId = $parent->id;
+        $parent->setRelation('self', $parent);
+
+        $children = new Collection();
+        for ($count = 0; $count < 2; $count++) {
+            $child = new EloquentModelWithRecursiveRelationshipsStub(['id' => ++$lastId, 'parent_id' => $parent->id]);
+            $child->setRelation('parent', $parent);
+            $child->setRelation('self', $child);
+            $children->push($child);
+        }
+        $parent->setRelation('children', $children);
+
+        try {
+            $this->assertSame(
+                [
+                    'id' => 1,
+                    'parent_id' => null,
+                    'self' => ['id' => 1, 'parent_id' => null],
+                    'children' => [
+                        [
+                            'id' => 2,
+                            'parent_id' => 1,
+                            'parent' => ['id' => 1, 'parent_id' => null],
+                            'self' => ['id' => 2, 'parent_id' => 1],
+                        ],
+                        [
+                            'id' => 3,
+                            'parent_id' => 1,
+                            'parent' => ['id' => 1, 'parent_id' => null],
+                            'self' => ['id' => 3, 'parent_id' => 1],
+                        ],
+                    ],
+                ],
+                $parent->jsonSerialize()
+            );
+        } catch (\RuntimeException $e) {
+            $this->fail($e->getMessage());
+        }
+    }
+
+    public function testJsonSerializeUsesJsonSerializeForRelations()
+    {
+        $model = new class extends Model
         {
-            public function jsonSerialize(): array
+            public function relationsToArray(bool $useJsonSerialize = false)
             {
-                return ['json_serialized' => 'value'];
+                // Store the value of $useJsonSerialize for testing
+                $this->lastUseJsonSerializeValue = $useJsonSerialize;
+
+                return parent::relationsToArray($useJsonSerialize);
+            }
+
+            public $lastUseJsonSerializeValue = null;
+        };
+
+        $model->setRelation('test', new stdClass());
+
+        // Call toArray() and verify $useJsonSerialize is false
+        $model->toArray();
+        $this->assertFalse($model->lastUseJsonSerializeValue);
+
+        // Call jsonSerialize() and verify $useJsonSerialize is true
+        $model->jsonSerialize();
+        $this->assertTrue($model->lastUseJsonSerializeValue);
+    }
+
+    public function testJsonSerializeHandlesDifferentRelationTypes()
+    {
+        $model = new EloquentModelStub;
+        $model->name = 'foo';
+        $model->setRelation('customObject', new class implements JsonSerializable
+        {
+            public function jsonSerialize(): mixed
+            {
+                return ['custom' => 'serialized'];
             }
 
             public function toArray()
             {
-                return ['array_method' => 'value'];
+                return ['different' => 'array'];
             }
-        };
+        });
+        $model->setRelation('arrayable', new EloquentModelStub(['bar' => 'baz']));
+        $model->setRelation('null_relation', null);
 
+        $serialized = $model->jsonSerialize();
+
+        $this->assertSame('foo', $serialized['name']);
+        $this->assertSame(['custom' => 'serialized'], $serialized['custom_object']);
+        $this->assertArrayHasKey('bar', $serialized['arrayable']);
+        $this->assertSame('baz', $serialized['arrayable']['bar']);
+        $this->assertNull($serialized['null_relation']);
+    }
+
+    public function testJsonSerializeDiffersFromToArrayForJsonSerializableRelations()
+    {
         $model = new EloquentModelStub;
-        $model->setRelation('relation', $jsonSerializableRelation);
+        $model->setRelation('test', new class implements JsonSerializable, Arrayable
+        {
+            public function jsonSerialize(): mixed
+            {
+                return ['from' => 'json_serialize'];
+            }
 
-        // Test that jsonSerialize passes true to toArray
-        $jsonSerialized = $model->jsonSerialize();
-        $this->assertArrayHasKey('relation', $jsonSerialized);
-        $this->assertEquals(['json_serialized' => 'value'], $jsonSerialized['relation']);
+            public function toArray()
+            {
+                return ['from' => 'to_array'];
+            }
+        });
 
-        // Test that toArray with useJsonSerialize=false uses toArray method
-        $array = $model->toArray(false);
-        $this->assertArrayHasKey('relation', $array);
-        $this->assertEquals(['array_method' => 'value'], $array['relation']);
+        $arrayResult = $model->toArray();
+        $jsonResult = $model->jsonSerialize();
 
-        // Test that toArray with useJsonSerialize=true uses jsonSerialize method
-        $arrayWithJsonSerialize = $model->toArray(true);
-        $this->assertArrayHasKey('relation', $arrayWithJsonSerialize);
-        $this->assertEquals(['json_serialized' => 'value'], $arrayWithJsonSerialize['relation']);
+        $this->assertSame(['from' => 'to_array'], $arrayResult['test']);
+        $this->assertSame(['from' => 'json_serialize'], $jsonResult['test']);
+    }
+
+    public function testModelToJsonUsesJsonSerialize()
+    {
+        $model = new EloquentModelStub;
+        $model->name = 'John';
+        $model->setRelation('profile', new class implements JsonSerializable
+        {
+            public function jsonSerialize(): mixed
+            {
+                return ['custom' => 'serialized'];
+            }
+
+            public function toArray()
+            {
+                return ['regular' => 'array'];
+            }
+        });
+
+        $json = $model->toJson();
+        $decoded = json_decode($json, true);
+
+        $this->assertSame('John', $decoded['name']);
+        $this->assertSame(['custom' => 'serialized'], $decoded['profile']);
     }
 
     public function testGetQueueableRelationsWithCircularRelations()

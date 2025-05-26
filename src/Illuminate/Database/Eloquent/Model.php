@@ -1726,10 +1726,10 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      *
      * @return array
      */
-    public function toArray(bool $useJsonSerialize = false)
+    public function toArray()
     {
         return $this->withoutRecursion(
-            fn () => array_merge($this->attributesToArray(), $this->relationsToArray(useJsonSerialize: $useJsonSerialize)),
+            fn () => array_merge($this->attributesToArray(), $this->relationsToArray()),
             fn () => $this->attributesToArray(),
         );
     }
@@ -1760,7 +1760,10 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function jsonSerialize(): mixed
     {
-        return $this->toArray(useJsonSerialize: true);
+        return $this->withoutRecursion(
+            fn () => array_merge($this->attributesToArray(), $this->relationsToArray(useJsonSerialize: true)),
+            fn () => $this->attributesToArray(),
+        );
     }
 
     /**
