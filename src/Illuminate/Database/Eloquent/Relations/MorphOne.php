@@ -13,15 +13,19 @@ use Illuminate\Database\Query\JoinClause;
 
 /**
  * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
- * @template TDeclaringModel of \Illuminate\Database\Eloquent\Model
+ * @template TParentModel of \Illuminate\Database\Eloquent\Model
  *
- * @extends \Illuminate\Database\Eloquent\Relations\MorphOneOrMany<TRelatedModel, TDeclaringModel, ?TRelatedModel>
+ * @extends \Illuminate\Database\Eloquent\Relations\MorphOneOrMany<TRelatedModel, TParentModel>
  */
 class MorphOne extends MorphOneOrMany implements SupportsPartialRelations
 {
     use CanBeOneOfMany, ComparesRelatedModels, SupportsDefaultModels;
 
-    /** @inheritDoc */
+    /**
+     * Get the results of the relationship.
+     *
+     * @return \Illuminate\Database\Eloquent\Model|null
+     */
     public function getResults()
     {
         if (is_null($this->getParentKey())) {
@@ -30,15 +34,9 @@ class MorphOne extends MorphOneOrMany implements SupportsPartialRelations
 
         $result = $this->query->first();
 
-        if ($result) {
-            return $result;
-        }
-
-        return tap($this->getDefaultFor($this->parent), function ($instance) {
-            // Always set morph type
+        return $result ?: tap($this->getDefaultFor($this->parent), function ($instance) {
             $instance->setAttribute($this->getMorphType(), $this->parent->getMorphClass());
 
-            // Only set foreign key if parent has key
             $key = $this->parent->getKey();
 
             if (! is_null($key)) {
@@ -47,7 +45,13 @@ class MorphOne extends MorphOneOrMany implements SupportsPartialRelations
         });
     }
 
-    /** @inheritDoc */
+    /**
+     * Initialize the relation on a set of models.
+     *
+     * @param  array  $models
+     * @param  string  $relation
+     * @return array
+     */
     public function initRelation(array $models, $relation)
     {
         foreach ($models as $model) {
@@ -57,13 +61,27 @@ class MorphOne extends MorphOneOrMany implements SupportsPartialRelations
         return $models;
     }
 
-    /** @inheritDoc */
+    /**
+     * Match the eagerly loaded results to their parent models.
+     *
+     * @param  array  $models
+     * @param  \Illuminate\Database\Eloquent\Collection  $results
+     * @param  string  $relation
+     * @return array
+     */
     public function match(array $models, EloquentCollection $results, $relation)
     {
         return $this->matchOne($models, $results, $relation);
     }
 
-    /** @inheritDoc */
+    /**
+     * Get the query for existence check on the relationship.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  \Illuminate\Database\Eloquent\Builder  $parentQuery
+     * @param  array|string  $columns
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
     public function getRelationExistenceQuery(Builder $query, Builder $parentQuery, $columns = ['*'])
     {
         if ($this->isOneOfMany()) {
@@ -74,9 +92,9 @@ class MorphOne extends MorphOneOrMany implements SupportsPartialRelations
     }
 
     /**
-     * Add constraints for inner join subselect for one of many relationships.
+     * Add constraints for "one of many" subquery.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder<TRelatedModel>  $query
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @param  string|null  $column
      * @param  string|null  $aggregate
      * @return void
@@ -87,9 +105,9 @@ class MorphOne extends MorphOneOrMany implements SupportsPartialRelations
     }
 
     /**
-     * Get the columns that should be selected by the one of many subquery.
+     * Get columns needed for "one of many" subquery.
      *
-     * @return array|string
+     * @return array
      */
     public function getOneOfManySubQuerySelectColumns()
     {
@@ -97,39 +115,45 @@ class MorphOne extends MorphOneOrMany implements SupportsPartialRelations
     }
 
     /**
-     * Add join query constraints for one of many relationships.
+     * Add join constraints for "one of many" subquery.
      *
      * @param  \Illuminate\Database\Query\JoinClause  $join
      * @return void
      */
     public function addOneOfManyJoinSubQueryConstraints(JoinClause $join)
     {
-        $join
-            ->on($this->qualifySubSelectColumn($this->morphType), '=', $this->qualifyRelatedColumn($this->morphType))
-            ->on($this->qualifySubSelectColumn($this->foreignKey), '=', $this->qualifyRelatedColumn($this->foreignKey));
+        $join->on(
+            $this->qualifySubSelectColumn($this->morphType),
+            '=',
+            $this->qualifyRelatedColumn($this->morphType)
+        )->on(
+            $this->qualifySubSelectColumn($this->foreignKey),
+            '=',
+            $this->qualifyRelatedColumn($this->foreignKey)
+        );
     }
 
     /**
      * Make a new related instance for the given model.
      *
-     * @param  TDeclaringModel  $parent
-     * @return TRelatedModel
+     * @param  \Illuminate\Database\Eloquent\Model  $parent
+     * @return \Illuminate\Database\Eloquent\Model
      */
     public function newRelatedInstanceFor(Model $parent)
     {
         return tap($this->related->newInstance(), function ($instance) use ($parent) {
-            $instance->setAttribute($this->getForeignKeyName(), $parent->{$this->localKey})
-                     ->setAttribute($this->getMorphType(), $this->morphClass);
+            $instance->setAttribute($this->getForeignKeyName(), $parent->{$this->localKey});
+            $instance->setAttribute($this->getMorphType(), $this->morphClass);
 
             $this->applyInverseRelationToModel($instance, $parent);
         });
     }
 
     /**
-     * Get the value of the model's foreign key.
+     * Get the foreign key value from the related model.
      *
-     * @param  TRelatedModel  $model
-     * @return int|string
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @return mixed
      */
     protected function getRelatedKeyFrom(Model $model)
     {
