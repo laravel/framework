@@ -12,6 +12,8 @@ class ComponentMakeCommandTest extends TestCase
         'app/View/Components/Nested/Foo.php',
         'resources/views/components/nested/foo.blade.php',
         'tests/Feature/View/Components/Nested/FooTest.php',
+        'app/View/Components/MyViewlessComponent.php',       // <<< Add this
+        'app/View/Components/MyViewlessInlineComponent.php', // <<< Add this
     ];
 
     public function testItCanGenerateComponentFile()
@@ -101,5 +103,54 @@ class ComponentMakeCommandTest extends TestCase
 
         $this->assertFilenameExists('resources/views/custom/path/foo.blade.php');
         $this->assertFilenameNotExists('tests/Feature/View/Components/Nested/FooTest.php');
+    }
+    public function testItCanGenerateViewlessComponentFileWithoutView()
+    {
+        $this->artisan('make:component', [
+            'name' => 'MyViewlessComponent',
+            '--viewless' => true,
+        ])->assertExitCode(0);
+
+        $this->assertFilenameExists('app/View/Components/MyViewlessComponent.php');
+
+        $this->assertFileContains([
+            'namespace App\View\Components;',
+            'class MyViewlessComponent extends Component',
+            "return  ''; /*",
+            'This component is viewless. Implement the render method to return content directly.',
+        ], 'app/View/Components/MyViewlessComponent.php');
+
+        $this->assertFilenameNotExists('resources/views/components/my-viewless-component.blade.php');
+    }
+    public function testItCanGenerateViewlessInlineComponent()
+    {
+        $this->artisan('make:component', [
+            'name' => 'MyViewlessInlineComponent',
+            '--viewless' => true,
+            '--inline' => true,
+        ])->assertExitCode(0);
+
+        $this->assertFilenameExists('app/View/Components/MyViewlessInlineComponent.php');
+
+        $this->assertFileContains([
+            'namespace App\View\Components;',
+            'class MyViewlessInlineComponent extends Component',
+            "return <<<'blade'",
+        ], 'app/View/Components/MyViewlessInlineComponent.php');
+
+        $this->assertFilenameNotExists('resources/views/components/my-viewless-inline-component.blade.php');
+    }
+
+    public function testItErrorsWhenViewlessAndViewOptionsAreUsedTogether()
+    {
+        $this->artisan('make:component', [
+            'name' => 'ConflictingComponent',
+            '--viewless' => true,
+            '--view' => true,
+        ])
+        ->expectsOutputToContain('The --viewless option cannot be used with the --view option.');
+
+        $this->assertFilenameNotExists('app/View/Components/ConflictingComponent.php');
+        $this->assertFilenameNotExists('resources/views/components/conflicting-component.blade.php');
     }
 }

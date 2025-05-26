@@ -44,6 +44,11 @@ class ComponentMakeCommand extends GeneratorCommand
     public function handle()
     {
         if ($this->option('view')) {
+
+            if($this->option('viewless')) {
+                $this->components->error('The --viewless option cannot be used with the --view option.');
+                return false;
+            }
             return $this->writeView();
         }
 
@@ -51,7 +56,7 @@ class ComponentMakeCommand extends GeneratorCommand
             return false;
         }
 
-        if (! $this->option('inline')) {
+        if (! $this->option('inline') && ! $this->option('viewless')) {
             $this->writeView();
         }
     }
@@ -99,6 +104,14 @@ class ComponentMakeCommand extends GeneratorCommand
             return str_replace(
                 ['DummyView', '{{ view }}'],
                 "<<<'blade'\n<div>\n    <!-- ".Inspiring::quotes()->random()." -->\n</div>\nblade",
+                parent::buildClass($name)
+            );
+        }
+
+        if ($this->option('viewless')) {
+            return str_replace(
+                ['DummyView', '{{ view }}'],
+        " ''; /*\n    This component is viewless. Implement the render method to return content directly.\n    Example: return '<div>My custom content</div>';\n    If you don't, it will render an empty string.\n    */", //
                 parent::buildClass($name)
             );
         }
@@ -179,6 +192,7 @@ class ComponentMakeCommand extends GeneratorCommand
         return [
             ['inline', null, InputOption::VALUE_NONE, 'Create a component that renders an inline view'],
             ['view', null, InputOption::VALUE_NONE, 'Create an anonymous component with only a view'],
+            ['viewless', null, InputOption::VALUE_NONE, 'Create a component class without a corresponding view file'],
             ['path', null, InputOption::VALUE_REQUIRED, 'The location where the component view should be created'],
             ['force', 'f', InputOption::VALUE_NONE, 'Create the class even if the component already exists'],
         ];
