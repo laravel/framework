@@ -2083,4 +2083,37 @@ class Str
         static::$camelCache = [];
         static::$studlyCache = [];
     }
+
+    /**
+     * Generate a random string according to the given template.
+     * Alphabetical [a-zA-Z] characters will be converted to a random letter individually
+     * Numerical [0-9] characters will be converted to a random number individually
+     * Other characters won't be modified.
+     *
+     *
+     * @param  string  $format
+     * @return string
+     */
+    public static function template(string $format)
+    {
+        $value = '';
+
+        $char = strlen($format);
+
+        for($i = 0; $i < $char; $i++) {
+            if(preg_match('/[a-zA-Z]/', $format[$i])) {
+                if (ctype_lower($format[$i])) {
+                    $value .= chr(random_int(97, 122));
+                } else {
+                    $value .= chr(random_int(65, 90));
+                }
+            } elseif(preg_match('/\d/', $format[$i])) {
+                $value .= random_int(0, 9);
+            } else {
+                $value .= $format[$i];
+            }
+        }
+
+        return $value;
+    }
 }

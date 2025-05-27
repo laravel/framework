@@ -1814,6 +1814,19 @@ class SupportStrTest extends TestCase
 
         $this->assertSame('UserGroups', Str::pluralPascal('UserGroup', $countable));
     }
+
+    public function testGenerateTemplate(): void
+    {
+        foreach ([
+            ['XXXX-9999-X9X9-99XX', '/^[A-Z]{4}-[0-9]{4}-[A-Z][0-9][A-Z][0-9]-[0-9]{2}[A-Z]{2}$/'],
+            ['XXX-999-XX', '/^[A-Z]{3}-[0-9]{3}-[A-Z]{2}$/'],
+            ['ABC-123-de', '/^[A-Z]{3}-[0-9]{3}-[a-z]{2}$/'],
+        ] as $value) {
+            [$template, $pattern] = $value;
+            $this->assertMatchesRegularExpression($pattern, Str::template($template));
+        }
+
+    }
 }
 
 class StringableObjectStub
