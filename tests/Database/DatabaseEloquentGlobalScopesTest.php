@@ -147,6 +147,115 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
         $this->assertEquals($mainQuery, $query->toSql());
         $this->assertEquals(['bar', 1, 'baz', 1], $query->getBindings());
     }
+
+    public function testRemoveGlobalScopeWithString()
+    {
+        // Clean up any existing global scopes
+        EloquentClosureGlobalScopesTestModel::setAllGlobalScopes([]);
+
+        EloquentClosureGlobalScopesTestModel::addGlobalScope('test_scope', function ($query) {
+            $query->where('test', 1);
+        });
+
+        $this->assertTrue(EloquentClosureGlobalScopesTestModel::hasGlobalScope('test_scope'));
+
+        $originals = EloquentClosureGlobalScopesTestModel::removeGlobalScope('test_scope');
+
+        $this->assertFalse(EloquentClosureGlobalScopesTestModel::hasGlobalScope('test_scope'));
+        $this->assertIsArray($originals);
+        $this->assertArrayHasKey(EloquentClosureGlobalScopesTestModel::class, $originals);
+    }
+
+    public function testRemoveGlobalScopeWithClosure()
+    {
+        // Clean up any existing global scopes
+        EloquentClosureGlobalScopesTestModel::setAllGlobalScopes([]);
+
+        $closure = function ($query) {
+            $query->where('test', 1);
+        };
+        EloquentClosureGlobalScopesTestModel::addGlobalScope($closure);
+
+        // For closures without a key, we need to check using the spl_object_hash
+        $allScopes = EloquentClosureGlobalScopesTestModel::getAllGlobalScopes();
+        $this->assertArrayHasKey(EloquentClosureGlobalScopesTestModel::class, $allScopes);
+        $this->assertArrayHasKey(spl_object_hash($closure), $allScopes[EloquentClosureGlobalScopesTestModel::class]);
+
+        $originals = EloquentClosureGlobalScopesTestModel::removeGlobalScope($closure);
+
+        $allScopes = EloquentClosureGlobalScopesTestModel::getAllGlobalScopes();
+        $this->assertArrayNotHasKey(spl_object_hash($closure), $allScopes[EloquentClosureGlobalScopesTestModel::class] ?? []);
+        $this->assertIsArray($originals);
+    }
+
+    public function testRemoveGlobalScopeWithClassInstance()
+    {
+        // Clean up any existing global scopes
+        EloquentClosureGlobalScopesTestModel::setAllGlobalScopes([]);
+
+        $scope = new ActiveScope;
+        EloquentClosureGlobalScopesTestModel::addGlobalScope($scope);
+
+        $this->assertTrue(EloquentClosureGlobalScopesTestModel::hasGlobalScope($scope));
+
+        $originals = EloquentClosureGlobalScopesTestModel::removeGlobalScope($scope);
+
+        $this->assertFalse(EloquentClosureGlobalScopesTestModel::hasGlobalScope($scope));
+        $this->assertIsArray($originals);
+    }
+
+    public function testRemoveGlobalScopeWithClassName()
+    {
+        // Clean up any existing global scopes
+        EloquentClosureGlobalScopesTestModel::setAllGlobalScopes([]);
+
+        EloquentClosureGlobalScopesTestModel::addGlobalScope(ActiveScope::class);
+
+        $this->assertTrue(EloquentClosureGlobalScopesTestModel::hasGlobalScope(ActiveScope::class));
+
+        $originals = EloquentClosureGlobalScopesTestModel::removeGlobalScope(ActiveScope::class);
+
+        $this->assertFalse(EloquentClosureGlobalScopesTestModel::hasGlobalScope(ActiveScope::class));
+        $this->assertIsArray($originals);
+    }
+
+    public function testRemoveGlobalScopes()
+    {
+        // Clean up any existing global scopes
+        EloquentClosureGlobalScopesTestModel::setAllGlobalScopes([]);
+
+        EloquentClosureGlobalScopesTestModel::addGlobalScopes([
+            'scope1' => function ($query) {
+                $query->where('test1', 1);
+            },
+            'scope2' => new ActiveScope,
+            'scope_not_removed' => new ActiveScope,
+            ActiveScope::class,
+        ]);
+
+        $this->assertTrue(EloquentClosureGlobalScopesTestModel::hasGlobalScope('scope1'));
+        $this->assertTrue(EloquentClosureGlobalScopesTestModel::hasGlobalScope('scope2'));
+        $this->assertTrue(EloquentClosureGlobalScopesTestModel::hasGlobalScope(ActiveScope::class));
+        $this->assertTrue(EloquentClosureGlobalScopesTestModel::hasGlobalScope('scope_not_removed'));
+
+        EloquentClosureGlobalScopesTestModel::removeGlobalScopes(['scope1', 'scope2', ActiveScope::class]);
+
+        $this->assertFalse(EloquentClosureGlobalScopesTestModel::hasGlobalScope('scope1'));
+        $this->assertFalse(EloquentClosureGlobalScopesTestModel::hasGlobalScope('scope2'));
+        $this->assertFalse(EloquentClosureGlobalScopesTestModel::hasGlobalScope(ActiveScope::class));
+        $this->assertTrue(EloquentClosureGlobalScopesTestModel::hasGlobalScope('scope_not_removed'));
+    }
+
+    public function testRemoveNonExistentGlobalScope()
+    {
+        // Clean up any existing global scopes
+        EloquentClosureGlobalScopesTestModel::setAllGlobalScopes([]);
+
+        $originals = EloquentClosureGlobalScopesTestModel::removeGlobalScope('non_existent');
+
+        // Should not throw an exception
+        $this->assertIsArray($originals);
+    }
 }
 
 class EloquentClosureGlobalScopesTestModel extends Model
