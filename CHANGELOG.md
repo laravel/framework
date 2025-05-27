@@ -1,6 +1,27 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.15.0...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.16.0...12.x)
+
+## [v12.16.0](https://github.com/laravel/framework/compare/v12.15.0...v12.16.0) - 2025-05-27
+
+* [12.x] Change priority in optimize:clear by [@amirmohammadnajmi](https://github.com/amirmohammadnajmi) in https://github.com/laravel/framework/pull/55792
+* [12.x] Fix `TestResponse::assertSessionMissing()` when given an array of keys by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/55800
+* [12.x] Allowing `Context` Attribute to Interact with Hidden by [@devajmeireles](https://github.com/devajmeireles) in https://github.com/laravel/framework/pull/55799
+* Add support for sending raw (non-encoded) attachments in Resend mail driver by [@Roywcm](https://github.com/Roywcm) in https://github.com/laravel/framework/pull/55803
+* [12.x] Added option to always defer for flexible cache by [@Zwartpet](https://github.com/Zwartpet) in https://github.com/laravel/framework/pull/55802
+* [12.x] style: Use null coalescing assignment (??=) for cleaner code by [@mohsenetm](https://github.com/mohsenetm) in https://github.com/laravel/framework/pull/55823
+* [12.x] Introducing `Arr::hasAll` by [@devajmeireles](https://github.com/devajmeireles) in https://github.com/laravel/framework/pull/55815
+* [12.x] Restore lazy loading check by [@decadence](https://github.com/decadence) in https://github.com/laravel/framework/pull/55817
+* [12.x] Minor language update by [@AhmedAlaa4611](https://github.com/AhmedAlaa4611) in https://github.com/laravel/framework/pull/55812
+* fix(cache/redis): use connectionAwareSerialize in RedisStore::putMany() by [@superbiche](https://github.com/superbiche) in https://github.com/laravel/framework/pull/55814
+* [12.x] Fix `ResponseFactory` should also accept `null` callback by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/55833
+* [12.x] Add template variables to scope by [@wietsewarendorff](https://github.com/wietsewarendorff) in https://github.com/laravel/framework/pull/55830
+* [12.x] Introducing `toUri` to the `Stringable` Class by [@devajmeireles](https://github.com/devajmeireles) in https://github.com/laravel/framework/pull/55862
+* [12.x] Remove remaining [@return](https://github.com/return) tags from constructors by [@AhmedAlaa4611](https://github.com/AhmedAlaa4611) in https://github.com/laravel/framework/pull/55858
+* [12.x] Replace alias `is_integer()` with `is_int()` to comply with Laravel Pint by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/55851
+* Fix argument types for Illuminate/Database/Query/Builder::upsert() by [@jellisii](https://github.com/jellisii) in https://github.com/laravel/framework/pull/55849
+* [12.x] Add `in_array_keys` validation rule to check for presence of specified array keys by [@stevebauman](https://github.com/stevebauman) in https://github.com/laravel/framework/pull/55807
+* [12.x] Add `Rule::contains` by [@stevebauman](https://github.com/stevebauman) in https://github.com/laravel/framework/pull/55809
 
 ## [v12.15.0](https://github.com/laravel/framework/compare/v12.14.1...v12.15.0) - 2025-05-20
 
