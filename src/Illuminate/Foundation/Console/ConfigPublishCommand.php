@@ -7,6 +7,7 @@ use Illuminate\Support\Collection;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Finder\Finder;
 
+use function Laravel\Prompts\search;
 use function Laravel\Prompts\select;
 
 #[AsCommand(name: 'config:publish')]
@@ -46,12 +47,30 @@ class ConfigPublishCommand extends Command
             return;
         }
 
-        $name = (string) (is_null($this->argument('name')) ? select(
-            label: 'Which configuration file would you like to publish?',
-            options: (new Collection($config))->map(function (string $path) {
-                return basename($path, '.php');
-            }),
-        ) : $this->argument('name'));
+        $choices = array_map(
+            fn(string $path) => basename($path, '.php'),
+            $config,
+        );
+
+        $choice = windows_os()
+            ? select(
+                'Which configuration file would you like to publish?',
+                $choices,
+                scroll: 15,
+            )
+            : search(
+                label: 'Which configuration file would you like to publish?',
+                placeholder: 'Search...',
+                options: fn($search) => array_values(array_filter(
+                    $choices,
+                    fn($choice) => str_contains(strtolower($choice), strtolower($search))
+                )),
+                scroll: 15,
+            );
+
+        $name = (string) (is_null($this->argument('name'))
+            ? $choice
+            : $this->argument('name'));
 
         if (! is_null($name) && ! isset($config[$name])) {
             $this->components->error('Unrecognized configuration file.');
