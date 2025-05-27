@@ -48,7 +48,7 @@ class ConfigPublishCommand extends Command
         }
 
         $choices = array_map(
-            fn(string $path) => basename($path, '.php'),
+            fn (string $path) => basename($path, '.php'),
             $config,
         );
 
@@ -61,9 +61,9 @@ class ConfigPublishCommand extends Command
             : search(
                 label: 'Which configuration file would you like to publish?',
                 placeholder: 'Search...',
-                options: fn($search) => array_values(array_filter(
+                options: fn ($search) => array_values(array_filter(
                     $choices,
-                    fn($choice) => str_contains(strtolower($choice), strtolower($search))
+                    fn ($choice) => str_contains(strtolower($choice), strtolower($search))
                 )),
                 scroll: 15,
             );
