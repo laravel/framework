@@ -777,7 +777,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     * Add a straight_join to the query.
+     * Add a straight join to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $table
      * @param  \Closure|string  $first
@@ -791,7 +791,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     * Add a "straight_join where" clause to the query.
+     * Add a "straight join where" clause to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $table
      * @param  \Closure|\Illuminate\Contracts\Database\Query\Expression|string  $first
@@ -805,7 +805,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     * Add a subquery straight_join to the query.
+     * Add a subquery straight join to the query.
      *
      * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|string  $query
      * @param  string  $as

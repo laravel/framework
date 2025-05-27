@@ -376,14 +376,6 @@ class MySqlGrammar extends Grammar
     }
 
     /**
-     * @return bool
-     */
-    protected function supportStraightJoin(): bool
-    {
-        return true;
-    }
-
-    /**
      * Compile a "lateral join" clause.
      *
      * @param  \Illuminate\Database\Query\JoinLateralClause  $join
@@ -393,6 +385,14 @@ class MySqlGrammar extends Grammar
     public function compileJoinLateral(JoinLateralClause $join, string $expression): string
     {
         return trim("{$join->type} join lateral {$expression} on true");
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function supportsStraightJoins()
+    {
+        return true;
     }
 
     /**
