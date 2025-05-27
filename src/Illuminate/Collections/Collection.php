@@ -516,9 +516,11 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
         foreach ($this->items as $key => $value) {
             $groupKeys = $groupBy($value, $key);
 
-            if (! is_array($groupKeys)) {
-                $groupKeys = [$groupKeys];
-            }
+            $groupKeys = match (true) {
+                ! is_array($groupKeys) => [$groupKeys],
+                is_array($groupKeys) && empty($groupKeys) => [null],
+                default => $groupKeys,
+            };  
 
             foreach ($groupKeys as $groupKey) {
                 $groupKey = match (true) {

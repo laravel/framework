@@ -3458,6 +3458,32 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testGroupWithEmptyValue($collection)
+    {
+        $data = new $collection([
+            10 => [],
+            20 => ['user' => 2, 'roles' => []],
+            30 => ['user' => 3, 'roles' => [null]],
+            40 => ['user' => 4, 'roles' => ['Role_2']],
+        ]);
+
+        $result = $data->groupBy('roles', true);
+
+        $expected_result = [
+            '' => [
+                10 => [],
+                20 => ['user' => 2, 'roles' => []],
+                30 => ['user' => 3, 'roles' => [null]],
+            ],
+            'Role_2' => [
+                40 => ['user' => 4, 'roles' => ['Role_2']],
+            ],
+        ];
+
+        $this->assertEquals($expected_result, $result->toArray());
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testKeyByAttribute($collection)
     {
         $data = new $collection([['rating' => 1, 'name' => '1'], ['rating' => 2, 'name' => '2'], ['rating' => 3, 'name' => '3']]);
