@@ -1239,7 +1239,7 @@ class Blueprint
      * Add nullable creation and update timestamps to the table.
      *
      * @param  int|null  $precision
-     * @return Illuminate\Support\Collection<int, \Illuminate\Database\Schema\ColumnDefinition>
+     * @return \Illuminate\Support\Collection<int, \Illuminate\Database\Schema\ColumnDefinition>
      */
     public function timestamps($precision = null)
     {
@@ -1255,7 +1255,7 @@ class Blueprint
      * Alias for self::timestamps().
      *
      * @param  int|null  $precision
-     * @return Illuminate\Support\Collection<int, \Illuminate\Database\Schema\ColumnDefinition>
+     * @return \Illuminate\Support\Collection<int, \Illuminate\Database\Schema\ColumnDefinition>
      */
     public function nullableTimestamps($precision = null)
     {
@@ -1266,7 +1266,7 @@ class Blueprint
      * Add creation and update timestampTz columns to the table.
      *
      * @param  int|null  $precision
-     * @return Illuminate\Support\Collection<int, \Illuminate\Database\Schema\ColumnDefinition>
+     * @return \Illuminate\Support\Collection<int, \Illuminate\Database\Schema\ColumnDefinition>
      */
     public function timestampsTz($precision = null)
     {
@@ -1280,7 +1280,7 @@ class Blueprint
      * Add creation and update datetime columns to the table.
      *
      * @param  int|null  $precision
-     * @return Illuminate\Support\Collection<int, \Illuminate\Database\Schema\ColumnDefinition>
+     * @return \Illuminate\Support\Collection<int, \Illuminate\Database\Schema\ColumnDefinition>
      */
     public function datetimes($precision = null)
     {
