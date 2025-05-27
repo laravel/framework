@@ -199,7 +199,9 @@ class Grammar extends BaseGrammar
                 return $this->compileJoinLateral($join, $tableAndNestedJoins);
             }
 
-            return trim("{$join->type} join {$tableAndNestedJoins} {$this->compileWheres($join)}");
+            $joinWord = ($join->type === 'straight_join' && $this->supportsStraightJoins()) ? '' : ' join';
+
+            return trim("{$join->type}{$joinWord} {$tableAndNestedJoins} {$this->compileWheres($join)}");
         })->implode(' ');
     }
 
@@ -215,6 +217,16 @@ class Grammar extends BaseGrammar
     public function compileJoinLateral(JoinLateralClause $join, string $expression): string
     {
         throw new RuntimeException('This database engine does not support lateral joins.');
+    }
+
+    /**
+     * Determine if the grammar supports straight joins.
+     *
+     * @return bool
+     */
+    protected function supportsStraightJoins()
+    {
+        throw new RuntimeException('This database engine does not support straight joins.');
     }
 
     /**

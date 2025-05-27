@@ -388,6 +388,14 @@ class MySqlGrammar extends Grammar
     }
 
     /**
+     * {@inheritdoc}
+     */
+    protected function supportsStraightJoins()
+    {
+        return true;
+    }
+
+    /**
      * Prepare a JSON column being updated using the JSON_SET function.
      *
      * @param  string  $key
