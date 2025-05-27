@@ -48,7 +48,7 @@ class ComponentMakeCommand extends GeneratorCommand
         }
 
         if (parent::handle() === false && ! $this->option('force')) {
-            return false;
+            return;
         }
 
         if (! $this->option('inline')) {
