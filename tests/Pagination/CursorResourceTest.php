@@ -4,7 +4,6 @@ namespace Illuminate\Tests\Pagination;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Pagination\CursorPaginator;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Tests\Pagination\Fixtures\Models\PaginatorResourceTestModel;
 use PHPUnit\Framework\TestCase;
 
