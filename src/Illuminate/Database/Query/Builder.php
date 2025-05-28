@@ -1193,6 +1193,73 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add a where like clause to the query from array of columns
+     *
+     * @param array $columns
+     * @param $value
+     * @param $caseSensitive
+     * @param $boolean
+     * @param $not
+     * @return $this|Builder
+     */
+    public function whereLikeAny(array $columns, $value = null, $caseSensitive = false, $boolean = 'and', $not = false)
+    {
+        return $this->whereNested(function ($query) use ($boolean, $not, $caseSensitive, $columns, $value) {
+            foreach ($columns as $column) {
+                $query->whereLike($column, $value, $caseSensitive, 'or');
+            }
+        }, $boolean);
+    }
+
+    /**
+     * Add a where like clause to the query from array of columns
+     *
+     * @param array $columns
+     * @param $value
+     * @param $caseSensitive
+     * @param $boolean
+     * @param $not
+     * @return $this|Builder
+     */
+    public function whereAnyLike(array $columns, $value = null, $caseSensitive = false, $boolean = 'and', $not = false)
+    {
+        return $this->whereLikeAny($columns, $value, $caseSensitive, $boolean, $not);
+    }
+
+
+    /**
+     * Add a where like clause to the query from array of columns
+     *
+     * @param array $columns
+     * @param $value
+     * @param $caseSensitive
+     * @param $boolean
+     * @param $not
+     * @return $this|Builder
+     */
+    public function orWhereLikeAny(array $columns, $value = null, $caseSensitive = false, $boolean = 'or', $not = false)
+    {
+        return $this->whereLikeAny($columns, $value, $caseSensitive, $boolean, $not);
+    }
+
+    /**
+     * Add a where like clause to the query from array of columns.
+     *
+     * @alias orWhereLikeAny
+     * @param array $columns
+     * @param $value
+     * @param $caseSensitive
+     * @param $boolean
+     * @param $not
+     * @return $this|Builder
+     */
+    public function orWhereAnyLike(array $columns, $value = null, $caseSensitive = false, $boolean = 'or', $not = false)
+    {
+        return $this->orWhereLikeAny($columns, $value, $caseSensitive, $boolean, $not);
+    }
+
+
+    /**
      * Add a "where in" clause to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
