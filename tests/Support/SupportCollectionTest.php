@@ -5015,8 +5015,8 @@ class SupportCollectionTest extends TestCase
         $classes = new $collection([$class1, $class2]);
 
         $this->assertEquals(['TAYLOR', 't a y l o r'], $classes->map->transform('taylor')->toArray());
-        $this->assertEquals(TestSupportCollectionHigherOrderStaticClass1::class, $classes->first->matches('Taylor'));
-        $this->assertEquals(TestSupportCollectionHigherOrderStaticClass2::class, $classes->first->matches('Otwell'));
+        $this->assertEquals($class1, $classes->first->matches('Taylor'));
+        $this->assertEquals($class2, $classes->first->matches('Otwell'));
     }
 
     #[DataProvider('collectionClassProvider')]
