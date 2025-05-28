@@ -520,7 +520,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
                 ! is_array($groupKeys) => [$groupKeys],
                 is_array($groupKeys) && empty($groupKeys) => [null],
                 default => $groupKeys,
-            };  
+            };
 
             foreach ($groupKeys as $groupKey) {
                 $groupKey = match (true) {
