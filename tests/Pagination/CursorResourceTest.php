@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Pagination;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Pagination\CursorPaginator;
-use Illuminate\Tests\Pagination\Fixtures\Models\PaginatorResourceTestModel;
+use Illuminate\Tests\Pagination\Fixtures\Models\CursorResourceTestModel;
 use PHPUnit\Framework\TestCase;
 
 class CursorResourceTest extends TestCase
@@ -12,7 +12,7 @@ class CursorResourceTest extends TestCase
     public function testItCanTransformToExplicitResource()
     {
         $paginator = new CursorResourceTestPaginator([
-            new PaginatorResourceTestModel(),
+            new CursorResourceTestModel(),
         ], 1);
 
         $resource = $paginator->toResourceCollection(CursorResourceTestResource::class);
@@ -23,10 +23,10 @@ class CursorResourceTest extends TestCase
     public function testItThrowsExceptionWhenResourceCannotBeFound()
     {
         $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('Failed to find resource class for model [Illuminate\Tests\Pagination\Fixtures\Models\PaginatorResourceTestModel].');
+        $this->expectExceptionMessage('Failed to find resource class for model [Illuminate\Tests\Pagination\Fixtures\Models\CursorResourceTestModel].');
 
         $paginator = new CursorResourceTestPaginator([
-            new PaginatorResourceTestModel(),
+            new CursorResourceTestModel(),
         ], 1);
 
         $paginator->toResourceCollection();
@@ -35,10 +35,10 @@ class CursorResourceTest extends TestCase
     public function testItCanGuessResourceWhenNotProvided()
     {
         $paginator = new CursorResourceTestPaginator([
-            new PaginatorResourceTestModel(),
+            new CursorResourceTestModel(),
         ], 1);
 
-        class_alias(CursorResourceTestResource::class, 'Illuminate\Tests\Pagination\Fixtures\Http\Resources\PaginatorResourceTestModelResource');
+        class_alias(CursorResourceTestResource::class, 'Illuminate\Tests\Pagination\Fixtures\Http\Resources\CursorResourceTestModelResource');
 
         $resource = $paginator->toResourceCollection();
 
