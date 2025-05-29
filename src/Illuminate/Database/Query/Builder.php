@@ -2857,6 +2857,17 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add descending "reorder" clause to the query.
+     *
+     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Contracts\Database\Query\Expression|string|null  $column
+     * @return $this
+     */
+    public function reorderDesc($column)
+    {
+        return $this->reorder($column, 'desc');
+    }
+
+    /**
      * Get an array with all orders with a given column removed.
      *
      * @param  string  $column
