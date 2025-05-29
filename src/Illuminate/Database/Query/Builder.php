@@ -2862,7 +2862,7 @@ class Builder implements BuilderContract
      * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Contracts\Database\Query\Expression|string|null  $column
      * @return $this
      */
-    public function reorderByDesc($column = null)
+    public function reorderByDesc($column)
     {
         return $this->reorder($column, 'desc');
     }
