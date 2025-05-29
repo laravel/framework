@@ -3,6 +3,7 @@
 namespace Illuminate\Bus;
 
 use Closure;
+use Illuminate\Bus\Attributes\HandledBy;
 use Illuminate\Contracts\Bus\QueueingDispatcher;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Queue\Queue;
@@ -12,6 +13,8 @@ use Illuminate\Pipeline\Pipeline;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Jobs\SyncJob;
 use Illuminate\Support\Collection;
+use ReflectionClass;
+use ReflectionException;
 use RuntimeException;
 
 class Dispatcher implements QueueingDispatcher
@@ -189,13 +192,43 @@ class Dispatcher implements QueueingDispatcher
      * @param  mixed  $command
      * @return bool|mixed
      */
-    public function getCommandHandler($command)
+    public function getCommandHandler($command): mixed
     {
-        if ($this->hasCommandHandler($command)) {
-            return $this->container->make($this->handlers[get_class($command)]);
+        return $this->hasCommandHandler($command)
+            ? $this->getCommandHandlerViaMap($command)
+            : $this->getCommandHandlerViaAttribute($command);
+    }
+
+    /**
+     * Retreive the handler for a commmand via map.
+     *
+     * @param  mixed  $command
+     * @return mixed
+     */
+    public function getCommandHandlerViaMap($command): mixed
+    {
+        return $this->container->make($this->handlers[get_class($command)]);
+    }
+
+    /**
+     * Retreive the handler for a commmand via attribute.
+     *
+     * @param  mixed  $command
+     * @return bool|mixed
+     */
+    public function getCommandHandlerViaAttribute($command): mixed
+    {
+        try {
+            $attributes = (new ReflectionClass($command))->getAttributes(HandledBy::class);
+        } catch (ReflectionException) {
+            return false;
         }
 
-        return false;
+        if (!$attributes) {
+            return false;
+        }
+
+        return $this->container->make($attributes[0]->newInstance()->handler);
     }
 
     /**
