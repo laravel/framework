@@ -238,12 +238,39 @@ class Builder implements BuilderContract
      * @var string[]
      */
     public $operators = [
-        '=', '<', '>', '<=', '>=', '<>', '!=', '<=>',
-        'like', 'like binary', 'not like', 'ilike',
-        '&', '|', '^', '<<', '>>', '&~', 'is', 'is not',
-        'rlike', 'not rlike', 'regexp', 'not regexp',
-        '~', '~*', '!~', '!~*', 'similar to',
-        'not similar to', 'not ilike', '~~*', '!~~*',
+        '=',
+        '<',
+        '>',
+        '<=',
+        '>=',
+        '<>',
+        '!=',
+        '<=>',
+        'like',
+        'like binary',
+        'not like',
+        'ilike',
+        '&',
+        '|',
+        '^',
+        '<<',
+        '>>',
+        '&~',
+        'is',
+        'is not',
+        'rlike',
+        'not rlike',
+        'regexp',
+        'not regexp',
+        '~',
+        '~*',
+        '!~',
+        '!~*',
+        'similar to',
+        'not similar to',
+        'not ilike',
+        '~~*',
+        '!~~*',
     ];
 
     /**
@@ -252,7 +279,12 @@ class Builder implements BuilderContract
      * @var string[]
      */
     public $bitwiseOperators = [
-        '&', '|', '^', '<<', '>>', '&~',
+        '&',
+        '|',
+        '^',
+        '<<',
+        '>>',
+        '&~',
     ];
 
     /**
@@ -313,7 +345,8 @@ class Builder implements BuilderContract
         [$query, $bindings] = $this->createSub($query);
 
         return $this->selectRaw(
-            '('.$query.') as '.$this->grammar->wrap($as), $bindings
+            '('.$query.') as '.$this->grammar->wrap($as),
+            $bindings
         );
     }
 
@@ -417,8 +450,10 @@ class Builder implements BuilderContract
      */
     protected function prependDatabaseNameIfCrossDatabaseQuery($query)
     {
-        if ($query->getConnection()->getDatabaseName() !==
-            $this->getConnection()->getDatabaseName()) {
+        if (
+            $query->getConnection()->getDatabaseName() !==
+            $this->getConnection()->getDatabaseName()
+        ) {
             $databaseName = $query->getConnection()->getDatabaseName();
 
             if (! str_starts_with($query->from, $databaseName) && ! str_contains($query->from, '.')) {
@@ -841,7 +876,9 @@ class Builder implements BuilderContract
         // passed to the method, we will assume that the operator is an equals sign
         // and keep going. Otherwise, we'll require the operator to be passed in.
         [$value, $operator] = $this->prepareValueAndOperator(
-            $value, $operator, func_num_args() === 2
+            $value,
+            $operator,
+            func_num_args() === 2
         );
 
         // If the column is actually a Closure instance, we will assume the developer
@@ -907,7 +944,11 @@ class Builder implements BuilderContract
         // in our array and add the query binding to our array of bindings that
         // will be bound to each SQL statements when it is finally executed.
         $this->wheres[] = compact(
-            'type', 'column', 'operator', 'value', 'boolean'
+            'type',
+            'column',
+            'operator',
+            'value',
+            'boolean'
         );
 
         if (! $value instanceof ExpressionContract) {
@@ -971,7 +1012,7 @@ class Builder implements BuilderContract
     protected function invalidOperatorAndValue($operator, $value)
     {
         return is_null($value) && in_array($operator, $this->operators) &&
-             ! in_array($operator, ['=', '<=>', '<>', '!=']);
+            ! in_array($operator, ['=', '<=>', '<>', '!=']);
     }
 
     /**
@@ -983,7 +1024,7 @@ class Builder implements BuilderContract
     protected function invalidOperator($operator)
     {
         return ! is_string($operator) || (! in_array(strtolower($operator), $this->operators, true) &&
-               ! in_array(strtolower($operator), $this->grammar->getOperators(), true));
+            ! in_array(strtolower($operator), $this->grammar->getOperators(), true));
     }
 
     /**
@@ -995,7 +1036,7 @@ class Builder implements BuilderContract
     protected function isBitwiseOperator($operator)
     {
         return in_array(strtolower($operator), $this->bitwiseOperators, true) ||
-               in_array(strtolower($operator), $this->grammar->getBitwiseOperators(), true);
+            in_array(strtolower($operator), $this->grammar->getBitwiseOperators(), true);
     }
 
     /**
@@ -1009,7 +1050,9 @@ class Builder implements BuilderContract
     public function orWhere($column, $operator = null, $value = null)
     {
         [$value, $operator] = $this->prepareValueAndOperator(
-            $value, $operator, func_num_args() === 2
+            $value,
+            $operator,
+            func_num_args() === 2
         );
 
         return $this->where($column, $operator, $value, 'or');
@@ -1079,7 +1122,11 @@ class Builder implements BuilderContract
         $type = 'Column';
 
         $this->wheres[] = compact(
-            'type', 'first', 'operator', 'second', 'boolean'
+            'type',
+            'first',
+            'operator',
+            'second',
+            'boolean'
         );
 
         return $this;
@@ -1512,7 +1559,9 @@ class Builder implements BuilderContract
     public function whereDate($column, $operator, $value = null, $boolean = 'and')
     {
         [$value, $operator] = $this->prepareValueAndOperator(
-            $value, $operator, func_num_args() === 2
+            $value,
+            $operator,
+            func_num_args() === 2
         );
 
         // If the given operator is not found in the list of valid operators we will
@@ -1542,7 +1591,9 @@ class Builder implements BuilderContract
     public function orWhereDate($column, $operator, $value = null)
     {
         [$value, $operator] = $this->prepareValueAndOperator(
-            $value, $operator, func_num_args() === 2
+            $value,
+            $operator,
+            func_num_args() === 2
         );
 
         return $this->whereDate($column, $operator, $value, 'or');
@@ -1560,7 +1611,9 @@ class Builder implements BuilderContract
     public function whereTime($column, $operator, $value = null, $boolean = 'and')
     {
         [$value, $operator] = $this->prepareValueAndOperator(
-            $value, $operator, func_num_args() === 2
+            $value,
+            $operator,
+            func_num_args() === 2
         );
 
         // If the given operator is not found in the list of valid operators we will
@@ -1590,7 +1643,9 @@ class Builder implements BuilderContract
     public function orWhereTime($column, $operator, $value = null)
     {
         [$value, $operator] = $this->prepareValueAndOperator(
-            $value, $operator, func_num_args() === 2
+            $value,
+            $operator,
+            func_num_args() === 2
         );
 
         return $this->whereTime($column, $operator, $value, 'or');
@@ -1608,7 +1663,9 @@ class Builder implements BuilderContract
     public function whereDay($column, $operator, $value = null, $boolean = 'and')
     {
         [$value, $operator] = $this->prepareValueAndOperator(
-            $value, $operator, func_num_args() === 2
+            $value,
+            $operator,
+            func_num_args() === 2
         );
 
         // If the given operator is not found in the list of valid operators we will
@@ -1642,7 +1699,9 @@ class Builder implements BuilderContract
     public function orWhereDay($column, $operator, $value = null)
     {
         [$value, $operator] = $this->prepareValueAndOperator(
-            $value, $operator, func_num_args() === 2
+            $value,
+            $operator,
+            func_num_args() === 2
         );
 
         return $this->whereDay($column, $operator, $value, 'or');
@@ -1660,7 +1719,9 @@ class Builder implements BuilderContract
     public function whereMonth($column, $operator, $value = null, $boolean = 'and')
     {
         [$value, $operator] = $this->prepareValueAndOperator(
-            $value, $operator, func_num_args() === 2
+            $value,
+            $operator,
+            func_num_args() === 2
         );
 
         // If the given operator is not found in the list of valid operators we will
@@ -1694,7 +1755,9 @@ class Builder implements BuilderContract
     public function orWhereMonth($column, $operator, $value = null)
     {
         [$value, $operator] = $this->prepareValueAndOperator(
-            $value, $operator, func_num_args() === 2
+            $value,
+            $operator,
+            func_num_args() === 2
         );
 
         return $this->whereMonth($column, $operator, $value, 'or');
@@ -1712,7 +1775,9 @@ class Builder implements BuilderContract
     public function whereYear($column, $operator, $value = null, $boolean = 'and')
     {
         [$value, $operator] = $this->prepareValueAndOperator(
-            $value, $operator, func_num_args() === 2
+            $value,
+            $operator,
+            func_num_args() === 2
         );
 
         // If the given operator is not found in the list of valid operators we will
@@ -1742,7 +1807,9 @@ class Builder implements BuilderContract
     public function orWhereYear($column, $operator, $value = null)
     {
         [$value, $operator] = $this->prepareValueAndOperator(
-            $value, $operator, func_num_args() === 2
+            $value,
+            $operator,
+            func_num_args() === 2
         );
 
         return $this->whereYear($column, $operator, $value, 'or');
@@ -1835,7 +1902,11 @@ class Builder implements BuilderContract
         }
 
         $this->wheres[] = compact(
-            'type', 'column', 'operator', 'query', 'boolean'
+            'type',
+            'column',
+            'operator',
+            'query',
+            'boolean'
         );
 
         $this->addBinding($query->getBindings(), 'where');
@@ -2142,7 +2213,9 @@ class Builder implements BuilderContract
         $type = 'JsonLength';
 
         [$value, $operator] = $this->prepareValueAndOperator(
-            $value, $operator, func_num_args() === 2
+            $value,
+            $operator,
+            func_num_args() === 2
         );
 
         // If the given operator is not found in the list of valid operators we will
@@ -2172,7 +2245,9 @@ class Builder implements BuilderContract
     public function orWhereJsonLength($column, $operator, $value = null)
     {
         [$value, $operator] = $this->prepareValueAndOperator(
-            $value, $operator, func_num_args() === 2
+            $value,
+            $operator,
+            func_num_args() === 2
         );
 
         return $this->whereJsonLength($column, $operator, $value, 'or');
@@ -2190,7 +2265,10 @@ class Builder implements BuilderContract
         $finder = substr($method, 5);
 
         $segments = preg_split(
-            '/(And|Or)(?=[A-Z])/', $finder, -1, PREG_SPLIT_DELIM_CAPTURE
+            '/(And|Or)(?=[A-Z])/',
+            $finder,
+            -1,
+            PREG_SPLIT_DELIM_CAPTURE
         );
 
         // The connector variable will determine which connector will be used for the
@@ -2285,7 +2363,9 @@ class Builder implements BuilderContract
     public function whereAll($columns, $operator = null, $value = null, $boolean = 'and')
     {
         [$value, $operator] = $this->prepareValueAndOperator(
-            $value, $operator, func_num_args() === 2
+            $value,
+            $operator,
+            func_num_args() === 2
         );
 
         $this->whereNested(function ($query) use ($columns, $operator, $value) {
@@ -2322,7 +2402,9 @@ class Builder implements BuilderContract
     public function whereAny($columns, $operator = null, $value = null, $boolean = 'and')
     {
         [$value, $operator] = $this->prepareValueAndOperator(
-            $value, $operator, func_num_args() === 2
+            $value,
+            $operator,
+            func_num_args() === 2
         );
 
         $this->whereNested(function ($query) use ($columns, $operator, $value) {
@@ -2432,7 +2514,9 @@ class Builder implements BuilderContract
         // passed to the method, we will assume that the operator is an equals sign
         // and keep going. Otherwise, we'll require the operator to be passed in.
         [$value, $operator] = $this->prepareValueAndOperator(
-            $value, $operator, func_num_args() === 2
+            $value,
+            $operator,
+            func_num_args() === 2
         );
 
         if ($column instanceof Closure && is_null($operator)) {
@@ -2470,7 +2554,9 @@ class Builder implements BuilderContract
     public function orHaving($column, $operator = null, $value = null)
     {
         [$value, $operator] = $this->prepareValueAndOperator(
-            $value, $operator, func_num_args() === 2
+            $value,
+            $operator,
+            func_num_args() === 2
         );
 
         return $this->having($column, $operator, $value, 'or');
@@ -2857,6 +2943,17 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add descending "reorder" clause to the query.
+     *
+     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Contracts\Database\Query\Expression|string|null  $column
+     * @return $this
+     */
+    public function reorderByDesc($column = null)
+    {
+        return $this->reorder($column, 'desc');
+    }
+
+    /**
      * Get an array with all orders with a given column removed.
      *
      * @param  string  $column
@@ -3011,7 +3108,8 @@ class Builder implements BuilderContract
     public function toRawSql()
     {
         return $this->grammar->substituteBindingsIntoRawSql(
-            $this->toSql(), $this->connection->prepareBindings($this->getBindings())
+            $this->toSql(),
+            $this->connection->prepareBindings($this->getBindings())
         );
     }
 
@@ -3118,7 +3216,9 @@ class Builder implements BuilderContract
     protected function runSelect()
     {
         return $this->connection->select(
-            $this->toSql(), $this->getBindings(), ! $this->useWritePdo
+            $this->toSql(),
+            $this->getBindings(),
+            ! $this->useWritePdo
         );
     }
 
@@ -3338,7 +3438,9 @@ class Builder implements BuilderContract
 
         return (new LazyCollection(function () {
             yield from $this->connection->cursor(
-                $this->toSql(), $this->getBindings(), ! $this->useWritePdo
+                $this->toSql(),
+                $this->getBindings(),
+                ! $this->useWritePdo
             );
         }))->map(function ($item) {
             return $this->applyAfterQueryCallbacks(new Collection([$item]))->first();
@@ -3375,7 +3477,8 @@ class Builder implements BuilderContract
             is_null($key) || $key === $column ? [$column] : [$column, $key],
             function () {
                 return $this->processor->processSelect(
-                    $this, $this->runSelect()
+                    $this,
+                    $this->runSelect()
                 );
             }
         );
@@ -3491,7 +3594,9 @@ class Builder implements BuilderContract
         $this->applyBeforeQueryCallbacks();
 
         $results = $this->connection->select(
-            $this->grammar->compileExists($this), $this->getBindings(), ! $this->useWritePdo
+            $this->grammar->compileExists($this),
+            $this->getBindings(),
+            ! $this->useWritePdo
         );
 
         // If the results have rows, we will get the row and see if the exists column is a
@@ -4039,7 +4144,8 @@ class Builder implements BuilderContract
         $this->applyBeforeQueryCallbacks();
 
         return $this->connection->delete(
-            $this->grammar->compileDelete($this), $this->cleanBindings(
+            $this->grammar->compileDelete($this),
+            $this->cleanBindings(
                 $this->grammar->prepareBindingsForDelete($this->bindings)
             )
         );
@@ -4332,9 +4438,9 @@ class Builder implements BuilderContract
     protected function isQueryable($value)
     {
         return $value instanceof self ||
-               $value instanceof EloquentBuilder ||
-               $value instanceof Relation ||
-               $value instanceof Closure;
+            $value instanceof EloquentBuilder ||
+            $value instanceof Relation ||
+            $value instanceof Closure;
     }
 
     /**
