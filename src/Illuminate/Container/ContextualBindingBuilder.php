@@ -4,6 +4,8 @@ namespace Illuminate\Container;
 
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Container\ContextualBindingBuilder as ContextualBindingBuilderContract;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 
 class ContextualBindingBuilder implements ContextualBindingBuilderContract
 {
@@ -91,5 +93,40 @@ class ContextualBindingBuilder implements ContextualBindingBuilderContract
     public function giveConfig($key, $default = null)
     {
         $this->give(fn ($container) => $container->get('config')->get($key, $default));
+    }
+
+    /**
+     * @param  string  $key
+     * @param  class-string|null  $default
+     * @return void
+     */
+    public function giveInstance($key, $default = null)
+    {
+        $this->give(function (Container $container) use ($key, $default) {
+            $class = $container->get('config')->get($key, $default);
+
+            return isset($class) ? $container->get($class) : null;
+        });
+    }
+
+    /**
+     * @param  string  $key
+     * @param  array  $default
+     * @return void
+     */
+    public function giveInstances($key, array $default = [])
+    {
+        $this->give(function (Container $container) use ($key, $default) {
+            $classes = Arr::mapWithKeys(
+                $container->get('config')->get($key, $default),
+                fn ($item, $key) => is_int($key) ? [$item => []] : [$key => $item]
+            );
+
+            return Arr::map($classes, function ($parameters, $class) use ($container) {
+                $parameters = Arr::mapWithKeys($parameters, fn ($value, $key) => [Str::camel($key) => $value]);
+
+                return $container->make($class, $parameters);
+            });
+        });
     }
 }
