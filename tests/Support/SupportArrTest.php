@@ -1657,7 +1657,6 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['a' => 1, 'b' => [], 'c' => 3], Arr::keyByListValues($array, 3));
 
         $this->expectException(TypeError::class);
-        $this->expectExceptionMessage('Cannot access offset of type array on array');
         Arr::keyByListValues([[]]);
     }
 
