@@ -160,9 +160,9 @@ class ScheduleListCommandTest extends TestCase
             ->everyMinute()
             ->onOneServer();
 
-         $this->artisan(ScheduleListCommand::class)
-             ->assertSuccessful()
-             ->expectsOutput('  * * * * *  php artisan foo:command [OneServer] . Next Due: 1 minute from now');
+        $this->artisan(ScheduleListCommand::class)
+            ->assertSuccessful()
+            ->expectsOutput('  * * * * *  php artisan foo:command [OneServer] . Next Due: 1 minute from now');
     }
 
     public function testDisplayScheduleWithMaintenanceModeModifier()
