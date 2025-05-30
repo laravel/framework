@@ -2,6 +2,8 @@
 
 namespace Illuminate\Cache;
 
+use function Illuminate\Support\enum_value;
+
 class ApcStore extends TaggableStore
 {
     use RetrievesMultipleKeys;
@@ -35,48 +37,56 @@ class ApcStore extends TaggableStore
     /**
      * Retrieve an item from the cache by key.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @return mixed
      */
     public function get($key)
     {
+        $key = enum_value($key);
+
         return $this->apc->get($this->prefix.$key);
     }
 
     /**
      * Store an item in the cache for a given number of seconds.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @param  mixed  $value
      * @param  int  $seconds
      * @return bool
      */
     public function put($key, $value, $seconds)
     {
+        $key = enum_value($key);
+
         return $this->apc->put($this->prefix.$key, $value, $seconds);
     }
 
     /**
      * Increment the value of an item in the cache.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @param  mixed  $value
      * @return int|bool
      */
     public function increment($key, $value = 1)
     {
+        $key = enum_value($key);
+
         return $this->apc->increment($this->prefix.$key, $value);
     }
 
     /**
      * Decrement the value of an item in the cache.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @param  mixed  $value
      * @return int|bool
      */
     public function decrement($key, $value = 1)
     {
+        $key = enum_value($key);
+
         return $this->apc->decrement($this->prefix.$key, $value);
     }
 
@@ -95,11 +105,13 @@ class ApcStore extends TaggableStore
     /**
      * Remove an item from the cache.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @return bool
      */
     public function forget($key)
     {
+        $key = enum_value($key);
+
         return $this->apc->delete($this->prefix.$key);
     }
 
