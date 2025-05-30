@@ -24,7 +24,7 @@
         "ext-session": "*",
         "ext-tokenizer": "*",
         "composer-runtime-api": "^2.2",
-        "brick/math": "^0.11|^0.12",
+        "brick/math": "^0.11|^0.12|^0.13",
         "doctrine/inflector": "^2.0.5",
         "dragonmantank/cron-expression": "^3.4",
         "egulias/email-validator": "^3.2.1|^4.0",
