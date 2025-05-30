@@ -8,10 +8,9 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Env;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Stringable;
+use RuntimeException;
 use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
 
 use function Illuminate\Support\php_binary;
@@ -35,13 +34,6 @@ class ServeCommand extends Command
      * @var string
      */
     protected $description = 'Serve the application on the PHP development server';
-
-    /**
-     * The number of PHP CLI server workers.
-     *
-     * @var int<2, max>|false
-     */
-    protected $phpServerWorkers = 1;
 
     /**
      * The current port offset.
@@ -85,27 +77,13 @@ class ServeCommand extends Command
         'IGNITION_LOCAL_SITES_PATH',
         'LARAVEL_SAIL',
         'PATH',
+        'PHP_CLI_SERVER_WORKERS',
         'PHP_IDE_CONFIG',
         'SYSTEMROOT',
         'XDEBUG_CONFIG',
         'XDEBUG_MODE',
         'XDEBUG_SESSION',
     ];
-
-    /** {@inheritdoc} */
-    #[\Override]
-    protected function initialize(InputInterface $input, OutputInterface $output)
-    {
-        $this->phpServerWorkers = transform((int) env('PHP_CLI_SERVER_WORKERS', 1), function (int $workers) {
-            if ($workers < 2) {
-                return false;
-            }
-
-            return $workers > 1 && ! $this->option('no-reload') ? false : $workers;
-        });
-
-        parent::initialize($input, $output);
-    }
 
     /**
      * Execute the console command.
@@ -133,7 +111,7 @@ class ServeCommand extends Command
                 clearstatcache(false, $environmentFile);
             }
 
-            if (! $this->option('no-reload') &&
+            if ($this->shouldAutoReload() &&
                 $hasEnvironment &&
                 filemtime($environmentFile) > $environmentLastModified) {
                 $environmentLastModified = filemtime($environmentFile);
@@ -145,6 +123,8 @@ class ServeCommand extends Command
                 $process->stop(5);
 
                 $this->serverRunningHasBeenDisplayed = false;
+
+                $this->waitUntilPortIsAvailableOrFail($this->host(), $this->port());
 
                 $process = $this->startProcess($hasEnvironment);
             }
@@ -172,12 +152,12 @@ class ServeCommand extends Command
     protected function startProcess($hasEnvironment)
     {
         $process = new Process($this->serverCommand(), public_path(), (new Collection($_ENV))->mapWithKeys(function ($value, $key) use ($hasEnvironment) {
-            if ($this->option('no-reload') || ! $hasEnvironment) {
+            if (! $this->shouldAutoReload() || ! $hasEnvironment) {
                 return [$key => $value];
             }
 
             return in_array($key, static::$passthroughVariables) ? [$key => $value] : [$key => false];
-        })->merge(['PHP_CLI_SERVER_WORKERS' => $this->phpServerWorkers])->all());
+        })->all());
 
         $this->trap(fn () => [SIGTERM, SIGINT, SIGHUP, SIGUSR1, SIGUSR2, SIGQUIT], function ($signal) use ($process) {
             if ($process->isRunning()) {
@@ -383,7 +363,7 @@ class ServeCommand extends Command
      */
     protected function getDateFromLine($line)
     {
-        $regex = ! windows_os() && is_int($this->phpServerWorkers)
+        $regex = ! windows_os() && env('PHP_CLI_SERVER_WORKERS', 1) > 1
             ? '/^\[\d+]\s\[([a-zA-Z0-9: ]+)\]/'
             : '/^\[([^\]]+)\]/';
 
@@ -424,5 +404,38 @@ class ServeCommand extends Command
             ['tries', null, InputOption::VALUE_OPTIONAL, 'The max number of ports to attempt to serve from', 10],
             ['no-reload', null, InputOption::VALUE_NONE, 'Do not reload the development server on .env file changes'],
         ];
+    }
+
+    /**
+     * Determines if the processes should autoreload.
+     */
+    protected function shouldAutoReload(): bool
+    {
+        return ! $this->option('no-reload');
+    }
+
+    /**
+     * Waits for the ports to become available and throws an exception if it never does.
+     */
+    protected function waitUntilPortIsAvailableOrFail(string $host, string $port): void
+    {
+        for ($i = 1; $i <= 3; $i++) {
+            // To check if the port is available, we'll attempt to open a socket connection to it.
+            // Note that the logic here is flipped: successfully opening the socket connection
+            // means something is using it. If it fails to open, that port is likely unused.
+
+            $socket = @fsockopen($host, $port, $errorCode, $errorMessage, timeout: 5);
+
+            if (! $socket) {
+                return;
+            }
+
+            fclose($socket);
+
+            // Gradually increase the waiting time between attempts...
+            usleep(1_000_000 * $i);
+        }
+
+        throw new RuntimeException("Port {$port} was not released.");
     }
 }
