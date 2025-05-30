@@ -59,13 +59,26 @@ class RouteCollection extends AbstractRouteCollection
     protected function addToCollections($route)
     {
         $methods = $route->methods();
-        $domainAndUri = $route->getDomain().$route->uri();
+        $domain = $route->getDomain();
+        $domainAndUri = $domain.$route->uri();
 
         foreach ($methods as $method) {
-            $this->routes[$method][$domainAndUri] = $route;
+            if ($route->getDomain()) {
+                $sameDomainRoutes = array_filter($this->routes[$method] ?? [], fn ($route) => $route->getDomain() === $domain);
+
+                $this->routes[$method] = $sameDomainRoutes + [$domainAndUri => $route] + ($this->routes[$method] ?? []);
+            } else {
+                $this->routes[$method][$domainAndUri] = $route;
+            }
         }
 
-        $this->allRoutes[implode('|', $methods).$domainAndUri] = $route;
+        if ($route->getDomain()) {
+            $sameDomainRoutes = array_filter($this->allRoutes, fn ($route) => $route->getDomain() === $domain);
+
+            $this->allRoutes = $sameDomainRoutes + [implode('|', $methods).$domainAndUri => $route] + $this->allRoutes;
+        } else {
+            $this->allRoutes[implode('|', $methods).$domainAndUri] = $route;
+        }
     }
 
     /**
