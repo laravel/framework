@@ -638,15 +638,15 @@ class Arr
      * @template TKey of array-key
      * @template TKeyableItem of array-key
      * @template TItem
-     * @template TDefaultValue
+     * @template TDefault
      *
      * @param  array<TKey, (TKey is int ? TKeyableItem : TItem)>  $array
-     * @param  TDefaultValue  $value
-     * @return array<(TKey is int ? TKeyableItem : TKey), (TKey is int ? TDefaultValue : TItem)>
+     * @param  TDefault  $default
+     * @return array<(TKey is int ? TKeyableItem : TKey), (TKey is int ? TDefault : TItem)>
      */
-    public static function keyByListValues($array, $value = null)
+    public static function keyByListValues($array, $default = null)
     {
-        return static::mapWithKeys($array, fn ($item, $key) => is_int($key) ? [$item => $value] : [$key => $item]);
+        return static::mapWithKeys($array, fn ($item, $key) => is_int($key) ? [$item => $default] : [$key => $item]);
     }
 
     /**
