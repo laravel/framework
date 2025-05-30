@@ -116,7 +116,10 @@ class ContextualBindingBuilder implements ContextualBindingBuilderContract
     public function giveInstances($key, array $default = [])
     {
         $this->give(function (Container $container) use ($key, $default) {
-            $classes = Arr::keyByListValues($container->get('config')->get($key, $default), []);
+            $classes = Arr::mapWithKeys(
+                $container->get('config')->get($key, $default),
+                fn ($item, $key) => is_int($key) ? [$item => []] : [$key => $item]
+            );
 
             return Arr::map($classes, fn ($parameters, $class) => $container->make($class, $parameters));
         });
