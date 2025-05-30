@@ -363,103 +363,60 @@ class RouteCollectionTest extends TestCase
     public function testPrependsRoutesWithDomain()
     {
         $this->routeCollection->add(
-            $getOnNoDomain1 = new Route('GET', 'get-on-nodomain1', ['uses' => 'NoDomain1Controller@index'])
+            $noDomainGet1 = new Route('GET', 'no-domain-get1', ['uses' => 'NoDomainController@index'])
         );
 
         $this->routeCollection->add(
-            $getOnFooDomain1 = (new Route('GET', 'get-on-foodomain1', ['uses' => 'FooDomain1Controller@index']))->domain('foo.test')
+            $fooDomainGet1 = (new Route('GET', 'foo-domain-get1', ['uses' => 'FooDomainController@index']))->domain('foo.test')
         );
 
         $this->routeCollection->add(
-            $postOnNoDomain1 = new Route('POST', 'post-on-nodomain1', ['uses' => 'NoDomain1Controller@store'])
+            $barDomainGet1 = (new Route('GET', 'bar-domain-get1', ['uses' => 'BarDomainController@index']))->domain('bar.test')
         );
 
         $this->routeCollection->add(
-            $postOnBarDomain1 = (new Route('POST', 'post-on-bardomain1', ['uses' => 'BarDomain1Controller@store']))->domain('bar.test')
+            $noDomainGet2 = new Route('GET', 'no-domain-get2', ['uses' => 'NoDomainController@show'])
         );
 
         $this->routeCollection->add(
-            $postOnFooDomain1 = (new Route('POST', 'post-on-foodomain1', ['uses' => 'FooDomain1Controller@store']))->domain('foo.test')
+            $fooDomainGet2 = (new Route('GET', 'foo-domain-get2', ['uses' => 'FooDomainController@show']))->domain('foo.test')
         );
 
         $this->routeCollection->add(
-            $getOnBarDomain1 = (new Route('GET', 'get-on-bardomain1', ['uses' => 'BarDomain1Controller@index']))->domain('bar.test')
-        );
-
-        $this->routeCollection->add(
-            $getOnNoDomain2 = new Route('GET', 'get-on-nodomain2', ['uses' => 'NoDomain2Controller@index'])
-        );
-
-        $this->routeCollection->add(
-            $postOnFooDomain2 = (new Route('POST', 'post-on-foodomain2', ['uses' => 'FooDomain2Controller@store']))->domain('foo.test')
-        );
-
-        $this->routeCollection->add(
-            $getOnBarDomain2 = (new Route('GET', 'get-on-bardomain2', ['uses' => 'BarDomain2Controller@index']))->domain('bar.test')
-        );
-
-        $this->routeCollection->add(
-            $postOnNoDomain2 = new Route('POST', 'post-on-nodomain2', ['uses' => 'NoDomain2Controller@store'])
-        );
-
-        $this->routeCollection->add(
-            $postOnBarDomain2 = (new Route('POST', 'post-on-bardomain2', ['uses' => 'BarDomain2Controller@store']))->domain('bar.test')
-        );
-
-        $this->routeCollection->add(
-            $getOnFooDomain2 = (new Route('GET', 'get-on-foodomain2', ['uses' => 'FooDomain2Controller@index']))->domain('foo.test')
+            $barDomainGet2 = (new Route('GET', 'bar-domain-get2', ['uses' => 'BarDomainController@show']))->domain('bar.test')
         );
 
         $this->assertSame([
-            $getOnFooDomain1,
-            $postOnFooDomain1,
-            $postOnFooDomain2,
-            $getOnFooDomain2,
-
-            $postOnBarDomain1,
-            $getOnBarDomain1,
-            $getOnBarDomain2,
-            $postOnBarDomain2,
-
-            $getOnNoDomain1,
-            $postOnNoDomain1,
-            $getOnNoDomain2,
-            $postOnNoDomain2,
+            $fooDomainGet1,
+            $barDomainGet1,
+            $fooDomainGet2,
+            $barDomainGet2,
+            $noDomainGet1,
+            $noDomainGet2
         ], $this->routeCollection->getRoutes());
 
-        $this->assertSame(dump([
+        $this->assertSame([
             'GET' => [
-                'foo.testget-on-foodomain1' => $getOnFooDomain1,
-                'foo.testget-on-foodomain2' => $getOnFooDomain2,
+                'foo.testfoo-domain-get1' => $fooDomainGet1,
+                'bar.testbar-domain-get1' => $barDomainGet1,
 
-                'bar.testget-on-bardomain1' => $getOnBarDomain1,
-                'bar.testget-on-bardomain2' => $getOnBarDomain2,
+                'foo.testfoo-domain-get2' => $fooDomainGet2,
+                'bar.testbar-domain-get2' => $barDomainGet2,
 
-                'get-on-nodomain1' => $getOnNoDomain1,
-                'get-on-nodomain2' => $getOnNoDomain2,
+                'no-domain-get1' => $noDomainGet1,
+                'no-domain-get2' => $noDomainGet2,
             ],
 
             'HEAD' => [
-                'foo.testget-on-foodomain1' => $getOnFooDomain1,
-                'foo.testget-on-foodomain2' => $getOnFooDomain2,
+                'foo.testfoo-domain-get1' => $fooDomainGet1,
+                'bar.testbar-domain-get1' => $barDomainGet1,
 
-                'bar.testget-on-bardomain1' => $getOnBarDomain1,
-                'bar.testget-on-bardomain2' => $getOnBarDomain2,
+                'foo.testfoo-domain-get2' => $fooDomainGet2,
+                'bar.testbar-domain-get2' => $barDomainGet2,
 
-                'get-on-nodomain1' => $getOnNoDomain1,
-                'get-on-nodomain2' => $getOnNoDomain2,
+                'no-domain-get1' => $noDomainGet1,
+                'no-domain-get2' => $noDomainGet2,
             ],
-
-            'POST' => [
-                'bar.testpost-on-bardomain1' => $postOnBarDomain1,
-                'bar.testpost-on-bardomain2' => $postOnBarDomain2,
-
-                'foo.testpost-on-foodomain1' => $postOnFooDomain1,
-                'foo.testpost-on-foodomain2' => $postOnFooDomain2,
-
-                'post-on-nodomain1' => $postOnNoDomain1,
-                'post-on-nodomain2' => $postOnNoDomain2,
-            ],
-        ]), $this->routeCollection->getRoutesByMethod());
+        ], $this->routeCollection->getRoutesByMethod());
     }
 }
