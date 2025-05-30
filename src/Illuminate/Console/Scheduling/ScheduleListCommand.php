@@ -145,18 +145,21 @@ class ScheduleListCommand extends Command
 
         $hasMutex = $event->mutex->exists($event) ? 'Has Mutex › ' : '';
 
+        $additionalModifiers = $this->compileModifiers($event);
+
         $dots = str_repeat('.', max(
-            $terminalWidth - mb_strlen($expression.$repeatExpression.$command.$nextDueDateLabel.$nextDueDate.$hasMutex) - 8, 0
+            $terminalWidth - mb_strlen($expression.$repeatExpression.$command.$additionalModifiers.$nextDueDateLabel.$nextDueDate.$hasMutex) - 8, 0
         ));
 
         // Highlight the parameters...
         $command = preg_replace("#(php artisan [\w\-:]+) (.+)#", '$1 <fg=yellow;options=bold>$2</>', $command);
 
         return [sprintf(
-            '  <fg=yellow>%s</> <fg=#6C7280>%s</> %s<fg=#6C7280>%s %s%s %s</>',
+            '  <fg=yellow>%s</> <fg=#6C7280>%s</> %s<fg=cyan>%s</><fg=#6C7280>%s</> <fg=#6C7280>%s</><fg=#6C7280>%s</> <fg=#6C7280>%s</>',
             $expression,
             $repeatExpression,
             $command,
+            $additionalModifiers,
             $dots,
             $hasMutex,
             $nextDueDateLabel,
@@ -300,5 +303,34 @@ class ScheduleListCommand extends Command
     public static function resolveTerminalWidthUsing($resolver)
     {
         static::$terminalWidthResolver = $resolver;
+    }
+
+    /**
+     * Compile the notable event modifiers into a display string.
+     *
+     * @param  \Illuminate\Console\Scheduling\Event  $event
+     * @return string
+     */
+    protected function compileModifiers(Event $event): string
+    {
+        $modifiers = [];
+
+        if ($event->onOneServer) {
+            $modifiers[] = 'OneServer';
+        }
+
+        if ($event->evenInMaintenanceMode) {
+            $modifiers[] = 'MaintMode';
+        }
+
+        if ($event->runInBackground) {
+            $modifiers[] = 'InBackground';
+        }
+
+        if (empty($modifiers)) {
+            return '';
+        }
+
+        return '['.implode(', ', $modifiers).'] ';
     }
 }

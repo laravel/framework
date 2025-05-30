@@ -154,6 +154,52 @@ class ScheduleListCommandTest extends TestCase
             ->expectsOutput('  * */3 * * * 1s   php artisan six ............... Next Due: 1 second from now');
     }
 
+    public function testDisplayScheduleWithOnOneServerModifier()
+    {
+        $this->schedule->command(FooCommand::class)
+            ->everyMinute()
+            ->onOneServer();
+
+         $this->artisan(ScheduleListCommand::class)
+             ->assertSuccessful()
+             ->expectsOutput('  * * * * *  php artisan foo:command [OneServer] . Next Due: 1 minute from now');
+    }
+
+    public function testDisplayScheduleWithMaintenanceModeModifier()
+    {
+        $this->schedule->command(FooCommand::class)
+            ->everyMinute()
+            ->evenInMaintenanceMode();
+
+        $this->artisan(ScheduleListCommand::class)
+            ->assertSuccessful()
+            ->expectsOutput('  * * * * *  php artisan foo:command [MaintMode] . Next Due: 1 minute from now');
+    }
+
+    public function testDisplayScheduleWithInBackgroundModifier()
+    {
+        $this->schedule->command(FooCommand::class)
+            ->everyMinute()
+            ->runInBackground();
+
+        $this->artisan(ScheduleListCommand::class)
+            ->assertSuccessful()
+            ->expectsOutput('  * * * * *  php artisan foo:command [InBackground]  Next Due: 1 minute from now'); // Placeholder dots & modifier
+    }
+
+    public function testDisplayScheduleWithMultipleModifiers()
+    {
+        $this->schedule->command(FooCommand::class)
+            ->everyMinute()
+            ->onOneServer()
+            ->runInBackground()
+            ->evenInMaintenanceMode();
+
+        $this->artisan(ScheduleListCommand::class)
+            ->assertSuccessful()
+            ->expectsOutput('  * * * * *  php artisan foo:command [OneServer, MaintMode, InBackground]  Next Due: 1 minute from now'); // Placeholder
+    }
+
     protected function tearDown(): void
     {
         putenv('SHELL_VERBOSITY');
