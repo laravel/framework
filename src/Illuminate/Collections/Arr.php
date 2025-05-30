@@ -633,6 +633,23 @@ class Arr
     }
 
     /**
+     * Key a non-associative/partially associative array by its items while replacing them with a specified default value.
+     *
+     * @template TKey of array-key
+     * @template TKeyableItem of array-key
+     * @template TItem
+     * @template TDefaultValue
+     *
+     * @param  array<TKey, (TKey is int ? TKeyableItem : TItem)>  $array
+     * @param  TDefaultValue  $value
+     * @return array<(TKey is int ? TKeyableItem : TKey), (TKey is int ? TDefaultValue : TItem)>
+     */
+    public static function keyByListValues($array, $value = null)
+    {
+        return static::mapWithKeys($array, fn ($item, $key) => is_int($key) ? [$item => $value] : [$key => $item]);
+    }
+
+    /**
      * Prepend the key names of an associative array.
      *
      * @param  array  $array

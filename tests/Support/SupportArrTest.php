@@ -11,6 +11,7 @@ use Illuminate\Support\MultipleItemsFoundException;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use stdClass;
+use TypeError;
 use WeakMap;
 
 include_once 'Common.php';
@@ -1648,6 +1649,16 @@ class SupportArrTest extends TestCase
             '345' => ['id' => '345', 'data' => 'def'],
             '498' => ['id' => '498', 'data' => 'hgi'],
         ], Arr::keyBy($array, 'id'));
+    }
+
+    public function testKeyByListValues()
+    {
+        $array = ['a' => 1, 'b' => [], 'c'];
+        $this->assertEquals(['a' => 1, 'b' => [], 'c' => 3], Arr::keyByListValues($array, 3));
+
+        $this->expectException(TypeError::class);
+        $this->expectExceptionMessage('Cannot access offset of type array on array');
+        Arr::keyByListValues([[]]);
     }
 
     public function testPrependKeysWith()
