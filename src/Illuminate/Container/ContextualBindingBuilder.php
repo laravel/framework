@@ -5,6 +5,7 @@ namespace Illuminate\Container;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Container\ContextualBindingBuilder as ContextualBindingBuilderContract;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 
 class ContextualBindingBuilder implements ContextualBindingBuilderContract
 {
@@ -121,7 +122,11 @@ class ContextualBindingBuilder implements ContextualBindingBuilderContract
                 fn ($item, $key) => is_int($key) ? [$item => []] : [$key => $item]
             );
 
-            return Arr::map($classes, fn ($parameters, $class) => $container->make($class, $parameters));
+            return Arr::map($classes, function ($parameters, $class) use ($container) {
+                $parameters = Arr::mapWithKeys($parameters, fn ($value, $key) => [Str::camel($key) => $value]);
+
+                return $container->make($class, $parameters);
+            });
         });
     }
 }
