@@ -224,7 +224,7 @@ class Dispatcher implements QueueingDispatcher
             return false;
         }
 
-        if (!$attributes) {
+        if (! $attributes) {
             return false;
         }
 

@@ -13,18 +13,18 @@ class BusHandlerResolutionTest extends TestCase
     {
         $resolution = (new Dispatcher(new Container()))
             ->getCommandHandler(new CommandForAttributeHandler());
-        
+
         $this->assertInstanceOf(AttributeHandler::class, $resolution);
     }
 
     public function test_command_handler_correctly_resolved_via_map()
     {
         $resolution = tap(
-            new Dispatcher(new Container()), 
-            function($dispatcher) {
+            new Dispatcher(new Container()),
+            function ($dispatcher) {
                 $dispatcher->map([CommandForMapHandler::class => MapHandler::class]);
-        })->getCommandHandler(new CommandForMapHandler());
-        
+            })->getCommandHandler(new CommandForMapHandler());
+
         $this->assertInstanceOf(MapHandler::class, $resolution);
     }
 
@@ -32,18 +32,18 @@ class BusHandlerResolutionTest extends TestCase
     {
         $resolution = (new Dispatcher(new Container()))
             ->getCommandHandler(new CommandForMapHandler());
-        
+
         $this->assertFalse($resolution);
     }
-    
+
     public function test_mapped_handler_takes_precedence_over_attribute_handler()
     {
         $resolution = tap(
-            new Dispatcher(new Container()), 
-            function($dispatcher) {
+            new Dispatcher(new Container()),
+            function ($dispatcher) {
                 $dispatcher->map([CommandForAttributeHandler::class => MapHandler::class]);
-        })->getCommandHandler(new CommandForAttributeHandler());
-                        
+            })->getCommandHandler(new CommandForAttributeHandler());
+
         $this->assertInstanceOf(MapHandler::class, $resolution);
         $this->assertNotInstanceOf(AttributeHandler::class, $resolution);
     }
@@ -52,22 +52,30 @@ class BusHandlerResolutionTest extends TestCase
     {
         $resolution = (new Dispatcher(new Container()))
             ->getCommandHandler(new \stdClass());
-    
+
         $this->assertFalse($resolution);
     }
 }
 
 #[HandledBy(AttributeHandler::class)]
-class CommandForAttributeHandler {}
+class CommandForAttributeHandler
+{
+}
 
-class CommandForMapHandler {}
+class CommandForMapHandler
+{
+}
 
 class AttributeHandler
 {
-    public function handle($command) {}
+    public function handle($command)
+    {
+    }
 }
 
 class MapHandler
 {
-    public function handle($command){}
+    public function handle($command)
+    {
+    }
 }
