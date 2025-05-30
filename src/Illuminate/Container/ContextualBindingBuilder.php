@@ -4,6 +4,7 @@ namespace Illuminate\Container;
 
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Container\ContextualBindingBuilder as ContextualBindingBuilderContract;
+use Illuminate\Support\Arr;
 
 class ContextualBindingBuilder implements ContextualBindingBuilderContract
 {
@@ -91,5 +92,33 @@ class ContextualBindingBuilder implements ContextualBindingBuilderContract
     public function giveConfig($key, $default = null)
     {
         $this->give(fn ($container) => $container->get('config')->get($key, $default));
+    }
+
+    /**
+     * @param  string  $key
+     * @param  class-string|null  $default
+     * @return void
+     */
+    public function giveInstance($key, $default = null)
+    {
+        $this->give(function (Container $container) use ($key, $default) {
+            $class = $container->get('config')->get($key, $default);
+
+            return isset($class) ? $container->get($class) : null;
+        });
+    }
+
+    /**
+     * @param  string  $key
+     * @param  array  $default
+     * @return void
+     */
+    public function giveInstances($key, array $default = [])
+    {
+        $this->give(function (Container $container) use ($key, $default) {
+            $classes = Arr::keyByListValues($container->get('config')->get($key, $default), []);
+
+            return Arr::map($classes, fn ($parameters, $class) => $container->make($class, $parameters));
+        });
     }
 }

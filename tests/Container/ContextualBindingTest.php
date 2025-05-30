@@ -493,6 +493,86 @@ class ContextualBindingTest extends TestCase
         $this->assertSame('lumen', $resolvedInstance->settings['alias']);
     }
 
+    public function testContextualBindingGivesInstancesFromConfig()
+    {
+        $container = new Container;
+
+        $container->singleton('config', function () {
+            return new Repository([
+                'test' => [
+                    'stub1' => ContainerContextNonContractStub::class,
+                    'stub2' => IContainerContextContractStub::class,
+                ],
+            ]);
+        });
+
+        $container->bind(IContainerContextContractStub::class, ContainerContextImplementationStub::class);
+
+        $container
+            ->when(ContainerTestContextInjectInstancesFromConfigIndividualValues::class)
+            ->needs('$stub1')
+            ->giveInstance('test.stub1');
+
+        $container
+            ->when(ContainerTestContextInjectInstancesFromConfigIndividualValues::class)
+            ->needs('$stub2')
+            ->giveInstance('test.stub2');
+
+        $container
+            ->when(ContainerTestContextInjectInstancesFromConfigIndividualValues::class)
+            ->needs('$stub3')
+            ->giveInstance('test.stub3', ContainerContextImplementationStubTwo::class);
+
+        $resolvedInstance = $container->make(ContainerTestContextInjectInstancesFromConfigIndividualValues::class);
+
+        $this->assertInstanceOf(ContainerContextNonContractStub::class, $resolvedInstance->stub1);
+        $this->assertInstanceOf(ContainerContextImplementationStub::class, $resolvedInstance->stub2);
+        $this->assertInstanceOf(ContainerContextImplementationStubTwo::class, $resolvedInstance->stub3);
+    }
+
+    public function testContextualBindingGivesInstancesFromConfigArray()
+    {
+        $container = new Container;
+
+        $container->singleton('config', function () {
+            return new Repository([
+                'stubs' => [
+                    ContainerContextNonContractStub::class,
+                    IContainerContextContractStub::class,
+                    ContainerTestContextInjectFromConfigIndividualValues::class => [
+                        'username' => 'laravel',
+                        'password' => 'hunter42',
+                    ],
+                ],
+            ]);
+        });
+
+        $container->bind(IContainerContextContractStub::class, ContainerContextImplementationStub::class);
+
+        $container
+            ->when(ContainerTestContextInjectInstancesFromConfigArray::class)
+            ->needs('$stubs')
+            ->giveInstances('stubs');
+
+        $resolvedInstance = $container->make(ContainerTestContextInjectInstancesFromConfigArray::class);
+
+        $this->assertSame([
+            ContainerContextNonContractStub::class,
+            IContainerContextContractStub::class,
+            ContainerTestContextInjectFromConfigIndividualValues::class,
+        ], array_keys($resolvedInstance->stubs));
+
+        $this->assertInstanceOf(ContainerContextNonContractStub::class, $resolvedInstance->stubs[ContainerContextNonContractStub::class]);
+        $this->assertInstanceOf(ContainerContextImplementationStub::class, $resolvedInstance->stubs[IContainerContextContractStub::class]);
+        $this->assertInstanceOf(
+            ContainerTestContextInjectFromConfigIndividualValues::class,
+            $resolvedDependency = $resolvedInstance->stubs[ContainerTestContextInjectFromConfigIndividualValues::class],
+        );
+
+        $this->assertSame('laravel', $resolvedDependency->username);
+        $this->assertSame('hunter42', $resolvedDependency->password);
+    }
+
     public function testContextualBindingWorksForMethodInvocation()
     {
         $container = new Container;
@@ -650,6 +730,16 @@ class ContainerTestContextInjectFromConfigArray
     {
         $this->settings = $settings;
     }
+}
+
+class ContainerTestContextInjectInstancesFromConfigIndividualValues
+{
+    public function __construct(public $stub1, public $stub2, public $stub3) {}
+}
+
+class ContainerTestContextInjectInstancesFromConfigArray
+{
+    public function __construct(public $stubs) {}
 }
 
 class ContainerTestContextInjectMethodArgument
