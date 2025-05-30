@@ -734,12 +734,16 @@ class ContainerTestContextInjectFromConfigArray
 
 class ContainerTestContextInjectInstancesFromConfigIndividualValues
 {
-    public function __construct(public $stub1, public $stub2, public $stub3) {}
+    public function __construct(public $stub1, public $stub2, public $stub3)
+    {
+    }
 }
 
 class ContainerTestContextInjectInstancesFromConfigArray
 {
-    public function __construct(public $stubs) {}
+    public function __construct(public $stubs)
+    {
+    }
 }
 
 class ContainerTestContextInjectMethodArgument
