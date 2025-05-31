@@ -1274,16 +1274,16 @@ class Blueprint
     }
 
     /**
-     * Add creation and update datetime columns to the table.
+     * Add creation and update dateTime columns to the table.
      *
      * @param  int|null  $precision
      * @return void
      */
-    public function datetimes($precision = 0)
+    public function dateTimes($precision = 0)
     {
-        $this->datetime('created_at', $precision)->nullable();
+        $this->dateTime('created_at', $precision)->nullable();
 
-        $this->datetime('updated_at', $precision)->nullable();
+        $this->dateTime('updated_at', $precision)->nullable();
     }
 
     /**
@@ -1319,7 +1319,7 @@ class Blueprint
      */
     public function softDeletesDatetime($column = 'deleted_at', $precision = 0)
     {
-        return $this->datetime($column, $precision)->nullable();
+        return $this->dateTime($column, $precision)->nullable();
     }
 
     /**
