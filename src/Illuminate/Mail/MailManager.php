@@ -113,7 +113,7 @@ class MailManager implements FactoryContract
         $config = $this->getConfig($name);
 
         if (is_null($config)) {
-            throw new InvalidArgumentException("Mailer [{$name}] is not defined.");
+            throw new InvalidArgumentException("Mailer [$name] is not defined.");
         }
 
         // Once we have created the mailer instance we will set a container instance
@@ -174,7 +174,7 @@ class MailManager implements FactoryContract
 
         if (trim($transport ?? '') === '' ||
             ! method_exists($this, $method = 'create'.ucfirst(Str::camel($transport)).'Transport')) {
-            throw new InvalidArgumentException("Unsupported mail transport [{$transport}].");
+            throw new InvalidArgumentException("Unsupported mail transport [$transport].");
         }
 
         return $this->{$method}($config);
