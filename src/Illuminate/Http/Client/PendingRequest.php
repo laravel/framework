@@ -910,12 +910,7 @@ class PendingRequest
         try {
             if ($this->truncateAt !== null) {
                 $originalTruncateAt = LaravelRequestException::$truncateAt;
-                if ($this->truncateAt === false) {
-                    LaravelRequestException::dontTruncate();
-                }
-                else {
-                    LaravelRequestException::truncateAt($this->truncateAt);
-                }
+                $this->truncateAt === false ? LaravelRequestException::dontTruncate() : LaravelRequestException::truncateAt($this->truncateAt);
             }
             return retry($this->tries ?? 1, function ($attempt) use ($method, $url, $options, &$shouldRetry) {
                 try {
