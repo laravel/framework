@@ -219,7 +219,7 @@ class LogManager implements LoggerInterface
         $config ??= $this->configurationFor($name);
 
         if (is_null($config)) {
-            throw new InvalidArgumentException("Log [{$name}] is not defined.");
+            throw new InvalidArgumentException("Log [$name] is not defined.");
         }
 
         if (isset($this->customCreators[$config['driver']])) {
@@ -558,7 +558,7 @@ class LogManager implements LoggerInterface
      */
     protected function configurationFor($name)
     {
-        return $this->app['config']["logging.channels.{$name}"];
+        return $this->app['config']["logging.channels.$name"];
     }
 
     /**
