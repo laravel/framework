@@ -27,6 +27,7 @@ use OutOfBoundsException;
 use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\RequestInterface;
 use Symfony\Component\VarDumper\VarDumper;
+use Illuminate\Http\Client\RequestException as LaravelRequestException;
 
 class PendingRequest
 {
@@ -213,6 +214,11 @@ class PendingRequest
         'multipart',
         'query',
     ];
+
+    /**
+     * @var int<1, max>|false|null
+     */
+    protected $truncateAt = null;
 
     /**
      * Create a new HTTP Client instance.
@@ -899,59 +905,79 @@ class PendingRequest
         }
 
         $shouldRetry = null;
+        $originalTruncateAt = null;
 
-        return retry($this->tries ?? 1, function ($attempt) use ($method, $url, $options, &$shouldRetry) {
-            try {
-                return tap($this->newResponse($this->sendRequest($method, $url, $options)), function ($response) use ($attempt, &$shouldRetry) {
-                    $this->populateResponse($response);
-
-                    $this->dispatchResponseReceivedEvent($response);
-
-                    if (! $response->successful()) {
-                        try {
-                            $shouldRetry = $this->retryWhenCallback ? call_user_func($this->retryWhenCallback, $response->toException(), $this, $this->request->toPsrRequest()->getMethod()) : true;
-                        } catch (Exception $exception) {
-                            $shouldRetry = false;
-
-                            throw $exception;
-                        }
-
-                        if ($this->throwCallback &&
-                            ($this->throwIfCallback === null ||
-                             call_user_func($this->throwIfCallback, $response))) {
-                            $response->throw($this->throwCallback);
-                        }
-
-                        $potentialTries = is_array($this->tries)
-                            ? count($this->tries) + 1
-                            : $this->tries;
-
-                        if ($attempt < $potentialTries && $shouldRetry) {
-                            $response->throw();
-                        }
-
-                        if ($potentialTries > 1 && $this->retryThrow) {
-                            $response->throw();
-                        }
-                    }
-                });
-            } catch (ConnectException $e) {
-                $exception = new ConnectionException($e->getMessage(), 0, $e);
-                $request = new Request($e->getRequest());
-
-                $this->factory?->recordRequestResponsePair($request, null);
-
-                $this->dispatchConnectionFailedEvent($request, $exception);
-
-                throw $exception;
+        try {
+            if ($this->truncateAt !== null) {
+                $originalTruncateAt = LaravelRequestException::$truncateAt;
+                if ($this->truncateAt === false) {
+                    LaravelRequestException::dontTruncate();
+                }
+                else {
+                    LaravelRequestException::truncateAt($this->truncateAt);
+                }
             }
-        }, $this->retryDelay ?? 100, function ($exception) use (&$shouldRetry) {
-            $result = $shouldRetry ?? ($this->retryWhenCallback ? call_user_func($this->retryWhenCallback, $exception, $this, $this->request?->toPsrRequest()->getMethod()) : true);
+            return retry($this->tries ?? 1, function ($attempt) use ($method, $url, $options, &$shouldRetry) {
+                try {
+                    return tap($this->newResponse($this->sendRequest($method, $url, $options)),
+                        function ($response) use ($attempt, &$shouldRetry) {
+                            $this->populateResponse($response);
 
-            $shouldRetry = null;
+                            $this->dispatchResponseReceivedEvent($response);
 
-            return $result;
-        });
+                            if (!$response->successful()) {
+                                try {
+                                    $shouldRetry = $this->retryWhenCallback ? call_user_func($this->retryWhenCallback,
+                                        $response->toException(), $this,
+                                        $this->request->toPsrRequest()->getMethod()) : true;
+                                } catch (Exception $exception) {
+                                    $shouldRetry = false;
+
+                                    throw $exception;
+                                }
+
+                                if ($this->throwCallback &&
+                                    ($this->throwIfCallback === null ||
+                                        call_user_func($this->throwIfCallback, $response))) {
+                                    $response->throw($this->throwCallback);
+                                }
+
+                                $potentialTries = is_array($this->tries)
+                                    ? count($this->tries) + 1
+                                    : $this->tries;
+
+                                if ($attempt < $potentialTries && $shouldRetry) {
+                                    $response->throw();
+                                }
+
+                                if ($potentialTries > 1 && $this->retryThrow) {
+                                    $response->throw();
+                                }
+                            }
+                        });
+                } catch (ConnectException $e) {
+                    $exception = new ConnectionException($e->getMessage(), 0, $e);
+                    $request = new Request($e->getRequest());
+
+                    $this->factory?->recordRequestResponsePair($request, null);
+
+                    $this->dispatchConnectionFailedEvent($request, $exception);
+
+                    throw $exception;
+                }
+            }, $this->retryDelay ?? 100, function ($exception) use (&$shouldRetry) {
+                $result = $shouldRetry ?? ($this->retryWhenCallback ? call_user_func($this->retryWhenCallback,
+                    $exception, $this, $this->request?->toPsrRequest()->getMethod()) : true);
+
+                $shouldRetry = null;
+
+                return $result;
+            });
+        } finally {
+            if ($originalTruncateAt !== null) {
+                $originalTruncateAt === false ? LaravelRequestException::dontTruncate() : LaravelRequestException::truncateAt($originalTruncateAt);
+            }
+        }
     }
 
     /**
@@ -1551,5 +1577,30 @@ class PendingRequest
     public function getOptions()
     {
         return $this->options;
+    }
+
+    /**
+     * When a RequestException is thrown, truncate to this length.
+     *
+     * @param  int<1, max>  $length
+     * @return $this
+     */
+    public function truncateAt(int $length)
+    {
+        $this->truncateAt = $length;
+
+        return $this;
+    }
+
+    /**
+     * Do not truncate a RequestException.
+     *
+     * @return $this
+     */
+    public function dontTruncate()
+    {
+        $this->truncateAt = false;
+
+        return $this;
     }
 }
