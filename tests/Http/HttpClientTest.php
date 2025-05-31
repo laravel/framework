@@ -1304,6 +1304,66 @@ class HttpClientTest extends TestCase
         throw new RequestException(new Response($response));
     }
 
+    public function testRequestLevelTruncationLevelOnRequestException()
+    {
+        RequestException::truncateAt(60);
+
+        $this->factory->fake([
+            '*' => $this->factory->response(['error'], 403),
+        ]);
+
+        $exception = null;
+        try {
+            $this->factory->throw()->truncateAt(3)->get('http://foo.com/json');
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertEquals("HTTP request returned status code 403:\n[\"e (truncated...)\n", $exception->getMessage());
+
+        $this->assertEquals(60, RequestException::$truncateAt);
+    }
+
+    public function testNoTruncationOnRequestLevel()
+    {
+        RequestException::truncateAt(60);
+
+        $this->factory->fake([
+            '*' => $this->factory->response(['error'], 403),
+        ]);
+
+        $exception = null;
+        try {
+            $this->factory->throw()->dontTruncate()->get('http://foo.com/json');
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertEquals("HTTP request returned status code 403:\nHTTP/1.1 403 Forbidden\r\nContent-Type: application/json\r\n\r\n[\"error\"]\n", $exception->getMessage());
+
+        $this->assertEquals(60, RequestException::$truncateAt);
+    }
+
+    public function testRequestExceptionDoesNotTruncateButRequestDoes()
+    {
+        RequestException::dontTruncate();
+
+        $this->factory->fake([
+            '*' => $this->factory->response(['error'], 403),
+        ]);
+
+        $exception = null;
+        try {
+            $this->factory->throw()->truncateAt(3)->get('http://foo.com/json');
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertEquals("HTTP request returned status code 403:\n[\"e (truncated...)\n", $exception->getMessage());
+
+        $this->assertFalse(RequestException::$truncateAt);
+    }
+
     public function testRequestExceptionEmptyBody()
     {
         $this->expectException(RequestException::class);
