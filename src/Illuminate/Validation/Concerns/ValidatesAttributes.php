@@ -1818,6 +1818,83 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate nested JSON data using a schema.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|string>  $parameters
+     * @return bool
+     */
+    public function validateNested($attribute, $value, $parameters)
+    {
+        $schema = $parameters[0] ?? null;
+        $conditions = [];
+
+        if (! $schema) {
+            return false;
+        }
+
+        // Parse conditions from remaining parameters
+        for ($i = 1; $i < count($parameters); $i += 3) {
+            if (isset($parameters[$i], $parameters[$i + 1], $parameters[$i + 2])) {
+                $conditions[] = [
+                    'field' => $parameters[$i],
+                    'operator' => $parameters[$i + 1],
+                    'value' => $parameters[$i + 2],
+                ];
+            }
+        }
+
+        if (is_null($value)) {
+            return true;
+        }
+
+        // Load schema if it's a file path
+        if (is_string($schema) && ! str_contains($schema, ':')) {
+            try {
+                $schema = $this->loadSchema($schema);
+            } catch (\InvalidArgumentException $e) {
+                return false;
+            }
+        }
+
+        // If schema is still a string, treat it as inline rules
+        if (is_string($schema)) {
+            $schema = ['*' => $schema];
+        }
+
+        // Ensure we have an array to work with
+        if (! is_array($value)) {
+            return false;
+        }
+
+        // Apply conditional validation if specified
+        if (! empty($conditions)) {
+            foreach ($conditions as $condition) {
+                if (! $this->evaluateCondition($condition, $value, $attribute)) {
+                    return true; // Skip validation if condition not met
+                }
+            }
+        }
+
+        // Create a sub-validator for the nested data
+        $nestedValidator = $this->createNestedValidator($value, $schema, $attribute);
+
+        if ($nestedValidator->fails()) {
+            // Transfer error messages with proper nesting
+            foreach ($nestedValidator->errors()->messages() as $nestedAttribute => $messages) {
+                $fullAttribute = $attribute . '.' . $nestedAttribute;
+                foreach ($messages as $message) {
+                    $this->messages->add($fullAttribute, $message);
+                }
+            }
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * Validate an attribute is not contained within a list of values.
      *
      * @param  string  $attribute

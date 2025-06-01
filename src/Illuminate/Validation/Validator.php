@@ -1680,5 +1680,680 @@ class Validator implements ValidatorContract
         throw new BadMethodCallException(sprintf(
             'Method %s::%s does not exist.', static::class, $method
         ));
+    }    /**
+     * Validate nested data using the provided schema.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array  $parameters
+     * @return bool
+     */    public function validateNested($attribute, $value, $parameters)
+    {
+        if (empty($parameters)) {
+            return false;
+        }
+
+        // The first parameter should be the JSON-encoded schema
+        $schemaJson = $parameters[0];
+
+        try {
+            // Check if it's Base64 encoded (if it doesn't look like JSON, try to decode it)
+            if (!str_starts_with($schemaJson, '{') && !str_starts_with($schemaJson, '[')) {
+                $decodedSchema = base64_decode($schemaJson);
+                if ($decodedSchema !== false) {
+                    $schemaJson = $decodedSchema;
+                }
+            }
+
+            $schema = json_decode($schemaJson, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                return false;
+            }
+        } catch (\Exception $e) {
+            return false;
+        }
+
+        // Check if value is null, which is valid if the field is not required
+        if (is_null($value)) {
+            return true;
+        }
+
+        // For the rule-based validation, we don't want to throw exceptions
+        try {
+            // Initialize message bag if needed
+            if (! $this->messages) {
+                $this->messages = new MessageBag;
+            }
+
+            // Create a new validator for the nested structure
+            $nestedValidator = $this->createNestedValidator($value, $schema, $attribute);
+
+            // Check if the nested validation passes
+            if ($nestedValidator->passes()) {
+                return true;
+            } else {
+
+                // Transfer error messages with proper nesting
+                foreach ($nestedValidator->errors()->messages() as $nestedAttribute => $messages) {
+                    $fullAttribute = $attribute . '.' . $nestedAttribute;
+                    foreach ($messages as $message) {
+                        // Format the message to use the full attribute path
+                        $formattedMessage = str_replace(
+                            'The ' . $nestedAttribute . ' field',
+                            'The ' . $fullAttribute . ' field',
+                            $message
+                        );
+
+                        // Copy the failed rules
+                        if (isset($nestedValidator->failedRules[$nestedAttribute])) {
+                            $this->failedRules[$fullAttribute] = $nestedValidator->failedRules[$nestedAttribute];
+                        }
+
+                        // Add the error to the main validator's message bag
+                        $this->messages->add($fullAttribute, $formattedMessage);
+                    }
+                }
+                return false;
+            }
+        } catch (\Exception $e) {
+            // Add generic error message
+            $this->messages->add($attribute, 'The ' . $attribute . ' field contains invalid nested data.');
+            return false;
+        }
+    }
+
+    /**
+     * Validate nested JSON data using a schema.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  string|array  $schema
+     * @param  array  $conditions
+     * @return bool
+     */
+    public function validateNestedStructure($attribute, $value, $schema, array $conditions = [])
+    {
+        $result = $this->validateNestedStructureInternal($attribute, $value, $schema, $conditions);
+
+        if (!$result) {
+            throw new ValidationException($this);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Internal method for nested validation without throwing exceptions.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  string|array  $schema
+     * @param  array  $conditions
+     * @return bool
+     */
+    protected function validateNestedStructureInternal($attribute, $value, $schema, array $conditions = [])
+    {
+        if (is_null($value)) {
+            return true;
+        }
+
+        // Load schema if it's a file path
+        if (is_string($schema) && ! str_contains($schema, ':')) {
+            $schema = $this->loadSchema($schema);
+        }
+
+        // If schema is still a string, treat it as inline rules
+        if (is_string($schema)) {
+            $schema = ['*' => $schema];
+        }
+
+        // Detect and convert flat Laravel validation rules format
+        if (is_array($schema) && $this->isFlatLaravelRulesFormat($schema)) {
+            $schema = $this->convertFlatRulesToNestedSchema($schema);
+        }        // Ensure we have an array or object to work with
+        if (! is_array($value) && ! is_object($value)) {
+            return false;
+        }
+
+        // Convert objects to arrays for consistent handling
+        if (is_object($value)) {
+            $value = (array) $value;
+        }
+
+        // Handle JSON Schema array-type validation
+        if (isset($schema['type']) && $schema['type'] === 'array' && isset($schema['items'])) {
+            // When array schema is used, value should be an array
+            if (!is_array($value)) {
+                if (!$this->messages) {
+                    $this->messages = new MessageBag;
+                }
+                $this->messages->add($attribute, "The {$attribute} field must be an array.");
+                return false;
+            }
+
+            $itemSchema = $schema['items'];
+            $newSchema = [];
+
+            // Create a schema entry for each array item
+            foreach ($value as $index => $item) {
+                $newSchema[$index] = $itemSchema;
+            }
+
+            $schema = $newSchema;
+        }
+
+        // Apply conditional validation if specified
+        if (! empty($conditions)) {
+            // If conditions is a multi-dimensional array without 'when' key directly
+            if (isset($conditions[0]) && is_array($conditions[0])) {
+                foreach ($conditions as $condition) {
+                    $this->applyConditionToSchema($condition, $value, $schema);
+                }
+            } else {
+                // Single condition
+                $this->applyConditionToSchema($conditions, $value, $schema);
+            }
+        }
+
+        // Create a sub-validator for the nested data
+        $nestedValidator = $this->createNestedValidator($value, $schema, $attribute);
+
+        if ($nestedValidator->fails()) {
+            // Ensure messages bag is initialized
+            if (! $this->messages) {
+                $this->messages = new MessageBag;
+            }
+
+            // Transfer error messages with proper nesting
+            foreach ($nestedValidator->errors()->messages() as $nestedAttribute => $messages) {
+                $fullAttribute = $attribute . '.' . $nestedAttribute;
+                foreach ($messages as $message) {
+                    // Get the validation rule that failed
+                    $failedRule = isset($nestedValidator->failedRules[$nestedAttribute]) ? key($nestedValidator->failedRules[$nestedAttribute]) : null;
+
+                    // If message is a translation key (starts with validation.), translate it
+                    if (str_starts_with($message, 'validation.')) {
+                        $rule = str_replace('validation.', '', $message);
+                        $params = [];
+
+                        if (isset($nestedValidator->failedRules[$nestedAttribute][$rule])) {
+                            $params = $nestedValidator->failedRules[$nestedAttribute][$rule];
+                        }
+
+                        // Format message with full attribute path
+                        $translatedMessage = $this->translator->get('validation.' . $rule);
+
+                        $formattedMessage = $this->makeReplacements(
+                            $translatedMessage,
+                            $fullAttribute,
+                            $rule,
+                            $params
+                        );
+                    }
+                    // Handle already translated messages
+                    else {
+                        // Create a properly formatted error message with full path
+                        if (str_contains($message, 'The ' . $nestedAttribute . ' field')) {
+                            $formattedMessage = str_replace(
+                                'The ' . $nestedAttribute . ' field',
+                                'The ' . $fullAttribute . ' field',
+                                $message
+                            );
+                        } else {
+                            // Use regex for more complex replacements
+                            $patterns = [
+                                '/The ' . preg_quote($nestedAttribute, '/') . ' field/',
+                                '/The ' . preg_quote($nestedAttribute, '/') . ' must/',
+                                '/The ' . preg_quote($nestedAttribute, '/') . ' may not/',
+                                '/The ' . preg_quote($nestedAttribute, '/') . ' is/',
+                                '/:attribute/',
+                            ];
+
+                            $replacements = [
+                                'The ' . $fullAttribute . ' field',
+                                'The ' . $fullAttribute . ' must',
+                                'The ' . $fullAttribute . ' may not',
+                                'The ' . $fullAttribute . ' is',
+                                $fullAttribute,
+                            ];
+
+                            $formattedMessage = preg_replace($patterns, $replacements, $message);
+                        }
+                    }
+
+                    // Copy the failed rules
+                    if (isset($nestedValidator->failedRules[$nestedAttribute])) {
+                        $this->failedRules[$fullAttribute] = $nestedValidator->failedRules[$nestedAttribute];
+                    }
+
+                    // Add the error to the main validator's message bag
+                    $this->messages->add($fullAttribute, $formattedMessage);
+                }
+            }
+
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Load a validation schema from a file.
+     *
+     * @param  string  $schemaPath
+     * @return array
+     * @throws \InvalidArgumentException
+     */
+    protected function loadSchema($schemaPath)
+    {
+        // Support both absolute and relative paths
+        if (! str_starts_with($schemaPath, '/')) {
+            // Try to get base path from app, fallback to current directory for tests
+            try {
+                $basePath = function_exists('app') && app()->bound('path.base')
+                    ? app('path.base') . '/resources/schemas'
+                    : getcwd() . '/resources/schemas';
+            } catch (\Exception $e) {
+                $basePath = getcwd() . '/resources/schemas';
+            }
+            $schemaPath = $basePath . '/' . $schemaPath;
+
+            // Add .json extension if not present
+            if (! str_ends_with($schemaPath, '.json')) {
+                $schemaPath .= '.json';
+            }
+        }
+
+        if (! file_exists($schemaPath)) {
+            throw new InvalidArgumentException("Schema file not found: {$schemaPath}");
+        }
+
+        $schema = json_decode(file_get_contents($schemaPath), true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new InvalidArgumentException("Invalid JSON in schema file: {$schemaPath}");
+        }
+
+        // Detect and convert flat Laravel validation rules format from file
+        if (is_array($schema) && $this->isFlatLaravelRulesFormat($schema)) {
+            $schema = $this->convertFlatRulesToNestedSchema($schema);
+        }
+
+        return $schema;
+    }
+
+    /**
+     * Create a validator for nested data.
+     *
+     * @param  array  $data
+     * @param  array  $rules
+     * @param  string  $parentAttribute
+     * @return \Illuminate\Validation\Validator
+     */
+    protected function createNestedValidator(array $data, array $rules, $parentAttribute)
+    {
+        // Flatten the rules for proper nested validation
+        $flattenedRules = $this->flattenNestedRules($rules, $data);
+
+        // Create new validator with the same configuration
+        $validator = new static(
+            $this->translator,
+            $data,
+            $flattenedRules,
+            $this->customMessages,
+            $this->customAttributes
+        );
+
+        // Set container if available
+        if ($this->container) {
+            $validator->setContainer($this->container);
+        }
+
+        // Copy validation extensions
+        $validator->extensions = $this->extensions;
+        $validator->replacers = $this->replacers;
+
+        return $validator;
+    }
+
+    /**
+     * Flatten nested rules for validation.
+     *
+     * @param
+     * @param  array  $data
+     * @return array
+     */
+    protected function flattenNestedRules(array $rules, array $data)
+    {
+        $flattened = [];
+
+        // Handle JSON Schema format with type and properties
+        if (isset($rules['type']) && isset($rules['properties'])) {
+            $rules = $rules['properties'];
+        }
+
+        foreach ($rules as $key => $rule) {
+            if ($key === '*') {
+                // Apply rule to all array elements
+                foreach ($data as $index => $item) {
+                    if (is_array($rule)) {
+                        if (isset($rule['rules'])) {
+                            // Handle rule with explicit 'rules' key
+                            $flattened[$index] = $rule['rules'];
+                        } elseif (isset($rule['properties'])) {
+                            // Handle nested object with properties
+                            foreach ($rule['properties'] as $subKey => $subRule) {
+                                if (isset($subRule['rules'])) {
+                                    $flattened[$index . '.' . $subKey] = $subRule['rules'];
+                                } else {
+                                    $flattened[$index . '.' . $subKey] = $subRule;
+                                }
+                            }
+                        } else {
+                            foreach ($rule as $subKey => $subRule) {
+                                if (isset($subRule['rules'])) {
+                                    $flattened[$index . '.' . $subKey] = $subRule['rules'];
+                                } else {
+                                    $flattened[$index . '.' . $subKey] = $subRule;
+                                }
+                            }
+                        }
+                    } else {
+                        $flattened[$index] = $rule;
+                    }
+                }
+            } elseif (str_contains($key, '*')) {
+                // Handle wildcard patterns
+                $pattern = str_replace('*', '([^\.]+)', preg_quote($key, '/'));
+                $this->expandWildcardRule($pattern, $key, $rule, $data, '', $flattened);
+            } else {
+                if (is_array($rule)) {
+                    if (isset($rule['rules'])) {
+                        // Handle rule with explicit 'rules' key
+                        $flattened[$key] = $rule['rules'];
+                    } elseif (isset($rule['properties'])) {
+                        // Handle nested object with properties
+                        foreach ($rule['properties'] as $subKey => $subRule) {
+                            if (isset($subRule['rules'])) {
+                                $flattened[$key . '.' . $subKey] = $subRule['rules'];
+                            } else {
+                                $flattened[$key . '.' . $subKey] = $subRule;
+                            }
+                        }
+                    } else {
+                        $flattened[$key] = $rule;
+                    }
+                } else {
+                    $flattened[$key] = $rule;
+                }
+            }
+        }
+
+        return $flattened;
+    }
+
+    /**
+     * Expand wildcard rules recursively.
+     *
+     * @param  string  $pattern
+     * @param  string  $originalKey
+     * @param  mixed  $rule
+     * @param  array  $data
+     * @param  string  $currentPath
+     * @param  array  &$flattened
+     * @return void
+     */
+    protected function expandWildcardRule($pattern, $originalKey, $rule, $data, $currentPath, &$flattened)
+    {
+        foreach ($data as $key => $value) {
+            $fullPath = $currentPath ? $currentPath . '.' . $key : $key;
+
+            if (preg_match('/^' . str_replace('([^\.]+)', $key, $pattern) . '$/', $fullPath)) {
+                if (is_array($rule)) {
+                    if (isset($rule['rules'])) {
+                        // Handle rule with explicit 'rules' key
+                        $flattened[$fullPath] = $rule['rules'];
+                    } elseif (isset($rule['properties'])) {
+                        // Handle nested object with properties
+                        foreach ($rule['properties'] as $subKey => $subRule) {
+                            if (isset($subRule['rules'])) {
+                                $flattened[$fullPath . '.' . $subKey] = $subRule['rules'];
+                            } else {
+                                $flattened[$fullPath . '.' . $subKey] = $subRule;
+                            }
+                        }
+                    } else {
+                        foreach ($rule as $subKey => $subRule) {
+                            if (isset($subRule['rules'])) {
+                                $flattened[$fullPath . '.' . $subKey] = $subRule['rules'];
+                            } else {
+                                $flattened[$fullPath . '.' . $subKey] = $subRule;
+                            }
+                        }
+                    }
+                } else {
+                    $flattened[$fullPath] = $rule;
+                }
+            }
+
+            if (is_array($value)) {
+                $this->expandWildcardRule($pattern, $originalKey, $rule, $value, $fullPath, $flattened);
+            }
+        }
+    }
+
+    /**
+     * Evaluate a conditional validation rule.
+     *
+     * @param  array  $condition
+     * @param  array  $data
+     * @param  string  $attribute
+     * @return bool
+     */
+    protected function evaluateCondition(array $condition, array $data, $attribute)
+    {
+        $field = $condition['field'] ?? null;
+        $operator = $condition['operator'] ?? '=';
+        $value = $condition['value'] ?? null;
+
+        if (! $field) {
+            return true;
+        }
+
+        $fieldValue = Arr::get($data, $field);
+
+        switch ($operator) {
+            case '=':
+            case '==':
+                return $fieldValue == $value;
+            case '!=':
+            case '<>':
+                return $fieldValue != $value;
+            case '>':
+                return $fieldValue > $value;
+            case '>=':
+                return $fieldValue >= $value;
+            case '<':
+                return $fieldValue < $value;
+            case '<=':
+                return $fieldValue <= $value;
+            case 'in':
+                return in_array($fieldValue, (array) $value);
+            case 'not_in':
+                return ! in_array($fieldValue, (array) $value);
+            case 'exists':
+                return Arr::has($data, $field);
+            case 'missing':
+                return ! Arr::has($data, $field);
+            default:
+                return true;
+        }
+    }
+
+    /**
+     * Validate that the provided value is an object.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function validateObject($attribute, $value)
+    {
+        return is_array($value) || is_object($value);
+    }
+
+    /**
+     * Apply conditional rules to the schema.
+     *
+     * @param  array  $condition
+     * @param  array  $data
+     * @param  array  &$schema
+     * @return void
+     */
+    protected function applyConditionToSchema(array $condition, array $data, array &$schema)
+    {
+        if (!isset($condition['when']) || !isset($condition['then'])) {
+            return;
+        }
+
+        $when = $condition['when'];
+        $then = $condition['then'];
+        $otherwise = $condition['otherwise'] ?? [];
+
+        // Check if the condition is met
+        if ($this->evaluateCondition($when, $data, '')) {
+            // Apply 'then' rules to schema
+            foreach ($then as $field => $rules) {
+                // Handle nested properties if schema uses JSON Schema format
+                if (isset($schema['type']) && isset($schema['properties'])) {
+                    $this->applyRulesToNestedSchema($field, $rules, $schema);
+                } else {
+                    $schema[$field] = $rules;
+                }
+            }
+        } elseif (!empty($otherwise)) {
+            // Apply 'otherwise' rules if condition not met
+            foreach ($otherwise as $field => $rules) {
+                // Handle nested properties if schema uses JSON Schema format
+                if (isset($schema['type']) && isset($schema['properties'])) {
+                    $this->applyRulesToNestedSchema($field, $rules, $schema);
+                } else {
+                    $schema[$field] = $rules;
+                }
+            }
+        }
+    }
+
+    /**
+     * Apply rules to a nested JSON schema field.
+     *
+     * @param  string  $field
+     * @param  array|string  $rules
+     * @param  array  &$schema
+     * @return void
+     */
+    protected function applyRulesToNestedSchema($field, $rules, array &$schema)
+    {
+        $path = explode('.', $field);
+        $current = &$schema;
+
+        // Navigate to the correct position in the schema
+        foreach ($path as $i => $segment) {
+            if ($i === count($path) - 1) {
+                // Last segment, apply the rules
+                if (isset($current['properties'][$segment])) {
+                    $current['properties'][$segment]['rules'] = $rules;
+                } else {
+                    $current['properties'][$segment] = [
+                        'type' => is_numeric($rules[0] ?? '') ? 'integer' : 'string',
+                        'rules' => $rules
+                    ];
+                }
+                break;
+            }
+
+            // Not the last segment, navigate deeper
+            if (!isset($current['properties'][$segment])) {
+                $current['properties'][$segment] = [
+                    'type' => 'object',
+                    'properties' => []
+                ];
+            }
+
+            $current = &$current['properties'][$segment];
+        }
+    }
+
+    /**
+     * Detect if the schema is in flat Laravel validation rules format.
+     *
+     * @param  array  $schema
+     * @return bool
+     */
+    protected function isFlatLaravelRulesFormat(array $schema)
+    {
+        // If schema has standard nested structure keys, it's not flat format
+        if (isset($schema['type']) || isset($schema['properties']) || isset($schema['items'])) {
+            return false;
+        }
+
+        // Check if at least one key contains a dot (indicating nested field)
+        // or if the values are strings/arrays that look like Laravel validation rules
+        foreach ($schema as $key => $rules) {
+            // If key contains dots, it's likely flat format
+            if (str_contains($key, '.')) {
+                return true;
+            }
+
+            // If key is wildcard pattern like 'items.*', it's likely flat format
+            if (str_contains($key, '*') && str_contains($key, '.')) {
+                return true;
+            }
+
+            // If rules look like Laravel validation rules (string with pipes or array)
+            if (is_string($rules) && (str_contains($rules, '|') || in_array($rules, [
+                'required', 'string', 'integer', 'numeric', 'email', 'boolean', 'array', 'object'
+            ]))) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Convert flat Laravel validation rules to nested schema format.
+     *
+     * @param  array  $flatRules
+     * @return array
+     */
+    protected function convertFlatRulesToNestedSchema(array $flatRules)
+    {
+        $nestedSchema = [];
+
+        foreach ($flatRules as $field => $rules) {
+            if ($field === '*') {
+                // Handle root wildcard
+                $nestedSchema['*'] = $rules;
+                continue;
+            }
+
+            if (str_contains($field, '*')) {
+                // Handle wildcard patterns like 'items.*' or 'items.*.name'
+                $nestedSchema[$field] = $rules;
+                continue;
+            }
+
+            if (!str_contains($field, '.')) {
+                // Simple field, no nesting - pass rules directly
+                $nestedSchema[$field] = $rules;
+                continue;
+            }
+
+            // Handle nested fields - keep the flat structure for Laravel validation
+            $nestedSchema[$field] = $rules;
+        }
+
+        return $nestedSchema;
     }
 }

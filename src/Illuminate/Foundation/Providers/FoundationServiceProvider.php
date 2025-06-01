@@ -164,6 +164,15 @@ class FoundationServiceProvider extends AggregateServiceProvider
                 throw $e;
             }
         });
+
+        Request::macro('validateNested', function ($schema, array $conditions = [], array $messages = [], array $attributes = []) {
+            $validator = validator($this->all(), [], $messages, $attributes);
+
+            // Use the new validateNestedStructure method on the validator
+            $validator->validateNestedStructure('data', $this->all(), $schema, $conditions);
+
+            return $this->all();
+        });
     }
 
     /**
