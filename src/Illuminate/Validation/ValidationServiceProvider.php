@@ -6,6 +6,9 @@ use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Contracts\Validation\UncompromisedVerifier;
 use Illuminate\Http\Client\Factory as HttpFactory;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Validation\DatabasePresenceVerifier;
+use Illuminate\Validation\Factory;
+use Illuminate\Validation\NotPwnedVerifier;
 
 class ValidationServiceProvider extends ServiceProvider implements DeferrableProvider
 {
