@@ -2,6 +2,7 @@
 
 namespace Tests\Foundation\Console;
 
+use Illuminate\Foundation\AliasLoader;
 use Illuminate\Foundation\Console\SchemaMakeCommand;
 use Orchestra\Testbench\TestCase;
 
@@ -165,5 +166,11 @@ class SchemaMakeCommandTest extends TestCase
             $this->assertEquals('uri', $property['format'], "Field '{$field}' should be detected as URL");
             $this->assertContains('url', $property['rules']);
         }
+    }
+
+    protected function tearDown(): void
+    {
+        AliasLoader::setInstance(null);
+        parent::tearDown();
     }
 }

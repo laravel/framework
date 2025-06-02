@@ -2108,34 +2108,43 @@ class Validator implements ValidatorContract
         foreach ($data as $key => $value) {
             $fullPath = $currentPath ? $currentPath . '.' . $key : $key;
 
-            if (preg_match('/^' . str_replace('([^\.]+)', $key, $pattern) . '$/', $fullPath)) {
-                if (is_array($rule)) {
-                    if (isset($rule['rules'])) {
-                        // Handle rule with explicit 'rules' key
-                        $flattened[$fullPath] = $rule['rules'];
-                    } elseif (isset($rule['properties'])) {
-                        // Handle nested object with properties
-                        foreach ($rule['properties'] as $subKey => $subRule) {
-                            if (isset($subRule['rules'])) {
-                                $flattened[$fullPath . '.' . $subKey] = $subRule['rules'];
-                            } else {
-                                $flattened[$fullPath . '.' . $subKey] = $subRule;
+            // Convert wildcard pattern to regex and check if current path matches
+            $regexPattern = str_replace('\*', '([^\.]+)', preg_quote($originalKey, '/'));
+
+            try {
+                if (preg_match('/^' . $regexPattern . '$/', $fullPath)) {
+                    if (is_array($rule)) {
+                        if (isset($rule['rules'])) {
+                            // Handle rule with explicit 'rules' key
+                            $flattened[$fullPath] = $rule['rules'];
+                        } elseif (isset($rule['properties'])) {
+                            // Handle nested object with properties
+                            foreach ($rule['properties'] as $subKey => $subRule) {
+                                if (isset($subRule['rules'])) {
+                                    $flattened[$fullPath . '.' . $subKey] = $subRule['rules'];
+                                } else {
+                                    $flattened[$fullPath . '.' . $subKey] = $subRule;
+                                }
+                            }
+                        } else {
+                            foreach ($rule as $subKey => $subRule) {
+                                if (isset($subRule['rules'])) {
+                                    $flattened[$fullPath . '.' . $subKey] = $subRule['rules'];
+                                } else {
+                                    $flattened[$fullPath . '.' . $subKey] = $subRule;
+                                }
                             }
                         }
                     } else {
-                        foreach ($rule as $subKey => $subRule) {
-                            if (isset($subRule['rules'])) {
-                                $flattened[$fullPath . '.' . $subKey] = $subRule['rules'];
-                            } else {
-                                $flattened[$fullPath . '.' . $subKey] = $subRule;
-                            }
-                        }
+                        $flattened[$fullPath] = $rule;
                     }
-                } else {
-                    $flattened[$fullPath] = $rule;
                 }
+            } catch (\Exception $e) {
+                // Skip invalid regex patterns to prevent crashes
+                continue;
             }
 
+            // Recursively process nested arrays
             if (is_array($value)) {
                 $this->expandWildcardRule($pattern, $originalKey, $rule, $value, $fullPath, $flattened);
             }

@@ -2,6 +2,7 @@
 
 namespace Tests\Foundation\Console;
 
+use Illuminate\Foundation\AliasLoader;
 use Illuminate\Foundation\Console\SchemaMakeCommand;
 use Orchestra\Testbench\TestCase;
 
@@ -115,5 +116,11 @@ class SchemaMakeCommandIntegrationTest extends TestCase
         $this->assertFalse($method->invoke($command, 'description', 'text'), 'Description field should not be required');
         $this->assertFalse($method->invoke($command, 'notes', 'text'), 'Notes field should not be required');
         $this->assertFalse($method->invoke($command, 'bio', 'text'), 'Bio field should not be required');
+    }
+
+    protected function tearDown(): void
+    {
+        AliasLoader::setInstance(null);
+        parent::tearDown();
     }
 }
