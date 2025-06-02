@@ -7,7 +7,7 @@ use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Container\ContextualAttribute;
 
 #[Attribute(Attribute::TARGET_PARAMETER)]
-class Provide implements ContextualAttribute
+class Give implements ContextualAttribute
 {
     /**
      * Provide a concrete class implementation for dependency injection.

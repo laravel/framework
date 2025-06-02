@@ -15,7 +15,7 @@ use Illuminate\Container\Attributes\Context;
 use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Container\Attributes\Database;
 use Illuminate\Container\Attributes\Log;
-use Illuminate\Container\Attributes\Provide;
+use Illuminate\Container\Attributes\Give;
 use Illuminate\Container\Attributes\RouteParameter;
 use Illuminate\Container\Attributes\Storage;
 use Illuminate\Container\Attributes\Tag;
@@ -66,25 +66,25 @@ class ContextualAttributeBindingTest extends TestCase
         $this->assertInstanceOf(ContainerTestImplB::class, $classB->property);
     }
 
-    public function testSimpleDependencyCanBeResolvedCorrectlyFromProvideAttributeBinding()
+    public function testSimpleDependencyCanBeResolvedCorrectlyFromGiveAttributeBinding()
     {
         $container = new Container;
 
         $container->bind(ContainerTestContract::class, concrete: ContainerTestImplA::class);
 
-        $resolution = $container->make(ProvideTestSimple::class);
+        $resolution = $container->make(GiveTestSimple::class);
 
         $this->assertInstanceOf(SimpleDependency::class, $resolution->dependency);
     }
 
 
-    public function testComplexDependencyCanBeResolvedCorrectlyFromProvideAttributeBinding()
+    public function testComplexDependencyCanBeResolvedCorrectlyFromGiveAttributeBinding()
     {
         $container = new Container;
 
         $container->bind(ContainerTestContract::class, concrete: ContainerTestImplA::class);
 
-        $resolution = $container->make(ProvideTestComplex::class);
+        $resolution = $container->make(GiveTestComplex::class);
 
         $this->assertInstanceOf(ComplexDependency::class, $resolution->dependency);
         $this->assertTrue($resolution->dependency->param);
@@ -538,19 +538,19 @@ final class StorageTest
     }
 }
 
-final class ProvideTestSimple
+final class GiveTestSimple
 {
     public function __construct(
-        #[Provide(SimpleDependency::class)]
+        #[Give(SimpleDependency::class)]
         public readonly ContainerTestContract $dependency
     ) {
     }
 }
 
-final class ProvideTestComplex
+final class GiveTestComplex
 {
     public function __construct(
-        #[Provide(ComplexDependency::class, ['param' => true])]
+        #[Give(ComplexDependency::class, ['param' => true])]
         public readonly ContainerTestContract $dependency
     ) {
     }
