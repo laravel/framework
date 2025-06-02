@@ -21,7 +21,7 @@ class ValidationSchemaLoader
                 $rules = json_decode($decoded, true);
 
                 if (json_last_error() !== JSON_ERROR_NONE) {
-                    throw new \InvalidArgumentException("Invalid inline schema encoding");
+                    throw new \InvalidArgumentException('Invalid inline schema encoding');
                 }
 
                 return $rules;
@@ -44,7 +44,7 @@ class ValidationSchemaLoader
             throw new \InvalidArgumentException("Schema file not found: {$filePath}");
         }
 
-        throw new \InvalidArgumentException("Schema must be an array or string path");
+        throw new \InvalidArgumentException('Schema must be an array or string path');
     }
 
     /**
@@ -62,17 +62,19 @@ class ValidationSchemaLoader
             function_exists('base_path') ? base_path('resources/validation') : null,
             function_exists('base_path') ? base_path('resources/schemas') : null,
             function_exists('base_path') ? base_path('storage/validation') : null,
-            getcwd() . '/resources/validation',
-            getcwd() . '/resources/schemas',
+            getcwd().'/resources/validation',
+            getcwd().'/resources/schemas',
         ];
 
         foreach ($basePaths as $basePath) {
-            if (!$basePath) continue;
+            if (! $basePath) {
+                continue;
+            }
 
-            $fullPath = $basePath . '/' . ltrim($path, '/');
+            $fullPath = $basePath.'/'.ltrim($path, '/');
 
             // Add .json extension if not present
-            if (!str_ends_with($fullPath, '.json')) {
+            if (! str_ends_with($fullPath, '.json')) {
                 $fullPath .= '.json';
             }
 
@@ -83,7 +85,7 @@ class ValidationSchemaLoader
 
         // If no base path works, try relative to current directory
         $relativePath = ltrim($path, '/');
-        if (!str_ends_with($relativePath, '.json')) {
+        if (! str_ends_with($relativePath, '.json')) {
             $relativePath .= '.json';
         }
 

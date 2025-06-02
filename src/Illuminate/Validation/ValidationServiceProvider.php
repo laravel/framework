@@ -41,27 +41,20 @@ class ValidationServiceProvider extends ServiceProvider implements DeferrablePro
     {
         $this->app['validator']->extend('nested', function ($attribute, $value, $parameters, $validator) {
             if (empty($parameters)) {
-                echo "DEBUG: Empty parameters\n";
                 return false;
             }
 
             // The parameter contains the Base64 encoded JSON schema
             $encodedSchema = $parameters[0];
-            echo "DEBUG: Encoded Schema: " . $encodedSchema . "\n";
 
             // Decode the Base64 encoded schema
             $schemaJson = base64_decode($encodedSchema);
-            echo "DEBUG: Decoded Schema JSON: " . $schemaJson . "\n";
 
             // Parse the JSON to validate it
             $schema = json_decode($schemaJson, true);
             if (json_last_error() !== JSON_ERROR_NONE) {
-                echo "DEBUG: Invalid JSON schema: " . json_last_error_msg() . "\n";
                 return false;
             }
-
-            echo "DEBUG: Parsed schema: " . json_encode($schema) . "\n";
-            echo "DEBUG: Value: " . json_encode($value) . "\n";
 
             // Instead of calling validateNested with JSON, pass the array directly
             return $validator->validateNestedStructureInternal($attribute, $value, $schema, []);
@@ -138,7 +131,7 @@ class ValidationServiceProvider extends ServiceProvider implements DeferrablePro
             $middlewareClass = 'Illuminate\Validation\Middleware\ValidateRequestBySchema';
 
             // Only accept file paths (strings) pointing to JSON files
-            if (!is_string($jsonFilePath)) {
+            if (! is_string($jsonFilePath)) {
                 throw new \InvalidArgumentException('validateRequestBy() only accepts file paths to JSON files. Use validateQuery() for array rules.');
             }
 
@@ -154,7 +147,7 @@ class ValidationServiceProvider extends ServiceProvider implements DeferrablePro
 
             if (is_array($schema)) {
                 // For inline rules, encode as base64 JSON and prefix with 'inline:'
-                $encoded = 'inline:' . base64_encode(json_encode($schema));
+                $encoded = 'inline:'.base64_encode(json_encode($schema));
             } else {
                 // For file paths, use as-is
                 $encoded = $schema;
@@ -168,12 +161,12 @@ class ValidationServiceProvider extends ServiceProvider implements DeferrablePro
             $middlewareClass = 'Illuminate\Validation\Middleware\ValidateQueryOnly';
 
             // Only accept arrays of validation rules
-            if (!is_array($rulesArray)) {
+            if (! is_array($rulesArray)) {
                 throw new \InvalidArgumentException('validateQuery() only accepts arrays of validation rules. Use validateRequestBy() for JSON file paths.');
             }
 
             // For inline rules, encode as base64 JSON and prefix with 'inline:'
-            $encoded = 'inline:' . base64_encode(json_encode($rulesArray));
+            $encoded = 'inline:'.base64_encode(json_encode($rulesArray));
 
             return $this->middleware("{$middlewareClass}:{$encoded}");
         });
