@@ -5,6 +5,7 @@ namespace Illuminate\Console;
 use Illuminate\Console\View\Components\Factory;
 use Illuminate\Contracts\Console\Isolatable;
 use Illuminate\Support\Traits\Macroable;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -101,9 +102,7 @@ class Command extends SymfonyCommand
         // Once we have constructed the command, we'll set the description and other
         // related properties of the command. If a signature wasn't used to build
         // the command we'll set the arguments and the options on this command.
-        if (! isset($this->description)) {
-            $this->setDescription((string) static::getDefaultDescription());
-        } else {
+        if (isset($this->description)) {
             $this->setDescription((string) $this->description);
         }
 
