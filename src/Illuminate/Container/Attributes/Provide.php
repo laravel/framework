@@ -11,21 +11,10 @@ class Provide implements ContextualAttribute
 {
     /**
      * Provide a concrete class implementation for dependency injection.
-     * 
-     * Note: This attribute requires a concrete class name. Abstract classes 
-     * and interfaces are not supported and will result in binding resolution errors.
      *
      * @template T
-     * @param class-string<T> $class The concrete class to instantiate
-     * @param  array|null  $params  Constructor parameters (optional)
-     * 
-     * @example Basic usage:
-     * #[Provide(EloquentUserRepository::class)]
-     * private UserRepository $EloquentUserRepository
-     * 
-     * @example With constructor parameters:
-     * #[Provide(SendGridEmailService::class, ['template' => 'welcome', 'from' => 'noreply@app.com'])]
-     * private EmailService $emailService
+     * @param  class-string<T> $class
+     * @param  array|null  $params
      */
     public function __construct(
         public string $class,
