@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Validation;
 use Illuminate\Container\Container;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Foundation\AliasLoader;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\CallableDispatcher;
@@ -108,8 +109,10 @@ class RouteValidationIntegrationTest extends TestCase
             $this->removeDirectory($this->tempDir);
         }
 
+        // Clean up global singletons to prevent test contamination
         Container::setInstance();
         Facade::clearResolvedInstances();
+        AliasLoader::setInstance(null);
     }
 
     /**
