@@ -14,8 +14,8 @@ use Illuminate\Container\Attributes\Config;
 use Illuminate\Container\Attributes\Context;
 use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Container\Attributes\Database;
-use Illuminate\Container\Attributes\Log;
 use Illuminate\Container\Attributes\Give;
+use Illuminate\Container\Attributes\Log;
 use Illuminate\Container\Attributes\RouteParameter;
 use Illuminate\Container\Attributes\Storage;
 use Illuminate\Container\Attributes\Tag;
@@ -76,7 +76,6 @@ class ContextualAttributeBindingTest extends TestCase
 
         $this->assertInstanceOf(SimpleDependency::class, $resolution->dependency);
     }
-
 
     public function testComplexDependencyCanBeResolvedCorrectlyFromGiveAttributeBinding()
     {
@@ -185,7 +184,6 @@ class ContextualAttributeBindingTest extends TestCase
 
         $container->make(ConfigTest::class);
     }
-
 
     public function testDatabaseAttribute()
     {
@@ -461,12 +459,16 @@ final class ContainerTestHasConfigValueWithResolvePropertyAndAfterCallback
     }
 }
 
-final class SimpleDependency implements ContainerTestContract {}
+final class SimpleDependency implements ContainerTestContract
+{
+}
 
 final class ComplexDependency implements ContainerTestContract
 {
-    public function __construct(public bool $param) {}
-}   
+    public function __construct(public bool $param)
+    {
+    }
+}
 
 final class AuthedTest
 {
