@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Validation;
 
 use Illuminate\Container\Container;
+use Illuminate\Foundation\AliasLoader;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Translation\ArrayLoader;
@@ -53,6 +54,9 @@ class ValidationNestedTest extends TestCase
         Facade::clearResolvedInstances();
 
         Facade::setFacadeApplication(null);
+
+        // Clean up AliasLoader to prevent contamination
+        AliasLoader::setInstance(null);
     }
 
     protected function getValidator($data, $rules, $messages = [], $attributes = [])

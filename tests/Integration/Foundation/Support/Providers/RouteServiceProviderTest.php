@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Foundation\Support\Providers;
 
 use Illuminate\Foundation\Application;
+use Illuminate\Foundation\AliasLoader;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider;
@@ -36,6 +37,13 @@ class RouteServiceProviderTest extends TestCase
             ->withExceptions(function (Exceptions $exceptions) {
                 //
             })->create();
+    }
+
+    protected function tearDown(): void
+    {
+        AliasLoader::setInstance(null);
+
+        parent::tearDown();
     }
 
     public function test_it_can_register_multiple_route_service_providers()
