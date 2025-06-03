@@ -4,6 +4,8 @@ namespace Illuminate\Notifications;
 
 use Illuminate\Queue\SerializesModels;
 
+use function Illuminate\Support\enum_value;
+
 class Notification
 {
     use SerializesModels;
@@ -35,12 +37,12 @@ class Notification
     /**
      * Set the locale to send this notification in.
      *
-     * @param  string  $locale
+     * @param  \UnitEnum|string  $locale
      * @return $this
      */
     public function locale($locale)
     {
-        $this->locale = $locale;
+        $this->locale = enum_value($locale);
 
         return $this;
     }
