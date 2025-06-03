@@ -9,6 +9,7 @@ use Illuminate\Contracts\Foundation\CachesRoutes;
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Database\Eloquent\Factory as ModelFactory;
 use Illuminate\View\Compilers\BladeCompiler;
+use Symfony\Component\Finder\Finder;
 
 /**
  * @property array<string, string> $bindings All of the container bindings that should be registered.
@@ -180,6 +181,31 @@ abstract class ServiceProvider
                 require $path, $config->get($key, [])
             ));
         }
+    }
+
+    /**
+     * Register all of the commands in the given directory.
+     *
+     * @param  string  $path
+     * @param  string  $namespace
+     * @return void
+     */
+    protected function loadCommandsFrom($path, $namespace)
+    {
+        if (! $this->app->runningInConsole()) {
+            return;
+        }
+
+        $commands = [];
+        foreach (Finder::create()->in($path)->files() as $file) {
+            $commands[] = $namespace.str_replace(
+                ['/', '.php'],
+                ['\\', ''],
+                Str::after($file->getRealPath(), realpath($path))
+            );
+        }
+
+        $this->commands($commands);
     }
 
     /**
