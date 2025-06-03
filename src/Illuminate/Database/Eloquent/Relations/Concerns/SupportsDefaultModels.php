@@ -50,6 +50,10 @@ trait SupportsDefaultModels
 
         $instance = $this->newRelatedInstanceFor($parent);
 
+        if (method_exists($this, 'setForeignAttributesForCreate')) {
+            $this->setForeignAttributesForCreate($instance);
+        }
+
         if (is_callable($this->withDefault)) {
             return call_user_func($this->withDefault, $instance, $parent) ?: $instance;
         }
