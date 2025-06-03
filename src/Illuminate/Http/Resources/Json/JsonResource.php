@@ -102,7 +102,7 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
      * @param  \Illuminate\Http\Request|null  $request
      * @return array
      */
-    public function resolve($request = null)
+    public function resolve($request = null): array
     {
         $data = $this->toArray(
             $request ?: Container::getInstance()->make('request')
