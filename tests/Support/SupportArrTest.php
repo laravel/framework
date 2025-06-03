@@ -1773,4 +1773,22 @@ class SupportArrTest extends TestCase
 
         $this->assertEquals([[0 => 'John', 1 => 'Jane'], [2 => 'Greg']], $result);
     }
+
+    public function testFilterKeys()
+    {
+        $array = [
+            'name' => 'Taylor',
+            'age' => 40,
+            'email' => 'taylor@example.com',
+        ];
+
+        $filtered = Arr::filterKeys($array, function ($key) {
+            return in_array($key, ['name', 'email']);
+        });
+
+        $this->assertSame([
+            'name' => 'Taylor',
+            'email' => 'taylor@example.com',
+        ], $filtered);
+    }
 }

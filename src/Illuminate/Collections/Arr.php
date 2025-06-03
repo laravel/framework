@@ -1177,4 +1177,25 @@ class Arr
 
         return is_array($value) ? $value : [$value];
     }
+
+    /**
+     * Filter the array by its keys using the given callback.
+     *
+     * @param  array  $array
+     * @param  callable  $callback
+     * @return array
+     */
+    public static function filterKeys(array $array, callable $callback)
+    {
+        $result = [];
+
+        foreach ($array as $key => $value) {
+            if ($callback($key)) {
+                $result[$key] = $value;
+            }
+        }
+
+        return $result;
+    }
+
 }
