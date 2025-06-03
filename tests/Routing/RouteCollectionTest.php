@@ -392,7 +392,7 @@ class RouteCollectionTest extends TestCase
             $fooDomainGet2,
             $barDomainGet2,
             $noDomainGet1,
-            $noDomainGet2
+            $noDomainGet2,
         ], $this->routeCollection->getRoutes());
 
         $this->assertSame([
