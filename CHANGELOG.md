@@ -1,6 +1,11 @@
 # Release Notes for 11.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v11.45.0...11.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v11.45.1...11.x)
+
+## [v11.45.1](https://github.com/laravel/framework/compare/v11.45.0...v11.45.1) - 2025-06-03
+
+* Add support for sending raw (non-encoded) attachments in Resend mail by [@Roywcm](https://github.com/Roywcm) in https://github.com/laravel/framework/pull/55837
+* [11.x] Fixes Symfony Console 7.3 deprecations on closure command by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/55888
 
 ## [v11.45.0](https://github.com/laravel/framework/compare/v11.44.7...v11.45.0) - 2025-05-20
 
