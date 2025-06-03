@@ -1194,8 +1194,6 @@ class Arr
                 $result[$key] = $value;
             }
         }
-
         return $result;
     }
-
 }
