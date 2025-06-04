@@ -15,6 +15,8 @@ use PHPUnit\Framework\TestCase;
 
 class SupportStringableTest extends TestCase
 {
+    protected Container $container;
+
     /**
      * @param  string  $string
      * @return \Illuminate\Support\Stringable
