@@ -1441,10 +1441,11 @@ class SupportStringableTest extends TestCase
         $this->assertSame(hash('sha256', 'foobarbaz'), (string) $this->stringable('foobarbaz')->hash('sha256'));
     }
 
-    public function testEncryptAndDecrypt(){
-        Container::setInstance( $this->container = new Container );
+    public function testEncryptAndDecrypt()
+    {
+        Container::setInstance($this->container = new Container);
 
-        $this->container->bind('encrypter', fn() => new Encrypter(str_repeat('b', 16)));
+        $this->container->bind('encrypter', fn () => new Encrypter(str_repeat('b', 16)));
 
         $encrypted = encrypt('foo');
 

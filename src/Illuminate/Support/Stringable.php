@@ -1347,7 +1347,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
-     * Encrypt the string
+     * Encrypt the string.
      *
      * @param  bool  $serialize
      * @return static
@@ -1358,7 +1358,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
-     * Decrypt the string
+     * Decrypt the string.
      *
      * @param  bool  $serialize
      * @return static
