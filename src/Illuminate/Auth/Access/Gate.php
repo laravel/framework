@@ -672,7 +672,7 @@ class Gate implements GateContract
 
         $policy = $this->getPolicyFromAttribute($class);
 
-        if ($policy !== null) {
+        if (! is_null($policy)) {
             return $this->resolvePolicy($policy);
         }
 
@@ -690,7 +690,7 @@ class Gate implements GateContract
     }
 
     /**
-     * Get the policy from the class attribute.
+     * Get the policy class from the class attribute.
      *
      * @param  class-string<*>  $class
      * @return class-string<*>|null
@@ -703,11 +703,9 @@ class Gate implements GateContract
 
         $attributes = (new ReflectionClass($class))->getAttributes(UsePolicy::class);
 
-        if ($attributes === []) {
-            return null;
-        }
-
-        return $attributes[0]->newInstance()->class;
+        return $attributes !== []
+            ? $attributes[0]->newInstance()->class
+            : null;
     }
 
     /**
