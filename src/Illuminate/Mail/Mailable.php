@@ -12,6 +12,7 @@ use Illuminate\Contracts\Queue\Factory as Queue;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Contracts\Translation\HasLocalePreference;
+use Illuminate\Foundation\Queue\InteractsWithQueueAndConnection;
 use Illuminate\Support\Collection;
 use Illuminate\Support\EncodedHtmlString;
 use Illuminate\Support\HtmlString;
@@ -29,9 +30,11 @@ use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\Header\TagHeader;
 use Symfony\Component\Mime\Address;
 
+use function Illuminate\Support\enum_value;
+
 class Mailable implements MailableContract, Renderable
 {
-    use Conditionable, ForwardsCalls, Localizable, Tappable, Macroable {
+    use Conditionable, ForwardsCalls, Localizable, Tappable, InteractsWithQueueAndConnection, Macroable {
         __call as macroCall;
     }
 
@@ -228,12 +231,8 @@ class Mailable implements MailableContract, Renderable
             return $this->later($this->delay, $queue);
         }
 
-        $connection = property_exists($this, 'connection') ? $this->connection : null;
-
-        $queueName = property_exists($this, 'queue') ? $this->queue : null;
-
-        return $queue->connection($connection)->pushOn(
-            $queueName ?: null, $this->newQueuedJob()
+        return $queue->connection($this->getConnection())->pushOn(
+            $this->getQueue(), $this->newQueuedJob()
         );
     }
 
@@ -246,12 +245,8 @@ class Mailable implements MailableContract, Renderable
      */
     public function later($delay, Queue $queue)
     {
-        $connection = property_exists($this, 'connection') ? $this->connection : null;
-
-        $queueName = property_exists($this, 'queue') ? $this->queue : null;
-
-        return $queue->connection($connection)->laterOn(
-            $queueName ?: null, $delay, $this->newQueuedJob()
+        return $queue->connection($this->getConnection())->laterOn(
+            $this->getQueue(), $delay, $this->newQueuedJob()
         );
     }
 
@@ -466,6 +461,38 @@ class Mailable implements MailableContract, Renderable
         }
 
         return $this;
+    }
+
+    /**
+     * Get the queue specified on the class or from the OnQueue attribute.
+     *
+     * @return string|null
+     */
+    protected function getQueue()
+    {
+        $queue = property_exists($this, 'queue') ? $this->queue : null;
+
+        if ($queue === null) {
+            $queue = $this->getQueueFromOnQueueAttribute(new ReflectionClass($this));
+        }
+
+        return $queue !== null ? enum_value($queue) : null;
+    }
+
+    /**
+     * Get the connection specified on the class or from the OnConnection attribute.
+     *
+     * @return string|null
+     */
+    protected function getConnection()
+    {
+        $connection = property_exists($this, 'connection') ? $this->connection : null;
+
+        if ($connection === null) {
+            $connection = $this->getConnectionFromOnConnectionAttribute(new ReflectionClass($this));
+        }
+
+        return $connection !== null ? enum_value($connection) : null;
     }
 
     /**
