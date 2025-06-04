@@ -1814,6 +1814,7 @@ class SupportStrTest extends TestCase
 
         $this->assertSame('UserGroups', Str::pluralPascal('UserGroup', $countable));
     }
+    
     public function testSnakeHandlesDashes()
     {
         $this->assertSame('add_stream', Str::snake('Add-Stream'));

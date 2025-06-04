@@ -30,8 +30,7 @@ class BusPendingBatchTest extends TestCase
 
         $container->instance(Dispatcher::class, $eventDispatcher);
 
-        $job = new class
-        {
+        $job = new class {
             use Batchable;
         };
 
@@ -227,8 +226,7 @@ class BusPendingBatchTest extends TestCase
 
     public function test_it_throws_exception_if_batched_job_is_not_batchable(): void
     {
-        $nonBatchableJob = new class
-        {
+        $nonBatchableJob = new class {
         };
 
         $this->expectException(RuntimeException::class);
@@ -244,8 +242,7 @@ class BusPendingBatchTest extends TestCase
         new PendingBatch(
             $container,
             new Collection(
-                [new PendingBatch($container, new Collection([new BatchableJob, new class
-                {
+                [new PendingBatch($container, new Collection([new BatchableJob, new class {
                 }]))]
             )
         );
