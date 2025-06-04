@@ -2,6 +2,8 @@
 
 namespace Illuminate\Tests\Support;
 
+use Illuminate\Container\Container;
+use Illuminate\Encryption\Encrypter;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
@@ -1437,5 +1439,16 @@ class SupportStringableTest extends TestCase
         $this->assertSame(hash('xxh3', 'foo'), (string) $this->stringable('foo')->hash('xxh3'));
         $this->assertSame(hash('xxh3', 'foobar'), (string) $this->stringable('foobar')->hash('xxh3'));
         $this->assertSame(hash('sha256', 'foobarbaz'), (string) $this->stringable('foobarbaz')->hash('sha256'));
+    }
+
+    public function testEncryptAndDecrypt(){
+        Container::setInstance( $this->container = new Container );
+
+        $this->container->bind('encrypter', fn() => new Encrypter(str_repeat('b', 16)));
+
+        $encrypted = encrypt('foo');
+
+        $this->assertNotSame('foo', $encrypted);
+        $this->assertSame('foo', decrypt($encrypted));
     }
 }
