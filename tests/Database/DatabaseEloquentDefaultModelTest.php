@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Support\Facades\Schema;
 use Orchestra\Testbench\TestCase;
 
@@ -114,12 +113,12 @@ class DatabaseEloquentDefaultModelTest extends TestCase
         $wallet->save();
         $transaction = $wallet->transactions()->create([
             'amount' => 100,
-            'type' => 'credit'
+            'type' => 'credit',
         ]);
         $this->assertDatabaseHas('transactions', [
             'wallet_id' => $wallet->id,
             'amount' => 100,
-            'type' => 'credit'
+            'type' => 'credit',
         ]);
         Model::automaticallyEagerLoadRelationships(false);
     }
@@ -140,10 +139,12 @@ class DatabaseEloquentDefaultModelTest extends TestCase
 class Business extends Model
 {
     protected $guarded = [];
+
     public static function booted()
     {
         static::automaticallyEagerLoadRelationships();
     }
+
     public function wallet()
     {
         return $this->morphOne(Wallet::class, 'holder')
@@ -151,6 +152,7 @@ class Business extends Model
                 'balance' => 0,
             ]);
     }
+
     public function walletWithCallback()
     {
         return $this->morphOne(Wallet::class, 'holder')
@@ -163,10 +165,12 @@ class Business extends Model
 class Wallet extends Model
 {
     protected $guarded = [];
+
     public function holder()
     {
         return $this->morphTo();
     }
+
     public function transactions()
     {
         return $this->hasMany(Transaction::class);
@@ -176,8 +180,9 @@ class Wallet extends Model
 class Transaction extends Model
 {
     protected $guarded = [];
+
     public function wallet()
     {
         return $this->belongsTo(Wallet::class);
     }
-} 
+}
