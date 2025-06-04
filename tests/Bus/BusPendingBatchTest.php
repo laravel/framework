@@ -30,7 +30,7 @@ class BusPendingBatchTest extends TestCase
 
         $container->instance(Dispatcher::class, $eventDispatcher);
 
-        $job = new class 
+        $job = new class
         {
             use Batchable;
         };
