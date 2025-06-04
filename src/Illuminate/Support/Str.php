@@ -1555,6 +1555,8 @@ class Str
             return static::$snakeCache[$key][$delimiter];
         }
 
+        $value = preg_replace('/[-\s]+/', ' ', $value);
+
         if (! ctype_lower($value)) {
             $value = preg_replace('/\s+/u', '', ucwords($value));
 

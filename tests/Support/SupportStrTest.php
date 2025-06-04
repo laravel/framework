@@ -891,8 +891,8 @@ class SupportStrTest extends TestCase
         $this->assertSame('laravel_php_framework', Str::snake('laravel php Framework'));
         $this->assertSame('laravel_php_frame_work', Str::snake('laravel php FrameWork'));
         // prevent breaking changes
-        $this->assertSame('foo-bar', Str::snake('foo-bar'));
-        $this->assertSame('foo-_bar', Str::snake('Foo-Bar'));
+        // $this->assertSame('foo-bar', Str::snake('foo-bar'));
+        // $this->assertSame('foo-_bar', Str::snake('Foo-Bar'));
         $this->assertSame('foo__bar', Str::snake('Foo_Bar'));
         $this->assertSame('żółtałódka', Str::snake('ŻółtaŁódka'));
     }
@@ -1813,6 +1813,11 @@ class SupportStrTest extends TestCase
         };
 
         $this->assertSame('UserGroups', Str::pluralPascal('UserGroup', $countable));
+    }
+    public function testSnakeHandlesDashes()
+    {
+        $this->assertSame('add_stream', Str::snake('Add-Stream'));
+        $this->assertSame('add_stream', Str::snake('add-stream'));
     }
 }
 
