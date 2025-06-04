@@ -1352,7 +1352,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      * @param  bool  $serialize
      * @return static
      */
-    public function encrypt(bool $serialize = true)
+    public function encrypt(bool $serialize = false)
     {
         return new static(encrypt($this->value, $serialize));
     }
@@ -1363,7 +1363,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      * @param  bool  $serialize
      * @return static
      */
-    public function decrypt(bool $serialize = true)
+    public function decrypt(bool $serialize = false)
     {
         return new static(decrypt($this->value, $serialize));
     }
