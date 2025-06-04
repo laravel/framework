@@ -40,6 +40,10 @@ class JobMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
+        if ($this->option('batched')) {
+            return $this->resolveStubPath('/stubs/job.batched.queued.stub');
+        }
+
         return $this->option('sync')
             ? $this->resolveStubPath('/stubs/job.stub')
             : $this->resolveStubPath('/stubs/job.queued.stub');
@@ -78,7 +82,8 @@ class JobMakeCommand extends GeneratorCommand
     {
         return [
             ['force', 'f', InputOption::VALUE_NONE, 'Create the class even if the job already exists'],
-            ['sync', null, InputOption::VALUE_NONE, 'Indicates that job should be synchronous'],
+            ['sync', null, InputOption::VALUE_NONE, 'Indicates that the job should be synchronous'],
+            ['batched', null, InputOption::VALUE_NONE, 'Indicates that the job should be batchable'],
         ];
     }
 }
