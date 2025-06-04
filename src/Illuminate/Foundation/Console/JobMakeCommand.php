@@ -82,8 +82,8 @@ class JobMakeCommand extends GeneratorCommand
     {
         return [
             ['force', 'f', InputOption::VALUE_NONE, 'Create the class even if the job already exists'],
-            ['sync', null, InputOption::VALUE_NONE, 'Indicates that job should be synchronous'],
-            ['batched', null, InputOption::VALUE_NONE, 'Indicates that job should be batchable'],
+            ['sync', null, InputOption::VALUE_NONE, 'Indicates that the job should be synchronous'],
+            ['batched', null, InputOption::VALUE_NONE, 'Indicates that the job should be batchable'],
         ];
     }
 }
