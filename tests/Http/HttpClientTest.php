@@ -1364,6 +1364,20 @@ class HttpClientTest extends TestCase
         $this->assertFalse(RequestException::$truncateAt);
     }
 
+    public function testAsyncRequestExceptionsRespectRequestTruncation()
+    {
+        RequestException::dontTruncate();
+        $this->factory->fake([
+            '*' => $this->factory->response(['error'], 403),
+        ]);
+
+        $exception = $this->factory->async()->throw()->truncateAt(4)->get('http://foo.com/json')->wait();
+
+        $this->assertInstanceOf(RequestException::class, $exception);
+        $this->assertEquals("HTTP request returned status code 403:\n[\"er (truncated...)\n", $exception->getMessage());
+        $this->assertFalse(RequestException::$truncateAt);
+    }
+
     public function testRequestExceptionEmptyBody()
     {
         $this->expectException(RequestException::class);
