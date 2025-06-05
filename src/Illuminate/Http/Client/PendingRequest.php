@@ -936,7 +936,6 @@ class PendingRequest
                     }
                 });
             } catch (TransferException $e) {
-
                 if ($e instanceof ConnectException) {
                     $exception = new ConnectionException($e->getMessage(), 0, $e);
                     $request = new Request($e->getRequest());
