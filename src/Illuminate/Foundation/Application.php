@@ -249,15 +249,14 @@ class Application extends Container implements ApplicationContract, CachesConfig
     }
 
     /**
-     * Extend environment with custom adapters
+     * Extend environment with custom adapters.
      *
      * @param  array  $environments
      * @return void
      */
     protected static function extendEnvironment(array $environments)
     {
-        foreach ($environments as $name => $callback)
-        {
+        foreach ($environments as $name => $callback) {
             Env::extend($callback, is_string($name) ? $name : null);
         }
     }
