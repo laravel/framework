@@ -938,23 +938,34 @@ class PendingRequest
             } catch (TransferException $e) {
                 if ($e instanceof ConnectException) {
                     $exception = new ConnectionException($e->getMessage(), 0, $e);
-                    $request = new Request($e->getRequest());
-                    $this->factory?->recordRequestResponsePair($request, null);
+
+                    $this->factory?->recordRequestResponsePair(
+                        $request = new Request($e->getRequest()), null
+                    );
+
                     $this->dispatchConnectionFailedEvent($request, $exception);
+
                     throw $exception;
                 }
 
                 if ($e instanceof RequestException && ! $e->hasResponse()) {
                     $exception = new ConnectionException($e->getMessage(), 0, $e);
-                    $request = new Request($e->getRequest());
-                    $this->factory?->recordRequestResponsePair($request, null);
+
+                    $this->factory?->recordRequestResponsePair(
+                        $request = new Request($e->getRequest()), null
+                    );
+
                     $this->dispatchConnectionFailedEvent($request, $exception);
+
                     throw $exception;
                 }
 
                 if ($e instanceof RequestException && $e->hasResponse()) {
-                    $response = $this->populateResponse($this->newResponse($e->getResponse()));
-                    $this->factory?->recordRequestResponsePair(new Request($e->getRequest()), $response);
+                    $this->factory?->recordRequestResponsePair(
+                        new Request($e->getRequest()),
+                        $response = $this->populateResponse($this->newResponse($e->getResponse()))
+                    );
+
                     throw $response->toException();
                 }
 
