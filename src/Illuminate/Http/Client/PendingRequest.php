@@ -27,7 +27,6 @@ use OutOfBoundsException;
 use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\RequestInterface;
 use Symfony\Component\VarDumper\VarDumper;
-use Illuminate\Http\Client\RequestException as LaravelRequestException;
 
 class PendingRequest
 {
