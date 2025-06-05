@@ -48,6 +48,11 @@ class Response implements ArrayAccess, Stringable
     public $transferStats;
 
     /**
+     * @var int<1, max>|false|null
+     */
+    protected $truncateAt = null;
+
+    /**
      * Create a new response instance.
      *
      * @param  \Psr\Http\Message\MessageInterface  $response
@@ -290,6 +295,31 @@ class Response implements ArrayAccess, Stringable
     }
 
     /**
+     * When a RequestException is thrown, truncate to this length.
+     *
+     * @param  int<1, max>  $length
+     * @return $this
+     */
+    public function truncateAt(int $length)
+    {
+        $this->truncateAt = $length;
+
+        return $this;
+    }
+
+    /**
+     * Do not truncate a RequestException if thrown.
+     *
+     * @return $this
+     */
+    public function dontTruncate()
+    {
+        $this->truncateAt = false;
+
+        return $this;
+    }
+
+    /**
      * Create an exception if a server or client error occurred.
      *
      * @return \Illuminate\Http\Client\RequestException|null
@@ -297,7 +327,16 @@ class Response implements ArrayAccess, Stringable
     public function toException()
     {
         if ($this->failed()) {
-            return new RequestException($this);
+            $originalTruncateAt = RequestException::$truncateAt;
+            try {
+                if ($this->truncateAt !== null) {
+                    $this->truncateAt === false ? RequestException::dontTruncate() : RequestException::truncateAt($this->truncateAt);
+                }
+
+                return new RequestException($this);
+            } finally {
+                RequestException::$truncateAt = $originalTruncateAt;
+            }
         }
     }
 
