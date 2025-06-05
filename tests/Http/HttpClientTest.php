@@ -3,9 +3,11 @@
 namespace Illuminate\Tests\Http;
 
 use Exception;
+use GuzzleHttp\Exception\RequestException as GuzzleRequestException;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Promise\RejectedPromise;
+use GuzzleHttp\Psr7\Request as GuzzleRequest;
 use GuzzleHttp\Psr7\Response as Psr7Response;
 use GuzzleHttp\Psr7\Utils;
 use GuzzleHttp\TransferStats;
@@ -2513,6 +2515,22 @@ class HttpClientTest extends TestCase
                 $request->url() === 'https://laravel.example' &&
                 $request->hasHeader('X-Test-Header', 'Test');
         });
+    }
+
+    public function testSslCertificateErrorsConvertedToConnectionException()
+    {
+        $this->factory->fake(function () {
+            $request = new GuzzleRequest('HEAD', 'https://ssl-error.laravel.example');
+            throw new GuzzleRequestException(
+                'cURL error 60: SSL certificate problem: unable to get local issuer certificate',
+                $request
+            );
+        });
+
+        $this->expectException(ConnectionException::class);
+        $this->expectExceptionMessage('cURL error 60: SSL certificate problem: unable to get local issuer certificate');
+
+        $this->factory->head('https://ssl-error.laravel.example');
     }
 
     public function testRequestExceptionIsNotThrownIfThePendingRequestIsSetToThrowOnFailureButTheResponseIsSuccessful()
