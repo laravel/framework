@@ -19,6 +19,21 @@ class FoundationApplicationTest extends TestCase
 {
     protected function tearDown(): void
     {
+        // Clean up environment variables that might be set by tests
+        unset($_ENV['FOO'], $_SERVER['FOO']);
+        putenv('FOO');
+
+        // Reset the global Env state to prevent test pollution
+        $reflection = new \ReflectionClass(\Illuminate\Support\Env::class);
+
+        $customAdaptersProperty = $reflection->getProperty('customAdapters');
+        $customAdaptersProperty->setAccessible(true);
+        $customAdaptersProperty->setValue(null, []);
+
+        $repositoryProperty = $reflection->getProperty('repository');
+        $repositoryProperty->setAccessible(true);
+        $repositoryProperty->setValue(null, null);
+
         m::close();
     }
 
@@ -288,8 +303,10 @@ class FoundationApplicationTest extends TestCase
         };
         $app->afterLoadingEnvironment($closure);
         $app->useConfigPath(__DIR__.'/fixtures/config');
-        $app->bootstrapWith([\Illuminate\Foundation\Bootstrap\LoadConfiguration::class]);
-
+        $app->bootstrapWith([
+            \Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables::class,
+            \Illuminate\Foundation\Bootstrap\LoadConfiguration::class,
+        ]);
         $this->assertSame('BAR', $app->make('config')->get('app.bar'));
         $this->assertNotSame('foo', $app->make('config')->get('app.bar'));
     }
