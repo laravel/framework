@@ -935,15 +935,31 @@ class PendingRequest
                         }
                     }
                 });
-            } catch (ConnectException $e) {
-                $exception = new ConnectionException($e->getMessage(), 0, $e);
-                $request = new Request($e->getRequest());
+            } catch (TransferException $e) {
 
-                $this->factory?->recordRequestResponsePair($request, null);
+                if ($e instanceof ConnectException) {
+                    $exception = new ConnectionException($e->getMessage(), 0, $e);
+                    $request = new Request($e->getRequest());
+                    $this->factory?->recordRequestResponsePair($request, null);
+                    $this->dispatchConnectionFailedEvent($request, $exception);
+                    throw $exception;
+                }
 
-                $this->dispatchConnectionFailedEvent($request, $exception);
+                if ($e instanceof RequestException && ! $e->hasResponse()) {
+                    $exception = new ConnectionException($e->getMessage(), 0, $e);
+                    $request = new Request($e->getRequest());
+                    $this->factory?->recordRequestResponsePair($request, null);
+                    $this->dispatchConnectionFailedEvent($request, $exception);
+                    throw $exception;
+                }
 
-                throw $exception;
+                if ($e instanceof RequestException && $e->hasResponse()) {
+                    $response = $this->populateResponse($this->newResponse($e->getResponse()));
+                    $this->factory?->recordRequestResponsePair(new Request($e->getRequest()), $response);
+                    throw $response->toException();
+                }
+
+                throw $e;
             }
         }, $this->retryDelay ?? 100, function ($exception) use (&$shouldRetry) {
             $result = $shouldRetry ?? ($this->retryWhenCallback ? call_user_func($this->retryWhenCallback, $exception, $this, $this->request?->toPsrRequest()->getMethod()) : true);
