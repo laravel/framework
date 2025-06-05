@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Foundation;
 
+use Dotenv\Repository\Adapter\ArrayAdapter;
 use Illuminate\Config\Repository;
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Foundation\Application;
@@ -269,6 +270,28 @@ class FoundationApplicationTest extends TestCase
         };
         $app->afterLoadingEnvironment($closure);
         $this->assertArrayHasKey(0, $app['events']->getListeners('bootstrapped: Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables'));
+    }
+
+    public function testExtendingEnvironmentWithCustomAdapter()
+    {
+        $adapter = ArrayAdapter::create()->get();
+
+        $adapter->write('FOO', 'BAR');
+
+        $app = Application::configure(
+            environments: [
+                fn () => $adapter,
+            ]
+        )->create();
+        $closure = function () {
+            //
+        };
+        $app->afterLoadingEnvironment($closure);
+        $app->useConfigPath(__DIR__.'/fixtures/config');
+        $app->bootstrapWith([\Illuminate\Foundation\Bootstrap\LoadConfiguration::class]);
+
+        $this->assertSame('BAR', $app->make('config')->get('app.bar'));
+        $this->assertNotSame('foo', $app->make('config')->get('app.bar'));
     }
 
     public function testBeforeBootstrappingAddsClosure()

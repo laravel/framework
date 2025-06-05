@@ -229,20 +229,37 @@ class Application extends Container implements ApplicationContract, CachesConfig
      * Begin configuring a new Laravel application instance.
      *
      * @param  string|null  $basePath
+     * @param  array  $environments
      * @return \Illuminate\Foundation\Configuration\ApplicationBuilder
      */
-    public static function configure(?string $basePath = null)
+    public static function configure(?string $basePath = null, array $environments = [])
     {
         $basePath = match (true) {
             is_string($basePath) => $basePath,
             default => static::inferBasePath(),
         };
 
+        static::extendEnvironment($environments);
+
         return (new Configuration\ApplicationBuilder(new static($basePath)))
             ->withKernels()
             ->withEvents()
             ->withCommands()
             ->withProviders();
+    }
+
+    /**
+     * Extend environment with custom adapters
+     *
+     * @param  array  $environments
+     * @return void
+     */
+    protected static function extendEnvironment(array $environments)
+    {
+        foreach ($environments as $name => $callback)
+        {
+            Env::extend($callback, is_string($name) ? $name : null);
+        }
     }
 
     /**
