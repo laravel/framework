@@ -960,60 +960,6 @@ class PendingRequest
     }
 
     /**
-     * Handle the given connection exception.
-     *
-     * @param  \GuzzleHttp\Exception\ConnectException  $e
-     * @return void
-     */
-    protected function marshalConnectionException(ConnectException $e)
-    {
-        $exception = new ConnectionException($e->getMessage(), 0, $e);
-
-        $this->factory?->recordRequestResponsePair(
-            $request = new Request($e->getRequest()), null
-        );
-
-        $this->dispatchConnectionFailedEvent($request, $exception);
-
-        throw $exception;
-    }
-
-    /**
-     * Handle the given request exception.
-     *
-     * @param  \GuzzleHttp\Exception\RequestException  $e
-     * @return void
-     */
-    protected function marshalRequestExceptionWithoutResponse(RequestException $e)
-    {
-        $exception = new ConnectionException($e->getMessage(), 0, $e);
-
-        $this->factory?->recordRequestResponsePair(
-            $request = new Request($e->getRequest()), null
-        );
-
-        $this->dispatchConnectionFailedEvent($request, $exception);
-
-        throw $exception;
-    }
-
-    /**
-     * Handle the given request exception.
-     *
-     * @param  \GuzzleHttp\Exception\RequestException  $e
-     * @return void
-     */
-    protected function marshalRequestExceptionWithResponse(RequestException $e)
-    {
-        $this->factory?->recordRequestResponsePair(
-            new Request($e->getRequest()),
-            $response = $this->populateResponse($this->newResponse($e->getResponse()))
-        );
-
-        throw $response->toException();
-    }
-
-    /**
      * Substitute the URL parameters in the given URL.
      *
      * @param  string  $url
@@ -1574,6 +1520,60 @@ class PendingRequest
         if ($dispatcher = $this->factory?->getDispatcher()) {
             $dispatcher->dispatch(new ConnectionFailed($request, $exception));
         }
+    }
+
+    /**
+     * Handle the given connection exception.
+     *
+     * @param  \GuzzleHttp\Exception\ConnectException  $e
+     * @return void
+     */
+    protected function marshalConnectionException(ConnectException $e)
+    {
+        $exception = new ConnectionException($e->getMessage(), 0, $e);
+
+        $this->factory?->recordRequestResponsePair(
+            $request = new Request($e->getRequest()), null
+        );
+
+        $this->dispatchConnectionFailedEvent($request, $exception);
+
+        throw $exception;
+    }
+
+    /**
+     * Handle the given request exception.
+     *
+     * @param  \GuzzleHttp\Exception\RequestException  $e
+     * @return void
+     */
+    protected function marshalRequestExceptionWithoutResponse(RequestException $e)
+    {
+        $exception = new ConnectionException($e->getMessage(), 0, $e);
+
+        $this->factory?->recordRequestResponsePair(
+            $request = new Request($e->getRequest()), null
+        );
+
+        $this->dispatchConnectionFailedEvent($request, $exception);
+
+        throw $exception;
+    }
+
+    /**
+     * Handle the given request exception.
+     *
+     * @param  \GuzzleHttp\Exception\RequestException  $e
+     * @return void
+     */
+    protected function marshalRequestExceptionWithResponse(RequestException $e)
+    {
+        $this->factory?->recordRequestResponsePair(
+            new Request($e->getRequest()),
+            $response = $this->populateResponse($this->newResponse($e->getResponse()))
+        );
+
+        throw $response->toException();
     }
 
     /**
