@@ -30,7 +30,7 @@ class NamespacedItemResolver
         // namespace, and is just a regular configuration item. Namespaces are a
         // tool for organizing configuration items for things such as modules.
         if (! str_contains($key, '::')) {
-            $segments = explode('.', $key);
+            $segments = explode('.', (string) $key);
 
             $parsed = $this->parseBasicSegments($segments);
         } else {
@@ -74,12 +74,12 @@ class NamespacedItemResolver
      */
     protected function parseNamespacedSegments($key)
     {
-        [$namespace, $item] = explode('::', $key);
+        [$namespace, $item] = explode('::', (string) $key);
 
         // First we'll just explode the first segment to get the namespace and group
         // since the item should be in the remaining segments. Once we have these
         // two pieces of data we can proceed with parsing out the item's value.
-        $itemSegments = explode('.', $item);
+        $itemSegments = explode('.', (string) $item);
 
         $groupAndItem = array_slice(
             $this->parseBasicSegments($itemSegments), 1
