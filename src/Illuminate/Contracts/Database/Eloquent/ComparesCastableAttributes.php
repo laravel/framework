@@ -2,16 +2,18 @@
 
 namespace Illuminate\Contracts\Database\Eloquent;
 
+use Illuminate\Database\Eloquent\Model;
+
 interface ComparesCastableAttributes
 {
     /**
-     * Compare two values for an attribute and check if they are equal.
+     * Determine if the given values are equal.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $model
      * @param  string  $key
-     * @param  mixed  $value1
-     * @param  mixed  $value2
+     * @param  mixed  $firstValue
+     * @param  mixed  $secondValue
      * @return bool
      */
-    public function compare($model, string $key, $value1, $value2);
+    public function compare(Model $model, string $key, mixed $firstValue, mixed $secondValue);
 }
