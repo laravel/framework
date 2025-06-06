@@ -16,6 +16,7 @@ use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Queue\Events\JobReleasedAfterException;
 use Illuminate\Queue\Events\JobTimedOut;
 use Illuminate\Queue\Events\Looping;
+use Illuminate\Queue\Events\WorkerStarting;
 use Illuminate\Queue\Events\WorkerStopping;
 use Illuminate\Support\Carbon;
 use Throwable;
@@ -138,6 +139,8 @@ class Worker
         $lastRestart = $this->getTimestampOfLastQueueRestart();
 
         [$startTime, $jobsProcessed] = [hrtime(true) / 1e9, 0];
+
+        $this->raiseWorkerStartingEvent($connectionName, $queue, $options);
 
         while (true) {
             // Before reserving any jobs, we will make sure this queue is not paused and
@@ -621,6 +624,19 @@ class Worker
         );
 
         return (int) ($backoff[$job->attempts() - 1] ?? last($backoff));
+    }
+
+    /**
+     * Raise the before job has been popped.
+     *
+     * @param  string  $connectionName
+     * @param  string  $queue
+     * @param  \Illuminate\Queue\WorkerOptions  $options
+     * @return void
+     */
+    protected function raiseWorkerStartingEvent($connectionName, $queue, $options)
+    {
+        $this->events->dispatch(new WorkerStarting($connectionName, $queue, $options));
     }
 
     /**
