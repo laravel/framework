@@ -991,6 +991,21 @@ trait HasAttributes
     }
 
     /**
+     * Compare two values for the given attribute using the custom cast class.
+     *
+     * @param  string  $key
+     * @param  mixed  $original
+     * @param  mixed  $value
+     * @return bool
+     */
+    protected function compareClassCastableAttribute($key, $original, $value)
+    {
+        return $this->resolveCasterClass($key)->compare(
+            $this, $key, $original, $value
+        );
+    }
+
+    /**
      * Determine if the cast type is a custom date time cast.
      *
      * @param  string  $cast
@@ -1801,6 +1816,19 @@ trait HasAttributes
     }
 
     /**
+     * Determine if the key is comparable using a custom class.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    protected function isClassComparable($key)
+    {
+        return ! $this->isEnumCastable($key) &&
+            $this->isClassCastable($key) &&
+            method_exists($this->resolveCasterClass($key), 'compare');
+    }
+
+    /**
      * Resolve the custom caster class for a given key.
      *
      * @param  string  $key
@@ -2265,6 +2293,8 @@ trait HasAttributes
             }
 
             return false;
+        } elseif ($this->isClassComparable($key)) {
+            return $this->compareClassCastableAttribute($key, $original, $attribute);
         }
 
         return is_numeric($attribute) && is_numeric($original)
