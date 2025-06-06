@@ -48,9 +48,11 @@ class Response implements ArrayAccess, Stringable
     public $transferStats;
 
     /**
+     * The length to which request exceptions should be truncated to.
+     *
      * @var int<1, max>|false|null
      */
-    protected $truncateAt = null;
+    protected $truncateExceptionsAt = null;
 
     /**
      * Create a new response instance.
@@ -295,31 +297,6 @@ class Response implements ArrayAccess, Stringable
     }
 
     /**
-     * When a RequestException is thrown, truncate to this length.
-     *
-     * @param  int<1, max>  $length
-     * @return $this
-     */
-    public function truncateAt(int $length)
-    {
-        $this->truncateAt = $length;
-
-        return $this;
-    }
-
-    /**
-     * Do not truncate a RequestException if thrown.
-     *
-     * @return $this
-     */
-    public function dontTruncate()
-    {
-        $this->truncateAt = false;
-
-        return $this;
-    }
-
-    /**
      * Create an exception if a server or client error occurred.
      *
      * @return \Illuminate\Http\Client\RequestException|null
@@ -328,9 +305,12 @@ class Response implements ArrayAccess, Stringable
     {
         if ($this->failed()) {
             $originalTruncateAt = RequestException::$truncateAt;
+
             try {
-                if ($this->truncateAt !== null) {
-                    $this->truncateAt === false ? RequestException::dontTruncate() : RequestException::truncateAt($this->truncateAt);
+                if ($this->truncateExceptionsAt !== null) {
+                    $this->truncateExceptionsAt === false
+                        ? RequestException::dontTruncate()
+                        : RequestException::truncateAt($this->truncateExceptionsAt);
                 }
 
                 return new RequestException($this);
@@ -432,6 +412,31 @@ class Response implements ArrayAccess, Stringable
     public function throwIfServerError()
     {
         return $this->serverError() ? $this->throw() : $this;
+    }
+
+    /**
+     * When a RequestException is thrown, truncate it to this length.
+     *
+     * @param  int<1, max>  $length
+     * @return $this
+     */
+    public function truncateExceptionsAt(int $length)
+    {
+        $this->truncateExceptionsAt = $length;
+
+        return $this;
+    }
+
+    /**
+     * Do not truncate a RequestException if thrown.
+     *
+     * @return $this
+     */
+    public function dontTruncateExceptions()
+    {
+        $this->truncateExceptionsAt = false;
+
+        return $this;
     }
 
     /**

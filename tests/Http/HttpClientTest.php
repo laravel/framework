@@ -1314,7 +1314,7 @@ class HttpClientTest extends TestCase
 
         $exception = null;
         try {
-            $this->factory->throw()->truncateAt(3)->get('http://foo.com/json');
+            $this->factory->throw()->truncateExceptionsAt(3)->get('http://foo.com/json');
         } catch (RequestException $e) {
             $exception = $e;
         }
@@ -1333,8 +1333,9 @@ class HttpClientTest extends TestCase
         ]);
 
         $exception = null;
+
         try {
-            $this->factory->throw()->dontTruncate()->get('http://foo.com/json');
+            $this->factory->throw()->dontTruncateExceptions()->get('http://foo.com/json');
         } catch (RequestException $e) {
             $exception = $e;
         }
@@ -1354,7 +1355,7 @@ class HttpClientTest extends TestCase
 
         $exception = null;
         try {
-            $this->factory->throw()->truncateAt(3)->get('http://foo.com/json');
+            $this->factory->throw()->truncateExceptionsAt(3)->get('http://foo.com/json');
         } catch (RequestException $e) {
             $exception = $e;
         }
@@ -1371,7 +1372,7 @@ class HttpClientTest extends TestCase
             '*' => $this->factory->response(['error'], 403),
         ]);
 
-        $exception = $this->factory->async()->throw()->truncateAt(4)->get('http://foo.com/json')->wait();
+        $exception = $this->factory->async()->throw()->truncateExceptionsAt(4)->get('http://foo.com/json')->wait();
 
         $this->assertInstanceOf(RequestException::class, $exception);
         $this->assertEquals("HTTP request returned status code 403:\n[\"er (truncated...)\n", $exception->getMessage());

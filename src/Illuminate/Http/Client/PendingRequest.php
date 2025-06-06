@@ -215,9 +215,11 @@ class PendingRequest
     ];
 
     /**
+     * The length to which request exceptions should be truncated to.
+     *
      * @var int<1, max>|false|null
      */
-    protected $truncateAt = null;
+    protected $truncateExceptionsAt = null;
 
     /**
      * Create a new HTTP Client instance.
@@ -1430,10 +1432,13 @@ class PendingRequest
     protected function newResponse($response)
     {
         return tap(new Response($response), function (Response $laravelResponse) {
-            if ($this->truncateAt === null) {
+            if ($this->truncateExceptionsAt === null) {
                 return;
             }
-            $this->truncateAt === false ? $laravelResponse->dontTruncate() : $laravelResponse->truncateAt($this->truncateAt);
+
+            $this->truncateExceptionsAt === false
+                ? $laravelResponse->dontTruncateExceptions()
+                : $laravelResponse->truncateExceptionsAt($this->truncateExceptionsAt);
         });
     }
 
@@ -1528,6 +1533,31 @@ class PendingRequest
     }
 
     /**
+     * When a RequestException is thrown, truncate it to this length.
+     *
+     * @param  int<1, max>  $length
+     * @return $this
+     */
+    public function truncateExceptionsAt(int $length)
+    {
+        $this->truncateExceptionsAt = $length;
+
+        return $this;
+    }
+
+    /**
+     * Do not truncate a RequestException if thrown.
+     *
+     * @return $this
+     */
+    public function dontTruncateExceptions()
+    {
+        $this->truncateExceptionsAt = false;
+
+        return $this;
+    }
+
+    /**
      * Set the client instance.
      *
      * @param  \GuzzleHttp\Client  $client
@@ -1561,30 +1591,5 @@ class PendingRequest
     public function getOptions()
     {
         return $this->options;
-    }
-
-    /**
-     * When a RequestException is thrown, truncate to this length.
-     *
-     * @param  int<1, max>  $length
-     * @return $this
-     */
-    public function truncateAt(int $length)
-    {
-        $this->truncateAt = $length;
-
-        return $this;
-    }
-
-    /**
-     * Do not truncate a RequestException if thrown.
-     *
-     * @return $this
-     */
-    public function dontTruncate()
-    {
-        $this->truncateAt = false;
-
-        return $this;
     }
 }
