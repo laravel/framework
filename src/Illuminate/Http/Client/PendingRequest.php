@@ -215,6 +215,13 @@ class PendingRequest
     ];
 
     /**
+     * The length at which request exceptions will be truncated.
+     *
+     * @var int<1, max>|false|null
+     */
+    protected $truncateExceptionsAt = null;
+
+    /**
      * Create a new HTTP Client instance.
      *
      * @param  \Illuminate\Http\Client\Factory|null  $factory
@@ -1429,7 +1436,15 @@ class PendingRequest
      */
     protected function newResponse($response)
     {
-        return new Response($response);
+        return tap(new Response($response), function (Response $laravelResponse) {
+            if ($this->truncateExceptionsAt === null) {
+                return;
+            }
+
+            $this->truncateExceptionsAt === false
+                ? $laravelResponse->dontTruncateExceptions()
+                : $laravelResponse->truncateExceptionsAt($this->truncateExceptionsAt);
+        });
     }
 
     /**
@@ -1522,6 +1537,31 @@ class PendingRequest
         }
     }
 
+    /**
+     * Indicate that request exceptions should be truncated to the given length.
+     *
+     * @param  int<1, max>  $length
+     * @return $this
+     */
+    public function truncateExceptionsAt(int $length)
+    {
+        $this->truncateExceptionsAt = $length;
+
+        return $this;
+    }
+
+    /**
+     * Indicate that request exceptions should not be truncated.
+     *
+     * @return $this
+     */
+    public function dontTruncateExceptions()
+    {
+        $this->truncateExceptionsAt = false;
+
+        return $this;
+    }
+  
     /**
      * Handle the given connection exception.
      *
