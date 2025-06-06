@@ -415,7 +415,7 @@ class Response implements ArrayAccess, Stringable
     }
 
     /**
-     * When a RequestException is thrown, truncate it to this length.
+     * Indicate that request exceptions should be truncated to the given length.
      *
      * @param  int<1, max>  $length
      * @return $this
@@ -428,7 +428,7 @@ class Response implements ArrayAccess, Stringable
     }
 
     /**
-     * Do not truncate a RequestException if thrown.
+     * Indicate that request exceptions should not be truncated.
      *
      * @return $this
      */
