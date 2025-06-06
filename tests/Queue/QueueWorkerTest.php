@@ -390,6 +390,7 @@ class QueueWorkerTest extends TestCase
     public function testWorkerStartingIsDispatched()
     {
         $workerOptions = new WorkerOptions();
+        $workerOptions->stopWhenEmpty = true;
 
         $worker = $this->getWorker('default', ['queue' => [
             $firstJob = new WorkerFakeJob(),
