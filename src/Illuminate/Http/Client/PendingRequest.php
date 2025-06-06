@@ -1561,7 +1561,7 @@ class PendingRequest
 
         return $this;
     }
-  
+
     /**
      * Handle the given connection exception.
      *
