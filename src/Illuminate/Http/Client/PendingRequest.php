@@ -1533,7 +1533,7 @@ class PendingRequest
     }
 
     /**
-     * When a RequestException is thrown, truncate it to this length.
+     * Indicate that request exceptions should be truncated to the given length.
      *
      * @param  int<1, max>  $length
      * @return $this
@@ -1546,7 +1546,7 @@ class PendingRequest
     }
 
     /**
-     * Do not truncate a RequestException if thrown.
+     * Indicate that request exceptions should not be truncated.
      *
      * @return $this
      */
