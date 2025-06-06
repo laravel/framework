@@ -40,5 +40,7 @@ class NotificationServiceProvider extends ServiceProvider
         $this->app->alias(
             ChannelManager::class, FactoryContract::class
         );
+
+        $this->app->bind(SendQueuedNotifications::class, SendQueuedNotifications::class);
     }
 }
