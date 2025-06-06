@@ -14,7 +14,7 @@ class Contains implements Stringable
      *
      * @var array
      */
-    protected $values;
+    protected $values = [];
 
     /**
      * Create a new contains rule instance.
@@ -38,12 +38,11 @@ class Contains implements Stringable
      */
     public function __toString()
     {
-        $values = array_map(function ($value) {
-            $value = enum_value($value);
-
-            return '"'.str_replace('"', '""', $value).'"';
+        $escapedValues = array_map(function ($value) {
+            $value = enum_value($value) ?? $value;
+            return '"'.str_replace('"', '""', (string) $value).'"';
         }, $this->values);
 
-        return 'contains:'.implode(',', $values);
+        return 'contains:'.implode(',', $escapedValues);
     }
 }
