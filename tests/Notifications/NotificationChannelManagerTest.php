@@ -15,6 +15,8 @@ use Illuminate\Notifications\Events\NotificationSent;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\SendQueuedNotifications;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -159,6 +161,26 @@ class NotificationChannelManagerTest extends TestCase
 
         $manager->send([new NotificationChannelManagerTestNotifiable], new NotificationChannelManagerTestQueuedNotification);
     }
+
+    public function testSendQueuedNotificationsCanBeOverrideViaContainer()
+    {
+        $container = new Container;
+        $container->instance('config', ['app.name' => 'Name', 'app.logo' => 'Logo']);
+        $container->instance(Dispatcher::class, $events = m::mock());
+        $container->instance(Bus::class, $bus = m::mock());
+        $bus->shouldReceive('dispatch')->with(m::type(TestSendQueuedNotifications::class));
+        $container->bind(SendQueuedNotifications::class, TestSendQueuedNotifications::class);
+        Container::setInstance($container);
+        $manager = m::mock(ChannelManager::class.'[driver]', [$container]);
+        $events->shouldReceive('listen')->once();
+
+        $manager->send([new NotificationChannelManagerTestNotifiable], new NotificationChannelManagerTestQueuedNotification);
+    }
+}
+
+class TestSendQueuedNotifications implements ShouldQueue
+{
+    use InteractsWithQueue, Queueable, SerializesModels;
 }
 
 class NotificationChannelManagerTestNotifiable
