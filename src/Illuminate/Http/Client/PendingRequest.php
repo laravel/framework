@@ -215,7 +215,7 @@ class PendingRequest
     ];
 
     /**
-     * The length to which request exceptions should be truncated to.
+     * The length at which request exceptions will be truncated.
      *
      * @var int<1, max>|false|null
      */
