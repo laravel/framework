@@ -627,7 +627,7 @@ class Worker
     }
 
     /**
-     * Raise the before job has been popped.
+     * Raise an event indicating the worker is starting.
      *
      * @param  string  $connectionName
      * @param  string  $queue
@@ -640,7 +640,7 @@ class Worker
     }
 
     /**
-     * Raise the before job has been popped.
+     * Raise an event indicating a job is being popped from the queue.
      *
      * @param  string  $connectionName
      * @return void
@@ -651,7 +651,7 @@ class Worker
     }
 
     /**
-     * Raise the after job has been popped.
+     * Raise an event indicating a job has been popped from the queue.
      *
      * @param  string  $connectionName
      * @param  \Illuminate\Contracts\Queue\Job|null  $job
@@ -665,7 +665,7 @@ class Worker
     }
 
     /**
-     * Raise the before queue job event.
+     * Raise an event indicating a job is being processed.
      *
      * @param  string  $connectionName
      * @param  \Illuminate\Contracts\Queue\Job  $job
@@ -679,7 +679,7 @@ class Worker
     }
 
     /**
-     * Raise the after queue job event.
+     * Raise an event indicating a job has been processed.
      *
      * @param  string  $connectionName
      * @param  \Illuminate\Contracts\Queue\Job  $job
