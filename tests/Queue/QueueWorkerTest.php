@@ -396,7 +396,7 @@ class QueueWorkerTest extends TestCase
             $secondJob = new WorkerFakeJob(),
         ]]);
 
-        $status = $worker->daemon('default', 'queue', $workerOptions);
+        $worker->daemon('default', 'queue', $workerOptions);
 
         $this->assertTrue($firstJob->fired);
         $this->assertTrue($secondJob->fired);
