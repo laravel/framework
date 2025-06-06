@@ -28,6 +28,7 @@ use Illuminate\Database\Eloquent\Casts\AsEnumArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsEnumCollection;
 use Illuminate\Database\Eloquent\Casts\AsHtmlString;
 use Illuminate\Database\Eloquent\Casts\AsStringable;
+use Illuminate\Database\Eloquent\Casts\AsUri;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
@@ -49,6 +50,7 @@ use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Stringable;
+use Illuminate\Support\Uri;
 use InvalidArgumentException;
 use LogicException;
 use Mockery as m;
@@ -282,6 +284,24 @@ class DatabaseEloquentModelTest extends TestCase
 
         $model->asHtmlStringAttribute = new Stringable('<div>foo baz</div>');
         $this->assertTrue($model->isDirty('asHtmlStringAttribute'));
+    }
+
+    public function testDirtyOnCastedUri()
+    {
+        $model = new EloquentModelCastingStub;
+        $model->setRawAttributes([
+            'asUriAttribute' => 'https://www.example.com:1234?query=param&another=value',
+        ]);
+        $model->syncOriginal();
+
+        $this->assertInstanceOf(Uri::class, $model->asUriAttribute);
+        $this->assertFalse($model->isDirty('asUriAttribute'));
+
+        $model->asUriAttribute = new Uri('https://www.example.com:1234?query=param&another=value');
+        $this->assertFalse($model->isDirty('asUriAttribute'));
+
+        $model->asUriAttribute = new Uri('https://www.updated.com:1234?query=param&another=value');
+        $this->assertTrue($model->isDirty('asUriAttribute'));
     }
 
     // public function testDirtyOnCastedEncryptedCollection()
@@ -3733,6 +3753,7 @@ class EloquentModelCastingStub extends Model
             'asarrayobjectAttribute' => AsArrayObject::class,
             'asStringableAttribute' => AsStringable::class,
             'asHtmlStringAttribute' => AsHtmlString::class,
+            'asUriAttribute' => AsUri::class,
             'asCustomCollectionAttribute' => AsCollection::using(CustomCollection::class),
             'asEncryptedArrayObjectAttribute' => AsEncryptedArrayObject::class,
             'asEncryptedCustomCollectionAttribute' => AsEncryptedCollection::using(CustomCollection::class),

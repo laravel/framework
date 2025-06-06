@@ -1,6 +1,24 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.16.0...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.17.0...12.x)
+
+## [v12.17.0](https://github.com/laravel/framework/compare/v12.16.0...v12.17.0) - 2025-06-03
+
+* [11.x] Backport `TestResponse::assertRedirectBack` by [@GrahamCampbell](https://github.com/GrahamCampbell) in https://github.com/laravel/framework/pull/55780
+* Add support for sending raw (non-encoded) attachments in Resend mail by [@Roywcm](https://github.com/Roywcm) in https://github.com/laravel/framework/pull/55837
+* [12.x] chore: return Collection from timestamps methods by [@calebdw](https://github.com/calebdw) in https://github.com/laravel/framework/pull/55871
+* [12.x] fix: fully qualify collection return type by [@calebdw](https://github.com/calebdw) in https://github.com/laravel/framework/pull/55873
+* [12.x] Fix Blade nested default component resolution for custom namespaces by [@daniser](https://github.com/daniser) in https://github.com/laravel/framework/pull/55874
+* [12.x] Fix return types in console command handlers to void by [@michaelnabil230](https://github.com/michaelnabil230) in https://github.com/laravel/framework/pull/55876
+* [12.x] Ability to perform higher order static calls on collection items by [@daniser](https://github.com/daniser) in https://github.com/laravel/framework/pull/55880
+* Adds Resource helpers to cursor paginator by [@jsandfordhughescoop](https://github.com/jsandfordhughescoop) in https://github.com/laravel/framework/pull/55879
+* Add reorderDesc() to Query Builder by [@ghabriel25](https://github.com/ghabriel25) in https://github.com/laravel/framework/pull/55885
+* [11.x] Fixes Symfony Console 7.3 deprecations on closure command by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/55888
+* [12.x] Add `AsUri` model cast by [@ash-jc-allen](https://github.com/ash-jc-allen) in https://github.com/laravel/framework/pull/55909
+* [12.x] feat: Add Contextual Implementation/Interface Binding via PHP8 Attribute by [@yitzwillroth](https://github.com/yitzwillroth) in https://github.com/laravel/framework/pull/55904
+* [12.x] Add tests for the `AuthenticateSession` Middleware by [@imanghafoori1](https://github.com/imanghafoori1) in https://github.com/laravel/framework/pull/55900
+* [12.x] Allow brick/math ^0.13 by [@jnoordsij](https://github.com/jnoordsij) in https://github.com/laravel/framework/pull/54964
+* [12.x] fix: Factory::state and ::prependState generics by [@calebdw](https://github.com/calebdw) in https://github.com/laravel/framework/pull/55915
 
 ## [v12.16.0](https://github.com/laravel/framework/compare/v12.15.0...v12.16.0) - 2025-05-27
 

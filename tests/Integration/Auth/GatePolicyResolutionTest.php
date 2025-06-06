@@ -3,6 +3,8 @@
 namespace Illuminate\Tests\Integration\Auth;
 
 use Illuminate\Auth\Access\Events\GateEvaluated;
+use Illuminate\Database\Eloquent\Attributes\UsePolicy;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Tests\Integration\Auth\Fixtures\AuthenticationTestUser;
@@ -78,4 +80,20 @@ class GatePolicyResolutionTest extends TestCase
             Gate::getPolicyFor(AuthenticationTestUser::class)
         );
     }
+
+    public function testPolicyCanBeGivenByAttribute(): void
+    {
+        Gate::guessPolicyNamesUsing(fn () => [AuthenticationTestUserPolicy::class]);
+
+        $this->assertInstanceOf(PostPolicy::class, Gate::getPolicyFor(Post::class));
+    }
+}
+
+#[UsePolicy(PostPolicy::class)]
+class Post extends Model
+{
+}
+
+class PostPolicy
+{
 }

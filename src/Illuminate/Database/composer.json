@@ -17,7 +17,7 @@
     "require": {
         "php": "^8.2",
         "ext-pdo": "*",
-        "brick/math": "^0.11|^0.12",
+        "brick/math": "^0.11|^0.12|^0.13",
         "illuminate/collections": "^12.0",
         "illuminate/container": "^12.0",
         "illuminate/contracts": "^12.0",
