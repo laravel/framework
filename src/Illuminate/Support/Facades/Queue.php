@@ -11,6 +11,7 @@ use Illuminate\Support\Testing\Fakes\QueueFake;
  * @method static void exceptionOccurred(mixed $callback)
  * @method static void looping(mixed $callback)
  * @method static void failing(mixed $callback)
+ * @method static void starting(mixed $callback)
  * @method static void stopping(mixed $callback)
  * @method static bool connected(string|null $name = null)
  * @method static \Illuminate\Contracts\Queue\Queue connection(string|null $name = null)
