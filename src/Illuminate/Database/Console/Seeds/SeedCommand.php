@@ -85,49 +85,48 @@ class SeedCommand extends Command
      */
     protected function getSeeder()
     {
-        $classes = $this->input->getArgument('classes') ?? $this->input->getOption('classes');
+        $input = $this->input->getArgument('class') ?? $this->input->getOption('class');
 
-        $response = [];
-        foreach (explode(',', $classes) as $class) {
-            $class = trim($class);
-            if (! str_contains($class, '\\')) {
-                $class = 'Database\\Seeders\\'.$class;
-            }
+        $seederClasses = array_filter(array_map('trim', explode(',', $input)));
 
-            if ($class === 'Database\\Seeders\\DatabaseSeeder' &&
-                ! class_exists($class)) {
-                $class = 'DatabaseSeeder';
-            }
-
-            if (! class_exists($class)) {
-                $this->components->error("Seeder class [{$class}] does not exist.");
-                continue;
-            }
-            if (! is_subclass_of($class, 'Illuminate\Database\Seeder')) {
-                $this->components->error("Seeder class [{$class}] must extend Illuminate\\Database\\Seeder.");
-                continue;
-            }
-            if (! method_exists($class, 'run')) {
-                $this->components->error("Seeder class [{$class}] must define a run method.");
-                continue;
-            }
-            $this->components->info("Seeding: {$class}");
-
-            $response[] = $this->laravel->make($class)
-                ->setContainer($this->laravel)
-                ->setCommand($this);
+        if (count($seederClasses) === 1) {
+            return $this->resolveSeeder($seederClasses[0]);
         }
 
-        if (count($response) === 1) {
-            return $response[0];
-        }
-        return function () use ($response) {
-            foreach ($response as $seeder) {
-                $seeder->__invoke();
+        return function () use ($seederClasses) {
+            foreach ($seederClasses as $class) {
+                $this->resolveSeeder($class)->__invoke();
             }
         };
     }
 
+    protected function resolveSeeder(string $class): \Illuminate\Database\Seeder
+    {
+        if (! str_contains($class, '\\')) {
+            $class = 'Database\\Seeders\\' . $class;
+        }
+
+        if (! class_exists($class)) {
+            $this->components->error("Seeder class [{$class}] does not exist.");
+            exit(1);
+        }
+
+        if (! is_subclass_of($class, 'Illuminate\Database\Seeder')) {
+            $this->components->error("Seeder class [{$class}] must extend Illuminate\\Database\\Seeder.");
+            exit(1);
+        }
+
+        if (! method_exists($class, 'run')) {
+            $this->components->error("Seeder class [{$class}] must define a run method.");
+            exit(1);
+        }
+
+        $this->components->info("Seeding: {$class}");
+
+        return $this->laravel->make($class)
+            ->setContainer($this->laravel)
+            ->setCommand($this);
+    }
     /**
      * Get the name of the database connection to use.
      *
@@ -148,7 +147,7 @@ class SeedCommand extends Command
     protected function getArguments()
     {
         return [
-            ['classes', InputArgument::OPTIONAL, 'The class name of the root seeder. (Use Comma seperator for multiple classes)', null],
+            ['class', InputArgument::OPTIONAL, 'The class name(s) of the root seeder (comma-separated for multiple)', 'Database\\Seeders\\DatabaseSeeder'],
         ];
     }
 
@@ -160,7 +159,7 @@ class SeedCommand extends Command
     protected function getOptions()
     {
         return [
-            ['classes', null, InputOption::VALUE_OPTIONAL, 'The class name of the root seeder. (Use Comma seperator for multiple classes)', 'Database\\Seeders\\DatabaseSeeder'],
+            ['class', null, InputOption::VALUE_OPTIONAL, 'The class name(s) of the root seeder (comma-separated for multiple)', 'Database\\Seeders\\DatabaseSeeder'],
             ['database', null, InputOption::VALUE_OPTIONAL, 'The database connection to seed'],
             ['force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production'],
         ];
