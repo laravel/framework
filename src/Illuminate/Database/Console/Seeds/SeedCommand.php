@@ -81,26 +81,52 @@ class SeedCommand extends Command
     /**
      * Get a seeder instance from the container.
      *
-     * @return \Illuminate\Database\Seeder
+     * @return \Illuminate\Database\Seeder |callable
      */
     protected function getSeeder()
     {
-        $class = $this->input->getArgument('class') ?? $this->input->getOption('class');
+        $input = $this->input->getArgument('class') ?? $this->input->getOption('class');
 
+        $seederClasses = array_filter(array_map('trim', explode(',', $input)));
+
+        if (count($seederClasses) === 1) {
+            return $this->resolveSeeder($seederClasses[0]);
+        }
+
+        return function () use ($seederClasses) {
+            foreach ($seederClasses as $class) {
+                $this->resolveSeeder($class)->__invoke();
+            }
+        };
+    }
+
+    protected function resolveSeeder(string $class): \Illuminate\Database\Seeder
+    {
         if (! str_contains($class, '\\')) {
-            $class = 'Database\\Seeders\\'.$class;
+            $class = 'Database\\Seeders\\' . $class;
         }
 
-        if ($class === 'Database\\Seeders\\DatabaseSeeder' &&
-            ! class_exists($class)) {
-            $class = 'DatabaseSeeder';
+        if (! class_exists($class)) {
+            $this->components->error("Seeder class [{$class}] does not exist.");
+            exit(1);
         }
+
+        if (! is_subclass_of($class, 'Illuminate\Database\Seeder')) {
+            $this->components->error("Seeder class [{$class}] must extend Illuminate\\Database\\Seeder.");
+            exit(1);
+        }
+
+        if (! method_exists($class, 'run')) {
+            $this->components->error("Seeder class [{$class}] must define a run method.");
+            exit(1);
+        }
+
+        $this->components->info("Seeding: {$class}");
 
         return $this->laravel->make($class)
             ->setContainer($this->laravel)
             ->setCommand($this);
     }
-
     /**
      * Get the name of the database connection to use.
      *
@@ -121,7 +147,7 @@ class SeedCommand extends Command
     protected function getArguments()
     {
         return [
-            ['class', InputArgument::OPTIONAL, 'The class name of the root seeder', null],
+            ['class', InputArgument::OPTIONAL, 'The class name(s) of the root seeder (comma-separated for multiple)', 'Database\\Seeders\\DatabaseSeeder'],
         ];
     }
 
@@ -133,7 +159,7 @@ class SeedCommand extends Command
     protected function getOptions()
     {
         return [
-            ['class', null, InputOption::VALUE_OPTIONAL, 'The class name of the root seeder', 'Database\\Seeders\\DatabaseSeeder'],
+            ['class', null, InputOption::VALUE_OPTIONAL, 'The class name(s) of the root seeder (comma-separated for multiple)', 'Database\\Seeders\\DatabaseSeeder'],
             ['database', null, InputOption::VALUE_OPTIONAL, 'The database connection to seed'],
             ['force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production'],
         ];
