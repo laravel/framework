@@ -696,6 +696,7 @@ class Vite implements Htmlable
             'href' => $url,
             'nonce' => $this->nonce ?? false,
             'crossorigin' => $this->resolveScriptTagAttributes($src, $url, $chunk, $manifest)['crossorigin'] ?? false,
+            'as' => 'script',
         ];
 
         $attributes = $this->integrityKey !== false
