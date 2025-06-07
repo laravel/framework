@@ -19,6 +19,13 @@ class EloquentCursorPaginateTest extends DatabaseTestCase
             $table->timestamps();
         });
 
+        Schema::create('test_post_with_global_scopes', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('title')->nullable();
+            $table->unsignedInteger('user_id')->nullable();
+            $table->timestamps();
+        });
+
         Schema::create('test_users', function ($table) {
             $table->increments('id');
             $table->string('name')->nullable();
@@ -52,6 +59,50 @@ class EloquentCursorPaginateTest extends DatabaseTestCase
             ->cursorPaginate(1);
 
         $this->assertSame(['user_id'], $result->getOptions()['parameters']);
+    }
+
+    public function testPaginationWithUnionAndGlobalScopes()
+    {
+        TestPostWithGlobalScope::create(['title' => 'Hello world', 'user_id' => 1]);
+        TestPostWithGlobalScope::create(['title' => 'Goodbye world', 'user_id' => 2]);
+        TestPostWithGlobalScope::create(['title' => 'Howdy', 'user_id' => 3]);
+        TestPostWithGlobalScope::create(['title' => '4th', 'user_id' => 4]);
+
+        $table1 = TestPostWithGlobalScope::select('id')->whereIn('user_id', [1, 2]);
+        $table2 = TestPostWithGlobalScope::select('id')->whereIn('user_id', [3, 4]);
+
+        $columns = ['id'];
+        $cursorName = 'cursor-name';
+        $cursor = new Cursor(['id' => 1]);
+
+        $result = $table1
+            ->union($table2)
+            ->orderBy('id', 'asc')
+            ->cursorPaginate(1, $columns, $cursorName, $cursor);
+
+        $this->assertSame(['id'], $result->getOptions()['parameters']);
+    }
+
+    public function testPaginationWithUnionAndGlobalScopesToBase()
+    {
+        TestPostWithGlobalScope::create(['title' => 'Hello world', 'user_id' => 1]);
+        TestPostWithGlobalScope::create(['title' => 'Goodbye world', 'user_id' => 2]);
+        TestPostWithGlobalScope::create(['title' => 'Howdy', 'user_id' => 3]);
+        TestPostWithGlobalScope::create(['title' => '4th', 'user_id' => 4]);
+
+        $table1 = TestPostWithGlobalScope::select('id')->whereIn('user_id', [1, 2]);
+        $table2 = TestPostWithGlobalScope::select('id')->whereIn('user_id', [3, 4]);
+
+        $columns = ['id'];
+        $cursorName = 'cursor-name';
+        $cursor = new Cursor(['id' => 1]);
+
+        $result = $table1
+            ->union($table2->toBase())
+            ->orderBy('id', 'asc')
+            ->cursorPaginate(1, $columns, $cursorName, $cursor);
+
+        $this->assertSame(['id'], $result->getOptions()['parameters']);
     }
 
     public function testPaginationWithDistinct()
@@ -282,6 +333,20 @@ class EloquentCursorPaginateTest extends DatabaseTestCase
 class TestPost extends Model
 {
     protected $guarded = [];
+}
+
+class TestPostWithGlobalScope extends Model
+{
+    protected $guarded = [];
+
+    public static function boot()
+    {
+        parent::boot();
+
+        static::addGlobalScope('global', function ($builder) {
+            $builder->where('id', '>', 0);
+        });
+    }
 }
 
 class TestUser extends Model
