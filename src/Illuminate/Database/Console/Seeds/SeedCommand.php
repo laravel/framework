@@ -81,24 +81,37 @@ class SeedCommand extends Command
     /**
      * Get a seeder instance from the container.
      *
-     * @return \Illuminate\Database\Seeder
+     * @return \Illuminate\Database\Seeder |callable
      */
     protected function getSeeder()
     {
-        $class = $this->input->getArgument('class') ?? $this->input->getOption('class');
+        $classes = $this->input->getArgument('classes') ?? $this->input->getOption('classes');
 
-        if (! str_contains($class, '\\')) {
-            $class = 'Database\\Seeders\\'.$class;
+        $response = [];
+        foreach (explode(',', $classes) as $class) {
+            $class = trim($class);
+            if (! str_contains($class, '\\')) {
+                $class = 'Database\\Seeders\\'.$class;
+            }
+
+            if ($class === 'Database\\Seeders\\DatabaseSeeder' &&
+                ! class_exists($class)) {
+                $class = 'DatabaseSeeder';
+            }
+
+            $response[] = $this->laravel->make($class)
+                ->setContainer($this->laravel)
+                ->setCommand($this);
         }
 
-        if ($class === 'Database\\Seeders\\DatabaseSeeder' &&
-            ! class_exists($class)) {
-            $class = 'DatabaseSeeder';
+        if (count($response) === 1) {
+            return $response[0];
         }
-
-        return $this->laravel->make($class)
-            ->setContainer($this->laravel)
-            ->setCommand($this);
+        return function () use ($response) {
+            foreach ($response as $seeder) {
+                $seeder->__invoke();
+            }
+        };
     }
 
     /**
@@ -121,7 +134,7 @@ class SeedCommand extends Command
     protected function getArguments()
     {
         return [
-            ['class', InputArgument::OPTIONAL, 'The class name of the root seeder', null],
+            ['classes', InputArgument::OPTIONAL, 'The class name of the root seeder. (Use Comma seperator for multiple classes)', null],
         ];
     }
 
@@ -133,7 +146,7 @@ class SeedCommand extends Command
     protected function getOptions()
     {
         return [
-            ['class', null, InputOption::VALUE_OPTIONAL, 'The class name of the root seeder', 'Database\\Seeders\\DatabaseSeeder'],
+            ['classes', null, InputOption::VALUE_OPTIONAL, 'The class name of the root seeder. (Use Comma seperator for multiple classes)', 'Database\\Seeders\\DatabaseSeeder'],
             ['database', null, InputOption::VALUE_OPTIONAL, 'The database connection to seed'],
             ['force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production'],
         ];
