@@ -5,10 +5,14 @@ namespace Illuminate\Tests\Integration\Queue;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Queue\Attributes\EagerLoad;
 use Illuminate\Queue\Attributes\WithoutRelations;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\DB;
 use LogicException;
 use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\TestCase;
@@ -398,6 +402,109 @@ class ModelSerializationTest extends TestCase
 
         $this->assertTrue(true);
     }
+
+    public function test_it_can_eagerly_load_relationships_on_models()
+    {
+        $user = User::create([
+            'email' => 'taylor@laravel.com',
+        ]);
+
+        $serialize = serialize(new ModelSerializationEagerLoadRoles($user));
+
+        $queries = [];
+        DB::listen(function (QueryExecuted $query) use (&$queries) {
+            $queries[] = $query;
+        });
+
+        $unserialized = unserialize($serialize);
+
+        $this->assertFalse($user->relationLoaded('roles'));
+        $this->assertTrue($unserialized->value->relationLoaded('roles'));
+        $this->assertCount(2, $queries);
+    }
+
+    public function test_it_can_eagerly_load_relationships_on_collections()
+    {
+        $users = new Collection([
+            User::create(['email' => 'taylor@laravel.com']),
+            User::create(['email' => 'tim@laravel.com']),
+        ]);
+
+        $serialize = serialize(new ModelSerializationEagerLoadRoles($users));
+
+        $queries = [];
+        DB::listen(function (QueryExecuted $query) use (&$queries) {
+            $queries[] = $query;
+        });
+
+        $unserialized = unserialize($serialize);
+
+        $this->assertTrue($unserialized->value->every->relationLoaded('roles'));
+        $this->assertFalse($users->some->relationLoaded('roles'));
+        $this->assertCount(2, $queries);
+    }
+
+    public function test_it_eager_loads_already_loaded_relationships()
+    {
+        $user = User::create([
+            'email' => 'taylor@laravel.com',
+        ]);
+        $user->roles()->create();
+        $user->load('roles');
+
+        $serialized = serialize(new ModelSerializationEagerLoadRoles($user));
+
+        // create a role while the value is serialized...
+        $user->roles()->create();
+
+        $queries = [];
+        DB::listen(function (QueryExecuted $query) use (&$queries) {
+            $queries[] = $query;
+        });
+        $unserialized = unserialize($serialized);
+
+        $this->assertTrue($unserialized->value->relationLoaded('roles'));
+        $this->assertTrue($user->relationLoaded('roles'));
+        $this->assertCount(2, $unserialized->value->roles);
+        $this->assertCount(1, $user->roles);
+        $this->assertCount(3, $queries);
+    }
+
+    public function test_it_can_mix_without_relations_and_eager_load()
+    {
+        $order = Order::create()->load('products');
+
+        $serialize = serialize(new ModelSerializationWithoutRelationsAndEagerLoadLines($order));
+
+        $queries = [];
+        DB::listen(function (QueryExecuted $query) use (&$queries) {
+            $queries[] = $query;
+        });
+
+        $unserialized = unserialize($serialize);
+
+        $this->assertTrue($unserialized->value->relationLoaded('lines'));
+        $this->assertTrue(! $unserialized->value->relationLoaded('products'));
+        $this->assertCount(2, $queries);
+    }
+
+    public function test_it_initilize_on_the_queue()
+    {
+        $order = Order::create();
+
+        $serialized = serialize(new ModelSerializationWithInitilizeOnQueueHook($order));
+
+        $queries = [];
+        DB::listen(function (QueryExecuted $query) use (&$queries) {
+            $queries[] = $query;
+        });
+
+        $unserialized = unserialize($serialized);
+
+        $this->assertTrue($unserialized->value->relationLoaded('lines'));
+        $this->assertTrue(! $unserialized->value->relationLoaded('products'));
+        $this->assertCount(2, $queries);
+    }
 }
 
 trait TraitBootsAndInitializersTest
@@ -611,6 +718,49 @@ class ModelSerializationAttributeTargetsClassTestClass
 
     public function __construct(public User $user, public DataValueObject $value)
     {
+    }
+}
+
+class ModelSerializationEagerLoadRoles
+{
+    use SerializesModels;
+
+    public function __construct(
+        #[EagerLoad(['roles'])]
+        public $value,
+    ) {
+        //
+    }
+}
+
+#[WithoutRelations]
+class ModelSerializationWithoutRelationsAndEagerLoadLines
+{
+    use SerializesModels;
+
+    public function __construct(
+        #[EagerLoad(['lines'])]
+        public $value
+    ) {
+        //
+    }
+}
+
+class ModelSerializationWithInitilizeOnQueueHook
+{
+    use Queueable;
+
+    public function __construct(
+        public $value,
+    ) {
+        //
+    }
+
+    protected function initializeOnQueue()
+    {
+        $this->value->load([
+            'lines' => fn ($q) => $q->where('product_id', 5),
+        ]);
     }
 }
 
