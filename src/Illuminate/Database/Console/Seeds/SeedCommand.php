@@ -99,6 +99,20 @@ class SeedCommand extends Command
                 $class = 'DatabaseSeeder';
             }
 
+            if (! class_exists($class)) {
+                $this->components->error("Seeder class [{$class}] does not exist.");
+                continue;
+            }
+            if (! is_subclass_of($class, 'Illuminate\Database\Seeder')) {
+                $this->components->error("Seeder class [{$class}] must extend Illuminate\\Database\\Seeder.");
+                continue;
+            }
+            if (! method_exists($class, 'run')) {
+                $this->components->error("Seeder class [{$class}] must define a run method.");
+                continue;
+            }
+            $this->components->info("Seeding: {$class}");
+
             $response[] = $this->laravel->make($class)
                 ->setContainer($this->laravel)
                 ->setCommand($this);
