@@ -40,6 +40,14 @@ class JobMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
+        if ($this->option('unique')) {
+            return $this->resolveStubPath('/stubs/job.unique.queued.stub');
+        }
+
+        if ($this->option('encrypted')) {
+            return $this->resolveStubPath('/stubs/job.encrypted.queued.stub');
+        }
+
         if ($this->option('batched')) {
             return $this->resolveStubPath('/stubs/job.batched.queued.stub');
         }
@@ -83,6 +91,8 @@ class JobMakeCommand extends GeneratorCommand
         return [
             ['force', 'f', InputOption::VALUE_NONE, 'Create the class even if the job already exists'],
             ['sync', null, InputOption::VALUE_NONE, 'Indicates that the job should be synchronous'],
+            ['unique', null, InputOption::VALUE_NONE, 'Indicates that the job should be unique'],
+            ['encrypted', null, InputOption::VALUE_NONE, 'Indicates that the job should be encrypted'],
             ['batched', null, InputOption::VALUE_NONE, 'Indicates that the job should be batchable'],
         ];
     }
