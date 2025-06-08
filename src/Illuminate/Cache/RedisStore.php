@@ -466,6 +466,7 @@ class RedisStore extends TaggableStore implements LockProvider
      * Determine if the given value should be stored as plain value.
      *
      * @param  mixed  $value
+     * @return bool
      */
     protected function shouldBeStoredWithoutSerialization($value): bool
     {

@@ -136,14 +136,10 @@ class CacheRedisStoreTest extends TestCase
 
     public function testForgetMethodProperlyCallsRedis()
     {
-        $key = 'key';
-
         $redis = $this->getRedis();
-
         $redis->getRedis()->shouldReceive('connection')->once()->with('default')->andReturn($redis->getRedis());
-        $redis->getRedis()->shouldReceive('del')->once()->with("prefix:$key");
-
-        $redis->forget($key);
+        $redis->getRedis()->shouldReceive('del')->once()->with('prefix:foo');
+        $redis->forget('foo');
     }
 
     public function testFlushesCached()

@@ -106,6 +106,7 @@ class Repository implements ArrayAccess, CacheContract
      *
      * @param  array|string  $key
      * @param  mixed  $default
+     * @return mixed
      */
     public function get($key, $default = null): mixed
     {
@@ -250,6 +251,8 @@ class Repository implements ArrayAccess, CacheContract
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function set($key, $value, $ttl = null): bool
     {
@@ -259,6 +262,7 @@ class Repository implements ArrayAccess, CacheContract
     /**
      * Store multiple items in the cache for a given number of seconds.
      *
+     * @param  array  $values
      * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
      * @return bool
      */
@@ -292,6 +296,7 @@ class Repository implements ArrayAccess, CacheContract
     /**
      * Store multiple items in the cache indefinitely.
      *
+     * @param  array  $values
      * @return bool
      */
     protected function putManyForever(array $values)
@@ -526,7 +531,7 @@ class Repository implements ArrayAccess, CacheContract
     public function touch(string $key, \DateTimeInterface|\DateInterval|int|null $ttl = null): bool
     {
         $value = $this->get($key);
-        
+
         if (is_null($value)) {
             return false;
         }
@@ -557,6 +562,8 @@ class Repository implements ArrayAccess, CacheContract
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function delete($key): bool
     {
@@ -565,6 +572,8 @@ class Repository implements ArrayAccess, CacheContract
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function deleteMultiple($keys): bool
     {
@@ -581,6 +590,8 @@ class Repository implements ArrayAccess, CacheContract
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function clear(): bool
     {
@@ -742,6 +753,7 @@ class Repository implements ArrayAccess, CacheContract
     /**
      * Set the event dispatcher instance.
      *
+     * @param  \Illuminate\Contracts\Events\Dispatcher  $events
      * @return void
      */
     public function setEventDispatcher(Dispatcher $events)
@@ -753,6 +765,7 @@ class Repository implements ArrayAccess, CacheContract
      * Determine if a cached value exists.
      *
      * @param  string  $key
+     * @return bool
      */
     public function offsetExists($key): bool
     {
@@ -763,6 +776,7 @@ class Repository implements ArrayAccess, CacheContract
      * Retrieve an item from the cache by key.
      *
      * @param  string  $key
+     * @return mixed
      */
     public function offsetGet($key): mixed
     {
@@ -774,6 +788,7 @@ class Repository implements ArrayAccess, CacheContract
      *
      * @param  string  $key
      * @param  mixed  $value
+     * @return void
      */
     public function offsetSet($key, $value): void
     {
@@ -784,6 +799,7 @@ class Repository implements ArrayAccess, CacheContract
      * Remove an item from the cache.
      *
      * @param  string  $key
+     * @return void
      */
     public function offsetUnset($key): void
     {

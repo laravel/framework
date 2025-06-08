@@ -146,6 +146,4 @@ class CacheApcStoreTest extends TestCase
         $result = $store->flush();
         $this->assertTrue($result);
     }
-
-
 }

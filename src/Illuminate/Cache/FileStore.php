@@ -312,7 +312,7 @@ class FileStore implements Store, LockProvider
             }
 
             $expire = substr($contents, 0, 10);
-        } catch (Exception $e) {
+        } catch (Exception) {
             return $this->emptyPayload();
         }
 
@@ -328,7 +328,6 @@ class FileStore implements Store, LockProvider
         try {
             $data = unserialize(substr($contents, 10));
         } catch (Exception) {
-
             $this->forget($key);
 
             return $this->emptyPayload();
