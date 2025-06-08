@@ -255,6 +255,36 @@ class CacheRepositoryTest extends TestCase
         $this->assertTrue($repo->add('foo', 'bar'));
     }
 
+    public function testRememberWhenMethodStoresWhenValidatorPasses()
+    {
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('get')->once()->with('foo')->andReturn(null);
+        $repo->getStore()->shouldReceive('put')->once()->with('foo', 'bar', 10);
+
+        $result = $repo->rememberWhen('foo', 10, function () {
+            return 'bar';
+        }, function ($value) {
+            return $value === 'bar';
+        });
+
+        $this->assertEquals('bar', $result);
+    }
+
+    public function testRememberWhenMethodDoesNotStoreWhenValidatorFails()
+    {
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('get')->once()->with('foo')->andReturn(null);
+        $repo->getStore()->shouldReceive('put')->never();
+
+        $result = $repo->rememberWhen('foo', 10, function () {
+            return 'bar';
+        }, function ($value) {
+            return $value === 'not-bar';
+        });
+
+        $this->assertEquals('bar', $result);
+    }
+
     public function testAddWithDatetimeInPastOrZeroSecondsReturnsImmediately()
     {
         $repo = $this->getRepository();

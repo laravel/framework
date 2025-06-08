@@ -475,6 +475,36 @@ class Repository implements ArrayAccess, CacheContract
     }
 
     /**
+     * Get an item from the cache, or execute the given Closure and store the result only if it passes validation.
+     *
+     * @template TCacheValue
+     *
+     * @param  string  $key
+     * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
+     * @param  \Closure(): TCacheValue  $callback
+     * @param  \Closure(TCacheValue): bool  $validator
+     * @return TCacheValue
+     */
+    public function rememberWhen($key, $ttl, Closure $callback, Closure $validator)
+    {
+        $value = $this->get($key);
+
+        // If the item exists in the cache we will just return this immediately
+        if (! is_null($value)) {
+            return $value;
+        }
+
+        $value = $callback();
+
+        // Only store the result in cache if it passes the validator
+        if ($validator($value)) {
+            $this->put($key, $value, value($ttl, $value));
+        }
+
+        return $value;
+    }
+
+    /**
      * Retrieve an item from the cache by key, refreshing it in the background if it is stale.
      *
      * @template TCacheValue
