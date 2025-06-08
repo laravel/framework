@@ -3,6 +3,7 @@
 namespace Illuminate\Cache;
 
 use Illuminate\Contracts\Cache\LockProvider;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\InteractsWithTime;
 
@@ -128,6 +129,24 @@ class ArrayStore extends TaggableStore implements LockProvider
     public function forever($key, $value)
     {
         return $this->put($key, $value, 0);
+    }
+
+    /**
+     * Set the expiration time of a cached item.
+     */
+    public function touch(string $key, int $ttl): bool
+    {
+        $item = Arr::get($this->storage, $key = $this->getPrefix().$key, null);
+
+        if (is_null($item)) {
+            return false;
+        }
+
+        $item['expiresAt'] = $this->calculateExpiration($ttl);
+
+        $this->storage = array_merge($this->storage, [$key => $item]);
+
+        return true;
     }
 
     /**

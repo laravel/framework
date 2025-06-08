@@ -7,6 +7,7 @@ use Illuminate\Cache\DatabaseStore;
 use Illuminate\Database\Connection;
 use Illuminate\Database\PostgresConnection;
 use Illuminate\Database\SQLiteConnection;
+use Illuminate\Support\Carbon;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use stdClass;
@@ -222,6 +223,50 @@ class CacheDatabaseStoreTest extends TestCase
         $table->shouldReceive('where')->once()->with('key', 'prefixbar')->andReturn($table);
         $table->shouldReceive('update')->once()->with(['value' => serialize(2)]);
         $this->assertEquals(2, $store->decrement('bar'));
+    }
+
+    public function testTouchExtendsTtl()
+    {
+        $ttl = 60;
+
+        $store = $this->getMockBuilder(DatabaseStore::class)->onlyMethods(['getTime'])->setConstructorArgs($this->getMocks())->getMock();
+        $table = m::mock(stdClass::class);
+
+        $store->getConnection()->shouldReceive('table')->with('table')->andReturn($table);
+        $store->expects($this->once())->method('getTime')->willReturn(0);
+        $table->shouldReceive('where')->twice()->andReturn($table);
+        $table->shouldReceive('update')->once()->with(['expiration' => $ttl])->andReturn(1);
+
+        $this->assertTrue($store->touch('foo', $ttl));
+    }
+    public function testTouchExtendsTtlOnPostgres(): void
+    {
+        $ttl = 60;
+
+        $store = $this->getMockBuilder(DatabaseStore::class)->onlyMethods(['getTime'])->setConstructorArgs($this->getPostgresMocks())->getMock();
+        $table = m::mock(stdClass::class);
+
+        $store->getConnection()->shouldReceive('table')->with('table')->andReturn($table);
+        $store->expects($this->once())->method('getTime')->willReturn(0);
+        $table->shouldReceive('where')->twice()->andReturn($table);
+        $table->shouldReceive('update')->once()->with(['expiration' => $ttl])->andReturn(1);
+
+        $this->assertTrue($store->touch('foo', $ttl));
+    }
+
+    public function testTouchExtendsTtlOnSqlite()
+    {
+        $ttl = 60;
+
+        $store = $this->getMockBuilder(DatabaseStore::class)->onlyMethods(['getTime'])->setConstructorArgs($this->getSqliteMocks())->getMock();
+        $table = m::mock(stdClass::class);
+
+        $store->getConnection()->shouldReceive('table')->with('table')->andReturn($table);
+        $store->expects($this->once())->method('getTime')->willReturn(0);
+        $table->shouldReceive('where')->twice()->andReturn($table);
+        $table->shouldReceive('update')->once()->with(['expiration' => $ttl])->andReturn(1);
+
+        $this->assertTrue($store->touch('foo', $ttl));
     }
 
     protected function getStore()

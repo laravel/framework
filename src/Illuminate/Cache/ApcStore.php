@@ -104,6 +104,20 @@ class ApcStore extends TaggableStore
     }
 
     /**
+     * Set the expiration time of a cached item.
+     */
+    public function touch(string $key, int $ttl): bool
+    {
+        $value = $this->apc->get($key = $this->getPrefix().$key);
+
+        if (is_null($value)) {
+            return false;
+        }
+
+        return $this->apc->put($key, $value, $ttl);
+    }
+
+    /**
      * Remove all items from the cache.
      *
      * @return bool

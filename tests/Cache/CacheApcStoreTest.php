@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Cache;
 
 use Illuminate\Cache\ApcStore;
 use Illuminate\Cache\ApcWrapper;
+use Illuminate\Support\Carbon;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 
@@ -124,6 +125,19 @@ class CacheApcStoreTest extends TestCase
         $this->assertTrue($result);
     }
 
+    public function testTouchMethodProperlyCallsAPC(): void
+    {
+        $key = 'key';
+        $ttl = 60;
+
+        $apc = $this->getMockBuilder(ApcWrapper::class)->onlyMethods(['get', 'put'])->getMock();
+
+        $apc->expects($this->once())->method('get')->with($this->equalTo($key))->willReturn('bar');
+        $apc->expects($this->once())->method('put')->with($this->equalTo($key), $this->equalTo('bar'), $this->equalTo($ttl))->willReturn(true);
+
+        $this->assertTrue((new ApcStore($apc))->touch($key, $ttl));
+    }
+
     public function testFlushesCached()
     {
         $apc = $this->getMockBuilder(ApcWrapper::class)->onlyMethods(['flush'])->getMock();
@@ -132,4 +146,6 @@ class CacheApcStoreTest extends TestCase
         $result = $store->flush();
         $this->assertTrue($result);
     }
+
+
 }

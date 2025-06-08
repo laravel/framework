@@ -258,6 +258,20 @@ class FileStore implements Store, LockProvider
     }
 
     /**
+     * Set the expiration time of a cached item.
+     */
+    public function touch(string $key, int $ttl): bool
+    {
+        $payload = $this->getPayload($this->getPrefix().$key);
+
+        if (is_null($payload['data'])) {
+            return false;
+        }
+
+        return $this->put($key, $payload['data'], $ttl);
+    }
+
+    /**
      * Remove all items from the cache.
      *
      * @return bool
@@ -298,7 +312,7 @@ class FileStore implements Store, LockProvider
             }
 
             $expire = substr($contents, 0, 10);
-        } catch (Exception) {
+        } catch (Exception $e) {
             return $this->emptyPayload();
         }
 
@@ -314,6 +328,7 @@ class FileStore implements Store, LockProvider
         try {
             $data = unserialize(substr($contents, 10));
         } catch (Exception) {
+
             $this->forget($key);
 
             return $this->emptyPayload();

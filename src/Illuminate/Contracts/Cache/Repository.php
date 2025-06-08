@@ -3,6 +3,8 @@
 namespace Illuminate\Contracts\Cache;
 
 use Closure;
+use DateInterval;
+use DateTimeInterface;
 use Psr\SimpleCache\CacheInterface;
 
 interface Repository extends CacheInterface
@@ -87,6 +89,11 @@ interface Repository extends CacheInterface
      * @return TCacheValue
      */
     public function sear($key, Closure $callback);
+
+    /**
+     * Set the expiration of a cached item; null TTL will retain indefinitely.
+     */
+    public function touch(string $key, DateTimeInterface|DateInterval|int|null $ttl = null): bool;
 
     /**
      * Get an item from the cache, or execute the given Closure and store the result forever.
