@@ -265,7 +265,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Create a new Eloquent model instance.
      *
-     * @param  array  $attributes
+     * @param  array<string, mixed>  $attributes
      */
     public function __construct(array $attributes = [])
     {
@@ -568,7 +568,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Fill the model with an array of attributes.
      *
-     * @param  array  $attributes
+     * @param  array<string, mixed>  $attributes
      * @return $this
      *
      * @throws \Illuminate\Database\Eloquent\MassAssignmentException
@@ -618,7 +618,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Fill the model with an array of attributes. Force mass assignment.
      *
-     * @param  array  $attributes
+     * @param  array<string, mixed>  $attributes
      * @return $this
      */
     public function forceFill(array $attributes)
@@ -657,7 +657,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Create a new instance of the given model.
      *
-     * @param  array  $attributes
+     * @param  array<string, mixed>  $attributes
      * @param  bool  $exists
      * @return static
      */
@@ -686,7 +686,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Create a new model instance that is existing.
      *
-     * @param  array  $attributes
+     * @param  array<string, mixed>  $attributes
      * @param  string|null  $connection
      * @return static
      */
@@ -1049,8 +1049,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Update the model in the database.
      *
-     * @param  array  $attributes
-     * @param  array  $options
+     * @param  array<string, mixed>  $attributes
+     * @param  array<string, mixed>  $options
      * @return bool
      */
     public function update(array $attributes = [], array $options = [])
@@ -1065,8 +1065,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Update the model in the database within a transaction.
      *
-     * @param  array  $attributes
-     * @param  array  $options
+     * @param  array<string, mixed>  $attributes
+     * @param  array<string, mixed>  $options
      * @return bool
      *
      * @throws \Throwable
@@ -1083,8 +1083,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Update the model in the database without raising any events.
      *
-     * @param  array  $attributes
-     * @param  array  $options
+     * @param  array<string, mixed>  $attributes
+     * @param  array<string, mixed>  $options
      * @return bool
      */
     public function updateQuietly(array $attributes = [], array $options = [])
@@ -1400,7 +1400,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * Insert the given attributes and set the ID on the model.
      *
      * @param  \Illuminate\Database\Eloquent\Builder<static>  $query
-     * @param  array  $attributes
+     * @param  array<string, mixed>  $attributes
      * @return void
      */
     protected function insertAndSetId(Builder $query, $attributes)
@@ -1668,7 +1668,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * Create a new pivot model instance.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $parent
-     * @param  array  $attributes
+     * @param  array<string, mixed>  $attributes
      * @param  string  $table
      * @param  bool  $exists
      * @param  string|null  $using
