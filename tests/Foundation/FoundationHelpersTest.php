@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Foundation;
 
 use Exception;
+use Illuminate\Broadcasting\FakePendingBroadcast;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Cache\Repository as CacheRepository;
 use Illuminate\Contracts\Config\Repository;
@@ -294,5 +295,10 @@ class FoundationHelpersTest extends TestCase
         Container::setInstance($app);
 
         abort($code, $message, $headers);
+    }
+
+    public function testBroadcastIfReturnsFakeOnFalse()
+    {
+        $this->assertInstanceOf(FakePendingBroadcast::class, broadcast_if(false, 'foo'));
     }
 }
