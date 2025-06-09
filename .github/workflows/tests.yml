@@ -40,13 +40,17 @@ jobs:
       fail-fast: true
       matrix:
         php: [8.2, 8.3, 8.4]
-        phpunit: ['10.5.35', '11.5.3', '12.0.0', '12.1.0']
+        phpunit: ['10.5.35', '11.5.3', '12.0.0', '12.2.0']
         stability: [prefer-lowest, prefer-stable]
         exclude:
           - php: 8.2
             phpunit: '12.0.0'
           - php: 8.2
+            phpunit: '12.2.0'
+        include:
+          - php: 8.3
             phpunit: '12.1.0'
+            stability: prefer-stable
 
     name: PHP ${{ matrix.php }} - PHPUnit ${{ matrix.phpunit }} - ${{ matrix.stability }}
 
