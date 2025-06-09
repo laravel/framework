@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Broadcasting\NoopPendingBroadcast;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
@@ -224,6 +225,42 @@ if (! function_exists('broadcast')) {
     function broadcast($event = null)
     {
         return app(BroadcastFactory::class)->event($event);
+    }
+}
+
+if (! function_exists('broadcast_if')) {
+    /**
+     * Begin broadcasting an event if the given condition is true.
+     *
+     * @param  bool  $boolean
+     * @param  mixed|null  $event
+     * @return \Illuminate\Broadcasting\PendingBroadcast
+     */
+    function broadcast_if($boolean, $event = null)
+    {
+        if ($boolean) {
+            return app(BroadcastFactory::class)->event($event);
+        } else {
+            return new FakePendingBroadcast;
+        }
+    }
+}
+
+if (! function_exists('broadcast_unless')) {
+    /**
+     * Begin broadcasting an event unless the given condition is true.
+     *
+     * @param  bool  $boolean
+     * @param  mixed|null  $event
+     * @return \Illuminate\Broadcasting\PendingBroadcast
+     */
+    function broadcast_unless($boolean, $event = null)
+    {
+        if (! $boolean) {
+            return app(BroadcastFactory::class)->event($event);
+        } else {
+            return new FakePendingBroadcast;
+        }
     }
 }
 
