@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Broadcasting\NoopPendingBroadcast;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
