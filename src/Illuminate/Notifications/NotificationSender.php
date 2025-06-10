@@ -84,6 +84,7 @@ class NotificationSender
 
         if ($notification instanceof ShouldQueue) {
             $this->queueNotification($notifiables, $notification);
+
             return;
         }
 
