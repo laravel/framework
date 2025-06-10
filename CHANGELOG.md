@@ -1,6 +1,32 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.17.0...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.18.0...12.x)
+
+## [v12.18.0](https://github.com/laravel/framework/compare/v12.17.0...v12.18.0) - 2025-06-10
+
+* document `through()` method in interfaces to fix IDE warnings by [@harryqt](https://github.com/harryqt) in https://github.com/laravel/framework/pull/55925
+* [12.x] Add encrypt and decrypt Str helper methods by [@KIKOmanasijev](https://github.com/KIKOmanasijev) in https://github.com/laravel/framework/pull/55931
+* [12.x] Add a command option for making batchable jobs by [@hafezdivandari](https://github.com/hafezdivandari) in https://github.com/laravel/framework/pull/55929
+* [12.x] fix: intersect Authenticatable with Model in UserProvider phpdocs by [@calebdw](https://github.com/calebdw) in https://github.com/laravel/framework/pull/54061
+* [12.x] feat: create UsePolicy attribute by [@calebdw](https://github.com/calebdw) in https://github.com/laravel/framework/pull/55882
+* [12.x] `ScheduledTaskFailed` not dispatched on scheduled forground task fails by [@achrafAa](https://github.com/achrafAa) in https://github.com/laravel/framework/pull/55624
+* [12.x] Add generics to `Model::unguarded()` by [@axlon](https://github.com/axlon) in https://github.com/laravel/framework/pull/55932
+* [12.x] Fix SSL Certificate and Connection Errors Leaking as Guzzle Exceptions by [@achrafAa](https://github.com/achrafAa) in https://github.com/laravel/framework/pull/55937
+* Fix deprecation warning in PHP 8.3 by ensuring string type in explode() by [@Khuthaily](https://github.com/Khuthaily) in https://github.com/laravel/framework/pull/55939
+* revert: #55939 by [@NickSdot](https://github.com/NickSdot) in https://github.com/laravel/framework/pull/55943
+* [12.x] feat: Add WorkerStarting event when worker daemon starts by [@Orrison](https://github.com/Orrison) in https://github.com/laravel/framework/pull/55941
+* [12.x] Allow setting the `RequestException` truncation limit per request by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/55897
+* [12.x] feat: Make custom eloquent castings comparable for more granular isDirty check by [@SanderSander](https://github.com/SanderSander) in https://github.com/laravel/framework/pull/55945
+* [12.x] fix alphabetical order by [@AhmedAlaa4611](https://github.com/AhmedAlaa4611) in https://github.com/laravel/framework/pull/55965
+* [12.x] Use native named parameter instead of unused variable by [@imanghafoori1](https://github.com/imanghafoori1) in https://github.com/laravel/framework/pull/55964
+* [12.x] add generics to Model attribute related methods and properties by [@taka-oyama](https://github.com/taka-oyama) in https://github.com/laravel/framework/pull/55962
+* [12.x] Supports PHPUnit 12.2 by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/55961
+* [12.x] feat: Add ability to override SendQueuedNotifications job class by [@Orrison](https://github.com/Orrison) in https://github.com/laravel/framework/pull/55942
+* [12.x] Fix timezone validation test for PHP 8.3+ by [@platoindebugmode](https://github.com/platoindebugmode) in https://github.com/laravel/framework/pull/55956
+* Broadcasting Utilities by [@taylorotwell](https://github.com/taylorotwell) in https://github.com/laravel/framework/pull/55967
+* [12.x] Remove unused $guarded parameter from testChannelNameNormalization method by [@AhmedAlaa4611](https://github.com/AhmedAlaa4611) in https://github.com/laravel/framework/pull/55973
+* [12.x] Validate that `outOf` is greater than 0 in `Lottery` helper by [@mrvipchien](https://github.com/mrvipchien) in https://github.com/laravel/framework/pull/55969
+* [12.x] Allow retrieving all reported exceptions from `ExceptionHandlerFake` by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/55972
 
 ## [v12.17.0](https://github.com/laravel/framework/compare/v12.16.0...v12.17.0) - 2025-06-03
 
