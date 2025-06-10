@@ -45,7 +45,7 @@ class Lottery
      * Create a new Lottery instance.
      *
      * @param  int|float  $chances
-     * @param  int|null  $outOf
+     * @param  int<1, max>|null  $outOf
      */
     public function __construct($chances, $outOf = null)
     {
@@ -54,7 +54,7 @@ class Lottery
         }
 
         if ($outOf !== null && $outOf < 1) {
-            throw new RuntimeException('The opportunities to win must be greater or equals to 1.');
+            throw new RuntimeException('Lottery "out of" value must be greater than or equal to 1.');
         }
 
         $this->chances = $chances;
