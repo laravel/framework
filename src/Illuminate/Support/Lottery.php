@@ -53,6 +53,10 @@ class Lottery
             throw new RuntimeException('Float must not be greater than 1.');
         }
 
+        if ($outOf !== null && $outOf < 1) {
+            throw new RuntimeException('The opportunities to win must be greater than 1.');
+        }
+
         $this->chances = $chances;
 
         $this->outOf = $outOf;
