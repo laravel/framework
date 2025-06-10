@@ -58,16 +58,6 @@ class ExceptionHandlerFake implements ExceptionHandler, Fake
     }
 
     /**
-     * Get the exceptions that have been reported.
-     *
-     * @return list<\Throwable>
-     */
-    public function reported()
-    {
-        return $this->reported;
-    }
-
-    /**
      * Assert if an exception of the given type has been reported.
      *
      * @param  (\Closure(\Throwable): bool)|class-string<\Throwable>  $exception
@@ -256,6 +246,16 @@ class ExceptionHandlerFake implements ExceptionHandler, Fake
         }
 
         return $this;
+    }
+
+    /**
+     * Get the exceptions that have been reported.
+     *
+     * @return list<\Throwable>
+     */
+    public function reported()
+    {
+        return $this->reported;
     }
 
     /**
