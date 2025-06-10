@@ -83,7 +83,8 @@ class NotificationSender
         $notifiables = $this->formatNotifiables($notifiables);
 
         if ($notification instanceof ShouldQueue) {
-            return $this->queueNotification($notifiables, $notification);
+            $this->queueNotification($notifiables, $notification);
+            return;
         }
 
         $this->sendNow($notifiables, $notification);
@@ -203,8 +204,6 @@ class NotificationSender
      */
     protected function queueNotification($notifiables, $notification)
     {
-        $notifiables = $this->formatNotifiables($notifiables);
-
         $original = clone $notification;
 
         foreach ($notifiables as $notifiable) {
