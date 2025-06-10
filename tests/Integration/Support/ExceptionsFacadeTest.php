@@ -32,7 +32,7 @@ class ExceptionsFacadeTest extends TestCase
         Exceptions::assertReportedCount(2);
 
         $reported = Exceptions::reported();
-        $this->assertCount(1, $reported);
+        $this->assertCount(2, $reported);
         $this->assertSame($thrownException, $reported[0]);
     }
 
