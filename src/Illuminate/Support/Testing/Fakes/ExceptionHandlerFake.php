@@ -249,6 +249,16 @@ class ExceptionHandlerFake implements ExceptionHandler, Fake
     }
 
     /**
+     * Get the exceptions that have been reported.
+     *
+     * @return list<\Throwable>
+     */
+    public function reported()
+    {
+        return $this->reported;
+    }
+
+    /**
      * Set the "original" handler that should be used by the fake.
      *
      * @param  \Illuminate\Contracts\Debug\ExceptionHandler  $handler
