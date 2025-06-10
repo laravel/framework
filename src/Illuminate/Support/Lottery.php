@@ -54,7 +54,7 @@ class Lottery
         }
 
         if ($outOf !== null && $outOf < 1) {
-            throw new RuntimeException('The opportunities to win must be greater than 1.');
+            throw new RuntimeException('The opportunities to win must be greater or equals to 1.');
         }
 
         $this->chances = $chances;
