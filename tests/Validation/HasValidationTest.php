@@ -8,7 +8,6 @@ use Illuminate\Validation\HasValidation;
 use Illuminate\Validation\ValidationException;
 use Orchestra\Testbench\TestCase;
 
-
 class HasValidationTest extends TestCase
 {
     public function testHasValidationPassesIfNoRulesProvided()
