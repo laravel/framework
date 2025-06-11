@@ -2615,7 +2615,7 @@ class HttpClientTest extends TestCase
         $this->factory->fake(function () {
             $request = new GuzzleRequest('GET', 'https://redirect.laravel.example');
             $response = new Psr7Response(301, ['Location' => 'https://redirect2.laravel.example']);
-            
+
             throw new TooManyRedirectsException(
                 'Maximum number of redirects (5) exceeded',
                 $request,
