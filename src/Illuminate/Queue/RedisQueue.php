@@ -150,7 +150,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      */
     public function oldestPending($queue = null)
     {
-        $payload = $this->getConnection()->lindex($this->getQueue($queue), -1);
+        $payload = $this->getConnection()->lindex($this->getQueue($queue), 0);
 
         if (! $payload) {
             return null;
@@ -158,7 +158,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
 
         $data = json_decode($payload, true);
 
-        return $data['available_at'] ?? null;
+        return $data['createdAt'] ?? null;
     }
 
     /**
