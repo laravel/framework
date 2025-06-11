@@ -256,7 +256,10 @@ class TestResponse implements ArrayAccess
     public function assertRedirectBackWithErrors($keys = [], $format = null, $errorBag = 'default')
     {
         $this->assertRedirectBack();
+
         $this->assertSessionHasErrors($keys, $format, $errorBag);
+
+        return $this;
     }
 
     /**
