@@ -510,22 +510,21 @@ abstract class Grammar extends BaseGrammar
     /**
      * Build the constraints for the table.
      *
-     * @param Blueprint $blueprint
+     * @param  Blueprint  $blueprint
      * @return string[]
      */
     protected function getCheckConstraints(Blueprint $blueprint): array
     {
         return collect($blueprint->getCheckConstraints())
-            ->map(fn(CheckConstraintBuilder $builder) => "CONSTRAINT {$builder->name()} {$builder->toSql()}")
+            ->map(fn (CheckConstraintBuilder $builder) => "CONSTRAINT {$builder->name()} {$builder->toSql()}")
             ->all();
     }
 
     /**
      * Compile a drop constraint command.
      *
-     * @param Blueprint $blueprint
-     * @param Fluent $command
-     *
+     * @param  Blueprint  $blueprint
+     * @param  Fluent  $command
      * @return string[]
      */
     public function compileAddCheckConstraint(Blueprint $blueprint, Fluent $command): array
@@ -546,9 +545,8 @@ abstract class Grammar extends BaseGrammar
     /**
      * Compile a drop constraint command.
      *
-     * @param Blueprint $blueprint
-     * @param Fluent $command
-     *
+     * @param  Blueprint  $blueprint
+     * @param  Fluent  $command
      * @return string
      */
     public function compileDropConstraint(Blueprint $blueprint, Fluent $command): string

@@ -24,7 +24,9 @@ class CheckConstraintBuilder
      */
     public function __construct(
         protected string $name,
-    ) {}
+    ) {
+
+    }
 
     /**
      * Get the constraint name.
@@ -99,6 +101,7 @@ class CheckConstraintBuilder
     {
         $quoted = implode(', ', array_map([$this, 'quote'], $values));
         $this->expressions[] = "$column NOT IN ($quoted)";
+
         return $this;
     }
 
@@ -134,7 +137,7 @@ class CheckConstraintBuilder
         }
 
         // Handle standalone expressions (from whereIn, whereNotIn, rule)
-        if (!empty($this->expressions) && empty($this->groups)) {
+        if (! empty($this->expressions) && empty($this->groups)) {
             $parts[] = implode(' AND ', $this->expressions);
         }
 

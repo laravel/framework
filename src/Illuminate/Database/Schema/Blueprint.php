@@ -1916,7 +1916,6 @@ class Blueprint
      *
      * @param  string  $name
      * @param  Closure  $callback
-     *
      * @return void
      */
     public function checkConstraint(string $name, Closure $callback)

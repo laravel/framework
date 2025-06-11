@@ -1408,9 +1408,9 @@ class MySqlGrammar extends Grammar
             ? version_compare($version, '10.2.1', '>=')
             : version_compare($version, '8.0.16', '>=');
 
-        if(! $isCompatible) {
-           $driverWithVersion = $isMaria ? 'MariaDB 10.2.1' : 'MySQL 8.0.16';
-           throw new RuntimeException("$driverWithVersion or higher is required to use check constraints.");
+        if (! $isCompatible) {
+            $driverWithVersion = $isMaria ? 'MariaDB 10.2.1' : 'MySQL 8.0.16';
+            throw new RuntimeException("$driverWithVersion or higher is required to use check constraints.");
         }
     }
 
