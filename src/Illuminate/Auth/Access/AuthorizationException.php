@@ -51,7 +51,7 @@ class AuthorizationException extends Exception
      * @param  \Illuminate\Auth\Access\Response  $response
      * @return $this
      */
-    public function setResponse($response)
+    public function setResponse($response): static
     {
         $this->response = $response;
 
@@ -64,7 +64,7 @@ class AuthorizationException extends Exception
      * @param  int|null  $status
      * @return $this
      */
-    public function withStatus($status)
+    public function withStatus($status): static
     {
         $this->status = $status;
 
@@ -76,7 +76,7 @@ class AuthorizationException extends Exception
      *
      * @return $this
      */
-    public function asNotFound()
+    public function asNotFound(): static
     {
         return $this->withStatus(404);
     }
@@ -86,7 +86,7 @@ class AuthorizationException extends Exception
      *
      * @return bool
      */
-    public function hasStatus()
+    public function hasStatus(): bool
     {
         return $this->status !== null;
     }
@@ -96,7 +96,7 @@ class AuthorizationException extends Exception
      *
      * @return int|null
      */
-    public function status()
+    public function status(): ?int
     {
         return $this->status;
     }
@@ -106,7 +106,7 @@ class AuthorizationException extends Exception
      *
      * @return \Illuminate\Auth\Access\Response
      */
-    public function toResponse()
+    public function toResponse(): Response
     {
         return Response::deny($this->message, $this->code)->withStatus($this->status);
     }
