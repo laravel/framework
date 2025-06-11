@@ -63,7 +63,7 @@ class AuthManager implements FactoryContract
      * @param  string|null  $name
      * @return \Illuminate\Contracts\Auth\Guard|\Illuminate\Contracts\Auth\StatefulGuard
      */
-    public function guard($name = null)
+    public function guard($name = null): \Illuminate\Contracts\Auth\Guard|\Illuminate\Contracts\Auth\StatefulGuard
     {
         $name = $name ?: $this->getDefaultDriver();
 
@@ -78,7 +78,7 @@ class AuthManager implements FactoryContract
      *
      * @throws \InvalidArgumentException
      */
-    protected function resolve($name)
+    protected function resolve($name): \Illuminate\Contracts\Auth\Guard|\Illuminate\Contracts\Auth\StatefulGuard
     {
         $config = $this->getConfig($name);
 
@@ -104,11 +104,11 @@ class AuthManager implements FactoryContract
     /**
      * Call a custom driver creator.
      *
-     * @param  string  $name
+     * @param string $name
      * @param  array  $config
      * @return mixed
      */
-    protected function callCustomCreator($name, array $config)
+    protected function callCustomCreator(string $name, array $config): mixed
     {
         return $this->customCreators[$config['driver']]($this->app, $name, $config);
     }
@@ -120,7 +120,7 @@ class AuthManager implements FactoryContract
      * @param  array  $config
      * @return \Illuminate\Auth\SessionGuard
      */
-    public function createSessionDriver($name, $config)
+    public function createSessionDriver($name, $config): SessionGuard
     {
         $guard = new SessionGuard(
             $name,
@@ -158,7 +158,7 @@ class AuthManager implements FactoryContract
      * @param  array  $config
      * @return \Illuminate\Auth\TokenGuard
      */
-    public function createTokenDriver($name, $config)
+    public function createTokenDriver($name, $config): TokenGuard
     {
         // The token guard implements a basic API token based guard implementation
         // that takes an API token field from the request and matches it to the
@@ -179,10 +179,10 @@ class AuthManager implements FactoryContract
     /**
      * Get the guard configuration.
      *
-     * @param  string  $name
+     * @param string $name
      * @return array
      */
-    protected function getConfig($name)
+    protected function getConfig(string $name): array
     {
         return $this->app['config']["auth.guards.{$name}"];
     }
@@ -192,7 +192,7 @@ class AuthManager implements FactoryContract
      *
      * @return string
      */
-    public function getDefaultDriver()
+    public function getDefaultDriver(): string
     {
         return $this->app['config']['auth.defaults.guard'];
     }
@@ -215,10 +215,10 @@ class AuthManager implements FactoryContract
     /**
      * Set the default authentication driver name.
      *
-     * @param  string  $name
+     * @param string $name
      * @return void
      */
-    public function setDefaultDriver($name)
+    public function setDefaultDriver(string $name)
     {
         $this->app['config']['auth.defaults.guard'] = $name;
     }
@@ -230,7 +230,7 @@ class AuthManager implements FactoryContract
      * @param  callable  $callback
      * @return $this
      */
-    public function viaRequest($driver, callable $callback)
+    public function viaRequest($driver, callable $callback): static
     {
         return $this->extend($driver, function () use ($callback) {
             $guard = new RequestGuard($callback, $this->app['request'], $this->createUserProvider());
@@ -246,7 +246,7 @@ class AuthManager implements FactoryContract
      *
      * @return \Closure
      */
-    public function userResolver()
+    public function userResolver(): Closure
     {
         return $this->userResolver;
     }
@@ -257,7 +257,7 @@ class AuthManager implements FactoryContract
      * @param  \Closure  $userResolver
      * @return $this
      */
-    public function resolveUsersUsing(Closure $userResolver)
+    public function resolveUsersUsing(Closure $userResolver): static
     {
         $this->userResolver = $userResolver;
 
@@ -271,7 +271,7 @@ class AuthManager implements FactoryContract
      * @param  \Closure  $callback
      * @return $this
      */
-    public function extend($driver, Closure $callback)
+    public function extend($driver, Closure $callback): static
     {
         $this->customCreators[$driver] = $callback;
 
@@ -285,31 +285,9 @@ class AuthManager implements FactoryContract
      * @param  \Closure  $callback
      * @return $this
      */
-    public function provider($name, Closure $callback)
+    public function provider($name, Closure $callback): static
     {
         $this->customProviderCreators[$name] = $callback;
-
-        return $this;
-    }
-
-    /**
-     * Determines if any guards have already been resolved.
-     *
-     * @return bool
-     */
-    public function hasResolvedGuards()
-    {
-        return count($this->guards) > 0;
-    }
-
-    /**
-     * Forget all of the resolved guard instances.
-     *
-     * @return $this
-     */
-    public function forgetGuards()
-    {
-        $this->guards = [];
 
         return $this;
     }
@@ -320,7 +298,7 @@ class AuthManager implements FactoryContract
      * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @return $this
      */
-    public function setApplication($app)
+    public function setApplication($app): static
     {
         $this->app = $app;
 
