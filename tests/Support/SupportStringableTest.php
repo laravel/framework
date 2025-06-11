@@ -1463,9 +1463,9 @@ class SupportStringableTest extends TestCase
 
         $this->container->bind('encrypter', fn () => new Encrypter(str_repeat('b', 16)));
 
-        $encrypted = encrypt('foo');
+        $encrypted = $this->stringable('foo')->encrypt();
 
-        $this->assertNotSame('foo', $encrypted);
-        $this->assertSame('foo', decrypt($encrypted));
+        $this->assertNotSame('foo', $encrypted->value());
+        $this->assertSame('foo', $encrypted->decrypt()->value());
     }
 }
