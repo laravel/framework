@@ -297,6 +297,10 @@ class Str
      */
     public static function contains($haystack, $needles, $ignoreCase = false)
     {
+        if (is_null($haystack)) {
+            return false;
+        }
+
         if ($ignoreCase) {
             $haystack = mb_strtolower($haystack);
         }
