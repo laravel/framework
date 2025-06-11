@@ -153,7 +153,9 @@ class ThrottleRequests
             if ($this->limiter->tooManyAttempts($limit->key, $limit->maxAttempts)) {
                 throw $this->buildException($request, $limit->key, $limit->maxAttempts, $limit->responseCallback);
             }
-
+        }
+        // Only hit limiters if none failed
+        foreach ($limits as $limit) {
             $this->limiter->hit($limit->key, $limit->decaySeconds);
         }
 
