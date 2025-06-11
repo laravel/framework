@@ -1416,6 +1416,7 @@ class MySqlGrammar extends Grammar
 
     /**
      * {@inheritDoc}
+     *
      * @throws RuntimeException
      */
     public function compileAddCheckConstraint(Blueprint $blueprint, Fluent $command): array
@@ -1427,6 +1428,7 @@ class MySqlGrammar extends Grammar
 
     /**
      * {@inheritDoc}
+     *
      * @throws RuntimeException
      */
     public function compileDropConstraint(Blueprint $blueprint, Fluent $command): string

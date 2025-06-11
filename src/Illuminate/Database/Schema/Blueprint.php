@@ -1914,8 +1914,8 @@ class Blueprint
     /**
      * Add a new check constraint to the blueprint.
      *
-     * @param string  $name
-     * @param Closure  $callback
+     * @param  string  $name
+     * @param  Closure  $callback
      *
      * @return void
      */
@@ -1944,7 +1944,7 @@ class Blueprint
     /**
      * Drop a constraint.
      *
-     * @param string $name
+     * @param  string  $name
      * @return void
      */
     public function dropConstraint(string $name): void

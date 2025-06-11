@@ -841,7 +841,6 @@ class SchemaBuilderTest extends DatabaseTestCase
         $this->runCheckConstraintTest();
     }
 
-
     private function runCheckConstraintTest(): void
     {
         Schema::create('orders', function (Blueprint $table) {

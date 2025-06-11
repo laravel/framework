@@ -8,19 +8,19 @@ class CheckConstraintBuilder
     /**
      * The constraint groups.
      *
-     * @var array<int, array<string, string>> $groups
+     * @var array<int, array<string, string>>
      */
     protected array $groups = [];
 
     /**
      * The constraint expressions.
      *
-     * @var array<int, string> $expressions
+     * @var array<int, string>
      */
     protected array $expressions = [];
 
     /**
-     * @param string $name
+     * @param  string  $name
      */
     public function __construct(
         protected string $name,
@@ -39,10 +39,10 @@ class CheckConstraintBuilder
     /**
      * Add a new constraint expression and group it with an AND operator.
      *
-     * @param string $column
-     * @param string $operator
-     * @param mixed $value
-     * @param Closure $callback
+     * @param  string  $column
+     * @param  string  $operator
+     * @param  mixed  $value
+     * @param  Closure  $callback
      * @return $this
      */
     public function where(string $column, string $operator, mixed $value, Closure $callback): static
@@ -53,10 +53,10 @@ class CheckConstraintBuilder
     /**
      * Add a new constraint expression and group it with an OR operator.
      *
-     * @param string $column
-     * @param string $operator
-     * @param mixed $value
-     * @param Closure $callback
+     * @param  string  $column
+     * @param  string  $operator
+     * @param  mixed  $value
+     * @param  Closure  $callback
      * @return $this
      */
     public function orWhere(string $column, string $operator, mixed $value, Closure $callback): static
@@ -67,11 +67,11 @@ class CheckConstraintBuilder
     /**
      * Add a new constraint expression and group it with the given glue operator.
      *
-     * @param string $glue
-     * @param string $column
-     * @param string $operator
-     * @param mixed $value
-     * @param Closure $callback
+     * @param  string  $glue
+     * @param  string  $column
+     * @param  string  $operator
+     * @param  mixed  $value
+     * @param  Closure  $callback
      * @return $this
      */
     protected function addGroup(string $glue, string $column, string $operator, mixed $value, Closure $callback): static
@@ -91,8 +91,8 @@ class CheckConstraintBuilder
     /**
      * Add a new constraint expression to the builder.
      *
-     * @param string $column
-     * @param array $values
+     * @param  string  $column
+     * @param  array  $values
      * @return $this
      */
     public function whereNotIn(string $column, array $values): static
@@ -105,8 +105,8 @@ class CheckConstraintBuilder
     /**
      * Add a new constraint expression to the builder.
      *
-     * @param string $column
-     * @param array $values
+     * @param  string  $column
+     * @param  array  $values
      * @return $this
      */
     public function whereIn(string $column, array $values): static
@@ -144,7 +144,7 @@ class CheckConstraintBuilder
     /**
      * Quote the given value.
      *
-     * @param mixed $value
+     * @param  mixed  $value
      * @return string
      */
     protected function quote(mixed $value): string
@@ -167,9 +167,9 @@ class CheckConstraintBuilder
     /**
      * Add a new rule to the constraint.
      *
-     * @param string $column
-     * @param string $operator
-     * @param mixed|null $value
+     * @param  string  $column
+     * @param  string  $operator
+     * @param  mixed|null  $value
      * @return $this
      */
     public function rule(string $column, string $operator, mixed $value = null): static

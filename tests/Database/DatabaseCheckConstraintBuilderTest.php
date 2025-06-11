@@ -72,7 +72,7 @@ class DatabaseCheckConstraintBuilderTest extends TestCase
         $builder->rule('email', 'IS NOT NULL')
             ->rule('deleted_at', 'IS NULL');
 
-        $expected = "CHECK (email IS NOT NULL AND deleted_at IS NULL)";
+        $expected = 'CHECK (email IS NOT NULL AND deleted_at IS NULL)';
         $this->assertSame($expected, $builder->toSql());
     }
 
@@ -137,7 +137,7 @@ class DatabaseCheckConstraintBuilderTest extends TestCase
             ->rule('discount', '<=', 100.50)
             ->rule('quantity', '!=', -1);
 
-        $expected = "CHECK (price >= 0 AND discount <= 100.5 AND quantity != -1)";
+        $expected = 'CHECK (price >= 0 AND discount <= 100.5 AND quantity != -1)';
         $this->assertSame($expected, $builder->toSql());
     }
 }
