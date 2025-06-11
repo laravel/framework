@@ -37,4 +37,14 @@ abstract class Migration
     {
         return true;
     }
+
+    /**
+     * Determine if the migration should be pruned via the schema:dump command.
+     *
+     * @return bool
+     */
+    public function shouldPrune(): bool
+    {
+        return true;
+    }
 }

@@ -8,6 +8,8 @@ use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\Events\MigrationsPruned;
 use Illuminate\Database\Events\SchemaDumped;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Config;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -23,7 +25,7 @@ class DumpCommand extends Command
     protected $signature = 'schema:dump
                 {--database= : The database connection to use}
                 {--path= : The path where the schema dump file should be stored}
-                {--prune : Delete all existing migration files}';
+                {--prune : Delete existing migration files}';
 
     /**
      * The console command description.
@@ -37,11 +39,12 @@ class DumpCommand extends Command
      *
      * @param  \Illuminate\Database\ConnectionResolverInterface  $connections
      * @param  \Illuminate\Contracts\Events\Dispatcher  $dispatcher
+     * @param  \Illuminate\Database\Migrations\Migrator  $migrator
      * @return void
      */
-    public function handle(ConnectionResolverInterface $connections, Dispatcher $dispatcher)
+    public function handle(ConnectionResolverInterface $connections, Dispatcher $dispatcher, Migrator $migrator)
     {
-        $connection = $connections->connection($database = $this->input->getOption('database'));
+        $connection = $connections->connection($this->input->getOption('database'));
 
         $this->schemaState($connection)->dump(
             $connection, $path = $this->path($connection)
@@ -52,13 +55,11 @@ class DumpCommand extends Command
         $info = 'Database schema dumped';
 
         if ($this->option('prune')) {
-            (new Filesystem)->deleteDirectory(
-                $path = database_path('migrations'), preserve: false
-            );
+            $filesDeleted = $this->prune($migrator);
 
             $info .= ' and pruned';
 
-            $dispatcher->dispatch(new MigrationsPruned($connection, $path));
+            $dispatcher->dispatch(new MigrationsPruned($connection, $path, $filesDeleted));
         }
 
         $this->components->info($info.' successfully.');
@@ -93,5 +94,40 @@ class DumpCommand extends Command
         return tap($this->option('path') ?: database_path('schema/'.$connection->getName().'-schema.sql'), function ($path) {
             (new Filesystem)->ensureDirectoryExists(dirname($path));
         });
+    }
+
+    /**
+     * Prune migration files.
+     *
+     * @param  Migrator  $migrator
+     * @return array<int, string>
+     */
+    protected function prune(Migrator $migrator)
+    {
+        $migrations = $migrator->getMigrationFiles($this->laravel->databasePath('migrations'));
+        if ($migrations === []) {
+            return [];
+        }
+
+        $migrator->requireFiles($migrations);
+        $filesDeleted = [];
+
+        foreach ($migrations as $file) {
+            $migration = $migrator->resolvePath($file);
+
+            $shouldPruneMigration = $migration instanceof Migration
+                ? $migration->shouldPrune()
+                : true;
+
+            if ($shouldPruneMigration) {
+                $filesDeleted[] = $file;
+            }
+        }
+
+        if ($filesDeleted !== []) {
+            (new Filesystem)->delete($filesDeleted);
+        }
+
+        return $filesDeleted;
     }
 }
