@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Http;
 
 use Exception;
 use GuzzleHttp\Exception\RequestException as GuzzleRequestException;
+use GuzzleHttp\Exception\TooManyRedirectsException;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Promise\RejectedPromise;
@@ -2607,6 +2608,38 @@ class HttpClientTest extends TestCase
         $this->expectExceptionMessage('cURL error 60: SSL certificate problem: unable to get local issuer certificate');
 
         $this->factory->head('https://ssl-error.laravel.example');
+    }
+
+    public function testTooManyRedirectsExceptionConvertedToConnectionException()
+    {
+        $this->factory->fake(function () {
+            $request = new GuzzleRequest('GET', 'https://redirect.laravel.example');
+            $response = new Psr7Response(301, ['Location' => 'https://redirect2.laravel.example']);
+            
+            throw new TooManyRedirectsException(
+                'Maximum number of redirects (5) exceeded',
+                $request,
+                $response
+            );
+        });
+
+        $this->expectException(ConnectionException::class);
+        $this->expectExceptionMessage('Maximum number of redirects (5) exceeded');
+
+        $this->factory->maxRedirects(5)->get('https://redirect.laravel.example');
+    }
+
+    public function testTooManyRedirectsWithFakedRedirectChain()
+    {
+        $this->factory->fake([
+            '1.example.com' => $this->factory->response(null, 301, ['Location' => 'https://2.example.com']),
+            '2.example.com' => $this->factory->response(null, 301, ['Location' => 'https://3.example.com']),
+            '3.example.com' => $this->factory->response('', 200),
+        ]);
+
+        $this->expectException(ConnectionException::class);
+
+        $this->factory->maxRedirects(1)->get('https://1.example.com');
     }
 
     public function testRequestExceptionIsNotThrownIfThePendingRequestIsSetToThrowOnFailureButTheResponseIsSuccessful()

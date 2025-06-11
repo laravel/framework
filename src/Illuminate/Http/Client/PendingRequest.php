@@ -1613,7 +1613,13 @@ class PendingRequest
             $response = $this->populateResponse($this->newResponse($e->getResponse()))
         );
 
-        throw $response->toException();
+        $exception = $response->toException();
+
+        if ($exception === null) {
+            $exception = new ConnectionException($e->getMessage(), 0, $e);
+        }
+
+        throw $exception;
     }
 
     /**
