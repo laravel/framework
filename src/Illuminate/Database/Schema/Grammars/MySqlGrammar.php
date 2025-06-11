@@ -234,7 +234,10 @@ class MySqlGrammar extends Grammar
      */
     protected function compileCreateTable($blueprint, $command)
     {
-        $tableStructure = $this->getColumns($blueprint);
+        $tableStructure = array_merge(
+            $this->getColumns($blueprint),
+            $this->getCheckConstraints($blueprint)
+        );
 
         if ($primaryKey = $this->getCommandByName($blueprint, 'primary')) {
             $tableStructure[] = sprintf(
@@ -1389,5 +1392,47 @@ class MySqlGrammar extends Grammar
         [$field, $path] = $this->wrapJsonFieldAndPath($value);
 
         return 'json_unquote(json_extract('.$field.$path.'))';
+    }
+
+    /**
+     * Check version compatibility before calling main handler.
+     *
+     * @throws RuntimeException
+     */
+    private function checkCheckConstraintCompatibility(): void
+    {
+        $isMaria = $this->connection->isMaria();
+        $version = $this->connection->getServerVersion();
+
+        $isCompatible = $isMaria
+            ? version_compare($version, '10.2.1', '>=')
+            : version_compare($version, '8.0.16', '>=');
+
+        if(! $isCompatible) {
+           $driverWithVersion = $isMaria ? 'MariaDB 10.2.1' : 'MySQL 8.0.16';
+           throw new RuntimeException("$driverWithVersion or higher is required to use check constraints.");
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * @throws RuntimeException
+     */
+    public function compileAddCheckConstraint(Blueprint $blueprint, Fluent $command): array
+    {
+        $this->checkCheckConstraintCompatibility();
+
+        return parent::compileAddCheckConstraint($blueprint, $command);
+    }
+
+    /**
+     * {@inheritDoc}
+     * @throws RuntimeException
+     */
+    public function compileDropConstraint(Blueprint $blueprint, Fluent $command): string
+    {
+        $this->checkCheckConstraintCompatibility();
+
+        return parent::compileDropConstraint($blueprint, $command);
     }
 }

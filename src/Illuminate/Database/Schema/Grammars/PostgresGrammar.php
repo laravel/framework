@@ -236,10 +236,15 @@ class PostgresGrammar extends Grammar
      */
     public function compileCreate(Blueprint $blueprint, Fluent $command)
     {
+        $columns = array_merge(
+            $this->getColumns($blueprint),
+            $this->getCheckConstraints($blueprint)
+        );
+
         return sprintf('%s table %s (%s)',
             $blueprint->temporary ? 'create temporary' : 'create',
             $this->wrapTable($blueprint),
-            implode(', ', $this->getColumns($blueprint))
+            implode(', ', $columns)
         );
     }
 

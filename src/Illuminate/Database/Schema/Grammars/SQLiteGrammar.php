@@ -230,10 +230,15 @@ class SQLiteGrammar extends Grammar
      */
     public function compileCreate(Blueprint $blueprint, Fluent $command)
     {
+        $columns = array_merge(
+            $this->getColumns($blueprint),
+            $this->getCheckConstraints($blueprint)
+        );
+
         return sprintf('%s table %s (%s%s%s)',
             $blueprint->temporary ? 'create temporary' : 'create',
             $this->wrapTable($blueprint),
-            implode(', ', $this->getColumns($blueprint)),
+            implode(', ', $columns),
             $this->addForeignKeys($this->getCommandsByName($blueprint, 'foreign')),
             $this->addPrimaryKeys($this->getCommandByName($blueprint, 'primary'))
         );
@@ -1200,5 +1205,21 @@ class SQLiteGrammar extends Grammar
         [$field, $path] = $this->wrapJsonFieldAndPath($value);
 
         return 'json_extract('.$field.$path.')';
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function compileAddCheckConstraint(Blueprint $blueprint, Fluent $command): array
+    {
+        throw new RuntimeException('SQLite does not support adding constraints to existing tables.');
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function compileDropConstraint(Blueprint $blueprint, Fluent $command): string
+    {
+        throw new RuntimeException('SQLite does not support dropping constraints.');
     }
 }

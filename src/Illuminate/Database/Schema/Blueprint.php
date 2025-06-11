@@ -49,6 +49,13 @@ class Blueprint
     protected $commands = [];
 
     /**
+     * All defined check constraints for the table.
+     *
+     * @var \Illuminate\Database\Schema\CheckConstraintBuilder[]
+     */
+    protected array $checkConstraints = [];
+
+    /**
      * The storage engine that should be used for the table.
      *
      * @var string
@@ -1902,5 +1909,46 @@ class Blueprint
     protected function defaultTimePrecision(): ?int
     {
         return $this->connection->getSchemaBuilder()::$defaultTimePrecision;
+    }
+
+    /**
+     * Add a new check constraint to the blueprint.
+     *
+     * @param string  $name
+     * @param Closure  $callback
+     *
+     * @return void
+     */
+    public function checkConstraint(string $name, Closure $callback)
+    {
+        $builder = new CheckConstraintBuilder($name);
+        $callback($builder);
+
+        $this->checkConstraints[] = $builder;
+
+        if (! $this->creating()) {
+            $this->addCommand('addCheckConstraint', compact('builder'));
+        }
+    }
+
+    /**
+     * Get the check constraints.
+     *
+     * @return CheckConstraintBuilder[]
+     */
+    public function getCheckConstraints(): array
+    {
+        return $this->checkConstraints;
+    }
+
+    /**
+     * Drop a constraint.
+     *
+     * @param string $name
+     * @return void
+     */
+    public function dropConstraint(string $name): void
+    {
+        $this->addCommand('dropConstraint')->set('constraintName', $name);
     }
 }

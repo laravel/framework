@@ -3,7 +3,9 @@
 namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Database\Query\Expression;
+use Illuminate\Database\QueryException;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Schema\CheckConstraintBuilder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Orchestra\Testbench\Attributes\RequiresDatabase;
@@ -819,5 +821,152 @@ class SchemaBuilderTest extends DatabaseTestCase
 
         $this->assertTrue(Schema::hasForeignKeyForColumn('question_id', 'answers', 'questions'));
         $this->assertFalse(Schema::hasForeignKeyForColumn('body', 'answers', 'questions'));
+    }
+
+    #[RequiresDatabase('mariadb', '>=10.2.1')]
+    public function testCheckConstraintsOnMariaDb()
+    {
+        $this->runCheckConstraintTest();
+    }
+
+    #[RequiresDatabase('mysql', '>=8.0.16')]
+    public function testCheckConstraintsOnMysql()
+    {
+        $this->runCheckConstraintTest();
+    }
+
+    #[RequiresDatabase(['sqlite', 'pgsql', 'sqlsrv'])]
+    public function testCheckConstraints()
+    {
+        $this->runCheckConstraintTest();
+    }
+
+
+    private function runCheckConstraintTest(): void
+    {
+        Schema::create('test_classes', function (Blueprint $table) {
+            $table->id();
+            $table->string('type');
+            $table->unsignedBigInteger('season_id')->nullable();
+            $table->timestamp('start_at')->nullable();
+            $table->timestamp('end_at')->nullable();
+
+            $table->checkConstraint('check_enrolments', function (CheckConstraintBuilder $constraintBuilder) {
+                $constraintBuilder
+                    ->where('type', '=', 'enrolment', function (CheckConstraintBuilder $q) {
+                        $q->rule('season_id', 'IS NOT NULL')
+                            ->rule('start_at', 'IS NULL');
+                    })
+                    ->orWhere('type',  '=', 'drop-in', function (CheckConstraintBuilder $q) {
+                        $q->rule('season_id', 'IS NULL')
+                            ->rule('start_at', 'IS NOT NULL');
+                    });
+            });
+        });
+
+        if ($this->driver !== 'sqlite') {
+            $this->assertTrue(DB::table('information_schema.table_constraints')
+                ->where('constraint_type', 'CHECK')
+                ->where('table_name', 'test_classes')
+                ->where('constraint_name', 'check_enrolments')
+                ->exists());
+        }
+
+        $this->expectException(QueryException::class);
+
+        DB::table('test_classes')->insert([
+            'type' => 'enrolment', 'season_id' => 123,
+            'start_at' => '2022-01-01', 'end_at' => null,
+        ]);
+
+        DB::table('test_classes')->insert([
+            'type' => 'drop-in', 'season_id' => null,
+            'start_at' => null, 'end_at' => null,
+        ]);
+    }
+
+    #[RequiresDatabase('mariadb', '>=10.2.1')]
+    public function testDropCheckConstraintOnMariaDb()
+    {
+        $this->runDropCheckConstraintTest();
+    }
+
+    #[RequiresDatabase('mysql', '>=8.0.16')]
+    public function testDropCheckConstraintOnMysql()
+    {
+        $this->runDropCheckConstraintTest();
+    }
+
+    #[RequiresDatabase(['pgsql', 'sqlsrv'])]
+    public function testDropCheckConstraint()
+    {
+        $this->runDropCheckConstraintTest();
+    }
+
+    private function runDropCheckConstraintTest(): void
+    {
+        Schema::create('users', function (Blueprint $table) {
+            $table->id();
+            $table->string('firstname');
+            $table->string('surname');
+            $table->checkConstraint('check_name', function (CheckConstraintBuilder $constraintBuilder) {
+                $constraintBuilder->where('firstname', '=', 'John',
+                    function (CheckConstraintBuilder $constraintBuilder) {
+                        $constraintBuilder->rule('surname', 'IS NOT NULL');
+                    });
+            });
+        });
+
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropConstraint('check_name');
+        });
+
+        $this->assertFalse(DB::table('information_schema.table_constraints')
+            ->where('constraint_type', 'CHECK')
+            ->where('table_name', 'users')
+            ->where('constraint_name', 'check_name')
+            ->exists());
+    }
+
+    #[RequiresDatabase('mariadb', '>=10.2.1')]
+    public function testAddCheckConstraintOnMariaDb()
+    {
+        $this->runAddCheckConstraintTest();
+    }
+
+    #[RequiresDatabase('mysql', '>=8.0.16')]
+    public function testAddCheckConstraintOnMysql()
+    {
+        $this->runAddCheckConstraintTest();
+    }
+
+    #[RequiresDatabase(['pgsql', 'sqlsrv'])]
+    public function testAddCheckConstraint()
+    {
+        $this->runAddCheckConstraintTest();
+    }
+
+    private function runAddCheckConstraintTest(): void
+    {
+        Schema::create('users', function (Blueprint $table) {
+            $table->id();
+            $table->string('firstname');
+            $table->string('surname')->nullable();
+        });
+
+        Schema::table('users', function (Blueprint $table) {
+            $table->checkConstraint('check_name', function (CheckConstraintBuilder $constraintBuilder) {
+                $constraintBuilder->where('firstname', '=', 'John',
+                    function (CheckConstraintBuilder $constraintBuilder) {
+                        $constraintBuilder->rule('surname', 'IS NOT NULL');
+                    });
+            });
+        });
+
+        $this->assertTrue(DB::table('information_schema.table_constraints')
+            ->where('constraint_type', 'CHECK')
+            ->where('table_name', 'users')
+            ->where('constraint_name', 'check_name')
+            ->exists());
     }
 }

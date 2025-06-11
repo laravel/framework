@@ -7,6 +7,7 @@ use Illuminate\Contracts\Database\Query\Expression;
 use Illuminate\Database\Concerns\CompilesJsonPaths;
 use Illuminate\Database\Grammar as BaseGrammar;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Schema\CheckConstraintBuilder;
 use Illuminate\Support\Fluent;
 use RuntimeException;
 
@@ -504,5 +505,58 @@ abstract class Grammar extends BaseGrammar
     public function supportsSchemaTransactions()
     {
         return $this->transactions;
+    }
+
+    /**
+     * Build the constraints for the table.
+     *
+     * @param Blueprint $blueprint
+     * @return string[]
+     */
+    protected function getCheckConstraints(Blueprint $blueprint): array
+    {
+        return collect($blueprint->getCheckConstraints())
+            ->map(fn(CheckConstraintBuilder $builder) => "CONSTRAINT {$builder->name()} {$builder->toSql()}")
+            ->all();
+    }
+
+    /**
+     * Compile a drop constraint command.
+     *
+     * @param Blueprint $blueprint
+     * @param Fluent $command
+     *
+     * @return string[]
+     */
+    public function compileAddCheckConstraint(Blueprint $blueprint, Fluent $command): array
+    {
+        $sql = [];
+        foreach ($blueprint->getCheckConstraints() as $constraint) {
+            $sql[] = sprintf(
+                'ALTER TABLE %s ADD CONSTRAINT %s %s',
+                $this->wrapTable($blueprint),
+                $this->wrap($constraint->name()),
+                $constraint->toSql()
+            );
+        }
+
+        return $sql;
+    }
+
+    /**
+     * Compile a drop constraint command.
+     *
+     * @param Blueprint $blueprint
+     * @param Fluent $command
+     *
+     * @return string
+     */
+    public function compileDropConstraint(Blueprint $blueprint, Fluent $command): string
+    {
+        return sprintf(
+            'ALTER TABLE %s DROP CONSTRAINT %s',
+            $this->wrapTable($blueprint),
+            $this->wrap($command->get('constraintName'))
+        );
     }
 }

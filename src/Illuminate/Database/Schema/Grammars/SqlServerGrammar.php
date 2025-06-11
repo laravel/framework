@@ -205,9 +205,14 @@ class SqlServerGrammar extends Grammar
      */
     public function compileCreate(Blueprint $blueprint, Fluent $command)
     {
+        $columns = array_merge(
+            $this->getColumns($blueprint),
+            $this->getCheckConstraints($blueprint)
+        );
+
         return sprintf('create table %s (%s)',
             $this->wrapTable($blueprint, $blueprint->temporary ? '#'.$this->connection->getTablePrefix() : null),
-            implode(', ', $this->getColumns($blueprint))
+            implode(', ', $columns)
         );
     }
 
