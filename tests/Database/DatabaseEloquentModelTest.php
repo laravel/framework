@@ -3286,7 +3286,6 @@ class DatabaseEloquentModelTest extends TestCase
         $model = new EloquentModelWithPrimitiveCasts();
 
         $model->address_line_one = '123 Main Street';
-        $model->address_line_two = 'Anytown';
 
         $this->assertEquals('123 Main Street', $model->address->lineOne);
         $this->assertEquals('123 MAIN STREET', $model->address_in_caps);
