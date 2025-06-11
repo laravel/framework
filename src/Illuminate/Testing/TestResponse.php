@@ -259,7 +259,7 @@ class TestResponse implements ArrayAccess
 
         $this->assertSessionHasErrors($keys, $format, $errorBag);
 
-        return $this;
+        return $this; 
     }
 
     /**
