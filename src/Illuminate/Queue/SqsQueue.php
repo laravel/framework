@@ -80,7 +80,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
     }
 
     /**
-     * Get the number of pending jobs (ready to be received).
+     * Get the number of pending jobs (ready to run).
      *
      * @param  string|null  $queue
      * @return int
@@ -91,7 +91,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
     }
 
     /**
-     * Get the number of delayed jobs.
+     * Get the number of delayed jobs (waiting for future execution).
      *
      * @param  string|null  $queue
      * @return int
@@ -102,7 +102,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
     }
 
     /**
-     * Get the number of reserved jobs (in-flight).
+     * Get the number of reserved jobs (currently running).
      *
      * @param  string|null  $queue
      * @return int
@@ -113,7 +113,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
     }
 
     /**
-     * Get the timestamp of the oldest pending job.
+     * Get the timestamp of the oldest pending job (excluding delayed jobs).
      *
      * Not supported by SQS, returns null.
      *

@@ -80,7 +80,7 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
     }
 
     /**
-     * Get the number of pending jobs (ready to run, not delayed or reserved).
+     * Get the number of pending jobs (ready to run).
      *
      * @param  string|null  $queue
      * @return int
@@ -95,7 +95,7 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
     }
 
     /**
-     * Get the number of delayed jobs (future-dated available_at).
+     * Get the number of delayed jobs (waiting for future execution).
      *
      * @param  string|null  $queue
      * @return int
@@ -110,7 +110,7 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
     }
 
     /**
-     * Get the number of reserved (running) jobs.
+     * Get the number of reserved jobs (currently running).
      *
      * @param  string|null  $queue
      * @return int

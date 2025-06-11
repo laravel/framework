@@ -75,7 +75,7 @@ class BeanstalkdQueue extends Queue implements QueueContract
     }
 
     /**
-     * Get the number of pending jobs (ready).
+     * Get the number of pending jobs (ready to run).
      *
      * @param  string|null  $queue
      * @return int
@@ -86,7 +86,7 @@ class BeanstalkdQueue extends Queue implements QueueContract
     }
 
     /**
-     * Get the number of delayed jobs.
+     * Get the number of delayed jobs (waiting for future execution).
      *
      * @param  string|null  $queue
      * @return int
@@ -97,7 +97,7 @@ class BeanstalkdQueue extends Queue implements QueueContract
     }
 
     /**
-     * Get the number of reserved jobs (in progress).
+     * Get the number of reserved jobs (currently running).
      *
      * @param  string|null  $queue
      * @return int
@@ -108,7 +108,7 @@ class BeanstalkdQueue extends Queue implements QueueContract
     }
 
     /**
-     * Get the available_at timestamp of the oldest pending job (not supported).
+     * Get the timestamp of the oldest pending job (not supported).
      *
      * @param  string|null  $queue
      * @return int|null

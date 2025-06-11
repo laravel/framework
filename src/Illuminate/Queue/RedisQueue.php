@@ -143,7 +143,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
     }
 
     /**
-     * Get the available_at timestamp of the oldest pending job (not delayed).
+     * Get the timestamp of the oldest pending job (excluding delayed jobs).
      *
      * @param  string|null  $queue
      * @return int|null
