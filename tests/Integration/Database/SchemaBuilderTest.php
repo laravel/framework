@@ -844,45 +844,33 @@ class SchemaBuilderTest extends DatabaseTestCase
 
     private function runCheckConstraintTest(): void
     {
-        Schema::create('test_classes', function (Blueprint $table) {
+        Schema::create('orders', function (Blueprint $table) {
             $table->id();
-            $table->string('type');
-            $table->unsignedBigInteger('season_id')->nullable();
-            $table->timestamp('start_at')->nullable();
-            $table->timestamp('end_at')->nullable();
+            $table->string('status');
+            $table->decimal('amount', 10, 2);
+            $table->timestamp('shipped_at')->nullable();
 
-            $table->checkConstraint('check_enrolments', function (CheckConstraintBuilder $constraintBuilder) {
-                $constraintBuilder
-                    ->where('type', '=', 'enrolment', function (CheckConstraintBuilder $q) {
-                        $q->rule('season_id', 'IS NOT NULL')
-                            ->rule('start_at', 'IS NULL');
-                    })
-                    ->orWhere('type',  '=', 'drop-in', function (CheckConstraintBuilder $q) {
-                        $q->rule('season_id', 'IS NULL')
-                            ->rule('start_at', 'IS NOT NULL');
-                    });
+            $table->checkConstraint('shipping_logic', function (CheckConstraintBuilder $constraint) {
+                $constraint->where('status', '=', 'shipped', function ($q) {
+                    $q->rule('shipped_at', 'IS NOT NULL');
+                })->orWhere('status', '!=', 'shipped', function ($q) {
+                    $q->rule('shipped_at', 'IS NULL');
+                });
             });
         });
 
         if ($this->driver !== 'sqlite') {
             $this->assertTrue(DB::table('information_schema.table_constraints')
                 ->where('constraint_type', 'CHECK')
-                ->where('table_name', 'test_classes')
-                ->where('constraint_name', 'check_enrolments')
+                ->where('table_name', 'orders')
+                ->where('constraint_name', 'shipping_logic')
                 ->exists());
         }
 
+        DB::table('orders')->insert(['status' => 'dispatched', 'amount' => 100.00, 'shipped_at' => null]);
+
         $this->expectException(QueryException::class);
-
-        DB::table('test_classes')->insert([
-            'type' => 'enrolment', 'season_id' => 123,
-            'start_at' => '2022-01-01', 'end_at' => null,
-        ]);
-
-        DB::table('test_classes')->insert([
-            'type' => 'drop-in', 'season_id' => null,
-            'start_at' => null, 'end_at' => null,
-        ]);
+        DB::table('orders')->insert(['status' => 'shipped', 'amount' => 100.00, 'shipped_at' => null]);
     }
 
     #[RequiresDatabase('mariadb', '>=10.2.1')]
