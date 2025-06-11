@@ -67,7 +67,7 @@ class HasValidationTest extends TestCase
 
         $object = new DummyReviewList();
         $object->author = 'Taylor';
-        $object->reviews = collect([5,4]);
+        $object->reviews = collect([5, 4]);
         $object->validate();
     }
 
@@ -78,7 +78,7 @@ class HasValidationTest extends TestCase
 
         $object = new DummyReviewList();
         $object->author = 'Taylor';
-        $object->reviews = collect(['a','b']);
+        $object->reviews = collect(['a', 'b']);
         $object->validate();
     }
 
