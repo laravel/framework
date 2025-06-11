@@ -2,8 +2,10 @@
 
 namespace Illuminate\Database\Eloquent;
 
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Database\Events\ModelsPruned;
 use LogicException;
+use Throwable;
 
 trait Prunable
 {
@@ -21,9 +23,21 @@ trait Prunable
             ->when(in_array(SoftDeletes::class, class_uses_recursive(static::class)), function ($query) {
                 $query->withTrashed();
             })->chunkById($chunkSize, function ($models) use (&$total) {
-                $models->each->prune();
+                $models->each(function ($model) use (&$total) {
+                    try {
+                        $model->prune();
 
-                $total += $models->count();
+                        $total++;
+                    } catch (Throwable $e) {
+                        $handler = app(ExceptionHandler::class);
+
+                        if ($handler) {
+                            $handler->report($e);
+                        } else {
+                            throw $e;
+                        }
+                    }
+                });
 
                 event(new ModelsPruned(static::class, $total));
             });
@@ -51,8 +65,8 @@ trait Prunable
         $this->pruning();
 
         return in_array(SoftDeletes::class, class_uses_recursive(static::class))
-                ? $this->forceDelete()
-                : $this->delete();
+            ? $this->forceDelete()
+            : $this->delete();
     }
 
     /**

@@ -925,7 +925,8 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['name' => ''], ['name' => 'required']);
 
-        $exception = new class($v) extends ValidationException {};
+        $exception = new class($v) extends ValidationException {
+        };
         $v->setException($exception);
 
         try {
@@ -5937,7 +5938,7 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['foo' => 'Europe/Kyiv'], ['foo' => 'Timezone:All_with_BC']);
         $this->assertTrue($v->passes());
 
-        $v = new Validator($trans, ['foo' => 'Europe/Kiev'], ['foo' => 'Timezone:All_with_BC']);
+        $v = new Validator($trans, ['foo' => 'Europe/Kyiv'], ['foo' => 'Timezone:All_with_BC']);
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['foo' => 'indian/christmas'], ['foo' => 'Timezone:All_with_BC']);
@@ -5946,7 +5947,7 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['foo' => 'GMT'], ['foo' => 'Timezone:All_with_BC']);
         $this->assertTrue($v->passes());
 
-        $v = new Validator($trans, ['foo' => 'GB'], ['foo' => 'Timezone:All_with_BC']);
+        $v = new Validator($trans, ['foo' => 'Europe/London'], ['foo' => 'Timezone:All_with_BC']);
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['foo' => ['this_is_not_a_timezone']], ['foo' => 'Timezone:All_with_BC']);

@@ -48,7 +48,6 @@ class BeanstalkdQueue extends Queue implements QueueContract
      * @param  int  $timeToRun
      * @param  int  $blockFor
      * @param  bool  $dispatchAfterCommit
-     * @return void
      */
     public function __construct(
         $pheanstalk,
@@ -126,7 +125,7 @@ class BeanstalkdQueue extends Queue implements QueueContract
     {
         return $this->enqueueUsing(
             $job,
-            $this->createPayload($job, $this->getQueue($queue), $data),
+            $this->createPayload($job, $this->getQueue($queue), $data, $delay),
             $queue,
             $delay,
             function ($payload, $queue, $delay) {

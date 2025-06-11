@@ -36,7 +36,6 @@ class HigherOrderWhenProxy
      * Create a new proxy instance.
      *
      * @param  mixed  $target
-     * @return void
      */
     public function __construct($target)
     {

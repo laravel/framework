@@ -118,6 +118,7 @@ class Builder implements BuilderContract
         'explain',
         'getbindings',
         'getconnection',
+        'getcountforpagination',
         'getgrammar',
         'getrawbindings',
         'implode',
@@ -168,7 +169,6 @@ class Builder implements BuilderContract
      * Create a new Eloquent query builder instance.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
-     * @return void
      */
     public function __construct(QueryBuilder $query)
     {
@@ -445,6 +445,67 @@ class Builder implements BuilderContract
 
             return $model;
         }, $items));
+    }
+
+    /**
+     * Insert into the database after merging the model's default attributes, setting timestamps, and casting values.
+     *
+     * @param  array<int, array<string, mixed>>  $values
+     * @return bool
+     */
+    public function fillAndInsert(array $values)
+    {
+        return $this->insert($this->fillForInsert($values));
+    }
+
+    /**
+     * Insert (ignoring errors) into the database after merging the model's default attributes, setting timestamps, and casting values.
+     *
+     * @param  array<int, array<string, mixed>>  $values
+     * @return int
+     */
+    public function fillAndInsertOrIgnore(array $values)
+    {
+        return $this->insertOrIgnore($this->fillForInsert($values));
+    }
+
+    /**
+     * Insert a record into the database and get its ID after merging the model's default attributes, setting timestamps, and casting values.
+     *
+     * @param  array<string, mixed>  $values
+     * @return int
+     */
+    public function fillAndInsertGetId(array $values)
+    {
+        return $this->insertGetId($this->fillForInsert([$values])[0]);
+    }
+
+    /**
+     * Enrich the given values by merging in the model's default attributes, adding timestamps, and casting values.
+     *
+     * @param  array<int, array<string, mixed>>  $values
+     * @return array<int, array<string, mixed>>
+     */
+    public function fillForInsert(array $values)
+    {
+        if (empty($values)) {
+            return [];
+        }
+
+        if (! is_array(reset($values))) {
+            $values = [$values];
+        }
+
+        $this->model->unguarded(function () use (&$values) {
+            foreach ($values as $key => $rowValues) {
+                $values[$key] = tap(
+                    $this->newModelInstance($rowValues),
+                    fn ($model) => $model->setUniqueIds()
+                )->getAttributes();
+            }
+        });
+
+        return $this->addTimestampsToUpsertValues($values);
     }
 
     /**
@@ -1505,7 +1566,8 @@ class Builder implements BuilderContract
         // scope so that we can properly group the added scope constraints in the
         // query as their own isolated nested where statement and avoid issues.
         $originalWhereCount = is_null($query->wheres)
-                    ? 0 : count($query->wheres);
+            ? 0
+            : count($query->wheres);
 
         $result = $scope(...$parameters) ?? $this;
 
@@ -1595,7 +1657,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     * Set the relationships that should be eager loaded.
+     * Specify relationships that should be eager loaded.
      *
      * @param  array<array-key, array|(\Closure(\Illuminate\Database\Eloquent\Relations\Relation<*,*,*>): mixed)|string>|string  $relations
      * @param  (\Closure(\Illuminate\Database\Eloquent\Relations\Relation<*,*,*>): mixed)|string|null  $callback
@@ -1779,8 +1841,8 @@ class Builder implements BuilderContract
         return [explode(':', $name)[0], static function ($query) use ($name) {
             $query->select(array_map(static function ($column) use ($query) {
                 return $query instanceof BelongsToMany
-                        ? $query->getRelated()->qualifyColumn($column)
-                        : $column;
+                    ? $query->getRelated()->qualifyColumn($column)
+                    : $column;
             }, explode(',', explode(':', $name)[1])));
         }];
     }
@@ -1819,16 +1881,19 @@ class Builder implements BuilderContract
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|array|string  $attributes
      * @param  mixed  $value
+     * @param  bool  $asConditions
      * @return $this
      */
-    public function withAttributes(Expression|array|string $attributes, $value = null)
+    public function withAttributes(Expression|array|string $attributes, $value = null, $asConditions = true)
     {
         if (! is_array($attributes)) {
             $attributes = [$attributes => $value];
         }
 
-        foreach ($attributes as $column => $value) {
-            $this->where($this->qualifyColumn($column), $value);
+        if ($asConditions) {
+            foreach ($attributes as $column => $value) {
+                $this->where($this->qualifyColumn($column), $value);
+            }
         }
 
         $this->pendingAttributes = array_merge($this->pendingAttributes, $attributes);

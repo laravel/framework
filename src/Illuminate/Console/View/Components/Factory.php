@@ -33,7 +33,6 @@ class Factory
      * Creates a new factory instance.
      *
      * @param  \Illuminate\Console\OutputStyle  $output
-     * @return void
      */
     public function __construct($output)
     {

@@ -126,4 +126,109 @@ class SupportUriTest extends TestCase
 
         $this->assertEquals('https://laravel.com/docs/11.x/installation?tags[0]=first&tags[1]=second', $uri->decode());
     }
+
+    public function test_with_query_if_missing()
+    {
+        // Test adding new parameters while preserving existing ones
+        $uri = Uri::of('https://laravel.com?existing=value');
+
+        $uri = $uri->withQueryIfMissing([
+            'new' => 'parameter',
+            'existing' => 'new_value',
+        ]);
+
+        $this->assertEquals('existing=value&new=parameter', $uri->query()->decode());
+
+        // Test adding complex nested arrays to empty query string
+        $uri = Uri::of('https://laravel.com');
+
+        $uri = $uri->withQueryIfMissing([
+            'name' => 'Taylor',
+            'role' => [
+                'title' => 'Developer',
+                'focus' => 'PHP',
+            ],
+            'tags' => [
+                'person',
+                'employee',
+            ],
+        ]);
+
+        $this->assertEquals('name=Taylor&role[title]=Developer&role[focus]=PHP&tags[0]=person&tags[1]=employee', $uri->query()->decode());
+
+        // Test partial array merging and preserving indexed arrays
+        $uri = Uri::of('https://laravel.com?name=Taylor&tags[0]=person');
+
+        $uri = $uri->withQueryIfMissing([
+            'name' => 'Changed',
+            'age' => 38,
+            'tags' => ['should', 'not', 'change'],
+        ]);
+
+        $this->assertEquals('name=Taylor&tags[0]=person&age=38', $uri->query()->decode());
+        $this->assertEquals(['name' => 'Taylor', 'tags' => ['person'], 'age' => 38], $uri->query()->all());
+
+        $uri = Uri::of('https://laravel.com?user[name]=Taylor');
+
+        $uri = $uri->withQueryIfMissing([
+            'user' => [
+                'name' => 'Should Not Change',
+                'age' => 38,
+            ],
+            'settings' => [
+                'theme' => 'dark',
+            ],
+        ]);
+        $this->assertEquals([
+            'user' => [
+                'name' => 'Taylor',
+            ],
+            'settings' => [
+                'theme' => 'dark',
+            ],
+        ], $uri->query()->all());
+    }
+
+    public function test_with_query_prevents_empty_query_string()
+    {
+        $uri = Uri::of('https://laravel.com');
+
+        $this->assertEquals('https://laravel.com', (string) $uri);
+        $this->assertEquals('https://laravel.com', (string) $uri->withQuery([]));
+    }
+
+    public function test_path_segments()
+    {
+        $uri = Uri::of('https://laravel.com');
+
+        $this->assertEquals([], $uri->pathSegments()->toArray());
+
+        $uri = Uri::of('https://laravel.com/one/two/three');
+
+        $this->assertEquals(['one', 'two', 'three'], $uri->pathSegments()->toArray());
+        $this->assertEquals('one', $uri->pathSegments()->first());
+
+        $uri = Uri::of('https://laravel.com/one/two/three?foo=bar');
+
+        $this->assertEquals(3, $uri->pathSegments()->count());
+
+        $uri = Uri::of('https://laravel.com/one/two/three/?foo=bar');
+
+        $this->assertEquals(3, $uri->pathSegments()->count());
+
+        $uri = Uri::of('https://laravel.com/one/two/three/#foo=bar');
+
+        $this->assertEquals(3, $uri->pathSegments()->count());
+    }
+
+    public function test_macroable()
+    {
+        Uri::macro('myMacro', function () {
+            return $this->withPath('foobar');
+        });
+
+        $uri = new Uri('https://laravel.com/');
+
+        $this->assertSame('https://laravel.com/foobar', (string) $uri->myMacro());
+    }
 }

@@ -96,7 +96,6 @@ class Blueprint
      * @param  \Illuminate\Database\Connection  $connection
      * @param  string  $table
      * @param  \Closure|null  $callback
-     * @return void
      */
     public function __construct(Connection $connection, $table, ?Closure $callback = null)
     {
@@ -1240,13 +1239,14 @@ class Blueprint
      * Add nullable creation and update timestamps to the table.
      *
      * @param  int|null  $precision
-     * @return void
+     * @return \Illuminate\Support\Collection<int, \Illuminate\Database\Schema\ColumnDefinition>
      */
     public function timestamps($precision = null)
     {
-        $this->timestamp('created_at', $precision)->nullable();
-
-        $this->timestamp('updated_at', $precision)->nullable();
+        return new Collection([
+            $this->timestamp('created_at', $precision)->nullable(),
+            $this->timestamp('updated_at', $precision)->nullable(),
+        ]);
     }
 
     /**
@@ -1255,37 +1255,39 @@ class Blueprint
      * Alias for self::timestamps().
      *
      * @param  int|null  $precision
-     * @return void
+     * @return \Illuminate\Support\Collection<int, \Illuminate\Database\Schema\ColumnDefinition>
      */
     public function nullableTimestamps($precision = null)
     {
-        $this->timestamps($precision);
+        return $this->timestamps($precision);
     }
 
     /**
      * Add creation and update timestampTz columns to the table.
      *
      * @param  int|null  $precision
-     * @return void
+     * @return \Illuminate\Support\Collection<int, \Illuminate\Database\Schema\ColumnDefinition>
      */
     public function timestampsTz($precision = null)
     {
-        $this->timestampTz('created_at', $precision)->nullable();
-
-        $this->timestampTz('updated_at', $precision)->nullable();
+        return new Collection([
+            $this->timestampTz('created_at', $precision)->nullable(),
+            $this->timestampTz('updated_at', $precision)->nullable(),
+        ]);
     }
 
     /**
      * Add creation and update datetime columns to the table.
      *
      * @param  int|null  $precision
-     * @return void
+     * @return \Illuminate\Support\Collection<int, \Illuminate\Database\Schema\ColumnDefinition>
      */
     public function datetimes($precision = null)
     {
-        $this->datetime('created_at', $precision)->nullable();
-
-        $this->datetime('updated_at', $precision)->nullable();
+        return new Collection([
+            $this->datetime('created_at', $precision)->nullable(),
+            $this->datetime('updated_at', $precision)->nullable(),
+        ]);
     }
 
     /**

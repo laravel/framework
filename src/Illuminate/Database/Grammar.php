@@ -22,7 +22,6 @@ abstract class Grammar
      * Create a new grammar instance.
      *
      * @param  \Illuminate\Database\Connection  $connection
-     * @return void
      */
     public function __construct(Connection $connection)
     {
@@ -32,8 +31,8 @@ abstract class Grammar
     /**
      * Wrap an array of values.
      *
-     * @param  array  $values
-     * @return array
+     * @param  array<\Illuminate\Contracts\Database\Query\Expression|string>  $values
+     * @return array<string>
      */
     public function wrapArray(array $values)
     {
@@ -137,15 +136,15 @@ abstract class Grammar
     /**
      * Wrap the given value segments.
      *
-     * @param  array  $segments
+     * @param  list<string>  $segments
      * @return string
      */
     protected function wrapSegments($segments)
     {
         return (new Collection($segments))->map(function ($segment, $key) use ($segments) {
             return $key == 0 && count($segments) > 1
-                            ? $this->wrapTable($segment)
-                            : $this->wrapValue($segment);
+                ? $this->wrapTable($segment)
+                : $this->wrapValue($segment);
         })->implode('.');
     }
 
@@ -191,7 +190,7 @@ abstract class Grammar
     /**
      * Convert an array of column names into a delimited string.
      *
-     * @param  array  $columns
+     * @param  array<\Illuminate\Contracts\Database\Query\Expression|string>  $columns
      * @return string
      */
     public function columnize(array $columns)
@@ -202,7 +201,7 @@ abstract class Grammar
     /**
      * Create query parameter place-holders for an array.
      *
-     * @param  array  $values
+     * @param  array<mixed>  $values
      * @return string
      */
     public function parameterize(array $values)
@@ -224,7 +223,7 @@ abstract class Grammar
     /**
      * Quote the given string literal.
      *
-     * @param  string|array  $value
+     * @param  string|array<string>  $value
      * @return string
      */
     public function quoteString($value)

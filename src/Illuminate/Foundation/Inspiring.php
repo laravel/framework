@@ -56,9 +56,7 @@ class Inspiring
      */
     public static function quote()
     {
-        return static::quotes()
-            ->map(fn ($quote) => static::formatForConsole($quote))
-            ->random();
+        return static::formatForConsole(static::quotes()->random());
     }
 
     /**

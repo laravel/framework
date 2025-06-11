@@ -18,7 +18,9 @@ class EventListCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'event:list {--event= : Filter the events by name}';
+    protected $signature = 'event:list
+                            {--event= : Filter the events by name}
+                            {--json : Output the events and listeners as JSON}';
 
     /**
      * The console command description.
@@ -44,11 +46,48 @@ class EventListCommand extends Command
         $events = $this->getEvents()->sortKeys();
 
         if ($events->isEmpty()) {
-            $this->components->info("Your application doesn't have any events matching the given criteria.");
+            if ($this->option('json')) {
+                $this->output->writeln('[]');
+            } else {
+                $this->components->info("Your application doesn't have any events matching the given criteria.");
+            }
 
             return;
         }
 
+        if ($this->option('json')) {
+            $this->displayJson($events);
+        } else {
+            $this->displayForCli($events);
+        }
+    }
+
+    /**
+     * Display events and their listeners in JSON.
+     *
+     * @param  \Illuminate\Support\Collection  $events
+     * @return void
+     */
+    protected function displayJson(Collection $events)
+    {
+        $data = $events->map(function ($listeners, $event) {
+            return [
+                'event' => strip_tags($this->appendEventInterfaces($event)),
+                'listeners' => collect($listeners)->map(fn ($listener) => strip_tags($listener))->values()->all(),
+            ];
+        })->values();
+
+        $this->output->writeln($data->toJson());
+    }
+
+    /**
+     * Display the events and their listeners for the CLI.
+     *
+     * @param  \Illuminate\Support\Collection  $events
+     * @return void
+     */
+    protected function displayForCli(Collection $events)
+    {
         $this->newLine();
 
         $events->each(function ($listeners, $event) {

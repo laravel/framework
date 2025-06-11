@@ -56,7 +56,6 @@ class DurationLimiterBuilder
      *
      * @param  \Illuminate\Redis\Connections\Connection  $connection
      * @param  string  $name
-     * @return void
      */
     public function __construct($connection, $name)
     {

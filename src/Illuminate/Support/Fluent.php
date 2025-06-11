@@ -5,6 +5,7 @@ namespace Illuminate\Support;
 use ArrayAccess;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\InteractsWithData;
 use Illuminate\Support\Traits\Macroable;
 use JsonSerializable;
@@ -18,7 +19,7 @@ use JsonSerializable;
  */
 class Fluent implements Arrayable, ArrayAccess, Jsonable, JsonSerializable
 {
-    use InteractsWithData, Macroable {
+    use Conditionable, InteractsWithData, Macroable {
         __call as macroCall;
     }
 
@@ -33,11 +34,21 @@ class Fluent implements Arrayable, ArrayAccess, Jsonable, JsonSerializable
      * Create a new fluent instance.
      *
      * @param  iterable<TKey, TValue>  $attributes
-     * @return void
      */
     public function __construct($attributes = [])
     {
         $this->fill($attributes);
+    }
+
+    /**
+     * Create a new fluent instance.
+     *
+     * @param  iterable<TKey, TValue>  $attributes
+     * @return static
+     */
+    public static function make($attributes = [])
+    {
+        return new static($attributes);
     }
 
     /**

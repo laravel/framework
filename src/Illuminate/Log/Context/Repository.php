@@ -194,6 +194,28 @@ class Repository
     }
 
     /**
+     * Retrieve all values except those with the given keys.
+     *
+     * @param  array<int, string>  $keys
+     * @return array<string, mixed>
+     */
+    public function except($keys)
+    {
+        return array_diff_key($this->data, array_flip($keys));
+    }
+
+    /**
+     * Retrieve all hidden values except those with the given keys.
+     *
+     * @param  array<int, string>  $keys
+     * @return array<string, mixed>
+     */
+    public function exceptHidden($keys)
+    {
+        return array_diff_key($this->hidden, array_flip($keys));
+    }
+
+    /**
      * Add a context value.
      *
      * @param  string|array<string, mixed>  $key
@@ -370,6 +392,35 @@ class Repository
     }
 
     /**
+     * Increment a context counter.
+     *
+     * @param  string  $key
+     * @param  int  $amount
+     * @return $this
+     */
+    public function increment(string $key, int $amount = 1)
+    {
+        $this->add(
+            $key,
+            (int) $this->get($key, 0) + $amount,
+        );
+
+        return $this;
+    }
+
+    /**
+     * Decrement a context counter.
+     *
+     * @param  string  $key
+     * @param  int  $amount
+     * @return $this
+     */
+    public function decrement(string $key, int $amount = 1)
+    {
+        return $this->increment($key, $amount * -1);
+    }
+
+    /**
      * Determine if the given value is in the given stack.
      *
      * @param  string  $key
@@ -445,6 +496,35 @@ class Repository
     {
         return ! $this->hasHidden($key) ||
             (is_array($this->hidden[$key]) && array_is_list($this->hidden[$key]));
+    }
+
+    /**
+     * Run the callback function with the given context values and restore the original context state when complete.
+     *
+     * @param  callable  $callback
+     * @param  array<string, mixed>  $data
+     * @param  array<string, mixed>  $hidden
+     * @return mixed
+     */
+    public function scope(callable $callback, array $data = [], array $hidden = [])
+    {
+        $dataBefore = $this->data;
+        $hiddenBefore = $this->hidden;
+
+        if ($data !== []) {
+            $this->add($data);
+        }
+
+        if ($hidden !== []) {
+            $this->addHidden($hidden);
+        }
+
+        try {
+            return $callback();
+        } finally {
+            $this->data = $dataBefore;
+            $this->hidden = $hiddenBefore;
+        }
     }
 
     /**

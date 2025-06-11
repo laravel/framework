@@ -10,6 +10,7 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Broadcasting\ShouldBeUnique;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
+use Illuminate\Contracts\Broadcasting\ShouldRescue;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Bus;
@@ -39,6 +40,28 @@ class BroadcastManagerTest extends TestCase
 
         Bus::assertNotDispatched(BroadcastEvent::class);
         Queue::assertPushed(BroadcastEvent::class);
+    }
+
+    public function testEventsCanBeRescued()
+    {
+        Bus::fake();
+        Queue::fake();
+
+        Broadcast::queue(new TestEventRescue);
+
+        Bus::assertNotDispatched(BroadcastEvent::class);
+        Queue::assertPushed(BroadcastEvent::class);
+    }
+
+    public function testNowEventsCanBeRescued()
+    {
+        Bus::fake();
+        Queue::fake();
+
+        Broadcast::queue(new TestEventNowRescue);
+
+        Bus::assertDispatched(BroadcastEvent::class);
+        Queue::assertNotPushed(BroadcastEvent::class);
     }
 
     public function testUniqueEventsCanBeBroadcast()
@@ -113,6 +136,32 @@ class TestEventNow implements ShouldBroadcastNow
 }
 
 class TestEventUnique implements ShouldBroadcast, ShouldBeUnique
+{
+    /**
+     * Get the channels the event should broadcast on.
+     *
+     * @return \Illuminate\Broadcasting\Channel|\Illuminate\Broadcasting\Channel[]
+     */
+    public function broadcastOn()
+    {
+        //
+    }
+}
+
+class TestEventRescue implements ShouldBroadcast, ShouldRescue
+{
+    /**
+     * Get the channels the event should broadcast on.
+     *
+     * @return \Illuminate\Broadcasting\Channel|\Illuminate\Broadcasting\Channel[]
+     */
+    public function broadcastOn()
+    {
+        //
+    }
+}
+
+class TestEventNowRescue implements ShouldBroadcastNow, ShouldRescue
 {
     /**
      * Get the channels the event should broadcast on.

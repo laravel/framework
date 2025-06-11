@@ -32,6 +32,7 @@ use Illuminate\Support\Testing\Fakes\ExceptionHandlerFake;
  * @method static void renderForConsole(\Symfony\Component\Console\Output\OutputInterface $output, \Throwable $e)
  * @method static \Illuminate\Support\Testing\Fakes\ExceptionHandlerFake throwOnReport()
  * @method static \Illuminate\Support\Testing\Fakes\ExceptionHandlerFake throwFirstReported()
+ * @method static array reported()
  * @method static \Illuminate\Support\Testing\Fakes\ExceptionHandlerFake setHandler(\Illuminate\Contracts\Debug\ExceptionHandler $handler)
  *
  * @see \Illuminate\Foundation\Exceptions\Handler

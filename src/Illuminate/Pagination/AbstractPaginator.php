@@ -3,11 +3,13 @@
 namespace Illuminate\Pagination;
 
 use Closure;
+use Illuminate\Contracts\Support\CanBeEscapedWhenCastToString;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\Tappable;
+use Illuminate\Support\Traits\TransformsToResourceCollection;
 use Stringable;
 use Traversable;
 
@@ -18,9 +20,9 @@ use Traversable;
  *
  * @mixin \Illuminate\Support\Collection<TKey, TValue>
  */
-abstract class AbstractPaginator implements Htmlable, Stringable
+abstract class AbstractPaginator implements CanBeEscapedWhenCastToString, Htmlable, Stringable
 {
-    use ForwardsCalls, Tappable;
+    use ForwardsCalls, Tappable, TransformsToResourceCollection;
 
     /**
      * All of the items being paginated.
@@ -70,6 +72,13 @@ abstract class AbstractPaginator implements Htmlable, Stringable
      * @var string
      */
     protected $pageName = 'page';
+
+    /**
+     * Indicates that the paginator's string representation should be escaped when __toString is invoked.
+     *
+     * @var bool
+     */
+    protected $escapeWhenCastingToString = false;
 
     /**
      * The number of links to display on each side of current page link.
@@ -797,6 +806,21 @@ abstract class AbstractPaginator implements Htmlable, Stringable
      */
     public function __toString()
     {
-        return (string) $this->render();
+        return $this->escapeWhenCastingToString
+            ? e((string) $this->render())
+            : (string) $this->render();
+    }
+
+    /**
+     * Indicate that the paginator's string representation should be escaped when __toString is invoked.
+     *
+     * @param  bool  $escape
+     * @return $this
+     */
+    public function escapeWhenCastingToString($escape = true)
+    {
+        $this->escapeWhenCastingToString = $escape;
+
+        return $this;
     }
 }

@@ -16,7 +16,6 @@ class MessageSent
      *
      * @param  \Illuminate\Mail\SentMessage  $sent  The message that was sent.
      * @param  array  $data  The message data.
-     * @return void
      */
     public function __construct(
         public SentMessage $sent,

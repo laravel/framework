@@ -12,12 +12,9 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
 use Illuminate\Support\HigherOrderCollectionProxy;
-use InvalidArgumentException;
 use JsonSerializable;
-use Traversable;
 use UnexpectedValueException;
 use UnitEnum;
-use WeakMap;
 
 use function Illuminate\Support\enum_value;
 
@@ -177,6 +174,19 @@ trait EnumeratesValues
         return static::range(1, $number)
             ->unless($callback == null)
             ->map($callback);
+    }
+
+    /**
+     * Create a new collection by decoding a JSON string.
+     *
+     * @param  string  $json
+     * @param  int  $depth
+     * @param  int  $flags
+     * @return static<TKey, TValue>
+     */
+    public static function fromJson($json, $depth = 512, $flags = 0)
+    {
+        return new static(json_decode($json, true, $depth, $flags));
     }
 
     /**
@@ -342,7 +352,7 @@ trait EnumeratesValues
      *
      * @template TEnsureOfType
      *
-     * @param  class-string<TEnsureOfType>|array<array-key, class-string<TEnsureOfType>>  $type
+     * @param  class-string<TEnsureOfType>|array<array-key, class-string<TEnsureOfType>>|'string'|'int'|'float'|'bool'|'array'|'null'  $type
      * @return static<TKey, TEnsureOfType>
      *
      * @throws \UnexpectedValueException
@@ -504,20 +514,11 @@ trait EnumeratesValues
      */
     public function partition($key, $operator = null, $value = null)
     {
-        $passed = [];
-        $failed = [];
-
         $callback = func_num_args() === 1
-                ? $this->valueRetriever($key)
-                : $this->operatorForWhere(...func_get_args());
+            ? $this->valueRetriever($key)
+            : $this->operatorForWhere(...func_get_args());
 
-        foreach ($this as $key => $item) {
-            if ($callback($item, $key)) {
-                $passed[$key] = $item;
-            } else {
-                $failed[$key] = $item;
-            }
-        }
+        [$passed, $failed] = Arr::partition($this->getIterator(), $callback);
 
         return new static([new static($passed), new static($failed)]);
     }
@@ -544,8 +545,10 @@ trait EnumeratesValues
     /**
      * Get the sum of the given values.
      *
-     * @param  (callable(TValue): mixed)|string|null  $callback
-     * @return mixed
+     * @template TReturnType
+     *
+     * @param  (callable(TValue): TReturnType)|string|null  $callback
+     * @return ($callback is callable ? TReturnType : mixed)
      */
     public function sum($callback = null)
     {
@@ -1000,8 +1003,8 @@ trait EnumeratesValues
     public function __toString()
     {
         return $this->escapeWhenCastingToString
-                    ? e($this->toJson())
-                    : $this->toJson();
+            ? e($this->toJson())
+            : $this->toJson();
     }
 
     /**
@@ -1053,20 +1056,9 @@ trait EnumeratesValues
      */
     protected function getArrayableItems($items)
     {
-        if (is_array($items)) {
-            return $items;
-        }
-
-        return match (true) {
-            $items instanceof WeakMap => throw new InvalidArgumentException('Collections can not be created using instances of WeakMap.'),
-            $items instanceof Enumerable => $items->all(),
-            $items instanceof Arrayable => $items->toArray(),
-            $items instanceof Traversable => iterator_to_array($items),
-            $items instanceof Jsonable => json_decode($items->toJson(), true),
-            $items instanceof JsonSerializable => (array) $items->jsonSerialize(),
-            $items instanceof UnitEnum => [$items],
-            default => (array) $items,
-        };
+        return is_null($items) || is_scalar($items) || $items instanceof UnitEnum
+            ? Arr::wrap($items)
+            : Arr::from($items);
     }
 
     /**

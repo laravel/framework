@@ -47,6 +47,17 @@ class LogLoggerTest extends TestCase
         $writer->error('foo');
     }
 
+    public function testContextKeysCanBeRemovedForSubsequentLogs()
+    {
+        $writer = new Logger($monolog = m::mock(Monolog::class));
+        $writer->withContext(['bar' => 'baz', 'forget' => 'me']);
+        $writer->withoutContext(['forget']);
+
+        $monolog->shouldReceive('error')->once()->with('foo', ['bar' => 'baz']);
+
+        $writer->error('foo');
+    }
+
     public function testLoggerFiresEventsDispatcher()
     {
         $writer = new Logger($monolog = m::mock(Monolog::class), $events = new Dispatcher);
@@ -91,5 +102,22 @@ class LogLoggerTest extends TestCase
         $events->shouldReceive('listen')->with(MessageLogged::class, $callback)->once();
 
         $writer->listen($callback);
+    }
+
+    public function testComplexContextManipulation()
+    {
+        $writer = new Logger($monolog = m::mock(Monolog::class));
+
+        $writer->withContext(['user_id' => 123, 'action' => 'login']);
+        $writer->withContext(['ip' => '127.0.0.1', 'timestamp' => '1986-10-29']);
+        $writer->withoutContext(['timestamp']);
+
+        $monolog->shouldReceive('info')->once()->with('User action', [
+            'user_id' => 123,
+            'action' => 'login',
+            'ip' => '127.0.0.1',
+        ]);
+
+        $writer->info('User action');
     }
 }

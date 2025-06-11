@@ -15,7 +15,6 @@ class NotificationSending
      * @param  mixed  $notifiable  The notifiable entity who received the notification.
      * @param  \Illuminate\Notifications\Notification  $notification  The notification instance.
      * @param  string  $channel  The channel name.
-     * @return void
      */
     public function __construct(
         public $notifiable,

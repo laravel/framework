@@ -26,11 +26,17 @@ class ClosureCommand extends Command
     protected $callback;
 
     /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = '';
+
+    /**
      * Create a new command instance.
      *
      * @param  string  $signature
      * @param  \Closure  $callback
-     * @return void
      */
     public function __construct($signature, Closure $callback)
     {

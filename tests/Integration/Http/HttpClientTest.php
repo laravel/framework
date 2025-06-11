@@ -21,7 +21,7 @@ class HttpClientTest extends TestCase
         Http::get('laravel.com');
 
         Event::assertDispatched(RequestSending::class, function (RequestSending $event) {
-            return Collection::make($event->request->header('User-Agent'))->contains('Facade/1.0');
+            return (new Collection($event->request->header('User-Agent')))->contains('Facade/1.0');
         });
     }
 

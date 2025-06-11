@@ -53,7 +53,6 @@ class InvokableValidationRule implements Rule, ValidatorAwareRule
      * Create a new explicit Invokable validation rule.
      *
      * @param  \Illuminate\Contracts\Validation\ValidationRule|\Illuminate\Contracts\Validation\InvokableRule  $invokable
-     * @return void
      */
     protected function __construct(ValidationRule|InvokableRule $invokable)
     {
@@ -96,8 +95,8 @@ class InvokableValidationRule implements Rule, ValidatorAwareRule
         }
 
         $method = $this->invokable instanceof ValidationRule
-                        ? 'validate'
-                        : '__invoke';
+            ? 'validate'
+            : '__invoke';
 
         $this->invokable->{$method}($attribute, $value, function ($attribute, $message = null) {
             $this->failed = true;

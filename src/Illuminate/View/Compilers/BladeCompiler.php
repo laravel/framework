@@ -193,7 +193,17 @@ class BladeCompiler extends Compiler implements CompilerInterface
                 $compiledPath = $this->getCompiledPath($this->getPath())
             );
 
-            $this->files->put($compiledPath, $contents);
+            if (! $this->files->exists($compiledPath)) {
+                $this->files->put($compiledPath, $contents);
+
+                return;
+            }
+
+            $compiledHash = $this->files->hash($compiledPath, 'xxh128');
+
+            if ($compiledHash !== hash('xxh128', $contents)) {
+                $this->files->put($compiledPath, $contents);
+            }
         }
     }
 
@@ -222,11 +232,15 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function getOpenAndClosingPhpTokens($contents)
     {
-        return (new Collection(token_get_all($contents)))
-            ->pluck(0)
-            ->filter(function ($token) {
-                return in_array($token, [T_OPEN_TAG, T_OPEN_TAG_WITH_ECHO, T_CLOSE_TAG]);
-            });
+        $tokens = [];
+
+        foreach (token_get_all($contents) as $token) {
+            if ($token[0] === T_OPEN_TAG || $token[0] === T_OPEN_TAG_WITH_ECHO || $token[0] === T_CLOSE_TAG) {
+                $tokens[] = $token[0];
+            }
+        }
+
+        return new Collection($tokens);
     }
 
     /**
@@ -713,8 +727,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
 
         $this->directive($name, function ($expression) use ($name) {
             return $expression !== ''
-                    ? "<?php if (\Illuminate\Support\Facades\Blade::check('{$name}', {$expression})): ?>"
-                    : "<?php if (\Illuminate\Support\Facades\Blade::check('{$name}')): ?>";
+                ? "<?php if (\Illuminate\Support\Facades\Blade::check('{$name}', {$expression})): ?>"
+                : "<?php if (\Illuminate\Support\Facades\Blade::check('{$name}')): ?>";
         });
 
         $this->directive('unless'.$name, function ($expression) use ($name) {
@@ -762,10 +776,10 @@ class BladeCompiler extends Compiler implements CompilerInterface
 
         if (is_null($alias)) {
             $alias = str_contains($class, '\\View\\Components\\')
-                            ? (new Collection(explode('\\', Str::after($class, '\\View\\Components\\'))))->map(function ($segment) {
-                                return Str::kebab($segment);
-                            })->implode(':')
-                            : Str::kebab(class_basename($class));
+                ? (new Collection(explode('\\', Str::after($class, '\\View\\Components\\'))))->map(function ($segment) {
+                    return Str::kebab($segment);
+                })->implode(':')
+                : Str::kebab(class_basename($class));
         }
 
         if (! empty($prefix)) {
@@ -897,8 +911,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
 
         $this->directive($alias, function ($expression) use ($path) {
             return $expression
-                        ? "<?php \$__env->startComponent('{$path}', {$expression}); ?>"
-                        : "<?php \$__env->startComponent('{$path}'); ?>";
+                ? "<?php \$__env->startComponent('{$path}', {$expression}); ?>"
+                : "<?php \$__env->startComponent('{$path}'); ?>";
         });
 
         $this->directive('end'.$alias, function ($expression) {
@@ -1001,6 +1015,28 @@ class BladeCompiler extends Compiler implements CompilerInterface
     public function precompiler(callable $precompiler)
     {
         $this->precompilers[] = $precompiler;
+    }
+
+    /**
+     * Execute the given callback using a custom echo format.
+     *
+     * @param  string  $format
+     * @param  callable  $callback
+     * @return string
+     */
+    public function usingEchoFormat($format, callable $callback)
+    {
+        $originalEchoFormat = $this->echoFormat;
+
+        $this->setEchoFormat($format);
+
+        try {
+            $output = call_user_func($callback);
+        } finally {
+            $this->setEchoFormat($originalEchoFormat);
+        }
+
+        return $output;
     }
 
     /**

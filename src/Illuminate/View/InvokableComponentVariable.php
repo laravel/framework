@@ -23,7 +23,6 @@ class InvokableComponentVariable implements DeferringDisplayableValue, IteratorA
      * Create a new variable instance.
      *
      * @param  \Closure  $callable
-     * @return void
      */
     public function __construct(Closure $callable)
     {

@@ -69,8 +69,8 @@ class RouteBinding
             $instance = $container->make($class);
 
             $routeBindingMethod = $route?->allowsTrashedBindings() && in_array(SoftDeletes::class, class_uses_recursive($instance))
-                        ? 'resolveSoftDeletableRouteBinding'
-                        : 'resolveRouteBinding';
+                ? 'resolveSoftDeletableRouteBinding'
+                : 'resolveRouteBinding';
 
             if ($model = $instance->{$routeBindingMethod}($value)) {
                 return $model;

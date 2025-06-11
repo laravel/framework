@@ -41,7 +41,6 @@ class CallQueuedHandler
      *
      * @param  \Illuminate\Contracts\Bus\Dispatcher  $dispatcher
      * @param  \Illuminate\Contracts\Container\Container  $container
-     * @return void
      */
     public function __construct(Dispatcher $dispatcher, Container $container)
     {
@@ -275,11 +274,16 @@ class CallQueuedHandler
      * @param  array  $data
      * @param  \Throwable|null  $e
      * @param  string  $uuid
+     * @param  \Illuminate\Contracts\Queue\Job|null  $job
      * @return void
      */
-    public function failed(array $data, $e, string $uuid)
+    public function failed(array $data, $e, string $uuid, ?Job $job = null)
     {
         $command = $this->getCommand($data);
+
+        if (! is_null($job)) {
+            $command = $this->setJobInstanceIfNecessary($job, $command);
+        }
 
         if (! $command instanceof ShouldBeUniqueUntilProcessing) {
             $this->ensureUniqueJobLockIsReleased($command);

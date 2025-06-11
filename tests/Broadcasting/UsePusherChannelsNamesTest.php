@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 class UsePusherChannelsNamesTest extends TestCase
 {
     #[DataProvider('channelsProvider')]
-    public function testChannelNameNormalization($requestChannelName, $normalizedName)
+    public function testChannelNameNormalization($requestChannelName, $normalizedName, $_)
     {
         $broadcaster = new FakeBroadcasterUsingPusherChannelsNames;
 

@@ -288,7 +288,8 @@ class DatabaseEloquentInverseRelationTest extends TestCase
             [],
             new HasInverseRelationRelatedStub(),
             'foo',
-            new class() {},
+            new class() {
+            },
             new HasInverseRelationRelatedStub(),
         ]);
     }
@@ -378,7 +379,7 @@ class HasInverseRelationStub extends Relation
         return $this->getPossibleInverseRelations();
     }
 
-    public function exposeGuessInverseRelation(): string|null
+    public function exposeGuessInverseRelation(): ?string
     {
         return $this->guessInverseRelation();
     }

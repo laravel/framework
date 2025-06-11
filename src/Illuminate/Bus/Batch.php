@@ -113,7 +113,6 @@ class Batch implements Arrayable, JsonSerializable
      * @param  \Carbon\CarbonImmutable  $createdAt
      * @param  \Carbon\CarbonImmutable|null  $cancelledAt
      * @param  \Carbon\CarbonImmutable|null  $finishedAt
-     * @return void
      */
     public function __construct(
         QueueFactory $queue,
@@ -454,7 +453,7 @@ class Batch implements Arrayable, JsonSerializable
     protected function invokeHandlerCallback($handler, Batch $batch, ?Throwable $e = null)
     {
         try {
-            return $handler($batch, $e);
+            $handler($batch, $e);
         } catch (Throwable $e) {
             if (function_exists('report')) {
                 report($e);

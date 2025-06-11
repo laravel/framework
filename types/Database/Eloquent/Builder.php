@@ -63,6 +63,7 @@ function test(
     assertType('Illuminate\Types\Builder\User', $query->forceCreate(['name' => 'John']));
     assertType('Illuminate\Types\Builder\User', $query->updateOrCreate(['id' => 1], ['name' => 'John']));
     assertType('Illuminate\Types\Builder\User', $query->firstOrFail());
+    assertType('Illuminate\Types\Builder\User', $query->findSole(1));
     assertType('Illuminate\Types\Builder\User', $query->sole());
     assertType('Illuminate\Support\LazyCollection<int, Illuminate\Types\Builder\User>', $query->cursor());
     assertType('Illuminate\Support\LazyCollection<int, Illuminate\Types\Builder\User>', $query->cursor());
@@ -222,6 +223,12 @@ function test(
     assertType('Illuminate\Types\Builder\CommentBuilder', $comment->newQuery()->where('foo', 'bar'));
     assertType('Illuminate\Types\Builder\CommentBuilder', $comment->newQuery()->foo());
     assertType('Illuminate\Types\Builder\Comment', $comment->newQuery()->create(['name' => 'John']));
+    assertType('Illuminate\Database\Eloquent\Builder<Illuminate\Types\Builder\User>', $query->pipe(function () {
+        //
+    }));
+    assertType('Illuminate\Database\Eloquent\Builder<Illuminate\Types\Builder\User>', $query->pipe(fn () => null));
+    assertType('Illuminate\Database\Eloquent\Builder<Illuminate\Types\Builder\User>', $query->pipe(fn ($query) => $query));
+    assertType('5', $query->pipe(fn ($query) => 5));
 }
 
 class User extends Model

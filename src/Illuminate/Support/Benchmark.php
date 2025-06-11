@@ -23,7 +23,7 @@ class Benchmark
 
                 $callback();
 
-                return (hrtime(true) - $start) / 1000000;
+                return (hrtime(true) - $start) / 1_000_000;
             })->average();
         })->when(
             $benchmarkables instanceof Closure,
@@ -33,7 +33,7 @@ class Benchmark
     }
 
     /**
-     * Measure a callable once and return the duration and result.
+     * Measure a callable once and return the result and duration in milliseconds.
      *
      * @template TReturn of mixed
      *
@@ -48,7 +48,7 @@ class Benchmark
 
         $result = $callback();
 
-        return [$result, (hrtime(true) - $start) / 1000000];
+        return [$result, (hrtime(true) - $start) / 1_000_000];
     }
 
     /**

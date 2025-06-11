@@ -32,7 +32,6 @@ class Signals
      * Create a new signal registrar instance.
      *
      * @param  \Symfony\Component\Console\SignalRegistry\SignalRegistry  $registry
-     * @return void
      */
     public function __construct($registry)
     {

@@ -26,7 +26,6 @@ class UniqueBroadcastEvent extends BroadcastEvent implements ShouldBeUnique
      * Create a new event instance.
      *
      * @param  mixed  $event
-     * @return void
      */
     public function __construct($event)
     {
@@ -55,7 +54,7 @@ class UniqueBroadcastEvent extends BroadcastEvent implements ShouldBeUnique
     public function uniqueVia()
     {
         return method_exists($this->event, 'uniqueVia')
-                ? $this->event->uniqueVia()
-                : Container::getInstance()->make(Repository::class);
+            ? $this->event->uniqueVia()
+            : Container::getInstance()->make(Repository::class);
     }
 }

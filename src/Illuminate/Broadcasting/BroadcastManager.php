@@ -14,6 +14,7 @@ use Illuminate\Bus\UniqueLock;
 use Illuminate\Contracts\Broadcasting\Factory as FactoryContract;
 use Illuminate\Contracts\Broadcasting\ShouldBeUnique;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
+use Illuminate\Contracts\Broadcasting\ShouldRescue;
 use Illuminate\Contracts\Bus\Dispatcher as BusDispatcherContract;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Foundation\CachesRoutes;
@@ -51,7 +52,6 @@ class BroadcastManager implements FactoryContract
      * Create a new manager instance.
      *
      * @param  \Illuminate\Contracts\Container\Container  $app
-     * @return void
      */
     public function __construct($app)
     {
@@ -179,7 +179,12 @@ class BroadcastManager implements FactoryContract
             (is_object($event) &&
              method_exists($event, 'shouldBroadcastNow') &&
              $event->shouldBroadcastNow())) {
-            return $this->app->make(BusDispatcherContract::class)->dispatchNow(new BroadcastEvent(clone $event));
+            $dispatch = fn () => $this->app->make(BusDispatcherContract::class)
+                ->dispatchNow(new BroadcastEvent(clone $event));
+
+            return $event instanceof ShouldRescue
+                ? $this->rescue($dispatch)
+                : $dispatch();
         }
 
         $queue = null;
@@ -202,9 +207,13 @@ class BroadcastManager implements FactoryContract
             }
         }
 
-        $this->app->make('queue')
+        $push = fn () => $this->app->make('queue')
             ->connection($event->connection ?? null)
             ->pushOn($queue, $broadcastEvent);
+
+        $event instanceof ShouldRescue
+            ? $this->rescue($push)
+            : $push();
     }
 
     /**
@@ -474,6 +483,21 @@ class BroadcastManager implements FactoryContract
         $this->customCreators[$driver] = $callback;
 
         return $this;
+    }
+
+    /**
+     * Execute the given callback using "rescue" if possible.
+     *
+     * @param  \Closure  $callback
+     * @return mixed
+     */
+    protected function rescue(Closure $callback)
+    {
+        if (function_exists('rescue')) {
+            return rescue($callback);
+        }
+
+        return $callback();
     }
 
     /**

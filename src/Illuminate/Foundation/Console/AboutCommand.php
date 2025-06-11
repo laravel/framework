@@ -53,7 +53,6 @@ class AboutCommand extends Command
      * Create a new command instance.
      *
      * @param  \Illuminate\Support\Composer  $composer
-     * @return void
      */
     public function __construct(Composer $composer)
     {
@@ -165,6 +164,7 @@ class AboutCommand extends Command
 
         $formatEnabledStatus = fn ($value) => $value ? '<fg=yellow;options=bold>ENABLED</>' : 'OFF';
         $formatCachedStatus = fn ($value) => $value ? '<fg=green;options=bold>CACHED</>' : '<fg=yellow;options=bold>NOT CACHED</>';
+        $formatStorageLinkedStatus = fn ($value) => $value ? '<fg=green;options=bold>LINKED</>' : '<fg=yellow;options=bold>NOT LINKED</>';
 
         static::addToSection('Environment', fn () => [
             'Application Name' => config('app.name'),
@@ -183,7 +183,7 @@ class AboutCommand extends Command
             'Config' => static::format($this->laravel->configurationIsCached(), console: $formatCachedStatus),
             'Events' => static::format($this->laravel->eventsAreCached(), console: $formatCachedStatus),
             'Routes' => static::format($this->laravel->routesAreCached(), console: $formatCachedStatus),
-            'Views' => static::format($this->hasPhpFiles($this->laravel->storagePath('framework/views')), console: $formatCachedStatus),
+            'Views' => static::format($this->hasPhpFiles(config('view.compiled')), console: $formatCachedStatus),
         ]);
 
         static::addToSection('Drivers', fn () => array_filter([
@@ -214,7 +214,28 @@ class AboutCommand extends Command
             'Session' => config('session.driver'),
         ]));
 
+        static::addToSection('Storage', fn () => [
+            ...$this->determineStoragePathLinkStatus($formatStorageLinkedStatus),
+        ]);
+
         (new Collection(static::$customDataResolvers))->each->__invoke();
+    }
+
+    /**
+     * Determine storage symbolic links status.
+     *
+     * @param  callable  $formatStorageLinkedStatus
+     * @return array<string,mixed>
+     */
+    protected function determineStoragePathLinkStatus(callable $formatStorageLinkedStatus): array
+    {
+        return (new Collection(config('filesystems.links', [])))
+            ->mapWithKeys(function ($target, $link) use ($formatStorageLinkedStatus) {
+                $path = Str::replace(public_path(), '', $link);
+
+                return [public_path($path) => static::format(file_exists($link), console: $formatStorageLinkedStatus)];
+            })
+            ->toArray();
     }
 
     /**

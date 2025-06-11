@@ -10,7 +10,6 @@ class JobFailed
      * @param  string  $connectionName  The connection name.
      * @param  \Illuminate\Contracts\Queue\Job  $job  The job instance.
      * @param  \Throwable  $exception  The exception that caused the job to fail.
-     * @return void
      */
     public function __construct(
         public $connectionName,

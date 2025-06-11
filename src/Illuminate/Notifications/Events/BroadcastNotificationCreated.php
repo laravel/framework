@@ -20,7 +20,6 @@ class BroadcastNotificationCreated implements ShouldBroadcast
      * @param  mixed  $notifiable  The notifiable entity who received the notification.
      * @param  \Illuminate\Notifications\Notification  $notification  The notification instance.
      * @param  array  $data  The notification data.
-     * @return void
      */
     public function __construct(
         public $notifiable,
@@ -97,8 +96,8 @@ class BroadcastNotificationCreated implements ShouldBroadcast
     public function broadcastType()
     {
         return method_exists($this->notification, 'broadcastType')
-                    ? $this->notification->broadcastType()
-                    : get_class($this->notification);
+            ? $this->notification->broadcastType()
+            : get_class($this->notification);
     }
 
     /**
@@ -109,7 +108,7 @@ class BroadcastNotificationCreated implements ShouldBroadcast
     public function broadcastAs()
     {
         return method_exists($this->notification, 'broadcastAs')
-                ? $this->notification->broadcastAs()
-                : __CLASS__;
+            ? $this->notification->broadcastAs()
+            : __CLASS__;
     }
 }

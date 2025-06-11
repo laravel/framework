@@ -51,7 +51,6 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
      * @param  string  $default
      * @param  int  $retryAfter
      * @param  bool  $dispatchAfterCommit
-     * @return void
      */
     public function __construct(
         Connection $database,
@@ -127,7 +126,7 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
     {
         return $this->enqueueUsing(
             $job,
-            $this->createPayload($job, $this->getQueue($queue), $data),
+            $this->createPayload($job, $this->getQueue($queue), $data, $delay),
             $queue,
             $delay,
             function ($payload, $queue, $delay) {

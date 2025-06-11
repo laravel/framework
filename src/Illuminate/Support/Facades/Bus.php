@@ -20,6 +20,8 @@ use Illuminate\Support\Testing\Fakes\BusFake;
  * @method static void dispatchAfterResponse(mixed $command, mixed $handler = null)
  * @method static \Illuminate\Bus\Dispatcher pipeThrough(array $pipes)
  * @method static \Illuminate\Bus\Dispatcher map(array $map)
+ * @method static \Illuminate\Bus\Dispatcher withDispatchingAfterResponses()
+ * @method static \Illuminate\Bus\Dispatcher withoutDispatchingAfterResponses()
  * @method static \Illuminate\Support\Testing\Fakes\BusFake except(array|string $jobsToDispatch)
  * @method static void assertDispatched(string|\Closure $command, callable|int|null $callback = null)
  * @method static void assertDispatchedTimes(string|\Closure $command, int $times = 1)
@@ -66,8 +68,8 @@ class Bus extends Facade
     public static function fake($jobsToFake = [], ?BatchRepository $batchRepository = null)
     {
         $actualDispatcher = static::isFake()
-                ? static::getFacadeRoot()->dispatcher
-                : static::getFacadeRoot();
+            ? static::getFacadeRoot()->dispatcher
+            : static::getFacadeRoot();
 
         return tap(new BusFake($actualDispatcher, $jobsToFake, $batchRepository), function ($fake) {
             static::swap($fake);
