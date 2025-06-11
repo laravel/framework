@@ -4,7 +4,6 @@ namespace Illuminate\Tests\Cache;
 
 use Illuminate\Cache\ApcStore;
 use Illuminate\Cache\ApcWrapper;
-use Illuminate\Support\Carbon;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 
