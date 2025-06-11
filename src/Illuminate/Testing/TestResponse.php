@@ -209,6 +209,19 @@ class TestResponse implements ArrayAccess
     }
 
     /**
+     * Assert whether the response is redirecting to a given URI.
+     *
+     * @param  string|null  $uri
+     * @return $this
+     *
+     * @see assertRedirect
+     */
+    public function assertRedirected($uri = null)
+    {
+        return $this->assertRedirect($uri);
+    }
+
+    /**
      * Assert whether the response is redirecting to a URI that contains the given URI.
      *
      * @param  string  $uri
@@ -246,6 +259,18 @@ class TestResponse implements ArrayAccess
     }
 
     /**
+     * Assert whether the response is redirecting back to the previous location.
+     *
+     * @return $this
+     *
+     * @see assertRedirectBack
+     */
+    public function assertRedirectedBack()
+    {
+        return $this->assertRedirectBack();
+    }
+
+    /**
      * Assert whether the response is redirecting to a given route.
      *
      * @param  \BackedEnum|string  $name
@@ -264,6 +289,20 @@ class TestResponse implements ArrayAccess
         $this->assertLocation($uri);
 
         return $this;
+    }
+
+    /**
+     * Assert whether the response is redirecting to a given route.
+     *
+     * @param  \BackedEnum|string  $name
+     * @param  mixed  $parameters
+     * @return $this
+     *
+     * @see assertRedirectToRoute
+     */
+    public function assertRedirectedToRoute($name, $parameters = [])
+    {
+        return $this->assertRedirectToRoute($name, $parameters);
     }
 
     /**
@@ -306,6 +345,21 @@ class TestResponse implements ArrayAccess
     }
 
     /**
+     * Assert whether the response is redirecting to a given signed route.
+     *
+     * @param  \BackedEnum|string|null  $name
+     * @param  mixed  $parameters
+     * @param  bool  $absolute
+     * @return $this
+     *
+     * @see assertRedirectToSignedRoute
+     */
+    public function assertRedirectedToSignedRoute($name = null, $parameters = [], $absolute = true)
+    {
+        return $this->assertRedirectToSignedRoute($name, $parameters, $absolute);
+    }
+
+    /**
      * Assert whether the response is redirecting to a given controller action.
      *
      * @param  string|array  $name
@@ -324,6 +378,20 @@ class TestResponse implements ArrayAccess
         $this->assertLocation($uri);
 
         return $this;
+    }
+
+    /**
+     * Assert whether the response is redirecting to a given controller action.
+     *
+     * @param  string|array  $name
+     * @param  array  $parameters
+     * @return $this
+     *
+     * @see assertRedirectToAction
+     */
+    public function assertRedirectedToAction($name, $parameters = [])
+    {
+        return $this->assertRedirectToAction($name, $parameters);
     }
 
     /**
