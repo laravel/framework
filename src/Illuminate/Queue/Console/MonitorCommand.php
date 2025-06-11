@@ -20,6 +20,7 @@ class MonitorCommand extends Command
     protected $signature = 'queue:monitor
                        {queues : The names of the queues to monitor}
                        {--max=1000 : The maximum number of jobs that can be on the queue before an event is dispatched}
+                       {--metrics : Output queue metrics}
                        {--json : Output the queue size as JSON}';
 
     /**
@@ -136,6 +137,7 @@ class MonitorCommand extends Command
             $this->components->twoColumnDetail('Delayed jobs', $queue['delayed'] ?? 'N/A');
             $this->components->twoColumnDetail('Reserved jobs', $queue['reserved'] ?? 'N/A');
             $this->components->twoColumnDetail('Oldest pending', $queue['oldest_pending'] ? date('c', $queue['oldest_pending']) : 'N/A');
+            $this->line('');
         });
 
         $this->newLine();
