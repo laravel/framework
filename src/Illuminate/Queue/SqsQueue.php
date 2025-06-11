@@ -80,6 +80,52 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
     }
 
     /**
+     * Get the number of pending jobs (ready to be received).
+     *
+     * @param  string|null  $queue
+     * @return int
+     */
+    public function sizePending($queue = null)
+    {
+        return $this->getQueueAttribute($queue, 'ApproximateNumberOfMessages');
+    }
+
+    /**
+     * Get the number of delayed jobs.
+     *
+     * @param  string|null  $queue
+     * @return int
+     */
+    public function sizeDelayed($queue = null)
+    {
+        return $this->getQueueAttribute($queue, 'ApproximateNumberOfMessagesDelayed');
+    }
+
+    /**
+     * Get the number of reserved jobs (in-flight).
+     *
+     * @param  string|null  $queue
+     * @return int
+     */
+    public function sizeReserved($queue = null)
+    {
+        return $this->getQueueAttribute($queue, 'ApproximateNumberOfMessagesNotVisible');
+    }
+
+    /**
+     * Get the timestamp of the oldest pending job.
+     *
+     * Not supported by SQS, returns null.
+     *
+     * @param  string|null  $queue
+     * @return int|null
+     */
+    public function oldestPending($queue = null)
+    {
+        return null;
+    }
+
+    /**
      * Push a new job onto the queue.
      *
      * @param  string  $job

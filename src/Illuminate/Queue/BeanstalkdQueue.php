@@ -75,6 +75,50 @@ class BeanstalkdQueue extends Queue implements QueueContract
     }
 
     /**
+     * Get the number of pending jobs (ready).
+     *
+     * @param  string|null  $queue
+     * @return int
+     */
+    public function sizePending($queue = null)
+    {
+        return (int) $this->pheanstalk->statsTube(new TubeName($this->getQueue($queue)))->currentJobsReady;
+    }
+
+    /**
+     * Get the number of delayed jobs.
+     *
+     * @param  string|null  $queue
+     * @return int
+     */
+    public function sizeDelayed($queue = null)
+    {
+        return (int) $this->pheanstalk->statsTube(new TubeName($this->getQueue($queue)))->currentJobsDelayed;
+    }
+
+    /**
+     * Get the number of reserved jobs (in progress).
+     *
+     * @param  string|null  $queue
+     * @return int
+     */
+    public function sizeReserved($queue = null)
+    {
+        return (int) $this->pheanstalk->statsTube(new TubeName($this->getQueue($queue)))->currentJobsReserved;
+    }
+
+    /**
+     * Get the available_at timestamp of the oldest pending job (not supported).
+     *
+     * @param  string|null  $queue
+     * @return int|null
+     */
+    public function oldestPending($queue = null)
+    {
+        return null;
+    }
+
+    /**
      * Push a new job onto the queue.
      *
      * @param  string  $job

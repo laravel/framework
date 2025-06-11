@@ -80,6 +80,66 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
     }
 
     /**
+     * Get the number of pending jobs (ready to run, not delayed or reserved).
+     *
+     * @param  string|null  $queue
+     * @return int
+     */
+    public function sizePending($queue = null)
+    {
+        return $this->database->table($this->table)
+            ->where('queue', $this->getQueue($queue))
+            ->whereNull('reserved_at')
+            ->where('available_at', '<=', $this->currentTime())
+            ->count();
+    }
+
+    /**
+     * Get the number of delayed jobs (future-dated available_at).
+     *
+     * @param  string|null  $queue
+     * @return int
+     */
+    public function sizeDelayed($queue = null)
+    {
+        return $this->database->table($this->table)
+            ->where('queue', $this->getQueue($queue))
+            ->whereNull('reserved_at')
+            ->where('available_at', '>', $this->currentTime())
+            ->count();
+    }
+
+    /**
+     * Get the number of reserved (running) jobs.
+     *
+     * @param  string|null  $queue
+     * @return int
+     */
+    public function sizeReserved($queue = null)
+    {
+        return $this->database->table($this->table)
+            ->where('queue', $this->getQueue($queue))
+            ->whereNotNull('reserved_at')
+            ->count();
+    }
+
+    /**
+     * Get the timestamp of the oldest pending job (excluding delayed jobs).
+     *
+     * @param  string|null  $queue
+     * @return int|null
+     */
+    public function oldestPending($queue = null)
+    {
+        return $this->database->table($this->table)
+            ->where('queue', $this->getQueue($queue))
+            ->whereNull('reserved_at')
+            ->where('available_at', '<=', $this->currentTime())
+            ->oldest('available_at')
+            ->value('available_at');
+    }
+
+    /**
      * Push a new job onto the queue.
      *
      * @param  string  $job

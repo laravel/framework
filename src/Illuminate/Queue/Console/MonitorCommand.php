@@ -99,6 +99,18 @@ class MonitorCommand extends Command
                 'connection' => $connection,
                 'queue' => $queue,
                 'size' => $size = $this->manager->connection($connection)->size($queue),
+                'pending' => method_exists($this->manager->connection($connection), 'sizePending')
+                    ? $this->manager->connection($connection)->sizePending($queue)
+                    : null,
+                'delayed' => method_exists($this->manager->connection($connection), 'sizeDelayed')
+                    ? $this->manager->connection($connection)->sizeDelayed($queue)
+                    : null,
+                'reserved' => method_exists($this->manager->connection($connection), 'sizeReserved')
+                    ? $this->manager->connection($connection)->sizeReserved($queue)
+                    : null,
+                'oldest_pending' => method_exists($this->manager->connection($connection), 'oldestPending')
+                    ? $this->manager->connection($connection)->oldestPending($queue)
+                    : null,
                 'status' => $size >= $this->option('max') ? '<fg=yellow;options=bold>ALERT</>' : '<fg=green;options=bold>OK</>',
             ];
         });
@@ -121,6 +133,9 @@ class MonitorCommand extends Command
             $status = '['.$queue['size'].'] '.$queue['status'];
 
             $this->components->twoColumnDetail($name, $status);
+            $this->components->twoColumnDetail('Delayed jobs', $queue['delayed'] ?? 'N/A');
+            $this->components->twoColumnDetail('Reserved jobs', $queue['reserved'] ?? 'N/A');
+            $this->components->twoColumnDetail('Oldest pending', $queue['oldest_pending'] ? date('c', $queue['oldest_pending']) : 'N/A');
         });
 
         $this->newLine();
