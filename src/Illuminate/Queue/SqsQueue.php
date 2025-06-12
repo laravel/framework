@@ -85,6 +85,12 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
             + (int) $a['ApproximateNumberOfMessagesNotVisible'];
     }
 
+    /**
+     * Get the number of pending jobs (ready to run).
+     *
+     * @param  string|null  $queue
+     * @return int
+     */
     public function sizePending($queue = null)
     {
         $response = $this->sqs->getQueueAttributes([
@@ -95,6 +101,12 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
         return (int) $response['Attributes']['ApproximateNumberOfMessages'] ?? 0;
     }
 
+    /**
+     * Get the number of delayed jobs (waiting for future execution).
+     *
+     * @param  string|null  $queue
+     * @return int
+     */
     public function sizeDelayed($queue = null)
     {
         $response = $this->sqs->getQueueAttributes([
@@ -105,6 +117,12 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
         return (int) $response['Attributes']['ApproximateNumberOfMessagesDelayed'] ?? 0;
     }
 
+    /**
+     * Get the number of reserved jobs (currently running).
+     *
+     * @param  string|null  $queue
+     * @return int
+     */
     public function sizeReserved($queue = null)
     {
         $response = $this->sqs->getQueueAttributes([
