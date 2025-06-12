@@ -80,12 +80,12 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
     }
 
     /**
-     * Get the number of pending jobs (ready to run).
+     * Get the number of pending jobs.
      *
      * @param  string|null  $queue
      * @return int
      */
-    public function sizePending($queue = null)
+    public function pendingSize($queue = null)
     {
         return $this->database->table($this->table)
             ->where('queue', $this->getQueue($queue))
@@ -95,12 +95,12 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
     }
 
     /**
-     * Get the number of delayed jobs (waiting for future execution).
+     * Get the number of delayed jobs.
      *
      * @param  string|null  $queue
      * @return int
      */
-    public function sizeDelayed($queue = null)
+    public function delayedSize($queue = null)
     {
         return $this->database->table($this->table)
             ->where('queue', $this->getQueue($queue))
@@ -110,12 +110,12 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
     }
 
     /**
-     * Get the number of reserved jobs (currently running).
+     * Get the number of reserved jobs.
      *
      * @param  string|null  $queue
      * @return int
      */
-    public function sizeReserved($queue = null)
+    public function reservedSize($queue = null)
     {
         return $this->database->table($this->table)
             ->where('queue', $this->getQueue($queue))
@@ -124,7 +124,7 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
     }
 
     /**
-     * Get the timestamp of the oldest pending job (excluding delayed jobs).
+     * Get the creation timestamp of the oldest pending job, excluding delayed jobs.
      *
      * @param  string|null  $queue
      * @return int|null

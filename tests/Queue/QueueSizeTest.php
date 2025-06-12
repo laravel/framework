@@ -39,26 +39,26 @@ class QueueSizeTest extends TestCase
         dispatch(new TestJob2)->delay(5);
         dispatch($job)->onQueue('Q2');
 
-        $this->assertEquals(2, $queue->sizePending());
-        $this->assertEquals(1, $queue->sizeDelayed());
-        $this->assertEquals(0, $queue->sizeReserved());
+        $this->assertEquals(2, $queue->pendingSize());
+        $this->assertEquals(1, $queue->delayedSize());
+        $this->assertEquals(0, $queue->reservedSize());
         $this->assertIsInt($queue->oldestPending());
 
-        $this->assertEquals(1, $queue->sizePending('Q2'));
-        $this->assertEquals(0, $queue->sizeDelayed('Q2'));
-        $this->assertEquals(0, $queue->sizeReserved('Q2'));
+        $this->assertEquals(1, $queue->pendingSize('Q2'));
+        $this->assertEquals(0, $queue->delayedSize('Q2'));
+        $this->assertEquals(0, $queue->reservedSize('Q2'));
         $this->assertIsInt($queue->oldestPending('Q2'));
 
         $queue->process();
         $queue->process('Q2');
 
-        $this->assertEquals(1, $queue->sizePending());
-        $this->assertEquals(1, $queue->sizeDelayed());
-        $this->assertEquals(1, $queue->sizeReserved());
+        $this->assertEquals(1, $queue->pendingSize());
+        $this->assertEquals(1, $queue->delayedSize());
+        $this->assertEquals(1, $queue->reservedSize());
 
-        $this->assertEquals(0, $queue->sizePending('Q2'));
-        $this->assertEquals(0, $queue->sizeDelayed('Q2'));
-        $this->assertEquals(1, $queue->sizeReserved('Q2'));
+        $this->assertEquals(0, $queue->pendingSize('Q2'));
+        $this->assertEquals(0, $queue->delayedSize('Q2'));
+        $this->assertEquals(1, $queue->reservedSize('Q2'));
     }
 }
 

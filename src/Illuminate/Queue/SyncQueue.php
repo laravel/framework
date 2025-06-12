@@ -37,40 +37,40 @@ class SyncQueue extends Queue implements QueueContract
     }
 
     /**
-     * Get the number of pending jobs (none for sync).
+     * Get the number of pending jobs.
      *
      * @param  string|null  $queue
      * @return int
      */
-    public function sizePending($queue = null)
+    public function pendingSize($queue = null)
     {
         return 0;
     }
 
     /**
-     * Get the number of delayed jobs (none for sync).
+     * Get the number of delayed jobs.
      *
      * @param  string|null  $queue
      * @return int
      */
-    public function sizeDelayed($queue = null)
+    public function delayedSize($queue = null)
     {
         return 0;
     }
 
     /**
-     * Get the number of reserved jobs (none for sync).
+     * Get the number of reserved jobs.
      *
      * @param  string|null  $queue
      * @return int
      */
-    public function sizeReserved($queue = null)
+    public function reservedSize($queue = null)
     {
         return 0;
     }
 
     /**
-     * Get the timestamp of the oldest pending job (not supported).
+     * Get the creation timestamp of the oldest pending job, excluding delayed jobs.
      *
      * @param  string|null  $queue
      * @return int|null

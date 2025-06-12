@@ -437,7 +437,7 @@ class QueueFake extends QueueManager implements Fake, Queue
      * @param  string|null  $queue
      * @return int
      */
-    public function sizePending($queue = null)
+    public function pendingSize($queue = null)
     {
         return collect($this->pendingJobs)
             ->filter(fn ($job) => $job['queue'] === $queue && $job['available_at'] <= now()->getTimestamp())
@@ -450,7 +450,7 @@ class QueueFake extends QueueManager implements Fake, Queue
      * @param  string|null  $queue
      * @return int
      */
-    public function sizeDelayed($queue = null)
+    public function delayedSize($queue = null)
     {
         return collect($this->delayedJobs)
             ->filter(fn ($job) => $job['queue'] === $queue && $job['available_at'] > now()->getTimestamp())
@@ -463,7 +463,7 @@ class QueueFake extends QueueManager implements Fake, Queue
      * @param  string|null  $queue
      * @return int
      */
-    public function sizeReserved($queue = null)
+    public function reservedSize($queue = null)
     {
         return collect($this->reservedJobs)
             ->filter(fn ($job) => $job['queue'] === $queue)

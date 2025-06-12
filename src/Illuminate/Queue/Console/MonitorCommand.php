@@ -99,14 +99,14 @@ class MonitorCommand extends Command
                 'connection' => $connection,
                 'queue' => $queue,
                 'size' => $size = $this->manager->connection($connection)->size($queue),
-                'pending' => method_exists($this->manager->connection($connection), 'sizePending')
-                    ? $this->manager->connection($connection)->sizePending($queue)
+                'pending' => method_exists($this->manager->connection($connection), 'pendingSize')
+                    ? $this->manager->connection($connection)->pendingSize($queue)
                     : null,
-                'delayed' => method_exists($this->manager->connection($connection), 'sizeDelayed')
-                    ? $this->manager->connection($connection)->sizeDelayed($queue)
+                'delayed' => method_exists($this->manager->connection($connection), 'delayedSize')
+                    ? $this->manager->connection($connection)->delayedSize($queue)
                     : null,
-                'reserved' => method_exists($this->manager->connection($connection), 'sizeReserved')
-                    ? $this->manager->connection($connection)->sizeReserved($queue)
+                'reserved' => method_exists($this->manager->connection($connection), 'reservedSize')
+                    ? $this->manager->connection($connection)->reservedSize($queue)
                     : null,
                 'oldest_pending' => method_exists($this->manager->connection($connection), 'oldestPending')
                     ? $this->manager->connection($connection)->oldestPending($queue)
@@ -136,7 +136,6 @@ class MonitorCommand extends Command
             $this->components->twoColumnDetail('Pending jobs', $queue['pending'] ?? 'N/A');
             $this->components->twoColumnDetail('Delayed jobs', $queue['delayed'] ?? 'N/A');
             $this->components->twoColumnDetail('Reserved jobs', $queue['reserved'] ?? 'N/A');
-            $this->components->twoColumnDetail('Oldest pending', $queue['oldest_pending'] ? date('c', $queue['oldest_pending']) : 'N/A');
             $this->line('');
         });
 

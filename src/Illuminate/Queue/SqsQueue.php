@@ -86,12 +86,12 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
     }
 
     /**
-     * Get the number of pending jobs (ready to run).
+     * Get the number of pending jobs.
      *
      * @param  string|null  $queue
      * @return int
      */
-    public function sizePending($queue = null)
+    public function pendingSize($queue = null)
     {
         $response = $this->sqs->getQueueAttributes([
             'QueueUrl' => $this->getQueue($queue),
@@ -102,12 +102,12 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
     }
 
     /**
-     * Get the number of delayed jobs (waiting for future execution).
+     * Get the number of delayed jobs.
      *
      * @param  string|null  $queue
      * @return int
      */
-    public function sizeDelayed($queue = null)
+    public function delayedSize($queue = null)
     {
         $response = $this->sqs->getQueueAttributes([
             'QueueUrl' => $this->getQueue($queue),
@@ -118,12 +118,12 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
     }
 
     /**
-     * Get the number of reserved jobs (currently running).
+     * Get the number of reserved jobs.
      *
      * @param  string|null  $queue
      * @return int
      */
-    public function sizeReserved($queue = null)
+    public function reservedSize($queue = null)
     {
         $response = $this->sqs->getQueueAttributes([
             'QueueUrl' => $this->getQueue($queue),
@@ -134,7 +134,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
     }
 
     /**
-     * Get the timestamp of the oldest pending job (excluding delayed jobs).
+     * Get the creation timestamp of the oldest pending job, excluding delayed jobs.
      *
      * Not supported by SQS, returns null.
      *
@@ -143,6 +143,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
      */
     public function oldestPending($queue = null)
     {
+        // Not supported by SQS...
         return null;
     }
 
