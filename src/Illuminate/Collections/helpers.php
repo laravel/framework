@@ -108,6 +108,24 @@ if (! function_exists('data_set')) {
      */
     function data_set(&$target, $key, $value, $overwrite = true)
     {
+        return data_map($target, $key, fn () => $value, $overwrite);
+    }
+}
+
+if (! function_exists('data_map')) {
+    /**
+     * Run a map over an array or object using dot notation.
+     *
+     * @param  mixed  $target
+     * @param  string|array  $key
+     * @param  callable  $callback
+     * @param  bool  $overwrite
+     * @return mixed
+     */
+    function data_map(&$target, $key, callable $callback, bool $overwrite = true)
+    {
+        static $fullKey = '';
+
         $segments = is_array($key) ? $key : explode('.', $key);
 
         if (($segment = array_shift($segments)) === '*') {
@@ -116,12 +134,16 @@ if (! function_exists('data_set')) {
             }
 
             if ($segments) {
-                foreach ($target as &$inner) {
-                    data_set($inner, $segments, $value, $overwrite);
+                $loopKey = $fullKey;
+                foreach ($target as $i => &$inner) {
+                    $fullKey = trim($loopKey.'.'.$i, '.');
+                    data_map($inner, $segments, $callback, $overwrite);
                 }
             } elseif ($overwrite) {
-                foreach ($target as &$inner) {
-                    $inner = $value;
+                $loopKey = $fullKey;
+                foreach ($target as $i => &$inner) {
+                    $fullKey = trim($loopKey.'.'.$i, '.');
+                    $inner = $callback($inner, $fullKey);
                 }
             }
         } elseif (Arr::accessible($target)) {
@@ -130,9 +152,10 @@ if (! function_exists('data_set')) {
                     $target[$segment] = [];
                 }
 
-                data_set($target[$segment], $segments, $value, $overwrite);
+                $fullKey = trim($fullKey.'.'.$segment, '.');
+                data_map($target[$segment], $segments, $callback, $overwrite);
             } elseif ($overwrite || ! Arr::exists($target, $segment)) {
-                $target[$segment] = $value;
+                $target[$segment] = $callback(Arr::get($target, $segment), $fullKey);
             }
         } elseif (is_object($target)) {
             if ($segments) {
@@ -140,19 +163,23 @@ if (! function_exists('data_set')) {
                     $target->{$segment} = [];
                 }
 
-                data_set($target->{$segment}, $segments, $value, $overwrite);
+                $fullKey = trim($fullKey.'.'.$segment, '.');
+                data_map($target->{$segment}, $segments, $callback, $overwrite);
             } elseif ($overwrite || ! isset($target->{$segment})) {
-                $target->{$segment} = $value;
+                $target->{$segment} = $callback($target->{$segment} ?? null, $fullKey);
             }
         } else {
             $target = [];
 
             if ($segments) {
-                data_set($target[$segment], $segments, $value, $overwrite);
+                $fullKey = trim($fullKey.'.'.$segment, '.');
+                data_map($target[$segment], $segments, $callback, $overwrite);
             } elseif ($overwrite) {
-                $target[$segment] = $value;
+                $target[$segment] = $callback($target[$segment] ?? null, $fullKey);
             }
         }
+
+        $fullKey = '';
 
         return $target;
     }

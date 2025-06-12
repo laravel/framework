@@ -622,6 +622,46 @@ class SupportHelpersTest extends TestCase
         ], $data);
     }
 
+    public function testDataMap()
+    {
+        $data = [
+            'posts' => [
+                (object) [
+                    'comments' => [
+                        (object) ['order' => 1],
+                        (object) [],
+                    ],
+                ],
+                (object) [
+                    'comments' => [
+                        (object) [],
+                        (object) ['order' => 2],
+                    ],
+                ],
+            ],
+        ];
+
+        data_map($data, 'posts.*.comments.*.key', fn ($old, $key) => $key);
+        data_map($data, 'posts.*.comments.*.order', fn ($old) => isset($old) ? ++$old : null);
+
+        $this->assertEquals([
+            'posts' => [
+                (object) [
+                    'comments' => [
+                        (object) ['key' => 'posts.0.comments.0', 'order' => 2],
+                        (object) ['key' => 'posts.0.comments.1', 'order' => null],
+                    ],
+                ],
+                (object) [
+                    'comments' => [
+                        (object) ['key' => 'posts.1.comments.0', 'order' => null],
+                        (object) ['key' => 'posts.1.comments.1', 'order' => 3],
+                    ],
+                ],
+            ],
+        ], $data);
+    }
+
     public function testDataRemove()
     {
         $data = ['foo' => 'bar', 'hello' => 'world'];
