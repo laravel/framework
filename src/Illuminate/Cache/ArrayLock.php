@@ -82,7 +82,7 @@ class ArrayLock extends Lock
     /**
      * Returns the owner value written into the driver for this lock.
      *
-     * @return string
+     * @return string|null
      */
     protected function getCurrentOwner()
     {
