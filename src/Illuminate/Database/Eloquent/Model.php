@@ -13,6 +13,7 @@ use Illuminate\Contracts\Support\CanBeEscapedWhenCastToString;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Illuminate\Database\Eloquent\Attributes\Scope as LocalScope;
+use Illuminate\Database\Eloquent\Attributes\UseEloquentBuilder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
@@ -1651,7 +1652,34 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function newEloquentBuilder($query)
     {
+        $builderClass = $this->resolveCustomBuilderClass();
+
+        if ($builderClass !== null && is_subclass_of($builderClass, Builder::class)) {
+            return new $builderClass($query);
+        }
+
         return new static::$builder($query);
+    }
+
+    /**
+     * Resolve the custom Eloquent builder class from model attributes.
+     *
+     * @return class-string<\Illuminate\Database\Eloquent\Builder>|false
+     */
+    protected function resolveCustomBuilderClass()
+    {
+        $reflection = new \ReflectionClass($this);
+
+        $attributes = $reflection->getAttributes(UseEloquentBuilder::class);
+
+        if (! empty($attributes)) {
+            /** @var \Illuminate\Database\Eloquent\Attributes\UseEloquentBuilder $attribute */
+            $attribute = $attributes[0]->newInstance();
+
+            return $attribute->builderClass;
+        }
+
+        return false;
     }
 
     /**
