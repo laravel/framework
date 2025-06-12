@@ -166,7 +166,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
         }
 
         if (! $results) {
-            return $this;
+            return new static;
         }
 
         return new static(array_replace(...$results));
