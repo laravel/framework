@@ -2155,6 +2155,9 @@ trait HasAttributes
     {
         [$this->attributes, $this->changes, $this->previous] = [$this->original, [], []];
 
+        $this->classCastCache = [];
+        $this->attributeCastCache = [];
+
         return $this;
     }
 

@@ -297,6 +297,10 @@ class Str
      */
     public static function contains($haystack, $needles, $ignoreCase = false)
     {
+        if (is_null($haystack)) {
+            return false;
+        }
+
         if ($ignoreCase) {
             $haystack = mb_strtolower($haystack);
         }
@@ -384,12 +388,12 @@ class Str
      */
     public static function endsWith($haystack, $needles)
     {
-        if (! is_iterable($needles)) {
-            $needles = (array) $needles;
-        }
-
         if (is_null($haystack)) {
             return false;
+        }
+
+        if (! is_iterable($needles)) {
+            $needles = (array) $needles;
         }
 
         foreach ($needles as $needle) {
@@ -1638,12 +1642,12 @@ class Str
      */
     public static function startsWith($haystack, $needles)
     {
-        if (! is_iterable($needles)) {
-            $needles = [$needles];
-        }
-
         if (is_null($haystack)) {
             return false;
+        }
+
+        if (! is_iterable($needles)) {
+            $needles = [$needles];
         }
 
         foreach ($needles as $needle) {
