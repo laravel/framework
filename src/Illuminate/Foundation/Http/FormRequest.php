@@ -358,6 +358,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
 
     /**
      * Checks if the given target has the given property.
+     *
      * @param  object  $target
      * @param  string  $property
      * @return bool
@@ -381,6 +382,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
     {
         if ($target instanceof Model) {
             $target->{$property} = $value;
+
             return;
         }
 
@@ -404,6 +406,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
         $type = $reflection->getType();
         if ($type === null) {
             $target->{$property} = $value;
+
             return;
         }
 
