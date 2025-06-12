@@ -2,6 +2,12 @@
 
 namespace Illuminate\Contracts\Queue;
 
+/**
+ * @method int sizePending(string|null $queue = null)
+ * @method int sizeDelayed(string|null $queue = null)
+ * @method int sizeReserved(string|null $queue = null)
+ * @method int|null oldestPending(string|null $queue = null)
+ */
 interface Queue
 {
     /**
@@ -37,7 +43,6 @@ interface Queue
      *
      * @param  string  $payload
      * @param  string|null  $queue
-     * @param  array  $options
      * @return mixed
      */
     public function pushRaw($payload, $queue = null, array $options = []);
