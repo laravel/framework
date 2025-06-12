@@ -3372,12 +3372,18 @@ class DatabaseEloquentModelTest extends TestCase
     }
 }
 
-class CustomBuilder extends Builder {}
+class CustomBuilder extends Builder
+{
+}
 
 #[\Illuminate\Database\Eloquent\Attributes\UseEloquentBuilder(CustomBuilder::class)]
-class EloquentModelWithUseEloquentBuilderAttributeStub extends Model {}
+class EloquentModelWithUseEloquentBuilderAttributeStub extends Model
+{
+}
 
-class EloquentModelWithoutUseEloquentBuilderAttributeStub extends Model {}
+class EloquentModelWithoutUseEloquentBuilderAttributeStub extends Model
+{
+}
 
 class EloquentTestObserverStub
 {
