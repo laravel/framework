@@ -3,7 +3,7 @@
 namespace Illuminate\Support;
 
 use Closure;
-use Illuminate\Contracts\Support\ComputesOnceableHashInterface;
+use Illuminate\Contracts\Support\HasOnceHash;
 use Laravel\SerializableClosure\Support\ReflectionClosure;
 
 class Onceable
@@ -63,8 +63,8 @@ class Onceable
 
         $uses = array_map(
             static function (mixed $argument) {
-                if ($argument instanceof ComputesOnceableHashInterface) {
-                    return $argument->computeOnceableHash();
+                if ($argument instanceof HasOnceHash) {
+                    return $argument->onceHash();
                 }
 
                 if (is_object($argument)) {
